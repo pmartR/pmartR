@@ -56,7 +56,7 @@ meta_info \tab A logical argument, specifying where the \code{e_meta} is provide
 }
 }
 \examples{
-library(MSomicsDATA)
+library(pmartRdata)
 data("metab_edata")
 data("metab_fdata")
 mymetabData <- as.metabData(e_data = metab_edata, f_data = metab_fdata, edata_cname = "Metabolite", samp_cname = "SampleID")

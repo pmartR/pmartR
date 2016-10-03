@@ -44,7 +44,7 @@
 #' }
 #'
 #' @examples
-#' library(MSomicsDATA)
+#' library(pmartRdata)
 #' data("lipid_edata")
 #' data("lipid_fdata")
 #' mylipidData <- as.lipidData(e_data = lipid_edata, f_data = lipid_fdata, edata_cname = "LipidCommonName", samp_cname = "SampleID")

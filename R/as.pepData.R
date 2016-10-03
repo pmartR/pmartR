@@ -44,7 +44,7 @@
 #' }
 #'
 #' @examples
-#' library(MSomicsDATA)
+#' library(pmartRdata)
 #' data("pep_edata")
 #' data("pep_fdata")
 #' data("pep_emeta")

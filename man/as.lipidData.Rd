@@ -56,7 +56,7 @@ Computed values included in the \code{data_info} attribute are as follows:
 }
 }
 \examples{
-library(MSomicsDATA)
+library(pmartRdata)
 data("lipid_edata")
 data("lipid_fdata")
 mylipidData <- as.lipidData(e_data = lipid_edata, f_data = lipid_fdata, edata_cname = "LipidCommonName", samp_cname = "SampleID")

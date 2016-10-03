@@ -56,7 +56,7 @@ meta_info \tab A logical argument, specifying whether \code{e_meta} is provided.
 }
 }
 \examples{
-library(MSomicsDATA)
+library(pmartRdata)
 data("pep_edata")
 data("pep_fdata")
 data("pep_emeta")
