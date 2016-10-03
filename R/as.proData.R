@@ -25,8 +25,6 @@
 #' \tab \cr
 #' scale_param \tab A vector of normalization scale parameters for each sample. This is set to NULL if there are no scale parameters from normalization, or \code{data_norm} is FALSE. Default value is NULL.\cr
 #' \tab \cr
-#' #' filters \tab List to contain information about filters as they are applied to the data object. Information includes the filter type, a threshold value (if applicable), samples filtered, e_data identifiers filtered, and e_meta identifiers filtered. \cr
-#' \tab \cr
 #' data_types \tab Character string describing the type of data (e.g.'Positive ion'). Default value is NULL. \cr
 #' }
 #' Computed values included in the \code{data_info} attribute are as follows:
@@ -65,8 +63,7 @@ as.proData <- function(e_data, f_data, e_meta = NULL, ...){
 .as.proData <- function(e_data, f_data, e_meta = NULL, edata_cname = "Protein",
                         emeta_cname="NULL", samp_cname = "sampleID", data_scale = "log2",
                         data_norm = FALSE, norm_method=NULL,
-                        location_param=NULL, scale_param=NULL,
-                        filters=list(), data_types=NULL){
+                        location_param=NULL, scale_param=NULL, data_types=NULL){
   
   # initial checks #
   
