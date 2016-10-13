@@ -128,6 +128,18 @@ as.lipidData <- function(e_data, f_data, e_meta = NULL, ...){
     emeta_cname = NULL
   }
   
+  # check that e_data has unique rows #
+  if(nrow(e_data) == length(unique(e_data[, edata_cname]))){
+    e_data <- e_data
+  }else{
+    e_data_unique <- unique(e_data)
+    if(nrow(e_data_unique) == length(unique(e_data_unique[, edata_cname]))){
+      e_data <- e_data_unique
+    }else{
+      stop("The 'edata_cname' identifier is non-unique.")
+    }
+  }
+  
   # store results #
   res = list(e_data = e_data, f_data = f_data, e_meta = e_meta)
   
