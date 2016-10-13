@@ -96,7 +96,7 @@ as.metabData <- function(e_data, f_data, e_meta = NULL, ...){
   if(!(samp_cname %in% names(f_data))) stop(paste("Sample column ", samp_cname, " not found in f_data. See details of as.metabData for specifying column names.", sep = ""))
   
   # check that all samples in e_data are present in f_data #
-  edat_sampid = which(names(e_data) == samp_cname)
+  edat_sampid = which(names(e_data) == edata_cname)
   samps.miss = sum(!(names(e_data[,-edat_sampid]) %in% f_data[,samp_cname]))
   if( samps.miss > 0) stop(paste( samps.miss, " samples from e_data not found in f_data", sep = ""))
   
