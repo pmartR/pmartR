@@ -20,7 +20,7 @@
 #'
 #' @author Kelly Stratton
 #'
-#' @export
+
 
 
 all_subset <- function(e_data, edata_id){
@@ -59,7 +59,6 @@ all_subset <- function(e_data, edata_id){
 #'
 #' @author Kelly Stratton, Lisa Bramer
 #'
-#' @export
 
 
 los <- function(e_data, edata_id, L =.05){
@@ -123,7 +122,7 @@ los <- function(e_data, edata_id, L =.05){
 #'
 #' @author Kelly Stratton
 #'
-#' @export
+
 
 
 ppp <- function(e_data, edata_id, proportion=0.5){
@@ -179,7 +178,7 @@ ppp <- function(e_data, edata_id, proportion=0.5){
 #'
 #' @author Kelly Stratton
 #'
-#' @export
+
 
 
 ppp_rip <- function(e_data, edata_id, fdata_id, groupDF, alpha=0.2, proportion=0.5){
@@ -253,7 +252,7 @@ ppp_rip <- function(e_data, edata_id, fdata_id, groupDF, alpha=0.2, proportion=0
 #'
 #' @author Kelly Stratton
 #'
-#' @export
+
 
 
 rip <- function(e_data, edata_id, groupDF, alpha=.2){
