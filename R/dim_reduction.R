@@ -1,0 +1,59 @@
+#' Reduce Dimension of Data for Exploratory Data Analysis
+#'
+#' Calculate principal components using projection pursuit estimation, which implements an expectation-maximization (EM) estimation algorithm when data is missing.
+#'
+#' @param omicsData an object of the class 'pepdata', 'prodata', or 'genedata' usually created by \code{\link{as.pepdata}}, \code{\link{as.prodata}}, or \code{\link{as.genedata}}, respectively.
+#' @param k number of principal components to return
+#'
+#' @return a data.frame with first \code{k} principal component scores, sample identifiers, and group membership for each sample (if group designation was previously run on the data).
+#'
+#' @details Any biomoleculs seen in only one sample or with a variance less than 1E-6 across all samples are not included in the PCA calculations. This function leverages code from \code{\link[pcaMethods]{pca}}.
+#' @export
+#' @rdname dim_reduction
+#' @name dim_reduction
+#'
+
+dim_reduction <- function(omicsData, k){
+  # check that omicsData is of appropriate class #
+  if(!(class(omicsData) %in% c("pepData","proData","metabData", "lipidData"))) stop("omicsR_data must be an object of class 'pepdata','prodata', or 'genedata'.")
+
+  # check that group designation has been run #
+  if(!("group_DF" %in% names(attributes(omicsData)))) warning("group_designation has not been run on this data and may limit plotting options")
+
+  # data should be log transformed #
+  if(!attr(omicsData, "data_info")$data_scale %in% c("log2", "log10", "log")){
+    warning("omicsData$e_data should be log transformed prior to calling dim_reduction. See documentation for edata_transform function for more information.")
+  }
+
+  samp_id = attr(omicsData, "cnames")$fdata_cname
+  pep_id = attr(omicsData, "cnames")$edata_cname
+
+  temp_data = omicsData$e_data[, -which(names(omicsData$e_data) == pep_id)]
+
+  ## check for samples seen in only one sample or no samples and remove ##
+  minsamps = which(apply(!is.na(temp_data), 1, sum) < 2)
+  if(length(minsamps) > 0){
+    temp_data = temp_data[-minsamps,]
+  }
+
+  ## check for near zero variance features and remove ##
+  minvars = which(apply(temp_data, 1, var, na.rm = T) < 0.000001)
+  if(length(minvars) > 0){
+    temp_data[-minvars, ]
+  }
+
+  pca_res = pcaMethods::pca(object = as.matrix(t(temp_data)), method = "ppca", scale = "vector", nPcs = k)
+  pca_ests = pca_res@scores[,1:k]
+
+  temp_res = data.frame(SampleID = names(temp_data), pca_ests)
+
+  class(temp_res) <- "dimRes"
+
+  if(!is.null(attr(omicsData, "group_DF"))){
+  attr(temp_res, "group_DF") <- attr(omicsData, "group_DF")
+  }else{attr(temp_res, "group_DF") <- NULL}
+
+  attr(temp_res, "R2") <- pca_res@R2
+
+  return(temp_res)
+}

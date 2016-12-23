@@ -12,14 +12,18 @@
 #' @return An object of the same class as the input \code{omicsData} object - the provided object with the samples filtered out, if any NAs were produced in designating groups. An attribute 'group_DF', a data.frame with columns for sample id and group, is added to the object. If two main effects are provided the original main effect levels for each sample are returned as the third and fourth columns of the data.frame. If time_course is included, a column for 'TimeCourse' will be output as well. Additionally, the covariates provided will be listed as attributes of this data.frame.
 #'
 #' @examples
+#' dontrun{
 #' library(pmartRdata)
-#' data(lipid_object)
-#' lipid_object2 <- group_designation(omicsData = lipid_object, main_effects = "Condition")
-#' attr(lipid_object2, "group_DF")
+#' data(lipid_lipidData)
+#' lipid_lipidData2 <- group_designation(omicsData = lipid_lipidData, main_effects = "Condition")
+#' attr(lipid_lipidData2, "group_DF")
+#'}
 #'
 #' @author Lisa Bramer, Kelly Stratton
 #'
 #' @export
+
+
 group_designation <- function(omicsData, main_effects, covariates=NULL, time_course=NULL){
 
   ### perform some intial checks that data is in an acceptable format ###
@@ -63,8 +67,9 @@ group_designation <- function(omicsData, main_effects, covariates=NULL, time_cou
   # store f_data temporarily #
   temp_data = omicsData$f_data
 
+
   # pull sample id column name #
-  samp_id = attr(omicsData, "cnames")$samp_cname
+  samp_id = attr(omicsData, "cnames")$fdata_cname
 
   # Get number of main effects #
   n.maineffects = length(main_effects)
@@ -85,6 +90,8 @@ group_designation <- function(omicsData, main_effects, covariates=NULL, time_cou
 
     # get main effect variables #
     obs.effects = temp_data[,names(temp_data)%in% main_effects]
+    obs.effects <- apply(obs.effects, 2, as.character)
+
 
     # create a group variable and paste main effect levels together for samples #
     # samples with a value of NA for either main effect will have a Group value of NA #
@@ -119,11 +126,11 @@ group_designation <- function(omicsData, main_effects, covariates=NULL, time_cou
     }
 
     # output a warning message listing the groups and samples that are removed (7/8/2016 KS)
-    sm.samps = as.character(output$Names[is.na(output$Group)])
+    sm.samps = as.character(output[is.na(output$Group), samp_id])
     n.samps = length(sm.samps)
-    mystr <- paste("The following ", n.sm.groups, " groups have been removed from the dataset due to a group size of less than 2 samples: \n", sep="")
+    mystr <- paste("The following ", n.sm.groups, " groups have been removed from the dataset due to a group size of less than 2 samples: ", sep="")
     mystr2 <- paste(as.character(sm.groups), sep="' '", collapse=", ")
-    mystr3 <- paste("\n\nThis corresponds to the following", n.samps, " samples: \n", sep="")
+    mystr3 <- paste(". This corresponds to the following ", n.samps, " samples: ", sep="")
     mystr4 <- paste(as.character(sm.samps), sep="' '", collapse=", ")
     warning(paste(mystr, mystr2, mystr3, mystr4, sep=""))
   }
@@ -137,7 +144,17 @@ group_designation <- function(omicsData, main_effects, covariates=NULL, time_cou
       for(i in 1:n.sm.groups){
         output$TimeCourse[output$TimeCourse==sm.groups[i]] = NA
       }
-     }
+    }
+
+    # output a warning message listing the groups and samples that are removed (7/8/2016 KS)
+    sm.samps = as.character(output[is.na(output$TimeCourse), samp_id])
+    n.samps = length(sm.samps)
+    mystr <- paste("The following ", n.sm.groups, " time courses have been removed from the dataset due to a time course size of less than 2 samples: ", sep="")
+    mystr2 <- paste(as.character(sm.groups), sep="' '", collapse=", ")
+    mystr3 <- paste(". This corresponds to the following ", n.samps, " samples: ", sep="")
+    mystr4 <- paste(as.character(sm.samps), sep="' '", collapse=", ")
+    warning(paste(mystr, mystr2, mystr3, mystr4, sep=""))
+
   }
 
   # find any samples with NA for group membership #
@@ -175,13 +192,13 @@ group_designation <- function(omicsData, main_effects, covariates=NULL, time_cou
   emeta_cname = attributes(omicsData)$cnames$emeta_cname
   attributes(omicsData)$data_info$num_edata = length(unique(omicsData$e_data[, edata_cname]))
   attributes(omicsData)$data_info$num_miss_obs = sum(is.na(omicsData$e_data[,-which(names(omicsData$e_data)==edata_cname)]))
-  attributes(omicsData)$data_info$num_frac_missing = mean(is.na(omicsData$e_data[,-which(names(omicsData$e_data)==edata_cname)]))
+  attributes(omicsData)$data_info$num_prop_missing = mean(is.na(omicsData$e_data[,-which(names(omicsData$e_data)==edata_cname)]))
   attributes(omicsData)$data_info$num_samps = ncol(omicsData$e_data) - 1
 
   if(!is.null(omicsData$e_meta)){
     # number of unique proteins that map to a peptide in e_data #
     if(!is.null(emeta_cname)){
-      num_emeta = length(unique(omicsData$e_meta[which(as.character(omicsData$e_meta[, edata_cname]) %in% as.character(omicsData$e_data[, edata_cname])), emeta_cname]))
+      num_emeta = length(unique(omicsData$e_meta[which(as.character(omicsData$e_meta[, which(names(omicsData$e_meta) == edata_cname)]) %in% as.character(omicsData$e_data[, edata_cname])), emeta_cname]))
     }else{num_emeta = NULL}
   }else{
     num_emeta = NULL
