@@ -12,9 +12,9 @@
 #' @examples
 #' dontrun{
 #' library(pmartRdata)
-#' data("pep_pepData")
-#' pep_pepData2 <- group_designation(omicsData = pep_pepData, main_effects = "Condition")
-#' to_filter <- cv_filter(omicsData = pep_pepData2)
+#' data("pep_object")
+#' pep_object2 <- group_designation(omicsData = pep_object, main_effects = "Condition")
+#' to_filter <- cv_filter(omicsData = pep_object2)
 #' summary(to_filter, cv_threshold = 30)
 #'}
 #'

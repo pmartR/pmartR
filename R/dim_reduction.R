@@ -3,17 +3,28 @@
 #' Calculate principal components using projection pursuit estimation, which implements an expectation-maximization (EM) estimation algorithm when data is missing.
 #'
 #' @param omicsData an object of the class 'pepdata', 'prodata', or 'genedata' usually created by \code{\link{as.pepdata}}, \code{\link{as.prodata}}, or \code{\link{as.genedata}}, respectively.
-#' @param k number of principal components to return
+#' @param k integer number of principal components to return. Defaults to 2.
 #'
 #' @return a data.frame with first \code{k} principal component scores, sample identifiers, and group membership for each sample (if group designation was previously run on the data).
 #'
 #' @details Any biomoleculs seen in only one sample or with a variance less than 1E-6 across all samples are not included in the PCA calculations. This function leverages code from \code{\link[pcaMethods]{pca}}.
+#' 
+#' @examples 
+#' dontrun{
+#' library(pmartRdata)
+#' data(lipid_object)
+#' lipid_object <- edata_transform(omicsData = lipid_object, data_scale="log2")
+#' lipid_object <- group_designation(omicsData = lipid_object, main_effects = "Condition")
+#' pca_lipids <- dim_reduction(omicsData = lipid_object)
+#' plot(pca_lipids)
+#' summary(pca_lipids)
+#' }
+#' 
 #' @export
 #' @rdname dim_reduction
 #' @name dim_reduction
 #'
-
-dim_reduction <- function(omicsData, k){
+dim_reduction <- function(omicsData, k = 2){
   # check that omicsData is of appropriate class #
   if(!(class(omicsData) %in% c("pepData","proData","metabData", "lipidData"))) stop("omicsR_data must be an object of class 'pepdata','prodata', or 'genedata'.")
 

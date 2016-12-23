@@ -37,11 +37,12 @@
 #' }
 #'
 #' @examples
+#' dontrun{
 #' library(pmartRdata)
 #' data("lipid_edata")
 #' data("lipid_fdata")
 #' mylipidData <- as.lipidData(e_data = lipid_edata, f_data = lipid_fdata, edata_cname = "LipidCommonName", fdata_cname = "SampleID")
-#'
+#'}
 #'
 #' @author Lisa Bramer, Kelly Stratton
 #' @seealso \code{\link{as.metabData}}

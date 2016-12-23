@@ -11,11 +11,12 @@
 #' @return data object of the same class as omicsData
 #'
 #' @examples
+#' dontrun{
 #' library(pmartRdata)
-#' data(metab_metabData)
-#' metab_metabData2 <- edata_transform(omicsData = metab_metabData, data_scale="log2")
-#' attr(metab_metabData2, "data_info")$data_scale
-#'
+#' data(metab_object)
+#' metab_object2 <- edata_transform(omicsData = metab_object, data_scale="log2")
+#' attr(metab_object2, "data_info")$data_scale
+#'}
 #' @author Kelly Stratton, Natalie Heller
 #'
 #' @export
@@ -219,7 +220,7 @@ edata_transform.proData <- function(omicsData, data_scale, check.names=TRUE){
   }
 
   # create an updated proData object #
-  updated_data <- as.proData(e_data = edata_new, f_data = omicsData$f_data, e_meta = omicsData$e_meta, edata_cname = edata_id, emeta_cname=emeta_cname, fdata_cname = attr(omicsData, "cnames")$fdata_cname, data_scale = data_scale, data_norm = attr(omicsData, "data_info")$data_norm, norm_method=attr(omicsData, "data_info")$norm_method, data_types=attr(omicsData, "data_info")$data_types)
+  updated_data <- as.proData(e_data = edata_new, f_data = omicsData$f_data, e_meta = omicsData$e_meta, edata_cname = edata_id, emeta_cname=emeta_cname, fdata_cname = attr(omicsData, "cnames")$fdata_cname, data_scale = data_scale, data_norm = attr(omicsData, "data_info")$data_norm, data_types=attr(omicsData, "data_info")$data_types)
 
   attributes(updated_data)$group_DF <- attributes(omicsData)$group_DF
 
@@ -309,7 +310,7 @@ edata_transform.metabData <- function(omicsData, data_scale, check.names=TRUE){
   }
 
   # create an updated metabData object #
-  updated_data <- as.metabData(e_data = edata_new, f_data = omicsData$f_data, e_meta = omicsData$e_meta, edata_cname = edata_id, emeta_cname=emeta_cname, fdata_cname = attr(omicsData, "cnames")$fdata_cname, data_scale = data_scale, data_norm = attr(omicsData, "data_info")$data_norm, norm_method=attr(omicsData, "data_info")$norm_method, data_types=attr(omicsData, "data_info")$data_types)
+  updated_data <- as.metabData(e_data = edata_new, f_data = omicsData$f_data, e_meta = omicsData$e_meta, edata_cname = edata_id, emeta_cname=emeta_cname, fdata_cname = attr(omicsData, "cnames")$fdata_cname, data_scale = data_scale, data_norm = attr(omicsData, "data_info")$data_norm, data_types=attr(omicsData, "data_info")$data_types)
 
   attributes(updated_data)$group_DF <- attributes(omicsData)$group_DF
 
@@ -398,7 +399,7 @@ edata_transform.lipidData <- function(omicsData, data_scale, check.names=TRUE){
   }
 
   # create an updated lipidData object #
-  updated_data <- as.lipidData(e_data = edata_new, f_data = omicsData$f_data, e_meta = omicsData$e_meta, edata_cname = edata_id, emeta_cname=emeta_cname, fdata_cname = attr(omicsData, "cnames")$fdata_cname, data_scale = data_scale, data_norm = attr(omicsData, "data_info")$data_norm, norm_method=attr(omicsData, "data_info")$norm_method, data_types=attr(omicsData, "data_info")$data_types)
+  updated_data <- as.lipidData(e_data = edata_new, f_data = omicsData$f_data, e_meta = omicsData$e_meta, edata_cname = edata_id, emeta_cname=emeta_cname, fdata_cname = attr(omicsData, "cnames")$fdata_cname, data_scale = data_scale, data_norm = attr(omicsData, "data_info")$data_norm, data_types=attr(omicsData, "data_info")$data_types)
 
   attributes(updated_data)$group_DF <- attributes(omicsData)$group_DF
 

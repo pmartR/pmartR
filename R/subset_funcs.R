@@ -12,7 +12,7 @@
 #' @return Character vector containing all features.
 #'
 #' @examples
-#' \dontrun{
+#' dontrun{
 #' library(pmartRdata)
 #' data(pep_edata)
 #' keep <- none_subset(e_data = pep_edata, edata_id = "Mass_Tag_ID")

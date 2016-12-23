@@ -12,10 +12,10 @@
 #' @examples
 #' dontrun{
 #' library(pmartRdata)
-#' data("metab_metabData")
-#' to_filter <- custom_filter(metab_metabData, e_data_remove = "fumaric acid", f_data_remove = "Infection1")
+#' data("metab_object")
+#' to_filter <- custom_filter(metab_object, e_data_remove = "fumaric acid", f_data_remove = "Infection1")
 #' summary(to_filter)
-#' to_filter2 <- custom_filter(metab_metabData, e_data_remove = "fumaric acid")
+#' to_filter2 <- custom_filter(metab_object, e_data_remove = "fumaric acid")
 #' summary(to_filter2)
 #'}
 #'

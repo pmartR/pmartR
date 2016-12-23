@@ -49,6 +49,17 @@
 #'
 #'
 #' @return If apply_norm is FALSE, an S3 object of type 'normRes' is returned. This object contains a list with: subset method, normalization method, normalization parameters, number of features used in normalization, and proportion of features used in normalization. plot() and summary() methods are available for this object. If apply_norm is TRUE, then the normalized data is returned in an object of the appropriate S3 class (e.g. pepData).
+#' 
+#' @examples
+#' dontrun{
+#' library(pmartRdata)
+#' data(lipid_object)
+#' lipid_object <- edata_transform(omicsData = lipid_object, data_scale="log2")
+#' lipid_object <- group_designation(omicsData = lipid_object, main_effects = "Condition")
+#' norm_object <- normalize(omicsData = lipid_object, subset_fn = "all", norm_fn = "median")
+#' norm_object <- normalize(omicsData = lipid_object, subset_fn = "all", norm_fn = "median", apply_norm = FALSE, backtransform = TRUE)
+#' norm_data <- normalize(omicsData = lipid_object, subset_fn = "all", norm_fn = "median", apply_norm = TRUE, backtransform = TRUE)
+#'}
 #'
 #' @author Lisa Bramer
 #' @references

@@ -18,10 +18,10 @@
 #' @examples
 #' dontrun{
 #' library(MSomicsQC)
-#' data(pep_pepData)
-#' pep_pepData2 <- group_designation(omicsData = pep_pepData, main_effects = "Condition")
-#' nonmissing_result <- nonmissing_per_group(omicsData = pep_pepData2)
-#' to_filter <- gtest_filter(nonmiss_per_group = nonmissing_result, omicsData = pep_pepData2, min_nonmiss_gtest = 3)
+#' data(pep_object)
+#' pep_object2 <- group_designation(omicsData = pep_object, main_effects = "Condition")
+#' nonmissing_result <- nonmissing_per_group(omicsData = pep_object2)
+#' to_filter <- gtest_filter(nonmiss_per_group = nonmissing_result, omicsData = pep_object2, min_nonmiss_gtest = 3)
 #'}
 #'
 #' @author Kelly Stratton

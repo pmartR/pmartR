@@ -37,12 +37,13 @@
 #' }
 #'
 #' @examples
+#' dontrun{
 #' library(pmartRdata)
 #' data("pep_edata")
 #' data("pep_fdata")
 #' data("pep_emeta")
 #' mypepData <- as.pepData(e_data = pep_edata, e_meta = pep_emeta, f_data = pep_fdata, edata_cname = "Mass_Tag_ID", fdata_cname = "SampleID", emeta_cname = "Mass_Tag_ID")
-#'
+#'}
 #' @author Kelly Stratton, Lisa Bramer
 #' @seealso \code{\link{as.proData}}
 #' @seealso \code{\link{as.lipidData}}

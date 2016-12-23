@@ -9,10 +9,11 @@
 #' @return An \eqn{n \times n} matrix giving the correlation between samples.
 #'
 #' @examples
+#' dontrun{
 #' library(MSomicsQC)
-#' data(pep_pepData)
-#' my_correlation <- cor_result(omicsData = pep_pepData)
-#'
+#' data(pep_object)
+#' my_correlation <- cor_result(omicsData = pep_object)
+#'}
 #' @author Kelly Stratton, Lisa Bramer
 #'
 #' @export

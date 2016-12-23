@@ -14,9 +14,9 @@
 #' @examples
 #' dontrun{
 #' library(pmartRdata)
-#' data(lipid_lipidData)
-#' lipid_lipidData2 <- group_designation(omicsData = lipid_lipidData, main_effects = "Condition")
-#' attr(lipid_lipidData2, "group_DF")
+#' data(lipid_object)
+#' lipid_object2 <- group_designation(omicsData = lipid_object, main_effects = "Condition")
+#' attr(lipid_object2, "group_DF")
 #'}
 #'
 #' @author Lisa Bramer, Kelly Stratton

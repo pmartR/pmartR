@@ -12,8 +12,8 @@
 #' @examples
 #' dontrun{
 #' library(pmartRdata)
-#' data("pep_pepData")
-#' to_filter <- molecule_filter(omicsData = pep_pepData)
+#' data("pep_object")
+#' to_filter <- molecule_filter(omicsData = pep_object)
 #' summary(to_filter, min_num = 2)
 #'}
 #'

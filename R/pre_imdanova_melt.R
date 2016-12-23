@@ -8,10 +8,6 @@
 #'
 #' @return a data.frame of class "grouped_dt" which is compatible with functions in the dplyr package
 #'
-#' @examples
-#' library(pmartRdata)
-#' data(pep_pepData)
-#'
 #'
 #' @author Lisa Bramer, Kelly Stratton
 
