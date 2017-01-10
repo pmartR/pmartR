@@ -12,7 +12,9 @@ LazyData: TRUE
 URL: https://github.com/pmartR/pmartRqc
 BugReports: https://github.com/pmartR/pmartRqc/issues
 VignetteBuilder: knitr
+LinkingTo: Rcpp
 Imports:
+    Rcpp (>= 0.12.8),
     data.table,
     dplyr,
     ggplot2,
