@@ -32,7 +32,7 @@ imdanova_filter <- function(omicsData){ #}, filter_method, min_nonmiss_gtest=3, 
   # omicsData must include groupDF information #
   # if(!is.null(omicsData)){
   e_data <- omicsData$e_data
-  mintR_groupDF <- attr(omicsData, "group_DF")
+  groupDF <- attr(omicsData, "group_DF")
 
 
   ## end of initial checks ##
@@ -41,30 +41,30 @@ imdanova_filter <- function(omicsData){ #}, filter_method, min_nonmiss_gtest=3, 
   edata_id <- attr(omicsData, "cnames")$edata_cname
   emeta_id <- attr(omicsData, "cnames")$emeta_cname
 
-  # if mintR_groupDF has column for TimeCourse, do the following within time point (do not re-compute mintR_groupDF including TimeCourse as main effect--this was our old strategy but Bobbie-Jo directed us to not do this, and instead loop through time points)
-  if(any(names(mintR_groupDF)=="TimeCourse")){
+  # if groupDF has column for TimeCourse, do the following within time point (do not re-compute groupDF including TimeCourse as main effect--this was our old strategy but Bobbie-Jo directed us to not do this, and instead loop through time points)
+  if(any(names(groupDF)=="TimeCourse")){
 
-#     filt.edata <- vector(mode = "list", length = length(unique(mintR_groupDF$TimeCourse)))
-#     names(filt.edata) <- unique(mintR_groupDF$TimeCourse)
+#     filt.edata <- vector(mode = "list", length = length(unique(groupDF$TimeCourse)))
+#     names(filt.edata) <- unique(groupDF$TimeCourse)
 #
-#     for(tind in 1:length(unique(mintR_groupDF$TimeCourse))){
+#     for(tind in 1:length(unique(groupDF$TimeCourse))){
 #
-#       t = unique(mintR_groupDF$TimeCourse)[tind]
-#       t.e_data <- cbind(e_data[,1], e_data[, names(e_data) %in% as.character(mintR_groupDF[,samp_id][mintR_groupDF$TimeCourse==t])])
+#       t = unique(groupDF$TimeCourse)[tind]
+#       t.e_data <- cbind(e_data[,1], e_data[, names(e_data) %in% as.character(groupDF[,samp_id][groupDF$TimeCourse==t])])
 #       names(t.e_data)[1] <- names(e_data)[1]
 #
-#       t.mintR_groupDF <- mintR_groupDF[mintR_groupDF$TimeCourse==t, ]
-#       #all(names(t.e_data)[-1] == t.mintR_groupDF$sampleID) # just checking, should be TRUE
+#       t.groupDF <- groupDF[groupDF$TimeCourse==t, ]
+#       #all(names(t.e_data)[-1] == t.groupDF$sampleID) # just checking, should be TRUE
 #
-#       nonmiss_per_group <- nonmissing_per_group(omicsData=NULL, e_data=t.e_data, mintR_groupDF=t.mintR_groupDF, cname_id=edata_id, samp_id=samp_id)
+#       nonmiss_per_group <- nonmissing_per_group(omicsData=NULL, e_data=t.e_data, groupDF=t.groupDF, cname_id=edata_id, samp_id=samp_id)
 #       if(filter_method=="anova"){
 #         filt.edata[[tind]] <- anova_filter(nonmiss_per_group=nonmiss_per_group, min_nonmiss_anova=min_nonmiss_anova, cname_id = edata_id)
 #       }else{
 #         if(filter_method=="gtest"){
-#           filt.edata[[tind]] <- gtest_filter(nonmiss_per_group=nonmiss_per_group, mintR_groupDF=t.mintR_groupDF, e_data=t.e_data, alpha=alpha, min_nonmiss_gtest=min_nonmiss_gtest, cname_id = edata_id, samp_id = samp_id)
+#           filt.edata[[tind]] <- gtest_filter(nonmiss_per_group=nonmiss_per_group, groupDF=t.groupDF, e_data=t.e_data, alpha=alpha, min_nonmiss_gtest=min_nonmiss_gtest, cname_id = edata_id, samp_id = samp_id)
 #         }else{
 #           if(filter_method=="combined"){
-#             filt.edata.gtest <- gtest_filter(nonmiss_per_group, mintR_groupDF=t.mintR_groupDF, e_data=t.e_data, alpha=alpha, min_nonmiss_gtest=min_nonmiss_gtest, cname_id = edata_id)
+#             filt.edata.gtest <- gtest_filter(nonmiss_per_group, groupDF=t.groupDF, e_data=t.e_data, alpha=alpha, min_nonmiss_gtest=min_nonmiss_gtest, cname_id = edata_id)
 #             #           min.nonmiss.allowed <- 2
 #             filt.edata.anova <- anova_filter(nonmiss_per_group, min_nonmiss_anova, cname_id = edata_id)
 #             filt.edata[[tind]] <- intersect(filt.edata.anova, filt.edata.gtest)
@@ -85,10 +85,10 @@ imdanova_filter <- function(omicsData){ #}, filter_method, min_nonmiss_gtest=3, 
 #       filter.edata <- anova_filter(nonmiss_per_group=nonmiss_per_group, min_nonmiss_anova=min_nonmiss_anova, cname_id = edata_id)
 #     }else{
 #       if(filter_method=="gtest"){
-#         filter.edata <- gtest_filter(nonmiss_per_group=nonmiss_per_group, mintR_groupDF=mintR_groupDF, e_data=e_data, alpha=NULL, min_nonmiss_gtest=min_nonmiss_gtest, cname_id = edata_id, samp_id = samp_id)
+#         filter.edata <- gtest_filter(nonmiss_per_group=nonmiss_per_group, groupDF=groupDF, e_data=e_data, alpha=NULL, min_nonmiss_gtest=min_nonmiss_gtest, cname_id = edata_id, samp_id = samp_id)
 #       }else{
 #         if(filter_method=="combined"){
-#           filter.edata.gtest <- gtest_filter(nonmiss_per_group=nonmiss_per_group, mintR_groupDF=mintR_groupDF, e_data=e_data, alpha=NULL, min_nonmiss_gtest=min_nonmiss_gtest, cname_id = edata_id, samp_id = samp_id)
+#           filter.edata.gtest <- gtest_filter(nonmiss_per_group=nonmiss_per_group, groupDF=groupDF, e_data=e_data, alpha=NULL, min_nonmiss_gtest=min_nonmiss_gtest, cname_id = edata_id, samp_id = samp_id)
 #           #           min.nonmiss.allowed <- 2
 #           filter.edata.anova <- anova_filter(nonmiss_per_group=nonmiss_per_group, min_nonmiss_anova=min_nonmiss_anova, cname_id = edata_id)
 #           filter.edata <- intersect(filter.edata.anova, filter.edata.gtest)

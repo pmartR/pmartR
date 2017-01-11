@@ -4,14 +4,14 @@
 \alias{gtest_filter}
 \title{Identifies peptides to be filtered out in preparation for IMD-ANOVA.}
 \usage{
-gtest_filter(nonmiss_per_group, mintR_groupDF = NULL, omicsData = NULL,
+gtest_filter(nonmiss_per_group, groupDF = NULL, omicsData = NULL,
   e_data = NULL, alpha = NULL, min_nonmiss_gtest = NULL,
   cname_id = NULL, samp_id = NULL)
 }
 \arguments{
 \item{nonmiss_per_group}{list created by \code{\link{nonmissing_per_group}}. The first element giving the total number of possible samples for each group. The second element giving a data.frame with the first column giving the biomolecule and the second through kth columns giving the number of non-missing observations for each of the \code{k} groups.}
 
-\item{mintR_groupDF}{data.frame created by \code{group_designation} with columns for sampleID and Group. If omicsData is supplied, this argument is optional; if e_data is supplied, this argument is required. If two main effects are provided the original main effect levels for each sample are returned as the third and fourth columns of the data.frame.}
+\item{groupDF}{data.frame created by \code{group_designation} with columns for sampleID and Group. If omicsData is supplied, this argument is optional; if e_data is supplied, this argument is required. If two main effects are provided the original main effect levels for each sample are returned as the third and fourth columns of the data.frame.}
 
 \item{omicsData}{an optional object of one of the classes "pepData", "proData", "lipidData", or "metabData" usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.lipidData}}, or \code{\link{as.metabData}}, respectively.}
 
@@ -37,10 +37,10 @@ Two methods are available for determining the peptides to be filtered. The naive
 \examples{
 dontrun{
 library(MSomicsQC)
-data(pep_pepData)
-pep_pepData2 <- group_designation(omicsData = pep_pepData, main_effects = "Condition")
-nonmissing_result <- nonmissing_per_group(omicsData = pep_pepData2)
-to_filter <- gtest_filter(nonmiss_per_group = nonmissing_result, omicsData = pep_pepData2, min_nonmiss_gtest = 3)
+data(pep_object)
+pep_object2 <- group_designation(omicsData = pep_object, main_effects = "Condition")
+nonmissing_result <- nonmissing_per_group(omicsData = pep_object2)
+to_filter <- gtest_filter(nonmiss_per_group = nonmissing_result, omicsData = pep_object2, min_nonmiss_gtest = 3)
 }
 
 }
