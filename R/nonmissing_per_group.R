@@ -58,7 +58,7 @@ nonmissing_per_group <- function(omicsData = NULL, e_data = NULL, groupDF=NULL, 
 
 
   # melt the data by peptide and merge with groupDF then group by peptide and group #
-  melt.data = MSomicsQC:::pre_imdanova_melt(e_data = e_data, groupDF = groupDF, samp_id = samp_id)
+  melt.data = pre_imdanova_melt(e_data = e_data, groupDF = groupDF, samp_id = samp_id)
   names(melt.data)[2] <- "Peptide" # set this explicitly now, and then before we return the function output, reset "Peptide" to cname_id
   # class(melt.data) ## "grouped_dt" "tbl_dt"     "tbl"        "data.table" "data.frame" --> this doesn't work with dplyr::summarise
   class(melt.data) <- c("grouped_df", "tbl_df", "tbl", "data.frame")
