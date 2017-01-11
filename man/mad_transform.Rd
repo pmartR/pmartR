@@ -45,12 +45,12 @@ Calculate normalization parameters for the data via median absolute deviation (M
 Each feature is scaled by subtracting the median of the feature subset specified for normalization and then dividing the result by the median absolute deviation (MAD) of the feature subset specified for normalization to get the normalized data. The location estimates are the subset medians for each sample. The scale estimates are the subset MADs for each sample. Medians are taken ignoring any NA values. If backtransform is TRUE, the normalized feature values are multiplied by a pooled MAD (estimated from all samples) and a global median of the subset data (across all samples) is added back to the normalized values.
 }
 \examples{
-\dontrun{
+dontrun{
 library(pmartRdata)
-data(lipid_lipidData)
-lipid_lipidData2 <- group_designation(omicsData = lipid_lipidData, main_effects = "Condition")
-lipid_subset <- los(e_data = lipid_lipidData2$e_data, edata_id = attr(lipid_lipidData2, "cnames")$edata_cname, mintR_groupDF = attr(lipid_lipidData2, "group_DF"))
-lipids_mad <- mad_transform(e_data = lipid_lipidData2$e_data, edata_id = attr(lipid_lipidData, "cnames")$edata_cname, feature_subset = lipid_subset, backtransform = TRUE)
+data(lipid_object)
+lipid_object2 <- group_designation(omicsData = lipid_object, main_effects = "Condition")
+lipid_subset <- los(e_data = lipid_object2$e_data, edata_id = attr(lipid_object2, "cnames")$edata_cname, mintR_groupDF = attr(lipid_object2, "group_DF"))
+lipids_mad <- mad_transform(e_data = lipid_object2$e_data, edata_id = attr(lipid_object, "cnames")$edata_cname, feature_subset = lipid_subset, backtransform = TRUE)
 }
 }
 \author{

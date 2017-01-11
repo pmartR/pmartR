@@ -4,12 +4,12 @@
 \alias{dim_reduction}
 \title{Reduce Dimension of Data for Exploratory Data Analysis}
 \usage{
-dim_reduction(omicsData, k)
+dim_reduction(omicsData, k = 2)
 }
 \arguments{
 \item{omicsData}{an object of the class 'pepdata', 'prodata', or 'genedata' usually created by \code{\link{as.pepdata}}, \code{\link{as.prodata}}, or \code{\link{as.genedata}}, respectively.}
 
-\item{k}{number of principal components to return}
+\item{k}{integer number of principal components to return. Defaults to 2.}
 }
 \value{
 a data.frame with first \code{k} principal component scores, sample identifiers, and group membership for each sample (if group designation was previously run on the data).
@@ -19,5 +19,17 @@ Calculate principal components using projection pursuit estimation, which implem
 }
 \details{
 Any biomoleculs seen in only one sample or with a variance less than 1E-6 across all samples are not included in the PCA calculations. This function leverages code from \code{\link[pcaMethods]{pca}}.
+}
+\examples{
+dontrun{
+library(pmartRdata)
+data(lipid_object)
+lipid_object <- edata_transform(omicsData = lipid_object, data_scale="log2")
+lipid_object <- group_designation(omicsData = lipid_object, main_effects = "Condition")
+pca_lipids <- dim_reduction(omicsData = lipid_object)
+plot(pca_lipids)
+summary(pca_lipids)
+}
+
 }
 

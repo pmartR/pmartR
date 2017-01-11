@@ -45,11 +45,11 @@ lipidData \tab For lipidData objects, , the use of "Proportion_Missing" is disco
 \examples{
 dontrun{
 library(pmartRdata)
-data(metab_metabData)
-metab_metabData2 <- edata_transform(omicsData = metab_metabData, data_scale = "log2")
-metab_metabData3 <- group_designation(omicsData = metab_metabData2, main_effects = "Condition")
-rmd_results <- rmd_filter(omicsData = metab_metabData3, metrics=c("MAD", "Skewness", "Correlation"))
-rmd_results <- rmd_filter(omicsData = metab_metabData2)
+data(metab_object)
+metab_object2 <- edata_transform(omicsData = metab_object, data_scale = "log2")
+metab_object3 <- group_designation(omicsData = metab_object2, main_effects = "Condition")
+rmd_results <- rmd_filter(omicsData = metab_object3, metrics=c("MAD", "Skewness", "Correlation"))
+rmd_results <- rmd_filter(omicsData = metab_object2)
 
 data(pep_pepData)
 pep_pepData2 <- edata_transform(omicsData = pep_pepData, data_scale = "log2")

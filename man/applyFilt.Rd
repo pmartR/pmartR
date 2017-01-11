@@ -69,14 +69,13 @@ There are no futher arguments for a \code{filter_object} of type 'customFilt'.
 \examples{
 dontrun{
 library(pmartRdata)
-data("pep_pepData")
-to_filter <- molecule_filter(omicsData = pep_pepData)
-pep_pepData2 <- apply(filter_object = to_filter, omicsData = pep_pepData, min_num = 2)
-print(str(attributes(pep_pepData2)$filters))
-
-to_filter2 <- imdanova_filter(omicsData = pep_pepData2)
-pep_pepData3 <- apply(filter_object = to_filter2, omicsData = pep_pepData2, min_num_peps = 4)
-print(str(attributes(pep_pepData3)$filters))
+data("pep_object")
+to_filter <- molecule_filter(omicsData = pep_object)
+pep_object2 <- apply(filter_object = to_filter, omicsData = pep_object, min_num = 2)
+print(str(attributes(pep_object2)$filters))
+to_filter2 <- imdanova_filter(omicsData = pep_object2)
+pep_object3 <- apply(filter_object = to_filter2, omicsData = pep_object2, min_num_peps = 4)
+print(str(attributes(pep_object3)$filters))
 }
 
 }

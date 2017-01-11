@@ -19,10 +19,11 @@ This function returns an object of class corRes (correlation Result)
 The Pearson correlation between samples is calculated based on biomolecules that are observed in both samples.  the \eqn{n \times n} correlation matrix of normalized data. See \code{\link{cor}} for further details.
 }
 \examples{
+dontrun{
 library(MSomicsQC)
-data(pep_pepData)
-my_correlation <- cor_result(omicsData = pep_pepData)
-
+data(pep_object)
+my_correlation <- cor_result(omicsData = pep_object)
+}
 }
 \author{
 Kelly Stratton, Lisa Bramer

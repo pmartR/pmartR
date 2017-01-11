@@ -19,12 +19,6 @@ a data.frame of class "grouped_dt" which is compatible with functions in the dpl
 \description{
 This function creates a melted version of e_data, grouped by edata_id and group designation, for future use of implementing a IMD_ANOVA filter
 }
-\examples{
-library(pmartRdata)
-data(pep_pepData)
-
-
-}
 \author{
 Lisa Bramer, Kelly Stratton
 }

@@ -201,25 +201,26 @@ For plotting an S3 object of type 'imdanovaFilt':
 }
 }
 \examples{
+donrun{
 library(pmartRdata)
-data("pep_pepData")
-cor_matrix <- cor_result(pep_pepData)
+data("pep_object")
+cor_matrix <- cor_result(pep_object)
 plot(cor_matrix)
 plot(cor_matrix, interactive = TRUE)
 
-to_filter <- molecule_filter(pep_pepData)
+to_filter <- molecule_filter(pep_object)
 plot(to_filter, min_num = 4)
 
-data("pro_proData")
-plot(pro_proData)
-plot(pro_proData, order_by = "Condition")
-plot(pro_proData, color_by = "Condition")
-plot(pro_proData, facet_by = "Condition")
-plot(pro_proData, facet_by = "Condition", facet_cols = 1)
+data("pro_object")
+plot(pro_object)
+plot(pro_object, order_by = "Condition")
+plot(pro_object, color_by = "Condition")
+plot(pro_object, facet_by = "Condition")
+plot(pro_object, facet_by = "Condition", facet_cols = 1)
 
-pep_pepData2 <- group_designation(pep_pepData, main_effects = "Condition")
-pca_res <- dim_reduction(pep_pepData2, k = 2)
+pep_object2 <- group_designation(pep_object, main_effects = "Condition")
+pca_res <- dim_reduction(pep_object2, k = 2)
 plot(pca_res)
-
+}
 }
 

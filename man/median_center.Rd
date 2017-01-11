@@ -47,10 +47,10 @@ The sample-wise median of the feature subset specified for normalization is subt
 \examples{
 \dontrun{
 library(pmartRdata)
-data(lipid_lipidData)
-lipid_lipidData2 <- group_designation(omicsData = lipid_lipidData, main_effects = "Condition")
-lipid_subset <- los(e_data = lipid_lipidData2$e_data, edata_id = attr(lipid_lipidData2, "cnames")$edata_cname, mintR_groupDF = attr(lipid_lipidData2, "group_DF"))
-lipids_median <- median_center(e_data = lipid_lipidData2$e_data, edata_id = attr(lipid_lipidData, "cnames")$edata_cname, feature_subset = lipid_subset, backtransform = TRUE)
+data(lipid_object)
+lipid_object2 <- group_designation(omicsData = lipid_object, main_effects = "Condition")
+lipid_subset <- los(e_data = lipid_object2$e_data, edata_id = attr(lipid_object2, "cnames")$edata_cname, mintR_groupDF = attr(lipid_object2, "group_DF"))
+lipids_median <- median_center(e_data = lipid_object2$e_data, edata_id = attr(lipid_object, "cnames")$edata_cname, feature_subset = lipid_subset, backtransform = TRUE)
 }
 
 }

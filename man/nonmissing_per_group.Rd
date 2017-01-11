@@ -27,10 +27,10 @@ This function computes the number of non-missing observations for samples, based
 \examples{
 dontrun{
 library(pmartRdata)
-data(pep_pepData)
-pep_pepData2 <- group_designation(omicsData = pep_pepData, main_effects = "Condition")
-nonmissing_result <- nonmissing_per_group(omicsData = pep_pepData2)
-nonmissing_result <- nonmissing_per_group(e_data = pep_pepData2$e_data, groupDF = attr(pep_pepData2, "group_DF"), cname_id = attr(pep_pepData2, "cnames")$edata_cname, samp_id = attr(pep_pepData2, "cnames")$fdata_cname)
+data(pep_object)
+pep_object2 <- group_designation(omicsData = pep_object, main_effects = "Condition")
+nonmissing_result <- nonmissing_per_group(omicsData = pep_object2)
+nonmissing_result <- nonmissing_per_group(e_data = pep_object2$e_data, groupDF = attr(pep_object2, "group_DF"), cname_id = attr(pep_object2, "cnames")$edata_cname, samp_id = attr(pep_object2, "cnames")$fdata_cname)
 }
 
 }

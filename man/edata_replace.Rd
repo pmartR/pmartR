@@ -37,10 +37,11 @@ This function finds all values of x in the e_data element of omicsData and repla
 This function is often used to replace any 0 values in peptide, protein, metabolite, or lipid data with NA's.
 }
 \examples{
+dontrun{
 library(pmartRdata)
-data(metab_metabData)
-metab_metabData2 <- edata_replace(omicsData = metab_metabData, x=0, y=NA)
-
+data(metab_object)
+metab_object2 <- edata_replace(omicsData = metab_object, x=0, y=NA)
+}
 }
 \author{
 Kelly Stratton

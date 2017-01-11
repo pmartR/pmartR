@@ -70,6 +70,18 @@ The purpose of back transforming data is to ensure values are on a scale similar
 \cr
 }
 }
+\examples{
+dontrun{
+library(pmartRdata)
+data(lipid_object)
+lipid_object <- edata_transform(omicsData = lipid_object, data_scale="log2")
+lipid_object <- group_designation(omicsData = lipid_object, main_effects = "Condition")
+norm_object <- normalize(omicsData = lipid_object, subset_fn = "all", norm_fn = "median")
+norm_object <- normalize(omicsData = lipid_object, subset_fn = "all", norm_fn = "median", apply_norm = FALSE, backtransform = TRUE)
+norm_data <- normalize(omicsData = lipid_object, subset_fn = "all", norm_fn = "median", apply_norm = TRUE, backtransform = TRUE)
+}
+
+}
 \author{
 Lisa Bramer
 }

@@ -78,10 +78,9 @@ This function will provide basic summary statistics for objects from the MSomics
 \examples{
 dontrun{
 library(pmartRdata)
-data("pep_pepData")
-summary(pep_pepData)
-
-to_filter <- molecule_filter(pep_pepData)
+data("pep_object")
+summary(pep_object)
+to_filter <- molecule_filter(pep_object)
 summary(to_filter)
 summary(to_filter, min_num = 4)
 }

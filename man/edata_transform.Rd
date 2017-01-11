@@ -35,11 +35,12 @@ This function applies a transformation to the e_data element of omicsData
 This function is intended to be used before analysis of the data begins. Data are typically analyzed on a log scale.
 }
 \examples{
+dontrun{
 library(pmartRdata)
-data(metab_metabData)
-metab_metabData2 <- edata_transform(omicsData = metab_metabData, data_scale="log2")
-attr(metab_metabData2, "data_info")$data_scale
-
+data(metab_object)
+metab_object2 <- edata_transform(omicsData = metab_object, data_scale="log2")
+attr(metab_object2, "data_info")$data_scale
+}
 }
 \author{
 Kelly Stratton, Natalie Heller
