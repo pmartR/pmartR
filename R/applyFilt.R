@@ -124,7 +124,7 @@ applyFilt.moleculeFilt <- function(filter_object, omicsData, min_num=2){
 
 
     # call the function that does the filter application
-    results_pieces <- MSomicsQC:::MSomics_filter_worker(omicsData = omicsData, filter_object = filter_object_new)
+    results_pieces <- MSomics_filter_worker(omicsData = omicsData, filter_object = filter_object_new)
 
     # return filtered data object #
     results <- omicsData
@@ -197,7 +197,7 @@ applyFilt.cvFilt <- function(filter_object, omicsData, cv_threshold = 150){
     filter_object_new = list(edata_filt = p_filt, emeta_filt = NULL, samples_filt = NULL)
 
     # call the function that does the filter application
-    results_pieces <- MSomicsQC:::MSomics_filter_worker(omicsData = omicsData, filter_object = filter_object_new)
+    results_pieces <- MSomics_filter_worker(omicsData = omicsData, filter_object = filter_object_new)
 
     # return filtered data object #
     results <- omicsData
@@ -277,7 +277,7 @@ applyFilt.rmdFilt <- function(filter_object, omicsData, pvalue_threshold=0.001){
     filter_object_new = list(edata_filt = NULL, emeta_filt = NULL, samples_filt = samp_filt)
 
     # call the function that does the filter application
-    results_pieces <- MSomicsQC:::MSomics_filter_worker(omicsData = omicsData, filter_object = filter_object_new)
+    results_pieces <- MSomics_filter_worker(omicsData = omicsData, filter_object = filter_object_new)
 
     # return filtered data object #
     results <- omicsData
@@ -411,7 +411,7 @@ applyFilt.proteomicsFilt <- function(filter_object, omicsData, min_num_peps=NULL
 
 
     # call the function that does the filter application
-    results_pieces <- MSomicsQC:::MSomics_filter_worker(omicsData = omicsData, filter_object = filter_object_new)
+    results_pieces <- MSomics_filter_worker(omicsData = omicsData, filter_object = filter_object_new)
 
     # return filtered data object #
     results <- omicsData
@@ -546,7 +546,7 @@ applyFilt.imdanovaFilt <- function(filter_object, omicsData, min_nonmiss_anova=N
     filter_object_new = list(edata_filt = filter.edata, emeta_filt = NULL, samples_filt = NULL)
 
     # call the function that does the filter application
-    results_pieces <- MSomicsQC:::MSomics_filter_worker(omicsData = omicsData, filter_object = filter_object_new)
+    results_pieces <- MSomics_filter_worker(omicsData = omicsData, filter_object = filter_object_new)
 
     # return filtered data object #
     omicsData$e_data <- results_pieces$temp.pep2
@@ -638,7 +638,7 @@ applyFilt.customFilt <- function(filter_object, omicsData){
 
 
   # call the function that does the filter application
-  results_pieces <- MSomicsQC:::MSomics_filter_worker(omicsData = omicsData, filter_object = filter_object_new)
+  results_pieces <- MSomics_filter_worker(omicsData = omicsData, filter_object = filter_object_new)
 
   # return filtered data object #
   results <- omicsData

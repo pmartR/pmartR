@@ -888,7 +888,7 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
   ## if facet_by is not null and isn't the same as either order_by or color_by ##
   if(!is.null(facet_by)) {
     if(!(facet_by %in% c(order_by, color_by))) {
-      facet_temp <- MSomicsQC::group_designation(omicsData, main_effects = facet_by)
+      facet_temp <- group_designation(omicsData, main_effects = facet_by)
       facetDF <- attributes(facet_temp)$group_DF
       colnames(facetDF) <- c("variable", facet_by)
 
@@ -920,7 +920,7 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     ## if order_by is not null and color_by is ##
   } else if(!is.null(order_by) & is.null(color_by)) {
     if(order_by != "group_DF") {
-      order_temp <- MSomicsQC::group_designation(omicsData, main_effects = order_by)
+      order_temp <- group_designation(omicsData, main_effects = order_by)
     } else {
       order_temp <- omicsData
     }
@@ -954,7 +954,7 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     ## if color_by is not null and order_by is ##
   } else if(!is.null(color_by) & is.null(order_by)) {
     if(color_by != "group_DF") {
-      color_temp <- MSomicsQC::group_designation(omicsData, main_effects = color_by)
+      color_temp <- group_designation(omicsData, main_effects = color_by)
     } else {
       color_temp <- omicsData
     }
@@ -984,7 +984,7 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     ## if neither order_by or color_by are null ##
   } else if(!is.null(order_by) & !is.null(color_by)) {
     if(order_by != "group_DF") {
-      order_temp <- MSomicsQC::group_designation(omicsData, main_effects = order_by)
+      order_temp <- group_designation(omicsData, main_effects = order_by)
     } else {
       order_temp <- omicsData
     }
@@ -992,7 +992,7 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     colnames(orderDF)[1:2] <- c("variable", order_by)
 
     if(color_by != "group_DF") {
-      color_temp <- MSomicsQC::group_designation(omicsData, main_effects = color_by)
+      color_temp <- group_designation(omicsData, main_effects = color_by)
     } else {
       color_temp <- omicsData
     }
@@ -1101,7 +1101,7 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
   ## if facet_by is not null and isn't the same as either order_by or color_by ##
   if(!is.null(facet_by)) {
     if(!(facet_by %in% c(order_by, color_by))) {
-      facet_temp <- MSomicsQC::group_designation(omicsData, main_effects = facet_by)
+      facet_temp <- group_designation(omicsData, main_effects = facet_by)
       facetDF <- attributes(facet_temp)$group_DF
       colnames(facetDF) <- c("variable", facet_by)
 
@@ -1133,7 +1133,7 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     ## if order_by is not null and color_by is ##
   } else if(!is.null(order_by) & is.null(color_by)) {
     if(order_by != "group_DF") {
-      order_temp <- MSomicsQC::group_designation(omicsData, main_effects = order_by)
+      order_temp <- group_designation(omicsData, main_effects = order_by)
     } else {
       order_temp <- omicsData
     }
@@ -1167,7 +1167,7 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     ## if color_by is not null and order_by is ##
   } else if(!is.null(color_by) & is.null(order_by)) {
     if(color_by != "group_DF") {
-      color_temp <- MSomicsQC::group_designation(omicsData, main_effects = color_by)
+      color_temp <- group_designation(omicsData, main_effects = color_by)
     } else {
       color_temp <- omicsData
     }
@@ -1197,7 +1197,7 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     ## if neither order_by or color_by are null ##
   } else if(!is.null(order_by) & !is.null(color_by)) {
     if(order_by != "group_DF") {
-      order_temp <- MSomicsQC::group_designation(omicsData, main_effects = order_by)
+      order_temp <- group_designation(omicsData, main_effects = order_by)
     } else {
       order_temp <- omicsData
     }
@@ -1205,7 +1205,7 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     colnames(orderDF)[1:2] <- c("variable", order_by)
 
     if(color_by != "group_DF") {
-      color_temp <- MSomicsQC::group_designation(omicsData, main_effects = color_by)
+      color_temp <- group_designation(omicsData, main_effects = color_by)
     } else {
       color_temp <- omicsData
     }
@@ -1314,7 +1314,7 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
   ## if facet_by is not null and isn't the same as either order_by or color_by ##
   if(!is.null(facet_by)) {
     if(!(facet_by %in% c(order_by, color_by))) {
-      facet_temp <- MSomicsQC::group_designation(omicsData, main_effects = facet_by)
+      facet_temp <- group_designation(omicsData, main_effects = facet_by)
       facetDF <- attributes(facet_temp)$group_DF
       colnames(facetDF) <- c("variable", facet_by)
 
@@ -1346,7 +1346,7 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     ## if order_by is not null and color_by is ##
   } else if(!is.null(order_by) & is.null(color_by)) {
     if(order_by != "group_DF") {
-      order_temp <- MSomicsQC::group_designation(omicsData, main_effects = order_by)
+      order_temp <- group_designation(omicsData, main_effects = order_by)
     } else {
       order_temp <- omicsData
     }
@@ -1369,7 +1369,7 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     ## if color_by is not null and order_by is ##
   } else if(!is.null(color_by) & is.null(order_by)) {
     if(color_by != "group_DF") {
-      color_temp <- MSomicsQC::group_designation(omicsData, main_effects = color_by)
+      color_temp <- group_designation(omicsData, main_effects = color_by)
     } else {
       color_temp <- omicsData
     }
@@ -1400,7 +1400,7 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     ## if neither order_by or color_by are null ##
   } else if(!is.null(order_by) & !is.null(color_by)) {
     if(order_by != "group_DF") {
-      order_temp <- MSomicsQC::group_designation(omicsData, main_effects = order_by)
+      order_temp <- group_designation(omicsData, main_effects = order_by)
     } else {
       order_temp <- omicsData
     }
@@ -1408,7 +1408,7 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     colnames(orderDF)[1:2] <- c("variable", order_by)
 
     if(color_by != "group_DF") {
-      color_temp <- MSomicsQC::group_designation(omicsData, main_effects = color_by)
+      color_temp <- group_designation(omicsData, main_effects = color_by)
     } else {
       color_temp <- omicsData
     }
@@ -1518,7 +1518,7 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
   ## if facet_by is not null and isn't the same as either order_by or color_by ##
   if(!is.null(facet_by)) {
     if(!(facet_by %in% c(order_by, color_by))) {
-      facet_temp <- MSomicsQC::group_designation(omicsData, main_effects = facet_by)
+      facet_temp <- group_designation(omicsData, main_effects = facet_by)
       facetDF <- attributes(facet_temp)$group_DF
       colnames(facetDF) <- c("variable", facet_by)
 
@@ -1550,7 +1550,7 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     ## if order_by is not null and color_by is ##
   } else if(!is.null(order_by) & is.null(color_by)) {
     if(order_by != "group_DF") {
-      order_temp <- MSomicsQC::group_designation(omicsData, main_effects = order_by)
+      order_temp <- group_designation(omicsData, main_effects = order_by)
     } else {
       order_temp <- omicsData
     }
@@ -1584,7 +1584,7 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     ## if color_by is not null and order_by is ##
   } else if(!is.null(color_by) & is.null(order_by)) {
     if(color_by != "group_DF") {
-      color_temp <- MSomicsQC::group_designation(omicsData, main_effects = color_by)
+      color_temp <- group_designation(omicsData, main_effects = color_by)
     } else {
       color_temp <- omicsData
     }
@@ -1614,7 +1614,7 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     ## if neither order_by or color_by are null ##
   } else if(!is.null(order_by) & !is.null(color_by)) {
     if(order_by != "group_DF") {
-      order_temp <- MSomicsQC::group_designation(omicsData, main_effects = order_by)
+      order_temp <- group_designation(omicsData, main_effects = order_by)
     } else {
       order_temp <- omicsData
     }
@@ -1622,7 +1622,7 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     colnames(orderDF)[1:2] <- c("variable", order_by)
 
     if(color_by != "group_DF") {
-      color_temp <- MSomicsQC::group_designation(omicsData, main_effects = color_by)
+      color_temp <- group_designation(omicsData, main_effects = color_by)
     } else {
       color_temp <- omicsData
     }
@@ -1871,7 +1871,7 @@ plot.normRes <- function(normData, order_by = NULL, color_by = NULL, ...) {
   # ## if facet_by is not null and isn't the same as either order_by or color_by ##
   # if(!is.null(facet_by)) {
   #   if(!(facet_by %in% c(order_by, color_by))) {
-  #     facet_temp <- MSomicsQC::group_designation(normData, main_effects = facet_by)
+  #     facet_temp <- group_designation(normData, main_effects = facet_by)
   #     facetDF <- attributes(facet_temp)$group_DF
   #     colnames(facetDF) <- c("variable", facet_by)
   #
@@ -1905,7 +1905,7 @@ plot.normRes <- function(normData, order_by = NULL, color_by = NULL, ...) {
     ## if order_by is not null and color_by is ##
   } else if(!is.null(order_by) & is.null(color_by)) {
     if(order_by != "group_DF") {
-      order_temp <- MSomicsQC::group_designation(omicsData, main_effects = order_by)
+      order_temp <- group_designation(omicsData, main_effects = order_by)
     } else {
       order_temp <- omicsData
     }
@@ -1939,7 +1939,7 @@ plot.normRes <- function(normData, order_by = NULL, color_by = NULL, ...) {
     ## if color_by is not null and order_by is ##
   } else if(!is.null(color_by) & is.null(order_by)) {
     if(color_by != "group_DF") {
-      color_temp <- MSomicsQC::group_designation(omicsData, main_effects = color_by)
+      color_temp <- group_designation(omicsData, main_effects = color_by)
     } else {
       color_temp <- omicsData
     }
@@ -1969,7 +1969,7 @@ plot.normRes <- function(normData, order_by = NULL, color_by = NULL, ...) {
     ## if neither order_by or color_by are null ##
   } else if(!is.null(order_by) & !is.null(color_by)) {
     if(order_by != "group_DF") {
-      order_temp <- MSomicsQC::group_designation(omicsData, main_effects = order_by)
+      order_temp <- group_designation(omicsData, main_effects = order_by)
     } else {
       order_temp <- omicsData
     }
@@ -1977,7 +1977,7 @@ plot.normRes <- function(normData, order_by = NULL, color_by = NULL, ...) {
     colnames(orderDF)[1:2] <- c("variable", order_by)
 
     if(color_by != "group_DF") {
-      color_temp <- MSomicsQC::group_designation(omicsData, main_effects = color_by)
+      color_temp <- group_designation(omicsData, main_effects = color_by)
     } else {
       color_temp <- omicsData
     }
@@ -2068,7 +2068,7 @@ plot.normRes <- function(normData, order_by = NULL, color_by = NULL, ...) {
     ## if order_by is not null and color_by is ##
   } else if(!is.null(order_by) & is.null(color_by)) {
     if(order_by != "group_DF") {
-      order_temp <- MSomicsQC::group_designation(omicsData, main_effects = order_by)
+      order_temp <- group_designation(omicsData, main_effects = order_by)
     } else {
       order_temp <- omicsData
     }
@@ -2102,7 +2102,7 @@ plot.normRes <- function(normData, order_by = NULL, color_by = NULL, ...) {
     ## if color_by is not null and order_by is ##
   } else if(!is.null(color_by) & is.null(order_by)) {
     if(color_by != "group_DF") {
-      color_temp <- MSomicsQC::group_designation(omicsData, main_effects = color_by)
+      color_temp <- group_designation(omicsData, main_effects = color_by)
     } else {
       color_temp <- omicsData
     }
@@ -2132,7 +2132,7 @@ plot.normRes <- function(normData, order_by = NULL, color_by = NULL, ...) {
     ## if neither order_by or color_by are null ##
   } else if(!is.null(order_by) & !is.null(color_by)) {
     if(order_by != "group_DF") {
-      order_temp <- MSomicsQC::group_designation(omicsData, main_effects = order_by)
+      order_temp <- group_designation(omicsData, main_effects = order_by)
     } else {
       order_temp <- omicsData
     }
@@ -2140,7 +2140,7 @@ plot.normRes <- function(normData, order_by = NULL, color_by = NULL, ...) {
     colnames(orderDF)[1:2] <- c("variable", order_by)
 
     if(color_by != "group_DF") {
-      color_temp <- MSomicsQC::group_designation(omicsData, main_effects = color_by)
+      color_temp <- group_designation(omicsData, main_effects = color_by)
     } else {
       color_temp <- omicsData
     }

@@ -88,14 +88,14 @@ rmd_filter.pepData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewness
   metrics = tolower(metrics)
   metrics_final = rep(NA, 5)
 
-  rmd.vals = data.frame(Sample.ID = MSomicsQC:::run_prop_missing(dat_only)[,1])
+  rmd.vals = data.frame(Sample.ID = run_prop_missing(dat_only)[,1])
 
   if(any(metrics %in% c("mad", "m", "median absolute deviation", "median_absolute_deviation"))){
     ind = which(metrics %in% c("mad", "m", "median absolute deviation", "median_absolute_deviation"))
     if(length(ind)>1){stop("More than one of the entries in metric matches to use of MAD.")}
     metrics = metrics[-ind]
     metrics_final[1] = 1
-    rmd.vals$MAD = MSomicsQC:::run_mad(dat_only)[,2]
+    rmd.vals$MAD = run_mad(dat_only)[,2]
   }
 
   if(any(metrics %in% c("kurtosis", "kurt", "k"))){
@@ -103,7 +103,7 @@ rmd_filter.pepData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewness
     if(length(ind)>1){stop("More than one of the entries in metric matches to use of Kurtosis.")}
     metrics = metrics[-ind]
     metrics_final[2] = 1
-    rmd.vals$Kurtosis = MSomicsQC:::run_kurtosis(dat_only)[,2]
+    rmd.vals$Kurtosis = run_kurtosis(dat_only)[,2]
   }
 
   if(any(metrics %in% c("skew", "s", "skewness"))){
@@ -111,7 +111,7 @@ rmd_filter.pepData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewness
     if(length(ind)>1){stop("More than one of the entries in metric matches to use of Skew.")}
     metrics = metrics[-ind]
     metrics_final[3] = 1
-    rmd.vals$Skewness = MSomicsQC:::run_skewness(dat_only)[,2]
+    rmd.vals$Skewness = run_skewness(dat_only)[,2]
   }
 
   if(any(metrics %in% c("corr", "c", "cor", "correlation"))){
@@ -119,7 +119,7 @@ rmd_filter.pepData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewness
     if(length(ind)>1){stop("More than one of the entries in metric matches to use of Correlation.")}
     metrics = metrics[-ind]
     metrics_final[4] = 1
-    rmd.vals$Corr = MSomicsQC:::run_group_meancor(omicsData, mintR_groupDF)[,2]
+    rmd.vals$Corr = run_group_meancor(omicsData, mintR_groupDF)[,2]
   }
 
   if(any(metrics %in% c("proportion_missing", "p", "prop_missing", "prop_miss", "proportion_miss", "prop", "proportion", "proportion missing", "prop miss", "proportion miss"))){
@@ -127,7 +127,7 @@ rmd_filter.pepData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewness
     if(length(ind)>1){stop("More than one of the entries in metric matches to use of Proportion_Missing.")}
     metrics = metrics[-ind]
     metrics_final[5] = 1
-    rmd.vals$Proportion_Missing = MSomicsQC:::run_prop_missing(dat_only)[,2]
+    rmd.vals$Proportion_Missing = run_prop_missing(dat_only)[,2]
   }
 
   if(sum(metrics_final, na.rm=TRUE)<2){stop("Vector of metrics must contain at least two valid entries.")}
@@ -204,14 +204,14 @@ rmd_filter.proData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewness
   metrics = tolower(metrics)
   metrics_final = rep(NA, 5)
 
-  rmd.vals = data.frame(Sample.ID = MSomicsQC:::run_prop_missing(dat_only)[,1])
+  rmd.vals = data.frame(Sample.ID = run_prop_missing(dat_only)[,1])
 
   if(any(metrics %in% c("mad", "m", "median absolute deviation", "median_absolute_deviation"))){
     ind = which(metrics %in% c("mad", "m", "median absolute deviation", "median_absolute_deviation"))
     if(length(ind)>1){stop("More than one of the entries in metric matches to use of MAD.")}
     metrics = metrics[-ind]
     metrics_final[1] = 1
-    rmd.vals$MAD = MSomicsQC:::run_mad(dat_only)[,2]
+    rmd.vals$MAD = run_mad(dat_only)[,2]
   }
 
   if(any(metrics %in% c("kurtosis", "kurt", "k"))){
@@ -219,7 +219,7 @@ rmd_filter.proData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewness
     if(length(ind)>1){stop("More than one of the entries in metric matches to use of Kurtosis.")}
     metrics = metrics[-ind]
     metrics_final[2] = 1
-    rmd.vals$Kurtosis = MSomicsQC:::run_kurtosis(dat_only)[,2]
+    rmd.vals$Kurtosis = run_kurtosis(dat_only)[,2]
   }
 
   if(any(metrics %in% c("skew", "s", "skewness"))){
@@ -227,7 +227,7 @@ rmd_filter.proData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewness
     if(length(ind)>1){stop("More than one of the entries in metric matches to use of Skew.")}
     metrics = metrics[-ind]
     metrics_final[3] = 1
-    rmd.vals$Skewness = MSomicsQC:::run_skewness(dat_only)[,2]
+    rmd.vals$Skewness = run_skewness(dat_only)[,2]
   }
 
   if(any(metrics %in% c("corr", "c", "cor", "correlation"))){
@@ -235,7 +235,7 @@ rmd_filter.proData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewness
     if(length(ind)>1){stop("More than one of the entries in metric matches to use of Correlation.")}
     metrics = metrics[-ind]
     metrics_final[4] = 1
-    rmd.vals$Corr = MSomicsQC:::run_group_meancor(omicsData, mintR_groupDF)[,2]
+    rmd.vals$Corr = run_group_meancor(omicsData, mintR_groupDF)[,2]
   }
 
   if(any(metrics %in% c("proportion_missing", "p", "prop_missing", "prop_miss", "proportion_miss", "prop", "proportion", "proportion missing", "prop miss", "proportion miss"))){
@@ -243,7 +243,7 @@ rmd_filter.proData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewness
     if(length(ind)>1){stop("More than one of the entries in metric matches to use of Proportion_Missing.")}
     metrics = metrics[-ind]
     metrics_final[5] = 1
-    rmd.vals$Proportion_Missing = MSomicsQC:::run_prop_missing(dat_only)[,2]
+    rmd.vals$Proportion_Missing = run_prop_missing(dat_only)[,2]
   }
 
   if(sum(metrics_final, na.rm=TRUE)<2){stop("Vector of metrics must contain at least two valid entries.")}
@@ -316,14 +316,14 @@ rmd_filter.lipidData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewne
   metrics = tolower(metrics)
   metrics_final = rep(NA, 5)
 
-  rmd.vals = data.frame(Sample.ID = MSomicsQC:::run_prop_missing(dat_only)[,1])
+  rmd.vals = data.frame(Sample.ID = run_prop_missing(dat_only)[,1])
 
   if(any(metrics %in% c("mad", "m", "median absolute deviation", "median_absolute_deviation"))){
     ind = which(metrics %in% c("mad", "m", "median absolute deviation", "median_absolute_deviation"))
     if(length(ind)>1){stop("More than one of the entries in metric matches to use of MAD.")}
     metrics = metrics[-ind]
     metrics_final[1] = 1
-    rmd.vals$MAD = MSomicsQC:::run_mad(dat_only)[,2]
+    rmd.vals$MAD = run_mad(dat_only)[,2]
   }
 
   if(any(metrics %in% c("kurtosis", "kurt", "k"))){
@@ -331,7 +331,7 @@ rmd_filter.lipidData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewne
     if(length(ind)>1){stop("More than one of the entries in metric matches to use of Kurtosis.")}
     metrics = metrics[-ind]
     metrics_final[2] = 1
-    rmd.vals$Kurtosis = MSomicsQC:::run_kurtosis(dat_only)[,2]
+    rmd.vals$Kurtosis = run_kurtosis(dat_only)[,2]
   }
 
   if(any(metrics %in% c("skew", "s", "skewness"))){
@@ -339,7 +339,7 @@ rmd_filter.lipidData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewne
     if(length(ind)>1){stop("More than one of the entries in metric matches to use of Skew.")}
     metrics = metrics[-ind]
     metrics_final[3] = 1
-    rmd.vals$Skewness = MSomicsQC:::run_skewness(dat_only)[,2]
+    rmd.vals$Skewness = run_skewness(dat_only)[,2]
   }
 
   if(any(metrics %in% c("corr", "c", "cor", "correlation"))){
@@ -347,7 +347,7 @@ rmd_filter.lipidData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewne
     if(length(ind)>1){stop("More than one of the entries in metric matches to use of Correlation.")}
     metrics = metrics[-ind]
     metrics_final[4] = 1
-    rmd.vals$Corr = MSomicsQC:::run_group_meancor(omicsData, mintR_groupDF)[,2]
+    rmd.vals$Corr = run_group_meancor(omicsData, mintR_groupDF)[,2]
   }
 
   if(any(metrics %in% c("proportion_missing", "p", "prop_missing", "prop_miss", "proportion_miss", "prop", "proportion", "proportion missing", "prop miss", "proportion miss"))){
@@ -363,7 +363,7 @@ rmd_filter.lipidData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewne
       if(length(ind)>1){stop("More than one of the entries in metric matches to use of Proportion_Missing.")}
       metrics = metrics[-ind]
       metrics_final[5] = 1
-      rmd.vals$Proportion_Missing = MSomicsQC:::run_prop_missing(dat_only)[,2]
+      rmd.vals$Proportion_Missing = run_prop_missing(dat_only)[,2]
 
       ## proceed, to check the rank of cov.mat ##
       # in case the user input 'enough' metrics (2-5) but they were not recognized by the code as valid entries #
@@ -471,14 +471,14 @@ rmd_filter.metabData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewne
   metrics_final = rep(NA, 5)
   metrics_orig = metrics
 
-  rmd.vals = data.frame(Sample.ID = MSomicsQC:::run_prop_missing(dat_only)[,1])
+  rmd.vals = data.frame(Sample.ID = run_prop_missing(dat_only)[,1])
 
   if(any(metrics %in% c("mad", "m", "median absolute deviation", "median_absolute_deviation"))){
     ind = which(metrics %in% c("mad", "m", "median absolute deviation", "median_absolute_deviation"))
     if(length(ind)>1){stop("More than one of the entries in metric matches to use of MAD.")}
     metrics = metrics[-ind]
     metrics_final[1] = 1
-    rmd.vals$MAD = MSomicsQC:::run_mad(dat_only)[,2]
+    rmd.vals$MAD = run_mad(dat_only)[,2]
   }
 
   if(any(metrics %in% c("kurtosis", "kurt", "k"))){
@@ -486,7 +486,7 @@ rmd_filter.metabData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewne
     if(length(ind)>1){stop("More than one of the entries in metric matches to use of Kurtosis.")}
     metrics = metrics[-ind]
     metrics_final[2] = 1
-    rmd.vals$Kurtosis = MSomicsQC:::run_kurtosis(dat_only)[,2]
+    rmd.vals$Kurtosis = run_kurtosis(dat_only)[,2]
   }
 
   if(any(metrics %in% c("skew", "s", "skewness"))){
@@ -494,7 +494,7 @@ rmd_filter.metabData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewne
     if(length(ind)>1){stop("More than one of the entries in metric matches to use of Skew.")}
     metrics = metrics[-ind]
     metrics_final[3] = 1
-    rmd.vals$Skewness = MSomicsQC:::run_skewness(dat_only)[,2]
+    rmd.vals$Skewness = run_skewness(dat_only)[,2]
   }
 
   if(any(metrics %in% c("corr", "c", "cor", "correlation"))){
@@ -502,7 +502,7 @@ rmd_filter.metabData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewne
     if(length(ind)>1){stop("More than one of the entries in metric matches to use of Correlation.")}
     metrics = metrics[-ind]
     metrics_final[4] = 1
-    rmd.vals$Corr = MSomicsQC:::run_group_meancor(omicsData, mintR_groupDF)[,2]
+    rmd.vals$Corr = run_group_meancor(omicsData, mintR_groupDF)[,2]
   }
 
   if(any(metrics %in% c("proportion_missing", "p", "prop_missing", "prop_miss", "proportion_miss", "prop", "proportion", "proportion missing", "prop miss", "proportion miss"))){
@@ -518,7 +518,7 @@ rmd_filter.metabData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewne
       if(length(ind)>1){stop("More than one of the entries in metric matches to use of Proportion_Missing.")}
       metrics = metrics[-ind]
       metrics_final[5] = 1
-      rmd.vals$Proportion_Missing = MSomicsQC:::run_prop_missing(dat_only)[,2]
+      rmd.vals$Proportion_Missing = run_prop_missing(dat_only)[,2]
 
       ## proceed, to check the rank of cov.mat ##
       # in case the user input 'enough' metrics (2-5) but they were not recognized by the code as valid entries #
