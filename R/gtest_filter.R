@@ -112,7 +112,7 @@ gtest_filter <- function(nonmiss_per_group, groupDF=NULL, omicsData=NULL, e_data
       cur.data <- rep(NA, length(groupDF$Sample.ID))
       cur.data[inds==TRUE] <- c(rep(1, group.size))
       cur.data <- t(data.frame(cur.data))
-      if(mintR:::gtest_vector(cur.data, groupDF$Group)$pvalues > alpha){
+      if(gtest_vector(cur.data, groupDF$Group)$pvalues > alpha){
         # if the pvalue is big (i.e. > alpha) when all data is present in 1 group but not the others, then we don't need to go through the while loop because the G-test will never be significant
         num.nonmiss <- 0 #max(table(groupDF$Group)) + 1000
       }else{ # find the smallest number of peptide identifications that must be present in 1 group in order for the G-test to be significant
@@ -126,7 +126,7 @@ gtest_filter <- function(nonmiss_per_group, groupDF=NULL, omicsData=NULL, e_data
           inds[is.na(inds)] <- FALSE # set any missing values to FALSE
 
           cur.data[inds] <- c(rep(1, num.nonmiss), rep(NA, length(groupDF$Group[inds])-num.nonmiss))
-          pval <- mintR:::gtest_vector(cur.data, groupDF$Group)$pvalues
+          pval <- gtest_vector(cur.data, groupDF$Group)$pvalues
 
           num.nonmiss <- num.nonmiss + 1
         }
