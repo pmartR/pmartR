@@ -2,7 +2,7 @@
 #'
 #' This function will provide basic summary statistics for objects from the MSomicsR package.
 #'
-#' @param omicsData an object of the class 'lipidData', 'metabData', 'pepData', or 'proData' usually created by \code{\link{as.lipidData}}, \code{\link{as.metabData}}, \code{\link{as.pepData}}, or \code{\link{as.proData}}, or \code{\link{as.rRNAdata}}, respectively.
+#' @param omicsData an object of the class 'lipidData', 'metabData', 'pepData', or 'proData' usually created by \code{\link{as.lipidData}}, \code{\link{as.metabData}}, \code{\link{as.pepData}}, or \code{\link{as.proData}}, respectively.
 #' @param filter_object S3 object of class 'moleculeFilt', 'proteomicsFilt', or 'imdanovaFilt' created by \code{\link{molecule_filter}}, \code{\link{proteomics_filter}}, or \code{\link{imdanova_filter}}, respectively.
 #'
 #' @return a summary table for the MSomicsR object. If assigned to a variable, the elements of the summary table are saved in a list format.

@@ -727,7 +727,7 @@ run_skewness <- function(data_only){
 #'
 #' This function calculates the mean correlation of a sample with all other samples that have the same group membership
 #'
-#' @param omicsData an object of the class 'pepData', 'proData', or 'genedata' usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, or \code{\link{as.genedata}}, respectively.
+#' @param omicsData an object of the class 'pepData', 'proData', 'metabData', or 'lipidData' usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.
 #' @param mintR_groupDF data.frame created by \code{\link{group_designation}} with columns for sample.id and group.
 #'
 #' @details Correlation calculations use only complete pairwise observations.

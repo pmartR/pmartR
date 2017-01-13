@@ -2,7 +2,7 @@
 #'
 #' A pooled CV is calculated for each biomolecule.
 #'
-#' @param omicsData an object of the class 'pepData', 'proData', 'metabData', or 'lipidData', created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively. Note, if \code{\link{group.designation}} has not been run, the CV is calculated based on all samples for each biomolecule.
+#' @param omicsData an object of the class 'pepData', 'proData', 'metabData', or 'lipidData', created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively. Note, if \code{\link{group_designation}} has not been run, the CV is calculated based on all samples for each biomolecule.
 #'
 #' @return  An S3 object of class 'cvFilt' giving the pooled CV for each biomolecule and additional attributes used for plottinga data.frame with a column giving the peptide, protein, or gene name and a column giving the pooled CV value
 #'

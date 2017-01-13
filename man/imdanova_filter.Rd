@@ -16,7 +16,7 @@ Object of class imdanovaFilt (also a data.frame) containing the molecule identif
 This function returns an imdanovaFilt object for use with \code{\link{MSomics_filter}}
 }
 \details{
-The output from this function can be used in conjunction with \code{\link{MSomics_filter}} to filter out molecules that are not present in enough samples to do statistical comparisons.
+The output from this function can be used in conjunction with \code{\link{applyFilt}} to filter out molecules that are not present in enough samples to do statistical comparisons.
 }
 \examples{
 dontrun{

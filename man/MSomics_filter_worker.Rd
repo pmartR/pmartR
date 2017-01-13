@@ -9,7 +9,7 @@ MSomics_filter_worker(filter_object, omicsData)
 \arguments{
 \item{filter_object}{a list created by the functions above}
 
-\item{omicsData}{an object of the class \code{pepData}, \code{proData}, \code{lipidData}, \code{metabData}, \code{cDNAdata}, or \code{gDNAdata} usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.lipidData}}, \code{\link{as.metabData}}, \code{\link{as.cDNAdata}}, \code{\link{as.gDNAdata}}, respectively.}
+\item{omicsData}{an object of the class \code{pepData}, \code{proData}, \code{lipidData}, or \code{metabData}, usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.lipidData}}, or \code{\link{as.metabData}}, respectively.}
 }
 \value{
 list

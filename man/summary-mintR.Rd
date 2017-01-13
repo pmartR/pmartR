@@ -47,7 +47,7 @@
 \method{summary}{normRes}(omicsNorm)
 }
 \arguments{
-\item{omicsData}{an object of the class 'lipidData', 'metabData', 'pepData', or 'proData' usually created by \code{\link{as.lipidData}}, \code{\link{as.metabData}}, \code{\link{as.pepData}}, or \code{\link{as.proData}}, or \code{\link{as.rRNAdata}}, respectively.}
+\item{omicsData}{an object of the class 'lipidData', 'metabData', 'pepData', or 'proData' usually created by \code{\link{as.lipidData}}, \code{\link{as.metabData}}, \code{\link{as.pepData}}, or \code{\link{as.proData}}, respectively.}
 
 \item{corRes_object}{an object of class corRes. A correlation matrix of all samples.}
 

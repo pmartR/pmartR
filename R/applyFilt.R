@@ -511,7 +511,7 @@ applyFilt.imdanovaFilt <- function(filter_object, omicsData, min_nonmiss_anova=N
     group_sizes <- attr(filter_object, "group_sizes")
     nonmiss_per_group <- list(nonmiss_totals = filter_object, group_sizes = group_sizes)
 
-    mintR_groupDF <- attributes(omicsData)$group_DF
+    groupDF <- attributes(omicsData)$group_DF
     e_data <- omicsData$e_data
     edata_cname <- attr(omicsData, "cnames")$edata_cname
     samp_cname <- attr(omicsData, "cnames")$fdata_cname
@@ -532,10 +532,10 @@ applyFilt.imdanovaFilt <- function(filter_object, omicsData, min_nonmiss_anova=N
       filter.edata <- anova_filter(nonmiss_per_group=nonmiss_per_group, min_nonmiss_anova=min_nonmiss_anova, cname_id = edata_cname)
     }else{
       if(filter_method=="gtest"){
-        filter.edata <- gtest_filter(nonmiss_per_group=nonmiss_per_group, mintR_groupDF=mintR_groupDF, e_data=e_data, alpha=NULL, min_nonmiss_gtest=min_nonmiss_gtest, cname_id = edata_cname, samp_id = samp_cname)
+        filter.edata <- gtest_filter(nonmiss_per_group=nonmiss_per_group, groupDF=groupDF, e_data=e_data, alpha=NULL, min_nonmiss_gtest=min_nonmiss_gtest, cname_id = edata_cname, samp_id = samp_cname)
       }else{
         if(filter_method=="combined"){
-          filter.edata.gtest <- gtest_filter(nonmiss_per_group=nonmiss_per_group, mintR_groupDF=mintR_groupDF, e_data=e_data, alpha=NULL, min_nonmiss_gtest=min_nonmiss_gtest, cname_id = edata_cname, samp_id = samp_cname)
+          filter.edata.gtest <- gtest_filter(nonmiss_per_group=nonmiss_per_group, groupDF=groupDF, e_data=e_data, alpha=NULL, min_nonmiss_gtest=min_nonmiss_gtest, cname_id = edata_cname, samp_id = samp_cname)
           #           min.nonmiss.allowed <- 2
           filter.edata.anova <- anova_filter(nonmiss_per_group=nonmiss_per_group, min_nonmiss_anova=min_nonmiss_anova, cname_id = edata_cname)
           filter.edata <- intersect(filter.edata.anova, filter.edata.gtest)
@@ -729,7 +729,7 @@ applyFilt.customFilt <- function(filter_object, omicsData){
 #'
 #' This function removes
 #'
-#' @param omicsData an object of the class \code{pepData}, \code{proData}, \code{lipidData}, \code{metabData}, \code{cDNAdata}, or \code{gDNAdata} usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.lipidData}}, \code{\link{as.metabData}}, \code{\link{as.cDNAdata}}, \code{\link{as.gDNAdata}}, respectively.
+#' @param omicsData an object of the class \code{pepData}, \code{proData}, \code{lipidData}, or \code{metabData}, usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.lipidData}}, or \code{\link{as.metabData}}, respectively.
 #' @param filter_object a list created by the functions above
 #' @return list
 #' @author Kelly Stratton, Lisa Bramer

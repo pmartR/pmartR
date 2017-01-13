@@ -1,6 +1,6 @@
 #' Molecule filter object
 #'
-#' This function returns a moleculeFilt object for use with \code{\link{MSomics_filter}}
+#' This function returns a moleculeFilt object for use with \code{\link{applyFilt}}
 #'
 #' @param omicsData an object of the class 'pepData', 'proData', 'metabData', or 'lipidData', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.
 #' @param min_num an integer value specifying the minimum number of times each feature must be observed across all samples. Default value is 2.

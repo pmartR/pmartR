@@ -2,7 +2,7 @@
 #'
 #' Calculate principal components using projection pursuit estimation, which implements an expectation-maximization (EM) estimation algorithm when data is missing.
 #'
-#' @param omicsData an object of the class 'pepdata', 'prodata', or 'genedata' usually created by \code{\link{as.pepdata}}, \code{\link{as.prodata}}, or \code{\link{as.genedata}}, respectively.
+#' @param omicsData an object of the class 'pepdata', 'prodata', 'metabData', or 'lipidData' usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.
 #' @param k integer number of principal components to return. Defaults to 2.
 #'
 #' @return a data.frame with first \code{k} principal component scores, sample identifiers, and group membership for each sample (if group designation was previously run on the data).

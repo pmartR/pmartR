@@ -23,7 +23,7 @@ edata_transform(omicsData, data_scale, check.names = TRUE)
 
 \item{data_scale}{a character string indicating the type of transformation to be applied to the data. Valid values are: 'log2', 'log', 'log10', or 'abundance'. A value of 'abundance' indicates the data has previously undergone one of the log transformations and should be transformed back to raw values with no transformation applied.}
 
-\item{check.names}{logical. If TRUE then the names of the variables in the data frame are checked to ensure that they are syntactically valid variable names and are not duplicated. If necessary they are adjusted (by \link{\code{make.names}}) so that they are.}
+\item{check.names}{logical. If TRUE then the names of the variables in the data frame are checked to ensure that they are syntactically valid variable names and are not duplicated. If necessary they are adjusted (by \code{\link{make.names}}) so that they are.}
 }
 \value{
 data object of the same class as omicsData

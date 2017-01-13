@@ -15,7 +15,7 @@ molecule_filter(omicsData)
 Object of class moleculeFilt (also a data.frame) that contains the molecule identifier and the number of samples for which the molecule was measured (not NA)
 }
 \description{
-This function returns a moleculeFilt object for use with \code{\link{MSomics_filter}}
+This function returns a moleculeFilt object for use with \code{\link{applyFilt}}
 }
 \details{
 Attribute of molecule_filt object is "total_poss_obs", the number of total possible observations for each feature (same as the number of samples)

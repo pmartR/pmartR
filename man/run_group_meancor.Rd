@@ -7,7 +7,7 @@
 run_group_meancor(omicsData, mintR_groupDF)
 }
 \arguments{
-\item{omicsData}{an object of the class 'pepData', 'proData', or 'genedata' usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, or \code{\link{as.genedata}}, respectively.}
+\item{omicsData}{an object of the class 'pepData', 'proData', 'metabData', or 'lipidData' usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.}
 
 \item{mintR_groupDF}{data.frame created by \code{\link{group_designation}} with columns for sample.id and group.}
 }

@@ -1,10 +1,10 @@
 #' IMD-ANOVA filter object
 #'
-#' This function returns an imdanovaFilt object for use with \code{\link{MSomics_filter}}
+#' This function returns an imdanovaFilt object for use with \code{\link{applyFilt}}
 #'
 #' @param omicsData object of one of the classes "pepData", "proData", "lipidData", or "metabData", usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.lipidData}}, \code{\link{as.metabData}}, respectively.
 #'
-#' @details The output from this function can be used in conjunction with \code{\link{MSomics_filter}} to filter out molecules that are not present in enough samples to do statistical comparisons.
+#' @details The output from this function can be used in conjunction with \code{\link{applyFilt}} to filter out molecules that are not present in enough samples to do statistical comparisons.
 #'
 #' @return Object of class imdanovaFilt (also a data.frame) containing the molecule identifier and number of samples in each group with non-missing values for that molecule.
 #'

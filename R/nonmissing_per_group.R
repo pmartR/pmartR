@@ -2,7 +2,7 @@
 #'
 #' This function computes the number of non-missing observations for samples, based on a group designation, for every peptide in the dataset
 #'
-#' @param omicsData an optional object of one of the classes "pepData", "proData", or "genedata", usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, or \code{\link{as.genedata}}, respectively. Either omicsData or all of e_data, groupDF, cname_id, and samp_id must be provided.
+#' @param omicsData an optional object of one of the classes "pepData", "proData", "metabData", or "lipidData", usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{lipidData}}, respectively. Either omicsData or all of e_data, groupDF, cname_id, and samp_id must be provided.
 #' @param e_data an optional a \eqn{p \times n + 1} data.frame of expression data, where \eqn{p} is the number of lipids observed and \eqn{n} is the number of samples. Each row corresponds to data for each lipid. One column specifying a unique identifier for each lipid (row) must be present. Not required if omicsData is provided.
 #' @param groupDF data.frame created by \code{group_designation} with columns for the sample identifier and the designated group. Not required if omicsData is provided.
 #' @param cname_id character string specifying the name of the column containing the biomolecule identifiers in \code{e_data} and \code{e_meta} (if applicable). Not required if omicsData is provided.

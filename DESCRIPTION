@@ -22,7 +22,10 @@ Imports:
     rrcov,
     Rmisc,
     scales,
-    pcaMethods
+    pcaMethods,
+    d3heatmap,
+    gridExtra,
+    reshape2
 Suggests:
     knitr,
     rmarkdown,
