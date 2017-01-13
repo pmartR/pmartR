@@ -3,7 +3,7 @@
 #' This function creates a customFilt S3 object based on user-specified items to filter out of the dataset
 #'
 #' @param omicsData an object of class "pepData", "proData", "metabData", or "lipidData", created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.
-#' @param e_data_remove character vectory specifying the names of the e_data identifiers to remove from the data
+#' @param e_data_remove character vector specifying the names of the e_data identifiers to remove from the data
 #' @param f_data_remove character vector specifying the names of samples to remove from the data
 #' @param e_meta_remove character vector specifying the names of the e_meta identifiers to remove from the data
 #'
