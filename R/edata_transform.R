@@ -4,7 +4,7 @@
 #'
 #' @param omicsData an object of the class 'pepData', 'proData', 'metabData', or 'lipidData', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.
 #' @param data_scale a character string indicating the type of transformation to be applied to the data. Valid values are: 'log2', 'log', 'log10', or 'abundance'. A value of 'abundance' indicates the data has previously undergone one of the log transformations and should be transformed back to raw values with no transformation applied.
-#' @param check.names logical. If TRUE then the names of the variables in the data frame are checked to ensure that they are syntactically valid variable names and are not duplicated. If necessary they are adjusted (by \link{\code{make.names}}) so that they are.
+#' @param check.names logical. If TRUE then the names of the variables in the data frame are checked to ensure that they are syntactically valid variable names and are not duplicated. If necessary they are adjusted (by \code{\link{make.names}}) so that they are.
 #'
 #' @details This function is intended to be used before analysis of the data begins. Data are typically analyzed on a log scale.
 #'

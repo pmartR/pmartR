@@ -5,7 +5,7 @@
 #' @param omicsData an object of the class 'pepData', 'proData', 'metabData', or 'lipidData', usually created by \code{pepData}, \code{proData}, \code{metabData}, or \code{lipidData}, respectively.
 #' @param x value to be replaced, usually numeric or NA
 #' @param y replacment value, usually numeric or NA
-#' @param check.names logical. If TRUE then the names of the variables in the data frame are checked to ensure that they are syntactically valid variable names and are not duplicated. If necessary they are adjusted (by \link{\code{make.names}}) so that they are.
+#' @param check.names logical. If TRUE then the names of the variables in the data frame are checked to ensure that they are syntactically valid variable names and are not duplicated. If necessary they are adjusted (by \code{\link{make.names}}) so that they are.
 #'
 #' @details This function is often used to replace any 0 values in peptide, protein, metabolite, or lipid data with NA's.
 #'
