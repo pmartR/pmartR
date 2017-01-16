@@ -37,7 +37,7 @@ Below we load in 3 data.frames from the pmartRdata package:
 knitr::opts_chunk$set(fig.width=5)
 knitr::opts_chunk$set(fig.height=5)
 
-library(MSomicsDATA)
+library(pmartRdata)
 
 data("pep_edata")
 data("pep_fdata")
@@ -46,9 +46,9 @@ data("pep_fdata")
 Here, $p$ is `r nrow(pep_edata)` and $n$ is `r nrow(pep_fdata)`. The `pep_fdata` data.frame contains the sample identifier and the condition designation for each sample, either 'Infection' (samples that were infected with some pathogen) or 'Mock' (uninfected samples used as a control). The `pep_emeta` data.frame contains the peptide identifier column ('Mass_Tag_ID'), the protein identification name to which each mass tag ID maps ('Protein'), a reference identifier ('Ref_ID'), and the peptide sequence (Peptide_Sequence). Note that the mass tag IDs are unique ($n_{peptide} =$ `r length(unique(pep_emeta$Mass_Tag_ID))`) while the protein identifiers are not ($n_{protein} =$ `r length(unique(pep_emeta$Protein))`) since multiple peptides often map to the same protein.
 
 ```{r data1}
-library(MSomicsQC)
+library(pmartRqc)
 
-library(MSomicsDATA)
+library(pmartRdata)
 
 data("pep_edata")
 dim(pep_edata)
@@ -72,10 +72,10 @@ summary(mypepData)
 Alternatively, the pmartRdata package contains the corresponding pepData object, which can be loaded as follows.
 
 ```{r data3}
-data("pep_pepData")
-class(pep_pepData)
+data("pep_object")
+class(pep_object)
 
-rm(pep_pepData)
+rm(pep_object)
 ```
 
 We can use the `plot()` function to display box plots for each sample in the pepData object.
