@@ -10,7 +10,7 @@ custom_filter(omicsData, e_data_remove = NULL, f_data_remove = NULL,
 \arguments{
 \item{omicsData}{an object of class "pepData", "proData", "metabData", or "lipidData", created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.}
 
-\item{e_data_remove}{character vectory specifying the names of the e_data identifiers to remove from the data}
+\item{e_data_remove}{character vector specifying the names of the e_data identifiers to remove from the data}
 
 \item{f_data_remove}{character vector specifying the names of samples to remove from the data}
 

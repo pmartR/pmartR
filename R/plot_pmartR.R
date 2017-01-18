@@ -135,6 +135,9 @@ plot.corRes <- function(corRes_object, ...){
   if(!is.null(title_plot)) {
     if(!is.character(title_plot)) stop("title_plot must be a character vector")
   }
+  
+  # Workaround for certain "check" warnings
+  Var1 <- Var2 <- value <- NULL
 
   if(is.null(title_plot)){
     if(attributes(corRes_object)$data_norm == TRUE) {
@@ -420,6 +423,9 @@ plot.imdanovaFilt <- function(filter_object, min_nonmiss_anova = NULL, min_nonmi
   }
 
   ## end of initial checks ##
+  
+  # workaround for certain "check" warnings
+  x_anova <-x_gtest <- Var2 <- Var1 <- value <- NULL
 
   # The smallest group size
   min_n_group <- min(attr(filter_object,"group_sizes")$n_group)
