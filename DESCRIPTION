@@ -12,7 +12,7 @@ LazyData: TRUE
 URL: https://github.com/pmartR/pmartRqc
 BugReports: https://github.com/pmartR/pmartRqc/issues
 VignetteBuilder: knitr
-LinkingTo: Rcpp
+LinkingTo: Rcpp, RcppArmadillo, BH
 Imports:
     Rcpp (>= 0.12.8),
     data.table,
@@ -25,7 +25,8 @@ Imports:
     pcaMethods,
     d3heatmap,
     gridExtra,
-    reshape2
+    reshape2,
+    RcppArmadillo
 Suggests:
     knitr,
     rmarkdown,

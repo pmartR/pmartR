@@ -57,32 +57,49 @@ nonmissing_per_group <- function(omicsData = NULL, e_data = NULL, groupDF=NULL, 
   ## end of initial checks ##
 
 
-  # melt the data by peptide and merge with groupDF then group by peptide and group #
-  melt.data = pre_imdanova_melt(e_data = e_data, groupDF = groupDF, samp_id = samp_id)
-  names(melt.data)[2] <- "Peptide" # set this explicitly now, and then before we return the function output, reset "Peptide" to cname_id
-  # class(melt.data) ## "grouped_dt" "tbl_dt"     "tbl"        "data.table" "data.frame" --> this doesn't work with dplyr::summarise
-  class(melt.data) <- c("grouped_df", "tbl_df", "tbl", "data.frame")
+#  # melt the data by peptide and merge with groupDF then group by peptide and group #
+#  melt.data = pre_imdanova_melt(e_data = e_data, groupDF = groupDF, samp_id = samp_id)
+#  names(melt.data)[2] <- "Peptide" # set this explicitly now, and then before we return the function output, reset "Peptide" to cname_id
+#  # class(melt.data) ## "grouped_dt" "tbl_dt"     "tbl"        "data.table" "data.frame" --> this doesn't work with dplyr::summarise
+#  class(melt.data) <- c("grouped_df", "tbl_df", "tbl", "data.frame")
 
   # summarize total sample size per group #
   tot_samps = data.frame(dplyr::summarise(dplyr::group_by(groupDF, Group), n_group = n()))
 
-  # summarize the number of non-missing samples per group #
-  nonmiss_dat = dplyr::summarise(melt.data, non_miss = sum(!is.na(value)))
+#  # summarize the number of non-missing samples per group #
+#  nonmiss_dat = dplyr::summarise(melt.data, non_miss = sum(!is.na(value)))
 
-  # put data back in wide format #
-  nonmiss_res = data.table::dcast.data.table(data.table::data.table(nonmiss_dat), Peptide~Group, value.var = "non_miss") # this command, using "Peptide", is the reason that we had to set the column name in melt.data to "Peptide" (using cname_id did not work)
+#  # put data back in wide format #
+#  nonmiss_res = data.table::dcast.data.table(data.table::data.table(nonmiss_dat), Peptide~Group, value.var = "non_miss") # this command, using "Peptide", is the reason that we had to set the column name in melt.data to "Peptide" (using cname_id did not work)
 
-  #
-  nonmiss_res <- as.data.frame(nonmiss_res)
+#  #
+#  nonmiss_res <- as.data.frame(nonmiss_res)
 
-  # format Peptide column as a character vector #
-  nonmiss_res[,"Peptide"] = as.character(nonmiss_res[,"Peptide"])
+#  # format Peptide column as a character vector #
+#  nonmiss_res[,"Peptide"] = as.character(nonmiss_res[,"Peptide"])
 
-  # [Kelly added 12/29/14] set the names(nonmiss_res) here, so the spaces and dashes don't get changed to periods (this messes things up in gtest_filter.R)
-  mynames <- names(nonmiss_res)
-  mynames[1] <- cname_id # re-set "Peptide" to whatever the cname_id is
-  nonmiss_totals <- data.frame(nonmiss_res)
-  names(nonmiss_totals) <- mynames
+#  # [Kelly added 12/29/14] set the names(nonmiss_res) here, so the spaces and dashes don't get changed to periods (this messes things up in gtest_filter.R)
+#  mynames <- names(nonmiss_res)
+#  mynames[1] <- cname_id # re-set "Peptide" to whatever the cname_id is
+#  nonmiss_totals <- data.frame(nonmiss_res)
+#  names(nonmiss_totals) <- mynames
+
+  
+  group_dat<- as.character(groupDF$Group[order(groupDF$Group)])
+  
+  Mass_Tag_ID<-as.character(e_data[,1])
+  
+  temp_data<- e_data[,-1]
+  
+  nonmissing<- nonmissing_per_grp(as.matrix(temp_data),group_dat)
+  
+  nonmissing<- data.frame(nonmissing)
+  
+  colnames(nonmissing)<- unique(group_dat)
+  
+  nonmiss_totals<- data.frame(Mass_Tag_ID,nonmissing,stringsAsFactors = FALSE)
+  
+  
 
   return(list(group_sizes = tot_samps, nonmiss_totals = nonmiss_totals))
 }
