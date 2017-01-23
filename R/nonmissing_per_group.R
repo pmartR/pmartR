@@ -98,7 +98,7 @@ nonmissing_per_group <- function(omicsData = NULL, e_data = NULL, groupDF=NULL, 
   
   nonmissing<- data.frame(nonmissing)
   
-  colnames(nonmissing)<- levels(groupDF$Group)
+  colnames(nonmissing)<- unique(group_dat)
   
   nonmiss_totals<- data.frame(Mass_Tag_ID,nonmissing,stringsAsFactors = FALSE)
   
