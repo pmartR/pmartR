@@ -21,7 +21,7 @@
 #'
 #' @author Lisa Bramer, Kelly Stratton
 #'
-#' @export
+#' 
 #'
 nonmissing_per_group <- function(omicsData = NULL, e_data = NULL, groupDF=NULL, cname_id=NULL, samp_id=NULL){
 
@@ -30,7 +30,7 @@ nonmissing_per_group <- function(omicsData = NULL, e_data = NULL, groupDF=NULL, 
   ## initial checks ##
 
   # check that omicsData is of an appropriate class #
-  if(!is.null(omicsData) && !(class(omicsData) %in% c("proData","pepData","lipidData", "metabData", "cDNAdata", "gDNAdata"))) stop("omicsData is not an object of appropriate class")
+  if(!is.null(omicsData) && !(class(omicsData) %in% c("proData","pepData","lipidData", "metabData"))) stop("omicsData is not an object of appropriate class")
 
 
 
@@ -87,18 +87,22 @@ nonmissing_per_group <- function(omicsData = NULL, e_data = NULL, groupDF=NULL, 
   
   group_dat<- as.character(groupDF$Group[order(groupDF$Group)])
   
-  Mass_Tag_ID<-as.character(e_data[,1])
+  Mass_Tag_ID<- as.character(e_data[,cname_id])
   
-  temp_data<- e_data[,-1]
+  temp_data<- e_data[ , -which(names(e_data) %in% cname_id)]
+  temp_data2<- temp_data[,match(names(temp_data),groupDF$SampleID)]
+  temp_data3<- temp_data2[,order(groupDF$Group)]
   
-  nonmissing<- nonmissing_per_grp(as.matrix(temp_data),group_dat)
+  
+  nonmissing<- nonmissing_per_grp(as.matrix(temp_data3),group_dat)
   
   nonmissing<- data.frame(nonmissing)
   
-  colnames(nonmissing)<- unique(group_dat)
+  colnames(nonmissing)<- levels(groupDF$Group)
   
   nonmiss_totals<- data.frame(Mass_Tag_ID,nonmissing,stringsAsFactors = FALSE)
   
+  names(nonmiss_totals)[1] <- cname_id
   
 
   return(list(group_sizes = tot_samps, nonmiss_totals = nonmiss_totals))
