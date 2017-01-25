@@ -266,11 +266,17 @@ rip <- function(e_data, edata_id, groupDF, alpha=.2){
   mydata <- e_data[, -edata_id_ind]
   inds <- which(complete.cases(mydata) == TRUE)
   mydata <- mydata[inds,]
-
-  pvals <- data.frame(rep(NA, nrow(mydata)))
-  for(i in 1:nrow(mydata)){
-    pvals[i,1] <- kruskal.test(as.numeric(mydata[i,])~as.factor(groupDF$Group))$p.value
-  }
+  
+  # put mydata in order
+  group_dat = as.character(groupDF$Group[order(groupDF$Group)])
+  
+  rtemp =  mydata[,match(names(mydata),groupDF$SampleID)]
+  rtemp2 =  rtemp[,order(groupDF$Group)]
+  
+  # conduct K-W test using kw_rcpp function #
+  pvals = kw_rcpp(as.matrix(rtemp2),group_dat)
+  pvals = data.frame(pvals)
+  
   row.names(pvals) <- row.names(mydata)
 
   RIPeps <- as.character(row.names(pvals)[as.numeric(pvals[,1]) > alpha])

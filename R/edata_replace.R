@@ -70,7 +70,7 @@ edata_replace.pepData <- function(omicsData, x, y, check.names=TRUE){
 
   attributes(updated_data)$group_DF <- attributes(omicsData)$group_DF
 
-  print(paste(num_replaced, "instances of", x, "have been replaced with", y, sep=" "))
+  message(paste(num_replaced, "instances of", x, "have been replaced with", y, sep=" "))
   return(updated_data)
 }
 
@@ -116,7 +116,7 @@ edata_replace.proData <- function(omicsData, x, y, check.names=TRUE){
 
   attributes(updated_data)$group_DF <- attributes(omicsData)$group_DF
 
-  print(paste(num_replaced, "instances of", x, "have been replaced with", y, sep=" "))
+ message(paste(num_replaced, "instances of", x, "have been replaced with", y, sep=" "))
   return(updated_data)
 }
 
@@ -162,7 +162,7 @@ edata_replace.metabData <- function(omicsData, x, y, check.names=TRUE){
 
   attributes(updated_data)$group_DF <- attributes(omicsData)$group_DF
 
-  print(paste(num_replaced, "instances of", x, "have been replaced with", y, sep=" "))
+  message(paste(num_replaced, "instances of", x, "have been replaced with", y, sep=" "))
   return(updated_data)
 }
 
@@ -208,7 +208,7 @@ edata_replace.lipidData <- function(omicsData, x, y, check.names=TRUE){
 
   attributes(updated_data)$group_DF <- attributes(omicsData)$group_DF
 
-  print(paste(num_replaced, "instances of", x, "have been replaced with", y, sep=" "))
+ message(paste(num_replaced, "instances of", x, "have been replaced with", y, sep=" "))
   return(updated_data)
 }
 
