@@ -1150,7 +1150,7 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     # reorder levels #
     plot_data <- plot_data[order(plot_data[,order_by]),]
     plot_data$variable <- factor(plot_data$variable, levels=unique(plot_data$variable), ordered=TRUE)
-    plot_data[[color_by]] <- factor(plot_data[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
+    #plot_data[[color_by]] <- factor(plot_data[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
 
     if(bw_theme==FALSE){
       p <- ggplot2::ggplot(plot_data) + ggplot2::geom_boxplot(ggplot2::aes(x = variable, y = value), fill = "deepskyblue1") +
