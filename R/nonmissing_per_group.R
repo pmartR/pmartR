@@ -96,11 +96,11 @@ nonmissing_per_group <- function(omicsData = NULL, e_data = NULL, groupDF=NULL, 
   
   nonmissing<- nonmissing_per_grp(as.matrix(temp_data3),group_dat)
   
-  nonmissing<- data.frame(nonmissing)
+  nonmissing<- data.frame(nonmissing, check.names = FALSE)
   
   colnames(nonmissing)<- unique(group_dat)
   
-  nonmiss_totals<- data.frame(Mass_Tag_ID,nonmissing,stringsAsFactors = FALSE)
+  nonmiss_totals<- data.frame(Mass_Tag_ID,nonmissing,stringsAsFactors = FALSE, check.names = FALSE)
   
   names(nonmiss_totals)[1] <- cname_id
   
