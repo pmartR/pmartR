@@ -1,4 +1,4 @@
-
+library(pmartRdata)
 #### Check plot.pepData ####
 
 context("plot as pepData")
@@ -6,9 +6,11 @@ context("plot as pepData")
 test_that("plot.pepData fails on non-specified objects", {
   
   ## Create some counterfeits ##
-  data(metab_object)
+  data(metab_object) 
   data(lipid_object)
-  e_data = e_dat = f_data = e_meta = c(1, 2, 3, 4, 5)
+  data(pep_object)
+  e_dat = f_data = e_meta = c(1, 2, 3, 4, 5)
+  e_data = c("a", "b", "c", "d", "e")
   
   # Object with correct names but wrong setup #
   almost_object = data.frame(e_data, f_data, e_meta)
