@@ -872,7 +872,7 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     if(!is.character(facet_by) | length(facet_by) > 1) stop("facet_by must be a character vector of length 1")
   }
   if(!is.null(facet_cols)) {
-    if(is.null(facet_by)) stop("facet_by cannot be NULL when fact_cols is specified")
+    if(is.null(facet_by)) stop("facet_by cannot be NULL when facet_cols is specified")
     if(length(facet_cols)>1) stop("facet_cols must be of length 1")
     if(!is.numeric(facet_cols)) stop("facet_cols must be an integer greater than zero")
     if(facet_cols %% 1 != 0 | facet_cols <= 0) stop("facet_cols must be an integer greater than zero")
@@ -1085,7 +1085,7 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     if(!is.character(facet_by) | length(facet_by) > 1) stop("facet_by must be a character vector of length 1")
   }
   if(!is.null(facet_cols)) {
-    if(is.null(facet_by)) stop("facet_by cannot be NULL when fact_cols is specified")
+    if(is.null(facet_by)) stop("facet_by cannot be NULL when facet_cols is specified")
     if(length(facet_cols)>1) stop("facet_cols must be of length 1")
     if(!is.numeric(facet_cols)) stop("facet_cols must be an integer greater than zero")
     if(facet_cols %% 1 != 0 | facet_cols <= 0) stop("facet_cols must be an integer greater than zero")
@@ -1298,7 +1298,7 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     if(!is.character(facet_by) | length(facet_by) > 1) stop("facet_by must be a character vector of length 1")
   }
   if(!is.null(facet_cols)) {
-    if(is.null(facet_by)) stop("facet_by cannot be NULL when fact_cols is specified")
+    if(is.null(facet_by)) stop("facet_by cannot be NULL when facet_cols is specified")
     if(length(facet_cols)>1) stop("facet_cols must be of length 1")
     if(!is.numeric(facet_cols)) stop("facet_cols must be an integer greater than zero")
     if(facet_cols %% 1 != 0 | facet_cols <= 0) stop("facet_cols must be an integer greater than zero")
@@ -1502,7 +1502,7 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     if(!is.character(facet_by) | length(facet_by) > 1) stop("facet_by must be a character vector of length 1")
   }
   if(!is.null(facet_cols)) {
-    if(is.null(facet_by)) stop("facet_by cannot be NULL when fact_cols is specified")
+    if(is.null(facet_by)) stop("facet_by cannot be NULL when facet_cols is specified")
     if(length(facet_cols)>1) stop("facet_cols must be of length 1")
     if(!is.numeric(facet_cols)) stop("facet_cols must be an integer greater than zero")
     if(facet_cols %% 1 != 0 | facet_cols <= 0) stop("facet_cols must be an integer greater than zero")
@@ -1829,7 +1829,7 @@ plot.normRes <- function(normData, order_by = NULL, color_by = NULL, ...) {
   #   if(!is.character(facet_by) | length(facet_by) > 1) stop("facet_by must be a character vector of length 1")
   # }
   # if(!is.null(facet_cols)) {
-  #   if(is.null(facet_by)) stop("facet_by cannot be NULL when fact_cols is specified")
+  #   if(is.null(facet_by)) stop("facet_by cannot be NULL when facet_cols is specified")
   #   if(length(facet_cols)>1) stop("facet_cols must be of length 1")
   #   if(!is.numeric(facet_cols)) stop("facet_cols must be an integer greater than zero")
   #   if(facet_cols %% 1 != 0 | facet_cols <= 0) stop("facet_cols must be an integer greater than zero")
