@@ -203,22 +203,33 @@ ppp_rip <- function(e_data, edata_id, fdata_id, groupDF, alpha=0.2, proportion=0
   inds <- which(mydata_pct_present >= proportion)
   mydata <- mydata[inds,]
   peps <- peps[inds]
-
-  pvals <- data.frame(rep(NA, nrow(mydata)))
-  for(i in 1:nrow(mydata)){
-    # check to see whether all observations are in the same group
-    nonmiss <- nonmissing_per_group(e_data = mydata[i,], groupDF= groupDF, cname_id=edata_id, samp_id=samp_id)$nonmiss_totals
-    if(sum(nonmiss[-1]==0) > (length(nonmiss[-1])-2)){
-      # if so, return 0 (we don't want to keep this one)
-      pvals[i,1] <- 0
-    }else{
-      # otherwise, return the p-value
-      pvals[i,1] <- kruskal.test(as.numeric(mydata[i,-1])~as.factor(groupDF$Group), na.action="na.omit")$p.value
-    }
-
-  }
-  #row.names(pvals) <- row.names(mydata)
-
+##########
+#  pvals <- data.frame(rep(NA, nrow(mydata)))
+#  for(i in 1:nrow(mydata)){
+#    # check to see whether all observations are in the same group
+#    nonmiss <- nonmissing_per_group(e_data = mydata[i,], groupDF= groupDF, cname_id=edata_id, samp_id=samp_id)$nonmiss_totals
+#    if(sum(nonmiss[-1]==0) > (length(nonmiss[-1])-2)){
+#      # if so, return 0 (we don't want to keep this one)
+#      pvals[i,1] <- 0
+#    }else{
+#      # otherwise, return the p-value
+#      pvals[i,1] <- kruskal.test(as.numeric(mydata[i,-1])~as.factor(groupDF$Group), na.action="na.omit")$p.value
+#    }
+#
+#  }
+#  #row.names(pvals) <- row.names(mydata)
+##########
+  
+  #added 2/6/17 lines 223-231 iobani
+  mydata = mydata[,-which(names(mydata) %in% edata_id)]
+  group_dat = as.character(groupDF$Group[order(groupDF$Group)])
+  rtemp = mydata[,match(names(mydata),groupDF[,samp_id])]
+  rtemp2 = rtemp[,order(groupDF$Group)]
+  
+  # conduct K-W test using kw_rcpp function 
+  pvals = kw_rcpp(as.matrix(rtemp2),group_dat)
+  pvals= data.frame(pvals)
+  
   RIPeps <- as.character(peps[as.numeric(pvals[,1]) > alpha])
 
   if(length(RIPeps)<2) stop("There are <2 biomolecules in the subset; cannot proceed.")
@@ -271,6 +282,20 @@ rip <- function(e_data, edata_id, groupDF, alpha=.2){
   for(i in 1:nrow(mydata)){
     pvals[i,1] <- kruskal.test(as.numeric(mydata[i,])~as.factor(groupDF$Group))$p.value
   }
+  
+  ########## In order to make these changes we need to add fdata_id as an argument to the function
+  #  #added 2/6/17 iobani
+  #  samp_id = fdata_id
+  #  group_dat = as.character(groupDF$Group[order(groupDF$Group)])
+  #  
+  #  rtemp =  mydata[,match(names(mydata),groupDF[,samp_id])]
+  #  rtemp2 =  rtemp[,order(groupDF$Group)]
+  #  
+  #  # conduct K-W test on un-normalized data # #used kw_rcpp function 
+  #  pvals = kw_rcpp(as.matrix(rtemp2),group_dat)#here we use the kw_rcpp function to calculate pvals#
+  #  pvals = data.frame(pvals)
+  ###########
+  
   row.names(pvals) <- row.names(mydata)
 
   RIPeps <- as.character(row.names(pvals)[as.numeric(pvals[,1]) > alpha])
