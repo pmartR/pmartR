@@ -23,73 +23,97 @@
 #' @export
 
 cv_filter <- function(omicsData){
-
+  
   ## some intial checks ##
-
+  
   # check that omicsData is of appropriate class #
   if(!(class(omicsData) %in% c("pepData", "proData", "lipidData", "metabData"))) stop("omicsData must be an object of class 'pepData', 'proData', 'lipidData', or 'metabData'")
-
+  
   # check that group_designation has been called already #
   if(!is.null(attr(omicsData, "group_DF"))){
-
-    groupDF = attr(omicsData, "group_DF")
-
-    samp_id = attr(omicsData, "cnames")$fdata_cname
-    edata_id = attr(omicsData, "cnames")$edata_cname
-
-    ## format the data ##
-    temp_dat = data.table::data.table(omicsData$e_data)
-    melt_dat = data.table::melt.data.table(temp_dat, id.var = edata_id)
-
-    data.table::setnames(melt_dat, names(melt_dat)[2], samp_id)
-
-    merge_dat = data.table:::merge.data.table(x = melt_dat, y = data.table::data.table(groupDF), by = samp_id, all.x = TRUE)
-
-    # group the data by peptide and group #
-    dat_grouped = dplyr::group_by_(data.frame(merge_dat), edata_id, "Group")
-
+    
+    groupDF<- attr(omicsData, "group_DF")
+    
+    samp_id<- attr(omicsData, "cnames")$fdata_cname
+    edata_id<- attr(omicsData, "cnames")$edata_cname
+    
+    ##########
+    #    ## format the data ##
+    #    temp_dat = data.table::data.table(omicsData$e_data)
+    #    melt_dat = data.table::melt.data.table(temp_dat, id.var = edata_id)
+    #
+    #    data.table::setnames(melt_dat, names(melt_dat)[2], samp_id)
+    #
+    #    merge_dat = data.table:::merge.data.table(x = melt_dat, y = data.table::data.table(groupDF), by = samp_id, all.x = TRUE)
+    #
+    #    # group the data by peptide and group #
+    #    dat_grouped = dplyr::group_by_(data.frame(merge_dat), edata_id, "Group")
+    ##########
+    
+    #added 2/2/17 iobani lines 53-58 and 63,68,73,78
+    edataid_col_num = which(names(omicsData$e_data) == edata_id)
+    
+    temp_data<- omicsData$e_data[,-edataid_col_num]
+    temp_data2<- temp_data[,match(names(temp_data), groupDF[,samp_id])]
+    temp_data3<- temp_data2[,order(groupDF$Group)]
+    
     # calculate cv (on original scale) and number of non-missing values, by peptide and group #
     if(attr(omicsData, "data_info")$data_scale == "log2"){
-      grp_cv = dplyr::summarise(dat_grouped, CV_group = cv.calc(2^value), n_cv = sum(!is.na(2^value)))
+      #grp_cv = dplyr::summarise(dat_grouped, CV_group = cv.calc(2^value), n_cv = sum(!is.na(2^value)))
+      temp_data3<- as.matrix(2^(temp_data3))
     }
-
+    
     if(attr(omicsData, "data_info")$data_scale == "log10"){
-      grp_cv = dplyr::summarise(dat_grouped, CV_group = cv.calc(10^value), n_cv = sum(!is.na(10^value)))
+      #grp_cv = dplyr::summarise(dat_grouped, CV_group = cv.calc(10^value), n_cv = sum(!is.na(10^value)))
+      temp_data3<- as.matrix(10^(temp_data3))
     }
-
+    
     if(attr(omicsData, "data_info")$data_scale == "log"){
-      grp_cv = dplyr::summarise(dat_grouped, CV_group = cv.calc(exp(value)), n_cv = sum(!is.na(exp(value))))
+      #grp_cv = dplyr::summarise(dat_grouped, CV_group = cv.calc(exp(value)), n_cv = sum(!is.na(exp(value))))
+      temp_data3<- as.matrix(exp(temp_data3))
     }
-
+    
     if(attr(omicsData, "data_info")$data_scale == "abundance"){
-      grp_cv = dplyr::summarise(dat_grouped, CV_group = cv.calc(value), n_cv = sum(!is.na(value)))
+      #grp_cv = dplyr::summarise(dat_grouped, CV_group = cv.calc(value), n_cv = sum(!is.na(value)))
+      temp_data3<- temp_data2[,order(groupDF$Group)]
     }
-
-    cv_grouped = dplyr::group_by_(grp_cv, edata_id)
-
-    # calculate pooled cv #
-    pool_cv = dplyr::summarise(cv_grouped, CV_pooled = 100*sum(CV_group[!is.na(CV_group)]*n_cv[!is.na(CV_group)])/sum(n_cv[!is.na(CV_group)]))
-
+    ##########
+    #    cv_grouped = dplyr::group_by_(grp_cv, edata_id)
+    #
+    #    # calculate pooled cv #
+    #    pool_cv = dplyr::summarise(cv_grouped, CV_pooled = 100*sum(CV_group[!is.na(CV_group)]*n_cv[!is.na(CV_group)])/sum(n_cv[!is.na(CV_group)]))
+    ##########
+    
+    #added 2/2/17 iobani lines 87-95
+    mass_tag_id<- omicsData$e_data[,edataid_col_num]
+    group_dat<- as.character(groupDF$Group[order(groupDF$Group)])
+    
+    CV_pooled<- pooled_cv_rcpp(as.matrix(temp_data3), group_dat)
+    CV_pooled<- CV_pooled*100
+    
+    pool_cv<- data.frame(mass_tag_id,CV_pooled,stringsAsFactors = FALSE)
+    names(pool_cv)[1] <- edata_id
+    
     ## determine plotting window cutoff ##
     # calculate percentage of observations with CV <= 200 #
     prct.less200 = sum(pool_cv$CV_pooled <= 200,na.rm=T)/length(pool_cv$CV_pooled[!is.na(pool_cv$CV_pooled)])
-
+    
     if(prct.less200 > 0.95){x.max = min(200, quantile(pool_cv$CV_pooled, 0.99, na.rm=TRUE))}else{x.max = quantile(pool_cv$CV_pooled, 0.95, na.rm = TRUE)}
-
+    
     ## generate some summary stats for CV values, for PMART purposes only ##
     tot.nas = sum(is.na(pool_cv$CV_pooled))
-
-  output <- data.frame(pool_cv, row.names=NULL)
-
-  orig_class <- class(output)
-
-  class(output) <- c("cvFilt", orig_class)
-
-  attr(output, "sample_names") <- names(omicsData$e_data)[-which(names(omicsData$e_data) == attr(omicsData, "cnames")$edata_cname)]
-  attr(output, "group_DF") <- attr(omicsData, "group_DF")
-  attr(output, "max_x_val") <- x.max
-  attr(output, "tot_nas") <- tot.nas
-
+    
+    output <- data.frame(pool_cv, row.names=NULL)
+    
+    orig_class <- class(output)
+    
+    class(output) <- c("cvFilt", orig_class)
+    
+    attr(output, "sample_names") <- names(omicsData$e_data)[-which(names(omicsData$e_data) == attr(omicsData, "cnames")$edata_cname)]
+    attr(output, "group_DF") <- attr(omicsData, "group_DF")
+    attr(output, "max_x_val") <- x.max
+    attr(output, "tot_nas") <- tot.nas
+    
   }else{
 
     samp_id = attr(omicsData, "cnames")$fdata_cname
