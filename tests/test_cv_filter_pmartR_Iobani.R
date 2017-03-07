@@ -7,27 +7,27 @@ data("pep_object")
 omicsData <- group_designation(omicsData = pep_object, main_effects = "Condition")
 result <- pmartRqc:::cv_filter(omicsData)
 
+samp_id <- attr(omicsData, "cnames")$fdata_cname
+edata_id <- attr(omicsData, "cnames")$edata_cname
+mat <- matrix(c(1,2,3,4,5,6),nrow = 2, ncol = 3)
+vec <- c(1,2,3)
+
 #hardcoded results are from running cv_filter with "pep_object" 
 hardcoded_cv_result <- c(NaN, 36.01185, 32.76790, 31.93044, 47.89102)
 hardcoded_result_dim <- c(17407, 2)
 hardcoded_max  <- 91.95324
 hardcoded_tot_nas <- 2173
 
-samp_id <- attr(omicsData, "cnames")$fdata_cname
-edata_id <- attr(omicsData, "cnames")$edata_cname
-mat <- matrix(c(1,2,3,4,5,6),nrow = 2, ncol = 3)
-vec <- c(1,2,3)
 
 context("output tests for cv_filter()")
 
 
-test_that("some output tests",{
-  
-  #checking class of result
-  expect_that(result, is_a(c("cvFilt","data.frame")))
-  
-  expect_that(length(result), equals(2))
-  
+test_that("result is of appropriate class and length",{ 
+  expect_that(result, is_a(c("cvFilt","data.frame")))      
+  expect_that(length(result), equals(2)) 
+})
+
+test_that("components of result match attributes of omicsData",{     
   #checking that groupDF in result is the same as groupDF in omicsData
   expect_that(attr(result,"group_DF"), equals(attr(omicsData,"group_DF")))
  
@@ -47,14 +47,10 @@ test_that("some output tests",{
 
 context("input tests for cv_filter()")
 
-test_that("some input tests",{
-
-#inputing incorrect type for omicsData    
-expect_that(pmartRqc:::cv_filter(mat), throws_error())
-expect_that(pmartRqc:::cv_filter(vec), throws_error())
-
+test_that("invalid input for omicsData argument throws error",{     
+  expect_that(pmartRqc:::cv_filter(mat), throws_error())  
+  expect_that(pmartRqc:::cv_filter(vec), throws_error())
 })
-
 
 context("tests using hard coded results of cv_filter()")
 
