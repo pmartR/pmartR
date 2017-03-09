@@ -557,106 +557,50 @@ summary.customFilt <- function(filter_object){
   emeta_id <- attr(filter_object, "cnames")$emeta_cname
   samp_id <- attr(filter_object, "cnames")$fdata_cname
   
-  #if filter_object contains removes
-  if(!is.null(filter_object$e_data_remove)||!is.null(filter_object$f_data_remove)||!is.null(filter_object$e_meta_remove))
-  {
-    # samples #
-    num_samples <- attributes(filter_object)$num_samples
-    if(!is.null(filter_object$f_data_remove)) {
-      samps_filt <- length(filter_object$f_data_remove)
-      samps_left <- num_samples - samps_filt
-    } else {
-      samps_filt <- 0
-      samps_left <- num_samples
-    }
-    
-    # e_data #
-    num_edata <- attributes(filter_object)$num_edata
-    if(!is.null(filter_object$e_data_remove)) {
-      edata_filt <- length(filter_object$e_data_remove)
-      edata_left <- num_edata - edata_filt
-    } else {
-      edata_filt <- 0
-      edata_left <- num_edata
-    }
-    
-    # e_meta #
-    num_emeta <- attributes(filter_object)$num_emeta
-    if(!is.null(filter_object$e_meta_remove)) {
-      emeta_filt <- length(filter_object$e_meta_remove)
-      emeta_left <- num_emeta - emeta_filt
-    } else {
-      emeta_filt <- 0
-      emeta_left <- num_emeta
-    }
-    
-    # Display #
-    
-    samp_id <- paste(samp_id, "s (f_data)", sep="")
-    edata_id <- paste(edata_id, "s (e_data)", sep="")
-    display_emeta_id <- paste(emeta_id, "s (e_meta)", sep="")
-    
-    ## construct data frame ##
-    if(is.null(emeta_id)) {
-      disp <- data.frame(Filtered = c(samps_filt, edata_filt), Remaining = c(samps_left, edata_left), Total = c(num_samples, num_edata))
-      rownames(disp) <- c(samp_id, edata_id)
-    } else {
-      disp <- data.frame(Filtered = c(samps_filt, edata_filt, emeta_filt), Remaining = c(samps_left, edata_left, emeta_left), Total = c(num_samples, num_edata, num_emeta))
-      rownames(disp) <- c(samp_id, edata_id, display_emeta_id)
-    }
-    
+  # samples #
+  num_samples <- attributes(filter_object)$num_samples
+  if(!is.null(filter_object$f_data_remove)) {
+    samps_filt <- length(filter_object$f_data_remove)
+    samps_left <- num_samples - samps_filt
+  } else {
+    samps_filt <- 0
+    samps_left <- num_samples
   }
   
-  #if filter_object contains keeps
-  if(!is.null(filter_object$e_data_keep)||!is.null(filter_object$f_data_keep)||!is.null(filter_object$e_meta_keep))
-  {
-    # samples #
-    num_samples <- attributes(filter_object)$num_samples
-    if(!is.null(filter_object$f_data_keep)) {
-      samps_keep <- length(filter_object$f_data_keep)
-      samps_discard <- num_samples - samps_keep
-    } else {
-      samps_keep <- num_samples
-      samps_discard <- 0
-    }
-    
-    # e_data #
-    num_edata <- attributes(filter_object)$num_edata
-    if(!is.null(filter_object$e_data_keep)) {
-      edata_keep <- length(filter_object$e_data_keep)
-      edata_discard <- num_edata - edata_keep
-    } else {
-      edata_keep <- num_edata
-      edata_discard <- 0
-    }
-    
-    # e_meta #
-    num_emeta <- attributes(filter_object)$num_emeta
-    if(!is.null(filter_object$e_meta_keep)) {
-      emeta_keep <- length(filter_object$e_meta_keep)
-      emeta_discard <- num_emeta - emeta_keep
-    } else {
-      emeta_keep <- num_emeta
-      emeta_discard <- 0
-    }
-    
-    # Display #
-    
-    samp_id <- paste(samp_id, "s (f_data)", sep="")
-    edata_id <- paste(edata_id, "s (e_data)", sep="")
-    display_emeta_id <- paste(emeta_id, "s (e_meta)", sep="")
-    
-    ## construct data frame ##
-    if(is.null(emeta_id)) {
-      disp <- data.frame(Kept = c(samps_keep, edata_keep), Discarded = c(samps_discard, edata_discard), Total = c(num_samples, num_edata))
-      rownames(disp) <- c(samp_id, edata_id)
-    } else {
-      disp <- data.frame(Kept = c(samps_keep, edata_keep, emeta_keep), Discarded = c(samps_discard, edata_discard, emeta_discard), Total = c(num_samples, num_edata, num_emeta))
-      rownames(disp) <- c(samp_id, edata_id, display_emeta_id)
-    }
-    
+  # e_data #
+  num_edata <- attributes(filter_object)$num_edata
+  if(!is.null(filter_object$e_data_remove)) {
+    edata_filt <- length(filter_object$e_data_remove)
+    edata_left <- num_edata - edata_filt
+  } else {
+    edata_filt <- 0
+    edata_left <- num_edata
   }
   
+  # e_meta #
+  num_emeta <- attributes(filter_object)$num_emeta
+  if(!is.null(filter_object$e_meta_remove)) {
+    emeta_filt <- length(filter_object$e_meta_remove)
+    emeta_left <- num_emeta - emeta_filt
+  } else {
+    emeta_filt <- 0
+    emeta_left <- num_emeta
+  }
+  
+  # Display #
+  
+  samp_id <- paste(samp_id, "s (f_data)", sep="")
+  edata_id <- paste(edata_id, "s (e_data)", sep="")
+  display_emeta_id <- paste(emeta_id, "s (e_meta)", sep="")
+  
+  ## construct data frame ##
+  if(is.null(emeta_id)) {
+    disp <- data.frame(Filtered = c(samps_filt, edata_filt), Remaining = c(samps_left, edata_left), Total = c(num_samples, num_edata))
+    rownames(disp) <- c(samp_id, edata_id)
+  } else {
+    disp <- data.frame(Filtered = c(samps_filt, edata_filt, emeta_filt), Remaining = c(samps_left, edata_left, emeta_left), Total = c(num_samples, num_edata, num_emeta))
+    rownames(disp) <- c(samp_id, edata_id, display_emeta_id)
+  }
   
   ## Display output ##
   cat("\nSummary of Custom Filter\n\n")
