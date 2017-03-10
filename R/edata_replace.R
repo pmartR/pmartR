@@ -69,6 +69,8 @@ edata_replace.pepData <- function(omicsData, x, y, check.names=TRUE){
   updated_data <- as.pepData(e_data = edata_new, f_data = omicsData$f_data, e_meta = omicsData$e_meta, edata_cname = edata_id, emeta_cname=emeta_cname, fdata_cname = attr(omicsData, "cnames")$fdata_cname, data_scale = attr(omicsData, "data_info")$data_scale, data_norm = attr(omicsData, "data_info")$data_norm, norm_info=attr(omicsData, "data_info")$norm_info, data_types=attr(omicsData, "data_info")$data_types)
 
   attributes(updated_data)$group_DF <- attributes(omicsData)$group_DF
+  attributes(updated_data)$filters <- attributes(omicsData)$filters
+  attributes(updated_data)$meta_info <- attributes(omicsData)$meta_info
 
   message(paste(num_replaced, "instances of", x, "have been replaced with", y, sep=" "))
   return(updated_data)
@@ -115,6 +117,8 @@ edata_replace.proData <- function(omicsData, x, y, check.names=TRUE){
   updated_data <- as.proData(e_data = edata_new, f_data = omicsData$f_data, e_meta = omicsData$e_meta, edata_cname = edata_id, emeta_cname=emeta_cname, fdata_cname = attr(omicsData, "cnames")$fdata_cname, data_scale = attr(omicsData, "data_info")$data_scale, data_norm = attr(omicsData, "data_info")$data_norm, data_types=attr(omicsData, "data_info")$data_types)
 
   attributes(updated_data)$group_DF <- attributes(omicsData)$group_DF
+  attributes(updated_data)$filters <- attributes(omicsData)$filters
+  attributes(updated_data)$meta_info <- attributes(omicsData)$meta_info
 
   message(paste(num_replaced, "instances of", x, "have been replaced with", y, sep=" "))
   return(updated_data)
@@ -161,6 +165,8 @@ edata_replace.metabData <- function(omicsData, x, y, check.names=TRUE){
   updated_data <- as.metabData(e_data = edata_new, f_data = omicsData$f_data, e_meta = omicsData$e_meta, edata_cname = edata_id, emeta_cname=emeta_cname, fdata_cname = attr(omicsData, "cnames")$fdata_cname, data_scale = attr(omicsData, "data_info")$data_scale, data_norm = attr(omicsData, "data_info")$data_norm, data_types=attr(omicsData, "data_info")$data_types)
 
   attributes(updated_data)$group_DF <- attributes(omicsData)$group_DF
+  attributes(updated_data)$filters <- attributes(omicsData)$filters
+  attributes(updated_data)$meta_info <- attributes(omicsData)$meta_info
 
   message(paste(num_replaced, "instances of", x, "have been replaced with", y, sep=" "))
   return(updated_data)
@@ -207,6 +213,8 @@ edata_replace.lipidData <- function(omicsData, x, y, check.names=TRUE){
   updated_data <- as.lipidData(e_data = edata_new, f_data = omicsData$f_data, e_meta = omicsData$e_meta, edata_cname = edata_id, emeta_cname=emeta_cname, fdata_cname = attr(omicsData, "cnames")$fdata_cname, data_scale = attr(omicsData, "data_info")$data_scale, data_norm = attr(omicsData, "data_info")$data_norm, data_types=attr(omicsData, "data_info")$data_types)
 
   attributes(updated_data)$group_DF <- attributes(omicsData)$group_DF
+  attributes(updated_data)$filters <- attributes(omicsData)$filters
+  attributes(updated_data)$meta_info <- attributes(omicsData)$meta_info
 
   message(paste(num_replaced, "instances of", x, "have been replaced with", y, sep=" "))
   return(updated_data)

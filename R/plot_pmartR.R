@@ -877,6 +877,15 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     if(!is.numeric(facet_cols)) stop("facet_cols must be an integer greater than zero")
     if(facet_cols %% 1 != 0 | facet_cols <= 0) stop("facet_cols must be an integer greater than zero")
   }
+  
+  # add check for samples with all NAs and return message to user that these will not be plotted #
+  sample_nas <- colSums(is.na(omicsData$e_data))
+  if(any(sample_nas == nrow(omicsData$e_data))){
+    empties <- names(omicsData$e_data)[which(sample_nas == nrow(omicsData$e_data))]
+    message(paste("The following sample(s) are comprised entirely of missing data and will not be included in the plot: ", empties, sep = " "))
+  }
+  
+  
   ## end of initial checks ##
 
 
@@ -1089,6 +1098,13 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     if(length(facet_cols)>1) stop("facet_cols must be of length 1")
     if(!is.numeric(facet_cols)) stop("facet_cols must be an integer greater than zero")
     if(facet_cols %% 1 != 0 | facet_cols <= 0) stop("facet_cols must be an integer greater than zero")
+  }
+  
+  # add check for samples with all NAs and return message to user that these will not be plotted #
+  sample_nas <- colSums(is.na(omicsData$e_data))
+  if(any(sample_nas == nrow(omicsData$e_data))){
+    empties <- names(omicsData$e_data)[which(sample_nas == nrow(omicsData$e_data))]
+    message(paste("The following sample(s) are comprised entirely of missing data and will not be included in the plot: ", empties, sep = " "))
   }
   ## end of initial checks ##
 
@@ -1303,6 +1319,13 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     if(!is.numeric(facet_cols)) stop("facet_cols must be an integer greater than zero")
     if(facet_cols %% 1 != 0 | facet_cols <= 0) stop("facet_cols must be an integer greater than zero")
   }
+  
+  # add check for samples with all NAs and return message to user that these will not be plotted #
+  sample_nas <- colSums(is.na(omicsData$e_data))
+  if(any(sample_nas == nrow(omicsData$e_data))){
+    empties <- names(omicsData$e_data)[which(sample_nas == nrow(omicsData$e_data))]
+    message(paste("The following sample(s) are comprised entirely of missing data and will not be included in the plot: ", empties, sep = " "))
+  }
   ## end of initial checks ##
 
 
@@ -1506,6 +1529,13 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     if(length(facet_cols)>1) stop("facet_cols must be of length 1")
     if(!is.numeric(facet_cols)) stop("facet_cols must be an integer greater than zero")
     if(facet_cols %% 1 != 0 | facet_cols <= 0) stop("facet_cols must be an integer greater than zero")
+  }
+  
+  # add check for samples with all NAs and return message to user that these will not be plotted #
+  sample_nas <- colSums(is.na(omicsData$e_data))
+  if(any(sample_nas == nrow(omicsData$e_data))){
+    empties <- names(omicsData$e_data)[which(sample_nas == nrow(omicsData$e_data))]
+    message(paste("The following sample(s) are comprised entirely of missing data and will not be included in the plot: ", empties, sep = " "))
   }
   ## end of initial checks ##
 
