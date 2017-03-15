@@ -878,6 +878,9 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     if(facet_cols %% 1 != 0 | facet_cols <= 0) stop("facet_cols must be an integer greater than zero")
   }
   
+  ##checking that 'size' arguments are numeric
+  if(!is.numeric(title_size) | !is.numeric(x_lab_size) | !is.numeric(y_lab_size)) stop("title_size, x_lab_size and y_lab_size must be integer values")
+  
   # add check for samples with all NAs and return message to user that these will not be plotted #
   sample_nas <- colSums(is.na(omicsData$e_data))
   if(any(sample_nas == nrow(omicsData$e_data))){
@@ -1099,6 +1102,8 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     if(!is.numeric(facet_cols)) stop("facet_cols must be an integer greater than zero")
     if(facet_cols %% 1 != 0 | facet_cols <= 0) stop("facet_cols must be an integer greater than zero")
   }
+  ##checking that 'size' arguments are numeric
+  if(!is.numeric(title_size) | !is.numeric(x_lab_size) | !is.numeric(y_lab_size)) stop("title_size, x_lab_size and y_lab_size must be integer values")
   
   # add check for samples with all NAs and return message to user that these will not be plotted #
   sample_nas <- colSums(is.na(omicsData$e_data))
@@ -1320,6 +1325,9 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     if(facet_cols %% 1 != 0 | facet_cols <= 0) stop("facet_cols must be an integer greater than zero")
   }
   
+  ##checking that 'size' arguments are numeric
+  if(!is.numeric(title_size) | !is.numeric(x_lab_size) | !is.numeric(y_lab_size)) stop("title_size, x_lab_size and y_lab_size must be integer values")
+  
   # add check for samples with all NAs and return message to user that these will not be plotted #
   sample_nas <- colSums(is.na(omicsData$e_data))
   if(any(sample_nas == nrow(omicsData$e_data))){
@@ -1530,6 +1538,9 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     if(!is.numeric(facet_cols)) stop("facet_cols must be an integer greater than zero")
     if(facet_cols %% 1 != 0 | facet_cols <= 0) stop("facet_cols must be an integer greater than zero")
   }
+  
+  ##checking that 'size' arguments are numeric
+  if(!is.numeric(title_size) | !is.numeric(x_lab_size) | !is.numeric(y_lab_size)) stop("title_size, x_lab_size and y_lab_size must be integer values")
   
   # add check for samples with all NAs and return message to user that these will not be plotted #
   sample_nas <- colSums(is.na(omicsData$e_data))
