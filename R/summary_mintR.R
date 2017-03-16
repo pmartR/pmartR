@@ -551,12 +551,12 @@ summary.cvFilt <- function(filter_object, cv_threshold = NULL){
 #'@rdname summary-mintR
 #'@name summary-mintR
 summary.customFilt <- function(filter_object){
-
+  
   # get names #
   edata_id <- attr(filter_object, "cnames")$edata_cname
   emeta_id <- attr(filter_object, "cnames")$emeta_cname
   samp_id <- attr(filter_object, "cnames")$fdata_cname
-
+  
   # samples #
   num_samples <- attributes(filter_object)$num_samples
   if(!is.null(filter_object$f_data_remove)) {
@@ -566,7 +566,7 @@ summary.customFilt <- function(filter_object){
     samps_filt <- 0
     samps_left <- num_samples
   }
-
+  
   # e_data #
   num_edata <- attributes(filter_object)$num_edata
   if(!is.null(filter_object$e_data_remove)) {
@@ -576,7 +576,7 @@ summary.customFilt <- function(filter_object){
     edata_filt <- 0
     edata_left <- num_edata
   }
-
+  
   # e_meta #
   num_emeta <- attributes(filter_object)$num_emeta
   if(!is.null(filter_object$e_meta_remove)) {
@@ -586,27 +586,27 @@ summary.customFilt <- function(filter_object){
     emeta_filt <- 0
     emeta_left <- num_emeta
   }
-
+  
   # Display #
-
+  
   samp_id <- paste(samp_id, "s (f_data)", sep="")
   edata_id <- paste(edata_id, "s (e_data)", sep="")
-  emeta_id <- paste(emeta_id, "s (e_meta)", sep="")
-
+  display_emeta_id <- paste(emeta_id, "s (e_meta)", sep="")
+  
   ## construct data frame ##
   if(is.null(emeta_id)) {
     disp <- data.frame(Filtered = c(samps_filt, edata_filt), Remaining = c(samps_left, edata_left), Total = c(num_samples, num_edata))
     rownames(disp) <- c(samp_id, edata_id)
   } else {
     disp <- data.frame(Filtered = c(samps_filt, edata_filt, emeta_filt), Remaining = c(samps_left, edata_left, emeta_left), Total = c(num_samples, num_edata, num_emeta))
-    rownames(disp) <- c(samp_id, edata_id, emeta_id)
+    rownames(disp) <- c(samp_id, edata_id, display_emeta_id)
   }
-
+  
   ## Display output ##
   cat("\nSummary of Custom Filter\n\n")
   cat(capture.output(disp), sep = "\n")
   cat("\n")
-
+  
   return(invisible(disp))
 }
 

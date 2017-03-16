@@ -133,6 +133,8 @@ edata_transform.pepData <- function(omicsData, data_scale, check.names=TRUE){
   updated_data <- as.pepData(e_data = edata_new, f_data = omicsData$f_data, e_meta = omicsData$e_meta, edata_cname = edata_id, emeta_cname=emeta_cname, fdata_cname = attr(omicsData, "cnames")$fdata_cname, data_scale = data_scale, data_norm = attr(omicsData, "data_info")$data_norm, norm_info=attr(omicsData, "data_info")$norm_info, data_types=attr(omicsData, "data_info")$data_types)
 
   attributes(updated_data)$group_DF <- attributes(omicsData)$group_DF
+  attributes(updated_data)$filters <- attributes(omicsData)$filters
+  attributes(updated_data)$meta_info <- attributes(omicsData)$meta_info
 
   return(updated_data)
 }
@@ -223,6 +225,8 @@ edata_transform.proData <- function(omicsData, data_scale, check.names=TRUE){
   updated_data <- as.proData(e_data = edata_new, f_data = omicsData$f_data, e_meta = omicsData$e_meta, edata_cname = edata_id, emeta_cname=emeta_cname, fdata_cname = attr(omicsData, "cnames")$fdata_cname, data_scale = data_scale, data_norm = attr(omicsData, "data_info")$data_norm, data_types=attr(omicsData, "data_info")$data_types)
 
   attributes(updated_data)$group_DF <- attributes(omicsData)$group_DF
+  attributes(updated_data)$filters <- attributes(omicsData)$filters
+  attributes(updated_data)$meta_info <- attributes(omicsData)$meta_info
 
   return(updated_data)
 }
@@ -313,6 +317,8 @@ edata_transform.metabData <- function(omicsData, data_scale, check.names=TRUE){
   updated_data <- as.metabData(e_data = edata_new, f_data = omicsData$f_data, e_meta = omicsData$e_meta, edata_cname = edata_id, emeta_cname=emeta_cname, fdata_cname = attr(omicsData, "cnames")$fdata_cname, data_scale = data_scale, data_norm = attr(omicsData, "data_info")$data_norm, data_types=attr(omicsData, "data_info")$data_types)
 
   attributes(updated_data)$group_DF <- attributes(omicsData)$group_DF
+  attributes(updated_data)$filters <- attributes(omicsData)$filters
+  attributes(updated_data)$meta_info <- attributes(omicsData)$meta_info
 
   return(updated_data)
 }
@@ -402,6 +408,8 @@ edata_transform.lipidData <- function(omicsData, data_scale, check.names=TRUE){
   updated_data <- as.lipidData(e_data = edata_new, f_data = omicsData$f_data, e_meta = omicsData$e_meta, edata_cname = edata_id, emeta_cname=emeta_cname, fdata_cname = attr(omicsData, "cnames")$fdata_cname, data_scale = data_scale, data_norm = attr(omicsData, "data_info")$data_norm, data_types=attr(omicsData, "data_info")$data_types)
 
   attributes(updated_data)$group_DF <- attributes(omicsData)$group_DF
+  attributes(updated_data)$filters <- attributes(omicsData)$filters
+  attributes(updated_data)$meta_info <- attributes(omicsData)$meta_info
 
   return(updated_data)
 }

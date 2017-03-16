@@ -1,4 +1,4 @@
-ok---
+---
 title: "Analyzing Peptide Data with the pmartRqc Package"
 author: "Kelly Stratton, Lisa Bramer"
 date: "`r Sys.Date()`"
@@ -399,7 +399,7 @@ sppPCA is a PCA algorithm that can be used in the presence of missing data. The 
 Note that `dim_reduction()` requires that the `group_designation()` function has been run.
 
 ```{r sppPCA}
-pca_results <- dim_reduction(norm_data, k = 2)
+pca_results <- dim_reduction(mypepData, k = 2)
 
 summary(pca_results) 
 plot(pca_results)
@@ -411,7 +411,7 @@ plot(pca_results, title_size = 20, bw_theme=TRUE, legend_position="left")
 
 
 ```{r corr}
-correlation_results <- cor_result(norm_data)
+correlation_results <- cor_result(mypepData)
 
 summary(correlation_results)
 plot(correlation_results)
