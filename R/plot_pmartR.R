@@ -917,20 +917,15 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
   ## if both order_by and color_by are null ##
   if(is.null(order_by) & is.null(color_by)) {
 
-    if(bw_theme==FALSE){
-      p <- ggplot2::ggplot(plot_data) + ggplot2::geom_boxplot(ggplot2::aes(x = variable, y = value), fill = "deepskyblue1") +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
-                       legend.position = legend_position)
-    }else{
-      p <- ggplot2::ggplot(plot_data) +
-        ggplot2::theme_bw() +
-        ggplot2::geom_boxplot(ggplot2::aes(x = variable, y = value), fill = "deepskyblue1") +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
-                       legend.position = legend_position)
+    p <- ggplot2::ggplot(plot_data) + ggplot2::geom_boxplot(ggplot2::aes(x = variable, y = value), fill = "deepskyblue1") +
+      ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
+                     axis.title.x = ggplot2::element_text(size=x_lab_size),
+                     axis.title.y = ggplot2::element_text(size=y_lab_size),
+                     legend.position = legend_position)
+    
+    if(bw_theme==TRUE){
+      p <- p + ggplot2::theme_bw()
+     
     }
 
     title <- maintitle
@@ -951,20 +946,14 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     plot_data$variable <- factor(plot_data$variable, levels=unique(plot_data$variable), ordered=TRUE)
     #plot_data[[color_by]] <- factor(plot_data[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
 
-    if(bw_theme==FALSE){
-      p <- ggplot2::ggplot(plot_data) + ggplot2::geom_boxplot(ggplot2::aes(x = variable, y = value), fill = "deepskyblue1") +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
-                       legend.position = legend_position)
-    }else{
-      p <- ggplot2::ggplot(plot_data) +
-        ggplot2::theme_bw() +
-        ggplot2::geom_boxplot(ggplot2::aes(x = variable, y = value), fill = "deepskyblue1") +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
-                       legend.position = legend_position)
+    p <- ggplot2::ggplot(plot_data) + ggplot2::geom_boxplot(ggplot2::aes(x = variable, y = value), fill = "deepskyblue1") +
+      ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
+                     axis.title.x = ggplot2::element_text(size=x_lab_size),
+                     axis.title.y = ggplot2::element_text(size=y_lab_size),
+                     legend.position = legend_position)
+    
+    if(bw_theme==TRUE){
+      p <- ggplot2::theme_bw()
     }
 
     title <- bquote(atop(.(maintitle),atop(italic(paste("Ordered by ",.(order_by))),"")))
@@ -981,20 +970,14 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     plot_data <- merge(plot_data, colorDF, by = "variable")
     plot_data[[color_by]] <- factor(plot_data[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
 
-    if(bw_theme==FALSE){
-      p <- ggplot2::ggplot(plot_data) + ggplot2::geom_boxplot(ggplot2::aes_string(x = "variable", y = "value", fill = color_by)) +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
-                       legend.position = legend_position)
-    }else{
-      p <- ggplot2::ggplot(plot_data) +
-        ggplot2::theme_bw() +
-        ggplot2::geom_boxplot(ggplot2::aes_string(x = "variable", y = "value", fill = color_by)) +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
-                       legend.position = legend_position)
+    p <- ggplot2::ggplot(plot_data) + ggplot2::geom_boxplot(ggplot2::aes_string(x = "variable", y = "value", fill = color_by)) +
+      ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
+                     axis.title.x = ggplot2::element_text(size=x_lab_size),
+                     axis.title.y = ggplot2::element_text(size=y_lab_size),
+                     legend.position = legend_position)
+    
+    if(bw_theme==TRUE){
+      p <- p + ggplot2::theme_bw()
     }
 
     title <- maintitle
@@ -1030,20 +1013,15 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     plot_data$variable <- factor(plot_data$variable, levels=unique(plot_data$variable), ordered=TRUE)
     plot_data[[color_by]] <- factor(plot_data[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
 
-    if(bw_theme==FALSE){
-      p <- ggplot2::ggplot(plot_data) + ggplot2::geom_boxplot(ggplot2::aes_string(x = "variable", y = "value", fill = color_by)) +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
-                       legend.position = legend_position)
-    }else{
-      p <- ggplot2::ggplot(plot_data) +
-        ggplot2::theme_bw() +
-        ggplot2::geom_boxplot(ggplot2::aes_string(x = "variable", y = "value", fill = color_by)) +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
-                       legend.position = legend_position)
+    p <- ggplot2::ggplot(plot_data) + ggplot2::geom_boxplot(ggplot2::aes_string(x = "variable", y = "value", fill = color_by)) +
+      ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
+                     axis.title.x = ggplot2::element_text(size=x_lab_size),
+                     axis.title.y = ggplot2::element_text(size=y_lab_size),
+                     legend.position = legend_position)
+    
+    if(bw_theme==TRUE){
+      p <- p + ggplot2::theme_bw()
+     
     }
 
     title <- bquote(atop(.(maintitle),atop(italic(paste("Ordered by ",.(order_by))),"")))
@@ -1071,6 +1049,7 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     ggplot2::ggtitle(title) + ggplot2::xlab(xlabel) + ggplot2::ylab(ylabel) +
     ggplot2::scale_fill_discrete(legend_title)
 
+
   return(p)
 }
 
@@ -1085,7 +1064,7 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
 }
 
 .plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by = NULL, facet_cols = NULL, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_lab = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme=FALSE, legend_position = "right") {
-
+  
   ## initial checks ##
   if(!is.null(order_by)) {
     if(!is.character(order_by) | length(order_by) > 1) stop("order_by must be a character vector of length 1")
@@ -1112,51 +1091,45 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     message(paste("The following sample(s) are comprised entirely of missing data and will not be included in the plot: ", empties, sep = " "))
   }
   ## end of initial checks ##
-
-
+  
+  
   # organize data #
   e_data <- omicsData$e_data
   e_data_cname <- attributes(omicsData)$cnames$edata_cname
   plot_data <- reshape2::melt(e_data, id = e_data_cname, na.rm = TRUE)
-
+  
   maintitle <- ifelse(attributes(omicsData)$data_info$data_norm,
                       "Boxplots of Normalized Protein Data",
                       "Boxplots of Un-Normalized Protein Data")
-
+  
   # get data and aesthetics for plots #
-
+  
   ## if facet_by is not null and isn't the same as either order_by or color_by ##
   if(!is.null(facet_by)) {
     if(!(facet_by %in% c(order_by, color_by))) {
       facet_temp <- group_designation(omicsData, main_effects = facet_by)
       facetDF <- attributes(facet_temp)$group_DF
       colnames(facetDF) <- c("variable", facet_by)
-
+      
       plot_data <- merge(plot_data, facetDF, by = "variable")
     }
   }
-
+  
   ## if both order_by and color_by are null ##
   if(is.null(order_by) & is.null(color_by)) {
-
-    if(bw_theme == FALSE){
-      p <- ggplot2::ggplot(plot_data) + ggplot2::geom_boxplot(ggplot2::aes(x = variable, y = value), fill = "deepskyblue1") +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
-                       legend.position = legend_position)
-    }else{
-      p <- ggplot2::ggplot(plot_data) +
-        ggplot2::theme_bw() +
-        ggplot2::geom_boxplot(ggplot2::aes(x = variable, y = value), fill = "deepskyblue1") +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
-                       legend.position = legend_position)
+    
+    p <- ggplot2::ggplot(plot_data) + ggplot2::geom_boxplot(ggplot2::aes(x = variable, y = value), fill = "deepskyblue1") +
+      ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
+                     axis.title.x = ggplot2::element_text(size=x_lab_size),
+                     axis.title.y = ggplot2::element_text(size=y_lab_size),
+                     legend.position = legend_position)
+    
+    if(bw_theme == TRUE){
+      p  <- p + ggplot2::theme_bw()
     }
-
+    
     title <- maintitle
-
+    
     ## if order_by is not null and color_by is ##
   } else if(!is.null(order_by) & is.null(color_by)) {
     if(order_by != "group_DF") {
@@ -1167,30 +1140,24 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     orderDF <- attributes(order_temp)$group_DF
     colnames(orderDF)[1:2] <- c("variable", order_by)
     plot_data <- merge(plot_data, orderDF, by = "variable")
-
+    
     # reorder levels #
     plot_data <- plot_data[order(plot_data[,order_by]),]
     plot_data$variable <- factor(plot_data$variable, levels=unique(plot_data$variable), ordered=TRUE)
     #plot_data[[color_by]] <- factor(plot_data[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
-
-    if(bw_theme==FALSE){
-      p <- ggplot2::ggplot(plot_data) + ggplot2::geom_boxplot(ggplot2::aes(x = variable, y = value), fill = "deepskyblue1") +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
-                       legend.position = legend_position)
-    }else{
-      p <- ggplot2::ggplot(plot_data) +
-        ggplot2::theme_bw() +
-        ggplot2::geom_boxplot(ggplot2::aes(x = variable, y = value), fill = "deepskyblue1") +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
-                       legend.position = legend_position)
+    
+    p <- ggplot2::ggplot(plot_data) + ggplot2::geom_boxplot(ggplot2::aes(x = variable, y = value), fill = "deepskyblue1") +
+      ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
+                     axis.title.x = ggplot2::element_text(size=x_lab_size),
+                     axis.title.y = ggplot2::element_text(size=y_lab_size),
+                     legend.position = legend_position)
+    
+    if(bw_theme==TRUE){
+      p <- p + ggplot2::theme_bw()
     }
-
+    
     title <- bquote(atop(.(maintitle),atop(italic(paste("Ordered by ",.(order_by))),"")))
-
+    
     ## if color_by is not null and order_by is ##
   } else if(!is.null(color_by) & is.null(order_by)) {
     if(color_by != "group_DF") {
@@ -1202,25 +1169,19 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     colnames(colorDF)[1:2] <- c("variable", color_by)
     plot_data <- merge(plot_data, colorDF, by = "variable")
     plot_data[[color_by]] <- factor(plot_data[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
-
-    if(bw_theme==FALSE){
-      p <- ggplot2::ggplot(plot_data) + ggplot2::geom_boxplot(ggplot2::aes_string(x = "variable", y = "value", fill = color_by)) +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
-                       legend.position = legend_position)
-    }else{
-      p <- ggplot2::ggplot(plot_data) +
-        ggplot2::theme_bw() +
-        ggplot2::geom_boxplot(ggplot2::aes_string(x = "variable", y = "value", fill = color_by)) +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
-                       legend.position = legend_position)
+    
+    p <- ggplot2::ggplot(plot_data) + ggplot2::geom_boxplot(ggplot2::aes_string(x = "variable", y = "value", fill = color_by)) +
+      ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
+                     axis.title.x = ggplot2::element_text(size=x_lab_size),
+                     axis.title.y = ggplot2::element_text(size=y_lab_size),
+                     legend.position = legend_position)
+    
+    if(bw_theme==TRUE){
+      p <- p + ggplot2::theme_bw()
     }
-
+    
     title <- maintitle
-
+    
     ## if neither order_by or color_by are null ##
   } else if(!is.null(order_by) & !is.null(color_by)) {
     if(order_by != "group_DF") {
@@ -1230,7 +1191,7 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     }
     orderDF <- attributes(order_temp)$group_DF
     colnames(orderDF)[1:2] <- c("variable", order_by)
-
+    
     if(color_by != "group_DF") {
       color_temp <- group_designation(omicsData, main_effects = color_by)
     } else {
@@ -1238,7 +1199,7 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     }
     colorDF <- attributes(color_temp)$group_DF
     colnames(colorDF)[1:2] <- c("variable", color_by)
-
+    
     # deal with case where both are equal #
     if(order_by != color_by) {
       tempdata <- merge(orderDF, colorDF, by = "variable")
@@ -1246,32 +1207,27 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     } else {
       plot_data <- merge(plot_data, colorDF, by = "variable")
     }
-
+    
     # reorder levels #
     plot_data <- plot_data[order(plot_data[,order_by]),]
     plot_data$variable <- factor(plot_data$variable, levels=unique(plot_data$variable), ordered=TRUE)
     plot_data[[color_by]] <- factor(plot_data[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
-
-    if(bw_theme==FALSE){
-      p <- ggplot2::ggplot(plot_data) + ggplot2::geom_boxplot(ggplot2::aes_string(x = "variable", y = "value", fill = color_by)) +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
-                       legend.position = legend_position)
-    }else{
-      p <- ggplot2::ggplot(plot_data) +
-        + ggplot2::theme_bw()
-        ggplot2::geom_boxplot(ggplot2::aes_string(x = "variable", y = "value", fill = color_by)) +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
-                       legend.position = legend_position)
+    
+    p <- ggplot2::ggplot(plot_data) + ggplot2::geom_boxplot(ggplot2::aes_string(x = "variable", y = "value", fill = color_by)) +
+      ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
+                     axis.title.x = ggplot2::element_text(size=x_lab_size),
+                     axis.title.y = ggplot2::element_text(size=y_lab_size),
+                     legend.position = legend_position)
+    
+    if(bw_theme==TRUE){
+      p <- p + ggplot2::theme_bw()
+      
     }
-
+    
     title <- bquote(atop(.(maintitle),atop(italic(paste("Ordered by ",.(order_by))),"")))
   }
-
-
+  
+  
   # facet plot #
   if(!is.null(facet_by)) {
     if(is.null(facet_cols)) {
@@ -1280,19 +1236,19 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
       p <- p + ggplot2::facet_wrap(formula(paste("~",facet_by)), scales = "free_x", ncol = facet_cols)
     }
   }
-
+  
   # custom labels #
   if(!is.null(title_plot)) title <- title_plot
   xlabel <- ifelse(is.null(x_lab), "Sample", x_lab)
   ylabel <- ifelse(is.null(y_lab), "Value", y_lab)
   legend_title <- color_by
   if(!is.null(legend_lab)) legend_title <- legend_lab
-
+  
   # add additional features to plot #
   p <- p + ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90)) + ggplot2::xlab("Sample") +
     ggplot2::ggtitle(title) + ggplot2::xlab(xlabel) + ggplot2::ylab(ylabel) +
     ggplot2::scale_fill_discrete(legend_title)
-
+  
   return(p)
 }
 
@@ -1361,21 +1317,15 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
 
   ## if both order_by and color_by are null ##
   if(is.null(order_by) & is.null(color_by)) {
-
-    if(bw_theme==FALSE){
-      p <- ggplot2::ggplot(plot_data) + ggplot2::geom_boxplot(ggplot2::aes(x = variable, y = value), fill = "deepskyblue1") +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
-                       legend.position = legend_position)
-    }else{
-      p <- ggplot2::ggplot(plot_data) +
-        ggplot2::theme_bw() +
-        ggplot2::geom_boxplot(ggplot2::aes(x = variable, y = value), fill = "deepskyblue1") +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
-                       legend.position = legend_position)
+    
+    p <- ggplot2::ggplot(plot_data) + ggplot2::geom_boxplot(ggplot2::aes(x = variable, y = value), fill = "deepskyblue1") +
+      ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
+                     axis.title.x = ggplot2::element_text(size=x_lab_size),
+                     axis.title.y = ggplot2::element_text(size=y_lab_size),
+                     legend.position = legend_position)
+    
+    if(bw_theme==TRUE){
+     p <- p + ggplot2::theme_bw()
     }
 
     title <- maintitle
@@ -1401,6 +1351,11 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
                      axis.title.x = ggplot2::element_text(size=x_lab_size),
                      axis.title.y = ggplot2::element_text(size=y_lab_size),
                      legend.position = legend_position)
+    
+    if(bw_theme==TRUE){
+      p <- p + ggplot2::theme_bw()
+    }
+    
     title <- bquote(atop(.(maintitle),atop(italic(paste("Ordered by ",.(order_by))),"")))
 
     ## if color_by is not null and order_by is ##
@@ -1414,23 +1369,17 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     colnames(colorDF)[1:2] <- c("variable", color_by)
     plot_data <- merge(plot_data, colorDF, by = "variable")
     plot_data[[color_by]] <- factor(plot_data[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
-
-    if(bw_theme==FALSE){
-      p <- ggplot2::ggplot(plot_data) + ggplot2::geom_boxplot(ggplot2::aes_string(x = "variable", y = "value", fill = color_by)) +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
-                       legend.position = legend_position)
-    }else{
-      p <- ggplot2::ggplot(plot_data) +
-        ggplot2::theme_bw() +
-        ggplot2::geom_boxplot(ggplot2::aes_string(x = "variable", y = "value", fill = color_by)) +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
-                       legend.position = legend_position)
+    
+    p <- ggplot2::ggplot(plot_data) + ggplot2::geom_boxplot(ggplot2::aes_string(x = "variable", y = "value", fill = color_by)) +
+      ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
+                     axis.title.x = ggplot2::element_text(size=x_lab_size),
+                     axis.title.y = ggplot2::element_text(size=y_lab_size),
+                     legend.position = legend_position)
+    
+    if(bw_theme==TRUE){
+      p <- p + ggplot::theme_bw()
+      
     }
-
 
     title <- maintitle
 
@@ -1464,23 +1413,18 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     plot_data <- plot_data[order(plot_data[,order_by]),]
     plot_data$variable <- factor(plot_data$variable, levels=unique(plot_data$variable), ordered=TRUE)
     plot_data[[color_by]] <- factor(plot_data[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
-
-    if(bw_theme==FALSE){
-      p <- ggplot2::ggplot(plot_data) + ggplot2::geom_boxplot(ggplot2::aes_string(x = "variable", y = "value", fill = color_by)) +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
-                       legend.position = legend_position)
-    }else{
-      p <- ggplot2::ggplot(plot_data) +
-        ggplot2::theme_bw() +
-        ggplot2::geom_boxplot(ggplot2::aes_string(x = "variable", y = "value", fill = color_by)) +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
-                       legend.position = legend_position)
+    
+    p <- ggplot2::ggplot(plot_data) + ggplot2::geom_boxplot(ggplot2::aes_string(x = "variable", y = "value", fill = color_by)) +
+      ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
+                     axis.title.x = ggplot2::element_text(size=x_lab_size),
+                     axis.title.y = ggplot2::element_text(size=y_lab_size),
+                     legend.position = legend_position)
+    
+    if(bw_theme==TRUE){
+      p <- p + ggplot2::theme_bw()
+      
     }
-
+    
     title <- bquote(atop(.(maintitle),atop(italic(paste("Ordered by ",.(order_by))),"")))
   }
 
@@ -1505,6 +1449,7 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
   p <- p + ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90)) + ggplot2::xlab("Sample") +
     ggplot2::ggtitle(title) + ggplot2::xlab(xlabel) + ggplot2::ylab(ylabel) +
     ggplot2::scale_fill_discrete(legend_title)
+
 
   return(p)
 }
@@ -1575,21 +1520,16 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
 
   ## if both order_by and color_by are null ##
   if(is.null(order_by) & is.null(color_by)) {
-
-    if(bw_theme==FALSE){
-      p <- ggplot2::ggplot(plot_data) + ggplot2::geom_boxplot(ggplot2::aes(x = variable, y = value), fill = "deepskyblue1") +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
-                       legend.position = legend_position)
-    }else{
-      p <- ggplot2::ggplot(plot_data) +
-        ggplot2::theme_bw() +
-        ggplot2::geom_boxplot(ggplot2::aes(x = variable, y = value), fill = "deepskyblue1") +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
-                       legend.position = legend_position)
+    
+    p <- ggplot2::ggplot(plot_data) + ggplot2::geom_boxplot(ggplot2::aes(x = variable, y = value), fill = "deepskyblue1") +
+      ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
+                     axis.title.x = ggplot2::element_text(size=x_lab_size),
+                     axis.title.y = ggplot2::element_text(size=y_lab_size),
+                     legend.position = legend_position)
+    
+    if(bw_theme==TRUE){
+      p <- p + ggplot2::theme_bw()
+    
     }
 
     title <- maintitle
@@ -1610,20 +1550,15 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     plot_data$variable <- factor(plot_data$variable, levels=unique(plot_data$variable), ordered=TRUE)
     #plot_data[[color_by]] <- factor(plot_data[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
 
-    if(bw_theme==FALSE){
-      p <- ggplot2::ggplot(plot_data) + ggplot2::geom_boxplot(ggplot2::aes(x = variable, y = value), fill = "deepskyblue1") +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
-                       legend.position = legend_position)
-    }else{
-      p <- ggplot2::ggplot(plot_data) +
-        ggplot2::theme_bw() +
-        ggplot2::geom_boxplot(ggplot2::aes(x = variable, y = value), fill = "deepskyblue1") +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
-                       legend.position = legend_position)
+    p <- ggplot2::ggplot(plot_data) + ggplot2::geom_boxplot(ggplot2::aes(x = variable, y = value), fill = "deepskyblue1") +
+      ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
+                     axis.title.x = ggplot2::element_text(size=x_lab_size),
+                     axis.title.y = ggplot2::element_text(size=y_lab_size),
+                     legend.position = legend_position)
+    
+    if(bw_theme==TRUE){
+      p <- p + ggplot2::theme_bw()
+      
     }
 
     title <- bquote(atop(.(maintitle),atop(italic(paste("Ordered by ",.(order_by))),"")))
@@ -1639,21 +1574,16 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     colnames(colorDF)[1:2] <- c("variable", color_by)
     plot_data <- merge(plot_data, colorDF, by = "variable")
     plot_data[[color_by]] <- factor(plot_data[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
-
-    if(bw_theme==FALSE){
-      p <- ggplot2::ggplot(plot_data) + ggplot2::geom_boxplot(ggplot2::aes_string(x = "variable", y = "value", fill = color_by)) +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
-                       legend.position = legend_position)
-    }else{
-      p <- ggplot2::ggplot(plot_data) +
-        ggplot2::theme_bw() +
-        ggplot2::geom_boxplot(ggplot2::aes_string(x = "variable", y = "value", fill = color_by)) +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
-                       legend.position = legend_position)
+    
+    p <- ggplot2::ggplot(plot_data) + ggplot2::geom_boxplot(ggplot2::aes_string(x = "variable", y = "value", fill = color_by)) +
+      ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
+                     axis.title.x = ggplot2::element_text(size=x_lab_size),
+                     axis.title.y = ggplot2::element_text(size=y_lab_size),
+                     legend.position = legend_position)
+    
+    if(bw_theme==TRUE){
+      p <- p + ggplot2::theme_bw()
+      
     }
 
     title <- maintitle
@@ -1689,20 +1619,15 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     plot_data$variable <- factor(plot_data$variable, levels=unique(plot_data$variable), ordered=TRUE)
     plot_data[[color_by]] <- factor(plot_data[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
 
-    if(bw_theme==FALSE){
-      p <- ggplot2::ggplot(plot_data) + ggplot2::geom_boxplot(ggplot2::aes_string(x = "variable", y = "value", fill = color_by)) +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
-                       legend.position = legend_position)
-    }else{
-      p <- ggplot2::ggplot(plot_data) +
-        ggplot2::theme_bw() +
-        ggplot2::geom_boxplot(ggplot2::aes_string(x = "variable", y = "value", fill = color_by)) +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
-                       legend.position = legend_position)
+    p <- ggplot2::ggplot(plot_data) + ggplot2::geom_boxplot(ggplot2::aes_string(x = "variable", y = "value", fill = color_by)) +
+      ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
+                     axis.title.x = ggplot2::element_text(size=x_lab_size),
+                     axis.title.y = ggplot2::element_text(size=y_lab_size),
+                     legend.position = legend_position)
+    
+    if(bw_theme==TRUE){
+      p <- p + ggplot2::theme_bw()
+      
     }
 
     title <- bquote(atop(.(maintitle),atop(italic(paste("Ordered by ",.(order_by))),"")))
