@@ -188,14 +188,14 @@ plot(norm_data, title_plot="Normalized Data: Median Centering Using RIP 0.2 Pept
 
 
 ## ----sppPCA--------------------------------------------------------------
-pca_results <- dim_reduction(mypepData, k = 2)
+pca_results <- dim_reduction(norm_data, k = 2)
 
 summary(pca_results) 
 plot(pca_results)
 plot(pca_results, title_size = 20, bw_theme=TRUE, legend_position="left")
 
 ## ----corr----------------------------------------------------------------
-correlation_results <- cor_result(mypepData)
+correlation_results <- cor_result(norm_data)
 
 summary(correlation_results)
 plot(correlation_results)
