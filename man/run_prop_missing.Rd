@@ -18,4 +18,3 @@ This function calculates the fraction of missing data for each sample run.
 \author{
 Lisa Bramer
 }
-

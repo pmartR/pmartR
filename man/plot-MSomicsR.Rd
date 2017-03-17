@@ -3,18 +3,30 @@
 \name{plot-MSomicsR}
 \alias{plot-MSomicsR}
 \alias{plot.corRes}
-\alias{plot.customFilt}
-\alias{plot.cvFilt}
-\alias{plot.dimRes}
-\alias{plot.imdanovaFilt}
-\alias{plot.lipidData}
-\alias{plot.metabData}
+\alias{plot-MSomicsR}
 \alias{plot.moleculeFilt}
-\alias{plot.normRes}
-\alias{plot.pepData}
-\alias{plot.proData}
+\alias{plot-MSomicsR}
 \alias{plot.proteomicsFilt}
+\alias{plot-MSomicsR}
+\alias{plot.imdanovaFilt}
+\alias{plot-MSomicsR}
 \alias{plot.rmdFilt}
+\alias{plot-MSomicsR}
+\alias{plot.cvFilt}
+\alias{plot-MSomicsR}
+\alias{plot.customFilt}
+\alias{plot-MSomicsR}
+\alias{plot.pepData}
+\alias{plot-MSomicsR}
+\alias{plot.proData}
+\alias{plot-MSomicsR}
+\alias{plot.lipidData}
+\alias{plot-MSomicsR}
+\alias{plot.metabData}
+\alias{plot-MSomicsR}
+\alias{plot.dimRes}
+\alias{plot-MSomicsR}
+\alias{plot.normRes}
 \title{Produce a plot of a MSomicsR S3 Object}
 \usage{
 \method{plot}{corRes}(corRes_object, ...)
@@ -223,4 +235,3 @@ pca_res <- dim_reduction(pep_object2, k = 2)
 plot(pca_res)
 }
 }
-

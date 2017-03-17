@@ -32,4 +32,3 @@ summary(to_filter, min_num = 2)
 \author{
 Kelly Stratton
 }
-

@@ -70,6 +70,7 @@ The purpose of back transforming data is to ensure values are on a scale similar
 \cr
 }
 }
+
 \examples{
 dontrun{
 library(pmartRdata)
@@ -82,10 +83,9 @@ norm_data <- normalize(omicsData = lipid_object, subset_fn = "all", norm_fn = "m
 }
 
 }
-\author{
-Lisa Bramer
-}
 \references{
 
 }
-
+\author{
+Lisa Bramer
+}

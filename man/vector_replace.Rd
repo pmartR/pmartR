@@ -22,4 +22,3 @@ Replace x with y for a single vector
 \author{
 Kelly Stratton
 }
-

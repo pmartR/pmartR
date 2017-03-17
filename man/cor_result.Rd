@@ -28,4 +28,3 @@ my_correlation <- cor_result(omicsData = pep_object)
 \author{
 Kelly Stratton, Lisa Bramer
 }
-
