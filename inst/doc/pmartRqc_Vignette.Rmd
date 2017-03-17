@@ -1,4 +1,4 @@
-ok---
+---
 title: "Analyzing Peptide Data with the pmartRqc Package"
 author: "Kelly Stratton, Lisa Bramer"
 date: "`r Sys.Date()`"

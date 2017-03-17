@@ -872,11 +872,23 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     if(!is.character(facet_by) | length(facet_by) > 1) stop("facet_by must be a character vector of length 1")
   }
   if(!is.null(facet_cols)) {
-    if(is.null(facet_by)) stop("facet_by cannot be NULL when fact_cols is specified")
+    if(is.null(facet_by)) stop("facet_by cannot be NULL when facet_cols is specified")
     if(length(facet_cols)>1) stop("facet_cols must be of length 1")
     if(!is.numeric(facet_cols)) stop("facet_cols must be an integer greater than zero")
     if(facet_cols %% 1 != 0 | facet_cols <= 0) stop("facet_cols must be an integer greater than zero")
   }
+  
+  ##checking that 'size' arguments are numeric
+  if(!is.numeric(title_size) | !is.numeric(x_lab_size) | !is.numeric(y_lab_size)) stop("title_size, x_lab_size and y_lab_size must be integer values")
+  
+  # add check for samples with all NAs and return message to user that these will not be plotted #
+  sample_nas <- colSums(is.na(omicsData$e_data))
+  if(any(sample_nas == nrow(omicsData$e_data))){
+    empties <- names(omicsData$e_data)[which(sample_nas == nrow(omicsData$e_data))]
+    message(paste("The following sample(s) are comprised entirely of missing data and will not be included in the plot: ", empties, sep = " "))
+  }
+  
+  
   ## end of initial checks ##
 
 
@@ -1085,10 +1097,19 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     if(!is.character(facet_by) | length(facet_by) > 1) stop("facet_by must be a character vector of length 1")
   }
   if(!is.null(facet_cols)) {
-    if(is.null(facet_by)) stop("facet_by cannot be NULL when fact_cols is specified")
+    if(is.null(facet_by)) stop("facet_by cannot be NULL when facet_cols is specified")
     if(length(facet_cols)>1) stop("facet_cols must be of length 1")
     if(!is.numeric(facet_cols)) stop("facet_cols must be an integer greater than zero")
     if(facet_cols %% 1 != 0 | facet_cols <= 0) stop("facet_cols must be an integer greater than zero")
+  }
+  ##checking that 'size' arguments are numeric
+  if(!is.numeric(title_size) | !is.numeric(x_lab_size) | !is.numeric(y_lab_size)) stop("title_size, x_lab_size and y_lab_size must be integer values")
+  
+  # add check for samples with all NAs and return message to user that these will not be plotted #
+  sample_nas <- colSums(is.na(omicsData$e_data))
+  if(any(sample_nas == nrow(omicsData$e_data))){
+    empties <- names(omicsData$e_data)[which(sample_nas == nrow(omicsData$e_data))]
+    message(paste("The following sample(s) are comprised entirely of missing data and will not be included in the plot: ", empties, sep = " "))
   }
   ## end of initial checks ##
 
@@ -1298,10 +1319,20 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     if(!is.character(facet_by) | length(facet_by) > 1) stop("facet_by must be a character vector of length 1")
   }
   if(!is.null(facet_cols)) {
-    if(is.null(facet_by)) stop("facet_by cannot be NULL when fact_cols is specified")
+    if(is.null(facet_by)) stop("facet_by cannot be NULL when facet_cols is specified")
     if(length(facet_cols)>1) stop("facet_cols must be of length 1")
     if(!is.numeric(facet_cols)) stop("facet_cols must be an integer greater than zero")
     if(facet_cols %% 1 != 0 | facet_cols <= 0) stop("facet_cols must be an integer greater than zero")
+  }
+  
+  ##checking that 'size' arguments are numeric
+  if(!is.numeric(title_size) | !is.numeric(x_lab_size) | !is.numeric(y_lab_size)) stop("title_size, x_lab_size and y_lab_size must be integer values")
+  
+  # add check for samples with all NAs and return message to user that these will not be plotted #
+  sample_nas <- colSums(is.na(omicsData$e_data))
+  if(any(sample_nas == nrow(omicsData$e_data))){
+    empties <- names(omicsData$e_data)[which(sample_nas == nrow(omicsData$e_data))]
+    message(paste("The following sample(s) are comprised entirely of missing data and will not be included in the plot: ", empties, sep = " "))
   }
   ## end of initial checks ##
 
@@ -1502,10 +1533,20 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     if(!is.character(facet_by) | length(facet_by) > 1) stop("facet_by must be a character vector of length 1")
   }
   if(!is.null(facet_cols)) {
-    if(is.null(facet_by)) stop("facet_by cannot be NULL when fact_cols is specified")
+    if(is.null(facet_by)) stop("facet_by cannot be NULL when facet_cols is specified")
     if(length(facet_cols)>1) stop("facet_cols must be of length 1")
     if(!is.numeric(facet_cols)) stop("facet_cols must be an integer greater than zero")
     if(facet_cols %% 1 != 0 | facet_cols <= 0) stop("facet_cols must be an integer greater than zero")
+  }
+  
+  ##checking that 'size' arguments are numeric
+  if(!is.numeric(title_size) | !is.numeric(x_lab_size) | !is.numeric(y_lab_size)) stop("title_size, x_lab_size and y_lab_size must be integer values")
+  
+  # add check for samples with all NAs and return message to user that these will not be plotted #
+  sample_nas <- colSums(is.na(omicsData$e_data))
+  if(any(sample_nas == nrow(omicsData$e_data))){
+    empties <- names(omicsData$e_data)[which(sample_nas == nrow(omicsData$e_data))]
+    message(paste("The following sample(s) are comprised entirely of missing data and will not be included in the plot: ", empties, sep = " "))
   }
   ## end of initial checks ##
 
@@ -1829,7 +1870,7 @@ plot.normRes <- function(normData, order_by = NULL, color_by = NULL, ...) {
   #   if(!is.character(facet_by) | length(facet_by) > 1) stop("facet_by must be a character vector of length 1")
   # }
   # if(!is.null(facet_cols)) {
-  #   if(is.null(facet_by)) stop("facet_by cannot be NULL when fact_cols is specified")
+  #   if(is.null(facet_by)) stop("facet_by cannot be NULL when facet_cols is specified")
   #   if(length(facet_cols)>1) stop("facet_cols must be of length 1")
   #   if(!is.numeric(facet_cols)) stop("facet_cols must be an integer greater than zero")
   #   if(facet_cols %% 1 != 0 | facet_cols <= 0) stop("facet_cols must be an integer greater than zero")

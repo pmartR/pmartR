@@ -56,4 +56,3 @@ lipids_mad <- mad_transform(e_data = lipid_object2$e_data, edata_id = attr(lipid
 \author{
 Lisa Bramer, Kelly Stratton
 }
-
