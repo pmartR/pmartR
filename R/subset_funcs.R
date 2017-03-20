@@ -184,21 +184,21 @@ ppp <- function(e_data, edata_id, proportion=0.5){
 ppp_rip <- function(e_data, edata_id, fdata_id, groupDF, alpha=0.2, proportion=0.5){
 
   samp_id = fdata_id
-
+  
   # pull off the column for edata_id
   edata_id_ind <- which(colnames(e_data)==edata_id)
-
+  
   # subset to features present in at least proportion samples
   peps <- e_data[, edata_id_ind]
   #row.names(e_data) <- peps
   mydata <- e_data#[, -edata_id_ind]
-
+  
   # get matrix of !is.na's #
   mydata_present <- !is.na(mydata)
-
+  
   # get column of proportion present #
   mydata_pct_present <- rowSums(mydata_present)/ncol(mydata_present)
-
+  
   # which features have proportion present above the value of "proportion" #
   inds <- which(mydata_pct_present >= proportion)
   mydata <- mydata[inds,]
@@ -246,6 +246,7 @@ ppp_rip <- function(e_data, edata_id, fdata_id, groupDF, alpha=0.2, proportion=0
 #'
 #' @param e_data a \eqn{p \times n} data.frame, where \eqn{p} is the number of peptides, proteins, lipids, or metabolites and \eqn{n} is the number of samples. Each row corresponds to data for a peptide, protein, lipid, or metabolite, with the first column giving the identifer name.
 #' @param edata_id character string indicating the name of the peptide, protein, lipid, or metabolite identifier. Usually obtained by calling \code{attr(omicsData, "cnames")$edata_cname}.
+#' @param fdata_id character string indicating the name of the sample column name in f_data.
 #' @param groupDF data.frame created by \code{group_designation} with columns for sample.id and group. If two main effects are provided the original main effect levels for each sample are returned as the third and fourth columns of the data.frame.
 #' @param alpha numeric p-value threshold, above which the features are retained as rank invariant (default value 0.25)
 #'
@@ -266,7 +267,7 @@ ppp_rip <- function(e_data, edata_id, fdata_id, groupDF, alpha=0.2, proportion=0
 
 
 
-rip <- function(e_data, edata_id, groupDF, alpha=.2){
+rip <- function(e_data, edata_id, fdata_id, groupDF, alpha=.2){
 
   # pull off the column for edata_id
   edata_id_ind <- which(colnames(e_data)==edata_id)
@@ -277,24 +278,25 @@ rip <- function(e_data, edata_id, groupDF, alpha=.2){
   mydata <- e_data[, -edata_id_ind]
   inds <- which(complete.cases(mydata) == TRUE)
   mydata <- mydata[inds,]
-
-  pvals <- data.frame(rep(NA, nrow(mydata)))
-  for(i in 1:nrow(mydata)){
-    pvals[i,1] <- kruskal.test(as.numeric(mydata[i,])~as.factor(groupDF$Group))$p.value
-  }
+ 
+##########
+#  pvals <- data.frame(rep(NA, nrow(mydata)))
+#  for(i in 1:nrow(mydata)){
+#    pvals[i,1] <- kruskal.test(as.numeric(mydata[i,])~as.factor(groupDF$Group))$p.value
+#  }
+##########
   
-  ########## In order to make these changes we need to add fdata_id as an argument to the function
-  #  #added 2/6/17 iobani
-  #  samp_id = fdata_id
-  #  group_dat = as.character(groupDF$Group[order(groupDF$Group)])
-  #  
-  #  rtemp =  mydata[,match(names(mydata),groupDF[,samp_id])]
-  #  rtemp2 =  rtemp[,order(groupDF$Group)]
-  #  
-  #  # conduct K-W test on un-normalized data # #used kw_rcpp function 
-  #  pvals = kw_rcpp(as.matrix(rtemp2),group_dat)#here we use the kw_rcpp function to calculate pvals#
-  #  pvals = data.frame(pvals)
-  ###########
+  #added 2/6/17 iobani
+  samp_id = fdata_id
+  group_dat = as.character(groupDF$Group[order(groupDF$Group)])
+    
+  rtemp =  mydata[,match(names(mydata),groupDF[,samp_id])]
+  rtemp2 =  rtemp[,order(groupDF$Group)]
+    
+  # conduct K-W test on un-normalized data # #used kw_rcpp function 
+  pvals = kw_rcpp(as.matrix(rtemp2),group_dat)#here we use the kw_rcpp function to calculate pvals#
+  pvals = data.frame(pvals)
+ 
   
   row.names(pvals) <- row.names(mydata)
 
