@@ -859,7 +859,7 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
   .plot.pepData(omicsData, order_by, color_by, facet_by, facet_cols, ...)
 }
 
-.plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by = NULL, facet_cols = NULL, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_lab = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme=FALSE, legend_position = "right") {
+.plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by = NULL, facet_cols = NULL, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_lab = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme=FALSE, legend_position = "right", ylimit = NULL) {
 
   ## initial checks ##
   if(!is.null(order_by)) {
@@ -1050,6 +1050,12 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     ggplot2::scale_fill_discrete(legend_title)
 
 
+  if(!is.null(ylimit))
+  {
+    p <- p + ggplot2::scale_y_continuous(limits = ylimit)
+  }
+  
+  
   return(p)
 }
 
@@ -1063,7 +1069,7 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
   .plot.proData(omicsData, order_by, color_by, facet_by, facet_cols, ...)
 }
 
-.plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by = NULL, facet_cols = NULL, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_lab = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme=FALSE, legend_position = "right") {
+.plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by = NULL, facet_cols = NULL, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_lab = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme=FALSE, legend_position = "right", ylimit = NULL) {
   
   ## initial checks ##
   if(!is.null(order_by)) {
@@ -1249,6 +1255,12 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     ggplot2::ggtitle(title) + ggplot2::xlab(xlabel) + ggplot2::ylab(ylabel) +
     ggplot2::scale_fill_discrete(legend_title)
   
+  if(!is.null(ylimit))
+  {
+    p <- p + ggplot2::scale_y_continuous(limits = ylimit)
+  }
+  
+  
   return(p)
 }
 
@@ -1262,7 +1274,7 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
   .plot.lipidData(omicsData, order_by, color_by, facet_by, facet_cols, ...)
 }
 
-.plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by = NULL, facet_cols = NULL, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_lab = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme=FALSE, legend_position = "right") {
+.plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by = NULL, facet_cols = NULL, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_lab = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme=FALSE, legend_position = "right", ylimit = NULL) {
 
   ## initial checks ##
   if(!is.null(order_by)) {
@@ -1450,6 +1462,11 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     ggplot2::ggtitle(title) + ggplot2::xlab(xlabel) + ggplot2::ylab(ylabel) +
     ggplot2::scale_fill_discrete(legend_title)
 
+  if(!is.null(ylimit))
+  {
+    p <- p + ggplot2::scale_y_continuous(limits = ylimit)
+  }
+  
 
   return(p)
 }
@@ -1465,7 +1482,7 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
   .plot.metabData(omicsData, order_by, color_by, facet_by, facet_cols, ...)
 }
 
-.plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by = NULL, facet_cols = NULL, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_lab = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme=FALSE, legend_position = "right") {
+.plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by = NULL, facet_cols = NULL, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_lab = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme=FALSE, legend_position = "right", ylimit = NULL) {
 
   ## initial checks ##
   if(!is.null(order_by)) {
@@ -1659,6 +1676,12 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
                    axis.title.y = ggplot2::element_text(size=y_lab_size),
                    legend.position = legend_position)
 
+  if(!is.null(ylimit))
+  {
+    p <- p + ggplot2::scale_y_continuous(limits = ylimit)
+  }
+  
+  
   return(p)
 }
 
