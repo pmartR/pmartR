@@ -49,6 +49,7 @@
 #' \code{y_lab_size} \tab integer value indicating the font size for the y-axis. Defaults to 11. \cr
 #' \code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used. \cr
 #' \code{legend_position} \tab character string specifying one of "right", "left", "top", or "bottom" for the location of the legend. Defaults to "right". \cr
+#' \code{ylimit} \tab numeric vector of length 2 specifying y axis lower and upper limits. \cr
 #' }
 #'
 #' For plotting an S3 object of type 'corRes':
@@ -881,6 +882,9 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
   ##checking that 'size' arguments are numeric
   if(!is.numeric(title_size) | !is.numeric(x_lab_size) | !is.numeric(y_lab_size)) stop("title_size, x_lab_size and y_lab_size must be integer values")
   
+  ##checking that ylimit is numeric of length 2
+  if(!is.numeric(ylimit) | length(ylimit)!= 2) stop("ylimit must be a numeric vector of length 2")
+  
   # add check for samples with all NAs and return message to user that these will not be plotted #
   sample_nas <- colSums(is.na(omicsData$e_data))
   if(any(sample_nas == nrow(omicsData$e_data))){
@@ -1090,6 +1094,9 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
   ##checking that 'size' arguments are numeric
   if(!is.numeric(title_size) | !is.numeric(x_lab_size) | !is.numeric(y_lab_size)) stop("title_size, x_lab_size and y_lab_size must be integer values")
   
+  ##checking that ylimit is numeric of length 2
+  if(!is.numeric(ylimit) | length(ylimit)!= 2) stop("ylimit must be a numeric vector of length 2")
+  
   # add check for samples with all NAs and return message to user that these will not be plotted #
   sample_nas <- colSums(is.na(omicsData$e_data))
   if(any(sample_nas == nrow(omicsData$e_data))){
@@ -1295,6 +1302,9 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
   
   ##checking that 'size' arguments are numeric
   if(!is.numeric(title_size) | !is.numeric(x_lab_size) | !is.numeric(y_lab_size)) stop("title_size, x_lab_size and y_lab_size must be integer values")
+  
+  ##checking that ylimit is numeric of length 2
+  if(!is.numeric(ylimit) | length(ylimit)!= 2) stop("ylimit must be a numeric vector of length 2")
   
   # add check for samples with all NAs and return message to user that these will not be plotted #
   sample_nas <- colSums(is.na(omicsData$e_data))
@@ -1503,6 +1513,9 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
   
   ##checking that 'size' arguments are numeric
   if(!is.numeric(title_size) | !is.numeric(x_lab_size) | !is.numeric(y_lab_size)) stop("title_size, x_lab_size and y_lab_size must be integer values")
+  
+  ##checking that ylimit is numeric of length 2
+  if(!is.numeric(ylimit) | length(ylimit)!= 2) stop("ylimit must be a numeric vector of length 2")
   
   # add check for samples with all NAs and return message to user that these will not be plotted #
   sample_nas <- colSums(is.na(omicsData$e_data))
