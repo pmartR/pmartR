@@ -38,4 +38,3 @@ rmd_conversion(log2rmd = 4.5, df = 3)
 \author{
 Lisa Bramer
 }
-

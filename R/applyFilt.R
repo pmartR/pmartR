@@ -644,8 +644,15 @@ applyFilt.customFilt <- function(filter_object, omicsData){
   results <- omicsData
   results$e_data <- results_pieces$temp.pep2
   results$f_data <- results_pieces$temp.samp2
-  results$e_meta <- data.frame(results_pieces$temp.meta1)
-  names(results$e_meta)[which(names(omicsData$e_meta) == emeta_cname)] <- emeta_cname
+  if(!is.null(omicsData$e_meta)){ # if-statement added by Kelly 3/24/2017 #
+    results$e_meta <- data.frame(results_pieces$temp.meta1)
+    names(results$e_meta)[which(names(omicsData$e_meta) == emeta_cname)] <- emeta_cname
+  }else{
+   # e_meta is null
+    results$e_meta <- NULL
+  }
+  
+  
 
   # if group attribute is present, re-run group_designation in case filtering any items impacted the group structure #
   if(!is.null(attr(results, "group_DF"))){
@@ -873,16 +880,17 @@ MSomics_filter_worker <- function(filter_object, omicsData){
 
 
     # check for rogue entries in edata #
-    if(!is.null(ncol(temp.meta1))){
-      edat_ids2 = which(!(temp.pep2[,edata_cname] %in% temp.meta1[,edata_cname]))
+    if(!is.null(ncol(temp.meta2))){
+      edat_ids2 = which(!(temp.pep2[,edata_cname] %in% temp.meta2[,edata_cname]))
     }else{
-      edat_ids2 = which(!(temp.pep2[,edata_cname] %in% temp.meta1))
+      edat_ids2 = which(!(temp.pep2[,edata_cname] %in% temp.meta2))
     }
 
 
     # filter out edata entries which no longer have mappings to emeta entries #
     if(length(edat_ids2) > 0){
-      temp.pep2 = temp.pep2[-which(!(temp.pep2[,edata_cname] %in% temp.meta1[,edata_cname])),]
+      #temp.pep2 = temp.pep2[-which(!(temp.pep2[,edata_cname] %in% temp.meta2[,edata_cname])),]
+      temp.pep2 = temp.pep2[-edat_ids2,]
     }
 
 

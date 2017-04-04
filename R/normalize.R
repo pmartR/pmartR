@@ -65,7 +65,7 @@
 #' @references
 #'
 #' @export
-normalize <- function(omicsData, subset_fn, norm_fn, params = NULL, apply_norm = FALSE, backtransform = FALSE){
+normalize <- function(omicsData, subset_fn, norm_fn, params = NULL, apply_norm = FALSE, backtransform = FALSE, check.names=TRUE){
 
     ## initial checks ##
 
@@ -171,7 +171,7 @@ if(subset_fn == "los"){
   if(!is.null(param_val)){
   peps = los(omicsData$e_data, edata_id, param_val)
   }else{
-  peps = lost(omicsData$e_data, edtat_id)
+  peps = los(omicsData$e_data, edata_id)
   }
 }
 if(subset_fn == "rip"){
@@ -194,9 +194,9 @@ if(subset_fn == "ppp_rip"){
   peps = ppp_rip(omicsData$e_data, edata_id, samp_id, group_df, alpha = params_rip, proportion = params_ppp)
 }
 
-fn_to_use <- switch(norm_fn,mean = mean_center, median = median_center, zscore = zscore_transform, mad = mad_transform)
+fn_to_use <- switch(norm_fn, mean = mean_center, median = median_center, zscore = zscore_transform, mad = mad_transform)
 
-norm_results <- fn_to_use(e_data = omicsData$e_data, edata_id=edata_id, feature_subset = peps, backtransform = backtransform, apply_norm = apply_norm)
+norm_results <- fn_to_use(e_data = omicsData$e_data, edata_id=edata_id, feature_subset = peps, backtransform = backtransform, apply_norm = apply_norm, check.names=check.names)
 
 if(apply_norm == FALSE){
   res = list(subset_fn = subset_fn, norm_fn = norm_fn, parameters = list(normalization = norm_results$norm_params, backtransform = norm_results$backtransform_params), n_features_calc = length(peps), prop_features_calc = length(peps)/nrow(omicsData$e_data))

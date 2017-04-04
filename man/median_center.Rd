@@ -57,4 +57,3 @@ lipids_median <- median_center(e_data = lipid_object2$e_data, edata_id = attr(li
 \author{
 Lisa Bramer, Kelly Stratton
 }
-

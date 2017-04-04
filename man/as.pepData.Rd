@@ -61,9 +61,6 @@ data("pep_emeta")
 mypepData <- as.pepData(e_data = pep_edata, e_meta = pep_emeta, f_data = pep_fdata, edata_cname = "Mass_Tag_ID", fdata_cname = "SampleID", emeta_cname = "Mass_Tag_ID")
 }
 }
-\author{
-Kelly Stratton, Lisa Bramer
-}
 \seealso{
 \code{\link{as.proData}}
 
@@ -71,4 +68,6 @@ Kelly Stratton, Lisa Bramer
 
 \code{\link{as.metabData}}
 }
-
+\author{
+Kelly Stratton, Lisa Bramer
+}

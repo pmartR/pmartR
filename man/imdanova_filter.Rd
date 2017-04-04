@@ -31,4 +31,3 @@ summary(to_filter, min_nonmiss_anova = 2)
 \author{
 Kelly Stratton
 }
-

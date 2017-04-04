@@ -2,10 +2,14 @@
 % Please edit documentation in R/edata_replace.R
 \name{edata_replace}
 \alias{edata_replace}
-\alias{edata_replace.lipidData}
-\alias{edata_replace.metabData}
+\alias{edata_replace}
 \alias{edata_replace.pepData}
+\alias{edata_replace}
 \alias{edata_replace.proData}
+\alias{edata_replace}
+\alias{edata_replace.metabData}
+\alias{edata_replace}
+\alias{edata_replace.lipidData}
 \title{Replace Values Equal to x with y}
 \usage{
 edata_replace(omicsData, x, y, check.names = TRUE)
@@ -46,4 +50,3 @@ metab_object2 <- edata_replace(omicsData = metab_object, x=0, y=NA)
 \author{
 Kelly Stratton
 }
-
