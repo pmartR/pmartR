@@ -40,7 +40,7 @@
 #' @author Lisa Bramer, Kelly Stratton
 #'
 
-mad_transform <- function(e_data, edata_id, feature_subset, backtransform=FALSE, apply_norm = FALSE){
+mad_transform <- function(e_data, edata_id, feature_subset, backtransform=FALSE, apply_norm = FALSE, check.names=TRUE){
 
   subset.data <- e_data[as.character(e_data[,edata_id]) %in% as.character(feature_subset),]
   subset.data <- subset.data[, -which(colnames(subset.data)==edata_id)]
@@ -74,7 +74,7 @@ mad_transform <- function(e_data, edata_id, feature_subset, backtransform=FALSE,
       mad.data <- mad.data * pooled.mad + array(median(subset.data, na.rm=TRUE), dim=dim(e_data[,-1]))
     }
 
-    norm_data <- data.frame(e_data[,edata_id], mad.data)
+    norm_data <- data.frame(e_data[,edata_id], mad.data, check.names=check.names)
     names(norm_data)[1] <- edata_id
 
     ret_res = list(norm_params = list(scale = scale_param, location = location_param), backtransform_params = list(scale = pooled.mad, location = glob.median), transf_data = norm_data)
@@ -135,7 +135,7 @@ mad_transform <- function(e_data, edata_id, feature_subset, backtransform=FALSE,
 #' @author Lisa Bramer, Kelly Stratton
 #'
 
-median_center <- function(e_data, edata_id, feature_subset, backtransform=FALSE, apply_norm = FALSE){
+median_center <- function(e_data, edata_id, feature_subset, backtransform=FALSE, apply_norm = FALSE, check.names=TRUE){
 
   subset.data <- e_data[as.character(e_data[,edata_id]) %in% as.character(feature_subset),]
   subset.data <- subset.data[, -which(colnames(subset.data)==edata_id)]
@@ -164,7 +164,7 @@ median_center <- function(e_data, edata_id, feature_subset, backtransform=FALSE,
       med.diff <- med.diff + array(median(subset.data, na.rm=TRUE), dim=dim(e_data[,-1]))
     }
 
-    norm_data <- data.frame(e_data[,edata_id], med.diff)
+    norm_data <- data.frame(e_data[,edata_id], med.diff, check.names=check.names)
     names(norm_data)[1] <- edata_id
     ret_res = list(norm_params=list(scale = scale_param, location = location_param), backtransform_params = list(scale = NULL, location = glob.med), transf_data = norm_data)
 
@@ -213,7 +213,7 @@ median_center <- function(e_data, edata_id, feature_subset, backtransform=FALSE,
 #' @author Lisa Bramer, Kelly Stratton
 #'
 
-mean_center <- function(e_data, edata_id, feature_subset, backtransform=FALSE, apply_norm = FALSE){
+mean_center <- function(e_data, edata_id, feature_subset, backtransform=FALSE, apply_norm = FALSE, check.names=TRUE){
 
   subset_data <- e_data[as.character(e_data[,edata_id]) %in% as.character(feature_subset),]
   subset_data <- subset_data[, -which(colnames(subset_data)==edata_id)]
@@ -243,7 +243,7 @@ if(apply_norm == FALSE){
     mean_diff <- mean_diff + array(median(subset_data, na.rm=TRUE), dim=dim(e_data[,-1]))
   }
 
-  norm_data <- data.frame(e_data[,edata_id], mean_diff)
+  norm_data <- data.frame(e_data[,edata_id], mean_diff, check.names=check.names)
   names(norm_data)[1] <- edata_id
 
   ret_res = list(norm_params = list(scale = scale_param, location = location_param), backtransform_params = list(scale = NULL, location = glob.median), transf_data = norm_data)
@@ -302,7 +302,7 @@ return(ret_res)
 #'
 #'
 
-zscore_transform <- function(e_data, edata_id, feature_subset, backtransform=FALSE, apply_norm = FALSE){
+zscore_transform <- function(e_data, edata_id, feature_subset, backtransform=FALSE, apply_norm = FALSE, check.names=TRUE){
 
   subset_data <- e_data[as.character(e_data[,edata_id]) %in% as.character(feature_subset),]
   subset_data <- subset_data[, -which(colnames(subset_data)==edata_id)]
@@ -335,7 +335,7 @@ zscore_transform <- function(e_data, edata_id, feature_subset, backtransform=FAL
         # calc a pooled variance
       zscore_transf <- zscore_transf*pooled_sd + array(mean(subset_data, na.rm=TRUE), dim=dim(e_data[,-1]))
       }
-      norm_data <- data.frame(e_data[,edata_id], zscore_transf)
+      norm_data <- data.frame(e_data[,edata_id], zscore_transf, check.names=check.names)
       names(norm_data)[1] <- edata_id
       ret_res = list(norm_params = list(scale = scale_param, location = location_param), backtransform_params = list(scale = pooled_sd, location = glob_mean), transf_data = norm_data)
 
