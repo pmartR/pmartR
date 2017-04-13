@@ -74,3 +74,11 @@ test_that("invalid input for x_lab_size argument throws error",{
 test_that("invalid input for y_lab_size argument throws error",{    
   expect_that(plot(omicsData, y_lab_size = "five"), throws_error())
 })
+
+test_that("invalid input for ylimit argument throws error",{    
+  expect_that(plot(omicsData, ylimit = "one"), throws_error())
+  expect_that(plot(omicsData, ylimit = 15), throws_error())
+  expect_that(plot(omicsData, ylimit = c(1,2,3)), throws_error())
+  expect_that(plot(omicsData, ylimit = c("one", "two")), throws_error())
+})
+
