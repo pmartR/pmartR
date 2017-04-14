@@ -11,7 +11,7 @@
  vector is an ordered character vector indicating what "group" (factor level) a specific
  data element belongs to. This function makes a copy of group, called temp. Next a 
  unique function is applied to temp, exposing the levels of the factor. Next we 
- iterate through temp and count how many elements belong to each factor, these
+ iterate through temp and count how many elements belong to each factor level, these
  counts are stored in gsize.*/
 
 /* The function calculate_cv takes a vector of doubles(group) and calculates the 
@@ -23,7 +23,7 @@
  coefficient of variation of every group in a row of data. The second vector
  (non_na_values) stores the number of non-missing values per group for one 
  row of data. This function returns the pooled coefficient of variation for a 
- single row of data. The first for loop sums over all groups the product of 
+ single row of data. The first for loop sums over all groups, the product of 
  coefficient of variation and number of non-missing. The second for loop just 
  adds up all the non-missing values in a row. Then the quotient of these two 
  sums is returned.*/
@@ -48,12 +48,9 @@
  is returned. */
 
 
-  
 #include <RcppArmadillo.h>
 // [[Rcpp::depends(RcppArmadillo)]]
-
 using namespace Rcpp;
-
 
 std::vector<int> group_size(std::vector<std::string> group)
 {
@@ -69,33 +66,25 @@ std::vector<int> group_size(std::vector<std::string> group)
   
   std::vector<int> gsize(tempsize);
   
-  
   for(unsigned int i = 0;i<group.size();i++)
   {
     for(unsigned int k=0;k<temp.size();k++)
     {
-      
       if(group[i]==temp[k])
         gsize[k]++;
-      
     }
   }
   
-  
   return gsize;
-  
 }
-
 
 double calculate_cv(std::vector<double> numbers)
 {
-  
   double mean = 0, sum = 0;
   for (unsigned int i = 0; i < numbers.size(); i++)
   {
     sum = sum + numbers[i];
     mean = sum / numbers.size();
-    
   }
   double var = 0;
   for (unsigned int i = 0; i < numbers.size(); i++)
@@ -106,16 +95,13 @@ double calculate_cv(std::vector<double> numbers)
   return (sqrt(var / (numbers.size() - 1))) / mean;
 }
 
-
 double calculate_pool_cv(std::vector<double> cv, std::vector<double> non_na_values)
 {
-  
   double total = 0, sum = 0;
   
   for (unsigned int i = 0; i < cv.size(); i++)
   {
     total = total + cv[i] * non_na_values[i];
-    
   }
   
   for (unsigned int i = 0; i < cv.size(); i++)
@@ -153,12 +139,10 @@ std::list<double> pooled_cv_rcpp(arma::mat mtr,std::vector<std::string> group)
     {
       for (unsigned int k = 0; k < gsize[j]; k++)
       {
-        
         if (R_IsNA(cpy[k]))
           continue;
         else 
         {
-          
           temp.push_back(cpy[k]);
         }
       }
@@ -168,11 +152,9 @@ std::list<double> pooled_cv_rcpp(arma::mat mtr,std::vector<std::string> group)
       j++;
     }
  
-  
   //calculating cv for each group and pushing_back into gcv vector
   for (unsigned int i = 0; i < groups.size(); i++)
   {
-    
     if(groups[i].size()<= 1)
     {
       groupcv.push_back(NA_INTEGER);
@@ -183,7 +165,6 @@ std::list<double> pooled_cv_rcpp(arma::mat mtr,std::vector<std::string> group)
       tempcv = calculate_cv(groups[i]);
       groupcv.push_back(tempcv);
     }
-    
   }
   
   //counting the number of nonmissing values per group and pushing_back into nonmiss vector
@@ -194,16 +175,12 @@ std::list<double> pooled_cv_rcpp(arma::mat mtr,std::vector<std::string> group)
         {
            nonmiss.push_back(0);
         }
-    
        else
         {
            tempnonmis = groups[i].size();
            nonmiss.push_back(tempnonmis);
-      
         }
-  
   }
-  
     pool_cv = calculate_pool_cv(groupcv, nonmiss);
 
     final.push_back(pool_cv);
@@ -215,24 +192,4 @@ std::list<double> pooled_cv_rcpp(arma::mat mtr,std::vector<std::string> group)
   }
     
 return final;
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

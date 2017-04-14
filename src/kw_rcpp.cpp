@@ -1,5 +1,5 @@
 /*This program uses Rcpp attributes to import pure C++ functions into R. The main
- function takes in an anrmadillo matrix(which has already had the anova
+function takes in an anrmadillo matrix(which has already had the anova
 filter applied to it) and parses through its rows. NA values are skipped 
 and non-NA values are stored in a vector of vectors called groups, depending
 on their group membership. All the non-NA values are concatenated into a vector which
@@ -48,7 +48,6 @@ matrix is reached, all the p-values are stored in order in a list named
 // [[Rcpp::depends(BH)]]
 using namespace Rcpp;
 
-
 std::vector<int> gp_size(std::vector<std::string> group)
 {
   std::vector<std::string> temp;
@@ -75,7 +74,6 @@ std::vector<int> gp_size(std::vector<std::string> group)
   return gsize;
 }
 
-
 double calculate_kwh(std::vector <std::vector <double> > ranks, std::vector <double> nonmiss_sizes)
 {
   std::vector <double> rsums;
@@ -101,7 +99,6 @@ double calculate_kwh(std::vector <std::vector <double> > ranks, std::vector <dou
     j++;
   }
   
-  
   for(unsigned int i = 0;i<rsums.size();i++)
   {
     summation = summation + rsums[i];
@@ -111,7 +108,6 @@ double calculate_kwh(std::vector <std::vector <double> > ranks, std::vector <dou
   
   return result;
 }
-
 
 double compute_pvalue(double h,std::vector<double> nonmiss)
 {
@@ -148,7 +144,6 @@ std::list<double> kw_rcpp(arma::mat mtr,std::vector<std::string> group)
         {
           for (unsigned int k = 0; k < gsize[j]; k++)
           {
-        
             if (R_IsNA(cp[k]))
               continue;
             
@@ -181,13 +176,11 @@ std::list<double> kw_rcpp(arma::mat mtr,std::vector<std::string> group)
              }
            }
 
-    
             if((groups.size()-all_na_count) < 2)
             {
               final.push_back(0);
               nonmiss.clear();
               groups.clear();
-      
             }
     
           else
@@ -205,7 +198,6 @@ std::list<double> kw_rcpp(arma::mat mtr,std::vector<std::string> group)
                 {
                   cpy.insert(cpy.end(), groups[i].begin(), groups[i].end());
                 }
-                
               }
       
               std::vector <double> rankvec (cpy.size());
@@ -243,7 +235,6 @@ std::list<double> kw_rcpp(arma::mat mtr,std::vector<std::string> group)
                 double h = 0, p = 0;
       
                 h = calculate_kwh(ranks,nonmiss);
-      
                 p = compute_pvalue(h,nonmiss);
         
                 final.push_back(p);
@@ -254,11 +245,8 @@ std::list<double> kw_rcpp(arma::mat mtr,std::vector<std::string> group)
                 rankvec.clear();
                 yvec.clear();
                 cpy.clear();
-      
             }
-    
       }
   
   return final;
-  
 }
