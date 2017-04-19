@@ -1016,39 +1016,59 @@ MSomics_filter_worker <- function(filter_object, omicsData){
       if(!is.null(filter_object$emeta_keep) & !is.null(emeta_cname)){
         # identify which proteins in data match filter list and remove from e_meta #
         temp.meta = temp.meta1
+        temp.meta_not_kept = omicsData$e_meta[-which(omicsData$e_meta$Mass_Tag_ID %in% temp.meta$Mass_Tag_ID),]
         
-        # check that at least one of the proteins is in e_meta #
+        # check that at least one of the proteins is in e_meta (this is e_meta after e_data_keep has been applied) #
         if(!is.null(ncol(temp.meta))){
           emeta_ids2 = which(as.character(temp.meta[,emeta_cname]) %in% filter_object$emeta_keep)
         }else{
           emeta_ids2 = which(temp.meta %in% filter_object$emeta_keep)
         }
         
+        # check that at least one of the proteins is in temp_meta_not_kept #
+        if(!is.null(ncol(temp.meta_not_kept))){
+          emeta_ids_not_kept = which(as.character(temp.meta_not_kept[,emeta_cname]) %in% filter_object$emeta_keep)
+        }else{
+          emeta_ids_not_kept = which(temp.meta_not_kept %in% filter_object$emeta_keep)
+        }
         
+        #if there are e_meta_keep (proteins) in the part of e_meta that we previously kept we will keep temp.meta
         if(length(emeta_ids2) > 0){
           if(!is.null(ncol(temp.meta))){
-            temp.meta2 = temp.meta[which(temp.meta[,emeta_cname] %in% filter_object$emeta_keep),]
+            temp.meta2 = temp.meta
           }else{
-            temp.meta2 = temp.meta[which(temp.meta %in% filter_object$emeta_keep)]
+            temp.meta2 = temp.meta
           }
         }else{temp.meta2 = temp.meta}
+        
+        #if there are e_meta_keep(proteins) outside of e_meta that we previously kept we will keep these along with temp.meta2
+        if(length(emeta_ids_not_kept) > 0){
+          if(!is.null(ncol(temp.meta_not_kept))){
+            temp.meta3 = temp.meta_not_kept[which(temp.meta_not_kept[,emeta_cname] %in% filter_object$emeta_keep),]
+            temp.meta2 = rbind(temp.meta2,temp.meta3)
+          }else{
+            temp.meta3 = temp.meta_not_kept[which(temp.meta_not_kept %in% filter_object$emeta_keep)]
+            temp.meta2 = rbind(temp.meta2, temp.meta3)
+          }
+        }else{temp.meta2 = temp.meta}
+        
       }else{
         temp.meta2 = temp.meta1
       }
       
       
-      # check for rogue entries in edata #
+      # check for entries in e_meta[,emeta_cname] that are not in e_data[,edata_cname]#
       if(!is.null(ncol(temp.meta2))){
-        edat_ids2 = which(!(temp.pep2[,edata_cname] %in% temp.meta2[,edata_cname]))
+        edat_ids2 = which(!temp.meta2[,edata_cname] %in% (temp.pep2[,edata_cname]))
       }else{
-        edat_ids2 = which(!(temp.pep2[,edata_cname] %in% temp.meta2))
+        edat_ids2 = which(!(temp.meta2 %in% temp.pep2[,edata_cname]))
       }
       
       
-      # filter out edata entries which no longer have mappings to emeta entries #
+      # add edata entries which were present in emeta but not edata #
       if(length(edat_ids2) > 0){
-        #temp.pep2 = temp.pep2[-which(!(temp.pep2[,edata_cname] %in% temp.meta2[,edata_cname])),]
-        temp.pep2 = temp.pep2[-edat_ids2,]
+        additional_peps<- temp.meta2$Mass_Tag_ID[edat_ids2]
+        temp.pep2 = rbind(temp.pep2, omicsData$e_data[which(omicsData$e_data$Mass_Tag_ID %in% additional_peps) ,c(edata_cname_id,inds)])
       }
       
       
