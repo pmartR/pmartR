@@ -221,16 +221,16 @@ ppp_rip <- function(e_data, edata_id, fdata_id, groupDF, alpha=0.2, proportion=0
 ##########
   
   #added 2/6/17 lines 223-231 iobani
-  mydata = mydata[,-which(names(mydata) %in% edata_id)]
+  mydata = mydata[, -which(names(mydata) %in% edata_id)]
   group_dat = as.character(groupDF$Group[order(groupDF$Group)])
-  rtemp = mydata[,match(names(mydata),groupDF[,samp_id])]
-  rtemp2 = rtemp[,order(groupDF$Group)]
+  rtemp = mydata[, match(groupDF[, samp_id], names(mydata))]
+  rtemp2 = rtemp[, order(groupDF$Group)]
   
   # conduct K-W test using kw_rcpp function 
-  pvals = kw_rcpp(as.matrix(rtemp2),group_dat)
+  pvals = kw_rcpp(as.matrix(rtemp2), group_dat)
   pvals= data.frame(pvals)
   
-  RIPeps <- as.character(peps[as.numeric(pvals[,1]) > alpha])
+  RIPeps <- as.character(peps[as.numeric(pvals[, 1]) > alpha])
 
   if(length(RIPeps)<2) stop("There are <2 biomolecules in the subset; cannot proceed.")
 
@@ -290,17 +290,17 @@ rip <- function(e_data, edata_id, fdata_id, groupDF, alpha=.2){
   samp_id = fdata_id
   group_dat = as.character(groupDF$Group[order(groupDF$Group)])
     
-  rtemp =  mydata[,match(names(mydata),groupDF[,samp_id])]
-  rtemp2 =  rtemp[,order(groupDF$Group)]
+  rtemp =  mydata[, match(groupDF[, samp_id], names(mydata))]
+  rtemp2 =  rtemp[, order(groupDF$Group)]
     
-  # conduct K-W test on un-normalized data # #used kw_rcpp function 
-  pvals = kw_rcpp(as.matrix(rtemp2),group_dat)#here we use the kw_rcpp function to calculate pvals#
+  # conduct K-W test on un-normalized data, used kw_rcpp function 
+  pvals = kw_rcpp(as.matrix(rtemp2), group_dat)
   pvals = data.frame(pvals)
  
   
   row.names(pvals) <- row.names(mydata)
 
-  RIPeps <- as.character(row.names(pvals)[as.numeric(pvals[,1]) > alpha])
+  RIPeps <- as.character(row.names(pvals)[as.numeric(pvals[, 1]) > alpha])
 
   if(length(RIPeps)<2) stop("There are <2 biomolecules in the subset; cannot proceed.")
 

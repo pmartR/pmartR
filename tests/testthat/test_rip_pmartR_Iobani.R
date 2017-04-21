@@ -1,5 +1,5 @@
 # testing function for rip() in subset_funcs.R
-
+library(pmartRqc)
 library(testthat)
 library(pmartRdata)
 data("pep_object")

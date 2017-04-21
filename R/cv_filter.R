@@ -54,8 +54,8 @@ cv_filter <- function(omicsData){
     edataid_col_num = which(names(omicsData$e_data) == edata_id)
     
     temp_data<- omicsData$e_data[,-edataid_col_num]
-    temp_data2<- temp_data[,match(names(temp_data), groupDF[,samp_id])]
-    temp_data3<- temp_data2[,order(groupDF$Group)]
+    temp_data2<- temp_data[, match(groupDF[, samp_id], names(temp_data))]
+    temp_data3<- temp_data2[, order(groupDF$Group)]
     
     # calculate cv (on original scale) and number of non-missing values, by peptide and group #
     if(attr(omicsData, "data_info")$data_scale == "log2"){

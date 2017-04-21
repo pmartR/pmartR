@@ -90,7 +90,7 @@ nonmissing_per_group <- function(omicsData = NULL, e_data = NULL, groupDF=NULL, 
   Mass_Tag_ID<- as.character(e_data[,cname_id])
   
   temp_data<- e_data[ , -which(names(e_data) %in% cname_id)]
-  temp_data2<- temp_data[,match(names(temp_data),groupDF[ ,samp_id])]
+  temp_data2<- temp_data[, match(groupDF[ ,samp_id], names(temp_data))]
   temp_data3<- temp_data2[,order(groupDF$Group)]
   
   
