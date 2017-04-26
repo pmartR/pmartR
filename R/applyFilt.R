@@ -759,7 +759,7 @@ MSomics_filter_worker <- function(filter_object, omicsData){
   group_DF = attr(omicsData, "group_DF")
   
   #check if filter object contains remove arguments
-  if(!is.null(filter_object$edata_filt)||!is.null(filter_object$emeta_filt)||!is.null(filter_object$sample_filt)){
+  if(!is.null(filter_object$edata_filt)||!is.null(filter_object$emeta_filt)||!is.null(filter_object$samples_filt)){
     
     ## check to see if e_meta is provided ##
     # if not provided we only need to worry about e_data and f_data #
