@@ -1014,7 +1014,7 @@ MSomics_filter_worker <- function(filter_object, omicsData){
       
       ## keep entries in emeta ##
       if(!is.null(filter_object$emeta_keep) & !is.null(emeta_cname)){
-        # identify which proteins in data match filter list and remove from e_meta #
+        # identify which proteins in data match filter list and keep in e_meta #
         temp.meta = temp.meta1
         temp.meta_not_kept = omicsData$e_meta[-which(omicsData$e_meta$Mass_Tag_ID %in% temp.meta$Mass_Tag_ID),]
         
@@ -1032,7 +1032,7 @@ MSomics_filter_worker <- function(filter_object, omicsData){
           emeta_ids_not_kept = which(temp.meta_not_kept %in% filter_object$emeta_keep)
         }
         
-        #if there are e_meta_keep (proteins) in the part of e_meta that we previously kept we will keep temp.meta
+        #if there are e_meta_keep (proteins) in the part of e_meta that we previously kept, then these proteins have already been kept
         if(length(emeta_ids2) > 0){
           if(!is.null(ncol(temp.meta))){
             temp.meta2 = temp.meta
@@ -1041,7 +1041,7 @@ MSomics_filter_worker <- function(filter_object, omicsData){
           }
         }else{temp.meta2 = temp.meta}
         
-        #if there are e_meta_keep(proteins) outside of e_meta that we previously kept we will keep these along with temp.meta2
+        #if there are e_meta_keep(proteins) outside of e_meta that we previously kept we will keep these 
         if(length(emeta_ids_not_kept) > 0){
           if(!is.null(ncol(temp.meta_not_kept))){
             temp.meta3 = temp.meta_not_kept[which(temp.meta_not_kept[,emeta_cname] %in% filter_object$emeta_keep),]
@@ -1068,6 +1068,13 @@ MSomics_filter_worker <- function(filter_object, omicsData){
       # add edata entries which were present in emeta but not edata #
       if(length(edat_ids2) > 0){
         additional_peps<- temp.meta2$Mass_Tag_ID[edat_ids2]
+        edata_cname_id = which(names(temp.pep1) == edata_cname)
+        
+        if(is.null(filter_object$samples_keep)){
+          inds = which(names(temp.pep1) %in% temp.samp2[,samp_cname]) 
+        }
+        else inds = which(names(temp.pep1) %in% filter_object$samples_keep)
+        
         temp.pep2 = rbind(temp.pep2, omicsData$e_data[which(omicsData$e_data$Mass_Tag_ID %in% additional_peps) ,c(edata_cname_id,inds)])
       }
       
