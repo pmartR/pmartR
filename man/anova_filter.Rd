@@ -30,9 +30,10 @@ filter_results <- anova_filter(nonmiss_per_group = nonmissing_per_group(omicsDat
 }
 
 }
-\seealso{
-\code{\link{nonmissing_per_group}}
-}
 \author{
 Kelly Stratton
 }
+\seealso{
+\code{\link{nonmissing_per_group}}
+}
+

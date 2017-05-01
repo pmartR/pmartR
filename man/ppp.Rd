@@ -35,3 +35,4 @@ pep_subset <- ppp(e_data = pep_pepData$e_data, edata_id = attr(pep_pepData, "cna
 \author{
 Kelly Stratton
 }
+
