@@ -21,3 +21,4 @@ Kurtosis is calculated by method 2 in the \code{e1071} package, which is unbiase
 \author{
 Lisa Bramer
 }
+

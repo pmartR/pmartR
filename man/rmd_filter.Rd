@@ -2,14 +2,10 @@
 % Please edit documentation in R/rmd_filter.R
 \name{rmd_filter}
 \alias{rmd_filter}
-\alias{rmd_filter}
-\alias{rmd_filter.pepData}
-\alias{rmd_filter}
-\alias{rmd_filter.proData}
-\alias{rmd_filter}
 \alias{rmd_filter.lipidData}
-\alias{rmd_filter}
 \alias{rmd_filter.metabData}
+\alias{rmd_filter.pepData}
+\alias{rmd_filter.proData}
 \title{RMD Runs}
 \usage{
 rmd_filter(omicsData, ...)
@@ -62,9 +58,10 @@ rmd_results <- rmd_filter(omicsData = pep_pepData3)
 }
 
 }
-\references{
-Matzke, M., Waters, K., Metz, T., Jacobs, J., Sims, A., Baric, R., Pounds, J., and Webb-Robertson, B.J. (2011), \emph{Improved quality control processing of peptide-centric LC-MS proteomics data}. Bioinformatics. 27(20): 2866-2872.
-}
 \author{
 Lisa Bramer, Kelly Stratton
 }
+\references{
+Matzke, M., Waters, K., Metz, T., Jacobs, J., Sims, A., Baric, R., Pounds, J., and Webb-Robertson, B.J. (2011), \emph{Improved quality control processing of peptide-centric LC-MS proteomics data}. Bioinformatics. 27(20): 2866-2872.
+}
+

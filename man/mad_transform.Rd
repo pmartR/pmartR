@@ -5,7 +5,7 @@
 \title{Median Absolute Deviation Transformation}
 \usage{
 mad_transform(e_data, edata_id, feature_subset, backtransform = FALSE,
-  apply_norm = FALSE)
+  apply_norm = FALSE, check.names = TRUE)
 }
 \arguments{
 \item{e_data}{a \eqn{p \times n + 1} data.frame, where \eqn{p} is the number of peptides, lipids, or metabolites and \eqn{n} is the number of samples. Each row corresponds to data for a peptide, lipid, or metabolite, with a column giving the identifer name.}
@@ -56,3 +56,4 @@ lipids_mad <- mad_transform(e_data = lipid_object2$e_data, edata_id = attr(lipid
 \author{
 Lisa Bramer, Kelly Stratton
 }
+

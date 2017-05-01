@@ -2,14 +2,10 @@
 % Please edit documentation in R/edata_transform.R
 \name{edata_transform}
 \alias{edata_transform}
-\alias{edata_transform}
-\alias{edata_transform.pepData}
-\alias{edata_transform}
-\alias{edata_transform.proData}
-\alias{edata_transform}
-\alias{edata_transform.metabData}
-\alias{edata_transform}
 \alias{edata_transform.lipidData}
+\alias{edata_transform.metabData}
+\alias{edata_transform.pepData}
+\alias{edata_transform.proData}
 \title{Apply a Transformation to the Data}
 \usage{
 edata_transform(omicsData, data_scale, check.names = TRUE)
@@ -49,3 +45,4 @@ attr(metab_object2, "data_info")$data_scale
 \author{
 Kelly Stratton, Natalie Heller
 }
+

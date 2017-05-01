@@ -18,3 +18,4 @@ This function calculates the coefficient of variation for a vector of data
 \author{
 Lisa Bramer
 }
+
