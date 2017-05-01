@@ -1708,13 +1708,15 @@ plot.dimRes <- function(dimRes_object, ...) {
 }
 
 .plot.dimRes <- function(dimRes_object, x_lab = NULL, y_lab = NULL, legend_lab = NULL, title_plot = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme = FALSE, legend_position = "right") {
-
+  
   plotdata <- data.frame(SampleID = dimRes_object$SampleID, PC1 = dimRes_object$PC1, PC2 = dimRes_object$PC2)
-
+  plotdata_name<-names(plotdata)[1]
+  
   # if there is a group designation #
   if(!is.null(attr(dimRes_object,"group_DF"))) {
     group_DF <- attr(dimRes_object,"group_DF")
-
+    fdata_cname<- names(group_DF)[1]
+    
     # if there's two main effects #
     if(ncol(group_DF) == 4) {
       main_eff_names <- names(group_DF[,3:4])
@@ -1725,25 +1727,35 @@ plot.dimRes <- function(dimRes_object, ...) {
       }
       # manage the length of legend titles #
       display_names <- sapply(main_eff_names, abbrev_fun)
-
-      plotdata[,4:5] <- group_DF[,3:4]
-      names(plotdata[,4:5]) <- main_eff_names
-
+      
+      if(!identical(as.character(plotdata[[plotdata_name]]), as.character(group_DF[[fdata_cname]]))){
+        group_DF<- group_DF[match(plotdata[[plotdata_name]], group_DF[[fdata_cname]]), ]
+        plotdata<- merge.data.frame(plotdata, group_DF, by.x = plotdata_name, by.y = fdata_cname, sort = FALSE)
+      }
+      
+      else plotdata<- merge.data.frame(plotdata, group_DF, by.x = plotdata_name, by.y = group_DF[[fdata_cname]], sort = FALSE)
+      
       color_var <- main_eff_names[1]
       pch_var <- main_eff_names[2]
-
+      
       #plotdata[, colnames(plotdata) == pch_var] <- as.factor(plotdata[, colnames(plotdata) == pch_var])
       #plotdata[, colnames(plotdata) == color_var] <- as.factor(plotdata[, colnames(plotdata) == color_var])
-
+      
       if(length(legend_lab) > length(main_eff_names)) warning("legend_lab length is greater than the number of main effects. Only the first two entries will be used.")
-
+      
     } else {
-      plotdata$Group <- group_DF$Group
-
+      
+      if(!identical(as.character(plotdata[[plotdata_name]]), as.character(group_DF[[fdata_cname]]))){
+        group_DF<- group_DF[match(plotdata[[plotdata_name]], group_DF[[fdata_cname]]), ]
+        plotdata<- merge.data.frame(plotdata, group_DF, by.x = plotdata_name, by.y = fdata_cname, sort = FALSE)
+      }
+      
+      else plotdata<- merge.data.frame(plotdata, group_DF, by.x = plotdata_name, by.y = fdata_cname,sort = FALSE)
+      
       color_var <- "Group"
       pch_var <- NULL
       display_names <- c("Group", NULL)
-
+      
       if(length(legend_lab) > 1) warning("legend_lab length is greater than the number of main effects. Only the first entry will be used.")
     }
   } else {
@@ -1752,22 +1764,22 @@ plot.dimRes <- function(dimRes_object, ...) {
     display_names <- c(NULL, NULL)
     if(!is.null(legend_lab)) warning("There is no group designation, so legend_lab will go unused.")
   }
-
+  
   # axis labels #
   xr2 <- paste(" = ", round(attr(dimRes_object, "R2")[1],3), ")", sep = "")
   yr2 <- paste(" = ", round(attr(dimRes_object, "R2")[2],3), ")", sep = "")
   pc1 <- "PC1 ("
   pc2 <- "PC2 ("
-
+  
   # custom legend names #
   if(!is.null(legend_lab)) {
     # make the vector at least length 2 to avoid errors in the plot
     display_names[1:length(legend_lab)] <- legend_lab[1:min(2, length(legend_lab))]
   }
-
+  
   # title #
   plot_title <- ifelse(is.null(title_plot), "Principal Components", title_plot)
-
+  
   # plot #
   if(bw_theme==FALSE){
     p <- ggplot2::ggplot(plotdata, ggplot2::aes(x = PC1, y = PC2)) +
@@ -1791,8 +1803,8 @@ plot.dimRes <- function(dimRes_object, ...) {
                      axis.title.y = ggplot2::element_text(size=y_lab_size),
                      legend.position = legend_position)
   }
-
-
+  
+  
   if(is.null(x_lab) & is.null(y_lab)) {
     p <- p + ggplot2::xlab(substitute(paste(pc1, R^2, xr2))) +
       ggplot2::ylab(substitute(paste(pc2, R^2, yr2)))
@@ -1804,8 +1816,8 @@ plot.dimRes <- function(dimRes_object, ...) {
       p <- p + ggplot2::ylab(y_lab)
     }
   }
-
-
+  
+  
   return(p)
 }
 
