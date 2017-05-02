@@ -638,12 +638,32 @@ applyFilt.customFilt <- function(filter_object, omicsData){
   if(!is.null(filter_object$e_data_remove)||!is.null(filter_object$f_data_remove)||!is.null(filter_object$e_meta_remove)){
     
     filter_object_new = list(edata_filt = filter_object$e_data_remove, emeta_filt = filter_object$e_meta_remove, samples_filt = filter_object$f_data_remove)
+    
+    # check that edata_filt doesn't specify ALL the items in omicsData #
+    if(all(omicsData$e_data[, edata_cname] %in% filter_object_new$edata_filt)){stop("edata_filt specifies all the items in the data")}
+    
+    # check that samples_filt doesn't specify ALL the items in omicsData #
+    if(all(omicsData$f_data[, fdata_cname] %in% filter_object_new$samples_filt)){stop("samples_filt specifies all the items in the data")}
+    
+    # check that emeta_filt doesn't specify ALL the items in omicsData #
+    if(all(omicsData$e_meta[, emeta_cname] %in% filter_object_new$emeta_filt)){stop("emeta_filt specifies all the items in the data")}
+    
   }
   
   else{
     filter_object_new = list(edata_keep = filter_object$e_data_keep, emeta_keep = filter_object$e_meta_keep, samples_keep = filter_object$f_data_keep)
+    
+    # check that edata_keep doesn't specify ALL the items in omicsData #
+    if(all(omicsData$e_data[, edata_cname] %in% filter_object_new$edata_keep)){stop("edata_keep specifies all the items in the data")}
+    
+    # check that samples_keep doesn't specify ALL the items in omicsData #
+    if(all(omicsData$f_data[, fdata_cname] %in% filter_object_new$samples_keep)){stop("samples_keep specifies all the items in the data")}
+    
+    # check that emeta_keep doesn't specify ALL the items in omicsData #
+    if(all(omicsData$e_meta[, emeta_cname] %in% filter_object_new$emeta_filt)){stop("emeta_filt specifies all the items in the data")}
+    
   }
-
+  
   # call the function that does the filter application
   results_pieces <- MSomics_filter_worker(omicsData = omicsData, filter_object = filter_object_new)
 
