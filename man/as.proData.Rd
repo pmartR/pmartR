@@ -60,6 +60,9 @@ data("pro_fdata")
 myproData <- as.proData(e_data = pro_edata, f_data = pro_fdata, edata_cname = "Reference", fdata_cname = "SampleID", data_norm=TRUE, norm_method="median_center")
 }
 }
+\author{
+Kelly Stratton, Lisa Bramer
+}
 \seealso{
 \code{\link{as.pepData}}
 
@@ -67,6 +70,4 @@ myproData <- as.proData(e_data = pro_edata, f_data = pro_fdata, edata_cname = "R
 
 \code{\link{as.metabData}}
 }
-\author{
-Kelly Stratton, Lisa Bramer
-}
+

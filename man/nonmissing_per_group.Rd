@@ -37,3 +37,4 @@ nonmissing_result <- nonmissing_per_group(e_data = pep_object2$e_data, groupDF =
 \author{
 Lisa Bramer, Kelly Stratton
 }
+

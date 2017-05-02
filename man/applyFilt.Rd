@@ -2,18 +2,12 @@
 % Please edit documentation in R/applyFilt.R
 \name{applyFilt}
 \alias{applyFilt}
-\alias{applyFilt}
-\alias{applyFilt.moleculeFilt}
-\alias{applyFilt}
-\alias{applyFilt.cvFilt}
-\alias{applyFilt}
-\alias{applyFilt.rmdFilt}
-\alias{applyFilt}
-\alias{applyFilt.proteomicsFilt}
-\alias{applyFilt}
-\alias{applyFilt.imdanovaFilt}
-\alias{applyFilt}
 \alias{applyFilt.customFilt}
+\alias{applyFilt.cvFilt}
+\alias{applyFilt.imdanovaFilt}
+\alias{applyFilt.moleculeFilt}
+\alias{applyFilt.proteomicsFilt}
+\alias{applyFilt.rmdFilt}
 \title{Apply a S3 filter  object to an MSomics S3 object}
 \usage{
 applyFilt(filter_object, omicsData, ...)
@@ -85,6 +79,9 @@ print(str(attributes(pep_object3)$filters))
 }
 
 }
+\author{
+Lisa Bramer, Kelly Stratton
+}
 \seealso{
 \code{\link{molecule_filter}}
 
@@ -98,6 +95,4 @@ print(str(attributes(pep_object3)$filters))
 
 \code{\link{custom_filter}}
 }
-\author{
-Lisa Bramer, Kelly Stratton
-}
+

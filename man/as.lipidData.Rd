@@ -61,6 +61,9 @@ mylipidData <- as.lipidData(e_data = lipid_edata, f_data = lipid_fdata, edata_cn
 }
 
 }
+\author{
+Lisa Bramer, Kelly Stratton
+}
 \seealso{
 \code{\link{as.metabData}}
 
@@ -68,6 +71,4 @@ mylipidData <- as.lipidData(e_data = lipid_edata, f_data = lipid_fdata, edata_cn
 
 \code{\link{as.proData}}
 }
-\author{
-Lisa Bramer, Kelly Stratton
-}
+

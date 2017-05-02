@@ -5,7 +5,7 @@
 \title{Mean Center Transformation}
 \usage{
 mean_center(e_data, edata_id, feature_subset, backtransform = FALSE,
-  apply_norm = FALSE)
+  apply_norm = FALSE, check.names = TRUE)
 }
 \arguments{
 \item{e_data}{e_data a \eqn{p \times n + 1} data.frame, where \eqn{p} is the number of peptides, lipids, or metabolites and \eqn{n} is the number of samples. Each row corresponds to data for a peptide, protein, lipid, or metabolite, with a column giving the identifer name.}
@@ -49,3 +49,4 @@ If backtransform is TRUE, the global median of the subset data (across all sampl
 \author{
 Lisa Bramer, Kelly Stratton
 }
+
