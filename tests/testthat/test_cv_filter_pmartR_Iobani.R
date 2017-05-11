@@ -1,5 +1,5 @@
 # testing function for cv_filter() 
-
+library(pmartRqc)
 library(testthat)
 library(pmartRdata)
 data("pep_object")

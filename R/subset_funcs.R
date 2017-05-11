@@ -184,42 +184,53 @@ ppp <- function(e_data, edata_id, proportion=0.5){
 ppp_rip <- function(e_data, edata_id, fdata_id, groupDF, alpha=0.2, proportion=0.5){
 
   samp_id = fdata_id
-
+  
   # pull off the column for edata_id
   edata_id_ind <- which(colnames(e_data)==edata_id)
-
+  
   # subset to features present in at least proportion samples
   peps <- e_data[, edata_id_ind]
   #row.names(e_data) <- peps
   mydata <- e_data#[, -edata_id_ind]
-
+  
   # get matrix of !is.na's #
   mydata_present <- !is.na(mydata)
-
+  
   # get column of proportion present #
   mydata_pct_present <- rowSums(mydata_present)/ncol(mydata_present)
-
+  
   # which features have proportion present above the value of "proportion" #
   inds <- which(mydata_pct_present >= proportion)
   mydata <- mydata[inds,]
   peps <- peps[inds]
-
-  pvals <- data.frame(rep(NA, nrow(mydata)))
-  for(i in 1:nrow(mydata)){
-    # check to see whether all observations are in the same group
-    nonmiss <- nonmissing_per_group(e_data = mydata[i,], groupDF= groupDF, cname_id=edata_id, samp_id=samp_id)$nonmiss_totals
-    if(sum(nonmiss[-1]==0) > (length(nonmiss[-1])-2)){
-      # if so, return 0 (we don't want to keep this one)
-      pvals[i,1] <- 0
-    }else{
-      # otherwise, return the p-value
-      pvals[i,1] <- kruskal.test(as.numeric(mydata[i,-1])~as.factor(groupDF$Group), na.action="na.omit")$p.value
-    }
-
-  }
-  #row.names(pvals) <- row.names(mydata)
-
-  RIPeps <- as.character(peps[as.numeric(pvals[,1]) > alpha])
+##########
+#  pvals <- data.frame(rep(NA, nrow(mydata)))
+#  for(i in 1:nrow(mydata)){
+#    # check to see whether all observations are in the same group
+#    nonmiss <- nonmissing_per_group(e_data = mydata[i,], groupDF= groupDF, cname_id=edata_id, samp_id=samp_id)$nonmiss_totals
+#    if(sum(nonmiss[-1]==0) > (length(nonmiss[-1])-2)){
+#      # if so, return 0 (we don't want to keep this one)
+#      pvals[i,1] <- 0
+#    }else{
+#      # otherwise, return the p-value
+#      pvals[i,1] <- kruskal.test(as.numeric(mydata[i,-1])~as.factor(groupDF$Group), na.action="na.omit")$p.value
+#    }
+#
+#  }
+#  #row.names(pvals) <- row.names(mydata)
+##########
+  
+  #added 2/6/17 lines 223-231 iobani
+  mydata = mydata[, -which(names(mydata) %in% edata_id)]
+  group_dat = as.character(groupDF$Group[order(groupDF$Group)])
+  rtemp = mydata[, match(groupDF[, samp_id], names(mydata))]
+  rtemp2 = rtemp[, order(groupDF$Group)]
+  
+  # conduct K-W test using kw_rcpp function 
+  pvals = kw_rcpp(as.matrix(rtemp2), group_dat)
+  pvals= data.frame(pvals)
+  
+  RIPeps <- as.character(peps[as.numeric(pvals[, 1]) > alpha])
 
   if(length(RIPeps)<2) stop("There are <2 biomolecules in the subset; cannot proceed.")
 
@@ -235,6 +246,7 @@ ppp_rip <- function(e_data, edata_id, fdata_id, groupDF, alpha=0.2, proportion=0
 #'
 #' @param e_data a \eqn{p \times n} data.frame, where \eqn{p} is the number of peptides, proteins, lipids, or metabolites and \eqn{n} is the number of samples. Each row corresponds to data for a peptide, protein, lipid, or metabolite, with the first column giving the identifer name.
 #' @param edata_id character string indicating the name of the peptide, protein, lipid, or metabolite identifier. Usually obtained by calling \code{attr(omicsData, "cnames")$edata_cname}.
+#' @param fdata_id character string indicating the name of the sample column name in f_data.
 #' @param groupDF data.frame created by \code{group_designation} with columns for sample.id and group. If two main effects are provided the original main effect levels for each sample are returned as the third and fourth columns of the data.frame.
 #' @param alpha numeric p-value threshold, above which the features are retained as rank invariant (default value 0.25)
 #'
@@ -255,7 +267,7 @@ ppp_rip <- function(e_data, edata_id, fdata_id, groupDF, alpha=0.2, proportion=0
 
 
 
-rip <- function(e_data, edata_id, groupDF, alpha=.2){
+rip <- function(e_data, edata_id, fdata_id, groupDF, alpha=.2){
 
   # pull off the column for edata_id
   edata_id_ind <- which(colnames(e_data)==edata_id)
@@ -266,14 +278,29 @@ rip <- function(e_data, edata_id, groupDF, alpha=.2){
   mydata <- e_data[, -edata_id_ind]
   inds <- which(complete.cases(mydata) == TRUE)
   mydata <- mydata[inds,]
-
-  pvals <- data.frame(rep(NA, nrow(mydata)))
-  for(i in 1:nrow(mydata)){
-    pvals[i,1] <- kruskal.test(as.numeric(mydata[i,])~as.factor(groupDF$Group))$p.value
-  }
+ 
+##########
+#  pvals <- data.frame(rep(NA, nrow(mydata)))
+#  for(i in 1:nrow(mydata)){
+#    pvals[i,1] <- kruskal.test(as.numeric(mydata[i,])~as.factor(groupDF$Group))$p.value
+#  }
+##########
+  
+  #added 2/6/17 iobani
+  samp_id = fdata_id
+  group_dat = as.character(groupDF$Group[order(groupDF$Group)])
+    
+  rtemp =  mydata[, match(groupDF[, samp_id], names(mydata))]
+  rtemp2 =  rtemp[, order(groupDF$Group)]
+    
+  # conduct K-W test on un-normalized data, used kw_rcpp function 
+  pvals = kw_rcpp(as.matrix(rtemp2), group_dat)
+  pvals = data.frame(pvals)
+ 
+  
   row.names(pvals) <- row.names(mydata)
 
-  RIPeps <- as.character(row.names(pvals)[as.numeric(pvals[,1]) > alpha])
+  RIPeps <- as.character(row.names(pvals)[as.numeric(pvals[, 1]) > alpha])
 
   if(length(RIPeps)<2) stop("There are <2 biomolecules in the subset; cannot proceed.")
 
