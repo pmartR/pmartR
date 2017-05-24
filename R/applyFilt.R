@@ -107,7 +107,8 @@ applyFilt.moleculeFilt <- function(filter_object, omicsData, min_num=2){
     if(length(min_num) != 1) stop("min_num must be of length 1")
 
     edata_cname <- attributes(omicsData)$cnames$edata_cname
-
+    emeta_cname <- attributes(omicsData)$cnames$emeta_cname
+    
     num_obs <- filter_object$Num_Observations
     #min_num <- attr(filter_object, "min_num")
 
@@ -116,12 +117,16 @@ applyFilt.moleculeFilt <- function(filter_object, omicsData, min_num=2){
 
     if(length(inds) < 1){
       filter.edata <- NULL
-    }else{
+    }
+    
+    else{
       filter.edata <- omicsData$e_data[, which(names(omicsData$e_data) == edata_cname)][inds]
     }
-
+    
+    #checking if filter specifies all of omicsData$e_data
+    if(all(omicsData$e_data[[edata_cname]] %in% filter.edata)) {stop("filter_object specifies all samples in omicsData")}
+    
     filter_object_new = list(edata_filt = filter.edata, emeta_filt = NULL, samples_filt = NULL)
-
 
     # call the function that does the filter application
     results_pieces <- MSomics_filter_worker(omicsData = omicsData, filter_object = filter_object_new)
@@ -190,10 +195,13 @@ applyFilt.cvFilt <- function(filter_object, omicsData, cv_threshold = 150){
 
     # determine which peptides have a CV greater than the threshold #
     p.ids = which(filter_object$CV_pooled > cv_threshold)
-
+  
     # return peptide names to be filtered #
     if(length(p.ids) > 0){p_filt = as.character(filter_object[p.ids,1])}else{p_filt = NULL}
-
+    
+    #checking if filter specifies all peptides
+    if(all(omicsData$e_data[[edata_cname]] %in% p_filt)) {stop("filter_object specifies all peptides in omicsData")}
+    
     filter_object_new = list(edata_filt = p_filt, emeta_filt = NULL, samples_filt = NULL)
 
     # call the function that does the filter application
@@ -270,10 +278,13 @@ applyFilt.rmdFilt <- function(filter_object, omicsData, pvalue_threshold=0.001){
 
     # determine which samples have a pvalue less than the threshold #
     samp.ids = which(filter_object$pvalue < pvalue_threshold)
-
+    
     # return sample names to be filtered #
     if(length(samp.ids) > 0){samp_filt = as.character(filter_object[samp.ids,1])}else{samp_filt = NULL}
-
+    
+    #checking that filter_object does not specify all samples
+    if(all(as.character(omicsData$f_data[[samp_cname]]) %in% samp_filt)) {stop("samples_filt specifies all samples")}
+    
     filter_object_new = list(edata_filt = NULL, emeta_filt = NULL, samples_filt = samp_filt)
 
     # call the function that does the filter application
@@ -331,7 +342,7 @@ applyFilt.proteomicsFilt <- function(filter_object, omicsData, min_num_peps=NULL
   # #' @describeIn MSomics_filter MSomics_filter for proteomicsFilt S3 object
 
 
-  # check to see whether a rmdFilt has already been run on omicsData #
+  # check to see whether a "proteomicsFilt" has already been run on omicsData #
   if("proteomicsFilt" %in% names(attributes(omicsData)$filters)){
     # get previous threshold #
     threshold_prev <- attributes(omicsData)$filters$proteomicsFilt$threshold$min_num_peps
@@ -408,7 +419,10 @@ applyFilt.proteomicsFilt <- function(filter_object, omicsData, min_num_peps=NULL
 
     ## consolidate filter_object_new1 and filter_object_new2 ##
     filter_object_new <- list(emeta_filt = unique(c(filter_object_new1$emeta_filt, filter_object_new2$emeta_filt)), edata_filt = unique(c(filter_object_new1$edata_filt, filter_object_new2$edata_filt)))
-
+    
+    #checking that filter_object_new does not specify all of e_data(peps) or all of e_meta(protiens) in omicsData
+    if(all(omicsData$e_meta[[pro_id]] %in% filter_object_new$emeta_filt)) {stop("filter_object specifies all proteins in e_meta")}
+    if(all(omicsData$e_data[[pep_id]] %in% filter_object_new$edata_filt)) {stop("filter_object specifies all peps in e_data")}
 
     # call the function that does the filter application
     results_pieces <- MSomics_filter_worker(omicsData = omicsData, filter_object = filter_object_new)
@@ -471,7 +485,7 @@ applyFilt.imdanovaFilt <- function(filter_object, omicsData, min_nonmiss_anova=N
   # #' @details If filter_method="combined" is specified, then both the \code{anova_filter} and \code{gtest_filter} are applied to the data, and the intersection of features from the two filters is the set returned. For ANOVA, features that do not have at least \code{min_nonmiss_allowed} values per group are candidates for filtering. For the G-test, features that do not have at least \code{min_nonmiss_allowed} values per group are candidates for filtering. The G-test is a test of independence, used here to test the null hypothesis of independence between the number of missing values across groups.
 
 
-  # check to see whether a rmdFilt has already been run on omicsData #
+  # check to see whether a imdanovaFilt has already been run on omicsData #
   if("imdanovaFilt" %in% names(attributes(omicsData)$filters)){
     # get previous threshold #
     min_nonmiss_anova_prev <- attributes(omicsData)$filters$imdanovaFilt$threshold$min_nonmiss_anova
@@ -542,7 +556,10 @@ applyFilt.imdanovaFilt <- function(filter_object, omicsData, min_nonmiss_anova=N
         }
       }
     }
-
+    
+    #checking that filter.edata does not specify all of e_data in omicsData
+    if(all(omicsData$e_data[[edata_cname]] %in% filter.edata)){stop("filter.edata specifies all of e_data in omicsData")}
+    
     filter_object_new = list(edata_filt = filter.edata, emeta_filt = NULL, samples_filt = NULL)
 
     # call the function that does the filter application
