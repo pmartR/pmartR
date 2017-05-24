@@ -6,6 +6,18 @@
 
 using namespace Rcpp;
 
+// kw_rcpp
+std::list<double> kw_rcpp(arma::mat mtr, std::vector<std::string> group);
+RcppExport SEXP pmartRqc_kw_rcpp(SEXP mtrSEXP, SEXP groupSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type mtr(mtrSEXP);
+    Rcpp::traits::input_parameter< std::vector<std::string> >::type group(groupSEXP);
+    rcpp_result_gen = Rcpp::wrap(kw_rcpp(mtr, group));
+    return rcpp_result_gen;
+END_RCPP
+}
 // nonmissing_per_grp
 arma::Mat<int> nonmissing_per_grp(arma::mat mtr, std::vector<std::string> group);
 RcppExport SEXP pmartRqc_nonmissing_per_grp(SEXP mtrSEXP, SEXP groupSEXP) {
@@ -15,6 +27,18 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::mat >::type mtr(mtrSEXP);
     Rcpp::traits::input_parameter< std::vector<std::string> >::type group(groupSEXP);
     rcpp_result_gen = Rcpp::wrap(nonmissing_per_grp(mtr, group));
+    return rcpp_result_gen;
+END_RCPP
+}
+// pooled_cv_rcpp
+std::list<double> pooled_cv_rcpp(arma::mat mtr, std::vector<std::string> group);
+RcppExport SEXP pmartRqc_pooled_cv_rcpp(SEXP mtrSEXP, SEXP groupSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type mtr(mtrSEXP);
+    Rcpp::traits::input_parameter< std::vector<std::string> >::type group(groupSEXP);
+    rcpp_result_gen = Rcpp::wrap(pooled_cv_rcpp(mtr, group));
     return rcpp_result_gen;
 END_RCPP
 }

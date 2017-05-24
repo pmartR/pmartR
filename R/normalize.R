@@ -177,9 +177,9 @@ if(subset_fn == "los"){
 if(subset_fn == "rip"){
   group_df = attr(omicsData, "group_DF")
   if(!is.null(param_val)){
-  peps = rip(omicsData$e_data, edata_id, group_df, param_val)
+  peps = rip(omicsData$e_data, edata_id, samp_id, group_df, param_val)
   }else{
-  peps = rip(omicsData$e_data, edata_id, group_df)
+  peps = rip(omicsData$e_data, edata_id, samp_id, group_df)
   }
 }
 if(subset_fn == "ppp"){
