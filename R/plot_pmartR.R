@@ -887,7 +887,10 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
   if(!is.numeric(title_size) | !is.numeric(x_lab_size) | !is.numeric(y_lab_size)) stop("title_size, x_lab_size and y_lab_size must be integer values")
   
   ##checking that ylimit is numeric of length 2
-  if(!is.numeric(ylimit) | length(ylimit)!= 2) stop("ylimit must be a numeric vector of length 2")
+  if(!is.null(ylimit)){
+    if(!is.numeric(ylimit) | length(ylimit)!= 2) stop("ylimit must be a numeric vector of length 2")
+  }
+  
   
   # add check for samples with all NAs and return message to user that these will not be plotted #
   sample_nas <- colSums(is.na(omicsData$e_data))
@@ -1116,8 +1119,9 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
   if(!is.numeric(title_size) | !is.numeric(x_lab_size) | !is.numeric(y_lab_size)) stop("title_size, x_lab_size and y_lab_size must be integer values")
   
   ##checking that ylimit is numeric of length 2
-  if(!is.numeric(ylimit) | length(ylimit)!= 2) stop("ylimit must be a numeric vector of length 2")
-  
+  if(!is.null(ylimit)){
+    if(!is.numeric(ylimit) | length(ylimit)!= 2) stop("ylimit must be a numeric vector of length 2")
+  }  
   # add check for samples with all NAs and return message to user that these will not be plotted #
   sample_nas <- colSums(is.na(omicsData$e_data))
   if(any(sample_nas == nrow(omicsData$e_data))){
@@ -1341,8 +1345,9 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
   if(!is.numeric(title_size) | !is.numeric(x_lab_size) | !is.numeric(y_lab_size)) stop("title_size, x_lab_size and y_lab_size must be integer values")
   
   ##checking that ylimit is numeric of length 2
-  if(!is.numeric(ylimit) | length(ylimit)!= 2) stop("ylimit must be a numeric vector of length 2")
-  
+  if(!is.null(ylimit)){
+    if(!is.numeric(ylimit) | length(ylimit)!= 2) stop("ylimit must be a numeric vector of length 2")
+  }  
   # add check for samples with all NAs and return message to user that these will not be plotted #
   sample_nas <- colSums(is.na(omicsData$e_data))
   if(any(sample_nas == nrow(omicsData$e_data))){
@@ -1567,7 +1572,9 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
   if(!is.numeric(title_size) | !is.numeric(x_lab_size) | !is.numeric(y_lab_size)) stop("title_size, x_lab_size and y_lab_size must be integer values")
   
   ##checking that ylimit is numeric of length 2
-  if(!is.numeric(ylimit) | length(ylimit)!= 2) stop("ylimit must be a numeric vector of length 2")
+  if(!is.null(ylimit)){
+    if(!is.numeric(ylimit) | length(ylimit)!= 2) stop("ylimit must be a numeric vector of length 2")
+  }
   
   # add check for samples with all NAs and return message to user that these will not be plotted #
   sample_nas <- colSums(is.na(omicsData$e_data))
