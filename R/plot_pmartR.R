@@ -1797,7 +1797,7 @@ plot.dimRes <- function(dimRes_object, ...) {
         plotdata<- merge.data.frame(plotdata, group_DF, by.x = plotdata_name, by.y = fdata_cname, sort = FALSE)
       }
       
-      else plotdata<- merge.data.frame(plotdata, group_DF, by.x = plotdata_name, by.y = group_DF[[fdata_cname]], sort = FALSE)
+      else plotdata<- merge.data.frame(plotdata, group_DF, by.x = plotdata_name, by.y = fdata_cname, sort = FALSE)
       
       color_var <- main_eff_names[1]
       pch_var <- main_eff_names[2]

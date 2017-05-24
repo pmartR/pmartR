@@ -1,5 +1,5 @@
 # Testing function for nonmissing_per_group 
-
+library(pmartRqc)
 library(pmartRdata)
 library(dplyr)
 data("pep_object")
