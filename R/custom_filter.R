@@ -6,6 +6,9 @@
 #' @param e_data_remove character vector specifying the names of the e_data identifiers to remove from the data
 #' @param f_data_remove character vector specifying the names of samples to remove from the data
 #' @param e_meta_remove character vector specifying the names of the e_meta identifiers to remove from the data
+#' @param e_data_keep character vector specifying the names of the e_data identifiers to keep from the data
+#' @param f_data_keep character vector specifying the names of samples to keep from the data
+#' @param e_meta_keep character vector specifying the names of the e_meta identifiers to keep from the data
 #'
 #' @return An S3 object of class 'customFilt', which is a list with 3 elements: e_data_remove, f_data_remove, and e_meta_remove.
 #'
