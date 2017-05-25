@@ -556,6 +556,9 @@ plot.rmdFilt <- function(filter_object, pvalue_threshold = NULL, sampleID = NULL
     # check that length is 1
     if(length(sampleID) > 1) stop("sampleID must be of length 1")
   }
+  #check point_size argument is numeric
+  if(!is.numeric(point_size)) stop("point_size must be numeric")
+  
   ## end of initial checks ##
   
   samp_id <- names(attr(filter_object, "group_DF"))[1]
@@ -1796,6 +1799,10 @@ plot.dimRes <- function(dimRes_object, ...) {
         if(nchar(string)>25) string=paste0(substr(string,1,23),"...")
         return(string)
       }
+      
+      #check point_size argument is numeric
+      if(!is.numeric(point_size)) stop("point_size must be numeric")
+      
       # manage the length of legend titles #
       display_names <- sapply(main_eff_names, abbrev_fun)
       
