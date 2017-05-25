@@ -537,7 +537,7 @@ plot.rmdFilt <- function(filter_object, pvalue_threshold = NULL, sampleID = NULL
   .plot.rmdFilt(filter_object, pvalue_threshold, sampleID, ...)
 }
 
-.plot.rmdFilt <- function(filter_object, pvalue_threshold = NULL, sampleID = NULL, x_lab = NULL, y_lab = NULL, legend_lab = NULL, title_plot = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme=FALSE, legend_position = "right") {
+.plot.rmdFilt <- function(filter_object, pvalue_threshold = NULL, sampleID = NULL, x_lab = NULL, y_lab = NULL, legend_lab = NULL, title_plot = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme=FALSE, legend_position = "right", point_size = 4) {
   
   ## initial checks ##
   
@@ -556,6 +556,9 @@ plot.rmdFilt <- function(filter_object, pvalue_threshold = NULL, sampleID = NULL
     # check that length is 1
     if(length(sampleID) > 1) stop("sampleID must be of length 1")
   }
+  #check point_size argument is numeric
+  if(!is.numeric(point_size)) stop("point_size must be numeric")
+  
   ## end of initial checks ##
   
   samp_id <- names(attr(filter_object, "group_DF"))[1]
@@ -620,7 +623,7 @@ plot.rmdFilt <- function(filter_object, pvalue_threshold = NULL, sampleID = NULL
       p <- ggplot2::ggplot(dfsub) +
         ggplot2::geom_boxplot(ggplot2::aes(x=rep(1,length(value)), y=value), fill=heat.colors(length(metrics))) +
         ggplot2::facet_wrap(~ variable, scales = "free", ncol=length(metrics)) +
-        ggplot2::geom_point(data = dfsub[dfsub[,samp_id]==sampleID,], ggplot2::aes(x=rep(1,length(value)), y=value), size=4, pch=4) +
+        ggplot2::geom_point(data = dfsub[dfsub[,samp_id]==sampleID,], ggplot2::aes(x=rep(1,length(value)), y=value), size=point_size, pch=4) +
         ggplot2::geom_text(data = dfsub[dfsub[,samp_id]==sampleID,], ggplot2::aes(x=rep(1,length(value)), y=value), label = sampleID, vjust=1.5, size=3.5, fontface="bold") +
         ggplot2::theme(axis.text.x = ggplot2::element_blank(), axis.ticks.x = ggplot2::element_blank(),
                        plot.title = ggplot2::element_text(size=title_size),
@@ -633,7 +636,7 @@ plot.rmdFilt <- function(filter_object, pvalue_threshold = NULL, sampleID = NULL
         ggplot2::theme_bw() +
         ggplot2::geom_boxplot(ggplot2::aes(x=rep(1,length(value)), y=value), fill=heat.colors(length(metrics))) +
         ggplot2::facet_wrap(~ variable, scales = "free", ncol=length(metrics)) +
-        ggplot2::geom_point(data = dfsub[dfsub[,samp_id]==sampleID,], ggplot2::aes(x=rep(1,length(value)), y=value), size=4, pch=4) +
+        ggplot2::geom_point(data = dfsub[dfsub[,samp_id]==sampleID,], ggplot2::aes(x=rep(1,length(value)), y=value), size=point_size, pch=4) +
         ggplot2::geom_text(data = dfsub[dfsub[,samp_id]==sampleID,], ggplot2::aes(x=rep(1,length(value)), y=value), label = sampleID, vjust=1.5, size=3.5, fontface="bold") +
         ggplot2::theme(axis.text.x = ggplot2::element_blank(), axis.ticks.x = ggplot2::element_blank(),
                        plot.title = ggplot2::element_text(size=title_size),
@@ -646,10 +649,10 @@ plot.rmdFilt <- function(filter_object, pvalue_threshold = NULL, sampleID = NULL
   }else if(is.null(pvalue_threshold)) {
     if(length(main_eff_names)==1) {
       p <- ggplot2::ggplot(filter_object) +
-        ggplot2::geom_point(ggplot2::aes_string(x = samp_id, y="Log2.md", col=main_eff_names[1]), size=4)
+        ggplot2::geom_point(ggplot2::aes_string(x = samp_id, y="Log2.md", col=main_eff_names[1]), size=point_size)
     } else {
       p <- ggplot2::ggplot(filter_object) +
-        ggplot2::geom_point(ggplot2::aes_string(x = samp_id, y="Log2.md", col=main_eff_names[1], pch=main_eff_names[2]), size=4)
+        ggplot2::geom_point(ggplot2::aes_string(x = samp_id, y="Log2.md", col=main_eff_names[1], pch=main_eff_names[2]), size=point_size)
     }
     
     plot_title <- ifelse(is.null(title_plot), "Sample Outlier Results", title_plot)
@@ -698,12 +701,12 @@ plot.rmdFilt <- function(filter_object, pvalue_threshold = NULL, sampleID = NULL
     
     if(length(main_eff_names)==1) {
       p <- ggplot2::ggplot(sub1) +
-        ggplot2::geom_point(ggplot2::aes_string(x = samp_id, y="Log2.md", col=main_eff_names), size=4, bg="gray") +
-        ggplot2::geom_point(data = sub2, ggplot2::aes_string(x = samp_id, y="Log2.md", col=main_eff_names), alpha=0.5, size=4, bg="gray")
+        ggplot2::geom_point(ggplot2::aes_string(x = samp_id, y="Log2.md", col=main_eff_names), size=point_size, bg="gray") +
+        ggplot2::geom_point(data = sub2, ggplot2::aes_string(x = samp_id, y="Log2.md", col=main_eff_names), alpha=0.5, size=point_size, bg="gray")
     } else {
       p <- ggplot2::ggplot(sub1) +
-        ggplot2::geom_point(ggplot2::aes_string(x = samp_id, y="Log2.md", pch=main_eff_names[2], col=main_eff_names[1]), size=4, bg="gray") +
-        ggplot2::geom_point(data = sub2, ggplot2::aes_string(x = samp_id, y="Log2.md", pch=main_eff_names[2], col=main_eff_names[1]), alpha=0.5, size=4, bg="gray")
+        ggplot2::geom_point(ggplot2::aes_string(x = samp_id, y="Log2.md", pch=main_eff_names[2], col=main_eff_names[1]), size=point_size, bg="gray") +
+        ggplot2::geom_point(data = sub2, ggplot2::aes_string(x = samp_id, y="Log2.md", pch=main_eff_names[2], col=main_eff_names[1]), alpha=0.5, size=point_size, bg="gray")
     }
     
     if(bw_theme == FALSE){
@@ -887,7 +890,10 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
   if(!is.numeric(title_size) | !is.numeric(x_lab_size) | !is.numeric(y_lab_size)) stop("title_size, x_lab_size and y_lab_size must be integer values")
   
   ##checking that ylimit is numeric of length 2
-  if(!is.numeric(ylimit) | length(ylimit)!= 2) stop("ylimit must be a numeric vector of length 2")
+  if(!is.null(ylimit)){
+    if(!is.numeric(ylimit) | length(ylimit)!= 2) stop("ylimit must be a numeric vector of length 2")
+  }
+  
   
   # add check for samples with all NAs and return message to user that these will not be plotted #
   sample_nas <- colSums(is.na(omicsData$e_data))
@@ -1116,8 +1122,9 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
   if(!is.numeric(title_size) | !is.numeric(x_lab_size) | !is.numeric(y_lab_size)) stop("title_size, x_lab_size and y_lab_size must be integer values")
   
   ##checking that ylimit is numeric of length 2
-  if(!is.numeric(ylimit) | length(ylimit)!= 2) stop("ylimit must be a numeric vector of length 2")
-  
+  if(!is.null(ylimit)){
+    if(!is.numeric(ylimit) | length(ylimit)!= 2) stop("ylimit must be a numeric vector of length 2")
+  }  
   # add check for samples with all NAs and return message to user that these will not be plotted #
   sample_nas <- colSums(is.na(omicsData$e_data))
   if(any(sample_nas == nrow(omicsData$e_data))){
@@ -1341,8 +1348,9 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
   if(!is.numeric(title_size) | !is.numeric(x_lab_size) | !is.numeric(y_lab_size)) stop("title_size, x_lab_size and y_lab_size must be integer values")
   
   ##checking that ylimit is numeric of length 2
-  if(!is.numeric(ylimit) | length(ylimit)!= 2) stop("ylimit must be a numeric vector of length 2")
-  
+  if(!is.null(ylimit)){
+    if(!is.numeric(ylimit) | length(ylimit)!= 2) stop("ylimit must be a numeric vector of length 2")
+  }  
   # add check for samples with all NAs and return message to user that these will not be plotted #
   sample_nas <- colSums(is.na(omicsData$e_data))
   if(any(sample_nas == nrow(omicsData$e_data))){
@@ -1567,7 +1575,9 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
   if(!is.numeric(title_size) | !is.numeric(x_lab_size) | !is.numeric(y_lab_size)) stop("title_size, x_lab_size and y_lab_size must be integer values")
   
   ##checking that ylimit is numeric of length 2
-  if(!is.numeric(ylimit) | length(ylimit)!= 2) stop("ylimit must be a numeric vector of length 2")
+  if(!is.null(ylimit)){
+    if(!is.numeric(ylimit) | length(ylimit)!= 2) stop("ylimit must be a numeric vector of length 2")
+  }
   
   # add check for samples with all NAs and return message to user that these will not be plotted #
   sample_nas <- colSums(is.na(omicsData$e_data))
@@ -1771,7 +1781,7 @@ plot.dimRes <- function(dimRes_object, ...) {
   .plot.dimRes(dimRes_object, ...)
 }
 
-.plot.dimRes <- function(dimRes_object, x_lab = NULL, y_lab = NULL, legend_lab = NULL, title_plot = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme = FALSE, legend_position = "right") {
+.plot.dimRes <- function(dimRes_object, x_lab = NULL, y_lab = NULL, legend_lab = NULL, title_plot = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme = FALSE, legend_position = "right", point_size = 4) {
   
   plotdata <- data.frame(SampleID = dimRes_object$SampleID, PC1 = dimRes_object$PC1, PC2 = dimRes_object$PC2)
   plotdata_name<-names(plotdata)[1]
@@ -1789,6 +1799,10 @@ plot.dimRes <- function(dimRes_object, ...) {
         if(nchar(string)>25) string=paste0(substr(string,1,23),"...")
         return(string)
       }
+      
+      #check point_size argument is numeric
+      if(!is.numeric(point_size)) stop("point_size must be numeric")
+      
       # manage the length of legend titles #
       display_names <- sapply(main_eff_names, abbrev_fun)
       
@@ -1847,7 +1861,7 @@ plot.dimRes <- function(dimRes_object, ...) {
   # plot #
   if(bw_theme==FALSE){
     p <- ggplot2::ggplot(plotdata, ggplot2::aes(x = PC1, y = PC2)) +
-      ggplot2::geom_point(ggplot2::aes_string(col = color_var, pch = pch_var)) +
+      ggplot2::geom_point(ggplot2::aes_string(col = color_var, pch = pch_var), size = point_size) +
       ggplot2::ggtitle(plot_title) +
       ggplot2::scale_color_discrete(display_names[1]) +
       ggplot2::scale_shape_discrete(display_names[2]) +
@@ -1858,7 +1872,7 @@ plot.dimRes <- function(dimRes_object, ...) {
   }else{
     p <- ggplot2::ggplot(plotdata, ggplot2::aes(x = PC1, y = PC2)) +
       ggplot2::theme_bw() +
-      ggplot2::geom_point(ggplot2::aes_string(col = color_var, pch = pch_var)) +
+      ggplot2::geom_point(ggplot2::aes_string(col = color_var, pch = pch_var), size = point_size) +
       ggplot2::ggtitle(plot_title) +
       ggplot2::scale_color_discrete(display_names[1]) +
       ggplot2::scale_shape_discrete(display_names[2]) +
