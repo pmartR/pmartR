@@ -4,12 +4,14 @@
 \alias{rip}
 \title{Identify Rank-Invariant Peptides}
 \usage{
-rip(e_data, edata_id, groupDF, alpha = 0.2)
+rip(e_data, edata_id, fdata_id, groupDF, alpha = 0.2)
 }
 \arguments{
 \item{e_data}{a \eqn{p \times n} data.frame, where \eqn{p} is the number of peptides, proteins, lipids, or metabolites and \eqn{n} is the number of samples. Each row corresponds to data for a peptide, protein, lipid, or metabolite, with the first column giving the identifer name.}
 
 \item{edata_id}{character string indicating the name of the peptide, protein, lipid, or metabolite identifier. Usually obtained by calling \code{attr(omicsData, "cnames")$edata_cname}.}
+
+\item{fdata_id}{character string indicating the name of the sample column name in f_data.}
 
 \item{groupDF}{data.frame created by \code{group_designation} with columns for sample.id and group. If two main effects are provided the original main effect levels for each sample are returned as the third and fourth columns of the data.frame.}
 

@@ -5,7 +5,8 @@
 \title{Custom Filter}
 \usage{
 custom_filter(omicsData, e_data_remove = NULL, f_data_remove = NULL,
-  e_meta_remove = NULL)
+  e_meta_remove = NULL, e_data_keep = NULL, f_data_keep = NULL,
+  e_meta_keep = NULL)
 }
 \arguments{
 \item{omicsData}{an object of class "pepData", "proData", "metabData", or "lipidData", created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.}
@@ -15,6 +16,12 @@ custom_filter(omicsData, e_data_remove = NULL, f_data_remove = NULL,
 \item{f_data_remove}{character vector specifying the names of samples to remove from the data}
 
 \item{e_meta_remove}{character vector specifying the names of the e_meta identifiers to remove from the data}
+
+\item{e_data_keep}{character vector specifying the names of the e_data identifiers to keep from the data}
+
+\item{f_data_keep}{character vector specifying the names of samples to keep from the data}
+
+\item{e_meta_keep}{character vector specifying the names of the e_meta identifiers to keep from the data}
 }
 \value{
 An S3 object of class 'customFilt', which is a list with 3 elements: e_data_remove, f_data_remove, and e_meta_remove.

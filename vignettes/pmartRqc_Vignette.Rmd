@@ -1,4 +1,4 @@
-ok---
+---
 title: "Analyzing Peptide Data with the pmartRqc Package"
 author: "Kelly Stratton, Lisa Bramer"
 date: "`r Sys.Date()`"
@@ -238,7 +238,7 @@ Sometimes it is known a priori that certain peptides or samples should be filter
 Here, we remove peptide with Mass Tag ID 1047 and sample `Infection 1` as an example.
 
 ```{r custom_filter}
-myfilter <- custom_filter(mypepData, e_data_remove = 1047, e_meta_remove = 1047, f_data_remove = "Infection 1")
+myfilter <- custom_filter(mypepData, e_data_remove = 1047, e_meta_remove = NULL, f_data_remove = "Infection1")
 summary(myfilter)
 
 mypepData_temp <- applyFilt(filter_object = myfilter, mypepData)
