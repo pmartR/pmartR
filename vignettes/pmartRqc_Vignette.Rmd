@@ -248,7 +248,7 @@ summary(mypepData_temp)
 rm(mypepData_temp)
 ```
 Here we keep sample `Infection 1`, `Infection 2`, `Infection 3`, `Infection 4` and `Infection 5`
-```{r custom_filter}
+```{r custom_filter2}
 myfilter2<- custom_filter(mypepData, e_data_keep = NULL, e_meta_keep = NULL, f_data_keep = c("Infection1", "Infection2", "Infection3", "Infection4", "Infection5"))
 summary(myfilter2)
 
