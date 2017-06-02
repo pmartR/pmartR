@@ -233,7 +233,7 @@ summary(mypepData)
 
 #### Custom Filter
 
-Sometimes it is known a priori that certain peptides or samples should be filtered out of the dataset prior to statistical analysis. Perhaps there are known contaminant proteins, and so peptides mapping to them should be removed, or perhaps something went wrong during sample preparation for a particular sample.
+Sometimes it is known a priori that certain peptides or samples should be filtered out of the dataset prior to statistical analysis. Perhaps there are known contaminant proteins, and so peptides mapping to them should be removed, or perhaps something went wrong during sample preparation for a particular sample. On the other hand there maybe peptides or samples to keep while the rest are filtered out, this can also be specified. 
 
 Here, we remove peptide with Mass Tag ID 1047 and sample `Infection 1` as an example.
 
@@ -246,6 +246,16 @@ summary(mypepData_temp)
 
 
 rm(mypepData_temp)
+```
+Here we keep sample `Infection 1`, `Infection 2`, `Infection 3`, `Infection 4` and `Infection 5`
+```{r custom_filter}
+myfilter2<- custom_filter(mypepData, e_data_keep = NULL, e_meta_keep = NULL, f_data_keep = c("Infection1", "Infection2", "Infection3", "Infection4", "Infection5"))
+summary(myfilter2)
+
+mypepData_temp2<- applyFilt(filter_object = myfilter2, mypepData)
+summary(mypepData_temp2)
+
+rm(mypepData_temp2)
 ```
 
 Note that there is a `summary()` method for objects of type custom_filt, but no `plot()` method.
@@ -317,6 +327,8 @@ plot(myfilter, pvalue_threshold = 0.001, bw_theme=TRUE, legend_position="bottom"
 plot(myfilter, pvalue_threshold = 0.001, legend_position="top")
 plot(myfilter, pvalue_threshold = 0.001, bw_theme=TRUE, legend_position="left")
 plot(myfilter, pvalue_threshold = 0.001, x_lab_size = 8, y_lab_size = 8)
+plot(myfilter, pvalue_threshold = 0.001, x_lab_size = 8, y_lab_size = 8, point_size = 6)
+plot(myfilter, pvalue_threshold = 0.001, x_lab_size = 8, y_lab_size = 8, point_size = 7)
 
 ```
 
