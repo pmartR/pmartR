@@ -233,7 +233,7 @@ summary(mypepData)
 
 #### Custom Filter
 
-Sometimes it is known a priori that certain peptides or samples should be filtered out of the dataset prior to statistical analysis. Perhaps there are known contaminant proteins, and so peptides mapping to them should be removed, or perhaps something went wrong during sample preparation for a particular sample. On the other hand there maybe peptides or samples to keep while the rest are filtered out, this can also be specified. 
+Sometimes it is known a priori that certain peptides or samples should be filtered out of the dataset prior to statistical analysis. Perhaps there are known contaminant proteins, and so peptides mapping to them should be removed, or perhaps something went wrong during sample preparation for a particular sample. On the other hand there maybe peptides or samples to keep while the rest are filtered out, this can also be specified. keep in mind that both remove and keep arguments cannot be specified, either all remove arguments only or all keep arguments only. 
 
 Here, we remove peptide with Mass Tag ID 1047 and sample `Infection 1` as an example.
 
