@@ -3,12 +3,12 @@
 #' This function creates a customFilt S3 object based on user-specified items to filter out of the dataset
 #'
 #' @param omicsData an object of class "pepData", "proData", "metabData", or "lipidData", created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.
-#' @param e_data_remove character vector specifying the names of the e_data identifiers to remove from the data
-#' @param f_data_remove character vector specifying the names of samples to remove from the data
-#' @param e_meta_remove character vector specifying the names of the e_meta identifiers to remove from the data
-#' @param e_data_keep character vector specifying the names of the e_data identifiers to keep from the data
-#' @param f_data_keep character vector specifying the names of samples to keep from the data
-#' @param e_meta_keep character vector specifying the names of the e_meta identifiers to keep from the data
+#' @param e_data_remove character vector specifying the names of the e_data identifiers to remove from the data, can only be specified with other remove arguments
+#' @param f_data_remove character vector specifying the names of samples to remove from the data, can only be specified with other remove arguments
+#' @param e_meta_remove character vector specifying the names of the e_meta identifiers to remove from the data, can only be specified with other remove arguments
+#' @param e_data_keep character vector specifying the names of the e_data identifiers to keep from the data, can only be specified with other keep arguments
+#' @param f_data_keep character vector specifying the names of samples to keep from the data, can only be specified with other keep arguments
+#' @param e_meta_keep character vector specifying the names of the e_meta identifiers to keep from the data, can only be specified with other keep arguments
 #'
 #' @return An S3 object of class 'customFilt', which is a list with 3 elements: e_data_remove, f_data_remove, and e_meta_remove.
 #'

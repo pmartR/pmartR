@@ -46,7 +46,7 @@ NULL
 #' For plotting an S3 object of type 'corRes':
 #' 
 #'@rdname plot-pmartR-corRes
-#'
+#'@export
 #'@param interactive default value is FALSE. If TRUE, an interactive d3heatmap will be rendered, allowing you to zoom in on sections of the heatmap.
 #'@param x_lab logical indicator of whether to label the x-axis with the sample names. Defaults to TRUE. If FALSE, no x-axis labels are included in the plot.
 #'@param y_lab logical indicator of whether to label the y-axis with the sample names. Defaults to TRUE. If FALSE, no y-axis labels are included in the plot.
