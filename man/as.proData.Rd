@@ -28,7 +28,7 @@ Converts a list object or several data.frames of protein-level data to an object
 \details{
 Objects of class 'proData' contain some attributes that are referenced by downstream functions. These attributes can be changed from their default value by manual specification. A list of these attributes as well as their default values are as follows:
 \tabular{ll}{
-data_scale \tab Scale of the data provided in \code{e_data}. Acceptable values are 'log2', 'log10', 'log', and 'abundance', which indicate data is log base 2, base 10, natural log transformed, and raw abundance, respectively. Default values is 'log2'. \cr
+data_scale \tab Scale of the data provided in \code{e_data}. Acceptable values are 'log2', 'log10', 'log', and 'abundance', which indicate data is log base 2, base 10, natural log transformed, and raw abundance, respectively. Default values is 'abundance'. \cr
 \tab \cr
 data_norm \tab A logical argument, specifying whether the data has been normalized or not. Default value is FALSE. \cr
 \tab \cr
@@ -60,9 +60,6 @@ data("pro_fdata")
 myproData <- as.proData(e_data = pro_edata, f_data = pro_fdata, edata_cname = "Reference", fdata_cname = "SampleID", data_norm=TRUE, norm_method="median_center")
 }
 }
-\author{
-Kelly Stratton, Lisa Bramer
-}
 \seealso{
 \code{\link{as.pepData}}
 
@@ -70,4 +67,6 @@ Kelly Stratton, Lisa Bramer
 
 \code{\link{as.metabData}}
 }
-
+\author{
+Kelly Stratton, Lisa Bramer
+}
