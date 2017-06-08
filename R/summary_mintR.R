@@ -204,8 +204,8 @@ summary.dimRes <- function(dimRes_object){
   dim_summary = data.frame(R_squared = r2)
   row.names(dim_summary) <- attributes(dimRes_object)$names[-1]
 
-  cat("Summary of 'dimRes' Object\n\n")
-  cat(capture.output(dim_summary), sep="\n")
+  message("Summary of 'dimRes' Object\n\n")
+  message(capture.output(dim_summary), sep="\n")
 
   return(invisible(dim_summary))
 }
