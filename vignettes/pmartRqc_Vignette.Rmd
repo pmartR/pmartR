@@ -233,7 +233,7 @@ summary(mypepData)
 
 #### Custom Filter
 
-Sometimes it is known a priori that certain peptides or samples should be filtered out of the dataset prior to statistical analysis. Perhaps there are known contaminant proteins, and so peptides mapping to them should be removed, or perhaps something went wrong during sample preparation for a particular sample. On the other hand there maybe peptides or samples to keep while the rest are filtered out, this can also be specified. Keep in mind that both remove and keep arguments cannot be specified, either remove arguments only or keep arguments only. 
+Sometimes it is known a priori that certain peptides or samples should be filtered out of the dataset prior to statistical analysis. Perhaps there are known contaminant proteins, and so peptides mapping to them should be removed, or perhaps something went wrong during sample preparation for a particular sample. On the other hand, it may be preferred to specify peptides or samples to keep (removing those not explicitly specified), and this can also be accomplished. Keep in mind that both 'remove' and 'keep' arguments cannot be specified together; either 'remove' arguments only or 'keep' arguments only may be specified in a single call to custom_filter(). 
 
 Here, we remove peptide with Mass Tag ID 1047 and sample `Infection 1` as an example.
 
@@ -404,9 +404,9 @@ Below we use SPANS to select a normalization approach and then normalize the dat
 
 The pmartRqc package contains two methods for data summarization and exploration that can be used as part of the quality control process: sequential projection pursuit principal components analysis (sppPCA) for dimension reduction and a correlation heat map.
 
-#### Sequential Projection Pursuit Principal Components Analysis
+#### Probabilistic Principal Components Analysis
 
-sppPCA is a PCA algorithm that can be used in the presence of missing data. The principal components are calculated using projection pursuit estimation, which implements an expectation-maximization (EM) algorithm when data is missing. We use the `dim_reduction()` function in pmartRqc, specifying the dataset and the number of principal components to return (should we make this default to 2?). The `summary()` and `plot()` functions operate on the results of the `dim_reduction()` function.
+Probabilistic is a PCA algorithm that can be used in the presence of missing data. We use the `dim_reduction()` function in pmartRqc, specifying the dataset and the number of principal components to return (should we make this default to 2?). The `summary()` and `plot()` functions operate on the results of the `dim_reduction()` function.
 
 Note that `dim_reduction()` requires that the `group_designation()` function has been run.
 
