@@ -123,6 +123,14 @@ as.metabData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname
   if(is.null(e_meta)){
     emeta_cname = NULL
   }
+  
+  #check that e_data does not contain zero entries if data_scale is log
+  if(data_scale %in% c('log2', 'log10', 'log')){
+    edata<- e_data[, -which(names(e_data) == edata_cname)]
+    zeros<- apply(edata, 1, function(row) length(which(row == 0)))
+    
+    if(sum(zeros) > 0) stop("if 'data_scale' is log, e_data cannot contain zeros")
+  }
 
   # check that e_data has unique rows #
   if(nrow(e_data) == length(unique(e_data[, edata_cname]))){
