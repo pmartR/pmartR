@@ -1787,6 +1787,10 @@ plot.dimRes <- function(dimRes_object, ...) {
   plotdata <- data.frame(SampleID = dimRes_object$SampleID, PC1 = dimRes_object$PC1, PC2 = dimRes_object$PC2)
   plotdata_name<-names(plotdata)[1]
   
+  #check point_size argument is numeric and >= zero
+  if(!is.numeric(point_size)) stop("point_size must be numeric")
+  if(point_size < 0) stop("point_size must be greater than or equal to zero")
+  
   # if there is a group designation #
   if(!is.null(attr(dimRes_object,"group_DF"))) {
     group_DF <- attr(dimRes_object,"group_DF")
@@ -1800,11 +1804,7 @@ plot.dimRes <- function(dimRes_object, ...) {
         if(nchar(string)>25) string=paste0(substr(string,1,23),"...")
         return(string)
       }
-      
-      #check point_size argument is numeric and >= zero
-      if(!is.numeric(point_size)) stop("point_size must be numeric")
-      if(point_size < 0) stop("point_size must be greater than or equal to zero")
-      
+     
       # manage the length of legend titles #
       display_names <- sapply(main_eff_names, abbrev_fun)
       
