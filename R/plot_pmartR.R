@@ -1805,7 +1805,7 @@ plot.dimRes <- function(dimRes_object, ...) {
         if(nchar(string)>25) string=paste0(substr(string,1,23),"...")
         return(string)
       }
-     
+
       # manage the length of legend titles #
       display_names <- sapply(main_eff_names, abbrev_fun)
       
