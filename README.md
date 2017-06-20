@@ -6,3 +6,7 @@ This R package provides functionality for quality control processing of mass spe
 ``` r
 devtools::install_github("pmartR/pmartRqc")
 ```
+
+For Mac Users, to enable the C++11 plugin, run the following in your R console before installing this package:
+Sys.setenv("PKG_CXXFLAGS"="-std=c++11")
+ 

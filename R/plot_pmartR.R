@@ -1055,7 +1055,7 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
   # custom labels #
   if(!is.null(title_plot)) title <- title_plot
   xlabel <- ifelse(is.null(x_lab), "Sample", x_lab)
-  ylabel <- ifelse(is.null(y_lab), "Value", y_lab)
+  ylabel <- ifelse(is.null(y_lab), attr(omicsData, "data_info")$data_scale, y_lab)
   legend_title <- color_by
   if(!is.null(legend_lab)) legend_title <- legend_lab
   
@@ -1132,6 +1132,7 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     empties <- names(omicsData$e_data)[which(sample_nas == nrow(omicsData$e_data))]
     message(paste("The following sample(s) are comprised entirely of missing data and will not be included in the plot: ", empties, sep = " "))
   }
+
   ## end of initial checks ##
   
   
@@ -1282,7 +1283,7 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
   # custom labels #
   if(!is.null(title_plot)) title <- title_plot
   xlabel <- ifelse(is.null(x_lab), "Sample", x_lab)
-  ylabel <- ifelse(is.null(y_lab), "Value", y_lab)
+  ylabel <- ifelse(is.null(y_lab), attr(omicsData,"data_info")$data_scale, y_lab)
   legend_title <- color_by
   if(!is.null(legend_lab)) legend_title <- legend_lab
   
@@ -1787,6 +1788,10 @@ plot.dimRes <- function(dimRes_object, ...) {
   plotdata <- data.frame(SampleID = dimRes_object$SampleID, PC1 = dimRes_object$PC1, PC2 = dimRes_object$PC2)
   plotdata_name<-names(plotdata)[1]
   
+  #check point_size argument is numeric and >= zero
+  if(!is.numeric(point_size)) stop("point_size must be numeric")
+  if(point_size < 0) stop("point_size must be greater than or equal to zero")
+  
   # if there is a group designation #
   if(!is.null(attr(dimRes_object,"group_DF"))) {
     group_DF <- attr(dimRes_object,"group_DF")
@@ -1800,11 +1805,7 @@ plot.dimRes <- function(dimRes_object, ...) {
         if(nchar(string)>25) string=paste0(substr(string,1,23),"...")
         return(string)
       }
-      
-      #check point_size argument is numeric and >= zero
-      if(!is.numeric(point_size)) stop("point_size must be numeric")
-      if(point_size < 0) stop("point_size must be greater than or equal to zero")
-      
+
       # manage the length of legend titles #
       display_names <- sapply(main_eff_names, abbrev_fun)
       

@@ -28,7 +28,7 @@ Converts a list object or several data.frames of metabolomic-level data to an ob
 \details{
 Objects of class 'metabData' contain some attributes that are referenced by downstream functions. These attributes can be changed from their default value by manual specification. A list of these attributes as well as their default values are as follows:
 \tabular{ll}{
-data_scale \tab Scale of the data provided in \code{e_data}. Acceptable values are 'log2', 'log10', 'log', and 'abundance', which indicate data is log base 2, base 10, natural log transformed, and raw abundance, respectively. \cr
+data_scale \tab Scale of the data provided in \code{e_data}. Acceptable values are 'log2', 'log10', 'log', and 'abundance', which indicate data is log base 2, base 10, natural log transformed, and raw abundance, respectively. Default is 'abundance'. \cr
 \tab \cr
 data_norm \tab A logical argument, specifying whether the data has been normalized or not. Default value is FALSE. \cr
 \tab \cr
@@ -61,9 +61,6 @@ mymetabData <- as.metabData(e_data = metab_edata, f_data = metab_fdata, edata_cn
 }
 
 }
-\author{
-Lisa Bramer, Kelly Stratton
-}
 \seealso{
 \code{\link{as.lipidData}}
 
@@ -71,4 +68,6 @@ Lisa Bramer, Kelly Stratton
 
 \code{\link{as.proData}}
 }
-
+\author{
+Lisa Bramer, Kelly Stratton
+}
