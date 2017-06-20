@@ -1510,7 +1510,7 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
   # custom labels #
   if(!is.null(title_plot)) title <- title_plot
   xlabel <- ifelse(is.null(x_lab), "Sample", x_lab)
-  ylabel <- ifelse(is.null(y_lab), "Value", y_lab)
+  ylabel <- ifelse(is.null(y_lab), attr(omicsData, "data_info")$data_scale, y_lab)
   legend_title <- color_by
   if(!is.null(legend_lab)) legend_title <- legend_lab
   
@@ -1740,7 +1740,7 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
   # custom labels #
   if(!is.null(title_plot)) title <- title_plot
   xlabel <- ifelse(is.null(x_lab), "Sample", x_lab)
-  ylabel <- ifelse(is.null(y_lab), "Value", y_lab)
+  ylabel <- ifelse(is.null(y_lab), attr(omicsData, "data_info")$data_scale, y_lab)
   legend_title <- color_by
   if(!is.null(legend_lab)) legend_title <- legend_lab
   
