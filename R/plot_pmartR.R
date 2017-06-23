@@ -1055,7 +1055,14 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
   # custom labels #
   if(!is.null(title_plot)) title <- title_plot
   xlabel <- ifelse(is.null(x_lab), "Sample", x_lab)
-  ylabel <- ifelse(is.null(y_lab), "Value", y_lab)
+ 
+  if(is.null(y_lab)){
+    if(attr(omicsData, "data_info")$data_scale == 'abundance'){
+      ylabel<- "Abundance"}
+    else if(attr(omicsData, "data_info")$data_scale == 'log'){
+      ylabel<- "ln Abundance"
+    }else ylabel <- paste(attr(omicsData, "data_info")$data_scale, "Abundance", sep = " ")
+  }
   legend_title <- color_by
   if(!is.null(legend_lab)) legend_title <- legend_lab
   
@@ -1132,6 +1139,7 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     empties <- names(omicsData$e_data)[which(sample_nas == nrow(omicsData$e_data))]
     message(paste("The following sample(s) are comprised entirely of missing data and will not be included in the plot: ", empties, sep = " "))
   }
+
   ## end of initial checks ##
   
   
@@ -1282,7 +1290,14 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
   # custom labels #
   if(!is.null(title_plot)) title <- title_plot
   xlabel <- ifelse(is.null(x_lab), "Sample", x_lab)
-  ylabel <- ifelse(is.null(y_lab), "Value", y_lab)
+  
+  if(is.null(y_lab)){
+    if(attr(omicsData, "data_info")$data_scale == 'abundance'){
+      ylabel<- "Abundance"}
+    else if(attr(omicsData, "data_info")$data_scale == 'log'){
+      ylabel<- "ln Abundance"
+    }else ylabel <- paste(attr(omicsData, "data_info")$data_scale, "Abundance", sep = " ")
+  }
   legend_title <- color_by
   if(!is.null(legend_lab)) legend_title <- legend_lab
   
@@ -1509,7 +1524,14 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
   # custom labels #
   if(!is.null(title_plot)) title <- title_plot
   xlabel <- ifelse(is.null(x_lab), "Sample", x_lab)
-  ylabel <- ifelse(is.null(y_lab), "Value", y_lab)
+  
+  if(is.null(y_lab)){
+    if(attr(omicsData, "data_info")$data_scale == 'abundance'){
+      ylabel<- "Abundance"}
+    else if(attr(omicsData, "data_info")$data_scale == 'log'){
+      ylabel<- "ln Abundance"
+    }else ylabel <- paste(attr(omicsData, "data_info")$data_scale, "Abundance", sep = " ")
+  }
   legend_title <- color_by
   if(!is.null(legend_lab)) legend_title <- legend_lab
   
@@ -1739,7 +1761,14 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
   # custom labels #
   if(!is.null(title_plot)) title <- title_plot
   xlabel <- ifelse(is.null(x_lab), "Sample", x_lab)
-  ylabel <- ifelse(is.null(y_lab), "Value", y_lab)
+  
+  if(is.null(y_lab)){
+    if(attr(omicsData, "data_info")$data_scale == 'abundance'){
+      ylabel<- "Abundance"}
+    else if(attr(omicsData, "data_info")$data_scale == 'log'){
+      ylabel<- "ln Abundance"
+    }else ylabel <- paste(attr(omicsData, "data_info")$data_scale, "Abundance", sep = " ")
+  }
   legend_title <- color_by
   if(!is.null(legend_lab)) legend_title <- legend_lab
   
