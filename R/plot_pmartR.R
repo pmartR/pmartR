@@ -1058,7 +1058,10 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
  
   if(is.null(y_lab)){
     if(attr(omicsData, "data_info")$data_scale == 'abundance'){
-      ylabel<- "Abundance"}else ylabel <- paste(attr(omicsData, "data_info")$data_scale, "Abundance", sep = " ")
+      ylabel<- "Abundance"}
+    else if(attr(omicsData, "data_info")$data_scale == 'log'){
+      ylabel<- "ln Abundance"
+    }else ylabel <- paste(attr(omicsData, "data_info")$data_scale, "Abundance", sep = " ")
   }
   legend_title <- color_by
   if(!is.null(legend_lab)) legend_title <- legend_lab
@@ -1290,7 +1293,10 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
   
   if(is.null(y_lab)){
     if(attr(omicsData, "data_info")$data_scale == 'abundance'){
-      ylabel<- "Abundance"}else ylabel <- paste(attr(omicsData, "data_info")$data_scale, "Abundance", sep = " ")
+      ylabel<- "Abundance"}
+    else if(attr(omicsData, "data_info")$data_scale == 'log'){
+      ylabel<- "ln Abundance"
+    }else ylabel <- paste(attr(omicsData, "data_info")$data_scale, "Abundance", sep = " ")
   }
   legend_title <- color_by
   if(!is.null(legend_lab)) legend_title <- legend_lab
@@ -1521,7 +1527,10 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
   
   if(is.null(y_lab)){
     if(attr(omicsData, "data_info")$data_scale == 'abundance'){
-      ylabel<- "Abundance"}else ylabel <- paste(attr(omicsData, "data_info")$data_scale, "Abundance", sep = " ")
+      ylabel<- "Abundance"}
+    else if(attr(omicsData, "data_info")$data_scale == 'log'){
+      ylabel<- "ln Abundance"
+    }else ylabel <- paste(attr(omicsData, "data_info")$data_scale, "Abundance", sep = " ")
   }
   legend_title <- color_by
   if(!is.null(legend_lab)) legend_title <- legend_lab
@@ -1755,7 +1764,10 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
   
   if(is.null(y_lab)){
     if(attr(omicsData, "data_info")$data_scale == 'abundance'){
-      ylabel<- "Abundance"}else ylabel <- paste(attr(omicsData, "data_info")$data_scale, "Abundance", sep = " ")
+      ylabel<- "Abundance"}
+    else if(attr(omicsData, "data_info")$data_scale == 'log'){
+      ylabel<- "ln Abundance"
+    }else ylabel <- paste(attr(omicsData, "data_info")$data_scale, "Abundance", sep = " ")
   }
   legend_title <- color_by
   if(!is.null(legend_lab)) legend_title <- legend_lab
