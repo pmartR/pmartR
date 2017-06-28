@@ -1,4 +1,5 @@
-#rrollup_mod 
+#rrollup_new, we took the original rollup.R function and modified it to take in a pepData object and apply rrollup to it and
+#return a proData object
 
 rrollup<- function(pepData, parallel = TRUE){
   
@@ -82,9 +83,24 @@ rrollup<- function(pepData, parallel = TRUE){
   data_scale = attr(pepData, "data_info")$data_scale
   data_norm = attr(pepData, "data_info")$data_norm
   
-  prodata = as.proData(e_data = data.frame(final_result, check.names=FALSE), f_data = pepData$f_data, e_meta = NULL , fdata_cname = samp_id, edata_cname = pro_id, data_scale = data_scale, data_norm = data_norm)
+  #subsetting pepData$e_meta by 'unique_proteins' 
+  emeta_indices<- match(unique_proteins, pepData$e_meta[[pro_id]])
   
-  attr(prodata, "meta_info") = attr(pepData, "meta_info")
+  if(ncol(pepData$e_meta) == 2){
+    e_meta = as.data.frame(pepData$e_meta[emeta_indices, -which(names(pepData$e_meta)==pep_id)])
+    names(e_meta)<-pro_id
+  }else {e_meta = pepData$e_meta[emeta_indices, -which(names(pepData$e_meta)==pep_id)]} 
+  
+  prodata = as.proData(e_data = data.frame(final_result, check.names=FALSE), f_data = pepData$f_data, e_meta = e_meta ,edata_cname = pro_id, fdata_cname = samp_id, emeta_cname = pro_id, data_scale = data_scale, data_norm = data_norm)
+  
+  #updating prodata attributes
+  attr(prodata, "data_info")$norm_info = attr(pepData, "data_info")$norm_info
+  attr(prodata, "data_info")$data_types = attr(pepData, "data_info")$data_types
+  attr(prodata, "data_info")$norm_method = attr(pepData, "data_info")$norm_method
+  
+  attr(prodata, "filters")<- attr(pepData, "filters")
+  attr(prodata, "group_DF")<- attr(pepData, "group_DF")
+  attr(prodata, "imdanova")<- attr(pepData, "imdanova")
   }
   
   #applying rrollup without doParallel
@@ -143,9 +159,25 @@ rrollup<- function(pepData, parallel = TRUE){
     data_scale = attr(pepData, "data_info")$data_scale
     data_norm = attr(pepData, "data_info")$data_norm
     
-    prodata = as.proData(e_data = data.frame(final_result, check.names=FALSE), f_data = pepData$f_data, e_meta = NULL , fdata_cname = samp_id, edata_cname = pro_id, data_scale = data_scale, data_norm = data_norm)
+    #subsetting pepData$e_meta by 'unique_proteins' 
+    emeta_indices<- match(unique_proteins, pepData$e_meta[[pro_id]])
     
-    attr(prodata, "meta_info") = attr(pepData, "meta_info")
+    if(ncol(pepData$e_meta) == 2){
+      e_meta = as.data.frame(pepData$e_meta[emeta_indices, -which(names(pepData$e_meta)==pep_id)])
+      names(e_meta)<-pro_id
+    }else {e_meta = pepData$e_meta[emeta_indices, -which(names(pepData$e_meta)==pep_id)]} 
+    
+    
+    prodata = as.proData(e_data = data.frame(final_result, check.names=FALSE), f_data = pepData$f_data, e_meta = e_meta ,edata_cname = pro_id, fdata_cname = samp_id, emeta_cname = pro_id, data_scale = data_scale, data_norm = data_norm)
+    
+    #updating prodata attributes
+    attr(prodata, "data_info")$norm_info = attr(pepData, "data_info")$norm_info
+    attr(prodata, "data_info")$data_types = attr(pepData, "data_info")$data_types
+    attr(prodata, "data_info")$norm_method = attr(pepData, "data_info")$norm_method
+    
+    attr(prodata, "filters")<- attr(pepData, "filters")
+    attr(prodata, "group_DF")<- attr(pepData, "group_DF")
+    attr(prodata, "imdanova")<- attr(pepData, "imdanova")
     
   }
   
