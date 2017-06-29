@@ -61,6 +61,7 @@ prot_quant<- function(pepData, method, proteoformRes, parallel = TRUE){
     stopCluster(cl)
     
     final_res<- do.call(rbind, r)
+    proteoformRes_sub<-attr(proteoformRes, "proteoformRes_subset")
     
     #proData_object<- as.proData(e_data = final_res, f_data= f_data, e_meta= NULL, edata_cname = emeta_cname, fdata_cname = fdata_cname)
     #return(proData_object)

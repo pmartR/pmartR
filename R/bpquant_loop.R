@@ -67,6 +67,13 @@ bpquant<- function(statRes, pepData, pi_not = .9, max_proteoforms = 5){
  }
 
  stopCluster(cl)
+ 
+ bound_result<- do.call(rbind, r)
+ zero_inds<- which(bound_result$proteoformID == 0)
+ bound_result<- bound_result[-zero_inds, ]
+ attr(r, "proteoformRes_subset")<- bound_result
+ 
+ 
  return(r)
  
 #do.call(rbind, r)
