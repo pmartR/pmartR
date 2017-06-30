@@ -66,7 +66,7 @@ summary.pepData <- function(omicsData) {
     newres2<- c(newres, newres2)
     catmat2 <- data.frame(unlist(newres2, use.names = FALSE))
     colnames(catmat2) <- NULL
-    rownames(catmat2) <- c("Class",fdata_name, edata_name, emeta_name, "Missing Observations ", "Proportion Missing ", paste("Samples per group", levels, sep = " "))
+    rownames(catmat2) <- c("Class",fdata_name, edata_name, emeta_name, "Missing Observations ", "Proportion Missing ", paste("Samples per group:", levels, sep = " "))
     
     catmat<- catmat2
 
@@ -121,7 +121,7 @@ summary.proData <- function(omicsData) {
     newres2<- c(newres, newres2)
     catmat2 <- data.frame(unlist(newres2, use.names = FALSE))
     colnames(catmat2) <- NULL
-    rownames(catmat2) <- c("Class", fdata_name, edata_name, emeta_name, "Missing Observations ", "Proportion Missing ", paste("Samples per group", levels, sep = " "))
+    rownames(catmat2) <- c("Class", fdata_name, edata_name, emeta_name, "Missing Observations ", "Proportion Missing ", paste("Samples per group:", levels, sep = " "))
     
     catmat<- catmat2
   }
@@ -176,7 +176,7 @@ summary.lipidData <- function(omicsData) {
     newres2<- c(newres, newres2)
     catmat2 <- data.frame(unlist(newres2, use.names = FALSE))
     colnames(catmat2) <- NULL
-    rownames(catmat2) <- c("Class", fdata_name, edata_name, emeta_name, "Missing Observations ", "Proportion Missing ", paste("Samples per group", levels, sep = " "))
+    rownames(catmat2) <- c("Class", fdata_name, edata_name, emeta_name, "Missing Observations ", "Proportion Missing ", paste("Samples per group:", levels, sep = " "))
     
     catmat<- catmat2
   }
@@ -230,7 +230,7 @@ summary.metabData <- function(omicsData) {
     newres2<- c(newres, newres2)
     catmat2 <- data.frame(unlist(newres2, use.names = FALSE))
     colnames(catmat2) <- NULL
-    rownames(catmat2) <- c("Class", fdata_name, edata_name, emeta_name, "Missing Observations ", "Proportion Missing ", paste("Samples per group", levels, sep = " "))
+    rownames(catmat2) <- c("Class", fdata_name, edata_name, emeta_name, "Missing Observations ", "Proportion Missing ", paste("Samples per group:", levels, sep = " "))
     
     catmat<- catmat2
   }
