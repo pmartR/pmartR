@@ -1,6 +1,6 @@
-# prot-quant function
+#Wrapper function prot-quant
 
-prot_quant<- function(pepData, method, proteoformRes, parallel = TRUE){
+prot_quant<- function(pepData, method, proteoformRes = NULL, parallel = TRUE){
   
   #some checks
   if(class(pepData) != "pepData") stop("pepData must be an object of class pepData")
@@ -14,11 +14,29 @@ prot_quant<- function(pepData, method, proteoformRes, parallel = TRUE){
   e_meta<- pepData$e_meta
   
   edata_cname_id<- which(names(pepData$e_data) == edata_cname)
+
+  if(is.null(proteoformRes)){
+    
+    if(method == 'mean'){
+       #use pquant_mean function
+    }
+    if(method == 'median'){
+      #use pquant_median function
+    }
+    if(method == 'rrollup'){
+      #use rrollup_new function
+    }
+    
+    
+  }  
   
+ if(!is.null(proteoformRes)){
+    
   if(method == 'rrollup'){
 
     library(doParallel)
-    cl<- makeCluster(4)
+    cores<- detectCores()
+    cl<- makeCluster(cores)
     registerDoParallel(cl)
     
     final_res<- foreach(i=1:length(proteoformRes), .combine = 'rbind', .packages="foreach") %dopar%{
@@ -45,6 +63,6 @@ prot_quant<- function(pepData, method, proteoformRes, parallel = TRUE){
     return(final_res)
   }  
   
-  
+ }
   
 }

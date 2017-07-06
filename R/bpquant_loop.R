@@ -47,10 +47,11 @@ bpquant<- function(statRes, pepData, pi_not = .9, max_proteoforms = 5){
   res<- list()
   
   library(doParallel)
-  cl<- makeCluster(3)
+  cores<- detectCores()
+  cl<- makeCluster(cores)
   registerDoParallel(cl)
   
- r<- foreach(i=1:length(unique_proteins),.export = c("bpquant_mod")) %dopar%{
+ proteoformRes<- foreach(i=1:length(unique_proteins)) %dopar%{
     
     row_ind<- which(protein_sig_data[, emeta_cname] == unique_proteins[i])
     cur_protein<- protein_sig_data[row_ind, ]
@@ -68,13 +69,13 @@ bpquant<- function(statRes, pepData, pi_not = .9, max_proteoforms = 5){
 
  stopCluster(cl)
  
- bound_result<- do.call(rbind, r)
+ bound_result<- do.call(rbind, proteoformRes)
  zero_inds<- which(bound_result$proteoformID == 0)
  bound_result<- bound_result[-zero_inds, ]
- attr(r, "proteoformRes_subset")<- bound_result
+ attr(proteoformRes, "proteoformRes_subset")<- bound_result
  
  
- return(r)
+ return(proteoformRes)
  
 #do.call(rbind, r)
   

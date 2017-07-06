@@ -28,7 +28,8 @@ rrollup<- function(pepData, parallel = TRUE){
   final_list<- vector("list", length(unique_proteins))
   
   require(doParallel)
-  cl<- makeCluster(4)
+  cores<- detectCores()
+  cl<- makeCluster(cores)
   registerDoParallel(cl)
   
   r<-foreach(i=1:length(unique_proteins))%dopar%{
