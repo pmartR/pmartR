@@ -1,6 +1,6 @@
 #Wrapper function prot-quant
 
-prot_quant<- function(pepData, method, proteoformRes = NULL, parallel = TRUE){
+prot_quant<- function(pepData, method, proteoformRes = NULL){
   
   #some checks
   if(class(pepData) != "pepData") stop("pepData must be an object of class pepData")
@@ -18,7 +18,7 @@ prot_quant<- function(pepData, method, proteoformRes = NULL, parallel = TRUE){
   if(is.null(proteoformRes)){
     
     if(method == 'mean'){
-       #use pquant_mean function
+      results<- pquant_mean(pepData)
     }
     if(method == 'median'){
       #use pquant_median function
@@ -31,38 +31,22 @@ prot_quant<- function(pepData, method, proteoformRes = NULL, parallel = TRUE){
   }  
   
  if(!is.null(proteoformRes)){
+   
+   if(method == 'rrollup'){
+     #apply "myfunction" to proteoformRes to identify "Protein_Isoform"
+     proteoformRes2<- lapply(proteoformRes, myfunction)
+     proteoformRes2<- do.call(rbind, proteoformRes2)
     
-  if(method == 'rrollup'){
-
-    library(doParallel)
-    cores<- detectCores()
-    cl<- makeCluster(cores)
-    registerDoParallel(cl)
+     peptides<- which(pepData$e_data[,edata_cname] %in% proteoformRes2[, edata_cname])
+     
+     temp_pepdata<- as.pepData(e_data = pepData$e_data[peptides,], f_data = f_data, e_meta = proteoformRes2, edata_cname = edata_cname, fdata_cname = fdata_cname, emeta_cname = "Protein_Isoform" )
+     
+     results<- pmartRqc:::rrollup(temp_pepdata)
+     
+   }
     
-    final_res<- foreach(i=1:length(proteoformRes), .combine = 'rbind', .packages="foreach") %dopar%{
-        pformRes_sub<- proteoformRes[[i]]
-          
-        foreach(j = 1:max(pformRes_sub$proteoformID), .combine = 'rbind') %do%{
-           prot_name<- pformRes_sub$Protein[1]
-           cur_subset<- pformRes_sub[which(pformRes_sub$proteoformID == j), ]
-           inds<- which(pepData$e_data[[edata_cname]] %in% cur_subset[[edata_cname]])
-           edata_subset<- pepData$e_data[inds, -edata_cname_id]
-           prot<- paste(prot_name, j, sep=';')
-           result<- rrollup_r(edata_subset)
-           result<- result[,-1]
-           result<- cbind(prot, result)
-      }
-    }
-    stopCluster(cl)
-    
-    names(final_res)[1]<- emeta_cname
-    proteoformRes_sub<-attr(proteoformRes, "proteoformRes_subset")
-    
-    #proData_object<- as.proData(e_data = final_res, f_data= f_data, e_meta= NULL, edata_cname = emeta_cname, fdata_cname = fdata_cname)
-    #return(proData_object)
-    return(final_res)
-  }  
+ 
   
  }
-  
+  return(results)
 }
