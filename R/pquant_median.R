@@ -1,3 +1,9 @@
+#' Protein Quantitation using Median Peptide Abundances
+#' 
+#' Description here
+#' 
+#' @export
+
 #pquant_median for pmartRqc pep_object
 
 pquant_median <- function(pepData){
@@ -13,11 +19,11 @@ pquant_median <- function(pepData){
   pro_id = attr(pepData, "cnames")$emeta_cname
   
 
-  pep = data.table(pepData$e_data)
-  pro = data.table(pepData$e_meta[,c(pep_id, pro_id)])
-  temp = data.table:::merge.data.table(x = pro, y = pep, by = pep_id, all.x = F, all.y = T)
+  pep = data.table::data.table(pepData$e_data)
+  pro = data.table::data.table(pepData$e_meta[,c(pep_id, pro_id)])
+  temp = data.table::merge.data.table(x = pro, y = pep, by = pep_id, all.x = F, all.y = T)
   temp = as.data.frame(temp, check.names=FALSE)[,-which(names(temp)==pep_id)]
-  DT = data.table(temp)
+  DT = data.table::data.table(temp)
   res = as.data.frame(DT[,lapply(.SD, median, na.rm = T), by = pro_id], check.names=FALSE)
   
   samp_id = attr(pepData, "cnames")$fdata_cname
