@@ -28,7 +28,7 @@ Converts a list object or several data.frames of peptide-level data to an object
 \details{
 Objects of class 'pepData' contain some attributes that are referenced by downstream functions. These attributes can be changed from their default value by manual specification. A list of these attributes as well as their default values are as follows:
 \tabular{ll}{
-data_scale \tab Scale of the data provided in \code{e_data}. Acceptable values are 'log2', 'log10', 'log', and 'abundance', which indicate data is log base 2, base 10, natural log transformed, and raw abundance, respectively. \cr
+data_scale \tab Scale of the data provided in \code{e_data}. Acceptable values are 'log2', 'log10', 'log', and 'abundance', which indicate data is log base 2, base 10, natural log transformed, and raw abundance, respectively. Default is 'abundance'. \cr
 \tab \cr
 data_norm \tab A logical argument, specifying whether the data has been normalized or not. Default value is FALSE. \cr
 \tab \cr
@@ -61,9 +61,6 @@ data("pep_emeta")
 mypepData <- as.pepData(e_data = pep_edata, e_meta = pep_emeta, f_data = pep_fdata, edata_cname = "Mass_Tag_ID", fdata_cname = "SampleID", emeta_cname = "Mass_Tag_ID")
 }
 }
-\author{
-Kelly Stratton, Lisa Bramer
-}
 \seealso{
 \code{\link{as.proData}}
 
@@ -71,4 +68,6 @@ Kelly Stratton, Lisa Bramer
 
 \code{\link{as.metabData}}
 }
-
+\author{
+Kelly Stratton, Lisa Bramer
+}

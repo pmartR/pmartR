@@ -28,7 +28,7 @@
 summary.pepData <- function(omicsData) {
 
   # get values #
-  res <- list(num_samps = attr(omicsData, "data_info")$num_samps,
+  res <- list(class = class(omicsData), num_samps = attr(omicsData, "data_info")$num_samps,
               num_edata = attr(omicsData, "data_info")$num_edata,
               num_emeta = attr(omicsData, "data_info")$num_emeta,
               num_miss_obs = attr(omicsData, "data_info")$num_miss_obs,
@@ -46,15 +46,32 @@ summary.pepData <- function(omicsData) {
   }else{
     emeta_name <- "Rows (e_meta) "
   }
-
+  
   colnames(catmat) <- NULL
-  rownames(catmat) <- c(fdata_name, edata_name, emeta_name, "Missing Observations ", "Proportion Missing ")
+  rownames(catmat) <- c("Class", fdata_name, edata_name, emeta_name, "Missing Observations ", "Proportion Missing ")
+  
+  #if group_DF attr is present 
+  if(!is.null(attr(omicsData, "group_DF"))){
+    group_vec<- attr(omicsData, "group_DF")$Group
+    levels<- levels(attr(omicsData, "group_DF")$Group)
+    counts <- vector(mode="numeric", length=length(levels))
+    
+    for(i in 1:length(levels)){
+      counts[i]<- length(which(group_vec == levels[i]))
+    }
+    res2<- as.list(counts)
+    names(res2)<- levels
+    newres2 <- lapply(res2, function(x) ifelse(is.null(x), "NA", as.character(x)))
+    
+    newres2<- c(newres, newres2)
+    catmat2 <- data.frame(unlist(newres2, use.names = FALSE))
+    colnames(catmat2) <- NULL
+    rownames(catmat2) <- c("Class",fdata_name, edata_name, emeta_name, "Missing Observations ", "Proportion Missing ", paste("Samples per group:", levels, sep = " "))
+    
+    catmat<- catmat2
 
-  cat("\nSummary of 'pepData' Object\n---------------------------")
-  cat(capture.output(catmat), sep = "\n")
-  cat("\n")
-
-  return(invisible(res))
+  }
+  return(catmat)
 }
 
 
@@ -66,7 +83,7 @@ summary.pepData <- function(omicsData) {
 summary.proData <- function(omicsData) {
 
   # get values #
-  res <- list(num_samps = attr(omicsData, "data_info")$num_samps,
+  res <- list(class = class(omicsData), num_samps = attr(omicsData, "data_info")$num_samps,
               num_edata = attr(omicsData, "data_info")$num_edata,
               num_emeta = attr(omicsData, "data_info")$num_emeta,
               num_miss_obs = attr(omicsData, "data_info")$num_miss_obs,
@@ -86,13 +103,30 @@ summary.proData <- function(omicsData) {
   }
 
   colnames(catmat) <- NULL
-  rownames(catmat) <- c(fdata_name, edata_name, emeta_name, "Missing Observations ", "Proportion Missing ")
+  rownames(catmat) <- c("Class", fdata_name, edata_name, emeta_name, "Missing Observations ", "Proportion Missing ")
 
-  cat("\nSummary of 'proData' Object\n---------------------------")
-  cat(capture.output(catmat), sep = "\n")
-  cat("\n")
+  #if group_DF attr is present 
+  if(!is.null(attr(omicsData, "group_DF"))){
+    group_vec<- attr(omicsData, "group_DF")$Group
+    levels<- levels(attr(omicsData, "group_DF")$Group)
+    counts <- vector(mode="numeric", length=length(levels))
+    
+    for(i in 1:length(levels)){
+      counts[i]<- length(which(group_vec == levels[i]))
+    }
+    res2<- as.list(counts)
+    names(res2)<- levels
+    newres2 <- lapply(res2, function(x) ifelse(is.null(x), "NA", as.character(x)))
+    
+    newres2<- c(newres, newres2)
+    catmat2 <- data.frame(unlist(newres2, use.names = FALSE))
+    colnames(catmat2) <- NULL
+    rownames(catmat2) <- c("Class", fdata_name, edata_name, emeta_name, "Missing Observations ", "Proportion Missing ", paste("Samples per group:", levels, sep = " "))
+    
+    catmat<- catmat2
+  }
 
-  return(invisible(res))
+  return(catmat)
 }
 
 
@@ -104,7 +138,7 @@ summary.proData <- function(omicsData) {
 summary.lipidData <- function(omicsData) {
 
   # get values #
-  res <- list(num_samps = attr(omicsData, "data_info")$num_samps,
+  res <- list(class = class(omicsData), num_samps = attr(omicsData, "data_info")$num_samps,
               num_edata = attr(omicsData, "data_info")$num_edata,
               num_emeta = attr(omicsData, "data_info")$num_emeta,
               num_miss_obs = attr(omicsData, "data_info")$num_miss_obs,
@@ -124,13 +158,30 @@ summary.lipidData <- function(omicsData) {
   }
 
   colnames(catmat) <- NULL
-  rownames(catmat) <- c(fdata_name, edata_name, emeta_name, "Missing Observations ", "Proportion Missing ")
+  rownames(catmat) <- c("Class", fdata_name, edata_name, emeta_name, "Missing Observations ", "Proportion Missing ")
 
-  cat("\nSummary of 'lipidData' Object\n---------------------------")
-  cat(capture.output(catmat), sep = "\n")
-  cat("\n")
+  #if group_DF attr is present 
+  if(!is.null(attr(omicsData, "group_DF"))){
+    group_vec<- attr(omicsData, "group_DF")$Group
+    levels<- levels(attr(omicsData, "group_DF")$Group)
+    counts <- vector(mode="numeric", length=length(levels))
+    
+    for(i in 1:length(levels)){
+      counts[i]<- length(which(group_vec == levels[i]))
+    }
+    res2<- as.list(counts)
+    names(res2)<- levels
+    newres2 <- lapply(res2, function(x) ifelse(is.null(x), "NA", as.character(x)))
+    
+    newres2<- c(newres, newres2)
+    catmat2 <- data.frame(unlist(newres2, use.names = FALSE))
+    colnames(catmat2) <- NULL
+    rownames(catmat2) <- c("Class", fdata_name, edata_name, emeta_name, "Missing Observations ", "Proportion Missing ", paste("Samples per group:", levels, sep = " "))
+    
+    catmat<- catmat2
+  }
 
-  return(invisible(res))
+  return(catmat)
 }
 
 
@@ -141,7 +192,7 @@ summary.lipidData <- function(omicsData) {
 summary.metabData <- function(omicsData) {
 
   # get values #
-  res <- list(num_samps = attr(omicsData, "data_info")$num_samps,
+  res <- list(class = class(omicsData), num_samps = attr(omicsData, "data_info")$num_samps,
               num_edata = attr(omicsData, "data_info")$num_edata,
               num_emeta = attr(omicsData, "data_info")$num_emeta,
               num_miss_obs = attr(omicsData, "data_info")$num_miss_obs,
@@ -161,13 +212,30 @@ summary.metabData <- function(omicsData) {
   }
 
   colnames(catmat) <- NULL
-  rownames(catmat) <- c(fdata_name, edata_name, emeta_name, "Missing Observations ", "Proportion Missing ")
+  rownames(catmat) <- c("Class", fdata_name, edata_name, emeta_name, "Missing Observations ", "Proportion Missing ")
 
-  cat("\nSummary of 'metabData' Object\n---------------------------")
-  cat(capture.output(catmat), sep = "\n")
-  cat("\n")
+  #if group_DF attr is present 
+  if(!is.null(attr(omicsData, "group_DF"))){
+    group_vec<- attr(omicsData, "group_DF")$Group
+    levels<- levels(attr(omicsData, "group_DF")$Group)
+    counts <- vector(mode="numeric", length=length(levels))
+    
+    for(i in 1:length(levels)){
+      counts[i]<- length(which(group_vec == levels[i]))
+    }
+    res2<- as.list(counts)
+    names(res2)<- levels
+    newres2 <- lapply(res2, function(x) ifelse(is.null(x), "NA", as.character(x)))
+    
+    newres2<- c(newres, newres2)
+    catmat2 <- data.frame(unlist(newres2, use.names = FALSE))
+    colnames(catmat2) <- NULL
+    rownames(catmat2) <- c("Class", fdata_name, edata_name, emeta_name, "Missing Observations ", "Proportion Missing ", paste("Samples per group:", levels, sep = " "))
+    
+    catmat<- catmat2
+  }
 
-  return(invisible(res))
+  return(catmat)
 }
 
 
@@ -204,8 +272,8 @@ summary.dimRes <- function(dimRes_object){
   dim_summary = data.frame(R_squared = r2)
   row.names(dim_summary) <- attributes(dimRes_object)$names[-1]
 
-  cat("Summary of 'dimRes' Object\n\n")
-  cat(capture.output(dim_summary), sep="\n")
+  message("Summary of 'dimRes' Object\n\n")
+  message(capture.output(dim_summary), sep="\n")
 
   return(invisible(dim_summary))
 }

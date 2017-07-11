@@ -12,7 +12,7 @@
 #'
 #' @details Objects of class 'lipidData' contain some attributes that are referenced by downstream functions. These attributes can be changed from their default value by manual specification. A list of these attributes as well as their default values are as follows:
 #' \tabular{ll}{
-#' data_scale \tab Scale of the data provided in \code{e_data}. Acceptable values are 'log2', 'log10', 'log', and 'abundance', which indicate data is log base 2, base 10, natural log transformed, and raw abundance, respectively. Default values is 'log2'. \cr
+#' data_scale \tab Scale of the data provided in \code{e_data}. Acceptable values are 'log2', 'log10', 'log', and 'abundance', which indicate data is log base 2, base 10, natural log transformed, and raw abundance, respectively. Default values is 'abundance'. \cr
 #' \tab \cr
 #' data_norm \tab A logical argument, specifying whether the data has been normalized or not. Default value is FALSE. \cr
 #' \tab \cr
@@ -56,7 +56,7 @@ as.lipidData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname
 
 ## lipid data ##
 .as.lipidData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname,
-                          emeta_cname = NULL, data_scale = "log2",
+                          emeta_cname = NULL, data_scale = "abundance",
                           data_norm = FALSE, norm_info=NULL,
                           data_types=NULL){
 
@@ -118,7 +118,15 @@ as.lipidData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname
 
   # check that data_scale is one of the acceptable options #
   if(!(data_scale %in% c('log2', 'log10', 'log', 'abundance'))) stop(paste(data_scale, " is not a valid option for 'data_scale'. See details of as.lipidData for specifics.", sep=""))
-
+  
+  #check that e_data does not contain zero entries if data_scale is log
+  if(data_scale %in% c('log2', 'log10', 'log')){
+    edata<- e_data[, -which(names(e_data) == edata_cname)]
+    zeros<- apply(edata, 1, function(row) length(which(row == 0)))
+    
+    if(sum(zeros) > 0) stop("if 'data_scale' is log, e_data cannot contain zeros")
+  }
+  
   # if e_meta is NULL, set emeta_cname to NULL #
   if(is.null(e_meta)){
     emeta_cname = NULL
