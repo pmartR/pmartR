@@ -1,5 +1,10 @@
-#pquant_mean for pmartRqc pep_object
+#' Protein Quantitation using Mean Peptide Abundances
+#' 
+#' Description here
+#' 
+#' @export
 
+#pquant_mean for pmartRqc pep_object
 pquant_mean <- function(pepData){
   # check that pepData is of appropraite class #
   if(class(pepData) != "pepData") stop("pepData is not an object of the appropriate class")

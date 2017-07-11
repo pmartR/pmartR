@@ -1,5 +1,9 @@
-#rrollup_new, we took the original rollup.R function and modified it to take in a pepData object and apply rrollup to it and
-#return a proData object
+#' rrollup_new
+#' 
+#' started with the original rollup.R function and modified it to take in a pepData object. 
+#' rrollup is applied to the pepData object and a proData object is returned.
+#' 
+#' @export
 
 rrollup<- function(pepData, parallel = TRUE){
   

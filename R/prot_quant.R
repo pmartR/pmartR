@@ -1,4 +1,10 @@
-#Wrapper function prot-quant
+#' prot_quant wrapper function
+#' 
+#' Takes in a pepData object, the argument 'method' determines the quantitation method to be applied to pepData.
+#' The argument proteoformRes defaults to NULL, is a list of data.frames which are results of applying bpquant to
+#' the original pepData object for each protein. If proteoformRes is provided then,   
+#' 
+#' @export
 
 prot_quant<- function(pepData, method, proteoformRes = NULL){
   
@@ -21,10 +27,10 @@ prot_quant<- function(pepData, method, proteoformRes = NULL){
       results<- pquant_mean(pepData)
     }
     if(method == 'median'){
-      #use pquant_median function
+     results<- pquant_median(pepData)
     }
     if(method == 'rrollup'){
-      #use rrollup_new function
+      results<- rrollup(pepData)
     }
     
     
@@ -32,21 +38,37 @@ prot_quant<- function(pepData, method, proteoformRes = NULL){
   
  if(!is.null(proteoformRes)){
    
+   if(method == 'mean'){
+     #apply "proteoformRes_func" to proteoformRes to identify "Protein_Isoform"
+     proteoformRes2<- lapply(proteoformRes, proteoformRes_func)
+     proteoformRes2<- do.call(rbind, proteoformRes2)
+     
+     peptides<- which(pepData$e_data[,edata_cname] %in% proteoformRes2[, edata_cname])
+     temp_pepdata<- as.pepData(e_data = pepData$e_data[peptides,], f_data = f_data, e_meta = proteoformRes2, edata_cname = edata_cname, fdata_cname = fdata_cname, emeta_cname = "Protein_Isoform" )
+     results<- pquant_mean(temp_pepdata)
+   }
+   
+   if(method == 'median'){
+     #apply "proteoformRes_func" to proteoformRes to identify "Protein_Isoform"
+     proteoformRes2<- lapply(proteoformRes, proteoformRes_func)
+     proteoformRes2<- do.call(rbind, proteoformRes2)
+     
+     peptides<- which(pepData$e_data[,edata_cname] %in% proteoformRes2[, edata_cname])
+     temp_pepdata<- as.pepData(e_data = pepData$e_data[peptides,], f_data = f_data, e_meta = proteoformRes2, edata_cname = edata_cname, fdata_cname = fdata_cname, emeta_cname = "Protein_Isoform" )
+     results<- pquant_median(temp_pepdata)
+   }
+   
    if(method == 'rrollup'){
-     #apply "myfunction" to proteoformRes to identify "Protein_Isoform"
-     proteoformRes2<- lapply(proteoformRes, myfunction)
+     #apply "proteoformRes_func" to proteoformRes to identify "Protein_Isoform"
+     proteoformRes2<- lapply(proteoformRes, proteoformRes_func)
      proteoformRes2<- do.call(rbind, proteoformRes2)
     
      peptides<- which(pepData$e_data[,edata_cname] %in% proteoformRes2[, edata_cname])
-     
      temp_pepdata<- as.pepData(e_data = pepData$e_data[peptides,], f_data = f_data, e_meta = proteoformRes2, edata_cname = edata_cname, fdata_cname = fdata_cname, emeta_cname = "Protein_Isoform" )
-     
-     results<- pmartRqc:::rrollup(temp_pepdata)
-     
+     results<- rrollup(temp_pepdata)
    }
-    
- 
   
  }
+  
   return(results)
 }
