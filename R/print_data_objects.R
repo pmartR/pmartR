@@ -17,15 +17,13 @@ print.pepData<- function(pepData){
   if(!is.null(pepData$e_meta)){
     e_meta<- pepData$e_meta
     emeta_ncols<- ncol(e_meta)
+    if(max(edata_ncols, fdata_ncols, emeta_ncols) > 5) message("only first 5 columns are shown")
     out<- list(e_data_head = head(e_data, 4)[, 1:min(edata_ncols, 5)], e_data_tail = tail(e_data, 4)[, 1:min(edata_ncols, 5)], f_data_head = head(f_data, 4)[, 1:min(fdata_ncols, 5)], f_data_tail = tail(f_data, 4)[, 1:min(fdata_ncols, 5)], e_meta_head = head(e_meta, 4)[, 1:min(emeta_ncols, 5)], e_meta_tail = tail(e_meta, 4)[, 1:min(emeta_ncols, 5)])
   }else{
-    e_meta<-NULL
+    if(max(edata_ncols, fdata_ncols) > 5) message("only first 5 columns are shown")
     out<- list(e_data_head = head(e_data, 4)[, 1:min(edata_ncols, 5)], e_data_tail = tail(e_data, 4)[, 1:min(edata_ncols, 5)], f_data_head = head(f_data, 4)[, 1:min(fdata_ncols, 5)], f_data_tail = tail(f_data, 4)[, 1:min(fdata_ncols, 5)])
-    
   }
   
-  if(max(edata_ncols, fdata_ncols, emeta_ncols) > 5) message("only first 5 columns are shown")
-
   print(out)
 }
 
@@ -48,14 +46,13 @@ print.metabData<- function(metabData){
   if(!is.null(metabData$e_meta)){
     e_meta<- metabData$e_meta
     emeta_ncols<- ncol(e_meta)
+    if(max(edata_ncols, fdata_ncols, emeta_ncols) > 5) message("only first 5 columns are shown")
     out<- list(e_data_head = head(e_data, 4)[, 1:min(edata_ncols, 5)], e_data_tail = tail(e_data, 4)[, 1:min(edata_ncols, 5)], f_data_head = head(f_data, 4)[, 1:min(fdata_ncols, 5)], f_data_tail = tail(f_data, 4)[, 1:min(fdata_ncols, 5)], e_meta_head = head(e_meta, 4)[, 1:min(emeta_ncols, 5)], e_meta_tail = tail(e_meta, 4)[, 1:min(emeta_ncols, 5)])
   }else{
-    e_meta<-NULL
+    if(max(edata_ncols, fdata_ncols) > 5) message("only first 5 columns are shown")
     out<- list(e_data_head = head(e_data, 4)[, 1:min(edata_ncols, 5)], e_data_tail = tail(e_data, 4)[, 1:min(edata_ncols, 5)], f_data_head = head(f_data, 4)[, 1:min(fdata_ncols, 5)], f_data_tail = tail(f_data, 4)[, 1:min(fdata_ncols, 5)])
   }
-  
-  if(max(edata_ncols, fdata_ncols, emeta_ncols) > 5) message("only first 5 columns are shown")
-  
+
   print(out)
 }
 
@@ -78,13 +75,12 @@ print.proData<- function(proData){
   if(!is.null(proData$e_meta)){
     e_meta<- proData$e_meta
     emeta_ncols<- ncol(e_meta)
+    if(max(edata_ncols, fdata_ncols, emeta_ncols) > 5) message("only first 5 columns are shown")
     out<- list(e_data_head = head(e_data, 4)[, 1:min(edata_ncols, 5)], e_data_tail = tail(e_data, 4)[, 1:min(edata_ncols, 5)], f_data_head = head(f_data, 4)[, 1:min(fdata_ncols, 5)], f_data_tail = tail(f_data, 4)[, 1:min(fdata_ncols, 5)], e_meta_head = head(e_meta, 4)[, 1:min(emeta_ncols, 5)], e_meta_tail = tail(e_meta, 4)[, 1:min(emeta_ncols, 5)])
   }else{
-    e_meta<-NULL
+    if(max(edata_ncols, fdata_ncols) > 5) message("only first 5 columns are shown")
     out<- list(e_data_head = head(e_data, 4)[, 1:min(edata_ncols, 5)], e_data_tail = tail(e_data, 4)[, 1:min(edata_ncols, 5)], f_data_head = head(f_data, 4)[, 1:min(fdata_ncols, 5)], f_data_tail = tail(f_data, 4)[, 1:min(fdata_ncols, 5)])
   }
-  
-  if(max(edata_ncols, fdata_ncols, emeta_ncols) > 5) message("only first 5 columns are shown")
   
   print(out)
 }
@@ -108,13 +104,12 @@ print.lipidData<- function(lipidData){
   if(!is.null(lipidData$e_meta)){
     e_meta<- lipidData$e_meta
     emeta_ncols<- ncol(e_meta)
+    if(max(edata_ncols, fdata_ncols, emeta_ncols) > 5) message("only first 5 columns are shown")
     out<- list(e_data_head = head(e_data, 4)[, 1:min(edata_ncols, 5)], e_data_tail = tail(e_data, 4)[, 1:min(edata_ncols, 5)], f_data_head = head(f_data, 4)[, 1:min(fdata_ncols, 5)], f_data_tail = tail(f_data, 4)[, 1:min(fdata_ncols, 5)], e_meta_head = head(e_meta, 4)[, 1:min(emeta_ncols, 5)], e_meta_tail = tail(e_meta, 4)[, 1:min(emeta_ncols, 5)])
   }else{
-    e_meta<-NULL
+    if(max(edata_ncols, fdata_ncols) > 5) message("only first 5 columns are shown")
     out<- list(e_data_head = head(e_data, 4)[, 1:min(edata_ncols, 5)], e_data_tail = tail(e_data, 4)[, 1:min(edata_ncols, 5)], f_data_head = head(f_data, 4)[, 1:min(fdata_ncols, 5)], f_data_tail = tail(f_data, 4)[, 1:min(fdata_ncols, 5)])
   }
-  
-  if(max(edata_ncols, fdata_ncols, emeta_ncols) > 5) message("only first 5 columns are shown")
-  
+
   print(out)
 }
