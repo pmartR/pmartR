@@ -38,34 +38,23 @@ prot_quant<- function(pepData, method, proteoformRes = NULL){
   
  if(!is.null(proteoformRes)){
    
+   #apply "proteoformRes_func" to proteoformRes to identify "Protein_Isoform"
+   proteoformRes2<- lapply(proteoformRes, proteoformRes_func)
+   proteoformRes2<- do.call(rbind, proteoformRes2)
+   
+   peptides<- which(pepData$e_data[,edata_cname] %in% proteoformRes2[, edata_cname])
+   temp_pepdata<- as.pepData(e_data = pepData$e_data[peptides,], f_data = f_data, e_meta = proteoformRes2, edata_cname = edata_cname, fdata_cname = fdata_cname, emeta_cname = "Protein_Isoform" )
+   
    if(method == 'mean'){
-     #apply "proteoformRes_func" to proteoformRes to identify "Protein_Isoform"
-     proteoformRes2<- lapply(proteoformRes, proteoformRes_func)
-     proteoformRes2<- do.call(rbind, proteoformRes2)
-     
-     peptides<- which(pepData$e_data[,edata_cname] %in% proteoformRes2[, edata_cname])
-     temp_pepdata<- as.pepData(e_data = pepData$e_data[peptides,], f_data = f_data, e_meta = proteoformRes2, edata_cname = edata_cname, fdata_cname = fdata_cname, emeta_cname = "Protein_Isoform" )
      results<- pquant_mean(temp_pepdata)
    }
    
    if(method == 'median'){
-     #apply "proteoformRes_func" to proteoformRes to identify "Protein_Isoform"
-     proteoformRes2<- lapply(proteoformRes, proteoformRes_func)
-     proteoformRes2<- do.call(rbind, proteoformRes2)
-     
-     peptides<- which(pepData$e_data[,edata_cname] %in% proteoformRes2[, edata_cname])
-     temp_pepdata<- as.pepData(e_data = pepData$e_data[peptides,], f_data = f_data, e_meta = proteoformRes2, edata_cname = edata_cname, fdata_cname = fdata_cname, emeta_cname = "Protein_Isoform" )
-     results<- pquant_median(temp_pepdata)
+         results<- pquant_median(temp_pepdata)
    }
    
    if(method == 'rrollup'){
-     #apply "proteoformRes_func" to proteoformRes to identify "Protein_Isoform"
-     proteoformRes2<- lapply(proteoformRes, proteoformRes_func)
-     proteoformRes2<- do.call(rbind, proteoformRes2)
-    
-     peptides<- which(pepData$e_data[,edata_cname] %in% proteoformRes2[, edata_cname])
-     temp_pepdata<- as.pepData(e_data = pepData$e_data[peptides,], f_data = f_data, e_meta = proteoformRes2, edata_cname = edata_cname, fdata_cname = fdata_cname, emeta_cname = "Protein_Isoform" )
-     results<- rrollup(temp_pepdata)
+      results<- rrollup(temp_pepdata)
    }
   
  }
