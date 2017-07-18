@@ -55,3 +55,72 @@ print.proteomicsFilt<- function(filter_object){
   cat("\n")
   
 }
+
+#' print.imdanovaFilt
+#' 
+#' For printing an S3 object of type 'imdanovaFilt':
+#' 
+#'@rdname print-imdanovaFilt
+#'@export
+#'
+print.imdanovaFilt<- function(filter_object){
+  if(class(filter_object)[1] != "imdanovaFilt") stop("filter object must be of the class 'imdanovaFilt'")
+  filter_object<- as.data.frame(lapply(filter_object, as.character), stringsAsFactors = FALSE)
+  
+  filter_object_head = head(filter_object, 4)[, 1:ncol(filter_object)]
+  filter_object_tail = tail(filter_object, 4)[, 1:ncol(filter_object)]
+  blank_row = rep("---", ncol(filter_object))
+  
+  result<- rbind(filter_object_head, blank_row, filter_object_tail)
+  
+  cat("imdanovaFilt object\n")
+  cat(capture.output(result), sep = "\n")
+  cat("\n")
+}
+
+#' print.rmdFilt
+#' 
+#' For printing an S3 object of type 'rmdFilt':
+#' 
+#'@rdname print-rmdFilt
+#'@export
+#'
+print.rmdFilt<- function(filter_object){
+  if(class(filter_object)[1] != "rmdFilt") stop("filter object must be of the class 'rmdFilt'")
+  filter_object<- as.data.frame(lapply(filter_object, as.character), stringsAsFactors = FALSE)
+  num_cols<- ncol(filter_object)
+  
+  filter_object_head = head(filter_object, 4)[, 1:min(num_cols, 5)]
+  filter_object_tail = tail(filter_object, 4)[, 1:min(num_cols, 5)]
+  blank_row = rep("---", ncol(filter_object))
+  
+  result<- rbind(filter_object_head, blank_row, filter_object_tail)
+ 
+  if(num_cols > 5) message("only first 5 columns are shown")
+  cat("rmdFilt object\n")
+  cat(capture.output(result), sep = "\n")
+  cat("\n")
+}
+
+#' print.cvFilt
+#' 
+#' For printing an S3 object of type 'cvFilt':
+#' 
+#'@rdname print-cvFilt
+#'@export
+#'
+print.cvFilt<- function(filter_object){
+  if(class(filter_object)[1] != "cvFilt") stop("filter object must be of the class 'cvFilt'")
+  filter_object<- as.data.frame(lapply(filter_object, as.character), stringsAsFactors = FALSE)
+  
+  filter_object_head = head(filter_object, 4)[, 1:ncol(filter_object)]
+  filter_object_tail = tail(filter_object, 4)[, 1:ncol(filter_object)]
+  blank_row = rep("---", ncol(filter_object))
+  
+  result<- rbind(filter_object_head, blank_row, filter_object_tail)
+  
+  cat("cvFilt object\n")
+  cat(capture.output(result), sep = "\n")
+  cat("\n")
+}
+
