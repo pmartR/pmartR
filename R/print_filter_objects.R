@@ -124,3 +124,146 @@ print.cvFilt<- function(filter_object){
   cat("\n")
 }
 
+#' print.customFilt
+#' 
+#' For printing an S3 object of type 'customFilt':
+#' 
+#'@rdname print-customFilt
+#'@export
+#'
+print.customFilt<- function(filter_object){
+  if(class(filter_object)[1] != "customFilt") stop("filter object must be of the class 'customFilt'")
+  
+  if(!is.null(filter_object$e_data_remove) | !is.null(filter_object$f_data_remove) | !is.null(filter_object$e_meta_remove)){
+    
+    if(!is.null(filter_object$e_data_remove)) {
+      edata_rm<- filter_object$e_data_remove
+      
+      if(length(edata_rm)< 8){
+        out<- cbind(edata_rm)
+        colnames(out)<- 'e_data_remove'
+        cat(capture.output(out), sep ='\n')
+        cat('\n')
+      }else{
+      edata_rm_hd<- cbind(head(edata_rm, 4))
+      edata_rm_tl<- cbind(tail(edata_rm, 4))
+      blank_row<- '---'
+      
+      out<-rbind(edata_rm_hd, blank_row, edata_rm_tl)
+      colnames(out)<- 'e_data_remove'
+      rownames(out)<-NULL
+      cat(capture.output(out), sep = '\n')
+      cat('\n')
+      }
+    }
+    
+    if(!is.null(filter_object$f_data_remove)){
+      fdata_rm<- filter_object$f_data_remove
+      
+      if(length(fdata_rm)< 8){
+        out<- cbind(fdata_rm)
+        colnames(out)<- 'f_data_remove'
+        cat(capture.output(out), sep ='\n')
+        cat('\n')
+      }else{
+      fdata_rm_hd<- cbind(head(fdata_rm, 4))
+      edata_rm_tl<- cbind(tail(edata_rm, 4))
+      blank_row<- '---'
+      
+      out<-rbind(fdata_rm_hd, blank_row, fdata_rm_tl)
+      colnames(out)<- 'f_data_remove'
+      rownames(out)<-NULL
+      cat(capture.output(out), sep = '\n')
+      cat('\n')
+      }
+    } 
+    
+    if(!is.null(filter_object$emeta_remove)){
+      emeta_rm<- filter_object$emeta_remove
+      
+      if(length(emeta_rm)< 8){
+        out<- cbind(emeta_rm)
+        colnames(out)<- 'e_meta_remove'
+        cat(capture.output(out), sep ='\n')
+        cat('\n')
+      }else{
+      emeta_rm_hd<- cbind(head(emeta_rm, 4))
+      emeta_rm_tl<- cbind(tail(emeta_rm, 4))
+      blank_row<- '---'
+      
+      out<-rbind(emeta_rm_hd, blank_row, emeta_rm_tl)
+      colnames(out)<- 'e_meta_remove'
+      rownames(out)<-NULL
+      cat(capture.output(out), sep = '\n')
+      cat('\n')
+      }
+    } 
+  }
+  if(!is.null(filter_object$e_data_keep) | !is.null(filter_object$f_data_keep) | !is.null(filter_object$e_meta_keep)){
+    
+    if(!is.null(filter_object$e_data_keep)) {
+      edata_kp<- filter_object$e_data_keep
+      
+      if(length(edata_kp)< 8){
+        out<- cbind(edata_kp)
+        colnames(out)<- 'e_data_keep'
+        cat(capture.output(out), sep ='\n')
+        cat('\n')
+      }else{
+        edata_kp_hd<- cbind(head(edata_kp, 4))
+        edata_kp_tl<- cbind(tail(edata_kp, 4))
+        blank_row<- '---'
+        
+        out<-rbind(edata_kp_hd, blank_row, edata_kp_tl)
+        colnames(out)<- 'e_data_keep'
+        rownames(out)<-NULL
+        cat(capture.output(out), sep = '\n')
+        cat('\n')
+      }
+    }
+    
+    if(!is.null(filter_object$f_data_keep)){
+      fdata_kp<- filter_object$f_data_keep
+      
+      if(length(fdata_kp)< 8){
+        out<- cbind(fdata_kp)
+        colnames(out)<- 'f_data_keep'
+        cat(capture.output(out), sep ='\n')
+        cat('\n')
+      }else{
+        fdata_kp_hd<- cbind(head(fdata_kp, 4))
+        edata_kp_tl<- cbind(tail(edata_kp, 4))
+        blank_row<- '---'
+        
+        out<-rbind(fdata_kp_hd, blank_row, fdata_kp_tl)
+        colnames(out)<- 'f_data_keep'
+        rownames(out)<-NULL
+        cat(capture.output(out), sep = '\n')
+        cat('\n')
+      }
+    } 
+    
+    if(!is.null(filter_object$emeta_keep)){
+      emeta_kp<- filter_object$emeta_keep
+      
+      if(length(emeta_kp)< 8){
+        out<- cbind(emeta_kp)
+        colnames(out)<- 'e_meta_keep'
+        cat(capture.output(out), sep ='\n')
+        cat('\n')
+      }else{
+        emeta_kp_hd<- cbind(head(emeta_kp, 4))
+        emeta_kp_tl<- cbind(tail(emeta_kp, 4))
+        blank_row<- '---'
+        
+        out<-rbind(emeta_kp_hd, blank_row, emeta_kp_tl)
+        colnames(out)<- 'e_meta_keep'
+        rownames(out)<-NULL
+        cat(capture.output(out), sep = '\n')
+        cat('\n')
+      }
+    } 
+  }
+  
+}
+
