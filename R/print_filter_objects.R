@@ -178,8 +178,8 @@ print.customFilt<- function(filter_object){
       }
     } 
     
-    if(!is.null(filter_object$emeta_remove)){
-      emeta_rm<- filter_object$emeta_remove
+    if(!is.null(filter_object$e_meta_remove)){
+      emeta_rm<- filter_object$e_meta_remove
       
       if(length(emeta_rm)< 8){
         out<- cbind(emeta_rm)
@@ -243,8 +243,8 @@ print.customFilt<- function(filter_object){
       }
     } 
     
-    if(!is.null(filter_object$emeta_keep)){
-      emeta_kp<- filter_object$emeta_keep
+    if(!is.null(filter_object$e_meta_keep)){
+      emeta_kp<- filter_object$e_meta_keep
       
       if(length(emeta_kp)< 8){
         out<- cbind(emeta_kp)
