@@ -74,7 +74,7 @@ bpquant<- function(statRes, pepData, pi_not = .9, max_proteoforms = 5){
  bound_result<- bound_result[-zero_inds, ]
  attr(proteoformRes, "proteoformRes_subset")<- bound_result
  
- 
+ class(proteoformRes)<- "IsoformRes"
  return(proteoformRes)
  
 #do.call(rbind, r)
