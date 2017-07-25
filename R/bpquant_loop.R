@@ -51,7 +51,7 @@ bpquant<- function(statRes, pepData, pi_not = .9, max_proteoforms = 5){
   cl<- makeCluster(cores)
   registerDoParallel(cl)
   
- proteoformRes<- foreach(i=1:length(unique_proteins)) %dopar%{
+ isoformRes<- foreach(i=1:length(unique_proteins)) %dopar%{
     
     row_ind<- which(protein_sig_data[, emeta_cname] == unique_proteins[i])
     cur_protein<- protein_sig_data[row_ind, ]
@@ -69,13 +69,13 @@ bpquant<- function(statRes, pepData, pi_not = .9, max_proteoforms = 5){
 
  stopCluster(cl)
  
- bound_result<- do.call(rbind, proteoformRes)
+ bound_result<- do.call(rbind, isoformRes)
  zero_inds<- which(bound_result$proteoformID == 0)
  bound_result<- bound_result[-zero_inds, ]
- attr(proteoformRes, "proteoformRes_subset")<- bound_result
+ attr(isoformRes, "isoformRes_subset")<- bound_result
  
- class(proteoformRes)<- "IsoformRes"
- return(proteoformRes)
+ class(isoformRes)<- "isoformRes"
+ return(isoformRes)
  
 #do.call(rbind, r)
   

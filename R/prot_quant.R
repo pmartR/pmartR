@@ -1,12 +1,12 @@
 #' prot_quant wrapper function
 #' 
 #' Takes in a pepData object, the argument 'method' determines the quantitation method to be applied to pepData.
-#' The argument proteoformRes defaults to NULL, is a list of data.frames which are results of applying bpquant to
-#' the original pepData object for each protein. If proteoformRes is provided then,   
+#' The argument isoformRes defaults to NULL, is a list of data.frames which are results of applying bpquant to
+#' the original pepData object for each protein. If isoformRes is provided then,   
 #' 
 #' @export
 
-prot_quant<- function(pepData, method, proteoformRes = NULL){
+prot_quant<- function(pepData, method, isoformRes = NULL){
   
   #some checks
   if(class(pepData) != "pepData") stop("pepData must be an object of class pepData")
@@ -21,7 +21,7 @@ prot_quant<- function(pepData, method, proteoformRes = NULL){
   
   edata_cname_id<- which(names(pepData$e_data) == edata_cname)
 
-  if(is.null(proteoformRes)){
+  if(is.null(isoformRes)){
     
     if(method == 'mean'){
       results<- pquant_mean(pepData)
@@ -36,14 +36,14 @@ prot_quant<- function(pepData, method, proteoformRes = NULL){
     
   }  
   
- if(!is.null(proteoformRes)){
+ if(!is.null(isoformRes)){
    
-   #apply "proteoformRes_func" to proteoformRes to identify "Protein_Isoform"
-   proteoformRes2<- lapply(proteoformRes, proteoformRes_func)
-   proteoformRes2<- do.call(rbind, proteoformRes2)
+   #apply "isormRes_func" to isoformRes to identify "Protein_Isoform"
+   isoformRes2<- lapply(isoformRes, isoformRes_func)
+   isoformRes2<- do.call(rbind, isoformRes2)
    
-   peptides<- which(pepData$e_data[,edata_cname] %in% proteoformRes2[, edata_cname])
-   temp_pepdata<- as.pepData(e_data = pepData$e_data[peptides,], f_data = f_data, e_meta = proteoformRes2, edata_cname = edata_cname, fdata_cname = fdata_cname, emeta_cname = "Protein_Isoform" )
+   peptides<- which(pepData$e_data[,edata_cname] %in% isoformRes2[, edata_cname])
+   temp_pepdata<- as.pepData(e_data = pepData$e_data[peptides,], f_data = f_data, e_meta = isoformRes2, edata_cname = edata_cname, fdata_cname = fdata_cname, emeta_cname = "Protein_Isoform" )
    
    if(method == 'mean'){
      results<- pquant_mean(temp_pepdata)
@@ -65,8 +65,8 @@ prot_quant<- function(pepData, method, proteoformRes = NULL){
 
 
 
-# function to use with lapply on proteoformRes
-proteoformRes_func<- function(df){
+# function to use with lapply on isoformRes
+isoformRes_func<- function(df){
   temp<- vector("list", max(df$proteoformID))
   
   for(i in 1:max(df$proteoformID)){
