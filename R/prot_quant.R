@@ -38,9 +38,8 @@ prot_quant<- function(pepData, method, isoformRes = NULL){
   
  if(!is.null(isoformRes)){
    
-   #apply "isormRes_func" to isoformRes to identify "Protein_Isoform"
-   isoformRes2<- lapply(isoformRes, isoformRes_func)
-   isoformRes2<- do.call(rbind, isoformRes2)
+   #we will extract 'isoformRes_subset' attribute from isoformRes, which is all the proteins that mapped to a nonzero proteoformID
+   isoformRes2<- attr(isoformRes, "isoformRes_subset")
    
    peptides<- which(pepData$e_data[,edata_cname] %in% isoformRes2[, edata_cname])
    temp_pepdata<- as.pepData(e_data = pepData$e_data[peptides,], f_data = f_data, e_meta = isoformRes2, edata_cname = edata_cname, fdata_cname = fdata_cname, emeta_cname = "Protein_Isoform" )
@@ -62,19 +61,3 @@ prot_quant<- function(pepData, method, isoformRes = NULL){
   return(results)
 }
 
-
-
-
-# function to use with lapply on isoformRes
-isoformRes_func<- function(df){
-  temp<- vector("list", max(df$proteoformID))
-  
-  for(i in 1:max(df$proteoformID)){
-    cur_subset<- df[which(df$proteoformID == i), ]
-    new_df<- data.frame(cur_subset$Protein, paste(cur_subset$Protein, cur_subset$proteoformID, sep = ';'), as.numeric(cur_subset$Mass_Tag_ID))
-    names(new_df)<- c(names(df)[1], "Protein_Isoform", names(df)[2])
-    temp[[i]]<- new_df
-  }
-  
-  do.call(rbind, temp)
-}
