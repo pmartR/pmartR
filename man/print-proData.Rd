@@ -4,7 +4,7 @@
 \alias{print.proData}
 \title{print.proData}
 \usage{
-\method{print}{proData}(x)
+\method{print}{proData}(proData)
 }
 \description{
 For printing an S3 object of type 'proData':

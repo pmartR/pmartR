@@ -4,7 +4,7 @@
 \alias{print.lipidData}
 \title{print.lipidData}
 \usage{
-\method{print}{lipidData}(x)
+\method{print}{lipidData}(lipidData)
 }
 \description{
 For printing an S3 object of type 'lipidData':

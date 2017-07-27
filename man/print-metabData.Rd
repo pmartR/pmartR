@@ -4,7 +4,7 @@
 \alias{print.metabData}
 \title{print.metabData}
 \usage{
-\method{print}{metabData}(x)
+\method{print}{metabData}(metabData)
 }
 \description{
 For printing an S3 object of type 'metabData':
