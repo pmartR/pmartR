@@ -1058,7 +1058,7 @@ MSomics_filter_worker <- function(filter_object, omicsData){
       if(!is.null(filter_object$emeta_keep) & !is.null(emeta_cname)){
         # identify which proteins in data match filter list and keep in e_meta #
         temp.meta = temp.meta1
-        temp.meta_not_kept = omicsData$e_meta[-which(omicsData$e_meta$Mass_Tag_ID %in% temp.meta$Mass_Tag_ID),]
+        temp.meta_not_kept = omicsData$e_meta[-which(omicsData$e_meta[[edata_cname]] %in% temp.meta[[edata_cname]]),]
         
         # check that at least one of the proteins is in e_meta (this is e_meta after e_data_keep has been applied) #
         if(!is.null(ncol(temp.meta))){
@@ -1099,7 +1099,7 @@ MSomics_filter_worker <- function(filter_object, omicsData){
       }
       
       
-      # check for entries in e_meta[,emeta_cname] that are not in e_data[,edata_cname]#
+      # check for entries in e_meta[,edata_cname] that are not in e_data[,edata_cname]#
       if(!is.null(ncol(temp.meta2))){
         edat_ids2 = which(!temp.meta2[,edata_cname] %in% (temp.pep2[,edata_cname]))
       }else{
@@ -1109,7 +1109,7 @@ MSomics_filter_worker <- function(filter_object, omicsData){
       
       # add edata entries which were present in emeta but not edata #
       if(length(edat_ids2) > 0){
-        additional_peps<- temp.meta2$Mass_Tag_ID[edat_ids2]
+        additional_peps<- temp.meta2[[edata_cname]][edat_ids2]
         edata_cname_id = which(names(temp.pep1) == edata_cname)
         
         if(is.null(filter_object$samples_keep)){
@@ -1117,7 +1117,7 @@ MSomics_filter_worker <- function(filter_object, omicsData){
         }
         else inds = which(names(temp.pep1) %in% filter_object$samples_keep)
         
-        temp.pep2 = rbind(temp.pep2, omicsData$e_data[which(omicsData$e_data$Mass_Tag_ID %in% additional_peps) ,c(edata_cname_id,inds)])
+        temp.pep2 = rbind(temp.pep2, omicsData$e_data[which(omicsData$e_data[[edata_cname]] %in% additional_peps) ,c(edata_cname_id,inds)])
       }
       
       
