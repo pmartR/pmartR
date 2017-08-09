@@ -18,7 +18,6 @@ pquant_median <- function(pepData){
   pep_id = attr(pepData, "cnames")$edata_cname
   pro_id = attr(pepData, "cnames")$emeta_cname
   
-
   pep = data.table::data.table(pepData$e_data)
   pro = data.table::data.table(pepData$e_meta[,c(pep_id, pro_id)])
   temp = data.table:::merge.data.table(x = pro, y = pep, by = pep_id, all.x = F, all.y = T)
@@ -37,7 +36,6 @@ pquant_median <- function(pepData){
   
   else {e_meta = pepData$e_meta[,-which(names(pepData$e_meta)==pep_id)]} 
 
-
   prodata = as.proData(e_data = data.frame(res, check.names=FALSE), f_data = pepData$f_data, e_meta = e_meta, edata_cname = pro_id, fdata_cname = samp_id, emeta_cname = pro_id, data_scale = data_scale, data_norm = data_norm)
   
   #updating prodata attributes
@@ -49,7 +47,5 @@ pquant_median <- function(pepData){
   attr(prodata, "group_DF")<- attr(pepData, "group_DF")
   attr(prodata, "imdanova")<- attr(pepData, "imdanova")
 
-  
   return(prodata)
 }
-

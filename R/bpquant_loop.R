@@ -1,11 +1,14 @@
-#bpquant_loop
-#The bpquant_loop function takes in a statRes object and a pepData object. The statRes object contains 
-#the signatures data frame, the pepData object is used for its e_meta data frame. Next the signatures data 
-#frame and e_meta are merged by their edata_cname ("Peptide") columns, this new data frame called 
-#protein_sig_data will be input to bpquant_mod in a "foreach" statement. "Foreach" will subset protein_sig_data 
-#for each protein and apply bpquant_mod to each subset and store the results.
+#'bpquant_loop
+#'
+#'The bpquant_loop function takes in a statRes object and a pepData object. The statRes object contains 
+#'the signatures data frame, the pepData object is used for its e_meta data frame. Next the signatures data 
+#'frame and e_meta are merged by their edata_cname ("Peptide") columns, this new data frame called 
+#'protein_sig_data will be input to bpquant_mod in a "foreach" statement. "Foreach" will subset protein_sig_data 
+#'for each protein and apply bpquant_mod to each subset and store the results.
+#'
+#' @export
 
-bpquant<- function(statRes, pepData, pi_not = .9, max_proteoforms = 5){
+bpquant_loop<- function(statRes, pepData, pi_not = .9, max_proteoforms = 5){
   
   #some checks
   if(pi_not < 0 | pi_not > 1) stop("pi_not must be between 0 and 1")

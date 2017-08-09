@@ -1,4 +1,4 @@
-#' prot_quant wrapper function
+#' protein_quant wrapper function
 #' 
 #' Takes in a pepData object, the argument 'method' determines the quantitation method to be applied to pepData.
 #' The argument isoformRes defaults to NULL, is a list of data.frames which are results of applying bpquant to

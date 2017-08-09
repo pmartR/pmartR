@@ -1,3 +1,5 @@
+#original bpquant_mod function is called in bpquant_loop function
+
 bpquant_mod <- function(protein_sig, pi_not, max_proteoforms){
   
 ## implement some checks ##
