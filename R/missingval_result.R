@@ -1,4 +1,9 @@
-
+#' missingval_result
+#' 
+#' input is an omicsData object, outputs a list of two data frames, one contains NA by sample, the second contains NA by
+#'
+#'
+#'@export
 
 missingval_result<- function(omicsData){
   
@@ -22,7 +27,8 @@ missingval_result<- function(omicsData){
   na_per_row<- apply(is.na(temp), 1, sum)
   na_by_molecule<- data.frame("molecule"= omicsData$e_data[,edata_cname_id], "num_NA"= as.numeric(na_per_row))
   names(na_by_molecule)[1]<- edata_cname
-  result<- list(na_by_sample, na_by_molecule)
+  
+  result<- list("na.by.sample" = na_by_sample, "na.by.molecule" = na_by_molecule)
   class(result)<- "NARes"
 
   return(result)  
