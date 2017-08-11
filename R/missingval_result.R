@@ -29,7 +29,7 @@ missingval_result<- function(omicsData){
   names(na_by_molecule)[1]<- edata_cname
   
   result<- list("na.by.sample" = na_by_sample, "na.by.molecule" = na_by_molecule)
-  class(result)<- "NARes"
+  class(result)<- "naRes"
   
   attr(result, "cnames")<- list("edata_cname" = edata_cname, "fdata_cname" = fdata_cname)
 

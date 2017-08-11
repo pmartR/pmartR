@@ -1,19 +1,19 @@
-#' plot.NARes
+#' plot.naRes
 #' 
-#' For plotting an S3 object of type 'NARes':
+#' For plotting an S3 object of type 'naRes':
 #' 
-#'@rdname plot-NARes
+#'@rdname plot-naRes
 #'@export
 #'
 
-plot.NARes <- function(NARes_object, x_lab = NULL, ...) {
-  .plot.NARes(NARes_object, x_lab, ...)
+plot.naRes <- function(naRes_object, x_lab = NULL, ...) {
+  .plot.naRes(naRes_object, x_lab, ...)
 }
 
-.plot.NARes<- function(NARes_object, x_lab = NULL, y_lab = NULL, title_plot = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme = FALSE){
+.plot.naRes<- function(naRes_object, x_lab = NULL, y_lab = NULL, title_plot = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme = FALSE){
  
-   # check for a NARes object #
-  if(class(NARes_object)[1] != "NARes") stop("object must be of class 'NARes'")
+   # check for a naRes object #
+  if(class(naRes_object)[1] != "naRes") stop("object must be of class 'naRes'")
   
   if(!is.null(title_plot)) {
     if(!is.character(title_plot)) stop("title_plot must be a character vector")
@@ -26,11 +26,11 @@ plot.NARes <- function(NARes_object, x_lab = NULL, ...) {
   }
   ## end of initial checks ##
   
-  #extracting items from NARes_object
-  na.by.sample<- NARes_object$na.by.sample
-  na.by.molecule<- NARes_object$na.by.molecule
-  edata_cname<- attr(NARes_object, "cnames")$edata_cname
-  fdata_cname<- attr(NARes_object, "cnames")$fdata_cname
+  #extracting items from naRes_object
+  na.by.sample<- naRes_object$na.by.sample
+  na.by.molecule<- naRes_object$na.by.molecule
+  edata_cname<- attr(naRes_object, "cnames")$edata_cname
+  fdata_cname<- attr(naRes_object, "cnames")$fdata_cname
   
   
   # make labels #
