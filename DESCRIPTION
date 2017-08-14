@@ -26,7 +26,8 @@ Imports:
     d3heatmap,
     gridExtra,
     reshape2,
-    RcppArmadillo
+    RcppArmadillo,
+    gridExtra
 Suggests:
     knitr,
     rmarkdown,
