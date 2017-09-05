@@ -1,10 +1,11 @@
 
-#here we will make a temporary function called missingval_heatmapplot, it takes in omicsData and a missingval_result object
-#and returns a heatmap of omicsData$e_data
+#here we will make a temporary function called missingval_heatmapplot, it takes in omicsData and returns a heatmap of omicsData$e_data
 
-missingval_heatmapplot<- function(omicsData, missingval_res){
- 
-by_molecule<- missingval_res$na.by.molecule
+missingval_heatmapplot<- function(omicsData){
+
+#here we call 'missingval_result' function that will give us an object of type naRes containing informaiton on the number of missing values per molecule   
+na_Res<- missingval_result(omicsData)   
+by_molecule<- na_Res$na.by.molecule
 by_molecule<- by_molecule[order(by_molecule$num_NA),]
 
 edata_cname<- attr(omicsData, "cnames")$edata_cname 
