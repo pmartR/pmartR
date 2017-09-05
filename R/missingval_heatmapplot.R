@@ -1,5 +1,11 @@
+#' missingval_heatmapplot
+#' 
+#'takes in omicsData and returns a heatmap of omicsData$e_data
+#' 
+#'@rdname missingval_heatmapplot
+#'@export
+#'
 
-#here we will make a temporary function called missingval_heatmapplot, it takes in omicsData and returns a heatmap of omicsData$e_data
 
 missingval_heatmapplot<- function(omicsData){
 
