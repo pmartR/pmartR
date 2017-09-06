@@ -7,23 +7,49 @@
 #'
 
 
-missingval_heatmapplot<- function(omicsData){
+missingval_heatmapplot <- function(omicsData, x_lab = NULL, y_lab = NULL, ...) {
+  .missingval_heatmapplot(omicsData, x_lab, y_lab, ...)
+}
+
+.missingval_heatmapplot<- function(omicsData, x_lab = NULL, y_lab = NULL, title_plot = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11){
+  
+  #check that omicsData is of correct class
+  if(!(class(omicsData) %in% c("proData","pepData","lipidData", "metabData"))) stop("omicsData is not an object of appropriate class")
+  
+  #checking arguments are of correct class
+  if(!is.null(title_plot)) {
+    if(!is.character(title_plot)) stop("title_plot must be a character vector")
+  }
+  if(!is.null(x_lab)) {
+    if(!is.character(x_lab)) stop("x_lab must be a character vector")
+  }
+  if(!is.null(y_lab)) {
+    if(!is.character(y_lab)) stop("y_lab must be a character vector")
+  } 
 
 #here we call 'missingval_result' function that will give us an object of type naRes containing informaiton on the number of missing values per molecule   
 na_Res<- missingval_result(omicsData)   
 by_molecule<- na_Res$na.by.molecule
 by_molecule<- by_molecule[order(by_molecule$num_NA),]
 
-edata_cname<- attr(omicsData, "cnames")$edata_cname 
+# make labels #
+xlabel <- ifelse(is.null(x_lab), "Intensity", x_lab)
+ylabel <- ifelse(is.null(y_lab), "Molecule", y_lab)
+plot_title <- ifelse(is.null(title_plot), "Missing Values Heatmap", title_plot)
 
+#pull attr from omicsData
+edata_cname<- attr(omicsData, "cnames")$edata_cname 
 e_data<- omicsData$e_data
 
 edata_melt<- melt(e_data, id.vars = edata_cname)
 edata_melt[[edata_cname]]<- factor(edata_melt[[edata_cname]], levels = rev(by_molecule[[edata_cname]]))  
 names(edata_melt)[1]<- "edata_cname"
 
-p <- ggplot(edata_melt, aes(x=variable, y = edata_cname)) + geom_tile(aes(fill = value), colour = "white") + 
-     theme(axis.text.y = element_blank(), axis.ticks.y = element_blank()) + ylab("Molecule")
+p <- ggplot2::ggplot(edata_melt, aes(x=variable, y = edata_cname)) + geom_tile(aes(fill = value), colour = "white") +
+      ggplot2::xlab(xlabel) +
+      ggplot2::ylab(ylabel) +
+      ggplot2::ggtitle(plot_title) +
+      theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size)) 
   
 return(p)
 
