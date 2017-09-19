@@ -11,7 +11,7 @@ missingval_heatmapplot <- function(omicsData, x_lab = NULL, y_lab = NULL, ...) {
   .missingval_heatmapplot(omicsData, x_lab, y_lab, ...)
 }
 
-.missingval_heatmapplot<- function(omicsData, x_lab = NULL, y_lab = NULL, title_plot = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme = FALSE){
+.missingval_heatmapplot<- function(omicsData, x_lab = NULL, y_lab = NULL, title_plot = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11){
   
   #check that omicsData is of correct class
   if(!(class(omicsData) %in% c("proData","pepData","lipidData", "metabData"))) stop("omicsData is not an object of appropriate class")
@@ -45,21 +45,13 @@ edata_melt<- melt(e_data, id.vars = edata_cname)
 edata_melt[[edata_cname]]<- factor(edata_melt[[edata_cname]], levels = rev(by_molecule[[edata_cname]]))  
 names(edata_melt)[1]<- "edata_cname"
 
-if(bw_theme == FALSE){
   p <- ggplot2::ggplot(edata_melt, aes(x=variable, y = edata_cname)) + geom_tile(aes(fill = value), colour = "white") +
     ggplot2::xlab(xlabel) +
     ggplot2::ylab(ylabel) +
     ggplot2::ggtitle(plot_title) +
     ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size)) 
-}
-else{
-  p <- ggplot2::ggplot(edata_melt, aes(x=variable, y = edata_cname)) + geom_tile(aes(fill = value), colour = "white") +
-    ggplot2::xlab(xlabel) +
-    ggplot2::ylab(ylabel) +
-    ggplot2::ggtitle(plot_title) +
-    ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size)) +
-    ggplot2::theme_bw()
-}
+
+
 return(p)
 
 }

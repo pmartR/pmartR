@@ -3,7 +3,9 @@
 #' fold change vs t-Test p-value 
 #' 
 #'@param comparison can either be a character string name of the comparison to plot, or an integer index refering to the comparisons attribute vector
-#' 
+#'@param vlines The x coordinate (integer in absolute value) where to draw vertical lines, defaults to NULL
+#'@param pvalue_threshold logical, defaults to FALSE, if TRUE a horizontal line is put in according to attr(statRes, "pval_thresh")
+#'  
 #'@rdname missingval_volcanoplot
 #'
 #' \tabular{ll}{
@@ -23,14 +25,17 @@ missingval_volcanoplot<- function(statRes, comparison, x_lab = NULL, ...) {
   .missingval_volcanoplot(statRes, comparison, x_lab, ...)
 }
 
-.missingval_volcanoplot<- function(statRes, comparison, x_lab = NULL, y_lab = NULL, title_plot = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme = FALSE){
+.missingval_volcanoplot<- function(statRes, comparison, x_lab = NULL, y_lab = NULL, title_plot = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme = FALSE, vlines = NULL, pvalue_threshold = FALSE){
 
-#check that staRes object is of 'statRes' class
+#check that statRes object is of 'statRes' class
 if(class(statRes) != "statRes") stop("object must be of class 'statRes'")
 
 #check that comparison is of correct class, either integer or character
 if(!(class(comparison)) %in% c("character", "numeric")) stop("comparison must be either of 'character' or 'numeric' class")  
 
+#check that pval_threshold attr of statRes in not NULL
+if(is.null(attr(statRes,"pval_thresh"))) stop("pval_thresh attribute of statRes was not found")  
+  
 #plot label checks
 if(!is.null(title_plot)) {
   if(!is.character(title_plot)) stop("title_plot must be a character vector")
@@ -86,29 +91,39 @@ if(length(comparison) == 1){
 
   #now we can apply -log10() to the pvalue_data
   plotdata$pvalue_data = -log10(plotdata$pvalue_data)
-  #take log2 of fold chang aswell
+  #plotdata$fold_change_data = log2(plotdata$fold_change_data) taking log2 of fold_change_data produces many NaN and inf, going to assume data is already log2 scale
+  
   
   # make labels #
-  xlabel <- ifelse(is.null(x_lab), "Fold Change", x_lab)
+  xlabel <- ifelse(is.null(x_lab), "log2 Fold Change", x_lab)
   ylabel <- ifelse(is.null(y_lab), "-log10 t-Test P-value", y_lab)
   plot_title <- ifelse(is.null(title_plot), paste("Volcano Plot", comparison, sep = " "), title_plot)
   
-  if(bw_theme == FALSE){
+  #checks for vlines parameter 
+   if(!is.null(vlines)){
+    if(!(is.numeric(vlines)) & vlines <= 0) stop("'vlines' must be positive non-zero and numeric")
+     vert_lines = c(vlines, -vlines)
+   }
+  
+  #extract pvalue threshold from statRes object
+    pval_thresh = attr(statRes, "pval_thresh")
+    
     p <- ggplot(plotdata, aes(x = fold_change_data, y = pvalue_data)) + geom_point(color = "blue") +
       ggplot2::xlab(xlabel) +
       ggplot2::ylab(ylabel) +
       ggplot2::ggtitle(plot_title) +
       ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size))
-  }
-  else{
-    p <- ggplot(plotdata, aes(x = fold_change_data, y = pvalue_data)) + geom_point(color = "blue") +
-      ggplot2::xlab(xlabel) +
-      ggplot2::ylab(ylabel) +
-      ggplot2::ggtitle(plot_title) +
-      ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size)) +
-      ggplot2::theme_bw()
-  }
     
+    if(bw_theme == TRUE){
+      p = p + ggplot2::theme_bw()
+    }
+    if(!(is.null(vlines))){
+      p = p + ggplot2::geom_vline(xintercept = vert_lines, color = "red")
+    }
+    if(pvalue_threshold == TRUE){
+      p = p + ggplot2::geom_hline(yintercept = pval_thresh, color = "green")
+    }
+  
   return(p)
 }
   
