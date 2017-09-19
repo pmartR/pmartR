@@ -86,6 +86,7 @@ if(length(comparison) == 1){
 
   #now we can apply -log10() to the pvalue_data
   plotdata$pvalue_data = -log10(plotdata$pvalue_data)
+  #take log2 of fold chang aswell
   
   # make labels #
   xlabel <- ifelse(is.null(x_lab), "Fold Change", x_lab)

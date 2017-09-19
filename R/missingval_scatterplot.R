@@ -10,7 +10,7 @@ missingval_scatterplot <- function(omicsData, x_lab = NULL, y_lab = NULL, ...) {
   .missingval_scatterplot(omicsData, x_lab, y_lab, ...)
 }
 
-.missingval_scatterplot<- function(omicsData, x_lab = NULL, y_lab = NULL, title_plot = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11){
+.missingval_scatterplot<- function(omicsData, x_lab = NULL, y_lab = NULL, title_plot = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme = FALSE){
   
   #check that omicsData is of correct class
   if(!(class(omicsData) %in% c("proData","pepData","lipidData", "metabData"))) stop("omicsData is not an object of appropriate class")
@@ -48,12 +48,22 @@ missingval_scatterplot <- function(omicsData, x_lab = NULL, y_lab = NULL, ...) {
     
     plot_data<- as.data.frame(cbind(mean_intensity, num_missing_vals))
     
+    if(bw_theme == FALSE){
     p<-ggplot2::ggplot(plot_data, aes(mean_intensity, num_missing_vals)) + geom_point(color = "blue") + 
       ggplot2::xlab(xlabel) +
       ggplot2::ylab(ylabel) +
       ggplot2::ggtitle(plot_title) +
       ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size))
-    
+    }
+    else{
+      p<-ggplot2::ggplot(plot_data, aes(mean_intensity, num_missing_vals)) + geom_point(color = "blue") + 
+        ggplot2::xlab(xlabel) +
+        ggplot2::ylab(ylabel) +
+        ggplot2::ggtitle(plot_title) +
+        ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size)) +
+        ggplot2::theme_bw()
+      
+    }
   }
   
   if(!is.null(attr(omicsData, "group_DF"))){
@@ -79,12 +89,23 @@ missingval_scatterplot <- function(omicsData, x_lab = NULL, y_lab = NULL, ...) {
     plot_data<- as.data.frame(plot_data)
     plot_data<- melt(plot_data, id.vars = "num_missing_vals")
     
-    p<-ggplot2::ggplot(plot_data, aes(value, num_missing_vals)) + geom_point(aes(colour = variable), size = 3) +
-      ggplot2::xlab(xlabel) +
-      ggplot2::ylab(ylabel) +
-      ggplot2::ggtitle(plot_title) +
-      ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size))
-    
+    if(bw_theme == FALSE){
+      p<-ggplot2::ggplot(plot_data, aes(value, num_missing_vals)) + geom_point(aes(colour = variable), size = 3) +
+        ggplot2::xlab(xlabel) +
+        ggplot2::ylab(ylabel) +
+        ggplot2::ggtitle(plot_title) +
+        ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size))
+      
+    }
+    else{
+      p<-ggplot2::ggplot(plot_data, aes(value, num_missing_vals)) + geom_point(aes(colour = variable), size = 3) +
+        ggplot2::xlab(xlabel) +
+        ggplot2::ylab(ylabel) +
+        ggplot2::ggtitle(plot_title) +
+        ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size)) +
+        ggplot2::theme_bw()
+    }
+        
   }
   
    return(p) 
