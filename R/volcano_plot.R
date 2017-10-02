@@ -4,7 +4,7 @@
 #' 
 #'@param comparison can either be a character string name of the comparison to plot, or an integer index refering to the comparisons attribute vector
 #'@param vlines The x coordinate (integer in absolute value) where to draw vertical lines, defaults to NULL
-#'@param pvalue_threshold logical, defaults to FALSE, if TRUE a horizontal line is put in according to attr(statRes, "pval_thresh")
+#'@param pvalue_threshold numeric value, draws horizontal line at value, defaults to NULL
 #'  
 #'@rdname missingval_volcanoplot
 #'
@@ -25,7 +25,7 @@ missingval_volcanoplot<- function(statRes, comparison, x_lab = NULL, ...) {
   .missingval_volcanoplot(statRes, comparison, x_lab, ...)
 }
 
-.missingval_volcanoplot<- function(statRes, comparison, x_lab = NULL, y_lab = NULL, title_plot = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme = FALSE, vlines = NULL, pvalue_threshold = FALSE){
+.missingval_volcanoplot<- function(statRes, comparison, x_lab = NULL, y_lab = NULL, title_plot = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme = FALSE, vlines = NULL, pvalue_threshold = NULL){
 
 #check that statRes object is of 'statRes' class
 if(class(statRes) != "statRes") stop("object must be of class 'statRes'")
@@ -101,12 +101,15 @@ if(length(comparison) == 1){
   
   #checks for vlines parameter 
    if(!is.null(vlines)){
-    if(!(is.numeric(vlines)) & vlines <= 0) stop("'vlines' must be positive non-zero and numeric")
+    if(!(is.numeric(vlines)) | vlines <= 0) stop("'vlines' must be positive non-zero and numeric")
      vert_lines = c(vlines, -vlines)
    }
   
-  #extract pvalue threshold from statRes object
-    pval_thresh = attr(statRes, "pval_thresh")
+  #checks for pvalue_threshold paramater
+  if(!is.null(pvalue_threshold)){
+    if(!(is.numeric(pvalue_threshold)) | pvalue_threshold < 0 | pvalue_threshold > 1) stop("'pvalue threshold' must be numeric, between zero and one")
+    pval_thresh = -log10(pvalue_threshold)
+  }
     
     p <- ggplot(plotdata, aes(x = fold_change_data, y = pvalue_data)) + geom_point(color = "blue") +
       ggplot2::xlab(xlabel) +
@@ -118,10 +121,10 @@ if(length(comparison) == 1){
       p = p + ggplot2::theme_bw()
     }
     if(!(is.null(vlines))){
-      p = p + ggplot2::geom_vline(xintercept = vert_lines, color = "red")
+      p = p + ggplot2::geom_vline(xintercept = vert_lines, color = "red", linetype = "dashed")
     }
-    if(pvalue_threshold == TRUE){
-      p = p + ggplot2::geom_hline(yintercept = pval_thresh, color = "green")
+    if(!is.null(pvalue_threshold)){
+      p = p + ggplot2::geom_hline(yintercept = pval_thresh, color = "green", linetype = "dashed")
     }
   
   return(p)
