@@ -2,6 +2,20 @@
 #' 
 #'takes in omicsData and returns a heatmap of omicsData$e_data
 #' 
+#' 
+#' 
+#' \tabular{ll}{
+#' \code{x_lab} \tab character string to be used for x-axis label. Defaults to NULL \cr
+#' \code{y_lab} \tab character string to be used for y-axis label. Defaults to NULL \cr
+#' \code{title_plot} \tab character string to be used for the plot title. Defaults to NULL. \cr
+#' \code{legend_title} \tab character string to be used for legend_title label. Defaults to NULL \cr
+#' \code{title_size} \tab integer value specifying the font size for the plot title. Default is 14. \cr
+#' \code{x_lab_size} \tab integer value indicating the font size for the x-axis. Defaults to 11. \cr
+#' \code{y_lab_size} \tab integer value indicating the font size for the y-axis. Defaults to 11. \cr
+#' \code{palette} \tab character string indicating the name of the RColorBrewer palette to use. \cr
+#' }
+#' 
+#' 
 #'@rdname missingval_heatmapplot
 #'@export
 #'
@@ -11,7 +25,7 @@ missingval_heatmapplot <- function(omicsData, x_lab = NULL, y_lab = NULL, ...) {
   .missingval_heatmapplot(omicsData, x_lab, y_lab, ...)
 }
 
-.missingval_heatmapplot<- function(omicsData, x_lab = NULL, y_lab = NULL, title_plot = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11){
+.missingval_heatmapplot<- function(omicsData, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_title = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, palette = "YlOrRd"){
   
   #check that omicsData is of correct class
   if(!(class(omicsData) %in% c("proData","pepData","lipidData", "metabData"))) stop("omicsData is not an object of appropriate class")
@@ -36,6 +50,7 @@ by_molecule<- by_molecule[order(by_molecule$num_NA),]
 xlabel <- ifelse(is.null(x_lab), "Intensity", x_lab)
 ylabel <- ifelse(is.null(y_lab), "Molecule", y_lab)
 plot_title <- ifelse(is.null(title_plot), "Missing Values Heatmap", title_plot)
+legendtitle<- ifelse(is.null(legend_title), "Value", legend_title)
 
 #pull attr from omicsData
 edata_cname<- attr(omicsData, "cnames")$edata_cname 
@@ -49,7 +64,8 @@ names(edata_melt)[1]<- "edata_cname"
     ggplot2::xlab(xlabel) +
     ggplot2::ylab(ylabel) +
     ggplot2::ggtitle(plot_title) +
-    ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size)) 
+    ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size)) +
+    scale_fill_distiller(palette = palette, name = legendtitle)
 
 
 return(p)

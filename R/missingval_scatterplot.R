@@ -2,6 +2,23 @@
 #' 
 #' mean intensity vs number of missing values (per molecule) 
 #' 
+#' 
+#' 
+#' 
+#' \tabular{ll}{
+#' \code{x_lab} \tab character string to be used for x-axis label. Defaults to NULL \cr
+#' \code{y_lab} \tab character string to be used for y-axis label. Defaults to NULL \cr
+#' \code{title_plot} \tab character string to be used for the plot title. Defaults to NULL. \cr
+#' \code{legend_title} \tab character string to be used for legend_title label. Defaults to NULL \cr
+#' \code{title_size} \tab integer value specifying the font size for the plot title. Default is 14. \cr
+#' \code{x_lab_size} \tab integer value indicating the font size for the x-axis. Defaults to 11. \cr
+#' \code{y_lab_size} \tab integer value indicating the font size for the y-axis. Defaults to 11. \cr
+#' \code{point_size} \tab integer value indicating scatterplot point size, defaults to 3. \cr
+#' \code{palette} \tab character string indicating the name of the RColorBrewer palette to use. \cr
+#' \code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used. \cr
+#' }
+#' 
+#' 
 #'@rdname missingval_scatterplot
 #'@export
 #'
@@ -10,7 +27,7 @@ missingval_scatterplot <- function(omicsData, x_lab = NULL, y_lab = NULL, ...) {
   .missingval_scatterplot(omicsData, x_lab, y_lab, ...)
 }
 
-.missingval_scatterplot<- function(omicsData, x_lab = NULL, y_lab = NULL, title_plot = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, point_size = 3, bw_theme = FALSE){
+.missingval_scatterplot<- function(omicsData, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_title = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, point_size = 3, palette = "Spectral", bw_theme = FALSE){
   
   #check that omicsData is of correct class
   if(!(class(omicsData) %in% c("proData","pepData","lipidData", "metabData"))) stop("omicsData is not an object of appropriate class")
@@ -40,6 +57,7 @@ missingval_scatterplot <- function(omicsData, x_lab = NULL, y_lab = NULL, ...) {
   xlabel <- ifelse(is.null(x_lab), "Mean Intensity", x_lab)
   ylabel <- ifelse(is.null(y_lab), "Missing Values (per molecule)", y_lab)
   plot_title <- ifelse(is.null(title_plot), "Mean Intensity vs NA per Molecule", title_plot)
+  legendtitle <- ifelse(is.null(legend_title), "Missing Values", legend_title)
   
   #check if group_designation has not been applied to omicsData
   if(is.null(attr(omicsData, "group_DF"))){
@@ -49,19 +67,20 @@ missingval_scatterplot <- function(omicsData, x_lab = NULL, y_lab = NULL, ...) {
     plot_data<- as.data.frame(cbind(mean_intensity, num_missing_vals))
     
     if(bw_theme == FALSE){
-    p<-ggplot2::ggplot(plot_data, aes(mean_intensity, num_missing_vals)) + geom_point(color = "blue", size = point_size) + 
+    p<-ggplot2::ggplot(plot_data, aes(mean_intensity, num_missing_vals)) + geom_point(aes(color = num_missing_vals), size = point_size) + 
       ggplot2::xlab(xlabel) +
       ggplot2::ylab(ylabel) +
       ggplot2::ggtitle(plot_title) +
-      ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size))
+      ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size)) + scale_color_distiller(palette = palette, name = legendtitle)
     }
     else{
-      p<-ggplot2::ggplot(plot_data, aes(mean_intensity, num_missing_vals)) + geom_point(color = "blue", size = point_size) + 
+      p<-ggplot2::ggplot(plot_data, aes(mean_intensity, num_missing_vals)) + geom_point(aes(color = num_missing_vals), size = point_size) + 
         ggplot2::xlab(xlabel) +
         ggplot2::ylab(ylabel) +
         ggplot2::ggtitle(plot_title) +
         ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size)) +
-        ggplot2::theme_bw()
+        ggplot2::theme_bw() +
+        scale_color_distiller(palette = palette, name = legendtitle)
       
     }
   }
@@ -88,13 +107,16 @@ missingval_scatterplot <- function(omicsData, x_lab = NULL, y_lab = NULL, ...) {
     plot_data<- cbind(num_missing_vals, mean_intensity)
     plot_data<- as.data.frame(plot_data)
     plot_data<- melt(plot_data, id.vars = "num_missing_vals")
+    legendtitle <- ifelse(is.null(legend_title), "group", legend_title)
     
     if(bw_theme == FALSE){
       p<-ggplot2::ggplot(plot_data, aes(value, num_missing_vals)) + geom_point(aes(colour = variable), size = point_size) +
         ggplot2::xlab(xlabel) +
         ggplot2::ylab(ylabel) +
         ggplot2::ggtitle(plot_title) +
-        ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size))
+        ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size)) +
+        scale_color_brewer(palette = palette, name = legendtitle)
+        
       
     }
     else{
@@ -103,7 +125,8 @@ missingval_scatterplot <- function(omicsData, x_lab = NULL, y_lab = NULL, ...) {
         ggplot2::ylab(ylabel) +
         ggplot2::ggtitle(plot_title) +
         ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size)) +
-        ggplot2::theme_bw()
+        ggplot2::theme_bw() +
+        scale_color_brewer(palette = palette, name = legend_title)
     }
         
   }
