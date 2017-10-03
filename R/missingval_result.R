@@ -22,6 +22,8 @@ missingval_result<- function(omicsData){
   
   na_by_sample<- data.frame("sample_names" = names(temp), "num_NA" = as.numeric(na_per_col))
   names(na_by_sample)[1]<- fdata_cname
+  na_by_sample<- merge(na_by_sample, omicsData$f_data, by = fdata_cname)
+  names(na_by_sample)[3]<- "group"
   
   #now count the number of NA values per row
   na_per_row<- apply(is.na(temp), 1, sum)

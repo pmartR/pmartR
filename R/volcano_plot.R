@@ -6,8 +6,7 @@
 #'@param vlines The x coordinate (integer in absolute value) where to draw vertical lines, defaults to NULL
 #'@param pvalue_threshold numeric value, draws horizontal line at value, defaults to NULL
 #'  
-#'@rdname missingval_volcanoplot
-#'
+#'  
 #' \tabular{ll}{
 #' \code{x_lab} \tab character string to be used for x-axis label. Defaults to NULL \cr
 #' \code{y_lab} \tab character string to be used for y-axis label. Defaults to NULL \cr
@@ -18,6 +17,7 @@
 #' \code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used. \cr
 #' }
 #'
+#'@rdname missingval_volcanoplot
 #'@export
 #'
 
