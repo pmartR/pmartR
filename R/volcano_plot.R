@@ -11,10 +11,12 @@
 #' \code{x_lab} \tab character string to be used for x-axis label. Defaults to NULL \cr
 #' \code{y_lab} \tab character string to be used for y-axis label. Defaults to NULL \cr
 #' \code{title_plot} \tab character string to be used for the plot title. Defaults to NULL. \cr
+#' \code{legend_title} \tab character string to be used for legend_title label. Defaults to NULL \cr
 #' \code{title_size} \tab integer value specifying the font size for the plot title. Default is 14. \cr
 #' \code{x_lab_size} \tab integer value indicating the font size for the x-axis. Defaults to 11. \cr
 #' \code{y_lab_size} \tab integer value indicating the font size for the y-axis. Defaults to 11. \cr
 #' \code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used. \cr
+#' \code{palette} \tab character string indicating the name of the RColorBrewer palette to use. \cr
 #' }
 #'
 #'@rdname missingval_volcanoplot
@@ -25,7 +27,7 @@ missingval_volcanoplot<- function(statRes, comparison, x_lab = NULL, ...) {
   .missingval_volcanoplot(statRes, comparison, x_lab, ...)
 }
 
-.missingval_volcanoplot<- function(statRes, comparison, x_lab = NULL, y_lab = NULL, title_plot = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme = FALSE, vlines = NULL, pvalue_threshold = NULL){
+.missingval_volcanoplot<- function(statRes, comparison, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_title = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme = FALSE, vlines = NULL, pvalue_threshold = NULL, palette = "YlOrRd"){
 
 #check that statRes object is of 'statRes' class
 if(class(statRes) != "statRes") stop("object must be of class 'statRes'")
@@ -98,6 +100,7 @@ if(length(comparison) == 1){
   xlabel <- ifelse(is.null(x_lab), "log2 Fold Change", x_lab)
   ylabel <- ifelse(is.null(y_lab), "-log10 t-Test P-value", y_lab)
   plot_title <- ifelse(is.null(title_plot), paste("Volcano Plot", comparison, sep = " "), title_plot)
+  legendtitle<- ifelse(is.null(legend_title),"pvalue", legend_title)
   
   #checks for vlines parameter 
    if(!is.null(vlines)){
@@ -111,11 +114,12 @@ if(length(comparison) == 1){
     pval_thresh = -log10(pvalue_threshold)
   }
     
-    p <- ggplot(plotdata, aes(x = fold_change_data, y = pvalue_data)) + geom_point(color = "blue") +
+    p <- ggplot(plotdata, aes(x = fold_change_data, y = pvalue_data)) + geom_point(aes(color = pvalue_data)) +
       ggplot2::xlab(xlabel) +
       ggplot2::ylab(ylabel) +
       ggplot2::ggtitle(plot_title) +
-      ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size))
+      ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size)) +
+      scale_color_distiller(palette = palette, name = legendtitle)
     
     if(bw_theme == TRUE){
       p = p + ggplot2::theme_bw()
