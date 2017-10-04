@@ -4,7 +4,7 @@
 #' 
 #'
 #'@param type is for specifying plot type, there are three options, "bySample", "byMolecule" and "Both"
-#'
+#'@param palette is a character string indicating the name of the RColorBrewer palette to use; "YlOrRd", "YlOrBr", "YlGnBu", "YlGn", "Reds","RdPu", "Purples", "PuRd", "PuBuGn", "PuBu", "OrRd","Oranges", "Greys", "Greens", "GnBu", "BuPu","BuGn","Blues", "Set3", "Set2", "Set1", "Pastel2", "Pastel1", "Paired", "Dark2", "Accent", "Spectral", "RdYlGn", "RdYlBu", "RdGy", "RdBu", "PuOr","PRGn", "PiYG", "BrBG"
 #'
 #' \tabular{ll}{
 #' \code{x_lab} \tab character string to be used for x-axis label. Defaults to NULL \cr
@@ -16,7 +16,6 @@
 #' \code{y_lab_size} \tab integer value indicating the font size for the y-axis. Defaults to 11. \cr
 #' \code{bar_width} \tab integer value indicating the bar width in a barplot (when type = "bySample"). Defaults to .8. \cr
 #' \code{binwidth} \tab integer value indicating the bin width in a histogram (when type = "byMolecule"). Defaults to 1. \cr
-#' \code{palette} \tab character string indicating the name of the RColorBrewer palette to use. \cr
 #' \code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used. \cr
 #' }
 #' 
@@ -39,6 +38,10 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
   
   #check that if type "Both" is specified, then x_lab, y_lab and tile_plot are all NULL
   if(type == "Both" & (!is.null(x_lab)|!is.null(y_lab)|!is.null(title_plot))) stop("if type 'Both' is specified, x_lab, y_lab and title_plot cannot be specified")
+  
+  if(!(palette %in% c("YlOrRd", "YlOrBr", "YlGnBu", "YlGn", "Reds","RdPu", "Purples", "PuRd", "PuBuGn", "PuBu", "OrRd","Oranges", "Greys", 
+                      "Greens", "GnBu", "BuPu","BuGn","Blues", "Set3", "Set2", "Set1", "Pastel2", "Pastel1", "Paired", "Dark2", "Accent", 
+                      "Spectral", "RdYlGn", "RdYlBu", "RdGy", "RdBu", "PuOr","PRGn", "PiYG", "BrBG"))) stop("palette must be one of RColorBrewer palettes")
   
   if(!is.null(title_plot)) {
     if(!is.character(title_plot)) stop("title_plot must be a character vector")

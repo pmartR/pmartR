@@ -2,7 +2,7 @@
 #' 
 #'takes in omicsData and returns a heatmap of omicsData$e_data
 #' 
-#' 
+#'@param palette is a character string indicating the name of the RColorBrewer palette to use; "YlOrRd", "YlOrBr", "YlGnBu", "YlGn", "Reds","RdPu", "Purples", "PuRd", "PuBuGn", "PuBu", "OrRd","Oranges", "Greys", "Greens", "GnBu", "BuPu","BuGn","Blues", "Set3", "Set2", "Set1", "Pastel2", "Pastel1", "Paired", "Dark2", "Accent", "Spectral", "RdYlGn", "RdYlBu", "RdGy", "RdBu", "PuOr","PRGn", "PiYG", "BrBG"
 #' 
 #' \tabular{ll}{
 #' \code{x_lab} \tab character string to be used for x-axis label. Defaults to NULL \cr
@@ -12,7 +12,6 @@
 #' \code{title_size} \tab integer value specifying the font size for the plot title. Default is 14. \cr
 #' \code{x_lab_size} \tab integer value indicating the font size for the x-axis. Defaults to 11. \cr
 #' \code{y_lab_size} \tab integer value indicating the font size for the y-axis. Defaults to 11. \cr
-#' \code{palette} \tab character string indicating the name of the RColorBrewer palette to use. \cr
 #' }
 #' 
 #' 
@@ -30,6 +29,14 @@ missingval_heatmapplot <- function(omicsData, x_lab = NULL, y_lab = NULL, ...) {
   #check that omicsData is of correct class
   if(!(class(omicsData) %in% c("proData","pepData","lipidData", "metabData"))) stop("omicsData is not an object of appropriate class")
   
+  #check that omicsData data_scale attribute is log2
+  if(attr(omicsData, "data_info")$data_scale != "log2") message("omicsData is not of log2 scale")
+  
+  #check that palette is in the list of RColorBrewer palettes
+  if(!(palette %in% c("YlOrRd", "YlOrBr", "YlGnBu", "YlGn", "Reds","RdPu", "Purples", "PuRd", "PuBuGn", "PuBu", "OrRd","Oranges", "Greys", 
+                      "Greens", "GnBu", "BuPu","BuGn","Blues", "Set3", "Set2", "Set1", "Pastel2", "Pastel1", "Paired", "Dark2", "Accent", 
+                      "Spectral", "RdYlGn", "RdYlBu", "RdGy", "RdBu", "PuOr","PRGn", "PiYG", "BrBG"))) stop("palette must be one of RColorBrewer palettes")
+  
   #checking arguments are of correct class
   if(!is.null(title_plot)) {
     if(!is.character(title_plot)) stop("title_plot must be a character vector")
@@ -40,6 +47,9 @@ missingval_heatmapplot <- function(omicsData, x_lab = NULL, y_lab = NULL, ...) {
   if(!is.null(y_lab)) {
     if(!is.character(y_lab)) stop("y_lab must be a character vector")
   } 
+  if(!is.null(legend_title)) {
+    if(!is.character(legend_title)) stop("legend_title must be a character vector")
+  }
 
 #here we call 'missingval_result' function that will give us an object of type naRes containing informaiton on the number of missing values per molecule   
 na_Res<- missingval_result(omicsData)   
@@ -60,7 +70,7 @@ edata_melt<- melt(e_data, id.vars = edata_cname)
 edata_melt[[edata_cname]]<- factor(edata_melt[[edata_cname]], levels = rev(by_molecule[[edata_cname]]))  
 names(edata_melt)[1]<- "edata_cname"
 
-  p <- ggplot2::ggplot(edata_melt, aes(x=variable, y = edata_cname)) + geom_tile(aes(fill = value), colour = "white") +
+  p <- ggplot2::ggplot(edata_melt, aes(x=variable, y = edata_cname)) + geom_tile(aes(fill = value)) +
     ggplot2::xlab(xlabel) +
     ggplot2::ylab(ylabel) +
     ggplot2::ggtitle(plot_title) +

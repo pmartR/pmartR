@@ -5,7 +5,7 @@
 #'@param comparison can either be a character string name of the comparison to plot, or an integer index refering to the comparisons attribute vector
 #'@param vlines The x coordinate (integer in absolute value) where to draw vertical lines, defaults to NULL
 #'@param pvalue_threshold numeric value, draws horizontal line at value, defaults to NULL
-#'  
+#'@param palette is a character string indicating the name of the RColorBrewer palette to use; "YlOrRd", "YlOrBr", "YlGnBu", "YlGn", "Reds","RdPu", "Purples", "PuRd", "PuBuGn", "PuBu", "OrRd","Oranges", "Greys", "Greens", "GnBu", "BuPu","BuGn","Blues", "Set3", "Set2", "Set1", "Pastel2", "Pastel1", "Paired", "Dark2", "Accent", "Spectral", "RdYlGn", "RdYlBu", "RdGy", "RdBu", "PuOr","PRGn", "PiYG", "BrBG"
 #'  
 #' \tabular{ll}{
 #' \code{x_lab} \tab character string to be used for x-axis label. Defaults to NULL \cr
@@ -16,8 +16,7 @@
 #' \code{x_lab_size} \tab integer value indicating the font size for the x-axis. Defaults to 11. \cr
 #' \code{y_lab_size} \tab integer value indicating the font size for the y-axis. Defaults to 11. \cr
 #' \code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used. \cr
-#' \code{palette} \tab character string indicating the name of the RColorBrewer palette to use. \cr
-#' }
+#'}
 #'
 #'@rdname missingval_volcanoplot
 #'@export
@@ -31,7 +30,12 @@ missingval_volcanoplot<- function(statRes, comparison, x_lab = NULL, ...) {
 
 #check that statRes object is of 'statRes' class
 if(class(statRes) != "statRes") stop("object must be of class 'statRes'")
-
+  
+#check that palette is in the list of RColorBrewer palettes
+if(!(palette %in% c("YlOrRd", "YlOrBr", "YlGnBu", "YlGn", "Reds","RdPu", "Purples", "PuRd", "PuBuGn", "PuBu", "OrRd","Oranges", "Greys", 
+                    "Greens", "GnBu", "BuPu","BuGn","Blues", "Set3", "Set2", "Set1", "Pastel2", "Pastel1", "Paired", "Dark2", "Accent", 
+                    "Spectral", "RdYlGn", "RdYlBu", "RdGy", "RdBu", "PuOr","PRGn", "PiYG", "BrBG"))) stop("palette must be one of RColorBrewer palettes")
+  
 #check that comparison is of correct class, either integer or character
 if(!(class(comparison)) %in% c("character", "numeric")) stop("comparison must be either of 'character' or 'numeric' class")  
 
@@ -47,7 +51,10 @@ if(!is.null(x_lab)) {
 }
 if(!is.null(y_lab)) {
   if(!is.character(y_lab)) stop("y_lab must be a character vector")
-}  
+} 
+if(!is.null(legend_title)) {
+  if(!is.character(legend_title)) stop("legend_title must be a character vector")
+}   
   
 #make sure comparison is in attr(statRes, "comparisons")  
 if(class(comparison) == "character"){
