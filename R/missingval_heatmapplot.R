@@ -12,6 +12,7 @@
 #' \code{title_size} \tab integer value specifying the font size for the plot title. Default is 14. \cr
 #' \code{x_lab_size} \tab integer value indicating the font size for the x-axis. Defaults to 11. \cr
 #' \code{y_lab_size} \tab integer value indicating the font size for the y-axis. Defaults to 11. \cr
+#' \code{x_lab_angle} \tab integer value indicating the angle of x-axis labels \cr
 #' }
 #' 
 #' 
@@ -24,7 +25,7 @@ missingval_heatmapplot <- function(omicsData, x_lab = NULL, y_lab = NULL, ...) {
   .missingval_heatmapplot(omicsData, x_lab, y_lab, ...)
 }
 
-.missingval_heatmapplot<- function(omicsData, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_title = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, palette = "YlOrRd"){
+.missingval_heatmapplot<- function(omicsData, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_title = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, palette = "YlOrRd", x_lab_angle = 60){
   
   #check that omicsData is of correct class
   if(!(class(omicsData) %in% c("proData","pepData","lipidData", "metabData"))) stop("omicsData is not an object of appropriate class")
@@ -50,6 +51,7 @@ missingval_heatmapplot <- function(omicsData, x_lab = NULL, y_lab = NULL, ...) {
   if(!is.null(legend_title)) {
     if(!is.character(legend_title)) stop("legend_title must be a character vector")
   }
+  if(!(is.numeric(x_lab_angle))) stop("x_lab_angle must be numeric")
 
 #here we call 'missingval_result' function that will give us an object of type naRes containing informaiton on the number of missing values per molecule   
 na_Res<- missingval_result(omicsData)   
@@ -74,7 +76,7 @@ names(edata_melt)[1]<- "edata_cname"
     ggplot2::xlab(xlabel) +
     ggplot2::ylab(ylabel) +
     ggplot2::ggtitle(plot_title) +
-    ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size)) +
+    ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size), axis.text.x = element_text(angle = x_lab_angle, hjust = 1)) +
     scale_fill_distiller(palette = palette, name = legendtitle)
 
 

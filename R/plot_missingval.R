@@ -17,6 +17,7 @@
 #' \code{bar_width} \tab integer value indicating the bar width in a barplot (when type = "bySample"). Defaults to .8. \cr
 #' \code{binwidth} \tab integer value indicating the bin width in a histogram (when type = "byMolecule"). Defaults to 1. \cr
 #' \code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used. \cr
+#' \code{x_lab_angle} \tab integer value indicating the angle of x-axis labels \cr
 #' }
 #' 
 #' 
@@ -28,7 +29,7 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
   .plot.naRes(naRes_object, type, x_lab, ...)
 }
 
-.plot.naRes<- function(naRes_object, type, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_title = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bar_width = .8, binwidth = 1, bw_theme = FALSE, palette = "Spectral"){
+.plot.naRes<- function(naRes_object, type, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_title = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bar_width = .8, binwidth = 1, bw_theme = FALSE, palette = "Spectral", x_lab_angle = 60){
  
    # check for a naRes object #
   if(class(naRes_object)[1] != "naRes") stop("object must be of class 'naRes'")
@@ -55,6 +56,7 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
   if(!is.null(legend_title)) {
     if(!is.character(legend_title)) stop("legend_title must be a character vector")
   }
+  if(!(is.numeric(x_lab_angle))) stop("x_lab_angle must be numeric")
   
   ## end of initial checks ##
   
@@ -81,7 +83,8 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
           ggplot2::xlab(xlabel) +
           ggplot2::ylab(ylabel) +
           ggplot2::ggtitle(plot_title) +
-          ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size)) + scale_fill_brewer(palette = palette, name = legendtitle )
+          ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size), axis.text.x = element_text(angle = x_lab_angle, hjust = 1)) + scale_fill_brewer(palette = palette, name = legendtitle) 
+      
 
     }
     else{
@@ -93,7 +96,7 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
           ggplot2::xlab(xlabel) +
           ggplot2::ylab(ylabel) +
           ggplot2::ggtitle(plot_title) +
-          ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size)) + scale_fill_brewer(palette = palette, name = legendtitle)
+          ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size), axis.text.x = element_text(angle = x_lab_angle, hjust = 1)) + scale_fill_brewer(palette = palette, name = legendtitle)
     }
     return(p)
   }
@@ -142,7 +145,7 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
           ggplot2::xlab("Sample Name") +
           ggplot2::ylab("Missing values (count)") +
           ggplot2::ggtitle("Missing Values by Sample") +
-          ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size)) + scale_fill_brewer(palette = palette, name = "group")
+          ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size), axis.text.x = element_text(angle = x_lab_angle, hjust = 1)) + scale_fill_brewer(palette = palette, name = "group")
     }
     else{
       s<- ggplot2::ggplot(data=na.by.sample, aes(x=na.by.sample[[fdata_cname]], y = na.by.sample$num_NA, fill = group)) + 
@@ -153,7 +156,7 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
           ggplot2::xlab("Sample Name") +
           ggplot2::ylab("Missing values (count)") +
           ggplot2::ggtitle("Missing Values by Sample") +
-          ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size)) + scale_fill_brewer(palette = palette, name = "group")
+          ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size), axis.text.x = element_text(angle = x_lab_angle, hjust = 1)) + scale_fill_brewer(palette = palette, name = "group")
     }
     
     #plots NA per molecule
