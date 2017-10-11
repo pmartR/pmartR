@@ -18,6 +18,7 @@
 #' \code{binwidth} \tab integer value indicating the bin width in a histogram (when type = "byMolecule"). Defaults to 1. \cr
 #' \code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used. \cr
 #' \code{x_lab_angle} \tab integer value indicating the angle of x-axis labels \cr
+#' \code{coordinate_flip} \tab logical indicates whether to flip cartesian coordinates so that horizontal becomes vertical and vise versa, defaults to false \cr
 #' }
 #' 
 #' 
@@ -29,7 +30,7 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
   .plot.naRes(naRes_object, type, x_lab, ...)
 }
 
-.plot.naRes<- function(naRes_object, type, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_title = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bar_width = .8, binwidth = 1, bw_theme = FALSE, palette = "Spectral", x_lab_angle = 60){
+.plot.naRes<- function(naRes_object, type, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_title = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bar_width = .8, binwidth = 1, bw_theme = FALSE, palette = "Spectral", x_lab_angle = 60, coordinate_flip = FALSE){
  
    # check for a naRes object #
   if(class(naRes_object)[1] != "naRes") stop("object must be of class 'naRes'")
@@ -85,6 +86,10 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
           ggplot2::ggtitle(plot_title) +
           ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size), axis.text.x = element_text(angle = x_lab_angle, hjust = 1)) + scale_fill_brewer(palette = palette, name = legendtitle) 
       
+      if(coordinate_flip == TRUE){
+        p = p + ggplot2::coord_flip()
+      }
+      
 
     }
     else{
@@ -97,6 +102,10 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
           ggplot2::ylab(ylabel) +
           ggplot2::ggtitle(plot_title) +
           ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size), axis.text.x = element_text(angle = x_lab_angle, hjust = 1)) + scale_fill_brewer(palette = palette, name = legendtitle)
+         
+          if(coordinate_flip == TRUE){
+            p = p + ggplot2::coord_flip()
+          } 
     }
     return(p)
   }
@@ -118,6 +127,10 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
            ggplot2::ggtitle(plot_title) +
            ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size)) +
            scale_fill_distiller(palette = palette, name = legendtitle)  
+      
+          if(coordinate_flip == TRUE){
+            p = p + ggplot2::coord_flip()
+          }
       }
     else{
       p<-  ggplot2::ggplot(data= na.by.molecule, aes(x = na.by.molecule$num_NA)) +
@@ -129,6 +142,10 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
            ggplot2::ggtitle(plot_title) +
            ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size)) +
            scale_fill_distiller(palette = palette, name = legendtitle)  
+      
+            if(coordinate_flip == TRUE){
+              p = p + ggplot2::coord_flip()
+            }
     }
     return(p)
   }
@@ -146,6 +163,10 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
           ggplot2::ylab("Missing values (count)") +
           ggplot2::ggtitle("Missing Values by Sample") +
           ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size), axis.text.x = element_text(angle = x_lab_angle, hjust = 1)) + scale_fill_brewer(palette = palette, name = "group")
+      
+          if(coordinate_flip == TRUE){
+            s = s + ggplot2::coord_flip()
+          }
     }
     else{
       s<- ggplot2::ggplot(data=na.by.sample, aes(x=na.by.sample[[fdata_cname]], y = na.by.sample$num_NA, fill = group)) + 
@@ -157,6 +178,10 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
           ggplot2::ylab("Missing values (count)") +
           ggplot2::ggtitle("Missing Values by Sample") +
           ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size), axis.text.x = element_text(angle = x_lab_angle, hjust = 1)) + scale_fill_brewer(palette = palette, name = "group")
+      
+          if(coordinate_flip == TRUE){
+            s = s + ggplot2::coord_flip()
+          }
     }
     
     #plots NA per molecule
@@ -169,6 +194,10 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
            ggplot2::ggtitle("Missing Values per Molecule") +
            ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size)) +
            scale_fill_distiller(palette = palette, name = "Count")
+      
+          if(coordinate_flip == TRUE){
+            m = m + ggplot2::coord_flip()
+          }
     }
     else{
       m<-  ggplot2::ggplot(data= na.by.molecule, aes(x = na.by.molecule$num_NA)) +
@@ -180,6 +209,10 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
            ggplot2::ggtitle("Missing Values per Molecule") +
            ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size)) +
            scale_fill_distiller(palette = palette, name = "Count")
+     
+           if(coordinate_flip == TRUE){
+             m = m + ggplot2::coord_flip()
+           }
        }
     
      grid.arrange(s, m, ncol = 2)

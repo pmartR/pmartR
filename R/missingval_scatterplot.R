@@ -15,6 +15,8 @@
 #' \code{y_lab_size} \tab integer value indicating the font size for the y-axis. Defaults to 11. \cr
 #' \code{point_size} \tab integer value indicating scatterplot point size, defaults to 3. \cr
 #' \code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used. \cr
+#' \code{x_lab_angle} \tab integer value indicating the angle of x-axis labels \cr
+#' \code{coordinate_flip} \tab logical indicates whether to flip cartesian coordinates so that horizontal becomes vertical and vise versa, defaults to false \cr
 #' }
 #' 
 #' 
@@ -26,7 +28,7 @@ missingval_scatterplot <- function(omicsData, x_lab = NULL, y_lab = NULL, ...) {
   .missingval_scatterplot(omicsData, x_lab, y_lab, ...)
 }
 
-.missingval_scatterplot<- function(omicsData, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_title = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, point_size = 3, palette = "Spectral", bw_theme = FALSE){
+.missingval_scatterplot<- function(omicsData, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_title = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, point_size = 3, palette = "Spectral", bw_theme = FALSE, x_lab_angle = 60, coordinate_flip = FALSE){
   
   #check that omicsData is of correct class
   if(!(class(omicsData) %in% c("proData","pepData","lipidData", "metabData"))) stop("omicsData is not an object of appropriate class")
@@ -49,6 +51,7 @@ missingval_scatterplot <- function(omicsData, x_lab = NULL, y_lab = NULL, ...) {
   if(!is.null(legend_title)) {
     if(!is.character(legend_title)) stop("legend_title must be a character vector")
   }
+  if(!(is.numeric(x_lab_angle))) stop("x_lab_angle must be numeric")
   
   #extract from omicsData, e_data and attributes
   edata<- omicsData$e_data
@@ -78,16 +81,25 @@ missingval_scatterplot <- function(omicsData, x_lab = NULL, y_lab = NULL, ...) {
       ggplot2::xlab(xlabel) +
       ggplot2::ylab(ylabel) +
       ggplot2::ggtitle(plot_title) +
-      ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size)) + scale_color_distiller(palette = palette, name = legendtitle)
+      ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size), axis.text.x = element_text(angle = x_lab_angle, hjust = 1)) + scale_color_distiller(palette = palette, name = legendtitle)
+    
+        if(coordinate_flip == TRUE){
+          p = p + ggplot2::coord_flip()
+        }
+    
     }
     else{
       p<-ggplot2::ggplot(plot_data, aes(mean_intensity, num_missing_vals)) + geom_point(aes(color = num_missing_vals), size = point_size) + 
         ggplot2::xlab(xlabel) +
         ggplot2::ylab(ylabel) +
         ggplot2::ggtitle(plot_title) +
-        ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size)) +
+        ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size), axis.text.x = element_text(angle = x_lab_angle, hjust = 1)) +
         ggplot2::theme_bw() +
         scale_color_distiller(palette = palette, name = legendtitle)
+      
+        if(coordinate_flip == TRUE){
+          p = p + ggplot2::coord_flip()
+        }
       
     }
   }
@@ -121,8 +133,12 @@ missingval_scatterplot <- function(omicsData, x_lab = NULL, y_lab = NULL, ...) {
         ggplot2::xlab(xlabel) +
         ggplot2::ylab(ylabel) +
         ggplot2::ggtitle(plot_title) +
-        ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size)) +
+        ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size), axis.text.x = element_text(angle = x_lab_angle, hjust = 1)) +
         scale_color_brewer(palette = palette, name = legendtitle)
+      
+      if(coordinate_flip == TRUE){
+        p = p + ggplot2::coord_flip()
+      }
         
       
     }
@@ -131,9 +147,13 @@ missingval_scatterplot <- function(omicsData, x_lab = NULL, y_lab = NULL, ...) {
         ggplot2::xlab(xlabel) +
         ggplot2::ylab(ylabel) +
         ggplot2::ggtitle(plot_title) +
-        ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size)) +
+        ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size), axis.text.x = element_text(angle = x_lab_angle, hjust = 1)) +
         ggplot2::theme_bw() +
         scale_color_brewer(palette = palette, name = legend_title)
+      
+        if(coordinate_flip == TRUE){
+          p = p + ggplot2::coord_flip()
+        }
     }
         
   }
