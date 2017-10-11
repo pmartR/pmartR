@@ -125,7 +125,7 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
            ggplot2::xlab(xlabel) +
            ggplot2::ylab(ylabel) +
            ggplot2::ggtitle(plot_title) +
-           ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size)) +
+           ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size),axis.text.x = element_text(angle = x_lab_angle, hjust = 1)) +
            scale_fill_distiller(palette = palette, name = legendtitle)  
       
           if(coordinate_flip == TRUE){
@@ -140,7 +140,7 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
            ggplot2::xlab(xlabel) +
            ggplot2::ylab(ylabel) +
            ggplot2::ggtitle(plot_title) +
-           ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size)) +
+           ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size), axis.text.x = element_text(angle = x_lab_angle, hjust = 1)) +
            scale_fill_distiller(palette = palette, name = legendtitle)  
       
             if(coordinate_flip == TRUE){
@@ -192,7 +192,7 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
            ggplot2::xlab("Number of NA values per Molecule") +
            ggplot2::ylab("Molecules (count)") +
            ggplot2::ggtitle("Missing Values per Molecule") +
-           ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size)) +
+           ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size), axis.text.x = element_text(angle = x_lab_angle, hjust = 1)) +
            scale_fill_distiller(palette = palette, name = "Count")
       
           if(coordinate_flip == TRUE){
@@ -207,7 +207,7 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
            ggplot2::xlab("Number of NA values per Molecule") +
            ggplot2::ylab("Molecules (count)") +
            ggplot2::ggtitle("Missing Values per Molecule") +
-           ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size)) +
+           ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size), axis.text.x = element_text(angle = x_lab_angle, hjust = 1)) +
            scale_fill_distiller(palette = palette, name = "Count")
      
            if(coordinate_flip == TRUE){

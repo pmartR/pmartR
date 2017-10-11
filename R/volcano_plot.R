@@ -16,6 +16,8 @@
 #' \code{x_lab_size} \tab integer value indicating the font size for the x-axis. Defaults to 11. \cr
 #' \code{y_lab_size} \tab integer value indicating the font size for the y-axis. Defaults to 11. \cr
 #' \code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used. \cr
+#' \code{x_lab_angle} \tab integer value indicating the angle of x-axis labels \cr
+#' \code{coordinate_flip} \tab logical indicates whether to flip cartesian coordinates so that horizontal becomes vertical and vise versa, defaults to false \cr
 #'}
 #'
 #'@rdname missingval_volcanoplot
@@ -26,7 +28,7 @@ missingval_volcanoplot<- function(statRes, comparison, x_lab = NULL, ...) {
   .missingval_volcanoplot(statRes, comparison, x_lab, ...)
 }
 
-.missingval_volcanoplot<- function(statRes, comparison, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_title = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme = FALSE, vlines = NULL, pvalue_threshold = NULL, palette = "YlOrRd"){
+.missingval_volcanoplot<- function(statRes, comparison, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_title = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme = FALSE, vlines = NULL, pvalue_threshold = NULL, palette = "YlOrRd", x_lab_angle = 0, coordinate_flip = FALSE){
 
 #check that statRes object is of 'statRes' class
 if(class(statRes) != "statRes") stop("object must be of class 'statRes'")
@@ -55,6 +57,7 @@ if(!is.null(y_lab)) {
 if(!is.null(legend_title)) {
   if(!is.character(legend_title)) stop("legend_title must be a character vector")
 }   
+if(!(is.numeric(x_lab_angle))) stop("x_lab_angle must be numeric")
   
 #make sure comparison is in attr(statRes, "comparisons")  
 if(class(comparison) == "character"){
@@ -107,7 +110,7 @@ if(length(comparison) == 1){
   xlabel <- ifelse(is.null(x_lab), "log2 Fold Change", x_lab)
   ylabel <- ifelse(is.null(y_lab), "-log10 t-Test P-value", y_lab)
   plot_title <- ifelse(is.null(title_plot), paste("Volcano Plot", comparison, sep = " "), title_plot)
-  legendtitle<- ifelse(is.null(legend_title),"pvalue", legend_title)
+  legendtitle<- ifelse(is.null(legend_title),"-log10 pvalue", legend_title)
   
   #checks for vlines parameter 
    if(!is.null(vlines)){
@@ -125,11 +128,15 @@ if(length(comparison) == 1){
       ggplot2::xlab(xlabel) +
       ggplot2::ylab(ylabel) +
       ggplot2::ggtitle(plot_title) +
-      ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size)) +
+      ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size), axis.text.x = element_text(angle = x_lab_angle, hjust = 1)) +
       scale_color_distiller(palette = palette, name = legendtitle)
     
+    if(coordinate_flip == TRUE){
+      p = p + ggplot2::coord_flip()
+    }
+    
     if(bw_theme == TRUE){
-      p = p + ggplot2::theme_bw()
+      p = p + ggplot2::theme_bw() + ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size), axis.text.x = element_text(angle = x_lab_angle, hjust = 1))
     }
     if(!(is.null(vlines))){
       p = p + ggplot2::geom_vline(xintercept = vert_lines, color = "red", linetype = "dashed")

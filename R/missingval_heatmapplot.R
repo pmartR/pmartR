@@ -13,6 +13,7 @@
 #' \code{x_lab_size} \tab integer value indicating the font size for the x-axis. Defaults to 11. \cr
 #' \code{y_lab_size} \tab integer value indicating the font size for the y-axis. Defaults to 11. \cr
 #' \code{x_lab_angle} \tab integer value indicating the angle of x-axis labels \cr
+#' \code{coordinate_flip} \tab logical indicates whether to flip cartesian coordinates so that horizontal becomes vertical and vise versa, defaults to false \cr
 #' }
 #' 
 #' 
@@ -25,7 +26,7 @@ missingval_heatmapplot <- function(omicsData, x_lab = NULL, y_lab = NULL, ...) {
   .missingval_heatmapplot(omicsData, x_lab, y_lab, ...)
 }
 
-.missingval_heatmapplot<- function(omicsData, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_title = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, palette = "YlOrRd", x_lab_angle = 60){
+.missingval_heatmapplot<- function(omicsData, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_title = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, palette = "YlOrRd", x_lab_angle = 60, coordinate_flip = FALSE){
   
   #check that omicsData is of correct class
   if(!(class(omicsData) %in% c("proData","pepData","lipidData", "metabData"))) stop("omicsData is not an object of appropriate class")
@@ -78,7 +79,16 @@ names(edata_melt)[1]<- "edata_cname"
     ggplot2::ggtitle(plot_title) +
     ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size), axis.text.x = element_text(angle = x_lab_angle, hjust = 1)) +
     scale_fill_distiller(palette = palette, name = legendtitle)
-
+  
+  if(coordinate_flip == TRUE){
+    p <- ggplot2::ggplot(edata_melt, aes(x=variable, y = edata_cname)) + geom_tile(aes(fill = value)) +
+      ggplot2::xlab(xlabel) +
+      ggplot2::ylab(ylabel) +
+      ggplot2::ggtitle(plot_title) +
+      coord_flip() +
+      ggplot2::theme(axis.text.x = ggplot2::element_blank(), axis.ticks.x = ggplot2::element_blank(), plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size)) +
+      scale_fill_distiller(palette = palette, name = legendtitle) 
+  }
 
 return(p)
 
