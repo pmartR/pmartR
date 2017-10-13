@@ -1,24 +1,39 @@
 #' Produces a heatmap of missing data
 #' 
 #' This function takes in an omicsData object and returns a heatmap of omicsData$e_data
-#' 
-#'@param palette is a character string indicating the name of the RColorBrewer palette to use; "YlOrRd", "YlOrBr", "YlGnBu", "YlGn", "Reds","RdPu", "Purples", "PuRd", "PuBuGn", "PuBu", "OrRd","Oranges", "Greys", "Greens", "GnBu", "BuPu","BuGn","Blues", "Set3", "Set2", "Set1", "Pastel2", "Pastel1", "Paired", "Dark2", "Accent", "Spectral", "RdYlGn", "RdYlBu", "RdGy", "RdBu", "PuOr","PRGn", "PiYG", "BrBG"
+#'
+#' @param omicsData an object of class "pepData", "proData", "metabData", or "lipidData", created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.
+#' @param x_lab character string to be used for x-axis label. Defaults to NULL
+#' @param y_lab character string to be used for y-axis label. Defaults to NULL 
+#' @param ... further arguments
 #' 
 #' \tabular{ll}{
-#' \code{x_lab} \tab character string to be used for x-axis label. Defaults to NULL \cr
-#' \code{y_lab} \tab character string to be used for y-axis label. Defaults to NULL \cr
 #' \code{title_plot} \tab character string to be used for the plot title. Defaults to NULL. \cr
 #' \code{legend_title} \tab character string to be used for legend_title label. Defaults to NULL \cr
 #' \code{title_size} \tab integer value specifying the font size for the plot title. Default is 14. \cr
 #' \code{x_lab_size} \tab integer value indicating the font size for the x-axis. Defaults to 11. \cr
 #' \code{y_lab_size} \tab integer value indicating the font size for the y-axis. Defaults to 11. \cr
+#' \code{palette} \tab is a character string indicating the name of the RColorBrewer palette to use; "YlOrRd", "YlOrBr", "YlGnBu", "YlGn", "Reds","RdPu", "Purples", "PuRd", "PuBuGn", "PuBu", "OrRd","Oranges", "Greys", "Greens", "GnBu", "BuPu","BuGn","Blues", "Set3", "Set2", "Set1", "Pastel2", "Pastel1", "Paired", "Dark2", "Accent", "Spectral", "RdYlGn", "RdYlBu", "RdGy", "RdBu", "PuOr","PRGn", "PiYG", "BrBG"\cr
 #' \code{x_lab_angle} \tab integer value indicating the angle of x-axis labels \cr
 #' \code{coordinate_flip} \tab logical indicates whether to flip cartesian coordinates so that horizontal becomes vertical and vise versa, defaults to false \cr
 #' }
 #' 
+#' @return plots ggplot2 object
 #' 
-#'@rdname missingval_heatmap
-#'@export
+#' @details This function takes in an omicsData object and returns a heatmap of omicsData$e_data, the colored tiles in the heatmap represent the intensity of the the e_data values, while the grey tiles represent NA values.  
+#' 
+#' @examples 
+#' dontrun{
+#' library(pmartRdata)
+#' data("lipid_object")
+#' 
+#' lipid_object2 <- edata_transform(omicsData = lipid_object, data_scale="log2")
+#' missingval_heatmap(lipid_object2, palette = "OrRd")
+#' missingval_heatmap(lipid_object2, palette = "Reds", coordinate_flip = TRUE)
+#'}
+#' 
+#' @rdname missingval_heatmap
+#' @export
 #'
 
 

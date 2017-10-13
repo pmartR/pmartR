@@ -1,14 +1,13 @@
 #' Produces a volcano plot from statRes object
 #' 
 #' This function creates a fold change vs t-Test p-value volcano plot from a statRes object
+#'
+#' @param statRes is an object of class 'statRes' 
+#' @param comparison can either be a character string name of the comparison to plot, or an integer index refering to the comparisons attribute vector
+#' @param x_lab character string to be used for x-axis label. Defaults to NULL
+#' @param ... further arguments
 #' 
-#'@param comparison can either be a character string name of the comparison to plot, or an integer index refering to the comparisons attribute vector
-#'@param vlines The x coordinate (integer in absolute value) where to draw vertical lines, defaults to NULL
-#'@param pvalue_threshold numeric value, draws horizontal line at value, defaults to NULL
-#'@param palette is a character string indicating the name of the RColorBrewer palette to use; "YlOrRd", "YlOrBr", "YlGnBu", "YlGn", "Reds","RdPu", "Purples", "PuRd", "PuBuGn", "PuBu", "OrRd","Oranges", "Greys", "Greens", "GnBu", "BuPu","BuGn","Blues", "Set3", "Set2", "Set1", "Pastel2", "Pastel1", "Paired", "Dark2", "Accent", "Spectral", "RdYlGn", "RdYlBu", "RdGy", "RdBu", "PuOr","PRGn", "PiYG", "BrBG"
-#'  
 #' \tabular{ll}{
-#' \code{x_lab} \tab character string to be used for x-axis label. Defaults to NULL \cr
 #' \code{y_lab} \tab character string to be used for y-axis label. Defaults to NULL \cr
 #' \code{title_plot} \tab character string to be used for the plot title. Defaults to NULL. \cr
 #' \code{legend_title} \tab character string to be used for legend_title label. Defaults to NULL \cr
@@ -16,12 +15,25 @@
 #' \code{x_lab_size} \tab integer value indicating the font size for the x-axis. Defaults to 11. \cr
 #' \code{y_lab_size} \tab integer value indicating the font size for the y-axis. Defaults to 11. \cr
 #' \code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used. \cr
+#' \code{vlines} \tab The x coordinate (integer in absolute value) where to draw vertical lines, defaults to NULL\cr
+#' \code{pvalue_threshold} \tab numeric value, draws horizontal line at value, defaults to NULL\cr
+#' \code{palette} \tab is a character string indicating the name of the RColorBrewer palette to use; "YlOrRd", "YlOrBr", "YlGnBu", "YlGn", "Reds","RdPu", "Purples", "PuRd", "PuBuGn", "PuBu", "OrRd","Oranges", "Greys", "Greens", "GnBu", "BuPu","BuGn","Blues", "Set3", "Set2", "Set1", "Pastel2", "Pastel1", "Paired", "Dark2", "Accent", "Spectral", "RdYlGn", "RdYlBu", "RdGy", "RdBu", "PuOr","PRGn", "PiYG", "BrBG"\cr
 #' \code{x_lab_angle} \tab integer value indicating the angle of x-axis labels \cr
 #' \code{coordinate_flip} \tab logical indicates whether to flip cartesian coordinates so that horizontal becomes vertical and vise versa, defaults to false \cr
 #'}
 #'
-#'@rdname missingval_volcanoplot
-#'@export
+#' @return plots ggplot2 object
+#' 
+#' @details This function creates a fold change vs t-Test p-value volcano plot from a statRes object
+#'  
+#' @examples 
+#' dontrun{
+#'
+#'}
+#' 
+#' 
+#' @rdname missingval_volcanoplot
+#' @export
 #'
 
 missingval_volcanoplot<- function(statRes, comparison, x_lab = NULL, ...) {

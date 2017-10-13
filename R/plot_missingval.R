@@ -1,13 +1,11 @@
-#' Plots an naRes object
+#' Plots an object of class naRes
 #' 
 #' For plotting an S3 object of type 'naRes':
 #' 
-#'@param naRes_object a list of two data frames, one contains NA values by sample, the second contains NA values by molecule
-#'@param type is for specifying plot type, there are three options, 'bySample': plots missing values per sample, 'byMolecule': plots missing values per molecule and 'Both': displays both 'bySample' and 'byMolecule' plots. 
-#'@param x_lab character string to be used for x-axis label. Defaults to NULL  
-#'@param ... further arguments 
-#'
-#'@return plots ggplot2 object
+#' @param naRes_object a list of two data frames, one contains NA values by sample, the second contains NA values by molecule
+#' @param type is for specifying plot type, there are three options, 'bySample': plots missing values per sample, 'byMolecule': plots missing values per molecule and 'Both': displays both 'bySample' and 'byMolecule' plots. 
+#' @param x_lab character string to be used for x-axis label. Defaults to NULL  
+#' @param ... further arguments 
 #'
 #' \tabular{ll}{
 #' \code{y_lab} \tab character string to be used for y-axis label. Defaults to NULL \cr
@@ -19,10 +17,14 @@
 #' \code{bar_width} \tab integer value indicating the bar width in a barplot (when type = "bySample"). Defaults to .8. \cr
 #' \code{binwidth} \tab integer value indicating the bin width in a histogram (when type = "byMolecule"). Defaults to 1. \cr
 #' \code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used. \cr
+#' \code{palette} \tab palette is a character string indicating the name of the RColorBrewer palette to use; "YlOrRd", "YlOrBr", "YlGnBu", "YlGn", "Reds","RdPu", "Purples", "PuRd", "PuBuGn", "PuBu", "OrRd","Oranges", "Greys", "Greens", "GnBu", "BuPu","BuGn","Blues", "Set3", "Set2", "Set1", "Pastel2", "Pastel1", "Paired", "Dark2", "Accent", "Spectral", "RdYlGn", "RdYlBu", "RdGy", "RdBu", "PuOr","PRGn", "PiYG", "BrBG"\cr
 #' \code{x_lab_angle} \tab integer value indicating the angle of x-axis labels \cr
 #' \code{coordinate_flip} \tab logical indicates whether to flip cartesian coordinates so that horizontal becomes vertical and vise versa, defaults to false \cr
-#' \code{palette} \tab palette is a character string indicating the name of the RColorBrewer palette to use; "YlOrRd", "YlOrBr", "YlGnBu", "YlGn", "Reds","RdPu", "Purples", "PuRd", "PuBuGn", "PuBu", "OrRd","Oranges", "Greys", "Greens", "GnBu", "BuPu","BuGn","Blues", "Set3", "Set2", "Set1", "Pastel2", "Pastel1", "Paired", "Dark2", "Accent", "Spectral", "RdYlGn", "RdYlBu", "RdGy", "RdBu", "PuOr","PRGn", "PiYG", "BrBG"\cr
-#' }
+#'}
+#' 
+#' @return plots ggplot2 object
+#' 
+#' @details This function takes in an object of class naRes and creates either a bar chart or histogram of missing values. When parameter type = "bySample", a "sample name" by "missing values count" bar chart is returned. When parameter type = "byMolecule" a "number of missing values per molecule" by "Molecules" histogram is returned. If type is set to "Both", a bar chart and histogram will be returned. 
 #' 
 #' @examples
 #' dontrun{
@@ -35,8 +37,8 @@
 #'}
 #' 
 #' 
-#'@rdname plot-naRes
-#'@export
+#' @rdname plot-naRes
+#' @export
 #'
 
 plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
@@ -109,7 +111,6 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
             ggplot2::coord_flip()
       }
       
-
     }
     else{
       p<- ggplot2::ggplot(data=na.by.sample, aes(x=na.by.sample[[fdata_cname]], y = na.by.sample$num_NA, fill = group)) + 

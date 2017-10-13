@@ -1,13 +1,13 @@
 #' Produces a scatterplot of missing data
 #' 
-#' This function creates a mean intensity vs number of missing values (per molecule) scatter plot 
+#' This function takes in an omicsData object and creates a mean intensity vs number of missing values (per molecule) scatter plot 
 #' 
-#'@param palette is a character string indicating the name of the RColorBrewer palette to use; "YlOrRd", "YlOrBr", "YlGnBu", "YlGn", "Reds","RdPu", "Purples", "PuRd", "PuBuGn", "PuBu", "OrRd","Oranges", "Greys", "Greens", "GnBu", "BuPu","BuGn","Blues", "Set3", "Set2", "Set1", "Pastel2", "Pastel1", "Paired", "Dark2", "Accent", "Spectral", "RdYlGn", "RdYlBu", "RdGy", "RdBu", "PuOr","PRGn", "PiYG", "BrBG"
-#' 
-#' 
+#' @param omicsData an object of class "pepData", "proData", "metabData", or "lipidData", created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.
+#' @param x_lab character string to be used for x-axis label. Defaults to NULL
+#' @param y_lab character string to be used for y-axis label. Defaults to NULL
+#' @param ... further arguments
+#'    
 #' \tabular{ll}{
-#' \code{x_lab} \tab character string to be used for x-axis label. Defaults to NULL \cr
-#' \code{y_lab} \tab character string to be used for y-axis label. Defaults to NULL \cr
 #' \code{title_plot} \tab character string to be used for the plot title. Defaults to NULL. \cr
 #' \code{legend_title} \tab character string to be used for legend_title label. Defaults to NULL \cr
 #' \code{title_size} \tab integer value specifying the font size for the plot title. Default is 14. \cr
@@ -15,13 +15,31 @@
 #' \code{y_lab_size} \tab integer value indicating the font size for the y-axis. Defaults to 11. \cr
 #' \code{point_size} \tab integer value indicating scatterplot point size, defaults to 3. \cr
 #' \code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used. \cr
+#' \code{palette} \tab palette is a character string indicating the name of the RColorBrewer palette to use; "YlOrRd", "YlOrBr", "YlGnBu", "YlGn", "Reds","RdPu", "Purples", "PuRd", "PuBuGn", "PuBu", "OrRd","Oranges", "Greys", "Greens", "GnBu", "BuPu","BuGn","Blues", "Set3", "Set2", "Set1", "Pastel2", "Pastel1", "Paired", "Dark2", "Accent", "Spectral", "RdYlGn", "RdYlBu", "RdGy", "RdBu", "PuOr","PRGn", "PiYG", "BrBG"\cr
 #' \code{x_lab_angle} \tab integer value indicating the angle of x-axis labels \cr
 #' \code{coordinate_flip} \tab logical indicates whether to flip cartesian coordinates so that horizontal becomes vertical and vise versa, defaults to false \cr
-#' }
+#'}
 #' 
+#' @return plots ggplot2 object
 #' 
-#'@rdname missingval_scatterplot
-#'@export
+#' @details This function takes in an omicsData object and creates a mean intensity vs number of missing values (per molecule) scatter plot. Note: If the omicsData object has had \code{\link{group_designation}} applied to it, then the points in the plot will be colored by "group", otherwise the points are colored by the number of missing values. 
+#' 
+#' @examples
+#' dontrun{
+#' library(pmartRdata)
+#' data("lipid_object")
+#' 
+#' lipid_object2 <- edata_transform(omicsData = lipid_object, data_scale="log2")
+#' missingval_scatterplot(lipid_object2)
+#' missingval_scatterplot(lipid_object2, palette = "Set1")
+#' 
+#' lipid_object3 = group_designation(lipid_object2, "Condition")
+#' missingval_scatterplot(lipid_object3, palette = "Set1")
+#' 
+#'}
+#' 
+#' @rdname missingval_scatterplot
+#' @export
 #'
 
 missingval_scatterplot <- function(omicsData, x_lab = NULL, y_lab = NULL, ...) {
