@@ -79,15 +79,21 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
     if(bw_theme == FALSE){
       p<- ggplot2::ggplot(data=na.by.sample, aes(x=na.by.sample[[fdata_cname]], y = na.by.sample$num_NA, fill = group)) + 
           ggplot2::geom_bar(stat = "identity", width = bar_width) +
-          ggplot2::geom_text(aes(label = num_NA), vjust = 2, color = "white", size = 3) +
-        
+          ggplot2::geom_text(aes(label = na.by.sample$num_NA), vjust = 2, color = "black", size = 3) +
           ggplot2::xlab(xlabel) +
           ggplot2::ylab(ylabel) +
           ggplot2::ggtitle(plot_title) +
           ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size), axis.text.x = element_text(angle = x_lab_angle, hjust = 1)) + scale_fill_brewer(palette = palette, name = legendtitle) 
       
       if(coordinate_flip == TRUE){
-        p = p + ggplot2::coord_flip()
+        p<- ggplot2::ggplot(data=na.by.sample, aes(x=na.by.sample[[fdata_cname]], y = na.by.sample$num_NA, fill = group)) + 
+            ggplot2::geom_bar(stat = "identity", width = bar_width) +
+            ggplot2::geom_text(aes(label = na.by.sample$num_NA), hjust = 2, color = "black", size = 3) +
+            ggplot2::xlab(xlabel) +
+            ggplot2::ylab(ylabel) +
+            ggplot2::ggtitle(plot_title) +
+            ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size), axis.text.x = element_text(angle = x_lab_angle, hjust = 1)) + scale_fill_brewer(palette = palette, name = legendtitle) + 
+            ggplot2::coord_flip()
       }
       
 
@@ -95,16 +101,23 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
     else{
       p<- ggplot2::ggplot(data=na.by.sample, aes(x=na.by.sample[[fdata_cname]], y = na.by.sample$num_NA, fill = group)) + 
           ggplot2::geom_bar(stat = "identity", width = bar_width) +
-          ggplot2::geom_text(aes(label = num_NA), vjust = 2, color = "white", size = 3) +
-          theme_bw() +
-      
+          ggplot2::geom_text(aes(label = na.by.sample$num_NA), vjust = 2, color = "black", size = 3) +
+          ggplot2::theme_bw() +
           ggplot2::xlab(xlabel) +
           ggplot2::ylab(ylabel) +
           ggplot2::ggtitle(plot_title) +
           ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size), axis.text.x = element_text(angle = x_lab_angle, hjust = 1)) + scale_fill_brewer(palette = palette, name = legendtitle)
          
           if(coordinate_flip == TRUE){
-            p = p + ggplot2::coord_flip()
+            p<- ggplot2::ggplot(data=na.by.sample, aes(x=na.by.sample[[fdata_cname]], y = na.by.sample$num_NA, fill = group)) + 
+                ggplot2::geom_bar(stat = "identity", width = bar_width) +
+                ggplot2::geom_text(aes(label = na.by.sample$num_NA), hjust = 2, color = "black", size = 3) +
+                ggplot2::theme_bw() +
+                ggplot2::xlab(xlabel) +
+                ggplot2::ylab(ylabel) +
+                ggplot2::ggtitle(plot_title) +
+                ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size), axis.text.x = element_text(angle = x_lab_angle, hjust = 1)) + scale_fill_brewer(palette = palette, name = legendtitle) + 
+                ggplot2::coord_flip()
           } 
     }
     return(p)
@@ -121,7 +134,6 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
     if(bw_theme == FALSE){
       p<-  ggplot2::ggplot(data= na.by.molecule, aes(x = na.by.molecule$num_NA)) +
            ggplot2::geom_histogram(binwidth = binwidth, aes(fill = ..count..)) + 
-         
            ggplot2::xlab(xlabel) +
            ggplot2::ylab(ylabel) +
            ggplot2::ggtitle(plot_title) +
@@ -136,7 +148,6 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
       p<-  ggplot2::ggplot(data= na.by.molecule, aes(x = na.by.molecule$num_NA)) +
            ggplot2::geom_histogram(binwidth = binwidth, aes(fill = ..count..)) +      
            theme_bw() +
-      
            ggplot2::xlab(xlabel) +
            ggplot2::ylab(ylabel) +
            ggplot2::ggtitle(plot_title) +
@@ -157,30 +168,43 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
     if(bw_theme == FALSE){
       s<- ggplot2::ggplot(data=na.by.sample, aes(x=na.by.sample[[fdata_cname]], y = na.by.sample$num_NA, fill = group)) + 
           ggplot2::geom_bar(stat = "identity", width = bar_width) +
-          ggplot2::geom_text(aes(label = num_NA), vjust = 2, color = "white", size = 3) +
-        
+          ggplot2::geom_text(aes(label = na.by.sample$num_NA), vjust = 2, color = "black", size = 3) +
           ggplot2::xlab("Sample Name") +
           ggplot2::ylab("Missing values (count)") +
           ggplot2::ggtitle("Missing Values by Sample") +
           ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size), axis.text.x = element_text(angle = x_lab_angle, hjust = 1)) + scale_fill_brewer(palette = palette, name = "group")
       
           if(coordinate_flip == TRUE){
-            s = s + ggplot2::coord_flip()
+            s<- ggplot2::ggplot(data=na.by.sample, aes(x=na.by.sample[[fdata_cname]], y = na.by.sample$num_NA, fill = group)) + 
+                ggplot2::geom_bar(stat = "identity", width = bar_width) +
+                ggplot2::geom_text(aes(label = na.by.sample$num_NA), hjust = 2, color = "black", size = 3) +
+                ggplot2::xlab("Sample Name") +
+                ggplot2::ylab("Missing values (count)") +
+                ggplot2::ggtitle("Missing Values by Sample") +
+                ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size), axis.text.x = element_text(angle = x_lab_angle, hjust = 1)) + scale_fill_brewer(palette = palette, name = "group") +
+                ggplot2::coord_flip()
           }
     }
     else{
       s<- ggplot2::ggplot(data=na.by.sample, aes(x=na.by.sample[[fdata_cname]], y = na.by.sample$num_NA, fill = group)) + 
           ggplot2::geom_bar(stat = "identity", width = bar_width) +
-          ggplot2::geom_text(aes(label = num_NA), vjust = 2, color = "white", size = 3) +
+          ggplot2::geom_text(aes(label = na.by.sample$num_NA), vjust = 2, color = "black", size = 3) +
           theme_bw() +
-        
           ggplot2::xlab("Sample Name") +
           ggplot2::ylab("Missing values (count)") +
           ggplot2::ggtitle("Missing Values by Sample") +
           ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size), axis.text.x = element_text(angle = x_lab_angle, hjust = 1)) + scale_fill_brewer(palette = palette, name = "group")
       
           if(coordinate_flip == TRUE){
-            s = s + ggplot2::coord_flip()
+            s<- ggplot2::ggplot(data=na.by.sample, aes(x=na.by.sample[[fdata_cname]], y = na.by.sample$num_NA, fill = group)) + 
+                ggplot2::geom_bar(stat = "identity", width = bar_width) +
+                ggplot2::geom_text(aes(label = na.by.sample$num_NA), hjust = 2, color = "black", size = 3) +
+                theme_bw() +
+                ggplot2::xlab("Sample Name") +
+                ggplot2::ylab("Missing values (count)") +
+                ggplot2::ggtitle("Missing Values by Sample") +
+                ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size), axis.text.x = element_text(angle = x_lab_angle, hjust = 1)) + scale_fill_brewer(palette = palette, name = "group") +
+                ggplot2::coord_flip()
           }
     }
     
@@ -188,7 +212,6 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
     if(bw_theme == FALSE){
       m<-  ggplot2::ggplot(data= na.by.molecule, aes(x = na.by.molecule$num_NA)) +
            ggplot2::geom_histogram(binwidth = binwidth, aes(fill = ..count..)) + 
-        
            ggplot2::xlab("Number of NA values per Molecule") +
            ggplot2::ylab("Molecules (count)") +
            ggplot2::ggtitle("Missing Values per Molecule") +
@@ -203,7 +226,6 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
       m<-  ggplot2::ggplot(data= na.by.molecule, aes(x = na.by.molecule$num_NA)) +
            ggplot2::geom_histogram(binwidth = binwidth, aes(fill = ..count..)) +      
            theme_bw() +
-        
            ggplot2::xlab("Number of NA values per Molecule") +
            ggplot2::ylab("Molecules (count)") +
            ggplot2::ggtitle("Missing Values per Molecule") +

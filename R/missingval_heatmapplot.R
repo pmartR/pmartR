@@ -63,7 +63,7 @@ by_molecule<- by_molecule[order(by_molecule$num_NA),]
 xlabel <- ifelse(is.null(x_lab), "Intensity", x_lab)
 ylabel <- ifelse(is.null(y_lab), "Molecule", y_lab)
 plot_title <- ifelse(is.null(title_plot), "Missing Values Heatmap", title_plot)
-legendtitle<- ifelse(is.null(legend_title), "Value", legend_title)
+legendtitle<- ifelse(is.null(legend_title), "Intensity", legend_title)
 
 #pull attr from omicsData
 edata_cname<- attr(omicsData, "cnames")$edata_cname 
