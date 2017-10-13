@@ -1,6 +1,6 @@
-#' missingval_scatterplot
+#' Produces a scatterplot of missing data
 #' 
-#' mean intensity vs number of missing values (per molecule) 
+#' This function creates a mean intensity vs number of missing values (per molecule) scatter plot 
 #' 
 #'@param palette is a character string indicating the name of the RColorBrewer palette to use; "YlOrRd", "YlOrBr", "YlGnBu", "YlGn", "Reds","RdPu", "Purples", "PuRd", "PuBuGn", "PuBu", "OrRd","Oranges", "Greys", "Greens", "GnBu", "BuPu","BuGn","Blues", "Set3", "Set2", "Set1", "Pastel2", "Pastel1", "Paired", "Dark2", "Accent", "Spectral", "RdYlGn", "RdYlBu", "RdGy", "RdBu", "PuOr","PRGn", "PiYG", "BrBG"
 #' 

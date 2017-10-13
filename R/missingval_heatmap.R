@@ -1,6 +1,6 @@
-#' missingval_heatmapplot
+#' Produces a heatmap of missing data
 #' 
-#'takes in omicsData and returns a heatmap of omicsData$e_data
+#' This function takes in an omicsData object and returns a heatmap of omicsData$e_data
 #' 
 #'@param palette is a character string indicating the name of the RColorBrewer palette to use; "YlOrRd", "YlOrBr", "YlGnBu", "YlGn", "Reds","RdPu", "Purples", "PuRd", "PuBuGn", "PuBu", "OrRd","Oranges", "Greys", "Greens", "GnBu", "BuPu","BuGn","Blues", "Set3", "Set2", "Set1", "Pastel2", "Pastel1", "Paired", "Dark2", "Accent", "Spectral", "RdYlGn", "RdYlBu", "RdGy", "RdBu", "PuOr","PRGn", "PiYG", "BrBG"
 #' 
@@ -17,16 +17,16 @@
 #' }
 #' 
 #' 
-#'@rdname missingval_heatmapplot
+#'@rdname missingval_heatmap
 #'@export
 #'
 
 
-missingval_heatmapplot <- function(omicsData, x_lab = NULL, y_lab = NULL, ...) {
-  .missingval_heatmapplot(omicsData, x_lab, y_lab, ...)
+missingval_heatmap <- function(omicsData, x_lab = NULL, y_lab = NULL, ...) {
+  .missingval_heatmap(omicsData, x_lab, y_lab, ...)
 }
 
-.missingval_heatmapplot<- function(omicsData, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_title = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, palette = "YlOrRd", x_lab_angle = 60, coordinate_flip = FALSE){
+.missingval_heatmap<- function(omicsData, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_title = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, palette = "YlOrRd", x_lab_angle = 60, coordinate_flip = FALSE){
   
   #check that omicsData is of correct class
   if(!(class(omicsData) %in% c("proData","pepData","lipidData", "metabData"))) stop("omicsData is not an object of appropriate class")

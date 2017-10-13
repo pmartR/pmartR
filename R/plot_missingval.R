@@ -1,13 +1,15 @@
-#' plot.naRes
+#' Plots an naRes object
 #' 
 #' For plotting an S3 object of type 'naRes':
 #' 
+#'@param naRes_object a list of two data frames, one contains NA values by sample, the second contains NA values by molecule
+#'@param type is for specifying plot type, there are three options, 'bySample': plots missing values per sample, 'byMolecule': plots missing values per molecule and 'Both': displays both 'bySample' and 'byMolecule' plots. 
+#'@param x_lab character string to be used for x-axis label. Defaults to NULL  
+#'@param ... further arguments 
 #'
-#'@param type is for specifying plot type, there are three options, 'bySample': plots missing values per sample, 'byMolecule': plots missing values per molecule and 'Both': displays both 'bySample' and 'byMolecule' plots.  
-#'@param palette is a character string indicating the name of the RColorBrewer palette to use; "YlOrRd", "YlOrBr", "YlGnBu", "YlGn", "Reds","RdPu", "Purples", "PuRd", "PuBuGn", "PuBu", "OrRd","Oranges", "Greys", "Greens", "GnBu", "BuPu","BuGn","Blues", "Set3", "Set2", "Set1", "Pastel2", "Pastel1", "Paired", "Dark2", "Accent", "Spectral", "RdYlGn", "RdYlBu", "RdGy", "RdBu", "PuOr","PRGn", "PiYG", "BrBG"
+#'@return plots ggplot2 object
 #'
 #' \tabular{ll}{
-#' \code{x_lab} \tab character string to be used for x-axis label. Defaults to NULL \cr
 #' \code{y_lab} \tab character string to be used for y-axis label. Defaults to NULL \cr
 #' \code{title_plot} \tab character string to be used for the plot title. Defaults to NULL. \cr
 #' \code{legend_title} \tab character string to be used for legend_title label. Defaults to NULL \cr
@@ -19,7 +21,18 @@
 #' \code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used. \cr
 #' \code{x_lab_angle} \tab integer value indicating the angle of x-axis labels \cr
 #' \code{coordinate_flip} \tab logical indicates whether to flip cartesian coordinates so that horizontal becomes vertical and vise versa, defaults to false \cr
+#' \code{palette} \tab palette is a character string indicating the name of the RColorBrewer palette to use; "YlOrRd", "YlOrBr", "YlGnBu", "YlGn", "Reds","RdPu", "Purples", "PuRd", "PuBuGn", "PuBu", "OrRd","Oranges", "Greys", "Greens", "GnBu", "BuPu","BuGn","Blues", "Set3", "Set2", "Set1", "Pastel2", "Pastel1", "Paired", "Dark2", "Accent", "Spectral", "RdYlGn", "RdYlBu", "RdGy", "RdBu", "PuOr","PRGn", "PiYG", "BrBG"\cr
 #' }
+#' 
+#' @examples
+#' dontrun{
+#' library(pmartRdata)
+#' data("lipid_object")
+#' result<- missingval_result(lipid_object)
+#' plot(result, type = "bySample", x_lab_angle = 50, palette = "Set1")
+#' 
+#' plot(result, type = "Both", palette = "Set2")
+#'}
 #' 
 #' 
 #'@rdname plot-naRes
@@ -39,7 +52,7 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
   if(!(type %in% c("bySample", "byMolecule", "Both"))) stop("type must be one of 'bySample', 'byMolecule', 'Both'")
   
   #check that if type "Both" is specified, then x_lab, y_lab and tile_plot are all NULL
-  if(type == "Both" & (!is.null(x_lab)|!is.null(y_lab)|!is.null(title_plot))) stop("if type 'Both' is specified, x_lab, y_lab and title_plot cannot be specified")
+  if(type == "Both" & (!is.null(x_lab)|!is.null(y_lab)|!is.null(title_plot)| !is.null(legend_title))) stop("if type 'Both' is specified, x_lab, y_lab, legend_title and title_plot cannot be specified")
   
   if(!(palette %in% c("YlOrRd", "YlOrBr", "YlGnBu", "YlGn", "Reds","RdPu", "Purples", "PuRd", "PuBuGn", "PuBu", "OrRd","Oranges", "Greys", 
                       "Greens", "GnBu", "BuPu","BuGn","Blues", "Set3", "Set2", "Set1", "Pastel2", "Pastel1", "Paired", "Dark2", "Accent", 
@@ -79,7 +92,7 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
     if(bw_theme == FALSE){
       p<- ggplot2::ggplot(data=na.by.sample, aes(x=na.by.sample[[fdata_cname]], y = na.by.sample$num_NA, fill = group)) + 
           ggplot2::geom_bar(stat = "identity", width = bar_width) +
-          ggplot2::geom_text(aes(label = na.by.sample$num_NA), vjust = 2, color = "black", size = 3) +
+          ggplot2::geom_text(aes(label = num_NA), vjust = 2, color = "black", size = 3) +
           ggplot2::xlab(xlabel) +
           ggplot2::ylab(ylabel) +
           ggplot2::ggtitle(plot_title) +
@@ -88,7 +101,7 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
       if(coordinate_flip == TRUE){
         p<- ggplot2::ggplot(data=na.by.sample, aes(x=na.by.sample[[fdata_cname]], y = na.by.sample$num_NA, fill = group)) + 
             ggplot2::geom_bar(stat = "identity", width = bar_width) +
-            ggplot2::geom_text(aes(label = na.by.sample$num_NA), hjust = 2, color = "black", size = 3) +
+            ggplot2::geom_text(aes(label = num_NA), hjust = 2, color = "black", size = 3) +
             ggplot2::xlab(xlabel) +
             ggplot2::ylab(ylabel) +
             ggplot2::ggtitle(plot_title) +
@@ -101,7 +114,7 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
     else{
       p<- ggplot2::ggplot(data=na.by.sample, aes(x=na.by.sample[[fdata_cname]], y = na.by.sample$num_NA, fill = group)) + 
           ggplot2::geom_bar(stat = "identity", width = bar_width) +
-          ggplot2::geom_text(aes(label = na.by.sample$num_NA), vjust = 2, color = "black", size = 3) +
+          ggplot2::geom_text(aes(label = num_NA), vjust = 2, color = "black", size = 3) +
           ggplot2::theme_bw() +
           ggplot2::xlab(xlabel) +
           ggplot2::ylab(ylabel) +
@@ -111,7 +124,7 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
           if(coordinate_flip == TRUE){
             p<- ggplot2::ggplot(data=na.by.sample, aes(x=na.by.sample[[fdata_cname]], y = na.by.sample$num_NA, fill = group)) + 
                 ggplot2::geom_bar(stat = "identity", width = bar_width) +
-                ggplot2::geom_text(aes(label = na.by.sample$num_NA), hjust = 2, color = "black", size = 3) +
+                ggplot2::geom_text(aes(label = num_NA), hjust = 2, color = "black", size = 3) +
                 ggplot2::theme_bw() +
                 ggplot2::xlab(xlabel) +
                 ggplot2::ylab(ylabel) +
@@ -168,7 +181,7 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
     if(bw_theme == FALSE){
       s<- ggplot2::ggplot(data=na.by.sample, aes(x=na.by.sample[[fdata_cname]], y = na.by.sample$num_NA, fill = group)) + 
           ggplot2::geom_bar(stat = "identity", width = bar_width) +
-          ggplot2::geom_text(aes(label = na.by.sample$num_NA), vjust = 2, color = "black", size = 3) +
+          ggplot2::geom_text(aes(label = num_NA), vjust = 2, color = "black", size = 3) +
           ggplot2::xlab("Sample Name") +
           ggplot2::ylab("Missing values (count)") +
           ggplot2::ggtitle("Missing Values by Sample") +
@@ -177,7 +190,7 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
           if(coordinate_flip == TRUE){
             s<- ggplot2::ggplot(data=na.by.sample, aes(x=na.by.sample[[fdata_cname]], y = na.by.sample$num_NA, fill = group)) + 
                 ggplot2::geom_bar(stat = "identity", width = bar_width) +
-                ggplot2::geom_text(aes(label = na.by.sample$num_NA), hjust = 2, color = "black", size = 3) +
+                ggplot2::geom_text(aes(label = num_NA), hjust = 2, color = "black", size = 3) +
                 ggplot2::xlab("Sample Name") +
                 ggplot2::ylab("Missing values (count)") +
                 ggplot2::ggtitle("Missing Values by Sample") +
@@ -188,7 +201,7 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
     else{
       s<- ggplot2::ggplot(data=na.by.sample, aes(x=na.by.sample[[fdata_cname]], y = na.by.sample$num_NA, fill = group)) + 
           ggplot2::geom_bar(stat = "identity", width = bar_width) +
-          ggplot2::geom_text(aes(label = na.by.sample$num_NA), vjust = 2, color = "black", size = 3) +
+          ggplot2::geom_text(aes(label = num_NA), vjust = 2, color = "black", size = 3) +
           theme_bw() +
           ggplot2::xlab("Sample Name") +
           ggplot2::ylab("Missing values (count)") +
@@ -198,7 +211,7 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
           if(coordinate_flip == TRUE){
             s<- ggplot2::ggplot(data=na.by.sample, aes(x=na.by.sample[[fdata_cname]], y = na.by.sample$num_NA, fill = group)) + 
                 ggplot2::geom_bar(stat = "identity", width = bar_width) +
-                ggplot2::geom_text(aes(label = na.by.sample$num_NA), hjust = 2, color = "black", size = 3) +
+                ggplot2::geom_text(aes(label = num_NA), hjust = 2, color = "black", size = 3) +
                 theme_bw() +
                 ggplot2::xlab("Sample Name") +
                 ggplot2::ylab("Missing values (count)") +

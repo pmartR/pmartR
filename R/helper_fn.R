@@ -1,6 +1,6 @@
-#' get_comparisons
+#' Return comparisons of statRes object
 #' 
-#' returns comparisons given statRes object
+#' This function returns comparisons from statRes object
 #' 
 #' 
 #'@rdname get_comparisons

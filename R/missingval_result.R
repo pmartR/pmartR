@@ -1,6 +1,6 @@
-#' missingval_result
+#' Creates an object of class naRes
 #' 
-#' input is an omicsData object, outputs a list of two data frames, one contains NA by sample, the second contains NA by molecule
+#' This function takes in an omicsData object, outputs a list of two data frames, one contains NA by sample, the second contains NA by molecule
 #'
 #'
 #'@export

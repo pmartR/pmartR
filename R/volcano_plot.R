@@ -1,6 +1,6 @@
-#' missingval_volcanoplot
+#' Produces a volcano plot from statRes object
 #' 
-#' fold change vs t-Test p-value 
+#' This function creates a fold change vs t-Test p-value volcano plot from a statRes object
 #' 
 #'@param comparison can either be a character string name of the comparison to plot, or an integer index refering to the comparisons attribute vector
 #'@param vlines The x coordinate (integer in absolute value) where to draw vertical lines, defaults to NULL
