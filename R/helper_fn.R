@@ -2,9 +2,18 @@
 #' 
 #' This function returns comparisons from statRes object
 #' 
+#' @param statRes is an object of class 'statRes'
 #' 
-#'@rdname get_comparisons
-#'@export
+#' @return returns a data frame with comparisons and their indices
+#'
+#' @examples 
+#' dontrun{
+#' get_comparisons(statRes_object)
+#'
+#'}
+#' 
+#' @rdname get_comparisons
+#' @export
 #'
 
 get_comparisons<- function(statRes){
@@ -20,5 +29,4 @@ get_comparisons<- function(statRes){
   return(result)
   
 }
-
 

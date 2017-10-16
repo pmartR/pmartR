@@ -2,10 +2,23 @@
 % Please edit documentation in R/helper_fn.R
 \name{get_comparisons}
 \alias{get_comparisons}
-\title{get_comparisons}
+\title{Return comparisons of statRes object}
 \usage{
 get_comparisons(statRes)
 }
+\arguments{
+\item{statRes}{is an object of class 'statRes'}
+}
+\value{
+returns a data frame with comparisons and their indices
+}
 \description{
-returns comparisons given statRes object
+This function returns comparisons from statRes object
+}
+\examples{
+dontrun{
+get_comparisons(statRes_object)
+
+}
+
 }
