@@ -2,11 +2,26 @@
 % Please edit documentation in R/rrollup.R
 \name{rrollup}
 \alias{rrollup}
-\title{rrollup}
+\title{Applies rrollup function}
 \usage{
 rrollup(pepData, parallel = TRUE)
 }
+\arguments{
+\item{pepData}{an omicsData object of class 'pepData'}
+
+\item{parallel}{logical indicating whether or not to use "doParallel" loop in applying rrollup function. Defaults to TRUE.}
+}
+\value{
+an omicsData object of class 'proData'
+}
 \description{
-started with the original rollup.R function and modified it to take in a pepData object. 
-rrollup is applied to the pepData object and a proData object is returned.
+This function applies the rrollup function to a pepData object for each unique protein and returns a proData object.
+}
+\examples{
+dontrun{
+library(pmartRdata)
+data(pep_object)
+result = rrollup(pepData = pep_object) 
+}
+
 }

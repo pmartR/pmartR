@@ -1,8 +1,20 @@
-#' rrollup
+#' Applies rrollup function 
 #' 
-#' started with the original rollup.R function and modified it to take in a pepData object. 
-#' rrollup is applied to the pepData object and a proData object is returned.
+#' This function applies the rrollup function to a pepData object for each unique protein and returns a proData object. 
 #' 
+#' @param pepData an omicsData object of class 'pepData'
+#' @param parallel logical indicating whether or not to use "doParallel" loop in applying rrollup function. Defaults to TRUE.
+#' 
+#' @return an omicsData object of class 'proData'
+#' 
+#' @examples 
+#' dontrun{
+#' library(pmartRdata)
+#' data(pep_object)
+#' result = rrollup(pepData = pep_object) 
+#'}
+#' 
+#' @rdname rrollup
 #' @export
 
 rrollup<- function(pepData, parallel = TRUE){
