@@ -1,8 +1,26 @@
 #' protein_quant wrapper function
 #' 
-#' Takes in a pepData object, the argument 'method' determines the quantitation method to be applied to pepData.
-#' The argument isoformRes defaults to NULL, is a list of data.frames which are results of applying bpquant to
-#' the original pepData object for each protein. If isoformRes is provided then,   
+#' This function takes in a pepData object, method (quantitation method, mean, median or rrollup), and the optional argument isoformRes (defaults to NULL). An object of the class 'proData' is returned. 
+#' 
+#' @param pepData an omicsData object of the class 'pepData'
+#' @param method is one of the three protein quantitation methods, 'mean', 'median' and 'rrollup'
+#' @param isoformRes is a list of data frames, the result of applying the 'bpquant_loop' function to original pepData object. Defaults to NULL
+#' 
+#' @return an omicsData object of the class 'proData'
+#' 
+#' @details If isoformRes is provided then, a temporary pepData object is formed using the isoformRes information as the e_meta component and the original pepData object will be used for e_data and f_data components. The emeta_cname for the temporary pepData object will be the “protein_isoform” column of isoformRes. Then one of the three 'method' functions can be applied to the temporary pepData object to return a proData object. If isofromRes is left NULL, then depending on the input for 'method', the correct 'method' function is applied directly to the input pepData object and a proData object is returned.
+#' 
+#' @examples 
+#' dontrun{
+#' library(pmartRdata)
+#' data("pep_object")
+#' 
+#' case where isoformRes is NULL:
+#' results<- prot_quant(pepData = pep_object, method = 'median', isoformRes = NULL)
+#' 
+#' case where isoformRes is provided:
+#' results2 = prot_quant(pep_data = pep_object, method = 'mean', isoformRes = isoformRes_object)
+#' }
 #' 
 #' @export
 

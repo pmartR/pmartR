@@ -1,6 +1,17 @@
 #' Protein Quantitation using Median Peptide Abundances
 #' 
-#' Description here
+#' This function takes in a pepData object and returns a proData object
+#' 
+#' @param pepData omicsData object of class 'pepData'
+#' 
+#' @returns an omicsData object of class 'proData'
+#' 
+#' @examples 
+#' dontrun{
+#' library(pmartRdata)
+#' data(pep_object)
+#' result = pquant_median(pep_object) 
+#'}
 #' 
 #' @export
 

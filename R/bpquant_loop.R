@@ -1,11 +1,24 @@
-#'bpquant_loop
+#' Applies bpquant_mod function to each unique protein in pepData object
 #'
-#'The bpquant_loop function takes in a statRes object and a pepData object. The statRes object contains 
-#'the signatures data frame, the pepData object is used for its e_meta data frame. Next the signatures data 
-#'frame and e_meta are merged by their edata_cname ("Peptide") columns, this new data frame called 
-#'protein_sig_data will be input to bpquant_mod in a "foreach" statement. "Foreach" will subset protein_sig_data 
-#'for each protein and apply bpquant_mod to each subset and store the results.
+#' The bpquant_loop function takes in a statRes object and a pepData object.It organizes the molecule and protein data into a data frame called protein_sig_data. Next bpquant_mod is applied to each unique protein and the results are stored and returned.  
 #'
+#' @param statRes an object of the class 'statRes'
+#' @param pepData is an omicsData object of the class 'pepData'
+#' @param pi_not is a numeric value between 0 and 1 indicating the background probability/frequency of a zero signature.
+#' @param max_proteoforms a numeric value, a maximum threshold for the number of possible proteoforms.
+#' 
+#' @return a list of data frames, one for each unique protein. The data frames have three columns, "Protein", "Mass_Tag_ID" (which is molecule ID), and "ProteoformID". The class of this list is 'isoformRes'. 
+#' 
+#' @details The statRes object contains the signatures data frame, the pepData object is used for its e_meta data frame. Next the signatures data frame and e_meta are merged by their edata_cname (“Peptide”) columns, this new data frame called protein_sig_data will be input to bpquant_mod in a “foreach” statement. “Foreach” will subset protein_sig_data for each unique protein and apply bpquant_mod to each subset and store the results. 
+#' 
+#' @examples 
+#' dontrun{
+#' library(pmarRdata)
+#' data("pep_object")
+#' 
+#' isoformRes_result = bpquant_loop(statRes = statRes_object, pepData = pep_object, pi_not = .9, max_proteoforms = 5)
+#' }
+#' 
 #' @export
 
 bpquant_loop<- function(statRes, pepData, pi_not = .9, max_proteoforms = 5){
@@ -102,3 +115,5 @@ isoformRes_func<- function(df){
   
   do.call(rbind, temp)
 }
+
+

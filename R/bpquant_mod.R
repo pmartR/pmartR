@@ -1,4 +1,31 @@
-#original bpquant_mod function is called in bpquant_loop function
+#' bpquant_mod function
+#' 
+#' The function is written to take input from one protein at a time and requires three inputs: protein_sig, pi_not and max_proteforms.
+#' 
+#' @param protein_sig  is a matrix or data.frame with p rows and n columns, where p is the number of peptides mapped to the protein of interest and n is the number of tests conducted to generate signatures made up of values 0, 1, and -1. 
+#' @param pi_not is a numeric value between 0 and 1 indicating the background probability/frequency of a zero signature.
+#' @param max_proteoforms a numeric value, a maximum threshold for the number of possible proteoforms.
+#' 
+#' @returns a list of five items: num_proteoforms, unique_sigs, proteoform_configs, post_prob and peptide_idx
+#' 
+#' @details 
+#' \tabular{ll}{
+#' num_proteoforms \tab the number of proteoforms as identified by bpquant \cr
+#' unique_sigs \tab matrix of unique signatures observed  \cr
+#' proteoform_configs \tab matrix of 0/1 values indicating scenarios of proteoform absence/presence scenarios \cr
+#' post_prob \tab vector of posterior probabilities corresponding to each proteoform configuration in "proteoform_configs" \cr
+#' peptide_idx \tab vector of 0, 1, 2, . . . values indicating which proteoform each peptide belongs to \cr
+#' }
+#' 
+#' @examples 
+#' dontrun{
+#' cur_protein = subset(protein_sig_data, Protein == "A")
+#' cur_protein_sigs = cur_protein[,-(1:2)]
+#' 
+#' results = bpquant_mod(protein_sig = cur_protein_sigs, pi_not = .9, max_proteoforms = 5)
+#' }
+#'
+#'@export 
 
 bpquant_mod <- function(protein_sig, pi_not, max_proteoforms){
   
