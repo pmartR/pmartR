@@ -2,19 +2,19 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 kw_rcpp <- function(mtr, group) {
-    .Call('pmartRqc_kw_rcpp', PACKAGE = 'pmartRqc', mtr, group)
+    .Call('_pmartRqc_kw_rcpp', PACKAGE = 'pmartRqc', mtr, group)
 }
 
 nonmissing_per_grp <- function(mtr, group) {
-    .Call('pmartRqc_nonmissing_per_grp', PACKAGE = 'pmartRqc', mtr, group)
+    .Call('_pmartRqc_nonmissing_per_grp', PACKAGE = 'pmartRqc', mtr, group)
 }
 
 pooled_cv_rcpp <- function(mtr, group) {
-    .Call('pmartRqc_pooled_cv_rcpp', PACKAGE = 'pmartRqc', mtr, group)
+    .Call('_pmartRqc_pooled_cv_rcpp', PACKAGE = 'pmartRqc', mtr, group)
 }
 
 #' @export
 rcpp_hello_world <- function() {
-    .Call('pmartRqc_rcpp_hello_world', PACKAGE = 'pmartRqc')
+    .Call('_pmartRqc_rcpp_hello_world', PACKAGE = 'pmartRqc')
 }
 
