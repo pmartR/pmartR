@@ -7,7 +7,7 @@ Author: Lisa Bramer [aut], Kelly Stratton [aut], Thomas Johansen [ctb]
 Maintainer: Lisa Bramer <lisa.bramer@pnnl.gov>, Kelly Stratton <kelly.stratton@pnnl.gov>
 Description: Provides functionality for quality control processing of mass spectrometry (MS) omics data, in particular proteomic (either at the peptide or the protein level), lipidomic, and metabolomic data. This includes data transformation, specification of groups that are to be compared against each other, filtering of feature and/or samples, data normalization, and data summarization (correlation, PCA).
 License: MIT + file LICENSE
-Depends: R (>= 2.15)
+Depends: R (>= 2.15), data.table
 LazyData: TRUE
 URL: https://github.com/pmartR/pmartRqc
 BugReports: https://github.com/pmartR/pmartRqc/issues
@@ -15,7 +15,6 @@ VignetteBuilder: knitr
 LinkingTo: Rcpp, RcppArmadillo, BH
 Imports:
     Rcpp (>= 0.12.8),
-    data.table,
     dplyr,
     ggplot2,
     e1071,
@@ -26,9 +25,10 @@ Imports:
     d3heatmap,
     gridExtra,
     reshape2,
-    RcppArmadillo
+    RcppArmadillo,
+    gridExtra
 Suggests:
     knitr,
     rmarkdown,
     testthat
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1
