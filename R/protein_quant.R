@@ -21,7 +21,8 @@
 #' case where isoformRes is provided:
 #' results2 = prot_quant(pep_data = pep_object, method = 'mean', isoformRes = isoformRes_object)
 #' }
-#' 
+#'
+#' @rdname protein_quant 
 #' @export
 
 protein_quant<- function(pepData, method, isoformRes = NULL){

@@ -6,7 +6,7 @@
 #' @param pi_not is a numeric value between 0 and 1 indicating the background probability/frequency of a zero signature.
 #' @param max_proteoforms a numeric value, a maximum threshold for the number of possible proteoforms.
 #' 
-#' @returns a list of five items: num_proteoforms, unique_sigs, proteoform_configs, post_prob and peptide_idx
+#' @return  a list of five items: num_proteoforms, unique_sigs, proteoform_configs, post_prob and peptide_idx
 #' 
 #' @details 
 #' \tabular{ll}{
@@ -25,6 +25,7 @@
 #' results = bpquant_mod(protein_sig = cur_protein_sigs, pi_not = .9, max_proteoforms = 5)
 #' }
 #'
+#'@rdname bpquant_mod
 #'@export 
 
 bpquant_mod <- function(protein_sig, pi_not, max_proteoforms){

@@ -4,7 +4,7 @@
 #' 
 #' @param pepData omicsData object of class 'pepData'
 #' 
-#' @returns an omicsData object of class 'proData'
+#' @return an omicsData object of class 'proData'
 #' 
 #' @examples 
 #' dontrun{
@@ -13,6 +13,7 @@
 #' result = pquant_mean(pep_object) 
 #'}
 #' 
+#' @rdname pquant_mean
 #' @export
 
 #pquant_mean for pmartRqc pep_object

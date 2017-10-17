@@ -19,6 +19,7 @@
 #' isoformRes_result = bpquant_loop(statRes = statRes_object, pepData = pep_object, pi_not = .9, max_proteoforms = 5)
 #' }
 #' 
+#' @rdname bpquant_loop
 #' @export
 
 bpquant_loop<- function(statRes, pepData, pi_not = .9, max_proteoforms = 5){
