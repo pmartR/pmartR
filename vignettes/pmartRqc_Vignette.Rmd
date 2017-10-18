@@ -61,10 +61,10 @@ dim(pep_emeta)
 head(pep_emeta)
 ```
 
-Next we create pepData object, which contains the 3 components loaded above. During object creation, we specify the names of the identifier columns in the `e_data`, `f_data`, and `e_meta` components of the data (`edata_cname = "Mass_Tag_ID", emeta_cname = "Mass_Tag_ID", fdata_cname = "SampleID"`, respectively), as well as the scale of the data (`data_scale = "abundance"`). We can use the `summary` function to get basic summary information for our pepData object.
+Next we create pepData object, which contains the 3 components loaded above. During object creation, we specify the names of the identifier columns in the `e_data`, `f_data`, and `e_meta` components of the data (`edata_cname = "Mass_Tag_ID", emeta_cname = "Protein", fdata_cname = "SampleID"`, respectively), as well as the scale of the data (`data_scale = "abundance"`). We can use the `summary` function to get basic summary information for our pepData object.
 
 ```{r data2}
-mypepData <- as.pepData(e_data = pep_edata, f_data = pep_fdata, e_meta = pep_emeta, edata_cname = "Mass_Tag_ID", emeta_cname = "Mass_Tag_ID", fdata_cname = "SampleID", data_scale = "abundance")
+mypepData <- as.pepData(e_data = pep_edata, f_data = pep_fdata, e_meta = pep_emeta, edata_cname = "Mass_Tag_ID", emeta_cname = "Protein", fdata_cname = "SampleID", data_scale = "abundance")
 class(mypepData)
 summary(mypepData)
 ```
@@ -402,7 +402,7 @@ Below we use SPANS to select a normalization approach and then normalize the dat
 
 ### Summarize Data
 
-The pmartRqc package contains two methods for data summarization and exploration that can be used as part of the quality control process: sequential projection pursuit principal components analysis (sppPCA) for dimension reduction and a correlation heat map.
+The pmartRqc package contains two methods for data summarization and exploration that can be used as part of the quality control process: sequential projection pursuit principal components analysis (sppPCA) for dimension reduction and a correlation heat map. As for missing data summarization there are also functions to collect and plot missing data information. Missing data collection and plotting functions include, `missingval_result`, `plot_missingval`, `missingval_scatterplot` and `missingval_heatmap`. 
 
 #### Probabilistic Principal Components Analysis
 
@@ -434,5 +434,55 @@ plot(correlation_results, colorbar_lim=c(0,1))
 
 ```
 
+
+
+#### Missingval_result and plot_missingval functions
+
+
+```{r missingval}
+library(ggplot2)
+results <- missingval_result(mypepData)
+
+
+plot(results, type = "bySample")
+plot(results, type = "bySample", title_plot="Hey look at this!")
+plot(results, type = "byMolecule", x_lab_angle = 0)
+
+```
+
+
+#### Missingval_scatterplot and missingval_heatmap functions
+
+
+```{r missingval_plots}
+
+missingval_scatterplot(mypepData, palette = "Set1")
+missingval_scatterplot(mypepData, title_plot="Hey look at this!", palette = "Set2")
+
+missingval_heatmap(mypepData)
+missingval_heatmap(mypepData, title_size = 20, title_plot = "Hey look at this!")
+
+```
+
+
+#### Protein Quantitation Methods
+
+The pmartRqc package contains three functions for protein quantitation, `pquant_mean`, `pquant_median`, and `rrollup`. These functions are applied within a wrapper function, `protein_quant`. The inputs of `protein_quant` are, a pepData object, a method (one of 'mean', 'median' or 'rrollup') and an optional isoformRes object which defaults to NULL. In the case where 'isoformRes' is left NULL, depending on the input for 'method', the correct protein quantitation function is applied to the input pepData object and a proData object is returned. 
+
+¿FURTHER DESCRIPTION OF EACH PROTEIN QUANTITATION METHOD?
+
+
+```{r protein_quant}
+print(mypepData)
+
+mypepdata_median<- protein_quant(pepData = mypepData, method = "median")
+print(mypepdata_median)
+rm(mypepdata_median)
+
+mypepdata_rrollup<- protein_quant(pepData = mypepData, method = "rrollup")
+print(mypepdata_rrollup)
+rm(mypepdata_rrollup)
+
+```
 
 ## References
