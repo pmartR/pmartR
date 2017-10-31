@@ -18,6 +18,7 @@
 #' @export
 
 rrollup<- function(pepData, parallel = TRUE){
+  check_names = getchecknames(pepData)
   
   # check that pepData is of appropraite class #
   if(class(pepData) != "pepData") stop("pepData is not an object of the appropriate class")
@@ -33,7 +34,7 @@ rrollup<- function(pepData, parallel = TRUE){
   pep = data.table(pepData$e_data)
   pro = data.table(pepData$e_meta[,c(pep_id, pro_id)])
   temp = data.table:::merge.data.table(x = pro, y = pep, by = pep_id, all.x = F, all.y = T)
-  temp = as.data.frame(temp, check.names=FALSE)[,-which(names(temp)==pep_id)]
+  temp = as.data.frame(temp, check.names=check_names)[,-which(names(temp)==pep_id)]
   
   #pull protein column from temp and apply unique function
   unique_proteins<- unique(temp[[pro_id]])
@@ -107,7 +108,7 @@ rrollup<- function(pepData, parallel = TRUE){
     names(e_meta)<-pro_id
   }else {e_meta = pepData$e_meta[emeta_indices, -which(names(pepData$e_meta)==pep_id)]} 
   
-  prodata = as.proData(e_data = data.frame(final_result, check.names=FALSE), f_data = pepData$f_data, e_meta = e_meta ,edata_cname = pro_id, fdata_cname = samp_id, emeta_cname = pro_id, data_scale = data_scale, data_norm = data_norm)
+  prodata = as.proData(e_data = data.frame(final_result, check.names=check_names), f_data = pepData$f_data, e_meta = e_meta ,edata_cname = pro_id, fdata_cname = samp_id, emeta_cname = pro_id, data_scale = data_scale, data_norm = data_norm)
   
   #updating prodata attributes
   attr(prodata, "data_info")$norm_info = attr(pepData, "data_info")$norm_info
@@ -183,7 +184,7 @@ rrollup<- function(pepData, parallel = TRUE){
       names(e_meta)<-pro_id
     }else {e_meta = pepData$e_meta[emeta_indices, -which(names(pepData$e_meta)==pep_id)]} 
     
-    prodata = as.proData(e_data = data.frame(final_result, check.names=FALSE), f_data = pepData$f_data, e_meta = e_meta ,edata_cname = pro_id, fdata_cname = samp_id, emeta_cname = pro_id, data_scale = data_scale, data_norm = data_norm)
+    prodata = as.proData(e_data = data.frame(final_result, check.names=check_names), f_data = pepData$f_data, e_meta = e_meta ,edata_cname = pro_id, fdata_cname = samp_id, emeta_cname = pro_id, data_scale = data_scale, data_norm = data_norm)
     
     #updating prodata attributes
     attr(prodata, "data_info")$norm_info = attr(pepData, "data_info")$norm_info
