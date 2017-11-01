@@ -2,8 +2,24 @@
 #' 
 #' This function takes in an omicsData object, outputs a list of two data frames, one contains NA by sample, the second contains NA by molecule
 #'
+#' @param omicsData an object of class "pepData", "proData", "metabData", or "lipidData", created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.
+#' 
+#' @return outputs a list of two data frames, one contains NA by sample (missing values per sample), the second contains NA by molecule (missing values per molecule). The output is assigned class 'naRes'. 
+#' 
+#' @examples 
+#' dontrun{
+#' library(pmartRdata)
+#' data("lipid_object")
+#' data("metab_object")
+#' 
+#' result = missingval_result(lipid_object)
+#' result2 = missingval_result(metab_object)
 #'
-#'@export
+#'}  
+#' 
+#' @rdname missingval_result
+#' @export
+#' 
 
 missingval_result<- function(omicsData){
   

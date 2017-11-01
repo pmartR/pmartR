@@ -24,13 +24,14 @@
 #'
 #' @return plots ggplot2 object
 #' 
-#' @details This function creates a fold change vs t-Test p-value volcano plot from a statRes object
+#' @details This function takes in a statRes object and plots log2 fold change vs -log10 t-Test P-values for a comparison from attr(statRes, “comparison”), ‘comparison’ parameter could be either a string or an integer refereing to an index of statRes comparisons
 #'  
 #' @examples 
 #' dontrun{
-#'
-#'}
+#' missingval_volcanoplot(statRes_object, comparison = 2, palette = "Set1")
+#' missingval_volcanoplot(statRes_object, comparison = 3, pvalue_threshold = .005, palette = "Dark2", x_lab_angle = 45)
 #' 
+#'}
 #' 
 #' @rdname missingval_volcanoplot
 #' @export
@@ -161,7 +162,3 @@ if(length(comparison) == 1){
 }
   
 }
-
-
-
-

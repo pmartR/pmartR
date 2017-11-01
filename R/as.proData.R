@@ -19,6 +19,8 @@
 #' norm_info \tab Default value is NULL. When a normalization is applied to the data, this becomes populated with a list containing the normalization function, normalization subset and subset parameters, the location and scale parameters used to normalize the data, and the location and scale parameters used to backtransform the data (if applicable). \cr
 #' \tab \cr
 #' data_types \tab Character string describing the type of data (e.g.'Positive ion'). Default value is NULL. \cr
+#' \tab\cr
+#' check.names \tab Logical defaults to TRUE. Indicates whether 'check.names' attribute of returned omicsData object is TRUE or FALSE. \cr
 #' }
 #' Computed values included in the \code{data_info} attribute are as follows:
 #' \tabular{ll}{
@@ -57,7 +59,7 @@ as.proData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname, 
 .as.proData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname,
                         emeta_cname="NULL", data_scale = "abundance",
                         data_norm = FALSE, norm_info=NULL,
-                        data_types=NULL){
+                        data_types=NULL, check.names = TRUE){
 
   # initial checks #
 
@@ -164,6 +166,9 @@ as.proData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname, 
   attr(res, "data_info") = list(data_scale = data_scale, data_norm = data_norm, norm_info = norm_info, num_edata = num_edata, num_miss_obs = num_miss_obs,
                                 num_emeta = num_emeta, prop_missing = prop_missing, num_samps = num_samps, data_types = data_types)
 
+  #set check.names attribute #
+  attr(res, "check.names") = check.names 
+  
   # set meta data attributes #
   if(!is.null(e_meta)){
     attr(res, "meta_info") = TRUE

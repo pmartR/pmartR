@@ -65,7 +65,7 @@
 #' @references
 #'
 #' @export
-normalize <- function(omicsData, subset_fn, norm_fn, params = NULL, apply_norm = FALSE, backtransform = FALSE, check.names=TRUE){
+normalize <- function(omicsData, subset_fn, norm_fn, params = NULL, apply_norm = FALSE, backtransform = FALSE){
 
     ## initial checks ##
 
@@ -83,6 +83,7 @@ normalize <- function(omicsData, subset_fn, norm_fn, params = NULL, apply_norm =
     stop("omicsData$e_data should be log transformed prior to calling normalize_data. See documentation for edata_transform function for more information.")
   }
 
+  check_names = getchecknames(omicsData)
   edata_id <- attr(omicsData, "cnames")$edata_cname
   samp_id <- attr(omicsData, "cnames")$fdata_cname
 
@@ -196,7 +197,7 @@ if(subset_fn == "ppp_rip"){
 
 fn_to_use <- switch(norm_fn, mean = mean_center, median = median_center, zscore = zscore_transform, mad = mad_transform)
 
-norm_results <- fn_to_use(e_data = omicsData$e_data, edata_id=edata_id, feature_subset = peps, backtransform = backtransform, apply_norm = apply_norm, check.names=check.names)
+norm_results <- fn_to_use(e_data = omicsData$e_data, edata_id=edata_id, feature_subset = peps, backtransform = backtransform, apply_norm = apply_norm, check.names=check_names)
 
 if(apply_norm == FALSE){
   res = list(subset_fn = subset_fn, norm_fn = norm_fn, parameters = list(normalization = norm_results$norm_params, backtransform = norm_results$backtransform_params), n_features_calc = length(peps), prop_features_calc = length(peps)/nrow(omicsData$e_data))

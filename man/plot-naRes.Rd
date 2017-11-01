@@ -2,24 +2,51 @@
 % Please edit documentation in R/plot_missingval.R
 \name{plot.naRes}
 \alias{plot.naRes}
-\title{plot.naRes}
+\title{Plots an object of class naRes}
 \usage{
 \method{plot}{naRes}(naRes_object, type, x_lab = NULL, ...)
 }
 \arguments{
-\item{type}{is for specifying plot type, there are three options, "bySample", "byMolecule" and "Both"
+\item{naRes_object}{a list of two data frames, one contains NA values by sample, the second contains NA values by molecule}
+
+\item{type}{is for specifying plot type, there are three options, 'bySample': plots missing values per sample, 'byMolecule': plots missing values per molecule and 'Both': displays both 'bySample' and 'byMolecule' plots.}
+
+\item{x_lab}{character string to be used for x-axis label. Defaults to NULL}
+
+\item{...}{further arguments 
+
 \tabular{ll}{
-\code{x_lab} \tab character string to be used for x-axis label. Defaults to NULL \cr
 \code{y_lab} \tab character string to be used for y-axis label. Defaults to NULL \cr
 \code{title_plot} \tab character string to be used for the plot title. Defaults to NULL. \cr
+\code{legend_title} \tab character string to be used for legend_title label. Defaults to NULL \cr
 \code{title_size} \tab integer value specifying the font size for the plot title. Default is 14. \cr
 \code{x_lab_size} \tab integer value indicating the font size for the x-axis. Defaults to 11. \cr
 \code{y_lab_size} \tab integer value indicating the font size for the y-axis. Defaults to 11. \cr
 \code{bar_width} \tab integer value indicating the bar width in a barplot (when type = "bySample"). Defaults to .8. \cr
 \code{binwidth} \tab integer value indicating the bin width in a histogram (when type = "byMolecule"). Defaults to 1. \cr
 \code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used. \cr
+\code{palette} \tab palette is a character string indicating the name of the RColorBrewer palette to use; "YlOrRd", "YlOrBr", "YlGnBu", "YlGn", "Reds","RdPu", "Purples", "PuRd", "PuBuGn", "PuBu", "OrRd","Oranges", "Greys", "Greens", "GnBu", "BuPu","BuGn","Blues", "Set3", "Set2", "Set1", "Pastel2", "Pastel1", "Paired", "Dark2", "Accent", "Spectral", "RdYlGn", "RdYlBu", "RdGy", "RdBu", "PuOr","PRGn", "PiYG", "BrBG"\cr
+\code{x_lab_angle} \tab integer value indicating the angle of x-axis labels \cr
+\code{coordinate_flip} \tab logical indicates whether to flip cartesian coordinates so that horizontal becomes vertical and vise versa, defaults to false \cr
 }}
+}
+\value{
+plots ggplot2 object
 }
 \description{
 For plotting an S3 object of type 'naRes':
+}
+\details{
+This function takes in an object of class naRes and creates either a bar chart or histogram of missing values. When parameter type = "bySample", a "sample name" by "missing values count" bar chart is returned. When parameter type = "byMolecule" a "number of missing values per molecule" by "Molecules" histogram is returned. If type is set to "Both", a bar chart and histogram will be returned.
+}
+\examples{
+dontrun{
+library(pmartRdata)
+data("lipid_object")
+result<- missingval_result(lipid_object)
+plot(result, type = "bySample", x_lab_angle = 50, palette = "Set1")
+
+plot(result, type = "Both", palette = "Set2")
+}
+
 }
