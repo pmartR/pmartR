@@ -3,11 +3,12 @@
 #' This function takes in a pepData object, method (quantitation method, mean, median or rrollup), and the optional argument isoformRes (defaults to NULL). An object of the class 'proData' is returned. 
 #' 
 #' @param pepData an omicsData object of the class 'pepData'
-#' @param method is one of the five protein quantitation methods, 'mean_quant', 'median_quant', 'rrollup', 'qrollup' and 'zrollup'
+#' @param method is one of four protein quantitation methods, 'rollup', 'rrollup', 'qrollup' and 'zrollup'. When 'rollup' is selected, combine_fn must also be provided and will determine whether pquant_mean or pquant_median function will be used.
 #' @param isoformRes is a list of data frames, the result of applying the 'bpquant_loop' function to original pepData object. Defaults to NULL
 #' @param qrollup_thresh is a numeric value; is the peptide abundance cutoff value. Is an argument to qrollup function.
 #' @param single_pep logical indicating whether or not to remove proteins that have just a single peptide mapping to them, defaults to FALSE
 #' @param single_observation logical indicating whether or not to remove peptides that have just a single observation, defaults to FALSE
+#' @param combine_fn can either be 'mean' or 'median' 
 #' @param use_parallel logical indicating whether or not to use "doParallel" loop in applying rollup functions. Defaults to TRUE. Is an argument of rrollup, qrollup and zrollup functions.
 #' 
 #' @return an omicsData object of the class 'proData'
@@ -20,10 +21,10 @@
 #' data("pep_object")
 #' 
 #' case where isoformRes is NULL:
-#' results<- prot_quant(pepData = pep_object, method = 'median_quant', isoformRes = NULL)
+#' results<- prot_quant(pepData = pep_object, method = 'rollup', combine_fn = 'median', isoformRes = NULL)
 #' 
 #' case where isoformRes is provided:
-#' results2 = prot_quant(pep_data = pep_object, method = 'mean_quant', isoformRes = isoformRes_object)
+#' results2 = prot_quant(pep_data = pep_object, method = 'rollup', combine_fn = 'mean', isoformRes = isoformRes_object)
 #' }
 #'
 #' @rdname protein_quant 
@@ -33,7 +34,8 @@ protein_quant<- function(pepData, method, isoformRes = NULL, qrollup_thresh = NU
   
   #some checks
   if(class(pepData) != "pepData") stop("pepData must be an object of class pepData")
-  if(!(method %in% c('mean_quant', 'median_quant', 'rrollup', 'qrollup', 'zrollup'))) stop("method must be one of, mean, median, rrollup, qrollup, zrollup")
+  if(!(method %in% c('rollup', 'rrollup', 'qrollup', 'zrollup'))) stop("method must be one of, rollup, rrollup, qrollup, zrollup")
+  if(!(combine_fn %in% c('median', 'mean'))) stop("combine_fn must be on of mean or median")
   
   edata_cname<- attr(pepData, "cnames")$edata_cname
   fdata_cname<- attr(pepData, "cnames")$fdata_cname
@@ -50,18 +52,14 @@ protein_quant<- function(pepData, method, isoformRes = NULL, qrollup_thresh = NU
   #gives message if qrollup_thresh is not NULL and method is not qrollup
   if(method != 'qrollup' & !is.null(qrollup_thresh)) message("qrollup_thresh argument will be ignored if method is not qrollup")
   
-  #gives message if combine_fn is not NULL and method is not a rollup
-  if(!(method %in% c('rrollup','qrollup', 'zrollup')) & !is.null(combine_fn)) message("combine_fn argument will be ignored if method is not rrollup, qrollup or zrollup")
-  
   #gives message if use_parallel is TRUE and method is not a rollup
   if(!(method %in% c('rrollup','qrollup', 'zrollup')) & use_parallel == TRUE) message("use_parallel argument will be ignored if method is not rrollup, qrollup or zrollup")
   
   if(is.null(isoformRes)){
-    if(method == 'mean_quant'){
-      results<- pquant_mean(pepData)
-    }
-    if(method == 'median_quant'){
-      results<- pquant_median(pepData)
+    if(method == 'rollup'){
+      if(combine_fn = 'median'){
+        results<- pquant_median(pepData)
+      }else{results = pquant_mean(pepData)}
     }
     if(method == 'rrollup'){
       results<- rrollup(pepData, combine_fn = combine_fn, parallel = use_parallel)
@@ -134,14 +132,12 @@ protein_quant<- function(pepData, method, isoformRes = NULL, qrollup_thresh = NU
     attr(temp_pepdata, "group_DF")<- attr(pepData, "group_DF")
     attr(temp_pepdata, "imdanova")<- attr(pepData, "imdanova")
     
-    if(method == 'mean_quant'){
-      results<- pquant_mean(temp_pepdata)
+    if(method == 'rollup'){
+      if(combine_fn == 'median'){
+        results<- pquant_median(temp_pepdata)
+      }else{results<- pquant_mean(temp_pepdata)}
     }
-    
-    if(method == 'median_quant'){
-      results<- pquant_median(temp_pepdata)
-    }
-    
+
     if(method == 'rrollup'){
       results<- rrollup(temp_pepdata, combine_fn = combine_fn, parallel = use_parallel)
     }
