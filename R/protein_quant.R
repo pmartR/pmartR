@@ -57,7 +57,7 @@ protein_quant<- function(pepData, method, isoformRes = NULL, qrollup_thresh = NU
   
   if(is.null(isoformRes)){
     if(method == 'rollup'){
-      if(combine_fn = 'median'){
+      if(combine_fn == 'median'){
         results<- pquant_median(pepData)
       }else{results = pquant_mean(pepData)}
     }
