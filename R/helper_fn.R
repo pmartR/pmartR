@@ -89,4 +89,10 @@ setchecknames<- function(omicsData, set_to = TRUE){
   return(omicsData)
 }
 
+#rollup combine_fn functions
+combine_fn_mean<- function(x){
+  if(all(is.na(x))){mean(x)}else{mean(x, na.rm = T)}
+}
+
+combine_fn_median<- function(x){median(x, na.rm = T)}
 
