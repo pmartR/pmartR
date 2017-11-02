@@ -47,13 +47,13 @@ protein_quant<- function(pepData, method, isoformRes = NULL, qrollup_thresh = NU
   edata_cname_id<- which(names(pepData$e_data) == edata_cname)
   
   #gives message if single_pep and single_observation are TRUE and method is not zrollup
-  if(method != 'zrollup' & (single_pep == TRUE | single_observation == TRUE)) message("single_pep and single_observation will be ignored if method is not zrollup")
+  if(method != 'zrollup' & (single_pep == TRUE | single_observation == TRUE)) message("single_pep and single_observation will be ignored, as they are only applicable if method is zrollup")
   
   #gives message if qrollup_thresh is not NULL and method is not qrollup
-  if(method != 'qrollup' & !is.null(qrollup_thresh)) message("qrollup_thresh argument will be ignored if method is not qrollup")
+  if(method != 'qrollup' & !is.null(qrollup_thresh)) message("qrollup_thresh argument will be ignored, as it is only applicable if method is qrollup")
   
   #gives message if use_parallel is TRUE and method is not a rollup
-  if(!(method %in% c('rrollup','qrollup', 'zrollup')) & use_parallel == TRUE) message("use_parallel argument will be ignored if method is not rrollup, qrollup or zrollup")
+  if(!(method %in% c('rrollup','qrollup', 'zrollup')) & use_parallel == TRUE) message("use_parallel argument will be ignored, as it is not applicable if method is rrollup, qrollup or zrollup")
   
   if(is.null(isoformRes)){
     if(method == 'rollup'){
@@ -74,9 +74,9 @@ protein_quant<- function(pepData, method, isoformRes = NULL, qrollup_thresh = NU
         proteomicsfilt = proteomics_filter(pepData)
         moleculefilt = molecule_filter(pepData)
         
-        if(any(moleculefilt$Num_Observations == 1) & any(proteomicsfilt$counts_by_pro == 1)) stop("there are peptides with less than 2 observations and proteins with just a single peptide mapping to them and zrollup cannot be applied when this is the case. If you would like to filter out these peptides/proteins and then run zrollup, set both 'single_observation' and 'single_pep' arguments to TRUE")
-        if(any(moleculefilt$Num_Observations == 1)) stop("there are peptides with less than 2 observations and zrollup cannot be applied when this is the case. If you would like to filter out these peptides and then run zrollup, set the 'single_observation' argument to TRUE")
-        if(any(proteomicsfilt$counts_by_pro == 1)) stop ("there are proteins with just a single peptide mapping to them and zrollup cannot be applied when this is the case. If you would like to filter out these single peptide to protein mappings and then run zrollup, set the 'single_pep' input argument to TRUE")
+        if(any(moleculefilt$Num_Observations == 1) & any(proteomicsfilt$counts_by_pro == 1)) stop("There are peptides with less than 2 observations and proteins with just a single peptide mapping to them. The method zrollup cannot be applied when this is the case. If you would like to filter out these peptides/proteins and then run zrollup, set both 'single_observation' and 'single_pep' arguments to TRUE")
+        if(any(moleculefilt$Num_Observations == 1)) stop("There are peptides with less than 2 observations. The method zrollup cannot be applied when this is the case. If you would like to filter out these peptides and then run zrollup, set the 'single_observation' argument to TRUE.")
+        if(any(proteomicsfilt$counts_by_pro == 1)) stop ("There are proteins with just a single peptide mapping to them. The method zrollup cannot be applied when this is the case. If you would like to filter out these single peptide to protein mappings and then run zrollup, set the 'single_pep' input argument to TRUE")
       }
       
       if(single_pep == TRUE & single_observation == FALSE){
@@ -86,7 +86,7 @@ protein_quant<- function(pepData, method, isoformRes = NULL, qrollup_thresh = NU
         #since single_pep is TRUE we will remove proteins with single peptide mapped to them
         pepData = applyFilt(proteomicsfilt, pepData, min_num_peps = 2)
         
-        if(any(moleculefilt$Num_Observations == 1)) stop("there are peptides with less than 2 observations, if you would like to filter out these peptides and then run zrollup, set the 'single_observation' argument to TRUE")
+        if(any(moleculefilt$Num_Observations == 1)) stop("There are peptides with less than 2 observations. If you would like to filter out these peptides and then run zrollup, set the 'single_observation' argument to TRUE.")
       }
       
       if(single_pep == FALSE & single_observation == TRUE){
@@ -96,7 +96,7 @@ protein_quant<- function(pepData, method, isoformRes = NULL, qrollup_thresh = NU
         #since single_observation is TRUE we will remove peptides with single observation
         pepData = applyFilt(moleculefilt, pepData)
         
-        if(any(proteomicsfilt$counts_by_pro == 1)) stop ("there are proteins with just a single peptide mapping to them and zrollup cannot be applied when this is the case. If you would like to filter out these single peptide to protein mappings and then run zrollup, set the 'single_pep' input argument to TRUE")
+        if(any(proteomicsfilt$counts_by_pro == 1)) stop ("There are proteins with just a single peptide mapping to them. The method zrollup cannot be applied when this is the case. If you would like to filter out these single peptide to protein mappings and then run zrollup, set the 'single_pep' input argument to TRUE.")
       }
       
       if(single_pep == TRUE & single_observation == TRUE){
@@ -152,9 +152,9 @@ protein_quant<- function(pepData, method, isoformRes = NULL, qrollup_thresh = NU
         proteomicsfilt = proteomics_filter(temp_pepdata)
         moleculefilt = molecule_filter(temp_pepdata)
         
-        if(any(moleculefilt$Num_Observations == 1) & any(proteomicsfilt$counts_by_pro == 1)) stop("there are peptides with less than 2 observations and proteins with just a single peptide mapping to them and zrollup cannot be applied when this is the case. If you would like to filter out these peptides/proteins and then run zrollup, set both 'single_observation' and 'single_pep' arguments to TRUE")
-        if(any(moleculefilt$Num_Observations == 1)) stop("there are peptides with less than 2 observations and zrollup cannot be applied when this is the case. If you would like to filter out these peptides and then run zrollup, set the 'single_observation' argument to TRUE")
-        if(any(proteomicsfilt$counts_by_pro == 1)) stop ("there are proteins with just a single peptide mapping to them and zrollup cannot be applied when this is the case. If you would like to filter out these single peptide to protein mappings and then run zrollup, set the 'single_pep' input argument to TRUE")
+        if(any(moleculefilt$Num_Observations == 1) & any(proteomicsfilt$counts_by_pro == 1)) stop("There are peptides with less than 2 observations and proteins with just a single peptide mapping to them. The method zrollup cannot be applied when this is the case. If you would like to filter out these peptides/proteins and then run zrollup, set both 'single_observation' and 'single_pep' arguments to TRUE.")
+        if(any(moleculefilt$Num_Observations == 1)) stop("There are peptides with less than 2 observations. The method zrollup cannot be applied when this is the case. If you would like to filter out these peptides and then run zrollup, set the 'single_observation' argument to TRUE.")
+        if(any(proteomicsfilt$counts_by_pro == 1)) stop ("There are proteins with just a single peptide mapping to them. The method zrollup cannot be applied when this is the case. If you would like to filter out these single peptide to protein mappings and then run zrollup, set the 'single_pep' input argument to TRUE.")
       }
       
       if(single_pep == TRUE & single_observation == FALSE){
@@ -164,7 +164,7 @@ protein_quant<- function(pepData, method, isoformRes = NULL, qrollup_thresh = NU
         #since single_pep is TRUE we will remove proteins with single peptide mapped to them
         temp_pepdata = applyFilt(proteomicsfilt, temp_pepdata, min_num_peps = 2)
         
-        if(any(moleculefilt$Num_Observations == 1)) stop("there are peptides with less than 2 observations, if you would like to filter out these peptides and then run zrollup, set the 'single_observation' argument to TRUE")
+        if(any(moleculefilt$Num_Observations == 1)) stop("There are peptides with less than 2 observations. If you would like to filter out these peptides and then run zrollup, set the 'single_observation' argument to TRUE.")
       }
       
       if(single_pep == FALSE & single_observation == TRUE){
@@ -174,7 +174,7 @@ protein_quant<- function(pepData, method, isoformRes = NULL, qrollup_thresh = NU
         #since single_observation is TRUE we will remove peptides with single observation
         temp_pepdata = applyFilt(moleculefilt, temp_pepdata)
         
-        if(any(proteomicsfilt$counts_by_pro == 1)) stop ("there are proteins with just a single peptide mapping to them and zrollup cannot be applied when this is the case. If you would like to filter out these single peptide to protein mappings and then run zrollup, set the 'single_pep' input argument to TRUE")
+        if(any(proteomicsfilt$counts_by_pro == 1)) stop ("There are proteins with just a single peptide mapping to them. The method zrollup cannot be applied when this is the case. If you would like to filter out these single peptide to protein mappings and then run zrollup, set the 'single_pep' input argument to TRUE.")
       }
       
       if(single_pep == TRUE & single_observation == TRUE){
