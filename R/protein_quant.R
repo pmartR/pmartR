@@ -2,13 +2,13 @@
 #' 
 #' This function takes in a pepData object, method (quantitation method, mean, median or rrollup), and the optional argument isoformRes (defaults to NULL). An object of the class 'proData' is returned. 
 #' 
-#' @param pepData an omicsData object of the class 'pepData'
+#' @param pepData an omicsData object of the class 'pepData'.
 #' @param method is one of four protein quantitation methods, 'rollup', 'rrollup', 'qrollup' and 'zrollup'. When 'rollup' is selected, combine_fn must also be provided and will determine whether pquant_mean or pquant_median function will be used.
-#' @param isoformRes is a list of data frames, the result of applying the 'bpquant_loop' function to original pepData object. Defaults to NULL
+#' @param isoformRes is a list of data frames, the result of applying the 'bpquant_loop' function to original pepData object. Defaults to NULL.
 #' @param qrollup_thresh is a numeric value; is the peptide abundance cutoff value. Is an argument to qrollup function.
-#' @param single_pep logical indicating whether or not to remove proteins that have just a single peptide mapping to them, defaults to FALSE
-#' @param single_observation logical indicating whether or not to remove peptides that have just a single observation, defaults to FALSE
-#' @param combine_fn can either be 'mean' or 'median' 
+#' @param single_pep logical indicating whether or not to remove proteins that have just a single peptide mapping to them, defaults to FALSE.
+#' @param single_observation logical indicating whether or not to remove peptides that have just a single observation, defaults to FALSE.
+#' @param combine_fn can either be 'mean' or 'median'.
 #' @param use_parallel logical indicating whether or not to use "doParallel" loop in applying rollup functions. Defaults to TRUE. Is an argument of rrollup, qrollup and zrollup functions.
 #' 
 #' @return an omicsData object of the class 'proData'
@@ -36,6 +36,7 @@ protein_quant<- function(pepData, method, isoformRes = NULL, qrollup_thresh = NU
   if(class(pepData) != "pepData") stop("pepData must be an object of class pepData")
   if(!(method %in% c('rollup', 'rrollup', 'qrollup', 'zrollup'))) stop("method must be one of, rollup, rrollup, qrollup, zrollup")
   if(!(combine_fn %in% c('median', 'mean'))) stop("combine_fn must be on of mean or median")
+  if(!is.null(isoformRes) & !is.null(pepData)) stop("if isoformRes argument is provided then pepData argument must be NULL")
   
   edata_cname<- attr(pepData, "cnames")$edata_cname
   fdata_cname<- attr(pepData, "cnames")$fdata_cname
@@ -103,8 +104,8 @@ protein_quant<- function(pepData, method, isoformRes = NULL, qrollup_thresh = NU
         proteomicsfilt = proteomics_filter(pepData)
         moleculefilt = molecule_filter(pepData)
         
-        pepData0 = applyFilt(proteomicsfilt, pepData, min_num_peps = 2)
-        pepData = applyFilt(moleculefilt, pepData0)
+        pepData0 = applyFilt(moleculefilt, pepData)
+        pepData = applyFilt(proteomicsfilt, pepData0, min_num_peps = 2)
       }
       
       results<- zrollup(pepData, combine_fn = combine_fn, parallel = use_parallel)
