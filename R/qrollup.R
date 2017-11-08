@@ -3,7 +3,7 @@
 #' This function applies the qrollup method to a pepData object for each unique protein and returns a proData object. 
 #' 
 #' @param pepData an omicsData object of class 'pepData'
-#' @param qrollup_thresh is a numeric value; is the peptide abundance cutoff value. Peptides with non-NA value counts greater than or equal to the cutoff value are selected to be used in calculating protein abundance.
+#' @param qrollup_thresh is a numeric value; is the peptide abundance cutoff value. 
 #' @param combine_fn logical indicating what combine_fn to use, defaults to median, other option is mean
 #' @param parallel logical indicating whether or not to use "doParallel" loop in applying qrollup function. Defaults to TRUE.
 #' 
@@ -79,14 +79,16 @@ qrollup<- function(pepData, qrollup_thresh, combine_fn = "median", parallel = TR
         protein_val = unlist(current_subset)
       }else{
         ## Step 1: Subset peptides whose abundance is >= to qrollup_thresh ##
-        non_na_cnt = apply(!is.na(current_subset), 1, sum)
-        new_subset = current_subset[which(non_na_cnt >= qrollup_thresh), ]
+        means = apply(current_subset,1,mean,na.rm=T)
+        quantil = quantile(means, probs = qrollup_thresh, na.rm = T)
+
+        new_subset = current_subset[which(means >= quantil), ]
         
         #after step 1 if only 1 peptide, set the protein value to the peptide
         if(nrow(new_subset) == 1){
           protein_val = unlist(new_subset)
         }else{
-          ## Step 2: Set protein abundance as the mean of peptide abundances from qrollup_thresh_subset
+          ## Step 2: Set protein abundance as the mean/median of peptide abundances 
           protein_val = apply(new_subset, 2, chosen_combine_fn)
         }
       }
