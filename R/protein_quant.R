@@ -54,7 +54,7 @@ protein_quant<- function(pepData, method, isoformRes = NULL, qrollup_thresh = NU
   if(method != 'qrollup' & !is.null(qrollup_thresh)) message("qrollup_thresh argument will be ignored, as it is only applicable if method is qrollup")
   
   #gives message if use_parallel is TRUE and method is not a rollup
-  if(!(method %in% c('rrollup','qrollup', 'zrollup')) & use_parallel == TRUE) message("use_parallel argument will be ignored, as it is not applicable if method is rrollup, qrollup or zrollup")
+  #if(!(method %in% c('rrollup','qrollup', 'zrollup')) & use_parallel == TRUE) message("use_parallel argument will be ignored, as it is not applicable if method isn't rrollup, qrollup or zrollup")
   
   if(is.null(isoformRes)){
     if(method == 'rollup'){

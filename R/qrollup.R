@@ -31,9 +31,9 @@ qrollup<- function(pepData, qrollup_thresh, combine_fn = "median", parallel = TR
   if(is.null(pepData$e_meta)){
     stop("A mapping to proteins must be provided in order to use the protein_filter function.")
   }
-  # check that a qrollup_thresh is numeric and positive #
-  if(!is.numeric(qrollup_thresh) | qrollup_thresh<0){
-    stop("qrollup_thresh must be Numeric and greater than zero")
+  # check that a qrollup_thresh is numeric and between 0 and 1#
+  if(!is.numeric(qrollup_thresh) | qrollup_thresh > 1 | qrollup_thresh < 0){
+    stop("qrollup_thresh must be Numeric and between 0 and 1")
   }
   #check that combine_fn is one of 'mean', 'median'
   if(!(combine_fn %in% c('median', 'mean'))) stop("combine_fn has to be one of 'mean' or 'median'")
