@@ -38,7 +38,8 @@ pquant_mean <- function(pepData){
   temp = data.table:::merge.data.table(x = pro, y = pep, by = pep_id, all.x = F, all.y = T)
   temp = as.data.frame(temp, check.names=check_names)[,-which(names(temp)==pep_id)]
   DT = data.table(temp)
-  res = as.data.frame(DT[,lapply(.SD, mean, na.rm = T), by = pro_id], check.names=check_names)
+  res = as.data.frame(DT[,lapply(.SD, function(x){if(all(is.na(x))){mean(x)}else{mean(x, na.rm = T)}}), by = pro_id], check.names=check_names)
+  
   
   samp_id = attr(pepData, "cnames")$fdata_cname
   data_scale = attr(pepData, "data_info")$data_scale
@@ -52,7 +53,7 @@ pquant_mean <- function(pepData){
   else {e_meta = pepData$e_meta[,-which(names(pepData$e_meta)==pep_id)]} 
   
   
-  prodata = as.proData(e_data = data.frame(res, check.names=check_names), f_data = pepData$f_data,  e_meta = e_meta ,edata_cname = pro_id, fdata_cname = samp_id, emeta_cname = pro_id, data_scale = data_scale, data_norm = data_norm)
+  prodata = as.proData(e_data = data.frame(res, check.names=check_names), f_data = pepData$f_data,  e_meta = e_meta ,edata_cname = pro_id, fdata_cname = samp_id, emeta_cname = pro_id, data_scale = data_scale, data_norm = data_norm, check.names = check_names)
   
   #updating prodata attributes
   attr(prodata, "data_info")$norm_info = attr(pepData, "data_info")$norm_info
