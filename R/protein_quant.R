@@ -36,7 +36,6 @@ protein_quant<- function(pepData, method, isoformRes = NULL, qrollup_thresh = NU
   if(class(pepData) != "pepData") stop("pepData must be an object of class pepData")
   if(!(method %in% c('rollup', 'rrollup', 'qrollup', 'zrollup'))) stop("method must be one of, rollup, rrollup, qrollup, zrollup")
   if(!(combine_fn %in% c('median', 'mean'))) stop("combine_fn must be on of mean or median")
-  if(!is.null(isoformRes) & !is.null(pepData)) stop("if isoformRes argument is provided then pepData argument must be NULL")
   
   edata_cname<- attr(pepData, "cnames")$edata_cname
   fdata_cname<- attr(pepData, "cnames")$fdata_cname
@@ -60,7 +59,7 @@ protein_quant<- function(pepData, method, isoformRes = NULL, qrollup_thresh = NU
     if(method == 'rollup'){
       if(combine_fn == 'median'){
         results<- pquant_median(pepData)
-      }else{results = pquant_mean(pepData)}
+      }else{results = pmartRqc:::pquant_mean(pepData)}
     }
     if(method == 'rrollup'){
       results<- rrollup(pepData, combine_fn = combine_fn, parallel = use_parallel)
@@ -144,7 +143,7 @@ protein_quant<- function(pepData, method, isoformRes = NULL, qrollup_thresh = NU
     }
     
     if(method == 'qrollup'){
-      results<- qrollup(temp_pepdata, qrollup_thresh = qrollup_thresh, combine_fn = combine_fn, parallel = use_parallel)
+      results<- pmartRqc:::qrollup(temp_pepdata, qrollup_thresh = qrollup_thresh, combine_fn = combine_fn, parallel = use_parallel)
     }
     
     if(method == 'zrollup'){
