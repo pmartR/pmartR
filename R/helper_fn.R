@@ -15,7 +15,6 @@
 #' @rdname get_comparisons
 #' @export
 #'
-
 get_comparisons<- function(statRes){
 
   #check that statRes object is of 'statRes' class
@@ -29,6 +28,7 @@ get_comparisons<- function(statRes){
   return(result)
   
 }
+
 
 #' Return check.names attribute of omicsData object
 #' 
@@ -47,7 +47,6 @@ get_comparisons<- function(statRes){
 #' @rdname getchecknames
 #' @export
 #'
-
 getchecknames<- function(omicsData){
   # check that omicsData is of appropriate class #
   if(!class(omicsData) %in% c("pepData", "proData", "metabData", "lipidData")) stop("omicsData must be of class 'pepData', 'proData', 'metabData', or 'lipidData'")
@@ -76,7 +75,6 @@ getchecknames<- function(omicsData){
 #' @rdname setchecknames
 #' @export
 #'
-
 setchecknames<- function(omicsData, set_to = TRUE){
   # check that omicsData is of appropriate class #
   if(!class(omicsData) %in% c("pepData", "proData", "metabData", "lipidData")) stop("omicsData must be of class 'pepData', 'proData', 'metabData', or 'lipidData'")
@@ -88,6 +86,62 @@ setchecknames<- function(omicsData, set_to = TRUE){
   
   return(omicsData)
 }
+
+
+#' Get group info of omicsData object
+#' 
+#' This function returns the "group_DF" attribute of an omicsData object
+#' 
+#' @param omicsData an object of the class 'pepData', 'proData', 'metabData', or 'lipidData', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.
+#' 
+#' @return a data.frame containing omicsData object group info
+#' 
+#' @examples 
+#' dontrun{
+#' get_group_info(omicsData)
+#'
+#'}
+#' 
+#' @rdname get_group_info
+#' @export
+#'
+get_group_info<- function(omicsData){
+  # check that omicsData is of appropriate class #
+  if(!class(omicsData) %in% c("pepData", "proData", "metabData", "lipidData")) stop("omicsData must be of class 'pepData', 'proData', 'metabData', or 'lipidData'")
+  if(is.null(attr(omicsData, "group_DF"))) stop("group_designation has not been run on omicsData")
+  
+  res = attr(omicsData, "group_DF")
+  
+  return(res)
+}
+
+
+#' Get group table
+#' 
+#' This function returns a table with number of samples per group
+#' 
+#' @param omicsData an object of the class 'pepData', 'proData', 'metabData', or 'lipidData', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.
+#' 
+#' @return a table containing number of samples per group
+#' 
+#' @examples 
+#' dontrun{
+#' get_group_table(omicsData)
+#'
+#'}
+#' 
+#' @rdname get_group_table
+#' @export
+#'
+get_group_table<- function(omicsData){
+  # check that omicsData is of appropriate class #
+  if(!class(omicsData) %in% c("pepData", "proData", "metabData", "lipidData")) stop("omicsData must be of class 'pepData', 'proData', 'metabData', or 'lipidData'")
+  if(is.null(attr(omicsData, "group_DF"))) stop("group_designation has not been run on omicsData")
+  
+  #should the result be constructed from omicsData$f_data or from the group_DF attr?
+
+}
+
 
 #rollup combine_fn functions
 combine_fn_mean<- function(x){
