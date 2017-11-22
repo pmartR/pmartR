@@ -467,29 +467,17 @@ missingval_heatmap(mypepData, title_size = 20, title_plot = "Hey look at this!")
 
 ### Protein Quantitation Methods
 
-The pmartRqc package contains five methods for protein quantitation, pquant_mean, pquant_median, rrollup, qrollup and zrollup. These functions are applied within a wrapper function, `protein_quant`. The inputs of `protein_quant` are, a pepData object, a method (one of 'mean', 'median' or 'rrollup') and an optional isoformRes object which defaults to NULL. In the case where 'isoformRes' is left NULL, depending on the input for 'method', the correct protein quantitation method is applied to the input pepData object and a proData object is returned. 
+The pmartRqc package contains four methods for protein quantitation, rollup, rrollup, qrollup and zrollup. These functions are applied within a wrapper function, `protein_quant`. The inputs of `protein_quant` are, a pepData object, a method (one of 'rollup', 'rollup', 'qrollup' or 'zrollup'),an optional isoformRes object which defaults to NULL and 'combine_fn'(either mean or median). In the case where 'isoformRes' is left NULL, depending on the input for 'method', the correct protein quantitation method is applied to the input pepData object and a proData object is returned. 
 
 #### Rollup Methods
 
-In the rrollup method, all peptides that map to a single protein are first scaled based on a chosen reference peptide, which is the peptide with most observations. Next the average or mean of the scaled peptides is set as the relative protein abundance.
-The qrollup method starts with all peptides that map to a single protein. Next peptides are selected according to a user selected abundance cutoff value and the average or mean of the scaled peptides is set as the protein abundance.
-In the zrollup method, scaling is done similarly to the  z-score formula (except with medians instead of means). The scaling formula is applied to peptides that map to a single protein and then mean or median of the scaled peptides is set as protein abundance. 
-
-#### Pquant Mean and Median
-
-The pquant_mean and pquant_median methods are similar to the rollup methods, except there is no scaling involved in these methods. Either the mean or median is applied to all peptides that map to a single protein to obtain protein abundance.
+In the rrollup method, all peptides that map to a single protein are scaled based on a chosen reference peptide, which is the peptide with most observations. Next the average or mean of the scaled peptides is set as the relative protein abundance.
+The qrollup method starts with all peptides that map to a single protein. Next peptides are chosen according to an abundance cutoff value and the average or mean of the scaled peptides is set as the protein abundance.
+In the zrollup method, scaling is done similarly to the  z-score formula (except with medians instead of means). The scaling formula is applied to peptides that map to a single protein and then the mean or median of the scaled peptides is set as protein abundance (from DAnTE article). The rollup method is similar to rrollup method, except there is no scaling involved in these methods. Either the mean or median is applied to all peptides that map to a single protein to obtain protein abundance.
 
 
 ```{r protein_quant}
-print(mypepData)
 
-mypepdata_median<- protein_quant(pepData = mypepData, method = "median")
-print(mypepdata_median)
-rm(mypepdata_median)
-
-mypepdata_rrollup<- protein_quant(pepData = mypepData, method = "rrollup")
-print(mypepdata_rrollup)
-rm(mypepdata_rrollup)
 
 ```
 
