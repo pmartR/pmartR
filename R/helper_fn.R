@@ -138,8 +138,10 @@ get_group_table<- function(omicsData){
   if(!class(omicsData) %in% c("pepData", "proData", "metabData", "lipidData")) stop("omicsData must be of class 'pepData', 'proData', 'metabData', or 'lipidData'")
   if(is.null(attr(omicsData, "group_DF"))) stop("group_designation has not been run on omicsData")
   
-  #should the result be constructed from omicsData$f_data or from the group_DF attr?
-
+  #should the result be constructed from omicsData$f_data or from the group_DF attr? if so...
+  group = attr(omicsData, "group_DF")$Group
+  
+  return(table(group))
 }
 
 
