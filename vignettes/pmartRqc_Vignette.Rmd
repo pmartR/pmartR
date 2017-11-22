@@ -477,7 +477,15 @@ In the zrollup method, scaling is done similarly to the  z-score formula (except
 
 
 ```{r protein_quant}
+print(mypepData)
 
+mypepdata_median<- protein_quant(pepData = mypepData, method = "rollup", combine_fn = "median")
+print(mypepdata_median)
+rm(mypepdata_median)
+
+mypepdata_rrollup<- protein_quant(pepData = mypepData, method = "rrollup")
+print(mypepdata_rrollup)
+rm(mypepdata_rrollup)
 
 ```
 
