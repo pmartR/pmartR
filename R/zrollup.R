@@ -1,25 +1,26 @@
-#' Applies rrollup function 
+#' Applies zrollup function 
 #' 
-#' This function applies the rrollup method to a pepData object for each unique protein and returns a proData object. 
+#' This function applies the zrollup method to a pepData object for each unique protein and returns a proData object. 
 #' 
 #' @param pepData an omicsData object of class 'pepData'
 #' @param combine_fn logical indicating what combine_fn to use, defaults to median, other option is mean
-#' @param parallel logical indicating whether or not to use "doParallel" loop in applying rrollup function. Defaults to TRUE.
+#' @param parallel logical indicating whether or not to use "doParallel" loop in applying zrollup function. Defaults to TRUE.
 #' 
 #' @return an omicsData object of class 'proData'
 #' 
-#' @details In the rrollup method, peptides are scaled based on a reference peptide and protein abundance is set as the mean of these scaled peptides. 
+#' @details In the zrollup method, peptides are scaled as, pep_scaled = (pep - median)/sd, and protein abundance is set as the mean of these scaled peptides.  
+#'  
 #' @examples 
 #' dontrun{
 #' library(pmartRdata)
 #' data(pep_object)
-#' result = rrollup(pepData = pep_object) 
+#' result = zrollup(pepData = pep_object) 
 #'}
 #' 
-#' @rdname rrollup
+#' @rdname zrollup
 #' 
 
-rrollup<- function(pepData, combine_fn = "median", parallel = TRUE){
+zrollup<- function(pepData, combine_fn = "median", parallel = TRUE){
   check_names = getchecknames(pepData)
   
   # check that pepData is of appropraite class #
@@ -29,6 +30,7 @@ rrollup<- function(pepData, combine_fn = "median", parallel = TRUE){
   if(is.null(pepData$e_meta)){
     stop("A mapping to proteins must be provided in order to use the protein_filter function.")
   }
+  
   #check that combine_fn is one of 'mean', 'median'
   if(!(combine_fn %in% c('median', 'mean'))) stop("combine_fn has to be one of 'mean' or 'median'")
   
@@ -63,37 +65,22 @@ rrollup<- function(pepData, combine_fn = "median", parallel = TRUE){
       current_subset<- temp[row_ind,]
       current_subset<- current_subset[,-which(names(temp) == pro_id)]
       
-      #### Perform R_Rollup ####
+      #### Perform Z_Rollup ####
       ## store number of peptides ##
       num_peps = nrow(current_subset)
       
       res = matrix(NA, nrow = 1, ncol =  ncol(current_subset))
-      ## if only 1 peptide, set the protein value to the peptide ##
-      if(num_peps==1){
-        protein_val = unlist(current_subset)
-      }else{
-        ## Step 1: Select Reference Peptide -- peptide with least amount of missing data ##
-        na.cnt = apply(is.na(current_subset),1,sum)
-        least.na = which(na.cnt == min(na.cnt))
-        
-        ## If tied, select one with highest median abundance##
-        if(length(least.na)>1){
-          mds = apply(current_subset,1,median,na.rm=T)[least.na]
-          least.na = least.na[which(mds==max(mds))]		
-        }
-        prot_val = unlist(current_subset[least.na,])
-        
-        ## Step 2: Ratio all peptides to the reference.  Since the data is on the log scale, this is the difference ##
-        scaling_factor = apply(matrix(prot_val, nrow = num_peps, ncol = ncol(current_subset), byrow=T) - current_subset,1,median,na.rm=T)
-        
-        ## Step 3: Use the median of the ratio as a scaling factor for each peptide ##
-        x_scaled = current_subset + matrix(scaling_factor, nrow = num_peps, ncol = ncol(current_subset))
-        
-        ## Step 4: Set Abundance as Median Peptide Abundance ##
-        protein_val = apply(x_scaled, 2, chosen_combine_fn)
-      }
+      ## Step 1: Compute mean and sd of peptides ##
+      mds = apply(current_subset, 1, median, na.rm = T)
+      sds = apply(current_subset, 1, sd, na.rm = T)
       
-      res[1,] = protein_val
+      ## Step 2: Scale peptide data as pep_scaled = (pep - median)/sd
+      medians_mat = matrix(mds, nrow = num_peps, ncol = ncol(current_subset), byrow = F)
+      standiv_mat = matrix(sds, nrow = num_peps, ncol = ncol(current_subset), byrow = F)
+      
+      peptides_scaled = apply((current_subset - medians_mat)/standiv_mat, 2, chosen_combine_fn)
+      
+      res[1,] = peptides_scaled
       res<- data.frame(res)
       names(res)<- names(current_subset)
       
@@ -129,8 +116,7 @@ rrollup<- function(pepData, combine_fn = "median", parallel = TRUE){
     attr(prodata, "imdanova")<- attr(pepData, "imdanova")
   }
   
-  #applying rrollup without doParallel
-  
+  #applying zrollup without doParallel
   else{
     final_list<- vector("list", length(unique_proteins))
     
@@ -140,37 +126,23 @@ rrollup<- function(pepData, combine_fn = "median", parallel = TRUE){
       current_subset<- temp[row_ind,]
       current_subset<- current_subset[,-which(names(temp) == pro_id)]
       
-      #### Perform R_Rollup ####
+      #### Perform Z_Rollup ####
       ## store number of peptides ##
       num_peps = nrow(current_subset)
       
       res = matrix(NA, nrow = 1, ncol =  ncol(current_subset))
-      ## if only 1 peptide, set the protein value to the peptide ##
-      if(num_peps==1){
-        protein_val = unlist(current_subset)
-      }else{
-        ## Step 1: Select Reference Peptide -- peptide with least amount of missing data ##
-        na.cnt = apply(is.na(current_subset),1,sum)
-        least.na = which(na.cnt == min(na.cnt))
-        
-        ## If tied, select one with highest median abundance##
-        if(length(least.na)>1){
-          mds = apply(current_subset,1,median,na.rm=T)[least.na]
-          least.na = least.na[which(mds==max(mds))]		
-        }
-        prot_val = unlist(current_subset[least.na,])
-        
-        ## Step 2: Ratio all peptides to the reference.  Since the data is on the log scale, this is the difference ##
-        scaling_factor = apply(matrix(prot_val, nrow = num_peps, ncol = ncol(current_subset), byrow=T) - current_subset,1,median,na.rm=T)
-        
-        ## Step 3: Use the median of the ratio as a scaling factor for each peptide ##
-        x_scaled = current_subset + matrix(scaling_factor, nrow = num_peps, ncol = ncol(current_subset))
-        
-        ## Step 4: Set Abundance as Median Peptide Abundance ##
-        protein_val = apply(x_scaled, 2, chosen_combine_fn)
-      }
       
-      res[1,] = protein_val
+      ## Step 1: Compute mean and sd of peptides ##
+      mds = apply(current_subset, 1, median, na.rm = T)
+      sds = apply(current_subset, 1, sd, na.rm = T)
+      
+      ## Step 2: Scale peptide data as pep_scaled = (pep - median)/sd
+      medians_mat = matrix(mds, nrow = num_peps, ncol = ncol(current_subset), byrow = F)
+      standiv_mat = matrix(sds, nrow = num_peps, ncol = ncol(current_subset), byrow = F)
+      
+      peptides_scaled = apply((current_subset - medians_mat)/standiv_mat, 2, chosen_combine_fn)
+      
+      res[1,] = peptides_scaled
       res<- data.frame(res)
       names(res)<- names(current_subset)
       

@@ -19,6 +19,8 @@
 #' norm_info \tab Default value is NULL. When a normalization is applied to the data, this becomes populated with a list containing the normalization function, normalization subset and subset parameters, the location and scale parameters used to normalize the data, and the location and scale parameters used to backtransform the data (if applicable). \cr
 #' \tab \cr
 #' data_types \tab Character string describing the type of data (e.g.'Positive ion'). Default value is NULL. \cr
+#' \tab \cr
+#' check.names \tab Logical defaults to TRUE. Indicates whether 'check.names' attribute of returned omicsData object is TRUE or FALSE. \cr
 #' }
 #' Computed values included in the \code{data_info} attribute are as follows:
 #' \tabular{ll}{
@@ -57,7 +59,7 @@ as.pepData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname, 
 ## peptide data ##
 .as.pepData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname,
                         emeta_cname = NULL, data_scale = "abundance",
-                        data_norm = FALSE, norm_info = NULL, data_types=NULL){
+                        data_norm = FALSE, norm_info = NULL, data_types=NULL, check.names = TRUE){
 
   # initial checks #
 
@@ -116,15 +118,7 @@ as.pepData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname, 
 
   # check that data_scale is one of the acceptable options #
   if(!(data_scale %in% c('log2', 'log10', 'log', 'count', 'abundance'))) stop(paste(data_scale, " is not a valid option for 'data_scale'. See details of as.pepData for specifics.", sep=""))
-  
-  #check that e_data does not contain zero entries if data_scale is log
-  if(data_scale %in% c('log2', 'log10', 'log')){
-    edata<- e_data[, -which(names(e_data) == edata_cname)]
-    zeros<- apply(edata, 1, function(row) length(which(row == 0)))
-    
-    if(sum(zeros) > 0) stop("if 'data_scale' is log, e_data cannot contain zeros")
-  }
-  
+
   # if e_meta is NULL, set emeta_cname to NULL #
   if(is.null(e_meta)){
     emeta_cname = NULL
@@ -169,7 +163,10 @@ as.pepData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname, 
 
   # set data information attributes #
   attr(res, "data_info") = list(data_scale = data_scale, data_norm = data_norm, norm_info = norm_info, num_edata = num_edata, num_miss_obs = num_miss_obs, num_emeta = num_emeta, prop_missing = prop_missing, num_samps = num_samps, data_types = data_types)
-
+  
+  #set check.names attribute #
+  attr(res, "check.names") = check.names 
+  
   # set meta data attributes #
   if(!is.null(e_meta)){
     attr(res, "meta_info") = TRUE

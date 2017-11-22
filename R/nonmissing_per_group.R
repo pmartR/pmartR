@@ -7,6 +7,7 @@
 #' @param groupDF data.frame created by \code{group_designation} with columns for the sample identifier and the designated group. Not required if omicsData is provided.
 #' @param cname_id character string specifying the name of the column containing the biomolecule identifiers in \code{e_data} and \code{e_meta} (if applicable). Not required if omicsData is provided.
 #' @param samp_id character string specifying the name of the column containing the sample identifiers in \code{groupDF}. Not required if omicsData is provided.
+#' @param check.names Logical, determines whether check.names argument of the data.frame function is TRUE or FALSE. Not required if omicsData is provided. 
 #'
 #' @return a list of length two. The first element giving the total number of possible samples for each group. The second element giving a data.frame with the first column giving the peptide and the second through kth columns giving the number of non-missing observations for each of the \code{k} groups.
 #'
@@ -23,7 +24,7 @@
 #'
 #' 
 #'
-nonmissing_per_group <- function(omicsData = NULL, e_data = NULL, groupDF=NULL, cname_id=NULL, samp_id=NULL){
+nonmissing_per_group <- function(omicsData = NULL, e_data = NULL, groupDF=NULL, cname_id=NULL, samp_id=NULL, check.names = NULL){
 
   # NOTE: Keep e_data & groupDF in this function because it gets called from within other functions and on the output of other functions that only return e_data (modifying all of those is too big of a task to handle, at least for the time being. -KS Jan 14, 2016)
 
@@ -35,6 +36,8 @@ nonmissing_per_group <- function(omicsData = NULL, e_data = NULL, groupDF=NULL, 
 
 
   if(!is.null(omicsData)){
+    check_names = getchecknames(omicsData)
+    
     e_data <- omicsData$e_data
     groupDF <- attr(omicsData, "group_DF")
 
@@ -46,6 +49,9 @@ nonmissing_per_group <- function(omicsData = NULL, e_data = NULL, groupDF=NULL, 
 
     if(is.null(samp_id)) stop("samp_id must be provided if omicsData is not")
     if(is.null(cname_id)) stop("cname_id must be provided if omicsData is not")
+    if(is.null(check.names)) stop("check.names must be provided if omicsData is not")
+    
+    check_names = check.names
   }
 
   # check that groupDF is not NULL #
@@ -96,11 +102,11 @@ nonmissing_per_group <- function(omicsData = NULL, e_data = NULL, groupDF=NULL, 
   
   nonmissing<- nonmissing_per_grp(as.matrix(temp_data3),group_dat)
   
-  nonmissing<- data.frame(nonmissing, check.names = FALSE)
+  nonmissing<- data.frame(nonmissing, check.names = check_names)
   
   colnames(nonmissing)<- unique(group_dat)
   
-  nonmiss_totals<- data.frame(Mass_Tag_ID,nonmissing,stringsAsFactors = FALSE, check.names = FALSE)
+  nonmiss_totals<- data.frame(Mass_Tag_ID,nonmissing,stringsAsFactors = FALSE, check.names = check_names)
   
   names(nonmiss_totals)[1] <- cname_id
   

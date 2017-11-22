@@ -4,8 +4,7 @@
 #'
 #' @param omicsData an object of the class 'pepData', 'proData', 'metabData', or 'lipidData', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.
 #' @param data_scale a character string indicating the type of transformation to be applied to the data. Valid values are: 'log2', 'log', 'log10', or 'abundance'. A value of 'abundance' indicates the data has previously undergone one of the log transformations and should be transformed back to raw values with no transformation applied.
-#' @param check.names logical. If TRUE then the names of the variables in the data frame are checked to ensure that they are syntactically valid variable names and are not duplicated. If necessary they are adjusted (by \code{\link{make.names}}) so that they are.
-#'
+#' 
 #' @details This function is intended to be used before analysis of the data begins. Data are typically analyzed on a log scale.
 #'
 #' @return data object of the same class as omicsData
@@ -20,7 +19,7 @@
 #' @author Kelly Stratton, Natalie Heller
 #'
 #' @export
-edata_transform <- function(omicsData, data_scale, check.names=TRUE){
+edata_transform <- function(omicsData, data_scale){
   ## some initial checks ##
 
   # check that omicsData is of appropriate class #
@@ -54,8 +53,9 @@ edata_transform <- function(omicsData, data_scale, check.names=TRUE){
 #' @export
 #' @name edata_transform
 #' @rdname edata_transform
-edata_transform.pepData <- function(omicsData, data_scale, check.names=TRUE){
-
+edata_transform.pepData <- function(omicsData, data_scale){
+  
+  check_names = getchecknames(omicsData)
   edata_id = attr(omicsData, "cnames")$edata_cname
 
   edata <- omicsData$e_data
@@ -121,7 +121,7 @@ edata_transform.pepData <- function(omicsData, data_scale, check.names=TRUE){
   }
 
   # add the identifier column back #
-  edata_new <- data.frame(edata_id=feature_names, edata_new, check.names=check.names)
+  edata_new <- data.frame(edata_id=feature_names, edata_new, check.names=check_names)
 
   if(is.null(omicsData$e_meta)){
     emeta_cname = NULL
@@ -130,7 +130,7 @@ edata_transform.pepData <- function(omicsData, data_scale, check.names=TRUE){
   }
 
   # create an updated pepData object #
-  updated_data <- as.pepData(e_data = edata_new, f_data = omicsData$f_data, e_meta = omicsData$e_meta, edata_cname = edata_id, emeta_cname=emeta_cname, fdata_cname = attr(omicsData, "cnames")$fdata_cname, data_scale = data_scale, data_norm = attr(omicsData, "data_info")$data_norm, norm_info=attr(omicsData, "data_info")$norm_info, data_types=attr(omicsData, "data_info")$data_types)
+  updated_data <- as.pepData(e_data = edata_new, f_data = omicsData$f_data, e_meta = omicsData$e_meta, edata_cname = edata_id, emeta_cname=emeta_cname, fdata_cname = attr(omicsData, "cnames")$fdata_cname, data_scale = data_scale, data_norm = attr(omicsData, "data_info")$data_norm, norm_info=attr(omicsData, "data_info")$norm_info, data_types=attr(omicsData, "data_info")$data_types, check.names = check_names)
 
   attributes(updated_data)$group_DF <- attributes(omicsData)$group_DF
   attributes(updated_data)$filters <- attributes(omicsData)$filters
@@ -145,8 +145,9 @@ edata_transform.pepData <- function(omicsData, data_scale, check.names=TRUE){
 #' @export
 #' @name edata_transform
 #' @rdname edata_transform
-edata_transform.proData <- function(omicsData, data_scale, check.names=TRUE){
+edata_transform.proData <- function(omicsData, data_scale){
 
+  check_names = getchecknames(omicsData)
   edata_id = attr(omicsData, "cnames")$edata_cname
 
   edata <- omicsData$e_data
@@ -213,7 +214,7 @@ edata_transform.proData <- function(omicsData, data_scale, check.names=TRUE){
 
 
   # add the identifier column back #
-  edata_new <- data.frame(edata_id=feature_names, edata_new, check.names=check.names)
+  edata_new <- data.frame(edata_id=feature_names, edata_new, check.names=check_names)
 
   if(is.null(omicsData$e_meta)){
     emeta_cname = NULL
@@ -222,7 +223,7 @@ edata_transform.proData <- function(omicsData, data_scale, check.names=TRUE){
   }
 
   # create an updated proData object #
-  updated_data <- as.proData(e_data = edata_new, f_data = omicsData$f_data, e_meta = omicsData$e_meta, edata_cname = edata_id, emeta_cname=emeta_cname, fdata_cname = attr(omicsData, "cnames")$fdata_cname, data_scale = data_scale, data_norm = attr(omicsData, "data_info")$data_norm, data_types=attr(omicsData, "data_info")$data_types)
+  updated_data <- as.proData(e_data = edata_new, f_data = omicsData$f_data, e_meta = omicsData$e_meta, edata_cname = edata_id, emeta_cname=emeta_cname, fdata_cname = attr(omicsData, "cnames")$fdata_cname, data_scale = data_scale, data_norm = attr(omicsData, "data_info")$data_norm, data_types=attr(omicsData, "data_info")$data_types, check.names = check_names)
 
   attributes(updated_data)$group_DF <- attributes(omicsData)$group_DF
   attributes(updated_data)$filters <- attributes(omicsData)$filters
@@ -237,8 +238,9 @@ edata_transform.proData <- function(omicsData, data_scale, check.names=TRUE){
 #' @export
 #' @name edata_transform
 #' @rdname edata_transform
-edata_transform.metabData <- function(omicsData, data_scale, check.names=TRUE){
+edata_transform.metabData <- function(omicsData, data_scale){
 
+  check_names = getchecknames(omicsData)
   edata_id = attr(omicsData, "cnames")$edata_cname
 
   edata <- omicsData$e_data
@@ -305,7 +307,7 @@ edata_transform.metabData <- function(omicsData, data_scale, check.names=TRUE){
 
 
   # add the identifier column back #
-  edata_new <- data.frame(edata_id=feature_names, edata_new, check.names=check.names)
+  edata_new <- data.frame(edata_id=feature_names, edata_new, check.names=check_names)
 
   if(is.null(omicsData$e_meta)){
     emeta_cname = NULL
@@ -314,7 +316,7 @@ edata_transform.metabData <- function(omicsData, data_scale, check.names=TRUE){
   }
 
   # create an updated metabData object #
-  updated_data <- as.metabData(e_data = edata_new, f_data = omicsData$f_data, e_meta = omicsData$e_meta, edata_cname = edata_id, emeta_cname=emeta_cname, fdata_cname = attr(omicsData, "cnames")$fdata_cname, data_scale = data_scale, data_norm = attr(omicsData, "data_info")$data_norm, data_types=attr(omicsData, "data_info")$data_types)
+  updated_data <- as.metabData(e_data = edata_new, f_data = omicsData$f_data, e_meta = omicsData$e_meta, edata_cname = edata_id, emeta_cname=emeta_cname, fdata_cname = attr(omicsData, "cnames")$fdata_cname, data_scale = data_scale, data_norm = attr(omicsData, "data_info")$data_norm, data_types=attr(omicsData, "data_info")$data_types, check.names = check_names)
 
   attributes(updated_data)$group_DF <- attributes(omicsData)$group_DF
   attributes(updated_data)$filters <- attributes(omicsData)$filters
@@ -328,8 +330,9 @@ edata_transform.metabData <- function(omicsData, data_scale, check.names=TRUE){
 #' @export
 #' @name edata_transform
 #' @rdname edata_transform
-edata_transform.lipidData <- function(omicsData, data_scale, check.names=TRUE){
+edata_transform.lipidData <- function(omicsData, data_scale){
 
+  check_names = getchecknames(omicsData)
   edata_id = attr(omicsData, "cnames")$edata_cname
 
   edata <- omicsData$e_data
@@ -396,7 +399,7 @@ edata_transform.lipidData <- function(omicsData, data_scale, check.names=TRUE){
 
 
   # add the identifier column back #
-  edata_new <- data.frame(edata_id=feature_names, edata_new, check.names=check.names)
+  edata_new <- data.frame(edata_id=feature_names, edata_new, check.names=check_names)
 
   if(is.null(omicsData$e_meta)){
     emeta_cname = NULL
@@ -405,7 +408,7 @@ edata_transform.lipidData <- function(omicsData, data_scale, check.names=TRUE){
   }
 
   # create an updated lipidData object #
-  updated_data <- as.lipidData(e_data = edata_new, f_data = omicsData$f_data, e_meta = omicsData$e_meta, edata_cname = edata_id, emeta_cname=emeta_cname, fdata_cname = attr(omicsData, "cnames")$fdata_cname, data_scale = data_scale, data_norm = attr(omicsData, "data_info")$data_norm, data_types=attr(omicsData, "data_info")$data_types)
+  updated_data <- as.lipidData(e_data = edata_new, f_data = omicsData$f_data, e_meta = omicsData$e_meta, edata_cname = edata_id, emeta_cname=emeta_cname, fdata_cname = attr(omicsData, "cnames")$fdata_cname, data_scale = data_scale, data_norm = attr(omicsData, "data_info")$data_norm, data_types=attr(omicsData, "data_info")$data_types, check.names = check_names)
 
   attributes(updated_data)$group_DF <- attributes(omicsData)$group_DF
   attributes(updated_data)$filters <- attributes(omicsData)$filters

@@ -36,7 +36,6 @@
 #' plot(result, type = "Both", palette = "Set2")
 #'}
 #' 
-#' 
 #' @rdname plot-naRes
 #' @export
 #'

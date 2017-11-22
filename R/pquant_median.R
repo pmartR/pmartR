@@ -19,6 +19,8 @@
 #pquant_median for pmartRqc pep_object
 
 pquant_median <- function(pepData){
+  check_names = getchecknames(pepData)
+  
   # check that pepData is of appropraite class #
   if(class(pepData) != "pepData") stop("pepData is not an object of the appropriate class")
   
@@ -33,9 +35,9 @@ pquant_median <- function(pepData){
   pep = data.table::data.table(pepData$e_data)
   pro = data.table::data.table(pepData$e_meta[,c(pep_id, pro_id)])
   temp = data.table:::merge.data.table(x = pro, y = pep, by = pep_id, all.x = F, all.y = T)
-  temp = as.data.frame(temp, check.names=FALSE)[,-which(names(temp)==pep_id)]
+  temp = as.data.frame(temp, check.names=check_names)[,-which(names(temp)==pep_id)]
   DT = data.table::data.table(temp)
-  res = as.data.frame(DT[,lapply(.SD, median, na.rm = T), by = pro_id], check.names=FALSE)
+  res = as.data.frame(DT[,lapply(.SD, median, na.rm = T), by = pro_id], check.names=check_names)
   
   samp_id = attr(pepData, "cnames")$fdata_cname
   data_scale = attr(pepData, "data_info")$data_scale
@@ -48,7 +50,7 @@ pquant_median <- function(pepData){
   
   else {e_meta = pepData$e_meta[,-which(names(pepData$e_meta)==pep_id)]} 
 
-  prodata = as.proData(e_data = data.frame(res, check.names=FALSE), f_data = pepData$f_data, e_meta = e_meta, edata_cname = pro_id, fdata_cname = samp_id, emeta_cname = pro_id, data_scale = data_scale, data_norm = data_norm)
+  prodata = as.proData(e_data = data.frame(res, check.names=check_names), f_data = pepData$f_data, e_meta = e_meta, edata_cname = pro_id, fdata_cname = samp_id, emeta_cname = pro_id, data_scale = data_scale, data_norm = data_norm, check.names = check_names)
   
   #updating prodata attributes
   attr(prodata, "data_info")$norm_info = attr(pepData, "data_info")$norm_info
