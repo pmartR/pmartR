@@ -231,7 +231,7 @@ normalize <- function(omicsData, subset_fn, norm_fn, params = NULL, apply_norm =
     
     if(!is.null(min_prop)){
       prop_features_calc = attributes(omicsData)$norm_info$prop_features_calc
-      if(prop_features_calc < min_prop) message(paste("prop_features_calc: ", prop_features_calc,", cannot be less than min_prop: ", min_prop, sep = ""))
+      if(prop_features_calc < min_prop) stop(paste("prop_features_calc: ", prop_features_calc,", cannot be less than min_prop: ", min_prop, sep = ""))
     }
   }
   
