@@ -36,97 +36,24 @@ summarize<- function(omicsData, groupvar = NULL, by){
   fdata_cname_id = which(names(fdata) == fdata_cname)
   
   if(by == 'sample'){
-    if(is.null(groupvar)){
-      if(is.null(attr(omicsData, "group_DF"))){
-        #when groupvar is NULL and group_designation is NULL, we calculate metric for each column 
-        avg = as.data.frame(edata[, -edata_cname_id] %>% summarise_all(funs(mean), na.rm = T))
-        sd = as.data.frame(edata[, -edata_cname_id] %>% summarise_all(funs(sd), na.rm = T))
-        mds = as.data.frame(edata[, -edata_cname_id] %>% summarise_all(funs(median), na.rm = T))
-        pct_obs = as.data.frame(t(apply(edata[,-edata_cname_id], 2, function(x){sum(!is.na(x))/length(x)})))
-        min = as.data.frame(edata[, -edata_cname_id] %>% summarise_all(funs(min), na.rm = T))
-        max = as.data.frame(edata[, -edata_cname_id] %>% summarise_all(funs(max), na.rm = T))
+    #check that groupvar is NULL, groupvar is only used when by == 'molecule'
+    if(!is.null(groupvar)) stop("groupvar is only used when by == 'molecule'")
+  
+    avg = as.data.frame(apply(edata[,-edata_cname_id], 2, function(x){if(all(is.na(x))){mean(x)}else{mean(x, na.rm = T)}}))
+    names(avg)[1]<- "mean"
+    sd = as.data.frame(apply(edata[,-edata_cname_id], 2, sd, na.rm = T))
+    names(sd)[1]<- "sd"
+    mds = as.data.frame(apply(edata[,-edata_cname_id], 2, median, na.rm = T))
+    names(mds)[1]<- "median"
+    pct_obs = as.data.frame(apply(edata[,-edata_cname_id], 2, function(x){sum(!is.na(x))/length(x)}))
+    names(pct_obs)[1]<- "pct_obs"
+    min = as.data.frame(apply(edata[,-edata_cname_id], 2, min, na.rm = T))
+    names(min)[1]<- "min"
+    max = as.data.frame(apply(edata[,-edata_cname_id], 2, max, na.rm = T))
+    names(max)[1]<- "max"
         
-        res_list = list(mean = avg, sd = sd, median = mds, pct_obs = pct_obs, min = min , max = max)
-        class(res_list)<- "dataRes"
-        
-      }else if(!is.null(attr(omicsData, "group_DF"))){
-        #if groupvar = NULL and group_designation has been run, groupvar gets set to attr(omicsData, "group_DF")$Group
-        edata_melt = reshape2::melt(edata, id.vars = edata_cname)
-        names(edata_melt)[2]<- fdata_cname
-        edata_melt = merge.data.frame(edata_melt, attr(omicsData, "group_DF"), by = fdata_cname)
-        edata_melt = edata_melt[, -which(names(edata_melt) == fdata_cname)]
-        
-        #calculate metrics for samples belonging to each group
-        avg = as.data.frame(edata_melt %>% group_by(Group) %>% summarise(mean = mean(value, na.rm = T)))
-        sd = as.data.frame(edata_melt %>% group_by(Group) %>% summarise(sd = sd(value, na.rm = T)))
-        mds = as.data.frame(edata_melt %>% group_by(Group) %>% summarise(mds = median(value, na.rm = T)))
-        pct_obs = as.data.frame(edata_melt %>% group_by(Group) %>% summarise(pct_obs = sum(!is.na(value))/length(value)))
-        min = as.data.frame(edata_melt %>% group_by(Group) %>% summarise(min = min(value, na.rm = T)))
-        max = as.data.frame(edata_melt %>% group_by(Group) %>% summarise(max = max(value, na.rm = T)))
-        
-        res_list = list(mean = avg, sd = sd, median = mds, pct_obs = pct_obs, min = min , max = max)
-        class(res_list)<- "dataRes"
-      }
-    }else if(length(groupvar) == 1){
-      ####case where groupvar is provided and has length 1####
-      if(any(groupvar %in% names(fdata)) == F) stop("groupvar must be in omicsData f_data")
-      temp_fdata = fdata[, c(fdata_cname_id, which(names(fdata) == groupvar))]
-      names(temp_fdata)[2]<- "Group"
-      
-      #rearranging edata
-      edata_melt = reshape2::melt(edata, id.vars = edata_cname)
-      names(edata_melt)[2]<- fdata_cname
-      edata_melt = merge.data.frame(edata_melt, temp_fdata, by = fdata_cname)
-      edata_melt = edata_melt[, -which(names(edata_melt) == fdata_cname)]
-      
-      #calculate metrics for samples belonging to each group
-      avg = as.data.frame(edata_melt %>% group_by(Group) %>% summarise(mean = mean(value, na.rm = T)))
-      sd = as.data.frame(edata_melt %>% group_by(Group) %>% summarise(sd = sd(value, na.rm = T)))
-      mds = as.data.frame(edata_melt %>% group_by(Group) %>% summarise(mds = median(value, na.rm = T)))
-      pct_obs = as.data.frame(edata_melt %>% group_by(Group) %>% summarise(pct_obs = sum(!is.na(value))/length(value)))
-      min = as.data.frame(edata_melt %>% group_by(Group) %>% summarise(min = min(value, na.rm = T)))
-      max = as.data.frame(edata_melt %>% group_by(Group) %>% summarise(max = max(value, na.rm = T)))
-      
-      res_list = list(mean = avg, sd = sd, median = mds, pct_obs = pct_obs, min = min , max = max)
-      class(res_list)<- "dataRes"
-      
-    }else if(length(groupvar) == 2){
-      ####case where length of groupvar is 2####
-      if (length(groupvar) > 2) stop("No more than two groupvar can be provided")
-      if(any(groupvar %in% names(fdata)) == F) stop("groupvar must be in omicsData f_data")
-      
-      group_vars = fdata[, names(fdata)%in% groupvar]
-      group_vars <- apply(group_vars, 2, as.character)
-      
-      # create a group variable and paste grouvar levels together for samples #
-      # samples with a value of NA for either groupvar will have a Group value of NA #
-      Group = rep(NA, nrow(fdata))
-      
-      # identify samples that will have a Group membership that is not missing #
-      nonna.group = (!is.na(group_vars[,1]) & !is.na(group_vars[,2]))
-      Group[nonna.group] = paste(as.character(group_vars[nonna.group,1]), as.character(group_vars[nonna.group,2]), sep = "_")
-      
-      # create output formatted with first column being fdata_cname and second column group id #
-      output = data.frame(Sample.ID = fdata[,fdata_cname], Group = Group)
-      names(output)[1] = fdata_cname
-      
-      #rearranging edata
-      edata_melt = reshape2::melt(omicsData$e_data, id.vars = edata_cname)
-      names(edata_melt)[2]<- fdata_cname
-      edata_melt = merge.data.frame(edata_melt, output, by = fdata_cname)
-      edata_melt = edata_melt[, -which(names(edata_melt) == fdata_cname)]
-      
-      #calculate metrics for samples belonging to each group
-      avg = as.data.frame(edata_melt %>% group_by(Group) %>% summarise(mean = mean(value, na.rm = T)))
-      sd = as.data.frame(edata_melt %>% group_by(Group) %>% summarise(sd = sd(value, na.rm = T)))
-      mds = as.data.frame(edata_melt %>% group_by(Group) %>% summarise(mds = median(value, na.rm = T)))
-      pct_obs = as.data.frame(edata_melt %>% group_by(Group) %>% summarise(pct_obs = sum(!is.na(value))/length(value)))
-      min = as.data.frame(edata_melt %>% group_by(Group) %>% summarise(min = min(value, na.rm = T)))
-      max = as.data.frame(edata_melt %>% group_by(Group) %>% summarise(max = max(value, na.rm = T)))
-      
-      res_list = list(mean = avg, sd = sd, median = mds, pct_obs = pct_obs, min = min , max = max)
-      class(res_list)<- "dataRes"
-    }
+    res_list = list(mean = avg, sd = sd, median = mds, pct_obs = pct_obs, min = min , max = max)
+    class(res_list)<- "dataRes"
   }
   
   if(by == "molecule"){
