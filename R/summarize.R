@@ -54,6 +54,7 @@ summarize<- function(omicsData, groupvar = NULL, by){
         
     res_list = list(mean = avg, sd = sd, median = mds, pct_obs = pct_obs, min = min , max = max)
     class(res_list)<- "dataRes"
+    attr(res_list, "by")<- by
   }
   
   if(by == "molecule"){
@@ -75,6 +76,7 @@ summarize<- function(omicsData, groupvar = NULL, by){
         
         res_list = list(mean = avg, sd = sd, median = mds, pct_obs = pct_obs, min = min , max = max)
         class(res_list)<- "dataRes"
+        attr(res_list, "by")<- by
         
       }else if(!is.null(attr(omicsData, "group_DF"))){
         #when groupvar is NULL but group_designation has been run
@@ -108,6 +110,7 @@ summarize<- function(omicsData, groupvar = NULL, by){
         
         res_list = list(mean = avg, sd = std_div, median = mds, pct_obs = pct_obs, min = mins , max = maxs)
         class(res_list)<- "dataRes"
+        attr(res_list, "by")<- by
       }
     }else if(length(groupvar) == 1){
       ####case where groupvar is provided and has length 1####
@@ -146,6 +149,7 @@ summarize<- function(omicsData, groupvar = NULL, by){
       
       res_list = list(mean = avg, sd = std_div, median = mds, pct_obs = pct_obs, min = mins , max = maxs)
       class(res_list)<- "dataRes"
+      attr(res_list, "by")<- by
       
     }else if(length(groupvar) == 2){
       ####case where length of groupvar is 2####
@@ -198,6 +202,7 @@ summarize<- function(omicsData, groupvar = NULL, by){
       
       res_list = list(mean = avg, sd = std_div, median = mds, pct_obs = pct_obs, min = mins , max = maxs) 
       class(res_list)<- "dataRes"
+      attr(res_list, "by")<- by
     }
   }
   return(res_list)
