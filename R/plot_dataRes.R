@@ -14,10 +14,10 @@
 #' 
 #'}
 #'
-#'
+#'@rdname plot-dataRes
 #' @export
 
-plot_datares<- function(dataRes, metric = NULL){
+plot.dataRes<- function(dataRes, metric = NULL){
   #some checks
   if(!(class(dataRes) %in% 'dataRes')) stop("dataRes must be an object of class dataRes")
   
@@ -66,7 +66,7 @@ plot_datares<- function(dataRes, metric = NULL){
     data_melt = melt(data, id.vars = edata_cname)
     
     r<- ggplot(data_melt, aes(x = value, fill = variable)) + geom_histogram(binwidth = .5, alpha = .5) + ggtitle(paste("Histogram for ", metric, sep = "")) +
-      theme_bw()
+      theme_bw() + scale_fill_brewer(palette = "Set1") 
     
     return(r)
   }
