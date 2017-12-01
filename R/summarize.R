@@ -40,17 +40,34 @@ summarize<- function(omicsData, groupvar = NULL, by){
     if(!is.null(groupvar)) stop("groupvar is only used when by == 'molecule'")
   
     avg = as.data.frame(apply(edata[,-edata_cname_id], 2, function(x){if(all(is.na(x))){mean(x)}else{mean(x, na.rm = T)}}))
-    names(avg)[1]<- "mean"
+    avg = cbind(names(edata[,-edata_cname_id]), avg)
+    names(avg)<- c("sample", "mean")
+    rownames(avg)<- NULL
+    
     sd = as.data.frame(apply(edata[,-edata_cname_id], 2, sd, na.rm = T))
-    names(sd)[1]<- "sd"
+    sd = cbind(names(edata[,-edata_cname_id]), sd)
+    names(sd)<- c("sample", "sd")
+    rownames(sd)<- NULL
+    
     mds = as.data.frame(apply(edata[,-edata_cname_id], 2, median, na.rm = T))
-    names(mds)[1]<- "median"
+    mds = cbind(names(edata[,-edata_cname_id]), mds)
+    names(mds)<- c("sample", "median")
+    rownames(mds)<- NULL
+    
     pct_obs = as.data.frame(apply(edata[,-edata_cname_id], 2, function(x){sum(!is.na(x))/length(x)}))
-    names(pct_obs)[1]<- "pct_obs"
+    pct_obs = cbind(names(edata[,-edata_cname_id]), pct_obs)
+    names(pct_obs)<- c("sample", "pct_obs")
+    rownames(pct_obs)<- NULL
+    
     min = as.data.frame(apply(edata[,-edata_cname_id], 2, min, na.rm = T))
-    names(min)[1]<- "min"
+    min = cbind(names(edata[,-edata_cname_id]), min)
+    names(min)<- c("sample", "min")
+    rownames(min)<- NULL
+  
     max = as.data.frame(apply(edata[,-edata_cname_id], 2, max, na.rm = T))
-    names(max)[1]<- "max"
+    max = cbind(names(edata[,-edata_cname_id]), max)
+    names(max)<- c("sample", "max")
+    rownames(max)<- NULL
         
     res_list = list(mean = avg, sd = sd, median = mds, pct_obs = pct_obs, min = min , max = max)
     class(res_list)<- "dataRes"
