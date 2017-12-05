@@ -34,6 +34,7 @@ summarize<- function(omicsData, groupvar = NULL, by){
   fdata_cname = attr(omicsData, "cnames")$fdata_cname
   edata_cname_id = which(names(edata) == edata_cname)
   fdata_cname_id = which(names(fdata) == fdata_cname)
+  groupDF = attr(omicsData, "groupDF")
   
   if(by == 'sample'){
     #check that groupvar is NULL, groupvar is only used when by == 'molecule'
@@ -104,6 +105,7 @@ summarize<- function(omicsData, groupvar = NULL, by){
         attr(res_list, "by")<- by
         attr(res_list, "groupvar")<- groupvar
         attr(res_list, "cnames")<- list("edata_cname" = edata_cname, "fdata_cname" = fdata_cname)
+        attr(res_list, "groupDF")<- groupDF
         
       }else if(!is.null(attr(omicsData, "group_DF"))){
         #when groupvar is NULL but group_designation has been run
@@ -140,6 +142,7 @@ summarize<- function(omicsData, groupvar = NULL, by){
         attr(res_list, "by")<- by
         attr(res_list, "groupvar")<- groupvar
         attr(res_list, "cnames")<- list("edata_cname" = edata_cname, "fdata_cname" = fdata_cname)
+        attr(res_list, "groupDF")<- groupDF
       }
     }else if(length(groupvar) == 1){
       ####case where groupvar is provided and has length 1####
