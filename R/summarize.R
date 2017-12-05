@@ -82,16 +82,22 @@ summarize<- function(omicsData, groupvar = NULL, by){
         #when groupvar is NULL and group_designation is NULL, we calculate metric for each row
         avg = apply(edata[, -edata_cname_id], 1, function(x){if(all(is.na(x))){mean(x)}else{mean(x, na.rm = T)}})
         avg = data.frame(molecule = edata[, edata_cname_id], mean = avg, stringsAsFactors = F)
+        names(avg)[1]<- edata_cname
         sd = apply(edata[, -edata_cname_id], 1, sd, na.rm = T)
         sd = data.frame(molecule = edata[, edata_cname_id], sd = sd, stringsAsFactors = F)
+        names(sd)[1]<- edata_cname
         mds = apply(edata[, -edata_cname_id], 1, median, na.rm = T)
         mds = data.frame(molecule = edata[, edata_cname_id], median = mds, stringsAsFactors = F)
+        names(mds)[1]<- edata_cname
         pct_obs = apply(edata[,-edata_cname_id], 1, function(x){sum(!is.na(x))/length(x)})
         pct_obs = data.frame(molecule = edata[, edata_cname_id], pct_obs = pct_obs, stringsAsFactors = F)
+        names(pct_obs)[1]<- edata_cname
         min = apply(edata[, -edata_cname_id], 1, min, na.rm = T)
         min = data.frame(molecule = edata[, edata_cname_id], min = min, stringsAsFactors = F)
+        names(min)[1]<- edata_cname
         max = apply(edata[, -edata_cname_id], 1, max, na.rm = T)
         max = data.frame(molecule = edata[, edata_cname_id], max = max, stringsAsFactors = F)
+        names(max)[1]<- edata_cname
         
         res_list = list(mean = avg, sd = sd, median = mds, pct_obs = pct_obs, min = min , max = max)
         class(res_list)<- "dataRes"
