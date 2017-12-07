@@ -15,6 +15,10 @@ vignette: >
 
 ```{r logo, out.width = "100px", echo=FALSE}
 knitr::include_graphics("pmartR_logo_final.jpg")
+
+library(pmartRqc)
+library(pmartRdata)
+library(ggplot2)
 ```
 
 The pmartRqc package provides functionality for quality control (QC) processing of mass spectrometry (MS) pan-omics data, in particular proteomic (either at the peptide or the protein level), lipidomic, and metabolomic data. This includes data transformation, specification of groups that are to be compared against each other, filtering of features and/or samples, data normalization, and data summarization (correlation, principal components analysis).
@@ -37,8 +41,6 @@ Below we load in 3 data.frames from the pmartRdata package:
 knitr::opts_chunk$set(fig.width=5)
 knitr::opts_chunk$set(fig.height=5)
 
-library(pmartRdata)
-
 data("pep_edata")
 data("pep_fdata")
 ```
@@ -46,10 +48,6 @@ data("pep_fdata")
 Here, $p$ is `r nrow(pep_edata)` and $n$ is `r nrow(pep_fdata)`. The `pep_fdata` data.frame contains the sample identifier and the condition designation for each sample, either 'Infection' (samples that were infected with some pathogen) or 'Mock' (uninfected samples used as a control). The `pep_emeta` data.frame contains the peptide identifier column ('Mass_Tag_ID'), the protein identification name to which each mass tag ID maps ('Protein'), a reference identifier ('Ref_ID'), and the peptide sequence (Peptide_Sequence). Note that the mass tag IDs are unique ($n_{peptide} =$ `r length(unique(pep_emeta$Mass_Tag_ID))`) while the protein identifiers are not ($n_{protein} =$ `r length(unique(pep_emeta$Protein))`) since multiple peptides often map to the same protein.
 
 ```{r data1}
-library(pmartRqc)
-
-library(pmartRdata)
-
 data("pep_edata")
 dim(pep_edata)
 pep_edata[1:6,1:5]
@@ -134,7 +132,7 @@ mypepData <- edata_replace(mypepData, x = 0, y = NA)
 
 In this dataset, there were no 0s so nothing was replaced.
 
-We also recommend log transforming the data prior to analysis. pmartRqc supports log2, log10, and natural logarithm transformations. The `edata_transform()` function provides this capability. We can also use `edata_trasnform()` to transform the data back to the abundance scale if needed. Note that the scale of the data is stored and automatically updated in the `data_info$data_scale` attribute of the pepData object. Below we log10 transform the data, then back transform to the abundance scale, and finally settle on the log2 scale.
+We also highly recommend log transforming the data prior to analysis. pmartRqc supports log2, log10, and natural logarithm transformations. The `edata_transform()` function provides this capability. We can also use `edata_trasnform()` to transform the data back to the abundance scale if needed. Note that the scale of the data is stored and automatically updated in the `data_info$data_scale` attribute of the pepData object. Below we log10 transform the data, then back transform to the abundance scale, and finally settle on the log2 scale.
 
 ```{r format2}
 mypepData <- edata_transform(mypepData, data_scale = "log10")
@@ -247,7 +245,9 @@ summary(mypepData_temp)
 
 rm(mypepData_temp)
 ```
-Here we keep sample `Infection 1`, `Infection 2`, `Infection 3`, `Infection 4` and `Infection 5`
+
+Here, we keep the samples `Infection 1`, `Infection 2`, `Infection 3`, `Infection 4` and `Infection 5`.
+
 ```{r custom_filter2}
 myfilter2<- custom_filter(mypepData, e_data_keep = NULL, e_meta_keep = NULL, f_data_keep = c("Infection1", "Infection2", "Infection3", "Infection4", "Infection5"))
 summary(myfilter2)
@@ -402,11 +402,17 @@ Below we use SPANS to select a normalization approach and then normalize the dat
 
 ### Summarize Data
 
-The pmartRqc package contains two methods for data summarization and exploration that can be used as part of the quality control process: sequential projection pursuit principal components analysis (sppPCA) for dimension reduction and a correlation heat map. As for missing data summarization there are also functions to collect and plot missing data information. Missing data collection and plotting functions include, `missingval_result`, `plot_missingval`, `missingval_scatterplot` and `missingval_heatmap`. 
+The pmartRqc package contains various methods for data summarization and exploration that can be used as part of the quality control process: numeric summaries and associated plots (via the `summarize()` function), sequential projection pursuit principal components analysis (sppPCA) for dimension reduction (via the`dim_reduction()` function), and a correlation heat map (via the `cor_result()` function). As for missing data summarization there are also functions to collect and plot missing data information. Missing data collection and plotting functions include, `missingval_result()`, `plot_missingval()`, `missingval_scatterplot()` and `missingval_heatmap()`. 
+
+#### Numeric Summaries
+
+```{r summarize}
+
+```
 
 #### Probabilistic Principal Components Analysis
 
-Probabilistic is a PCA algorithm that can be used in the presence of missing data. We use the `dim_reduction()` function in pmartRqc, specifying the dataset and the number of principal components to return (should we make this default to 2?). The `summary()` and `plot()` functions operate on the results of the `dim_reduction()` function.
+Probabilistic is a PCA algorithm that can be used in the presence of missing data. We use the `dim_reduction()` function in pmartRqc, specifying the dataset and the number of principal components to return (default value of 2 principal components). The `summary()` and `plot()` functions operate on the results of the `dim_reduction()` function.
 
 Note that `dim_reduction()` requires that the `group_designation()` function has been run.
 
@@ -421,6 +427,7 @@ plot(pca_results, title_size = 20, bw_theme=TRUE, legend_position="left")
 
 #### Correlation Heatmap
 
+Pearson correlation between samples is calculated based on pairwise complete biomolecules. 
 
 ```{r corr}
 correlation_results <- cor_result(norm_data)
@@ -428,7 +435,7 @@ correlation_results <- cor_result(norm_data)
 summary(correlation_results)
 plot(correlation_results)
 plot(correlation_results, title_size = 20)
-plot(correlation_results, x_lab=FALSE, title_plot="Hey look at this!")
+plot(correlation_results, x_lab=FALSE, title_plot="My Correlation Heatmap")
 plot(correlation_results, x_lab=FALSE, y_lab=FALSE)
 plot(correlation_results, colorbar_lim=c(0,1))
 
@@ -436,11 +443,13 @@ plot(correlation_results, colorbar_lim=c(0,1))
 
 
 
-#### Missingval_result and plot_missingval functions
+#### Missing Data
+
+Patterns of missing data can be explored using the `missingval_result()` and `plot_missingval()` functions.
 
 
 ```{r missingval}
-library(ggplot2)
+
 results <- missingval_result(mypepData)
 
 
@@ -451,7 +460,7 @@ plot(results, type = "byMolecule", x_lab_angle = 0)
 ```
 
 
-#### Missingval_scatterplot and missingval_heatmap functions
+In addition, the `missingval_scatterplot()` and `missingval_heatmap()` functions provide more views of the missing data.
 
 
 ```{r missingval_plots}
@@ -465,14 +474,20 @@ missingval_heatmap(mypepData, title_size = 20, title_plot = "Hey look at this!")
 ```
 
 
-### Protein Quantitation Methods
+### Protein Quantification Methods
 
-The pmartRqc package contains four methods for protein quantitation, rollup, rrollup, qrollup and zrollup. These functions are applied within a wrapper function, `protein_quant`. The inputs of `protein_quant` are, a pepData object, a method (one of 'rollup', 'rollup', 'qrollup' or 'zrollup'),an optional isoformRes object which defaults to NULL and 'combine_fn'(either mean or median). In the case where 'isoformRes' is left NULL, depending on the input for 'method', the correct protein quantitation method is applied to the input pepData object and a proData object is returned. 
+Protein quantification can be done using the `protein_quant()` function, either with or without accounting for different isoforms of the proteins, also called 'proteoforms. Regardless of whether the user is accounting for protein isoforms, they must specify a method for rolling peptides up to proteins (one of "rollup", "rollup", "qrollup", or "zrollup") and a function to use for combining the peptide-level data (either "mean" or "median"). When the user does wish to account for protein isoforms, they have two options for doing so: Bayesian Proteoform Quantification (BP-Quant) or Protein Quantification via Peptide Quality-Control (PQPQ). 
+
+The `protein_quant()` function returns an object of class proData.
 
 #### Rollup Methods
 
+The rollup method ... 
+
 In the rrollup method, all peptides that map to a single protein are scaled based on a chosen reference peptide, which is the peptide with most observations. Next the average or mean of the scaled peptides is set as the relative protein abundance.
+
 The qrollup method starts with all peptides that map to a single protein. Next peptides are chosen according to an abundance cutoff value and the average or mean of the scaled peptides is set as the protein abundance.
+
 In the zrollup method, scaling is done similarly to the  z-score formula (except with medians instead of means). The scaling formula is applied to peptides that map to a single protein and then the mean or median of the scaled peptides is set as protein abundance (from DAnTE article). The rollup method is similar to rrollup method, except there is no scaling involved in these methods. Either the mean or median is applied to all peptides that map to a single protein to obtain protein abundance.
 
 
@@ -488,5 +503,12 @@ print(mypepdata_rrollup)
 rm(mypepdata_rrollup)
 
 ```
+
+
+### Peptide or Protein Statistics
+
+
+
+
 
 ## References
