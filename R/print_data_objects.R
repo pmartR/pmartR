@@ -269,3 +269,138 @@ print.lipidData<- function(lipidData){
     cat("\n")
   }
 }
+
+#' print.dataRes
+#' 
+#' For printing an S3 object of type 'dataRes':
+#' 
+#'@rdname print-dataRes
+#'@export
+#'
+print.dataRes<- function(dataRes){
+  #extract item from dataRes, mean
+  mean<- as.data.frame(lapply(dataRes$mean, as.character), stringsAsFactors = FALSE)
+  
+  #choosing how many rows to print
+  if(nrow(mean) <= 10){
+    print(mean)
+  }else{
+    rows = floor(nrow(mean)/2)
+    
+    head_mean = head(mean, rows)[, 1:min(ncol(mean), 5)]
+    tail_mean = tail(mean, rows)[, 1:min(ncol(mean), 5)]
+    blank_row = rep("----", min(ncol(mean), 5))
+    
+    print_mean<- rbind(head_mean, blank_row, tail_mean)
+    
+    if(ncol(mean) > 5) message("only first 5 columns are shown")
+    cat("mean\n")
+    cat(capture.output(print_mean), sep = "\n")
+    cat("\n")
+  }
+
+  #extract item from dataRes, std_div
+  sd<- as.data.frame(lapply(dataRes$sd, as.character), stringsAsFactors = FALSE)
+  
+  #choosing how many rows to print
+  if(nrow(sd) <= 10){
+    print(sd)
+  }else{
+    rows = floor(nrow(sd)/2)
+    
+    head_sd = head(sd, rows)[, 1:min(ncol(sd), 5)]
+    tail_sd = tail(sd, rows)[, 1:min(ncol(sd), 5)]
+    blank_row = rep("----", min(ncol(sd), 5))
+    
+    print_sd<- rbind(head_sd, blank_row, tail_sd)
+    
+    if(ncol(sd) > 5) message("only first 5 columns are shown")
+    cat("std_div\n")
+    cat(capture.output(print_sd), sep = "\n")
+    cat("\n")
+  }
+
+  #extract item from dataRes, median
+  median<- as.data.frame(lapply(dataRes$median, as.character), stringsAsFactors = FALSE)
+  
+  #choosing how many rows to print
+  if(nrow(median) <= 10){
+    print(median)
+  }else{
+    rows = floor(nrow(median)/2)
+    
+    head_median = head(median, rows)[, 1:min(ncol(median), 5)]
+    tail_median = tail(median, rows)[, 1:min(ncol(median), 5)]
+    blank_row = rep("----", min(ncol(median), 5))
+    
+    print_median<- rbind(head_median, blank_row, tail_median)
+    
+    if(ncol(median) > 5) message("only first 5 columns are shown")
+    cat("median\n")
+    cat(capture.output(print_median), sep = "\n")
+    cat("\n")
+  }
+
+  #extract item from dataRes, pct_obs
+  pct_obs<- as.data.frame(lapply(dataRes$pct_obs, as.character), stringsAsFactors = FALSE)
+  
+  #choosing how many rows to print
+  if(nrow(pct_obs) <= 10){
+    print(pct_obs)
+  }else{
+    rows = floor(nrow(pct_obs)/2)
+    
+    head_pct_obs = head(pct_obs, rows)[, 1:min(ncol(pct_obs), 5)]
+    tail_pct_obs = tail(pct_obs, rows)[, 1:min(ncol(pct_obs), 5)]
+    blank_row = rep("----", min(ncol(pct_obs), 5))
+    
+    print_pct_obs<- rbind(head_pct_obs, blank_row, tail_pct_obs)
+    
+    if(ncol(pct_obs) > 5) message("only first 5 columns are shown")
+    cat("pct_obs\n")
+    cat(capture.output(print_pct_obs), sep = "\n")
+    cat("\n")
+  }
+  
+  #extract item from dataRes, min
+  min<- as.data.frame(lapply(dataRes$min, as.character), stringsAsFactors = FALSE)
+  
+  #choosing how many rows to print
+  if(nrow(min) <= 10){
+    print(min)
+  }else{
+    rows = floor(nrow(min)/2)
+    
+    head_min = head(min, rows)[, 1:min(ncol(min), 5)]
+    tail_min = tail(min, rows)[, 1:min(ncol(min), 5)]
+    blank_row = rep("----", min(ncol(min), 5))
+    
+    print_min<- rbind(head_min, blank_row, tail_min)
+    
+    if(ncol(min) > 5) message("only first 5 columns are shown")
+    cat("minimum\n")
+    cat(capture.output(print_min), sep = "\n")
+    cat("\n")
+  }
+  
+  #extract item from dataRes, max
+  max<- as.data.frame(lapply(dataRes$max, as.character), stringsAsFactors = FALSE)
+  
+  #choosing how many rows to print
+  if(nrow(max) <= 10){
+    print(max)
+  }else{
+    rows = floor(nrow(max)/2)
+    
+    head_max = head(max, rows)[, 1:min(ncol(max), 5)]
+    tail_max = tail(max, rows)[, 1:min(ncol(max), 5)]
+    blank_row = rep("----", min(ncol(max), 5))
+    
+    print_max<- rbind(head_max, blank_row, tail_max)
+    
+    if(ncol(max) > 5) message("only first 5 columns are shown")
+    cat("maximum\n")
+    cat(capture.output(print_max), sep = "\n")
+    cat("\n")
+  }
+}
