@@ -5,7 +5,7 @@
 #' @param dataRes an object of the class 'dataRes, usually created by \code{\link{summarize}}.
 #' @param metric a character string indicating which metric to use in plot, one of 'mean', 'median', 'sd, 'min' or 'max'
 #' 
-#' @details This function can only create plots of dataRes objects whose 'by' and 'groupvar' attributes are non NULL
+#' @details This function can only create plots of dataRes objects whose 'by' == 'molecule' and 'groupvar' attribute is non NULL
 #' @return plots ggplot2 object
 #'
 #' @examples
@@ -20,9 +20,6 @@
 #' @export
 
 plot.dataRes<- function(dataRes, metric = NULL){
-  #some checks
-  if(!(class(dataRes) %in% 'dataRes')) stop("dataRes must be an object of class dataRes")
-  
   #check that attr(dataRes, "by") == "molecule"
   if(attr(dataRes, "by") != "molecule") stop("can only plot a dataRes object if its 'by' attribute is equal to 'molecule'")
   
@@ -67,10 +64,34 @@ plot.dataRes<- function(dataRes, metric = NULL){
     data = dataRes[[metric]]
     data_melt = melt(data, id.vars = edata_cname)
     
-    r<- ggplot(data_melt, aes(x = value, fill = variable)) + geom_histogram(binwidth = .5, alpha = .5) + ggtitle(paste("Histogram for ", metric, sep = "")) +
-      theme_bw() + scale_fill_brewer(palette = "Set1") 
+    #the number of groups, which is the number of histograms
+    vars = levels(data_melt$variable)
+    
+    if(length(vars) == 1){
+      r<- ggplot(data_melt, aes(x = value)) + geom_histogram(alpha = .3, fill = "red", binwidth = .5) + ggtitle(paste("Histogram for ", metric, sep = "")) + theme_bw()
+    }
+    else if(length(vars) == 2){
+      r<- ggplot(data_melt, aes(value)) +
+      geom_histogram(data = subset(data_melt, variable == vars[1]), fill = "red", alpha = .2, binwidth = .5) +
+      geom_histogram(data = subset(data_melt, variable == vars[2]), fill = "blue", alpha = .2, binwidth = .5) +
+      ggtitle(paste("Histogram for ", metric, sep = "")) + theme_bw()
+    }
+    else if(length(vars) == 3){
+      r<- ggplot(data_melt, aes(value)) + 
+      geom_histogram(data = subset(data_melt, variable == vars[1]), fill = "red", alpha = .2, binwidth = .5) +
+      geom_histogram(data = subset(data_melt, variable == vars[2]), fill = "blue", alpha = .2, binwidth = .5) +
+      geom_histogram(data = subset(data_melt, variable == vars[3]), fill = "green", alpha = .2, binwidth = .5) +
+      ggtitle(paste("Histogram for ", metric, sep = "")) + theme_bw()
+    }
+    else if(length(vars) == 4){
+      r<- ggplot(data_melt, aes(value)) +
+      geom_histogram(data = subset(data_melt, variable == vars[1]), fill = "red", alpha = .2, binwidth = .5) +
+      geom_histogram(data = subset(data_melt, variable == vars[2]), fill = "blue", alpha = .2, binwidth = .5) +
+      geom_histogram(data = subset(data_melt, variable == vars[3]), fill = "green", alpha = .2, binwidth = .5) +
+      geom_histogram(data = subset(data_melt, variable == vars[4]), fill = "gray", alpha = .2, binwidth = .5) +
+      ggtitle(paste("Histogram for ", metric, sep = "")) + theme_bw()
+    }
     
     return(r)
   }
-
 }
