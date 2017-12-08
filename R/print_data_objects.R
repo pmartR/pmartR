@@ -278,7 +278,6 @@ print.lipidData<- function(lipidData){
 #'@export
 #'
 print.normRes<- function(normRes){
-  if(class(normRes) != "normRes") stop("normRes object must be of the class 'normRes'") 
   
   attr(normRes, "class")<- NULL
   attr(normRes, "omicsData")<- NULL
