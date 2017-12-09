@@ -285,10 +285,8 @@ print.dataRes<- function(dataRes){
   if(nrow(mean) <= 10){
     print(mean)
   }else{
-    rows = floor(nrow(mean)/2)
-    
-    head_mean = head(mean, rows)[, 1:min(ncol(mean), 5)]
-    tail_mean = tail(mean, rows)[, 1:min(ncol(mean), 5)]
+    head_mean = head(mean, 5)[, 1:min(ncol(mean), 5)]
+    tail_mean = tail(mean, 5)[, 1:min(ncol(mean), 5)]
     blank_row = rep("----", min(ncol(mean), 5))
     
     print_mean<- rbind(head_mean, blank_row, tail_mean)
@@ -306,10 +304,8 @@ print.dataRes<- function(dataRes){
   if(nrow(sd) <= 10){
     print(sd)
   }else{
-    rows = floor(nrow(sd)/2)
-    
-    head_sd = head(sd, rows)[, 1:min(ncol(sd), 5)]
-    tail_sd = tail(sd, rows)[, 1:min(ncol(sd), 5)]
+    head_sd = head(sd, 5)[, 1:min(ncol(sd), 5)]
+    tail_sd = tail(sd, 5)[, 1:min(ncol(sd), 5)]
     blank_row = rep("----", min(ncol(sd), 5))
     
     print_sd<- rbind(head_sd, blank_row, tail_sd)
@@ -327,10 +323,8 @@ print.dataRes<- function(dataRes){
   if(nrow(median) <= 10){
     print(median)
   }else{
-    rows = floor(nrow(median)/2)
-    
-    head_median = head(median, rows)[, 1:min(ncol(median), 5)]
-    tail_median = tail(median, rows)[, 1:min(ncol(median), 5)]
+    head_median = head(median, 5)[, 1:min(ncol(median), 5)]
+    tail_median = tail(median, 5)[, 1:min(ncol(median), 5)]
     blank_row = rep("----", min(ncol(median), 5))
     
     print_median<- rbind(head_median, blank_row, tail_median)
@@ -348,10 +342,8 @@ print.dataRes<- function(dataRes){
   if(nrow(pct_obs) <= 10){
     print(pct_obs)
   }else{
-    rows = floor(nrow(pct_obs)/2)
-    
-    head_pct_obs = head(pct_obs, rows)[, 1:min(ncol(pct_obs), 5)]
-    tail_pct_obs = tail(pct_obs, rows)[, 1:min(ncol(pct_obs), 5)]
+    head_pct_obs = head(pct_obs, 5)[, 1:min(ncol(pct_obs), 5)]
+    tail_pct_obs = tail(pct_obs, 5)[, 1:min(ncol(pct_obs), 5)]
     blank_row = rep("----", min(ncol(pct_obs), 5))
     
     print_pct_obs<- rbind(head_pct_obs, blank_row, tail_pct_obs)
@@ -369,10 +361,8 @@ print.dataRes<- function(dataRes){
   if(nrow(min) <= 10){
     print(min)
   }else{
-    rows = floor(nrow(min)/2)
-    
-    head_min = head(min, rows)[, 1:min(ncol(min), 5)]
-    tail_min = tail(min, rows)[, 1:min(ncol(min), 5)]
+    head_min = head(min, 5)[, 1:min(ncol(min), 5)]
+    tail_min = tail(min, 5)[, 1:min(ncol(min), 5)]
     blank_row = rep("----", min(ncol(min), 5))
     
     print_min<- rbind(head_min, blank_row, tail_min)
@@ -390,10 +380,8 @@ print.dataRes<- function(dataRes){
   if(nrow(max) <= 10){
     print(max)
   }else{
-    rows = floor(nrow(max)/2)
-    
-    head_max = head(max, rows)[, 1:min(ncol(max), 5)]
-    tail_max = tail(max, rows)[, 1:min(ncol(max), 5)]
+    head_max = head(max, 5)[, 1:min(ncol(max), 5)]
+    tail_max = tail(max, 5)[, 1:min(ncol(max), 5)]
     blank_row = rep("----", min(ncol(max), 5))
     
     print_max<- rbind(head_max, blank_row, tail_max)

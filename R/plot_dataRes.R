@@ -68,27 +68,30 @@ plot.dataRes<- function(dataRes, metric = NULL){
     vars = levels(data_melt$variable)
     
     if(length(vars) == 1){
-      r<- ggplot(data_melt, aes(x = value)) + geom_histogram(alpha = .3, fill = "red", binwidth = .5) + ggtitle(paste("Histogram for ", metric, sep = "")) + theme_bw()
+      r<- ggplot(data_melt, aes(x = value)) + geom_histogram(alpha = .5, fill = "red", binwidth = .5) + ggtitle(paste("Histogram for ", metric, sep = "")) + theme_bw()
     }
     else if(length(vars) == 2){
       r<- ggplot(data_melt, aes(value)) +
-      geom_histogram(data = subset(data_melt, variable == vars[1]), fill = "red", alpha = .2, binwidth = .5) +
-      geom_histogram(data = subset(data_melt, variable == vars[2]), fill = "blue", alpha = .2, binwidth = .5) +
-      ggtitle(paste("Histogram for ", metric, sep = "")) + theme_bw()
-    }
+      geom_histogram(data = subset(data_melt, variable == vars[1]), aes(fill = variable), alpha = .2, binwidth = .5) +
+      geom_histogram(data = subset(data_melt, variable == vars[2]), aes(fill = variable), alpha = .2, binwidth = .5) +
+      scale_fill_manual(name = "group", values = c("red", "blue"), labels = c(vars[1], vars[2])) +
+      ggtitle(paste("Histogram for ", metric, sep = "")) + theme_bw()      
+      }
     else if(length(vars) == 3){
       r<- ggplot(data_melt, aes(value)) + 
-      geom_histogram(data = subset(data_melt, variable == vars[1]), fill = "red", alpha = .2, binwidth = .5) +
-      geom_histogram(data = subset(data_melt, variable == vars[2]), fill = "blue", alpha = .2, binwidth = .5) +
-      geom_histogram(data = subset(data_melt, variable == vars[3]), fill = "green", alpha = .2, binwidth = .5) +
+      geom_histogram(data = subset(data_melt, variable == vars[1]), aes(fill = variable), alpha = .2, binwidth = .5) +
+      geom_histogram(data = subset(data_melt, variable == vars[2]), aes(fill = variable), alpha = .2, binwidth = .5) +
+      geom_histogram(data = subset(data_melt, variable == vars[3]), aes(fill = variable), alpha = .2, binwidth = .5) +
+      scale_fill_manual(name = "group", values = c("red", "blue", "green"), labels = c(vars[1], vars[2], vars[3])) +  
       ggtitle(paste("Histogram for ", metric, sep = "")) + theme_bw()
     }
     else if(length(vars) == 4){
       r<- ggplot(data_melt, aes(value)) +
-      geom_histogram(data = subset(data_melt, variable == vars[1]), fill = "red", alpha = .2, binwidth = .5) +
-      geom_histogram(data = subset(data_melt, variable == vars[2]), fill = "blue", alpha = .2, binwidth = .5) +
-      geom_histogram(data = subset(data_melt, variable == vars[3]), fill = "green", alpha = .2, binwidth = .5) +
-      geom_histogram(data = subset(data_melt, variable == vars[4]), fill = "gray", alpha = .2, binwidth = .5) +
+      geom_histogram(data = subset(data_melt, variable == vars[1]), aes(fill = variable), alpha = .2, binwidth = .5) +
+      geom_histogram(data = subset(data_melt, variable == vars[2]), aes(fill = variable), alpha = .2, binwidth = .5) +
+      geom_histogram(data = subset(data_melt, variable == vars[3]), aes(fill = variable), alpha = .2, binwidth = .5) +
+      geom_histogram(data = subset(data_melt, variable == vars[4]), aes(fill = variable), alpha = .2, binwidth = .5) +
+      scale_fill_manual(name = "group", values = c("red", "blue", "green", "gray"), labels = c(vars[1], vars[2], vars[3], vars[4])) +    
       ggtitle(paste("Histogram for ", metric, sep = "")) + theme_bw()
     }
     
