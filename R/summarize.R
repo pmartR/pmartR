@@ -117,7 +117,7 @@ summarize<- function(omicsData, groupvar = NULL, by){
         #here we are creating a string to input for dcast function argument 'formula'
         formula1 = paste(edata_cname, "+Group~...", sep = "")
         formula2 = paste(edata_cname, "~...", sep = "")
-        
+
         avg = dcast(edata_melt, formula = formula1, function(x){if(all(is.na(x))){mean(x)}else{mean(x, na.rm = T)}})
         names(avg)[which(colnames(avg)== ".")]<- "value"
         avg = dcast(avg, formula = formula2)
@@ -205,6 +205,13 @@ summarize<- function(omicsData, groupvar = NULL, by){
       output = data.frame(Sample.ID = fdata[,fdata_cname], Group = Group)
       names(output)[1] = fdata_cname
       
+      #check that there are atleast 2 sample in each group and remove groups that have less than two samples per group
+      n_per_grp = as.data.frame(output %>% group_by(Group) %>% summarise(count = n()))
+      remove_group = as.character(n_per_grp[which(n_per_grp$count<2), "Group"])
+      n_per_grp = n_per_grp[-which(n_per_grp$count<2),]
+      
+      output = output[-which(output$Group == remove_group),]
+      
       #groupvar was provided, rearranging edata
       edata_melt = reshape2::melt(omicsData$e_data, id.vars = edata_cname)
       names(edata_melt)[2]<- fdata_cname
@@ -234,7 +241,7 @@ summarize<- function(omicsData, groupvar = NULL, by){
       names(maxs)[which(colnames(maxs)== ".")]<- "value"
       maxs = dcast(maxs, formula = formula2)
       
-      res_list = list(mean = avg, sd = std_div, median = mds, pct_obs = pct_obs, min = mins , max = maxs) 
+      res_list = list(n_per_grp = n_per_grp, mean = avg, sd = std_div, median = mds, pct_obs = pct_obs, min = mins , max = maxs) 
       class(res_list)<- "dataRes"
       attr(res_list, "by")<- by
       attr(res_list, "groupvar")<- groupvar
