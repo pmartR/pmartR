@@ -34,7 +34,7 @@ summarize<- function(omicsData, groupvar = NULL, by){
   fdata_cname = attr(omicsData, "cnames")$fdata_cname
   edata_cname_id = which(names(edata) == edata_cname)
   fdata_cname_id = which(names(fdata) == fdata_cname)
-  groupDF = attr(omicsData, "groupDF")
+  groupDF = attr(omicsData, "group_DF")
   
   if(by == 'sample'){
     #check that groupvar is NULL, groupvar is only used when by == 'molecule'
@@ -79,7 +79,7 @@ summarize<- function(omicsData, groupvar = NULL, by){
   
   if(by == "molecule"){
     if(is.null(groupvar)){
-      if(is.null(attr(omicsData, "group_DF"))){
+      if(is.null(groupDF)){
         #when groupvar is NULL and group_designation is NULL, we calculate metric for each row
         avg = apply(edata[, -edata_cname_id], 1, function(x){if(all(is.na(x))){mean(x)}else{mean(x, na.rm = T)}})
         avg = data.frame(molecule = edata[, edata_cname_id], mean = avg, stringsAsFactors = F)
@@ -105,13 +105,22 @@ summarize<- function(omicsData, groupvar = NULL, by){
         attr(res_list, "by")<- by
         attr(res_list, "groupvar")<- groupvar
         attr(res_list, "cnames")<- list("edata_cname" = edata_cname, "fdata_cname" = fdata_cname)
-        attr(res_list, "groupDF")<- groupDF
+        attr(res_list, "group_DF")<- groupDF
         
-      }else if(!is.null(attr(omicsData, "group_DF"))){
+      }else if(!is.null(groupDF)){
         #when groupvar is NULL but group_designation has been run
+        
+        #check that there are atleast 2 samples in each group and remove groups that have less than two samples per group
+        n_per_grp = as.data.frame(groupDF %>% group_by(Group) %>% summarise(count = n()))
+        remove_group = as.character(n_per_grp[which(n_per_grp$count<2), "Group"])
+        if(length(remove_group) > 0){
+          n_per_grp = n_per_grp[-which(n_per_grp$count<2),]
+          groupDF = groupDF[-which(groupDF$Group == remove_group),]
+        }
+        
         edata_melt = reshape2::melt(edata, id.vars = edata_cname)
         names(edata_melt)[2]<- fdata_cname
-        edata_melt = merge.data.frame(edata_melt, attr(omicsData, "group_DF"), by = fdata_cname)
+        edata_melt = merge.data.frame(edata_melt, groupDF, by = fdata_cname)
         edata_melt = edata_melt[, -which(names(edata_melt) == fdata_cname)]
         
         #here we are creating a string to input for dcast function argument 'formula'
@@ -137,18 +146,26 @@ summarize<- function(omicsData, groupvar = NULL, by){
         names(maxs)[which(colnames(maxs)== ".")]<- "value"
         maxs = dcast(maxs, formula = formula2)
         
-        res_list = list(mean = avg, sd = std_div, median = mds, pct_obs = pct_obs, min = mins , max = maxs)
+        res_list = list(n_per_grp = n_per_grp, mean = avg, sd = std_div, median = mds, pct_obs = pct_obs, min = mins , max = maxs)
         class(res_list)<- "dataRes"
         attr(res_list, "by")<- by
         attr(res_list, "groupvar")<- groupvar
         attr(res_list, "cnames")<- list("edata_cname" = edata_cname, "fdata_cname" = fdata_cname)
-        attr(res_list, "groupDF")<- groupDF
+        attr(res_list, "group_DF")<- groupDF
       }
     }else if(length(groupvar) == 1){
       ####case where groupvar is provided and has length 1####
       if(any(groupvar %in% names(fdata)) == F) stop("groupvar must be in omicsData f_data")
       temp_fdata = fdata[, c(fdata_cname_id, which(names(fdata) == groupvar))]
       names(temp_fdata)[2]<- "Group"
+      
+      #check that there are atleast 2 samples in each group and remove groups that have less than two samples per group
+      n_per_grp = as.data.frame(temp_fdata %>% group_by(Group) %>% summarise(count = n()))
+      remove_group = as.character(n_per_grp[which(n_per_grp$count<2), "Group"])
+      if(length(remove_group) > 0){
+        n_per_grp = n_per_grp[-which(n_per_grp$count<2),]
+        temp_fdata = temp_fdata[-which(temp_fdata$Group == remove_group),]
+      }
       
       #rearranging edata
       edata_melt = reshape2::melt(omicsData$e_data, id.vars = edata_cname)
@@ -179,7 +196,7 @@ summarize<- function(omicsData, groupvar = NULL, by){
       names(maxs)[which(colnames(maxs)== ".")]<- "value"
       maxs = dcast(maxs, formula = formula2)
       
-      res_list = list(mean = avg, sd = std_div, median = mds, pct_obs = pct_obs, min = mins , max = maxs)
+      res_list = list(n_per_grp = n_per_group, mean = avg, sd = std_div, median = mds, pct_obs = pct_obs, min = mins , max = maxs)
       class(res_list)<- "dataRes"
       attr(res_list, "by")<- by
       attr(res_list, "groupvar")<- groupvar
@@ -205,13 +222,14 @@ summarize<- function(omicsData, groupvar = NULL, by){
       output = data.frame(Sample.ID = fdata[,fdata_cname], Group = Group)
       names(output)[1] = fdata_cname
       
-      #check that there are atleast 2 sample in each group and remove groups that have less than two samples per group
+      #check that there are atleast 2 samples in each group and remove groups that have less than two samples per group
       n_per_grp = as.data.frame(output %>% group_by(Group) %>% summarise(count = n()))
       remove_group = as.character(n_per_grp[which(n_per_grp$count<2), "Group"])
-      n_per_grp = n_per_grp[-which(n_per_grp$count<2),]
-      
-      output = output[-which(output$Group == remove_group),]
-      
+      if(length(remove_group) > 0){
+        n_per_grp = n_per_grp[-which(n_per_grp$count<2),]
+        output = output[-which(output$Group == remove_group),]
+      }
+
       #groupvar was provided, rearranging edata
       edata_melt = reshape2::melt(omicsData$e_data, id.vars = edata_cname)
       names(edata_melt)[2]<- fdata_cname

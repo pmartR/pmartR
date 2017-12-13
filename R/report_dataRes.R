@@ -80,7 +80,7 @@ report_dataRes<- function(dataRes, minmax = FALSE, digits = 2){
           res = res2
         }
       }else{
-        if(is.null(attr(dataRes, "groupDF"))){
+        if(is.null(attr(dataRes, "group_DF"))){
           #subsetting dataRes object
           avg = dataRes$mean
           avg$mean<- round(avg[,-which(names(avg) == edata_cname)], digits = digits)
@@ -114,7 +114,7 @@ report_dataRes<- function(dataRes, minmax = FALSE, digits = 2){
             res = res2
           }
         }
-        else if(!is.null(attr(dataRes, "groupDF"))){
+        else if(!is.null(attr(dataRes, "group_DF"))){
           #subsetting dataRes object
           avg = dataRes$mean
           avg[, 2:ncol(avg)]<- round(avg[,-1], digits = digits)
