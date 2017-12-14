@@ -69,6 +69,10 @@ report_dataRes<- function(dataRes, minmax = FALSE, digits = 2){
         formula2 = paste(edata_cname, "~...", sep = "")
         res = dcast(res, formula = formula2)
         
+        n_per_grp = dataRes$n_per_grp
+        npergroup_print = paste("(n = ", n_per_grp$count, ")", sep = "")
+        names(res)[2:length(names(res))]<- paste(names(res)[-1], npergroup_print, sep = "<br>")
+        
         if(minmax == TRUE){
           min_max_cols = all_data[,c("min", "max")]
           new_col2 = apply(min_max_cols, 1, function(x){if(is.na(x[1]) & is.na(x[2])){paste("NA")}else{paste(x[1], x[2], sep = "/")}})
@@ -78,6 +82,9 @@ report_dataRes<- function(dataRes, minmax = FALSE, digits = 2){
           res2 = dcast(res2, formula = formula2)
           
           res = res2
+          
+          npergroup_print = paste("(n = ", n_per_grp$count, ")", sep = "")
+          names(res)[2:length(names(res))]<- paste(names(res)[-1], npergroup_print, sep = "<br>")
         }
       }else{
         if(is.null(attr(dataRes, "group_DF"))){
@@ -150,6 +157,10 @@ report_dataRes<- function(dataRes, minmax = FALSE, digits = 2){
           formula2 = paste(edata_cname, "~...", sep = "")
           res = dcast(res, formula = formula2)
           
+          n_per_grp = dataRes$n_per_grp
+          npergroup_print = paste("(n = ", n_per_grp$count, ")", sep = "")
+          names(res)[2:length(names(res))]<- paste(names(res)[-1], npergroup_print, sep = "<br>")
+          
           if(minmax == TRUE){
             min_max_cols = all_data[,c("min", "max")]
             new_col2 = apply(min_max_cols, 1, function(x){if(is.na(x[1]) & is.na(x[2])){paste("NA")}else{paste(x[1], x[2], sep = "/")}})
@@ -158,6 +169,9 @@ report_dataRes<- function(dataRes, minmax = FALSE, digits = 2){
             res2 = dcast(res2, formula = formula2)
             
             res = res2
+            
+            npergroup_print = paste("(n = ", n_per_grp$count, ")", sep = "")
+            names(res)[2:length(names(res))]<- paste(names(res)[-1], npergroup_print, sep = "<br>")
           }
         }
       }

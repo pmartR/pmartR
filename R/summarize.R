@@ -196,7 +196,7 @@ summarize<- function(omicsData, groupvar = NULL, by){
       names(maxs)[which(colnames(maxs)== ".")]<- "value"
       maxs = dcast(maxs, formula = formula2)
       
-      res_list = list(n_per_grp = n_per_group, mean = avg, sd = std_div, median = mds, pct_obs = pct_obs, min = mins , max = maxs)
+      res_list = list(n_per_grp = n_per_grp, mean = avg, sd = std_div, median = mds, pct_obs = pct_obs, min = mins , max = maxs)
       class(res_list)<- "dataRes"
       attr(res_list, "by")<- by
       attr(res_list, "groupvar")<- groupvar
