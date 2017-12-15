@@ -70,6 +70,9 @@ report_dataRes<- function(dataRes, minmax = FALSE, digits = 2){
         res = dcast(res, formula = formula2)
         
         n_per_grp = dataRes$n_per_grp
+        #checking that n_per_grp group order matches that of res
+        n_per_grp = n_per_grp[match(names(res)[-1], n_per_grp$Group), ]
+        
         npergroup_print = paste("(n = ", n_per_grp$count, ")", sep = "")
         names(res)[2:length(names(res))]<- paste(names(res)[-1], npergroup_print, sep = "<br>")
         
@@ -158,6 +161,9 @@ report_dataRes<- function(dataRes, minmax = FALSE, digits = 2){
           res = dcast(res, formula = formula2)
           
           n_per_grp = dataRes$n_per_grp
+          #checking that n_per_grp group order matches that of res
+          n_per_grp = n_per_grp[match(names(res)[-1], n_per_grp$Group), ]
+          
           npergroup_print = paste("(n = ", n_per_grp$count, ")", sep = "")
           names(res)[2:length(names(res))]<- paste(names(res)[-1], npergroup_print, sep = "<br>")
           

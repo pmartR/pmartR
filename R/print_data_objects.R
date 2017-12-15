@@ -286,6 +286,7 @@ print.dataRes<- function(dataRes){
       
       #choosing how many rows to print
       if(nrow(n_per_grp) <= 10){
+        cat("n_per_grp\n")
         print(n_per_grp)
       }else{
         head_n_per_grp = head(n_per_grp, 5)[, 1:min(ncol(n_per_grp), 5)]

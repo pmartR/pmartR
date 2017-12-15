@@ -117,11 +117,15 @@ summarize<- function(omicsData, groupvar = NULL, by){
           n_per_grp = n_per_grp[-which(n_per_grp$count<2),]
           groupDF = groupDF[-which(groupDF$Group == remove_group),]
         }
-        
+       
+         #rearranging edata
         edata_melt = reshape2::melt(edata, id.vars = edata_cname)
         names(edata_melt)[2]<- fdata_cname
         edata_melt = merge.data.frame(edata_melt, groupDF, by = fdata_cname)
         edata_melt = edata_melt[, -which(names(edata_melt) == fdata_cname)]
+        
+        #checking that n_per_grp group order matches that of edata_melt
+        n_per_grp = n_per_grp[match(unique(edata_melt$Group), n_per_grp$Group), ]
         
         #here we are creating a string to input for dcast function argument 'formula'
         formula1 = paste(edata_cname, "+Group~...", sep = "")
@@ -172,6 +176,9 @@ summarize<- function(omicsData, groupvar = NULL, by){
       names(edata_melt)[2]<- fdata_cname
       edata_melt = merge.data.frame(edata_melt, temp_fdata, by = fdata_cname)
       edata_melt = edata_melt[, -which(names(edata_melt) == fdata_cname)]
+      
+      #checking that n_per_grp group order matches that of edata_melt
+      n_per_grp = n_per_grp[match(unique(edata_melt$Group), n_per_grp$Group), ]
       
       #here we are creating a string to input for dcast function argument 'formula'
       formula1 = paste(edata_cname, "+Group~...", sep = "")
@@ -235,6 +242,9 @@ summarize<- function(omicsData, groupvar = NULL, by){
       names(edata_melt)[2]<- fdata_cname
       edata_melt = merge.data.frame(edata_melt, output, by = fdata_cname)
       edata_melt = edata_melt[, -which(names(edata_melt) == fdata_cname)]
+      
+      #checking that n_per_grp group order matches that of edata_melt
+      n_per_grp = n_per_grp[match(unique(edata_melt$Group), n_per_grp$Group), ]
       
       #here we are creating a string to input for dcast function argument 'formula'
       formula1 = paste(edata_cname, "+Group~...", sep = "")

@@ -19,7 +19,7 @@
 #'@rdname plot-dataRes
 #' @export
 
-plot.dataRes<- function(dataRes, metric = NULL){
+plot.dataRes<- function(dataRes, metric = NULL, density = FALSE, ncols = NULL){
   #check that attr(dataRes, "by") == "molecule"
   if(attr(dataRes, "by") != "molecule") stop("can only plot a dataRes object if its 'by' attribute is equal to 'molecule'")
   
@@ -55,43 +55,31 @@ plot.dataRes<- function(dataRes, metric = NULL){
     
     grid.arrange(q, p, ncol = 2)
     
-  }else{
-    #histogram plots
-    
+  }
+  
+  else if(!is.null(metric)){
     if(!(metric %in% c('mean', 'median','sd', 'pct_obs', 'min', 'max'))) stop("metric must be one of mean, median, sd, pct_obs, min or max")
+    if(!is.logical(density)) stop("density must be either TRUE or FALSE")
     
-    #subsetting dataRes object
-    data = dataRes[[metric]]
-    data_melt = melt(data, id.vars = edata_cname)
-    
-    #the number of groups, which is the number of histograms
-    vars = levels(data_melt$variable)
-    
-    if(length(vars) == 1){
-      r<- ggplot(data_melt, aes(x = value)) + geom_histogram(alpha = .5, fill = "red", binwidth = .5) + ggtitle(paste("Histogram for ", metric, sep = "")) + theme_bw()
+    #if density == F, will plot faceted histograms
+    if(density == FALSE){
+      #subsetting dataRes object
+      data = dataRes[[metric]]
+      data_melt = melt(data, id.vars = edata_cname)
+      
+      r<- ggplot(data_melt, aes(x = value, fill = variable)) + geom_histogram(binwidth = .5, colour = "white") +
+        facet_wrap(~variable, ncol = 2) +
+        ggtitle(paste("Histograms for ", metric, sep = "", ncol = ncols)) + theme_bw()
+      
+    }else{
+      #if density == T, will plot geom_density
+      data = dataRes[[metric]]
+      data_melt = melt(data, id.vars = edata_cname)
+      
+      r<- ggplot(data_melt, aes(x = value, colour = variable)) + geom_density() +
+        ggtitle(paste("Density plot for ", metric, sep = "", ncol = ncols)) + theme_bw()
     }
-    else if(length(vars) == 2){
-      r<- ggplot(data_melt, aes(value)) +
-      geom_histogram(data = subset(data_melt, variable == vars[1]), aes(fill = variable), alpha = .2, binwidth = .5) +
-      geom_histogram(data = subset(data_melt, variable == vars[2]), aes(fill = variable), alpha = .2, binwidth = .5) +
-      ggtitle(paste("Histogram for ", metric, sep = "")) + theme_bw()      
-      }
-    else if(length(vars) == 3){
-      r<- ggplot(data_melt, aes(value)) + 
-      geom_histogram(data = subset(data_melt, variable == vars[1]), aes(fill = variable), alpha = .2, binwidth = .5) +
-      geom_histogram(data = subset(data_melt, variable == vars[2]), aes(fill = variable), alpha = .2, binwidth = .5) +
-      geom_histogram(data = subset(data_melt, variable == vars[3]), aes(fill = variable), alpha = .2, binwidth = .5) +  
-      ggtitle(paste("Histogram for ", metric, sep = "")) + theme_bw()
-    }
-    else if(length(vars) == 4){
-      r<- ggplot(data_melt, aes(value)) +
-      geom_histogram(data = subset(data_melt, variable == vars[1]), aes(fill = variable), alpha = .2, binwidth = .5) +
-      geom_histogram(data = subset(data_melt, variable == vars[2]), aes(fill = variable), alpha = .2, binwidth = .5) +
-      geom_histogram(data = subset(data_melt, variable == vars[3]), aes(fill = variable), alpha = .2, binwidth = .5) +
-      geom_histogram(data = subset(data_melt, variable == vars[4]), aes(fill = variable), alpha = .2, binwidth = .5) +    
-      ggtitle(paste("Histogram for ", metric, sep = "")) + theme_bw()
-    }
-    
+
     return(r)
   }
 }
