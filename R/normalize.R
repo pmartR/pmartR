@@ -9,6 +9,7 @@
 #' @param params additional arguments passed to the chosen subset functions. See details for parameter specification and default values.
 #' @param apply_norm logical argument indicating if the normalization should be applied to the data. Defaults to FALSE. If TRUE, the normalization is applied to the data and an S3 object of the same class as \code{omicsData} (e.g. 'pepData') with normalized values in \code{e_data} is returned.
 #' @param backtransform logical argument indicating if parameters for back transforming the data, after normalization, should be calculated.  Defaults to FALSE. If TRUE, the parameters for back transforming the data after normalization will be calculated, and subsequently included in the data normalization if \code{apply_norm} is TRUE or \code{\link{apply.normRes}} is used downstream. See details for an explanation of how these factors are calculated.
+#' @param min_prop is a minimum threshold value for the proportion of features subset (rows of \code{e_data})
 #'
 #'@details Below are details for specifying function and parameter options.
 #'@section Subset Functions:
@@ -65,146 +66,156 @@
 #' @references
 #'
 #' @export
-normalize <- function(omicsData, subset_fn, norm_fn, params = NULL, apply_norm = FALSE, backtransform = FALSE){
-
-    ## initial checks ##
-
+normalize <- function(omicsData, subset_fn, norm_fn, params = NULL, apply_norm = FALSE, backtransform = FALSE, min_prop = NULL){
+  
+  ## initial checks ##
+  
   #Store data class as it will be referred to often
   dat_class <- class(omicsData)
-
+  
   # check for group information #
   grp_pres = length(grep("group_DF", names(attributes(omicsData))))
-
+  
   # check that omicsData is of the appropriate class
   if(!(dat_class%in% c("proData","pepData","lipidData", "metabData"))) stop("omicsData is not an object of appropriate class")
-
+  
   # data should be log transformed #
   if(!attr(omicsData, "data_info")$data_scale %in% c("log2", "log10", "log")){
     stop("omicsData$e_data should be log transformed prior to calling normalize_data. See documentation for edata_transform function for more information.")
   }
-
+  
+  #check that min_prop is greater than 0 but less than or equal to 1
+  if(!is.null(min_prop)){
+    if(min_prop <= 0 | min_prop > 1) stop("min_prop must be greater than zero but less than or equal to 1")
+  }
+  
   check_names = getchecknames(omicsData)
   edata_id <- attr(omicsData, "cnames")$edata_cname
   samp_id <- attr(omicsData, "cnames")$fdata_cname
-
+  
   #Use default normalization and subsetting if not specified
   if(missing(subset_fn)) stop("subset_fn wasn't specified")
   if(missing(norm_fn)) stop("norm_fn wasn't specified")
-
+  
   # check for valid subset function choice #
   if(!(subset_fn %in% c("all", "los", "ppp", "rip", "ppp_rip")))stop(paste(subset_fn, " is not a valid subset option", sep = ""))
-
+  
   # check for valid normalization function choice #
   if(!(norm_fn %in% c("mean", "median", "zscore", "mad")))stop(paste(norm_fn, " is not a valid subset option", sep = ""))
-
+  
   # check that group designation was run if "rip" is involved
   if(subset_fn %in% c("rip", "ppp_rip") & grp_pres == 0)stop("group_designation() must be run on the data if subset_fn is 'rip' or 'ppp_rip'")
-
+  
   # check that parameter was specified for subset functions other than all #
-if(subset_fn != "all"){
-
-  # ppp_rip #
-  if(subset_fn == "ppp_rip"){
-
-  # set default parameter values, will be overwritten if user specifies #
-    params_ppp = 0.5
-    params_rip = 0.2
-
-    # check that parameters are either specified with "ppp_rip" or separate options, if both are specified, error out #
-    if(sum(c("ppp", "rip") %in% names(params)) > 1 & "ppp_rip" %in% names(params))stop("Too many arguments in 'params'. Specifying only one of 'ppp_rip = ' or 'ppp'/'rip'")
-
+  if(subset_fn != "all"){
+    
+    # ppp_rip #
+    if(subset_fn == "ppp_rip"){
+      
+      # set default parameter values, will be overwritten if user specifies #
+      params_ppp = 0.5
+      params_rip = 0.2
+      
+      # check that parameters are either specified with "ppp_rip" or separate options, if both are specified, error out #
+      if(sum(c("ppp", "rip") %in% names(params)) > 1 & "ppp_rip" %in% names(params))stop("Too many arguments in 'params'. Specifying only one of 'ppp_rip = ' or 'ppp'/'rip'")
+      
       if("ppp" %in% names(params)){
-
-      # check that parameters are valid #
-        if(params$ppp < 0 | params$ppp > 1)stop("ppp parameter must be between 0 and 1")
-
-        params_ppp = params$ppp
-}
-
-    if("rip" %in% names(params)){
-        if(params$rip < 0 | params$rip > 1)stop("rip parameter must be between 0 and 1")
-
-      params_rip = params$rip
-    }
-
-    if("ppp_rip" %in% names(params)){
-
-      # check that at least one of the two parameters is specified #
-      if(sum(c("ppp", "rip") %in% names(params[["ppp_rip"]])) < 1)stop("Invalid parameter specification for 'ppp_rip'")
-
-      if("ppp" %in% names(params[["ppp_rip"]])){
+        
         # check that parameters are valid #
-        if(params[["ppp_rip"]]$ppp < 0 | params[["ppp_rip"]]$ppp > 1)stop("ppp parameter must be between 0 and 1")
-
-        params_ppp = params[["ppp_rip"]]$ppp
-        }
+        if(params$ppp < 0 | params$ppp > 1)stop("ppp parameter must be between 0 and 1")
+        
+        params_ppp = params$ppp
+      }
+      
       if("rip" %in% names(params)){
+        if(params$rip < 0 | params$rip > 1)stop("rip parameter must be between 0 and 1")
+        
+        params_rip = params$rip
+      }
+      
+      if("ppp_rip" %in% names(params)){
+        
+        # check that at least one of the two parameters is specified #
+        if(sum(c("ppp", "rip") %in% names(params[["ppp_rip"]])) < 1)stop("Invalid parameter specification for 'ppp_rip'")
+        
+        if("ppp" %in% names(params[["ppp_rip"]])){
+          # check that parameters are valid #
+          if(params[["ppp_rip"]]$ppp < 0 | params[["ppp_rip"]]$ppp > 1)stop("ppp parameter must be between 0 and 1")
+          
+          params_ppp = params[["ppp_rip"]]$ppp
+        }
+        if("rip" %in% names(params)){
           if(params[["ppp_rip"]]$rip < 0 | params[["ppp_rip"]]$rip > 1)stop("rip parameter must be between 0 and 1")
-
-        params_rip = params[["ppp_rip"]]$rip
+          
+          params_rip = params[["ppp_rip"]]$rip
         }
-
-
-        }
-  }else{
+        
+        
+      }
+    }else{
       param_val = NULL
       # if something other than "all" or "ppp_rip" is specified #
       if(subset_fn %in% names(params)){
         if(params[[subset_fn]] < 0 | params[[subset_fn]] > 1)stop("Specified parameter must be between 0 and 1")
         param_val = params[[subset_fn]]
       }
+    }
+    
   }
-
-  }
-
-# check that apply_norm is T/F #
+  
+  # check that apply_norm is T/F #
   if(class(apply_norm) != "logical")stop("apply_norm must be a logical argument")
-
-#check that backtransform is T/F #
+  
+  #check that backtransform is T/F #
   if(class(backtransform) != "logical")stop("backtransform must a logical argument")
-
-
-# subset data using current subset method #
-if(subset_fn == "all"){
-  peps = all_subset(omicsData$e_data, edata_id)
-}
-if(subset_fn == "los"){
-  if(!is.null(param_val)){
-  peps = los(omicsData$e_data, edata_id, param_val)
-  }else{
-  peps = los(omicsData$e_data, edata_id)
+  
+  
+  # subset data using current subset method #
+  if(subset_fn == "all"){
+    peps = all_subset(omicsData$e_data, edata_id)
   }
-}
-if(subset_fn == "rip"){
-  group_df = attr(omicsData, "group_DF")
-  if(!is.null(param_val)){
-  peps = rip(omicsData$e_data, edata_id, samp_id, group_df, param_val)
-  }else{
-  peps = rip(omicsData$e_data, edata_id, samp_id, group_df)
+  if(subset_fn == "los"){
+    if(!is.null(param_val)){
+      peps = los(omicsData$e_data, edata_id, param_val)
+    }else{
+      peps = los(omicsData$e_data, edata_id)
+    }
   }
-}
-if(subset_fn == "ppp"){
-  if(!is.null(param_val)){
-  peps = ppp(omicsData$e_data, edata_id, param_val)
-  }else{
-    peps = ppp(omicsData$e_data, edata_id)
+  if(subset_fn == "rip"){
+    group_df = attr(omicsData, "group_DF")
+    if(!is.null(param_val)){
+      peps = rip(omicsData$e_data, edata_id, samp_id, group_df, param_val)
+    }else{
+      peps = rip(omicsData$e_data, edata_id, samp_id, group_df)
+    }
   }
-}
-if(subset_fn == "ppp_rip"){
-  group_df = attr(omicsData, "group_DF")
-  peps = ppp_rip(omicsData$e_data, edata_id, samp_id, group_df, alpha = params_rip, proportion = params_ppp)
-}
-
-fn_to_use <- switch(norm_fn, mean = mean_center, median = median_center, zscore = zscore_transform, mad = mad_transform)
-
-norm_results <- fn_to_use(e_data = omicsData$e_data, edata_id=edata_id, feature_subset = peps, backtransform = backtransform, apply_norm = apply_norm, check.names=check_names)
-
-if(apply_norm == FALSE){
-  res = list(subset_fn = subset_fn, norm_fn = norm_fn, parameters = list(normalization = norm_results$norm_params, backtransform = norm_results$backtransform_params), n_features_calc = length(peps), prop_features_calc = length(peps)/nrow(omicsData$e_data))
-
-  class(res) = "normRes"
-  attributes(res)$omicsData = omicsData
-}else{
+  if(subset_fn == "ppp"){
+    if(!is.null(param_val)){
+      peps = ppp(omicsData$e_data, edata_id, param_val)
+    }else{
+      peps = ppp(omicsData$e_data, edata_id)
+    }
+  }
+  if(subset_fn == "ppp_rip"){
+    group_df = attr(omicsData, "group_DF")
+    peps = ppp_rip(omicsData$e_data, edata_id, samp_id, group_df, alpha = params_rip, proportion = params_ppp)
+  }
+  
+  fn_to_use <- switch(norm_fn, mean = mean_center, median = median_center, zscore = zscore_transform, mad = mad_transform)
+  
+  norm_results <- fn_to_use(e_data = omicsData$e_data, edata_id=edata_id, feature_subset = peps, backtransform = backtransform, apply_norm = apply_norm, check.names=check_names)
+  
+  if(apply_norm == FALSE){
+    res = list(subset_fn = subset_fn, norm_fn = norm_fn, parameters = list(normalization = norm_results$norm_params, backtransform = norm_results$backtransform_params), n_features_calc = length(peps), prop_features_calc = length(peps)/nrow(omicsData$e_data))
+    
+    class(res) = "normRes"
+    attributes(res)$omicsData = omicsData
+    
+    if(!is.null(min_prop)){
+      if(res[[5]] < min_prop) message(paste("The minimum proportion of features allowed (min_prop) was specified as", min_prop, "but the actual proportion of features used to calculate the normalization factors using the given subset function (subset_fn) was", round(res[[5]], 3), sep = " "))
+    }
+    
+  }else{
     omicsData$e_data = norm_results$transf_data
     attributes(omicsData)$data_info$data_norm = TRUE
     attributes(omicsData)$norm_info$subset_fn = subset_fn
@@ -217,9 +228,14 @@ if(apply_norm == FALSE){
     attributes(omicsData)$norm_info$params$bt_scale = norm_results$backtransform_params$scale
     attributes(omicsData)$norm_info$params$bt_location = norm_results$backtransform_params$location
     res = omicsData
-}
-
-return(res)
+    
+    if(!is.null(min_prop)){
+      prop_features_calc = attributes(omicsData)$norm_info$prop_features_calc
+        if(prop_features_calc < min_prop) stop(paste("The minimum proportion of features allowed (min_prop) was specified as", min_prop, "but the actual proportion of features used to calculate the normalization factors using the given subset function (subset_fn) was", round(prop_features_calc, 3), "hence normalization was not carried out." , sep = " "))
+    }
+  }
+  
+  return(res)
 }
 
 
