@@ -4,6 +4,8 @@
 #'
 #' @param dataRes an object of the class 'dataRes, usually created by \code{\link{summarize}}.
 #' @param metric a character string indicating which metric to use in plot, one of 'mean', 'median', 'sd, 'min' or 'max'
+#' @param density logical default to FALSE, if set to true a density plot of the specified metric is returned
+#' @param ncols defaults to NULL, is an integer the specifies the number of columns for the histogram facet_wrap
 #' 
 #' @details This function can only create plots of dataRes objects whose 'by' == 'molecule' and 'groupvar' attribute is non NULL
 #' @return plots ggplot2 object

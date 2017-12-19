@@ -272,7 +272,7 @@ print.lipidData<- function(lipidData){
 
 #' print.dataRes
 #' 
-#' For printing an S3 object of type 'dataRes':
+#' For printing an S3 object of class 'dataRes':
 #' 
 #'@rdname print-dataRes
 #'@export
