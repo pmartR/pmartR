@@ -212,7 +212,7 @@ normalize <- function(omicsData, subset_fn, norm_fn, params = NULL, apply_norm =
     attributes(res)$omicsData = omicsData
     
     if(!is.null(min_prop)){
-      if(res[[5]] < min_prop) message(paste("prop_features_calc: ", res[[5]],", is less than min_prop: ", min_prop, sep = ""))
+      if(res[[5]] < min_prop) message(paste("The minimum proportion of features allowed (min_prop) was specified as", min_prop, "but the actual proportion of features used to calculate the normalization factors using the given subset function (subset_fn) was", round(res[[5]], 3), sep = " "))
     }
     
   }else{
@@ -231,7 +231,7 @@ normalize <- function(omicsData, subset_fn, norm_fn, params = NULL, apply_norm =
     
     if(!is.null(min_prop)){
       prop_features_calc = attributes(omicsData)$norm_info$prop_features_calc
-      if(prop_features_calc < min_prop) stop(paste("prop_features_calc: ", prop_features_calc,", cannot be less than min_prop: ", min_prop, sep = ""))
+        if(prop_features_calc < min_prop) stop(paste("The minimum proportion of features allowed (min_prop) was specified as", min_prop, "but the actual proportion of features used to calculate the normalization factors using the given subset function (subset_fn) was", round(prop_features_calc, 3), "hence normalization was not carried out." , sep = " "))
     }
   }
   
