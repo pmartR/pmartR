@@ -114,7 +114,7 @@ plot.corRes <- function(corRes_object, ...){
     if(y_lab==FALSE) heatmap <- heatmap + ggplot2::theme(axis.text.y = ggplot2::element_blank()) # added by KS
     
     if(attributes(corRes_object)$data_norm == TRUE) {
-      heatmap <- heatmap + ggplot2::ggtitle(bquote(atop(plot_title)))
+      heatmap <- heatmap + ggplot2::ggtitle(plot_title)
     }else {
       heatmap <- heatmap + ggplot2::ggtitle(plot_title)
     }

@@ -270,6 +270,7 @@ print.lipidData<- function(lipidData){
   }
 }
 
+
 #' print.dataRes
 #' 
 #' For printing an S3 object of class 'dataRes':
@@ -532,3 +533,19 @@ print.dataRes<- function(dataRes){
 }
   
  
+
+#' print.normRes
+#' 
+#' For printing an S3 object of type 'normRes':
+#' 
+#'@rdname print-normRes
+#'@export
+#'
+print.normRes<- function(normRes){
+  
+  attr(normRes, "class")<- NULL
+  attr(normRes, "omicsData")<- NULL
+  
+  print(normRes)
+}
+
