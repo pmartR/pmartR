@@ -68,7 +68,10 @@ bpquant_loop<- function(statRes, pepData, pi_not = .9, max_proteoforms = 5){
 
   res<- list()
   
-  library(doParallel)
+  suppressMessages(suppressPackageStartupMessages({
+    library(doParallel)
+  })
+  )
   cores<- detectCores()
   cl<- makeCluster(cores)
   registerDoParallel(cl)

@@ -54,7 +54,10 @@ zrollup<- function(pepData, combine_fn = "median", parallel = TRUE){
     
     final_list<- vector("list", length(unique_proteins))
     
-    require(doParallel)
+    suppressMessages(suppressPackageStartupMessages({
+      library(doParallel)
+    })
+    )
     cores<- detectCores()
     cl<- makeCluster(cores)
     registerDoParallel(cl)
