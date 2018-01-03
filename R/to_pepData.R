@@ -21,7 +21,7 @@
 #'
 #' @export
 
-to_pepData<- function(msnset_object, edata_cname = "UniqueID", fdata_cname = "SampleID", emeta_cname = "UniqueID", data_scale = "abundance"){
+to_pepData<- function(msnset_object, edata_cname = "UniqueID", fdata_cname = "SampleID", emeta_cname = "UniqueID", data_scale = "abundance", check.names = TRUE){
   
   #check that msnset_object is of correct class
   if(class(msnset_object)!= "MSnSet") stop("msnset_object must be of class 'MSnSet'")
@@ -48,6 +48,6 @@ to_pepData<- function(msnset_object, edata_cname = "UniqueID", fdata_cname = "Sa
   row.names(msnset_emeta)<- NULL
   names(msnset_emeta)[1]<- "UniqueID"
   
-  res<- as.pepData(e_data = msnset_edata, f_data = msnset_fdata, e_meta = msnset_emeta, edata_cname = edata_cname, fdata_cname = fdata_cname, emeta_cname = emeta_cname, data_scale = data_scale)
+  res<- as.pepData(e_data = msnset_edata, f_data = msnset_fdata, e_meta = msnset_emeta, edata_cname = edata_cname, fdata_cname = fdata_cname, emeta_cname = emeta_cname, data_scale = data_scale, check.names = check.names)
   return(res)
 }
