@@ -6,7 +6,7 @@
 #' @param edata_cname character string specifying the name of the column containing the peptide identifiers in \code{e_data} and \code{e_meta} (if applicable).
 #' @param emeta_cname character string specifying the name of the column containing the protein identifiers (or other mapping variable) in \code{e_meta} (if applicable).
 #' @param fdata_cname character string specifying the name of the column containing the sample identifiers in \code{f_data}.
-#' @param Scale of the data provided in \code{e_data}. Acceptable values are 'log2', 'log10', 'log', and 'abundance', which indicate data is log base 2, base 10, natural log transformed, and raw abundance, respectively. Default is 'abundance'.
+#' @param data_scale Scale of the data provided in \code{e_data}. Acceptable values are 'log2', 'log10', 'log', and 'abundance', which indicate data is log base 2, base 10, natural log transformed, and raw abundance, respectively.
 #' 
 #' @return pepData object
 #' 
@@ -21,10 +21,13 @@
 #'
 #' @export
 
-to_pepData<- function(msnset_object, edata_cname = "UniqueID", fdata_cname = "SampleID", emeta_cname = "UniqueID", data_scale = "abundance", check.names = TRUE){
+to_pepData<- function(msnset_object, data_scale, edata_cname = "UniqueID", fdata_cname = "SampleID", emeta_cname = "UniqueID", check.names = TRUE){
   
   #check that msnset_object is of correct class
   if(class(msnset_object)!= "MSnSet") stop("msnset_object must be of class 'MSnSet'")
+  
+  # check that data_scale is one of the acceptable options #
+  if(!(data_scale %in% c('log2', 'log10', 'log', 'count', 'abundance'))) stop(paste(data_scale, " is not a valid option for 'data_scale'", sep=""))
   
   msnset_edata<- msnset_object@assayData$exprs
   if(any(dim(msnset_edata) == 0)) stop("msnset_object@assayData must not have empty rows or columns ")
