@@ -16,12 +16,12 @@
 #' library("MSnbase")
 #' data("msnset")
 #' 
-#' result = pmartRqc:::to_pepData(msnset)
+#' result = pmartRqc:::MSnSet2pepData(msnset)
 #'}
 #'
 #' @export
 
-to_pepData<- function(msnset_object, data_scale, edata_cname = "UniqueID", fdata_cname = "SampleID", emeta_cname = "UniqueID", check.names = TRUE){
+MSnSet2pepData<- function(msnset_object, data_scale, edata_cname = "UniqueID", fdata_cname = "SampleID", emeta_cname = "UniqueID", check.names = TRUE){
   
   #check that msnset_object is of correct class
   if(class(msnset_object)!= "MSnSet") stop("msnset_object must be of class 'MSnSet'")
