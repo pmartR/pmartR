@@ -5,7 +5,7 @@
 #' @param normRes_object an object of class normRes, produced by normalize function
 #' @param parametric logical indicating what test to use (anova test or Mann-Whitney U test), defaults to TRUE(anova test is used).
 #' 
-#' @returns an object of class normRes, but with an additional list item 'test'
+#' @return an object of class normRes, but with an additional list item 'test'
 #' 
 #' @examples
 #' dontrun{
@@ -49,7 +49,7 @@ test_normalization<- function(normRes_object, parametric = TRUE){
   }
   
   #case where location is NULL and scale is non-NULL
-  if(is.null(normRes_object$parameters$normalization$location) & !is.null(normRes_object$parameters$normalization$scale)){
+  else if(is.null(normRes_object$parameters$normalization$location) & !is.null(normRes_object$parameters$normalization$scale)){
     scale = normRes_object$parameters$normalization$scale
     scale = data.frame("Sample_Name" = names(scale), "scale" = scale, stringsAsFactors = FALSE)
     row.names(scale) = NULL
@@ -72,7 +72,7 @@ test_normalization<- function(normRes_object, parametric = TRUE){
   }
   
   #case where both location is non-NULL and scale is non-NULL
-  if(!is.null(normRes_object$parameters$normalization$location) & !is.null(normRes_object$parameters$normalization$scale)){
+  else if(!is.null(normRes_object$parameters$normalization$location) & !is.null(normRes_object$parameters$normalization$scale)){
     location = normRes_object$parameters$normalization$location
     location = data.frame("Sample_Name" = names(location), "location" = location, stringsAsFactors = FALSE)
     row.names(location) = NULL
@@ -108,6 +108,3 @@ test_normalization<- function(normRes_object, parametric = TRUE){
   }
   return(normRes_object)
 }
-
-
-
