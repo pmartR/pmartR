@@ -43,6 +43,7 @@ test_normalization<- function(normRes_object, parametric = TRUE){
     }else{
       res_wilcox = wilcox.test(location ~ Group, data = my_data)
       result = data.frame("Test" = "Mann Whittney", "Test Statistic" = res_wilcox$statistic, "P-value" = res_wilcox$p.value, check.names = F, stringsAsFactors = F)
+      row.names(result)<- NULL
     }
     
     normRes_object$test = list("scale" = NULL, "location" = result) 
@@ -65,7 +66,7 @@ test_normalization<- function(normRes_object, parametric = TRUE){
     }else{
       res_wilcox = wilcox.test(scale ~ Group, data = my_data)
       result = data.frame("Test" = "Mann Whittney", "Test Statistic" = res_wilcox$statistic, "P-value" = res_wilcox$p.value, check.names = F, stringsAsFactors = F)
-      
+      row.names(result) = NULL
     }
   
     normRes_object$test = list("scale" = result, "location" = NULL) 
@@ -99,9 +100,11 @@ test_normalization<- function(normRes_object, parametric = TRUE){
     }else{
       res_wilcox_location = wilcox.test(location ~ Group, data = my_data_location)
       result_location = data.frame("Test" = "Mann Whittney", "Test Statistic" = res_wilcox_location$statistic, "P-value" = res_wilcox_location$p.value, check.names = F, stringsAsFactors = F)
+      row.names(result_location) = NULL
       
       res_wilcox_scale = wilcox.test(scale ~ Group, data = my_data_scale)
       result_scale = data.frame("Test" = "Mann Whittney", "Test Statistic" = res_wilcox_scale$statistic, "P-value" = res_wilcox_scale$p.value, check.names = F, stringsAsFactors = F)
+      row.names(result_scale) = NULL
     }
     
     normRes_object$test = list("scale" = result_scale, "location" = result_location)
