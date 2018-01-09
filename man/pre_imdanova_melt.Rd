@@ -22,4 +22,3 @@ This function creates a melted version of e_data, grouped by edata_id and group 
 \author{
 Lisa Bramer, Kelly Stratton
 }
-

@@ -23,4 +23,3 @@ Correlation calculations use only complete pairwise observations.
 \author{
 Lisa Bramer
 }
-

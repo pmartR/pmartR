@@ -11,17 +11,17 @@ custom_filter(omicsData, e_data_remove = NULL, f_data_remove = NULL,
 \arguments{
 \item{omicsData}{an object of class "pepData", "proData", "metabData", or "lipidData", created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.}
 
-\item{e_data_remove}{character vector specifying the names of the e_data identifiers to remove from the data, can only be specified with other remove arguments}
+\item{e_data_remove}{character vector specifying the names of the e_data identifiers to remove from the data. This argument can only be specified with other 'remove' arguments.}
 
-\item{f_data_remove}{character vector specifying the names of samples to remove from the data, can only be specified with other remove arguments}
+\item{f_data_remove}{character vector specifying the names of f_data identifiers to remove from the data. This argument can only be specified with other 'remove' arguments.}
 
-\item{e_meta_remove}{character vector specifying the names of the e_meta identifiers to remove from the data, can only be specified with other remove arguments}
+\item{e_meta_remove}{character vector specifying the names of the e_meta identifiers to remove from the data. This argument can only be specified with other 'remove' arguments.}
 
-\item{e_data_keep}{character vector specifying the names of the e_data identifiers to keep from the data, can only be specified with other keep arguments}
+\item{e_data_keep}{character vector specifying the names of the e_data identifiers to keep from the data. This argument can only be specified with other 'keep' arguments.}
 
-\item{f_data_keep}{character vector specifying the names of samples to keep from the data, can only be specified with other keep arguments}
+\item{f_data_keep}{character vector specifying the names of f_data identifiers to keep from the data. This argument can only be specified with other 'keep' arguments.}
 
-\item{e_meta_keep}{character vector specifying the names of the e_meta identifiers to keep from the data, can only be specified with other keep arguments}
+\item{e_meta_keep}{character vector specifying the names of the e_meta identifiers to keep from the data. This argument can only be specified with other 'keep' arguments.}
 }
 \value{
 An S3 object of class 'customFilt', which is a list with 3 elements: e_data_remove, f_data_remove, and e_meta_remove.
@@ -43,4 +43,3 @@ summary(to_filter2)
 \author{
 Kelly Stratton
 }
-

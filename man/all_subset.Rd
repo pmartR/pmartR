@@ -31,4 +31,3 @@ keep <- none_subset(e_data = pep_edata, edata_id = "Mass_Tag_ID")
 \author{
 Kelly Stratton
 }
-

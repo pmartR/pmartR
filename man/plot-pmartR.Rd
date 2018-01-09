@@ -44,4 +44,3 @@ pca_res <- dim_reduction(pep_object2, k = 2)
 plot(pca_res)
 }
 }
-

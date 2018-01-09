@@ -8,7 +8,7 @@ using namespace Rcpp;
 
 // kw_rcpp
 std::list<double> kw_rcpp(arma::mat mtr, std::vector<std::string> group);
-RcppExport SEXP pmartRqc_kw_rcpp(SEXP mtrSEXP, SEXP groupSEXP) {
+RcppExport SEXP _pmartRqc_kw_rcpp(SEXP mtrSEXP, SEXP groupSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -20,7 +20,7 @@ END_RCPP
 }
 // nonmissing_per_grp
 arma::Mat<int> nonmissing_per_grp(arma::mat mtr, std::vector<std::string> group);
-RcppExport SEXP pmartRqc_nonmissing_per_grp(SEXP mtrSEXP, SEXP groupSEXP) {
+RcppExport SEXP _pmartRqc_nonmissing_per_grp(SEXP mtrSEXP, SEXP groupSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -32,7 +32,7 @@ END_RCPP
 }
 // pooled_cv_rcpp
 std::list<double> pooled_cv_rcpp(arma::mat mtr, std::vector<std::string> group);
-RcppExport SEXP pmartRqc_pooled_cv_rcpp(SEXP mtrSEXP, SEXP groupSEXP) {
+RcppExport SEXP _pmartRqc_pooled_cv_rcpp(SEXP mtrSEXP, SEXP groupSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -44,11 +44,24 @@ END_RCPP
 }
 // rcpp_hello_world
 List rcpp_hello_world();
-RcppExport SEXP pmartRqc_rcpp_hello_world() {
+RcppExport SEXP _pmartRqc_rcpp_hello_world() {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     rcpp_result_gen = Rcpp::wrap(rcpp_hello_world());
     return rcpp_result_gen;
 END_RCPP
+}
+
+static const R_CallMethodDef CallEntries[] = {
+    {"_pmartRqc_kw_rcpp", (DL_FUNC) &_pmartRqc_kw_rcpp, 2},
+    {"_pmartRqc_nonmissing_per_grp", (DL_FUNC) &_pmartRqc_nonmissing_per_grp, 2},
+    {"_pmartRqc_pooled_cv_rcpp", (DL_FUNC) &_pmartRqc_pooled_cv_rcpp, 2},
+    {"_pmartRqc_rcpp_hello_world", (DL_FUNC) &_pmartRqc_rcpp_hello_world, 0},
+    {NULL, NULL, 0}
+};
+
+RcppExport void R_init_pmartRqc(DllInfo *dll) {
+    R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
+    R_useDynamicSymbols(dll, FALSE);
 }
