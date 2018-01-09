@@ -646,31 +646,29 @@ applyFilt.imdanovaFilt <- function(filter_object, omicsData, min_nonmiss_anova=N
 #' @rdname applyFilt
 applyFilt.customFilt <- function(filter_object, omicsData){
 
-
   edata_cname <- attributes(omicsData)$cnames$edata_cname
   fdata_cname <- attributes(omicsData)$cnames$fdata_cname
   emeta_cname <- attributes(omicsData)$cnames$emeta_cname
 
-  #if filter_object contains removes
+  # if filter_object contains 'removes' #
   if(!is.null(filter_object$e_data_remove)||!is.null(filter_object$f_data_remove)||!is.null(filter_object$e_meta_remove)){
     
     filter_object_new = list(edata_filt = filter_object$e_data_remove, emeta_filt = filter_object$e_meta_remove, samples_filt = filter_object$f_data_remove)
     
     # check that edata_filt doesn't specify ALL the items in omicsData #
-    if(all(omicsData$e_data[, edata_cname] %in% filter_object_new$edata_filt)){stop("edata_filt specifies all the items in the data")}
+    if(all(omicsData$e_data[, edata_cname] %in% filter_object_new$edata_filt)){stop("e_data_remove specifies all the items in the data")}
     
     # check that samples_filt doesn't specify ALL the items in omicsData #
-    if(all(omicsData$f_data[, fdata_cname] %in% filter_object_new$samples_filt)){stop("samples_filt specifies all the items in the data")}
+    if(all(omicsData$f_data[, fdata_cname] %in% filter_object_new$samples_filt)){stop("f_data_remove specifies all the items in the data")}
     
     # check that emeta_filt doesn't specify ALL the items in omicsData, emeta_filt is present #
     if(!is.null(omicsData$e_meta[, emeta_cname])){
-       if(all(omicsData$e_meta[, emeta_cname] %in% filter_object_new$emeta_filt)){stop("emeta_filt specifies all the items in the data")}
+       if(all(omicsData$e_meta[, emeta_cname] %in% filter_object_new$emeta_filt)){stop("e_meta_remove specifies all the items in the data")}
     }
-   
     
   }
   
-  else{
+  else{ # filter_object contains 'keeps' #
     filter_object_new = list(edata_keep = filter_object$e_data_keep, emeta_keep = filter_object$e_meta_keep, samples_keep = filter_object$f_data_keep)
     
     # check that edata_keep doesn't specify ALL the items in omicsData #
@@ -701,8 +699,6 @@ applyFilt.customFilt <- function(filter_object, omicsData){
     results$e_meta <- NULL
   }
   
-  
-
   # if group attribute is present, re-run group_designation in case filtering any items impacted the group structure #
   if(!is.null(attr(results, "group_DF"))){
     results <- group_designation(omicsData = results, main_effects = attr(attr(omicsData, "group_DF"), "main_effects"), covariates = attr(attr(omicsData, "group_DF"), "covariates"), time_course = attr(attr(omicsData, "group_DF"), "time_course"))
@@ -800,335 +796,97 @@ MSomics_filter_worker <- function(filter_object, omicsData){
   # pull group_DF attribute #
   group_DF = attr(omicsData, "group_DF")
   
+  # initialize the new omicsData parts #
+  temp.edata <- omicsData$e_data
+  temp.fdata <- omicsData$f_data
+  temp.emeta <- omicsData$e_meta
+  
   #check if filter object contains remove arguments
   if(!is.null(filter_object$edata_filt)||!is.null(filter_object$emeta_filt)||!is.null(filter_object$samples_filt)){
     
-    ## check to see if e_meta is provided ##
-    # if not provided we only need to worry about e_data and f_data #
-    if(attr(omicsData, "meta_info") == FALSE){
+    # remove any samples from f_data and e_data #
+    if(!is.null(filter_object$samples_filt)){
+      inds <- which(temp.fdata[, which(names(temp.fdata) == samp_cname)] %in% filter_object$samples_filt)
+      temp.fdata <- temp.fdata[-inds, ]
       
-      ## remove entries in edata ##
-      if(!is.null(filter_object$edata_filt) & !is.null(edata_cname)){
-        
-        temp.pep = omicsData$e_data
-        
-        # have to check that at least one of the items is present in the data #
-        edat_ids = which(temp.pep[,edata_cname] %in% filter_object$edata_filt)
-        
-        if(length(edat_ids) > 0){
-          # identify which peptides in e_data match filter list and remove #
-          temp.pep1 = temp.pep[-which(temp.pep[,edata_cname] %in% filter_object$edata_filt),]
-        }else{temp.pep1 = temp.pep}
-        
-      }else{ # no entries in edata need to be removed
-        temp.pep1 = omicsData$e_data
-      }
-      
-      ## remove samples ##
-      if(!is.null(filter_object$samples_filt) & !is.null(samp_cname)){
-        # identify which samples in f_data match filter list #
-        temp.samp = omicsData$f_data
-        
-        # check that at least one sample is in f_data and e_data #
-        fdat_ids = which(temp.samp[,samp_cname] %in% filter_object$samples_filt)
-        edat_ids2 = which(names(temp.pep1) %in% filter_object$samples_filt)
-        
-        if(length(fdat_ids) > 0){
-          temp.samp2 = temp.samp[-which(temp.samp[,samp_cname] %in% filter_object$samples_filt),]
-        }else{temp.samp2 = temp.samp}
-        
-        # identify which samples in e_data match filter list and remove #
-        if(length(edat_ids2) > 0){
-          temp.pep2 = temp.pep1[, -which(names(temp.pep1) %in% filter_object$samples_filt)]
-        }else{temp.pep2 = temp.pep1}
-        
-      }else{ # no entries in f_data need to be removed
-        temp.samp2 = omicsData$f_data
-        temp.pep2 = temp.pep1
-      }
-      
-      temp.meta2 = NULL
-      
-      
-    }else{ # e_meta is present, so we need to work with it as well
-      ## remove entries in edata ##
-      if(!is.null(filter_object$edata_filt) & !is.null(edata_cname)){
-        
-        temp.pep = omicsData$e_data
-        
-        # have to check that at least one of the items is present in the data #
-        edat_ids = which(temp.pep[,edata_cname] %in% filter_object$edata_filt)
-        
-        if(length(edat_ids) > 0){
-          # identify which peptides in e_data and e_meta match filter list and remove#
-          temp.pep1 = temp.pep[-which(temp.pep[,edata_cname] %in% filter_object$edata_filt),]
-        }else{temp.pep1 = temp.pep}
-        
-        temp.meta = omicsData$e_meta
-        
-        # check that at least one of the peptides is present in e_meta #
-        emeta_ids = which(temp.meta[,edata_cname] %in% filter_object$edata_filt)
-        
-        if(length(emeta_ids) > 0){
-          temp.meta1 = temp.meta[-which(temp.meta[,edata_cname] %in% filter_object$edata_filt),]
-        }else{temp.meta1 = temp.meta}
-        
-      }else{
-        temp.pep1 = omicsData$e_data
-        temp.meta1 = omicsData$e_meta
-      }
-      
-      ## remove samples ##
-      if(!is.null(filter_object$samples_filt) & !is.null(samp_cname)){
-        # identify which samples in f_data match filter list #
-        temp.samp = omicsData$f_data
-        
-        # check that at least one sample is in f_data and e_data #
-        fdat_ids = which(temp.samp[,samp_cname] %in% filter_object$samples_filt)
-        edat_ids2 = which(names(temp.pep1) %in% filter_object$samples_filt)
-        
-        if(length(fdat_ids) > 0){
-          temp.samp2 = temp.samp[-which(temp.samp[,samp_cname] %in% filter_object$samples_filt),]
-        }else{temp.samp2 = temp.samp}
-        
-        # identify which samples in e_data match filter list and remove #
-        if(length(edat_ids2) > 0){
-          inds = which(names(temp.pep1) %in% filter_object$samples_filt)
-          temp.pep2 = temp.pep1[, -inds]
-        }else{temp.pep2 = temp.pep1}
-        
-      }else{
-        temp.samp2 = omicsData$f_data
-        temp.pep2 = temp.pep1
-      }
-      
-      ## remove entries in emeta ##
-      if(!is.null(filter_object$emeta_filt) & !is.null(emeta_cname)){
-        # identify which proteins in data match filter list and remove from e_meta #
-        temp.meta = temp.meta1
-        
-        # check that at least one of the proteins is in e_meta #
-        if(!is.null(ncol(temp.meta))){
-          emeta_ids2 = which(as.character(temp.meta[,emeta_cname]) %in% filter_object$emeta_filt)
-        }else{
-          emeta_ids2 = which(temp.meta %in% filter_object$emeta_filt)
-        }
-        
-        
-        if(length(emeta_ids2) > 0){
-          if(!is.null(ncol(temp.meta))){
-            temp.meta2 = temp.meta[-which(temp.meta[,emeta_cname] %in% filter_object$emeta_filt),]
-          }else{
-            temp.meta2 = temp.meta[-which(temp.meta %in% filter_object$emeta_filt)]
-          }
-        }else{temp.meta2 = temp.meta}
-      }else{
-        temp.meta2 = temp.meta1
-      }
-      
-      
-      # check for rogue entries in edata #
-      if(!is.null(ncol(temp.meta2))){
-        edat_ids2 = which(!(temp.pep2[,edata_cname] %in% temp.meta2[,edata_cname]))
-      }else{
-        edat_ids2 = which(!(temp.pep2[,edata_cname] %in% temp.meta2))
-      }
-      
-      
-      # filter out edata entries which no longer have mappings to emeta entries #
-      if(length(edat_ids2) > 0){
-        #temp.pep2 = temp.pep2[-which(!(temp.pep2[,edata_cname] %in% temp.meta2[,edata_cname])),]
-        temp.pep2 = temp.pep2[-edat_ids2,]
-      }
-      
+      inds <- which(names(temp.edata) %in% filter_object$samples_filt)
+      temp.edata <- temp.edata[ ,-inds]
     }
     
-    output <- list(temp.pep2 = temp.pep2, temp.samp2 = temp.samp2, temp.meta1 = temp.meta2, edata_cname = edata_cname, emeta_cname = emeta_cname, samp_cname = samp_cname)
-  }
-  
-  
-  #if filter object contains keep arguments
-  else{
-    
-    ## check to see if e_meta is provided ##
-    # if not provided we only need to worry about e_data and f_data #
-    if(attr(omicsData, "meta_info") == FALSE){
+    # remove any edata molecules from e_data and e_meta #
+    if(!is.null(filter_object$edata_filt)){
+      inds <- which(temp.edata[ , which(names(temp.edata) == edata_cname)] %in% filter_object$edata_filt)
+      temp.edata <- temp.edata[-inds, ]
       
-      ## keep entries in edata ##
-      if(!is.null(filter_object$edata_keep) & !is.null(edata_cname)){
-        
-        temp.pep = omicsData$e_data
-        
-        # have to check that at least one of the items is present in the data #
-        edat_ids = which(temp.pep[,edata_cname] %in% filter_object$edata_keep)
-        
-        if(length(edat_ids) > 0){
-          # identify which peptides in e_data match filter list and keep #
-          temp.pep1 = temp.pep[which(temp.pep[,edata_cname] %in% filter_object$edata_keep),]
-        }else{temp.pep1 = temp.pep}
-        
-      }else{ # no entries in edata need to be removed
-        temp.pep1 = omicsData$e_data
+      # also remove these from e_meta, if it is present #
+      if(!is.null(temp.emeta)){
+        inds <- which(temp.emeta[ , which(names(temp.emeta) == edata_cname)] %in% filter_object$edata_filt)
+        temp.emeta <- temp.emeta[-inds, ]
       }
-      
-      ## keep samples ##
-      if(!is.null(filter_object$samples_keep) & !is.null(samp_cname)){
-        # identify which samples in f_data match filter list #
-        temp.samp = omicsData$f_data
-        
-        # check that at least one sample is in f_data and e_data #
-        fdat_ids = which(temp.samp[,samp_cname] %in% filter_object$samples_keep)
-        edat_ids2 = which(names(temp.pep1) %in% filter_object$samples_keep)
-        
-        if(length(fdat_ids) > 0){
-          temp.samp2 = temp.samp[which(temp.samp[,samp_cname] %in% filter_object$samples_keep),]
-        }else{temp.samp2 = temp.samp}
-        
-        # identify which samples in e_data match filter list and keep #
-        if(length(edat_ids2) > 0){
-          edata_cname_id = which(names(temp.pep1) == edata_cname)
-          temp.pep2 = temp.pep1[,c(edata_cname_id,(which(names(temp.pep1) %in% filter_object$samples_keep)))]
-        }else{temp.pep2 = temp.pep1}
-        
-      }else{ # no entries in f_data need to be removed
-        temp.samp2 = omicsData$f_data
-        temp.pep2 = temp.pep1
-      }
-      
-      temp.meta2 = NULL
-      
-      
-      
-      
-    }else{ # e_meta is present, so we need to work with it as well
-      ## keep entries in edata ##
-      if(!is.null(filter_object$edata_keep) & !is.null(edata_cname)){
-        
-        temp.pep = omicsData$e_data
-        
-        # have to check that at least one of the items is present in the data #
-        edat_ids = which(temp.pep[,edata_cname] %in% filter_object$edata_keep)
-        
-        if(length(edat_ids) > 0){
-          # identify which peptides in e_data and e_meta match filter list and keep#
-          temp.pep1 = temp.pep[which(temp.pep[,edata_cname] %in% filter_object$edata_keep),]
-        }else{temp.pep1 = temp.pep}
-        
-        temp.meta = omicsData$e_meta
-        
-        # check that at least one of the peptides is present in e_meta #
-        emeta_ids = which(temp.meta[,edata_cname] %in% filter_object$edata_keep)
-        
-        if(length(emeta_ids) > 0){
-          temp.meta1 = temp.meta[which(temp.meta[,edata_cname] %in% filter_object$edata_keep),]
-        }else{temp.meta1 = temp.meta}
-        
-      }else{
-        temp.pep1 = omicsData$e_data
-        temp.meta1 = omicsData$e_meta
-      }
-      
-      ## keep samples ##
-      if(!is.null(filter_object$samples_keep) & !is.null(samp_cname)){
-        # identify which samples in f_data match filter list #
-        temp.samp = omicsData$f_data
-        
-        # check that at least one sample is in f_data and e_data #
-        fdat_ids = which(temp.samp[,samp_cname] %in% filter_object$samples_keep)
-        edat_ids2 = which(names(temp.pep1) %in% filter_object$samples_keep)
-        
-        if(length(fdat_ids) > 0){
-          temp.samp2 = temp.samp[which(temp.samp[,samp_cname] %in% filter_object$samples_keep),]
-        }else{temp.samp2 = temp.samp}
-        
-        # identify which samples in e_data match filter list and keep #
-        if(length(edat_ids2) > 0){
-          edata_cname_id = which(names(temp.pep1) == edata_cname)
-          
-          inds = which(names(temp.pep1) %in% filter_object$samples_keep)
-          temp.pep2 = temp.pep1[,c(edata_cname_id,inds)]
-        }else{temp.pep2 = temp.pep1}
-        
-      }else{
-        temp.samp2 = omicsData$f_data
-        temp.pep2 = temp.pep1
-      }
-      
-      ## keep entries in emeta ##
-      if(!is.null(filter_object$emeta_keep) & !is.null(emeta_cname)){
-        # identify which proteins in data match filter list and keep in e_meta #
-        temp.meta = temp.meta1
-        temp.meta_not_kept = omicsData$e_meta[-which(omicsData$e_meta[[edata_cname]] %in% temp.meta[[edata_cname]]),]
-        
-        # check that at least one of the proteins is in e_meta (this is e_meta after e_data_keep has been applied) #
-        if(!is.null(ncol(temp.meta))){
-          emeta_ids2 = which(as.character(temp.meta[,emeta_cname]) %in% filter_object$emeta_keep)
-        }else{
-          emeta_ids2 = which(temp.meta %in% filter_object$emeta_keep)
-        }
-        
-        # check that at least one of the proteins is in temp_meta_not_kept #
-        if(!is.null(ncol(temp.meta_not_kept))){
-          emeta_ids_not_kept = which(as.character(temp.meta_not_kept[,emeta_cname]) %in% filter_object$emeta_keep)
-        }else{
-          emeta_ids_not_kept = which(temp.meta_not_kept %in% filter_object$emeta_keep)
-        }
-        
-        #if there are e_meta_keep (proteins) in the part of e_meta that we previously kept, then these proteins have already been kept
-        if(length(emeta_ids2) > 0){
-          if(!is.null(ncol(temp.meta))){
-            temp.meta2 = temp.meta
-          }else{
-            temp.meta2 = temp.meta
-          }
-        }else{temp.meta2 = temp.meta}
-        
-        #if there are e_meta_keep(proteins) outside of e_meta that we previously kept we will keep these 
-        if(length(emeta_ids_not_kept) > 0){
-          if(!is.null(ncol(temp.meta_not_kept))){
-            temp.meta3 = temp.meta_not_kept[which(temp.meta_not_kept[,emeta_cname] %in% filter_object$emeta_keep),]
-            temp.meta2 = rbind(temp.meta2,temp.meta3)
-          }else{
-            temp.meta3 = temp.meta_not_kept[which(temp.meta_not_kept %in% filter_object$emeta_keep)]
-            temp.meta2 = rbind(temp.meta2, temp.meta3)
-          }
-        }else{temp.meta2 = temp.meta}
-        
-      }else{
-        temp.meta2 = temp.meta1
-      }
-      
-      
-      # check for entries in e_meta[,edata_cname] that are not in e_data[,edata_cname]#
-      if(!is.null(ncol(temp.meta2))){
-        edat_ids2 = which(!temp.meta2[,edata_cname] %in% (temp.pep2[,edata_cname]))
-      }else{
-        edat_ids2 = which(!(temp.meta2 %in% temp.pep2[,edata_cname]))
-      }
-      
-      
-      # add edata entries which were present in emeta but not edata #
-      if(length(edat_ids2) > 0){
-        additional_peps<- temp.meta2[[edata_cname]][edat_ids2]
-        edata_cname_id = which(names(temp.pep1) == edata_cname)
-        
-        if(is.null(filter_object$samples_keep)){
-          inds = which(names(temp.pep1) %in% temp.samp2[,samp_cname]) 
-        }
-        else inds = which(names(temp.pep1) %in% filter_object$samples_keep)
-        
-        temp.pep2 = rbind(temp.pep2, omicsData$e_data[which(omicsData$e_data[[edata_cname]] %in% additional_peps) ,c(edata_cname_id,inds)])
-      }
-      
-      
-      
     }
     
-    output <- list(temp.pep2 = temp.pep2, temp.samp2 = temp.samp2, temp.meta1 = temp.meta2, edata_cname = edata_cname, emeta_cname = emeta_cname, samp_cname = samp_cname)
+    # remove any emeta molecules from e_meta and e_data #
+    if(!is.null(filter_object$emeta_filt)){
+      inds <- which(temp.emeta[ , which(names(temp.emeta) == emeta_cname)] %in% filter_object$emeta_filt)
+      temp.emeta <- temp.emeta[-inds, ]
+      
+      # subset to the intersection of the edata_molecules in both e_data and e_meta, in case more were removed in one than the other #
+      mols <- intersect(temp.edata[, which(names(temp.edata) == edata_cname)], temp.emeta[, which(names(temp.emeta) == edata_cname)])
+      inds <- which(temp.edata[, which(names(temp.edata) == edata_cname)] %in% mols)
+      temp.edata <- temp.edata[inds, ]
+      inds <- which(temp.emeta[, which(names(temp.emeta) == edata_cname)] %in% mols)
+      temp.emeta <- temp.emeta[inds, ]
+    }
     
+  }else{ # filter object contains keep arguments #
+    
+    # keep samples in f_data and e_data #
+    if(!is.null(filter_object$samples_keep)){
+      inds <- which(temp.fdata[, which(names(temp.fdata) == samp_cname)] %in% filter_object$samples_keep)
+      temp.fdata <- temp.fdata[inds, ]
+      
+      inds <- c(which(names(temp.edata) == edata_cname), which(names(temp.edata) %in% filter_object$samples_keep))
+      temp.edata <- temp.edata[ , inds]
+    }
+    
+    # keep edata molecules in e_data #
+    if(!is.null(filter_object$edata_keep)){
+      inds <- which(temp.edata[ , which(names(temp.edata) == edata_cname)] %in% filter_object$edata_keep)
+      temp.edata <- temp.edata[inds, ]
+      
+      # if e_meta is present and we aren't explicitly specifying to keep anything in it, also keep these e_data molecules in e_meta #
+      if(!is.null(temp.emeta) && is.null(filter_object$emeta_keep)){
+        inds <- which(temp.emeta[ , which(names(temp.emeta) == edata_cname)] %in% filter_object$edata_keep)
+        temp.emeta <- temp.emeta[inds, ]
+      }
+    }
+    
+    # keep emeta molecules in e_meta (here, we are explicitly specifying things to keep) #
+    if(!is.null(filter_object$emeta_keep)){
+      inds <- which(temp.emeta[ , which(names(temp.emeta) == emeta_cname)] %in% filter_object$emeta_keep)
+      temp.emeta <- temp.emeta[inds, ]
+      
+      # keep the union of the edata_molecules in both e_data and e_meta, in case more were kept in one than the other #
+      if(is.null(filter_object$edata_keep)){
+        # use intersection here, since nothing was explicitly specified to keep from edata, and if we use the union, then edata doesn't actually get filtered at all #
+        mols <- intersect(temp.edata[, which(names(temp.edata) == edata_cname)], temp.emeta[, which(names(temp.emeta) == edata_cname)])
+        inds <- which(temp.edata[, which(names(temp.edata) == edata_cname)] %in% mols)
+        temp.edata <- temp.edata[inds, ]
+        inds <- which(temp.emeta[, which(names(temp.emeta) == edata_cname)] %in% mols)
+        temp.emeta <- temp.emeta[inds, ]
+      }else{
+        # use union here, since there WERE things explicitly specified to keep from edata #
+        mols <- union(temp.edata[, which(names(temp.edata) == edata_cname)], temp.emeta[, which(names(temp.emeta) == edata_cname)])
+        inds <- which(temp.edata[, which(names(temp.edata) == edata_cname)] %in% mols)
+        temp.edata <- temp.edata[inds, ]
+        inds <- which(temp.emeta[, which(names(temp.emeta) == edata_cname)] %in% mols)
+        temp.emeta <- temp.emeta[inds, ]
+      }
+    }
   }
   
+  # return the pieces needed to assemble a proData/pepData/lipidData/metabData object #
+  output <- list(temp.pep2 = temp.edata, temp.samp2 = temp.fdata, temp.meta1 = temp.emeta, edata_cname = edata_cname, emeta_cname = emeta_cname, samp_cname = samp_cname)
   
-  # return the pieces needed to assemble a proData/pepData/lipidData/metabData object
   return(output)
 }
