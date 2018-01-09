@@ -26,6 +26,9 @@ test_normalization<- function(normRes_object, parametric = TRUE){
   omicsData = attr(normRes_object, "omicsData")
   group_DF = attr(omicsData, "group_DF")
   
+  #check for case where scale and location are both NULL
+  if(is.null(normRes_object$parameters$normalization$scale) & is.null(normRes_object$parameters$normalization$location)) stop("one of 'scale' or 'location' must be non-NULL in order to test normalization")
+  
   #case where scale is NULL and location is non-NULL
   if(is.null(normRes_object$parameters$normalization$scale) & !is.null(normRes_object$parameters$normalization$location)){
     location = normRes_object$parameters$normalization$location
