@@ -9,4 +9,3 @@
 \description{
 For printing an S3 object of type 'rmdFilt':
 }
-

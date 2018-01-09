@@ -9,4 +9,3 @@
 \description{
 For plotting an s3 object of type 'customFilt'
 }
-

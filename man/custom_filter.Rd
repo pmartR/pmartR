@@ -43,4 +43,3 @@ summary(to_filter2)
 \author{
 Kelly Stratton
 }
-

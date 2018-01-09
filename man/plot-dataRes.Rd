@@ -4,12 +4,17 @@
 \alias{plot.dataRes}
 \title{Plots an object of class dataRes}
 \usage{
-\method{plot}{dataRes}(dataRes, metric = NULL)
+\method{plot}{dataRes}(dataRes, metric = NULL, density = FALSE,
+  ncols = NULL)
 }
 \arguments{
 \item{dataRes}{an object of the class 'dataRes, usually created by \code{\link{summarize}}.}
 
 \item{metric}{a character string indicating which metric to use in plot, one of 'mean', 'median', 'sd, 'min' or 'max'}
+
+\item{density}{logical default to FALSE, if set to true a density plot of the specified metric is returned}
+
+\item{ncols}{defaults to NULL, is an integer the specifies the number of columns for the histogram facet_wrap}
 }
 \value{
 plots ggplot2 object
@@ -18,12 +23,14 @@ plots ggplot2 object
 For plotting an S3 object of type 'dataRes'
 }
 \details{
-This function can only create plots of dataRes objects whose 'by' and 'groupvar' attributes are non NULL
+This function can only create plots of dataRes objects whose 'by' == 'molecule' and 'groupvar' attribute is non NULL
 }
 \examples{
 dontrun{
-
-
+data(lipid_object)
+lipid_object = edata_transform(lipid_object, "log2")
+result = summarize(omicsData = lipid_object, by = "molecule", groupvar = "Condition")
+plot(result)
 }
 
 }

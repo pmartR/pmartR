@@ -40,4 +40,3 @@ pep_subset <- ppp_rip(e_data = pep_pepData2$e_data, edata_id = attr(pep_pepData2
 \author{
 Kelly Stratton
 }
-

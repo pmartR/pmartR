@@ -2,21 +2,25 @@
 % Please edit documentation in R/edata_replace.R
 \name{edata_replace}
 \alias{edata_replace}
-\alias{edata_replace.lipidData}
-\alias{edata_replace.metabData}
+\alias{edata_replace}
 \alias{edata_replace.pepData}
+\alias{edata_replace}
 \alias{edata_replace.proData}
+\alias{edata_replace}
+\alias{edata_replace.metabData}
+\alias{edata_replace}
+\alias{edata_replace.lipidData}
 \title{Replace Values Equal to x with y}
 \usage{
-edata_replace(omicsData, x, y, check.names = TRUE)
+edata_replace(omicsData, x, y)
 
-\method{edata_replace}{pepData}(omicsData, x, y, check.names = TRUE)
+\method{edata_replace}{pepData}(omicsData, x, y)
 
-\method{edata_replace}{proData}(omicsData, x, y, check.names = TRUE)
+\method{edata_replace}{proData}(omicsData, x, y)
 
-\method{edata_replace}{metabData}(omicsData, x, y, check.names = TRUE)
+\method{edata_replace}{metabData}(omicsData, x, y)
 
-\method{edata_replace}{lipidData}(omicsData, x, y, check.names = TRUE)
+\method{edata_replace}{lipidData}(omicsData, x, y)
 }
 \arguments{
 \item{omicsData}{an object of the class 'pepData', 'proData', 'metabData', or 'lipidData', usually created by \code{pepData}, \code{proData}, \code{metabData}, or \code{lipidData}, respectively.}
@@ -24,8 +28,6 @@ edata_replace(omicsData, x, y, check.names = TRUE)
 \item{x}{value to be replaced, usually numeric or NA}
 
 \item{y}{replacment value, usually numeric or NA}
-
-\item{check.names}{logical. If TRUE then the names of the variables in the data frame are checked to ensure that they are syntactically valid variable names and are not duplicated. If necessary they are adjusted (by \code{\link{make.names}}) so that they are.}
 }
 \value{
 data object of the same class as omicsData
@@ -46,4 +48,3 @@ metab_object2 <- edata_replace(omicsData = metab_object, x=0, y=NA)
 \author{
 Kelly Stratton
 }
-

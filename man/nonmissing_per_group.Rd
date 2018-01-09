@@ -5,7 +5,7 @@
 \title{Computes the Number of Non-Missing Data Points by Group}
 \usage{
 nonmissing_per_group(omicsData = NULL, e_data = NULL, groupDF = NULL,
-  cname_id = NULL, samp_id = NULL)
+  cname_id = NULL, samp_id = NULL, check.names = NULL)
 }
 \arguments{
 \item{omicsData}{an optional object of one of the classes "pepData", "proData", "metabData", or "lipidData", usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{lipidData}}, respectively. Either omicsData or all of e_data, groupDF, cname_id, and samp_id must be provided.}
@@ -17,6 +17,8 @@ nonmissing_per_group(omicsData = NULL, e_data = NULL, groupDF = NULL,
 \item{cname_id}{character string specifying the name of the column containing the biomolecule identifiers in \code{e_data} and \code{e_meta} (if applicable). Not required if omicsData is provided.}
 
 \item{samp_id}{character string specifying the name of the column containing the sample identifiers in \code{groupDF}. Not required if omicsData is provided.}
+
+\item{check.names}{Logical, determines whether check.names argument of the data.frame function is TRUE or FALSE. Not required if omicsData is provided.}
 }
 \value{
 a list of length two. The first element giving the total number of possible samples for each group. The second element giving a data.frame with the first column giving the peptide and the second through kth columns giving the number of non-missing observations for each of the \code{k} groups.
@@ -37,4 +39,3 @@ nonmissing_result <- nonmissing_per_group(e_data = pep_object2$e_data, groupDF =
 \author{
 Lisa Bramer, Kelly Stratton
 }
-

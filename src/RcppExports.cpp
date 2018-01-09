@@ -52,3 +52,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+
+static const R_CallMethodDef CallEntries[] = {
+    {"pmartRqc_kw_rcpp", (DL_FUNC) &pmartRqc_kw_rcpp, 2},
+    {"pmartRqc_nonmissing_per_grp", (DL_FUNC) &pmartRqc_nonmissing_per_grp, 2},
+    {"pmartRqc_pooled_cv_rcpp", (DL_FUNC) &pmartRqc_pooled_cv_rcpp, 2},
+    {"pmartRqc_rcpp_hello_world", (DL_FUNC) &pmartRqc_rcpp_hello_world, 0},
+    {NULL, NULL, 0}
+};
+
+RcppExport void R_init_pmartRqc(DllInfo *dll) {
+    R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
+    R_useDynamicSymbols(dll, FALSE);
+}

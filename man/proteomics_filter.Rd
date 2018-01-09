@@ -30,4 +30,3 @@ summary(my_filter, min_num_peps = 3)
 \author{
 Lisa Bramer, Kelly Stratton
 }
-

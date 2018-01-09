@@ -57,4 +57,3 @@ peps_zscore <- zscore_transform(e_data = pep_edata, edata_id = "Mass_Tag_ID", fe
 \author{
 Lisa Bramer, Kelly Stratton, Bryan Stanfill
 }
-

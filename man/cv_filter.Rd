@@ -28,10 +28,9 @@ summary(to_filter, cv_threshold = 30)
 }
 
 }
-\author{
-Lisa Bramer, Kelly Stratton
-}
 \references{
 Ahmed, S.E. (1995). \emph{A pooling methodology for coefficient of variation}. The Indian Journal of Statistics. 57: 57-75.
 }
-
+\author{
+Lisa Bramer, Kelly Stratton
+}

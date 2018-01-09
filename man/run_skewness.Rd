@@ -21,4 +21,3 @@ Skewness is calculated as a bias-corrected calculation given by method 2 in the 
 \author{
 Lisa Bramer
 }
-

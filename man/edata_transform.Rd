@@ -2,28 +2,30 @@
 % Please edit documentation in R/edata_transform.R
 \name{edata_transform}
 \alias{edata_transform}
-\alias{edata_transform.lipidData}
-\alias{edata_transform.metabData}
+\alias{edata_transform}
 \alias{edata_transform.pepData}
+\alias{edata_transform}
 \alias{edata_transform.proData}
+\alias{edata_transform}
+\alias{edata_transform.metabData}
+\alias{edata_transform}
+\alias{edata_transform.lipidData}
 \title{Apply a Transformation to the Data}
 \usage{
-edata_transform(omicsData, data_scale, check.names = TRUE)
+edata_transform(omicsData, data_scale)
 
-\method{edata_transform}{pepData}(omicsData, data_scale, check.names = TRUE)
+\method{edata_transform}{pepData}(omicsData, data_scale)
 
-\method{edata_transform}{proData}(omicsData, data_scale, check.names = TRUE)
+\method{edata_transform}{proData}(omicsData, data_scale)
 
-\method{edata_transform}{metabData}(omicsData, data_scale, check.names = TRUE)
+\method{edata_transform}{metabData}(omicsData, data_scale)
 
-\method{edata_transform}{lipidData}(omicsData, data_scale, check.names = TRUE)
+\method{edata_transform}{lipidData}(omicsData, data_scale)
 }
 \arguments{
 \item{omicsData}{an object of the class 'pepData', 'proData', 'metabData', or 'lipidData', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.}
 
 \item{data_scale}{a character string indicating the type of transformation to be applied to the data. Valid values are: 'log2', 'log', 'log10', or 'abundance'. A value of 'abundance' indicates the data has previously undergone one of the log transformations and should be transformed back to raw values with no transformation applied.}
-
-\item{check.names}{logical. If TRUE then the names of the variables in the data frame are checked to ensure that they are syntactically valid variable names and are not duplicated. If necessary they are adjusted (by \code{\link{make.names}}) so that they are.}
 }
 \value{
 data object of the same class as omicsData
@@ -45,4 +47,3 @@ attr(metab_object2, "data_info")$data_scale
 \author{
 Kelly Stratton, Natalie Heller
 }
-
