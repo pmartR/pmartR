@@ -12,23 +12,36 @@ print.pepData<- function(pepData){
   f_data<- as.data.frame(lapply(pepData$f_data, as.character), stringsAsFactors = FALSE)
   edata_ncols<- ncol(e_data)
   fdata_ncols<- ncol(f_data)
+  blank_row = rep("----", 5)
   
   if(!is.null(pepData$e_meta)){
     e_meta<- as.data.frame(lapply(pepData$e_meta, as.character), stringsAsFactors = FALSE)
     emeta_ncols<- ncol(e_meta)
     
-    e_data_head = head(e_data, 4)[, 1:min(edata_ncols, 5)]
-    e_data_tail = tail(e_data, 4)[, 1:min(edata_ncols, 5)]
-    f_data_head = head(f_data, 4)[, 1:min(fdata_ncols, 5)]
-    f_data_tail = tail(f_data, 4)[, 1:min(fdata_ncols, 5)]
-    e_meta_head = head(e_meta, 4)[, 1:min(emeta_ncols, 5)]
-    e_meta_tail = tail(e_meta, 4)[, 1:min(emeta_ncols, 5)]
-    blank_row = rep("----", 5)
-    
-    edata<-rbind(e_data_head, blank_row, e_data_tail)
-    fdata<-rbind(f_data_head, blank_row, f_data_tail)
-    emeta<-rbind(e_meta_head, blank_row, e_meta_tail)
-    
+    if(nrow(e_data) >= 9){
+      e_data_head = head(e_data, 4)[, 1:min(edata_ncols, 5)]
+      e_data_tail = tail(e_data, 4)[, 1:min(edata_ncols, 5)]
+      edata = rbind(e_data_head, blank_row, e_data_tail)
+    }else{
+      edata = e_data
+    }
+
+    if(nrow(f_data) >= 9){
+      f_data_head = head(f_data, 4)[, 1:min(fdata_ncols, 5)]
+      f_data_tail = tail(f_data, 4)[, 1:min(fdata_ncols, 5)]
+      fdata = rbind(f_data_head, blank_row, f_data_tail)
+    }else{
+      fdata = f_data
+    }
+
+    if(nrow(e_meta) >= 9){
+      e_meta_head = head(e_meta, 4)[, 1:min(emeta_ncols, 5)]
+      e_meta_tail = tail(e_meta, 4)[, 1:min(emeta_ncols, 5)]
+      emeta = rbind(e_meta_head, blank_row, e_meta_tail)
+    }else{
+      emeta = e_meta
+    }
+
     if(edata_ncols > 5) message("only first 5 columns are shown")
     cat("e_data\n")
     cat(capture.output(edata), sep = "\n")
@@ -45,14 +58,21 @@ print.pepData<- function(pepData){
     cat("\n")
     
   }else{
-    e_data_head = head(e_data, 4)[, 1:min(edata_ncols, 5)]
-    e_data_tail = tail(e_data, 4)[, 1:min(edata_ncols, 5)]
-    f_data_head = head(f_data, 4)[, 1:min(fdata_ncols, 5)]
-    f_data_tail = tail(f_data, 4)[, 1:min(fdata_ncols, 5)]
-    blank_row = rep("----", 5)
+    if(nrow(e_data) >= 9){
+      e_data_head = head(e_data, 4)[, 1:min(edata_ncols, 5)]
+      e_data_tail = tail(e_data, 4)[, 1:min(edata_ncols, 5)]
+      edata = rbind(e_data_head, blank_row, e_data_tail)
+    }else{
+      edata = e_data
+    }
     
-    edata<-rbind(e_data_head, blank_row, e_data_tail)
-    fdata<-rbind(f_data_head, blank_row, f_data_tail)
+    if(nrow(f_data) >= 9){
+      f_data_head = head(f_data, 4)[, 1:min(fdata_ncols, 5)]
+      f_data_tail = tail(f_data, 4)[, 1:min(fdata_ncols, 5)]
+      fdata = rbind(f_data_head, blank_row, f_data_tail)
+    }else{
+      fdata = f_data
+    }
     
     if(edata_ncols > 5) message("only first 5 columns are shown")
     cat("e_data\n")
@@ -80,22 +100,35 @@ print.metabData<- function(metabData){
   f_data<- as.data.frame(lapply(metabData$f_data, as.character), stringsAsFactors = FALSE)
   edata_ncols<- ncol(e_data)
   fdata_ncols<- ncol(f_data)
+  blank_row = rep("----", 5)
   
   if(!is.null(metabData$e_meta)){
     e_meta<- as.data.frame(lapply(metabData$e_meta, as.character), stringsAsFactors = FALSE)
     emeta_ncols<- ncol(e_meta)
     
-    e_data_head = head(e_data, 4)[, 1:min(edata_ncols, 5)]
-    e_data_tail = tail(e_data, 4)[, 1:min(edata_ncols, 5)]
-    f_data_head = head(f_data, 4)[, 1:min(fdata_ncols, 5)]
-    f_data_tail = tail(f_data, 4)[, 1:min(fdata_ncols, 5)]
-    e_meta_head = head(e_meta, 4)[, 1:min(emeta_ncols, 5)]
-    e_meta_tail = tail(e_meta, 4)[, 1:min(emeta_ncols, 5)]
-    blank_row = rep("----", 5)
+    if(nrow(e_data) >= 9){
+      e_data_head = head(e_data, 4)[, 1:min(edata_ncols, 5)]
+      e_data_tail = tail(e_data, 4)[, 1:min(edata_ncols, 5)]
+      edata = rbind(e_data_head, blank_row, e_data_tail)
+    }else{
+      edata = e_data
+    }
     
-    edata<-rbind(e_data_head, blank_row, e_data_tail)
-    fdata<-rbind(f_data_head, blank_row, f_data_tail)
-    emeta<-rbind(e_meta_head, blank_row, e_meta_tail)
+    if(nrow(f_data) >= 9){
+      f_data_head = head(f_data, 4)[, 1:min(fdata_ncols, 5)]
+      f_data_tail = tail(f_data, 4)[, 1:min(fdata_ncols, 5)]
+      fdata = rbind(f_data_head, blank_row, f_data_tail)
+    }else{
+      fdata = f_data
+    }
+    
+    if(nrow(e_meta) >= 9){
+      e_meta_head = head(e_meta, 4)[, 1:min(emeta_ncols, 5)]
+      e_meta_tail = tail(e_meta, 4)[, 1:min(emeta_ncols, 5)]
+      emeta = rbind(e_meta_head, blank_row, e_meta_tail)
+    }else{
+      emeta = e_meta
+    }
     
     if(edata_ncols > 5) message("only first 5 columns are shown")
     cat("e_data\n")
@@ -113,14 +146,21 @@ print.metabData<- function(metabData){
     cat("\n")
     
   }else{
-    e_data_head = head(e_data, 4)[, 1:min(edata_ncols, 5)]
-    e_data_tail = tail(e_data, 4)[, 1:min(edata_ncols, 5)]
-    f_data_head = head(f_data, 4)[, 1:min(fdata_ncols, 5)]
-    f_data_tail = tail(f_data, 4)[, 1:min(fdata_ncols, 5)]
-    blank_row = rep("----", 5)
+    if(nrow(e_data) >= 9){
+      e_data_head = head(e_data, 4)[, 1:min(edata_ncols, 5)]
+      e_data_tail = tail(e_data, 4)[, 1:min(edata_ncols, 5)]
+      edata = rbind(e_data_head, blank_row, e_data_tail)
+    }else{
+      edata = e_data
+    }
     
-    edata<-rbind(e_data_head, blank_row, e_data_tail)
-    fdata<-rbind(f_data_head, blank_row, f_data_tail)
+    if(nrow(f_data) >= 9){
+      f_data_head = head(f_data, 4)[, 1:min(fdata_ncols, 5)]
+      f_data_tail = tail(f_data, 4)[, 1:min(fdata_ncols, 5)]
+      fdata = rbind(f_data_head, blank_row, f_data_tail)
+    }else{
+      fdata = f_data
+    }
     
     if(edata_ncols > 5) message("only first 5 columns are shown")
     cat("e_data\n")
@@ -148,22 +188,35 @@ print.proData<- function(proData){
   f_data<- as.data.frame(lapply(proData$f_data, as.character), stringsAsFactors = FALSE)
   edata_ncols<- ncol(e_data)
   fdata_ncols<- ncol(f_data)
+  blank_row = rep("----", 5)
   
   if(!is.null(proData$e_meta)){
     e_meta<- as.data.frame(lapply(proData$e_meta, as.character), stringsAsFactors = FALSE)
     emeta_ncols<- ncol(e_meta)
     
-    e_data_head = head(e_data, 4)[, 1:min(edata_ncols, 5)]
-    e_data_tail = tail(e_data, 4)[, 1:min(edata_ncols, 5)]
-    f_data_head = head(f_data, 4)[, 1:min(fdata_ncols, 5)]
-    f_data_tail = tail(f_data, 4)[, 1:min(fdata_ncols, 5)]
-    e_meta_head = head(e_meta, 4)[, 1:min(emeta_ncols, 5)]
-    e_meta_tail = tail(e_meta, 4)[, 1:min(emeta_ncols, 5)]
-    blank_row = rep("----", 5)
+    if(nrow(e_data) >= 9){
+      e_data_head = head(e_data, 4)[, 1:min(edata_ncols, 5)]
+      e_data_tail = tail(e_data, 4)[, 1:min(edata_ncols, 5)]
+      edata = rbind(e_data_head, blank_row, e_data_tail)
+    }else{
+      edata = e_data
+    }
     
-    edata<-rbind(e_data_head, blank_row, e_data_tail)
-    fdata<-rbind(f_data_head, blank_row, f_data_tail)
-    emeta<-rbind(e_meta_head, blank_row, e_meta_tail)
+    if(nrow(f_data) >= 9){
+      f_data_head = head(f_data, 4)[, 1:min(fdata_ncols, 5)]
+      f_data_tail = tail(f_data, 4)[, 1:min(fdata_ncols, 5)]
+      fdata = rbind(f_data_head, blank_row, f_data_tail)
+    }else{
+      fdata = f_data
+    }
+    
+    if(nrow(e_meta) >= 9){
+      e_meta_head = head(e_meta, 4)[, 1:min(emeta_ncols, 5)]
+      e_meta_tail = tail(e_meta, 4)[, 1:min(emeta_ncols, 5)]
+      emeta = rbind(e_meta_head, blank_row, e_meta_tail)
+    }else{
+      emeta = e_meta
+    }
     
     if(edata_ncols > 5) message("only first 5 columns are shown")
     cat("e_data\n")
@@ -181,14 +234,21 @@ print.proData<- function(proData){
     cat("\n")
     
   }else{
-    e_data_head = head(e_data, 4)[, 1:min(edata_ncols, 5)]
-    e_data_tail = tail(e_data, 4)[, 1:min(edata_ncols, 5)]
-    f_data_head = head(f_data, 4)[, 1:min(fdata_ncols, 5)]
-    f_data_tail = tail(f_data, 4)[, 1:min(fdata_ncols, 5)]
-    blank_row = rep("----", 5)
+    if(nrow(e_data) >= 9){
+      e_data_head = head(e_data, 4)[, 1:min(edata_ncols, 5)]
+      e_data_tail = tail(e_data, 4)[, 1:min(edata_ncols, 5)]
+      edata = rbind(e_data_head, blank_row, e_data_tail)
+    }else{
+      edata = e_data
+    }
     
-    edata<-rbind(e_data_head, blank_row, e_data_tail)
-    fdata<-rbind(f_data_head, blank_row, f_data_tail)
+    if(nrow(f_data) >= 9){
+      f_data_head = head(f_data, 4)[, 1:min(fdata_ncols, 5)]
+      f_data_tail = tail(f_data, 4)[, 1:min(fdata_ncols, 5)]
+      fdata = rbind(f_data_head, blank_row, f_data_tail)
+    }else{
+      fdata = f_data
+    }
     
     if(edata_ncols > 5) message("only first 5 columns are shown")
     cat("e_data\n")
@@ -216,22 +276,35 @@ print.lipidData<- function(lipidData){
   f_data<- as.data.frame(lapply(lipidData$f_data, as.character), stringsAsFactors = FALSE)
   edata_ncols<- ncol(e_data)
   fdata_ncols<- ncol(f_data)
+  blank_row = rep("----", 5)
   
   if(!is.null(lipidData$e_meta)){
     e_meta<- as.data.frame(lapply(lipidData$e_meta, as.character), stringsAsFactors = FALSE)
     emeta_ncols<- ncol(e_meta)
     
-    e_data_head = head(e_data, 4)[, 1:min(edata_ncols, 5)]
-    e_data_tail = tail(e_data, 4)[, 1:min(edata_ncols, 5)]
-    f_data_head = head(f_data, 4)[, 1:min(fdata_ncols, 5)]
-    f_data_tail = tail(f_data, 4)[, 1:min(fdata_ncols, 5)]
-    e_meta_head = head(e_meta, 4)[, 1:min(emeta_ncols, 5)]
-    e_meta_tail = tail(e_meta, 4)[, 1:min(emeta_ncols, 5)]
-    blank_row = rep("----", 5)
+    if(nrow(e_data) >= 9){
+      e_data_head = head(e_data, 4)[, 1:min(edata_ncols, 5)]
+      e_data_tail = tail(e_data, 4)[, 1:min(edata_ncols, 5)]
+      edata = rbind(e_data_head, blank_row, e_data_tail)
+    }else{
+      edata = e_data
+    }
     
-    edata<-rbind(e_data_head, blank_row, e_data_tail)
-    fdata<-rbind(f_data_head, blank_row, f_data_tail)
-    emeta<-rbind(e_meta_head, blank_row, e_meta_tail)
+    if(nrow(f_data) >= 9){
+      f_data_head = head(f_data, 4)[, 1:min(fdata_ncols, 5)]
+      f_data_tail = tail(f_data, 4)[, 1:min(fdata_ncols, 5)]
+      fdata = rbind(f_data_head, blank_row, f_data_tail)
+    }else{
+      fdata = f_data
+    }
+    
+    if(nrow(e_meta) >= 9){
+      e_meta_head = head(e_meta, 4)[, 1:min(emeta_ncols, 5)]
+      e_meta_tail = tail(e_meta, 4)[, 1:min(emeta_ncols, 5)]
+      emeta = rbind(e_meta_head, blank_row, e_meta_tail)
+    }else{
+      emeta = e_meta
+    }
     
     if(edata_ncols > 5) message("only first 5 columns are shown")
     cat("e_data\n")
@@ -249,14 +322,21 @@ print.lipidData<- function(lipidData){
     cat("\n")
     
   }else{
-    e_data_head = head(e_data, 4)[, 1:min(edata_ncols, 5)]
-    e_data_tail = tail(e_data, 4)[, 1:min(edata_ncols, 5)]
-    f_data_head = head(f_data, 4)[, 1:min(fdata_ncols, 5)]
-    f_data_tail = tail(f_data, 4)[, 1:min(fdata_ncols, 5)]
-    blank_row = rep("----", 5)
+    if(nrow(e_data) >= 9){
+      e_data_head = head(e_data, 4)[, 1:min(edata_ncols, 5)]
+      e_data_tail = tail(e_data, 4)[, 1:min(edata_ncols, 5)]
+      edata = rbind(e_data_head, blank_row, e_data_tail)
+    }else{
+      edata = e_data
+    }
     
-    edata<-rbind(e_data_head, blank_row, e_data_tail)
-    fdata<-rbind(f_data_head, blank_row, f_data_tail)
+    if(nrow(f_data) >= 9){
+      f_data_head = head(f_data, 4)[, 1:min(fdata_ncols, 5)]
+      f_data_tail = tail(f_data, 4)[, 1:min(fdata_ncols, 5)]
+      fdata = rbind(f_data_head, blank_row, f_data_tail)
+    }else{
+      fdata = f_data
+    }
     
     if(edata_ncols > 5) message("only first 5 columns are shown")
     cat("e_data\n")
