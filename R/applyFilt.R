@@ -560,7 +560,12 @@ applyFilt.imdanovaFilt <- function(filter_object, omicsData, min_nonmiss_anova=N
     #checking that filter.edata does not specify all of e_data in omicsData
     if(all(omicsData$e_data[[edata_cname]] %in% filter.edata)){stop("filter.edata specifies all of e_data in omicsData")}
     
-    filter_object_new = list(edata_filt = filter.edata, emeta_filt = NULL, samples_filt = NULL)
+    if(length(filter.edata) < 1){ # if-statement added by KS 1/12/2018 to catch the case where nothing is removed
+      filter_object_new = list(edata_filt = NULL, emeta_filt = NULL, samples_filt = NULL)
+    }else{
+      filter_object_new = list(edata_filt = filter.edata, emeta_filt = NULL, samples_filt = NULL)
+    }
+    
 
     # call the function that does the filter application
     results_pieces <- MSomics_filter_worker(omicsData = omicsData, filter_object = filter_object_new)
