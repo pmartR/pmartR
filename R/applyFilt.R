@@ -1,14 +1,14 @@
 #' Apply a S3 filter  object to an MSomics S3 object
 #'
-#' This function takes a filter object of  'cvFilt', 'rmdFilt', 'moleculeFilt', 'proteomicsFilt', 'imdanovaFilt', or 'customFilt' and applies the filter to a dataset of  \code{pepData}, \code{proData}, \code{lipidData}, or \code{metabData}.
+#' This function takes a filter object of class 'cvFilt', 'rmdFilt', 'moleculeFilt', 'proteomicsFilt', 'imdanovaFilt', or 'customFilt' and applies the filter to a dataset of  \code{pepData}, \code{proData}, \code{lipidData}, or \code{metabData}.
 #'
-#' @param filter_object an object of the  'cvFilt', 'proteomicsFilt', 'rmdFilt', 'moleculeFilt', 'imdanovaFilt', or 'customFilt' created by \code{cv_filter}, \code{proteomics_filter}, \code{rmd_filter}, \code{molecule_filter}, or \code{imdanova_filter}, respectively.
-#' @param omicsData an object of the  \code{pepData}, \code{proData}, \code{lipidData}, or \code{metabData} usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.lipidData}}, or  \code{\link{as.metabData}}, respectively.
+#' @param filter_object an object of the class 'cvFilt', 'proteomicsFilt', 'rmdFilt', 'moleculeFilt', 'imdanovaFilt', or 'customFilt' created by \code{cv_filter}, \code{proteomics_filter}, \code{rmd_filter}, \code{molecule_filter}, or \code{imdanova_filter}, respectively.
+#' @param omicsData an object of the class \code{pepData}, \code{proData}, \code{lipidData}, or \code{metabData} usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.lipidData}}, or  \code{\link{as.metabData}}, respectively.
 #' @param ... further arguments
 #'
-#' @return An object of the  \code{pepData}, \code{proData}, \code{lipidData}, or \code{metabData},  with specified cname_ids, edata_cnames, and emeta_cnames filtered out of the appropriate datasets.
+#' @return An object of the class \code{pepData}, \code{proData}, \code{lipidData}, or \code{metabData},  with specified cname_ids, edata_cnames, and emeta_cnames filtered out of the appropriate datasets.
 #'
-#' @details Various further arguments can be specified depending on the  of the \code{filter_object} being applied.
+#' @details Various further arguments can be specified depending on the class of the \code{filter_object} being applied.
 #' For a \code{filter_object} of type 'moleculeFilt':
 #' \tabular{ll}{
 #' \code{min_num} \tab an integer value specifying the minimum number of times each biomolecule must be observed across all samples in order to retain the biomolecule. Default value is 2. \cr
@@ -57,10 +57,10 @@
 #' @export
 applyFilt <- function(filter_object, omicsData, ...){
 
-  # check that omicsData is of mintR S3 #
-  if(!inherits(omicsData, c("pepData", "proData", "lipidData", "metabData"))) stop("omicsData must be of  'pepData', 'proData', 'lipidData', or 'metabData'")
+  # check that omicsData is of mintR S3 class#
+  if(!inherits(omicsData, c("pepData", "proData", "lipidData", "metabData"))) stop("omicsData must be of class 'pepData', 'proData', 'lipidData', or 'metabData'")
 
-  # check that filter_object is of an appropriate  #
+  # check that filter_object is of an appropriate class#
   if(!inherits(filter_object, c("cvFilt", "proteomicsFilt", "moleculeFilt", "rmdFilt", "imdanovaFilt", "customFilt"))) stop("filter_object must be of  'cvFilt', 'proteomicsFilt', 'moleculeFilt', 'rmdFilt', 'imdanovaFilt', or 'customFilt.")
 
   # pull column names from omicR_data attributes #
@@ -266,8 +266,8 @@ applyFilt.rmdFilt <- function(filter_object, omicsData, pvalue_threshold=0.001){
 
   }else{ # no previous rmdFilt, so go ahead and run it like normal #
 
-    # check that filter_object is of  rmdFilt #
-    if(!inherits(filter_object, "rmdFilt")) stop("filter_object must be of the  'rmdFilt'. See rmd_filter for details.")
+    # check that filter_object is of class rmdFilt #
+    if(!inherits(filter_object, "rmdFilt")) stop("filter_object must be of the class 'rmdFilt'. See rmd_filter for details.")
 
     # check that pvalue_threshold is between 0 and 1 #
     if(pvalue_threshold < 0 | pvalue_threshold > 1) stop("pvalue_threshold must be between 0 and 1.")
@@ -785,7 +785,7 @@ applyFilt.customFilt <- function(filter_object, omicsData){
 #'
 #' This function removes
 #'
-#' @param omicsData an object of the  \code{pepData}, \code{proData}, \code{lipidData}, or \code{metabData}, usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.lipidData}}, or \code{\link{as.metabData}}, respectively.
+#' @param omicsData an object of the class \code{pepData}, \code{proData}, \code{lipidData}, or \code{metabData}, usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.lipidData}}, or \code{\link{as.metabData}}, respectively.
 #' @param filter_object a list created by the functions above
 #' @return list
 #' @author Kelly Stratton, Lisa Bramer
