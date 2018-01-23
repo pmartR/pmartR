@@ -1,4 +1,4 @@
-#' Produce a basic summary of an mintR S3 Object
+#' Produce a basic summary of an pmartR S3 Object
 #'
 #' This function will provide basic summary statistics for objects from the MSomicsR package.
 #'
@@ -23,8 +23,8 @@
 
 
 
-#'@rdname summary-mintR
-#'@name summary-mintR
+#'@rdname summary-pmartR
+#'@name summary-pmartR
 summary.pepData <- function(omicsData) {
 
   # get values #
@@ -78,8 +78,8 @@ summary.pepData <- function(omicsData) {
 
 
 #'@export
-#'@rdname summary-mintR
-#'@name summary-mintR
+#'@rdname summary-pmartR
+#'@name summary-pmartR
 summary.proData <- function(omicsData) {
 
   # get values #
@@ -133,8 +133,8 @@ summary.proData <- function(omicsData) {
 
 
 #'@export
-#'@rdname summary-mintR
-#'@name summary-mintR
+#'@rdname summary-pmartR
+#'@name summary-pmartR
 summary.lipidData <- function(omicsData) {
 
   # get values #
@@ -187,8 +187,8 @@ summary.lipidData <- function(omicsData) {
 
 
 #'@export
-#'@rdname summary-mintR
-#'@name summary-mintR
+#'@rdname summary-pmartR
+#'@name summary-pmartR
 summary.metabData <- function(omicsData) {
 
   # get values #
@@ -241,8 +241,8 @@ summary.metabData <- function(omicsData) {
 
 
 #'@export
-#'@rdname summary-mintR
-#'@name summary-mintR
+#'@rdname summary-pmartR
+#'@name summary-pmartR
 #'@param corRes_object an object of class corRes. A correlation matrix of all samples.
 summary.corRes <- function(corRes_object){
 
@@ -257,8 +257,8 @@ summary.corRes <- function(corRes_object){
 
 
 #'@export
-#'@rdname summary-mintR
-#'@name summary-mintR
+#'@rdname summary-pmartR
+#'@name summary-pmartR
 #'@param dimRes_object an object of class dimRes. A list containing sample identifiers and the principle components scores.
 summary.dimRes <- function(dimRes_object){
 
@@ -282,7 +282,7 @@ summary.dimRes <- function(dimRes_object){
 
 
 #'@export
-#'@rdname summary-mintR
+#'@rdname summary-pmartR
 #'@name summary-mint
 #'@param min_num an integer value specifying the minimum number of times each feature must be observed across all samples. Default value is 2.
 summary.moleculeFilt <- function(filter_object, min_num=NULL){
@@ -336,8 +336,8 @@ summary.moleculeFilt <- function(filter_object, min_num=NULL){
 
 
 #'@export
-#'@rdname summary-mintR
-#'@name summary-mintR
+#'@rdname summary-pmartR
+#'@name summary-pmartR
 #'@param min_num_peps an optional integer value between 1 and the maximum number of peptides that map to a protein in the data. The value specifies the minimum number of peptides that must map to a protein. Any protein with less than \code{min_num_peps} mapping to it will be returned as a protein that should be filtered. Default value is NULL.
 #'@param degen_peps logical indicator of whether to filter out degenerate peptides (TRUE) or not (FALSE). Default value is FALSE.
 summary.proteomicsFilt <- function(filter_object, min_num_peps=NULL, degen_peps=FALSE){
@@ -435,8 +435,8 @@ summary.proteomicsFilt <- function(filter_object, min_num_peps=NULL, degen_peps=
 
 
 #'@export
-#'@rdname summary-mintR
-#'@name summary-mintR
+#'@rdname summary-pmartR
+#'@name summary-pmartR
 #'@param min_nonmiss_gtest the minimum number of non-missing feature values allowed per group for \code{gtest_filter}. Suggested value is 3.
 #'@param min_nonmiss_anova the minimum number of non-missing feature values allowed per group for \code{anova_filter}. Suggested value is 2.
 summary.imdanovaFilt <- function(filter_object, min_nonmiss_anova=NULL, min_nonmiss_gtest=NULL){
@@ -530,8 +530,8 @@ summary.imdanovaFilt <- function(filter_object, min_nonmiss_anova=NULL, min_nonm
 
 
 #'@export
-#'@rdname summary-mintR
-#'@name summary-mintR
+#'@rdname summary-pmartR
+#'@name summary-pmartR
 #'@param pvalue_threshold A threshold for the Robust Mahalanobis Distance (RMD) p-value. All samples below the threshold will be filtered out. Default value is NULL.
 summary.rmdFilt <- function(filter_object, pvalue_threshold = NULL){
 
@@ -569,8 +569,8 @@ summary.rmdFilt <- function(filter_object, pvalue_threshold = NULL){
 
 
 #'@export
-#'@rdname summary-mintR
-#'@name summary-mintR
+#'@rdname summary-pmartR
+#'@name summary-pmartR
 #'@param cv_threshold CV values above cv_threshold are filtered out. Default value is NULL.
 summary.cvFilt <- function(filter_object, cv_threshold = NULL){
 
@@ -616,14 +616,22 @@ summary.cvFilt <- function(filter_object, cv_threshold = NULL){
 
 
 #'@export
-#'@rdname summary-mintR
-#'@name summary-mintR
+#'@rdname summary-pmartR
+#'@name summary-pmartR
 summary.customFilt <- function(filter_object){
+  
+  # get omicsData object #
+  omicsData <- attr(filter_object, "omicsData")
+  summary_orig <- summary(omicsData)
   
   # get names #
   edata_id <- attr(filter_object, "cnames")$edata_cname
   emeta_id <- attr(filter_object, "cnames")$emeta_cname
   samp_id <- attr(filter_object, "cnames")$fdata_cname
+  
+  # apply the filter #
+  filtered_data <- applyFilt(filter_object, omicsData)
+  summary_filt <- summary(filtered_data)
   
   #if filter_object contains removes
   if(!is.null(filter_object$e_data_remove)||!is.null(filter_object$f_data_remove)||!is.null(filter_object$e_meta_remove))
@@ -644,20 +652,21 @@ summary.customFilt <- function(filter_object){
       edata_filt <- length(filter_object$e_data_remove)
       edata_left <- num_edata - edata_filt
     } else {
-      edata_filt <- 0
-      edata_left <- num_edata
+      edata_filt <- num_edata - nrow(filtered_data$e_data)
+      edata_left <- nrow(filtered_data$e_data)
     }
     
     # e_meta #
-    num_emeta <- attributes(filter_object)$num_emeta
-    if(!is.null(filter_object$e_meta_remove)) {
-      emeta_filt <- length(filter_object$e_meta_remove)
-      emeta_left <- num_emeta - emeta_filt
-    } else {
-      emeta_filt <- 0
-      emeta_left <- num_emeta
+    if(!is.null(filtered_data$e_meta)){
+      num_emeta <- attributes(filter_object)$num_emeta
+      if(!is.null(filter_object$e_meta_remove)) {
+        emeta_filt <- length(filter_object$e_meta_remove)
+        emeta_left <- num_emeta - emeta_filt
+      } else {
+        emeta_filt <- num_emeta - length(unique(filtered_data$e_meta[, emeta_id] ))
+        emeta_left <- length(unique(filtered_data$e_meta[, emeta_id] ))
+      }
     }
-    
     # Display #
     
     samp_id <- paste(samp_id, "s (f_data)", sep="")
@@ -694,8 +703,8 @@ summary.customFilt <- function(filter_object){
       edata_keep <- length(filter_object$e_data_keep)
       edata_discard <- num_edata - edata_keep
     } else {
-      edata_keep <- num_edata
-      edata_discard <- 0
+      edata_keep <- nrow(filtered_data$e_data)
+      edata_discard <- num_edata - nrow(filtered_data$e_data)
     }
     
     # e_meta #
@@ -704,8 +713,8 @@ summary.customFilt <- function(filter_object){
       emeta_keep <- length(filter_object$e_meta_keep)
       emeta_discard <- num_emeta - emeta_keep
     } else {
-      emeta_keep <- num_emeta
-      emeta_discard <- 0
+      emeta_keep <- length(unique(filtered_data$e_meta[, emeta_id] ))
+      emeta_discard <- num_emeta - length(unique(filtered_data$e_meta[, emeta_id] ))
     }
     
     # Display #
@@ -737,8 +746,8 @@ summary.customFilt <- function(filter_object){
 
 
 #'@export
-#'@rdname summary-mintR
-#'@name summary-mintR
+#'@rdname summary-pmartR
+#'@name summary-pmartR
 summary.normRes <- function(omicsNorm) {
   # summary for the normalization object (if normalize=FALSE when calling normalization_calc)
 

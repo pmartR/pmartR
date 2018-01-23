@@ -22,4 +22,3 @@ For plotting an S3 object of type 'dimRes':
 \code{legend_position} \tab character string specifying one of "right", "left", "top", or "bottom" for the location of the legend. Defaults to "right". \cr
 }
 }
-

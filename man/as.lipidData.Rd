@@ -35,6 +35,8 @@ data_norm \tab A logical argument, specifying whether the data has been normaliz
 norm_info \tab Default value is NULL. When a normalization is applied to the data, this becomes populated with a list containing the normalization function, normalization subset and subset parameters, the location and scale parameters used to normalize the data, and the location and scale parameters used to backtransform the data (if applicable). \cr
 \tab \cr
 data_types \tab Character string describing the type of data (e.g. 'Positive ion'). Default value is NULL. \cr
+\tab \cr
+check.names \tab Logical defaults to TRUE. Indicates whether 'check.names' attribute of returned omicsData object is TRUE or FALSE. \cr
 }
 Computed values included in the \code{data_info} attribute are as follows:
 \tabular{ll}{

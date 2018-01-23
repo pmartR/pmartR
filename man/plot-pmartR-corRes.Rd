@@ -23,4 +23,3 @@
 \description{
 For plotting an S3 object of type 'corRes':
 }
-
