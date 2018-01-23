@@ -28,8 +28,8 @@ bpquant_loop<- function(statRes, pepData, pi_not = .9, max_proteoforms = 5){
   if(pi_not < 0 | pi_not > 1) stop("pi_not must be between 0 and 1")
   if(max_proteoforms <= 0) stop("max_proteoforms must be 1 or greater")
   
-  if(class(statRes)[1] != "statRes") stop("statRes must be an object of class statRes")
-  if(class(pepData)[1] != "pepData") stop("pepData must be an object of class pepData")
+  if(!inherits(statRes, "statRes")) stop("statRes must be an object of class statRes")
+  if(!inherits(pepData, "pepData")) stop("pepData must be an object of class pepData")
   
   
   #pulling e_meta from pepData, aswell as cnames

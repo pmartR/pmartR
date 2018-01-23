@@ -18,7 +18,7 @@
 get_comparisons<- function(statRes){
 
   #check that statRes object is of 'statRes' class
-  if(class(statRes) != "statRes") stop("object must be of class 'statRes'")
+  if(!inherits(statRes, "statRes")) stop("object must be of class 'statRes'")
   
   #pull comparisons attribute
   comp = attr(statRes, "comparisons")
@@ -49,7 +49,7 @@ get_comparisons<- function(statRes){
 #'
 getchecknames<- function(omicsData){
   # check that omicsData is of appropriate class #
-  if(!class(omicsData) %in% c("pepData", "proData", "metabData", "lipidData")) stop("omicsData must be of class 'pepData', 'proData', 'metabData', or 'lipidData'")
+  if(!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData"))) stop("omicsData must be of class 'pepData', 'proData', 'metabData', or 'lipidData'")
   
   result = attr(omicsData, "check.names")
   
@@ -77,7 +77,7 @@ getchecknames<- function(omicsData){
 #'
 setchecknames<- function(omicsData, set_to = TRUE){
   # check that omicsData is of appropriate class #
-  if(!class(omicsData) %in% c("pepData", "proData", "metabData", "lipidData")) stop("omicsData must be of class 'pepData', 'proData', 'metabData', or 'lipidData'")
+  if(!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData"))) stop("omicsData must be of class 'pepData', 'proData', 'metabData', or 'lipidData'")
   
   #check that set_to is logical
   if(!is.logical(set_to)) stop ("set_to must be of class 'logical' ")
@@ -107,7 +107,7 @@ setchecknames<- function(omicsData, set_to = TRUE){
 #'
 get_group_info<- function(omicsData){
   # check that omicsData is of appropriate class #
-  if(!class(omicsData) %in% c("pepData", "proData", "metabData", "lipidData")) stop("omicsData must be of class 'pepData', 'proData', 'metabData', or 'lipidData'")
+  if(!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData"))) stop("omicsData must be of class 'pepData', 'proData', 'metabData', or 'lipidData'")
   if(is.null(attr(omicsData, "group_DF"))) stop("group_designation has not been run on omicsData")
   
   res = attr(omicsData, "group_DF")
@@ -135,7 +135,7 @@ get_group_info<- function(omicsData){
 #'
 get_group_table<- function(omicsData){
   # check that omicsData is of appropriate class #
-  if(!class(omicsData) %in% c("pepData", "proData", "metabData", "lipidData")) stop("omicsData must be of class 'pepData', 'proData', 'metabData', or 'lipidData'")
+  if(!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData"))) stop("omicsData must be of class 'pepData', 'proData', 'metabData', or 'lipidData'")
   if(is.null(attr(omicsData, "group_DF"))) stop("group_designation has not been run on omicsData")
   
   #should the result be constructed from omicsData$f_data or from the group_DF attr? if so...

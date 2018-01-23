@@ -33,7 +33,7 @@
 protein_quant<- function(pepData, method, isoformRes = NULL, qrollup_thresh = NULL, single_pep = FALSE, single_observation = FALSE, combine_fn = "median", use_parallel = TRUE){
   
   #some checks
-  if(class(pepData) != "pepData") stop("pepData must be an object of class pepData")
+  if(!inherits(pepData, "pepData")) stop("pepData must be an object of class pepData")
   if(!(method %in% c('rollup', 'rrollup', 'qrollup', 'zrollup'))) stop("method must be one of, rollup, rrollup, qrollup, zrollup")
   if(!(combine_fn %in% c('median', 'mean'))) stop("combine_fn must be on of mean or median")
   

@@ -24,7 +24,7 @@
 
 summarize<- function(omicsData, groupvar = NULL, by){
   #some checks
-  if(!(class(omicsData) %in% c('pepData','proData', 'lipidData', 'metabData'))) stop("omicsData must be an object of class pepData, proData, lipidData or metabData")
+  if(!inherits(omicsData, c('pepData','proData', 'lipidData', 'metabData'))) stop("omicsData must be an object of class pepData, proData, lipidData or metabData")
   if(!(by %in% c('sample', 'molecule'))) stop("by must be either sample or molecule")
   
   #pull cnames attr from omicsData

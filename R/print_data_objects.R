@@ -6,7 +6,7 @@
 #'@export
 #'
 print.pepData<- function(pepData){
-  if(class(pepData) != "pepData") stop("pep_object must be of the class 'pepData'")
+  if(!inherits(pepData, "pepData")) stop("pep_object must be of the class 'pepData'")
   
   e_data<- as.data.frame(lapply(pepData$e_data, as.character), stringsAsFactors = FALSE)
   f_data<- as.data.frame(lapply(pepData$f_data, as.character), stringsAsFactors = FALSE)
@@ -94,7 +94,7 @@ print.pepData<- function(pepData){
 #'@export
 #'
 print.metabData<- function(metabData){
-  if(class(metabData) != "metabData") stop("metab_object must be of the class 'metabData'")
+  if(!inherits(metabData, "metabData")) stop("metab_object must be of the class 'metabData'")
   
   e_data<- as.data.frame(lapply(metabData$e_data, as.character), stringsAsFactors = FALSE)
   f_data<- as.data.frame(lapply(metabData$f_data, as.character), stringsAsFactors = FALSE)
@@ -182,7 +182,7 @@ print.metabData<- function(metabData){
 #'@export
 #'
 print.proData<- function(proData){
-  if(class(proData) != "proData") stop("pro_object must be of the class 'proData'")
+  if(!inherits(proData, "proData")) stop("pro_object must be of the class 'proData'")
   
   e_data<- as.data.frame(lapply(proData$e_data, as.character), stringsAsFactors = FALSE)
   f_data<- as.data.frame(lapply(proData$f_data, as.character), stringsAsFactors = FALSE)
@@ -270,7 +270,7 @@ print.proData<- function(proData){
 #'@export
 #'
 print.lipidData<- function(lipidData){
-  if(class(lipidData) != "lipidData") stop("lipid_object must be of the class 'lipidData'")
+  if(!inherits(lipidData, "lipidData")) stop("lipid_object must be of the class 'lipidData'")
   
   e_data<- as.data.frame(lapply(lipidData$e_data, as.character), stringsAsFactors = FALSE)
   f_data<- as.data.frame(lapply(lipidData$f_data, as.character), stringsAsFactors = FALSE)
