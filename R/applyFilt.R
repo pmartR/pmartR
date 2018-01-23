@@ -1,14 +1,14 @@
 #' Apply a S3 filter  object to an MSomics S3 object
 #'
-#' This function takes a filter object of class 'cvFilt', 'rmdFilt', 'moleculeFilt', 'proteomicsFilt', 'imdanovaFilt', or 'customFilt' and applies the filter to a dataset of class \code{pepData}, \code{proData}, \code{lipidData}, or \code{metabData}.
+#' This function takes a filter object of  'cvFilt', 'rmdFilt', 'moleculeFilt', 'proteomicsFilt', 'imdanovaFilt', or 'customFilt' and applies the filter to a dataset of  \code{pepData}, \code{proData}, \code{lipidData}, or \code{metabData}.
 #'
-#' @param filter_object an object of the class 'cvFilt', 'proteomicsFilt', 'rmdFilt', 'moleculeFilt', 'imdanovaFilt', or 'customFilt' created by \code{cv_filter}, \code{proteomics_filter}, \code{rmd_filter}, \code{molecule_filter}, or \code{imdanova_filter}, respectively.
-#' @param omicsData an object of the class \code{pepData}, \code{proData}, \code{lipidData}, or \code{metabData} usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.lipidData}}, or  \code{\link{as.metabData}}, respectively.
+#' @param filter_object an object of the  'cvFilt', 'proteomicsFilt', 'rmdFilt', 'moleculeFilt', 'imdanovaFilt', or 'customFilt' created by \code{cv_filter}, \code{proteomics_filter}, \code{rmd_filter}, \code{molecule_filter}, or \code{imdanova_filter}, respectively.
+#' @param omicsData an object of the  \code{pepData}, \code{proData}, \code{lipidData}, or \code{metabData} usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.lipidData}}, or  \code{\link{as.metabData}}, respectively.
 #' @param ... further arguments
 #'
-#' @return An object of the class \code{pepData}, \code{proData}, \code{lipidData}, or \code{metabData},  with specified cname_ids, edata_cnames, and emeta_cnames filtered out of the appropriate datasets.
+#' @return An object of the  \code{pepData}, \code{proData}, \code{lipidData}, or \code{metabData},  with specified cname_ids, edata_cnames, and emeta_cnames filtered out of the appropriate datasets.
 #'
-#' @details Various further arguments can be specified depending on the class of the \code{filter_object} being applied.
+#' @details Various further arguments can be specified depending on the  of the \code{filter_object} being applied.
 #' For a \code{filter_object} of type 'moleculeFilt':
 #' \tabular{ll}{
 #' \code{min_num} \tab an integer value specifying the minimum number of times each biomolecule must be observed across all samples in order to retain the biomolecule. Default value is 2. \cr
@@ -57,11 +57,11 @@
 #' @export
 applyFilt <- function(filter_object, omicsData, ...){
 
-  # check that omicsData is of mintR S3 class#
-  if(!(class(omicsData) %in% c("pepData", "proData", "lipidData", "metabData"))) stop("omicsData must be of class 'pepData', 'proData', 'lipidData', or 'metabData'")
+  # check that omicsData is of mintR S3 #
+  if(!inherits(omicsData, c("pepData", "proData", "lipidData", "metabData"))) stop("omicsData must be of  'pepData', 'proData', 'lipidData', or 'metabData'")
 
-  # check that filter_object is of an appropriate class #
-  if(!(any(class(filter_object) %in% c("cvFilt", "proteomicsFilt", "moleculeFilt", "rmdFilt", "imdanovaFilt", "customFilt")))) stop("filter_object must be of class 'cvFilt', 'proteomicsFilt', 'moleculeFilt', 'rmdFilt', 'imdanovaFilt', or 'customFilt.")
+  # check that filter_object is of an appropriate  #
+  if(!inherits(filter_object, c("cvFilt", "proteomicsFilt", "moleculeFilt", "rmdFilt", "imdanovaFilt", "customFilt"))) stop("filter_object must be of  'cvFilt', 'proteomicsFilt', 'moleculeFilt', 'rmdFilt', 'imdanovaFilt', or 'customFilt.")
 
   # pull column names from omicR_data attributes #
   col_nms = attr(omicsData, "cnames")
@@ -98,7 +98,7 @@ applyFilt.moleculeFilt <- function(filter_object, omicsData, min_num=2){
 
 
     # check that min_num is numeric and >=1 #
-    if(!(class(min_num) %in% c("numeric","integer")) | min_num < 1) stop("min_num must be an integer greater than or equal to 1")
+    if(!inherits(min_num, c("numeric","integer")) | min_num < 1) stop("min_num must be an integer greater than or equal to 1")
     # check that min_num is an integer #
     if(min_num %% 1 != 0) stop("min_num must be an integer greater than or equal to 1")
     # check that min_num is less than the number of samples #
@@ -266,8 +266,8 @@ applyFilt.rmdFilt <- function(filter_object, omicsData, pvalue_threshold=0.001){
 
   }else{ # no previous rmdFilt, so go ahead and run it like normal #
 
-    # check that filter_object is of class rmdFilt #
-    if(!"rmdFilt" %in% class(filter_object)) stop("filter_object must be of the class 'rmdFilt'. See rmd_filter for details.")
+    # check that filter_object is of  rmdFilt #
+    if(!inherits(filter_object, "rmdFilt")) stop("filter_object must be of the  'rmdFilt'. See rmd_filter for details.")
 
     # check that pvalue_threshold is between 0 and 1 #
     if(pvalue_threshold < 0 | pvalue_threshold > 1) stop("pvalue_threshold must be between 0 and 1.")
@@ -356,7 +356,7 @@ applyFilt.proteomicsFilt <- function(filter_object, omicsData, min_num_peps=NULL
     # error checks for min_num_peps, if not NULL #
     if(!is.null(min_num_peps)) {
       # check that min_num_peps is numeric and >=1 #
-      if(class(min_num_peps) != "numeric"| min_num_peps < 1) stop("min_num_peps must be an integer greater than or equal to 1")
+      if(!inherits(min_num_peps, "numeric") | min_num_peps < 1) stop("min_num_peps must be an integer greater than or equal to 1")
       # check that min_num_peps is an integer #
       if(min_num_peps %% 1 != 0) stop("min_num_peps must be an integer greater than or equal to 1")
       # check that min_num_peps is of length 1 #
@@ -365,7 +365,7 @@ applyFilt.proteomicsFilt <- function(filter_object, omicsData, min_num_peps=NULL
       if(min_num_peps > nrow(omicsData$e_data)) stop("min_num_peps cannot be greater than the total number of peptides")
     }
     # check that degen_peps is logical #
-    if(class(degen_peps) != "logical") stop("degen_peps must be either TRUE or FALSE")
+    if(!inherits(degen_peps, "logical")) stop("degen_peps must be either TRUE or FALSE")
 
 
     pep_id = attr(omicsData, "cnames")$edata_cname
@@ -504,7 +504,7 @@ applyFilt.imdanovaFilt <- function(filter_object, omicsData, min_nonmiss_anova=N
     # check that if they aren't NULL, min_nonmiss_anova and min_nonmiss_gtest are numeric, >=2 and >=3, respectively, and neither are bigger than the minimum group size (group_sizes in an attribute of the filter_object, see below) #
     if(!is.null(min_nonmiss_anova)) {
       # check that min_nonmiss_anova is numeric >= 2 #
-      if(!(class(min_nonmiss_anova) %in% c("numeric","integer")) | min_nonmiss_anova < 2) stop("min_nonmiss_anova must be an integer >= 2")
+      if(!inherits(min_nonmiss_anova, c("numeric","integer")) | min_nonmiss_anova < 2) stop("min_nonmiss_anova must be an integer >= 2")
       # check that min_nonmiss_anova is an integer #
       if(min_nonmiss_anova %% 1 != 0) stop("min_nonmiss_anova must be an integer >= 2")
       # check that min_nonmiss_anova is less than the max number of observations #
@@ -512,7 +512,7 @@ applyFilt.imdanovaFilt <- function(filter_object, omicsData, min_nonmiss_anova=N
     }
     if(!is.null(min_nonmiss_gtest)) {
       # check that min_nonmiss_gtest is numeric >= 3 #
-      if(!(class(min_nonmiss_gtest) %in% c("numeric","integer")) | min_nonmiss_gtest < 3) stop("min_nonmiss_gtest must be an integer >= 3")
+      if(!inherits(min_nonmiss_gtest, c("numeric","integer")) | min_nonmiss_gtest < 3) stop("min_nonmiss_gtest must be an integer >= 3")
       # check that min_nonmiss_gtest is an integer #
       if(min_nonmiss_gtest %% 1 != 0) stop("min_nonmiss_gtest must be an integer >= 3")
       # check that min_nonmiss_gtest is less than the max number of observations #
@@ -785,7 +785,7 @@ applyFilt.customFilt <- function(filter_object, omicsData){
 #'
 #' This function removes
 #'
-#' @param omicsData an object of the class \code{pepData}, \code{proData}, \code{lipidData}, or \code{metabData}, usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.lipidData}}, or \code{\link{as.metabData}}, respectively.
+#' @param omicsData an object of the  \code{pepData}, \code{proData}, \code{lipidData}, or \code{metabData}, usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.lipidData}}, or \code{\link{as.metabData}}, respectively.
 #' @param filter_object a list created by the functions above
 #' @return list
 #' @author Kelly Stratton, Lisa Bramer
