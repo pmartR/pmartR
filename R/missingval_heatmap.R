@@ -44,7 +44,7 @@ missingval_heatmap <- function(omicsData, x_lab = NULL, y_lab = NULL, ...) {
 .missingval_heatmap<- function(omicsData, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_title = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, palette = "YlOrRd", x_lab_angle = 60, coordinate_flip = FALSE){
   
   #check that omicsData is of correct class
-  if(!(class(omicsData) %in% c("proData","pepData","lipidData", "metabData"))) stop("omicsData is not an object of appropriate class")
+  if(!inherits(omicsData, c("proData","pepData","lipidData", "metabData"))) stop("omicsData is not an object of appropriate class")
   
   #check that omicsData data_scale attribute is log2
   if(attr(omicsData, "data_info")$data_scale != "log2") message("omicsData is not of log2 scale")

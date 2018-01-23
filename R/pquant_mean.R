@@ -22,7 +22,7 @@ pquant_mean <- function(pepData){
   check_names = getchecknames(pepData)
   
   # check that pepData is of appropraite class #
-  if(class(pepData) != "pepData") stop("pepData is not an object of the appropriate class")
+  if(!inherits(pepData, "pepData")) stop("pepData is not an object of the appropriate class")
   
   # check that a protein mapping is provided #
   if(is.null(pepData$e_meta)){

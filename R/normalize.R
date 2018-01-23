@@ -77,7 +77,7 @@ normalize <- function(omicsData, subset_fn, norm_fn, params = NULL, apply_norm =
   grp_pres = length(grep("group_DF", names(attributes(omicsData))))
   
   # check that omicsData is of the appropriate class
-  if(!(dat_class%in% c("proData","pepData","lipidData", "metabData"))) stop("omicsData is not an object of appropriate class")
+  if(!inherits(dat_class, c("proData","pepData","lipidData", "metabData"))) stop("omicsData is not an object of appropriate class")
   
   # data should be log transformed #
   if(!attr(omicsData, "data_info")$data_scale %in% c("log2", "log10", "log")){
@@ -164,10 +164,10 @@ normalize <- function(omicsData, subset_fn, norm_fn, params = NULL, apply_norm =
   }
   
   # check that apply_norm is T/F #
-  if(class(apply_norm) != "logical")stop("apply_norm must be a logical argument")
+  if(!inherits(apply_norm, "logical"))stop("apply_norm must be a logical argument")
   
   #check that backtransform is T/F #
-  if(class(backtransform) != "logical")stop("backtransform must a logical argument")
+  if(!inherits(backtransform, "logical"))stop("backtransform must a logical argument")
   
   
   # subset data using current subset method #

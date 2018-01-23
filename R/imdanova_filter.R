@@ -25,7 +25,7 @@ imdanova_filter <- function(omicsData){ #}, filter_method, min_nonmiss_gtest=3, 
   ## Initial checks ##
 
   # omicsData must be of the appropriate class
-  if(!(class(omicsData) %in% c("pepData", "proData", "lipidData", "metabData"))){
+  if(!inherits(omicsData, c("pepData", "proData", "lipidData", "metabData"))){
     stop("Invalid class for omicsData. Valid classes are pepData, proData, lipidData, and metabData.")
   }
 
