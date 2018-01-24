@@ -20,4 +20,3 @@ This function removes
 \author{
 Kelly Stratton, Lisa Bramer
 }
-

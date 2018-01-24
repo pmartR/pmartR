@@ -25,14 +25,14 @@ molecule_filter <- function(omicsData){
   ## some initial checks ##
 
   # check that omicsData is of appropriate class #
-  if(!class(omicsData) %in% c("pepData", "proData", "metabData", "lipidData")) stop("omicsData must be of class 'pepData', 'proData', 'metabData', or 'lipidData'")
+  if(!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData"))) stop("omicsData must be of class 'pepData', 'proData', 'metabData', or 'lipidData'")
 
   edata_id = attr(omicsData, "cnames")$edata_cname
   emeta_id = attr(omicsData, "cnames")$emeta_cname
   samp_id = attr(omicsData, "cnames")$fdata_cname
 
 #   # check that min_num is numeric and >=1 #
-#   if(class(min_num) != "numeric"| min_num < 1) stop("min_num must be an integer greater than or equal to 1")
+#   if(!inherits(min_num, "numeric") | min_num < 1) stop("min_num must be an integer greater than or equal to 1")
 #   # check that min_num is less than the number of samples #
 #   if(min_num > summary(omicsData)$num_samps) stop("min_num cannont be greater than the number of samples")
 
@@ -70,7 +70,7 @@ molecule_filter <- function(omicsData){
 #   ## some initial checks ##
 #
 #   # check that omicsData is of appropriate class #
-#   if(!class(omicsData) %in% c("pepData", "proData", "metabData", "lipidData")) stop("omicsData must be of class 'pepData', 'proData', 'metabData', or 'lipidData'")
+#   if(!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData"))) stop("omicsData must be of class 'pepData', 'proData', 'metabData', or 'lipidData'")
 #
 #   edata_id = attr(omicsData, "cnames")$edata_cname
 #   emeta_id = attr(omicsData, "cnames")$emeta_cname
@@ -78,7 +78,7 @@ molecule_filter <- function(omicsData){
 #
 #
 #   # check that min_num is numeric and >=1 #
-#   if(class(min_num) != "numeric"| min_num < 1) stop("min_num must be an integer greater than or equal to 1")
+#   if(!inherits(min_num, "numeric") | min_num < 1) stop("min_num must be an integer greater than or equal to 1")
 #   # check that min_num is less than the number of samples #
 #   if(min_num > summary(omicsData)$num_samps) stop("min_num cannont be greater than the number of samples")
 #

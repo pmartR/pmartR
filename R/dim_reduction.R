@@ -26,7 +26,7 @@
 #'
 dim_reduction <- function(omicsData, k = 2){
   # check that omicsData is of appropriate class #
-  if(!(class(omicsData) %in% c("pepData","proData","metabData", "lipidData"))) stop("omicsR_data must be an object of class 'pepdata','prodata', or 'genedata'.")
+  if(!inherits(omicsData, c("pepData","proData","metabData", "lipidData"))) stop("omicsR_data must be an object of class 'pepdata','prodata', or 'genedata'.")
 
   # check that group designation has been run #
   if(!("group_DF" %in% names(attributes(omicsData)))) warning("group_designation has not been run on this data and may limit plotting options")

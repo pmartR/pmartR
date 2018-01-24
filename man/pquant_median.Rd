@@ -6,7 +6,20 @@
 \usage{
 pquant_median(pepData)
 }
+\arguments{
+\item{pepData}{omicsData object of class 'pepData'}
+}
+\value{
+an omicsData object of class 'proData'
+}
 \description{
-Description here
+This function takes in a pepData object and returns a proData object
+}
+\examples{
+dontrun{
+library(pmartRdata)
+data(pep_object)
+result = pquant_median(pep_object) 
 }
 
+}

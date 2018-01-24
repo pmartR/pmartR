@@ -32,7 +32,7 @@ anova_filter <- function(nonmiss_per_group, min_nonmiss_anova=2, cname_id){
   }
 
   # check that nonmiss_per_group is a list of length 2 #
-  if(class(nonmiss_per_group) != "list" | length(nonmiss_per_group)!=2) stop("nonmiss_per_group must be a list of length 2.")
+  if(!inherits(nonmiss_per_group, "list") | length(nonmiss_per_group)!=2) stop("nonmiss_per_group must be a list of length 2.")
 
   # column names of nonmiss_per_group$nonmiss_totals
   my.names <- names(nonmiss_per_group$nonmiss_totals)

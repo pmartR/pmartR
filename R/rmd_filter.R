@@ -64,7 +64,7 @@ rmd_filter.pepData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewness
   ## some initial checks ##
 
   # check that omicsData is of class 'pepData', 'proData', 'lipidata', or 'metabData' #
-  if(!(class(omicsData) %in% c("pepData","proData","lipidData","metabData"))) stop("omicsData is not of an appropriate class")
+  if(!inherits(omicsData, c("pepData","proData","lipidData","metabData"))) stop("omicsData is not of an appropriate class")
 
   if(length(metrics) < 2){
     stop("Vector of metrics must contain at least two elements.")
@@ -180,7 +180,7 @@ rmd_filter.proData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewness
   ## some initial checks ##
 
   # check that omicsData is of class 'pepData', 'proData', 'lipidata', or 'metabData' #
-  if(!(class(omicsData) %in% c("pepData","proData","lipidData","metabData"))) stop("omicsData is not of an appropriate class")
+  if(!inherits(omicsData, c("pepData","proData","lipidData","metabData"))) stop("omicsData is not of an appropriate class")
 
   if(length(metrics) < 2){
     stop("Vector of metrics must contain at least two elements.")
@@ -293,6 +293,9 @@ rmd_filter.proData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewness
 rmd_filter.lipidData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewness", "Correlation")){
 
   ## some initial checks ##
+  
+  # check that omicsData is of class 'pepData', 'proData', 'lipidata', or 'metabData' #
+  if(!inherits(omicsData, c("pepData","proData","lipidData","metabData"))) stop("omicsData is not of an appropriate class")
 
   if(length(metrics) < 2){
     stop("Vector of metrics must contain at least two elements.")
@@ -446,7 +449,7 @@ rmd_filter.metabData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewne
   ## some initial checks ##
 
   # check that omicsData is of class 'pepData', 'proData', 'lipidata', or 'metabData' #
-  if(!(class(omicsData) %in% c("pepData","proData","lipidData","metabData"))) stop("omicsData is not of an appropriate class")
+  if(!inherits(omicsData, c("pepData","proData","lipidData","metabData"))) stop("omicsData is not of an appropriate class")
 
   if(length(metrics) < 2){
     stop("Vector of metrics must contain at least two elements.")

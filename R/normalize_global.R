@@ -9,7 +9,7 @@
 #' @param params additional arguments passed to the chosen subset functions. See details for parameter specification and default values.
 #' @param apply_norm logical argument indicating if the normalization should be applied to the data. Defaults to FALSE. If TRUE, the normalization is applied to the data and an S3 object of the same class as \code{omicsData} (e.g. 'pepData') with normalized values in \code{e_data} is returned.
 #' @param backtransform logical argument indicating if parameters for back transforming the data, after normalization, should be calculated.  Defaults to FALSE. If TRUE, the parameters for back transforming the data after normalization will be calculated, and subsequently included in the data normalization if \code{apply_norm} is TRUE or \code{\link{apply.normRes}} is used downstream. See details for an explanation of how these factors are calculated.
-#' @param min_prop is a minimum threshold value for the proportion of features subset (rows of \code{e_data})
+#' @param min_prop numeric threshold between 0 and 1 giving the minimum value for the proportion of features subset (rows of \code{e_data})
 #'
 #'@details Below are details for specifying function and parameter options.
 #'@section Subset Functions:
@@ -57,16 +57,16 @@
 #' data(lipid_object)
 #' lipid_object <- edata_transform(omicsData = lipid_object, data_scale="log2")
 #' lipid_object <- group_designation(omicsData = lipid_object, main_effects = "Condition")
-#' norm_object <- normalize(omicsData = lipid_object, subset_fn = "all", norm_fn = "median")
-#' norm_object <- normalize(omicsData = lipid_object, subset_fn = "all", norm_fn = "median", apply_norm = FALSE, backtransform = TRUE)
-#' norm_data <- normalize(omicsData = lipid_object, subset_fn = "all", norm_fn = "median", apply_norm = TRUE, backtransform = TRUE)
+#' norm_object <- normalize_global(omicsData = lipid_object, subset_fn = "all", norm_fn = "median")
+#' norm_object <- normalize_global(omicsData = lipid_object, subset_fn = "all", norm_fn = "median", apply_norm = FALSE, backtransform = TRUE)
+#' norm_data <- normalize_global(omicsData = lipid_object, subset_fn = "all", norm_fn = "median", apply_norm = TRUE, backtransform = TRUE)
 #'}
 #'
 #' @author Lisa Bramer
 #' @references
 #'
 #' @export
-normalize <- function(omicsData, subset_fn, norm_fn, params = NULL, apply_norm = FALSE, backtransform = FALSE, min_prop = NULL){
+normalize_global <- function(omicsData, subset_fn, norm_fn, params = NULL, apply_norm = FALSE, backtransform = FALSE, min_prop = NULL){
   
   ## initial checks ##
   
@@ -164,10 +164,17 @@ normalize <- function(omicsData, subset_fn, norm_fn, params = NULL, apply_norm =
   }
   
   # check that apply_norm is T/F #
+<<<<<<< HEAD:R/normalize.R
   if(!inherits(apply_norm, "logical")) stop("apply_norm must be a logical argument")
   
   #check that backtransform is T/F #
   if(!inherits(backtransform, "logical")) stop("backtransform must a logical argument")
+=======
+  if(!inherits(apply_norm, "logical"))stop("apply_norm must be a logical argument")
+  
+  #check that backtransform is T/F #
+  if(!inherits(backtransform, "logical"))stop("backtransform must a logical argument")
+>>>>>>> feature/class_to_inherits_changes:R/normalize_global.R
   
   
   # subset data using current subset method #
@@ -218,6 +225,7 @@ normalize <- function(omicsData, subset_fn, norm_fn, params = NULL, apply_norm =
   }else{
     omicsData$e_data = norm_results$transf_data
     attributes(omicsData)$data_info$data_norm = TRUE
+    attributes(omicsData)$norm_info$norm_type = "global"  # added 12/21/17 by KS
     attributes(omicsData)$norm_info$subset_fn = subset_fn
     attributes(omicsData)$norm_info$subset_params = params
     attributes(omicsData)$norm_info$norm_fn = norm_fn

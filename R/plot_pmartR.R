@@ -61,7 +61,7 @@ plot.corRes <- function(corRes_object, ...){
 }
 .plot.corRes <- function(corRes_object, interactive = FALSE, title_plot = NULL, x_lab=TRUE, y_lab=TRUE, colorbar_lim=c(NA, NA), title_size = 14){
   # check for a corRes object #
-  if(class(corRes_object)[1] != "corRes") stop("object must be of class 'corRes'")
+  if(!inherits(corRes_object, "corRes")) stop("object must be of class 'corRes'")
   # check plot title is a string #
   if(!is.null(title_plot)) {
     if(!is.character(title_plot)) stop("title_plot must be a character vector")
@@ -154,7 +154,7 @@ plot.moleculeFilt <- function(filter_object, min_num = NULL, ...) {
   ## initial checks ##
   if(!is.null(min_num)) {
     # check that min_num is numeric >= 0 #
-    if(!(class(min_num) %in% c("numeric","integer")) | min_num < 0) stop("min_num must be an integer >= 0")
+    if(!inherits(min_num, c("numeric","integer")) | min_num < 0) stop("min_num must be an integer >= 0")
     # check that min_num is an integer #
     if(min_num %% 1 != 0) stop("min_num must be an integer >= 0")
     # check that min_num is less than the max number of observations #
@@ -249,7 +249,7 @@ plot.proteomicsFilt <- function(filter_object, min_num_peps = NULL, degen_peps =
   # error checks for min_num_peps, if not NULL #
   if(!is.null(min_num_peps)) {
     # check that min_num_peps is numeric and >=1 #
-    if(class(min_num_peps) != "numeric"| min_num_peps < 1) stop("min_num_peps must be an integer greater than or equal to 1")
+    if(!inherits(min_num_peps, "numeric") | min_num_peps < 1) stop("min_num_peps must be an integer greater than or equal to 1")
     # check that min_num_peps is an integer #
     if(min_num_peps %% 1 != 0) stop("min_num_peps must be an integer greater than or equal to 1")
     # check that min_num_peps is of length 1 #
@@ -258,7 +258,7 @@ plot.proteomicsFilt <- function(filter_object, min_num_peps = NULL, degen_peps =
     if(min_num_peps > sum(filter_object$counts_by_pep$n)) stop("min_num_peps cannot be greater than the total number of peptides")
   }
   # check that degen_peps is logical #
-  if(class(degen_peps) != "logical") stop("degen_peps must be either TRUE or FALSE")
+  if(!inherits(degen_peps, "logical")) stop("degen_peps must be either TRUE or FALSE")
   
   
   suppressMessages({
@@ -377,7 +377,7 @@ plot.imdanovaFilt <- function(filter_object, min_nonmiss_anova = NULL, min_nonmi
   # check that if they aren't NULL, min_nonmiss_anova and min_nonmiss_gtest are numeric, >=2 and >=3, respectively, and neither are bigger than the minimum group size (group_sizes in an attribute of the filter_object, see below) #
   if(!is.null(min_nonmiss_anova)) {
     # check that min_nonmiss_anova is numeric >= 2 #
-    if(!(class(min_nonmiss_anova) %in% c("numeric","integer")) | min_nonmiss_anova < 2) stop("min_nonmiss_anova must be an integer >= 2")
+    if(!inherits(min_nonmiss_anova, c("numeric","integer")) | min_nonmiss_anova < 2) stop("min_nonmiss_anova must be an integer >= 2")
     # check that min_nonmiss_anova is an integer #
     if(min_nonmiss_anova %% 1 != 0) stop("min_nonmiss_anova must be an integer >= 2")
     # check that min_nonmiss_anova is less than the minimum group size #
@@ -385,7 +385,7 @@ plot.imdanovaFilt <- function(filter_object, min_nonmiss_anova = NULL, min_nonmi
   }
   if(!is.null(min_nonmiss_gtest)) {
     # check that min_nonmiss_gtest is numeric >= 3 #
-    if(!(class(min_nonmiss_gtest) %in% c("numeric","integer")) | min_nonmiss_gtest < 3) stop("min_nonmiss_gtest must be an integer >= 3")
+    if(!inherits(min_nonmiss_gtest, c("numeric","integer")) | min_nonmiss_gtest < 3) stop("min_nonmiss_gtest must be an integer >= 3")
     # check that min_nonmiss_gtest is an integer #
     if(min_nonmiss_gtest %% 1 != 0) stop("min_nonmiss_gtest must be an integer >= 3")
     # check that min_nonmiss_gtest is less than the minimum group size #

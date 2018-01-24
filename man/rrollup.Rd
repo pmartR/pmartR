@@ -4,10 +4,12 @@
 \alias{rrollup}
 \title{Applies rrollup function}
 \usage{
-rrollup(pepData, parallel = TRUE)
+rrollup(pepData, combine_fn = "median", parallel = TRUE)
 }
 \arguments{
 \item{pepData}{an omicsData object of class 'pepData'}
+
+\item{combine_fn}{logical indicating what combine_fn to use, defaults to median, other option is mean}
 
 \item{parallel}{logical indicating whether or not to use "doParallel" loop in applying rrollup function. Defaults to TRUE.}
 }
@@ -15,7 +17,10 @@ rrollup(pepData, parallel = TRUE)
 an omicsData object of class 'proData'
 }
 \description{
-This function applies the rrollup function to a pepData object for each unique protein and returns a proData object.
+This function applies the rrollup method to a pepData object for each unique protein and returns a proData object.
+}
+\details{
+In the rrollup method, peptides are scaled based on a reference peptide and protein abundance is set as the mean of these scaled peptides.
 }
 \examples{
 dontrun{

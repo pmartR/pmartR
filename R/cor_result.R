@@ -20,7 +20,7 @@
 
 cor_result <- function(omicsData){
 
-  if(!class(omicsData) %in% c("pepData", "proData", "metabData", "lipidData")) stop("omicsData must be of class 'pepData', 'proData', 'metabData', or 'lipidData'")
+  if(!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData"))) stop("omicsData must be of class 'pepData', 'proData', 'metabData', or 'lipidData'")
 
   edata_id = attr(omicsData, "cnames")$edata_cname
   edata <- omicsData$e_data

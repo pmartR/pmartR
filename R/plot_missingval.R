@@ -47,7 +47,7 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
 .plot.naRes<- function(naRes_object, type, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_title = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bar_width = .8, binwidth = 1, bw_theme = FALSE, palette = "Spectral", x_lab_angle = 60, coordinate_flip = FALSE){
  
    # check for a naRes object #
-  if(class(naRes_object)[1] != "naRes") stop("object must be of class 'naRes'")
+  if(!inherits(naRes_object, "naRes")) stop("object must be of class 'naRes'")
   
   #check that type is one of the three options
   if(!(type %in% c("bySample", "byMolecule", "Both"))) stop("type must be one of 'bySample', 'byMolecule', 'Both'")

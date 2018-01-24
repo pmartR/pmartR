@@ -44,7 +44,7 @@ missingval_volcanoplot<- function(statRes, comparison, x_lab = NULL, ...) {
 .missingval_volcanoplot<- function(statRes, comparison, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_title = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme = FALSE, vlines = NULL, pvalue_threshold = NULL, palette = "YlOrRd", x_lab_angle = 0, coordinate_flip = FALSE){
 
 #check that statRes object is of 'statRes' class
-if(class(statRes) != "statRes") stop("object must be of class 'statRes'")
+if(!inherits(statRes, "statRes")) stop("object must be of class 'statRes'")
   
 #check that palette is in the list of RColorBrewer palettes
 if(!(palette %in% c("YlOrRd", "YlOrBr", "YlGnBu", "YlGn", "Reds","RdPu", "Purples", "PuRd", "PuBuGn", "PuBu", "OrRd","Oranges", "Greys", 
@@ -52,7 +52,7 @@ if(!(palette %in% c("YlOrRd", "YlOrBr", "YlGnBu", "YlGn", "Reds","RdPu", "Purple
                     "Spectral", "RdYlGn", "RdYlBu", "RdGy", "RdBu", "PuOr","PRGn", "PiYG", "BrBG"))) stop("palette must be one of RColorBrewer palettes")
   
 #check that comparison is of correct class, either integer or character
-if(!(class(comparison)) %in% c("character", "numeric")) stop("comparison must be either of 'character' or 'numeric' class")  
+if(!inherits(comparison, c("character", "numeric"))) stop("comparison must be either of 'character' or 'numeric' class")  
 
 #check that pval_threshold attr of statRes in not NULL
 if(is.null(attr(statRes,"pval_thresh"))) stop("pval_thresh attribute of statRes was not found")  
@@ -73,12 +73,12 @@ if(!is.null(legend_title)) {
 if(!(is.numeric(x_lab_angle))) stop("x_lab_angle must be numeric")
   
 #make sure comparison is in attr(statRes, "comparisons")  
-if(class(comparison) == "character"){
+if(inherits(comparison, "character")){
   if(!(comparison %in% attr(statRes, "comparisons"))) stop(paste(comparison, "was not found in statRes attributes", sep = " ")) 
 }
 
 #check that when comparison is numeric it is a valid index  
-if(class(comparison) == "numeric"){
+if(inherits(comparison, "numeric")){
   if(!(comparison %in% c(1:length(attr(statRes, "comparisons"))))) stop("comparison must be valid index of comparisons attr of statRes object")
   
   #now we take comparison and re-assign it a character string instead of a numeric

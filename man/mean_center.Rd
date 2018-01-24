@@ -49,4 +49,3 @@ If backtransform is TRUE, the global median of the subset data (across all sampl
 \author{
 Lisa Bramer, Kelly Stratton
 }
-

@@ -24,7 +24,7 @@
 MSnSet2pepData<- function(msnset_object, data_scale, edata_cname = "UniqueID", fdata_cname = "SampleID", emeta_cname = "UniqueID", check.names = TRUE){
   
   #check that msnset_object is of correct class
-  if(class(msnset_object)!= "MSnSet") stop("msnset_object must be of class 'MSnSet'")
+  if(!inherits(msnset_object, "MSnSet")) stop("msnset_object must be of class 'MSnSet'")
   
   # check that data_scale is one of the acceptable options #
   if(!(data_scale %in% c('log2', 'log10', 'log', 'count', 'abundance'))) stop(paste(data_scale, " is not a valid option for 'data_scale'", sep=""))

@@ -28,4 +28,3 @@ For plotting an S3 object of type 'proData'
 \code{ylimit} \tab numeric vector of length 2 specifying y axis lower and upper limits. \cr
 }
 }
-
