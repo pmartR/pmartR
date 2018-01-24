@@ -65,11 +65,11 @@ as.lipidData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname
   # initial checks #
 
   # check that e_data and f_data are data.frames #
-  if(class(e_data) != "data.frame") stop("e_data must be of the class 'data.frame'")
-  if(class(f_data) != "data.frame") stop("f_data must be of the class 'data.frame'")
+  if(!inherits(e_data, "data.frame")) stop("e_data must be of the class 'data.frame'")
+  if(!inherits(f_data, "data.frame")) stop("f_data must be of the class 'data.frame'")
 
   # check to see if e_meta is NULL, if not check that it is a data.frame #
-  if(!is.null(e_meta)){ if(class(e_meta) != "data.frame") stop("e_meta must be of the class 'data.frame'")}
+  if(!is.null(e_meta)){ if(!inherits(e_meta, "data.frame")) stop("e_meta must be of the class 'data.frame'")}
 
   # check that the lipid column exists in e_data and e_meta (if applicable) #
   if(!(edata_cname %in% names(e_data))) stop(paste("Lipid column ", edata_cname," not found in e_data. See details of as.lipidData for specifying column names.", sep = ""))

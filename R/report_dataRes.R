@@ -25,7 +25,7 @@
 
 report_dataRes<- function(dataRes, minmax = FALSE, digits = 2){
   #checks
-  if(class(dataRes) != "dataRes") stop("dataRes must be of class dataRes")
+  if(!inherits(dataRes, "dataRes")) stop("dataRes must be of class dataRes")
   if(!is.logical(minmax)) stop("minmax must be of class 'logical'")
   if(digits <= 0) stop("digits must be an integer greater than zero")
   

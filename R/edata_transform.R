@@ -23,7 +23,7 @@ edata_transform <- function(omicsData, data_scale){
   ## some initial checks ##
 
   # check that omicsData is of appropriate class #
-  if(!class(omicsData) %in% c("pepData", "proData", "metabData", "lipidData")) stop("omicsData must be of class 'pepData', 'proData', 'metabData', or 'lipidData'")
+  if(!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData"))) stop("omicsData must be of class 'pepData', 'proData', 'metabData', or 'lipidData'")
 
   # check that data_scale is one of the acceptable options #
   if(!(data_scale %in% c('log2', 'log10', 'log', 'abundance'))) stop(paste(data_scale, " is not a valid option for 'data_scale'. See details of as.pepData for specifics.", sep=""))

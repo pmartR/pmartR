@@ -25,7 +25,7 @@ proteomics_filter <- function(omicsData){
   ## initial checks ##
 
   # check that omicsData is of class 'pepData' #
-  if(class(omicsData) != "pepData") stop("omicsData must be of class 'pepData'")
+  if(!inherits(omicsData, "pepData")) stop("omicsData must be of class 'pepData'")
 
   # check that e_meta is not NULL #
   if(is.null(omicsData$e_meta)) stop("e_meta must be non-NULL")

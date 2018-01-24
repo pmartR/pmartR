@@ -24,7 +24,7 @@
 missingval_result<- function(omicsData){
   
   #check for correct class
-  if(!(class(omicsData) %in% c("pepData", "proData", "lipidData", "metabData" ))) stop("omicsData must have class of the following, 'pepData', 'proData', 'lipidData', 'metabData'")
+  if(!inherits(omicsData, c("pepData", "proData", "lipidData", "metabData" ))) stop("omicsData must have class of the following, 'pepData', 'proData', 'lipidData', 'metabData'")
   
   
   #pulling cname attr

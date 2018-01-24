@@ -31,7 +31,7 @@ nonmissing_per_group <- function(omicsData = NULL, e_data = NULL, groupDF=NULL, 
   ## initial checks ##
 
   # check that omicsData is of an appropriate class #
-  if(!is.null(omicsData) && !(class(omicsData) %in% c("proData","pepData","lipidData", "metabData"))) stop("omicsData is not an object of appropriate class")
+  if(!is.null(omicsData) && !inherits(omicsData, c("proData","pepData","lipidData", "metabData"))) stop("omicsData is not an object of appropriate class")
 
 
 

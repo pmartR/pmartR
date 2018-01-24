@@ -49,7 +49,7 @@ missingval_scatterplot <- function(omicsData, x_lab = NULL, y_lab = NULL, ...) {
 .missingval_scatterplot<- function(omicsData, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_title = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, point_size = 3, palette = "Spectral", bw_theme = FALSE, x_lab_angle = 0, coordinate_flip = FALSE){
   
   #check that omicsData is of correct class
-  if(!(class(omicsData) %in% c("proData","pepData","lipidData", "metabData"))) stop("omicsData is not an object of appropriate class")
+  if(!inherits(omicsData, c("proData","pepData","lipidData", "metabData"))) stop("omicsData is not an object of appropriate class")
   
   #check that palette is in the list of RColorBrewer palettes
   if(!(palette %in% c("YlOrRd", "YlOrBr", "YlGnBu", "YlGn", "Reds","RdPu", "Purples", "PuRd", "PuBuGn", "PuBu", "OrRd","Oranges", "Greys", 

@@ -23,7 +23,7 @@ edata_replace <- function(omicsData, x, y){
   ## some initial checks ##
 
   # check that omicsData is of appropriate class #
-  if(!class(omicsData) %in% c("pepData", "proData", "metabData", "lipidData")) stop("omicsData must be of class 'pepData', 'proData', 'metabData', or 'lipidData'")
+  if(!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData"))) stop("omicsData must be of class 'pepData', 'proData', 'metabData', or 'lipidData'")
 
   UseMethod("edata_replace")
 }

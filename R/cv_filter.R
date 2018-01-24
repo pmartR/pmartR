@@ -27,7 +27,7 @@ cv_filter <- function(omicsData){
   ## some intial checks ##
   
   # check that omicsData is of appropriate class #
-  if(!(class(omicsData) %in% c("pepData", "proData", "lipidData", "metabData"))) stop("omicsData must be an object of class 'pepData', 'proData', 'lipidData', or 'metabData'")
+  if(!inherits(omicsData, c("pepData", "proData", "lipidData", "metabData"))) stop("omicsData must be an object of class 'pepData', 'proData', 'lipidData', or 'metabData'")
   
   # check that group_designation has been called already #
   if(!is.null(attr(omicsData, "group_DF"))){
