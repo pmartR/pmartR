@@ -204,8 +204,8 @@ std::list<double> kw_rcpp(arma::mat mtr,std::vector<std::string> group)
               std::vector<double> yvec(cpy.size());
               std::size_t n(0);
       
-              std::generate(yvec.begin(), yvec.end(),[&]{ return n++; });
-              std::sort(yvec.begin(), yvec.end(),[&](int i1, int i2) {return cpy[i1] < cpy[i2]; } );
+              std::generate(yvec.begin(), yvec.end(), [&]{ return n++; });
+              std::sort(yvec.begin(), yvec.end(), [&](int i1, int i2) {return cpy[i1] < cpy[i2]; } );
       
               for(unsigned int i = 0,j = 1;i<yvec.size();i++)
               {
