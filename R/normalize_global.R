@@ -77,7 +77,7 @@ normalize_global <- function(omicsData, subset_fn, norm_fn, params = NULL, apply
   grp_pres = length(grep("group_DF", names(attributes(omicsData))))
   
   # check that omicsData is of the appropriate class
-  if(!inherits(dat_class, c("proData","pepData","lipidData", "metabData"))) stop("omicsData is not an object of appropriate class")
+  if(!inherits(omicsData, c("proData","pepData","lipidData", "metabData"))) stop("omicsData is not an object of appropriate class")
   
   # data should be log transformed #
   if(!attr(omicsData, "data_info")$data_scale %in% c("log2", "log10", "log")){
