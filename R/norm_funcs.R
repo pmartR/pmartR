@@ -193,7 +193,7 @@ median_center <- function(e_data, edata_id, feature_subset, backtransform=FALSE,
 #'
 #' @return List containing two elements: \code{norm_params} is list with two elements:
 #' \tabular{ll}{
-#' scale \tab NULL
+#' scale \tab NULL \cr
 #' \tab \cr
 #' location \tab numeric vector of length \code{n} means for each sample
 #' \cr
@@ -201,7 +201,7 @@ median_center <- function(e_data, edata_id, feature_subset, backtransform=FALSE,
 #'
 #' \code{backtransform_params} is a list with two elements:
 #' \tabular{ll}{
-#' scale \tab NULL
+#' scale \tab NULL \cr
 #' \tab \cr
 #' location \tab numeric value giving global median across all samples
 #' \cr
@@ -274,7 +274,7 @@ return(ret_res)
 #'
 #' @return List containing two elements: \code{norm_params} is list with two elements:
 #' \tabular{ll}{
-#' scale \tab numeric vector of length \code{n} standard deviations for each sample
+#' scale \tab numeric vector of length \code{n} standard deviations for each sample \cr
 #' \tab \cr
 #' location \tab numeric vector of length \code{n} means for each sample
 #' \cr
@@ -282,7 +282,7 @@ return(ret_res)
 #'
 #' \code{backtransform_params} is a list with two elements:
 #' \tabular{ll}{
-#' scale \tab numeric value giving the pooled standard deviation across all samples
+#' scale \tab numeric value giving the pooled standard deviation across all samples \cr
 #' \tab \cr
 #' location \tab numeric value giving global mean across all samples
 #' \cr
