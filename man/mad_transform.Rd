@@ -21,7 +21,7 @@ mad_transform(e_data, edata_id, feature_subset, backtransform = FALSE,
 \value{
 List containing two elements: \code{norm_params} is list with two elements:
 \tabular{ll}{
-scale \tab numeric vector of length \code{n} median absolute deviations (MAD) for each sample
+scale \tab numeric vector of length \code{n} median absolute deviations (MAD) for each sample \cr
 \tab \cr
 location \tab numeric vector of length \code{n} medians for each sample
 \cr
@@ -29,7 +29,7 @@ location \tab numeric vector of length \code{n} medians for each sample
 
 \code{backtransform_params} is a list with two elements:
 \tabular{ll}{
-scale \tab numeric value giving pooled MAD
+scale \tab numeric value giving pooled MAD \cr
 \tab \cr
 location \tab numeric value giving global median across all samples
 \cr

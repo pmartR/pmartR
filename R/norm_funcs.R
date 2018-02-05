@@ -12,7 +12,7 @@
 #'
 #' @return List containing two elements: \code{norm_params} is list with two elements:
 #' \tabular{ll}{
-#' scale \tab numeric vector of length \code{n} median absolute deviations (MAD) for each sample
+#' scale \tab numeric vector of length \code{n} median absolute deviations (MAD) for each sample \cr
 #' \tab \cr
 #' location \tab numeric vector of length \code{n} medians for each sample
 #' \cr
@@ -20,7 +20,7 @@
 #'
 #' \code{backtransform_params} is a list with two elements:
 #' \tabular{ll}{
-#' scale \tab numeric value giving pooled MAD
+#' scale \tab numeric value giving pooled MAD \cr
 #' \tab \cr
 #' location \tab numeric value giving global median across all samples
 #' \cr
