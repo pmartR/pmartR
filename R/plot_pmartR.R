@@ -81,7 +81,8 @@ plot.corRes <- function(corRes_object, ...){
   }
   
   if(!interactive) {
-    pal <- colorRampPalette(c("blue","white","red"))
+    #pal <- colorRampPalette(c("blue","white","red"))
+    pal <- colorRampPalette(c("red", "yellow")) # modified by KS 2/12/2018
     
     colnames(corRes_object) <- rownames(corRes_object)
     corRes_melt <- reshape2::melt(corRes_object)

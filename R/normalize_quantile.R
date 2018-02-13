@@ -3,9 +3,8 @@
 #' Perform quantile normalization 
 #'
 #' @param omicsData an object of the class 'pepData', 'proData', 'metabData', or 'lipidData', created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively. The function \code{\link{group_designation}} must have been run on omicsData to use several of the subset functions (i.e. rip and ppp_rip).
-#' @param min_prop numeric threshold between 0 and 1 giving the minimum value for the proportion of features subset (rows of \code{e_data})
 #'
-#' @details Quantile normalization is an algorithm for normalizing a set of data vecteors by giving them the same distribution. It is applied to data on the abundance scale (e.g. not a log scale). It is often used for microarry data. 
+#' @details Quantile normalization is an algorithm for normalizing a set of data vectors by giving them the same distribution. It is applied to data on the abundance scale (e.g. not a log scale). It is often used for microarry data. 
 #' @return The normalized data is returned in an object of the appropriate S3 class (e.g. pepData), on the same scale as omicsData (e.g. if omicsData contains log2 transformed data, the normalization will be performed on the non-log2 scale and then re-scaled after normalization to be returned on the log2 scale).
 #' 
 #' @examples
@@ -19,7 +18,7 @@
 #' @references
 #'
 #' @export
-normalize_quantile <- function(omicsData, min_prop = NULL){
+normalize_quantile <- function(omicsData){
   ## initial checks ##
   
   omicsData_orig <- omicsData
@@ -35,14 +34,9 @@ normalize_quantile <- function(omicsData, min_prop = NULL){
     omicsData <- edata_transform(omicsData, "abundance")
   }
   
-  # check that min_prop is greater than 0 but less than or equal to 1
-  if(!is.null(min_prop)){
-    if(min_prop <= 0 | min_prop > 1) stop("min_prop must be greater than zero but less than or equal to 1")
-  }
-  
-  # give message if proportion of missing data is > 0.1
-  if(attributes(omicsData)$data_info$prop_missing > 0.05){
-    message(paste("The proportion of missing data is ", round(attributes(omicsData)$data_info$prop_missing, 2), ". We do not recommend using quantile normalization when the proportion of missing data exceeds 0.05 or 0.1, as it may result in heavily skewed normalized data that does not accurately respresent the data observed.", sep=""))
+  # give message if proportion of missing data is > 0
+  if(attributes(omicsData)$data_info$prop_missing > 0){
+    message(paste("The proportion of missing data is ", round(attributes(omicsData)$data_info$prop_missing, 2), ". Quantile normalization only works with complete data. Consider using SPANS to choose an appropriate normalization method for a dataset that includes missing values.", sep=""))
   }
   
   check_names <- getchecknames(omicsData)
