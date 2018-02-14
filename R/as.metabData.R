@@ -78,8 +78,14 @@ as.metabData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname
     if(!(edata_cname %in% names(e_meta))) stop(paste("Metabolite column ", edata_cname," not found in e_meta. Column names for metabolite names must match for e_data and e_meta. See details of as.metabData for specifying column names.", sep = ""))
   }
 
-  # if e_meta is NULL set emeta_cname to NULL #
-  if(is.null(e_meta)) emeta_cname = NULL
+  # if e_meta is NULL and emeta_cname is non-NULL #
+  if(is.null(e_meta) & !is.null(emeta_cname)){
+    message("emeta_cname will not be used, no e_meta was provided") 
+    emeta_cname = NULL
+  } 
+  
+  # if e_meta is non-NULL and emeta_cname is NULL #
+  if(!is.null(e_meta) & is.null(emeta_cname)) stop("if e_meta is non-NULL, emeta_cname must also be non-NULL")
 
   # if e_meta is not NULL check that identification columns are found #
   if(!is.null(e_meta)){
