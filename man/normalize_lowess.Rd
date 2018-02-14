@@ -18,7 +18,7 @@ The normalized data is returned in an object of the appropriate S3 class (e.g. p
 Perform Lowess normalization
 }
 \details{
-Quantile normalization is an algorithm for normalizing a set of data vecteors by giving them the same distribution. It is applied to data on the abundance scale (e.g. not a log scale). It is often used for microarry data.
+Intensity-dependent normalization. We use the robust scatter plot smoother ‘lowess’, implemented in the statistical software package R (17), to perform a local A-dependent normalization log2R/G → log2R/G – c(A) = log2R/[k(A)G] where c(A) is the lowess fit to the MA-plot. The lowess scatter plot smoother performs robust locally linear fits. In particular, it will not be affected by a small percentage of differentially expressed genes, which will appear as outliers in the MA-plot. The user-defined parameter f is the fraction of the data used for smoothing at each point; the larger the f value, the smoother the fit. We typically use f  = 40%. It is applied to data on the abundance scale (e.g. not a log scale). It is often used for microarry data. (https://www.ncbi.nlm.nih.gov/pmc/articles/PMC100354/)
 }
 \examples{
 dontrun{

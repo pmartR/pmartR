@@ -424,8 +424,9 @@ applyFilt.proteomicsFilt <- function(filter_object, omicsData, min_num_peps=NULL
     if(all(omicsData$e_meta[[pro_id]] %in% filter_object_new$emeta_filt)) {stop("filter_object specifies all proteins in e_meta")}
     if(all(omicsData$e_data[[pep_id]] %in% filter_object_new$edata_filt)) {stop("filter_object specifies all peps in e_data")}
 
+    
     # call the function that does the filter application
-    results_pieces <- MSomics_filter_worker(omicsData = omicsData, filter_object = filter_object_new)
+    results_pieces <- pmartRqc:::MSomics_filter_worker(omicsData = omicsData, filter_object = filter_object_new)
 
     # return filtered data object #
     results <- omicsData
@@ -457,6 +458,7 @@ applyFilt.proteomicsFilt <- function(filter_object, omicsData, min_num_peps=NULL
 
     # set attributes for which filters were run
     attr(results, "filters")$proteomicsFilt <- list(report_text = "", threshold = c(), filtered = list())
+    if(is.null(min_num_peps)){min_num_peps <- NA}
     attr(results, "filters")$proteomicsFilt$threshold <- data.frame(min_num_peps = min_num_peps, degen_peps = as.character(degen_peps))
     attr(results, "filters")$proteomicsFilt$filtered <- filter_object_new
     if(degen_peps == TRUE & is.null(min_num_peps)){
@@ -833,7 +835,9 @@ MSomics_filter_worker <- function(filter_object, omicsData){
     # remove any emeta molecules from e_meta and e_data #
     if(!is.null(filter_object$emeta_filt)){
       inds <- which(temp.emeta[ , which(names(temp.emeta) == emeta_cname)] %in% filter_object$emeta_filt)
-      temp.emeta <- temp.emeta[-inds, ]
+      if(length(inds) > 0){
+        temp.emeta <- temp.emeta[-inds, ] 
+      }
       
       # subset to the intersection of the edata_molecules in both e_data and e_meta, in case more were removed in one than the other #
       mols <- intersect(temp.edata[, which(names(temp.edata) == edata_cname)], temp.emeta[, which(names(temp.emeta) == edata_cname)])
