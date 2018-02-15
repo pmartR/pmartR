@@ -77,7 +77,7 @@ as.isobaricpepData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata
 .as.isobaricpepData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname,
                         emeta_cname = NULL, exp_cname, channel_cname = NULL, 
                         refpool_channel = NULL, refpool_cname = NULL, refpool_notation = NULL, data_scale = "abundance",
-                        data_norm = FALSE, norm_info = NULL, data_types=NULL, check.names = TRUE){
+                        data_norm = FALSE, isobaric_norm = FALSE, norm_info = NULL, data_types=NULL, check.names = TRUE){
   
   # initial checks #
   
