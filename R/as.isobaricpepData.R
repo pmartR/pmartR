@@ -238,7 +238,7 @@ as.isobaricpepData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata
   }else{ attr(res, "meta_info") = FALSE}
   
   # set reference pool information up #
-  attr(res, "refsamp_info") = list(exp_cname = exp_cname, channel_cname = channel_cname, refpool_channel = refpool_channel, refpool_cname = refpool_cname, refpool_notation = refpool_notation)
+  attr(res, "isobaric_info") = list(exp_cname = exp_cname, channel_cname = channel_cname, refpool_channel = refpool_channel, refpool_cname = refpool_cname, refpool_notation = refpool_notation)
 
   # set group dataframe attribute to NULL, will be filled in after running group_designation function #
   attr(res, "group_DF") = NULL
