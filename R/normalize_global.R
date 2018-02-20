@@ -164,18 +164,10 @@ normalize_global <- function(omicsData, subset_fn, norm_fn, params = NULL, apply
   }
   
   # check that apply_norm is T/F #
-<<<<<<< HEAD:R/normalize.R
   if(!inherits(apply_norm, "logical")) stop("apply_norm must be a logical argument")
   
   #check that backtransform is T/F #
   if(!inherits(backtransform, "logical")) stop("backtransform must a logical argument")
-=======
-  if(!inherits(apply_norm, "logical"))stop("apply_norm must be a logical argument")
-  
-  #check that backtransform is T/F #
-  if(!inherits(backtransform, "logical"))stop("backtransform must a logical argument")
->>>>>>> feature/class_to_inherits_changes:R/normalize_global.R
-  
   
   # subset data using current subset method #
   if(subset_fn == "all"){
