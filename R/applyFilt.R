@@ -457,7 +457,9 @@ applyFilt.proteomicsFilt <- function(filter_object, omicsData, min_num_peps=NULL
 
     # set attributes for which filters were run
     attr(results, "filters")$proteomicsFilt <- list(report_text = "", threshold = c(), filtered = list())
-    attr(results, "filters")$proteomicsFilt$threshold <- data.frame(min_num_peps = min_num_peps, degen_peps = as.character(degen_peps))
+    if(is.null(min_num_peps)){attr(results, "filters")$proteomicsFilt$threshold <- data.frame(min_num_peps = NA, degen_peps = as.character(degen_peps))}else{
+      attr(results, "filters")$proteomicsFilt$threshold <- data.frame(min_num_peps = min_num_peps, degen_peps = as.character(degen_peps))
+    }
     attr(results, "filters")$proteomicsFilt$filtered <- filter_object_new
     if(degen_peps == TRUE & is.null(min_num_peps)){
       attr(results, "filters")$proteomicsFilt$report_text <- paste("A degenerate peptide filter was applied to the data, identifying ", pep_id, "s that map to more than one ", pro_id, ". The filter identified ", length(filter_object_new1$peptides_filt), " such ", pep_id, "s in the data. Associated with these ", pep_id, "s were ", length(filter_object_new1$proteins_filt), " ", pro_id, "s that no longer had ", pep_id, "s mapping to them.", sep = "")
