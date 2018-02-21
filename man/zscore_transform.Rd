@@ -21,7 +21,7 @@ zscore_transform(e_data, edata_id, feature_subset, backtransform = FALSE,
 \value{
 List containing two elements: \code{norm_params} is list with two elements:
 \tabular{ll}{
-scale \tab numeric vector of length \code{n} standard deviations for each sample
+scale \tab numeric vector of length \code{n} standard deviations for each sample \cr
 \tab \cr
 location \tab numeric vector of length \code{n} means for each sample
 \cr
@@ -29,7 +29,7 @@ location \tab numeric vector of length \code{n} means for each sample
 
 \code{backtransform_params} is a list with two elements:
 \tabular{ll}{
-scale \tab numeric value giving the pooled standard deviation across all samples
+scale \tab numeric value giving the pooled standard deviation across all samples \cr
 \tab \cr
 location \tab numeric value giving global mean across all samples
 \cr

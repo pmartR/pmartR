@@ -21,7 +21,7 @@ mean_center(e_data, edata_id, feature_subset, backtransform = FALSE,
 \value{
 List containing two elements: \code{norm_params} is list with two elements:
 \tabular{ll}{
-scale \tab NULL
+scale \tab NULL \cr
 \tab \cr
 location \tab numeric vector of length \code{n} means for each sample
 \cr
@@ -29,7 +29,7 @@ location \tab numeric vector of length \code{n} means for each sample
 
 \code{backtransform_params} is a list with two elements:
 \tabular{ll}{
-scale \tab NULL
+scale \tab NULL \cr
 \tab \cr
 location \tab numeric value giving global median across all samples
 \cr
