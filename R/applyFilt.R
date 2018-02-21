@@ -439,15 +439,15 @@ applyFilt.proteomicsFilt <- function(filter_object, omicsData, min_num_peps=NULL
       results <- group_designation(omicsData = results, main_effects = attr(attr(omicsData, "group_DF"), "main_effects"), covariates = attr(attr(omicsData, "group_DF"), "covariates"), time_course = attr(attr(omicsData, "group_DF"), "time_course"))
     }else{
       # Update attributes (7/11/2016 by KS) - this is being done already in group_designation
-      attributes(results)$data_info$num_edata = length(unique(results$e_data[, edata_cname]))
-      attributes(results)$data_info$num_miss_obs = sum(is.na(results$e_data[,-which(names(results$e_data)==edata_cname)]))
-      attributes(results)$data_info$num_prop_missing = mean(is.na(results$e_data[,-which(names(results$e_data)==edata_cname)]))
+      attributes(results)$data_info$num_edata = length(unique(results$e_data[, pep_id]))
+      attributes(results)$data_info$num_miss_obs = sum(is.na(results$e_data[,-which(names(results$e_data)==pep_id)]))
+      attributes(results)$data_info$num_prop_missing = mean(is.na(results$e_data[,-which(names(results$e_data)==pep_id)]))
       attributes(results)$data_info$num_samps = ncol(results$e_data) - 1
 
       if(!is.null(results$e_meta)){
         # number of unique proteins that map to a peptide in e_data #
-        if(!is.null(emeta_cname)){
-          num_emeta = length(unique(results$e_meta[which(as.character(results$e_meta[, edata_cname]) %in% as.character(results$e_data[, edata_cname])), emeta_cname]))
+        if(!is.null(pro_id)){
+          num_emeta = length(unique(results$e_meta[which(as.character(results$e_meta[, pep_id]) %in% as.character(results$e_data[, pep_id])), pro_id]))
         }else{num_emeta = NULL}
       }else{
         num_emeta = NULL
