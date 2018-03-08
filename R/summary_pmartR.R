@@ -500,7 +500,7 @@ summary.imdanovaFilt <- function(filter_object, min_nonmiss_anova=NULL, min_nonm
   }
 
 
-
+  #if-statement for the case where both min_nonmiss_anova and min_nonmiss_gtest are non-NULL. Note: num_not_tested will be the count of (inds_rm_anova + inds_rm_gtest) that sum to 2. That is the intersection of both filters. 
   if(!is.null(min_nonmiss_anova) && !is.null(min_nonmiss_gtest)){
     # get number molecules not tested
     num_not_tested <- sum((inds_rm_anova + inds_rm_gtest) > 1)
