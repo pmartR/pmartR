@@ -1,4 +1,16 @@
-#work on normalize_isobaric function 
+#' Normalize an object of class isobaricpepData
+#' 
+#' Description of what this function does
+#' 
+#' @param omicsData an object of the class 'isobaricpepData'
+#' @param apply_norm logical, indicates whether normalization should be applied to omicsData$e_data
+#'
+#' @examples  
+#' dontrun{ 
+#' 
+#' 
+#' }
+#' 
 
 normalize_isobaric<- function(omicsData, apply_norm = FALSE){
   # initial checks #
@@ -32,12 +44,12 @@ normalize_isobaric<- function(omicsData, apply_norm = FALSE){
   split_data = split(edata_melt2, edata_melt2[[exp_cname]])
   
   #case where refpool_channel is non-NULL and channel_cname is non-NULL
-  if(!is.null(attr(omicsData, "isobaric_info")$refpool_channel) & !is.null(attr(omicsData, "isobaric_info")$channel_cname)){
+  if(!is.null(refpool_channel) & !is.null(channel_cname)){
     #looking for ref_samples
     ref_samples = fdata[[fdata_cname]][which(fdata[[channel_cname]] == refpool_channel)] 
   }
   #case where refpool_cname is non-NULL and refpool_notation is non-NULL
-  else if(!is.null(attr(omicsData, "isobaric_info")$refpool_cname) & !is.null(attr(omicsData, "isobaric_info")$refpool_notation)){
+  else if(!is.null(refpool_cname) & !is.null(refpool_notation)){
     #looking for ref_samples
     ref_samples = fdata[[fdata_cname]][which(fdata[[refpool_cname]] == refpool_notation)] 
   }
@@ -64,8 +76,44 @@ normalize_isobaric<- function(omicsData, apply_norm = FALSE){
     #subsetting fdata to just contain ref_samples
     fdata = fdata[which(fdata[[fdata_cname]] %in% ref_samples), ]
     
-    #merging edata_melt and fdata
-    result = merge(edata_melt, fdata, by = fdata_cname, all.y = F)
+    #subset specific columns of fdata
+    if(!is.null(channel_cname)){
+      fdata_cname_ind = which(names(fdata) %in% fdata_cname)
+      exp_cname_ind = which(names(fdata) %in% exp_cname)
+      channel_cname_ind = which(names(fdata) %in% channel_cname)
+      
+      fdata = fdata[, c(fdata_cname_ind, exp_cname_ind, channel_cname_ind)]
+      
+      #merging edata_melt and fdata
+      result = merge(edata_melt, fdata, by = fdata_cname)
+      class(result) = "isobaricnormRes"
+      
+      #adding some more attributes to result
+      attr(result, "isobaric_info")$exp_cname = exp_cname
+      attr(result, "isobaric_info")$refpool_channel = refpool_channel
+      attr(result, "isobaric_info")$channel_cname = channel_cname
+      attr(result, "isobaric_info")$refpool_cname = NULL
+      attr(result, "isobaric_info")$refpool_notation = NULL
+    }
+    else if(!is.null(refpool_cname)){
+      fdata_cname_ind = which(names(fdata) %in% fdata_cname)
+      exp_cname_ind = which(names(fdata) %in% exp_cname)
+      refpool_cname_ind = which(names(fdata) %in% refpool_cname)
+      
+      fdata = fdata[, c(fdata_cname_ind, exp_cname_ind, refpool_cname_ind)]
+      
+      #merging edata_melt and fdata
+      result = merge(edata_melt, fdata, by = fdata_cname)
+      class(result) = "isobaricnormRes"
+      
+      #adding some more attributes to result
+      attr(result, "isobaric_info")$exp_cname = exp_cname
+      attr(result, "isobaric_info")$refpool_channel = NULL
+      attr(result, "isobaric_info")$channel_cname = NULL
+      attr(result, "isobaric_info")$refpool_cname = refpool_cname
+      attr(result, "isobaric_info")$refpool_notation = refpool_notation
+    }
+
   }
   
   return(result)
