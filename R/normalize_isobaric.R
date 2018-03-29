@@ -7,11 +7,15 @@
 #'
 #' @examples  
 #' dontrun{ 
+#' library(pmartRdata)
+#' data(isobaric_object)
 #' 
-#' 
+#' result = normalize_isobaric(isobaric_object, apply_norm = TRUE)
 #' }
 #' 
-
+#' @export
+#'
+  
 normalize_isobaric<- function(omicsData, apply_norm = FALSE){
   # initial checks #
   
