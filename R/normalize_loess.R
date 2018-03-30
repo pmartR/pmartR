@@ -6,6 +6,9 @@
 #' @param min_prop numeric threshold between 0 and 1 giving the minimum value for the proportion of features subset (rows of \code{e_data}); default value is 0.4.
 #'
 #' @details Intensity-dependent normalization. We use the robust scatter plot smoother ‘lowess’, implemented in the statistical software package R (17), to perform a local A-dependent normalization log2R/G → log2R/G – c(A) = log2R/[k(A)G] where c(A) is the lowess fit to the MA-plot. The lowess scatter plot smoother performs robust locally linear fits. In particular, it will not be affected by a small percentage of differentially expressed genes, which will appear as outliers in the MA-plot. The user-defined parameter f is the fraction of the data used for smoothing at each point; the larger the f value, the smoother the fit. We typically use f  = 40%. It is applied to data on the abundance scale (e.g. not a log scale). It is often used for microarry data. (https://www.ncbi.nlm.nih.gov/pmc/articles/PMC100354/)
+#'  
+#' @references Strand, M. (2003). \emph{Contrast normalization of oligonucleotide arrays}. Journal of Computational Biology. 10(1): 95-102. Laurent, G., Leslie C., Benjamin, M. B., Rafael, A. I. (2004). \emph{affy—analysis of Affymetrix GeneChip data at the probe level}. Bioinformatics. 20(3): 307–315.  
+#' 
 #' @return The normalized data is returned in an object of the appropriate S3 class (e.g. pepData), on the same scale as omicsData (e.g. if omicsData contains log2 transformed data, the normalization will be performed on the non-log2 scale and then re-scaled after normalization to be returned on the log2 scale).
 #' 
 #' @examples
