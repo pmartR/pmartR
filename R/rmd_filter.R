@@ -39,6 +39,7 @@
 #'
 #'@rdname rmd_filter
 #'@name rmd_filter
+#'
 rmd_filter <- function(omicsData, ...){
 
   # group_DF attribute is required #

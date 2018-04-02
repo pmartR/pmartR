@@ -32,3 +32,6 @@ summary(pca_lipids)
 }
 
 }
+\references{
+Redestig, H., Stacklies, W., Scholz, M., Selbig, J., & Walther, D. (2007). \emph{pcaMethods - a bioconductor package providing PCA methods for incomplete data}. Bioinformatics. 23(9): 1164-7.
+}
