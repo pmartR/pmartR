@@ -69,7 +69,10 @@ normalize_isobaric<- function(omicsData, apply_norm = FALSE){
     #replace omicsData$e_data with normalized edata
     omicsData$e_data<- final
     
-    #updata isobaric_norm attr
+    #remove refsamples from f_data 
+    omicsData$f_data<- fdata[-which(fdata[[fdata_cname]] %in% ref_samples),]
+    
+    #update isobaric_norm attr
     attr(omicsData, "data_info")$isobaric_norm = TRUE
     
     result = omicsData
