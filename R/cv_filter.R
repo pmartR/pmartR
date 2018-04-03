@@ -6,8 +6,8 @@
 #'
 #' @return  An S3 object of class 'cvFilt' giving the pooled CV for each biomolecule and additional attributes used for plottinga data.frame with a column giving the peptide, protein, or gene name and a column giving the pooled CV value
 #'
-#'@details For each biomolecule, the CV of each group is calculated as the standard deviation divided by the mean, excluding missing values. A pooled CV estimate is then calculated based on the methods of Ahmed (1995).
-#'@references Ahmed, S.E. (1995). \emph{A pooling methodology for coefficient of variation}. The Indian Journal of Statistics. 57: 57-75.
+#' @details For each biomolecule, the CV of each group is calculated as the standard deviation divided by the mean, excluding missing values. A pooled CV estimate is then calculated based on the methods of Ahmed (1995).
+#' @references Ahmed, S.E. (1995). \emph{A pooling methodology for coefficient of variation}. The Indian Journal of Statistics. 57: 57-75.
 #'
 #' @examples
 #' dontrun{

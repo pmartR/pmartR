@@ -32,3 +32,6 @@ result = qrollup(pepData = pep_object, qrollup_thresh = 2)
 }
 
 }
+\references{
+Polpitiya, A. D., Qian, W.-J., Jaitly, N., Petyuk, V. A., Adkins, J. N., Camp, D. G., ... Smith, R. D. (2008). \emph{DAnTE: a statistical tool for quantitative analysis of -omics data}. Bioinformatics (Oxford, England), 24(13), 1556-1558.
+}

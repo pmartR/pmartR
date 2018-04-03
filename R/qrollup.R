@@ -11,6 +11,8 @@
 #' 
 #' @details In the qrollup method, peptides are selected according to a user selected abundance cutoff value (qrollup_thresh), and protein abundance is set as the mean of these selected peptides.  
 #' 
+#' @references Polpitiya, A. D., Qian, W.-J., Jaitly, N., Petyuk, V. A., Adkins, J. N., Camp, D. G., ... Smith, R. D. (2008). \emph{DAnTE: a statistical tool for quantitative analysis of -omics data}. Bioinformatics (Oxford, England), 24(13), 1556-1558. 
+#' 
 #' @examples 
 #' dontrun{
 #' library(pmartRdata)

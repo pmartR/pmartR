@@ -32,7 +32,7 @@ an omicsData object of the class 'proData'
 This function takes in a pepData object, method (quantitation method, mean, median or rrollup), and the optional argument isoformRes (defaults to NULL). An object of the class 'proData' is returned.
 }
 \details{
-If isoformRes is provided then, a temporary pepData object is formed using the isoformRes information as the e_meta component and the original pepData object will be used for e_data and f_data components. The emeta_cname for the temporary pepData object will be the âprotein_isoformâ column of isoformRes. Then one of the three 'method' functions can be applied to the temporary pepData object to return a proData object. If isofromRes is left NULL, then depending on the input for 'method', the correct 'method' function is applied directly to the input pepData object and a proData object is returned.
+If isoformRes is provided then, a temporary pepData object is formed using the isoformRes information as the e_meta component and the original pepData object will be used for e_data and f_data components. The emeta_cname for the temporary pepData object will be the 'protein_isoform' column of isoformRes. Then one of the three 'method' functions can be applied to the temporary pepData object to return a proData object. If isofromRes is left NULL, then depending on the input for 'method', the correct 'method' function is applied directly to the input pepData object and a proData object is returned.
 }
 \examples{
 dontrun{
@@ -46,4 +46,7 @@ case where isoformRes is provided:
 results2 = prot_quant(pep_data = pep_object, method = 'rollup', combine_fn = 'mean', isoformRes = isoformRes_object)
 }
 
+}
+\references{
+Webb-Robertson, B.-J. M., Matzke, M. M., Datta, S., Payne, S. H., Kang, J., Bramer, L. M., ... Waters, K. M. (2014). \emph{Bayesian Proteoform Modeling Improves Protein Quantification of Global Proteomic Measurements}. Molecular & Cellular Proteomics.: MCP, 13(12), 3639-3646.
 }
