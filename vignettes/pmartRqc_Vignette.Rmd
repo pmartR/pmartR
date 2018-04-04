@@ -512,3 +512,21 @@ rm(mypepdata_rrollup)
 
 
 ## References
+
+Ahmed, S.E. (1995). A pooling methodology for coefficient of variation. The Indian Journal of Statistics. 57: 57-75.
+
+Laurent, G., Leslie C., Benjamin, M. B., Rafael, A. I. (2004). affy-analysis of Affymetrix GeneChip data at the probe level. Bioinformatics. 20(3): 307-315.
+
+Matzke, M. M., Brown, J. N., Gritsenko, M. A., Metz, T. O., Pounds, J. G., Rodland, K. D., ... Webb-Robertson, B.-J. (2013). A comparative analysis of computational approaches to relative protein quantification using peptide peak intensities in label-free LC-MS proteomics experiments. Proteomics, 13(0), 493-503. 
+
+Matzke, M., Waters, K., Metz, T., Jacobs, J., Sims, A., Baric, R., Pounds, J., and Webb-Robertson, B.J. (2011), Improved quality control processing of peptide-centric LC-MS proteomics data. Bioinformatics. 27(20): 2866-2872.
+
+Polpitiya, A. D., Qian, W.-J., Jaitly, N., Petyuk, V. A., Adkins, J. N., Camp, D. G., ... Smith, R. D. (2008). DAnTE: a statistical tool for quantitative analysis of -omics data. Bioinformatics (Oxford, England), 24(13), 1556-1558. 
+
+Redestig, H., Stacklies, W., Scholz, M., Selbig, J., & Walther, D. (2007). pcaMethods - a bioconductor package providing PCA methods for incomplete data. Bioinformatics. 23(9): 1164-7.
+
+Strand, M. (2003). Contrast normalization of oligonucleotide arrays. Journal of Computational Biology. 10(1): 95-102. 
+
+Webb-Robertson, B.-J. M., Matzke, M. M., Datta, S., Payne, S. H., Kang, J., Bramer, L. M., ... Waters, K. M. (2014). Bayesian Proteoform Modeling Improves Protein Quantification of Global Proteomic Measurements. Molecular & Cellular Proteomics.: MCP, 13(12), 3639-3646.
+
+
