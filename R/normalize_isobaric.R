@@ -96,6 +96,8 @@ normalize_isobaric<- function(omicsData, apply_norm = FALSE){
       class(result) = "isobaricnormRes"
       
       #adding some more attributes to result
+      attr(result, "cnames")$edata_cname = edata_cname
+      attr(result, "cnames")$fdata_cname = fdata_cname
       attr(result, "isobaric_info")$exp_cname = exp_cname
       attr(result, "isobaric_info")$refpool_channel = refpool_channel
       attr(result, "isobaric_info")$channel_cname = channel_cname
@@ -114,6 +116,8 @@ normalize_isobaric<- function(omicsData, apply_norm = FALSE){
       class(result) = "isobaricnormRes"
       
       #adding some more attributes to result
+      attr(result, "cnames")$edata_cname = edata_cname
+      attr(result, "cnames")$fdata_cname = fdata_cname
       attr(result, "isobaric_info")$exp_cname = exp_cname
       attr(result, "isobaric_info")$refpool_channel = NULL
       attr(result, "isobaric_info")$channel_cname = NULL
