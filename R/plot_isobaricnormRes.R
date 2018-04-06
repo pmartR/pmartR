@@ -2,7 +2,7 @@
 #' 
 #' For plotting an S3 object of type 'isobaricnormRes':
 #' 
-#' @param isobaricnormRes... 
+#' @param an object of type isobaricnormRes, created by \code{\link{normalize_isobaric}}  
 #' @param x_lab character string to be used for x-axis label. Defaults to NULL  
 #' @param ... further arguments 
 #'
@@ -20,6 +20,11 @@
 #' 
 #' @examples
 #' dontrun{
+#' library(pmartRdata)
+#' data(isobaric_object)
+#' result = normalize_isobaric(isobaric_object, apply_norm = F)
+#' 
+#' plot(result)
 #'}
 #' 
 #' @rdname plot-isobaricnormRes
@@ -60,7 +65,7 @@ plot.isobaricnormRes <- function(isobaricnormRes_object, x_lab = NULL, ...) {
   
   #make labels
   xlabel <- ifelse(is.null(x_lab), "ref_sample", x_lab)
-  ylabel <- ifelse(is.null(y_lab), "log2 abundance", y_lab)
+  ylabel <- ifelse(is.null(y_lab), "log2 Abundance", y_lab)
   plot_title <- ifelse(is.null(title_plot), "Reference Sample Profile", title_plot)
   
   p<- ggplot(data = data, aes(x = data[[fdata_cname]], y = value))
