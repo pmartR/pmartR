@@ -300,7 +300,7 @@ summary(mypepData)
 
 ### Filter Samples
 
-To identify any samples that are potential outliers or anomalies (due to sample quality, preparation, or processing circumstances), we use a robust Mahalanobis distance (rMd) score based on 2-5 metrics. The possible metrics are:
+To identify any samples that are potential outliers or anomalies (due to sample quality, preparation, or processing circumstances), we use a robust Mahalanobis distance (rMd) [@matzke2011improved] score based on 2-5 metrics. The possible metrics are:
 
 - Correlation 
 
@@ -347,7 +347,7 @@ We can see that Infection5 has the highest MAD, low skewness, and almost the low
 
 The next step in a typical workflow is to normalize the data. 
 
-Normalization approaches consist of a subset method and a normalization function. Available subset methods include:
+Normalization approaches consist of a subset method and a normalization function [@aastrand2003contrast],[@gautier2004affy]. Available subset methods include:
 
 - Percentage of peptides present (PPP): Subset the data to peptides present in at least $p$ percent of samples. This subset method is specified as "ppp".
 
@@ -402,7 +402,7 @@ Below we use SPANS to select a normalization approach and then normalize the dat
 
 ### Summarize Data
 
-The pmartRqc package contains various methods for data summarization and exploration that can be used as part of the quality control process: numeric summaries and associated plots (via the `summarize()` function), sequential projection pursuit principal components analysis (sppPCA) for dimension reduction (via the`dim_reduction()` function), and a correlation heat map (via the `cor_result()` function). As for missing data summarization there are also functions to collect and plot missing data information. Missing data collection and plotting functions include, `missingval_result()`, `plot_missingval()`, `missingval_scatterplot()` and `missingval_heatmap()`. 
+The pmartRqc package contains various methods for data summarization and exploration that can be used as part of the quality control process: numeric summaries and associated plots (via the `summarize()` function), sequential projection pursuit principal components analysis (sppPCA) for dimension reduction (via the`dim_reduction()` function), and a correlation heat map (via the `cor_result()` function)[@stacklies2007pcamethods]. As for missing data summarization there are also functions to collect and plot missing data information. Missing data collection and plotting functions include, `missingval_result()`, `plot_missingval()`, `missingval_scatterplot()` and `missingval_heatmap()`. 
 
 #### Numeric Summaries
 
@@ -476,7 +476,7 @@ missingval_heatmap(mypepData, title_size = 20, title_plot = "Hey look at this!")
 
 ### Protein Quantification Methods
 
-Protein quantification can be done using the `protein_quant()` function, either with or without accounting for different isoforms of the proteins, also called 'proteoforms. Regardless of whether the user is accounting for protein isoforms, they must specify a method for rolling peptides up to proteins (one of "rollup", "rollup", "qrollup", or "zrollup") and a function to use for combining the peptide-level data (either "mean" or "median"). When the user does wish to account for protein isoforms, they have two options for doing so: Bayesian Proteoform Quantification (BP-Quant) or Protein Quantification via Peptide Quality-Control (PQPQ). 
+Protein quantification can be done using the `protein_quant()` function, either with or without accounting for different isoforms of the proteins, also called 'proteoforms. Regardless of whether the user is accounting for protein isoforms, they must specify a method for rolling peptides up to proteins (one of "rollup", "rollup", "qrollup", or "zrollup") and a function to use for combining the peptide-level data (either "mean" or "median"). When the user does wish to account for protein isoforms, they have two options for doing so: Bayesian Proteoform Quantification (BP-Quant) [@webb2014bayesian] or Protein Quantification via Peptide Quality-Control (PQPQ). 
 
 The `protein_quant()` function returns an object of class proData.
 
@@ -484,11 +484,11 @@ The `protein_quant()` function returns an object of class proData.
 
 The rollup method ... 
 
-In the rrollup method, all peptides that map to a single protein are scaled based on a chosen reference peptide, which is the peptide with most observations. Next the average or mean of the scaled peptides is set as the relative protein abundance.
+In the rrollup method, all peptides that map to a single protein are scaled based on a chosen reference peptide, which is the peptide with most observations. Next the average or mean of the scaled peptides is set as the relative protein abundance. [@matzke2013comparative] 
 
 The qrollup method starts with all peptides that map to a single protein. Next peptides are chosen according to an abundance cutoff value and the average or mean of the scaled peptides is set as the protein abundance.
 
-In the zrollup method, scaling is done similarly to the  z-score formula (except with medians instead of means). The scaling formula is applied to peptides that map to a single protein and then the mean or median of the scaled peptides is set as protein abundance (from DAnTE article). The rollup method is similar to rrollup method, except there is no scaling involved in these methods. Either the mean or median is applied to all peptides that map to a single protein to obtain protein abundance.
+In the zrollup method, scaling is done similarly to the  z-score formula (except with medians instead of means). The scaling formula is applied to peptides that map to a single protein and then the mean or median of the scaled peptides is set as protein abundance (from DAnTE article). The rollup method is similar to rrollup method, except there is no scaling involved in these methods. Either the mean or median is applied to all peptides that map to a single protein to obtain protein abundance.[@polpitiya2008dante]
 
 
 ```{r protein_quant}
@@ -512,21 +512,3 @@ rm(mypepdata_rrollup)
 
 
 ## References
-
-Ahmed, S.E. (1995). A pooling methodology for coefficient of variation. The Indian Journal of Statistics. 57: 57-75.
-
-Laurent, G., Leslie C., Benjamin, M. B., Rafael, A. I. (2004). affy-analysis of Affymetrix GeneChip data at the probe level. Bioinformatics. 20(3): 307-315.
-
-Matzke, M. M., Brown, J. N., Gritsenko, M. A., Metz, T. O., Pounds, J. G., Rodland, K. D., ... Webb-Robertson, B.-J. (2013). A comparative analysis of computational approaches to relative protein quantification using peptide peak intensities in label-free LC-MS proteomics experiments. Proteomics, 13(0), 493-503. 
-
-Matzke, M., Waters, K., Metz, T., Jacobs, J., Sims, A., Baric, R., Pounds, J., and Webb-Robertson, B.J. (2011), Improved quality control processing of peptide-centric LC-MS proteomics data. Bioinformatics. 27(20): 2866-2872.
-
-Polpitiya, A. D., Qian, W.-J., Jaitly, N., Petyuk, V. A., Adkins, J. N., Camp, D. G., ... Smith, R. D. (2008). DAnTE: a statistical tool for quantitative analysis of -omics data. Bioinformatics (Oxford, England), 24(13), 1556-1558. 
-
-Redestig, H., Stacklies, W., Scholz, M., Selbig, J., & Walther, D. (2007). pcaMethods - a bioconductor package providing PCA methods for incomplete data. Bioinformatics. 23(9): 1164-7.
-
-Strand, M. (2003). Contrast normalization of oligonucleotide arrays. Journal of Computational Biology. 10(1): 95-102. 
-
-Webb-Robertson, B.-J. M., Matzke, M. M., Datta, S., Payne, S. H., Kang, J., Bramer, L. M., ... Waters, K. M. (2014). Bayesian Proteoform Modeling Improves Protein Quantification of Global Proteomic Measurements. Molecular & Cellular Proteomics.: MCP, 13(12), 3639-3646.
-
-
