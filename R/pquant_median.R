@@ -52,6 +52,12 @@ pquant_median <- function(pepData){
 
   prodata = as.proData(e_data = data.frame(res, check.names=check_names), f_data = pepData$f_data, e_meta = e_meta, edata_cname = pro_id, fdata_cname = samp_id, emeta_cname = pro_id, data_scale = data_scale, data_norm = data_norm, check.names = check_names)
   
+  #check for isobaricpepData class
+  if(inherits(pepData, "isobaricpepData")){
+    #add isobaric_info to prodata
+    attr(prodata, "isobaric_info") = attr(pepData, "isobaric_info")
+  }
+  
   #updating prodata attributes
   attr(prodata, "data_info")$norm_info = attr(pepData, "data_info")$norm_info
   attr(prodata, "data_info")$data_types = attr(pepData, "data_info")$data_types

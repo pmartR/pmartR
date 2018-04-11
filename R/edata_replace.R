@@ -64,10 +64,16 @@ edata_replace.pepData <- function(omicsData, x, y){
   }else{
     emeta_cname = attr(omicsData, "cnames")$emeta_cname
   }
-
+  
   # create an updated metabData object (look at as.metabData function to see how the attributes are accessed) #
   updated_data <- as.pepData(e_data = edata_new, f_data = omicsData$f_data, e_meta = omicsData$e_meta, edata_cname = edata_id, emeta_cname=emeta_cname, fdata_cname = attr(omicsData, "cnames")$fdata_cname, data_scale = attr(omicsData, "data_info")$data_scale, data_norm = attr(omicsData, "data_info")$data_norm, norm_info=attr(omicsData, "data_info")$norm_info, data_types=attr(omicsData, "data_info")$data_types, check.names = check_names)
 
+  #check for isobaricpepData class
+  if(inherits(omicsData, "isobaricpepData")){
+    #add isobaric_info to updated_data
+    attr(updated_data, "isobaric_info") = attr(omicsData, "isobaric_info")
+  }
+  
   attributes(updated_data)$group_DF <- attributes(omicsData)$group_DF
   attributes(updated_data)$filters <- attributes(omicsData)$filters
   attributes(updated_data)$meta_info <- attributes(omicsData)$meta_info
