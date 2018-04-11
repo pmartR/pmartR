@@ -300,7 +300,7 @@ summary(mypepData)
 
 ### Filter Samples
 
-To identify any samples that are potential outliers or anomalies (due to sample quality, preparation, or processing circumstances), we use a robust Mahalanobis distance (rMd) score based on 2-5 metrics. The possible metrics are:
+To identify any samples that are potential outliers or anomalies (due to sample quality, preparation, or processing circumstances), we use a robust Mahalanobis distance (rMd) [@matzke2011improved] score based on 2-5 metrics. The possible metrics are:
 
 - Correlation 
 
@@ -347,7 +347,7 @@ We can see that Infection5 has the highest MAD, low skewness, and almost the low
 
 The next step in a typical workflow is to normalize the data. 
 
-Normalization approaches consist of a subset method and a normalization function. Available subset methods include:
+Normalization approaches consist of a subset method and a normalization function [@aastrand2003contrast],[@gautier2004affy]. Available subset methods include:
 
 - Percentage of peptides present (PPP): Subset the data to peptides present in at least $p$ percent of samples. This subset method is specified as "ppp".
 
@@ -374,13 +374,13 @@ We can go straight to the normalization, if we know what approach we want to use
 ```{r norm2}
 
 # Normalize using all peptides and median centering #
-norm_object <- normalize(omicsData = mypepData, subset_fn = "all", norm_fn = "median", apply_norm = FALSE, backtransform = TRUE)
-norm_data <- normalize(omicsData = mypepData, subset_fn = "all", norm_fn = "median", apply_norm = TRUE, backtransform = TRUE)
+norm_object <- normalize_global(omicsData = mypepData, subset_fn = "all", norm_fn = "median", apply_norm = FALSE, backtransform = TRUE)
+norm_data <- normalize_global(omicsData = mypepData, subset_fn = "all", norm_fn = "median", apply_norm = TRUE, backtransform = TRUE)
 plot(norm_data, title_plot="Normalized Data: Median Centering Using all Peptides", title_size=12)
 
 # Normalize using RIP 0.2 and median centering #
-norm_object <- normalize(omicsData = mypepData, subset_fn = "rip", params=list(rip=0.2), norm_fn = "median", apply_norm = FALSE, backtransform = TRUE)
-norm_data <- normalize(omicsData = mypepData, subset_fn = "rip", params=list(rip=0.2), norm_fn = "median", apply_norm = TRUE, backtransform = TRUE)
+norm_object <- normalize_global(omicsData = mypepData, subset_fn = "rip", params=list(rip=0.2), norm_fn = "median", apply_norm = FALSE, backtransform = TRUE)
+norm_data <- normalize_global(omicsData = mypepData, subset_fn = "rip", params=list(rip=0.2), norm_fn = "median", apply_norm = TRUE, backtransform = TRUE)
 plot(norm_data, title_plot="Normalized Data: Median Centering Using RIP 0.2 Peptides", title_size=12)
 
 ```
@@ -402,7 +402,7 @@ Below we use SPANS to select a normalization approach and then normalize the dat
 
 ### Summarize Data
 
-The pmartRqc package contains various methods for data summarization and exploration that can be used as part of the quality control process: numeric summaries and associated plots (via the `summarize()` function), sequential projection pursuit principal components analysis (sppPCA) for dimension reduction (via the`dim_reduction()` function), and a correlation heat map (via the `cor_result()` function). As for missing data summarization there are also functions to collect and plot missing data information. Missing data collection and plotting functions include, `missingval_result()`, `plot_missingval()`, `missingval_scatterplot()` and `missingval_heatmap()`. 
+The pmartRqc package contains various methods for data summarization and exploration that can be used as part of the quality control process: numeric summaries and associated plots (via the `summarize()` function), sequential projection pursuit principal components analysis (sppPCA) for dimension reduction (via the`dim_reduction()` function), and a correlation heat map (via the `cor_result()` function)[@stacklies2007pcamethods]. As for missing data summarization there are also functions to collect and plot missing data information. Missing data collection and plotting functions include, `missingval_result()`, `plot_missingval()`, `missingval_scatterplot()` and `missingval_heatmap()`. 
 
 #### Numeric Summaries
 
@@ -476,7 +476,7 @@ missingval_heatmap(mypepData, title_size = 20, title_plot = "Hey look at this!")
 
 ### Protein Quantification Methods
 
-Protein quantification can be done using the `protein_quant()` function, either with or without accounting for different isoforms of the proteins, also called 'proteoforms. Regardless of whether the user is accounting for protein isoforms, they must specify a method for rolling peptides up to proteins (one of "rollup", "rollup", "qrollup", or "zrollup") and a function to use for combining the peptide-level data (either "mean" or "median"). When the user does wish to account for protein isoforms, they have two options for doing so: Bayesian Proteoform Quantification (BP-Quant) or Protein Quantification via Peptide Quality-Control (PQPQ). 
+Protein quantification can be done using the `protein_quant()` function, either with or without accounting for different isoforms of the proteins, also called 'proteoforms. Regardless of whether the user is accounting for protein isoforms, they must specify a method for rolling peptides up to proteins (one of "rollup", "rollup", "qrollup", or "zrollup") and a function to use for combining the peptide-level data (either "mean" or "median"). When the user does wish to account for protein isoforms, they have two options for doing so: Bayesian Proteoform Quantification (BP-Quant) [@webb2014bayesian] or Protein Quantification via Peptide Quality-Control (PQPQ). 
 
 The `protein_quant()` function returns an object of class proData.
 
@@ -484,11 +484,11 @@ The `protein_quant()` function returns an object of class proData.
 
 The rollup method ... 
 
-In the rrollup method, all peptides that map to a single protein are scaled based on a chosen reference peptide, which is the peptide with most observations. Next the average or mean of the scaled peptides is set as the relative protein abundance.
+In the rrollup method, all peptides that map to a single protein are scaled based on a chosen reference peptide, which is the peptide with most observations. Next the average or mean of the scaled peptides is set as the relative protein abundance. [@matzke2013comparative] 
 
 The qrollup method starts with all peptides that map to a single protein. Next peptides are chosen according to an abundance cutoff value and the average or mean of the scaled peptides is set as the protein abundance.
 
-In the zrollup method, scaling is done similarly to the  z-score formula (except with medians instead of means). The scaling formula is applied to peptides that map to a single protein and then the mean or median of the scaled peptides is set as protein abundance (from DAnTE article). The rollup method is similar to rrollup method, except there is no scaling involved in these methods. Either the mean or median is applied to all peptides that map to a single protein to obtain protein abundance.
+In the zrollup method, scaling is done similarly to the  z-score formula (except with medians instead of means). The scaling formula is applied to peptides that map to a single protein and then the mean or median of the scaled peptides is set as protein abundance (from DAnTE article). The rollup method is similar to rrollup method, except there is no scaling involved in these methods. Either the mean or median is applied to all peptides that map to a single protein to obtain protein abundance.[@polpitiya2008dante]
 
 
 ```{r protein_quant}

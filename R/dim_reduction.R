@@ -7,6 +7,8 @@
 #'
 #' @return a data.frame with first \code{k} principal component scores, sample identifiers, and group membership for each sample (if group designation was previously run on the data).
 #'
+#' @references Redestig, H., Stacklies, W., Scholz, M., Selbig, J., & Walther, D. (2007). \emph{pcaMethods - a bioconductor package providing PCA methods for incomplete data}. Bioinformatics. 23(9): 1164-7.
+#'
 #' @details Any biomoleculs seen in only one sample or with a variance less than 1E-6 across all samples are not included in the PCA calculations. This function leverages code from \code{\link[pcaMethods]{pca}}.
 #' 
 #' @examples 
