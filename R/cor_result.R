@@ -40,7 +40,13 @@ cor_result <- function(omicsData){
 
   attr(output, "sample_names") <- names(edata)
   attr(output, "group_DF") <- attr(omicsData, "group_DF")
-  attr(output, "data_norm") <- ifelse(attr(omicsData,"data_info")$data_norm == TRUE, TRUE, FALSE)
+  
+  if(inherits(omicsData, "pepData")){
+    attr(output, "data_norm") <- ifelse(attr(omicsData,"data_info")$data_norm == TRUE, TRUE, FALSE)
+  }
+  else if(inherits(omicsData, "isobaricpepData")){
+    attr(output, "isobaric_norm") <- ifelse(attr(omicsData,"data_info")$isobaric_norm == TRUE, TRUE, FALSE)
+  }
 
   return(output)
 }
