@@ -113,8 +113,7 @@ zrollup<- function(pepData, combine_fn = "median", parallel = TRUE){
     
     #check for isobaricpepData class
     if(inherits(pepData, "isobaricpepData")){
-      #add isobaric_info to prodata
-      attr(prodata, "isobaric_info") = attr(pepData, "isobaric_info")
+      prodata = as.isobaricproData(e_data = data.frame(final_result, check.names=check_names), f_data = pepData$f_data, e_meta = e_meta ,edata_cname = pro_id, fdata_cname = samp_id, emeta_cname = pro_id, exp_cname = attr(omicsData, "isobaric_info")$exp_cname, channel_cname = attr(omicsData, "isobaric_info")$channel_cname, refpool_channel = attr(omicsData, "isobaric_info")$refpool_channel, refpool_cname = attr(omicsData, "isobaric_info")$refpool_cname, refpool_notation = attr(omicsData, "isobaric_info")$refpool_notation, data_scale = data_scale, data_norm = data_norm, isobaric_norm = attr(omicsData, "data_info")$isobaric_norm, norm_info=attr(omicsData, "data_info")$norm_info, data_types=attr(omicsData, "data_info")$data_types)
     }
     
     #updating prodata attributes
@@ -180,8 +179,7 @@ zrollup<- function(pepData, combine_fn = "median", parallel = TRUE){
     
     #check for isobaricpepData class
     if(inherits(pepData, "isobaricpepData")){
-      #add isobaric_info to prodata
-      attr(prodata, "isobaric_info") = attr(pepData, "isobaric_info")
+      prodata = as.isobaricproData(e_data = data.frame(final_result, check.names=check_names), f_data = pepData$f_data, e_meta = e_meta ,edata_cname = pro_id, fdata_cname = samp_id, emeta_cname = pro_id, exp_cname = attr(omicsData, "isobaric_info")$exp_cname, channel_cname = attr(omicsData, "isobaric_info")$channel_cname, refpool_channel = attr(omicsData, "isobaric_info")$refpool_channel, refpool_cname = attr(omicsData, "isobaric_info")$refpool_cname, refpool_notation = attr(omicsData, "isobaric_info")$refpool_notation, data_scale = data_scale, data_norm = data_norm, isobaric_norm = attr(omicsData, "data_info")$isobaric_norm, norm_info=attr(omicsData, "data_info")$norm_info, data_types=attr(omicsData, "data_info")$data_types)
     }
     
     #updating prodata attributes
