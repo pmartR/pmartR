@@ -913,16 +913,17 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
   e_data_cname <- attributes(omicsData)$cnames$edata_cname
   plot_data <- reshape2::melt(e_data, id = e_data_cname, na.rm = TRUE)
   
-  if(inherits(omicsData, "pepData")){
-    maintitle <- ifelse(attributes(omicsData)$data_info$data_norm,
-                        "Boxplots of Normalized Peptide Data",
-                        "Boxplots of Un-Normalized Peptide Data")
-  }
-  else if(inherits(omicsData, "isobaricpepData")){
+  if(inherits(omicsData, "isobaricpepData")){
     maintitle <- ifelse(attributes(omicsData)$data_info$isobaric_norm,
                         "Boxplots of Normalized Isobaric Peptide Data",
                         "Boxplots of Un-Normalized Isobaric Peptide Data")
   }
+  else if(inherits(omicsData, "pepData")){
+    maintitle <- ifelse(attributes(omicsData)$data_info$data_norm,
+                        "Boxplots of Normalized Peptide Data",
+                        "Boxplots of Un-Normalized Peptide Data")
+  }
+
 
   
   # get data and aesthetics for plots #
