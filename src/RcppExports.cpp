@@ -8,7 +8,7 @@ using namespace Rcpp;
 
 // anova_cpp
 List anova_cpp(NumericMatrix data, NumericVector gp, int unequal_var, NumericVector df_red);
-RcppExport SEXP _pmartRqc_anova_cpp(SEXP dataSEXP, SEXP gpSEXP, SEXP unequal_varSEXP, SEXP df_redSEXP) {
+RcppExport SEXP _pmartR_anova_cpp(SEXP dataSEXP, SEXP gpSEXP, SEXP unequal_varSEXP, SEXP df_redSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -22,7 +22,7 @@ END_RCPP
 }
 // count_missing_cpp
 NumericMatrix count_missing_cpp(NumericMatrix data, NumericVector gp);
-RcppExport SEXP _pmartRqc_count_missing_cpp(SEXP dataSEXP, SEXP gpSEXP) {
+RcppExport SEXP _pmartR_count_missing_cpp(SEXP dataSEXP, SEXP gpSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -34,7 +34,7 @@ END_RCPP
 }
 // proj_mat_cpp
 List proj_mat_cpp(arma::mat X, int ngroups);
-RcppExport SEXP _pmartRqc_proj_mat_cpp(SEXP XSEXP, SEXP ngroupsSEXP) {
+RcppExport SEXP _pmartR_proj_mat_cpp(SEXP XSEXP, SEXP ngroupsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -46,7 +46,7 @@ END_RCPP
 }
 // project_to_null_cpp
 List project_to_null_cpp(arma::mat data_mat, arma::mat Xmatrix, int ngroups);
-RcppExport SEXP _pmartRqc_project_to_null_cpp(SEXP data_matSEXP, SEXP XmatrixSEXP, SEXP ngroupsSEXP) {
+RcppExport SEXP _pmartR_project_to_null_cpp(SEXP data_matSEXP, SEXP XmatrixSEXP, SEXP ngroupsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -59,7 +59,7 @@ END_RCPP
 }
 // fold_change_diff
 arma::mat fold_change_diff(arma::mat data, arma::mat C);
-RcppExport SEXP _pmartRqc_fold_change_diff(SEXP dataSEXP, SEXP CSEXP) {
+RcppExport SEXP _pmartR_fold_change_diff(SEXP dataSEXP, SEXP CSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -71,7 +71,7 @@ END_RCPP
 }
 // fold_change_ratio
 arma::mat fold_change_ratio(arma::mat data, arma::mat C);
-RcppExport SEXP _pmartRqc_fold_change_ratio(SEXP dataSEXP, SEXP CSEXP) {
+RcppExport SEXP _pmartR_fold_change_ratio(SEXP dataSEXP, SEXP CSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -83,7 +83,7 @@ END_RCPP
 }
 // fold_change_logbase2
 arma::mat fold_change_logbase2(arma::mat data, arma::mat C);
-RcppExport SEXP _pmartRqc_fold_change_logbase2(SEXP dataSEXP, SEXP CSEXP) {
+RcppExport SEXP _pmartR_fold_change_logbase2(SEXP dataSEXP, SEXP CSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -95,7 +95,7 @@ END_RCPP
 }
 // fold_change_diff_na_okay
 arma::mat fold_change_diff_na_okay(arma::mat data, arma::mat C);
-RcppExport SEXP _pmartRqc_fold_change_diff_na_okay(SEXP dataSEXP, SEXP CSEXP) {
+RcppExport SEXP _pmartR_fold_change_diff_na_okay(SEXP dataSEXP, SEXP CSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -107,7 +107,7 @@ END_RCPP
 }
 // fold_change_diff_copy
 arma::mat fold_change_diff_copy(arma::mat data, arma::mat C);
-RcppExport SEXP _pmartRqc_fold_change_diff_copy(SEXP dataSEXP, SEXP CSEXP) {
+RcppExport SEXP _pmartR_fold_change_diff_copy(SEXP dataSEXP, SEXP CSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -119,7 +119,7 @@ END_RCPP
 }
 // group_comparison_anova_cpp
 List group_comparison_anova_cpp(arma::mat means, arma::mat sizes, arma::vec sigma2, arma::mat C);
-RcppExport SEXP _pmartRqc_group_comparison_anova_cpp(SEXP meansSEXP, SEXP sizesSEXP, SEXP sigma2SEXP, SEXP CSEXP) {
+RcppExport SEXP _pmartR_group_comparison_anova_cpp(SEXP meansSEXP, SEXP sizesSEXP, SEXP sigma2SEXP, SEXP CSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -133,7 +133,7 @@ END_RCPP
 }
 // gtest_cpp
 List gtest_cpp(NumericMatrix data, NumericVector gp);
-RcppExport SEXP _pmartRqc_gtest_cpp(SEXP dataSEXP, SEXP gpSEXP) {
+RcppExport SEXP _pmartR_gtest_cpp(SEXP dataSEXP, SEXP gpSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -145,7 +145,7 @@ END_RCPP
 }
 // holm_cpp
 NumericVector holm_cpp(NumericVector ps);
-RcppExport SEXP _pmartRqc_holm_cpp(SEXP psSEXP) {
+RcppExport SEXP _pmartR_holm_cpp(SEXP psSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -156,7 +156,7 @@ END_RCPP
 }
 // kw_rcpp
 std::list<double> kw_rcpp(arma::mat mtr, std::vector<std::string> group);
-RcppExport SEXP _pmartRqc_kw_rcpp(SEXP mtrSEXP, SEXP groupSEXP) {
+RcppExport SEXP _pmartR_kw_rcpp(SEXP mtrSEXP, SEXP groupSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -168,7 +168,7 @@ END_RCPP
 }
 // nonmissing_per_grp
 arma::Mat<int> nonmissing_per_grp(arma::mat mtr, std::vector<std::string> group);
-RcppExport SEXP _pmartRqc_nonmissing_per_grp(SEXP mtrSEXP, SEXP groupSEXP) {
+RcppExport SEXP _pmartR_nonmissing_per_grp(SEXP mtrSEXP, SEXP groupSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -180,7 +180,7 @@ END_RCPP
 }
 // pooled_cv_rcpp
 std::list<double> pooled_cv_rcpp(arma::mat mtr, std::vector<std::string> group);
-RcppExport SEXP _pmartRqc_pooled_cv_rcpp(SEXP mtrSEXP, SEXP groupSEXP) {
+RcppExport SEXP _pmartR_pooled_cv_rcpp(SEXP mtrSEXP, SEXP groupSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -192,7 +192,7 @@ END_RCPP
 }
 // rcpp_hello_world
 List rcpp_hello_world();
-RcppExport SEXP _pmartRqc_rcpp_hello_world() {
+RcppExport SEXP _pmartR_rcpp_hello_world() {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -202,7 +202,7 @@ END_RCPP
 }
 // ptukey_speed
 NumericMatrix ptukey_speed(NumericMatrix qstats, NumericVector sizes);
-RcppExport SEXP _pmartRqc_ptukey_speed(SEXP qstatsSEXP, SEXP sizesSEXP) {
+RcppExport SEXP _pmartR_ptukey_speed(SEXP qstatsSEXP, SEXP sizesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -214,7 +214,7 @@ END_RCPP
 }
 // two_factor_anova_cpp
 List two_factor_anova_cpp(arma::mat y, arma::mat X_full, arma::mat X_red, NumericVector red_df);
-RcppExport SEXP _pmartRqc_two_factor_anova_cpp(SEXP ySEXP, SEXP X_fullSEXP, SEXP X_redSEXP, SEXP red_dfSEXP) {
+RcppExport SEXP _pmartR_two_factor_anova_cpp(SEXP ySEXP, SEXP X_fullSEXP, SEXP X_redSEXP, SEXP red_dfSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -228,28 +228,28 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_pmartRqc_anova_cpp", (DL_FUNC) &_pmartRqc_anova_cpp, 4},
-    {"_pmartRqc_count_missing_cpp", (DL_FUNC) &_pmartRqc_count_missing_cpp, 2},
-    {"_pmartRqc_proj_mat_cpp", (DL_FUNC) &_pmartRqc_proj_mat_cpp, 2},
-    {"_pmartRqc_project_to_null_cpp", (DL_FUNC) &_pmartRqc_project_to_null_cpp, 3},
-    {"_pmartRqc_fold_change_diff", (DL_FUNC) &_pmartRqc_fold_change_diff, 2},
-    {"_pmartRqc_fold_change_ratio", (DL_FUNC) &_pmartRqc_fold_change_ratio, 2},
-    {"_pmartRqc_fold_change_logbase2", (DL_FUNC) &_pmartRqc_fold_change_logbase2, 2},
-    {"_pmartRqc_fold_change_diff_na_okay", (DL_FUNC) &_pmartRqc_fold_change_diff_na_okay, 2},
-    {"_pmartRqc_fold_change_diff_copy", (DL_FUNC) &_pmartRqc_fold_change_diff_copy, 2},
-    {"_pmartRqc_group_comparison_anova_cpp", (DL_FUNC) &_pmartRqc_group_comparison_anova_cpp, 4},
-    {"_pmartRqc_gtest_cpp", (DL_FUNC) &_pmartRqc_gtest_cpp, 2},
-    {"_pmartRqc_holm_cpp", (DL_FUNC) &_pmartRqc_holm_cpp, 1},
-    {"_pmartRqc_kw_rcpp", (DL_FUNC) &_pmartRqc_kw_rcpp, 2},
-    {"_pmartRqc_nonmissing_per_grp", (DL_FUNC) &_pmartRqc_nonmissing_per_grp, 2},
-    {"_pmartRqc_pooled_cv_rcpp", (DL_FUNC) &_pmartRqc_pooled_cv_rcpp, 2},
-    {"_pmartRqc_rcpp_hello_world", (DL_FUNC) &_pmartRqc_rcpp_hello_world, 0},
-    {"_pmartRqc_ptukey_speed", (DL_FUNC) &_pmartRqc_ptukey_speed, 2},
-    {"_pmartRqc_two_factor_anova_cpp", (DL_FUNC) &_pmartRqc_two_factor_anova_cpp, 4},
+    {"_pmartR_anova_cpp", (DL_FUNC) &_pmartR_anova_cpp, 4},
+    {"_pmartR_count_missing_cpp", (DL_FUNC) &_pmartR_count_missing_cpp, 2},
+    {"_pmartR_proj_mat_cpp", (DL_FUNC) &_pmartR_proj_mat_cpp, 2},
+    {"_pmartR_project_to_null_cpp", (DL_FUNC) &_pmartR_project_to_null_cpp, 3},
+    {"_pmartR_fold_change_diff", (DL_FUNC) &_pmartR_fold_change_diff, 2},
+    {"_pmartR_fold_change_ratio", (DL_FUNC) &_pmartR_fold_change_ratio, 2},
+    {"_pmartR_fold_change_logbase2", (DL_FUNC) &_pmartR_fold_change_logbase2, 2},
+    {"_pmartR_fold_change_diff_na_okay", (DL_FUNC) &_pmartR_fold_change_diff_na_okay, 2},
+    {"_pmartR_fold_change_diff_copy", (DL_FUNC) &_pmartR_fold_change_diff_copy, 2},
+    {"_pmartR_group_comparison_anova_cpp", (DL_FUNC) &_pmartR_group_comparison_anova_cpp, 4},
+    {"_pmartR_gtest_cpp", (DL_FUNC) &_pmartR_gtest_cpp, 2},
+    {"_pmartR_holm_cpp", (DL_FUNC) &_pmartR_holm_cpp, 1},
+    {"_pmartR_kw_rcpp", (DL_FUNC) &_pmartR_kw_rcpp, 2},
+    {"_pmartR_nonmissing_per_grp", (DL_FUNC) &_pmartR_nonmissing_per_grp, 2},
+    {"_pmartR_pooled_cv_rcpp", (DL_FUNC) &_pmartR_pooled_cv_rcpp, 2},
+    {"_pmartR_rcpp_hello_world", (DL_FUNC) &_pmartR_rcpp_hello_world, 0},
+    {"_pmartR_ptukey_speed", (DL_FUNC) &_pmartR_ptukey_speed, 2},
+    {"_pmartR_two_factor_anova_cpp", (DL_FUNC) &_pmartR_two_factor_anova_cpp, 4},
     {NULL, NULL, 0}
 };
 
-RcppExport void R_init_pmartRqc(DllInfo *dll) {
+RcppExport void R_init_pmartR(DllInfo *dll) {
     R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
     R_useDynamicSymbols(dll, FALSE);
 }

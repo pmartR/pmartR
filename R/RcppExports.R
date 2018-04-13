@@ -2,75 +2,75 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 anova_cpp <- function(data, gp, unequal_var, df_red) {
-    .Call('_pmartRqc_anova_cpp', PACKAGE = 'pmartRqc', data, gp, unequal_var, df_red)
+    .Call('_pmartR_anova_cpp', PACKAGE = 'pmartR', data, gp, unequal_var, df_red)
 }
 
 count_missing_cpp <- function(data, gp) {
-    .Call('_pmartRqc_count_missing_cpp', PACKAGE = 'pmartRqc', data, gp)
+    .Call('_pmartR_count_missing_cpp', PACKAGE = 'pmartR', data, gp)
 }
 
 proj_mat_cpp <- function(X, ngroups) {
-    .Call('_pmartRqc_proj_mat_cpp', PACKAGE = 'pmartRqc', X, ngroups)
+    .Call('_pmartR_proj_mat_cpp', PACKAGE = 'pmartR', X, ngroups)
 }
 
 project_to_null_cpp <- function(data_mat, Xmatrix, ngroups) {
-    .Call('_pmartRqc_project_to_null_cpp', PACKAGE = 'pmartRqc', data_mat, Xmatrix, ngroups)
+    .Call('_pmartR_project_to_null_cpp', PACKAGE = 'pmartR', data_mat, Xmatrix, ngroups)
 }
 
 fold_change_diff <- function(data, C) {
-    .Call('_pmartRqc_fold_change_diff', PACKAGE = 'pmartRqc', data, C)
+    .Call('_pmartR_fold_change_diff', PACKAGE = 'pmartR', data, C)
 }
 
 fold_change_ratio <- function(data, C) {
-    .Call('_pmartRqc_fold_change_ratio', PACKAGE = 'pmartRqc', data, C)
+    .Call('_pmartR_fold_change_ratio', PACKAGE = 'pmartR', data, C)
 }
 
 fold_change_logbase2 <- function(data, C) {
-    .Call('_pmartRqc_fold_change_logbase2', PACKAGE = 'pmartRqc', data, C)
+    .Call('_pmartR_fold_change_logbase2', PACKAGE = 'pmartR', data, C)
 }
 
 fold_change_diff_na_okay <- function(data, C) {
-    .Call('_pmartRqc_fold_change_diff_na_okay', PACKAGE = 'pmartRqc', data, C)
+    .Call('_pmartR_fold_change_diff_na_okay', PACKAGE = 'pmartR', data, C)
 }
 
 fold_change_diff_copy <- function(data, C) {
-    .Call('_pmartRqc_fold_change_diff_copy', PACKAGE = 'pmartRqc', data, C)
+    .Call('_pmartR_fold_change_diff_copy', PACKAGE = 'pmartR', data, C)
 }
 
 group_comparison_anova_cpp <- function(means, sizes, sigma2, C) {
-    .Call('_pmartRqc_group_comparison_anova_cpp', PACKAGE = 'pmartRqc', means, sizes, sigma2, C)
+    .Call('_pmartR_group_comparison_anova_cpp', PACKAGE = 'pmartR', means, sizes, sigma2, C)
 }
 
 gtest_cpp <- function(data, gp) {
-    .Call('_pmartRqc_gtest_cpp', PACKAGE = 'pmartRqc', data, gp)
+    .Call('_pmartR_gtest_cpp', PACKAGE = 'pmartR', data, gp)
 }
 
 holm_cpp <- function(ps) {
-    .Call('_pmartRqc_holm_cpp', PACKAGE = 'pmartRqc', ps)
+    .Call('_pmartR_holm_cpp', PACKAGE = 'pmartR', ps)
 }
 
 kw_rcpp <- function(mtr, group) {
-    .Call('_pmartRqc_kw_rcpp', PACKAGE = 'pmartRqc', mtr, group)
+    .Call('_pmartR_kw_rcpp', PACKAGE = 'pmartR', mtr, group)
 }
 
 nonmissing_per_grp <- function(mtr, group) {
-    .Call('_pmartRqc_nonmissing_per_grp', PACKAGE = 'pmartRqc', mtr, group)
+    .Call('_pmartR_nonmissing_per_grp', PACKAGE = 'pmartR', mtr, group)
 }
 
 pooled_cv_rcpp <- function(mtr, group) {
-    .Call('_pmartRqc_pooled_cv_rcpp', PACKAGE = 'pmartRqc', mtr, group)
+    .Call('_pmartR_pooled_cv_rcpp', PACKAGE = 'pmartR', mtr, group)
 }
 
 #' @export
 rcpp_hello_world <- function() {
-    .Call('_pmartRqc_rcpp_hello_world', PACKAGE = 'pmartRqc')
+    .Call('_pmartR_rcpp_hello_world', PACKAGE = 'pmartR')
 }
 
 ptukey_speed <- function(qstats, sizes) {
-    .Call('_pmartRqc_ptukey_speed', PACKAGE = 'pmartRqc', qstats, sizes)
+    .Call('_pmartR_ptukey_speed', PACKAGE = 'pmartR', qstats, sizes)
 }
 
 two_factor_anova_cpp <- function(y, X_full, X_red, red_df) {
-    .Call('_pmartRqc_two_factor_anova_cpp', PACKAGE = 'pmartRqc', y, X_full, X_red, red_df)
+    .Call('_pmartR_two_factor_anova_cpp', PACKAGE = 'pmartR', y, X_full, X_red, red_df)
 }
 
