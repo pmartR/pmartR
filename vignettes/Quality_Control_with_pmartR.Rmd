@@ -1,6 +1,6 @@
 ---
 title: "Quality Control of Peptide Data with the `pmartR` Package"
-author: "Kelly Stratton, Lisa Bramer"
+author: "Kelly Stratton, Lisa Bramer, Iobani Godinez"
 date: "`r Sys.Date()`"
 bibliography: bibliography.bib
 output: 
