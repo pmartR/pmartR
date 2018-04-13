@@ -272,6 +272,8 @@ applyFilt.rmdFilt <- function(filter_object, omicsData, pvalue_threshold=0.001){
     # check that pvalue_threshold is between 0 and 1 #
     if(pvalue_threshold < 0 | pvalue_threshold > 1) stop("pvalue_threshold must be between 0 and 1.")
 
+    if(attr(omicsData, "data_info")$num_edata < 100) stop("Use the results of the RMD filter with caution due to a small number of biomolecules")
+    
     samp_cname <- attributes(omicsData)$cnames$fdata_cname
     edata_cname <- attributes(omicsData)$cnames$edata_cname
     emeta_cname <- attributes(omicsData)$cnames$emeta_cname
