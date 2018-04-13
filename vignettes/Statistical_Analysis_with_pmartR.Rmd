@@ -8,7 +8,7 @@ output:
       in_header: modify_mathjax.html
       
 vignette: >
-  %\VignetteIndexEntry{pmartRstat-intro}
+  %\VignetteIndexEntry{pmartR-intro}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 bibliography: pmartRstat_lit.bib
@@ -30,9 +30,9 @@ pep_object$f_data$Condition3 <- c(rep("Plus",6), rep("Minus",6))
 ```
 ## Introduction
 
-The `pmartRstat` package includes functions to analyze omics data using the most recent statistical methods.  Qualitative and quantitative differences in abundance data are tested using the IMD-ANOVA method described in @webb2010combined.  Our IMD-ANOVA functionality can handle any type of omics dataset including up to two grouping factors with our without additional covariate information.  The data can be paired or not.  One could also perform a survival analysis of omics data.
+The `pmartR` package includes functions to analyze omics data using the most recent statistical methods.  Qualitative and quantitative differences in abundance data are tested using the IMD-ANOVA method described in @webb2010combined.  Our IMD-ANOVA functionality can handle any type of omics dataset including up to two grouping factors with our without additional covariate information.  The data can be paired or not.  One could also perform a survival analysis of omics data.
 
-The functionality of the `pmartRstat` package will be illustrated with peptide data available from the `pmartRdata` package called `pep_object`.  In a nut shell, the `pep_object` object is a list of length three of the class `pepData`.  The `e_data` element contains all of the peptide abundance data on the log base two scale, the `f_data` object contains sample information and the `e_meta` object contains meta information related to the peptides in the dataset.  See the `?pmartRdata` for more on this data set.  
+The functionality of the `pmartR` package will be illustrated with peptide data available from the `pmartRdata` package called `pep_object`.  In a nut shell, the `pep_object` object is a list of length three of the class `pepData`.  The `e_data` element contains all of the peptide abundance data on the log base two scale, the `f_data` object contains sample information and the `e_meta` object contains meta information related to the peptides in the dataset.  See the `?pmartRdata` for more on this data set.  
 
 ## Analysis of Variance 
 
