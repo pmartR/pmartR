@@ -64,10 +64,15 @@ edata_replace.pepData <- function(omicsData, x, y){
   }else{
     emeta_cname = attr(omicsData, "cnames")$emeta_cname
   }
-
+  
   # create an updated metabData object (look at as.metabData function to see how the attributes are accessed) #
   updated_data <- as.pepData(e_data = edata_new, f_data = omicsData$f_data, e_meta = omicsData$e_meta, edata_cname = edata_id, emeta_cname=emeta_cname, fdata_cname = attr(omicsData, "cnames")$fdata_cname, data_scale = attr(omicsData, "data_info")$data_scale, data_norm = attr(omicsData, "data_info")$data_norm, norm_info=attr(omicsData, "data_info")$norm_info, data_types=attr(omicsData, "data_info")$data_types, check.names = check_names)
 
+  #check for isobaricpepData class
+  if(inherits(omicsData, "isobaricpepData")){
+    updated_data <- as.isobaricpepData(e_data = edata_new, f_data = omicsData$f_data, e_meta = omicsData$e_meta, edata_cname = edata_id, emeta_cname=emeta_cname, fdata_cname = attr(omicsData, "cnames")$fdata_cname, exp_cname = attr(omicsData, "isobaric_info")$exp_cname, channel_cname = attr(omicsData, "isobaric_info")$channel_cname, refpool_channel = attr(omicsData, "isobaric_info")$refpool_channel, refpool_cname = attr(omicsData, "isobaric_info")$refpool_cname, refpool_notation = attr(omicsData, "isobaric_info")$refpool_notation, data_scale = attr(omicsData, "data_info")$data_scale, data_norm = attr(omicsData, "data_info")$data_norm, isobaric_norm = attr(omicsData, "data_info")$isobaric_norm, norm_info=attr(omicsData, "data_info")$norm_info, data_types=attr(omicsData, "data_info")$data_types, check.names = check_names)
+  }
+  
   attributes(updated_data)$group_DF <- attributes(omicsData)$group_DF
   attributes(updated_data)$filters <- attributes(omicsData)$filters
   attributes(updated_data)$meta_info <- attributes(omicsData)$meta_info
