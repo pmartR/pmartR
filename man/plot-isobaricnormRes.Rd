@@ -20,7 +20,7 @@
 \code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used. \cr
 \code{order} \tab logical indicates whether to order data by exp_cname'}}
 
-\item{isobaricnormRes...}{}
+\item{an}{object of type isobaricnormRes, created by \code{\link{normalize_isobaric}}}
 }
 \value{
 plots ggplot2 object
@@ -30,6 +30,11 @@ For plotting an S3 object of type 'isobaricnormRes':
 }
 \examples{
 dontrun{
+library(pmartRdata)
+data(isobaric_object)
+result = normalize_isobaric(isobaric_object, apply_norm = F)
+
+plot(result)
 }
 
 }

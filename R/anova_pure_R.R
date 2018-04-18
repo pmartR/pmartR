@@ -3,7 +3,13 @@
 #to be able to determine how much slower a pure R implementation compares to that of 
 #an Rcpp implementation
 
-anova_test_R <- function(omicsData, groupData, return_sizes = FALSE){
+anova_test_R <- function(omicsData, return_sizes = FALSE){
+  # Check for group_DF attribute #
+  if(is.null(attr(omicsData, "group_DF"))){
+    stop("group_designation must be called in order to create a 'group_DF' attribute for omicsData.")
+  }else{
+    groupData <- attr(omicsData, "group_DF")
+  }
   
   #Catch if number of groups is too small
   k <- length(unique(groupData$Group))
