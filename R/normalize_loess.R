@@ -6,6 +6,8 @@
 #' @param method character string specifying which variant of the cyclic loess method to use. Options are "fast", "affy" or "pairs"
 #' @param span span of loess smoothing window, between 0 and 1.
 #' 
+#' @details DETAILS GO HERE!!
+#' 
 #' @return The normalized data is returned in an object of the appropriate S3 class (e.g. pepData), on the same scale as omicsData (e.g. if omicsData contains log2 transformed data, the normalization will be performed on the non-log2 scale and then re-scaled after normalization to be returned on the log2 scale).
 #' 
 #' @examples
