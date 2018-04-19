@@ -18,7 +18,5 @@ This function returns check.names attribute from omicsData object
 \examples{
 dontrun{
 getchecknames(omicsData)
-
 }
-
 }

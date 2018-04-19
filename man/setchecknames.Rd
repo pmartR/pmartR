@@ -20,7 +20,5 @@ This function sets the check.names attribute of an omicsData object
 \examples{
 dontrun{
 setchecknames(omicsData, set_to = TRUE)
-
 }
-
 }

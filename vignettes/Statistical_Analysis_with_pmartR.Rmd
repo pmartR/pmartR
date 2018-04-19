@@ -15,8 +15,7 @@ bibliography: pmartRstat_lit.bib
 ---
 
 ```{r setup,include=FALSE,warning=FALSE}
-library(MSomicsSTAT)
-library(pmartRqc)
+library(pmartR)
 library(pmartRdata)
 
 data(pep_object)
@@ -55,8 +54,6 @@ all_pairwise_results <- anova_test(omicsData = pep_object)
 ```
 
 The function `anova_test` returns a length four list.  The first element is called `Results` which contains the best linear unbiased estimators of $\mu_i$ in the rows called `Mean_i` where `i` is replaced by the group name supplied as an attribute of the `omicsData` argument, an estimate $\sigma^2$ in the column `Sigma2`, the global $F$-test statistic and $p$-value in the `F_Statistic` and `p_value` columns, respectively.  Because every group is assumed to have the same variance, `Sigma2` is the maximum likelihood estimators (*is this right?*).  The remaining three elements, `Fold_changes`, `Fold_change_pvalues` and `Flags`, contain the fold change estimates, $p$-values and indicators of significance, respectively, for all pairwise comparisons of groups.  Each column of the `Flags` element is a $\pm1$ or 0  depending on if that fold change was or was not statistically significant from zero, respectively, according to the $p$-values contained in the `Fold_change_pvalues` `data.frame` and the specificed $p$-value threshold set by the `pval_thresh` argument.  A value of $-1$ implies the control group is significantly under expressed compared to the test group, and the converse is true for $+1$.  
-
-WHY DO WE NEED THE "FOLD_CHANGES_PVALUES" ELEMENT OF THE STAT OUTPUT?
 
 The $p$-values associated with each group comparison can be adjusted to multiple comparisons.  A detailed look at the available $p$-value adjustment methods and when they should be applied are discussed later in this vignette, but the use of the Tukey multiple comparison method is illustrated in the following.
 
