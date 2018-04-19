@@ -30,7 +30,9 @@ The method creates a data.frame containing the comparisons to be made using diff
 This function returns comparisons from statRes object
 }
 \details{
+
 This function takes in the omicsData and type of comparison, and returns a data.frame where each row corresponds to a comparison of interest.
+
 }
 \examples{
 dontrun{
