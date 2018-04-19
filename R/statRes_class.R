@@ -13,7 +13,10 @@
 #' @export
 #' 
 statRes_output <- function(imd_out,omicsData,comparisons,test_method,pval_adjust,pval_thresh){
-  # Check for group_DF attribute #
+  # check that omicsData is of the appropriate class
+  if(!inherits(omicsData, c("proData","pepData","lipidData", "metabData"))) stop("omicsData is not an object of appropriate class")
+  
+   # Check for group_DF attribute #
   if(is.null(attr(omicsData, "group_DF"))){
     stop("group_designation must be called in order to create a 'group_DF' attribute for omicsData.")
   }else{
