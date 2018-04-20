@@ -3,17 +3,27 @@
 #' The method creates a data.frame containing the comparisons to be made using differential statistics.  
 #'  
 #' @param comp_type string taking one of the following values: control, pairwise, custom. Specifying "control" indicates that all other groups are to be compared to this single control group. Specifying "pairwise" indicates that all pairwise comparisons are to be made. 
-#' @param group_data data.frame with column for sample identifier and column for Group. Typically this is created by the group_designation function.
+#' @param omicsData A mintR data object of any class, which has a `group_df` attribute that is usually created by the `group_designation()` function
 #' @param control_group string indicating the group to use for the control group. Only required when comp_type="control".
 #'
-#' @details This function takes in the group_data and type of comparison, and returns a data.frame where each row corresponds to a comparison of interest.
+#' @details This function takes in the omicsData and type of comparison, and returns a data.frame where each row corresponds to a comparison of interest.
 #'
 #' @return data.frame with columns for Test and Control. Each row corresponds to a comparison of interest. 
 #' #'  
 #' @author Kelly Stratton
 #' 
 #' @export
-get_comparisons <- function(comp_type, group_data, control_group=NULL){
+get_comparisons <- function(comp_type, omicsData, control_group=NULL){
+  # check that omicsData is of the appropriate class
+  if(!inherits(omicsData, c("proData","pepData","lipidData", "metabData"))) stop("omicsData is not an object of appropriate class")
+  
+  # Check for group_DF attribute #
+  if(is.null(attr(omicsData, "group_DF"))){
+    stop("group_designation must be called in order to create a 'group_DF' attribute for omicsData.")
+  }else{
+    group_data <- attr(omicsData, "group_DF")
+  }
+  
   # do we even run this if they want custom groups? 
   # need to address the order of the factor levels somewhere...maybe not in this function, but somewhere...
   

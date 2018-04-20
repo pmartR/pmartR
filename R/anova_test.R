@@ -84,6 +84,8 @@
 #' @export
 
 anova_test <- function(omicsData, comparisons = NULL, pval_adjust = 'none', pval_thresh = 0.05, covariates = NULL, paired = FALSE, equal_var = TRUE){
+  # check that omicsData is of the appropriate class
+  if(!inherits(omicsData, c("proData","pepData","lipidData", "metabData"))) stop("omicsData is not an object of appropriate class")
   
   # Check for group_DF attribute #
   if(!("group_DF" %in% names(attributes(omicsData)))){

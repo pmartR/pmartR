@@ -3,7 +3,7 @@
 #' Not really an interesting function.  Just exporting it so Natalie can use in a different function.
 #' 
 #' @param imd_out Data.frame containing the results of the imd anova call
-#' @param groupData the groupData object
+#' @param omicsData A mintR data object of any class, which has a `group_df` attribute that is usually created by the `group_designation()` function
 #' @param comparisons the comparisons made
 #' @param test_method the test method
 #' @param pval_ajust pvalue adjustment method
@@ -12,7 +12,16 @@
 #' @return the final object of class statRes
 #' @export
 #' 
-statRes_output <- function(imd_out,groupData,comparisons,test_method,pval_adjust,pval_thresh){
+statRes_output <- function(imd_out,omicsData,comparisons,test_method,pval_adjust,pval_thresh){
+  # check that omicsData is of the appropriate class
+  if(!inherits(omicsData, c("proData","pepData","lipidData", "metabData"))) stop("omicsData is not an object of appropriate class")
+  
+   # Check for group_DF attribute #
+  if(is.null(attr(omicsData, "group_DF"))){
+    stop("group_designation must be called in order to create a 'group_DF' attribute for omicsData.")
+  }else{
+    groupData <- attr(omicsData, "group_DF")
+  }
   
   #Flags to determine number of significant
   imd_out_flags <- imd_out[[grep("flag",tolower(names(imd_out)))]]

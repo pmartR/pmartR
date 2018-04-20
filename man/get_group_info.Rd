@@ -18,7 +18,5 @@ This function returns the "group_DF" attribute of an omicsData object
 \examples{
 dontrun{
 get_group_info(omicsData)
-
 }
-
 }

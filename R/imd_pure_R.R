@@ -3,7 +3,16 @@
 #to be able to determine how much slower a pure R implementation compares to that of 
 #an Rcpp implementation
 
-imd_test_R <- function(omicsData, groupData){
+imd_test_R <- function(omicsData){
+  # check that omicsData is of the appropriate class
+  if(!inherits(omicsData, c("proData","pepData","lipidData", "metabData"))) stop("omicsData is not an object of appropriate class")
+  
+  # Check for group_DF attribute #
+  if(is.null(attr(omicsData, "group_DF"))){
+    stop("group_designation must be called in order to create a 'group_DF' attribute for omicsData.")
+  }else{
+    groupData <- attr(omicsData, "group_DF")
+  }
   
   #Catch if number of groups is too small
   k <- length(unique(groupData$Group))

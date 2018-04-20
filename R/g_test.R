@@ -5,7 +5,6 @@
 #' qualitative difference).  For count data, this is used to test if the number of counts is the same for all groups.
 #'
 #' @param omicsData A mintR data object of any class
-#' @param groupData The `group_df` attribute of a mintR data object, usually created by the `group_designation()` function
 #' @param return_sizes Logical, should the group sizes be returned as well?  If true, a separate data.frame containing the group sizes is returned
 #'
 #' @return a data frame with the following columns: group means, global G-test statistic and corresponding p-value
@@ -24,7 +23,16 @@
 #' 
 #' @export
 
-g_test <- function(omicsData, groupData, return_sizes = FALSE){
+g_test <- function(omicsData, return_sizes = FALSE){
+  # check that omicsData is of the appropriate class
+  if(!inherits(omicsData, c("proData","pepData","lipidData", "metabData"))) stop("omicsData is not an object of appropriate class")
+  
+  # Check for group_DF attribute #
+  if(is.null(attr(omicsData, "group_DF"))){
+    stop("group_designation must be called in order to create a 'group_DF' attribute for omicsData.")
+  }else{
+    groupData <- attr(omicsData, "group_DF")
+  }
   
   #Catch if number of groups is too small
   k <- length(unique(groupData$Group))
