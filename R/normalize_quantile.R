@@ -27,7 +27,7 @@ normalize_quantile <- function(omicsData){
   dat_class <- class(omicsData)
   
   # check that omicsData is of the appropriate class
-  if(!(dat_class%in% c("proData","pepData","lipidData", "metabData"))) stop("omicsData is not an object of appropriate class")
+  if(!inherits(omicsData, c("proData","pepData","lipidData", "metabData"))) stop("omicsData is not an object of appropriate class")
   
   # data should be on raw scale #
   if(attr(omicsData, "data_info")$data_scale %in% c("log2", "log10", "log")){
