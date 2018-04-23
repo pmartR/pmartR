@@ -21,14 +21,14 @@ Imports:
     rrcov,
     Rmisc,
     scales,
-    pcaMethods,
     d3heatmap,
     gridExtra,
     reshape2,
-    RcppArmadillo,
-    gridExtra
+    RcppArmadillo
 Suggests:
     knitr,
     rmarkdown,
-    testthat
+    testthat, 
+    pcaMethods,
+    limma
 RoxygenNote: 6.0.1
