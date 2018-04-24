@@ -15,9 +15,44 @@ arma::mat fold_change_diff_copy(arma::mat data, arma::mat C)  {
   int num_comparisons = C.n_rows;
   arma::mat fc_diff(n,num_comparisons);
   arma::colvec rowi_means(p);
+  arma::uvec found_finite;
+  arma::uvec zero_C;
+  arma::colvec not_nan;
+  arma::mat good_C;
+  arma::mat bad_C;
+  arma::rowvec temp_fc_diff(p);
+  arma::colvec rsums;
+  
   for(int i=0;i<n;i++){
     rowi_means = arma::conv_to<arma::colvec>::from(data.row(i));
-    fc_diff.row(i) = arma::conv_to<arma::rowvec>::from(C*rowi_means);
+    
+    //Treat rows with NaN as special cases
+    if(rowi_means.has_nan()){
+      //Which rows of C do not involve the NaN element(s)?
+      bad_C = C.cols(find_nonfinite(rowi_means)); //Submatrix of C involving the NaN element
+      
+      temp_fc_diff.fill(arma::datum::nan); //Fill the vector with NAs
+      
+      if(bad_C.n_cols<=(p-2)){ //Only proceed if there are at least two non-NaN means, otherwise return all NaNs
+        //Absolute row sum of bad_C to see where the differences we can compute are
+        rsums = arma::sum(abs(bad_C),1);
+        
+        zero_C = arma::find(rsums<0.01);    //Which rows of bad_C have zero elements? i.e., should compute differences of
+        
+        //non-nan elements of rowi_means
+        found_finite = find_finite(rowi_means);
+        not_nan = rowi_means.rows(found_finite); //rowi_means is a column vector so take it's rows
+        good_C = C.cols(found_finite);          //C is a matrix so take the columns I need
+        good_C = good_C.rows(zero_C);
+
+        
+        temp_fc_diff.cols(zero_C) = arma::conv_to<arma::rowvec>::from(good_C*not_nan);
+      }
+      
+      fc_diff.row(i) = temp_fc_diff;
+    }else{
+      fc_diff.row(i) = arma::conv_to<arma::rowvec>::from(C*rowi_means);
+    }
   }
   return fc_diff;
 }
@@ -92,6 +127,22 @@ List group_comparison_anova_cpp(arma::mat means, arma::mat sizes, arma::vec sigm
   
 }
 
+
+
+/*
+** R
+Rcpp::sourceCpp('~/Documents/MinT/pmartR/src/anova_helper_funs.cpp')
+fake_data <- matrix(c(rnorm(20),rpois(20,2),rgamma(20,2,5)),nrow=10)
+fake_data[c(3,6,40,30,52,59)] <- NA
+fake_groups <- c(1,1,2,2,3,3)
+R_res <- matrix(0,nrow(fake_data),4)
+Cmat <- matrix(c(1,-1,0,0,1,-1,1,0,-1),nrow=3,byrow=T)
+cpp_res_p1 <- anova_cpp(fake_data,fake_groups,unequal_var=1,df_red=matrix(0,nrow=nrow(fake_data),ncol=1))
+cpp_res_p1$group_means[10,] <- c(NaN,NaN,NaN)
+fold_change_diff_copy(data = cpp_res_p1$group_means,C = Cmat)
+
+*/
+
 /*
 ** R
 Rcpp::sourceCpp('mintR/inst/cpp/anova_helper_funs.cpp')
@@ -101,7 +152,7 @@ fake_groups <- c(1,1,2,2,3,3)
 R_res <- matrix(0,nrow(fake_data),4)
 Cmat <- matrix(c(1,-1,0,0,1,-1),nrow=2,byrow=T)
 
-cpp_res_p1 <- anova_cpp(fake_data,fake_groups)
+cpp_res_p1 <- anova_cpp(fake_data,fake_groups,unequal_var=1,df_red=matrix(0,nrow=nrow(fake_data),ncol=1))
 for(i in 1:nrow(fake_data)){
   lmres <- lm(fake_data[i,]~as.factor(fake_groups))
   R_res[i,c(1:3)] <- c(mean(fake_data[i,c(1,2)],na.rm=T),mean(fake_data[i,c(3,4)],na.rm=T),mean(fake_data[i,c(5,6)],na.rm=T))

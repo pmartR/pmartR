@@ -3,7 +3,7 @@
 using namespace Rcpp;
 // [[Rcpp::depends(RcppArmadillo)]]
 
-// [[Rcpp::export]]
+/* Old verion of fold_change_diff that can't handle missing values (kept for posterity only)
 arma::mat fold_change_diff(arma::mat data, arma::mat C)  {
   //Given the group means, and wanted group comparisons, compute the fold change using differencing
   //means - matrix of group means
@@ -29,6 +29,59 @@ arma::mat fold_change_diff(arma::mat data, arma::mat C)  {
     fc_diff.row(i) = arma::conv_to<arma::rowvec>::from(C*rowi_means);
   }
   
+  return fc_diff;
+}*/
+
+// [[Rcpp::export]]
+arma::mat fold_change_diff(arma::mat data, arma::mat C)  {
+  //Given the group means, and wanted group comparisons, compute the fold change using differencing
+  //means - matrix of group means
+  // C - matrix that defines the group comparisons you want to make
+  
+  int n = data.n_rows;
+  int p = data.n_cols;
+  int num_comparisons = C.n_rows;
+  arma::mat fc_diff(n,num_comparisons);
+  arma::colvec rowi_means(p);
+  arma::uvec found_finite;
+  arma::uvec zero_C;
+  arma::colvec not_nan;
+  arma::mat good_C;
+  arma::mat bad_C;
+  arma::rowvec temp_fc_diff(p);
+  arma::colvec rsums;
+  
+  for(int i=0;i<n;i++){
+    rowi_means = arma::conv_to<arma::colvec>::from(data.row(i));
+    
+    //Treat rows with NaN as special cases
+    if(rowi_means.has_nan()){
+      //Which rows of C do not involve the NaN element(s)?
+      bad_C = C.cols(find_nonfinite(rowi_means)); //Submatrix of C involving the NaN element
+      
+      temp_fc_diff.fill(arma::datum::nan); //Fill the vector with NAs
+      
+      if(bad_C.n_cols<=(p-2)){ //Only proceed if there are at least two non-NaN means, otherwise return all NaNs
+        //Absolute row sum of bad_C to see where the differences we can compute are
+        rsums = arma::sum(abs(bad_C),1);
+        
+        zero_C = arma::find(rsums<0.01);    //Which rows of bad_C have zero elements? i.e., should compute differences of
+        
+        //non-nan elements of rowi_means
+        found_finite = find_finite(rowi_means);
+        not_nan = rowi_means.rows(found_finite); //rowi_means is a column vector so take it's rows
+        good_C = C.cols(found_finite);          //C is a matrix so take the columns I need
+        good_C = good_C.rows(zero_C);
+        
+        
+        temp_fc_diff.cols(zero_C) = arma::conv_to<arma::rowvec>::from(good_C*not_nan);
+      }
+      
+      fc_diff.row(i) = temp_fc_diff;
+    }else{
+      fc_diff.row(i) = arma::conv_to<arma::rowvec>::from(C*rowi_means);
+    }
+  }
   return fc_diff;
 }
 
