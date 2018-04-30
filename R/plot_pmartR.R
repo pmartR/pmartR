@@ -71,11 +71,16 @@ plot.corRes <- function(corRes_object, ...){
   Var1 <- Var2 <- value <- NULL
   
   if(is.null(title_plot)){
-    if(attributes(corRes_object)$data_norm == TRUE) {
-      plot_title <- "Correlations Among Samples (Normalized Data)"
-    }else {
-      plot_title <- "Correlations Among Samples (Un-Normalized Data)"
+    if(!is.null(attributes(corRes_object)$data_norm)){
+      if(attributes(corRes_object)$data_norm == TRUE) {
+        plot_title <- "Correlations Among Samples (Normalized Data)"
+      }else{
+        if(attributes(corRes_object)$data_norm == FALSE){
+          plot_title <- "Correlations Among Samples (Un-Normalized Data)"
+        }
+      }
     }
+    
   }else{
     plot_title <- title_plot
   }
