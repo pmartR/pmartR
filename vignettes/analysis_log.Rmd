@@ -1,0 +1,74 @@
+---
+title: "analysis_log"
+output: html_document
+---
+
+```{r include=FALSE}
+#pull attributes from omicsData object
+
+if(!is.null(attr(omicsData, "cnames"))){
+  cnames = attr(omicsData, "cnames")
+}else cnames = NULL
+
+if(!is.null(attr(omicsData, "data_info"))){
+  data_info = attr(omicsData, "data_info")
+}else data_info = NULL
+
+if(!is.null(attr(omicsData, "check.names"))){
+  check_names = attr(omicsData, "check.names")
+}else check_names = NULL
+
+if(!is.null(attr(omicsData, "meta_info"))){
+  meta_info = attr(omicsData, "meta_info")
+}else meta_info = NULL
+
+if(!is.null(attr(omicsData, "filters"))){
+  filters = attr(omicsData, "filters")
+}else filters = NULL
+
+if(!is.null(attr(omicsData, "class"))){
+  class = attr(omicsData, "class")
+}else class = NULL
+
+if(!is.null(attr(omicsData, "group_DF"))){
+  group_DF = attr(omicsData, "group_DF")
+}else group_DF = NULL
+
+```
+
+####cnames
+```{r } 
+print(unlist(cnames))
+```
+
+####data_info
+```{r }
+print(unlist(data_info))
+```
+
+####check.names
+```{r }
+print(check_names)
+```
+
+####meta_info
+```{r }
+print(meta_info)
+```
+
+
+####filters
+```{r }
+print(unlist(names(filters)))
+```
+
+####class
+```{r }
+print(unlist(class))
+```
+
+####group_DF
+```{r }
+print(group_DF)
+```
+
