@@ -2,6 +2,6 @@
 #' 
 #' @docType package
 #' @importFrom Rcpp evalCpp
-#' @useDynLib pmartRqc
-#' @name pmartRqc
+#' @useDynLib pmartR
+#' @name pmartR
 NULL

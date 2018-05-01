@@ -4,12 +4,10 @@
 \alias{g_test}
 \title{Implement the G-test}
 \usage{
-g_test(omicsData, groupData, return_sizes = FALSE)
+g_test(omicsData, return_sizes = FALSE)
 }
 \arguments{
 \item{omicsData}{A mintR data object of any class}
-
-\item{groupData}{The `group_df` attribute of a mintR data object, usually created by the `group_designation()` function}
 
 \item{return_sizes}{Logical, should the group sizes be returned as well?  If true, a separate data.frame containing the group sizes is returned}
 }

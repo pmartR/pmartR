@@ -671,7 +671,7 @@ applyFilt.customFilt <- function(filter_object, omicsData){
     if(all(omicsData$f_data[, fdata_cname] %in% filter_object_new$samples_filt)){stop("f_data_remove specifies all the items in the data")}
     
     # check that emeta_filt doesn't specify ALL the items in omicsData, emeta_filt is present #
-    if(!is.null(omicsData$e_meta[, emeta_cname])){
+    if(!is.null(omicsData$e_meta)){
        if(all(omicsData$e_meta[, emeta_cname] %in% filter_object_new$emeta_filt)){stop("e_meta_remove specifies all the items in the data")}
     }
     

@@ -158,7 +158,7 @@ imd_anova <- function(omicsData, comparisons = NULL, test_method, pval_adjust = 
     colnames(anova_fold_flags) <- gsub("Flag_","",colnames(anova_fold_flags))
     imd_out$Flags <- anova_fold_flags
 
-    return(statRes_output(imd_out,groupData,comparisons,test_method,pval_adjust,pval_thresh))
+    return(statRes_output(imd_out,omicsData,comparisons,test_method,pval_adjust,pval_thresh))
     
   }else if(test_method=='gtest'){
     
@@ -176,7 +176,7 @@ imd_anova <- function(omicsData, comparisons = NULL, test_method, pval_adjust = 
     colnames(gtest_flags) <- gsub("Flag_","",colnames(gtest_flags))
     imd_out$Flags <- gtest_flags
 
-    return(statRes_output(imd_out,groupData,comparisons,test_method,pval_adjust,pval_thresh))
+    return(statRes_output(imd_out,omicsData,comparisons,test_method,pval_adjust,pval_thresh))
   }
   
   #####-----Determine which p-values/flags to return--------######
@@ -238,7 +238,7 @@ imd_anova <- function(omicsData, comparisons = NULL, test_method, pval_adjust = 
                   Flags = data.frame(imd_flags, check.names = FALSE),
                   P_values = data.frame(imd_pvals, check.names = FALSE))
   
-  final_out <- statRes_output(imd_out,groupData,comparisons,test_method,pval_adjust,pval_thresh)
+  final_out <- statRes_output(imd_out,omicsData,comparisons,test_method,pval_adjust,pval_thresh)
   
   return(final_out)
 }
