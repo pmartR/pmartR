@@ -88,7 +88,7 @@ custom_filter <- function(omicsData, e_data_remove = NULL, f_data_remove = NULL,
       if(!(all(e_data_keep %in% omicsData$e_data[, edata_id]))){stop("Not all of the items in e_data_keep are found in the data.")}
       
       # check that e_data_keep doesn't specify ALL the items in omicsData #
-      if(all(omicsData$e_data[, edata_id] %in% e_data_keep)){stop("e_data_keep specifies all the items in the data")}
+      if(all(omicsData$e_data[, edata_id] %in% e_data_keep)){message("e_data_keep specifies all the items in the data; this (portion of) the filter will not change the number of items e_data.")}
     }
     
     # checks for f_data_keep #
