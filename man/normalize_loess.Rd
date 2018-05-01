@@ -19,6 +19,9 @@ The normalized data is returned in an object of the appropriate S3 class (e.g. p
 \description{
 Perform Loess normalization
 }
+\details{
+DETAILS GO HERE!!
+}
 \examples{
 dontrun{
 library(pmartR)
