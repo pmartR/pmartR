@@ -79,6 +79,9 @@ plot.corRes <- function(corRes_object, ...){
           plot_title <- "Correlations Among Samples (Un-Normalized Data)"
         }
       }
+      
+    }else{
+        plot_title <- "Correlations Among Samples (Un-Normalized Data)"
     }
     
   }else{
@@ -119,10 +122,12 @@ plot.corRes <- function(corRes_object, ...){
     if(x_lab==FALSE) heatmap <- heatmap + ggplot2::theme(axis.text.x = ggplot2::element_blank()) # added by KS
     if(y_lab==FALSE) heatmap <- heatmap + ggplot2::theme(axis.text.y = ggplot2::element_blank()) # added by KS
     
-    if(attributes(corRes_object)$data_norm == TRUE) {
-      heatmap <- heatmap + ggplot2::ggtitle(plot_title)
-    }else {
-      heatmap <- heatmap + ggplot2::ggtitle(plot_title)
+    if(!is.null(attributes(corRes_object)$data_norm)){
+      if(attributes(corRes_object)$data_norm == TRUE) {
+        heatmap <- heatmap + ggplot2::ggtitle(plot_title)
+      }
+    }else{
+        heatmap <- heatmap + ggplot2::ggtitle(plot_title)
     }
     
   } else {
