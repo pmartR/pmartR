@@ -1,15 +1,17 @@
-
-##----------------------------------------------------------------##
-##-------- Do the group comparisons for the anova test   ---------##
-##----------------------------------------------------------------##
-
+#' Group comparisons for the anova test
+#'
+#' Takes the results of anova_test() and returns group comparison p-values
+#'
+#' @param groupData data frame that assigns sample names to groups
+#' @param comparisons dataframe that defiens the comparsions of interest
+#' @param anova_results results of the pmartR::anova_test() function
+#'
+#' @return A data.frame containing the p-values from the group comparisons.
+#'
+#' @author Bryan Stanfill
+#'
 group_comparison_anova <- function(groupData,comparisons,anova_results_full){
-  #Takes the results of anova_test() and returns group comparison p-values
-  
-  #groupData - data frame that assigns sample names to groups
-  #comparisons - dataframe that defiens the comparsions of interest
-  #anova_results - the results of the MSomicsSTAT::anova_test() function
-  
+
   #The group means include the word "Group" in them so that is what will be passed 
   #to the group_comparison(...) and fold_change(...) functions along with estimated variance
   anova_results <- anova_results_full$Results

@@ -26,11 +26,11 @@
 #' Webb-Robertson, Bobbie-Jo M., et al. "Combined statistical analyses of peptide intensities and peptide occurrences improves identification of significant peptides from MS-based proteomics data." Journal of proteome research 9.11 (2010): 5748-5756.
 #'
 #' @examples 
-#' library(MSomicsDATA)
-#' library(MSomicsQC)
+#' dontrun{
+#' library(pmartRdata)
+#' library(pmartR)
 #' #Add attribute required by MSomicsQC
-#' attr(pep_pepData, "cnames")$fdata_cname <- attr(pep_pepData,"cnames")$samp_cname
-#' mypepData <- edata_transform(omicsData = pep_pepData, data_scale = "log2")
+#' mypepData <- edata_transform(omicsData = pep_object, data_scale = "log2")
 #' mypepData <- group_designation(omicsData = mypepData, main_effects = c("Condition"))
 #' 
 #' #Haven't filtered yet, should get warning
@@ -39,7 +39,7 @@
 #' 
 #' #Now filter and run again
 #' imdanova_Filt <- imdanova_filter(omicsData = mypepData)
-#' mypepData <- MSomics_filter(filter_object = imdanova_Filt, omicsData = mypepData, min_nonmiss_gtest=3)
+#' mypepData <- applyFilt(filter_object = imdanova_Filt, omicsData = mypepData, min_nonmiss_gtest=3)
 #' imd_res <- imd_test(omicsData = mypepData)
 #' imd_res_holm <- imd_test(omicsData = mypepData, pval_adjust = 'holm')
 #' 
@@ -60,6 +60,7 @@
 #' ovarian_res_holm <- imd_test(omicsData = tcga_ovarian_pepdata_bp, pval_adjust = 'holm')
 #' #Bonferonni adjustment
 #' ovarian_res_bon <- imd_test(omicsData = tcga_ovarian_pepdata_bp, pval_adjust = 'bonf')
+#' }
 #' @export
 
 imd_test <- function(omicsData, comparisons=NULL, pval_adjust = 'none', pval_thresh = 0.05){

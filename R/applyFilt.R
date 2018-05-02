@@ -1,4 +1,4 @@
-#' Apply a S3 filter  object to an MSomics S3 object
+#' Apply a S3 filter  object to a pmartR S3 object
 #'
 #' This function takes a filter object of class 'cvFilt', 'rmdFilt', 'moleculeFilt', 'proteomicsFilt', 'imdanovaFilt', or 'customFilt' and applies the filter to a dataset of  \code{pepData}, \code{proData}, \code{lipidData}, or \code{metabData}.
 #'
@@ -38,10 +38,11 @@
 #' library(pmartRdata)
 #' data("pep_object")
 #' to_filter <- molecule_filter(omicsData = pep_object)
-#' pep_object2 <- apply(filter_object = to_filter, omicsData = pep_object, min_num = 2)
+#' pep_object2 <- applyFilt(filter_object = to_filter, omicsData = pep_object, min_num = 2)
 #' print(str(attributes(pep_object2)$filters))
+#' pep_object2 <- group_designation(pep_object2, main_effects = "Condition")
 #' to_filter2 <- imdanova_filter(omicsData = pep_object2)
-#' pep_object3 <- apply(filter_object = to_filter2, omicsData = pep_object2, min_num_peps = 4)
+#' pep_object3 <- applyFilt(filter_object = to_filter2, omicsData = pep_object2, min_nonmiss_anova = 3)
 #' print(str(attributes(pep_object3)$filters))
 #' }
 #'
@@ -129,7 +130,7 @@ applyFilt.moleculeFilt <- function(filter_object, omicsData, min_num=2){
     filter_object_new = list(edata_filt = filter.edata, emeta_filt = NULL, samples_filt = NULL)
 
     # call the function that does the filter application
-    results_pieces <- MSomics_filter_worker(omicsData = omicsData, filter_object = filter_object_new)
+    results_pieces <- pmartR_filter_worker(omicsData = omicsData, filter_object = filter_object_new)
 
     # return filtered data object #
     results <- omicsData
@@ -205,7 +206,7 @@ applyFilt.cvFilt <- function(filter_object, omicsData, cv_threshold = 150){
     filter_object_new = list(edata_filt = p_filt, emeta_filt = NULL, samples_filt = NULL)
 
     # call the function that does the filter application
-    results_pieces <- MSomics_filter_worker(omicsData = omicsData, filter_object = filter_object_new)
+    results_pieces <- pmartR_filter_worker(omicsData = omicsData, filter_object = filter_object_new)
 
     # return filtered data object #
     results <- omicsData
@@ -290,7 +291,7 @@ applyFilt.rmdFilt <- function(filter_object, omicsData, pvalue_threshold=0.001){
     filter_object_new = list(edata_filt = NULL, emeta_filt = NULL, samples_filt = samp_filt)
 
     # call the function that does the filter application
-    results_pieces <- MSomics_filter_worker(omicsData = omicsData, filter_object = filter_object_new)
+    results_pieces <- pmartR_filter_worker(omicsData = omicsData, filter_object = filter_object_new)
 
     # return filtered data object #
     results <- omicsData
@@ -341,7 +342,6 @@ applyFilt.rmdFilt <- function(filter_object, omicsData, pvalue_threshold=0.001){
 #' @rdname applyFilt
 #' @export
 applyFilt.proteomicsFilt <- function(filter_object, omicsData, min_num_peps=NULL, degen_peps=FALSE){
-  # #' @describeIn MSomics_filter MSomics_filter for proteomicsFilt S3 object
 
 
   # check to see whether a "proteomicsFilt" has already been run on omicsData #
@@ -428,7 +428,7 @@ applyFilt.proteomicsFilt <- function(filter_object, omicsData, min_num_peps=NULL
 
     
     # call the function that does the filter application
-    results_pieces <- pmartRqc:::MSomics_filter_worker(omicsData = omicsData, filter_object = filter_object_new)
+    results_pieces <- pmartRqc:::pmartR_filter_worker(omicsData = omicsData, filter_object = filter_object_new)
 
     # return filtered data object #
     results <- omicsData
@@ -572,7 +572,7 @@ applyFilt.imdanovaFilt <- function(filter_object, omicsData, min_nonmiss_anova=N
     
 
     # call the function that does the filter application
-    results_pieces <- MSomics_filter_worker(omicsData = omicsData, filter_object = filter_object_new)
+    results_pieces <- pmartR_filter_worker(omicsData = omicsData, filter_object = filter_object_new)
 
     # return filtered data object #
     omicsData$e_data <- results_pieces$temp.pep2
@@ -694,7 +694,7 @@ applyFilt.customFilt <- function(filter_object, omicsData){
   }
   
   # call the function that does the filter application
-  results_pieces <- MSomics_filter_worker(omicsData = omicsData, filter_object = filter_object_new)
+  results_pieces <- pmartR_filter_worker(omicsData = omicsData, filter_object = filter_object_new)
 
   # return filtered data object #
   results <- omicsData
@@ -795,7 +795,7 @@ applyFilt.customFilt <- function(filter_object, omicsData){
 #' @return list
 #' @author Kelly Stratton, Lisa Bramer
 #'
-MSomics_filter_worker <- function(filter_object, omicsData){
+pmartR_filter_worker <- function(filter_object, omicsData){
   # pull column names from omicR_data attributes #
   col_nms = attr(omicsData, "cnames")
   samp_cname = col_nms$fdata_cname
