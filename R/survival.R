@@ -34,6 +34,7 @@
 #' @return if fitted survival analysis object is returned
 #' 
 #' @examples 
+#' dontrun{
 #' library(MSomicsSTAT)
 #' library(OvarianPepdataBP)
 #' 
@@ -46,7 +47,7 @@
 #' attr(tcga_ovarian_pepdata_bp,"survDF") <- list(t_death = "survival_time",ind_death = "vital_status", covariates = "g__initial_pathologic_diagnosis_method_g1")
 #' sfit <- fit_surv(tcga_ovarian_pepdata_bp)
 #' plot(sfit,col=c(1,2))
-#' 
+#' }
 #' @export
 #' 
 
@@ -128,6 +129,7 @@ plot_km <- function(omicsData,...){
 #' @return if `percent` is provided then the time at which that probability of death is returned; else, the summary of the `survival` object is returned
 #' 
 #' @examples 
+#' dontrun{
 #' library(OvarianPepdataBP)
 #' attr(tcga_ovarian_pepdata_bp,"survDF") <- list(t_death = "survival_time",ind_death = "vital_status")
 #' #No percent is provided so the entire object is returned
@@ -135,6 +137,7 @@ plot_km <- function(omicsData,...){
 #' 
 #' #Percent is provided so corresponding time point is returned
 #' summary_km(tcga_ovarian_pepdata_bp, .4)
+#' }
 #' @export
 #' 
 

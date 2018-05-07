@@ -182,7 +182,7 @@ anova_test <- function(omicsData, comparisons = NULL, pval_adjust = 'none', pval
     
     #groupData needs to be updated so that pairs map to groups instead of observations
     groupData <- merge(groupData,omicsData$f_data[,cols],sort = FALSE)
-    groupData <- groupData%>%group_by_at(vars(contains("pair")))%>%summarize(NewGroup=first(Group))
+    groupData <- groupData%>%group_by_at(vars(contains("pair")))%>%dplyr::summarize(NewGroup=first(Group))
     
     colnames(groupData) <- c(samp_cname,"Group")
     groupData <- data.frame(groupData)
@@ -197,7 +197,7 @@ anova_test <- function(omicsData, comparisons = NULL, pval_adjust = 'none', pval
       covariates <- merge(covariates,omicsData$f_data[,cols],sort = FALSE)
       orig_colnames <- colnames(covariates)
       colnames(covariates)[c(2,3)] <- c("Cov","PairID")
-      covariates <- covariates%>%group_by(PairID)%>%summarize(NewCov=first(Cov))
+      covariates <- covariates%>%group_by(PairID)%>%dplyr::summarize(NewCov=first(Cov))
       colnames(covariates) <- c(samp_cname,orig_colnames[2])
       covariates <- data.frame(covariates)
       if(is.numeric(omicsData$f_data[,pair_col])){

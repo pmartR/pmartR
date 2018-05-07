@@ -14,7 +14,7 @@
 \alias{applyFilt.imdanovaFilt}
 \alias{applyFilt}
 \alias{applyFilt.customFilt}
-\title{Apply a S3 filter  object to an MSomics S3 object}
+\title{Apply a S3 filter  object to a pmartR S3 object}
 \usage{
 applyFilt(filter_object, omicsData, ...)
 
@@ -77,10 +77,11 @@ dontrun{
 library(pmartRdata)
 data("pep_object")
 to_filter <- molecule_filter(omicsData = pep_object)
-pep_object2 <- apply(filter_object = to_filter, omicsData = pep_object, min_num = 2)
+pep_object2 <- applyFilt(filter_object = to_filter, omicsData = pep_object, min_num = 2)
 print(str(attributes(pep_object2)$filters))
+pep_object2 <- group_designation(pep_object2, main_effects = "Condition")
 to_filter2 <- imdanova_filter(omicsData = pep_object2)
-pep_object3 <- apply(filter_object = to_filter2, omicsData = pep_object2, min_num_peps = 4)
+pep_object3 <- applyFilt(filter_object = to_filter2, omicsData = pep_object2, min_nonmiss_anova = 3)
 print(str(attributes(pep_object3)$filters))
 }
 

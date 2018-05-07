@@ -8,7 +8,7 @@ output:
     self_contained: true
     fig_caption: true
 vignette: >
-  %\VignetteIndexEntry{Analyzing Peptide Data with the pmartRqc Package}
+  %\VignetteIndexEntry{Analyzing Peptide Data with the pmartR Package}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
@@ -16,12 +16,12 @@ vignette: >
 ```{r logo, out.width = "100px", echo=FALSE}
 knitr::include_graphics("pmartR_logo_final.jpg")
 
-library(pmartRqc)
+library(pmartR)
 library(pmartRdata)
 library(ggplot2)
 ```
 
-The pmartRqc package provides functionality for quality control (QC) processing of mass spectrometry (MS) pan-omics data, in particular proteomic (either at the peptide or the protein level), lipidomic, and metabolomic data. This includes data transformation, specification of groups that are to be compared against each other, filtering of features and/or samples, data normalization, and data summarization (correlation, principal components analysis).
+The pmartR package provides functionality for quality control (QC) processing of mass spectrometry (MS) pan-omics data, in particular proteomic (either at the peptide or the protein level), lipidomic, and metabolomic data. This includes data transformation, specification of groups that are to be compared against each other, filtering of features and/or samples, data normalization, and data summarization (correlation, principal components analysis).
 
 Sample datasets are available in the pmartRdata package for each of the following data types: peptide level data, protein level data, lipidomic data, and metabolomic data. Under development are 3 additional packages that will contain functionality for processing MS omics data. These are pmartRstat for statistical analysis, pmartRpq for protein quantification of peptide level data, and pmartRviz for visualization of the data incorporating the statistical results.
 
@@ -116,7 +116,7 @@ all(names(edata)[-1] == fdata$SampleID)
 Once the pepData object is created, a typical QC workflow follows the figure below. 
 
 
-```{r workflowFig, out.width = "600px", echo=FALSE, fig.cap = "Figure 1. Quality control and processing workflow in pmartRqc package."}
+```{r workflowFig, out.width = "600px", echo=FALSE, fig.cap = "Figure 1. Quality control and processing workflow in pmartR package."}
 knitr::include_graphics("pmartR_graphic-final.jpg")
 ```
 
@@ -132,7 +132,7 @@ mypepData <- edata_replace(mypepData, x = 0, y = NA)
 
 In this dataset, there were no 0s so nothing was replaced.
 
-We also highly recommend log transforming the data prior to analysis. pmartRqc supports log2, log10, and natural logarithm transformations. The `edata_transform()` function provides this capability. We can also use `edata_trasnform()` to transform the data back to the abundance scale if needed. Note that the scale of the data is stored and automatically updated in the `data_info$data_scale` attribute of the pepData object. Below we log10 transform the data, then back transform to the abundance scale, and finally settle on the log2 scale.
+We also highly recommend log transforming the data prior to analysis. pmartR supports log2, log10, and natural logarithm transformations. The `edata_transform()` function provides this capability. We can also use `edata_trasnform()` to transform the data back to the abundance scale if needed. Note that the scale of the data is stored and automatically updated in the `data_info$data_scale` attribute of the pepData object. Below we log10 transform the data, then back transform to the abundance scale, and finally settle on the log2 scale.
 
 ```{r format2}
 mypepData <- edata_transform(mypepData, data_scale = "log10")
@@ -367,7 +367,7 @@ Available normalization functions include:
 
 - Median absolute deviation (MAD) transformation: The sample-wise median (median of all peptides in a given sample) is subtracted from each peptide, and the result is divided by the sample-wise MAD (MAD of all peptides in a given sample) in the corresponding sample. This normalization method is specified as "mad".
 
-There are two ways to go about normalizing data in the pmartRqc package. If you know the normalization approach you'd like to use, you can directly specify it in the `normalize_data()` function. Or, if you want to see how compatible different normalization approaches are with your dataset, you can use the `spans()` function [UNDER DEVELOPMENT].
+There are two ways to go about normalizing data in the pmartR package. If you know the normalization approach you'd like to use, you can directly specify it in the `normalize_data()` function. Or, if you want to see how compatible different normalization approaches are with your dataset, you can use the `spans()` function [UNDER DEVELOPMENT].
 
 We can go straight to the normalization, if we know what approach we want to use.
 
@@ -402,7 +402,7 @@ Below we use SPANS to select a normalization approach and then normalize the dat
 
 ### Summarize Data
 
-The pmartRqc package contains various methods for data summarization and exploration that can be used as part of the quality control process: numeric summaries and associated plots (via the `summarize()` function), sequential projection pursuit principal components analysis (sppPCA) for dimension reduction (via the`dim_reduction()` function), and a correlation heat map (via the `cor_result()` function)[@stacklies2007pcamethods]. As for missing data summarization there are also functions to collect and plot missing data information. Missing data collection and plotting functions include, `missingval_result()`, `plot_missingval()`, `missingval_scatterplot()` and `missingval_heatmap()`. 
+The pmartR package contains various methods for data summarization and exploration that can be used as part of the quality control process: numeric summaries and associated plots (via the `summarize()` function), sequential projection pursuit principal components analysis (sppPCA) for dimension reduction (via the`dim_reduction()` function), and a correlation heat map (via the `cor_result()` function)[@stacklies2007pcamethods]. As for missing data summarization there are also functions to collect and plot missing data information. Missing data collection and plotting functions include, `missingval_result()`, `plot_missingval()`, `missingval_scatterplot()` and `missingval_heatmap()`. 
 
 #### Numeric Summaries
 
@@ -412,7 +412,7 @@ The pmartRqc package contains various methods for data summarization and explora
 
 #### Probabilistic Principal Components Analysis
 
-Probabilistic is a PCA algorithm that can be used in the presence of missing data. We use the `dim_reduction()` function in pmartRqc, specifying the dataset and the number of principal components to return (default value of 2 principal components). The `summary()` and `plot()` functions operate on the results of the `dim_reduction()` function.
+Probabilistic is a PCA algorithm that can be used in the presence of missing data. We use the `dim_reduction()` function in pmartR, specifying the dataset and the number of principal components to return (default value of 2 principal components). The `summary()` and `plot()` functions operate on the results of the `dim_reduction()` function.
 
 Note that `dim_reduction()` requires that the `group_designation()` function has been run.
 

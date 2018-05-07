@@ -28,16 +28,18 @@ of the tests are significant, 1 if significant or 0 if insignificant.  If \code{
 of the change is indicated by the sign on 1, i.e., means<0 and p_value<pval_thresh will return -1, similarly for means>0.
 }
 \examples{
-library(MSomicsDATA)
-library(MSomicsQC)
-mypepData <- edata_transform(mintR_data = pep_pepData, data_scale = "log2")
-mypepData <- group_designation(mintR_data = mypepData, main_effects = c("Condition"))
+dontrun{
+library(pmartRdata)
+library(pmartR)
+mypepData <- edata_transform(omicsData = pep_object, data_scale = "log2")
+mypepData <- group_designation(omicsData = mypepData, main_effects = c("Condition"))
 group_df <- attr(mypepData, "group_DF")
-imdanova_Filt <- imdanova_filter(mintR_data = mypepData)
-mypepData <- MSomics_filter(filter_object = imdanova_Filt, mintR_data = mypepData, min_nonmiss_anova=2)
-anova_res <- anova_test(omicsData = mypepData, groupData = group_df)
+imdanova_Filt <- imdanova_filter(omicsData = mypepData)
+mypepData <- applyFilt(filter_object = imdanova_Filt, omicsData = mypepData, min_nonmiss_anova=2)
+anova_res <- anova_test(omicsData = mypepData)
 
-adjusted_pvalues <- p_adjustment_anova(p_values = anova_res$Comparisons, diff_mean = anova_res$Fold)
+adjusted_pvalues <- p_adjustment_anova(p_values = anova_res$Fold_change_pvalues, diff_mean = anova_res$Results[, grep("Mean", names(anova_res$Results))])
+}
 }
 \author{
 Bryan Stanfill

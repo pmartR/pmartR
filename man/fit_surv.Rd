@@ -17,6 +17,7 @@ Implements overall survival analysis or progression-free survival analysis, depe
 pmartRqc::surv_designation, and return the "survfit" object
 }
 \examples{
+dontrun{
 library(MSomicsSTAT)
 library(OvarianPepdataBP)
 
@@ -29,5 +30,5 @@ plot(sfit)
 attr(tcga_ovarian_pepdata_bp,"survDF") <- list(t_death = "survival_time",ind_death = "vital_status", covariates = "g__initial_pathologic_diagnosis_method_g1")
 sfit <- fit_surv(tcga_ovarian_pepdata_bp)
 plot(sfit,col=c(1,2))
-
+}
 }

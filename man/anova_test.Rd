@@ -50,19 +50,18 @@ The order in which different scenarios are handeled:
 }
 }
 \examples{
-library(MSomicsSTAT)
-library(MSomicsDATA)
-library(MSomicsQC)
-attr(pep_pepData,"cnames")$fdata_cname <- "SampleID"
-mypepData <- edata_transform(omicsData = pep_pepData, data_scale = "log2")
+dontrun{
+library(pmartRdata)
+library(pmartR)
+mypepData <- edata_transform(omicsData = pep_object, data_scale = "log2")
 mypepData <- group_designation(omicsData = mypepData, main_effects = c("Condition"))
 
 #Try running anova_test without filtering, should get warning because the data haven't been filtered yet
-anova_res <- anova_test(omicsData = mypepData)
+anova_res <- anova_test(omicsData = mypepData) ## FIX: This gives an error:  Error in group_comparison_anova_cpp(means, sizes, sigma2, Cmat) : copy into submatrix: incompatible matrix dimensions: 1x1 and 1x2 
 
 #Now filter and run again
 imdanova_Filt <- imdanova_filter(omicsData = mypepData)
-mypepData <- MSomics_filter(filter_object = imdanova_Filt, omicsData = mypepData, min_nonmiss_anova=2)
+mypepData <- applyFilt(filter_object = imdanova_Filt, omicsData = mypepData, min_nonmiss_anova=2)
 anova_res <- anova_test(omicsData = mypepData)
 anova_res_tukey <- anova_test(omicsData = mypepData, pval_adjust = 'tukey') 
 #Should be equivalent to above since only making one comparison
@@ -76,13 +75,16 @@ summary(anova_res$Fold_changes)
 
 #Test with really big dataset, one factor
 library(OvarianPepdataBPsubset)
-tcga_ovarian_pepdata_bp <- as.pepData(e_data = tcga_ovarian_pepdata_bp_subset$e_data, f_data = tcga_ovarian_pepdata_bp_subset$f_data, e_meta = tcga_ovarian_pepdata_bp_subset$e_meta, edata_cname = "Peptide", fdata_cname = "sampleID")
+tcga_ovarian_pepdata_bp <- as.pepData(e_data = tcga_ovarian_pepdata_bp_subset$e_data, f_data = tcga_ovarian_pepdata_bp_subset$f_data, e_meta = tcga_ovarian_pepdata_bp_subset$e_meta, edata_cname = "Peptide", fdata_cname = "sampleID", emeta_cname = "Protein", check.names = FALSE)
 tcga_ovarian_pepdata_bp <- group_designation(omicsData = tcga_ovarian_pepdata_bp, main_effects = c("vital_status"))
-ovarian_res <- anova_test(omicsData = tcga_ovarian_pepdata_bp)
+tcga_ovarian_pepdata_bp <- edata_transform(tcga_ovarian_pepdata_bp, "log2")
+imdanova_Filt <- imdanova_filter(omicsData = tcga_ovarian_pepdata_bp)
+tcga_ovarian_pepdata_bp <- applyFilt(filter_object = imdanova_Filt, omicsData = tcga_ovarian_pepdata_bp, min_nonmiss_anova=2)
+ovarian_res <- anova_test(omicsData = tcga_ovarian_pepdata_bp) # FIX: added filtering but this one still does not work (same error as above)
 #Tukey adjustment is super slow right now because "ptukey" is super slow, not sure how to fix that
-ovarian_res_tukey <- anova_test(omicsData = tcga_ovarian_pepdata_bp, pval_adjust = 'tukey')
+ovarian_res_tukey <- anova_test(omicsData = tcga_ovarian_pepdata_bp, pval_adjust = 'tukey') # FIX: added filtering but this one still does not work (same error as above)
 #Dunnett adjustment, super slow because mvtnorm::pmvt is super slow
-ovarian_res_dunnett <- anova_test(omicsData = tcga_ovarian_pepdata_bp, pval_adjust = 'dunnett')
+ovarian_res_dunnett <- anova_test(omicsData = tcga_ovarian_pepdata_bp, pval_adjust = 'dunnett') # FIX: added filtering but this one still does not work (same error as above)
 
 #Test really big dataset, two factors, all pairwise comparisons
 tcga_ovarian_pepdata_bp <- group_designation(omicsData = tcga_ovarian_pepdata_bp, main_effects = c("vital_status","neoplasm_histologic_grade"))
@@ -95,6 +97,7 @@ ovarian_res_twofac_main_effects <- anova_test(omicsData = tcga_ovarian_pepdata_b
 #Same but only test arbitrary diagonal effects (Dead_G2 vs Alive_G3, Alive_G2 vs Alive_G3)
 comp_df <- data.frame(Control=c("Dead_G2","Alive_G2"), Test=c("Alive_G3","Alive_G3"))
 ovarian_res_twofac_arb_effects <- anova_test(omicsData = tcga_ovarian_pepdata_bp, comparisons = comp_df)
+}
 }
 \references{
 Webb-Robertson, Bobbie-Jo M., et al. "Combined statistical analyses of peptide intensities and peptide occurrences improves identification of significant peptides from MS-based proteomics data." Journal of proteome research 9.11 (2010): 5748-5756.

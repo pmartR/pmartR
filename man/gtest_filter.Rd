@@ -36,10 +36,10 @@ Two methods are available for determining the peptides to be filtered. The naive
 }
 \examples{
 dontrun{
-library(MSomicsQC)
+library(pmartR)
 data(pep_object)
 pep_object2 <- group_designation(omicsData = pep_object, main_effects = "Condition")
-nonmissing_result <- nonmissing_per_group(omicsData = pep_object2)
+nonmissing_result <- pmartR:::nonmissing_per_group(omicsData = pep_object2)
 to_filter <- gtest_filter(nonmiss_per_group = nonmissing_result, omicsData = pep_object2, min_nonmiss_gtest = 3)
 }
 
