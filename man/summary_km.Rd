@@ -16,7 +16,7 @@ if `percent` is provided then the time at which that probability of death is ret
 }
 \description{
 Implements overall survival analysis or progression-free survival analysis, depending upon the datatypes supplied to
-pmartRqc::surv_designation, and gives a summary of the results.
+surv_designation, and gives a summary of the results.
 }
 \examples{
 dontrun{

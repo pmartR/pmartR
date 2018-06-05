@@ -14,7 +14,7 @@ if fitted survival analysis object is returned
 }
 \description{
 Implements overall survival analysis or progression-free survival analysis, depending upon the datatypes supplied to
-pmartRqc::surv_designation, and return the "survfit" object
+surv_designation, and return the "survfit" object
 }
 \examples{
 dontrun{

@@ -428,7 +428,7 @@ applyFilt.proteomicsFilt <- function(filter_object, omicsData, min_num_peps=NULL
 
     
     # call the function that does the filter application
-    results_pieces <- pmartRqc:::pmartR_filter_worker(omicsData = omicsData, filter_object = filter_object_new)
+    results_pieces <- pmartR_filter_worker(omicsData = omicsData, filter_object = filter_object_new)
 
     # return filtered data object #
     results <- omicsData

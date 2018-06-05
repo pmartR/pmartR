@@ -16,7 +16,7 @@
 #' @rdname pquant_median
 #' @export
 
-#pquant_median for pmartRqc pep_object
+
 
 pquant_median <- function(pepData){
   check_names = getchecknames(pepData)
