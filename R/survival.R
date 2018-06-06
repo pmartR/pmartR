@@ -28,12 +28,13 @@
 #' Basic survival analysis function
 #' 
 #' Implements overall survival analysis or progression-free survival analysis, depending upon the datatypes supplied to
-#' pmartRqc::surv_designation, and return the "survfit" object
+#' surv_designation, and return the "survfit" object
 #' 
 #' @param omicsData A mintR data object of any class, which has a `group_df` attribute that is usually created by the `group_designation()` function
 #' @return if fitted survival analysis object is returned
 #' 
 #' @examples 
+#' dontrun{
 #' library(MSomicsSTAT)
 #' library(OvarianPepdataBP)
 #' 
@@ -46,7 +47,7 @@
 #' attr(tcga_ovarian_pepdata_bp,"survDF") <- list(t_death = "survival_time",ind_death = "vital_status", covariates = "g__initial_pathologic_diagnosis_method_g1")
 #' sfit <- fit_surv(tcga_ovarian_pepdata_bp)
 #' plot(sfit,col=c(1,2))
-#' 
+#' }
 #' @export
 #' 
 
@@ -92,7 +93,7 @@ fit_surv <- function(omicsData,...){
 #' Basic survival analysis plot
 #' 
 #' Implements overall survival analysis or progression-free survival analysis, depending upon the datatypes supplied to
-#' pmartRqc::surv_designation, and plot the resulting Kaplan-Meier curve.
+#' surv_designation, and plot the resulting Kaplan-Meier curve.
 #' 
 #' @param omicsData A mintR data object of any class, which has a `group_df` attribute that is usually created by the `group_designation()` function
 #' @return a Kaplan-Meier curve
@@ -121,13 +122,14 @@ plot_km <- function(omicsData,...){
 #' Basic survival analysis summary
 #' 
 #' Implements overall survival analysis or progression-free survival analysis, depending upon the datatypes supplied to
-#' pmartRqc::surv_designation, and gives a summary of the results.
+#' surv_designation, and gives a summary of the results.
 #' 
 #' @param omicsData A mintR data object of any class, which has a `group_df` attribute that is usually created by the `group_designation()` function
 #' @param percent The percentile
 #' @return if `percent` is provided then the time at which that probability of death is returned; else, the summary of the `survival` object is returned
 #' 
 #' @examples 
+#' dontrun{
 #' library(OvarianPepdataBP)
 #' attr(tcga_ovarian_pepdata_bp,"survDF") <- list(t_death = "survival_time",ind_death = "vital_status")
 #' #No percent is provided so the entire object is returned
@@ -135,6 +137,7 @@ plot_km <- function(omicsData,...){
 #' 
 #' #Percent is provided so corresponding time point is returned
 #' summary_km(tcga_ovarian_pepdata_bp, .4)
+#' }
 #' @export
 #' 
 

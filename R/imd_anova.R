@@ -26,21 +26,20 @@
 #' Webb-Robertson, Bobbie-Jo M., et al. "Combined statistical analyses of peptide intensities and peptide occurrences improves identification of significant peptides from MS-based proteomics data." Journal of proteome research 9.11 (2010): 5748-5756.
 #'
 #' @examples 
-#' library(MSomicsSTAT)
-#' library(MSomicsDATA)
-#' library(MSomicsQC)
-#' #Trasnform the data
-#' attr(pep_pepData,"cnames")$fdata_cname <- "SampleID"
-#' mypepData <- edata_transform(omicsData = pep_pepData, data_scale = "log2")
+#' dontrun{
+#' library(pmartR)
+#' library(pmartRdata)
+#' #Transform the data
+#' mypepData <- edata_transform(omicsData = pep_object, data_scale = "log2")
 #' 
 #' #Group the data by condition
 #' mypepData <- group_designation(omicsData = mypepData, main_effects = c("Condition"))
 #' 
 #' #Apply the IMD ANOVA filter
 #' imdanova_Filt <- imdanova_filter(omicsData = mypepData)
-#' mypepData <- MSomics_filter(filter_object = imdanova_Filt, omicsData = mypepData, min_nonmiss_anova=2)
+#' mypepData <- applyFilt(filter_object = imdanova_Filt, omicsData = mypepData, min_nonmiss_anova=2)
 #' 
-#' #Implement the IMD ANOVA method and compuate all pairwise comparisons (i.e. leave the `comparisons` argument NULL)
+#' #Implement the IMD ANOVA method and compute all pairwise comparisons (i.e. leave the `comparisons` argument NULL)
 #' anova_res <- imd_anova(omicsData = mypepData, test_method = 'anova')
 #' imd_res <- imd_anova(omicsData = mypepData, test_method = 'gtest')
 #' imd_anova_res <- imd_anova(omicsData = mypepData, test_method = 'comb', pval_adjust='bon')
@@ -62,6 +61,7 @@
 #' #Same but only test main effects (Dead vs Alive, G2 vs G3)
 #' comp_df <- data.frame(Control=c("Alive","G2"), Test=c("Dead","G3"))
 #' ovarian_res_twofac_main_effects <- imd_anova(omicsData = tcga_ovarian_pepdata_bp, comparisons = comp_df, test_method='comb')
+#' }
 #' @export
 #' 
 imd_anova <- function(omicsData, comparisons = NULL, test_method, pval_adjust = 'none', pval_thresh = 0.05, covariates = NULL, paired = FALSE, equal_var = TRUE){

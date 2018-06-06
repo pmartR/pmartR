@@ -50,6 +50,8 @@ The code below will group the peptide data by age at initial diagnosis, which is
 
 ```{r, warning=FALSE}
 pep_object <- group_designation(omicsData = pep_object, main_effects = c("Condition"))
+myfilt <- imdanova_filter(omicsData = pep_object)
+pep_object <- applyFilt(filter_object = myfilt, omicsData = pep_object, min_nonmiss_anova = 2, min_nonmiss_gtest = 3)
 all_pairwise_results <- anova_test(omicsData = pep_object)
 ```
 
@@ -66,14 +68,14 @@ By default, all pairwise comparisons are made.  Custom comparisons can by define
 ```{r, warning=FALSE}
 pep_object <- group_designation(pep_object, main_effects = "Condition2")
 one_vs_all <- data.frame(Control=rep("A",3),Test=c("B","C","D"))
-one_vs_all_results <- anova_test(omicsData = pep_object, comparisons = one_vs_all)
+#one_vs_all_results <- anova_test(omicsData = pep_object, comparisons = one_vs_all)
 ```
 
 If the grouping variable has only two levels, $m=2$, then a Welch's $t$-test is performed instead of an ANOVA.  That is, the model defined in Equation (\\ref{eq:one_group}) is still fit, but the two groups of the grouping factor are allowed to have different variances.  In particular, the error terms $e_{ik}$ are assumed to be independently distributed according to the normal distribution with mean $0$ and variance $\sigma^2_i$. To determine if the biomolecules are differentially expressed, $p$-values are derived from a $t$-distribution with degrees of freedom approximated by the Satterthwaite equation.  The value for `Sigma2`, which is not a pooled variance estimates, scaled by the Satterthwaite approximate degrees of freedom.  To illustrate this the data are grouped by vital status with levels "Alive" and "Dead", then  fit with `anova_test()`.
 
 ```{r, warning=FALSE}
 pep_object <- group_designation(omicsData = pep_object, main_effects = c("Condition3"))
-all_pairwise_results <- anova_test(omicsData = pep_object)
+#all_pairwise_results <- anova_test(omicsData = pep_object)
 ```
 
 When this model is fit, it is imperative the researcher check the assumptions of the model.  In particular for the $m>2$ case, the residuals $\hat e_{ik}=y_{ik}-\hat \mu_i$ are assumed to be independent, normally distributed and have a common variance across groups.  The appropriateness of this assumption can be assessed using quantile-quantile plots and comparisons of each group's variance.

@@ -26,11 +26,11 @@ Converts an object of class MSnSet to an object of the class 'pepData'
 }
 \examples{
 dontrun{
-library(pmartRqc)
+library(pmartR)
 library("MSnbase")
 data("msnset")
 
-result = pmartRqc:::MSnSet2pepData(msnset)
+result = MSnSet2pepData(msnset)
 }
 
 }

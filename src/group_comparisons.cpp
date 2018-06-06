@@ -20,7 +20,7 @@ arma::mat fold_change_diff_copy(arma::mat data, arma::mat C)  {
   arma::colvec not_nan;
   arma::mat good_C;
   arma::mat bad_C;
-  arma::rowvec temp_fc_diff(p);
+  arma::rowvec temp_fc_diff(num_comparisons);
   arma::colvec rsums;
   
   for(int i=0;i<n;i++){
@@ -28,8 +28,10 @@ arma::mat fold_change_diff_copy(arma::mat data, arma::mat C)  {
     
     //Treat rows with NaN as special cases
     if(rowi_means.has_nan()){
+  
       //Which rows of C do not involve the NaN element(s)?
       bad_C = C.cols(find_nonfinite(rowi_means)); //Submatrix of C involving the NaN element
+      
       
       temp_fc_diff.fill(arma::datum::nan); //Fill the vector with NAs
       
@@ -44,9 +46,10 @@ arma::mat fold_change_diff_copy(arma::mat data, arma::mat C)  {
         not_nan = rowi_means.rows(found_finite); //rowi_means is a column vector so take it's rows
         good_C = C.cols(found_finite);          //C is a matrix so take the columns I need
         good_C = good_C.rows(zero_C);
-
+        
         
         temp_fc_diff.cols(zero_C) = arma::conv_to<arma::rowvec>::from(good_C*not_nan);
+        
       }
       
       fc_diff.row(i) = temp_fc_diff;

@@ -12,11 +12,11 @@
 #' 
 #' @examples
 #' dontrun{
-#' library(pmartRqc)
+#' library(pmartR)
 #' library("MSnbase")
 #' data("msnset")
 #' 
-#' result = pmartRqc:::MSnSet2pepData(msnset)
+#' result = MSnSet2pepData(msnset)
 #'}
 #'
 #' @export

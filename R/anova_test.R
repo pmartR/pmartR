@@ -36,19 +36,18 @@
 #' Webb-Robertson, Bobbie-Jo M., et al. "Combined statistical analyses of peptide intensities and peptide occurrences improves identification of significant peptides from MS-based proteomics data." Journal of proteome research 9.11 (2010): 5748-5756.
 #'
 #' @examples 
-#' library(MSomicsSTAT)
-#' library(MSomicsDATA)
-#' library(MSomicsQC)
-#' attr(pep_pepData,"cnames")$fdata_cname <- "SampleID"
-#' mypepData <- edata_transform(omicsData = pep_pepData, data_scale = "log2")
+#' dontrun{
+#' library(pmartRdata)
+#' library(pmartR)
+#' mypepData <- edata_transform(omicsData = pep_object, data_scale = "log2")
 #' mypepData <- group_designation(omicsData = mypepData, main_effects = c("Condition"))
 #' 
 #' #Try running anova_test without filtering, should get warning because the data haven't been filtered yet
-#' anova_res <- anova_test(omicsData = mypepData)
+#' anova_res <- anova_test(omicsData = mypepData) ## FIX: This gives an error:  Error in group_comparison_anova_cpp(means, sizes, sigma2, Cmat) : copy into submatrix: incompatible matrix dimensions: 1x1 and 1x2 
 #' 
 #' #Now filter and run again
 #' imdanova_Filt <- imdanova_filter(omicsData = mypepData)
-#' mypepData <- MSomics_filter(filter_object = imdanova_Filt, omicsData = mypepData, min_nonmiss_anova=2)
+#' mypepData <- applyFilt(filter_object = imdanova_Filt, omicsData = mypepData, min_nonmiss_anova=2)
 #' anova_res <- anova_test(omicsData = mypepData)
 #' anova_res_tukey <- anova_test(omicsData = mypepData, pval_adjust = 'tukey') 
 #' #Should be equivalent to above since only making one comparison
@@ -62,13 +61,16 @@
 #' 
 #' #Test with really big dataset, one factor
 #' library(OvarianPepdataBPsubset)
-#' tcga_ovarian_pepdata_bp <- as.pepData(e_data = tcga_ovarian_pepdata_bp_subset$e_data, f_data = tcga_ovarian_pepdata_bp_subset$f_data, e_meta = tcga_ovarian_pepdata_bp_subset$e_meta, edata_cname = "Peptide", fdata_cname = "sampleID")
+#' tcga_ovarian_pepdata_bp <- as.pepData(e_data = tcga_ovarian_pepdata_bp_subset$e_data, f_data = tcga_ovarian_pepdata_bp_subset$f_data, e_meta = tcga_ovarian_pepdata_bp_subset$e_meta, edata_cname = "Peptide", fdata_cname = "sampleID", emeta_cname = "Protein", check.names = FALSE)
 #' tcga_ovarian_pepdata_bp <- group_designation(omicsData = tcga_ovarian_pepdata_bp, main_effects = c("vital_status"))
-#' ovarian_res <- anova_test(omicsData = tcga_ovarian_pepdata_bp)
+#' tcga_ovarian_pepdata_bp <- edata_transform(tcga_ovarian_pepdata_bp, "log2")
+#' imdanova_Filt <- imdanova_filter(omicsData = tcga_ovarian_pepdata_bp)
+#' tcga_ovarian_pepdata_bp <- applyFilt(filter_object = imdanova_Filt, omicsData = tcga_ovarian_pepdata_bp, min_nonmiss_anova=2)
+#' ovarian_res <- anova_test(omicsData = tcga_ovarian_pepdata_bp) # FIX: added filtering but this one still does not work (same error as above)
 #' #Tukey adjustment is super slow right now because "ptukey" is super slow, not sure how to fix that
-#' ovarian_res_tukey <- anova_test(omicsData = tcga_ovarian_pepdata_bp, pval_adjust = 'tukey')
+#' ovarian_res_tukey <- anova_test(omicsData = tcga_ovarian_pepdata_bp, pval_adjust = 'tukey') # FIX: added filtering but this one still does not work (same error as above)
 #' #Dunnett adjustment, super slow because mvtnorm::pmvt is super slow
-#' ovarian_res_dunnett <- anova_test(omicsData = tcga_ovarian_pepdata_bp, pval_adjust = 'dunnett')
+#' ovarian_res_dunnett <- anova_test(omicsData = tcga_ovarian_pepdata_bp, pval_adjust = 'dunnett') # FIX: added filtering but this one still does not work (same error as above)
 #' 
 #' #Test really big dataset, two factors, all pairwise comparisons
 #' tcga_ovarian_pepdata_bp <- group_designation(omicsData = tcga_ovarian_pepdata_bp, main_effects = c("vital_status","neoplasm_histologic_grade"))
@@ -81,6 +83,7 @@
 #' #Same but only test arbitrary diagonal effects (Dead_G2 vs Alive_G3, Alive_G2 vs Alive_G3)
 #' comp_df <- data.frame(Control=c("Dead_G2","Alive_G2"), Test=c("Alive_G3","Alive_G3"))
 #' ovarian_res_twofac_arb_effects <- anova_test(omicsData = tcga_ovarian_pepdata_bp, comparisons = comp_df)
+#' }
 #' @export
 
 anova_test <- function(omicsData, comparisons = NULL, pval_adjust = 'none', pval_thresh = 0.05, covariates = NULL, paired = FALSE, equal_var = TRUE){
@@ -160,7 +163,7 @@ anova_test <- function(omicsData, comparisons = NULL, pval_adjust = 'none', pval
     }
     
     ##---- use the pairing info to form paired differences ------##
-    #source('~/Documents/MinT/MSomics/MSomicsSTAT/R/paired_supp_funs.R')
+    #source('~/pmartR/R/paired_supp_funs.R')
     cols <- c(which(colnames(omicsData$f_data)==samp_cname),pair_col)
     pid_matrix <- build_pair_mat(pair_df = omicsData$f_data[,cols])
     #The new "data" are the paired differences, so overwrite data with paried differences
@@ -179,7 +182,7 @@ anova_test <- function(omicsData, comparisons = NULL, pval_adjust = 'none', pval
     
     #groupData needs to be updated so that pairs map to groups instead of observations
     groupData <- merge(groupData,omicsData$f_data[,cols],sort = FALSE)
-    groupData <- groupData%>%group_by_at(vars(contains("pair")))%>%summarize(NewGroup=first(Group))
+    groupData <- groupData%>%group_by_at(vars(contains("pair")))%>%dplyr::summarize(NewGroup=first(Group))
     
     colnames(groupData) <- c(samp_cname,"Group")
     groupData <- data.frame(groupData)
@@ -194,7 +197,7 @@ anova_test <- function(omicsData, comparisons = NULL, pval_adjust = 'none', pval
       covariates <- merge(covariates,omicsData$f_data[,cols],sort = FALSE)
       orig_colnames <- colnames(covariates)
       colnames(covariates)[c(2,3)] <- c("Cov","PairID")
-      covariates <- covariates%>%group_by(PairID)%>%summarize(NewCov=first(Cov))
+      covariates <- covariates%>%group_by(PairID)%>%dplyr::summarize(NewCov=first(Cov))
       colnames(covariates) <- c(samp_cname,orig_colnames[2])
       covariates <- data.frame(covariates)
       if(is.numeric(omicsData$f_data[,pair_col])){
@@ -215,7 +218,7 @@ anova_test <- function(omicsData, comparisons = NULL, pval_adjust = 'none', pval
       #Add group ids to covariate ids
       covariates <- merge(groupData, covariates,sort=FALSE)
       cov_samp_col <- which(colnames(covariates)==samp_cname)
-      #source('~/Documents/MinT/MSomics/MSomicsSTAT/R/covariate_supp_funs.R') #Run to debug
+      #source('~/pmartR/R/covariate_supp_funs.R') #Run to debug
       xmatrix <- build_x_mat(covariates[,-cov_samp_col]) #Build the appropriate X matrix based on the covariates data frame
       xmatrix <- reduce_xmatrix(xmatrix,length(unique(groupData$Group)))
       
@@ -240,15 +243,15 @@ anova_test <- function(omicsData, comparisons = NULL, pval_adjust = 'none', pval
     ##Translate the groups into numeric labels for anova_cpp() function
     gp <- factor(groupData$Group,labels=1:k,levels=unique(groupData$Group))
     
-    #Rcpp::sourceCpp('~/Documents/MinT/MSomics/MSomicsSTAT/src/anova_helper_funs.cpp') #Run if debugging code
+    #Rcpp::sourceCpp('~/pmartR/src/anova_helper_funs.cpp') #Run if debugging code
     raw_results <- anova_cpp(data.matrix(data),gp,1-equal_var,red_df)
     group_names <- paste("Mean",as.character(unique(groupData$Group)),sep="_")
     
   }else{
     ##---- Two factor ANOVA ----##
-    #source('~/Documents/MinT/MSomics/MSomicsSTAT/R/anova_helper_fun.R') #Run if debugging
-    #source('~/Documents/MinT/MSomics/MSomicsSTAT/R/covariate_supp_funs.R')
-    #Rcpp::sourceCpp('~/Documents/MinT/MSomics/MSomicsSTAT/src/two_factor_anova.cpp')
+    #source('~/pmartR/R/anova_helper_fun.R') #Run if debugging
+    #source('~/pmartR/R/covariate_supp_funs.R')
+    #Rcpp::sourceCpp('~/pmartR/src/two_factor_anova.cpp')
     raw_results <- run_twofactor_cpp(data=data.matrix(data),gpData=groupData,red_df)
     group_names <- paste("Mean",colnames(raw_results$group_means),sep="_")
   }
@@ -264,8 +267,8 @@ anova_test <- function(omicsData, comparisons = NULL, pval_adjust = 'none', pval
   results <- cbind(omicsData$e_data[edatacname],results)
   
   ###-------Use group_comparison_anova() to compare the groups that were requested--------------##
-  #source('~/Documents/MinT/MSomics/MSomicsSTAT/R/group_comparison.R') # Run if debugging
-  #Rcpp::sourceCpp('~/Documents/MinT/MSomics/MSomicsSTAT/src/group_comparisons.cpp') #Run if debugging
+  #source('~/pmartR/R/group_comparison.R') # Run if debugging
+  #Rcpp::sourceCpp('~/pmartR/src/group_comparisons.cpp') #Run if debugging
   group_comp <- group_comparison_anova(groupData=groupData,comparisons=comparisons,anova_results_full=list(Results=results,Sizes=raw_results$group_sizes))
   
   #If there are only two levels, replace group_comp p-values with those taken from ANOVA function

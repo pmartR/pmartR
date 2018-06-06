@@ -24,7 +24,8 @@ Imports:
     d3heatmap,
     gridExtra,
     reshape2,
-    RcppArmadillo
+    RcppArmadillo,
+    RColorBrewer
 Suggests:
     knitr,
     rmarkdown,

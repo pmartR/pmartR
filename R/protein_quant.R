@@ -61,7 +61,7 @@ protein_quant<- function(pepData, method, isoformRes = NULL, qrollup_thresh = NU
     if(method == 'rollup'){
       if(combine_fn == 'median'){
         results<- pquant_median(pepData)
-      }else{results = pmartRqc:::pquant_mean(pepData)}
+      }else{results = pquant_mean(pepData)}
     }
     if(method == 'rrollup'){
       results<- rrollup(pepData, combine_fn = combine_fn, parallel = use_parallel)
@@ -145,7 +145,7 @@ protein_quant<- function(pepData, method, isoformRes = NULL, qrollup_thresh = NU
     }
     
     if(method == 'qrollup'){
-      results<- pmartRqc:::qrollup(temp_pepdata, qrollup_thresh = qrollup_thresh, combine_fn = combine_fn, parallel = use_parallel)
+      results<- qrollup(temp_pepdata, qrollup_thresh = qrollup_thresh, combine_fn = combine_fn, parallel = use_parallel)
     }
     
     if(method == 'zrollup'){

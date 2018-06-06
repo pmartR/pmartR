@@ -13,16 +13,16 @@
 \item{...}{further arguments}
 }
 \value{
-a ggplot summarizing the MSomicsR object
+a ggplot summarizing the pmartR object
 }
 \description{
-This function will provide a plot for a \code{omicsData} object, any of the filter objects in MSomicsR, or a \code{corRes} object.
+This function will provide a plot for a \code{omicsData} object, any of the filter objects in pmartR, or a \code{corRes} object.
 }
 \details{
 Various further arguments can be specified depending on the class of the object being plotted.
 }
 \examples{
-donrun{
+dontrun{
 library(pmartRdata)
 data("pep_object")
 cor_matrix <- cor_result(pep_object)
@@ -40,6 +40,7 @@ plot(pro_object, facet_by = "Condition")
 plot(pro_object, facet_by = "Condition", facet_cols = 1)
 
 pep_object2 <- group_designation(pep_object, main_effects = "Condition")
+pep_object2 <- edata_transform(pep_object2, "log2")
 pca_res <- dim_reduction(pep_object2, k = 2)
 plot(pca_res)
 }

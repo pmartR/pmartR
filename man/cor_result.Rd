@@ -20,7 +20,7 @@ The Pearson correlation between samples is calculated based on biomolecules that
 }
 \examples{
 dontrun{
-library(MSomicsQC)
+library(pmartR)
 data(pep_object)
 my_correlation <- cor_result(omicsData = pep_object)
 }

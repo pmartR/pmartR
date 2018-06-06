@@ -17,19 +17,17 @@
 Produces plots that summarize the results contained in a `statRes` object.
 }
 \examples{
-
-library(MSomicsSTAT)
-library(MSomicsDATA)
-library(MSomicsQC)
-#Trasnform the data
-attr(pro_proData,"cnames")$fdata_cname <- "SampleID"
+dontrun{
+library(pmartR)
+library(pmartRdata)
+#Transform the data
 
 #Group the data by condition
-myproData <- group_designation(omicsData = pro_proData, main_effects = c("Condition"))
+myproData <- group_designation(omicsData = pro_object, main_effects = c("Condition"))
 
 #Apply the IMD ANOVA filter
 imdanova_Filt <- imdanova_filter(omicsData = myproData)
-myproData <- MSomics_filter(filter_object = imdanova_Filt, omicsData = myproData, min_nonmiss_anova=2)
+myproData <- applyFilt(filter_object = imdanova_Filt, omicsData = myproData, min_nonmiss_anova=2)
 
 #Implement the IMD ANOVA method and compuate all pairwise comparisons (i.e. leave the `comparisons` argument NULL)
 anova_res <- imd_anova(omicsData = myproData, test_method = 'anova')
@@ -40,4 +38,6 @@ plot(imd_res)
 
 imd_anova_res <- imd_anova(omicsData = myproData, test_method = 'comb', pval_adjust='bon')
 plot(imd_anova_res)
+}
+
 }

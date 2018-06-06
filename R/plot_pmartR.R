@@ -1,16 +1,16 @@
 #' Produce a plot of a pmartR S3 Object
 #'
-#' This function will provide a plot for a \code{omicsData} object, any of the filter objects in MSomicsR, or a \code{corRes} object.
+#' This function will provide a plot for a \code{omicsData} object, any of the filter objects in pmartR, or a \code{corRes} object.
 #'
 #' @param omicsData an object of the class 'pepData', 'proData', 'lipidData', or 'metabData' usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.lipidData}}, or  \code{\link{as.metabData}}, respectively.
 #' @param corRes_object an object of class corRes. A correlation matrix of all samples.
 #' @param filter_object a filter object for the respective \code{omicsData} class.
 #' @param ... further arguments
 #'
-#' @return a ggplot summarizing the MSomicsR object
+#' @return a ggplot summarizing the pmartR object
 #'
 #' @examples
-#' donrun{
+#' dontrun{
 #' library(pmartRdata)
 #' data("pep_object")
 #' cor_matrix <- cor_result(pep_object)
@@ -28,6 +28,7 @@
 #' plot(pro_object, facet_by = "Condition", facet_cols = 1)
 #'
 #' pep_object2 <- group_designation(pep_object, main_effects = "Condition")
+#' pep_object2 <- edata_transform(pep_object2, "log2")
 #' pca_res <- dim_reduction(pep_object2, k = 2)
 #' plot(pca_res)
 #'}
@@ -79,6 +80,9 @@ plot.corRes <- function(corRes_object, ...){
           plot_title <- "Correlations Among Samples (Un-Normalized Data)"
         }
       }
+      
+    }else{
+        plot_title <- "Correlations Among Samples (Un-Normalized Data)"
     }
     
   }else{
@@ -119,10 +123,12 @@ plot.corRes <- function(corRes_object, ...){
     if(x_lab==FALSE) heatmap <- heatmap + ggplot2::theme(axis.text.x = ggplot2::element_blank()) # added by KS
     if(y_lab==FALSE) heatmap <- heatmap + ggplot2::theme(axis.text.y = ggplot2::element_blank()) # added by KS
     
-    if(attributes(corRes_object)$data_norm == TRUE) {
-      heatmap <- heatmap + ggplot2::ggtitle(plot_title)
-    }else {
-      heatmap <- heatmap + ggplot2::ggtitle(plot_title)
+    if(!is.null(attributes(corRes_object)$data_norm)){
+      if(attributes(corRes_object)$data_norm == TRUE) {
+        heatmap <- heatmap + ggplot2::ggtitle(plot_title)
+      }
+    }else{
+        heatmap <- heatmap + ggplot2::ggtitle(plot_title)
     }
     
   } else {

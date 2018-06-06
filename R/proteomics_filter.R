@@ -10,7 +10,7 @@
 #'
 #' @examples
 #' dontrun{
-#' library(MSomicsQC)
+#' library(pmartR)
 #' data("pep_object")
 #' my_filter <- proteomics_filter(omicsData = pep_object)
 #' summary(my_filter, min_num_peps = 3)

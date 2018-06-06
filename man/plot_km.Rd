@@ -14,7 +14,7 @@ a Kaplan-Meier curve
 }
 \description{
 Implements overall survival analysis or progression-free survival analysis, depending upon the datatypes supplied to
-pmartRqc::surv_designation, and plot the resulting Kaplan-Meier curve.
+surv_designation, and plot the resulting Kaplan-Meier curve.
 }
 \examples{
 library(MSomicsSTAT)

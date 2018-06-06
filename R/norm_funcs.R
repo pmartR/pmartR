@@ -100,13 +100,13 @@ mad_transform <- function(e_data, edata_id, feature_subset, backtransform=FALSE,
 #' @param edata_id character string indicating the name of the peptide, protein, lipid, or metabolite identifier. Usually obtained by calling \code{attr(omicsData, "cnames")$edata_cname}.
 #' @param feature_subset character vector containing the feature names in the subset to be used for normalization
 #' @param backtransform logical argument. If TRUE, the data will be back transformed after normalization so that the values are on a scale similar to their raw values. See details for more information. Defaults to FALSE.
-#'@param apply_norm logical argument. If TRUE, the normalization will be applied to the data. Defaults to FALSE.
+#' @param apply_norm logical argument. If TRUE, the normalization will be applied to the data. Defaults to FALSE.
 #'
 #' @details The sample-wise median of the feature subset specified for normalization is subtracted from each feature in e_data to get the normalized data. The location estimates are the sample-wise medians of the subset data. There are no scale estimates for median centering, though the function returns a NULL list element as a placeholder for a scale estimate. If backtransform is TRUE, the global median of the subset data (across all samples) is added back to the normalized values. Medians are taken ignoring any NA values.
 #'
 #' @return List containing two elements: \code{norm_params} is list with two elements:
 #' \tabular{ll}{
-#' scale \tab NULL
+#' scale \tab NULL \cr
 #' \tab \cr
 #' location \tab numeric vector of length \code{n} medians for each sample
 #' \cr
@@ -114,7 +114,7 @@ mad_transform <- function(e_data, edata_id, feature_subset, backtransform=FALSE,
 #'
 #' \code{backtransform_params} is a list with two elements:
 #' \tabular{ll}{
-#' scale \tab NULL
+#' scale \tab NULL \cr
 #' \tab \cr
 #' location \tab numeric value giving global median across all samples
 #' \cr

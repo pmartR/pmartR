@@ -17,10 +17,10 @@
 #'
 #' @examples
 #' dontrun{
-#' library(MSomicsQC)
+#' library(pmartR)
 #' data(pep_object)
 #' pep_object2 <- group_designation(omicsData = pep_object, main_effects = "Condition")
-#' nonmissing_result <- nonmissing_per_group(omicsData = pep_object2)
+#' nonmissing_result <- pmartR:::nonmissing_per_group(omicsData = pep_object2)
 #' to_filter <- gtest_filter(nonmiss_per_group = nonmissing_result, omicsData = pep_object2, min_nonmiss_gtest = 3)
 #'}
 #'
@@ -31,6 +31,19 @@
 
 gtest_filter <- function(nonmiss_per_group, groupDF=NULL, omicsData=NULL, e_data=NULL, alpha=NULL, min_nonmiss_gtest=NULL, cname_id = NULL, samp_id = NULL){
 
+  # one of omicsData and e_data is required (but not both); if both are provided use e_data; if omicsData is provided, define peptide data; if neither is specified then stop
+  if(is.null(omicsData) & is.null(e_data)){
+    stop("Neither omicsData nor e_data has been specified. One of these two arguments is required.")
+  }else{
+    if(!is.null(omicsData) & !is.null(e_data)){
+      warning("Both omicsData and e_data were specified. Function will proceed using e_data")
+    }else{
+      if(!is.null(omicsData) & is.null(e_data)){
+        e_data <- omicsData$e_data
+      }
+    }
+  }
+  
   # check that groupDF is supplied if e_data is supplied #
   if(!is.null(omicsData)){
     e_data <- omicsData$e_data
@@ -56,18 +69,7 @@ gtest_filter <- function(nonmiss_per_group, groupDF=NULL, omicsData=NULL, e_data
     }
   }
 
-  # one of omicsData and e_data is required (but not both); if both are provided use e_data; if omicsData is provided, define peptide data; if neither is specified then stop
-  if(is.null(omicsData) & is.null(e_data)){
-    stop("Neither omicsData nor e_data has been specified. One of these two arguments is required.")
-  }else{
-    if(!is.null(omicsData) & !is.null(e_data)){
-      warning("Both omicsData and e_data were specified. Function will proceed using e_data")
-    }else{
-      if(!is.null(omicsData) & is.null(e_data)){
-        e_data <- omicsData$e_data
-      }
-    }
-  }
+  
 
   # the order of the peptides in groups has been changed--it no longer matches the order in the data (added by KS on 10/13/2015)
   inds <- match(e_data[,1], nonmiss_per_group$nonmiss_totals[,1])
