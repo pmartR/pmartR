@@ -1,11 +1,11 @@
 # testing function for cv_filter() 
-library(pmartRqc)
+library(pmartR)
 library(testthat)
 library(pmartRdata)
 data("pep_object")
 
 omicsData <- group_designation(omicsData = pep_object, main_effects = "Condition")
-result <- pmartRqc:::cv_filter(omicsData)
+result <- pmartR::cv_filter(omicsData)
 
 samp_id <- attr(omicsData, "cnames")$fdata_cname
 edata_id <- attr(omicsData, "cnames")$edata_cname
@@ -48,8 +48,8 @@ test_that("components of result match attributes of omicsData",{
 context("input tests for cv_filter()")
 
 test_that("invalid input for omicsData argument throws error",{     
-  expect_that(pmartRqc:::cv_filter(mat), throws_error())  
-  expect_that(pmartRqc:::cv_filter(vec), throws_error())
+  expect_that(pmartR::cv_filter(mat), throws_error())  
+  expect_that(pmartR::cv_filter(vec), throws_error())
 })
 
 context("tests using hard coded results of cv_filter()")

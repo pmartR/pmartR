@@ -122,7 +122,7 @@ gtest_filter <- function(nonmiss_per_group, groupDF=NULL, omicsData=NULL, e_data
         cur.data <- t(data.frame(cur.data))
         pval <- 1
         num.nonmiss <- 1
-        while(pval > alpha && num.nonmiss < length(groupDF$Group[inds])){
+        while(pval > alpha & num.nonmiss < length(groupDF$Group[inds])){
           # modify cur.data #
           inds <- groupDF$Group==group.vals.unique[i]
           inds[is.na(inds)] <- FALSE # set any missing values to FALSE

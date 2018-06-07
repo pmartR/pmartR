@@ -30,7 +30,7 @@
 #' Implements overall survival analysis or progression-free survival analysis, depending upon the datatypes supplied to
 #' surv_designation, and return the "survfit" object
 #' 
-#' @param omicsData A mintR data object of any class, which has a `group_df` attribute that is usually created by the `group_designation()` function
+#' @param omicsData A pmartR data object of any class, which has a `group_df` attribute that is usually created by the `group_designation()` function
 #' @return if fitted survival analysis object is returned
 #' 
 #' @examples 
@@ -95,7 +95,7 @@ fit_surv <- function(omicsData,...){
 #' Implements overall survival analysis or progression-free survival analysis, depending upon the datatypes supplied to
 #' surv_designation, and plot the resulting Kaplan-Meier curve.
 #' 
-#' @param omicsData A mintR data object of any class, which has a `group_df` attribute that is usually created by the `group_designation()` function
+#' @param omicsData A pmartR data object of any class, which has a `group_df` attribute that is usually created by the `group_designation()` function
 #' @return a Kaplan-Meier curve
 #' 
 #' @examples 
@@ -124,7 +124,7 @@ plot_km <- function(omicsData,...){
 #' Implements overall survival analysis or progression-free survival analysis, depending upon the datatypes supplied to
 #' surv_designation, and gives a summary of the results.
 #' 
-#' @param omicsData A mintR data object of any class, which has a `group_df` attribute that is usually created by the `group_designation()` function
+#' @param omicsData A pmartR data object of any class, which has a `group_df` attribute that is usually created by the `group_designation()` function
 #' @param percent The percentile
 #' @return if `percent` is provided then the time at which that probability of death is returned; else, the summary of the `survival` object is returned
 #' 

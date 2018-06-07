@@ -1,6 +1,6 @@
 #protein_quant testthat 
 library(testthat)
-library(pmartRqc)
+library(pmartR)
 library(pmartRdata)
 
 data("pep_object")

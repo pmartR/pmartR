@@ -1,9 +1,9 @@
 #' protein_quant wrapper function
 #' 
-#' This function takes in a pepData object, method (quantitation method, mean, median or rrollup), and the optional argument isoformRes (defaults to NULL). An object of the class 'proData' is returned. 
+#' This function takes in a pepData object, method (quantification method, mean, median or rrollup), and the optional argument isoformRes (defaults to NULL). An object of the class 'proData' is returned. 
 #' 
 #' @param pepData an omicsData object of the class 'pepData'.
-#' @param method is one of four protein quantitation methods, 'rollup', 'rrollup', 'qrollup' and 'zrollup'. When 'rollup' is selected, combine_fn must also be provided and will determine whether pquant_mean or pquant_median function will be used.
+#' @param method is one of four protein quantification methods, 'rollup', 'rrollup', 'qrollup' and 'zrollup'. When 'rollup' is selected, combine_fn must also be provided and will determine whether pquant_mean or pquant_median function will be used.
 #' @param isoformRes is a list of data frames, the result of applying the 'bpquant_loop' function to original pepData object. Defaults to NULL.
 #' @param qrollup_thresh is a numeric value; is the peptide abundance cutoff value. Is an argument to qrollup function.
 #' @param single_pep logical indicating whether or not to remove proteins that have just a single peptide mapping to them, defaults to FALSE.

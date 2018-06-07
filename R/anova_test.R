@@ -12,7 +12,7 @@
 #'  \item Group comparisons defined by `comaprison` argument are implemented use parameter vector and variance estimates in ANOVA step
 #'}
 #'
-#' @param omicsData A mintR data object of any class
+#' @param omicsData A pmartR data object of any class
 #' @param comparisons data.frame with columns for "Control" and "Test" containing the different comparisons of interest. Comparisons will be made between the Test and the corresponding Control  If left NULL, then all pairwise comparisons are executed.
 #' @param pval_adjust character vector specifying the type of multiple comparisons adjustment to implement. An unspecified value corresponds to no adjustment. Valid options include: holm, bonferroni, Tukey, Dunnett, none.
 #' @param pval_thresh numeric p-value threshold, below or equal to which peptides are considered differentially expressed. Defaults to 0.05
@@ -125,7 +125,7 @@ anova_test <- function(omicsData, comparisons = NULL, pval_adjust = 'none', pval
     stop("Tukey adjustment for multiple comparisions should only be used when all pairwise comparisons are being made; try a 'Dunnett' adjustment.")
   }
   
-  if((length(unique(comparisons$Control))>1 || (is.null(comparisons) & length(unique(groupData$Group))>2)) & tolower(pval_adjust)=="dunnett"){
+  if((length(unique(comparisons$Control))>1 | (is.null(comparisons) & length(unique(groupData$Group))>2)) & tolower(pval_adjust)=="dunnett"){
     stop("Dunnett adjustment for multiple comparisions should only be used when all case-vs-control comparisons are being made; try a 'Tukey' adjustment.")
   }
 

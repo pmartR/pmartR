@@ -2,7 +2,7 @@
 #'
 #'  This is IMD-ANOVA test proposed in Webb-Robertson et al. (2010).
 #'
-#' @param omicsData A mintR data object of any class, which has a `group_df` attribute that is usually created by the `group_designation()` function
+#' @param omicsData A pmartR data object of any class, which has a `group_df` attribute that is usually created by the `group_designation()` function
 #' @param comparisons data.frame with columns for "Control" and "Test" containing the different comparisons of interest. Comparisons will be made between the Test and the corresponding Control  If left NULL, then all pairwise comparisons are executed.
 #' @param test_method character string specifying the filter method to use: "combined", "gtest", or "anova". "combined" implements both the gtest and anova filters.
 #' @param pval_adjust character vector specifying the type of multiple comparisons adjustment to implement via \code{\link{p.adjust}}. A NULL value corresponds to no adjustment. Valid options for ANOVA include: holm, hochberg, hommel, bonferroni, BH, BY, fdr, none. Valid options for g-test include: holm, bonferonni and none. See \code{\link{p.adjust}} for some details.
