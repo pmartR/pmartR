@@ -8,7 +8,7 @@
 #' 
 #' @details If groupvar is NULL and group_designation has not been applied to omicsData, then the metrics will be applied to each column of e_data (when by = 'sample) or to each row of e_data (when by = 'molecule'). When groupvar is provided, it must match a column name from \code{f_data}, this column of f_data is used to group e_data in order to apply the metrics.  
 #'
-#' @return A list of six data frames, which are the results of applying the metrics to omicsData$e_data
+#' @return A list of six data frames, which are the results of applying the metrics (mean, standard deviation, median, percent observed, minimum and maximum) to omicsData$e_data
 #'
 #' @examples
 #' dontrun{
@@ -16,13 +16,13 @@
 #' data(lipid_object)
 #' lipid_object2 <- edata_transform(omicsData = lipid_object, data_scale = "log2")
 #' lipid_object2 <- group_designation(omicsData = lipid_object, main_effects = "Condition")
-#' summarize(omicsData = lipid_object2, groupvar = NULL, by = "sample")
+#' edata_summary(omicsData = lipid_object2, groupvar = NULL, by = "sample")
 #'}
 #'
 #'
 #' @export
 
-summarize<- function(omicsData, groupvar = NULL, by){
+edata_summary <- function(omicsData, groupvar = NULL, by){
   #some checks
   if(!inherits(omicsData, c('pepData','proData', 'lipidData', 'metabData'))) stop("omicsData must be an object of class pepData, proData, lipidData or metabData")
   if(!(by %in% c('sample', 'molecule'))) stop("by must be either sample or molecule")
