@@ -36,14 +36,14 @@ custom_filter <- function(omicsData, e_data_remove = NULL, f_data_remove = NULL,
   if(is.null(e_data_remove) & is.null(f_data_remove) & is.null(e_meta_remove) & is.null(e_data_keep) & is.null(f_data_keep) & is.null(e_meta_keep)) stop("No items have been identified for filtering.")
   
   #check that both keep and remove arguments are not non-NULL
-  if((!is.null(e_data_remove)||!is.null(f_data_remove)||!is.null(e_meta_remove)) & (!is.null(e_data_keep)||!is.null(f_data_keep)||!is.null(e_meta_keep))) stop("cannot have both remove arguments and keep arguments be non NULL, please create and apply to separate filter objects")
+  if((!is.null(e_data_remove)|!is.null(f_data_remove)|!is.null(e_meta_remove)) & (!is.null(e_data_keep)|!is.null(f_data_keep)|!is.null(e_meta_keep))) stop("cannot have both remove arguments and keep arguments be non NULL, please create and apply to separate filter objects")
   
   edata_id = attr(omicsData, "cnames")$edata_cname
   emeta_id = attr(omicsData, "cnames")$emeta_cname
   samp_id = attr(omicsData, "cnames")$fdata_cname
   
   #checks for removes
-  if((!is.null(e_data_remove)||!is.null(f_data_remove)||!is.null(e_meta_remove)) & (is.null(e_data_keep) & is.null(f_data_keep) & is.null(e_meta_keep))){
+  if((!is.null(e_data_remove)|!is.null(f_data_remove)|!is.null(e_meta_remove)) & (is.null(e_data_keep) & is.null(f_data_keep) & is.null(e_meta_keep))){
     # checks for e_data_remove #
     if(!is.null(e_data_remove)){
       
@@ -80,7 +80,7 @@ custom_filter <- function(omicsData, e_data_remove = NULL, f_data_remove = NULL,
   }
   
   #checks for keeps
-  if((is.null(e_data_remove) & is.null(f_data_remove) & is.null(e_meta_remove)) & (!is.null(e_data_keep)||!is.null(f_data_keep)||!is.null(e_meta_keep))){
+  if((is.null(e_data_remove) & is.null(f_data_remove) & is.null(e_meta_remove)) & (!is.null(e_data_keep)|!is.null(f_data_keep)|!is.null(e_meta_keep))){
     # checks for e_data_keep #
     if(!is.null(e_data_keep)){
       

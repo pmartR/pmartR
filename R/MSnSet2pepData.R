@@ -2,7 +2,7 @@
 #'
 #' Converts an object of class MSnSet to an object of the class 'pepData'
 #' 
-#' @param msnset_object is an object of class MSnSet, it stores quantitation data and meta data. Creating an MSnSet object is described in the MSNbase package io vignette.   
+#' @param msnset_object is an object of class MSnSet, it stores quantification data and meta data. Creating an MSnSet object is described in the MSNbase package io vignette.   
 #' @param edata_cname character string specifying the name of the column containing the peptide identifiers in \code{e_data} and \code{e_meta} (if applicable).
 #' @param emeta_cname character string specifying the name of the column containing the protein identifiers (or other mapping variable) in \code{e_meta} (if applicable).
 #' @param fdata_cname character string specifying the name of the column containing the sample identifiers in \code{f_data}.

@@ -4,7 +4,7 @@
 #' for count data.  For continuous data, this is often used to test if the number of missing values is the same across all groups (i.e.a
 #' qualitative difference).  For count data, this is used to test if the number of counts is the same for all groups.
 #'
-#' @param omicsData A mintR data object of any class
+#' @param omicsData A pmartR data object of any class
 #' @param return_sizes Logical, should the group sizes be returned as well?  If true, a separate data.frame containing the group sizes is returned
 #'
 #' @return a data frame with the following columns: group means, global G-test statistic and corresponding p-value
@@ -15,7 +15,7 @@
 #'
 #' @examples 
 #' library(mintJansson)
-#' rRNA_data <- mintR::group_designation(omicsData = rRNA_data, main_effects = c("site","treatment"))
+#' rRNA_data <- pmartR::group_designation(omicsData = rRNA_data, main_effects = c("site","treatment"))
 #' group_df <- attr(rRNA_data, "group_DF")
 #' #This is will return a lot of errors because the peptides with too few data haven't 
 #' #been filtered out yet

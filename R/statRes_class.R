@@ -3,7 +3,7 @@
 #' Not really an interesting function.  Just exporting it so Natalie can use in a different function.
 #' 
 #' @param imd_out Data.frame containing the results of the imd anova call
-#' @param omicsData A mintR data object of any class, which has a `group_df` attribute that is usually created by the `group_designation()` function
+#' @param omicsData A pmartR data object of any class, which has a `group_df` attribute that is usually created by the `group_designation()` function
 #' @param comparisons the comparisons made
 #' @param test_method the test method
 #' @param pval_ajust pvalue adjustment method
@@ -186,7 +186,7 @@ plot.statRes <- function(x, plot_type = NULL, fc_threshold = NULL,...){
   }
   
   #Both the volcano plot and heatmap need a dataframe of fold changes by comparison/biomolecule
-  if("volcano" %in%plot_type || "heatmap"%in%plot_type){
+  if("volcano" %in%plot_type | "heatmap"%in%plot_type){
     fc_data <- x$Full_results[,c(1,grep("Fold_change",colnames(x$Full_results)))]
     colnames(fc_data) <- gsub(pattern = "Fold_change_",replacement = "",x = colnames(fc_data))
     fc_data <- reshape2::melt(fc_data,id.vars=1,variable.name="Comparison",value.name="Fold_change")

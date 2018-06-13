@@ -1,5 +1,5 @@
 # Testing function for nonmissing_per_group 
-library(pmartRqc)
+library(pmartR)
 library(pmartRdata)
 library(dplyr)
 data("pep_object")
@@ -12,7 +12,7 @@ cname_id <- attr(omicsData, "cnames")$edata_cname
 mat <- matrix(c(1,2,3,4,5,6), nrow = 2, ncol = 3)
 
 #here we apply nonmissing_per_group to omicsData and store in result
-result<- pmartRqc:::nonmissing_per_group(omicsData)
+result<- pmartR:::nonmissing_per_group(omicsData)
 result_df <- result$nonmiss_totals[1:5,] 
 
 #hardcoded results are from running nonmissing_per_group with "pep_object" 
@@ -51,22 +51,22 @@ context("input tests for nonmissing_per_group()")
 
 
 test_that("invalid input for omicsData argument throws error",{     
-  expect_that(pmartRqc:::nonmissing_per_group(omicsData = mat),throws_error())
+  expect_that(pmartR::nonmissing_per_group(omicsData = mat),throws_error())
 }) 
  
 test_that("leaving all arguments null throws error",{     
-  expect_that(pmartRqc:::nonmissing_per_group(omicsData = NULL, e_data = NULL, groupDF = NULL, cname_id = NULL, samp_id = NULL),throws_error())
+  expect_that(pmartR::nonmissing_per_group(omicsData = NULL, e_data = NULL, groupDF = NULL, cname_id = NULL, samp_id = NULL),throws_error())
 })  
 
 test_that("inputing a single argument and leaving the rest null throws error",{ 
-  expect_that(pmartRqc:::nonmissing_per_group(e_data = e_data),throws_error())   
-  expect_that(pmartRqc:::nonmissing_per_group(groupDF = groupDF),throws_error())   
-  expect_that(pmartRqc:::nonmissing_per_group(cname_id = cname_id),throws_error())   
-  expect_that(pmartRqc:::nonmissing_per_group(samp_id = samp_id),throws_error())      
+  expect_that(pmartR::nonmissing_per_group(e_data = e_data),throws_error())   
+  expect_that(pmartR::nonmissing_per_group(groupDF = groupDF),throws_error())   
+  expect_that(pmartR::nonmissing_per_group(cname_id = cname_id),throws_error())   
+  expect_that(pmartR::nonmissing_per_group(samp_id = samp_id),throws_error())      
 })
 
 test_that("e_data and groupDF are specified but cname_id and samp_id are not, throws error ",{
-  expect_that(pmartRqc:::nonmissing_per_group(e_data = e_data, groupDF = groupDF, cname_id = NULL, samp_id = NULL),throws_error())   
+  expect_that(pmartR::nonmissing_per_group(e_data = e_data, groupDF = groupDF, cname_id = NULL, samp_id = NULL),throws_error())   
 })
 
 

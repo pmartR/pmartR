@@ -38,10 +38,10 @@ p_adjustment_anova <- function(p_values = NULL, diff_mean = NULL, t_stats = NULL
     stop("Provided 'pval_adjust' argument is invalid, please select 'holm', 'bonferroni', 'tukey', 'dunnett' or 'none'.")
   
   
-  if(pval_adjust=="tukey" || pval_adjust=="dunnett"){
+  if(pval_adjust=="tukey" | pval_adjust=="dunnett"){
     
     #Tukey-Kramer statistics are t-statistic/sqrt(2)
-    if(is.null(t_stats) || is.null(sizes)){
+    if(is.null(t_stats) | is.null(sizes)){
       stop("The standard t-tests and group sizes need to be supplied in order to apply Tukey-Kramer adjustment.")
     }
     
@@ -97,7 +97,7 @@ p_adjustment_anova <- function(p_values = NULL, diff_mean = NULL, t_stats = NULL
       stop("The `p_values` argument must be supplied to perform the selected `pval_adjust` method")
     }
     
-    if(is.null(dim(p_values))||ncol(p_values)==1){
+    if(is.null(dim(p_values))|ncol(p_values)==1){
       pval_adjust='none'
     }
     

@@ -5,7 +5,7 @@
 #' the mean response (which varies with data type) is the same across groups; this combination is called IMD_ANOVA.  It's probably a good idea
 #' to first filter the data with `imd_anova_filter` to see if there is enough infomration to even do this test.  See Webb-Robertson et al. (2010) for more.
 #'
-#' @param omicsData A mintR data object of any class
+#' @param omicsData A pmartR data object of any class
 #' @param comparisons `data.frame` with columns for "Control" and "Test" containing the different comparisons of interest. Comparisons will be made between the Test and the corresponding Control  If left NULL, then all pairwise comparisons are executed.
 #' @param pval_adjust character vector specifying the type of multiple comparisons adjustment to implement. The default setting is to not apply an adjustment. Valid options include: holm, bonferonni and none. See \code{\link{p.adjust}} for some details.
 #' @param pval_thresh numeric p-value threshold, below or equal to which peptides are considered differentially expressed. Defaults to 0.05

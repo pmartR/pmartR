@@ -29,18 +29,18 @@ edata_transform <- function(omicsData, data_scale){
   if(!(data_scale %in% c('log2', 'log10', 'log', 'abundance'))) stop(paste(data_scale, " is not a valid option for 'data_scale'. See details of as.pepData for specifics.", sep=""))
 
   # if desired scale is log scale, check to make sure data is not already on log scale #
-  if(attr(omicsData, "data_info")$data_scale == "log2" && data_scale == "log2"){
+  if(attr(omicsData, "data_info")$data_scale == "log2" & data_scale == "log2"){
     stop("Data is already on log2 scale.")
   }
-  if(attr(omicsData, "data_info")$data_scale == "log10" && data_scale == "log10"){
+  if(attr(omicsData, "data_info")$data_scale == "log10" & data_scale == "log10"){
     stop("Data is already on log10 scale.")
   }
-  if(attr(omicsData, "data_info")$data_scale == "log" && data_scale == "log"){
+  if(attr(omicsData, "data_info")$data_scale == "log" & data_scale == "log"){
     stop("Data is already on (natural) log scale.")
   }
 
   # if desired scale is abundance, check to make sure data is not already on abundance scale #
-  if(data_scale=="abundance" && attr(omicsData, "data_info")$data_scale == "abundance"){
+  if(data_scale=="abundance" & attr(omicsData, "data_info")$data_scale == "abundance"){
     stop("Data is already on abundance scale.")
   }
 

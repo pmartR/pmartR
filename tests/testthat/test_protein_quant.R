@@ -1,11 +1,12 @@
 #protein_quant testthat 
 library(testthat)
-library(pmartRqc)
+library(pmartR)
 library(pmartRdata)
 
 data("pep_object")
 data("lipid_object")
 mypepData = edata_transform(pep_object, "log2")
+data("myobject")
 
 zrollup_median = protein_quant(myobject, method = 'zrollup', combine_fn = 'median', single_observation = T)
 zrollup_mean = protein_quant(myobject, method = 'zrollup', combine_fn = 'mean', single_observation = T)

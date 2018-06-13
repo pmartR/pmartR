@@ -50,9 +50,9 @@ test_that("invalid input for facet_cols argument throws error",{
 })
 
 test_that("invalid input for omicsData argument throws error",{  
-  expect_that(pmartRqc:::plot.proData(input), throws_error())   
-  expect_that(pmartRqc:::plot.proData(mat), throws_error()) 
-  expect_that(pmartRqc:::plot.proData(almost_object), throws_error())
+  expect_that(pmartR::plot.proData(input), throws_error())   
+  expect_that(pmartR::plot.proData(mat), throws_error()) 
+  expect_that(pmartR::plot.proData(almost_object), throws_error())
 })
 
 test_that("invalid input for legend_position argument throws error",{  

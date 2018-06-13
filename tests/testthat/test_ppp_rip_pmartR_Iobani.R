@@ -1,12 +1,12 @@
 # testing function for ppp_rip() in subset_funcs.R 
-library(pmartRqc)
+library(pmartR)
 library(testthat)
 library(pmartRdata)
 data("pep_object")
 
 omicsData<- group_designation(omicsData = pep_object, main_effects = "Condition")
 
-result<- pmartRqc:::ppp_rip(e_data = omicsData$e_data, edata_id = attr(omicsData,"cnames")$edata_cname, fdata_id = attr(omicsData,"cnames")$fdata_cname, groupDF = attr(omicsData, "group_DF"))
+result<- pmartR:::ppp_rip(e_data = omicsData$e_data, edata_id = attr(omicsData,"cnames")$edata_cname, fdata_id = attr(omicsData,"cnames")$fdata_cname, groupDF = attr(omicsData, "group_DF"))
 
 e_data = omicsData$e_data
 f_data = omicsData$f_data
@@ -37,40 +37,40 @@ context("input tests for ppp_rip()")
 
 
 test_that("one NULL argument throws an error",{ 
-  expect_that(pmartRqc:::ppp_rip(e_data = NULL, edata_id = edata_id, fdata_id = fdata_id, groupDF = groupDF), throws_error())   
-  expect_that(pmartRqc:::ppp_rip(e_data = e_data, edata_id = NULL, fdata_id = fdata_id, groupDF = groupDF), throws_error())
-  expect_that(pmartRqc:::ppp_rip(e_data = e_data, edata_id = edata_id, fdata_id = NULL, groupDF = groupDF), throws_error())
-  expect_that(pmartRqc:::ppp_rip(e_data = e_data, edata_id = edata_id, fdata_id = fdata_id, groupDF = NULL), throws_error())
+  expect_that(pmartR:::ppp_rip(e_data = NULL, edata_id = edata_id, fdata_id = fdata_id, groupDF = groupDF), throws_error())   
+  expect_that(pmartR:::ppp_rip(e_data = e_data, edata_id = NULL, fdata_id = fdata_id, groupDF = groupDF), throws_error())
+  expect_that(pmartR:::ppp_rip(e_data = e_data, edata_id = edata_id, fdata_id = NULL, groupDF = groupDF), throws_error())
+  expect_that(pmartR:::ppp_rip(e_data = e_data, edata_id = edata_id, fdata_id = fdata_id, groupDF = NULL), throws_error())
 })
 
 test_that("invalid input for e_data argument throws error",{      
-  expect_that(pmartRqc:::ppp_rip(e_data = c(1,2,3),edata_id = edata_id, fdata_id = fdata_id, groupDF = groupDF), throws_error())
-  expect_that(pmartRqc:::ppp_rip(e_data = 11, edata_id = edata_id, fdata_id = fdata_id, groupDF = groupDF), throws_error())
-  expect_that(pmartRqc:::ppp_rip(e_data = mat, edata_id = edata_id, fdata_id = fdata_id, groupDF = groupDF), throws_error())
+  expect_that(pmartR:::ppp_rip(e_data = c(1,2,3),edata_id = edata_id, fdata_id = fdata_id, groupDF = groupDF), throws_error())
+  expect_that(pmartR:::ppp_rip(e_data = 11, edata_id = edata_id, fdata_id = fdata_id, groupDF = groupDF), throws_error())
+  expect_that(pmartR:::ppp_rip(e_data = mat, edata_id = edata_id, fdata_id = fdata_id, groupDF = groupDF), throws_error())
 })
 
 test_that("invalid input for edata_id argument throws error",{     
-  expect_that(pmartRqc:::ppp_rip(e_data = e_data, edata_id = "mass_tag_id", fdata_id = fdata_id, groupDF = groupDF), throws_error())   
-  expect_that(pmartRqc:::ppp_rip(e_data = e_data, edata_id = "abcdefg", fdata_id = fdata_id, groupDF = groupDF), throws_error())
+  expect_that(pmartR:::ppp_rip(e_data = e_data, edata_id = "mass_tag_id", fdata_id = fdata_id, groupDF = groupDF), throws_error())   
+  expect_that(pmartR:::ppp_rip(e_data = e_data, edata_id = "abcdefg", fdata_id = fdata_id, groupDF = groupDF), throws_error())
 })
 
 test_that("invalid input for fdata_id argument throws error",{     
-  expect_that(pmartRqc:::ppp_rip(e_data = e_data, edata_id = edata_id, fdata_id = "sampleid", groupDF = groupDF), throws_error())   
-  expect_that(pmartRqc:::ppp_rip(e_data = e_data, edata_id = edata_id, fdata_id = "abcdefg", groupDF = groupDF), throws_error())
+  expect_that(pmartR:::ppp_rip(e_data = e_data, edata_id = edata_id, fdata_id = "sampleid", groupDF = groupDF), throws_error())   
+  expect_that(pmartR:::ppp_rip(e_data = e_data, edata_id = edata_id, fdata_id = "abcdefg", groupDF = groupDF), throws_error())
 })
 
 test_that("invalid input for alpha argument throws error",{
-  expect_that(pmartRqc:::ppp_rip(e_data = e_data, edata_id = edata_id, fdata_id = fdata_id, groupDF = groupDF, alpha = 50), throws_error())
- # expect_that(pmartRqc:::ppp_rip(e_data = e_data, edata_id = edata_id, fdata_id = fdata_id, groupDF = groupDF, alpha = -50), throws_error())   
-  expect_that(pmartRqc:::ppp_rip(e_data = e_data, edata_id = edata_id, fdata_id = fdata_id, groupDF = groupDF, alpha = "three"), throws_error()) 
- # expect_that(pmartRqc:::ppp_rip(e_data = e_data, edata_id = edata_id, fdata_id = fdata_id, groupDF = groupDF, alpha = c(.1,.2)), throws_error()) 
+  expect_that(pmartR:::ppp_rip(e_data = e_data, edata_id = edata_id, fdata_id = fdata_id, groupDF = groupDF, alpha = 50), throws_error())
+ # expect_that(pmartR:::ppp_rip(e_data = e_data, edata_id = edata_id, fdata_id = fdata_id, groupDF = groupDF, alpha = -50), throws_error())   
+  expect_that(pmartR:::ppp_rip(e_data = e_data, edata_id = edata_id, fdata_id = fdata_id, groupDF = groupDF, alpha = "three"), throws_error()) 
+ # expect_that(pmartR:::ppp_rip(e_data = e_data, edata_id = edata_id, fdata_id = fdata_id, groupDF = groupDF, alpha = c(.1,.2)), throws_error()) 
 })
 
 test_that("invalid input for proportion argument throws error",{    
-  expect_that(pmartRqc:::ppp_rip(e_data = e_data, edata_id = edata_id, fdata_id = fdata_id, groupDF = groupDF, proportion = 50), throws_error()) 
-  #expect_that(pmartRqc:::ppp_rip(e_data = e_data, edata_id = edata_id, fdata_id = fdata_id, groupDF = groupDF, proportion = -50), throws_error())   
-  expect_that(pmartRqc:::ppp_rip(e_data = e_data, edata_id = edata_id, fdata_id = fdata_id, groupDF = groupDF, proportion = "one"), throws_error())  
-  #expect_that(pmartRqc:::ppp_rip(e_data = e_data, edata_id = edata_id, fdata_id = fdata_id, groupDF = groupDF, proportion = c(.1,.2)), throws_error())                  
+  expect_that(pmartR:::ppp_rip(e_data = e_data, edata_id = edata_id, fdata_id = fdata_id, groupDF = groupDF, proportion = 50), throws_error()) 
+  #expect_that(pmartR:::ppp_rip(e_data = e_data, edata_id = edata_id, fdata_id = fdata_id, groupDF = groupDF, proportion = -50), throws_error())   
+  expect_that(pmartR:::ppp_rip(e_data = e_data, edata_id = edata_id, fdata_id = fdata_id, groupDF = groupDF, proportion = "one"), throws_error())  
+  #expect_that(pmartR:::ppp_rip(e_data = e_data, edata_id = edata_id, fdata_id = fdata_id, groupDF = groupDF, proportion = c(.1,.2)), throws_error())                  
 })
   
   

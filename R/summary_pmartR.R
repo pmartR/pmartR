@@ -283,7 +283,7 @@ summary.dimRes <- function(dimRes_object){
 
 #'@export
 #'@rdname summary-pmartR
-#'@name summary-mint
+#'@name summary-pmartR
 #'@param min_num an integer value specifying the minimum number of times each feature must be observed across all samples. Default value is 2.
 summary.moleculeFilt <- function(filter_object, min_num=NULL){
 
@@ -501,7 +501,7 @@ summary.imdanovaFilt <- function(filter_object, min_nonmiss_anova=NULL, min_nonm
 
 
   #if-statement for the case where both min_nonmiss_anova and min_nonmiss_gtest are non-NULL. Note: num_not_tested will be the count of (inds_rm_anova + inds_rm_gtest) that sum to 2. That is the intersection of both filters. 
-  if(!is.null(min_nonmiss_anova) && !is.null(min_nonmiss_gtest)){
+  if(!is.null(min_nonmiss_anova) & !is.null(min_nonmiss_gtest)){
     # get number molecules not tested
     num_not_tested <- sum((inds_rm_anova + inds_rm_gtest) > 1)
 
@@ -510,7 +510,7 @@ summary.imdanovaFilt <- function(filter_object, min_nonmiss_anova=NULL, min_nonm
 
   }
   
-  else if(!is.null(min_nonmiss_anova) || !is.null(min_nonmiss_gtest)){
+  else if(!is.null(min_nonmiss_anova) | !is.null(min_nonmiss_gtest)){
     # get number molecules not tested
     num_not_tested <- sum((inds_rm_anova + inds_rm_gtest) > 0)
     
@@ -644,7 +644,7 @@ summary.customFilt <- function(filter_object){
   summary_filt <- summary(filtered_data)
   
   #if filter_object contains removes
-  if(!is.null(filter_object$e_data_remove)||!is.null(filter_object$f_data_remove)||!is.null(filter_object$e_meta_remove))
+  if(!is.null(filter_object$e_data_remove)|!is.null(filter_object$f_data_remove)|!is.null(filter_object$e_meta_remove))
   {
     # samples #
     num_samples <- attributes(filter_object)$num_samples
@@ -695,7 +695,7 @@ summary.customFilt <- function(filter_object){
   }
   
   #if filter_object contains keeps
-  if(!is.null(filter_object$e_data_keep)||!is.null(filter_object$f_data_keep)||!is.null(filter_object$e_meta_keep))
+  if(!is.null(filter_object$e_data_keep)|!is.null(filter_object$f_data_keep)|!is.null(filter_object$e_meta_keep))
   {
     # samples #
     num_samples <- attributes(filter_object)$num_samples

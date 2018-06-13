@@ -58,7 +58,7 @@
 #' @export
 applyFilt <- function(filter_object, omicsData, ...){
 
-  # check that omicsData is of mintR S3 class#
+  # check that omicsData is of pmartR S3 class#
   if(!inherits(omicsData, c("pepData", "proData", "lipidData", "metabData"))) stop("omicsData must be of class 'pepData', 'proData', 'lipidData', or 'metabData'")
 
   # check that filter_object is of an appropriate class#
@@ -660,7 +660,7 @@ applyFilt.customFilt <- function(filter_object, omicsData){
   emeta_cname <- attributes(omicsData)$cnames$emeta_cname
 
   # if filter_object contains 'removes' #
-  if(!is.null(filter_object$e_data_remove)||!is.null(filter_object$f_data_remove)||!is.null(filter_object$e_meta_remove)){
+  if(!is.null(filter_object$e_data_remove)|!is.null(filter_object$f_data_remove)|!is.null(filter_object$e_meta_remove)){
     
     filter_object_new = list(edata_filt = filter_object$e_data_remove, emeta_filt = filter_object$e_meta_remove, samples_filt = filter_object$f_data_remove)
     
@@ -811,7 +811,7 @@ pmartR_filter_worker <- function(filter_object, omicsData){
   temp.emeta <- omicsData$e_meta
   
   #check if filter object contains remove arguments
-  if(!is.null(filter_object$edata_filt)||!is.null(filter_object$emeta_filt)||!is.null(filter_object$samples_filt)){
+  if(!is.null(filter_object$edata_filt)|!is.null(filter_object$emeta_filt)|!is.null(filter_object$samples_filt)){
     
     # remove any samples from f_data and e_data #
     if(!is.null(filter_object$samples_filt)){
@@ -866,7 +866,7 @@ pmartR_filter_worker <- function(filter_object, omicsData){
       temp.edata <- temp.edata[inds, ]
       
       # if e_meta is present and we aren't explicitly specifying to keep anything in it, also keep these e_data molecules in e_meta #
-      if(!is.null(temp.emeta) && is.null(filter_object$emeta_keep)){
+      if(!is.null(temp.emeta) & is.null(filter_object$emeta_keep)){
         inds <- which(temp.emeta[ , which(names(temp.emeta) == edata_cname)] %in% filter_object$edata_keep)
         temp.emeta <- temp.emeta[inds, ]
       }

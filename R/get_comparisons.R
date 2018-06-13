@@ -3,7 +3,7 @@
 #' The method creates a data.frame containing the comparisons to be made using differential statistics.  
 #'  
 #' @param comp_type string taking one of the following values: control, pairwise, custom. Specifying "control" indicates that all other groups are to be compared to this single control group. Specifying "pairwise" indicates that all pairwise comparisons are to be made. 
-#' @param omicsData A mintR data object of any class, which has a `group_df` attribute that is usually created by the `group_designation()` function
+#' @param omicsData A pmartR data object of any class, which has a `group_df` attribute that is usually created by the `group_designation()` function
 #' @param control_group string indicating the group to use for the control group. Only required when comp_type="control".
 #'
 #' @details This function takes in the omicsData and type of comparison, and returns a data.frame where each row corresponds to a comparison of interest.

@@ -34,7 +34,7 @@
 #' library(pmartRdata)
 #' data(lipid_object)
 #' lipid_object2 <- group_designation(omicsData = lipid_object, main_effects = "Condition")
-#' lipid_subset <- los(e_data = lipid_object2$e_data, edata_id = attr(lipid_object2, "cnames")$edata_cname, mintR_groupDF = attr(lipid_object2, "group_DF"))
+#' lipid_subset <- los(e_data = lipid_object2$e_data, edata_id = attr(lipid_object2, "cnames")$edata_cname, pmartR_groupDF = attr(lipid_object2, "group_DF"))
 #' lipids_mad <- mad_transform(e_data = lipid_object2$e_data, edata_id = attr(lipid_object, "cnames")$edata_cname, feature_subset = lipid_subset, backtransform = TRUE)
 #'}
 #' @author Lisa Bramer, Kelly Stratton
@@ -79,10 +79,10 @@ mad_transform <- function(e_data, edata_id, feature_subset, backtransform=FALSE,
 
     ret_res = list(norm_params = list(scale = scale_param, location = location_param), backtransform_params = list(scale = pooled.mad, location = glob.median), transf_data = norm_data)
 
-    if(any(is.na(location_param)) || any(is.na(scale_param))) stop("One or more of the location or scale parameters to use for MAD normalization is NA. Cannot proceed.")
+    if(any(is.na(location_param)) | any(is.na(scale_param))) stop("One or more of the location or scale parameters to use for MAD normalization is NA. Cannot proceed.")
 
     if(backtransform==TRUE){
-      if(any(is.na(pooled.mad)) || any(is.na(glob.median))) stop("One or more of the location or scale parameters to use for backtransform of the MAD normalization is NA. Cannot proceed.")
+      if(any(is.na(pooled.mad)) | any(is.na(glob.median))) stop("One or more of the location or scale parameters to use for backtransform of the MAD normalization is NA. Cannot proceed.")
     }
 
   }
@@ -128,7 +128,7 @@ mad_transform <- function(e_data, edata_id, feature_subset, backtransform=FALSE,
 #' library(pmartRdata)
 #' data(lipid_object)
 #' lipid_object2 <- group_designation(omicsData = lipid_object, main_effects = "Condition")
-#' lipid_subset <- los(e_data = lipid_object2$e_data, edata_id = attr(lipid_object2, "cnames")$edata_cname, mintR_groupDF = attr(lipid_object2, "group_DF"))
+#' lipid_subset <- los(e_data = lipid_object2$e_data, edata_id = attr(lipid_object2, "cnames")$edata_cname, pmartR_groupDF = attr(lipid_object2, "group_DF"))
 #' lipids_median <- median_center(e_data = lipid_object2$e_data, edata_id = attr(lipid_object, "cnames")$edata_cname, feature_subset = lipid_subset, backtransform = TRUE)
 #' }
 #'
@@ -339,10 +339,10 @@ zscore_transform <- function(e_data, edata_id, feature_subset, backtransform=FAL
       names(norm_data)[1] <- edata_id
       ret_res = list(norm_params = list(scale = scale_param, location = location_param), backtransform_params = list(scale = pooled_sd, location = glob_mean), transf_data = norm_data)
 
-      if(any(is.na(location_param)) || any(is.na(scale_param))) stop("One or more of the location or scale parameters to use for z-score normalization is NA. Cannot proceed.")
+      if(any(is.na(location_param)) | any(is.na(scale_param))) stop("One or more of the location or scale parameters to use for z-score normalization is NA. Cannot proceed.")
 
       if(backtransform==TRUE){
-        if(any(is.na(pooled_sd)) || any(is.na(glob_mean))) stop("One or more of the location or scale parameters to use for backtransform of the z-score normalization is NA. Cannot proceed.")
+        if(any(is.na(pooled_sd)) | any(is.na(glob_mean))) stop("One or more of the location or scale parameters to use for backtransform of the z-score normalization is NA. Cannot proceed.")
       }
 
     }

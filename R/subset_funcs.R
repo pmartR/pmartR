@@ -54,7 +54,7 @@ all_subset <- function(e_data, edata_id){
 #' library(pmartRdata)
 #' data(pep_pepData)
 #' pep_pepData2 <- group_designation(omicsData = pep_pepData, main_effects = "Condition")
-#' pep_subset <- los(e_data = pep_pepData2$e_data, edata_id = attr(pep_pepData2, "cnames")$edata_cname, mintR_groupDF = attr(pep_pepData2, "group_DF"))
+#' pep_subset <- los(e_data = pep_pepData2$e_data, edata_id = attr(pep_pepData2, "cnames")$edata_cname, pmartR_groupDF = attr(pep_pepData2, "group_DF"))
 #' }
 #'
 #' @author Kelly Stratton, Lisa Bramer
@@ -173,7 +173,7 @@ ppp <- function(e_data, edata_id, proportion=0.5){
 #' library(pmartRdata)
 #' data(pep_pepData)
 #' pep_pepData2 <- group_designation(omicsData = pep_pepData, main_effects = "Condition")
-#' pep_subset <- ppp_rip(e_data = pep_pepData2$e_data, edata_id = attr(pep_pepData2, "cnames")$edata_cname, samp_id = attr(pep_pepData2, "cnames")$fdata_cname, mintR_groupDF = attr(pep_pepData2, "group_DF"))
+#' pep_subset <- ppp_rip(e_data = pep_pepData2$e_data, edata_id = attr(pep_pepData2, "cnames")$edata_cname, samp_id = attr(pep_pepData2, "cnames")$fdata_cname, pmartR_groupDF = attr(pep_pepData2, "group_DF"))
 #'}
 #'
 #' @author Kelly Stratton
@@ -259,7 +259,7 @@ ppp_rip <- function(e_data, edata_id, fdata_id, groupDF, alpha=0.2, proportion=0
 #' library(pmartRdata)
 #' data(pep_pepData)
 #' pep_pepData2 <- group_designation(omicsData = pep_pepData, main_effects = "Condition")
-#' pep_subset <- rip(e_data = pep_pepData2$e_data, edata_id = attr(pep_pepData2, "cnames")$edata_cname, mintR_groupDF = attr(pep_pepData2, "group_DF"))
+#' pep_subset <- rip(e_data = pep_pepData2$e_data, edata_id = attr(pep_pepData2, "cnames")$edata_cname, pmartR_groupDF = attr(pep_pepData2, "group_DF"))
 #'}
 #'
 #' @author Kelly Stratton
