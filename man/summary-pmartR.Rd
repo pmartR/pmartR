@@ -13,7 +13,7 @@
 \alias{summary.corRes}
 \alias{summary-pmartR}
 \alias{summary.dimRes}
-\alias{summary-mint}
+\alias{summary-pmartR}
 \alias{summary.moleculeFilt}
 \alias{summary-pmartR}
 \alias{summary.proteomicsFilt}

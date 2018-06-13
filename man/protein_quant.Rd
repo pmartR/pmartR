@@ -11,7 +11,7 @@ protein_quant(pepData, method, isoformRes = NULL, qrollup_thresh = NULL,
 \arguments{
 \item{pepData}{an omicsData object of the class 'pepData'.}
 
-\item{method}{is one of four protein quantitation methods, 'rollup', 'rrollup', 'qrollup' and 'zrollup'. When 'rollup' is selected, combine_fn must also be provided and will determine whether pquant_mean or pquant_median function will be used.}
+\item{method}{is one of four protein quantification methods, 'rollup', 'rrollup', 'qrollup' and 'zrollup'. When 'rollup' is selected, combine_fn must also be provided and will determine whether pquant_mean or pquant_median function will be used.}
 
 \item{isoformRes}{is a list of data frames, the result of applying the 'bpquant_loop' function to original pepData object. Defaults to NULL.}
 
@@ -29,7 +29,7 @@ protein_quant(pepData, method, isoformRes = NULL, qrollup_thresh = NULL,
 an omicsData object of the class 'proData'
 }
 \description{
-This function takes in a pepData object, method (quantitation method, mean, median or rrollup), and the optional argument isoformRes (defaults to NULL). An object of the class 'proData' is returned.
+This function takes in a pepData object, method (quantification method, mean, median or rrollup), and the optional argument isoformRes (defaults to NULL). An object of the class 'proData' is returned.
 }
 \details{
 If isoformRes is provided then, a temporary pepData object is formed using the isoformRes information as the e_meta component and the original pepData object will be used for e_data and f_data components. The emeta_cname for the temporary pepData object will be the 'protein_isoform' column of isoformRes. Then one of the three 'method' functions can be applied to the temporary pepData object to return a proData object. If isofromRes is left NULL, then depending on the input for 'method', the correct 'method' function is applied directly to the input pepData object and a proData object is returned.

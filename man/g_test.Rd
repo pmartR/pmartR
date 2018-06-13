@@ -7,7 +7,7 @@
 g_test(omicsData, return_sizes = FALSE)
 }
 \arguments{
-\item{omicsData}{A mintR data object of any class}
+\item{omicsData}{A pmartR data object of any class}
 
 \item{return_sizes}{Logical, should the group sizes be returned as well?  If true, a separate data.frame containing the group sizes is returned}
 }
@@ -21,7 +21,7 @@ qualitative difference).  For count data, this is used to test if the number of 
 }
 \examples{
 library(mintJansson)
-rRNA_data <- mintR::group_designation(omicsData = rRNA_data, main_effects = c("site","treatment"))
+rRNA_data <- pmartR::group_designation(omicsData = rRNA_data, main_effects = c("site","treatment"))
 group_df <- attr(rRNA_data, "group_DF")
 #This is will return a lot of errors because the peptides with too few data haven't 
 #been filtered out yet

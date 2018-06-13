@@ -9,7 +9,7 @@ imd_anova(omicsData, comparisons = NULL, test_method, pval_adjust = "none",
   equal_var = TRUE)
 }
 \arguments{
-\item{omicsData}{A mintR data object of any class, which has a `group_df` attribute that is usually created by the `group_designation()` function}
+\item{omicsData}{A pmartR data object of any class, which has a `group_df` attribute that is usually created by the `group_designation()` function}
 
 \item{comparisons}{data.frame with columns for "Control" and "Test" containing the different comparisons of interest. Comparisons will be made between the Test and the corresponding Control  If left NULL, then all pairwise comparisons are executed.}
 

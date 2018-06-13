@@ -7,7 +7,7 @@
 summary_km(omicsData, percent = NULL, ...)
 }
 \arguments{
-\item{omicsData}{A mintR data object of any class, which has a `group_df` attribute that is usually created by the `group_designation()` function}
+\item{omicsData}{A pmartR data object of any class, which has a `group_df` attribute that is usually created by the `group_designation()` function}
 
 \item{percent}{The percentile}
 }

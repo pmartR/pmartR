@@ -33,7 +33,7 @@ Features present across \code{proportion} samples are subjected to a Kruskal-Wal
 library(pmartRdata)
 data(pep_pepData)
 pep_pepData2 <- group_designation(omicsData = pep_pepData, main_effects = "Condition")
-pep_subset <- ppp_rip(e_data = pep_pepData2$e_data, edata_id = attr(pep_pepData2, "cnames")$edata_cname, samp_id = attr(pep_pepData2, "cnames")$fdata_cname, mintR_groupDF = attr(pep_pepData2, "group_DF"))
+pep_subset <- ppp_rip(e_data = pep_pepData2$e_data, edata_id = attr(pep_pepData2, "cnames")$edata_cname, samp_id = attr(pep_pepData2, "cnames")$fdata_cname, pmartR_groupDF = attr(pep_pepData2, "group_DF"))
 }
 
 }

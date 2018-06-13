@@ -7,7 +7,7 @@
 fit_surv(omicsData, ...)
 }
 \arguments{
-\item{omicsData}{A mintR data object of any class, which has a `group_df` attribute that is usually created by the `group_designation()` function}
+\item{omicsData}{A pmartR data object of any class, which has a `group_df` attribute that is usually created by the `group_designation()` function}
 }
 \value{
 if fitted survival analysis object is returned

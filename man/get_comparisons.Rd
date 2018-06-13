@@ -14,7 +14,7 @@ get_comparisons(statRes)
 
 \item{comp_type}{string taking one of the following values: control, pairwise, custom. Specifying "control" indicates that all other groups are to be compared to this single control group. Specifying "pairwise" indicates that all pairwise comparisons are to be made.}
 
-\item{omicsData}{A mintR data object of any class, which has a `group_df` attribute that is usually created by the `group_designation()` function}
+\item{omicsData}{A pmartR data object of any class, which has a `group_df` attribute that is usually created by the `group_designation()` function}
 
 \item{control_group}{string indicating the group to use for the control group. Only required when comp_type="control".}
 }

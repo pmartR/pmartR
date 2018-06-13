@@ -10,7 +10,7 @@ statRes_output(imd_out, omicsData, comparisons, test_method, pval_adjust,
 \arguments{
 \item{imd_out}{Data.frame containing the results of the imd anova call}
 
-\item{omicsData}{A mintR data object of any class, which has a `group_df` attribute that is usually created by the `group_designation()` function}
+\item{omicsData}{A pmartR data object of any class, which has a `group_df` attribute that is usually created by the `group_designation()` function}
 
 \item{comparisons}{the comparisons made}
 
