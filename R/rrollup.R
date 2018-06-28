@@ -56,7 +56,7 @@ rrollup<- function(pepData, combine_fn = "median", parallel = TRUE){
     final_list<- vector("list", length(unique_proteins))
     
     suppressMessages(suppressPackageStartupMessages({
-      library(doParallel)
+      library(parallel)
     })
     )
     cores<- detectCores()
