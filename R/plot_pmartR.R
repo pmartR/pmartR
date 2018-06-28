@@ -275,14 +275,14 @@ plot.proteomicsFilt <- function(filter_object, min_num_peps = NULL, degen_peps =
   
   suppressMessages({
     # get counts
-    pep_counts <- filter_object$counts_by_pep$n
-    pro_counts <- filter_object$counts_by_pro$n
+    pep_counts <- filter_object$counts_by_pro$n
+    pro_counts <- filter_object$counts_by_pep$n
     
     # peptides plot
     ## make labels ##
-    xlabel_pep <- ifelse(is.null(x_lab_pep), "Number of Peptides", x_lab_pep)
-    ylabel_pep <- ifelse(is.null(y_lab_pep), "Number of Proteins", y_lab_pep)
-    plot_title_pep <- ifelse(is.null(title.pep), "Number of Peptides \nPer Protein", title.pep)
+    xlabel_pep <- ifelse(is.null(x_lab_pep), "Number of Peptides \nMapping to a Protein", x_lab_pep)
+    ylabel_pep <- ifelse(is.null(y_lab_pep), "Count \n(number of proteins)", y_lab_pep)
+    plot_title_pep <- ifelse(is.null(title.pep), "Number of Peptides \nMapping to a Protein", title.pep)
     
     ## plot histogram
     if(bw_theme==FALSE){
@@ -317,14 +317,14 @@ plot.proteomicsFilt <- function(filter_object, min_num_peps = NULL, degen_peps =
     
     # proteins plot
     ## make labels ##
-    xlabel_pro <- ifelse(is.null(x_lab_pro), "Number of Proteins", x_lab_pro)
-    ylabel_pro <- ifelse(is.null(y_lab_pro), "Number of Peptides", y_lab_pro)
-    plot_title_pro <- ifelse(is.null(title.pro), "Number of Proteins \nPer Peptide", title.pro)
+    xlabel_pro <- ifelse(is.null(x_lab_pro), "Number of Proteins \nMapped to by each Peptide", x_lab_pro)
+    ylabel_pro <- ifelse(is.null(y_lab_pro), "Count \n(number of peptides)", y_lab_pro)
+    plot_title_pro <- ifelse(is.null(title.pro), "Number of Proteins \nMapped to by each Peptide", title.pro)
     
     ## plot histogram
     if(bw_theme == FALSE){
       p2 <- ggplot2::ggplot(as.data.frame(pro_counts), ggplot2::aes(x=pro_counts)) +
-        ggplot2::geom_histogram(fill="springgreen4", binwidth = 1) +
+        ggplot2::geom_histogram(fill="springgreen4", binwidth = .5) +
         ggplot2::ggtitle(plot_title_pro) +
         ggplot2::xlab(xlabel_pro) +
         ggplot2::ylab(ylabel_pro) +
