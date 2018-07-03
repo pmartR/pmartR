@@ -61,7 +61,7 @@ qrollup<- function(pepData, qrollup_thresh, combine_fn = "median", parallel = TR
     final_list<- vector("list", length(unique_proteins))
     
     suppressMessages(suppressPackageStartupMessages({
-      library(doParallel)
+      library(parallel)
     })
     )
     cores<- detectCores()
