@@ -503,27 +503,27 @@ summary.imdanovaFilt <- function(filter_object, min_nonmiss_anova=NULL, min_nonm
   #if-statement for the case where both min_nonmiss_anova and min_nonmiss_gtest are non-NULL. Note: num_not_tested will be the count of (inds_rm_anova + inds_rm_gtest) that sum to 2. That is the intersection of both filters. 
   if(!is.null(min_nonmiss_anova) & !is.null(min_nonmiss_gtest)){
     # get number molecules not tested
-    num_not_tested <- sum((inds_rm_anova + inds_rm_gtest) > 1)
+    num_filtered <- sum((inds_rm_anova + inds_rm_gtest) > 1)
 
     # get number molecules tested
-    num_tested <- nrow(filter_object) - num_not_tested
+    num_not_filtered <- nrow(filter_object) - num_filtered
 
   }
   
   else if(!is.null(min_nonmiss_anova) | !is.null(min_nonmiss_gtest)){
     # get number molecules not tested
-    num_not_tested <- sum((inds_rm_anova + inds_rm_gtest) > 0)
+    num_filtered <- sum((inds_rm_anova + inds_rm_gtest) > 0)
     
     # get number molecules tested
-    num_tested <- nrow(filter_object) - num_not_tested
+    num_not_filtered <- nrow(filter_object) - num_filtered
     
   }
   else{
-    num_tested = NULL
-    num_not_tested = NULL
+    num_not_filtered = NULL
+    num_filtered = NULL
   }
 
-  res <- list(pep_observation_counts = nrow(filter_object), num_not_tested = num_not_tested, num_tested = num_tested)
+  res <- list(pep_observation_counts = nrow(filter_object), num_filtered = num_filtered, num_not_filtered = num_not_filtered)
 
   # create output #
   catmat <- data.frame(sapply(res, function(x) ifelse(is.null(x),"NULL",x)))
