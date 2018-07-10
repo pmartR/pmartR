@@ -1315,7 +1315,7 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     else if(attr(omicsData, "data_info")$data_scale == 'log'){
       ylabel<- "ln Abundance"
     }else ylabel <- paste(attr(omicsData, "data_info")$data_scale, "Abundance", sep = " ")
-  }
+  }else{ylabel = y_lab}
   legend_title <- color_by
   if(!is.null(legend_lab)) legend_title <- legend_lab
   
