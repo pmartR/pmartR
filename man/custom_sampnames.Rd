@@ -4,15 +4,13 @@
 \alias{custom_sampnames}
 \title{Creates custom sample names for plots}
 \usage{
-custom_sampnames(omicsData, sample_names = "option1", firstx = NULL,
-  from = NULL, to = NULL, delim = NULL, components = NULL)
+custom_sampnames(omicsData, firstn = NULL, from = NULL, to = NULL,
+  delim = NULL, components = NULL)
 }
 \arguments{
 \item{omicsData}{omicsData an object of the class 'pepData', 'proData', 'metabData', or 'lipidData', usually created by \code{pepData}, \code{proData}, \code{metabData}, or \code{lipidData}, respectively.}
 
-\item{sample_names}{is an optional argument that has three options for creating custom sample names, 'option1', 'option2','option3'. 'option1' takes the first n characters of each sample name to be the new sample names. Requires 'firstx' argument to be input. 'option2' takes a range of characters from each sample name to be the new sample names. Requires 'from' and 'to' arguments be input. 'option3' takes components separated by a delimiter in each sample name to be the new sample names. Requires 'delim' and 'components' arguments be input.}
-
-\item{firstx}{is an integer specifying the first n characters to keep as the sample name}
+\item{firstn}{is an integer specifying the first n characters to keep as the sample name}
 
 \item{from}{is an integer specifying the start of the range of characters to keep as the sample name}
 
@@ -30,12 +28,8 @@ This helper function creates custom sample names for plot data object function
 }
 \examples{
 dontrun{
-library(pmartR)
-library(pmartRdata)
 data(pep_object)
-results = custom_sampnames(pep_object, sample_names = "option1", firstx = 5)
-
+results = custom_sampnames(pep_object, firstn = 5)
 } 
-
 
 }

@@ -11,9 +11,13 @@
 #' 
 #' @details 
 #' 
-#' @examples 
+#' @examples
+#' dontrun{
+#' data(pep_object)
+#' results = custom_sampnames(pep_object, firstn = 5)
+#' } 
 #' 
-#' 
+#' @export
 
 custom_sampnames = function(omicsData, firstn = NULL, from = NULL, to = NULL, delim = NULL, components = NULL){
   #extract sample names from omicsData object
