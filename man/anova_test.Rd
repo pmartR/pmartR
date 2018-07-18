@@ -57,7 +57,7 @@ mypepData <- edata_transform(omicsData = pep_object, data_scale = "log2")
 mypepData <- group_designation(omicsData = mypepData, main_effects = c("Condition"))
 
 #Try running anova_test without filtering, should get warning because the data haven't been filtered yet
-anova_res <- anova_test(omicsData = mypepData) ## FIX: This gives an error:  Error in group_comparison_anova_cpp(means, sizes, sigma2, Cmat) : copy into submatrix: incompatible matrix dimensions: 1x1 and 1x2 
+anova_res <- anova_test(omicsData = mypepData) 
 
 #Now filter and run again
 imdanova_Filt <- imdanova_filter(omicsData = mypepData)
@@ -80,11 +80,11 @@ tcga_ovarian_pepdata_bp <- group_designation(omicsData = tcga_ovarian_pepdata_bp
 tcga_ovarian_pepdata_bp <- edata_transform(tcga_ovarian_pepdata_bp, "log2")
 imdanova_Filt <- imdanova_filter(omicsData = tcga_ovarian_pepdata_bp)
 tcga_ovarian_pepdata_bp <- applyFilt(filter_object = imdanova_Filt, omicsData = tcga_ovarian_pepdata_bp, min_nonmiss_anova=2)
-ovarian_res <- anova_test(omicsData = tcga_ovarian_pepdata_bp) # FIX: added filtering but this one still does not work (same error as above)
+ovarian_res <- anova_test(omicsData = tcga_ovarian_pepdata_bp) 
 #Tukey adjustment is super slow right now because "ptukey" is super slow, not sure how to fix that
-ovarian_res_tukey <- anova_test(omicsData = tcga_ovarian_pepdata_bp, pval_adjust = 'tukey') # FIX: added filtering but this one still does not work (same error as above)
+ovarian_res_tukey <- anova_test(omicsData = tcga_ovarian_pepdata_bp, pval_adjust = 'tukey') 
 #Dunnett adjustment, super slow because mvtnorm::pmvt is super slow
-ovarian_res_dunnett <- anova_test(omicsData = tcga_ovarian_pepdata_bp, pval_adjust = 'dunnett') # FIX: added filtering but this one still does not work (same error as above)
+ovarian_res_dunnett <- anova_test(omicsData = tcga_ovarian_pepdata_bp, pval_adjust = 'dunnett') 
 
 #Test really big dataset, two factors, all pairwise comparisons
 tcga_ovarian_pepdata_bp <- group_designation(omicsData = tcga_ovarian_pepdata_bp, main_effects = c("vital_status","neoplasm_histologic_grade"))

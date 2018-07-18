@@ -29,7 +29,7 @@ pep_object$f_data$Condition3 <- c(rep("Plus",6), rep("Minus",6))
 ```
 ## Introduction
 
-The `pmartR` package includes functions to analyze omics data using the most recent statistical methods.  Qualitative and quantitative differences in abundance data are tested using the IMD-ANOVA method described in @webb2010combined.  Our IMD-ANOVA functionality can handle any type of omics dataset including up to two grouping factors with our without additional covariate information.  The data can be paired or not.  One could also perform a survival analysis of omics data.
+The `pmartR` package includes functions to analyze omics data using the most recent statistical methods.  Qualitative and quantitative differences in abundance data are tested using the IMD-ANOVA method described in @webb2010combined.  Our IMD-ANOVA functionality can handle any type of omics dataset including up to two grouping factors with or without additional covariate information. The data can be paired or not. One could also perform a survival analysis of omics data.
 
 The functionality of the `pmartR` package will be illustrated with peptide data available from the `pmartRdata` package called `pep_object`.  In a nut shell, the `pep_object` object is a list of length three of the class `pepData`.  The `e_data` element contains all of the peptide abundance data on the log base two scale, the `f_data` object contains sample information and the `e_meta` object contains meta information related to the peptides in the dataset.  See the `?pmartRdata` for more on this data set.  
 
@@ -130,7 +130,7 @@ Several methods are defined for objects of class `statRes` including `summary()`
 
 ## Test for Independence of Missing Data
 
-In the event that there aren't enough data to test for a qualitative difference in abundance between groups, one could still test for a *qualitative* difference in groups using the independence of missing data (IMD) test.  This is often the case for proteomics data where several peptide or proteins could have missing data for one of several reasons.  The idea is to assess if there are more missing data in one group compared to another.  If there are an adequate number of non-missing data available, then the $chi^2$ test of independence can be used.  This assumption often fails, however, so a modified version of the $chi^2$ test, called the $G$-test, should be used.
+In the event that there aren't enough data to test for a quantitative difference in abundance between groups, one could still test for a *qualitative* difference in groups using the independence of missing data (IMD) test.  This is often the case for proteomics data where several peptide or proteins could have missing data for one of several reasons.  The idea is to assess if there are more missing data in one group compared to another.  If there are an adequate number of non-missing data available, then the $chi^2$ test of independence can be used.  This assumption often fails, however, so a modified version of the $chi^2$ test, called the $G$-test, should be used.
 
 The test statistic associated with the IMD test for each biomolecule is given by
 \begin{equation}

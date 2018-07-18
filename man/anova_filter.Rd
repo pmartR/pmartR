@@ -26,6 +26,7 @@ This function filters biomolecules that do not have at least \code{min.nonmiss.a
 dontrun{
 library(pmartRdata)
 data("pep_object")
+pep_object <- group_designation(pep_object, main_effects = "Condition")
 filter_results <- anova_filter(nonmiss_per_group = nonmissing_per_group(omicsData = pep_object), cname_id = "Mass_Tag_ID")
 }
 
