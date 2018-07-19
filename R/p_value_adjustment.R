@@ -97,7 +97,7 @@ p_adjustment_anova <- function(p_values = NULL, diff_mean = NULL, t_stats = NULL
       stop("The `p_values` argument must be supplied to perform the selected `pval_adjust` method")
     }
     
-    if(is.null(dim(p_values))|ncol(p_values)==1){
+    if(is.null(dim(p_values)) || ncol(p_values)==1){ # leaving this as "||" because only evaluating the 1st argument is fine in this case, as it returns TRUE when p_values is a vector (and thus ncol(p_values) does not compute and using a "|" gives an error)
       pval_adjust='none'
     }
     

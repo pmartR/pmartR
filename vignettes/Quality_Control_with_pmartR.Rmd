@@ -124,7 +124,7 @@ We will walk through the steps in this QC workflow using `mypepData`.
 
 ### Format Data
 
-Sometimes omics abundance data comes with 0s when the particular biomolecule was not detected for a given sample. It is our practice to replace any 0s with NAs as opposed to imputing the missing values [reference?]. We strongly prefer NAs to imputation because we cannot know whether the biomolecule is not present in the sample, simply was below the limit of detection, or was present but missing from our data at random. The function `edata_replace()` can be used to replace values in the pepData object.
+Sometimes omics abundance data contains 0s when the particular biomolecule was not detected for a given sample. It is our practice to replace any 0s with NAs as opposed to imputing the missing values. We strongly prefer NAs to imputation because we cannot know whether the biomolecule is not present in the sample, simply was below the limit of detection, or was present but missing from our data at random. The function `edata_replace()` can be used to replace values in the pepData object.
 
 ```{r format1}
 mypepData <- edata_replace(mypepData, x = 0, y = NA)
@@ -147,7 +147,7 @@ attributes(mypepData)$data_info$data_scale
 plot(mypepData)
 ```
 
-Finally, we are preparing this data for statistical analysis where we will compare the samples belonging to one group to the samples belonging to another, and so we must specify the group membership of the samples. We do this using the `group_designation()` function, which modifies our pepData object and returns an updated version of it. Up to two main effects and up to two covariates may be specified, with one main effect being required at minimum. For the example data, we only have one option - specify the main effect to be "Condition" - since we do not have any additional information about the samples. Certain functions we will use below require that groups be designated.
+Finally, we are preparing this data for statistical analysis where we will compare the samples belonging to one group to the samples belonging to another, and so we must specify the group membership of the samples. We do this using the `group_designation()` function, which modifies our pepData object and returns an updated version of it. Up to two main effects and up to two covariates may be specified, with one main effect being required at minimum. For the example data, we only have one option - specify the main effect to be "Condition" - since we do not have any additional information about the samples. Certain functions we will use below require that groups have been designated via the `group_designation()` function.
 
 ```{r format3}
 mypepData <- group_designation(mypepData, main_effects = "Condition", covariates = NULL)
@@ -402,11 +402,17 @@ Below we use SPANS to select a normalization approach and then normalize the dat
 
 ### Summarize Data
 
-The pmartR package contains various methods for data summarization and exploration that can be used as part of the quality control process: numeric summaries and associated plots (via the `summarize()` function), sequential projection pursuit principal components analysis (sppPCA) for dimension reduction (via the`dim_reduction()` function), and a correlation heat map (via the `cor_result()` function)[@stacklies2007pcamethods]. As for missing data summarization there are also functions to collect and plot missing data information. Missing data collection and plotting functions include, `missingval_result()`, `plot_missingval()`, `missingval_scatterplot()` and `missingval_heatmap()`. 
+The pmartR package contains various methods for data summarization and exploration that can be used as part of the quality control process: numeric summaries and associated plots (via the `edata_summary()` function), sequential projection pursuit principal components analysis (sppPCA) for dimension reduction (via the`dim_reduction()` function), and a correlation heat map (via the `cor_result()` function)[@stacklies2007pcamethods]. As for missing data summarization there are also functions to collect and plot missing data information. Missing data collection and plotting functions include, `missingval_result()`, `plot_missingval()`, `missingval_scatterplot()` and `missingval_heatmap()`. 
 
 #### Numeric Summaries
 
-```{r summarize}
+We can generate numeric summaries of our data by either sample or molecule. The `edata_summary()` function computes the mean, standard deviation, median, percent of observations for which a value was observed, the minimum value, and the maximum value.
+
+```{r edata_summary}
+edata_summary(omicsData = norm_data, by = "sample", groupvar = NULL)
+#edata_summary(omicsData = norm_data, by = "sample", groupvar = "Condition")
+
+#edata_summary(omicsData = norm_data, by = "molecule", groupvar = NULL)
 
 ```
 
@@ -476,7 +482,7 @@ missingval_heatmap(mypepData, title_size = 20, title_plot = "Hey look at this!")
 
 ### Protein Quantification Methods
 
-Protein quantification can be done using the `protein_quant()` function, either with or without accounting for different isoforms of the proteins, also called 'proteoforms. Regardless of whether the user is accounting for protein isoforms, they must specify a method for rolling peptides up to proteins (one of "rollup", "rollup", "qrollup", or "zrollup") and a function to use for combining the peptide-level data (either "mean" or "median"). When the user does wish to account for protein isoforms, they have two options for doing so: Bayesian Proteoform Quantification (BP-Quant) [@webb2014bayesian] or Protein Quantification via Peptide Quality-Control (PQPQ). 
+Protein quantification can be done using the `protein_quant()` function, either with or without accounting for different isoforms of the proteins, also called 'proteoforms'. Regardless of whether the user is accounting for protein isoforms, they must specify a method for rolling peptides up to proteins (one of "rollup", "rollup", "qrollup", or "zrollup") and a function to use for combining the peptide-level data (either "mean" or "median"). When the user does wish to account for protein isoforms, they have two options for doing so: Bayesian Proteoform Quantification (BP-Quant) [@webb2014bayesian] or Protein Quantification via Peptide Quality-Control (PQPQ). 
 
 The `protein_quant()` function returns an object of class proData.
 
@@ -488,10 +494,10 @@ In the rrollup method, all peptides that map to a single protein are scaled base
 
 The qrollup method starts with all peptides that map to a single protein. Next peptides are chosen according to an abundance cutoff value and the average or mean of the scaled peptides is set as the protein abundance.
 
-In the zrollup method, scaling is done similarly to the  z-score formula (except with medians instead of means). The scaling formula is applied to peptides that map to a single protein and then the mean or median of the scaled peptides is set as protein abundance (from DAnTE article). The rollup method is similar to rrollup method, except there is no scaling involved in these methods. Either the mean or median is applied to all peptides that map to a single protein to obtain protein abundance.[@polpitiya2008dante]
+In the zrollup method, scaling is done similarly to the  z-score formula (except with medians instead of means). The scaling formula is applied to peptides that map to a single protein and then the mean or median of the scaled peptides is set as protein abundance (from DAnTE article). The rollup method is similar to rrollup method, except there is no scaling involved in these methods. Either the mean or median is applied to all peptides that map to a single protein to obtain protein abundance. [@polpitiya2008dante]
 
 
-```{r protein_quant}
+```{r protein_quant, eval = FALSE}
 print(mypepData)
 
 mypepdata_median<- protein_quant(pepData = mypepData, method = "rollup", combine_fn = "median")
@@ -505,7 +511,6 @@ rm(mypepdata_rrollup)
 ```
 
 
-### Peptide or Protein Statistics
 
 
 

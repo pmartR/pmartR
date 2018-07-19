@@ -80,10 +80,13 @@ meta_info \tab A logical argument, specifying whether \code{e_meta} is provided.
 \examples{
 dontrun{
 library(pmartRdata)
-data("pep_edata")
-data("pep_fdata")
-data("pep_emeta")
-mypepData <- as.pepData(e_data = pep_edata, e_meta = pep_emeta, f_data = pep_fdata, edata_cname = "Mass_Tag_ID", fdata_cname = "SampleID", emeta_cname = "Mass_Tag_ID")
+data("isobaric_edata")
+data("isobaric_fdata")
+data("isobaric_emeta")
+mypepData <- as.isobaricpepData(e_data = isobaric_edata, e_meta = isobaric_emeta, f_data = isobaric_fdata, edata_cname = "Peptide", fdata_cname = "Sample", emeta_cname = "Mass_Tag_ID")
+
+# Alternate specification #
+
 }
 }
 \seealso{

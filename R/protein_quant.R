@@ -67,6 +67,7 @@ protein_quant<- function(pepData, method, isoformRes = NULL, qrollup_thresh = NU
       results<- rrollup(pepData, combine_fn = combine_fn, parallel = use_parallel)
     }
     if(method == 'qrollup'){
+      if(is.null(qrollup_thresh)) stop("qrollup_thresh parameter value must be specified")
       results<- qrollup(pepData, qrollup_thresh = qrollup_thresh, combine_fn = combine_fn, parallel = use_parallel)
     }
     if(method == 'zrollup'){
@@ -145,6 +146,7 @@ protein_quant<- function(pepData, method, isoformRes = NULL, qrollup_thresh = NU
     }
     
     if(method == 'qrollup'){
+      if(is.null(qrollup_thresh)) stop("qrollup_thresh parameter value must be specified")
       results<- qrollup(temp_pepdata, qrollup_thresh = qrollup_thresh, combine_fn = combine_fn, parallel = use_parallel)
     }
     

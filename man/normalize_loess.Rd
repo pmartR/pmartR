@@ -9,7 +9,7 @@ normalize_loess(omicsData, method = "fast", span = 0.4)
 \arguments{
 \item{omicsData}{an object of the class 'pepData', 'proData', 'metabData', or 'lipidData', created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively. The function \code{\link{group_designation}} must have been run on omicsData to use several of the subset functions (i.e. rip and ppp_rip).}
 
-\item{method}{character string specifying which variant of the cyclic loess method to use. Options are "fast", "affy" or "pairs"}
+\item{method}{character string specifying which variant of the cyclic loess method to use. Options are "fast" (default), "affy", or "pairs"}
 
 \item{span}{span of loess smoothing window, between 0 and 1.}
 }
@@ -20,7 +20,7 @@ The normalized data is returned in an object of the appropriate S3 class (e.g. p
 Perform Loess normalization
 }
 \details{
-DETAILS GO HERE!!
+A wrapper for the normalizeCyclicLoess function from the limma package.
 }
 \examples{
 dontrun{
@@ -33,5 +33,8 @@ result = normalize_loess(pep_object)
 
 }
 \references{
-Bolstad, B. M., Irizarry R. A., Astrand, M., and Speed, T. P. (2003). \emph{A comparison of normalization methods for high density oligonucleotide array data based on bias and variance.} Bioinformatics 19, 185-193.    Ballman, KV Grill, DE, Oberg, AL and Therneau, TM (2004). \emph{Faster cyclic loess: normalizing RNA arrays via linear models.} Bioinformatics 20, 2778-2786.
+Bolstad, B. M., Irizarry R. A., Astrand, M., and Speed, T. P. (2003). \emph{A comparison of normalization methods for high density oligonucleotide array data based on bias and variance.} Bioinformatics 19, 185-193. Ballman, KV Grill, DE, Oberg, AL and Therneau, TM (2004). \emph{Faster cyclic loess: normalizing RNA arrays via linear models.} Bioinformatics 20, 2778-2786.
+}
+\seealso{
+\code{\link{normalizeCyclicLoess}}
 }

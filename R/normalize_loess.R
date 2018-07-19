@@ -3,10 +3,10 @@
 #' Perform Loess normalization 
 #'
 #' @param omicsData an object of the class 'pepData', 'proData', 'metabData', or 'lipidData', created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively. The function \code{\link{group_designation}} must have been run on omicsData to use several of the subset functions (i.e. rip and ppp_rip).
-#' @param method character string specifying which variant of the cyclic loess method to use. Options are "fast", "affy" or "pairs"
+#' @param method character string specifying which variant of the cyclic loess method to use. Options are "fast" (default), "affy", or "pairs"
 #' @param span span of loess smoothing window, between 0 and 1.
 #' 
-#' @details DETAILS GO HERE!!
+#' @details A wrapper for the normalizeCyclicLoess function from the limma package. 
 #' 
 #' @return The normalized data is returned in an object of the appropriate S3 class (e.g. pepData), on the same scale as omicsData (e.g. if omicsData contains log2 transformed data, the normalization will be performed on the non-log2 scale and then re-scaled after normalization to be returned on the log2 scale).
 #' 
@@ -19,7 +19,9 @@
 #'
 #'}
 #'
-#' @references Bolstad, B. M., Irizarry R. A., Astrand, M., and Speed, T. P. (2003). \emph{A comparison of normalization methods for high density oligonucleotide array data based on bias and variance.} Bioinformatics 19, 185-193.    Ballman, KV Grill, DE, Oberg, AL and Therneau, TM (2004). \emph{Faster cyclic loess: normalizing RNA arrays via linear models.} Bioinformatics 20, 2778-2786. 
+#'@seealso \code{\link{normalizeCyclicLoess}} in the \code{limma} package
+#'
+#' @references Bolstad, B. M., Irizarry R. A., Astrand, M., and Speed, T. P. (2003). \emph{A comparison of normalization methods for high density oligonucleotide array data based on bias and variance.} Bioinformatics 19, 185-193. Ballman, KV Grill, DE, Oberg, AL and Therneau, TM (2004). \emph{Faster cyclic loess: normalizing RNA arrays via linear models.} Bioinformatics 20, 2778-2786. 
 #'
 #' @export
 normalize_loess<- function(omicsData, method = "fast", span = .4){

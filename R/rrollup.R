@@ -55,13 +55,10 @@ rrollup<- function(pepData, combine_fn = "median", parallel = TRUE){
     
     final_list<- vector("list", length(unique_proteins))
     
-    suppressMessages(suppressPackageStartupMessages({
-      library(doParallel)
-    })
-    )
-    cores<- detectCores()
-    cl<- makeCluster(cores)
-    registerDoParallel(cl)
+    
+    cores<- parallel::detectCores()
+    cl<- parallel::makeCluster(cores - 1)
+    doParallel::registerDoParallel(cl)
     
     r<-foreach(i=1:length(unique_proteins))%dopar%{
       
@@ -105,7 +102,7 @@ rrollup<- function(pepData, combine_fn = "median", parallel = TRUE){
       
       final_list[[i]]<- res
     }
-    stopCluster(cl)
+    parallel::stopCluster(cl)
     
     final_result<- do.call(rbind, r)
     final_result<- cbind(unique_proteins, final_result)
