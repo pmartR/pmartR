@@ -22,7 +22,7 @@ Quantile normalization is an algorithm for normalizing a set of data vectors by 
 dontrun{
 library(pmartRdata)
 data(lipid_object)
-norm_data <- normalize_quantile(omicsData = lipid_object, subset_fn = "all", norm_fn = "median", apply_norm = TRUE, backtransform = TRUE)
+norm_data <- normalize_quantile(omicsData = lipid_object)
 }
 
 }
