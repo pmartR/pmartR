@@ -251,7 +251,7 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
            }
        }
     
-     grid.arrange(s, m, ncol = 2)
+     gridExtra::grid.arrange(s, m, ncol = 2)
     
   }
 }
