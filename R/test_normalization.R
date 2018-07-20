@@ -13,7 +13,7 @@
 #' data(lipid_object)
 #' lipid_object<- edata_transform(omicsData = lipid_object, data_scale="log2")
 #' lipid_object<- group_designation(omicsData = lipid_object, main_effects = "Condition")
-#' norm_object<- normalize(omicsData = lipid_object, subset_fn = "all", norm_fn = "median")
+#' norm_object<- normalize_global(omicsData = lipid_object, subset_fn = "all", norm_fn = "median")
 #' 
 #' test_result<- test_normalization(normRes_object = norm_object, parametric = TRUE)
 #'}
