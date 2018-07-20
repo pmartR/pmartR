@@ -12,7 +12,7 @@
 #' dontrun{
 #' library(pmartRdata)
 #' data("pep_object")
-#' pep_pepData2 <- group_designation(omicsData = pep_pepData, main_effects = "Condition")
+#' pep_pepData2 <- group_designation(omicsData = pep_object, main_effects = "Condition")
 #' to_filter <- imdanova_filter(omicsData = pep_pepData2)
 #' summary(to_filter, min_nonmiss_anova = 2)
 #'}

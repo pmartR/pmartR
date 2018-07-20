@@ -43,7 +43,7 @@
 #' library(pmartRdata)
 #' data("pro_edata")
 #' data("pro_fdata")
-#' myproData <- as.proData(e_data = pro_edata, f_data = pro_fdata, edata_cname = "Reference", fdata_cname = "SampleID", data_norm=TRUE, norm_method="median_center")
+#' myproData <- as.proData(e_data = pro_edata, f_data = pro_fdata, edata_cname = "Reference", fdata_cname = "SampleID", data_norm=TRUE)
 #'}
 #' @author Kelly Stratton, Lisa Bramer
 #' @seealso \code{\link{as.pepData}}

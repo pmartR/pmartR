@@ -125,18 +125,16 @@ $(document).ready(function () {
 <div id="cnames" class="section level4">
 <h4>cnames</h4>
 <pre class="r"><code>print(unlist(cnames))</code></pre>
-<pre><code>##   edata_cname   emeta_cname   fdata_cname 
-## &quot;Mass_Tag_ID&quot;     &quot;Protein&quot;    &quot;SampleID&quot;</code></pre>
+<pre><code>##  edata_cname  fdata_cname 
+## &quot;Metabolite&quot;   &quot;SampleID&quot;</code></pre>
 </div>
 <div id="data_info" class="section level4">
 <h4>data_info</h4>
 <pre class="r"><code>print(unlist(data_info))</code></pre>
 <pre><code>##          data_scale           data_norm           num_edata 
-##         &quot;abundance&quot;             &quot;FALSE&quot;             &quot;17407&quot; 
-##        num_miss_obs           num_emeta        prop_missing 
-##             &quot;82833&quot;              &quot;2774&quot; &quot;0.396550238409835&quot; 
-##           num_samps 
-##                &quot;12&quot;</code></pre>
+##         &quot;abundance&quot;             &quot;FALSE&quot;                &quot;80&quot; 
+##        num_miss_obs        prop_missing           num_samps 
+##               &quot;148&quot; &quot;0.154166666666667&quot;                &quot;12&quot;</code></pre>
 </div>
 <div id="check.names" class="section level4">
 <h4>check.names</h4>
@@ -146,7 +144,7 @@ $(document).ready(function () {
 <div id="meta_info" class="section level4">
 <h4>meta_info</h4>
 <pre class="r"><code>print(meta_info)</code></pre>
-<pre><code>## [1] TRUE</code></pre>
+<pre><code>## [1] FALSE</code></pre>
 </div>
 <div id="filters" class="section level4">
 <h4>filters</h4>
@@ -156,7 +154,7 @@ $(document).ready(function () {
 <div id="class" class="section level4">
 <h4>class</h4>
 <pre class="r"><code>print(unlist(class))</code></pre>
-<pre><code>## [1] &quot;pepData&quot;</code></pre>
+<pre><code>## [1] &quot;metabData&quot;</code></pre>
 </div>
 <div id="group_df" class="section level4">
 <h4>group_DF</h4>

@@ -28,6 +28,7 @@
 #' 
 #' @examples
 #' dontrun{
+#' library(gridExtra)
 #' library(pmartRdata)
 #' data("lipid_object")
 #' result<- missingval_result(lipid_object)

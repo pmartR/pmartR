@@ -14,12 +14,11 @@
 #' Webb-Robertson, Bobbie-Jo M., et al. "Combined statistical analyses of peptide intensities and peptide occurrences improves identification of significant peptides from MS-based proteomics data." Journal of proteome research 9.11 (2010): 5748-5756.
 #'
 #' @examples 
-#' library(mintJansson)
-#' rRNA_data <- pmartR::group_designation(omicsData = rRNA_data, main_effects = c("site","treatment"))
-#' group_df <- attr(rRNA_data, "group_DF")
-#' #This is will return a lot of errors because the peptides with too few data haven't 
-#' #been filtered out yet
-#' g_res <- g_test(omicsData = rRNA_data, groupData = group_df)
+#' library(pmartRdata)
+#' pep_data <- pmartR::group_designation(omicsData = pep_object, main_effects = "Condition")
+#' group_df <- attr(pep_data, "group_DF")
+#'
+#' g_res <- g_test(omicsData = pep_data)
 #' 
 #' @export
 
