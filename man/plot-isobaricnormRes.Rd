@@ -32,6 +32,8 @@ For plotting an S3 object of type 'isobaricnormRes':
 dontrun{
 library(pmartRdata)
 data(isobaric_object)
+
+isobaric_object = edata_transform(isobaric_object, "log2")
 result = normalize_isobaric(isobaric_object, apply_norm = F)
 
 plot(result)

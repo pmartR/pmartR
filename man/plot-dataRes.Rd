@@ -29,7 +29,7 @@ This function can only create plots of dataRes objects whose 'by' == 'molecule' 
 dontrun{
 data(lipid_object)
 lipid_object = edata_transform(lipid_object, "log2")
-result = summarize(omicsData = lipid_object, by = "molecule", groupvar = "Condition")
+result = edata_summary(omicsData = lipid_object, by = "molecule", groupvar = "Condition")
 plot(result)
 }
 

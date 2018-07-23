@@ -20,12 +20,11 @@ for count data.  For continuous data, this is often used to test if the number o
 qualitative difference).  For count data, this is used to test if the number of counts is the same for all groups.
 }
 \examples{
-library(mintJansson)
-rRNA_data <- pmartR::group_designation(omicsData = rRNA_data, main_effects = c("site","treatment"))
-group_df <- attr(rRNA_data, "group_DF")
-#This is will return a lot of errors because the peptides with too few data haven't 
-#been filtered out yet
-g_res <- g_test(omicsData = rRNA_data, groupData = group_df)
+library(pmartRdata)
+pep_data <- pmartR::group_designation(omicsData = pep_object, main_effects = "Condition")
+group_df <- attr(pep_data, "group_DF")
+
+g_res <- g_test(omicsData = pep_data)
 
 }
 \references{

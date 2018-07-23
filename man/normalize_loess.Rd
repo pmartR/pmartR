@@ -36,5 +36,5 @@ result = normalize_loess(pep_object)
 Bolstad, B. M., Irizarry R. A., Astrand, M., and Speed, T. P. (2003). \emph{A comparison of normalization methods for high density oligonucleotide array data based on bias and variance.} Bioinformatics 19, 185-193. Ballman, KV Grill, DE, Oberg, AL and Therneau, TM (2004). \emph{Faster cyclic loess: normalizing RNA arrays via linear models.} Bioinformatics 20, 2778-2786.
 }
 \seealso{
-\code{\link{normalizeCyclicLoess}}
+\code{\link{normalizeCyclicLoess}} in the \code{limma} package
 }
