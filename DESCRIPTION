@@ -15,9 +15,11 @@ VignetteBuilder: knitr
 LinkingTo: Rcpp, RcppArmadillo, BH
 Imports:
     Rcpp (>= 0.12.8),
+    doParallel,
     dplyr,
     ggplot2,
     e1071,
+    foreach,
     rrcov,
     Rmisc,
     scales,

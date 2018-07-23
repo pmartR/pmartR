@@ -16,7 +16,7 @@
 #' data(lipid_object)
 #' lipid_object2 <- edata_transform(omicsData = lipid_object, data_scale = "log2")
 #' 
-#' dataRes_sample = summarize(omicsData = lipid_object2, groupvar = NULL, by = "sample")
+#' dataRes_sample = edata_summary(omicsData = lipid_object2, groupvar = NULL, by = "sample")
 #' report_dataRes(dataRes_sample)
 #'}
 #'

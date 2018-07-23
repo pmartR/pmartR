@@ -25,7 +25,7 @@
 #' rmd_results <- rmd_filter(omicsData = metab_object2)
 #'
 #' data(pep_pepData)
-#' pep_pepData2 <- edata_transform(omicsData = pep_pepData, data_scale = "log2")
+#' pep_pepData2 <- edata_transform(omicsData = pep_object, data_scale = "log2")
 #' pep_pepData3 <- group_designation(omicsData = pep_pepData2, main_effects = "Condition")
 #' rmd_results <- rmd_filter(omicsData = pep_pepData3)
 #'}

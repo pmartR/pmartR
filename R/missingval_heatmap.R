@@ -25,6 +25,7 @@
 #' @examples 
 #' dontrun{
 #' library(pmartRdata)
+#' library(ggplot2)
 #' data("lipid_object")
 #' 
 #' lipid_object2 <- edata_transform(omicsData = lipid_object, data_scale="log2")

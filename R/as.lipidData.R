@@ -43,7 +43,7 @@
 #' library(pmartRdata)
 #' data("lipid_edata")
 #' data("lipid_fdata")
-#' mylipidData <- as.lipidData(e_data = lipid_edata, f_data = lipid_fdata, edata_cname = "LipidCommonName", fdata_cname = "SampleID")
+#' mylipidData <- as.lipidData(e_data = lipid_edata, f_data = lipid_fdata, edata_cname = "LipidCommonName", fdata_cname = "Sample_Name")
 #'}
 #'
 #' @author Lisa Bramer, Kelly Stratton

@@ -1,6 +1,6 @@
 #' Creates a list of six Data Frames, one for each summarizing metric
 #'
-#' This function takes in an omicsData object and returns a summary of the e_data component. The six summarizing metrics include, mean, standard deviation, median, percent observed, minimum and maximum.   
+#' This function takes in an omicsData object and returns a summary of the e_data component. The six summarizing metrics include the mean, standard deviation, median, percent observed, minimum, and maximum.   
 #'
 #' @param omicsData an object of the class 'lipidData', 'metabData', 'pepData', or 'proData', usually created by \code{\link{as.lipidData}}, \code{\link{as.metabData}}, \code{\link{as.pepData}}, or \code{\link{as.proData}}, respectively.
 #' @param groupvar a character vector with no more than two variable names that should be used to determine group membership of samples. The variable name must match a column name from \code{f_data}. Defaults to NULL, in which case group_DF attribute will be used.
@@ -16,13 +16,13 @@
 #' data(lipid_object)
 #' lipid_object2 <- edata_transform(omicsData = lipid_object, data_scale = "log2")
 #' lipid_object2 <- group_designation(omicsData = lipid_object, main_effects = "Condition")
-#' edata_summary(omicsData = lipid_object2, groupvar = NULL, by = "sample")
+#' edata_summary(omicsData = lipid_object2, by = "sample", groupvar = NULL)
 #'}
 #'
 #'
 #' @export
 
-edata_summary <- function(omicsData, groupvar = NULL, by){
+edata_summary <- function(omicsData, by, groupvar = NULL){
   #some checks
   if(!inherits(omicsData, c('pepData','proData', 'lipidData', 'metabData'))) stop("omicsData must be an object of class pepData, proData, lipidData or metabData")
   if(!(by %in% c('sample', 'molecule'))) stop("by must be either sample or molecule")

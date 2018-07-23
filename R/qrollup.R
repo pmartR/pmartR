@@ -60,13 +60,10 @@ qrollup<- function(pepData, qrollup_thresh, combine_fn = "median", parallel = TR
     
     final_list<- vector("list", length(unique_proteins))
     
-    suppressMessages(suppressPackageStartupMessages({
-      library(parallel)
-    })
-    )
-    cores<- detectCores()
-    cl<- makeCluster(cores)
-    registerDoParallel(cl)
+
+    cores<- parallel::detectCores()
+    cl<- parallel::makeCluster(cores)
+    doParallel::registerDoParallel(cl)
     
     r<-foreach(i=1:length(unique_proteins))%dopar%{
       
@@ -104,7 +101,7 @@ qrollup<- function(pepData, qrollup_thresh, combine_fn = "median", parallel = TR
       
       final_list[[i]]<- res
     }
-    stopCluster(cl)
+    parallel::stopCluster(cl)
     
     final_result<- do.call(rbind, r)
     final_result<- cbind(unique_proteins, final_result)

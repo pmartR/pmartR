@@ -23,10 +23,10 @@
 #' data("pep_object")
 #' 
 #' case where isoformRes is NULL:
-#' results<- prot_quant(pepData = pep_object, method = 'rollup', combine_fn = 'median', isoformRes = NULL)
+#' results<- protein_quant(pepData = pep_object, method = 'rollup', combine_fn = 'median', isoformRes = NULL)
 #' 
 #' case where isoformRes is provided:
-#' results2 = prot_quant(pep_data = pep_object, method = 'rollup', combine_fn = 'mean', isoformRes = isoformRes_object)
+#' results2 = protein_quant(pepData = pep_object, method = 'rollup', combine_fn = 'mean', isoformRes = isoformRes_object)
 #' }
 #'
 #' @rdname protein_quant 
@@ -67,6 +67,7 @@ protein_quant<- function(pepData, method, isoformRes = NULL, qrollup_thresh = NU
       results<- rrollup(pepData, combine_fn = combine_fn, parallel = use_parallel)
     }
     if(method == 'qrollup'){
+      if(is.null(qrollup_thresh)) stop("qrollup_thresh parameter value must be specified")
       results<- qrollup(pepData, qrollup_thresh = qrollup_thresh, combine_fn = combine_fn, parallel = use_parallel)
     }
     if(method == 'zrollup'){
@@ -145,6 +146,7 @@ protein_quant<- function(pepData, method, isoformRes = NULL, qrollup_thresh = NU
     }
     
     if(method == 'qrollup'){
+      if(is.null(qrollup_thresh)) stop("qrollup_thresh parameter value must be specified")
       results<- qrollup(temp_pepdata, qrollup_thresh = qrollup_thresh, combine_fn = combine_fn, parallel = use_parallel)
     }
     
