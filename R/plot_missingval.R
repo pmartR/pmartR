@@ -3,7 +3,7 @@
 #' For plotting an S3 object of type 'naRes':
 #' 
 #' @param naRes_object a list of two data frames, one contains NA values by sample, the second contains NA values by molecule
-#' @param type is for specifying plot type, there are three options, 'bySample': plots missing values per sample, 'byMolecule': plots missing values per molecule and 'Both': displays both 'bySample' and 'byMolecule' plots. 
+#' @param type is for specifying plot type, there are three options, 'bySample': plots missing values per sample, 'byMolecule': plots histogram for the number of missing values per molecule and 'Both': displays both 'bySample' and 'byMolecule' plots. 
 #' @param x_lab character string to be used for x-axis label. Defaults to NULL  
 #' @param ... further arguments 
 #'
