@@ -8,7 +8,6 @@
 #' @examples  
 #' dontrun{ 
 #' library(pmartRdata)
-#' library(plyr)
 #' data(isobaric_object)
 #' 
 #' isobaric_object = edata_transform(isobaric_object, "log2")
@@ -66,7 +65,7 @@ normalize_isobaric<- function(omicsData, apply_norm = FALSE){
     res = lapply(split_data, myfunc, ref_samples = ref_samples, edata_cname = edata_cname, fdata_cname = fdata_cname)
     
     #combining normalized split_data
-    final = join_all(res, by =  edata_cname)
+    final = Reduce(function(...) merge(..., all=T), res)
     
     #replace omicsData$e_data with normalized edata
     omicsData$e_data<- final
