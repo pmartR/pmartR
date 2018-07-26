@@ -18,11 +18,10 @@ Description of what this function does
  
 dontrun{ 
 library(pmartRdata)
-library(plyr)
 data(isobaric_object)
 
 isobaric_object = edata_transform(isobaric_object, "log2")
-result = normalize_isobaric(isobaric_object, apply_norm = TRUE)
+isobaric_norm = normalize_isobaric(isobaric_object, apply_norm = TRUE)
 }
 
 }

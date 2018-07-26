@@ -9,7 +9,7 @@
 \arguments{
 \item{naRes_object}{a list of two data frames, one contains NA values by sample, the second contains NA values by molecule}
 
-\item{type}{is for specifying plot type, there are three options, 'bySample': plots missing values per sample, 'byMolecule': plots missing values per molecule and 'Both': displays both 'bySample' and 'byMolecule' plots.}
+\item{type}{is for specifying plot type, there are three options, 'bySample': plots missing values per sample, 'byMolecule': plots histogram for the number of missing values per molecule and 'Both': displays both 'bySample' and 'byMolecule' plots.}
 
 \item{x_lab}{character string to be used for x-axis label. Defaults to NULL}
 
@@ -41,7 +41,6 @@ This function takes in an object of class naRes and creates either a bar chart o
 }
 \examples{
 dontrun{
-library(gridExtra)
 library(pmartRdata)
 data("lipid_object")
 result<- missingval_result(lipid_object)
