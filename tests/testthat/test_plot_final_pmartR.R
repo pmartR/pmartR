@@ -1,3 +1,4 @@
+context("input tests for plot.proData()")
 # testing function for plot.proData()
 
 library(testthat) 
@@ -11,8 +12,6 @@ almost_object$e_data <- NULL
 
 input<- c(1, 2, 3)
 mat<- matrix(1:6, nrow = 2, ncol = 3)
-
-context("input tests for plot.proData()")
 
 test_that("invalid input for order_by argument throws error",{
   expect_that(plot(omicsData, order_by = input), throws_error())   
@@ -52,7 +51,6 @@ test_that("invalid input for facet_cols argument throws error",{
 test_that("invalid input for omicsData argument throws error",{  
   expect_that(pmartR::plot.proData(input), throws_error())   
   expect_that(pmartR::plot.proData(mat), throws_error()) 
-  expect_that(pmartR::plot.proData(almost_object), throws_error())
 })
 
 test_that("invalid input for legend_position argument throws error",{  

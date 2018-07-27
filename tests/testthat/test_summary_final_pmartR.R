@@ -1,12 +1,10 @@
+context("output tests for summary.proData()")
 #testthat function for summary.proData()
 
 library(pmartRdata)
 data("pro_object")
 omicsData <- pro_object
 result <- summary(omicsData)
-
-
-context("output tests for summary.proData()")
 
 test_that("summary results are of correct type", {
   expect_that(result, is_a("data.frame")) # changed from list to data.frame

@@ -1,3 +1,4 @@
+context("output tests for rip()")
 # testing function for rip() in subset_funcs.R
 library(pmartR)
 library(testthat)
@@ -18,9 +19,6 @@ result<- pmartR:::rip(e_data = e_data, edata_id = edata_id, fdata_id = fdata_id,
 
 hardcoded_rip_result <- c("11078", "216191", "6709133", "6753571", "6781312")
 hardcoded_result_len <- 1158
-
-
-context("output tests for rip()")
 
 test_that("results are of appropriate class and length",{ 
   expect_that(result, is_a("character"))
