@@ -20,6 +20,7 @@
 #' \code{palette} \tab palette is a character string indicating the name of the RColorBrewer palette to use; "YlOrRd", "YlOrBr", "YlGnBu", "YlGn", "Reds","RdPu", "Purples", "PuRd", "PuBuGn", "PuBu", "OrRd","Oranges", "Greys", "Greens", "GnBu", "BuPu","BuGn","Blues", "Set3", "Set2", "Set1", "Pastel2", "Pastel1", "Paired", "Dark2", "Accent", "Spectral", "RdYlGn", "RdYlBu", "RdGy", "RdBu", "PuOr","PRGn", "PiYG", "BrBG"\cr
 #' \code{x_lab_angle} \tab integer value indicating the angle of x-axis labels \cr
 #' \code{coordinate_flip} \tab logical indicates whether to flip cartesian coordinates so that horizontal becomes vertical and vise versa, defaults to false \cr
+#' \code{use_VizSampNames} \tab logical indicates whether to use custom sample names \cr
 #'}
 #' 
 #' @return plots ggplot2 object
@@ -44,7 +45,7 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
   .plot.naRes(naRes_object, type, x_lab, ...)
 }
 
-.plot.naRes<- function(naRes_object, type, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_title = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bar_width = .8, binwidth = 1, bw_theme = FALSE, palette = "Spectral", x_lab_angle = 60, coordinate_flip = FALSE){
+.plot.naRes<- function(naRes_object, type, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_title = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bar_width = .8, binwidth = 1, bw_theme = FALSE, palette = "Spectral", x_lab_angle = 60, coordinate_flip = FALSE, use_VizSampNames = FALSE){
  
    # check for a naRes object #
   if(!inherits(naRes_object, "naRes")) stop("object must be of class 'naRes'")
@@ -133,6 +134,9 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
                 ggplot2::coord_flip()
           } 
     }
+    if(use_VizSampNames == T){
+      p = p + scale_x_discrete(labels = na.by.sample$VizSampNames)
+    }
     return(p)
   }
  
@@ -219,6 +223,10 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
                 ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size), axis.text.x = element_text(angle = x_lab_angle, hjust = 1)) + scale_fill_brewer(palette = palette, name = "group") +
                 ggplot2::coord_flip()
           }
+    }
+    
+    if(use_VizSampNames == T){
+      s = s + scale_x_discrete(labels = na.by.sample$VizSampNames)
     }
     
     #plots NA per molecule

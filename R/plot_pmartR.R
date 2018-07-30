@@ -874,7 +874,7 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
   .plot.pepData(omicsData, order_by, color_by, facet_by, facet_cols, ...)
 }
 
-.plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by = NULL, facet_cols = NULL, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_lab = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme=FALSE, legend_position = "right", ylimit = NULL) {
+.plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by = NULL, facet_cols = NULL, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_lab = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme=FALSE, legend_position = "right", ylimit = NULL, use_VizSampNames = FALSE) {
   
   ## initial checks ##
   if(!is.null(order_by)) {
@@ -915,6 +915,7 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
   
   # organize data #
   e_data <- omicsData$e_data
+  f_data = omicsData$f_data
   e_data_cname <- attributes(omicsData)$cnames$edata_cname
   plot_data <- reshape2::melt(e_data, id = e_data_cname, na.rm = TRUE)
   
@@ -960,6 +961,10 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     
     title <- maintitle
     
+    if(use_VizSampNames == T){
+      p = p + scale_x_discrete(labels = f_data$VizSampNames)
+    }
+    
     ## if order_by is not null and color_by is ##
   } else if(!is.null(order_by) & is.null(color_by)) {
     if(order_by != "group_DF") {
@@ -988,6 +993,11 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     
     title <- bquote(atop(.(maintitle),atop(italic(paste("Ordered by ",.(order_by))),"")))
     
+    if(use_VizSampNames == T){
+      f_data = f_data[order(f_data[,order_by]),]
+      p = p + scale_x_discrete(labels = f_data$VizSampNames)
+    }
+    
     ## if color_by is not null and order_by is ##
   } else if(!is.null(color_by) & is.null(order_by)) {
     if(color_by != "group_DF") {
@@ -1011,6 +1021,11 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     }
     
     title <- maintitle
+    
+    if(use_VizSampNames == T){
+      f_data = f_data[order(f_data[,color_by]),]
+      p = p + scale_x_discrete(labels = f_data$VizSampNames)
+    }
     
     ## if neither order_by or color_by are null ##
   } else if(!is.null(order_by) & !is.null(color_by)) {
@@ -1055,6 +1070,12 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     }
     
     title <- bquote(atop(.(maintitle),atop(italic(paste("Ordered by ",.(order_by))),"")))
+    
+    if(use_VizSampNames == T){
+      f_data = f_data[order(f_data[,order_by]),]
+      p = p + scale_x_discrete(labels = f_data$VizSampNames)
+    }
+    
   }
   
   
