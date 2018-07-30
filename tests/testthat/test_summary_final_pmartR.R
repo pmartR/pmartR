@@ -1,6 +1,8 @@
 context("output tests for summary.proData()")
 #testthat function for summary.proData()
 
+library(testthat)
+library(pmartR)
 library(pmartRdata)
 data("pro_object")
 omicsData <- pro_object

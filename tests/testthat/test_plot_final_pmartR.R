@@ -1,6 +1,6 @@
 context("input tests for plot.proData()")
 # testing function for plot.proData()
-
+library(pmartR)
 library(testthat) 
 library(pmartRdata) 
 data("pro_object") 

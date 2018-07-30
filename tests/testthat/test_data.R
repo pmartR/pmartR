@@ -1,4 +1,5 @@
 context("Test that data package loads")
+library(testthat)
 library(pmartRdata)
 library(pmartR)
 

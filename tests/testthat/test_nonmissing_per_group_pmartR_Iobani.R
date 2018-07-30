@@ -1,5 +1,6 @@
 context("output tests for nonmissing_per_group()")
 # Testing function for nonmissing_per_group 
+library(testthat)
 library(pmartR)
 library(pmartRdata)
 library(dplyr)
