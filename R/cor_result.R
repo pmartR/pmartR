@@ -10,7 +10,7 @@
 #'
 #' @examples
 #' dontrun{
-#' library(MSomicsQC)
+#' library(pmartRdata)
 #' data(pep_object)
 #' my_correlation <- cor_result(omicsData = pep_object)
 #'}

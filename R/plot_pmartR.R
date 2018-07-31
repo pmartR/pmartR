@@ -47,6 +47,7 @@ NULL
 #' 
 #'@rdname plot-pmartR-corRes
 #'@export
+#'@param omicsData an object of the class 'pepData', 'proData', 'metabData', or 'lipidData', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.
 #'@param interactive default value is FALSE. If TRUE, an interactive d3heatmap will be rendered, allowing you to zoom in on sections of the heatmap.
 #'@param x_lab logical indicator of whether to label the x-axis with the sample names. Defaults to TRUE. If FALSE, no x-axis labels are included in the plot.
 #'@param y_lab logical indicator of whether to label the y-axis with the sample names. Defaults to TRUE. If FALSE, no y-axis labels are included in the plot.
@@ -54,12 +55,13 @@ NULL
 #'
 #' \tabular{ll}{
 #' \code{title_plot} \tab character string to be used for the plot title. Defaults to NULL, in which case "Sample Outlier Results /n p-value threshold = 0.xyz" is used, where 'xyz' is the pvalue_threshold supplied to the function. \cr
-#' \code{title_size} integer value specifying the font size for the plot title. Default is 14. \cr
+#' \code{title_size} integer value specifying the font size for the plot title. Default is 14. \cr]
+#' \code{use_VizSampNames} \tab logical specifies whether to use custom sample names \cr
 #' } 
 plot.corRes <- function(corRes_object, ...){
   .plot.corRes(corRes_object, ...)
 }
-.plot.corRes <- function(corRes_object, interactive = FALSE, title_plot = NULL, x_lab=TRUE, y_lab=TRUE, colorbar_lim=c(NA, NA), title_size = 14){
+.plot.corRes <- function(corRes_object, omicsData, interactive = FALSE, title_plot = NULL, x_lab=TRUE, y_lab=TRUE, colorbar_lim=c(NA, NA), title_size = 14, use_VizSampNames = FALSE){
   # check for a corRes object #
   if(!inherits(corRes_object, "corRes")) stop("object must be of class 'corRes'")
   # check plot title is a string #
@@ -67,6 +69,9 @@ plot.corRes <- function(corRes_object, ...){
     if(!is.character(title_plot)) stop("title_plot must be a character vector")
   }
   
+  # check that omicsData is of appropriate class #
+  if(!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData"))) stop("omicsData must be of class 'pepData', 'proData', 'metabData', or 'lipidData'")
+
   # Workaround for certain "check" warnings
   Var1 <- Var2 <- value <- NULL
   
@@ -88,7 +93,7 @@ plot.corRes <- function(corRes_object, ...){
   if(!interactive) {
     #pal <- colorRampPalette(c("blue","white","red"))
     pal <- colorRampPalette(c("red", "yellow")) # modified by KS 2/12/2018
-    
+
     colnames(corRes_object) <- rownames(corRes_object)
     corRes_melt <- reshape2::melt(corRes_object)
     corRes_melt$Var1 <- abbreviate(corRes_melt$Var1, minlength=20)
@@ -123,6 +128,10 @@ plot.corRes <- function(corRes_object, ...){
       heatmap <- heatmap + ggplot2::ggtitle(plot_title)
     }else {
       heatmap <- heatmap + ggplot2::ggtitle(plot_title)
+    }
+    
+    if(!use_VizSampNames){
+      heatmap = heatmap + scale_x_discrete(labels = omicsData$f_data$VizSampNames) + scale_y_discrete(labels = omicsData$f_data$VizSampNames)
     }
     
   } else {
@@ -869,6 +878,7 @@ plot.customFilt <- function(filter_object, ...) {
 #' \code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used. \cr
 #' \code{legend_position} \tab character string specifying one of "right", "left", "top", or "bottom" for the location of the legend. Defaults to "right". \cr
 #' \code{ylimit} \tab numeric vector of length 2 specifying y axis lower and upper limits. \cr
+#' \code{use_VizSampNames} \tab logical specifies whether to use custom sample names \cr
 #' }
 plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by = NULL, facet_cols = NULL, ...) {
   .plot.pepData(omicsData, order_by, color_by, facet_by, facet_cols, ...)
@@ -936,6 +946,7 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
   
   ## if facet_by is not null and isn't the same as either order_by or color_by ##
   if(!is.null(facet_by)) {
+    if(!use_VizSampNames) stop("if argument 'facet_by' is provided, argument 'use_VizSampNames' must be set to FALSE")
     if(!(facet_by %in% c(order_by, color_by))) {
       facet_temp <- group_designation(omicsData, main_effects = facet_by)
       facetDF <- attributes(facet_temp)$group_DF
@@ -1136,6 +1147,7 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
 #' \code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used. \cr
 #' \code{legend_position} \tab character string specifying one of "right", "left", "top", or "bottom" for the location of the legend. Defaults to "right". \cr
 #' \code{ylimit} \tab numeric vector of length 2 specifying y axis lower and upper limits. \cr
+#' \code{use_VizSampNames} \tab logical specifies whether to use custom sample names \cr
 #' }
 #'
 #'@export
@@ -1144,7 +1156,7 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
   .plot.proData(omicsData, order_by, color_by, facet_by, facet_cols, ...)
 }
 
-.plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by = NULL, facet_cols = NULL, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_lab = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme=FALSE, legend_position = "right", ylimit = NULL) {
+.plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by = NULL, facet_cols = NULL, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_lab = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme=FALSE, legend_position = "right", ylimit = NULL, use_VizSampNames = FALSE) {
   
   ## initial checks ##
   if(!is.null(order_by)) {
@@ -1182,6 +1194,7 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
   # organize data #
   e_data <- omicsData$e_data
   e_data_cname <- attributes(omicsData)$cnames$edata_cname
+  f_data = omicsData$f_data
   plot_data <- reshape2::melt(e_data, id = e_data_cname, na.rm = TRUE)
   
   maintitle <- ifelse(attributes(omicsData)$data_info$data_norm,
@@ -1192,6 +1205,7 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
   
   ## if facet_by is not null and isn't the same as either order_by or color_by ##
   if(!is.null(facet_by)) {
+    if(!use_VizSampNames) stop("if argument 'facet_by' is provided, argument 'use_VizSampNames' must be set to FALSE")
     if(!(facet_by %in% c(order_by, color_by))) {
       facet_temp <- group_designation(omicsData, main_effects = facet_by)
       facetDF <- attributes(facet_temp)$group_DF
@@ -1215,6 +1229,10 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     }
     
     title <- maintitle
+    
+    if(use_VizSampNames == T){
+      p = p + scale_x_discrete(labels = f_data$VizSampNames)
+    }
     
     ## if order_by is not null and color_by is ##
   } else if(!is.null(order_by) & is.null(color_by)) {
@@ -1244,6 +1262,11 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     
     title <- bquote(atop(.(maintitle),atop(italic(paste("Ordered by ",.(order_by))),"")))
     
+    if(use_VizSampNames == T){
+      f_data = f_data[order(f_data[,order_by]),]
+      p = p + scale_x_discrete(labels = f_data$VizSampNames)
+    }
+    
     ## if color_by is not null and order_by is ##
   } else if(!is.null(color_by) & is.null(order_by)) {
     if(color_by != "group_DF") {
@@ -1267,6 +1290,11 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     }
     
     title <- maintitle
+    
+    if(use_VizSampNames == T){
+      f_data = f_data[order(f_data[,color_by]),]
+      p = p + scale_x_discrete(labels = f_data$VizSampNames)
+    }
     
     ## if neither order_by or color_by are null ##
   } else if(!is.null(order_by) & !is.null(color_by)) {
@@ -1311,6 +1339,12 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     }
     
     title <- bquote(atop(.(maintitle),atop(italic(paste("Ordered by ",.(order_by))),"")))
+    
+    if(use_VizSampNames == T){
+      f_data = f_data[order(f_data[,order_by]),]
+      p = p + scale_x_discrete(labels = f_data$VizSampNames)
+    }
+    
   }
   
   
@@ -1370,6 +1404,7 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
 #' \code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used. \cr
 #' \code{legend_position} \tab character string specifying one of "right", "left", "top", or "bottom" for the location of the legend. Defaults to "right". \cr
 #' \code{ylimit} \tab numeric vector of length 2 specifying y axis lower and upper limits. \cr
+#' \code{use_VizSampNames} \tab logical specifies whether to use custom sample names \cr
 #' }
 #'@export
 #'@rdname plot-pmartR-lipidData
@@ -1377,7 +1412,7 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
   .plot.lipidData(omicsData, order_by, color_by, facet_by, facet_cols, ...)
 }
 
-.plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by = NULL, facet_cols = NULL, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_lab = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme=FALSE, legend_position = "right", ylimit = NULL) {
+.plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by = NULL, facet_cols = NULL, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_lab = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme=FALSE, legend_position = "right", ylimit = NULL, use_VizSampNames = FALSE) {
   
   ## initial checks ##
   if(!is.null(order_by)) {
@@ -1415,6 +1450,7 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
   # organize data #
   e_data <- omicsData$e_data
   e_data_cname <- attributes(omicsData)$cnames$edata_cname
+  f_data = omicsData$f_data
   plot_data <- reshape2::melt(e_data, id = e_data_cname, na.rm = TRUE)
   
   maintitle <- ifelse(attributes(omicsData)$data_info$data_norm,
@@ -1425,6 +1461,7 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
   
   ## if facet_by is not null and isn't the same as either order_by or color_by ##
   if(!is.null(facet_by)) {
+    if(!use_VizSampNames) stop("if argument 'facet_by' is provided, argument 'use_VizSampNames' must be set to FALSE")
     if(!(facet_by %in% c(order_by, color_by))) {
       facet_temp <- group_designation(omicsData, main_effects = facet_by)
       facetDF <- attributes(facet_temp)$group_DF
@@ -1448,6 +1485,10 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     }
     
     title <- maintitle
+    
+    if(use_VizSampNames == T){
+      p = p + scale_x_discrete(labels = f_data$VizSampNames)
+    }
     
     ## if order_by is not null and color_by is ##
   } else if(!is.null(order_by) & is.null(color_by)) {
@@ -1477,6 +1518,11 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     
     title <- bquote(atop(.(maintitle),atop(italic(paste("Ordered by ",.(order_by))),"")))
     
+    if(use_VizSampNames == T){
+      f_data = f_data[order(f_data[,order_by]),]
+      p = p + scale_x_discrete(labels = f_data$VizSampNames)
+    }
+    
     ## if color_by is not null and order_by is ##
   } else if(!is.null(color_by) & is.null(order_by)) {
     if(color_by != "group_DF") {
@@ -1501,6 +1547,11 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     }
     
     title <- maintitle
+    
+    if(use_VizSampNames == T){
+      f_data = f_data[order(f_data[,color_by]),]
+      p = p + scale_x_discrete(labels = f_data$VizSampNames)
+    }
     
     ## if neither order_by or color_by are null ##
   } else if(!is.null(order_by) & !is.null(color_by)) {
@@ -1545,6 +1596,12 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     }
     
     title <- bquote(atop(.(maintitle),atop(italic(paste("Ordered by ",.(order_by))),"")))
+    
+    if(use_VizSampNames == T){
+      f_data = f_data[order(f_data[,order_by]),]
+      p = p + scale_x_discrete(labels = f_data$VizSampNames)
+    }
+    
   }
   
   
@@ -1604,6 +1661,7 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
 #' \code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used. \cr
 #' \code{legend_position} \tab character string specifying one of "right", "left", "top", or "bottom" for the location of the legend. Defaults to "right". \cr
 #' \code{ylimit} \tab numeric vector of length 2 specifying y axis lower and upper limits. \cr
+#' \code{use_VizSampNames} \tab logical specifies whether to use custom sample names \cr
 #' }
 #'@export
 #'@rdname plot-pmartR-metabData
@@ -1611,7 +1669,7 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
   .plot.metabData(omicsData, order_by, color_by, facet_by, facet_cols, ...)
 }
 
-.plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by = NULL, facet_cols = NULL, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_lab = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme=FALSE, legend_position = "right", ylimit = NULL) {
+.plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by = NULL, facet_cols = NULL, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_lab = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme=FALSE, legend_position = "right", ylimit = NULL, use_VizSampNames = FALSE) {
   
   ## initial checks ##
   if(!is.null(order_by)) {
@@ -1650,6 +1708,7 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
   # organize data #
   e_data <- omicsData$e_data
   e_data_cname <- attributes(omicsData)$cnames$edata_cname
+  f_data = omicsData$f_data
   plot_data <- reshape2::melt(e_data, id = e_data_cname, na.rm = TRUE)
   
   maintitle <- ifelse(attributes(omicsData)$data_info$data_norm,
@@ -1661,6 +1720,7 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
   ## if facet_by is not null and isn't the same as either order_by or color_by ##
   if(!is.null(facet_by)) {
     if(!(facet_by %in% c(order_by, color_by))) {
+      if(!use_VizSampNames) stop("if argument 'facet_by' is provided, argument 'use_VizSampNames' must be set to FALSE")
       facet_temp <- group_designation(omicsData, main_effects = facet_by)
       facetDF <- attributes(facet_temp)$group_DF
       colnames(facetDF) <- c("variable", facet_by)
@@ -1684,6 +1744,10 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     }
     
     title <- maintitle
+    
+    if(use_VizSampNames == T){
+      p = p + scale_x_discrete(labels = f_data$VizSampNames)
+    }
     
     ## if order_by is not null and color_by is ##
   } else if(!is.null(order_by) & is.null(color_by)) {
@@ -1714,6 +1778,11 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     
     title <- bquote(atop(.(maintitle),atop(italic(paste("Ordered by ",.(order_by))),"")))
     
+    if(use_VizSampNames == T){
+      f_data = f_data[order(f_data[,order_by]),]
+      p = p + scale_x_discrete(labels = f_data$VizSampNames)
+    }
+    
     ## if color_by is not null and order_by is ##
   } else if(!is.null(color_by) & is.null(order_by)) {
     if(color_by != "group_DF") {
@@ -1738,6 +1807,11 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     }
     
     title <- maintitle
+    
+    if(use_VizSampNames == T){
+      f_data = f_data[order(f_data[,color_by]),]
+      p = p + scale_x_discrete(labels = f_data$VizSampNames)
+    }
     
     ## if neither order_by or color_by are null ##
   } else if(!is.null(order_by) & !is.null(color_by)) {
@@ -1782,6 +1856,11 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     }
     
     title <- bquote(atop(.(maintitle),atop(italic(paste("Ordered by ",.(order_by))),"")))
+    
+    if(use_VizSampNames == T){
+      f_data = f_data[order(f_data[,order_by]),]
+      p = p + scale_x_discrete(labels = f_data$VizSampNames)
+    }
   }
   
   
