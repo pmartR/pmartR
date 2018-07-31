@@ -130,7 +130,7 @@ plot.corRes <- function(corRes_object, ...){
       heatmap <- heatmap + ggplot2::ggtitle(plot_title)
     }
     
-    if(!use_VizSampNames){
+    if(use_VizSampNames){
       heatmap = heatmap + scale_x_discrete(labels = omicsData$f_data$VizSampNames) + scale_y_discrete(labels = omicsData$f_data$VizSampNames)
     }
     
