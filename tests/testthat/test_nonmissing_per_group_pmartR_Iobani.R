@@ -1,4 +1,6 @@
+context("output tests for nonmissing_per_group()")
 # Testing function for nonmissing_per_group 
+library(testthat)
 library(pmartR)
 library(pmartRdata)
 library(dplyr)
@@ -22,9 +24,6 @@ Infection <- c(0,9,8,9,8)
 Mock <- c(1,3,3,3,3)
 
 hardcoded_nonmissdf <- data.frame(Mass_Tag_ID, Infection, Mock, stringsAsFactors = FALSE)
-
-context("output tests for nonmissing_per_group()")
-
 
 test_that("results are of appropriate class and length",{ 
   expect_that(result, is_a("list"))   

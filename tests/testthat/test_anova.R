@@ -1,3 +1,4 @@
+context("Comparison adjustment")
 library(testthat)
 library(pmartR)
 library(pmartRdata)
@@ -8,7 +9,7 @@ mypepData <- edata_transform(omicsData = pep_object, data_scale = "log2")
 mypepData <- group_designation(omicsData = mypepData, main_effects = c("Condition"))
 
 ##------- Test that the comparisons don't change with/without adjustment -----##
-context("Comparison adjustment")
+
 #Now filter and run again
 imdanova_Filt <- imdanova_filter(omicsData = mypepData)
 mypepData <- applyFilt(filter_object = imdanova_Filt, omicsData = mypepData, min_nonmiss_anova=2)

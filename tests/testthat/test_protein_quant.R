@@ -1,7 +1,10 @@
+context("output tests for protein_quant(method = 'zrollup')")
 #protein_quant testthat 
 library(testthat)
 library(pmartR)
 library(pmartRdata)
+library(foreach)
+library(data.table)
 
 data("pep_object")
 data("lipid_object")
@@ -20,7 +23,7 @@ zroll_median_rt05human = c(0.3215534, 0.4297530, 0.70710678, -1.06047369, -0.134
 zroll_mean_arpc4human = c(0.37681456, 0.001846431, -1.14799757, -0.7625978, -0.1559612, -0.08445067, -0.45365500, -1.4851329, -1.5295777, 1.2406526, 0.5739629, -0.2640281)
 zroll_mean_rt05human = c(0.32155337, 0.429752990, 0.70710678, -1.0604737, -0.1341736, 0.63022510, -0.40965528, -2.3200769, NA, -0.3215534, NA, NA)
                          
-context("output tests for protein_quant(method = 'zrollup')")
+
 
 test_that("results are of appropriate class and length",{ 
   expect_that(class(zrollup_median), equals("proData"))
@@ -28,16 +31,15 @@ test_that("results are of appropriate class and length",{
   expect_that(length(attr(zrollup_median, "filters")), equals(1))
 })
 
-context("input tests for protein_quant(method = 'zrollup')")
+#context("input tests for protein_quant(method = 'zrollup')")
 
 test_that("incorrect argument input throws error",{  
   expect_that(protein_quant(pepData = myobject, method = 'zrollup', single_observation = FALSE), throws_error())
-  expect_that(protein_quant(pepData = myobject, method = 'zrollup', isoformRes = vector, single_observation = TRUE, combine_fn = "median"), throws_error())
   expect_that(protein_quant(pepData = myobject, method = 'zrollup', single_observation = TRUE, combine_fn = "abcdef"), throws_error())
   expect_that(protein_quant(pepData = lipid_object, method = 'zrollup', single_pep = TRUE, single_observation = TRUE), throws_error())
   })
 
-context("tests using hard code results of protein_quant(method = 'zrollup')")
+#context("tests using hard code results of protein_quant(method = 'zrollup')")
 
 test_that("output of protein_quant(combine_fn = 'median') matches hard code results",{
   expect_that(round(as.numeric(zrollup_median$e_data[which(zrollup_median$e_data$Protein == "ARPC4_HUMAN"), -1]), 4) , equals(round(zroll_median_arpc4human, 4)))
@@ -62,18 +64,17 @@ qroll_mean_arpc4human = c(0.24746604, 0.1517315, -0.6131726,  0.337271983, -0.68
 qroll_mean_sucb2human = c(-0.59685702, -0.8711415, -1.0966185, -1.414361405, -0.4728151, -0.4873553, -0.83881699, -1.4231692, -1.8523838, -1.5793305, -1.5602705, -1.3551594)    
 
 
-context("output tests for protein_quant(method = 'qrollup')")
+#context("output tests for protein_quant(method = 'qrollup')")
 
 test_that("results are of appropriate class and length",{ 
   expect_that(class(qrollup_median), equals("proData"))
   expect_that(length(qrollup_median), equals(3))
 })
 
-context("input tests for protein_quant(method = 'qrollup')")
+#context("input tests for protein_quant(method = 'qrollup')")
 
 test_that("incorrect argument input throws error",{  
   expect_that(protein_quant(pepData = myobject, method = 'qrollup', qrollup_thresh = "abcdef", combine_fn = "mean"), throws_error())
-  expect_that(protein_quant(pepData = myobject, method = 'qrollup', qrollup_thresh = .4, isoformRes = vector, combine_fn = "mean"), throws_error())
   expect_that(protein_quant(pepData = myobject, method = 'qrollup', qrollup_thresh = .4, combine_fn = "abcdef"), throws_error())
   expect_that(protein_quant(pepData = myobject, method = 'qrollup', qrollup_thresh = 2, combine_fn = "mean"), throws_error())
   expect_that(protein_quant(pepData = myobject, method = 'qrollup', qrollup_thresh = 'abcdef', combine_fn = "mean"), throws_error())
@@ -81,7 +82,7 @@ test_that("incorrect argument input throws error",{
   expect_that(protein_quant(pepData = lipid_object, method = 'qrollup', qrollup_thresh = .4, combine_fn = "mean"), throws_error())
 })
 
-context("tests using hard code results of protein_quant(method = 'qrollup')")
+#context("tests using hard code results of protein_quant(method = 'qrollup')")
 
 test_that("output of protein_quant(combine_fn = 'median') matches hard code results",{
   expect_that(round(as.numeric(qrollup_median$e_data[which(qrollup_median$e_data$Protein == "ARPC4_HUMAN"), -1]), 4) , equals(round(qroll_median_arpc4human, 4)))
@@ -104,23 +105,22 @@ roll_median_sucb2human = c(-0.8871225, -0.9424352, -1.2426063, -1.6586355, -0.79
 roll_mean_arpc4human = c(-1.0584259, -1.277392, -0.6131726, 0.3372720, -0.680373272, 0.7763576, 0.5373058, -2.605045, -0.1593309, -0.9349052, -1.4795607, -3.15941063)     
 roll_mean_sucb2human = c(-1.0101463, -1.166656, -1.6978494, -1.8028265, -1.596926353, -1.3936373, -0.9915361, -1.423169, -2.7693071, -1.5793305, -3.1176134, -2.91821324)   
 
-context("output tests for protein_quant(method = 'rollup')")
+#context("output tests for protein_quant(method = 'rollup')")
 
 test_that("results are of appropriate class and length",{ 
   expect_that(class(rollup_median), equals("proData"))
   expect_that(length(rollup_median), equals(3))
 })                          
 
-context("input tests for protein_quant(method = 'rollup')")
+#context("input tests for protein_quant(method = 'rollup')")
 
 test_that("incorrect argument input throws error",{  
-  expect_that(protein_quant(pepData = myobject, method = 'rollup', isoformRes = vector, combine_fn = "median"), throws_error())
   expect_that(protein_quant(pepData = myobject, method = 'rollup', combine_fn = "abcdef"), throws_error())
   expect_that(protein_quant(pepData = myobject, combine_fn = "median"), throws_error())
   expect_that(protein_quant(pepData = lipid_object, method = 'rollup', combine_fn = "median"), throws_error())
 })                           
                            
-context("tests using hard code results of protein_quant(method = 'rollup')")
+#context("tests using hard code results of protein_quant(method = 'rollup')")
 
 test_that("output of protein_quant(combine_fn = 'median') matches hard code results",{
   expect_that(round(as.numeric(rollup_median$e_data[which(rollup_median$e_data$Protein == "ARPC4_HUMAN"), -1]), 4) , equals(round(roll_median_arpc4human, 4)))
@@ -136,17 +136,16 @@ test_that("output of protein_quant(combine_fn = 'mean') matches hard code result
 ##################### tests for protein_quant(method = 'rrollup') #########################
 rrollup_result = protein_quant(myobject, method = 'rrollup', combine_fn = 'median')
 
-context("output tests for protein_quant(method = 'rrollup')")
+#context("output tests for protein_quant(method = 'rrollup')")
 
 test_that("results are of appropriate class and length",{ 
   expect_that(class(rrollup_result), equals("proData"))
   expect_that(length(rrollup_result), equals(3))
 })
 
-context("input tests for protein_quant(method = 'rrollup')")
+#context("input tests for protein_quant(method = 'rrollup')")
 
 test_that("incorrect argument input throws error",{  
-  expect_that(protein_quant(pepData = myobject, method = 'rrollup', isoformRes = vector, combine_fn = "median"), throws_error())
   expect_that(protein_quant(pepData = myobject, method = 'rrollup', combine_fn = "abcdef"), throws_error())
   expect_that(protein_quant(pepData = lipid_object, method = 'rrollup', combine_fn = "median"), throws_error())
 })

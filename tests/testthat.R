@@ -1,4 +1,4 @@
 library(testthat)
-library(pmartRqc)
+library(pmartR)
 
-test_check("pmartRqc")
+test_check("pmartR")

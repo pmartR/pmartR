@@ -1,3 +1,4 @@
+context("Check p-value adjustments")
 library(pmartR)
 library(pmartRdata)
 library(testthat)
@@ -13,7 +14,7 @@ imdanova_Filt <- imdanova_filter(omicsData = mypepData)
 mypepData <- applyFilt(filter_object = imdanova_Filt, omicsData = mypepData, min_nonmiss_anova=2)
 
 ##---- Check that warnings and errors are produced in various situations --------##
-context("Check p-value adjustments")
+
 expect_warning(imd_anova(omicsData = mypepData, test_method = 'comb', pval_adjust='dunnett'))
 expect_warning(imd_anova(omicsData = mypepData, test_method = 'comb', pval_adjust='tukey'))
 
