@@ -10,9 +10,8 @@
 #' 
 #' @author Natalie Heller
 #' 
-#' @export
 #' 
-write_stat_results <- function(omicsData, statResData, refCondition, filePath = NULL){
+write_stat_results_omics <- function(omicsData, statResData, refCondition, filePath = NULL){
   
   if(!require(openxlsx)){
     stop("openxlsx package is required")

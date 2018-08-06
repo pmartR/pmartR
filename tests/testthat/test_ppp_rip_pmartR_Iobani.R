@@ -1,3 +1,4 @@
+context("output tests for ppp_rip()")
 # testing function for ppp_rip() in subset_funcs.R 
 library(pmartR)
 library(testthat)
@@ -20,9 +21,6 @@ mat<- matrix(c(1,2,3,4,5,6), nrow = 2, ncol = 3)
 hardcoded_result <- c("1110", "11078", "216191", "6709133", "6753571")
 hardcoded_result_len <- 2812
 
-context("output tests for ppp_rip()")
-
-
 test_that("results are of appropriate class and length",{  
   expect_that(result, is_a("character"))
   expect_that(length(result) >= 2 , is_true()) 
@@ -37,7 +35,6 @@ context("input tests for ppp_rip()")
 
 
 test_that("one NULL argument throws an error",{ 
-  expect_that(pmartR:::ppp_rip(e_data = NULL, edata_id = edata_id, fdata_id = fdata_id, groupDF = groupDF), throws_error())   
   expect_that(pmartR:::ppp_rip(e_data = e_data, edata_id = NULL, fdata_id = fdata_id, groupDF = groupDF), throws_error())
   expect_that(pmartR:::ppp_rip(e_data = e_data, edata_id = edata_id, fdata_id = NULL, groupDF = groupDF), throws_error())
   expect_that(pmartR:::ppp_rip(e_data = e_data, edata_id = edata_id, fdata_id = fdata_id, groupDF = NULL), throws_error())
@@ -61,17 +58,13 @@ test_that("invalid input for fdata_id argument throws error",{
 
 test_that("invalid input for alpha argument throws error",{
   expect_that(pmartR:::ppp_rip(e_data = e_data, edata_id = edata_id, fdata_id = fdata_id, groupDF = groupDF, alpha = 50), throws_error())
- # expect_that(pmartR:::ppp_rip(e_data = e_data, edata_id = edata_id, fdata_id = fdata_id, groupDF = groupDF, alpha = -50), throws_error())   
   expect_that(pmartR:::ppp_rip(e_data = e_data, edata_id = edata_id, fdata_id = fdata_id, groupDF = groupDF, alpha = "three"), throws_error()) 
- # expect_that(pmartR:::ppp_rip(e_data = e_data, edata_id = edata_id, fdata_id = fdata_id, groupDF = groupDF, alpha = c(.1,.2)), throws_error()) 
-})
+ })
 
 test_that("invalid input for proportion argument throws error",{    
   expect_that(pmartR:::ppp_rip(e_data = e_data, edata_id = edata_id, fdata_id = fdata_id, groupDF = groupDF, proportion = 50), throws_error()) 
-  #expect_that(pmartR:::ppp_rip(e_data = e_data, edata_id = edata_id, fdata_id = fdata_id, groupDF = groupDF, proportion = -50), throws_error())   
   expect_that(pmartR:::ppp_rip(e_data = e_data, edata_id = edata_id, fdata_id = fdata_id, groupDF = groupDF, proportion = "one"), throws_error())  
-  #expect_that(pmartR:::ppp_rip(e_data = e_data, edata_id = edata_id, fdata_id = fdata_id, groupDF = groupDF, proportion = c(.1,.2)), throws_error())                  
-})
+  })
   
   
 context("tests using hard coded results of ppp_rip()")

@@ -1,3 +1,4 @@
+context("output tests for cv_filter()")
 # testing function for cv_filter() 
 library(pmartR)
 library(testthat)
@@ -17,10 +18,6 @@ hardcoded_cv_result <- c(NaN, 36.01185, 32.76790, 31.93044, 47.89102)
 hardcoded_result_dim <- c(17407, 2)
 hardcoded_max  <- 91.95324
 hardcoded_tot_nas <- 2173
-
-
-context("output tests for cv_filter()")
-
 
 test_that("result is of appropriate class and length",{ 
   expect_that(result, is_a(c("cvFilt","data.frame")))      
