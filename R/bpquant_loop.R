@@ -13,10 +13,19 @@
 #' 
 #' @examples 
 #' dontrun{
-#' library(pmarRdata)
-#' data("pep_object")
+#' library(pmartR)
+#' library(pmartRdata)
 #' 
-#' isoformRes_result = bpquant_loop(statRes = statRes_object, pepData = pep_object, pi_not = .9, max_proteoforms = 5)
+#' mypepData <- group_designation(omicsData = pep_object, main_effects = c("Condition"))
+#' mypepData = edata_transform(mypepData, "log2")
+#' 
+#' imdanova_Filt <- imdanova_filter(omicsData = mypepData)
+#' mypepData <- applyFilt(filter_object = imdanova_Filt, omicsData = mypepData, min_nonmiss_anova=2)
+#' 
+#' imd_anova_res <- imd_anova(omicsData = mypepData, test_method = 'comb', pval_adjust='bon')
+#' 
+#' result = bpquant_loop(statRes = imd_anova_res, pepData = mypepData)
+#' 
 #' }
 #' 
 #' @rdname bpquant_loop
@@ -42,7 +51,9 @@ bpquant_loop<- function(statRes, pepData, pi_not = .9, max_proteoforms = 5){
   
   #check that rows in signatures equals rows in e_data
   if(nrow(signatures) != nrow(pepData$e_data)) stop("rows in signatures must equal rows in e_data")
-
+  
+  
+  
   #changing entries in signatures to 1 or -1
   for(j in 2:ncol(signatures)){
     
@@ -80,7 +91,8 @@ bpquant_loop<- function(statRes, pepData, pi_not = .9, max_proteoforms = 5){
     
     row_ind<- which(protein_sig_data[, emeta_cname] == unique_proteins[i])
     cur_protein<- protein_sig_data[row_ind, ]
-    cur_protein_sigs = cur_protein[, -(1:2)]
+    cur_protein_sigs = as.data.frame(cur_protein[, which(names(cur_protein) == "flags")])
+    colnames(cur_protein_sigs) = NULL
        
     result<- bpquant_mod(protein_sig = cur_protein_sigs, pi_not = pi_not, max_proteoforms = max_proteoforms)
     peptide_id<- result$peptide_idx
