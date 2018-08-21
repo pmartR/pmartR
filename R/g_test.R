@@ -44,6 +44,10 @@ g_test <- function(omicsData, return_sizes = FALSE){
     warning("This function is intendend for count data only; consider using 'anova_test(...)' for the data provided.")
   }
   
+  #sample_name
+  fdata_cname = get_fdata_cname(omicsData = omicsData)
+  sample_name = as.character(groupData[[fdata_cname]])
+  
   #Remove rows in "groupData" that don't have corresponding columns in 'omicsData$edata'
   groupData <- dplyr::filter(groupData,sample_name%in%colnames(omicsData$e_data))
   
