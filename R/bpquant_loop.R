@@ -91,10 +91,10 @@ bpquant_loop<- function(statRes, pepData, pi_not = .9, max_proteoforms = 5){
     
     row_ind<- which(protein_sig_data[, emeta_cname] == unique_proteins[i])
     cur_protein<- protein_sig_data[row_ind, ]
-    cur_protein_sigs = as.data.frame(cur_protein[, which(names(cur_protein) == "flags")])
-    colnames(cur_protein_sigs) = NULL
+    cur_protein_sigs = as.data.frame(cur_protein[, which(names(cur_protein) %in% "flags")])
+    colnames(cur_protein_sigs) = paste(rep("flags", ncol(cur_protein_sigs)), 1:ncol(cur_protein_sigs), sep = "")
        
-    result<- bpquant_mod(protein_sig = cur_protein_sigs, pi_not = pi_not, max_proteoforms = max_proteoforms)
+    result<- pmartR::bpquant_mod(protein_sig = cur_protein_sigs, pi_not = pi_not, max_proteoforms = max_proteoforms)
     peptide_id<- result$peptide_idx
     
     temp<- data.frame(Protein = as.character(cur_protein[, emeta_cname]), Mass_Tag_ID = as.character(cur_protein[, edata_cname]), proteoformID = peptide_id, stringsAsFactors = FALSE)
@@ -106,25 +106,27 @@ bpquant_loop<- function(statRes, pepData, pi_not = .9, max_proteoforms = 5){
 
  stopCluster(cl)
  
- isoformRes2<- lapply(isoformRes, isoformRes_func)
+ #filter out isoformRes with max(proteoformID) of zero
+ list_inds = lapply(isoformRes,function(x){max(x$proteoformID)})
+ inds = which(list_inds == 0)
+ isoformRes = isoformRes[-inds]
+ 
+ isoformRes2<- lapply(isoformRes, isoformRes_func, emeta_cname = emeta_cname, edata_cname = edata_cname)
  isoformRes2<- do.call(rbind, isoformRes2) 
  
  attr(isoformRes, "isoformRes_subset")<- isoformRes2
  
  class(isoformRes)<- "isoformRes"
  return(isoformRes)
- 
-#do.call(rbind, r)
-  
 }
 
 # function to use with lapply on isoformRes
-isoformRes_func<- function(df){
+isoformRes_func<- function(df, emeta_cname, edata_cname){
   temp<- vector("list", max(df$proteoformID))
   
   for(i in 1:max(df$proteoformID)){
     cur_subset<- df[which(df$proteoformID == i), ]
-    new_df<- data.frame(cur_subset$Protein, paste(cur_subset$Protein, cur_subset$proteoformID, sep = ';'), as.numeric(cur_subset$Mass_Tag_ID))
+    new_df<- data.frame(cur_subset[[emeta_cname]], paste(cur_subset[[emeta_cname]], cur_subset$proteoformID, sep = ';'), as.numeric(cur_subset[[edata_cname]]))
     names(new_df)<- c(names(df)[1], "Protein_Isoform", names(df)[2])
     temp[[i]]<- new_df
   }

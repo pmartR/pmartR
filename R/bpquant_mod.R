@@ -53,7 +53,7 @@ if(sum(apply(protein_sig, 1, function(x) sum(!(x %in% c(1,-1,0)))))> 0 ) stop("E
   
   ## order signatures by count##
   cnt.ord = counts[order(counts, decreasing=T)]
-  if(nrow(sigs) > 1){sig.ord = sigs[order(counts, decreasing=T),]}else{sig.ord = sigs}
+  if(nrow(sigs) > 1){sig.ord = as.data.frame(sigs[order(counts, decreasing=T),])}else{sig.ord = sigs}
   
   ## set zero signature first ##
   z.sig = which(apply(abs(sig.ord),1,sum)==0)

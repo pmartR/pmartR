@@ -19,14 +19,24 @@
 #' 
 #' @examples 
 #' dontrun{
+#' library(pmartR)
 #' library(pmartRdata)
-#' data("pep_object")
 #' 
-#' case where isoformRes is NULL:
-#' results<- protein_quant(pepData = pep_object, method = 'rollup', combine_fn = 'median', isoformRes = NULL)
+#' mypepData <- group_designation(omicsData = pep_object, main_effects = c("Condition"))
+#' mypepData = edata_transform(mypepData, "log2")
 #' 
-#' case where isoformRes is provided:
-#' results2 = protein_quant(pepData = pep_object, method = 'rollup', combine_fn = 'mean', isoformRes = isoformRes_object)
+#' imdanova_Filt <- imdanova_filter(omicsData = mypepData)
+#' mypepData <- applyFilt(filter_object = imdanova_Filt, omicsData = mypepData, min_nonmiss_anova=2)
+#' 
+#' imd_anova_res <- imd_anova(omicsData = mypepData, test_method = 'comb', pval_adjust='bon')
+#' 
+#' isoformRes = bpquant_loop(statRes = imd_anova_res, pepData = mypepData)
+#' 
+#' #case where isoformRes is NULL:
+#' results<- protein_quant(pepData = mypepData, method = 'rollup', combine_fn = 'median', isoformRes = NULL)
+#' 
+#' #case where isoformRes is provided:
+#' results2 = protein_quant(pepData = pep_object, method = 'rollup', combine_fn = 'mean', isoformRes = isoformRes)
 #' }
 #'
 #' @rdname protein_quant 
