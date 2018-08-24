@@ -2,17 +2,11 @@
 % Please edit documentation in R/applyFilt.R
 \name{applyFilt}
 \alias{applyFilt}
-\alias{applyFilt}
 \alias{applyFilt.moleculeFilt}
-\alias{applyFilt}
 \alias{applyFilt.cvFilt}
-\alias{applyFilt}
 \alias{applyFilt.rmdFilt}
-\alias{applyFilt}
 \alias{applyFilt.proteomicsFilt}
-\alias{applyFilt}
 \alias{applyFilt.imdanovaFilt}
-\alias{applyFilt}
 \alias{applyFilt.customFilt}
 \title{Apply a S3 filter  object to a pmartR S3 object}
 \usage{

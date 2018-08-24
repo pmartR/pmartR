@@ -2,7 +2,7 @@
 % Please edit documentation in R/write_stat_results.R
 \name{write_stat_results}
 \alias{write_stat_results}
-\title{Creates a list of three sheets, Normalized Data, DA Test Results, and Only DA biomolecules}
+\title{Creates a list of three sheets, Normalized Data, DA Test Results, and Only DA biomolecules - for OMICS project}
 \usage{
 write_stat_results(omicsData, statResData, refCondition, filePath = NULL)
 }
@@ -19,7 +19,7 @@ write_stat_results(omicsData, statResData, refCondition, filePath = NULL)
 a list of three data frames Normalized_Data, DA_Test_Results, and DA_"data type"_Only
 }
 \description{
-Creates a list of three sheets, Normalized Data, DA Test Results, and Only DA biomolecules
+Creates a list of three sheets, Normalized Data, DA Test Results, and Only DA biomolecules - for OMICS project
 }
 \author{
 Natalie Heller

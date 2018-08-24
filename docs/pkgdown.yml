@@ -1,0 +1,8 @@
+pandoc: 1.19.2.1
+pkgdown: 1.1.0.9000
+pkgdown_sha: b2798656f04ce282edea3e12734ba5588c6acd6e
+articles:
+  Quality_Control_with_pmartR: Quality_Control_with_pmartR.html
+  Statistical_Analysis_with_pmartR: Statistical_Analysis_with_pmartR.html
+  analysis_log: analysis_log.html
+
