@@ -126,13 +126,14 @@ plot.corRes <- function(corRes_object, ...){
     if(!is.null(attributes(corRes_object)$data_norm)){
       if(attributes(corRes_object)$data_norm == TRUE) {
         heatmap <- heatmap + ggplot2::ggtitle(plot_title)
-      }
+      }else{heatmap <- heatmap + ggplot2::ggtitle(plot_title)}
     }else{
         heatmap <- heatmap + ggplot2::ggtitle(plot_title)
     }
     
   } else {
-    heatmap <- d3heatmap::d3heatmap(corRes_object, dendrogram = 'none', reorderfun = function(x) ordered(x, levels = rev(sort(unique(x)))))
+    if(is.null(title_plot)){message("The ability to display a plot title is not available when interactive is set to TRUE")}
+    heatmap <- d3heatmap::d3heatmap(corRes_object, dendrogram = 'none', reorderfun = function(x) ordered(x, levels = rev(sort(unique(x)))), title = plot_title)
   }
   
   return(heatmap)
