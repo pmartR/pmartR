@@ -6,7 +6,16 @@
 #' @return returns a data frame with comparisons and their indices
 #' @examples 
 #' dontrun{
-#' get_comparisons(statRes_object)
+#' library(pmartR)
+#' library(pmartRdata)
+#' 
+#' my_prodata = group_designation(omicsData = pro_object, main_effects = c("Condition"))
+#' 
+#' imdanova_Filt = imdanova_filter(omicsData = my_prodata)
+#' my_prodata = applyFilt(filter_object = imdanova_Filt, omicsData = my_prodata, min_nonmiss_anova=2) 
+#' imd_anova_res = imd_anova(omicsData = my_prodata, test_method = 'comb', pval_adjust='bon')
+#' 
+#' result = get_comparisons(imd_anova_res)
 #'}
 #' @rdname get_comparisons
 #' @export

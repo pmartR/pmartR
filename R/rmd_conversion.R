@@ -16,7 +16,7 @@
 #' data(metab_object)
 #' metab_object2 <- edata_transform(omicsData = metab_object, data_scale = "log2")
 #' metab_object3 <- group_designation(omicsData = metab_object2, main_effects = "Condition")
-#' rmd_results <- rmd_runs(omicsData = metab_object3, metrics=c("MAD", "Skewness", "Correlation"))
+#' rmd_results <- rmd_filter(omicsData = metab_object3, metrics=c("MAD", "Skewness", "Correlation"))
 #' rmd_conversion(log2rmd = rmd_results$Log2.md, df=3)
 #'
 #' rmd_conversion(pval = .0001, df = 3)
