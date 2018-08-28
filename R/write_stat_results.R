@@ -10,6 +10,21 @@
 #' 
 #' @author Natalie Heller
 #' 
+#' @examples 
+#' dontrun{
+#' library(pmartR)
+#' library(pmartRdata)
+#' 
+#' myproData <- group_designation(omicsData = pro_object, main_effects = c("Condition"))
+#' 
+#' imdanova_Filt <- imdanova_filter(omicsData = myproData)
+#' myproData <- applyFilt(filter_object = imdanova_Filt, omicsData = myproData, min_nonmiss_anova=2)
+#' 
+#' imd_anova_res <- imd_anova(omicsData = myproData, test_method = 'comb', pval_adjust='bon')
+#' 
+#' result = write_stat_results(omicsData = myproData, statResData = imd_anova_res, refCondition = "Mock")
+#' }
+#' 
 #' @export
 #' 
 write_stat_results <- function(omicsData, statResData, refCondition, filePath = NULL){
@@ -44,8 +59,8 @@ write_stat_results <- function(omicsData, statResData, refCondition, filePath = 
   
   
   ## Get the query condition(s)
-  ii <- unique(as.character(attributes(statResData)$group_DF$VIRUS))
-  q_cond <- ii[which(ii != refCondition)]
+  #ii <- unique(as.character(attributes(statResData)$group_DF$VIRUS))
+  #q_cond <- ii[which(ii != refCondition)]
   
   pval <- statResData$P_values
   flag <- statResData$Flags
@@ -54,12 +69,12 @@ write_stat_results <- function(omicsData, statResData, refCondition, filePath = 
   # Rename columns of pval
   a1 <- which(attributes(omicsData)$cname$edata_cname == colnames(pval))
   colnames(pval)[-a1] <- gsub(pattern = "pvals_", replacement = "", x = tolower(colnames(pval)[-a1]))
-  colnames(pval)[-a1] <- paste(q_cond, colnames(pval)[-a1], "Pval", sep = "_")
+  #colnames(pval)[-a1] <- paste(q_cond, colnames(pval)[-a1], "Pval", sep = "_")
   
   # Renames the columns of flag
   a2 <- which(attributes(omicsData)$cname$edata_cname == colnames(flag))
   colnames(flag)[-a2] <- gsub(pattern = "flags_", replacement = "", x = tolower(colnames(flag)[-a2]))
-  colnames(flag)[-a2] <- paste(q_cond, colnames(flag)[-a1], "Flag", sep = "_")
+  #colnames(flag)[-a2] <- paste(q_cond, colnames(flag)[-a1], "Flag", sep = "_")
   
   a3 <- which(attributes(omicsData)$cname$edata_cname == colnames(fc))
   colnames(fc)[-a3] <- gsub(pattern = "Fold_change_", replacement = "", x = colnames(fc)[-a3])
@@ -70,7 +85,7 @@ write_stat_results <- function(omicsData, statResData, refCondition, filePath = 
   
   ## Now get the DA_Molecule_Only tab
   tmp <- flag
-  tmp$TMP <- apply(flag[, -a1], 1, function(x){abs(sum(x))})
+  tmp$TMP <- apply(as.data.frame(flag[, -a1]), 1, function(x){abs(sum(x))})
   indx <- which(tmp$TMP != 0)
   
   DA_Only <- DA_Test_Results[indx, ]
