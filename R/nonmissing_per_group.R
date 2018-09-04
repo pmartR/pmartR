@@ -76,7 +76,7 @@ nonmissing_per_group <- function(omicsData = NULL, e_data = NULL, groupDF=NULL, 
 #  nonmiss_dat = dplyr::summarise(melt.data, non_miss = sum(!is.na(value)))
 
 #  # put data back in wide format #
-#  nonmiss_res = data.table::dcast.data.table(data.table::data.table(nonmiss_dat), Peptide~Group, value.var = "non_miss") # this command, using "Peptide", is the reason that we had to set the column name in melt.data to "Peptide" (using cname_id did not work)
+#  nonmiss_res = data.table::dcast.data.table(data.table(nonmiss_dat), Peptide~Group, value.var = "non_miss") # this command, using "Peptide", is the reason that we had to set the column name in melt.data to "Peptide" (using cname_id did not work)
 
 #  #
 #  nonmiss_res <- as.data.frame(nonmiss_res)

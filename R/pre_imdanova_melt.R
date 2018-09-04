@@ -15,7 +15,7 @@ pre_imdanova_melt <- function(e_data, groupDF, samp_id){
 
 
   # convert peptide data to class "data.table" #
-  DT <- data.table::data.table(e_data)
+  DT <- data.table(e_data)
   data.table::setnames(DT,names(DT)[1], "Peptide") # Don't change this from "Peptide"! When I tried to use cname_id, it messed up use of the "summarise" function in nonmissing_per_group.R
 
   # melt this data based on the first column giving the peptide names #
@@ -29,7 +29,7 @@ pre_imdanova_melt <- function(e_data, groupDF, samp_id){
   names(groupDF)[1] <- "samp_id"
 
   # merge melted e_data and groupDF #
-  new.dat = data.table:::merge.data.table(x = melt.pep, y = data.table::data.table(groupDF),
+  new.dat = data.table:::merge.data.table(x = melt.pep, y = data.table(groupDF),
                                           by = "samp_id", all.x = TRUE)
 
   # group data by Peptide and Group #
