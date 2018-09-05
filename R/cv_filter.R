@@ -40,11 +40,11 @@ cv_filter <- function(omicsData){
     ##########
     #    ## format the data ##
     #    temp_dat = data.table(omicsData$e_data)
-    #    melt_dat = data.table::melt.data.table(temp_dat, id.var = edata_id)
+    #    melt_dat = melt(temp_dat, id.var = edata_id)
     #
-    #    data.table::setnames(melt_dat, names(melt_dat)[2], samp_id)
+    #    setnames(melt_dat, names(melt_dat)[2], samp_id)
     #
-    #    merge_dat = data.table:::merge.data.table(x = melt_dat, y = data.table(groupDF), by = samp_id, all.x = TRUE)
+    #    merge_dat = merge(x = melt_dat, y = data.table(groupDF), by = samp_id, all.x = TRUE)
     #
     #    # group the data by peptide and group #
     #    dat_grouped = dplyr::group_by_(data.frame(merge_dat), edata_id, "Group")

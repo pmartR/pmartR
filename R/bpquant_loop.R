@@ -67,7 +67,7 @@ bpquant_loop<- function(statRes, pepData, pi_not = .9, max_proteoforms = 5){
   }
   
   #merging e_meta with signatures from statRes
-  protein_sig_data<- data.table:::merge.data.table(e_meta, signatures, by = edata_cname, all.x = TRUE)
+  protein_sig_data<- merge(e_meta, signatures, by = edata_cname, all.x = TRUE)
   
   protein_sig_data<- as.data.frame(protein_sig_data)
 
@@ -85,9 +85,9 @@ bpquant_loop<- function(statRes, pepData, pi_not = .9, max_proteoforms = 5){
   )
   cores<- detectCores()
   cl<- makeCluster(cores)
-  registerDoParallel(cl)
+  doParallel::registerDoParallel(cl)
   
- isoformRes<- foreach(i=1:length(unique_proteins)) %dopar%{
+ isoformRes<- foreach::foreach(i=1:length(unique_proteins))%dopar%{
     
     row_ind<- which(protein_sig_data[, emeta_cname] == unique_proteins[i])
     cur_protein<- protein_sig_data[row_ind, ]
