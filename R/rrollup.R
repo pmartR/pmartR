@@ -40,7 +40,7 @@ rrollup<- function(pepData, combine_fn = "median", parallel = TRUE){
   
   pep = data.table(pepData$e_data)
   pro = data.table(pepData$e_meta[,c(pep_id, pro_id)])
-  temp = data.table:::merge.data.table(x = pro, y = pep, by = pep_id, all.x = F, all.y = T)
+  temp = merge(x = pro, y = pep, by = pep_id, all.x = F, all.y = T)
   temp = as.data.frame(temp, check.names=check_names)[,-which(names(temp)==pep_id)]
   
   #pull protein column from temp and apply unique function
@@ -60,7 +60,7 @@ rrollup<- function(pepData, combine_fn = "median", parallel = TRUE){
     cl<- parallel::makeCluster(cores - 1)
     doParallel::registerDoParallel(cl)
     
-    r<-foreach(i=1:length(unique_proteins))%dopar%{
+    r<-foreach::foreach(i=1:length(unique_proteins))%dopar%{
       
       row_ind<- which(temp[ ,pro_id] == unique_proteins[i])
       current_subset<- temp[row_ind,]

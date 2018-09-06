@@ -35,7 +35,7 @@ pquant_mean <- function(pepData){
   
   pep = data.table(pepData$e_data)
   pro = data.table(pepData$e_meta[,c(pep_id, pro_id)])
-  temp = data.table:::merge.data.table(x = pro, y = pep, by = pep_id, all.x = F, all.y = T)
+  temp = merge(x = pro, y = pep, by = pep_id, all.x = F, all.y = T)
   temp = as.data.frame(temp, check.names=check_names)[,-which(names(temp)==pep_id)]
   DT = data.table(temp)
   res = as.data.frame(DT[,lapply(.SD, function(x){if(all(is.na(x))){mean(x)}else{mean(x, na.rm = T)}}), by = pro_id], check.names=check_names)
