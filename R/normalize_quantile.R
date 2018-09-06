@@ -57,7 +57,7 @@ normalize_quantile <- function(omicsData){
   x_sort <- apply(x, 2, function(c) sort(c, na.last = FALSE))
   x_ord <- apply(x, 2, function(c) order(c, na.last = FALSE))
   
-  for(i in 1:ncol(x_norm)){
+  for(i in 1:ncol(x)){
     x_ord[, i] <- match(x_sort[, i], x[, i])
   }
   
@@ -67,6 +67,7 @@ normalize_quantile <- function(omicsData){
   
   # 4. get x_norm by rearranging each column of x_sort_prime to have same ordering as the original x #
   x_norm <- x
+  temp_x_sort_prime <- rep(NA, nrow(x_norm))
   for(i in 1:ncol(x_norm)){
     temp_x_sort_prime[x_ord[, i]] <- x_sort_prime[, i]
     x_norm[, i] <- temp_x_sort_prime
