@@ -62,17 +62,18 @@ NULL
 plot.corRes <- function(corRes_object, ...){
   .plot.corRes(corRes_object, ...)
 }
-.plot.corRes <- function(corRes_object, omicsData, interactive = FALSE, title_plot = NULL, x_lab=TRUE, y_lab=TRUE, colorbar_lim=c(NA, NA), title_size = 14, use_VizSampNames = FALSE){
+.plot.corRes <- function(corRes_object, omicsData = NULL, interactive = FALSE, title_plot = NULL, x_lab=TRUE, y_lab=TRUE, colorbar_lim=c(NA, NA), title_size = 14, use_VizSampNames = FALSE){
   # check for a corRes object #
   if(!inherits(corRes_object, "corRes")) stop("object must be of class 'corRes'")
   # check plot title is a string #
   if(!is.null(title_plot)) {
     if(!is.character(title_plot)) stop("title_plot must be a character vector")
   }
-  
+  if(!all(is.na(colorbar_lim))){
+    if(!is.numeric(colorbar_lim) | length(colorbar_lim) != 2) stop("colorbar_lim must be a numeric vector of length 2")
+  }
   # check that omicsData is of appropriate class #
-  if(!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData"))) stop("omicsData must be of class 'pepData', 'proData', 'metabData', or 'lipidData'")
-
+  if(!is.numeric(title_size)) message("Title size should be a numeric value, a default value will be used")
   # Workaround for certain "check" warnings
   Var1 <- Var2 <- value <- NULL
   
@@ -137,11 +138,16 @@ plot.corRes <- function(corRes_object, ...){
     }
     
     if(use_VizSampNames){
-      heatmap = heatmap + scale_x_discrete(labels = omicsData$f_data$VizSampNames) + scale_y_discrete(labels = omicsData$f_data$VizSampNames)
+      if(!is.logical(as.logical(use_VizSampNames))) stop("Must specify a logical TRUE/FALSE value for use_VizSampNames")
+      if(is.null(omicsData)) stop("If using custom sample names, specify the corresponding omicsData object")
+      heatmap = heatmap + 
+        ggplot2::scale_x_discrete(labels = omicsData$f_data$VizSampNames, breaks = levels(omicsData$f_data[,get_fdata_cname(omicsData)])) + 
+        ggplot2::scale_y_discrete(labels = omicsData$f_data$VizSampNames, breaks = levels(omicsData$f_data[,get_fdata_cname(omicsData)]))
     }
     
   } else {
-    if(is.null(title_plot)){message("The ability to display a plot title is not available when interactive is set to TRUE")}
+    if(!is.null(title_plot)) message("The ability to display a plot title is not available when interactive is set to TRUE")
+    if(use_VizSampNames) message("Custom Sample names not available in interactive plots")
     heatmap <- d3heatmap::d3heatmap(corRes_object, dendrogram = 'none', reorderfun = function(x) ordered(x, levels = rev(sort(unique(x)))), title = plot_title)
   }
   
@@ -512,7 +518,7 @@ plot.imdanovaFilt <- function(filter_object, min_nonmiss_anova = NULL, min_nonmi
     
     p <- ggplot2::ggplot(heat_df_melt, ggplot2::aes(x = ordered(Var2, levels = sort(unique(Var2))), y = ordered(Var1, levels = sort(unique(Var1))))) +
       ggplot2::geom_tile(ggplot2::aes(fill = value)) +
-      ggplot2::geom_text(ggplot2::aes(fill = value, label = value), size=50/max(heat_df_melt$Var2)) +
+      ggplot2::geom_text(ggplot2::aes(label = value), size=50/max(heat_df_melt$Var2)) +
       ggplot2::geom_segment(x=min_nonmiss_gtest-2.5, xend=min_nonmiss_gtest-2.5, y=0, yend=max(heat_df_melt$Var1)+1, linetype = 1, size = 1.5) +
       ggplot2::geom_segment(x=min_nonmiss_gtest-1.5, xend=min_nonmiss_gtest-1.5, y=0, yend=max(heat_df_melt$Var1)+1, linetype = 1, size = 1.5) +
       ggplot2::geom_segment(x=0, xend=max(heat_df_melt$Var2)+1, y=min_nonmiss_anova-1.5, yend=min_nonmiss_anova-1.5, linetype = 1, size = 1.5) +
@@ -950,7 +956,6 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
   
   ## if facet_by is not null and isn't the same as either order_by or color_by ##
   if(!is.null(facet_by)) {
-    if(!use_VizSampNames) stop("if argument 'facet_by' is provided, argument 'use_VizSampNames' must be set to FALSE")
     if(!(facet_by %in% c(order_by, color_by))) {
       facet_temp <- group_designation(omicsData, main_effects = facet_by)
       facetDF <- attributes(facet_temp)$group_DF
@@ -977,7 +982,7 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     title <- maintitle
     
     if(use_VizSampNames == T){
-      p = p + scale_x_discrete(labels = f_data$VizSampNames)
+      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = levels(f_data[,get_fdata_cname(omicsData)]))
     }
     
     ## if order_by is not null and color_by is ##
@@ -1010,7 +1015,7 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     
     if(use_VizSampNames == T){
       f_data = f_data[order(f_data[,order_by]),]
-      p = p + scale_x_discrete(labels = f_data$VizSampNames)
+      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = levels(f_data[,get_fdata_cname(omicsData)]))
     }
     
     ## if color_by is not null and order_by is ##
@@ -1039,7 +1044,7 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     
     if(use_VizSampNames == T){
       f_data = f_data[order(f_data[,color_by]),]
-      p = p + scale_x_discrete(labels = f_data$VizSampNames)
+      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = levels(f_data[,get_fdata_cname(omicsData)]))
     }
     
     ## if neither order_by or color_by are null ##
@@ -1088,7 +1093,7 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     
     if(use_VizSampNames == T){
       f_data = f_data[order(f_data[,order_by]),]
-      p = p + scale_x_discrete(labels = f_data$VizSampNames)
+      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = levels(f_data[,get_fdata_cname(omicsData)]))
     }
     
   }
@@ -1235,7 +1240,7 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     title <- maintitle
     
     if(use_VizSampNames == T){
-      p = p + scale_x_discrete(labels = f_data$VizSampNames)
+      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = levels(f_data[,get_fdata_cname(omicsData)]))
     }
     
     ## if order_by is not null and color_by is ##
@@ -1268,7 +1273,7 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     
     if(use_VizSampNames == T){
       f_data = f_data[order(f_data[,order_by]),]
-      p = p + scale_x_discrete(labels = f_data$VizSampNames)
+      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = levels(f_data[,get_fdata_cname(omicsData)]))
     }
     
     ## if color_by is not null and order_by is ##
@@ -1297,7 +1302,7 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     
     if(use_VizSampNames == T){
       f_data = f_data[order(f_data[,color_by]),]
-      p = p + scale_x_discrete(labels = f_data$VizSampNames)
+      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = levels(f_data[,get_fdata_cname(omicsData)]))
     }
     
     ## if neither order_by or color_by are null ##
@@ -1346,7 +1351,7 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     
     if(use_VizSampNames == T){
       f_data = f_data[order(f_data[,order_by]),]
-      p = p + scale_x_discrete(labels = f_data$VizSampNames)
+      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = levels(f_data[,get_fdata_cname(omicsData)]))
     }
     
   }
@@ -1491,7 +1496,7 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     title <- maintitle
     
     if(use_VizSampNames == T){
-      p = p + scale_x_discrete(labels = f_data$VizSampNames)
+      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = levels(f_data[,get_fdata_cname(omicsData)]))
     }
     
     ## if order_by is not null and color_by is ##
@@ -1524,7 +1529,7 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     
     if(use_VizSampNames == T){
       f_data = f_data[order(f_data[,order_by]),]
-      p = p + scale_x_discrete(labels = f_data$VizSampNames)
+      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = levels(f_data[,get_fdata_cname(omicsData)]))
     }
     
     ## if color_by is not null and order_by is ##
@@ -1554,7 +1559,7 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     
     if(use_VizSampNames == T){
       f_data = f_data[order(f_data[,color_by]),]
-      p = p + scale_x_discrete(labels = f_data$VizSampNames)
+      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = levels(f_data[,get_fdata_cname(omicsData)]))
     }
     
     ## if neither order_by or color_by are null ##
@@ -1603,7 +1608,7 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     
     if(use_VizSampNames == T){
       f_data = f_data[order(f_data[,order_by]),]
-      p = p + scale_x_discrete(labels = f_data$VizSampNames)
+      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = levels(f_data[,get_fdata_cname(omicsData)]))
     }
     
   }
@@ -1750,7 +1755,7 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     title <- maintitle
     
     if(use_VizSampNames == T){
-      p = p + scale_x_discrete(labels = f_data$VizSampNames)
+      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = levels(f_data[,get_fdata_cname(omicsData)]))
     }
     
     ## if order_by is not null and color_by is ##
@@ -1784,7 +1789,7 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     
     if(use_VizSampNames == T){
       f_data = f_data[order(f_data[,order_by]),]
-      p = p + scale_x_discrete(labels = f_data$VizSampNames)
+      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = levels(f_data[,get_fdata_cname(omicsData)]))
     }
     
     ## if color_by is not null and order_by is ##
@@ -1814,7 +1819,7 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     
     if(use_VizSampNames == T){
       f_data = f_data[order(f_data[,color_by]),]
-      p = p + scale_x_discrete(labels = f_data$VizSampNames)
+      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = levels(f_data[,get_fdata_cname(omicsData)]))
     }
     
     ## if neither order_by or color_by are null ##
@@ -1863,7 +1868,7 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     
     if(use_VizSampNames == T){
       f_data = f_data[order(f_data[,order_by]),]
-      p = p + scale_x_discrete(labels = f_data$VizSampNames)
+      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = levels(f_data[,get_fdata_cname(omicsData)]))
     }
   }
   
