@@ -70,8 +70,8 @@ plot.dataRes<- function(dataRes, metric = NULL, density = FALSE, ncols = NULL){
       data_melt = melt(data, id.vars = edata_cname)
       
       r<- ggplot(data_melt, aes(x = value, fill = variable)) + geom_histogram(binwidth = .5, colour = "white") +
-        facet_wrap(~variable, ncol = 2) +
-        ggtitle(paste("Histograms for ", metric, sep = "", ncol = ncols)) + theme_bw()
+        facet_wrap(~variable, ncol = ncols) +
+        ggtitle(paste("Histograms for ", metric, sep = "")) + theme_bw()
       
     }else{
       #if density == T, will plot geom_density
@@ -79,7 +79,7 @@ plot.dataRes<- function(dataRes, metric = NULL, density = FALSE, ncols = NULL){
       data_melt = melt(data, id.vars = edata_cname)
       
       r<- ggplot(data_melt, aes(x = value, colour = variable)) + geom_density() +
-        ggtitle(paste("Density plot for ", metric, sep = "", ncol = ncols)) + theme_bw()
+        ggtitle(paste("Density plot for ", metric, sep = "")) + theme_bw()
     }
 
     return(r)

@@ -3,22 +3,22 @@ library(pmartR)
 library(pmartRdata)
 library(testthat)
 library(htmlwidgets)
+library(gridExtra)
 
 data("pep_object")
 
-# Testing object.  Has a fake group and vizsamp names truncated to 4 characters
-
+# List of testing objects.  Each has a fake group and custom sample names
 obj_list <- lapply(list(pep_object, pro_object, metab_object, lipid_object), function(x){
   x$f_data["testgroup"] <- c(rep(1, floor(nrow(x$f_data)/2)), rep(2, ceiling(nrow(x$f_data)/2)))
   x = custom_sampnames(x, from = 2, to = 14)
 })
 
+# filter functions to test
 filter_list <- list("molecule_filter", "proteomics_filter", "imdanova_filter", "rmd_filter", "cv_filter")
 
 ### Test and store plots for corRes objects ###
 
 test_that("cor_res errors", {
-  
   # test errors
   lapply(obj_list, function(x){
     cor_matrix <- cor_result(x)
@@ -29,7 +29,7 @@ test_that("cor_res errors", {
  
 })
 
-# write plots to tests/testthat/images
+# write corRes plots to tests/testthat/images
 plot_list <- list()
 
 plot_list <-  lapply(1:4, function(i){
@@ -63,7 +63,6 @@ for (i in 1:4) {
 }
 
 #### Test and store plots for filters ###
-
 test_that("filter plot errors", {
   
   obj <- obj_list[[1]] %>% 
@@ -157,6 +156,7 @@ grouped_objs <- lapply(obj_list, function(obj){
   }
   else(res %>% edata_transform(data_scale = "log2"))})
 
+# error testing taken from test_plot_final.R
 lapply(1:length(grouped_objs), function(i){
     omicsData <- grouped_objs[[i]]
     
@@ -246,46 +246,106 @@ lapply(1:length(grouped_objs), function(i){
       expect_that(plot(omicsData, ylimit = c("one", "two")), throws_error())
     })
     
+    # store plots of current omicsdata object in ../images
     png(paste("images/", class(omicsData),"_plot_", i, ".png", sep=""))
     print(do.call(plot, c(list(omicsData), common_params)))
     dev.off()
     
   })
 
+#### PCA, normres, edata_summary and missingval_result objects #####
 
 
-# cor_matrix <- cor_result(pep_object)
-# p_cor <- plot(cor_matrix, pep_object, interactive = FALSE)
-# 
-# p <- plot(pep_object_viznames, facet_by = "Condition", use_VizSampNames = TRUE)
-
+# create lists of objects resulting from applying dim_reduction, normalize_global, edata_summary, and missingval_result to each omicsData object in obj_list #
+pcares <- lapply(obj_list, function(obj){
+  res <- obj %>% group_designation(main_effects = "testgroup")
   
-# pepdata object
+  if(attr(res, "data_info")$data_scale != "log2"){
+    res <- res %>% edata_transform(data_scale = "log2")
+  }
+  
+  res <- dim_reduction(res)
+  
+  res
+  })
 
-# prodata object
+normres <- lapply(obj_list, function(obj){
+  res <- obj %>% group_designation(main_effects = "testgroup")
+  
+  if(attr(res, "data_info")$data_scale != "log2"){
+    res <- res %>% edata_transform(data_scale = "log2")
+  }
+  
+  res <- normalize_global(res, subset_fn = "all", norm_fn = "median")
+  
+  res
+})
 
-# lipiddata object
+summaryres <- lapply(obj_list, function(obj){
+  res <- obj %>% group_designation(main_effects = "testgroup")
+  
+  if(attr(res, "data_info")$data_scale != "log2"){
+    res <- res %>% edata_transform(data_scale = "log2")
+  }
+  
+  res <- edata_summary(res, by = "molecule", groupvar = "testgroup")
+  
+  res
+})
 
-# metabdata object
+missingvalres <- lapply(obj_list, function(obj){
+  res <- obj %>% group_designation(main_effects = "testgroup")
+  
+  if(attr(res, "data_info")$data_scale != "log2"){
+    res <- res %>% edata_transform(data_scale = "log2")
+  }
+  
+  res <- missingval_result(res)
+  
+  res
+})
 
-# dimres object
+# end creating lists of results of function calls to omicsData objects #
 
-# normres object
+# plot write loop for misc objects
 
-# plot.moleculeFilt <- function(filter_object, min_num = NULL, x_lab = NULL, y_lab = NULL, 
-#                                title_plot = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, 
-#                                bw_theme = FALSE) 
-# plot.proteomicsFilt <- function(filter_object, min_num_peps = NULL, degen_peps = FALSE,
-#                                    x_lab_pep = NULL, y_lab_pep = NULL, title.pep = NULL,
-#                                    x_lab_pro = NULL, y_lab_pro = NULL, title.pro = NULL,
-#                                    title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme = FALSE)
-#     
-# plot.imdanovaFilt <- function(filter_object, min_nonmiss_anova = NULL, min_nonmiss_gtest = NULL, 
-#                                    x_lab = NULL, y_lab = NULL, title_plot = NULL, title_size = 14, 
-#                                    x_lab_size = 11, y_lab_size = 11) 
-# plot.rmdFilt <- function(filter_object, pvalue_threshold = NULL, sampleID = NULL, x_lab = NULL, 
-#                          y_lab = NULL, legend_lab = NULL, title_plot = NULL, title_size = 14, x_lab_size = 11, 
-#                          y_lab_size = 11, bw_theme=FALSE, legend_position = "right", point_size = 4) 
-# plot.cvFilt <- function(filter_object, cv_threshold = NULL, x_lab = NULL, y_lab = NULL, 
-#                          title_plot = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, 
-#                          bw_theme = FALSE) {
+lapply(1:length(obj_list), function(i){
+  
+  common_params <- list(
+    x_lab = paste(sample(LETTERS, 5), collapse = ""),
+    y_lab = paste(sample(LETTERS, 5), collapse = ""),
+    title_size = sample(8:16, 1),
+    x_lab_size = sample(5:16, 1),
+    y_lab_size = sample(5:16, 1),
+    bw_theme = as.logical(i%%2),
+    legend_position = ifelse(i%%2 == 1, "left", "right")
+  )
+  
+  png(paste("images/PCA_plot_", i, ".png", sep=""))
+  print(do.call(plot, c(list(pcares[[i]], point_size = sample(4:10, 1)), common_params)))
+  dev.off()
+  
+  png(paste("images/NormRes_plot_", i, ".png", sep=""))
+  print(do.call(plot, c(list(normres[[i]], combined = TRUE), common_params)))
+  dev.off()
+  
+  #dataRes params
+  metric = if(i%%2 == 1) NULL else sample(c('median', 'sd', 'min', 'max'), 1)
+  ncol = sample(1:length(unique(obj_list[[i]]$f_data[,"testgroup"])), 1)
+  density = ifelse(i%%2 == 1, TRUE, FALSE)
+  
+  png(paste("images/Summary_plot_", i, ".png", sep=""))
+  print(do.call(plot, list(summaryres[[i]], metric = metric, ncols = ncol, density = density)))
+  dev.off()
+  
+  #missingval params
+  palette = ifelse(i%%2 == 1, "Set1", "Set2")
+  type = ifelse(i%%2 == 1, "bySample", ifelse(i%%4 == 0, "byMolecule", "Both"))
+  use_VizSampNames = as.logical(i%%2)
+  coordinate_flip = as.logical(i%%2)
+  
+  png(paste("images/missingvalres_plot_", i, ".png", sep=""))
+  print(do.call(plot, c(list(naRes_object = missingvalres[[i]], type = type, palette = palette, use_VizSampNames = use_VizSampNames, coordinate_flip = coordinate_flip))))
+  dev.off()
+  
+})
