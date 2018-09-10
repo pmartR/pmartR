@@ -2,6 +2,7 @@ context("Test custom_sampnames")
 library(pmartR)
 library(pmartRdata)
 library(testthat)
+library(ggplot2)
 
 fdata_cname = attr(pep_object, "cnames")$fdata_cname
 
