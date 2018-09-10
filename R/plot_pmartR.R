@@ -65,15 +65,20 @@ plot.corRes <- function(corRes_object, ...){
 .plot.corRes <- function(corRes_object, omicsData = NULL, interactive = FALSE, title_plot = NULL, x_lab=TRUE, y_lab=TRUE, colorbar_lim=c(NA, NA), title_size = 14, use_VizSampNames = FALSE){
   # check for a corRes object #
   if(!inherits(corRes_object, "corRes")) stop("object must be of class 'corRes'")
-  # check plot title is a string #
+  
+  # check title and colorbar options #
   if(!is.null(title_plot)) {
     if(!is.character(title_plot)) stop("title_plot must be a character vector")
   }
   if(!all(is.na(colorbar_lim))){
     if(!is.numeric(colorbar_lim) | length(colorbar_lim) != 2) stop("colorbar_lim must be a numeric vector of length 2")
   }
-  # check that omicsData is of appropriate class #
   if(!is.numeric(title_size)) message("Title size should be a numeric value, a default value will be used")
+  
+  # check that omicsData is of appropriate class #
+  if(!is.null(omicsData)){
+    if(!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData"))) stop("omicsData must be of class 'pepData', 'proData', 'metabData', or 'lipidData'")
+  }
   # Workaround for certain "check" warnings
   Var1 <- Var2 <- value <- NULL
   
