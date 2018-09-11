@@ -7,3 +7,9 @@ src/*.o
 src/*.so
 *.dll
 .Rproj.user
+
+# dont commit saved images
+/tests/testthat/images/*
+/tests/testthat/corRes_plot_1.html
+/tests/testthat/corRes_plot_3.html
+
