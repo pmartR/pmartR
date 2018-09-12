@@ -145,7 +145,7 @@ applyFilt.moleculeFilt <- function(filter_object, omicsData, min_num=2){
       # Update attributes (7/11/2016 by KS) - this is being done already in group_designation
       attributes(results)$data_info$num_edata = length(unique(results$e_data[, edata_cname]))
       attributes(results)$data_info$num_miss_obs = sum(is.na(results$e_data[,-which(names(results$e_data)==edata_cname)]))
-      attributes(results)$data_info$num_prop_missing = mean(is.na(results$e_data[,-which(names(results$e_data)==edata_cname)]))
+      attributes(results)$data_info$prop_missing = mean(is.na(results$e_data[,-which(names(results$e_data)==edata_cname)]))
       attributes(results)$data_info$num_samps = ncol(results$e_data) - 1
 
       if(!is.null(results$e_meta)){
@@ -221,7 +221,7 @@ applyFilt.cvFilt <- function(filter_object, omicsData, cv_threshold = 150){
       # Update attributes (7/11/2016 by KS) - this is being done already in group_designation
       attributes(results)$data_info$num_edata = length(unique(results$e_data[, edata_cname]))
       attributes(results)$data_info$num_miss_obs = sum(is.na(results$e_data[,-which(names(results$e_data)==edata_cname)]))
-      attributes(results)$data_info$num_prop_missing = mean(is.na(results$e_data[,-which(names(results$e_data)==edata_cname)]))
+      attributes(results)$data_info$prop_missing = mean(is.na(results$e_data[,-which(names(results$e_data)==edata_cname)]))
       attributes(results)$data_info$num_samps = ncol(results$e_data) - 1
 
       if(!is.null(results$e_meta)){
@@ -306,7 +306,7 @@ applyFilt.rmdFilt <- function(filter_object, omicsData, pvalue_threshold=0.001){
       # Update attributes (7/11/2016 by KS) - this is being done already in group_designation
       attributes(results)$data_info$num_edata = length(unique(results$e_data[, edata_cname]))
       attributes(results)$data_info$num_miss_obs = sum(is.na(results$e_data[,-which(names(results$e_data)==edata_cname)]))
-      attributes(results)$data_info$num_prop_missing = mean(is.na(results$e_data[,-which(names(results$e_data)==edata_cname)]))
+      attributes(results)$data_info$prop_missing = mean(is.na(results$e_data[,-which(names(results$e_data)==edata_cname)]))
       attributes(results)$data_info$num_samps = ncol(results$e_data) - 1
 
       if(!is.null(results$e_meta)){
@@ -443,7 +443,7 @@ applyFilt.proteomicsFilt <- function(filter_object, omicsData, min_num_peps=NULL
       # Update attributes (7/11/2016 by KS) - this is being done already in group_designation
       attributes(results)$data_info$num_edata = length(unique(results$e_data[, pep_id]))
       attributes(results)$data_info$num_miss_obs = sum(is.na(results$e_data[,-which(names(results$e_data)==pep_id)]))
-      attributes(results)$data_info$num_prop_missing = mean(is.na(results$e_data[,-which(names(results$e_data)==pep_id)]))
+      attributes(results)$data_info$prop_missing = mean(is.na(results$e_data[,-which(names(results$e_data)==pep_id)]))
       attributes(results)$data_info$num_samps = ncol(results$e_data) - 1
 
       if(!is.null(results$e_meta)){
@@ -587,7 +587,7 @@ applyFilt.imdanovaFilt <- function(filter_object, omicsData, min_nonmiss_anova=N
       # Update attributes (7/11/2016 by KS) - this is being done already in group_designation
       attributes(results)$data_info$num_edata = length(unique(results$e_data[, edata_cname]))
       attributes(results)$data_info$num_miss_obs = sum(is.na(results$e_data[,-which(names(results$e_data)==edata_cname)]))
-      attributes(results)$data_info$num_prop_missing = mean(is.na(results$e_data[,-which(names(results$e_data)==edata_cname)]))
+      attributes(results)$data_info$prop_missing = mean(is.na(results$e_data[,-which(names(results$e_data)==edata_cname)]))
       attributes(results)$data_info$num_samps = ncol(results$e_data) - 1
 
       if(!is.null(results$e_meta)){
@@ -715,7 +715,7 @@ applyFilt.customFilt <- function(filter_object, omicsData){
     # Update attributes (7/11/2016 by KS) - this is being done already in group_designation
     attributes(results)$data_info$num_edata = length(unique(results$e_data[, edata_cname]))
     attributes(results)$data_info$num_miss_obs = sum(is.na(results$e_data[,-which(names(results$e_data)==edata_cname)]))
-    attributes(results)$data_info$num_prop_missing = mean(is.na(results$e_data[,-which(names(results$e_data)==edata_cname)]))
+    attributes(results)$data_info$prop_missing = mean(is.na(results$e_data[,-which(names(results$e_data)==edata_cname)]))
     attributes(results)$data_info$num_samps = ncol(results$e_data) - 1
 
     if(!is.null(results$e_meta)){
