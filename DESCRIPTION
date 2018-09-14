@@ -7,8 +7,7 @@ Authors@R: c(person("Lisa", "Bramer", email = "lisa.bramer@pnnl.gov", role = c("
 Description: Provides functionality for quality control processing and statistical analysis of mass spectrometry (MS) omics data, in particular proteomic (either at the peptide or the protein level), lipidomic, and metabolomic data. This includes data transformation, specification of groups that are to be compared against each other, filtering of features and/or samples, data normalization, data summarization (correlation, PCA), and statistical comparisons between defined groups.
 License: BSD + file LICENSE
 Depends: 
-  R (>= 3.0.0), 
-  data.table
+  R (>= 3.0.0),
 LazyData: TRUE
 URL: https://github.com/pmartR/pmartR
 BugReports: https://github.com/pmartR/pmartR/issues
@@ -16,6 +15,7 @@ VignetteBuilder: knitr
 LinkingTo: Rcpp, RcppArmadillo, BH
 Imports:
     Rcpp (>= 0.12.8),
+    data.table,
     doParallel,
     dplyr,
     ggplot2,
