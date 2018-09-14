@@ -192,7 +192,7 @@ group_designation <- function(omicsData, main_effects, covariates=NULL, time_cou
   emeta_cname = attributes(omicsData)$cnames$emeta_cname
   attributes(omicsData)$data_info$num_edata = length(unique(omicsData$e_data[, edata_cname]))
   attributes(omicsData)$data_info$num_miss_obs = sum(is.na(omicsData$e_data[,-which(names(omicsData$e_data)==edata_cname)]))
-  attributes(omicsData)$data_info$num_prop_missing = mean(is.na(omicsData$e_data[,-which(names(omicsData$e_data)==edata_cname)]))
+  attributes(omicsData)$data_info$prop_missing = mean(is.na(omicsData$e_data[,-which(names(omicsData$e_data)==edata_cname)]))
   attributes(omicsData)$data_info$num_samps = ncol(omicsData$e_data) - 1
 
   if(!is.null(omicsData$e_meta)){

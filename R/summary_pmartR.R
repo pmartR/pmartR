@@ -32,7 +32,7 @@ summary.pepData <- function(omicsData) {
               num_edata = attr(omicsData, "data_info")$num_edata,
               num_emeta = attr(omicsData, "data_info")$num_emeta,
               num_miss_obs = attr(omicsData, "data_info")$num_miss_obs,
-              prop_missing = round(attr(omicsData, "data_info")$num_miss_obs/(nrow(omicsData$e_data)*ncol(omicsData$e_data)), 3))
+              prop_missing = round(attr(omicsData, "data_info")$prop_missing, 3))
 
   # construct output #
   newres <- lapply(res, function(x) ifelse(is.null(x), "NA", as.character(x)))
@@ -87,7 +87,7 @@ summary.proData <- function(omicsData) {
               num_edata = attr(omicsData, "data_info")$num_edata,
               num_emeta = attr(omicsData, "data_info")$num_emeta,
               num_miss_obs = attr(omicsData, "data_info")$num_miss_obs,
-              prop_missing = round(attr(omicsData, "data_info")$num_miss_obs/(nrow(omicsData$e_data)*ncol(omicsData$e_data)), 3))
+              prop_missing = round(attr(omicsData, "data_info")$prop_missing, 3))
 
   # construct output #
   newres <- lapply(res, function(x) ifelse(is.null(x), "NA", as.character(x)))
@@ -142,7 +142,7 @@ summary.lipidData <- function(omicsData) {
               num_edata = attr(omicsData, "data_info")$num_edata,
               num_emeta = attr(omicsData, "data_info")$num_emeta,
               num_miss_obs = attr(omicsData, "data_info")$num_miss_obs,
-              prop_missing = round(attr(omicsData, "data_info")$num_miss_obs/(nrow(omicsData$e_data)*ncol(omicsData$e_data)), 3))
+              prop_missing = round(attr(omicsData, "data_info")$prop_missing, 3))
 
   # construct output #
   newres <- lapply(res, function(x) ifelse(is.null(x), "NA", as.character(x)))
@@ -196,7 +196,7 @@ summary.metabData <- function(omicsData) {
               num_edata = attr(omicsData, "data_info")$num_edata,
               num_emeta = attr(omicsData, "data_info")$num_emeta,
               num_miss_obs = attr(omicsData, "data_info")$num_miss_obs,
-              prop_missing = round(attr(omicsData, "data_info")$num_miss_obs/(nrow(omicsData$e_data)*ncol(omicsData$e_data)), 3))
+              prop_missing = round(attr(omicsData, "data_info")$prop_missing, 3))
 
   # construct output #
   newres <- lapply(res, function(x) ifelse(is.null(x), "NA", as.character(x)))
