@@ -25,7 +25,8 @@ statRes_output <- function(imd_out,omicsData,comparisons,test_method,pval_adjust
   
   #Flags to determine number of significant
   imd_out_flags <- imd_out[[grep("flag",tolower(names(imd_out)))]]
-  flags <- data.matrix(imd_out_flags[, grep("flag",tolower(names(imd_out_flags)))])
+  flags <- data.matrix(imd_out_flags)
+  
   
   #Add biomolecule to P_values and Flags
   meta <- imd_out$Full_results[,1]
@@ -33,18 +34,24 @@ statRes_output <- function(imd_out,omicsData,comparisons,test_method,pval_adjust
   colnames(imd_out$Flags)[1] <- colnames(imd_out$Full_results)[1]
   
   imd_out_pvals <- imd_out[[grep("p_values",tolower(names(imd_out)))]]
-  pvals <- data.matrix(imd_out_pvals[, grep("pvals",tolower(names(imd_out_pvals)))])
+  pvals <- data.matrix(imd_out_pvals)
   imd_out$P_values <- cbind.data.frame(imd_out$Full_results[,1],pvals)
   colnames(imd_out$P_values)[1] <- colnames(imd_out$Full_results)[1]
   
   #Add attributes
   attr(imd_out, "group_DF") <- groupData
   #if(is.null(comparisons)){
-  comparisons <- colnames(imd_out_flags)[grep("flag", tolower(names(imd_out_flags)))]
+  comparisons <- colnames(imd_out_flags)
   #}
   attr(imd_out, "comparisons") <- comparisons
-  attr(imd_out, "number_significant") <-  data.frame(Comparison=comparisons, Up = apply(flags,2,function(x){length(which(x>0))}),
-                                                     Down = apply(flags,2,function(x){length(which(x<0))}))
+  attr(imd_out, "number_significant") <-  data.frame(Comparison=comparisons, 
+                                                     Up_total = apply(flags,2,function(x){length(which(x>0))}),
+                                                     Down_total = apply(flags,2,function(x){length(which(x<0))}),
+                                                     Up_anova = apply(flags, 2, function(x){length(which(x == 1))}),
+                                                     Down_anova = apply(flags, 2, function(x){length(which(x == -1))}),
+                                                     Up_gtest = apply(flags, 2, function(x){length(which(x == 2))}),
+                                                     Down_gtest = apply(flags, 2, function(x){length(which(x == -2))})
+                                                     )
   attr(imd_out,"statistical_test") <- test_method
   attr(imd_out, "adjustment_method") <- pval_adjust
   attr(imd_out, "pval_thresh") <- pval_thresh
@@ -94,7 +101,7 @@ print.statRes <- function(x,...){
 #' Produces plots that summarize the results contained in a `statRes` object.
 #' 
 #' @param x `statRes` object to be plotted, usually the result of `imd_anova`
-#' @param plot_type defines which plots to be produced, options are "bar", "heatmap", "volcano"; if left `NULL` then all options are produced
+#' @param plot_type defines which plots to be produced, options are "bar", "heatmap", "volcano"; defaults to "bar"
 #' @param fc_threshold optional threshold value for fold change estimates that's added to the volcano plot
 #' 
 #' @export
@@ -123,16 +130,11 @@ print.statRes <- function(x,...){
 #' plot(imd_anova_res)
 #' }
 #' 
-plot.statRes <- function(x, plot_type = NULL, fc_threshold = NULL,...){
+plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, stacked = FALSE, ...){
   
   #For now require ggplot2, consider adding base graphics option too
   if(!require(ggplot2)){
     stop("ggplot2 is required, base graphics aren't available yet")
-  }
-  
-  #If no plot_type is specified, do all 4
-  if(is.null(plot_type)){
-    plot_type <- c("bar","heatmap","volcano")
   }
   
   #Most plots are based on "number_significant" data frame so pull it out
@@ -140,29 +142,18 @@ plot.statRes <- function(x, plot_type = NULL, fc_threshold = NULL,...){
   
   ##--------##
   #Go through the given plot_types and remove any that aren't currently avilable
-  for(j in 1:length(plot_type)){
-    plt_tyj <- try(match.arg(tolower(plot_type[j]),c("bar","volcano","heatmap")),silent=TRUE)
-    if(class(plt_tyj)=='try-error'){
-      warning(paste0("Plot type '",plot_type[j],"' is not currently available."))
-      plot_type[j] <- NA
-    }else{
-      plot_type[j] <- plt_tyj
-    }
+  plt_tyj <- try(match.arg(tolower(plot_type),c("bar","volcano","heatmap")),silent=TRUE)
+  if(class(plt_tyj)=='try-error'){
+    warning(paste0("Plot type '",plot_type,"' is not currently available, defaulting to bar plot."))
+    plot_type <- "bar"
+  }else{
+    plot_type <- plt_tyj
   }
   
   #Don't make heatmaps if there's only one comparison
   if("heatmap"%in%plot_type & nrow(comp_df)==1){
-    warning("Heatmaps are not produced when only one comparison is being made.")
-    plot_type[which(plot_type=="heatmap")] <- NA
+    stop("Heatmaps not supported when only one comparison is being made.")
   }
-  
-  if(any(is.na(plot_type))){
-    plot_type <- plot_type[-which(is.na(plot_type))]
-  }
-  ##--------##
-  
-  #I'll return a list of grobs
-  all_plts <- vector('list',length(plot_type))
   
   #Bar plot
   if("bar"%in%plot_type){
@@ -176,13 +167,31 @@ plot.statRes <- function(x, plot_type = NULL, fc_threshold = NULL,...){
     pal <- RColorBrewer::brewer.pal(9, "Set1")
     
     ##Up direction is positive, down direction is negative
-    comp_df_melt[comp_df_melt$Direction=="Down",]$Count <- (-comp_df_melt[comp_df_melt$Direction=="Down",]$Count)
-    all_plts[[1]] <- ggplot(data=comp_df_melt,aes(Comparison,Count,fill=Direction))+geom_bar(stat='identity')+
-      geom_hline(aes(yintercept=0),colour='gray50')+
-      theme(axis.text.x=element_text(angle=90,vjust=0.5))+
-      scale_fill_manual(values=pal[c(3,1)])+
-      ggtitle(paste("Number of DE Metabolites for", unique(attributes(x)$group_DF$VIRUS)[1], "vs", unique(attributes(x)$group_DF$VIRUS)[2], sep = " ")) +
-      theme(plot.title = element_text(hjust = 0.5))
+    if(!stacked) comp_df_melt[grep("Down", comp_df_melt$Direction),]$Count <- (-comp_df_melt[grep("Down", comp_df_melt$Direction),]$Count)
+    
+    # add whichtest, posneg, and adjust columns used for plot grouping and label adjustment
+    comp_df_melt <- comp_df_melt %>% 
+      dplyr::mutate(whichtest = ifelse(grepl("anova", Direction), "anova", ifelse(grepl("gtest", Direction), "gtest", "total")),
+                    posneg = ifelse(grepl("Up", Direction), "Positive", "Negative")) %>%
+      dplyr::arrange(desc(posneg))
+    
+    if(attr(x, "statistical_test") %in% c("anova", "gtest")){
+      comp_df_melt <- comp_df_melt %>%
+        dplyr::filter(whichtest == "total") %>%
+        mutate(whichtest = attr(x, "statistical_test"))
+    }
+      
+    p <- ggplot(data=comp_df_melt,aes(Comparison,Count)) + 
+            geom_bar(aes(x = whichtest, fill = posneg, group = whichtest),stat='identity') + 
+            geom_text(aes(x = whichtest, label = abs(Count)), position = position_stack(vjust = 0.5), size = 3) +
+            geom_hline(aes(yintercept=0),colour='gray50') +
+            theme(axis.text.x=element_text(angle=90,vjust=0.5)) +
+            scale_fill_manual(values=c("red", "green"), labels = c("Negative", "Positive"), name = "Fold Change Sign") +
+            facet_wrap(~Comparison) + 
+            ggtitle("Number of DE Metabolites Between Groups") +
+            theme(plot.title = element_text(hjust = 0.5), legend.text = element_text(size = 6), legend.title = element_text(size = 6))
+  
+    return(p)
   }
   
   #Both the volcano plot and heatmap need a dataframe of fold changes by comparison/biomolecule
@@ -190,6 +199,11 @@ plot.statRes <- function(x, plot_type = NULL, fc_threshold = NULL,...){
     fc_data <- x$Full_results[,c(1,grep("Fold_change",colnames(x$Full_results)))]
     colnames(fc_data) <- gsub(pattern = "Fold_change_",replacement = "",x = colnames(fc_data))
     fc_data <- reshape2::melt(fc_data,id.vars=1,variable.name="Comparison",value.name="Fold_change")
+    
+    fc_flags <- x$Full_results[,c(1,grep("Flag_",colnames(x$Full_results)))]
+    colnames(fc_flags) <- gsub(pattern = "Flag_",replacement = "",x = colnames(fc_flags))
+    fc_flags <- reshape2::melt(fc_flags,id.vars=1,variable.name="Comparison",value.name="Fold_change_flag") %>%
+      dplyr::mutate(Fold_change_flag = as.character(Fold_change_flag))
     
     p_data <- x$Full_results[,c(1,grep("P_value",colnames(x$Full_results)))]
     pvals <- reshape2::melt(p_data,id.vars=1,variable.name="Comparison",value.name="P_value")
@@ -206,7 +220,7 @@ plot.statRes <- function(x, plot_type = NULL, fc_threshold = NULL,...){
     levels(pvals$Comparison) <- gsub(pattern="P_value_G_",replacement = "",levels(pvals$Comparison))
     levels(pvals$Comparison) <- gsub(pattern="P_value_T_",replacement = "",levels(pvals$Comparison))
     
-    volcano <- merge(fc_data,pvals,all=TRUE)
+    volcano <- merge(merge(fc_data,pvals,all=TRUE), fc_flags, all = TRUE)
     levels(volcano$Comparison) <- gsub(pattern = "_",replacement = " ",levels(volcano$Comparison))
     
     #Remove NAs to avoid ggplot2 warning
@@ -217,18 +231,25 @@ plot.statRes <- function(x, plot_type = NULL, fc_threshold = NULL,...){
   
   #Volcano plot 
   if("volcano"%in%plot_type){
-    #Put plot into list at appropriate place
-    elem_num <- min(which(unlist(lapply(all_plts,is.null))))
-    all_plts[[elem_num]] <- ggplot(data=volcano,aes(Fold_change,-log(P_value,base=10)))+geom_point()+facet_grid(Type~Comparison)+
-      ylab(expression(-log[10](p-value)))+xlab("Fold-change")
+    # specify colorscale for flags
+    cols <- c("-2" = "red", "-1" = "red", "0" = "black", "1" = "green", "2" = "green")
+    
+    p <- ggplot(data=volcano,aes(Fold_change,-log(P_value,base=10)))+
+      geom_point(aes(color = Fold_change_flag))+
+      facet_grid(Type~Comparison)+
+      ylab(expression(-log[10](p-value)))+xlab("Fold-change") +
+      scale_color_manual(values = cols)
+    
+    # draw a line if threshold specified
     if(!is.null(fc_threshold)){
-      all_plts[[elem_num]] <- all_plts[[elem_num]]+geom_hline(aes(yintercept=fc_threshold))
+      p <- p + geom_hline(aes(yintercept=fc_threshold))
     }
+    
+    return(p)
   }
   
   #Heatmap
   if("heatmap"%in%plot_type){
-    # pal <- colorRampPalette(c("blue", "white", "red"))
     pal <- colorRampPalette(colors=rev(brewer.pal(11, "RdYlGn")))
     
     #For now just consider biomolecules significant with respect to ANOVA
@@ -237,20 +258,18 @@ plot.statRes <- function(x, plot_type = NULL, fc_threshold = NULL,...){
     volcano_sigs <- dplyr::filter(volcano,P_value<attr(x,"pval_thresh"))
     colnames(volcano_sigs)[1] <- "Biomolecule"
     volcano_sigs$Biomolecule <- as.factor(volcano_sigs$Biomolecule)
-    #Put plot into list at appropriate place
-    elem_num <- min(which(unlist(lapply(all_plts,is.null))))
-    all_plts[[elem_num]] <- ggplot(volcano_sigs, aes(Biomolecule, Comparison)) +
-      geom_tile(aes(fill = Fold_change), , color = "white") +
-      scale_fill_gradient(low = "green", high = "red") +
-      theme(axis.text.x = element_text(angle = 90, hjust = 0.5)) +
-      ggtitle("Average Log Fold Change") +
-      theme(plot.title = element_text(hjust = 0.5))
+    
+    p <- ggplot(volcano_sigs, aes(Biomolecule, Comparison)) +
+          geom_tile(aes(fill = Fold_change), color = "white") +
+          scale_fill_gradient(low = "green", high = "red") +
+          theme(axis.text.x = element_text(angle = 90, hjust = 0.5)) +
+          ggtitle("Average Log Fold Change") +
+          theme(plot.title = element_text(hjust = 0.5), axis.text.x = element_blank())
       # ggplot(data=volcano_sigs,aes(Comparison,Biomolecule)) +
       # geom_tile(aes(fill=Fold_change)) +
       # theme(axis.text.x=element_text(angle=90,vjust=0.5))+
       # scale_fill_brewer(palette = "RdYlGn")
+    return(p)
   }
-  
-  gridExtra::grid.arrange(grobs=all_plts,nrow=ceiling(length(plot_type)/2))
   #invisible(all_plts)
 }

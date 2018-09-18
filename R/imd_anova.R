@@ -201,15 +201,15 @@ imd_anova <- function(omicsData, comparisons = NULL, test_method, pval_adjust = 
   #(6)   If both but g-test is significant, report g-test (+/-2 for flag)
   
   #Start with the anova p-values (extracted from combined results) and replace if missing [see (2)] or g-test is significant [see (6)]
-  imd_pvals <- data.matrix(Full_results[,grep("P_value_T_",colnames(Full_results))])
-  imd_flags <- data.matrix(Full_results[,grep("Flag_",colnames(Full_results))])
+  imd_pvals <- data.matrix(Full_results[grep("P_value_T_",colnames(Full_results))])
+  imd_flags <- data.matrix(Full_results[grep("Flag_",colnames(Full_results))])
   #Redefine gtest_pvalues after it's been merged
-  gtest_pvalues <- data.matrix(Full_results[,grep("P_value_G_",colnames(Full_results))])
+  gtest_pvalues <- data.matrix(Full_results[grep("P_value_G_",colnames(Full_results))])
   #Same for 'gtest_flags', but a little more complicated
   gtest_flags <- cbind(imd_counts[,1],gtest_flags)
   colnames(gtest_flags)[1] <- colnames(imd_counts)[1]
   gtest_flags <- merge(anova_results,gtest_flags,all=TRUE)
-  gtest_flags <- data.matrix(gtest_flags[,grep("Flag_",colnames(gtest_flags))])
+  gtest_flags <- data.matrix(gtest_flags[grep("Flag_",colnames(gtest_flags))])
   
   #Replance missing ANOVA p-values with g-test p-values
   if(any(is.na(imd_pvals))){
