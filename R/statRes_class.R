@@ -188,6 +188,7 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, stacked = FA
             theme(axis.text.x=element_text(angle=90,vjust=0.5)) +
             scale_fill_manual(values=c("red", "green"), labels = c("Negative", "Positive"), name = "Fold Change Sign") +
             facet_wrap(~Comparison) + 
+            xlab("Statistical test, by group comparison") + ylab("Count of DE Biomolecules") +
             ggtitle("Number of DE Metabolites Between Groups") +
             theme(plot.title = element_text(hjust = 0.5), legend.text = element_text(size = 6), legend.title = element_text(size = 6))
   
@@ -315,16 +316,17 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, stacked = FA
   
   #Heatmap
   if("heatmap"%in%plot_type){
-    pal <- colorRampPalette(colors=rev(brewer.pal(11, "RdYlGn")))
+    pal <- colorRampPalette(colors=rev(RColorBrewer::brewer.pal(11, "RdYlGn")))
     
     #For now just consider biomolecules significant with respect to ANOVA
     volcano <- dplyr::filter(volcano,Type=="ANOVA")
     
     volcano_sigs <- dplyr::filter(volcano,P_value<attr(x,"pval_thresh"))
+    if(!(nrow(volcano_sigs)) > 0) warning("No molecules significant at the provided p-value threshold")
     colnames(volcano_sigs)[1] <- "Biomolecule"
     volcano_sigs$Biomolecule <- as.factor(volcano_sigs$Biomolecule)
     
-    p <- ggplot(volcano_sigs, aes(Biomolecule, Comparison)) +
+    p <- ggplot(volcano_sigs, aes(Biomolecule, Comparison, text = paste("ID:", Biomolecule, "<br>", "Pval:", P_value))) +
           geom_tile(aes(fill = Fold_change), color = "white") +
           scale_fill_gradient(low = "green", high = "red") +
           theme(axis.text.x = element_text(angle = 90, hjust = 0.5)) +
@@ -334,7 +336,7 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, stacked = FA
       # geom_tile(aes(fill=Fold_change)) +
       # theme(axis.text.x=element_text(angle=90,vjust=0.5))+
       # scale_fill_brewer(palette = "RdYlGn")
-    return(p)
+    if(interactive) return(plotly::ggplotly(p, tooltip = c("text"))) else return(p)
   }
   #invisible(all_plts)
 }
