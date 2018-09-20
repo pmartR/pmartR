@@ -130,7 +130,7 @@ print.statRes <- function(x,...){
 #' plot(imd_anova_res)
 #' }
 #' 
-plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, stacked = FALSE, interactive = FALSE, ...){
+plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, stacked = FALSE, interactive = FALSE, theme_bw = FALSE, ...){
   
   #For now require ggplot2, consider adding base graphics option too
   if(!require(ggplot2)){
@@ -191,7 +191,9 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, stacked = FA
             xlab("Statistical test, by group comparison") + ylab("Count of DE Biomolecules") +
             ggtitle("Number of DE Metabolites Between Groups") +
             theme(plot.title = element_text(hjust = 0.5), legend.text = element_text(size = 6), legend.title = element_text(size = 6))
-  
+    
+    if(theme_bw) p <- p + theme_bw()
+    
     return(p)
   }
   
@@ -201,8 +203,7 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, stacked = FA
     colnames(fc_data) <- gsub(pattern = "Fold_change_",replacement = "",x = colnames(fc_data))
     fc_data <- reshape2::melt(fc_data,id.vars=1,variable.name="Comparison",value.name="Fold_change")
     
-    fc_flags <- x$Full_results[c(1,grep("Flag_",colnames(x$Full_results)))]
-    colnames(fc_flags) <- gsub(pattern = "Flag_",replacement = "",x = colnames(fc_flags))
+    fc_flags <- x$Flags
     fc_flags <- reshape2::melt(fc_flags,id.vars=1,variable.name="Comparison",value.name="Fold_change_flag") %>%
       dplyr::mutate(Fold_change_flag = as.character(Fold_change_flag))
     
@@ -251,14 +252,17 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, stacked = FA
     #
   }
   
+  
+  
   #Volcano plot 
   if("volcano"%in%plot_type){
-    # specify colorscale for flags
-    cols <- c("-2" = "red", "-1" = "red", "0" = "black", "1" = "green", "2" = "green")
+
+    # global jitter parameter and ID column
     jitter <- position_jitter(width = 0.4, height = 0.4)
     idcol <- colnames(volcano)[1]
     
     if(attr(x, "statistical_test") %in% c("anova", "combined")){
+      cols_anova <- c("-2" = "black", "-1" = "red", "0" = "black", "1" = "green", "2" = "black")
       temp_data_anova <- volcano %>% dplyr::filter(Type == "ANOVA")
       if(interactive){
         p1 <- ggplot(temp_data_anova, aes(Fold_change,-log(P_value,base=10), text = paste("ID:", !!sym(idcol), "<br>", "Pval:", round(P_value, 4))))
@@ -269,12 +273,13 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, stacked = FA
           geom_point(aes(color = Fold_change_flag), shape = 1)+
           facet_wrap(~Comparison) +
           ylab("-log[10](p-value)")+xlab("Fold-change") +
-          scale_color_manual(values = cols, name = "Fold Change", 
-                             labels = c("Neg(Gtest)", "Neg(ANOVA)", "0", "Pos(ANOVA)", "Pos(Gtest)"),
-                             breaks  = c("-2", "-1", "0", "1", "2"))
+        scale_color_manual(values = cols_anova, name = "Fold Change", 
+                           labels = c("Neg(Anova)", "0", "Pos(Anova)"),
+                           breaks = c("-1", "0", "1"))
     }
     
     if(attr(x, "statistical_test") %in% c("gtest", "combined")){
+      cols_gtest <- c("-2" = "red", "-1" = "black", "0" = "black", "1" = "black", "2" = "green")
       temp_data_gtest <- volcano %>% dplyr::filter(Type == "G-test")
       if(interactive){
         p2 <- ggplot(temp_data_gtest, aes(Count_First_Group, Count_Second_Group, text = paste("ID:", !!sym(idcol), "<br>", "Pval:", round(P_value, 4))))
@@ -282,15 +287,15 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, stacked = FA
       else p2 <- ggplot(data=temp_data_gtest, aes(Count_First_Group, Count_Second_Group))
       
       p2 <- p2 +
-        geom_point(data = temp_data_gtest %>% dplyr::filter(Fold_change_flag == 0), aes(color = Fold_change_flag), position = jitter, shape = 1) +
-        geom_point(data = temp_data_gtest %>% dplyr::filter(Fold_change_flag != 0), aes(color = Fold_change_flag), position = jitter) +
+        geom_point(data = temp_data_gtest %>% dplyr::filter(Fold_change_flag %in% c(-1,0,1)), aes(color = Fold_change_flag), position = jitter, shape = 1) +
+        geom_point(data = temp_data_gtest %>% dplyr::filter(!(Fold_change_flag %in% c(-1,0,1))), aes(color = Fold_change_flag), position = jitter) +
         facet_wrap(~Comparison) +
         geom_hline(yintercept = c(unique(temp_data_gtest$Count_Second_Group) + 0.5, min(temp_data_gtest$Count_Second_Group) - 0.5)) +
         geom_vline(xintercept = c(unique(temp_data_gtest$Count_First_Group) + 0.5, min(temp_data_gtest$Count_First_Group) - 0.5)) +
         ylab("No. present in first group")+xlab("No. present in second group") +
-        scale_color_manual(values = cols, name = "Fold Change", 
-                           labels = c("Neg(Gtest)", "Neg(ANOVA)", "0", "Pos(ANOVA)", "Pos(Gtest)"),
-                           breaks = c("-2", "-1", "0", "1", "2"))
+        scale_color_manual(values = cols_gtest, name = "Fold Change", 
+                           labels = c("Neg(Gtest)", "0", "Pos(Gtest)"),
+                           breaks = c("-2", "0", "2"))
     }
     
     # draw a line if threshold specified
@@ -300,12 +305,19 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, stacked = FA
     
     
     if(attr(x, "statistical_test") %in% "anova"){
+      if(theme_bw) p1 <- p1 + theme_bw()
       if(interactive) return(plotly::ggplotly(p1, tooltip = c("text"))) else return(p1)
     } 
     if(attr(x, "statistical_test") %in% "gtest"){
+      if(theme_bw) p2 <- p2 + theme_bw()
       if(interactive) return(plotly::ggplotly(p2, tooltip = c("text"))) else return(p2)
     }
     if(attr(x, "statistical_test") %in% "combined"){
+      if(theme_bw){
+        p1 <- p1 + theme_bw()
+        p2 <- p2 + theme_bw()
+      } 
+      
       if(interactive){
         p1 <- plotly::ggplotly(p1, tooltip = c("text"))
         p2 <- plotly::ggplotly(p2, tooltip = c("text"))
