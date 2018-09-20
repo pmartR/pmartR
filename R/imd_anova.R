@@ -162,7 +162,7 @@ imd_anova <- function(omicsData, comparisons = NULL, test_method, pval_adjust = 
     
   }else if(test_method=='gtest'){
     
-    all_gtest <- cbind(imd_counts,gtest_pvalues)
+    all_gtest <- cbind(imd_counts,gtest_pvalues, gtest_flags)
     all_anova <- cbind(anova_results,anova_fold_change)
     Full_results <- base::merge(all_gtest,all_anova,all.x=TRUE,all.y=FALSE,fill=NA,sort=FALSE)
     if(nrow(Full_results)>max(nrow(all_gtest),nrow(all_anova))){
