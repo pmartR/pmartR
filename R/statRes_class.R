@@ -261,7 +261,7 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, stacked = FA
       if(interactive){
         p1 <- ggplot(temp_data_anova, aes(Fold_change,-log(P_value,base=10), text = paste("ID:", !!sym(idcol), "<br>", "Pval:", P_value)))
       }
-      else p1 <- ggplot(data=volcano %>% filter(Type == "ANOVA"), aes(Fold_change,-log(P_value,base=10)))
+      else p1 <- ggplot(data = temp_data_anova, aes(Fold_change,-log(P_value,base=10)))
       
       p1 <- p1 +
           geom_point(aes(color = Fold_change_flag))+
