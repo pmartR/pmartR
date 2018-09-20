@@ -255,17 +255,18 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, stacked = FA
   if("volcano"%in%plot_type){
     # specify colorscale for flags
     cols <- c("-2" = "red", "-1" = "red", "0" = "black", "1" = "green", "2" = "green")
+    jitter <- position_jitter(width = 0.4, height = 0.4)
     idcol <- colnames(volcano)[1]
     
     if(attr(x, "statistical_test") %in% c("anova", "combined")){
       temp_data_anova <- volcano %>% dplyr::filter(Type == "ANOVA")
       if(interactive){
-        p1 <- ggplot(temp_data_anova, aes(Fold_change,-log(P_value,base=10), text = paste("ID:", !!sym(idcol), "<br>", "Pval:", P_value)))
+        p1 <- ggplot(temp_data_anova, aes(Fold_change,-log(P_value,base=10), text = paste("ID:", !!sym(idcol), "<br>", "Pval:", round(P_value, 4))))
       }
       else p1 <- ggplot(data = temp_data_anova, aes(Fold_change,-log(P_value,base=10)))
       
       p1 <- p1 +
-          geom_point(aes(color = Fold_change_flag))+
+          geom_point(aes(color = Fold_change_flag), shape = 1)+
           facet_wrap(~Comparison) +
           ylab("-log[10](p-value)")+xlab("Fold-change") +
           scale_color_manual(values = cols, name = "Fold Change", 
@@ -276,14 +277,14 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, stacked = FA
     if(attr(x, "statistical_test") %in% c("gtest", "combined")){
       temp_data_gtest <- volcano %>% dplyr::filter(Type == "G-test")
       if(interactive){
-        p2 <- ggplot(temp_data_gtest, aes(Count_First_Group, Count_Second_Group, text = paste("ID:", !!sym(idcol), "<br>", "Pval:", P_value)))
+        p2 <- ggplot(temp_data_gtest, aes(Count_First_Group, Count_Second_Group, text = paste("ID:", !!sym(idcol), "<br>", "Pval:", round(P_value, 4))))
       }
       else p2 <- ggplot(data=temp_data_gtest, aes(Count_First_Group, Count_Second_Group))
       
       p2 <- p2 +
-        geom_point(aes(color = Fold_change_flag)) +
+        geom_point(data = temp_data_gtest %>% dplyr::filter(Fold_change_flag == 0), aes(color = Fold_change_flag), position = jitter, shape = 1) +
+        geom_point(data = temp_data_gtest %>% dplyr::filter(Fold_change_flag != 0), aes(color = Fold_change_flag), position = jitter) +
         facet_wrap(~Comparison) +
-        geom_jitter(width = 0.4, height = 0.4) + 
         geom_hline(yintercept = c(unique(temp_data_gtest$Count_Second_Group) + 0.5, min(temp_data_gtest$Count_Second_Group) - 0.5)) +
         geom_vline(xintercept = c(unique(temp_data_gtest$Count_First_Group) + 0.5, min(temp_data_gtest$Count_First_Group) - 0.5)) +
         ylab("No. present in first group")+xlab("No. present in second group") +
