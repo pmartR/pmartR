@@ -208,7 +208,7 @@ imd_anova <- function(omicsData, comparisons = NULL, test_method, pval_adjust = 
   #Same for 'gtest_flags', but a little more complicated
   gtest_flags <- cbind(imd_counts[,1],gtest_flags)
   colnames(gtest_flags)[1] <- colnames(imd_counts)[1]
-  gtest_flags <- merge(anova_results,gtest_flags,all=TRUE)
+  gtest_flags <- merge(anova_results,gtest_flags,all=TRUE, sort = FALSE)
   gtest_flags <- data.matrix(gtest_flags[grep("Flag_",colnames(gtest_flags))])
   
   #Replance missing ANOVA p-values with g-test p-values
