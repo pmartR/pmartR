@@ -188,7 +188,7 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, fc_colors = 
             geom_text(aes(x = whichtest, label = abs(Count)), position = position_stack(vjust = 0.5), size = 3) +
             geom_hline(aes(yintercept=0),colour='gray50') +
             theme(axis.text.x=element_text(angle=90,vjust=0.5)) +
-            scale_fill_manual(values=c(fc_colors[1], fc_colors[2]), labels = c("Negative", "Positive"), name = "Fold Change Sign") +
+            scale_fill_manual(values=c(fc_colors[1], fc_colors[3]), labels = c("Negative", "Positive"), name = "Fold Change Sign") +
             facet_wrap(~Comparison) + 
             xlab("Statistical test, by group comparison") + ylab("Count of DE Biomolecules") +
             ggtitle("Number of DE Metabolites Between Groups") +
