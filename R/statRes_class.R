@@ -24,7 +24,7 @@ statRes_output <- function(imd_out,omicsData,comparisons,test_method,pval_adjust
   }
   
   #Flags to determine number of significant
-  imd_out_flags <- imd_out[[grep("flag",tolower(names(imd_out)))]]
+  imd_out_flags <- imd_out[[grep("^flag",tolower(names(imd_out)))]]
   flags <- data.matrix(imd_out_flags)
   
   
@@ -33,7 +33,7 @@ statRes_output <- function(imd_out,omicsData,comparisons,test_method,pval_adjust
   imd_out$Flags <- cbind.data.frame(meta, flags)
   colnames(imd_out$Flags)[1] <- colnames(imd_out$Full_results)[1]
   
-  imd_out_pvals <- imd_out[[grep("p_values",tolower(names(imd_out)))]]
+  imd_out_pvals <- imd_out[[grep("^p_values",tolower(names(imd_out)))]]
   pvals <- data.matrix(imd_out_pvals)
   imd_out$P_values <- cbind.data.frame(imd_out$Full_results[,1],pvals)
   colnames(imd_out$P_values)[1] <- colnames(imd_out$Full_results)[1]
@@ -225,20 +225,20 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, fc_colors = 
       pvals$Type <- "ANOVA"
     }
     
-    levels(pvals$Comparison) <- gsub(pattern="P_value_G_",replacement = "",levels(pvals$Comparison))
-    levels(pvals$Comparison) <- gsub(pattern="P_value_T_",replacement = "",levels(pvals$Comparison))
+    levels(pvals$Comparison) <- gsub(pattern="^P_value_G_",replacement = "",levels(pvals$Comparison))
+    levels(pvals$Comparison) <- gsub(pattern="^P_value_T_",replacement = "",levels(pvals$Comparison))
     
     volcano <- merge(merge(fc_data,pvals,all=TRUE), fc_flags, all = TRUE)
     
     # levels of comparison now of the form 'GROUPNAME_X vs GROUPNAME_Y'
-    levels(volcano$Comparison) <- gsub(pattern = "_",replacement = " ",levels(volcano$Comparison))
+    levels(volcano$Comparison) <- gsub(pattern = "_vs_",replacement = " vs ",levels(volcano$Comparison))
     
     # create counts for gtest plot (number present in each group)
     if(attr(x, "statistical_test") %in% c("gtest", "combined")){
-      counts <- x$Full_results[c(1, grep("Count_", colnames(x$Full_results)))]
+      counts <- x$Full_results[c(1, grep("^Count_", colnames(x$Full_results)))]
       
       # trim column names so they are just group names
-      colnames(counts) <- gsub("Count_", replacement = "", colnames(counts))
+      colnames(counts) <- gsub("^Count_", replacement = "", colnames(counts))
       
       counts_df <- data.frame()
       for(comp in as.character(unique(volcano$Comparison))){
