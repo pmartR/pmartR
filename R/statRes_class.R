@@ -202,8 +202,8 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, fc_colors = 
   #Both the volcano plot and heatmap need a dataframe of fold changes by comparison/biomolecule
   if("volcano" %in%plot_type | "heatmap"%in%plot_type){
     # fold change values for volcano plot
-    fc_data <- x$Full_results[,c(1,grep("Fold_change",colnames(x$Full_results)))]
-    colnames(fc_data) <- gsub(pattern = "Fold_change_",replacement = "",x = colnames(fc_data))
+    fc_data <- x$Full_results[,c(1,grep("^Fold_change",colnames(x$Full_results)))]
+    colnames(fc_data) <- gsub(pattern = "^Fold_change_",replacement = "",x = colnames(fc_data))
     fc_data <- reshape2::melt(fc_data,id.vars=1,variable.name="Comparison",value.name="Fold_change")
     
     # fold change flags for coloring 
@@ -212,13 +212,13 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, fc_colors = 
       dplyr::mutate(Fold_change_flag = as.character(Fold_change_flag))
     
     # p values for labeling and y axis in anova volcano plot
-    p_data <- x$Full_results[c(1,grep("P_value",colnames(x$Full_results)))]
+    p_data <- x$Full_results[c(1,grep("^P_value",colnames(x$Full_results)))]
     pvals <- reshape2::melt(p_data,id.vars=1,variable.name="Comparison",value.name="P_value")
     
     # grouping column based on test type
     if(attr(x,"statistical_test")=="combined"){
       pvals$Type <- "G-test"
-      pvals$Type[grep(pattern="P_value_T_",x=pvals$Comparison)] <- "ANOVA"
+      pvals$Type[grep(pattern="^P_value_T_",x=pvals$Comparison)] <- "ANOVA"
     }else if(attr(x,"statistical_test")=="gtest"){
       pvals$Type <- "G-test"
     }else if(attr(x,"statistical_test")=="anova"){
