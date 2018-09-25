@@ -6,7 +6,7 @@ library(htmlwidgets)
 library(gridExtra)
 
 data("pep_object")
-
+sink(file = "logs_test_plotting")
 # List of testing objects.  Each has a fake group and custom sample names
 obj_list <- lapply(list(pep_object, pro_object, metab_object, lipid_object), function(x){
   x$f_data["testgroup"] <- c(rep(1, floor(nrow(x$f_data)/2)), rep(2, ceiling(nrow(x$f_data)/2)))
@@ -349,3 +349,4 @@ lapply(1:length(obj_list), function(i){
   dev.off()
   
 })
+sink()

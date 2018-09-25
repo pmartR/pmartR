@@ -358,7 +358,7 @@ applyFilt.proteomicsFilt <- function(filter_object, omicsData, min_num_peps=NULL
     # error checks for min_num_peps, if not NULL #
     if(!is.null(min_num_peps)) {
       # check that min_num_peps is numeric and >=1 #
-      if(!inherits(min_num_peps, "numeric") | min_num_peps < 1) stop("min_num_peps must be an integer greater than or equal to 1")
+      if(!inherits(min_num_peps, c("numeric", "integer")) | min_num_peps < 1) stop("min_num_peps must be an integer greater than or equal to 1")
       # check that min_num_peps is an integer #
       if(min_num_peps %% 1 != 0) stop("min_num_peps must be an integer greater than or equal to 1")
       # check that min_num_peps is of length 1 #
@@ -464,13 +464,13 @@ applyFilt.proteomicsFilt <- function(filter_object, omicsData, min_num_peps=NULL
     attr(results, "filters")$proteomicsFilt$threshold <- data.frame(min_num_peps = min_num_peps, degen_peps = as.character(degen_peps))
     attr(results, "filters")$proteomicsFilt$filtered <- filter_object_new
     if(degen_peps == TRUE & is.null(min_num_peps)){
-      attr(results, "filters")$proteomicsFilt$report_text <- paste("A degenerate peptide filter was applied to the data, identifying ", pep_id, "s that map to more than one ", pro_id, ". The filter identified ", length(filter_object_new1$peptides_filt), " such ", pep_id, "s in the data. Associated with these ", pep_id, "s were ", length(filter_object_new1$proteins_filt), " ", pro_id, "s that no longer had ", pep_id, "s mapping to them.", sep = "")
+      attr(results, "filters")$proteomicsFilt$report_text <- paste("A degenerate peptide filter was applied to the data, identifying ", pep_id, "s that map to more than one ", pro_id, ". The filter identified ", length(filter_object_new1$edata_filt), " such ", pep_id, "s in the data. Associated with these ", pep_id, "s were ", length(filter_object_new1$emeta_filt), " ", pro_id, "s that no longer had ", pep_id, "s mapping to them.", sep = "")
 
     }else if(degen_peps == FALSE & !is.null(min_num_peps)){
-      attr(results, "filters")$proteomicsFilt$report_text <- paste("A protein filter was applied to the data, identifying ", pro_id, "s that do not have at least ", min_num_peps, " ", pep_id, "s mapping to them. This filter identified ", length(filter_object_new2$proteins_filt), " ", pro_id, "s from the data. Associated with these ", pro_id, "s were ", length(filter_object_new2$peptides_filt), " ", pep_id, "s that no longer mapped to a ", pro_id, ".", sep="")
+      attr(results, "filters")$proteomicsFilt$report_text <- paste("A protein filter was applied to the data, identifying ", pro_id, "s that do not have at least ", min_num_peps, " ", pep_id, "s mapping to them. This filter identified ", length(filter_object_new2$emeta_filt), " ", pro_id, "s from the data. Associated with these ", pro_id, "s were ", length(filter_object_new2$edata_filt), " ", pep_id, "s that no longer mapped to a ", pro_id, ".", sep="")
 
     }else if(degen_peps == TRUE & !is.null(min_num_peps)) {
-      attr(results, "filters")$proteomicsFilt$report_text <- paste("A degenerate peptide filter was applied to the data, identifying ", pep_id, "s that map to more than one ", pro_id, ". The filter identified ", length(filter_object_new1$peptides_filt), " such ", pep_id, "s in the data. Associated with these ", pep_id, "s were ", length(filter_object_new1$proteins_filt), " ", pro_id, "s that no longer had ", pep_id, "s mapping to them. Additionally, a protein filter was applied to the data, identifying ", pro_id, "s that do not have at least ", min_num_peps, " ", pep_id, "s mapping to them. This filter identified ", length(filter_object_new2$proteins_filt), " ", pro_id, "s from the data. Associated with these ", pro_id, "s were ", length(filter_object_new2$peptides_filt), " ", pep_id, "s that no longer mapped to a ", pro_id, ". Together, the two filters removed ", length(filter_object_new$peptides_filt), " ", pep_id, "s and ", length(filter_object_new$proteins_filt), " ", pro_id, "s from the data.", sep="")
+      attr(results, "filters")$proteomicsFilt$report_text <- paste("A degenerate peptide filter was applied to the data, identifying ", pep_id, "s that map to more than one ", pro_id, ". The filter identified ", length(filter_object_new1$edata_filt), " such ", pep_id, "s in the data. Associated with these ", pep_id, "s were ", length(filter_object_new1$emeta_filt), " ", pro_id, "s that no longer had ", pep_id, "s mapping to them. Additionally, a protein filter was applied to the data, identifying ", pro_id, "s that do not have at least ", min_num_peps, " ", pep_id, "s mapping to them. This filter identified ", length(filter_object_new2$emeta_filt), " ", pro_id, "s from the data. Associated with these ", pro_id, "s were ", length(filter_object_new2$edata_filt), " ", pep_id, "s that no longer mapped to a ", pro_id, ". Together, the two filters removed ", length(filter_object_new$edata_filt), " ", pep_id, "s and ", length(filter_object_new$emeta_filt), " ", pro_id, "s from the data.", sep="")
 
     }
 

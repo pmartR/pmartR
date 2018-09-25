@@ -372,7 +372,7 @@ summary.proteomicsFilt <- function(filter_object, min_num_peps=NULL, degen_peps=
 
     # determine which peptides no longer have a protein to map to  #
     ## find rows in peptide.info that correspond to proteins to be filtered ##
-    protfilt.ids <- which(filter_object$counts_by_pro[,pro_id] %in% pro_filt)
+    protfilt.ids <- which(attr(filter_object, "e_meta")[,pro_id] %in% pro_filt)
 
 
     ## find the peptides that are in the filter list but are not in the unfiltered lists ##
