@@ -256,7 +256,9 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, fc_colors = 
       }
       
       # should automatically left join by ID AND Comparison
-      volcano <- volcano %>% dplyr::left_join(counts_df)
+      suppressWarnings(
+        volcano <- volcano %>% dplyr::left_join(counts_df)
+      )
     }
     
     #Remove NAs to avoid ggplot2 warning
@@ -341,9 +343,11 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, fc_colors = 
       if(interactive){
         p1 <- p1 %>% plotly::ggplotly(tooltip = c("text"))
         p2 <- p2 %>% plotly::ggplotly(tooltip = c("text"))
-        p <- plotly::subplot(p1, p2, nrows = 2) %>% 
-          plotly::layout(showlegend = FALSE, title = "TOP: -log10-pvalue vs fold change | BOTTOM:  #Present in each group | Colored by fold change direction",
-                         font = list(size = 10))
+        suppressWarnings(
+          p <- plotly::subplot(p1, p2, nrows = 2) %>% 
+            plotly::layout(showlegend = FALSE, title = "TOP: -log10-pvalue vs fold change | BOTTOM:  #Present in each group | Colored by fold change direction",
+                           font = list(size = 10))
+        )
         return(p)
       }
       else return(gridExtra::grid.arrange(p1,p2,nrow = 2))
