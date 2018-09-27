@@ -401,7 +401,7 @@ print.dataRes<- function(dataRes){
         cat("\n")
       }
       
-      #extract item from dataRes, std_div
+      #extract item from dataRes, std_dev
       sd<- as.data.frame(lapply(dataRes$sd, as.character), stringsAsFactors = FALSE)
       
       #choosing how many rows to print
@@ -415,7 +415,7 @@ print.dataRes<- function(dataRes){
         print_sd<- rbind(head_sd, blank_row, tail_sd)
         
         if(ncol(sd) > 5) message("only first 5 columns are shown")
-        cat("std_div\n")
+        cat("std_dev\n")
         cat(capture.output(print_sd), sep = "\n")
         cat("\n")
       }
@@ -515,7 +515,7 @@ print.dataRes<- function(dataRes){
       cat("\n")
     }
     
-    #extract item from dataRes, std_div
+    #extract item from dataRes, std_dev
     sd<- as.data.frame(lapply(dataRes$sd, as.character), stringsAsFactors = FALSE)
     
     #choosing how many rows to print
@@ -529,7 +529,7 @@ print.dataRes<- function(dataRes){
       print_sd<- rbind(head_sd, blank_row, tail_sd)
       
       if(ncol(sd) > 5) message("only first 5 columns are shown")
-      cat("std_div\n")
+      cat("std_dev\n")
       cat(capture.output(print_sd), sep = "\n")
       cat("\n")
     }
