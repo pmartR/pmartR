@@ -3,7 +3,7 @@
 #' This function takes in an omicsData object and returns a summary of the e_data component. The six summarizing metrics include the mean, standard deviation, median, percent observed, minimum, and maximum.   
 #'
 #' @param omicsData an object of the class 'lipidData', 'metabData', 'pepData', or 'proData', usually created by \code{\link{as.lipidData}}, \code{\link{as.metabData}}, \code{\link{as.pepData}}, or \code{\link{as.proData}}, respectively.
-#' @param by a character string indicating whether summarizing metrics will be applied by 'sample' or by 'molecule'.  Defaults to sample.
+#' @param by a character string indicating whether summarizing metrics will be applied by 'sample' or by 'molecule'.  Defaults to 'sample'.
 #' @param groupvar a character vector with no more than two variable names that should be used to determine group membership of samples. The variable name must match a column name from \code{f_data}. Defaults to NULL, in which case group_DF attribute will be used.
 #' 
 #' @details If groupvar is NULL and group_designation has not been applied to omicsData, then the metrics will be applied to each column of e_data (when by = 'sample) or to each row of e_data (when by = 'molecule'). When groupvar is provided, it must match a column name from \code{f_data}, this column of f_data is used to group e_data in order to apply the metrics.  

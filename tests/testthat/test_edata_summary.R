@@ -38,9 +38,18 @@ test_that("test correctness of some output", {
   summary1 <- edata_summary(pep_object, by = "molecule", groupvar = "fakegroup3")
   summary2 <- edata_summary(pep_object, by = "molecule", groupvar = "fakegroup2")
   summary3 <- edata_summary(pep_object, by = "molecule", groupvar = c("Condition", "fakegroup3"))
+  summary4 <- edata_summary(pep_object, by = "sample")
   
   expect_true(nrow(summary1$n_per_grp) == 1)
   expect_true(nrow(summary2$n_per_grp) == 3)
   expect_true(nrow(summary3$n_per_grp) == 1)
+  expect_true(all(lapply(summary4, nrow) == 12))
+  
+  lapply(list(summary1, summary2, summary3, summary4), function(summary){
+    expect_true(!any(lapply(summary, is.null)))
+    expect_true(all(lapply(summary, inherits, "data.frame")))
+  })
+  
+  
   
 })

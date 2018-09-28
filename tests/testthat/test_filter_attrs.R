@@ -3,6 +3,8 @@ context("attributes proteomics filter")
 library(pmartR)
 library(testthat)
 library(pmartRdata)
+library(parallel)
+library(dplyr)
 
 sink(file = "logs_test_filter_attrs")
 
@@ -32,3 +34,48 @@ test_that("apply proteomics filter and check summary", {
   })
 
 sink()
+
+omicsData <- pro_object
+omicsData$f_data$fakegroup <- c(rep("A",3), rep("B",4), rep("C",4))
+
+# Weird groups
+# omicsData$f_data$fakegroup <- 1:12
+# omicsData$f_data$fakegroup2 <- c(1:8, 1, 9:11)
+
+omicsData_fakegroup <- group_designation(omicsData = omicsData, main_effects = c("fakegroup"))
+omicsData_conditiongroup <- group_designation(omicsData = omicsData, main_effects = c("Condition"))
+
+imdanovafilt_fakegroup <- imdanova_filter(omicsData = omicsData_fakegroup)
+imdanovafilt_conditiongroup <- imdanova_filter(omicsData = omicsData_conditiongroup)
+
+nonmiss_params <- list(list(2, NULL), list(NULL, 3), list(2, 3))
+
+lapply(nonmiss_params, function(params){
+    omicsData_fakegroup <- applyFilt(filter_object = imdanovafilt_fakegroup, omicsData = omicsData_fakegroup, min_nonmiss_anova = params[[1]], min_nonmiss_gtest = params[[2]])
+    omicsData_conditiongroup <- applyFilt(filter_object = imdanovafilt_conditiongroup, omicsData = omicsData_conditiongroup, min_nonmiss_anova = params[[1]], min_nonmiss_gtest = params[[2]])
+    
+    sink(file = "logs_statres_filter_summary")
+    fakegroup_summary <- summary(imdanovafilt_fakegroup, min_nonmiss_anova = params[[1]], min_nonmiss_gtest = params[[2]])
+    conditiongroup_summary <- summary(imdanovafilt_conditiongroup, min_nonmiss_anova = params[[1]], min_nonmiss_gtest = params[[2]])
+    sink()
+    
+    #test correct number filtered
+    expect_equal(attr(omicsData_fakegroup, "data_info")$num_edata, fakegroup_summary$num_not_filtered)
+    expect_equal(attr(omicsData_conditiongroup, "data_info")$num_edata, conditiongroup_summary$num_not_filtered)
+    
+    expect_equal(length(attr(omicsData_fakegroup, "filters")$imdanovaFilt$filtered), fakegroup_summary$num_filtered)
+    expect_equal(length(attr(omicsData_conditiongroup, "filters")$imdanovaFilt$filtered), conditiongroup_summary$num_filtered)
+    
+    # move to test_imd_anova
+    # for(test in list("anova", "gtest", "comb")){
+    #   for(omicsData in list(omicsData_fakegroup, omicsData_conditiongroup)){
+    #     statRes_obj <- imd_anova(omicsData = omicsData, test_method = test)
+    #     
+    #     # check consistency of statRes_obj output
+    #     print("ayyyy")
+    #     
+    #   }
+    # }
+})
+  
+
