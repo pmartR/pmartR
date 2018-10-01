@@ -75,8 +75,25 @@ summary.statRes <- function(x,...){
   cat("Type of test:",attr(x,"statistical_test"),"\n\n")
   cat("Multiple comparison adjustment:",attr(x,"adjustment_method"),"\n\n")
   cat("p-value threshold:",attr(x,"pval_thresh"),"\n\n")
-  cat("Number of significant biomolecules by comparison:\n\n")
-  print(attr(x,"number_significant"))
+  cat("Number of significant biomolecules by comparison.  Columns specify fold change direction and type of test:\n\n")
+  
+  table <- attr(x,"number_significant")
+  names(table) <- lapply(names(table), function(name){switch(name,
+                                                     Up_total = "Total:Positive",
+                                                     Down_total = "Total:Negative",
+                                                     Up_anova = "Positive:ANOVA",
+                                                     Down_anova = "Negative:ANOVA",
+                                                     Up_gtest = "Positive:G-test",
+                                                     Down_gtest = "Negative:G-test",
+                                                     name)
+  })
+  
+  rownames(table) <- NULL
+  
+  print(table)
+  
+  return(invisible(list(test_type = attr(x,"statistical_test"), adjustment = attr(x,"adjustment_method"), pval_thresh = attr(x,"pval_thresh"), sig_table = table,
+                        comparisons = attr(x, "comparisons"), group_DF = attr(x,"group_DF"))))
 }
 
 #' @export
