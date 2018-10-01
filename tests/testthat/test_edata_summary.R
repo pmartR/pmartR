@@ -46,8 +46,8 @@ test_that("test correctness of some output", {
   expect_true(all(lapply(summary4, nrow) == 12))
   
   lapply(list(summary1, summary2, summary3, summary4), function(summary){
-    expect_true(!any(lapply(summary, is.null)))
-    expect_true(all(lapply(summary, inherits, "data.frame")))
+    expect_true(!any(unlist(lapply(summary, is.null))))
+    expect_true(all(unlist(lapply(summary, inherits, "data.frame"))))
   })
   
   

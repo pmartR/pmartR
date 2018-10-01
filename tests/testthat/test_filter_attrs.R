@@ -3,7 +3,6 @@ context("attributes proteomics filter")
 library(pmartR)
 library(testthat)
 library(pmartRdata)
-library(parallel)
 library(dplyr)
 
 sink(file = "logs_test_filter_attrs")
@@ -66,16 +65,6 @@ lapply(nonmiss_params, function(params){
     expect_equal(length(attr(omicsData_fakegroup, "filters")$imdanovaFilt$filtered), fakegroup_summary$num_filtered)
     expect_equal(length(attr(omicsData_conditiongroup, "filters")$imdanovaFilt$filtered), conditiongroup_summary$num_filtered)
     
-    # move to test_imd_anova
-    # for(test in list("anova", "gtest", "comb")){
-    #   for(omicsData in list(omicsData_fakegroup, omicsData_conditiongroup)){
-    #     statRes_obj <- imd_anova(omicsData = omicsData, test_method = test)
-    #     
-    #     # check consistency of statRes_obj output
-    #     print("ayyyy")
-    #     
-    #   }
-    # }
 })
   
 
