@@ -143,12 +143,16 @@ print.statRes <- function(x,...){
 #' #Implement the IMD ANOVA method and compuate all pairwise comparisons (i.e. leave the `comparisons` argument NULL)
 #' anova_res <- imd_anova(omicsData = myproData, test_method = 'anova')
 #' plot(anova_res)
+#' plot(anova_res, plot_type = "volcano")
 #' 
 #' imd_res <- imd_anova(omicsData = myproData, test_method = 'gtest')
 #' plot(imd_res)
+#' plot(imd_res, plot_type = "volcano")
 #' 
 #' imd_anova_res <- imd_anova(omicsData = myproData, test_method = 'comb', pval_adjust='bon')
-#' plot(imd_anova_res)
+#' plot(imd_anova_res, theme_bw = TRUE)
+#' plot(imd_anova_res, plot_type = "volcano", theme_bw = TRUE)
+#' 
 #' }
 #' 
 plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, fc_colors = c("red", "black", "green"), stacked = FALSE, interactive = FALSE, theme_bw = FALSE, ...){
