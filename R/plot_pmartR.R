@@ -256,8 +256,7 @@ plot.moleculeFilt <- function(filter_object, min_num = NULL, ...) {
 #' 
 #'@export
 #'@rdname plot-pmartR-proteomicsFilt
-#'@param min_num_peps an optional integer value between 1 and the maximum number of peptides that map to a protein in the data. The value specifies the minimum number of peptides that must map to a protein. Any protein with less than \code{min_num_peps} mapping to it will be returned as a protein that should be filtered. Default value is NULL.
-#'@param degen_peps logical indicator of whether to filter out degenerate peptides (TRUE) or not (FALSE). Default value is FALSE.
+#'@param mapping whether to display a histogram of the number of peptides mapping to a protein for all proteins (mapping = 'pep_to_pro'), a histogram of the number of proteins mapped to by each peptide (mapping = "pro_to_pep"), or 'both'.  Defaults to "both"
 #'
 #' \tabular{ll}{
 #' \code{x_lab} \tab character string to be used for x-axis label. Defaults to NULL, in which case "Samples" is used. \cr
@@ -267,46 +266,35 @@ plot.moleculeFilt <- function(filter_object, min_num = NULL, ...) {
 #' \code{title_size} \tab integer value specifying the font size for the plot title. Default is 14. \cr
 #' \code{x_lab_size} \tab integer value indicating the font size for the x-axis. Defaults to 11. \cr
 #' \code{y_lab_size} \tab integer value indicating the font size for the y-axis. Defaults to 11. \cr
+#' \code(xlim) \tab length 2 numeric vector specifying x-axis limits for the peptide to protein plot.  Defaults to NULL, which gives default ggplot2 axis limits
+#' \code(ylim) \tab length 2 numeric vector specifying y-axis limits for the peptide to protein plot.  Defaults to NULL, which gives default ggplot2 axis limits
 #' \code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used. \cr
 #' \code{legend_position} \tab character string specifying one of "right", "left", "top", or "bottom" for the location of the legend. Defaults to "right". \cr
 #' }
-plot.proteomicsFilt <- function(filter_object, min_num_peps = NULL, degen_peps = FALSE, ...) {
-  .plot.proteomicsFilt(filter_object, min_num_peps, degen_peps, ...)
+plot.proteomicsFilt <- function(filter_object, mapping = "both", ...) {
+  .plot.proteomicsFilt(filter_object, mapping = mapping, ...)
 }
 
-.plot.proteomicsFilt <- function(filter_object, min_num_peps = NULL, degen_peps = FALSE,
+.plot.proteomicsFilt <- function(filter_object, mapping = "both",
                                  x_lab_pep = NULL, y_lab_pep = NULL, title.pep = NULL,
                                  x_lab_pro = NULL, y_lab_pro = NULL, title.pro = NULL,
+                                 xlim = NULL, ylim = NULL,
                                  title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme = FALSE) {
   
-  # error checks for min_num_peps, if not NULL #
-  if(!is.null(min_num_peps)) {
-    # check that min_num_peps is numeric and >=1 #
-    if(!inherits(min_num_peps, "numeric") | min_num_peps < 1) stop("min_num_peps must be an integer greater than or equal to 1")
-    # check that min_num_peps is an integer #
-    if(min_num_peps %% 1 != 0) stop("min_num_peps must be an integer greater than or equal to 1")
-    # check that min_num_peps is of length 1 #
-    if(length(min_num_peps) != 1) stop("min_num_peps must be of length 1")
-    # check that min_num_peps is less than the total number of peptides #
-    if(min_num_peps > sum(filter_object$counts_by_pep$n)) stop("min_num_peps cannot be greater than the total number of peptides")
-  }
-  # check that degen_peps is logical #
-  if(!inherits(degen_peps, "logical")) stop("degen_peps must be either TRUE or FALSE")
-  
-  
+  if(!(mapping %in% c("both", "pep_to_pro", "pro_to_pep"))) stop("'mapping' argument must be one of 'both', 'pep_to_pro' or 'pro_to_pep'")
+
   suppressMessages({
     # get counts
     pep_counts <- filter_object$counts_by_pro$n
     pro_counts <- filter_object$counts_by_pep$n
     
-    # peptides plot
-    ## make labels ##
-    xlabel_pep <- ifelse(is.null(x_lab_pep), "Number of Peptides \nMapping to each Protein", x_lab_pep)
-    ylabel_pep <- ifelse(is.null(y_lab_pep), "Count \n(Number of Proteins)", y_lab_pep)
-    plot_title_pep <- ifelse(is.null(title.pep), "Number of Peptides \nMapping to each Protein", title.pep)
-    
     ## plot histogram
-    if(bw_theme==FALSE){
+    if(mapping %in% c("both", "pep_to_pro")){ # peptides plot
+      ## make labels ##
+      xlabel_pep <- ifelse(is.null(x_lab_pep), "Number of Peptides \nMapping to each Protein", x_lab_pep)
+      ylabel_pep <- ifelse(is.null(y_lab_pep), "Count \n(Number of Proteins)", y_lab_pep)
+      plot_title_pep <- ifelse(is.null(title.pep), "Number of Peptides \nMapping to each Protein", title.pep)
+      
       p1 <- ggplot2::ggplot(as.data.frame(pep_counts), ggplot2::aes(x=pep_counts)) +
         ggplot2::geom_histogram(fill="royalblue4", binwidth = 1) +
         ggplot2::ggtitle(plot_title_pep) +
@@ -315,63 +303,42 @@ plot.proteomicsFilt <- function(filter_object, min_num_peps = NULL, degen_peps =
         ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
                        axis.title.x = ggplot2::element_text(size=x_lab_size),
                        axis.title.y = ggplot2::element_text(size=y_lab_size))
-    }else{
-      p1 <- ggplot2::ggplot(as.data.frame(pep_counts), ggplot2::aes(x=pep_counts)) +
-        ggplot2::theme_bw() +
-        ggplot2::geom_histogram(fill="royalblue4", binwidth = 1) +
-        ggplot2::ggtitle(plot_title_pep) +
-        ggplot2::xlab(xlabel_pep) +
-        ggplot2::ylab(ylabel_pep)  +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size))
+      if(bw_theme){
+        p1 <- p1 + ggplot2::theme_bw()
+      }
+      if(!is.null(xlim)){
+        p1 <- p1 + ggplot2::xlim(xlim)
+      }
+      if(!is.null(ylim)){
+        p1 <- p1 + ggplot2::ylim(ylim)
+      }
     }
     
-    
-    ## get max count for line segment, draw segment on plot
-    if(degen_peps) {
-      max_counts <- ggplot2::ggplot_build(p1)$data[[1]]$count[1]
-      p1 <- p1 + ggplot2::annotate(geom="rect", xmin=0.5, xmax=1.5, ymin=0, ymax=max_counts, col="black", alpha = 0, size = 1)
-    }
-    
-    # proteins plot
-    ## make labels ##
-    xlabel_pro <- ifelse(is.null(x_lab_pro), "Number of Proteins \nMapped to by each Peptide", x_lab_pro)
-    ylabel_pro <- ifelse(is.null(y_lab_pro), "Count \n(Number of Peptides)", y_lab_pro)
-    plot_title_pro <- ifelse(is.null(title.pro), "Number of Proteins \nMapped to by each Peptide", title.pro)
-    
-    ## plot histogram
-    if(bw_theme == FALSE){
+    if(mapping %in% c("both","pro_to_pep")){ # proteins plot
+      ## make labels ##
+      xlabel_pro <- ifelse(is.null(x_lab_pro), "Number of Proteins \nMapped to by each Peptide", x_lab_pro)
+      ylabel_pro <- ifelse(is.null(y_lab_pro), "Count \n(Number of Peptides)", y_lab_pro)
+      plot_title_pro <- ifelse(is.null(title.pro), "Number of Proteins \nMapped to by each Peptide", title.pro)
+      
+      ## plot histogram
       p2 <- ggplot2::ggplot(as.data.frame(pro_counts), ggplot2::aes(x=pro_counts)) +
         ggplot2::geom_histogram(fill="springgreen4", binwidth = .5) +
         ggplot2::ggtitle(plot_title_pro) +
         ggplot2::xlab(xlabel_pro) +
         ggplot2::ylab(ylabel_pro) +
+        ggplot2::scale_x_continuous(breaks = unique(pro_counts)) +
         ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
                        axis.title.x = ggplot2::element_text(size=x_lab_size),
                        axis.title.y = ggplot2::element_text(size=y_lab_size))
-    }else{
-      p2 <- ggplot2::ggplot(as.data.frame(pro_counts), ggplot2::aes(x=pro_counts)) +
-        ggplot2::theme_bw() +
-        ggplot2::geom_histogram(fill="springgreen4", binwidth = .5) +
-        ggplot2::ggtitle(plot_title_pro) +
-        ggplot2::xlab(xlabel_pro) +
-        ggplot2::ylab(ylabel_pro) +
-        ggplot2::scale_x_continuous(breaks = 1, labels = "1") +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size))
+      if(bw_theme){
+        p2 <- p2 + ggplot2::theme_bw()
+      }
     }
     
+    if(mapping == "pep_to_pro") return(p1)
+    else if(mapping == "pro_to_pep") return(p2)
+    else if(mapping == "both") return(Rmisc::multiplot(p1, p2, cols = 2))
     
-    
-    ## get max count for line segment, draw segment on plot
-    if(!is.null(min_num_peps)) {
-      max_counts <- max(ggplot2::ggplot_build(p2)$data[[1]]$count)
-      p2 <- p2 + ggplot2::annotate(geom="rect", xmin=0.5, xmax=min_num_peps + 0.5, ymin=0, ymax=max_counts, col="red", fill="red", alpha = 0.2, size = 0.5)
-    }
-    
-    return(Rmisc::multiplot(p1, p2, cols = 2))
   })
 }
 
@@ -987,7 +954,7 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     title <- maintitle
     
     if(use_VizSampNames == T){
-      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = levels(f_data[,get_fdata_cname(omicsData)]))
+      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
     }
     
     ## if order_by is not null and color_by is ##
@@ -1020,7 +987,7 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     
     if(use_VizSampNames == T){
       f_data = f_data[order(f_data[,order_by]),]
-      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = levels(f_data[,get_fdata_cname(omicsData)]))
+      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
     }
     
     ## if color_by is not null and order_by is ##
@@ -1049,7 +1016,7 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     
     if(use_VizSampNames == T){
       f_data = f_data[order(f_data[,color_by]),]
-      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = levels(f_data[,get_fdata_cname(omicsData)]))
+      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
     }
     
     ## if neither order_by or color_by are null ##
@@ -1098,7 +1065,7 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     
     if(use_VizSampNames == T){
       f_data = f_data[order(f_data[,order_by]),]
-      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = levels(f_data[,get_fdata_cname(omicsData)]))
+      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
     }
     
   }
@@ -1245,7 +1212,7 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     title <- maintitle
     
     if(use_VizSampNames == T){
-      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = levels(f_data[,get_fdata_cname(omicsData)]))
+      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
     }
     
     ## if order_by is not null and color_by is ##
@@ -1278,7 +1245,7 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     
     if(use_VizSampNames == T){
       f_data = f_data[order(f_data[,order_by]),]
-      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = levels(f_data[,get_fdata_cname(omicsData)]))
+      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
     }
     
     ## if color_by is not null and order_by is ##
@@ -1307,7 +1274,7 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     
     if(use_VizSampNames == T){
       f_data = f_data[order(f_data[,color_by]),]
-      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = levels(f_data[,get_fdata_cname(omicsData)]))
+      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
     }
     
     ## if neither order_by or color_by are null ##
@@ -1356,7 +1323,7 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     
     if(use_VizSampNames == T){
       f_data = f_data[order(f_data[,order_by]),]
-      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = levels(f_data[,get_fdata_cname(omicsData)]))
+      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
     }
     
   }
@@ -1501,7 +1468,7 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     title <- maintitle
     
     if(use_VizSampNames == T){
-      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = levels(f_data[,get_fdata_cname(omicsData)]))
+      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
     }
     
     ## if order_by is not null and color_by is ##
@@ -1534,7 +1501,7 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     
     if(use_VizSampNames == T){
       f_data = f_data[order(f_data[,order_by]),]
-      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = levels(f_data[,get_fdata_cname(omicsData)]))
+      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
     }
     
     ## if color_by is not null and order_by is ##
@@ -1564,7 +1531,7 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     
     if(use_VizSampNames == T){
       f_data = f_data[order(f_data[,color_by]),]
-      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = levels(f_data[,get_fdata_cname(omicsData)]))
+      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
     }
     
     ## if neither order_by or color_by are null ##
@@ -1613,7 +1580,7 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     
     if(use_VizSampNames == T){
       f_data = f_data[order(f_data[,order_by]),]
-      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = levels(f_data[,get_fdata_cname(omicsData)]))
+      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
     }
     
   }
@@ -1760,7 +1727,7 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     title <- maintitle
     
     if(use_VizSampNames == T){
-      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = levels(f_data[,get_fdata_cname(omicsData)]))
+      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
     }
     
     ## if order_by is not null and color_by is ##
@@ -1794,7 +1761,7 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     
     if(use_VizSampNames == T){
       f_data = f_data[order(f_data[,order_by]),]
-      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = levels(f_data[,get_fdata_cname(omicsData)]))
+      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
     }
     
     ## if color_by is not null and order_by is ##
@@ -1824,7 +1791,7 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     
     if(use_VizSampNames == T){
       f_data = f_data[order(f_data[,color_by]),]
-      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = levels(f_data[,get_fdata_cname(omicsData)]))
+      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
     }
     
     ## if neither order_by or color_by are null ##
@@ -1873,7 +1840,7 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     
     if(use_VizSampNames == T){
       f_data = f_data[order(f_data[,order_by]),]
-      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = levels(f_data[,get_fdata_cname(omicsData)]))
+      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
     }
   }
   
