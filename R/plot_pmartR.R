@@ -814,7 +814,7 @@ plot.cvFilt <- function(filter_object, cv_threshold = NULL, ...) {
   
   # get number of biomolecules with CV > max_x_val & display a warning #
   n_not_displayed <- sum(new_object$CV_pooled > max_x_val)
-  warning(paste("For display purposes, biomolecules with pooled CV greater than ", round(max_x_val, 2), " are not displayed in the graph. This corresponds to ", n_not_displayed, " biomolecules.", sep=""))
+  message(paste("For display purposes, biomolecules with pooled CV greater than ", round(max_x_val, 2), " are not displayed in the graph. This corresponds to ", n_not_displayed, " biomolecules.", sep=""))
   
   # labels
   plot_title <- ifelse(is.null(title_plot), "Coefficient of Variation (CV)", title_plot)
