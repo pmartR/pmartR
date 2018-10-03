@@ -212,7 +212,7 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, fc_colors = 
             scale_fill_manual(values=c(fc_colors[1], fc_colors[3]), labels = c("Negative", "Positive"), name = "Fold Change Sign") +
             facet_wrap(~Comparison) + 
             xlab("Statistical test, by group comparison") + ylab("Count of DE Biomolecules") +
-            ggtitle("Number of DE Metabolites Between Groups") +
+            ggtitle("Number of DE Biomolecules Between Groups") +
             theme(plot.title = element_text(hjust = 0.5), legend.text = element_text(size = 6), legend.title = element_text(size = 6))
     
     if(theme_bw) p <- p + theme_bw()
