@@ -116,7 +116,7 @@ imd_anova <- function(omicsData, comparisons = NULL, test_method, pval_adjust = 
   }
   
   #Get cname and counts by group from imd_results_full
-  imd_counts <- imd_results_full[[1]][,c(1,grep("Count",colnames(imd_results_full[[1]])))] 
+  imd_counts <- imd_results_full[[1]][,c(1,grep("^Count",colnames(imd_results_full[[1]])))] 
   
   
   ############
@@ -153,16 +153,16 @@ imd_anova <- function(omicsData, comparisons = NULL, test_method, pval_adjust = 
     
     imd_out <- list(Full_results=Full_results, Flags = NULL,P_values = NULL)
     #Remove p-value and flag indicators from column names
-    colnames(anova_pvalues) <- gsub("P_value_T_","",colnames(anova_pvalues))
+    colnames(anova_pvalues) <- gsub("^P_value_T_","",colnames(anova_pvalues))
     imd_out$P_values <- anova_pvalues
-    colnames(anova_fold_flags) <- gsub("Flag_","",colnames(anova_fold_flags))
+    colnames(anova_fold_flags) <- gsub("^Flag_","",colnames(anova_fold_flags))
     imd_out$Flags <- anova_fold_flags
 
     return(statRes_output(imd_out,omicsData,comparisons,test_method,pval_adjust,pval_thresh))
     
   }else if(test_method=='gtest'){
     
-    all_gtest <- cbind(imd_counts,gtest_pvalues)
+    all_gtest <- cbind(imd_counts,gtest_pvalues, gtest_flags)
     all_anova <- cbind(anova_results,anova_fold_change)
     Full_results <- base::merge(all_gtest,all_anova,all.x=TRUE,all.y=FALSE,fill=NA,sort=FALSE)
     if(nrow(Full_results)>max(nrow(all_gtest),nrow(all_anova))){
@@ -171,9 +171,9 @@ imd_anova <- function(omicsData, comparisons = NULL, test_method, pval_adjust = 
 
     imd_out <- list(Full_results = Full_results,Flags = NULL, P_values = NULL)
     #Remove p-value and flag indicators from column names
-    colnames(gtest_pvalues) <- gsub("P_value_G_","",colnames(gtest_pvalues))
+    colnames(gtest_pvalues) <- gsub("^P_value_G_","",colnames(gtest_pvalues))
     imd_out$P_values <- gtest_pvalues
-    colnames(gtest_flags) <- gsub("Flag_","",colnames(gtest_flags))
+    colnames(gtest_flags) <- gsub("^Flag_","",colnames(gtest_flags))
     imd_out$Flags <- gtest_flags
 
     return(statRes_output(imd_out,omicsData,comparisons,test_method,pval_adjust,pval_thresh))
@@ -201,15 +201,15 @@ imd_anova <- function(omicsData, comparisons = NULL, test_method, pval_adjust = 
   #(6)   If both but g-test is significant, report g-test (+/-2 for flag)
   
   #Start with the anova p-values (extracted from combined results) and replace if missing [see (2)] or g-test is significant [see (6)]
-  imd_pvals <- data.matrix(Full_results[,grep("P_value_T_",colnames(Full_results))])
-  imd_flags <- data.matrix(Full_results[,grep("Flag_",colnames(Full_results))])
+  imd_pvals <- data.matrix(Full_results[grep("^P_value_T_",colnames(Full_results))])
+  imd_flags <- data.matrix(Full_results[grep("^Flag_",colnames(Full_results))])
   #Redefine gtest_pvalues after it's been merged
-  gtest_pvalues <- data.matrix(Full_results[,grep("P_value_G_",colnames(Full_results))])
+  gtest_pvalues <- data.matrix(Full_results[grep("^P_value_G_",colnames(Full_results))])
   #Same for 'gtest_flags', but a little more complicated
   gtest_flags <- cbind(imd_counts[,1],gtest_flags)
   colnames(gtest_flags)[1] <- colnames(imd_counts)[1]
-  gtest_flags <- merge(anova_results,gtest_flags,all=TRUE)
-  gtest_flags <- data.matrix(gtest_flags[,grep("Flag_",colnames(gtest_flags))])
+  gtest_flags <- merge(anova_results,gtest_flags,all=TRUE, sort = FALSE)
+  gtest_flags <- data.matrix(gtest_flags[grep("^Flag_",colnames(gtest_flags))])
   
   #Replance missing ANOVA p-values with g-test p-values
   if(any(is.na(imd_pvals))){
@@ -230,8 +230,10 @@ imd_anova <- function(omicsData, comparisons = NULL, test_method, pval_adjust = 
   }
   
   #Remove p-value and flag indicators from column names
-  colnames(imd_pvals) <- gsub("P_value_T_","",colnames(imd_pvals))
-  colnames(imd_flags) <- gsub("Flag_","",colnames(imd_flags))
+  colnames(imd_pvals) <- gsub("^P_value_T_","",colnames(imd_pvals))
+  colnames(imd_flags) <- gsub("^Flag_","",colnames(imd_flags))
+  
+  Full_results[,grep("^Flag_",colnames(Full_results))] <- if(ncol(imd_flags) == 1) as.vector(imd_flags) else imd_flags
   
   ##-------- Construct statRes object --------##
   imd_out <- list(Full_results=Full_results,

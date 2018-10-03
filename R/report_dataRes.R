@@ -38,8 +38,8 @@ report_dataRes<- function(dataRes, minmax = FALSE, digits = 2){
         avg = dataRes$mean
         avg[, 2:ncol(avg)]<- round(avg[,-1], digits = digits)
         
-        std_div = dataRes$sd
-        std_div[, 2:ncol(std_div)]<- round(std_div[, -1], digits = digits)
+        std_dev = dataRes$sd
+        std_dev[, 2:ncol(std_dev)]<- round(std_dev[, -1], digits = digits)
         
         minimum = dataRes$min
         minimum[, 2:ncol(minimum)]<- round(minimum[, -1], digits = digits)
@@ -50,7 +50,7 @@ report_dataRes<- function(dataRes, minmax = FALSE, digits = 2){
         #organizing data
         mean_melt = melt(avg, id.vars = edata_cname)
         names(mean_melt)[3]<- "mean"
-        sd_melt = melt(std_div, id.vars = edata_cname)
+        sd_melt = melt(std_dev, id.vars = edata_cname)
         names(sd_melt)[3]<- "sd"
         min_melt = melt(minimum, id.vars = edata_cname)
         names(min_melt)[3]<- "min"
@@ -95,8 +95,8 @@ report_dataRes<- function(dataRes, minmax = FALSE, digits = 2){
           avg = dataRes$mean
           avg$mean<- round(avg[,-which(names(avg) == edata_cname)], digits = digits)
           
-          std_div = dataRes$sd
-          std_div$sd<- round(std_div[,-which(names(std_div) == edata_cname)], digits = digits)
+          std_dev = dataRes$sd
+          std_dev$sd<- round(std_dev[,-which(names(std_dev) == edata_cname)], digits = digits)
           
           minimum = dataRes$min
           minimum$min<- round(minimum[,-which(names(minimum) == edata_cname)], digits = digits)
@@ -104,7 +104,7 @@ report_dataRes<- function(dataRes, minmax = FALSE, digits = 2){
           maximum = dataRes$max
           maximum$max<- round(maximum[,-which(names(maximum) == edata_cname)], digits = digits)
           
-          data_mean_sd<- merge(avg, std_div, by = edata_cname)
+          data_mean_sd<- merge(avg, std_dev, by = edata_cname)
           data_min_max = merge(minimum, maximum, by = edata_cname)
           all_data = merge(data_mean_sd, data_min_max, by = edata_cname)
           
@@ -129,8 +129,8 @@ report_dataRes<- function(dataRes, minmax = FALSE, digits = 2){
           avg = dataRes$mean
           avg[, 2:ncol(avg)]<- round(avg[,-1], digits = digits)
           
-          std_div = dataRes$sd
-          std_div[, 2:ncol(std_div)]<- round(std_div[, -1], digits = digits)
+          std_dev = dataRes$sd
+          std_dev[, 2:ncol(std_dev)]<- round(std_dev[, -1], digits = digits)
           
           minimum = dataRes$min
           minimum[, 2:ncol(minimum)]<- round(minimum[, -1], digits = digits)
@@ -141,7 +141,7 @@ report_dataRes<- function(dataRes, minmax = FALSE, digits = 2){
           #organizing data
           mean_melt = melt(avg, id.vars = edata_cname)
           names(mean_melt)[3]<- "mean"
-          sd_melt = melt(std_div, id.vars = edata_cname)
+          sd_melt = melt(std_dev, id.vars = edata_cname)
           names(sd_melt)[3]<- "sd"
           min_melt = melt(minimum, id.vars = edata_cname)
           names(min_melt)[3]<- "min"
@@ -191,8 +191,8 @@ report_dataRes<- function(dataRes, minmax = FALSE, digits = 2){
     avg = dataRes$mean
     avg$mean<- round(avg[,-1], digits = digits)
     
-    std_div = dataRes$sd
-    std_div$sd<- round(std_div[,-1], digits = digits)
+    std_dev = dataRes$sd
+    std_dev$sd<- round(std_dev[,-1], digits = digits)
   
     minimum = dataRes$min
     minimum$min = round(minimum[,-1], digits = digits)
@@ -200,7 +200,7 @@ report_dataRes<- function(dataRes, minmax = FALSE, digits = 2){
     maximum = dataRes$max
     maximum$max = round(maximum[,-1], digits = digits)
     
-    data_mean_sd<- merge(avg, std_div, by = "sample")
+    data_mean_sd<- merge(avg, std_dev, by = "sample")
     data_min_max = merge(minimum, maximum, by = "sample")
     all_data = merge(data_mean_sd, data_min_max, by = "sample")
     

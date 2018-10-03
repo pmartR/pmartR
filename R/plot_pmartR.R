@@ -48,6 +48,7 @@ NULL
 #' 
 #'@rdname plot-pmartR-corRes
 #'@export
+#'@param omicsData an object of the class 'pepData', 'proData', 'metabData', or 'lipidData', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.
 #'@param interactive default value is FALSE. If TRUE, an interactive d3heatmap will be rendered, allowing you to zoom in on sections of the heatmap.
 #'@param x_lab logical indicator of whether to label the x-axis with the sample names. Defaults to TRUE. If FALSE, no x-axis labels are included in the plot.
 #'@param y_lab logical indicator of whether to label the y-axis with the sample names. Defaults to TRUE. If FALSE, no y-axis labels are included in the plot.
@@ -55,19 +56,29 @@ NULL
 #'
 #' \tabular{ll}{
 #' \code{title_plot} \tab character string to be used for the plot title. Defaults to NULL, in which case "Sample Outlier Results /n p-value threshold = 0.xyz" is used, where 'xyz' is the pvalue_threshold supplied to the function. \cr
-#' \code{title_size} integer value specifying the font size for the plot title. Default is 14. \cr
+#' \code{title_size} integer value specifying the font size for the plot title. Default is 14. \cr]
+#' \code{use_VizSampNames} \tab logical specifies whether to use custom sample names \cr
 #' } 
 plot.corRes <- function(corRes_object, ...){
   .plot.corRes(corRes_object, ...)
 }
-.plot.corRes <- function(corRes_object, interactive = FALSE, title_plot = NULL, x_lab=TRUE, y_lab=TRUE, colorbar_lim=c(NA, NA), title_size = 14){
+.plot.corRes <- function(corRes_object, omicsData = NULL, interactive = FALSE, title_plot = NULL, x_lab=TRUE, y_lab=TRUE, colorbar_lim=c(NA, NA), title_size = 14, use_VizSampNames = FALSE){
   # check for a corRes object #
   if(!inherits(corRes_object, "corRes")) stop("object must be of class 'corRes'")
-  # check plot title is a string #
+  
+  # check title and colorbar options #
   if(!is.null(title_plot)) {
     if(!is.character(title_plot)) stop("title_plot must be a character vector")
   }
+  if(!all(is.na(colorbar_lim))){
+    if(!is.numeric(colorbar_lim) | length(colorbar_lim) != 2) stop("colorbar_lim must be a numeric vector of length 2")
+  }
+  if(!is.numeric(title_size)) message("Title size should be a numeric value, a default value will be used")
   
+  # check that omicsData is of appropriate class #
+  if(!is.null(omicsData)){
+    if(!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData"))) stop("omicsData must be of class 'pepData', 'proData', 'metabData', or 'lipidData'")
+  }
   # Workaround for certain "check" warnings
   Var1 <- Var2 <- value <- NULL
   
@@ -92,7 +103,7 @@ plot.corRes <- function(corRes_object, ...){
   if(!interactive) {
     #pal <- colorRampPalette(c("blue","white","red"))
     pal <- colorRampPalette(c("red", "yellow")) # modified by KS 2/12/2018
-    
+
     colnames(corRes_object) <- rownames(corRes_object)
     corRes_melt <- reshape2::melt(corRes_object)
     corRes_melt$Var1 <- abbreviate(corRes_melt$Var1, minlength=20)
@@ -126,13 +137,23 @@ plot.corRes <- function(corRes_object, ...){
     if(!is.null(attributes(corRes_object)$data_norm)){
       if(attributes(corRes_object)$data_norm == TRUE) {
         heatmap <- heatmap + ggplot2::ggtitle(plot_title)
-      }
+      }else{heatmap <- heatmap + ggplot2::ggtitle(plot_title)}
     }else{
         heatmap <- heatmap + ggplot2::ggtitle(plot_title)
     }
     
+    if(use_VizSampNames){
+      if(!is.logical(as.logical(use_VizSampNames))) stop("Must specify a logical TRUE/FALSE value for use_VizSampNames")
+      if(is.null(omicsData)) stop("If using custom sample names, specify the corresponding omicsData object")
+      heatmap = heatmap + 
+        ggplot2::scale_x_discrete(labels = omicsData$f_data$VizSampNames, breaks = levels(omicsData$f_data[,get_fdata_cname(omicsData)])) + 
+        ggplot2::scale_y_discrete(labels = omicsData$f_data$VizSampNames, breaks = levels(omicsData$f_data[,get_fdata_cname(omicsData)]))
+    }
+    
   } else {
-    heatmap <- d3heatmap::d3heatmap(corRes_object, dendrogram = 'none', reorderfun = function(x) ordered(x, levels = rev(sort(unique(x)))))
+    if(!is.null(title_plot)) message("The ability to display a plot title is not available when interactive is set to TRUE")
+    if(use_VizSampNames) message("Custom Sample names not available in interactive plots")
+    heatmap <- d3heatmap::d3heatmap(corRes_object, dendrogram = 'none', reorderfun = function(x) ordered(x, levels = rev(sort(unique(x)))), title = plot_title)
   }
   
   return(heatmap)
@@ -235,8 +256,7 @@ plot.moleculeFilt <- function(filter_object, min_num = NULL, ...) {
 #' 
 #'@export
 #'@rdname plot-pmartR-proteomicsFilt
-#'@param min_num_peps an optional integer value between 1 and the maximum number of peptides that map to a protein in the data. The value specifies the minimum number of peptides that must map to a protein. Any protein with less than \code{min_num_peps} mapping to it will be returned as a protein that should be filtered. Default value is NULL.
-#'@param degen_peps logical indicator of whether to filter out degenerate peptides (TRUE) or not (FALSE). Default value is FALSE.
+#'@param mapping whether to display a histogram of the number of peptides mapping to a protein for all proteins (mapping = 'pep_to_pro'), a histogram of the number of proteins mapped to by each peptide (mapping = "pro_to_pep"), or 'both'.  Defaults to "both"
 #'
 #' \tabular{ll}{
 #' \code{x_lab} \tab character string to be used for x-axis label. Defaults to NULL, in which case "Samples" is used. \cr
@@ -246,46 +266,35 @@ plot.moleculeFilt <- function(filter_object, min_num = NULL, ...) {
 #' \code{title_size} \tab integer value specifying the font size for the plot title. Default is 14. \cr
 #' \code{x_lab_size} \tab integer value indicating the font size for the x-axis. Defaults to 11. \cr
 #' \code{y_lab_size} \tab integer value indicating the font size for the y-axis. Defaults to 11. \cr
+#' \code(xlim) \tab length 2 numeric vector specifying x-axis limits for the peptide to protein plot.  Defaults to NULL, which gives default ggplot2 axis limits
+#' \code(ylim) \tab length 2 numeric vector specifying y-axis limits for the peptide to protein plot.  Defaults to NULL, which gives default ggplot2 axis limits
 #' \code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used. \cr
 #' \code{legend_position} \tab character string specifying one of "right", "left", "top", or "bottom" for the location of the legend. Defaults to "right". \cr
 #' }
-plot.proteomicsFilt <- function(filter_object, min_num_peps = NULL, degen_peps = FALSE, ...) {
-  .plot.proteomicsFilt(filter_object, min_num_peps, degen_peps, ...)
+plot.proteomicsFilt <- function(filter_object, mapping = "both", ...) {
+  .plot.proteomicsFilt(filter_object, mapping = mapping, ...)
 }
 
-.plot.proteomicsFilt <- function(filter_object, min_num_peps = NULL, degen_peps = FALSE,
+.plot.proteomicsFilt <- function(filter_object, mapping = "both",
                                  x_lab_pep = NULL, y_lab_pep = NULL, title.pep = NULL,
                                  x_lab_pro = NULL, y_lab_pro = NULL, title.pro = NULL,
+                                 xlim = NULL, ylim = NULL,
                                  title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme = FALSE) {
   
-  # error checks for min_num_peps, if not NULL #
-  if(!is.null(min_num_peps)) {
-    # check that min_num_peps is numeric and >=1 #
-    if(!inherits(min_num_peps, "numeric") | min_num_peps < 1) stop("min_num_peps must be an integer greater than or equal to 1")
-    # check that min_num_peps is an integer #
-    if(min_num_peps %% 1 != 0) stop("min_num_peps must be an integer greater than or equal to 1")
-    # check that min_num_peps is of length 1 #
-    if(length(min_num_peps) != 1) stop("min_num_peps must be of length 1")
-    # check that min_num_peps is less than the total number of peptides #
-    if(min_num_peps > sum(filter_object$counts_by_pep$n)) stop("min_num_peps cannot be greater than the total number of peptides")
-  }
-  # check that degen_peps is logical #
-  if(!inherits(degen_peps, "logical")) stop("degen_peps must be either TRUE or FALSE")
-  
-  
+  if(!(mapping %in% c("both", "pep_to_pro", "pro_to_pep"))) stop("'mapping' argument must be one of 'both', 'pep_to_pro' or 'pro_to_pep'")
+
   suppressMessages({
     # get counts
     pep_counts <- filter_object$counts_by_pro$n
     pro_counts <- filter_object$counts_by_pep$n
     
-    # peptides plot
-    ## make labels ##
-    xlabel_pep <- ifelse(is.null(x_lab_pep), "Number of Peptides \nMapping to each Protein", x_lab_pep)
-    ylabel_pep <- ifelse(is.null(y_lab_pep), "Count \n(Number of Proteins)", y_lab_pep)
-    plot_title_pep <- ifelse(is.null(title.pep), "Number of Peptides \nMapping to each Protein", title.pep)
-    
     ## plot histogram
-    if(bw_theme==FALSE){
+    if(mapping %in% c("both", "pep_to_pro")){ # peptides plot
+      ## make labels ##
+      xlabel_pep <- ifelse(is.null(x_lab_pep), "Number of Peptides \nMapping to each Protein", x_lab_pep)
+      ylabel_pep <- ifelse(is.null(y_lab_pep), "Count \n(Number of Proteins)", y_lab_pep)
+      plot_title_pep <- ifelse(is.null(title.pep), "Number of Peptides \nMapping to each Protein", title.pep)
+      
       p1 <- ggplot2::ggplot(as.data.frame(pep_counts), ggplot2::aes(x=pep_counts)) +
         ggplot2::geom_histogram(fill="royalblue4", binwidth = 1) +
         ggplot2::ggtitle(plot_title_pep) +
@@ -294,63 +303,42 @@ plot.proteomicsFilt <- function(filter_object, min_num_peps = NULL, degen_peps =
         ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
                        axis.title.x = ggplot2::element_text(size=x_lab_size),
                        axis.title.y = ggplot2::element_text(size=y_lab_size))
-    }else{
-      p1 <- ggplot2::ggplot(as.data.frame(pep_counts), ggplot2::aes(x=pep_counts)) +
-        ggplot2::theme_bw() +
-        ggplot2::geom_histogram(fill="royalblue4", binwidth = 1) +
-        ggplot2::ggtitle(plot_title_pep) +
-        ggplot2::xlab(xlabel_pep) +
-        ggplot2::ylab(ylabel_pep)  +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size))
+      if(bw_theme){
+        p1 <- p1 + ggplot2::theme_bw()
+      }
+      if(!is.null(xlim)){
+        p1 <- p1 + ggplot2::xlim(xlim)
+      }
+      if(!is.null(ylim)){
+        p1 <- p1 + ggplot2::ylim(ylim)
+      }
     }
     
-    
-    ## get max count for line segment, draw segment on plot
-    if(degen_peps) {
-      max_counts <- ggplot2::ggplot_build(p1)$data[[1]]$count[1]
-      p1 <- p1 + ggplot2::annotate(geom="rect", xmin=0.5, xmax=1.5, ymin=0, ymax=max_counts, col="black", alpha = 0, size = 1)
-    }
-    
-    # proteins plot
-    ## make labels ##
-    xlabel_pro <- ifelse(is.null(x_lab_pro), "Number of Proteins \nMapped to by each Peptide", x_lab_pro)
-    ylabel_pro <- ifelse(is.null(y_lab_pro), "Count \n(Number of Peptides)", y_lab_pro)
-    plot_title_pro <- ifelse(is.null(title.pro), "Number of Proteins \nMapped to by each Peptide", title.pro)
-    
-    ## plot histogram
-    if(bw_theme == FALSE){
+    if(mapping %in% c("both","pro_to_pep")){ # proteins plot
+      ## make labels ##
+      xlabel_pro <- ifelse(is.null(x_lab_pro), "Number of Proteins \nMapped to by each Peptide", x_lab_pro)
+      ylabel_pro <- ifelse(is.null(y_lab_pro), "Count \n(Number of Peptides)", y_lab_pro)
+      plot_title_pro <- ifelse(is.null(title.pro), "Number of Proteins \nMapped to by each Peptide", title.pro)
+      
+      ## plot histogram
       p2 <- ggplot2::ggplot(as.data.frame(pro_counts), ggplot2::aes(x=pro_counts)) +
         ggplot2::geom_histogram(fill="springgreen4", binwidth = .5) +
         ggplot2::ggtitle(plot_title_pro) +
         ggplot2::xlab(xlabel_pro) +
         ggplot2::ylab(ylabel_pro) +
+        ggplot2::scale_x_continuous(breaks = unique(pro_counts)) +
         ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
                        axis.title.x = ggplot2::element_text(size=x_lab_size),
                        axis.title.y = ggplot2::element_text(size=y_lab_size))
-    }else{
-      p2 <- ggplot2::ggplot(as.data.frame(pro_counts), ggplot2::aes(x=pro_counts)) +
-        ggplot2::theme_bw() +
-        ggplot2::geom_histogram(fill="springgreen4", binwidth = .5) +
-        ggplot2::ggtitle(plot_title_pro) +
-        ggplot2::xlab(xlabel_pro) +
-        ggplot2::ylab(ylabel_pro) +
-        ggplot2::scale_x_continuous(breaks = 1, labels = "1") +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size))
+      if(bw_theme){
+        p2 <- p2 + ggplot2::theme_bw()
+      }
     }
     
+    if(mapping == "pep_to_pro") return(p1)
+    else if(mapping == "pro_to_pep") return(p2)
+    else if(mapping == "both") return(Rmisc::multiplot(p1, p2, cols = 2))
     
-    
-    ## get max count for line segment, draw segment on plot
-    if(!is.null(min_num_peps)) {
-      max_counts <- max(ggplot2::ggplot_build(p2)$data[[1]]$count)
-      p2 <- p2 + ggplot2::annotate(geom="rect", xmin=0.5, xmax=min_num_peps + 0.5, ymin=0, ymax=max_counts, col="red", fill="red", alpha = 0.2, size = 0.5)
-    }
-    
-    return(Rmisc::multiplot(p1, p2, cols = 2))
   })
 }
 
@@ -502,7 +490,7 @@ plot.imdanovaFilt <- function(filter_object, min_nonmiss_anova = NULL, min_nonmi
     
     p <- ggplot2::ggplot(heat_df_melt, ggplot2::aes(x = ordered(Var2, levels = sort(unique(Var2))), y = ordered(Var1, levels = sort(unique(Var1))))) +
       ggplot2::geom_tile(ggplot2::aes(fill = value)) +
-      ggplot2::geom_text(ggplot2::aes(fill = value, label = value), size=50/max(heat_df_melt$Var2)) +
+      ggplot2::geom_text(ggplot2::aes(label = value), size=50/max(heat_df_melt$Var2)) +
       ggplot2::geom_segment(x=min_nonmiss_gtest-2.5, xend=min_nonmiss_gtest-2.5, y=0, yend=max(heat_df_melt$Var1)+1, linetype = 1, size = 1.5) +
       ggplot2::geom_segment(x=min_nonmiss_gtest-1.5, xend=min_nonmiss_gtest-1.5, y=0, yend=max(heat_df_melt$Var1)+1, linetype = 1, size = 1.5) +
       ggplot2::geom_segment(x=0, xend=max(heat_df_melt$Var2)+1, y=min_nonmiss_anova-1.5, yend=min_nonmiss_anova-1.5, linetype = 1, size = 1.5) +
@@ -793,7 +781,7 @@ plot.cvFilt <- function(filter_object, cv_threshold = NULL, ...) {
   
   # get number of biomolecules with CV > max_x_val & display a warning #
   n_not_displayed <- sum(new_object$CV_pooled > max_x_val)
-  warning(paste("For display purposes, biomolecules with pooled CV greater than ", round(max_x_val, 2), " are not displayed in the graph. This corresponds to ", n_not_displayed, " biomolecules.", sep=""))
+  message(paste("For display purposes, biomolecules with pooled CV greater than ", round(max_x_val, 2), " are not displayed in the graph. This corresponds to ", n_not_displayed, " biomolecules.", sep=""))
   
   # labels
   plot_title <- ifelse(is.null(title_plot), "Coefficient of Variation (CV)", title_plot)
@@ -872,12 +860,13 @@ plot.customFilt <- function(filter_object, ...) {
 #' \code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used. \cr
 #' \code{legend_position} \tab character string specifying one of "right", "left", "top", or "bottom" for the location of the legend. Defaults to "right". \cr
 #' \code{ylimit} \tab numeric vector of length 2 specifying y axis lower and upper limits. \cr
+#' \code{use_VizSampNames} \tab logical specifies whether to use custom sample names \cr
 #' }
 plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by = NULL, facet_cols = NULL, ...) {
   .plot.pepData(omicsData, order_by, color_by, facet_by, facet_cols, ...)
 }
 
-.plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by = NULL, facet_cols = NULL, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_lab = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme=FALSE, legend_position = "right", ylimit = NULL) {
+.plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by = NULL, facet_cols = NULL, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_lab = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme=FALSE, legend_position = "right", ylimit = NULL, use_VizSampNames = FALSE) {
   
   ## initial checks ##
   if(!is.null(order_by)) {
@@ -918,6 +907,7 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
   
   # organize data #
   e_data <- omicsData$e_data
+  f_data = omicsData$f_data
   e_data_cname <- attributes(omicsData)$cnames$edata_cname
   plot_data <- reshape2::melt(e_data, id = e_data_cname, na.rm = TRUE)
   
@@ -963,6 +953,10 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     
     title <- maintitle
     
+    if(use_VizSampNames == T){
+      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
+    }
+    
     ## if order_by is not null and color_by is ##
   } else if(!is.null(order_by) & is.null(color_by)) {
     if(order_by != "group_DF") {
@@ -991,6 +985,11 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     
     title <- bquote(atop(.(maintitle),atop(italic(paste("Ordered by ",.(order_by))),"")))
     
+    if(use_VizSampNames == T){
+      f_data = f_data[order(f_data[,order_by]),]
+      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
+    }
+    
     ## if color_by is not null and order_by is ##
   } else if(!is.null(color_by) & is.null(order_by)) {
     if(color_by != "group_DF") {
@@ -1014,6 +1013,11 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     }
     
     title <- maintitle
+    
+    if(use_VizSampNames == T){
+      f_data = f_data[order(f_data[,color_by]),]
+      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
+    }
     
     ## if neither order_by or color_by are null ##
   } else if(!is.null(order_by) & !is.null(color_by)) {
@@ -1058,6 +1062,12 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     }
     
     title <- bquote(atop(.(maintitle),atop(italic(paste("Ordered by ",.(order_by))),"")))
+    
+    if(use_VizSampNames == T){
+      f_data = f_data[order(f_data[,order_by]),]
+      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
+    }
+    
   }
   
   
@@ -1080,7 +1090,7 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     else if(attr(omicsData, "data_info")$data_scale == 'log'){
       ylabel<- "ln Abundance"
     }else ylabel <- paste(attr(omicsData, "data_info")$data_scale, "Abundance", sep = " ")
-  }
+  }else ylabel = y_lab
   legend_title <- color_by
   if(!is.null(legend_lab)) legend_title <- legend_lab
   
@@ -1118,6 +1128,7 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
 #' \code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used. \cr
 #' \code{legend_position} \tab character string specifying one of "right", "left", "top", or "bottom" for the location of the legend. Defaults to "right". \cr
 #' \code{ylimit} \tab numeric vector of length 2 specifying y axis lower and upper limits. \cr
+#' \code{use_VizSampNames} \tab logical specifies whether to use custom sample names \cr
 #' }
 #'
 #'@export
@@ -1126,7 +1137,7 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
   .plot.proData(omicsData, order_by, color_by, facet_by, facet_cols, ...)
 }
 
-.plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by = NULL, facet_cols = NULL, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_lab = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme=FALSE, legend_position = "right", ylimit = NULL) {
+.plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by = NULL, facet_cols = NULL, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_lab = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme=FALSE, legend_position = "right", ylimit = NULL, use_VizSampNames = FALSE) {
   
   ## initial checks ##
   if(!is.null(order_by)) {
@@ -1164,6 +1175,7 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
   # organize data #
   e_data <- omicsData$e_data
   e_data_cname <- attributes(omicsData)$cnames$edata_cname
+  f_data = omicsData$f_data
   plot_data <- reshape2::melt(e_data, id = e_data_cname, na.rm = TRUE)
   
   maintitle <- ifelse(attributes(omicsData)$data_info$data_norm,
@@ -1174,6 +1186,7 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
   
   ## if facet_by is not null and isn't the same as either order_by or color_by ##
   if(!is.null(facet_by)) {
+    # if(!use_VizSampNames) stop("if argument 'facet_by' is provided, argument 'use_VizSampNames' must be set to FALSE")
     if(!(facet_by %in% c(order_by, color_by))) {
       facet_temp <- group_designation(omicsData, main_effects = facet_by)
       facetDF <- attributes(facet_temp)$group_DF
@@ -1197,6 +1210,10 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     }
     
     title <- maintitle
+    
+    if(use_VizSampNames == T){
+      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
+    }
     
     ## if order_by is not null and color_by is ##
   } else if(!is.null(order_by) & is.null(color_by)) {
@@ -1226,6 +1243,11 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     
     title <- bquote(atop(.(maintitle),atop(italic(paste("Ordered by ",.(order_by))),"")))
     
+    if(use_VizSampNames == T){
+      f_data = f_data[order(f_data[,order_by]),]
+      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
+    }
+    
     ## if color_by is not null and order_by is ##
   } else if(!is.null(color_by) & is.null(order_by)) {
     if(color_by != "group_DF") {
@@ -1249,6 +1271,11 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     }
     
     title <- maintitle
+    
+    if(use_VizSampNames == T){
+      f_data = f_data[order(f_data[,color_by]),]
+      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
+    }
     
     ## if neither order_by or color_by are null ##
   } else if(!is.null(order_by) & !is.null(color_by)) {
@@ -1293,6 +1320,12 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     }
     
     title <- bquote(atop(.(maintitle),atop(italic(paste("Ordered by ",.(order_by))),"")))
+    
+    if(use_VizSampNames == T){
+      f_data = f_data[order(f_data[,order_by]),]
+      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
+    }
+    
   }
   
   
@@ -1352,6 +1385,7 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
 #' \code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used. \cr
 #' \code{legend_position} \tab character string specifying one of "right", "left", "top", or "bottom" for the location of the legend. Defaults to "right". \cr
 #' \code{ylimit} \tab numeric vector of length 2 specifying y axis lower and upper limits. \cr
+#' \code{use_VizSampNames} \tab logical specifies whether to use custom sample names \cr
 #' }
 #'@export
 #'@rdname plot-pmartR-lipidData
@@ -1359,7 +1393,7 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
   .plot.lipidData(omicsData, order_by, color_by, facet_by, facet_cols, ...)
 }
 
-.plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by = NULL, facet_cols = NULL, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_lab = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme=FALSE, legend_position = "right", ylimit = NULL) {
+.plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by = NULL, facet_cols = NULL, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_lab = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme=FALSE, legend_position = "right", ylimit = NULL, use_VizSampNames = FALSE) {
   
   ## initial checks ##
   if(!is.null(order_by)) {
@@ -1397,6 +1431,7 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
   # organize data #
   e_data <- omicsData$e_data
   e_data_cname <- attributes(omicsData)$cnames$edata_cname
+  f_data = omicsData$f_data
   plot_data <- reshape2::melt(e_data, id = e_data_cname, na.rm = TRUE)
   
   maintitle <- ifelse(attributes(omicsData)$data_info$data_norm,
@@ -1407,6 +1442,7 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
   
   ## if facet_by is not null and isn't the same as either order_by or color_by ##
   if(!is.null(facet_by)) {
+    # if(!use_VizSampNames) stop("if argument 'facet_by' is provided, argument 'use_VizSampNames' must be set to FALSE")
     if(!(facet_by %in% c(order_by, color_by))) {
       facet_temp <- group_designation(omicsData, main_effects = facet_by)
       facetDF <- attributes(facet_temp)$group_DF
@@ -1430,6 +1466,10 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     }
     
     title <- maintitle
+    
+    if(use_VizSampNames == T){
+      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
+    }
     
     ## if order_by is not null and color_by is ##
   } else if(!is.null(order_by) & is.null(color_by)) {
@@ -1459,6 +1499,11 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     
     title <- bquote(atop(.(maintitle),atop(italic(paste("Ordered by ",.(order_by))),"")))
     
+    if(use_VizSampNames == T){
+      f_data = f_data[order(f_data[,order_by]),]
+      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
+    }
+    
     ## if color_by is not null and order_by is ##
   } else if(!is.null(color_by) & is.null(order_by)) {
     if(color_by != "group_DF") {
@@ -1483,6 +1528,11 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     }
     
     title <- maintitle
+    
+    if(use_VizSampNames == T){
+      f_data = f_data[order(f_data[,color_by]),]
+      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
+    }
     
     ## if neither order_by or color_by are null ##
   } else if(!is.null(order_by) & !is.null(color_by)) {
@@ -1527,6 +1577,12 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     }
     
     title <- bquote(atop(.(maintitle),atop(italic(paste("Ordered by ",.(order_by))),"")))
+    
+    if(use_VizSampNames == T){
+      f_data = f_data[order(f_data[,order_by]),]
+      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
+    }
+    
   }
   
   
@@ -1549,7 +1605,7 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     else if(attr(omicsData, "data_info")$data_scale == 'log'){
       ylabel<- "ln Abundance"
     }else ylabel <- paste(attr(omicsData, "data_info")$data_scale, "Abundance", sep = " ")
-  }
+  }else{ylabel = y_lab}
   legend_title <- color_by
   if(!is.null(legend_lab)) legend_title <- legend_lab
   
@@ -1586,6 +1642,7 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
 #' \code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used. \cr
 #' \code{legend_position} \tab character string specifying one of "right", "left", "top", or "bottom" for the location of the legend. Defaults to "right". \cr
 #' \code{ylimit} \tab numeric vector of length 2 specifying y axis lower and upper limits. \cr
+#' \code{use_VizSampNames} \tab logical specifies whether to use custom sample names \cr
 #' }
 #'@export
 #'@rdname plot-pmartR-metabData
@@ -1593,7 +1650,7 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
   .plot.metabData(omicsData, order_by, color_by, facet_by, facet_cols, ...)
 }
 
-.plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by = NULL, facet_cols = NULL, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_lab = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme=FALSE, legend_position = "right", ylimit = NULL) {
+.plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by = NULL, facet_cols = NULL, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_lab = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme=FALSE, legend_position = "right", ylimit = NULL, use_VizSampNames = FALSE) {
   
   ## initial checks ##
   if(!is.null(order_by)) {
@@ -1632,6 +1689,7 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
   # organize data #
   e_data <- omicsData$e_data
   e_data_cname <- attributes(omicsData)$cnames$edata_cname
+  f_data = omicsData$f_data
   plot_data <- reshape2::melt(e_data, id = e_data_cname, na.rm = TRUE)
   
   maintitle <- ifelse(attributes(omicsData)$data_info$data_norm,
@@ -1643,6 +1701,7 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
   ## if facet_by is not null and isn't the same as either order_by or color_by ##
   if(!is.null(facet_by)) {
     if(!(facet_by %in% c(order_by, color_by))) {
+      # if(!use_VizSampNames) stop("if argument 'facet_by' is provided, argument 'use_VizSampNames' must be set to FALSE")
       facet_temp <- group_designation(omicsData, main_effects = facet_by)
       facetDF <- attributes(facet_temp)$group_DF
       colnames(facetDF) <- c("variable", facet_by)
@@ -1666,6 +1725,10 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     }
     
     title <- maintitle
+    
+    if(use_VizSampNames == T){
+      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
+    }
     
     ## if order_by is not null and color_by is ##
   } else if(!is.null(order_by) & is.null(color_by)) {
@@ -1696,6 +1759,11 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     
     title <- bquote(atop(.(maintitle),atop(italic(paste("Ordered by ",.(order_by))),"")))
     
+    if(use_VizSampNames == T){
+      f_data = f_data[order(f_data[,order_by]),]
+      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
+    }
+    
     ## if color_by is not null and order_by is ##
   } else if(!is.null(color_by) & is.null(order_by)) {
     if(color_by != "group_DF") {
@@ -1720,6 +1788,11 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     }
     
     title <- maintitle
+    
+    if(use_VizSampNames == T){
+      f_data = f_data[order(f_data[,color_by]),]
+      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
+    }
     
     ## if neither order_by or color_by are null ##
   } else if(!is.null(order_by) & !is.null(color_by)) {
@@ -1764,6 +1837,11 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     }
     
     title <- bquote(atop(.(maintitle),atop(italic(paste("Ordered by ",.(order_by))),"")))
+    
+    if(use_VizSampNames == T){
+      f_data = f_data[order(f_data[,order_by]),]
+      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
+    }
   }
   
   
@@ -1786,7 +1864,7 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     else if(attr(omicsData, "data_info")$data_scale == 'log'){
       ylabel<- "ln Abundance"
     }else ylabel <- paste(attr(omicsData, "data_info")$data_scale, "Abundance", sep = " ")
-  }
+  }else{ylabel = y_lab}
   legend_title <- color_by
   if(!is.null(legend_lab)) legend_title <- legend_lab
   

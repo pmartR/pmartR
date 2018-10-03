@@ -1,6 +1,6 @@
 ---
-title: "Quality Control of Peptide Data with the `pmartR` Package"
-author: "Kelly Stratton, Lisa Bramer, Iobani Godinez"
+title: "Quality Control and Normalization of Peptide Data with the `pmartR` Package"
+author: "Kelly Stratton, Lisa Bramer"
 date: "`r Sys.Date()`"
 bibliography: bibliography.bib
 output: 
@@ -13,6 +13,11 @@ vignette: >
   \usepackage[utf8]{inputenc}
 ---
 
+```{r global_options, include = FALSE}
+knitr::opts_chunk$set(warning=FALSE, fig.width = 8, fig.height = 6)
+
+```
+
 ```{r logo, out.width = "100px", echo=FALSE}
 knitr::include_graphics("pmartR_logo_final.jpg")
 
@@ -21,11 +26,10 @@ library(pmartRdata)
 library(ggplot2)
 ```
 
-The pmartR package provides functionality for quality control (QC) processing of mass spectrometry (MS) pan-omics data, in particular proteomic (either at the peptide or the protein level), lipidomic, and metabolomic data. This includes data transformation, specification of groups that are to be compared against each other, filtering of features and/or samples, data normalization, and data summarization (correlation, principal components analysis).
+This vignette describes the pmartR package functionality for quality control (QC) processing of mass spectrometry (MS) pan-omics data, in particular proteomics data at the peptide level. This includes data transformation, specification of groups that are to be compared against each other, filtering of features and/or samples, data normalization, and data summarization (correlation, principal components analysis). It is based on example data in the pmartRdata package. 
 
-Sample datasets are available in the pmartRdata package for each of the following data types: peptide level data, protein level data, lipidomic data, and metabolomic data. Under development are 3 additional packages that will contain functionality for processing MS omics data. These are pmartRstat for statistical analysis, pmartRpq for protein quantification of peptide level data, and pmartRviz for visualization of the data incorporating the statistical results.
+Additional datasets available in the pmartRdata package include the following data types: protein level data, lipidomic data, and metabolomic data. A separate vignette describes the statistical analysis capabilities of pmartR.
 
-This vignette focuses on the quality control of proteomic data at the peptide level. Other vignettes will be available shortly describing analysis of the other data types. 
 
 ## Data
 
@@ -38,8 +42,8 @@ Below we load in 3 data.frames from the pmartRdata package:
 - `pep_emeta`: An optional data.frame with at least $p$ rows. Each row corresponds to a peptide with one column giving peptide names (must be named the same as the column in `e_data`) and other columns giving meta information (e.g. mappings of peptides to proteins).
 
 ```{r data0, include=FALSE}
-knitr::opts_chunk$set(fig.width=5)
-knitr::opts_chunk$set(fig.height=5)
+knitr::opts_chunk$set(fig.width=8)
+knitr::opts_chunk$set(fig.height=6)
 
 data("pep_edata")
 data("pep_fdata")
@@ -132,7 +136,7 @@ mypepData <- edata_replace(mypepData, x = 0, y = NA)
 
 In this dataset, there were no 0s so nothing was replaced.
 
-We also highly recommend log transforming the data prior to analysis. pmartR supports log2, log10, and natural logarithm transformations. The `edata_transform()` function provides this capability. We can also use `edata_trasnform()` to transform the data back to the abundance scale if needed. Note that the scale of the data is stored and automatically updated in the `data_info$data_scale` attribute of the pepData object. Below we log10 transform the data, then back transform to the abundance scale, and finally settle on the log2 scale.
+We also highly recommend log transforming the data prior to analysis. pmartR supports log2, log10, and natural logarithm transformations. The `edata_transform()` function provides this capability. We can also use `edata_trasnform()` to transform the data back to the abundance scale if needed. Note that the scale of the data is stored and automatically updated in the `data_info$data_scale` attribute of the pepData object. Below we log10 transform the data, then return to the abundance scale, and finally settle on the log2 scale.
 
 ```{r format2}
 mypepData <- edata_transform(mypepData, data_scale = "log10")
@@ -158,10 +162,7 @@ The `group_designation()` function creates an attribute of the dataset as follow
 ```{r format4}
 attributes(mypepData)$group_DF
 
-plot(mypepData)
 plot(mypepData, color_by = "Condition", bw_theme=TRUE)
-plot(mypepData, color_by = "Condition", title_size=10, legend_position="bottom")
-plot(mypepData, facet_by = "Condition", color_by = "Condition")
 ```
 
 
@@ -176,12 +177,10 @@ The proteomics filter is applicable only to peptide level data that contains the
 ```{r proteomics_filter}
 myfilter <- proteomics_filter(mypepData)
 summary(myfilter)
-plot(myfilter)
 plot(myfilter, bw_theme=TRUE)
-plot(myfilter, title_size=10, x_lab_size=9, y_lab_size=9)
 ```
 
-With the current dataset, there is a one-to-one mapping between peptides and proteins, so these plots are not very informative. With a many-to-one mapping, we'd see a histogram.
+With the current dataset, the majority of proteins have one peptide mapping to them (graph on the left) and all peptides map to a single protein (e.g. no degenerate peptides; graph on the right). 
 
 #### Molecule Filter
 
@@ -189,18 +188,15 @@ The molecule filter allows the user to remove from the dataset any biomolecule n
 
 ```{r molecule_filter}
 myfilter <- molecule_filter(mypepData)
-plot(myfilter)
+plot(myfilter, bw_them = TRUE)
 summary(myfilter, min_num = 3)
-plot(myfilter, min_num = 3)
-plot(myfilter, min_num = 3, bw_theme = TRUE)
-plot(myfilter, min_num = 3, title_size = 10, x_lab_size = 6, y_lab_size = 8)
 ```
 
-Maybe we don't want to remove as many peptides as the above would, so we can look at `min_num=2`.
+Setting the threshold to 3, we would filter 3,342 peptides out of the dataset. If we'd like to make the filter less stringent, we could use a threshold of 2 and only filter 1,872 peptides. 
 
 ```{r molecule_filter2}
 summary(myfilter, min_num = 2)
-plot(myfilter, min_num = 2)
+#plot(myfilter, min_num = 2)
 
 mypepData <- applyFilt(filter_object = myfilter, mypepData, min_num = 2)
 summary(mypepData)
@@ -209,17 +205,12 @@ summary(mypepData)
 
 #### Coefficient of Variation Filter
 
-The coefficient of variation (CV) filter calculates the pooled CV values [@ahmed1995pooling] as
-
-$CV=()$
-
+The coefficient of variation (CV) filter calculates the pooled CV values as in [@ahmed1995pooling].
 
 The user can then specify a CV threshold, above which peptides are removed.
 
 ```{r cv_filter}
 myfilter <- cv_filter(mypepData)
-plot(myfilter)
-plot(myfilter, bw_theme = TRUE)
 summary(myfilter, cv_threshold = 150)
 plot(myfilter, cv_threshold = 150, title_size = 15)
 
@@ -233,7 +224,7 @@ summary(mypepData)
 
 Sometimes it is known a priori that certain peptides or samples should be filtered out of the dataset prior to statistical analysis. Perhaps there are known contaminant proteins, and so peptides mapping to them should be removed, or perhaps something went wrong during sample preparation for a particular sample. On the other hand, it may be preferred to specify peptides or samples to keep (removing those not explicitly specified), and this can also be accomplished. Keep in mind that both 'remove' and 'keep' arguments cannot be specified together; either 'remove' arguments only or 'keep' arguments only may be specified in a single call to custom_filter(). 
 
-Here, we remove peptide with Mass Tag ID 1047 and sample `Infection 1` as an example.
+Here, we demonstrate the removal of the peptide with Mass Tag ID 1047 and sample `Infection 1` as an example.
 
 ```{r custom_filter}
 myfilter <- custom_filter(mypepData, e_data_remove = 1047, e_meta_remove = NULL, f_data_remove = "Infection1")
@@ -246,7 +237,7 @@ summary(mypepData_temp)
 rm(mypepData_temp)
 ```
 
-Here, we keep the samples `Infection 1`, `Infection 2`, `Infection 3`, `Infection 4` and `Infection 5`.
+We also demonstrate how to use this filter with the 'keep' option by keeping the samples `Infection 1`, `Infection 2`, `Infection 3`, `Infection 4` and `Infection 5`.
 
 ```{r custom_filter2}
 myfilter2<- custom_filter(mypepData, e_data_keep = NULL, e_meta_keep = NULL, f_data_keep = c("Infection1", "Infection2", "Infection3", "Infection4", "Infection5"))
@@ -262,7 +253,7 @@ Note that there is a `summary()` method for objects of type custom_filt, but no 
 
 #### IMD-ANOVA Filter 
 
-The IMD-ANOVA filter removes peptides that do not have sufficient data for the available statistical tests in the pmartRstat package. The statistical tests available are ANOVA (quantitative test) and independence of missing data (IMD) using a g-test (qualitative test). When using the `summary()`, `plot()`, and `applyFilt()` functions, you can specify just one filter (ANOVA or IMD) or both, depending on the tests you'd like to perform later. Using this filter speeds up the process of performing the statistical tests. 
+The IMD-ANOVA filter removes peptides that do not have sufficient data for the statistical tests available in the pmartRstat package; these are ANOVA (quantitative test) and an independence of missing data (IMD) using a g-test (qualitative test). When using the `summary()`, `plot()`, and `applyFilt()` functions, you can specify just one filter (ANOVA or IMD) or both, depending on the tests you'd like to perform later. Using this filter speeds up the process of performing the statistical tests. 
 
 ```{r imdanova_filter1}
 myfilter <- imdanova_filter(mypepData)
@@ -273,21 +264,21 @@ Here we consider what the filter would look like for both ANOVA and IMD.
 ```{r imdanova_filter2}
 summary(myfilter, min_nonmiss_anova = 2, min_nonmiss_gtest = 3)
 
-plot(myfilter, min_nonmiss_anova = 2, min_nonmiss_gtest = 3, x_lab_size = 9, y_lab_size = 9)
+#plot(myfilter, min_nonmiss_anova = 2, min_nonmiss_gtest = 3)
 ```
 
 Here we consider what the filter would look like for just ANOVA.
 
 ```{r imdanova_filter3}
 summary(myfilter, min_nonmiss_anova = 2)
-plot(myfilter, min_nonmiss_anova = 2)
+#plot(myfilter, min_nonmiss_anova = 2)
 ```
 
 Here we consider what the filter would look like for just IMD.
 
 ```{r imdanova_filter4}
 summary(myfilter, min_nonmiss_gtest = 3)
-plot(myfilter, min_nonmiss_gtest = 3)
+#plot(myfilter, min_nonmiss_gtest = 3)
 ```
 
 Now we apply the filter for both ANOVA and IMD.
@@ -312,33 +303,25 @@ To identify any samples that are potential outliers or anomalies (due to sample 
 
 - Kurtosis
 
-The rMd score can be mapped to a p-value, and a p-value threshold used to identify potentially outlying samples. In general, for proteomics data we recommend using correlation, proportion missing, MAD, and skew. 
+The rMd score can be mapped to a p-value, and a p-value threshold used to identify potentially outlying samples. In general, for proteomics data we recommend using correlation, proportion missing, MAD, and skew. A plot of the rMd values for each sample is generated, and specifying a value for 'pvalue_threshold' results in a horizontal line on the plot, with samples above the line slated for filtering at the given threshold.
 
 
 ```{r rmd1}
 myfilter <- rmd_filter(mypepData, metrics = c("Correlation", "Proportion_Missing", "MAD", "Skewness"))
-
-plot(myfilter)
-plot(myfilter, title_size=7, bw_theme=TRUE)
+plot(myfilter, bw_theme=TRUE)
 
 summary(myfilter, pvalue_threshold = 0.001)
 plot(myfilter, pvalue_threshold = 0.001, bw_theme=TRUE)
-plot(myfilter, pvalue_threshold = 0.001, bw_theme=TRUE, legend_position="bottom")
-plot(myfilter, pvalue_threshold = 0.001, legend_position="top")
-plot(myfilter, pvalue_threshold = 0.001, bw_theme=TRUE, legend_position="left")
-plot(myfilter, pvalue_threshold = 0.001, x_lab_size = 8, y_lab_size = 8)
-plot(myfilter, pvalue_threshold = 0.001, x_lab_size = 8, y_lab_size = 8, point_size = 6)
-plot(myfilter, pvalue_threshold = 0.001, x_lab_size = 8, y_lab_size = 8, point_size = 7)
+
 
 ```
 
-Using the output from the `summary()` function, we can explore the outliers identified to see what metrics are driving their outlier-ness. Box plots for each metric are plotted, with the specified sample marked with an 'X'.
+Using the output from the `summary()` function, we can explore the outliers identified to see what metrics are driving their outlier-ness. Box plots for each metric are graphed, with the specified sample marked with an 'X'.
 
 
 ```{r rmd2}
-plot(myfilter, sampleID = "Infection5")
 plot(myfilter, sampleID = "Infection5", bw_theme=TRUE)
-plot(myfilter, sampleID = "Infection8", title_size = 10, y_lab_size=8)
+plot(myfilter, sampleID = "Infection8", bw_theme=TRUE)
 ```
 
 We can see that Infection5 has the highest MAD, low skewness, and almost the lowest correlation, but the lowest proportion missing compared to the other samples. Infection 8 has MAD close to the median MAD value, the highest skew, the lowest correlation, and the highest proportion of missing data. We can use this information to determine whether to remove either or both of these samples. Sometimes it is also useful to look at additional data summaries to inform outlier removal, such as a principal components plot or correlation heat map (below).
@@ -367,7 +350,7 @@ Available normalization functions include:
 
 - Median absolute deviation (MAD) transformation: The sample-wise median (median of all peptides in a given sample) is subtracted from each peptide, and the result is divided by the sample-wise MAD (MAD of all peptides in a given sample) in the corresponding sample. This normalization method is specified as "mad".
 
-There are two ways to go about normalizing data in the pmartR package. If you know the normalization approach you'd like to use, you can directly specify it in the `normalize_data()` function. Or, if you want to see how compatible different normalization approaches are with your dataset, you can use the `spans()` function [UNDER DEVELOPMENT].
+There are two ways to go about normalizing data in the pmartR package. If you know the normalization approach you'd like to use, you can directly specify it in the `normalize_data()` function. Or, if you want to see how compatible different normalization approaches are with your dataset, you can use the `spans()` function.
 
 We can go straight to the normalization, if we know what approach we want to use.
 
@@ -386,10 +369,11 @@ plot(norm_data, title_plot="Normalized Data: Median Centering Using RIP 0.2 Pept
 ```
 
 
+
 Below we use SPANS to select a normalization approach and then normalize the data. [UNDER DEVELOPMENT]
 
-```{r norm1}
-# data_norm <- normalize_data(mypepData, subset_fn="ppp.5", norm_fun="median", backtransform=TRUE)
+```{r spans}
+
 
 
 
@@ -402,7 +386,7 @@ Below we use SPANS to select a normalization approach and then normalize the dat
 
 ### Summarize Data
 
-The pmartR package contains various methods for data summarization and exploration that can be used as part of the quality control process: numeric summaries and associated plots (via the `edata_summary()` function), sequential projection pursuit principal components analysis (sppPCA) for dimension reduction (via the`dim_reduction()` function), and a correlation heat map (via the `cor_result()` function)[@stacklies2007pcamethods]. As for missing data summarization there are also functions to collect and plot missing data information. Missing data collection and plotting functions include, `missingval_result()`, `plot_missingval()`, `missingval_scatterplot()` and `missingval_heatmap()`. 
+The pmartR package contains various methods for data summarization and exploration that can be used as part of the QC process: numeric summaries and associated plots (via the `edata_summary()` function), sequential projection pursuit principal components analysis (sppPCA) for dimension reduction (via the`dim_reduction()` function), and a correlation heat map (via the `cor_result()` function)[@stacklies2007pcamethods]. As for missing data summarization there are also functions to collect and plot missing data information. Missing data collection and plotting functions include, `missingval_result()`, `plot_missingval()`, `missingval_scatterplot()` and `missingval_heatmap()`. 
 
 #### Numeric Summaries
 
@@ -410,8 +394,8 @@ We can generate numeric summaries of our data by either sample or molecule. The 
 
 ```{r edata_summary}
 edata_summary(omicsData = norm_data, by = "sample", groupvar = NULL)
-#edata_summary(omicsData = norm_data, by = "sample", groupvar = "Condition")
 
+#edata_summary(omicsData = norm_data, by = "molecule", groupvar = "Condition")
 #edata_summary(omicsData = norm_data, by = "molecule", groupvar = NULL)
 
 ```
@@ -426,8 +410,7 @@ Note that `dim_reduction()` requires that the `group_designation()` function has
 pca_results <- dim_reduction(norm_data, k = 2)
 
 summary(pca_results) 
-plot(pca_results)
-plot(pca_results, title_size = 20, bw_theme=TRUE, legend_position="left")
+plot(pca_results, bw_theme=TRUE)
 ```
 
 
@@ -440,10 +423,7 @@ correlation_results <- cor_result(norm_data)
 
 summary(correlation_results)
 plot(correlation_results)
-plot(correlation_results, title_size = 20)
-plot(correlation_results, x_lab=FALSE, title_plot="My Correlation Heatmap")
-plot(correlation_results, x_lab=FALSE, y_lab=FALSE)
-plot(correlation_results, colorbar_lim=c(0,1))
+
 
 ```
 
@@ -460,8 +440,7 @@ results <- missingval_result(mypepData)
 
 
 plot(results, type = "bySample")
-plot(results, type = "bySample", title_plot="Hey look at this!")
-plot(results, type = "byMolecule", x_lab_angle = 0)
+plot(results, type = "byMolecule")
 
 ```
 
@@ -472,10 +451,8 @@ In addition, the `missingval_scatterplot()` and `missingval_heatmap()` functions
 ```{r missingval_plots}
 
 missingval_scatterplot(mypepData, palette = "Set1")
-missingval_scatterplot(mypepData, title_plot="Hey look at this!", palette = "Set2")
 
 missingval_heatmap(mypepData)
-missingval_heatmap(mypepData, title_size = 20, title_plot = "Hey look at this!")
 
 ```
 
@@ -488,7 +465,7 @@ The `protein_quant()` function returns an object of class proData.
 
 #### Rollup Methods
 
-The rollup method ... 
+The rollup method takes either the mean or median of all peptides mapping to a given protein, and sets that value as the relative protein abundance.
 
 In the rrollup method, all peptides that map to a single protein are scaled based on a chosen reference peptide, which is the peptide with most observations. Next the average or mean of the scaled peptides is set as the relative protein abundance. [@matzke2013comparative] 
 
