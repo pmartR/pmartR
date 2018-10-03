@@ -13,6 +13,11 @@ vignette: >
   \usepackage[utf8]{inputenc}
 ---
 
+```{r global_options, include = FALSE}
+knitr::opts_chunk$set(warning=FALSE, fig.width = 8, fig.height = 6)
+
+```
+
 ```{r logo, out.width = "100px", echo=FALSE}
 knitr::include_graphics("pmartR_logo_final.jpg")
 
@@ -37,8 +42,8 @@ Below we load in 3 data.frames from the pmartRdata package:
 - `pep_emeta`: An optional data.frame with at least $p$ rows. Each row corresponds to a peptide with one column giving peptide names (must be named the same as the column in `e_data`) and other columns giving meta information (e.g. mappings of peptides to proteins).
 
 ```{r data0, include=FALSE}
-knitr::opts_chunk$set(fig.width=5)
-knitr::opts_chunk$set(fig.height=5)
+knitr::opts_chunk$set(fig.width=8)
+knitr::opts_chunk$set(fig.height=6)
 
 data("pep_edata")
 data("pep_fdata")
