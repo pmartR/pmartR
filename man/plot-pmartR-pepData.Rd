@@ -17,16 +17,17 @@
 \item{facet_cols}{an optional integer specifying the number of columns to show in the facet plot.
 
 \tabular{ll}{
-\code{x_lab} \tab character string to be used for x-axis label. Defaults to NULL, in which case "Samples" is used. \cr
-\code{y_lab} \tab character string to be used for y-axis label. Defaults to NULL, in which case "log2(Robust Mahalanobis Distance)" is used. \cr
-\code{title_plot} \tab character string to be used for the plot title. Defaults to NULL, in which case "Sample Outlier Results /n p-value threshold = 0.xyz" is used, where 'xyz' is the pvalue_threshold supplied to the function. \cr
+\code{x_lab} \tab character string to be used for x-axis label. Defaults to NULL, in which case a default label is used. \cr
+\code{y_lab} \tab character string to be used for y-axis label. Defaults to NULL, in which case a default label is used. \cr
 \code{legend_lab} \tab character string specifying the title label to use for the legend \cr
+\code{title_plot} \tab character string to be used for the plot title. Defaults to NULL, in which case a default title is used. \cr
 \code{title_size} \tab integer value specifying the font size for the plot title. Default is 14. \cr
 \code{x_lab_size} \tab integer value indicating the font size for the x-axis. Defaults to 11. \cr
 \code{y_lab_size} \tab integer value indicating the font size for the y-axis. Defaults to 11. \cr
 \code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used. \cr
 \code{legend_position} \tab character string specifying one of "right", "left", "top", or "bottom" for the location of the legend. Defaults to "right". \cr
 \code{ylimit} \tab numeric vector of length 2 specifying y axis lower and upper limits. \cr
+\code{use_VizSampNames} \tab logical specifies whether to use custom sample names \cr
 }}
 }
 \description{

@@ -10,28 +10,17 @@
 \arguments{
 \item{pvalue_threshold}{A threshold for the Robust Mahalanobis Distance (RMD) p-value. If \code{sampleID} is NULL (see \code{sampleID} below), a horizontal line is plotted at the RMD value that corresponds with the threshold, and all samples above the line have a p-value below the threshold. If \code{sampleID} is not NULL, \code{pvalue_threshold} will do nothing. Default value is NULL.}
 
-\item{sampleID}{If specified, the plot produces a boxplot instead of a scatterplot. The \code{sampleID} input will place an "x" at the value for each of the metrics on the boxplots. Default value is NULL.}
-
-\item{x_lab}{character string to be used for x-axis label. Defaults to NULL, in which case "Samples" is used.}
-
-\item{y_lab}{character string to be used for y-axis label. Defaults to NULL, in which case "log2(Robust Mahalanobis Distance)" is used.}
-
-\item{legend_lab}{character string to be used for the legend title. Defaults to NULL, in which case "Group" is used.}
-
-\item{title_plot}{character string to be used for the plot title. Defaults to NULL, in which case "Sample Outlier Results /n p-value threshold = 0.xyz" is used, where 'xyz' is the pvalue_threshold supplied to the function.}
-
-\item{title_size}{integer value indicating the font size for the plot title. Defaults to 14.}
-
-\item{x_lab_size}{integer value indicating the font size for the plot title. Defaults to 11.}
-
-\item{y_lab_size}{integer value indicating the font size for the plot title. Defaults to 11.}
-
-\item{bw_theme}{logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used.}
-
-\item{legend_position}{character string specifying one of "right", "left", "top", or "bottom" for the location of the legend. Deafults to "right".
-
+\item{sampleID}{If specified, the plot produces a boxplot instead of a scatterplot. The \code{sampleID} input will place an "x" at the value for each of the metrics on the boxplots. Default value is NULL.
 \tabular{ll}{
-\code{pvalue_threshold} \tab numeric value between 0 and 1, specifying the p-value, below which samples will be removed from the dataset. Default is 0.001. \cr
+\code{x_lab} \tab character string to be used for x-axis label. Defaults to NULL, in which case a default label is used. \cr
+\code{y_lab} \tab character string to be used for y-axis label. Defaults to NULL, in which case a default label is used. \cr
+\code{legend_lab} \tab character string specifying the title label to use for the legend \cr
+\code{title_plot} \tab character string to be used for the plot title. Defaults to NULL, in which case a default title is used. \cr
+\code{title_size} \tab integer value indicating the font size for the plot title. Defaults to 14.
+\code{x_lab_size} \tab integer value indicating the font size for the plot title. Defaults to 11.
+\code{y_lab_size} \tab integer value indicating the font size for the plot title. Defaults to 11.
+\code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used.
+\code{legend_position} \tab character string specifying one of "right", "left", "top", or "bottom" for the location of the legend. Deafults to "right".
 }}
 }
 \description{

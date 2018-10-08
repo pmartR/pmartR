@@ -6,8 +6,8 @@
 #' @param omicsData A pmartR data object of any class, which has a `group_df` attribute that is usually created by the `group_designation()` function
 #' @param comparisons the comparisons made
 #' @param test_method the test method
-#' @param pval_ajust pvalue adjustment method
-#' @param pval_thres p-value threshold value
+#' @param pval_adjust pvalue adjustment method
+#' @param pval_thresh p-value threshold value
 #' 
 #' @return the final object of class statRes
 #' @export

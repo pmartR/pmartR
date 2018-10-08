@@ -21,6 +21,22 @@ a list of three data frames Normalized_Data, DA_Test_Results, and DA_"data type"
 \description{
 Creates a list of three sheets, Normalized Data, DA Test Results, and Only DA biomolecules - for OMICS project
 }
+\examples{
+dontrun{
+library(pmartR)
+library(pmartRdata)
+
+myproData <- group_designation(omicsData = pro_object, main_effects = c("Condition"))
+
+imdanova_Filt <- imdanova_filter(omicsData = myproData)
+myproData <- applyFilt(filter_object = imdanova_Filt, omicsData = myproData, min_nonmiss_anova=2)
+
+imd_anova_res <- imd_anova(omicsData = myproData, test_method = 'comb', pval_adjust='bon')
+
+result = write_stat_results(omicsData = myproData, statResData = imd_anova_res, refCondition = "Mock")
+}
+
+}
 \author{
 Natalie Heller
 }

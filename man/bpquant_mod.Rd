@@ -29,11 +29,6 @@ peptide_idx \tab vector of 0, 1, 2, . . . values indicating which proteoform eac
 }
 }
 \examples{
-dontrun{
-cur_protein = subset(protein_sig_data, Protein == "A")
-cur_protein_sigs = cur_protein[,-(1:2)]
-
-results = bpquant_mod(protein_sig = cur_protein_sigs, pi_not = .9, max_proteoforms = 5)
-}
+This function is called within bpquant_loop function
 
 }

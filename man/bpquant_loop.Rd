@@ -26,10 +26,19 @@ The statRes object contains the signatures data frame, the pepData object is use
 }
 \examples{
 dontrun{
-library(pmarRdata)
-data("pep_object")
+library(pmartR)
+library(pmartRdata)
 
-isoformRes_result = bpquant_loop(statRes = statRes_object, pepData = pep_object, pi_not = .9, max_proteoforms = 5)
+mypepData <- group_designation(omicsData = pep_object, main_effects = c("Condition"))
+mypepData = edata_transform(mypepData, "log2")
+
+imdanova_Filt <- imdanova_filter(omicsData = mypepData)
+mypepData <- applyFilt(filter_object = imdanova_Filt, omicsData = mypepData, min_nonmiss_anova=2)
+
+imd_anova_res <- imd_anova(omicsData = mypepData, test_method = 'comb', pval_adjust='bon')
+
+result = bpquant_loop(statRes = imd_anova_res, pepData = mypepData)
+
 }
 
 }

@@ -4,12 +4,12 @@
 \alias{edata_summary}
 \title{Creates a list of six Data Frames, one for each summarizing metric}
 \usage{
-edata_summary(omicsData, by, groupvar = NULL)
+edata_summary(omicsData, by = "sample", groupvar = NULL)
 }
 \arguments{
 \item{omicsData}{an object of the class 'lipidData', 'metabData', 'pepData', or 'proData', usually created by \code{\link{as.lipidData}}, \code{\link{as.metabData}}, \code{\link{as.pepData}}, or \code{\link{as.proData}}, respectively.}
 
-\item{by}{a character string indicating whether summarizing metrics will be applied by 'sample' or by 'molecule}
+\item{by}{a character string indicating whether summarizing metrics will be applied by 'sample' or by 'molecule'.  Defaults to 'sample'.}
 
 \item{groupvar}{a character vector with no more than two variable names that should be used to determine group membership of samples. The variable name must match a column name from \code{f_data}. Defaults to NULL, in which case group_DF attribute will be used.}
 }
