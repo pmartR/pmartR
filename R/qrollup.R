@@ -3,7 +3,7 @@
 #' This function applies the qrollup method to a pepData object for each unique protein and returns a proData object. 
 #' 
 #' @param pepData an omicsData object of class 'pepData'
-#' @param qrollup_thresh is a numeric value; is the peptide abundance cutoff value. 
+#' @param qrollup_thresh numeric value between 0 and 1 inclusive. Peptides above this threshold are used to roll up to the protein level 
 #' @param combine_fn logical indicating what combine_fn to use, defaults to median, other option is mean
 #' @param parallel logical indicating whether or not to use "doParallel" loop in applying qrollup function. Defaults to TRUE.
 #' 
