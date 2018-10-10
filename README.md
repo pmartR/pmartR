@@ -8,6 +8,10 @@ This R package provides functionality for quality control processing, statistica
 devtools::install_github("pmartR/pmartR")
 ```
 
+It’s been noted here https://stackoverflow.com/questions/51257009/is-rtools-incompatible-with-r-version-3-5-1 that there are issues with Rtools for R version 3.5.1.
+ 
+If you run into the same problem when trying to install using `devtools::install_github()` and the suggested fix in the above link does not work, you can clone or download the pmartR library to your computer and install it locally.
+
 ## Tutorial:
 
 To get started, see the package documentation and function reference located [here](https://pmartr.github.io/pmartR/index.html).
