@@ -165,24 +165,24 @@ plot.corRes <- function(corRes_object, ...){
 #' 
 #'@export
 #'@rdname plot-pmartR-moleculeFilt
-#'@param min_num an integer value specifying the minimum number of times each feature must be observed across all samples.
+#'@param min_num integer value specifying the minimum number of times each feature must be observed across all samples.  If a value is specified, a horizontal line will be drawn when \code{cumulative=TRUE}, and bars will be colored appropriatel if \code{cumulative=FALSE}.  Defaults to NULL.
+#'@param cumulative logical indicating whether the number of biomolecules observed in \emph{at least} (TRUE) x number of samples or \emph{exactly} (FALSE) x number of samples should be plotted.  Defaults to TRUE.
 #'
+#'@param ... Additional arguments passed to ggplot2
 #' \tabular{ll}{
 #' \code{x_lab} \tab character string to be used for x-axis label. Defaults to NULL, in which case a default label is used. \cr
 #' \code{y_lab} \tab character string to be used for y-axis label. Defaults to NULL, in which case a default label is used. \cr
-#' \code{legend_lab} \tab character string specifying the title label to use for the legend \cr
 #' \code{title_plot} \tab character string to be used for the plot title. Defaults to NULL, in which case a default title is used. \cr
 #' \code{title_size} \tab integer value specifying the font size for the plot title. Default is 14. \cr
 #' \code{x_lab_size} \tab integer value indicating the font size for the x-axis. Defaults to 11. \cr
 #' \code{y_lab_size} \tab integer value indicating the font size for the y-axis. Defaults to 11. \cr
 #' \code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used. \cr
-#' \code{legend_position} \tab character string specifying one of "right", "left", "top", or "bottom" for the location of the legend. Defaults to "right". \cr
 #' }
-plot.moleculeFilt <- function(filter_object, min_num = NULL, ...) {
-  .plot.moleculeFilt(filter_object, min_num, ...)
+plot.moleculeFilt <- function(filter_object, min_num = NULL, cumulative = TRUE,...) {
+  .plot.moleculeFilt(filter_object, min_num, cumulative, ...)
 }
 
-.plot.moleculeFilt <- function(filter_object, min_num = NULL, x_lab = NULL, y_lab = NULL, title_plot = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme = FALSE) {
+.plot.moleculeFilt <- function(filter_object, min_num = NULL, cumulative = TRUE, x_lab = NULL, y_lab = NULL, title_plot = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme = FALSE) {
   
   ## initial checks ##
   if(!is.null(min_num)) {
@@ -204,47 +204,81 @@ plot.moleculeFilt <- function(filter_object, min_num = NULL, ...) {
   }
   ## end of initial checks ##
   
-  # get observation counts #
-  cut_data <- table(cut(filter_object$Num_Observations, breaks = -1:max(filter_object$Num_Observations)))
-  cumcounts <- cumsum(cut_data)
-  pep_observation_counts <- data.frame(num_observations=0:(length(cumcounts)-1), frequency_counts=cumcounts)
+  # make counts, colors, and plot shape based on value of cumulative
   
-  # make labels #
-  xlabel <- ifelse(is.null(x_lab), "Minimum Number of Times a Biomolecule Appears Across All Samples", x_lab)
-  ylabel <- ifelse(is.null(y_lab), "Frequency of Biomolecules", y_lab)
-  plot_title <- ifelse(is.null(title_plot), "Cumulative Frequency of Biomolecules in Samples", title_plot)
+  # values that will be updated depending on input
+  fill <- 0
+  legend_scale <- NULL
+  hline <- NULL
   
-  # plot #
-  if(bw_theme == FALSE){
-    p <- ggplot2::ggplot(pep_observation_counts[-1, ]) +
-      ggplot2::geom_rect(ggplot2::aes(xmin = num_observations - 0.5, xmax = num_observations + 0.5,
-                                      ymin = 0, ymax = frequency_counts), fill="royalblue1", col="black") +
-      ggplot2::xlab(xlabel) +
-      ggplot2::ylab(ylabel) +
-      ggplot2::ggtitle(plot_title) +
-      ggplot2::scale_x_continuous(breaks = scales::pretty_breaks()) +
-      ggplot2::theme(plot.title = ggplot2::element_text(size = title_size),
-                     axis.title.x = ggplot2::element_text(size = x_lab_size),
-                     axis.title.y = ggplot2::element_text(size = y_lab_size))
-  }else{
-    p <- ggplot2::ggplot(pep_observation_counts[-1, ]) +
-      ggplot2::theme_bw() +
-      ggplot2::geom_rect(ggplot2::aes(xmin = num_observations - 0.5, xmax = num_observations + 0.5,
-                                      ymin = 0, ymax = frequency_counts), fill="royalblue1", col="black") +
-      ggplot2::xlab(xlabel) +
-      ggplot2::ylab(ylabel) +
-      ggplot2::ggtitle(plot_title) +
-      ggplot2::scale_x_continuous(breaks = scales::pretty_breaks()) +
-      ggplot2::theme(plot.title = ggplot2::element_text(size = title_size),
-                     axis.title.x = ggplot2::element_text(size = x_lab_size),
-                     axis.title.y = ggplot2::element_text(size = y_lab_size))
+  if(cumulative) {
+    # cumulative counts (>=)
+    counts <- sapply(1:max(filter_object$Num_Observations), function(i){
+        filter_object[filter_object$Num_Observations >= i,]$Num_Observations %>% length()
+      })
+    # append 1 to extend last step (looks awkward without this)
+    counts <- c(counts, counts[length(counts)])
+    # 1 appended step
+    num_obs <- 1:(max(filter_object$Num_Observations)+1)
+    
+    # shape is a step function with fixed color
+    shape <- ggplot2::geom_step(ggplot2::aes(x = num_observations, y = counts), color = "red")
+    
+    # draw a horizontal line if min_num is specified
+    hline <- if(!is.null(min_num)) ggplot2::geom_hline(ggplot2::aes(color = "black"), yintercept = counts[min_num], linetype = "dashed") else NULL
+    
+    xlabel <- ifelse(is.null(x_lab), "Minimum Number of Times a Biomolecule Appears Across All Samples", x_lab)
+    ylabel <- ifelse(is.null(y_lab), "Frequency observed in at least X number of samples", y_lab)
+    plot_title <- ifelse(is.null(title_plot), "Count of biomolecules observed in at least X number of samples", title_plot)
+  }
+  else if(!cumulative){
+   # counts for a specific number of nonmissing biomolecules (==)
+   counts <- sapply(1:max(filter_object$Num_Observations), function(i){
+     filter_object[filter_object$Num_Observations == i,]$Num_Observations %>% length()
+   })
+   
+   # color by which values are kept if min_num is specified
+   if(!is.null(min_num)){
+     fill <- ifelse(1:max(filter_object$Num_Observations) >= min_num, "retained", "dropped")
+     shape <- ggplot2::geom_bar(ggplot2::aes(x = num_observations, y = counts, fill = fill), color = "black", stat = "identity")
+     legend_scale <- scale_fill_manual(name = "", values = c("dropped" =  "red", "retained" =  "green"))
+     }
+   else{
+     shape <- ggplot2::geom_bar(ggplot2::aes(x = num_observations, y = counts), fill = "royalblue1", color = "black", stat = "identity")
+   }
+   
+   num_obs <- 1:max(filter_object$Num_Observations)
+
+   xlabel <- ifelse(is.null(x_lab), "Number of Times a Biomolecule Appears Across All Samples", x_lab)
+   ylabel <- ifelse(is.null(y_lab), "Frequency observed in exactly X number of samples", y_lab)
+   plot_title <- ifelse(is.null(title_plot), "Count of biomolecules observed in exactly X number of samples", title_plot)
   }
   
+  # create plotting dataframe
+  pep_observation_counts <- data.frame(num_observations = num_obs, 
+                                       frequency_counts = counts,
+                                       fill = fill)
   
-  if(!is.null(min_num)) {
-    num_tested <- pep_observation_counts$frequency_counts[min_num+1]
-    p <- p + ggplot2::annotate(geom = "rect", xmin = min_num - 0.5, xmax = min_num + 0.5,
-                               ymin = 0, ymax = num_tested, fill="royalblue1", col="black", size=1.5)
+  # value annotation
+  text <- ggplot2::geom_text(data = pep_observation_counts[1:max(filter_object$Num_Observations),], 
+                             ggplot2::aes(x = num_observations, y = frequency_counts, label = frequency_counts), vjust = -1, nudge_x = ifelse(cumulative, 0.5, 0))
+  
+  # plot #
+  p <- ggplot2::ggplot(pep_observation_counts) +
+    shape +
+    hline +
+    text +
+    legend_scale +
+    ggplot2::xlab(xlabel) +
+    ggplot2::ylab(ylabel) +
+    ggplot2::ggtitle(plot_title) +
+    ggplot2::scale_x_continuous(breaks = max(filter_object$Num_Observations):1) +
+    ggplot2::theme(plot.title = ggplot2::element_text(size = title_size),
+                   axis.title.x = ggplot2::element_text(size = x_lab_size),
+                   axis.title.y = ggplot2::element_text(size = y_lab_size))
+  
+  if(bw_theme == TRUE){
+    p <- p + ggplot2::theme_bw()  
   }
   
   return(p)
@@ -256,7 +290,11 @@ plot.moleculeFilt <- function(filter_object, min_num = NULL, ...) {
 #' 
 #'@export
 #'@rdname plot-pmartR-proteomicsFilt
+#'@param min_num_peps an optional integer value between 1 and the maximum number of peptides that map to a protein in the data. The value specifies the minimum number of peptides that must map to a protein. Any protein with less than \code{min_num_peps} mapping to it will be returned as a protein that should be filtered. Default value is NULL.
+#'@param degen_peps logical indicator of whether to filter out degenerate peptides (TRUE) or not (FALSE). Default value is FALSE.
 #'@param mapping whether to display a histogram of the number of peptides mapping to a protein for all proteins (mapping = 'pep_to_pro'), a histogram of the number of proteins mapped to by each peptide (mapping = "pro_to_pep"), or 'both'.  Defaults to "both"
+#'@param log_scale TRUE or FALSE specifying whether or not to plot the x-axis on the log scale, defaults to TRUE
+#'@param cumulative logical specifying whether the peptide to protein mapping should be cumulative or at each value i.e. number of proteins with \emph{at least} x (TRUE) peptides mapping to it, or \emph{exactly} x (FALSE) peptides mapping to it.  Defaults to TRUE
 #'
 #' \tabular{ll}{
 #' \code{x_lab} \tab character string to be used for x-axis label. Defaults to NULL, in which case a default label is used. \cr
@@ -271,35 +309,115 @@ plot.moleculeFilt <- function(filter_object, min_num = NULL, ...) {
 #' \code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used. \cr
 #' \code{legend_position} \tab character string specifying one of "right", "left", "top", or "bottom" for the location of the legend. Defaults to "right". \cr
 #' }
-plot.proteomicsFilt <- function(filter_object, mapping = "both", ...) {
-  .plot.proteomicsFilt(filter_object, mapping = mapping, ...)
+plot.proteomicsFilt <- function(filter_object, mapping = "both", cumulative = TRUE, log_scale = TRUE, min_num_peps = NULL, degen_peps = FALSE, ...) {
+  .plot.proteomicsFilt(filter_object, mapping, cumulative, log_scale, min_num_peps, degen_peps, ...)
 }
 
-.plot.proteomicsFilt <- function(filter_object, mapping = "both",
+.plot.proteomicsFilt <- function(filter_object, mapping = "both", cumulative = TRUE, 
+                                 log_scale = TRUE, min_num_peps = NULL, degen_peps = FALSE,
                                  x_lab_pep = NULL, y_lab_pep = NULL, title.pep = NULL,
                                  x_lab_pro = NULL, y_lab_pro = NULL, title.pro = NULL,
                                  xlim = NULL, ylim = NULL,
                                  title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme = FALSE) {
+  # Error Checks
+  if(!is.null(min_num_peps)) {
+    # check that min_num_peps is numeric and >=1 #
+    if(!inherits(min_num_peps, "numeric") | min_num_peps < 1) stop("min_num_peps must be an integer greater than or equal to 1")
+    # check that min_num_peps is an integer #
+    if(min_num_peps %% 1 != 0) stop("min_num_peps must be an integer greater than or equal to 1")
+    # check that min_num_peps is of length 1 #
+    if(length(min_num_peps) != 1) stop("min_num_peps must be of length 1")
+    # check that min_num_peps is less than the total number of peptides #
+    if(min_num_peps > sum(filter_object$counts_by_pep$n)) stop("min_num_peps cannot be greater than the total number of peptides")
+  }
+  # check that degen_peps is logical #
+  if(!inherits(degen_peps, "logical")) stop("degen_peps must be either TRUE or FALSE")
   
   if(!(mapping %in% c("both", "pep_to_pro", "pro_to_pep"))) stop("'mapping' argument must be one of 'both', 'pep_to_pro' or 'pro_to_pep'")
-
+  
   suppressMessages({
-    # get counts
-    pep_counts <- filter_object$counts_by_pro$n
-    pro_counts <- filter_object$counts_by_pep$n
+    pep_bins = sort(unique(filter_object$counts_by_pep$n))
+    pro_bins = sort(unique(filter_object$counts_by_pro$n))
+    
+    fill <- 0
+    fill_format <- NULL
+    hline <- NULL
+    
+    if(cumulative){
+      
+      pep_counts <- sapply(pep_bins, function(x){
+        filter_object$counts_by_pep[filter_object$counts_by_pep >= x,] %>% nrow()
+      })
+      
+      pro_counts <- sapply(pro_bins, function(x){
+        filter_object$counts_by_pro[filter_object$counts_by_pro$n >= x,] %>% nrow()
+      })
+      
+      if(length(pep_counts) > 1){
+        pep_counts <- c(pep_counts, pep_counts[length(pep_counts)])
+        pep_bins <- c(pep_bins, max(pep_bins)+1)
+        shape_pep <- ggplot2::geom_step(ggplot2::aes(x = bins, y = counts), color = "red")
+      }
+      else shape_pep <- ggplot2::geom_bar(ggplot2::aes(x = bins, y = counts), fill = "royalblue1", stat = "identity")
+      
+      if(length(pro_counts) > 1){
+        pro_counts <- c(pro_counts, pro_counts[length(pro_counts)])
+        pro_bins <- c(pro_bins, max(pro_bins)+1)
+        shape_pro <- ggplot2::geom_step(ggplot2::aes(x = bins, y = counts), color = "red")
+      }
+      else shape_pro <- ggplot2::geom_bar(ggplot2::aes(x = bins, y = counts), fill = "royalblue1", stat = "identity")
+      
+      if(!is.null(min_num_peps)){
+        hline <- ggplot2::geom_hline(ggplot2::aes(color = "black"), yintercept = pro_counts[which(pro_bins == min_num_peps)], linetype = "dashed")
+      }
+    
+    }
+    else if(!cumulative){
+      pep_counts <- sapply(pep_bins, function(x){
+        filter_object$counts_by_pep[filter_object$counts_by_pep$n == x,] %>% nrow()
+      })
+      
+      pro_counts <- sapply(pro_bins, function(x){
+        filter_object$counts_by_pro[filter_object$counts_by_pro$n == x,] %>% nrow()
+      })
+      
+      if(!is.null(min_num_peps)){
+        fill <- ifelse(pro_bins >= min_num_peps, "retained", "dropped")
+        shape_pro <- ggplot2::geom_bar(ggplot2::aes(x = bins, y = counts, fill = fill), stat = "identity")
+        fill_format <- scale_fill_manual(name = "", values = c("dropped" =  "red", "retained" =  "green"))
+      }
+      else{
+        shape_pro <- ggplot2::geom_bar(ggplot2::aes(x = bins, y = counts), fill = "royalblue1", stat = "identity")
+      }
+      
+      shape_pep <- ggplot2::geom_bar(ggplot2::aes(x = bins, y = counts), fill = "royalblue1", stat = "identity") 
+    }
+    
+    if(log_scale){
+      scale_pep <- ggplot2::scale_x_continuous(breaks = unique(pep_bins), trans = "log10")
+      scale_pro <- ggplot2::scale_x_continuous(trans = "log10")
+    }  
+    else{
+      scale_pro <- NULL
+      scale_pep <- ggplot2::scale_x_continuous(breaks = seq(1:max(pep_counts)))
+    }
+  
+    # make plotting df for peptides and proteins
+    pep_counts_df <- data.frame(counts = pep_counts, bins = pep_bins)
+    pro_counts_df <- data.frame(counts = pro_counts, bins = pro_bins, fill = fill)
     
     ## plot histogram
     if(mapping %in% c("both", "pep_to_pro")){ # peptides plot
       ## make labels ##
-      xlabel_pep <- ifelse(is.null(x_lab_pep), "Number of Peptides \nMapping to each Protein", x_lab_pep)
-      ylabel_pep <- ifelse(is.null(y_lab_pep), "Count \n(Number of Proteins)", y_lab_pep)
-      plot_title_pep <- ifelse(is.null(title.pep), "Number of Peptides \nMapping to each Protein", title.pep)
+      xlabel_pep <- ifelse(is.null(x_lab_pep), "Number of Peptides Mapped to a Protein", x_lab_pep)
+      ylabel_pep <- ifelse(is.null(y_lab_pep), "Count of Proteins", y_lab_pep)
+      plot_title_pep <- ifelse(is.null(title.pep), paste0("Number of proteins mapped to by ", ifelse(cumulative, "at least", "exactly")," X peptides"), title.pep)
       
-      p1 <- ggplot2::ggplot(as.data.frame(pep_counts), ggplot2::aes(x=pep_counts)) +
-        ggplot2::geom_histogram(fill="royalblue4", binwidth = 1) +
+      p1 <- ggplot2::ggplot(pro_counts_df) +
+        shape_pro + scale_pro + hline + fill_format +
         ggplot2::ggtitle(plot_title_pep) +
         ggplot2::xlab(xlabel_pep) +
-        ggplot2::ylab(ylabel_pep)  +
+        ggplot2::ylab(ylabel_pep) +
         ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
                        axis.title.x = ggplot2::element_text(size=x_lab_size),
                        axis.title.y = ggplot2::element_text(size=y_lab_size))
@@ -316,17 +434,19 @@ plot.proteomicsFilt <- function(filter_object, mapping = "both", ...) {
     
     if(mapping %in% c("both","pro_to_pep")){ # proteins plot
       ## make labels ##
-      xlabel_pro <- ifelse(is.null(x_lab_pro), "Number of Proteins \nMapped to by each Peptide", x_lab_pro)
-      ylabel_pro <- ifelse(is.null(y_lab_pro), "Count \n(Number of Peptides)", y_lab_pro)
-      plot_title_pro <- ifelse(is.null(title.pro), "Number of Proteins \nMapped to by each Peptide", title.pro)
+      xlabel_pro <- ifelse(is.null(x_lab_pro), "Number of Proteins Mapped to a Peptide", x_lab_pro)
+      ylabel_pro <- ifelse(is.null(y_lab_pro), "Count of Peptides", y_lab_pro)
+      plot_title_pro <- ifelse(is.null(title.pep), paste0("Number of peptides mapped to by ", ifelse(cumulative, "at least", "exactly")," X proteins"), title.pep)
+      
+      
+      text <- ggplot2::geom_text(data = pep_counts_df[!duplicated(pep_counts_df$counts),], ggplot2::aes(x = bins, y = counts, label = counts), vjust = -1, nudge_x = ifelse(cumulative, 0.5, 0))
       
       ## plot histogram
-      p2 <- ggplot2::ggplot(as.data.frame(pro_counts), ggplot2::aes(x=pro_counts)) +
-        ggplot2::geom_histogram(fill="springgreen4", binwidth = .5) +
+      p2 <- ggplot2::ggplot(pep_counts_df) +
+        shape_pep + scale_pep + text +
         ggplot2::ggtitle(plot_title_pro) +
         ggplot2::xlab(xlabel_pro) +
         ggplot2::ylab(ylabel_pro) +
-        ggplot2::scale_x_continuous(breaks = unique(pro_counts)) +
         ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
                        axis.title.x = ggplot2::element_text(size=x_lab_size),
                        axis.title.y = ggplot2::element_text(size=y_lab_size))
