@@ -54,15 +54,16 @@ NULL
 #'@param y_lab logical indicator of whether to label the y-axis with the sample names. Defaults to TRUE. If FALSE, no y-axis labels are included in the plot.
 #'@param colorbar_lim numeric pair of numeric values specifying the minimum and maximum values to use in the heatmap color bar. Defaults to 'c(NA, NA)', in which case ggplot2 automatically sets the minimum and maximum values based on the correlation values in the data.
 #'
+#'@param ... Additional arguments
 #' \tabular{ll}{
 #' \code{title_plot} \tab character string to be used for the plot title. Defaults to NULL, in which case "Sample Outlier Results /n p-value threshold = 0.xyz" is used, where 'xyz' is the pvalue_threshold supplied to the function. \cr
-#' \code{title_size} integer value specifying the font size for the plot title. Default is 14. \cr]
+#' \code{title_size} \tab integer value specifying the font size for the plot title. Default is 14. \cr
 #' \code{use_VizSampNames} \tab logical specifies whether to use custom sample names \cr
 #' } 
-plot.corRes <- function(corRes_object, ...){
-  .plot.corRes(corRes_object, ...)
+plot.corRes <- function(corRes_object, omicsData = NULL, interactive = FALSE, x_lab=TRUE, y_lab=TRUE, colorbar_lim=c(NA, NA), ...){
+  .plot.corRes(corRes_object, omicsData, interactive, x_lab, y_lab, colorbar_lim, ...)
 }
-.plot.corRes <- function(corRes_object, omicsData = NULL, interactive = FALSE, title_plot = NULL, x_lab=TRUE, y_lab=TRUE, colorbar_lim=c(NA, NA), title_size = 14, use_VizSampNames = FALSE){
+.plot.corRes <- function(corRes_object, omicsData = NULL, interactive = FALSE, x_lab=TRUE, y_lab=TRUE, colorbar_lim=c(NA, NA), title_plot = NULL, title_size = 14, use_VizSampNames = FALSE){
   # check for a corRes object #
   if(!inherits(corRes_object, "corRes")) stop("object must be of class 'corRes'")
   
@@ -168,7 +169,7 @@ plot.corRes <- function(corRes_object, ...){
 #'@param min_num integer value specifying the minimum number of times each feature must be observed across all samples.  If a value is specified, a horizontal line will be drawn when \code{cumulative=TRUE}, and bars will be colored appropriatel if \code{cumulative=FALSE}.  Defaults to NULL.
 #'@param cumulative logical indicating whether the number of biomolecules observed in \emph{at least} (TRUE) x number of samples or \emph{exactly} (FALSE) x number of samples should be plotted.  Defaults to TRUE.
 #'
-#'@param ... Additional arguments passed to ggplot2
+#'@param ... Additional arguments
 #' \tabular{ll}{
 #' \code{x_lab} \tab character string to be used for x-axis label. Defaults to NULL, in which case a default label is used. \cr
 #' \code{y_lab} \tab character string to be used for y-axis label. Defaults to NULL, in which case a default label is used. \cr
@@ -178,6 +179,13 @@ plot.corRes <- function(corRes_object, ...){
 #' \code{y_lab_size} \tab integer value indicating the font size for the y-axis. Defaults to 11. \cr
 #' \code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used. \cr
 #' }
+#' 
+#' @examples
+#' data(pep_object)
+#' molfilt <- molecule_filter(pep_object)
+#' plot(molfilt, min_num = 5)
+#' plot(molfilt, min_num = 3, cumulative = FALSE)
+#' 
 plot.moleculeFilt <- function(filter_object, min_num = NULL, cumulative = TRUE,...) {
   .plot.moleculeFilt(filter_object, min_num, cumulative, ...)
 }
@@ -202,6 +210,9 @@ plot.moleculeFilt <- function(filter_object, min_num = NULL, cumulative = TRUE,.
   if(!is.null(y_lab)) {
     if(!is.character(y_lab)) stop("y_lab must be a character vector")
   }
+  
+  if(!inherits(cumulative, "logical")) stop("argument cumulative must be either TRUE or FALSE")
+  
   ## end of initial checks ##
   
   # make counts, colors, and plot shape based on value of cumulative
@@ -228,7 +239,7 @@ plot.moleculeFilt <- function(filter_object, min_num = NULL, cumulative = TRUE,.
     hline <- if(!is.null(min_num)) ggplot2::geom_hline(ggplot2::aes(color = "black"), yintercept = counts[min_num], linetype = "dashed") else NULL
     
     xlabel <- ifelse(is.null(x_lab), "Minimum Number of Times a Biomolecule Appears Across All Samples", x_lab)
-    ylabel <- ifelse(is.null(y_lab), "Frequency observed in at least X number of samples", y_lab)
+    ylabel <- ifelse(is.null(y_lab), "Count of Biomolecules", y_lab)
     plot_title <- ifelse(is.null(title_plot), "Count of biomolecules observed in at least X number of samples", title_plot)
   }
   else if(!cumulative){
@@ -241,7 +252,7 @@ plot.moleculeFilt <- function(filter_object, min_num = NULL, cumulative = TRUE,.
    if(!is.null(min_num)){
      fill <- ifelse(1:max(filter_object$Num_Observations) >= min_num, "retained", "dropped")
      shape <- ggplot2::geom_bar(ggplot2::aes(x = num_observations, y = counts, fill = fill), color = "black", stat = "identity")
-     legend_scale <- scale_fill_manual(name = "", values = c("dropped" =  "red", "retained" =  "green"))
+     legend_scale <- ggplot2::scale_fill_manual(name = "", values = c("dropped" =  "red", "retained" =  "green"))
      }
    else{
      shape <- ggplot2::geom_bar(ggplot2::aes(x = num_observations, y = counts), fill = "royalblue1", color = "black", stat = "identity")
@@ -250,7 +261,7 @@ plot.moleculeFilt <- function(filter_object, min_num = NULL, cumulative = TRUE,.
    num_obs <- 1:max(filter_object$Num_Observations)
 
    xlabel <- ifelse(is.null(x_lab), "Number of Times a Biomolecule Appears Across All Samples", x_lab)
-   ylabel <- ifelse(is.null(y_lab), "Frequency observed in exactly X number of samples", y_lab)
+   ylabel <- ifelse(is.null(y_lab), "Count of Biomolecules", y_lab)
    plot_title <- ifelse(is.null(title_plot), "Count of biomolecules observed in exactly X number of samples", title_plot)
   }
   
@@ -259,16 +270,13 @@ plot.moleculeFilt <- function(filter_object, min_num = NULL, cumulative = TRUE,.
                                        frequency_counts = counts,
                                        fill = fill)
   
-  # value annotation
+  # value annotation - data argument is to shave off last row that is only there to extend the last step
   text <- ggplot2::geom_text(data = pep_observation_counts[1:max(filter_object$Num_Observations),], 
                              ggplot2::aes(x = num_observations, y = frequency_counts, label = frequency_counts), vjust = -1, nudge_x = ifelse(cumulative, 0.5, 0))
   
   # plot #
   p <- ggplot2::ggplot(pep_observation_counts) +
-    shape +
-    hline +
-    text +
-    legend_scale +
+    shape + hline + text + legend_scale +
     ggplot2::xlab(xlabel) +
     ggplot2::ylab(ylabel) +
     ggplot2::ggtitle(plot_title) +
@@ -290,31 +298,36 @@ plot.moleculeFilt <- function(filter_object, min_num = NULL, cumulative = TRUE,.
 #' 
 #'@export
 #'@rdname plot-pmartR-proteomicsFilt
-#'@param min_num_peps an optional integer value between 1 and the maximum number of peptides that map to a protein in the data. The value specifies the minimum number of peptides that must map to a protein. Any protein with less than \code{min_num_peps} mapping to it will be returned as a protein that should be filtered. Default value is NULL.
-#'@param degen_peps logical indicator of whether to filter out degenerate peptides (TRUE) or not (FALSE). Default value is FALSE.
 #'@param mapping whether to display a histogram of the number of peptides mapping to a protein for all proteins (mapping = 'pep_to_pro'), a histogram of the number of proteins mapped to by each peptide (mapping = "pro_to_pep"), or 'both'.  Defaults to "both"
-#'@param log_scale TRUE or FALSE specifying whether or not to plot the x-axis on the log scale, defaults to TRUE
 #'@param cumulative logical specifying whether the peptide to protein mapping should be cumulative or at each value i.e. number of proteins with \emph{at least} x (TRUE) peptides mapping to it, or \emph{exactly} x (FALSE) peptides mapping to it.  Defaults to TRUE
+#'@param log_scale TRUE or FALSE specifying whether or not to plot the x-axis on the log scale, defaults to TRUE
+#'@param min_num_peps an optional integer value between 1 and the maximum number of peptides that map to a protein in the data. The value specifies the minimum number of peptides that must map to a protein. Any protein with less than \code{min_num_peps} mapping to it will be returned as a protein that should be filtered. Default value is NULL.
 #'
+#'@param ... Additional arguments
 #' \tabular{ll}{
 #' \code{x_lab} \tab character string to be used for x-axis label. Defaults to NULL, in which case a default label is used. \cr
 #' \code{y_lab} \tab character string to be used for y-axis label. Defaults to NULL, in which case a default label is used. \cr
-#' \code{legend_lab} \tab character string specifying the title label to use for the legend \cr
 #' \code{title_plot} \tab character string to be used for the plot title. Defaults to NULL, in which case a default title is used. \cr
 #' \code{title_size} \tab integer value specifying the font size for the plot title. Default is 14. \cr
 #' \code{x_lab_size} \tab integer value indicating the font size for the x-axis. Defaults to 11. \cr
 #' \code{y_lab_size} \tab integer value indicating the font size for the y-axis. Defaults to 11. \cr
-#' \code{xlim} \tab length 2 numeric vector specifying x-axis limits for the peptide to protein plot.  Defaults to NULL, which gives default ggplot2 axis limits
-#' \code{ylim} \tab length 2 numeric vector specifying y-axis limits for the peptide to protein plot.  Defaults to NULL, which gives default ggplot2 axis limits
+#' \code{xlim} \tab length 2 numeric vector specifying x-axis limits for the peptide to protein plot.  Defaults to NULL, which gives default ggplot2 axis limits \cr
+#' \code{ylim} \tab length 2 numeric vector specifying y-axis limits for the peptide to protein plot.  Defaults to NULL, which gives default ggplot2 axis limits \cr
 #' \code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used. \cr
-#' \code{legend_position} \tab character string specifying one of "right", "left", "top", or "bottom" for the location of the legend. Defaults to "right". \cr
 #' }
-plot.proteomicsFilt <- function(filter_object, mapping = "both", cumulative = TRUE, log_scale = TRUE, min_num_peps = NULL, degen_peps = FALSE, ...) {
-  .plot.proteomicsFilt(filter_object, mapping, cumulative, log_scale, min_num_peps, degen_peps, ...)
+#' 
+#' @examples
+#' data(pep_object)
+#' profilt <- proteomics_filter(pep_object)
+#' plot(profilt, min_num_peps = 5)
+#' plot(profilt, min_num_peps = 10, cumulative = FALSE)
+#' 
+plot.proteomicsFilt <- function(filter_object, mapping = "both", cumulative = TRUE, log_scale = TRUE, min_num_peps = NULL, ...) {
+  .plot.proteomicsFilt(filter_object, mapping, cumulative, log_scale, min_num_peps, ...)
 }
 
 .plot.proteomicsFilt <- function(filter_object, mapping = "both", cumulative = TRUE, 
-                                 log_scale = TRUE, min_num_peps = NULL, degen_peps = FALSE,
+                                 log_scale = TRUE, min_num_peps = NULL,
                                  x_lab_pep = NULL, y_lab_pep = NULL, title.pep = NULL,
                                  x_lab_pro = NULL, y_lab_pro = NULL, title.pro = NULL,
                                  xlim = NULL, ylim = NULL,
@@ -330,32 +343,44 @@ plot.proteomicsFilt <- function(filter_object, mapping = "both", cumulative = TR
     # check that min_num_peps is less than the total number of peptides #
     if(min_num_peps > sum(filter_object$counts_by_pep$n)) stop("min_num_peps cannot be greater than the total number of peptides")
   }
-  # check that degen_peps is logical #
-  if(!inherits(degen_peps, "logical")) stop("degen_peps must be either TRUE or FALSE")
+  # check that cumulative and log_scale are logical #
+  if(!inherits(cumulative, "logical")) stop("argument cumulative must be either TRUE or FALSE")
+  if(!inherits(log_scale, "logical")) stop("argument log_scale must be either TRUE or FALSE")
   
+  # check that a valid mapping argument is supplied
   if(!(mapping %in% c("both", "pep_to_pro", "pro_to_pep"))) stop("'mapping' argument must be one of 'both', 'pep_to_pro' or 'pro_to_pep'")
   
+  # suppress ggplot2 warnings
   suppressMessages({
-    pep_bins = sort(unique(filter_object$counts_by_pep$n))
-    pro_bins = sort(unique(filter_object$counts_by_pro$n))
     
+    #intantiate bin values for both mappings
+    pep_bins = sort(unique(filter_object$counts_by_pep$n)) # bins for peptide COUNTS.  These bins represent a number of PROTEINS
+    pro_bins = sort(unique(filter_object$counts_by_pro$n)) # bins for protein COUNTS.  These bins represent a number of PEPTIDES
+    
+    # fill value, fill labels, and horizontal line values that will be given real values if certain arguments are supplied
     fill <- 0
     fill_format <- NULL
     hline <- NULL
     
+    # construct resurces for cumulative (step function) plot
     if(cumulative){
-      
+      # get counts of peptides that are mapped to by AT LEAST the number of proteins given in pep_bins
       pep_counts <- sapply(pep_bins, function(x){
         filter_object$counts_by_pep[filter_object$counts_by_pep >= x,] %>% nrow()
       })
       
+      # get counts of proteins that are mapped to by AT LEAST the number of peptides given in pro_bins
       pro_counts <- sapply(pro_bins, function(x){
         filter_object$counts_by_pro[filter_object$counts_by_pro$n >= x,] %>% nrow()
       })
       
+      # only use step function if there is more than 1 step
       if(length(pep_counts) > 1){
+        # an extra count to extend the last step
         pep_counts <- c(pep_counts, pep_counts[length(pep_counts)])
         pep_bins <- c(pep_bins, max(pep_bins)+1)
+        
+        # store shape variable to be added to plot object later
         shape_pep <- ggplot2::geom_step(ggplot2::aes(x = bins, y = counts), color = "red")
       }
       else shape_pep <- ggplot2::geom_bar(ggplot2::aes(x = bins, y = counts), fill = "royalblue1", stat = "identity")
@@ -367,24 +392,28 @@ plot.proteomicsFilt <- function(filter_object, mapping = "both", cumulative = TR
       }
       else shape_pro <- ggplot2::geom_bar(ggplot2::aes(x = bins, y = counts), fill = "royalblue1", stat = "identity")
       
+      # if min_num_peps is specified, draw a horizontal line to indicate the number of peptides retained
       if(!is.null(min_num_peps)){
         hline <- ggplot2::geom_hline(ggplot2::aes(color = "black"), yintercept = pro_counts[which(pro_bins == min_num_peps)], linetype = "dashed")
       }
     
     }
+    # get resources for bar chart (not cumulative)
     else if(!cumulative){
+      # get counts of peptides that are mapped to by EXACTLY the number of proteins given in pep_bins
       pep_counts <- sapply(pep_bins, function(x){
         filter_object$counts_by_pep[filter_object$counts_by_pep$n == x,] %>% nrow()
       })
-      
+      # get counts of proteins that are mapped to by EXACTLY the number of peptides given in pro_bins
       pro_counts <- sapply(pro_bins, function(x){
         filter_object$counts_by_pro[filter_object$counts_by_pro$n == x,] %>% nrow()
       })
       
+      # if min_num_peps is specified, add a coloring variable that is red for dropped values and green for retained values
       if(!is.null(min_num_peps)){
         fill <- ifelse(pro_bins >= min_num_peps, "retained", "dropped")
         shape_pro <- ggplot2::geom_bar(ggplot2::aes(x = bins, y = counts, fill = fill), stat = "identity")
-        fill_format <- scale_fill_manual(name = "", values = c("dropped" =  "red", "retained" =  "green"))
+        fill_format <- ggplot2::scale_fill_manual(name = "", values = c("dropped" =  "red", "retained" =  "green"))
       }
       else{
         shape_pro <- ggplot2::geom_bar(ggplot2::aes(x = bins, y = counts), fill = "royalblue1", stat = "identity")
@@ -393,6 +422,7 @@ plot.proteomicsFilt <- function(filter_object, mapping = "both", cumulative = TR
       shape_pep <- ggplot2::geom_bar(ggplot2::aes(x = bins, y = counts), fill = "royalblue1", stat = "identity") 
     }
     
+    # log scaling
     if(log_scale){
       scale_pep <- ggplot2::scale_x_continuous(breaks = unique(pep_bins), trans = "log10")
       scale_pro <- ggplot2::scale_x_continuous(trans = "log10")
@@ -406,13 +436,14 @@ plot.proteomicsFilt <- function(filter_object, mapping = "both", cumulative = TR
     pep_counts_df <- data.frame(counts = pep_counts, bins = pep_bins)
     pro_counts_df <- data.frame(counts = pro_counts, bins = pro_bins, fill = fill)
     
-    ## plot histogram
-    if(mapping %in% c("both", "pep_to_pro")){ # peptides plot
+    # make peptide counts plot
+    if(mapping %in% c("both", "pep_to_pro")){
       ## make labels ##
       xlabel_pep <- ifelse(is.null(x_lab_pep), "Number of Peptides Mapped to a Protein", x_lab_pep)
       ylabel_pep <- ifelse(is.null(y_lab_pep), "Count of Proteins", y_lab_pep)
       plot_title_pep <- ifelse(is.null(title.pep), paste0("Number of proteins mapped to by ", ifelse(cumulative, "at least", "exactly")," X peptides"), title.pep)
       
+      # main plot object that adds resources built in ifelse blocks above
       p1 <- ggplot2::ggplot(pro_counts_df) +
         shape_pro + scale_pro + hline + fill_format +
         ggplot2::ggtitle(plot_title_pep) +
@@ -421,6 +452,7 @@ plot.proteomicsFilt <- function(filter_object, mapping = "both", cumulative = TR
         ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
                        axis.title.x = ggplot2::element_text(size=x_lab_size),
                        axis.title.y = ggplot2::element_text(size=y_lab_size))
+      # other ggplot2 arguments
       if(bw_theme){
         p1 <- p1 + ggplot2::theme_bw()
       }
@@ -432,18 +464,18 @@ plot.proteomicsFilt <- function(filter_object, mapping = "both", cumulative = TR
       }
     }
     
-    if(mapping %in% c("both","pro_to_pep")){ # proteins plot
-      ## make labels ##
+    # make protein counts plot
+    if(mapping %in% c("both","pro_to_pep")){
       xlabel_pro <- ifelse(is.null(x_lab_pro), "Number of Proteins Mapped to a Peptide", x_lab_pro)
       ylabel_pro <- ifelse(is.null(y_lab_pro), "Count of Peptides", y_lab_pro)
       plot_title_pro <- ifelse(is.null(title.pep), paste0("Number of peptides mapped to by ", ifelse(cumulative, "at least", "exactly")," X proteins"), title.pep)
       
+      # text annotation (peptide count plot has too many bins to make this an option) 
+      # data argument shaves off last row that is only used to extend last step in cumulative plot
+      text <- ggplot2::geom_text(data = pep_counts_df[pep_counts_df$bins <= max(filter_object$counts_by_pep$n),], ggplot2::aes(x = bins, y = counts, label = counts), vjust = -1, hjust = ifelse(cumulative, -0.5, 0.5))
       
-      text <- ggplot2::geom_text(data = pep_counts_df[!duplicated(pep_counts_df$counts),], ggplot2::aes(x = bins, y = counts, label = counts), vjust = -1, nudge_x = ifelse(cumulative, 0.5, 0))
-      
-      ## plot histogram
       p2 <- ggplot2::ggplot(pep_counts_df) +
-        shape_pep + scale_pep + text +
+        shape_pep + text + scale_pep +
         ggplot2::ggtitle(plot_title_pro) +
         ggplot2::xlab(xlabel_pro) +
         ggplot2::ylab(ylabel_pro) +
@@ -455,6 +487,7 @@ plot.proteomicsFilt <- function(filter_object, mapping = "both", cumulative = TR
       }
     }
     
+    # conditionally return plots depending on mapping input
     if(mapping == "pep_to_pro") return(p1)
     else if(mapping == "pro_to_pep") return(p2)
     else if(mapping == "both") return(Rmisc::multiplot(p1, p2, cols = 2))
@@ -470,16 +503,16 @@ plot.proteomicsFilt <- function(filter_object, mapping = "both", cumulative = TR
 #'@rdname plot-pmartR-imdanovaFilt
 #'@param min_nonmiss_gtest the minimum number of non-missing feature values allowed per group for \code{gtest_filter}. Suggested value is 3.
 #'@param min_nonmiss_anova the minimum number of non-missing feature values allowed per group for \code{anova_filter}. Suggested value is 2.
+#'
+#'@param ... Additional arguments
 #' \tabular{ll}{
 #' \code{x_lab} \tab character string to be used for x-axis label. Defaults to NULL, in which case a default label is used. \cr
 #' \code{y_lab} \tab character string to be used for y-axis label. Defaults to NULL, in which case a default label is used. \cr
-#' \code{legend_lab} \tab character string specifying the title label to use for the legend \cr
 #' \code{title_plot} \tab character string to be used for the plot title. Defaults to NULL, in which case a default title is used. \cr
 #' \code{title_size} \tab integer value specifying the font size for the plot title. Default is 14. \cr
 #' \code{x_lab_size} \tab integer value indicating the font size for the x-axis. Defaults to 11. \cr
 #' \code{y_lab_size} \tab integer value indicating the font size for the y-axis. Defaults to 11. \cr
 #' \code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used. \cr
-#' \code{legend_position} \tab character string specifying one of "right", "left", "top", or "bottom" for the location of the legend. Defaults to "right". \cr
 #' }
 plot.imdanovaFilt <- function(filter_object, min_nonmiss_anova = NULL, min_nonmiss_gtest = NULL, ...) {
   .plot.imdanovaFilt(filter_object, min_nonmiss_anova, min_nonmiss_gtest, ...)
@@ -638,8 +671,9 @@ plot.imdanovaFilt <- function(filter_object, min_nonmiss_anova = NULL, min_nonmi
 #'@rdname plot-pmartR-rmdFilt
 #'@param pvalue_threshold A threshold for the Robust Mahalanobis Distance (RMD) p-value. If \code{sampleID} is NULL (see \code{sampleID} below), a horizontal line is plotted at the RMD value that corresponds with the threshold, and all samples above the line have a p-value below the threshold. If \code{sampleID} is not NULL, \code{pvalue_threshold} will do nothing. Default value is NULL.
 #'@param sampleID If specified, the plot produces a boxplot instead of a scatterplot. The \code{sampleID} input will place an "x" at the value for each of the metrics on the boxplots. Default value is NULL.
-
-#'\tabular{ll}{
+#'
+#'@param ... Additional arguments
+#' \tabular{ll}{
 #' \code{x_lab} \tab character string to be used for x-axis label. Defaults to NULL, in which case a default label is used. \cr
 #' \code{y_lab} \tab character string to be used for y-axis label. Defaults to NULL, in which case a default label is used. \cr
 #' \code{legend_lab} \tab character string specifying the title label to use for the legend \cr
@@ -869,16 +903,15 @@ plot.rmdFilt <- function(filter_object, pvalue_threshold = NULL, sampleID = NULL
 #'@rdname plot-pmartR-cvFilt
 #'@param cv_threshold shades the area on the histogram below the given threshold. Default value is NULL.
 #'
+#'@param ... Additional arguments
 #' \tabular{ll}{
 #' \code{x_lab} \tab character string to be used for x-axis label. Defaults to NULL, in which case a default label is used. \cr
 #' \code{y_lab} \tab character string to be used for y-axis label. Defaults to NULL, in which case a default label is used. \cr
-#' \code{legend_lab} \tab character string specifying the title label to use for the legend \cr
 #' \code{title_plot} \tab character string to be used for the plot title. Defaults to NULL, in which case a default title is used. \cr
 #' \code{title_size} \tab integer value specifying the font size for the plot title. Default is 14. \cr
 #' \code{x_lab_size} \tab integer value indicating the font size for the x-axis. Defaults to 11. \cr
 #' \code{y_lab_size} \tab integer value indicating the font size for the y-axis. Defaults to 11. \cr
 #' \code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used. \cr
-#' \code{legend_position} \tab character string specifying one of "right", "left", "top", or "bottom" for the location of the legend. Defaults to "right". \cr
 #' }
 plot.cvFilt <- function(filter_object, cv_threshold = NULL, ...) {
   .plot.cvFilt(filter_object, cv_threshold, ...)
@@ -969,6 +1002,7 @@ plot.customFilt <- function(filter_object, ...) {
 #'@param facet_by a character string specifying a main effect with which to create a facet plot. This main effect must be found in the column names of f_data in the omicsData object. Default value is NULL.
 #'@param facet_cols an optional integer specifying the number of columns to show in the facet plot.
 #'
+#'@param ... Additional arguments
 #' \tabular{ll}{
 #' \code{x_lab} \tab character string to be used for x-axis label. Defaults to NULL, in which case a default label is used. \cr
 #' \code{y_lab} \tab character string to be used for y-axis label. Defaults to NULL, in which case a default label is used. \cr
@@ -1218,7 +1252,6 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
   p <- p + ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90)) + ggplot2::xlab("Sample") +
     ggplot2::ggtitle(title) + ggplot2::xlab(xlabel) + ggplot2::ylab(ylabel) +
     ggplot2::scale_fill_discrete(legend_title)
-  
   
   if(!is.null(ylimit))
   {

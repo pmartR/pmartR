@@ -14,8 +14,9 @@
 
 \item{facet_by}{a character string specifying a main effect with which to create a facet plot. This main effect must be found in the column names of f_data in the omicsData object. Default value is NULL.}
 
-\item{facet_cols}{an optional integer specifying the number of columns to show in the facet plot.
+\item{facet_cols}{an optional integer specifying the number of columns to show in the facet plot.}
 
+\item{...}{Additional arguments
 \tabular{ll}{
 \code{x_lab} \tab character string to be used for x-axis label. Defaults to NULL, in which case a default label is used. \cr
 \code{y_lab} \tab character string to be used for y-axis label. Defaults to NULL, in which case a default label is used. \cr

@@ -16,9 +16,9 @@ statRes_output(imd_out, omicsData, comparisons, test_method, pval_adjust,
 
 \item{test_method}{the test method}
 
-\item{pval_ajust}{pvalue adjustment method}
+\item{pval_adjust}{pvalue adjustment method}
 
-\item{pval_thres}{p-value threshold value}
+\item{pval_thresh}{p-value threshold value}
 }
 \value{
 the final object of class statRes

@@ -4,23 +4,32 @@
 \alias{plot.moleculeFilt}
 \title{plot.moleculeFilt}
 \usage{
-\method{plot}{moleculeFilt}(filter_object, min_num = NULL, ...)
+\method{plot}{moleculeFilt}(filter_object, min_num = NULL,
+  cumulative = TRUE, ...)
 }
 \arguments{
-\item{min_num}{an integer value specifying the minimum number of times each feature must be observed across all samples.
+\item{min_num}{integer value specifying the minimum number of times each feature must be observed across all samples.  If a value is specified, a horizontal line will be drawn when \code{cumulative=TRUE}, and bars will be colored appropriatel if \code{cumulative=FALSE}.  Defaults to NULL.}
 
+\item{cumulative}{logical indicating whether the number of biomolecules observed in \emph{at least} (TRUE) x number of samples or \emph{exactly} (FALSE) x number of samples should be plotted.  Defaults to TRUE.}
+
+\item{...}{Additional arguments
 \tabular{ll}{
 \code{x_lab} \tab character string to be used for x-axis label. Defaults to NULL, in which case a default label is used. \cr
 \code{y_lab} \tab character string to be used for y-axis label. Defaults to NULL, in which case a default label is used. \cr
-\code{legend_lab} \tab character string specifying the title label to use for the legend \cr
 \code{title_plot} \tab character string to be used for the plot title. Defaults to NULL, in which case a default title is used. \cr
 \code{title_size} \tab integer value specifying the font size for the plot title. Default is 14. \cr
 \code{x_lab_size} \tab integer value indicating the font size for the x-axis. Defaults to 11. \cr
 \code{y_lab_size} \tab integer value indicating the font size for the y-axis. Defaults to 11. \cr
 \code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used. \cr
-\code{legend_position} \tab character string specifying one of "right", "left", "top", or "bottom" for the location of the legend. Defaults to "right". \cr
 }}
 }
 \description{
 For plotting an S3 object of type 'moleculeFilt':
+}
+\examples{
+data(pep_object)
+molfilt <- molecule_filter(pep_object)
+plot(molfilt, min_num = 5)
+plot(molfilt, min_num = 3, cumulative = FALSE)
+
 }
