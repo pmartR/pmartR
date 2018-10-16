@@ -4,20 +4,26 @@
 \alias{plot.corRes}
 \title{plot.corRes}
 \usage{
-\method{plot}{corRes}(corRes_object, ...)
+\method{plot}{corRes}(corRes_object, omicsData = NULL,
+  interactive = FALSE, x_lab = TRUE, y_lab = TRUE,
+  colorbar_lim = c(NA, NA), ...)
 }
 \arguments{
+\item{omicsData}{an object of the class 'pepData', 'proData', 'metabData', or 'lipidData', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.}
+
 \item{interactive}{default value is FALSE. If TRUE, an interactive d3heatmap will be rendered, allowing you to zoom in on sections of the heatmap.}
 
 \item{x_lab}{logical indicator of whether to label the x-axis with the sample names. Defaults to TRUE. If FALSE, no x-axis labels are included in the plot.}
 
 \item{y_lab}{logical indicator of whether to label the y-axis with the sample names. Defaults to TRUE. If FALSE, no y-axis labels are included in the plot.}
 
-\item{colorbar_lim}{numeric pair of numeric values specifying the minimum and maximum values to use in the heatmap color bar. Defaults to 'c(NA, NA)', in which case ggplot2 automatically sets the minimum and maximum values based on the correlation values in the data.
+\item{colorbar_lim}{numeric pair of numeric values specifying the minimum and maximum values to use in the heatmap color bar. Defaults to 'c(NA, NA)', in which case ggplot2 automatically sets the minimum and maximum values based on the correlation values in the data.}
 
+\item{...}{Additional arguments
 \tabular{ll}{
 \code{title_plot} \tab character string to be used for the plot title. Defaults to NULL, in which case "Sample Outlier Results /n p-value threshold = 0.xyz" is used, where 'xyz' is the pvalue_threshold supplied to the function. \cr
-\code{title_size} integer value specifying the font size for the plot title. Default is 14. \cr
+\code{title_size} \tab integer value specifying the font size for the plot title. Default is 14. \cr
+\code{use_VizSampNames} \tab logical specifies whether to use custom sample names \cr
 }}
 }
 \description{

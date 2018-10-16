@@ -10,7 +10,7 @@ qrollup(pepData, qrollup_thresh, combine_fn = "median",
 \arguments{
 \item{pepData}{an omicsData object of class 'pepData'}
 
-\item{qrollup_thresh}{is a numeric value; is the peptide abundance cutoff value.}
+\item{qrollup_thresh}{numeric value between 0 and 1 inclusive. Peptides above this threshold are used to roll up to the protein level}
 
 \item{combine_fn}{logical indicating what combine_fn to use, defaults to median, other option is mean}
 

@@ -41,6 +41,16 @@ This function takes in a statRes object and plots log2 fold change vs -log10 t-T
 }
 \examples{
 dontrun{
+library(pmartR)
+library(pmartRdata)
+
+myproData <- group_designation(omicsData = pro_object, main_effects = c("Condition"))
+
+imdanova_Filt <- imdanova_filter(omicsData = myproData)
+myproData <- applyFilt(filter_object = imdanova_Filt, omicsData = myproData, min_nonmiss_anova=2)
+
+statRes_object <- imd_anova(omicsData = myproData, test_method = 'comb', pval_adjust='bon')
+
 missingval_volcanoplot(statRes_object, comparison = 2, palette = "Set1")
 missingval_volcanoplot(statRes_object, comparison = 3, pvalue_threshold = .005, palette = "Dark2", x_lab_angle = 45)
 
