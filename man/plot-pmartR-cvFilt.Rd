@@ -7,10 +7,11 @@
 \method{plot}{cvFilt}(filter_object, cv_threshold = NULL, ...)
 }
 \arguments{
-\item{cv_threshold}{shades the area on the histogram below the given threshold. Default value is NULL.}
+\item{cv_threshold}{draws a vertical line at the pooled cv cutoff, values to the left of this cutoff are dropped if the filter is applied.}
 
 \item{...}{Additional arguments
 \tabular{ll}{
+\code{log_scale} \tab logical indicating whether to use a log2 transformed x-axis. Defaults to TRUE.\cr
 \code{x_lab} \tab character string to be used for x-axis label. Defaults to NULL, in which case a default label is used. \cr
 \code{y_lab} \tab character string to be used for y-axis label. Defaults to NULL, in which case a default label is used. \cr
 \code{title_plot} \tab character string to be used for the plot title. Defaults to NULL, in which case a default title is used. \cr
@@ -22,4 +23,13 @@
 }
 \description{
 For plotting an S3 object of type 'cvFilt':
+}
+\examples{
+data(pep_object)
+pep_object <- group_designation(omicsData = pep_object, main_effects = "Condition")
+cvfilt <- cv_filter(pep_object)
+
+plot(cvfilt, cv_threshold = 20)
+plot(cvfilt, cv_threshold = 10, log_scale = FALSE)
+
 }

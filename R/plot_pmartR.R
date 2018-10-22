@@ -901,10 +901,11 @@ plot.rmdFilt <- function(filter_object, pvalue_threshold = NULL, sampleID = NULL
 #' 
 #'@export
 #'@rdname plot-pmartR-cvFilt
-#'@param cv_threshold shades the area on the histogram below the given threshold. Default value is NULL.
+#'@param cv_threshold draws a vertical line at the pooled cv cutoff, values to the left of this cutoff are dropped if the filter is applied.
 #'
 #'@param ... Additional arguments
 #' \tabular{ll}{
+#' \code{log_scale} \tab logical indicating whether to use a log2 transformed x-axis. Defaults to TRUE.\cr
 #' \code{x_lab} \tab character string to be used for x-axis label. Defaults to NULL, in which case a default label is used. \cr
 #' \code{y_lab} \tab character string to be used for y-axis label. Defaults to NULL, in which case a default label is used. \cr
 #' \code{title_plot} \tab character string to be used for the plot title. Defaults to NULL, in which case a default title is used. \cr
@@ -913,11 +914,20 @@ plot.rmdFilt <- function(filter_object, pvalue_threshold = NULL, sampleID = NULL
 #' \code{y_lab_size} \tab integer value indicating the font size for the y-axis. Defaults to 11. \cr
 #' \code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used. \cr
 #' }
+#' 
+#' @examples
+#' data(pep_object)
+#' pep_object <- group_designation(omicsData = pep_object, main_effects = "Condition")
+#' cvfilt <- cv_filter(pep_object)
+#' 
+#' plot(cvfilt, cv_threshold = 20)
+#' plot(cvfilt, cv_threshold = 10, log_scale = FALSE)
+#' 
 plot.cvFilt <- function(filter_object, cv_threshold = NULL, ...) {
   .plot.cvFilt(filter_object, cv_threshold, ...)
 }
 
-.plot.cvFilt <- function(filter_object, cv_threshold = NULL, x_lab = NULL, y_lab = NULL, title_plot = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme = FALSE) {
+.plot.cvFilt <- function(filter_object, cv_threshold = NULL, log_scale = TRUE, x_lab = NULL, y_lab = NULL, title_plot = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme = FALSE) {
   
   # checks for cv_threshold if not null
   if(!is.null(cv_threshold)) {
@@ -929,49 +939,58 @@ plot.cvFilt <- function(filter_object, cv_threshold = NULL, ...) {
     if(cv_threshold <= 1 | cv_threshold >= max(filter_object$CV_pooled, na.rm = TRUE)) stop("cv_threshold must be greater than 1 and less than the maximum CV_pooled value")
   }
   
+  if(!is.logical(log_scale)) stop("log_scale must be logical: TRUE or FALSE")
+  
+  # plotting object
   new_object <- filter_object[!is.na(filter_object$CV_pooled),]
   max_x_val <- attributes(filter_object)$max_x_val
-  
-  # get number of biomolecules with CV > max_x_val & display a warning #
-  n_not_displayed <- sum(new_object$CV_pooled > max_x_val)
-  message(paste("For display purposes, biomolecules with pooled CV greater than ", round(max_x_val, 2), " are not displayed in the graph. This corresponds to ", n_not_displayed, " biomolecules.", sep=""))
   
   # labels
   plot_title <- ifelse(is.null(title_plot), "Coefficient of Variation (CV)", title_plot)
   xlabel <- ifelse(is.null(x_lab), "Pooled CV", x_lab)
   ylabel <- ifelse(is.null(y_lab), "Count", y_lab)
   
-  if(bw_theme==FALSE){
-    p <- ggplot2::ggplot(new_object) +
-      ggplot2::geom_histogram(ggplot2::aes(x=CV_pooled), fill = "steelblue1", breaks = seq(0,max_x_val,length.out = 20)) +
-      ggplot2::scale_x_continuous(breaks = pretty(new_object$CV_pooled[new_object$CV_pooled < max_x_val], n=10), limits = c(0, max_x_val)) +
-      ggplot2::scale_y_continuous(breaks = scales::pretty_breaks(n=5)) +
-      ggplot2::ggtitle(plot_title) +
-      ggplot2::xlab(xlabel) + ggplot2::ylab(ylabel) +
-      ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                     axis.title.x = ggplot2::element_text(size=x_lab_size),
-                     axis.title.y = ggplot2::element_text(size=y_lab_size))
-  }else{
-    p <- ggplot2::ggplot(new_object) +
-      ggplot2::theme_bw() +
-      ggplot2::geom_histogram(ggplot2::aes(x=CV_pooled), fill = "steelblue1", breaks = seq(0,max_x_val,length.out = 20)) +
-      ggplot2::scale_x_continuous(breaks = pretty(new_object$CV_pooled[new_object$CV_pooled < max_x_val], n=10), limits = c(0, max_x_val)) +
-      ggplot2::scale_y_continuous(breaks = scales::pretty_breaks(n=5)) +
-      ggplot2::ggtitle(plot_title) +
-      ggplot2::xlab(xlabel) + ggplot2::ylab(ylabel) +
-      ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                     axis.title.x = ggplot2::element_text(size=x_lab_size),
-                     axis.title.y = ggplot2::element_text(size=y_lab_size))
+  ### Store ggplot2 layers
+  
+  # bw theme
+  bw = if(bw_theme) ggplot2::theme_bw() else NULL
+  
+  # scale transform and breaks depending on x-axis scale
+  if(log_scale){
+    trans <- "log2"
+    i <- 0
+    breaks <- 0
+    while(2^i < max(new_object$CV_pooled, na.rm = TRUE)){
+      breaks <- c(breaks, 2^i)
+      i <- i+1
+    }
   }
-  
-  
+  else{
+    breaks <- scales::pretty_breaks()
+    trans <- "identity" 
+  }
+ 
+  # change default title and draw a vertical line if cv_thresh specified
   if(!is.null(cv_threshold)) {
     if(is.null(title_plot)) {
-      plot_title <- bquote(atop("Coefficient of Variation (CV)",atop(italic(paste("CV Threshold = ",.(cv_threshold))),"")))
+      plot_title <- bquote(paste("Coefficient of Variation (CV):  ",italic(paste("CV Threshold = ",.(cv_threshold))),""))
     }
-    p <- p + ggplot2::annotate("rect", xmin = 0, xmax = cv_threshold, ymin = 0, ymax = Inf, alpha = 0.3, fill = "steelblue1") +
-      ggplot2::ggtitle(plot_title)
+    cutoff <- ggplot2::geom_vline(xintercept = cv_threshold)
+  }else{
+    cutoff <- NULL
   }
+  
+  # main plot object
+  p <- ggplot2::ggplot(new_object) +
+    ggplot2::geom_histogram(ggplot2::aes(x=CV_pooled), fill = "steelblue1") + 
+    cutoff + bw +
+    ggplot2::scale_x_continuous(breaks = breaks, trans = trans) +
+    ggplot2::scale_y_continuous(breaks = scales::pretty_breaks(n=5)) +
+    ggplot2::ggtitle(plot_title) +
+    ggplot2::xlab(xlabel) + ggplot2::ylab(ylabel) + 
+    ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
+                   axis.title.x = ggplot2::element_text(size=x_lab_size),
+                   axis.title.y = ggplot2::element_text(size=y_lab_size))
   
   return(p)
 }
