@@ -906,6 +906,7 @@ plot.rmdFilt <- function(filter_object, pvalue_threshold = NULL, sampleID = NULL
 #'@param ... Additional arguments
 #' \tabular{ll}{
 #' \code{log_scale} \tab logical indicating whether to use a log2 transformed x-axis. Defaults to TRUE.\cr
+#' \bode{n_breaks} \tab integer value specifying the number of breaks to use.  You may get less breaks if rounding causes certain values to become non-unique.  Defaults to 15. \cr
 #' \code{x_lab} \tab character string to be used for x-axis label. Defaults to NULL, in which case a default label is used. \cr
 #' \code{y_lab} \tab character string to be used for y-axis label. Defaults to NULL, in which case a default label is used. \cr
 #' \code{title_plot} \tab character string to be used for the plot title. Defaults to NULL, in which case a default title is used. \cr
@@ -927,7 +928,7 @@ plot.cvFilt <- function(filter_object, cv_threshold = NULL, ...) {
   .plot.cvFilt(filter_object, cv_threshold, ...)
 }
 
-.plot.cvFilt <- function(filter_object, cv_threshold = NULL, log_scale = TRUE, x_lab = NULL, y_lab = NULL, title_plot = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme = FALSE) {
+.plot.cvFilt <- function(filter_object, cv_threshold = NULL, log_scale = TRUE, n_breaks = 15, x_lab = NULL, y_lab = NULL, title_plot = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme = FALSE) {
   
   # checks for cv_threshold if not null
   if(!is.null(cv_threshold)) {
@@ -958,15 +959,22 @@ plot.cvFilt <- function(filter_object, cv_threshold = NULL, ...) {
   # scale transform and breaks depending on x-axis scale
   if(log_scale){
     trans <- "log2"
-    i <- 0
+    i <- log2(min(new_object$CV_pooled, na.rm = TRUE))
     breaks <- 0
+    
+    # define a step value that is evenly spaced in the log2 scale
+    step = (max(log2(new_object$CV_pooled), na.rm = TRUE) - min(log2(new_object$CV_pooled), na.rm = TRUE))/n_breaks
+    
+    # create the normal scale labels that will be log2 transformed when passed to ggplot
     while(2^i < max(new_object$CV_pooled, na.rm = TRUE)){
       breaks <- c(breaks, 2^i)
-      i <- i+1
+      i <- i+step
     }
+    # rounding for plot purposes
+    breaks <- round(breaks, 2)
   }
   else{
-    breaks <- scales::pretty_breaks()
+    breaks <- scales::pretty_breaks(n = n_breaks)
     trans <- "identity" 
   }
  
