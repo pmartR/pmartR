@@ -366,7 +366,7 @@ plot.proteomicsFilt <- function(filter_object, mapping = "both", cumulative = TR
     if(cumulative){
       # get counts of peptides that are mapped to by AT LEAST the number of proteins given in pep_bins
       pep_counts <- sapply(pep_bins, function(x){
-        filter_object$counts_by_pep[filter_object$counts_by_pep >= x,] %>% nrow()
+        filter_object$counts_by_pep[filter_object$counts_by_pep$n >= x,] %>% nrow()
       })
       
       # get counts of proteins that are mapped to by AT LEAST the number of peptides given in pro_bins
@@ -472,7 +472,7 @@ plot.proteomicsFilt <- function(filter_object, mapping = "both", cumulative = TR
       
       # text annotation (peptide count plot has too many bins to make this an option) 
       # data argument shaves off last row that is only used to extend last step in cumulative plot
-      text <- ggplot2::geom_text(data = pep_counts_df[pep_counts_df$bins <= max(filter_object$counts_by_pep$n),], ggplot2::aes(x = bins, y = counts, label = counts), vjust = -1, hjust = ifelse(cumulative, -0.5, 0.5))
+      text <- ggplot2::geom_text(data = pep_counts_df[pep_counts_df$bins <= max(filter_object$counts_by_pep$n),], ggplot2::aes(x = bins, y = counts, label = counts), vjust = -1, hjust = ifelse(cumulative & (length(pep_counts) > 1), -0.5, 0.5))
       
       p2 <- ggplot2::ggplot(pep_counts_df) +
         shape_pep + text + scale_pep +
@@ -906,7 +906,7 @@ plot.rmdFilt <- function(filter_object, pvalue_threshold = NULL, sampleID = NULL
 #'@param ... Additional arguments
 #' \tabular{ll}{
 #' \code{log_scale} \tab logical indicating whether to use a log2 transformed x-axis. Defaults to TRUE.\cr
-#' \bode{n_breaks} \tab integer value specifying the number of breaks to use.  You may get less breaks if rounding causes certain values to become non-unique.  Defaults to 15. \cr
+#' \code{n_breaks} \tab integer value specifying the number of breaks to use.  You may get less breaks if rounding causes certain values to become non-unique.  Defaults to 15. \cr
 #' \code{x_lab} \tab character string to be used for x-axis label. Defaults to NULL, in which case a default label is used. \cr
 #' \code{y_lab} \tab character string to be used for y-axis label. Defaults to NULL, in which case a default label is used. \cr
 #' \code{title_plot} \tab character string to be used for the plot title. Defaults to NULL, in which case a default title is used. \cr

@@ -12,6 +12,7 @@
 \item{...}{Additional arguments
 \tabular{ll}{
 \code{log_scale} \tab logical indicating whether to use a log2 transformed x-axis. Defaults to TRUE.\cr
+\code{n_breaks} \tab integer value specifying the number of breaks to use.  You may get less breaks if rounding causes certain values to become non-unique.  Defaults to 15. \cr
 \code{x_lab} \tab character string to be used for x-axis label. Defaults to NULL, in which case a default label is used. \cr
 \code{y_lab} \tab character string to be used for y-axis label. Defaults to NULL, in which case a default label is used. \cr
 \code{title_plot} \tab character string to be used for the plot title. Defaults to NULL, in which case a default title is used. \cr
