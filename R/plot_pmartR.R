@@ -906,7 +906,12 @@ plot.rmdFilt <- function(filter_object, pvalue_threshold = NULL, sampleID = NULL
 #'@param ... Additional arguments
 #' \tabular{ll}{
 #' \code{log_scale} \tab logical indicating whether to use a log2 transformed x-axis. Defaults to TRUE.\cr
+<<<<<<< Updated upstream
 #' \code{n_breaks} \tab integer value specifying the number of breaks to use.  You may get less breaks if rounding causes certain values to become non-unique.  Defaults to 15. \cr
+=======
+#' \code{n_bins} \tab integer value specifying the number of bins to draw in the histogram.  Defaults to 30. \cr
+#' \bode{n_breaks} \tab integer value specifying the number of breaks to use.  You may get less breaks if rounding causes certain values to become non-unique.  Defaults to 15. \cr
+>>>>>>> Stashed changes
 #' \code{x_lab} \tab character string to be used for x-axis label. Defaults to NULL, in which case a default label is used. \cr
 #' \code{y_lab} \tab character string to be used for y-axis label. Defaults to NULL, in which case a default label is used. \cr
 #' \code{title_plot} \tab character string to be used for the plot title. Defaults to NULL, in which case a default title is used. \cr
@@ -928,7 +933,7 @@ plot.cvFilt <- function(filter_object, cv_threshold = NULL, ...) {
   .plot.cvFilt(filter_object, cv_threshold, ...)
 }
 
-.plot.cvFilt <- function(filter_object, cv_threshold = NULL, log_scale = TRUE, n_breaks = 15, x_lab = NULL, y_lab = NULL, title_plot = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme = FALSE) {
+.plot.cvFilt <- function(filter_object, cv_threshold = NULL, log_scale = TRUE, n_breaks = 15, n_bins = 30, x_lab = NULL, y_lab = NULL, title_plot = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme = FALSE) {
   
   # checks for cv_threshold if not null
   if(!is.null(cv_threshold)) {
@@ -941,6 +946,8 @@ plot.cvFilt <- function(filter_object, cv_threshold = NULL, ...) {
   }
   
   if(!is.logical(log_scale)) stop("log_scale must be logical: TRUE or FALSE")
+  if(!(n_breaks%%1 == 0)) stop("n_breaks must be integer valued")
+  if(!(n_bins%%1 == 0)) stop("n_bins must be integer valued")
   
   # plotting object
   new_object <- filter_object[!is.na(filter_object$CV_pooled),]
@@ -990,7 +997,7 @@ plot.cvFilt <- function(filter_object, cv_threshold = NULL, ...) {
   
   # main plot object
   p <- ggplot2::ggplot(new_object) +
-    ggplot2::geom_histogram(ggplot2::aes(x=CV_pooled), fill = "steelblue1") + 
+    ggplot2::geom_histogram(ggplot2::aes(x=CV_pooled), bins = n_bins, fill = "steelblue1") + 
     cutoff + bw +
     ggplot2::scale_x_continuous(breaks = breaks, trans = trans) +
     ggplot2::scale_y_continuous(breaks = scales::pretty_breaks(n=5)) +
