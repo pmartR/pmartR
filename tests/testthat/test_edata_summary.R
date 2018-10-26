@@ -35,10 +35,12 @@ test_that("by molecule throws errors", {
 })
 
 test_that("test correctness of some output", {
-  summary1 <- edata_summary(pep_object, by = "molecule", groupvar = "fakegroup3")
-  summary2 <- edata_summary(pep_object, by = "molecule", groupvar = "fakegroup2")
-  summary3 <- edata_summary(pep_object, by = "molecule", groupvar = c("Condition", "fakegroup3"))
-  summary4 <- edata_summary(pep_object, by = "sample")
+  suppressWarnings({
+    summary1 <- edata_summary(pep_object, by = "molecule", groupvar = "fakegroup3")
+    summary2 <- edata_summary(pep_object, by = "molecule", groupvar = "fakegroup2")
+    summary3 <- edata_summary(pep_object, by = "molecule", groupvar = c("Condition", "fakegroup3"))
+    summary4 <- edata_summary(pep_object, by = "sample")
+  })
   
   expect_true(nrow(summary1$n_per_grp) == 1)
   expect_true(nrow(summary2$n_per_grp) == 3)

@@ -2625,7 +2625,6 @@ plot.normRes <- function(normData, order_by = NULL, color_by = NULL, ...) {
     gridExtra:::grid.arrange(p, p_norm, ncol=1)
   }
   
-  
-  #return(list(p, p_norm))
+  invisible(list(p, p_norm))
 }
 
