@@ -1,6 +1,6 @@
-#' Calculate Normalization Parameters
+#' Calculate SPANS Score for a Number of Normalization Methods
 #'
-#' Calculates normalization parameters based on the data using the specified subset and normalization functions with possibility of apply the normalization to the data.
+#' Ranks different combinations of subsetting and normalization methods based on a score that captures how much bias a particular normalization procedure introduces into the data.  Higher score implies less bias.
 #'
 #' @param omicsData an object of the class 'pepData' or 'proData' created by \code{\link{as.pepData}} or \code{\link{as.proData}} respectively. The data must be log transformed (using edata_transform()) and have a grouping structure, usually set by calling group_designation() on the object. 
 #' @param subset_fn character vector indicating which subset functions to test. See details for the current offerings.
@@ -16,6 +16,8 @@
 #' @param ... Additional arguments
 #' \tabular{ll}{
 #' \code{location_thresh, scale_thresh} The minimum p-value resulting from a Kruskal-Wallis test on the location and scale parameters resulting from a normalization method in order for that method to be considered a candidate for scoring.  
+#' \code{verbose} Logical specifying whether to print the completion of SPANS procedure steps to console.  Defaults to TRUE.
+#' \code{parrallel} Logical specifying whether to use a parrallel backend.  Depending on the size of your data, setting this FALSE can cause the algorithm to be very slow.  Defaults to TRUE.
 #' }
 #'@details Below are details for specifying function and parameter options.
 #' @section Subset Functions:
@@ -60,6 +62,8 @@
 #'
 #' @author Daniel Claborne
 #'
+#' @references Webb-Robertson BJ, Matzke MM, Jacobs JM, Pounds JG, Waters KM. A statistical selection strategy for normalization procedures in LC-MS proteomics experiments through dataset-dependent ranking of normalization scaling factors. Proteomics. 2011;11(24):4736-41. 
+#'
 #' @export
 
 spans_procedure <- function(omicsData, norm_fn = c("median", "mean", "zscore", "mad"), subset_fn = c("all", "los", "ppp", "rip", "ppp_rip"), 
@@ -70,7 +74,12 @@ spans_procedure <- function(omicsData, norm_fn = c("median", "mean", "zscore", "
 
   .spans_procedure <- function(omicsData, norm_fn = c("median", "mean", "zscore", "mad"), subset_fn = c("all", "los", "ppp", "rip", "ppp_rip"), 
                             params = NULL, group = NULL, n_iter = 1000, sig_thresh = 0.0001, nonsig_thresh = 0.5, min_nonsig = 20, min_sig = 20,
-                            location_thresh = 0.05, scale_thresh = 0.05){  
+                            location_thresh = 0.05, scale_thresh = 0.05, verbose = TRUE, parrallel = TRUE){ 
+    
+    edata_cname = get_edata_cname(omicsData)
+    fdata_cname = get_fdata_cname(omicsData)
+    nsamps = attributes(omicsData)$data_info$num_samps
+    
     # error checks
     if(!inherits(omicsData, c("pepData", "proData"))) stop("omicsData must be of class 'pepData', or 'proData'")
     
@@ -108,6 +117,15 @@ spans_procedure <- function(omicsData, norm_fn = c("median", "mean", "zscore", "
       if(is.null(params$rip)) stop("params must contain a list element named 'rip'")
       if(!all(checkvals(params$rip))) stop("each element of 'rip' in params must be a numeric value between 0 and 1")
     }
+    
+    if(is.null(group)){
+      group = attr(omicsData, "group_DF")$Group
+    }
+    else{
+      if(!is.character(group) | !(group %in% colnames(omicsData$f_data[,-fdata_cname]))) stop("group must be a string specifying a column in f_data by which to group by")
+      omicsData <- group_designation(omicsData, main_effects = group)
+      group = attr(omicsData, "group_DF")$Group
+    }
       
     # misc input checks
     if(!inherits(attr(omicsData, "group_DF"), "data.frame")) stop("the omicsData object must have a grouping structure, usually set by calling group_designation() on the object")
@@ -119,11 +137,7 @@ spans_procedure <- function(omicsData, norm_fn = c("median", "mean", "zscore", "
     if(!all(norm_fn %in% c("median", "mean", "zscore", "mad"))) stop("norm_fn must be a character vector containing more than one of the elements 'median', 'mean', 'zscore', 'mad'")
     if(is.null(attr(omicsData, "group_DF"))) stop("omicsData object must have a grouping structure set by calling group_designation()")
     
-    ### end error checking ###
-    
-    edata_cname = get_edata_cname(omicsData)
-    group = attr(omicsData, "group_DF")$Group
-    nsamps = attributes(omicsData)$data_info$num_samps
+    ### end main error checking ###
     
     # get indices of significant and nonsignificant p-values
     kw_pvals <- kw_rcpp(omicsData$e_data %>% dplyr::select(-edata_cname) %>% as.matrix(), as.character(group))
@@ -185,10 +199,13 @@ spans_procedure <- function(omicsData, norm_fn = c("median", "mean", "zscore", "
     ### STEP 0:  create random distribution ####
     
     # set up parallel backend
-    cores<- parallel::detectCores()
-    cl<- parallel::makeCluster(cores)
-    on.exit(parallel::stopCluster(cl))
-    doParallel::registerDoParallel(cl)
+    if(parrallel){
+      cores<- parallel::detectCores()
+      cl<- parallel::makeCluster(cores)
+      on.exit(parallel::stopCluster(cl))
+      doParallel::registerDoParallel(cl)
+    } 
+    else foreach::registerDoSEQ()
     
     # get a median significant and non-significant p-value for n_iter iterations
     background_distribution <- foreach::foreach(i = 1:n_iter, .packages = "pmartR", .export = c("spans_make_distribution", "kw_rcpp", "normalize_global_matrix")) %dopar% {
@@ -200,7 +217,7 @@ spans_procedure <- function(omicsData, norm_fn = c("median", "mean", "zscore", "
     sig_cdf <- sapply(background_distribution, function(el){el[[1]]}) %>% ecdf()
     nonsig_cdf <- sapply(background_distribution, function(el){el[[2]]}) %>% ecdf()
     
-    print("Finished creating background distribution, moving to STEP 1")
+    if(verbose) print("Finished creating background distribution, moving to method candidate selection")
     
     #### STEP 1:  
     # determine which methods (subset function + normalization function + parameters combination) will be assessed in step 2.
@@ -223,7 +240,7 @@ spans_procedure <- function(omicsData, norm_fn = c("median", "mean", "zscore", "
       
     }
     
-    print("Finished method candidate selection")
+    if(verbose) print("Finished method candidate selection, proceeding to score selected methods.")
     
     # STEP 2: Score each method that passed step 1 by normalizing the full data and getting median Kruskal-Wallis p-values for significant and nonsignificant peptides
     
@@ -232,8 +249,8 @@ spans_procedure <- function(omicsData, norm_fn = c("median", "mean", "zscore", "
         norm_data <- normalize_global(omicsData, el$subset_fn, el$norm_fn, params = el$params, apply_norm = TRUE)
         abundance_matrix <- norm_data$e_data %>% dplyr::select(-edata_cname) %>% as.matrix()
         
-        sig_score <- -log10(median(kw_rcpp(abundance_matrix[sig_inds,], group = as.character(group))))
-        non_sig_score <- log10(median(kw_rcpp(abundance_matrix[nonsig_inds,], group = as.character(group))))
+        sig_score <- -log10(median(kw_rcpp(abundance_matrix[sig_inds,], group = as.character(group)), na.rm = TRUE))
+        non_sig_score <- log10(median(kw_rcpp(abundance_matrix[nonsig_inds,], group = as.character(group)), na.rm = TRUE))
         
         score <- (sig_cdf(sig_score) + nonsig_cdf(non_sig_score))/2
         
@@ -242,7 +259,7 @@ spans_procedure <- function(omicsData, norm_fn = c("median", "mean", "zscore", "
       else return(NA)
     }
     
-    print("Finished scoring selected methods")
+    if(verbose) print("Finished scoring selected methods")
     
     # create dataframe with selected methods
     results <- data.frame("subset method" = character(n_methods), "normalization method" = character(n_methods), "SPANS_score" = character(n_methods), 
@@ -270,8 +287,15 @@ spans_procedure <- function(omicsData, norm_fn = c("median", "mean", "zscore", "
     extra_info <- dplyr::arrange(extra_info, desc(results$SPANS_score))
     
     spansres_obj <- list(results)
+    attr(spansres_obj, "intermediate_values") <- extra_info
+    attr(spansres_obj, "group_vector") = group
+    attr(spansres_obj, "significant_thresh") = sig_thresh
+    attr(spansres_obj, "nonsignificant_thresh") = nonsig_thresh
+    attr(spansres_obj, "n_not_significant") = sum(nonsig_inds)
+    attr(spansres_obj, "n_significant") = sum(sig_inds)
+    attr(spansres_obj, "location_threshold") = location_thresh
+    attr(spansres_obj, "scale_thresh") = scale_thresh
     class(spansres_obj) <- "SPANSres"
-    attr(spansres_obj, "extra_info") <- extra_info
     
     return(spansres_obj)
   

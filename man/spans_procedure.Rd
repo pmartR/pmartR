@@ -2,7 +2,7 @@
 % Please edit documentation in R/spans.R
 \name{spans_procedure}
 \alias{spans_procedure}
-\title{Calculate Normalization Parameters}
+\title{Calculate SPANS Score for a Number of Normalization Methods}
 \usage{
 spans_procedure(omicsData, norm_fn = c("median", "mean", "zscore",
   "mad"), subset_fn = c("all", "los", "ppp", "rip", "ppp_rip"),
@@ -36,7 +36,7 @@ spans_procedure(omicsData, norm_fn = c("median", "mean", "zscore",
 }}
 }
 \description{
-Calculates normalization parameters based on the data using the specified subset and normalization functions with possibility of apply the normalization to the data.
+Ranks different combinations of subsetting and normalization methods based on a score that captures how much bias a particular normalization procedure introduces into the data.  Higher score implies less bias.
 }
 \details{
 Below are details for specifying function and parameter options.
@@ -87,6 +87,9 @@ pep_object <- group_designation(pep_object, main_effects = "Condition")
 # spans_res <- spans_procedure(pep_object, subset_fn = c("all", "los", "ppp"), params = list(los = list(0.25, 0.5), ppp = list(0.15, 0.25)))
 # spans_res <- spans_procedure(pep_object, subset_fn = c("all", "rip", "ppp_rip"), params = list(rip = list(0.3, 0.4), ppp_rip = list(c(0.15, 0.5), c(0.25, 0.5))))
 
+}
+\references{
+Webb-Robertson BJ, Matzke MM, Jacobs JM, Pounds JG, Waters KM. A statistical selection strategy for normalization procedures in LC-MS proteomics experiments through dataset-dependent ranking of normalization scaling factors. Proteomics. 2011;11(24):4736-41.
 }
 \author{
 Daniel Claborne
