@@ -178,7 +178,7 @@ std::list<double> kw_rcpp(arma::mat mtr,std::vector<std::string> group)
 
             if((groups.size()-all_na_count) < 2)
             {
-              final.push_back(0);
+              final.push_back(NA_REAL);
               nonmiss.clear();
               groups.clear();
             }
@@ -236,7 +236,7 @@ std::list<double> kw_rcpp(arma::mat mtr,std::vector<std::string> group)
       
                 h = calculate_kwh(ranks,nonmiss);
                 p = compute_pvalue(h,nonmiss);
-        
+                
                 final.push_back(p);
       
                 nonmiss.clear();

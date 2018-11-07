@@ -678,10 +678,10 @@ plot.imdanovaFilt <- function(filter_object, min_nonmiss_anova = NULL, min_nonmi
 #' \code{y_lab} \tab character string to be used for y-axis label. Defaults to NULL, in which case a default label is used. \cr
 #' \code{legend_lab} \tab character string specifying the title label to use for the legend \cr
 #' \code{title_plot} \tab character string to be used for the plot title. Defaults to NULL, in which case a default title is used. \cr
-#' \code{title_size} \tab integer value indicating the font size for the plot title. Defaults to 14.
-#' \code{x_lab_size} \tab integer value indicating the font size for the plot title. Defaults to 11.
-#' \code{y_lab_size} \tab integer value indicating the font size for the plot title. Defaults to 11.
-#' \code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used.
+#' \code{title_size} \tab integer value indicating the font size for the plot title. Defaults to 14.\cr
+#' \code{x_lab_size} \tab integer value indicating the font size for the plot title. Defaults to 11.\cr
+#' \code{y_lab_size} \tab integer value indicating the font size for the plot title. Defaults to 11.\cr
+#' \code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used.\cr
 #' \code{legend_position} \tab character string specifying one of "right", "left", "top", or "bottom" for the location of the legend. Deafults to "right".
 #'} 
 plot.rmdFilt <- function(filter_object, pvalue_threshold = NULL, sampleID = NULL, ...) {
@@ -907,7 +907,7 @@ plot.rmdFilt <- function(filter_object, pvalue_threshold = NULL, sampleID = NULL
 #' \tabular{ll}{
 #' \code{log_scale} \tab logical indicating whether to use a log2 transformed x-axis. Defaults to TRUE.\cr
 #' \code{n_bins} \tab integer value specifying the number of bins to draw in the histogram.  Defaults to 30. \cr
-#' \bode{n_breaks} \tab integer value specifying the number of breaks to use.  You may get less breaks if rounding causes certain values to become non-unique.  Defaults to 15. \cr
+#' \code{n_breaks} \tab integer value specifying the number of breaks to use.  You may get less breaks if rounding causes certain values to become non-unique.  Defaults to 15. \cr
 #' \code{x_lab} \tab character string to be used for x-axis label. Defaults to NULL, in which case a default label is used. \cr
 #' \code{y_lab} \tab character string to be used for y-axis label. Defaults to NULL, in which case a default label is used. \cr
 #' \code{title_plot} \tab character string to be used for the plot title. Defaults to NULL, in which case a default title is used. \cr

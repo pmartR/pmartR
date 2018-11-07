@@ -230,7 +230,7 @@ ppp_rip <- function(e_data, edata_id, fdata_id, groupDF, alpha=0.2, proportion=0
   pvals = kw_rcpp(as.matrix(rtemp2), group_dat)
   pvals= data.frame(pvals)
   
-  RIPeps <- as.character(peps[as.numeric(pvals[, 1]) > alpha])
+  RIPeps <- as.character(peps[as.numeric(pvals[, 1]) > alpha & !is.na(as.numeric(pvals[, 1]))])
 
   if(length(RIPeps)<2) stop("There are <2 biomolecules in the subset; cannot proceed.")
 
