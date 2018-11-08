@@ -167,7 +167,7 @@ spans_procedure <- function(omicsData, norm_fn = c("median", "mean", "zscore", "
     
     # get a vector of n_iter sample sizes for randomly selecting peptides to determine normalization factors
     scaling_factor <- sum(!is.na(omicsData$e_data %>% dplyr::select(-edata_cname)))/100
-    select_n <- round(runif(n_iter, nsamps/scaling_factor, 100)*scaling_factor) - nsamps
+    select_n <- ceiling(runif(n_iter, nsamps/scaling_factor, 100)*scaling_factor) - nsamps
     
     ### produce a list with all combinations of subset funcctions, normalization functions, and parameters ###
     all_calls <- list()
@@ -330,7 +330,7 @@ spans_make_distribution <- function(omicsData, norm_fn, sig_inds, nonsig_inds, s
   }
   
   # randomly assign the rest of the indices
-  inds <- c(inds, sample(setdiff(1:length(abundance_matrix), inds), select_n - nsamps))
+  inds <- c(inds, sample(setdiff(which(!is.na(abundance_matrix)), inds), select_n))
   
   # randomly select a normalization method
   rand_norm <- sample(norm_fn ,1)
