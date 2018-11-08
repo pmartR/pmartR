@@ -330,7 +330,7 @@ spans_make_distribution <- function(omicsData, norm_fn, sig_inds, nonsig_inds, s
   }
   
   # randomly assign the rest of the indices
-  inds <- c(inds, sample(setdiff(1:length(abundance_matrix), inds), select_n - nsamps))
+  inds <- c(inds, sample(setdiff(which(!is.na(abundance_matrix)), inds), select_n))
   
   # randomly select a normalization method
   rand_norm <- sample(norm_fn ,1)
