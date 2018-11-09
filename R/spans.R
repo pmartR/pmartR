@@ -262,32 +262,32 @@ spans_procedure <- function(omicsData, norm_fn = c("median", "mean", "zscore", "
     if(verbose) print("Finished scoring selected methods")
     
     # create dataframe with selected methods
-    results <- data.frame("subset method" = character(n_methods), "normalization method" = character(n_methods), "SPANS_score" = character(n_methods), 
-                          "parameters" = character(n_methods), "Passed_Step_1" = logical(n_methods), stringsAsFactors = FALSE)
+    spansres_obj <- data.frame("subset_method" = character(n_methods), "normalization_method" = character(n_methods), "SPANS_score" = numeric(n_methods), 
+                          "parameters" = character(n_methods), "mols_used_in_norm" = numeric(n_methods), "passed_selection" = logical(n_methods), stringsAsFactors = FALSE)
     
-    extra_info <- data.frame("subset method" = character(n_methods), "normalization method" = character(n_methods), "parameters" = character(n_methods), "location_p_value" = numeric(n_methods), "scale_p_value" = numeric(n_methods), "Num_norm_peaks" = numeric(n_methods), stringsAsFactors = FALSE)
+    extra_info <- data.frame("subset method" = character(n_methods), "normalization method" = character(n_methods), "parameters" = character(n_methods), "location_p_value" = numeric(n_methods), "scale_p_value" = numeric(n_methods), stringsAsFactors = FALSE)
     
     # populate the dataframe from which_spans
     for(i in 1:n_methods){
       ss <- which_spans[[i]]$subset_fn
       norm <- which_spans[[i]]$norm_fn
       score <- scores[i]
-      num_peaks <- which_spans[[i]]$n_features_calc
+      num_mols <- which_spans[[i]]$n_features_calc
       params <- which_spans[[i]]$params %>% unlist() %>% as.character() %>% paste(collapse = ";")
       p_loc <- which_spans[[i]]$step1_pvals[1]
       p_scale <- which_spans[[i]]$step1_pvals[2]
       pass_fail <- which_spans[[i]]$passfail
       
       # store into row of df
-      results[i,] <- c(ss, norm, score, params, pass_fail)
-      extra_info[i, ] <- c(ss, norm, params, p_loc, p_scale, num_peaks)
+      spansres_obj[i,] <- c(ss, norm, score, params, num_mols, pass_fail)
+      extra_info[i, ] <- c(ss, norm, params, p_loc, p_scale)
     }
     
-    results <- dplyr::arrange(results, desc(SPANS_score))
-    extra_info <- dplyr::arrange(extra_info, desc(results$SPANS_score))
+    spansres_obj <- dplyr::arrange(spansres_obj, desc(SPANS_score))
+    extra_info <- dplyr::arrange(extra_info, desc(spansres_obj$SPANS_score))
     
-    spansres_obj <- list(results)
-    attr(spansres_obj, "intermediate_values") <- extra_info
+    spansres_obj <- spansres_obj
+    attr(spansres_obj, "method_selection_pvals") <- extra_info
     attr(spansres_obj, "group_vector") = group
     attr(spansres_obj, "significant_thresh") = sig_thresh
     attr(spansres_obj, "nonsignificant_thresh") = nonsig_thresh
@@ -295,7 +295,7 @@ spans_procedure <- function(omicsData, norm_fn = c("median", "mean", "zscore", "
     attr(spansres_obj, "n_significant") = sum(sig_inds)
     attr(spansres_obj, "location_threshold") = location_thresh
     attr(spansres_obj, "scale_thresh") = scale_thresh
-    class(spansres_obj) <- "SPANSres"
+    class(spansres_obj) <- c("SPANSRes", "data.frame")
     
     return(spansres_obj)
   
