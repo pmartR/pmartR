@@ -21,8 +21,14 @@
 #' }
 #'@details Below are details for specifying function and parameter options.
 #' @section Subset Functions:
-#' Specifying a subset function indicates the subset of features (rows of \code{e_data}) that should be used for computing normalization factors. The following are valid options: "all", "los", "ppp", "rip", and "ppp_rip". The option "all" is the subset that includes all features (i.e. no subsetting is done). The option "los" identifies the subset of the features associated with the top \code{L}, where \code{L} is a proportion between 0 and 1, order statistics. Specifically, the features with the top \code{L} proportion of highest absolute abundance are retained for each sample, and the union of these features is taken as the subset identified (Wang et al., 2006). The option "ppp" (orignally stands for percentage of peptides present) identifies the subset of features that are present/non-missing for a minimum \code{proportion} of samples (Karpievitch et al., 2009; Kultima et al., 2009). The option "rip" identifies features with complete data that have a p-value greater than a defined threshold \code{alpha} (common values include 0.1 or 0.25) when subjected to a Kruskal-Wallis test based (non-parametric one-way ANOVA) on group membership (Webb-Robertson et al., 2011). The option "ppp_rip" is equivalent to "rip" however rather than requiring features with complete data, features with at least a \code{proportion} of non-missing values are subject to the Kruskal-Wallis test.
-#'
+#' Specifying a subset function indicates the subset of features (rows of \code{e_data}) that should be used for computing normalization factors. The following are valid options: "all", "los", "ppp", "rip", and "ppp_rip". \cr
+#' \tabular{ll}{
+#' \tab "all" is the subset that includes all features (i.e. no subsetting is done). \cr
+#' \tab "los" identifies the subset of the features associated with the top \code{L}, where \code{L} is a proportion between 0 and 1, order statistics. Specifically, the features with the top \code{L} proportion of highest absolute abundance are retained for each sample, and the union of these features is taken as the subset identified (Wang et al., 2006). \cr
+#' \tab "ppp" (orignally stands for percentage of peptides present) identifies the subset of features that are present/non-missing for a minimum \code{proportion} of samples (Karpievitch et al., 2009; Kultima et al., 2009). \cr
+#' \tab"rip" identifies features with complete data that have a p-value greater than a defined threshold \code{alpha} (common values include 0.1 or 0.25) when subjected to a Kruskal-Wallis test based (non-parametric one-way ANOVA) on group membership (Webb-Robertson et al., 2011). \cr
+#' \tab "ppp_rip" is equivalent to "rip" however rather than requiring features with complete data, features with at least a \code{proportion} of non-missing values are subject to the Kruskal-Wallis test.\cr
+#'}
 #' @section Normalization Functions:
 #' Specifying a normalization function indicates how normalization scale and location parameters should be calculated. The following are valid options: "median", "mean", "zscore", and "mad". Parameters for median centering are calculated if "median" is specified. The location estimates are the sample-wise medians of the subset data. There are no scale estimates for median centering. Parameters for mean centering are calculated if "mean" is specified. The location estimates are the sample-wise means of the subset data. There are no scale estimates for median centering. Parameters for z-score transformation are calculated if "zscore" is specified. The location estimates are the subset means for each sample. The scale estimates are the subset standard deviations for each sample. Parameters for median absolute deviation (MAD) transformation are calculated if "mad" is specified.
 #'
@@ -41,8 +47,14 @@
 #' \cr
 #' }
 #' 
-#' @examples 
+#' @return An object of class 'SPANSRes', which is a dataframe containing columns for the subset method and normalization used, the parameters used in the subset method, and the corresponding SPANS score.  \cr
 #' 
+#' The column 'mols_used_in_norm' contains the number of molecules that were selected by the subset method and subsequently used to determine the location/scale parameters for normalization.  The column 'passed selection' is \code{TRUE} if the subset+normalization procedure was selected for scoring.\cr
+#' 
+#' The attribute 'method_selection_pvals' is a dataframe containing information on the p values used to determine if a method was selected for scoring (location_p_value, scale_p_value) as well as the probabilities (F_log_HSmPV, F_log_NSmPV) given by the empirical cdfs generated in the first step of SPANS.
+#' 
+#' 
+#' @examples 
 #' library(pmartR)
 #' library(pmartRdata)
 #' 
@@ -244,7 +256,7 @@ spans_procedure <- function(omicsData, norm_fn = c("median", "mean", "zscore", "
     
     # STEP 2: Score each method that passed step 1 by normalizing the full data and getting median Kruskal-Wallis p-values for significant and nonsignificant peptides
     
-    scores <- foreach::foreach(el = which_spans, .packages = "pmartR", .export = c("kw_rcpp"), .combine = "cbind") %dopar% {
+    scores <- foreach::foreach(el = which_spans, .packages = "pmartR", .export = c("kw_rcpp")) %dopar% {
       if(el$passfail){
         norm_data <- normalize_global(omicsData, el$subset_fn, el$norm_fn, params = el$params, apply_norm = TRUE)
         abundance_matrix <- norm_data$e_data %>% dplyr::select(-edata_cname) %>% as.matrix()
@@ -254,39 +266,43 @@ spans_procedure <- function(omicsData, norm_fn = c("median", "mean", "zscore", "
         
         score <- (sig_cdf(sig_score) + nonsig_cdf(non_sig_score))/2
         
-        return(score)
+        return(list(score, sig_cdf(sig_score), nonsig_cdf(non_sig_score)))
       }
-      else return(NA)
+      else return(list(NA, NA, NA))
     }
     
     if(verbose) print("Finished scoring selected methods")
     
     # create dataframe with selected methods
     spansres_obj <- data.frame("subset_method" = character(n_methods), "normalization_method" = character(n_methods), "SPANS_score" = numeric(n_methods), 
-                          "parameters" = character(n_methods), "mols_used_in_norm" = numeric(n_methods), "passed_selection" = logical(n_methods), stringsAsFactors = FALSE)
+                                "parameters" = character(n_methods), "mols_used_in_norm" = numeric(n_methods), "passed_selection" = logical(n_methods), 
+                                stringsAsFactors = FALSE, check.names = FALSE)
     
-    extra_info <- data.frame("subset method" = character(n_methods), "normalization method" = character(n_methods), "parameters" = character(n_methods), "location_p_value" = numeric(n_methods), "scale_p_value" = numeric(n_methods), stringsAsFactors = FALSE)
+    extra_info <- data.frame("subset_method" = character(n_methods), "normalization_method" = character(n_methods), "parameters" = character(n_methods), 
+                             "location_p_value" = numeric(n_methods), "scale_p_value" = numeric(n_methods), 
+                             "F_log_HSmPV" = numeric(n_methods), "F_log_NSmPV" = numeric(n_methods), stringsAsFactors = FALSE, check.names = FALSE)
     
     # populate the dataframe from which_spans
     for(i in 1:n_methods){
       ss <- which_spans[[i]]$subset_fn
       norm <- which_spans[[i]]$norm_fn
-      score <- scores[i]
+      score <- scores[[i]][[1]]
       num_mols <- which_spans[[i]]$n_features_calc
       params <- which_spans[[i]]$params %>% unlist() %>% as.character() %>% paste(collapse = ";")
       p_loc <- which_spans[[i]]$step1_pvals[1]
       p_scale <- which_spans[[i]]$step1_pvals[2]
+      F_HSmPV <- scores[[i]][[2]]
+      F_NSmPV <- scores[[i]][[3]]
       pass_fail <- which_spans[[i]]$passfail
       
       # store into row of df
-      spansres_obj[i,] <- c(ss, norm, score, params, num_mols, pass_fail)
-      extra_info[i, ] <- c(ss, norm, params, p_loc, p_scale)
+      spansres_obj[i,] <- list(ss, norm, score, params, num_mols, pass_fail)
+      extra_info[i, ] <- list(ss, norm, params, p_loc, p_scale, F_HSmPV, F_NSmPV)
     }
     
     spansres_obj <- dplyr::arrange(spansres_obj, desc(SPANS_score))
     extra_info <- dplyr::arrange(extra_info, desc(spansres_obj$SPANS_score))
     
-    spansres_obj <- spansres_obj
     attr(spansres_obj, "method_selection_pvals") <- extra_info
     attr(spansres_obj, "group_vector") = group
     attr(spansres_obj, "significant_thresh") = sig_thresh

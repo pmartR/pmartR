@@ -37,6 +37,13 @@ spans_procedure(omicsData, norm_fn = c("median", "mean", "zscore",
 \code{parrallel} Logical specifying whether to use a parrallel backend.  Depending on the size of your data, setting this FALSE can cause the algorithm to be very slow.  Defaults to TRUE.
 }}
 }
+\value{
+An object of class 'SPANSRes', which is a dataframe containing columns for the subset method and normalization used, the parameters used in the subset method, and the corresponding SPANS score.  \cr
+
+The column 'mols_used_in_norm' contains the number of molecules that were selected by the subset method and subsequently used to determine the location/scale parameters for normalization.  The column 'passed selection' is \code{TRUE} if the subset+normalization procedure was selected for scoring.\cr
+
+The attribute 'method_selection_pvals' is a dataframe containing information on the p values used to determine if a method was selected for scoring (location_p_value, scale_p_value) as well as the probabilities (F_log_HSmPV, F_log_NSmPV) given by the empirical cdfs generated in the first step of SPANS.
+}
 \description{
 Ranks different combinations of subsetting and normalization methods based on a score that captures how much bias a particular normalization procedure introduces into the data.  Higher score implies less bias.
 }
@@ -45,7 +52,14 @@ Below are details for specifying function and parameter options.
 }
 \section{Subset Functions}{
 
-Specifying a subset function indicates the subset of features (rows of \code{e_data}) that should be used for computing normalization factors. The following are valid options: "all", "los", "ppp", "rip", and "ppp_rip". The option "all" is the subset that includes all features (i.e. no subsetting is done). The option "los" identifies the subset of the features associated with the top \code{L}, where \code{L} is a proportion between 0 and 1, order statistics. Specifically, the features with the top \code{L} proportion of highest absolute abundance are retained for each sample, and the union of these features is taken as the subset identified (Wang et al., 2006). The option "ppp" (orignally stands for percentage of peptides present) identifies the subset of features that are present/non-missing for a minimum \code{proportion} of samples (Karpievitch et al., 2009; Kultima et al., 2009). The option "rip" identifies features with complete data that have a p-value greater than a defined threshold \code{alpha} (common values include 0.1 or 0.25) when subjected to a Kruskal-Wallis test based (non-parametric one-way ANOVA) on group membership (Webb-Robertson et al., 2011). The option "ppp_rip" is equivalent to "rip" however rather than requiring features with complete data, features with at least a \code{proportion} of non-missing values are subject to the Kruskal-Wallis test.
+Specifying a subset function indicates the subset of features (rows of \code{e_data}) that should be used for computing normalization factors. The following are valid options: "all", "los", "ppp", "rip", and "ppp_rip". \cr
+\tabular{ll}{
+\tab "all" is the subset that includes all features (i.e. no subsetting is done). \cr
+\tab "los" identifies the subset of the features associated with the top \code{L}, where \code{L} is a proportion between 0 and 1, order statistics. Specifically, the features with the top \code{L} proportion of highest absolute abundance are retained for each sample, and the union of these features is taken as the subset identified (Wang et al., 2006). \cr
+\tab "ppp" (orignally stands for percentage of peptides present) identifies the subset of features that are present/non-missing for a minimum \code{proportion} of samples (Karpievitch et al., 2009; Kultima et al., 2009). \cr
+\tab"rip" identifies features with complete data that have a p-value greater than a defined threshold \code{alpha} (common values include 0.1 or 0.25) when subjected to a Kruskal-Wallis test based (non-parametric one-way ANOVA) on group membership (Webb-Robertson et al., 2011). \cr
+\tab "ppp_rip" is equivalent to "rip" however rather than requiring features with complete data, features with at least a \code{proportion} of non-missing values are subject to the Kruskal-Wallis test.\cr
+}
 }
 
 \section{Normalization Functions}{
@@ -71,7 +85,6 @@ ppp_rip \tab list of length 2 numeric vectors corresponding to the RIP and PPP p
 }
 
 \examples{
-
 library(pmartR)
 library(pmartRdata)
 
