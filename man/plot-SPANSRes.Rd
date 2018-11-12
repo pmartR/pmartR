@@ -7,7 +7,7 @@
 \method{plot}{SPANSRes}(SPANSRes_obj)
 }
 \arguments{
-\item{SPANSRes_obj}{an object of the class 'SPANSRes, usually created by \code{\link{spans_procedure()}}.}
+\item{SPANSRes_obj}{an object of the class 'SPANSRes', usually created by \code{\link{spans_procedure()}}.}
 }
 \value{
 plots a plotly object

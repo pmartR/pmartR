@@ -376,3 +376,58 @@ spans_make_distribution <- function(omicsData, norm_fn, sig_inds, nonsig_inds, s
 
   return(list(hs_mpv, ns_mpv))
 }
+
+#' Gets the parameters for the highest ranked methods from spans.
+#' 
+#' @param SPANSRes_obj an object of the class SPANSRes obtained by calling \code{spans_procedure()}
+#' 
+#' @return A list of lists, where there are multiple sublists only if there were ties for the top SPANS score.  Each sublist contains named elements for the subset and normalization methods, and the parameters used for the subset method. \cr
+#' 
+#' @examples 
+#' 
+#' library(pmartR)
+#' library(pmartRdata)
+#' 
+#' # data must be grouped
+#' myobject <- group_designation(pep_object, main_effects = "Condition")
+#' 
+#' spans_result <- spans_procedure(myobject)
+#' 
+#' # a list of the parameters for any normalization procedure with the best SPANS score
+#' best_params <- get_spans_params(spans_result)
+#' 
+#' # extract the arguments from the first list element
+#' subset_fn = best_params[[1]]$subset_fn
+#' norm_fn = best_params[[1]]$norm_fn
+#' params = best_params[[1]]$params
+#' 
+#' # pass arguments to normalize global
+#' norm_object <- normalize_global(omicsData = myobject, subset_fn = subset_fn, norm_fn = norm_fn, params = params)
+#' 
+#' @export 
+get_spans_params <- function(SPANSRes_obj){
+  best_df <- SPANSRes_obj %>% dplyr::top_n(1, wt = SPANS_score)
+  
+  params <- vector("list", nrow(best_df))
+  
+  for(i in 1:nrow(best_df)){
+    params[[i]]["subset_fn"] = best_df[i, "subset_method"]
+    params[[i]]["norm_fn"] = best_df[i, "normalization_method"]
+
+    pars_from_df = as.numeric(strsplit(best_df[i,"parameters"], ";")[[1]])
+    
+    if(params[[i]]["subset_fn"] == "ppp_rip"){
+      params[[i]]["params"] = list(ppp_rip = list(ppp = pars_from_df[1], rip = pars_from_df[2]))
+    }
+    else if(params[[i]]["subset_fn"] == "all"){
+      params[[i]]["params"] = list(NULL)
+    }
+    else if(params[[i]]["subset_fn"] %in% c("los", "rip", "ppp")){
+      sublist = list()
+      sublist[[params[[i]]["subset_fn"]]] <- pars_from_df
+      params[[i]]["params"] <- sublist
+    }
+  }
+  
+  return(params)
+}
