@@ -101,6 +101,12 @@ spans_procedure <- function(omicsData, norm_fn = c("median", "mean", "zscore", "
                      "ppp" = list(0.1,0.25,0.50,0.75), 
                      "rip" = list(0.1,0.15,0.2,0.25), 
                      "ppp_rip" = list(c(0.1,0.1), c(0.25, 0.15), c(0.5, 0.2), c(0.75,0.25)))
+      
+      for(name in names(params)){
+        if(!(name %in% subset_fn)){
+          params[[name]] <- NULL
+        }
+      }
     }
     
     # simple function to check if an element of params contains all values between 0 and 1
@@ -280,7 +286,8 @@ spans_procedure <- function(omicsData, norm_fn = c("median", "mean", "zscore", "
     
     extra_info <- data.frame("subset_method" = character(n_methods), "normalization_method" = character(n_methods), "parameters" = character(n_methods), 
                              "location_p_value" = numeric(n_methods), "scale_p_value" = numeric(n_methods), 
-                             "F_log_HSmPV" = numeric(n_methods), "F_log_NSmPV" = numeric(n_methods), stringsAsFactors = FALSE, check.names = FALSE)
+                             "F_log_HSmPV" = numeric(n_methods), "F_log_NSmPV" = numeric(n_methods), 
+                             "SPANS_score" = numeric(n_methods), stringsAsFactors = FALSE, check.names = FALSE)
     
     # populate the dataframe from which_spans
     for(i in 1:n_methods){
@@ -297,11 +304,11 @@ spans_procedure <- function(omicsData, norm_fn = c("median", "mean", "zscore", "
       
       # store into row of df
       spansres_obj[i,] <- list(ss, norm, score, params, num_mols, pass_fail)
-      extra_info[i, ] <- list(ss, norm, params, p_loc, p_scale, F_HSmPV, F_NSmPV)
+      extra_info[i, ] <- list(ss, norm, params, p_loc, p_scale, F_HSmPV, F_NSmPV, score)
     }
     
     spansres_obj <- dplyr::arrange(spansres_obj, desc(SPANS_score))
-    extra_info <- dplyr::arrange(extra_info, desc(spansres_obj$SPANS_score))
+    extra_info <- dplyr::arrange(extra_info, desc(SPANS_score)) %>% dplyr::select(-SPANS_score)
     
     attr(spansres_obj, "method_selection_pvals") <- extra_info
     attr(spansres_obj, "group_vector") = group
@@ -388,8 +395,11 @@ spans_make_distribution <- function(omicsData, norm_fn, sig_inds, nonsig_inds, s
 #' library(pmartR)
 #' library(pmartRdata)
 #' 
-#' # data must be grouped
-#' myobject <- group_designation(pep_object, main_effects = "Condition")
+#' data(pep_object)
+#' 
+#' # data must be log transformed and grouped
+#' myobject <- edata_transform(pep_object, data_scale = "log2")
+#' myobject <- group_designation(myobject, main_effects = "Condition")
 #' 
 #' spans_result <- spans_procedure(myobject)
 #' 
@@ -406,26 +416,29 @@ spans_make_distribution <- function(omicsData, norm_fn, sig_inds, nonsig_inds, s
 #' 
 #' @export 
 get_spans_params <- function(SPANSRes_obj){
+  
+  if(all(is.na(SPANSRes_obj$SPANS_score))) stop("No methods were selected for scoring, there is no 'best' set of parameters to get.")
+    
   best_df <- SPANSRes_obj %>% dplyr::top_n(1, wt = SPANS_score)
   
   params <- vector("list", nrow(best_df))
   
   for(i in 1:nrow(best_df)){
-    params[[i]]["subset_fn"] = best_df[i, "subset_method"]
-    params[[i]]["norm_fn"] = best_df[i, "normalization_method"]
+    params[[i]][["subset_fn"]] = best_df[i, "subset_method"]
+    params[[i]][["norm_fn"]] = best_df[i, "normalization_method"]
 
     pars_from_df = as.numeric(strsplit(best_df[i,"parameters"], ";")[[1]])
     
-    if(params[[i]]["subset_fn"] == "ppp_rip"){
-      params[[i]]["params"] = list(ppp_rip = list(ppp = pars_from_df[1], rip = pars_from_df[2]))
+    if(params[[i]][["subset_fn"]] == "ppp_rip"){
+      params[[i]][["params"]] = list(ppp_rip = list(ppp = pars_from_df[1], rip = pars_from_df[2]))
     }
-    else if(params[[i]]["subset_fn"] == "all"){
-      params[[i]]["params"] = list(NULL)
+    else if(params[[i]][["subset_fn"]] == "all"){
+      params[[i]][["params"]] = list(NULL)
     }
-    else if(params[[i]]["subset_fn"] %in% c("los", "rip", "ppp")){
+    else if(params[[i]][["subset_fn"]] %in% c("los", "rip", "ppp")){
       sublist = list()
       sublist[[params[[i]]["subset_fn"]]] <- pars_from_df
-      params[[i]]["params"] <- sublist
+      params[[i]][["params"]] <- sublist
     }
   }
   
