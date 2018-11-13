@@ -1,4 +1,4 @@
-context("Test that data package loads")
+context("test spans_procedure....will take a minute.....")
 library(testthat)
 library(pmartRdata)
 library(pmartR)
@@ -26,7 +26,7 @@ expect_error(spans_procedure(myobject, norm_fn = rand_norm_fn, subset_fn = c("al
 expect_error(spans_procedure(myobject, norm_fn = "mean", subset_fn = "ppp_rip", params = list(ppp_rip = list(c(0.1, 0.2)))))
 
 # make a small spansres_object so testing isn't slowed too much
-spansres_obj <- spans_procedure(myobject, norm_fn = rand_norm_fn, subset_fn = rand_subset_fn)
+spansres_obj <- spans_procedure(myobject, norm_fn = rand_norm_fn, subset_fn = rand_subset_fn, verbose = FALSE)
 # get the parameters of the highest scoring methods
 spans_params <- get_spans_params(spansres_obj)
 

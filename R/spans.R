@@ -6,7 +6,7 @@
 #' @param subset_fn character vector indicating which subset functions to test. See details for the current offerings.
 #' @param norm_fn character vector indicating the normalization functions to test. See details for the current offerings.
 #' @param params list of additional arguments passed to the chosen subset functions. See details for parameter specification and default values.
-#' @param group character vector that specifies group assignment of the samples.  Defaults to NULL, in which case the grouping structure given in \code{attr(omicsData, 'group_DF')} is used.
+#' @param group character specifying a column name in f_data that gives the group assignment of the samples.  Defaults to NULL, in which case the grouping structure given in \code{attr(omicsData, 'group_DF')} is used.
 #' @param n_iter number of iterations used in calculating the background distribution in step 0 of SPANS.  Defaults to 1000.
 #' @param sig_thresh numeric value that specifies the maximum p-value for which a biomolecule can be considered highly significant based on a Kruskal-Wallis test.  Defaults to 0.0001.
 #' @param nonsig_thresh numeric value that specifies the minimum p-value for which a biomolecule can be considered non-significant based on a Kruskal-Wallis test.  Defaults to 0.5.
@@ -15,9 +15,9 @@
 #'
 #' @param ... Additional arguments
 #' \tabular{ll}{
-#' \code{location_thresh, scale_thresh} The minimum p-value resulting from a Kruskal-Wallis test on the location and scale parameters resulting from a normalization method in order for that method to be considered a candidate for scoring.  
-#' \code{verbose} Logical specifying whether to print the completion of SPANS procedure steps to console.  Defaults to TRUE.
-#' \code{parrallel} Logical specifying whether to use a parrallel backend.  Depending on the size of your data, setting this FALSE can cause the algorithm to be very slow.  Defaults to TRUE.
+#' \code{location_thresh, scale_thresh} The minimum p-value resulting from a Kruskal-Wallis test on the location and scale parameters resulting from a normalization method in order for that method to be considered a candidate for scoring.\cr  
+#' \code{verbose} Logical specifying whether to print the completion of SPANS procedure steps to console.  Defaults to TRUE.\cr
+#' \code{parrallel} Logical specifying whether to use a parrallel backend.  Depending on the size of your data, setting this to FALSE can cause the algorithm to be very slow.  Defaults to TRUE.
 #' }
 #'@details Below are details for specifying function and parameter options.
 #' @section Subset Functions:
@@ -136,6 +136,7 @@ spans_procedure <- function(omicsData, norm_fn = c("median", "mean", "zscore", "
       if(!all(checkvals(params$rip))) stop("each element of 'rip' in params must be a numeric value between 0 and 1")
     }
     
+    # assign group variable or internally call group_designation() if user specified a grouping column in f_data
     if(is.null(group)){
       group = attr(omicsData, "group_DF")$Group
     }
@@ -417,10 +418,12 @@ spans_make_distribution <- function(omicsData, norm_fn, sig_inds, nonsig_inds, s
 #' @export 
 get_spans_params <- function(SPANSRes_obj){
   
-  if(all(is.na(SPANSRes_obj$SPANS_score))) stop("No methods were selected for scoring, there is no 'best' set of parameters to get.")
+  if(all(is.na(SPANSRes_obj$SPANS_score))) stop("No methods were selected for scoring, there is no 'best' set of parameters to return.")
     
+  # get rows that are tied for top score
   best_df <- SPANSRes_obj %>% dplyr::top_n(1, wt = SPANS_score)
   
+  ## populate a list with the subset method, normalization method, and subset parameters.
   params <- vector("list", nrow(best_df))
   
   for(i in 1:nrow(best_df)){

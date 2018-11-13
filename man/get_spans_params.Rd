@@ -20,8 +20,11 @@ Gets the parameters for the highest ranked methods from spans.
 library(pmartR)
 library(pmartRdata)
 
-# data must be grouped
-myobject <- group_designation(pep_object, main_effects = "Condition")
+data(pep_object)
+
+# data must be log transformed and grouped
+myobject <- edata_transform(pep_object, data_scale = "log2")
+myobject <- group_designation(myobject, main_effects = "Condition")
 
 spans_result <- spans_procedure(myobject)
 

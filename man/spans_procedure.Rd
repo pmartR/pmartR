@@ -18,7 +18,7 @@ spans_procedure(omicsData, norm_fn = c("median", "mean", "zscore",
 
 \item{params}{list of additional arguments passed to the chosen subset functions. See details for parameter specification and default values.}
 
-\item{group}{character vector that specifies group assignment of the samples.  Defaults to NULL, in which case the grouping structure given in \code{attr(omicsData, 'group_DF')} is used.}
+\item{group}{character specifying a column name in f_data that gives the group assignment of the samples.  Defaults to NULL, in which case the grouping structure given in \code{attr(omicsData, 'group_DF')} is used.}
 
 \item{n_iter}{number of iterations used in calculating the background distribution in step 0 of SPANS.  Defaults to 1000.}
 
@@ -32,8 +32,8 @@ spans_procedure(omicsData, norm_fn = c("median", "mean", "zscore",
 
 \item{...}{Additional arguments
 \tabular{ll}{
-\code{location_thresh, scale_thresh} The minimum p-value resulting from a Kruskal-Wallis test on the location and scale parameters resulting from a normalization method in order for that method to be considered a candidate for scoring.  
-\code{verbose} Logical specifying whether to print the completion of SPANS procedure steps to console.  Defaults to TRUE.
+\code{location_thresh, scale_thresh} The minimum p-value resulting from a Kruskal-Wallis test on the location and scale parameters resulting from a normalization method in order for that method to be considered a candidate for scoring.\cr  
+\code{verbose} Logical specifying whether to print the completion of SPANS procedure steps to console.  Defaults to TRUE.\cr
 \code{parrallel} Logical specifying whether to use a parrallel backend.  Depending on the size of your data, setting this FALSE can cause the algorithm to be very slow.  Defaults to TRUE.
 }}
 }
