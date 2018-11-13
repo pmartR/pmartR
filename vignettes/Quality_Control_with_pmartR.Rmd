@@ -350,7 +350,7 @@ Available normalization functions include:
 
 - Median absolute deviation (MAD) transformation: The sample-wise median (median of all peptides in a given sample) is subtracted from each peptide, and the result is divided by the sample-wise MAD (MAD of all peptides in a given sample) in the corresponding sample. This normalization method is specified as "mad".
 
-There are two ways to go about normalizing data in the pmartR package. If you know the normalization approach you'd like to use, you can directly specify it in the `normalize_data()` function. Or, if you want to see how compatible different normalization approaches are with your dataset, you can use the `spans()` function.
+There are two ways to go about normalizing data in the pmartR package. If you know the normalization approach you'd like to use, you can directly specify it in the `normalize_data()` function. Or, if you want to see how compatible different normalization approaches are with your dataset, you can use the `spans_procedure()` function.
 
 We can go straight to the normalization, if we know what approach we want to use.
 
@@ -370,13 +370,30 @@ plot(norm_data, title_plot="Normalized Data: Median Centering Using RIP 0.2 Pept
 
 
 
-Below we use SPANS to select a normalization approach and then normalize the data. [UNDER DEVELOPMENT]
+Below we use SPANS to select a normalization approach and then normalize the data.
 
 ```{r spans}
+# returns a dataframe arranged by descending SPANS score
+spans_result <- spans_procedure(mypepData)
 
+```
 
+```{r spans_plot_summarize}
+summary(spans_result)
+plot(spans_result)
+```
 
+```{r spans_normalize, eval = FALSE}
+# a list of the parameters for any normalization procedure with the best SPANS score
+best_params <- get_spans_params(spans_result)
 
+# there are a few ties, all using ppp_rip, well select the method that uses median normalization and parameters ppp = 0.1 and rip = 0.1
+subset_fn = best_params[[1]]$subset_fn
+norm_fn = best_params[[1]]$norm_fn
+params = best_params[[1]]$params
+
+# we now pass the extracted subset function, normalization function, and parameters from SPANS to normalize_global()
+norm_object <- normalize_global(omicsData = mypepData, subset_fn = subset_fn, norm_fn = norm_fn, params = params)
 ```
 
 

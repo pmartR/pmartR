@@ -783,5 +783,26 @@ summary.normRes <- function(omicsNorm) {
   return(invisible(res)) # should this be returning "catmat" instead?
 }
 
+#'@export
+#'@rdname summary-pmartR
+#'@name summary-pmartR
+#'@param SPANSres_obj an object of class SPANSRes created by calling spans_procedure() on a grouped pepData or proData object.
+summary.SPANSRes <- function(SPANSRes_obj){
+  
+  spanscores <- sort(unique(SPANSRes_obj$SPANS_score), decreasing = TRUE)
+  SPANSRes_obj <- SPANSRes_obj %>% 
+    dplyr::mutate(rank = dplyr::dense_rank(desc(SPANS_score)))
+  
+  cat("\nSummary of spans procedure\n")
+  
+  cat(paste0("\nHighest ranked method(s)\n"))
+  cat(capture.output(head(SPANSRes_obj)), sep="\n")
+  
+  cat(paste0("\nNumber of input methods:  ", nrow(SPANSRes_obj)))
+  cat(paste0("\nNumber of methods scored:  ", sum(as.logical(SPANSRes_obj$passed_selection))))
+  cat(paste0("\nAverage molecules used in normalization:  ", round(mean(as.numeric(SPANSRes_obj$mols_used_in_norm), na.rm = TRUE))))
+  
+}
+
 
 
