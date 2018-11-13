@@ -21,7 +21,7 @@ knitr::opts_chunk$set(warning=FALSE, fig.width = 8, fig.height = 6)
 ```{r logo, out.width = "100px", echo=FALSE}
 knitr::include_graphics("pmartR_logo_final.jpg")
 
-devtools::load_all("~/Documents/forked_repos/pmartR")
+library(pmartR)
 library(pmartRdata)
 library(ggplot2)
 ```
