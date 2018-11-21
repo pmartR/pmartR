@@ -34,7 +34,7 @@ spans_procedure(omicsData, norm_fn = c("median", "mean", "zscore",
 \tabular{ll}{
 \code{location_thresh, scale_thresh} The minimum p-value resulting from a Kruskal-Wallis test on the location and scale parameters resulting from a normalization method in order for that method to be considered a candidate for scoring.\cr  
 \code{verbose} Logical specifying whether to print the completion of SPANS procedure steps to console.  Defaults to TRUE.\cr
-\code{parrallel} Logical specifying whether to use a parrallel backend.  Depending on the size of your data, setting this FALSE can cause the algorithm to be very slow.  Defaults to TRUE.
+\code{parrallel} Logical specifying whether to use a parrallel backend.  Depending on the size of your data, setting this to FALSE can cause the algorithm to be very slow.  Defaults to TRUE.
 }}
 }
 \value{

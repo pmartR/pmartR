@@ -6,7 +6,7 @@
 \usage{
 as.isobaricpepData(e_data, f_data, e_meta = NULL, edata_cname,
   fdata_cname, emeta_cname = NULL, exp_cname, channel_cname = NULL,
-  refpool_channel = NULL, refpool_cname = NULL,
+  techrep_cname = NULL, refpool_channel = NULL, refpool_cname = NULL,
   refpool_notation = NULL, ...)
 }
 \arguments{
@@ -25,6 +25,8 @@ as.isobaricpepData(e_data, f_data, e_meta = NULL, edata_cname,
 \item{exp_cname}{character string specifying the name of the column containing the experiment/plate information in \code{f_data}.}
 
 \item{channel_cname}{optional character string specifying the name of the column containing the instrument channel a sample was run on in \code{f_data}. This argument is optional, see Details for how to specify information regarding reference pool samples.}
+
+\item{techrep_cname}{character string specifying the name of the column in \code{f_data} containing the identifiers for the biological samples if the observations represent technical replicates.  This column is used to collapse the data when \code{combine_techreps} is called on this object.  Defaults to NULL (no technical replicates).}
 
 \item{refpool_channel}{optional character string specifying which channel contained the reference pool sample, only used when this remains the same from experiment to experiment. This argument is optional, see Details for how to specify information regarding reference pool samples.}
 

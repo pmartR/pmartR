@@ -10,6 +10,7 @@
 #' @param fdata_cname character string specifying the name of the column containing the sample identifiers in \code{f_data}.
 #' @param exp_cname character string specifying the name of the column containing the experiment/plate information in \code{f_data}.
 #' @param channel_cname optional character string specifying the name of the column containing the instrument channel a sample was run on in \code{f_data}. This argument is optional, see Details for how to specify information regarding reference pool samples.
+#' @param techrep_cname character string specifying the name of the column in \code{f_data} containing the identifiers for the biological samples if the observations represent technical replicates.  This column is used to collapse the data when \code{combine_techreps} is called on this object.  Defaults to NULL (no technical replicates). 
 #' @param refpool_channel optional character string specifying which channel contained the reference pool sample, only used when this remains the same from experiment to experiment. This argument is optional, see Details for how to specify information regarding reference pool samples.
 #' @param refpool_cname optional character string specifying the name of the column containing information about which samples are reference samples in \code{f_data}. This argument is optional, see Details for how to specify information regarding reference pool samples.
 #' @param refpool_notation optional character string specifying the value in the refpool_channel column which denotes that a sample is a reference sample. This argument is optional, see Details for how to specify information regarding reference pool samples.
@@ -72,13 +73,13 @@
 #' @seealso \code{\link{as.metabData}}
 #'
 #' @export
-as.isobaricpepData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname, emeta_cname = NULL, exp_cname, channel_cname = NULL, refpool_channel = NULL, refpool_cname = NULL, refpool_notation = NULL, ...){
-  .as.isobaricpepData(e_data, f_data, e_meta, edata_cname, fdata_cname, emeta_cname, exp_cname, channel_cname, refpool_channel, refpool_cname, refpool_notation, ...)
+as.isobaricpepData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname, emeta_cname = NULL, exp_cname, channel_cname = NULL, techrep_cname = NULL, refpool_channel = NULL, refpool_cname = NULL, refpool_notation = NULL, ...){
+  .as.isobaricpepData(e_data, f_data, e_meta, edata_cname, fdata_cname, emeta_cname, exp_cname, channel_cname, techrep_cname, refpool_channel, refpool_cname, refpool_notation, ...)
 }
 
 ## peptide data ##
 .as.isobaricpepData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname,
-                        emeta_cname = NULL, exp_cname, channel_cname = NULL, 
+                        emeta_cname = NULL, exp_cname, channel_cname = NULL, techrep_cname = NULL, 
                         refpool_channel = NULL, refpool_cname = NULL, refpool_notation = NULL, data_scale = "abundance",
                         data_norm = FALSE, isobaric_norm = FALSE, norm_info = NULL, data_types=NULL, check.names = TRUE){
   
@@ -204,11 +205,18 @@ as.isobaricpepData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata
     }
   }
   
+  # check that technical replicate identifier column specifies at least one biological sample with 2 or more technical replicates.
+  if(!is.null(techrep_cname)){
+    if(!inherits(techrep_cname, "character") | length(techrep_cname) == 0) stop("techrep_cname must be a character string specifying a column in f_data")
+    if(!(techrep_cname %in% colnames(f_data[,-which(names(f_data) == fdata_cname)]))) stop("Specified technical replicate column was not found in f_data or was the same as fdata_cname")
+    if(length(unique(f_data$techrep_cname) == nrow(f_data))) stop("Specified technical replicate column had a unique value for each row.  Values should specify groups of technical replicates belonging to a biological sample")
+  }
+  
   # store results #
   res = list(e_data = e_data, f_data = f_data, e_meta = e_meta)
   
   # set column name attributes #
-  attr(res, "cnames") = list(edata_cname = edata_cname, emeta_cname = emeta_cname, fdata_cname = fdata_cname)
+  attr(res, "cnames") = list(edata_cname = edata_cname, emeta_cname = emeta_cname, fdata_cname = fdata_cname, techrep_cname = techrep_cname)
   
   # count missing values in e_data #
   num_miss_obs = sum(is.na(e_data[,-which(names(e_data)==edata_cname)]))

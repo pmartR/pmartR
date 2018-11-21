@@ -8,8 +8,7 @@
 #' @param edata_cname character string specifying the name of the column containing the peptide identifiers in \code{e_data} and \code{e_meta} (if applicable).
 #' @param emeta_cname character string specifying the name of the column containing the protein identifiers (or other mapping variable) in \code{e_meta} (if applicable). Defaults to NULL. If \code{e_meta} is NULL, then either do not specify \code{emeta_cname} or specify it as NULL. If \code{e_meta} is NULL, then specify \code{emeta_cname} as NULL.
 #' @param fdata_cname character string specifying the name of the column containing the sample identifiers in \code{f_data}.
-#' @param techrep_cname character string specifying the name of the column in \code{f_data} specifying the technical replicate grouping column.  Defaults to NULL (no technical replicates)
-#' @param bio_sample_cname character string specifying the name of the column in \code{fdata} containing the identifiers for the biological samples if technical replicates are present.  See details.
+#' @param techrep_cname character string specifying the name of the column in \code{f_data} containing the identifiers for the biological samples if the observations represent technical replicates.  This column is used to collapse the data when \code{combine_techreps} is called on this object.  Defaults to NULL (no technical replicates). 
 #' @param ... further arguments
 #'
 #' @details Objects of class 'pepData' contain some attributes that are referenced by downstream functions. These attributes can be changed from their default value by manual specification. A list of these attributes as well as their default values are as follows:
@@ -39,11 +38,6 @@
 #' meta_info \tab A logical argument, specifying whether \code{e_meta} is provided.\cr
 #' \tab \cr
 #' }
-#' 
-#' @Section Specifying technical replicates
-#' If techrep_col is specified then each row in f_data will be combined with other rows having the same identifier in this column when \code{combine_techreps} is called on this object. \cr
-#' When this combination occurs, the new sample identifiers will be determined by the names in the column specified by techrep_names.  If techrep_names is not specified, a default name is given to each sample.
-#' 
 #'
 #' @examples
 #' dontrun{
@@ -150,8 +144,8 @@ as.pepData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname, 
   }
   
   # check that technical replicate identifier column specifies at least one biological sample with 2 or more technical replicates.
-  # check that biological sample name column has a single value for each group of technical replicates
   if(!is.null(techrep_cname)){
+    if(!inherits(techrep_cname, "character") | length(techrep_cname) == 0) stop("techrep_cname must be a character string specifying a column in f_data")
     if(!(techrep_cname %in% colnames(f_data[,-which(names(f_data) == fdata_cname)]))) stop("Specified technical replicate column was not found in f_data or was the same as fdata_cname")
     if(length(unique(f_data$techrep_cname) == nrow(f_data))) stop("Specified technical replicate column had a unique value for each row.  Values should specify groups of technical replicates belonging to a biological sample")
   }
@@ -195,9 +189,6 @@ as.pepData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname, 
 
   # set group dataframe attribute to NULL, will be filled in after running group_designation function #
   attr(res, "group_DF") = NULL
-  
-  # set techrep dataframe attribute to NULL, will be filled in after running combine_techreps function #
-  attr(res, "techrep_DF") = NULL
 
   # set filters attributes #
   if(!is.null(attr(res, "filters"))){

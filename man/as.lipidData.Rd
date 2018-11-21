@@ -5,7 +5,7 @@
 \title{Convert Data to Appropriate pmartR Class}
 \usage{
 as.lipidData(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname,
-  emeta_cname = NULL, ...)
+  emeta_cname = NULL, techrep_cname = NULL, ...)
 }
 \arguments{
 \item{e_data}{a \eqn{p \times n + 1} data.frame of expression data, where \eqn{p} is the number of lipids observed and \eqn{n} is the number of samples. Each row corresponds to data for each lipid. One column specifying a unique identifier for each lipid (row) must be present.}
@@ -19,6 +19,8 @@ as.lipidData(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname,
 \item{fdata_cname}{character string specifying the name of the column containing the sample identifiers in \code{f_data}.}
 
 \item{emeta_cname}{character string specifying the name of the column containing the mapped identifiers in \code{e_meta} (if applicable). Defaults to NULL. If \code{e_meta} is NULL, then either do not specify \code{emeta_cname} or specify it as NULL. If \code{e_meta} is NULL, then specify \code{emeta_cname} as NULL.}
+
+\item{techrep_cname}{character string specifying the name of the column in \code{f_data} containing the identifiers for the biological samples if the observations represent technical replicates.  This column is used to collapse the data when \code{combine_techreps} is called on this object.  Defaults to NULL (no technical replicates).}
 
 \item{...}{further arguments}
 }

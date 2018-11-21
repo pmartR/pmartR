@@ -8,6 +8,7 @@
 #' @param edata_cname character string specifying the name of the column containing the lipid identifiers in \code{e_data} and \code{e_meta} (if applicable).
 #' @param emeta_cname character string specifying the name of the column containing the mapped identifiers in \code{e_meta} (if applicable). Defaults to NULL. If \code{e_meta} is NULL, then either do not specify \code{emeta_cname} or specify it as NULL. If \code{e_meta} is NULL, then specify \code{emeta_cname} as NULL.
 #' @param fdata_cname character string specifying the name of the column containing the sample identifiers in \code{f_data}.
+#' @param techrep_cname character string specifying the name of the column in \code{f_data} containing the identifiers for the biological samples if the observations represent technical replicates.  This column is used to collapse the data when \code{combine_techreps} is called on this object.  Defaults to NULL (no technical replicates). 
 #' @param ... further arguments
 #'
 #' @details Objects of class 'lipidData' contain some attributes that are referenced by downstream functions. These attributes can be changed from their default value by manual specification. A list of these attributes as well as their default values are as follows:
@@ -52,15 +53,14 @@
 #' @seealso \code{\link{as.proData}}
 #'
 #' @export
-as.lipidData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname, emeta_cname = NULL, ...){
-  .as.lipidData(e_data, f_data, e_meta, edata_cname, fdata_cname, emeta_cname, ...)
+as.lipidData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname, emeta_cname = NULL, techrep_cname = NULL, ...){
+  .as.lipidData(e_data, f_data, e_meta, edata_cname, fdata_cname, emeta_cname, techrep_cname, ...)
 }
 
 ## lipid data ##
 .as.lipidData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname,
-                          emeta_cname = NULL, data_scale = "abundance",
-                          data_norm = FALSE, norm_info=NULL,
-                          data_types=NULL, check.names = TRUE){
+                        emeta_cname = NULL, techrep_cname = NULL, data_scale = "abundance",
+                        data_norm = FALSE, norm_info = NULL, data_types=NULL, check.names = TRUE){
 
   # initial checks #
 
@@ -144,11 +144,18 @@ as.lipidData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname
     }
   }
 
+  # check that technical replicate identifier column specifies at least one biological sample with 2 or more technical replicates.
+  if(!is.null(techrep_cname)){
+    if(!inherits(techrep_cname, "character") | length(techrep_cname) == 0) stop("techrep_cname must be a character string specifying a column in f_data")
+    if(!(techrep_cname %in% colnames(f_data[,-which(names(f_data) == fdata_cname)]))) stop("Specified technical replicate column was not found in f_data or was the same as fdata_cname")
+    if(length(unique(f_data$techrep_cname) == nrow(f_data))) stop("Specified technical replicate column had a unique value for each row.  Values should specify groups of technical replicates belonging to a biological sample")
+  }
+  
   # store results #
   res = list(e_data = e_data, f_data = f_data, e_meta = e_meta)
 
   # set column name attributes #
-  attr(res, "cnames") = list(edata_cname = edata_cname, emeta_cname = emeta_cname, fdata_cname = fdata_cname)
+  attr(res, "cnames") = list(edata_cname = edata_cname, emeta_cname = emeta_cname, fdata_cname = fdata_cname, techrep_cname = techrep_cname)
 
   # count missing values in e_data #
   num_miss_obs = sum(is.na(e_data[,-which(names(e_data)==edata_cname)]))

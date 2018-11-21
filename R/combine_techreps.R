@@ -1,20 +1,29 @@
 #' Combine technical replicates of an omicsData object
 #'
-#' Combines the technical replicates within biological samples using a specified aggregation method
+#' For each biomolecule, aggregates the technical replicates within biological samples using a specified aggregation method
 #'
-#' @param omicsData an object of the class 'lipidData', 'metabData', 'pepData', or 'proData', usually created by \code{\link{as.lipidData}}, \code{\link{as.metabData}}, \code{\link{as.pepData}}, or \code{\link{as.proData}}, respectively.
+#' @param omicsData an object of the class 'lipidData', 'metabData', 'pepData', or 'proData', usually created by \code{\link{as.lipidData}}, \code{\link{as.metabData}}, \code{\link{as.pepData}}, or \code{\link{as.proData}}, respectively.  The parameter techrep_cnames must have been specified when creating this object.
+#' @param combine_fn a character string specifying the function used to aggregate across technical replicates, currently only supports "mean".
 #' 
-#' @details 
-#' 
+#' @details Loss of information after aggregation
+#' \tabular{ll}{
+#' f_data: \tab   If there are columns of f_data that have more than 1 value per biological sample, then for each biological sample, only the first value in that column will be retained.  Technical replicate specific information will be lost.\cr
+#' group information:  \tab If a grouping structure has been set using a main effect from f_data that has more than 1 level within any given biological sample, that grouping structure will be removed.  Call \code{group_designation} again on the aggregated data to assign a grouping structure.
+#' }
 #' 
 #' @return An object with the same class as omicsData that has been aggregated to the biological sample level
 #' 
 #' @examples 
+#' # UNDER CONSTRUCTION #
+#' 
+#' @author Daniel Claborne
 #' 
 #' @export
-
 combine_techreps <- function(omicsData, combine_fn = "mean"){
-  if(is.null(attr(omicsData, "cnames")$techrep_cname)) stop("This object did not have technical replicates specified")
+  if(is.null(attr(omicsData, "cnames")$techrep_cname)) stop("This object did not have technical replicates specified.  Specify the argument techrep_cname when creating your omicsData object.")
+  if(inherits(omicsData, "isobaricpepData")){
+    if(!attr(res, "data_info")$isobaric_norm) stop("isobaricpepData objects must have been normalized to the appropriate reference pool samples before combining technical replicates")
+  }
   
   f_data = omicsData$f_data
   e_data = omicsData$e_data
@@ -70,7 +79,7 @@ combine_techreps <- function(omicsData, combine_fn = "mean"){
     
     # gives number of unique main effect levels in group_DF for a given group of technical replictes...
     multiple_groups <- attr(omicsData, "group_DF") %>% 
-      dplyr::left_join(fdata[c(fdata_cname, techrep_cname)]) %>%
+      dplyr::left_join(fdata[c(fdata_cname, techrep_cname)], by = fdata_cname) %>%
       dplyr::group_by(!!rlang::sym(techrep_cname)) %>%
       dplyr::summarise_all(dplyr::n_distinct) %>%
       dplyr::select("Group")
@@ -80,13 +89,14 @@ combine_techreps <- function(omicsData, combine_fn = "mean"){
       warning("A grouping structure was present that assigned multiple groups within a biological sample, this grouping structure will be discarded, run group_designation() again to set a new grouping structure")
       new_group_DF <- NULL
     }
-    # otherwise collapse the grouping structure around the newly 
+    # otherwise collapse the grouping structure around the newly created f_data
     else{
       new_group_DF <- attr(omicsData, "group_DF") %>%
-        dplyr::left_join(fdata[c(fdata_cname, techrep_cname)]) %>% 
+        dplyr::left_join(fdata[c(fdata_cname, techrep_cname)], by = fdata_cname) %>% 
         dplyr::group_by(!!rlang::sym(techrep_cname)) %>%
         dplyr::slice(1) %>%
-        dplyr::select(!!rlang::sym(techrep_cname), dplyr::everything(), -dplyr::one_of(fdata_cname))
+        dplyr::select(!!rlang::sym(techrep_cname), dplyr::everything(), -dplyr::one_of(fdata_cname)) %>%
+        as.data.frame()
     }
   }else new_group_DF <- NULL
   
