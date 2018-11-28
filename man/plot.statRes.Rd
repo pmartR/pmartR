@@ -4,14 +4,24 @@
 \alias{plot.statRes}
 \title{Plotting function for `statRes` objects}
 \usage{
-\method{plot}{statRes}(x, plot_type = NULL, fc_threshold = NULL, ...)
+\method{plot}{statRes}(x, plot_type = "bar", fc_threshold = NULL,
+  fc_colors = c("red", "black", "green"), stacked = FALSE,
+  interactive = FALSE, theme_bw = FALSE, ...)
 }
 \arguments{
 \item{x}{`statRes` object to be plotted, usually the result of `imd_anova`}
 
-\item{plot_type}{defines which plots to be produced, options are "bar", "heatmap", "volcano"; if left `NULL` then all options are produced}
+\item{plot_type}{defines which plots to be produced, options are "bar", "heatmap", "volcano"; defaults to "bar"}
 
 \item{fc_threshold}{optional threshold value for fold change estimates that's added to the volcano plot}
+
+\item{fc_colors}{vector of length three with character color values interpretable by ggplot. i.e. c("orange", "black", "blue") with the values being used to color negative, non-significant, and positive fold changes respectively}
+
+\item{stacked}{TRUE/FALSE for whether to stack positive and negative fold change sections in the barplot, defaults to FALSE}
+
+\item{interactive}{TRUE/FALSE for whether to create an interactive plot using plotly}
+
+\item{theme_bw}{TRUE/FALSE for whether to apply a black-white background theme}
 }
 \description{
 Produces plots that summarize the results contained in a `statRes` object.
@@ -32,12 +42,16 @@ myproData <- applyFilt(filter_object = imdanova_Filt, omicsData = myproData, min
 #Implement the IMD ANOVA method and compuate all pairwise comparisons (i.e. leave the `comparisons` argument NULL)
 anova_res <- imd_anova(omicsData = myproData, test_method = 'anova')
 plot(anova_res)
+plot(anova_res, plot_type = "volcano")
 
 imd_res <- imd_anova(omicsData = myproData, test_method = 'gtest')
 plot(imd_res)
+plot(imd_res, plot_type = "volcano")
 
 imd_anova_res <- imd_anova(omicsData = myproData, test_method = 'comb', pval_adjust='bon')
-plot(imd_anova_res)
+plot(imd_anova_res, theme_bw = TRUE)
+plot(imd_anova_res, plot_type = "volcano", theme_bw = TRUE)
+
 }
 
 }

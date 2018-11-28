@@ -1,6 +1,6 @@
-#' Applies bpquant_mod function to each unique protein in pepData object
+#' Runs BP-Quant
 #'
-#' The bpquant_loop function takes in a statRes object and a pepData object.It organizes the molecule and protein data into a data frame called protein_sig_data. Next bpquant_mod is applied to each unique protein and the results are stored and returned.  
+#' Applies BP-Quant to a pepData object 
 #'
 #' @param statRes an object of the class 'statRes'
 #' @param pepData is an omicsData object of the class 'pepData'
@@ -24,14 +24,14 @@
 #' 
 #' imd_anova_res <- imd_anova(omicsData = mypepData, test_method = 'comb', pval_adjust='bon')
 #' 
-#' result = bpquant_loop(statRes = imd_anova_res, pepData = mypepData)
+#' result = bpquant(statRes = imd_anova_res, pepData = mypepData)
 #' 
 #' }
 #' 
-#' @rdname bpquant_loop
+#' @rdname bpquant
 #' @export
 
-bpquant_loop<- function(statRes, pepData, pi_not = .9, max_proteoforms = 5){
+bpquant<- function(statRes, pepData, pi_not = .9, max_proteoforms = 5){
   
   #some checks
   if(pi_not < 0 | pi_not > 1) stop("pi_not must be between 0 and 1")

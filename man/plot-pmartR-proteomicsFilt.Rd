@@ -4,13 +4,10 @@
 \alias{plot.proteomicsFilt}
 \title{plot.proteomicsFilt}
 \usage{
-\method{plot}{proteomicsFilt}(filter_object, min_num_peps = NULL,
-  degen_peps = FALSE, ...)
+\method{plot}{proteomicsFilt}(filter_object, mapping = "both", ...)
 }
 \arguments{
-\item{min_num_peps}{an optional integer value between 1 and the maximum number of peptides that map to a protein in the data. The value specifies the minimum number of peptides that must map to a protein. Any protein with less than \code{min_num_peps} mapping to it will be returned as a protein that should be filtered. Default value is NULL.}
-
-\item{degen_peps}{logical indicator of whether to filter out degenerate peptides (TRUE) or not (FALSE). Default value is FALSE.
+\item{mapping}{whether to display a histogram of the number of peptides mapping to a protein for all proteins (mapping = 'pep_to_pro'), a histogram of the number of proteins mapped to by each peptide (mapping = "pro_to_pep"), or 'both'.  Defaults to "both"
 
 \tabular{ll}{
 \code{x_lab} \tab character string to be used for x-axis label. Defaults to NULL, in which case "Samples" is used. \cr
@@ -20,6 +17,8 @@
 \code{title_size} \tab integer value specifying the font size for the plot title. Default is 14. \cr
 \code{x_lab_size} \tab integer value indicating the font size for the x-axis. Defaults to 11. \cr
 \code{y_lab_size} \tab integer value indicating the font size for the y-axis. Defaults to 11. \cr
+\code(xlim) \tab length 2 numeric vector specifying x-axis limits for the peptide to protein plot.  Defaults to NULL, which gives default ggplot2 axis limits
+\code(ylim) \tab length 2 numeric vector specifying y-axis limits for the peptide to protein plot.  Defaults to NULL, which gives default ggplot2 axis limits
 \code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used. \cr
 \code{legend_position} \tab character string specifying one of "right", "left", "top", or "bottom" for the location of the legend. Defaults to "right". \cr
 }}

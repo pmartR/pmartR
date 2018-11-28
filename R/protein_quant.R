@@ -4,7 +4,7 @@
 #' 
 #' @param pepData an omicsData object of the class 'pepData'.
 #' @param method is one of four protein quantification methods, 'rollup', 'rrollup', 'qrollup' and 'zrollup'. When 'rollup' is selected, combine_fn must also be provided and will determine whether pquant_mean or pquant_median function will be used.
-#' @param isoformRes is a list of data frames, the result of applying the 'bpquant_loop' function to original pepData object. Defaults to NULL.
+#' @param isoformRes is a list of data frames, the result of applying the 'bpquant' function to original pepData object. Defaults to NULL.
 #' @param qrollup_thresh is a numeric value; is the peptide abundance cutoff value. Is an argument to qrollup function.
 #' @param single_pep logical indicating whether or not to remove proteins that have just a single peptide mapping to them, defaults to FALSE.
 #' @param single_observation logical indicating whether or not to remove peptides that have just a single observation, defaults to FALSE.
@@ -30,7 +30,7 @@
 #' 
 #' imd_anova_res <- imd_anova(omicsData = mypepData, test_method = 'comb', pval_adjust='bon')
 #' 
-#' isoformRes = bpquant_loop(statRes = imd_anova_res, pepData = mypepData)
+#' isoformRes = bpquant(statRes = imd_anova_res, pepData = mypepData)
 #' 
 #' #case where isoformRes is NULL:
 #' results<- protein_quant(pepData = mypepData, method = 'rollup', combine_fn = 'median', isoformRes = NULL)

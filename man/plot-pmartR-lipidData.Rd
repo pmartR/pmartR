@@ -26,5 +26,6 @@ For plotting an S3 object of type 'lipidData'
 \code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used. \cr
 \code{legend_position} \tab character string specifying one of "right", "left", "top", or "bottom" for the location of the legend. Defaults to "right". \cr
 \code{ylimit} \tab numeric vector of length 2 specifying y axis lower and upper limits. \cr
+\code{use_VizSampNames} \tab logical specifies whether to use custom sample names \cr
 }
 }

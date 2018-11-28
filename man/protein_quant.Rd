@@ -4,9 +4,8 @@
 \alias{protein_quant}
 \title{protein_quant wrapper function}
 \usage{
-protein_quant(pepData, method, isoformRes = NULL,
-  qrollup_thresh = NULL, single_pep = FALSE,
-  single_observation = FALSE, combine_fn = "median",
+protein_quant(pepData, method, isoformRes = NULL, qrollup_thresh = NULL,
+  single_pep = FALSE, single_observation = FALSE, combine_fn = "median",
   use_parallel = TRUE)
 }
 \arguments{
@@ -14,7 +13,7 @@ protein_quant(pepData, method, isoformRes = NULL,
 
 \item{method}{is one of four protein quantification methods, 'rollup', 'rrollup', 'qrollup' and 'zrollup'. When 'rollup' is selected, combine_fn must also be provided and will determine whether pquant_mean or pquant_median function will be used.}
 
-\item{isoformRes}{is a list of data frames, the result of applying the 'bpquant_loop' function to original pepData object. Defaults to NULL.}
+\item{isoformRes}{is a list of data frames, the result of applying the 'bpquant' function to original pepData object. Defaults to NULL.}
 
 \item{qrollup_thresh}{is a numeric value; is the peptide abundance cutoff value. Is an argument to qrollup function.}
 
@@ -37,14 +36,24 @@ If isoformRes is provided then, a temporary pepData object is formed using the i
 }
 \examples{
 dontrun{
+library(pmartR)
 library(pmartRdata)
-data("pep_object")
 
-case where isoformRes is NULL:
-results<- protein_quant(pepData = pep_object, method = 'rollup', combine_fn = 'median', isoformRes = NULL)
+mypepData <- group_designation(omicsData = pep_object, main_effects = c("Condition"))
+mypepData = edata_transform(mypepData, "log2")
 
-case where isoformRes is provided:
-results2 = protein_quant(pepData = pep_object, method = 'rollup', combine_fn = 'mean', isoformRes = isoformRes_object)
+imdanova_Filt <- imdanova_filter(omicsData = mypepData)
+mypepData <- applyFilt(filter_object = imdanova_Filt, omicsData = mypepData, min_nonmiss_anova=2)
+
+imd_anova_res <- imd_anova(omicsData = mypepData, test_method = 'comb', pval_adjust='bon')
+
+isoformRes = bpquant(statRes = imd_anova_res, pepData = mypepData)
+
+#case where isoformRes is NULL:
+results<- protein_quant(pepData = mypepData, method = 'rollup', combine_fn = 'median', isoformRes = NULL)
+
+#case where isoformRes is provided:
+results2 = protein_quant(pepData = pep_object, method = 'rollup', combine_fn = 'mean', isoformRes = isoformRes)
 }
 
 }

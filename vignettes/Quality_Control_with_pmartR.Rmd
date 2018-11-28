@@ -24,6 +24,7 @@ knitr::include_graphics("pmartR_logo_final.jpg")
 library(pmartR)
 library(pmartRdata)
 library(ggplot2)
+library(reshape2)
 ```
 
 This vignette describes the pmartR package functionality for quality control (QC) processing of mass spectrometry (MS) pan-omics data, in particular proteomics data at the peptide level. This includes data transformation, specification of groups that are to be compared against each other, filtering of features and/or samples, data normalization, and data summarization (correlation, principal components analysis). It is based on example data in the pmartRdata package. 
