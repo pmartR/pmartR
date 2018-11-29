@@ -116,7 +116,7 @@ edata_summary <- function(omicsData, by = 'sample', groupvar = NULL){
         #when groupvar is NULL but group_designation has been run
         
         #check that there are atleast 2 samples in each group and remove groups that have less than two samples per group
-        n_per_grp = as.data.frame(groupDF %>% group_by(Group) %>% summarise(count = n()))
+        n_per_grp = as.data.frame(groupDF %>% dplyr::group_by(Group) %>% dplyr::summarise(count = n()))
         remove_group = as.character(n_per_grp[which(n_per_grp$count<2), "Group"])
         if(length(remove_group) > 0){
           n_per_grp = n_per_grp[-which(n_per_grp$count<2),]
@@ -168,7 +168,7 @@ edata_summary <- function(omicsData, by = 'sample', groupvar = NULL){
       names(temp_fdata)[2]<- "Group"
       
       #check that there are atleast 2 samples in each group and remove groups that have less than two samples per group
-      n_per_grp = as.data.frame(temp_fdata %>% group_by(Group) %>% summarise(count = n()))
+      n_per_grp = as.data.frame(temp_fdata %>% dplyr::group_by(Group) %>% dplyr::summarise(count = n()))
       remove_group = as.character(n_per_grp[which(n_per_grp$count<2), "Group"])
       if(length(remove_group) > 0){
         n_per_grp = n_per_grp[-which(n_per_grp$count<2),]
@@ -235,7 +235,7 @@ edata_summary <- function(omicsData, by = 'sample', groupvar = NULL){
       names(output)[1] = fdata_cname
       
       #check that there are atleast 2 samples in each group and remove groups that have less than two samples per group
-      n_per_grp = as.data.frame(output %>% group_by(Group) %>% summarise(count = n()))
+      n_per_grp = as.data.frame(output %>% dplyr::group_by(Group) %>% dplyr::summarise(count = n()))
       remove_group = as.character(n_per_grp[which(n_per_grp$count<2), "Group"])
       if(length(remove_group) > 0){
         n_per_grp = n_per_grp[-which(n_per_grp$count<2),]
