@@ -84,18 +84,18 @@ normalize_quantile <- function(omicsData){
   
   # assign attributes # 
   omicsData$e_data <- edata_norm
-  attributes(omicsData)$data_info$data_norm <- TRUE
-  attributes(omicsData)$norm_info$norm_type <- "quantile" # new attribute as of 12/21/17
+  attributes(omicsData)$data_info$norm_info$is_normalized <- TRUE
+  attributes(omicsData)$data_info$norm_info$norm_type <- "quantile" # new attribute as of 12/21/17
   # none of these other attributes are applicable for quantile normalization #
-  # attributes(omicsData)$norm_info$subset_fn = subset_fn
-  # attributes(omicsData)$norm_info$subset_params = params
-  # attributes(omicsData)$norm_info$norm_fn = norm_fn
-  # attributes(omicsData)$norm_info$n_features_calc = length(peps)
-  # attributes(omicsData)$norm_info$prop_features_calc = length(peps)/nrow(omicsData$e_data)
-  # attributes(omicsData)$norm_info$params$norm_scale = norm_results$norm_params$scale
-  # attributes(omicsData)$norm_info$params$norm_location = norm_results$norm_params$location
-  # attributes(omicsData)$norm_info$params$bt_scale = norm_results$backtransform_params$scale
-  # attributes(omicsData)$norm_info$params$bt_location = norm_results$backtransform_params$location
+  # attributes(omicsData)$data_info$norm_info$subset_fn = subset_fn
+  # attributes(omicsData)$data_info$norm_info$subset_params = params
+  # attributes(omicsData)$data_info$norm_info$norm_fn = norm_fn
+  # attributes(omicsData)$data_info$norm_info$n_features_calc = length(peps)
+  # attributes(omicsData)$data_info$norm_info$prop_features_calc = length(peps)/nrow(omicsData$e_data)
+  # attributes(omicsData)$data_info$norm_info$params$norm_scale = norm_results$norm_params$scale
+  # attributes(omicsData)$data_info$norm_info$params$norm_location = norm_results$norm_params$location
+  # attributes(omicsData)$data_info$norm_info$params$bt_scale = norm_results$backtransform_params$scale
+  # attributes(omicsData)$data_info$norm_info$params$bt_location = norm_results$backtransform_params$location
   
   if(attributes(omicsData_orig)$data_info$data_scale != "abundance"){
     omicsData <- edata_transform(omicsData, attributes(omicsData_orig)$data_info$data_scale)

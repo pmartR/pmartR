@@ -48,7 +48,7 @@ NULL
 #' 
 #'@rdname plot-pmartR-corRes
 #'@export
-#'@param omicsData an object of the class 'pepData', 'proData', 'metabData', or 'lipidData', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.
+#'@param corRes_object an object of the class "corRes" created by calling \code{cor_result} on an omicsData object
 #'@param interactive default value is FALSE. If TRUE, an interactive d3heatmap will be rendered, allowing you to zoom in on sections of the heatmap.
 #'@param x_lab logical indicator of whether to label the x-axis with the sample names. Defaults to TRUE. If FALSE, no x-axis labels are included in the plot.
 #'@param y_lab logical indicator of whether to label the y-axis with the sample names. Defaults to TRUE. If FALSE, no y-axis labels are included in the plot.
@@ -84,11 +84,11 @@ plot.corRes <- function(corRes_object, omicsData = NULL, interactive = FALSE, x_
   Var1 <- Var2 <- value <- NULL
   
   if(is.null(title_plot)){
-    if(!is.null(attributes(corRes_object)$data_norm)){
-      if(attributes(corRes_object)$data_norm == TRUE) {
+    if(!is.null(attributes(corRes_object)$is_normalized)){
+      if(attributes(corRes_object)$is_normalized == TRUE) {
         plot_title <- "Correlations Among Samples (Normalized Data)"
       }else{
-        if(attributes(corRes_object)$data_norm == FALSE){
+        if(attributes(corRes_object)$is_normalized == FALSE){
           plot_title <- "Correlations Among Samples (Un-Normalized Data)"
         }
       }
@@ -135,8 +135,8 @@ plot.corRes <- function(corRes_object, omicsData = NULL, interactive = FALSE, x_
     if(x_lab==FALSE) heatmap <- heatmap + ggplot2::theme(axis.text.x = ggplot2::element_blank()) # added by KS
     if(y_lab==FALSE) heatmap <- heatmap + ggplot2::theme(axis.text.y = ggplot2::element_blank()) # added by KS
     
-    if(!is.null(attributes(corRes_object)$data_norm)){
-      if(attributes(corRes_object)$data_norm == TRUE) {
+    if(!is.null(attributes(corRes_object)$is_normalized)){
+      if(attributes(corRes_object)$is_normalized == TRUE) {
         heatmap <- heatmap + ggplot2::ggtitle(plot_title)
       }else{heatmap <- heatmap + ggplot2::ggtitle(plot_title)}
     }else{
@@ -706,6 +706,7 @@ plot.rmdFilt <- function(filter_object, pvalue_threshold = NULL, sampleID = NULL
     if(!is.character(sampleID)) stop("sampleID must be a character string")
     # check that length is 1
     if(length(sampleID) > 1) stop("sampleID must be of length 1")
+    if(!(sampleID %in% attr(filter_object, "sample_names"))) stop("The sample ID provided does not match any sample ID's in the data")
   }
   #check point_size argument is numeric and >= to zero
   if(!is.numeric(point_size)) stop("point_size must be numeric")
@@ -1096,12 +1097,12 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
   plot_data <- reshape2::melt(e_data, id = e_data_cname, na.rm = TRUE)
   
   if(inherits(omicsData, "isobaricpepData")){
-    maintitle <- ifelse(attributes(omicsData)$data_info$isobaric_norm,
+    maintitle <- ifelse(attributes(omicsData)$isobaric_info$data_norm$isobaric_norm,
                         "Boxplots of Normalized Isobaric Peptide Data",
                         "Boxplots of Un-Normalized Isobaric Peptide Data")
   }
   else if(inherits(omicsData, "pepData")){
-    maintitle <- ifelse(attributes(omicsData)$data_info$data_norm,
+    maintitle <- ifelse(attributes(omicsData)$data_info$norm_info$is_normalized,
                         "Boxplots of Normalized Peptide Data",
                         "Boxplots of Un-Normalized Peptide Data")
   }
@@ -1361,7 +1362,7 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
   f_data = omicsData$f_data
   plot_data <- reshape2::melt(e_data, id = e_data_cname, na.rm = TRUE)
   
-  maintitle <- ifelse(attributes(omicsData)$data_info$data_norm,
+  maintitle <- ifelse(attributes(omicsData)$data_info$norm_info$is_normalized,
                       "Boxplots of Normalized Protein Data",
                       "Boxplots of Un-Normalized Protein Data")
   
@@ -1617,7 +1618,7 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
   f_data = omicsData$f_data
   plot_data <- reshape2::melt(e_data, id = e_data_cname, na.rm = TRUE)
   
-  maintitle <- ifelse(attributes(omicsData)$data_info$data_norm,
+  maintitle <- ifelse(attributes(omicsData)$data_info$norm_info$is_normalized,
                       "Boxplots of Normalized Lipid Data",
                       "Boxplots of Un-Normalized Lipid Data")
   
@@ -1875,7 +1876,7 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
   f_data = omicsData$f_data
   plot_data <- reshape2::melt(e_data, id = e_data_cname, na.rm = TRUE)
   
-  maintitle <- ifelse(attributes(omicsData)$data_info$data_norm,
+  maintitle <- ifelse(attributes(omicsData)$data_info$norm_info$is_normalized,
                       "Boxplots of Normalized Metabolite Data",
                       "Boxplots of Un-Normalized Metabolite Data")
   

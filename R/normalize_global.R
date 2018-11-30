@@ -217,21 +217,21 @@ normalize_global <- function(omicsData, subset_fn, norm_fn, params = NULL, apply
     
   }else{
     omicsData$e_data = norm_results$transf_data
-    attributes(omicsData)$data_info$data_norm = TRUE
-    attributes(omicsData)$norm_info$norm_type = "global"  # added 12/21/17 by KS
-    attributes(omicsData)$norm_info$subset_fn = subset_fn
-    attributes(omicsData)$norm_info$subset_params = params
-    attributes(omicsData)$norm_info$norm_fn = norm_fn
-    attributes(omicsData)$norm_info$n_features_calc = length(peps)
-    attributes(omicsData)$norm_info$prop_features_calc = length(peps)/nrow(omicsData$e_data)
-    attributes(omicsData)$norm_info$params$norm_scale = norm_results$norm_params$scale
-    attributes(omicsData)$norm_info$params$norm_location = norm_results$norm_params$location
-    attributes(omicsData)$norm_info$params$bt_scale = norm_results$backtransform_params$scale
-    attributes(omicsData)$norm_info$params$bt_location = norm_results$backtransform_params$location
+    attributes(omicsData)$data_info$norm_info$is_normalized = TRUE
+    attributes(omicsData)$data_info$norm_info$norm_type = "global"  # added 12/21/17 by KS
+    attributes(omicsData)$data_info$norm_info$subset_fn = subset_fn
+    attributes(omicsData)$data_info$norm_info$subset_params = params
+    attributes(omicsData)$data_info$norm_info$norm_fn = norm_fn
+    attributes(omicsData)$data_info$norm_info$n_features_calc = length(peps)
+    attributes(omicsData)$data_info$norm_info$prop_features_calc = length(peps)/nrow(omicsData$e_data)
+    attributes(omicsData)$data_info$norm_info$params$norm_scale = norm_results$norm_params$scale
+    attributes(omicsData)$data_info$norm_info$params$norm_location = norm_results$norm_params$location
+    attributes(omicsData)$data_info$norm_info$params$bt_scale = norm_results$backtransform_params$scale
+    attributes(omicsData)$data_info$norm_info$params$bt_location = norm_results$backtransform_params$location
     res = omicsData
     
     if(!is.null(min_prop)){
-      prop_features_calc = attributes(omicsData)$norm_info$prop_features_calc
+      prop_features_calc = attributes(omicsData)$data_info$norm_info$prop_features_calc
         if(prop_features_calc < min_prop) stop(paste("The minimum proportion of features allowed (min_prop) was specified as", min_prop, "but the actual proportion of features used to calculate the normalization factors using the given subset function (subset_fn) was", round(prop_features_calc, 3), "hence normalization was not carried out." , sep = " "))
     }
   }

@@ -14,9 +14,9 @@
 #' \tabular{ll}{
 #' data_scale \tab Scale of the data provided in \code{e_data}. Acceptable values are 'log2', 'log10', 'log', and 'abundance', which indicate data is log base 2, base 10, natural log transformed, and raw abundance, respectively. Default values is 'abundance'. \cr
 #' \tab \cr
-#' data_norm \tab A logical argument, specifying whether the data has been normalized or not. Default value is FALSE. \cr
+#' is_normalized \tab A logical argument, specifying whether the data has been normalized or not. Default value is FALSE. \cr
 #' \tab \cr
-#' norm_info \tab Default value is NULL. When a normalization is applied to the data, this becomes populated with a list containing the normalization function, normalization subset and subset parameters, the location and scale parameters used to normalize the data, and the location and scale parameters used to backtransform the data (if applicable). \cr
+#' norm_info \tab Default value is an empty list, which will be populated with a single named element \code{is_normalized = is_normalized}. When a normalization is applied to the data, this becomes populated with a list containing the normalization function, normalization subset and subset parameters, the location and scale parameters used to normalize the data, and the location and scale parameters used to backtransform the data (if applicable). \cr
 #' \tab \cr
 #' data_types \tab Character string describing the type of data (e.g.'Positive ion'). Default value is NULL. \cr
 #' \tab\cr
@@ -43,7 +43,7 @@
 #' library(pmartRdata)
 #' data("pro_edata")
 #' data("pro_fdata")
-#' myproData <- as.proData(e_data = pro_edata, f_data = pro_fdata, edata_cname = "Reference", fdata_cname = "SampleID", data_norm=TRUE)
+#' myproData <- as.proData(e_data = pro_edata, f_data = pro_fdata, edata_cname = "Reference", fdata_cname = "SampleID", is_normalized=TRUE)
 #'}
 #' @author Kelly Stratton, Lisa Bramer
 #' @seealso \code{\link{as.pepData}}
@@ -58,7 +58,7 @@ as.proData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname, 
 ## protein data ##
 .as.proData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname,
                         emeta_cname="NULL", data_scale = "abundance",
-                        data_norm = FALSE, norm_info=NULL,
+                        is_normalized = FALSE, norm_info=list(),
                         data_types=NULL, check.names = TRUE){
 
   # initial checks #
@@ -169,7 +169,8 @@ as.proData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname, 
   }
 
   # set data information attributes #
-  attr(res, "data_info") = list(data_scale = data_scale, data_norm = data_norm, norm_info = norm_info, num_edata = num_edata, num_miss_obs = num_miss_obs,
+  norm_info$is_normalized = is_normalized
+  attr(res, "data_info") = list(data_scale = data_scale, norm_info = norm_info, num_edata = num_edata, num_miss_obs = num_miss_obs,
                                 num_emeta = num_emeta, prop_missing = prop_missing, num_samps = num_samps, data_types = data_types)
 
   #set check.names attribute #

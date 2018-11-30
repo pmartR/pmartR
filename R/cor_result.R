@@ -42,11 +42,11 @@ cor_result <- function(omicsData){
   attr(output, "group_DF") <- attr(omicsData, "group_DF")
  
    if(inherits(omicsData, "isobaricpepData")){
-    attr(output, "isobaric_norm") <- ifelse(attr(omicsData,"data_info")$isobaric_norm == TRUE, TRUE, FALSE)
-    attr(output, "data_norm") <- ifelse(attr(omicsData,"data_info")$data_norm == TRUE, TRUE, FALSE)
+    attr(output, "isobaric_norm") <- ifelse(attr(omicsData,"isobaric_info")$norm_info$is_normalized == TRUE, TRUE, FALSE)
+    attr(output, "is_normalized") <- ifelse(attr(omicsData,"data_info")$norm_info$is_normalized == TRUE, TRUE, FALSE)
   }
   else if(inherits(omicsData, "pepData")){
-    attr(output, "data_norm") <- ifelse(attr(omicsData,"data_info")$data_norm == TRUE, TRUE, FALSE)
+    attr(output, "is_normalized") <- ifelse(attr(omicsData,"data_info")$norm_info$is_normalized == TRUE, TRUE, FALSE)
   }
 
 

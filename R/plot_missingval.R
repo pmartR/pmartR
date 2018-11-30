@@ -135,7 +135,7 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
           } 
     }
     if(use_VizSampNames == T){
-      p = p + scale_x_discrete(labels = na.by.sample$VizSampNames)
+      p = p + ggplot2::scale_x_discrete(labels = na.by.sample$VizSampNames)
     }
     return(p)
   }
@@ -226,7 +226,7 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
     }
     
     if(use_VizSampNames == T){
-      s = s + scale_x_discrete(labels = na.by.sample$VizSampNames)
+      s = s + ggplot2::scale_x_discrete(labels = na.by.sample$VizSampNames)
     }
     
     #plots NA per molecule
