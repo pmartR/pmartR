@@ -34,6 +34,7 @@
 #'
 
 plot.isobaricnormRes <- function(isobaricnormRes_object, x_lab = NULL, ...) {
+  require(ggplot2)
   .plot.isobaricnormRes(isobaricnormRes_object, x_lab = NULL, ...)
 }
 
@@ -78,10 +79,10 @@ plot.isobaricnormRes <- function(isobaricnormRes_object, x_lab = NULL, ...) {
     }
   
   p<- p + geom_boxplot() +
-      ggplot2::xlab(xlabel) +
-      ggplot2::ylab(ylabel) +
-      ggplot2::ggtitle(plot_title) +
-      ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size)) 
+      xlab(xlabel) +
+      ylab(ylabel) +
+      ggtitle(plot_title) +
+      theme(plot.title = element_text(size = title_size), axis.title.x = element_text(size = x_lab_size), axis.title.y = element_text(size = y_lab_size)) 
   
   if(bw_theme == TRUE){
     p<- p + theme_bw()

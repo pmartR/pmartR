@@ -22,6 +22,7 @@
 #' @export
 
 plot.dataRes<- function(dataRes, metric = NULL, density = FALSE, ncols = NULL){
+  require(ggplot2)
   #check that attr(dataRes, "by") == "molecule"
   if(attr(dataRes, "by") != "molecule") stop("can only plot a dataRes object if its 'by' attribute is equal to 'molecule'")
   
@@ -49,10 +50,10 @@ plot.dataRes<- function(dataRes, metric = NULL, density = FALSE, ncols = NULL){
     data_mean_sd<- merge(mean_melt, sd_melt, by = c(edata_cname, "variable"))
     data_mean_median<- merge(mean_melt, median_melt, by = c(edata_cname, "variable"))
     
-    q<- ggplot2::ggplot(data_mean_sd, ggplot2::aes(x = mean, y = sd, color = variable)) + ggplot2::geom_point(shape = 1) + ggplot2::ggtitle("Mean x Standard Deviation") +
+    q<- ggplot(data_mean_sd, aes(x = mean, y = sd, color = variable)) + geom_point(shape = 1) + ggtitle("Mean x Standard Deviation") +
       theme_bw()
     
-    p<- ggplot2::ggplot(data_mean_median, ggplot2::aes(x = mean, y = median, color = variable)) + ggplot2::geom_point(shape = 1) + ggplot2::ggtitle("Mean x Median") +
+    p<- ggplot(data_mean_median, aes(x = mean, y = median, color = variable)) + geom_point(shape = 1) + ggtitle("Mean x Median") +
       theme_bw()
     
     gridExtra::grid.arrange(q, p, ncol = 2)
@@ -69,17 +70,17 @@ plot.dataRes<- function(dataRes, metric = NULL, density = FALSE, ncols = NULL){
       data = dataRes[[metric]]
       data_melt = melt(data, id.vars = edata_cname)
       
-      r<- ggplot2::ggplot(data_melt, ggplot2::aes(x = value, fill = variable)) + ggplot2::geom_histogram(binwidth = .5, colour = "white") +
-        ggplot2::facet_wrap(~variable, ncol = ncols) +
-        ggplot2::ggtitle(paste("Histograms for ", metric, sep = "")) + ggplot2::theme_bw()
+      r<- ggplot(data_melt, aes(x = value, fill = variable)) + geom_histogram(binwidth = .5, colour = "white") +
+        facet_wrap(~variable, ncol = ncols) +
+        ggtitle(paste("Histograms for ", metric, sep = "")) + theme_bw()
       
     }else{
       #if density == T, will plot geom_density
       data = dataRes[[metric]]
       data_melt = melt(data, id.vars = edata_cname)
       
-      r<- ggplot2::ggplot(data_melt, ggplot2::aes(x = value, colour = variable)) + ggplot2::geom_density() +
-        ggplot2::ggtitle(paste("Density plot for ", metric, sep = "")) + ggplot2::theme_bw()
+      r<- ggplot(data_melt, aes(x = value, colour = variable)) + geom_density() +
+        ggtitle(paste("Density plot for ", metric, sep = "")) + theme_bw()
     }
 
     return(r)
