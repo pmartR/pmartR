@@ -149,7 +149,7 @@ as.metabData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname
   if(!is.null(techrep_cname)){
     if(!inherits(techrep_cname, "character") | length(techrep_cname) == 0) stop("techrep_cname must be a character string specifying a column in f_data")
     if(!(techrep_cname %in% colnames(f_data[,-which(names(f_data) == fdata_cname)]))) stop("Specified technical replicate column was not found in f_data or was the same as fdata_cname")
-    if(length(unique(f_data$techrep_cname) == nrow(f_data))) stop("Specified technical replicate column had a unique value for each row.  Values should specify groups of technical replicates belonging to a biological sample")
+    if(length(unique(f_data[,techrep_cname])) == nrow(f_data)) stop("Specified technical replicate column had a unique value for each row.  Values should specify groups of technical replicates belonging to a biological sample")
   }
 
   # store results #
