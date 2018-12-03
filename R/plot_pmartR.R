@@ -1105,7 +1105,7 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
   plot_data <- reshape2::melt(e_data, id = e_data_cname, na.rm = TRUE)
   
   if(inherits(omicsData, "isobaricpepData")){
-    maintitle <- ifelse(attributes(omicsData)$isobaric_info$data_norm$isobaric_norm,
+    maintitle <- ifelse(attributes(omicsData)$isobaric_info$norm_info$is_normalized,
                         "Boxplots of Normalized Isobaric Peptide Data",
                         "Boxplots of Un-Normalized Isobaric Peptide Data")
   }
