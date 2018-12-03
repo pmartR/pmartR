@@ -48,6 +48,7 @@
 #'
 
 missingval_volcanoplot<- function(statRes, comparison, x_lab = NULL, ...) {
+  require(ggplot2)
   .missingval_volcanoplot(statRes, comparison, x_lab, ...)
 }
 

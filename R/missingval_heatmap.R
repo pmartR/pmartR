@@ -39,6 +39,7 @@
 
 
 missingval_heatmap <- function(omicsData, x_lab = NULL, y_lab = NULL, ...) {
+  require(ggplot2)
   .missingval_heatmap(omicsData, x_lab, y_lab, ...)
 }
 
