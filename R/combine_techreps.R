@@ -148,6 +148,7 @@ combine_techreps <- function(omicsData, combine_fn = "mean", bio_sample_names = 
     
   }else new_group_DF <- NULL
   
+
   # store new data and reset attributes
   omicsData$e_data <- new_edata
   omicsData$f_data <- new_fdata
