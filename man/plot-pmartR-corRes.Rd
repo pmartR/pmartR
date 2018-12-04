@@ -9,7 +9,7 @@
   colorbar_lim = c(NA, NA), ...)
 }
 \arguments{
-\item{omicsData}{an object of the class 'pepData', 'proData', 'metabData', or 'lipidData', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.}
+\item{corRes_object}{an object of the class "corRes" created by calling \code{cor_result} on an omicsData object}
 
 \item{interactive}{default value is FALSE. If TRUE, an interactive d3heatmap will be rendered, allowing you to zoom in on sections of the heatmap.}
 

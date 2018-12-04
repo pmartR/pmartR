@@ -48,7 +48,7 @@ NULL
 #' 
 #'@rdname plot-pmartR-corRes
 #'@export
-#'@param omicsData an object of the class 'pepData', 'proData', 'metabData', or 'lipidData', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.
+#'@param corRes_object an object of the class "corRes" created by calling \code{cor_result} on an omicsData object
 #'@param interactive default value is FALSE. If TRUE, an interactive d3heatmap will be rendered, allowing you to zoom in on sections of the heatmap.
 #'@param x_lab logical indicator of whether to label the x-axis with the sample names. Defaults to TRUE. If FALSE, no x-axis labels are included in the plot.
 #'@param y_lab logical indicator of whether to label the y-axis with the sample names. Defaults to TRUE. If FALSE, no y-axis labels are included in the plot.
@@ -61,6 +61,7 @@ NULL
 #' \code{use_VizSampNames} \tab logical specifies whether to use custom sample names \cr
 #' } 
 plot.corRes <- function(corRes_object, omicsData = NULL, interactive = FALSE, x_lab=TRUE, y_lab=TRUE, colorbar_lim=c(NA, NA), ...){
+  require(ggplot2)
   .plot.corRes(corRes_object, omicsData, interactive, x_lab, y_lab, colorbar_lim, ...)
 }
 .plot.corRes <- function(corRes_object, omicsData = NULL, interactive = FALSE, x_lab=TRUE, y_lab=TRUE, colorbar_lim=c(NA, NA), title_plot = NULL, title_size = 14, use_VizSampNames = FALSE){
@@ -84,11 +85,11 @@ plot.corRes <- function(corRes_object, omicsData = NULL, interactive = FALSE, x_
   Var1 <- Var2 <- value <- NULL
   
   if(is.null(title_plot)){
-    if(!is.null(attributes(corRes_object)$data_norm)){
-      if(attributes(corRes_object)$data_norm == TRUE) {
+    if(!is.null(attributes(corRes_object)$is_normalized)){
+      if(attributes(corRes_object)$is_normalized == TRUE) {
         plot_title <- "Correlations Among Samples (Normalized Data)"
       }else{
-        if(attributes(corRes_object)$data_norm == FALSE){
+        if(attributes(corRes_object)$is_normalized == FALSE){
           plot_title <- "Correlations Among Samples (Un-Normalized Data)"
         }
       }
@@ -111,44 +112,44 @@ plot.corRes <- function(corRes_object, omicsData = NULL, interactive = FALSE, x_
     corRes_melt$Var2 <- abbreviate(corRes_melt$Var2, minlength=20)
     
     if(all(is.na(colorbar_lim))){
-      heatmap <- ggplot2::ggplot(corRes_melt, ggplot2::aes(x = ordered(Var2, levels = rev(sort(unique(Var2)))),
+      heatmap <- ggplot(corRes_melt, aes(x = ordered(Var2, levels = rev(sort(unique(Var2)))),
                                                            y = ordered(Var1, levels = rev(sort(unique(Var1)))))) +
-        ggplot2::geom_tile(ggplot2::aes(fill = value)) +
-        ggplot2::scale_fill_gradientn("Correlation", colours = pal(50)) +
-        ggplot2::xlab("") +  ggplot2::ylab("") +
-        ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90),
-                       axis.ticks = ggplot2::element_blank(),
-                       plot.title = ggplot2::element_text(size=title_size))
+        geom_tile(aes(fill = value)) +
+        scale_fill_gradientn("Correlation", colours = pal(50)) +
+        xlab("") +  ylab("") +
+        theme(axis.text.x = element_text(angle = 90),
+                       axis.ticks = element_blank(),
+                       plot.title = element_text(size=title_size))
     }else{
-      heatmap <- ggplot2::ggplot(corRes_melt, ggplot2::aes(x = ordered(Var2, levels = rev(sort(unique(Var2)))),
+      heatmap <- ggplot(corRes_melt, aes(x = ordered(Var2, levels = rev(sort(unique(Var2)))),
                                                            y = ordered(Var1, levels = rev(sort(unique(Var1)))))) +
-        ggplot2::geom_tile(ggplot2::aes(fill = value)) +
-        ggplot2::scale_fill_gradientn("Correlation", limits = colorbar_lim, colours = pal(50)) +
-        ggplot2::xlab("") +  ggplot2::ylab("") +
-        ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90),
-                       axis.ticks = ggplot2::element_blank(),
-                       plot.title = ggplot2::element_text(size=title_size))
+        geom_tile(aes(fill = value)) +
+        scale_fill_gradientn("Correlation", limits = colorbar_lim, colours = pal(50)) +
+        xlab("") +  ylab("") +
+        theme(axis.text.x = element_text(angle = 90),
+                       axis.ticks = element_blank(),
+                       plot.title = element_text(size=title_size))
     }
     
     
-    if(nrow(corRes_object) > 40) heatmap <- heatmap + ggplot2::theme(axis.text.x = ggplot2::element_blank())
-    if(x_lab==FALSE) heatmap <- heatmap + ggplot2::theme(axis.text.x = ggplot2::element_blank()) # added by KS
-    if(y_lab==FALSE) heatmap <- heatmap + ggplot2::theme(axis.text.y = ggplot2::element_blank()) # added by KS
+    if(nrow(corRes_object) > 40) heatmap <- heatmap + theme(axis.text.x = element_blank())
+    if(x_lab==FALSE) heatmap <- heatmap + theme(axis.text.x = element_blank()) # added by KS
+    if(y_lab==FALSE) heatmap <- heatmap + theme(axis.text.y = element_blank()) # added by KS
     
-    if(!is.null(attributes(corRes_object)$data_norm)){
-      if(attributes(corRes_object)$data_norm == TRUE) {
-        heatmap <- heatmap + ggplot2::ggtitle(plot_title)
-      }else{heatmap <- heatmap + ggplot2::ggtitle(plot_title)}
+    if(!is.null(attributes(corRes_object)$is_normalized)){
+      if(attributes(corRes_object)$is_normalized == TRUE) {
+        heatmap <- heatmap + ggtitle(plot_title)
+      }else{heatmap <- heatmap + ggtitle(plot_title)}
     }else{
-        heatmap <- heatmap + ggplot2::ggtitle(plot_title)
+        heatmap <- heatmap + ggtitle(plot_title)
     }
     
     if(use_VizSampNames){
       if(!is.logical(as.logical(use_VizSampNames))) stop("Must specify a logical TRUE/FALSE value for use_VizSampNames")
       if(is.null(omicsData)) stop("If using custom sample names, specify the corresponding omicsData object")
       heatmap = heatmap + 
-        ggplot2::scale_x_discrete(labels = omicsData$f_data$VizSampNames, breaks = levels(omicsData$f_data[,get_fdata_cname(omicsData)])) + 
-        ggplot2::scale_y_discrete(labels = omicsData$f_data$VizSampNames, breaks = levels(omicsData$f_data[,get_fdata_cname(omicsData)]))
+        scale_x_discrete(labels = omicsData$f_data$VizSampNames, breaks = levels(omicsData$f_data[,get_fdata_cname(omicsData)])) + 
+        scale_y_discrete(labels = omicsData$f_data$VizSampNames, breaks = levels(omicsData$f_data[,get_fdata_cname(omicsData)]))
     }
     
   } else {
@@ -187,6 +188,7 @@ plot.corRes <- function(corRes_object, omicsData = NULL, interactive = FALSE, x_
 #' plot(molfilt, min_num = 3, cumulative = FALSE)
 #' 
 plot.moleculeFilt <- function(filter_object, min_num = NULL, cumulative = TRUE,...) {
+  require(ggplot2)
   .plot.moleculeFilt(filter_object, min_num, cumulative, ...)
 }
 
@@ -233,10 +235,10 @@ plot.moleculeFilt <- function(filter_object, min_num = NULL, cumulative = TRUE,.
     num_obs <- 1:(max(filter_object$Num_Observations)+1)
     
     # shape is a step function with fixed color
-    shape <- ggplot2::geom_step(ggplot2::aes(x = num_observations, y = counts), color = "red")
+    shape <- geom_step(aes(x = num_observations, y = counts), color = "red")
     
     # draw a horizontal line if min_num is specified
-    hline <- if(!is.null(min_num)) ggplot2::geom_hline(ggplot2::aes(color = "black"), yintercept = counts[min_num], linetype = "dashed") else NULL
+    hline <- if(!is.null(min_num)) geom_hline(aes(color = "black"), yintercept = counts[min_num], linetype = "dashed") else NULL
     
     xlabel <- ifelse(is.null(x_lab), "Minimum Number of Times a Biomolecule Appears Across All Samples", x_lab)
     ylabel <- ifelse(is.null(y_lab), "Count of Biomolecules", y_lab)
@@ -251,11 +253,11 @@ plot.moleculeFilt <- function(filter_object, min_num = NULL, cumulative = TRUE,.
    # color by which values are kept if min_num is specified
    if(!is.null(min_num)){
      fill <- ifelse(1:max(filter_object$Num_Observations) >= min_num, "retained", "dropped")
-     shape <- ggplot2::geom_bar(ggplot2::aes(x = num_observations, y = counts, fill = fill), color = "black", stat = "identity")
-     legend_scale <- ggplot2::scale_fill_manual(name = "", values = c("dropped" =  "red", "retained" =  "green"))
+     shape <- geom_bar(aes(x = num_observations, y = counts, fill = fill), color = "black", stat = "identity")
+     legend_scale <- scale_fill_manual(name = "", values = c("dropped" =  "red", "retained" =  "green"))
      }
    else{
-     shape <- ggplot2::geom_bar(ggplot2::aes(x = num_observations, y = counts), fill = "royalblue1", color = "black", stat = "identity")
+     shape <- geom_bar(aes(x = num_observations, y = counts), fill = "royalblue1", color = "black", stat = "identity")
    }
    
    num_obs <- 1:max(filter_object$Num_Observations)
@@ -271,22 +273,22 @@ plot.moleculeFilt <- function(filter_object, min_num = NULL, cumulative = TRUE,.
                                        fill = fill)
   
   # value annotation - data argument is to shave off last row that is only there to extend the last step
-  text <- ggplot2::geom_text(data = pep_observation_counts[1:max(filter_object$Num_Observations),], 
-                             ggplot2::aes(x = num_observations, y = frequency_counts, label = frequency_counts), vjust = -1, nudge_x = ifelse(cumulative, 0.5, 0))
+  text <- geom_text(data = pep_observation_counts[1:max(filter_object$Num_Observations),], 
+                             aes(x = num_observations, y = frequency_counts, label = frequency_counts), vjust = -1, nudge_x = ifelse(cumulative, 0.5, 0))
   
   # plot #
-  p <- ggplot2::ggplot(pep_observation_counts) +
+  p <- ggplot(pep_observation_counts) +
     shape + hline + text + legend_scale +
-    ggplot2::xlab(xlabel) +
-    ggplot2::ylab(ylabel) +
-    ggplot2::ggtitle(plot_title) +
-    ggplot2::scale_x_continuous(breaks = max(filter_object$Num_Observations):1) +
-    ggplot2::theme(plot.title = ggplot2::element_text(size = title_size),
-                   axis.title.x = ggplot2::element_text(size = x_lab_size),
-                   axis.title.y = ggplot2::element_text(size = y_lab_size))
+    xlab(xlabel) +
+    ylab(ylabel) +
+    ggtitle(plot_title) +
+    scale_x_continuous(breaks = max(filter_object$Num_Observations):1) +
+    theme(plot.title = element_text(size = title_size),
+                   axis.title.x = element_text(size = x_lab_size),
+                   axis.title.y = element_text(size = y_lab_size))
   
   if(bw_theme == TRUE){
-    p <- p + ggplot2::theme_bw()  
+    p <- p + theme_bw()  
   }
   
   return(p)
@@ -323,6 +325,7 @@ plot.moleculeFilt <- function(filter_object, min_num = NULL, cumulative = TRUE,.
 #' plot(profilt, min_num_peps = 10, cumulative = FALSE)
 #' 
 plot.proteomicsFilt <- function(filter_object, mapping = "both", cumulative = TRUE, log_scale = TRUE, min_num_peps = NULL, ...) {
+  require(ggplot2)
   .plot.proteomicsFilt(filter_object, mapping, cumulative, log_scale, min_num_peps, ...)
 }
 
@@ -381,20 +384,20 @@ plot.proteomicsFilt <- function(filter_object, mapping = "both", cumulative = TR
         pep_bins <- c(pep_bins, max(pep_bins)+1)
         
         # store shape variable to be added to plot object later
-        shape_pep <- ggplot2::geom_step(ggplot2::aes(x = bins, y = counts), color = "red")
+        shape_pep <- geom_step(aes(x = bins, y = counts), color = "red")
       }
-      else shape_pep <- ggplot2::geom_bar(ggplot2::aes(x = bins, y = counts), fill = "royalblue1", stat = "identity")
+      else shape_pep <- geom_bar(aes(x = bins, y = counts), fill = "royalblue1", stat = "identity")
       
       if(length(pro_counts) > 1){
         pro_counts <- c(pro_counts, pro_counts[length(pro_counts)])
         pro_bins <- c(pro_bins, max(pro_bins)+1)
-        shape_pro <- ggplot2::geom_step(ggplot2::aes(x = bins, y = counts), color = "red")
+        shape_pro <- geom_step(aes(x = bins, y = counts), color = "red")
       }
-      else shape_pro <- ggplot2::geom_bar(ggplot2::aes(x = bins, y = counts), fill = "royalblue1", stat = "identity")
+      else shape_pro <- geom_bar(aes(x = bins, y = counts), fill = "royalblue1", stat = "identity")
       
       # if min_num_peps is specified, draw a horizontal line to indicate the number of peptides retained
       if(!is.null(min_num_peps)){
-        hline <- ggplot2::geom_hline(ggplot2::aes(color = "black"), yintercept = pro_counts[which(pro_bins == min_num_peps)], linetype = "dashed")
+        hline <- geom_hline(aes(color = "black"), yintercept = pro_counts[which(pro_bins == min_num_peps)], linetype = "dashed")
       }
     
     }
@@ -412,24 +415,24 @@ plot.proteomicsFilt <- function(filter_object, mapping = "both", cumulative = TR
       # if min_num_peps is specified, add a coloring variable that is red for dropped values and green for retained values
       if(!is.null(min_num_peps)){
         fill <- ifelse(pro_bins >= min_num_peps, "retained", "dropped")
-        shape_pro <- ggplot2::geom_bar(ggplot2::aes(x = bins, y = counts, fill = fill), stat = "identity")
-        fill_format <- ggplot2::scale_fill_manual(name = "", values = c("dropped" =  "red", "retained" =  "green"))
+        shape_pro <- geom_bar(aes(x = bins, y = counts, fill = fill), stat = "identity")
+        fill_format <- scale_fill_manual(name = "", values = c("dropped" =  "red", "retained" =  "green"))
       }
       else{
-        shape_pro <- ggplot2::geom_bar(ggplot2::aes(x = bins, y = counts), fill = "royalblue1", stat = "identity")
+        shape_pro <- geom_bar(aes(x = bins, y = counts), fill = "royalblue1", stat = "identity")
       }
       
-      shape_pep <- ggplot2::geom_bar(ggplot2::aes(x = bins, y = counts), fill = "royalblue1", stat = "identity") 
+      shape_pep <- geom_bar(aes(x = bins, y = counts), fill = "royalblue1", stat = "identity") 
     }
     
     # log scaling
     if(log_scale){
-      scale_pep <- ggplot2::scale_x_continuous(breaks = unique(pep_bins), trans = "log10")
-      scale_pro <- ggplot2::scale_x_continuous(trans = "log10")
+      scale_pep <- scale_x_continuous(breaks = unique(pep_bins), trans = "log10")
+      scale_pro <- scale_x_continuous(trans = "log10")
     }  
     else{
       scale_pro <- NULL
-      scale_pep <- ggplot2::scale_x_continuous(breaks = seq(1:max(pep_counts)))
+      scale_pep <- scale_x_continuous(breaks = seq(1:max(pep_counts)))
     }
   
     # make plotting df for peptides and proteins
@@ -444,23 +447,23 @@ plot.proteomicsFilt <- function(filter_object, mapping = "both", cumulative = TR
       plot_title_pep <- ifelse(is.null(title.pep), paste0("Number of proteins mapped to by ", ifelse(cumulative, "at least", "exactly")," X peptides"), title.pep)
       
       # main plot object that adds resources built in ifelse blocks above
-      p1 <- ggplot2::ggplot(pro_counts_df) +
+      p1 <- ggplot(pro_counts_df) +
         shape_pro + scale_pro + hline + fill_format +
-        ggplot2::ggtitle(plot_title_pep) +
-        ggplot2::xlab(xlabel_pep) +
-        ggplot2::ylab(ylabel_pep) +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size))
+        ggtitle(plot_title_pep) +
+        xlab(xlabel_pep) +
+        ylab(ylabel_pep) +
+        theme(plot.title = element_text(size=title_size),
+                       axis.title.x = element_text(size=x_lab_size),
+                       axis.title.y = element_text(size=y_lab_size))
       # other ggplot2 arguments
       if(bw_theme){
-        p1 <- p1 + ggplot2::theme_bw()
+        p1 <- p1 + theme_bw()
       }
       if(!is.null(xlim)){
-        p1 <- p1 + ggplot2::xlim(xlim)
+        p1 <- p1 + xlim(xlim)
       }
       if(!is.null(ylim)){
-        p1 <- p1 + ggplot2::ylim(ylim)
+        p1 <- p1 + ylim(ylim)
       }
     }
     
@@ -472,18 +475,18 @@ plot.proteomicsFilt <- function(filter_object, mapping = "both", cumulative = TR
       
       # text annotation (peptide count plot has too many bins to make this an option) 
       # data argument shaves off last row that is only used to extend last step in cumulative plot
-      text <- ggplot2::geom_text(data = pep_counts_df[pep_counts_df$bins <= max(filter_object$counts_by_pep$n),], ggplot2::aes(x = bins, y = counts, label = counts), vjust = -1, hjust = ifelse(cumulative & (length(pep_counts) > 1), -0.5, 0.5))
+      text <- geom_text(data = pep_counts_df[pep_counts_df$bins <= max(filter_object$counts_by_pep$n),], aes(x = bins, y = counts, label = counts), vjust = -1, hjust = ifelse(cumulative & (length(pep_counts) > 1), -0.5, 0.5))
       
-      p2 <- ggplot2::ggplot(pep_counts_df) +
+      p2 <- ggplot(pep_counts_df) +
         shape_pep + text + scale_pep +
-        ggplot2::ggtitle(plot_title_pro) +
-        ggplot2::xlab(xlabel_pro) +
-        ggplot2::ylab(ylabel_pro) +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size))
+        ggtitle(plot_title_pro) +
+        xlab(xlabel_pro) +
+        ylab(ylabel_pro) +
+        theme(plot.title = element_text(size=title_size),
+                       axis.title.x = element_text(size=x_lab_size),
+                       axis.title.y = element_text(size=y_lab_size))
       if(bw_theme){
-        p2 <- p2 + ggplot2::theme_bw()
+        p2 <- p2 + theme_bw()
       }
     }
     
@@ -515,6 +518,7 @@ plot.proteomicsFilt <- function(filter_object, mapping = "both", cumulative = TR
 #' \code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used. \cr
 #' }
 plot.imdanovaFilt <- function(filter_object, min_nonmiss_anova = NULL, min_nonmiss_gtest = NULL, ...) {
+  require(ggplot2)
   .plot.imdanovaFilt(filter_object, min_nonmiss_anova, min_nonmiss_gtest, ...)
 }
 
@@ -564,21 +568,21 @@ plot.imdanovaFilt <- function(filter_object, min_nonmiss_anova = NULL, min_nonmi
     plot_df_anova <- data.frame(x_anova = 2:min_n_group, filtered_vec1)
     
     ## generate plot
-    p <- ggplot2::ggplot(plot_df_anova) +
-      ggplot2::geom_rect(ggplot2::aes(xmin = x_anova - 0.5, xmax = x_anova + 0.5,
+    p <- ggplot(plot_df_anova) +
+      geom_rect(aes(xmin = x_anova - 0.5, xmax = x_anova + 0.5,
                                       ymin = 0, ymax = filtered_vec1), fill="royalblue1", col="black") +
-      ggplot2::geom_text(ggplot2::aes(x = x_anova, y = filtered_vec1, label = filtered_vec1), vjust = -0.25) +
-      ggplot2::xlab(xlabel) +
-      ggplot2::ylab(ylabel) +
-      ggplot2::ggtitle(plot_title) +
-      ggplot2::ylim(0, 1.1*max(filtered_vec1, na.rm=TRUE)) +
-      ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                     axis.title.x = ggplot2::element_text(size=x_lab_size),
-                     axis.title.y = ggplot2::element_text(size=y_lab_size))
+      geom_text(aes(x = x_anova, y = filtered_vec1, label = filtered_vec1), vjust = -0.25) +
+      xlab(xlabel) +
+      ylab(ylabel) +
+      ggtitle(plot_title) +
+      ylim(0, 1.1*max(filtered_vec1, na.rm=TRUE)) +
+      theme(plot.title = element_text(size=title_size),
+                     axis.title.x = element_text(size=x_lab_size),
+                     axis.title.y = element_text(size=y_lab_size))
     
     if(!is.null(min_nonmiss_anova)) {
       num_tested <- plot_df_anova$filtered_vec1[min_nonmiss_anova-1]
-      p <- p + ggplot2::annotate(geom = "rect", xmin = min_nonmiss_anova - 0.5, xmax = min_nonmiss_anova + 0.5,
+      p <- p + annotate(geom = "rect", xmin = min_nonmiss_anova - 0.5, xmax = min_nonmiss_anova + 0.5,
                                  ymin = 0, ymax = num_tested, fill="royalblue1", col="black", size=1.5)
     }
     
@@ -598,21 +602,21 @@ plot.imdanovaFilt <- function(filter_object, min_nonmiss_anova = NULL, min_nonmi
     plot_df_gtest <- data.frame(x_gtest = 3:min_n_group, filtered_vec2)
     
     ## generate plot
-    p <- ggplot2::ggplot(plot_df_gtest) +
-      ggplot2::geom_rect(ggplot2::aes(xmin = x_gtest - 0.5, xmax = x_gtest + 0.5,
+    p <- ggplot(plot_df_gtest) +
+      geom_rect(aes(xmin = x_gtest - 0.5, xmax = x_gtest + 0.5,
                                       ymin = 0, ymax = filtered_vec2), fill="royalblue1", col="black") +
-      ggplot2::geom_text(ggplot2::aes(x = x_gtest, y = filtered_vec2, label = filtered_vec2), vjust = -0.25) +
-      ggplot2::xlab(xlabel) +
-      ggplot2::ylab(ylabel) +
-      ggplot2::ggtitle(plot_title) +
-      ggplot2::ylim(0, 1.1*max(filtered_vec2, na.rm=TRUE)) +
-      ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                     axis.title.x = ggplot2::element_text(size=x_lab_size),
-                     axis.title.y = ggplot2::element_text(size=y_lab_size))
+      geom_text(aes(x = x_gtest, y = filtered_vec2, label = filtered_vec2), vjust = -0.25) +
+      xlab(xlabel) +
+      ylab(ylabel) +
+      ggtitle(plot_title) +
+      ylim(0, 1.1*max(filtered_vec2, na.rm=TRUE)) +
+      theme(plot.title = element_text(size=title_size),
+                     axis.title.x = element_text(size=x_lab_size),
+                     axis.title.y = element_text(size=y_lab_size))
     
     if(!is.null(min_nonmiss_gtest)) {
       num_tested <- plot_df_gtest$filtered_vec2[min_nonmiss_gtest-2]
-      p <- p + ggplot2::annotate(geom = "rect", xmin = min_nonmiss_gtest - 0.5, xmax = min_nonmiss_gtest + 0.5,
+      p <- p + annotate(geom = "rect", xmin = min_nonmiss_gtest - 0.5, xmax = min_nonmiss_gtest + 0.5,
                                  ymin = 0, ymax = num_tested, fill="royalblue1", col="black", size=1.5)
     }
     
@@ -641,20 +645,20 @@ plot.imdanovaFilt <- function(filter_object, min_nonmiss_anova = NULL, min_nonmi
     heat_df_melt <- reshape2::melt(heat_df)
     bold_label <- heat_df_melt[heat_df_melt$Var1 == min_nonmiss_anova & heat_df_melt$Var2 == min_nonmiss_gtest, "value"]
     
-    p <- ggplot2::ggplot(heat_df_melt, ggplot2::aes(x = ordered(Var2, levels = sort(unique(Var2))), y = ordered(Var1, levels = sort(unique(Var1))))) +
-      ggplot2::geom_tile(ggplot2::aes(fill = value)) +
-      ggplot2::geom_text(ggplot2::aes(label = value), size=50/max(heat_df_melt$Var2)) +
-      ggplot2::geom_segment(x=min_nonmiss_gtest-2.5, xend=min_nonmiss_gtest-2.5, y=0, yend=max(heat_df_melt$Var1)+1, linetype = 1, size = 1.5) +
-      ggplot2::geom_segment(x=min_nonmiss_gtest-1.5, xend=min_nonmiss_gtest-1.5, y=0, yend=max(heat_df_melt$Var1)+1, linetype = 1, size = 1.5) +
-      ggplot2::geom_segment(x=0, xend=max(heat_df_melt$Var2)+1, y=min_nonmiss_anova-1.5, yend=min_nonmiss_anova-1.5, linetype = 1, size = 1.5) +
-      ggplot2::geom_segment(x=0, xend=max(heat_df_melt$Var2)+1, y=min_nonmiss_anova-0.5, yend=min_nonmiss_anova-0.5, linetype = 1, size = 1.5) +
-      ggplot2::scale_fill_gradientn(colours = heat.colors(100)) +
-      ggplot2::annotate("text", label = bold_label, x = min_nonmiss_gtest-2, y = min_nonmiss_anova-1, size = 50/max(heat_df_melt$Var2), fontface = "bold", col="blue") +
-      ggplot2::xlab(xlabel) +  ggplot2::ylab(ylabel) +
-      ggplot2::ggtitle(plot_title) +
-      ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                     axis.title.x = ggplot2::element_text(size=x_lab_size),
-                     axis.title.y = ggplot2::element_text(size=y_lab_size))
+    p <- ggplot(heat_df_melt, aes(x = ordered(Var2, levels = sort(unique(Var2))), y = ordered(Var1, levels = sort(unique(Var1))))) +
+      geom_tile(aes(fill = value)) +
+      geom_text(aes(label = value), size=50/max(heat_df_melt$Var2)) +
+      geom_segment(x=min_nonmiss_gtest-2.5, xend=min_nonmiss_gtest-2.5, y=0, yend=max(heat_df_melt$Var1)+1, linetype = 1, size = 1.5) +
+      geom_segment(x=min_nonmiss_gtest-1.5, xend=min_nonmiss_gtest-1.5, y=0, yend=max(heat_df_melt$Var1)+1, linetype = 1, size = 1.5) +
+      geom_segment(x=0, xend=max(heat_df_melt$Var2)+1, y=min_nonmiss_anova-1.5, yend=min_nonmiss_anova-1.5, linetype = 1, size = 1.5) +
+      geom_segment(x=0, xend=max(heat_df_melt$Var2)+1, y=min_nonmiss_anova-0.5, yend=min_nonmiss_anova-0.5, linetype = 1, size = 1.5) +
+      scale_fill_gradientn(colours = heat.colors(100)) +
+      annotate("text", label = bold_label, x = min_nonmiss_gtest-2, y = min_nonmiss_anova-1, size = 50/max(heat_df_melt$Var2), fontface = "bold", col="blue") +
+      xlab(xlabel) +  ylab(ylabel) +
+      ggtitle(plot_title) +
+      theme(plot.title = element_text(size=title_size),
+                     axis.title.x = element_text(size=x_lab_size),
+                     axis.title.y = element_text(size=y_lab_size))
   }
   
   
@@ -685,6 +689,7 @@ plot.imdanovaFilt <- function(filter_object, min_nonmiss_anova = NULL, min_nonmi
 #' \code{legend_position} \tab character string specifying one of "right", "left", "top", or "bottom" for the location of the legend. Deafults to "right".
 #'} 
 plot.rmdFilt <- function(filter_object, pvalue_threshold = NULL, sampleID = NULL, ...) {
+  require(ggplot2)
   .plot.rmdFilt(filter_object, pvalue_threshold, sampleID, ...)
 }
 
@@ -706,6 +711,7 @@ plot.rmdFilt <- function(filter_object, pvalue_threshold = NULL, sampleID = NULL
     if(!is.character(sampleID)) stop("sampleID must be a character string")
     # check that length is 1
     if(length(sampleID) > 1) stop("sampleID must be of length 1")
+    if(!(sampleID %in% attr(filter_object, "sample_names"))) stop("The sample ID provided does not match any sample ID's in the data")
   }
   #check point_size argument is numeric and >= to zero
   if(!is.numeric(point_size)) stop("point_size must be numeric")
@@ -772,39 +778,39 @@ plot.rmdFilt <- function(filter_object, pvalue_threshold = NULL, sampleID = NULL
     ylabel <- ifelse(is.null(y_lab), "Value", y_lab)
     
     if(bw_theme == FALSE){
-      p <- ggplot2::ggplot(dfsub) +
-        ggplot2::geom_boxplot(ggplot2::aes(x=rep(1,length(value)), y=value), fill=heat.colors(length(metrics))) +
-        ggplot2::facet_wrap(~ variable, scales = "free", ncol=length(metrics)) +
-        ggplot2::geom_point(data = dfsub[dfsub[,samp_id]==sampleID,], ggplot2::aes(x=rep(1,length(value)), y=value), size=point_size, pch=4) +
-        ggplot2::geom_text(data = dfsub[dfsub[,samp_id]==sampleID,], ggplot2::aes(x=rep(1,length(value)), y=value), label = sampleID, vjust=1.5, size=3.5, fontface="bold") +
-        ggplot2::theme(axis.text.x = ggplot2::element_blank(), axis.ticks.x = ggplot2::element_blank(),
-                       plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
+      p <- ggplot(dfsub) +
+        geom_boxplot(aes(x=rep(1,length(value)), y=value), fill=heat.colors(length(metrics))) +
+        facet_wrap(~ variable, scales = "free", ncol=length(metrics)) +
+        geom_point(data = dfsub[dfsub[,samp_id]==sampleID,], aes(x=rep(1,length(value)), y=value), size=point_size, pch=4) +
+        geom_text(data = dfsub[dfsub[,samp_id]==sampleID,], aes(x=rep(1,length(value)), y=value), label = sampleID, vjust=1.5, size=3.5, fontface="bold") +
+        theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(),
+                       plot.title = element_text(size=title_size),
+                       axis.title.x = element_text(size=x_lab_size),
+                       axis.title.y = element_text(size=y_lab_size),
                        legend.position = legend_position) +
-        ggplot2::xlab(xlabel) + ggplot2::ylab(ylabel) + ggplot2::ggtitle(plot_title)
+        xlab(xlabel) + ylab(ylabel) + ggtitle(plot_title)
     }else{
-      p <- ggplot2::ggplot(dfsub) +
-        ggplot2::theme_bw() +
-        ggplot2::geom_boxplot(ggplot2::aes(x=rep(1,length(value)), y=value), fill=heat.colors(length(metrics))) +
-        ggplot2::facet_wrap(~ variable, scales = "free", ncol=length(metrics)) +
-        ggplot2::geom_point(data = dfsub[dfsub[,samp_id]==sampleID,], ggplot2::aes(x=rep(1,length(value)), y=value), size=point_size, pch=4) +
-        ggplot2::geom_text(data = dfsub[dfsub[,samp_id]==sampleID,], ggplot2::aes(x=rep(1,length(value)), y=value), label = sampleID, vjust=1.5, size=3.5, fontface="bold") +
-        ggplot2::theme(axis.text.x = ggplot2::element_blank(), axis.ticks.x = ggplot2::element_blank(),
-                       plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
+      p <- ggplot(dfsub) +
+        theme_bw() +
+        geom_boxplot(aes(x=rep(1,length(value)), y=value), fill=heat.colors(length(metrics))) +
+        facet_wrap(~ variable, scales = "free", ncol=length(metrics)) +
+        geom_point(data = dfsub[dfsub[,samp_id]==sampleID,], aes(x=rep(1,length(value)), y=value), size=point_size, pch=4) +
+        geom_text(data = dfsub[dfsub[,samp_id]==sampleID,], aes(x=rep(1,length(value)), y=value), label = sampleID, vjust=1.5, size=3.5, fontface="bold") +
+        theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(),
+                       plot.title = element_text(size=title_size),
+                       axis.title.x = element_text(size=x_lab_size),
+                       axis.title.y = element_text(size=y_lab_size),
                        legend.position = legend_position) +
-        ggplot2::xlab(xlabel) + ggplot2::ylab(ylabel) + ggplot2::ggtitle(plot_title)
+        xlab(xlabel) + ylab(ylabel) + ggtitle(plot_title)
     }
     
   }else if(is.null(pvalue_threshold)) {
     if(length(main_eff_names)==1) {
-      p <- ggplot2::ggplot(filter_object) +
-        ggplot2::geom_point(ggplot2::aes_string(x = samp_id, y="Log2.md", col=main_eff_names[1]), size=point_size)
+      p <- ggplot(filter_object) +
+        geom_point(aes_string(x = samp_id, y="Log2.md", col=main_eff_names[1]), size=point_size)
     } else {
-      p <- ggplot2::ggplot(filter_object) +
-        ggplot2::geom_point(ggplot2::aes_string(x = samp_id, y="Log2.md", col=main_eff_names[1], pch=main_eff_names[2]), size=point_size)
+      p <- ggplot(filter_object) +
+        geom_point(aes_string(x = samp_id, y="Log2.md", col=main_eff_names[1], pch=main_eff_names[2]), size=point_size)
     }
     
     plot_title <- ifelse(is.null(title_plot), "Sample Outlier Results", title_plot)
@@ -812,24 +818,24 @@ plot.rmdFilt <- function(filter_object, pvalue_threshold = NULL, sampleID = NULL
     ylabel <- ifelse(is.null(y_lab), "log2(Robust Mahalanobis Distance)", y_lab)
     
     if(bw_theme == FALSE){
-      p <- p + ggplot2::theme(axis.ticks.x = ggplot2::element_blank(), axis.text.x = ggplot2::element_blank(),
-                              plot.title = ggplot2::element_text(size=title_size),
-                              axis.title.x = ggplot2::element_text(size=x_lab_size),
-                              axis.title.y = ggplot2::element_text(size=y_lab_size),
+      p <- p + theme(axis.ticks.x = element_blank(), axis.text.x = element_blank(),
+                              plot.title = element_text(size=title_size),
+                              axis.title.x = element_text(size=x_lab_size),
+                              axis.title.y = element_text(size=y_lab_size),
                               legend.position = legend_position) +
-        ggplot2::xlab(xlabel) + ggplot2::ylab(ylabel) + ggplot2::ggtitle(plot_title) +
-        ggplot2::scale_color_discrete(legend_title_color) +
-        ggplot2::scale_shape_discrete(legend_title_shape)
+        xlab(xlabel) + ylab(ylabel) + ggtitle(plot_title) +
+        scale_color_discrete(legend_title_color) +
+        scale_shape_discrete(legend_title_shape)
     }else{
-      p <- p + ggplot2::theme_bw() +
-        ggplot2::theme(axis.ticks.x = ggplot2::element_blank(), axis.text.x = ggplot2::element_blank(),
-                       plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
+      p <- p + theme_bw() +
+        theme(axis.ticks.x = element_blank(), axis.text.x = element_blank(),
+                       plot.title = element_text(size=title_size),
+                       axis.title.x = element_text(size=x_lab_size),
+                       axis.title.y = element_text(size=y_lab_size),
                        legend.position = legend_position) +
-        ggplot2::xlab(xlabel) + ggplot2::ylab(ylabel) + ggplot2::ggtitle(plot_title) +
-        ggplot2::scale_color_discrete(legend_title_color) +
-        ggplot2::scale_shape_discrete(legend_title_shape)
+        xlab(xlabel) + ylab(ylabel) + ggtitle(plot_title) +
+        scale_color_discrete(legend_title_color) +
+        scale_shape_discrete(legend_title_shape)
     }
     
     
@@ -852,42 +858,42 @@ plot.rmdFilt <- function(filter_object, pvalue_threshold = NULL, sampleID = NULL
     ylabel <- ifelse(is.null(y_lab), "log2(Robust Mahalanobis Distance)", y_lab)
     
     if(length(main_eff_names)==1) {
-      p <- ggplot2::ggplot(sub1) +
-        ggplot2::geom_point(ggplot2::aes_string(x = samp_id, y="Log2.md", col=main_eff_names), size=point_size, bg="gray") +
-        ggplot2::geom_point(data = sub2, ggplot2::aes_string(x = samp_id, y="Log2.md", col=main_eff_names), alpha=0.5, size=point_size, bg="gray")
+      p <- ggplot(sub1) +
+        geom_point(aes_string(x = samp_id, y="Log2.md", col=main_eff_names), size=point_size, bg="gray") +
+        geom_point(data = sub2, aes_string(x = samp_id, y="Log2.md", col=main_eff_names), alpha=0.5, size=point_size, bg="gray")
     } else {
-      p <- ggplot2::ggplot(sub1) +
-        ggplot2::geom_point(ggplot2::aes_string(x = samp_id, y="Log2.md", pch=main_eff_names[2], col=main_eff_names[1]), size=point_size, bg="gray") +
-        ggplot2::geom_point(data = sub2, ggplot2::aes_string(x = samp_id, y="Log2.md", pch=main_eff_names[2], col=main_eff_names[1]), alpha=0.5, size=point_size, bg="gray")
+      p <- ggplot(sub1) +
+        geom_point(aes_string(x = samp_id, y="Log2.md", pch=main_eff_names[2], col=main_eff_names[1]), size=point_size, bg="gray") +
+        geom_point(data = sub2, aes_string(x = samp_id, y="Log2.md", pch=main_eff_names[2], col=main_eff_names[1]), alpha=0.5, size=point_size, bg="gray")
     }
     
     if(bw_theme == FALSE){
       p <- p +
-        ggplot2::geom_hline(yintercept = yint) +
-        ggplot2::theme(axis.ticks.x = ggplot2::element_blank(),
-                       axis.text.x = ggplot2::element_blank(),
-                       plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
+        geom_hline(yintercept = yint) +
+        theme(axis.ticks.x = element_blank(),
+                       axis.text.x = element_blank(),
+                       plot.title = element_text(size=title_size),
+                       axis.title.x = element_text(size=x_lab_size),
+                       axis.title.y = element_text(size=y_lab_size),
                        legend.position = legend_position) +
-        ggplot2::guides(col = ggplot2::guide_legend(ncol = 1), pch = ggplot2::guide_legend(ncol = 1)) +
-        ggplot2::scale_shape_manual(legend_title_shape, values=rep(c(16,9,22,13,11,3,4,15,0,5),6)) +
-        ggplot2::scale_color_manual(legend_title_color, values=rep(c("blue","red","green","darkturquoise","goldenrod3","darkorchid2"),10)) +
-        ggplot2::xlab(xlabel) + ggplot2::ylab(ylabel) + ggplot2::ggtitle(plot_title)
+        guides(col = guide_legend(ncol = 1), pch = guide_legend(ncol = 1)) +
+        scale_shape_manual(legend_title_shape, values=rep(c(16,9,22,13,11,3,4,15,0,5),6)) +
+        scale_color_manual(legend_title_color, values=rep(c("blue","red","green","darkturquoise","goldenrod3","darkorchid2"),10)) +
+        xlab(xlabel) + ylab(ylabel) + ggtitle(plot_title)
     }else{
       p <- p +
-        ggplot2::geom_hline(yintercept = yint) +
-        ggplot2::theme_bw() +
-        ggplot2::theme(axis.ticks.x = ggplot2::element_blank(),
-                       axis.text.x = ggplot2::element_blank(),
-                       plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
+        geom_hline(yintercept = yint) +
+        theme_bw() +
+        theme(axis.ticks.x = element_blank(),
+                       axis.text.x = element_blank(),
+                       plot.title = element_text(size=title_size),
+                       axis.title.x = element_text(size=x_lab_size),
+                       axis.title.y = element_text(size=y_lab_size),
                        legend.position = legend_position) +
-        ggplot2::guides(col = ggplot2::guide_legend(ncol = 1), pch = ggplot2::guide_legend(ncol = 1)) +
-        ggplot2::scale_shape_manual(legend_title_shape, values=rep(c(16,9,22,13,11,3,4,15,0,5),6)) +
-        ggplot2::scale_color_manual(legend_title_color, values=rep(c("blue","red","green","darkturquoise","goldenrod3","darkorchid2"),10)) +
-        ggplot2::xlab(xlabel) + ggplot2::ylab(ylabel) + ggplot2::ggtitle(plot_title)
+        guides(col = guide_legend(ncol = 1), pch = guide_legend(ncol = 1)) +
+        scale_shape_manual(legend_title_shape, values=rep(c(16,9,22,13,11,3,4,15,0,5),6)) +
+        scale_color_manual(legend_title_color, values=rep(c("blue","red","green","darkturquoise","goldenrod3","darkorchid2"),10)) +
+        xlab(xlabel) + ylab(ylabel) + ggtitle(plot_title)
     }
     
   }
@@ -926,6 +932,7 @@ plot.rmdFilt <- function(filter_object, pvalue_threshold = NULL, sampleID = NULL
 #' plot(cvfilt, cv_threshold = 10, log_scale = FALSE)
 #' 
 plot.cvFilt <- function(filter_object, cv_threshold = NULL, ...) {
+  require(ggplot2)
   .plot.cvFilt(filter_object, cv_threshold, ...)
 }
 
@@ -957,7 +964,7 @@ plot.cvFilt <- function(filter_object, cv_threshold = NULL, ...) {
   ### Store ggplot2 layers
   
   # bw theme
-  bw = if(bw_theme) ggplot2::theme_bw() else NULL
+  bw = if(bw_theme) theme_bw() else NULL
   
   # scale transform and breaks depending on x-axis scale
   if(log_scale){
@@ -986,22 +993,22 @@ plot.cvFilt <- function(filter_object, cv_threshold = NULL, ...) {
     if(is.null(title_plot)) {
       plot_title <- bquote(paste("Coefficient of Variation (CV):  ",italic(paste("CV Threshold = ",.(cv_threshold))),""))
     }
-    cutoff <- ggplot2::geom_vline(xintercept = cv_threshold)
+    cutoff <- geom_vline(xintercept = cv_threshold)
   }else{
     cutoff <- NULL
   }
   
   # main plot object
-  p <- ggplot2::ggplot(new_object) +
-    ggplot2::geom_histogram(ggplot2::aes(x=CV_pooled), bins = n_bins, fill = "steelblue1") + 
+  p <- ggplot(new_object) +
+    geom_histogram(aes(x=CV_pooled), bins = n_bins, fill = "steelblue1") + 
     cutoff + bw +
-    ggplot2::scale_x_continuous(breaks = breaks, trans = trans) +
-    ggplot2::scale_y_continuous(breaks = scales::pretty_breaks(n=5)) +
-    ggplot2::ggtitle(plot_title) +
-    ggplot2::xlab(xlabel) + ggplot2::ylab(ylabel) + 
-    ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                   axis.title.x = ggplot2::element_text(size=x_lab_size),
-                   axis.title.y = ggplot2::element_text(size=y_lab_size))
+    scale_x_continuous(breaks = breaks, trans = trans) +
+    scale_y_continuous(breaks = scales::pretty_breaks(n=5)) +
+    ggtitle(plot_title) +
+    xlab(xlabel) + ylab(ylabel) + 
+    theme(plot.title = element_text(size=title_size),
+                   axis.title.x = element_text(size=x_lab_size),
+                   axis.title.y = element_text(size=y_lab_size))
   
   return(p)
 }
@@ -1013,6 +1020,7 @@ plot.cvFilt <- function(filter_object, cv_threshold = NULL, ...) {
 #'@export
 #'@rdname plot-pmartR-customFilt
 plot.customFilt <- function(filter_object, ...) {
+  require(ggplot2)
   .plot.customFilt(filter_object, ...)
 }
 
@@ -1047,6 +1055,7 @@ plot.customFilt <- function(filter_object, ...) {
 #' \code{use_VizSampNames} \tab logical specifies whether to use custom sample names \cr
 #' }
 plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by = NULL, facet_cols = NULL, ...) {
+  require(ggplot2)
   .plot.pepData(omicsData, order_by, color_by, facet_by, facet_cols, ...)
 }
 
@@ -1096,12 +1105,12 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
   plot_data <- reshape2::melt(e_data, id = e_data_cname, na.rm = TRUE)
   
   if(inherits(omicsData, "isobaricpepData")){
-    maintitle <- ifelse(attributes(omicsData)$data_info$isobaric_norm,
+    maintitle <- ifelse(attributes(omicsData)$isobaric_info$norm_info$is_normalized,
                         "Boxplots of Normalized Isobaric Peptide Data",
                         "Boxplots of Un-Normalized Isobaric Peptide Data")
   }
   else if(inherits(omicsData, "pepData")){
-    maintitle <- ifelse(attributes(omicsData)$data_info$data_norm,
+    maintitle <- ifelse(attributes(omicsData)$data_info$norm_info$is_normalized,
                         "Boxplots of Normalized Peptide Data",
                         "Boxplots of Un-Normalized Peptide Data")
   }
@@ -1124,21 +1133,21 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
   ## if both order_by and color_by are null ##
   if(is.null(order_by) & is.null(color_by)) {
     
-    p <- ggplot2::ggplot(plot_data) + ggplot2::geom_boxplot(ggplot2::aes(x = variable, y = value), fill = "deepskyblue1") +
-      ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                     axis.title.x = ggplot2::element_text(size=x_lab_size),
-                     axis.title.y = ggplot2::element_text(size=y_lab_size),
+    p <- ggplot(plot_data) + geom_boxplot(aes(x = variable, y = value), fill = "deepskyblue1") +
+      theme(plot.title = element_text(size=title_size),
+                     axis.title.x = element_text(size=x_lab_size),
+                     axis.title.y = element_text(size=y_lab_size),
                      legend.position = legend_position)
     
     if(bw_theme==TRUE){
-      p <- p + ggplot2::theme_bw()
+      p <- p + theme_bw()
       
     }
     
     title <- maintitle
     
     if(use_VizSampNames == T){
-      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
+      p = p + scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
     }
     
     ## if order_by is not null and color_by is ##
@@ -1157,21 +1166,21 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     plot_data$variable <- factor(plot_data$variable, levels=unique(plot_data$variable), ordered=TRUE)
     #plot_data[[color_by]] <- factor(plot_data[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
     
-    p <- ggplot2::ggplot(plot_data) + ggplot2::geom_boxplot(ggplot2::aes(x = variable, y = value), fill = "deepskyblue1") +
-      ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                     axis.title.x = ggplot2::element_text(size=x_lab_size),
-                     axis.title.y = ggplot2::element_text(size=y_lab_size),
+    p <- ggplot(plot_data) + geom_boxplot(aes(x = variable, y = value), fill = "deepskyblue1") +
+      theme(plot.title = element_text(size=title_size),
+                     axis.title.x = element_text(size=x_lab_size),
+                     axis.title.y = element_text(size=y_lab_size),
                      legend.position = legend_position)
     
     if(bw_theme==TRUE){
-      p <- ggplot2::theme_bw()
+      p <- theme_bw()
     }
     
     title <- bquote(atop(.(maintitle),atop(italic(paste("Ordered by ",.(order_by))),"")))
     
     if(use_VizSampNames == T){
       f_data = f_data[order(f_data[,order_by]),]
-      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
+      p = p + scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
     }
     
     ## if color_by is not null and order_by is ##
@@ -1186,21 +1195,21 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     plot_data <- merge(plot_data, colorDF, by = "variable")
     plot_data[[color_by]] <- factor(plot_data[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
     
-    p <- ggplot2::ggplot(plot_data) + ggplot2::geom_boxplot(ggplot2::aes_string(x = "variable", y = "value", fill = color_by)) +
-      ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                     axis.title.x = ggplot2::element_text(size=x_lab_size),
-                     axis.title.y = ggplot2::element_text(size=y_lab_size),
+    p <- ggplot(plot_data) + geom_boxplot(aes_string(x = "variable", y = "value", fill = color_by)) +
+      theme(plot.title = element_text(size=title_size),
+                     axis.title.x = element_text(size=x_lab_size),
+                     axis.title.y = element_text(size=y_lab_size),
                      legend.position = legend_position)
     
     if(bw_theme==TRUE){
-      p <- p + ggplot2::theme_bw()
+      p <- p + theme_bw()
     }
     
     title <- maintitle
     
     if(use_VizSampNames == T){
       f_data = f_data[order(f_data[,color_by]),]
-      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
+      p = p + scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
     }
     
     ## if neither order_by or color_by are null ##
@@ -1234,14 +1243,14 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     plot_data$variable <- factor(plot_data$variable, levels=unique(plot_data$variable), ordered=TRUE)
     plot_data[[color_by]] <- factor(plot_data[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
     
-    p <- ggplot2::ggplot(plot_data) + ggplot2::geom_boxplot(ggplot2::aes_string(x = "variable", y = "value", fill = color_by)) +
-      ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                     axis.title.x = ggplot2::element_text(size=x_lab_size),
-                     axis.title.y = ggplot2::element_text(size=y_lab_size),
+    p <- ggplot(plot_data) + geom_boxplot(aes_string(x = "variable", y = "value", fill = color_by)) +
+      theme(plot.title = element_text(size=title_size),
+                     axis.title.x = element_text(size=x_lab_size),
+                     axis.title.y = element_text(size=y_lab_size),
                      legend.position = legend_position)
     
     if(bw_theme==TRUE){
-      p <- p + ggplot2::theme_bw()
+      p <- p + theme_bw()
       
     }
     
@@ -1249,7 +1258,7 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     
     if(use_VizSampNames == T){
       f_data = f_data[order(f_data[,order_by]),]
-      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
+      p = p + scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
     }
     
   }
@@ -1258,9 +1267,9 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
   # facet plot #
   if(!is.null(facet_by)) {
     if(is.null(facet_cols)) {
-      p <- p + ggplot2::facet_wrap(formula(paste("~",facet_by)), scales = "free_x")
+      p <- p + facet_wrap(formula(paste("~",facet_by)), scales = "free_x")
     } else {
-      p <- p + ggplot2::facet_wrap(formula(paste("~",facet_by)), scales = "free_x", ncol = facet_cols)
+      p <- p + facet_wrap(formula(paste("~",facet_by)), scales = "free_x", ncol = facet_cols)
     }
   }
   
@@ -1279,13 +1288,13 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
   if(!is.null(legend_lab)) legend_title <- legend_lab
   
   # add additional features to plot #
-  p <- p + ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90)) + ggplot2::xlab("Sample") +
-    ggplot2::ggtitle(title) + ggplot2::xlab(xlabel) + ggplot2::ylab(ylabel) +
-    ggplot2::scale_fill_discrete(legend_title)
+  p <- p + theme(axis.text.x = element_text(angle = 90)) + xlab("Sample") +
+    ggtitle(title) + xlab(xlabel) + ylab(ylabel) +
+    scale_fill_discrete(legend_title)
   
   if(!is.null(ylimit))
   {
-    p <- p + ggplot2::scale_y_continuous(limits = ylimit)
+    p <- p + scale_y_continuous(limits = ylimit)
   }
   
   
@@ -1317,6 +1326,7 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
 #'@export
 #'@rdname plot-pmartR-proData
 plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by = NULL, facet_cols = NULL, ...) {
+  require(ggplot2)
   .plot.proData(omicsData, order_by, color_by, facet_by, facet_cols, ...)
 }
 
@@ -1361,7 +1371,7 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
   f_data = omicsData$f_data
   plot_data <- reshape2::melt(e_data, id = e_data_cname, na.rm = TRUE)
   
-  maintitle <- ifelse(attributes(omicsData)$data_info$data_norm,
+  maintitle <- ifelse(attributes(omicsData)$data_info$norm_info$is_normalized,
                       "Boxplots of Normalized Protein Data",
                       "Boxplots of Un-Normalized Protein Data")
   
@@ -1382,20 +1392,20 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
   ## if both order_by and color_by are null ##
   if(is.null(order_by) & is.null(color_by)) {
     
-    p <- ggplot2::ggplot(plot_data) + ggplot2::geom_boxplot(ggplot2::aes(x = variable, y = value), fill = "deepskyblue1") +
-      ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                     axis.title.x = ggplot2::element_text(size=x_lab_size),
-                     axis.title.y = ggplot2::element_text(size=y_lab_size),
+    p <- ggplot(plot_data) + geom_boxplot(aes(x = variable, y = value), fill = "deepskyblue1") +
+      theme(plot.title = element_text(size=title_size),
+                     axis.title.x = element_text(size=x_lab_size),
+                     axis.title.y = element_text(size=y_lab_size),
                      legend.position = legend_position)
     
     if(bw_theme == TRUE){
-      p  <- p + ggplot2::theme_bw()
+      p  <- p + theme_bw()
     }
     
     title <- maintitle
     
     if(use_VizSampNames == T){
-      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
+      p = p + scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
     }
     
     ## if order_by is not null and color_by is ##
@@ -1414,21 +1424,21 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     plot_data$variable <- factor(plot_data$variable, levels=unique(plot_data$variable), ordered=TRUE)
     #plot_data[[color_by]] <- factor(plot_data[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
     
-    p <- ggplot2::ggplot(plot_data) + ggplot2::geom_boxplot(ggplot2::aes(x = variable, y = value), fill = "deepskyblue1") +
-      ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                     axis.title.x = ggplot2::element_text(size=x_lab_size),
-                     axis.title.y = ggplot2::element_text(size=y_lab_size),
+    p <- ggplot(plot_data) + geom_boxplot(aes(x = variable, y = value), fill = "deepskyblue1") +
+      theme(plot.title = element_text(size=title_size),
+                     axis.title.x = element_text(size=x_lab_size),
+                     axis.title.y = element_text(size=y_lab_size),
                      legend.position = legend_position)
     
     if(bw_theme==TRUE){
-      p <- p + ggplot2::theme_bw()
+      p <- p + theme_bw()
     }
     
     title <- bquote(atop(.(maintitle),atop(italic(paste("Ordered by ",.(order_by))),"")))
     
     if(use_VizSampNames == T){
       f_data = f_data[order(f_data[,order_by]),]
-      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
+      p = p + scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
     }
     
     ## if color_by is not null and order_by is ##
@@ -1443,21 +1453,21 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     plot_data <- merge(plot_data, colorDF, by = "variable")
     plot_data[[color_by]] <- factor(plot_data[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
     
-    p <- ggplot2::ggplot(plot_data) + ggplot2::geom_boxplot(ggplot2::aes_string(x = "variable", y = "value", fill = color_by)) +
-      ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                     axis.title.x = ggplot2::element_text(size=x_lab_size),
-                     axis.title.y = ggplot2::element_text(size=y_lab_size),
+    p <- ggplot(plot_data) + geom_boxplot(aes_string(x = "variable", y = "value", fill = color_by)) +
+      theme(plot.title = element_text(size=title_size),
+                     axis.title.x = element_text(size=x_lab_size),
+                     axis.title.y = element_text(size=y_lab_size),
                      legend.position = legend_position)
     
     if(bw_theme==TRUE){
-      p <- p + ggplot2::theme_bw()
+      p <- p + theme_bw()
     }
     
     title <- maintitle
     
     if(use_VizSampNames == T){
       f_data = f_data[order(f_data[,color_by]),]
-      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
+      p = p + scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
     }
     
     ## if neither order_by or color_by are null ##
@@ -1491,14 +1501,14 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     plot_data$variable <- factor(plot_data$variable, levels=unique(plot_data$variable), ordered=TRUE)
     plot_data[[color_by]] <- factor(plot_data[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
     
-    p <- ggplot2::ggplot(plot_data) + ggplot2::geom_boxplot(ggplot2::aes_string(x = "variable", y = "value", fill = color_by)) +
-      ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                     axis.title.x = ggplot2::element_text(size=x_lab_size),
-                     axis.title.y = ggplot2::element_text(size=y_lab_size),
+    p <- ggplot(plot_data) + geom_boxplot(aes_string(x = "variable", y = "value", fill = color_by)) +
+      theme(plot.title = element_text(size=title_size),
+                     axis.title.x = element_text(size=x_lab_size),
+                     axis.title.y = element_text(size=y_lab_size),
                      legend.position = legend_position)
     
     if(bw_theme==TRUE){
-      p <- p + ggplot2::theme_bw()
+      p <- p + theme_bw()
       
     }
     
@@ -1506,7 +1516,7 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     
     if(use_VizSampNames == T){
       f_data = f_data[order(f_data[,order_by]),]
-      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
+      p = p + scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
     }
     
   }
@@ -1515,9 +1525,9 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
   # facet plot #
   if(!is.null(facet_by)) {
     if(is.null(facet_cols)) {
-      p <- p + ggplot2::facet_wrap(formula(paste("~",facet_by)), scales = "free_x")
+      p <- p + facet_wrap(formula(paste("~",facet_by)), scales = "free_x")
     } else {
-      p <- p + ggplot2::facet_wrap(formula(paste("~",facet_by)), scales = "free_x", ncol = facet_cols)
+      p <- p + facet_wrap(formula(paste("~",facet_by)), scales = "free_x", ncol = facet_cols)
     }
   }
   
@@ -1536,13 +1546,13 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
   if(!is.null(legend_lab)) legend_title <- legend_lab
   
   # add additional features to plot #
-  p <- p + ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90)) + ggplot2::xlab("Sample") +
-    ggplot2::ggtitle(title) + ggplot2::xlab(xlabel) + ggplot2::ylab(ylabel) +
-    ggplot2::scale_fill_discrete(legend_title)
+  p <- p + theme(axis.text.x = element_text(angle = 90)) + xlab("Sample") +
+    ggtitle(title) + xlab(xlabel) + ylab(ylabel) +
+    scale_fill_discrete(legend_title)
   
   if(!is.null(ylimit))
   {
-    p <- p + ggplot2::scale_y_continuous(limits = ylimit)
+    p <- p + scale_y_continuous(limits = ylimit)
   }
   
   
@@ -1573,6 +1583,7 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
 #'@export
 #'@rdname plot-pmartR-lipidData
 plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by = NULL, facet_cols = NULL, ...) {
+  require(ggplot2)
   .plot.lipidData(omicsData, order_by, color_by, facet_by, facet_cols, ...)
 }
 
@@ -1617,7 +1628,7 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
   f_data = omicsData$f_data
   plot_data <- reshape2::melt(e_data, id = e_data_cname, na.rm = TRUE)
   
-  maintitle <- ifelse(attributes(omicsData)$data_info$data_norm,
+  maintitle <- ifelse(attributes(omicsData)$data_info$norm_info$is_normalized,
                       "Boxplots of Normalized Lipid Data",
                       "Boxplots of Un-Normalized Lipid Data")
   
@@ -1638,20 +1649,20 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
   ## if both order_by and color_by are null ##
   if(is.null(order_by) & is.null(color_by)) {
     
-    p <- ggplot2::ggplot(plot_data) + ggplot2::geom_boxplot(ggplot2::aes(x = variable, y = value), fill = "deepskyblue1") +
-      ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                     axis.title.x = ggplot2::element_text(size=x_lab_size),
-                     axis.title.y = ggplot2::element_text(size=y_lab_size),
+    p <- ggplot(plot_data) + geom_boxplot(aes(x = variable, y = value), fill = "deepskyblue1") +
+      theme(plot.title = element_text(size=title_size),
+                     axis.title.x = element_text(size=x_lab_size),
+                     axis.title.y = element_text(size=y_lab_size),
                      legend.position = legend_position)
     
     if(bw_theme==TRUE){
-      p <- p + ggplot2::theme_bw()
+      p <- p + theme_bw()
     }
     
     title <- maintitle
     
     if(use_VizSampNames == T){
-      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
+      p = p + scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
     }
     
     ## if order_by is not null and color_by is ##
@@ -1670,21 +1681,21 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     plot_data$variable <- factor(plot_data$variable, levels=unique(plot_data$variable), ordered=TRUE)
     #plot_data[[color_by]] <- factor(plot_data[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
     
-    p <- ggplot2::ggplot(plot_data) + ggplot2::geom_boxplot(ggplot2::aes(x = variable, y = value), fill = "deepskyblue1") +
-      ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                     axis.title.x = ggplot2::element_text(size=x_lab_size),
-                     axis.title.y = ggplot2::element_text(size=y_lab_size),
+    p <- ggplot(plot_data) + geom_boxplot(aes(x = variable, y = value), fill = "deepskyblue1") +
+      theme(plot.title = element_text(size=title_size),
+                     axis.title.x = element_text(size=x_lab_size),
+                     axis.title.y = element_text(size=y_lab_size),
                      legend.position = legend_position)
     
     if(bw_theme==TRUE){
-      p <- p + ggplot2::theme_bw()
+      p <- p + theme_bw()
     }
     
     title <- bquote(atop(.(maintitle),atop(italic(paste("Ordered by ",.(order_by))),"")))
     
     if(use_VizSampNames == T){
       f_data = f_data[order(f_data[,order_by]),]
-      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
+      p = p + scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
     }
     
     ## if color_by is not null and order_by is ##
@@ -1699,10 +1710,10 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     plot_data <- merge(plot_data, colorDF, by = "variable")
     plot_data[[color_by]] <- factor(plot_data[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
     
-    p <- ggplot2::ggplot(plot_data) + ggplot2::geom_boxplot(ggplot2::aes_string(x = "variable", y = "value", fill = color_by)) +
-      ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                     axis.title.x = ggplot2::element_text(size=x_lab_size),
-                     axis.title.y = ggplot2::element_text(size=y_lab_size),
+    p <- ggplot(plot_data) + geom_boxplot(aes_string(x = "variable", y = "value", fill = color_by)) +
+      theme(plot.title = element_text(size=title_size),
+                     axis.title.x = element_text(size=x_lab_size),
+                     axis.title.y = element_text(size=y_lab_size),
                      legend.position = legend_position)
     
     if(bw_theme==TRUE){
@@ -1714,7 +1725,7 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     
     if(use_VizSampNames == T){
       f_data = f_data[order(f_data[,color_by]),]
-      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
+      p = p + scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
     }
     
     ## if neither order_by or color_by are null ##
@@ -1748,14 +1759,14 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     plot_data$variable <- factor(plot_data$variable, levels=unique(plot_data$variable), ordered=TRUE)
     plot_data[[color_by]] <- factor(plot_data[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
     
-    p <- ggplot2::ggplot(plot_data) + ggplot2::geom_boxplot(ggplot2::aes_string(x = "variable", y = "value", fill = color_by)) +
-      ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                     axis.title.x = ggplot2::element_text(size=x_lab_size),
-                     axis.title.y = ggplot2::element_text(size=y_lab_size),
+    p <- ggplot(plot_data) + geom_boxplot(aes_string(x = "variable", y = "value", fill = color_by)) +
+      theme(plot.title = element_text(size=title_size),
+                     axis.title.x = element_text(size=x_lab_size),
+                     axis.title.y = element_text(size=y_lab_size),
                      legend.position = legend_position)
     
     if(bw_theme==TRUE){
-      p <- p + ggplot2::theme_bw()
+      p <- p + theme_bw()
       
     }
     
@@ -1763,7 +1774,7 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     
     if(use_VizSampNames == T){
       f_data = f_data[order(f_data[,order_by]),]
-      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
+      p = p + scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
     }
     
   }
@@ -1772,9 +1783,9 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
   # facet plot #
   if(!is.null(facet_by)) {
     if(is.null(facet_cols)) {
-      p <- p + ggplot2::facet_wrap(formula(paste("~",facet_by)), scales = "free_x")
+      p <- p + facet_wrap(formula(paste("~",facet_by)), scales = "free_x")
     } else {
-      p <- p + ggplot2::facet_wrap(formula(paste("~",facet_by)), scales = "free_x", ncol = facet_cols)
+      p <- p + facet_wrap(formula(paste("~",facet_by)), scales = "free_x", ncol = facet_cols)
     }
   }
   
@@ -1793,13 +1804,13 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
   if(!is.null(legend_lab)) legend_title <- legend_lab
   
   # add additional features to plot #
-  p <- p + ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90)) + ggplot2::xlab("Sample") +
-    ggplot2::ggtitle(title) + ggplot2::xlab(xlabel) + ggplot2::ylab(ylabel) +
-    ggplot2::scale_fill_discrete(legend_title)
+  p <- p + theme(axis.text.x = element_text(angle = 90)) + xlab("Sample") +
+    ggtitle(title) + xlab(xlabel) + ylab(ylabel) +
+    scale_fill_discrete(legend_title)
   
   if(!is.null(ylimit))
   {
-    p <- p + ggplot2::scale_y_continuous(limits = ylimit)
+    p <- p + scale_y_continuous(limits = ylimit)
   }
   
   
@@ -1830,6 +1841,7 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
 #'@export
 #'@rdname plot-pmartR-metabData
 plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by = NULL, facet_cols = NULL, ...) {
+  require(ggplot2)
   .plot.metabData(omicsData, order_by, color_by, facet_by, facet_cols, ...)
 }
 
@@ -1875,7 +1887,7 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
   f_data = omicsData$f_data
   plot_data <- reshape2::melt(e_data, id = e_data_cname, na.rm = TRUE)
   
-  maintitle <- ifelse(attributes(omicsData)$data_info$data_norm,
+  maintitle <- ifelse(attributes(omicsData)$data_info$norm_info$is_normalized,
                       "Boxplots of Normalized Metabolite Data",
                       "Boxplots of Un-Normalized Metabolite Data")
   
@@ -1896,21 +1908,21 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
   ## if both order_by and color_by are null ##
   if(is.null(order_by) & is.null(color_by)) {
     
-    p <- ggplot2::ggplot(plot_data) + ggplot2::geom_boxplot(ggplot2::aes(x = variable, y = value), fill = "deepskyblue1") +
-      ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                     axis.title.x = ggplot2::element_text(size=x_lab_size),
-                     axis.title.y = ggplot2::element_text(size=y_lab_size),
+    p <- ggplot(plot_data) + geom_boxplot(aes(x = variable, y = value), fill = "deepskyblue1") +
+      theme(plot.title = element_text(size=title_size),
+                     axis.title.x = element_text(size=x_lab_size),
+                     axis.title.y = element_text(size=y_lab_size),
                      legend.position = legend_position)
     
     if(bw_theme==TRUE){
-      p <- p + ggplot2::theme_bw()
+      p <- p + theme_bw()
       
     }
     
     title <- maintitle
     
     if(use_VizSampNames == T){
-      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
+      p = p + scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
     }
     
     ## if order_by is not null and color_by is ##
@@ -1929,14 +1941,14 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     plot_data$variable <- factor(plot_data$variable, levels=unique(plot_data$variable), ordered=TRUE)
     #plot_data[[color_by]] <- factor(plot_data[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
     
-    p <- ggplot2::ggplot(plot_data) + ggplot2::geom_boxplot(ggplot2::aes(x = variable, y = value), fill = "deepskyblue1") +
-      ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                     axis.title.x = ggplot2::element_text(size=x_lab_size),
-                     axis.title.y = ggplot2::element_text(size=y_lab_size),
+    p <- ggplot(plot_data) + geom_boxplot(aes(x = variable, y = value), fill = "deepskyblue1") +
+      theme(plot.title = element_text(size=title_size),
+                     axis.title.x = element_text(size=x_lab_size),
+                     axis.title.y = element_text(size=y_lab_size),
                      legend.position = legend_position)
     
     if(bw_theme==TRUE){
-      p <- p + ggplot2::theme_bw()
+      p <- p + theme_bw()
       
     }
     
@@ -1944,7 +1956,7 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     
     if(use_VizSampNames == T){
       f_data = f_data[order(f_data[,order_by]),]
-      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
+      p = p + scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
     }
     
     ## if color_by is not null and order_by is ##
@@ -1959,14 +1971,14 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     plot_data <- merge(plot_data, colorDF, by = "variable")
     plot_data[[color_by]] <- factor(plot_data[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
     
-    p <- ggplot2::ggplot(plot_data) + ggplot2::geom_boxplot(ggplot2::aes_string(x = "variable", y = "value", fill = color_by)) +
-      ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                     axis.title.x = ggplot2::element_text(size=x_lab_size),
-                     axis.title.y = ggplot2::element_text(size=y_lab_size),
+    p <- ggplot(plot_data) + geom_boxplot(aes_string(x = "variable", y = "value", fill = color_by)) +
+      theme(plot.title = element_text(size=title_size),
+                     axis.title.x = element_text(size=x_lab_size),
+                     axis.title.y = element_text(size=y_lab_size),
                      legend.position = legend_position)
     
     if(bw_theme==TRUE){
-      p <- p + ggplot2::theme_bw()
+      p <- p + theme_bw()
       
     }
     
@@ -1974,7 +1986,7 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     
     if(use_VizSampNames == T){
       f_data = f_data[order(f_data[,color_by]),]
-      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
+      p = p + scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
     }
     
     ## if neither order_by or color_by are null ##
@@ -2008,14 +2020,14 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     plot_data$variable <- factor(plot_data$variable, levels=unique(plot_data$variable), ordered=TRUE)
     plot_data[[color_by]] <- factor(plot_data[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
     
-    p <- ggplot2::ggplot(plot_data) + ggplot2::geom_boxplot(ggplot2::aes_string(x = "variable", y = "value", fill = color_by)) +
-      ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                     axis.title.x = ggplot2::element_text(size=x_lab_size),
-                     axis.title.y = ggplot2::element_text(size=y_lab_size),
+    p <- ggplot(plot_data) + geom_boxplot(aes_string(x = "variable", y = "value", fill = color_by)) +
+      theme(plot.title = element_text(size=title_size),
+                     axis.title.x = element_text(size=x_lab_size),
+                     axis.title.y = element_text(size=y_lab_size),
                      legend.position = legend_position)
     
     if(bw_theme==TRUE){
-      p <- p + ggplot2::theme_bw()
+      p <- p + theme_bw()
       
     }
     
@@ -2023,7 +2035,7 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     
     if(use_VizSampNames == T){
       f_data = f_data[order(f_data[,order_by]),]
-      p = p + ggplot2::scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
+      p = p + scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
     }
   }
   
@@ -2031,9 +2043,9 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
   # facet plot #
   if(!is.null(facet_by)) {
     if(is.null(facet_cols)) {
-      p <- p + ggplot2::facet_wrap(formula(paste("~",facet_by)), scales = "free_x")
+      p <- p + facet_wrap(formula(paste("~",facet_by)), scales = "free_x")
     } else {
-      p <- p + ggplot2::facet_wrap(formula(paste("~",facet_by)), scales = "free_x", ncol = facet_cols)
+      p <- p + facet_wrap(formula(paste("~",facet_by)), scales = "free_x", ncol = facet_cols)
     }
   }
   
@@ -2052,17 +2064,17 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
   if(!is.null(legend_lab)) legend_title <- legend_lab
   
   # add additional features to plot #
-  p <- p + ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90)) + ggplot2::xlab("Sample") +
-    ggplot2::ggtitle(title) + ggplot2::xlab(xlabel) + ggplot2::ylab(ylabel) +
-    ggplot2::scale_fill_discrete(legend_title) +
-    ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                   axis.title.x = ggplot2::element_text(size=x_lab_size),
-                   axis.title.y = ggplot2::element_text(size=y_lab_size),
+  p <- p + theme(axis.text.x = element_text(angle = 90)) + xlab("Sample") +
+    ggtitle(title) + xlab(xlabel) + ylab(ylabel) +
+    scale_fill_discrete(legend_title) +
+    theme(plot.title = element_text(size=title_size),
+                   axis.title.x = element_text(size=x_lab_size),
+                   axis.title.y = element_text(size=y_lab_size),
                    legend.position = legend_position)
   
   if(!is.null(ylimit))
   {
-    p <- p + ggplot2::scale_y_continuous(limits = ylimit)
+    p <- p + scale_y_continuous(limits = ylimit)
   }
   
   
@@ -2087,6 +2099,7 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
 #'@export
 #'@rdname plot-pmartR-dimRes
 plot.dimRes <- function(dimRes_object, ...) {
+  require(ggplot2)
   .plot.dimRes(dimRes_object, ...)
 }
 
@@ -2170,38 +2183,38 @@ plot.dimRes <- function(dimRes_object, ...) {
   
   # plot #
   if(bw_theme==FALSE){
-    p <- ggplot2::ggplot(plotdata, ggplot2::aes(x = PC1, y = PC2)) +
-      ggplot2::geom_point(ggplot2::aes_string(col = color_var, pch = pch_var), size = point_size) +
-      ggplot2::ggtitle(plot_title) +
-      ggplot2::scale_color_discrete(display_names[1]) +
-      ggplot2::scale_shape_discrete(display_names[2]) +
-      ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                     axis.title.x = ggplot2::element_text(size=x_lab_size),
-                     axis.title.y = ggplot2::element_text(size=y_lab_size),
+    p <- ggplot(plotdata, aes(x = PC1, y = PC2)) +
+      geom_point(aes_string(col = color_var, pch = pch_var), size = point_size) +
+      ggtitle(plot_title) +
+      scale_color_discrete(display_names[1]) +
+      scale_shape_discrete(display_names[2]) +
+      theme(plot.title = element_text(size=title_size),
+                     axis.title.x = element_text(size=x_lab_size),
+                     axis.title.y = element_text(size=y_lab_size),
                      legend.position = legend_position)
   }else{
-    p <- ggplot2::ggplot(plotdata, ggplot2::aes(x = PC1, y = PC2)) +
-      ggplot2::theme_bw() +
-      ggplot2::geom_point(ggplot2::aes_string(col = color_var, pch = pch_var), size = point_size) +
-      ggplot2::ggtitle(plot_title) +
-      ggplot2::scale_color_discrete(display_names[1]) +
-      ggplot2::scale_shape_discrete(display_names[2]) +
-      ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                     axis.title.x = ggplot2::element_text(size=x_lab_size),
-                     axis.title.y = ggplot2::element_text(size=y_lab_size),
+    p <- ggplot(plotdata, aes(x = PC1, y = PC2)) +
+      theme_bw() +
+      geom_point(aes_string(col = color_var, pch = pch_var), size = point_size) +
+      ggtitle(plot_title) +
+      scale_color_discrete(display_names[1]) +
+      scale_shape_discrete(display_names[2]) +
+      theme(plot.title = element_text(size=title_size),
+                     axis.title.x = element_text(size=x_lab_size),
+                     axis.title.y = element_text(size=y_lab_size),
                      legend.position = legend_position)
   }
   
   
   if(is.null(x_lab) & is.null(y_lab)) {
-    p <- p + ggplot2::xlab(substitute(paste(pc1, R^2, xr2))) +
-      ggplot2::ylab(substitute(paste(pc2, R^2, yr2)))
+    p <- p + xlab(substitute(paste(pc1, R^2, xr2))) +
+      ylab(substitute(paste(pc2, R^2, yr2)))
   } else {
     if(!is.null(x_lab)) {
-      p <- p + ggplot2::xlab(x_lab)
+      p <- p + xlab(x_lab)
     }
     if(!is.null(y_lab)) {
-      p <- p + ggplot2::ylab(y_lab)
+      p <- p + ylab(y_lab)
     }
   }
   
@@ -2218,6 +2231,7 @@ plot.dimRes <- function(dimRes_object, ...) {
 #'
 #'
 plot.normRes <- function(normData, order_by = NULL, color_by = NULL, ...) {
+  require(ggplot2)
   .plot.normRes(normData, order_by, color_by, ...)
 }
 
@@ -2296,18 +2310,18 @@ plot.normRes <- function(normData, order_by = NULL, color_by = NULL, ...) {
   if(is.null(order_by) & is.null(color_by)) {
     
     if(bw_theme==FALSE){
-      p <- ggplot2::ggplot(plot_data_raw) + ggplot2::geom_boxplot(ggplot2::aes(x = variable, y = value), fill = "deepskyblue1") +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
+      p <- ggplot(plot_data_raw) + geom_boxplot(aes(x = variable, y = value), fill = "deepskyblue1") +
+        theme(plot.title = element_text(size=title_size),
+                       axis.title.x = element_text(size=x_lab_size),
+                       axis.title.y = element_text(size=y_lab_size),
                        legend.position = legend_position)
     }else{
-      p <- ggplot2::ggplot(plot_data_raw) +
-        ggplot2::theme_bw() +
-        ggplot2::geom_boxplot(ggplot2::aes(x = variable, y = value), fill = "deepskyblue1") +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
+      p <- ggplot(plot_data_raw) +
+        theme_bw() +
+        geom_boxplot(aes(x = variable, y = value), fill = "deepskyblue1") +
+        theme(plot.title = element_text(size=title_size),
+                       axis.title.x = element_text(size=x_lab_size),
+                       axis.title.y = element_text(size=y_lab_size),
                        legend.position = legend_position)
     }
     
@@ -2330,18 +2344,18 @@ plot.normRes <- function(normData, order_by = NULL, color_by = NULL, ...) {
     plot_data_raw[[color_by]] <- factor(plot_data_raw[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
     
     if(bw_theme==FALSE){
-      p <- ggplot2::ggplot(plot_data_raw) + ggplot2::geom_boxplot(ggplot2::aes(x = variable, y = value), fill = "deepskyblue1") +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
+      p <- ggplot(plot_data_raw) + geom_boxplot(aes(x = variable, y = value), fill = "deepskyblue1") +
+        theme(plot.title = element_text(size=title_size),
+                       axis.title.x = element_text(size=x_lab_size),
+                       axis.title.y = element_text(size=y_lab_size),
                        legend.position = legend_position)
     }else{
-      p <- ggplot2::ggplot(plot_data_raw) +
-        ggplot2::theme_bw() +
-        ggplot2::geom_boxplot(ggplot2::aes(x = variable, y = value), fill = "deepskyblue1") +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
+      p <- ggplot(plot_data_raw) +
+        theme_bw() +
+        geom_boxplot(aes(x = variable, y = value), fill = "deepskyblue1") +
+        theme(plot.title = element_text(size=title_size),
+                       axis.title.x = element_text(size=x_lab_size),
+                       axis.title.y = element_text(size=y_lab_size),
                        legend.position = legend_position)
     }
     
@@ -2360,18 +2374,18 @@ plot.normRes <- function(normData, order_by = NULL, color_by = NULL, ...) {
     plot_data_raw[[color_by]] <- factor(plot_data_raw[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
     
     if(bw_theme==FALSE){
-      p <- ggplot2::ggplot(plot_data_raw) + ggplot2::geom_boxplot(ggplot2::aes_string(x = "variable", y = "value", fill = color_by)) +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
+      p <- ggplot(plot_data_raw) + geom_boxplot(aes_string(x = "variable", y = "value", fill = color_by)) +
+        theme(plot.title = element_text(size=title_size),
+                       axis.title.x = element_text(size=x_lab_size),
+                       axis.title.y = element_text(size=y_lab_size),
                        legend.position = legend_position)
     }else{
-      p <- ggplot2::ggplot(plot_data_raw) +
-        ggplot2::theme_bw() +
-        ggplot2::geom_boxplot(ggplot2::aes_string(x = "variable", y = "value", fill = color_by)) +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
+      p <- ggplot(plot_data_raw) +
+        theme_bw() +
+        geom_boxplot(aes_string(x = "variable", y = "value", fill = color_by)) +
+        theme(plot.title = element_text(size=title_size),
+                       axis.title.x = element_text(size=x_lab_size),
+                       axis.title.y = element_text(size=y_lab_size),
                        legend.position = legend_position)
     }
     
@@ -2409,18 +2423,18 @@ plot.normRes <- function(normData, order_by = NULL, color_by = NULL, ...) {
     plot_data_raw[[color_by]] <- factor(plot_data_raw[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
     
     if(bw_theme==FALSE){
-      p <- ggplot2::ggplot(plot_data_raw) + ggplot2::geom_boxplot(ggplot2::aes_string(x = "variable", y = "value", fill = color_by)) +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
+      p <- ggplot(plot_data_raw) + geom_boxplot(aes_string(x = "variable", y = "value", fill = color_by)) +
+        theme(plot.title = element_text(size=title_size),
+                       axis.title.x = element_text(size=x_lab_size),
+                       axis.title.y = element_text(size=y_lab_size),
                        legend.position = legend_position)
     }else{
-      p <- ggplot2::ggplot(plot_data_raw) +
-        ggplot2::theme_bw() +
-        ggplot2::geom_boxplot(ggplot2::aes_string(x = "variable", y = "value", fill = color_by)) +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
+      p <- ggplot(plot_data_raw) +
+        theme_bw() +
+        geom_boxplot(aes_string(x = "variable", y = "value", fill = color_by)) +
+        theme(plot.title = element_text(size=title_size),
+                       axis.title.x = element_text(size=x_lab_size),
+                       axis.title.y = element_text(size=y_lab_size),
                        legend.position = legend_position)
     }
     
@@ -2431,9 +2445,9 @@ plot.normRes <- function(normData, order_by = NULL, color_by = NULL, ...) {
   # facet plot #
   # if(!is.null(facet_by)) {
   #   if(is.null(facet_cols)) {
-  #     p <- p + ggplot2::facet_wrap(formula(paste("~",facet_by)), scales = "free_x")
+  #     p <- p + facet_wrap(formula(paste("~",facet_by)), scales = "free_x")
   #   } else {
-  #     p <- p + ggplot2::facet_wrap(formula(paste("~",facet_by)), scales = "free_x", ncol = facet_cols)
+  #     p <- p + facet_wrap(formula(paste("~",facet_by)), scales = "free_x", ncol = facet_cols)
   #   }
   # }
   
@@ -2445,9 +2459,9 @@ plot.normRes <- function(normData, order_by = NULL, color_by = NULL, ...) {
   if(!is.null(legend_lab)) legend_title <- legend_lab
   
   # add additional features to plot #
-  p <- p + ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90)) + ggplot2::xlab("Sample") +
-    ggplot2::ggtitle(title) + ggplot2::xlab(xlabel) + ggplot2::ylab(ylabel) +
-    ggplot2::scale_fill_discrete(legend_title)
+  p <- p + theme(axis.text.x = element_text(angle = 90)) + xlab("Sample") +
+    ggtitle(title) + xlab(xlabel) + ylab(ylabel) +
+    scale_fill_discrete(legend_title)
   
   #### END OF RAW DATA PLOT ####
   
@@ -2459,18 +2473,18 @@ plot.normRes <- function(normData, order_by = NULL, color_by = NULL, ...) {
   if(is.null(order_by) & is.null(color_by)) {
     
     if(bw_theme==FALSE){
-      p_norm <- ggplot2::ggplot(plot_data_norm) + ggplot2::geom_boxplot(ggplot2::aes(x = variable, y = value), fill = "deepskyblue1") +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
+      p_norm <- ggplot(plot_data_norm) + geom_boxplot(aes(x = variable, y = value), fill = "deepskyblue1") +
+        theme(plot.title = element_text(size=title_size),
+                       axis.title.x = element_text(size=x_lab_size),
+                       axis.title.y = element_text(size=y_lab_size),
                        legend.position = legend_position)
     }else{
-      p_norm <- ggplot2::ggplot(plot_data_norm) +
-        ggplot2::theme_bw() +
-        ggplot2::geom_boxplot(ggplot2::aes(x = variable, y = value), fill = "deepskyblue1") +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
+      p_norm <- ggplot(plot_data_norm) +
+        theme_bw() +
+        geom_boxplot(aes(x = variable, y = value), fill = "deepskyblue1") +
+        theme(plot.title = element_text(size=title_size),
+                       axis.title.x = element_text(size=x_lab_size),
+                       axis.title.y = element_text(size=y_lab_size),
                        legend.position = legend_position)
     }
     
@@ -2493,18 +2507,18 @@ plot.normRes <- function(normData, order_by = NULL, color_by = NULL, ...) {
     plot_data_norm[[color_by]] <- factor(plot_data_norm[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
     
     if(bw_theme==FALSE){
-      p_norm <- ggplot2::ggplot(plot_data_norm) + ggplot2::geom_boxplot(ggplot2::aes(x = variable, y = value), fill = "deepskyblue1") +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
+      p_norm <- ggplot(plot_data_norm) + geom_boxplot(aes(x = variable, y = value), fill = "deepskyblue1") +
+        theme(plot.title = element_text(size=title_size),
+                       axis.title.x = element_text(size=x_lab_size),
+                       axis.title.y = element_text(size=y_lab_size),
                        legend.position = legend_position)
     }else{
-      p_norm <- ggplot2::ggplot(plot_data_norm) +
-        ggplot2::theme_bw() +
-        ggplot2::geom_boxplot(ggplot2::aes(x = variable, y = value), fill = "deepskyblue1") +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
+      p_norm <- ggplot(plot_data_norm) +
+        theme_bw() +
+        geom_boxplot(aes(x = variable, y = value), fill = "deepskyblue1") +
+        theme(plot.title = element_text(size=title_size),
+                       axis.title.x = element_text(size=x_lab_size),
+                       axis.title.y = element_text(size=y_lab_size),
                        legend.position = legend_position)
     }
     
@@ -2523,18 +2537,18 @@ plot.normRes <- function(normData, order_by = NULL, color_by = NULL, ...) {
     plot_data_norm[[color_by]] <- factor(plot_data_norm[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
     
     if(bw_theme==FALSE){
-      p_norm <- ggplot2::ggplot(plot_data_norm) + ggplot2::geom_boxplot(ggplot2::aes_string(x = "variable", y = "value", fill = color_by)) +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
+      p_norm <- ggplot(plot_data_norm) + geom_boxplot(aes_string(x = "variable", y = "value", fill = color_by)) +
+        theme(plot.title = element_text(size=title_size),
+                       axis.title.x = element_text(size=x_lab_size),
+                       axis.title.y = element_text(size=y_lab_size),
                        legend.position = legend_position)
     }else{
-      p_norm <- ggplot2::ggplot(plot_data_norm) +
-        ggplot2::theme_bw() +
-        ggplot2::geom_boxplot(ggplot2::aes_string(x = "variable", y = "value", fill = color_by)) +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
+      p_norm <- ggplot(plot_data_norm) +
+        theme_bw() +
+        geom_boxplot(aes_string(x = "variable", y = "value", fill = color_by)) +
+        theme(plot.title = element_text(size=title_size),
+                       axis.title.x = element_text(size=x_lab_size),
+                       axis.title.y = element_text(size=y_lab_size),
                        legend.position = legend_position)
     }
     
@@ -2572,18 +2586,18 @@ plot.normRes <- function(normData, order_by = NULL, color_by = NULL, ...) {
     plot_data_norm[[color_by]] <- factor(plot_data_norm[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
     
     if(bw_theme==FALSE){
-      p_norm <- ggplot2::ggplot(plot_data_norm) + ggplot2::geom_boxplot(ggplot2::aes_string(x = "variable", y = "value", fill = color_by)) +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
+      p_norm <- ggplot(plot_data_norm) + geom_boxplot(aes_string(x = "variable", y = "value", fill = color_by)) +
+        theme(plot.title = element_text(size=title_size),
+                       axis.title.x = element_text(size=x_lab_size),
+                       axis.title.y = element_text(size=y_lab_size),
                        legend.position = legend_position)
     }else{
-      p_norm <- ggplot2::ggplot(plot_data_norm) +
-        ggplot2::theme_bw() +
-        ggplot2::geom_boxplot(ggplot2::aes_string(x = "variable", y = "value", fill = color_by)) +
-        ggplot2::theme(plot.title = ggplot2::element_text(size=title_size),
-                       axis.title.x = ggplot2::element_text(size=x_lab_size),
-                       axis.title.y = ggplot2::element_text(size=y_lab_size),
+      p_norm <- ggplot(plot_data_norm) +
+        theme_bw() +
+        geom_boxplot(aes_string(x = "variable", y = "value", fill = color_by)) +
+        theme(plot.title = element_text(size=title_size),
+                       axis.title.x = element_text(size=x_lab_size),
+                       axis.title.y = element_text(size=y_lab_size),
                        legend.position = legend_position)
     }
     
@@ -2594,9 +2608,9 @@ plot.normRes <- function(normData, order_by = NULL, color_by = NULL, ...) {
   # facet plot #
   # if(!is.null(facet_by)) {
   #   if(is.null(facet_cols)) {
-  #     p <- p + ggplot2::facet_wrap(formula(paste("~",facet_by)), scales = "free_x")
+  #     p <- p + facet_wrap(formula(paste("~",facet_by)), scales = "free_x")
   #   } else {
-  #     p <- p + ggplot2::facet_wrap(formula(paste("~",facet_by)), scales = "free_x", ncol = facet_cols)
+  #     p <- p + facet_wrap(formula(paste("~",facet_by)), scales = "free_x", ncol = facet_cols)
   #   }
   # }
   
@@ -2608,9 +2622,9 @@ plot.normRes <- function(normData, order_by = NULL, color_by = NULL, ...) {
   if(!is.null(legend_lab)) legend_title <- legend_lab
   
   # add additional features to plot #
-  p_norm <- p_norm + ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90)) + ggplot2::xlab("Sample") +
-    ggplot2::ggtitle(title) + ggplot2::xlab(xlabel) + ggplot2::ylab(ylabel) +
-    ggplot2::scale_fill_discrete(legend_title)
+  p_norm <- p_norm + theme(axis.text.x = element_text(angle = 90)) + xlab("Sample") +
+    ggtitle(title) + xlab(xlabel) + ylab(ylabel) +
+    scale_fill_discrete(legend_title)
   
   #### END OF NORM DATA PLOT ####
   

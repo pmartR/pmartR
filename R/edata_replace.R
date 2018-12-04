@@ -66,11 +66,11 @@ edata_replace.pepData <- function(omicsData, x, y){
   }
   
   # create an updated metabData object (look at as.metabData function to see how the attributes are accessed) #
-  updated_data <- as.pepData(e_data = edata_new, f_data = omicsData$f_data, e_meta = omicsData$e_meta, edata_cname = edata_id, emeta_cname=emeta_cname, fdata_cname = attr(omicsData, "cnames")$fdata_cname, data_scale = attr(omicsData, "data_info")$data_scale, data_norm = attr(omicsData, "data_info")$data_norm, norm_info=attr(omicsData, "data_info")$norm_info, data_types=attr(omicsData, "data_info")$data_types, check.names = check_names)
+  updated_data <- as.pepData(e_data = edata_new, f_data = omicsData$f_data, e_meta = omicsData$e_meta, edata_cname = edata_id, emeta_cname=emeta_cname, fdata_cname = attr(omicsData, "cnames")$fdata_cname, data_scale = attr(omicsData, "data_info")$data_scale, is_normalized = attr(omicsData, "data_info")$norm_info$is_normalized, norm_info=attr(omicsData, "data_info")$norm_info, data_types=attr(omicsData, "data_info")$data_types, check.names = check_names)
 
   #check for isobaricpepData class
   if(inherits(omicsData, "isobaricpepData")){
-    updated_data <- as.isobaricpepData(e_data = edata_new, f_data = omicsData$f_data, e_meta = omicsData$e_meta, edata_cname = edata_id, emeta_cname=emeta_cname, fdata_cname = attr(omicsData, "cnames")$fdata_cname, exp_cname = attr(omicsData, "isobaric_info")$exp_cname, channel_cname = attr(omicsData, "isobaric_info")$channel_cname, refpool_channel = attr(omicsData, "isobaric_info")$refpool_channel, refpool_cname = attr(omicsData, "isobaric_info")$refpool_cname, refpool_notation = attr(omicsData, "isobaric_info")$refpool_notation, data_scale = attr(omicsData, "data_info")$data_scale, data_norm = attr(omicsData, "data_info")$data_norm, isobaric_norm = attr(omicsData, "data_info")$isobaric_norm, norm_info=attr(omicsData, "data_info")$norm_info, data_types=attr(omicsData, "data_info")$data_types, check.names = check_names)
+    updated_data <- as.isobaricpepData(e_data = edata_new, f_data = omicsData$f_data, e_meta = omicsData$e_meta, edata_cname = edata_id, emeta_cname=emeta_cname, fdata_cname = attr(omicsData, "cnames")$fdata_cname, exp_cname = attr(omicsData, "isobaric_info")$exp_cname, channel_cname = attr(omicsData, "isobaric_info")$channel_cname, refpool_channel = attr(omicsData, "isobaric_info")$refpool_channel, refpool_cname = attr(omicsData, "isobaric_info")$refpool_cname, refpool_notation = attr(omicsData, "isobaric_info")$refpool_notation, data_scale = attr(omicsData, "data_info")$data_scale, is_normalized = attr(omicsData, "data_info")$norm_info$is_normalized, isobaric_norm = attr(omicsData, "isobaric_info")$norm_info$is_normalized, norm_info=attr(omicsData, "data_info")$norm_info, data_types=attr(omicsData, "data_info")$data_types, check.names = check_names)
   }
   
   attributes(updated_data)$group_DF <- attributes(omicsData)$group_DF
@@ -120,7 +120,7 @@ edata_replace.proData <- function(omicsData, x, y){
   }
 
   # create an updated metabData object (look at as.metabData function to see how the attributes are accessed) #
-  updated_data <- as.proData(e_data = edata_new, f_data = omicsData$f_data, e_meta = omicsData$e_meta, edata_cname = edata_id, emeta_cname=emeta_cname, fdata_cname = attr(omicsData, "cnames")$fdata_cname, data_scale = attr(omicsData, "data_info")$data_scale, data_norm = attr(omicsData, "data_info")$data_norm, data_types=attr(omicsData, "data_info")$data_types, check.names = check_names)
+  updated_data <- as.proData(e_data = edata_new, f_data = omicsData$f_data, e_meta = omicsData$e_meta, edata_cname = edata_id, emeta_cname=emeta_cname, fdata_cname = attr(omicsData, "cnames")$fdata_cname, data_scale = attr(omicsData, "data_info")$data_scale, is_normalized = attr(omicsData, "data_info")$norm_info$is_normalized, data_types=attr(omicsData, "data_info")$data_types, check.names = check_names)
 
   attributes(updated_data)$group_DF <- attributes(omicsData)$group_DF
   attributes(updated_data)$filters <- attributes(omicsData)$filters
@@ -169,7 +169,7 @@ edata_replace.metabData <- function(omicsData, x, y){
   }
 
   # create an updated metabData object (look at as.metabData function to see how the attributes are accessed) #
-  updated_data <- as.metabData(e_data = edata_new, f_data = omicsData$f_data, e_meta = omicsData$e_meta, edata_cname = edata_id, emeta_cname=emeta_cname, fdata_cname = attr(omicsData, "cnames")$fdata_cname, data_scale = attr(omicsData, "data_info")$data_scale, data_norm = attr(omicsData, "data_info")$data_norm, data_types=attr(omicsData, "data_info")$data_types, check.names = check_names)
+  updated_data <- as.metabData(e_data = edata_new, f_data = omicsData$f_data, e_meta = omicsData$e_meta, edata_cname = edata_id, emeta_cname=emeta_cname, fdata_cname = attr(omicsData, "cnames")$fdata_cname, data_scale = attr(omicsData, "data_info")$data_scale, is_normalized = attr(omicsData, "data_info")$norm_info$is_normalized, data_types=attr(omicsData, "data_info")$data_types, check.names = check_names)
 
   attributes(updated_data)$group_DF <- attributes(omicsData)$group_DF
   attributes(updated_data)$filters <- attributes(omicsData)$filters
@@ -218,7 +218,7 @@ edata_replace.lipidData <- function(omicsData, x, y){
   }
 
   # create an updated metabData object (look at as.metabData function to see how the attributes are accessed) #
-  updated_data <- as.lipidData(e_data = edata_new, f_data = omicsData$f_data, e_meta = omicsData$e_meta, edata_cname = edata_id, emeta_cname=emeta_cname, fdata_cname = attr(omicsData, "cnames")$fdata_cname, data_scale = attr(omicsData, "data_info")$data_scale, data_norm = attr(omicsData, "data_info")$data_norm, data_types=attr(omicsData, "data_info")$data_types, check.names = check_names)
+  updated_data <- as.lipidData(e_data = edata_new, f_data = omicsData$f_data, e_meta = omicsData$e_meta, edata_cname = edata_id, emeta_cname=emeta_cname, fdata_cname = attr(omicsData, "cnames")$fdata_cname, data_scale = attr(omicsData, "data_info")$data_scale, is_normalized = attr(omicsData, "data_info")$norm_info$is_normalized, data_types=attr(omicsData, "data_info")$data_types, check.names = check_names)
 
   attributes(updated_data)$group_DF <- attributes(omicsData)$group_DF
   attributes(updated_data)$filters <- attributes(omicsData)$filters

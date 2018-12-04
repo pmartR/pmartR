@@ -124,8 +124,9 @@ double compute_pvalue(double h,std::vector<double> nonmiss)
 // [[Rcpp::export]]
 std::list<double> kw_rcpp(arma::mat mtr,std::vector<std::string> group)
 {
-  std::vector<int> gsize;
-  gsize = gp_size(group); 
+  std::vector<std::string> unique_groups = group; 
+  std::sort(unique_groups.begin(),unique_groups.end());
+  unique_groups.erase( std::unique( unique_groups.begin(), unique_groups.end() ), unique_groups.end() );
   
   std::list<double> final;
   std:: vector<double> cp(mtr.n_cols);
@@ -139,24 +140,21 @@ std::list<double> kw_rcpp(arma::mat mtr,std::vector<std::string> group)
   for(unsigned int i = 0; i <mtr.n_rows;i++)
   {
         cp = arma::conv_to< std::vector<double> >::from(mtr.row(i));
-    
-        for (unsigned int i = 0, j = 0; i < gsize.size(); i++)
+        
+        for (unsigned int i = 0; i < unique_groups.size(); i++)
         {
-          for (unsigned int k = 0; k < gsize[j]; k++)
+          for (unsigned int k = 0; k < cp.size(); k++)
           {
-            if (R_IsNA(cp[k]))
+            if (ISNAN(cp[k])){
               continue;
-            
-            else 
-            {
+            }
+            else if(unique_groups[i] == group[k]) {
               tmp.push_back(cp[k]);
             }
           }
           
           groups.push_back(tmp);
-          cp.erase(cp.begin(),cp.begin()+gsize[j]);
           tmp.clear();
-          j++;
         
        }
     

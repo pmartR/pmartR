@@ -48,6 +48,7 @@
 #'
 
 missingval_volcanoplot<- function(statRes, comparison, x_lab = NULL, ...) {
+  require(ggplot2)
   .missingval_volcanoplot(statRes, comparison, x_lab, ...)
 }
 
@@ -148,24 +149,24 @@ if(length(comparison) == 1){
   }
     
     p <- ggplot(plotdata, aes(x = fold_change_data, y = pvalue_data)) + geom_point(aes(color = pvalue_data)) +
-      ggplot2::xlab(xlabel) +
-      ggplot2::ylab(ylabel) +
-      ggplot2::ggtitle(plot_title) +
-      ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size), axis.text.x = element_text(angle = x_lab_angle, hjust = 1)) +
+      xlab(xlabel) +
+      ylab(ylabel) +
+      ggtitle(plot_title) +
+      theme(plot.title = element_text(size = title_size), axis.title.x = element_text(size = x_lab_size), axis.title.y = element_text(size = y_lab_size), axis.text.x = element_text(angle = x_lab_angle, hjust = 1)) +
       scale_color_distiller(palette = palette, name = legendtitle)
     
     if(coordinate_flip == TRUE){
-      p = p + ggplot2::coord_flip()
+      p = p + coord_flip()
     }
     
     if(bw_theme == TRUE){
-      p = p + ggplot2::theme_bw() + ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size), axis.text.x = element_text(angle = x_lab_angle, hjust = 1))
+      p = p + theme_bw() + theme(plot.title = element_text(size = title_size), axis.title.x = element_text(size = x_lab_size), axis.title.y = element_text(size = y_lab_size), axis.text.x = element_text(angle = x_lab_angle, hjust = 1))
     }
     if(!(is.null(vlines))){
-      p = p + ggplot2::geom_vline(xintercept = vert_lines, color = "red", linetype = "dashed")
+      p = p + geom_vline(xintercept = vert_lines, color = "red", linetype = "dashed")
     }
     if(!is.null(pvalue_threshold)){
-      p = p + ggplot2::geom_hline(yintercept = pval_thresh, color = "green", linetype = "dashed")
+      p = p + geom_hline(yintercept = pval_thresh, color = "green", linetype = "dashed")
     }
   
   return(p)

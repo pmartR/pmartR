@@ -150,7 +150,7 @@ spans_procedure <- function(omicsData, norm_fn = c("median", "mean", "zscore", "
     if(!inherits(attr(omicsData, "group_DF"), "data.frame")) stop("the omicsData object must have a grouping structure, usually set by calling group_designation() on the object")
     if(any(c(min_nonsig, min_sig) < 1) | any(c(min_nonsig, min_sig) > nrow(omicsData$e_data))) stop("min_nonsig and min_sig must be an integer value no greater than the number of observed biomolecules")
     if(any(c(sig_thresh, nonsig_thresh) > 1) | any(c(sig_thresh, nonsig_thresh) < 0)) stop("sig_thresh and nonsig_thresh must be numeric values between 0 and 1")
-    if(isTRUE(attributes(omicsData)$norm_info$norm_type == "global")) stop("a global normalization scheme has already been applied to this data, SPANS should be run on an unnormalized log-transformed pepData or proData object.")
+    if(isTRUE(attributes(omicsData)$data_info$norm_info$norm_type == "global")) stop("a global normalization scheme has already been applied to this data, SPANS should be run on an unnormalized log-transformed pepData or proData object.")
     if(!isTRUE(grepl("log", attr(omicsData, "data_info")$data_scale))) stop("omicsData object must have been transformed to the log scale.  Either specify the attribute attr(omicsData, 'data_info')$data_scale or call edata_transform() on the omicsData object.")
     if(!all(subset_fn %in% c("all", "los", "ppp", "rip", "ppp_rip"))) stop("subset_fn must be a character vector containing more than one of the elements 'all', 'los', 'ppp', 'rip', 'ppp_rip'")
     if(!all(norm_fn %in% c("median", "mean", "zscore", "mad"))) stop("norm_fn must be a character vector containing more than one of the elements 'median', 'mean', 'zscore', 'mad'")
