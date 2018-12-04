@@ -87,7 +87,7 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
     xlabel <- ifelse(is.null(x_lab), "Sample Name", x_lab)
     ylabel <- ifelse(is.null(y_lab), "Missing values (count)", y_lab)
     plot_title <- ifelse(is.null(title_plot), "Missing Values by Sample", title_plot)
-    legendtitle<- ifelse(is.null(legend_title), "group", legend_title)
+    legendtitle<- ifelse(is.null(legend_title), "Group", legend_title)
     
     
     #plots NA per sample
