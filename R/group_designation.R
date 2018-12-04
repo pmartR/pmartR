@@ -80,7 +80,7 @@ group_designation <- function(omicsData, main_effects, covariates=NULL, time_cou
     Group = temp_data[,names(temp_data) %in% main_effects]
 
   # create output formatted with first column being sample id and second column group id #
-    output = data.frame(Sample.ID = temp_data[,samp_id], Group = as.character(Group))
+    output = data.frame(Sample.ID = temp_data[,samp_id], Group = as.character(Group), stringsAsFactors = FALSE)
     names(output)[1] = samp_id
 
   }
@@ -104,7 +104,7 @@ group_designation <- function(omicsData, main_effects, covariates=NULL, time_cou
 
     # create output formatted with first column being sample id and second column group id #
     # third and fourth columns are the original main effect levels #
-    output = data.frame(Sample.ID = temp_data[,samp_id], Group = Group, obs.effects)
+    output = data.frame(Sample.ID = temp_data[,samp_id], Group = Group, obs.effects, stringsAsFactors = FALSE)
     names(output)[1] = samp_id
   }
 

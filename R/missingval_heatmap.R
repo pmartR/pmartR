@@ -39,6 +39,7 @@
 
 
 missingval_heatmap <- function(omicsData, x_lab = NULL, y_lab = NULL, ...) {
+  require(ggplot2)
   .missingval_heatmap(omicsData, x_lab, y_lab, ...)
 }
 
@@ -89,20 +90,20 @@ edata_melt<- melt(e_data, id.vars = edata_cname)
 edata_melt[[edata_cname]]<- factor(edata_melt[[edata_cname]], levels = rev(by_molecule[[edata_cname]]))  
 names(edata_melt)[1]<- "edata_cname"
 
-  p <- ggplot2::ggplot(edata_melt, aes(x=variable, y = edata_cname)) + geom_tile(aes(fill = value)) +
-    ggplot2::xlab(xlabel) +
-    ggplot2::ylab(ylabel) +
-    ggplot2::ggtitle(plot_title) +
-    ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size), axis.text.x = element_text(angle = x_lab_angle, hjust = 1)) +
+  p <- ggplot(edata_melt, aes(x=variable, y = edata_cname)) + geom_tile(aes(fill = value)) +
+    xlab(xlabel) +
+    ylab(ylabel) +
+    ggtitle(plot_title) +
+    theme(axis.text.y = element_blank(), axis.ticks.y = element_blank(), plot.title = element_text(size = title_size), axis.title.x = element_text(size = x_lab_size), axis.title.y = element_text(size = y_lab_size), axis.text.x = element_text(angle = x_lab_angle, hjust = 1)) +
     scale_fill_distiller(palette = palette, name = legendtitle)
   
   if(coordinate_flip == TRUE){
-    p <- ggplot2::ggplot(edata_melt, aes(x=variable, y = edata_cname)) + geom_tile(aes(fill = value)) +
-      ggplot2::xlab(xlabel) +
-      ggplot2::ylab(ylabel) +
-      ggplot2::ggtitle(plot_title) +
+    p <- ggplot(edata_melt, aes(x=variable, y = edata_cname)) + geom_tile(aes(fill = value)) +
+      xlab(xlabel) +
+      ylab(ylabel) +
+      ggtitle(plot_title) +
       coord_flip() +
-      ggplot2::theme(axis.text.x = ggplot2::element_blank(), axis.ticks.x = ggplot2::element_blank(), plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size)) +
+      theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(), plot.title = element_text(size = title_size), axis.title.x = element_text(size = x_lab_size), axis.title.y = element_text(size = y_lab_size)) +
       scale_fill_distiller(palette = palette, name = legendtitle) 
   }
 

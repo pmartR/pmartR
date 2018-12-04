@@ -57,7 +57,7 @@ arma::Mat<int> nonmissing_per_grp(arma::mat mtr,std::vector<std::string> group)
       for (unsigned int k = 0; k < nvec[j]; k++)
       {
         
-        if(R_IsNA(cpy[k]))
+        if(ISNAN(cpy[k]))
           continue;
         
         else count++;

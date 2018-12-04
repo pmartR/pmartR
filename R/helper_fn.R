@@ -164,13 +164,9 @@ get_data_scale<- function(omicsData){
 #' @export
 get_data_norm<- function(omicsData){
   # check that omicsData is of appropriate class #
-  if(!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData"))) stop("omicsData must be of class 'pepData', 'proData', 'metabData', or 'lipidData'")
+  if(!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData", "isobaricpepData"))) stop("omicsData must be of class 'pepData', 'proData', 'metabData', 'lipidData', or 'isobaricpepData'")
   
-  data_norm = attr(omicsData, "data_info")$data_norm
-  
-  if(inherits(omicsData, "isobaricpepData")){
-    data_norm =  data_norm = attr(omicsData, "data_info")$isobaric_norm
-  }
+  data_norm = attr(omicsData, "data_info")$norm_info$is_normalized
   
   return(data_norm)
 }
@@ -191,7 +187,7 @@ get_isobaric_norm<- function(omicsData){
   # check that omicsData is of appropriate class #
   if(!inherits(omicsData, c("pepData", "proData", "isobaricpepData"))) stop("omicsData must be of class 'pepData', 'proData' or 'isobaricpepData'")
   
-  isobaric_norm = attr(omicsData, "data_info")$isobaric_norm
+  isobaric_norm = attr(omicsData, "isobaric_info")$norm_info$is_normalized
   
   return(isobaric_norm)
 }

@@ -73,8 +73,8 @@ normalize_isobaric<- function(omicsData, apply_norm = FALSE){
     #remove refsamples from f_data 
     omicsData$f_data<- fdata[-which(fdata[[fdata_cname]] %in% ref_samples),]
     
-    #update isobaric_norm attr
-    attr(omicsData, "data_info")$isobaric_norm = TRUE
+    #update isobaric norm flag
+    attr(omicsData, "isobaric_info")$norm_info$is_normalized = TRUE
     
     result = omicsData
   }else{

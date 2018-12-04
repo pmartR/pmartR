@@ -22,6 +22,7 @@
 #' @export
 
 plot.dataRes<- function(dataRes, metric = NULL, density = FALSE, ncols = NULL){
+  require(ggplot2)
   #check that attr(dataRes, "by") == "molecule"
   if(attr(dataRes, "by") != "molecule") stop("can only plot a dataRes object if its 'by' attribute is equal to 'molecule'")
   
@@ -55,7 +56,7 @@ plot.dataRes<- function(dataRes, metric = NULL, density = FALSE, ncols = NULL){
     p<- ggplot(data_mean_median, aes(x = mean, y = median, color = variable)) + geom_point(shape = 1) + ggtitle("Mean x Median") +
       theme_bw()
     
-    grid.arrange(q, p, ncol = 2)
+    gridExtra::grid.arrange(q, p, ncol = 2)
     
   }
   

@@ -4,7 +4,6 @@ library(pmartRdata)
 library(testthat)
 library(gridExtra)
 
-data("pep_object")
 # sink(file = "logs_test_plotting")
 # List of testing objects.  Each has a fake group and custom sample names
 obj_list <- lapply(list(pep_object, pro_object, metab_object, lipid_object), function(x){
@@ -59,8 +58,8 @@ test_that("filter plot errors", {
 
   # only test pep_object
   obj <- obj_list[[1]] %>%
-    group_designation(main_effects = "testgroup") %>%
-    edata_transform(data_scale = "log2")
+    edata_transform(data_scale = "log2") %>%
+    group_designation(main_effects = "testgroup")
 
 # run tests for all filters in a loop
 for(i in 1:length(filter_list)){
@@ -118,7 +117,7 @@ for(i in 1:length(filter_list)){
       expect_error(plot(filter_obj, min_nonmiss_gest = "2"))
 
       temp_plot <- do.call(plot, c(list(filter_object = filter_obj, min_nonmiss_anova = 3, min_nonmiss_gtest = 3), common_params[names(common_params) != "bw_theme"]))
-      expect_equal(filter_obj[,-1] %>% dplyr::filter_all(all_vars(. >= 3)) %>% nrow(),
+      expect_equal(filter_obj[,-1] %>% dplyr::filter_all(dplyr::all_vars(. >= 3)) %>% nrow(),
                    temp_plot$data %>% dplyr::filter(Var1 == 3 & Var2 == 3) %>% purrr::pluck('value'))
       
     } else if (filter_list[[i]] == "rmd_filter"){
@@ -131,7 +130,7 @@ for(i in 1:length(filter_list)){
       temp_plot1 <- do.call(plot, c(list(filter_object = filter_obj, pvalue_threshold = pval_thresh), common_params))
       expect_true(all(temp_plot1$data == filter_obj %>% dplyr::filter(pvalue <= pval_thresh)))
       
-      temp_plot2 <- do.call(plot, c(list(filter_object = filter_obj, pvalue_threshold = pval_thresh, sampleID = "sampleID"), common_params))
+      temp_plot2 <- do.call(plot, c(list(filter_object = filter_obj, pvalue_threshold = pval_thresh, sampleID = "Infection1"), common_params))
       expect_true(all(data.table::melt(filter_obj, measure = 5:ncol(filter_obj))$value == temp_plot2$data$value))
 
     } else if (filter_list[[i]] == "cv_filter"){
@@ -254,51 +253,53 @@ for(i in 1:length(grouped_objs)){
 
 # create lists of objects resulting from applying dim_reduction, normalize_global, edata_summary, and missingval_result to each omicsData object in obj_list #
 pcares <- lapply(obj_list, function(obj){
-  res <- obj %>% group_designation(main_effects = "testgroup")
-
-  if(attr(res, "data_info")$data_scale != "log2"){
-    res <- res %>% edata_transform(data_scale = "log2")
+  if(attr(obj, "data_info")$data_scale != "log2"){
+    obj <- obj %>% edata_transform(data_scale = "log2")
   }
+  
+  obj <- obj %>% group_designation(main_effects = "testgroup")
 
-  res <- dim_reduction(res)
+  obj <- dim_reduction(obj)
 
-  res
+  obj
   })
 
 normres <- lapply(obj_list, function(obj){
-  res <- obj %>% group_designation(main_effects = "testgroup")
-
-  if(attr(res, "data_info")$data_scale != "log2"){
-    res <- res %>% edata_transform(data_scale = "log2")
+  if(attr(obj, "data_info")$data_scale != "log2"){
+    obj <- obj %>% edata_transform(data_scale = "log2")
   }
+  
+  obj <- obj %>% group_designation(main_effects = "testgroup")
 
-  res <- normalize_global(res, subset_fn = "all", norm_fn = "median")
+  obj  <- normalize_global(obj , subset_fn = "all", norm_fn = "median")
 
-  res
+  obj 
 })
 
 summaryres <- lapply(obj_list, function(obj){
-  res <- obj %>% group_designation(main_effects = "testgroup")
-
-  if(attr(res, "data_info")$data_scale != "log2"){
-    res <- res %>% edata_transform(data_scale = "log2")
+  if(attr(obj, "data_info")$data_scale != "log2"){
+    obj <- obj %>% edata_transform(data_scale = "log2")
   }
+  
+  obj <- obj %>% group_designation(main_effects = "testgroup")
+  
   suppressWarnings(
-    res <- edata_summary(res, by = "molecule", groupvar = "testgroup")
+    obj  <- edata_summary(obj , by = "molecule", groupvar = "testgroup")
   )
-  res
+  
+  obj 
 })
 
 missingvalres <- lapply(obj_list, function(obj){
-  res <- obj %>% group_designation(main_effects = "testgroup")
-
-  if(attr(res, "data_info")$data_scale != "log2"){
-    res <- res %>% edata_transform(data_scale = "log2")
+  if(attr(obj, "data_info")$data_scale != "log2"){
+    obj <- obj %>% edata_transform(data_scale = "log2")
   }
+  
+  obj <- obj %>% group_designation(main_effects = "testgroup")
 
-  res <- missingval_result(res)
+  obj <- missingval_result(obj)
 
-  res
+  obj
 })
 
 # end creating lists of results of function calls to omicsData objects #
@@ -331,7 +332,7 @@ test_that("data integrity for misc plots", {
     pca_plot <- do.call(plot, c(list(pcares[[i]], point_size = sample(4:10, 1)), common_params))
     norm_plot <- do.call(plot, c(list(normres[[i]], combined = TRUE), common_params))
     summary_plot <- plot(summaryres[[i]], metric = metric, ncols = ncol)
-    missingval_plot <- do.call(plot, c(list(naRes_object = missingvalres[[i]], type = type, palette = palette, use_VizSampNames = use_VizSampNames, coordinate_flip = coordinate_flip)))
+    missingval_plot <- plot(naRes_object = missingvalres[[i]], type = type, palette = palette, use_VizSampNames = use_VizSampNames, coordinate_flip = coordinate_flip)
     
     ## tests
     expect_true(all(pca_plot$data %in% cbind(attr(pcares[[i]], "group_DF"), pcares[[i]]["PC1"], pcares[[i]]["PC2"])))
