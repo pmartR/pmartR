@@ -71,7 +71,7 @@ combine_techreps <- function(omicsData, combine_fn = "mean", bio_sample_names = 
   # get number of distinct levels for each column per biological sample.
   distinct <- f_data %>% 
     dplyr::group_by(!!rlang::sym(techrep_cname)) %>% 
-    dplyr::summarise_all(n_distinct) %>% 
+    dplyr::summarise_all(dplyr::n_distinct) %>% 
     dplyr::select(-dplyr::one_of(c(techrep_cname, fdata_cname))) %>% 
     as.data.frame() 
   
@@ -93,7 +93,7 @@ combine_techreps <- function(omicsData, combine_fn = "mean", bio_sample_names = 
   # create new, collapsed e_data object, averaged over technical replicates
   new_edata <- e_data[which(names(e_data) == attr(omicsData, "cnames")$edata_cname)]
   for(el in names(bio_sample_list)){
-    edata_subsample <- e_data %>% dplyr::select(one_of(bio_sample_list[[el]]))
+    edata_subsample <- e_data %>% dplyr::select(dplyr::one_of(bio_sample_list[[el]]))
     if(combine_fn == "mean") new_edata[el] = rowMeans(edata_subsample, na.rm = TRUE)
     # other combine methods coming soon! #
   }
