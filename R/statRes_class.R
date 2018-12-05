@@ -324,8 +324,8 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, fc_colors = 
       cols_gtest <- c("-2" = fc_colors[1], "-1" = fc_colors[2], "0" = fc_colors[2], "1" = fc_colors[2], "2" = fc_colors[3])
       temp_data_gtest <- volcano %>% 
         dplyr::filter(Type == "G-test") %>% 
-        dplyr::mutate(Fold_change_flag = ifelse(Count_First_Group >= Count_Second_Group & P_value <= attr(x, "pval_thresh"), 2, 
-                                                ifelse(Count_First_Group < Count_Second_Group & P_value <= attr(x, "pval_thresh"), -2, Fold_change_flag)))
+        dplyr::mutate(Fold_change_flag = ifelse(Count_First_Group <= Count_Second_Group & P_value <= attr(x, "pval_thresh"), 2, 
+                                                ifelse(Count_First_Group > Count_Second_Group & P_value <= attr(x, "pval_thresh"), -2, Fold_change_flag)))
       
       if(interactive){
         p2 <- ggplot(temp_data_gtest, aes(Count_First_Group, Count_Second_Group, text = paste("ID:", !!sym(idcol), "<br>", "Pval:", round(P_value, 4))))

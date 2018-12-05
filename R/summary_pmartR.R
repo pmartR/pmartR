@@ -53,7 +53,7 @@ summary.pepData <- function(omicsData) {
   #if group_DF attr is present 
   if(!is.null(attr(omicsData, "group_DF"))){
     group_vec<- attr(omicsData, "group_DF")$Group
-    levels<- levels(attr(omicsData, "group_DF")$Group)
+    levels<- unique(attr(omicsData, "group_DF")$Group)
     counts <- vector(mode="numeric", length=length(levels))
     
     for(i in 1:length(levels)){

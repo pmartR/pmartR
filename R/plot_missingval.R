@@ -14,6 +14,7 @@
 #' \code{title_size} \tab integer value specifying the font size for the plot title. Default is 14. \cr
 #' \code{x_lab_size} \tab integer value indicating the font size for the x-axis. Defaults to 11. \cr
 #' \code{y_lab_size} \tab integer value indicating the font size for the y-axis. Defaults to 11. \cr
+#' \code{text_size} \tab integer value indicating the font size for the bar labels. Defaults to 3. \cr
 #' \code{bar_width} \tab integer value indicating the bar width in a barplot (when type = "bySample"). Defaults to .8. \cr
 #' \code{binwidth} \tab integer value indicating the bin width in a histogram (when type = "byMolecule"). Defaults to 1. \cr
 #' \code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used. \cr
@@ -46,7 +47,7 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
   .plot.naRes(naRes_object, type, x_lab, ...)
 }
 
-.plot.naRes<- function(naRes_object, type, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_title = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bar_width = .8, binwidth = 1, bw_theme = FALSE, palette = "Spectral", x_lab_angle = 60, coordinate_flip = FALSE, use_VizSampNames = FALSE){
+.plot.naRes<- function(naRes_object, type, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_title = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, text_size = 3, bar_width = .8, binwidth = 1, bw_theme = FALSE, palette = "Spectral", x_lab_angle = 60, coordinate_flip = FALSE, use_VizSampNames = FALSE){
  
    # check for a naRes object #
   if(!inherits(naRes_object, "naRes")) stop("object must be of class 'naRes'")
@@ -88,14 +89,14 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
     xlabel <- ifelse(is.null(x_lab), "Sample Name", x_lab)
     ylabel <- ifelse(is.null(y_lab), "Missing values (count)", y_lab)
     plot_title <- ifelse(is.null(title_plot), "Missing Values by Sample", title_plot)
-    legendtitle<- ifelse(is.null(legend_title), "group", legend_title)
+    legendtitle<- ifelse(is.null(legend_title), "Group", legend_title)
     
     
     #plots NA per sample
     if(bw_theme == FALSE){
       p<- ggplot(data=na.by.sample, aes(x=na.by.sample[[fdata_cname]], y = na.by.sample$num_NA, fill = group)) + 
           geom_bar(stat = "identity", width = bar_width) +
-          geom_text(aes(label = num_NA), vjust = 2, color = "black", size = 3) +
+          geom_text(aes(label = num_NA), vjust = 2, color = "black", size = text_size) +
           xlab(xlabel) +
           ylab(ylabel) +
           ggtitle(plot_title) +
@@ -104,7 +105,7 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
       if(coordinate_flip == TRUE){
         p<- ggplot(data=na.by.sample, aes(x=na.by.sample[[fdata_cname]], y = na.by.sample$num_NA, fill = group)) + 
             geom_bar(stat = "identity", width = bar_width) +
-            geom_text(aes(label = num_NA), hjust = 2, color = "black", size = 3) +
+            geom_text(aes(label = num_NA), hjust = 2, color = "black", size = text_size) +
             xlab(xlabel) +
             ylab(ylabel) +
             ggtitle(plot_title) +
@@ -116,7 +117,7 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
     else{
       p<- ggplot(data=na.by.sample, aes(x=na.by.sample[[fdata_cname]], y = na.by.sample$num_NA, fill = group)) + 
           geom_bar(stat = "identity", width = bar_width) +
-          geom_text(aes(label = num_NA), vjust = 2, color = "black", size = 3) +
+          geom_text(aes(label = num_NA), vjust = 2, color = "black", size = text_size) +
           theme_bw() +
           xlab(xlabel) +
           ylab(ylabel) +
@@ -126,7 +127,7 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
           if(coordinate_flip == TRUE){
             p<- ggplot(data=na.by.sample, aes(x=na.by.sample[[fdata_cname]], y = na.by.sample$num_NA, fill = group)) + 
                 geom_bar(stat = "identity", width = bar_width) +
-                geom_text(aes(label = num_NA), hjust = 2, color = "black", size = 3) +
+                geom_text(aes(label = num_NA), hjust = 2, color = "black", size = text_size) +
                 theme_bw() +
                 xlab(xlabel) +
                 ylab(ylabel) +
@@ -186,7 +187,7 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
     if(bw_theme == FALSE){
       s<- ggplot(data=na.by.sample, aes(x=na.by.sample[[fdata_cname]], y = na.by.sample$num_NA, fill = group)) + 
           geom_bar(stat = "identity", width = bar_width) +
-          geom_text(aes(label = num_NA), vjust = 2, color = "black", size = 3) +
+          geom_text(aes(label = num_NA), vjust = 2, color = "black", size = text_size) +
           xlab("Sample Name") +
           ylab("Missing values (count)") +
           ggtitle("Missing Values by Sample") +
@@ -195,7 +196,7 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
           if(coordinate_flip == TRUE){
             s<- ggplot(data=na.by.sample, aes(x=na.by.sample[[fdata_cname]], y = na.by.sample$num_NA, fill = group)) + 
                 geom_bar(stat = "identity", width = bar_width) +
-                geom_text(aes(label = num_NA), hjust = 2, color = "black", size = 3) +
+                geom_text(aes(label = num_NA), hjust = 2, color = "black", size = text_size) +
                 xlab("Sample Name") +
                 ylab("Missing values (count)") +
                 ggtitle("Missing Values by Sample") +
@@ -206,7 +207,7 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
     else{
       s<- ggplot(data=na.by.sample, aes(x=na.by.sample[[fdata_cname]], y = na.by.sample$num_NA, fill = group)) + 
           geom_bar(stat = "identity", width = bar_width) +
-          geom_text(aes(label = num_NA), vjust = 2, color = "black", size = 3) +
+          geom_text(aes(label = num_NA), vjust = 2, color = "black", size = text_size) +
           theme_bw() +
           xlab("Sample Name") +
           ylab("Missing values (count)") +
@@ -216,7 +217,7 @@ plot.naRes <- function(naRes_object, type, x_lab = NULL, ...) {
           if(coordinate_flip == TRUE){
             s<- ggplot(data=na.by.sample, aes(x=na.by.sample[[fdata_cname]], y = na.by.sample$num_NA, fill = group)) + 
                 geom_bar(stat = "identity", width = bar_width) +
-                geom_text(aes(label = num_NA), hjust = 2, color = "black", size = 3) +
+                geom_text(aes(label = num_NA), hjust = 2, color = "black", size = text_size) +
                 theme_bw() +
                 xlab("Sample Name") +
                 ylab("Missing values (count)") +
