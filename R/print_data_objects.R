@@ -8,14 +8,14 @@
 print.pepData<- function(pepData){
   if(!inherits(pepData, "pepData")) stop("pep_object must be of the class 'pepData'")
   
-  e_data<- as.data.frame(lapply(pepData$e_data, as.character), stringsAsFactors = FALSE)
-  f_data<- as.data.frame(lapply(pepData$f_data, as.character), stringsAsFactors = FALSE)
+  e_data<- as.data.frame(lapply(pepData$e_data, as.character), stringsAsFactors = FALSE, check.names = attr(pepData, "check.names"))
+  f_data<- as.data.frame(lapply(pepData$f_data, as.character), stringsAsFactors = FALSE, check.names = attr(pepData, "check.names"))
   edata_ncols<- ncol(e_data)
   fdata_ncols<- ncol(f_data)
   blank_row = rep("----", 5)
   
   if(!is.null(pepData$e_meta)){
-    e_meta<- as.data.frame(lapply(pepData$e_meta, as.character), stringsAsFactors = FALSE)
+    e_meta<- as.data.frame(lapply(pepData$e_meta, as.character), stringsAsFactors = FALSE, check.names = attr(pepData, "check.names"))
     emeta_ncols<- ncol(e_meta)
     
     if(nrow(e_data) >= 9){
@@ -96,14 +96,14 @@ print.pepData<- function(pepData){
 print.metabData<- function(metabData){
   if(!inherits(metabData, "metabData")) stop("metab_object must be of the class 'metabData'")
   
-  e_data<- as.data.frame(lapply(metabData$e_data, as.character), stringsAsFactors = FALSE)
-  f_data<- as.data.frame(lapply(metabData$f_data, as.character), stringsAsFactors = FALSE)
+  e_data<- as.data.frame(lapply(metabData$e_data, as.character), stringsAsFactors = FALSE, check.names = attr(metabData, "check.names"))
+  f_data<- as.data.frame(lapply(metabData$f_data, as.character), stringsAsFactors = FALSE, check.names = attr(metabData, "check.names"))
   edata_ncols<- ncol(e_data)
   fdata_ncols<- ncol(f_data)
   blank_row = rep("----", 5)
   
   if(!is.null(metabData$e_meta)){
-    e_meta<- as.data.frame(lapply(metabData$e_meta, as.character), stringsAsFactors = FALSE)
+    e_meta<- as.data.frame(lapply(metabData$e_meta, as.character), stringsAsFactors = FALSE, check.names = attr(metabData, "check.names"))
     emeta_ncols<- ncol(e_meta)
     
     if(nrow(e_data) >= 9){
@@ -184,14 +184,14 @@ print.metabData<- function(metabData){
 print.proData<- function(proData){
   if(!inherits(proData, "proData")) stop("pro_object must be of the class 'proData'")
   
-  e_data<- as.data.frame(lapply(proData$e_data, as.character), stringsAsFactors = FALSE)
-  f_data<- as.data.frame(lapply(proData$f_data, as.character), stringsAsFactors = FALSE)
+  e_data<- as.data.frame(lapply(proData$e_data, as.character), stringsAsFactors = FALSE, check.names = attr(proData, "check.names"))
+  f_data<- as.data.frame(lapply(proData$f_data, as.character), stringsAsFactors = FALSE, check.names = attr(proData, "check.names"))
   edata_ncols<- ncol(e_data)
   fdata_ncols<- ncol(f_data)
   blank_row = rep("----", 5)
   
   if(!is.null(proData$e_meta)){
-    e_meta<- as.data.frame(lapply(proData$e_meta, as.character), stringsAsFactors = FALSE)
+    e_meta<- as.data.frame(lapply(proData$e_meta, as.character), stringsAsFactors = FALSE, check.names = attr(proData, "check.names"))
     emeta_ncols<- ncol(e_meta)
     
     if(nrow(e_data) >= 9){
@@ -272,14 +272,14 @@ print.proData<- function(proData){
 print.lipidData<- function(lipidData){
   if(!inherits(lipidData, "lipidData")) stop("lipid_object must be of the class 'lipidData'")
   
-  e_data<- as.data.frame(lapply(lipidData$e_data, as.character), stringsAsFactors = FALSE)
-  f_data<- as.data.frame(lapply(lipidData$f_data, as.character), stringsAsFactors = FALSE)
+  e_data<- as.data.frame(lapply(lipidData$e_data, as.character), stringsAsFactors = FALSE, check.names = attr(lipidData, "check.names"))
+  f_data<- as.data.frame(lapply(lipidData$f_data, as.character), stringsAsFactors = FALSE, check.names = attr(lipidData, "check.names"))
   edata_ncols<- ncol(e_data)
   fdata_ncols<- ncol(f_data)
   blank_row = rep("----", 5)
   
   if(!is.null(lipidData$e_meta)){
-    e_meta<- as.data.frame(lapply(lipidData$e_meta, as.character), stringsAsFactors = FALSE)
+    e_meta<- as.data.frame(lapply(lipidData$e_meta, as.character), stringsAsFactors = FALSE, check.names = attr(lipidData, "check.names"))
     emeta_ncols<- ncol(e_meta)
     
     if(nrow(e_data) >= 9){
