@@ -127,7 +127,7 @@ missingval_scatterplot <- function(omicsData, x_lab = NULL, y_lab = NULL, ...) {
   if(!is.null(attr(omicsData, "group_DF"))){
     
     group_df<-attr(omicsData, "group_DF")
-    levels<- levels(group_df$Group)
+    levels<- unique(group_df$Group)
     indices_list<- list()
     
     for(i in 1:length(levels)){

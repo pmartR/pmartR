@@ -59,7 +59,6 @@ combine_techreps <- function(omicsData, combine_fn = "mean", bio_sample_names = 
   # create a list with the biological sample identifiers as names and the corresponding technical replicate names (column names of edata) as values
   # used below in constructing new e_data and also stored as an attribute
   bio_sample_list = list()
-  defaultnames <- 
   
   for(el in as.character(unique(f_data[,which(names(f_data) == techrep_cname)]))){
     bio_sample_list[[el]] = unique(f_data %>% dplyr::filter(!!rlang::sym(techrep_cname) == el) %>% {.[,fdata_cname]}) %>% as.character()
