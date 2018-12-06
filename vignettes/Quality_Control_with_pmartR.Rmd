@@ -2,15 +2,15 @@
 title: "Quality Control and Normalization of Peptide Data with the `pmartR` Package"
 author: "Kelly Stratton, Lisa Bramer"
 date: "`r Sys.Date()`"
-bibliography: bibliography.bib
-output: 
+output:
+  html_document:
+    df_print: paged
   rmarkdown::html_vignette:
-    self_contained: true
-    fig_caption: true
-vignette: >
-  %\VignetteIndexEntry{Analyzing Peptide Data with the pmartR Package}
-  %\VignetteEngine{knitr::rmarkdown}
-  \usepackage[utf8]{inputenc}
+    fig_caption: yes
+    self_contained: yes
+bibliography: bibliography.bib
+vignette: |
+  %\VignetteIndexEntry{Analyzing Peptide Data with the pmartR Package} %\VignetteEngine{knitr::rmarkdown} \usepackage[utf8]{inputenc}
 ---
 
 ```{r global_options, include = FALSE}

@@ -8,6 +8,7 @@ knitr::include_graphics("pmartR_logo_final.jpg")
 library(pmartR)
 library(pmartRdata)
 library(ggplot2)
+library(reshape2)
 
 ## ----data0, include=FALSE------------------------------------------------
 knitr::opts_chunk$set(fig.width=8)
@@ -177,10 +178,25 @@ plot(norm_data, title_plot="Normalized Data: Median Centering Using RIP 0.2 Pept
 
 
 ## ----spans---------------------------------------------------------------
+# returns a dataframe arranged by descending SPANS score
+spans_result <- spans_procedure(mypepData)
 
 
+## ----spans_plot_summarize------------------------------------------------
+summary(spans_result)
+plot(spans_result)
 
-
+## ----spans_normalize, eval = FALSE---------------------------------------
+#  # a list of the parameters for any normalization procedure with the best SPANS score
+#  best_params <- get_spans_params(spans_result)
+#  
+#  # there are a few ties, all using ppp_rip, well select the method that uses median normalization and parameters ppp = 0.1 and rip = 0.1
+#  subset_fn = best_params[[1]]$subset_fn
+#  norm_fn = best_params[[1]]$norm_fn
+#  params = best_params[[1]]$params
+#  
+#  # we now pass the extracted subset function, normalization function, and parameters from SPANS to normalize_global()
+#  norm_object <- normalize_global(omicsData = mypepData, subset_fn = subset_fn, norm_fn = norm_fn, params = params)
 
 ## ----edata_summary-------------------------------------------------------
 edata_summary(omicsData = norm_data, by = "sample", groupvar = NULL)
