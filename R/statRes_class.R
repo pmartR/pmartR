@@ -6,8 +6,8 @@
 #' @param omicsData A pmartR data object of any class, which has a `group_df` attribute that is usually created by the `group_designation()` function
 #' @param comparisons the comparisons made
 #' @param test_method the test method
-#' @param pval_ajust pvalue adjustment method
-#' @param pval_thres p-value threshold value
+#' @param pval_adjust pvalue adjustment method
+#' @param pval_thresh p-value threshold value
 #' 
 #' @return the final object of class statRes
 #' @export
@@ -206,12 +206,12 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, fc_colors = 
       
     p <- ggplot(data=comp_df_melt,aes(Comparison,Count)) + 
             geom_bar(aes(x = whichtest, fill = posneg, group = whichtest),stat='identity') + 
-            geom_text(aes(x = whichtest, label = abs(Count)), position = position_stack(vjust = 0.5), size = 3) +
+            geom_text(aes(x = whichtest, label = ifelse(abs(Count) > 0, abs(Count), "")), position = position_stack(vjust = 0.5), size = 3) +
             geom_hline(aes(yintercept=0),colour='gray50') +
             theme(axis.text.x=element_text(angle=90,vjust=0.5)) +
             scale_fill_manual(values=c(fc_colors[1], fc_colors[3]), labels = c("Negative", "Positive"), name = "Fold Change Sign") +
             facet_wrap(~Comparison) + 
-            xlab("Statistical test, by group comparison") + ylab("Count of DE Biomolecules") +
+            xlab("Statistical test, by group comparison") + ylab("Count of Biomolecules") +
             ggtitle("Number of DE Biomolecules Between Groups") +
             theme(plot.title = element_text(hjust = 0.5), legend.text = element_text(size = 6), legend.title = element_text(size = 6))
     
@@ -322,7 +322,10 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, fc_colors = 
     if(attr(x, "statistical_test") %in% c("gtest", "combined")){
       # assign black to anova flag values and filter down to G-test rows
       cols_gtest <- c("-2" = fc_colors[1], "-1" = fc_colors[2], "0" = fc_colors[2], "1" = fc_colors[2], "2" = fc_colors[3])
-      temp_data_gtest <- volcano %>% dplyr::filter(Type == "G-test")
+      temp_data_gtest <- volcano %>% 
+        dplyr::filter(Type == "G-test") %>% 
+        dplyr::mutate(Fold_change_flag = ifelse(Count_First_Group <= Count_Second_Group & P_value <= attr(x, "pval_thresh"), 2, 
+                                                ifelse(Count_First_Group > Count_Second_Group & P_value <= attr(x, "pval_thresh"), -2, Fold_change_flag)))
       
       if(interactive){
         p2 <- ggplot(temp_data_gtest, aes(Count_First_Group, Count_Second_Group, text = paste("ID:", !!sym(idcol), "<br>", "Pval:", round(P_value, 4))))

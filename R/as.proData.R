@@ -8,15 +8,16 @@
 #' @param edata_cname character string specifying the name of the column containing the protein identifiers in \code{e_data} and \code{e_meta} (if applicable).
 #' @param emeta_cname character string specifying the name of the column containing the gene identifiers (or other mapping variable) in \code{e_meta} (if applicable). Defaults to NULL. If \code{e_meta} is NULL, then either do not specify \code{emeta_cname} or specify it as NULL.
 #' @param fdata_cname character string specifying the name of the column containing the sample identifiers in \code{f_data}.
+#' @param techrep_cname character string specifying the name of the column in \code{f_data} containing the identifiers for the biological samples if the observations represent technical replicates.  This column is used to collapse the data when \code{combine_techreps} is called on this object.  Defaults to NULL (no technical replicates). 
 #' @param ... further arguments
 #'
 #' @details Objects of class 'proData' contain some attributes that are referenced by downstream functions. These attributes can be changed from their default value by manual specification. A list of these attributes as well as their default values are as follows:
 #' \tabular{ll}{
 #' data_scale \tab Scale of the data provided in \code{e_data}. Acceptable values are 'log2', 'log10', 'log', and 'abundance', which indicate data is log base 2, base 10, natural log transformed, and raw abundance, respectively. Default values is 'abundance'. \cr
 #' \tab \cr
-#' data_norm \tab A logical argument, specifying whether the data has been normalized or not. Default value is FALSE. \cr
+#' is_normalized \tab A logical argument, specifying whether the data has been normalized or not. Default value is FALSE. \cr
 #' \tab \cr
-#' norm_info \tab Default value is NULL. When a normalization is applied to the data, this becomes populated with a list containing the normalization function, normalization subset and subset parameters, the location and scale parameters used to normalize the data, and the location and scale parameters used to backtransform the data (if applicable). \cr
+#' norm_info \tab Default value is an empty list, which will be populated with a single named element \code{is_normalized = is_normalized}. When a normalization is applied to the data, this becomes populated with a list containing the normalization function, normalization subset and subset parameters, the location and scale parameters used to normalize the data, and the location and scale parameters used to backtransform the data (if applicable). \cr
 #' \tab \cr
 #' data_types \tab Character string describing the type of data (e.g.'Positive ion'). Default value is NULL. \cr
 #' \tab\cr
@@ -43,7 +44,7 @@
 #' library(pmartRdata)
 #' data("pro_edata")
 #' data("pro_fdata")
-#' myproData <- as.proData(e_data = pro_edata, f_data = pro_fdata, edata_cname = "Reference", fdata_cname = "SampleID", data_norm=TRUE)
+#' myproData <- as.proData(e_data = pro_edata, f_data = pro_fdata, edata_cname = "Reference", fdata_cname = "SampleID", is_normalized=TRUE)
 #'}
 #' @author Kelly Stratton, Lisa Bramer
 #' @seealso \code{\link{as.pepData}}
@@ -51,14 +52,14 @@
 #' @seealso \code{\link{as.metabData}}
 #'
 #' @export
-as.proData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname, emeta_cname = NULL, ...){
-  .as.proData(e_data, f_data, e_meta, edata_cname, fdata_cname, emeta_cname, ...)
+as.proData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname, emeta_cname = NULL, techrep_cname = NULL, ...){
+  .as.proData(e_data, f_data, e_meta, edata_cname, fdata_cname, emeta_cname, techrep_cname, ...)
 }
 
-## protein data ##
+## peptide data ##
 .as.proData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname,
-                        emeta_cname="NULL", data_scale = "abundance",
-                        data_norm = FALSE, norm_info=NULL,
+                        emeta_cname="NULL", techrep_cname = NULL, data_scale = "abundance",
+                        is_normalized = FALSE, norm_info=list(),
                         data_types=NULL, check.names = TRUE){
 
   # initial checks #
@@ -142,12 +143,19 @@ as.proData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname, 
       stop("The 'edata_cname' identifier is non-unique.")
     }
   }
+  
+  # check that technical replicate identifier column specifies at least one biological sample with 2 or more technical replicates.
+  if(!is.null(techrep_cname)){
+    if(!inherits(techrep_cname, "character") | length(techrep_cname) == 0) stop("techrep_cname must be a character string specifying a column in f_data")
+    if(!(techrep_cname %in% colnames(f_data[,-which(names(f_data) == fdata_cname)]))) stop("Specified technical replicate column was not found in f_data or was the same as fdata_cname")
+    if(length(unique(f_data[,techrep_cname])) == nrow(f_data)) stop("Specified technical replicate column had a unique value for each row.  Values should specify groups of technical replicates belonging to a biological sample")
+  }
 
   # store results #
   res = list(e_data = e_data, f_data = f_data, e_meta = e_meta)
 
   # set column name attributes #
-  attr(res, "cnames") = list(edata_cname = edata_cname, emeta_cname = emeta_cname, fdata_cname = fdata_cname)
+  attr(res, "cnames") = list(edata_cname = edata_cname, emeta_cname = emeta_cname, fdata_cname = fdata_cname, techrep_cname = techrep_cname)
 
   # count missing values in e_data #
   num_miss_obs = sum(is.na(e_data[,-which(names(e_data)==edata_cname)]))
@@ -169,7 +177,8 @@ as.proData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname, 
   }
 
   # set data information attributes #
-  attr(res, "data_info") = list(data_scale = data_scale, data_norm = data_norm, norm_info = norm_info, num_edata = num_edata, num_miss_obs = num_miss_obs,
+  norm_info$is_normalized = is_normalized
+  attr(res, "data_info") = list(data_scale = data_scale, norm_info = norm_info, num_edata = num_edata, num_miss_obs = num_miss_obs,
                                 num_emeta = num_emeta, prop_missing = prop_missing, num_samps = num_samps, data_types = data_types)
 
   #set check.names attribute #

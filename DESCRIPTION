@@ -21,6 +21,8 @@ Imports:
     ggplot2,
     e1071,
     foreach,
+    plotly,
+    rlang,
     rrcov,
     Rmisc,
     scales,

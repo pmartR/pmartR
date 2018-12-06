@@ -3,7 +3,7 @@
 #' This function applies the qrollup method to a pepData object for each unique protein and returns a proData object. 
 #' 
 #' @param pepData an omicsData object of class 'pepData'
-#' @param qrollup_thresh is a numeric value; is the peptide abundance cutoff value. 
+#' @param qrollup_thresh numeric value between 0 and 1 inclusive. Peptides above this threshold are used to roll up to the protein level 
 #' @param combine_fn logical indicating what combine_fn to use, defaults to median, other option is mean
 #' @param parallel logical indicating whether or not to use "doParallel" loop in applying qrollup function. Defaults to TRUE.
 #' 
@@ -109,7 +109,7 @@ qrollup<- function(pepData, qrollup_thresh, combine_fn = "median", parallel = TR
     
     samp_id = attr(pepData, "cnames")$fdata_cname
     data_scale = attr(pepData, "data_info")$data_scale
-    data_norm = attr(pepData, "data_info")$data_norm
+    is_normalized = attr(pepData, "data_info")$norm_info$is_normalized
     
     #subsetting pepData$e_meta by 'unique_proteins' 
     emeta_indices<- match(unique_proteins, pepData$e_meta[[pro_id]])
@@ -119,13 +119,13 @@ qrollup<- function(pepData, qrollup_thresh, combine_fn = "median", parallel = TR
       names(e_meta)<-pro_id
     }else {e_meta = pepData$e_meta[emeta_indices, -which(names(pepData$e_meta)==pep_id)]} 
     
-    prodata = as.proData(e_data = data.frame(final_result, check.names=check_names), f_data = pepData$f_data, e_meta = e_meta ,edata_cname = pro_id, fdata_cname = samp_id, emeta_cname = pro_id, data_scale = data_scale, data_norm = data_norm, check.names = check_names)
+    prodata = as.proData(e_data = data.frame(final_result, check.names=check_names), f_data = pepData$f_data, e_meta = e_meta ,edata_cname = pro_id, fdata_cname = samp_id, emeta_cname = pro_id, data_scale = data_scale, is_normalized = is_normalized, check.names = check_names)
     
     #check for isobaricpepData class
     if(inherits(pepData, "isobaricpepData")){
       #update attributes in prodata
       attr(prodata, "isobaric_info") = attr(pepData, "isobaric_info")
-      attr(prodata, "data_info")$isobaric_norm = attr(pepData, "data_info")$isobaric_norm
+      attr(prodata, "isobaric_info")$norm_info$is_normalized = attr(pepData, "isobaric_info")$norm_info$is_normalized
     }
     
     #updating prodata attributes
@@ -184,7 +184,7 @@ qrollup<- function(pepData, qrollup_thresh, combine_fn = "median", parallel = TR
     
     samp_id = attr(pepData, "cnames")$fdata_cname
     data_scale = attr(pepData, "data_info")$data_scale
-    data_norm = attr(pepData, "data_info")$data_norm
+    is_normalized = attr(pepData, "data_info")$norm_info$is_normalized
     
     #subsetting pepData$e_meta by 'unique_proteins' 
     emeta_indices<- match(unique_proteins, pepData$e_meta[[pro_id]])
@@ -194,13 +194,13 @@ qrollup<- function(pepData, qrollup_thresh, combine_fn = "median", parallel = TR
       names(e_meta)<-pro_id
     }else {e_meta = pepData$e_meta[emeta_indices, -which(names(pepData$e_meta)==pep_id)]} 
     
-    prodata = as.proData(e_data = data.frame(final_result, check.names=check_names), f_data = pepData$f_data, e_meta = e_meta ,edata_cname = pro_id, fdata_cname = samp_id, emeta_cname = pro_id, data_scale = data_scale, data_norm = data_norm, check.names = check_names)
+    prodata = as.proData(e_data = data.frame(final_result, check.names=check_names), f_data = pepData$f_data, e_meta = e_meta ,edata_cname = pro_id, fdata_cname = samp_id, emeta_cname = pro_id, data_scale = data_scale, is_normalized = is_normalized, check.names = check_names)
     
     #check for isobaricpepData class
     if(inherits(pepData, "isobaricpepData")){
       #update attributes in prodata
       attr(prodata, "isobaric_info") = attr(pepData, "isobaric_info")
-      attr(prodata, "data_info")$isobaric_norm = attr(pepData, "data_info")$isobaric_norm
+      attr(prodata, "isobaric_info")$norm_info$is_normalized = attr(pepData, "isobaric_info")$norm_info$is_normalized 
     }
     
     #updating prodata attributes

@@ -162,7 +162,7 @@ rmd_filter.pepData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewness
 
   class(output) <- c("rmdFilt", orig_class)
 
-  attr(output, "sample_names") <- names(omicsData$e_data)
+  attr(output, "sample_names") <- names(omicsData$e_data[,-which(names(omicsData$e_data) == edata_id)])
   attr(output, "group_DF") <- attr(omicsData, "group_DF")
   attr(output, "df") <- sum(!is.na(metrics_final))
   attr(output, "metrics") <- metrics_final_txt

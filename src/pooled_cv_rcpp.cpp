@@ -139,7 +139,7 @@ std::list<double> pooled_cv_rcpp(arma::mat mtr,std::vector<std::string> group)
     {
       for (unsigned int k = 0; k < gsize[j]; k++)
       {
-        if (R_IsNA(cpy[k]))
+        if (ISNAN(cpy[k]))
           continue;
         else 
         {

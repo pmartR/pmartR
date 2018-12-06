@@ -43,6 +43,7 @@
 #'
 
 missingval_scatterplot <- function(omicsData, x_lab = NULL, y_lab = NULL, ...) {
+  require(ggplot2)
   .missingval_scatterplot(omicsData, x_lab, y_lab, ...)
 }
 
@@ -95,29 +96,29 @@ missingval_scatterplot <- function(omicsData, x_lab = NULL, y_lab = NULL, ...) {
     plot_data<- as.data.frame(cbind(mean_intensity, num_missing_vals))
     
     if(bw_theme == FALSE){
-    p<-ggplot2::ggplot(plot_data, aes(mean_intensity, num_missing_vals)) + geom_point(aes(color = num_missing_vals), size = point_size) + 
-      ggplot2::xlab(xlabel) +
-      ggplot2::ylab(ylabel) +
-      ggplot2::ggtitle(plot_title) +
-      ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size), axis.text.x = element_text(angle = x_lab_angle, hjust = 1)) + 
+    p<-ggplot(plot_data, aes(mean_intensity, num_missing_vals)) + geom_point(aes(color = num_missing_vals), size = point_size) + 
+      xlab(xlabel) +
+      ylab(ylabel) +
+      ggtitle(plot_title) +
+      theme(plot.title = element_text(size = title_size), axis.title.x = element_text(size = x_lab_size), axis.title.y = element_text(size = y_lab_size), axis.text.x = element_text(angle = x_lab_angle, hjust = 1)) + 
       scale_color_distiller(palette = palette, name = legendtitle)
     
         if(coordinate_flip == TRUE){
-          p = p + ggplot2::coord_flip()
+          p = p + coord_flip()
         }
     
     }
     else{
-      p<-ggplot2::ggplot(plot_data, aes(mean_intensity, num_missing_vals)) + geom_point(aes(color = num_missing_vals), size = point_size) + 
-        ggplot2::theme_bw() +
-        ggplot2::xlab(xlabel) +
-        ggplot2::ylab(ylabel) +
-        ggplot2::ggtitle(plot_title) +
-        ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size), axis.text.x = element_text(angle = x_lab_angle, hjust = 1)) +
+      p<-ggplot(plot_data, aes(mean_intensity, num_missing_vals)) + geom_point(aes(color = num_missing_vals), size = point_size) + 
+        theme_bw() +
+        xlab(xlabel) +
+        ylab(ylabel) +
+        ggtitle(plot_title) +
+        theme(plot.title = element_text(size = title_size), axis.title.x = element_text(size = x_lab_size), axis.title.y = element_text(size = y_lab_size), axis.text.x = element_text(angle = x_lab_angle, hjust = 1)) +
         scale_color_distiller(palette = palette, name = legendtitle)
       
         if(coordinate_flip == TRUE){
-          p = p + ggplot2::coord_flip()
+          p = p + coord_flip()
         }
       
     }
@@ -126,7 +127,7 @@ missingval_scatterplot <- function(omicsData, x_lab = NULL, y_lab = NULL, ...) {
   if(!is.null(attr(omicsData, "group_DF"))){
     
     group_df<-attr(omicsData, "group_DF")
-    levels<- levels(group_df$Group)
+    levels<- unique(group_df$Group)
     indices_list<- list()
     
     for(i in 1:length(levels)){
@@ -148,31 +149,31 @@ missingval_scatterplot <- function(omicsData, x_lab = NULL, y_lab = NULL, ...) {
     legendtitle <- ifelse(is.null(legend_title), "group", legend_title)
     
     if(bw_theme == FALSE){
-      p<-ggplot2::ggplot(plot_data, aes(value, num_missing_vals)) + geom_point(aes(colour = variable), size = point_size) +
-        ggplot2::xlab(xlabel) +
-        ggplot2::ylab(ylabel) +
-        ggplot2::ggtitle(plot_title) +
-        ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size), axis.text.x = element_text(angle = x_lab_angle, hjust = 1)) +
+      p<-ggplot(plot_data, aes(value, num_missing_vals)) + geom_point(aes(colour = variable), size = point_size) +
+        xlab(xlabel) +
+        ylab(ylabel) +
+        ggtitle(plot_title) +
+        theme(plot.title = element_text(size = title_size), axis.title.x = element_text(size = x_lab_size), axis.title.y = element_text(size = y_lab_size), axis.text.x = element_text(angle = x_lab_angle, hjust = 1)) +
         scale_color_brewer(palette = palette, name = legendtitle)
       
       if(coordinate_flip == TRUE){
-        p = p + ggplot2::coord_flip()
+        p = p + coord_flip()
       }
         
       
     }
     else{
-      p<-ggplot2::ggplot(plot_data, aes(value, num_missing_vals)) + geom_point(aes(colour = variable), size = point_size) +
-        ggplot2::theme_bw() +
-        ggplot2::xlab(xlabel) +
-        ggplot2::ylab(ylabel) +
-        ggplot2::ggtitle(plot_title) +
-        ggplot2::theme(plot.title = ggplot2::element_text(size = title_size), axis.title.x = ggplot2::element_text(size = x_lab_size), axis.title.y = ggplot2::element_text(size = y_lab_size), axis.text.x = element_text(angle = x_lab_angle, hjust = 1)) +
+      p<-ggplot(plot_data, aes(value, num_missing_vals)) + geom_point(aes(colour = variable), size = point_size) +
+        theme_bw() +
+        xlab(xlabel) +
+        ylab(ylabel) +
+        ggtitle(plot_title) +
+        theme(plot.title = element_text(size = title_size), axis.title.x = element_text(size = x_lab_size), axis.title.y = element_text(size = y_lab_size), axis.text.x = element_text(angle = x_lab_angle, hjust = 1)) +
         
         scale_color_brewer(palette = palette, name = legend_title)
       
         if(coordinate_flip == TRUE){
-          p = p + ggplot2::coord_flip()
+          p = p + coord_flip()
         }
     }
         

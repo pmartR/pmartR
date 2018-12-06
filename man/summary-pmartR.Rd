@@ -27,6 +27,7 @@
 \alias{summary.customFilt}
 \alias{summary-pmartR}
 \alias{summary.normRes}
+\alias{summary.SPANSRes}
 \title{Produce a basic summary of an pmartR S3 Object}
 \usage{
 \method{summary}{pepData}(omicsData)
@@ -56,6 +57,8 @@
 \method{summary}{customFilt}(filter_object)
 
 \method{summary}{normRes}(omicsNorm)
+
+\method{summary}{SPANSRes}(SPANSRes_obj)
 }
 \arguments{
 \item{omicsData}{an object of the class 'lipidData', 'metabData', 'pepData', or 'proData' usually created by \code{\link{as.lipidData}}, \code{\link{as.metabData}}, \code{\link{as.pepData}}, or \code{\link{as.proData}}, respectively.}
@@ -79,6 +82,8 @@
 \item{pvalue_threshold}{A threshold for the Robust Mahalanobis Distance (RMD) p-value. All samples below the threshold will be filtered out. Default value is NULL.}
 
 \item{cv_threshold}{CV values above cv_threshold are filtered out. Default value is NULL.}
+
+\item{SPANSres_obj}{an object of class SPANSRes created by calling spans_procedure() on a grouped pepData or proData object.}
 }
 \value{
 a summary table for the MSomicsR object. If assigned to a variable, the elements of the summary table are saved in a list format.
