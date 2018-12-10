@@ -5,7 +5,6 @@ library(testthat)
 library(pmartR)
 library(pmartRdata)
 
-data("pep_object")
 pep_object$f_data$fakegroup1 <- 1:12
 pep_object$f_data$fakegroup2 <- c(1:9, 1:3)
 pep_object$f_data$fakegroup3 <- c(1:8, 1, 9:11)

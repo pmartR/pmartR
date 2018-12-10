@@ -6,8 +6,6 @@ library(pmartR)
 library(pmartRdata)
 library(dplyr)
 
-data("pro_object")
-
 #regular and group object to test with
 omicsData <- pro_object
 omicsData_grouped <- group_designation(omicsData, main_effects = "Condition")

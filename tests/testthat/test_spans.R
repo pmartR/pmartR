@@ -3,8 +3,6 @@ library(testthat)
 library(pmartRdata)
 library(pmartR)
 
-data(pep_object)
-
 valid_norm_fn <- c("median", "mean", "zscore", "mad")
 valid_subset_fn = c("all", "los", "ppp", "rip", "ppp_rip")
 
@@ -37,15 +35,17 @@ subset_fn <- spans_params[[i]]$subset_fn
 params <- spans_params[[i]]$params
 norm_object <- normalize_global(myobject, norm_fn = norm_fn, subset_fn = subset_fn, params = params)
 
-
+# get matrix values and group vector to pass to kw_rcpp
 norm_params <- norm_object$parameters[[1]]
 groupvec = as.character(attr(spansres_obj, "group"))
 
+# output from kw_rcpp
 p_location <- kw_rcpp(matrix(norm_params$location, nrow = 1), groupvec)
 if(!is.null(norm_params$scale)){
   p_scale <- kw_rcpp(matrix(norm_params$scale, nrow = 1), groupvec)
 }
 
+# location and scale p-values from spansres object
 ploc_comp <- attr(spansres_obj, "method_selection_pvals")[i, "location_p_value"]
 pscale_comp <- attr(spansres_obj, "method_selection_pvals")[i, "scale_p_value"]
 

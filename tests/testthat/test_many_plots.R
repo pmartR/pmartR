@@ -57,9 +57,9 @@ lapply(1:4, function(i){
 test_that("filter plot errors", {
 
   # only test pep_object
-  obj <- obj_list[[1]] %>%
-    edata_transform(data_scale = "log2") %>%
-    group_designation(main_effects = "testgroup")
+  obj <- obj_list[[1]]  %>%
+    group_designation(main_effects = "testgroup") %>%
+    edata_transform(data_scale = "log2")
 
 # run tests for all filters in a loop
 for(i in 1:length(filter_list)){
@@ -306,7 +306,6 @@ missingvalres <- lapply(obj_list, function(obj){
 
 # plot test loop for misc objects
 
-pdf(file = NULL)
 test_that("data integrity for misc plots", {
   for(i in 1:length(obj_list)){
   
