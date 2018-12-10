@@ -3,7 +3,6 @@ context("output tests for cv_filter()")
 library(pmartR)
 library(testthat)
 library(pmartRdata)
-data("pep_object")
 
 omicsData <- group_designation(omicsData = pep_object, main_effects = "Condition")
 result <- pmartR::cv_filter(omicsData)

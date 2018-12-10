@@ -7,7 +7,6 @@ library(dplyr)
 
 sink(file = "logs_test_filter_attrs")
 
-data("pep_object")
 myfilt <- proteomics_filter(pep_object)
 prefilt_n_edata <- attributes(pep_object)$data_info$num_edata
 prefilt_n_emeta <- attributes(pep_object)$data_info$num_emeta
