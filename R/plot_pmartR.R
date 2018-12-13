@@ -1056,6 +1056,9 @@ plot.customFilt <- function(filter_object, ...) {
 #' }
 plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by = NULL, facet_cols = NULL, ...) {
   require(ggplot2)
+  
+  verify_data_info(omicsData)
+  
   .plot.pepData(omicsData, order_by, color_by, facet_by, facet_cols, ...)
 }
 
@@ -1327,6 +1330,9 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
 #'@rdname plot-pmartR-proData
 plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by = NULL, facet_cols = NULL, ...) {
   require(ggplot2)
+  
+  verify_data_info(omicsData)
+  
   .plot.proData(omicsData, order_by, color_by, facet_by, facet_cols, ...)
 }
 
@@ -1584,6 +1590,9 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
 #'@rdname plot-pmartR-lipidData
 plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by = NULL, facet_cols = NULL, ...) {
   require(ggplot2)
+  
+  verify_data_info(omicsData)
+  
   .plot.lipidData(omicsData, order_by, color_by, facet_by, facet_cols, ...)
 }
 
@@ -1842,6 +1851,9 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
 #'@rdname plot-pmartR-metabData
 plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by = NULL, facet_cols = NULL, ...) {
   require(ggplot2)
+  
+  verify_data_info(omicsData)
+  
   .plot.metabData(omicsData, order_by, color_by, facet_by, facet_cols, ...)
 }
 
