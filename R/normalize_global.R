@@ -13,7 +13,7 @@
 #'
 #'@details Below are details for specifying function and parameter options.
 #'@section Subset Functions:
-#' Specifying a subset function indicates the subset of features (rows of \code{e_data}) that should be used for computing normalization factors. The following are valid options: "all", "los", "ppp", "rip", and "ppp_rip". The option "all" is the subset that includes all features (i.e. no subsetting is done). The option "los" identifies the subset of the features associated with the top \code{L}, where \code{L} is a proportion between 0 and 1, order statistics. Specifically, the features with the top \code{L} proportion of highest absolute abundance are retained for each sample, and the union of these features is taken as the subset identified (Wang et al., 2006). The option "ppp" (orignally stands for percentage of peptides present) identifies the subset of features that are present/non-missing for a minimum \code{proportion} of samples (Karpievitch et al., 2009; Kultima et al., 2009). The option "rip" identifies features with complete data that have a p-value greater than a defined threshold \code{alpha} (common values include 0.1 or 0.25) when subjected to a Kruskal-Wallis test based (non-parametric one-way ANOVA) on group membership (Webb-Robertson et al., 2011). The option "ppp_rip" is equivalent to "rip" however rather than requiring features with complete data, features with at least a \code{proportion} of non-missing values are subject to the Kruskal-Wallis test.
+#' Specifying a subset function indicates the subset of features (rows of \code{e_data}) that should be used for computing normalization factors. The following are valid options: "all", "los", "ppp", "complete", "rip", and "ppp_rip". The option "all" is the subset that includes all features (i.e. no subsetting is done). The option "los" identifies the subset of the features associated with the top \code{L}, where \code{L} is a proportion between 0 and 1, order statistics. Specifically, the features with the top \code{L} proportion of highest absolute abundance are retained for each sample, and the union of these features is taken as the subset identified (Wang et al., 2006). The option "ppp" (orignally stands for percentage of peptides present) identifies the subset of features that are present/non-missing for a minimum \code{proportion} of samples (Karpievitch et al., 2009; Kultima et al., 2009). The option "complete" retains molecules with no missing data across all samples, equivalent to "ppp" with proportion = 1.  The option "rip" identifies features with complete data that have a p-value greater than a defined threshold \code{alpha} (common values include 0.1 or 0.25) when subjected to a Kruskal-Wallis test based (non-parametric one-way ANOVA) on group membership (Webb-Robertson et al., 2011). The option "ppp_rip" is equivalent to "rip" however rather than requiring features with complete data, features with at least a \code{proportion} of non-missing values are subject to the Kruskal-Wallis test.
 #'
 #' @section Normalization Functions:
 #' Specifying a normalization function indicates how normalization scale and location parameters should be calculated. The following are valid options: "median", "mean", "zscore", and "mad". Parameters for median centering are calculated if "median" is specified. The location estimates are the sample-wise medians of the subset data. There are no scale estimates for median centering. Parameters for mean centering are calculated if "mean" is specified. The location estimates are the sample-wise means of the subset data. There are no scale estimates for median centering. Parameters for z-score transformation are calculated if "zscore" is specified. The location estimates are the subset means for each sample. The scale estimates are the subset standard deviations for each sample. Parameters for median absolute deviation (MAD) transformation are calculated if "mad" is specified.
@@ -98,10 +98,10 @@ normalize_global <- function(omicsData, subset_fn, norm_fn, params = NULL, apply
   if(missing(norm_fn)) stop("norm_fn wasn't specified")
   
   # check for valid subset function choice #
-  if(!(subset_fn %in% c("all", "los", "ppp", "rip", "ppp_rip")))stop(paste(subset_fn, " is not a valid subset option", sep = ""))
+  if(!(subset_fn %in% c("all", "los", "ppp", "rip", "ppp_rip", "complete")))stop(paste(subset_fn, " is not a valid subset option", sep = ""))
   
   # check for valid normalization function choice #
-  if(!(norm_fn %in% c("mean", "median", "zscore", "mad")))stop(paste(norm_fn, " is not a valid subset option", sep = ""))
+  if(!(norm_fn %in% c("mean", "median", "zscore", "mad")))stop(paste(norm_fn, " is not a valid normalization option", sep = ""))
   
   # check that group designation was run if "rip" is involved
   if(subset_fn %in% c("rip", "ppp_rip") & grp_pres == 0)stop("group_designation() must be run on the data if subset_fn is 'rip' or 'ppp_rip'")
@@ -188,6 +188,9 @@ normalize_global <- function(omicsData, subset_fn, norm_fn, params = NULL, apply
     }else{
       peps = rip(omicsData$e_data, edata_id, samp_id, group_df)
     }
+  }
+  if(subset_fn == "complete"){
+    peps = complete_mols(omicsData$e_data, edata_id)
   }
   if(subset_fn == "ppp"){
     if(!is.null(param_val)){
