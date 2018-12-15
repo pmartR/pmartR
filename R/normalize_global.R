@@ -209,7 +209,8 @@ normalize_global <- function(omicsData, subset_fn, norm_fn, params = NULL, apply
   norm_results <- fn_to_use(e_data = omicsData$e_data, edata_id=edata_id, feature_subset = peps, backtransform = backtransform, apply_norm = apply_norm, check.names=check_names)
   
   if(apply_norm == FALSE){
-    res = list(subset_fn = subset_fn, norm_fn = norm_fn, parameters = list(normalization = norm_results$norm_params, backtransform = norm_results$backtransform_params), n_features_calc = length(peps), prop_features_calc = length(peps)/nrow(omicsData$e_data))
+    res = list(subset_fn = subset_fn, norm_fn = norm_fn, parameters = list(normalization = norm_results$norm_params, backtransform = norm_results$backtransform_params), 
+               n_features_calc = length(peps), feature_subset = peps, prop_features_calc = length(peps)/nrow(omicsData$e_data))
     
     class(res) = "normRes"
     attributes(res)$omicsData = omicsData
