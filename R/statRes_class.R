@@ -278,6 +278,8 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, fc_colors = 
       for(comp in as.character(unique(volcano$Comparison))){
         #create a vector of the two group names being compared
         groups = strsplit(comp, " vs ")[[1]]
+        gsize_1 = nrow(attr(x, "group_DF") %>% dplyr::filter(Group == groups[1]))
+        gsize_2 = nrow(attr(x, "group_DF") %>% dplyr::filter(Group == groups[2]))
         
         # will contain ID column and count column corresponding to the two groups
         temp_df <- counts[c(1,which(colnames(counts) == groups[1]), which(colnames(counts) == groups[2]))]
@@ -285,6 +287,10 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, fc_colors = 
         
         # rename the columns to something static so they can be rbind-ed
         colnames(temp_df)[which(colnames(temp_df)%in% groups)] <- c("Count_First_Group", "Count_Second_Group") 
+        
+        # store proportion of nonmissing to color g-test values in volcano plot
+        temp_df$Prop_First_Group <- temp_df$Count_First_Group/gsize_1
+        temp_df$Prop_Second_Group <- temp_df$Count_Second_Group/gsize_2
         
         counts_df <- rbind(counts_df, temp_df)
       }
@@ -331,8 +337,8 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, fc_colors = 
       cols_gtest <- c("-2" = fc_colors[1], "-1" = fc_colors[2], "0" = fc_colors[2], "1" = fc_colors[2], "2" = fc_colors[3])
       temp_data_gtest <- volcano %>% 
         dplyr::filter(Type == "G-test") %>% 
-        dplyr::mutate(Fold_change_flag = ifelse(Count_First_Group > Count_Second_Group & P_value <= attr(x, "pval_thresh"), 2, 
-                                                ifelse(Count_First_Group <= Count_Second_Group & P_value <= attr(x, "pval_thresh"), -2, Fold_change_flag)))
+        dplyr::mutate(Fold_change_flag = ifelse(Prop_First_Group > Prop_Second_Group & P_value <= attr(x, "pval_thresh"), 2, 
+                                                ifelse(Prop_First_Group < Prop_Second_Group & P_value <= attr(x, "pval_thresh"), -2, Fold_change_flag)))
       
       if(interactive){
         p2 <- ggplot(temp_data_gtest, aes(Count_Second_Group, Count_First_Group, text = paste("ID:", !!rlang::sym(idcol), "<br>", "Pval:", round(P_value, 4))))
