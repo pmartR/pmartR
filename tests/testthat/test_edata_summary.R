@@ -1,13 +1,14 @@
 context("test edata_summary")
 
-
 library(testthat)
 library(pmartR)
 library(pmartRdata)
 
-pep_object$f_data$fakegroup1 <- 1:12
-pep_object$f_data$fakegroup2 <- c(1:9, 1:3)
-pep_object$f_data$fakegroup3 <- c(1:8, 1, 9:11)
+mypepData <- pmartRdata::pep_object
+
+mypepData$f_data$fakegroup1 <- 1:12
+mypepData$f_data$fakegroup2 <- c(1:9, 1:3)
+mypepData$f_data$fakegroup3 <- c(1:8, 1, 9:11)
 
 bad_columns = list(
   bad_col = c("___COLNAME___"),
@@ -17,28 +18,28 @@ bad_columns = list(
 )
 
 test_that("by sample throws errors", {
-  expect_error(edata_summary(pep_object, by = "sample", groupvar = "Condition"))
+  expect_error(edata_summary(mypepData, by = "sample", groupvar = "Condition"))
   lapply(bad_columns, function(col){
-    expect_error(edata_summary(pep_object, by = "sample", groupvar = col))
+    expect_error(edata_summary(mypepData, by = "sample", groupvar = col))
   })
 })
 
 test_that("by molecule throws errors", {
-  expect_error(edata_summary(pep_object, by = "molecule", groupvar = "fakegroup1"))
-  expect_error(edata_summary(pep_object, by = "molecule", groupvar = c("Condition", "fakegroup2")))
+  expect_error(edata_summary(mypepData, by = "molecule", groupvar = "fakegroup1"))
+  expect_error(edata_summary(mypepData, by = "molecule", groupvar = c("Condition", "fakegroup2")))
   
   lapply(bad_columns, function(col){
-    expect_error(edata_summary(pep_object, by = "molecule", groupvar = col))
+    expect_error(edata_summary(mypepData, by = "molecule", groupvar = col))
   })
   
 })
 
 test_that("test correctness of some output", {
   suppressWarnings({
-    summary1 <- edata_summary(pep_object, by = "molecule", groupvar = "fakegroup3")
-    summary2 <- edata_summary(pep_object, by = "molecule", groupvar = "fakegroup2")
-    summary3 <- edata_summary(pep_object, by = "molecule", groupvar = c("Condition", "fakegroup3"))
-    summary4 <- edata_summary(pep_object, by = "sample")
+    summary1 <- edata_summary(mypepData, by = "molecule", groupvar = "fakegroup3")
+    summary2 <- edata_summary(mypepData, by = "molecule", groupvar = "fakegroup2")
+    summary3 <- edata_summary(mypepData, by = "molecule", groupvar = c("Condition", "fakegroup3"))
+    summary4 <- edata_summary(mypepData, by = "sample")
   })
   
   expect_true(nrow(summary1$n_per_grp) == 1)

@@ -6,7 +6,7 @@ library(gridExtra)
 
 # sink(file = "logs_test_plotting")
 # List of testing objects.  Each has a fake group and custom sample names
-obj_list <- lapply(list(pep_object, pro_object, metab_object, lipid_object), function(x){
+obj_list <- lapply(list(pmartRdata::pep_object, pmartRdata::pro_object, pmartRdata::metab_object, pmartRdata::lipid_object), function(x){
   x$f_data["testgroup"] <- c(rep(1, floor(nrow(x$f_data)/2)), rep(2, ceiling(nrow(x$f_data)/2)))
   x = custom_sampnames(x, from = 2, to = 14)
 })
@@ -347,4 +347,3 @@ test_that("data integrity for misc plots", {
   }
 })
 
-dev.off()

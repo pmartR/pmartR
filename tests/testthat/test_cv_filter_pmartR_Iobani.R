@@ -4,7 +4,7 @@ library(pmartR)
 library(testthat)
 library(pmartRdata)
 
-omicsData <- group_designation(omicsData = pep_object, main_effects = "Condition")
+omicsData <- group_designation(omicsData = pmartRdata::pep_object, main_effects = "Condition")
 result <- pmartR::cv_filter(omicsData)
 
 samp_id <- attr(omicsData, "cnames")$fdata_cname

@@ -4,7 +4,7 @@ library(pmartRdata)
 library(testthat)
 #Trasnform the data
 attr(pep_object,"cnames")$fdata_cname <- "SampleID"
-mypepData <- edata_transform(omicsData = pep_object, data_scale = "log2")
+mypepData <- edata_transform(omicsData = pmartRdata::pep_object, data_scale = "log2")
 
 #Group the data by condition
 mypepData <- group_designation(omicsData = mypepData, main_effects = c("Condition"))

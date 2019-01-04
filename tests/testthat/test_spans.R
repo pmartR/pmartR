@@ -10,9 +10,9 @@ rand_norm_fn <- c("zscore", "mean")
 rand_subset_fn <- c("ppp_rip", "all")
 
 # object must be log2 transformed and grouped
-expect_error(spans_procedure(pep_object))
+expect_error(spans_procedure(pmartRdata::pep_object))
 
-myobject <- edata_transform(pep_object, data_scale = "log2")
+myobject <- edata_transform(pmartRdata::pep_object, data_scale = "log2")
 expect_error(spans_procedure(myobject))
 
 myobject <- group_designation(myobject, main_effects = "Condition")
