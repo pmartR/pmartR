@@ -91,7 +91,7 @@ bpquant_loop<- function(statRes, pepData, pi_not = .9, max_proteoforms = 5){
     
     row_ind<- which(protein_sig_data[, emeta_cname] == unique_proteins[i])
     cur_protein<- protein_sig_data[row_ind, ]
-    cur_protein_sigs = as.data.frame(cur_protein[, which(names(cur_protein) %in% "flags")])
+    cur_protein_sigs = cur_protein[which(names(cur_protein) %in% colnames(signatures[-which(colnames(signatures) == edata_cname)]))]
     colnames(cur_protein_sigs) = paste(rep("flags", ncol(cur_protein_sigs)), 1:ncol(cur_protein_sigs), sep = "")
        
     result<- pmartR::bpquant_mod(protein_sig = cur_protein_sigs, pi_not = pi_not, max_proteoforms = max_proteoforms)
