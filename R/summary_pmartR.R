@@ -26,7 +26,9 @@
 #'@rdname summary-pmartR
 #'@name summary-pmartR
 summary.pepData <- function(omicsData) {
-
+  
+  verify_data_info(omicsData)
+  
   # get values #
   res <- list(class = class(omicsData), num_samps = attr(omicsData, "data_info")$num_samps,
               num_edata = attr(omicsData, "data_info")$num_edata,
@@ -82,6 +84,8 @@ summary.pepData <- function(omicsData) {
 #'@name summary-pmartR
 summary.proData <- function(omicsData) {
 
+  verify_data_info(omicsData)
+  
   # get values #
   res <- list(class = class(omicsData), num_samps = attr(omicsData, "data_info")$num_samps,
               num_edata = attr(omicsData, "data_info")$num_edata,
@@ -136,7 +140,9 @@ summary.proData <- function(omicsData) {
 #'@rdname summary-pmartR
 #'@name summary-pmartR
 summary.lipidData <- function(omicsData) {
-
+  
+  verify_data_info(omicsData)
+  
   # get values #
   res <- list(class = class(omicsData), num_samps = attr(omicsData, "data_info")$num_samps,
               num_edata = attr(omicsData, "data_info")$num_edata,
@@ -190,7 +196,9 @@ summary.lipidData <- function(omicsData) {
 #'@rdname summary-pmartR
 #'@name summary-pmartR
 summary.metabData <- function(omicsData) {
-
+  
+  verify_data_info(omicsData)
+  
   # get values #
   res <- list(class = class(omicsData), num_samps = attr(omicsData, "data_info")$num_samps,
               num_edata = attr(omicsData, "data_info")$num_edata,

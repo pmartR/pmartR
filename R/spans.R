@@ -26,7 +26,8 @@
 #' \tab "all" is the subset that includes all features (i.e. no subsetting is done). \cr
 #' \tab "los" identifies the subset of the features associated with the top \code{L}, where \code{L} is a proportion between 0 and 1, order statistics. Specifically, the features with the top \code{L} proportion of highest absolute abundance are retained for each sample, and the union of these features is taken as the subset identified (Wang et al., 2006). \cr
 #' \tab "ppp" (orignally stands for percentage of peptides present) identifies the subset of features that are present/non-missing for a minimum \code{proportion} of samples (Karpievitch et al., 2009; Kultima et al., 2009). \cr
-#' \tab"rip" identifies features with complete data that have a p-value greater than a defined threshold \code{alpha} (common values include 0.1 or 0.25) when subjected to a Kruskal-Wallis test based (non-parametric one-way ANOVA) on group membership (Webb-Robertson et al., 2011). \cr
+#' \tab "complete" subset of features that have no missing data across all samples.  Equivalent to "ppp" with proportion = 1. \cr
+#' \tab "rip" identifies features with complete data that have a p-value greater than a defined threshold \code{alpha} (common values include 0.1 or 0.25) when subjected to a Kruskal-Wallis test based (non-parametric one-way ANOVA) on group membership (Webb-Robertson et al., 2011). \cr
 #' \tab "ppp_rip" is equivalent to "rip" however rather than requiring features with complete data, features with at least a \code{proportion} of non-missing values are subject to the Kruskal-Wallis test.\cr
 #'}
 #' @section Normalization Functions:
@@ -152,7 +153,7 @@ spans_procedure <- function(omicsData, norm_fn = c("median", "mean", "zscore", "
     if(any(c(sig_thresh, nonsig_thresh) > 1) | any(c(sig_thresh, nonsig_thresh) < 0)) stop("sig_thresh and nonsig_thresh must be numeric values between 0 and 1")
     if(isTRUE(attributes(omicsData)$data_info$norm_info$norm_type == "global")) stop("a global normalization scheme has already been applied to this data, SPANS should be run on an unnormalized log-transformed pepData or proData object.")
     if(!isTRUE(grepl("log", attr(omicsData, "data_info")$data_scale))) stop("omicsData object must have been transformed to the log scale.  Either specify the attribute attr(omicsData, 'data_info')$data_scale or call edata_transform() on the omicsData object.")
-    if(!all(subset_fn %in% c("all", "los", "ppp", "rip", "ppp_rip"))) stop("subset_fn must be a character vector containing more than one of the elements 'all', 'los', 'ppp', 'rip', 'ppp_rip'")
+    if(!all(subset_fn %in% c("all", "los", "ppp", "complete", "rip", "ppp_rip"))) stop("subset_fn must be a character vector containing more than one of the elements 'all', 'los', 'ppp', 'complete', 'rip', 'ppp_rip'")
     if(!all(norm_fn %in% c("median", "mean", "zscore", "mad"))) stop("norm_fn must be a character vector containing more than one of the elements 'median', 'mean', 'zscore', 'mad'")
     if(is.null(attr(omicsData, "group_DF"))) stop("omicsData object must have a grouping structure set by calling group_designation()")
     

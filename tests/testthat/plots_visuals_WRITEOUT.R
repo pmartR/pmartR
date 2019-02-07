@@ -5,7 +5,6 @@ library(testthat)
 library(htmlwidgets)
 library(gridExtra)
 
-data("pep_object")
 sink(file = "logs_test_plotting")
 # List of testing objects.  Each has a fake group and custom sample names
 obj_list <- lapply(list(pep_object, pro_object, metab_object, lipid_object), function(x){

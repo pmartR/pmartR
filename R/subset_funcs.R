@@ -306,3 +306,36 @@ rip <- function(e_data, edata_id, fdata_id, groupDF, alpha=.2){
 
   return(RIPeps)
 }
+
+#' Identify biomolecules with no missing values across samples
+#'
+#' Selects biomolecules that have complete rows in e_data, equivalent to 'ppp' with proportion = 1.
+#'
+#' @param e_data a \eqn{p \times n + 1} data.frame, where \eqn{p} is the number of peptides, proteins, lipids, or metabolites and \eqn{n} is the number of samples. Each row corresponds to data for a peptide, protein, lipid, or metabolite, with a column giving the identifer name.
+#' @param edata_id character string indicating the name of the peptide, protein, lipid, or metabolite identifier. Usually obtained by calling \code{attr(omicsData, "cnames")$edata_cname}.
+#'
+#' @return Character vector containing the features with no missing values across all samples.
+#'
+#' @examples
+#' \dontrun{
+#' library(pmartRdata)
+#' data(pep_pepData)
+#' complete_peps <- complete_mols(e_data = pep_pepData$e_data, edata_id = attr(pep_pepData, "cnames")$edata_cname)
+#'
+#'}
+#'
+complete_mols <- function(e_data, edata_id){
+  
+  # pull off the column for edata_id
+  edata_id_ind <- which(colnames(e_data)==edata_id)
+  
+  # rows with no missing values
+  complete_inds <- which(rowSums(is.na(e_data[-edata_id_ind])) == 0)
+  
+  # retain only character peptide names for complete rows
+  peps <- as.character(e_data[complete_inds, edata_id_ind])
+  
+  if(length(peps)<2) stop("There are <2 biomolecules in the subset; cannot proceed.")
+  
+  return(peps)
+}

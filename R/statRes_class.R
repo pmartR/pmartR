@@ -123,7 +123,7 @@ print.statRes <- function(x,...){
 #' @param fc_colors vector of length three with character color values interpretable by ggplot. i.e. c("orange", "black", "blue") with the values being used to color negative, non-significant, and positive fold changes respectively
 #' @param stacked TRUE/FALSE for whether to stack positive and negative fold change sections in the barplot, defaults to FALSE
 #' @param interactive TRUE/FALSE for whether to create an interactive plot using plotly
-#' @param theme_bw TRUE/FALSE for whether to apply a black-white background theme
+#' @param bw_theme TRUE/FALSE for whether to apply a black-white background theme
 #' 
 #' @export
 #' @method plot statRes
@@ -150,13 +150,19 @@ print.statRes <- function(x,...){
 #' plot(imd_res, plot_type = "volcano")
 #' 
 #' imd_anova_res <- imd_anova(omicsData = myproData, test_method = 'comb', pval_adjust='bon')
-#' plot(imd_anova_res, theme_bw = TRUE)
-#' plot(imd_anova_res, plot_type = "volcano", theme_bw = TRUE)
+#' plot(imd_anova_res, bw_theme = TRUE)
+#' plot(imd_anova_res, plot_type = "volcano", bw_theme = TRUE)
 #' 
 #' }
 #' 
-plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, fc_colors = c("red", "black", "green"), stacked = FALSE, interactive = FALSE, theme_bw = FALSE, ...){
-  
+plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, fc_colors = c("red", "black", "green"), stacked = FALSE, interactive = FALSE, bw_theme = FALSE, ...){
+ .plot.statRes(x = x, plot_type = plot_type, fc_threshold = fc_threshold, fc_colors = fc_colors, stacked = stacked, interactive = interactive, bw_theme = bw_theme, ...) 
+}
+
+.plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, fc_colors = c("red", "black", "green"), stacked = FALSE, interactive = FALSE, bw_theme = FALSE, 
+                          title_theme = element_text(size = 14), axis_text_theme = element_text(size = 12), axis_title_theme = element_text(size = 14),
+                          legend_title_theme = element_text(size = 10), legend_text_theme = element_text(size = 8), strip_text_theme  = element_text(size = 12),
+                          custom_theme = NULL){
   #For now require ggplot2, consider adding base graphics option too
   if(!require(ggplot2)){
     stop("ggplot2 is required, base graphics aren't available yet")
@@ -179,6 +185,14 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, fc_colors = 
   if("heatmap"%in%plot_type & nrow(comp_df)==1){
     stop("Heatmaps not supported when only one comparison is being made.")
   }
+  
+  # specified theme parameters
+  if(!is.null(custom_theme)){
+    if(!bw_theme) warning("bw_theme set to TRUE overrides provided custom theme")
+    if(!inherits(custom_theme, c("theme", "gg"))) stop("custom_theme must be a valid 'theme' object as used in ggplot")
+    mytheme = custom_theme
+  }
+  else mytheme = theme(plot.title = title_theme, axis.title = axis_title_theme, axis.text = axis_text_theme, legend.title = legend_title_theme, legend.text = legend_text_theme, strip.text = strip_text_theme)
   
   #Bar plot
   if("bar"%in%plot_type){
@@ -208,14 +222,13 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, fc_colors = 
             geom_bar(aes(x = whichtest, fill = posneg, group = whichtest),stat='identity') + 
             geom_text(aes(x = whichtest, label = ifelse(abs(Count) > 0, abs(Count), "")), position = position_stack(vjust = 0.5), size = 3) +
             geom_hline(aes(yintercept=0),colour='gray50') +
-            theme(axis.text.x=element_text(angle=90,vjust=0.5)) +
             scale_fill_manual(values=c(fc_colors[1], fc_colors[3]), labels = c("Negative", "Positive"), name = "Fold Change Sign") +
             facet_wrap(~Comparison) + 
             xlab("Statistical test, by group comparison") + ylab("Count of Biomolecules") +
             ggtitle("Number of DE Biomolecules Between Groups") +
-            theme(plot.title = element_text(hjust = 0.5), legend.text = element_text(size = 6), legend.title = element_text(size = 6))
+            mytheme
     
-    if(theme_bw) p <- p + theme_bw()
+    if(bw_theme) p <- p + theme_bw()
     
     return(p)
   }
@@ -265,13 +278,19 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, fc_colors = 
       for(comp in as.character(unique(volcano$Comparison))){
         #create a vector of the two group names being compared
         groups = strsplit(comp, " vs ")[[1]]
+        gsize_1 = nrow(attr(x, "group_DF") %>% dplyr::filter(Group == groups[1]))
+        gsize_2 = nrow(attr(x, "group_DF") %>% dplyr::filter(Group == groups[2]))
         
         # will contain ID column and count column corresponding to the two groups
-        temp_df <- counts[c(1,which(colnames(counts) %in% groups))]
+        temp_df <- counts[c(1,which(colnames(counts) == groups[1]), which(colnames(counts) == groups[2]))]
         temp_df$Comparison <- comp
         
         # rename the columns to something static so they can be rbind-ed
         colnames(temp_df)[which(colnames(temp_df)%in% groups)] <- c("Count_First_Group", "Count_Second_Group") 
+        
+        # store proportion of nonmissing to color g-test values in volcano plot
+        temp_df$Prop_First_Group <- temp_df$Count_First_Group/gsize_1
+        temp_df$Prop_Second_Group <- temp_df$Count_Second_Group/gsize_2
         
         counts_df <- rbind(counts_df, temp_df)
       }
@@ -281,13 +300,6 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, fc_colors = 
         volcano <- volcano %>% dplyr::left_join(counts_df)
       )
     }
-    
-    #Remove NAs to avoid ggplot2 warning
-    to_rm <- which(apply(volcano,1,function(x){any(is.na(x))}))
-    if(length(to_rm)>0)
-      volcano <- volcano[-to_rm,]
-    
-    #
   }
   
   #Volcano plot 
@@ -306,7 +318,7 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, fc_colors = 
       
       # interactive plots need manual text applied to prepare for ggplotly conversion
       if(interactive){
-        p1 <- ggplot(temp_data_anova, aes(Fold_change,-log(P_value,base=10), text = paste("ID:", !!sym(idcol), "<br>", "Pval:", round(P_value, 4))))
+        p1 <- ggplot(temp_data_anova, aes(Fold_change,-log(P_value,base=10), text = paste("ID:", !!rlang::sym(idcol), "<br>", "Pval:", round(P_value, 4))))
       }
       else p1 <- ggplot(data = temp_data_anova, aes(Fold_change,-log(P_value,base=10)))
       
@@ -314,34 +326,38 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, fc_colors = 
           geom_point(aes(color = Fold_change_flag), shape = 1)+
           facet_wrap(~Comparison) +
           ylab("-log[10](p-value)")+xlab("Fold-change") +
-        scale_color_manual(values = cols_anova, name = "Fold Change", 
-                           labels = c("Neg(Anova)", "0", "Pos(Anova)"),
-                           breaks = c("-1", "0", "1"))
+          scale_color_manual(values = cols_anova, name = "Fold Change", 
+                             labels = c("Neg(Anova)", "0", "Pos(Anova)"),
+                             breaks = c("-1", "0", "1")) + 
+          mytheme
     }
     
     if(attr(x, "statistical_test") %in% c("gtest", "combined")){
-      # assign black to anova flag values and filter down to G-test rows
+      # assign black to anova flag values and filter down to G-test rows, reassign significant g-test flags so that anova significance doesn't cover them up
       cols_gtest <- c("-2" = fc_colors[1], "-1" = fc_colors[2], "0" = fc_colors[2], "1" = fc_colors[2], "2" = fc_colors[3])
       temp_data_gtest <- volcano %>% 
         dplyr::filter(Type == "G-test") %>% 
-        dplyr::mutate(Fold_change_flag = ifelse(Count_First_Group <= Count_Second_Group & P_value <= attr(x, "pval_thresh"), 2, 
-                                                ifelse(Count_First_Group > Count_Second_Group & P_value <= attr(x, "pval_thresh"), -2, Fold_change_flag)))
+        dplyr::mutate(Fold_change_flag = ifelse(Prop_First_Group > Prop_Second_Group & P_value <= attr(x, "pval_thresh"), 2, 
+                                                ifelse(Prop_First_Group < Prop_Second_Group & P_value <= attr(x, "pval_thresh"), -2, Fold_change_flag)))
       
       if(interactive){
-        p2 <- ggplot(temp_data_gtest, aes(Count_First_Group, Count_Second_Group, text = paste("ID:", !!sym(idcol), "<br>", "Pval:", round(P_value, 4))))
+        p2 <- ggplot(temp_data_gtest, aes(Count_Second_Group, Count_First_Group, text = paste("ID:", !!rlang::sym(idcol), "<br>", "Pval:", round(P_value, 4))))
       }
-      else p2 <- ggplot(data=temp_data_gtest, aes(Count_First_Group, Count_Second_Group))
+      else p2 <- ggplot(data=temp_data_gtest, aes(Count_Second_Group, Count_First_Group))
       
       p2 <- p2 +
         geom_point(data = temp_data_gtest %>% dplyr::filter(Fold_change_flag %in% c(-1,0,1)), aes(color = Fold_change_flag), position = jitter, shape = 1) +
         geom_point(data = temp_data_gtest %>% dplyr::filter(!(Fold_change_flag %in% c(-1,0,1))), aes(color = Fold_change_flag), position = jitter) +
         facet_wrap(~Comparison) +
-        geom_hline(yintercept = c(unique(temp_data_gtest$Count_Second_Group) + 0.5, min(temp_data_gtest$Count_Second_Group) - 0.5)) +
-        geom_vline(xintercept = c(unique(temp_data_gtest$Count_First_Group) + 0.5, min(temp_data_gtest$Count_First_Group) - 0.5)) +
+        geom_vline(xintercept = c(unique(temp_data_gtest$Count_Second_Group) + 0.5, min(temp_data_gtest$Count_Second_Group) - 0.5)) +
+        geom_hline(yintercept = c(unique(temp_data_gtest$Count_First_Group) + 0.5, min(temp_data_gtest$Count_First_Group) - 0.5)) +
         ylab("No. present in first group")+xlab("No. present in second group") +
         scale_color_manual(values = cols_gtest, name = "Fold Change", 
                            labels = c("Neg(Gtest)", "0", "Pos(Gtest)"),
-                           breaks = c("-2", "0", "2"))
+                           breaks = c("-2", "0", "2")) + 
+        scale_x_continuous(breaks = unique(temp_data_gtest$Count_Second_Group), labels = as.character(unique(temp_data_gtest$Count_Second_Group))) +
+        scale_y_continuous(breaks = unique(temp_data_gtest$Count_First_Group), labels = as.character(unique(temp_data_gtest$Count_First_Group))) +
+        mytheme
     }
     
     # draw a line if threshold specified
@@ -349,17 +365,17 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, fc_colors = 
       p1 <- p1 + geom_hline(aes(yintercept=fc_threshold))
     }
     
-    
+    # apply theme_bw() and interactivity if specified
     if(attr(x, "statistical_test") %in% "anova"){
-      if(theme_bw) p1 <- p1 + theme_bw()
+      if(bw_theme) p1 <- p1 + theme_bw()
       if(interactive) return(plotly::ggplotly(p1, tooltip = c("text"))) else return(p1)
     } 
     if(attr(x, "statistical_test") %in% "gtest"){
-      if(theme_bw) p2 <- p2 + theme_bw()
+      if(bw_theme) p2 <- p2 + theme_bw()
       if(interactive) return(plotly::ggplotly(p2, tooltip = c("text"))) else return(p2)
     }
     if(attr(x, "statistical_test") %in% "combined"){
-      if(theme_bw){
+      if(bw_theme){
         p1 <- p1 + theme_bw()
         p2 <- p2 + theme_bw()
       } 
@@ -374,6 +390,7 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, fc_colors = 
         )
         return(p)
       }
+      
       else return(gridExtra::grid.arrange(p1,p2,nrow = 2))
     }
   }
@@ -392,9 +409,8 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, fc_colors = 
     p <- ggplot(volcano_sigs, aes(Biomolecule, Comparison, text = paste("ID:", Biomolecule, "<br>", "Pval:", P_value))) +
           geom_tile(aes(fill = Fold_change), color = "white") +
           scale_fill_gradient(low = fc_colors[1], high = fc_colors[3]) +
-          theme(axis.text.x = element_text(angle = 90, hjust = 0.5)) +
           ggtitle("Average Log Fold Change") +
-          theme(plot.title = element_text(hjust = 0.5), axis.text.x = element_blank())
+          mytheme
     if(interactive) return(plotly::ggplotly(p, tooltip = c("text"))) else return(p)
   }
   #invisible(all_plts)

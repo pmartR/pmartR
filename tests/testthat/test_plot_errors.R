@@ -3,8 +3,7 @@ context("input tests for plot.proData()")
 library(pmartR)
 library(testthat) 
 library(pmartRdata) 
-data("pro_object") 
-omicsData<- pro_object
+omicsData <- pro_object
 
 #Here we create a proData object that has e_data = NULL
 almost_object <- omicsData

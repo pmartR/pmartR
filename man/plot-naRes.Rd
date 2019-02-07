@@ -22,6 +22,7 @@
 \code{title_size} \tab integer value specifying the font size for the plot title. Default is 14. \cr
 \code{x_lab_size} \tab integer value indicating the font size for the x-axis. Defaults to 11. \cr
 \code{y_lab_size} \tab integer value indicating the font size for the y-axis. Defaults to 11. \cr
+\code{text_size} \tab integer value indicating the font size for the bar labels. Defaults to 3. \cr
 \code{bar_width} \tab integer value indicating the bar width in a barplot (when type = "bySample"). Defaults to .8. \cr
 \code{binwidth} \tab integer value indicating the bin width in a histogram (when type = "byMolecule"). Defaults to 1. \cr
 \code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used. \cr

@@ -4,7 +4,6 @@ library(testthat)
 library(pmartR)
 library(pmartRdata)
 library(dplyr)
-data("pep_object")
 omicsData <- group_designation(omicsData = pep_object, main_effects = "Condition")
 
 e_data <- omicsData$e_data
@@ -43,7 +42,7 @@ test_that("components of result match attributes of omicsData",{
   expect_that(result$nonmiss_totals[,cname_id], equals(as.character(omicsData$e_data[,which(names(omicsData$e_data)==cname_id)])))      
   
   #double checking that the names(result$nonmiss_totals) is correct by comparing to levels of (groupDF$Group)   
-  expect_that(names(result$nonmiss_totals)[match(levels(groupDF$Group),names(result$nonmiss_totals))], equals(levels(groupDF$Group)))    
+  expect_that(names(result$nonmiss_totals)[match(unique(groupDF$Group),names(result$nonmiss_totals))], equals(unique(groupDF$Group)))    
 })
 
 context("input tests for nonmissing_per_group()")

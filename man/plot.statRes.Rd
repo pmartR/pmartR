@@ -6,7 +6,7 @@
 \usage{
 \method{plot}{statRes}(x, plot_type = "bar", fc_threshold = NULL,
   fc_colors = c("red", "black", "green"), stacked = FALSE,
-  interactive = FALSE, theme_bw = FALSE, ...)
+  interactive = FALSE, bw_theme = FALSE, ...)
 }
 \arguments{
 \item{x}{`statRes` object to be plotted, usually the result of `imd_anova`}
@@ -21,7 +21,7 @@
 
 \item{interactive}{TRUE/FALSE for whether to create an interactive plot using plotly}
 
-\item{theme_bw}{TRUE/FALSE for whether to apply a black-white background theme}
+\item{bw_theme}{TRUE/FALSE for whether to apply a black-white background theme}
 }
 \description{
 Produces plots that summarize the results contained in a `statRes` object.
@@ -49,8 +49,8 @@ plot(imd_res)
 plot(imd_res, plot_type = "volcano")
 
 imd_anova_res <- imd_anova(omicsData = myproData, test_method = 'comb', pval_adjust='bon')
-plot(imd_anova_res, theme_bw = TRUE)
-plot(imd_anova_res, plot_type = "volcano", theme_bw = TRUE)
+plot(imd_anova_res, bw_theme = TRUE)
+plot(imd_anova_res, plot_type = "volcano", bw_theme = TRUE)
 
 }
 

@@ -3,7 +3,6 @@ context("output tests for ppp_rip()")
 library(pmartR)
 library(testthat)
 library(pmartRdata)
-data("pep_object")
 
 omicsData<- group_designation(omicsData = pep_object, main_effects = "Condition")
 

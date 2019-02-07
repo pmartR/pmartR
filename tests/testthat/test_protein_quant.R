@@ -6,10 +6,7 @@ library(pmartRdata)
 library(foreach)
 library(data.table)
 
-data("pep_object")
-data("lipid_object")
-mypepData = edata_transform(pep_object, "log2")
-data("myobject")
+mypepData = edata_transform(pmartRdata::pep_object, "log2")
 
 zrollup_median = protein_quant(myobject, method = 'zrollup', combine_fn = 'median', single_observation = T)
 zrollup_mean = protein_quant(myobject, method = 'zrollup', combine_fn = 'mean', single_observation = T)
