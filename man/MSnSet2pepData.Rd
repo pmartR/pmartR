@@ -5,8 +5,7 @@
 \title{Convert Data of class MSnSet to pmartR pepData Class}
 \usage{
 MSnSet2pepData(msnset_object, data_scale, edata_cname = "UniqueID",
-  fdata_cname = "SampleID", emeta_cname = "UniqueID",
-  check.names = TRUE)
+  fdata_cname = "SampleID", emeta_cname = "UniqueID", check.names = TRUE)
 }
 \arguments{
 \item{msnset_object}{is an object of class MSnSet, it stores quantification data and meta data. Creating an MSnSet object is described in the MSNbase package io vignette.}

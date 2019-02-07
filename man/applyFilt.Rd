@@ -2,11 +2,17 @@
 % Please edit documentation in R/applyFilt.R
 \name{applyFilt}
 \alias{applyFilt}
+\alias{applyFilt}
 \alias{applyFilt.moleculeFilt}
+\alias{applyFilt}
 \alias{applyFilt.cvFilt}
+\alias{applyFilt}
 \alias{applyFilt.rmdFilt}
+\alias{applyFilt}
 \alias{applyFilt.proteomicsFilt}
+\alias{applyFilt}
 \alias{applyFilt.imdanovaFilt}
+\alias{applyFilt}
 \alias{applyFilt.customFilt}
 \title{Apply a S3 filter  object to a pmartR S3 object}
 \usage{
@@ -17,7 +23,7 @@ applyFilt(filter_object, omicsData, ...)
 \method{applyFilt}{cvFilt}(filter_object, omicsData, cv_threshold = 150)
 
 \method{applyFilt}{rmdFilt}(filter_object, omicsData,
-  pvalue_threshold = 0.001)
+  pvalue_threshold = 1e-04)
 
 \method{applyFilt}{proteomicsFilt}(filter_object, omicsData,
   min_num_peps = NULL, degen_peps = FALSE)

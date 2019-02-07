@@ -2,15 +2,15 @@
 title: "Quality Control and Normalization of Peptide Data with the `pmartR` Package"
 author: "Kelly Stratton, Lisa Bramer"
 date: "`r Sys.Date()`"
-bibliography: bibliography.bib
-output: 
+output:
+  html_document:
+    df_print: paged
   rmarkdown::html_vignette:
-    self_contained: true
-    fig_caption: true
-vignette: >
-  %\VignetteIndexEntry{Analyzing Peptide Data with the pmartR Package}
-  %\VignetteEngine{knitr::rmarkdown}
-  \usepackage[utf8]{inputenc}
+    fig_caption: yes
+    self_contained: yes
+bibliography: bibliography.bib
+vignette: |
+  %\VignetteIndexEntry{Analyzing Peptide Data with the pmartR Package} %\VignetteEngine{knitr::rmarkdown} \usepackage[utf8]{inputenc}
 ---
 
 ```{r global_options, include = FALSE}
@@ -24,6 +24,7 @@ knitr::include_graphics("pmartR_logo_final.jpg")
 library(pmartR)
 library(pmartRdata)
 library(ggplot2)
+library(reshape2)
 ```
 
 This vignette describes the pmartR package functionality for quality control (QC) processing of mass spectrometry (MS) pan-omics data, in particular proteomics data at the peptide level. This includes data transformation, specification of groups that are to be compared against each other, filtering of features and/or samples, data normalization, and data summarization (correlation, principal components analysis). It is based on example data in the pmartRdata package. 

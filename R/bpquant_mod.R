@@ -18,10 +18,9 @@
 #' }
 #' 
 #' @examples 
-#' This function is called within bpquant_loop function
+#' This function is called within bpquant function
 #'
 #'@rdname bpquant_mod
-#'@export 
 
 bpquant_mod <- function(protein_sig, pi_not, max_proteoforms){
   

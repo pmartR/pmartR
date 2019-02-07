@@ -254,7 +254,7 @@ applyFilt.cvFilt <- function(filter_object, omicsData, cv_threshold = 150){
 #' @export
 #' @name applyFilt
 #' @rdname applyFilt
-applyFilt.rmdFilt <- function(filter_object, omicsData, pvalue_threshold=0.001){
+applyFilt.rmdFilt <- function(filter_object, omicsData, pvalue_threshold=0.0001){
 
 
   # check to see whether a rmdFilt has already been run on omicsData #

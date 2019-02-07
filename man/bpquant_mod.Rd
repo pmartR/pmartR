@@ -29,6 +29,6 @@ peptide_idx \tab vector of 0, 1, 2, . . . values indicating which proteoform eac
 }
 }
 \examples{
-This function is called within bpquant_loop function
+This function is called within bpquant function
 
 }
