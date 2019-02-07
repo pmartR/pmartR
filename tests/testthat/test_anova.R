@@ -79,80 +79,80 @@ expect_equal(anova_res$Fold_change_pvalues[row,],myres$p_value)
 
 
 ##-------- Test the anova function computes means, and comparisons correctly, two factors ----##
-context("Test two factor ANOVA")
-library(OvarianPepdataBPsubset)
-suppressWarnings(tcga_ovarian_pepdata_bp <- as.pepData(e_data = tcga_ovarian_pepdata_bp_subset$e_data, f_data = tcga_ovarian_pepdata_bp_subset$f_data, e_meta = tcga_ovarian_pepdata_bp_subset$e_meta,
-                                      edata_cname="Peptide", fdata_cname="sampleID", emeta_cname = "Protein", data_scale = "log2"))
-suppressWarnings(tcga_ovarian_pepdata_bp <- group_designation(omicsData = tcga_ovarian_pepdata_bp, main_effects = c("vital_status","neoplasm_histologic_grade")))
-attr(tcga_ovarian_pepdata_bp,"imdanova") <- data.frame(test_with_anova=NULL)
-ovarian_res_twofac <- anova_test(omicsData = tcga_ovarian_pepdata_bp)
-
-#Because there is so much missing data we need to pick a row that has at least
-#one observation for at least two leves of each of 2 factors
-resample <- TRUE
-while(resample){
-  #Randomly select row to test
-  row <- floor(runif(1,1,nrow(tcga_ovarian_pepdata_bp$e_data)))
-  my_res <- ovarian_res_twofac$Results[row,]
-  my_res_means <- c(my_res$Mean_Alive_G2,my_res$Mean_Alive_G3,my_res$Mean_Dead_G2,my_res$Mean_Dead_G3)
-  
-  #Get treatment means and compare to my results
-  ydf_twofac <- tcga_ovarian_pepdata_bp$e_data[row,]
-  ydf_twofac <- reshape2::melt(ydf_twofac[,-1],id.vars=NULL)
-  
-  ydf_twofac$Treat <- attr(tcga_ovarian_pepdata_bp,"group_DF")$Group
-  ydf_twofac$Fac1 <- attr(tcga_ovarian_pepdata_bp,"group_DF")$neoplasm_histologic_grade
-  ydf_twofac$Fac2 <- attr(tcga_ovarian_pepdata_bp,"group_DF")$vital_status
-  ydf_twofac_nona <- filter(ydf_twofac,!is.na(value))
-  
-  if(length(unique(ydf_twofac_nona$Fac1))>1 & length(unique(ydf_twofac_nona$Fac2))>1){
-     resample <- FALSE  
-  }
-}
-
-#ANOVA with and without interaction
-res_twofac_int <- lm(value~Fac1*Fac2,data=ydf_twofac)
-res_twofac_noint <- lm(value~Fac1+Fac2,data=ydf_twofac)
-modelc_p <- anova(res_twofac_noint,res_twofac_int)[2,6]
-
-#If full and reduced model are the same, make p-value 0
-if(is.na(modelc_p)){
-  modelc_p <- 0
-}
-
-if(modelc_p<0.05){
-  #Full model is preferred, compare means and variance estimates (res_twofac_int)
-  ydf_res <- ydf_twofac%>%group_by(Treat)%>%summarize(Est=mean(value,na.rm=T))
-  to_remove <- which(is.na(ydf_res$Est))
-  if(length(to_remove)>0){
-    my_res_means <- my_res_means[-to_remove]
-    ydf_res <- ydf_res[-to_remove,]
-  }
-  
-  #Compare means
-  expect_equal(my_res_means,ydf_res$Est)
-  
-  #Compare sigma estimate
-  expect_equal(my_res$Variance,anova(res_twofac_int)[3,3])
-  
-  #Compare contrasts
-  #my_res_cont <- unname(data.matrix(ovarian_res_twofac$Fold_changes[row,]))[1,]
-  #anova_res_cont <- c(-unname(res_twofac_int$coefficients[2]),)
-                      
-}else{
-  #Reduced model preferred, compare means and variance estimates (res_twofac_noint)
-  
-  Xmatrix <- matrix(c(1,0,0,
-                      1,1,0,
-                      1,0,1,
-                      1,1,1),ncol=3,byrow=TRUE)
-  model_ests <- as.vector((Xmatrix%*%res_twofac_noint$coefficients))
-  
-  #Compare means
-  expect_equal(my_res_means,model_ests)
-  
-  #Compare variance estimates
-  expect_equal(my_res$Variance, anova(res_twofac_noint)[3,3])
-}
-
-
+# context("Test two factor ANOVA")
+# library(OvarianPepdataBPsubset)
+# suppressWarnings(tcga_ovarian_pepdata_bp <- as.pepData(e_data = tcga_ovarian_pepdata_bp_subset$e_data, f_data = tcga_ovarian_pepdata_bp_subset$f_data, e_meta = tcga_ovarian_pepdata_bp_subset$e_meta,
+#                                       edata_cname="Peptide", fdata_cname="sampleID", emeta_cname = "Protein", data_scale = "log2"))
+# suppressWarnings(tcga_ovarian_pepdata_bp <- group_designation(omicsData = tcga_ovarian_pepdata_bp, main_effects = c("vital_status","neoplasm_histologic_grade")))
+# attr(tcga_ovarian_pepdata_bp,"imdanova") <- data.frame(test_with_anova=NULL)
+# ovarian_res_twofac <- anova_test(omicsData = tcga_ovarian_pepdata_bp)
+# 
+# #Because there is so much missing data we need to pick a row that has at least
+# #one observation for at least two leves of each of 2 factors
+# resample <- TRUE
+# while(resample){
+#   #Randomly select row to test
+#   row <- floor(runif(1,1,nrow(tcga_ovarian_pepdata_bp$e_data)))
+#   my_res <- ovarian_res_twofac$Results[row,]
+#   my_res_means <- c(my_res$Mean_Alive_G2,my_res$Mean_Alive_G3,my_res$Mean_Dead_G2,my_res$Mean_Dead_G3)
+#   
+#   #Get treatment means and compare to my results
+#   ydf_twofac <- tcga_ovarian_pepdata_bp$e_data[row,]
+#   ydf_twofac <- reshape2::melt(ydf_twofac[,-1],id.vars=NULL)
+#   
+#   ydf_twofac$Treat <- attr(tcga_ovarian_pepdata_bp,"group_DF")$Group
+#   ydf_twofac$Fac1 <- attr(tcga_ovarian_pepdata_bp,"group_DF")$neoplasm_histologic_grade
+#   ydf_twofac$Fac2 <- attr(tcga_ovarian_pepdata_bp,"group_DF")$vital_status
+#   ydf_twofac_nona <- filter(ydf_twofac,!is.na(value))
+#   
+#   if(length(unique(ydf_twofac_nona$Fac1))>1 & length(unique(ydf_twofac_nona$Fac2))>1){
+#      resample <- FALSE  
+#   }
+# }
+# 
+# #ANOVA with and without interaction
+# res_twofac_int <- lm(value~Fac1*Fac2,data=ydf_twofac)
+# res_twofac_noint <- lm(value~Fac1+Fac2,data=ydf_twofac)
+# modelc_p <- anova(res_twofac_noint,res_twofac_int)[2,6]
+# 
+# #If full and reduced model are the same, make p-value 0
+# if(is.na(modelc_p)){
+#   modelc_p <- 0
+# }
+# 
+# if(modelc_p<0.05){
+#   #Full model is preferred, compare means and variance estimates (res_twofac_int)
+#   ydf_res <- ydf_twofac%>%group_by(Treat)%>%summarize(Est=mean(value,na.rm=T))
+#   to_remove <- which(is.na(ydf_res$Est))
+#   if(length(to_remove)>0){
+#     my_res_means <- my_res_means[-to_remove]
+#     ydf_res <- ydf_res[-to_remove,]
+#   }
+#   
+#   #Compare means
+#   expect_equal(my_res_means,ydf_res$Est)
+#   
+#   #Compare sigma estimate
+#   expect_equal(my_res$Variance,anova(res_twofac_int)[3,3])
+#   
+#   #Compare contrasts
+#   #my_res_cont <- unname(data.matrix(ovarian_res_twofac$Fold_changes[row,]))[1,]
+#   #anova_res_cont <- c(-unname(res_twofac_int$coefficients[2]),)
+#                       
+# }else{
+#   #Reduced model preferred, compare means and variance estimates (res_twofac_noint)
+#   
+#   Xmatrix <- matrix(c(1,0,0,
+#                       1,1,0,
+#                       1,0,1,
+#                       1,1,1),ncol=3,byrow=TRUE)
+#   model_ests <- as.vector((Xmatrix%*%res_twofac_noint$coefficients))
+#   
+#   #Compare means
+#   expect_equal(my_res_means,model_ests)
+#   
+#   #Compare variance estimates
+#   expect_equal(my_res$Variance, anova(res_twofac_noint)[3,3])
+# }
+# 
+# 

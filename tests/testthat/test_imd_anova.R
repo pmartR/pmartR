@@ -80,8 +80,8 @@ lapply(nonmiss_params, function(params){
 
 
 #Test with really big dataset
-library(OvarianPepdataBPsubset)
-suppressWarnings(tcga_ovarian_pepdata_bp <- as.pepData(e_data = tcga_ovarian_pepdata_bp_subset$e_data, f_data = tcga_ovarian_pepdata_bp_subset$f_data, e_meta = tcga_ovarian_pepdata_bp_subset$e_meta,
-                                      edata_cname = 'Peptide', fdata_cname = "sampleID", emeta_cname = "Protein", data_scale = "log2"))
-suppressWarnings(tcga_ovarian_pepdata_bp <- group_designation(omicsData = tcga_ovarian_pepdata_bp, main_effects = c("race")))
-expect_warning(expect_error(ovarian_res_dunnett <- imd_anova(omicsData = tcga_ovarian_pepdata_bp, pval_adjust = 'dunnett', test_method='combined')))
+# library(OvarianPepdataBPsubset)
+# suppressWarnings(tcga_ovarian_pepdata_bp <- as.pepData(e_data = tcga_ovarian_pepdata_bp_subset$e_data, f_data = tcga_ovarian_pepdata_bp_subset$f_data, e_meta = tcga_ovarian_pepdata_bp_subset$e_meta,
+#                                       edata_cname = 'Peptide', fdata_cname = "sampleID", emeta_cname = "Protein", data_scale = "log2"))
+# suppressWarnings(tcga_ovarian_pepdata_bp <- group_designation(omicsData = tcga_ovarian_pepdata_bp, main_effects = c("race")))
+# expect_warning(expect_error(ovarian_res_dunnett <- imd_anova(omicsData = tcga_ovarian_pepdata_bp, pval_adjust = 'dunnett', test_method='combined')))
