@@ -57,7 +57,7 @@ custom_sampnames = function(omicsData, firstn = NULL, from = NULL, to = NULL, de
                                        if(length(components) > length(temp)) stop(paste("the length of 'components vector must be less than", length(temp), sep = " "))
                                        if(!any(components %in% 1:length(temp))) stop("none of the indices specified in 'components' match indices of the split sample name")
                                        temp <- temp[components]
-                                       temp2 = paste(temp[!is.na(temp)], collapse = "")
+                                       temp2 = paste(temp[!is.na(temp)], collapse = delim)
                                        return(temp2)})
     
     output = unlist(output)

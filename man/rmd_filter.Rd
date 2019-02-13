@@ -2,9 +2,13 @@
 % Please edit documentation in R/rmd_filter.R
 \name{rmd_filter}
 \alias{rmd_filter}
+\alias{rmd_filter}
 \alias{rmd_filter.pepData}
+\alias{rmd_filter}
 \alias{rmd_filter.proData}
+\alias{rmd_filter}
 \alias{rmd_filter.lipidData}
+\alias{rmd_filter}
 \alias{rmd_filter.metabData}
 \title{RMD Runs}
 \usage{

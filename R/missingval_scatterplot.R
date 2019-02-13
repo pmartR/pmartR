@@ -145,7 +145,7 @@ missingval_scatterplot <- function(omicsData, x_lab = NULL, y_lab = NULL, ...) {
     
     plot_data<- cbind(num_missing_vals, mean_intensity)
     plot_data<- as.data.frame(plot_data)
-    plot_data<- melt(plot_data, id.vars = "num_missing_vals")
+    plot_data<- reshape2::melt(plot_data, id.vars = "num_missing_vals")
     legendtitle <- ifelse(is.null(legend_title), "group", legend_title)
     
     if(bw_theme == FALSE){
