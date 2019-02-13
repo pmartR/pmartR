@@ -4,7 +4,7 @@ library(pmartR)
 library(testthat)
 library(pmartRdata)
 
-omicsData<- group_designation(omicsData = pep_object, main_effects = "Condition")
+omicsData<- group_designation(omicsData = pmartRdata::pep_object, main_effects = "Condition")
 
 result<- pmartR:::ppp_rip(e_data = omicsData$e_data, edata_id = attr(omicsData,"cnames")$edata_cname, fdata_id = attr(omicsData,"cnames")$fdata_cname, groupDF = attr(omicsData, "group_DF"))
 

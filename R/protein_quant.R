@@ -122,6 +122,19 @@ protein_quant<- function(pepData, method, isoformRes = NULL, qrollup_thresh = NU
       
       results<- zrollup(pepData, combine_fn = combine_fn, parallel = use_parallel)
     }
+    
+    # store total number of peptides mapping to each protein
+    peps_per_protein = e_meta %>%
+      dplyr::group_by(!!rlang::sym(emeta_cname)) %>%
+      dplyr::mutate(peps_per_pro = dplyr::n()) %>%
+      dplyr::select(!!rlang::sym(emeta_cname), peps_per_pro) %>%
+      dplyr::slice(1)
+    
+    # join the count column.  if qrollup was used, e_meta should already contain a column called "n_peps_used"
+    results$e_meta <- results$e_meta %>%
+      dplyr::left_join(peps_per_protein, by = emeta_cname) %>%
+      dplyr::mutate(n_peps_used = if("n_peps_used" %in% colnames(results$e_meta)) n_peps_used else peps_per_pro) # only qrollup will cause n_peps_used != peps_per_protein if isoformRes is NULL
+    
   }  
   
   if(!is.null(isoformRes)){
@@ -200,7 +213,28 @@ protein_quant<- function(pepData, method, isoformRes = NULL, qrollup_thresh = NU
       }
       
       results<- zrollup(temp_pepdata, combine_fn = combine_fn, parallel = use_parallel)
+      
     }
+    
+    # if isoform is specified, proteins used in rollup will be unique peptides/protein found in isoformRes2
+    peps_used <- isoformRes2 %>%
+      dplyr::group_by(!!rlang::sym(emeta_cname)) %>%
+      dplyr::mutate(n_peps_used = dplyr::n()) %>%
+      dplyr::select(!!rlang::sym(emeta_cname), n_peps_used) %>%
+      dplyr::slice(1)
+    
+    # store total number of peptides mapping to each protein (different from above)
+    peps_per_protein = e_meta %>%
+      dplyr::group_by(!!rlang::sym(emeta_cname)) %>%
+      dplyr::mutate(peps_per_pro = dplyr::n()) %>%
+      dplyr::select(!!rlang::sym(emeta_cname), peps_per_pro) %>%
+      dplyr::slice(1)
+    
+    # join the two count columns to the output e_meta
+    results$e_meta <- results$e_meta %>%
+      dplyr::left_join(peps_per_protein, by = emeta_cname) %>%
+      dplyr::left_join(peps_used, by = emeta_cname)
   }
+  
   return(results)
 }

@@ -56,162 +56,92 @@ qrollup<- function(pepData, qrollup_thresh, combine_fn = "median", parallel = TR
     chosen_combine_fn<- combine_fn_median
   }else{chosen_combine_fn = combine_fn_mean}
   
+  # set up parallel backend
   if(parallel == TRUE){
-    
-    final_list<- vector("list", length(unique_proteins))
-    
-
     cores<- parallel::detectCores()
     cl<- parallel::makeCluster(cores)
+    on.exit(parallel::stopCluster(cl))
     doParallel::registerDoParallel(cl)
+  }
+  else foreach::registerDoSEQ()
     
-    r<-foreach::foreach(i=1:length(unique_proteins))%dopar%{
-      
-      row_ind<- which(temp[ ,pro_id] == unique_proteins[i])
-      current_subset<- temp[row_ind,]
-      current_subset<- current_subset[,-which(names(temp) == pro_id)]
-      
-      #### Perform Q_Rollup ####
-      ## store number of peptides ##
-      num_peps = nrow(current_subset)
-      
-      res = matrix(NA, nrow = 1, ncol =  ncol(current_subset))
-      ## if only 1 peptide, set the protein value to the peptide ##
-      if(num_peps==1){
-        protein_val = unlist(current_subset)
-      }else{
-        ## Step 1: Subset peptides whose abundance is >= to qrollup_thresh ##
-        means = apply(current_subset,1,mean,na.rm=T)
-        quantil = quantile(means, probs = qrollup_thresh, na.rm = T)
+  r<-foreach::foreach(i=1:length(unique_proteins))%dopar%{
+    
+    row_ind<- which(temp[ ,pro_id] == unique_proteins[i])
+    current_subset<- temp[row_ind,]
+    current_subset<- current_subset[,-which(names(temp) == pro_id)]
+    
+    #### Perform Q_Rollup ####
+    ## store number of peptides ##
+    num_peps = nrow(current_subset)
+    
+    res = matrix(NA, nrow = 1, ncol =  ncol(current_subset))
+    ## if only 1 peptide, set the protein value to the peptide ##
+    if(num_peps==1){
+      protein_val = unlist(current_subset)
+      peps_used <- 1
+    }else{
+      ## Step 1: Subset peptides whose abundance is >= to qrollup_thresh ##
+      means = apply(current_subset,1,mean,na.rm=T)
+      quantil = quantile(means, probs = qrollup_thresh, na.rm = T)
 
-        new_subset = current_subset[which(means >= quantil), ]
-        
-        #after step 1 if only 1 peptide, set the protein value to the peptide
-        if(nrow(new_subset) == 1){
-          protein_val = unlist(new_subset)
-        }else{
-          ## Step 2: Set protein abundance as the mean/median of peptide abundances 
-          protein_val = apply(new_subset, 2, chosen_combine_fn)
-        }
-      }
+      new_subset = current_subset[which(means >= quantil), ]
+      peps_used <- nrow(new_subset)
       
-      res[1,] = protein_val
-      res<- data.frame(res)
-      names(res)<- names(current_subset)
-      
-      final_list[[i]]<- res
-    }
-    parallel::stopCluster(cl)
-    
-    final_result<- do.call(rbind, r)
-    final_result<- cbind(unique_proteins, final_result)
-    names(final_result)[1]<-pro_id
-    
-    samp_id = attr(pepData, "cnames")$fdata_cname
-    data_scale = attr(pepData, "data_info")$data_scale
-    is_normalized = attr(pepData, "data_info")$norm_info$is_normalized
-    
-    #subsetting pepData$e_meta by 'unique_proteins' 
-    emeta_indices<- match(unique_proteins, pepData$e_meta[[pro_id]])
-    
-    if(ncol(pepData$e_meta) == 2){
-      e_meta = as.data.frame(pepData$e_meta[emeta_indices, -which(names(pepData$e_meta)==pep_id)])
-      names(e_meta)<-pro_id
-    }else {e_meta = pepData$e_meta[emeta_indices, -which(names(pepData$e_meta)==pep_id)]} 
-    
-    prodata = as.proData(e_data = data.frame(final_result, check.names=check_names), f_data = pepData$f_data, e_meta = e_meta ,edata_cname = pro_id, fdata_cname = samp_id, emeta_cname = pro_id, data_scale = data_scale, is_normalized = is_normalized, check.names = check_names)
-    
-    #check for isobaricpepData class
-    if(inherits(pepData, "isobaricpepData")){
-      #update attributes in prodata
-      attr(prodata, "isobaric_info") = attr(pepData, "isobaric_info")
-      attr(prodata, "isobaric_info")$norm_info$is_normalized = attr(pepData, "isobaric_info")$norm_info$is_normalized
-    }
-    
-    #updating prodata attributes
-    attr(prodata, "data_info")$norm_info = attr(pepData, "data_info")$norm_info
-    attr(prodata, "data_info")$data_types = attr(pepData, "data_info")$data_types
-    attr(prodata, "data_info")$norm_method = attr(pepData, "data_info")$norm_method
-    
-    attr(prodata, "filters")<- attr(pepData, "filters")
-    attr(prodata, "group_DF")<- attr(pepData, "group_DF")
-    attr(prodata, "imdanova")<- attr(pepData, "imdanova")
-  }
-  
-  #applying rrollup without doParallel
-  
-  else{
-    final_list<- vector("list", length(unique_proteins))
-    
-    for(i in 1:length(unique_proteins)){
-      
-      row_ind<- which(temp[ ,pro_id] == unique_proteins[i])
-      current_subset<- temp[row_ind,]
-      current_subset<- current_subset[,-which(names(temp) == pro_id)]
-      
-      #### Perform Q_Rollup ####
-      ## store number of peptides ##
-      num_peps = nrow(current_subset)
-      
-      res = matrix(NA, nrow = 1, ncol =  ncol(current_subset))
-      ## if only 1 peptide, set the protein value to the peptide ##
-      if(num_peps==1){
-        protein_val = unlist(current_subset)
+      #after step 1 if only 1 peptide, set the protein value to the peptide
+      if(nrow(new_subset) == 1){
+        protein_val = unlist(new_subset)
       }else{
-        ## Step 1: Subset peptides whose abundance is >= to qrollup_thresh ##
-        non_na_cnt = apply(!is.na(current_subset), 1, sum)
-        new_subset = current_subset[which(non_na_cnt >= qrollup_thresh), ]
-        
-        #after step 1 if only 1 peptide, set the protein value to the peptide
-        if(nrow(new_subset) == 1){
-          protein_val = unlist(new_subset)
-        }else{
-          ## Step 2: Set protein abundance as the mean of peptide abundances from qrollup_thresh_subset
-          protein_val = apply(new_subset, 2, chosen_combine_fn)
-        }
+        ## Step 2: Set protein abundance as the mean/median of peptide abundances 
+        protein_val = apply(new_subset, 2, chosen_combine_fn)
       }
-      
-      res[1,] = protein_val
-      res<- data.frame(res)
-      names(res)<- names(current_subset)
-      
-      final_list[[i]]<- res
     }
     
-    final_result<- do.call(rbind, final_list)
-    final_result<- cbind(unique_proteins, final_result)
-    names(final_result)[1]<-pro_id
+    res[1,] = protein_val
+    res<- data.frame(res)
+    names(res)<- names(current_subset)
     
-    samp_id = attr(pepData, "cnames")$fdata_cname
-    data_scale = attr(pepData, "data_info")$data_scale
-    is_normalized = attr(pepData, "data_info")$norm_info$is_normalized
-    
-    #subsetting pepData$e_meta by 'unique_proteins' 
-    emeta_indices<- match(unique_proteins, pepData$e_meta[[pro_id]])
-    
-    if(ncol(pepData$e_meta) == 2){
-      e_meta = as.data.frame(pepData$e_meta[emeta_indices, -which(names(pepData$e_meta)==pep_id)])
-      names(e_meta)<-pro_id
-    }else {e_meta = pepData$e_meta[emeta_indices, -which(names(pepData$e_meta)==pep_id)]} 
-    
-    prodata = as.proData(e_data = data.frame(final_result, check.names=check_names), f_data = pepData$f_data, e_meta = e_meta ,edata_cname = pro_id, fdata_cname = samp_id, emeta_cname = pro_id, data_scale = data_scale, is_normalized = is_normalized, check.names = check_names)
-    
-    #check for isobaricpepData class
-    if(inherits(pepData, "isobaricpepData")){
-      #update attributes in prodata
-      attr(prodata, "isobaric_info") = attr(pepData, "isobaric_info")
-      attr(prodata, "isobaric_info")$norm_info$is_normalized = attr(pepData, "isobaric_info")$norm_info$is_normalized 
-    }
-    
-    #updating prodata attributes
-    attr(prodata, "data_info")$norm_info = attr(pepData, "data_info")$norm_info
-    attr(prodata, "data_info")$data_types = attr(pepData, "data_info")$data_types
-    attr(prodata, "data_info")$norm_method = attr(pepData, "data_info")$norm_method
-    
-    attr(prodata, "filters")<- attr(pepData, "filters")
-    attr(prodata, "group_DF")<- attr(pepData, "group_DF")
-    attr(prodata, "imdanova")<- attr(pepData, "imdanova")
+    list(res, peps_used)
   }
   
+  final_result<- do.call(rbind, lapply(r, function(x) x[[1]]))
+  final_result<- cbind(unique_proteins, final_result)
+  names(final_result)[1]<-pro_id
+  
+  n_peps_used = sapply(r, function(x) x[[2]])
+  
+  samp_id = attr(pepData, "cnames")$fdata_cname
+  data_scale = attr(pepData, "data_info")$data_scale
+  is_normalized = attr(pepData, "data_info")$norm_info$is_normalized
+  
+  #subsetting pepData$e_meta by 'unique_proteins' 
+  emeta_indices<- match(unique_proteins, pepData$e_meta[[pro_id]])
+  
+  if(ncol(pepData$e_meta) == 2){
+    e_meta = as.data.frame(pepData$e_meta[emeta_indices, -which(names(pepData$e_meta)==pep_id)])
+    names(e_meta)<-pro_id
+  }else {e_meta = pepData$e_meta[emeta_indices, -which(names(pepData$e_meta)==pep_id)]} 
+  
+  e_meta$n_peps_used <- n_peps_used
+  
+  prodata = as.proData(e_data = data.frame(final_result, check.names=check_names), f_data = pepData$f_data, e_meta = e_meta ,edata_cname = pro_id, fdata_cname = samp_id, emeta_cname = pro_id, data_scale = data_scale, is_normalized = is_normalized, check.names = check_names)
+  
+  #check for isobaricpepData class
+  if(inherits(pepData, "isobaricpepData")){
+    #update attributes in prodata
+    attr(prodata, "isobaric_info") = attr(pepData, "isobaric_info")
+    attr(prodata, "isobaric_info")$norm_info$is_normalized = attr(pepData, "isobaric_info")$norm_info$is_normalized
+  }
+  
+  #updating prodata attributes
+  attr(prodata, "data_info")$norm_info = attr(pepData, "data_info")$norm_info
+  attr(prodata, "data_info")$data_types = attr(pepData, "data_info")$data_types
+  attr(prodata, "data_info")$norm_method = attr(pepData, "data_info")$norm_method
+  
+  attr(prodata, "filters")<- attr(pepData, "filters")
+  attr(prodata, "group_DF")<- attr(pepData, "group_DF")
+  attr(prodata, "imdanova")<- attr(pepData, "imdanova")
+  
+
   return(prodata)
 } 

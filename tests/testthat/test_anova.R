@@ -4,8 +4,10 @@ library(pmartR)
 library(pmartRdata)
 
 suppressMessages(library(dplyr))
-attr(pep_object,"cnames")$fdata_cname <- "SampleID"
-mypepData <- edata_transform(omicsData = pep_object, data_scale = "log2")
+
+mypepData <- pmartRdata::pep_object
+attr(mypepData,"cnames")$fdata_cname <- "SampleID"
+mypepData <- edata_transform(omicsData = mypepData, data_scale = "log2")
 mypepData <- group_designation(omicsData = mypepData, main_effects = c("Condition"))
 
 ##------- Test that the comparisons don't change with/without adjustment -----##
