@@ -4,7 +4,7 @@ library(testthat)
 library(pmartR)
 library(pmartRdata)
 library(dplyr)
-omicsData <- group_designation(omicsData = pep_object, main_effects = "Condition")
+omicsData <- group_designation(omicsData = pmartRdata::pep_object, main_effects = "Condition")
 
 e_data <- omicsData$e_data
 groupDF <- attr(omicsData, "group_DF")

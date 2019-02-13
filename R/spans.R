@@ -17,7 +17,7 @@
 #' \tabular{ll}{
 #' \code{location_thresh, scale_thresh} The minimum p-value resulting from a Kruskal-Wallis test on the location and scale parameters resulting from a normalization method in order for that method to be considered a candidate for scoring.\cr  
 #' \code{verbose} Logical specifying whether to print the completion of SPANS procedure steps to console.  Defaults to TRUE.\cr
-#' \code{parrallel} Logical specifying whether to use a parrallel backend.  Depending on the size of your data, setting this to FALSE can cause the algorithm to be very slow.  Defaults to TRUE.
+#' \code{parallel} Logical specifying whether to use a parallel backend.  Depending on the size of your data, setting this to FALSE can cause the algorithm to be very slow.  Defaults to TRUE.
 #' }
 #'@details Below are details for specifying function and parameter options.
 #' @section Subset Functions:
@@ -87,7 +87,7 @@ spans_procedure <- function(omicsData, norm_fn = c("median", "mean", "zscore", "
 
   .spans_procedure <- function(omicsData, norm_fn = c("median", "mean", "zscore", "mad"), subset_fn = c("all", "los", "ppp", "rip", "ppp_rip"), 
                             params = NULL, group = NULL, n_iter = 1000, sig_thresh = 0.0001, nonsig_thresh = 0.5, min_nonsig = 20, min_sig = 20,
-                            location_thresh = 0.05, scale_thresh = 0.05, verbose = TRUE, parrallel = TRUE){ 
+                            location_thresh = 0.05, scale_thresh = 0.05, verbose = TRUE, parallel = TRUE){ 
     
     edata_cname = get_edata_cname(omicsData)
     fdata_cname = get_fdata_cname(omicsData)
@@ -219,7 +219,7 @@ spans_procedure <- function(omicsData, norm_fn = c("median", "mean", "zscore", "
     ### STEP 0:  create random distribution ####
     
     # set up parallel backend
-    if(parrallel){
+    if(parallel){
       cores<- parallel::detectCores()
       cl<- parallel::makeCluster(cores)
       on.exit(parallel::stopCluster(cl))
