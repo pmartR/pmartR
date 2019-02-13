@@ -8,7 +8,7 @@ techrep_pepData <- pmartRdata::techrep_pep_object
 pep_techrep_avg <- combine_techreps(techrep_pepData)
 techrep_cname = attr(pep_techrep_avg, "cnames")$techrep_cname
 
-verify_data_info(pep_techrep_avg)
+pmartR:::verify_data_info(pep_techrep_avg)
 
 test_that("bad input throws error", {
   # not a column
