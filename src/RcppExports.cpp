@@ -213,8 +213,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // two_factor_anova_cpp
-List two_factor_anova_cpp(arma::mat y, arma::mat X_full, arma::mat X_red, NumericVector red_df);
-RcppExport SEXP _pmartR_two_factor_anova_cpp(SEXP ySEXP, SEXP X_fullSEXP, SEXP X_redSEXP, SEXP red_dfSEXP) {
+List two_factor_anova_cpp(arma::mat y, arma::mat X_full, arma::mat X_red, NumericVector red_df, arma::colvec group_ids);
+RcppExport SEXP _pmartR_two_factor_anova_cpp(SEXP ySEXP, SEXP X_fullSEXP, SEXP X_redSEXP, SEXP red_dfSEXP, SEXP group_idsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -222,7 +222,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::mat >::type X_full(X_fullSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type X_red(X_redSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type red_df(red_dfSEXP);
-    rcpp_result_gen = Rcpp::wrap(two_factor_anova_cpp(y, X_full, X_red, red_df));
+    Rcpp::traits::input_parameter< arma::colvec >::type group_ids(group_idsSEXP);
+    rcpp_result_gen = Rcpp::wrap(two_factor_anova_cpp(y, X_full, X_red, red_df, group_ids));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -245,7 +246,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_pmartR_pooled_cv_rcpp", (DL_FUNC) &_pmartR_pooled_cv_rcpp, 2},
     {"_pmartR_rcpp_hello_world", (DL_FUNC) &_pmartR_rcpp_hello_world, 0},
     {"_pmartR_ptukey_speed", (DL_FUNC) &_pmartR_ptukey_speed, 2},
-    {"_pmartR_two_factor_anova_cpp", (DL_FUNC) &_pmartR_two_factor_anova_cpp, 4},
+    {"_pmartR_two_factor_anova_cpp", (DL_FUNC) &_pmartR_two_factor_anova_cpp, 5},
     {NULL, NULL, 0}
 };
 
