@@ -169,7 +169,7 @@ anova_test <- function(omicsData, comparisons = NULL, pval_adjust = 'none', pval
     #The new "data" are the paired differences, so overwrite data with paried differences
     #Rcpp::sourceCpp('src/fc_functions.cpp')
     #data <- fold_change_diff_na_okay(data = data.matrix(omicsData$e_data[,-1]),C = t(pid_matrix)) #This failed if columns didn't 
-    data <- fold_change_diff_na_okay(data = data.matrix(omicsData$e_data[,omicsData$f_data[,samp_cname]]),C = t(pid_matrix))
+    data <- fold_change_diff_na_okay(data = data.matrix(omicsData$e_data[,as.character(omicsData$f_data[,samp_cname])]),C = t(pid_matrix))
     
     #Add columns names 
     if(is.numeric(omicsData$f_data[,pair_col])){
