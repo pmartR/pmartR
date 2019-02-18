@@ -212,8 +212,10 @@ anova_test <- function(omicsData, comparisons = NULL, pval_adjust = 'none', pval
     cov_samp_col <- which(colnames(covariates)==samp_cname)
     if(length(cov_samp_col)==0){
       warning(paste(samp_cname,"information is missing from provided covariates thus covariates will be ignored"))
+      red_df <- matrix(rep(0,nrow(data)),ncol=1)
     }else if(any(is.na(covariates[,-cov_samp_col]))){
       warning("Missing values were detected in the provided covariates thus covariates will be ignored")
+      red_df <- matrix(rep(0,nrow(data)),ncol=1)
     }else{
       #Add group ids to covariate ids
       covariates <- merge(groupData, covariates,sort=FALSE)

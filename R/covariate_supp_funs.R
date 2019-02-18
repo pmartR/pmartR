@@ -38,13 +38,19 @@ reduce_xmatrix <- function(x,ngroups){
   p <- ncol(x)
   orig_rank <- qr(x)$rank
   if(orig_rank<p){
-    stdx <- apply(x,2,function(mat) (mat-mean(mat))/sd(mat))
-    dmat <- as.matrix(dist(t(stdx)))
-    dmat <- dmat[(1:ngroups),-(1:ngroups)]
-    if(any(dmat==0)){
-      ind_mat <- matrix(1:ngroups,ngroups,(p-ngroups))
-      cols_to_remove <- ind_mat[which(dmat==0)]
-      x[,cols_to_remove] <- 0
+    #Remove constant columns
+    col_sds <- apply(x,2,sd)
+    if(any(col_sds==0)){
+      x <- x[,-which(col_sds==0)]
+    }else{
+      stdx <- apply(x,2,function(mat) (mat-mean(mat))/sd(mat))
+      dmat <- as.matrix(dist(t(stdx)))
+      dmat <- dmat[(1:ngroups),-(1:ngroups)]
+      if(any(dmat==0)){
+        ind_mat <- matrix(1:ngroups,ngroups,(p-ngroups))
+        cols_to_remove <- ind_mat[which(dmat==0)]
+        x[,cols_to_remove] <- 0
+      }
     }
   }
   return(x)
