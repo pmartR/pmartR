@@ -53,15 +53,6 @@ List two_factor_anova_cpp(arma::mat y, arma::mat X_full, arma::mat X_red, Numeri
     csums = sum(X_full_nona,0);
     zero_cols = arma::find(csums==0);
     non_zero_cols = arma::find(csums);
-    //if(zero_cols.n_rows>0){
-    //  for(j=(zero_cols.n_rows-1);j>=0;j--){
-    //    X_full_nona.shed_col(zero_cols[j]);
-    //  }  
-    //}
-    
-    //while(rank(X_full_nona)<X_full_nona.n_cols){
-    //  X_full_nona.shed_col((X_full_nona.n_cols-1));
-    //}
     
     df_red = X_red_nona.n_rows-rank(X_red_nona)-red_df(i); //Subtract off df spent elsewhere, e.g., on covariates
     df_full = X_full_nona.n_rows-rank(X_full_nona)-red_df(i);
@@ -94,17 +85,20 @@ List two_factor_anova_cpp(arma::mat y, arma::mat X_full, arma::mat X_red, Numeri
       sig_est(i) = sigma2_full;
     }else{
       XFinal = X_full_nona;
-      //Rcpp::Rcout << "Dim XFinal: " << XFinal.n_cols << "; p_red "<<p_red<<"; p_full "<<p_full << std::endl;
+      
       XFinal.cols(p_red,p_full-1).fill(0.0); //Zero out the interaction terms if they're insignificant
       sig_est(i) = sigma2_red;
     }
-    //Rcpp::Rcout <<"Xfinal\n"<<XFinal;  
+    
+    //"Parameter estiamtes" are the group means: Xbeta_hat=X(XpX)^{-1}XpY
     par_ests_temp = XFinal*pinv(XFinal.t()*XFinal)*XFinal.t()*yrowi_nona.t();
-    //Rcpp::Rcout <<"par_ests_temp \n"<<par_ests_temp<<"\n";  
+    
+    //Find groups that had at least one non-missing value
     group_ids_nona_unq=arma::unique(group_ids_nona);
-    //Rcpp::Rcout <<"size_na_gps \n"<< group_ids_nona;  
     
     
+    
+    //Fill in the par_ests vector, put NaN if group was missing or the average effect in groups with no missing data
     if(group_ids_nona_unq.n_elem<p_full){
       par_ests.zeros();
       //cntr = 0;
@@ -126,12 +120,11 @@ List two_factor_anova_cpp(arma::mat y, arma::mat X_full, arma::mat X_red, Numeri
       }
     }
     
-    //Rcpp::Rcout <<"par_ests \n"<<par_ests;  
     
     
     parmat.row(i) = par_ests.t();
-    //Rcpp::Rcout <<"group_ids_nona \n"<<group_ids_nona;  
-    //Sum columns of to get number of observations in each group
+    
+    //Compute group sizes after accounting for NaNs
     for(j=0;j<p_full;j++){
       size_j = find(group_ids_nona==j);
       gsizes(j) = size_j.n_elem;
@@ -151,6 +144,7 @@ List two_factor_anova_cpp(arma::mat y, arma::mat X_full, arma::mat X_red, Numeri
 
 /*
 ** R
+#Testing in R
 nrows_to_kp <- nrow(data)
 ytst <- matrix(data.matrix(unname(data[1:nrows_to_kp,])),nrow=nrows_to_kp)
 grp_nums <- as.numeric(as.factor(groupData$Group))
