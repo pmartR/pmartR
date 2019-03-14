@@ -4,8 +4,9 @@
 \alias{protein_quant}
 \title{protein_quant wrapper function}
 \usage{
-protein_quant(pepData, method, isoformRes = NULL, qrollup_thresh = NULL,
-  single_pep = FALSE, single_observation = FALSE, combine_fn = "median",
+protein_quant(pepData, method, isoformRes = NULL,
+  qrollup_thresh = NULL, single_pep = FALSE,
+  single_observation = FALSE, combine_fn = "median",
   use_parallel = TRUE)
 }
 \arguments{

@@ -2,13 +2,9 @@
 % Please edit documentation in R/edata_replace.R
 \name{edata_replace}
 \alias{edata_replace}
-\alias{edata_replace}
 \alias{edata_replace.pepData}
-\alias{edata_replace}
 \alias{edata_replace.proData}
-\alias{edata_replace}
 \alias{edata_replace.metabData}
-\alias{edata_replace}
 \alias{edata_replace.lipidData}
 \title{Replace Values Equal to x with y}
 \usage{

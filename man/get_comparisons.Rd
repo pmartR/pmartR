@@ -2,7 +2,6 @@
 % Please edit documentation in R/get_comparisons.R, R/helper_fn.R
 \name{get_comparisons}
 \alias{get_comparisons}
-\alias{get_comparisons}
 \title{Returns data.frame with comparisons to be made}
 \usage{
 get_comparisons(statRes)
