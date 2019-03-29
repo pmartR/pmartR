@@ -104,7 +104,7 @@ anova_test <- function(omicsData, comparisons = NULL, pval_adjust = 'none', pval
   }
   
   # Check for log transform #
-  if(!(attr(omicsData,"data_info")$data_scale%in%c("log2","log"))){
+  if(!(attr(omicsData,"data_info")$data_scale%in%c("log2","log","log10"))){
     stop("Data must be log transformed in order to implement ANOVA.")
   }
   
@@ -277,7 +277,7 @@ anova_test <- function(omicsData, comparisons = NULL, pval_adjust = 'none', pval
   }
   
   #Different way to compute fold change: diff if log scale, ratio otherwise
-  if(attr(omicsData,"data_info")$data_scale%in%c("log2","log")){
+  if(attr(omicsData,"data_info")$data_scale%in%c("log2","log","log10")){
     fold_change <- group_comp$diff_mat
   }else{
     #CONSIDER MAKING GROUP_COMPARISON RETURN THE CMAT ALONG WITH EVERYTHING ELSE INSTEAD OF RECREATING IT HERE
