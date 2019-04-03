@@ -43,8 +43,8 @@ qrollup<- function(pepData, qrollup_thresh, combine_fn = "median", parallel = TR
   pep_id = attr(pepData, "cnames")$edata_cname
   pro_id = attr(pepData, "cnames")$emeta_cname
   
-  pep = data.table(pepData$e_data)
-  pro = data.table(pepData$e_meta[,c(pep_id, pro_id)])
+  pep = data.table::data.table(pepData$e_data)
+  pro = data.table::data.table(pepData$e_meta[,c(pep_id, pro_id)])
   temp = merge(x = pro, y = pep, by = pep_id, all.x = F, all.y = T)
   temp = as.data.frame(temp, check.names=check_names)[,-which(names(temp)==pep_id)]
   
