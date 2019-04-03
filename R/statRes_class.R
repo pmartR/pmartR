@@ -368,7 +368,7 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, fc_colors = 
     
     # draw a line if threshold specified
     if(!is.null(fc_threshold)){
-      p1 <- p1 + geom_hline(aes(yintercept=fc_threshold))
+      p1 <- p1 + geom_vline(aes(xintercept=abs(fc_threshold)), lty = 2) + geom_vline(aes(xintercept = abs(fc_threshold)*(-1)), lty = 2)
     }
     
     # apply theme_bw() and interactivity if specified
