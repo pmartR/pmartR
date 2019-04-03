@@ -43,6 +43,7 @@
 #' 
 #'}
 #' 
+#' @name missingval_volcanoplot
 #' @rdname missingval_volcanoplot
 #' @export
 #'
