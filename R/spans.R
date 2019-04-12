@@ -142,7 +142,7 @@ spans_procedure <- function(omicsData, norm_fn = c("median", "mean", "zscore", "
       group = attr(omicsData, "group_DF")$Group
     }
     else{
-      if(!is.character(group) | !(group %in% colnames(omicsData$f_data[,-fdata_cname]))) stop("group must be a string specifying a column in f_data by which to group by")
+      if(!is.character(group) | !(group %in% colnames(omicsData$f_data[,-which(colnames(omicsData$f_data) == fdata_cname)]))) stop("group must be a string specifying a column in f_data by which to group by")
       omicsData <- group_designation(omicsData, main_effects = group)
       group = attr(omicsData, "group_DF")$Group
     }

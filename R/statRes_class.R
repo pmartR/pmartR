@@ -314,13 +314,17 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, fc_colors = 
       cols_anova <- c("-2" = fc_colors[2], "-1" = fc_colors[1], "0" = fc_colors[2], "1" = fc_colors[3], "2" = fc_colors[2])
       
       # temp data with rows only for ANOVA
-      temp_data_anova <- volcano %>% dplyr::filter(Type == "ANOVA")
+      temp_data_anova <- volcano %>% dplyr::filter(Type == "ANOVA") %>% 
+        dplyr::mutate(Fold_change_flag = dplyr::case_when(Fold_change > 0 & P_value <= attr(x, "pval_thresh") ~  "1", 
+                                                          Fold_change < 0 & P_value <= attr(x, "pval_thresh") ~ "-1", 
+                                                          is.na(Fold_change) ~ "0",
+                                                          TRUE ~ Fold_change_flag))
       
       # interactive plots need manual text applied to prepare for ggplotly conversion
       if(interactive){
         p1 <- ggplot(temp_data_anova, aes(Fold_change,-log(P_value,base=10), text = paste("ID:", !!rlang::sym(idcol), "<br>", "Pval:", round(P_value, 4))))
       }
-      else p1 <- ggplot(data = temp_data_anova, aes(Fold_change,-log(P_value,base=10)))
+      else p1 <- ggplot(data = temp_data_anova, aes(Fold_change,-log(P_value,base=10))) 
       
       p1 <- p1 +
           geom_point(aes(color = Fold_change_flag), shape = 1)+
@@ -337,8 +341,10 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, fc_colors = 
       cols_gtest <- c("-2" = fc_colors[1], "-1" = fc_colors[2], "0" = fc_colors[2], "1" = fc_colors[2], "2" = fc_colors[3])
       temp_data_gtest <- volcano %>% 
         dplyr::filter(Type == "G-test") %>% 
-        dplyr::mutate(Fold_change_flag = ifelse(Prop_First_Group > Prop_Second_Group & P_value <= attr(x, "pval_thresh"), 2, 
-                                                ifelse(Prop_First_Group < Prop_Second_Group & P_value <= attr(x, "pval_thresh"), -2, Fold_change_flag)))
+        dplyr::mutate(Fold_change_flag = dplyr::case_when(Prop_First_Group > Prop_Second_Group & P_value <= attr(x, "pval_thresh") ~  "2", 
+                                                          Prop_First_Group < Prop_Second_Group & P_value <= attr(x, "pval_thresh") ~ "-2", 
+                                                          is.na(Fold_change) ~ "0",
+                                                          TRUE ~ Fold_change_flag))
       
       if(interactive){
         p2 <- ggplot(temp_data_gtest, aes(Count_Second_Group, Count_First_Group, text = paste("ID:", !!rlang::sym(idcol), "<br>", "Pval:", round(P_value, 4))))
@@ -362,7 +368,7 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, fc_colors = 
     
     # draw a line if threshold specified
     if(!is.null(fc_threshold)){
-      p1 <- p1 + geom_hline(aes(yintercept=fc_threshold))
+      p1 <- p1 + geom_vline(aes(xintercept=abs(fc_threshold)), lty = 2) + geom_vline(aes(xintercept = abs(fc_threshold)*(-1)), lty = 2)
     }
     
     # apply theme_bw() and interactivity if specified

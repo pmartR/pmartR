@@ -4,7 +4,8 @@
 \alias{qrollup}
 \title{Applies qrollup function}
 \usage{
-qrollup(pepData, qrollup_thresh, combine_fn = "median", parallel = TRUE)
+qrollup(pepData, qrollup_thresh, combine_fn = "median",
+  parallel = TRUE)
 }
 \arguments{
 \item{pepData}{an omicsData object of class 'pepData'}

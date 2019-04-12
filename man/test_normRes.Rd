@@ -9,7 +9,7 @@ test_normRes(norm_object, test_fn = "kw", group_vec = NULL)
 \arguments{
 \item{norm_object}{An object of class 'pepData', 'proData', 'lipidData', 'metabData', 'isobaricpepData' that has had \code{normalize_global()} run on it, or a 'normRes' object}
 
-\item{test_fn}{The statistical test to use, current tests are: "kw" = Kruskal-Wallis test.}
+\item{test_fn}{The statistical test to use, current tests are "anova" and "kw" for a Kruskal-Wallis test.}
 
 \item{group_vec}{character vector of the same length as the number of normalization parameters (number of samples)}
 }

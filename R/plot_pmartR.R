@@ -1196,7 +1196,8 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     colorDF <- attributes(color_temp)$group_DF
     colnames(colorDF)[1:2] <- c("variable", color_by)
     plot_data <- merge(plot_data, colorDF, by = "variable")
-    plot_data[[color_by]] <- factor(plot_data[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
+    color_levels <- if(color_by != "group_DF") unique(factor(omicsData$f_data[[color_by]])) else unique(factor(attr(omicsData, "group_DF")[["Group"]]))
+    plot_data[[color_by]] <- factor(plot_data[[color_by]], levels = color_levels)
     
     p <- ggplot(plot_data) + geom_boxplot(aes_string(x = "variable", y = "value", fill = color_by)) +
       theme(plot.title = element_text(size=title_size),
@@ -1244,7 +1245,8 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     # reorder levels #
     plot_data <- plot_data[order(plot_data[,order_by]),]
     plot_data$variable <- factor(plot_data$variable, levels=unique(plot_data$variable), ordered=TRUE)
-    plot_data[[color_by]] <- factor(plot_data[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
+    color_levels <- if(color_by != "group_DF") unique(factor(omicsData$f_data[[color_by]])) else unique(factor(attr(omicsData, "group_DF")[["Group"]]))
+    plot_data[[color_by]] <- factor(plot_data[[color_by]], levels = color_levels)
     
     p <- ggplot(plot_data) + geom_boxplot(aes_string(x = "variable", y = "value", fill = color_by)) +
       theme(plot.title = element_text(size=title_size),
@@ -1457,7 +1459,8 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     colorDF <- attributes(color_temp)$group_DF
     colnames(colorDF)[1:2] <- c("variable", color_by)
     plot_data <- merge(plot_data, colorDF, by = "variable")
-    plot_data[[color_by]] <- factor(plot_data[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
+    color_levels <- if(color_by != "group_DF") unique(factor(omicsData$f_data[[color_by]])) else unique(factor(attr(omicsData, "group_DF")[["Group"]]))
+    plot_data[[color_by]] <- factor(plot_data[[color_by]], levels = color_levels)
     
     p <- ggplot(plot_data) + geom_boxplot(aes_string(x = "variable", y = "value", fill = color_by)) +
       theme(plot.title = element_text(size=title_size),
@@ -1505,7 +1508,8 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     # reorder levels #
     plot_data <- plot_data[order(plot_data[,order_by]),]
     plot_data$variable <- factor(plot_data$variable, levels=unique(plot_data$variable), ordered=TRUE)
-    plot_data[[color_by]] <- factor(plot_data[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
+    color_levels <- if(color_by != "group_DF") unique(factor(omicsData$f_data[[color_by]])) else unique(factor(attr(omicsData, "group_DF")[["Group"]]))
+    plot_data[[color_by]] <- factor(plot_data[[color_by]], levels = color_levels)
     
     p <- ggplot(plot_data) + geom_boxplot(aes_string(x = "variable", y = "value", fill = color_by)) +
       theme(plot.title = element_text(size=title_size),
@@ -1717,7 +1721,8 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     colorDF <- attributes(color_temp)$group_DF
     colnames(colorDF)[1:2] <- c("variable", color_by)
     plot_data <- merge(plot_data, colorDF, by = "variable")
-    plot_data[[color_by]] <- factor(plot_data[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
+    color_levels <- if(color_by != "group_DF") unique(factor(omicsData$f_data[[color_by]])) else unique(factor(attr(omicsData, "group_DF")[["Group"]]))
+    plot_data[[color_by]] <- factor(plot_data[[color_by]], levels = color_levels)
     
     p <- ggplot(plot_data) + geom_boxplot(aes_string(x = "variable", y = "value", fill = color_by)) +
       theme(plot.title = element_text(size=title_size),
@@ -1766,7 +1771,8 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     # reorder levels #
     plot_data <- plot_data[order(plot_data[,order_by]),]
     plot_data$variable <- factor(plot_data$variable, levels=unique(plot_data$variable), ordered=TRUE)
-    plot_data[[color_by]] <- factor(plot_data[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
+    color_levels <- if(color_by != "group_DF") unique(factor(omicsData$f_data[[color_by]])) else unique(factor(attr(omicsData, "group_DF")[["Group"]]))
+    plot_data[[color_by]] <- factor(plot_data[[color_by]], levels = color_levels)
     
     p <- ggplot(plot_data) + geom_boxplot(aes_string(x = "variable", y = "value", fill = color_by)) +
       theme(plot.title = element_text(size=title_size),
@@ -1981,7 +1987,8 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     colorDF <- attributes(color_temp)$group_DF
     colnames(colorDF)[1:2] <- c("variable", color_by)
     plot_data <- merge(plot_data, colorDF, by = "variable")
-    plot_data[[color_by]] <- factor(plot_data[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
+    color_levels <- if(color_by != "group_DF") unique(factor(omicsData$f_data[[color_by]])) else unique(factor(attr(omicsData, "group_DF")[["Group"]]))
+    plot_data[[color_by]] <- factor(plot_data[[color_by]], levels = color_levels)
     
     p <- ggplot(plot_data) + geom_boxplot(aes_string(x = "variable", y = "value", fill = color_by)) +
       theme(plot.title = element_text(size=title_size),
@@ -2030,7 +2037,8 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     # reorder levels #
     plot_data <- plot_data[order(plot_data[,order_by]),]
     plot_data$variable <- factor(plot_data$variable, levels=unique(plot_data$variable), ordered=TRUE)
-    plot_data[[color_by]] <- factor(plot_data[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
+    color_levels <- if(color_by != "group_DF") unique(factor(omicsData$f_data[[color_by]])) else unique(factor(attr(omicsData, "group_DF")[["Group"]]))
+    plot_data[[color_by]] <- factor(plot_data[[color_by]], levels = color_levels)
     
     p <- ggplot(plot_data) + geom_boxplot(aes_string(x = "variable", y = "value", fill = color_by)) +
       theme(plot.title = element_text(size=title_size),
