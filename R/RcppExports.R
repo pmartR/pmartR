@@ -70,7 +70,7 @@ ptukey_speed <- function(qstats, sizes) {
     .Call('_pmartR_ptukey_speed', PACKAGE = 'pmartR', qstats, sizes)
 }
 
-two_factor_anova_cpp <- function(y, X_full, X_red, red_df) {
-    .Call('_pmartR_two_factor_anova_cpp', PACKAGE = 'pmartR', y, X_full, X_red, red_df)
+two_factor_anova_cpp <- function(y, X_full, X_red, red_df, group_ids) {
+    .Call('_pmartR_two_factor_anova_cpp', PACKAGE = 'pmartR', y, X_full, X_red, red_df, group_ids)
 }
 

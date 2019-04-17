@@ -30,7 +30,8 @@ Imports:
     gridExtra,
     reshape2,
     RcppArmadillo,
-    RColorBrewer
+    RColorBrewer,
+    magrittr
 Suggests:
     knitr,
     rmarkdown,
@@ -38,3 +39,5 @@ Suggests:
     pcaMethods,
     limma
 RoxygenNote: 6.1.1
+Encoding: UTF-8
+
