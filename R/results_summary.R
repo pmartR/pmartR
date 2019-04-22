@@ -60,7 +60,7 @@ summary.SPANSRes <- function(SPANSRes_obj){
   
   spanscores <- sort(unique(SPANSRes_obj$SPANS_score), decreasing = TRUE)
   SPANSRes_obj <- SPANSRes_obj %>% 
-    dplyr::mutate(rank = dplyr::dense_rank(desc(SPANS_score)))
+    dplyr::mutate(rank = dplyr::dense_rank(dplyr::desc(SPANS_score)))
   
   cat("\nSummary of spans procedure\n")
   

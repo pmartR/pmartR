@@ -309,8 +309,8 @@ spans_procedure <- function(omicsData, norm_fn = c("median", "mean", "zscore", "
       extra_info[i, ] <- list(ss, norm, params, p_loc, p_scale, F_HSmPV, F_NSmPV, score)
     }
     
-    spansres_obj <- dplyr::arrange(spansres_obj, desc(SPANS_score))
-    extra_info <- dplyr::arrange(extra_info, desc(SPANS_score)) %>% dplyr::select(-SPANS_score)
+    spansres_obj <- dplyr::arrange(spansres_obj, dplyr::desc(SPANS_score))
+    extra_info <- dplyr::arrange(extra_info, dplyr::desc(SPANS_score)) %>% dplyr::select(-SPANS_score)
     
     attr(spansres_obj, "method_selection_pvals") <- extra_info
     attr(spansres_obj, "group_vector") = group
