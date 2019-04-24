@@ -28,6 +28,7 @@
 #' 
 #' }
 #' 
+#' @name bpquant
 #' @rdname bpquant
 #' @export
 
