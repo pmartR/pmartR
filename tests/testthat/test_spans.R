@@ -13,6 +13,9 @@ rand_subset_fn <- c("ppp_rip", "all")
 expect_error(spans_procedure(pmartRdata::pep_object))
 
 myobject <- edata_transform(pmartRdata::pep_object, data_scale = "log2")
+set.seed(101)
+shuffle_fdata <- sample(1:nrow(myobject$f_data))
+myobject$f_data <- myobject$f_data[shuffle_fdata,]
 expect_error(spans_procedure(myobject))
 
 myobject <- group_designation(myobject, main_effects = "Condition")

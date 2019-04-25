@@ -16,7 +16,7 @@ run_twofactor_cpp <- function(data,gpData,red_df){
   red_gpData <- dplyr::distinct(gpData,Group,.keep_all=TRUE)
   red_gpData <- dplyr::arrange(red_gpData,y)
   
-  means <- res$par_estimates
+  means <- res$par_estimates[,1:length(red_gpData$Group)]
   colnames(means) <- red_gpData$Group
   
   res$group_means <- means

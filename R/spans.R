@@ -139,12 +139,17 @@ spans_procedure <- function(omicsData, norm_fn = c("median", "mean", "zscore", "
     
     # assign group variable or internally call group_designation() if user specified a grouping column in f_data
     if(is.null(group)){
-      group = attr(omicsData, "group_DF")$Group
+      if(!inherits(attr(omicsData, "group_DF"), "data.frame")) stop("the omicsData object must have a grouping structure, usually set by calling group_designation() on the object")
+      group_df = attr(omicsData, "group_DF")
+      reorder = match(colnames(omicsData$e_data)[-which(colnames(omicsData$e_data) == edata_cname)], as.character(group_df[,fdata_cname]))
+      group = group_df[reorder,]$Group
     }
     else{
       if(!is.character(group) | !(group %in% colnames(omicsData$f_data[,-which(colnames(omicsData$f_data) == fdata_cname)]))) stop("group must be a string specifying a column in f_data by which to group by")
       omicsData <- group_designation(omicsData, main_effects = group)
-      group = attr(omicsData, "group_DF")$Group
+      group_df = attr(omicsData, "group_DF")
+      reorder = match(colnames(omicsData$e_data)[-which(colnames(omicsData$e_data) == edata_cname)], as.character(group_df[,fdata_cname]))
+      group = group_df[reorder,]$Group
     }
       
     # misc input checks
@@ -309,8 +314,8 @@ spans_procedure <- function(omicsData, norm_fn = c("median", "mean", "zscore", "
       extra_info[i, ] <- list(ss, norm, params, p_loc, p_scale, F_HSmPV, F_NSmPV, score)
     }
     
-    spansres_obj <- dplyr::arrange(spansres_obj, desc(SPANS_score))
-    extra_info <- dplyr::arrange(extra_info, desc(SPANS_score)) %>% dplyr::select(-SPANS_score)
+    spansres_obj <- dplyr::arrange(spansres_obj, dplyr::desc(SPANS_score))
+    extra_info <- dplyr::arrange(extra_info, dplyr::desc(SPANS_score)) %>% dplyr::select(-SPANS_score)
     
     attr(spansres_obj, "method_selection_pvals") <- extra_info
     attr(spansres_obj, "group_vector") = group
@@ -338,7 +343,11 @@ spans_procedure <- function(omicsData, norm_fn = c("median", "mean", "zscore", "
 #'  These are obtained from a SINGLE Kruskal-Wallis test on data normalized by scale/location factors determined from a randomly selected subset of peptides and normalization method
 spans_make_distribution <- function(omicsData, norm_fn, sig_inds, nonsig_inds, select_n){
   edata_cname = get_edata_cname(omicsData)
-  group_vector = as.character(attr(omicsData, "group_DF")$Group)
+  group_df = attr(omicsData, "group_DF")
+  
+  # put the samples in the group vector in the same order as in the columns of e_data
+  reorder = match(colnames(omicsData$e_data)[-which(colnames(omicsData$e_data) == edata_cname)], as.character(group_df[,get_fdata_cname(omicsData)]))
+  group_vector = as.character(group_df[reorder,]$Group)
   nsamps = attributes(omicsData)$data_info$num_samps
   
   # need a matrix to pass to kw_rcpp
