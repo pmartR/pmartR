@@ -55,6 +55,7 @@ statRes_output <- function(imd_out,omicsData,comparisons,test_method,pval_adjust
   attr(imd_out,"statistical_test") <- test_method
   attr(imd_out, "adjustment_method") <- pval_adjust
   attr(imd_out, "pval_thresh") <- pval_thresh
+  attr(imd_out, "data_info") <- attr(omicsData, "data_info")
   class(imd_out) <- "statRes"
   return(imd_out)
 }
@@ -329,7 +330,7 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, fc_colors = 
       p1 <- p1 +
           geom_point(aes(color = Fold_change_flag), shape = 1)+
           facet_wrap(~Comparison) +
-          ylab("-log[10](p-value)")+xlab("Fold-change") +
+          ylab("-log[10](p-value)")+xlab(sprintf("Fold-change (%s)", attr(x, 'data_info')$data_scale)) +
           scale_color_manual(values = cols_anova, name = "Fold Change", 
                              labels = c("Neg(Anova)", "0", "Pos(Anova)"),
                              breaks = c("-1", "0", "1")) + 
@@ -391,7 +392,9 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, fc_colors = 
         p2 <- p2 %>% plotly::ggplotly(tooltip = c("text"))
         suppressWarnings(
           p <- plotly::subplot(p1, p2, nrows = 2) %>% 
-            plotly::layout(showlegend = FALSE, title = "TOP: -log10-pvalue vs fold change | BOTTOM:  #Present in each group | Colored by fold change direction",
+            plotly::layout(showlegend = FALSE, 
+                           title = sprintf("TOP: -log10-pvalue vs %s fold change | BOTTOM:  #Present in each group | Colored by fold change direction",
+                                                               attr(x, 'data_info')$data_scale),
                            font = list(size = 10))
         )
         return(p)
