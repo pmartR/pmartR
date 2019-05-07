@@ -114,7 +114,7 @@ List group_comparison_anova_cpp(arma::mat means, arma::mat sizes, arma::vec sigm
     for(k=0; k<num_comparisons; k++){
       
       //Only compute p-values if the degrees of freedom are atleast 3
-      if(arma::is_finite(t_tests(i,k)) && (N-n_groups)>2){
+      if(arma::is_finite(t_tests(i,k)) && (N-n_groups)>0){
         p_values(i,k) = 2*R::pt(fabs(t_tests(i,k)),(N-n_groups),false,false);
       }else{
         p_values(i,k) = arma::datum::nan;
