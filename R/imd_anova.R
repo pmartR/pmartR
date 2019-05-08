@@ -242,6 +242,7 @@ imd_anova <- function(omicsData, comparisons = NULL, test_method, pval_adjust = 
   
   final_out <- statRes_output(imd_out,omicsData,comparisons,test_method,pval_adjust,pval_thresh)
   
+  attr(final_out, "cnames") = attr(omicsData, "cnames")
   return(final_out)
 }
 
