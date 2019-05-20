@@ -186,6 +186,19 @@ imd_anova <- function(omicsData, comparisons = NULL, test_method, pval_adjust = 
   all_anova <- cbind(anova_results,anova_pvalues,anova_fold_change,anova_fold_flags)
   Full_results <- base::merge(all_gtest,all_anova,all=TRUE,fill=NA,sort=FALSE)
   
+  #Get counts for rows in "anova_results" but not in "imd_counts"
+  final_cnts <- Full_results[,grep("Count",colnames(Full_results))]
+  msng_cnts <- which(is.na(rowSums(final_cnts)))
+  if(length(msng_cnts)>0){
+    to_fix <- Full_results[msng_cnts,]$Peptide
+    omicsData2 <- omicsData
+    omicsData2$e_data <- omicsData$e_data%>%filter(Peptide%in%as.character(to_fix))
+    new_cnts <- imd_test(omicsData = omicsData2, comparisons = NULL, pval_adjust = 'none', pval_thresh = pval_thresh)
+    rm(omicsData2)
+    #Replace the NA counts with the correct counts
+    Full_results[msng_cnts,grep("Count",colnames(Full_results))] <- new_cnts$Results[,grep("Count",colnames(new_cnts$Results))]
+  }
+  
   ##I added this catch for some reason, but I don't know why and it stops some perfectly fine code
   #if(nrow(Full_results)>max(nrow(all_gtest),nrow(all_anova))){
   #  stop("Combining g-test and ANOVA results failed.")
