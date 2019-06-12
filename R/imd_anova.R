@@ -160,7 +160,7 @@ imd_anova <- function(omicsData, comparisons = NULL, test_method, pval_adjust = 
 
     final_out <- statRes_output(imd_out,omicsData,comparisons,test_method,pval_adjust,pval_thresh) 
     attr(final_out, "cnames") = attr(omicsData, "cnames")
-    attr(final_out, "parent_class") = attr(omicsData, "class")
+    attr(final_out, "data_class") = attr(omicsData, "class")
     return(final_out)
     
   }else if(test_method=='gtest'){
@@ -181,7 +181,7 @@ imd_anova <- function(omicsData, comparisons = NULL, test_method, pval_adjust = 
 
     final_out <- statRes_output(imd_out,omicsData,comparisons,test_method,pval_adjust,pval_thresh) 
     attr(final_out, "cnames") = attr(omicsData, "cnames")
-    attr(final_out, "parent_class") = attr(omicsData, "class")
+    attr(final_out, "data_class") = attr(omicsData, "class")
     return(final_out)
   }
   
@@ -262,7 +262,7 @@ imd_anova <- function(omicsData, comparisons = NULL, test_method, pval_adjust = 
   final_out <- statRes_output(imd_out,omicsData,comparisons,test_method,pval_adjust,pval_thresh)
   
   attr(final_out, "cnames") = attr(omicsData, "cnames")
-  attr(final_out, "parent_class") = attr(omicsData, "class")
+  attr(final_out, "data_class") = attr(omicsData, "class")
   return(final_out)
 }
 
