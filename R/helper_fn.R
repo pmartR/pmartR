@@ -82,24 +82,24 @@ setchecknames<- function(omicsData, set_to = TRUE){
 }
 
 
-#' Get group info of omicsData object
+#' Get group info of omicsObject object
 #' 
-#' This function returns the "group_DF" attribute of an omicsData object
+#' This function returns the "group_DF" attribute of an omicsObject object
 #' 
-#' @param omicsData an object of the class 'pepData', 'proData', 'metabData', or 'lipidData', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.
-#' @return a data.frame containing omicsData object group info
+#' @param omicsObject an object of the class 'pepData', 'proData', 'metabData', 'lipidData', or 'statRes', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, or \code{\link{imd_anova}} respectively.
+#' @return a data.frame containing omicsObject object group info
 #' @examples 
 #' dontrun{
-#' get_group_info(omicsData)
+#' get_group_info(omicsObject)
 #'}
 #' @rdname get_group_info
 #' @export
-get_group_info<- function(omicsData){
-  # check that omicsData is of appropriate class #
-  if(!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData"))) stop("omicsData must be of class 'pepData', 'proData', 'metabData', or 'lipidData'")
-  if(is.null(attr(omicsData, "group_DF"))) stop("group_designation has not been run on omicsData")
+get_group_info<- function(omicsObject){
+  # check that omicsObject is of appropriate class #
+  if(!inherits(omicsObject, c("pepData", "proData", "metabData", "lipidData", "statRes"))) stop("omicsObject must be of class 'pepData', 'proData', 'metabData', 'lipidData', or 'statRes'")
+  if(is.null(attr(omicsObject, "group_DF"))) stop("group_designation has not been run on omicsObject")
   
-  res = attr(omicsData, "group_DF")
+  res = attr(omicsObject, "group_DF")
   
   return(res)
 }
@@ -109,21 +109,21 @@ get_group_info<- function(omicsData){
 #' 
 #' This function returns a table with number of samples per group
 #' 
-#' @param omicsData an object of the class 'pepData', 'proData', 'metabData', or 'lipidData', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.
+#' @param omicsObject an object of the class 'pepData', 'proData', 'metabData', 'lipidData', or 'statRes', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, or \code{\link{imd_anova}} respectively.
 #' @return a table containing number of samples per group
 #' @examples 
 #' dontrun{
-#' get_group_table(omicsData)
+#' get_group_table(omicsObject)
 #'}
 #' @rdname get_group_table
 #' @export
-get_group_table<- function(omicsData){
-  # check that omicsData is of appropriate class #
-  if(!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData"))) stop("omicsData must be of class 'pepData', 'proData', 'metabData', or 'lipidData'")
-  if(is.null(attr(omicsData, "group_DF"))) stop("group_designation has not been run on omicsData")
+get_group_table<- function(omicsObject){
+  # check that omicsObject is of appropriate class #
+  if(!inherits(omicsObject, c("pepData", "proData", "metabData", "lipidData", "statRes"))) stop("omicsObject must be of class 'pepData', 'proData', 'metabData', 'lipidData', or 'statRes'")
+  if(is.null(attr(omicsObject, "group_DF"))) stop("group_designation has not been run on omicsObject")
   
-  #should the result be constructed from omicsData$f_data or from the group_DF attr? if so...
-  group = attr(omicsData, "group_DF")$Group
+  #should the result be constructed from omicsObject$f_data or from the group_DF attr? if so...
+  group = attr(omicsObject, "group_DF")$Group
   
   return(table(group))
 }
@@ -133,19 +133,19 @@ get_group_table<- function(omicsData){
 #' 
 #' This function returns data scale attribute
 #' 
-#' @param omicsData an object of the class 'pepData', 'proData', 'metabData', or 'lipidData', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.
+#' @param omicsObject an object of the class 'pepData', 'proData', 'metabData', 'lipidData', or 'statRes', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, or \code{\link{imd_anova}} respectively.
 #' @return a character string describing data scale
 #' @examples 
 #' dontrun{
-#' get_data_scale(omicsData)
+#' get_data_scale(omicsObject)
 #'}
 #' @rdname get_data_scale
 #' @export
-get_data_scale<- function(omicsData){
-  # check that omicsData is of appropriate class #
-  if(!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData"))) stop("omicsData must be of class 'pepData', 'proData', 'metabData', or 'lipidData'")
+get_data_scale<- function(omicsObject){
+  # check that omicsObject is of appropriate class #
+  if(!inherits(omicsObject, c("pepData", "proData", "metabData", "lipidData", "statRes"))) stop("omicsObject must be of class 'pepData', 'proData', 'metabData', 'lipidData', or 'statRes'")
   
-  data_scale = attr(omicsData, "data_info")$data_scale
+  data_scale = attr(omicsObject, "data_info")$data_scale
   return(data_scale)
 }
 
@@ -154,19 +154,19 @@ get_data_scale<- function(omicsData){
 #' 
 #' This function returns data norm attribute
 #' 
-#' @param omicsData an object of the class 'pepData', 'proData', 'metabData', or 'lipidData', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.
+#' @param omicsObject an object of the class 'pepData', 'proData', 'metabData', 'lipidData', or 'statRes', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, or \code{\link{imd_anova}} respectively.
 #' @return a character string describing data norm
 #' @examples 
 #' dontrun{
-#' get_data_norm(omicsData)
+#' get_data_norm(omicsObject)
 #'}
 #' @rdname get_data_norm
 #' @export
-get_data_norm<- function(omicsData){
-  # check that omicsData is of appropriate class #
-  if(!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData", "isobaricpepData"))) stop("omicsData must be of class 'pepData', 'proData', 'metabData', 'lipidData', or 'isobaricpepData'")
+get_data_norm<- function(omicsObject){
+  # check that omicsObject is of appropriate class #
+  if(!inherits(omicsObject, c("pepData", "proData", "metabData", "lipidData", "isobaricpepData", "statRes"))) stop("omicsObject must be of class 'pepData', 'proData', 'metabData', 'lipidData', 'isobaricpepData', or 'statRes'")
   
-  data_norm = attr(omicsData, "data_info")$norm_info$is_normalized
+  data_norm = attr(omicsObject, "data_info")$norm_info$is_normalized
   
   return(data_norm)
 }
@@ -196,19 +196,19 @@ get_isobaric_norm<- function(omicsData){
 #' 
 #' This function returns e_data cname
 #' 
-#' @param omicsData an object of the class 'pepData', 'proData', 'metabData', or 'lipidData', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.
+#' @param omicsObject an object of the class 'pepData', 'proData', 'metabData', 'lipidData', or 'statRes', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, or \code{\link{imd_anova}} respectively.
 #' @return a character string describing e_data cname
 #' @examples 
 #' dontrun{
-#' get_edata_cname(omicsData)
+#' get_edata_cname(omicsObject)
 #'}
 #' @rdname get_edata_cname
 #' @export
-get_edata_cname<- function(omicsData){
-  # check that omicsData is of appropriate class #
-  if(!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData"))) stop("omicsData must be of class 'pepData', 'proData', 'metabData', or 'lipidData'")
+get_edata_cname<- function(omicsObject){
+  # check that omicsObject is of appropriate class #
+  if(!inherits(omicsObject, c("pepData", "proData", "metabData", "lipidData", "statRes"))) stop("omicsObject must be of class 'pepData', 'proData', 'metabData', 'lipidData', or 'statRes'")
   
-  edata_cname = attr(omicsData, "cnames")$edata_cname
+  edata_cname = attr(omicsObject, "cnames")$edata_cname
   return(edata_cname)
 }
 
@@ -216,19 +216,19 @@ get_edata_cname<- function(omicsData){
 #' 
 #' This function returns f_data cname
 #' 
-#' @param omicsData an object of the class 'pepData', 'proData', 'metabData', or 'lipidData', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.
+#' @param omicsObject an object of the class 'pepData', 'proData', 'metabData', 'lipidData', or 'statRes', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, or \code{\link{imd_anova}} respectively.
 #' @return a character string describing f_data cname
 #' @examples 
 #' dontrun{
-#' get_fdata_cname(omicsData)
+#' get_fdata_cname(omicsObject)
 #'}
 #' @rdname get_fdata_cname
 #' @export
-get_fdata_cname<- function(omicsData){
-  # check that omicsData is of appropriate class #
-  if(!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData"))) stop("omicsData must be of class 'pepData', 'proData', 'metabData', or 'lipidData'")
+get_fdata_cname<- function(omicsObject){
+  # check that omicsObject is of appropriate class #
+  if(!inherits(omicsObject, c("pepData", "proData", "metabData", "lipidData", "statRes"))) stop("omicsObject must be of class 'pepData', 'proData', 'metabData', 'lipidData', or 'statRes")
   
-  fdata_cname = attr(omicsData, "cnames")$fdata_cname
+  fdata_cname = attr(omicsObject, "cnames")$fdata_cname
   return(fdata_cname)
 }
 
@@ -236,22 +236,22 @@ get_fdata_cname<- function(omicsData){
 #' 
 #' This function returns e_meta cname
 #' 
-#' @param omicsData an object of the class 'pepData', 'proData', 'metabData', or 'lipidData', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.
+#' @param omicsObject an object of the class 'pepData', 'proData', 'metabData', 'lipidData', or 'statRes', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, or \code{\link{imd_anova}} respectively.
 #' @return a character string describing e_meta cname
 #' @examples 
 #' dontrun{
-#' get_emeta_cname(omicsData)
+#' get_emeta_cname(omicsObject)
 #'}
 #' @rdname get_emeta_cname
 #' @export
-get_emeta_cname<- function(omicsData){
-  # check that omicsData is of appropriate class #
-  if(!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData"))) stop("omicsData must be of class 'pepData', 'proData', 'metabData', or 'lipidData'")
+get_emeta_cname<- function(omicsObject){
+  # check that omicsObject is of appropriate class #
+  if(!inherits(omicsObject, c("pepData", "proData", "metabData", "lipidData", "statRes"))) stop("omicsObject must be of class 'pepData', 'proData', 'metabData', 'lipidData', or 'statRes")
   
   #check if emeta is null
-  if(is.null(omicsData$e_meta)) stop("e_meta is NULL in omicsData, thus emeta_cname is also NULL")
+  if(is.null(omicsObject$e_meta)) stop("e_meta is NULL in omicsObject, thus emeta_cname is also NULL")
   
-  emeta_cname = attr(omicsData, "cnames")$emeta_cname
+  emeta_cname = attr(omicsObject, "cnames")$emeta_cname
   return(emeta_cname)
 }
 
