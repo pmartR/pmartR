@@ -158,7 +158,10 @@ imd_anova <- function(omicsData, comparisons = NULL, test_method, pval_adjust = 
     colnames(anova_fold_flags) <- gsub("^Flag_","",colnames(anova_fold_flags))
     imd_out$Flags <- anova_fold_flags
 
-    return(statRes_output(imd_out,omicsData,comparisons,test_method,pval_adjust,pval_thresh))
+    final_out <- statRes_output(imd_out,omicsData,comparisons,test_method,pval_adjust,pval_thresh) 
+    attr(final_out, "cnames") = attr(omicsData, "cnames")
+    attr(final_out, "data_class") = attr(omicsData, "class")
+    return(final_out)
     
   }else if(test_method=='gtest'){
     
@@ -176,7 +179,10 @@ imd_anova <- function(omicsData, comparisons = NULL, test_method, pval_adjust = 
     colnames(gtest_flags) <- gsub("^Flag_","",colnames(gtest_flags))
     imd_out$Flags <- gtest_flags
 
-    return(statRes_output(imd_out,omicsData,comparisons,test_method,pval_adjust,pval_thresh))
+    final_out <- statRes_output(imd_out,omicsData,comparisons,test_method,pval_adjust,pval_thresh) 
+    attr(final_out, "cnames") = attr(omicsData, "cnames")
+    attr(final_out, "data_class") = attr(omicsData, "class")
+    return(final_out)
   }
   
   #####-----Determine which p-values/flags to return--------######
@@ -185,6 +191,19 @@ imd_anova <- function(omicsData, comparisons = NULL, test_method, pval_adjust = 
   all_gtest <- cbind(imd_counts,gtest_pvalues)
   all_anova <- cbind(anova_results,anova_pvalues,anova_fold_change,anova_fold_flags)
   Full_results <- base::merge(all_gtest,all_anova,all=TRUE,fill=NA,sort=FALSE)
+  
+  #Get counts for rows in "anova_results" but not in "imd_counts"
+  final_cnts <- Full_results[,grep("Count",colnames(Full_results))]
+  msng_cnts <- which(is.na(rowSums(final_cnts)))
+  if(length(msng_cnts)>0){
+    to_fix <- Full_results[msng_cnts,get_edata_cname(omicsData)]
+    omicsData2 <- omicsData
+    omicsData2$e_data <- omicsData$e_data%>%filter(!!rlang::sym(get_edata_cname(omicsData))%in%as.character(to_fix))
+    new_cnts <- imd_test(omicsData = omicsData2, comparisons = NULL, pval_adjust = 'none', pval_thresh = pval_thresh)
+    rm(omicsData2)
+    #Replace the NA counts with the correct counts
+    Full_results[msng_cnts,grep("Count",colnames(Full_results))] <- new_cnts$Results[,grep("Count",colnames(new_cnts$Results))]
+  }
   
   ##I added this catch for some reason, but I don't know why and it stops some perfectly fine code
   #if(nrow(Full_results)>max(nrow(all_gtest),nrow(all_anova))){
@@ -242,6 +261,8 @@ imd_anova <- function(omicsData, comparisons = NULL, test_method, pval_adjust = 
   
   final_out <- statRes_output(imd_out,omicsData,comparisons,test_method,pval_adjust,pval_thresh)
   
+  attr(final_out, "cnames") = attr(omicsData, "cnames")
+  attr(final_out, "data_class") = attr(omicsData, "class")
   return(final_out)
 }
 
