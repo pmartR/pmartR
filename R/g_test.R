@@ -45,7 +45,7 @@ g_test <- function(omicsData, return_sizes = FALSE){
   }
   
   #sample_name
-  fdata_cname = get_fdata_cname(omicsData = omicsData)
+  fdata_cname = get_fdata_cname(omicsData)
   sample_name = as.character(groupData[[fdata_cname]])
   
   #Remove rows in "groupData" that don't have corresponding columns in 'omicsData$edata'
