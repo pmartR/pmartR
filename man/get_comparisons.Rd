@@ -4,12 +4,12 @@
 \alias{get_comparisons}
 \title{Returns data.frame with comparisons to be made}
 \usage{
-get_comparisons(statRes)
+get_comparisons(compObj)
 
-get_comparisons(statRes)
+get_comparisons(compObj)
 }
 \arguments{
-\item{statRes}{is an object of class 'statRes'}
+\item{compObj}{is an object with the comparison attribute; specifically objects of class 'statRes' and 'trellData' objects derived from 'statRes' objects in \code{\link{format_data}}}
 
 \item{comp_type}{string taking one of the following values: control, pairwise, custom. Specifying "control" indicates that all other groups are to be compared to this single control group. Specifying "pairwise" indicates that all pairwise comparisons are to be made.}
 
@@ -26,7 +26,7 @@ returns a data frame with comparisons and their indices
 \description{
 The method creates a data.frame containing the comparisons to be made using differential statistics.
 
-This function returns comparisons from statRes object
+This function returns comparisons from statRes or trellData object
 }
 \details{
 This function takes in the omicsData and type of comparison, and returns a data.frame where each row corresponds to a comparison of interest.

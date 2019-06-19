@@ -2,21 +2,21 @@
 % Please edit documentation in R/helper_fn.R
 \name{get_group_info}
 \alias{get_group_info}
-\title{Get group info of omicsData object}
+\title{Get group info of omicsObject object}
 \usage{
-get_group_info(omicsData)
+get_group_info(omicsObject)
 }
 \arguments{
-\item{omicsData}{an object of the class 'pepData', 'proData', 'metabData', or 'lipidData', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.}
+\item{omicsObject}{an object of the class 'pepData', 'proData', 'metabData', 'lipidData', 'statRes', or 'trellData', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, \code{\link{imd_anova}}, or \code{\link{format_data}} respectively.}
 }
 \value{
-a data.frame containing omicsData object group info
+a data.frame containing omicsObject object group info
 }
 \description{
-This function returns the "group_DF" attribute of an omicsData object
+This function returns the "group_DF" attribute of an omicsObject object
 }
 \examples{
 dontrun{
-get_group_info(omicsData)
+get_group_info(omicsObject)
 }
 }
