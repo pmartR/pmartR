@@ -198,7 +198,7 @@ imd_anova <- function(omicsData, comparisons = NULL, test_method, pval_adjust = 
   if(length(msng_cnts)>0){
     to_fix <- Full_results[msng_cnts,get_edata_cname(omicsData)]
     omicsData2 <- omicsData
-    omicsData2$e_data <- omicsData$e_data%>%filter(!!rlang::sym(get_edata_cname(omicsData))%in%as.character(to_fix))
+    omicsData2$e_data <- omicsData$e_data%>%dplyr::filter(!!rlang::sym(get_edata_cname(omicsData))%in%as.character(to_fix))
     new_cnts <- imd_test(omicsData = omicsData2, comparisons = NULL, pval_adjust = 'none', pval_thresh = pval_thresh)
     rm(omicsData2)
     #Replace the NA counts with the correct counts
