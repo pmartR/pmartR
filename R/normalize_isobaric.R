@@ -43,7 +43,7 @@ normalize_isobaric<- function(omicsData, apply_norm = FALSE){
   refpool_notation = attr(omicsData, "isobaric_info")$refpool_notation
   
   #rearranging edata 
-  edata_melt = melt(edata, id.vars = edata_cname)
+  edata_melt = reshape2::melt(edata, id.vars = edata_cname)
   names(edata_melt)[2] = fdata_cname
   edata_melt2 = merge.data.frame(edata_melt, fdata[,c(exp_cname, fdata_cname)], by = fdata_cname)
   split_data = split(edata_melt2, edata_melt2[[exp_cname]])
@@ -131,17 +131,13 @@ normalize_isobaric<- function(omicsData, apply_norm = FALSE){
   return(result)
 }
 
-
-
-
 #lapply function to work on list items in split_data
 myfunc<- function(item, ref_samples, edata_cname, fdata_cname){
   #for formula argument in dcast function
   formula = paste(edata_cname, "~", fdata_cname, sep = "")
   
   #casting data associated with one exp_cname
-  cast_data = dcast(item, formula)
-  
+  cast_data = reshape2::dcast(item, formula)
   #colum number for reference sample
   ref_samp_ind = which(names(cast_data) %in% ref_samples)
   #column number for edata_cname

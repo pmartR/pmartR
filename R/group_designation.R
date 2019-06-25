@@ -30,6 +30,9 @@ group_designation <- function(omicsData, main_effects, covariates=NULL, time_cou
 
   # check that omicsData is of appropriate class #
   if(!inherits(omicsData, c("lipidData","metabData","proData","pepData"))) stop("omicsData is not an object of appropriate class")
+  
+  # check that omicsData is of appropriate class #
+  if(!inherits(omicsData, c("lipidData","metabData","proData","pepData"))) stop("omicsData is not an object of appropriate class")
 
   # Check that main_effects are character vector #
   if( !is.character(main_effects) ) stop("main_effects must be a character vector.")
