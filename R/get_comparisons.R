@@ -13,7 +13,7 @@
 #' @author Kelly Stratton
 #' 
 #' @export
-get_comparisons <- function(comp_type, omicsData, control_group=NULL){
+create_comparisonDF <- function(comp_type, omicsData, control_group=NULL){
   # check that omicsData is of the appropriate class
   if(!inherits(omicsData, c("proData","pepData","lipidData", "metabData"))) stop("omicsData is not an object of appropriate class")
   
