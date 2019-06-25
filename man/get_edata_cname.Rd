@@ -4,10 +4,10 @@
 \alias{get_edata_cname}
 \title{Get e_data cname}
 \usage{
-get_edata_cname(omicsData)
+get_edata_cname(omicsObject)
 }
 \arguments{
-\item{omicsData}{an object of the class 'pepData', 'proData', 'metabData', or 'lipidData', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.}
+\item{omicsObject}{an object of the class 'pepData', 'proData', 'metabData', 'lipidData', 'statRes', or 'trellData', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, \code{\link{imd_anova}}, or \code{\link{format_data}} respectively.}
 }
 \value{
 a character string describing e_data cname
@@ -17,6 +17,6 @@ This function returns e_data cname
 }
 \examples{
 dontrun{
-get_edata_cname(omicsData)
+get_edata_cname(omicsObject)
 }
 }

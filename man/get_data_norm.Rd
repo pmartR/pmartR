@@ -4,10 +4,10 @@
 \alias{get_data_norm}
 \title{Get data norm}
 \usage{
-get_data_norm(omicsData)
+get_data_norm(omicsObject)
 }
 \arguments{
-\item{omicsData}{an object of the class 'pepData', 'proData', 'metabData', or 'lipidData', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.}
+\item{omicsObject}{an object of the class 'pepData', 'proData', 'metabData', 'lipidData', 'statRes', or 'trellData', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, \code{\link{imd_anova}}, or \code{\link{format_data}} respectively.}
 }
 \value{
 a character string describing data norm
@@ -17,6 +17,6 @@ This function returns data norm attribute
 }
 \examples{
 dontrun{
-get_data_norm(omicsData)
+get_data_norm(omicsObject)
 }
 }
