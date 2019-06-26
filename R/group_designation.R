@@ -31,7 +31,7 @@ group_designation <- function(omicsData, main_effects, covariates=NULL, time_cou
   # check that omicsData is of appropriate class #
   if(!inherits(omicsData, c("lipidData","metabData","proData","pepData"))) stop("omicsData is not an object of appropriate class")
   
-  # check that omicsData is of appropriate class #
+  # check that isobaric data has been normalized #
   if(inherits(omicsData, "isobaricpepData") && 
      (is.null(attr(omicsData, "isobaric_info")$norm_info$is_normalized) ||
      (attr(omicsData, "isobaric_info")$norm_info$is_normalized != TRUE))) stop(
