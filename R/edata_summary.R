@@ -136,24 +136,24 @@ edata_summary <- function(omicsData, by = 'sample', groupvar = NULL){
         formula1 = paste(edata_cname, "+Group~...", sep = "")
         formula2 = paste(edata_cname, "~...", sep = "")
 
-        avg = dcast(edata_melt, formula = formula1, function(x){if(all(is.na(x))){mean(x)}else{mean(x, na.rm = T)}})
+        avg = reshape2::dcast(edata_melt, formula = formula1, function(x){if(all(is.na(x))){mean(x)}else{mean(x, na.rm = T)}})
         names(avg)[which(colnames(avg)== ".")]<- "value"
-        avg = dcast(avg, formula = formula2)
-        std_dev = dcast(edata_melt, formula = formula1, sd, na.rm = T)
+        avg = reshape2::dcast(avg, formula = formula2)
+        std_dev = reshape2::dcast(edata_melt, formula = formula1, sd, na.rm = T)
         names(std_dev)[which(colnames(std_dev)== ".")]<- "value"
-        std_dev = dcast(std_dev, formula = formula2)
-        mds = dcast(edata_melt, formula = formula1, median, na.rm = T)
+        std_dev = reshape2::dcast(std_dev, formula = formula2)
+        mds = reshape2::dcast(edata_melt, formula = formula1, median, na.rm = T)
         names(mds)[which(colnames(mds)== ".")]<- "value"
-        mds = dcast(mds, formula = formula2)
-        pct_obs = dcast(edata_melt, formula = formula1, function(x){sum(!is.na(x))/length(x)})
+        mds = reshape2::dcast(mds, formula = formula2)
+        pct_obs = reshape2::dcast(edata_melt, formula = formula1, function(x){sum(!is.na(x))/length(x)})
         names(pct_obs)[which(colnames(pct_obs)== ".")]<- "value"
-        pct_obs = dcast(pct_obs, formula = formula2)
-        mins = dcast(edata_melt, formula = formula1, function(x){if(all(is.na(x))){min(x)}else{min(x, na.rm = T)}})
+        pct_obs = reshape2::dcast(pct_obs, formula = formula2)
+        mins = reshape2::dcast(edata_melt, formula = formula1, function(x){if(all(is.na(x))){min(x)}else{min(x, na.rm = T)}})
         names(mins)[which(colnames(mins)== ".")]<- "value"
-        mins = dcast(mins, formula = formula2)
-        maxs = dcast(edata_melt, formula = formula1, function(x){if(all(is.na(x))){max(x)}else{max(x, na.rm = T)}})
+        mins = reshape2::dcast(mins, formula = formula2)
+        maxs = reshape2::dcast(edata_melt, formula = formula1, function(x){if(all(is.na(x))){max(x)}else{max(x, na.rm = T)}})
         names(maxs)[which(colnames(maxs)== ".")]<- "value"
-        maxs = dcast(maxs, formula = formula2)
+        maxs = reshape2::dcast(maxs, formula = formula2)
         
         res_list = list(n_per_grp = n_per_grp, mean = avg, sd = std_dev, median = mds, pct_obs = pct_obs, min = mins , max = maxs)
         class(res_list)<- "dataRes"
@@ -191,24 +191,24 @@ edata_summary <- function(omicsData, by = 'sample', groupvar = NULL){
       formula1 = paste(edata_cname, "+Group~...", sep = "")
       formula2 = paste(edata_cname, "~...", sep = "")
       
-      avg = dcast(edata_melt, formula = formula1, function(x){if(all(is.na(x))){mean(x)}else{mean(x, na.rm = T)}})
+      avg = reshape2::dcast(edata_melt, formula = formula1, function(x){if(all(is.na(x))){mean(x)}else{mean(x, na.rm = T)}})
       names(avg)[which(colnames(avg)== ".")]<- "value"
-      avg = dcast(avg, formula = formula2)
-      std_dev = dcast(edata_melt, formula = formula1, sd, na.rm = T)
+      avg = reshape2::dcast(avg, formula = formula2)
+      std_dev = reshape2::dcast(edata_melt, formula = formula1, sd, na.rm = T)
       names(std_dev)[which(colnames(std_dev)== ".")]<- "value"
-      std_dev = dcast(std_dev, formula = formula2)
-      mds = dcast(edata_melt, formula = formula1, median, na.rm = T)
+      std_dev = reshape2::dcast(std_dev, formula = formula2)
+      mds = reshape2::dcast(edata_melt, formula = formula1, median, na.rm = T)
       names(mds)[which(colnames(mds)== ".")]<- "value"
-      mds = dcast(mds, formula = formula2)
-      pct_obs = dcast(edata_melt, formula = formula1, function(x){sum(!is.na(x))/length(x)})
+      mds = reshape2::dcast(mds, formula = formula2)
+      pct_obs = reshape2::dcast(edata_melt, formula = formula1, function(x){sum(!is.na(x))/length(x)})
       names(pct_obs)[which(colnames(pct_obs)== ".")]<- "value"
-      pct_obs = dcast(pct_obs, formula = formula2)
-      mins = dcast(edata_melt, formula = formula1, function(x){if(all(is.na(x))){min(x)}else{min(x, na.rm = T)}})
+      pct_obs = reshape2::dcast(pct_obs, formula = formula2)
+      mins = reshape2::dcast(edata_melt, formula = formula1, function(x){if(all(is.na(x))){min(x)}else{min(x, na.rm = T)}})
       names(mins)[which(colnames(mins)== ".")]<- "value"
-      mins = dcast(mins, formula = formula2)
-      maxs = dcast(edata_melt, formula = formula1, function(x){if(all(is.na(x))){max(x)}else{max(x, na.rm = T)}})
+      mins = reshape2::dcast(mins, formula = formula2)
+      maxs = reshape2::dcast(edata_melt, formula = formula1, function(x){if(all(is.na(x))){max(x)}else{max(x, na.rm = T)}})
       names(maxs)[which(colnames(maxs)== ".")]<- "value"
-      maxs = dcast(maxs, formula = formula2)
+      maxs = reshape2::dcast(maxs, formula = formula2)
       
       res_list = list(n_per_grp = n_per_grp, mean = avg, sd = std_dev, median = mds, pct_obs = pct_obs, min = mins , max = maxs)
       class(res_list)<- "dataRes"
@@ -257,24 +257,24 @@ edata_summary <- function(omicsData, by = 'sample', groupvar = NULL){
       formula1 = paste(edata_cname, "+Group~...", sep = "")
       formula2 = paste(edata_cname, "~...", sep = "")
       
-      avg = dcast(edata_melt, formula = formula1, function(x){if(all(is.na(x))){mean(x)}else{mean(x, na.rm = T)}})
+      avg = reshape2::dcast(edata_melt, formula = formula1, function(x){if(all(is.na(x))){mean(x)}else{mean(x, na.rm = T)}})
       names(avg)[which(colnames(avg)== ".")]<- "value"
-      avg = dcast(avg, formula = formula2)
-      std_dev = dcast(edata_melt, formula = formula1, sd, na.rm = T)
+      avg = reshape2::dcast(avg, formula = formula2)
+      std_dev = reshape2::dcast(edata_melt, formula = formula1, sd, na.rm = T)
       names(std_dev)[which(colnames(std_dev)== ".")]<- "value"
-      std_dev = dcast(std_dev, formula = formula2)
-      mds = dcast(edata_melt, formula = formula1, median, na.rm = T)
+      std_dev = reshape2::dcast(std_dev, formula = formula2)
+      mds = reshape2::dcast(edata_melt, formula = formula1, median, na.rm = T)
       names(mds)[which(colnames(mds)== ".")]<- "value"
-      mds = dcast(mds, formula = formula2)
-      pct_obs = dcast(edata_melt, formula = formula1, function(x){sum(!is.na(x))/length(x)})
+      mds = reshape2::dcast(mds, formula = formula2)
+      pct_obs = reshape2::dcast(edata_melt, formula = formula1, function(x){sum(!is.na(x))/length(x)})
       names(pct_obs)[which(colnames(pct_obs)== ".")]<- "value"
-      pct_obs = dcast(pct_obs, formula = formula2)
-      mins = dcast(edata_melt, formula = formula1, function(x){if(all(is.na(x))){min(x)}else{min(x, na.rm = T)}})
+      pct_obs = reshape2::dcast(pct_obs, formula = formula2)
+      mins = reshape2::dcast(edata_melt, formula = formula1, function(x){if(all(is.na(x))){min(x)}else{min(x, na.rm = T)}})
       names(mins)[which(colnames(mins)== ".")]<- "value"
-      mins = dcast(mins, formula = formula2)
-      maxs = dcast(edata_melt, formula = formula1, function(x){if(all(is.na(x))){max(x)}else{max(x, na.rm = T)}})
+      mins = reshape2::dcast(mins, formula = formula2)
+      maxs = reshape2::dcast(edata_melt, formula = formula1, function(x){if(all(is.na(x))){max(x)}else{max(x, na.rm = T)}})
       names(maxs)[which(colnames(maxs)== ".")]<- "value"
-      maxs = dcast(maxs, formula = formula2)
+      maxs = reshape2::dcast(maxs, formula = formula2)
       
       res_list = list(n_per_grp = n_per_grp, mean = avg, sd = std_dev, median = mds, pct_obs = pct_obs, min = mins , max = maxs) 
       class(res_list)<- "dataRes"
