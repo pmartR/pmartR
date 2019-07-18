@@ -493,8 +493,10 @@ plot.proteomicsFilt <- function(filter_object, mapping = "both", cumulative = TR
     # conditionally return plots depending on mapping input
     if(mapping == "pep_to_pro") return(p1)
     else if(mapping == "pro_to_pep") return(p2)
-    else if(mapping == "both") return(Rmisc::multiplot(p1, p2, cols = 2))
-    
+    else if(mapping == "both") {
+      gridExtra::grid.arrange(p1, p2, ncol = 2)
+      return(invisible(list(p1,p2)))
+    }
   })
 }
 
@@ -2655,7 +2657,6 @@ plot.normRes <- function(normData, order_by = NULL, color_by = NULL, ...) {
     par(ask=FALSE)
   }else{
     # the user wants the graphs in a single image
-    #Rmisc:::multiplot(p, p_norm, cols=1)
     gridExtra:::grid.arrange(p, p_norm, ncol=1)
   }
   

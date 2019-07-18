@@ -24,7 +24,6 @@ Imports:
     plotly,
     rlang,
     rrcov,
-    Rmisc,
     scales,
     d3heatmap,
     gridExtra,
