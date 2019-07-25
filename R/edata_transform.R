@@ -131,7 +131,7 @@ edata_transform.pepData <- function(omicsData, data_scale){
 
   # create an updated pepData object #
   updated_data <- as.pepData(e_data = edata_new, f_data = omicsData$f_data, e_meta = omicsData$e_meta, edata_cname = edata_id, emeta_cname=emeta_cname, fdata_cname = attr(omicsData, "cnames")$fdata_cname, techrep_cname = attr(omicsData, "cnames")$techrep_cname,
-                             data_scale = data_scale, is_normalized = attr(omicsData, "data_info")$norm_info$is_normalized, norm_info=attr(omicsData, "data_info")$norm_info, data_types=attr(omicsData, "data_info")$data_types, check.names = check_names)
+                             data_scale = data_scale, norm_info=attr(omicsData, "data_info")$norm_info,  is_normalized = attr(omicsData, "data_info")$norm_info$is_normalized, data_types=attr(omicsData, "data_info")$data_types, check.names = check_names)
   
   #check for isobaricpepData class
   if(inherits(omicsData, "isobaricpepData")){
@@ -146,7 +146,8 @@ edata_transform.pepData <- function(omicsData, data_scale){
   attributes(updated_data)$group_DF <- attributes(omicsData)$group_DF
   attributes(updated_data)$filters <- attributes(omicsData)$filters
   attributes(updated_data)$meta_info <- attributes(omicsData)$meta_info
-
+  attributes(updated_data)$imdanova <- attributes(omicsData)$imdanova
+  
   return(updated_data)
 }
 
@@ -234,12 +235,14 @@ edata_transform.proData <- function(omicsData, data_scale){
   }
 
   # create an updated proData object #
-  updated_data <- as.proData(e_data = edata_new, f_data = omicsData$f_data, e_meta = omicsData$e_meta, edata_cname = edata_id, emeta_cname=emeta_cname, fdata_cname = attr(omicsData, "cnames")$fdata_cname, techrep_cname = attr(omicsData, "cnames")$techrep_cname, data_scale = data_scale, is_normalized = attr(omicsData, "data_info")$norm_info$is_normalized, data_types=attr(omicsData, "data_info")$data_types, check.names = check_names)
+  updated_data <- as.proData(e_data = edata_new, f_data = omicsData$f_data, e_meta = omicsData$e_meta, edata_cname = edata_id, emeta_cname=emeta_cname, fdata_cname = attr(omicsData, "cnames")$fdata_cname, techrep_cname = attr(omicsData, "cnames")$techrep_cname, 
+                             data_scale = data_scale,  norm_info=attr(omicsData, "data_info")$norm_info, is_normalized = attr(omicsData, "data_info")$norm_info$is_normalized, data_types=attr(omicsData, "data_info")$data_types, check.names = check_names)
 
   attributes(updated_data)$group_DF <- attributes(omicsData)$group_DF
   attributes(updated_data)$filters <- attributes(omicsData)$filters
   attributes(updated_data)$meta_info <- attributes(omicsData)$meta_info
-
+  attributes(updated_data)$imdanova <- attributes(omicsData)$imdanova
+  
   return(updated_data)
 }
 
@@ -327,12 +330,14 @@ edata_transform.metabData <- function(omicsData, data_scale){
   }
 
   # create an updated metabData object #
-  updated_data <- as.metabData(e_data = edata_new, f_data = omicsData$f_data, e_meta = omicsData$e_meta, edata_cname = edata_id, emeta_cname=emeta_cname, fdata_cname = attr(omicsData, "cnames")$fdata_cname, techrep_cname = attr(omicsData, "cnames")$techrep_cname, data_scale = data_scale, is_normalized = attr(omicsData, "data_info")$norm_info$is_normalized, data_types=attr(omicsData, "data_info")$data_types, check.names = check_names)
+  updated_data <- as.metabData(e_data = edata_new, f_data = omicsData$f_data, e_meta = omicsData$e_meta, edata_cname = edata_id, emeta_cname=emeta_cname, fdata_cname = attr(omicsData, "cnames")$fdata_cname, techrep_cname = attr(omicsData, "cnames")$techrep_cname, 
+                               data_scale = data_scale, norm_info=attr(omicsData, "data_info")$norm_info,  is_normalized = attr(omicsData, "data_info")$norm_info$is_normalized, data_types=attr(omicsData, "data_info")$data_types, check.names = check_names)
 
   attributes(updated_data)$group_DF <- attributes(omicsData)$group_DF
   attributes(updated_data)$filters <- attributes(omicsData)$filters
   attributes(updated_data)$meta_info <- attributes(omicsData)$meta_info
-
+  attributes(updated_data)$imdanova <- attributes(omicsData)$imdanova
+  
   return(updated_data)
 }
 
@@ -419,11 +424,13 @@ edata_transform.lipidData <- function(omicsData, data_scale){
   }
 
   # create an updated lipidData object #
-  updated_data <- as.lipidData(e_data = edata_new, f_data = omicsData$f_data, e_meta = omicsData$e_meta, edata_cname = edata_id, emeta_cname=emeta_cname, fdata_cname = attr(omicsData, "cnames")$fdata_cname, techrep_cname = attr(omicsData, "cnames")$techrep_cname, data_scale = data_scale, is_normalized = attr(omicsData, "data_info")$norm_info$is_normalized, data_types=attr(omicsData, "data_info")$data_types, check.names = check_names)
+  updated_data <- as.lipidData(e_data = edata_new, f_data = omicsData$f_data, e_meta = omicsData$e_meta, edata_cname = edata_id, emeta_cname=emeta_cname, fdata_cname = attr(omicsData, "cnames")$fdata_cname, techrep_cname = attr(omicsData, "cnames")$techrep_cname, 
+                               data_scale = data_scale, norm_info = attr(omicsData, "data_info")$norm_info, is_normalized = attr(omicsData, "data_info")$norm_info$is_normalized, data_types=attr(omicsData, "data_info")$data_types, check.names = check_names)
 
   attributes(updated_data)$group_DF <- attributes(omicsData)$group_DF
   attributes(updated_data)$filters <- attributes(omicsData)$filters
   attributes(updated_data)$meta_info <- attributes(omicsData)$meta_info
+  attributes(updated_data)$imdanova <- attributes(omicsData)$imdanova
 
   return(updated_data)
 }
