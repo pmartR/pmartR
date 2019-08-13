@@ -8,7 +8,11 @@
   cumulative = TRUE, log_scale = TRUE, min_num_peps = NULL, ...)
 }
 \arguments{
-\item{mapping}{whether to display a histogram of the number of peptides mapping to a protein for all proteins (mapping = 'pep_to_pro'), a histogram of the number of proteins mapped to by each peptide (mapping = "pro_to_pep"), or 'both'.  Defaults to "both"}
+\item{mapping}{One of 'pep_to_pro', 'pro_to_pep', or 'both'. Defaults to 'both'.
+\tabular{ll}{
+\tab Specifying 'pep_to_pro' will draw a plot where the y-axis represents the number of proteins that at least/exactly(depending on the value of \code{cumulative}) the number of peptides on the x-axis map to)\cr
+\tab Specifying 'pro_to_pep' will draw a plot where the y-axis represents the number of peptides that map to the number of proteins specified on the x-axis.\cr
+}}
 
 \item{cumulative}{logical specifying whether the peptide to protein mapping should be cumulative or at each value i.e. number of proteins with \emph{at least} x (TRUE) peptides mapping to it, or \emph{exactly} x (FALSE) peptides mapping to it.  Defaults to TRUE}
 
@@ -18,8 +22,8 @@
 
 \item{...}{Additional arguments
 \tabular{ll}{
-\code{x_lab} \tab character string to be used for x-axis label. Defaults to NULL, in which case a default label is used. \cr
-\code{y_lab} \tab character string to be used for y-axis label. Defaults to NULL, in which case a default label is used. \cr
+\code{x_lab_pep,x_lab_pro} \tab character strings to be used for x-axis label for the peptide-to-protein and protein-to-peptide plots respectively. Defaults are NULL, in which case default labels are used. \cr
+\code{y_lab_pep,y_lab_pro} \tab character strings to be used for y-axis label for the peptide-to-protein and protein-to-peptide plots respectively. Defaults are NULL, in which case default labels are used. \cr
 \code{title_plot} \tab character string to be used for the plot title. Defaults to NULL, in which case a default title is used. \cr
 \code{title_size} \tab integer value specifying the font size for the plot title. Default is 14. \cr
 \code{x_lab_size} \tab integer value indicating the font size for the x-axis. Defaults to 11. \cr
@@ -31,6 +35,10 @@
 }
 \description{
 For plotting an S3 object of type 'proteomicsFilt':
+}
+\details{
+Specifying 'pep_to_pro' in the mapping argument will draw a plot where the y-axis represents the number of proteins that at least/exactly(depending on the value of \code{cumulative}) the number of peptides on the x-axis map to)
+Specifying 'pro_to_pep' will draw a plot where the y-axis represents the number of peptides that map to the number of proteins specified on the x-axis.
 }
 \examples{
 data(pep_object)
