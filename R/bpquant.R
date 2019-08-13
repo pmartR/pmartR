@@ -33,7 +33,6 @@
 #' @export
 
 bpquant<- function(statRes, pepData, pi_not = .9, max_proteoforms = 5){
-  
   #some checks
   if(pi_not < 0 | pi_not > 1) stop("pi_not must be between 0 and 1")
   if(max_proteoforms <= 0) stop("max_proteoforms must be 1 or greater")
@@ -80,37 +79,43 @@ bpquant<- function(statRes, pepData, pi_not = .9, max_proteoforms = 5){
 
   res<- list()
   
-  suppressMessages(suppressPackageStartupMessages({
-    library(parallel)
-  })
-  )
-  cores<- detectCores()
-  cl<- makeCluster(cores)
-  doParallel::registerDoParallel(cl)
+   suppressMessages(suppressPackageStartupMessages({
+     library(parallel)
+   })
+   )
+   cores<- detectCores()
+   cl<- makeCluster(cores)
+   doParallel::registerDoParallel(cl)
+ #  
+ #  
+  isoformRes<- foreach::foreach(i=1:length(unique_proteins), .packages = "pmartR")%dopar%{
   
- isoformRes<- foreach::foreach(i=1:length(unique_proteins))%dopar%{
-    
+   #for(i in 1:length(unique_proteins)){  
     row_ind<- which(protein_sig_data[, emeta_cname] == unique_proteins[i])
     cur_protein<- protein_sig_data[row_ind, ]
     cur_protein_sigs = cur_protein[which(names(cur_protein) %in% colnames(signatures[-which(colnames(signatures) == edata_cname)]))]
     colnames(cur_protein_sigs) = paste(rep("flags", ncol(cur_protein_sigs)), 1:ncol(cur_protein_sigs), sep = "")
        
-    result<- pmartR::bpquant_mod(protein_sig = cur_protein_sigs, pi_not = pi_not, max_proteoforms = max_proteoforms)
+    result<- pmartR:::bpquant_mod(protein_sig = cur_protein_sigs, pi_not = pi_not, max_proteoforms = max_proteoforms)
     peptide_id<- result$peptide_idx
     
     temp<- data.frame(Protein = as.character(cur_protein[, emeta_cname]), Mass_Tag_ID = as.character(cur_protein[, edata_cname]), proteoformID = peptide_id, stringsAsFactors = FALSE)
     names(temp)<- c(emeta_cname, edata_cname, "proteoformID")
     
-    res[[i]]<- temp
+    temp
     
  }
 
- stopCluster(cl)
+  stopCluster(cl)
  
  #filter out isoformRes with max(proteoformID) of zero
  list_inds = lapply(isoformRes,function(x){max(x$proteoformID)})
  inds = which(list_inds == 0)
+ 
+ # only get rid of isoform results if we find something with no peptides #
+ if(length(inds)>0){
  isoformRes = isoformRes[-inds]
+ } 
  
  isoformRes2<- lapply(isoformRes, isoformRes_func, emeta_cname = emeta_cname, edata_cname = edata_cname)
  isoformRes2<- do.call(rbind, isoformRes2) 
