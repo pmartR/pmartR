@@ -1974,6 +1974,8 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
 #' For plotting an S3 object of type 'dimRes':
 #' 
 #' \tabular{ll}{
+#' \code{order_by} \tab a character string specifying a main effect by which to order the boxplots. This main effect must be found in the column names of f_data in the omicsData object. If order_by is "group_DF", the boxplots will be ordered by the group variable from the group_designation function. If NULL (default), the boxplots will be displayed in the order they appear in the data. \cr
+#' \code{color_by} \tab a character string specifying a main effect by which to color the boxplots. This main effect must be found in the column names of f_data in the omicsData object. If color_by is "group_DF", the boxplots will be colored by the group variable from the group_designation function. If NULL (default), the boxplots will have one default color. \cr
 #' \code{x_lab} \tab character string to be used for x-axis label. Defaults to NULL, in which case a default label is used. \cr
 #' \code{y_lab} \tab character string to be used for y-axis label. Defaults to NULL, in which case a default label is used. \cr
 #' \code{legend_lab} \tab character string specifying the title label to use for the legend \cr
@@ -2114,6 +2116,19 @@ plot.dimRes <- function(dimRes_object, ...) {
 #'
 #' For plotting an S3 object of type 'normRes'
 #'
+#' \tabular{ll}{
+#' \code{x_lab} \tab character string to be used for x-axis label. Defaults to NULL, in which case a default label is used. \cr
+#' \code{y_lab} \tab character string to be used for y-axis label. Defaults to NULL, in which case a default label is used. \cr
+#' \code{legend_lab} \tab character string specifying the title label to use for the legend \cr
+#' \code{title_plot_raw,title_plot_norm} \tab character string to be used for the plot title for the raw and normalized data respectively. Defaults are NULL, in which case default titles are used. \cr
+#' \code{title_size} \tab integer value specifying the font size for the plot title. Default is 14. \cr
+#' \code{x_lab_size} \tab integer value indicating the font size for the x-axis. Defaults to 11. \cr
+#' \code{y_lab_size} \tab integer value indicating the font size for the y-axis. Defaults to 11. \cr
+#' \code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used. \cr
+#' \code{legend_position} \tab character string specifying one of "right", "left", "top", or "bottom" for the location of the legend. Defaults to "right". \cr
+#' \code{combined} \tab logical indicating whether to display the the raw plot and then prompt the user to display the normalized plot (FALSE), or to display both at once (TRUE).  Defaults to FALSE.
+#' }
+#'
 #'@export
 #'@rdname plot-pmartR-normRes
 #'
@@ -2229,7 +2244,7 @@ plot.normRes <- function(normData, order_by = NULL, color_by = NULL, ...) {
     # reorder levels #
     plot_data_raw <- plot_data_raw[order(plot_data_raw[,order_by]),]
     plot_data_raw$variable <- factor(plot_data_raw$variable, levels=unique(plot_data_raw$variable), ordered=TRUE)
-    plot_data_raw[[color_by]] <- factor(plot_data_raw[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
+    # plot_data_raw[[color_by]] <- factor(plot_data_raw[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
     
     if(bw_theme==FALSE){
       p <- ggplot(plot_data_raw) + geom_boxplot(aes(x = variable, y = value), fill = "deepskyblue1") +
@@ -2329,16 +2344,6 @@ plot.normRes <- function(normData, order_by = NULL, color_by = NULL, ...) {
     title <- bquote(atop(.(maintitle_raw),atop(italic(paste("Ordered by ",.(order_by))),"")))
   }
   
-  
-  # facet plot #
-  # if(!is.null(facet_by)) {
-  #   if(is.null(facet_cols)) {
-  #     p <- p + facet_wrap(formula(paste("~",facet_by)), scales = "free_x")
-  #   } else {
-  #     p <- p + facet_wrap(formula(paste("~",facet_by)), scales = "free_x", ncol = facet_cols)
-  #   }
-  # }
-  
   # custom labels #
   if(!is.null(title_plot_raw)) title <- title_plot_raw
   xlabel <- ifelse(is.null(x_lab), "Sample", x_lab)
@@ -2392,7 +2397,7 @@ plot.normRes <- function(normData, order_by = NULL, color_by = NULL, ...) {
     # reorder levels #
     plot_data_norm <- plot_data_norm[order(plot_data_norm[,order_by]),]
     plot_data_norm$variable <- factor(plot_data_norm$variable, levels=unique(plot_data_norm$variable), ordered=TRUE)
-    plot_data_norm[[color_by]] <- factor(plot_data_norm[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
+    # plot_data_norm[[color_by]] <- factor(plot_data_norm[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
     
     if(bw_theme==FALSE){
       p_norm <- ggplot(plot_data_norm) + geom_boxplot(aes(x = variable, y = value), fill = "deepskyblue1") +
@@ -2491,16 +2496,6 @@ plot.normRes <- function(normData, order_by = NULL, color_by = NULL, ...) {
     
     title <- bquote(atop(.(maintitle_norm),atop(italic(paste("Ordered by ",.(order_by))),"")))
   }
-  
-  
-  # facet plot #
-  # if(!is.null(facet_by)) {
-  #   if(is.null(facet_cols)) {
-  #     p <- p + facet_wrap(formula(paste("~",facet_by)), scales = "free_x")
-  #   } else {
-  #     p <- p + facet_wrap(formula(paste("~",facet_by)), scales = "free_x", ncol = facet_cols)
-  #   }
-  # }
   
   # custom labels #
   if(!is.null(title_plot_norm)) title <- title_plot_norm
