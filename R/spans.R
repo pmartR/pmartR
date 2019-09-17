@@ -426,12 +426,18 @@ spans_make_distribution <- function(omicsData, norm_fn, sig_inds, nonsig_inds, s
 #' norm_object <- normalize_global(omicsData = myobject, subset_fn = subset_fn, norm_fn = norm_fn, params = params)
 #' 
 #' @export 
-get_spans_params <- function(SPANSRes_obj){
+get_spans_params <- function(SPANSRes_obj, sort_by_nmols = FALSE){
   
   if(all(is.na(SPANSRes_obj$SPANS_score))) stop("No methods were selected for scoring, there is no 'best' set of parameters to return.")
     
   # get rows that are tied for top score
-  best_df <- SPANSRes_obj %>% dplyr::top_n(1, wt = SPANS_score)
+  best_df <- SPANSRes_obj %>% 
+    dplyr::top_n(1, wt = SPANS_score)
+  
+  if(sort_by_nmols){
+    best_df <- best_df %>%
+      dplyr::top_n(1, mols_used_in_norm) 
+  }
   
   ## populate a list with the subset method, normalization method, and subset parameters.
   params <- vector("list", nrow(best_df))

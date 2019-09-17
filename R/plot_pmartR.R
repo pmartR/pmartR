@@ -823,9 +823,11 @@ plot.rmdFilt <- function(filter_object, pvalue_threshold = NULL, sampleID = NULL
     
     # make title
     if(is.null(title_plot)) {
-      plot_title <- bquote(atop("Sample Outlier Results", italic(paste("p-value threshold = ", .(pvalue_threshold)))))
+      plot_title <- "Sample Outlier Results"
+      subtitle <- paste("p-value threshold = ", pvalue_threshold)
     } else {
       plot_title <- title_plot
+      subtitle <- waiver()
     }
     xlabel <- ifelse(is.null(x_lab), "Samples", x_lab)
     ylabel <- ifelse(is.null(y_lab), "log2(Robust Mahalanobis Distance)", y_lab)
@@ -845,12 +847,13 @@ plot.rmdFilt <- function(filter_object, pvalue_threshold = NULL, sampleID = NULL
       guides(col = guide_legend(ncol = 1), pch = guide_legend(ncol = 1)) +
       scale_shape_manual(legend_title_shape, values=rep(c(16,9,22,13,11,3,4,15,0,5),6)) +
       scale_color_manual(legend_title_color, values=rep(c("blue","red","green","darkturquoise","goldenrod3","darkorchid2"),10)) +
-      xlab(xlabel) + ylab(ylabel) + ggtitle(plot_title)
+      xlab(xlabel) + ylab(ylabel) + ggtitle(plot_title, subtitle = subtitle)
   }
   
   # apply theme
   mytheme <- theme(axis.ticks.x = element_blank(), axis.text.x = element_blank(),
                    plot.title = element_text(size=title_size),
+                   plot.subtitle = element_text(face = 'italic'),
                    axis.title.x = element_text(size=x_lab_size),
                    axis.title.y = element_text(size=y_lab_size),
                    legend.position = legend_position)
@@ -2147,17 +2150,7 @@ plot.normRes <- function(normData, order_by = NULL, color_by = NULL, ...) {
   if(!is.null(color_by)) {
     if(!is.character(color_by) | length(color_by) > 1) stop("color_by must be a character vector of length 1")
   }
-  # if(!is.null(facet_by)) {
-  #   if(!is.character(facet_by) | length(facet_by) > 1) stop("facet_by must be a character vector of length 1")
-  # }
-  # if(!is.null(facet_cols)) {
-  #   if(is.null(facet_by)) stop("facet_by cannot be NULL when facet_cols is specified")
-  #   if(length(facet_cols)>1) stop("facet_cols must be of length 1")
-  #   if(!is.numeric(facet_cols)) stop("facet_cols must be an integer greater than zero")
-  #   if(facet_cols %% 1 != 0 | facet_cols <= 0) stop("facet_cols must be an integer greater than zero")
-  # }
   ## end of initial checks ##
-  
   
   # organize data #
   omicsData <- attributes(normData)$omicsData
@@ -2193,19 +2186,6 @@ plot.normRes <- function(normData, order_by = NULL, color_by = NULL, ...) {
   
   maintitle_raw <- "Boxplots of Un-Normalized Peptide Data"
   maintitle_norm <- "Boxplots of Normalized Peptide Data"
-  
-  # get data and aesthetics for plots #
-  
-  # ## if facet_by is not null and isn't the same as either order_by or color_by ##
-  # if(!is.null(facet_by)) {
-  #   if(!(facet_by %in% c(order_by, color_by))) {
-  #     facet_temp <- group_designation(normData, main_effects = facet_by)
-  #     facetDF <- attributes(facet_temp)$group_DF
-  #     colnames(facetDF) <- c("variable", facet_by)
-  #
-  #     plot_data <- merge(plot_data, facetDF, by = "variable")
-  #   }
-  # }
   
   #### RAW DATA PLOT ####
   
@@ -2244,7 +2224,6 @@ plot.normRes <- function(normData, order_by = NULL, color_by = NULL, ...) {
     # reorder levels #
     plot_data_raw <- plot_data_raw[order(plot_data_raw[,order_by]),]
     plot_data_raw$variable <- factor(plot_data_raw$variable, levels=unique(plot_data_raw$variable), ordered=TRUE)
-    # plot_data_raw[[color_by]] <- factor(plot_data_raw[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
     
     if(bw_theme==FALSE){
       p <- ggplot(plot_data_raw) + geom_boxplot(aes(x = variable, y = value), fill = "deepskyblue1") +
@@ -2274,7 +2253,6 @@ plot.normRes <- function(normData, order_by = NULL, color_by = NULL, ...) {
     colorDF <- attributes(color_temp)$group_DF
     colnames(colorDF)[1:2] <- c("variable", color_by)
     plot_data_raw <- merge(plot_data_raw, colorDF, by = "variable")
-    plot_data_raw[[color_by]] <- factor(plot_data_raw[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
     
     if(bw_theme==FALSE){
       p <- ggplot(plot_data_raw) + geom_boxplot(aes_string(x = "variable", y = "value", fill = color_by)) +
@@ -2323,7 +2301,6 @@ plot.normRes <- function(normData, order_by = NULL, color_by = NULL, ...) {
     # reorder levels #
     plot_data_raw <- plot_data_raw[order(plot_data_raw[,order_by]),]
     plot_data_raw$variable <- factor(plot_data_raw$variable, levels=unique(plot_data_raw$variable), ordered=TRUE)
-    plot_data_raw[[color_by]] <- factor(plot_data_raw[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
     
     if(bw_theme==FALSE){
       p <- ggplot(plot_data_raw) + geom_boxplot(aes_string(x = "variable", y = "value", fill = color_by)) +
@@ -2397,7 +2374,6 @@ plot.normRes <- function(normData, order_by = NULL, color_by = NULL, ...) {
     # reorder levels #
     plot_data_norm <- plot_data_norm[order(plot_data_norm[,order_by]),]
     plot_data_norm$variable <- factor(plot_data_norm$variable, levels=unique(plot_data_norm$variable), ordered=TRUE)
-    # plot_data_norm[[color_by]] <- factor(plot_data_norm[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
     
     if(bw_theme==FALSE){
       p_norm <- ggplot(plot_data_norm) + geom_boxplot(aes(x = variable, y = value), fill = "deepskyblue1") +
@@ -2427,7 +2403,6 @@ plot.normRes <- function(normData, order_by = NULL, color_by = NULL, ...) {
     colorDF <- attributes(color_temp)$group_DF
     colnames(colorDF)[1:2] <- c("variable", color_by)
     plot_data_norm <- merge(plot_data_norm, colorDF, by = "variable")
-    plot_data_norm[[color_by]] <- factor(plot_data_norm[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
     
     if(bw_theme==FALSE){
       p_norm <- ggplot(plot_data_norm) + geom_boxplot(aes_string(x = "variable", y = "value", fill = color_by)) +
@@ -2476,7 +2451,6 @@ plot.normRes <- function(normData, order_by = NULL, color_by = NULL, ...) {
     # reorder levels #
     plot_data_norm <- plot_data_norm[order(plot_data_norm[,order_by]),]
     plot_data_norm$variable <- factor(plot_data_norm$variable, levels=unique(plot_data_norm$variable), ordered=TRUE)
-    plot_data_norm[[color_by]] <- factor(plot_data_norm[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
     
     if(bw_theme==FALSE){
       p_norm <- ggplot(plot_data_norm) + geom_boxplot(aes_string(x = "variable", y = "value", fill = color_by)) +
