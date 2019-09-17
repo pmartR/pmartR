@@ -2186,6 +2186,7 @@ plot.normRes <- function(normData, order_by = NULL, color_by = NULL, ...) {
   
   maintitle_raw <- "Boxplots of Un-Normalized Peptide Data"
   maintitle_norm <- "Boxplots of Normalized Peptide Data"
+  subtitle <- NULL
   
   #### RAW DATA PLOT ####
   
@@ -2241,7 +2242,8 @@ plot.normRes <- function(normData, order_by = NULL, color_by = NULL, ...) {
                        legend.position = legend_position)
     }
     
-    title <- bquote(atop(.(maintitle_raw),atop(italic(paste("Ordered by ",.(order_by))),"")))
+    title <- maintitle_raw
+    subtitle <- paste('Ordered by', order_by)
     
     ## if color_by is not null and order_by is ##
   } else if(!is.null(color_by) & is.null(order_by)) {
@@ -2318,7 +2320,8 @@ plot.normRes <- function(normData, order_by = NULL, color_by = NULL, ...) {
                        legend.position = legend_position)
     }
     
-    title <- bquote(atop(.(maintitle_raw),atop(italic(paste("Ordered by ",.(order_by))),"")))
+    title <- maintitle_raw
+    subtitle <- paste('Ordered by', order_by)
   }
   
   # custom labels #
@@ -2329,9 +2332,10 @@ plot.normRes <- function(normData, order_by = NULL, color_by = NULL, ...) {
   if(!is.null(legend_lab)) legend_title <- legend_lab
   
   # add additional features to plot #
-  p <- p + theme(axis.text.x = element_text(angle = 90)) + xlab("Sample") +
-    ggtitle(title) + xlab(xlabel) + ylab(ylabel) +
-    scale_fill_discrete(legend_title)
+  p <- p + xlab("Sample") +
+    ggtitle(title, subtitle) + xlab(xlabel) + ylab(ylabel) +
+    scale_fill_discrete(legend_title) + 
+    theme(axis.text.x = element_text(angle = 90), plot.subtitle = element_text(face = 'italic'))
   
   #### END OF RAW DATA PLOT ####
   
@@ -2391,7 +2395,8 @@ plot.normRes <- function(normData, order_by = NULL, color_by = NULL, ...) {
                        legend.position = legend_position)
     }
     
-    title <- bquote(atop(.(maintitle_norm),atop(italic(paste("Ordered by ",.(order_by))),"")))
+    title <- maintitle_raw
+    subtitle <- paste('Ordered by', order_by)
     
     ## if color_by is not null and order_by is ##
   } else if(!is.null(color_by) & is.null(order_by)) {
@@ -2468,7 +2473,8 @@ plot.normRes <- function(normData, order_by = NULL, color_by = NULL, ...) {
                        legend.position = legend_position)
     }
     
-    title <- bquote(atop(.(maintitle_norm),atop(italic(paste("Ordered by ",.(order_by))),"")))
+    title <- maintitle_raw
+    subtitle <- paste('Ordered by', order_by)
   }
   
   # custom labels #
@@ -2479,9 +2485,10 @@ plot.normRes <- function(normData, order_by = NULL, color_by = NULL, ...) {
   if(!is.null(legend_lab)) legend_title <- legend_lab
   
   # add additional features to plot #
-  p_norm <- p_norm + theme(axis.text.x = element_text(angle = 90)) + xlab("Sample") +
-    ggtitle(title) + xlab(xlabel) + ylab(ylabel) +
-    scale_fill_discrete(legend_title)
+  p_norm <- p_norm + xlab("Sample") +
+    ggtitle(title, subtitle) + xlab(xlabel) + ylab(ylabel) +
+    scale_fill_discrete(legend_title) + 
+    theme(axis.text.x = element_text(angle = 90), plot.subtitle = element_text(face = 'italic'))
   
   #### END OF NORM DATA PLOT ####
   
