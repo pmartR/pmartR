@@ -2395,7 +2395,7 @@ plot.normRes <- function(normData, order_by = NULL, color_by = NULL, ...) {
                        legend.position = legend_position)
     }
     
-    title <- maintitle_raw
+    title <- maintitle_norm
     subtitle <- paste('Ordered by', order_by)
     
     ## if color_by is not null and order_by is ##
@@ -2473,7 +2473,7 @@ plot.normRes <- function(normData, order_by = NULL, color_by = NULL, ...) {
                        legend.position = legend_position)
     }
     
-    title <- maintitle_raw
+    title <- maintitle_norm
     subtitle <- paste('Ordered by', order_by)
   }
   
