@@ -1072,6 +1072,9 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
   e_data_cname <- attributes(omicsData)$cnames$edata_cname
   plot_data <- reshape2::melt(e_data, id = e_data_cname, na.rm = TRUE)
   
+  # get data and aesthetics for plots #
+  subtitle <- NULL
+  
   if(inherits(omicsData, "isobaricpepData")){
     maintitle <- ifelse(attributes(omicsData)$isobaric_info$norm_info$is_normalized,
                         "Boxplots of Normalized Isobaric Peptide Data",
@@ -1083,8 +1086,6 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
                         "Boxplots of Un-Normalized Peptide Data")
   }
 
-  # get data and aesthetics for plots #
-  
   ## if facet_by is not null and isn't the same as either order_by or color_by ##
   if(!is.null(facet_by)) {
     if(!(facet_by %in% c(order_by, color_by))) {
@@ -1125,7 +1126,8 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     
     p <- ggplot(plot_data) + geom_boxplot(aes(x = variable, y = value), fill = "deepskyblue1") 
     
-    title <- bquote(atop(.(maintitle),atop(italic(paste("Ordered by ",.(order_by))),"")))
+    title <- maintitle
+    subtitle <- paste('Ordered by ', order_by) 
     
     if(use_VizSampNames == T){
       f_data = f_data[order(f_data[,order_by]),]
@@ -1188,7 +1190,8 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     
     p <- ggplot(plot_data) + geom_boxplot(aes_string(x = "variable", y = "value", fill = color_by)) 
     
-    title <- bquote(atop(.(maintitle),atop(italic(paste("Ordered by ",.(order_by))),"")))
+    title <- maintitle
+    subtitle <- paste('Ordered by ', order_by) 
     
     if(use_VizSampNames == T){
       f_data = f_data[order(f_data[,order_by]),]
@@ -1233,8 +1236,8 @@ plot.pepData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
   
   # add additional features to plot #
   p <- p + theme(axis.text.x = element_text(angle = 90)) + xlab("Sample") +
-    ggtitle(title) + xlab(xlabel) + ylab(ylabel) +
-    scale_fill_discrete(legend_title)
+    ggtitle(title, subtitle) + xlab(xlabel) + ylab(ylabel) +
+    scale_fill_discrete(legend_title) + theme(plot.subtitle = element_text(face = 'italic'))
   
   if(!is.null(ylimit))
   {
@@ -1318,11 +1321,12 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
   f_data = omicsData$f_data
   plot_data <- reshape2::melt(e_data, id = e_data_cname, na.rm = TRUE)
   
+  # get data and aesthetics for plots #
+  subtitle <- NULL
+  
   maintitle <- ifelse(attributes(omicsData)$data_info$norm_info$is_normalized,
                       "Boxplots of Normalized Protein Data",
                       "Boxplots of Un-Normalized Protein Data")
-  
-  # get data and aesthetics for plots #
   
   ## if facet_by is not null and isn't the same as either order_by or color_by ##
   if(!is.null(facet_by)) {
@@ -1365,7 +1369,8 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     
     p <- ggplot(plot_data) + geom_boxplot(aes(x = variable, y = value), fill = "deepskyblue1") 
     
-    title <- bquote(atop(.(maintitle),atop(italic(paste("Ordered by ",.(order_by))),"")))
+    title <- maintitle
+    subtitle <- paste('Ordered by ', order_by)
     
     if(use_VizSampNames == T){
       f_data = f_data[order(f_data[,order_by]),]
@@ -1428,7 +1433,8 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
     
     p <- ggplot(plot_data) + geom_boxplot(aes_string(x = "variable", y = "value", fill = color_by))
     
-    title <- bquote(atop(.(maintitle),atop(italic(paste("Ordered by ",.(order_by))),"")))
+    title <- maintitle
+    subtitle <- paste('Ordered by ', order_by)
     
     if(use_VizSampNames == T){
       f_data = f_data[order(f_data[,order_by]),]
@@ -1473,8 +1479,8 @@ plot.proData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by =
   
   # add additional features to plot #
   p <- p + theme(axis.text.x = element_text(angle = 90)) + xlab("Sample") +
-    ggtitle(title) + xlab(xlabel) + ylab(ylabel) +
-    scale_fill_discrete(legend_title)
+    ggtitle(title, subtitle) + xlab(xlabel) + ylab(ylabel) +
+    scale_fill_discrete(legend_title) + theme(plot.subtitle = element_text(face = 'italic'))
   
   if(!is.null(ylimit))
   {
@@ -1557,11 +1563,13 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
   f_data = omicsData$f_data
   plot_data <- reshape2::melt(e_data, id = e_data_cname, na.rm = TRUE)
   
+  # get data and aesthetics for plots #
+  subtitle <- NULL
+  
   maintitle <- ifelse(attributes(omicsData)$data_info$norm_info$is_normalized,
                       "Boxplots of Normalized Lipid Data",
                       "Boxplots of Un-Normalized Lipid Data")
   
-  # get data and aesthetics for plots #
   
   ## if facet_by is not null and isn't the same as either order_by or color_by ##
   if(!is.null(facet_by)) {
@@ -1604,7 +1612,8 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     
     p <- ggplot(plot_data) + geom_boxplot(aes(x = variable, y = value), fill = "deepskyblue1") 
     
-    title <- bquote(atop(.(maintitle),atop(italic(paste("Ordered by ",.(order_by))),"")))
+    title <- maintitle
+    subtitle <- paste('Ordered by ', order_by)
     
     if(use_VizSampNames == T){
       f_data = f_data[order(f_data[,order_by]),]
@@ -1667,7 +1676,8 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     
     p <- ggplot(plot_data) + geom_boxplot(aes_string(x = "variable", y = "value", fill = color_by))
     
-    title <- bquote(atop(.(maintitle),atop(italic(paste("Ordered by ",.(order_by))),"")))
+    title <- maintitle
+    subtitle <- paste('Ordered by ', order_by)
     
     if(use_VizSampNames == T){
       f_data = f_data[order(f_data[,order_by]),]
@@ -1712,8 +1722,8 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
   
   # add additional features to plot #
   p <- p + theme(axis.text.x = element_text(angle = 90)) + xlab("Sample") +
-    ggtitle(title) + xlab(xlabel) + ylab(ylabel) +
-    scale_fill_discrete(legend_title)
+    ggtitle(title, subtitle) + xlab(xlabel) + ylab(ylabel) +
+    scale_fill_discrete(legend_title) + theme(plot.subtitle = element_text(face = 'italic'))
   
   if(!is.null(ylimit))
   {
@@ -1797,11 +1807,12 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
   f_data = omicsData$f_data
   plot_data <- reshape2::melt(e_data, id = e_data_cname, na.rm = TRUE)
   
+  # get data and aesthetics for plots #
+  subtitle <- NULL
+  
   maintitle <- ifelse(attributes(omicsData)$data_info$norm_info$is_normalized,
                       "Boxplots of Normalized Metabolite Data",
                       "Boxplots of Un-Normalized Metabolite Data")
-  
-  # get data and aesthetics for plots #
   
   ## if facet_by is not null and isn't the same as either order_by or color_by ##
   if(!is.null(facet_by)) {
@@ -1844,7 +1855,8 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     
     p <- ggplot(plot_data) + geom_boxplot(aes(x = variable, y = value), fill = "deepskyblue1")
     
-    title <- bquote(atop(.(maintitle),atop(italic(paste("Ordered by ",.(order_by))),"")))
+    title <- maintitle
+    subtitle <- paste('Ordered by ', order_by)
     
     if(use_VizSampNames == T){
       f_data = f_data[order(f_data[,order_by]),]
@@ -1916,7 +1928,8 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     
     p <- ggplot(plot_data) + geom_boxplot(aes_string(x = "variable", y = "value", fill = color_by)) 
     
-    title <- bquote(atop(.(maintitle),atop(italic(paste("Ordered by ",.(order_by))),"")))
+    title <- maintitle
+    subtitle <- paste('Ordered by ', order_by)
     
     if(use_VizSampNames == T){
       f_data = f_data[order(f_data[,order_by]),]
@@ -1960,8 +1973,8 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
   
   # add additional features to plot #
   p <- p + theme(axis.text.x = element_text(angle = 90)) + xlab("Sample") +
-    ggtitle(title) + xlab(xlabel) + ylab(ylabel) +
-    scale_fill_discrete(legend_title) 
+    ggtitle(title, subtitle) + xlab(xlabel) + ylab(ylabel) +
+    scale_fill_discrete(legend_title) + theme(plot.subtitle = element_text(face = 'italic'))
   
   if(!is.null(ylimit))
   {
