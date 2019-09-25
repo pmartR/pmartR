@@ -9,3 +9,17 @@
 \description{
 For plotting an S3 object of type 'normRes'
 }
+\details{
+\tabular{ll}{
+\code{x_lab} \tab character string to be used for x-axis label. Defaults to NULL, in which case a default label is used. \cr
+\code{y_lab} \tab character string to be used for y-axis label. Defaults to NULL, in which case a default label is used. \cr
+\code{legend_lab} \tab character string specifying the title label to use for the legend \cr
+\code{title_plot_raw,title_plot_norm} \tab character string to be used for the plot title for the raw and normalized data respectively. Defaults are NULL, in which case default titles are used. \cr
+\code{title_size} \tab integer value specifying the font size for the plot title. Default is 14. \cr
+\code{x_lab_size} \tab integer value indicating the font size for the x-axis. Defaults to 11. \cr
+\code{y_lab_size} \tab integer value indicating the font size for the y-axis. Defaults to 11. \cr
+\code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used. \cr
+\code{legend_position} \tab character string specifying one of "right", "left", "top", or "bottom" for the location of the legend. Defaults to "right". \cr
+\code{combined} \tab logical indicating whether to display the the raw plot and then prompt the user to display the normalized plot (FALSE), or to display both at once (TRUE).  Defaults to FALSE.
+}
+}

@@ -167,7 +167,7 @@ print.customFilt<- function(filter_object){
         cat('\n')
       }else{
       fdata_rm_hd<- cbind(head(fdata_rm, 4))
-      edata_rm_tl<- cbind(tail(edata_rm, 4))
+      fdata_rm_tl<- cbind(tail(fdata_rm, 4))
       blank_row<- '---'
       
       out<-rbind(fdata_rm_hd, blank_row, fdata_rm_tl)
@@ -232,7 +232,7 @@ print.customFilt<- function(filter_object){
         cat('\n')
       }else{
         fdata_kp_hd<- cbind(head(fdata_kp, 4))
-        edata_kp_tl<- cbind(tail(edata_kp, 4))
+        fdata_kp_tl<- cbind(tail(fdata_kp, 4))
         blank_row<- '---'
         
         out<-rbind(fdata_kp_hd, blank_row, fdata_kp_tl)

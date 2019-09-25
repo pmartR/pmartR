@@ -146,7 +146,7 @@ imd_anova <- function(omicsData, comparisons = NULL, test_method, pval_adjust = 
   if(test_method=='anova'){
 
     all_anova <- cbind(anova_results,anova_pvalues,anova_fold_change,anova_fold_flags)
-    Full_results <- base::merge(imd_counts,all_anova,all.x=FALSE,all.y=TRUE,fill=NA,sort=FALSE)
+    Full_results <- right_join(imd_counts,all_anova)
     if(nrow(Full_results)>max(nrow(imd_counts),nrow(all_anova))){
       stop("Combining g-test and ANOVA results failed.")
     }
@@ -167,7 +167,7 @@ imd_anova <- function(omicsData, comparisons = NULL, test_method, pval_adjust = 
     
     all_gtest <- cbind(imd_counts,gtest_pvalues, gtest_flags)
     all_anova <- cbind(anova_results,anova_fold_change)
-    Full_results <- base::merge(all_gtest,all_anova,all.x=TRUE,all.y=FALSE,fill=NA,sort=FALSE)
+    Full_results <- left_join(all_gtest, all_anova)
     if(nrow(Full_results)>max(nrow(all_gtest),nrow(all_anova))){
       stop("Combining g-test and ANOVA results failed.")
     }
@@ -190,7 +190,7 @@ imd_anova <- function(omicsData, comparisons = NULL, test_method, pval_adjust = 
   #Create the list that is returned
   all_gtest <- cbind(imd_counts,gtest_pvalues)
   all_anova <- cbind(anova_results,anova_pvalues,anova_fold_change,anova_fold_flags)
-  Full_results <- base::merge(all_gtest,all_anova,all=TRUE,fill=NA,sort=FALSE)
+  Full_results <- full_join(all_gtest,all_anova)
   
   #Get counts for rows in "anova_results" but not in "imd_counts"
   final_cnts <- Full_results[,grep("Count",colnames(Full_results))]
@@ -227,7 +227,7 @@ imd_anova <- function(omicsData, comparisons = NULL, test_method, pval_adjust = 
   #Same for 'gtest_flags', but a little more complicated
   gtest_flags <- cbind(imd_counts[,1],gtest_flags)
   colnames(gtest_flags)[1] <- colnames(imd_counts)[1]
-  gtest_flags <- merge(anova_results,gtest_flags,all=TRUE, sort = FALSE)
+  gtest_flags <- full_join(anova_results,gtest_flags)
   gtest_flags <- data.matrix(gtest_flags[grep("^Flag_",colnames(gtest_flags))])
   
   #Replance missing ANOVA p-values with g-test p-values

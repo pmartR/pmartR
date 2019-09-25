@@ -4,7 +4,7 @@
 \alias{get_spans_params}
 \title{Gets the parameters for the highest ranked methods from spans.}
 \usage{
-get_spans_params(SPANSRes_obj)
+get_spans_params(SPANSRes_obj, sort_by_nmols = FALSE)
 }
 \arguments{
 \item{SPANSRes_obj}{an object of the class SPANSRes obtained by calling \code{spans_procedure()}}
