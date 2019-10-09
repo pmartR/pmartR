@@ -43,7 +43,8 @@
 #' @export
 
 protein_quant<- function(pepData, method, isoformRes = NULL, qrollup_thresh = NULL, single_pep = FALSE, single_observation = FALSE, combine_fn = "median", use_parallel = TRUE){
-  
+  # load data.table #
+  library(data.table)
   #some checks
   if(!inherits(pepData, "pepData")) stop("pepData must be an object of class pepData")
   if(!(method %in% c('rollup', 'rrollup', 'qrollup', 'zrollup'))) stop("method must be one of, rollup, rrollup, qrollup, zrollup")
