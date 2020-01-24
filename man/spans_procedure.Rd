@@ -26,9 +26,9 @@ spans_procedure(omicsData, norm_fn = c("median", "mean", "zscore",
 
 \item{nonsig_thresh}{numeric value that specifies the minimum p-value for which a biomolecule can be considered non-significant based on a Kruskal-Wallis test.  Defaults to 0.5.}
 
-\item{min_nonsig}{integer value specifying the minimum number of non-significant biomolecules identified in step 0 of SPANS.  nonsig_thresh will be adjusted to the maximum value that gives this many biomolecules.}
+\item{min_nonsig}{integer value specifying the minimum number of non-significant biomolecules identified in step 0 of SPANS in order to proceed.  nonsig_thresh will be adjusted to the maximum value that gives this many biomolecules.}
 
-\item{min_sig}{integer value specifying the minimum number of highly significant biomolecules identified in in step 0 order to proceed.  sig_thresh will be adjusted to the minimum value that gives this many biomolecules.}
+\item{min_sig}{integer value specifying the minimum number of highly significant biomolecules identified in step 0 of SPANS in order to proceed.  sig_thresh will be adjusted to the minimum value that gives this many biomolecules.}
 
 \item{...}{Additional arguments
 \tabular{ll}{
@@ -36,6 +36,8 @@ spans_procedure(omicsData, norm_fn = c("median", "mean", "zscore",
 \code{verbose} Logical specifying whether to print the completion of SPANS procedure steps to console.  Defaults to TRUE.\cr
 \code{parallel} Logical specifying whether to use a parallel backend.  Depending on the size of your data, setting this to FALSE can cause the algorithm to be very slow.  Defaults to TRUE.
 }}
+
+\item{max_sig/max_nonsig}{integer value specifying the maximum number of highly significant/non-significant biomolecules identified in step 0 if SPANS in order to proceed.  Excesses of highly significant/non-significant biomolecules will be randomly sampled down to these values.}
 }
 \value{
 An object of class 'SPANSRes', which is a dataframe containing columns for the subset method and normalization used, the parameters used in the subset method, and the corresponding SPANS score.  \cr

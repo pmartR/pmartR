@@ -1633,7 +1633,7 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
     color_levels <- if(color_by != "group_DF") unique(factor(omicsData$f_data[[color_by]])) else unique(factor(attr(omicsData, "group_DF")[["Group"]]))
     plot_data[[color_by]] <- factor(plot_data[[color_by]], levels = color_levels)
     
-    p <- ggplot(plot_data) + geom_boxplot(aes_string(x = "variable", y = "value", fill = color_by)) 
+    p <- ggplot(plot_data) + geom_boxplot(aes_string(x = "variable", y = "value", fill = color_by))
     
     title <- maintitle
     
@@ -1990,8 +1990,6 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
 #' For plotting an S3 object of type 'dimRes':
 #' 
 #' \tabular{ll}{
-#' \code{order_by} \tab a character string specifying a main effect by which to order the boxplots. This main effect must be found in the column names of f_data in the omicsData object. If order_by is "group_DF", the boxplots will be ordered by the group variable from the group_designation function. If NULL (default), the boxplots will be displayed in the order they appear in the data. \cr
-#' \code{color_by} \tab a character string specifying a main effect by which to color the boxplots. This main effect must be found in the column names of f_data in the omicsData object. If color_by is "group_DF", the boxplots will be colored by the group variable from the group_designation function. If NULL (default), the boxplots will have one default color. \cr
 #' \code{x_lab} \tab character string to be used for x-axis label. Defaults to NULL, in which case a default label is used. \cr
 #' \code{y_lab} \tab character string to be used for y-axis label. Defaults to NULL, in which case a default label is used. \cr
 #' \code{legend_lab} \tab character string specifying the title label to use for the legend \cr
@@ -2001,6 +1999,7 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
 #' \code{y_lab_size} \tab integer value indicating the font size for the y-axis. Defaults to 11. \cr
 #' \code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used. \cr
 #' \code{legend_position} \tab character string specifying one of "right", "left", "top", or "bottom" for the location of the legend. Defaults to "right". \cr
+#' \code{point_size} \tab integer specifying plotting point size.  Defaults to 4. \cr
 #' }
 #'@export
 #'@rdname plot-pmartR-dimRes

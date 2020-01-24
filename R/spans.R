@@ -10,9 +10,10 @@
 #' @param n_iter number of iterations used in calculating the background distribution in step 0 of SPANS.  Defaults to 1000.
 #' @param sig_thresh numeric value that specifies the maximum p-value for which a biomolecule can be considered highly significant based on a Kruskal-Wallis test.  Defaults to 0.0001.
 #' @param nonsig_thresh numeric value that specifies the minimum p-value for which a biomolecule can be considered non-significant based on a Kruskal-Wallis test.  Defaults to 0.5.
-#' @param min_sig integer value specifying the minimum number of highly significant biomolecules identified in in step 0 order to proceed.  sig_thresh will be adjusted to the minimum value that gives this many biomolecules.
-#' @param min_nonsig integer value specifying the minimum number of non-significant biomolecules identified in step 0 of SPANS.  nonsig_thresh will be adjusted to the maximum value that gives this many biomolecules.
-#'
+#' @param min_sig integer value specifying the minimum number of highly significant biomolecules identified in step 0 of SPANS in order to proceed.  sig_thresh will be adjusted to the minimum value that gives this many biomolecules.
+#' @param min_nonsig integer value specifying the minimum number of non-significant biomolecules identified in step 0 of SPANS in order to proceed.  nonsig_thresh will be adjusted to the maximum value that gives this many biomolecules.
+#' @param max_sig/max_nonsig integer value specifying the maximum number of highly significant/non-significant biomolecules identified in step 0 if SPANS in order to proceed.  Excesses of highly significant/non-significant biomolecules will be randomly sampled down to these values.
+#' 
 #' @param ... Additional arguments
 #' \tabular{ll}{
 #' \code{location_thresh, scale_thresh} The minimum p-value resulting from a Kruskal-Wallis test on the location and scale parameters resulting from a normalization method in order for that method to be considered a candidate for scoring.\cr  
@@ -87,7 +88,7 @@ spans_procedure <- function(omicsData, norm_fn = c("median", "mean", "zscore", "
 
   .spans_procedure <- function(omicsData, norm_fn = c("median", "mean", "zscore", "mad"), subset_fn = c("all", "los", "ppp", "rip", "ppp_rip"), 
                             params = NULL, group = NULL, n_iter = 1000, sig_thresh = 0.0001, nonsig_thresh = 0.5, min_nonsig = 20, min_sig = 20,
-                            location_thresh = 0.05, scale_thresh = 0.05, verbose = TRUE, parallel = TRUE){ 
+                            max_nonsig = NULL, max_sig = NULL, location_thresh = 0.05, scale_thresh = 0.05, verbose = TRUE, parallel = TRUE){ 
     
     edata_cname = get_edata_cname(omicsData)
     fdata_cname = get_fdata_cname(omicsData)
@@ -155,6 +156,12 @@ spans_procedure <- function(omicsData, norm_fn = c("median", "mean", "zscore", "
     # misc input checks
     if(!inherits(attr(omicsData, "group_DF"), "data.frame")) stop("the omicsData object must have a grouping structure, usually set by calling group_designation() on the object")
     if(any(c(min_nonsig, min_sig) < 1) | any(c(min_nonsig, min_sig) > nrow(omicsData$e_data))) stop("min_nonsig and min_sig must be an integer value no greater than the number of observed biomolecules")
+    if(!is.null(max_sig)){
+      if(!is.numeric(max_sig) | max_sig <= min_sig) stop('max_sig must be an integer value greater than min_sig')
+    }
+    if(!is.null(max_nonsig)){
+      if(!is.numeric(max_nonsig) | max_nonsig <= min_nonsig) stop('max_nonsig must be an integer value greater than min_nonsig')
+    }
     if(any(c(sig_thresh, nonsig_thresh) > 1) | any(c(sig_thresh, nonsig_thresh) < 0)) stop("sig_thresh and nonsig_thresh must be numeric values between 0 and 1")
     if(isTRUE(attributes(omicsData)$data_info$norm_info$norm_type == "global")) stop("a global normalization scheme has already been applied to this data, SPANS should be run on an unnormalized log-transformed pepData or proData object.")
     if(!isTRUE(grepl("log", attr(omicsData, "data_info")$data_scale))) stop("omicsData object must have been transformed to the log scale.  Either specify the attribute attr(omicsData, 'data_info')$data_scale or call edata_transform() on the omicsData object.")
@@ -190,11 +197,27 @@ spans_procedure <- function(omicsData, norm_fn = c("median", "mean", "zscore", "
       iter <- iter + 1
     }
     
+    # if user set a maximum for the number of significant and nonsignificant molecules and we are over the maximum
+    # randomly sample max_sig indices from the indices of significant molecules ...
+    if(!is.null(max_sig)){
+      if(sum(sig_inds) > max_sig){
+        make_false <- sample(which(sig_inds), sum(sig_inds) - max_sig)
+        sig_inds[make_false] <- FALSE
+      }
+    }
+    # ... and max_nonsig indices from the indices of non-significant molecules.
+    if(!is.null(max_nonsig)){
+      if(sum(nonsig_inds) > max_nonsig){
+        make_false <- sample(which(nonsig_inds), sum(nonsig_inds) - max_nonsig)
+        nonsig_inds[make_false] <- FALSE
+      }
+    }
+    
     # get a vector of n_iter sample sizes for randomly selecting peptides to determine normalization factors
     scaling_factor <- sum(!is.na(omicsData$e_data %>% dplyr::select(-edata_cname)))/100
     select_n <- ceiling(runif(n_iter, nsamps/scaling_factor, 100)*scaling_factor) - nsamps
     
-    ### produce a list with all combinations of subset funcctions, normalization functions, and parameters ###
+    ### produce a list with all combinations of subset functions, normalization functions, and parameters ###
     all_calls <- list()
     
     # for each normalization/subset method combination...

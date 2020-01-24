@@ -4,10 +4,12 @@
 \alias{plot.SPANSRes}
 \title{Plots an object of class SPANSRes}
 \usage{
-\method{plot}{SPANSRes}(SPANSRes_obj)
+\method{plot}{SPANSRes}(SPANSRes_obj, plot_type = "plotly")
 }
 \arguments{
 \item{SPANSRes_obj}{an object of the class 'SPANSRes', usually created by \code{\link{spans_procedure()}}.}
+
+\item{plot_type}{one of 'plotly' or 'ggplot' depending on what type of plot you want}
 }
 \value{
 plots a plotly object
