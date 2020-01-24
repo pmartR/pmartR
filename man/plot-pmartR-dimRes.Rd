@@ -20,5 +20,6 @@ For plotting an S3 object of type 'dimRes':
 \code{y_lab_size} \tab integer value indicating the font size for the y-axis. Defaults to 11. \cr
 \code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used. \cr
 \code{legend_position} \tab character string specifying one of "right", "left", "top", or "bottom" for the location of the legend. Defaults to "right". \cr
+\code{point_size} \tab integer specifying plotting point size.  Defaults to 4. \cr
 }
 }

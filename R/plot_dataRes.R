@@ -40,11 +40,11 @@ plot.dataRes<- function(dataRes, metric = NULL, density = FALSE, ncols = NULL){
     sd = dataRes$sd
     
     #melting data frames from dataRes object
-    mean_melt = melt(mean, id.vars = edata_cname)
+    mean_melt = reshape2::melt(mean, id.vars = edata_cname)
     names(mean_melt)[3]<- "mean"
-    sd_melt = melt(sd, id.vars = edata_cname)
+    sd_melt = reshape2::melt(sd, id.vars = edata_cname)
     names(sd_melt)[3]<- "sd"
-    median_melt = melt(median, id.vars = edata_cname)
+    median_melt = reshape2::melt(median, id.vars = edata_cname)
     names(median_melt)[3]<- "median"
     
     data_mean_sd<- merge(mean_melt, sd_melt, by = c(edata_cname, "variable"))
@@ -68,7 +68,7 @@ plot.dataRes<- function(dataRes, metric = NULL, density = FALSE, ncols = NULL){
     if(density == FALSE){
       #subsetting dataRes object
       data = dataRes[[metric]]
-      data_melt = melt(data, id.vars = edata_cname)
+      data_melt = reshape2::melt(data, id.vars = edata_cname)
       
       r<- ggplot(data_melt, aes(x = value, fill = variable)) + geom_histogram(binwidth = .5, colour = "white") +
         facet_wrap(~variable, ncol = ncols) +
@@ -77,7 +77,7 @@ plot.dataRes<- function(dataRes, metric = NULL, density = FALSE, ncols = NULL){
     }else{
       #if density == T, will plot geom_density
       data = dataRes[[metric]]
-      data_melt = melt(data, id.vars = edata_cname)
+      data_melt = reshape2::melt(data, id.vars = edata_cname)
       
       r<- ggplot(data_melt, aes(x = value, colour = variable)) + geom_density() +
         ggtitle(paste("Density plot for ", metric, sep = "")) + theme_bw()

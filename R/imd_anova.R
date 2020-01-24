@@ -146,7 +146,7 @@ imd_anova <- function(omicsData, comparisons = NULL, test_method, pval_adjust = 
   if(test_method=='anova'){
 
     all_anova <- cbind(anova_results,anova_pvalues,anova_fold_change,anova_fold_flags)
-    Full_results <- base::merge(imd_counts,all_anova,all.x=FALSE,all.y=TRUE,fill=NA,sort=FALSE)
+    Full_results <- right_join(imd_counts,all_anova)
     if(nrow(Full_results)>max(nrow(imd_counts),nrow(all_anova))){
       stop("Combining g-test and ANOVA results failed.")
     }
@@ -160,13 +160,14 @@ imd_anova <- function(omicsData, comparisons = NULL, test_method, pval_adjust = 
 
     final_out <- statRes_output(imd_out,omicsData,comparisons,test_method,pval_adjust,pval_thresh) 
     attr(final_out, "cnames") = attr(omicsData, "cnames")
+    attr(final_out, "data_class") = attr(omicsData, "class")
     return(final_out)
     
   }else if(test_method=='gtest'){
     
     all_gtest <- cbind(imd_counts,gtest_pvalues, gtest_flags)
     all_anova <- cbind(anova_results,anova_fold_change)
-    Full_results <- base::merge(all_gtest,all_anova,all.x=TRUE,all.y=FALSE,fill=NA,sort=FALSE)
+    Full_results <- left_join(all_gtest, all_anova)
     if(nrow(Full_results)>max(nrow(all_gtest),nrow(all_anova))){
       stop("Combining g-test and ANOVA results failed.")
     }
@@ -180,6 +181,7 @@ imd_anova <- function(omicsData, comparisons = NULL, test_method, pval_adjust = 
 
     final_out <- statRes_output(imd_out,omicsData,comparisons,test_method,pval_adjust,pval_thresh) 
     attr(final_out, "cnames") = attr(omicsData, "cnames")
+    attr(final_out, "data_class") = attr(omicsData, "class")
     return(final_out)
   }
   
@@ -188,15 +190,15 @@ imd_anova <- function(omicsData, comparisons = NULL, test_method, pval_adjust = 
   #Create the list that is returned
   all_gtest <- cbind(imd_counts,gtest_pvalues)
   all_anova <- cbind(anova_results,anova_pvalues,anova_fold_change,anova_fold_flags)
-  Full_results <- base::merge(all_gtest,all_anova,all=TRUE,fill=NA,sort=FALSE)
+  Full_results <- full_join(all_gtest,all_anova)
   
   #Get counts for rows in "anova_results" but not in "imd_counts"
   final_cnts <- Full_results[,grep("Count",colnames(Full_results))]
   msng_cnts <- which(is.na(rowSums(final_cnts)))
   if(length(msng_cnts)>0){
-    to_fix <- Full_results[msng_cnts,]$Peptide
+    to_fix <- Full_results[msng_cnts,get_edata_cname(omicsData)]
     omicsData2 <- omicsData
-    omicsData2$e_data <- omicsData$e_data%>%filter(Peptide%in%as.character(to_fix))
+    omicsData2$e_data <- omicsData$e_data%>%dplyr::filter(!!rlang::sym(get_edata_cname(omicsData))%in%as.character(to_fix))
     new_cnts <- imd_test(omicsData = omicsData2, comparisons = NULL, pval_adjust = 'none', pval_thresh = pval_thresh)
     rm(omicsData2)
     #Replace the NA counts with the correct counts
@@ -225,7 +227,7 @@ imd_anova <- function(omicsData, comparisons = NULL, test_method, pval_adjust = 
   #Same for 'gtest_flags', but a little more complicated
   gtest_flags <- cbind(imd_counts[,1],gtest_flags)
   colnames(gtest_flags)[1] <- colnames(imd_counts)[1]
-  gtest_flags <- merge(anova_results,gtest_flags,all=TRUE, sort = FALSE)
+  gtest_flags <- full_join(anova_results,gtest_flags)
   gtest_flags <- data.matrix(gtest_flags[grep("^Flag_",colnames(gtest_flags))])
   
   #Replance missing ANOVA p-values with g-test p-values
@@ -260,6 +262,7 @@ imd_anova <- function(omicsData, comparisons = NULL, test_method, pval_adjust = 
   final_out <- statRes_output(imd_out,omicsData,comparisons,test_method,pval_adjust,pval_thresh)
   
   attr(final_out, "cnames") = attr(omicsData, "cnames")
+  attr(final_out, "data_class") = attr(omicsData, "class")
   return(final_out)
 }
 

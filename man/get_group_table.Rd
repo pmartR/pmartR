@@ -4,10 +4,10 @@
 \alias{get_group_table}
 \title{Get group table}
 \usage{
-get_group_table(omicsData)
+get_group_table(omicsObject)
 }
 \arguments{
-\item{omicsData}{an object of the class 'pepData', 'proData', 'metabData', or 'lipidData', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.}
+\item{omicsObject}{an object of the class 'pepData', 'proData', 'metabData', 'lipidData', 'statRes', or 'trellData', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, \code{\link{imd_anova}}, or \code{\link{format_data}} respectively.}
 }
 \value{
 a table containing number of samples per group
@@ -17,6 +17,6 @@ This function returns a table with number of samples per group
 }
 \examples{
 dontrun{
-get_group_table(omicsData)
+get_group_table(omicsObject)
 }
 }

@@ -189,7 +189,7 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, fc_colors = 
   
   # specified theme parameters
   if(!is.null(custom_theme)){
-    if(!bw_theme) warning("bw_theme set to TRUE overrides provided custom theme")
+    if(!bw_theme) warning("Setting both bw_theme to TRUE and specifying a custom theme may cause undesirable results")
     if(!inherits(custom_theme, c("theme", "gg"))) stop("custom_theme must be a valid 'theme' object as used in ggplot")
     mytheme = custom_theme
   }
@@ -226,12 +226,11 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, fc_colors = 
             scale_fill_manual(values=c(fc_colors[1], fc_colors[3]), labels = c("Negative", "Positive"), name = "Fold Change Sign") +
             facet_wrap(~Comparison) + 
             xlab("Statistical test, by group comparison") + ylab("Count of Biomolecules") +
-            ggtitle("Number of DE Biomolecules Between Groups") +
-            mytheme
+            ggtitle("Number of DE Biomolecules Between Groups")
     
     if(bw_theme) p <- p + theme_bw()
     
-    return(p)
+    return(p + mytheme)
   }
   
   #Both the volcano plot and heatmap need a dataframe of fold changes by comparison/biomolecule
@@ -333,8 +332,11 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, fc_colors = 
           ylab("-log[10](p-value)")+xlab(sprintf("Fold-change (%s)", attr(x, 'data_info')$data_scale)) +
           scale_color_manual(values = cols_anova, name = "Fold Change", 
                              labels = c("Neg(Anova)", "0", "Pos(Anova)"),
-                             breaks = c("-1", "0", "1")) + 
-          mytheme
+                             breaks = c("-1", "0", "1"))
+      
+      if(bw_theme) p1 <- p1 + theme_bw()
+      
+      p1 <- p1 + mytheme
     }
     
     if(attr(x, "statistical_test") %in% c("gtest", "combined")){
@@ -363,8 +365,11 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, fc_colors = 
                            labels = c("Neg(Gtest)", "0", "Pos(Gtest)"),
                            breaks = c("-2", "0", "2")) + 
         scale_x_continuous(breaks = unique(temp_data_gtest$Count_Second_Group), labels = as.character(unique(temp_data_gtest$Count_Second_Group))) +
-        scale_y_continuous(breaks = unique(temp_data_gtest$Count_First_Group), labels = as.character(unique(temp_data_gtest$Count_First_Group))) +
-        mytheme
+        scale_y_continuous(breaks = unique(temp_data_gtest$Count_First_Group), labels = as.character(unique(temp_data_gtest$Count_First_Group)))
+      
+      if(bw_theme) p2 <- p2 + theme_bw()
+      
+      p2 <- p2 + mytheme
     }
     
     # draw a line if threshold specified
@@ -374,19 +379,13 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, fc_colors = 
     
     # apply theme_bw() and interactivity if specified
     if(attr(x, "statistical_test") %in% "anova"){
-      if(bw_theme) p1 <- p1 + theme_bw()
       if(interactive) return(plotly::ggplotly(p1, tooltip = c("text"))) else return(p1)
     } 
     if(attr(x, "statistical_test") %in% "gtest"){
-      if(bw_theme) p2 <- p2 + theme_bw()
       if(interactive) return(plotly::ggplotly(p2, tooltip = c("text"))) else return(p2)
     }
     if(attr(x, "statistical_test") %in% "combined"){
-      if(bw_theme){
-        p1 <- p1 + theme_bw()
-        p2 <- p2 + theme_bw()
-      } 
-      
+
       if(interactive){
         p1 <- p1 %>% plotly::ggplotly(tooltip = c("text"))
         p2 <- p2 %>% plotly::ggplotly(tooltip = c("text"))
@@ -400,7 +399,10 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, fc_colors = 
         return(p)
       }
       
-      else return(gridExtra::grid.arrange(p1,p2,nrow = 2))
+      else{
+        gridExtra::grid.arrange(p1,p2,nrow = 2)
+        return(invisible(list(p1,p2)))
+      }
     }
   }
   
