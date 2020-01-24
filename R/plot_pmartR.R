@@ -1731,7 +1731,7 @@ plot.lipidData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
                      legend.position = legend_position)
     
     if(bw_theme==TRUE){
-      p <- p + ggplot::theme_bw()
+      p <- p + ggplot2::theme_bw()
       
     }
     
