@@ -37,7 +37,6 @@ expect_warning(imd_anova(omicsData = mypepData, test_method = 'comb', pval_adjus
 # test over 3 combinations of parameters
 nonmiss_params <- list(list(2, NULL), list(NULL, 3), list(2, 3))
 lapply(nonmiss_params, function(params){
-  
   # two objects with different grouping structures
   omicsData_fakegroup <- applyFilt(filter_object = imdanovafilt_fakegroup, omicsData = omicsData_fakegroup, min_nonmiss_anova = params[[1]], min_nonmiss_gtest = params[[2]])
   omicsData_conditiongroup <- applyFilt(filter_object = imdanovafilt_conditiongroup, omicsData = omicsData_conditiongroup, min_nonmiss_anova = params[[1]], min_nonmiss_gtest = params[[2]])
@@ -47,7 +46,17 @@ lapply(nonmiss_params, function(params){
     # ...and on both objects for each test type
     for(omicsData in list(omicsData_fakegroup, omicsData_conditiongroup)){
       statRes_obj <- imd_anova(omicsData = omicsData, test_method = test)
-      flags <- statRes_obj$Full_results[grep("^Flag_", names(statRes_obj$Full_results))]
+      flag_columns <- names(statRes_obj$Full_results)[grep("^Flag_", names(statRes_obj$Full_results))]
+      
+      # get different sections of the results
+      anova_pval_columns <- names(statRes_obj$Full_results)[grep("^P_value_T", names(statRes_obj$Full_results))]
+      g_pval_columns <- names(statRes_obj$Full_results)[grep("^P_value_G", names(statRes_obj$Full_results))]
+      
+      flags <- statRes_obj$Full_results[flag_columns]
+      anova_pvals <- statRes_obj$Full_results[anova_pval_columns]
+      g_pvals <- statRes_obj$Full_results[g_pval_columns]
+      #
+      
       numsig <- attr(statRes_obj, "number_significant")
       
       #test num significant consistency and attributes  
@@ -64,15 +73,28 @@ lapply(nonmiss_params, function(params){
       expect_equal(length(attr(statRes_obj, "comparisons")), choose(length(unique(attr(statRes_obj, "group_DF")$Group)),2))
       expect_equal(ncol(flags), length(attr(statRes_obj, "comparisons")))
       
+      # various truth values to compare
+      anova_is_signif <- anova_pvals < 0.05
+      g_is_signif <- g_pvals < 0.05
+      zero_flag <- flags == 0
+      g_flag_pos <- flags == 2
+      g_flag_neg <- flags == -2
+      anova_flag_pos <- flags == 1
+      anova_flag_neg <- flags == -1
+      
       # depending on test method, flags should have certain values
       if(test == "gtest"){
         expect_true(all(sapply(flags, function(x){x %in% c(-2,0,2)})))
+        expect_false(g_is_signif && zero_flag)
       }
       else if(test == "anova"){
         expect_true(all(sapply(flags, function(x){x %in% c(-1,0,1)})))
+        expect_false(anova_is_signif && zero_flag)
       }
       else if(test == "comb"){
         expect_true(all((unlist(flags) %>% unique()) %in% c(-2,-1,0,1,2,NA)))
+        expect_false(anova_is_signif && zero_flag)
+        expect_false(g_is_signif && (zero_flag | anova_flag_pos | anova_flag_neg))
       }
     }
   }

@@ -146,7 +146,7 @@ imd_anova <- function(omicsData, comparisons = NULL, test_method, pval_adjust = 
   if(test_method=='anova'){
 
     all_anova <- cbind(anova_results,anova_pvalues,anova_fold_change,anova_fold_flags)
-    Full_results <- right_join(imd_counts,all_anova)
+    Full_results <- dplyr::right_join(imd_counts,all_anova)
     if(nrow(Full_results)>max(nrow(imd_counts),nrow(all_anova))){
       stop("Combining g-test and ANOVA results failed.")
     }
@@ -167,7 +167,7 @@ imd_anova <- function(omicsData, comparisons = NULL, test_method, pval_adjust = 
     
     all_gtest <- cbind(imd_counts,gtest_pvalues, gtest_flags)
     all_anova <- cbind(anova_results,anova_fold_change)
-    Full_results <- left_join(all_gtest, all_anova)
+    Full_results <- dplyr::left_join(all_gtest, all_anova)
     if(nrow(Full_results)>max(nrow(all_gtest),nrow(all_anova))){
       stop("Combining g-test and ANOVA results failed.")
     }
