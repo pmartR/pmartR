@@ -8,7 +8,7 @@ output:
       in_header: modify_mathjax.html
       
 vignette: >
-  %\VignetteIndexEntry{pmartR-intro}
+  %\VignetteIndexEntry{pmartR-stats}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 bibliography: pmartRstat_lit.bib

@@ -33,13 +33,13 @@ pquant_mean <- function(pepData){
   pro_id = attr(pepData, "cnames")$emeta_cname
   
   
-  pep = data.table::data.table(pepData$e_data)
-  pro = data.table::data.table(pepData$e_meta[,c(pep_id, pro_id)])
+  pep = pepData$e_data
+  pro = pepData$e_meta[,c(pep_id, pro_id)]
   temp = merge(x = pro, y = pep, by = pep_id, all.x = F, all.y = T)
   temp = as.data.frame(temp, check.names=check_names)[,-which(names(temp)==pep_id)]
-  DT = data.table::data.table(temp)
-  res = as.data.frame(DT[,lapply(.SD, function(x){if(all(is.na(x))){mean(x)}else{mean(x, na.rm = T)}}), by = pro_id], check.names=check_names)
-  
+  #DT = data.table::data.table(temp)
+  #res = as.data.frame(DT[,lapply(.SD, median, na.rm = T), by = pro_id], check.names=check_names)
+  res = as.data.frame(temp %>% dplyr::group_by_(pro_id) %>% dplyr::mutate_at(vars(-dplyr::group_cols()), mean, na.rm = T))
   
   samp_id = attr(pepData, "cnames")$fdata_cname
   data_scale = attr(pepData, "data_info")$data_scale

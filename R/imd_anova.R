@@ -236,6 +236,7 @@ imd_anova <- function(omicsData, comparisons = NULL, test_method, pval_adjust = 
   # Everything -but- gtest flags is aligned with the ID column from Full_results, reorder it here
   reorder = match(Full_results[,get_edata_cname(omicsData)], gtest_flags[,get_edata_cname(omicsData)])
   gtest_flags <- gtest_flags[reorder,]
+
   gtest_flags <- data.matrix(gtest_flags[grep("^Flag_",colnames(gtest_flags))])
   
   #Replance missing ANOVA p-values with g-test p-values

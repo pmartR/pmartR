@@ -9,9 +9,14 @@ This R package provides functionality for quality control processing, statistica
 devtools::install_github("pmartR/pmartR")
 ```
 
-It’s been noted here https://stackoverflow.com/questions/51257009/is-rtools-incompatible-with-r-version-3-5-1 that there are issues with Rtools for R version 3.5.1.
+It’s been noted, here https://stackoverflow.com/questions/51257009/is-rtools-incompatible-with-r-version-3-5-1 , that there are issues with Rtools for R version 3.5.1.
  
 If you run into the same problem when trying to install using `devtools::install_github()` and the suggested fix in the above link does not work, you can clone or download the pmartR library to your computer and install it locally.
+
+It's also been noted, here https://github.com/rcppsmc/rcppsmc/issues/27 , that there are issues with xcode. This manifests itself as an error stating "math.h" not found when trying to install and restart a package. The following fix, at the terminal, has worked for us:
+
+xcode-select --install
+
 
 ## Tutorial:
 
