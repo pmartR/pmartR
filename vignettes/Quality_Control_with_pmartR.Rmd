@@ -9,8 +9,10 @@ output:
     fig_caption: yes
     self_contained: yes
 bibliography: bibliography.bib
-vignette: |
-  %\VignetteIndexEntry{Analyzing Peptide Data with the pmartR Package} %\VignetteEngine{knitr::rmarkdown} \usepackage[utf8]{inputenc}
+vignette: >
+  %\VignetteIndexEntry{pmartR-peptide} 
+  %\VignetteEngine{knitr::rmarkdown} 
+  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r global_options, include = FALSE}

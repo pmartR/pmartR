@@ -132,7 +132,13 @@ isoformRes_func<- function(df, emeta_cname, edata_cname){
   
   for(i in 1:max(df$proteoformID)){
     cur_subset<- df[which(df$proteoformID == i), ]
-    new_df<- data.frame(cur_subset[[emeta_cname]], paste(cur_subset[[emeta_cname]], cur_subset$proteoformID, sep = ';'), as.numeric(cur_subset[[edata_cname]]))
+    
+    # append proteoform number if there's more than one #
+    if(max(df$proteoformID) > 1){
+    new_df<- data.frame(cur_subset[[emeta_cname]], paste(cur_subset[[emeta_cname]], cur_subset$proteoformID, sep = ';'), cur_subset[[edata_cname]])
+    }else{
+    new_df = data.frame(cur_subset[[emeta_cname]], cur_subset[[emeta_cname]], cur_subset[[edata_cname]])  
+    }
     names(new_df)<- c(names(df)[1], "Protein_Isoform", names(df)[2])
     temp[[i]]<- new_df
   }
