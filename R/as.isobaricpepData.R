@@ -1,6 +1,6 @@
 #' Convert Data to Appropriate pmartR Class
 #'
-#' Converts a list object or several data.frames of isobaric peptide-level data to an object of the class 'isobaricpepData'. Objects of the class 'isobaricpepData' are lists with two obligatory components \code{e_data} and \code{f_data}. An optional list component \code{e_meta} is used if analysis or visualization at other levels (e.g. protein) is also desired.
+#' Converts a list object or several data.frames of isobaric peptide-level data to an object of the class 'isobaricpepData'. Objects of the class 'isobaricpepData' are lists with two obligatory components \code{e_data} and \code{f_data}. An optional list component \code{e_meta} is used if analysis or visualization at other levels (e.g. protein) is also desired. !UPDATE THIS FUNCTION!
 #'
 #' @param e_data a \eqn{p \times n + 1} data.frame of expression data, where \eqn{p} is the number of peptides observed and \eqn{n} is the number of samples (an additional peptide identifier/name column should also be present anywhere in the data.frame). Each row corresponds to data for each peptide. One column specifying a unique identifier for each peptide (row) must be present.
 #' @param f_data a data.frame with \eqn{n} rows. Each row corresponds to a sample with one column giving the unique sample identifiers found in e_data column names and other columns providing qualitative and/or quantitative traits of each sample.
