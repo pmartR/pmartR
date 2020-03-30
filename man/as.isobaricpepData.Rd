@@ -37,7 +37,7 @@ as.isobaricpepData(e_data, f_data, e_meta = NULL, edata_cname,
 \item{...}{further arguments}
 }
 \description{
-Converts a list object or several data.frames of isobaric peptide-level data to an object of the class 'isobaricpepData'. Objects of the class 'isobaricpepData' are lists with two obligatory components \code{e_data} and \code{f_data}. An optional list component \code{e_meta} is used if analysis or visualization at other levels (e.g. protein) is also desired.
+Converts a list object or several data.frames of isobaric peptide-level data to an object of the class 'isobaricpepData'. Objects of the class 'isobaricpepData' are lists with two obligatory components \code{e_data} and \code{f_data}. An optional list component \code{e_meta} is used if analysis or visualization at other levels (e.g. protein) is also desired. !UPDATE THIS FUNCTION!
 }
 \details{
 The class 'isobaricpepData' is meant to deal with peptide data generated on instruments where a reference pool for normalization is available (e.g. TMT, iTRAQ). In all cases you must specify \code{exp_cname} which gives the column name for the column in \code{f_data} containing information about which experiment/plate a sample was run on.

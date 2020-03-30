@@ -2,7 +2,7 @@
 #'
 #' Calculate principal components using projection pursuit estimation, which implements an expectation-maximization (EM) estimation algorithm when data is missing.
 #'
-#' @param omicsData an object of the class 'pepdata', 'prodata', 'metabData', or 'lipidData' usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.
+#' @param omicsData an object of the class 'pepdata', 'prodata', 'metabData', 'lipidData', 'nmrData' usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, \code{\link{as.nmrData}}, respectively.
 #' @param k integer number of principal components to return. Defaults to 2.
 #'
 #' @return a data.frame with first \code{k} principal component scores, sample identifiers, and group membership for each sample (if group designation was previously run on the data).
@@ -28,7 +28,7 @@
 #'
 dim_reduction <- function(omicsData, k = 2){
   # check that omicsData is of appropriate class #
-  if(!inherits(omicsData, c("pepData","proData","metabData", "lipidData"))) stop("omicsR_data must be an object of class 'pepdata','prodata', or 'genedata'.")
+  if(!inherits(omicsData, c("pepData","proData","metabData", "lipidData", "nmrData"))) stop("omicsR_data must be an object of class 'pepdata','prodata', 'metabData', 'lipidData', or 'nrmData'.")
 
   # check that group designation has been run #
   if(!("group_DF" %in% names(attributes(omicsData)))) warning("group_designation has not been run on this data and may limit plotting options")

@@ -7,7 +7,7 @@
 dim_reduction(omicsData, k = 2)
 }
 \arguments{
-\item{omicsData}{an object of the class 'pepdata', 'prodata', 'metabData', or 'lipidData' usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.}
+\item{omicsData}{an object of the class 'pepdata', 'prodata', 'metabData', 'lipidData', 'nmrData' usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, \code{\link{as.nmrData}}, respectively.}
 
 \item{k}{integer number of principal components to return. Defaults to 2.}
 }
