@@ -2,7 +2,7 @@
 #'
 #' The method assigns each sample to a group, for future analyses, based on the variable(s) specified as main effects.
 #'
-#' @param omicsData an object of the class 'lipidData', 'metabData', 'pepData', or 'proData', usually created by \code{\link{as.lipidData}}, \code{\link{as.metabData}}, \code{\link{as.pepData}}, or \code{\link{as.proData}}, respectively.
+#' @param omicsData an object of the class 'lipidData', 'metabData', 'pepData', 'proData', or 'nmrData', usually created by \code{\link{as.lipidData}}, \code{\link{as.metabData}}, \code{\link{as.pepData}}, \code{\link{as.proData}}, or \code{\link{as.nmrData}}, respectively.
 #' @param main_effects a character vector with no more than two variable names that should be used as main effects to determine group membership of samples. The variable name must match a column name from \code{f_data}.
 #' @param covariates a character vector of no more than two variable names that should be used as covariates in downstream analyses. Covariates are typically variables that a user wants to account for in the analysis but quantifying/examining the effect of the variable is not of interest.
 #' @param time_course an optional character string specifying the variable name of a time course variable, if applicable to the experimental data.
@@ -29,7 +29,7 @@ group_designation <- function(omicsData, main_effects, covariates=NULL, time_cou
   ### perform some intial checks that data is in an acceptable format ###
 
   # check that omicsData is of appropriate class #
-  if(!inherits(omicsData, c("lipidData","metabData","proData","pepData"))) stop("omicsData is not an object of appropriate class")
+  if(!inherits(omicsData, c("lipidData","metabData","proData","pepData", "nmrData"))) stop("omicsData is not an object of appropriate class")
   
   # check that isobaric data has been normalized #
   if(inherits(omicsData, "isobaricpepData") && 

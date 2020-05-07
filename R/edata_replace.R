@@ -2,7 +2,7 @@
 #'
 #' This function finds all values of x in the e_data element of omicsData and replaces them with y
 #'
-#' @param omicsData an object of the class 'pepData', 'proData', 'metabData', or 'lipidData', usually created by \code{pepData}, \code{proData}, \code{metabData}, or \code{lipidData}, respectively.
+#' @param omicsData an object of the class 'pepData', 'proData', 'metabData', 'lipidData', or 'nmrData' usually created by \code{\link{pepData}}, \code{\link{proData}}, \code{\link{metabData}}, \code{\link{lipidData}}, or \code{\link{as.nmrData}}, respectively.
 #' @param x value to be replaced, usually numeric or NA
 #' @param y replacment value, usually numeric or NA
 #'
@@ -23,7 +23,7 @@ edata_replace <- function(omicsData, x, y){
   ## some initial checks ##
 
   # check that omicsData is of appropriate class #
-  if(!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData"))) stop("omicsData must be of class 'pepData', 'proData', 'metabData', or 'lipidData'")
+  if(!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData", "nmrData"))) stop("omicsData must be of class 'pepData', 'proData', 'metabData', 'lipidData', or 'nmrData'")
 
   UseMethod("edata_replace")
 }
@@ -224,6 +224,55 @@ edata_replace.lipidData <- function(omicsData, x, y){
   attributes(updated_data)$filters <- attributes(omicsData)$filters
   attributes(updated_data)$meta_info <- attributes(omicsData)$meta_info
 
+  message(paste(num_replaced, "instances of", x, "have been replaced with", y, sep=" "))
+  return(updated_data)
+}
+
+
+
+# function for nmrdata
+#' @name edata_replace
+#' @rdname edata_replace
+edata_replace.nmrData <- function(omicsData, x, y){
+  
+  edata_id = attr(omicsData, "cnames")$edata_cname
+  check_names = getchecknames(omicsData)
+  
+  edata <- omicsData$e_data
+  feature_names <- edata[which(names(edata)==edata_id)]
+  # pull off the identifier column #
+  edata <- edata[, -which(colnames(edata)==edata_id)]
+  
+  e_meta <- omicsData$e_meta
+  
+  # get count of the number of values replaced #
+  if(is.na(x)){
+    truefalse <- is.na(edata)
+  }else{
+    truefalse <- edata==x
+  }
+  num_replaced <- sum(truefalse, na.rm=TRUE)
+  
+  # apply vector_replace to the cols of edata (identifier column has been pulled off) #
+  edata_new <- apply(edata, 2, vector_replace, x=x, y=y)
+  
+  # add the identifier column back #
+  edata_new <- data.frame(edata_id=feature_names, edata_new, check.names=check_names)
+  
+  # replace e_data in omicsData with edata_new #
+  if(is.null(e_meta)){
+    emeta_cname = NULL
+  }else{
+    emeta_cname = attr(omicsData, "cnames")$emeta_cname
+  }
+  
+  # create an updated metabData object (look at as.metabData function to see how the attributes are accessed) #
+  updated_data <- as.nmrData(e_data = edata_new, f_data = omicsData$f_data, e_meta = omicsData$e_meta, edata_cname = edata_id, emeta_cname=emeta_cname, fdata_cname = attr(omicsData, "cnames")$fdata_cname, techrep_cname = attr(omicsData, "cnames")$techrep_cname, data_scale = attr(omicsData, "data_info")$data_scale, is_normalized = attr(omicsData, "data_info")$norm_info$is_normalized, data_types=attr(omicsData, "data_info")$data_types, check.names = check_names)
+  
+  attributes(updated_data)$group_DF <- attributes(omicsData)$group_DF
+  attributes(updated_data)$filters <- attributes(omicsData)$filters
+  attributes(updated_data)$meta_info <- attributes(omicsData)$meta_info
+  
   message(paste(num_replaced, "instances of", x, "have been replaced with", y, sep=" "))
   return(updated_data)
 }
