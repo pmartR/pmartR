@@ -6,24 +6,38 @@
 \alias{rmd_filter.proData}
 \alias{rmd_filter.lipidData}
 \alias{rmd_filter.metabData}
+\alias{rmd_filter.nmrData}
 \title{RMD Runs}
 \usage{
 rmd_filter(omicsData, ...)
 
-\method{rmd_filter}{pepData}(omicsData, metrics = c("MAD", "Kurtosis",
-  "Skewness", "Correlation", "Proportion_Missing"))
+\method{rmd_filter}{pepData}(
+  omicsData,
+  metrics = c("MAD", "Kurtosis", "Skewness", "Correlation", "Proportion_Missing")
+)
 
-\method{rmd_filter}{proData}(omicsData, metrics = c("MAD", "Kurtosis",
-  "Skewness", "Correlation", "Proportion_Missing"))
+\method{rmd_filter}{proData}(
+  omicsData,
+  metrics = c("MAD", "Kurtosis", "Skewness", "Correlation", "Proportion_Missing")
+)
 
-\method{rmd_filter}{lipidData}(omicsData, metrics = c("MAD", "Kurtosis",
-  "Skewness", "Correlation"))
+\method{rmd_filter}{lipidData}(
+  omicsData,
+  metrics = c("MAD", "Kurtosis", "Skewness", "Correlation")
+)
 
-\method{rmd_filter}{metabData}(omicsData, metrics = c("MAD", "Kurtosis",
-  "Skewness", "Correlation"))
+\method{rmd_filter}{metabData}(
+  omicsData,
+  metrics = c("MAD", "Kurtosis", "Skewness", "Correlation")
+)
+
+\method{rmd_filter}{nmrData}(
+  omicsData,
+  metrics = c("MAD", "Kurtosis", "Skewness", "Correlation")
+)
 }
 \arguments{
-\item{omicsData}{an object of the class 'pepData', 'proData', 'metabData', or 'lipidData', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.}
+\item{omicsData}{an object of the class 'pepData', 'proData', 'metabData', 'lipidData', or 'nmrData', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, respectively.}
 
 \item{...}{further arguments}
 }

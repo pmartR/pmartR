@@ -4,11 +4,17 @@
 \alias{nonmissing_per_group}
 \title{Computes the Number of Non-Missing Data Points by Group}
 \usage{
-nonmissing_per_group(omicsData = NULL, e_data = NULL, groupDF = NULL,
-  cname_id = NULL, samp_id = NULL, check.names = NULL)
+nonmissing_per_group(
+  omicsData = NULL,
+  e_data = NULL,
+  groupDF = NULL,
+  cname_id = NULL,
+  samp_id = NULL,
+  check.names = NULL
+)
 }
 \arguments{
-\item{omicsData}{an optional object of one of the classes "pepData", "proData", "metabData", or "lipidData", usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{lipidData}}, respectively. Either omicsData or all of e_data, groupDF, cname_id, and samp_id must be provided.}
+\item{omicsData}{an optional object of one of the classes "pepData", "proData", "metabData",  "lipidData", or "nmrData", usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, respectively. Either omicsData or all of e_data, groupDF, cname_id, and samp_id must be provided.}
 
 \item{e_data}{an optional a \eqn{p \times n + 1} data.frame of expression data, where \eqn{p} is the number of lipids observed and \eqn{n} is the number of samples. Each row corresponds to data for each lipid. One column specifying a unique identifier for each lipid (row) must be present. Not required if omicsData is provided.}
 
