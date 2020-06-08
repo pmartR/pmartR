@@ -22,6 +22,7 @@ Imports:
     ggplot2,
     e1071,
     foreach,
+    limma,
     pcaMethods,
     plotly,
     rlang,
@@ -35,8 +36,7 @@ Imports:
 Suggests:
     knitr,
     rmarkdown,
-    testthat, 
-    limma
+    testthat
 RoxygenNote: 6.1.1
 Encoding: UTF-8
 
