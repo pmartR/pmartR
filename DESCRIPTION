@@ -25,7 +25,6 @@ Imports:
     rlang,
     rrcov,
     scales,
-    d3heatmap,
     gridExtra,
     reshape2,
     RcppArmadillo,
