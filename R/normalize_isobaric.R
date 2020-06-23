@@ -1,11 +1,11 @@
 #' Normalize an object of class isobaricpepData
 #' 
-#' Description of what this function does
+#' The samples are normalized to their corresponding reference pool sample
 #' 
 #' @param omicsData an object of the class 'isobaricpepData'
 #' @param apply_norm logical, indicates whether normalization should be applied to omicsData$e_data
 #' @param channel_cname optional character string specifying the name of the column containing the instrument channel a sample was run on in \code{f_data}. This argument is optional, see Details for how to specify information regarding reference pool samples. If using this argument, the 'refpool_channel' argument must also be specified; in this case, 'refpool_cname' and 'refpool_notation' should not be specified.
-#' @param refpool_channel optional character string specifying which channel contained the reference pool sample, only used when this remains the same from experiment to experiment. This argument is optional, see Details for how to specify information regarding reference pool samples. If using this argument, the 'channel_cname" argument must also be specified; in this case, 'refpool_cname' and 'refpool_notation' should not be specified.
+#' @param refpool_channel optional character string specifying which channel contained the reference pool sample, only used when this remains the same from experiment to experiment. This argument is optional, see Details for how to specify information regarding reference pool samples. If using this argument, the 'channel_cname' argument must also be specified; in this case, 'refpool_cname' and 'refpool_notation' should not be specified.
 #' @param refpool_cname optional character string specifying the name of the column containing information about which samples are reference samples in \code{f_data}. This argument is optional, see Details for how to specify information regarding reference pool samples. If using this argument, the 'refpool_notation' argument must also be specified; in this case, 'channel_cname' and 'refpool_channel' should not be specified.
 #' @param refpool_notation optional character string specifying the value in the refpool_channel column which denotes that a sample is a reference sample. This argument is optional, see Details for how to specify information regarding reference pool samples. If using this argument, the 'refpool_cname' argument must also be specified; in this case, 'channel_cname' and 'refpool_channel' should not be specified.
 #' @details 
@@ -65,13 +65,16 @@ normalize_isobaric<- function(omicsData, apply_norm = FALSE, channel_cname = NUL
   # throw an error if neither or both of these are true #
   if((poss1 + poss2) != 1) stop("Reference samples information was not correctly specified. See Details and Examples for more information.")
   
+  # get some values #
   exp_cname = attr(omicsData, "isobaric_info")$exp_cname
+  edata_cname <- get_edata_cname(omicsData)
+  fdata_cname <- get_fdata_cname(omicsData)
   
   # if possibility 1 is used, check that ref_cname column 
   if(poss1 == TRUE){
     if(!is.character(refpool_notation)) stop("refpool_notation must be of class 'character'")
     omicsData$f_data[ , refpool_cname] = as.character(omicsData$f_data[ , refpool_cname])
-    omicsData$f_data[ , omicsData$fdata_cname] = as.character(omicsData$f_data[ , omicsData$fdata_cname])
+    omicsData$f_data[ , fdata_cname] = as.character(omicsData$f_data[ , fdata_cname])
     idx = split(omicsData$f_data[ , refpool_cname], omicsData$f_data[ , exp_cname])
     temp_check = lapply(idx, function(x) refpool_notation %in% x)
     if(sum(unlist(temp_check)) != length(temp_check)) stop(paste("'refpool_notation=", refpool_notation, " is not in every experiment. See Details and Examples for more information."))
@@ -81,7 +84,7 @@ normalize_isobaric<- function(omicsData, apply_norm = FALSE, channel_cname = NUL
   if(poss2 == TRUE){
     if(!is.character(refpool_channel)) stop("refpool_channel must be of class 'character'")
     omicsData$f_data[ , channel_cname] = as.character(omicsData$f_data[ , channel_cname])
-    omicsData$f_data[ , omicsData$fdata_cname] = as.character(omicsData$f_data[ , omicsData$fdata_cname])
+    omicsData$f_data[ , fdata_cname] = as.character(omicsData$f_data[ , fdata_cname])
     idx = split(omicsData$f_data[ , channel_cname], omicsData$f_data[ , exp_cname])
     temp_check = lapply(idx, function(x) refpool_channel %in% x)
     if(sum(unlist(temp_check)) != length(temp_check)) stop(paste("'refpool_channel=", refpool_channel, " is not in every experiment. See Details and Examples for more information."))
