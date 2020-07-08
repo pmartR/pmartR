@@ -42,9 +42,9 @@
 #' @examples
 #' dontrun{
 #' library(pmartRdata)
-#' data("nmr_edata")
-#' data("nmr_fdata")
-#' mynmrData <- as.nmrData(e_data = nmr_edata, f_data = nmr_fdata, edata_cname = "Metabolite", fdata_cname = "SampleID")
+#' data("nmr_edata_identified")
+#' data("nmr_fdata_identified")
+#' mynmrData <- as.nmrData(e_data = nmr_edata_identified, f_data = nmr_fdata_identified, edata_cname = "Metabolite", fdata_cname = "SampleID", data_type = "identified")
 #'}
 #'
 #' @author Lisa Bramer, Kelly Stratton
