@@ -4,6 +4,7 @@
 #' 
 #' @param omicsData an object of the class 'isobaricpepData'
 #' @param apply_norm logical, indicates whether normalization should be applied to omicsData$e_data
+#' #' @param exp_cname character string specifying the name of the column containing the experiment/plate information in \code{f_data}.
 #' @param channel_cname optional character string specifying the name of the column containing the instrument channel a sample was run on in \code{f_data}. This argument is optional, see Details for how to specify information regarding reference pool samples. If using this argument, the 'refpool_channel' argument must also be specified; in this case, 'refpool_cname' and 'refpool_notation' should not be specified.
 #' @param refpool_channel optional character string specifying which channel contained the reference pool sample, only used when this remains the same from experiment to experiment. This argument is optional, see Details for how to specify information regarding reference pool samples. If using this argument, the 'channel_cname' argument must also be specified; in this case, 'refpool_cname' and 'refpool_notation' should not be specified.
 #' @param refpool_cname optional character string specifying the name of the column containing information about which samples are reference samples in \code{f_data}. This argument is optional, see Details for how to specify information regarding reference pool samples. If using this argument, the 'refpool_notation' argument must also be specified; in this case, 'channel_cname' and 'refpool_channel' should not be specified.
@@ -14,6 +15,7 @@
 #' \item specify \code{channel_cname} and \code{refpool_channel}. This should be used when the reference sample for each experiment/plate was always located in the same channel. Here \code{channel_cname} gives the column name for the column in \code{f_data} which gives information about which channel each sample was run on, and \code{refpool_channel} is a character string specifying the value in \code{channel_colname} that corresponds to the reference sample channel.
 #' \item specify \code{refpool_cname} and \code{refpool_notation}. This should be used when the reference sample is not in a consistent channel across experiments/plates. Here, \code{refpool_cname} gives the name of the column in \code{f_data} which indicates whether a sample is a reference or not, and \code{refpool_notation} is a character string giving the value used to denote a reference sample in that column.
 #' }
+#' In both cases you must specify \code{exp_cname} which gives the column name for the column in \code{f_data} containing information about which experiment/plate a sample was run on.
 #' 
 #' See examples below.
 #' @examples  
@@ -22,20 +24,20 @@
 #' data(isobaric_object)
 #' 
 #' isobaric_object = edata_transform(isobaric_object, "log2")
-#' isobaric_norm = normalize_isobaric(isobaric_object, apply_norm = TRUE, channel_cname = "iTRAQ.Channel", refpool_channel = "116")
+#' isobaric_norm = normalize_isobaric(isobaric_object, exp_cname = "Set", apply_norm = TRUE, channel_cname = "iTRAQ.Channel", refpool_channel = "116")
 #' 
 #' # alternate specification: #
 #' data(isobaric_object)
 #' 
 #' isobaric_object = edata_transform(isobaric_object, "log2")
-#' isobaric_norm = normalize_isobaric(isobaric_object, apply_norm = TRUE, refpool_cname = "Reference", refpool_notation = "Yes")
+#' isobaric_norm = normalize_isobaric(isobaric_object, exp_cname = "Set", apply_norm = TRUE, refpool_cname = "Reference", refpool_notation = "Yes")
 #' 
 #' }
 #' 
 #' @export
 #'
   
-normalize_isobaric<- function(omicsData, apply_norm = FALSE, channel_cname = NULL, refpool_channel = NULL, refpool_cname = NULL, refpool_notation = NULL){
+normalize_isobaric<- function(omicsData, exp_cname = "Set", apply_norm = FALSE, channel_cname = NULL, refpool_channel = NULL, refpool_cname = NULL, refpool_notation = NULL){
   # initial checks #
   
   #check that omicsData is of correct class
@@ -44,6 +46,9 @@ normalize_isobaric<- function(omicsData, apply_norm = FALSE, channel_cname = NUL
   #check that omicsData$e_data is log transformed
   if(!(attr(omicsData, "data_info")$data_scale %in% c('log2', 'log10', 'log'))) stop("omicsData$e_data must be log transformed")
 
+  # check that exp_cname is in f_data #
+  if(!(exp_cname %in% names(omicsData$f_data))) stop(paste("Experiment column", exp_cname, "is not found in f_data.", sep = " "))
+  
   #check that apply_norm is of class logical
   if(!is.logical(apply_norm)) stop("apply_norm must be of class 'logical'")
   
@@ -143,6 +148,7 @@ normalize_isobaric<- function(omicsData, apply_norm = FALSE, channel_cname = NUL
     
     #update isobaric norm flag
     attr(omicsData, "isobaric_info")$norm_info$is_normalized = TRUE
+    attr(omicsData, "isobaric_info")$exp_cname = exp_cname
     
     result = omicsData
   }else{

@@ -8,11 +8,10 @@
 #' @param edata_cname character string specifying the name of the column containing the peptide identifiers in \code{e_data} and \code{e_meta} (if applicable).
 #' @param emeta_cname character string specifying the name of the column containing the protein identifiers (or other mapping variable) in \code{e_meta} (if applicable). Defaults to NULL. If \code{e_meta} is NULL, then either do not specify \code{emeta_cname} or specify it as NULL. If \code{e_meta} is NULL, then specify \code{emeta_cname} as NULL.
 #' @param fdata_cname character string specifying the name of the column containing the sample identifiers in \code{f_data}.
-#' @param exp_cname character string specifying the name of the column containing the experiment/plate information in \code{f_data}.
 #' @param techrep_cname character string specifying the name of the column in \code{f_data} containing the identifiers for the biological samples if the observations represent technical replicates.  This column is used to collapse the data when \code{combine_techreps} is called on this object.  Defaults to NULL (no technical replicates). 
 #' @param ... further arguments
 #'
-#' @details The class 'isobaricpepData' is meant to deal with peptide data generated on instruments where a reference pool for normalization is available (e.g. TMT, iTRAQ). In all cases you must specify \code{exp_cname} which gives the column name for the column in \code{f_data} containing information about which experiment/plate a sample was run on.
+#' @details The class 'isobaricpepData' is meant to deal with peptide data generated on instruments where a reference pool for normalization is available (e.g. TMT, iTRAQ). 
 #' 
 #'  If your data has already undergone normalization to the reference pool, you should speficy \code{isobaric_norm = T}.
 #' 
@@ -52,20 +51,20 @@
 #' data("isobaric_edata")
 #' data("isobaric_fdata")
 #' data("isobaric_emeta")
-#' mypepData <- as.isobaricpepData(e_data = isobaric_edata, e_meta = isobaric_emeta, f_data = isobaric_fdata, edata_cname = "Peptide", fdata_cname = "Sample", emeta_cname = "Protein", exp_cname = "Set")
+#' mypepData <- as.isobaricpepData(e_data = isobaric_edata, e_meta = isobaric_emeta, f_data = isobaric_fdata, edata_cname = "Peptide", fdata_cname = "Sample", emeta_cname = "Protein")
 #'}
 #' @author Lisa Bramer
 #' @seealso \code{\link{as.pepData}}
 #' @seealso \code{\link{normalize_isobaric}}
 #'
 #' @export
-as.isobaricpepData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname, emeta_cname = NULL, exp_cname, techrep_cname = NULL, ...){
-  .as.isobaricpepData(e_data, f_data, e_meta, edata_cname, fdata_cname, emeta_cname, exp_cname, techrep_cname, ...)
+as.isobaricpepData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname, emeta_cname = NULL, techrep_cname = NULL, ...){
+  .as.isobaricpepData(e_data, f_data, e_meta, edata_cname, fdata_cname, emeta_cname, techrep_cname, ...)
 }
 
 ## peptide data ##
 .as.isobaricpepData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname,
-                        emeta_cname = NULL, exp_cname, techrep_cname = NULL, 
+                        emeta_cname = NULL, techrep_cname = NULL, 
                         data_scale = "abundance",
                         is_normalized = FALSE, isobaric_norm = FALSE, norm_info = list(), data_types=NULL, check.names = TRUE){
   
@@ -89,10 +88,6 @@ as.isobaricpepData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata
     message("emeta_cname will not be used, no e_meta was provided") 
     emeta_cname = NULL
   } 
-  
-  # check that exp_cname is in f_data #
-  if(!(exp_cname %in% names(f_data))) stop(paste("Experiment column", exp_cname, "is not found in f_data. See details of as.isobaricpepData for specifying column names.", sep = " "))
-  
   
   # if e_meta is non-NULL and emeta_cname is NULL #
   if(!is.null(e_meta) & is.null(emeta_cname)) stop("if e_meta is non-NULL, emeta_cname must also be non-NULL")
@@ -166,8 +161,6 @@ as.isobaricpepData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata
   
   # set column name attributes #
   attr(res, "cnames") = list(edata_cname = edata_cname, emeta_cname = emeta_cname, fdata_cname = fdata_cname, techrep_cname = techrep_cname)
-  
-  attr(res, "isobaric_info") = list(exp_cname = exp_cname)
   
   # count missing values in e_data #
   num_miss_obs = sum(is.na(e_data[,-which(names(e_data)==edata_cname)]))
