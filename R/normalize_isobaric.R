@@ -37,7 +37,7 @@
 #' @export
 #'
   
-normalize_isobaric<- function(omicsData, exp_cname = "Set", apply_norm = FALSE, channel_cname = NULL, refpool_channel = NULL, refpool_cname = NULL, refpool_notation = NULL){
+normalize_isobaric<- function(omicsData, exp_cname = NULL, apply_norm = FALSE, channel_cname = NULL, refpool_channel = NULL, refpool_cname = NULL, refpool_notation = NULL){
   # initial checks #
   
   #check that omicsData is of correct class
@@ -71,7 +71,7 @@ normalize_isobaric<- function(omicsData, exp_cname = "Set", apply_norm = FALSE, 
   if((poss1 + poss2) != 1) stop("Reference samples information was not correctly specified. See Details and Examples for more information.")
   
   # get some values #
-  exp_cname = attr(omicsData, "isobaric_info")$exp_cname
+
   edata_cname <- get_edata_cname(omicsData)
   fdata_cname <- get_fdata_cname(omicsData)
   
