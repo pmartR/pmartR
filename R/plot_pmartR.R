@@ -103,61 +103,56 @@ plot.corRes <- function(corRes_object, omicsData = NULL, interactive = FALSE, x_
     plot_title <- title_plot
   }
   
-  if(!interactive) {
-    #pal <- colorRampPalette(c("blue","white","red"))
-    pal <- colorRampPalette(c("red", "yellow")) # modified by KS 2/12/2018
+  pal <- colorRampPalette(c("red", "yellow")) # modified by KS 2/12/2018
 
-    colnames(corRes_object) <- rownames(corRes_object)
-    corRes_melt <- reshape2::melt(corRes_object)
-    corRes_melt$Var1 <- abbreviate(corRes_melt$Var1, minlength=20)
-    corRes_melt$Var2 <- abbreviate(corRes_melt$Var2, minlength=20)
-    
-    if(all(is.na(colorbar_lim))){
-      heatmap <- ggplot(corRes_melt, aes(x = ordered(Var2, levels = rev(sort(unique(Var2)))),
-                                                           y = ordered(Var1, levels = rev(sort(unique(Var1)))))) +
-        geom_tile(aes(fill = value)) +
-        scale_fill_gradientn("Correlation", colours = pal(50)) +
-        xlab("") +  ylab("") +
-        theme(axis.text.x = element_text(angle = 90),
-                       axis.ticks = element_blank(),
-                       plot.title = element_text(size=title_size))
-    }else{
-      heatmap <- ggplot(corRes_melt, aes(x = ordered(Var2, levels = rev(sort(unique(Var2)))),
-                                                           y = ordered(Var1, levels = rev(sort(unique(Var1)))))) +
-        geom_tile(aes(fill = value)) +
-        scale_fill_gradientn("Correlation", limits = colorbar_lim, colours = pal(50)) +
-        xlab("") +  ylab("") +
-        theme(axis.text.x = element_text(angle = 90),
-                       axis.ticks = element_blank(),
-                       plot.title = element_text(size=title_size))
-    }
-    
-    
-    if(nrow(corRes_object) > 40) heatmap <- heatmap + theme(axis.text.x = element_blank())
-    if(x_lab==FALSE) heatmap <- heatmap + theme(axis.text.x = element_blank()) # added by KS
-    if(y_lab==FALSE) heatmap <- heatmap + theme(axis.text.y = element_blank()) # added by KS
-    
-    if(!is.null(attributes(corRes_object)$is_normalized)){
-      if(attributes(corRes_object)$is_normalized == TRUE) {
-        heatmap <- heatmap + ggtitle(plot_title)
-      }else{heatmap <- heatmap + ggtitle(plot_title)}
-    }else{
-        heatmap <- heatmap + ggtitle(plot_title)
-    }
-    
-    if(use_VizSampNames){
-      if(!is.logical(as.logical(use_VizSampNames))) stop("Must specify a logical TRUE/FALSE value for use_VizSampNames")
-      if(is.null(omicsData)) stop("If using custom sample names, specify the corresponding omicsData object")
-      heatmap = heatmap + 
-        scale_x_discrete(labels = omicsData$f_data$VizSampNames, breaks = levels(omicsData$f_data[,get_fdata_cname(omicsData)])) + 
-        scale_y_discrete(labels = omicsData$f_data$VizSampNames, breaks = levels(omicsData$f_data[,get_fdata_cname(omicsData)]))
-    }
-    
-  } else {
-    if(!is.null(title_plot)) message("The ability to display a plot title is not available when interactive is set to TRUE")
-    if(use_VizSampNames) message("Custom Sample names not available in interactive plots")
-    heatmap <- d3heatmap::d3heatmap(corRes_object, dendrogram = 'none', reorderfun = function(x) ordered(x, levels = rev(sort(unique(x)))), title = plot_title)
+  colnames(corRes_object) <- rownames(corRes_object)
+  corRes_melt <- reshape2::melt(corRes_object)
+  corRes_melt$Var1 <- abbreviate(corRes_melt$Var1, minlength=20)
+  corRes_melt$Var2 <- abbreviate(corRes_melt$Var2, minlength=20)
+  sampleIDx = ordered(corRes_melt$Var2, levels = rev(sort(unique(corRes_melt$Var2))))
+  sampleIDy = ordered(corRes_melt$Var1, levels = rev(sort(unique(corRes_melt$Var1))))
+  
+  if(all(is.na(colorbar_lim))){
+    heatmap <- ggplot(corRes_melt, aes(x = sampleIDx, y = sampleIDy)) +
+      geom_tile(aes(fill = value)) +
+      scale_fill_gradientn("Correlation", colours = pal(50)) +
+      xlab("") +  ylab("") +
+      theme(axis.text.x = element_text(angle = 90),
+                     axis.ticks = element_blank(),
+                     plot.title = element_text(size=title_size))
+  }else{
+    heatmap <- ggplot(corRes_melt, aes(x = sampldIDx, y = sampleIDy)) +
+      geom_tile(aes(fill = value)) +
+      scale_fill_gradientn("Correlation", limits = colorbar_lim, colours = pal(50)) +
+      xlab("") +  ylab("") +
+      theme(axis.text.x = element_text(angle = 90),
+                     axis.ticks = element_blank(),
+                     plot.title = element_text(size=title_size))
   }
+  
+  
+  if(nrow(corRes_object) > 40) heatmap <- heatmap + theme(axis.text.x = element_blank())
+  if(x_lab==FALSE) heatmap <- heatmap + theme(axis.text.x = element_blank()) # added by KS
+  if(y_lab==FALSE) heatmap <- heatmap + theme(axis.text.y = element_blank()) # added by KS
+  
+  if(!is.null(attributes(corRes_object)$is_normalized)){
+    if(attributes(corRes_object)$is_normalized == TRUE) {
+      heatmap <- heatmap + ggtitle(plot_title)
+    }else{heatmap <- heatmap + ggtitle(plot_title)}
+  }else{
+      heatmap <- heatmap + ggtitle(plot_title)
+  }
+  
+  if(use_VizSampNames){
+    if(!is.logical(as.logical(use_VizSampNames))) stop("Must specify a logical TRUE/FALSE value for use_VizSampNames")
+    if(is.null(omicsData)) stop("If using custom sample names, specify the corresponding omicsData object")
+    heatmap = heatmap + 
+      scale_x_discrete(labels = omicsData$f_data$VizSampNames, breaks = levels(omicsData$f_data[,get_fdata_cname(omicsData)])) + 
+      scale_y_discrete(labels = omicsData$f_data$VizSampNames, breaks = levels(omicsData$f_data[,get_fdata_cname(omicsData)]))
+  }
+  
+  # 
+  if(interactive) heatmap <- plotly::ggplotly(heatmap)
   
   return(heatmap)
 }
