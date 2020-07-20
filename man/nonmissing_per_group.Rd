@@ -30,7 +30,7 @@ nonmissing_per_group(
 a list of length two. The first element giving the total number of possible samples for each group. The second element giving a data.frame with the first column giving the peptide and the second through kth columns giving the number of non-missing observations for each of the \code{k} groups.
 }
 \description{
-This function computes the number of non-missing observations for samples, based on a group designation, for every peptide in the dataset
+This function computes the number of non-missing observations for samples, based on a group designation, for every biomolecule in the dataset
 }
 \examples{
 dontrun{
