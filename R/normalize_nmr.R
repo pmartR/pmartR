@@ -30,7 +30,7 @@
 #' nmr_norm = normalize_nmr(nmr_object, apply_norm = TRUE, metabolite_name = "unkm1.53")
 #' 
 #' # alternate specification: #
-#' data(nmr_object)
+#' data(nmr_object_identified)
 #' 
 #' nmr_object = edata_transform(nmr_object, "log2")
 #' nmr_norm = normalize_nmr(nmr_object, apply_norm = TRUE, sample_property_cname = "Concentration")
@@ -41,7 +41,9 @@
 #'
 
 normalize_nmr<- function(omicsData, apply_norm = FALSE, backtransform = TRUE, metabolite_name = NULL, sample_property_cname = NULL){
-  # initial checks #
+  
+  ### --------------------------------------------- ###
+  ### initial checks ###
   
   # check that omicsData is of correct class
   if(!inherits(omicsData, "nmrData")) stop("omicsData must be of the class 'nmrData'")
@@ -116,125 +118,168 @@ normalize_nmr<- function(omicsData, apply_norm = FALSE, backtransform = TRUE, me
     if(any(sample_property == 0)){stop(paste("sample_property_cname=", sample_property_cname, " is not non-zero for every sample. See Details and Examples for more information."))}
   }
   
+  ### --------------------------------------------- ###
+  
+  
   # set up attributes for nmr normalization information #
   attr(omicsData, "nmr_info") = list(metabolite_name = metabolite_name, sample_property_cname = sample_property_cname, norm_info = list(is_normalized = FALSE, backtransform = backtransform))
   
   
+  ### --------------------------------------------- ###
+  ### use a reference metabolite to normalize the other metabolites ###
+  
   if(poss1 == TRUE){
-    # use a reference metabolite to normalize the other metabolites; remove the reference metabolite from the new edata #
-    # remove the reference metabolite from edata as well as the edata_cname column #
-    edata_new <- edata[-grep(metabolite_name, edata[, edata_cname]), -grep(edata_cname, names(edata))]
-    if(is_log == TRUE){
-      # we need to subtract reference_metabolite from all the others #
-      edata_new <- edata_new - reference_metabolite
-      if(backtransform == TRUE){
-        # which log scale is the data on? #
-        data_scale <- attributes(omicsData)$data_info$data_scale
-        if(data_scale == "log2"){
-          edata_new <- edata_new + log2(backtransform_value)
-        }else{
-          if(data_scale == "log10"){
-            edata_new <- edata_new + log10(backtransform_value)
+    
+    if(apply_norm == TRUE){
+      # apply the normalization; remove the reference metabolite from edata as well as the edata_cname column #
+      edata_new <- edata[-grep(metabolite_name, edata[, edata_cname]), -grep(edata_cname, names(edata))]
+      
+      if(is_log == TRUE){
+        # we need to subtract reference_metabolite from all the others #
+        edata_new <- edata_new - reference_metabolite
+        if(backtransform == TRUE){
+          # which log scale is the data on? #
+          data_scale <- attributes(omicsData)$data_info$data_scale
+          if(data_scale == "log2"){
+            edata_new <- edata_new + log2(backtransform_value)
           }else{
-            if(data_scale == "ln"){
-              edata_new <- edata_new + ln(backtransform_value)
+            if(data_scale == "log10"){
+              edata_new <- edata_new + log10(backtransform_value)
             }else{
-              stop("data_scale is not recognized as valid. Check attributes(omcisData)$data_info$data_scale")
+              if(data_scale == "ln"){
+                edata_new <- edata_new + ln(backtransform_value)
+              }else{
+                stop("data_scale is not recognized as valid. Check attributes(omcisData)$data_info$data_scale")
+              }
             }
           }
         }
+      }else{
+        # is_log == FALSE, so we need to divide all the others by reference_metabolite #
+        edata_new <- edata_new / reference_metabolite
+        if(backtransform == TRUE){
+          edata_new <- edata_new * backtransform_value
+        }
       }
+      # reattach the edata_cname column to edata_new
+      metabolites_new <- omicsData$e_data[, edata_cname]
+      metabolites_new <- metabolites_new[-which(omicsData$e_data[, edata_cname] == metabolite_name)]
+      edata_new <- cbind(metabolites_new, edata_new)
+      names(edata_new)[1] <- edata_cname
+      
+      norm_string <- paste0("nmrObject was normalized using metabolite_name: ", metabolite_name)
+      norm_params <- reference_metabolite
+      
+      # replace omicsData$e_data with normalized edata
+      omicsData$e_data <- edata_new
+      
+      # need to update attributes containing summary info, since number of metabolites will change in the case that a row in edata was used to normalize ... probably need to re-create the data object and set the other attributes to their previous values #
+      attributes(omicsData)$data_info$num_edata <- length(unique(omicsData$e_data[, edata_cname]))
+      attributes(omicsData)$data_info$num_miss_obs <- sum(is.na(omicsData$e_data[,-which(names(omicsData$e_data)==edata_cname)]))
+      attributes(omicsData)$data_info$prop_missing <- mean(is.na(omicsData$e_data[,-which(names(omicsData$e_data)==edata_cname)]))
+      attributes(omicsData)$data_info$num_samps <- ncol(omicsData$e_data) - 1
+      
+      
+      # update nmr norm flag
+      attr(omicsData, "nmr_info")$norm_info$is_normalized = TRUE
+      
+      # update attribute stating how data was normalized #
+      attr(omicsData, "nmr_info")$norm_info$how_normalized <- norm_string
+      
+      result <- omicsData
+      
     }else{
-      # is_log == FALSE, so we need to divide all the others by reference_metabolite #
-      edata_new <- edata_new / reference_metabolite
-      if(backtransform == TRUE){
-        edata_new <- edata_new * backtransform_value
-      }
+      # apply_norm is FALSE in the reference metabolite case #
+      # want a list: Sample (fdata_cname col from f_data), Metabolite (single metabolite name), value (values for that metabolite from e_data)
+      rowind <- which(omicsData$e_data[, edata_cname] == metabolite_name)
+      result <- list(Sample = omicsData$f_data[, fdata_cname], Metabolite = metabolite_name, value = as.numeric(omicsData$e_data[rowind, -which(names(omicsData$e_data) == edata_cname)]))
+      
+      # set class #
+      class(result) <- c("nmrnormRes", "list")
+      
+      # set attributes #
+      attr(result, "cnames")$edata_cname = edata_cname
+      attr(result, "cnames")$fdata_cname = fdata_cname
+      attr(result, "nmr_info")$sample_property_cname <- NULL
+      attr(result, "nmr_info")$metabolite_name <- metabolite_name
+      
     }
-    # reattach the edata_cname column to edata_new
-    metabolites_new <- omicsData$e_data[, edata_cname]
-    metabolites_new <- metabolites_new[-which(omicsData$e_data[, edata_cname] == metabolite_name)]
-    edata_new <- cbind(metabolites_new, edata_new)
-    names(edata_new)[1] <- edata_cname
-    
-    norm_string <- paste0("nmrObject was normalized using metabolite_name: ", metabolite_name)
-    norm_params <- reference_metabolite
   }
+  
+  ### --------------------------------------------- ###
+  ### use a sample property from fdata to normalize the samples ###
   
   if(poss2 == TRUE){
-    # use a sample property from fdata to normalize the samples #
-    edata_new <- edata[ , -grep(edata_cname, names(edata))]
-    if(is_log == TRUE){
-      # we need to subtract sample_property from the samples #
-      edata_new <- edata_new - matrix(sample_property, nrow = nrow(edata_new), ncol = ncol(edata_new), byrow = FALSE)
-      if(backtransform == TRUE){
-        # which log scale is the data on? #
-        data_scale <- attributes(omicsData)$data_info$data_scale
-        if(data_scale == "log2"){
-          edata_new <- edata_new + log2(backtransform_value)
-        }else{
-          if(data_scale == "log10"){
-            edata_new <- edata_new + log10(backtransform_value)
+    
+    if(apply_norm == TRUE){
+      
+      edata_new <- edata[ , -grep(edata_cname, names(edata))]
+      if(is_log == TRUE){
+        # we need to subtract sample_property from the samples #
+        edata_new <- edata_new - matrix(sample_property, nrow = nrow(edata_new), ncol = ncol(edata_new), byrow = FALSE)
+        if(backtransform == TRUE){
+          # which log scale is the data on? #
+          data_scale <- attributes(omicsData)$data_info$data_scale
+          if(data_scale == "log2"){
+            edata_new <- edata_new + log2(backtransform_value)
           }else{
-            if(data_scale == "ln"){
-              edata_new <- edata_new + ln(backtransform_value)
+            if(data_scale == "log10"){
+              edata_new <- edata_new + log10(backtransform_value)
             }else{
-              stop("data_scale is not recognized as valid. Check attributes(omcisData)$data_info$data_scale")
+              if(data_scale == "ln"){
+                edata_new <- edata_new + ln(backtransform_value)
+              }else{
+                stop("data_scale is not recognized as valid. Check attributes(omcisData)$data_info$data_scale")
+              }
             }
           }
+          
         }
-        
+      }else{
+        # is_log == FALSE, so we need to divide samples by the sample_property #
+        edata_new <- edata_new / matrix(sample_property, nrow = nrow(edata_new), ncol = ncol(edata_new), byrow = FALSE)
+        if(backtransform == TRUE){
+          edata_new <- edata_new * backtransform_value
+        }
       }
-    }else{
-      # is_log == FALSE, so we need to divide samples by the sample_property #
-      edata_new <- edata_new / matrix(sample_property, nrow = nrow(edata_new), ncol = ncol(edata_new), byrow = FALSE)
-      if(backtransform == TRUE){
-        edata_new <- edata_new * backtransform_value
-      }
-    }
-    edata_new <- cbind(edata[, grep(edata_cname, names(edata))], edata_new)
-    names(edata_new)[1] <- edata_cname
-    
-    norm_string <- paste0("nmrObject was normalized using sample property: ", sample_property_cname)
-    norm_params <- sample_property
-  }
-  
-  
-  #########----------------------##########
-  
-  # case where apply_norm is TRUE
-  if(apply_norm == TRUE){
-    
-    # replace omicsData$e_data with normalized edata
-    omicsData$e_data <- edata_new
-    
-    # need to update attributes containing summary info, since number of metabolites will change in the case that a row in edata was used to normalize ... probably need to re-create the data object and set the other attributes to their previous values #
-    attributes(omicsData)$data_info$num_edata <- length(unique(omicsData$e_data[, edata_cname]))
-    attributes(omicsData)$data_info$num_miss_obs <- sum(is.na(omicsData$e_data[,-which(names(omicsData$e_data)==edata_cname)]))
-    attributes(omicsData)$data_info$prop_missing <- mean(is.na(omicsData$e_data[,-which(names(omicsData$e_data)==edata_cname)]))
-    attributes(omicsData)$data_info$num_samps <- ncol(omicsData$e_data) - 1
-    
-    
-    # update nmr norm flag
-    attr(omicsData, "nmr_info")$norm_info$is_normalized = TRUE
-    
-    # update attribute stating how data was normalized #
-    attr(omicsData, "nmr_info")$norm_info$how_normalized <- norm_string
-    
-    result <- omicsData
-  }else{ # apply_norm == FALSE
-    res = list(how_normalized = norm_string, parameters = list(normalization = norm_results$norm_params, backtransform = norm_results$backtransform_params), 
-               n_features_calc = length(peps), feature_subset = peps, prop_features_calc = length(peps)/nrow(omicsData$e_data))
-    
-    class(res) = "normRes"
-    attributes(res)$omicsData = omicsData
-    
-    result <- omicsData # the un-normalized version--make sure this is actually un-normalized
-    
-    
-    class(result) = "nmrnormRes" # do we want plot and summary methods for this?
+      edata_new <- cbind(edata[, grep(edata_cname, names(edata))], edata_new)
+      names(edata_new)[1] <- edata_cname
       
-    
+      norm_string <- paste0("nmrObject was normalized using sample property: ", sample_property_cname)
+      norm_params <- sample_property
+      
+      # replace omicsData$e_data with normalized edata
+      omicsData$e_data <- edata_new
+      
+      # need to update attributes containing summary info, since number of metabolites will change in the case that a row in edata was used to normalize ... probably need to re-create the data object and set the other attributes to their previous values #
+      attributes(omicsData)$data_info$num_edata <- length(unique(omicsData$e_data[, edata_cname]))
+      attributes(omicsData)$data_info$num_miss_obs <- sum(is.na(omicsData$e_data[,-which(names(omicsData$e_data)==edata_cname)]))
+      attributes(omicsData)$data_info$prop_missing <- mean(is.na(omicsData$e_data[,-which(names(omicsData$e_data)==edata_cname)]))
+      attributes(omicsData)$data_info$num_samps <- ncol(omicsData$e_data) - 1
+      
+      
+      # update nmr norm flag
+      attr(omicsData, "nmr_info")$norm_info$is_normalized = TRUE
+      
+      # update attribute stating how data was normalized #
+      attr(omicsData, "nmr_info")$norm_info$how_normalized <- norm_string
+      
+      result <- omicsData
+      
+    }else{
+      # apply_norm is FALSE in the sample property case #  
+      # want a list: Sample (fdata_cname col from f_data), sample property name (single column name from f_data), value (values for that metabolite from e_data)
+      result <- list(Sample = omicsData$f_data[, fdata_cname], Property = sample_property_cname, value = omicsData$f_data[, sample_property_cname])
+      
+      # set class #
+      class(result) <- c("nmrnormRes", "list")
+      
+      # set attributes #
+      attr(result, "cnames")$edata_cname = edata_cname
+      attr(result, "cnames")$fdata_cname = fdata_cname
+      attr(result, "nmr_info")$sample_property_cname <- sample_property_cname
+      attr(result, "nmr_info")$metabolite_name <- NULL
+    }
   }
   
   return(result)
