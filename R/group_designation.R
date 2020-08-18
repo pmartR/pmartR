@@ -26,7 +26,7 @@
 
 group_designation <- function(omicsData, main_effects, covariates=NULL, time_course=NULL){
 
-  ### perform some intial checks that data is in an acceptable format ###
+  ### perform some initial checks that data is in an acceptable format ###
 
   # check that omicsData is of appropriate class #
   if(!inherits(omicsData, c("lipidData","metabData","proData","pepData", "nmrData"))) stop("omicsData is not an object of appropriate class")

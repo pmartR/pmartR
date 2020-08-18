@@ -1,8 +1,15 @@
 #' Convert Data to Appropriate pmartR Class
 #'
-#' Converts a list object or several data.frames of metabolomic-level data to an object of the class 'metabData'. Objects of the class 'metabData' are lists with two obligatory components \code{e_data} and \code{f_data}. An optional list component \code{e_meta} is used if analysis or visualization at other levels (e.g. metabolite identification) is also desired.
+#' Converts a list object or several data.frames of metabolomic-level data to 
+#' an object of the class 'metabData'. Objects of the class 'metabData' are 
+#' lists with two obligatory components \code{e_data} and \code{f_data}. An 
+#' optional list component \code{e_meta} is used if analysis or visualization 
+#' at other levels (e.g. metabolite identification) is also desired.
 #'
-#' @param e_data a \eqn{p \times n + 1} data.frame of expression data, where \eqn{p} is the number of metabolites observed and \eqn{n} is the number of samples. Each row corresponds to data for each metabolite. One column specifying a unique identifier for each metabolite (row) must be present.
+#' @param e_data a \eqn{p \times n + 1} data.frame of expression data, where 
+#' \eqn{p} is the number of metabolites observed and \eqn{n} is the number of 
+#' samples. Each row corresponds to data for each metabolite. One column 
+#' specifying a unique identifier for each metabolite (row) must be present.
 #' @param f_data a data.frame with \eqn{n} rows. Each row corresponds to a sample with one column giving the unique sample identifiers found in e_data column names and other columns providing qualitative and/or quantitative traits of each sample.
 #' @param e_meta an optional data.frame with \eqn{p} rows. Each row corresponds to a metabolite with one column giving metabolite names (must be named the same as the column in \code{e_data}) and other columns giving meta information.
 #' @param edata_cname character string specifying the name of the column containing the metabolite identifiers in \code{e_data} and \code{e_meta} (if applicable).
