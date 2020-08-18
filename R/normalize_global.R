@@ -169,6 +169,7 @@ normalize_global <- function(omicsData, subset_fn, norm_fn, params = NULL, apply
   #check that backtransform is T/F #
   if(!inherits(backtransform, "logical")) stop("backtransform must a logical argument")
 
+  if(apply_norm == FALSE & backtransform == TRUE){stop("apply_norm is set to FALSE and backtransform is set to TRUE; a backtransform cannot be applied if the normalization is not being applied.")}
   
   # subset data using current subset method #
   if(subset_fn == "all"){
