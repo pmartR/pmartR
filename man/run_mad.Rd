@@ -16,7 +16,7 @@ data.frame with two elements: Sample, a character vector giving the sample names
 This function calculates the median absolute deviance across data for each sample run.
 }
 \details{
-When calculating the MAD within a sample NA values are ignorned. If all peptide abundance values are missing within a sample, the MAD is replaced by the overall mean MAD values for the data.
+When calculating the MAD within a sample NA values are ignored. If all peptide abundance values are missing within a sample, the MAD is replaced by the overall mean MAD values for the data.
 }
 \author{
 Lisa Bramer

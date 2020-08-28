@@ -7,16 +7,24 @@
 imdanova_filter(omicsData)
 }
 \arguments{
-\item{omicsData}{object of one of the classes "pepData", "proData", "lipidData", or "metabData", usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.lipidData}}, \code{\link{as.metabData}}, respectively.}
+\item{omicsData}{object of one of the classes "pepData", "isobaricpepData",
+"proData", "lipidData", "metabData", or "nmrData", usually created by
+\code{\link{as.pepData}}, \code{\link{as.isobaricpepData}}, \code{\link{as.proData}},
+\code{\link{as.lipidData}}, \code{\link{as.metabData}}, or \code{\link{as.nmrData}}, respectively.}
 }
 \value{
-Object of class imdanovaFilt (also a data.frame) containing the molecule identifier and number of samples in each group with non-missing values for that molecule.
+Object of class imdanovaFilt (also a data.frame) containing the
+ molecule identifier and number of samples in each group with non-missing
+ values for that molecule.
 }
 \description{
-This function returns an imdanovaFilt object for use with \code{\link{applyFilt}}
+This function returns an imdanovaFilt object for use with
+\code{\link{applyFilt}}
 }
 \details{
-The output from this function can be used in conjunction with \code{\link{applyFilt}} to filter out molecules that are not present in enough samples to do statistical comparisons.
+The output from this function can be used in conjunction with
+ \code{\link{applyFilt}} to filter out molecules that are not present in
+ enough samples to do statistical comparisons.
 }
 \examples{
 dontrun{

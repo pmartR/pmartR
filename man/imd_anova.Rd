@@ -2,38 +2,60 @@
 % Please edit documentation in R/imd_anova.R
 \name{imd_anova}
 \alias{imd_anova}
-\title{Tests for a qualitative and quantiative difference between groups using IMD and ANOVA, respectively}
+\title{Tests for a qualitative and quantitative difference between groups using IMD
+and ANOVA, respectively}
 \usage{
-imd_anova(omicsData, comparisons = NULL, test_method,
-  pval_adjust = "none", pval_thresh = 0.05, covariates = NULL,
-  paired = FALSE, equal_var = TRUE)
+imd_anova(
+  omicsData,
+  comparisons = NULL,
+  test_method,
+  pval_adjust = "none",
+  pval_thresh = 0.05,
+  covariates = NULL,
+  paired = FALSE,
+  equal_var = TRUE
+)
 }
 \arguments{
-\item{omicsData}{A pmartR data object of any class, which has a `group_df` attribute that is usually created by the `group_designation()` function}
+\item{omicsData}{A pmartR data object of any class, which has a `group_df`
+attribute that is usually created by the `group_designation()` function}
 
-\item{comparisons}{data.frame with columns for "Control" and "Test" containing the different comparisons of interest. Comparisons will be made between the Test and the corresponding Control  If left NULL, then all pairwise comparisons are executed.}
+\item{comparisons}{data.frame with columns for "Control" and "Test"
+containing the different comparisons of interest. Comparisons will be made
+between the Test and the corresponding Control  If left NULL, then all
+pairwise comparisons are executed.}
 
-\item{test_method}{character string specifying the filter method to use: "combined", "gtest", or "anova". "combined" implements both the gtest and anova filters.}
+\item{test_method}{character string specifying the filter method to use:
+"combined", "gtest", or "anova". "combined" implements both the gtest and
+anova filters.}
 
-\item{pval_adjust}{character vector specifying the type of multiple comparisons adjustment to implement via \code{\link{p.adjust}}. A NULL value corresponds to no adjustment. Valid options for ANOVA include: holm, hochberg, hommel, bonferroni, BH, BY, fdr, none. Valid options for g-test include: holm, bonferonni and none. See \code{\link{p.adjust}} for some details.}
+\item{pval_adjust}{character vector specifying the type of multiple
+comparisons adjustment to implement via \code{\link{p.adjust}}. A NULL
+value corresponds to no adjustment. Valid options for ANOVA include: holm,
+hochberg, hommel, bonferroni, BH, BY, fdr, none. Valid options for g-test
+include: holm, bonferonni and none. See \code{\link{p.adjust}} for some
+details.}
 
-\item{pval_thresh}{numeric p-value threshold, below or equal to which peptides are considered differentially expressed. Defaults to 0.05}
+\item{pval_thresh}{numeric p-value threshold, below or equal to which
+peptides are considered differentially expressed. Defaults to 0.05}
 
-\item{covariates}{data.frame similar to \code{groupData} consisting of two columns: the sample ID variable (with names matching column names in \code{omicsData$e_data}) and a column containing the numeric or group data for each sample}
+\item{covariates}{data.frame similar to \code{groupData} consisting of two
+columns: the sample ID variable (with names matching column names in
+\code{omicsData$e_data}) and a column containing the numeric or group data
+for each sample}
 
-\item{paired}{logical - should the data be paired or not; if TRUE the attribute "pairing" cannot be `NULL`}
+\item{paired}{logical - should the data be paired or not; if TRUE the
+attribute "pairing" cannot be `NULL`}
 }
 \value{
-a list of \code{data.frame} objects 
-\tabular{ll}{
-Full_Results \tab Columns: e_data cname, group counts, group means, ANOVA p-values, IMD p-values, fold change estimates, fold change significance flags\cr
- \tab \cr
- Flags (signatures)  \tab Indicator of statistical significance for one (+/-1 for ANOVA, +/-2 for g-test) or neither (0) test \cr
- \tab \cr
-p-values  \tab p-values for pairwise comparisons adjusted for within, e.g., peptide multiple comparisons only (not across peptides yet) \cr
-\tab \cr
-groupData  \tab Mapping between sample ID and group \cr
- }
+a list of \code{data.frame} objects \tabular{ll}{ Full_Results \tab
+  Columns: e_data cname, group counts, group means, ANOVA p-values, IMD
+  p-values, fold change estimates, fold change significance flags\cr \tab \cr
+  Flags (signatures)  \tab Indicator of statistical significance for one
+  (+/-1 for ANOVA, +/-2 for g-test) or neither (0) test \cr \tab \cr p-values
+  \tab p-values for pairwise comparisons adjusted for within, e.g., peptide
+  multiple comparisons only (not across peptides yet) \cr \tab \cr groupData
+  \tab Mapping between sample ID and group \cr }
 }
 \description{
 This is IMD-ANOVA test proposed in Webb-Robertson et al. (2010).
@@ -77,7 +99,10 @@ ovarian_res_twofac_main_effects <- imd_anova(omicsData = tcga_ovarian_pepdata_bp
 }
 }
 \references{
-Webb-Robertson, Bobbie-Jo M., et al. "Combined statistical analyses of peptide intensities and peptide occurrences improves identification of significant peptides from MS-based proteomics data." Journal of proteome research 9.11 (2010): 5748-5756.
+Webb-Robertson, Bobbie-Jo M., et al. "Combined statistical
+analyses of peptide intensities and peptide occurrences improves
+identification of significant peptides from MS-based proteomics data."
+Journal of proteome research 9.11 (2010): 5748-5756.
 }
 \author{
 Bryan Stanfill, Kelly Stratton

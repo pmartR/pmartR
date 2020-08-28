@@ -6,41 +6,66 @@
 \alias{rmd_filter.proData}
 \alias{rmd_filter.lipidData}
 \alias{rmd_filter.metabData}
+\alias{rmd_filter.nmrData}
 \title{RMD Runs}
 \usage{
 rmd_filter(omicsData, ...)
 
-\method{rmd_filter}{pepData}(omicsData, metrics = c("MAD", "Kurtosis",
-  "Skewness", "Correlation", "Proportion_Missing"))
+\method{rmd_filter}{pepData}(
+  omicsData,
+  metrics = c("MAD", "Kurtosis", "Skewness", "Correlation", "Proportion_Missing")
+)
 
-\method{rmd_filter}{proData}(omicsData, metrics = c("MAD", "Kurtosis",
-  "Skewness", "Correlation", "Proportion_Missing"))
+\method{rmd_filter}{proData}(
+  omicsData,
+  metrics = c("MAD", "Kurtosis", "Skewness", "Correlation", "Proportion_Missing")
+)
 
-\method{rmd_filter}{lipidData}(omicsData, metrics = c("MAD", "Kurtosis",
-  "Skewness", "Correlation"))
+\method{rmd_filter}{lipidData}(
+  omicsData,
+  metrics = c("MAD", "Kurtosis", "Skewness", "Correlation")
+)
 
-\method{rmd_filter}{metabData}(omicsData, metrics = c("MAD", "Kurtosis",
-  "Skewness", "Correlation"))
+\method{rmd_filter}{metabData}(
+  omicsData,
+  metrics = c("MAD", "Kurtosis", "Skewness", "Correlation")
+)
+
+\method{rmd_filter}{nmrData}(
+  omicsData,
+  metrics = c("MAD", "Kurtosis", "Skewness", "Correlation")
+)
 }
 \arguments{
-\item{omicsData}{an object of the class 'pepData', 'proData', 'metabData', or 'lipidData', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.}
+\item{omicsData}{an object of the class 'pepData', 'proData', 'metabData',
+'lipidData', or 'nmrData' usually created by \code{\link{as.pepData}},
+\code{\link{as.proData}}, \code{\link{as.metabData}}, 
+\code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, respectively.}
 
 \item{...}{further arguments}
 }
 \value{
-a data.frame containing columns for the Sample ID, log2 robust Mahalanobis distance, p-values, and robust Mahalanobis distance
+a data.frame containing columns for the Sample ID, log2 robust
+ Mahalanobis distance, p-values, and robust Mahalanobis distance
 }
 \description{
-The method computes a robust Mahalanobis distance that can be mapped to a p-value and used to identify outlying samples
+The method computes a robust Mahalanobis distance that can be mapped to a
+p-value and used to identify outlying samples
 }
 \details{
-The metrics on which the log2 robust Mahalanobis distance is based can be specified using the \code{metrics} argument.
-\tabular{ll}{
-pepData \tab For pepData objects, all five of the metrics "MAD", "Kurtosis", "Skewness", "Correlation", "Proportion_Missing" may be used (this is the default). \cr
-proData \tab For proData objects, all five of the metrics "MAD", "Kurtosis", "Skewness", "Correlation", "Proportion_Missing" may be used (this is the default). \cr
-metabData \tab For metabData objects, the use of "Proportion_Missing" is discouraged due to the general lack of missing data in metabolomics datasets (the default behavior omits "Proportion_Missing" from the metrics). \cr
-lipidData \tab For lipidData objects, , the use of "Proportion_Missing" is discouraged due to the general lack of missing data in metabolomics datasets (the default behavior omits "Proportion_Missing" from the metrics). \cr
-}
+The metrics on which the log2 robust Mahalanobis distance is based
+ can be specified using the \code{metrics} argument. \tabular{ll}{ pepData
+ \tab For pepData objects, all five of the metrics "MAD", "Kurtosis",
+ "Skewness", "Correlation", "Proportion_Missing" may be used (this is the
+ default). \cr proData \tab For proData objects, all five of the metrics
+ "MAD", "Kurtosis", "Skewness", "Correlation", "Proportion_Missing" may be
+ used (this is the default). \cr metabData \tab For metabData objects, the
+ use of "Proportion_Missing" is discouraged due to the general lack of
+ missing data in metabolomics datasets (the default behavior omits
+ "Proportion_Missing" from the metrics). \cr lipidData \tab For lipidData
+ objects, , the use of "Proportion_Missing" is discouraged due to the general
+ lack of missing data in metabolomics datasets (the default behavior omits
+ "Proportion_Missing" from the metrics). \cr }
 }
 \examples{
 dontrun{
@@ -59,7 +84,10 @@ rmd_results <- rmd_filter(omicsData = pep_pepData3)
 
 }
 \references{
-Matzke, M., Waters, K., Metz, T., Jacobs, J., Sims, A., Baric, R., Pounds, J., and Webb-Robertson, B.J. (2011), \emph{Improved quality control processing of peptide-centric LC-MS proteomics data}. Bioinformatics. 27(20): 2866-2872.
+Matzke, M., Waters, K., Metz, T., Jacobs, J., Sims, A., Baric, R.,
+ Pounds, J., and Webb-Robertson, B.J. (2011), \emph{Improved quality control
+ processing of peptide-centric LC-MS proteomics data}. Bioinformatics.
+ 27(20): 2866-2872.
 }
 \author{
 Lisa Bramer, Kelly Stratton

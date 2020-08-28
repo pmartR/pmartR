@@ -4,26 +4,56 @@
 \alias{group_designation}
 \title{Creates Data Frame for Group Membership Based on Specified Main Effects}
 \usage{
-group_designation(omicsData, main_effects, covariates = NULL,
-  time_course = NULL)
+group_designation(
+  omicsData,
+  main_effects,
+  covariates = NULL,
+  time_course = NULL
+)
 }
 \arguments{
-\item{omicsData}{an object of the class 'lipidData', 'metabData', 'pepData', or 'proData', usually created by \code{\link{as.lipidData}}, \code{\link{as.metabData}}, \code{\link{as.pepData}}, or \code{\link{as.proData}}, respectively.}
+\item{omicsData}{an object of the class 'lipidData', 'metabData', 'pepData',
+'proData', 'isobaricpepData', or 'nmrData', usually created by
+\code{\link{as.lipidData}}, \code{\link{as.metabData}},
+\code{\link{as.pepData}}, \code{\link{as.proData}},
+\code{\link{as.isobaricpepData}}, or \code{\link{as.nmrData}}, respectively.}
 
-\item{main_effects}{a character vector with no more than two variable names that should be used as main effects to determine group membership of samples. The variable name must match a column name from \code{f_data}.}
+\item{main_effects}{a character vector with no more than two variable names
+that should be used as main effects to determine group membership of
+samples. The variable name must match a column name from \code{f_data}.}
 
-\item{covariates}{a character vector of no more than two variable names that should be used as covariates in downstream analyses. Covariates are typically variables that a user wants to account for in the analysis but quantifying/examining the effect of the variable is not of interest.}
+\item{covariates}{a character vector of no more than two variable names that
+should be used as covariates in downstream analyses. Covariates are
+typically variables that a user wants to account for in the analysis but
+quantifying/examining the effect of the variable is not of interest.}
 
-\item{time_course}{an optional character string specifying the variable name of a time course variable, if applicable to the experimental data.}
+\item{time_course}{an optional character string specifying the variable name
+of a time course variable, if applicable to the experimental data. CURRENTLY 
+NOT SUPPORTED}
 }
 \value{
-An object of the same class as the input \code{omicsData} object - the provided object with the samples filtered out, if any NAs were produced in designating groups. An attribute 'group_DF', a data.frame with columns for sample id and group, is added to the object. If two main effects are provided the original main effect levels for each sample are returned as the third and fourth columns of the data.frame. If time_course is included, a column for 'TimeCourse' will be output as well. Additionally, the covariates provided will be listed as attributes of this data.frame.
+An object of the same class as the input \code{omicsData} object - the
+ provided object with the samples filtered out, if any NAs were produced in
+ designating groups. An attribute 'group_DF', a data.frame with columns for
+ sample id and group, is added to the object. If two main effects are
+ provided the original main effect levels for each sample are returned as the
+ third and fourth columns of the data.frame. Additionally, the covariates
+ provided will be listed as attributes of this data.frame. Use of time_course 
+ is currently not supported, however the eventual functionality is such that
+ if time_course is included, a column for 'TimeCourse' will be output as well.
 }
 \description{
-The method assigns each sample to a group, for future analyses, based on the variable(s) specified as main effects.
+The method assigns each sample to a group, for future analyses, based on the
+variable(s) specified as main effects.
 }
 \details{
-Groups are formed based on the levels of the main effect variables. One or two main effect variables are allowed. In the case of two main effect variables, groups are formed based on unique combinations of the levels of the two main effect variables. Any samples with level NA for a main effect variable will be removed from the data and will not be included in the final group designation results. Any groups with less than 2 samples will be designated to group NA and the affected sample(s) will be removed from the data.
+Groups are formed based on the levels of the main effect variables.
+ One or two main effect variables are allowed. In the case of two main effect
+ variables, groups are formed based on unique combinations of the levels of
+ the two main effect variables. Any samples with level NA for a main effect
+ variable will be removed from the data and will not be included in the final
+ group designation results. Groups with a single sample are allowed, as is a 
+ single group.
 }
 \examples{
 dontrun{
