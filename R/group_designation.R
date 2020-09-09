@@ -86,6 +86,7 @@ group_designation <- function(omicsData, main_effects, covariates=NULL, time_cou
   # Check time_course
   if(!is.null(time_course)){
     # added Aug 2020, since use of this argument is currently not actively supported #
+    if(is.na(time_course)){time_course = NULL}
     stop("Use of time_course argument is currently not supported.")
     
     if(!is.character(time_course)){
@@ -228,7 +229,7 @@ group_designation <- function(omicsData, main_effects, covariates=NULL, time_cou
   attr(output2, "main_effects") = main_effects
   attr(output2, "covariates") = covariates
   ### changed to NA Aug 2020 ###
-  attr(output2, "time_course") = NA #time_course
+  attr(output2, "time_course") = NULL #time_course
   attr(omicsData, "group_DF") = output2
   
   # Update attributes (7/7/2016 by KS)
