@@ -31,7 +31,7 @@ nonmissing_per_group <- function(omicsData = NULL, e_data = NULL, groupDF=NULL, 
   ## initial checks ##
 
   # check that omicsData is of an appropriate class #
-  if(!is.null(omicsData) & !inherits(omicsData, c("proData","pepData","lipidData", "metabData"))) stop("omicsData is not an object of appropriate class")
+  if(!is.null(omicsData) & !inherits(omicsData, c("proData","pepData","lipidData", "metabData", "nmrData"))) stop("omicsData is not an object of appropriate class")
 
 
 
@@ -91,22 +91,22 @@ nonmissing_per_group <- function(omicsData = NULL, e_data = NULL, groupDF=NULL, 
 #  names(nonmiss_totals) <- mynames
 
   
-  group_dat<- as.character(groupDF$Group[order(groupDF$Group)])
+  group_dat <- as.character(groupDF$Group[order(groupDF$Group)])
   
-  Mass_Tag_ID<- as.character(e_data[,cname_id])
+  Mass_Tag_ID <- as.character(e_data[,cname_id])
   
-  temp_data<- e_data[ , -which(names(e_data) %in% cname_id)]
-  temp_data2<- temp_data[, match(groupDF[ ,samp_id], names(temp_data))]
-  temp_data3<- temp_data2[,order(groupDF$Group)]
+  temp_data <- e_data[ , -which(names(e_data) %in% cname_id)]
+  temp_data2 <- temp_data[, match(groupDF[ ,samp_id], names(temp_data))]
+  temp_data3 <- temp_data2[,order(groupDF$Group)]
   
   
-  nonmissing<- nonmissing_per_grp(as.matrix(temp_data3),group_dat)
+  nonmissing <- nonmissing_per_grp(as.matrix(temp_data3),group_dat)
   
-  nonmissing<- data.frame(nonmissing, check.names = check_names)
+  nonmissing <- data.frame(nonmissing, check.names = check_names)
   
-  colnames(nonmissing)<- unique(group_dat)
+  colnames(nonmissing) <- unique(group_dat)
   
-  nonmiss_totals<- data.frame(Mass_Tag_ID,nonmissing,stringsAsFactors = FALSE, check.names = check_names)
+  nonmiss_totals <- data.frame(Mass_Tag_ID,nonmissing,stringsAsFactors = FALSE, check.names = check_names)
   
   names(nonmiss_totals)[1] <- cname_id
   
