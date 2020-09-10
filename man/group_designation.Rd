@@ -4,11 +4,15 @@
 \alias{group_designation}
 \title{Creates Data Frame for Group Membership Based on Specified Main Effects}
 \usage{
-group_designation(omicsData, main_effects, covariates = NULL,
-  time_course = NULL)
+group_designation(
+  omicsData,
+  main_effects,
+  covariates = NULL,
+  time_course = NULL
+)
 }
 \arguments{
-\item{omicsData}{an object of the class 'lipidData', 'metabData', 'pepData', or 'proData', usually created by \code{\link{as.lipidData}}, \code{\link{as.metabData}}, \code{\link{as.pepData}}, or \code{\link{as.proData}}, respectively.}
+\item{omicsData}{an object of the class 'lipidData', 'metabData', 'pepData', 'proData', or 'nmrData', usually created by \code{\link{as.lipidData}}, \code{\link{as.metabData}}, \code{\link{as.pepData}}, \code{\link{as.proData}}, or \code{\link{as.nmrData}}, respectively.}
 
 \item{main_effects}{a character vector with no more than two variable names that should be used as main effects to determine group membership of samples. The variable name must match a column name from \code{f_data}.}
 

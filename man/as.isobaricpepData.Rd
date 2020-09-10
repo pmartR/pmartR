@@ -4,10 +4,16 @@
 \alias{as.isobaricpepData}
 \title{Convert Data to Appropriate pmartR Class}
 \usage{
-as.isobaricpepData(e_data, f_data, e_meta = NULL, edata_cname,
-  fdata_cname, emeta_cname = NULL, exp_cname, channel_cname = NULL,
-  techrep_cname = NULL, refpool_channel = NULL, refpool_cname = NULL,
-  refpool_notation = NULL, ...)
+as.isobaricpepData(
+  e_data,
+  f_data,
+  e_meta = NULL,
+  edata_cname,
+  fdata_cname,
+  emeta_cname = NULL,
+  techrep_cname = NULL,
+  ...
+)
 }
 \arguments{
 \item{e_data}{a \eqn{p \times n + 1} data.frame of expression data, where \eqn{p} is the number of peptides observed and \eqn{n} is the number of samples (an additional peptide identifier/name column should also be present anywhere in the data.frame). Each row corresponds to data for each peptide. One column specifying a unique identifier for each peptide (row) must be present.}
@@ -22,32 +28,17 @@ as.isobaricpepData(e_data, f_data, e_meta = NULL, edata_cname,
 
 \item{emeta_cname}{character string specifying the name of the column containing the protein identifiers (or other mapping variable) in \code{e_meta} (if applicable). Defaults to NULL. If \code{e_meta} is NULL, then either do not specify \code{emeta_cname} or specify it as NULL. If \code{e_meta} is NULL, then specify \code{emeta_cname} as NULL.}
 
-\item{exp_cname}{character string specifying the name of the column containing the experiment/plate information in \code{f_data}.}
-
-\item{channel_cname}{optional character string specifying the name of the column containing the instrument channel a sample was run on in \code{f_data}. This argument is optional, see Details for how to specify information regarding reference pool samples.}
-
 \item{techrep_cname}{character string specifying the name of the column in \code{f_data} containing the identifiers for the biological samples if the observations represent technical replicates.  This column is used to collapse the data when \code{combine_techreps} is called on this object.  Defaults to NULL (no technical replicates).}
-
-\item{refpool_channel}{optional character string specifying which channel contained the reference pool sample, only used when this remains the same from experiment to experiment. This argument is optional, see Details for how to specify information regarding reference pool samples.}
-
-\item{refpool_cname}{optional character string specifying the name of the column containing information about which samples are reference samples in \code{f_data}. This argument is optional, see Details for how to specify information regarding reference pool samples.}
-
-\item{refpool_notation}{optional character string specifying the value in the refpool_channel column which denotes that a sample is a reference sample. This argument is optional, see Details for how to specify information regarding reference pool samples.}
 
 \item{...}{further arguments}
 }
 \description{
-Converts a list object or several data.frames of isobaric peptide-level data to an object of the class 'isobaricpepData'. Objects of the class 'isobaricpepData' are lists with two obligatory components \code{e_data} and \code{f_data}. An optional list component \code{e_meta} is used if analysis or visualization at other levels (e.g. protein) is also desired.
+Converts a list object or several data.frames of isobaric peptide-level data to an object of the class 'isobaricpepData'. Objects of the class 'isobaricpepData' are lists with two obligatory components \code{e_data} and \code{f_data}. An optional list component \code{e_meta} is used if analysis or visualization at other levels (e.g. protein) is also desired. !UPDATE THIS FUNCTION!
 }
 \details{
-The class 'isobaricpepData' is meant to deal with peptide data generated on instruments where a reference pool for normalization is available (e.g. TMT, iTRAQ). In all cases you must specify \code{exp_cname} which gives the column name for the column in \code{f_data} containing information about which experiment/plate a sample was run on.
-There are two ways to specify the information needed for identifying reference samples which should be used for normalization:
-\enumerate{
-\item specify \code{channel_cname} and \code{refpool_channel}. This should be used when the reference sample for each experiment/plate was always located in the same channel. Here \code{channel_cname} gives the column name for the column in \code{f_data} which gives information about which channel each sample was run on, and \code{refpool_channel} is a character string specifying the value in \code{channel_colname} that corresponds to the reference sample channel.
-\item specify \code{refpool_cname} and \code{refpool_notation}. This should be used when the reference sample is not in a consistent channel across experiments/plates. Here, \code{refpool_cname} gives the name of the column in \code{f_data} which indicates whether a sample is a reference or not, and \code{refpool_notation} is a character string giving the value used to denote a reference sample in that column.
-}
+The class 'isobaricpepData' is meant to deal with peptide data generated on instruments where a reference pool for normalization is available (e.g. TMT, iTRAQ). 
 
-See examples below. If your data has already undergone normalization to the reference pool, you should speficy \code{isobaric_norm = T}.
+ If your data has already undergone normalization to the reference pool, you should speficy \code{isobaric_norm = T}.
 
 Objects of class 'isobaricpepData' contain some attributes that are referenced by downstream functions. These attributes can be changed from their default value by manual specification. A list of these attributes as well as their default values are as follows:
 \tabular{ll}{
@@ -85,20 +76,13 @@ library(pmartRdata)
 data("isobaric_edata")
 data("isobaric_fdata")
 data("isobaric_emeta")
-mypepData <- as.isobaricpepData(e_data = isobaric_edata, e_meta = isobaric_emeta, f_data = isobaric_fdata, edata_cname = "Peptide", fdata_cname = "Sample", emeta_cname = "Mass_Tag_ID")
-
-# Alternate specification #
-
+mypepData <- as.isobaricpepData(e_data = isobaric_edata, e_meta = isobaric_emeta, f_data = isobaric_fdata, edata_cname = "Peptide", fdata_cname = "Sample", emeta_cname = "Protein")
 }
 }
 \seealso{
 \code{\link{as.pepData}}
 
-\code{\link{as.proData}}
-
-\code{\link{as.lipidData}}
-
-\code{\link{as.metabData}}
+\code{\link{normalize_isobaric}}
 }
 \author{
 Lisa Bramer

@@ -2,7 +2,7 @@
 #'
 #' This function creates a customFilt S3 object based on user-specified items to filter out of the dataset
 #'
-#' @param omicsData an object of class "pepData", "proData", "metabData", or "lipidData", created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.
+#' @param omicsData an object of class "pepData", "proData", "metabData", "lipidData", or "nmrData, created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, \code{\link{as.nmrData}}, respectively.
 #' @param e_data_remove character vector specifying the names of the e_data identifiers to remove from the data. This argument can only be specified with other 'remove' arguments.
 #' @param f_data_remove character vector specifying the names of f_data identifiers to remove from the data. This argument can only be specified with other 'remove' arguments.
 #' @param e_meta_remove character vector specifying the names of the e_meta identifiers to remove from the data. This argument can only be specified with other 'remove' arguments.
@@ -30,7 +30,7 @@ custom_filter <- function(omicsData, e_data_remove = NULL, f_data_remove = NULL,
   ## some initial checks ##
   
   # check that omicsData is of correct class #
-  if(!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData"))) stop("omicsData must be of class 'pepData', 'proData', 'metabData', or 'lipidData'.")
+  if(!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData", "nmrData"))) stop("omicsData must be of class 'pepData', 'proData', 'metabData', 'lipidData' 'nmrData'.")
   
   # check that not all e_data_remove, f_data_remove, e_meta_remove and e_data_keep... are NULL #
   if(is.null(e_data_remove) & is.null(f_data_remove) & is.null(e_meta_remove) & is.null(e_data_keep) & is.null(f_data_keep) & is.null(e_meta_keep)) stop("No items have been identified for filtering.")

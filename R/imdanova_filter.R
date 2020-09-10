@@ -2,7 +2,7 @@
 #'
 #' This function returns an imdanovaFilt object for use with \code{\link{applyFilt}}
 #'
-#' @param omicsData object of one of the classes "pepData", "proData", "lipidData", or "metabData", usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.lipidData}}, \code{\link{as.metabData}}, respectively.
+#' @param omicsData object of one of the classes "pepData", "proData", "lipidData", "metabData", or "nmrData", usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.lipidData}}, \code{\link{as.metabData}}, or \code{\link{as.nmrData}}, respectively.
 #'
 #' @details The output from this function can be used in conjunction with \code{\link{applyFilt}} to filter out molecules that are not present in enough samples to do statistical comparisons.
 #'
@@ -25,8 +25,8 @@ imdanova_filter <- function(omicsData){ #}, filter_method, min_nonmiss_gtest=3, 
   ## Initial checks ##
 
   # omicsData must be of the appropriate class
-  if(!inherits(omicsData, c("pepData", "proData", "lipidData", "metabData"))){
-    stop("Invalid class for omicsData. Valid classes are pepData, proData, lipidData, and metabData.")
+  if(!inherits(omicsData, c("pepData", "proData", "lipidData", "metabData", "nmrData"))){
+    stop("Invalid class for omicsData. Valid classes are pepData, proData, lipidData, metabData, and nmrData.")
   }
 
   # omicsData must include groupDF information #
