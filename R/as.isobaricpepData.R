@@ -66,7 +66,8 @@ as.isobaricpepData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata
 .as.isobaricpepData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname,
                         emeta_cname = NULL, techrep_cname = NULL, 
                         data_scale = "abundance",
-                        is_normalized = FALSE, isobaric_norm = FALSE, norm_info = list(), data_types=NULL, check.names = TRUE){
+                        is_normalized = FALSE, isobaric_norm = FALSE, norm_info = list(), 
+                        data_types=NULL, check.names = TRUE){
   
   # initial checks #
   
@@ -160,7 +161,10 @@ as.isobaricpepData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata
   res = list(e_data = e_data, f_data = f_data, e_meta = e_meta)
   
   # set column name attributes #
-  attr(res, "cnames") = list(edata_cname = edata_cname, emeta_cname = emeta_cname, fdata_cname = fdata_cname, techrep_cname = techrep_cname)
+  attr(res, "cnames") = list(edata_cname = edata_cname, 
+                             emeta_cname = emeta_cname, 
+                             fdata_cname = fdata_cname, 
+                             techrep_cname = techrep_cname)
   
   # count missing values in e_data #
   num_miss_obs = sum(is.na(e_data[,-which(names(e_data)==edata_cname)]))
@@ -184,6 +188,13 @@ as.isobaricpepData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata
   # set data information attributes #
   norm_info$is_normalized = is_normalized
   attr(res, "data_info") = list(data_scale = data_scale, norm_info = norm_info, num_edata = num_edata, num_miss_obs = num_miss_obs, num_emeta = num_emeta, prop_missing = prop_missing, num_samps = num_samps, data_types = data_types)
+  
+  attr(res, "isobaric_info") = list(exp_cname = NA, 
+                                          channel_cname = NA, 
+                                          refpool_channel = NA, 
+                                          refpool_cname = NA, 
+                                          refpool_notation = NA, 
+                                          norm_info = list(is_normalized = isobaric_norm))
   
   #set check.names attribute #
   attr(res, "check.names") = check.names 
