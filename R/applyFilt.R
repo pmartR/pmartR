@@ -1,37 +1,51 @@
 #' Apply a S3 filter  object to a pmartR S3 object
 #'
-#' This function takes a filter object of class 'cvFilt', 'rmdFilt', 'moleculeFilt', 'proteomicsFilt', 'imdanovaFilt', or 'customFilt' and applies the filter to a dataset of  \code{pepData}, \code{proData}, \code{lipidData}, or \code{metabData}.
+#' This function takes a filter object of class 'cvFilt', 'rmdFilt',
+#' 'moleculeFilt', 'proteomicsFilt', 'imdanovaFilt', or 'customFilt' and applies
+#' the filter to a dataset of  \code{pepData}, \code{proData}, \code{lipidData},
+#' or \code{metabData}.
 #'
-#' @param filter_object an object of the class 'cvFilt', 'proteomicsFilt', 'rmdFilt', 'moleculeFilt', 'imdanovaFilt', or 'customFilt' created by \code{cv_filter}, \code{proteomics_filter}, \code{rmd_filter}, \code{molecule_filter}, or \code{imdanova_filter}, respectively.
-#' @param omicsData an object of the class \code{pepData}, \code{proData}, \code{lipidData}, or \code{metabData} usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.lipidData}}, or  \code{\link{as.metabData}}, respectively.
+#' @param filter_object an object of the class 'cvFilt', 'proteomicsFilt',
+#'   'rmdFilt', 'moleculeFilt', 'imdanovaFilt', or 'customFilt' created by
+#'   \code{cv_filter}, \code{proteomics_filter}, \code{rmd_filter},
+#'   \code{molecule_filter}, or \code{imdanova_filter}, respectively.
+#' @param omicsData an object of the class \code{pepData}, \code{proData},
+#'   \code{lipidData}, \code{metabData}, or \code{nmrData} usually created by
+#'   \code{\link{as.pepData}}, \code{\link{as.proData}},
+#'   \code{\link{as.lipidData}}, \code{\link{as.metabData}}, or \code{\link{as.nmrData}}, respectively.
 #' @param ... further arguments
 #'
-#' @return An object of the class \code{pepData}, \code{proData}, \code{lipidData}, or \code{metabData},  with specified cname_ids, edata_cnames, and emeta_cnames filtered out of the appropriate datasets.
+#' @return An object of the class \code{pepData}, \code{proData},
+#'   \code{lipidData}, \code{metabData}, or \code{nmrData} with specified cname_ids,
+#'   edata_cnames, and emeta_cnames filtered out of the appropriate datasets.
 #'
-#' @details Various further arguments can be specified depending on the class of the \code{filter_object} being applied.
-#' For a \code{filter_object} of type 'moleculeFilt':
-#' \tabular{ll}{
-#' \code{min_num} \tab an integer value specifying the minimum number of times each biomolecule must be observed across all samples in order to retain the biomolecule. Default value is 2. \cr
-#' }
-#' For a \code{filter_object} of type 'cvFilt':
-#' \tabular{ll}{
-#' \code{cv_threshold} \tab an integer value specifying the maximum coefficient of variation (CV) threshold for the biomolecules. Biomolecules with CV greater than this threshold will be filtered. Default is 150. \cr
-#' }
-#' For a \code{filter_object} of type 'rmdFilt':
-#' \tabular{ll}{
-#' \code{pvalue_threshold} \tab numeric value between 0 and 1, specifying the p-value, below which samples will be removed from the dataset. Default is 0.001. \cr
-#' }
-#' For a \code{filter_object} of type 'proteomicsFilt':
-#' \tabular{ll}{
-#' \code{min_num_peps} \tab an optional integer value between 1 and the maximum number of peptides that map to a protein in omicsData. The value specifies the minimum number of peptides that must map to a protein. Any protein with less than \code{min_num_peps} mapping to it will be returned as a protein that should be filtered. Default value is NULL. \cr
-#' \code{degen_peps} \tab logical indicator of whether to filter out degenerate peptides (TRUE) or not (FALSE). Default value is FALSE.\cr
-#' }
-#' For a \code{filter_object} of type 'imdanovaFilt':
-#' \tabular{ll}{
-#' \code{min_nonmiss_anova} \tab integer value specifying the minimum number of non-missing feature values allowed per group for \code{anova_filter}. Default value is 2. \cr
-#' \code{min_nonmiss_gtest} \tab integer value specifying the minimum number of non-missing feature values allowed per group for \code{gtest_filter}. Default value is 3.\cr
-#' }
-#' There are no futher arguments for a \code{filter_object} of type 'customFilt'.
+#' @details Various further arguments can be specified depending on the class of
+#'   the \code{filter_object} being applied. For a \code{filter_object} of type
+#'   'moleculeFilt': \tabular{ll}{ \code{min_num} \tab an integer value
+#'   specifying the minimum number of times each biomolecule must be observed
+#'   across all samples in order to retain the biomolecule. Default value is 2.
+#'   \cr } For a \code{filter_object} of type 'cvFilt': \tabular{ll}{
+#'   \code{cv_threshold} \tab an integer value specifying the maximum
+#'   coefficient of variation (CV) threshold for the biomolecules. Biomolecules
+#'   with CV greater than this threshold will be filtered. Default is 150. \cr }
+#'   For a \code{filter_object} of type 'rmdFilt': \tabular{ll}{
+#'   \code{pvalue_threshold} \tab numeric value between 0 and 1, specifying the
+#'   p-value, below which samples will be removed from the dataset. Default is
+#'   0.001. \cr } For a \code{filter_object} of type 'proteomicsFilt':
+#'   \tabular{ll}{ \code{min_num_peps} \tab an optional integer value between 1
+#'   and the maximum number of peptides that map to a protein in omicsData. The
+#'   value specifies the minimum number of peptides that must map to a protein.
+#'   Any protein with less than \code{min_num_peps} mapping to it will be
+#'   returned as a protein that should be filtered. Default value is NULL. \cr
+#'   \code{degen_peps} \tab logical indicator of whether to filter out
+#'   degenerate peptides (TRUE) or not (FALSE). Default value is FALSE.\cr } For
+#'   a \code{filter_object} of type 'imdanovaFilt': \tabular{ll}{
+#'   \code{min_nonmiss_anova} \tab integer value specifying the minimum number
+#'   of non-missing feature values allowed per group for \code{anova_filter}.
+#'   Default value is 2. \cr \code{min_nonmiss_gtest} \tab integer value
+#'   specifying the minimum number of non-missing feature values allowed per
+#'   group for \code{gtest_filter}. Default value is 3.\cr } There are no futher
+#'   arguments for a \code{filter_object} of type 'customFilt'.
 #'
 #' @examples
 #' dontrun{
@@ -59,7 +73,7 @@
 applyFilt <- function(filter_object, omicsData, ...){
 
   # check that omicsData is of pmartR S3 class#
-  if(!inherits(omicsData, c("pepData", "proData", "lipidData", "metabData"))) stop("omicsData must be of class 'pepData', 'proData', 'lipidData', or 'metabData'")
+  if(!inherits(omicsData, c("pepData", "proData", "lipidData", "metabData", "nmrData"))) stop("omicsData must be of class 'pepData', 'proData', 'lipidData', or 'metabData'")
 
   # check that filter_object is of an appropriate class#
   if(!inherits(filter_object, c("cvFilt", "proteomicsFilt", "moleculeFilt", "rmdFilt", "imdanovaFilt", "customFilt"))) stop("filter_object must be of  'cvFilt', 'proteomicsFilt', 'moleculeFilt', 'rmdFilt', 'imdanovaFilt', or 'customFilt.")
@@ -485,7 +499,7 @@ applyFilt.proteomicsFilt <- function(filter_object, omicsData, min_num_peps=NULL
 #' @export
 #' @name applyFilt
 #' @rdname applyFilt
-applyFilt.imdanovaFilt <- function(filter_object, omicsData, min_nonmiss_anova=NULL, min_nonmiss_gtest=NULL){
+applyFilt.imdanovaFilt <- function(filter_object, omicsData, min_nonmiss_anova=NULL, min_nonmiss_gtest=NULL, remove_singleton_groups = TRUE){
   # #' @details If filter_method="combined" is specified, then both the \code{anova_filter} and \code{gtest_filter} are applied to the data, and the intersection of features from the two filters is the set returned. For ANOVA, features that do not have at least \code{min_nonmiss_allowed} values per group are candidates for filtering. For the G-test, features that do not have at least \code{min_nonmiss_allowed} values per group are candidates for filtering. The G-test is a test of independence, used here to test the null hypothesis of independence between the number of missing values across groups.
 
 
@@ -495,14 +509,51 @@ applyFilt.imdanovaFilt <- function(filter_object, omicsData, min_nonmiss_anova=N
     min_nonmiss_anova_prev <- attributes(omicsData)$filters$imdanovaFilt$threshold$min_nonmiss_anova
     min_nonmiss_gtest_prev <- attributes(omicsData)$filters$imdanovaFilt$threshold$min_nonmiss_gtest
 
-    stop(paste("A proteomics filter has already been run on this dataset, using a 'min_nonmiss_anova' of ", min_nonmiss_anova_prev, " and 'min_nonmiss_gtest' of ", min_nonmiss_gtest_prev, ". See Details for more information about how to choose a threshold before applying the filter.", sep=""))
+    stop(paste("An IMD-ANOVA filter has already been run on this dataset, using a 'min_nonmiss_anova' of ", min_nonmiss_anova_prev, " and 'min_nonmiss_gtest' of ", min_nonmiss_gtest_prev, ". See Details for more information about how to choose a threshold before applying the filter.", sep=""))
 
 
-  }else{ # no previous rmdFilt, so go ahead and run it like normal #
+  }else{ # no previous imdanovaFilt, so go ahead and run it like normal #
 
 
     ## initial checks ##
 
+    # verify remove_singleton_groups is logical T/F #
+    if(class(remove_singleton_groups) != "logical"){stop("remove_singletong_groups must be of class logical")}
+    
+    group_sizes <- attr(filter_object, "group_sizes")
+    nonmiss_per_group <- list(nonmiss_totals = filter_object, group_sizes = group_sizes)
+    groupDF <- attributes(omicsData)$group_DF
+    
+    # if remove_singleton_groups is TRUE, filter those out now #
+    if(remove_singleton_groups == TRUE){
+      if(any(group_sizes$n_group == 1)){
+        # which group(s) #
+        singleton_groups <- group_sizes$Group[group_sizes$n_group == 1]
+        
+        # which sample name(s) #
+        samps_to_rm <- as.character(groupDF$SampleID[groupDF$Group %in% singleton_groups])
+        
+        # use custom_filter to remove the sample(s) from the omicsData object #
+        my_cust_filt <- custom_filter(omicsData, f_data_remove = samps_to_rm)
+        omicsData <- applyFilt(my_cust_filt, omicsData)
+        
+        # update the IMD-ANOVA filter attributes #
+        attributes(filter_object)$names <- as.character(attributes(filter_object)$names[-which(attributes(filter_object)$names %in% singleton_groups)])
+        # might need to explicitly remove any NAs... #
+        # attributes(filter_object)$names <- attributes(filter_object)$names[-which(is.na(attributes(filter_object)$names))]
+        
+        attributes(filter_object)$group_sizes <- attributes(filter_object)$group_sizes[-which(attributes(filter_object)$group_sizes$Group %in% singleton_groups), ]
+        
+        # give a message to user saying which samples have been removed #
+        message(paste("You have specified remove_single_groups = TRUE, so we have removed the following sample(s) that correspond to singleton groups prior to proceeding with the IMD-ANOVA filter:", 
+                      paste(samps_to_rm, sep = ", ")))
+        
+      }else{
+        message("You have specified remove_singleton_groups = TRUE, but there are no singleton groups to remove. 
+                Proceeding with application of the IMD-ANOVA filter.")
+      }
+    }
+    
     # check that at least one of min_nonmiss_anova and min_nonmiss_gtest are present #
     if(is.null(min_nonmiss_anova) & is.null(min_nonmiss_gtest)) stop("At least one of min_nonmiss_anova and min_nonmiss_gtest must be present")
     # check that if they aren't NULL, min_nonmiss_anova and min_nonmiss_gtest are numeric, >=2 and >=3, respectively, and neither are bigger than the minimum group size (group_sizes in an attribute of the filter_object, see below) #
@@ -522,14 +573,10 @@ applyFilt.imdanovaFilt <- function(filter_object, omicsData, min_nonmiss_anova=N
       # check that min_nonmiss_gtest is less than the max number of observations #
       if(min_nonmiss_gtest > min(attributes(filter_object)$group_sizes$n_group)) stop("min_nonmiss_gtest cannot be greater than the minimum group size")
     }
-
+    
     ## end of initial checks ##
 
-
-    group_sizes <- attr(filter_object, "group_sizes")
-    nonmiss_per_group <- list(nonmiss_totals = filter_object, group_sizes = group_sizes)
-
-    groupDF <- attributes(omicsData)$group_DF
+    
     e_data <- omicsData$e_data
     edata_cname <- attr(omicsData, "cnames")$edata_cname
     samp_cname <- attr(omicsData, "cnames")$fdata_cname
