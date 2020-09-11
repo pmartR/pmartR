@@ -2,7 +2,7 @@
 #'
 #' Perform Loess normalization 
 #'
-#' @param omicsData an object of the class 'pepData', 'proData', 'metabData', or 'lipidData', created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively. The function \code{\link{group_designation}} must have been run on omicsData to use several of the subset functions (i.e. rip and ppp_rip).
+#' @param omicsData an object of the class 'pepData', 'proData', 'metabData', 'lipidData', or 'nmrData', created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, respectively. The function \code{\link{group_designation}} must have been run on omicsData to use several of the subset functions (i.e. rip and ppp_rip).
 #' @param method character string specifying which variant of the cyclic loess method to use. Options are "fast" (default), "affy", or "pairs"
 #' @param span span of loess smoothing window, between 0 and 1.
 #' 
@@ -26,7 +26,7 @@
 #' @export
 normalize_loess<- function(omicsData, method = "fast", span = .4){
   # check that omicsData is of the appropriate class
-  if(!inherits(omicsData, c("proData","pepData","lipidData", "metabData"))) stop("omicsData is not an object of appropriate class")
+  if(!inherits(omicsData, c("proData","pepData","lipidData", "metabData", "nmrData"))) stop("omicsData is not an object of appropriate class")
   
   # data should be on log scale #
   if(!(attr(omicsData, "data_info")$data_scale %in% c("log2", "log10", "log"))) stop("omicsData must be on log scale")

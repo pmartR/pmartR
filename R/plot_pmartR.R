@@ -2,7 +2,7 @@
 #'
 #' This function will provide a plot for a \code{omicsData} object, any of the filter objects in pmartR, or a \code{corRes} object.
 #'
-#' @param omicsData an object of the class 'pepData', 'proData', 'lipidData', or 'metabData' usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.lipidData}}, or  \code{\link{as.metabData}}, respectively.
+#' @param omicsData an object of the class 'pepData', 'proData', 'lipidData', 'metabData', or 'nmrData' usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.lipidData}}, \code{\link{as.metabData}}, or\code{\link{as.nmrData}}, respectively.
 #' @param corRes_object an object of class corRes. A correlation matrix of all samples.
 #' @param filter_object a filter object for the respective \code{omicsData} class.
 #' @param ... further arguments
@@ -59,7 +59,8 @@ NULL
 #' \code{title_plot} \tab character string to be used for the plot title. Defaults to NULL, in which case "Sample Outlier Results /n p-value threshold = 0.xyz" is used, where 'xyz' is the pvalue_threshold supplied to the function. \cr
 #' \code{title_size} \tab integer value specifying the font size for the plot title. Default is 14. \cr
 #' \code{use_VizSampNames} \tab logical specifies whether to use custom sample names \cr
-#' } 
+#' }
+#'  
 plot.corRes <- function(corRes_object, omicsData = NULL, interactive = FALSE, x_lab=TRUE, y_lab=TRUE, colorbar_lim=c(NA, NA), ...){
   require(ggplot2)
   .plot.corRes(corRes_object, omicsData, interactive, x_lab, y_lab, colorbar_lim, ...)
@@ -102,61 +103,56 @@ plot.corRes <- function(corRes_object, omicsData = NULL, interactive = FALSE, x_
     plot_title <- title_plot
   }
   
-  if(!interactive) {
-    #pal <- colorRampPalette(c("blue","white","red"))
-    pal <- colorRampPalette(c("red", "yellow")) # modified by KS 2/12/2018
+  pal <- colorRampPalette(c("red", "yellow")) # modified by KS 2/12/2018
 
-    colnames(corRes_object) <- rownames(corRes_object)
-    corRes_melt <- reshape2::melt(corRes_object)
-    corRes_melt$Var1 <- abbreviate(corRes_melt$Var1, minlength=20)
-    corRes_melt$Var2 <- abbreviate(corRes_melt$Var2, minlength=20)
-    
-    if(all(is.na(colorbar_lim))){
-      heatmap <- ggplot(corRes_melt, aes(x = ordered(Var2, levels = rev(sort(unique(Var2)))),
-                                                           y = ordered(Var1, levels = rev(sort(unique(Var1)))))) +
-        geom_tile(aes(fill = value)) +
-        scale_fill_gradientn("Correlation", colours = pal(50)) +
-        xlab("") +  ylab("") +
-        theme(axis.text.x = element_text(angle = 90),
-                       axis.ticks = element_blank(),
-                       plot.title = element_text(size=title_size))
-    }else{
-      heatmap <- ggplot(corRes_melt, aes(x = ordered(Var2, levels = rev(sort(unique(Var2)))),
-                                                           y = ordered(Var1, levels = rev(sort(unique(Var1)))))) +
-        geom_tile(aes(fill = value)) +
-        scale_fill_gradientn("Correlation", limits = colorbar_lim, colours = pal(50)) +
-        xlab("") +  ylab("") +
-        theme(axis.text.x = element_text(angle = 90),
-                       axis.ticks = element_blank(),
-                       plot.title = element_text(size=title_size))
-    }
-    
-    
-    if(nrow(corRes_object) > 40) heatmap <- heatmap + theme(axis.text.x = element_blank())
-    if(x_lab==FALSE) heatmap <- heatmap + theme(axis.text.x = element_blank()) # added by KS
-    if(y_lab==FALSE) heatmap <- heatmap + theme(axis.text.y = element_blank()) # added by KS
-    
-    if(!is.null(attributes(corRes_object)$is_normalized)){
-      if(attributes(corRes_object)$is_normalized == TRUE) {
-        heatmap <- heatmap + ggtitle(plot_title)
-      }else{heatmap <- heatmap + ggtitle(plot_title)}
-    }else{
-        heatmap <- heatmap + ggtitle(plot_title)
-    }
-    
-    if(use_VizSampNames){
-      if(!is.logical(as.logical(use_VizSampNames))) stop("Must specify a logical TRUE/FALSE value for use_VizSampNames")
-      if(is.null(omicsData)) stop("If using custom sample names, specify the corresponding omicsData object")
-      heatmap = heatmap + 
-        scale_x_discrete(labels = omicsData$f_data$VizSampNames, breaks = levels(omicsData$f_data[,get_fdata_cname(omicsData)])) + 
-        scale_y_discrete(labels = omicsData$f_data$VizSampNames, breaks = levels(omicsData$f_data[,get_fdata_cname(omicsData)]))
-    }
-    
-  } else {
-    if(!is.null(title_plot)) message("The ability to display a plot title is not available when interactive is set to TRUE")
-    if(use_VizSampNames) message("Custom Sample names not available in interactive plots")
-    heatmap <- d3heatmap::d3heatmap(corRes_object, dendrogram = 'none', reorderfun = function(x) ordered(x, levels = rev(sort(unique(x)))), title = plot_title)
+  colnames(corRes_object) <- rownames(corRes_object)
+  corRes_melt <- reshape2::melt(corRes_object)
+  corRes_melt$Var1 <- abbreviate(corRes_melt$Var1, minlength=20)
+  corRes_melt$Var2 <- abbreviate(corRes_melt$Var2, minlength=20)
+  sampleIDx = ordered(corRes_melt$Var2, levels = rev(sort(unique(corRes_melt$Var2))))
+  sampleIDy = ordered(corRes_melt$Var1, levels = rev(sort(unique(corRes_melt$Var1))))
+  
+  if(all(is.na(colorbar_lim))){
+    heatmap <- ggplot(corRes_melt, aes(x = sampleIDx, y = sampleIDy)) +
+      geom_tile(aes(fill = value)) +
+      scale_fill_gradientn("Correlation", colours = pal(50)) +
+      xlab("") +  ylab("") +
+      theme(axis.text.x = element_text(angle = 90),
+                     axis.ticks = element_blank(),
+                     plot.title = element_text(size=title_size))
+  }else{
+    heatmap <- ggplot(corRes_melt, aes(x = sampldIDx, y = sampleIDy)) +
+      geom_tile(aes(fill = value)) +
+      scale_fill_gradientn("Correlation", limits = colorbar_lim, colours = pal(50)) +
+      xlab("") +  ylab("") +
+      theme(axis.text.x = element_text(angle = 90),
+                     axis.ticks = element_blank(),
+                     plot.title = element_text(size=title_size))
   }
+  
+  
+  if(nrow(corRes_object) > 40) heatmap <- heatmap + theme(axis.text.x = element_blank())
+  if(x_lab==FALSE) heatmap <- heatmap + theme(axis.text.x = element_blank()) # added by KS
+  if(y_lab==FALSE) heatmap <- heatmap + theme(axis.text.y = element_blank()) # added by KS
+  
+  if(!is.null(attributes(corRes_object)$is_normalized)){
+    if(attributes(corRes_object)$is_normalized == TRUE) {
+      heatmap <- heatmap + ggtitle(plot_title)
+    }else{heatmap <- heatmap + ggtitle(plot_title)}
+  }else{
+      heatmap <- heatmap + ggtitle(plot_title)
+  }
+  
+  if(use_VizSampNames){
+    if(!is.logical(as.logical(use_VizSampNames))) stop("Must specify a logical TRUE/FALSE value for use_VizSampNames")
+    if(is.null(omicsData)) stop("If using custom sample names, specify the corresponding omicsData object")
+    heatmap = heatmap + 
+      scale_x_discrete(labels = omicsData$f_data$VizSampNames, breaks = levels(omicsData$f_data[,get_fdata_cname(omicsData)])) + 
+      scale_y_discrete(labels = omicsData$f_data$VizSampNames, breaks = levels(omicsData$f_data[,get_fdata_cname(omicsData)]))
+  }
+  
+  # 
+  if(interactive) heatmap <- plotly::ggplotly(heatmap)
   
   return(heatmap)
 }
@@ -1984,6 +1980,259 @@ plot.metabData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by
   
   return(p)
 }
+
+
+#' plot.nmrData
+#' 
+#' For plotting an S3 object of type 'nmrData'
+#' 
+#' \tabular{ll}{
+#' \code{order_by} \tab a character string specifying a main effect by which to order the boxplots. This main effect must be found in the column names of f_data in the omicsData object. If order_by is "group_DF", the boxplots will be ordered by the group variable from the group_designation function. If NULL (default), the boxplots will be displayed in the order they appear in the data. \cr
+#' \code{color_by} \tab a character string specifying a main effect by which to color the boxplots. This main effect must be found in the column names of f_data in the omicsData object. If color_by is "group_DF", the boxplots will be colored by the group variable from the group_designation function. If NULL (default), the boxplots will have one default color. \cr
+#' \code{facet_by} \tab a character string specifying a main effect with which to create a facet plot. This main effect must be found in the column names of f_data in the omicsData object. Default value is NULL. \cr
+#' \code{facet_cols} \tab an optional integer specifying the number of columns to show in the facet plot. \cr
+#' \code{x_lab} \tab character string to be used for x-axis label. Defaults to NULL, in which case a default label is used. \cr
+#' \code{y_lab} \tab character string to be used for y-axis label. Defaults to NULL, in which case a default label is used. \cr
+#' \code{legend_lab} \tab character string specifying the title label to use for the legend \cr
+#' \code{title_plot} \tab character string to be used for the plot title. Defaults to NULL, in which case a default title is used. \cr
+#' \code{title_size} \tab integer value specifying the font size for the plot title. Default is 14. \cr
+#' \code{x_lab_size} \tab integer value indicating the font size for the x-axis. Defaults to 11. \cr
+#' \code{y_lab_size} \tab integer value indicating the font size for the y-axis. Defaults to 11. \cr
+#' \code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used. \cr
+#' \code{legend_position} \tab character string specifying one of "right", "left", "top", or "bottom" for the location of the legend. Defaults to "right". \cr
+#' \code{ylimit} \tab numeric vector of length 2 specifying y axis lower and upper limits. \cr
+#' \code{use_VizSampNames} \tab logical specifies whether to use custom sample names \cr
+#' }
+#'@export
+#'@rdname plot-pmartR-nmrData
+plot.nmrData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by = NULL, facet_cols = NULL, ...) {
+  require(ggplot2)
+  
+  verify_data_info(omicsData)
+  
+  .plot.nmrData(omicsData, order_by, color_by, facet_by, facet_cols, ...)
+}
+
+.plot.nmrData <- function(omicsData, order_by = NULL, color_by = NULL, facet_by = NULL, facet_cols = NULL, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_lab = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, bw_theme=FALSE, legend_position = "right", ylimit = NULL, use_VizSampNames = FALSE) {
+  
+  ## initial checks ##
+  if(!is.null(order_by)) {
+    if(!is.character(order_by) | length(order_by) > 1) stop("order_by must be a character vector of length 1")
+  }
+  if(!is.null(color_by)) {
+    if(!is.character(color_by) | length(color_by) > 1) stop("color_by must be a character vector of length 1")
+  }
+  if(!is.null(facet_by)) {
+    if(!is.character(facet_by) | length(facet_by) > 1) stop("facet_by must be a character vector of length 1")
+  }
+  if(!is.null(facet_cols)) {
+    if(is.null(facet_by)) stop("facet_by cannot be NULL when facet_cols is specified")
+    if(length(facet_cols)>1) stop("facet_cols must be of length 1")
+    if(!is.numeric(facet_cols)) stop("facet_cols must be an integer greater than zero")
+    if(facet_cols %% 1 != 0 | facet_cols <= 0) stop("facet_cols must be an integer greater than zero")
+  }
+  
+  ##checking that 'size' arguments are numeric
+  if(!is.numeric(title_size) | !is.numeric(x_lab_size) | !is.numeric(y_lab_size)) stop("title_size, x_lab_size and y_lab_size must be integer values")
+  
+  ##checking that ylimit is numeric of length 2
+  if(!is.null(ylimit)){
+    if(!is.numeric(ylimit) | length(ylimit)!= 2) stop("ylimit must be a numeric vector of length 2")
+  }
+  
+  # add check for samples with all NAs and return message to user that these will not be plotted #
+  sample_nas <- colSums(is.na(omicsData$e_data))
+  if(any(sample_nas == nrow(omicsData$e_data))){
+    empties <- names(omicsData$e_data)[which(sample_nas == nrow(omicsData$e_data))]
+    message(paste("The following sample(s) are comprised entirely of missing data and will not be included in the plot: ", empties, sep = " "))
+  }
+  ## end of initial checks ##
+  
+  
+  # organize data #
+  e_data <- omicsData$e_data
+  e_data_cname <- attributes(omicsData)$cnames$edata_cname
+  f_data = omicsData$f_data
+  plot_data <- reshape2::melt(e_data, id = e_data_cname, na.rm = TRUE)
+  
+  # get data and aesthetics for plots #
+  subtitle <- NULL
+  
+  maintitle <- ifelse(attributes(omicsData)$data_info$norm_info$is_normalized,
+                      "Boxplots of Normalized NMR Data",
+                      "Boxplots of Un-Normalized NMR Data")
+  
+  ## if facet_by is not null and isn't the same as either order_by or color_by ##
+  if(!is.null(facet_by)) {
+    if(!(facet_by %in% c(order_by, color_by))) {
+      # if(!use_VizSampNames) stop("if argument 'facet_by' is provided, argument 'use_VizSampNames' must be set to FALSE")
+      facet_temp <- group_designation(omicsData, main_effects = facet_by)
+      facetDF <- attributes(facet_temp)$group_DF
+      colnames(facetDF) <- c("variable", facet_by)
+      
+      plot_data <- merge(plot_data, facetDF, by = "variable")
+    }
+  }
+  
+  ## if both order_by and color_by are null ##
+  if(is.null(order_by) & is.null(color_by)) {
+    
+    p <- ggplot(plot_data) + geom_boxplot(aes(x = variable, y = value), fill = "deepskyblue1") 
+    
+    title <- maintitle
+    
+    if(use_VizSampNames == T){
+      p = p + scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
+    }
+    
+    ## if order_by is not null and color_by is ##
+  } else if(!is.null(order_by) & is.null(color_by)) {
+    if(order_by != "group_DF") {
+      order_temp <- group_designation(omicsData, main_effects = order_by)
+    } else {
+      order_temp <- omicsData
+    }
+    orderDF <- attributes(order_temp)$group_DF
+    colnames(orderDF)[1:2] <- c("variable", order_by)
+    plot_data <- merge(plot_data, orderDF, by = "variable")
+    
+    # reorder levels #
+    plot_data <- plot_data[order(plot_data[,order_by]),]
+    plot_data$variable <- factor(plot_data$variable, levels=unique(plot_data$variable), ordered=TRUE)
+    #plot_data[[color_by]] <- factor(plot_data[[color_by]], levels = unique(factor(omicsData$f_data[[color_by]])))
+    
+    p <- ggplot(plot_data) + geom_boxplot(aes(x = variable, y = value), fill = "deepskyblue1")
+    
+    title <- maintitle
+    subtitle <- paste('Ordered by ', order_by)
+    
+    if(use_VizSampNames == T){
+      f_data = f_data[order(f_data[,order_by]),]
+      p = p + scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
+    }
+    
+    ## if color_by is not null and order_by is ##
+  } else if(!is.null(color_by) & is.null(order_by)) {
+    if(color_by != "group_DF") {
+      color_temp <- group_designation(omicsData, main_effects = color_by)
+    } else {
+      color_temp <- omicsData
+    }
+    colorDF <- attributes(color_temp)$group_DF
+    colnames(colorDF)[1:2] <- c("variable", color_by)
+    plot_data <- merge(plot_data, colorDF, by = "variable")
+    color_levels <- if(color_by != "group_DF") unique(factor(omicsData$f_data[[color_by]])) else unique(factor(attr(omicsData, "group_DF")[["Group"]]))
+    plot_data[[color_by]] <- factor(plot_data[[color_by]], levels = color_levels)
+    
+    p <- ggplot(plot_data) + geom_boxplot(aes_string(x = "variable", y = "value", fill = color_by)) +
+      theme(plot.title = element_text(size=title_size),
+            axis.title.x = element_text(size=x_lab_size),
+            axis.title.y = element_text(size=y_lab_size),
+            legend.position = legend_position)
+    
+    if(bw_theme==TRUE){
+      p <- p + theme_bw()
+      
+    }
+    
+    title <- maintitle
+    
+    if(use_VizSampNames == T){
+      f_data = f_data[order(f_data[,color_by]),]
+      p = p + scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
+    }
+    
+    ## if neither order_by or color_by are null ##
+  } else if(!is.null(order_by) & !is.null(color_by)) {
+    if(order_by != "group_DF") {
+      order_temp <- group_designation(omicsData, main_effects = order_by)
+    } else {
+      order_temp <- omicsData
+    }
+    orderDF <- attributes(order_temp)$group_DF
+    colnames(orderDF)[1:2] <- c("variable", order_by)
+    
+    if(color_by != "group_DF") {
+      color_temp <- group_designation(omicsData, main_effects = color_by)
+    } else {
+      color_temp <- omicsData
+    }
+    colorDF <- attributes(color_temp)$group_DF
+    colnames(colorDF)[1:2] <- c("variable", color_by)
+    
+    # deal with case where both are equal #
+    if(order_by != color_by) {
+      tempdata <- merge(orderDF, colorDF, by = "variable")
+      plot_data <- merge(plot_data, tempdata, by = "variable")
+    } else {
+      plot_data <- merge(plot_data, colorDF, by = "variable")
+    }
+    
+    # reorder levels #
+    plot_data <- plot_data[order(plot_data[,order_by]),]
+    plot_data$variable <- factor(plot_data$variable, levels=unique(plot_data$variable), ordered=TRUE)
+    color_levels <- if(color_by != "group_DF") unique(factor(omicsData$f_data[[color_by]])) else unique(factor(attr(omicsData, "group_DF")[["Group"]]))
+    plot_data[[color_by]] <- factor(plot_data[[color_by]], levels = color_levels)
+    
+    p <- ggplot(plot_data) + geom_boxplot(aes_string(x = "variable", y = "value", fill = color_by)) 
+    
+    title <- maintitle
+    subtitle <- paste('Ordered by ', order_by)
+    
+    if(use_VizSampNames == T){
+      f_data = f_data[order(f_data[,order_by]),]
+      p = p + scale_x_discrete(labels = f_data$VizSampNames, breaks = unique(f_data[,get_fdata_cname(omicsData)]))
+    }
+  }
+  
+  # apply theme
+  axs <- theme(plot.title = element_text(size=title_size),
+               axis.title.x = element_text(size=x_lab_size),
+               axis.title.y = element_text(size=y_lab_size),
+               legend.position = legend_position)
+  
+  if(bw_theme==TRUE){
+    p <- p + theme_bw() + axs
+  }
+  else p <- p + axs
+  
+  # facet plot #
+  if(!is.null(facet_by)) {
+    if(is.null(facet_cols)) {
+      p <- p + facet_wrap(formula(paste("~",facet_by)), scales = "free_x")
+    } else {
+      p <- p + facet_wrap(formula(paste("~",facet_by)), scales = "free_x", ncol = facet_cols)
+    }
+  }
+  
+  # custom labels #
+  if(!is.null(title_plot)) title <- title_plot
+  xlabel <- ifelse(is.null(x_lab), "Sample", x_lab)
+  
+  if(is.null(y_lab)){
+    if(attr(omicsData, "data_info")$data_scale == 'abundance'){
+      ylabel<- "Abundance"}
+    else if(attr(omicsData, "data_info")$data_scale == 'log'){
+      ylabel<- "ln Abundance"
+    }else ylabel <- paste(attr(omicsData, "data_info")$data_scale, "Abundance", sep = " ")
+  }else{ylabel = y_lab}
+  legend_title <- color_by
+  if(!is.null(legend_lab)) legend_title <- legend_lab
+  
+  # add additional features to plot #
+  p <- p + theme(axis.text.x = element_text(angle = 90)) + xlab("Sample") +
+    ggtitle(title, subtitle) + xlab(xlabel) + ylab(ylabel) +
+    scale_fill_discrete(legend_title) + theme(plot.subtitle = element_text(face = 'italic'))
+  
+  if(!is.null(ylimit))
+  {
+    p <- p + scale_y_continuous(limits = ylimit)
+  }
+  
+  
+  return(p)
+}
+
 
 #' plot.dimRes
 #' 

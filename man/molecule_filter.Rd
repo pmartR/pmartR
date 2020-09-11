@@ -7,7 +7,7 @@
 molecule_filter(omicsData)
 }
 \arguments{
-\item{omicsData}{an object of the class 'pepData', 'proData', 'metabData', or 'lipidData', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.}
+\item{omicsData}{an object of the class 'pepData', 'proData', 'metabData', 'lipidData', or 'nmrData', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, respectively.}
 
 \item{min_num}{an integer value specifying the minimum number of times each feature must be observed across all samples. Default value is 2.}
 }

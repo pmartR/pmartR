@@ -4,12 +4,18 @@
 \alias{custom_filter}
 \title{Custom Filter}
 \usage{
-custom_filter(omicsData, e_data_remove = NULL, f_data_remove = NULL,
-  e_meta_remove = NULL, e_data_keep = NULL, f_data_keep = NULL,
-  e_meta_keep = NULL)
+custom_filter(
+  omicsData,
+  e_data_remove = NULL,
+  f_data_remove = NULL,
+  e_meta_remove = NULL,
+  e_data_keep = NULL,
+  f_data_keep = NULL,
+  e_meta_keep = NULL
+)
 }
 \arguments{
-\item{omicsData}{an object of class "pepData", "proData", "metabData", or "lipidData", created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.}
+\item{omicsData}{an object of class "pepData", "proData", "metabData", "lipidData", or "nmrData, created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, \code{\link{as.nmrData}}, respectively.}
 
 \item{e_data_remove}{character vector specifying the names of the e_data identifiers to remove from the data. This argument can only be specified with other 'remove' arguments.}
 

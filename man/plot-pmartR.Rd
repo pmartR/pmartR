@@ -4,7 +4,7 @@
 \alias{plot-pmartR}
 \title{Produce a plot of a pmartR S3 Object}
 \arguments{
-\item{omicsData}{an object of the class 'pepData', 'proData', 'lipidData', or 'metabData' usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.lipidData}}, or  \code{\link{as.metabData}}, respectively.}
+\item{omicsData}{an object of the class 'pepData', 'proData', 'lipidData', 'metabData', or 'nmrData' usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.lipidData}}, \code{\link{as.metabData}}, or\code{\link{as.nmrData}}, respectively.}
 
 \item{corRes_object}{an object of class corRes. A correlation matrix of all samples.}
 
