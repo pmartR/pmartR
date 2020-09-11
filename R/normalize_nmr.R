@@ -76,7 +76,6 @@
 #' 
 #' @export
 #'
-
 normalize_nmr<- function(omicsData, apply_norm = FALSE, backtransform = FALSE, metabolite_name = NULL, sample_property_cname = NULL){
   
   ### --------------------------------------------- ###
@@ -113,6 +112,7 @@ normalize_nmr<- function(omicsData, apply_norm = FALSE, backtransform = FALSE, m
   
   edata <- omicsData$e_data
   fdata <- omicsData$f_data
+  check_names <- getchecknames(omicsData)
   
   # check that metabolite_cname is in e_data, if not NULL #
   if(!is.null(metabolite_name)){
@@ -185,7 +185,7 @@ normalize_nmr<- function(omicsData, apply_norm = FALSE, backtransform = FALSE, m
     
     if(apply_norm == TRUE){
       # apply the normalization; remove the reference metabolite from edata as well as the edata_cname column #
-      edata_new <- edata[-grep(metabolite_name, edata[, edata_cname]), -grep(edata_cname, names(edata))]
+      edata_new <- edata[-which(edata[, edata_cname] == metabolite_name), -grep(edata_cname, names(edata))]
       
       if(is_log == TRUE){
         # we need to subtract reference_metabolite from all the others #
@@ -337,7 +337,7 @@ normalize_nmr<- function(omicsData, apply_norm = FALSE, backtransform = FALSE, m
           }
         }
         
-        edata_new <- data.frame(edata_new) # convert back to data.frame since the apply statements above switch it to matrix, array
+        edata_new <- data.frame(edata_new, check.names = check_names) # convert back to data.frame since the apply statements above switch it to matrix, array
         
         
       }else{

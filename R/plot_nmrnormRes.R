@@ -88,12 +88,15 @@ plot.nmrnormRes <- function(nmrnormRes_object, x_lab = NULL, ...) {
     xlab(xlabel) +
     ylab(ylabel) +
     ggtitle(plot_title) +
-    theme(plot.title = element_text(size = title_size), axis.title.x = element_text(size = x_lab_size), axis.title.y = element_text(size = y_lab_size)) 
+    theme(plot.title = element_text(size = title_size), 
+          axis.title.x = element_text(size = x_lab_size), 
+          axis.title.y = element_text(size = y_lab_size)) 
+  
   
   if(bw_theme == TRUE){
-    p<- p + theme_bw()
+    p <- p + theme_bw()
   }
-  
+  p <- p + theme(axis.text.x = element_text(angle = 90))
   
   return(p)  
 }
