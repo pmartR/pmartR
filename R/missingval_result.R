@@ -2,7 +2,7 @@
 #' 
 #' This function takes in an omicsData object, outputs a list of two data frames, one contains NA by sample, the second contains NA by molecule
 #'
-#' @param omicsData an object of class "pepData", "proData", "metabData", "lipidData", or "nmrData", created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, respectively.
+#' @param omicsData an object of class "pepData", "proData", "metabData", or "lipidData", created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.
 #' 
 #' @return outputs a list of two data frames, one contains NA by sample (missing values per sample), the second contains NA by molecule (missing values per molecule). The output is assigned class 'naRes'. 
 #' 
@@ -24,7 +24,7 @@
 missingval_result<- function(omicsData){
   
   #check for correct class
-  if(!inherits(omicsData, c("pepData", "proData", "lipidData", "metabData", "nmrData"))) stop("omicsData must have class of the following, 'pepData', 'proData', 'lipidData', 'metabData', 'nmrData'")
+  if(!inherits(omicsData, c("pepData", "proData", "lipidData", "metabData" ))) stop("omicsData must have class of the following, 'pepData', 'proData', 'lipidData', 'metabData'")
   
   
   #pulling cname attr

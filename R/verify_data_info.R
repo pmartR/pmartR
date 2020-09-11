@@ -1,6 +1,6 @@
 #' Verifies some basic attributes of an omicsData object.  Intended use is in testing scripts and internally within some functions.
 #'
-#' @param omicsData an object of the class 'pepData', 'proData', 'metabData', 'lipidData', or 'nmrData' created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, respectively.
+#' @param omicsData an object of the class 'pepData', 'proData', 'metabData', or 'lipidData', created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.
 #'
 #' @details This function will invisibly return TRUE or FALSE depending on whether or not the objects contents are consistent with its attributes.  If FALSE, there will also be a print output of which values are inconsistent.
 #'

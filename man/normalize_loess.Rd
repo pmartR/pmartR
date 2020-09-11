@@ -7,7 +7,7 @@
 normalize_loess(omicsData, method = "fast", span = 0.4)
 }
 \arguments{
-\item{omicsData}{an object of the class 'pepData', 'proData', 'metabData', 'lipidData', or 'nmrData', created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, respectively. The function \code{\link{group_designation}} must have been run on omicsData to use several of the subset functions (i.e. rip and ppp_rip).}
+\item{omicsData}{an object of the class 'pepData', 'proData', 'metabData', or 'lipidData', created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively. The function \code{\link{group_designation}} must have been run on omicsData to use several of the subset functions (i.e. rip and ppp_rip).}
 
 \item{method}{character string specifying which variant of the cyclic loess method to use. Options are "fast" (default), "affy", or "pairs"}
 

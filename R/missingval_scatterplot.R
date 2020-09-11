@@ -2,7 +2,7 @@
 #' 
 #' This function takes in an omicsData object and creates a mean intensity vs number of missing values (per molecule) scatter plot 
 #' 
-#' @param omicsData an object of class "pepData", "proData", "metabData", "lipidData", or "nmrData", created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, respectively.
+#' @param omicsData an object of class "pepData", "proData", "metabData", or "lipidData", created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.
 #' @param x_lab character string to be used for x-axis label. Defaults to NULL
 #' @param y_lab character string to be used for y-axis label. Defaults to NULL
 #' @param ... further arguments
@@ -50,7 +50,7 @@ missingval_scatterplot <- function(omicsData, x_lab = NULL, y_lab = NULL, ...) {
 .missingval_scatterplot<- function(omicsData, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_title = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, point_size = 3, palette = "Spectral", bw_theme = FALSE, x_lab_angle = 0, coordinate_flip = FALSE){
   
   #check that omicsData is of correct class
-  if(!inherits(omicsData, c("proData","pepData","lipidData", "metabData", "nmrData"))) stop("omicsData is not an object of appropriate class")
+  if(!inherits(omicsData, c("proData","pepData","lipidData", "metabData"))) stop("omicsData is not an object of appropriate class")
   
   #check that palette is in the list of RColorBrewer palettes
   if(!(palette %in% c("YlOrRd", "YlOrBr", "YlGnBu", "YlGn", "Reds","RdPu", "Purples", "PuRd", "PuBuGn", "PuBu", "OrRd","Oranges", "Greys", 

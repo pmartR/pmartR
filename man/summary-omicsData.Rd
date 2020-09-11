@@ -6,7 +6,6 @@
 \alias{summary.proData}
 \alias{summary.lipidData}
 \alias{summary.metabData}
-\alias{summary.nmrData}
 \title{Produce a basic summary of a pmartR omicsData S3 Object}
 \usage{
 \method{summary}{pepData}(omicsData)
@@ -16,8 +15,9 @@
 \method{summary}{lipidData}(omicsData)
 
 \method{summary}{metabData}(omicsData)
-
-\method{summary}{nmrData}(omicsData)
+}
+\arguments{
+\item{omicsData}{an object of the class 'lipidData', 'metabData', 'pepData', or 'proData' usually created by \code{\link{as.lipidData}}, \code{\link{as.metabData}}, \code{\link{as.pepData}}, or \code{\link{as.proData}}, respectively.}
 }
 \value{
 a summary table for the pmartR omicsData object. If assigned to a variable, the elements of the summary table are saved in a list format.

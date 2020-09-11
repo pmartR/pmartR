@@ -6,7 +6,6 @@
 \alias{edata_transform.proData}
 \alias{edata_transform.metabData}
 \alias{edata_transform.lipidData}
-\alias{edata_transform.nmrData}
 \title{Apply a Transformation to the Data}
 \usage{
 edata_transform(omicsData, data_scale)
@@ -18,11 +17,9 @@ edata_transform(omicsData, data_scale)
 \method{edata_transform}{metabData}(omicsData, data_scale)
 
 \method{edata_transform}{lipidData}(omicsData, data_scale)
-
-\method{edata_transform}{nmrData}(omicsData, data_scale)
 }
 \arguments{
-\item{omicsData}{an object of the class 'pepData', 'proData', 'metabData', 'lipidData', or 'nmrData' usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, \code{\link{as.nmrData}}, respectively.}
+\item{omicsData}{an object of the class 'pepData', 'proData', 'metabData', or 'lipidData', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.}
 
 \item{data_scale}{a character string indicating the type of transformation to be applied to the data. Valid values are: 'log2', 'log', 'log10', or 'abundance'. A value of 'abundance' indicates the data has previously undergone one of the log transformations and should be transformed back to raw values with no transformation applied.}
 }

@@ -2,7 +2,7 @@
 #'
 #' This function returns an object of class corRes (correlation Result)
 #'
-#' @param omicsData an object of the class 'pepData', 'proData', 'metabData', 'lipidData', or 'nmrData' created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, \code{\link{as.nmrData}}, respectively.
+#' @param omicsData an object of the class 'pepData', 'proData', 'metabData', or 'lipidData', created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.
 #'
 #' @details The Pearson correlation between samples is calculated based on biomolecules that are observed in both samples.  the \eqn{n \times n} correlation matrix of normalized data. See \code{\link{cor}} for further details.
 #'
@@ -20,7 +20,7 @@
 
 cor_result <- function(omicsData){
 
-  if(!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData", "nmrData"))) stop("omicsData must be of class 'pepData', 'proData', 'metabData', 'lipidData', or 'nmrData'")
+  if(!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData"))) stop("omicsData must be of class 'pepData', 'proData', 'metabData', or 'lipidData'")
 
   edata_id = attr(omicsData, "cnames")$edata_cname
   edata <- omicsData$e_data

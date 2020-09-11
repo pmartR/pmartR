@@ -2,7 +2,7 @@
 #' 
 #' This function takes in an omicsData object and returns a heatmap of omicsData$e_data
 #'
-#' @param omicsData an object of class "pepData", "proData", "metabData", "lipidData", or "nmrData", created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, respectively.
+#' @param omicsData an object of class "pepData", "proData", "metabData", or "lipidData", created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.
 #' @param x_lab character string to be used for x-axis label. Defaults to NULL
 #' @param y_lab character string to be used for y-axis label. Defaults to NULL 
 #' @param ... further arguments
@@ -46,7 +46,7 @@ missingval_heatmap <- function(omicsData, x_lab = NULL, y_lab = NULL, ...) {
 .missingval_heatmap<- function(omicsData, x_lab = NULL, y_lab = NULL, title_plot = NULL, legend_title = NULL, title_size = 14, x_lab_size = 11, y_lab_size = 11, palette = "YlOrRd", x_lab_angle = 60, coordinate_flip = FALSE){
   
   #check that omicsData is of correct class
-  if(!inherits(omicsData, c("proData","pepData","lipidData", "metabData", "nmrData"))) stop("omicsData is not an object of appropriate class")
+  if(!inherits(omicsData, c("proData","pepData","lipidData", "metabData"))) stop("omicsData is not an object of appropriate class")
   
   #check that omicsData data_scale attribute is log2
   if(attr(omicsData, "data_info")$data_scale != "log2") message("omicsData is not of log2 scale")

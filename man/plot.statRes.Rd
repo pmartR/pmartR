@@ -4,16 +4,9 @@
 \alias{plot.statRes}
 \title{Plotting function for `statRes` objects}
 \usage{
-\method{plot}{statRes}(
-  x,
-  plot_type = "bar",
-  fc_threshold = NULL,
-  fc_colors = c("red", "black", "green"),
-  stacked = FALSE,
-  interactive = FALSE,
-  bw_theme = FALSE,
-  ...
-)
+\method{plot}{statRes}(x, plot_type = "bar", fc_threshold = NULL,
+  fc_colors = c("red", "black", "green"), stacked = FALSE,
+  interactive = FALSE, bw_theme = FALSE, ...)
 }
 \arguments{
 \item{x}{`statRes` object to be plotted, usually the result of `imd_anova`}

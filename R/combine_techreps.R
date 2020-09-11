@@ -2,7 +2,7 @@
 #'
 #' For each biomolecule, aggregates the technical replicates within biological samples using a specified aggregation method
 #'
-#' @param omicsData an object of the class 'lipidData', 'metabData', 'pepData', 'proData', or 'nmrData', usually created by \code{\link{as.lipidData}}, \code{\link{as.metabData}}, \code{\link{as.pepData}}, \code{\link{as.proData}}, or \code{\link{as.nmrData}}, respectively.  The parameter techrep_cnames must have been specified when creating this object.
+#' @param omicsData an object of the class 'lipidData', 'metabData', 'pepData', or 'proData', usually created by \code{\link{as.lipidData}}, \code{\link{as.metabData}}, \code{\link{as.pepData}}, or \code{\link{as.proData}}, respectively.  The parameter techrep_cnames must have been specified when creating this object.
 #' @param combine_fn a character string specifying the function used to aggregate across technical replicates, currently only supports "mean".
 #' @param bio_sample_names a character string specifying a column in \code{f_data} which contains names by which to label aggregated samples in \code{omicsData$e_data} and \code{omicsData$f_data} OR a character vector with number of elements equal to the number of biological samples.  If a column name is specified, it should have a one-to-one correspondence with the technical replicate ID column in \code{f_data}.  Defaults to NULL, in which case default names are used according to the technical replicate ID column. 
 #' 
@@ -27,9 +27,6 @@
 #' 
 #' @export
 combine_techreps <- function(omicsData, combine_fn = "mean", bio_sample_names = NULL){
-  
-  # check that omicsData is of pmartR S3 class#
-  if(!inherits(omicsData, c("pepData", "proData", "lipidData", "metabData", "nmrData"))) stop("omicsData must be of class 'pepData', 'proData', 'lipidData', 'metabData' or 'nmrData'")
   
   f_data = omicsData$f_data
   e_data = omicsData$e_data

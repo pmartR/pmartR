@@ -36,7 +36,7 @@ Imports:
 Suggests:
     knitr,
     rmarkdown,
-    testthat, 
-    pcaMethods
-RoxygenNote: 7.1.1
+    testthat
+RoxygenNote: 6.1.1
 Encoding: UTF-8
+
