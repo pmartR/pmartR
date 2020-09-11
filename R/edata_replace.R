@@ -343,6 +343,7 @@ edata_replace.lipidData <- function(omicsData, x, y) {
 
 
 # function for nmrdata
+#' @export
 #' @name edata_replace
 #' @rdname edata_replace
 edata_replace.nmrData <- function(omicsData, x, y) {
