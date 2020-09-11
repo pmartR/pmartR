@@ -1,9 +1,9 @@
 #' Apply a S3 filter  object to a pmartR S3 object
 #'
-#' This function takes a filter object of class 'cvFilt', 'rmdFilt', 'moleculeFilt', 'proteomicsFilt', 'imdanovaFilt', or 'customFilt' and applies the filter to a dataset of \code{pepData}, \code{proData}, \code{lipidData}, \code{metabData}, or \code{nmrData}.
+#' This function takes a filter object of class 'cvFilt', 'rmdFilt', 'moleculeFilt', 'proteomicsFilt', 'imdanovaFilt', or 'customFilt' and applies the filter to a dataset of  \code{pepData}, \code{proData}, \code{lipidData}, or \code{metabData}.
 #'
 #' @param filter_object an object of the class 'cvFilt', 'proteomicsFilt', 'rmdFilt', 'moleculeFilt', 'imdanovaFilt', or 'customFilt' created by \code{cv_filter}, \code{proteomics_filter}, \code{rmd_filter}, \code{molecule_filter}, or \code{imdanova_filter}, respectively.
-#' @param omicsData an object of the class \code{pepData}, \code{proData}, \code{lipidData}, \code{metabData}, or \code{nmrData} usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.lipidData}}, \code{\link{as.metabData}}, or \code{as.nmrData}, respectively.
+#' @param omicsData an object of the class \code{pepData}, \code{proData}, \code{lipidData}, or \code{metabData} usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.lipidData}}, or  \code{\link{as.metabData}}, respectively.
 #' @param ... further arguments
 #'
 #' @return An object of the class \code{pepData}, \code{proData}, \code{lipidData}, or \code{metabData},  with specified cname_ids, edata_cnames, and emeta_cnames filtered out of the appropriate datasets.
@@ -59,7 +59,7 @@
 applyFilt <- function(filter_object, omicsData, ...){
 
   # check that omicsData is of pmartR S3 class#
-  if(!inherits(omicsData, c("pepData", "proData", "lipidData", "metabData", "nmrData"))) stop("omicsData must be of class 'pepData', 'proData', 'lipidData', 'metabData' or 'nmrData'")
+  if(!inherits(omicsData, c("pepData", "proData", "lipidData", "metabData"))) stop("omicsData must be of class 'pepData', 'proData', 'lipidData', or 'metabData'")
 
   # check that filter_object is of an appropriate class#
   if(!inherits(filter_object, c("cvFilt", "proteomicsFilt", "moleculeFilt", "rmdFilt", "imdanovaFilt", "customFilt"))) stop("filter_object must be of  'cvFilt', 'proteomicsFilt', 'moleculeFilt', 'rmdFilt', 'imdanovaFilt', or 'customFilt.")

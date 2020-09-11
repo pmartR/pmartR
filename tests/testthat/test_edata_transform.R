@@ -60,7 +60,7 @@ testthat::test_that("Initial transformation carries all attribute similarities e
 testthat::test_that("edata_transform error throwing",{
   
   testthat::expect_error(pmartR::edata_transform("gfhjlkdsfhsd", "log2"), 
-                         "omicsData must be of class 'pepData', 'proData', 'metabData', 'lipidData', or 'nmrData")
+                         "omicsData must be of class 'pepData', 'proData', 'metabData', or 'lipidData'")
   testthat::expect_error(pmartR::edata_transform(mypepData, "hgfghdhjlhld"), 
                          "is not a valid option for 'data_scale'. See details of as.pepData for specifics.")
   testthat::expect_error(pmartR::edata_transform(myproData, "log2"), 
@@ -82,8 +82,7 @@ testthat::test_that("edata_transform error throwing",{
 ##### Fill possible object attributes ######
 
 # isobaric norm #
-myisoData <- pmartR::normalize_isobaric(myisoData, apply_norm = T, channel_cname = "iTRAQ.Channel", refpool_channel = "116")
-myisoData <- pmartR::normalize_isobaric(myisoData, apply_norm = T, refpool_cname = "Reference", refpool_notation = "Yes")
+myisoData <- pmartR::normalize_isobaric(myisoData, apply_norm = T)
 
 # Set appropriate group designations #
 myisoData    <- pmartR::group_designation(myisoData, "Group")

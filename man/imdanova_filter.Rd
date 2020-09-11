@@ -7,7 +7,7 @@
 imdanova_filter(omicsData)
 }
 \arguments{
-\item{omicsData}{object of one of the classes "pepData", "proData", "lipidData", "metabData", or "nmrData", usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.lipidData}}, \code{\link{as.metabData}}, or \code{\link{as.nmrData}}, respectively.}
+\item{omicsData}{object of one of the classes "pepData", "proData", "lipidData", or "metabData", usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.lipidData}}, \code{\link{as.metabData}}, respectively.}
 }
 \value{
 Object of class imdanovaFilt (also a data.frame) containing the molecule identifier and number of samples in each group with non-missing values for that molecule.

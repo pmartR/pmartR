@@ -2,7 +2,7 @@
 #'
 #' This function takes in an omicsData object and returns a summary of the e_data component. The six summarizing metrics include the mean, standard deviation, median, percent observed, minimum, and maximum.   
 #'
-#' @param omicsData an object of the class 'lipidData', 'metabData', 'pepData', 'proData', or 'nmrData' usually created by \code{\link{as.lipidData}}, \code{\link{as.metabData}}, \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.nmrData}}, respectively.
+#' @param omicsData an object of the class 'lipidData', 'metabData', 'pepData', or 'proData', usually created by \code{\link{as.lipidData}}, \code{\link{as.metabData}}, \code{\link{as.pepData}}, or \code{\link{as.proData}}, respectively.
 #' @param by a character string indicating whether summarizing metrics will be applied by 'sample' or by 'molecule'.  Defaults to 'sample'.
 #' @param groupvar a character vector with no more than two variable names that should be used to determine group membership of samples. The variable name must match a column name from \code{f_data}. Defaults to NULL, in which case group_DF attribute will be used.
 #' 
@@ -24,7 +24,7 @@
 
 edata_summary <- function(omicsData, by = 'sample', groupvar = NULL){
   #some checks
-  if(!inherits(omicsData, c('pepData','proData', 'lipidData', 'metabData', 'nmrData'))) stop("omicsData must be an object of class pepData, proData, lipidData, metabData, or nmrData")
+  if(!inherits(omicsData, c('pepData','proData', 'lipidData', 'metabData'))) stop("omicsData must be an object of class pepData, proData, lipidData or metabData")
   if(!isTRUE(by %in% c('sample', 'molecule'))) stop("by must be either sample or molecule")
   if(isTRUE(groupvar == attr(omicsData, "cnames")$fdata_cname)) stop("The sample ID column in f_data cannot be used as a grouping column.  Specify by = 'sample' to see a by-sample summary of the data")
   

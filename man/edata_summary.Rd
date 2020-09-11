@@ -7,7 +7,7 @@
 edata_summary(omicsData, by = "sample", groupvar = NULL)
 }
 \arguments{
-\item{omicsData}{an object of the class 'lipidData', 'metabData', 'pepData', 'proData', or 'nmrData' usually created by \code{\link{as.lipidData}}, \code{\link{as.metabData}}, \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.nmrData}}, respectively.}
+\item{omicsData}{an object of the class 'lipidData', 'metabData', 'pepData', or 'proData', usually created by \code{\link{as.lipidData}}, \code{\link{as.metabData}}, \code{\link{as.pepData}}, or \code{\link{as.proData}}, respectively.}
 
 \item{by}{a character string indicating whether summarizing metrics will be applied by 'sample' or by 'molecule'.  Defaults to 'sample'.}
 

@@ -2,7 +2,7 @@
 #'
 #' This function returns a moleculeFilt object for use with \code{\link{applyFilt}}
 #'
-#' @param omicsData an object of the class 'pepData', 'proData', 'metabData', 'lipidData', or 'nmrData', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, respectively.
+#' @param omicsData an object of the class 'pepData', 'proData', 'metabData', or 'lipidData', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.
 #' @param min_num an integer value specifying the minimum number of times each feature must be observed across all samples. Default value is 2.
 #'
 #' @details Attribute of molecule_filt object is "total_poss_obs", the number of total possible observations for each feature (same as the number of samples)
@@ -25,7 +25,7 @@ molecule_filter <- function(omicsData){
   ## some initial checks ##
 
   # check that omicsData is of appropriate class #
-  if(!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData", "nmrData"))) stop("omicsData must be of class 'pepData', 'proData', 'metabData', 'lipidData', or 'nmrData'")
+  if(!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData"))) stop("omicsData must be of class 'pepData', 'proData', 'metabData', or 'lipidData'")
 
   edata_id = attr(omicsData, "cnames")$edata_cname
   emeta_id = attr(omicsData, "cnames")$emeta_cname

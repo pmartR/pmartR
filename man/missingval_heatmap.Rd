@@ -7,7 +7,7 @@
 missingval_heatmap(omicsData, x_lab = NULL, y_lab = NULL, ...)
 }
 \arguments{
-\item{omicsData}{an object of class "pepData", "proData", "metabData", "lipidData", or "nmrData", created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, respectively.}
+\item{omicsData}{an object of class "pepData", "proData", "metabData", or "lipidData", created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.}
 
 \item{x_lab}{character string to be used for x-axis label. Defaults to NULL}
 

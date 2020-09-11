@@ -7,8 +7,6 @@
 \method{plot}{isobaricnormRes}(isobaricnormRes_object, x_lab = NULL, ...)
 }
 \arguments{
-\item{isobaricnormRes_object}{an object of type isobaricnormRes, created by \code{\link{normalize_isobaric}}}
-
 \item{x_lab}{character string to be used for x-axis label. Defaults to NULL}
 
 \item{...}{further arguments 
@@ -19,8 +17,10 @@
 \code{title_size} \tab integer value specifying the font size for the plot title. Default is 14. \cr
 \code{x_lab_size} \tab integer value indicating the font size for the x-axis. Defaults to 11. \cr
 \code{y_lab_size} \tab integer value indicating the font size for the y-axis. Defaults to 11. \cr
-\code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to TRUE, in which case the ggplot2 default theme is used. \cr
+\code{bw_theme} \tab logical indicator of whether to use the "theme_bw". Defaults to FALSE, in which case the ggplot2 default theme is used. \cr
 \code{order} \tab logical indicates whether to order data by exp_cname'}}
+
+\item{an}{object of type isobaricnormRes, created by \code{\link{normalize_isobaric}}}
 }
 \value{
 plots ggplot2 object
@@ -34,7 +34,7 @@ library(pmartRdata)
 data(isobaric_object)
 
 isobaric_object = edata_transform(isobaric_object, "log2")
-result = normalize_isobaric(isobaric_object, exp_cname = "Set", apply_norm = FALSE, channel_cname = "iTRAQ.Channel", refpool_channel = "116")
+result = normalize_isobaric(isobaric_object, apply_norm = F)
 
 plot(result)
 }

@@ -8,7 +8,7 @@
 \method{summary}{isobaricnormRes}(isobaricnormRes_object)
 }
 \arguments{
-\item{isobaricnormRes_object}{an object of type isobaricnormRes, created by \code{\link{normalize_isobaric}}}
+\item{an}{object of type isobaricnormRes, created by \code{\link{normalize_isobaric}}}
 }
 \value{
 data.frame object
@@ -22,7 +22,7 @@ library(pmartRdata)
 data(isobaric_object)
 
 isobaric_object = edata_transform(isobaric_object, "log2")
-result = normalize_isobaric(isobaric_object, exp_cname = "Set", apply_norm = FALSE, channel_cname = "iTRAQ.Channel", refpool_channel = "116")
+result = normalize_isobaric(isobaric_object, apply_norm = F)
 
 summary(result)
 }

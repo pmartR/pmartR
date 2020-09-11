@@ -4,14 +4,8 @@
 \alias{plot.metabData}
 \title{plot.metabData}
 \usage{
-\method{plot}{metabData}(
-  omicsData,
-  order_by = NULL,
-  color_by = NULL,
-  facet_by = NULL,
-  facet_cols = NULL,
-  ...
-)
+\method{plot}{metabData}(omicsData, order_by = NULL, color_by = NULL,
+  facet_by = NULL, facet_cols = NULL, ...)
 }
 \description{
 For plotting an S3 object of type 'metabData'
