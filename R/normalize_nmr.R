@@ -135,12 +135,16 @@ normalize_nmr<- function(omicsData, apply_norm = FALSE, backtransform = FALSE, m
   # if possibility 1 is used, check that metabolite_name corresponds to a metabolite seen in every sample #
   if(poss1 == TRUE){
     if(!is.character(metabolite_name)) stop("metabolite_name must be of class 'character'")
-    reference_metabolite <- omicsData$e_data[grep(metabolite_name, omicsData$e_data) , 2:ncol(omicsData$e_data)]
+    
+    reference_metabolite <- omicsData$e_data[grep(metabolite_name, omicsData$e_data[, edata_cname]) , -which(names(omicsData$e_data) == edata_cname)]
+  
     if(!all(unlist(lapply(reference_metabolite, class)) == "numeric")){
       # if TRUE, there's a problem with the values since they aren't all numeric #
       stop(paste("Values for", metabolite_name, "must be numeric"))
     }
-    reference_metabolite <- as.numeric(omicsData$e_data[grep(metabolite_name, omicsData$e_data) , 2:ncol(omicsData$e_data)])
+    # convert to numeric vector from data.frame with single row #
+    reference_metabolite <- as.numeric(omicsData$e_data[grep(metabolite_name, omicsData$e_data[, edata_cname]) , -which(names(omicsData$e_data) == edata_cname)])
+    
     backtransform_value <- median(reference_metabolite, na.rm = TRUE)
     
     # make sure none are NA #
