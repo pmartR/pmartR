@@ -32,7 +32,7 @@ applyFilt(filter_object, omicsData, ...)
 \arguments{
 \item{filter_object}{an object of the class 'cvFilt', 'proteomicsFilt', 'rmdFilt', 'moleculeFilt', 'imdanovaFilt', or 'customFilt' created by \code{cv_filter}, \code{proteomics_filter}, \code{rmd_filter}, \code{molecule_filter}, or \code{imdanova_filter}, respectively.}
 
-\item{omicsData}{an object of the class \code{pepData}, \code{proData}, \code{lipidData}, or \code{metabData} usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.lipidData}}, or  \code{\link{as.metabData}}, respectively.}
+\item{omicsData}{an object of the class \code{pepData}, \code{proData}, \code{lipidData}, \code{metabData}, or \code{nmrData} usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.lipidData}}, \code{\link{as.metabData}}, or \code{as.nmrData}, respectively.}
 
 \item{...}{further arguments}
 }
@@ -40,7 +40,7 @@ applyFilt(filter_object, omicsData, ...)
 An object of the class \code{pepData}, \code{proData}, \code{lipidData}, or \code{metabData},  with specified cname_ids, edata_cnames, and emeta_cnames filtered out of the appropriate datasets.
 }
 \description{
-This function takes a filter object of class 'cvFilt', 'rmdFilt', 'moleculeFilt', 'proteomicsFilt', 'imdanovaFilt', or 'customFilt' and applies the filter to a dataset of  \code{pepData}, \code{proData}, \code{lipidData}, or \code{metabData}.
+This function takes a filter object of class 'cvFilt', 'rmdFilt', 'moleculeFilt', 'proteomicsFilt', 'imdanovaFilt', or 'customFilt' and applies the filter to a dataset of \code{pepData}, \code{proData}, \code{lipidData}, \code{metabData}, or \code{nmrData}.
 }
 \details{
 Various further arguments can be specified depending on the class of the \code{filter_object} being applied.

@@ -1,59 +1,79 @@
-#' Convert Data to Appropriate pmartR Class
+#'Convert Data to Appropriate pmartR Class
 #'
-#' Converts a list object or several data.frames of isobaric peptide-level data to an object of the class 'isobaricpepData'. Objects of the class 'isobaricpepData' are lists with two obligatory components \code{e_data} and \code{f_data}. An optional list component \code{e_meta} is used if analysis or visualization at other levels (e.g. protein) is also desired.
+#'Converts a list object or several data.frames of isobaric peptide-level data
+#'to an object of the class 'isobaricpepData'. Objects of the class
+#''isobaricpepData' are lists with two obligatory components \code{e_data} and
+#'\code{f_data}. An optional list component \code{e_meta} is used if analysis or
+#'visualization at other levels (e.g. protein) is also desired.
 #'
-#' @param e_data a \eqn{p \times n + 1} data.frame of expression data, where \eqn{p} is the number of peptides observed and \eqn{n} is the number of samples (an additional peptide identifier/name column should also be present anywhere in the data.frame). Each row corresponds to data for each peptide. One column specifying a unique identifier for each peptide (row) must be present.
-#' @param f_data a data.frame with \eqn{n} rows. Each row corresponds to a sample with one column giving the unique sample identifiers found in e_data column names and other columns providing qualitative and/or quantitative traits of each sample.
-#' @param e_meta an optional data.frame with at least \eqn{p} rows. Each row corresponds to a peptide with one column giving peptide names (must be named the same as the column in \code{e_data}) and other columns giving meta information (e.g. mappings of peptides to proteins).
-#' @param edata_cname character string specifying the name of the column containing the peptide identifiers in \code{e_data} and \code{e_meta} (if applicable).
-#' @param emeta_cname character string specifying the name of the column containing the protein identifiers (or other mapping variable) in \code{e_meta} (if applicable). Defaults to NULL. If \code{e_meta} is NULL, then either do not specify \code{emeta_cname} or specify it as NULL. If \code{e_meta} is NULL, then specify \code{emeta_cname} as NULL.
-#' @param fdata_cname character string specifying the name of the column containing the sample identifiers in \code{f_data}.
-#' @param exp_cname character string specifying the name of the column containing the experiment/plate information in \code{f_data}.
-#' @param channel_cname optional character string specifying the name of the column containing the instrument channel a sample was run on in \code{f_data}. This argument is optional, see Details for how to specify information regarding reference pool samples.
-#' @param techrep_cname character string specifying the name of the column in \code{f_data} containing the identifiers for the biological samples if the observations represent technical replicates.  This column is used to collapse the data when \code{combine_techreps} is called on this object.  Defaults to NULL (no technical replicates). 
-#' @param refpool_channel optional character string specifying which channel contained the reference pool sample, only used when this remains the same from experiment to experiment. This argument is optional, see Details for how to specify information regarding reference pool samples.
-#' @param refpool_cname optional character string specifying the name of the column containing information about which samples are reference samples in \code{f_data}. This argument is optional, see Details for how to specify information regarding reference pool samples.
-#' @param refpool_notation optional character string specifying the value in the refpool_channel column which denotes that a sample is a reference sample. This argument is optional, see Details for how to specify information regarding reference pool samples.
-#' @param ... further arguments
+#'@param e_data a \eqn{p \times n + 1} data.frame of expression data, where
+#'  \eqn{p} is the number of peptides observed and \eqn{n} is the number of
+#'  samples (an additional peptide identifier/name column should also be present
+#'  anywhere in the data.frame). Each row corresponds to data for each peptide.
+#'  One column specifying a unique identifier for each peptide (row) must be
+#'  present.
+#'@param f_data a data.frame with \eqn{n} rows. Each row corresponds to a sample
+#'  with one column giving the unique sample identifiers found in e_data column
+#'  names and other columns providing qualitative and/or quantitative traits of
+#'  each sample.
+#'@param e_meta an optional data.frame with at least \eqn{p} rows. Each row
+#'  corresponds to a peptide with one column giving peptide names (must be named
+#'  the same as the column in \code{e_data}) and other columns giving meta
+#'  information (e.g. mappings of peptides to proteins).
+#'@param edata_cname character string specifying the name of the column
+#'  containing the peptide identifiers in \code{e_data} and \code{e_meta} (if
+#'  applicable).
+#'@param emeta_cname character string specifying the name of the column
+#'  containing the protein identifiers (or other mapping variable) in
+#'  \code{e_meta} (if applicable). Defaults to NULL. If \code{e_meta} is NULL,
+#'  then either do not specify \code{emeta_cname} or specify it as NULL. If
+#'  \code{e_meta} is NULL, then specify \code{emeta_cname} as NULL.
+#'@param fdata_cname character string specifying the name of the column
+#'  containing the sample identifiers in \code{f_data}.
+#'@param techrep_cname character string specifying the name of the column in
+#'  \code{f_data} containing the identifiers for the biological samples if the
+#'  observations represent technical replicates.  This column is used to
+#'  collapse the data when \code{combine_techreps} is called on this object.
+#'  Defaults to NULL (no technical replicates).
+#'@param ... further arguments
 #'
-#' @details The class 'isobaricpepData' is meant to deal with peptide data generated on instruments where a reference pool for normalization is available (e.g. TMT, iTRAQ). In all cases you must specify \code{exp_cname} which gives the column name for the column in \code{f_data} containing information about which experiment/plate a sample was run on.
-#' There are two ways to specify the information needed for identifying reference samples which should be used for normalization:
-#' \enumerate{
-#' \item specify \code{channel_cname} and \code{refpool_channel}. This should be used when the reference sample for each experiment/plate was always located in the same channel. Here \code{channel_cname} gives the column name for the column in \code{f_data} which gives information about which channel each sample was run on, and \code{refpool_channel} is a character string specifying the value in \code{channel_colname} that corresponds to the reference sample channel.
-#' \item specify \code{refpool_cname} and \code{refpool_notation}. This should be used when the reference sample is not in a consistent channel across experiments/plates. Here, \code{refpool_cname} gives the name of the column in \code{f_data} which indicates whether a sample is a reference or not, and \code{refpool_notation} is a character string giving the value used to denote a reference sample in that column.
-#' }
-#' 
-#' See examples below. If your data has already undergone normalization to the reference pool, you should speficy \code{isobaric_norm = T}.
-#' 
-#' Objects of class 'isobaricpepData' contain some attributes that are referenced by downstream functions. These attributes can be changed from their default value by manual specification. A list of these attributes as well as their default values are as follows:
-#' \tabular{ll}{
-#' data_scale \tab Scale of the data provided in \code{e_data}. Acceptable values are 'log2', 'log10', 'log', and 'abundance', which indicate data is log base 2, base 10, natural log transformed, and raw abundance, respectively. Default is 'abundance'. \cr
-#' \tab \cr
-#' is_normalized \tab A logical argument, specifying whether the data has been normalized or not. Default value is FALSE. \cr
-#' \tab \cr
-#' isobaric_norm \tab A logical argument, specifying whether the data has been normalized to the approporiate reference pool sample or not. Default value is FALSE \cr
-#' \tab \cr
-#' norm_info \tab Default value is an empty list, which will be populated with a single named element \code{is_normalized = is_normalized}. When a normalization is applied to the data, this becomes populated with a list containing the normalization function, normalization subset and subset parameters, the location and scale parameters used to normalize the data, and the location and scale parameters used to backtransform the data (if applicable). \cr
-#' \tab \cr
-#' data_types \tab Character string describing the type of data (e.g.'Positive ion'). Default value is NULL. \cr
-#' \tab \cr
-#' check.names \tab Logical defaults to TRUE. Indicates whether 'check.names' attribute of returned omicsData object is TRUE or FALSE. \cr
-#' }
-#' Computed values included in the \code{data_info} attribute are as follows:
-#' \tabular{ll}{
-#' num_edata \tab The number of unique \code{edata_cname} entries.\cr
-#' \tab \cr
-#' num_miss_obs \tab The number of missing observations.\cr
-#' \tab \cr
-#' num_emeta \tab The number of unique \code{emeta_cname} entries. \cr
-#' \tab \cr
-#' prop_missing \tab The proportion of \code{e_data} values that are NA. \cr
-#' \tab \cr
-#' num_samps \tab The number of samples that make up the columns of \code{e_data}.\cr
-#' \tab \cr
-#' meta_info \tab A logical argument, specifying whether \code{e_meta} is provided.\cr
-#' \tab \cr
-#' }
+#'@details The class 'isobaricpepData' is meant to deal with peptide data
+#'  generated on instruments where a reference pool for normalization is
+#'  available (e.g. TMT, iTRAQ).
+#'
+#'  If your data has already undergone normalization to the reference pool, you
+#'  should speficy \code{isobaric_norm = T}.
+#'
+#'  Objects of class 'isobaricpepData' contain some attributes that are
+#'  referenced by downstream functions. These attributes can be changed from
+#'  their default value by manual specification. A list of these attributes as
+#'  well as their default values are as follows: \tabular{ll}{ data_scale \tab
+#'  Scale of the data provided in \code{e_data}. Acceptable values are 'log2',
+#'  'log10', 'log', and 'abundance', which indicate data is log base 2, base 10,
+#'  natural log transformed, and raw abundance, respectively. Default is
+#'  'abundance'. \cr \tab \cr is_normalized \tab A logical argument, specifying
+#'  whether the data has been normalized or not. Default value is FALSE. \cr
+#'  \tab \cr isobaric_norm \tab A logical argument, specifying whether the data
+#'  has been normalized to the approporiate reference pool sample or not.
+#'  Default value is FALSE \cr \tab \cr norm_info \tab Default value is an empty
+#'  list, which will be populated with a single named element
+#'  \code{is_normalized = is_normalized}. When a normalization is applied to the
+#'  data, this becomes populated with a list containing the normalization
+#'  function, normalization subset and subset parameters, the location and scale
+#'  parameters used to normalize the data, and the location and scale parameters
+#'  used to backtransform the data (if applicable). \cr \tab \cr data_types \tab
+#'  Character string describing the type of data (e.g.'Positive ion'). Default
+#'  value is NULL. \cr \tab \cr check.names \tab Logical defaults to TRUE.
+#'  Indicates whether 'check.names' attribute of returned omicsData object is
+#'  TRUE or FALSE. \cr } Computed values included in the \code{data_info}
+#'  attribute are as follows: \tabular{ll}{ num_edata \tab The number of unique
+#'  \code{edata_cname} entries.\cr \tab \cr num_miss_obs \tab The number of
+#'  missing observations.\cr \tab \cr num_emeta \tab The number of unique
+#'  \code{emeta_cname} entries. \cr \tab \cr prop_missing \tab The proportion of
+#'  \code{e_data} values that are NA. \cr \tab \cr num_samps \tab The number of
+#'  samples that make up the columns of \code{e_data}.\cr \tab \cr meta_info
+#'  \tab A logical argument, specifying whether \code{e_meta} is provided.\cr
+#'  \tab \cr }
 #'
 #' @examples
 #' dontrun{
@@ -61,27 +81,23 @@
 #' data("isobaric_edata")
 #' data("isobaric_fdata")
 #' data("isobaric_emeta")
-#' mypepData <- as.isobaricpepData(e_data = isobaric_edata, e_meta = isobaric_emeta, f_data = isobaric_fdata, edata_cname = "Peptide", fdata_cname = "Sample", emeta_cname = "Mass_Tag_ID")
-#' 
-#' # Alternate specification #
-#' 
+#' mypepData <- as.isobaricpepData(e_data = isobaric_edata, e_meta = isobaric_emeta, f_data = isobaric_fdata, edata_cname = "Peptide", fdata_cname = "Sample", emeta_cname = "Protein")
 #'}
-#' @author Lisa Bramer
-#' @seealso \code{\link{as.pepData}}
-#' @seealso \code{\link{as.proData}}
-#' @seealso \code{\link{as.lipidData}}
-#' @seealso \code{\link{as.metabData}}
+#'@author Lisa Bramer
+#'@seealso \code{\link{as.pepData}}
+#'@seealso \code{\link{normalize_isobaric}}
 #'
-#' @export
-as.isobaricpepData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname, emeta_cname = NULL, exp_cname, channel_cname = NULL, techrep_cname = NULL, refpool_channel = NULL, refpool_cname = NULL, refpool_notation = NULL, ...){
-  .as.isobaricpepData(e_data, f_data, e_meta, edata_cname, fdata_cname, emeta_cname, exp_cname, channel_cname, techrep_cname, refpool_channel, refpool_cname, refpool_notation, ...)
+#'@export
+as.isobaricpepData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname, emeta_cname = NULL, techrep_cname = NULL, ...){
+  .as.isobaricpepData(e_data, f_data, e_meta, edata_cname, fdata_cname, emeta_cname, techrep_cname, ...)
 }
 
 ## peptide data ##
 .as.isobaricpepData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname,
-                        emeta_cname = NULL, exp_cname, channel_cname = NULL, techrep_cname = NULL, 
-                        refpool_channel = NULL, refpool_cname = NULL, refpool_notation = NULL, data_scale = "abundance",
-                        is_normalized = FALSE, isobaric_norm = FALSE, norm_info = list(), data_types=NULL, check.names = TRUE){
+                        emeta_cname = NULL, techrep_cname = NULL, 
+                        data_scale = "abundance",
+                        is_normalized = FALSE, isobaric_norm = FALSE, norm_info = list(), 
+                        data_types=NULL, check.names = TRUE){
   
   # initial checks #
   
@@ -103,47 +119,6 @@ as.isobaricpepData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata
     message("emeta_cname will not be used, no e_meta was provided") 
     emeta_cname = NULL
   } 
-  
-  # check that exp_cname is in f_data #
-  if(!(exp_cname %in% names(f_data))) stop(paste("Experiment column", exp_cname, "is not found in f_data. See details of as.isobaricpepData for specifying column names.", sep = " "))
-  
-  # check that channel_cname is in f_data, if not NULL #
-  if(!is.null(channel_cname)){
-    if(!(channel_cname %in% names(f_data))) stop(paste("Channel column", channel_cname, "is not found in f_data. See details of as.isobaricpepData for specifying column names.", sep = " "))
-  }
-  
-  # check that refpool_cname is in f_data, if not NULL #
-  if(!is.null(refpool_cname)){
-    if(!(refpool_cname %in% names(f_data))) stop(paste("Reference pool column", refpool_cname, "is not found in f_data. See details of as.isobaricpepData for specifying column names.", sep = " "))
-  }
-  # make sure the reference pool info info is specified appropriately #
-  # possibility 1: specify refpool_cname #
-  poss1 = !is.null(refpool_cname) & !is.null(refpool_notation)
-  # possibility 2: specify refpool_channel and channel_cname#
-  poss2 = !is.null(refpool_channel) & !is.null(channel_cname) 
-  
-  # throw an error if neither or both of these are true #
-  if((poss1 + poss2) != 1) stop("Reference samples information was not correctly specified. See Details and Examples for more information.")
-  
-  # if possibility 1 is used, check that ref_cname column 
-  if(poss1 == TRUE){
-    if(!is.character(refpool_notation)) stop("refpool_notation must be of class 'character'")
-    f_data[,refpool_cname] = as.character(f_data[,refpool_cname])
-    f_data[,fdata_cname] = as.character(f_data[,fdata_cname])
-    idx = split(f_data[,refpool_cname], f_data[,exp_cname])
-    temp_check = lapply(idx, function(x) refpool_notation %in% x)
-    if(sum(unlist(temp_check)) != length(temp_check)) stop(paste("'refpool_notation=", refpool_notation, " is not in every experiment. See Details and Examples for more information."))
-  }
-  
-  # if possibility 2 is used, check that refpool_channel is a value seen in each experiment #
-  if(poss2 == TRUE){
-    if(!is.character(refpool_channel)) stop("refpool_channel must be of class 'character'")
-    f_data[,channel_cname] = as.character(f_data[,channel_cname])
-    f_data[,fdata_cname] = as.character(f_data[,fdata_cname])
-    idx = split(f_data[,channel_cname], f_data[,exp_cname])
-    temp_check = lapply(idx, function(x) refpool_channel %in% x)
-    if(sum(unlist(temp_check)) != length(temp_check)) stop(paste("'refpool_channel=", refpool_channel, " is not in every experiment. See Details and Examples for more information."))
-  }
   
   # if e_meta is non-NULL and emeta_cname is NULL #
   if(!is.null(e_meta) & is.null(emeta_cname)) stop("if e_meta is non-NULL, emeta_cname must also be non-NULL")
@@ -216,7 +191,10 @@ as.isobaricpepData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata
   res = list(e_data = e_data, f_data = f_data, e_meta = e_meta)
   
   # set column name attributes #
-  attr(res, "cnames") = list(edata_cname = edata_cname, emeta_cname = emeta_cname, fdata_cname = fdata_cname, techrep_cname = techrep_cname)
+  attr(res, "cnames") = list(edata_cname = edata_cname, 
+                             emeta_cname = emeta_cname, 
+                             fdata_cname = fdata_cname, 
+                             techrep_cname = techrep_cname)
   
   # count missing values in e_data #
   num_miss_obs = sum(is.na(e_data[,-which(names(e_data)==edata_cname)]))
@@ -241,6 +219,13 @@ as.isobaricpepData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata
   norm_info$is_normalized = is_normalized
   attr(res, "data_info") = list(data_scale = data_scale, norm_info = norm_info, num_edata = num_edata, num_miss_obs = num_miss_obs, num_emeta = num_emeta, prop_missing = prop_missing, num_samps = num_samps, data_types = data_types)
   
+  attr(res, "isobaric_info") = list(exp_cname = NA, 
+                                          channel_cname = NA, 
+                                          refpool_channel = NA, 
+                                          refpool_cname = NA, 
+                                          refpool_notation = NA, 
+                                          norm_info = list(is_normalized = isobaric_norm))
+  
   #set check.names attribute #
   attr(res, "check.names") = check.names 
   
@@ -249,8 +234,7 @@ as.isobaricpepData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata
     attr(res, "meta_info") = TRUE
   }else{ attr(res, "meta_info") = FALSE}
   
-  # set reference pool information up #
-  attr(res, "isobaric_info") = list(exp_cname = exp_cname, channel_cname = channel_cname, refpool_channel = refpool_channel, refpool_cname = refpool_cname, refpool_notation = refpool_notation, norm_info = list(is_normalized = isobaric_norm))
+  
 
   # set group dataframe attribute to NULL, will be filled in after running group_designation function #
   attr(res, "group_DF") = NULL

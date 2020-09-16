@@ -1,15 +1,8 @@
 #' Convert Data to Appropriate pmartR Class
 #'
-#' Converts a list object or several data.frames of metabolomic-level data to 
-#' an object of the class 'metabData'. Objects of the class 'metabData' are 
-#' lists with two obligatory components \code{e_data} and \code{f_data}. An 
-#' optional list component \code{e_meta} is used if analysis or visualization 
-#' at other levels (e.g. metabolite identification) is also desired.
+#' Converts a list object or several data.frames of NMR-generated metabolomic-level data to an object of the class 'nmrData'. Objects of the class 'nmrData' are lists with two obligatory components \code{e_data} and \code{f_data}. An optional list component \code{e_meta} is used if analysis or visualization at other levels (e.g. metabolite identification) is also desired.
 #'
-#' @param e_data a \eqn{p \times n + 1} data.frame of expression data, where 
-#' \eqn{p} is the number of metabolites observed and \eqn{n} is the number of 
-#' samples. Each row corresponds to data for each metabolite. One column 
-#' specifying a unique identifier for each metabolite (row) must be present.
+#' @param e_data a \eqn{p \times n + 1} data.frame of expression data, where \eqn{p} is the number of metabolites observed and \eqn{n} is the number of samples. Each row corresponds to data for each metabolite. One column specifying a unique identifier for each metabolite (row) must be present.
 #' @param f_data a data.frame with \eqn{n} rows. Each row corresponds to a sample with one column giving the unique sample identifiers found in e_data column names and other columns providing qualitative and/or quantitative traits of each sample.
 #' @param e_meta an optional data.frame with \eqn{p} rows. Each row corresponds to a metabolite with one column giving metabolite names (must be named the same as the column in \code{e_data}) and other columns giving meta information.
 #' @param edata_cname character string specifying the name of the column containing the metabolite identifiers in \code{e_data} and \code{e_meta} (if applicable).
@@ -18,7 +11,7 @@
 #' @param techrep_cname character string specifying the name of the column in \code{f_data} containing the identifiers for the biological samples if the observations represent technical replicates.  This column is used to collapse the data when \code{combine_techreps} is called on this object.  Defaults to NULL (no technical replicates). 
 #' @param ... further arguments
 #'
-#' @details Objects of class 'metabData' contain some attributes that are referenced by downstream functions. These attributes can be changed from their default value by manual specification. A list of these attributes as well as their default values are as follows:
+#' @details Objects of class 'nmrData' contain some attributes that are referenced by downstream functions. These attributes can be changed from their default value by manual specification. A list of these attributes as well as their default values are as follows:
 #' \tabular{ll}{
 #' data_scale \tab Scale of the data provided in \code{e_data}. Acceptable values are 'log2', 'log10', 'log', and 'abundance', which indicate data is log base 2, base 10, natural log transformed, and raw abundance, respectively. Default is 'abundance'. \cr
 #' \tab \cr
@@ -26,7 +19,7 @@
 #' \tab \cr
 #' norm_info \tab Default value is an empty list, which will be populated with a single named element \code{is_normalized = is_normalized}. When a normalization is applied to the data, this becomes populated with a list containing the normalization function, normalization subset and subset parameters, the location and scale parameters used to normalize the data, and the location and scale parameters used to backtransform the data (if applicable). \cr
 #' \tab \cr
-#' data_types \tab Character string describing the type of data (e.g.'Positive ion'). Default value is NULL. \cr
+#' data_types \tab Character string describing the type of data (e.g.'binned' or 'identified', for NMR data). Default value is NULL. \cr
 #' \tab \cr
 #' check.names \tab Logical defaults to TRUE. Indicates whether 'check.names' attribute of returned omicsData object is TRUE or FALSE. \cr
 #' }
@@ -49,26 +42,29 @@
 #' @examples
 #' dontrun{
 #' library(pmartRdata)
-#' data("metab_edata")
-#' data("metab_fdata")
-#' mymetabData <- as.metabData(e_data = metab_edata, f_data = metab_fdata, edata_cname = "Metabolite", fdata_cname = "SampleID")
+#' data("nmr_edata_identified")
+#' data("nmr_fdata_identified")
+#' mynmrData <- as.nmrData(e_data = nmr_edata_identified, f_data = nmr_fdata_identified, edata_cname = "Metabolite", fdata_cname = "SampleID", data_type = "identified")
 #'}
 #'
 #' @author Lisa Bramer, Kelly Stratton
+#' @seealso \code{\link{as.metabData}}
+#' @seealso \code{\link{as.isobaricpepData}}
 #' @seealso \code{\link{as.lipidData}}
 #' @seealso \code{\link{as.pepData}}
 #' @seealso \code{\link{as.proData}}
 #'
 #' @export
-as.metabData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname, emeta_cname = NULL, techrep_cname = NULL, ...){
-  .as.metabData(e_data, f_data, e_meta, edata_cname, fdata_cname, emeta_cname, techrep_cname, ...)
+as.nmrData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname, emeta_cname = NULL, techrep_cname = NULL, ...){
+  .as.nmrData(e_data, f_data, e_meta, edata_cname, fdata_cname, emeta_cname, techrep_cname, ...)
 }
 
 ## metabolite data ##
-.as.metabData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname,
+.as.nmrData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname,
                           emeta_cname = NULL, techrep_cname = NULL, data_scale = "abundance",
                           is_normalized = FALSE, norm_info=list(),
-                          data_types=NULL, check.names = TRUE){
+                          data_types=NULL, check.names = TRUE 
+                          ){
 
   # initial checks #
 
@@ -78,12 +74,32 @@ as.metabData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname
 
   # check to see if e_meta is NULL, if not check that it is a data.frame #
   if(!is.null(e_meta)){ if(!inherits(e_meta, "data.frame")) stop("e_meta must be of the class 'data.frame'")}
+  
+  
+  # check that remaining input params are of correct class # added by KGS 5/1/2020
+  ## cnames are character strings
+  if(!is.null(edata_cname)){ if(!inherits(edata_cname, "character")) stop("edata_cname must be of the class 'character'")}
+  if(!is.null(fdata_cname)){ if(!inherits(fdata_cname, "character")) stop("fdata_cname must be of the class 'character'")}
+  if(!is.null(emeta_cname)){ if(!inherits(emeta_cname, "character")) stop("emeta_cname must be of the class 'character'")}
+  
+  ## is_normalized is logical
+  if(!is.null(is_normalized)){ if(!inherits(is_normalized, "logical")) stop("is_normalized must be of the class 'logical'")}
+  
+  ## norm_info is list
+  if(!inherits(norm_info, "list")) stop("norm_info must be of the class 'list'")
+  
+  ## data_types is character if not missing
+  if(!is.null(edata_cname)){ if(!inherits(edata_cname, "character")) stop("edata_cname must be of the class 'character'")}
+  
+  ## check.names is logical
+  if(!is.null(check.names)){ if(!inherits(check.names, "logical")) stop("check.names must be of the class 'logical'")}
 
+  
   # check that the metabolite column exists in e_data and e_meta (if applicable) #
-  if(!(edata_cname %in% names(e_data))) stop(paste("Metabolite column ", edata_cname," not found in e_data. See details of as.metabData for specifying column names.", sep = ""))
+  if(!(edata_cname %in% names(e_data))) stop(paste("Metabolite column ", edata_cname," not found in e_data. See details of as.nmrData for specifying column names.", sep = ""))
 
   if(!is.null(e_meta)){
-    if(!(edata_cname %in% names(e_meta))) stop(paste("Metabolite column ", edata_cname," not found in e_meta. Column names for metabolite names must match for e_data and e_meta. See details of as.metabData for specifying column names.", sep = ""))
+    if(!(edata_cname %in% names(e_meta))) stop(paste("Metabolite column ", edata_cname," not found in e_meta. Column names for metabolite names must match for e_data and e_meta. See details of as.nmrData for specifying column names.", sep = ""))
   }
 
   # if e_meta is NULL and emeta_cname is non-NULL #
@@ -98,12 +114,12 @@ as.metabData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname
   # if e_meta is not NULL check that identification columns are found #
   if(!is.null(e_meta)){
     if(!is.null(emeta_cname)){
-      if(!(emeta_cname %in% names(e_meta))) stop(paste("Metabolite identification column ", emeta_cname, " not found in e_meta. See details of as.metabData for specifying column names.", sep = "") )
+      if(!(emeta_cname %in% names(e_meta))) stop(paste("Metabolite identification column ", emeta_cname, " not found in e_meta. See details of as.nmrData for specifying column names.", sep = "") )
     }
   }
 
   # check that the Sample column name is in f_data column names #
-  if(!(fdata_cname %in% names(f_data))) stop(paste("Sample column ", fdata_cname, " not found in f_data. See details of as.metabData for specifying column names.", sep = ""))
+  if(!(fdata_cname %in% names(f_data))) stop(paste("Sample column ", fdata_cname, " not found in f_data. See details of as.nmrData for specifying column names.", sep = ""))
 
   # check that all samples in e_data are present in f_data #
   edat_sampid = which(names(e_data) == edata_cname) # fixed by KS 10/13/2016
@@ -133,7 +149,10 @@ as.metabData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname
   }
 
   # check that data_scale is one of the acceptable options #
-  if(!(data_scale %in% c('log2', 'log10', 'log', 'abundance'))) stop(paste(data_scale, " is not a valid option for 'data_scale'. See details of as.metabData for specifics.", sep=""))
+  data_scale <- tolower(data_scale) # added by KGS 5/1/2020
+  if(!(data_scale %in% c('log2', 'log10', 'log', 'abundance'))) stop(paste(data_scale, " is not a valid option for 'data_scale'. See details of as.nmrData for specifics.", sep=""))
+  
+  
 
   # if e_meta is NULL, set emeta_cname to NULL #
   if(is.null(e_meta)){
@@ -206,7 +225,7 @@ as.metabData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname
   }else{ attr(res, "filters") = list()}
 
   # set class of list #
-  class(res) = "metabData"
+  class(res) = c("nmrData") 
 
   return(res)
 

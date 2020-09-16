@@ -3,7 +3,7 @@
 #' Calculates normalization parameters based on the data using the specified subset and normalization functions with possibility of apply the normalization to the data.
 #'
 #'
-#' @param omicsData an object of the class 'pepData', 'proData', 'metabData', or 'lipidData', created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively. The function \code{\link{group_designation}} must have been run on omicsData to use several of the subset functions (i.e. rip and ppp_rip).
+#' @param omicsData an object of the class 'pepData', 'proData', 'metabData', 'lipidData', 'nmrData', created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, \code{\link{as.nmrData}}, respectively. The function \code{\link{group_designation}} must have been run on omicsData to use several of the subset functions (i.e. rip and ppp_rip).
 #' @param subset_fn character string indicating the subset function to use for normalization. See details for the current offerings.
 #' @param norm_fn character string indicating the normalization function to use for normalization. See details for the current offerings.
 #' @param params additional arguments passed to the chosen subset functions. See details for parameter specification and default values.
@@ -77,7 +77,7 @@ normalize_global <- function(omicsData, subset_fn, norm_fn, params = NULL, apply
   grp_pres = length(grep("group_DF", names(attributes(omicsData))))
   
   # check that omicsData is of the appropriate class
-  if(!inherits(omicsData, c("proData","pepData","lipidData", "metabData"))) stop("omicsData is not an object of appropriate class")
+  if(!inherits(omicsData, c("proData","pepData","lipidData", "metabData", "nmrData"))) stop("omicsData is not an object of appropriate class")
   
   # data should be log transformed #
   if(!attr(omicsData, "data_info")$data_scale %in% c("log2", "log10", "log")){
@@ -169,6 +169,7 @@ normalize_global <- function(omicsData, subset_fn, norm_fn, params = NULL, apply
   #check that backtransform is T/F #
   if(!inherits(backtransform, "logical")) stop("backtransform must a logical argument")
 
+  if(apply_norm == FALSE & backtransform == TRUE){stop("apply_norm is set to FALSE and backtransform is set to TRUE; a backtransform cannot be applied if the normalization is not being applied.")}
   
   # subset data using current subset method #
   if(subset_fn == "all"){

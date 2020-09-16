@@ -35,7 +35,6 @@ dontrun{
 library(pmartR)
 library("MSnbase")
 data("msnset")
-
 result = MSnSet2pepData(msnset, data_scale = "log2", edata_cname = "UniqueID", fdata_cname = "SampleID", emeta_cname = "UniqueID", check.names = TRUE)
 }
 

@@ -6,6 +6,7 @@
 \alias{edata_replace.proData}
 \alias{edata_replace.metabData}
 \alias{edata_replace.lipidData}
+\alias{edata_replace.nmrData}
 \title{Replace Values Equal to x with y}
 \usage{
 edata_replace(omicsData, x, y)
@@ -17,9 +18,11 @@ edata_replace(omicsData, x, y)
 \method{edata_replace}{metabData}(omicsData, x, y)
 
 \method{edata_replace}{lipidData}(omicsData, x, y)
+
+\method{edata_replace}{nmrData}(omicsData, x, y)
 }
 \arguments{
-\item{omicsData}{an object of the class 'pepData', 'proData', 'metabData', or 'lipidData', usually created by \code{pepData}, \code{proData}, \code{metabData}, or \code{lipidData}, respectively.}
+\item{omicsData}{an object of the class 'pepData', 'proData', 'metabData', 'lipidData', or 'nmrData' usually created by \code{\link{pepData}}, \code{\link{proData}}, \code{\link{metabData}}, \code{\link{lipidData}}, or \code{\link{as.nmrData}}, respectively.}
 
 \item{x}{value to be replaced, usually numeric or NA}
 

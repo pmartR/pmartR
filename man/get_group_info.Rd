@@ -7,7 +7,7 @@
 get_group_info(omicsObject)
 }
 \arguments{
-\item{omicsObject}{an object of the class 'pepData', 'proData', 'metabData', 'lipidData', 'statRes', or 'trellData', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, \code{\link{imd_anova}}, or \code{\link{format_data}} respectively.}
+\item{omicsObject}{an object of the class 'pepData', 'proData', 'metabData', 'lipidData', 'nmrData', 'statRes', or 'trellData', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, \code{\link{as.nmrData}}, \code{\link{imd_anova}}, or \code{\link{format_data}} respectively.}
 }
 \value{
 a data.frame containing omicsObject object group info

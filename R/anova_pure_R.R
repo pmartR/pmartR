@@ -5,7 +5,7 @@
 
 anova_test_R <- function(omicsData, return_sizes = FALSE){
   # check that omicsData is of the appropriate class
-  if(!inherits(omicsData, c("proData","pepData","lipidData", "metabData"))) stop("omicsData is not an object of appropriate class")
+  if(!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData", "nmrData"))) stop("omicsData must be of class 'pepData', 'proData', 'metabData', 'lipidData', or 'nmrData'.")
   
   # Check for group_DF attribute #
   if(is.null(attr(omicsData, "group_DF"))){
