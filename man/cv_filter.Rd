@@ -7,16 +7,29 @@
 cv_filter(omicsData)
 }
 \arguments{
-\item{omicsData}{an object of the class 'pepData', 'proData', 'metabData', 'lipidData', or 'nmrData', created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, \code{\link{as.nmrData}}, respectively. Note, if \code{\link{group_designation}} has not been run, the CV is calculated based on all samples for each biomolecule.}
+\item{omicsData}{an object of the class 'pepData', 'proData', 'metabData',
+'lipidData', or 'nmrData' created by \code{\link{as.pepData}},
+\code{\link{as.proData}}, \code{\link{as.metabData}},
+\code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, respectively. Note,
+if \code{\link{group_designation}} has not been run, the CV is calculated
+based on all samples for each biomolecule.}
 }
 \value{
-An S3 object of class 'cvFilt' giving the pooled CV for each biomolecule and additional attributes used for plottinga data.frame with a column giving the peptide, protein, or gene name and a column giving the pooled CV value
+An S3 object of class 'cvFilt' giving the pooled CV for each
+ biomolecule and additional attributes used for plotting a data.frame with a
+ column giving the biomolecule name and a column giving the pooled CV value.
 }
 \description{
 A pooled CV is calculated for each biomolecule.
 }
 \details{
-For each biomolecule, the CV of each group is calculated as the standard deviation divided by the mean, excluding missing values. A pooled CV estimate is then calculated based on the methods of Ahmed (1995).
+For each biomolecule, the CV of each group is calculated as the
+ standard deviation divided by the mean, excluding missing values. A pooled
+ CV estimate is then calculated based on the methods of Ahmed (1995). Any
+ groups consisting of a single sample are excluded from the CV calculation,
+ and thus, from the cv_filter result. If group_designation has not been run
+ on the omicsData object, all samples are considered to belong to the same
+ group.
 }
 \examples{
 dontrun{
@@ -29,7 +42,8 @@ summary(to_filter, cv_threshold = 30)
 
 }
 \references{
-Ahmed, S.E. (1995). \emph{A pooling methodology for coefficient of variation}. The Indian Journal of Statistics. 57: 57-75.
+Ahmed, S.E. (1995). \emph{A pooling methodology for coefficient of
+ variation}. The Indian Journal of Statistics. 57: 57-75.
 }
 \author{
 Lisa Bramer, Kelly Stratton
