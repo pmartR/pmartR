@@ -56,6 +56,10 @@
 #'  
 rmd_filter <- function(omicsData, ...){
 
+  # check that omicsData is of appropriate class #
+  if(!inherits(omicsData, c("pepData", "proData", "lipidData", "metabData", "nmrData"))) stop("omicsData is not of an appropriate class")
+  
+  
   # group_DF attribute is required #
   if(is.null(attr(omicsData, "group_DF"))){
     stop("omicsData must contain attribution information for 'group_DF'. See documentation for group_designation function for more information.")
@@ -77,10 +81,6 @@ rmd_filter <- function(omicsData, ...){
 rmd_filter.pepData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewness", "Correlation", "Proportion_Missing")){
 
   ## some initial checks ##
-
-  # check that omicsData is of class 'pepData', 'proData', 'lipidata', or 'metabData' #
-  if(!inherits(omicsData, c("pepData","proData","lipidData","metabData","nmrData"))) stop("omicsData is not of an appropriate class")
-
   if(length(metrics) < 2){
     stop("Vector of metrics must contain at least two elements.")
   }else{
@@ -215,10 +215,6 @@ rmd_filter.pepData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewness
 rmd_filter.proData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewness", "Correlation", "Proportion_Missing")){
 
   ## some initial checks ##
-
-  # check that omicsData is of class 'pepData', 'proData', 'lipidata', or 'metabData' #
-  if(!inherits(omicsData, c("pepData","proData","lipidData","metabData", "nmrData"))) stop("omicsData is not of an appropriate class")
-
   if(length(metrics) < 2){
     stop("Vector of metrics must contain at least two elements.")
   }else{
@@ -350,10 +346,6 @@ rmd_filter.proData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewness
 rmd_filter.lipidData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewness", "Correlation")){
 
   ## some initial checks ##
-  
-  # check that omicsData is of class 'pepData', 'proData', 'lipidata', or 'metabData' #
-  if(!inherits(omicsData, c("pepData","proData","lipidData","metabData", "nmrData"))) stop("omicsData is not of an appropriate class")
-
   if(length(metrics) < 2){
     stop("Vector of metrics must contain at least two elements.")
   }else{
@@ -524,10 +516,6 @@ rmd_filter.lipidData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewne
 rmd_filter.metabData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewness", "Correlation")){
 
   ## some initial checks ##
-
-  # check that omicsData is of class 'pepData', 'proData', 'lipidata', or 'metabData' #
-  if(!inherits(omicsData, c("pepData","proData","lipidData","metabData", "nmrData"))) stop("omicsData is not of an appropriate class")
-
   if(length(metrics) < 2){
     stop("Vector of metrics must contain at least two elements.")
   }else{
@@ -688,6 +676,7 @@ rmd_filter.metabData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewne
 
   return(output)
 }
+
 
 
 ### NMRdata function ###
@@ -697,10 +686,6 @@ rmd_filter.metabData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewne
 rmd_filter.nmrData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewness", "Correlation")){
   
   ## some initial checks ##
-  
-  # check that omicsData is of class 'pepData', 'proData', 'lipidata', or 'metabData' #
-  if(!inherits(omicsData, c("pepData","proData","lipidData","metabData", "nmrData"))) stop("omicsData is not of an appropriate class")
-  
   if(length(metrics) < 2){
     stop("Vector of metrics must contain at least two elements.")
   }else{
@@ -862,7 +847,7 @@ rmd_filter.nmrData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewness
   return(output)
 }
 
-
+ 
 
 
 
