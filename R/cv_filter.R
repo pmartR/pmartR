@@ -8,7 +8,11 @@
 #'  \code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, respectively. Note,
 #'  if \code{\link{group_designation}} has not been run, the CV is calculated
 #'  based on all samples for each biomolecule.
-#'
+#'@param use_groups logical indicator for whether to utilize group information
+#'  from \code{\link{group_designation}} when calculating the CV. Defaults to
+#'  TRUE. If use_groups is set to TRUE but \code{\link{group_designation}} has
+#'  not been run on the omicsData object, use_groups will be treated as FALSE.
+#'  
 #'@return  An S3 object of class 'cvFilt' giving the pooled CV for each
 #'  biomolecule and additional attributes used for plotting a data.frame with a
 #'  column giving the biomolecule name and a column giving the pooled CV value.
@@ -28,15 +32,15 @@
 #' library(pmartRdata)
 #' data("pep_object")
 #' pep_object2 <- group_designation(omicsData = pep_object, main_effects = "Condition")
-#' to_filter <- cv_filter(omicsData = pep_object2)
+#' to_filter <- cv_filter(omicsData = pep_object2, use_groups = TRUE)
 #' summary(to_filter, cv_threshold = 30)
 #'}
 #'
-#' @author Lisa Bramer, Kelly Stratton
+#'@author Lisa Bramer, Kelly Stratton
 #'
-#' @export
+#'@export
 
-cv_filter <- function(omicsData) {
+cv_filter <- function(omicsData, use_groups = TRUE) {
   ## some initial checks ##
   
   # check that omicsData is of appropriate class #
@@ -47,8 +51,51 @@ cv_filter <- function(omicsData) {
     )
   }
   
+  # check that use_groups is valid #
+  if(!is.logical(use_groups)){stop("Argument 'use_groups' must be either TRUE or FALSE")}
+  
+  # if no group_designation or use_groups = FALSE #
+  if(use_groups == FALSE || is.null(attr(omicsData, "group_DF"))){
+    samp_id <- attr(omicsData, "cnames")$fdata_cname
+    edata_id <- attr(omicsData, "cnames")$edata_cname
+    
+    cvs <-
+      apply(omicsData$e_data[, -which(names(omicsData$e_data) == edata_id)], 1, cv.calc)
+    
+    pool_cv <-
+      data.frame(omicsData$e_data[, which(names(omicsData$e_data) == edata_id)], CV_pooled = cvs)
+    names(pool_cv)[1] <- edata_id
+    
+    ## determine plotting window cutoff ##
+    # calculate percentage of observations with CV <= 200 #
+    prct.less200 <-
+      sum(pool_cv$CV_pooled <= 200, na.rm = T) / length(pool_cv$CV_pooled[!is.na(pool_cv$CV_pooled)])
+    
+    if (prct.less200 > 0.95) {
+      x.max = min(200, quantile(pool_cv$CV_pooled, 0.99, na.rm = TRUE))
+    } else{
+      x.max = quantile(pool_cv$CV_pooled, 0.95, na.rm = TRUE)
+    }
+    
+    ## generate some summary stats for CV values, for PMART purposes only ##
+    tot.nas <- sum(is.na(pool_cv$CV_pooled))
+    
+    output <- data.frame(pool_cv, row.names = NULL)
+    
+    orig_class <- class(output)
+    
+    class(output) <- c("cvFilt", orig_class)
+    
+    attr(output, "sample_names") <-
+      names(omicsData$e_data)[-which(names(omicsData$e_data) == attr(omicsData, "cnames")$edata_cname)]
+    attr(output, "group_DF") <- NULL
+    attr(output, "max_x_val") <- x.max
+    attr(output, "tot_nas") <- tot.nas
+    ### end of not using group info ###
+  }
+  
   # check that group_designation has been called already #
-  if (!is.null(attr(omicsData, "group_DF"))) {
+  if(use_groups == TRUE & !is.null(attr(omicsData, "group_DF"))) {
     groupDF <- attr(omicsData, "group_DF")
     
     samp_id <- attr(omicsData, "cnames")$fdata_cname
@@ -56,9 +103,9 @@ cv_filter <- function(omicsData) {
     
     # added by KGS Sept 2020: filters out any samples corresponding to singleton groups before proceeding with CV filter
     # the samples themselves won't be filtered out of the omicsData object upon application of the filter though
-    group_sizes <-
-      data.frame(Group = names(table(groupDF$Group)), n_group = as.numeric(table(groupDF$Group)))
-    if (any(group_sizes$n_group == 1)) {
+    group_sizes <- data.frame(Group = names(table(groupDF$Group)), n_group = as.numeric(table(groupDF$Group)))
+    
+    if (use_groups == TRUE & any(group_sizes$n_group == 1)) {
       # which group(s) #
       singleton_groups <-
         group_sizes$Group[group_sizes$n_group == 1]
@@ -66,6 +113,8 @@ cv_filter <- function(omicsData) {
       # which sample name(s) #
       samps_to_rm <-
         as.character(groupDF$SampleID[groupDF$Group %in% singleton_groups])
+      
+      warning("Grouping information is being utilized when calculating the CV, and there are group(s) consisting of a single sample. These singleton group(s) will be ignored by this filter.")
       
       # use custom_filter to remove the sample(s) from the omicsData object #
       my_cust_filt <-

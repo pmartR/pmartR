@@ -4,7 +4,7 @@
 \alias{cv_filter}
 \title{Filter Based on Pooled Coefficient of Variation (CV) Values}
 \usage{
-cv_filter(omicsData)
+cv_filter(omicsData, use_groups = TRUE)
 }
 \arguments{
 \item{omicsData}{an object of the class 'pepData', 'proData', 'metabData',
@@ -13,6 +13,11 @@ cv_filter(omicsData)
 \code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, respectively. Note,
 if \code{\link{group_designation}} has not been run, the CV is calculated
 based on all samples for each biomolecule.}
+
+\item{use_groups}{logical indicator for whether to utilize group information
+from \code{\link{group_designation}} when calculating the CV. Defaults to
+TRUE. If use_groups is set to TRUE but \code{\link{group_designation}} has
+not been run on the omicsData object, use_groups will be treated as FALSE.}
 }
 \value{
 An S3 object of class 'cvFilt' giving the pooled CV for each
@@ -36,7 +41,7 @@ dontrun{
 library(pmartRdata)
 data("pep_object")
 pep_object2 <- group_designation(omicsData = pep_object, main_effects = "Condition")
-to_filter <- cv_filter(omicsData = pep_object2)
+to_filter <- cv_filter(omicsData = pep_object2, use_groups = TRUE)
 summary(to_filter, cv_threshold = 30)
 }
 
