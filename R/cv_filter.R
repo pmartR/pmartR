@@ -54,16 +54,40 @@ cv_filter <- function(omicsData, use_groups = TRUE) {
   # check that use_groups is valid #
   if(!is.logical(use_groups)){stop("Argument 'use_groups' must be either TRUE or FALSE")}
   
+  if(use_groups==TRUE & is.null(attr(omicsData, "group_DF"))){
+    use_groups <- FALSE
+  }
+  
+  samp_id <- attr(omicsData, "cnames")$fdata_cname
+  edata_id <- attr(omicsData, "cnames")$edata_cname
+  data_scale <- attr(omicsData, "data_info")$data_scale
+  
   # if no group_designation or use_groups = FALSE #
   if(use_groups == FALSE || is.null(attr(omicsData, "group_DF"))){
-    samp_id <- attr(omicsData, "cnames")$fdata_cname
-    edata_id <- attr(omicsData, "cnames")$edata_cname
     
-    cvs <-
-      apply(omicsData$e_data[, -which(names(omicsData$e_data) == edata_id)], 1, cv.calc)
+    cur_edata <- omicsData$e_data[, -which(names(omicsData$e_data) == edata_id)]
     
-    pool_cv <-
-      data.frame(omicsData$e_data[, which(names(omicsData$e_data) == edata_id)], CV_pooled = cvs)
+    # calculate cv (on original scale) and number of non-missing values, by peptide and group #
+    if (data_scale == "log2") {
+      cur_edata <- as.matrix(2 ^ (cur_edata))
+    }
+    
+    if (data_scale == "log10") {
+      cur_edata <- as.matrix(10 ^ (cur_edata))
+    }
+    
+    if (data_scale == "log") {
+      cur_edata <- as.matrix(exp(cur_edata))
+    }
+    
+    if (data_scale == "abundance") {
+      cur_edata <- cur_edata
+    }
+    
+    cvs <- apply(cur_edata, 1, cv.calc)
+    cvs <- 100 * cvs
+    
+    pool_cv <- data.frame(cur_edata, CV_pooled = cvs)
     names(pool_cv)[1] <- edata_id
     
     ## determine plotting window cutoff ##
@@ -97,9 +121,6 @@ cv_filter <- function(omicsData, use_groups = TRUE) {
   # check that group_designation has been called already #
   if(use_groups == TRUE & !is.null(attr(omicsData, "group_DF"))) {
     groupDF <- attr(omicsData, "group_DF")
-    
-    samp_id <- attr(omicsData, "cnames")$fdata_cname
-    edata_id <- attr(omicsData, "cnames")$edata_cname
     
     # added by KGS Sept 2020: filters out any samples corresponding to singleton groups before proceeding with CV filter
     # the samples themselves won't be filtered out of the omicsData object upon application of the filter though
@@ -147,23 +168,19 @@ cv_filter <- function(omicsData, use_groups = TRUE) {
     temp_data3 <- temp_data2[, order(groupDF$Group)]
     
     # calculate cv (on original scale) and number of non-missing values, by peptide and group #
-    if (attr(omicsData, "data_info")$data_scale == "log2") {
-      #grp_cv = dplyr::summarise(dat_grouped, CV_group = cv.calc(2^value), n_cv = sum(!is.na(2^value)))
+    if (data_scale == "log2") {
       temp_data3 <- as.matrix(2 ^ (temp_data3))
     }
     
-    if (attr(omicsData, "data_info")$data_scale == "log10") {
-      #grp_cv = dplyr::summarise(dat_grouped, CV_group = cv.calc(10^value), n_cv = sum(!is.na(10^value)))
+    if (data_scale == "log10") {
       temp_data3 <- as.matrix(10 ^ (temp_data3))
     }
     
-    if (attr(omicsData, "data_info")$data_scale == "log") {
-      #grp_cv = dplyr::summarise(dat_grouped, CV_group = cv.calc(exp(value)), n_cv = sum(!is.na(exp(value))))
+    if (data_scale == "log") {
       temp_data3 <- as.matrix(exp(temp_data3))
     }
     
-    if (attr(omicsData, "data_info")$data_scale == "abundance") {
-      #grp_cv = dplyr::summarise(dat_grouped, CV_group = cv.calc(value), n_cv = sum(!is.na(value)))
+    if (data_scale == "abundance") {
       temp_data3 <- temp_data2[, order(groupDF$Group)]
     }
     ##########
@@ -210,46 +227,46 @@ cv_filter <- function(omicsData, use_groups = TRUE) {
     attr(output, "max_x_val") <- x.max
     attr(output, "tot_nas") <- tot.nas
     
-  } else{
-    # group designation has NOT been called on omicsData #
-    
-    samp_id <- attr(omicsData, "cnames")$fdata_cname
-    edata_id <- attr(omicsData, "cnames")$edata_cname
-    
-    cvs <-
-      apply(omicsData$e_data[, -which(names(omicsData$e_data) == edata_id)], 1, cv.calc)
-    
-    pool_cv <-
-      data.frame(omicsData$e_data[, which(names(omicsData$e_data) == edata_id)], CV_pooled = cvs)
-    names(pool_cv)[1] <- edata_id
-    
-    ## determine plotting window cutoff ##
-    # calculate percentage of observations with CV <= 200 #
-    prct.less200 <-
-      sum(pool_cv$CV_pooled <= 200, na.rm = T) / length(pool_cv$CV_pooled[!is.na(pool_cv$CV_pooled)])
-    
-    if (prct.less200 > 0.95) {
-      x.max = min(200, quantile(pool_cv$CV_pooled, 0.99, na.rm = TRUE))
-    } else{
-      x.max = quantile(pool_cv$CV_pooled, 0.95, na.rm = TRUE)
-    }
-    
-    ## generate some summary stats for CV values, for PMART purposes only ##
-    tot.nas <- sum(is.na(pool_cv$CV_pooled))
-    
-    output <- data.frame(pool_cv, row.names = NULL)
-    
-    orig_class <- class(output)
-    
-    class(output) <- c("cvFilt", orig_class)
-    
-    attr(output, "sample_names") <-
-      names(omicsData$e_data)[-which(names(omicsData$e_data) == attr(omicsData, "cnames")$edata_cname)]
-    attr(output, "group_DF") <- NULL
-    attr(output, "max_x_val") <- x.max
-    attr(output, "tot_nas") <- tot.nas
-    
-  }
+  } #else{
+  #   # group designation has NOT been called on omicsData #
+  #   
+  #   samp_id <- attr(omicsData, "cnames")$fdata_cname
+  #   edata_id <- attr(omicsData, "cnames")$edata_cname
+  #   
+  #   cvs <-
+  #     apply(omicsData$e_data[, -which(names(omicsData$e_data) == edata_id)], 1, cv.calc)
+  #   
+  #   pool_cv <-
+  #     data.frame(omicsData$e_data[, which(names(omicsData$e_data) == edata_id)], CV_pooled = cvs)
+  #   names(pool_cv)[1] <- edata_id
+  #   
+  #   ## determine plotting window cutoff ##
+  #   # calculate percentage of observations with CV <= 200 #
+  #   prct.less200 <-
+  #     sum(pool_cv$CV_pooled <= 200, na.rm = T) / length(pool_cv$CV_pooled[!is.na(pool_cv$CV_pooled)])
+  #   
+  #   if (prct.less200 > 0.95) {
+  #     x.max = min(200, quantile(pool_cv$CV_pooled, 0.99, na.rm = TRUE))
+  #   } else{
+  #     x.max = quantile(pool_cv$CV_pooled, 0.95, na.rm = TRUE)
+  #   }
+  #   
+  #   ## generate some summary stats for CV values, for PMART purposes only ##
+  #   tot.nas <- sum(is.na(pool_cv$CV_pooled))
+  #   
+  #   output <- data.frame(pool_cv, row.names = NULL)
+  #   
+  #   orig_class <- class(output)
+  #   
+  #   class(output) <- c("cvFilt", orig_class)
+  #   
+  #   attr(output, "sample_names") <-
+  #     names(omicsData$e_data)[-which(names(omicsData$e_data) == attr(omicsData, "cnames")$edata_cname)]
+  #   attr(output, "group_DF") <- NULL
+  #   attr(output, "max_x_val") <- x.max
+  #   attr(output, "tot_nas") <- tot.nas
+  #   
+  # }
   return(output)
 }
 
@@ -258,7 +275,7 @@ cv_filter <- function(omicsData, use_groups = TRUE) {
 #'
 #' This function calculates the coefficient of variation for a vector of data
 #'
-#' @param data a vector of values
+#' @param data a vector of values on the "abundance" scale (not log transformed)
 #'
 #' @return cv value for the vector of values with missing values ignored in the calculation
 #'
