@@ -136,14 +136,16 @@ normalize_nmr<- function(omicsData, apply_norm = FALSE, backtransform = FALSE, m
   if(poss1 == TRUE){
     if(!is.character(metabolite_name)) stop("metabolite_name must be of class 'character'")
     
-    reference_metabolite <- omicsData$e_data[grep(metabolite_name, omicsData$e_data[, edata_cname]) , -which(names(omicsData$e_data) == edata_cname)]
+    rowind <- which(omicsData$e_data[, edata_cname] == metabolite_name)
+    
+    reference_metabolite <- omicsData$e_data[rowind , -which(names(omicsData$e_data) == edata_cname)]
   
     if(!all(unlist(lapply(reference_metabolite, class)) == "numeric")){
       # if TRUE, there's a problem with the values since they aren't all numeric #
       stop(paste("Values for", metabolite_name, "must be numeric"))
     }
     # convert to numeric vector from data.frame with single row #
-    reference_metabolite <- as.numeric(omicsData$e_data[grep(metabolite_name, omicsData$e_data[, edata_cname]) , -which(names(omicsData$e_data) == edata_cname)])
+    reference_metabolite <- as.numeric(omicsData$e_data[rowind , -which(names(omicsData$e_data) == edata_cname)])
     
     backtransform_value <- median(reference_metabolite, na.rm = TRUE)
     
@@ -189,7 +191,7 @@ normalize_nmr<- function(omicsData, apply_norm = FALSE, backtransform = FALSE, m
     
     if(apply_norm == TRUE){
       # apply the normalization; remove the reference metabolite from edata as well as the edata_cname column #
-      edata_new <- edata[-which(edata[, edata_cname] == metabolite_name), -grep(edata_cname, names(edata))]
+      edata_new <- edata[-which(edata[, edata_cname] == metabolite_name), -which(names(edata) == edata_cname)]
       
       if(is_log == TRUE){
         # we need to subtract reference_metabolite from all the others #
@@ -272,7 +274,7 @@ normalize_nmr<- function(omicsData, apply_norm = FALSE, backtransform = FALSE, m
     
     if(apply_norm == TRUE){
       
-      edata_new <- edata[ , -grep(edata_cname, names(edata))]
+      edata_new <- edata[ , -which(names(edata) == edata_cname)]
       if(is_log == TRUE){
         # NEW: we need to un-log the data and divide the samples by their 
         # corresponding sample property values; if backtransforming, multiply
