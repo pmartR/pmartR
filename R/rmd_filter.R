@@ -5,8 +5,14 @@
 #'
 #'@param omicsData an object of the class 'pepData', 'proData', 'metabData',
 #'  'lipidData', or 'nmrData' usually created by \code{\link{as.pepData}},
-#'  \code{\link{as.proData}}, \code{\link{as.metabData}}, 
+#'  \code{\link{as.proData}}, \code{\link{as.metabData}},
 #'  \code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, respectively.
+#'
+#'@param ignore_singleton_groups logical indicator of whether to remove
+#'  singleton groups or not; defaults to TRUE. If TRUE, rmd_filter results are
+#'  returned only for samples in groups of size greater than 1. This is used
+#'  when calculating the correlation.
+#'  
 #'@param ... further arguments
 #'
 #'@return a data.frame containing columns for the Sample ID, log2 robust
@@ -54,11 +60,15 @@
 #'@rdname rmd_filter
 #'@name rmd_filter
 #'  
-rmd_filter <- function(omicsData, ...){
+rmd_filter <- function(omicsData, ignore_singleton_groups = TRUE, ...){
 
   # check that omicsData is of appropriate class #
   if(!inherits(omicsData, c("pepData", "proData", "lipidData", "metabData", "nmrData"))) stop("omicsData is not of an appropriate class")
   
+  # check that ignore_singleton_groups is logical #
+  if(!is.logical(ignore_singleton_groups)){
+    stop("ignore_singleton_groups must be either TRUE or FALSE")
+  }
   
   # group_DF attribute is required #
   if(is.null(attr(omicsData, "group_DF"))){
@@ -78,7 +88,7 @@ rmd_filter <- function(omicsData, ...){
 #'@export
 #'@rdname rmd_filter
 #'@name rmd_filter
-rmd_filter.pepData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewness", "Correlation", "Proportion_Missing")){
+rmd_filter.pepData <- function(omicsData, ignore_singleton_groups = TRUE, metrics=c("MAD", "Kurtosis", "Skewness", "Correlation", "Proportion_Missing")){
 
   ## some initial checks ##
   if(length(metrics) < 2){
@@ -92,7 +102,7 @@ rmd_filter.pepData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewness
   mintR_groupDF = attr(omicsData, "group_DF")
   
   ### Aug 2020: deal with any groups that have only a single sample in them ###
-  if(any(table(mintR_groupDF$Group))==1){
+  if(any(table(mintR_groupDF$Group)==1) & ignore_singleton_groups == TRUE){
     # save original data, which has some singleton group(s) #
     omicsData_orig <- omicsData
     
@@ -105,12 +115,12 @@ rmd_filter.pepData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewness
     to_remove <- as.character(mintR_groupDF[singleton_rows, get_fdata_cname(omicsData)])
     myfilter <- custom_filter(omicsData, f_data_remove = to_remove)
     omicsData <- applyFilt(myfilter, omicsData)
+    mintR_groupDF <- attr(omicsData, "group_DF")
     
   }else{
-    # no singleton groups, nothing to adjust/filter/etc. #
+    # no singleton groups or we are NOT ignoring singleton groups, nothing to adjust/filter/etc. #
     omicsData_orig <- omicsData
   }
-  
   
   
   # run_group_meancor already deals with the TimeCourse option #
@@ -156,7 +166,7 @@ rmd_filter.pepData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewness
     if(length(ind)>1){stop("More than one of the entries in metric matches to use of Correlation.")}
     metrics = metrics[-ind]
     metrics_final[4] = 1
-    rmd.vals$Corr = run_group_meancor(omicsData, mintR_groupDF)[,2]
+    rmd.vals$Corr = run_group_meancor(omicsData, mintR_groupDF, ignore_singleton_groups)[,2]
   }
 
   if(any(metrics %in% c("proportion_missing", "p", "prop_missing", "prop_miss", "proportion_miss", "prop", "proportion", "proportion missing", "prop miss", "proportion miss"))){
@@ -212,7 +222,7 @@ rmd_filter.pepData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewness
 #'@export
 #'@rdname rmd_filter
 #'@name rmd_filter
-rmd_filter.proData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewness", "Correlation", "Proportion_Missing")){
+rmd_filter.proData <- function(omicsData, ignore_singleton_groups = TRUE, metrics=c("MAD", "Kurtosis", "Skewness", "Correlation", "Proportion_Missing")){
 
   ## some initial checks ##
   if(length(metrics) < 2){
@@ -226,7 +236,7 @@ rmd_filter.proData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewness
   mintR_groupDF = attr(omicsData, "group_DF")
   
   ### Aug 2020: deal with any groups that have only a single sample in them ###
-  if(any(table(mintR_groupDF$Group))==1){
+  if(any(table(mintR_groupDF$Group)==1) & ignore_singleton_groups == TRUE){
     # save original data, which has some singleton group(s) #
     omicsData_orig <- omicsData
     
@@ -239,6 +249,7 @@ rmd_filter.proData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewness
     to_remove <- as.character(mintR_groupDF[singleton_rows, get_fdata_cname(omicsData)])
     myfilter <- custom_filter(omicsData, f_data_remove = to_remove)
     omicsData <- applyFilt(myfilter, omicsData)
+    mintR_groupDF <- attr(omicsData, "group_DF")
     
   }else{
     # no singleton groups, nothing to adjust/filter/etc. #
@@ -288,7 +299,7 @@ rmd_filter.proData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewness
     if(length(ind)>1){stop("More than one of the entries in metric matches to use of Correlation.")}
     metrics = metrics[-ind]
     metrics_final[4] = 1
-    rmd.vals$Corr = run_group_meancor(omicsData, mintR_groupDF)[,2]
+    rmd.vals$Corr = run_group_meancor(omicsData, mintR_groupDF, ignore_singleton_groups)[,2]
   }
 
   if(any(metrics %in% c("proportion_missing", "p", "prop_missing", "prop_miss", "proportion_miss", "prop", "proportion", "proportion missing", "prop miss", "proportion miss"))){
@@ -343,7 +354,7 @@ rmd_filter.proData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewness
 #'@export
 #'@rdname rmd_filter
 #'@name rmd_filter
-rmd_filter.lipidData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewness", "Correlation")){
+rmd_filter.lipidData <- function(omicsData, ignore_singleton_groups = TRUE, metrics=c("MAD", "Kurtosis", "Skewness", "Correlation")){
 
   ## some initial checks ##
   if(length(metrics) < 2){
@@ -357,7 +368,7 @@ rmd_filter.lipidData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewne
   mintR_groupDF = attr(omicsData, "group_DF")
   
   ### Aug 2020: deal with any groups that have only a single sample in them ###
-  if(any(table(mintR_groupDF$Group))==1){
+  if(any(table(mintR_groupDF$Group)==1) & ignore_singleton_groups == TRUE){
     # save original data, which has some singleton group(s) #
     omicsData_orig <- omicsData
     
@@ -370,6 +381,7 @@ rmd_filter.lipidData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewne
     to_remove <- as.character(mintR_groupDF[singleton_rows, get_fdata_cname(omicsData)])
     myfilter <- custom_filter(omicsData, f_data_remove = to_remove)
     omicsData <- applyFilt(myfilter, omicsData)
+    mintR_groupDF <- attr(omicsData, "group_DF")
     
   }else{
     # no singleton groups, nothing to adjust/filter/etc. #
@@ -419,7 +431,7 @@ rmd_filter.lipidData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewne
     if(length(ind)>1){stop("More than one of the entries in metric matches to use of Correlation.")}
     metrics = metrics[-ind]
     metrics_final[4] = 1
-    rmd.vals$Corr = run_group_meancor(omicsData, mintR_groupDF)[,2]
+    rmd.vals$Corr = run_group_meancor(omicsData, mintR_groupDF, ignore_singleton_groups)[,2]
   }
 
   if(any(metrics %in% c("proportion_missing", "p", "prop_missing", "prop_miss", "proportion_miss", "prop", "proportion", "proportion missing", "prop miss", "proportion miss"))){
@@ -513,7 +525,7 @@ rmd_filter.lipidData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewne
 #'@export
 #'@rdname rmd_filter
 #'@name rmd_filter
-rmd_filter.metabData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewness", "Correlation")){
+rmd_filter.metabData <- function(omicsData, ignore_singleton_groups = TRUE, metrics=c("MAD", "Kurtosis", "Skewness", "Correlation")){
 
   ## some initial checks ##
   if(length(metrics) < 2){
@@ -527,7 +539,7 @@ rmd_filter.metabData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewne
   mintR_groupDF = attr(omicsData, "group_DF")
   
   ### Aug 2020: deal with any groups that have only a single sample in them ###
-  if(any(table(mintR_groupDF$Group))==1){
+  if(any(table(mintR_groupDF$Group)==1) & ignore_singleton_groups == TRUE){
     # save original data, which has some singleton group(s) #
     omicsData_orig <- omicsData
     
@@ -540,6 +552,7 @@ rmd_filter.metabData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewne
     to_remove <- as.character(mintR_groupDF[singleton_rows, get_fdata_cname(omicsData)])
     myfilter <- custom_filter(omicsData, f_data_remove = to_remove)
     omicsData <- applyFilt(myfilter, omicsData)
+    mintR_groupDF <- attr(omicsData, "group_DF")
     
   }else{
     # no singleton groups, nothing to adjust/filter/etc. #
@@ -590,7 +603,7 @@ rmd_filter.metabData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewne
     if(length(ind)>1){stop("More than one of the entries in metric matches to use of Correlation.")}
     metrics = metrics[-ind]
     metrics_final[4] = 1
-    rmd.vals$Corr = run_group_meancor(omicsData, mintR_groupDF)[,2]
+    rmd.vals$Corr = run_group_meancor(omicsData, mintR_groupDF, ignore_singleton_groups)[,2]
   }
 
   if(any(metrics %in% c("proportion_missing", "p", "prop_missing", "prop_miss", "proportion_miss", "prop", "proportion", "proportion missing", "prop miss", "proportion miss"))){
@@ -683,7 +696,7 @@ rmd_filter.metabData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewne
 #'@export
 #'@rdname rmd_filter
 #'@name rmd_filter
-rmd_filter.nmrData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewness", "Correlation")){
+rmd_filter.nmrData <- function(omicsData, ignore_singleton_groups = TRUE, metrics=c("MAD", "Kurtosis", "Skewness", "Correlation")){
   
   ## some initial checks ##
   if(length(metrics) < 2){
@@ -696,8 +709,9 @@ rmd_filter.nmrData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewness
   
   mintR_groupDF = attr(omicsData, "group_DF")
   
-  ### Aug 2020: deal with any groups that have only a single sample in them ###
-  if(any(table(mintR_groupDF$Group))==1){
+  ### Aug 2020: deal with any groups that have only a single sample in them, 
+  # in the case that the user wants to ignore those groups ###
+  if(any(table(mintR_groupDF$Group)==1) & ignore_singleton_groups == TRUE){
     # save original data, which has some singleton group(s) #
     omicsData_orig <- omicsData
     
@@ -710,6 +724,7 @@ rmd_filter.nmrData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewness
     to_remove <- as.character(mintR_groupDF[singleton_rows, get_fdata_cname(omicsData)])
     myfilter <- custom_filter(omicsData, f_data_remove = to_remove)
     omicsData <- applyFilt(myfilter, omicsData)
+    mintR_groupDF <- attr(omicsData, "group_DF")
     
   }else{
     # no singleton groups, nothing to adjust/filter/etc. #
@@ -760,7 +775,7 @@ rmd_filter.nmrData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewness
     if(length(ind)>1){stop("More than one of the entries in metric matches to use of Correlation.")}
     metrics = metrics[-ind]
     metrics_final[4] = 1
-    rmd.vals$Corr = run_group_meancor(omicsData, mintR_groupDF)[,2]
+    rmd.vals$Corr = run_group_meancor(omicsData, mintR_groupDF, ignore_singleton_groups)[,2]
   }
   
   if(any(metrics %in% c("proportion_missing", "p", "prop_missing", "prop_miss", "proportion_miss", "prop", "proportion", "proportion missing", "prop miss", "proportion miss"))){
@@ -864,7 +879,6 @@ rmd_filter.nmrData <- function(omicsData, metrics=c("MAD", "Kurtosis", "Skewness
 #'
 #' @author Lisa Bramer
 #'
-
 run_prop_missing <- function(data_only){
 
   # calculate number of missing values per run #
@@ -879,6 +893,7 @@ run_prop_missing <- function(data_only){
   return(res.final)
 }
 
+
 #' Calculate the Median Absolute Deviance (MAD) of Sample Runs
 #'
 #' This function calculates the median absolute deviance across data for each sample run.
@@ -890,7 +905,6 @@ run_prop_missing <- function(data_only){
 #' @return data.frame with two elements: Sample, a character vector giving the sample names; and MAD, a numeric vector giving the MAD values
 #'
 #' @author Lisa Bramer
-
 run_mad <- function(data_only){
 
   # calculate MAD #
@@ -910,6 +924,7 @@ run_mad <- function(data_only){
   return(res.final)
 }
 
+
 #' Calculate the Kurtosis of Sample Runs
 #'
 #' This function calculates the kurtosis across data for each sample run.
@@ -921,11 +936,7 @@ run_mad <- function(data_only){
 #' @return data.frame with two elements: Sample, a character vector giving the sample names; and Kurtosis, a numeric vector giving the kurtosis
 #'
 #' @author Lisa Bramer
-
-
 run_kurtosis <- function(data_only){
-
-
 
   # calculate kurtosis #
   kurt_res <- apply(data_only, 2, e1071::kurtosis, na.rm = TRUE, type = 2)
@@ -955,11 +966,7 @@ run_kurtosis <- function(data_only){
 #' @return data.frame with two elements: Sample, a character vector giving the sample names; and Skewness, a numeric vector giving the skewness values
 #'
 #' @author Lisa Bramer
-
-
 run_skewness <- function(data_only){
-
-
 
   # calculate skewness #
   skew_res <- apply(data_only, 2, e1071::skewness, na.rm = TRUE, type = 2)
@@ -985,6 +992,7 @@ run_skewness <- function(data_only){
 #'
 #' @param omicsData an object of the class 'pepData', 'proData', 'metabData', or 'lipidData' usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.
 #' @param mintR_groupDF data.frame created by \code{\link{group_designation}} with columns for sample.id and group.
+#' @param use_singletons logical indicator of whether to include singleton groups or not; defaults to FALSE. If FALSE, rmd_filter results are returned only for samples in groups of size greater than 1. This is a pass-through argument from \code{\link{rmd_filter}}.
 #'
 #' @details Correlation calculations use only complete pairwise observations.
 #'
@@ -992,9 +1000,7 @@ run_skewness <- function(data_only){
 #'
 #' @author Lisa Bramer
 #'
-
-
-run_group_meancor <- function(omicsData, mintR_groupDF){
+run_group_meancor <- function(omicsData, mintR_groupDF, ignore_singleton_groups = TRUE){
 
   # if group.data has column for TimeCourse, re-compute group.data including TimeCourse as main effect
   # if mintR_groupDF has TimeCourse variable, re-compute group_data including TimeCourse as main effect

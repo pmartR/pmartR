@@ -5,8 +5,13 @@
 #'
 #'@param omicsData object of one of the classes "pepData", "isobaricpepData",
 #'  "proData", "lipidData", "metabData", or "nmrData", usually created by
-#'  \code{\link{as.pepData}}, \code{\link{as.isobaricpepData}}, \code{\link{as.proData}},
-#'  \code{\link{as.lipidData}}, \code{\link{as.metabData}}, or \code{\link{as.nmrData}}, respectively.
+#'  \code{\link{as.pepData}}, \code{\link{as.isobaricpepData}},
+#'  \code{\link{as.proData}}, \code{\link{as.lipidData}},
+#'  \code{\link{as.metabData}}, or \code{\link{as.nmrData}}, respectively.
+#'  Groups (more than one group) must have been specified using the
+#'  \code{\link{group_designation}} function prior to using the imdanova_filter
+#'  function.
+#'  @param ignore_singleton_groups
 #'
 #'@details The output from this function can be used in conjunction with
 #'  \code{\link{applyFilt}} to filter out molecules that are not present in
@@ -38,10 +43,19 @@ imdanova_filter <- function(omicsData){ #}, filter_method, min_nonmiss_gtest=3, 
   }
 
   # omicsData must include groupDF information #
-  # if(!is.null(omicsData)){
+  if(is.null(attr(omicsData, "group_DF"))){
+   stop("omicsData object must include grouping information. See group_designation() function for more details.") 
+  }
+  
+  # groupDF must have more than 1 group #
+  if(length(names(get_group_table(omicsData)))<2){
+    stop("There must be more than one group in order to create an imdanovaFilt object.")
+  }
+  
   e_data <- omicsData$e_data
   groupDF <- attr(omicsData, "group_DF")
 
+  # there must be more than one group #
 
   ## end of initial checks ##
 

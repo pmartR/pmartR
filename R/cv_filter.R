@@ -87,7 +87,7 @@ cv_filter <- function(omicsData, use_groups = TRUE) {
     cvs <- apply(cur_edata, 1, cv.calc)
     cvs <- 100 * cvs
     
-    pool_cv <- data.frame(cur_edata, CV_pooled = cvs)
+    pool_cv <- data.frame(omicsData$e_data[, which(names(omicsData$e_data) == edata_id)], cur_edata, CV_pooled = cvs)
     names(pool_cv)[1] <- edata_id
     
     ## determine plotting window cutoff ##

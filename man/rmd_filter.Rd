@@ -13,26 +13,31 @@ rmd_filter(omicsData, ...)
 
 \method{rmd_filter}{pepData}(
   omicsData,
-  metrics = c("MAD", "Kurtosis", "Skewness", "Correlation", "Proportion_Missing")
+  metrics = c("MAD", "Kurtosis", "Skewness", "Correlation", "Proportion_Missing"),
+  use_singletons = FALSE
 )
 
 \method{rmd_filter}{proData}(
   omicsData,
+  use_singletons = FALSE,
   metrics = c("MAD", "Kurtosis", "Skewness", "Correlation", "Proportion_Missing")
 )
 
 \method{rmd_filter}{lipidData}(
   omicsData,
+  use_singletons = FALSE,
   metrics = c("MAD", "Kurtosis", "Skewness", "Correlation")
 )
 
 \method{rmd_filter}{metabData}(
   omicsData,
+  use_singletons = FALSE,
   metrics = c("MAD", "Kurtosis", "Skewness", "Correlation")
 )
 
 \method{rmd_filter}{nmrData}(
   omicsData,
+  use_singletons = FALSE,
   metrics = c("MAD", "Kurtosis", "Skewness", "Correlation")
 )
 }
@@ -43,6 +48,11 @@ rmd_filter(omicsData, ...)
 \code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, respectively.}
 
 \item{...}{further arguments}
+
+\item{use_singletons}{logical indicator of whether to include singleton 
+groups or not; defaults to FALSE. If FALSE, rmd_filter results are returned 
+only for samples in groups of size greater than 1. This is used when 
+calculating the correlation.}
 }
 \value{
 a data.frame containing columns for the Sample ID, log2 robust
