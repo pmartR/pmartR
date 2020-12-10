@@ -22,7 +22,7 @@ attribute that is usually created by the `group_designation()` function}
 
 \item{comparisons}{data.frame with columns for "Control" and "Test"
 containing the different comparisons of interest. Comparisons will be made
-between the Test and the corresponding Control  If left NULL, then all
+between the Test and the corresponding Control. If left NULL, then all
 pairwise comparisons are executed.}
 
 \item{test_method}{character string specifying the filter method to use:

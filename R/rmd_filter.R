@@ -79,6 +79,11 @@ rmd_filter <- function(omicsData, ignore_singleton_groups = TRUE, ...){
   if(!attr(omicsData, "data_info")$data_scale %in% c("log2", "log10", "log")){
     stop("omicsData$e_data should be log transformed prior to calling rmd_filter. See documentation for edata_transform function for more information.")
   }
+  
+  # throw a warning if there are fewer than 50 biomolecules in the data object #
+  if(attributes(omicsData)$data_info$num_edata < 50){
+    warning("Use the results of the RMD filter with caution due to a small number of biomolecules (<50).")
+  }
 
   UseMethod("rmd_filter")
 }
@@ -111,7 +116,6 @@ rmd_filter.pepData <- function(omicsData, ignore_singleton_groups = TRUE, metric
     singleton_rows <- which(mintR_groupDF$Group %in% singleton_groups)
     
     # filter out samples corresponding to groups of size 1 #
-    # *** still need to check that this code works if there are more than 1 such group *** #
     to_remove <- as.character(mintR_groupDF[singleton_rows, get_fdata_cname(omicsData)])
     myfilter <- custom_filter(omicsData, f_data_remove = to_remove)
     omicsData <- applyFilt(myfilter, omicsData)
@@ -244,15 +248,15 @@ rmd_filter.proData <- function(omicsData, ignore_singleton_groups = TRUE, metric
     singleton_groups <- names(which(table(mintR_groupDF$Group)==1))
     singleton_rows <- which(mintR_groupDF$Group %in% singleton_groups)
     
-    # filter out samples corresponding to groups of size 1 #
-    # *** still need to check that this code works if there are more than 1 such group *** #
+    # filter out samples corresponding to groups of size 1 because we want to 
+    # construct the filter object without them (thus ignoring them) #
     to_remove <- as.character(mintR_groupDF[singleton_rows, get_fdata_cname(omicsData)])
     myfilter <- custom_filter(omicsData, f_data_remove = to_remove)
     omicsData <- applyFilt(myfilter, omicsData)
     mintR_groupDF <- attr(omicsData, "group_DF")
     
   }else{
-    # no singleton groups, nothing to adjust/filter/etc. #
+    # no singleton groups and/or nothing to adjust/filter/etc. #
     omicsData_orig <- omicsData
   }
 
@@ -377,7 +381,6 @@ rmd_filter.lipidData <- function(omicsData, ignore_singleton_groups = TRUE, metr
     singleton_rows <- which(mintR_groupDF$Group %in% singleton_groups)
     
     # filter out samples corresponding to groups of size 1 #
-    # *** still need to check that this code works if there are more than 1 such group *** #
     to_remove <- as.character(mintR_groupDF[singleton_rows, get_fdata_cname(omicsData)])
     myfilter <- custom_filter(omicsData, f_data_remove = to_remove)
     omicsData <- applyFilt(myfilter, omicsData)
@@ -548,7 +551,6 @@ rmd_filter.metabData <- function(omicsData, ignore_singleton_groups = TRUE, metr
     singleton_rows <- which(mintR_groupDF$Group %in% singleton_groups)
     
     # filter out samples corresponding to groups of size 1 #
-    # *** still need to check that this code works if there are more than 1 such group *** #
     to_remove <- as.character(mintR_groupDF[singleton_rows, get_fdata_cname(omicsData)])
     myfilter <- custom_filter(omicsData, f_data_remove = to_remove)
     omicsData <- applyFilt(myfilter, omicsData)
@@ -720,7 +722,6 @@ rmd_filter.nmrData <- function(omicsData, ignore_singleton_groups = TRUE, metric
     singleton_rows <- which(mintR_groupDF$Group %in% singleton_groups)
     
     # filter out samples corresponding to groups of size 1 #
-    # *** still need to check that this code works if there are more than 1 such group *** #
     to_remove <- as.character(mintR_groupDF[singleton_rows, get_fdata_cname(omicsData)])
     myfilter <- custom_filter(omicsData, f_data_remove = to_remove)
     omicsData <- applyFilt(myfilter, omicsData)
@@ -1016,32 +1017,124 @@ run_group_meancor <- function(omicsData, mintR_groupDF, ignore_singleton_groups 
   grps = unique(as.character(mintR_groupDF$Group))
 
   samp_id = attr(omicsData, "cnames")$fdata_cname
-  # make a list of which columns belong to which groups #
-  grp.col.ids = list()
-  for(i in 1:length(grps)){
-
-    # pull sample names from group.data in current group #
-    nms = as.character(mintR_groupDF[which(mintR_groupDF$Group == grps[i]), samp_id])
-
-    # pull column numbers corresponding to above names #
-    grp.col.ids[[i]] = which(names(omicsData$e_data) %in% nms)
-  }
+  
 
   # compute all pairwise correlations between samples of the same group #
-  prwse.grp.cors = lapply(grp.col.ids, function(x){
-    cor(omicsData$e_data[,x], use = "pairwise.complete.obs")
-  })
+  nonsingleton_groups <- attributes(mintR_groupDF)$nonsingleton_groups
+  singleton_groups <- setdiff(grps, nonsingleton_groups)
+  if(length(singleton_groups) > 0 & ignore_singleton_groups == FALSE){
+    ## there are singelton groups and we don't want to ignore them in creating the rmd filter ##
+    
+    # calculate the correlation of the singleton sample to all other samples and 
+    # average that value to get the correlation for that particular sample/group
+    omicsData_singletons <- omicsData
+    omicsData_singletons$f_data$Dummy <- "dummy" # create a dummy grouping variable so that all samples belong to same group
+    omicsData_singletons <- group_designation(omicsData_singletons, main_effect = "Dummy")
+    
+    prwse.grp.cors.all <- cor(omicsData_singletons$e_data[, -which(names(omicsData_singletons$e_data) == get_edata_cname(omicsData_singletons))], use = "pairwise.complete.obs")
+    
+    prwse.grp.cors.singletons <- list()
+    for(i in 1:length(singleton_groups)){
+      prwse.grp.cors.singletons[[i]] <- prwse.grp.cors.all
+    }
+    
+    
+    
+    
+    
+    
+    # do the "usual" thing for the nonsingleton groups: 
+    # calculate the mean correlation of a sample with all other samples that have the same group membership
+    myfilt <- custom_filter(omicsData, f_data_keep = as.character(mintR_groupDF[which(mintR_groupDF$Group %in% nonsingleton_groups), samp_id]))
+    omicsData_nonsingletons <- applyFilt(myfilt, omicsData)
+    
+    # make a list of which columns belong to which groups #
+    grp.col.ids = list()
+    for(i in 1:length(nonsingleton_groups)){
+      
+      # pull sample names from group.data in current group #
+      nms = as.character(mintR_groupDF[which(mintR_groupDF$Group == nonsingleton_groups[i]), samp_id])
+      
+      # pull column numbers corresponding to above names #
+      grp.col.ids[[i]] = which(names(omicsData_nonsingletons$e_data) %in% nms)
+    }
+    
+    prwse.grp.cors.nonsingletons <- lapply(grp.col.ids, function(x){
+      cor(omicsData_nonsingletons$e_data[,x], use = "pairwise.complete.obs")
+    })
+    
+    
+    ## combine the singleton and nonsingleton results...make sure the order is correct
+    prwse.grp.cors <- c(prwse.grp.cors.nonsingletons, prwse.grp.cors.singletons)
+    prws.grp.cors.grpnames <- c(nonsingleton_groups, singleton_groups) 
+    
+    
+  }else{
+    
+    # make a list of which columns belong to which groups #
+    grp.col.ids = list()
+    for(i in 1:length(grps)){
+      
+      # pull sample names from group.data in current group #
+      nms = as.character(mintR_groupDF[which(mintR_groupDF$Group == grps[i]), samp_id])
+      
+      # pull column numbers corresponding to above names #
+      grp.col.ids[[i]] = which(names(omicsData$e_data) %in% nms)
+    }
+    
+    prwse.grp.cors = lapply(grp.col.ids, function(x){
+      cor(omicsData$e_data[,x], use = "pairwise.complete.obs")
+    })
+    # structure of prws.grp.cors: list w/number elements equal to number groups
+    # each element is correlation matrix
+    # [[1]]
+    # Mock1     Mock2     Mock3
+    # Mock1 1.0000000 0.9670513 0.9703483
+    # Mock2 0.9670513 1.0000000 0.9858240
+    # Mock3 0.9703483 0.9858240 1.0000000
+    # 
+    # [[2]]
+    # Infection1 Infection2 Infection3 Infection4 Infection5
+    # Infection1  1.0000000  0.9802595  0.9757083  0.9790413  0.9732911
+    # Infection2  0.9802595  1.0000000  0.9837869  0.9804636  0.9824165
+    # Infection3  0.9757083  0.9837869  1.0000000  0.9786230  0.9801930
+    # Infection4  0.9790413  0.9804636  0.9786230  1.0000000  0.9784125
+    # Infection5  0.9732911  0.9824165  0.9801930  0.9784125  1.0000000
+  }
+  
 
   # turn diagonal into NAs, so we don't include a sample's correlation with itself #
   grp.cors = lapply(prwse.grp.cors, function(x) x*(matrix(1, nrow = nrow(x), ncol = ncol(x)) + diag(NA, nrow(x))))
 
   # compute mean correlation for each sample #
   mean.cor = lapply(grp.cors, function(x) apply(x, 1, mean, na.rm = T))
+  
+  ## need to adjust the list elements of mean.cor for any singleton groups, 
+  ## to just contain the value for the sample in that group
+  if(length(singleton_groups) > 0 & ignore_singleton_groups == FALSE){
+    mean.cor2 <- mean.cor
+    # when I concatenated the pairwise group correlations, I put the singleton groups last #
+    for(i in 1:length(singleton_groups)){
+      # get the sample name in the current singleton group, and pull that value out of mean.cor #
+      cur_singleton <- singleton_groups[i]
+      cur_sample <- as.character(omicsData_singletons$f_data[which(mintR_groupDF$Group == cur_singleton), samp_id])
+      
+      # get the element in mean.cor list that corresponds to this singleton group #
+      j <- which(prws.grp.cors.grpnames == cur_singleton)
+      mean.cor2[[j]] <- mean.cor[[j]][cur_sample]
+      # pull sample names from group.data in current group #
+      # nms = as.character(mintR_groupDF[which(mintR_groupDF$Group == nonsingleton_groups[i]), samp_id])
+      
+    }
+  }else{
+    mean.cor2 <- mean.cor
+  }
+  
 
   # format results #
   # get order to put results in original sample order based on peptide.data #
-  temp = match(names(omicsData$e_data)[-1],names(unlist(mean.cor)))
-  res.cor = data.frame(Sample.ID = names(omicsData$e_data)[-1], Mean_Correlation = unlist(mean.cor)[temp], row.names = NULL)
+  temp = match(names(omicsData$e_data)[-1],names(unlist(mean.cor2)))
+  res.cor = data.frame(Sample.ID = names(omicsData$e_data)[-1], Mean_Correlation = unlist(mean.cor2)[temp], row.names = NULL)
 
   return(res.cor)
 }

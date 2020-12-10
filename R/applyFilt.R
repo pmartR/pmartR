@@ -31,22 +31,26 @@
 #'   For a \code{filter_object} of type 'rmdFilt': \tabular{ll}{
 #'   \code{pvalue_threshold} \tab numeric value between 0 and 1, specifying the
 #'   p-value, below which samples will be removed from the dataset. Default is
-#'   0.001. \cr } For a \code{filter_object} of type 'proteomicsFilt':
-#'   \tabular{ll}{ \code{min_num_peps} \tab an optional integer value between 1
-#'   and the maximum number of peptides that map to a protein in omicsData. The
-#'   value specifies the minimum number of peptides that must map to a protein.
-#'   Any protein with less than \code{min_num_peps} mapping to it will be
-#'   returned as a protein that should be filtered. Default value is NULL. \cr
-#'   \code{degen_peps} \tab logical indicator of whether to filter out
-#'   degenerate peptides (TRUE) or not (FALSE). Default value is FALSE.\cr } For
-#'   a \code{filter_object} of type 'imdanovaFilt': \tabular{ll}{
-#'   \code{min_nonmiss_anova} \tab integer value specifying the minimum number
-#'   of non-missing feature values allowed per group for \code{anova_filter}.
-#'   Default value is 2. \cr \code{min_nonmiss_gtest} \tab integer value
+#'   0.001. \cr \code{min_num_biomolecules} \tab numeric value greater than 10
+#'   (preferably greater than 50) that specifies the minimume number of
+#'   biomolecules that must be present in order to create an rmdFilt object.
+#'   Using values less than 50 is not advised. \cr } For a \code{filter_object}
+#'   of type 'proteomicsFilt': \tabular{ll}{ \code{min_num_peps} \tab an
+#'   optional integer value between 1 and the maximum number of peptides that
+#'   map to a protein in omicsData. The value specifies the minimum number of
+#'   peptides that must map to a protein. Any protein with less than
+#'   \code{min_num_peps} mapping to it will be returned as a protein that should
+#'   be filtered. Default value is NULL. \cr \code{degen_peps} \tab logical
+#'   indicator of whether to filter out degenerate peptides (TRUE) or not
+#'   (FALSE). Default value is FALSE.\cr } For a \code{filter_object} of type
+#'   'imdanovaFilt': \tabular{ll}{ \code{min_nonmiss_anova} \tab integer value
 #'   specifying the minimum number of non-missing feature values allowed per
-#'   group for \code{gtest_filter}. Default value is 3.\cr } There are no futher
-#'   arguments for a \code{filter_object} of type 'customFilt'.
-#'
+#'   group for \code{anova_filter}. Default value is 2. \cr
+#'   \code{min_nonmiss_gtest} \tab integer value specifying the minimum number
+#'   of non-missing feature values allowed per group for \code{gtest_filter}.
+#'   Default value is 3.\cr } There are no further arguments for a
+#'   \code{filter_object} of type 'customFilt'.
+#'   
 #' @examples
 #' dontrun{
 #' library(pmartRdata)
@@ -268,8 +272,9 @@ applyFilt.cvFilt <- function(filter_object, omicsData, cv_threshold = 150){
 #' @export
 #' @name applyFilt
 #' @rdname applyFilt
-applyFilt.rmdFilt <- function(filter_object, omicsData, pvalue_threshold=0.0001){
+applyFilt.rmdFilt <- function(filter_object, omicsData, pvalue_threshold = 0.0001, min_num_biomolecules = 50){
 
+  
 
   # check to see whether a rmdFilt has already been run on omicsData #
   if("rmdFilt" %in% names(attributes(omicsData)$filters)){
@@ -287,7 +292,9 @@ applyFilt.rmdFilt <- function(filter_object, omicsData, pvalue_threshold=0.0001)
     # check that pvalue_threshold is between 0 and 1 #
     if(pvalue_threshold < 0 | pvalue_threshold > 1) stop("pvalue_threshold must be between 0 and 1.")
 
-    if(attr(omicsData, "data_info")$num_edata < 100) stop("Use the results of the RMD filter with caution due to a small number of biomolecules")
+    if(attributes(omicsData)$data_info$num_edata < min_num_biomolecules){
+      stop(paste0("There are fewer than min_num_biomolecules = ", min_num_biomolecules, " biomolecules in omicsData. See applyFilt for details."))
+    }
     
     samp_cname <- attributes(omicsData)$cnames$fdata_cname
     edata_cname <- attributes(omicsData)$cnames$edata_cname
@@ -552,6 +559,10 @@ applyFilt.imdanovaFilt <- function(filter_object, omicsData, min_nonmiss_anova=N
         message("You have specified remove_singleton_groups = TRUE, but there are no singleton groups to remove. 
                 Proceeding with application of the IMD-ANOVA filter.")
       }
+    }else{
+      if(any(group_sizes$n_group == 1)){
+        message("You have specified remove_singleton_groups = FALSE, so the sample(s) corresponding to the singleton group(s) were not utilized in the IMD-ANOVA filter and will be retained in the resulting omicsData object.")
+      }
     }
     
     # check that at least one of min_nonmiss_anova and min_nonmiss_gtest are present #
@@ -562,16 +573,18 @@ applyFilt.imdanovaFilt <- function(filter_object, omicsData, min_nonmiss_anova=N
       if(!inherits(min_nonmiss_anova, c("numeric","integer")) | min_nonmiss_anova < 2) stop("min_nonmiss_anova must be an integer >= 2")
       # check that min_nonmiss_anova is an integer #
       if(min_nonmiss_anova %% 1 != 0) stop("min_nonmiss_anova must be an integer >= 2")
-      # check that min_nonmiss_anova is less than the max number of observations #
-      if(min_nonmiss_anova > min(attributes(filter_object)$group_sizes$n_group)) stop("min_nonmiss_anova cannot be greater than the minimum group size")
+      # check that min_nonmiss_gtest is less than the minimum group size #
+      nonsingleton_groups <- attributes(attributes(omicsData)$group_DF)$nonsingleton_groups
+      if(min_nonmiss_anova > min(attributes(filter_object)$group_sizes$n_group[which(attributes(filter_object)$group_sizes$Group %in% nonsingleton_groups)])) stop("min_nonmiss_anova cannot be greater than the minimum group size")
     }
     if(!is.null(min_nonmiss_gtest)) {
       # check that min_nonmiss_gtest is numeric >= 3 #
       if(!inherits(min_nonmiss_gtest, c("numeric","integer")) | min_nonmiss_gtest < 3) stop("min_nonmiss_gtest must be an integer >= 3")
       # check that min_nonmiss_gtest is an integer #
       if(min_nonmiss_gtest %% 1 != 0) stop("min_nonmiss_gtest must be an integer >= 3")
-      # check that min_nonmiss_gtest is less than the max number of observations #
-      if(min_nonmiss_gtest > min(attributes(filter_object)$group_sizes$n_group)) stop("min_nonmiss_gtest cannot be greater than the minimum group size")
+      # check that min_nonmiss_gtest is less than the minimum group size #
+      nonsingleton_groups <- attributes(attributes(omicsData)$group_DF)$nonsingleton_groups
+      if(min_nonmiss_gtest > min(attributes(filter_object)$group_sizes$n_group[which(attributes(filter_object)$group_sizes$Group %in% nonsingleton_groups)])) stop("min_nonmiss_gtest cannot be greater than the minimum group size")
     }
     
     ## end of initial checks ##
@@ -627,7 +640,7 @@ applyFilt.imdanovaFilt <- function(filter_object, omicsData, min_nonmiss_anova=N
     omicsData$e_meta <- results_pieces$temp.meta1
     results <- omicsData
 
-    # if group attribute is present, re-run group_designation in case filtering any items impacted the group structure
+    # if group attribute is present (and it MUST be), re-run group_designation in case filtering any items impacted the group structure
     if(!is.null(attr(results, "group_DF"))){
       results <- group_designation(omicsData = results, main_effects = attr(attr(omicsData, "group_DF"), "main_effects"), covariates = attr(attr(omicsData, "group_DF"), "covariates"), time_course = attr(attr(omicsData, "group_DF"), "time_course"))
     }else{

@@ -219,7 +219,8 @@ summary.imdanovaFilt <- function(filter_object, min_nonmiss_anova=NULL, min_nonm
   
   # it is fine if both min_nonmiss_anova and min_nonmiss_gtest are NULL in the summary function #
   
-  # check that if they aren't NULL, min_nonmiss_anova and min_nonmiss_gtest are numeric, >=2 and >=3, respectively, and neither are bigger than the minimum group size (group_sizes in an attribute of the filter_object, see below) #
+  # check that if they aren't NULL, min_nonmiss_anova and min_nonmiss_gtest are numeric, >=2 and >=3, respectively, 
+  # and neither are bigger than the minimum group size (group_sizes in an attribute of the filter_object, see below) #
   if(!is.null(min_nonmiss_anova)) {
     # check that min_nonmiss_anova is not a vector #
     if(length(min_nonmiss_anova) > 1) stop("min_nonmiss_anova must be of length 1")
@@ -227,8 +228,9 @@ summary.imdanovaFilt <- function(filter_object, min_nonmiss_anova=NULL, min_nonm
     if(!is.numeric(min_nonmiss_anova) | min_nonmiss_anova < 2) stop("min_nonmiss_anova must be an integer >= 2")
     # check that min_nonmiss_anova is an integer #
     if(min_nonmiss_anova %% 1 != 0) stop("min_nonmiss_anova must be an integer >= 2")
-    # check that min_nonmiss_anova is less than the minimum group size #
-    if(min_nonmiss_anova > min(attributes(filter_object)$group_sizes$n_group)) stop("min_nonmiss_anova cannot be greater than the minimum group size")
+    # check that min_nonmiss_anova is less than the minimum group size among non-singleton groups #
+    nonsingleton_groups <- attributes(filter_object)$nonsingleton_groups
+    if(min_nonmiss_anova > min(attributes(filter_object)$group_sizes$n_group[which(attributes(filter_object)$group_sizes$Group %in% nonsingleton_groups)])) stop("min_nonmiss_anova cannot be greater than the minimum group size")
   }
   if(!is.null(min_nonmiss_gtest)) {
     # check that min_nonmiss_gtest is not a vector #
@@ -238,7 +240,8 @@ summary.imdanovaFilt <- function(filter_object, min_nonmiss_anova=NULL, min_nonm
     # check that min_nonmiss_gtest is an integer #
     if(min_nonmiss_gtest %% 1 != 0) stop("min_nonmiss_gtest must be an integer >= 3")
     # check that min_nonmiss_gtest is less than the minimum group size #
-    if(min_nonmiss_gtest > min(attributes(filter_object)$group_sizes$n_group)) stop("min_nonmiss_gtest cannot be greater than the minimum group size")
+    nonsingleton_groups <- attributes(filter_object)$nonsingleton_groups
+    if(min_nonmiss_gtest > min(attributes(filter_object)$group_sizes$n_group[which(attributes(filter_object)$group_sizes$Group %in% nonsingleton_groups)])) stop("min_nonmiss_gtest cannot be greater than the minimum group size")
   }
   
   ## end of initial checks ##
@@ -304,16 +307,24 @@ summary.imdanovaFilt <- function(filter_object, min_nonmiss_anova=NULL, min_nonm
   return(res)
 }
 
-#' Print method for summary of imdanova filter
-#' 
+
 #' Print method for summary of imdanova filter
 #' 
 #'@export
 #'
 print.imdanovaFilterSummary <- function(object){
   # create output #
+  if(is.null(object$num_filtered)){
+    object$num_filtered <- NA
+  }
+  
+  if(is.null(object$num_not_filtered)){
+    object$num_not_filtered <- NA
+  }
+  
   catmat <- data.frame(c(object$pep_observation_counts, object$num_filtered, object$num_not_filtered))
   rownames(catmat) <- c("Total Observations: ", "Filtered: ", "Not Filtered: ")
+  
   colnames(catmat) <- NULL
   
   cat("\nSummary of IMD Filter\n")

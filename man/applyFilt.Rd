@@ -16,7 +16,12 @@ applyFilt(filter_object, omicsData, ...)
 
 \method{applyFilt}{cvFilt}(filter_object, omicsData, cv_threshold = 150)
 
-\method{applyFilt}{rmdFilt}(filter_object, omicsData, pvalue_threshold = 1e-04)
+\method{applyFilt}{rmdFilt}(
+  filter_object,
+  omicsData,
+  pvalue_threshold = 1e-04,
+  min_num_biomolecules = 50
+)
 
 \method{applyFilt}{proteomicsFilt}(filter_object, omicsData, min_num_peps = NULL, degen_peps = FALSE)
 
@@ -67,21 +72,25 @@ Various further arguments can be specified depending on the class of
   For a \code{filter_object} of type 'rmdFilt': \tabular{ll}{
   \code{pvalue_threshold} \tab numeric value between 0 and 1, specifying the
   p-value, below which samples will be removed from the dataset. Default is
-  0.001. \cr } For a \code{filter_object} of type 'proteomicsFilt':
-  \tabular{ll}{ \code{min_num_peps} \tab an optional integer value between 1
-  and the maximum number of peptides that map to a protein in omicsData. The
-  value specifies the minimum number of peptides that must map to a protein.
-  Any protein with less than \code{min_num_peps} mapping to it will be
-  returned as a protein that should be filtered. Default value is NULL. \cr
-  \code{degen_peps} \tab logical indicator of whether to filter out
-  degenerate peptides (TRUE) or not (FALSE). Default value is FALSE.\cr } For
-  a \code{filter_object} of type 'imdanovaFilt': \tabular{ll}{
-  \code{min_nonmiss_anova} \tab integer value specifying the minimum number
-  of non-missing feature values allowed per group for \code{anova_filter}.
-  Default value is 2. \cr \code{min_nonmiss_gtest} \tab integer value
+  0.001. \cr \code{min_num_biomolecules} \tab numeric value greater than 10
+  (preferably greater than 50) that specifies the minimume number of
+  biomolecules that must be present in order to create an rmdFilt object.
+  Using values less than 50 is not advised. \cr } For a \code{filter_object}
+  of type 'proteomicsFilt': \tabular{ll}{ \code{min_num_peps} \tab an
+  optional integer value between 1 and the maximum number of peptides that
+  map to a protein in omicsData. The value specifies the minimum number of
+  peptides that must map to a protein. Any protein with less than
+  \code{min_num_peps} mapping to it will be returned as a protein that should
+  be filtered. Default value is NULL. \cr \code{degen_peps} \tab logical
+  indicator of whether to filter out degenerate peptides (TRUE) or not
+  (FALSE). Default value is FALSE.\cr } For a \code{filter_object} of type
+  'imdanovaFilt': \tabular{ll}{ \code{min_nonmiss_anova} \tab integer value
   specifying the minimum number of non-missing feature values allowed per
-  group for \code{gtest_filter}. Default value is 3.\cr } There are no futher
-  arguments for a \code{filter_object} of type 'customFilt'.
+  group for \code{anova_filter}. Default value is 2. \cr
+  \code{min_nonmiss_gtest} \tab integer value specifying the minimum number
+  of non-missing feature values allowed per group for \code{gtest_filter}.
+  Default value is 3.\cr } There are no further arguments for a
+  \code{filter_object} of type 'customFilt'.
 }
 \examples{
 dontrun{

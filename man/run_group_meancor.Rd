@@ -4,7 +4,7 @@
 \alias{run_group_meancor}
 \title{Calculate the Mean Correlation of a Sample with Respect to Group}
 \usage{
-run_group_meancor(omicsData, mintR_groupDF, use_singletons = FALSE)
+run_group_meancor(omicsData, mintR_groupDF, ignore_singleton_groups = TRUE)
 }
 \arguments{
 \item{omicsData}{an object of the class 'pepData', 'proData', 'metabData', or 'lipidData' usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.}

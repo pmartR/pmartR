@@ -1,4 +1,4 @@
-#'Creates Data Frame for Group Membership Based on Specified Main Effects
+#'Creates Attribute of omicsData object containing Group Membership Based on Specified Main Effects
 #'
 #'The method assigns each sample to a group, for future analyses, based on the
 #'variable(s) specified as main effects.
@@ -230,6 +230,10 @@ group_designation <- function(omicsData, main_effects, covariates=NULL, time_cou
   attr(output2, "covariates") = covariates
   ### changed to NA Aug 2020 ###
   attr(output2, "time_course") = NULL #time_course
+  ## added attribute that lists groups with 2 or more samples Nov 2020 ##
+  nonsingleton_groups <- names(which(table(output2$Group) > 1))
+  attr(output2, "nonsingleton_groups") <- nonsingleton_groups
+  
   attr(omicsData, "group_DF") = output2
   
   # Update attributes (7/7/2016 by KS)
