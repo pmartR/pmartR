@@ -133,6 +133,10 @@ rmd_filter.pepData <- function(omicsData, ignore_singleton_groups = TRUE, metric
   dat_only = omicsData$e_data[,-(edata_col_id)]
 
   samp_id = attr(omicsData, "cnames")$fdata_cname
+  
+  if(length(samp_id) < 2*length(metrics)){
+    warning("Use the results of the RMD filter with caution due to a small number of samples relative to the number of metrics being used. Consider reducing the number of metrics being used.")
+  }
 
   ## Calculate metrics for RMD runs ##
   # match the metrics (allow upper/lower case) #
@@ -170,7 +174,7 @@ rmd_filter.pepData <- function(omicsData, ignore_singleton_groups = TRUE, metric
     if(length(ind)>1){stop("More than one of the entries in metric matches to use of Correlation.")}
     metrics = metrics[-ind]
     metrics_final[4] = 1
-    rmd.vals$Corr = run_group_meancor(omicsData, mintR_groupDF, ignore_singleton_groups)[,2]
+    rmd.vals$Corr = suppressWarnings(run_group_meancor(omicsData, mintR_groupDF, ignore_singleton_groups)[,2])
   }
 
   if(any(metrics %in% c("proportion_missing", "p", "prop_missing", "prop_miss", "proportion_miss", "prop", "proportion", "proportion missing", "prop miss", "proportion miss"))){
@@ -266,6 +270,10 @@ rmd_filter.proData <- function(omicsData, ignore_singleton_groups = TRUE, metric
   dat_only = omicsData$e_data[,-(edata_col_id)]
 
   samp_id = attr(omicsData, "cnames")$fdata_cname
+  
+  if(length(samp_id) < 2*length(metrics)){
+    warning("Use the results of the RMD filter with caution due to a small number of samples relative to the number of metrics being used. Consider reducing the number of metrics being used.")
+  }
 
   ## Calculate metrics for RMD runs ##
   # match the metrics (allow upper/lower case) #
@@ -303,7 +311,7 @@ rmd_filter.proData <- function(omicsData, ignore_singleton_groups = TRUE, metric
     if(length(ind)>1){stop("More than one of the entries in metric matches to use of Correlation.")}
     metrics = metrics[-ind]
     metrics_final[4] = 1
-    rmd.vals$Corr = run_group_meancor(omicsData, mintR_groupDF, ignore_singleton_groups)[,2]
+    rmd.vals$Corr = suppressWarnings(run_group_meancor(omicsData, mintR_groupDF, ignore_singleton_groups)[,2])
   }
 
   if(any(metrics %in% c("proportion_missing", "p", "prop_missing", "prop_miss", "proportion_miss", "prop", "proportion", "proportion missing", "prop miss", "proportion miss"))){
@@ -319,10 +327,10 @@ rmd_filter.proData <- function(omicsData, ignore_singleton_groups = TRUE, metric
   metrics_final_txt <- names(rmd.vals[,-1])
 
   ## Conduct Robust PCA ##
-  robpca.res = rrcov:::PcaHubert(x = rmd.vals[,-1], k = (ncol(rmd.vals)-1), mcd = FALSE, scale = FALSE)
+  robpca.res = suppressWarnings(rrcov:::PcaHubert(x = rmd.vals[,-1], k = (ncol(rmd.vals)-1), mcd = FALSE, scale = FALSE))
 
   ## Calculate Covariance Matrix #
-  cov.mat = robpca.res@loadings %*% diag(robpca.res@eigenvalues) %*% t(robpca.res@loadings)
+  cov.mat = suppressWarnings(robpca.res@loadings %*% diag(robpca.res@eigenvalues) %*% t(robpca.res@loadings))
 
   ## Calculate Robust Mahalanobis Distance ##
   med.mat = matrix(apply(rmd.vals[,-1], 2, median), nrow = (ncol(rmd.vals)-1))
@@ -397,6 +405,10 @@ rmd_filter.lipidData <- function(omicsData, ignore_singleton_groups = TRUE, metr
   dat_only = omicsData$e_data[,-(edata_col_id)]
 
   samp_id = attr(omicsData, "cnames")$fdata_cname
+  
+  if(length(samp_id) < 2*length(metrics)){
+    warning("Use the results of the RMD filter with caution due to a small number of samples relative to the number of metrics being used. Consider reducing the number of metrics being used.")
+  }
 
   ## Calculate metrics for RMD runs ##
   # match the metrics (allow upper/lower case) #
@@ -434,7 +446,7 @@ rmd_filter.lipidData <- function(omicsData, ignore_singleton_groups = TRUE, metr
     if(length(ind)>1){stop("More than one of the entries in metric matches to use of Correlation.")}
     metrics = metrics[-ind]
     metrics_final[4] = 1
-    rmd.vals$Corr = run_group_meancor(omicsData, mintR_groupDF, ignore_singleton_groups)[,2]
+    rmd.vals$Corr = suppressWarnings(run_group_meancor(omicsData, mintR_groupDF, ignore_singleton_groups)[,2])
   }
 
   if(any(metrics %in% c("proportion_missing", "p", "prop_missing", "prop_miss", "proportion_miss", "prop", "proportion", "proportion missing", "prop miss", "proportion miss"))){
@@ -567,6 +579,10 @@ rmd_filter.metabData <- function(omicsData, ignore_singleton_groups = TRUE, metr
   dat_only = omicsData$e_data[,-(edata_col_id)]
 
   samp_id = attr(omicsData, "cnames")$fdata_cname
+  
+  if(length(samp_id) < 2*length(metrics)){
+    warning("Use the results of the RMD filter with caution due to a small number of samples relative to the number of metrics being used. Consider reducing the number of metrics being used.")
+  }
 
   ## Calculate metrics for RMD runs ##
   # match the metrics (allow upper/lower case) #
@@ -605,7 +621,7 @@ rmd_filter.metabData <- function(omicsData, ignore_singleton_groups = TRUE, metr
     if(length(ind)>1){stop("More than one of the entries in metric matches to use of Correlation.")}
     metrics = metrics[-ind]
     metrics_final[4] = 1
-    rmd.vals$Corr = run_group_meancor(omicsData, mintR_groupDF, ignore_singleton_groups)[,2]
+    rmd.vals$Corr = suppressWarnings(run_group_meancor(omicsData, mintR_groupDF, ignore_singleton_groups)[,2])
   }
 
   if(any(metrics %in% c("proportion_missing", "p", "prop_missing", "prop_miss", "proportion_miss", "prop", "proportion", "proportion missing", "prop miss", "proportion miss"))){
@@ -739,6 +755,10 @@ rmd_filter.nmrData <- function(omicsData, ignore_singleton_groups = TRUE, metric
   
   samp_id = attr(omicsData, "cnames")$fdata_cname
   
+  if(length(samp_id) < 2*length(metrics)){
+    warning("Use the results of the RMD filter with caution due to a small number of samples relative to the number of metrics being used. Consider reducing the number of metrics being used.")
+  }
+  
   ## Calculate metrics for RMD runs ##
   # match the metrics (allow upper/lower case) #
   metrics = tolower(metrics)
@@ -776,7 +796,7 @@ rmd_filter.nmrData <- function(omicsData, ignore_singleton_groups = TRUE, metric
     if(length(ind)>1){stop("More than one of the entries in metric matches to use of Correlation.")}
     metrics = metrics[-ind]
     metrics_final[4] = 1
-    rmd.vals$Corr = run_group_meancor(omicsData, mintR_groupDF, ignore_singleton_groups)[,2]
+    rmd.vals$Corr = suppressWarnings(run_group_meancor(omicsData, mintR_groupDF, ignore_singleton_groups)[,2])
   }
   
   if(any(metrics %in% c("proportion_missing", "p", "prop_missing", "prop_miss", "proportion_miss", "prop", "proportion", "proportion missing", "prop miss", "proportion miss"))){
