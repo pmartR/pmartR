@@ -538,7 +538,7 @@ applyFilt.imdanovaFilt <- function(filter_object, omicsData, min_nonmiss_anova=N
         singleton_groups <- group_sizes$Group[group_sizes$n_group == 1]
         
         # which sample name(s) #
-        samps_to_rm <- as.character(groupDF$SampleID[groupDF$Group %in% singleton_groups])
+        samps_to_rm <- as.character(groupDF[which(groupDF$Group %in% singleton_groups), get_fdata_cname(omicsData)])
         
         # use custom_filter to remove the sample(s) from the omicsData object #
         my_cust_filt <- custom_filter(omicsData, f_data_remove = samps_to_rm)

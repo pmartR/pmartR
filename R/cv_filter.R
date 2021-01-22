@@ -133,7 +133,7 @@ cv_filter <- function(omicsData, use_groups = TRUE) {
       
       # which sample name(s) #
       samps_to_rm <-
-        as.character(groupDF$SampleID[groupDF$Group %in% singleton_groups])
+        as.character(groupDF[which(groupDF$Group %in% singleton_groups), get_fdata_cname(omicsData)])
       
       warning("Grouping information is being utilized when calculating the CV, and there are group(s) consisting of a single sample. These singleton group(s) will be ignored by this filter.")
       
@@ -143,7 +143,7 @@ cv_filter <- function(omicsData, use_groups = TRUE) {
       omicsData <- applyFilt(my_cust_filt, omicsData)
       
       groupDF <-
-        groupDF[-which(groupDF$SampleID %in% samps_to_rm),]
+        groupDF[-which(groupDF[, get_fdata_cname(omicsData)] %in% samps_to_rm),]
     }
     
     ##########
