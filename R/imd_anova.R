@@ -1,49 +1,66 @@
-#' Tests for a qualitative and quantiative difference between groups using IMD and ANOVA, respectively
+#' Tests for a qualitative and quantitative difference between groups using IMD
+#' and ANOVA, respectively
 #'
-#'  This is IMD-ANOVA test proposed in Webb-Robertson et al. (2010).
+#' This is IMD-ANOVA test proposed in Webb-Robertson et al. (2010).
 #'
-#' @param omicsData A pmartR data object of any class, which has a `group_df` attribute that is usually created by the `group_designation()` function
-#' @param comparisons data.frame with columns for "Control" and "Test" containing the different comparisons of interest. Comparisons will be made between the Test and the corresponding Control  If left NULL, then all pairwise comparisons are executed.
-#' @param test_method character string specifying the filter method to use: "combined", "gtest", or "anova". "combined" implements both the gtest and anova filters.
-#' @param pval_adjust character vector specifying the type of multiple comparisons adjustment to implement via \code{\link{p.adjust}}. A NULL value corresponds to no adjustment. Valid options for ANOVA include: holm, hochberg, hommel, bonferroni, BH, BY, fdr, none. Valid options for g-test include: holm, bonferonni and none. See \code{\link{p.adjust}} for some details.
-#' @param pval_thresh numeric p-value threshold, below or equal to which peptides are considered differentially expressed. Defaults to 0.05
-#' @param covariates data.frame similar to \code{groupData} consisting of two columns: the sample ID variable (with names matching column names in \code{omicsData$e_data}) and a column containing the numeric or group data for each sample
-#' @param paired logical - should the data be paired or not; if TRUE the attribute "pairing" cannot be `NULL`
-#' 
-#' @return  a list of \code{data.frame} objects 
-#' \tabular{ll}{
-#' Full_Results \tab Columns: e_data cname, group counts, group means, ANOVA p-values, IMD p-values, fold change estimates, fold change significance flags\cr
-#'  \tab \cr
-#'  Flags (signatures)  \tab Indicator of statistical significance for one (+/-1 for ANOVA, +/-2 for g-test) or neither (0) test \cr
-#'  \tab \cr
-#' p-values  \tab p-values for pairwise comparisons adjusted for within, e.g., peptide multiple comparisons only (not across peptides yet) \cr
-#' \tab \cr
-#' groupData  \tab Mapping between sample ID and group \cr
-#'  }
+#' @param omicsData A pmartR data object of any class, which has a `group_df`
+#'   attribute that is usually created by the `group_designation()` function
+#' @param comparisons data.frame with columns for "Control" and "Test"
+#'   containing the different comparisons of interest. Comparisons will be made
+#'   between the Test and the corresponding Control. If left NULL, then all
+#'   pairwise comparisons are executed.
+#' @param test_method character string specifying the filter method to use:
+#'   "combined", "gtest", or "anova". "combined" implements both the gtest and
+#'   anova filters.
+#' @param pval_adjust character vector specifying the type of multiple
+#'   comparisons adjustment to implement via \code{\link{p.adjust}}. A NULL
+#'   value corresponds to no adjustment. Valid options for ANOVA include: holm,
+#'   hochberg, hommel, bonferroni, BH, BY, fdr, none. Valid options for g-test
+#'   include: holm, bonferonni and none. See \code{\link{p.adjust}} for some
+#'   details.
+#' @param pval_thresh numeric p-value threshold, below or equal to which
+#'   peptides are considered differentially expressed. Defaults to 0.05
+#' @param covariates data.frame similar to \code{groupData} consisting of two
+#'   columns: the sample ID variable (with names matching column names in
+#'   \code{omicsData$e_data}) and a column containing the numeric or group data
+#'   for each sample
+#' @param paired logical - should the data be paired or not; if TRUE the
+#'   attribute "pairing" cannot be `NULL`
+#'
+#' @return  a list of \code{data.frame} objects \tabular{ll}{ Full_Results \tab
+#'   Columns: e_data cname, group counts, group means, ANOVA p-values, IMD
+#'   p-values, fold change estimates, fold change significance flags\cr \tab \cr
+#'   Flags (signatures)  \tab Indicator of statistical significance for one
+#'   (+/-1 for ANOVA, +/-2 for g-test) or neither (0) test \cr \tab \cr p-values
+#'   \tab p-values for pairwise comparisons adjusted for within, e.g., peptide
+#'   multiple comparisons only (not across peptides yet) \cr \tab \cr groupData
+#'   \tab Mapping between sample ID and group \cr }
 #'
 #' @author Bryan Stanfill, Kelly Stratton
-#' @references 
-#' Webb-Robertson, Bobbie-Jo M., et al. "Combined statistical analyses of peptide intensities and peptide occurrences improves identification of significant peptides from MS-based proteomics data." Journal of proteome research 9.11 (2010): 5748-5756.
-#'
-#' @examples 
+#' @references Webb-Robertson, Bobbie-Jo M., et al. "Combined statistical
+#' analyses of peptide intensities and peptide occurrences improves
+#' identification of significant peptides from MS-based proteomics data."
+#' Journal of proteome research 9.11 (2010): 5748-5756.
+#' 
+#' @examples
 #' dontrun{
 #' library(pmartR)
 #' library(pmartRdata)
 #' #Transform the data
 #' mypepData <- edata_transform(omicsData = pep_object, data_scale = "log2")
-#' 
+#'
 #' #Group the data by condition
 #' mypepData <- group_designation(omicsData = mypepData, main_effects = c("Condition"))
-#' 
+#'
 #' #Apply the IMD ANOVA filter
 #' imdanova_Filt <- imdanova_filter(omicsData = mypepData)
 #' mypepData <- applyFilt(filter_object = imdanova_Filt, omicsData = mypepData, min_nonmiss_anova=2)
-#' 
+#'
 #' #Implement the IMD ANOVA method and compute all pairwise comparisons (i.e. leave the `comparisons` argument NULL)
 #' anova_res <- imd_anova(omicsData = mypepData, test_method = 'anova')
 #' imd_res <- imd_anova(omicsData = mypepData, test_method = 'gtest')
 #' imd_anova_res <- imd_anova(omicsData = mypepData, test_method = 'comb', pval_adjust='bon')
-#' 
+#'
 #' #Test with really big dataset
 #' library(OvarianPepdataBP)
 #' tcga_ovarian_pepdata_bp <- as.pepData(e_data = tcga_ovarian_pepdata_bp$e_data, f_data = tcga_ovarian_pepdata_bp$f_data, e_meta = tcga_ovarian_pepdata_bp$e_meta)
@@ -53,11 +70,11 @@
 #' ovarian_res_holm <- imd_anova(omicsData = tcga_ovarian_pepdata_bp, pval_adjust = 'holm', test_method='gtest')
 #' #Dunnett adjustment, should give an error because dunnett correction shouldn't be applied for all pairwise comparisons
 #' ovarian_res_dunnett <- imd_anova(omicsData = tcga_ovarian_pepdata_bp, pval_adjust = 'dunnett', test_method='combined')
-#' 
+#'
 #' #Test really big dataset, two factors
 #' tcga_ovarian_pepdata_bp <- group_designation(omicsData = tcga_ovarian_pepdata_bp, main_effects = c("vital_status","neoplasm_histologic_grade"))
 #' ovarian_res_twofac <- imd_anova(omicsData = tcga_ovarian_pepdata_bp, test_method='comb')
-#' 
+#'
 #' #Same but only test main effects (Dead vs Alive, G2 vs G3)
 #' comp_df <- data.frame(Control=c("Alive","G2"), Test=c("Dead","G3"))
 #' ovarian_res_twofac_main_effects <- imd_anova(omicsData = tcga_ovarian_pepdata_bp, comparisons = comp_df, test_method='comb')
@@ -66,16 +83,21 @@
 #' 
 imd_anova <- function(omicsData, comparisons = NULL, test_method, pval_adjust = 'none', pval_thresh = 0.05, covariates = NULL, paired = FALSE, equal_var = TRUE){
   # check that omicsData is of the appropriate class
-  if(!inherits(omicsData, c("proData","pepData","lipidData", "metabData", "nmrData"))) stop("omicsData is not an object of appropriate class")
+  if(!inherits(omicsData, c("proData", "pepData", "lipidData", "metabData", "nmrData"))) stop("omicsData is not an object of appropriate class")
   
   # Check for group_DF attribute #
   if(!("group_DF" %in% names(attributes(omicsData)))){
     stop("group_designation must be called in order to create a 'group_DF' attribute for omicsData.")
   }else{
     groupData <- attributes(omicsData)$group_DF
+    # check for any groups of size 1 #
+    
+    # if any, filter out the corresponding sample(s) # 
+    # we don't want to filter them out, we just want to ignore them... 
+    
   }
   
-  #Match provided 'test_method' to available options
+  # Match provided 'test_method' to available options
   test_method <- try(match.arg(tolower(test_method),c("combined","gtest","anova")),silent=TRUE)
   
   if(!(test_method%in%c("combined","gtest","anova"))){
@@ -89,7 +111,7 @@ imd_anova <- function(omicsData, comparisons = NULL, test_method, pval_adjust = 
   }
   
   ############
-  #Check for anova filter - give warning if not present then let `imd_test` and `anova_test` do the actual filtering
+  # Check for anova filter - give warning if not present then let `imd_test` and `anova_test` do the actual filtering
   if(is.null(attr(omicsData,"imdanova"))){
     warning("These data haven't been filtered, see `?imdanova_filter` for details.")
     #Add attribute so imd_test and anova_test don't return same warning
@@ -102,7 +124,7 @@ imd_anova <- function(omicsData, comparisons = NULL, test_method, pval_adjust = 
   #}
   
   ############
-  #Use imd_test() to test for independence of missing data (qualitative difference between groups)
+  # Use imd_test() to test for independence of missing data (qualitative difference between groups)
   if(test_method=='anova'){
     #If they don't want the g-test done, save some time by removing comparisons and the pval_adjust arguments
     #Also make the gtest_pvalues NULL so nothing's returned

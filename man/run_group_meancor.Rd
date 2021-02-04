@@ -4,12 +4,14 @@
 \alias{run_group_meancor}
 \title{Calculate the Mean Correlation of a Sample with Respect to Group}
 \usage{
-run_group_meancor(omicsData, mintR_groupDF)
+run_group_meancor(omicsData, mintR_groupDF, ignore_singleton_groups = TRUE)
 }
 \arguments{
 \item{omicsData}{an object of the class 'pepData', 'proData', 'metabData', or 'lipidData' usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.}
 
 \item{mintR_groupDF}{data.frame created by \code{\link{group_designation}} with columns for sample.id and group.}
+
+\item{use_singletons}{logical indicator of whether to include singleton groups or not; defaults to FALSE. If FALSE, rmd_filter results are returned only for samples in groups of size greater than 1. This is a pass-through argument from \code{\link{rmd_filter}}.}
 }
 \value{
 data.frame with two elements: Sample.ID, a character vector giving the sample names; and Mean_Correlation, a numeric vector giving the mean correlation values

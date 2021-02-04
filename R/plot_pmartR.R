@@ -550,7 +550,8 @@ plot.imdanovaFilt <- function(filter_object, min_nonmiss_anova = NULL, min_nonmi
     # check that min_nonmiss_anova is an integer #
     if(min_nonmiss_anova %% 1 != 0) stop("min_nonmiss_anova must be an integer >= 2")
     # check that min_nonmiss_anova is less than the minimum group size #
-    if(min_nonmiss_anova > min(attributes(filter_object)$group_sizes$n_group)) stop("min_nonmiss_anova cannot be greater than the minimum group size")
+    nonsingleton_groups <- attributes(filter_object)$nonsingleton_groups
+    if(min_nonmiss_anova > min(attributes(filter_object)$group_sizes$n_group[which(attributes(filter_object)$group_sizes$Group %in% nonsingleton_groups)])) stop("min_nonmiss_anova cannot be greater than the minimum group size")
   }
   if(!is.null(min_nonmiss_gtest)) {
     # check that min_nonmiss_gtest is numeric >= 3 #
@@ -558,7 +559,8 @@ plot.imdanovaFilt <- function(filter_object, min_nonmiss_anova = NULL, min_nonmi
     # check that min_nonmiss_gtest is an integer #
     if(min_nonmiss_gtest %% 1 != 0) stop("min_nonmiss_gtest must be an integer >= 3")
     # check that min_nonmiss_gtest is less than the minimum group size #
-    if(min_nonmiss_gtest > min(attributes(filter_object)$group_sizes$n_group)) stop("min_nonmiss_gtest cannot be greater than the minimum group size")
+    nonsingleton_groups <- attributes(filter_object)$nonsingleton_groups
+    if(min_nonmiss_anova > min(attributes(filter_object)$group_sizes$n_group[which(attributes(filter_object)$group_sizes$Group %in% nonsingleton_groups)])) stop("min_nonmiss_anova cannot be greater than the minimum group size")
   }
   
   ## end of initial checks ##

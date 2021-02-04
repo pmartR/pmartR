@@ -7,7 +7,7 @@
 cv.calc(data)
 }
 \arguments{
-\item{data}{a vector of values}
+\item{data}{a vector of values on the "abundance" scale (not log transformed)}
 }
 \value{
 cv value for the vector of values with missing values ignored in the calculation
