@@ -2,7 +2,7 @@
 % Please edit documentation in R/group_designation.R
 \name{group_designation}
 \alias{group_designation}
-\title{Creates Data Frame for Group Membership Based on Specified Main Effects}
+\title{Creates Attribute of omicsData object containing Group Membership Based on Specified Main Effects}
 \usage{
 group_designation(
   omicsData,

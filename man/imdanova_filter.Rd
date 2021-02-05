@@ -14,8 +14,7 @@ imdanova_filter(omicsData)
 \code{\link{as.metabData}}, or \code{\link{as.nmrData}}, respectively.
 Groups (more than one group) must have been specified using the
 \code{\link{group_designation}} function prior to using the imdanova_filter
-function.
-@param ignore_singleton_groups}
+function.}
 }
 \value{
 Object of class imdanovaFilt (also a data.frame) containing the
@@ -29,7 +28,9 @@ This function returns an imdanovaFilt object for use with
 \details{
 The output from this function can be used in conjunction with
  \code{\link{applyFilt}} to filter out molecules that are not present in
- enough samples to do statistical comparisons.
+ enough samples to do statistical comparisons. If any singleton groups are 
+ present in the omicsData object, those groups are not part of the filter 
+ object that is returned.
 }
 \examples{
 dontrun{
