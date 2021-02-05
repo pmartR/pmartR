@@ -360,12 +360,12 @@ We can go straight to the normalization, if we know what approach we want to use
 ```{r norm2}
 
 # Normalize using all peptides and median centering #
-norm_object <- normalize_global(omicsData = mypepData, subset_fn = "all", norm_fn = "median", apply_norm = FALSE, backtransform = TRUE)
+norm_object <- normalize_global(omicsData = mypepData, subset_fn = "all", norm_fn = "median", apply_norm = FALSE, backtransform = FALSE)
 norm_data <- normalize_global(omicsData = mypepData, subset_fn = "all", norm_fn = "median", apply_norm = TRUE, backtransform = TRUE)
 plot(norm_data, title_plot="Normalized Data: Median Centering Using all Peptides", title_size=12)
 
 # Normalize using RIP 0.2 and median centering #
-norm_object <- normalize_global(omicsData = mypepData, subset_fn = "rip", params=list(rip=0.2), norm_fn = "median", apply_norm = FALSE, backtransform = TRUE)
+norm_object <- normalize_global(omicsData = mypepData, subset_fn = "rip", params=list(rip=0.2), norm_fn = "median", apply_norm = FALSE, backtransform = FALSE)
 norm_data <- normalize_global(omicsData = mypepData, subset_fn = "rip", params=list(rip=0.2), norm_fn = "median", apply_norm = TRUE, backtransform = TRUE)
 plot(norm_data, title_plot="Normalized Data: Median Centering Using RIP 0.2 Peptides", title_size=12)
 
