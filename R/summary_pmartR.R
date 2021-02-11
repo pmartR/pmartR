@@ -2,7 +2,7 @@
 #'
 #' This function will provide basic summary statistics for omicsData objects from the pmartR package.
 #'
-#' @param omicsData an object of the class 'lipidData', 'metabData', 'pepData', 'proData', or 'nmrData' usually created by \code{\link{as.lipidData}}, \code{\link{as.metabData}}, \code{\link{as.pepData}}, \code{\link{as.proData}}, or \code\{\link{as.nmrData}}, respectively.
+#' @param omicsData an object of the class 'lipidData', 'metabData', 'pepData', 'proData', or 'nmrData' usually created by \code{\link{as.lipidData}}, \code{\link{as.metabData}}, \code{\link{as.pepData}}, \code{\link{as.proData}}, or \code{\link{as.nmrData}}, respectively.
 #'
 #' @return a summary table for the pmartR omicsData object. If assigned to a variable, the elements of the summary table are saved in a list format.
 #'
