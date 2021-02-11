@@ -84,6 +84,9 @@ normalize_nmr<- function(omicsData, apply_norm = FALSE, backtransform = FALSE, m
   # check that omicsData is of correct class
   if(!inherits(omicsData, "nmrData")) stop("omicsData must be of the class 'nmrData'")
   
+  # check that data has not already been nmr normalized 
+  if(attr(omicsData, "nmr_info")$norm_info$is_normalized == TRUE){stop("omicsData has already undergone NMR normalization")}
+  
   # check whether omicsData$e_data is log transformed
   if(!(attr(omicsData, "data_info")$data_scale %in% c('log2', 'log10', 'log'))){
     is_log <- FALSE
