@@ -42,6 +42,9 @@ data_scale \tab Scale of the data provided in \code{e_data}. Acceptable values a
 \tab \cr
 is_normalized \tab A logical argument, specifying whether the data has been normalized or not. Default value is FALSE. \cr
 \tab \cr
+nmr_norm \tab A logical argument, specifying whether the data has been normalized either to a spiked in metabolite or to a property 
+taking sample-specific values
+#' \tab \cr
 norm_info \tab Default value is an empty list, which will be populated with a single named element \code{is_normalized = is_normalized}. When a normalization is applied to the data, this becomes populated with a list containing the normalization function, normalization subset and subset parameters, the location and scale parameters used to normalize the data, and the location and scale parameters used to backtransform the data (if applicable). \cr
 \tab \cr
 data_types \tab Character string describing the type of data (e.g.'binned' or 'identified', for NMR data). Default value is NULL. \cr
