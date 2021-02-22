@@ -315,7 +315,7 @@ pre_flight <- function (e_data,
   if (data_scale == 'abundance' && any(na.omit(e_data == 0))) {
     
     # Exchange 0 for NA in edata.
-    e_data <- edata_replace(edata = e_data,
+    e_data <- replace_zeros(edata = e_data,
                             edata_cname = edata_cname)
     
   }
@@ -493,5 +493,80 @@ str_col <- function (edata,
                 sep = ' '))
     
   }
+  
+}
+
+#' Replace 0 with NA
+#'
+#' This function finds all instances of 0 in e_data and replaces them with NA.
+#'
+#' @param e_data A \eqn{p \times n + 1} data frame of expression data, where
+#'        \eqn{p} is the number of xxx observed and \eqn{n} is the
+#'        number of samples.
+#'        
+#' @param edata_cname A character string specifying the name of the ID column in
+#'        the e_data data frame.
+#'
+#' @details This function is used in the as.pepData, as.proData, as.lipidData,
+#'          as.metabData, as.isobaricpepData, and as.nmrData functions to
+#'          replace any 0 values with NAs.
+#'
+#' @return An updated e_data data frame where all instances of 0 have been
+#'         replaced with NA.
+#' 
+replace_zeros <- function(edata,
+                          edata_cname) {
+  
+  # Acquire the index of the edata_cname column.
+  id_col <- which(names(edata) == edata_cname)
+  
+  # Enumerate the number of zeros to be replaced with NA
+  n_zeros <- sum(edata[, -id_col] == 0,
+                 na.rm = TRUE)
+  
+  # Loop through each column in e_data.
+  for (e in 1:ncol(edata)) {
+    
+    # Check if the current column is NOT the ID column.
+    if (e != id_col) {
+      
+      # Find indices where the value is 0.
+      inds <- which(edata[, e] == 0)
+      
+      # Check if any values in the eth column of edata match 0. If there are no
+      # matches then which() will return integer(0) -- which has length 0.
+      if (length(inds) == 0) {
+        
+        # Move to the next column in the data frame.
+        next
+        
+        # If the length of inds is greater than 0 enter the else statement.
+      } else {
+        
+        # Replace 0 with NA.
+        edata[inds, e] <- NA
+        
+      }
+      
+      # If e is equal to the index of the ID column enter the else statement.
+    } else {
+      
+      # Move to the next column in the data frame.
+      next
+      
+    }
+    
+  }
+  
+  # Report the number of replaced elements in e_data
+  message(paste(n_zeros,
+                "instances of",
+                0,
+                "have been replaced with",
+                NA,
+                sep = " "))
+  
+  # Return the updated edata object.
+  return (edata)
   
 }
