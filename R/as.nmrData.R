@@ -17,6 +17,9 @@
 #' \tab \cr
 #' is_normalized \tab A logical argument, specifying whether the data has been normalized or not. Default value is FALSE. \cr
 #' \tab \cr
+#' nmr_norm \tab A logical argument, specifying whether the data has been normalized either to a spiked in metabolite or to a property 
+#' taking sample-specific values
+#' #' \tab \cr
 #' norm_info \tab Default value is an empty list, which will be populated with a single named element \code{is_normalized = is_normalized}. When a normalization is applied to the data, this becomes populated with a list containing the normalization function, normalization subset and subset parameters, the location and scale parameters used to normalize the data, and the location and scale parameters used to backtransform the data (if applicable). \cr
 #' \tab \cr
 #' data_types \tab Character string describing the type of data (e.g.'binned' or 'identified', for NMR data). Default value is NULL. \cr
@@ -55,180 +58,82 @@
 #' @seealso \code{\link{as.proData}}
 #'
 #' @export
-as.nmrData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname, emeta_cname = NULL, techrep_cname = NULL, ...){
-  .as.nmrData(e_data, f_data, e_meta, edata_cname, fdata_cname, emeta_cname, techrep_cname, ...)
+as.nmrData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname,
+                       emeta_cname = NULL, techrep_cname = NULL, ...){
+  .as.nmrData(e_data, f_data, e_meta, edata_cname, fdata_cname,
+              emeta_cname, techrep_cname, ...)
 }
 
 ## metabolite data ##
 .as.nmrData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname,
-                          emeta_cname = NULL, techrep_cname = NULL, data_scale = "abundance",
-                          is_normalized = FALSE, norm_info=list(),
-                          data_types=NULL, check.names = TRUE 
-                          ){
-
-  # initial checks #
-
-  # check that e_data and f_data are data.frames #
-  if(!inherits(e_data, "data.frame")) stop("e_data must be of the class 'data.frame'")
-  if(!inherits(f_data, "data.frame")) stop("f_data must be of the class 'data.frame'")
-
-  # check to see if e_meta is NULL, if not check that it is a data.frame #
-  if(!is.null(e_meta)){ if(!inherits(e_meta, "data.frame")) stop("e_meta must be of the class 'data.frame'")}
+                        emeta_cname = NULL, techrep_cname = NULL,
+                        data_scale = "abundance", is_normalized = FALSE,
+                        nmr_norm = FALSE, norm_info = list(), data_types = NULL,
+                        check.names = TRUE) {
   
+  # Define the dType variable. This is used for customizing the warnings and
+  # errors according to the data type (peptide, protein, lipid, ...).
+  dType <- c('metabolites', 'as.nmrData')
   
-  # check that remaining input params are of correct class # added by KGS 5/1/2020
-  ## cnames are character strings
-  if(!is.null(edata_cname)){ if(!inherits(edata_cname, "character")) stop("edata_cname must be of the class 'character'")}
-  if(!is.null(fdata_cname)){ if(!inherits(fdata_cname, "character")) stop("fdata_cname must be of the class 'character'")}
-  if(!is.null(emeta_cname)){ if(!inherits(emeta_cname, "character")) stop("emeta_cname must be of the class 'character'")}
+  # Perform pre analysis checks. Return updated data frames if they all receive
+  # a gold star.
+  res <- pre_flight(e_data = e_data,
+                    f_data = f_data,
+                    e_meta = e_meta,
+                    edata_cname = edata_cname,
+                    fdata_cname = fdata_cname,
+                    emeta_cname = emeta_cname,
+                    techrep_cname = techrep_cname,
+                    data_scale = data_scale,
+                    is_normalized = is_normalized,
+                    norm_info = norm_info,
+                    data_types = data_types,
+                    check.names = check.names,
+                    dType = dType)
   
-  ## is_normalized is logical
-  if(!is.null(is_normalized)){ if(!inherits(is_normalized, "logical")) stop("is_normalized must be of the class 'logical'")}
+  # Set the (possibly new) emeta_cname.
+  emeta_cname <- res$emeta_cname
   
-  ## norm_info is list
-  if(!inherits(norm_info, "list")) stop("norm_info must be of the class 'list'")
-  
-  ## data_types is character if not missing
-  if(!is.null(edata_cname)){ if(!inherits(edata_cname, "character")) stop("edata_cname must be of the class 'character'")}
-  
-  ## check.names is logical
-  if(!is.null(check.names)){ if(!inherits(check.names, "logical")) stop("check.names must be of the class 'logical'")}
-
-  
-  # check that the metabolite column exists in e_data and e_meta (if applicable) #
-  if(!(edata_cname %in% names(e_data))) stop(paste("Metabolite column ", edata_cname," not found in e_data. See details of as.nmrData for specifying column names.", sep = ""))
-
-  if(!is.null(e_meta)){
-    if(!(edata_cname %in% names(e_meta))) stop(paste("Metabolite column ", edata_cname," not found in e_meta. Column names for metabolite names must match for e_data and e_meta. See details of as.nmrData for specifying column names.", sep = ""))
-  }
-
-  # if e_meta is NULL and emeta_cname is non-NULL #
-  if(is.null(e_meta) & !is.null(emeta_cname)){
-    message("emeta_cname will not be used, no e_meta was provided") 
-    emeta_cname = NULL
-  } 
-  
-  # if e_meta is non-NULL and emeta_cname is NULL #
-  if(!is.null(e_meta) & is.null(emeta_cname)) stop("if e_meta is non-NULL, emeta_cname must also be non-NULL")
-
-  # if e_meta is not NULL check that identification columns are found #
-  if(!is.null(e_meta)){
-    if(!is.null(emeta_cname)){
-      if(!(emeta_cname %in% names(e_meta))) stop(paste("Metabolite identification column ", emeta_cname, " not found in e_meta. See details of as.nmrData for specifying column names.", sep = "") )
-    }
-  }
-
-  # check that the Sample column name is in f_data column names #
-  if(!(fdata_cname %in% names(f_data))) stop(paste("Sample column ", fdata_cname, " not found in f_data. See details of as.nmrData for specifying column names.", sep = ""))
-
-  # check that all samples in e_data are present in f_data #
-  edat_sampid = which(names(e_data) == edata_cname) # fixed by KS 10/13/2016
-  samps.miss = sum(!(names(e_data[,-edat_sampid]) %in% f_data[,fdata_cname]))
-  if( samps.miss > 0) stop(paste( samps.miss, " samples from e_data not found in f_data", sep = ""))
-
-  # check for any extra samples in f_data than in e_data - necessary to remove before group_designation function #
-  if(any(!(f_data[,fdata_cname] %in% names(e_data)))){
-    f_data <- f_data[-which(!(f_data[,fdata_cname] %in% names(e_data))),]
-    warning("Extra samples were found in f_data that were not in e_data. These have been removed from f_data.")
-  }
-
-  # check that f_data has at least 2 columns #
-  if(ncol(f_data) < 2) stop("f_data must contain at least 2 columns")
-
-  # if e_meta is provided, check that all metabolites in e_data occur in e_meta #
-  if(!is.null(e_meta)){
-    if(sum(!(e_data[,edata_cname] %in% e_meta[,edata_cname])) > 0 ) stop("Not all metabolites in e_data are present in e_meta")
-  }
-
-  # if e_meta is provided, remove any extra features that were provided #
-  if(!is.null(e_meta)){
-    if(any(!(e_meta[,edata_cname] %in% e_data[,edata_cname]))){
-      e_meta <- e_meta[-which(!(e_meta[,edata_cname] %in% e_data[,edata_cname])),]
-      warning("Extra metabolites were found in e_meta that were not in e_data. These have been removed from e_meta.")
-    }
-  }
-
-  # check that data_scale is one of the acceptable options #
-  data_scale <- tolower(data_scale) # added by KGS 5/1/2020
-  if(!(data_scale %in% c('log2', 'log10', 'log', 'abundance'))) stop(paste(data_scale, " is not a valid option for 'data_scale'. See details of as.nmrData for specifics.", sep=""))
-  
-  
-
-  # if e_meta is NULL, set emeta_cname to NULL #
-  if(is.null(e_meta)){
-    emeta_cname = NULL
-  }
-
-  # check that e_data has unique rows #
-  if(nrow(e_data) == length(unique(e_data[, edata_cname]))){
-    e_data <- e_data
-  }else{
-    e_data_unique <- unique(e_data)
-    if(nrow(e_data_unique) == length(unique(e_data_unique[, edata_cname]))){
-      e_data <- e_data_unique
-    }else{
-      stop("The 'edata_cname' identifier is non-unique.")
-    }
-  }
-  
-  # check that technical replicate identifier column specifies at least one biological sample with 2 or more technical replicates.
-  if(!is.null(techrep_cname)){
-    if(!inherits(techrep_cname, "character") | length(techrep_cname) == 0) stop("techrep_cname must be a character string specifying a column in f_data")
-    if(!(techrep_cname %in% colnames(f_data[,-which(names(f_data) == fdata_cname)]))) stop("Specified technical replicate column was not found in f_data or was the same as fdata_cname")
-    if(length(unique(f_data[,techrep_cname])) == nrow(f_data)) stop("Specified technical replicate column had a unique value for each row.  Values should specify groups of technical replicates belonging to a biological sample")
-  }
-
-  # store results #
-  res = list(e_data = e_data, f_data = f_data, e_meta = e_meta)
-
   # set column name attributes #
-  attr(res, "cnames") = list(edata_cname = edata_cname, emeta_cname = emeta_cname, fdata_cname = fdata_cname, techrep_cname = techrep_cname)
+  attr(res, "cnames") = list(edata_cname = edata_cname,
+                             emeta_cname = emeta_cname,
+                             fdata_cname = fdata_cname,
+                             techrep_cname = techrep_cname)
   
-  # count missing values in e_data #
-  num_miss_obs = sum(is.na(e_data[,-which(names(e_data)==edata_cname)]))
-  prop_missing = mean(is.na(e_data[,-which(names(e_data)==edata_cname)]))
-
-  # number of unique metabolites #
-  num_edata = length(unique(e_data[, edata_cname]))
-
-  # number of samples #
-  num_samps = ncol(e_data) - 1
-
-  if(!is.null(e_meta)){
-    # number of metabolite identifiers that map to a metabolite in e_data #
-    if(!is.null(emeta_cname)){
-      num_emeta = length(unique(e_meta[which(as.character(e_meta[, edata_cname]) %in% as.character(e_data[, edata_cname])), emeta_cname]))
-    }else{num_emeta = NULL}
-  }else{
-    num_emeta = NULL
-  }
+  # Compute the data_info attributes.
+  attr(res, "data_info") <- set_data_info(e_data = res$e_data,
+                                          edata_cname = edata_cname,
+                                          data_scale = data_scale,
+                                          data_types = data_types,
+                                          norm_info = norm_info,
+                                          is_normalized = is_normalized)
   
-  # set data information attributes #
-  norm_info$is_normalized = is_normalized
-  attr(res, "data_info") = list(data_scale = data_scale, norm_info = norm_info, num_edata = num_edata, num_miss_obs = num_miss_obs,
-                                num_emeta = num_emeta, prop_missing = prop_missing, num_samps = num_samps, data_types = data_types)
+  # Set nmr specific attribute.
+  attr(res, "nmr_info") <- set_nmr_info(metabolite_name = NA,
+                                        sample_property_cname = NA,
+                                        norm_info = norm_info,
+                                        nmr_norm = nmr_norm,
+                                        backtransform = NA)
+  
   #set check.names attribute #
   attr(res, "check.names") = check.names 
   
   # set meta data attributes #
-  if(!is.null(e_meta)){
-    attr(res, "meta_info") = TRUE
-  }else{ attr(res, "meta_info") = FALSE}
-
-
-  # set group dataframe attribute to NULL, will be filled in after running group_designation function #
+  attr(res, "meta_info") <- set_meta_info(e_meta = res$e_meta,
+                                          emeta_cname = emeta_cname)
+  
+  # set group dataframe attribute to NULL, will be filled in after running
+  # group_designation function #
   attr(res, "group_DF") = NULL
-
-  # set filters attributes #
-  if(!is.null(attr(res, "filters"))){
-    attr(res, "filters") = attr(res, "filters")
-  }else{ attr(res, "filters") = list()}
-
+  
+  # Initialize the filters attribute with a list. This list will be populated
+  # with filter class objects as filters are applied. Multiple filters can be
+  # implemented on one data set.
+  attr(res, "filters") <- list()
+  
   # set class of list #
   class(res) = c("nmrData") 
-
+  
   return(res)
-
+  
 }
-
-

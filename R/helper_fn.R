@@ -1,3 +1,142 @@
+# Functions to get omicsData attributes ----------------------------------------
+
+# Functions to set omicsData attributes ----------------------------------------
+
+# Create a set function that will return the value for each attribute. For 
+# example, set_data_info will perform all of the calculations to fill in the
+# data_info attribute. These functions will be called in the as.xxx functions
+# to create a xxData object but can be used individually to update any one of
+# the attributes at a later time.
+
+set_data_info <- function (e_data,
+                           edata_cname,
+                           data_scale,
+                           data_types,
+                           norm_info,
+                           is_normalized) {
+  
+  # Identify the column number that contains the IDs.
+  id_col <- which(names(e_data) == edata_cname)
+  
+  # Count the number of missing values in e_data.
+  num_miss_obs <- sum(is.na(e_data[, -id_col]))
+  
+  # Calculate the proportion of missing data in e_data.
+  prop_missing <- num_miss_obs / prod(dim(e_data[, -id_col]))
+  
+  # Extract the number of things (e.g., peptides, lipids, metabolites, ...).
+  num_edata <- nrow(e_data)
+  
+  # Procure the number of samples.
+  num_samps <- ncol(e_data) - 1
+  
+  # Set data normalization information.
+  norm_info$is_normalized <- is_normalized
+  
+  # Return all of the information that belongs in the data_info attribute.
+  return (list(data_scale = data_scale,
+               norm_info = norm_info,
+               num_edata = num_edata,
+               num_miss_obs = num_miss_obs,
+               prop_missing = prop_missing,
+               num_samps = num_samps,
+               data_types = data_types))
+  
+}
+
+set_meta_info <- function (e_meta,
+                           emeta_cname) {
+  
+  # Determine if meta data is present.
+  meta_data <- ifelse(is.null(e_meta), FALSE, TRUE)
+  
+  # Test if emeta_cname is not null.
+  if (!is.null(emeta_cname)) {
+    
+    # Enumerate the number of unique proteins that map to a peptide in e_data.
+    num_emeta <- length(unique(e_meta[, emeta_cname]))
+    
+  } else {
+    
+    # If emeta_cname is null set the number of proteins to null.
+    num_emeta <- NULL
+    
+  }
+  
+  # Return the list of meta attributes.
+  return (list(meta_data = meta_data,
+               num_emeta = num_emeta))
+  
+}
+
+# This is kind of a stupid function. Don't know why I wrote it.
+set_isobaric_info <- function (exp_cname, 
+                               channel_cname, 
+                               refpool_channel, 
+                               refpool_cname, 
+                               refpool_notation, 
+                               norm_info,
+                               isobaric_norm) {
+  
+  # Set the elements of the norm_info list.
+  norm_info$is_normalized <- isobaric_norm
+  
+  # Return the list of isobaric_info attributes.
+  return (list(exp_cname = exp_cname,
+               channel_cname = channel_cname, 
+               refpool_channel = refpool_channel, 
+               refpool_cname = refpool_cname, 
+               refpool_notation = refpool_notation, 
+               norm_info = norm_info))
+  
+}
+
+# Another stupid function but what are you going to do?
+set_nmr_info <- function (metabolite_name,
+                          sample_property_cname,
+                          norm_info,
+                          nmr_norm,
+                          backtransform) {
+  
+  # Set the elements of the norm_info list.
+  norm_info$is_normalized <- nmr_norm
+  norm_info$backtransform <- backtransform
+  
+  # Return the list of objects belonging to this attribute.
+  return(list(metabolite_name = metabolite_name,
+              sample_property_cname = sample_property_cname,
+              norm_info = norm_info))
+  
+}
+
+# This function will create a filter class object. The output will always have
+# the same attributes but not all of them will be used for every data type.
+set_filter <- function (threshold,
+                        filtered,
+                        filter_method = NULL) {
+  
+  # Create an object that will have the filter elements and class added to it
+  # later (in the next 10 lines or so).
+  filta <- list()
+  
+  # Add threshold to filta.
+  filta$threshold <- threshold
+  
+  # Append filtered to the filta list.
+  filta$filtered <- filtered
+  
+  # Affix the filter method to filta. This is only used with imdanovaFilt.
+  filta$method <- filter_method
+  
+  # Create the filter class.
+  class(filta) = "filter"
+  
+  return (filta)
+  
+}
+
+# To be sorted ---------------
+
 #' Return comparisons of statRes object
 #' 
 #' This function returns comparisons from statRes or trellData object
