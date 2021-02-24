@@ -106,7 +106,12 @@ library(pmartRdata)
 data("isobaric_edata")
 data("isobaric_fdata")
 data("isobaric_emeta")
-mypepData <- as.isobaricpepData(e_data = isobaric_edata, e_meta = isobaric_emeta, f_data = isobaric_fdata, edata_cname = "Peptide", fdata_cname = "Sample", emeta_cname = "Protein")
+mypepData <- as.isobaricpepData(e_data = isobaric_edata,
+                                e_meta = isobaric_emeta,
+                                f_data = isobaric_fdata,
+                                edata_cname = "Peptide",
+                                fdata_cname = "Sample",
+                                emeta_cname = "Protein")
 }
 }
 \seealso{
