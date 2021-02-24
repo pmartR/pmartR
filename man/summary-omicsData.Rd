@@ -19,6 +19,9 @@
 
 \method{summary}{nmrData}(omicsData)
 }
+\arguments{
+\item{omicsData}{an object of the class 'lipidData', 'metabData', 'pepData', 'proData', or 'nmrData' usually created by \code{\link{as.lipidData}}, \code{\link{as.metabData}}, \code{\link{as.pepData}}, \code{\link{as.proData}}, or \code{\link{as.nmrData}}, respectively.}
+}
 \value{
 a summary table for the pmartR omicsData object. If assigned to a variable, the elements of the summary table are saved in a list format.
 }
