@@ -1,12 +1,19 @@
 #' Replace Values Equal to x with y
 #'
-#' This function finds all values of x in the e_data element of omicsData and replaces them with y
+#' This function finds all values of x in the e_data element of omicsData and
+#' replaces them with y
 #'
-#' @param omicsData an object of the class 'pepData', 'proData', 'metabData', 'lipidData', or 'nmrData' usually created by \code{\link{pepData}}, \code{\link{proData}}, \code{\link{metabData}}, \code{\link{lipidData}}, or \code{\link{as.nmrData}}, respectively.
+#' @param omicsData an object of the class 'pepData', 'proData', 'metabData',
+#'        'lipidData', or 'nmrData' usually created by \code{\link{pepData}},
+#'        \code{\link{proData}}, \code{\link{metabData}},
+#'        \code{\link{lipidData}}, or \code{\link{as.nmrData}}, respectively.
+#'        
 #' @param x value to be replaced, usually numeric or NA
-#' @param y replacment value, usually numeric or NA
+#' 
+#' @param y replacement value, usually numeric or NA
 #'
-#' @details This function is often used to replace any 0 values in peptide, protein, metabolite, or lipid data with NA's.
+#' @details This function is often used to replace any 0 values in peptide,
+#'          protein, metabolite, or lipid data with NA's.
 #'
 #' @return data object of the same class as omicsData
 #'
@@ -19,401 +26,69 @@
 #' @author Kelly Stratton
 #'
 #' @export
+#' 
 edata_replace <- function(omicsData, x, y) {
   ## some initial checks ##
   
   # check that omicsData is of appropriate class #
-  if (!inherits(omicsData,
-                c("pepData", "proData", "metabData", "lipidData", "nmrData")))
-    stop(
-      "omicsData must be of class 'pepData', 'proData', 'metabData', 'lipidData', or 'nmrData'"
-    )
-  
-  UseMethod("edata_replace")
-}
-
-
-# function for peptides #
-#' @export
-#' @name edata_replace
-#' @rdname edata_replace
-edata_replace.pepData <- function(omicsData, x, y) {
-  edata_id = attr(omicsData, "cnames")$edata_cname
-  check_names = getchecknames(omicsData)
-  
-  edata <- omicsData$e_data
-  feature_names <- edata[which(names(edata) == edata_id)]
-  # pull off the identifier column #
-  edata <- edata[,-which(colnames(edata) == edata_id)]
-  
-  e_meta <- omicsData$e_meta
-  
-  # get count of the number of values replaced #
-  if (is.na(x)) {
-    truefalse <- is.na(edata)
-  } else{
-    truefalse <- edata == x
-  }
-  num_replaced <- sum(truefalse, na.rm = TRUE)
-  
-  # apply vector_replace to the cols of edata (identifier column has been pulled off) #
-  edata_new <- apply(edata, 2, vector_replace, x = x, y = y)
-  
-  # add the identifier column back #
-  edata_new <-
-    data.frame(edata_id = feature_names, edata_new, check.names = check_names)
-  
-  # replace e_data in omicsData with edata_new #
-  if (is.null(e_meta)) {
-    emeta_cname = NULL
-  } else{
-    emeta_cname = attr(omicsData, "cnames")$emeta_cname
-  }
-  
-  # create an updated pepData object (look at as.metabData function to see how the attributes are accessed) #
-  # check for isobaricpepData class #
-  if(inherits(omicsData, "isobaricpepData")){
-    updated_data <-
-      as.isobaricpepData(
-        e_data = edata_new,
-        f_data = omicsData$f_data,
-        e_meta = omicsData$e_meta,
-        edata_cname = edata_id,
-        emeta_cname = emeta_cname,
-        fdata_cname = attr(omicsData, "cnames")$fdata_cname,
-        techrep_cname = attr(omicsData, "cnames")$techrep_cname,
-        data_scale = attr(omicsData, "data_info")$data_scale,
-        is_normalized = attr(omicsData, "data_info")$norm_info$is_normalized,
-        isobaric_norm = attr(omicsData, "isobaric_info")$norm_info$is_normalized,
-        norm_info = attr(omicsData, "data_info")$norm_info,
-        data_types = attr(omicsData, "data_info")$data_types,
-        check.names = check_names
-      )
-  } else{ # not an isobaricpepData object, just pepData #
-    updated_data <-
-      as.pepData(
-        e_data = edata_new,
-        f_data = omicsData$f_data,
-        e_meta = omicsData$e_meta,
-        edata_cname = edata_id,
-        emeta_cname = emeta_cname,
-        fdata_cname = attr(omicsData, "cnames")$fdata_cname,
-        techrep_cname = attr(omicsData, "cnames")$techrep_cname,
-        data_scale = attr(omicsData, "data_info")$data_scale,
-        is_normalized = attr(omicsData, "data_info")$norm_info$is_normalized,
-        norm_info = attr(omicsData, "data_info")$norm_info,
-        data_types = attr(omicsData, "data_info")$data_types,
-        check.names = check_names
-      )
+  if (!inherits(omicsData, c("pepData", "proData", "metabData",
+                             "lipidData", "nmrData"))) {
+    
+    # Bestow an error on the user because the input does not have the correct
+    # class.
+    stop (paste("omicsData must be of class 'pepData', 'proData',",
+                "'metabData', 'lipidData', or 'nmrData'",
+                sep = " "))
     
   }
   
-  attributes(updated_data)$group_DF <-
-    attributes(omicsData)$group_DF
-  attributes(updated_data)$filters <- attributes(omicsData)$filters
-  attributes(updated_data)$meta_info <-
-    attributes(omicsData)$meta_info
   
-  message(paste(
-    num_replaced,
-    "instances of",
-    x,
-    "have been replaced with",
-    y,
-    sep = " "
-  ))
-  return(updated_data)
-}
-
-
-
-# function for proteins #
-#' @export
-#' @name edata_replace
-#' @rdname edata_replace
-edata_replace.proData <- function(omicsData, x, y) {
-  edata_id = attr(omicsData, "cnames")$edata_cname
-  check_names = getchecknames(omicsData)
-  
-  edata <- omicsData$e_data
-  feature_names <- edata[which(names(edata) == edata_id)]
-  # pull off the identifier column #
-  edata <- edata[,-which(colnames(edata) == edata_id)]
-  
-  e_meta <- omicsData$e_meta
+  # Acquire the index of the edata_cname column.
+  id_col <- which(names(omicsData$e_data) == attr(omicsData,
+                                                  "cnames")$edata_cname)
   
   # get count of the number of values replaced #
   if (is.na(x)) {
-    truefalse <- is.na(edata)
-  } else{
-    truefalse <- edata == x
-  }
-  num_replaced <- sum(truefalse, na.rm = TRUE)
-  
-  # apply vector_replace to the cols of edata (identifier column has been pulled off) #
-  edata_new <- apply(edata, 2, vector_replace, x = x, y = y)
-  
-  # add the identifier column back #
-  edata_new <-
-    data.frame(edata_id = feature_names, edata_new, check.names = check_names)
-  
-  # replace e_data in omicsData with edata_new #
-  if (is.null(e_meta)) {
-    emeta_cname = NULL
-  } else{
-    emeta_cname = attr(omicsData, "cnames")$emeta_cname
+    num_replaced <- sum(is.na(omicsData$e_data[, -id_col]),
+                        na.rm = TRUE)
+  } else {
+    num_replaced <- sum(omicsData$e_data[, -id_col] == x,
+                        na.rm = TRUE)
   }
   
-  # create an updated metabData object (look at as.metabData function to see how the attributes are accessed) #
-  updated_data <-
-    as.proData(
-      e_data = edata_new,
-      f_data = omicsData$f_data,
-      e_meta = omicsData$e_meta,
-      edata_cname = edata_id,
-      emeta_cname = emeta_cname,
-      fdata_cname = attr(omicsData, "cnames")$fdata_cname,
-      techrep_cname = attr(omicsData, "cnames")$techrep_cname,
-      data_scale = attr(omicsData, "data_info")$data_scale,
-      is_normalized = attr(omicsData, "data_info")$norm_info$is_normalized,
-      data_types = attr(omicsData, "data_info")$data_types,
-      check.names = check_names
-    )
+  # Update the e_data data frame in the omicsData object.
+  omicsData$e_data[, -id_col] <- apply(omicsData$e_data[, -id_col],
+                                       2,
+                                       vector_replace,
+                                       x = x,
+                                       y = y)
   
-  attributes(updated_data)$group_DF <-
-    attributes(omicsData)$group_DF
-  attributes(updated_data)$filters <- attributes(omicsData)$filters
-  attributes(updated_data)$meta_info <-
-    attributes(omicsData)$meta_info
+  # Update the data_info attribute of the omicsData object.
+  attr(omicsData,
+       'data_info') <- set_data_info(e_data = omicsData$e_data,
+                                     edata_cname = attr(omicsData,
+                                                        'cnames')$edata_cname,
+                                     data_scale = attr(omicsData,
+                                                       'data_info')$data_scale,
+                                     data_types = attr(omicsData,
+                                                       'data_info')$data_types,
+                                     norm_info = attr(omicsData,
+                                                      'data_info')$norm_info,
+                                     is_normalized = attr(omicsData,
+                                                          'data_info')$norm_info$is_normalized)
   
-  message(paste(
-    num_replaced,
-    "instances of",
-    x,
-    "have been replaced with",
-    y,
-    sep = " "
-  ))
-  return(updated_data)
+  # Report the number of replaced elements in e_data
+  message(paste(num_replaced,
+                "instances of",
+                x,
+                "have been replaced with",
+                y,
+                sep = " "))
+  
+  # Return the updated omicsData object.
+  return (omicsData)
+  
 }
-
-
-# function for metabolites #
-#' @export
-#' @name edata_replace
-#' @rdname edata_replace
-edata_replace.metabData <- function(omicsData, x, y) {
-  edata_id = attr(omicsData, "cnames")$edata_cname
-  check_names = getchecknames(omicsData)
-  
-  edata <- omicsData$e_data
-  feature_names <- edata[which(names(edata) == edata_id)]
-  # pull off the identifier column #
-  edata <- edata[,-which(colnames(edata) == edata_id)]
-  
-  e_meta <- omicsData$e_meta
-  
-  # get count of the number of values replaced #
-  if (is.na(x)) {
-    truefalse <- is.na(edata)
-  } else{
-    truefalse <- edata == x
-  }
-  num_replaced <- sum(truefalse, na.rm = TRUE)
-  
-  # apply vector_replace to the cols of edata (identifier column has been pulled off) #
-  edata_new <- apply(edata, 2, vector_replace, x = x, y = y)
-  
-  # add the identifier column back #
-  edata_new <-
-    data.frame(edata_id = feature_names, edata_new, check.names = check_names)
-  
-  # replace e_data in omicsData with edata_new #
-  if (is.null(e_meta)) {
-    emeta_cname = NULL
-  } else{
-    emeta_cname = attr(omicsData, "cnames")$emeta_cname
-  }
-  
-  # create an updated metabData object (look at as.metabData function to see how the attributes are accessed) #
-  updated_data <-
-    as.metabData(
-      e_data = edata_new,
-      f_data = omicsData$f_data,
-      e_meta = omicsData$e_meta,
-      edata_cname = edata_id,
-      emeta_cname = emeta_cname,
-      fdata_cname = attr(omicsData, "cnames")$fdata_cname,
-      techrep_cname = attr(omicsData, "cnames")$techrep_cname,
-      data_scale = attr(omicsData, "data_info")$data_scale,
-      is_normalized = attr(omicsData, "data_info")$norm_info$is_normalized,
-      data_types = attr(omicsData, "data_info")$data_types,
-      check.names = check_names
-    )
-  
-  attributes(updated_data)$group_DF <-
-    attributes(omicsData)$group_DF
-  attributes(updated_data)$filters <- attributes(omicsData)$filters
-  attributes(updated_data)$meta_info <-
-    attributes(omicsData)$meta_info
-  
-  message(paste(
-    num_replaced,
-    "instances of",
-    x,
-    "have been replaced with",
-    y,
-    sep = " "
-  ))
-  return(updated_data)
-}
-
-
-
-# function for lipids #
-#' @export
-#' @name edata_replace
-#' @rdname edata_replace
-edata_replace.lipidData <- function(omicsData, x, y) {
-  edata_id = attr(omicsData, "cnames")$edata_cname
-  check_names = getchecknames(omicsData)
-  
-  edata <- omicsData$e_data
-  feature_names <- edata[which(names(edata) == edata_id)]
-  # pull off the identifier column #
-  edata <- edata[,-which(colnames(edata) == edata_id)]
-  
-  e_meta <- omicsData$e_meta
-  
-  # get count of the number of values replaced #
-  if (is.na(x)) {
-    truefalse <- is.na(edata)
-  } else{
-    truefalse <- edata == x
-  }
-  num_replaced <- sum(truefalse, na.rm = TRUE)
-  
-  # apply vector_replace to the cols of edata (identifier column has been pulled off) #
-  edata_new <- apply(edata, 2, vector_replace, x = x, y = y)
-  
-  # add the identifier column back #
-  edata_new <-
-    data.frame(edata_id = feature_names, edata_new, check.names = check_names)
-  
-  # replace e_data in omicsData with edata_new #
-  if (is.null(e_meta)) {
-    emeta_cname = NULL
-  } else{
-    emeta_cname = attr(omicsData, "cnames")$emeta_cname
-  }
-  
-  # create an updated metabData object (look at as.metabData function to see how the attributes are accessed) #
-  updated_data <-
-    as.lipidData(
-      e_data = edata_new,
-      f_data = omicsData$f_data,
-      e_meta = omicsData$e_meta,
-      edata_cname = edata_id,
-      emeta_cname = emeta_cname,
-      fdata_cname = attr(omicsData, "cnames")$fdata_cname,
-      techrep_cname = attr(omicsData, "cnames")$techrep_cname,
-      data_scale = attr(omicsData, "data_info")$data_scale,
-      is_normalized = attr(omicsData, "data_info")$norm_info$is_normalized,
-      data_types = attr(omicsData, "data_info")$data_types,
-      check.names = check_names
-    )
-  
-  attributes(updated_data)$group_DF <-
-    attributes(omicsData)$group_DF
-  attributes(updated_data)$filters <- attributes(omicsData)$filters
-  attributes(updated_data)$meta_info <-
-    attributes(omicsData)$meta_info
-  
-  message(paste(
-    num_replaced,
-    "instances of",
-    x,
-    "have been replaced with",
-    y,
-    sep = " "
-  ))
-  return(updated_data)
-}
-
-
-
-# function for nmrdata
-#' @export
-#' @name edata_replace
-#' @rdname edata_replace
-edata_replace.nmrData <- function(omicsData, x, y) {
-  edata_id = attr(omicsData, "cnames")$edata_cname
-  check_names = getchecknames(omicsData)
-  
-  edata <- omicsData$e_data
-  feature_names <- edata[which(names(edata) == edata_id)]
-  # pull off the identifier column #
-  edata <- edata[,-which(colnames(edata) == edata_id)]
-  
-  e_meta <- omicsData$e_meta
-  
-  # get count of the number of values replaced #
-  if (is.na(x)) {
-    truefalse <- is.na(edata)
-  } else{
-    truefalse <- edata == x
-  }
-  num_replaced <- sum(truefalse, na.rm = TRUE)
-  
-  # apply vector_replace to the cols of edata (identifier column has been pulled off) #
-  edata_new <- apply(edata, 2, vector_replace, x = x, y = y)
-  
-  # add the identifier column back #
-  edata_new <-
-    data.frame(edata_id = feature_names, edata_new, check.names = check_names)
-  
-  # replace e_data in omicsData with edata_new #
-  if (is.null(e_meta)) {
-    emeta_cname = NULL
-  } else{
-    emeta_cname = attr(omicsData, "cnames")$emeta_cname
-  }
-  
-  # create an updated metabData object (look at as.metabData function to see how the attributes are accessed) #
-  updated_data <-
-    as.nmrData(
-      e_data = edata_new,
-      f_data = omicsData$f_data,
-      e_meta = omicsData$e_meta,
-      edata_cname = edata_id,
-      emeta_cname = emeta_cname,
-      fdata_cname = attr(omicsData, "cnames")$fdata_cname,
-      techrep_cname = attr(omicsData, "cnames")$techrep_cname,
-      data_scale = attr(omicsData, "data_info")$data_scale,
-      is_normalized = attr(omicsData, "data_info")$norm_info$is_normalized,
-      data_types = attr(omicsData, "data_info")$data_types,
-      check.names = check_names
-    )
-  
-  attributes(updated_data)$group_DF <-
-    attributes(omicsData)$group_DF
-  attributes(updated_data)$filters <- attributes(omicsData)$filters
-  attributes(updated_data)$meta_info <-
-    attributes(omicsData)$meta_info
-  
-  message(paste(
-    num_replaced,
-    "instances of",
-    x,
-    "have been replaced with",
-    y,
-    sep = " "
-  ))
-  return(updated_data)
-}
-
-
-
 
 #' Replace x with y for a single vector
 #'
@@ -425,20 +100,31 @@ edata_replace.nmrData <- function(omicsData, x, y) {
 #'
 #' @author Kelly Stratton
 #'
-vector_replace <- function(one_vector, x, y) {
+vector_replace <- function (one_vector, x, y) {
+  
   # find indices where the value is x #
   if (is.na(x)) {
     inds <- is.na(one_vector)
-  } else{
+  } else {
     inds <- which(one_vector == x)
   }
   
+  # Check if any values in the input vector match the value to be replaced. If
+  # zero values in the input vector match x then the which function will return
+  # integer(0) or the sum of is.na(x) will be zero.
+  if (length(inds) == 0 || sum(inds) == 0) {
+    
+    # Return the one_vector unchanged.
+    return (one_vector)
+    
+  } else {
+    
+    # Replace x with y.
+    one_vector[inds] <- y
+    
+    # Return one_vector with the updated values.
+    return (one_vector)
+    
+  }
   
-  # initialize a new vector, which will be returned after we replace x with y #
-  new_vector <- one_vector
-  
-  # replace x with y #
-  new_vector[inds] <- y
-  
-  return(new_vector)
 }
