@@ -160,19 +160,8 @@ edata_transform <- function (omicsData, data_scale) {
            
          })
   
-  # Extract the data_info attributes. Some of the elements from data_info will
-  # be used as the input for updating the data_info attribute.
-  gdi <- get_data_info(omicsData)
-  
   # Update data_scale in the data_info attribute.
-  attr(omicsData,
-       'data_info') <- set_data_info(e_data = omicsData$e_data,
-                                     edata_cname = attr(omicsData,
-                                                        'cnames')$edata_cname,
-                                     data_scale = data_scale,
-                                     data_types = gdi$data_types,
-                                     norm_info = gdi$norm_info,
-                                     is_normalized = gdi$norm_info$is_normalized)
+  attr(omicsData, 'data_info')$data_scale <- data_scale
   
   # Return the transmogrified omics object along with its attributes (some of
   # them updated and others left alone).
