@@ -1,13 +1,347 @@
 # Functions to get omicsData attributes ----------------------------------------
 
+#' Fetch the data_info attribute
+#' 
+#' Retrieves the values in the data_info attribute from an omicsData object.
+#' 
+#' @param omicsData An object of class pepData, proData, metabData, lipidData,
+#'                  or nmrData.
+#'                  
+#' @return A list containing seven elements:
+#'         \itemize{
+#'         
+#'           \item data_scale -- A Character string indicating the scale of the
+#'           data in \code{e_data}. 
+#'         
+#'           \item norm_info -- A list containing a single element indicating
+#'           whether the data in \code{e_data} have been normalized.
+#'         
+#'           \item num_edata -- The number of unique entries present in the 
+#'           \code{edata_cname} column in \code{e_data}.
+#'         
+#'           \item num_miss_obs -- An integer. The number of missing
+#'           observations in \code{e_data}.
+#'         
+#'           \item prop_missing -- A number between 0 and 1. The proportion of
+#'           missing observations in \code{e_data}.
+#'         
+#'           \item num_samps -- An integer indicating the number of samples or
+#'           columns (excluding the identifier column \code{edata_cname}) in
+#'           \code{e_data}.
+#'         
+#'           \item data_types -- A character string describing the type of data
+#'           in \code{e_data}.
+#'         
+#'         }
+#' 
+#' @export
+#' 
+get_data_info <- function (omicsData) {
+  
+  # Check class of omicsData.
+  if (!inherits(omicsData, c("pepData",
+                             "proData",
+                             "metabData",
+                             "lipidData",
+                             "nmrData"))) {
+    
+    # Lay down an error in the console.
+    stop (paste("omicsData must be of class 'pepData', 'proData',",
+                "'metabData', 'lipidData', or 'nmrData'",
+                sep = " "))
+    
+  }
+  
+  # Extract and return the data_info attribute.
+  return (attr(omicsData, 'data_info'))
+  
+}
+
+#' Fetch the meta_info attribute
+#' 
+#' Retrieves the values in the meta_info attribute from an omicsData object.
+#' 
+#' @param omicsData An object of class pepData, proData, metabData, lipidData,
+#'                  or nmrData.
+#'                  
+#' @return A list containing two elements:
+#'         \itemize{
+#'         
+#'           \item meta_data -- Logical. Indicates if the \code{e_meta} data
+#'           frame was provided. 
+#'         
+#'           \item num_emeta -- The number of unique entries present in the
+#'           \code{emeta_cname} column in \code{e_meta}.
+#'         
+#'         }
+#' 
+#' @export
+#' 
+get_meta_info <- function (omicsData) {
+  
+  # Check class of omicsData.
+  if (!inherits(omicsData, c("pepData",
+                             "proData",
+                             "metabData",
+                             "lipidData",
+                             "nmrData"))) {
+    
+    # Lay down an error in the console.
+    stop (paste("omicsData must be of class 'pepData', 'proData',",
+                "'metabData', 'lipidData', or 'nmrData'",
+                sep = " "))
+    
+  }
+  
+  # Extract and return the meta_info attribute.
+  return (attr(omicsData, 'meta_info'))
+  
+}
+
+#' Fetch the filters attribute
+#' 
+#' Retrieves the values in the filters attribute from an omicsData object.
+#' 
+#' @param omicsData An object of class pepData, proData, metabData, lipidData,
+#'                  or nmrData.
+#'                  
+#' @return A list containing filter class objects. Each element in this list
+#'         corresponds to a filter applied to the data. The filters will be
+#'         listed in the order they were applied. A filter object contains two
+#'         elements:
+#'         \itemize{
+#'         
+#'           \item threshold -- The threshold used to filter \code{e_data}. This
+#'           value depends on the type of filter applied.
+#'           
+#'           \item filtered -- A vector containing the identifiers from the 
+#'           \code{edata_cname} column that will be filtered.
+#'           
+#'           \item method -- A character string indicating the type of method
+#'           used to filter. This only applies when imdanova_filter is used.
+#'         
+#'         }
+#' 
+#' @export
+#' 
+get_filters <- function (omicsData) {
+  
+  # Check class of omicsData.
+  if (!inherits(omicsData, c("pepData",
+                             "proData",
+                             "metabData",
+                             "lipidData",
+                             "nmrData"))) {
+    
+    # Lay down an error in the console.
+    stop (paste("omicsData must be of class 'pepData', 'proData',",
+                "'metabData', 'lipidData', or 'nmrData'",
+                sep = " "))
+    
+  }
+  
+  # Send a message if the filters object is empty.
+  if (length(attr(omicsData, 'filters')) == 0) {
+    
+    message("No filters have been applied.")
+    
+  }
+  
+  # Extract and return the filters attribute.
+  return (attr(omicsData, 'filters'))
+  
+}
+
+#' Fetch the check.names attribute
+#' 
+#' Retrieves the value in the check.names attribute from an omicsData object.
+#' 
+#' @param omicsData An object of class pepData, proData, metabData, lipidData,
+#'                  or nmrData.
+#'                  
+#' @return A logical value indicating if the syntax of the column names in a
+#'         data frame should be checked. See \code{\link[base]{data.frame}} for
+#'         more details.
+#' 
+#' @export
+#' 
+get_check_names <- function (omicsData) {
+  
+  # Check class of omicsData.
+  if (!inherits(omicsData, c("pepData",
+                             "proData",
+                             "metabData",
+                             "lipidData",
+                             "nmrData"))) {
+    
+    # Lay down an error in the console.
+    stop (paste("omicsData must be of class 'pepData', 'proData',",
+                "'metabData', 'lipidData', or 'nmrData'",
+                sep = " "))
+    
+  }
+  
+  # Extract and return the check.names attribute.
+  return (attr(omicsData, 'check.names'))
+  
+}
+
+#' Fetch the isobaric_info attribute
+#' 
+#' Retrieves the values in the isobaric_info attribute from an omicsData object.
+#' 
+#' @param omicsData An object of class pepData, proData, metabData, lipidData,
+#'                  or nmrData.
+#'                  
+#' @return A list containing the following six elements:
+#'         \itemize{
+#'         
+#'           \item exp_cname -- 
+#'           
+#'           \item channel_cname -- 
+#'           
+#'           \item refpool_channel -- 
+#'           
+#'           \item refpool_cname -- 
+#'           
+#'           \item refpool_notation -- 
+#'           
+#'           \item norm_info -- A list containing a single logical element that
+#'           indicates whether the data have been normalized to a reference
+#'           pool.
+#'         
+#'         }
+#' 
+#' @export
+#' 
+get_isobaric_info <- function (omicsData) {
+  
+  # Check class of omicsData.
+  if (!inherits(omicsData, c("pepData",
+                             "proData",
+                             "metabData",
+                             "lipidData",
+                             "nmrData"))) {
+    
+    # Lay down an error in the console.
+    stop (paste("omicsData must be of class 'pepData', 'proData',",
+                "'metabData', 'lipidData', or 'nmrData'",
+                sep = " "))
+    
+  }
+  
+  # Extract and return the isobaric_info attribute.
+  return (attr(omicsData, 'isobaric_info'))
+  
+}
+
+#' Fetch the nmr_info attribute
+#' 
+#' Retrieves the values in the nmr_info attribute from an omicsData object.
+#' 
+#' @param omicsData An object of class pepData, proData, metabData, lipidData,
+#'                  or nmrData.
+#'                  
+#' @return A list containing the following three elements:
+#'         \itemize{
+#'         
+#'           \item metabolite_name -- 
+#'           
+#'           \item sample_property_cname -- 
+#'           
+#'           \item norm_info -- A list containing two logical elements that
+#'           indicate i) whether the data have been normalized to a spiked in
+#'           metabolite or to a property taking sample-specific values and ii)
+#'           whether the data have been back transformed so the values are on a
+#'           similar scale to the raw values before normalization.
+#'         
+#'         }
+#' 
+#' @export
+#' 
+get_nmr_info <- function (omicsData) {
+  
+  # Check class of omicsData.
+  if (!inherits(omicsData, c("pepData",
+                             "proData",
+                             "metabData",
+                             "lipidData",
+                             "nmrData"))) {
+    
+    # Lay down an error in the console.
+    stop (paste("omicsData must be of class 'pepData', 'proData',",
+                "'metabData', 'lipidData', or 'nmrData'",
+                sep = " "))
+    
+  }
+  
+  # Extract and return the nmr_info attribute.
+  return (attr(omicsData, 'nmr_info'))
+  
+}
+
+
+#' Fetch the group_DF attribute
+#' 
+#' Retrieves the values in the group_DF attribute from an omicsData object.
+#' 
+#' @param omicsData An object of class pepData, proData, metabData, lipidData,
+#'                  or nmrData.
+#' 
+#' @return A data.frame with columns for sample ID and group. If two main
+#'         effects are provided the original main effect levels for each sample
+#'         are returned as the third and fourth columns of the data frame.
+#'         Additionally, the covariates provided will be listed as attributes of
+#'         this data frame.
+#' 
+#' @export
+#' 
+get_group_DF <- function (omicsData) {
+  
+  # Check class of omicsData.
+  if (!inherits(omicsData, c("pepData",
+                             "proData",
+                             "metabData",
+                             "lipidData",
+                             "nmrData"))) {
+    
+    # Lay down an error in the console.
+    stop (paste("omicsData must be of class 'pepData', 'proData',",
+                "'metabData', 'lipidData', or 'nmrData'",
+                sep = " "))
+    
+  }
+  
+  # Extract and return the group_DF attribute.
+  return (attr(omicsData, 'group_DF'))
+  
+}
+
 # Functions to set omicsData attributes ----------------------------------------
 
 # Create a set function that will return the value for each attribute. For 
 # example, set_data_info will perform all of the calculations to fill in the
 # data_info attribute. These functions will be called in the as.xxx functions
-# to create a xxData object but can be used individually to update any one of
+# to create an xxxData object but can be used individually to update any one of
 # the attributes at a later time.
 
+# Sets/updates the values in the data_info attribute
+#
+# @param e_data 
+#
+# @param edata_cname
+#
+# @param data_scale
+#
+# @param data_types
+#
+# @param norm_info
+#
+# @param is_normalized
+#
+# @return A list containing all the elements in the data_info attribute:
+#         (list all attributes)
+#
 set_data_info <- function (e_data,
                            edata_cname,
                            data_scale,
@@ -44,6 +378,15 @@ set_data_info <- function (e_data,
   
 }
 
+# Sets/updates the values in the meta_info attribute
+#
+# @param e_data 
+#
+# @param emeta_cname
+#
+# @return A list containing all the elements in the meta_info attribute:
+#         (list all attributes)
+#
 set_meta_info <- function (e_meta,
                            emeta_cname) {
   
@@ -54,6 +397,8 @@ set_meta_info <- function (e_meta,
   if (!is.null(emeta_cname)) {
     
     # Enumerate the number of unique proteins that map to a peptide in e_data.
+    # When using other data (e.g., lipid or metabolite) this counts the number
+    # of unique mapping variables associated with a biomolecule.
     num_emeta <- length(unique(e_meta[, emeta_cname]))
     
   } else {
@@ -69,7 +414,26 @@ set_meta_info <- function (e_meta,
   
 }
 
-# This is kind of a stupid function. Don't know why I wrote it.
+# Sets/updates the values in the isobaric_info attribute. This is kind of a
+# stupid function. Don't know why I wrote it.
+#
+# @param exp_cname
+#
+# @param channel_cname
+#
+# @param refpool_channel
+#
+# @param refpool_cname
+#
+# @param refpool_notation
+#
+# @param norm_info
+#
+# @param isobaric_norm
+#
+# @return A list containing all the elements in the isobaric_info attribute:
+#         (list all attributes)
+#
 set_isobaric_info <- function (exp_cname, 
                                channel_cname, 
                                refpool_channel, 
@@ -91,7 +455,22 @@ set_isobaric_info <- function (exp_cname,
   
 }
 
-# Another stupid function but what are you going to do?
+# Sets/updates the values in the nmr_info attribute. Another kind of stupid
+# function. I am on a roll!!!
+#
+# @param metabolite_name
+#
+# @param sample_property_cname
+#
+# @param norm_info
+#
+# @param nmr_norm
+#
+# @param backtransform
+#
+# @return A list containing all the elements in the nmr_info attribute:
+#         (list all attributes)
+#
 set_nmr_info <- function (metabolite_name,
                           sample_property_cname,
                           norm_info,
@@ -109,15 +488,35 @@ set_nmr_info <- function (metabolite_name,
   
 }
 
+# Sets/updates the filters attribute with a filter class object.
+#
 # This function will create a filter class object. The output will always have
-# the same attributes but not all of them will be used for every data type.
-set_filter <- function (threshold,
+# the same elements but not all of them will be used for every filter type. This
+# object will be appended to the list in the filters attribute for an omicsData
+# object.
+#
+# @param filter_type
+#
+# @param threshold
+#
+# @param filtered
+#
+# @param filter_method
+#
+# @return A list containing all the elements in the filters attribute:
+#         (list all attributes)
+#
+set_filter <- function (type,
+                        threshold,
                         filtered,
-                        filter_method = NULL) {
+                        method) {
   
   # Create an object that will have the filter elements and class added to it
   # later (in the next 10 lines or so).
   filta <- list()
+  
+  # Add the class of the filter being applied to filta.
+  filta$type <- type
   
   # Add threshold to filta.
   filta$threshold <- threshold
@@ -126,7 +525,7 @@ set_filter <- function (threshold,
   filta$filtered <- filtered
   
   # Affix the filter method to filta. This is only used with imdanovaFilt.
-  filta$method <- filter_method
+  filta$method <- method
   
   # Create the filter class.
   class(filta) = "filter"
@@ -229,7 +628,6 @@ getchecknames<- function(omicsData){
   return(result)
 }
 
-
 #' Set check.names attribute of omicsData object
 #' 
 #' This function sets the check.names attribute of an omicsData object
@@ -254,30 +652,6 @@ setchecknames<- function(omicsData, set_to = TRUE){
   
   return(omicsData)
 }
-
-
-#' Get group info of omicsObject object
-#' 
-#' This function returns the "group_DF" attribute of an omicsObject object
-#' 
-#' @param omicsObject an object of the class 'pepData', 'proData', 'metabData', 'lipidData', 'nmrData', 'statRes', or 'trellData', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, \code{\link{as.nmrData}}, \code{\link{imd_anova}}, or \code{\link{format_data}} respectively.
-#' @return a data.frame containing omicsObject object group info
-#' @examples 
-#' dontrun{
-#' get_group_info(omicsObject)
-#'}
-#' @rdname get_group_info
-#' @export
-get_group_info<- function(omicsObject){
-  # check that omicsObject is of appropriate class #
-  if(!inherits(omicsObject, c("pepData", "proData", "metabData", "lipidData", "nmrData", "statRes", "trellData"))) stop("omicsObject must be of class 'pepData', 'proData', 'metabData', 'lipidData', 'nmrData', 'statRes', or 'trellData'")
-  if(is.null(attr(omicsObject, "group_DF"))) stop("group_designation has not been run for omicsObject")
-  
-  res = attr(omicsObject, "group_DF")
-  
-  return(res)
-}
-
 
 #' Get group table
 #' 
@@ -315,12 +689,13 @@ get_group_table<- function(omicsObject){
 #'}
 #' @rdname get_data_scale
 #' @export
-get_data_scale<- function(omicsObject){
+get_data_scale <- function (omicsObject){
+  
   # check that omicsObject is of appropriate class #
   if(!inherits(omicsObject, c("pepData", "proData", "metabData", "lipidData", "nmrData", "statRes", "trellData"))) stop("omicsObject must be of class 'pepData', 'proData', 'metabData', 'lipidData', 'nmrData', 'statRes', or 'trellData'")
   
-  data_scale = attr(omicsObject, "data_info")$data_scale
-  return(data_scale)
+  return(attr(omicsObject, "data_info")$data_scale)
+  
 }
 
 
@@ -415,7 +790,7 @@ get_fdata_cname<- function(omicsObject){
 #' @examples 
 #' dontrun{
 #' get_emeta_cname(omicsObject)
-#'}
+#' }
 #' @rdname get_emeta_cname
 #' @export
 get_emeta_cname<- function(omicsObject){
@@ -433,29 +808,6 @@ get_emeta_cname<- function(omicsObject){
   
   emeta_cname = attr(omicsObject, "cnames")$emeta_cname
   return(emeta_cname)
-}
-
-#' Get Filters
-#' 
-#' This function returns filters attribute
-#' 
-#' @param omicsData an object of the class 'pepData', 'proData', 'metabData', 'lipidData', or 'nmrData', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, respectively.
-#' @return a vector of filter names
-#' @examples 
-#' dontrun{
-#' get_filters(omicsData)
-#'}
-#' @rdname get_filters
-#' @export
-get_filters<- function(omicsData){
-  # check that omicsData is of appropriate class #
-  if(!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData", "nmrData"))) stop("omicsData must be of class 'pepData', 'proData', 'metabData', 'lipidData', or 'nmrData'")
-  
-  filters = names(attr(omicsData, "filters"))
-  
-  if(is.null(filters)) stop("no filters have been applied")
-  
-  return(filters)
 }
 
 #rollup combine_fn functions

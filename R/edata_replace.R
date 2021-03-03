@@ -66,8 +66,7 @@ edata_replace <- function(omicsData, x, y) {
   # Update the data_info attribute of the omicsData object.
   attr(omicsData,
        'data_info') <- set_data_info(e_data = omicsData$e_data,
-                                     edata_cname = attr(omicsData,
-                                                        'cnames')$edata_cname,
+                                     edata_cname = get_edata_cname(omicsData),
                                      data_scale = attr(omicsData,
                                                        'data_info')$data_scale,
                                      data_types = attr(omicsData,
