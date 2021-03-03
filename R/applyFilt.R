@@ -32,7 +32,7 @@
 #'   \code{pvalue_threshold} \tab numeric value between 0 and 1, specifying the
 #'   p-value, below which samples will be removed from the dataset. Default is
 #'   0.001. \cr \code{min_num_biomolecules} \tab numeric value greater than 10
-#'   (preferably greater than 50) that specifies the minimume number of
+#'   (preferably greater than 50) that specifies the minimum number of
 #'   biomolecules that must be present in order to create an rmdFilt object.
 #'   Using values less than 50 is not advised. \cr } For a \code{filter_object}
 #'   of type 'proteomicsFilt': \tabular{ll}{ \code{min_num_peps} \tab an
@@ -104,89 +104,122 @@ applyFilt <- function(filter_object, omicsData, ...){
 #' @name applyFilt
 #' @rdname applyFilt
 applyFilt.moleculeFilt <- function(filter_object, omicsData, min_num=2){
-
-  # check to see whether a moleculeFilt has already been run on omicsData #
-  if("moleculeFilt" %in% names(attributes(omicsData)$filters)){
-    # get previous threshold #
-    min_num_prev <- attributes(omicsData)$filters$moleculeFilt$threshold
-
-    stop(paste("A molecule filter has already been run on this dataset, using a 'min_num' of ", min_num_prev, ". See Details for more information about how to choose a threshold before applying the filter.", sep=""))
-
-
-  }else{ # no previous moleculeFilt, so go ahead and run it like normal #
-
-
-    # check that min_num is numeric and >=1 #
-    if(!inherits(min_num, c("numeric","integer")) | min_num < 1) stop("min_num must be an integer greater than or equal to 1")
-    # check that min_num is an integer #
-    if(min_num %% 1 != 0) stop("min_num must be an integer greater than or equal to 1")
-    # check that min_num is less than the number of samples #
-    if(min_num > max(filter_object$Num_Observations)) stop("min_num cannot be greater than the number of samples")
-    # check that min_num is of length 1 #
-    if(length(min_num) != 1) stop("min_num must be of length 1")
-
-    edata_cname <- attributes(omicsData)$cnames$edata_cname
-    emeta_cname <- attributes(omicsData)$cnames$emeta_cname
+  
+  # Perform some initial checks on the input arguments -------------------------
+  
+  # The min_num argument must be an integer and >= 1.
+  if (min_num %% 1 != 0 || min_num < 1) {
     
-    num_obs <- filter_object$Num_Observations
-    #min_num <- attr(filter_object, "min_num")
-
-    # get indices for which ones don't meet the min requirement #
-    inds <- which(num_obs < min_num)
-
-    if(length(inds) < 1){
-      filter.edata <- NULL
-    }
+    # Denounce the users heinous actions with an error.
+    stop ("min_num must be an integer greater than or equal to 1")
     
-    else{
-      filter.edata <- omicsData$e_data[, which(names(omicsData$e_data) == edata_cname)][inds]
-    }
-    
-    #checking if filter specifies all of omicsData$e_data
-    if(all(omicsData$e_data[[edata_cname]] %in% filter.edata)) {stop("filter_object specifies all samples in omicsData")}
-    
-    filter_object_new = list(edata_filt = filter.edata, emeta_filt = NULL, samples_filt = NULL)
-
-    # call the function that does the filter application
-    results_pieces <- pmartR_filter_worker(omicsData = omicsData, filter_object = filter_object_new)
-
-    # return filtered data object #
-    results <- omicsData
-    results$e_data <- results_pieces$temp.pep2
-    results$f_data <- results_pieces$temp.samp2
-    results$e_meta <- results_pieces$temp.meta1
-
-    # if group attribute is present, re-run group_designation in case filtering any items impacted the group structure
-    if(!is.null(attr(results, "group_DF"))){
-      results <- group_designation(omicsData = results, main_effects = attr(attr(omicsData, "group_DF"), "main_effects"), covariates = attr(attr(omicsData, "group_DF"), "covariates"), time_course = attr(attr(omicsData, "group_DF"), "time_course"))
-    }else{
-      # Update attributes (7/11/2016 by KS) - this is being done already in group_designation
-      attributes(results)$data_info$num_edata = length(unique(results$e_data[, edata_cname]))
-      attributes(results)$data_info$num_miss_obs = sum(is.na(results$e_data[,-which(names(results$e_data)==edata_cname)]))
-      attributes(results)$data_info$prop_missing = mean(is.na(results$e_data[,-which(names(results$e_data)==edata_cname)]))
-      attributes(results)$data_info$num_samps = ncol(results$e_data) - 1
-
-      if(!is.null(results$e_meta)){
-        # number of unique proteins that map to a peptide in e_data #
-        if(!is.null(emeta_cname)){
-          num_emeta = length(unique(results$e_meta[which(as.character(results$e_meta[, edata_cname]) %in% as.character(results$e_data[, edata_cname])), emeta_cname]))
-        }else{num_emeta = NULL}
-      }else{
-        num_emeta = NULL
-      }
-      attr(results, "data_info")$num_emeta = num_emeta
-      ## end of update attributes (7/11/2016 by KS)
-    }
-
-    # set attributes for which filters were run
-    attr(results, "filters")$moleculeFilt <- list(report_text = "", threshold = c(), filtered = c())
-    attr(results, "filters")$moleculeFilt$report_text <- paste("A molecule filter was applied to the data, removing ", edata_cname, "s ", "that were present in fewer than ", min_num, " samples. A total of ", length(filter.edata), " ", edata_cname, "s ", "were filtered out of the dataset by this filter.", sep="")
-    attr(results, "filters")$moleculeFilt$threshold <- min_num
-    attr(results, "filters")$moleculeFilt$filtered <- filter.edata
-
   }
 
-  return(results)
+  # check that min_num is less than the total number of samples #
+  if (min_num >= attr(filter_object, "num_samps")) {
+    
+    # Throw an error for the users audacity to besmirch the arguments in such a
+    # foul manner.
+    stop ("min_num cannot be greater than or equal to the number of samples")
+    
+  }
+  
+  # check that min_num is of length 1 #
+  if (length(min_num) != 1) {
+    
+    # Warn the user of their treachery with an error.
+    stop ("min_num must be of length 1")
+    
+  }
+  
+  # Prepare the information needed to filter the data --------------------------
+  
+  # Extract the column number containing the identifiers.
+  id_col <- which(names(omicsData$e_data) == get_edata_cname(omicsData))
+  
+  # Sniff out the indices that fall below the threshold.
+  inds <- which(filter_object$Num_Observations < min_num)
+  
+  # Compute the length of the inds vector and specify filter.edata accordingly.
+  if (length(inds) < 1) {
+    
+    # Set filter.edata to NULL because no rows in omicsData$e_data will be
+    # filtered out.
+    filter.edata <- NULL
+    
+  } else {
+    
+    # Fish out the identifiers that will be filtered.
+    filter.edata <- omicsData$e_data[, id_col][inds]
+    
+  }
+  
+  # Create a list that is used in the pmartR_filter_worker function.
+  filter_object_new <- list(edata_filt = filter.edata,
+                            emeta_filt = NULL,
+                            samples_filt = NULL)
+  
+  # Filter the data and update the attributes ----------------------------------
+  
+  # call the function that does the filter application
+  results_pieces <- pmartR_filter_worker(filter_object = filter_object_new,
+                                         omicsData = omicsData)
+  
+  # Update the omicsData data frames.
+  omicsData$e_data <- results_pieces$temp.pep2
+  omicsData$f_data <- results_pieces$temp.samp2
+  omicsData$e_meta <- results_pieces$temp.meta1
+  
+  # Check if group_DF attribute is present.
+  if (!is.null(attr(omicsData, "group_DF"))) {
+    
+    # Re-run group_designation in case filtering any items impacted the group
+    # structure. The attributes will also be updated in this function.
+    omicsData <- group_designation(omicsData = omicsData,
+                                   main_effects = attr(get_group_DF(omicsData),
+                                                       "main_effects"),
+                                   covariates = attr(get_group_DF(omicsData),
+                                                     "covariates"),
+                                   time_course = attr(get_group_DF(omicsData),
+                                                      "time_course"))
+    
+  } else {
+    
+    # Extract data_info attribute from omicsData. Some of the elements will be
+    # used to update this attribute.
+    dInfo <- attr(omicsData, 'data_info')
+    
+    # Update the data_info attribute.
+    attr(omicsData,
+         'data_info') <- set_data_info(e_data = omicsData$e_data,
+                                       edata_cname = get_edata_cname(omicsData),
+                                       data_scale = get_data_scale(omicsData),
+                                       data_types = dInfo$data_types,
+                                       norm_info = dInfo$norm_info,
+                                       is_normalized = dInfo$norm_info$is_normalized)
+    
+    # Update the meta_info attribute.
+    attr(omicsData,
+         'meta_info') <- set_meta_info(e_meta = omicsData$e_meta,
+                                       emeta_cname = get_emeta_cname(omicsData))
+    
+  }
+  
+  # Determine the number of filters applied previously and add one to it. This
+  # will include the current filter object in the next available space of the
+  # filters attribute list.
+  n_filters <- length(attr(omicsData, 'filters')) + 1
+  
+  # Update the filters attribute.
+  attr(omicsData,
+       'filters')[[n_filters]] <- set_filter(type = class(filter_object)[[1]],
+                                             threshold = min_num,
+                                             filtered = filter.edata,
+                                             method = NA)
+
+  # RETURN THE FILTERED OMICSDATA OBJECT! YAY!!!
+  return(omicsData)
+  
 }
 
 # function for cvFilt
