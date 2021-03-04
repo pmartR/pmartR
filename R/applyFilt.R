@@ -523,6 +523,9 @@ applyFilt.imdanovaFilt <- function(filter_object, omicsData, min_nonmiss_anova=N
 
 
     ## initial checks ##
+    
+    # verify group_designation has been run #
+    if(is.null(attributes(omicsData)$group_DF)){stop("group_designation() must be run on the omicsData object before applying the imdanova filter.")}
 
     # verify remove_singleton_groups is logical T/F #
     if(class(remove_singleton_groups) != "logical"){stop("remove_singletong_groups must be of class logical")}
