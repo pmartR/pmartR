@@ -121,7 +121,7 @@ plot.corRes <- function(corRes_object, omicsData = NULL, interactive = FALSE, x_
                      axis.ticks = element_blank(),
                      plot.title = element_text(size=title_size))
   }else{
-    heatmap <- ggplot(corRes_melt, aes(x = sampldIDx, y = sampleIDy)) +
+    heatmap <- ggplot(corRes_melt, aes(x = sampleIDx, y = sampleIDy)) +
       geom_tile(aes(fill = value)) +
       scale_fill_gradientn("Correlation", limits = colorbar_lim, colours = pal(50)) +
       xlab("") +  ylab("") +
