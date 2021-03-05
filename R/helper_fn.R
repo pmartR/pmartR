@@ -152,6 +152,44 @@ get_filters <- function (omicsData) {
   
 }
 
+# Extracts the types of filters that have been applied. This function will be
+# used at the beginning of the applyFilt function to give a warning if the
+# same type of filter has already been applied.
+get_filter_type <- function (omicsData) {
+  
+  # Store the filters attribute from the previous filters (if any).
+  pFilters <- attr(omicsData, 'filters')
+  
+  # Determine the length of the filters attribute. The length corresponds to the
+  # number of filters applied previously.
+  nFilters <- length(pFilters)
+  
+  # Check the length of filters.
+  if (nFilters == 0) {
+    
+    # If no filters have been applied return NULL.
+    return (NULL)
+    
+  } else {
+    
+    # Fabricate a vector to hold the filter types.
+    pTypes <- vector(length = nFilters)
+    
+    # Loop through each filter.
+    for (e in 1:nFilters) {
+      
+      # Extract the filter type.
+      pTypes[[e]] <- pFilters[[e]]$type
+      
+    }
+    
+    # Return the character vector containing the filter types!!
+    return (pTypes)
+    
+  }
+  
+}
+
 #' Fetch the check.names attribute
 #' 
 #' Retrieves the value in the check.names attribute from an omicsData object.

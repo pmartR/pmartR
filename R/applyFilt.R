@@ -107,6 +107,14 @@ applyFilt.moleculeFilt <- function(filter_object, omicsData, min_num=2){
   
   # Perform some initial checks on the input arguments -------------------------
   
+  # Check if a molecule filter has already been applied.
+  if ('moleculeFilt' %in% get_filter_type(omicsData)) {
+    
+    # Gently tell the user they have already applied a molecule filter.
+    warning ('A molecule filter has already been applied to this data set.')
+    
+  }
+  
   # The min_num argument must be an integer and >= 1.
   if (min_num %% 1 != 0 || min_num < 1) {
     
