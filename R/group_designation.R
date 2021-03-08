@@ -49,100 +49,177 @@
 #'
 #'@export
 
-
-group_designation <- function(omicsData, main_effects, covariates=NULL, time_course=NULL){
+group_designation <- function(omicsData, main_effects,
+                              covariates = NULL, time_course = NULL){
   
-  ### perform some initial checks that data is in an acceptable format ###
+  # Initial checks on input arguments ------------------------------------------
   
   # check that omicsData is of appropriate class #
-  if(!inherits(omicsData, c("lipidData","metabData","proData","pepData","isobaricpepData","nmrData"))) stop("omicsData is not an object of appropriate class")
+  if (!inherits(omicsData, c("pepData", "proData", "metabData",
+                             "isobaricpepData", "lipidData", "nmrData"))) {
+    
+    # Throw an error that the input for omicsData is not the appropriate class.
+    stop(paste("omicsData must be of class 'pepData', 'proData', 'metabData',",
+               "'isobaricpepData', 'lipidData', or 'nmrData'",
+               sep = ' '))
+    
+  } 
   
   # check that isobaric data has been normalized #
-  if(inherits(omicsData, "isobaricpepData") && 
-     (is.null(attr(omicsData, "isobaric_info")$norm_info$is_normalized) ||
-      (attr(omicsData, "isobaric_info")$norm_info$is_normalized != TRUE))) stop(
-        "omicsData with class 'isobaricpepData' must be normalized using normalize_isobaric(omicsData, apply_norm = TRUE) prior to calling group_designation()")
+  if (inherits(omicsData, "isobaricpepData") && 
+      (attr(omicsData, "isobaric_info")$norm_info$is_normalized != TRUE)) {
+    
+    # Lay down an isobaric error for the user to trip over.
+    stop (paste("omicsData with class 'isobaricpepData' must be normalized",
+                "using normalize_isobaric(omicsData, apply_norm = TRUE) prior",
+                "to calling group_designation()",
+                sep = " "))
+    
+  }
   # no need for an analogous check for nmrData objects because there are not 
   # entire samples that are used for normalization of NMR data
   
+  # Check main_effects ---------------
   
-  # Check that main_effects are character vector #
-  if( !is.character(main_effects) ) stop("main_effects must be a character vector.")
+  # Check that main_effects is a character vector #
+  if (!is.character(main_effects)) {
+    
+   # Stop production with a character vector error.
+    stop ("main_effects must be a character vector.")
+    
+  }
   
-  # Check that main_effects is of an appropriate length #
-  if (length(main_effects) < 1) stop("No main effects were provided")
-  if (length(main_effects) > 2) stop("No more than two main effects can be provided")
-  
-  # Check that covariates is of an appropriate length #
-  if( !is.null(covariates)){
-    if (length(covariates) > 2){
-      stop("No more than two covariates can be provided")
-    }
+  # Check that main_effects is of an appropriate length. The point is to be like
+  # Goldilocks.
+  if (length(main_effects) < 1) {
+    
+   # Error out with too few main effects.
+    stop("No main effects were provided")
+    
+  }
+  if (length(main_effects) > 2) {
+    
+   # Error out with too many main effects.
+    stop ("No more than two main effects can be provided")
+    
   }
   
   # Check that main_effects given are in f_data #
-  if(sum(main_effects %in% names(omicsData$f_data))!=length(main_effects)) stop("One or more of the main_effects is not found in f_data of omicsData")
-  
-  # Check time_course
-  if(!is.null(time_course)){
-    # added Aug 2020, since use of this argument is currently not actively supported #
-    if(is.na(time_course)){time_course = NULL}
-    stop("Use of time_course argument is currently not supported.")
+  if (sum(main_effects %in% names(omicsData$f_data)) != length(main_effects)) {
     
-    if(!is.character(time_course)){
+    stop("One or more of the main_effects is not found in f_data of omicsData")
+    
+  }
+  
+  # Check covariates ---------------
+  
+  # See if covariates are present.
+  if (!is.null(covariates)) {
+    
+    # Check that covariates is a character vector #
+    if (!is.character(covariates)) {
+      
+      # Stop production with a character vector error.
+      stop ("covariates must be a character vector.")
+      
+    }
+    
+    # Check that covariates is an appropriate length. Think Goldilocks! #
+    if (length(covariates) > 2) {
+      
+      # Error out with too many covariates.
+      stop ("No more than two covariates can be provided.")
+      
+    }
+    
+    # Check that covariates given are in f_data #
+    if (sum(covariates %in% names(omicsData$f_data)) != length(covariates)) {
+      
+      stop("One or more of the covariates is not found in f_data of omicsData")
+      
+    }
+    
+  }
+  
+  # Check time_course ---------------
+  
+  # See if time_course is present.
+  if (!is.null(time_course)) {
+    
+    # added Aug 2020, since use of this argument is currently not actively supported #
+    if (is.na(time_course)) {time_course = NULL}
+    
+    # Give an error and don't run the rest of the function because time_course
+    # is not currently supported.
+    stop (paste("Use of the time_course argument is currently not supported.",
+                "In group_designation set time_course = NULL.",
+                sep = " "))
+    
+    if (!is.character(time_course)) {
       # check that time_course is a character #
-      stop("time_course must be a character specifying the name of the variable denoting time")
+      stop ("time_course must be a character specifying the name of the variable denoting time")
     }
     
     # check that time_course is found in the data #
-    if(!(time_course %in% names(omicsData$f_data))) stop("time_course is not found in f_data of omicsData")
+    if(!(time_course %in% names(omicsData$f_data))) {
+      
+      stop ("time_course is not found in f_data of omicsData")
+      
+    }
     
     # check that no more than 1 main_effect is specified when time_course is non NULL #
-    if(length(main_effects) > 1) stop("Only 1 main effect may be specified when time_course is provided")
+    if(length(main_effects) > 1) {
+      
+      stop ("Only 1 main effect may be specified when time_course is provided")
+      
+    }
+    
   }
   
   ### end of preliminary checks ###
   
-  # store f_data temporarily #
-  temp_data = omicsData$f_data
+  # Create the group data frame and attributes ---------------------------------
   
   # pull sample id column name #
-  samp_id = attr(omicsData, "cnames")$fdata_cname
+  samp_id <- get_fdata_cname(omicsData)
   
   # Get number of main effects #
   n.maineffects = length(main_effects)
   
   # Case 1: 1 main effect variable #
-  if(n.maineffects==1){
-    # return groups as levels of the main effect variable #
-    Group = temp_data[,names(temp_data) %in% main_effects]
+  if (n.maineffects == 1) {
     
     # create output formatted with first column being sample id and second column group id #
-    output = data.frame(Sample.ID = temp_data[,samp_id], Group = as.character(Group), stringsAsFactors = FALSE)
+    output <- data.frame(Sample.ID = as.character(omicsData$f_data[, samp_id]),
+                         Group = as.character(omicsData$f_data[, main_effects]),
+                         stringsAsFactors = FALSE)
     names(output)[1] = samp_id
     
-  }
-  
-  # Case 2: 2 main effect variables #
-  if(n.maineffects==2){
-    
-    # get main effect variables #
-    obs.effects = temp_data[,names(temp_data)%in% main_effects]
-    obs.effects <- apply(obs.effects, 2, as.character)
+    # Case 2: 2 main effect variables #
+  } else if (n.maineffects == 2) {
     
     # create a group variable and paste main effect levels together for samples #
     # samples with a value of NA for either main effect will have a Group value of NA #
-    Group = rep(NA, nrow(temp_data))
+    Group = rep(NA, nrow(omicsData$f_data))
     
     # identify samples that will have a Group membership that is not missing #
-    nonna.group = (!is.na(obs.effects[,1]) & !is.na(obs.effects[,2]) )
+    nonna.group <- (!is.na(omicsData$f_data[, main_effects[[1]]]) &
+                      !is.na(omicsData$f_data[, main_effects[[2]]]))
     
-    Group[nonna.group] = paste(as.character(obs.effects[nonna.group,1]), as.character(obs.effects[nonna.group,2]), sep = "_")
+    # Combine names of the first and second main effects to create a group
+    # variable.
+    Group[nonna.group] <- paste(omicsData$f_data[nonna.group, main_effects[[1]]],
+                                omicsData$f_data[nonna.group, main_effects[[2]]],
+                               sep = "_")
     
     # create output formatted with first column being sample id and second column group id #
     # third and fourth columns are the original main effect levels #
-    output = data.frame(Sample.ID = temp_data[,samp_id], Group = Group, obs.effects, stringsAsFactors = FALSE)
-    names(output)[1] = samp_id
+    output <- data.frame(Sample.ID = as.character(omicsData$f_data[, samp_id]),
+                         Group = Group,
+                         me1 = as.character(omicsData$f_data[, main_effects[[1]]]),
+                         me2 = as.character(omicsData$f_data[, main_effects[[2]]]),
+                         stringsAsFactors = FALSE)
+    names(output) = c(samp_id, 'Group', main_effects[[1]], main_effects[[2]])
   }
   
   # if time_course is non NULL add a column to the output #
@@ -153,7 +230,8 @@ group_designation <- function(omicsData, main_effects, covariates=NULL, time_cou
   
   # check for group sizes <2; if there are any, set them to NA's # CHANGED BELOW
   
-  if(any(is.na(output$Group))){
+  # Check if any of the groups have NAs.
+  if (any(is.na(output$Group))) {
     ### COMMENTED OUT AUG 2020 TO UPDATE FUNCTIONALITY TO ALLOW FOR GROUPS OF SIZE 1
     #   output$Group = as.character(output$Group)
     #   sm.groups = which(table(output$Group)<2)
@@ -166,13 +244,27 @@ group_designation <- function(omicsData, main_effects, covariates=NULL, time_cou
     #   }
     
     # output a warning message listing the samples that are removed (7/8/2016 KS; updated Aug 2020 by KS)
-    na.samps = as.character(output[is.na(output$Group), samp_id])
-    n.samps = length(na.samps)
-    mystr <- paste("The following ", n.samps, " sample(s) has/have been removed from the dataset due to missing group information: ", sep="")
-    mystr2 <- paste(as.character(na.samps), sep="' '", collapse=", ")
+    na.group <- as.character(output[is.na(output$Group), samp_id])
+    n.samps = length(na.group)
+    mystr <- paste("The following ",
+                   n.samps,
+                   " sample(s) has/have been removed from the dataset due to",
+                   " missing group information: ",
+                   sep = "")
+    mystr2 <- paste(as.character(na.group), sep="' '", collapse=", ")
     warning(paste0(mystr, mystr2))
     # note: this doesn't actually remove them from the dataset, that is done further below
+    
+  } else {
+    
+    # If no group samples have NA values set na.group to null. This will allow
+    # all rows in the group data frame (output) to be selected.
+    na.group <- NULL
+    
   }
+  
+  # Set na.time to null because time course data is not supported.
+  na.time <- NULL
   
   # check for time courses with <2 samples; if there are any, set them to NA's
   ### commented out Aug 2020 ###
@@ -196,64 +288,59 @@ group_designation <- function(omicsData, main_effects, covariates=NULL, time_cou
   # mystr4 <- paste(as.character(sm.samps), sep="' '", collapse=", ")
   # warning(paste(mystr, mystr2, mystr3, mystr4, sep=""))
   
-  
-  
-  # find any samples with NA for group membership #
-  if(length(which(is.na(output$Group))) > 0){
-    na.group = as.character(output[which(is.na(output$Group)), samp_id])
-  }else{na.group = NULL}
-  
   # find any samples with NA for time course #
   ### commented out Aug 2020 ###
   # if(!is.null(time_course)){
   #   na.time = as.character(output[which(is.na(output$TimeCourse)), samp_id])
   # }else{
-  na.time = NULL
+  # na.time = NULL
   # }
   
+  # Select all rows that have an NA for either group or time.
   all.na = union(na.group, na.time)
   
   # remove samples with group or time NA from output and data
-  if(length(all.na) > 0){
+  if (length(all.na) > 0) {
+    
     # remove from output #
-    output2 = output[-which(output[,samp_id] %in% all.na),]
+    output <- output[-which(output[, samp_id] %in% all.na),]
     
-    # remove from e_data and f_data #
+    # Find rows or columns that need to be removed from e_data and f_data.
     edat_ids = which(names(omicsData$e_data) %in% all.na)
-    fdat_ids = which(temp_data[ , samp_id] %in% all.na)
+    fdat_ids = which(omicsData$f_data[, samp_id] %in% all.na)
     
-    omicsData$e_data = omicsData$e_data[,-edat_ids]
-    omicsData$f_data = omicsData$f_data[-fdat_ids,]
-  }else{output2 = output}
-  
-  attr(output2, "main_effects") = main_effects
-  attr(output2, "covariates") = covariates
-  ### changed to NA Aug 2020 ###
-  attr(output2, "time_course") = NULL #time_course
-  ## added attribute that lists groups with 2 or more samples Nov 2020 ##
-  nonsingleton_groups <- names(which(table(output2$Group) > 1))
-  attr(output2, "nonsingleton_groups") <- nonsingleton_groups
-  
-  attr(omicsData, "group_DF") = output2
-  
-  # Update attributes (7/7/2016 by KS)
-  edata_cname = attributes(omicsData)$cnames$edata_cname
-  emeta_cname = attributes(omicsData)$cnames$emeta_cname
-  attributes(omicsData)$data_info$num_edata = length(unique(omicsData$e_data[, edata_cname]))
-  attributes(omicsData)$data_info$num_miss_obs = sum(is.na(omicsData$e_data[,-which(names(omicsData$e_data)==edata_cname)]))
-  attributes(omicsData)$data_info$prop_missing = mean(is.na(omicsData$e_data[,-which(names(omicsData$e_data)==edata_cname)]))
-  attributes(omicsData)$data_info$num_samps = ncol(omicsData$e_data) - 1
-  
-  if(!is.null(omicsData$e_meta)){
-    # number of unique proteins that map to a peptide in e_data #
-    if(!is.null(emeta_cname)){
-      num_emeta = length(unique(omicsData$e_meta[which(as.character(omicsData$e_meta[, which(names(omicsData$e_meta) == edata_cname)]) %in% as.character(omicsData$e_data[, edata_cname])), emeta_cname]))
-    }else{num_emeta = NULL}
-  }else{
-    num_emeta = NULL
+    # Remove columns from e_data that have groups with NAs.
+    omicsData$e_data = omicsData$e_data[, -edat_ids]
+    
+    # Remove rows from f_data that have groups with NAs.
+    omicsData$f_data = omicsData$f_data[-fdat_ids, ]
+    
   }
-  attr(omicsData, "data_info")$num_emeta = num_emeta
-  ## end of update attributes (7/7/2016 by KS)
   
+  # Add attributes to the group data frame for the main effects, covariates,
+  # time course, and non-singleton groups.
+  attr(output, "main_effects") = main_effects
+  attr(output, "covariates") = covariates
+  ### changed to NA Aug 2020 ###
+  attr(output, "time_course") = NULL #time_course
+  ## added attribute that lists groups with 2 or more samples Nov 2020 ##
+  # Find groups with more than one sample in them.
+  nonsingleton_groups <- names(which(table(output$Group) > 1))
+  attr(output, "nonsingleton_groups") <- nonsingleton_groups
+  
+  # Add the group information to the group_DF attribute in the omicsData object.
+  attr(omicsData, "group_DF") = output
+  
+  # Update the data_info attribute.
+  attr(omicsData,
+       'data_info') <- set_data_info(e_data = omicsData$e_data,
+                                     edata_cname = get_edata_cname(omicsData),
+                                     data_scale = get_data_scale(omicsData),
+                                     data_types = get_data_info(omicsData)$data_types,
+                                     norm_info = get_data_info(omicsData)$norm_info,
+                                     is_normalized = get_data_info(omicsData)$norm_info$is_normalized)
+  
+  # Return the updated and polished omicsData object!!!
   return(omicsData)
+  
 }
