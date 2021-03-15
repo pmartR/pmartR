@@ -84,8 +84,8 @@ double calculate_cv(std::vector<double> numbers)
   for (unsigned int i = 0; i < numbers.size(); i++)
   {
     sum = sum + numbers[i];
-    mean = sum / numbers.size();
   }
+  mean = sum / numbers.size();
   double var = 0;
   for (unsigned int i = 0; i < numbers.size(); i++)
   {
@@ -192,4 +192,69 @@ std::list<double> pooled_cv_rcpp(arma::mat mtr,std::vector<std::string> group)
   }
     
 return final;
+}
+
+/*
+ * The following function calculates the CV when group data is not taken into
+ * account. This is the CV for the entire row (the CV is unpooled). 
+ * The input is a matrix containing the abundance of each biomolecule from the
+ * e_data object. The observations are down the rows and the samples are
+ * across the columns.
+ */
+// [[Rcpp::export]]
+std::list<double> unpooled_cv_rcpp(NumericMatrix mtr)
+{
+  
+  /*
+   * Initialize the final vector. This vector will hold the CV values for each
+   * row of the input matrix.
+   */
+  std::list<double> final;
+  
+  /*
+   * Initialize the temp vector. This vector will hold all the non missing
+   * values from each row. The CV will be calculated from this vector
+   */
+  std::vector<double> temp;
+  
+  // The coefficient of variation for each row of the input matrix.
+  double tempcv = 0;
+  
+  // Loop through each row of the input matrix to calculate the CV.
+  for (unsigned int i = 0; i < mtr.nrow(); i++) {
+    
+    // Loop through each column of the ith row in the input matrix.
+    for (unsigned int j = 0; j < mtr.ncol(); j++) {
+      
+      // Remove any NaNs from the vector.
+      if (ISNAN(mtr(i, j))) {
+        
+        continue;
+        
+      } else {
+        
+        /*
+         * Store the non missing values from the ith row in the temp vector.
+         * This vector will be used to calculate the ith CV.
+         */
+        temp.push_back(mtr(i, j));
+        
+      }
+      
+    }
+    
+    // Calculate the CV for the ith row of the input matrix.
+    tempcv = calculate_cv(temp);
+    
+    // Store the ith CV in the vector that will be returned at the end.
+    final.push_back(tempcv);
+    
+    // Clear the temp vector in preparation for the next iteration.
+    temp.clear();
+    
+  }
+  
+  // Return the vector of CVs!!!
+  return final;
+  
 }

@@ -61,6 +61,10 @@ pooled_cv_rcpp <- function(mtr, group) {
     .Call('_pmartR_pooled_cv_rcpp', PACKAGE = 'pmartR', mtr, group)
 }
 
+unpooled_cv_rcpp <- function(mtr) {
+    .Call('_pmartR_unpooled_cv_rcpp', PACKAGE = 'pmartR', mtr)
+}
+
 #' @export
 rcpp_hello_world <- function() {
     .Call('_pmartR_rcpp_hello_world', PACKAGE = 'pmartR')

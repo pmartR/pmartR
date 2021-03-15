@@ -104,7 +104,7 @@ cv_filter <- function(omicsData, use_groups = TRUE) {
   if (use_groups == FALSE || is.null(attr(omicsData, "group_DF"))) {
     
     # Calculate the unpooled coefficient of variation.
-    cvs <- apply(cur_edata, 1, cv.calc)
+    cvs <- unpooled_cv_rcpp(as.matrix(cur_edata))
     
     # For mysterious reasons multiply the unpooled CV by 100.
     cvs <- 100 * cvs
@@ -200,7 +200,6 @@ cv_filter <- function(omicsData, use_groups = TRUE) {
   return (output)
   
 }
-
 
 #' Calculate the Coefficient of Variation (CV)
 #'

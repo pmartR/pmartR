@@ -190,6 +190,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// unpooled_cv_rcpp
+std::list<double> unpooled_cv_rcpp(NumericMatrix mtr);
+RcppExport SEXP _pmartR_unpooled_cv_rcpp(SEXP mtrSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type mtr(mtrSEXP);
+    rcpp_result_gen = Rcpp::wrap(unpooled_cv_rcpp(mtr));
+    return rcpp_result_gen;
+END_RCPP
+}
 // rcpp_hello_world
 List rcpp_hello_world();
 RcppExport SEXP _pmartR_rcpp_hello_world() {
@@ -244,6 +255,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_pmartR_kw_rcpp", (DL_FUNC) &_pmartR_kw_rcpp, 2},
     {"_pmartR_nonmissing_per_grp", (DL_FUNC) &_pmartR_nonmissing_per_grp, 2},
     {"_pmartR_pooled_cv_rcpp", (DL_FUNC) &_pmartR_pooled_cv_rcpp, 2},
+    {"_pmartR_unpooled_cv_rcpp", (DL_FUNC) &_pmartR_unpooled_cv_rcpp, 1},
     {"_pmartR_rcpp_hello_world", (DL_FUNC) &_pmartR_rcpp_hello_world, 0},
     {"_pmartR_ptukey_speed", (DL_FUNC) &_pmartR_ptukey_speed, 2},
     {"_pmartR_two_factor_anova_cpp", (DL_FUNC) &_pmartR_two_factor_anova_cpp, 5},
