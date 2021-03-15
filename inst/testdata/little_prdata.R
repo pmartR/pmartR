@@ -1,3 +1,8 @@
+# The purpose of this script is to demonstrate how the e_data, f_data, and
+# e_meta data frames were created. It should NOT be rerun because the data sets
+# in pmartRdata will change over time and this will lead to errors in the unit
+# tests.
+
 # Generate data to test the as.proData function. -------------------------------
 
 # Load necessary libraries.
@@ -22,7 +27,7 @@ emeta <- data.frame(Reference = edata[, 1],
                                     size = 150,
                                     replace = TRUE))
 
-save(edata,
-     fdata,
-     emeta,
-     file = '~/pmartR/inst/testdata/little_prdata.RData')
+# save(edata,
+#      fdata,
+#      emeta,
+#      file = '~/pmartR/inst/testdata/little_prdata.RData')

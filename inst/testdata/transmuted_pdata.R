@@ -1,3 +1,8 @@
+# The purpose of this script is to demonstrate how the transfigured pepData
+# objects were created. It should NOT be rerun because the data sets in
+# pmartRdata will change over time and this will lead to errors in the unit
+# tests.
+
 # Load: pepData ----------------------------------------------------------------
 
 load(system.file('testdata',
@@ -29,8 +34,8 @@ l10pdata <- edata_transform(pdata,
                             "log10")
 
 # Save the transfigured pepData objects.
-save(pdata,
-     lpdata,
-     l2pdata,
-     l10pdata,
-     file = '~/pmartR/inst/testdata/transmuted_pdata.RData')
+# save(pdata,
+#      lpdata,
+#      l2pdata,
+#      l10pdata,
+#      file = '~/pmartR/inst/testdata/transmuted_pdata.RData')

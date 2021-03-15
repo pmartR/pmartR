@@ -1,3 +1,8 @@
+# The purpose of this script is to demonstrate how the e_data, f_data, and
+# e_meta data frames were created. It should NOT be rerun because the data sets
+# in pmartRdata will change over time and this will lead to errors in the unit
+# tests.
+
 # Fabricate the data to test the as.metabData function. ------------------------
 
 # I am saving these data sets (even though they are exact copies) in case the
@@ -25,7 +30,7 @@ emeta <- data.frame(Metabolite = edata[, 1],
                                     size = 80,
                                     replace = TRUE))
 
-save(edata,
-     fdata,
-     emeta,
-     file = '~/pmartR/inst/testdata/metaboliteData.RData')
+# save(edata,
+#      fdata,
+#      emeta,
+#      file = '~/pmartR/inst/testdata/metaboliteData.RData')

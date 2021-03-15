@@ -1,3 +1,8 @@
+# The purpose of this script is to demonstrate how the e_data, f_data, and
+# e_meta data frames were created. It should NOT be rerun because the data sets
+# in pmartRdata will change over time and this will lead to errors in the unit
+# tests.
+
 # Construct the data to test the as.nmrData function. --------------------------
 
 # I am saving these data sets (even though they are exact copies) in case the
@@ -23,7 +28,7 @@ emeta <- data.frame(emeta,
                     nmrClass = sub("_.*", "", emeta[, 2]))
 # The sub function extracts all characters before the first _.
 
-save(edata,
-     fdata,
-     emeta,
-     file = '~/pmartR/inst/testdata/nmrData.RData')
+# save(edata,
+#      fdata,
+#      emeta,
+#      file = '~/pmartR/inst/testdata/nmrData.RData')

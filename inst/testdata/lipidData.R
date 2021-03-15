@@ -1,3 +1,8 @@
+# The purpose of this script is to demonstrate how the e_data, f_data, and
+# e_meta data frames were created. It should NOT be rerun because the data sets
+# in pmartRdata will change over time and this will lead to errors in the unit
+# tests.
+
 # Forge the data to test the as.lipidData function. ----------------------------
 
 # I am saving these data sets (even though they are exact copies) in case the
@@ -21,7 +26,7 @@ emeta <- data.frame(LipidCommonName = edata[, 1],
                     LipidClass = sub("\\(.*", "", edata[, 1]))
 # The sub function extracts all characters before the first (.
 
-save(edata,
-     fdata,
-     emeta,
-     file = '~/pmartR/inst/testdata/lipidData.RData')
+# save(edata,
+#      fdata,
+#      emeta,
+#      file = '~/pmartR/inst/testdata/lipidData.RData')

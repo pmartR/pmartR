@@ -1,3 +1,8 @@
+# The purpose of this script is to demonstrate how the e_data, f_data, and
+# e_meta data frames were created. It should NOT be rerun because the data sets
+# in pmartRdata will change over time and this will lead to errors in the unit
+# tests.
+
 # Generate data to test the as.isobaricpepData function. -----------------------
 
 # Load necessary libraries.
@@ -19,7 +24,7 @@ emeta[, 1] <- edata[, 1]
 # Keep a copy of the original pep_fdata data frame.
 fdata <- isobaric_fdata
 
-save(edata,
-     fdata,
-     emeta,
-     file = '~/pmartR/inst/testdata/little_isodata.RData')
+# save(edata,
+#      fdata,
+#      emeta,
+#      file = '~/pmartR/inst/testdata/little_isodata.RData')

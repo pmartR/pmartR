@@ -168,10 +168,10 @@ pro_nil <- prdata2$e_data
 sum(pro_nil == 0)
 
 # Save the edata object with zeros in the data frame.
-save(iso_nil,
-     lip_nil,
-     met_nil,
-     nmr_nil,
-     pep_nil,
-     pro_nil,
-     file = '~/pmartR/inst/testdata/edata_nought.RData')
+# save(iso_nil,
+#      lip_nil,
+#      met_nil,
+#      nmr_nil,
+#      pep_nil,
+#      pro_nil,
+#      file = '~/pmartR/inst/testdata/edata_nought.RData')
