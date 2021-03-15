@@ -36,7 +36,7 @@ test_that('cv_filter and applyFilt produce the correct output',{
                c(150, 2))
   
   # Ensure the row sums are correct.
-  expect_identical(round(filter_cv$CV_pooled, 3),
+  expect_identical(round(filter_cv$CV, 3),
                    c(53.413, 44.024, 48.222, 51.462, 44.7, 55.745, 
                      80.581, 64.386, 44.421, 53.135, 28.859, 46.544, 
                      34.115, 48.714, 22.616, 105.602, 57.335, 12.66, 
@@ -88,7 +88,7 @@ test_that('cv_filter and applyFilt produce the correct output',{
                c(150, 2))
   
   # Ensure the row sums are correct.
-  expect_identical(round(filter_gdf$CV_pooled, 3),
+  expect_identical(round(filter_gdf$CV, 3),
                    c(36.012, 32.768, 31.93, 47.891, 20.448, 33.369, 42.747, 
                      36.528, 19.768, 26.027, 28.859, 29.821, 20.875, 19.629, 
                      22.616, 44.259, 36.152, 12.66, 7.951, 29.045, 52.619, 

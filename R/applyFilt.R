@@ -258,7 +258,7 @@ applyFilt.cvFilt <- function(filter_object, omicsData, cv_threshold = 150){
   if (cv_threshold <= 0) stop ("cv_threshold must be greater than 0.")
   
   # Check that cv_threshold is less than the largest CV value.
-  if (cv_threshold > max(na.omit(filter_object$CV_pooled))) {
+  if (cv_threshold > max(na.omit(filter_object$CV))) {
     
     # Throw an error because the user does not understand basic number line
     # protocol.
@@ -272,7 +272,7 @@ applyFilt.cvFilt <- function(filter_object, omicsData, cv_threshold = 150){
   id_col <- which(names(omicsData$e_data) == get_edata_cname(omicsData))
   
   # Sniff out the indices that fall below the threshold.
-  inds <- which(filter_object$CV_pooled > cv_threshold)
+  inds <- which(filter_object$CV > cv_threshold)
   
   # Compute the length of the inds vector and specify filter.edata accordingly.
   if (length(inds) < 1) {

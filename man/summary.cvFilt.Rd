@@ -9,7 +9,7 @@
 \arguments{
 \item{filter_object}{S3 object of class 'cvFilt' created by \code{\link{cv_filter}}.}
 
-\item{cv_threshold}{numeric value greater than 1 and less than the value given by filter_object$CV_pooled.  CV values above cv_threshold are filtered out. Default value is NULL.}
+\item{cv_threshold}{numeric value greater than 1 and less than the value given by filter_object$CV.  CV values above cv_threshold are filtered out. Default value is NULL.}
 }
 \value{
 a summary of the CV values, number of NA values, and non-NA values. If a CV threshold is provided the biomolecules that would be filtered, at this threshold, are reported.

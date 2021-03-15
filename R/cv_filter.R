@@ -144,35 +144,9 @@ cv_filter <- function(omicsData, use_groups = TRUE) {
         groupDF[-which(groupDF[, get_fdata_cname(omicsData)] %in% samps_to_rm),]
     }
     
-    ##########
-    #    ## format the data ##
-    #    temp_dat = data.table(omicsData$e_data)
-    #    melt_dat = melt(temp_dat, id.var = edata_id)
-    #
-    #    setnames(melt_dat, names(melt_dat)[2], samp_id)
-    #
-    #    merge_dat = merge(x = melt_dat, y = data.table(groupDF), by = samp_id, all.x = TRUE)
-    #
-    #    # group the data by peptide and group #
-    #    dat_grouped = dplyr::group_by_(data.frame(merge_dat), edata_id, "Group")
-    ##########
-    
-    #added 2/2/17 iobani lines 53-58 and 63,68,73,78
-    
     # Reorder the columns of cur_edata so the C++ function that calculates the
     # pooled CV can correctly account for group membership.
     cur_edata <- cur_edata[, order(groupDF$Group)]
-
-    ##########
-    #    cv_grouped = dplyr::group_by_(grp_cv, edata_id)
-    #
-    #    # calculate pooled cv #
-    #    pool_cv = dplyr::summarise(cv_grouped,
-    #    CV_pooled = 100*sum(CV_group[!is.na(CV_group)]*n_cv[!is.na(CV_group)])/
-    #    sum(n_cv[!is.na(CV_group)]))
-    ##########
-    
-    #added 2/2/17 iobani lines 87-95
     
     # Reorder the groups so the C++ function that calculates the pooled CV can
     # correctly account for group membership.
@@ -193,25 +167,24 @@ cv_filter <- function(omicsData, use_groups = TRUE) {
   
   # Create a data frame with the ID column from e_data and the CV values. This
   # data frame is called pool_cv even though the CV may not be pooled (this
-  # makes us mysterious). Call the column that holds the CV values CV_pooled.
-  # Again, the CV may not be pooled (this makes us even more mysterious).
+  # makes us mysterious).
   pool_cv <- data.frame(omicsData$e_data[, id_col],
-                        CV_pooled = cvs)
+                        CV = cvs)
   names(pool_cv)[1] <- get_edata_cname(omicsData)
   
   ## determine plotting window cutoff ##
   # calculate percentage of observations with CV <= 200 #
-  prct.less200 <- (sum(pool_cv$CV_pooled <= 200, na.rm = T) /
-                     length(pool_cv$CV_pooled[!is.na(pool_cv$CV_pooled)]))
+  prct.less200 <- (sum(pool_cv$CV <= 200, na.rm = T) /
+                     length(pool_cv$CV[!is.na(pool_cv$CV)]))
   
   if (prct.less200 > 0.95) {
-    x.max = min(200, quantile(pool_cv$CV_pooled, 0.99, na.rm = TRUE))
+    x.max = min(200, quantile(pool_cv$CV, 0.99, na.rm = TRUE))
   } else{
-    x.max = quantile(pool_cv$CV_pooled, 0.95, na.rm = TRUE)
+    x.max = quantile(pool_cv$CV, 0.95, na.rm = TRUE)
   }
   
   ## generate some summary stats for CV values, for PMART purposes only ##
-  tot.nas <- sum(is.na(pool_cv$CV_pooled))
+  tot.nas <- sum(is.na(pool_cv$CV))
   
   output <- data.frame(pool_cv, row.names = NULL)
   
@@ -225,47 +198,6 @@ cv_filter <- function(omicsData, use_groups = TRUE) {
   
   # Return the completed object. You did it!!!
   return (output)
-
-  #else{
-  #   # group designation has NOT been called on omicsData #
-  #   
-  #   samp_id <- attr(omicsData, "cnames")$fdata_cname
-  #   edata_id <- attr(omicsData, "cnames")$edata_cname
-  #   
-  #   cvs <-
-  #     apply(omicsData$e_data[, -which(names(omicsData$e_data) == edata_id)], 1, cv.calc)
-  #   
-  #   pool_cv <-
-  #     data.frame(omicsData$e_data[, which(names(omicsData$e_data) == edata_id)], CV_pooled = cvs)
-  #   names(pool_cv)[1] <- edata_id
-  #   
-  #   ## determine plotting window cutoff ##
-  #   # calculate percentage of observations with CV <= 200 #
-  #   prct.less200 <-
-  #     sum(pool_cv$CV_pooled <= 200, na.rm = T) / length(pool_cv$CV_pooled[!is.na(pool_cv$CV_pooled)])
-  #   
-  #   if (prct.less200 > 0.95) {
-  #     x.max = min(200, quantile(pool_cv$CV_pooled, 0.99, na.rm = TRUE))
-  #   } else{
-  #     x.max = quantile(pool_cv$CV_pooled, 0.95, na.rm = TRUE)
-  #   }
-  #   
-  #   ## generate some summary stats for CV values, for PMART purposes only ##
-  #   tot.nas <- sum(is.na(pool_cv$CV_pooled))
-  #   
-  #   output <- data.frame(pool_cv, row.names = NULL)
-  #   
-  #   orig_class <- class(output)
-  #   
-  #   class(output) <- c("cvFilt", orig_class)
-  #   
-  #   attr(output, "sample_names") <-
-  #     names(omicsData$e_data)[-which(names(omicsData$e_data) == attr(omicsData, "cnames")$edata_cname)]
-  #   attr(output, "group_DF") <- NULL
-  #   attr(output, "max_x_val") <- x.max
-  #   attr(output, "tot_nas") <- tot.nas
-  #   
-  # }
   
 }
 

@@ -392,7 +392,7 @@ print.rmdFilterSummary <- function(object){
 #' This function will provide basic summary statistics for the cv_filter object.
 #'
 #' @param filter_object S3 object of class 'cvFilt' created by \code{\link{cv_filter}}.
-#' @param cv_threshold numeric value greater than 1 and less than the value given by filter_object$CV_pooled.  CV values above cv_threshold are filtered out. Default value is NULL.
+#' @param cv_threshold numeric value greater than 1 and less than the value given by filter_object$CV.  CV values above cv_threshold are filtered out. Default value is NULL.
 #' @return a summary of the CV values, number of NA values, and non-NA values. If a CV threshold is provided the biomolecules that would be filtered, at this threshold, are reported.
 #'
 #'
@@ -410,14 +410,14 @@ summary.cvFilt <- function(filter_object, cv_threshold = NULL){
     # chack that cv_threshold is of length 1
     if(length(cv_threshold)>1) stop("cv_threshold must be numeric of length 1")
     # check that cv_threshold is more than 1 and less than max CV value
-    if(cv_threshold <= 1 | cv_threshold >= max(filter_object$CV_pooled, na.rm = TRUE)) stop("cv_threshold must be greater than 1 and less than the maximum CV_pooled value")
+    if(cv_threshold <= 1 | cv_threshold >= max(filter_object$CV, na.rm = TRUE)) stop("cv_threshold must be greater than 1 and less than the maximum CV value")
   }
   
   # get rid of NAs #
-  new_object <- filter_object[!is.na(filter_object$CV_pooled),]
+  new_object <- filter_object[!is.na(filter_object$CV),]
   
   # get summary of CVs #
-  CVs <- summary(new_object$CV_pooled)
+  CVs <- summary(new_object$CV)
   
   # get total NAs, total non-NAs #
   tot_NAs <- attributes(filter_object)$tot_nas
@@ -426,7 +426,7 @@ summary.cvFilt <- function(filter_object, cv_threshold = NULL){
   # get biomolecules to filter if cv_threshold is not NULL #
   filt <- NULL
   if(!is.null(cv_threshold)) {
-    filt <- as.character(new_object[new_object$CV_pooled > cv_threshold, 1])
+    filt <- as.character(new_object[new_object$CV > cv_threshold, 1])
     if(length(filt)==0) filt <- NULL
   }
   

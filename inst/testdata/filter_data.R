@@ -49,11 +49,11 @@ fdata_mol <- pmartRdata::pep_fdata
 pdata_cv <- cv_filter(pdata)
 
 # Determine which columns contain a cv value less than 150.
-leq <- which(pdata_cv$CV_pooled <= 150)
+leq <- which(pdata_cv$CV <= 150)
 
 # Obtain the indices that have cv values greater than 150 (these will be
 # filtered out later).
-geq <- which(pdata_cv$CV_pooled > 150)
+geq <- which(pdata_cv$CV > 150)
 
 set.seed(5)
 

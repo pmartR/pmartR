@@ -908,7 +908,7 @@ plot.cvFilt <- function(filter_object, cv_threshold = NULL, ...) {
     # chack that cv_threshold is of length 1
     if(length(cv_threshold)>1) stop("cv_threshold must be numeric of length 1")
     # check that cv_threshold is more than 1 and less than max CV value
-    if(cv_threshold <= 1 | cv_threshold >= max(filter_object$CV_pooled, na.rm = TRUE)) stop("cv_threshold must be greater than 1 and less than the maximum CV_pooled value")
+    if(cv_threshold <= 1 | cv_threshold >= max(filter_object$CV, na.rm = TRUE)) stop("cv_threshold must be greater than 1 and less than the maximum CV value")
   }
   
   if(!is.logical(log_scale)) stop("log_scale must be logical: TRUE or FALSE")
@@ -916,7 +916,7 @@ plot.cvFilt <- function(filter_object, cv_threshold = NULL, ...) {
   if(!(n_bins%%1 == 0)) stop("n_bins must be integer valued")
   
   # plotting object
-  new_object <- filter_object[!is.na(filter_object$CV_pooled),]
+  new_object <- filter_object[!is.na(filter_object$CV),]
   max_x_val <- attributes(filter_object)$max_x_val
   
   # labels
@@ -932,14 +932,14 @@ plot.cvFilt <- function(filter_object, cv_threshold = NULL, ...) {
   # scale transform and breaks depending on x-axis scale
   if(log_scale){
     trans <- "log2"
-    i <- log2(min(new_object$CV_pooled, na.rm = TRUE))
+    i <- log2(min(new_object$CV, na.rm = TRUE))
     breaks <- 0
     
     # define a step value that is evenly spaced in the log2 scale
-    step = (max(log2(new_object$CV_pooled), na.rm = TRUE) - min(log2(new_object$CV_pooled), na.rm = TRUE))/n_breaks
+    step = (max(log2(new_object$CV), na.rm = TRUE) - min(log2(new_object$CV), na.rm = TRUE))/n_breaks
     
     # create the normal scale labels that will be log2 transformed when passed to ggplot
-    while(2^i < max(new_object$CV_pooled, na.rm = TRUE)){
+    while(2^i < max(new_object$CV, na.rm = TRUE)){
       breaks <- c(breaks, 2^i)
       i <- i+step
     }
@@ -963,7 +963,7 @@ plot.cvFilt <- function(filter_object, cv_threshold = NULL, ...) {
   
   # main plot object
   p <- ggplot(new_object) +
-    geom_histogram(aes(x=CV_pooled), bins = n_bins, fill = "steelblue1") + 
+    geom_histogram(aes(x=CV), bins = n_bins, fill = "steelblue1") + 
     cutoff + bw +
     scale_x_continuous(breaks = breaks, trans = trans) +
     scale_y_continuous(breaks = scales::pretty_breaks(n=5)) +
