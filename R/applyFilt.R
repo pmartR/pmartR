@@ -115,6 +115,14 @@ applyFilt.moleculeFilt <- function(filter_object, omicsData, min_num=2){
     
   }
   
+  # check that min_num is of length 1 #
+  if (length(min_num) != 1) {
+    
+    # Warn the user of their treachery with an error.
+    stop ("min_num must be of length 1")
+    
+  }
+  
   # The min_num argument must be an integer and >= 1.
   if (min_num %% 1 != 0 || min_num < 1) {
     
@@ -129,14 +137,6 @@ applyFilt.moleculeFilt <- function(filter_object, omicsData, min_num=2){
     # Throw an error for the users audacity to besmirch the arguments in such a
     # foul manner.
     stop ("min_num cannot be greater than or equal to the number of samples")
-    
-  }
-  
-  # check that min_num is of length 1 #
-  if (length(min_num) != 1) {
-    
-    # Warn the user of their treachery with an error.
-    stop ("min_num must be of length 1")
     
   }
   
@@ -235,76 +235,125 @@ applyFilt.moleculeFilt <- function(filter_object, omicsData, min_num=2){
 #' @name applyFilt
 #' @rdname applyFilt
 applyFilt.cvFilt <- function(filter_object, omicsData, cv_threshold = 150){
-
-  # check to see whether a cvFilt has already been run on omicsData #
-  if("cvFilt" %in% names(attributes(omicsData)$filters)){
-    # get previous threshold #
-    cv_threshold_prev <- attributes(omicsData)$filters$cvFilt$threshold
-
-    stop(paste("A CV filter has already been run on this dataset, using a 'cv_threshold' of ", cv_threshold_prev, ". See Details for more information about how to choose a threshold before applying the filter.", sep=""))
-
-
-  }else{ # no previous cvFilt, so go ahead and run it like normal #
-
-    # check that cv_threshold is greater than 0 #
-    if(cv_threshold <= 0) stop("cv_threshold must be greater than 0.")
-
-    samp_cname <- attributes(omicsData)$cnames$fdata_cname
-    edata_cname <- attributes(omicsData)$cnames$edata_cname
-    emeta_cname <- attributes(omicsData)$cnames$emeta_cname
-
-    # determine which peptides have a CV greater than the threshold #
-    p.ids = which(filter_object$CV_pooled > cv_threshold)
   
-    # return peptide names to be filtered #
-    if(length(p.ids) > 0){p_filt = as.character(filter_object[p.ids,1])}else{p_filt = NULL}
+  # Perform some initial checks on the input arguments -------------------------
+
+  # Check if a CV filter has already been applied.
+  if ('cvFilt' %in% get_filter_type(omicsData)) {
     
-    #checking if filter specifies all peptides
-    if(all(omicsData$e_data[[edata_cname]] %in% p_filt)) {stop("filter_object specifies all peptides in omicsData")}
+    # Slap the users wrist with a warning.
+    warning ('A CV filter has already been applied to this data set.')
     
-    filter_object_new = list(edata_filt = p_filt, emeta_filt = NULL, samples_filt = NULL)
-
-    # call the function that does the filter application
-    results_pieces <- pmartR_filter_worker(omicsData = omicsData, filter_object = filter_object_new)
-
-    # return filtered data object #
-    results <- omicsData
-    results$e_data <- results_pieces$temp.pep2
-    results$f_data <- results_pieces$temp.samp2
-    results$e_meta <- results_pieces$temp.meta1
-
-    # if group attribute is present, re-run group_designation in case filtering any items impacted the group structure
-    if(!is.null(attr(results, "group_DF"))){
-      results <- group_designation(omicsData = results, main_effects = attr(attr(omicsData, "group_DF"), "main_effects"), covariates = attr(attr(omicsData, "group_DF"), "covariates"), time_course = attr(attr(omicsData, "group_DF"), "time_course"))
-    }else{
-      # Update attributes (7/11/2016 by KS) - this is being done already in group_designation
-      attributes(results)$data_info$num_edata = length(unique(results$e_data[, edata_cname]))
-      attributes(results)$data_info$num_miss_obs = sum(is.na(results$e_data[,-which(names(results$e_data)==edata_cname)]))
-      attributes(results)$data_info$prop_missing = mean(is.na(results$e_data[,-which(names(results$e_data)==edata_cname)]))
-      attributes(results)$data_info$num_samps = ncol(results$e_data) - 1
-
-      if(!is.null(results$e_meta)){
-        # number of unique proteins that map to a peptide in e_data #
-        if(!is.null(emeta_cname)){
-          num_emeta = length(unique(results$e_meta[which(as.character(results$e_meta[, edata_cname]) %in% as.character(results$e_data[, edata_cname])), emeta_cname]))
-        }else{num_emeta = NULL}
-      }else{
-        num_emeta = NULL
-      }
-      attr(results, "data_info")$num_emeta = num_emeta
-      ## end of update attributes (7/11/2016 by KS)
-    }
-
-    # set attributes for which filters were run
-
-    attr(results, "filters")$cvFilt <- list(report_text = "", threshold = c(), filtered = c())
-    attr(results, "filters")$cvFilt$report_text <- paste("A coefficient of variation (CV) filter was applied to the data, removing ", edata_cname, "s ", "with a CV greater than ", cv_threshold, ". A total of ", length(p.ids), " ", edata_cname, "s were filtered out of the dataset by this filter.", sep="")
-    attr(results, "filters")$cvFilt$threshold <- cv_threshold
-    attr(results, "filters")$cvFilt$filtered <- p.ids
-
   }
+  
+  # Check that cv_threshold is a scalar.
+  if (length(cv_threshold) != 1) {
+    
+    # Stop the treacherous snake with an error!
+    stop ("cv_threshold must be a scalar.")
+    
+  }
+  
+  # check that cv_threshold is greater than 0 #
+  if (cv_threshold <= 0) stop ("cv_threshold must be greater than 0.")
+  
+  # Check that cv_threshold is less than the largest CV value.
+  if (cv_threshold > max(na.omit(filter_object$CV_pooled))) {
+    
+    # Throw an error because the user does not understand basic number line
+    # protocol.
+    stop ("cv_threshold cannot be greater than the largest CV value.")
+    
+  }
+  
+  # Prepare the information needed to filter the data --------------------------
+  
+  # Extract the column number containing the identifiers.
+  id_col <- which(names(omicsData$e_data) == get_edata_cname(omicsData))
+  
+  # Sniff out the indices that fall below the threshold.
+  inds <- which(filter_object$CV_pooled > cv_threshold)
+  
+  # Compute the length of the inds vector and specify filter.edata accordingly.
+  if (length(inds) < 1) {
+    
+    # Set filter.edata to NULL because no rows in omicsData$e_data will be
+    # filtered out.
+    filter.edata <- NULL
+    
+  } else {
+    
+    # Fish out the identifiers that will be filtered.
+    filter.edata <- omicsData$e_data[, id_col][inds]
+    
+  }
+  
+  # Create a list that is used in the pmartR_filter_worker function.
+  filter_object_new <- list(edata_filt = filter.edata,
+                            emeta_filt = NULL,
+                            samples_filt = NULL)
+  
+  # Filter the data and update the attributes ----------------------------------
+  
+  # call the function that does the filter application
+  results_pieces <- pmartR_filter_worker(filter_object = filter_object_new,
+                                         omicsData = omicsData)
+  
+  # Update the omicsData data frames.
+  omicsData$e_data <- results_pieces$temp.pep2
+  omicsData$f_data <- results_pieces$temp.samp2
+  omicsData$e_meta <- results_pieces$temp.meta1
+  
+  # Check if group_DF attribute is present.
+  if (!is.null(attr(omicsData, "group_DF"))) {
+    
+    # Re-run group_designation in case filtering any items impacted the group
+    # structure. The attributes will also be updated in this function.
+    omicsData <- group_designation(omicsData = omicsData,
+                                   main_effects = attr(get_group_DF(omicsData),
+                                                       "main_effects"),
+                                   covariates = attr(get_group_DF(omicsData),
+                                                     "covariates"),
+                                   time_course = attr(get_group_DF(omicsData),
+                                                      "time_course"))
+    
+  } else {
+    
+    # Extract data_info attribute from omicsData. Some of the elements will be
+    # used to update this attribute.
+    dInfo <- attr(omicsData, 'data_info')
+    
+    # Update the data_info attribute.
+    attr(omicsData,
+         'data_info') <- set_data_info(e_data = omicsData$e_data,
+                                       edata_cname = get_edata_cname(omicsData),
+                                       data_scale = get_data_scale(omicsData),
+                                       data_types = dInfo$data_types,
+                                       norm_info = dInfo$norm_info,
+                                       is_normalized = dInfo$norm_info$is_normalized)
+    
+    # Update the meta_info attribute.
+    attr(omicsData,
+         'meta_info') <- set_meta_info(e_meta = omicsData$e_meta,
+                                       emeta_cname = get_emeta_cname(omicsData))
+    
+  }
+  
+  # Determine the number of filters applied previously and add one to it. This
+  # will include the current filter object in the next available space of the
+  # filters attribute list.
+  n_filters <- length(attr(omicsData, 'filters')) + 1
+  
+  # Update the filters attribute.
+  attr(omicsData,
+       'filters')[[n_filters]] <- set_filter(type = class(filter_object)[[1]],
+                                             threshold = cv_threshold,
+                                             filtered = filter.edata,
+                                             method = NA)
 
-  return(results)
+  # We did it! Kudos to us!!
+  return (omicsData)
+  
 }
 
 
