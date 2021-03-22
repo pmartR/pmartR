@@ -308,8 +308,9 @@ test_that("rmd_filter and applyFilt produce the correct output",{
                          omicsData = nmrdata,
                          pvalue_threshold = 0.0001,
                          min_num_biomolecules = 50),
-               paste("There are fewer than min_num_biomolecules = 50",
-                     "biomolecules in omicsData. See applyFilt for details.",
+               paste("There are fewer biomolecules in omicsData than",
+                     "min_num_biomolecules \\(50\\).",
+                     "See applyFilt for details.",
                      sep = " "))
   
   # Apply the filter to the nmr data without singleton groups.
