@@ -231,9 +231,6 @@ rmd_filter <- function(omicsData,
   # Extricate the column number from e_data that contains the IDs.
   id_col <- which(names(omicsData$e_data) == get_edata_cname(omicsData))
   
-  # Fish out the column number from f_data that contains sample IDs.
-  id_col_f <- which(names(omicsData$f_data) == get_fdata_cname(omicsData))
-  
   # Convert metrics to lower case for matching purposes.
   metrics <- tolower(metrics)
   
@@ -241,7 +238,7 @@ rmd_filter <- function(omicsData,
   metrics_final <- rep(NA, 5)
   
   # Initialize a data frame with the sample ID column from f_data.
-  rmd.vals <- data.frame(Sample.ID = omicsData$f_data[, id_col_f])
+  rmd.vals <- data.frame(Sample.ID = names(omicsData$e_data[, -id_col]))
   
   # Compute the median absolute deviation across the samples (columns).
   if (any(metrics %in% c("mad", "m", "median absolute deviation",
@@ -359,7 +356,8 @@ rmd_filter <- function(omicsData,
       }
       
       ## Calculate Robust Mahalanobis Distance ##
-      med.mat = matrix(apply(rmd.vals[,-1], 2, median), nrow = (ncol(rmd.vals)-1))
+      med.mat = matrix(apply(rmd.vals[,-1], 2, median),
+                       nrow = (ncol(rmd.vals)-1))
       
       rob.dist.vals = try (apply(rmd.vals[,-1], 1, mal.fun))
       
@@ -420,7 +418,8 @@ rmd_filter <- function(omicsData,
                  t(robpca.res@loadings))
     
     ## Calculate Robust Mahalanobis Distance ##
-    med.mat = matrix(apply(rmd.vals[,-1], 2, median), nrow = (ncol(rmd.vals)-1))
+    med.mat = matrix(apply(rmd.vals[,-1], 2, median),
+                     nrow = (ncol(rmd.vals)-1))
     
     rob.dist.vals = apply(rmd.vals[,-1], 1, mal.fun)
     
