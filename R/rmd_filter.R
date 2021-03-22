@@ -13,7 +13,12 @@
 #'  returned only for samples in groups of size greater than 1. This is used
 #'  when calculating the correlation.
 #'  
-#'@param ... further arguments
+#'@param metrics A character vector indicating which metrics should be used when
+#'       calculating the robust Mahalanobis distance. This vector must contain
+#'       between two and five of the following options: "MAD" (Median Absolute
+#'       Deviation), "Kurtosis", "Skewness", "Correlation", and
+#'       "Proportion_Missing". The default is NULL. When NULL a combination of
+#'       metrics will be chosen depending on the class of omicsData.
 #'
 #'@return a data.frame containing columns for the Sample ID, log2 robust
 #'  Mahalanobis distance, p-values, and robust Mahalanobis distance
@@ -56,839 +61,400 @@
 #'
 #'@export
 #'
-#'
 #'@rdname rmd_filter
 #'@name rmd_filter
 #'  
-rmd_filter <- function(omicsData, ignore_singleton_groups = TRUE, ...){
-
+rmd_filter <- function(omicsData,
+                       ignore_singleton_groups = TRUE,
+                       metrics = NULL) {
+  
+  # Create functions to be used later ------------------------------------------
+  
+  # This function will be used in two different places later depending on the
+  # metrics used in the input. It is here so changes only need to be made in one
+  # location of the code.
+  mal.fun <- function(x) (t(as.vector(x) - med.mat) %*%
+                            solve(as.matrix(cov.mat)) %*%
+                            (as.vector(x) - med.mat))
+  
+  # Run some preliminary checks ------------------------------------------------
+  
   # check that omicsData is of appropriate class #
-  if(!inherits(omicsData, c("pepData", "proData", "lipidData", "metabData", "nmrData"))) stop("omicsData is not of an appropriate class")
+  if (!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData",
+                             "nmrData"))) {
+    
+    # Throw down an error like Zeus with his lightning bolts.
+    stop (paste("omicsData must be of class 'pepData', 'proData', 'metabData',",
+                "'lipidData', or 'nmrData'",
+                sep = ' '))
+    
+  }
   
   # check that ignore_singleton_groups is logical #
-  if(!is.logical(ignore_singleton_groups)){
-    stop("ignore_singleton_groups must be either TRUE or FALSE")
+  if (!is.logical(ignore_singleton_groups)) {
+    
+    # Stop the illogical user with an error.
+    stop ("ignore_singleton_groups must be either TRUE or FALSE")
+    
   }
   
   # group_DF attribute is required #
-  if(is.null(attr(omicsData, "group_DF"))){
-    stop("omicsData must contain attribution information for 'group_DF'. See documentation for group_designation function for more information.")
+  if (is.null(attr(omicsData, "group_DF"))) {
+    
+    # Kindly tell the user they are wrong and point them in the right direction
+    # to get some much needed help.
+    stop (paste("omicsData must contain attribute information for 'group_DF'.",
+                "See documentation for group_designation function for more",
+                "information.",
+                sep = " "))
+    
   }
-
+  
   # data should be log transformed #
-  if(!attr(omicsData, "data_info")$data_scale %in% c("log2", "log10", "log")){
-    stop("omicsData$e_data should be log transformed prior to calling rmd_filter. See documentation for edata_transform function for more information.")
+  if (!attr(omicsData, "data_info")$data_scale %in% c("log2", "log10", "log")) {
+    
+    # Yet another error message for the user. Poor thing.
+    stop (paste("omicsData$e_data should be log transformed prior to calling",
+                "rmd_filter. See documentation for edata_transform function",
+                "for more information.",
+                sep = " "))
+    
   }
   
-  # throw a warning if there are fewer than 50 biomolecules in the data object #
-  if(attributes(omicsData)$data_info$num_edata < 50){
-    warning("Use the results of the RMD filter with caution due to a small number of biomolecules (<50).")
+  # Check the number of observations in e_data.
+  if (attributes(omicsData)$data_info$num_edata < 50) {
+    
+    # Warn the user that skimping on the sample size is ALWAYS a bad idea!
+    warning (paste("Use the results of the RMD filter with caution due to a",
+                   "small number of biomolecules (<50).",
+                   sep = " "))
+    
   }
-
-  UseMethod("rmd_filter")
-}
-
-
-### Peptide data function ###
-#'@export
-#'@rdname rmd_filter
-#'@name rmd_filter
-rmd_filter.pepData <- function(omicsData, ignore_singleton_groups = TRUE, metrics=c("MAD", "Kurtosis", "Skewness", "Correlation", "Proportion_Missing")){
-
-  ## some initial checks ##
-  if(length(metrics) < 2){
-    stop("Vector of metrics must contain at least two elements.")
-  }else{
-    if(length(metrics) > 5){
-      stop("Vector of metrics cannot contain more than five elements.")
+  
+  # Check if metrics is NULL.
+  if (is.null(metrics)) {
+    
+    # Take a looksie at the omicsData class.
+    if (inherits(omicsData, c("pepData", "proData"))) {
+      
+      # Set default metrics values for peptide and protein data.
+      metrics <- c("MAD", "Kurtosis", "Skewness", "Correlation",
+                   "Proportion_Missing")
+      
+    } else if (inherits(omicsData, c("lipidData", "metabData", "nmrData"))) {
+      
+      # Set default metrics values for lipid and metabolite data.
+      metrics <- c("MAD", "Kurtosis", "Skewness", "Correlation")
+      
     }
+    
+    # Check they didn't mess up the metrics vector (if it isn't NULL).
+  } else {
+    
+    # Make sure the entries in metrics are an acceptable type.
+    if (!all(metrics %in% c("MAD", "mad", "m", "median absolute deviation",
+                            "median_absolute_deviation",
+                            "Kurtosis", "kurtosis", "kurt", "k",
+                            "Skewness", "skew", "s", "skewness",
+                            "Correlation", "corr", "c", "cor", "correlation",
+                            "Proportion_Missing", "proportion_missing", "p",
+                            "prop_missing", "prop_miss", "proportion_miss",
+                            "prop", "proportion", "proportion missing",
+                            "prop miss", "proportion miss"))) {
+      
+      # Stop the user for using unholy elements in the metrics vector.
+      stop (paste("One or more of the elements in metrics does not match",
+                  "the acceptable values. See details for metrics in the",
+                  "rmd_filter documenation.",
+                  sep = " "))
+      
+    }
+    
+    # Make sure there are not any repeated metrics.
+    if (length(unique(metrics)) != length(metrics)) {
+      
+      # Stop the user for trying to use a metric more than once.
+      stop ("One or more of the elements in metrics occurs more than once.")
+      
+    }
+    
+    # Make sure the metrics vector as an appropriate number of elements
+    if (length(metrics) < 2) {
+      
+      # Just being Zeus again with the error throwing.
+      stop ("The metrics vector must contain at least two elements.")
+      
+    } else if (length(metrics) > 5) {
+      
+      # Zeus is nothing compared to pmartR!! BWAHAHAHA!!!
+      stop ("The metrics vector cannot contain more than five elements.")
+      
+    }
+    
   }
-
+  
+  # Carry out preliminary group calculations -----------------------------------
+  
+  # Create an object for the group_DF attribute with a name that is almost as
+  # long as using the call to the attr function.
   mintR_groupDF = attr(omicsData, "group_DF")
   
   ### Aug 2020: deal with any groups that have only a single sample in them ###
-  if(any(table(mintR_groupDF$Group)==1) & ignore_singleton_groups == TRUE){
-    # save original data, which has some singleton group(s) #
-    omicsData_orig <- omicsData
+  if (any(table(mintR_groupDF$Group) == 1) && ignore_singleton_groups) {
     
     # which groups have a single sample in them #
-    singleton_groups <- names(which(table(mintR_groupDF$Group)==1))
+    singleton_groups <- names(which(table(mintR_groupDF$Group) == 1))
     singleton_rows <- which(mintR_groupDF$Group %in% singleton_groups)
     
     # filter out samples corresponding to groups of size 1 #
-    to_remove <- as.character(mintR_groupDF[singleton_rows, get_fdata_cname(omicsData)])
+    to_remove <- as.character(mintR_groupDF[singleton_rows,
+                                            get_fdata_cname(omicsData)])
     myfilter <- custom_filter(omicsData, f_data_remove = to_remove)
     omicsData <- applyFilt(myfilter, omicsData)
     mintR_groupDF <- attr(omicsData, "group_DF")
     
-  }else{
-    # no singleton groups or we are NOT ignoring singleton groups, nothing to adjust/filter/etc. #
-    omicsData_orig <- omicsData
   }
   
-  
-  # run_group_meancor already deals with the TimeCourse option #
-  edata_id = attr(omicsData, "cnames")$edata_cname
-  edata_col_id = which(names(omicsData$e_data) == edata_id)
-  dat_only = omicsData$e_data[,-(edata_col_id)]
-
-  samp_id = attr(omicsData, "cnames")$fdata_cname
-  
-  if(length(samp_id) < 2*length(metrics)){
-    warning("Use the results of the RMD filter with caution due to a small number of samples relative to the number of metrics being used. Consider reducing the number of metrics being used.")
+  # Compare the number of samples to the number of metrics used.
+  if (dim(omicsData$f_data)[1] < 2*length(metrics)) {
+    
+    # Warn the user that little sample sizes are the bane of their existence.
+    warning (paste("Use the results of the RMD filter with caution due to a",
+                   "small number of samples relative to the number of metrics",
+                   "being used. Consider reducing the number of metrics being",
+                   "used.",
+                   sep = " "))
   }
-
-  ## Calculate metrics for RMD runs ##
-  # match the metrics (allow upper/lower case) #
-  metrics = tolower(metrics)
-  metrics_final = rep(NA, 5)
-
-  rmd.vals = data.frame(Sample.ID = run_prop_missing(dat_only)[,1])
-
-  if(any(metrics %in% c("mad", "m", "median absolute deviation", "median_absolute_deviation"))){
-    ind = which(metrics %in% c("mad", "m", "median absolute deviation", "median_absolute_deviation"))
-    if(length(ind)>1){stop("More than one of the entries in metric matches to use of MAD.")}
+  
+  # Compute the metrics used to calculate the RMD ------------------------------
+  
+  # Extricate the column number from e_data that contains the IDs.
+  id_col <- which(names(omicsData$e_data) == get_edata_cname(omicsData))
+  
+  # Fish out the column number from f_data that contains sample IDs.
+  id_col_f <- which(names(omicsData$f_data) == get_fdata_cname(omicsData))
+  
+  # Convert metrics to lower case for matching purposes.
+  metrics <- tolower(metrics)
+  
+  # Initialize a vector for counting the number of metrics used.
+  metrics_final <- rep(NA, 5)
+  
+  # Initialize a data frame with the sample ID column from f_data.
+  rmd.vals <- data.frame(Sample.ID = omicsData$f_data[, id_col_f])
+  
+  # Compute the median absolute deviation across the samples (columns).
+  if (any(metrics %in% c("mad", "m", "median absolute deviation",
+                         "median_absolute_deviation"))){
+    ind = which(metrics %in% c("mad", "m", "median absolute deviation",
+                               "median_absolute_deviation"))
+    if(length(ind)>1){
+      stop("More than one of the entries in metrics matches 'MAD'.")}
     metrics = metrics[-ind]
     metrics_final[1] = 1
-    rmd.vals$MAD = run_mad(dat_only)[,2]
+    rmd.vals$MAD = run_mad(omicsData$e_data[, -id_col])[,2]
   }
-
+  
+  # Compute the kurtosis across the samples (columns).
   if(any(metrics %in% c("kurtosis", "kurt", "k"))){
     ind = which(metrics %in% c("kurtosis", "kurt", "k"))
-    if(length(ind)>1){stop("More than one of the entries in metric matches to use of Kurtosis.")}
+    if(length(ind)>1){
+      stop("More than one of the entries in metrics matches 'Kurtosis'.")}
     metrics = metrics[-ind]
     metrics_final[2] = 1
-    rmd.vals$Kurtosis = run_kurtosis(dat_only)[,2]
+    rmd.vals$Kurtosis = run_kurtosis(omicsData$e_data[, -id_col])[,2]
   }
-
+  
+  # Compute the skewness across the samples (columns).
   if(any(metrics %in% c("skew", "s", "skewness"))){
     ind = which(metrics %in% c("skew", "s", "skewness"))
-    if(length(ind)>1){stop("More than one of the entries in metric matches to use of Skew.")}
+    if(length(ind)>1){
+      stop("More than one of the entries in metrics matches 'Skewness'.")}
     metrics = metrics[-ind]
     metrics_final[3] = 1
-    rmd.vals$Skewness = run_skewness(dat_only)[,2]
+    rmd.vals$Skewness = run_skewness(omicsData$e_data[, -id_col])[,2]
   }
-
+  
+  # Compute the correlation across the samples (columns).
   if(any(metrics %in% c("corr", "c", "cor", "correlation"))){
     ind = which(metrics %in% c("corr", "c", "cor", "correlation"))
-    if(length(ind)>1){stop("More than one of the entries in metric matches to use of Correlation.")}
+    if(length(ind)>1){
+      stop("More than one of the entries in metrics matches 'Correlation'.")}
     metrics = metrics[-ind]
     metrics_final[4] = 1
-    rmd.vals$Corr = suppressWarnings(run_group_meancor(omicsData, mintR_groupDF, ignore_singleton_groups)[,2])
-  }
-
-  if(any(metrics %in% c("proportion_missing", "p", "prop_missing", "prop_miss", "proportion_miss", "prop", "proportion", "proportion missing", "prop miss", "proportion miss"))){
-    ind = which(metrics %in% c("proportion_missing", "p", "prop_missing", "prop_miss", "proportion_miss", "prop", "proportion", "proportion missing", "prop miss", "proportion miss"))
-    if(length(ind)>1){stop("More than one of the entries in metric matches to use of Proportion_Missing.")}
-    metrics = metrics[-ind]
-    metrics_final[5] = 1
-    rmd.vals$Proportion_Missing = run_prop_missing(dat_only)[,2]
-  }
-
-  if(sum(metrics_final, na.rm=TRUE)<2){stop("Vector of metrics must contain at least two valid entries.")}
-
-  metrics_final_txt <- names(rmd.vals[,-1])
-
-  ## Conduct Robust PCA ##
-  robpca.res = rrcov:::PcaHubert(x = rmd.vals[,-1], k = (ncol(rmd.vals)-1), mcd = FALSE, scale = FALSE)
-
-  ## Calculate Covariance Matrix #
-  cov.mat = robpca.res@loadings %*% diag(robpca.res@eigenvalues) %*% t(robpca.res@loadings)
-
-  ## Calculate Robust Mahalanobis Distance ##
-  med.mat = matrix(apply(rmd.vals[,-1], 2, median), nrow = (ncol(rmd.vals)-1))
-
-  mal.fun <- function(x) t(as.vector(x) - med.mat) %*% solve(as.matrix(cov.mat)) %*% (as.vector(x) - med.mat)
-
-  rob.dist.vals = apply(rmd.vals[,-1], 1, mal.fun)
-
-  log2.dist.vals = log(rob.dist.vals, base = 2)
-
-  rmd.pvals = 1 - pchisq(rob.dist.vals, df = (ncol(rmd.vals)-1))
-
-  temp.res = data.frame(Sample.ID = rmd.vals[,1], Log2.md = log2.dist.vals, pvalue = rmd.pvals, rmd.vals[,-1])
-  names(temp.res)[1] = samp_id
-
-  output = merge(x = mintR_groupDF, y = temp.res, by = samp_id, all = TRUE)
-
-
-  orig_class <- class(output)
-
-  class(output) <- c("rmdFilt", orig_class)
-
-  attr(output, "sample_names") <- names(omicsData$e_data[,-which(names(omicsData$e_data) == edata_id)])
-  attr(output, "group_DF") <- attr(omicsData, "group_DF")
-  attr(output, "df") <- sum(!is.na(metrics_final))
-  attr(output, "metrics") <- metrics_final_txt
-
-  return(output)
-}
-
-
-
-### Prodata function ###
-#'@export
-#'@rdname rmd_filter
-#'@name rmd_filter
-rmd_filter.proData <- function(omicsData, ignore_singleton_groups = TRUE, metrics=c("MAD", "Kurtosis", "Skewness", "Correlation", "Proportion_Missing")){
-
-  ## some initial checks ##
-  if(length(metrics) < 2){
-    stop("Vector of metrics must contain at least two elements.")
-  }else{
-    if(length(metrics) > 5){
-      stop("Vector of metrics cannot contain more than five elements.")
-    }
-  }
-
-  mintR_groupDF = attr(omicsData, "group_DF")
-  
-  ### Aug 2020: deal with any groups that have only a single sample in them ###
-  if(any(table(mintR_groupDF$Group)==1) & ignore_singleton_groups == TRUE){
-    # save original data, which has some singleton group(s) #
-    omicsData_orig <- omicsData
-    
-    # which groups have a single sample in them #
-    singleton_groups <- names(which(table(mintR_groupDF$Group)==1))
-    singleton_rows <- which(mintR_groupDF$Group %in% singleton_groups)
-    
-    # filter out samples corresponding to groups of size 1 because we want to 
-    # construct the filter object without them (thus ignoring them) #
-    to_remove <- as.character(mintR_groupDF[singleton_rows, get_fdata_cname(omicsData)])
-    myfilter <- custom_filter(omicsData, f_data_remove = to_remove)
-    omicsData <- applyFilt(myfilter, omicsData)
-    mintR_groupDF <- attr(omicsData, "group_DF")
-    
-  }else{
-    # no singleton groups and/or nothing to adjust/filter/etc. #
-    omicsData_orig <- omicsData
-  }
-
-  # run_group_meancor already deals with the TimeCourse option #
-  edata_id = attr(omicsData, "cnames")$edata_cname
-  edata_col_id = which(names(omicsData$e_data) == edata_id)
-  dat_only = omicsData$e_data[,-(edata_col_id)]
-
-  samp_id = attr(omicsData, "cnames")$fdata_cname
-  
-  if(length(samp_id) < 2*length(metrics)){
-    warning("Use the results of the RMD filter with caution due to a small number of samples relative to the number of metrics being used. Consider reducing the number of metrics being used.")
-  }
-
-  ## Calculate metrics for RMD runs ##
-  # match the metrics (allow upper/lower case) #
-  metrics = tolower(metrics)
-  metrics_final = rep(NA, 5)
-
-  rmd.vals = data.frame(Sample.ID = run_prop_missing(dat_only)[,1])
-
-  if(any(metrics %in% c("mad", "m", "median absolute deviation", "median_absolute_deviation"))){
-    ind = which(metrics %in% c("mad", "m", "median absolute deviation", "median_absolute_deviation"))
-    if(length(ind)>1){stop("More than one of the entries in metric matches to use of MAD.")}
-    metrics = metrics[-ind]
-    metrics_final[1] = 1
-    rmd.vals$MAD = run_mad(dat_only)[,2]
-  }
-
-  if(any(metrics %in% c("kurtosis", "kurt", "k"))){
-    ind = which(metrics %in% c("kurtosis", "kurt", "k"))
-    if(length(ind)>1){stop("More than one of the entries in metric matches to use of Kurtosis.")}
-    metrics = metrics[-ind]
-    metrics_final[2] = 1
-    rmd.vals$Kurtosis = run_kurtosis(dat_only)[,2]
-  }
-
-  if(any(metrics %in% c("skew", "s", "skewness"))){
-    ind = which(metrics %in% c("skew", "s", "skewness"))
-    if(length(ind)>1){stop("More than one of the entries in metric matches to use of Skew.")}
-    metrics = metrics[-ind]
-    metrics_final[3] = 1
-    rmd.vals$Skewness = run_skewness(dat_only)[,2]
-  }
-
-  if(any(metrics %in% c("corr", "c", "cor", "correlation"))){
-    ind = which(metrics %in% c("corr", "c", "cor", "correlation"))
-    if(length(ind)>1){stop("More than one of the entries in metric matches to use of Correlation.")}
-    metrics = metrics[-ind]
-    metrics_final[4] = 1
-    rmd.vals$Corr = suppressWarnings(run_group_meancor(omicsData, mintR_groupDF, ignore_singleton_groups)[,2])
-  }
-
-  if(any(metrics %in% c("proportion_missing", "p", "prop_missing", "prop_miss", "proportion_miss", "prop", "proportion", "proportion missing", "prop miss", "proportion miss"))){
-    ind = which(metrics %in% c("proportion_missing", "p", "prop_missing", "prop_miss", "proportion_miss", "prop", "proportion", "proportion missing", "prop miss", "proportion miss"))
-    if(length(ind)>1){stop("More than one of the entries in metric matches to use of Proportion_Missing.")}
-    metrics = metrics[-ind]
-    metrics_final[5] = 1
-    rmd.vals$Proportion_Missing = run_prop_missing(dat_only)[,2]
-  }
-
-  if(sum(metrics_final, na.rm=TRUE)<2){stop("Vector of metrics must contain at least two valid entries.")}
-
-  metrics_final_txt <- names(rmd.vals[,-1])
-
-  ## Conduct Robust PCA ##
-  robpca.res = suppressWarnings(rrcov:::PcaHubert(x = rmd.vals[,-1], k = (ncol(rmd.vals)-1), mcd = FALSE, scale = FALSE))
-
-  ## Calculate Covariance Matrix #
-  cov.mat = suppressWarnings(robpca.res@loadings %*% diag(robpca.res@eigenvalues) %*% t(robpca.res@loadings))
-
-  ## Calculate Robust Mahalanobis Distance ##
-  med.mat = matrix(apply(rmd.vals[,-1], 2, median), nrow = (ncol(rmd.vals)-1))
-
-  mal.fun <- function(x) t(as.vector(x) - med.mat) %*% solve(as.matrix(cov.mat)) %*% (as.vector(x) - med.mat)
-
-  rob.dist.vals = apply(rmd.vals[,-1], 1, mal.fun)
-
-  log2.dist.vals = log(rob.dist.vals, base = 2)
-
-  rmd.pvals = 1 - pchisq(rob.dist.vals, df = (ncol(rmd.vals)-1))
-
-  temp.res = data.frame(Sample.ID = rmd.vals[,1], Log2.md = log2.dist.vals, pvalue = rmd.pvals, rmd.vals[,-1])
-  names(temp.res)[1] = samp_id
-
-  output = merge(x = mintR_groupDF, y = temp.res, by = samp_id, all = TRUE)
-
-  orig_class <- class(output)
-
-  class(output) <- c("rmdFilt", orig_class)
-
-  attr(output, "sample_names") <- names(omicsData$e_data)
-  attr(output, "group_DF") <- attr(omicsData, "group_DF")
-  attr(output, "df") <- sum(!is.na(metrics_final))
-  attr(output, "metrics") <- metrics_final_txt
-
-  return(output)
-}
-
-
-
-### Lipiddata function ###
-#'@export
-#'@rdname rmd_filter
-#'@name rmd_filter
-rmd_filter.lipidData <- function(omicsData, ignore_singleton_groups = TRUE, metrics=c("MAD", "Kurtosis", "Skewness", "Correlation")){
-
-  ## some initial checks ##
-  if(length(metrics) < 2){
-    stop("Vector of metrics must contain at least two elements.")
-  }else{
-    if(length(metrics) > 5){
-      stop("Vector of metrics cannot contain more than five elements.")
-    }
-  }
-
-  mintR_groupDF = attr(omicsData, "group_DF")
-  
-  ### Aug 2020: deal with any groups that have only a single sample in them ###
-  if(any(table(mintR_groupDF$Group)==1) & ignore_singleton_groups == TRUE){
-    # save original data, which has some singleton group(s) #
-    omicsData_orig <- omicsData
-    
-    # which groups have a single sample in them #
-    singleton_groups <- names(which(table(mintR_groupDF$Group)==1))
-    singleton_rows <- which(mintR_groupDF$Group %in% singleton_groups)
-    
-    # filter out samples corresponding to groups of size 1 #
-    to_remove <- as.character(mintR_groupDF[singleton_rows, get_fdata_cname(omicsData)])
-    myfilter <- custom_filter(omicsData, f_data_remove = to_remove)
-    omicsData <- applyFilt(myfilter, omicsData)
-    mintR_groupDF <- attr(omicsData, "group_DF")
-    
-  }else{
-    # no singleton groups, nothing to adjust/filter/etc. #
-    omicsData_orig <- omicsData
-  }
-
-  # run_group_meancor already deals with the TimeCourse option #
-  edata_id = attr(omicsData, "cnames")$edata_cname
-  edata_col_id = which(names(omicsData$e_data) == edata_id)
-  dat_only = omicsData$e_data[,-(edata_col_id)]
-
-  samp_id = attr(omicsData, "cnames")$fdata_cname
-  
-  if(length(samp_id) < 2*length(metrics)){
-    warning("Use the results of the RMD filter with caution due to a small number of samples relative to the number of metrics being used. Consider reducing the number of metrics being used.")
-  }
-
-  ## Calculate metrics for RMD runs ##
-  # match the metrics (allow upper/lower case) #
-  metrics = tolower(metrics)
-  metrics_final = rep(NA, 5)
-
-  rmd.vals = data.frame(Sample.ID = run_prop_missing(dat_only)[,1])
-
-  if(any(metrics %in% c("mad", "m", "median absolute deviation", "median_absolute_deviation"))){
-    ind = which(metrics %in% c("mad", "m", "median absolute deviation", "median_absolute_deviation"))
-    if(length(ind)>1){stop("More than one of the entries in metric matches to use of MAD.")}
-    metrics = metrics[-ind]
-    metrics_final[1] = 1
-    rmd.vals$MAD = run_mad(dat_only)[,2]
-  }
-
-  if(any(metrics %in% c("kurtosis", "kurt", "k"))){
-    ind = which(metrics %in% c("kurtosis", "kurt", "k"))
-    if(length(ind)>1){stop("More than one of the entries in metric matches to use of Kurtosis.")}
-    metrics = metrics[-ind]
-    metrics_final[2] = 1
-    rmd.vals$Kurtosis = run_kurtosis(dat_only)[,2]
-  }
-
-  if(any(metrics %in% c("skew", "s", "skewness"))){
-    ind = which(metrics %in% c("skew", "s", "skewness"))
-    if(length(ind)>1){stop("More than one of the entries in metric matches to use of Skew.")}
-    metrics = metrics[-ind]
-    metrics_final[3] = 1
-    rmd.vals$Skewness = run_skewness(dat_only)[,2]
-  }
-
-  if(any(metrics %in% c("corr", "c", "cor", "correlation"))){
-    ind = which(metrics %in% c("corr", "c", "cor", "correlation"))
-    if(length(ind)>1){stop("More than one of the entries in metric matches to use of Correlation.")}
-    metrics = metrics[-ind]
-    metrics_final[4] = 1
-    rmd.vals$Corr = suppressWarnings(run_group_meancor(omicsData, mintR_groupDF, ignore_singleton_groups)[,2])
-  }
-
-  if(any(metrics %in% c("proportion_missing", "p", "prop_missing", "prop_miss", "proportion_miss", "prop", "proportion", "proportion missing", "prop miss", "proportion miss"))){
-
-    # check to see whether there is any missing data
-    number_missing = sum(is.na(omicsData$e_data))
-    # if no missing data, we flat out refuse to include prop_missing in the metrics, so give a warning to this effect
-    if(number_missing == 0){
-      warning("There are no missing values in e_data, therefore prop_missing will not be used as one of the metrics for rMd-Runs.")
-    }else{
-
-      ind = which(metrics %in% c("proportion_missing", "p", "prop_missing", "prop_miss", "proportion_miss", "prop", "proportion", "proportion missing", "prop miss", "proportion miss"))
-      if(length(ind)>1){stop("More than one of the entries in metric matches to use of Proportion_Missing.")}
-      metrics = metrics[-ind]
-      metrics_final[5] = 1
-      rmd.vals$Proportion_Missing = run_prop_missing(dat_only)[,2]
-
-      ## proceed, to check the rank of cov.mat ##
-      # in case the user input 'enough' metrics (2-5) but they were not recognized by the code as valid entries #
-      if(sum(metrics_final, na.rm=TRUE)<2){stop("Vector of metrics must contain at least two valid entries.")}
-
-      ## Conduct Robust PCA ##
-      robpca.res = rrcov:::PcaHubert(x = rmd.vals[,-1], k = (ncol(rmd.vals)-1), mcd = FALSE, scale = FALSE)
-      if(inherits(robpca.res, "try-error")){
-        stop("There are not enough missing values in e_data to use prop_missing as one of the metrics. Try again, excluding prop_missing.")
-      }
-
-      ## Calculate Covariance Matrix #
-      cov.mat = robpca.res@loadings %*% diag(robpca.res@eigenvalues) %*% t(robpca.res@loadings)
-      # check the rank #
-      myrank = qr(cov.mat)$rank
-
-      if(myrank != length(metrics_final)){
-        stop("There are not enough missing values in e_data to use prop_missing as one of the metrics. Try again, excluding prop_missing.")
-      }
-
-      ## Calculate Robust Mahalanobis Distance ##
-      med.mat = matrix(apply(rmd.vals[,-1], 2, median), nrow = (ncol(rmd.vals)-1))
-
-      mal.fun <- function(x) t(as.vector(x) - med.mat) %*% solve(as.matrix(cov.mat)) %*% (as.vector(x) - med.mat)
-
-      rob.dist.vals = try(apply(rmd.vals[,-1], 1, mal.fun))
-      if(inherits(rob.dist.vals, "try-error")){
-        stop("There are not enough missing values in e_data to use prop_missing as one of the metrics. Try again, excluding prop_missing.")
-      }
-    }
-  }
-
-  # in case the user input 'enough' metrics (2-5) but they were not recognized by the code as valid entries
-  if(sum(metrics_final, na.rm=TRUE)<2){stop("Vector of metrics must contain at least two valid entries.")}
-
-  metrics_final_txt <- names(rmd.vals[,-1])
-
-  ## Conduct Robust PCA ##
-  robpca.res = rrcov:::PcaHubert(x = rmd.vals[,-1], k = (ncol(rmd.vals)-1), mcd = FALSE, scale = FALSE)
-
-  ## Calculate Covariance Matrix #
-  cov.mat = robpca.res@loadings %*% diag(robpca.res@eigenvalues) %*% t(robpca.res@loadings)
-
-  ## Calculate Robust Mahalanobis Distance ##
-  med.mat = matrix(apply(rmd.vals[,-1], 2, median), nrow = (ncol(rmd.vals)-1))
-
-  mal.fun <- function(x) t(as.vector(x) - med.mat) %*% solve(as.matrix(cov.mat)) %*% (as.vector(x) - med.mat)
-
-  rob.dist.vals = apply(rmd.vals[,-1], 1, mal.fun)
-
-  log2.dist.vals = log(rob.dist.vals, base = 2)
-
-  rmd.pvals = 1 - pchisq(rob.dist.vals, df = (ncol(rmd.vals)-1))
-
-  temp.res = data.frame(Sample.ID = rmd.vals[,1], Log2.md = log2.dist.vals, pvalue = rmd.pvals, rmd.vals[,-1])
-  names(temp.res)[1] = samp_id
-
-  output = merge(x = mintR_groupDF, y = temp.res, by = samp_id, all = TRUE)
-
-  orig_class <- class(output)
-
-  class(output) <- c("rmdFilt", orig_class)
-
-  attr(output, "sample_names") <- names(omicsData$e_data)
-  attr(output, "group_DF") <- attr(omicsData, "group_DF")
-  attr(output, "df") <- sum(!is.na(metrics_final))
-  attr(output, "metrics") <- metrics_final_txt
-
-  return(output)
-}
-
-
-
-### Metabdata function ###
-#'@export
-#'@rdname rmd_filter
-#'@name rmd_filter
-rmd_filter.metabData <- function(omicsData, ignore_singleton_groups = TRUE, metrics=c("MAD", "Kurtosis", "Skewness", "Correlation")){
-
-  ## some initial checks ##
-  if(length(metrics) < 2){
-    stop("Vector of metrics must contain at least two elements.")
-  }else{
-    if(length(metrics) > 5){
-      stop("Vector of metrics cannot contain more than five elements.")
-    }
-  }
-
-  mintR_groupDF = attr(omicsData, "group_DF")
-  
-  ### Aug 2020: deal with any groups that have only a single sample in them ###
-  if(any(table(mintR_groupDF$Group)==1) & ignore_singleton_groups == TRUE){
-    # save original data, which has some singleton group(s) #
-    omicsData_orig <- omicsData
-    
-    # which groups have a single sample in them #
-    singleton_groups <- names(which(table(mintR_groupDF$Group)==1))
-    singleton_rows <- which(mintR_groupDF$Group %in% singleton_groups)
-    
-    # filter out samples corresponding to groups of size 1 #
-    to_remove <- as.character(mintR_groupDF[singleton_rows, get_fdata_cname(omicsData)])
-    myfilter <- custom_filter(omicsData, f_data_remove = to_remove)
-    omicsData <- applyFilt(myfilter, omicsData)
-    mintR_groupDF <- attr(omicsData, "group_DF")
-    
-  }else{
-    # no singleton groups, nothing to adjust/filter/etc. #
-    omicsData_orig <- omicsData
-  }
-
-  # run_group_meancor already deals with the TimeCourse option #
-  edata_id = attr(omicsData, "cnames")$edata_cname
-  edata_col_id = which(names(omicsData$e_data) == edata_id)
-  dat_only = omicsData$e_data[,-(edata_col_id)]
-
-  samp_id = attr(omicsData, "cnames")$fdata_cname
-  
-  if(length(samp_id) < 2*length(metrics)){
-    warning("Use the results of the RMD filter with caution due to a small number of samples relative to the number of metrics being used. Consider reducing the number of metrics being used.")
-  }
-
-  ## Calculate metrics for RMD runs ##
-  # match the metrics (allow upper/lower case) #
-  metrics = tolower(metrics)
-  metrics_final = rep(NA, 5)
-  metrics_orig = metrics
-
-  rmd.vals = data.frame(Sample.ID = run_prop_missing(dat_only)[,1])
-
-  if(any(metrics %in% c("mad", "m", "median absolute deviation", "median_absolute_deviation"))){
-    ind = which(metrics %in% c("mad", "m", "median absolute deviation", "median_absolute_deviation"))
-    if(length(ind)>1){stop("More than one of the entries in metric matches to use of MAD.")}
-    metrics = metrics[-ind]
-    metrics_final[1] = 1
-    rmd.vals$MAD = run_mad(dat_only)[,2]
-  }
-
-  if(any(metrics %in% c("kurtosis", "kurt", "k"))){
-    ind = which(metrics %in% c("kurtosis", "kurt", "k"))
-    if(length(ind)>1){stop("More than one of the entries in metric matches to use of Kurtosis.")}
-    metrics = metrics[-ind]
-    metrics_final[2] = 1
-    rmd.vals$Kurtosis = run_kurtosis(dat_only)[,2]
-  }
-
-  if(any(metrics %in% c("skew", "s", "skewness"))){
-    ind = which(metrics %in% c("skew", "s", "skewness"))
-    if(length(ind)>1){stop("More than one of the entries in metric matches to use of Skew.")}
-    metrics = metrics[-ind]
-    metrics_final[3] = 1
-    rmd.vals$Skewness = run_skewness(dat_only)[,2]
-  }
-
-  if(any(metrics %in% c("corr", "c", "cor", "correlation"))){
-    ind = which(metrics %in% c("corr", "c", "cor", "correlation"))
-    if(length(ind)>1){stop("More than one of the entries in metric matches to use of Correlation.")}
-    metrics = metrics[-ind]
-    metrics_final[4] = 1
-    rmd.vals$Corr = suppressWarnings(run_group_meancor(omicsData, mintR_groupDF, ignore_singleton_groups)[,2])
-  }
-
-  if(any(metrics %in% c("proportion_missing", "p", "prop_missing", "prop_miss", "proportion_miss", "prop", "proportion", "proportion missing", "prop miss", "proportion miss"))){
-
-    # check to see whether there is any missing data
-    number_missing = sum(is.na(omicsData$e_data))
-    # if no missing data, we flat out refuse to include prop_missing in the metrics, so give a warning to this effect
-    if(number_missing == 0){
-      warning("There are no missing values in e_data, therefore prop_missing will not be used as one of the metrics for rMd-Runs.")
-    }else{
-
-      ind = which(metrics %in% c("proportion_missing", "p", "prop_missing", "prop_miss", "proportion_miss", "prop", "proportion", "proportion missing", "prop miss", "proportion miss"))
-      if(length(ind)>1){stop("More than one of the entries in metric matches to use of Proportion_Missing.")}
-      metrics = metrics[-ind]
-      metrics_final[5] = 1
-      rmd.vals$Proportion_Missing = run_prop_missing(dat_only)[,2]
-
-      ## proceed, to check the rank of cov.mat ##
-      # in case the user input 'enough' metrics (2-5) but they were not recognized by the code as valid entries #
-      if(sum(metrics_final, na.rm=TRUE)<2){stop("Vector of metrics must contain at least two valid entries.")}
-
-      ## Conduct Robust PCA ##
-      robpca.res = rrcov:::PcaHubert(x = rmd.vals[,-1], k = (ncol(rmd.vals)-1), mcd = FALSE, scale = FALSE)
-      if(inherits(robpca.res, "try-error")){
-        stop("There are not enough missing values in e_data to use prop_missing as one of the metrics. Try again, excluding prop_missing.")
-      }
-
-      ## Calculate Covariance Matrix #
-      cov.mat = robpca.res@loadings %*% diag(robpca.res@eigenvalues) %*% t(robpca.res@loadings)
-      # check the rank #
-      myrank = qr(cov.mat)$rank
-
-      if(myrank != length(metrics_final)){
-        stop("There are not enough missing values in e_data to use prop_missing as one of the metrics. Try again, excluding prop_missing.")
-      }
-
-      ## Calculate Robust Mahalanobis Distance ##
-      med.mat = matrix(apply(rmd.vals[,-1], 2, median), nrow = (ncol(rmd.vals)-1))
-
-      mal.fun <- function(x) t(as.vector(x) - med.mat) %*% solve(as.matrix(cov.mat)) %*% (as.vector(x) - med.mat)
-
-      rob.dist.vals = try(apply(rmd.vals[,-1], 1, mal.fun))
-      if(inherits(rob.dist.vals, "try-error")){
-        stop("There are not enough missing values in e_data to use prop_missing as one of the metrics. Try again, excluding prop_missing.")
-      }
-    }
-  }
-
-  if(sum(metrics_final, na.rm=TRUE)<2){stop("Vector of metrics must contain at least two valid entries.")}
-
-  metrics_final_txt <- names(rmd.vals[,-1])
-
-  ## Conduct Robust PCA ##
-  robpca.res = rrcov:::PcaHubert(x = rmd.vals[,-1], k = (ncol(rmd.vals)-1), mcd = FALSE, scale = FALSE)
-
-  ## Calculate Covariance Matrix #
-  cov.mat = robpca.res@loadings %*% diag(robpca.res@eigenvalues) %*% t(robpca.res@loadings)
-
-  ## Calculate Robust Mahalanobis Distance ##
-  med.mat = matrix(apply(rmd.vals[,-1], 2, median), nrow = (ncol(rmd.vals)-1))
-
-  mal.fun <- function(x) t(as.vector(x) - med.mat) %*% solve(as.matrix(cov.mat)) %*% (as.vector(x) - med.mat)
-
-  rob.dist.vals = apply(rmd.vals[,-1], 1, mal.fun)
-
-  log2.dist.vals = log(rob.dist.vals, base = 2)
-
-  rmd.pvals = 1 - pchisq(rob.dist.vals, df = (ncol(rmd.vals)-1))
-
-  temp.res = data.frame(Sample.ID = rmd.vals[,1], Log2.md = log2.dist.vals, pvalue = rmd.pvals, rmd.vals[,-1])
-  names(temp.res)[1] = samp_id
-
-  output = merge(x = mintR_groupDF, y = temp.res, by = samp_id, all = TRUE)
-
-  orig_class <- class(output)
-
-  class(output) <- c("rmdFilt", orig_class)
-
-  attr(output, "sample_names") <- names(omicsData$e_data)
-  attr(output, "group_DF") <- attr(omicsData, "group_DF")
-  attr(output, "df") <- sum(!is.na(metrics_final))
-  attr(output, "metrics") <- metrics_final_txt
-
-  return(output)
-}
-
-
-
-### NMRdata function ###
-#'@export
-#'@rdname rmd_filter
-#'@name rmd_filter
-rmd_filter.nmrData <- function(omicsData, ignore_singleton_groups = TRUE, metrics=c("MAD", "Kurtosis", "Skewness", "Correlation")){
-  
-  ## some initial checks ##
-  if(length(metrics) < 2){
-    stop("Vector of metrics must contain at least two elements.")
-  }else{
-    if(length(metrics) > 5){
-      stop("Vector of metrics cannot contain more than five elements.")
-    }
+    rmd.vals$Corr = suppressWarnings(run_group_meancor(omicsData,
+                                                       mintR_groupDF,
+                                                       ignore_singleton_groups)[,2])
   }
   
-  mintR_groupDF = attr(omicsData, "group_DF")
-  
-  ### Aug 2020: deal with any groups that have only a single sample in them, 
-  # in the case that the user wants to ignore those groups ###
-  if(any(table(mintR_groupDF$Group)==1) & ignore_singleton_groups == TRUE){
-    # save original data, which has some singleton group(s) #
-    omicsData_orig <- omicsData
-    
-    # which groups have a single sample in them #
-    singleton_groups <- names(which(table(mintR_groupDF$Group)==1))
-    singleton_rows <- which(mintR_groupDF$Group %in% singleton_groups)
-    
-    # filter out samples corresponding to groups of size 1 #
-    to_remove <- as.character(mintR_groupDF[singleton_rows, get_fdata_cname(omicsData)])
-    myfilter <- custom_filter(omicsData, f_data_remove = to_remove)
-    omicsData <- applyFilt(myfilter, omicsData)
-    mintR_groupDF <- attr(omicsData, "group_DF")
-    
-  }else{
-    # no singleton groups, nothing to adjust/filter/etc. #
-    omicsData_orig <- omicsData
-  }
-  
-  # run_group_meancor already deals with the TimeCourse option #
-  edata_id = attr(omicsData, "cnames")$edata_cname
-  edata_col_id = which(names(omicsData$e_data) == edata_id)
-  dat_only = omicsData$e_data[,-(edata_col_id)]
-  
-  samp_id = attr(omicsData, "cnames")$fdata_cname
-  
-  if(length(samp_id) < 2*length(metrics)){
-    warning("Use the results of the RMD filter with caution due to a small number of samples relative to the number of metrics being used. Consider reducing the number of metrics being used.")
-  }
-  
-  ## Calculate metrics for RMD runs ##
-  # match the metrics (allow upper/lower case) #
-  metrics = tolower(metrics)
-  metrics_final = rep(NA, 5)
-  metrics_orig = metrics
-  
-  rmd.vals = data.frame(Sample.ID = run_prop_missing(dat_only)[,1])
-  
-  if(any(metrics %in% c("mad", "m", "median absolute deviation", "median_absolute_deviation"))){
-    ind = which(metrics %in% c("mad", "m", "median absolute deviation", "median_absolute_deviation"))
-    if(length(ind)>1){stop("More than one of the entries in metric matches to use of MAD.")}
-    metrics = metrics[-ind]
-    metrics_final[1] = 1
-    rmd.vals$MAD = run_mad(dat_only)[,2]
-  }
-  
-  if(any(metrics %in% c("kurtosis", "kurt", "k"))){
-    ind = which(metrics %in% c("kurtosis", "kurt", "k"))
-    if(length(ind)>1){stop("More than one of the entries in metric matches to use of Kurtosis.")}
-    metrics = metrics[-ind]
-    metrics_final[2] = 1
-    rmd.vals$Kurtosis = run_kurtosis(dat_only)[,2]
-  }
-  
-  if(any(metrics %in% c("skew", "s", "skewness"))){
-    ind = which(metrics %in% c("skew", "s", "skewness"))
-    if(length(ind)>1){stop("More than one of the entries in metric matches to use of Skew.")}
-    metrics = metrics[-ind]
-    metrics_final[3] = 1
-    rmd.vals$Skewness = run_skewness(dat_only)[,2]
-  }
-  
-  if(any(metrics %in% c("corr", "c", "cor", "correlation"))){
-    ind = which(metrics %in% c("corr", "c", "cor", "correlation"))
-    if(length(ind)>1){stop("More than one of the entries in metric matches to use of Correlation.")}
-    metrics = metrics[-ind]
-    metrics_final[4] = 1
-    rmd.vals$Corr = suppressWarnings(run_group_meancor(omicsData, mintR_groupDF, ignore_singleton_groups)[,2])
-  }
-  
-  if(any(metrics %in% c("proportion_missing", "p", "prop_missing", "prop_miss", "proportion_miss", "prop", "proportion", "proportion missing", "prop miss", "proportion miss"))){
+  # Compute the proportion of missing values across the samples (columns).
+  if (any(metrics %in% c("proportion_missing", "p", "prop_missing", "prop_miss",
+                         "proportion_miss", "prop", "proportion",
+                         "proportion missing", "prop miss", "proportion miss"))) {
     
     # check to see whether there is any missing data
-    number_missing = sum(is.na(omicsData$e_data))
-    # if no missing data, we flat out refuse to include prop_missing in the metrics, so give a warning to this effect
-    if(number_missing == 0){
-      warning("There are no missing values in e_data, therefore prop_missing will not be used as one of the metrics for rMd-Runs.")
-    }else{
+    if (attr(omicsData, 'data_info')$num_miss_obs == 0) {
       
-      ind = which(metrics %in% c("proportion_missing", "p", "prop_missing", "prop_miss", "proportion_miss", "prop", "proportion", "proportion missing", "prop miss", "proportion miss"))
-      if(length(ind)>1){stop("More than one of the entries in metric matches to use of Proportion_Missing.")}
+      # if no missing data, we flat out refuse to include prop_missing in the
+      # metrics, so give a warning to this effect.
+      warning (paste("There are no missing values in e_data, therefore",
+                     "Proportion_Missing will not be used as one of the",
+                     "metrics for RMD-Runs.",
+                     sep = " "))
+      
+      # If there are missing values compute the proportion of missing values for
+      # each sample (column) as usual.
+    } else {
+      
+      ind = which(metrics %in% c("proportion_missing", "p", "prop_missing",
+                                 "prop_miss", "proportion_miss", "prop",
+                                 "proportion", "proportion missing", "prop miss",
+                                 "proportion miss"))
+      
+      if(length(ind)>1){
+        stop("More than one of the entries in metrics matches 'Proportion_Missing'.")}
+      
       metrics = metrics[-ind]
       metrics_final[5] = 1
-      rmd.vals$Proportion_Missing = run_prop_missing(dat_only)[,2]
+      rmd.vals$Proportion_Missing = run_prop_missing(omicsData$e_data[, -id_col])[,2]
       
       ## proceed, to check the rank of cov.mat ##
-      # in case the user input 'enough' metrics (2-5) but they were not recognized by the code as valid entries #
-      if(sum(metrics_final, na.rm=TRUE)<2){stop("Vector of metrics must contain at least two valid entries.")}
       
       ## Conduct Robust PCA ##
-      robpca.res = rrcov:::PcaHubert(x = rmd.vals[,-1], k = (ncol(rmd.vals)-1), mcd = FALSE, scale = FALSE)
-      if(inherits(robpca.res, "try-error")){
-        stop("There are not enough missing values in e_data to use prop_missing as one of the metrics. Try again, excluding prop_missing.")
+      robpca.res = rrcov:::PcaHubert(x = rmd.vals[,-1],
+                                     k = (ncol(rmd.vals)-1),
+                                     mcd = FALSE,
+                                     scale = FALSE)
+      
+      # Check for errors when conducting robust PCA.
+      if (inherits(robpca.res, "try-error")) {
+        
+        # Throw an error because there is not enough missing data. Good problem
+        # to have I guess.
+        stop (paste("There are not enough missing values in e_data to use",
+                    "prop_missing as one of the metrics. Try again, excluding",
+                    "Proportion_Missing from the metrics vector.",
+                    sep = " "))
       }
       
       ## Calculate Covariance Matrix #
-      cov.mat = robpca.res@loadings %*% diag(robpca.res@eigenvalues) %*% t(robpca.res@loadings)
-      # check the rank #
+      cov.mat = (robpca.res@loadings %*%
+                   diag(robpca.res@eigenvalues) %*%
+                   t(robpca.res@loadings))
+      
+      # Extract the rank of the covariance matrix.
       myrank = qr(cov.mat)$rank
       
-      if(myrank != length(metrics_final)){
-        stop("There are not enough missing values in e_data to use prop_missing as one of the metrics. Try again, excluding prop_missing.")
+      # Check the rank of the covariance matrix compared to the number of
+      # metrics used to calculate it.
+      if (myrank != sum(metrics_final, na.rm = TRUE)) {
+        
+        # Throw an error because there is not enough missing data. Good problem
+        # to have I guess.
+        stop (paste("There are not enough missing values in e_data to use",
+                    "prop_missing as one of the metrics. Try again, excluding",
+                    "Proportion_Missing from the metrics vector.",
+                    sep = " "))
+        
       }
       
       ## Calculate Robust Mahalanobis Distance ##
       med.mat = matrix(apply(rmd.vals[,-1], 2, median), nrow = (ncol(rmd.vals)-1))
       
-      mal.fun <- function(x) t(as.vector(x) - med.mat) %*% solve(as.matrix(cov.mat)) %*% (as.vector(x) - med.mat)
+      rob.dist.vals = try (apply(rmd.vals[,-1], 1, mal.fun))
       
-      rob.dist.vals = try(apply(rmd.vals[,-1], 1, mal.fun))
-      if(inherits(rob.dist.vals, "try-error")){
-        stop("There are not enough missing values in e_data to use prop_missing as one of the metrics. Try again, excluding prop_missing.")
+      # Check if there was an error when calculating the the RMD.
+      if (inherits(rob.dist.vals, "try-error")) {
+        
+        # Throw an error because there is not enough missing data. Good problem
+        # to have I guess.
+        stop (paste("There are not enough missing values in e_data to use",
+                    "Proportion_Missing as one of the metrics. Try again,",
+                    "excluding Proportion_Missing from the metrics vector.",
+                    sep = " "))
+        
       }
+      
     }
+    
   }
   
-  if(sum(metrics_final, na.rm=TRUE)<2){stop("Vector of metrics must contain at least two valid entries.")}
+  # Check the number of metrics used. This value could be less than two if only
+  # two metrics were input and one of them was Proportion_Missing. For example,
+  # if Proportion_Missing was removed because there were no missing values then
+  # there would only be one metric left and a PCA and RMD cannot be calculated
+  # for only one metric.
+  if (sum(metrics_final, na.rm = TRUE) < 2) {
+    
+    # Throw an error if only two metrics were given, one of them was
+    # Proportion_Missing, and there is no missing data. Give the user a helpful
+    # suggestion. We are quite nice :)
+    stop (paste("Vector of metrics must contain at least two valid entries.",
+                "Try including a metric other than Proportion_Missing.",
+                sep = " "))
+    
+  }
   
+  # Extract the names of the metrics that have been used. We cannot simply report
+  # the metrics vector used as the input because it is possible that the input
+  # metrics vector has had elements removed. For example, if the input data does
+  # not have any missing values, and Proportion_Missing was an input metric, then
+  # Proportion_Missing will not be calculated. Therefore, this metric will be
+  # removed from the metrics_final_txt vector.
   metrics_final_txt <- names(rmd.vals[,-1])
   
-  ## Conduct Robust PCA ##
-  robpca.res = rrcov:::PcaHubert(x = rmd.vals[,-1], k = (ncol(rmd.vals)-1), mcd = FALSE, scale = FALSE)
+  # RMD the heck out of the data -----------------------------------------------
   
-  ## Calculate Covariance Matrix #
-  cov.mat = robpca.res@loadings %*% diag(robpca.res@eigenvalues) %*% t(robpca.res@loadings)
-  
-  ## Calculate Robust Mahalanobis Distance ##
-  med.mat = matrix(apply(rmd.vals[,-1], 2, median), nrow = (ncol(rmd.vals)-1))
-  
-  mal.fun <- function(x) t(as.vector(x) - med.mat) %*% solve(as.matrix(cov.mat)) %*% (as.vector(x) - med.mat)
-  
-  rob.dist.vals = apply(rmd.vals[,-1], 1, mal.fun)
+  # Check if robust PCA, covariance matrix, and RMD objects have been created 
+  if (!exists("robpca.res")) {
+    
+    ## Conduct Robust PCA ##
+    robpca.res = rrcov:::PcaHubert(x = rmd.vals[,-1],
+                                   k = (ncol(rmd.vals)-1),
+                                   mcd = FALSE,
+                                   scale = FALSE)
+    
+    ## Calculate Covariance Matrix #
+    cov.mat = (robpca.res@loadings %*%
+                 diag(robpca.res@eigenvalues) %*%
+                 t(robpca.res@loadings))
+    
+    ## Calculate Robust Mahalanobis Distance ##
+    med.mat = matrix(apply(rmd.vals[,-1], 2, median), nrow = (ncol(rmd.vals)-1))
+    
+    rob.dist.vals = apply(rmd.vals[,-1], 1, mal.fun)
+    
+  }
   
   log2.dist.vals = log(rob.dist.vals, base = 2)
   
   rmd.pvals = 1 - pchisq(rob.dist.vals, df = (ncol(rmd.vals)-1))
   
-  temp.res = data.frame(Sample.ID = rmd.vals[,1], Log2.md = log2.dist.vals, pvalue = rmd.pvals, rmd.vals[,-1])
-  names(temp.res)[1] = samp_id
+  temp.res = data.frame(Sample.ID = rmd.vals[,1],
+                        Log2.md = log2.dist.vals,
+                        pvalue = rmd.pvals,
+                        rmd.vals[,-1])
   
-  output = merge(x = mintR_groupDF, y = temp.res, by = samp_id, all = TRUE)
+  names(temp.res)[1] = get_fdata_cname(omicsData)
+  
+  output = merge(x = mintR_groupDF,
+                 y = temp.res,
+                 by = get_fdata_cname(omicsData),
+                 all = TRUE)
   
   orig_class <- class(output)
   
   class(output) <- c("rmdFilt", orig_class)
   
-  attr(output, "sample_names") <- names(omicsData$e_data)
-  attr(output, "group_DF") <- attr(omicsData, "group_DF")
+  # Sum the number of metrics actually calculated.
   attr(output, "df") <- sum(!is.na(metrics_final))
+  
+  # Report the metrics actually used.
   attr(output, "metrics") <- metrics_final_txt
   
   return(output)
+  
 }
-
- 
-
-
-
-
-
 
 #' Calculate the Fraction of Missing Data of Sample Runs
 #'
@@ -901,19 +467,18 @@ rmd_filter.nmrData <- function(omicsData, ignore_singleton_groups = TRUE, metric
 #' @author Lisa Bramer
 #'
 run_prop_missing <- function(data_only){
-
+  
   # calculate number of missing values per run #
   nummiss <- apply(is.na(data_only), 2, sum)
-
+  
   # calculate the fraction of missing values per run #
   fracmiss <- nummiss/nrow(data_only)
-
+  
   # store data #
   res.final <- data.frame(Sample = names(data_only), Prop_missing = fracmiss, row.names = NULL)
-
+  
   return(res.final)
 }
-
 
 #' Calculate the Median Absolute Deviance (MAD) of Sample Runs
 #'
@@ -927,24 +492,23 @@ run_prop_missing <- function(data_only){
 #'
 #' @author Lisa Bramer
 run_mad <- function(data_only){
-
+  
   # calculate MAD #
   mad_val = apply(data_only, 2, function(x) median(abs(x - median(x, na.rm = T)), na.rm = T))
-
+  
   # calculate the number of samples with MAD equal to NA #
   num.miss <- sum(is.na(mad_val))
-
+  
   # if at least one sample has a MAD of NA, replace it with mean MAD value #
   if(num.miss > 0){
     mad_val[is.na(mad_val)] <- mean(mad_val, na.rm = T)
   }
-
+  
   # store data #
   res.final <- data.frame(Sample = names(data_only), MAD = mad_val, row.names = NULL)
-
+  
   return(res.final)
 }
-
 
 #' Calculate the Kurtosis of Sample Runs
 #'
@@ -958,21 +522,21 @@ run_mad <- function(data_only){
 #'
 #' @author Lisa Bramer
 run_kurtosis <- function(data_only){
-
+  
   # calculate kurtosis #
   kurt_res <- apply(data_only, 2, e1071::kurtosis, na.rm = TRUE, type = 2)
-
+  
   # calculate the number of samples with kurtosis equal to NA #
   num.miss <- sum(is.na(kurt_res))
-
+  
   # if at least one sample has a kurtosis of NA, replace it with mean kurtosis #
   if(num.miss > 0){
     kurt_res[is.na(kurt_res)] <- mean(kurt_res, na.rm = T)
   }
-
+  
   # store data #
   res.final <- data.frame(Sample = names(data_only), Kurtosis = kurt_res, row.names = NULL)
-
+  
   return(res.final)
 }
 
@@ -988,24 +552,23 @@ run_kurtosis <- function(data_only){
 #'
 #' @author Lisa Bramer
 run_skewness <- function(data_only){
-
+  
   # calculate skewness #
   skew_res <- apply(data_only, 2, e1071::skewness, na.rm = TRUE, type = 2)
-
+  
   # calculate the number of samples with skewness equal to NA #
   num.miss <- sum(is.na(skew_res))
-
+  
   # if at least one sample has a skewness of NA, replace it with mean skewness #
   if(num.miss > 0){
     skew_res[is.na(skew_res)] <- mean(skew_res, na.rm = T)
   }
-
+  
   # store data #
   res.final <- data.frame(Sample = names(data_only), Skewness = skew_res, row.names = NULL)
-
+  
   return(res.final)
 }
-
 
 #' Calculate the Mean Correlation of a Sample with Respect to Group
 #'
@@ -1022,7 +585,7 @@ run_skewness <- function(data_only){
 #' @author Lisa Bramer
 #'
 run_group_meancor <- function(omicsData, mintR_groupDF, ignore_singleton_groups = TRUE){
-
+  
   # if group.data has column for TimeCourse, re-compute group.data including TimeCourse as main effect
   # if mintR_groupDF has TimeCourse variable, re-compute group_data including TimeCourse as main effect
   if(!is.null(attr(mintR_groupDF, "time_course"))){
@@ -1032,13 +595,12 @@ run_group_meancor <- function(omicsData, mintR_groupDF, ignore_singleton_groups 
       }
     group_data = group_designation(omicsData, temp_maineff)
   }
-
+  
   # create a list of unique groups #
   grps = unique(as.character(mintR_groupDF$Group))
-
+  
   samp_id = attr(omicsData, "cnames")$fdata_cname
   
-
   # compute all pairwise correlations between samples of the same group #
   nonsingleton_groups <- attributes(mintR_groupDF)$nonsingleton_groups
   singleton_groups <- setdiff(grps, nonsingleton_groups)
@@ -1057,11 +619,6 @@ run_group_meancor <- function(omicsData, mintR_groupDF, ignore_singleton_groups 
     for(i in 1:length(singleton_groups)){
       prwse.grp.cors.singletons[[i]] <- prwse.grp.cors.all
     }
-    
-    
-    
-    
-    
     
     # do the "usual" thing for the nonsingleton groups: 
     # calculate the mean correlation of a sample with all other samples that have the same group membership
@@ -1087,7 +644,6 @@ run_group_meancor <- function(omicsData, mintR_groupDF, ignore_singleton_groups 
     ## combine the singleton and nonsingleton results...make sure the order is correct
     prwse.grp.cors <- c(prwse.grp.cors.nonsingletons, prwse.grp.cors.singletons)
     prws.grp.cors.grpnames <- c(nonsingleton_groups, singleton_groups) 
-    
     
   }else{
     
@@ -1122,10 +678,9 @@ run_group_meancor <- function(omicsData, mintR_groupDF, ignore_singleton_groups 
     # Infection5  0.9732911  0.9824165  0.9801930  0.9784125  1.0000000
   }
   
-
   # turn diagonal into NAs, so we don't include a sample's correlation with itself #
   grp.cors = lapply(prwse.grp.cors, function(x) x*(matrix(1, nrow = nrow(x), ncol = ncol(x)) + diag(NA, nrow(x))))
-
+  
   # compute mean correlation for each sample #
   mean.cor = lapply(grp.cors, function(x) apply(x, 1, mean, na.rm = T))
   
@@ -1150,11 +705,10 @@ run_group_meancor <- function(omicsData, mintR_groupDF, ignore_singleton_groups 
     mean.cor2 <- mean.cor
   }
   
-
   # format results #
   # get order to put results in original sample order based on peptide.data #
   temp = match(names(omicsData$e_data)[-1],names(unlist(mean.cor2)))
   res.cor = data.frame(Sample.ID = names(omicsData$e_data)[-1], Mean_Correlation = unlist(mean.cor2)[temp], row.names = NULL)
-
+  
   return(res.cor)
 }

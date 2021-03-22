@@ -362,87 +362,137 @@ applyFilt.cvFilt <- function(filter_object, omicsData, cv_threshold = 150){
 #' @export
 #' @name applyFilt
 #' @rdname applyFilt
-applyFilt.rmdFilt <- function(filter_object, omicsData, pvalue_threshold = 0.0001, min_num_biomolecules = 50){
+applyFilt.rmdFilt <- function (filter_object, omicsData,
+                               pvalue_threshold = 0.0001,
+                               min_num_biomolecules = 50) {
 
+  # Perform some initial checks on the input arguments -------------------------
   
-
-  # check to see whether a rmdFilt has already been run on omicsData #
-  if("rmdFilt" %in% names(attributes(omicsData)$filters)){
-    # get previous threshold #
-    threshold_prev <- attributes(omicsData)$filters$rmdFilt$threshold
-
-    stop(paste("A rMd filter has already been run on this dataset, using a 'pvalue_threshold' of ", threshold_prev, ". See Details for more information about how to choose a threshold before applying the filter.", sep=""))
-
-
-  }else{ # no previous rmdFilt, so go ahead and run it like normal #
-
-    # check that filter_object is of class rmdFilt #
-    if(!inherits(filter_object, "rmdFilt")) stop("filter_object must be of the class 'rmdFilt'. See rmd_filter for details.")
-
-    # check that pvalue_threshold is between 0 and 1 #
-    if(pvalue_threshold < 0 | pvalue_threshold > 1) stop("pvalue_threshold must be between 0 and 1.")
-
-    if(attributes(omicsData)$data_info$num_edata < min_num_biomolecules){
-      stop(paste0("There are fewer than min_num_biomolecules = ", min_num_biomolecules, " biomolecules in omicsData. See applyFilt for details."))
-    }
+  # Check if an RMD filter has already been applied.
+  if ('rmdFilt' %in% get_filter_type(omicsData)) {
     
-    samp_cname <- attributes(omicsData)$cnames$fdata_cname
-    edata_cname <- attributes(omicsData)$cnames$edata_cname
-    emeta_cname <- attributes(omicsData)$cnames$emeta_cname
-
-    # determine which samples have a pvalue less than the threshold #
-    samp.ids = which(filter_object$pvalue < pvalue_threshold)
+    # Slap the users wrist with a warning.
+    warning ('An RMD filter has already been applied to this data set.')
     
-    # return sample names to be filtered #
-    if(length(samp.ids) > 0){samp_filt = as.character(filter_object[samp.ids,1])}else{samp_filt = NULL}
-    
-    #checking that filter_object does not specify all samples
-    if(all(as.character(omicsData$f_data[[samp_cname]]) %in% samp_filt)) {stop("samples_filt specifies all samples")}
-    
-    filter_object_new = list(edata_filt = NULL, emeta_filt = NULL, samples_filt = samp_filt)
-
-    # call the function that does the filter application
-    results_pieces <- pmartR_filter_worker(omicsData = omicsData, filter_object = filter_object_new)
-
-    # return filtered data object #
-    results <- omicsData
-    results$e_data <- results_pieces$temp.pep2
-    results$f_data <- results_pieces$temp.samp2
-    results$e_meta <- results_pieces$temp.meta1
-
-    # if group attribute is present, re-run group_designation in case filtering any items impacted the group structure
-    if(!is.null(attr(results, "group_DF"))){
-      results <- group_designation(omicsData = results, main_effects = attr(attr(omicsData, "group_DF"), "main_effects"), covariates = attr(attr(omicsData, "group_DF"), "covariates"), time_course = attr(attr(omicsData, "group_DF"), "time_course"))
-    }else{
-      # Update attributes (7/11/2016 by KS) - this is being done already in group_designation
-      attributes(results)$data_info$num_edata = length(unique(results$e_data[, edata_cname]))
-      attributes(results)$data_info$num_miss_obs = sum(is.na(results$e_data[,-which(names(results$e_data)==edata_cname)]))
-      attributes(results)$data_info$prop_missing = mean(is.na(results$e_data[,-which(names(results$e_data)==edata_cname)]))
-      attributes(results)$data_info$num_samps = ncol(results$e_data) - 1
-
-      if(!is.null(results$e_meta)){
-        # number of unique proteins that map to a peptide in e_data #
-        if(!is.null(emeta_cname)){
-          num_emeta = length(unique(results$e_meta[which(as.character(results$e_meta[, edata_cname]) %in% as.character(results$e_data[, edata_cname])), emeta_cname]))
-        }else{num_emeta = NULL}
-      }else{
-        num_emeta = NULL
-      }
-      attr(results, "data_info")$num_emeta = num_emeta
-      ## end of update attributes (7/11/2016 by KS)
-    }
-
-    # set attributes for which filters were run
-    attr(results, "filters")$rmdFilt <- list(report_text = "", threshold = c(), filtered = c())
-
-    attr(results, "filters")$rmdFilt$report_text <- paste("A robust Mahalanobis distance (rMd) filter was applied to the data, removing ", samp_cname, "s ", "with an rMd-associated p-value less than ", pvalue_threshold, ". A total of ", length(samp_filt), " ", samp_cname, "s were filtered out of the dataset by this filter.", sep="")
-
-    attr(results, "filters")$rmdFilt$threshold <- pvalue_threshold
-    attr(results, "filters")$rmdFilt$filtered <- samp_filt
-
   }
+  
+  # check that pvalue_threshold is between 0 and 1 #
+  if (pvalue_threshold < 0 || pvalue_threshold > 1) {
+    
+   # Figuratively smack the user with an error for not knowing what a p-value
+   # is (or what values it can take).
+    stop ("pvalue_threshold must be between 0 and 1.")
+    
+  }
+  
+  # Check that min_num_biomolecules is less than the number of observations.
+  if (get_data_info(omicsData)$num_edata < min_num_biomolecules) {
+    
+    # Stop the user for trying to filter their entire sample. Maybe we should
+    # also ask them why they went to all that effort in gathering the data if
+    # they are just going to try to throw it all away.
+    stop (paste("There are fewer biomolecules in omicsData than",
+                "min_num_biomolecules",
+                paste0("(", min_num_biomolecules, ")."),
+                "See applyFilt for details.",
+                sep = " "))
+  }
+  
+  # Prepare the information needed to filter the data --------------------------
+  
+  # Extract the column number containing the sample IDs.
+  id_col <- which(names(omicsData$f_data) == get_fdata_cname(omicsData))
+  
+  # Sniff out the indices that fall below the threshold.
+  inds <- which(filter_object$pvalue < pvalue_threshold)
+  
+  # Compute the length of the inds vector and specify filter.samp accordingly.
+  if (length(inds) < 1) {
+    
+    # Set filter.samp to NULL because no columns in omicsData$e_data will be
+    # filtered out.
+    filter.samp <- NULL
+    
+    # Check if the number of indices to filter is equal to the total number of
+    # samples.
+  } else if (length(inds) == dim(filter_object)[1]) {
+    
+    # Throw an error for trying to remove every sample.
+    stop ("With the current p-value threshold all samples will be filtered.")
+    
+  } else {
+    
+    # Fish out the sample IDs that will be filtered.
+    filter.samp <- as.character(filter_object[inds, id_col])
+    
+  }
+  
+  # Create a list that is used in the pmartR_filter_worker function.
+  filter_object_new <- list(edata_filt = NULL,
+                            emeta_filt = NULL,
+                            samples_filt = filter.samp)
+  
+  # Filter the data and update the attributes ----------------------------------
+  
+  # call the function that does the filter application
+  results_pieces <- pmartR_filter_worker(filter_object = filter_object_new,
+                                         omicsData = omicsData)
+  
+  # Update the omicsData data frames.
+  omicsData$e_data <- results_pieces$temp.pep2
+  omicsData$f_data <- results_pieces$temp.samp2
+  omicsData$e_meta <- results_pieces$temp.meta1
+  
+  # Check if group_DF attribute is present.
+  if (!is.null(attr(omicsData, "group_DF"))) {
+    
+    # Re-run group_designation in case filtering any items impacted the group
+    # structure. The attributes will also be updated in this function.
+    omicsData <- group_designation(omicsData = omicsData,
+                                   main_effects = attr(get_group_DF(omicsData),
+                                                       "main_effects"),
+                                   covariates = attr(get_group_DF(omicsData),
+                                                     "covariates"),
+                                   time_course = attr(get_group_DF(omicsData),
+                                                      "time_course"))
+    
+  } else {
+    
+    # Extract data_info attribute from omicsData. Some of the elements will be
+    # used to update this attribute.
+    dInfo <- attr(omicsData, 'data_info')
+    
+    # Update the data_info attribute.
+    attr(omicsData,
+         'data_info') <- set_data_info(e_data = omicsData$e_data,
+                                       edata_cname = get_edata_cname(omicsData),
+                                       data_scale = get_data_scale(omicsData),
+                                       data_types = dInfo$data_types,
+                                       norm_info = dInfo$norm_info,
+                                       is_normalized = dInfo$norm_info$is_normalized)
+    
+    # Update the meta_info attribute.
+    attr(omicsData,
+         'meta_info') <- set_meta_info(e_meta = omicsData$e_meta,
+                                       emeta_cname = get_emeta_cname(omicsData))
+    
+  }
+  
+  # Determine the number of filters applied previously and add one to it. This
+  # will include the current filter object in the next available space of the
+  # filters attribute list.
+  n_filters <- length(attr(omicsData, 'filters')) + 1
+  
+  # Update the filters attribute.
+  attr(omicsData,
+       'filters')[[n_filters]] <- set_filter(type = class(filter_object)[[1]],
+                                             threshold = pvalue_threshold,
+                                             filtered = filter.samp,
+                                             method = NA)
 
-  return(results)
+  # RETURN THE FILTERED DATA!!
+  return(omicsData)
+  
 }
 
 

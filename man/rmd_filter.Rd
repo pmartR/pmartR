@@ -2,44 +2,9 @@
 % Please edit documentation in R/rmd_filter.R
 \name{rmd_filter}
 \alias{rmd_filter}
-\alias{rmd_filter.pepData}
-\alias{rmd_filter.proData}
-\alias{rmd_filter.lipidData}
-\alias{rmd_filter.metabData}
-\alias{rmd_filter.nmrData}
 \title{RMD Runs}
 \usage{
-rmd_filter(omicsData, ignore_singleton_groups = TRUE, ...)
-
-\method{rmd_filter}{pepData}(
-  omicsData,
-  ignore_singleton_groups = TRUE,
-  metrics = c("MAD", "Kurtosis", "Skewness", "Correlation", "Proportion_Missing")
-)
-
-\method{rmd_filter}{proData}(
-  omicsData,
-  ignore_singleton_groups = TRUE,
-  metrics = c("MAD", "Kurtosis", "Skewness", "Correlation", "Proportion_Missing")
-)
-
-\method{rmd_filter}{lipidData}(
-  omicsData,
-  ignore_singleton_groups = TRUE,
-  metrics = c("MAD", "Kurtosis", "Skewness", "Correlation")
-)
-
-\method{rmd_filter}{metabData}(
-  omicsData,
-  ignore_singleton_groups = TRUE,
-  metrics = c("MAD", "Kurtosis", "Skewness", "Correlation")
-)
-
-\method{rmd_filter}{nmrData}(
-  omicsData,
-  ignore_singleton_groups = TRUE,
-  metrics = c("MAD", "Kurtosis", "Skewness", "Correlation")
-)
+rmd_filter(omicsData, ignore_singleton_groups = TRUE, metrics = NULL)
 }
 \arguments{
 \item{omicsData}{an object of the class 'pepData', 'proData', 'metabData',
@@ -52,7 +17,12 @@ singleton groups or not; defaults to TRUE. If TRUE, rmd_filter results are
 returned only for samples in groups of size greater than 1. This is used
 when calculating the correlation.}
 
-\item{...}{further arguments}
+\item{metrics}{A character vector indicating which metrics should be used when
+calculating the robust Mahalanobis distance. This vector must contain
+between two and five of the following options: "MAD" (Median Absolute
+Deviation), "Kurtosis", "Skewness", "Correlation", and
+"Proportion_Missing". The default is NULL. When NULL a combination of
+metrics will be chosen depending on the class of omicsData.}
 }
 \value{
 a data.frame containing columns for the Sample ID, log2 robust
