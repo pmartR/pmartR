@@ -74,13 +74,37 @@ emeta_cv <- pmartRdata::pep_emeta[c(leq[1:non_filtered],
 # e_data and e_meta.
 fdata_cv <- pmartRdata::pep_fdata
 
+# Copy the pepData object for proteomics filter testing ------------------------
+
+# Extract the entire e_data, f_data, and e_meta objects from pmartRdata.
+edata_pro <- pmartRdata::pep_edata[1:500, ]
+fdata_pro <- pmartRdata::pep_fdata
+emeta_pro <- pmartRdata::pep_emeta[1:500, ]
+
+# Fabricate a pepData object with the reduced data set.
+pdata_pro <- as.pepData(e_data = edata_pro,
+                        f_data = fdata_pro,
+                        e_meta = emeta_pro,
+                        edata_cname = "Mass_Tag_ID",
+                        fdata_cname = "SampleID",
+                        emeta_cname = "Protein")
+
+# Create the proteomics filter standards to compare test output to.
+pfStandard <- proteomics_filter(pdata_pro)
+
+# Generate the filtered omicsData standards to compare test output to.
+afStandard <- applyFilt(filter_object = pfStandard,
+                        omicsData = pdata_pro,
+                        min_num_peps = 2)
+
 # Create a path to the folder where the data will be saved.
 sPath <- file.path('/Users/mart077/OneDrive - PNNL/Documents/multi_probe',
-                   '/pmartR/inst/testdata/filter_data_cv.RData')
+                   '/pmartR/inst/testdata/filter_data_pro.RData')
 
-# Save the reduced e_data and e_meta data frames along with the original f_data
-# data frame.
-save(edata_cv,
-     emeta_cv,
-     fdata_cv,
+# Save the data extracted from pmartRdata.
+save(edata_pro,
+     fdata_pro,
+     emeta_pro,
+     pfStandard,
+     afStandard,
      file = sPath)
