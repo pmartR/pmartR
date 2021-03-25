@@ -356,8 +356,6 @@ applyFilt.cvFilt <- function(filter_object, omicsData, cv_threshold = 150){
   
 }
 
-
-
 # function for rmdFilt
 #' @export
 #' @name applyFilt
@@ -490,154 +488,225 @@ applyFilt.rmdFilt <- function (filter_object, omicsData,
                                              filtered = filter.samp,
                                              method = NA)
 
-  # RETURN THE FILTERED DATA!!
+  # Return the filtered data! High fives all around!!!
   return(omicsData)
   
 }
-
-
 
 # function for proteomicsFilt
 #' @export
 #' @name applyFilt
 #' @rdname applyFilt
 #' @export
-applyFilt.proteomicsFilt <- function(filter_object, omicsData, min_num_peps=NULL, degen_peps=FALSE){
-
-
-  # check to see whether a "proteomicsFilt" has already been run on omicsData #
-  if("proteomicsFilt" %in% names(attributes(omicsData)$filters)){
-    # get previous threshold #
-    threshold_prev <- attributes(omicsData)$filters$proteomicsFilt$threshold$min_num_peps
-    degen_peps_prev <- attributes(omicsData)$filters$proteomicsFilt$threshold$degen_peps
-
-    stop(paste("A proteomics filter has already been run on this dataset, using a 'min_num_peps' of ", threshold_prev, " and 'degen_peps' of ", degen_peps_prev, ". See Details for more information about how to choose a threshold before applying the filter.", sep=""))
-
-
-  }else{ # no previous rmdFilt, so go ahead and run it like normal #
-
-    # error checks for min_num_peps, if not NULL #
-    if(!is.null(min_num_peps)) {
-      # check that min_num_peps is numeric and >=1 #
-      if(!inherits(min_num_peps, c("numeric", "integer")) | min_num_peps < 1) stop("min_num_peps must be an integer greater than or equal to 1")
-      # check that min_num_peps is an integer #
-      if(min_num_peps %% 1 != 0) stop("min_num_peps must be an integer greater than or equal to 1")
-      # check that min_num_peps is of length 1 #
-      if(length(min_num_peps) != 1) stop("min_num_peps must be of length 1")
-      # check that min_num_peps is less than the total number of peptides #
-      if(min_num_peps > nrow(omicsData$e_data)) stop("min_num_peps cannot be greater than the total number of peptides")
-    }
-    # check that degen_peps is logical #
-    if(!inherits(degen_peps, "logical")) stop("degen_peps must be either TRUE or FALSE")
-
-
-    pep_id = attr(omicsData, "cnames")$edata_cname
-    pro_id = attr(omicsData, "cnames")$emeta_cname
-    samp_cname <- attributes(omicsData)$cnames$fdata_cname
-
-    ## degenerate peptides portion ##
-    # pull peptides with more than one row #
-    if(degen_peps == TRUE){
-      count_bypep <- filter_object$counts_by_pep
-
-      degen_peptides = as.character(data.frame(count_bypep[which(count_bypep$n > 1), ])[, pep_id])
-
-      ## identify any proteins that now will not have peptides mapping to them ##
-      ## find rows in e_meta that correspond to peptides to be filtered ##
-      pepfilt.ids = which(omicsData$e_meta[,pep_id] %in% degen_peptides)
-
-      ## find the proteins that are in the filter list but are not in the unfiltered lists ##
-      add_prots = as.character(setdiff(omicsData$e_meta[pepfilt.ids, pro_id], omicsData$e_meta[-pepfilt.ids, pro_id]))
-
-      if(length(add_prots)==0){add_prots = NULL}
-      if(length(degen_peptides)==0){degen_peptides = NULL}
-      filter_object_new1 <- list(edata_filt = degen_peptides, emeta_filt = add_prots)
-    }else{
-      filter_object_new1 <- list(edata_filt = c(), emeta_filt = c())
-    }
-
-
-    ## protein filter portion ##
-    # pull proteins with less than min_num_peps #
-    if(!is.null(min_num_peps)){
-      count_bypro <- filter_object$counts_by_pro
-
-      pro_filt = as.character(data.frame(count_bypro[which(count_bypro$n < min_num_peps), ])[, pro_id])
-
-      # determine which peptides no longer have a protein to map to  #
-      ## find rows in peptide.info that correspond to proteins to be filtered ##
-      protfilt.ids = which(omicsData$e_meta[,pro_id] %in% pro_filt)
-
-      ## find the peptides that are in the filter list but are not in the unfiltered lists ##
-      pep_filt = as.character(setdiff(omicsData$e_meta[protfilt.ids, pep_id], omicsData$e_meta[-protfilt.ids, pep_id]))
-
-      if(length(pep_filt)==0){pep_filt = NULL}
-      if(length(pro_filt)==0){pro_filt = NULL}
-
-      filter_object_new2 <- list(emeta_filt = pro_filt, edata_filt = pep_filt)
-    }else{
-      filter_object_new2 <- list(edata_filt = c(), emeta_filt = c())
-    }
-
-
-    ## consolidate filter_object_new1 and filter_object_new2 ##
-    filter_object_new <- list(emeta_filt = unique(c(filter_object_new1$emeta_filt, filter_object_new2$emeta_filt)), edata_filt = unique(c(filter_object_new1$edata_filt, filter_object_new2$edata_filt)))
+applyFilt.proteomicsFilt <- function(filter_object,
+                                     omicsData,
+                                     min_num_peps = NULL,
+                                     degen_peps = FALSE) {
+  
+  # Perform initial checks on the input arguments ------------------------------
+  
+  # Check if a proteomics filter has already been applied.
+  if ('proteomicsFilt' %in% get_filter_type(omicsData)) {
     
-    #checking that filter_object_new does not specify all of e_data(peps) or all of e_meta(protiens) in omicsData
-    if(all(omicsData$e_meta[[pro_id]] %in% filter_object_new$emeta_filt)) {stop("filter_object specifies all proteins in e_meta")}
-    if(all(omicsData$e_data[[pep_id]] %in% filter_object_new$edata_filt)) {stop("filter_object specifies all peps in e_data")}
-
+    # Slap the users wrist with a warning.
+    warning ('A proteomics filter has already been applied to this data set.')
     
-    # call the function that does the filter application
-    results_pieces <- pmartR_filter_worker(omicsData = omicsData, filter_object = filter_object_new)
-
-    # return filtered data object #
-    results <- omicsData
-    results$e_data <- results_pieces$temp.pep2
-    results$f_data <- results_pieces$temp.samp2
-    results$e_meta <- results_pieces$temp.meta1
-
-    # if group attribute is present, re-run group_designation in case filtering any items impacted the group structure
-    if(!is.null(attr(results, "group_DF"))){
-      results <- group_designation(omicsData = results, main_effects = attr(attr(omicsData, "group_DF"), "main_effects"), covariates = attr(attr(omicsData, "group_DF"), "covariates"), time_course = attr(attr(omicsData, "group_DF"), "time_course"))
-    }else{
-      # Update attributes (7/11/2016 by KS) - this is being done already in group_designation
-      attributes(results)$data_info$num_edata = length(unique(results$e_data[, pep_id]))
-      attributes(results)$data_info$num_miss_obs = sum(is.na(results$e_data[,-which(names(results$e_data)==pep_id)]))
-      attributes(results)$data_info$prop_missing = mean(is.na(results$e_data[,-which(names(results$e_data)==pep_id)]))
-      attributes(results)$data_info$num_samps = ncol(results$e_data) - 1
-
-      if(!is.null(results$e_meta)){
-        # number of unique proteins that map to a peptide in e_data #
-        if(!is.null(pro_id)){
-          num_emeta = length(unique(results$e_meta[which(as.character(results$e_meta[, pep_id]) %in% as.character(results$e_data[, pep_id])), pro_id]))
-        }else{num_emeta = NULL}
-      }else{
-        num_emeta = NULL
-      }
-      attr(results, "data_info")$num_emeta = num_emeta
-      ## end of update attributes (7/11/2016 by KS)
+  }
+  
+  # Make sure at least some of the peptides or proteins will be filtered. This
+  # means min_num_peps must not be null or degen_peps must not be FALSE.
+  if (is.null(min_num_peps) && !degen_peps) {
+    
+    # Warn the user that no filtering will actually occur.
+    stop (paste("No peptides or proteins will be filtered. Either change",
+                "min_num_peps to an integer > 1 or change degen_peps to TRUE.",
+                sep = " "))
+    
+  }
+  
+  # error checks for min_num_peps, if not NULL #
+  if (!is.null(min_num_peps)) {
+    
+    # check that min_num_peps is of length 1 #
+    if (length(min_num_peps) != 1) {
+      
+      # Warn the user of their treachery with an error.
+      stop ("min_num_peps must be of length 1")
+      
     }
-
-    # set attributes for which filters were run
-    attr(results, "filters")$proteomicsFilt <- list(report_text = "", threshold = c(), filtered = list())
-    if(is.null(min_num_peps)){min_num_peps <- NA}
-    attr(results, "filters")$proteomicsFilt$threshold <- data.frame(min_num_peps = min_num_peps, degen_peps = as.character(degen_peps))
-    attr(results, "filters")$proteomicsFilt$filtered <- filter_object_new
-    if(degen_peps == TRUE & is.null(min_num_peps)){
-      attr(results, "filters")$proteomicsFilt$report_text <- paste("A degenerate peptide filter was applied to the data, identifying ", pep_id, "s that map to more than one ", pro_id, ". The filter identified ", length(filter_object_new1$edata_filt), " such ", pep_id, "s in the data. Associated with these ", pep_id, "s were ", length(filter_object_new1$emeta_filt), " ", pro_id, "s that no longer had ", pep_id, "s mapping to them.", sep = "")
-
-    }else if(degen_peps == FALSE & !is.null(min_num_peps)){
-      attr(results, "filters")$proteomicsFilt$report_text <- paste("A protein filter was applied to the data, identifying ", pro_id, "s that do not have at least ", min_num_peps, " ", pep_id, "s mapping to them. This filter identified ", length(filter_object_new2$emeta_filt), " ", pro_id, "s from the data. Associated with these ", pro_id, "s were ", length(filter_object_new2$edata_filt), " ", pep_id, "s that no longer mapped to a ", pro_id, ".", sep="")
-
-    }else if(degen_peps == TRUE & !is.null(min_num_peps)) {
-      attr(results, "filters")$proteomicsFilt$report_text <- paste("A degenerate peptide filter was applied to the data, identifying ", pep_id, "s that map to more than one ", pro_id, ". The filter identified ", length(filter_object_new1$edata_filt), " such ", pep_id, "s in the data. Associated with these ", pep_id, "s were ", length(filter_object_new1$emeta_filt), " ", pro_id, "s that no longer had ", pep_id, "s mapping to them. Additionally, a protein filter was applied to the data, identifying ", pro_id, "s that do not have at least ", min_num_peps, " ", pep_id, "s mapping to them. This filter identified ", length(filter_object_new2$emeta_filt), " ", pro_id, "s from the data. Associated with these ", pro_id, "s were ", length(filter_object_new2$edata_filt), " ", pep_id, "s that no longer mapped to a ", pro_id, ". Together, the two filters removed ", length(filter_object_new$edata_filt), " ", pep_id, "s and ", length(filter_object_new$emeta_filt), " ", pro_id, "s from the data.", sep="")
-
+    
+    # The min_num_peps argument must be an integer and > 1.
+    if (min_num_peps %% 1 != 0 || min_num_peps <= 1) {
+      
+      # Denounce the users heinous actions with an error.
+      stop ("min_num_peps must be an integer greater than 1")
+      
+    }
+    
+    # Check that min_num_peps is less than the total number of peptides.
+    if (min_num_peps >= nrow(omicsData$e_data)) {
+      
+      # Throw an error for the users inability to perform basic counting
+      # operations.
+      stop (paste("min_num_peps cannot be greater than or equal to the number",
+                  "of peptides",
+                  sep = " "))
+      
     }
 
   }
 
-  return(results)
+  # check that degen_peps is logical #
+  if (!inherits(degen_peps, "logical")) {
+    
+    # Warn the illogical user that their inputs are also illogical.
+    stop ("degen_peps must be either TRUE or FALSE")
+    
+  }
+  
+  # degenerate peptides portion ------------------------------------------------
+  
+  # Extract the name of the column that contains peptide IDs.
+  pep_id = attr(omicsData, "cnames")$edata_cname
+  
+  # Extract the column name containing the protein IDs.
+  pro_id = attr(omicsData, "cnames")$emeta_cname
+  
+  # Check if degen_peps is TRUE.
+  if (degen_peps) {
+    
+    count_bypep <- filter_object$counts_by_pep
+  
+    # pull peptides with more than one row in e_meta.  
+    degen_peptides = as.character(data.frame(count_bypep[which(count_bypep$n > 1),])[, pep_id])
+    
+    ## identify any proteins that now will not have peptides mapping to them ##
+    ## find rows in e_meta that correspond to peptides to be filtered ##
+    pepfilt.ids = which(omicsData$e_meta[, pep_id] %in% degen_peptides)
+    
+    # Fish out the indices for the proteins that will be filtered.
+    add_prots <- as.character(omicsData$e_meta[pepfilt.ids, pro_id])
+    # add_prots = as.character(setdiff(omicsData$e_meta[pepfilt.ids, pro_id],
+    #                                  omicsData$e_meta[-pepfilt.ids, pro_id]))
+    
+    if(length(add_prots)==0){add_prots = NULL}
+    if(length(degen_peptides)==0){degen_peptides = NULL}
+    
+    pepe <- list(edata_filt = degen_peptides, emeta_filt = add_prots)
+    
+  } else {
+    pepe <- list(edata_filt = NULL, emeta_filt = NULL)
+  }
+  
+  
+  # protein filter portion -----------------------------------------------------
+  
+  # Check if min_num_peps is not NULL.
+  if (!is.null(min_num_peps)) {
+    
+    # Find all rows with proteins that map to fewer peptides than min_num_peps.
+    pro_idx <- which(filter_object$counts_by_pro$n < min_num_peps)
+    
+    # pull proteins with less than min_num_peps.
+    pro_filt <- as.character(filter_object$counts_by_pro[pro_idx, pro_id])
+    
+    # Find rows in e_meta that correspond to proteins to be filtered.
+    protfilt.ids = which(omicsData$e_meta[,pro_id] %in% pro_filt)
+    
+    # Extricate the indices for the peptides that will be filtered.
+    pep_filt <- as.character(omicsData$e_meta[protfilt.ids, pep_id])
+    # pep_filt = as.character(setdiff(omicsData$e_meta[protfilt.ids, pep_id],
+    #                                 omicsData$e_meta[-protfilt.ids, pep_id]))
+    
+    if(length(pep_filt)==0){pep_filt = NULL}
+    if(length(pro_filt)==0){pro_filt = NULL}
+    
+    pepe2 <- list(emeta_filt = pro_filt, edata_filt = pep_filt)
+    
+  } else {
+    pepe2 <- list(edata_filt = NULL, emeta_filt = NULL)
+  }
+  
+  # Consolidate pepe and pepe2 to pass to the pmartR_filter_worker function.
+  filter_object_new <- list(emeta_filt = unique(c(pepe$emeta_filt, 
+                                                  pepe2$emeta_filt)),
+                            edata_filt = unique(c(pepe$edata_filt, 
+                                                  pepe2$edata_filt)))
+  
+  # checking that filter_object_new does not specify all of e_data(peps) or all
+  # of e_meta(protiens) in omicsData
+  if(all(omicsData$e_meta[[pro_id]] %in% filter_object_new$emeta_filt)) {
+    
+    stop("filter_object specifies all proteins in e_meta")
+    
+  }
+  if(all(omicsData$e_data[[pep_id]] %in% filter_object_new$edata_filt)) {
+    
+    stop("filter_object specifies all peps in e_data")
+    
+  }
+  
+  # Filter the data and update the attributes ----------------------------------
+  
+  # call the function that does the filter application
+  results_pieces <- pmartR_filter_worker(filter_object = filter_object_new,
+                                         omicsData = omicsData)
+  
+  # Update the omicsData data frames.
+  omicsData$e_data <- results_pieces$temp.pep2
+  omicsData$f_data <- results_pieces$temp.samp2
+  omicsData$e_meta <- results_pieces$temp.meta1
+  
+  # Check if group_DF attribute is present.
+  if (!is.null(attr(omicsData, "group_DF"))) {
+    
+    # Re-run group_designation in case filtering any items impacted the group
+    # structure. The attributes will also be updated in this function.
+    omicsData <- group_designation(omicsData = omicsData,
+                                   main_effects = attr(get_group_DF(omicsData),
+                                                       "main_effects"),
+                                   covariates = attr(get_group_DF(omicsData),
+                                                     "covariates"),
+                                   time_course = attr(get_group_DF(omicsData),
+                                                      "time_course"))
+    
+  } else {
+    
+    # Extract data_info attribute from omicsData. Some of the elements will be
+    # used to update this attribute.
+    dInfo <- attr(omicsData, 'data_info')
+    
+    # Update the data_info attribute.
+    attr(omicsData,
+         'data_info') <- set_data_info(e_data = omicsData$e_data,
+                                       edata_cname = get_edata_cname(omicsData),
+                                       data_scale = get_data_scale(omicsData),
+                                       data_types = dInfo$data_types,
+                                       norm_info = dInfo$norm_info,
+                                       is_normalized = dInfo$norm_info$is_normalized)
+    
+    # Update the meta_info attribute.
+    attr(omicsData,
+         'meta_info') <- set_meta_info(e_meta = omicsData$e_meta,
+                                       emeta_cname = get_emeta_cname(omicsData))
+    
+  }
+  
+  # Determine the number of filters applied previously and add one to it. This
+  # will include the current filter object in the next available space of the
+  # filters attribute list.
+  n_filters <- length(attr(omicsData, 'filters')) + 1
+  
+  # Update the filters attribute.
+  attr(omicsData,
+       'filters')[[n_filters]] <- set_filter(type = class(filter_object)[[1]],
+                                             threshold = data.frame(min_num_peps = min_num_peps,
+                                                                    degen_peps = as.character(degen_peps)),
+                                             filtered = filter_object_new,
+                                             method = NA)
+  
+  # Return the filtered data! Look at us go!!
+  return(omicsData)
 
 
 }
@@ -1041,8 +1110,10 @@ pmartR_filter_worker <- function(filter_object, omicsData){
         temp.emeta <- temp.emeta[-inds, ] 
       }
       
-      # subset to the intersection of the edata_molecules in both e_data and e_meta, in case more were removed in one than the other #
-      mols <- intersect(temp.edata[, which(names(temp.edata) == edata_cname)], temp.emeta[, which(names(temp.emeta) == edata_cname)])
+      # subset to the intersection of the edata_molecules in both e_data and 
+      # e_meta, in case more were removed in one than the other #
+      mols <- intersect(temp.edata[, which(names(temp.edata) == edata_cname)],
+                        temp.emeta[, which(names(temp.emeta) == edata_cname)])
       inds <- which(temp.edata[, which(names(temp.edata) == edata_cname)] %in% mols)
       temp.edata <- temp.edata[inds, ]
       inds <- which(temp.emeta[, which(names(temp.emeta) == edata_cname)] %in% mols)
@@ -1056,7 +1127,8 @@ pmartR_filter_worker <- function(filter_object, omicsData){
       inds <- which(temp.fdata[, which(names(temp.fdata) == samp_cname)] %in% filter_object$samples_keep)
       temp.fdata <- temp.fdata[inds, ]
       
-      inds <- c(which(names(temp.edata) == edata_cname), which(names(temp.edata) %in% filter_object$samples_keep))
+      inds <- c(which(names(temp.edata) == edata_cname), 
+                which(names(temp.edata) %in% filter_object$samples_keep))
       temp.edata <- temp.edata[ , inds]
     }
     
@@ -1065,7 +1137,8 @@ pmartR_filter_worker <- function(filter_object, omicsData){
       inds <- which(temp.edata[ , which(names(temp.edata) == edata_cname)] %in% filter_object$edata_keep)
       temp.edata <- temp.edata[inds, ]
       
-      # if e_meta is present and we aren't explicitly specifying to keep anything in it, also keep these e_data molecules in e_meta #
+      # if e_meta is present and we aren't explicitly specifying to keep anything
+      # in it, also keep these e_data molecules in e_meta #
       if(!is.null(temp.emeta) & is.null(filter_object$emeta_keep)){
         inds <- which(temp.emeta[ , which(names(temp.emeta) == edata_cname)] %in% filter_object$edata_keep)
         temp.emeta <- temp.emeta[inds, ]
@@ -1077,17 +1150,21 @@ pmartR_filter_worker <- function(filter_object, omicsData){
       inds <- which(temp.emeta[ , which(names(temp.emeta) == emeta_cname)] %in% filter_object$emeta_keep)
       temp.emeta <- temp.emeta[inds, ]
       
-      # keep the union of the edata_molecules in both e_data and e_meta, in case more were kept in one than the other #
+      # keep the union of the edata_molecules in both e_data and e_meta, in case 
+      # more were kept in one than the other #
       if(is.null(filter_object$edata_keep)){
-        # use intersection here, since nothing was explicitly specified to keep from edata, and if we use the union, then edata doesn't actually get filtered at all #
-        mols <- intersect(temp.edata[, which(names(temp.edata) == edata_cname)], temp.emeta[, which(names(temp.emeta) == edata_cname)])
+        # use intersection here, since nothing was explicitly specified to keep
+        # from edata, and if we use the union, then edata doesn't actually get filtered at all #
+        mols <- intersect(temp.edata[, which(names(temp.edata) == edata_cname)],
+                          temp.emeta[, which(names(temp.emeta) == edata_cname)])
         inds <- which(temp.edata[, which(names(temp.edata) == edata_cname)] %in% mols)
         temp.edata <- temp.edata[inds, ]
         inds <- which(temp.emeta[, which(names(temp.emeta) == edata_cname)] %in% mols)
         temp.emeta <- temp.emeta[inds, ]
       }else{
         # use union here, since there WERE things explicitly specified to keep from edata #
-        mols <- union(temp.edata[, which(names(temp.edata) == edata_cname)], temp.emeta[, which(names(temp.emeta) == edata_cname)])
+        mols <- union(temp.edata[, which(names(temp.edata) == edata_cname)],
+                      temp.emeta[, which(names(temp.emeta) == edata_cname)])
         inds <- which(temp.edata[, which(names(temp.edata) == edata_cname)] %in% mols)
         temp.edata <- temp.edata[inds, ]
         inds <- which(temp.emeta[, which(names(temp.emeta) == edata_cname)] %in% mols)
@@ -1097,7 +1174,12 @@ pmartR_filter_worker <- function(filter_object, omicsData){
   }
   
   # return the pieces needed to assemble a proData/pepData/lipidData/metabData object #
-  output <- list(temp.pep2 = temp.edata, temp.samp2 = temp.fdata, temp.meta1 = temp.emeta, edata_cname = edata_cname, emeta_cname = emeta_cname, samp_cname = samp_cname)
+  output <- list(temp.pep2 = temp.edata,
+                 temp.samp2 = temp.fdata,
+                 temp.meta1 = temp.emeta,
+                 edata_cname = edata_cname,
+                 emeta_cname = emeta_cname,
+                 samp_cname = samp_cname)
   
   return(output)
 }

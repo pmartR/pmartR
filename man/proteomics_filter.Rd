@@ -7,16 +7,19 @@
 proteomics_filter(omicsData)
 }
 \arguments{
-\item{omicsData}{an object of class "pepData", the a result of \code{\link{as.pepData}}. The e_meta component of omicsData must be nonempty.}
+\item{omicsData}{an object of class "pepData", the a result of
+\code{\link{as.pepData}}. The e_meta component of omicsData must be
+nonempty.}
 }
 \value{
-a list of two character vectors, the first, \code{peptides_filt}, giving degenerate peptide names. The second, \code{proteins_filt}, gives the names of proteins which no longer have peptides mapping to them in the dataset.
+A list with two elements. The first element is a data frame of counts 
+        for each unique peptide. The second element is also a data frame.
+        This data frame contains the counts for the number of peptides that
+        map to each unique protein.
 }
 \description{
-This function counts the number of peptides that map to each protein and/or the number of proteins to which each individual peptide maps.
-}
-\details{
-min_num_peps is an attribute of the proteomicsFilt object
+This function counts the number of peptides that map to each protein and/or
+the number of proteins to which each individual peptide maps.
 }
 \examples{
 dontrun{
