@@ -176,8 +176,6 @@ group_designation <- function(omicsData, main_effects,
     
   }
   
-  ### end of preliminary checks ###
-  
   # Create the group data frame and attributes ---------------------------------
   
   # pull sample id column name #
@@ -339,6 +337,11 @@ group_designation <- function(omicsData, main_effects,
                                      data_types = get_data_info(omicsData)$data_types,
                                      norm_info = get_data_info(omicsData)$norm_info,
                                      is_normalized = get_data_info(omicsData)$norm_info$is_normalized)
+  
+  # Update the meta_info attribute.
+  attr(omicsData,
+       'meta_info') <- set_meta_info(e_meta = omicsData$e_meta,
+                                     emeta_cname = get_emeta_cname(omicsData))
   
   # Return the updated and polished omicsData object!!!
   return(omicsData)
