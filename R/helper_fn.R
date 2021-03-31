@@ -835,11 +835,6 @@ get_emeta_cname<- function(omicsObject){
   # check that omicsObject is of appropriate class #
   if(!inherits(omicsObject, c("pepData", "proData", "metabData", "lipidData", "nmrData", "statRes", "trellData"))) stop("omicsObject must be of class 'pepData', 'proData', 'metabData', 'lipidData', 'nrmData', 'statRes', or 'trellData'")
   
-  #check if emeta is null
-  if(is.null(omicsObject$e_meta) && 
-     inherits(omicsObject, c("pepData", "proData", "metabData", "lipidData", "nmrData"))) stop(
-       "e_meta is NULL in omicsObject, thus emeta_cname is also NULL")
-  
   if(is.null(omicsObject$e_meta) && 
      inherits(omicsObject, "statRes")) stop(
        "emeta_cname of input statsRes object is dependent on omicsData used in imd_anova; emeta_cname is NULL")

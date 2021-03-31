@@ -7,27 +7,41 @@
 anova_filter(nonmiss_per_group, min_nonmiss_anova = 2, cname_id)
 }
 \arguments{
-\item{nonmiss_per_group}{a list of length two. The first element giving the total number of possible samples for each group. The second element giving a data.frame with the first column giving the biomolecule identifier and the second through kth columns giving the number of non-missing observations for each of the \code{k} groups. Usually the result of \code{\link{nonmissing_per_group}}}
+\item{nonmiss_per_group}{a list of length two. The first element giving the
+total number of possible samples for each group. The second element giving a
+data.frame with the first column giving the biomolecule identifier and the
+second through kth columns giving the number of non-missing observations for
+each of the \code{k} groups. Usually the result of
+\code{\link{nonmissing_per_group}}}
 
-\item{min_nonmiss_anova}{the minimum number of nonmissing biomolecule values required, in each group, in order for the biomolecule to not be filtered. Must be greater than or equal to 2; default value is 2.}
+\item{min_nonmiss_anova}{the minimum number of nonmissing biomolecule values
+required, in each group, in order for the biomolecule to not be filtered.
+Must be greater than or equal to 2; default value is 2.}
 
-\item{cname_id}{character string specifying the name of the column containing the biomolecule identifiers in \code{e_data} and \code{e_meta} (if applicable).}
+\item{cname_id}{character string specifying the name of the column containing
+the biomolecule identifiers in \code{e_data} and \code{e_meta} (if
+applicable).}
 }
 \value{
-filter.peps a character vector of the biomolecules to be filtered out prior to ANOVA or IMD-ANOVA
+filter.peps a character vector of the biomolecules to be filtered out
+prior to ANOVA or IMD-ANOVA
 }
 \description{
-The method identifies biomolecules to be filtered specifically according data requirements for running an ANOVA.
+The method identifies biomolecules to be filtered specifically according data
+requirements for running an ANOVA.
 }
 \details{
-This function filters biomolecules that do not have at least \code{min.nonmiss.allowed} values per group, where groups are from \code{group_designation}.
+This function filters biomolecules that do not have at least
+\code{min.nonmiss.allowed} values per group, where groups are from
+\code{group_designation}.
 }
 \examples{
-dontrun{
+\dontrun{
 library(pmartRdata)
 data("pep_object")
 pep_object <- group_designation(pep_object, main_effects = "Condition")
-filter_results <- anova_filter(nonmiss_per_group = nonmissing_per_group(omicsData = pep_object), cname_id = "Mass_Tag_ID")
+filter_results <- anova_filter(nonmiss_per_group = nonmissing_per_group(omicsData = pep_object),
+                               cname_id = "Mass_Tag_ID")
 }
 
 }

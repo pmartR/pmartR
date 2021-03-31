@@ -708,211 +708,395 @@ applyFilt.proteomicsFilt <- function(filter_object,
   # Return the filtered data! Look at us go!!
   return(omicsData)
 
-
 }
 
 # function for imdanovaFilt
 #' @export
 #' @name applyFilt
 #' @rdname applyFilt
-applyFilt.imdanovaFilt <- function(filter_object, omicsData, min_nonmiss_anova=NULL, min_nonmiss_gtest=NULL, remove_singleton_groups = TRUE){
-  # #' @details If filter_method="combined" is specified, then both the \code{anova_filter} and \code{gtest_filter} are applied to the data, and the intersection of features from the two filters is the set returned. For ANOVA, features that do not have at least \code{min_nonmiss_allowed} values per group are candidates for filtering. For the G-test, features that do not have at least \code{min_nonmiss_allowed} values per group are candidates for filtering. The G-test is a test of independence, used here to test the null hypothesis of independence between the number of missing values across groups.
+applyFilt.imdanovaFilt <- function (filter_object,
+                                    omicsData,
+                                    min_nonmiss_anova = NULL, 
+                                    min_nonmiss_gtest = NULL, 
+                                    remove_singleton_groups = TRUE) {
+  
+  # #' @details If filter_method="combined" is specified, then both the
+  # \code{anova_filter} and \code{gtest_filter} are applied to the data, and the
+  # intersection of features from the two filters is the set returned. For
+  # ANOVA, features that do not have at least \code{min_nonmiss_allowed} values
+  # per group are candidates for filtering. For the G-test, features that do not
+  # have at least \code{min_nonmiss_allowed} values per group are candidates for
+  # filtering. The G-test is a test of independence, used here to test the null
+  # hypothesis of independence between the number of missing values across
+  # groups.
 
 
-  # check to see whether a imdanovaFilt has already been run on omicsData #
-  if("imdanovaFilt" %in% names(attributes(omicsData)$filters)){
-    # get previous threshold #
-    min_nonmiss_anova_prev <- attributes(omicsData)$filters$imdanovaFilt$threshold$min_nonmiss_anova
-    min_nonmiss_gtest_prev <- attributes(omicsData)$filters$imdanovaFilt$threshold$min_nonmiss_gtest
-
-    stop(paste("An IMD-ANOVA filter has already been run on this dataset, using a 'min_nonmiss_anova' of ", min_nonmiss_anova_prev, " and 'min_nonmiss_gtest' of ", min_nonmiss_gtest_prev, ". See Details for more information about how to choose a threshold before applying the filter.", sep=""))
-
-
-  }else{ # no previous imdanovaFilt, so go ahead and run it like normal #
-
-
-    ## initial checks ##
-
-    # verify remove_singleton_groups is logical T/F #
-    if(class(remove_singleton_groups) != "logical"){stop("remove_singletong_groups must be of class logical")}
+  # Perform initial checks on the input arguments ------------------------------
+  
+  # Check if an imdanova filter has already been applied.
+  if ('imdanovaFilt' %in% get_filter_type(omicsData)) {
     
-    group_sizes <- attr(filter_object, "group_sizes")
-    nonmiss_per_group <- list(nonmiss_totals = filter_object, group_sizes = group_sizes)
-    groupDF <- attributes(omicsData)$group_DF
+    # Slap the users wrist with a warning.
+    warning ('An imdanova filter has already been applied to this data set.')
     
-    # if remove_singleton_groups is TRUE, filter those out now #
-    if(remove_singleton_groups == TRUE){
-      if(any(group_sizes$n_group == 1)){
-        # which group(s) #
-        singleton_groups <- group_sizes$Group[group_sizes$n_group == 1]
-        
-        # which sample name(s) #
-        samps_to_rm <- as.character(groupDF[which(groupDF$Group %in% singleton_groups), get_fdata_cname(omicsData)])
-        
-        # use custom_filter to remove the sample(s) from the omicsData object #
-        my_cust_filt <- custom_filter(omicsData, f_data_remove = samps_to_rm)
-        omicsData <- applyFilt(my_cust_filt, omicsData)
-        
-        # update the IMD-ANOVA filter attributes #
-        attributes(filter_object)$names <- as.character(attributes(filter_object)$names[-which(attributes(filter_object)$names %in% singleton_groups)])
-        # might need to explicitly remove any NAs... #
-        # attributes(filter_object)$names <- attributes(filter_object)$names[-which(is.na(attributes(filter_object)$names))]
-        
-        attributes(filter_object)$group_sizes <- attributes(filter_object)$group_sizes[-which(attributes(filter_object)$group_sizes$Group %in% singleton_groups), ]
-        
-        # give a message to user saying which samples have been removed #
-        message(paste("You have specified remove_single_groups = TRUE, so we have removed the following sample(s) that correspond to singleton groups prior to proceeding with the IMD-ANOVA filter:", 
-                      paste(samps_to_rm, sep = ", ")))
-        
-      }else{
-        message("You have specified remove_singleton_groups = TRUE, but there are no singleton groups to remove. 
-                Proceeding with application of the IMD-ANOVA filter.")
-      }
-    }else{
-      if(any(group_sizes$n_group == 1)){
-        message("You have specified remove_singleton_groups = FALSE, so the sample(s) corresponding to the singleton group(s) were not utilized in the IMD-ANOVA filter and will be retained in the resulting omicsData object.")
-      }
-    }
-    
-    # check that at least one of min_nonmiss_anova and min_nonmiss_gtest are present #
-    if(is.null(min_nonmiss_anova) & is.null(min_nonmiss_gtest)) stop("At least one of min_nonmiss_anova and min_nonmiss_gtest must be present")
-    # check that if they aren't NULL, min_nonmiss_anova and min_nonmiss_gtest are numeric, >=2 and >=3, respectively, and neither are bigger than the minimum group size (group_sizes in an attribute of the filter_object, see below) #
-    if(!is.null(min_nonmiss_anova)) {
-      # check that min_nonmiss_anova is numeric >= 2 #
-      if(!inherits(min_nonmiss_anova, c("numeric","integer")) | min_nonmiss_anova < 2) stop("min_nonmiss_anova must be an integer >= 2")
-      # check that min_nonmiss_anova is an integer #
-      if(min_nonmiss_anova %% 1 != 0) stop("min_nonmiss_anova must be an integer >= 2")
-      # check that min_nonmiss_gtest is less than the minimum group size #
-      nonsingleton_groups <- attributes(attributes(omicsData)$group_DF)$nonsingleton_groups
-      if(min_nonmiss_anova > min(attributes(filter_object)$group_sizes$n_group[which(attributes(filter_object)$group_sizes$Group %in% nonsingleton_groups)])) stop("min_nonmiss_anova cannot be greater than the minimum group size")
-    }
-    if(!is.null(min_nonmiss_gtest)) {
-      # check that min_nonmiss_gtest is numeric >= 3 #
-      if(!inherits(min_nonmiss_gtest, c("numeric","integer")) | min_nonmiss_gtest < 3) stop("min_nonmiss_gtest must be an integer >= 3")
-      # check that min_nonmiss_gtest is an integer #
-      if(min_nonmiss_gtest %% 1 != 0) stop("min_nonmiss_gtest must be an integer >= 3")
-      # check that min_nonmiss_gtest is less than the minimum group size #
-      nonsingleton_groups <- attributes(attributes(omicsData)$group_DF)$nonsingleton_groups
-      if(min_nonmiss_gtest > min(attributes(filter_object)$group_sizes$n_group[which(attributes(filter_object)$group_sizes$Group %in% nonsingleton_groups)])) stop("min_nonmiss_gtest cannot be greater than the minimum group size")
-    }
-    
-    ## end of initial checks ##
-
-    
-    e_data <- omicsData$e_data
-    edata_cname <- attr(omicsData, "cnames")$edata_cname
-    samp_cname <- attr(omicsData, "cnames")$fdata_cname
-    emeta_cname <- attributes(omicsData)$cnames$emeta_cname
-
-    if(!is.null(min_nonmiss_anova) & !is.null(min_nonmiss_gtest)){
-      filter_method <- "combined"
-    }else{
-      if(!is.null(min_nonmiss_anova) & is.null(min_nonmiss_gtest)){
-        filter_method <- "anova"
-      }else{
-        if(is.null(min_nonmiss_anova) & !is.null(min_nonmiss_gtest)){
-          filter_method <- "gtest"
-        }
-      }
-    }
-    if(filter_method=="anova"){
-      filter.edata <- anova_filter(nonmiss_per_group=nonmiss_per_group, min_nonmiss_anova=min_nonmiss_anova, cname_id = edata_cname)
-    }else{
-      if(filter_method=="gtest"){
-        filter.edata <- gtest_filter(nonmiss_per_group=nonmiss_per_group, groupDF=groupDF, e_data=e_data, alpha=NULL, min_nonmiss_gtest=min_nonmiss_gtest, cname_id = edata_cname, samp_id = samp_cname)
-      }else{
-        if(filter_method=="combined"){
-          filter.edata.gtest <- gtest_filter(nonmiss_per_group=nonmiss_per_group, groupDF=groupDF, e_data=e_data, alpha=NULL, min_nonmiss_gtest=min_nonmiss_gtest, cname_id = edata_cname, samp_id = samp_cname)
-          #           min.nonmiss.allowed <- 2
-          filter.edata.anova <- anova_filter(nonmiss_per_group=nonmiss_per_group, min_nonmiss_anova=min_nonmiss_anova, cname_id = edata_cname)
-          filter.edata <- intersect(filter.edata.anova, filter.edata.gtest)
-        }
-      }
-    }
-    
-    #checking that filter.edata does not specify all of e_data in omicsData
-    if(all(omicsData$e_data[[edata_cname]] %in% filter.edata)){stop("filter.edata specifies all of e_data in omicsData")}
-    
-    if(length(filter.edata) < 1){ # if-statement added by KS 1/12/2018 to catch the case where nothing is removed
-      filter_object_new = list(edata_filt = NULL, emeta_filt = NULL, samples_filt = NULL)
-    }else{
-      filter_object_new = list(edata_filt = filter.edata, emeta_filt = NULL, samples_filt = NULL)
-    }
-    
-
-    # call the function that does the filter application
-    results_pieces <- pmartR_filter_worker(omicsData = omicsData, filter_object = filter_object_new)
-
-    # return filtered data object #
-    omicsData$e_data <- results_pieces$temp.pep2
-    omicsData$f_data <- results_pieces$temp.samp2
-    omicsData$e_meta <- results_pieces$temp.meta1
-    results <- omicsData
-
-    # if group attribute is present (and it MUST be), re-run group_designation in case filtering any items impacted the group structure
-    if(!is.null(attr(results, "group_DF"))){
-      results <- group_designation(omicsData = results, main_effects = attr(attr(omicsData, "group_DF"), "main_effects"), covariates = attr(attr(omicsData, "group_DF"), "covariates"), time_course = attr(attr(omicsData, "group_DF"), "time_course"))
-    }else{
-      # Update attributes (7/11/2016 by KS) - this is being done already in group_designation
-      attributes(results)$data_info$num_edata = length(unique(results$e_data[, edata_cname]))
-      attributes(results)$data_info$num_miss_obs = sum(is.na(results$e_data[,-which(names(results$e_data)==edata_cname)]))
-      attributes(results)$data_info$prop_missing = mean(is.na(results$e_data[,-which(names(results$e_data)==edata_cname)]))
-      attributes(results)$data_info$num_samps = ncol(results$e_data) - 1
-
-      if(!is.null(results$e_meta)){
-        # number of unique proteins that map to a peptide in e_data #
-        if(!is.null(emeta_cname)){
-          num_emeta = length(unique(results$e_meta[which(as.character(results$e_meta[, edata_cname]) %in% as.character(results$e_data[, edata_cname])), emeta_cname]))
-        }else{num_emeta = NULL}
-      }else{
-        num_emeta = NULL
-      }
-      attr(results, "data_info")$num_emeta = num_emeta
-      ## end of update attributes (7/11/2016 by KS)
-    }
-
-    # set attributes for which filters were run
-    attr(results, "filters")$imdanovaFilt <- list(filter_method = NULL, report_text = "", threshold = c(), filtered = c())
-    if(filter_method == "anova"){
-      attr(results, "filters")$imdanovaFilt$filter_method <- "anova"
-      attr(results, "filters")$imdanovaFilt$report_text <- paste("An ANOVA filter was applied to the data, removing ", edata_cname, "s that do not have at least ", min_nonmiss_anova, " non-missing values per group. A total of ", length(filter.edata), " ", edata_cname, "s were filtered out of the dataset by this filter.", sep="")
-      attr(results, "filters")$imdanovaFilt$threshold <- data.frame(min_nonmiss_anova=min_nonmiss_anova, min_nonmiss_gtest=NA)
-      attr(results, "filters")$imdanovaFilt$filtered <- filter.edata
-
-      # add nonmissing per group, character vectors of the peptides that can be tested with anova and that can be tested with the gtest (default to NULL)
-      attr(results, "imdanova")$nonmiss_per_group <- nonmiss_per_group
-      attr(results, "imdanova")$test_with_anova <- setdiff(x=omicsData$e_data[, edata_cname], y=filter.edata)
-      attr(results, "imdanova")$test_with_gtest <- NULL
-    }else{
-      if(filter_method == "gtest"){
-        attr(results, "filters")$imdanovaFilt$filter_method <- "gtest"
-        attr(results, "filters")$imdanovaFilt$report_text <- paste("An IMD (independence of missing data) filter was applied to the data, removing ", edata_cname, "s that do not have at least ", min_nonmiss_gtest, " non-missing values in at least one of the groups specified in the group_DF attribute of the dataset. A total of ", length(filter.edata), " ", edata_cname, "s were filtered out of the dataset by this filter.", sep="")
-        attr(results, "filters")$imdanovaFilt$threshold <- data.frame(min_nonmiss_anova=NA, min_nonmiss_gtest=min_nonmiss_gtest)
-        attr(results, "filters")$imdanovaFilt$filtered <- filter.edata
-
-        # add nonmissing per group, character vectors of the peptides that can be tested with anova and that can be tested with the gtest (default to NULL)
-        attr(results, "imdanova")$nonmiss_per_group <- nonmiss_per_group
-        attr(results, "imdanova")$test_with_anova <- NULL
-        attr(results, "imdanova")$test_with_gtest <- setdiff(x=omicsData$e_data[, edata_cname], y=filter.edata)
-      }else{
-        if(filter_method == "combined"){
-          attr(results, "filters")$imdanovaFilt$filter_method <- c("anova", "gtest")
-          attr(results, "filters")$imdanovaFilt$report_text <- paste("An ANOVA filter was applied to the data, removing ", edata_cname, "s that do not have at least ", min_nonmiss_anova, " non-missing values per group. Additionally, an IMD (independence of missing data) filter was applied to the data, removing ", edata_cname, "s that do not have at least ", min_nonmiss_gtest, " non-missing values in at least one of the groups specified in the group_DF attribute of the dataset. A total of ", length(filter.edata), " ", edata_cname, "s were filtered out of the dataset by this filter.", sep="")
-          attr(results, "filters")$imdanovaFilt$threshold <- data.frame(min_nonmiss_anova=min_nonmiss_anova, min_nonmiss_gtest=min_nonmiss_gtest)
-          attr(results, "filters")$imdanovaFilt$filtered <- filter.edata
-
-          # add nonmissing per group, character vectors of the peptides that can be tested with anova and that can be tested with the gtest (default to NULL)
-          attr(results, "imdanova")$nonmiss_per_group <- nonmiss_per_group
-          attr(results, "imdanova")$test_with_anova <- setdiff(x=omicsData$e_data[, edata_cname], y=filter.edata.anova)
-          attr(results, "imdanova")$test_with_gtest <- setdiff(x=omicsData$e_data[, edata_cname], y=filter.edata.gtest)
-        }
-      }
-    }
-
-
   }
+  
+  # Check the number of columns in filter_object. If there are only two columns
+  # then there is only one non-singleton group and an imdanova filter cannot be
+  # applied.
+  if (dim(filter_object)[2] == 2) {
+    
+    # Throw an error for too few samples to run an imdanova filter.
+    stop (paste("An IMD-ANOVA filter cannot be used because there is only one",
+                "non-singleton group.",
+                sep = " "))
+    
+  }
+  
+  # verify remove_singleton_groups is logical T/F #
+  if (class(remove_singleton_groups) != "logical") {
+    
+    # Stop the illogical user in their tracks for using illogical inputs.
+    stop ("remove_singletong_groups must be TRUE or FALSE")
+    
+  }
+  
+  # check that at least one of min_nonmiss_anova and min_nonmiss_gtest are present #
+  if (is.null(min_nonmiss_anova) & is.null(min_nonmiss_gtest)) {
+    
+    # Throw an error for not providing any filter criteria.
+    stop("At least one of min_nonmiss_anova and min_nonmiss_gtest must be present")
+    
+  }
+  
+  #### The following objects will be used in the remainder of the checks. ####
+  
+  # Fish out the group_DF attribute.
+  groupDF <- attributes(omicsData)$group_DF
+  
+  # Extricate the nonsingleton group names.
+  nonsingleton_groups <- attr(groupDF, 'nonsingleton_groups')
+  
+  # Extract the group sizes attribute.
+  group_sizes <- attr(filter_object, "group_sizes")
+  
+  # Find the minimum group size.
+  min_grp_size <- min(group_sizes$n_group[which(group_sizes$Group %in%
+                                                  nonsingleton_groups)])
+  
+  #### End object creation for preliminary checking purposes. ####
+  
+  # Check if min_nonmiss_anova is present.
+  if (!is.null(min_nonmiss_anova)) {
+    
+    # check that min_nonmiss_anova is of length 1 #
+    if (length(min_nonmiss_anova) != 1) {
+      
+      # Warn the user of their treachery with an error.
+      stop ("min_nonmiss_anova must be of length 1")
+      
+    }
+    
+    # The min_nonmiss_anova argument must be an integer and > 1.
+    if (min_nonmiss_anova %% 1 != 0 || min_nonmiss_anova < 2) {
+      
+      # Denounce the users heinous actions with an error.
+      stop ("min_nonmiss_anova must be an integer > 1")
+      
+    }
+    
+    # Ensure min_nonmiss_anova is not greater than the smallest group size.
+    if (min_nonmiss_anova > min_grp_size) {
+      
+      # Throw an error for an illegal use of integers.
+      stop ("min_nonmiss_anova cannot be greater than the minimum group size")
+      
+    }
+    
+  }
+  
+  # Check if min_nonmiss_gtest is present.
+  if (!is.null(min_nonmiss_gtest)) {
+    
+    # check that min_nonmiss_gtest is of length 1 #
+    if (length(min_nonmiss_gtest) != 1) {
+      
+      # Warn the user of their treachery with an error.
+      stop ("min_nonmiss_gtest must be of length 1")
+      
+    }
+    
+    # The min_nonmiss_gtest argument must be an integer and > 1.
+    if (min_nonmiss_gtest %% 1 != 0 || min_nonmiss_gtest < 2) {
+      
+      # Denounce the users heinous actions with an error.
+      stop ("min_nonmiss_gtest must be an integer > 1")
+      
+    }
+    
+    # Ensure min_nonmiss_gtest is not greater than the smallest group size.
+    if (min_nonmiss_gtest > min_grp_size) {
+      
+      # Throw an error for an illegal use of integers.
+      stop ("min_nonmiss_gtest cannot be greater than the minimum group size")
+      
+    }
+    
+  }
+  
+  # Prepare the data to be filtered --------------------------------------------
+  
+  # if remove_singleton_groups is TRUE, filter those out now #
+  if (remove_singleton_groups) {
+    
+    # Check for singleton groups.
+    if (any(group_sizes$n_group == 1)) {
+      
+      # which group(s) #
+      singleton_groups <- group_sizes$Group[group_sizes$n_group == 1]
+      
+      # which sample name(s) #
+      samps_to_rm <- as.character(groupDF[which(groupDF$Group %in% singleton_groups),
+                                          get_fdata_cname(omicsData)])
+      
+      # use custom_filter to remove the sample(s) from the omicsData object #
+      my_cust_filt <- custom_filter(omicsData, f_data_remove = samps_to_rm)
+      omicsData <- applyFilt(my_cust_filt, omicsData)
+      
+      # Fish out the updated group_DF attribute.
+      groupDF <- attributes(omicsData)$group_DF
+      
+      # update the IMD-ANOVA filter attributes #
+      attributes(filter_object)$group_sizes <- attributes(filter_object)$group_sizes[-which(attributes(filter_object)$group_sizes$Group %in% singleton_groups), ]
+      
+      # Update the group_sizes object created above in the initial checks
+      # section.
+      group_sizes <- attributes(filter_object)$group_sizes
 
-  return(results)
+      # give a message to user saying which samples have been removed #
+      message(paste("You have specified remove_single_groups = TRUE, so we have",
+                    "removed the following sample(s) that correspond to",
+                    "singleton groups prior to proceeding with the IMD-ANOVA",
+                    "filter: ",
+                    sep = " "),
+                    paste(samps_to_rm, collapse = ", "))
+      
+      # Will run if no singleton groups are present.
+    } else {
+      
+      message(paste("You have specified remove_singleton_groups = TRUE, but", 
+                    "there are no singleton groups to remove.",
+                    "Proceeding with application of the IMD-ANOVA filter.",
+                    sep = " "))
+    }
+    
+    # Will run if remove_singleton_gropus is FALSE.
+  } else {
+    
+    # Check for singleton groups.
+    if (any(group_sizes$n_group == 1)) {
+      
+      # Give a message that there are singleton groups present but the user has
+      # elected to not remove them .
+      message(paste("You have specified remove_singleton_groups = FALSE, so",
+                    "the sample(s) corresponding to the singleton group(s)",
+                    "were not utilized in the IMD-ANOVA filter and will be",
+                    "retained in the resulting omicsData object.",
+                    sep = " "))
+      
+    }
+    
+  }
+  
+  # Create a list with the appropriate information for the anova_filter and
+  # gtest filter functions.
+  nonmiss_per_group <- list(nonmiss_totals = filter_object,
+                            group_sizes = group_sizes)
+  
+  edata_cname <- get_edata_cname(omicsData)
+  samp_cname <- get_fdata_cname(omicsData)
+  emeta_cname <- get_emeta_cname(omicsData)
+  
+  # Set the filter method according to the inputs min_nonmiss_anova and
+  # min_nonmiss_gtest.
+  if (!is.null(min_nonmiss_anova) && !is.null(min_nonmiss_gtest)) {
+    
+    filter_method <- "combined"
+    
+  } else if (!is.null(min_nonmiss_anova) && is.null(min_nonmiss_gtest)) {
+    
+    filter_method <- "anova"
+    
+  } else if (is.null(min_nonmiss_anova) && !is.null(min_nonmiss_gtest)) {
+    
+    filter_method <- "gtest"
+    
+  }
+  
+  # Apply the filter according to the filter type.
+  if (filter_method == "anova") {
+    
+    filter.edata <- anova_filter(nonmiss_per_group = nonmiss_per_group,
+                                 min_nonmiss_anova = min_nonmiss_anova,
+                                 cname_id = edata_cname)
+    
+  } else if (filter_method == "gtest") {
+    
+    filter.edata <- gtest_filter(nonmiss_per_group = nonmiss_per_group,
+                                 groupDF = groupDF,
+                                 e_data = omicsData$e_data,
+                                 alpha = NULL,
+                                 min_nonmiss_gtest = min_nonmiss_gtest,
+                                 cname_id = edata_cname,
+                                 samp_id = samp_cname)
+    
+  } else if(filter_method == "combined") {
+    
+    # Run the gtest filter.
+    filter.edata.gtest <- gtest_filter(nonmiss_per_group = nonmiss_per_group, 
+                                       groupDF = groupDF, 
+                                       e_data = omicsData$e_data, 
+                                       alpha = NULL, 
+                                       min_nonmiss_gtest = min_nonmiss_gtest, 
+                                       cname_id = edata_cname, 
+                                       samp_id = samp_cname)
+    
+    # Run the anova filter.
+    filter.edata.anova <- anova_filter(nonmiss_per_group = nonmiss_per_group, 
+                                       min_nonmiss_anova = min_nonmiss_anova, 
+                                       cname_id = edata_cname)
+    
+    # Only filter samples found in both filters.
+    filter.edata <- intersect(filter.edata.anova, filter.edata.gtest)
+    
+  }
+  
+  #checking that filter.edata does not specify all of e_data in omicsData
+  if (all(omicsData$e_data[[edata_cname]] %in% filter.edata)) {
+    
+    stop ("All samples will be filtered. Try reducing the thresholds.")
+    
+  }
+  
+  # if-statement added by KS 1/12/2018 to catch the case where nothing is removed
+  if (length(filter.edata) < 1) { 
+    
+    # Stop the remainder of the function from running because none of the
+    # samples will be filtered.
+    stop ("None of the samples will be removed with the current thresholds.")
+    
+  } else {
+    
+    # Prepare the objects for filtering.
+    filter_object_new = list(edata_filt = filter.edata,
+                             emeta_filt = NULL,
+                             samples_filt = NULL)
+    
+  }
+  
+  # call the function that does the filter application
+  results_pieces <- pmartR_filter_worker(omicsData = omicsData,
+                                         filter_object = filter_object_new)
+  
+  # return filtered data object #
+  omicsData$e_data <- results_pieces$temp.pep2
+  omicsData$f_data <- results_pieces$temp.samp2
+  omicsData$e_meta <- results_pieces$temp.meta1
+  
+  # Update the attributes ------------------------------------------------------
+  
+  # Check if group_DF attribute is present.
+  if (!is.null(attr(omicsData, "group_DF"))) {
+    
+    # Re-run group_designation in case filtering any items impacted the group
+    # structure. The attributes will also be updated in this function.
+    omicsData <- group_designation(omicsData = omicsData,
+                                   main_effects = attr(get_group_DF(omicsData),
+                                                       "main_effects"),
+                                   covariates = attr(get_group_DF(omicsData),
+                                                     "covariates"),
+                                   time_course = attr(get_group_DF(omicsData),
+                                                      "time_course"))
+    
+  } else {
+    
+    # Extract data_info attribute from omicsData. Some of the elements will be
+    # used to update this attribute.
+    dInfo <- attr(omicsData, 'data_info')
+    
+    # Update the data_info attribute.
+    attr(omicsData,
+         'data_info') <- set_data_info(e_data = omicsData$e_data,
+                                       edata_cname = get_edata_cname(omicsData),
+                                       data_scale = get_data_scale(omicsData),
+                                       data_types = dInfo$data_types,
+                                       norm_info = dInfo$norm_info,
+                                       is_normalized = dInfo$norm_info$is_normalized)
+    
+    # Update the meta_info attribute.
+    attr(omicsData,
+         'meta_info') <- set_meta_info(e_meta = omicsData$e_meta,
+                                       emeta_cname = get_emeta_cname(omicsData))
+    
+  }
+  
+  # Determine the number of filters applied previously and add one to it. This
+  # will include the current filter object in the next available space of the
+  # filters attribute list.
+  n_filters <- length(attr(omicsData, 'filters')) + 1
+  
+  # Update the filters attribute.
+  attr(omicsData,
+       'filters')[[n_filters]] <- set_filter(type = class(filter_object)[[1]],
+                                             threshold = data.frame(min_nonmiss_anova = ifelse(is.null(min_nonmiss_anova),
+                                                                                               NA,
+                                                                                               min_nonmiss_anova), 
+                                                                    min_nonmiss_gtest = ifelse(is.null(min_nonmiss_gtest),
+                                                                                               NA,
+                                                                                               min_nonmiss_gtest)),
+                                             filtered = filter.edata,
+                                             method = filter_method)
+  
+  # Create an additional attribute to the omicsData object that is specific to
+  # the imdanova filter.
+  attr(omicsData, "imdanova")$nonmiss_per_group <- nonmiss_per_group
+  
+  # Add information to the imdanova attribute according to the method used.
+  if (filter_method == "anova") {
+    
+    # Add the biomolecule IDs that will NOT be filtered. These IDs will be used
+    # for tests in later functions.
+    attr(omicsData, "imdanova")$test_with_anova <- setdiff(x = omicsData$e_data[, edata_cname],
+                                                           y = filter.edata)
+    
+    attr(omicsData, "imdanova")$test_with_gtest <- NULL
+    
+  } else if (filter_method == "gtest") {
+    
+    attr(omicsData, "imdanova")$test_with_anova <- NULL
+    
+    # Add the biomolecule IDs that will NOT be filtered. These IDs will be used
+    # for tests in later functions.
+    attr(omicsData, "imdanova")$test_with_gtest <- setdiff(x = omicsData$e_data[, edata_cname],
+                                                           y = filter.edata)
+    
+  } else if (filter_method == "combined") {
+    
+    # Add the biomolecule IDs that will NOT be filtered. These IDs will be used
+    # for tests in later functions.
+    attr(omicsData, "imdanova")$test_with_anova <- setdiff(x = omicsData$e_data[, edata_cname],
+                                                           y = filter.edata.anova)
+    
+    # Add the biomolecule IDs that will NOT be filtered. These IDs will be used
+    # for tests in later functions.
+    attr(omicsData, "imdanova")$test_with_gtest <- setdiff(x = omicsData$e_data[, edata_cname],
+                                                           y = filter.edata.gtest)
+    
+  }
+  
+  # It was rough but we made it through!
+  return(omicsData)
+
 }
 
 
