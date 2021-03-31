@@ -1,4 +1,4 @@
-context('filter by group counts')
+context('filter by IMD-ANOVA')
 
 test_that('imdanova_filter and applyFilt produce the correct output',{
   
