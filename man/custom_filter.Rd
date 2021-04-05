@@ -15,31 +15,49 @@ custom_filter(
 )
 }
 \arguments{
-\item{omicsData}{an object of class "pepData", "proData", "metabData", "lipidData", or "nmrData, created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, \code{\link{as.nmrData}}, respectively.}
+\item{omicsData}{an object of class "pepData", "proData", "metabData",
+"lipidData", or "nmrData, created by \code{\link{as.pepData}},
+\code{\link{as.proData}}, \code{\link{as.metabData}},
+\code{\link{as.lipidData}}, \code{\link{as.nmrData}}, respectively.}
 
-\item{e_data_remove}{character vector specifying the names of the e_data identifiers to remove from the data. This argument can only be specified with other 'remove' arguments.}
+\item{e_data_remove}{character vector specifying the names of the e_data
+identifiers to remove from the data. This argument can only be specified with
+other 'remove' arguments.}
 
-\item{f_data_remove}{character vector specifying the names of f_data identifiers to remove from the data. This argument can only be specified with other 'remove' arguments.}
+\item{f_data_remove}{character vector specifying the names of f_data
+identifiers to remove from the data. This argument can only be specified with
+other 'remove' arguments.}
 
-\item{e_meta_remove}{character vector specifying the names of the e_meta identifiers to remove from the data. This argument can only be specified with other 'remove' arguments.}
+\item{e_meta_remove}{character vector specifying the names of the e_meta
+identifiers to remove from the data. This argument can only be specified with
+other 'remove' arguments.}
 
-\item{e_data_keep}{character vector specifying the names of the e_data identifiers to keep from the data. This argument can only be specified with other 'keep' arguments.}
+\item{e_data_keep}{character vector specifying the names of the e_data
+identifiers to keep from the data. This argument can only be specified with
+other 'keep' arguments.}
 
-\item{f_data_keep}{character vector specifying the names of f_data identifiers to keep from the data. This argument can only be specified with other 'keep' arguments.}
+\item{f_data_keep}{character vector specifying the names of f_data
+identifiers to keep from the data. This argument can only be specified with
+other 'keep' arguments.}
 
-\item{e_meta_keep}{character vector specifying the names of the e_meta identifiers to keep from the data. This argument can only be specified with other 'keep' arguments.}
+\item{e_meta_keep}{character vector specifying the names of the e_meta
+identifiers to keep from the data. This argument can only be specified with
+other 'keep' arguments.}
 }
 \value{
-An S3 object of class 'customFilt', which is a list with 3 elements: e_data_remove, f_data_remove, and e_meta_remove.
+An S3 object of class 'customFilt', which is a list with 3 elements:
+e_data_remove, f_data_remove, and e_meta_remove.
 }
 \description{
-This function creates a customFilt S3 object based on user-specified items to filter out of the dataset
+This function creates a customFilt S3 object based on user-specified items to
+filter out of the dataset
 }
 \examples{
-dontrun{
+\dontrun{
 library(pmartRdata)
 data("metab_object")
-to_filter <- custom_filter(metab_object, e_data_remove = "fumaric acid", f_data_remove = "Infection1")
+to_filter <- custom_filter(metab_object, e_data_remove = "fumaric acid",
+                           f_data_remove = "Infection1")
 summary(to_filter)
 to_filter2 <- custom_filter(metab_object, e_data_remove = "fumaric acid")
 summary(to_filter2)

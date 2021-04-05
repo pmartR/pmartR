@@ -994,6 +994,8 @@ applyFilt.imdanovaFilt <- function (filter_object,
     
   }
   
+  # Filter the data and update the attributes ----------------------------------
+  
   # call the function that does the filter application
   results_pieces <- pmartR_filter_worker(omicsData = omicsData,
                                          filter_object = filter_object_new)
@@ -1002,8 +1004,6 @@ applyFilt.imdanovaFilt <- function (filter_object,
   omicsData$e_data <- results_pieces$temp.pep2
   omicsData$f_data <- results_pieces$temp.samp2
   omicsData$e_meta <- results_pieces$temp.meta1
-  
-  # Update the attributes ------------------------------------------------------
   
   # Check if group_DF attribute is present.
   if (!is.null(attr(omicsData, "group_DF"))) {
@@ -1099,145 +1099,105 @@ applyFilt.imdanovaFilt <- function (filter_object,
 
 }
 
-
-
-
 # function for customFilt
 #' @export
 #' @name applyFilt
 #' @rdname applyFilt
-applyFilt.customFilt <- function(filter_object, omicsData){
-
-  edata_cname <- attributes(omicsData)$cnames$edata_cname
-  fdata_cname <- attributes(omicsData)$cnames$fdata_cname
-  emeta_cname <- attributes(omicsData)$cnames$emeta_cname
-
-  # if filter_object contains 'removes' #
-  if(!is.null(filter_object$e_data_remove)|!is.null(filter_object$f_data_remove)|!is.null(filter_object$e_meta_remove)){
+applyFilt.customFilt <- function (filter_object, omicsData) {
+  
+  # Perform initial checks on the input arguments ------------------------------
+  
+  # Check if a custom filter has already been applied.
+  if ('customFilt' %in% get_filter_type(omicsData)) {
     
-    filter_object_new = list(edata_filt = filter_object$e_data_remove, emeta_filt = filter_object$e_meta_remove, samples_filt = filter_object$f_data_remove)
-    
-    # check that edata_filt doesn't specify ALL the items in omicsData #
-    if(all(omicsData$e_data[, edata_cname] %in% filter_object_new$edata_filt)){stop("e_data_remove specifies all the items in the data")}
-    
-    # check that samples_filt doesn't specify ALL the items in omicsData #
-    if(all(omicsData$f_data[, fdata_cname] %in% filter_object_new$samples_filt)){stop("f_data_remove specifies all the items in the data")}
-    
-    # check that emeta_filt doesn't specify ALL the items in omicsData, emeta_filt is present #
-    if(!is.null(omicsData$e_meta)){
-       if(all(omicsData$e_meta[, emeta_cname] %in% filter_object_new$emeta_filt)){stop("e_meta_remove specifies all the items in the data")}
-    }
+    # Slap the users wrist with a warning.
+    warning ('A custom filter has already been applied to this data set.')
     
   }
   
-  else{ # filter_object contains 'keeps' #
-    filter_object_new = list(edata_keep = filter_object$e_data_keep, emeta_keep = filter_object$e_meta_keep, samples_keep = filter_object$f_data_keep)
+  # Prepare the data to be filtered --------------------------------------------
+  
+  # if filter_object contains 'removes' #
+  if (!is.null(c(filter_object$e_data_remove,
+                 filter_object$f_data_remove,
+                 filter_object$e_meta_remove))) {
     
-    # check that edata_keep doesn't specify ALL the items in omicsData #
-    if(all(omicsData$e_data[, edata_cname] %in% filter_object_new$edata_keep)){stop("edata_keep specifies all the items in the data")}
+    filter_object_new = list(edata_filt = filter_object$e_data_remove,
+                             emeta_filt = filter_object$e_meta_remove,
+                             samples_filt = filter_object$f_data_remove)
     
-    # check that samples_keep doesn't specify ALL the items in omicsData #
-    if(all(omicsData$f_data[, fdata_cname] %in% filter_object_new$samples_keep)){stop("samples_keep specifies all the items in the data")}
+    # filter_object contains 'keeps' #
+  } else {
     
-    # check that emeta_keep doesn't specify ALL the items in omicsData #
-    if(!is.null(omicsData$e_meta[, emeta_cname])){
-    if(all(omicsData$e_meta[, emeta_cname] %in% filter_object_new$emeta_keep)){stop("emeta_keep specifies all the items in the data")}
+    filter_object_new = list(edata_keep = filter_object$e_data_keep,
+                             emeta_keep = filter_object$e_meta_keep,
+                             samples_keep = filter_object$f_data_keep)
     
-    }
   }
+  
+  # Filter the data and update the attributes ----------------------------------
   
   # call the function that does the filter application
-  results_pieces <- pmartR_filter_worker(omicsData = omicsData, filter_object = filter_object_new)
-
+  results_pieces <- pmartR_filter_worker(omicsData = omicsData,
+                                         filter_object = filter_object_new)
+  
   # return filtered data object #
-  results <- omicsData
-  results$e_data <- results_pieces$temp.pep2
-  results$f_data <- results_pieces$temp.samp2
-  if(!is.null(omicsData$e_meta)){ # if-statement added by Kelly 3/24/2017 #
-    results$e_meta <- data.frame(results_pieces$temp.meta1)
-    names(results$e_meta)[which(names(omicsData$e_meta) == emeta_cname)] <- emeta_cname
-  }else{
-   # e_meta is null
-    results$e_meta <- NULL
-  }
+  omicsData$e_data <- results_pieces$temp.pep2
+  omicsData$f_data <- results_pieces$temp.samp2
+  omicsData$e_meta <- results_pieces$temp.meta1
   
   # if group attribute is present, re-run group_designation in case filtering any items impacted the group structure #
-  if(!is.null(attr(results, "group_DF"))){
-    results <- group_designation(omicsData = results, main_effects = attr(attr(omicsData, "group_DF"), "main_effects"), covariates = attr(attr(omicsData, "group_DF"), "covariates"), time_course = attr(attr(omicsData, "group_DF"), "time_course"))
-  }else{
-    # Update attributes (7/11/2016 by KS) - this is being done already in group_designation
-    attributes(results)$data_info$num_edata = length(unique(results$e_data[, edata_cname]))
-    attributes(results)$data_info$num_miss_obs = sum(is.na(results$e_data[,-which(names(results$e_data)==edata_cname)]))
-    attributes(results)$data_info$prop_missing = mean(is.na(results$e_data[,-which(names(results$e_data)==edata_cname)]))
-    attributes(results)$data_info$num_samps = ncol(results$e_data) - 1
-
-    if(!is.null(results$e_meta)){
-      # number of unique proteins that map to a peptide in e_data #
-      if(!is.null(emeta_cname)){
-        num_emeta = length(unique(results$e_meta[which(as.character(results$e_meta[, edata_cname]) %in% as.character(results$e_data[, edata_cname])), emeta_cname]))
-      }else{num_emeta = NULL}
-    }else{
-      num_emeta = NULL
-    }
-    attr(results, "data_info")$num_emeta = num_emeta
-    ## end of update attributes (7/11/2016 by KS)
+  if (!is.null(attr(omicsData, "group_DF"))) {
+    
+    # Re-run group_designation in case filtering any items impacted the group
+    # structure. The attributes will also be updated in this function.
+    omicsData <- group_designation(omicsData = omicsData,
+                                   main_effects = attr(get_group_DF(omicsData),
+                                                       "main_effects"),
+                                   covariates = attr(get_group_DF(omicsData),
+                                                     "covariates"),
+                                   time_course = attr(get_group_DF(omicsData),
+                                                      "time_course"))
+    
+  } else {
+    
+    # Extract data_info attribute from omicsData. Some of the elements will be
+    # used to update this attribute.
+    dInfo <- attr(omicsData, 'data_info')
+    
+    # Update the data_info attribute.
+    attr(omicsData,
+         'data_info') <- set_data_info(e_data = omicsData$e_data,
+                                       edata_cname = get_edata_cname(omicsData),
+                                       data_scale = get_data_scale(omicsData),
+                                       data_types = dInfo$data_types,
+                                       norm_info = dInfo$norm_info,
+                                       is_normalized = dInfo$norm_info$is_normalized)
+    
+    # Update the meta_info attribute.
+    attr(omicsData,
+         'meta_info') <- set_meta_info(e_meta = omicsData$e_meta,
+                                       emeta_cname = get_emeta_cname(omicsData))
+    
   }
-
-
-  # check to see whether a customFilt has already been run on omicsData #
-  if("customFilt" %in% names(attributes(omicsData)$filters)){
-    # yes, so be sure to keep track of this customFilt in a separate $filters attribute #
-
-    # get number of previous customFilts applied #
-    n_prev_filts <- length(grep("customFilt", names(attributes(omicsData)$filters)))
-    # will need to append this number + 1 to the end of the $filters$customFilt attribute #
-
-
-    # set attributes for which filters were run
-    attr(results, "filters")[[(paste("customFilt", n_prev_filts + 1, sep=""))]] <- list(report_text = "", threshold = c(), filtered = c())
-
-    n_edata_filtered <- nrow(omicsData$e_data) - nrow(results$e_data)
-    n_fdata_filtered <- nrow(omicsData$f_data) - nrow(results$f_data)
-    if(!is.null(omicsData$e_meta)){
-      n_emeta_filtered <- nrow(omicsData$e_meta) - nrow(results$e_meta)
-    }else{
-      n_emeta_filtered = NA
-    }
-    if(!is.null(omicsData$e_meta)){
-      attr(results, "filters")[[(paste("customFilt", n_prev_filts + 1, sep=""))]]$report_text <- paste("A custom filter was applied to the data, removing ", n_edata_filtered, " ", edata_cname, "s from e_data, ", n_emeta_filtered, " ", emeta_cname, "s from e_meta, and ", n_fdata_filtered, " ", fdata_cname, "s from f_data.", sep="")
-    }else{
-      attr(results, "filters")[[(paste("customFilt", n_prev_filts + 1, sep=""))]]$report_text <- paste("A custom filter was applied to the data, removing ", n_edata_filtered, " ", edata_cname, "s from e_data and ", n_fdata_filtered, " ", fdata_cname, "s from f_data.", sep="")
-    }
-    attr(results, "filters")[[(paste("customFilt", n_prev_filts + 1, sep=""))]]$filtered <- filter_object
-
-  }else{ # no previous customFilt, so go ahead and name the attribute like normal #
-
-    # set attributes for which filters were run
-    attr(results, "filters")$customFilt <- list(report_text = "", threshold = c(), filtered = c())
-    n_edata_filtered <- nrow(omicsData$e_data) - nrow(results$e_data)
-    n_fdata_filtered <- nrow(omicsData$f_data) - nrow(results$f_data)
-    if(!is.null(omicsData$e_meta)){
-      n_emeta_filtered <- nrow(omicsData$e_meta) - nrow(results$e_meta)
-    }else{
-      n_emeta_filtered = NA
-    }
-    if(!is.null(omicsData$e_meta)){
-      attr(results, "filters")$customFilt$report_text <- paste("A custom filter was applied to the data, removing ", n_edata_filtered, " ", edata_cname, "s from e_data, ", n_emeta_filtered, " ", emeta_cname, "s from e_meta, and ", n_fdata_filtered, " ", fdata_cname, "s from f_data.", sep="")
-    }else{
-      attr(results, "filters")$customFilt$report_text <- paste("A custom filter was applied to the data, removing ", n_edata_filtered, " ", edata_cname, "s from e_data and ", n_fdata_filtered, " ", fdata_cname, "s from f_data.", sep="")
-    }
-    attr(results, "filters")$customFilt$filtered <- filter_object
-  }
-  return(results)
+  
+  
+  # Determine the number of filters applied previously and add one to it. This
+  # will include the current filter object in the next available space of the
+  # filters attribute list.
+  n_filters <- length(attr(omicsData, 'filters')) + 1
+  
+  # Update the filters attribute.
+  attr(omicsData,
+       'filters')[[n_filters]] <- set_filter(type = class(filter_object)[[1]],
+                                             threshold = NA,
+                                             filtered = filter_object_new,
+                                             method = NA)
+  
+  # Return the filtered data! Woot!!
+  return(omicsData)
+  
 }
-
-
-
-
-
-
-
-
 
 #' Remove items that need to be filtered out
 #'
