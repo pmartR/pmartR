@@ -41,18 +41,30 @@
 #' @export
 #' 
 anova_filter <- function (nonmiss_per_group, min_nonmiss_anova = 2, cname_id) {
+  
+  # check that min_nonmiss_anova is of length 1 #
+  if (length(min_nonmiss_anova) != 1) {
+    
+    # Warn the user of their treachery with an error.
+    stop ("min_nonmiss_anova must be of length 1")
+    
+  }
 
   # min_nonmiss_anova must be >=2
-  if(!is.null(min_nonmiss_anova)){
-    if(min_nonmiss_anova<2){
-      stop("min_nonmiss_anova must be >=2")
+  if (!is.null(min_nonmiss_anova)) {
+    
+    if (min_nonmiss_anova < 2) {
+      
+      stop ("min_nonmiss_anova must be >=2")
+
     }
+    
   }
 
   # check that nonmiss_per_group is a list of length 2 #
-  if(!inherits(nonmiss_per_group, "list") || length(nonmiss_per_group)!=2) {
+  if (!inherits(nonmiss_per_group, "list") || length(nonmiss_per_group) != 2) {
     
-    stop("nonmiss_per_group must be a list of length 2.")
+    stop ("nonmiss_per_group must be a list of length 2.")
     
   }
 
@@ -76,6 +88,6 @@ anova_filter <- function (nonmiss_per_group, min_nonmiss_anova = 2, cname_id) {
   filter.ids <- as.vector(nonmiss_per_group$nonmiss_totals[inds.rm, 1])
 
   # output names of peptides/proteins/genes to be filtered
-  return(filter.ids)
+  return (filter.ids)
   
 }
