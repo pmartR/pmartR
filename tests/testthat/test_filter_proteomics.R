@@ -70,9 +70,9 @@ test_that('proteomics_filter and applyFilt produce the correct output',{
   expect_identical(attr(filtered, 'filters')[[1]]$threshold,
                    data.frame(min_num_peps = 2,
                               degen_peps = as.character(FALSE)))
-  expect_equal(attr(filtered, 'filters')[[1]]$filtered$emeta_filt,
+  expect_equal(attr(filtered, 'filters')[[1]]$filtered$e_meta_remove,
                attr(afStandard, "filters")[[1]]$filtered$emeta_filt)
-  expect_equal(attr(filtered, 'filters')[[1]]$filtered$edata_filt,
+  expect_equal(attr(filtered, 'filters')[[1]]$filtered$e_data_remove,
                attr(afStandard, "filters")[[1]]$filtered$edata_filt)
   expect_true(is.na(attr(filtered, 'filters')[[1]]$method))
   

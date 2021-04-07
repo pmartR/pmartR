@@ -202,9 +202,9 @@ applyFilt.moleculeFilt <- function(filter_object, omicsData, min_num=2){
   }
   
   # Create a list that is used in the pmartR_filter_worker function.
-  filter_object_new <- list(edata_filt = filter.edata,
-                            emeta_filt = NULL,
-                            samples_filt = NULL)
+  filter_object_new <- list(e_data_remove = filter.edata,
+                            e_meta_remove = NULL,
+                            f_data_remove = NULL)
   
   # Filter the data and update the attributes ----------------------------------
   
@@ -213,9 +213,9 @@ applyFilt.moleculeFilt <- function(filter_object, omicsData, min_num=2){
                                          omicsData = omicsData)
   
   # Update the omicsData data frames.
-  omicsData$e_data <- results_pieces$temp.pep2
-  omicsData$f_data <- results_pieces$temp.samp2
-  omicsData$e_meta <- results_pieces$temp.meta1
+  omicsData$e_data <- results_pieces$temp.edata
+  omicsData$f_data <- results_pieces$temp.fdata
+  omicsData$e_meta <- results_pieces$temp.emeta
   
   # Check if group_DF attribute is present.
   if (!is.null(attr(omicsData, "group_DF"))) {
@@ -328,9 +328,9 @@ applyFilt.cvFilt <- function(filter_object, omicsData, cv_threshold = 150){
   }
   
   # Create a list that is used in the pmartR_filter_worker function.
-  filter_object_new <- list(edata_filt = filter.edata,
-                            emeta_filt = NULL,
-                            samples_filt = NULL)
+  filter_object_new <- list(e_data_remove = filter.edata,
+                            e_meta_remove = NULL,
+                            f_data_remove = NULL)
   
   # Filter the data and update the attributes ----------------------------------
   
@@ -339,9 +339,9 @@ applyFilt.cvFilt <- function(filter_object, omicsData, cv_threshold = 150){
                                          omicsData = omicsData)
   
   # Update the omicsData data frames.
-  omicsData$e_data <- results_pieces$temp.pep2
-  omicsData$f_data <- results_pieces$temp.samp2
-  omicsData$e_meta <- results_pieces$temp.meta1
+  omicsData$e_data <- results_pieces$temp.edata
+  omicsData$f_data <- results_pieces$temp.fdata
+  omicsData$e_meta <- results_pieces$temp.emeta
   
   # Check if group_DF attribute is present.
   if (!is.null(attr(omicsData, "group_DF"))) {
@@ -465,9 +465,9 @@ applyFilt.rmdFilt <- function (filter_object, omicsData,
   }
   
   # Create a list that is used in the pmartR_filter_worker function.
-  filter_object_new <- list(edata_filt = NULL,
-                            emeta_filt = NULL,
-                            samples_filt = filter.samp)
+  filter_object_new <- list(e_data_remove = NULL,
+                            e_meta_remove = NULL,
+                            f_data_remove = filter.samp)
   
   # Filter the data and update the attributes ----------------------------------
   
@@ -476,9 +476,9 @@ applyFilt.rmdFilt <- function (filter_object, omicsData,
                                          omicsData = omicsData)
   
   # Update the omicsData data frames.
-  omicsData$e_data <- results_pieces$temp.pep2
-  omicsData$f_data <- results_pieces$temp.samp2
-  omicsData$e_meta <- results_pieces$temp.meta1
+  omicsData$e_data <- results_pieces$temp.edata
+  omicsData$f_data <- results_pieces$temp.fdata
+  omicsData$e_meta <- results_pieces$temp.emeta
   
   # Check if group_DF attribute is present.
   if (!is.null(attr(omicsData, "group_DF"))) {
@@ -631,10 +631,10 @@ applyFilt.proteomicsFilt <- function(filter_object,
     if(length(add_prots)==0){add_prots = NULL}
     if(length(degen_peptides)==0){degen_peptides = NULL}
     
-    pepe <- list(edata_filt = degen_peptides, emeta_filt = add_prots)
+    pepe <- list(e_data_remove = degen_peptides, e_meta_remove = add_prots)
     
   } else {
-    pepe <- list(edata_filt = NULL, emeta_filt = NULL)
+    pepe <- list(e_data_remove = NULL, e_meta_remove = NULL)
   }
   
   
@@ -660,26 +660,26 @@ applyFilt.proteomicsFilt <- function(filter_object,
     if(length(pep_filt)==0){pep_filt = NULL}
     if(length(pro_filt)==0){pro_filt = NULL}
     
-    pepe2 <- list(emeta_filt = pro_filt, edata_filt = pep_filt)
+    pepe2 <- list(e_meta_remove = pro_filt, e_data_remove = pep_filt)
     
   } else {
-    pepe2 <- list(edata_filt = NULL, emeta_filt = NULL)
+    pepe2 <- list(e_data_remove = NULL, e_meta_remove = NULL)
   }
   
   # Consolidate pepe and pepe2 to pass to the pmartR_filter_worker function.
-  filter_object_new <- list(emeta_filt = unique(c(pepe$emeta_filt, 
-                                                  pepe2$emeta_filt)),
-                            edata_filt = unique(c(pepe$edata_filt, 
-                                                  pepe2$edata_filt)))
+  filter_object_new <- list(e_meta_remove = unique(c(pepe$e_meta_remove, 
+                                                     pepe2$e_meta_remove)),
+                            e_data_remove = unique(c(pepe$e_data_remove, 
+                                                     pepe2$e_data_remove)))
   
   # checking that filter_object_new does not specify all of e_data(peps) or all
   # of e_meta(protiens) in omicsData
-  if(all(omicsData$e_meta[[pro_id]] %in% filter_object_new$emeta_filt)) {
+  if(all(omicsData$e_meta[[pro_id]] %in% filter_object_new$e_meta_remove)) {
     
     stop("filter_object specifies all proteins in e_meta")
     
   }
-  if(all(omicsData$e_data[[pep_id]] %in% filter_object_new$edata_filt)) {
+  if(all(omicsData$e_data[[pep_id]] %in% filter_object_new$e_data_remove)) {
     
     stop("filter_object specifies all peps in e_data")
     
@@ -692,9 +692,9 @@ applyFilt.proteomicsFilt <- function(filter_object,
                                          omicsData = omicsData)
   
   # Update the omicsData data frames.
-  omicsData$e_data <- results_pieces$temp.pep2
-  omicsData$f_data <- results_pieces$temp.samp2
-  omicsData$e_meta <- results_pieces$temp.meta1
+  omicsData$e_data <- results_pieces$temp.edata
+  omicsData$f_data <- results_pieces$temp.fdata
+  omicsData$e_meta <- results_pieces$temp.emeta
   
   # Check if group_DF attribute is present.
   if (!is.null(attr(omicsData, "group_DF"))) {
@@ -1019,9 +1019,9 @@ applyFilt.imdanovaFilt <- function (filter_object,
   } else {
     
     # Prepare the objects for filtering.
-    filter_object_new = list(edata_filt = filter.edata,
-                             emeta_filt = NULL,
-                             samples_filt = NULL)
+    filter_object_new = list(e_data_remove = filter.edata,
+                             e_meta_remove = NULL,
+                             f_data_remove = NULL)
     
   }
   
@@ -1032,9 +1032,9 @@ applyFilt.imdanovaFilt <- function (filter_object,
                                          filter_object = filter_object_new)
   
   # return filtered data object #
-  omicsData$e_data <- results_pieces$temp.pep2
-  omicsData$f_data <- results_pieces$temp.samp2
-  omicsData$e_meta <- results_pieces$temp.meta1
+  omicsData$e_data <- results_pieces$temp.edata
+  omicsData$f_data <- results_pieces$temp.fdata
+  omicsData$e_meta <- results_pieces$temp.emeta
   
   # Check if group_DF attribute is present.
   if (!is.null(attr(omicsData, "group_DF"))) {
@@ -1153,16 +1153,16 @@ applyFilt.customFilt <- function (filter_object, omicsData) {
                  filter_object$f_data_remove,
                  filter_object$e_meta_remove))) {
     
-    filter_object_new = list(edata_filt = filter_object$e_data_remove,
-                             emeta_filt = filter_object$e_meta_remove,
-                             samples_filt = filter_object$f_data_remove)
+    filter_object_new = list(e_data_remove = filter_object$e_data_remove,
+                             e_meta_remove = filter_object$e_meta_remove,
+                             f_data_remove = filter_object$f_data_remove)
     
     # filter_object contains 'keeps' #
   } else {
     
-    filter_object_new = list(edata_keep = filter_object$e_data_keep,
-                             emeta_keep = filter_object$e_meta_keep,
-                             samples_keep = filter_object$f_data_keep)
+    filter_object_new = list(e_data_keep = filter_object$e_data_keep,
+                             e_meta_keep = filter_object$e_meta_keep,
+                             f_data_keep = filter_object$f_data_keep)
     
   }
   
@@ -1173,9 +1173,9 @@ applyFilt.customFilt <- function (filter_object, omicsData) {
                                          filter_object = filter_object_new)
   
   # return filtered data object #
-  omicsData$e_data <- results_pieces$temp.pep2
-  omicsData$f_data <- results_pieces$temp.samp2
-  omicsData$e_meta <- results_pieces$temp.meta1
+  omicsData$e_data <- results_pieces$temp.edata
+  omicsData$f_data <- results_pieces$temp.fdata
+  omicsData$e_meta <- results_pieces$temp.emeta
   
   # if group attribute is present, re-run group_designation in case filtering any items impacted the group structure #
   if (!is.null(attr(omicsData, "group_DF"))) {
@@ -1232,129 +1232,270 @@ applyFilt.customFilt <- function (filter_object, omicsData) {
 
 #' Remove items that need to be filtered out
 #'
-#' This function removes
+#' This function removes rows and columns in e_data, f_data, and e_meta based
+#' on either remove or keep criteria.
 #'
-#' @param omicsData an object of the class \code{pepData}, \code{proData}, \code{lipidData}, or \code{metabData}, usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.lipidData}}, or \code{\link{as.metabData}}, respectively.
-#' @param filter_object a list created by the functions above
-#' @return list
+#' @param omicsData an object of the class \code{pepData}, \code{proData},
+#' \code{lipidData}, or \code{metabData}, usually created by
+#' \code{\link{as.pepData}}, \code{\link{as.proData}},
+#' \code{\link{as.lipidData}}, or \code{\link{as.metabData}}, respectively.
+#'    
+#' @param filter_object A list of three elements. Each element contains a set of
+#'        names to either remove or keep from e_data, f_data, and e_meta.
+#' 
+#' @return A list with three elements: first is the filtered e_data object,
+#'         second is the filtered f_data object, and third is the filtered 
+#'         e_meta object.
+#' 
 #' @author Kelly Stratton, Lisa Bramer
 #'
-pmartR_filter_worker <- function(filter_object, omicsData){
+pmartR_filter_worker <- function (filter_object, omicsData) {
+  
   # pull column names from omicR_data attributes #
   col_nms = attr(omicsData, "cnames")
   samp_cname = col_nms$fdata_cname
   edata_cname = col_nms$edata_cname
   emeta_cname = col_nms$emeta_cname
   
-  # pull group_DF attribute #
-  group_DF = attr(omicsData, "group_DF")
+  # Filter with remove arguments ---------------
   
-  # initialize the new omicsData parts #
-  temp.edata <- omicsData$e_data
-  temp.fdata <- omicsData$f_data
-  temp.emeta <- omicsData$e_meta
-  
-  #check if filter object contains remove arguments
-  if(!is.null(filter_object$edata_filt)|!is.null(filter_object$emeta_filt)|!is.null(filter_object$samples_filt)){
+  if (!is.null(c(filter_object$e_data_remove,
+                 filter_object$e_meta_remove,
+                 filter_object$f_data_remove))) {
     
     # remove any samples from f_data and e_data #
-    if(!is.null(filter_object$samples_filt)){
-      inds <- which(temp.fdata[, which(names(temp.fdata) == samp_cname)] %in% filter_object$samples_filt)
-      temp.fdata <- temp.fdata[-inds, ]
+    if (!is.null(filter_object$f_data_remove)) {
       
-      inds <- which(names(temp.edata) %in% filter_object$samples_filt)
-      temp.edata <- temp.edata[ ,-inds]
-    }
+      # Find the row indices of the sample names that will be removed from the
+      # f_data object.
+      inds <- which(omicsData$f_data[, which(names(omicsData$f_data) == samp_cname)]
+                    %in% filter_object$f_data_remove)
+      
+      # Remove the rows in f_data that correspond to the samples that should be
+      # removed.
+      omicsData$f_data <- omicsData$f_data[-inds, ]
+      
+      # Find the column indices of the sample names that will be removed from
+      # the e_data object.
+      inds <- which(names(omicsData$e_data) %in% filter_object$f_data_remove)
+      
+      # Remove the columns in e_data that correspond to the samples that should
+      # be removed.
+      omicsData$e_data <- omicsData$e_data[, -inds]
+      
+      
+    } 
     
     # remove any edata molecules from e_data and e_meta #
-    if(!is.null(filter_object$edata_filt)){
-      inds <- which(temp.edata[ , which(names(temp.edata) == edata_cname)] %in% filter_object$edata_filt)
-      temp.edata <- temp.edata[-inds, ]
+    if (!is.null(filter_object$e_data_remove)) {
       
-      # also remove these from e_meta, if it is present #
-      if(!is.null(temp.emeta)){
-        inds <- which(temp.emeta[ , which(names(temp.emeta) == edata_cname)] %in% filter_object$edata_filt)
-        temp.emeta <- temp.emeta[-inds, ]
+      # Find the row indices of the biomolecule names that will be removed from
+      # the e_data object.
+      inds <- which(omicsData$e_data[, which(names(omicsData$e_data) == edata_cname)]
+                    %in% filter_object$e_data_remove)
+      
+      # Remove the rows in e_data that correspond to the biomolecules that
+      # should be removed.
+      omicsData$e_data <- omicsData$e_data[-inds, ]
+      
+      # Check if e_meta is present.
+      if (!is.null(omicsData$e_meta)) {
+        
+        # Find the row indices of the biomolecule names that will be removed
+        # from the e_meta object.
+        inds <- which(omicsData$e_meta[, which(names(omicsData$e_meta) == edata_cname)]
+                      %in% filter_object$e_data_remove)
+        
+        # Remove the rows in e_meta corresponding to the biomolecules that
+        # should be removed.
+        omicsData$e_meta <- omicsData$e_meta[-inds, ]
+        
       }
+      
     }
     
     # remove any emeta molecules from e_meta and e_data #
-    if(!is.null(filter_object$emeta_filt)){
-      inds <- which(temp.emeta[ , which(names(temp.emeta) == emeta_cname)] %in% filter_object$emeta_filt)
-      if(length(inds) > 0){
-        temp.emeta <- temp.emeta[-inds, ] 
+    if (!is.null(filter_object$e_meta_remove)) {
+      
+      # Find the row indices of the mapping variable names that will be removed
+      # from the e_meta object.
+      inds <- which(omicsData$e_meta[, which(names(omicsData$e_meta) == emeta_cname)]
+                    %in% filter_object$e_meta_remove)
+      
+      # Check if there is at least one mapping variable that will be removed.
+      if (length(inds) > 0) {
+        
+        # Remove the rows in e_meta corresponding the the mapping variables that
+        # should be removed.
+        omicsData$e_meta <- omicsData$e_meta[-inds, ]
+        
       }
       
       # subset to the intersection of the edata_molecules in both e_data and 
       # e_meta, in case more were removed in one than the other #
-      mols <- intersect(temp.edata[, which(names(temp.edata) == edata_cname)],
-                        temp.emeta[, which(names(temp.emeta) == edata_cname)])
-      inds <- which(temp.edata[, which(names(temp.edata) == edata_cname)] %in% mols)
-      temp.edata <- temp.edata[inds, ]
-      inds <- which(temp.emeta[, which(names(temp.emeta) == edata_cname)] %in% mols)
-      temp.emeta <- temp.emeta[inds, ]
+      
+      # Find the names of the biomolecules that are in both e_data and the
+      # reduced e_meta object.
+      mols <- intersect(omicsData$e_data[, which(names(omicsData$e_data) == edata_cname)],
+                        omicsData$e_meta[, which(names(omicsData$e_meta) == edata_cname)])
+      
+      # Find the row indices in e_data of the biomolecules that will be kept in
+      # both e_data and e_meta.
+      inds <- which(omicsData$e_data[, which(names(omicsData$e_data) == edata_cname)]
+                    %in% mols)
+      
+      # Only keep the rows in e_data corresponding to the biomolucules that
+      # should not be removed.
+      omicsData$e_data <- omicsData$e_data[inds, ]
+      
+      # Find the row indices in e_meta of the biomolecules that will be kept in
+      # both e_data and e_meta.
+      inds <- which(omicsData$e_meta[, which(names(omicsData$e_meta) == edata_cname)]
+                    %in% mols)
+      
+      # Only keep the rows in e_meta corresponding to the biomolucules that
+      # should not be removed.
+      omicsData$e_meta <- omicsData$e_meta[inds, ]
+      
     }
     
-  }else{ # filter object contains keep arguments #
+    # Filter with keep arguments ---------------
+    
+  } else {
     
     # keep samples in f_data and e_data #
-    if(!is.null(filter_object$samples_keep)){
-      inds <- which(temp.fdata[, which(names(temp.fdata) == samp_cname)] %in% filter_object$samples_keep)
-      temp.fdata <- temp.fdata[inds, ]
+    if (!is.null(filter_object$f_data_keep)) {
       
-      inds <- c(which(names(temp.edata) == edata_cname), 
-                which(names(temp.edata) %in% filter_object$samples_keep))
-      temp.edata <- temp.edata[ , inds]
+      # Find the row indices in f_data of the samples that will be kept.
+      inds <- which(omicsData$f_data[, which(names(omicsData$f_data) == samp_cname)]
+                    %in% filter_object$f_data_keep)
+      
+      # Only keep the rows in f_data that correspond to the samples that
+      # should be kept.
+      omicsData$f_data <- omicsData$f_data[inds, ]
+      
+      # Find the column indices in e_data corresponding to the ID column and
+      # the sample names that should be kept. The first element in the vector
+      # is the column index where the ID column is.
+      inds <- c(which(names(omicsData$e_data) == edata_cname), 
+                which(names(omicsData$e_data) %in% filter_object$f_data_keep))
+      
+      # Only keep the columns in e_data that correspond to the samples that
+      # should be kept.
+      omicsData$e_data <- omicsData$e_data[ , inds]
+      
     }
     
-    # keep edata molecules in e_data #
-    if(!is.null(filter_object$edata_keep)){
-      inds <- which(temp.edata[ , which(names(temp.edata) == edata_cname)] %in% filter_object$edata_keep)
-      temp.edata <- temp.edata[inds, ]
+    # keep edata molecules in e_data and e_meta if it is present #
+    if (!is.null(filter_object$e_data_keep)) {
       
-      # if e_meta is present and we aren't explicitly specifying to keep anything
-      # in it, also keep these e_data molecules in e_meta #
-      if(!is.null(temp.emeta) & is.null(filter_object$emeta_keep)){
-        inds <- which(temp.emeta[ , which(names(temp.emeta) == edata_cname)] %in% filter_object$edata_keep)
-        temp.emeta <- temp.emeta[inds, ]
+      # Find the row indices in e_data that correspond to the biomolecules
+      # that should be kept.
+      inds <- which(omicsData$e_data[ , which(names(omicsData$e_data) == edata_cname)]
+                    %in% filter_object$e_data_keep)
+      
+      # Only keep the rows in e_data corresponding to the biomolecules that
+      # should be kept.
+      omicsData$e_data <- omicsData$e_data[inds, ]
+      
+      # if e_meta is present and we aren't explicitly specifying to keep
+      # anything in it, also keep these e_data molecules in e_meta #
+      if (!is.null(omicsData$e_meta) && is.null(filter_object$e_meta_keep)) {
+        
+        # Find the row indices of e_meta from the biomolecule IDs specified in
+        # e_data_keep.
+        inds <- which(omicsData$e_meta[ , which(names(omicsData$e_meta) == edata_cname)]
+                      %in% filter_object$e_data_keep)
+        
+        # Only keep the rows of e_meta that contain the biomolecule IDs from
+        # the e_data_keep input.
+        omicsData$e_meta <- omicsData$e_meta[inds, ]
+        
       }
+      
     }
     
-    # keep emeta molecules in e_meta (here, we are explicitly specifying things to keep) #
-    if(!is.null(filter_object$emeta_keep)){
-      inds <- which(temp.emeta[ , which(names(temp.emeta) == emeta_cname)] %in% filter_object$emeta_keep)
-      temp.emeta <- temp.emeta[inds, ]
+    # keep emeta molecules in e_meta (here, we are explicitly specifying things
+    # to keep).
+    if (!is.null(filter_object$e_meta_keep)) {
+      
+      # Find the row indices in e_meta corresponding to the IDs of the mapping
+      # variable. These are the rows that will be kept.
+      inds <- which(omicsData$e_meta[ , which(names(omicsData$e_meta) == emeta_cname)]
+                    %in% filter_object$e_meta_keep)
+      
+      # Only keep the IDs of the mapping variable specified in e_meta_keep.
+      omicsData$e_meta <- omicsData$e_meta[inds, ]
       
       # keep the union of the edata_molecules in both e_data and e_meta, in case 
       # more were kept in one than the other #
-      if(is.null(filter_object$edata_keep)){
-        # use intersection here, since nothing was explicitly specified to keep
-        # from edata, and if we use the union, then edata doesn't actually get filtered at all #
-        mols <- intersect(temp.edata[, which(names(temp.edata) == edata_cname)],
-                          temp.emeta[, which(names(temp.emeta) == edata_cname)])
-        inds <- which(temp.edata[, which(names(temp.edata) == edata_cname)] %in% mols)
-        temp.edata <- temp.edata[inds, ]
-        inds <- which(temp.emeta[, which(names(temp.emeta) == edata_cname)] %in% mols)
-        temp.emeta <- temp.emeta[inds, ]
-      }else{
-        # use union here, since there WERE things explicitly specified to keep from edata #
-        mols <- union(temp.edata[, which(names(temp.edata) == edata_cname)],
-                      temp.emeta[, which(names(temp.emeta) == edata_cname)])
-        inds <- which(temp.edata[, which(names(temp.edata) == edata_cname)] %in% mols)
-        temp.edata <- temp.edata[inds, ]
-        inds <- which(temp.emeta[, which(names(temp.emeta) == edata_cname)] %in% mols)
-        temp.emeta <- temp.emeta[inds, ]
+      if (is.null(filter_object$e_data_keep)) {
+        
+        # Use intersection here, since nothing was explicitly specified to
+        # keep from e_data, and if we use the union, then e_data doesn't
+        # actually get filtered at all.
+        # Find the biomolecule names that occur in both e_data and the reduced
+        # e_meta data frame.
+        mols <- intersect(omicsData$e_data[, which(names(omicsData$e_data) == edata_cname)],
+                          omicsData$e_meta[, which(names(omicsData$e_meta) == edata_cname)])
+        
+        # Find the row indices in e_data that correspond to the biomolecule
+        # IDs that occur in both e_data and the reduced e_meta.
+        inds <- which(omicsData$e_data[, which(names(omicsData$e_data) == edata_cname)]
+                      %in% mols)
+        
+        # Only keep the rows in e_data that correspond to the biomolecule IDs
+        # found in both e_data and the reduced e_meta data frames.
+        omicsData$e_data <- omicsData$e_data[inds, ]
+        
+        # Find the row indices in e_meta that match the biomolecules found in
+        # both e_data and the reduced e_meta data frames.
+        inds <- which(omicsData$e_meta[, which(names(omicsData$e_meta) == edata_cname)]
+                      %in% mols)
+        
+        # Only keep the rows in e_meta corresponding to the biomolecule IDs
+        # from the previous line.
+        omicsData$e_meta <- omicsData$e_meta[inds, ]
+        
+        # Keep arguments are specified for both e_data and e_meta.
+      } else {
+        
+        # use union here, since there WERE things explicitly specified to keep
+        # from e_data.
+        # Find the names of the biomolecule IDs found in both the reduced
+        # e_data and reduced e_meta data frames.
+        mols <- union(omicsData$e_data[, which(names(omicsData$e_data) == edata_cname)],
+                      omicsData$e_meta[, which(names(omicsData$e_meta) == edata_cname)])
+        
+        # Find the row indices in e_data corresponding to the biomolecule IDs
+        # that occur in both e_data and e_meta. Both data frames were
+        # previously filtered separately.
+        inds <- which(omicsData$e_data[, which(names(omicsData$e_data) == edata_cname)]
+                      %in% mols)
+        
+        # Only keep the rows in e_data that were extracted from the previous
+        # line.
+        omicsData$e_data <- omicsData$e_data[inds, ]
+        
+        # Find the row indices in e_meta corresponding to the biomolecule IDs
+        # that occur in both e_data and e_meta. Both data frames were
+        # previously filtered separately.
+        inds <- which(omicsData$e_meta[, which(names(omicsData$e_meta) == edata_cname)]
+                      %in% mols)
+        
+        # Only keep the rows in e_meta that correspond to the indices
+        # extracted in the previous line.
+        omicsData$e_meta <- omicsData$e_meta[inds, ]
+        
       }
+      
     }
+    
   }
   
-  # return the pieces needed to assemble a proData/pepData/lipidData/metabData object #
-  output <- list(temp.pep2 = temp.edata,
-                 temp.samp2 = temp.fdata,
-                 temp.meta1 = temp.emeta,
-                 edata_cname = edata_cname,
-                 emeta_cname = emeta_cname,
-                 samp_cname = samp_cname)
+  # Return the filtered omicsData pieces!!!
+  return (list(temp.edata = omicsData$e_data,
+               temp.fdata = omicsData$f_data,
+               temp.emeta = omicsData$e_meta))
   
-  return(output)
 }

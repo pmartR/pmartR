@@ -312,7 +312,7 @@ test_that('custom_filter and applyFilt produce the correct output',{
   expect_equal(attr(filtered_edr, "filters")[[1]]$type,
                "customFilt")
   expect_true(is.na(attr(filtered_edr, "filters")[[1]]$threshold))
-  expect_equal(attr(filtered_edr, "filters")[[1]]$filtered$edata_filt,
+  expect_equal(attr(filtered_edr, "filters")[[1]]$filtered$e_data_remove,
                c(6948849, 6948892, 6948891, 6948829, 976139, 6948862, 6709059,
                  6948848, 6948884, 6948913, 6706932, 6679059))
   expect_true(is.na(attr(filtered_edr, "filters")[[1]]$method))
@@ -366,7 +366,7 @@ test_that('custom_filter and applyFilt produce the correct output',{
   expect_equal(attr(filtered_fdr, "filters")[[1]]$type,
                "customFilt")
   expect_true(is.na(attr(filtered_fdr, "filters")[[1]]$threshold))
-  expect_equal(attr(filtered_fdr, "filters")[[1]]$filtered$samples_filt,
+  expect_equal(attr(filtered_fdr, "filters")[[1]]$filtered$f_data_remove,
                c("Infection3", "Infection5", "Mock2"))
   expect_true(is.na(attr(filtered_fdr, "filters")[[1]]$method))
   
@@ -419,7 +419,7 @@ test_that('custom_filter and applyFilt produce the correct output',{
   expect_equal(attr(filtered_emr, "filters")[[1]]$type,
                "customFilt")
   expect_true(is.na(attr(filtered_emr, "filters")[[1]]$threshold))
-  expect_equal(attr(filtered_emr, "filters")[[1]]$filtered$emeta_filt,
+  expect_equal(attr(filtered_emr, "filters")[[1]]$filtered$e_meta_remove,
                c("GRP78_HUMAN", "GELS_HUMAN"))
   expect_true(is.na(attr(filtered_emr, "filters")[[1]]$method))
   
@@ -472,10 +472,10 @@ test_that('custom_filter and applyFilt produce the correct output',{
   expect_equal(attr(filtered_efdr, "filters")[[1]]$type,
                "customFilt")
   expect_true(is.na(attr(filtered_efdr, "filters")[[1]]$threshold))
-  expect_equal(attr(filtered_efdr, "filters")[[1]]$filtered$edata_filt,
+  expect_equal(attr(filtered_efdr, "filters")[[1]]$filtered$e_data_remove,
                c(6948849, 6948892, 6948891, 6948829, 976139, 6948862, 6709059,
                  6948848, 6948884, 6948913, 6706932, 6679059))
-  expect_equal(attr(filtered_efdr, "filters")[[1]]$filtered$samples_filt,
+  expect_equal(attr(filtered_efdr, "filters")[[1]]$filtered$f_data_remove,
                c("Infection3", "Infection5", "Mock2"))
   expect_true(is.na(attr(filtered_efdr, "filters")[[1]]$method))
   
@@ -528,10 +528,10 @@ test_that('custom_filter and applyFilt produce the correct output',{
   expect_equal(attr(filtered_edemr, "filters")[[1]]$type,
                "customFilt")
   expect_true(is.na(attr(filtered_edemr, "filters")[[1]]$threshold))
-  expect_equal(attr(filtered_edemr, "filters")[[1]]$filtered$edata_filt,
+  expect_equal(attr(filtered_edemr, "filters")[[1]]$filtered$e_data_remove,
                c(6948849, 6948892, 6948891, 6948829, 976139, 6948862, 6709059,
                  6948848, 6948884, 6948913, 6706932, 6679059))
-  expect_equal(attr(filtered_edemr, "filters")[[1]]$filtered$emeta_filt,
+  expect_equal(attr(filtered_edemr, "filters")[[1]]$filtered$e_meta_remove,
                c("GRP78_HUMAN", "GELS_HUMAN"))
   expect_true(is.na(attr(filtered_edemr, "filters")[[1]]$method))
   
@@ -584,12 +584,12 @@ test_that('custom_filter and applyFilt produce the correct output',{
   expect_equal(attr(filtered_efer, "filters")[[1]]$type,
                "customFilt")
   expect_true(is.na(attr(filtered_efer, "filters")[[1]]$threshold))
-  expect_equal(attr(filtered_efer, "filters")[[1]]$filtered$edata_filt,
+  expect_equal(attr(filtered_efer, "filters")[[1]]$filtered$e_data_remove,
                c(6948849, 6948892, 6948891, 6948829, 976139, 6948862, 6709059,
                  6948848, 6948884, 6948913, 6706932, 6679059))
-  expect_equal(attr(filtered_efer, "filters")[[1]]$filtered$samples_filt,
+  expect_equal(attr(filtered_efer, "filters")[[1]]$filtered$f_data_remove,
                c("Infection3", "Infection5", "Mock2"))
-  expect_equal(attr(filtered_efer, "filters")[[1]]$filtered$emeta_filt,
+  expect_equal(attr(filtered_efer, "filters")[[1]]$filtered$e_meta_remove,
                c("GRP78_HUMAN", "GELS_HUMAN"))
   expect_true(is.na(attr(filtered_efer, "filters")[[1]]$method))
   
@@ -642,7 +642,7 @@ test_that('custom_filter and applyFilt produce the correct output',{
   expect_equal(attr(filtered_fdr_grp, "filters")[[1]]$type,
                "customFilt")
   expect_true(is.na(attr(filtered_fdr_grp, "filters")[[1]]$threshold))
-  expect_equal(attr(filtered_fdr_grp, "filters")[[1]]$filtered$samples_filt,
+  expect_equal(attr(filtered_fdr_grp, "filters")[[1]]$filtered$f_data_remove,
                c("Infection3", "Infection5", "Mock2"))
   expect_true(is.na(attr(filtered_fdr_grp, "filters")[[1]]$method))
   
@@ -703,7 +703,7 @@ test_that('custom_filter and applyFilt produce the correct output',{
   expect_equal(attr(filtered_edk, "filters")[[1]]$type,
                "customFilt")
   expect_true(is.na(attr(filtered_edk, "filters")[[1]]$threshold))
-  expect_equal(attr(filtered_edk, "filters")[[1]]$filtered$edata_keep,
+  expect_equal(attr(filtered_edk, "filters")[[1]]$filtered$e_data_keep,
                c(6948849, 6948892, 6948891, 6948829, 976139, 6948862, 6709059,
                  6948848, 6948884, 6948913, 6706932, 6679059))
   expect_true(is.na(attr(filtered_edk, "filters")[[1]]$method))
@@ -757,7 +757,7 @@ test_that('custom_filter and applyFilt produce the correct output',{
   expect_equal(attr(filtered_fdk, "filters")[[1]]$type,
                "customFilt")
   expect_true(is.na(attr(filtered_fdk, "filters")[[1]]$threshold))
-  expect_equal(attr(filtered_fdk, "filters")[[1]]$filtered$samples_keep,
+  expect_equal(attr(filtered_fdk, "filters")[[1]]$filtered$f_data_keep,
                c("Infection3", "Infection5", "Mock2"))
   expect_true(is.na(attr(filtered_fdk, "filters")[[1]]$method))
   
@@ -810,7 +810,7 @@ test_that('custom_filter and applyFilt produce the correct output',{
   expect_equal(attr(filtered_emk, "filters")[[1]]$type,
                "customFilt")
   expect_true(is.na(attr(filtered_emk, "filters")[[1]]$threshold))
-  expect_equal(attr(filtered_emk, "filters")[[1]]$filtered$emeta_keep,
+  expect_equal(attr(filtered_emk, "filters")[[1]]$filtered$e_meta_keep,
                c("GRP78_HUMAN", "GELS_HUMAN"))
   expect_true(is.na(attr(filtered_emk, "filters")[[1]]$method))
   
@@ -863,10 +863,10 @@ test_that('custom_filter and applyFilt produce the correct output',{
   expect_equal(attr(filtered_efdk, "filters")[[1]]$type,
                "customFilt")
   expect_true(is.na(attr(filtered_efdk, "filters")[[1]]$threshold))
-  expect_equal(attr(filtered_efdk, "filters")[[1]]$filtered$edata_keep,
+  expect_equal(attr(filtered_efdk, "filters")[[1]]$filtered$e_data_keep,
                c(6948849, 6948892, 6948891, 6948829, 976139, 6948862, 6709059,
                  6948848, 6948884, 6948913, 6706932, 6679059))
-  expect_equal(attr(filtered_efdk, "filters")[[1]]$filtered$samples_keep,
+  expect_equal(attr(filtered_efdk, "filters")[[1]]$filtered$f_data_keep,
                c("Infection3", "Infection5", "Mock2"))
   expect_true(is.na(attr(filtered_efdk, "filters")[[1]]$method))
   
@@ -919,10 +919,10 @@ test_that('custom_filter and applyFilt produce the correct output',{
   expect_equal(attr(filtered_edemk, "filters")[[1]]$type,
                "customFilt")
   expect_true(is.na(attr(filtered_edemk, "filters")[[1]]$threshold))
-  expect_equal(attr(filtered_edemk, "filters")[[1]]$filtered$edata_keep,
+  expect_equal(attr(filtered_edemk, "filters")[[1]]$filtered$e_data_keep,
                c(6948849, 6948892, 6948891, 6948829, 976139, 6948862, 6709059,
                  6948848, 6948884, 6948913, 6706932, 6679059))
-  expect_equal(attr(filtered_edemk, "filters")[[1]]$filtered$emeta_keep,
+  expect_equal(attr(filtered_edemk, "filters")[[1]]$filtered$e_meta_keep,
                c("GRP78_HUMAN", "GELS_HUMAN"))
   expect_true(is.na(attr(filtered_edemk, "filters")[[1]]$method))
   
@@ -975,12 +975,12 @@ test_that('custom_filter and applyFilt produce the correct output',{
   expect_equal(attr(filtered_efek, "filters")[[1]]$type,
                "customFilt")
   expect_true(is.na(attr(filtered_efek, "filters")[[1]]$threshold))
-  expect_equal(attr(filtered_efek, "filters")[[1]]$filtered$edata_keep,
+  expect_equal(attr(filtered_efek, "filters")[[1]]$filtered$e_data_keep,
                c(6948849, 6948892, 6948891, 6948829, 976139, 6948862, 6709059,
                  6948848, 6948884, 6948913, 6706932, 6679059))
-  expect_equal(attr(filtered_efek, "filters")[[1]]$filtered$samples_keep,
+  expect_equal(attr(filtered_efek, "filters")[[1]]$filtered$f_data_keep,
                c("Infection3", "Infection5", "Mock2"))
-  expect_equal(attr(filtered_efek, "filters")[[1]]$filtered$emeta_keep,
+  expect_equal(attr(filtered_efek, "filters")[[1]]$filtered$e_meta_keep,
                c("GRP78_HUMAN", "GELS_HUMAN"))
   expect_true(is.na(attr(filtered_efek, "filters")[[1]]$method))
   
@@ -1033,7 +1033,7 @@ test_that('custom_filter and applyFilt produce the correct output',{
   expect_equal(attr(filtered_fdk_grp, "filters")[[1]]$type,
                "customFilt")
   expect_true(is.na(attr(filtered_fdk_grp, "filters")[[1]]$threshold))
-  expect_equal(attr(filtered_fdk_grp, "filters")[[1]]$filtered$samples_keep,
+  expect_equal(attr(filtered_fdk_grp, "filters")[[1]]$filtered$f_data_keep,
                c("Infection3", "Infection5", "Mock2"))
   expect_true(is.na(attr(filtered_fdk_grp, "filters")[[1]]$method))
   
