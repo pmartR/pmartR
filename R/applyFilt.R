@@ -74,29 +74,68 @@
 #' @author Lisa Bramer, Kelly Stratton
 #'
 #' @export
-applyFilt <- function(filter_object, omicsData, ...){
-
+#' 
+applyFilt <- function (filter_object, omicsData, ...) {
+  
   # check that omicsData is of pmartR S3 class#
-  if(!inherits(omicsData, c("pepData", "proData", "lipidData", "metabData", "nmrData"))) stop("omicsData must be of class 'pepData', 'proData', 'lipidData', 'metabData' or 'nmrData'")
-
+  if (!inherits(omicsData, c("pepData", "proData", "lipidData", "metabData",
+                             "nmrData"))) {
+    
+    # Throw down an error for blatant abuse of the pmartR standards.
+    stop (paste("omicsData must be of class 'pepData', 'proData', 'lipidData',",
+                "'metabData' or 'nmrData'",
+                sep = " "))
+    
+  }
+  
   # check that filter_object is of an appropriate class#
-  if(!inherits(filter_object, c("cvFilt", "proteomicsFilt", "moleculeFilt", "rmdFilt", "imdanovaFilt", "customFilt"))) stop("filter_object must be of  'cvFilt', 'proteomicsFilt', 'moleculeFilt', 'rmdFilt', 'imdanovaFilt', or 'customFilt.")
-
+  if (!inherits(filter_object, c("cvFilt", "proteomicsFilt", "moleculeFilt",
+                                 "rmdFilt", "imdanovaFilt", "customFilt"))) {
+    
+    # Throw an error for unholy argument specification.
+    stop (paste("filter_object must be of  'cvFilt', 'proteomicsFilt',",
+                "'moleculeFilt', 'rmdFilt', 'imdanovaFilt', or 'customFilt.",
+                sep = " "))
+    
+  }
+  
   # pull column names from omicR_data attributes #
   col_nms = attr(omicsData, "cnames")
   samp_cname = col_nms$fdata_cname
   edata_cname = col_nms$edata_cname
   emeta_cname = col_nms$emeta_cname
-
+  
   # generate warnings if data type is not present but user asks to filter #
-  if(!is.null(filter_object$filter_edata) & is.null(edata_cname)) warning("e_data identifier column specified in filter_object is not present in omicsData$e_data. Specified e_data features cannot be filtered from data.")
-
-  if(!is.null(filter_object$filter_emeta) & is.null(emeta_cname)) warning("e_meta identifier column specified in filter_object is not present in omicsData$e_meta. Specified e_meta features cannot be filtered from data.")
-
-  if(!is.null(filter_object$filter_samples) & is.null(samp_cname)) warning("Sample identifier column specified in filter_object is not present in omicsData. Specified samples cannot be filtered from data.")
-
-
-  UseMethod("applyFilt")
+  if (!is.null(filter_object$filter_edata) & is.null(edata_cname)) {
+    
+    warning (paste("e_data identifier column specified in filter_object is not",
+                   "present in omicsData$e_data. Specified e_data features",
+                   "cannot be filtered from data.",
+                   sep = " "))
+    
+  }
+  
+  if (!is.null(filter_object$filter_emeta) & is.null(emeta_cname)) {
+    
+    warning (paste("e_meta identifier column specified in filter_object is not",
+                   "present in omicsData$e_meta. Specified e_meta features",
+                   "cannot be filtered from data.",
+                   sep = " "))
+    
+  }
+  
+  if (!is.null(filter_object$filter_samples) & is.null(samp_cname)) {
+    
+    warning (paste("Sample identifier column specified in filter_object is not",
+                   "present in omicsData. Specified samples cannot be filtered",
+                   "from data.",
+                   sep = " "))
+    
+  }
+  
+  
+  UseMethod ("applyFilt")
+  
 }
 
 # function for moleculeFilt
@@ -130,7 +169,7 @@ applyFilt.moleculeFilt <- function(filter_object, omicsData, min_num=2){
     stop ("min_num must be an integer greater than or equal to 1")
     
   }
-
+  
   # check that min_num is less than the total number of samples #
   if (min_num >= attr(filter_object, "num_samps")) {
     
@@ -224,7 +263,7 @@ applyFilt.moleculeFilt <- function(filter_object, omicsData, min_num=2){
                                              threshold = min_num,
                                              filtered = filter.edata,
                                              method = NA)
-
+  
   # RETURN THE FILTERED OMICSDATA OBJECT! YAY!!!
   return(omicsData)
   
@@ -237,7 +276,7 @@ applyFilt.moleculeFilt <- function(filter_object, omicsData, min_num=2){
 applyFilt.cvFilt <- function(filter_object, omicsData, cv_threshold = 150){
   
   # Perform some initial checks on the input arguments -------------------------
-
+  
   # Check if a CV filter has already been applied.
   if ('cvFilt' %in% get_filter_type(omicsData)) {
     
@@ -350,7 +389,7 @@ applyFilt.cvFilt <- function(filter_object, omicsData, cv_threshold = 150){
                                              threshold = cv_threshold,
                                              filtered = filter.edata,
                                              method = NA)
-
+  
   # We did it! Kudos to us!!
   return (omicsData)
   
@@ -363,7 +402,7 @@ applyFilt.cvFilt <- function(filter_object, omicsData, cv_threshold = 150){
 applyFilt.rmdFilt <- function (filter_object, omicsData,
                                pvalue_threshold = 0.0001,
                                min_num_biomolecules = 50) {
-
+  
   # Perform some initial checks on the input arguments -------------------------
   
   # Check if an RMD filter has already been applied.
@@ -377,8 +416,8 @@ applyFilt.rmdFilt <- function (filter_object, omicsData,
   # check that pvalue_threshold is between 0 and 1 #
   if (pvalue_threshold < 0 || pvalue_threshold > 1) {
     
-   # Figuratively smack the user with an error for not knowing what a p-value
-   # is (or what values it can take).
+    # Figuratively smack the user with an error for not knowing what a p-value
+    # is (or what values it can take).
     stop ("pvalue_threshold must be between 0 and 1.")
     
   }
@@ -487,7 +526,7 @@ applyFilt.rmdFilt <- function (filter_object, omicsData,
                                              threshold = pvalue_threshold,
                                              filtered = filter.samp,
                                              method = NA)
-
+  
   # Return the filtered data! High fives all around!!!
   return(omicsData)
   
@@ -553,9 +592,9 @@ applyFilt.proteomicsFilt <- function(filter_object,
                   sep = " "))
       
     }
-
+    
   }
-
+  
   # check that degen_peps is logical #
   if (!inherits(degen_peps, "logical")) {
     
@@ -576,7 +615,7 @@ applyFilt.proteomicsFilt <- function(filter_object,
   if (degen_peps) {
     
     count_bypep <- filter_object$counts_by_pep
-  
+    
     # pull peptides with more than one row in e_meta.  
     degen_peptides = as.character(data.frame(count_bypep[which(count_bypep$n > 1),])[, pep_id])
     
@@ -707,7 +746,7 @@ applyFilt.proteomicsFilt <- function(filter_object,
   
   # Return the filtered data! Look at us go!!
   return(omicsData)
-
+  
 }
 
 # function for imdanovaFilt
@@ -729,8 +768,8 @@ applyFilt.imdanovaFilt <- function (filter_object,
   # filtering. The G-test is a test of independence, used here to test the null
   # hypothesis of independence between the number of missing values across
   # groups.
-
-
+  
+  
   # Perform initial checks on the input arguments ------------------------------
   
   # Check if an imdanova filter has already been applied.
@@ -872,14 +911,14 @@ applyFilt.imdanovaFilt <- function (filter_object,
       # Update the group_sizes object created above in the initial checks
       # section.
       group_sizes <- attributes(filter_object)$group_sizes
-
+      
       # give a message to user saying which samples have been removed #
       message(paste("You have specified remove_single_groups = TRUE, so we have",
                     "removed the following sample(s) that correspond to",
                     "singleton groups prior to proceeding with the IMD-ANOVA",
                     "filter: ",
                     sep = " "),
-                    paste(samps_to_rm, collapse = ", "))
+              paste(samps_to_rm, collapse = ", "))
       
       # Will run if no singleton groups are present.
     } else {
@@ -943,23 +982,15 @@ applyFilt.imdanovaFilt <- function (filter_object,
   } else if (filter_method == "gtest") {
     
     filter.edata <- gtest_filter(nonmiss_per_group = nonmiss_per_group,
-                                 groupDF = groupDF,
-                                 e_data = omicsData$e_data,
-                                 alpha = NULL,
-                                 min_nonmiss_gtest = min_nonmiss_gtest,
-                                 cname_id = edata_cname,
-                                 samp_id = samp_cname)
+                                 omicsData = omicsData,
+                                 min_nonmiss_gtest = min_nonmiss_gtest)
     
   } else if(filter_method == "combined") {
     
     # Run the gtest filter.
-    filter.edata.gtest <- gtest_filter(nonmiss_per_group = nonmiss_per_group, 
-                                       groupDF = groupDF, 
-                                       e_data = omicsData$e_data, 
-                                       alpha = NULL, 
-                                       min_nonmiss_gtest = min_nonmiss_gtest, 
-                                       cname_id = edata_cname, 
-                                       samp_id = samp_cname)
+    filter.edata.gtest <- gtest_filter(nonmiss_per_group = nonmiss_per_group,
+                                       omicsData = omicsData,
+                                       min_nonmiss_gtest = min_nonmiss_gtest)
     
     # Run the anova filter.
     filter.edata.anova <- anova_filter(nonmiss_per_group = nonmiss_per_group, 
@@ -1096,7 +1127,7 @@ applyFilt.imdanovaFilt <- function (filter_object,
   
   # It was rough but we made it through!
   return(omicsData)
-
+  
 }
 
 # function for customFilt
