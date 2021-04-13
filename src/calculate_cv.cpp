@@ -47,7 +47,6 @@
  to every row of the matrix. At the end the list "final" of the pooled cv for each row 
  is returned. */
 
-
 #include <RcppArmadillo.h>
 // [[Rcpp::depends(RcppArmadillo)]]
 using namespace Rcpp;
@@ -102,10 +101,6 @@ double calculate_pool_cv(std::vector<double> cv, std::vector<double> non_na_valu
   for (unsigned int i = 0; i < cv.size(); i++)
   {
     total = total + cv[i] * non_na_values[i];
-  }
-  
-  for (unsigned int i = 0; i < cv.size(); i++)
-  {
     sum = sum + non_na_values[i];
   }
   
@@ -131,67 +126,68 @@ std::list<double> pooled_cv_rcpp(arma::mat mtr,std::vector<std::string> group)
   std::vector<double> temp;
   double pool_cv = 0;
   
-  for(unsigned int i = 0; i <mtr.n_rows;i++)
-  {
+  for(unsigned int i = 0; i <mtr.n_rows;i++) {
+    
     cpy = arma::conv_to< std::vector<double> >::from(mtr.row(i));
     
-    for (unsigned int i = 0, j = 0; i < gsize.size(); i++)
-    {
-      for (unsigned int k = 0; k < gsize[j]; k++)
-      {
-        if (ISNAN(cpy[k]))
+    for (unsigned int j = 0; j < gsize.size(); j++) {
+      
+      for (unsigned int k = 0; k < gsize[j]; k++) {
+        
+        if (ISNAN(cpy[k])) {
+          
           continue;
-        else 
-        {
+          
+        } else {
+          
           temp.push_back(cpy[k]);
+          
         }
       }
+      
       groups.push_back(temp);
       cpy.erase(cpy.begin(),cpy.begin()+gsize[j]);
       temp.clear();
-      j++;
-    }
- 
-  //calculating cv for each group and pushing_back into gcv vector
-  for (unsigned int i = 0; i < groups.size(); i++)
-  {
-    if(groups[i].size()<= 1)
-    {
-      groupcv.push_back(NA_INTEGER);
+
     }
     
-    else
-    {
-      tempcv = calculate_cv(groups[i]);
-      groupcv.push_back(tempcv);
+    // calculating cv for each group and pushing_back into gcv vector. Counting
+    // the number of nonmissing values per group and pushing_back into nonmiss
+    // vector
+    for (unsigned int i = 0; i < groups.size(); i++) {
+      
+      if(groups[i].size()<= 1) {
+        
+        groupcv.push_back(NA_INTEGER);
+        
+        nonmiss.push_back(0);
+        
+      } else {
+        
+        tempcv = calculate_cv(groups[i]);
+        groupcv.push_back(tempcv);
+        
+        tempnonmis = groups[i].size();
+        nonmiss.push_back(tempnonmis);
+        
+      }
+      
     }
-  }
   
-  //counting the number of nonmissing values per group and pushing_back into nonmiss vector
-  
-  for (unsigned int i = 0; i < groups.size(); i++)
-  { 
-       if(groups[i].size()<=1)
-        {
-           nonmiss.push_back(0);
-        }
-       else
-        {
-           tempnonmis = groups[i].size();
-           nonmiss.push_back(tempnonmis);
-        }
-  }
     pool_cv = calculate_pool_cv(groupcv, nonmiss);
 
     final.push_back(pool_cv);
     
-    // clearing these vectors so they will be ready to store the next row's information
+    // clearing these vectors so they will be ready to store the next row's
+    // information
     nonmiss.clear();
     groups.clear();
     groupcv.clear();
+    
   }
     
 return final;
+  
 }
 
 /*

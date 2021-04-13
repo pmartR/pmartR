@@ -2,149 +2,365 @@ context('filter by coefficient of variation')
 
 test_that('cv_filter and applyFilt produce the correct output',{
   
+  # Functions for calculating the CV -------------------------------------------
+  
+  cv.calc <- function(data, pooled) {
+    
+    # calculate mean of observations #
+    ybar <- mean(data, na.rm = TRUE)
+    
+    # calculate standard deviation of observations #
+    ystd <- sd(data, na.rm = TRUE)
+    
+    # Check if the pooled CV will be calculated.
+    if (pooled) {
+      
+      # Check if ybar is a number and ystd is NA. If it is then there is only
+      # one value for the current group and the CV should be 0.
+      if (is.numeric(ybar) && is.na(ystd)) {
+        
+        sampcv <- 0
+        
+      } else {
+        
+        # calculate the sample cv value #
+        sampcv <- ystd / ybar
+        
+        # Multiply the CV value by 100. (It's for fun)
+        sampcv <- sampcv * 100
+        
+      }
+      
+    } else {
+      
+      # calculate the sample cv value #
+      sampcv <- ystd / ybar
+      
+      # Multiply the CV value by 100. (It's for fun)
+      sampcv <- sampcv * 100
+      
+    }
+    
+    # return cv values #
+    return(sampcv)
+    
+  }
+  
+  # Create a function to count the number of non-missing values to be used in
+  # connection with apply.
+  count <- function (x) {
+    
+    present <- sum(!is.na(x))
+    
+    return (present)
+    
+  }
+  
+  # This function only calculates the pooled CV for the peptide data in the
+  # little_pdata.RData file. It assumes the peptide ID column is the first
+  # column in e_data. The order of the remaining columns can be changed though.
+  cv.calc.pooled <- function (x, pooled, rm_single) {
+    
+    # Go fishin for the group attribute.
+    groupDF <- attr(x, "group_DF")
+    
+    # Check if singleton groups should be removed.
+    if (rm_single) {
+      
+      # Fetch the names of the non-singleton groups.
+      group_names <- attributes(groupDF)$nonsingleton_groups
+      
+      # Determine the number of non-singleton groups.
+      n_groups <- length(group_names)
+      
+    } else {
+      
+      # Fish out the unique group names.
+      group_names <- unique(groupDF$Group)
+      
+      # Determine the number of groups present.
+      n_groups <- length(group_names)
+      
+    }
+    
+    # Create a list that will hold the row indices for each sample that belongs
+    # to each group in f_data. Note: a one needs to be added when using these
+    # indices to correctly subset e_data because the ID column is the first
+    # column of the test data.
+    indices <- vector(mode = "list",
+                      length = n_groups)
+    
+    # Loop through each group to find the indices of the samples that belong to
+    # each group.
+    for (e in 1:n_groups) {
+      
+      indices[[e]] <- which(groupDF$Group == group_names[[e]])
+      
+    }
+    
+    # Create a list that will hold the counts of non-missing values for each
+    # group. Each element of n_nonmissing will be a vector with a length equal
+    # to the number of rows in e_data. The elements of the vector will be the
+    # counts of non-missing values for the current group. The list will have a
+    # length equal to the number of groups.
+    n_nonmissing <- vector(mode = "list",
+                           length = n_groups)
+    
+    # Loop through each group.
+    for (e in 1:n_groups) {
+      
+      # Count the non-missing values for the eth group.
+      n_nonmissing[[e]] <- apply(x$e_data[, indices[[e]] + 1], 1, count)
+      
+    }
+    
+    # Create a list that will hold the CV for each group. Each element of cv
+    # will be a vector with a length equal to the number of rows in e_data. The
+    # elements of the vector will be the CV for each biomolecule calculated by
+    # group. The length of the list is equal to the number of groups.
+    cv <- vector(mode = "list",
+                 length = n_groups)
+    
+    # Loop through each group.
+    for (e in 1:n_groups) {
+      
+      # Calculate the CV for the eth group.
+      cv[[e]] <- apply(x$e_data[, indices[[e]] + 1], 1, cv.calc, pooled = TRUE)
+      
+    }
+    
+    # Create a list that will hold the indices of the CV values that are equal to
+    # zero.
+    cv_zero <- vector(mode = "list",
+                      length = n_groups)
+    
+    # Loop through each group and find the indices corresponding to a group with
+    # a CV of zero. These will be used to change the counts from 1 to 0. This is
+    # done because the CV will only depend on the group(s) that have more than
+    # one non-missing value.
+    for (e in 1:n_groups) {
+      
+      # Extricate the indices of cv whose value is zero.
+      cv_zero[[e]] <- which(cv[[e]] == 0)
+      
+      # Change any elements in n_nonmissing[[e]] to zero that correspond to the
+      # elements in cv[[e]] that are zero. These elements correspond to groups
+      # that only have one non-missing value and should be ignored when
+      # calculating the CV.
+      n_nonmissing[[e]][cv_zero[[e]]] <- 0
+      
+    }
+    
+    # Fashion a list to hold the numerator of the pooled CV for each group
+    # within each biomolecule. For example, if there are 150 rows in e_data then
+    # each element in numerator (as well as each element in n_nonmissing and cv)
+    # will have a length of 150. These 150 elements correspond to the numerator
+    # of the pooled CV for each biomolecule in e_data.
+    numerator <- vector(mode = "list",
+                        length = n_groups)
+    
+    # Loop through each group and calculate the numerator of the pooled CV.
+    for (e in 1:n_groups) {
+      
+      # Calculate the numerator of the pooled CV for each group.
+      numerator[[e]] <- n_nonmissing[[e]] * cv[[e]]
+      
+    }
+    
+    # Calculate the pooled cv. The Reduce function performs element-wise
+    # calculations across the vectors in numerator and n_nonmissing. For
+    # example, if numerator <- list(1:3, 4:6) then Reduce(`+`, numerator) will
+    # produce the vector 5, 7, 9.
+    cv_pooled <- Reduce(`+`, numerator) / Reduce(`+`, n_nonmissing)
+    
+    # Return the pooled CV!!!
+    return (cv_pooled)
+    
+  }
+  
   # Load the reduced peptide data frames ---------------------------------------
   
   load(system.file('testdata',
-                   'filter_data_cv.RData',
+                   'little_pdata.RData',
                    package = 'pmartR'))
   
-  # Test filter_cv without groups ----------------------------------------------
-  
   # Create a pepData object with the reduced data set.
-  pdata_cv <- as.pepData(e_data = edata_cv,
-                         f_data = fdata_cv,
-                         e_meta = emeta_cv,
-                         edata_cname = 'Mass_Tag_ID',
-                         fdata_cname = 'SampleID',
-                         emeta_cname = 'Protein')
+  pdata <- as.pepData(e_data = edata,
+                      f_data = fdata,
+                      e_meta = emeta,
+                      edata_cname = "Mass_Tag_ID",
+                      fdata_cname = "SampleID",
+                      emeta_cname = "Protein")
+  
+  # Forge a group_DF attribute for pdata.
+  pdata_gdf <- group_designation(omicsData = pdata,
+                                 main_effects = 'Condition')
+  
+  # Copy the pepData object created above. This object will have three groups
+  # (two Infection and one Mock). The Mock group will be reduced to a singleton
+  # group later. sg: singleton group.
+  pdata_sg <- pdata
+  
+  # Break the Infection group into two groups.
+  pdata_sg$f_data$Condition <- c(rep("Infection1", 4),
+                                 rep("Infection2", 5),
+                                 rep("Mock", 3))
+  
+  # Remove two of the Mock samples.
+  pdata_sg$e_data <- pdata_sg$e_data[, -c(12, 13)]
+  pdata_sg$f_data <- pdata_sg$f_data[-c(11, 12), ]
+  
+  # Run the group_designation function on the singleton group pepData object.
+  pdata_sg_gdf <- group_designation(omicsData = pdata_sg,
+                                    main_effects = "Condition")
+  
+  # Test cv_filter without groups ----------------------------------------------
   
   # Try creating a cvFilt object with an untoward input object.
-  expect_error(cv_filter(omicsData = fdata_cv),
+  expect_error(cv_filter(omicsData = fdata),
                paste("omicsData must be of class 'pepData', 'proData',",
                      "'metabData', 'lipidData', or 'nmrData'",
                      sep = ' '))
   
-  # Run cv filter on the reduced data frame.
-  filter_cv <- cv_filter(omicsData = pdata_cv)
+  # Calculate the CV with R functions. The first column of edata is removed
+  # because it contains the peptide IDs.
+  use_r <- apply(pdata$e_data[ -1], 1, cv.calc, pooled = FALSE)
   
-  # Review the class for the cv_filter object.
-  expect_s3_class(filter_cv,
+  # Remove the names from the use_r vector.
+  names(use_r) <- NULL
+  
+  # Run cv_filter on the reduced data frame.
+  filter <- cv_filter(omicsData = pdata)
+  
+  # Review the class for the filter object.
+  expect_s3_class(filter,
                   c('cvFilt', 'data.frame'))
   
-  # Check the dimensions of cv_filter.
-  expect_equal(dim(filter_cv),
+  # Check the dimensions of filter.
+  expect_equal(dim(filter),
                c(150, 2))
   
-  # Ensure the row sums are correct.
-  expect_identical(round(filter_cv$CV, 3),
-                   c(53.413, 44.024, 48.222, 51.462, 44.7, 55.745, 
-                     80.581, 64.386, 44.421, 53.135, 28.859, 46.544, 
-                     34.115, 48.714, 22.616, 105.602, 57.335, 12.66, 
-                     7.951, 46.164, 72.192, 56.355, 54.41, 64.163, 
-                     44.241, 75.603, 6.917, 59.268, 69.866, 33.917, 
-                     35.984, 40.864, 53.374, 39.86, 8.21, 57.073, 
-                     55.883, 23.939, 42.402, 49.515, 106.378, 60.911, 
-                     52.559, 67.488, 31.147, 60.425, 44.164, 27.938, 
-                     34.481, 24.016, 91.029, 77.308, 126.354, 33.327, 
-                     69.152, 28.834, 48.358, 58.589, 70.466, 41.951, 
-                     55.988, 39.315, 48.917, 77.449, 40.776, 61.521, 
-                     74.333, 24.448, 57.545, 57.277, 33.157, 56.268, 
-                     48.047, 50.174, 42.885, 43.122, 43.826, 72.966, 
-                     34.606, 40.572, 62.338, 28.218, 63.366, 37.894, 
-                     35.297, 28.522, 34.866, 26.911, 46.264, 63.554, 
-                     25.862, 39.274, 54.486, 50.965, 66.826, 45.046, 
-                     41.899, 41.899, 42.382, 38.602, 34.281, 46.25, 
-                     50.955, 36.156, 31.934, 47.73, 43.722, 59.005, 
-                     56.884, 50.58, 36.924, 73.401, 27.896, 47.313, 
-                     43.419, 38.397, 27.599, 35.151, 31.254, 171.535, 
-                     197.314, 171.27, 171.27, 186.315, 152.481, 225.596, 
-                     157.757, 209.967, 213.983, 203.991, 209.497, 154.497, 
-                     199.676, 162.603, 150.238, 151.622, 166.633, 162.054, 
-                     174.03, 154.332, 171.218, 154.864, 164.243, 157.345, 
-                     159.167, 160.373, 151.62, 178.301, 160.972, 153.229))
+  # Ensure the CV values are correct.
+  expect_equal(round(filter$CV, 3),
+               round(use_r, 3))
   
   # Inspect the attributes of the cvFilt object.
-  expect_identical(attr(filter_cv, 'max_x_val'),
-                   200)
-  expect_equal(attr(filter_cv, 'tot_nas'),
-               0)
-  expect_false(attr(filter_cv, 'pooled'))
+  expect_identical(round(attr(filter, 'max_x_val'), 3),
+                   106.068)
+  expect_equal(attr(filter, 'tot_nas'),
+               9)
+  expect_false(attr(filter, 'pooled'))
   
-  # Test filter_cv with groups -------------------------------------------------
+  # Log transmogrify the data.
+  pdata_log <- edata_transform(omicsData = pdata,
+                               data_scale = "log")
   
-  # Forge a group_DF attribute for pdata.
-  pdata_gdf <- group_designation(omicsData = pdata_cv,
-                                 main_effects = 'Condition')
+  # CV filter the log transmogrified data.
+  filter_log <- cv_filter(omicsData = pdata_log)
   
-  # Run cv filter on the reduced data frame with groups added.
+  # Check that the cv_filter object is the same before and after log
+  # transmogrification.
+  expect_equal(filter, filter_log)
+  
+  # Test cv_filter with groups -------------------------------------------------
+  
+  # Calculate the pooled CV with R funcitons.
+  use_r_pooled <- cv.calc.pooled(x = pdata_gdf,
+                                 pooled = TRUE,
+                                 rm_single = FALSE)
+  
+  # Remove the names from use_r_pooled.
+  names(use_r_pooled) <- NULL
+  
+  # Run cv_filter on the reduced data frame with groups added.
   filter_gdf <- cv_filter(omicsData = pdata_gdf)
   
-  # Review the class for the filter_cv object.
+  # Review the class for the filter_gdf object.
   expect_s3_class(filter_gdf,
                   c('cvFilt', 'data.frame'))
   
-  # Check the dimensions of filter_cv.
+  # Check the dimensions of filter_gdf.
   expect_equal(dim(filter_gdf),
                c(150, 2))
   
-  # Ensure the row sums are correct.
-  expect_identical(round(filter_gdf$CV, 3),
-                   c(36.012, 32.768, 31.93, 47.891, 20.448, 33.369, 42.747, 
-                     36.528, 19.768, 26.027, 28.859, 29.821, 20.875, 19.629, 
-                     22.616, 44.259, 36.152, 12.66, 7.951, 29.045, 52.619, 
-                     38.169, 26.964, 24.18, 34.24, 57.684, 6.917, 22.252, 
-                     20.755, 30.455, 32.856, 28.478, 54.257, 28.876, 8.21, 
-                     31.248, 33.82, 23.939, 29.86, 23.593, 31.444, 15.693, 
-                     28.477, 23.84, 27.968, 11.561, 44.164, 27.526, 27.125, 
-                     23.237, 54.696, 27.129, NaN, 33.327, 69.152, 21.461, 
-                     49.465, 14.271, 49.843, 16.571, 31.854, 39.315, 48.917, 
-                     45.667, 34.881, 22.933, 74.333, 24.193, 20.719, 36.68, 
-                     29.829, 23.409, 28.334, 51.737, 42.851, 27.862, 41.238, 
-                     20.086, 31.641, 42.73, 62.338, 28.521, 49.657, 25.383, 
-                     16.76, 23.977, 30.713, 22.888, 42.954, 38.729, 20.915, 
-                     39.274, 18.885, 26.121, 23.757, 25.38, 13.901, 13.901, 
-                     22.142, 28.448, 30.159, 46.25, 24.448, 14.45, 27.964, 
-                     24.852, 33.451, 25.986, 27.423, 41.608, 32.924, 41.563, 
-                     26.448, 40.992, 31.513, 31.325, 26.42, 33.803, 28.45, 
-                     71.728, 66.075, 63.178, 63.178, 94.102, 61.05, 149.144, 
-                     64.717, 92.595, 89.103, 118.727, 156.935, 48.823, 92.817, 
-                     77.15, 62.025, 90.059, 79.209, 59.814, 60.821, 45.93, 
-                     67.457, 71.802, 100.432, 62.53, 63.508, 97.046, 59.292, 
-                     54.676, 46.204, 66.356))
+  # Ensure the CV values are correct.
+  expect_equal(round(filter_gdf$CV, 3),
+               round(use_r_pooled, 3))
   
   # Inspect the attributes of the cvFilt object.
   expect_equal(round(attr(filter_gdf, 'max_x_val'), 3),
-               134.544)
+               69.295)
   expect_equal(attr(filter_gdf, 'tot_nas'),
-               1)
+               10)
   expect_true(attr(filter_gdf, 'pooled'))
+  
+  # Test cv_filter with singleton groups ---------------------------------------
+  
+  # Calculate the pooled CV with R funcitons for data with singleton groups.
+  use_r_sg <- cv.calc.pooled(x = pdata_sg_gdf,
+                             pooled = TRUE,
+                             rm_single = TRUE)
+  
+  # Remove the names from use_r_sg.
+  names(use_r_sg) <- NULL
+  
+  # Run cv_filter on the data with singleton groups.
+  expect_warning(filter_sg_gdf <- cv_filter(omicsData = pdata_sg_gdf,
+                                            use_groups = TRUE),
+                 paste("Grouping information is being utilized when",
+                       "calculating the CV, and there are group\\(s\\)",
+                       "consisting of a single sample. The singleton",
+                       "group\\(s\\) will be ignored by this filter.",
+                       sep = " "))
+  
+  # Review the class for the filter_sg_gdf object.
+  expect_s3_class(filter_sg_gdf,
+                  c('cvFilt', 'data.frame'))
+  
+  # Check the dimensions of filter_sg_gdf.
+  expect_equal(dim(filter_sg_gdf),
+               c(150, 2))
+  
+  # Ensure the CV values are correct.
+  expect_equal(round(filter_sg_gdf$CV, 3),
+               round(use_r_sg, 3))
+  
+  # Inspect the attributes of the cvFilt object.
+  expect_equal(round(attr(filter_sg_gdf, 'max_x_val'), 3),
+               71.332)
+  expect_equal(attr(filter_sg_gdf, 'tot_nas'),
+               20)
+  expect_true(attr(filter_sg_gdf, 'pooled'))
   
   # Test applyFilt without groups ----------------------------------------------
   
+  # Apply a filter with the threshold being the max CV value (no peptides should
+  # be filtered).
+  expect_identical(applyFilt(filter_object = filter,
+                             omicsData = pdata,
+                             cv_threshold = max(na.omit(filter$CV)))$e_data,
+                   pdata$e_data)
+  
   # Apply the filter without groups to the reduced peptide data set.
-  filtered <- applyFilt(filter_object = filter_cv,
-                        omicsData = pdata_cv,
-                        cv_threshold = 150)
+  filtered <- applyFilt(filter_object = filter,
+                        omicsData = pdata,
+                        cv_threshold = 90)
 
   # Ensure the class and attributes that shouldn't have changed didn't change.
-  expect_identical(attr(pdata_cv, 'cnames'),
+  expect_identical(attr(pdata, 'cnames'),
                    attr(filtered, 'cnames'))
-  expect_identical(attr(pdata_cv, 'check.names'),
+  expect_identical(attr(pdata, 'check.names'),
                    attr(filtered, 'check.names'))
-  expect_identical(class(pdata_cv),
+  expect_identical(class(pdata),
                    class(filtered))
 
   # Examine the filters attribute.
   expect_equal(attr(filtered, 'filters')[[1]]$type,
                'cvFilt')
   expect_identical(attr(filtered, 'filters')[[1]]$threshold,
-                   150)
+                   90)
   expect_equal(attr(filtered, 'filters')[[1]]$filtered,
-               c(6949002, 6955078, 6959151, 6959152, 6959154, 6967199, 6967232,
-                 6967250, 6967253, 6967261, 6967276, 6967283, 6967345, 6967513,
-                 6976251, 6976332, 6976356, 6976383, 6976619, 7039620, 7040132,
-                 7045499, 7105633, 7217077, 7322754, 7439172, 7440084, 7451135,
-                 7537762, 7537769, 7590799))
+               c(11055, 6701524, 6781846, 6809644, 6948899))
   expect_true(is.na(attr(filtered, 'filters')[[1]]$method))
 
   # Investigate the data_info attribute.
@@ -153,11 +369,11 @@ test_that('cv_filter and applyFilt produce the correct output',{
   expect_false(attr(filtered, 'data_info')$norm_info$is_normalized,
                FALSE)
   expect_equal(attr(filtered, 'data_info')$num_edata,
-               119)
+               145)
   expect_equal(attr(filtered, 'data_info')$num_miss_obs,
-               228)
+               318)
   expect_equal(round(attr(filtered, 'data_info')$prop_missing, 4),
-               0.1597)
+               0.1828)
   expect_equal(attr(filtered, 'data_info')$num_samps,
                12)
   expect_null(attr(filtered, 'data_info')$data_types)
@@ -165,38 +381,38 @@ test_that('cv_filter and applyFilt produce the correct output',{
   # Explore the meta_info attribute.
   expect_true(attr(filtered, 'meta_info')$meta_data)
   expect_equal(attr(filtered, 'meta_info')$num_emeta,
-               65)
+               81)
 
   # Inspect the filtered e_data, f_data, and e_meta data frames.
   expect_equal(dim(filtered$e_data),
-               c(119, 13))
+               c(145, 13))
   expect_equal(dim(filtered$f_data),
                c(12, 2))
   expect_equal(dim(filtered$e_meta),
-               c(119, 4))
+               c(145, 4))
   
   # Test applyFilt with groups -------------------------------------------------
   
-  # Apply the filter without groups to the reduced peptide data set.
+  # Apply the filter with groups to the reduced peptide data set.
   filtered_gdf <- applyFilt(filter_object = filter_gdf,
                             omicsData = pdata_gdf,
-                            cv_threshold = 150)
+                            cv_threshold = 60)
   
   # Ensure the class and attributes that shouldn't have changed didn't change.
-  expect_identical(attr(pdata_cv, 'cnames'),
+  expect_identical(attr(pdata, 'cnames'),
                    attr(filtered_gdf, 'cnames'))
-  expect_identical(attr(pdata_cv, 'check.names'),
+  expect_identical(attr(pdata, 'check.names'),
                    attr(filtered_gdf, 'check.names'))
-  expect_identical(class(pdata_cv),
+  expect_identical(class(pdata),
                    class(filtered_gdf))
   
   # Examine the filters attribute.
   expect_equal(attr(filtered_gdf, 'filters')[[1]]$type,
                'cvFilt')
   expect_identical(attr(filtered_gdf, 'filters')[[1]]$threshold,
-                   150)
+                   60)
   expect_equal(attr(filtered_gdf, 'filters')[[1]]$filtered,
-               6967283)
+               c(6850636, 6948820, 6948835, 6948904))
   expect_true(is.na(attr(filtered_gdf, 'filters')[[1]]$method))
   
   # Investigate the data_info attribute.
@@ -205,11 +421,11 @@ test_that('cv_filter and applyFilt produce the correct output',{
   expect_false(attr(filtered_gdf, 'data_info')$norm_info$is_normalized,
                FALSE)
   expect_equal(attr(filtered_gdf, 'data_info')$num_edata,
-               149)
+               146)
   expect_equal(attr(filtered_gdf, 'data_info')$num_miss_obs,
-               295)
+               317)
   expect_equal(round(attr(filtered_gdf, 'data_info')$prop_missing, 4),
-               0.165)
+               0.1809)
   expect_equal(attr(filtered_gdf, 'data_info')$num_samps,
                12)
   expect_null(attr(filtered_gdf, 'data_info')$data_types)
@@ -217,14 +433,66 @@ test_that('cv_filter and applyFilt produce the correct output',{
   # Explore the meta_info attribute.
   expect_true(attr(filtered_gdf, 'meta_info')$meta_data)
   expect_equal(attr(filtered_gdf, 'meta_info')$num_emeta,
-               85)
+               80)
   
   # Inspect the filtered_gdf e_data, f_data, and e_meta data frames.
   expect_equal(dim(filtered_gdf$e_data),
-               c(149, 13))
+               c(146, 13))
   expect_equal(dim(filtered_gdf$f_data),
                c(12, 2))
   expect_equal(dim(filtered_gdf$e_meta),
-               c(149, 4))
+               c(146, 4))
+  
+  # Test applyFilt with singleton groups ---------------------------------------
+  
+  # Apply the filter with groups to the reduced peptide data set.
+  filtered_sg_gdf <- applyFilt(filter_object = filter_sg_gdf,
+                               omicsData = pdata_sg_gdf,
+                               cv_threshold = 60)
+  
+  # Ensure the class and attributes that shouldn't have changed didn't change.
+  expect_identical(attr(pdata, 'cnames'),
+                   attr(filtered_sg_gdf, 'cnames'))
+  expect_identical(attr(pdata, 'check.names'),
+                   attr(filtered_sg_gdf, 'check.names'))
+  expect_identical(class(pdata),
+                   class(filtered_sg_gdf))
+  
+  # Examine the filters attribute.
+  expect_equal(attr(filtered_sg_gdf, 'filters')[[1]]$type,
+               'cvFilt')
+  expect_identical(attr(filtered_sg_gdf, 'filters')[[1]]$threshold,
+                   60)
+  expect_equal(attr(filtered_sg_gdf, 'filters')[[1]]$filtered,
+               c(6948820, 6948835, 6948904))
+  expect_true(is.na(attr(filtered_sg_gdf, 'filters')[[1]]$method))
+  
+  # Investigate the data_info attribute.
+  expect_equal(attr(filtered_sg_gdf, 'data_info')$data_scale,
+               'abundance')
+  expect_false(attr(filtered_sg_gdf, 'data_info')$norm_info$is_normalized,
+               FALSE)
+  expect_equal(attr(filtered_sg_gdf, 'data_info')$num_edata,
+               147)
+  expect_equal(attr(filtered_sg_gdf, 'data_info')$num_miss_obs,
+               280)
+  expect_equal(round(attr(filtered_sg_gdf, 'data_info')$prop_missing, 4),
+               0.1905)
+  expect_equal(attr(filtered_sg_gdf, 'data_info')$num_samps,
+               10)
+  expect_null(attr(filtered_sg_gdf, 'data_info')$data_types)
+  
+  # Explore the meta_info attribute.
+  expect_true(attr(filtered_sg_gdf, 'meta_info')$meta_data)
+  expect_equal(attr(filtered_sg_gdf, 'meta_info')$num_emeta,
+               81)
+  
+  # Inspect the filtered_sg_gdf e_data, f_data, and e_meta data frames.
+  expect_equal(dim(filtered_sg_gdf$e_data),
+               c(147, 11))
+  expect_equal(dim(filtered_sg_gdf$f_data),
+               c(10, 2))
+  expect_equal(dim(filtered_sg_gdf$e_meta),
+               c(147, 4))
   
 })

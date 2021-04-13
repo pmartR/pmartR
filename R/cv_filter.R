@@ -28,10 +28,11 @@
 #'  variation}. The Indian Journal of Statistics. 57: 57-75.
 #'
 #' @examples
-#' dontrun{
+#' \dontrun{
 #' library(pmartRdata)
 #' data("pep_object")
-#' pep_object2 <- group_designation(omicsData = pep_object, main_effects = "Condition")
+#' pep_object2 <- group_designation(omicsData = pep_object,
+#'                                  main_effects = "Condition")
 #' to_filter <- cv_filter(omicsData = pep_object2, use_groups = TRUE)
 #' summary(to_filter, cv_threshold = 30)
 #'}
@@ -39,7 +40,7 @@
 #'@author Lisa Bramer, Kelly Stratton
 #'
 #'@export
-
+#'
 cv_filter <- function(omicsData, use_groups = TRUE) {
   
   # Run some preliminary checks ------------------------------------------------
@@ -65,7 +66,7 @@ cv_filter <- function(omicsData, use_groups = TRUE) {
   
   # Check if use_groups is TRUE but the group_designation function has not been
   # run yet.
-  if (use_groups==TRUE && is.null(attr(omicsData, "group_DF"))) {
+  if (use_groups == TRUE && is.null(attr(omicsData, "group_DF"))) {
     
     # Set use groups to FALSE and continue running. At this point it is clear
     # the user doesn't get it. We will help them out a little by doing some of
@@ -91,9 +92,9 @@ cv_filter <- function(omicsData, use_groups = TRUE) {
   } else {
     
     # Convert the data back to the abundance scale to perform the CV
-    # calculations.
+    # calculations. Remove the column containing the biomolecule IDs.
     cur_edata <- edata_transform(omicsData = omicsData,
-                                 data_scale = get_data_scale(omicsData))$e_data
+                                 data_scale = "abundance")$e_data[, -id_col]
     
   }
   
@@ -120,29 +121,37 @@ cv_filter <- function(omicsData, use_groups = TRUE) {
     # objects for not having a convenient way of extracting attributes!!
     groupDF <- attr(omicsData, "group_DF")
     
-    # added by KGS Sept 2020: filters out any samples corresponding to singleton groups before proceeding with CV filter
-    # the samples themselves won't be filtered out of the omicsData object upon application of the filter though
-    group_sizes <- data.frame(Group = names(table(groupDF$Group)), n_group = as.numeric(table(groupDF$Group)))
+    # From the group_DF attribute extract the non-singleton group names.
+    nonsingletons <- attr(groupDF, "nonsingleton_groups")
     
-    if (any(group_sizes$n_group == 1)) {
-      # which group(s) #
-      singleton_groups <-
-        group_sizes$Group[group_sizes$n_group == 1]
+    # Check if any groups are singletons.
+    # The following if statement removes any singleton samples from cur_edata.
+    # These samples will not be part of the CV calculation and they will not be
+    # filtered out of the omicsData object when the filter is applied.
+    if (!setequal(unique(groupDF$Group), nonsingletons)) {
       
-      # which sample name(s) #
-      samps_to_rm <-
-        as.character(groupDF[which(groupDF$Group %in% singleton_groups), get_fdata_cname(omicsData)])
+      # Give a warning that singleton groups will not be used to determine
+      # which biomolecules will be filtered.
+      warning (paste("Grouping information is being utilized when calculating",
+                     "the CV, and there are group(s) consisting of a single",
+                     "sample. The singleton group(s) will be ignored by this",
+                     "filter.",
+                     sep = " "))
       
-      warning("Grouping information is being utilized when calculating the CV, and there are group(s) consisting of a single sample. These singleton group(s) will be ignored by this filter.")
+      # Keep rows in groupDF that correspond to non-singleton groups.
+      groupDF <- groupDF[which(groupDF$Group %in% nonsingletons), ]
       
-      # use custom_filter to remove the sample(s) from the omicsData object #
-      my_cust_filt <-
-        custom_filter(omicsData, f_data_remove = samps_to_rm)
-      omicsData <- applyFilt(my_cust_filt, omicsData)
+      # Fish out the name of the column that contains the sample names.
+      sID <- get_fdata_cname(omicsData)
       
-      groupDF <-
-        groupDF[-which(groupDF[, get_fdata_cname(omicsData)] %in% samps_to_rm),]
+      # Keep columns in cur_edata corresponding to non-singleton groups.
+      cur_edata <- cur_edata[, which(names(cur_edata) %in% groupDF[, sID])]
+      
     }
+    
+    # Both cur_edata and group_dat must have the rows/columns ordered so all of
+    # the samples belonging to a group are grouped together. If they are not in
+    # order the C++ function will cause R to abort.
     
     # Reorder the columns of cur_edata so the C++ function that calculates the
     # pooled CV can correctly account for group membership.
@@ -196,31 +205,7 @@ cv_filter <- function(omicsData, use_groups = TRUE) {
   attr(output, "max_x_val") <- x.max
   attr(output, "tot_nas") <- tot.nas
   
-  # Return the completed object. You did it!!!
+  # Return the completed object. We did it!!!
   return (output)
   
-}
-
-#' Calculate the Coefficient of Variation (CV)
-#'
-#' This function calculates the coefficient of variation for a vector of data
-#'
-#' @param data a vector of values on the "abundance" scale (not log transformed)
-#'
-#' @return cv value for the vector of values with missing values ignored in the calculation
-#'
-#' @author Lisa Bramer
-
-cv.calc <- function(data) {
-  # calculate mean of observations #
-  ybar = mean(data, na.rm = TRUE)
-  
-  # calculate standard deviation of observations #
-  ystd = sd(data, na.rm = TRUE)
-  
-  # calculate the sample cv value #
-  sampcv = ystd / ybar
-  
-  # return cv values #
-  return(sampcv)
 }

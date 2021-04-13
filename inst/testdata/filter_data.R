@@ -43,37 +43,6 @@ emeta_mol <- pmartRdata::pep_emeta[c(leq[1:filtered],
 # e_data and e_meta.
 fdata_mol <- pmartRdata::pep_fdata
 
-# Generate data for CV filter testing ------------------------------------------
-
-# Filter by coefficient of variation (CV).
-pdata_cv <- cv_filter(pdata)
-
-# Determine which columns contain a cv value less than 150.
-leq <- which(pdata_cv$CV <= 150)
-
-# Obtain the indices that have cv values greater than 150 (these will be
-# filtered out later).
-geq <- which(pdata_cv$CV > 150)
-
-set.seed(5)
-
-# Randomly select a proportion of data that will not be filtered.
-prop_filter <- rbeta(1, shape1 = 1, shape2 = 1)
-
-# compute the number of observations that will come from either leq or geq.
-non_filtered <- floor(150 * prop_filter)
-filtered <- 150 - non_filtered
-
-# Subset the pep_edata and pep_emeta objects.
-edata_cv <- pmartRdata::pep_edata[c(leq[1:non_filtered],
-                                     geq[1:filtered]), ]
-emeta_cv <- pmartRdata::pep_emeta[c(leq[1:non_filtered],
-                                     geq[1:filtered]), ]
-
-# Import the original f_data data frame because it is not affected by subsetting
-# e_data and e_meta.
-fdata_cv <- pmartRdata::pep_fdata
-
 # Copy part of the pepData object for proteomics filter testing ----------------
 
 # Extract the entire e_data, f_data, and e_meta objects from pmartRdata.
