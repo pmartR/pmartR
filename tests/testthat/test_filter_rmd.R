@@ -238,6 +238,47 @@ test_that("rmd_filter and applyFilt produce the correct output",{
   expect_equal(attr(pfilter_rmd_sg, "metrics"),
                c("MAD", "Kurtosis", "Skewness", "Corr", "Proportion_Missing"))
   
+  # Forge a filter object for the peptide data. There is one singleton group but
+  # it is not ignored for the following tests. _f: ignore singletons is FALSE
+  pfilter_rmd_sg_f <- rmd_filter(omicsData = pdata_sg,
+                               ignore_singleton_groups = FALSE)
+  
+  # Check the class of the filter object.
+  expect_s3_class(pfilter_rmd_sg_f,
+                  c("rmdFilt", "data.frame"))
+  
+  # Checkify the peptide filter object data frame.
+  expect_equal(dim(pfilter_rmd_sg_f),
+               c(10, 9))
+  expect_equal(round(pfilter_rmd_sg_f$Log2.md, 3),
+               c(2.292, 0.680, 1.661, 0.385, 1.255,
+                 2.047, 1.655, 2.474, 2.772, 5.614))
+  expect_equal(round(pfilter_rmd_sg_f$pvalue, 10),
+               c(0.4285077890, 0.9010201653, 0.6750442797, 0.9343177198,
+                 0.7934655431, 0.5305775013, 0.6770948538, 0.3520673347,
+                 0.2333855866, 0.0000000022))
+  expect_equal(round(pfilter_rmd_sg_f$MAD, 3),
+               c(1.331, 1.185, 1.241, 1.228, 1.228,
+                 1.324, 1.203, 1.081, 1.169, 1.142))
+  expect_equal(round(pfilter_rmd_sg_f$Kurtosis, 3),
+               c(1.250, 0.962, 1.085, -0.016, 0.523,
+                 -0.274, -0.108, 0.174, -0.084, 0.286))
+  expect_equal(round(pfilter_rmd_sg_f$Skewness, 3),
+               c(-0.429, -0.269, -0.296, 0.170, -0.045,
+                 0.282, -0.006, 0.286, 0.355, -0.143))
+  expect_equal(round(pfilter_rmd_sg_f$Corr, 3),
+               c(0.971, 0.975, 0.971, 0.975, 0.974,
+                 0.966, 0.960, 0.941, 0.966, 0.903))
+  expect_equal(round(pfilter_rmd_sg_f$Proportion_Missing, 3),
+               c(0.173, 0.180, 0.180, 0.207, 0.187,
+                 0.220, 0.153, 0.260, 0.220, 0.167))
+  
+  # Inspectify the filter object attributes.
+  expect_equal(attr(pfilter_rmd_sg_f, "df"),
+               5)
+  expect_equal(attr(pfilter_rmd_sg_f, "metrics"),
+               c("MAD", "Kurtosis", "Skewness", "Corr", "Proportion_Missing"))
+
   # Test applyFilt no singletons -----------------------------------------------
   
   # Peptide data ---------------
@@ -313,7 +354,7 @@ test_that("rmd_filter and applyFilt produce the correct output",{
                      "See applyFilt for details.",
                      sep = " "))
   
-  # Apply the filter to the nmr data without singleton groups.
+  # Apply the filter to the nmr data with a lower biomolecule threshold.
   nmrfiltered <- applyFilt(filter_object = nmrfilter_rmd,
                            omicsData = nmrdata,
                            pvalue_threshold = 0.0001,
@@ -434,6 +475,65 @@ test_that("rmd_filter and applyFilt produce the correct output",{
   expect_equal(dim(pfiltered_sg$f_data),
                c(8, 2))
   expect_equal(dim(pfiltered_sg$e_meta),
+               c(150, 4))
+
+  # Apply the filter to the peptide data without singleton groups.
+  pfiltered_sg_f <- applyFilt(filter_object = pfilter_rmd_sg_f,
+                              omicsData = pdata_sg,
+                              pvalue_threshold = 0.0001,
+                              min_num_biomolecules = 50)
+  
+  # Ensurify the class and attributes that shouldn't have changed didn't change.
+  expect_identical(attr(pdata_sg, "cnames"),
+                   attr(pfiltered_sg_f, "cnames"))
+  expect_identical(attr(pdata_sg, "check.names"),
+                   attr(pfiltered_sg_f, "check.names"))
+  expect_identical(class(pdata_sg),
+                   class(pfiltered_sg_f))
+  
+  # Examine the filters attribute.
+  expect_equal(attr(pfiltered_sg_f, "filters")[[1]]$type,
+               "rmdFilt")
+  expect_identical(attr(pfiltered_sg_f, "filters")[[1]]$threshold,
+                   0.0001)
+  expect_equal(attr(pfiltered_sg_f, "filters")[[1]]$filtered,
+               "Mock1")
+  expect_true(is.na(attr(pfiltered_sg_f, "filters")[[1]]$method))
+  
+  # Investigate the data_info attribute.
+  expect_equal(attr(pfiltered_sg_f, "data_info")$data_scale,
+               "log")
+  expect_false(attr(pfiltered_sg_f, "data_info")$norm_info$is_normalized,
+               FALSE)
+  expect_equal(attr(pfiltered_sg_f, "data_info")$num_edata,
+               150)
+  expect_equal(attr(pfiltered_sg_f, "data_info")$num_miss_obs,
+               267)
+  expect_equal(round(attr(pfiltered_sg_f, "data_info")$prop_missing, 4),
+               0.1978)
+  expect_equal(attr(pfiltered_sg_f, "data_info")$num_samps,
+               9)
+  expect_null(attr(pfiltered_sg_f, "data_info")$data_types)
+  
+  # Explore the meta_info attribute.
+  expect_true(attr(pfiltered_sg_f, "meta_info")$meta_data)
+  expect_equal(attr(pfiltered_sg_f, "meta_info")$num_emeta,
+               83)
+  
+  # Dissect the group_DF attribute.
+  expect_equal(dim(attr(pfiltered_sg_f, "group_DF")),
+               c(9, 2))
+  expect_equal(attr(pfiltered_sg_f, "group_DF")$SampleID,
+               c("Infection1", "Infection2", "Infection3", "Infection4",
+                 "Infection5", "Infection6", "Infection7", "Infection8",
+                 "Infection9"))
+  
+  # Inspect the filtered e_data, f_data, and e_meta data frames.
+  expect_equal(dim(pfiltered_sg_f$e_data),
+               c(150, 10))
+  expect_equal(dim(pfiltered_sg_f$f_data),
+               c(9, 2))
+  expect_equal(dim(pfiltered_sg_f$e_meta),
                c(150, 4))
   
 })
