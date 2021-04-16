@@ -13,7 +13,7 @@
 #'         map to each unique protein.
 #'
 #' @examples
-#' dontrun{
+#' \dontrun{
 #' library(pmartR)
 #' data("pep_object")
 #' my_filter <- proteomics_filter(omicsData = pep_object)

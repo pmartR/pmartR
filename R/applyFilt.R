@@ -634,7 +634,7 @@ applyFilt.proteomicsFilt <- function (filter_object,
     
     # pull peptides with more than one row in e_meta.  
     degen_peptides <- as.character(
-      data.frame(count_bypep[which(count_bypep$n > 1),])[, pep_id]
+      data.frame(count_bypep[which(count_bypep$n > 1), ])[, pep_id]
     )
     
     ## identify any proteins that now will not have peptides mapping to them ##
@@ -784,7 +784,9 @@ applyFilt.proteomicsFilt <- function (filter_object,
   # Update the filters attribute.
   attr(omicsData, 'filters')[[n_filters]] <- set_filter(
     type = class(filter_object)[[1]],
-    threshold = data.frame(min_num_peps = min_num_peps,
+    threshold = data.frame(min_num_peps = ifelse(is.null(min_num_peps),
+                                                 NA,
+                                                 min_num_peps),
                            degen_peps = as.character(degen_peps)),
     filtered = filter_object_new,
     method = NA

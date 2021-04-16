@@ -22,7 +22,7 @@ This function counts the number of peptides that map to each protein and/or
 the number of proteins to which each individual peptide maps.
 }
 \examples{
-dontrun{
+\dontrun{
 library(pmartR)
 data("pep_object")
 my_filter <- proteomics_filter(omicsData = pep_object)
