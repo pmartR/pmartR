@@ -2,11 +2,70 @@ context('edata transform')
 
 test_that('edata_transform correctly transforms the data',{
   
-  # Load the transmogrified peptide data ---------------------------------------
+  # Load the data and create a pepData object ----------------------------------
   
   load(system.file('testdata',
-                   'transmuted_pdata.RData',
+                   'little_pdata.RData',
                    package = 'pmartR'))
+  
+  # Construct a pepData object.
+  pdata <- as.pepData(e_data = edata,
+                      f_data = fdata,
+                      e_meta = emeta,
+                      edata_cname = 'Mass_Tag_ID',
+                      fdata_cname = 'SampleID',
+                      emeta_cname = 'Protein')
+  
+  # Create test standards ------------------------------------------------------
+  
+  # Natural log transfiguration ---------------
+  
+  # Apply a natrual log transmogrification to e_data.
+  ledata <- edata
+  ledata[, -1] <- log(ledata[, -1])
+  lpdata <- as.pepData(e_data = ledata,
+                       f_data = fdata,
+                       e_meta = emeta,
+                       edata_cname = 'Mass_Tag_ID',
+                       fdata_cname = 'SampleID',
+                       emeta_cname = 'Protein',
+                       data_scale = "log")
+  
+  # Log base 2 transfiguration ---------------
+  
+  # Apply a log 2 transmogrification to e_data.
+  l2edata <- edata
+  l2edata[, -1] <- log2(l2edata[, -1])
+  l2pdata <- as.pepData(e_data = l2edata,
+                        f_data = fdata,
+                        e_meta = emeta,
+                        edata_cname = 'Mass_Tag_ID',
+                        fdata_cname = 'SampleID',
+                        emeta_cname = 'Protein',
+                        data_scale = "log2")
+  
+  # Log base 10 transfiguration ---------------
+  
+  # Apply a log 10 transmogrification to e_data.
+  l10edata <- edata
+  l10edata[, -1] <- log10(l10edata[, -1])
+  l10pdata <- as.pepData(e_data = l10edata,
+                         f_data = fdata,
+                         e_meta = emeta,
+                         edata_cname = 'Mass_Tag_ID',
+                         fdata_cname = 'SampleID',
+                         emeta_cname = 'Protein',
+                         data_scale = "log10")
+  
+  # Fabricate an attribute list that will be used for testing the data_info
+  # attributes (except for the data_scale attribute).
+  data_info_standard <- list(norm_info = list(is_normalized = FALSE),
+                             num_edata = 150,
+                             num_miss_obs = 341,
+                             prop_missing = attr(pdata,
+                                                 'data_info')$prop_missing,
+                             num_samps = 12,
+                             data_types = NULL)
   
   # Run tests on the transformed data ------------------------------------------
   
@@ -38,17 +97,6 @@ test_that('edata_transform correctly transforms the data',{
   expect_error(edata_transform(omicsData = l10pdata,
                                data_scale = 'log10'),
                "Data is already on log10 scale.")
-  
-  # Fabricate an attribute list that will be used for testing the data_info
-  # attributes (except for the data_scale attribute).
-  data_info_standard <- list(norm_info = list(is_normalized = FALSE),
-                             num_edata = 150,
-                             num_miss_obs = 341,
-                             prop_missing = attr(pdata,
-                                                 'data_info')$prop_missing,
-                             num_samps = 12,
-                             data_types = NULL)
-  
   
   # Transmogrify the data and check results ------------------------------------
   
