@@ -89,33 +89,35 @@ imdanova_filter <- function (omicsData) {
     stop (paste("Option for TimeCourse in group_designation is not currently",
                 "supported.",
                 sep = " "))
-#     filt.edata <- vector(mode = "list", length = length(unique(groupDF$TimeCourse)))
-#     names(filt.edata) <- unique(groupDF$TimeCourse)
+#     filt.edata <- vector(mode = "list", length =
+#     length(unique(groupDF$TimeCourse))) names(filt.edata) <-
+#     unique(groupDF$TimeCourse)
 #
 #     for(tind in 1:length(unique(groupDF$TimeCourse))){
 #
-#       t = unique(groupDF$TimeCourse)[tind]
-#       t.e_data <- cbind(e_data[,1], e_data[, names(e_data) %in% as.character(groupDF[,samp_id][groupDF$TimeCourse==t])])
-#       names(t.e_data)[1] <- names(e_data)[1]
+#     t = unique(groupDF$TimeCourse)[tind] t.e_data <- cbind(e_data[,1],
+#     e_data[, names(e_data) %in%
+#     as.character(groupDF[,samp_id][groupDF$TimeCourse==t])])
+#     names(t.e_data)[1] <- names(e_data)[1]
 #
-#       t.groupDF <- groupDF[groupDF$TimeCourse==t, ]
-#       #all(names(t.e_data)[-1] == t.groupDF$sampleID) # just checking, should be TRUE
+#     t.groupDF <- groupDF[groupDF$TimeCourse==t, ] #all(names(t.e_data)[-1] ==
+#     t.groupDF$sampleID) # just checking, should be TRUE
 #
-#       nonmiss_per_group <- nonmissing_per_group(omicsData=NULL, e_data=t.e_data, groupDF=t.groupDF, cname_id=edata_id, samp_id=samp_id)
-#       if(filter_method=="anova"){
-#         filt.edata[[tind]] <- anova_filter(nonmiss_per_group=nonmiss_per_group, min_nonmiss_anova=min_nonmiss_anova, cname_id = edata_id)
-#       }else{
-#         if(filter_method=="gtest"){
-#           filt.edata[[tind]] <- gtest_filter(nonmiss_per_group=nonmiss_per_group, groupDF=t.groupDF, e_data=t.e_data, alpha=alpha, min_nonmiss_gtest=min_nonmiss_gtest, cname_id = edata_id, samp_id = samp_id)
-#         }else{
-#           if(filter_method=="combined"){
-#             filt.edata.gtest <- gtest_filter(nonmiss_per_group, groupDF=t.groupDF, e_data=t.e_data, alpha=alpha, min_nonmiss_gtest=min_nonmiss_gtest, cname_id = edata_id)
-#             #           min.nonmiss.allowed <- 2
-#             filt.edata.anova <- anova_filter(nonmiss_per_group, min_nonmiss_anova, cname_id = edata_id)
-#             filt.edata[[tind]] <- intersect(filt.edata.anova, filt.edata.gtest)
-#           }
-#         }
-#       }
+#     nonmiss_per_group <- nonmissing_per_group(omicsData=NULL, e_data=t.e_data,
+#     groupDF=t.groupDF, cname_id=edata_id, samp_id=samp_id)
+#     if(filter_method=="anova"){ filt.edata[[tind]] <-
+#     anova_filter(nonmiss_per_group=nonmiss_per_group,
+#     min_nonmiss_anova=min_nonmiss_anova, cname_id = edata_id) }else{
+#     if(filter_method=="gtest"){ filt.edata[[tind]] <-
+#     gtest_filter(nonmiss_per_group=nonmiss_per_group, groupDF=t.groupDF,
+#     e_data=t.e_data, alpha=alpha, min_nonmiss_gtest=min_nonmiss_gtest,
+#     cname_id = edata_id, samp_id = samp_id) }else{
+#     if(filter_method=="combined"){ filt.edata.gtest <-
+#     gtest_filter(nonmiss_per_group, groupDF=t.groupDF, e_data=t.e_data,
+#     alpha=alpha, min_nonmiss_gtest=min_nonmiss_gtest, cname_id = edata_id) #
+#     min.nonmiss.allowed <- 2 filt.edata.anova <-
+#     anova_filter(nonmiss_per_group, min_nonmiss_anova, cname_id = edata_id)
+#     filt.edata[[tind]] <- intersect(filt.edata.anova, filt.edata.gtest) } } }
 #     }
 #
 #     filter.edata <- Reduce(base::intersect, filt.edata)
@@ -153,8 +155,10 @@ imdanova_filter <- function (omicsData) {
 
   attr(output, "group_sizes") <- nonmiss_per_group$group_sizes
   # KS added attribute for nonsingleton groups 12/3/2020 #
-  attr(output, "nonsingleton_groups") <- nonmiss_per_group$group_sizes$Group[which(nonmiss_per_group$group_sizes$n_group > 1)]
-  
+  attr(output, "nonsingleton_groups") <-
+    nonmiss_per_group$group_sizes$Group[which(
+      nonmiss_per_group$group_sizes$n_group > 1
+    )]
 
   return (output)
 

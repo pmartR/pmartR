@@ -12,11 +12,13 @@
 #' @param omicsData an object of the class \code{pepData}, \code{proData},
 #'   \code{lipidData}, \code{metabData}, or \code{nmrData} usually created by
 #'   \code{\link{as.pepData}}, \code{\link{as.proData}},
-#'   \code{\link{as.lipidData}}, \code{\link{as.metabData}}, or \code{\link{as.nmrData}}, respectively.
+#'   \code{\link{as.lipidData}}, \code{\link{as.metabData}}, or 
+#'   \code{\link{as.nmrData}}, respectively.
 #' @param ... further arguments
 #'
 #' @return An object of the class \code{pepData}, \code{proData},
-#'   \code{lipidData}, \code{metabData}, or \code{nmrData} with specified cname_ids,
+#'   \code{lipidData}, \code{metabData}, or \code{nmrData} with specified
+#'   cname_ids,
 #'   edata_cnames, and emeta_cnames filtered out of the appropriate datasets.
 #'
 #' @details Various further arguments can be specified depending on the class of
@@ -52,15 +54,18 @@
 #'   \code{filter_object} of type 'customFilt'.
 #'   
 #' @examples
-#' dontrun{
+#' \dontrun{
 #' library(pmartRdata)
 #' data("pep_object")
 #' to_filter <- molecule_filter(omicsData = pep_object)
-#' pep_object2 <- applyFilt(filter_object = to_filter, omicsData = pep_object, min_num = 2)
+#' pep_object2 <- applyFilt(filter_object = to_filter,
+#'                          omicsData = pep_object, min_num = 2)
 #' print(str(attributes(pep_object2)$filters))
 #' pep_object2 <- group_designation(pep_object2, main_effects = "Condition")
 #' to_filter2 <- imdanova_filter(omicsData = pep_object2)
-#' pep_object3 <- applyFilt(filter_object = to_filter2, omicsData = pep_object2, min_nonmiss_anova = 3)
+#' pep_object3 <- applyFilt(filter_object = to_filter2,
+#'                          omicsData = pep_object2,
+#'                          min_nonmiss_anova = 3)
 #' print(str(attributes(pep_object3)$filters))
 #' }
 #'
@@ -237,18 +242,21 @@ applyFilt.moleculeFilt <- function(filter_object, omicsData, min_num=2){
     dInfo <- attr(omicsData, 'data_info')
     
     # Update the data_info attribute.
-    attr(omicsData,
-         'data_info') <- set_data_info(e_data = omicsData$e_data,
-                                       edata_cname = get_edata_cname(omicsData),
-                                       data_scale = get_data_scale(omicsData),
-                                       data_types = dInfo$data_types,
-                                       norm_info = dInfo$norm_info,
-                                       is_normalized = dInfo$norm_info$is_normalized)
+    attr(omicsData, 'data_info') <- set_data_info(
+      e_data = omicsData$e_data,
+      edata_cname = get_edata_cname(omicsData),
+      data_scale = get_data_scale(omicsData),
+      data_types = dInfo$data_types,
+      norm_info = dInfo$norm_info,
+      is_normalized = dInfo$norm_info$is_normalized
+    )
+      
     
     # Update the meta_info attribute.
-    attr(omicsData,
-         'meta_info') <- set_meta_info(e_meta = omicsData$e_meta,
-                                       emeta_cname = get_emeta_cname(omicsData))
+    attr(omicsData, 'meta_info') <- set_meta_info(
+      e_meta = omicsData$e_meta,
+      emeta_cname = get_emeta_cname(omicsData)
+    )
     
   }
   
@@ -258,11 +266,12 @@ applyFilt.moleculeFilt <- function(filter_object, omicsData, min_num=2){
   n_filters <- length(attr(omicsData, 'filters')) + 1
   
   # Update the filters attribute.
-  attr(omicsData,
-       'filters')[[n_filters]] <- set_filter(type = class(filter_object)[[1]],
-                                             threshold = min_num,
-                                             filtered = filter.edata,
-                                             method = NA)
+  attr(omicsData, 'filters')[[n_filters]] <- set_filter(
+    type = class(filter_object)[[1]],
+    threshold = min_num,
+    filtered = filter.edata,
+    method = NA
+  )
   
   # RETURN THE FILTERED OMICSDATA OBJECT! YAY!!!
   return(omicsData)
@@ -273,7 +282,7 @@ applyFilt.moleculeFilt <- function(filter_object, omicsData, min_num=2){
 #' @export
 #' @name applyFilt
 #' @rdname applyFilt
-applyFilt.cvFilt <- function(filter_object, omicsData, cv_threshold = 150){
+applyFilt.cvFilt <- function (filter_object, omicsData, cv_threshold = 150) {
   
   # Perform some initial checks on the input arguments -------------------------
   
@@ -363,18 +372,20 @@ applyFilt.cvFilt <- function(filter_object, omicsData, cv_threshold = 150){
     dInfo <- attr(omicsData, 'data_info')
     
     # Update the data_info attribute.
-    attr(omicsData,
-         'data_info') <- set_data_info(e_data = omicsData$e_data,
-                                       edata_cname = get_edata_cname(omicsData),
-                                       data_scale = get_data_scale(omicsData),
-                                       data_types = dInfo$data_types,
-                                       norm_info = dInfo$norm_info,
-                                       is_normalized = dInfo$norm_info$is_normalized)
+    attr(omicsData, 'data_info') <- set_data_info(
+      e_data = omicsData$e_data,
+      edata_cname = get_edata_cname(omicsData),
+      data_scale = get_data_scale(omicsData),
+      data_types = dInfo$data_types,
+      norm_info = dInfo$norm_info,
+      is_normalized = dInfo$norm_info$is_normalized
+    )
     
     # Update the meta_info attribute.
-    attr(omicsData,
-         'meta_info') <- set_meta_info(e_meta = omicsData$e_meta,
-                                       emeta_cname = get_emeta_cname(omicsData))
+    attr(omicsData, 'meta_info') <- set_meta_info(
+      e_meta = omicsData$e_meta,
+      emeta_cname = get_emeta_cname(omicsData)
+    )
     
   }
   
@@ -384,11 +395,12 @@ applyFilt.cvFilt <- function(filter_object, omicsData, cv_threshold = 150){
   n_filters <- length(attr(omicsData, 'filters')) + 1
   
   # Update the filters attribute.
-  attr(omicsData,
-       'filters')[[n_filters]] <- set_filter(type = class(filter_object)[[1]],
-                                             threshold = cv_threshold,
-                                             filtered = filter.edata,
-                                             method = NA)
+  attr(omicsData, 'filters')[[n_filters]] <- set_filter(
+    type = class(filter_object)[[1]],
+    threshold = cv_threshold,
+    filtered = filter.edata,
+    method = NA
+  )
   
   # We did it! Kudos to us!!
   return (omicsData)
@@ -500,18 +512,21 @@ applyFilt.rmdFilt <- function (filter_object, omicsData,
     dInfo <- attr(omicsData, 'data_info')
     
     # Update the data_info attribute.
-    attr(omicsData,
-         'data_info') <- set_data_info(e_data = omicsData$e_data,
-                                       edata_cname = get_edata_cname(omicsData),
-                                       data_scale = get_data_scale(omicsData),
-                                       data_types = dInfo$data_types,
-                                       norm_info = dInfo$norm_info,
-                                       is_normalized = dInfo$norm_info$is_normalized)
+    attr(omicsData, 'data_info') <- set_data_info(
+      e_data = omicsData$e_data,
+      edata_cname = get_edata_cname(omicsData),
+      data_scale = get_data_scale(omicsData),
+      data_types = dInfo$data_types,
+      norm_info = dInfo$norm_info,
+      is_normalized = dInfo$norm_info$is_normalized
+    )
+      
     
     # Update the meta_info attribute.
-    attr(omicsData,
-         'meta_info') <- set_meta_info(e_meta = omicsData$e_meta,
-                                       emeta_cname = get_emeta_cname(omicsData))
+    attr(omicsData, 'meta_info') <- set_meta_info(
+      e_meta = omicsData$e_meta,
+      emeta_cname = get_emeta_cname(omicsData)
+    )
     
   }
   
@@ -521,11 +536,12 @@ applyFilt.rmdFilt <- function (filter_object, omicsData,
   n_filters <- length(attr(omicsData, 'filters')) + 1
   
   # Update the filters attribute.
-  attr(omicsData,
-       'filters')[[n_filters]] <- set_filter(type = class(filter_object)[[1]],
-                                             threshold = pvalue_threshold,
-                                             filtered = filter.samp,
-                                             method = NA)
+  attr(omicsData, 'filters')[[n_filters]] <- set_filter(
+    type = class(filter_object)[[1]],
+    threshold = pvalue_threshold,
+    filtered = filter.samp,
+    method = NA
+  )
   
   # Return the filtered data! High fives all around!!!
   return(omicsData)
@@ -537,10 +553,10 @@ applyFilt.rmdFilt <- function (filter_object, omicsData,
 #' @name applyFilt
 #' @rdname applyFilt
 #' @export
-applyFilt.proteomicsFilt <- function(filter_object,
-                                     omicsData,
-                                     min_num_peps = NULL,
-                                     degen_peps = FALSE) {
+applyFilt.proteomicsFilt <- function (filter_object,
+                                      omicsData,
+                                      min_num_peps = NULL,
+                                      degen_peps = FALSE) {
   
   # Perform initial checks on the input arguments ------------------------------
   
@@ -617,24 +633,38 @@ applyFilt.proteomicsFilt <- function(filter_object,
     count_bypep <- filter_object$counts_by_pep
     
     # pull peptides with more than one row in e_meta.  
-    degen_peptides = as.character(data.frame(count_bypep[which(count_bypep$n > 1),])[, pep_id])
+    degen_peptides <- as.character(
+      data.frame(count_bypep[which(count_bypep$n > 1),])[, pep_id]
+    )
     
     ## identify any proteins that now will not have peptides mapping to them ##
     ## find rows in e_meta that correspond to peptides to be filtered ##
     pepfilt.ids = which(omicsData$e_meta[, pep_id] %in% degen_peptides)
     
     # Fish out the indices for the proteins that will be filtered.
-    add_prots <- as.character(omicsData$e_meta[pepfilt.ids, pro_id])
-    # add_prots = as.character(setdiff(omicsData$e_meta[pepfilt.ids, pro_id],
-    #                                  omicsData$e_meta[-pepfilt.ids, pro_id]))
+    add_prots <- as.character(setdiff(omicsData$e_meta[pepfilt.ids, pro_id],
+                                      omicsData$e_meta[-pepfilt.ids, pro_id]))
     
-    if(length(add_prots)==0){add_prots = NULL}
-    if(length(degen_peptides)==0){degen_peptides = NULL}
+    if (length(add_prots) == 0) {
+      
+      add_prots = NULL
+      
+    }
     
-    pepe <- list(e_data_remove = degen_peptides, e_meta_remove = add_prots)
+    if (length(degen_peptides) == 0) {
+      
+      degen_peptides = NULL
+      
+    }
+    
+    pepe <- list(e_data_remove = degen_peptides,
+                 e_meta_remove = add_prots)
     
   } else {
-    pepe <- list(e_data_remove = NULL, e_meta_remove = NULL)
+    
+    pepe <- list(e_data_remove = NULL,
+                 e_meta_remove = NULL)
+    
   }
   
   
@@ -653,17 +683,29 @@ applyFilt.proteomicsFilt <- function(filter_object,
     protfilt.ids = which(omicsData$e_meta[,pro_id] %in% pro_filt)
     
     # Extricate the indices for the peptides that will be filtered.
-    pep_filt <- as.character(omicsData$e_meta[protfilt.ids, pep_id])
-    # pep_filt = as.character(setdiff(omicsData$e_meta[protfilt.ids, pep_id],
-    #                                 omicsData$e_meta[-protfilt.ids, pep_id]))
+    pep_filt <- as.character(setdiff(omicsData$e_meta[protfilt.ids, pep_id],
+                                     omicsData$e_meta[-protfilt.ids, pep_id]))
     
-    if(length(pep_filt)==0){pep_filt = NULL}
-    if(length(pro_filt)==0){pro_filt = NULL}
+    if (length(pep_filt) == 0) {
+      
+      pep_filt = NULL
+      
+    }
     
-    pepe2 <- list(e_meta_remove = pro_filt, e_data_remove = pep_filt)
+    if (length(pro_filt) == 0) {
+      
+      pro_filt = NULL
+      
+    }
+    
+    pepe2 <- list(e_meta_remove = pro_filt,
+                  e_data_remove = pep_filt)
     
   } else {
-    pepe2 <- list(e_data_remove = NULL, e_meta_remove = NULL)
+    
+    pepe2 <- list(e_data_remove = NULL,
+                  e_meta_remove = NULL)
+    
   }
   
   # Consolidate pepe and pepe2 to pass to the pmartR_filter_worker function.
@@ -674,14 +716,15 @@ applyFilt.proteomicsFilt <- function(filter_object,
   
   # checking that filter_object_new does not specify all of e_data(peps) or all
   # of e_meta(protiens) in omicsData
-  if(all(omicsData$e_meta[[pro_id]] %in% filter_object_new$e_meta_remove)) {
+  if (all(omicsData$e_meta[[pro_id]] %in% filter_object_new$e_meta_remove)) {
     
-    stop("filter_object specifies all proteins in e_meta")
+    stop ("filter_object specifies all proteins in e_meta")
     
   }
-  if(all(omicsData$e_data[[pep_id]] %in% filter_object_new$e_data_remove)) {
+  
+  if (all(omicsData$e_data[[pep_id]] %in% filter_object_new$e_data_remove)) {
     
-    stop("filter_object specifies all peps in e_data")
+    stop ("filter_object specifies all peps in e_data")
     
   }
   
@@ -716,18 +759,20 @@ applyFilt.proteomicsFilt <- function(filter_object,
     dInfo <- attr(omicsData, 'data_info')
     
     # Update the data_info attribute.
-    attr(omicsData,
-         'data_info') <- set_data_info(e_data = omicsData$e_data,
-                                       edata_cname = get_edata_cname(omicsData),
-                                       data_scale = get_data_scale(omicsData),
-                                       data_types = dInfo$data_types,
-                                       norm_info = dInfo$norm_info,
-                                       is_normalized = dInfo$norm_info$is_normalized)
+    attr(omicsData, 'data_info') <- set_data_info(
+      e_data = omicsData$e_data,
+      edata_cname = get_edata_cname(omicsData),
+      data_scale = get_data_scale(omicsData),
+      data_types = dInfo$data_types,
+      norm_info = dInfo$norm_info,
+      is_normalized = dInfo$norm_info$is_normalized
+    )
     
     # Update the meta_info attribute.
-    attr(omicsData,
-         'meta_info') <- set_meta_info(e_meta = omicsData$e_meta,
-                                       emeta_cname = get_emeta_cname(omicsData))
+    attr(omicsData, 'meta_info') <- set_meta_info(
+      e_meta = omicsData$e_meta,
+      emeta_cname = get_emeta_cname(omicsData)
+    )
     
   }
   
@@ -737,12 +782,13 @@ applyFilt.proteomicsFilt <- function(filter_object,
   n_filters <- length(attr(omicsData, 'filters')) + 1
   
   # Update the filters attribute.
-  attr(omicsData,
-       'filters')[[n_filters]] <- set_filter(type = class(filter_object)[[1]],
-                                             threshold = data.frame(min_num_peps = min_num_peps,
-                                                                    degen_peps = as.character(degen_peps)),
-                                             filtered = filter_object_new,
-                                             method = NA)
+  attr(omicsData, 'filters')[[n_filters]] <- set_filter(
+    type = class(filter_object)[[1]],
+    threshold = data.frame(min_num_peps = min_num_peps,
+                           degen_peps = as.character(degen_peps)),
+    filtered = filter_object_new,
+    method = NA
+  )
   
   # Return the filtered data! Look at us go!!
   return(omicsData)
@@ -800,11 +846,14 @@ applyFilt.imdanovaFilt <- function (filter_object,
     
   }
   
-  # check that at least one of min_nonmiss_anova and min_nonmiss_gtest are present #
+  # check that at least one of min_nonmiss_anova and min_nonmiss_gtest are
+  # present #
   if (is.null(min_nonmiss_anova) & is.null(min_nonmiss_gtest)) {
     
     # Throw an error for not providing any filter criteria.
-    stop("At least one of min_nonmiss_anova and min_nonmiss_gtest must be present")
+    stop (paste("At least one of min_nonmiss_anova and min_nonmiss_gtest must",
+                "be present",
+                sep = " "))
     
   }
   
@@ -885,36 +934,64 @@ applyFilt.imdanovaFilt <- function (filter_object,
   
   # Prepare the data to be filtered --------------------------------------------
   
+  # Create a variable that will be used to determine what should be included in
+  # the filtered attribute at the end of the function. If there are singleton
+  # groups and if they were removed this value will be changed to TRUE.
+  singletons <- FALSE
+  
   # if remove_singleton_groups is TRUE, filter those out now #
   if (remove_singleton_groups) {
     
     # Check for singleton groups.
     if (any(group_sizes$n_group == 1)) {
       
+      # Change the singleton variable to TRUE.
+      singletons <- TRUE
+      
       # which group(s) #
       singleton_groups <- group_sizes$Group[group_sizes$n_group == 1]
       
       # which sample name(s) #
-      samps_to_rm <- as.character(groupDF[which(groupDF$Group %in% singleton_groups),
-                                          get_fdata_cname(omicsData)])
+      samps_to_rm <- as.character(
+        groupDF[which(groupDF$Group %in% singleton_groups),
+                get_fdata_cname(omicsData)]
+      )
       
       # use custom_filter to remove the sample(s) from the omicsData object #
-      my_cust_filt <- custom_filter(omicsData, f_data_remove = samps_to_rm)
+      my_cust_filt <- custom_filter(omicsData,
+                                    f_data_remove = samps_to_rm)
       omicsData <- applyFilt(my_cust_filt, omicsData)
+      
+      # Check the length of the filters attribute.
+      if (length(attr(omicsData, "filters")) == 1) {
+        
+        # Reset the filters attribute to an empty list because no other filters
+        # have been applied previously.
+        attr(omicsData, "filters") <- list()
+        
+        # The following will run if the filters attribute is greater than 1. It
+        # cannot be 0 because a custom filter was just applied.
+      } else {
+        
+        # Get the total number of filters previously applied. This is the length
+        # of the filters attribute.
+        n_filtas <- length(attr(omicsData, "filters"))
+        
+        # Remove the custom filter from the filters attribute.
+        attr(omicsData, "filters") <- attr(omicsData, "filters")[-n_filtas]
+        
+      }
       
       # Fish out the updated group_DF attribute.
       groupDF <- attributes(omicsData)$group_DF
       
-      # update the IMD-ANOVA filter attributes #
-      attributes(filter_object)$group_sizes <- attributes(filter_object)$group_sizes[-which(attributes(filter_object)$group_sizes$Group %in% singleton_groups), ]
-      
-      # Update the group_sizes object created above in the initial checks
-      # section.
-      group_sizes <- attributes(filter_object)$group_sizes
+      # update the IMD-ANOVA filter attributes.
+      attributes(filter_object)$group_sizes <-
+        group_sizes[-which(group_sizes$Group %in% singleton_groups), ]
       
       # give a message to user saying which samples have been removed #
-      message(paste("You have specified remove_single_groups = TRUE, so we have",
-                    "removed the following sample(s) that correspond to",
+      message(paste("You have specified remove_single_groups = TRUE, so we",
+                    "have removed the following sample(s) that correspond to",
                     "singleton groups prior to proceeding with the IMD-ANOVA",
                     "filter: ",
                     sep = " "),
@@ -933,7 +1010,7 @@ applyFilt.imdanovaFilt <- function (filter_object,
   } else {
     
     # Check for singleton groups.
-    if (any(group_sizes$n_group == 1)) {
+    if (any(attributes(filter_object)$group_sizes$n_group == 1)) {
       
       # Give a message that there are singleton groups present but the user has
       # elected to not remove them .
@@ -950,7 +1027,7 @@ applyFilt.imdanovaFilt <- function (filter_object,
   # Create a list with the appropriate information for the anova_filter and
   # gtest filter functions.
   nonmiss_per_group <- list(nonmiss_totals = filter_object,
-                            group_sizes = group_sizes)
+                            group_sizes = attributes(filter_object)$group_sizes)
   
   edata_cname <- get_edata_cname(omicsData)
   samp_cname <- get_fdata_cname(omicsData)
@@ -1009,7 +1086,8 @@ applyFilt.imdanovaFilt <- function (filter_object,
     
   }
   
-  # if-statement added by KS 1/12/2018 to catch the case where nothing is removed
+  # if-statement added by KS 1/12/2018 to catch the case where nothing is
+  # removed
   if (length(filter.edata) < 1) { 
     
     # Stop the remainder of the function from running because none of the
@@ -1056,18 +1134,20 @@ applyFilt.imdanovaFilt <- function (filter_object,
     dInfo <- attr(omicsData, 'data_info')
     
     # Update the data_info attribute.
-    attr(omicsData,
-         'data_info') <- set_data_info(e_data = omicsData$e_data,
-                                       edata_cname = get_edata_cname(omicsData),
-                                       data_scale = get_data_scale(omicsData),
-                                       data_types = dInfo$data_types,
-                                       norm_info = dInfo$norm_info,
-                                       is_normalized = dInfo$norm_info$is_normalized)
+    attr(omicsData, 'data_info') <- set_data_info(
+      e_data = omicsData$e_data,
+      edata_cname = get_edata_cname(omicsData),
+      data_scale = get_data_scale(omicsData),
+      data_types = dInfo$data_types,
+      norm_info = dInfo$norm_info,
+      is_normalized = dInfo$norm_info$is_normalized
+    )
     
     # Update the meta_info attribute.
-    attr(omicsData,
-         'meta_info') <- set_meta_info(e_meta = omicsData$e_meta,
-                                       emeta_cname = get_emeta_cname(omicsData))
+    attr(omicsData, 'meta_info') <- set_meta_info(
+      e_meta = omicsData$e_meta,
+      emeta_cname = get_emeta_cname(omicsData)
+    )
     
   }
   
@@ -1077,16 +1157,35 @@ applyFilt.imdanovaFilt <- function (filter_object,
   n_filters <- length(attr(omicsData, 'filters')) + 1
   
   # Update the filters attribute.
-  attr(omicsData,
-       'filters')[[n_filters]] <- set_filter(type = class(filter_object)[[1]],
-                                             threshold = data.frame(min_nonmiss_anova = ifelse(is.null(min_nonmiss_anova),
-                                                                                               NA,
-                                                                                               min_nonmiss_anova), 
-                                                                    min_nonmiss_gtest = ifelse(is.null(min_nonmiss_gtest),
-                                                                                               NA,
-                                                                                               min_nonmiss_gtest)),
-                                             filtered = filter.edata,
-                                             method = filter_method)
+  attr(omicsData, 'filters')[[n_filters]] <- set_filter(
+    type = class(filter_object)[[1]],
+    threshold = data.frame(
+      min_nonmiss_anova = if (is.null(min_nonmiss_anova)) {
+        # Report NA because min_nonmiss_anova is NULL.
+        NA
+      } else {
+        # Report the vaule used for min_nonmiss_anova.
+        min_nonmiss_anova
+      },
+      min_nonmiss_gtest = if (is.null(min_nonmiss_gtest)) {
+        # Report NA because min_nonmiss_gtest is NULL.
+        NA
+      } else {
+        # Report the vaule used for min_nonmiss_gtest.
+        min_nonmiss_gtest
+      }
+    ),
+    filtered = if (singletons) {
+      # Include the samples that were filtered with the custom filter along with
+      # the biomolecules that were filtered with the IMD-ANOVA filter.
+      list(samples = samps_to_rm,
+           biomolecules = filter.edata)
+    } else {
+      # Only report the biomolecules because no samples were filtered.
+      filter.edata
+    },
+    method = filter_method
+  )
   
   # Create an additional attribute to the omicsData object that is specific to
   # the imdanova filter.
@@ -1097,8 +1196,10 @@ applyFilt.imdanovaFilt <- function (filter_object,
     
     # Add the biomolecule IDs that will NOT be filtered. These IDs will be used
     # for tests in later functions.
-    attr(omicsData, "imdanova")$test_with_anova <- setdiff(x = omicsData$e_data[, edata_cname],
-                                                           y = filter.edata)
+    attr(omicsData, "imdanova")$test_with_anova <- setdiff(
+      x = omicsData$e_data[, edata_cname],
+      y = filter.edata
+    )
     
     attr(omicsData, "imdanova")$test_with_gtest <- NULL
     
@@ -1108,20 +1209,26 @@ applyFilt.imdanovaFilt <- function (filter_object,
     
     # Add the biomolecule IDs that will NOT be filtered. These IDs will be used
     # for tests in later functions.
-    attr(omicsData, "imdanova")$test_with_gtest <- setdiff(x = omicsData$e_data[, edata_cname],
-                                                           y = filter.edata)
+    attr(omicsData, "imdanova")$test_with_gtest <- setdiff(
+      x = omicsData$e_data[, edata_cname],
+      y = filter.edata
+    )
     
   } else if (filter_method == "combined") {
     
     # Add the biomolecule IDs that will NOT be filtered. These IDs will be used
     # for tests in later functions.
-    attr(omicsData, "imdanova")$test_with_anova <- setdiff(x = omicsData$e_data[, edata_cname],
-                                                           y = filter.edata.anova)
+    attr(omicsData, "imdanova")$test_with_anova <- setdiff(
+      x = omicsData$e_data[, edata_cname],
+      y = filter.edata.anova
+    )
     
     # Add the biomolecule IDs that will NOT be filtered. These IDs will be used
     # for tests in later functions.
-    attr(omicsData, "imdanova")$test_with_gtest <- setdiff(x = omicsData$e_data[, edata_cname],
-                                                           y = filter.edata.gtest)
+    attr(omicsData, "imdanova")$test_with_gtest <- setdiff(
+      x = omicsData$e_data[, edata_cname],
+      y = filter.edata.gtest
+    )
     
   }
   
@@ -1177,7 +1284,8 @@ applyFilt.customFilt <- function (filter_object, omicsData) {
   omicsData$f_data <- results_pieces$temp.fdata
   omicsData$e_meta <- results_pieces$temp.emeta
   
-  # if group attribute is present, re-run group_designation in case filtering any items impacted the group structure #
+  # if group attribute is present, re-run group_designation in case filtering
+  # any items impacted the group structure #
   if (!is.null(attr(omicsData, "group_DF"))) {
     
     # Re-run group_designation in case filtering any items impacted the group
@@ -1197,18 +1305,20 @@ applyFilt.customFilt <- function (filter_object, omicsData) {
     dInfo <- attr(omicsData, 'data_info')
     
     # Update the data_info attribute.
-    attr(omicsData,
-         'data_info') <- set_data_info(e_data = omicsData$e_data,
-                                       edata_cname = get_edata_cname(omicsData),
-                                       data_scale = get_data_scale(omicsData),
-                                       data_types = dInfo$data_types,
-                                       norm_info = dInfo$norm_info,
-                                       is_normalized = dInfo$norm_info$is_normalized)
+    attr(omicsData, 'data_info') <- set_data_info(
+      e_data = omicsData$e_data,
+      edata_cname = get_edata_cname(omicsData),
+      data_scale = get_data_scale(omicsData),
+      data_types = dInfo$data_types,
+      norm_info = dInfo$norm_info,
+      is_normalized = dInfo$norm_info$is_normalized
+    )
     
     # Update the meta_info attribute.
-    attr(omicsData,
-         'meta_info') <- set_meta_info(e_meta = omicsData$e_meta,
-                                       emeta_cname = get_emeta_cname(omicsData))
+    attr(omicsData, 'meta_info') <- set_meta_info(
+      e_meta = omicsData$e_meta,
+      emeta_cname = get_emeta_cname(omicsData)
+    )
     
   }
   
@@ -1219,11 +1329,12 @@ applyFilt.customFilt <- function (filter_object, omicsData) {
   n_filters <- length(attr(omicsData, 'filters')) + 1
   
   # Update the filters attribute.
-  attr(omicsData,
-       'filters')[[n_filters]] <- set_filter(type = class(filter_object)[[1]],
-                                             threshold = NA,
-                                             filtered = filter_object_new,
-                                             method = NA)
+  attr(omicsData, 'filters')[[n_filters]] <- set_filter(
+    type = class(filter_object)[[1]],
+    threshold = NA,
+    filtered = filter_object_new,
+    method = NA
+  )
   
   # Return the filtered data! Woot!!
   return(omicsData)
@@ -1268,8 +1379,10 @@ pmartR_filter_worker <- function (filter_object, omicsData) {
       
       # Find the row indices of the sample names that will be removed from the
       # f_data object.
-      inds <- which(omicsData$f_data[, which(names(omicsData$f_data) == samp_cname)]
-                    %in% filter_object$f_data_remove)
+      inds <- which(
+        omicsData$f_data[, which(names(omicsData$f_data) == samp_cname)]
+        %in% filter_object$f_data_remove
+      )
       
       # Remove the rows in f_data that correspond to the samples that should be
       # removed.
@@ -1291,8 +1404,10 @@ pmartR_filter_worker <- function (filter_object, omicsData) {
       
       # Find the row indices of the biomolecule names that will be removed from
       # the e_data object.
-      inds <- which(omicsData$e_data[, which(names(omicsData$e_data) == edata_cname)]
-                    %in% filter_object$e_data_remove)
+      inds <- which(
+        omicsData$e_data[, which(names(omicsData$e_data) == edata_cname)]
+        %in% filter_object$e_data_remove
+      )
       
       # Remove the rows in e_data that correspond to the biomolecules that
       # should be removed.
@@ -1303,8 +1418,10 @@ pmartR_filter_worker <- function (filter_object, omicsData) {
         
         # Find the row indices of the biomolecule names that will be removed
         # from the e_meta object.
-        inds <- which(omicsData$e_meta[, which(names(omicsData$e_meta) == edata_cname)]
-                      %in% filter_object$e_data_remove)
+        inds <- which(
+          omicsData$e_meta[, which(names(omicsData$e_meta) == edata_cname)]
+          %in% filter_object$e_data_remove
+        )
         
         # Remove the rows in e_meta corresponding to the biomolecules that
         # should be removed.
@@ -1319,8 +1436,10 @@ pmartR_filter_worker <- function (filter_object, omicsData) {
       
       # Find the row indices of the mapping variable names that will be removed
       # from the e_meta object.
-      inds <- which(omicsData$e_meta[, which(names(omicsData$e_meta) == emeta_cname)]
-                    %in% filter_object$e_meta_remove)
+      inds <- which(
+        omicsData$e_meta[, which(names(omicsData$e_meta) == emeta_cname)]
+        %in% filter_object$e_meta_remove
+      )
       
       # Check if there is at least one mapping variable that will be removed.
       if (length(inds) > 0) {
@@ -1336,13 +1455,17 @@ pmartR_filter_worker <- function (filter_object, omicsData) {
       
       # Find the names of the biomolecules that are in both e_data and the
       # reduced e_meta object.
-      mols <- intersect(omicsData$e_data[, which(names(omicsData$e_data) == edata_cname)],
-                        omicsData$e_meta[, which(names(omicsData$e_meta) == edata_cname)])
+      mols <- intersect(
+        omicsData$e_data[, which(names(omicsData$e_data) == edata_cname)],
+        omicsData$e_meta[, which(names(omicsData$e_meta) == edata_cname)]
+      )
       
       # Find the row indices in e_data of the biomolecules that will be kept in
       # both e_data and e_meta.
-      inds <- which(omicsData$e_data[, which(names(omicsData$e_data) == edata_cname)]
-                    %in% mols)
+      inds <- which(
+        omicsData$e_data[, which(names(omicsData$e_data) == edata_cname)]
+        %in% mols
+      )
       
       # Only keep the rows in e_data corresponding to the biomolucules that
       # should not be removed.
@@ -1350,8 +1473,10 @@ pmartR_filter_worker <- function (filter_object, omicsData) {
       
       # Find the row indices in e_meta of the biomolecules that will be kept in
       # both e_data and e_meta.
-      inds <- which(omicsData$e_meta[, which(names(omicsData$e_meta) == edata_cname)]
-                    %in% mols)
+      inds <- which(
+        omicsData$e_meta[, which(names(omicsData$e_meta) == edata_cname)]
+        %in% mols
+      )
       
       # Only keep the rows in e_meta corresponding to the biomolucules that
       # should not be removed.
@@ -1367,8 +1492,10 @@ pmartR_filter_worker <- function (filter_object, omicsData) {
     if (!is.null(filter_object$f_data_keep)) {
       
       # Find the row indices in f_data of the samples that will be kept.
-      inds <- which(omicsData$f_data[, which(names(omicsData$f_data) == samp_cname)]
-                    %in% filter_object$f_data_keep)
+      inds <- which(
+        omicsData$f_data[, which(names(omicsData$f_data) == samp_cname)]
+        %in% filter_object$f_data_keep
+      )
       
       # Only keep the rows in f_data that correspond to the samples that
       # should be kept.
@@ -1391,8 +1518,10 @@ pmartR_filter_worker <- function (filter_object, omicsData) {
       
       # Find the row indices in e_data that correspond to the biomolecules
       # that should be kept.
-      inds <- which(omicsData$e_data[ , which(names(omicsData$e_data) == edata_cname)]
-                    %in% filter_object$e_data_keep)
+      inds <- which(
+        omicsData$e_data[ , which(names(omicsData$e_data) == edata_cname)]
+        %in% filter_object$e_data_keep
+      )
       
       # Only keep the rows in e_data corresponding to the biomolecules that
       # should be kept.
@@ -1404,8 +1533,10 @@ pmartR_filter_worker <- function (filter_object, omicsData) {
         
         # Find the row indices of e_meta from the biomolecule IDs specified in
         # e_data_keep.
-        inds <- which(omicsData$e_meta[ , which(names(omicsData$e_meta) == edata_cname)]
-                      %in% filter_object$e_data_keep)
+        inds <- which(
+          omicsData$e_meta[ , which(names(omicsData$e_meta) == edata_cname)]
+          %in% filter_object$e_data_keep
+        )
         
         # Only keep the rows of e_meta that contain the biomolecule IDs from
         # the e_data_keep input.
@@ -1421,8 +1552,10 @@ pmartR_filter_worker <- function (filter_object, omicsData) {
       
       # Find the row indices in e_meta corresponding to the IDs of the mapping
       # variable. These are the rows that will be kept.
-      inds <- which(omicsData$e_meta[ , which(names(omicsData$e_meta) == emeta_cname)]
-                    %in% filter_object$e_meta_keep)
+      inds <- which(
+        omicsData$e_meta[ , which(names(omicsData$e_meta) == emeta_cname)]
+        %in% filter_object$e_meta_keep
+      )
       
       # Only keep the IDs of the mapping variable specified in e_meta_keep.
       omicsData$e_meta <- omicsData$e_meta[inds, ]
@@ -1436,13 +1569,17 @@ pmartR_filter_worker <- function (filter_object, omicsData) {
         # actually get filtered at all.
         # Find the biomolecule names that occur in both e_data and the reduced
         # e_meta data frame.
-        mols <- intersect(omicsData$e_data[, which(names(omicsData$e_data) == edata_cname)],
-                          omicsData$e_meta[, which(names(omicsData$e_meta) == edata_cname)])
+        mols <- intersect(
+          omicsData$e_data[, which(names(omicsData$e_data) == edata_cname)],
+          omicsData$e_meta[, which(names(omicsData$e_meta) == edata_cname)]
+        )
         
         # Find the row indices in e_data that correspond to the biomolecule
         # IDs that occur in both e_data and the reduced e_meta.
-        inds <- which(omicsData$e_data[, which(names(omicsData$e_data) == edata_cname)]
-                      %in% mols)
+        inds <- which(
+          omicsData$e_data[, which(names(omicsData$e_data) == edata_cname)]
+          %in% mols
+        )
         
         # Only keep the rows in e_data that correspond to the biomolecule IDs
         # found in both e_data and the reduced e_meta data frames.
@@ -1450,8 +1587,10 @@ pmartR_filter_worker <- function (filter_object, omicsData) {
         
         # Find the row indices in e_meta that match the biomolecules found in
         # both e_data and the reduced e_meta data frames.
-        inds <- which(omicsData$e_meta[, which(names(omicsData$e_meta) == edata_cname)]
-                      %in% mols)
+        inds <- which(
+          omicsData$e_meta[, which(names(omicsData$e_meta) == edata_cname)]
+          %in% mols
+        )
         
         # Only keep the rows in e_meta corresponding to the biomolecule IDs
         # from the previous line.
@@ -1464,14 +1603,18 @@ pmartR_filter_worker <- function (filter_object, omicsData) {
         # from e_data.
         # Find the names of the biomolecule IDs found in both the reduced
         # e_data and reduced e_meta data frames.
-        mols <- union(omicsData$e_data[, which(names(omicsData$e_data) == edata_cname)],
-                      omicsData$e_meta[, which(names(omicsData$e_meta) == edata_cname)])
+        mols <- union(
+          omicsData$e_data[, which(names(omicsData$e_data) == edata_cname)],
+          omicsData$e_meta[, which(names(omicsData$e_meta) == edata_cname)]
+        )
         
         # Find the row indices in e_data corresponding to the biomolecule IDs
         # that occur in both e_data and e_meta. Both data frames were
         # previously filtered separately.
-        inds <- which(omicsData$e_data[, which(names(omicsData$e_data) == edata_cname)]
-                      %in% mols)
+        inds <- which(
+          omicsData$e_data[, which(names(omicsData$e_data) == edata_cname)]
+          %in% mols
+        )
         
         # Only keep the rows in e_data that were extracted from the previous
         # line.
@@ -1480,8 +1623,10 @@ pmartR_filter_worker <- function (filter_object, omicsData) {
         # Find the row indices in e_meta corresponding to the biomolecule IDs
         # that occur in both e_data and e_meta. Both data frames were
         # previously filtered separately.
-        inds <- which(omicsData$e_meta[, which(names(omicsData$e_meta) == edata_cname)]
-                      %in% mols)
+        inds <- which(
+          omicsData$e_meta[, which(names(omicsData$e_meta) == edata_cname)]
+          %in% mols
+        )
         
         # Only keep the rows in e_meta that correspond to the indices
         # extracted in the previous line.
