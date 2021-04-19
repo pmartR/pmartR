@@ -2,70 +2,81 @@ context('filter by molecule')
 
 test_that('molecule_filter and applyFilt produce the correct output',{
   
-  # Load the reduced peptide data frames ---------------------------------------
+  # Load data and prepare omicsData objects ------------------------------------
   
   load(system.file('testdata',
-                   'filter_data_mol.RData',
+                   'little_pdata.RData',
                    package = 'pmartR'))
+  
+  # Create a pepData object with the reduced data set.
+  pdata <- as.pepData(e_data = edata,
+                      f_data = fdata,
+                      e_meta = emeta,
+                      edata_cname = "Mass_Tag_ID",
+                      fdata_cname = "SampleID",
+                      emeta_cname = "Protein")
+  
+  # Create a function to count the number of non-missing values to be used in
+  # connection with apply.
+  count <- function (x) {
+    
+    present <- sum(!is.na(x))
+    
+    return (present)
+    
+  }
   
   # Test molecule_filter -------------------------------------------------------
   
-  # Create a pepData object with the reduced data set.
-  pdata_mol <- as.pepData(e_data = edata_mol,
-                          f_data = fdata_mol,
-                          e_meta = emeta_mol,
-                          edata_cname = 'Mass_Tag_ID',
-                          fdata_cname = 'SampleID',
-                          emeta_cname = 'Protein')
-  
   # Try creating a moleculeFilt object with inappropriate input objects.
-  expect_error(molecule_filter(omicsData = edata_mol),
+  expect_error(molecule_filter(omicsData = edata),
                paste("omicsData must be of class 'pepData', 'proData',",
                      "'metabData', 'lipidData', or 'nmrData'",
                      sep = ' '))
   
   # Run molecule filter on the reduced data frame.
-  filter_mol <- molecule_filter(omicsData = pdata_mol)
+  filter <- molecule_filter(omicsData = pdata)
   
-  # Review the class for the filter_mol object.
-  expect_s3_class(filter_mol,
+  # Review the class for the filter object.
+  expect_s3_class(filter,
                   c('moleculeFilt', 'data.frame'))
   
-  # Check the dimensions of filter_mol.
-  expect_equal(dim(filter_mol),
+  # Check the dimensions of filter.
+  expect_equal(dim(filter),
                c(150, 2))
   
+  # Count the number of molecules outside of the molecule_filter function
+  s_count <- apply(pdata$e_data[, -1], 1, count)
+  
+  # Remove the names from the counts vector.
+  names(s_count) <- NULL
+  
   # Ensure the row sums are correct.
-  expect_identical(filter_mol$Num_Observations,
-                   c(1, 2, 2, 1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 2, 1, 1, 2,
-                     2, 1, 1, 2, 2, 2, 2, 2, 1, 2, 1, 1, 2, 2, 2, 2, 1,
-                     1, 1, 2, 2, 2, 2, 1, 2, 1, 2, 2, 1, 2, 12, 11, 12, 11, 12,
-                     12, 12, 12, 12, 11, 12, 12, 12, 4, 10, 12, 3, 12, 11, 9,
-                     12, 12, 8, 6, 3, 10, 12, 5, 12, 12, 12, 12, 3, 12, 12, 3,
-                     9, 12, 7, 4, 12, 12, 12, 8, 9, 12, 12, 12, 8, 4, 4, 12, 10,
-                     11, 12, 12, 5, 3, 3, 12, 12, 12, 3, 12, 12, 10, 12, 12, 11,
-                     12, 12, 12, 12, 12, 11, 12, 9, 12, 12, 12, 11, 12, 12, 12,
-                     11, 7, 12, 7, 12, 12, 12, 12, 11, 11, 11, 12, 12, 8, 12,
-                     12, 12, 12, 10))
+  expect_equal(filter$Num_Observations,
+               s_count)
   
   # Inspect the number of samples in the moleculeFilt object.
-  expect_identical(attr(filter_mol, 'num_samps'),
+  expect_identical(attr(filter, 'num_samps'),
                    12)
   
   # Test applyFilt.moleculeFilt ------------------------------------------------
   
   # Apply the filter to the reduced peptide data set.
-  filtered <- applyFilt(filter_object = filter_mol,
-                        omicsData = pdata_mol,
+  filtered <- applyFilt(filter_object = filter,
+                        omicsData = pdata,
                         min_num = 2)
   
   # Ensure the class and attributes that shouldn't have changed didn't change.
-  expect_identical(attr(pdata_mol, 'cnames'),
+  expect_identical(attr(pdata, 'cnames'),
                    attr(filtered, 'cnames'))
-  expect_identical(attr(pdata_mol, 'check.names'),
+  expect_identical(attr(pdata, 'check.names'),
                    attr(filtered, 'check.names'))
-  expect_identical(class(pdata_mol),
+  expect_identical(class(pdata),
                    class(filtered))
+  
+  # Find the peptide IDs that will be filtered (without molecule_filter
+  # functions).
+  s_pepes <- pdata$e_data[which(s_count < 2), 1]
   
   # Examine the filters attribute.
   expect_equal(attr(filtered, 'filters')[[1]]$type,
@@ -73,10 +84,7 @@ test_that('molecule_filter and applyFilt produce the correct output',{
   expect_identical(attr(filtered, 'filters')[[1]]$threshold,
                    2)
   expect_equal(attr(filtered, 'filters')[[1]]$filtered,
-               c(1024, 15714, 16636, 976139, 6769231, 6769844, 6832528,
-                 6901575, 6934326, 6948923, 6949061, 6949902, 6954178,
-                 6955444, 6959184, 6959316, 6964584, 6966306, 6967194,
-                 6967301, 6967315, 6967481))
+               s_pepes)
   expect_true(is.na(attr(filtered, 'filters')[[1]]$method))
   
   # Investigate the data_info attribute.
@@ -85,11 +93,11 @@ test_that('molecule_filter and applyFilt produce the correct output',{
   expect_false(attr(filtered, 'data_info')$norm_info$is_normalized,
                FALSE)
   expect_equal(attr(filtered, 'data_info')$num_edata,
-               128)
+               141)
   expect_equal(attr(filtered, 'data_info')$num_miss_obs,
-               430)
+               242)
   expect_equal(round(attr(filtered, 'data_info')$prop_missing, 4),
-               0.2799)
+               0.1430)
   expect_equal(attr(filtered, 'data_info')$num_samps,
                12)
   expect_null(attr(filtered, 'data_info')$data_types)
@@ -97,46 +105,49 @@ test_that('molecule_filter and applyFilt produce the correct output',{
   # Explore the meta_info attribute.
   expect_true(attr(filtered, 'meta_info')$meta_data)
   expect_equal(attr(filtered, 'meta_info')$num_emeta,
-               75)
+               78)
   
   # Inspect the filtered e_data, f_data, and e_meta data frames.
   expect_equal(dim(filtered$e_data),
-               c(128, 13))
+               c(141, 13))
   expect_equal(dim(filtered$f_data),
                c(12, 2))
   expect_equal(dim(filtered$e_meta),
-               c(128, 4))
+               c(141, 4))
   
   # Test applying the same filter a second time --------------------------------
   
   # Run molecule filter on the already filtered data set.
-  filter_mol_2 <- molecule_filter(omicsData = filtered)
+  filter_2 <- molecule_filter(omicsData = filtered)
   
-  # Review the class for the filter_mol object.
-  expect_s3_class(filter_mol_2,
+  # Review the class for the filter object.
+  expect_s3_class(filter_2,
                   c('moleculeFilt', 'data.frame'))
   
-  # Check the dimensions of filter_mol.
-  expect_equal(dim(filter_mol_2),
-               c(128, 2))
+  # Check the dimensions of filter.
+  expect_equal(dim(filter_2),
+               c(141, 2))
+  
+  # Count the number of molecules outside of the molecule_filter function
+  s_count_2 <- apply(filtered$e_data[, -1], 1, count)
+  
+  # Remove the names from the count standard.
+  names(s_count_2) <- NULL
+  
+  # Find the peptide IDs that will be filtered (without molecule_filter
+  # functions).
+  s_pepes_2 <- filtered$e_data[which(s_count_2 < 3), 1]
   
   # Ensure the row sums are correct.
-  expect_identical(filter_mol_2$Num_Observations,
-                   c(2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-                     2, 2, 2, 2, 2, 12, 11, 12, 11, 12, 12, 12, 12, 12, 11, 12,
-                     12, 12, 4, 10, 12, 3, 12, 11, 9, 12, 12, 8, 6, 3, 10, 12,
-                     5, 12, 12, 12, 12, 3, 12, 12, 3, 9, 12, 7, 4, 12, 12, 12,
-                     8, 9, 12, 12, 12, 8, 4, 4, 12, 10, 11, 12, 12, 5, 3, 3, 12,
-                     12, 12, 3, 12, 12, 10, 12, 12, 11, 12, 12, 12, 12, 12, 11,
-                     12, 9, 12, 12, 12, 11, 12, 12, 12, 11, 7, 12, 7, 12, 12,
-                     12, 12, 11, 11, 11, 12, 12, 8, 12, 12, 12, 12, 10))
+  expect_equal(filter_2$Num_Observations,
+               s_count_2)
   
   # Inspect the number of samples in the moleculeFilt object.
-  expect_identical(attr(filter_mol, 'num_samps'),
+  expect_identical(attr(filter, 'num_samps'),
                    12)
   
   # Test outcome of applying the same filter more than once.
-  expect_warning(filtered_2 <- applyFilt(filter_object = filter_mol_2,
+  expect_warning(filtered_2 <- applyFilt(filter_object = filter_2,
                                          omicsData = filtered,
                                          min_num = 3),
                  'A molecule filter has already been applied to this data set.')
@@ -150,10 +161,7 @@ test_that('molecule_filter and applyFilt produce the correct output',{
   expect_identical(attr(filtered_2, 'filters')[[1]]$threshold,
                    2)
   expect_equal(attr(filtered_2, 'filters')[[1]]$filtered,
-               c(1024, 15714, 16636, 976139, 6769231, 6769844, 6832528,
-                 6901575, 6934326, 6948923, 6949061, 6949902, 6954178,
-                 6955444, 6959184, 6959316, 6964584, 6966306, 6967194,
-                 6967301, 6967315, 6967481))
+               s_pepes)
   expect_true(is.na(attr(filtered, 'filters')[[1]]$method))
   
   # Examine the second element in the filters attribute.
@@ -162,10 +170,7 @@ test_that('molecule_filter and applyFilt produce the correct output',{
   expect_identical(attr(filtered_2, 'filters')[[2]]$threshold,
                    3)
   expect_equal(attr(filtered_2, 'filters')[[2]]$filtered,
-               c(1687, 11083, 6809644, 6831118, 6948918, 6949195, 6949275,
-                 6955031, 6955082, 6955096, 6955110, 6955122, 6959166, 6962332,
-                 6962373, 6962578, 6964253, 6967197, 6967234, 6967241, 6967247,
-                 6967304, 6967435, 6967456, 6967706))
+               s_pepes_2)
   expect_true(is.na(attr(filtered_2, 'filters')[[2]]$method))
   
   # Investigate the data_info attribute.
@@ -174,11 +179,11 @@ test_that('molecule_filter and applyFilt produce the correct output',{
   expect_false(attr(filtered_2, 'data_info')$norm_info$is_normalized,
                FALSE)
   expect_equal(attr(filtered_2, 'data_info')$num_edata,
-               103)
+               137)
   expect_equal(attr(filtered_2, 'data_info')$num_miss_obs,
-               180)
+               202)
   expect_equal(round(attr(filtered_2, 'data_info')$prop_missing, 4),
-               0.1456)
+               0.1229)
   expect_equal(attr(filtered_2, 'data_info')$num_samps,
                12)
   expect_null(attr(filtered_2, 'data_info')$data_types)
@@ -186,14 +191,14 @@ test_that('molecule_filter and applyFilt produce the correct output',{
   # Explore the meta_info attribute.
   expect_true(attr(filtered_2, 'meta_info')$meta_data)
   expect_equal(attr(filtered_2, 'meta_info')$num_emeta,
-               59)
+               76)
   
   # Inspect the filtered e_data, f_data, and e_meta data frames.
   expect_equal(dim(filtered_2$e_data),
-               c(103, 13))
+               c(137, 13))
   expect_equal(dim(filtered_2$f_data),
                c(12, 2))
   expect_equal(dim(filtered_2$e_meta),
-               c(103, 4))
+               c(137, 4))
   
 })
