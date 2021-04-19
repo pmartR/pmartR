@@ -223,40 +223,50 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
   
   # No singleton groups ---------------
   
-  size <- attributes(filter)$group_sizes
+  # Create a vector of rows that pass the anova criteria.
+  p_anova <- which(rowSums(data.frame(infection = count_i,
+                                      mock = count_m) >= 3) < 2)
   
-  # Create the anova, gtest, and combined standards.
-  s_anova <- anova_filter(nonmiss_per_group = list(nonmiss_totals = filter,
-                                                   group_sizes = size),
-                          min_nonmiss_anova = 3,
-                          cname_id =  get_edata_cname(pdata_gdf))
+  # Extract the peptide IDs corresponding to the rows below the anova threshold.
+  s_anova <- as.character(pdata_gdf$e_data[p_anova, 1])
   
-  s_gtest <- gtest_filter(nonmiss_per_group = list(nonmiss_totals = filter,
-                                                   group_sizes = size),
-                          omicsData = pdata_gdf,
-                          min_nonmiss_gtest = 3)
+  # Fashion a vector of rows that pass the gtest criteria.
+  p_gtest <- apply(data.frame(infection = count_i,
+                              mock = count_m),
+                   1,
+                   function (x) max(x) >= 3)
   
+  # Extract the peptide IDs corresponding to the rows below the gtest threshold.
+  s_gtest <- as.character(pdata_gdf$e_data[!p_gtest, 1])
+  
+  # Find the peptide IDs that occur in both the anova and gtest sets.
   s_both <- intersect(s_anova, s_gtest)
   
   # With singleton groups ---------------
   
   size_sg <- attributes(filter_sg)$group_sizes
   
-  # Create the anova, gtest, and combined standards.
-  s_anova_sg <- anova_filter(
-    nonmiss_per_group = list(nonmiss_totals = filter_sg,
-                             group_sizes = size_sg),
-    min_nonmiss_anova = 3,
-    cname_id =  get_edata_cname(pdata_sg)
-  )
+  # Create a vector of rows that pass the anova criteria for data with
+  # singleton groups.
+  p_anova_sg <- which(rowSums(data.frame(infection1 = count_i1,
+                                         infection2 = count_i2,
+                                         mock = count_m2) >= 3) < 2)
   
-  s_gtest_sg <- gtest_filter(
-    nonmiss_per_group = list(nonmiss_totals = filter_sg,
-                             group_sizes = size_sg),
-    omicsData = pdata_sg,
-    min_nonmiss_gtest = 3
-  )
+  # Extract the peptide IDs corresponding to the rows below the anova threshold.
+  s_anova_sg <- as.character(pdata_sg$e_data[p_anova_sg, 1])
   
+  # Fashion a vector of rows that pass the gtest criteria for data with
+  # singleton groups.
+  p_gtest_sg <- apply(data.frame(infection1 = count_i1,
+                                 infection2 = count_i2,
+                                 mock = count_m2),
+                      1,
+                      function (x) max(x) >= 3)
+  
+  # Extract the peptide IDs corresponding to the rows below the gtest threshold.
+  s_gtest_sg <- as.character(pdata_sg$e_data[!p_gtest_sg, 1])
+  
+  # Find the peptide IDs that occur in both the anova and gtest sets.
   s_both_sg <- intersect(s_anova_sg, s_gtest_sg)
   
   # Test applyFilt anova no singletons -----------------------------------------
