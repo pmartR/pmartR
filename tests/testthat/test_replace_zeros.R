@@ -1,12 +1,6 @@
-context('replace missing values ')
+context('replace missing values')
 
 test_that('as.xxx correctly replaces missing values (0s) with NAs',{
-  
-  # Load all edata objects that contain 0s for missing values ------------------
-  
-  load(system.file('testdata',
-                   'edata_nought.RData',
-                   package = 'pmartR'))
   
   # Load: isobaricpepData ------------------------------------------------------
   
@@ -14,10 +8,13 @@ test_that('as.xxx correctly replaces missing values (0s) with NAs',{
                    'little_isodata.RData',
                    package = 'pmartR'))
   
+  # Mutate all NAs in edata.
+  edata[is.na(edata)] <- 0
+  
   # Test: isobaricpepData ------------------------------------------------------
   
   # Fabricate an isobaricpepData object.
-  expect_message(isodata <- as.isobaricpepData(e_data = iso_nil,
+  expect_message(isodata <- as.isobaricpepData(e_data = edata,
                                                f_data = fdata,
                                                e_meta = emeta,
                                                edata_cname = 'Peptide',
@@ -49,10 +46,13 @@ test_that('as.xxx correctly replaces missing values (0s) with NAs',{
                    'lipidData.RData',
                    package = 'pmartR'))
   
+  # Transmogrify all NAs in edata.
+  edata[is.na(edata)] <- 0
+  
   # Test: lipidData ------------------------------------------------------------
   
   # Produce a lipidData object.
-  expect_message(ldata <- as.lipidData(e_data = lip_nil,
+  expect_message(ldata <- as.lipidData(e_data = edata,
                                        f_data = fdata,
                                        e_meta = emeta,
                                        edata_cname = 'LipidCommonName',
@@ -84,10 +84,13 @@ test_that('as.xxx correctly replaces missing values (0s) with NAs',{
                    'metaboliteData.RData',
                    package = 'pmartR'))
   
+  # Transmute all NAs in edata.
+  edata[is.na(edata)] <- 0
+  
   # Test: metabData ------------------------------------------------------------
   
   # Forge a metabData object.
-  expect_message(mdata <- as.metabData(e_data = met_nil,
+  expect_message(mdata <- as.metabData(e_data = edata,
                                        f_data = fdata,
                                        e_meta = emeta,
                                        edata_cname = 'Metabolite',
@@ -119,10 +122,27 @@ test_that('as.xxx correctly replaces missing values (0s) with NAs',{
                    'nmrData.RData',
                    package = 'pmartR'))
   
+  # Alter the original nmr data frame to contain zeros
+  set.seed(22)
+  
+  # Select row indices.
+  rows <- sample(1:38, 338, replace = TRUE)
+  
+  # Select column indices.
+  columns <- sample(2:42, 338, replace = TRUE)
+  
+  # Loop through each row column pair.
+  for (e in 1:338) {
+    
+    # Replace current value in edata with zero.
+    edata[rows[[e]], columns[[e]]] <- 0
+    
+  }
+  
   # Test: nmrData --------------------------------------------------------------
   
   # Fabricate an nmrData object.
-  expect_message(nmrdata <- as.nmrData(e_data = nmr_nil,
+  expect_message(nmrdata <- as.nmrData(e_data = edata,
                                        f_data = fdata,
                                        e_meta = emeta,
                                        edata_cname = 'Metabolite',
@@ -155,10 +175,13 @@ test_that('as.xxx correctly replaces missing values (0s) with NAs',{
                    'little_pdata.RData',
                    package = 'pmartR'))
   
+  # Transfigure all NAs in edata.
+  edata[is.na(edata)] <- 0
+  
   # Test: pepData --------------------------------------------------------------
   
   # Construct a pepData object.
-  expect_message(pdata <- as.pepData(e_data = pep_nil,
+  expect_message(pdata <- as.pepData(e_data = edata,
                                      f_data = fdata,
                                      e_meta = emeta,
                                      edata_cname = 'Mass_Tag_ID',
@@ -190,10 +213,13 @@ test_that('as.xxx correctly replaces missing values (0s) with NAs',{
                    'little_prdata.RData',
                    package = 'pmartR'))
   
+  # Transmute all NAs in edata.
+  edata[is.na(edata)] <- 0
+  
   # Test: proData --------------------------------------------------------------
   
   # Generate a proData object.
-  expect_message(prdata <- as.proData(e_data = pro_nil,
+  expect_message(prdata <- as.proData(e_data = edata,
                                       f_data = fdata,
                                       e_meta = emeta,
                                       edata_cname = 'Reference',
