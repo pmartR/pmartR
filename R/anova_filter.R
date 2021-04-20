@@ -13,10 +13,6 @@
 #' @param min_nonmiss_anova the minimum number of nonmissing biomolecule values
 #' required, in each group, in order for the biomolecule to not be filtered.
 #' Must be greater than or equal to 2; default value is 2.
-#' 
-#' @param cname_id character string specifying the name of the column containing
-#' the biomolecule identifiers in \code{e_data} and \code{e_meta} (if
-#' applicable).
 #'
 #' @details This function filters biomolecules that do not have at least
 #' \code{min.nonmiss.allowed} values per group, where groups are from
@@ -29,9 +25,13 @@
 #' \dontrun{
 #' library(pmartRdata)
 #' data("pep_object")
-#' pep_object <- group_designation(pep_object, main_effects = "Condition")
-#' filter_results <- anova_filter(nonmiss_per_group = nonmissing_per_group(omicsData = pep_object),
-#'                                cname_id = "Mass_Tag_ID")
+#' 
+#' pep_object2 <- group_designation(pep_object, main_effects = "Condition")
+#' 
+#' nonmissing_result <- nonmissing_per_group(omicsData = pep_object2)
+#' 
+#' to_filter <- anova_filter(nonmiss_per_group = nonmissing_result,
+#'                           min_nonmiss_anova = 2)
 #' }
 #'
 #' @seealso \code{\link{nonmissing_per_group}}
@@ -40,7 +40,8 @@
 #'
 #' @export
 #' 
-anova_filter <- function (nonmiss_per_group, min_nonmiss_anova = 2, cname_id) {
+anova_filter <- function (nonmiss_per_group,
+                          min_nonmiss_anova = 2) {
   
   # check that min_nonmiss_anova is of length 1 #
   if (length(min_nonmiss_anova) != 1) {
@@ -68,26 +69,20 @@ anova_filter <- function (nonmiss_per_group, min_nonmiss_anova = 2, cname_id) {
     
   }
 
-  # Locate the column containing the biomolecule ID and any columns named NA.
-  inds.names <- which(names(nonmiss_per_group$nonmiss_totals) %in% c(cname_id,
-                                                                     "NA"))
-  # remove cname_id and "NA" (if there's a column named "NA")
-  my.names <- names(nonmiss_per_group$nonmiss_totals)[-inds.names]
-
-  # sum the number of groups that meet the nonmissing per group requirement
-  temp2 <- rowSums(nonmiss_per_group$nonmiss_totals[, which(names(nonmiss_per_group$nonmiss_totals) %in%
-                                                            my.names)] >= min_nonmiss_anova)
-
-  # create indicator for which rows do not meet the nonmissing requirement for
-  # at least 2 groups
-  # these are the rows to remove since they do not have at least 2 groups
-  # meeting nonmissing requirements
-  inds.rm <- which(temp2 < 2) 
+  # Remove the column with the biomolecule IDs and any columns that have an NA
+  # as the column name. Then sum (by row) the number of groups that meet the
+  # non-missing per group requirement. Then extract the rows that do not meet
+  # the requirement of at least two groups with non-missing counts higher than
+  # the threshold. These are the rows that will be filtered out later.
+  inds_rm <- which(rowSums(
+    nonmiss_per_group$nonmiss_totals[, -c(
+      1,
+      which(names(nonmiss_per_group$nonmiss_totals) %in%
+              c(NA, "<NA>", "NA.", "NA"))
+    )] >= min_nonmiss_anova
+  ) < 2)
 
   # get names of biomolecules to be filtered
-  filter.ids <- as.vector(nonmiss_per_group$nonmiss_totals[inds.rm, 1])
-
-  # output names of peptides/proteins/genes to be filtered
-  return (filter.ids)
+  return (as.character(nonmiss_per_group$nonmiss_totals[inds_rm, 1]))
   
 }

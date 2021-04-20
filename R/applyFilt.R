@@ -1055,26 +1055,22 @@ applyFilt.imdanovaFilt <- function (filter_object,
   if (filter_method == "anova") {
     
     filter.edata <- anova_filter(nonmiss_per_group = nonmiss_per_group,
-                                 min_nonmiss_anova = min_nonmiss_anova,
-                                 cname_id = edata_cname)
+                                 min_nonmiss_anova = min_nonmiss_anova)
     
   } else if (filter_method == "gtest") {
     
     filter.edata <- gtest_filter(nonmiss_per_group = nonmiss_per_group,
-                                 omicsData = omicsData,
                                  min_nonmiss_gtest = min_nonmiss_gtest)
     
   } else if(filter_method == "combined") {
     
     # Run the gtest filter.
     filter.edata.gtest <- gtest_filter(nonmiss_per_group = nonmiss_per_group,
-                                       omicsData = omicsData,
                                        min_nonmiss_gtest = min_nonmiss_gtest)
     
     # Run the anova filter.
     filter.edata.anova <- anova_filter(nonmiss_per_group = nonmiss_per_group, 
-                                       min_nonmiss_anova = min_nonmiss_anova, 
-                                       cname_id = edata_cname)
+                                       min_nonmiss_anova = min_nonmiss_anova)
     
     # Only filter samples found in both filters.
     filter.edata <- intersect(filter.edata.anova, filter.edata.gtest)

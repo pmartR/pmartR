@@ -4,7 +4,7 @@
 \alias{anova_filter}
 \title{Identifies biomolecules to be filtered in preparation for IMD-ANOVA.}
 \usage{
-anova_filter(nonmiss_per_group, min_nonmiss_anova = 2, cname_id)
+anova_filter(nonmiss_per_group, min_nonmiss_anova = 2)
 }
 \arguments{
 \item{nonmiss_per_group}{a list of length two. The first element giving the
@@ -17,10 +17,6 @@ each of the \code{k} groups. Usually the result of
 \item{min_nonmiss_anova}{the minimum number of nonmissing biomolecule values
 required, in each group, in order for the biomolecule to not be filtered.
 Must be greater than or equal to 2; default value is 2.}
-
-\item{cname_id}{character string specifying the name of the column containing
-the biomolecule identifiers in \code{e_data} and \code{e_meta} (if
-applicable).}
 }
 \value{
 filter.peps a character vector of the biomolecules to be filtered out
@@ -39,9 +35,13 @@ This function filters biomolecules that do not have at least
 \dontrun{
 library(pmartRdata)
 data("pep_object")
-pep_object <- group_designation(pep_object, main_effects = "Condition")
-filter_results <- anova_filter(nonmiss_per_group = nonmissing_per_group(omicsData = pep_object),
-                               cname_id = "Mass_Tag_ID")
+
+pep_object2 <- group_designation(pep_object, main_effects = "Condition")
+
+nonmissing_result <- nonmissing_per_group(omicsData = pep_object2)
+
+to_filter <- anova_filter(nonmiss_per_group = nonmissing_result,
+                          min_nonmiss_anova = 2)
 }
 
 }

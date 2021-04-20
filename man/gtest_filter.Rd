@@ -4,7 +4,7 @@
 \alias{gtest_filter}
 \title{Identifies peptides to be filtered out in preparation for IMD-ANOVA.}
 \usage{
-gtest_filter(nonmiss_per_group, omicsData, min_nonmiss_gtest = 3)
+gtest_filter(nonmiss_per_group, min_nonmiss_gtest = 3)
 }
 \arguments{
 \item{nonmiss_per_group}{list created by \code{\link{nonmissing_per_group}}.
@@ -12,11 +12,6 @@ The first element giving the total number of possible samples for each group.
 The second element giving a data.frame with the first column giving the 
 biomolecule and the second through kth columns giving the number of
  non-missing observations for each of the \code{k} groups.}
-
-\item{omicsData}{an optional object of one of the classes "pepData",
-"proData", "lipidData", or "metabData" usually created by
-\code{\link{as.pepData}}, \code{\link{as.proData}},
-\code{\link{as.lipidData}}, or \code{\link{as.metabData}}, respectively.}
 
 \item{min_nonmiss_gtest}{the minimum number of non-missing peptide values
 allowed in a minimum of one group. Default value is 3.}
@@ -43,11 +38,13 @@ of independence between the number of missing values across groups.
 \dontrun{
 library(pmartR)
 data(pep_object)
+
 pep_object2 <- group_designation(omicsData = pep_object,
                                  main_effects = "Condition")
+
 nonmissing_result <- nonmissing_per_group(omicsData = pep_object2)
+
 to_filter <- gtest_filter(nonmiss_per_group = nonmissing_result,
-                          omicsData = pep_object2,
                           min_nonmiss_gtest = 3)
 }
 

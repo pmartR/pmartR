@@ -44,13 +44,15 @@ applyFilt(filter_object, omicsData, ...)
 \item{omicsData}{an object of the class \code{pepData}, \code{proData},
 \code{lipidData}, \code{metabData}, or \code{nmrData} usually created by
 \code{\link{as.pepData}}, \code{\link{as.proData}},
-\code{\link{as.lipidData}}, \code{\link{as.metabData}}, or \code{\link{as.nmrData}}, respectively.}
+\code{\link{as.lipidData}}, \code{\link{as.metabData}}, or 
+\code{\link{as.nmrData}}, respectively.}
 
 \item{...}{further arguments}
 }
 \value{
 An object of the class \code{pepData}, \code{proData},
-  \code{lipidData}, \code{metabData}, or \code{nmrData} with specified cname_ids,
+  \code{lipidData}, \code{metabData}, or \code{nmrData} with specified
+  cname_ids,
   edata_cnames, and emeta_cnames filtered out of the appropriate datasets.
 }
 \description{
@@ -73,7 +75,7 @@ Various further arguments can be specified depending on the class of
   \code{pvalue_threshold} \tab numeric value between 0 and 1, specifying the
   p-value, below which samples will be removed from the dataset. Default is
   0.001. \cr \code{min_num_biomolecules} \tab numeric value greater than 10
-  (preferably greater than 50) that specifies the minimume number of
+  (preferably greater than 50) that specifies the minimum number of
   biomolecules that must be present in order to create an rmdFilt object.
   Using values less than 50 is not advised. \cr } For a \code{filter_object}
   of type 'proteomicsFilt': \tabular{ll}{ \code{min_num_peps} \tab an
@@ -93,15 +95,18 @@ Various further arguments can be specified depending on the class of
   \code{filter_object} of type 'customFilt'.
 }
 \examples{
-dontrun{
+\dontrun{
 library(pmartRdata)
 data("pep_object")
 to_filter <- molecule_filter(omicsData = pep_object)
-pep_object2 <- applyFilt(filter_object = to_filter, omicsData = pep_object, min_num = 2)
+pep_object2 <- applyFilt(filter_object = to_filter,
+                         omicsData = pep_object, min_num = 2)
 print(str(attributes(pep_object2)$filters))
 pep_object2 <- group_designation(pep_object2, main_effects = "Condition")
 to_filter2 <- imdanova_filter(omicsData = pep_object2)
-pep_object3 <- applyFilt(filter_object = to_filter2, omicsData = pep_object2, min_nonmiss_anova = 3)
+pep_object3 <- applyFilt(filter_object = to_filter2,
+                         omicsData = pep_object2,
+                         min_nonmiss_anova = 3)
 print(str(attributes(pep_object3)$filters))
 }
 
