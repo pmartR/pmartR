@@ -7,6 +7,7 @@
 mean_center(
   e_data,
   edata_id,
+  subset_fn,
   feature_subset,
   backtransform = FALSE,
   apply_norm = FALSE,
@@ -17,6 +18,8 @@ mean_center(
 \item{e_data}{e_data a \eqn{p \times n + 1} data.frame, where \eqn{p} is the number of peptides, lipids, or metabolites and \eqn{n} is the number of samples. Each row corresponds to data for a peptide, protein, lipid, or metabolite, with a column giving the identifer name.}
 
 \item{edata_id}{character string indicating the name of the peptide, protein, lipid, or metabolite identifier. Usually obtained by calling \code{attr(omicsData, "cnames")$edata_cname}.}
+
+\item{subset_fn}{character string indicating the subset function to use for normalization.}
 
 \item{feature_subset}{character vector containing the feature names in the subset to be used for normalization}
 
