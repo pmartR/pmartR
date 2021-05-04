@@ -38,26 +38,26 @@ test_that('proteomics_filter and applyFilt produce the correct output',{
   
   # Count the number of peptides in e_meta.
   pepCount <- pdata$e_meta %>%
-    group_by(Mass_Tag_ID) %>%
-    tally() %>%
+    dplyr::group_by(Mass_Tag_ID) %>%
+    dplyr::tally() %>%
     data.frame()
   
   # Count the number of peptides associated with each protein.
   proCount <- pdata$e_meta %>%
-    group_by(Protein) %>%
-    tally() %>%
+    dplyr::group_by(Protein) %>%
+    dplyr::tally() %>%
     data.frame()
   
   # Count the number of peptides in the ignoble e_meta data frame.
   pepCountS <- sordata$e_meta %>%
-    group_by(Mass_Tag_ID) %>%
-    tally() %>%
+    dplyr::group_by(Mass_Tag_ID) %>%
+    dplyr::tally() %>%
     data.frame()
   
   # Count the number of peptides associated with each protein.
   proCountS <- sordata$e_meta %>%
-    group_by(Protein) %>%
-    tally() %>%
+    dplyr::group_by(Protein) %>%
+    dplyr::tally() %>%
     data.frame()
   
   # Non-degenerate peptides ---------------

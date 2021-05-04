@@ -21,8 +21,6 @@
 #'}
 #'
 #' @author Lisa Bramer, Kelly Stratton
-#' 
-#' @importFrom dplyr group_by tally
 #'
 #' @export
 
@@ -56,10 +54,10 @@ proteomics_filter <- function(omicsData){
   # Count the number of rows for each peptide in e_meta.
   pepCount <- omicsData$e_meta %>%
     # Group the e_meta data frame by the peptide identifiers in the ID column.
-    group_by(.data[[pep_id]]) %>%
+    dplyr::group_by(.data[[pep_id]]) %>%
     # Count the number of times each peptide identifier occurs (the number of 
     # rows an identifier appears in).
-    tally() %>%
+    dplyr::tally() %>%
     # Convert pepCount to a data frame from a tibble.
     data.frame()
 
@@ -67,10 +65,10 @@ proteomics_filter <- function(omicsData){
   proCount <- omicsData$e_meta %>%
     # Group the e_meta data frame by the protein identifiers in the protein ID
     # column.
-    group_by(.data[[pro_id]]) %>%
+    dplyr::group_by(.data[[pro_id]]) %>%
     # Count the number of times each protein identifier occurs (the number of 
     # rows an identifier appears in).
-    tally() %>%
+    dplyr::tally() %>%
     # Convert proCount to a data frame from a tibble.
     data.frame()
 

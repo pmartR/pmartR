@@ -16,8 +16,6 @@
 #'         through kth columns giving the number of non-missing observations for
 #'         each of the \code{k} groups.
 #' 
-#' @importFrom dplyr summarize group_by n
-#' 
 #' @author Lisa Bramer, Kelly Stratton
 #'
 nonmissing_per_group <- function (omicsData) {
@@ -37,9 +35,9 @@ nonmissing_per_group <- function (omicsData) {
   # Count the number of samples per group from the group_DF data frame.
   tot_samps <- groupDF %>%
     # Gather all samples from each group.
-    group_by(Group) %>%
+    dplyr::group_by(Group) %>%
     # Create a new column, n_group, that is the number of samples per group.
-    summarize(n_group = n()) %>%
+    dplyr::summarize(n_group = dplyr::n()) %>%
     # Convert to a data frame.
     data.frame()
 
