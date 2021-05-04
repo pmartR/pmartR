@@ -27,7 +27,7 @@ test_that('as.nmrData returns the correct data frame and attributes',{
   expect_equal(dim(nmrdata$e_data),
                c(38, 42))
   expect_equal(dim(nmrdata$f_data),
-               c(41, 4))
+               c(41, 5))
   expect_equal(dim(nmrdata$e_meta),
                c(38, 3))
   
@@ -63,7 +63,7 @@ test_that('as.nmrData returns the correct data frame and attributes',{
   expect_equal(dim(nmrdata$e_data),
                c(38, 42))
   expect_equal(dim(nmrdata$f_data),
-               c(41, 4))
+               c(41, 5))
   expect_null(nmrdata$e_meta)
   
   # Verify all the elements of the data_info attribute are correct.
@@ -117,7 +117,7 @@ test_that('as.nmrData returns the correct data frame and attributes',{
   expect_equal(dim(nmrdata$e_data),
                c(38, 42))
   expect_equal(dim(nmrdata$f_data),
-               c(41, 4))
+               c(41, 5))
   
   # Generate a nmrData object and check for a warning when the e_meta object
   # has more rows than e_data.
@@ -165,7 +165,7 @@ test_that('as.nmrData returns the correct data frame and attributes',{
   expect_equal(dim(nmrdata$e_data),
                c(38, 42))
   expect_equal(dim(nmrdata$f_data),
-               c(41, 4))
+               c(41, 5))
   expect_null(nmrdata$e_meta)
   
   # Confirm that the elements of the data_info attribute are all correct.

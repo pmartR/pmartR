@@ -413,7 +413,7 @@ test_that("rmd_filter and applyFilt produce the correct output",{
   expect_equal(dim(nmrfiltered$e_data),
                c(38, 39))
   expect_equal(dim(nmrfiltered$f_data),
-               c(38, 4))
+               c(38, 5))
   expect_equal(dim(nmrfiltered$e_meta),
                c(38, 3))
   

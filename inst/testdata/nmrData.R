@@ -23,7 +23,7 @@ edata <- nmr_edata_identified
 fdata <- nmr_fdata_identified
 emeta <- nmr_emeta_identified
 
-# Fashin an nmr "type" column in the emeta data frame.
+# Fashion an nmr "type" column in the emeta data frame.
 emeta <- data.frame(emeta,
                     nmrClass = sub("_.*", "", emeta[, 2]))
 # The sub function extracts all characters before the first _.
