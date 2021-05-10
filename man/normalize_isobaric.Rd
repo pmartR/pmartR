@@ -81,13 +81,19 @@ library(pmartRdata)
 data(isobaric_object)
 
 isobaric_object = edata_transform(isobaric_object, "log2")
-isobaric_norm = normalize_isobaric(isobaric_object, exp_cname = "Set", apply_norm = TRUE, channel_cname = "iTRAQ.Channel", refpool_channel = "116")
+isobaric_norm = normalize_isobaric(isobaric_object, exp_cname = "Set",
+                                   apply_norm = TRUE,
+                                   channel_cname = "iTRAQ.Channel",
+                                   refpool_channel = "116")
 
 # alternate specification: #
 data(isobaric_object)
 
 isobaric_object = edata_transform(isobaric_object, "log2")
-isobaric_norm = normalize_isobaric(isobaric_object, exp_cname = "Set", apply_norm = TRUE, refpool_cname = "Reference", refpool_notation = "Yes")
+isobaric_norm = normalize_isobaric(isobaric_object, exp_cname = "Set",
+                                   apply_norm = TRUE,
+                                   refpool_cname = "Reference",
+                                   refpool_notation = "Yes")
 
 }
 

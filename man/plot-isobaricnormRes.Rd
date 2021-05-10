@@ -29,12 +29,15 @@ plots ggplot2 object
 For plotting an S3 object of type 'isobaricnormRes':
 }
 \examples{
-dontrun{
+\dontrun{
 library(pmartRdata)
 data(isobaric_object)
 
 isobaric_object = edata_transform(isobaric_object, "log2")
-result = normalize_isobaric(isobaric_object, exp_cname = "Set", apply_norm = FALSE, channel_cname = "iTRAQ.Channel", refpool_channel = "116")
+result = normalize_isobaric(isobaric_object, exp_cname = "Set",
+                            apply_norm = FALSE,
+                            channel_cname = "iTRAQ.Channel",
+                            refpool_channel = "116")
 
 plot(result)
 }
