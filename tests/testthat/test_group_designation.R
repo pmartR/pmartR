@@ -16,7 +16,8 @@ test_that('the correct group data frame and attributes are created',{
                       e_meta = emeta,
                       edata_cname = 'Mass_Tag_ID',
                       fdata_cname = 'SampleID',
-                      emeta_cname = 'Protein')
+                      emeta_cname = 'Protein',
+                      data_scale_orig = "abundance")
   
   # Forge a group_DF attribute for pdata.
   pdata_gdf <- group_designation(omicsData = pdata,
@@ -69,7 +70,8 @@ test_that('the correct group data frame and attributes are created',{
                         e_meta = emeta,
                         edata_cname = 'Mass_Tag_ID',
                         fdata_cname = 'SampleID',
-                        emeta_cname = 'Protein')
+                        emeta_cname = 'Protein',
+                        data_scale_orig = "abundance")
   
   # Run group_designation with two main effects.
   pdata_gdf_2 <- group_designation(omicsData = pdata_2,
@@ -124,7 +126,8 @@ test_that('the correct group data frame and attributes are created',{
                         e_meta = emeta,
                         edata_cname = 'Mass_Tag_ID',
                         fdata_cname = 'SampleID',
-                        emeta_cname = 'Protein')
+                        emeta_cname = 'Protein',
+                        data_scale_orig = "abundance")
   
   # Run group_designation with two main effects.
   expect_warning(pdata_gdf_2 <- group_designation(omicsData = pdata_2,
@@ -173,6 +176,8 @@ test_that('the correct group data frame and attributes are created',{
   
   # The following elements of data_info should be the same as the original
   # pepData object because they were not affected by removing the Mock samples.
+  expect_identical(get_data_scale_orig(pdata),
+                   get_data_scale_orig(pdata_gdf_2))
   expect_identical(get_data_scale(pdata),
                    get_data_scale(pdata_gdf_2))
   expect_identical(get_data_info(pdata)$norm_info$is_normalized,

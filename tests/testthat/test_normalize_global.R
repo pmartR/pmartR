@@ -14,7 +14,8 @@ test_that('normalize_global produces the correct output',{
                       e_meta = emeta,
                       edata_cname = "Mass_Tag_ID",
                       fdata_cname = "SampleID",
-                      emeta_cname = "Protein")
+                      emeta_cname = "Protein",
+                      data_scale_orig = "abundance")
   
   # Natural logate the data.
   pdata <- edata_transform(omicsData = pdata,
@@ -148,11 +149,14 @@ test_that('normalize_global produces the correct output',{
                    "all")
   expect_identical(norm_all_med$norm_fn,
                    "median")
-  expect_null(norm_all_med$parameters$normalization$scale)
-  expect_identical(norm_all_med$parameters$normalization$location,
-                   apply(pdata$e_data[, -1], 2, median, na.rm = TRUE))
-  expect_null(norm_all_med$parameters$backtransform$scale)
-  expect_null(norm_all_med$parameters$backtransform$location)
+  expect_equal(
+    norm_all_med$parameters,
+    list(normalization = list(scale = NULL,
+                              location = apply(pdata$e_data[, -1], 2,
+                                               median, na.rm = TRUE)),
+         backtransform = list(scale = NULL,
+                              location = NULL))
+  )
   expect_equal(norm_all_med$n_features_calc,
                150)
   expect_equal(norm_all_med$feature_subset,
@@ -180,12 +184,16 @@ test_that('normalize_global produces the correct output',{
                    "ppp")
   expect_identical(norm_ppp_med$norm_fn,
                    "median")
-  expect_null(norm_ppp_med$parameters$normalization$scale)
-  expect_identical(norm_ppp_med$parameters$normalization$location,
-                   apply(pdata$e_data[which(kp_all %in% kp_ppp), -1],
-                         2, median, na.rm = TRUE))
-  expect_null(norm_ppp_med$parameters$backtransform$scale)
-  expect_null(norm_ppp_med$parameters$backtransform$location)
+  expect_equal(
+    norm_ppp_med$parameters,
+    list(normalization = list(scale = NULL,
+                              location = apply(
+                                pdata$e_data[which(kp_all %in% kp_ppp), -1],
+                                2, median, na.rm = TRUE
+                              )),
+         backtransform = list(scale = NULL,
+                              location = NULL))
+  )
   expect_equal(norm_ppp_med$n_features_calc,
                length(kp_ppp))
   expect_equal(norm_ppp_med$feature_subset,
@@ -214,12 +222,16 @@ test_that('normalize_global produces the correct output',{
                    "los")
   expect_identical(norm_los_mean$norm_fn,
                    "mean")
-  expect_null(norm_los_mean$parameters$normalization$scale)
-  expect_identical(norm_los_mean$parameters$normalization$location,
-                   colMeans(pdata$e_data[which(kp_all %in% kp_los), -1],
-                                         na.rm = TRUE))
-  expect_null(norm_los_mean$parameters$backtransform$scale)
-  expect_null(norm_los_mean$parameters$backtransform$location)
+  expect_equal(
+    norm_los_mean$parameters,
+    list(normalization = list(scale = NULL,
+                              location = colMeans(
+                                pdata$e_data[which(kp_all %in% kp_los), -1],
+                                na.rm = TRUE
+                              )),
+         backtransform = list(scale = NULL,
+                              location = NULL))
+  )
   expect_equal(norm_los_mean$n_features_calc,
                length(kp_los))
   expect_equal(norm_los_mean$feature_subset,
@@ -248,16 +260,19 @@ test_that('normalize_global produces the correct output',{
                    "ppp")
   expect_identical(norm_ppp_z$norm_fn,
                    "zscore")
-  expect_identical(norm_ppp_z$parameters$normalization$scale,
-                   apply(pdata$e_data[which(kp_all %in% kp_ppp), -1],
-                         2,
-                         sd,
-                         na.rm = TRUE))
-  expect_identical(norm_ppp_z$parameters$normalization$location,
-                   colMeans(pdata$e_data[which(kp_all %in% kp_ppp), -1],
-                            na.rm = TRUE))
-  expect_null(norm_ppp_z$parameters$backtransform$scale)
-  expect_null(norm_ppp_z$parameters$backtransform$location)
+  expect_equal(
+    norm_ppp_z$parameters,
+    list(normalization = list(
+      scale = apply(pdata$e_data[which(kp_all %in% kp_ppp), -1],
+                    2,
+                    sd,
+                    na.rm = TRUE),
+      location = colMeans(pdata$e_data[which(kp_all %in% kp_ppp), -1],
+                          na.rm = TRUE)
+    ),
+         backtransform = list(scale = NULL,
+                              location = NULL))
+  )
   expect_equal(norm_ppp_z$n_features_calc,
                length(kp_ppp))
   expect_equal(norm_ppp_z$feature_subset,
@@ -285,12 +300,16 @@ test_that('normalize_global produces the correct output',{
                    "complete")
   expect_identical(norm_complete_mean$norm_fn,
                    "mean")
-  expect_null(norm_complete_mean$parameters$normalization$scale)
-  expect_identical(norm_complete_mean$parameters$normalization$location,
-                   colMeans(pdata$e_data[which(kp_all %in% kp_complete), -1],
-                            na.rm = TRUE))
-  expect_null(norm_complete_mean$parameters$backtransform$scale)
-  expect_null(norm_complete_mean$parameters$backtransform$location)
+  expect_equal(
+    norm_complete_mean$parameters,
+    list(normalization = list(
+      scale = NULL,
+      location = colMeans(pdata$e_data[which(kp_all %in% kp_complete), -1],
+                          na.rm = TRUE)
+    ),
+    backtransform = list(scale = NULL,
+                         location = NULL))
+  )
   expect_equal(norm_complete_mean$n_features_calc,
                length(kp_complete))
   expect_equal(norm_complete_mean$feature_subset,
@@ -319,18 +338,21 @@ test_that('normalize_global produces the correct output',{
                    "rip")
   expect_identical(norm_rip_mad$norm_fn,
                    "mad")
-  expect_identical(norm_rip_mad$parameters$normalization$scale,
-                   apply(pdata_gdf$e_data[which(kp_all %in% kp_rip), -1],
-                         2,
-                         mad,
-                         na.rm = TRUE))
-  expect_identical(norm_rip_mad$parameters$normalization$location,
-                   apply(pdata_gdf$e_data[which(kp_all %in% kp_rip), -1],
-                         2,
-                         median,
-                         na.rm = TRUE))
-  expect_null(norm_rip_mad$parameters$backtransform$scale)
-  expect_null(norm_rip_mad$parameters$backtransform$location)
+  expect_equal(
+    norm_rip_mad$parameters,
+    list(normalization = list(
+      scale = apply(pdata_gdf$e_data[which(kp_all %in% kp_rip), -1],
+                    2,
+                    mad,
+                    na.rm = TRUE),
+      location = apply(pdata_gdf$e_data[which(kp_all %in% kp_rip), -1],
+                       2,
+                       median,
+                       na.rm = TRUE)
+    ),
+    backtransform = list(scale = NULL,
+                         location = NULL))
+  )
   expect_equal(norm_rip_mad$n_features_calc,
                length(kp_rip))
   expect_equal(norm_rip_mad$feature_subset,
@@ -360,18 +382,21 @@ test_that('normalize_global produces the correct output',{
                    "ppp_rip")
   expect_identical(norm_pip_mad$norm_fn,
                    "mad")
-  expect_identical(norm_pip_mad$parameters$normalization$scale,
-                   apply(pdata_gdf$e_data[which(kp_all %in% kp_pip), -1],
-                         2,
-                         mad,
-                         na.rm = TRUE))
-  expect_identical(norm_pip_mad$parameters$normalization$location,
-                   apply(pdata_gdf$e_data[which(kp_all %in% kp_pip), -1],
-                         2,
-                         median,
-                         na.rm = TRUE))
-  expect_null(norm_pip_mad$parameters$backtransform$scale)
-  expect_null(norm_pip_mad$parameters$backtransform$location)
+  expect_equal(
+    norm_pip_mad$parameters,
+    list(normalization = list(
+      scale = apply(pdata_gdf$e_data[which(kp_all %in% kp_pip), -1],
+                    2,
+                    mad,
+                    na.rm = TRUE),
+      location = apply(pdata_gdf$e_data[which(kp_all %in% kp_pip), -1],
+                       2,
+                       median,
+                       na.rm = TRUE)
+    ),
+    backtransform = list(scale = NULL,
+                         location = NULL))
+  )
   expect_equal(norm_pip_mad$n_features_calc,
                length(kp_pip))
   expect_equal(norm_pip_mad$feature_subset,
@@ -402,34 +427,28 @@ test_that('normalize_global produces the correct output',{
                    attr(pdata, "meta_info"))
   expect_identical(attr(norm_all_med, "filters"),
                    attr(pdata, "filters"))
-  expect_identical(attr(norm_all_med, "data_info")$data_scale,
-                   attr(pdata, "data_info")$data_scale)
-  expect_identical(attr(norm_all_med, "data_info")$num_edata,
-                   attr(pdata, "data_info")$num_edata)
-  expect_identical(attr(norm_all_med, "data_info")$num_miss_obs,
-                   attr(pdata, "data_info")$num_miss_obs)
-  expect_identical(attr(norm_all_med, "data_info")$prop_missing,
-                   attr(pdata, "data_info")$prop_missing)
-  expect_identical(attr(norm_all_med, "data_info")$num_samps,
-                   attr(pdata, "data_info")$num_samps)
-  expect_identical(attr(norm_all_med, "data_info")$data_types,
-                   attr(pdata, "data_info")$data_types)
+  expect_identical(attr(norm_all_med, "data_info")[1:2],
+                   attr(pdata, "data_info")[1:2])
+  expect_identical(attr(norm_all_med, "data_info")[4:8],
+                   attr(pdata, "data_info")[4:8])
   
-  # Explore the data_info$norm_info attributes.
-  expect_true(attr(norm_all_med, "data_info")$norm_info$is_normalized)
-  expect_identical(attr(norm_all_med, "data_info")$norm_info$norm_type,
-                   "global")
-  expect_identical(attr(norm_all_med, "data_info")$norm_info$subset_fn,
-                   "all")
-  expect_identical(attr(norm_all_med, "data_info")$norm_info$norm_fn,
-                   "median")
-  expect_equal(attr(norm_all_med, "data_info")$norm_info$n_features_calc,
-               150)
-  expect_equal(attr(norm_all_med, "data_info")$norm_info$prop_features_calc,
-               1)
-  expect_null(attr(norm_all_med, "data_info")$norm_info$params$norm_scale)
-  expect_equal(attr(norm_all_med, "data_info")$norm_info$params$norm_location,
-               apply(pdata$e_data[, -1], 2, median, na.rm = TRUE))
+  # Explore the data_info$norm_info attribute.
+  expect_equal(
+    attr(norm_all_med, "data_info")$norm_info,
+    list(is_normalized = TRUE,
+         norm_type = "global",
+         subset_fn = "all",
+         subset_params = NULL,
+         norm_fn = "median",
+         n_features_calc = 150,
+         prop_features_calc = 1,
+         params = list(
+           norm_scale = NULL,
+           norm_location = apply(pdata$e_data[, -1], 2, median, na.rm = TRUE),
+           bt_scale = NULL,
+           bt_location = NULL
+         ))
+  )
   
   # Normalize the data using "all" and "mean".
   norm_all_mea <- normalize_global(omicsData = pdata,
@@ -452,34 +471,28 @@ test_that('normalize_global produces the correct output',{
                    attr(pdata, "meta_info"))
   expect_identical(attr(norm_all_mea, "filters"),
                    attr(pdata, "filters"))
-  expect_identical(attr(norm_all_mea, "data_info")$data_scale,
-                   attr(pdata, "data_info")$data_scale)
-  expect_identical(attr(norm_all_mea, "data_info")$num_edata,
-                   attr(pdata, "data_info")$num_edata)
-  expect_identical(attr(norm_all_mea, "data_info")$num_miss_obs,
-                   attr(pdata, "data_info")$num_miss_obs)
-  expect_identical(attr(norm_all_mea, "data_info")$prop_missing,
-                   attr(pdata, "data_info")$prop_missing)
-  expect_identical(attr(norm_all_mea, "data_info")$num_samps,
-                   attr(pdata, "data_info")$num_samps)
-  expect_identical(attr(norm_all_mea, "data_info")$data_types,
-                   attr(pdata, "data_info")$data_types)
+  expect_identical(attr(norm_all_mea, "data_info")[1:2],
+                   attr(pdata, "data_info")[1:2])
+  expect_identical(attr(norm_all_mea, "data_info")[4:8],
+                   attr(pdata, "data_info")[4:8])
   
-  # Explore the data_info$norm_info attributes.
-  expect_true(attr(norm_all_mea, "data_info")$norm_info$is_normalized)
-  expect_identical(attr(norm_all_mea, "data_info")$norm_info$norm_type,
-                   "global")
-  expect_identical(attr(norm_all_mea, "data_info")$norm_info$subset_fn,
-                   "all")
-  expect_identical(attr(norm_all_mea, "data_info")$norm_info$norm_fn,
-                   "mean")
-  expect_equal(attr(norm_all_mea, "data_info")$norm_info$n_features_calc,
-               150)
-  expect_equal(attr(norm_all_mea, "data_info")$norm_info$prop_features_calc,
-               1)
-  expect_null(attr(norm_all_mea, "data_info")$norm_info$params$norm_scale)
-  expect_equal(attr(norm_all_mea, "data_info")$norm_info$params$norm_location,
-               colMeans(pdata$e_data[, -1], na.rm = TRUE))
+  # Explore the data_info$norm_info attribute.
+  expect_equal(
+    attr(norm_all_mea, "data_info")$norm_info,
+    list(is_normalized = TRUE,
+         norm_type = "global",
+         subset_fn = "all",
+         subset_params = NULL,
+         norm_fn = "mean",
+         n_features_calc = 150,
+         prop_features_calc = 1,
+         params = list(
+           norm_scale = NULL,
+           norm_location = colMeans(pdata$e_data[, -1], na.rm = TRUE),
+           bt_scale = NULL,
+           bt_location = NULL
+         ))
+  )
   
   # Normalize the data using "all" and "zscore".
   norm_all_z <- normalize_global(omicsData = pdata,
@@ -504,35 +517,28 @@ test_that('normalize_global produces the correct output',{
                    attr(pdata, "meta_info"))
   expect_identical(attr(norm_all_z, "filters"),
                    attr(pdata, "filters"))
-  expect_identical(attr(norm_all_z, "data_info")$data_scale,
-                   attr(pdata, "data_info")$data_scale)
-  expect_identical(attr(norm_all_z, "data_info")$num_edata,
-                   attr(pdata, "data_info")$num_edata)
-  expect_identical(attr(norm_all_z, "data_info")$num_miss_obs,
-                   attr(pdata, "data_info")$num_miss_obs)
-  expect_identical(attr(norm_all_z, "data_info")$prop_missing,
-                   attr(pdata, "data_info")$prop_missing)
-  expect_identical(attr(norm_all_z, "data_info")$num_samps,
-                   attr(pdata, "data_info")$num_samps)
-  expect_identical(attr(norm_all_z, "data_info")$data_types,
-                   attr(pdata, "data_info")$data_types)
+  expect_identical(attr(norm_all_z, "data_info")[1:2],
+                   attr(pdata, "data_info")[1:2])
+  expect_identical(attr(norm_all_z, "data_info")[4:8],
+                   attr(pdata, "data_info")[4:8])
   
-  # Explore the data_info$norm_info attributes.
-  expect_true(attr(norm_all_z, "data_info")$norm_info$is_normalized)
-  expect_identical(attr(norm_all_z, "data_info")$norm_info$norm_type,
-                   "global")
-  expect_identical(attr(norm_all_z, "data_info")$norm_info$subset_fn,
-                   "all")
-  expect_identical(attr(norm_all_z, "data_info")$norm_info$norm_fn,
-                   "zscore")
-  expect_equal(attr(norm_all_z, "data_info")$norm_info$n_features_calc,
-               150)
-  expect_equal(attr(norm_all_z, "data_info")$norm_info$prop_features_calc,
-               1)
-  expect_equal(attr(norm_all_z, "data_info")$norm_info$params$norm_scale,
-               apply(pdata$e_data[, -1], 2, sd, na.rm = TRUE))
-  expect_equal(attr(norm_all_z, "data_info")$norm_info$params$norm_location,
-               colMeans(pdata$e_data[, -1], na.rm = TRUE))
+  # Explore the data_info$norm_info attribute.
+  expect_equal(
+    attr(norm_all_z, "data_info")$norm_info,
+    list(is_normalized = TRUE,
+         norm_type = "global",
+         subset_fn = "all",
+         subset_params = NULL,
+         norm_fn = "zscore",
+         n_features_calc = 150,
+         prop_features_calc = 1,
+         params = list(
+           norm_scale = apply(pdata$e_data[, -1], 2, sd, na.rm = TRUE),
+           norm_location = colMeans(pdata$e_data[, -1], na.rm = TRUE),
+           bt_scale = NULL,
+           bt_location = NULL
+         ))
+  )
   
   # Normalize the data using "all" and "mad".
   norm_all_mad <- normalize_global(omicsData = pdata,
@@ -557,35 +563,28 @@ test_that('normalize_global produces the correct output',{
                    attr(pdata, "meta_info"))
   expect_identical(attr(norm_all_mad, "filters"),
                    attr(pdata, "filters"))
-  expect_identical(attr(norm_all_mad, "data_info")$data_scale,
-                   attr(pdata, "data_info")$data_scale)
-  expect_identical(attr(norm_all_mad, "data_info")$num_edata,
-                   attr(pdata, "data_info")$num_edata)
-  expect_identical(attr(norm_all_mad, "data_info")$num_miss_obs,
-                   attr(pdata, "data_info")$num_miss_obs)
-  expect_identical(attr(norm_all_mad, "data_info")$prop_missing,
-                   attr(pdata, "data_info")$prop_missing)
-  expect_identical(attr(norm_all_mad, "data_info")$num_samps,
-                   attr(pdata, "data_info")$num_samps)
-  expect_identical(attr(norm_all_mad, "data_info")$data_types,
-                   attr(pdata, "data_info")$data_types)
+  expect_identical(attr(norm_all_mad, "data_info")[1:2],
+                   attr(pdata, "data_info")[1:2])
+  expect_identical(attr(norm_all_mad, "data_info")[4:8],
+                   attr(pdata, "data_info")[4:8])
   
-  # Explore the data_info$norm_info attributes.
-  expect_true(attr(norm_all_mad, "data_info")$norm_info$is_normalized)
-  expect_identical(attr(norm_all_mad, "data_info")$norm_info$norm_type,
-                   "global")
-  expect_identical(attr(norm_all_mad, "data_info")$norm_info$subset_fn,
-                   "all")
-  expect_identical(attr(norm_all_mad, "data_info")$norm_info$norm_fn,
-                   "mad")
-  expect_equal(attr(norm_all_mad, "data_info")$norm_info$n_features_calc,
-               150)
-  expect_equal(attr(norm_all_mad, "data_info")$norm_info$prop_features_calc,
-               1)
-  expect_equal(attr(norm_all_mad, "data_info")$norm_info$params$norm_scale,
-               apply(pdata$e_data[, -1], 2, mad, na.rm = TRUE))
-  expect_equal(attr(norm_all_mad, "data_info")$norm_info$params$norm_location,
-               apply(pdata$e_data[, -1], 2, median, na.rm = TRUE))
+  # Explore the data_info$norm_info attribute.
+  expect_equal(
+    attr(norm_all_mad, "data_info")$norm_info,
+    list(is_normalized = TRUE,
+         norm_type = "global",
+         subset_fn = "all",
+         subset_params = NULL,
+         norm_fn = "mad",
+         n_features_calc = 150,
+         prop_features_calc = 1,
+         params = list(
+           norm_scale = apply(pdata$e_data[, -1], 2, mad, na.rm = TRUE),
+           norm_location = apply(pdata$e_data[, -1], 2, median, na.rm = TRUE),
+           bt_scale = NULL,
+           bt_location = NULL
+         ))
+  )
   
   # Backtransformate -----------------------------------------------------------
   
@@ -607,36 +606,18 @@ test_that('normalize_global produces the correct output',{
                median(as.matrix(pdata$e_data[, -1]), na.rm = TRUE))
   
   # Verify the attributes are correct.
-  expect_identical(attributes(back_all_med)$data_info$data_scale,
-                   attributes(norm_all_med)$data_info$data_scale)
-  expect_identical(attributes(back_all_med)$data_info$norm_info$is_normalized,
-                   attributes(norm_all_med)$data_info$norm_info$is_normalized)
-  expect_identical(attributes(back_all_med)$data_info$norm_info$norm_type,
-                   attributes(norm_all_med)$data_info$norm_info$norm_type)
-  expect_identical(attributes(back_all_med)$data_info$norm_info$subset_fn,
-                   attributes(norm_all_med)$data_info$norm_info$subset_fn)
-  expect_identical(attributes(back_all_med)$data_info$norm_info$norm_fn,
-                   attributes(norm_all_med)$data_info$norm_info$norm_fn)
-  expect_identical(attributes(back_all_med)$data_info$norm_info$n_features_calc,
-                   attributes(norm_all_med)$data_info$norm_info$n_features_calc)
-  expect_identical(
-    attributes(back_all_med)$data_info$norm_info$prop_features_calc,
-    attributes(norm_all_med)$data_info$norm_info$prop_features_calc
-  )
-  expect_identical(
-    attributes(back_all_med)$data_info$norm_info$params$norm_location,
-    attributes(norm_all_med)$data_info$norm_info$params$norm_location
-  )
-  expect_identical(attributes(back_all_med)$data_info$num_edata,
-                   attributes(norm_all_med)$data_info$num_edata)
-  expect_identical(attributes(back_all_med)$data_info$num_miss_obs,
-                   attributes(norm_all_med)$data_info$num_miss_obs)
-  expect_identical(attributes(back_all_med)$data_info$prop_missing,
-                   attributes(norm_all_med)$data_info$prop_missing)
-  expect_identical(attributes(back_all_med)$data_info$num_samps,
-                   attributes(norm_all_med)$data_info$num_samps)
+  expect_identical(attributes(back_all_med)$data_info[1:2],
+                   attributes(norm_all_med)$data_info[1:2])
+  expect_identical(attributes(back_all_med)$data_info[[3]][1:7],
+                   attributes(norm_all_med)$data_info[[3]][1:7])
+  expect_identical(attributes(back_all_med)$data_info[[3]][[8]][1:2],
+                   attributes(norm_all_med)$data_info[[3]][[8]][1:2])
+  expect_identical(attributes(back_all_med)$data_info[4:8],
+                   attributes(norm_all_med)$data_info[4:8])
   expect_identical(attributes(back_all_med)$meta_info,
                    attributes(norm_all_med)$meta_info)
+  expect_identical(attributes(back_all_med)$filters,
+                   attributes(norm_all_med)$filters)
   
   # Normalize the data using "all" and "mean" with a backtransformation.
   back_all_mea <- normalize_global(omicsData = pdata,
@@ -656,36 +637,18 @@ test_that('normalize_global produces the correct output',{
                median(as.matrix(pdata$e_data[, -1]), na.rm = TRUE))
   
   # Verify the attributes are correct.
-  expect_identical(attributes(back_all_mea)$data_info$data_scale,
-                   attributes(norm_all_mea)$data_info$data_scale)
-  expect_identical(attributes(back_all_mea)$data_info$norm_info$is_normalized,
-                   attributes(norm_all_mea)$data_info$norm_info$is_normalized)
-  expect_identical(attributes(back_all_mea)$data_info$norm_info$norm_type,
-                   attributes(norm_all_mea)$data_info$norm_info$norm_type)
-  expect_identical(attributes(back_all_mea)$data_info$norm_info$subset_fn,
-                   attributes(norm_all_mea)$data_info$norm_info$subset_fn)
-  expect_identical(attributes(back_all_mea)$data_info$norm_info$norm_fn,
-                   attributes(norm_all_mea)$data_info$norm_info$norm_fn)
-  expect_identical(attributes(back_all_mea)$data_info$norm_info$n_features_calc,
-                   attributes(norm_all_mea)$data_info$norm_info$n_features_calc)
-  expect_identical(
-    attributes(back_all_mea)$data_info$norm_info$prop_features_calc,
-    attributes(norm_all_mea)$data_info$norm_info$prop_features_calc
-  )
-  expect_identical(
-    attributes(back_all_mea)$data_info$norm_info$params$norm_location,
-    attributes(norm_all_mea)$data_info$norm_info$params$norm_location
-  )
-  expect_identical(attributes(back_all_mea)$data_info$num_edata,
-                   attributes(norm_all_mea)$data_info$num_edata)
-  expect_identical(attributes(back_all_mea)$data_info$num_miss_obs,
-                   attributes(norm_all_mea)$data_info$num_miss_obs)
-  expect_identical(attributes(back_all_mea)$data_info$prop_missing,
-                   attributes(norm_all_mea)$data_info$prop_missing)
-  expect_identical(attributes(back_all_mea)$data_info$num_samps,
-                   attributes(norm_all_mea)$data_info$num_samps)
+  expect_identical(attributes(back_all_mea)$data_info[1:2],
+                   attributes(norm_all_mea)$data_info[1:2])
+  expect_identical(attributes(back_all_mea)$data_info[[3]][1:7],
+                   attributes(norm_all_mea)$data_info[[3]][1:7])
+  expect_identical(attributes(back_all_mea)$data_info[[3]][[8]][1:2],
+                   attributes(norm_all_mea)$data_info[[3]][[8]][1:2])
+  expect_identical(attributes(back_all_mea)$data_info[4:8],
+                   attributes(norm_all_mea)$data_info[4:8])
   expect_identical(attributes(back_all_mea)$meta_info,
                    attributes(norm_all_mea)$meta_info)
+  expect_identical(attributes(back_all_mea)$filters,
+                   attributes(norm_all_mea)$filters)
   
   # Normalize the data using "all" and "zscore" with a backtransformation.
   back_all_z <- normalize_global(omicsData = pdata,
@@ -713,36 +676,18 @@ test_that('normalize_global produces the correct output',{
                mean(as.matrix(pdata$e_data[, -1]), na.rm = TRUE))
   
   # Verify the attributes are correct.
-  expect_identical(attributes(back_all_z)$data_info$data_scale,
-                   attributes(norm_all_z)$data_info$data_scale)
-  expect_identical(attributes(back_all_z)$data_info$norm_info$is_normalized,
-                   attributes(norm_all_z)$data_info$norm_info$is_normalized)
-  expect_identical(attributes(back_all_z)$data_info$norm_info$norm_type,
-                   attributes(norm_all_z)$data_info$norm_info$norm_type)
-  expect_identical(attributes(back_all_z)$data_info$norm_info$subset_fn,
-                   attributes(norm_all_z)$data_info$norm_info$subset_fn)
-  expect_identical(attributes(back_all_z)$data_info$norm_info$norm_fn,
-                   attributes(norm_all_z)$data_info$norm_info$norm_fn)
-  expect_identical(attributes(back_all_z)$data_info$norm_info$n_features_calc,
-                   attributes(norm_all_z)$data_info$norm_info$n_features_calc)
-  expect_identical(
-    attributes(back_all_z)$data_info$norm_info$prop_features_calc,
-    attributes(norm_all_z)$data_info$norm_info$prop_features_calc
-  )
-  expect_identical(
-    attributes(back_all_z)$data_info$norm_info$params$norm_location,
-    attributes(norm_all_z)$data_info$norm_info$params$norm_location
-  )
-  expect_identical(attributes(back_all_z)$data_info$num_edata,
-                   attributes(norm_all_z)$data_info$num_edata)
-  expect_identical(attributes(back_all_z)$data_info$num_miss_obs,
-                   attributes(norm_all_z)$data_info$num_miss_obs)
-  expect_identical(attributes(back_all_z)$data_info$prop_missing,
-                   attributes(norm_all_z)$data_info$prop_missing)
-  expect_identical(attributes(back_all_z)$data_info$num_samps,
-                   attributes(norm_all_z)$data_info$num_samps)
+  expect_identical(attributes(back_all_z)$data_info[1:2],
+                   attributes(norm_all_z)$data_info[1:2])
+  expect_identical(attributes(back_all_z)$data_info[[3]][1:7],
+                   attributes(norm_all_z)$data_info[[3]][1:7])
+  expect_identical(attributes(back_all_z)$data_info[[3]][[8]][1:2],
+                   attributes(norm_all_z)$data_info[[3]][[8]][1:2])
+  expect_identical(attributes(back_all_z)$data_info[4:8],
+                   attributes(norm_all_z)$data_info[4:8])
   expect_identical(attributes(back_all_z)$meta_info,
                    attributes(norm_all_z)$meta_info)
+  expect_identical(attributes(back_all_z)$filters,
+                   attributes(norm_all_z)$filters)
   
   # Normalize the data using "all" and "mad" with a backtransformation.
   back_all_mad <- normalize_global(omicsData = pdata,
@@ -768,35 +713,17 @@ test_that('normalize_global produces the correct output',{
                median(as.matrix(pdata$e_data[, -1]), na.rm = TRUE))
   
   # Verify the attributes are correct.
-  expect_identical(attributes(back_all_mad)$data_info$data_scale,
-                   attributes(norm_all_mad)$data_info$data_scale)
-  expect_identical(attributes(back_all_mad)$data_info$norm_info$is_normalized,
-                   attributes(norm_all_mad)$data_info$norm_info$is_normalized)
-  expect_identical(attributes(back_all_mad)$data_info$norm_info$norm_type,
-                   attributes(norm_all_mad)$data_info$norm_info$norm_type)
-  expect_identical(attributes(back_all_mad)$data_info$norm_info$subset_fn,
-                   attributes(norm_all_mad)$data_info$norm_info$subset_fn)
-  expect_identical(attributes(back_all_mad)$data_info$norm_info$norm_fn,
-                   attributes(norm_all_mad)$data_info$norm_info$norm_fn)
-  expect_identical(attributes(back_all_mad)$data_info$norm_info$n_features_calc,
-                   attributes(norm_all_mad)$data_info$norm_info$n_features_calc)
-  expect_identical(
-    attributes(back_all_mad)$data_info$norm_info$prop_features_calc,
-    attributes(norm_all_mad)$data_info$norm_info$prop_features_calc
-  )
-  expect_identical(
-    attributes(back_all_mad)$data_info$norm_info$params$norm_location,
-    attributes(norm_all_mad)$data_info$norm_info$params$norm_location
-  )
-  expect_identical(attributes(back_all_mad)$data_info$num_edata,
-                   attributes(norm_all_mad)$data_info$num_edata)
-  expect_identical(attributes(back_all_mad)$data_info$num_miss_obs,
-                   attributes(norm_all_mad)$data_info$num_miss_obs)
-  expect_identical(attributes(back_all_mad)$data_info$prop_missing,
-                   attributes(norm_all_mad)$data_info$prop_missing)
-  expect_identical(attributes(back_all_mad)$data_info$num_samps,
-                   attributes(norm_all_mad)$data_info$num_samps)
+  expect_identical(attributes(back_all_mad)$data_info[1:2],
+                   attributes(norm_all_mad)$data_info[1:2])
+  expect_identical(attributes(back_all_mad)$data_info[[3]][1:7],
+                   attributes(norm_all_mad)$data_info[[3]][1:7])
+  expect_identical(attributes(back_all_mad)$data_info[[3]][[8]][1:2],
+                   attributes(norm_all_mad)$data_info[[3]][[8]][1:2])
+  expect_identical(attributes(back_all_mad)$data_info[4:8],
+                   attributes(norm_all_mad)$data_info[4:8])
   expect_identical(attributes(back_all_mad)$meta_info,
                    attributes(norm_all_mad)$meta_info)
+  expect_identical(attributes(back_all_mad)$filters,
+                   attributes(norm_all_mad)$filters)
   
 })

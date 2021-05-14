@@ -28,7 +28,7 @@ molecule_filter <- function(omicsData){
   if (!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData",
                              "nmrData"))) {
     
-    stop(paste("omicsData must be of class 'pepData', 'proData', 'metabData',",
+    stop (paste("omicsData must be of class 'pepData', 'proData', 'metabData',",
                "'lipidData', or 'nmrData'",
                sep = ' '))
     

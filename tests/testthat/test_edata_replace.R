@@ -16,7 +16,8 @@ test_that('edata_replace correctly replaces one value with another',{
                                 e_meta = emeta,
                                 edata_cname = 'Peptide',
                                 fdata_cname = 'Sample',
-                                emeta_cname = 'Protein')
+                                emeta_cname = 'Protein',
+                                data_scale_orig = "abundance")
   
   # Replace NAs with 0s in isodata.
   expect_message(isodata2 <- edata_replace(omicsData = isodata,
@@ -25,14 +26,18 @@ test_that('edata_replace correctly replaces one value with another',{
                  "400 instances of NA have been replaced with 0")
   
   # Check that the elements of the data_info attribute are all correct.
-  expect_equal(attributes(isodata2)$data_info$num_edata,
-               150)
-  expect_equal(attributes(isodata2)$data_info$num_miss_obs,
-               0)
-  expect_equal(attributes(isodata2)$data_info$prop_missing,
-               0)
-  expect_equal(attributes(isodata2)$data_info$num_samps,
-               12)
+  expect_equal(
+    attr(isodata2, "data_info"),
+    list(data_scale_orig = "abundance",
+         data_scale = "abundance",
+         norm_info = list(is_normalized = FALSE),
+         num_edata = length(unique(isodata2$e_data[, 1])),
+         num_miss_obs = sum(is.na(isodata2$e_data)),
+         prop_missing = (sum(is.na(isodata2$e_data)) /
+                           prod(dim(isodata2$e_data[, -1]))),
+         num_samps = ncol(isodata2$e_data[, -1]),
+         data_types = NULL)
+  )
   
   # Make sure all other attributes have not changed.
   expect_equal(attr(isodata, 'cnames'),
@@ -70,7 +75,8 @@ test_that('edata_replace correctly replaces one value with another',{
                         e_meta = emeta,
                         edata_cname = 'LipidCommonName',
                         fdata_cname = 'Sample_Name',
-                        emeta_cname = 'LipidClass')
+                        emeta_cname = 'LipidClass',
+                        data_scale_orig = "abundance")
   
   # Replace NAs with 0s in ldata.
   expect_message(ldata2 <- edata_replace(omicsData = ldata,
@@ -79,14 +85,18 @@ test_that('edata_replace correctly replaces one value with another',{
                  "884 instances of NA have been replaced with 0")
   
   # Check that the elements of the data_info attribute are all correct.
-  expect_equal(attributes(ldata2)$data_info$num_edata,
-               146)
-  expect_equal(attributes(ldata2)$data_info$num_miss_obs,
-               0)
-  expect_equal(attributes(ldata2)$data_info$prop_missing,
-               0)
-  expect_equal(attributes(ldata2)$data_info$num_samps,
-               11)
+  expect_equal(
+    attr(ldata2, "data_info"),
+    list(data_scale_orig = "abundance",
+         data_scale = "abundance",
+         norm_info = list(is_normalized = FALSE),
+         num_edata = length(unique(ldata2$e_data[, 1])),
+         num_miss_obs = sum(is.na(ldata2$e_data)),
+         prop_missing = (sum(is.na(ldata2$e_data)) /
+                           prod(dim(ldata2$e_data[, -1]))),
+         num_samps = ncol(ldata2$e_data[, -1]),
+         data_types = NULL)
+  )
   
   # Make sure all other attributes have not changed.
   expect_equal(attr(ldata, 'cnames'),
@@ -122,7 +132,8 @@ test_that('edata_replace correctly replaces one value with another',{
                         e_meta = emeta,
                         edata_cname = 'Metabolite',
                         fdata_cname = 'SampleID',
-                        emeta_cname = 'MClass')
+                        emeta_cname = 'MClass',
+                        data_scale_orig = "abundance")
   
   # Replace NAs with 0s in mdata.
   expect_message(mdata2 <- edata_replace(omicsData = mdata,
@@ -131,14 +142,18 @@ test_that('edata_replace correctly replaces one value with another',{
                  "148 instances of NA have been replaced with 0")
   
   # Check that the elements of the data_info attribute are all correct.
-  expect_equal(attributes(mdata2)$data_info$num_edata,
-               80)
-  expect_equal(attributes(mdata2)$data_info$num_miss_obs,
-               0)
-  expect_equal(attributes(mdata2)$data_info$prop_missing,
-               0)
-  expect_equal(attributes(mdata2)$data_info$num_samps,
-               12)
+  expect_equal(
+    attr(mdata2, "data_info"),
+    list(data_scale_orig = "abundance",
+         data_scale = "abundance",
+         norm_info = list(is_normalized = FALSE),
+         num_edata = length(unique(mdata2$e_data[, 1])),
+         num_miss_obs = sum(is.na(mdata2$e_data)),
+         prop_missing = (sum(is.na(mdata2$e_data)) /
+                           prod(dim(mdata2$e_data[, -1]))),
+         num_samps = ncol(mdata2$e_data[, -1]),
+         data_types = NULL)
+  )
   
   # Make sure all other attributes have not changed.
   expect_equal(attr(mdata, 'cnames'),
@@ -193,7 +208,8 @@ test_that('edata_replace correctly replaces one value with another',{
                         edata_cname = 'Metabolite',
                         fdata_cname = 'SampleID',
                         emeta_cname = 'nmrClass',
-                        check.names = FALSE)
+                        check.names = FALSE,
+                        data_scale_orig = "abundance")
   
   # Replace NAs with 0s in nmrdata.
   expect_message(nmrdata2 <- edata_replace(omicsData = nmrdata,
@@ -202,14 +218,18 @@ test_that('edata_replace correctly replaces one value with another',{
                  "302 instances of NA have been replaced with 0")
   
   # Check that the elements of the data_info attribute are all correct.
-  expect_equal(attributes(nmrdata2)$data_info$num_edata,
-               38)
-  expect_equal(attributes(nmrdata2)$data_info$num_miss_obs,
-               0)
-  expect_equal(attributes(nmrdata2)$data_info$prop_missing,
-               0)
-  expect_equal(attributes(nmrdata2)$data_info$num_samps,
-               41)
+  expect_equal(
+    attr(nmrdata2, "data_info"),
+    list(data_scale_orig = "abundance",
+         data_scale = "abundance",
+         norm_info = list(is_normalized = FALSE),
+         num_edata = length(unique(nmrdata2$e_data[, 1])),
+         num_miss_obs = sum(is.na(nmrdata2$e_data)),
+         prop_missing = (sum(is.na(nmrdata2$e_data)) /
+                           prod(dim(nmrdata2$e_data[, -1]))),
+         num_samps = ncol(nmrdata2$e_data[, -1]),
+         data_types = NULL)
+  )
   
   # Make sure all other attributes have not changed.
   expect_equal(attr(nmrdata, 'cnames'),
@@ -247,7 +267,8 @@ test_that('edata_replace correctly replaces one value with another',{
                       e_meta = emeta,
                       edata_cname = 'Mass_Tag_ID',
                       fdata_cname = 'SampleID',
-                      emeta_cname = 'Protein')
+                      emeta_cname = 'Protein',
+                      data_scale_orig = "abundance")
   
   # Replace NAs with 0s in pdata.
   expect_message(pdata2 <- edata_replace(omicsData = pdata,
@@ -256,14 +277,18 @@ test_that('edata_replace correctly replaces one value with another',{
                  "341 instances of NA have been replaced with 0")
   
   # Check that the elements of the data_info attribute are all correct.
-  expect_equal(attributes(pdata2)$data_info$num_edata,
-               150)
-  expect_equal(attributes(pdata2)$data_info$num_miss_obs,
-               0)
-  expect_equal(attributes(pdata2)$data_info$prop_missing,
-               0)
-  expect_equal(attributes(pdata2)$data_info$num_samps,
-               12)
+  expect_equal(
+    attr(pdata2, "data_info"),
+    list(data_scale_orig = "abundance",
+         data_scale = "abundance",
+         norm_info = list(is_normalized = FALSE),
+         num_edata = length(unique(pdata2$e_data[, 1])),
+         num_miss_obs = sum(is.na(pdata2$e_data)),
+         prop_missing = (sum(is.na(pdata2$e_data)) /
+                           prod(dim(pdata2$e_data[, -1]))),
+         num_samps = ncol(pdata2$e_data[, -1]),
+         data_types = NULL)
+  )
   
   # Make sure all other attributes have not changed.
   expect_equal(attr(pdata, 'cnames'),
@@ -299,7 +324,8 @@ test_that('edata_replace correctly replaces one value with another',{
                        e_meta = emeta,
                        edata_cname = 'Reference',
                        fdata_cname = 'SampleID',
-                       emeta_cname = 'PClass')
+                       emeta_cname = 'PClass',
+                       data_scale_orig = "abundance")
   
   # Replace NAs with 0s in prdata.
   expect_message(prdata2 <- edata_replace(omicsData = prdata,
@@ -308,14 +334,18 @@ test_that('edata_replace correctly replaces one value with another',{
                  "234 instances of NA have been replaced with 0")
   
   # Check that the elements of the data_info attribute are all correct.
-  expect_equal(attributes(prdata2)$data_info$num_edata,
-               150)
-  expect_equal(attributes(prdata2)$data_info$num_miss_obs,
-               0)
-  expect_equal(attributes(prdata2)$data_info$prop_missing,
-               0)
-  expect_equal(attributes(prdata2)$data_info$num_samps,
-               11)
+  expect_equal(
+    attr(prdata2, "data_info"),
+    list(data_scale_orig = "abundance",
+         data_scale = "abundance",
+         norm_info = list(is_normalized = FALSE),
+         num_edata = length(unique(prdata2$e_data[, 1])),
+         num_miss_obs = sum(is.na(prdata2$e_data)),
+         prop_missing = (sum(is.na(prdata2$e_data)) /
+                           prod(dim(prdata2$e_data[, -1]))),
+         num_samps = ncol(prdata2$e_data[, -1]),
+         data_types = NULL)
+  )
   
   # Make sure all other attributes have not changed.
   expect_equal(attr(prdata, 'cnames'),

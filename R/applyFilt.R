@@ -245,6 +245,7 @@ applyFilt.moleculeFilt <- function(filter_object, omicsData, min_num=2){
     attr(omicsData, 'data_info') <- set_data_info(
       e_data = omicsData$e_data,
       edata_cname = get_edata_cname(omicsData),
+      data_scale_orig = get_data_scale_orig(omicsData),
       data_scale = get_data_scale(omicsData),
       data_types = dInfo$data_types,
       norm_info = dInfo$norm_info,
@@ -375,6 +376,7 @@ applyFilt.cvFilt <- function (filter_object, omicsData, cv_threshold = 150) {
     attr(omicsData, 'data_info') <- set_data_info(
       e_data = omicsData$e_data,
       edata_cname = get_edata_cname(omicsData),
+      data_scale_orig = get_data_scale_orig(omicsData),
       data_scale = get_data_scale(omicsData),
       data_types = dInfo$data_types,
       norm_info = dInfo$norm_info,
@@ -515,6 +517,7 @@ applyFilt.rmdFilt <- function (filter_object, omicsData,
     attr(omicsData, 'data_info') <- set_data_info(
       e_data = omicsData$e_data,
       edata_cname = get_edata_cname(omicsData),
+      data_scale_orig = get_data_scale_orig(omicsData),
       data_scale = get_data_scale(omicsData),
       data_types = dInfo$data_types,
       norm_info = dInfo$norm_info,
@@ -762,6 +765,7 @@ applyFilt.proteomicsFilt <- function (filter_object,
     attr(omicsData, 'data_info') <- set_data_info(
       e_data = omicsData$e_data,
       edata_cname = get_edata_cname(omicsData),
+      data_scale_orig = get_data_scale_orig(omicsData),
       data_scale = get_data_scale(omicsData),
       data_types = dInfo$data_types,
       norm_info = dInfo$norm_info,
@@ -1135,6 +1139,7 @@ applyFilt.imdanovaFilt <- function (filter_object,
     attr(omicsData, 'data_info') <- set_data_info(
       e_data = omicsData$e_data,
       edata_cname = get_edata_cname(omicsData),
+      data_scale_orig = get_data_scale_orig(omicsData),
       data_scale = get_data_scale(omicsData),
       data_types = dInfo$data_types,
       norm_info = dInfo$norm_info,
@@ -1306,6 +1311,7 @@ applyFilt.customFilt <- function (filter_object, omicsData) {
     attr(omicsData, 'data_info') <- set_data_info(
       e_data = omicsData$e_data,
       edata_cname = get_edata_cname(omicsData),
+      data_scale_orig = get_data_scale_orig(omicsData),
       data_scale = get_data_scale(omicsData),
       data_types = dInfo$data_types,
       norm_info = dInfo$norm_info,

@@ -14,7 +14,8 @@ test_that('custom_filter and applyFilt produce the correct output',{
                       e_meta = emeta,
                       edata_cname = "Mass_Tag_ID",
                       fdata_cname = "SampleID",
-                      emeta_cname = "Protein")
+                      emeta_cname = "Protein",
+                      data_scale_orig = "abundance")
   
   # Test custom_filter preliminary checks --------------------------------------
   
@@ -57,12 +58,10 @@ test_that('custom_filter and applyFilt produce the correct output',{
   expect_equal(attr(edr, "num_samples"), 12)
   expect_equal(attr(edr, "num_edata"), 150)
   expect_equal(attr(edr, "num_emeta"), 83)
-  expect_equal(attr(edr, "cnames")$edata_cname,
-               "Mass_Tag_ID")
-  expect_equal(attr(edr, "cnames")$fdata_cname,
-               "SampleID")
-  expect_equal(attr(edr, "cnames")$emeta_cname,
-               "Protein")
+  expect_equal(attr(edr, "cnames"),
+               list(edata_cname = "Mass_Tag_ID",
+                    emeta_cname = "Protein",
+                    fdata_cname = "SampleID"))
   expect_equal(dim(attr(edr, "omicsData")$e_data),
                c(150, 13))
   expect_equal(dim(attr(edr, "omicsData")$f_data),
@@ -318,24 +317,25 @@ test_that('custom_filter and applyFilt produce the correct output',{
   expect_true(is.na(attr(filtered_edr, "filters")[[1]]$method))
   
   # Examinate the data_info attribute.
-  expect_equal(attr(filtered_edr, "data_info")$data_scale,
-               "abundance")
-  expect_false(attr(filtered_edr, "data_info")$norm_info$is_normalized,
-               FALSE)
-  expect_equal(attr(filtered_edr, "data_info")$num_edata,
-               138)
-  expect_equal(attr(filtered_edr, "data_info")$num_miss_obs,
-               322)
-  expect_equal(round(attr(filtered_edr, "data_info")$prop_missing, 4),
-               0.1944)
-  expect_equal(attr(filtered_edr, "data_info")$num_samps,
-               12)
-  expect_null(attr(filtered_edr, "data_info")$data_types)
+  expect_equal(
+    attr(filtered_edr, "data_info"),
+    list(data_scale_orig = "abundance",
+         data_scale = "abundance",
+         norm_info = list(is_normalized = FALSE),
+         num_edata = length(unique(filtered_edr$e_data$Mass_Tag_ID)),
+         num_miss_obs = sum(is.na(filtered_edr$e_data[, -1])),
+         prop_missing = (sum(is.na(filtered_edr$e_data[, -1])) / 
+                           prod(dim(filtered_edr$e_data[, -1]))),
+         num_samps = ncol(filtered_edr$e_data[, -1]),
+         data_types = NULL)
+  )
   
   # Explorate the meta_info attribute.
-  expect_true(attr(filtered_edr, "meta_info")$meta_data)
-  expect_equal(attr(filtered_edr, "meta_info")$num_emeta,
-               81)
+  expect_equal(
+    attr(filtered_edr, "meta_info"),
+    list(meta_data = TRUE,
+         num_emeta = length(unique(filtered_edr$e_meta$Protein)))
+  )
   
   # Inspecticate the filtered e_data, f_data, and e_meta data frames.
   expect_equal(dim(filtered_edr$e_data),
@@ -371,24 +371,25 @@ test_that('custom_filter and applyFilt produce the correct output',{
   expect_true(is.na(attr(filtered_fdr, "filters")[[1]]$method))
   
   # Examinate the data_info attribute.
-  expect_equal(attr(filtered_fdr, "data_info")$data_scale,
-               "abundance")
-  expect_false(attr(filtered_fdr, "data_info")$norm_info$is_normalized,
-               FALSE)
-  expect_equal(attr(filtered_fdr, "data_info")$num_edata,
-               150)
-  expect_equal(attr(filtered_fdr, "data_info")$num_miss_obs,
-               262)
-  expect_equal(round(attr(filtered_fdr, "data_info")$prop_missing, 4),
-               0.1941)
-  expect_equal(attr(filtered_fdr, "data_info")$num_samps,
-               9)
-  expect_null(attr(filtered_fdr, "data_info")$data_types)
+  expect_equal(
+    attr(filtered_fdr, "data_info"),
+    list(data_scale_orig = "abundance",
+         data_scale = "abundance",
+         norm_info = list(is_normalized = FALSE),
+         num_edata = length(unique(filtered_fdr$e_data$Mass_Tag_ID)),
+         num_miss_obs = sum(is.na(filtered_fdr$e_data[, -1])),
+         prop_missing = (sum(is.na(filtered_fdr$e_data[, -1])) / 
+                           prod(dim(filtered_fdr$e_data[, -1]))),
+         num_samps = ncol(filtered_fdr$e_data[, -1]),
+         data_types = NULL)
+  )
   
   # Explorate the meta_info attribute.
-  expect_true(attr(filtered_fdr, "meta_info")$meta_data)
-  expect_equal(attr(filtered_fdr, "meta_info")$num_emeta,
-               83)
+  expect_equal(
+    attr(filtered_fdr, "meta_info"),
+    list(meta_data = TRUE,
+         num_emeta = length(unique(filtered_fdr$e_meta$Protein)))
+  )
   
   # Inspecticate the filtered e_data, f_data, and e_meta data frames.
   expect_equal(dim(filtered_fdr$e_data),
@@ -424,24 +425,25 @@ test_that('custom_filter and applyFilt produce the correct output',{
   expect_true(is.na(attr(filtered_emr, "filters")[[1]]$method))
   
   # Examinate the data_info attribute.
-  expect_equal(attr(filtered_emr, "data_info")$data_scale,
-               "abundance")
-  expect_false(attr(filtered_emr, "data_info")$norm_info$is_normalized,
-               FALSE)
-  expect_equal(attr(filtered_emr, "data_info")$num_edata,
-               141)
-  expect_equal(attr(filtered_emr, "data_info")$num_miss_obs,
-               323)
-  expect_equal(round(attr(filtered_emr, "data_info")$prop_missing, 4),
-               0.1909)
-  expect_equal(attr(filtered_emr, "data_info")$num_samps,
-               12)
-  expect_null(attr(filtered_emr, "data_info")$data_types)
+  expect_equal(
+    attr(filtered_emr, "data_info"),
+    list(data_scale_orig = "abundance",
+         data_scale = "abundance",
+         norm_info = list(is_normalized = FALSE),
+         num_edata = length(unique(filtered_emr$e_data$Mass_Tag_ID)),
+         num_miss_obs = sum(is.na(filtered_emr$e_data[, -1])),
+         prop_missing = (sum(is.na(filtered_emr$e_data[, -1])) / 
+                           prod(dim(filtered_emr$e_data[, -1]))),
+         num_samps = ncol(filtered_emr$e_data[, -1]),
+         data_types = NULL)
+  )
   
   # Explorate the meta_info attribute.
-  expect_true(attr(filtered_emr, "meta_info")$meta_data)
-  expect_equal(attr(filtered_emr, "meta_info")$num_emeta,
-               81)
+  expect_equal(
+    attr(filtered_emr, "meta_info"),
+    list(meta_data = TRUE,
+         num_emeta = length(unique(filtered_emr$e_meta$Protein)))
+  )
   
   # Inspecticate the filtered e_data, f_data, and e_meta data frames.
   expect_equal(dim(filtered_emr$e_data),
@@ -480,24 +482,25 @@ test_that('custom_filter and applyFilt produce the correct output',{
   expect_true(is.na(attr(filtered_efdr, "filters")[[1]]$method))
   
   # Examinate the data_info attribute.
-  expect_equal(attr(filtered_efdr, "data_info")$data_scale,
-               "abundance")
-  expect_false(attr(filtered_efdr, "data_info")$norm_info$is_normalized,
-               FALSE)
-  expect_equal(attr(filtered_efdr, "data_info")$num_edata,
-               138)
-  expect_equal(attr(filtered_efdr, "data_info")$num_miss_obs,
-               248)
-  expect_equal(round(attr(filtered_efdr, "data_info")$prop_missing, 4),
-               0.1997)
-  expect_equal(attr(filtered_efdr, "data_info")$num_samps,
-               9)
-  expect_null(attr(filtered_efdr, "data_info")$data_types)
+  expect_equal(
+    attr(filtered_efdr, "data_info"),
+    list(data_scale_orig = "abundance",
+         data_scale = "abundance",
+         norm_info = list(is_normalized = FALSE),
+         num_edata = length(unique(filtered_efdr$e_data$Mass_Tag_ID)),
+         num_miss_obs = sum(is.na(filtered_efdr$e_data[, -1])),
+         prop_missing = (sum(is.na(filtered_efdr$e_data[, -1])) / 
+                           prod(dim(filtered_efdr$e_data[, -1]))),
+         num_samps = ncol(filtered_efdr$e_data[, -1]),
+         data_types = NULL)
+  )
   
   # Explorate the meta_info attribute.
-  expect_true(attr(filtered_efdr, "meta_info")$meta_data)
-  expect_equal(attr(filtered_efdr, "meta_info")$num_emeta,
-               81)
+  expect_equal(
+    attr(filtered_efdr, "meta_info"),
+    list(meta_data = TRUE,
+         num_emeta = length(unique(filtered_efdr$e_meta$Protein)))
+  )
   
   # Inspecticate the filtered e_data, f_data, and e_meta data frames.
   expect_equal(dim(filtered_efdr$e_data),
@@ -536,24 +539,25 @@ test_that('custom_filter and applyFilt produce the correct output',{
   expect_true(is.na(attr(filtered_edemr, "filters")[[1]]$method))
   
   # Examinate the data_info attribute.
-  expect_equal(attr(filtered_edemr, "data_info")$data_scale,
-               "abundance")
-  expect_false(attr(filtered_edemr, "data_info")$norm_info$is_normalized,
-               FALSE)
-  expect_equal(attr(filtered_edemr, "data_info")$num_edata,
-               130)
-  expect_equal(attr(filtered_edemr, "data_info")$num_miss_obs,
-               304)
-  expect_equal(round(attr(filtered_edemr, "data_info")$prop_missing, 4),
-               0.1949)
-  expect_equal(attr(filtered_edemr, "data_info")$num_samps,
-               12)
-  expect_null(attr(filtered_edemr, "data_info")$data_types)
+  expect_equal(
+    attr(filtered_edemr, "data_info"),
+    list(data_scale_orig = "abundance",
+         data_scale = "abundance",
+         norm_info = list(is_normalized = FALSE),
+         num_edata = length(unique(filtered_edemr$e_data$Mass_Tag_ID)),
+         num_miss_obs = sum(is.na(filtered_edemr$e_data[, -1])),
+         prop_missing = (sum(is.na(filtered_edemr$e_data[, -1])) / 
+                           prod(dim(filtered_edemr$e_data[, -1]))),
+         num_samps = ncol(filtered_edemr$e_data[, -1]),
+         data_types = NULL)
+  )
   
   # Explorate the meta_info attribute.
-  expect_true(attr(filtered_edemr, "meta_info")$meta_data)
-  expect_equal(attr(filtered_edemr, "meta_info")$num_emeta,
-               79)
+  expect_equal(
+    attr(filtered_edemr, "meta_info"),
+    list(meta_data = TRUE,
+         num_emeta = length(unique(filtered_edemr$e_meta$Protein)))
+  )
   
   # Inspecticate the filtered e_data, f_data, and e_meta data frames.
   expect_equal(dim(filtered_edemr$e_data),
@@ -594,24 +598,25 @@ test_that('custom_filter and applyFilt produce the correct output',{
   expect_true(is.na(attr(filtered_efer, "filters")[[1]]$method))
   
   # Examinate the data_info attribute.
-  expect_equal(attr(filtered_efer, "data_info")$data_scale,
-               "abundance")
-  expect_false(attr(filtered_efer, "data_info")$norm_info$is_normalized,
-               FALSE)
-  expect_equal(attr(filtered_efer, "data_info")$num_edata,
-               130)
-  expect_equal(attr(filtered_efer, "data_info")$num_miss_obs,
-               234)
-  expect_equal(round(attr(filtered_efer, "data_info")$prop_missing, 4),
-               0.2)
-  expect_equal(attr(filtered_efer, "data_info")$num_samps,
-               9)
-  expect_null(attr(filtered_efer, "data_info")$data_types)
+  expect_equal(
+    attr(filtered_efer, "data_info"),
+    list(data_scale_orig = "abundance",
+         data_scale = "abundance",
+         norm_info = list(is_normalized = FALSE),
+         num_edata = length(unique(filtered_efer$e_data$Mass_Tag_ID)),
+         num_miss_obs = sum(is.na(filtered_efer$e_data[, -1])),
+         prop_missing = (sum(is.na(filtered_efer$e_data[, -1])) / 
+                           prod(dim(filtered_efer$e_data[, -1]))),
+         num_samps = ncol(filtered_efer$e_data[, -1]),
+         data_types = NULL)
+  )
   
   # Explorate the meta_info attribute.
-  expect_true(attr(filtered_efer, "meta_info")$meta_data)
-  expect_equal(attr(filtered_efer, "meta_info")$num_emeta,
-               79)
+  expect_equal(
+    attr(filtered_efer, "meta_info"),
+    list(meta_data = TRUE,
+         num_emeta = length(unique(filtered_efer$e_meta$Protein)))
+  )
   
   # Inspecticate the filtered e_data, f_data, and e_meta data frames.
   expect_equal(dim(filtered_efer$e_data),
@@ -647,24 +652,25 @@ test_that('custom_filter and applyFilt produce the correct output',{
   expect_true(is.na(attr(filtered_fdr_grp, "filters")[[1]]$method))
   
   # Examinate the data_info attribute.
-  expect_equal(attr(filtered_fdr_grp, "data_info")$data_scale,
-               "abundance")
-  expect_false(attr(filtered_fdr_grp, "data_info")$norm_info$is_normalized,
-               FALSE)
-  expect_equal(attr(filtered_fdr_grp, "data_info")$num_edata,
-               150)
-  expect_equal(attr(filtered_fdr_grp, "data_info")$num_miss_obs,
-               262)
-  expect_equal(round(attr(filtered_fdr_grp, "data_info")$prop_missing, 4),
-               0.1941)
-  expect_equal(attr(filtered_fdr_grp, "data_info")$num_samps,
-               9)
-  expect_null(attr(filtered_fdr_grp, "data_info")$data_types)
+  expect_equal(
+    attr(filtered_fdr_grp, "data_info"),
+    list(data_scale_orig = "abundance",
+         data_scale = "abundance",
+         norm_info = list(is_normalized = FALSE),
+         num_edata = length(unique(filtered_fdr_grp$e_data$Mass_Tag_ID)),
+         num_miss_obs = sum(is.na(filtered_fdr_grp$e_data[, -1])),
+         prop_missing = (sum(is.na(filtered_fdr_grp$e_data[, -1])) / 
+                           prod(dim(filtered_fdr_grp$e_data[, -1]))),
+         num_samps = ncol(filtered_fdr_grp$e_data[, -1]),
+         data_types = NULL)
+  )
   
   # Explorate the meta_info attribute.
-  expect_true(attr(filtered_fdr_grp, "meta_info")$meta_data)
-  expect_equal(attr(filtered_fdr_grp, "meta_info")$num_emeta,
-               83)
+  expect_equal(
+    attr(filtered_fdr_grp, "meta_info"),
+    list(meta_data = TRUE,
+         num_emeta = length(unique(filtered_fdr_grp$e_meta$Protein)))
+  )
   
   # Inspecticate the filtered e_data, f_data, and e_meta data frames.
   expect_equal(dim(filtered_fdr_grp$e_data),
@@ -709,24 +715,25 @@ test_that('custom_filter and applyFilt produce the correct output',{
   expect_true(is.na(attr(filtered_edk, "filters")[[1]]$method))
   
   # Examinate the data_info attribute.
-  expect_equal(attr(filtered_edk, "data_info")$data_scale,
-               "abundance")
-  expect_false(attr(filtered_edk, "data_info")$norm_info$is_normalized,
-               FALSE)
-  expect_equal(attr(filtered_edk, "data_info")$num_edata,
-               12)
-  expect_equal(attr(filtered_edk, "data_info")$num_miss_obs,
-               19)
-  expect_equal(round(attr(filtered_edk, "data_info")$prop_missing, 4),
-               0.1319)
-  expect_equal(attr(filtered_edk, "data_info")$num_samps,
-               12)
-  expect_null(attr(filtered_edk, "data_info")$data_types)
+  expect_equal(
+    attr(filtered_edk, "data_info"),
+    list(data_scale_orig = "abundance",
+         data_scale = "abundance",
+         norm_info = list(is_normalized = FALSE),
+         num_edata = length(unique(filtered_edk$e_data$Mass_Tag_ID)),
+         num_miss_obs = sum(is.na(filtered_edk$e_data[, -1])),
+         prop_missing = (sum(is.na(filtered_edk$e_data[, -1])) / 
+                           prod(dim(filtered_edk$e_data[, -1]))),
+         num_samps = ncol(filtered_edk$e_data[, -1]),
+         data_types = NULL)
+  )
   
   # Explorate the meta_info attribute.
-  expect_true(attr(filtered_edk, "meta_info")$meta_data)
-  expect_equal(attr(filtered_edk, "meta_info")$num_emeta,
-               10)
+  expect_equal(
+    attr(filtered_edk, "meta_info"),
+    list(meta_data = TRUE,
+         num_emeta = length(unique(filtered_edk$e_meta$Protein)))
+  )
   
   # Inspecticate the filtered e_data, f_data, and e_meta data frames.
   expect_equal(dim(filtered_edk$e_data),
@@ -762,24 +769,25 @@ test_that('custom_filter and applyFilt produce the correct output',{
   expect_true(is.na(attr(filtered_fdk, "filters")[[1]]$method))
   
   # Examinate the data_info attribute.
-  expect_equal(attr(filtered_fdk, "data_info")$data_scale,
-               "abundance")
-  expect_false(attr(filtered_fdk, "data_info")$norm_info$is_normalized,
-               FALSE)
-  expect_equal(attr(filtered_fdk, "data_info")$num_edata,
-               150)
-  expect_equal(attr(filtered_fdk, "data_info")$num_miss_obs,
-               79)
-  expect_equal(round(attr(filtered_fdk, "data_info")$prop_missing, 4),
-               0.1756)
-  expect_equal(attr(filtered_fdk, "data_info")$num_samps,
-               3)
-  expect_null(attr(filtered_fdk, "data_info")$data_types)
+  expect_equal(
+    attr(filtered_fdk, "data_info"),
+    list(data_scale_orig = "abundance",
+         data_scale = "abundance",
+         norm_info = list(is_normalized = FALSE),
+         num_edata = length(unique(filtered_fdk$e_data$Mass_Tag_ID)),
+         num_miss_obs = sum(is.na(filtered_fdk$e_data[, -1])),
+         prop_missing = (sum(is.na(filtered_fdk$e_data[, -1])) / 
+                           prod(dim(filtered_fdk$e_data[, -1]))),
+         num_samps = ncol(filtered_fdk$e_data[, -1]),
+         data_types = NULL)
+  )
   
   # Explorate the meta_info attribute.
-  expect_true(attr(filtered_fdk, "meta_info")$meta_data)
-  expect_equal(attr(filtered_fdk, "meta_info")$num_emeta,
-               83)
+  expect_equal(
+    attr(filtered_fdk, "meta_info"),
+    list(meta_data = TRUE,
+         num_emeta = length(unique(filtered_fdk$e_meta$Protein)))
+  )
   
   # Inspecticate the filtered e_data, f_data, and e_meta data frames.
   expect_equal(dim(filtered_fdk$e_data),
@@ -815,24 +823,25 @@ test_that('custom_filter and applyFilt produce the correct output',{
   expect_true(is.na(attr(filtered_emk, "filters")[[1]]$method))
   
   # Examinate the data_info attribute.
-  expect_equal(attr(filtered_emk, "data_info")$data_scale,
-               "abundance")
-  expect_false(attr(filtered_emk, "data_info")$norm_info$is_normalized,
-               FALSE)
-  expect_equal(attr(filtered_emk, "data_info")$num_edata,
-               9)
-  expect_equal(attr(filtered_emk, "data_info")$num_miss_obs,
-               18)
-  expect_equal(round(attr(filtered_emk, "data_info")$prop_missing, 4),
-               0.1667)
-  expect_equal(attr(filtered_emk, "data_info")$num_samps,
-               12)
-  expect_null(attr(filtered_emk, "data_info")$data_types)
+  expect_equal(
+    attr(filtered_emk, "data_info"),
+    list(data_scale_orig = "abundance",
+         data_scale = "abundance",
+         norm_info = list(is_normalized = FALSE),
+         num_edata = length(unique(filtered_emk$e_data$Mass_Tag_ID)),
+         num_miss_obs = sum(is.na(filtered_emk$e_data[, -1])),
+         prop_missing = (sum(is.na(filtered_emk$e_data[, -1])) / 
+                           prod(dim(filtered_emk$e_data[, -1]))),
+         num_samps = ncol(filtered_emk$e_data[, -1]),
+         data_types = NULL)
+  )
   
   # Explorate the meta_info attribute.
-  expect_true(attr(filtered_emk, "meta_info")$meta_data)
-  expect_equal(attr(filtered_emk, "meta_info")$num_emeta,
-               2)
+  expect_equal(
+    attr(filtered_emk, "meta_info"),
+    list(meta_data = TRUE,
+         num_emeta = length(unique(filtered_emk$e_meta$Protein)))
+  )
   
   # Inspecticate the filtered e_data, f_data, and e_meta data frames.
   expect_equal(dim(filtered_emk$e_data),
@@ -871,24 +880,25 @@ test_that('custom_filter and applyFilt produce the correct output',{
   expect_true(is.na(attr(filtered_efdk, "filters")[[1]]$method))
   
   # Examinate the data_info attribute.
-  expect_equal(attr(filtered_efdk, "data_info")$data_scale,
-               "abundance")
-  expect_false(attr(filtered_efdk, "data_info")$norm_info$is_normalized,
-               FALSE)
-  expect_equal(attr(filtered_efdk, "data_info")$num_edata,
-               12)
-  expect_equal(attr(filtered_efdk, "data_info")$num_miss_obs,
-               5)
-  expect_equal(round(attr(filtered_efdk, "data_info")$prop_missing, 4),
-               0.1389)
-  expect_equal(attr(filtered_efdk, "data_info")$num_samps,
-               3)
-  expect_null(attr(filtered_efdk, "data_info")$data_types)
+  expect_equal(
+    attr(filtered_efdk, "data_info"),
+    list(data_scale_orig = "abundance",
+         data_scale = "abundance",
+         norm_info = list(is_normalized = FALSE),
+         num_edata = length(unique(filtered_efdk$e_data$Mass_Tag_ID)),
+         num_miss_obs = sum(is.na(filtered_efdk$e_data[, -1])),
+         prop_missing = (sum(is.na(filtered_efdk$e_data[, -1])) / 
+                           prod(dim(filtered_efdk$e_data[, -1]))),
+         num_samps = ncol(filtered_efdk$e_data[, -1]),
+         data_types = NULL)
+  )
   
   # Explorate the meta_info attribute.
-  expect_true(attr(filtered_efdk, "meta_info")$meta_data)
-  expect_equal(attr(filtered_efdk, "meta_info")$num_emeta,
-               10)
+  expect_equal(
+    attr(filtered_efdk, "meta_info"),
+    list(meta_data = TRUE,
+         num_emeta = length(unique(filtered_efdk$e_meta$Protein)))
+  )
   
   # Inspecticate the filtered e_data, f_data, and e_meta data frames.
   expect_equal(dim(filtered_efdk$e_data),
@@ -927,24 +937,25 @@ test_that('custom_filter and applyFilt produce the correct output',{
   expect_true(is.na(attr(filtered_edemk, "filters")[[1]]$method))
   
   # Examinate the data_info attribute.
-  expect_equal(attr(filtered_edemk, "data_info")$data_scale,
-               "abundance")
-  expect_false(attr(filtered_edemk, "data_info")$norm_info$is_normalized,
-               FALSE)
-  expect_equal(attr(filtered_edemk, "data_info")$num_edata,
-               12)
-  expect_equal(attr(filtered_edemk, "data_info")$num_miss_obs,
-               19)
-  expect_equal(round(attr(filtered_edemk, "data_info")$prop_missing, 4),
-               0.1319)
-  expect_equal(attr(filtered_edemk, "data_info")$num_samps,
-               12)
-  expect_null(attr(filtered_edemk, "data_info")$data_types)
+  expect_equal(
+    attr(filtered_edemk, "data_info"),
+    list(data_scale_orig = "abundance",
+         data_scale = "abundance",
+         norm_info = list(is_normalized = FALSE),
+         num_edata = length(unique(filtered_edemk$e_data$Mass_Tag_ID)),
+         num_miss_obs = sum(is.na(filtered_edemk$e_data[, -1])),
+         prop_missing = (sum(is.na(filtered_edemk$e_data[, -1])) / 
+                           prod(dim(filtered_edemk$e_data[, -1]))),
+         num_samps = ncol(filtered_edemk$e_data[, -1]),
+         data_types = NULL)
+  )
   
   # Explorate the meta_info attribute.
-  expect_true(attr(filtered_edemk, "meta_info")$meta_data)
-  expect_equal(attr(filtered_edemk, "meta_info")$num_emeta,
-               2)
+  expect_equal(
+    attr(filtered_edemk, "meta_info"),
+    list(meta_data = TRUE,
+         num_emeta = length(unique(filtered_edemk$e_meta$Protein)))
+  )
   
   # Inspecticate the filtered e_data, f_data, and e_meta data frames.
   expect_equal(dim(filtered_edemk$e_data),
@@ -985,24 +996,25 @@ test_that('custom_filter and applyFilt produce the correct output',{
   expect_true(is.na(attr(filtered_efek, "filters")[[1]]$method))
   
   # Examinate the data_info attribute.
-  expect_equal(attr(filtered_efek, "data_info")$data_scale,
-               "abundance")
-  expect_false(attr(filtered_efek, "data_info")$norm_info$is_normalized,
-               FALSE)
-  expect_equal(attr(filtered_efek, "data_info")$num_edata,
-               12)
-  expect_equal(attr(filtered_efek, "data_info")$num_miss_obs,
-               5)
-  expect_equal(round(attr(filtered_efek, "data_info")$prop_missing, 4),
-               0.1389)
-  expect_equal(attr(filtered_efek, "data_info")$num_samps,
-               3)
-  expect_null(attr(filtered_efek, "data_info")$data_types)
+  expect_equal(
+    attr(filtered_efek, "data_info"),
+    list(data_scale_orig = "abundance",
+         data_scale = "abundance",
+         norm_info = list(is_normalized = FALSE),
+         num_edata = length(unique(filtered_efek$e_data$Mass_Tag_ID)),
+         num_miss_obs = sum(is.na(filtered_efek$e_data[, -1])),
+         prop_missing = (sum(is.na(filtered_efek$e_data[, -1])) / 
+                           prod(dim(filtered_efek$e_data[, -1]))),
+         num_samps = ncol(filtered_efek$e_data[, -1]),
+         data_types = NULL)
+  )
   
   # Explorate the meta_info attribute.
-  expect_true(attr(filtered_efek, "meta_info")$meta_data)
-  expect_equal(attr(filtered_efek, "meta_info")$num_emeta,
-               2)
+  expect_equal(
+    attr(filtered_efek, "meta_info"),
+    list(meta_data = TRUE,
+         num_emeta = length(unique(filtered_efek$e_meta$Protein)))
+  )
   
   # Inspecticate the filtered e_data, f_data, and e_meta data frames.
   expect_equal(dim(filtered_efek$e_data),
@@ -1038,24 +1050,25 @@ test_that('custom_filter and applyFilt produce the correct output',{
   expect_true(is.na(attr(filtered_fdk_grp, "filters")[[1]]$method))
   
   # Examinate the data_info attribute.
-  expect_equal(attr(filtered_fdk_grp, "data_info")$data_scale,
-               "abundance")
-  expect_false(attr(filtered_fdk_grp, "data_info")$norm_info$is_normalized,
-               FALSE)
-  expect_equal(attr(filtered_fdk_grp, "data_info")$num_edata,
-               150)
-  expect_equal(attr(filtered_fdk_grp, "data_info")$num_miss_obs,
-               79)
-  expect_equal(round(attr(filtered_fdk_grp, "data_info")$prop_missing, 4),
-               0.1756)
-  expect_equal(attr(filtered_fdk_grp, "data_info")$num_samps,
-               3)
-  expect_null(attr(filtered_fdk_grp, "data_info")$data_types)
+  expect_equal(
+    attr(filtered_fdk_grp, "data_info"),
+    list(data_scale_orig = "abundance",
+         data_scale = "abundance",
+         norm_info = list(is_normalized = FALSE),
+         num_edata = length(unique(filtered_fdk_grp$e_data$Mass_Tag_ID)),
+         num_miss_obs = sum(is.na(filtered_fdk_grp$e_data[, -1])),
+         prop_missing = (sum(is.na(filtered_fdk_grp$e_data[, -1])) / 
+                           prod(dim(filtered_fdk_grp$e_data[, -1]))),
+         num_samps = ncol(filtered_fdk_grp$e_data[, -1]),
+         data_types = NULL)
+  )
   
   # Explorate the meta_info attribute.
-  expect_true(attr(filtered_fdk_grp, "meta_info")$meta_data)
-  expect_equal(attr(filtered_fdk_grp, "meta_info")$num_emeta,
-               83)
+  expect_equal(
+    attr(filtered_fdk_grp, "meta_info"),
+    list(meta_data = TRUE,
+         num_emeta = length(unique(filtered_fdk_grp$e_meta$Protein)))
+  )
   
   # Inspecticate the filtered e_data, f_data, and e_meta data frames.
   expect_equal(dim(filtered_fdk_grp$e_data),

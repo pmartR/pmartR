@@ -355,6 +355,34 @@ get_group_DF <- function (omicsData) {
   
 }
 
+#' Fetch the original data scale
+#'
+#' Retrieves the character string indicating the scale the data was originally
+#' on when read into R.
+#'
+#' @param omicsObject an object of class 'pepData', 'proData', 'metabData',
+#'  'lipidData', or 'nmrData'.
+#' 
+#' @return A character string.
+#' 
+#' @export
+#' 
+get_data_scale_orig <- function (omicsObject){
+  
+  # Check that the input is an appropriate class.
+  if (!inherits(omicsObject, c("pepData", "proData", "metabData",
+                               "lipidData", "nmrData"))) {
+    
+    # Halt! You are using an unholy input object. Come back when your data is
+    # decent.
+    stop ("omicsObject is not an accepted class.")
+    
+  }
+  
+  return(attr(omicsObject, "data_info")$data_scale_orig)
+  
+}
+
 # Functions to set omicsData attributes ----------------------------------------
 
 # Create a set function that will return the value for each attribute. For 
@@ -369,6 +397,8 @@ get_group_DF <- function (omicsData) {
 #
 # @param edata_cname
 #
+# @param data_scale_orig
+#
 # @param data_scale
 #
 # @param data_types
@@ -382,6 +412,7 @@ get_group_DF <- function (omicsData) {
 #
 set_data_info <- function (e_data,
                            edata_cname,
+                           data_scale_orig,
                            data_scale,
                            data_types,
                            norm_info,
@@ -406,7 +437,8 @@ set_data_info <- function (e_data,
   norm_info$is_normalized <- is_normalized
   
   # Return all of the information that belongs in the data_info attribute.
-  return (list(data_scale = data_scale,
+  return (list(data_scale_orig = data_scale_orig,
+               data_scale = data_scale,
                norm_info = norm_info,
                num_edata = num_edata,
                num_miss_obs = num_miss_obs,

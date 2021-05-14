@@ -14,7 +14,8 @@ test_that('nonmissing_per_grp correctly counts non-missing values by group',{
                       e_meta = emeta,
                       edata_cname = "Mass_Tag_ID",
                       fdata_cname = "SampleID",
-                      emeta_cname = "Protein")
+                      emeta_cname = "Protein",
+                      data_scale_orig = "abundance")
   
   # Run the group_designation function on pdata.
   pdata <- group_designation(omicsData = pdata,
@@ -35,7 +36,8 @@ test_that('nonmissing_per_grp correctly counts non-missing values by group',{
   pdata_s <- as.pepData(e_data = edata_s,
                         f_data = fdata_s,
                         edata_cname = "Mass_Tag_ID",
-                        fdata_cname = "SampleID")
+                        fdata_cname = "SampleID",
+                        data_scale_orig = "abundance")
   
   # Run the group_designation function on pdata_s.
   pdata_s <- group_designation(omicsData = pdata_s,

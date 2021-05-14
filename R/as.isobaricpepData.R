@@ -1,45 +1,49 @@
 #'Convert Data to Appropriate pmartR Class
 #'
-#'Converts a list object or several data.frames of isobaric peptide-level data
-#'to an object of the class 'isobaricpepData'. Objects of the class
-#''isobaricpepData' are lists with two obligatory components \code{e_data} and
-#'\code{f_data}. An optional list component \code{e_meta} is used if analysis or
-#'visualization at other levels (e.g. protein) is also desired.
+#' Converts a list object or several data.frames of isobaric peptide-level data
+#' to an object of the class 'isobaricpepData'. Objects of the class
+#' 'isobaricpepData' are lists with two obligatory components \code{e_data} and
+#' \code{f_data}. An optional list component \code{e_meta} is used if analysis
+#' or visualization at other levels (e.g. protein) is also desired.
 #'
-#'@param e_data a \eqn{p \times n + 1} data.frame of expression data, where
-#'  \eqn{p} is the number of peptides observed and \eqn{n} is the number of
-#'  samples (an additional peptide identifier/name column should also be present
-#'  anywhere in the data.frame). Each row corresponds to data for each peptide.
-#'  One column specifying a unique identifier for each peptide (row) must be
-#'  present.
-#'@param f_data a data.frame with \eqn{n} rows. Each row corresponds to a sample
-#'  with one column giving the unique sample identifiers found in e_data column
-#'  names and other columns providing qualitative and/or quantitative traits of
-#'  each sample.
-#'@param e_meta an optional data.frame with at least \eqn{p} rows. Each row
-#'  corresponds to a peptide with one column giving peptide names (must be named
-#'  the same as the column in \code{e_data}) and other columns giving meta
-#'  information (e.g. mappings of peptides to proteins).
-#'@param edata_cname character string specifying the name of the column
-#'  containing the peptide identifiers in \code{e_data} and \code{e_meta} (if
-#'  applicable).
-#'@param emeta_cname character string specifying the name of the column
-#'  containing the protein identifiers (or other mapping variable) in
-#'  \code{e_meta} (if applicable). Defaults to NULL. If \code{e_meta} is NULL,
-#'  then either do not specify \code{emeta_cname} or specify it as NULL. If
-#'  \code{e_meta} is NULL, then specify \code{emeta_cname} as NULL.
-#'@param fdata_cname character string specifying the name of the column
-#'  containing the sample identifiers in \code{f_data}.
-#'@param techrep_cname character string specifying the name of the column in
-#'  \code{f_data} containing the identifiers for the biological samples if the
-#'  observations represent technical replicates.  This column is used to
-#'  collapse the data when \code{combine_techreps} is called on this object.
-#'  Defaults to NULL (no technical replicates).
-#'@param ... further arguments
+#' @param e_data a \eqn{p \times n + 1} data.frame of expression data, where
+#'   \eqn{p} is the number of peptides observed and \eqn{n} is the number of
+#'   samples (an additional peptide identifier/name column should also be
+#'   present anywhere in the data.frame). Each row corresponds to data for each
+#'   peptide. One column specifying a unique identifier for each peptide (row)
+#'   must be present.
+#' @param f_data a data.frame with \eqn{n} rows. Each row corresponds to a
+#'   sample with one column giving the unique sample identifiers found in e_data
+#'   column names and other columns providing qualitative and/or quantitative
+#'   traits of each sample.
+#' @param e_meta an optional data.frame with at least \eqn{p} rows. Each row
+#'   corresponds to a peptide with one column giving peptide names (must be
+#'   named the same as the column in \code{e_data}) and other columns giving
+#'   meta information (e.g. mappings of peptides to proteins).
+#' @param edata_cname character string specifying the name of the column
+#'   containing the peptide identifiers in \code{e_data} and \code{e_meta} (if
+#'   applicable).
+#' @param emeta_cname character string specifying the name of the column
+#'   containing the protein identifiers (or other mapping variable) in
+#'   \code{e_meta} (if applicable). Defaults to NULL. If \code{e_meta} is NULL,
+#'   then either do not specify \code{emeta_cname} or specify it as NULL. If
+#'   \code{e_meta} is NULL, then specify \code{emeta_cname} as NULL.
+#' @param fdata_cname character string specifying the name of the column
+#'   containing the sample identifiers in \code{f_data}.
+#' @param techrep_cname character string specifying the name of the column in
+#'   \code{f_data} containing the identifiers for the biological samples if the
+#'   observations represent technical replicates.  This column is used to
+#'   collapse the data when \code{combine_techreps} is called on this object.
+#'   Defaults to NULL (no technical replicates).
 #'
-#'@details The class 'isobaricpepData' is meant to deal with peptide data
-#'  generated on instruments where a reference pool for normalization is
-#'  available (e.g. TMT, iTRAQ).
+#' @param data_scale_orig A character string indicating what scale the data are
+#'   on. Acceptable values are "abundance", "log", "log2", and "log10".
+#'
+#' @param ... further arguments
+#'
+#' @details The class 'isobaricpepData' is meant to deal with peptide data
+#'   generated on instruments where a reference pool for normalization is
+#'   available (e.g. TMT, iTRAQ).
 #'
 #'  If your data has already undergone normalization to the reference pool, you
 #'  should speficy \code{isobaric_norm = T}.
@@ -76,7 +80,7 @@
 #'  \tab \cr }
 #'
 #' @examples
-#' dontrun{
+#' \dontrun{
 #' library(pmartRdata)
 #' data("isobaric_edata")
 #' data("isobaric_fdata")
@@ -87,26 +91,31 @@
 #'                                 edata_cname = "Peptide",
 #'                                 fdata_cname = "Sample",
 #'                                 emeta_cname = "Protein")
-#'}
-#'@author Lisa Bramer
-#'@seealso \code{\link{as.pepData}}
-#'@seealso \code{\link{normalize_isobaric}}
+#' }
+#' 
+#' @author Lisa Bramer
+#' @seealso \code{\link{as.pepData}}
+#' @seealso \code{\link{normalize_isobaric}}
 #'
 #'@export
-as.isobaricpepData <- function(e_data, f_data, e_meta = NULL, edata_cname,
-                               fdata_cname, emeta_cname = NULL,
-                               techrep_cname = NULL, ...){
+#'
+as.isobaricpepData <- function (e_data, f_data, e_meta = NULL, edata_cname,
+                                fdata_cname, emeta_cname = NULL,
+                                techrep_cname = NULL, data_scale_orig = NULL,
+                                ...) {
   .as.isobaricpepData(e_data, f_data, e_meta, edata_cname, fdata_cname,
-                      emeta_cname, techrep_cname, ...)
+                      emeta_cname, techrep_cname, data_scale_orig, ...)
 }
 
 ## peptide data ##
-.as.isobaricpepData <- function(e_data, f_data, e_meta = NULL, edata_cname,
-                                fdata_cname, emeta_cname = NULL,
-                                techrep_cname = NULL, data_scale = "abundance",
-                                is_normalized = FALSE, isobaric_norm = FALSE,
-                                norm_info = list(),  data_types = NULL,
-                                check.names = TRUE){
+.as.isobaricpepData <- function (e_data, f_data, e_meta = NULL, edata_cname,
+                                 fdata_cname, emeta_cname = NULL,
+                                 techrep_cname = NULL, 
+                                 data_scale_orig = NULL,
+                                 data_scale = data_scale_orig,
+                                 is_normalized = FALSE, isobaric_norm = FALSE,
+                                 norm_info = list(),  data_types = NULL,
+                                 check.names = TRUE) {
   
   # Define the dType variable. This is used for customizing the warnings and
   # errors according to the data type (peptide, protein, lipid, ...).
@@ -121,6 +130,7 @@ as.isobaricpepData <- function(e_data, f_data, e_meta = NULL, edata_cname,
                     fdata_cname = fdata_cname,
                     emeta_cname = emeta_cname,
                     techrep_cname = techrep_cname,
+                    data_scale_orig = data_scale_orig,
                     data_scale = data_scale,
                     is_normalized = is_normalized,
                     norm_info = norm_info,
@@ -140,6 +150,7 @@ as.isobaricpepData <- function(e_data, f_data, e_meta = NULL, edata_cname,
   # Compute the data_info attributes.
   attr(res, "data_info") <- set_data_info(e_data = res$e_data,
                                           edata_cname = edata_cname,
+                                          data_scale_orig = data_scale_orig,
                                           data_scale = data_scale,
                                           data_types = data_types,
                                           norm_info = norm_info,

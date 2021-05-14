@@ -129,8 +129,8 @@ test_that('cv_filter and applyFilt produce the correct output',{
       
     }
     
-    # Create a list that will hold the indices of the CV values that are equal to
-    # zero.
+    # Create a list that will hold the indices of the CV values that are equal
+    # to zero.
     cv_zero <- vector(mode = "list",
                       length = n_groups)
     
@@ -190,7 +190,8 @@ test_that('cv_filter and applyFilt produce the correct output',{
                       e_meta = emeta,
                       edata_cname = "Mass_Tag_ID",
                       fdata_cname = "SampleID",
-                      emeta_cname = "Protein")
+                      emeta_cname = "Protein",
+                      data_scale_orig = "abundance")
   
   # Forge a group_DF attribute for pdata.
   pdata_gdf <- group_designation(omicsData = pdata,
@@ -364,24 +365,25 @@ test_that('cv_filter and applyFilt produce the correct output',{
   expect_true(is.na(attr(filtered, 'filters')[[1]]$method))
 
   # Investigate the data_info attribute.
-  expect_equal(attr(filtered, 'data_info')$data_scale,
-               'abundance')
-  expect_false(attr(filtered, 'data_info')$norm_info$is_normalized,
-               FALSE)
-  expect_equal(attr(filtered, 'data_info')$num_edata,
-               145)
-  expect_equal(attr(filtered, 'data_info')$num_miss_obs,
-               318)
-  expect_equal(round(attr(filtered, 'data_info')$prop_missing, 4),
-               0.1828)
-  expect_equal(attr(filtered, 'data_info')$num_samps,
-               12)
-  expect_null(attr(filtered, 'data_info')$data_types)
+  expect_equal(
+    attr(filtered, "data_info"),
+    list(data_scale_orig = "abundance",
+         data_scale = "abundance",
+         norm_info = list(is_normalized = FALSE),
+         num_edata = length(unique(filtered$e_data[, 1])),
+         num_miss_obs = sum(is.na(filtered$e_data)),
+         prop_missing = (sum(is.na(filtered$e_data)) /
+                           prod(dim(filtered$e_data[, -1]))),
+         num_samps = ncol(filtered$e_data[, -1]),
+         data_types = NULL)
+  )
 
   # Explore the meta_info attribute.
-  expect_true(attr(filtered, 'meta_info')$meta_data)
-  expect_equal(attr(filtered, 'meta_info')$num_emeta,
-               81)
+  expect_equal(
+    attr(filtered, "meta_info"),
+    list(meta_data = TRUE,
+         num_emeta = length(unique(filtered$e_meta$Protein)))
+  )
 
   # Inspect the filtered e_data, f_data, and e_meta data frames.
   expect_equal(dim(filtered$e_data),
@@ -416,24 +418,25 @@ test_that('cv_filter and applyFilt produce the correct output',{
   expect_true(is.na(attr(filtered_gdf, 'filters')[[1]]$method))
   
   # Investigate the data_info attribute.
-  expect_equal(attr(filtered_gdf, 'data_info')$data_scale,
-               'abundance')
-  expect_false(attr(filtered_gdf, 'data_info')$norm_info$is_normalized,
-               FALSE)
-  expect_equal(attr(filtered_gdf, 'data_info')$num_edata,
-               146)
-  expect_equal(attr(filtered_gdf, 'data_info')$num_miss_obs,
-               317)
-  expect_equal(round(attr(filtered_gdf, 'data_info')$prop_missing, 4),
-               0.1809)
-  expect_equal(attr(filtered_gdf, 'data_info')$num_samps,
-               12)
-  expect_null(attr(filtered_gdf, 'data_info')$data_types)
+  expect_equal(
+    attr(filtered_gdf, "data_info"),
+    list(data_scale_orig = "abundance",
+         data_scale = "abundance",
+         norm_info = list(is_normalized = FALSE),
+         num_edata = length(unique(filtered_gdf$e_data[, 1])),
+         num_miss_obs = sum(is.na(filtered_gdf$e_data)),
+         prop_missing = (sum(is.na(filtered_gdf$e_data)) /
+                           prod(dim(filtered_gdf$e_data[, -1]))),
+         num_samps = ncol(filtered_gdf$e_data[, -1]),
+         data_types = NULL)
+  )
   
   # Explore the meta_info attribute.
-  expect_true(attr(filtered_gdf, 'meta_info')$meta_data)
-  expect_equal(attr(filtered_gdf, 'meta_info')$num_emeta,
-               80)
+  expect_equal(
+    attr(filtered_gdf, "meta_info"),
+    list(meta_data = TRUE,
+         num_emeta = length(unique(filtered_gdf$e_meta$Protein)))
+  )
   
   # Inspect the filtered_gdf e_data, f_data, and e_meta data frames.
   expect_equal(dim(filtered_gdf$e_data),
@@ -468,24 +471,25 @@ test_that('cv_filter and applyFilt produce the correct output',{
   expect_true(is.na(attr(filtered_sg_gdf, 'filters')[[1]]$method))
   
   # Investigate the data_info attribute.
-  expect_equal(attr(filtered_sg_gdf, 'data_info')$data_scale,
-               'abundance')
-  expect_false(attr(filtered_sg_gdf, 'data_info')$norm_info$is_normalized,
-               FALSE)
-  expect_equal(attr(filtered_sg_gdf, 'data_info')$num_edata,
-               147)
-  expect_equal(attr(filtered_sg_gdf, 'data_info')$num_miss_obs,
-               280)
-  expect_equal(round(attr(filtered_sg_gdf, 'data_info')$prop_missing, 4),
-               0.1905)
-  expect_equal(attr(filtered_sg_gdf, 'data_info')$num_samps,
-               10)
-  expect_null(attr(filtered_sg_gdf, 'data_info')$data_types)
+  expect_equal(
+    attr(filtered_sg_gdf, "data_info"),
+    list(data_scale_orig = "abundance",
+         data_scale = "abundance",
+         norm_info = list(is_normalized = FALSE),
+         num_edata = length(unique(filtered_sg_gdf$e_data[, 1])),
+         num_miss_obs = sum(is.na(filtered_sg_gdf$e_data)),
+         prop_missing = (sum(is.na(filtered_sg_gdf$e_data)) /
+                           prod(dim(filtered_sg_gdf$e_data[, -1]))),
+         num_samps = ncol(filtered_sg_gdf$e_data[, -1]),
+         data_types = NULL)
+  )
   
   # Explore the meta_info attribute.
-  expect_true(attr(filtered_sg_gdf, 'meta_info')$meta_data)
-  expect_equal(attr(filtered_sg_gdf, 'meta_info')$num_emeta,
-               81)
+  expect_equal(
+    attr(filtered_sg_gdf, "meta_info"),
+    list(meta_data = TRUE,
+         num_emeta = length(unique(filtered_sg_gdf$e_meta$Protein)))
+  )
   
   # Inspect the filtered_sg_gdf e_data, f_data, and e_meta data frames.
   expect_equal(dim(filtered_sg_gdf$e_data),

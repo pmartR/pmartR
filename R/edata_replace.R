@@ -4,25 +4,26 @@
 #' replaces them with y
 #'
 #' @param omicsData an object of the class 'pepData', 'proData', 'metabData',
-#'        'lipidData', or 'nmrData' usually created by \code{\link{pepData}},
-#'        \code{\link{proData}}, \code{\link{metabData}},
-#'        \code{\link{lipidData}}, or \code{\link{as.nmrData}}, respectively.
-#'        
+#'   'lipidData', or 'nmrData' usually created by \code{\link{pepData}},
+#'   \code{\link{proData}}, \code{\link{metabData}}, \code{\link{lipidData}}, or
+#'   \code{\link{as.nmrData}}, respectively.
+#'
 #' @param x value to be replaced, usually numeric or NA
-#' 
+#'
 #' @param y replacement value, usually numeric or NA
 #'
 #' @details This function is often used to replace any 0 values in peptide,
-#'          protein, metabolite, or lipid data with NA's.
+#'   protein, metabolite, or lipid data with NA's.
 #'
 #' @return data object of the same class as omicsData
 #'
 #' @examples
-#' dontrun{
+#' \dontrun{
 #' library(pmartRdata)
 #' data(metab_object)
 #' metab_object2 <- edata_replace(omicsData = metab_object, x=0, y=NA)
-#'}
+#' }
+#' 
 #' @author Kelly Stratton
 #'
 #' @export
@@ -64,17 +65,15 @@ edata_replace <- function(omicsData, x, y) {
                                        y = y)
   
   # Update the data_info attribute of the omicsData object.
-  attr(omicsData,
-       'data_info') <- set_data_info(e_data = omicsData$e_data,
-                                     edata_cname = get_edata_cname(omicsData),
-                                     data_scale = attr(omicsData,
-                                                       'data_info')$data_scale,
-                                     data_types = attr(omicsData,
-                                                       'data_info')$data_types,
-                                     norm_info = attr(omicsData,
-                                                      'data_info')$norm_info,
-                                     is_normalized = attr(omicsData,
-                                                          'data_info')$norm_info$is_normalized)
+  attr(omicsData, 'data_info') <- set_data_info(
+    e_data = omicsData$e_data,
+    edata_cname = get_edata_cname(omicsData),
+    data_scale_orig = get_data_scale_orig(omicsData),
+    data_scale = get_data_scale(omicsData),
+    data_types = get_data_info(omicsData)$data_types,
+    norm_info = get_data_info(omicsData)$norm_info,
+    is_normalized = get_data_info(omicsData)$norm_info$is_normalized
+  )
   
   # Report the number of replaced elements in e_data
   message(paste(num_replaced,

@@ -14,7 +14,8 @@ test_that('molecule_filter and applyFilt produce the correct output',{
                       e_meta = emeta,
                       edata_cname = "Mass_Tag_ID",
                       fdata_cname = "SampleID",
-                      emeta_cname = "Protein")
+                      emeta_cname = "Protein",
+                      data_scale_orig = "abundance")
   
   # Create a function to count the number of non-missing values to be used in
   # connection with apply.
@@ -88,24 +89,25 @@ test_that('molecule_filter and applyFilt produce the correct output',{
   expect_true(is.na(attr(filtered, 'filters')[[1]]$method))
   
   # Investigate the data_info attribute.
-  expect_equal(attr(filtered, 'data_info')$data_scale,
-               'abundance')
-  expect_false(attr(filtered, 'data_info')$norm_info$is_normalized,
-               FALSE)
-  expect_equal(attr(filtered, 'data_info')$num_edata,
-               141)
-  expect_equal(attr(filtered, 'data_info')$num_miss_obs,
-               242)
-  expect_equal(round(attr(filtered, 'data_info')$prop_missing, 4),
-               0.1430)
-  expect_equal(attr(filtered, 'data_info')$num_samps,
-               12)
-  expect_null(attr(filtered, 'data_info')$data_types)
+  expect_equal(
+    attr(filtered, "data_info"),
+    list(data_scale_orig = "abundance",
+         data_scale = "abundance",
+         norm_info = list(is_normalized = FALSE),
+         num_edata = length(unique(filtered$e_data[, 1])),
+         num_miss_obs = sum(is.na(filtered$e_data)),
+         prop_missing = (sum(is.na(filtered$e_data)) /
+                           prod(dim(filtered$e_data[, -1]))),
+         num_samps = ncol(filtered$e_data[, -1]),
+         data_types = NULL)
+  )
   
   # Explore the meta_info attribute.
-  expect_true(attr(filtered, 'meta_info')$meta_data)
-  expect_equal(attr(filtered, 'meta_info')$num_emeta,
-               78)
+  expect_equal(
+    attr(filtered, "meta_info"),
+    list(meta_data = TRUE,
+         num_emeta = length(unique(filtered$e_meta$Protein)))
+  )
   
   # Inspect the filtered e_data, f_data, and e_meta data frames.
   expect_equal(dim(filtered$e_data),
@@ -174,24 +176,25 @@ test_that('molecule_filter and applyFilt produce the correct output',{
   expect_true(is.na(attr(filtered_2, 'filters')[[2]]$method))
   
   # Investigate the data_info attribute.
-  expect_equal(attr(filtered_2, 'data_info')$data_scale,
-               'abundance')
-  expect_false(attr(filtered_2, 'data_info')$norm_info$is_normalized,
-               FALSE)
-  expect_equal(attr(filtered_2, 'data_info')$num_edata,
-               137)
-  expect_equal(attr(filtered_2, 'data_info')$num_miss_obs,
-               202)
-  expect_equal(round(attr(filtered_2, 'data_info')$prop_missing, 4),
-               0.1229)
-  expect_equal(attr(filtered_2, 'data_info')$num_samps,
-               12)
-  expect_null(attr(filtered_2, 'data_info')$data_types)
+  expect_equal(
+    attr(filtered_2, "data_info"),
+    list(data_scale_orig = "abundance",
+         data_scale = "abundance",
+         norm_info = list(is_normalized = FALSE),
+         num_edata = length(unique(filtered_2$e_data[, 1])),
+         num_miss_obs = sum(is.na(filtered_2$e_data)),
+         prop_missing = (sum(is.na(filtered_2$e_data)) /
+                           prod(dim(filtered_2$e_data[, -1]))),
+         num_samps = ncol(filtered_2$e_data[, -1]),
+         data_types = NULL)
+  )
   
   # Explore the meta_info attribute.
-  expect_true(attr(filtered_2, 'meta_info')$meta_data)
-  expect_equal(attr(filtered_2, 'meta_info')$num_emeta,
-               76)
+  expect_equal(
+    attr(filtered_2, "meta_info"),
+    list(meta_data = TRUE,
+         num_emeta = length(unique(filtered_2$e_meta$Protein)))
+  )
   
   # Inspect the filtered e_data, f_data, and e_meta data frames.
   expect_equal(dim(filtered_2$e_data),

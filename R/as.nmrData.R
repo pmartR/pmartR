@@ -1,54 +1,88 @@
 #' Convert Data to Appropriate pmartR Class
 #'
-#' Converts a list object or several data.frames of NMR-generated metabolomic-level data to an object of the class 'nmrData'. Objects of the class 'nmrData' are lists with two obligatory components \code{e_data} and \code{f_data}. An optional list component \code{e_meta} is used if analysis or visualization at other levels (e.g. metabolite identification) is also desired.
+#' Converts a list object or several data.frames of NMR-generated
+#' metabolomic-level data to an object of the class 'nmrData'. Objects of the
+#' class 'nmrData' are lists with two obligatory components \code{e_data} and
+#' \code{f_data}. An optional list component \code{e_meta} is used if analysis
+#' or visualization at other levels (e.g. metabolite identification) is also
+#' desired.
 #'
-#' @param e_data a \eqn{p \times n + 1} data.frame of expression data, where \eqn{p} is the number of metabolites observed and \eqn{n} is the number of samples. Each row corresponds to data for each metabolite. One column specifying a unique identifier for each metabolite (row) must be present.
-#' @param f_data a data.frame with \eqn{n} rows. Each row corresponds to a sample with one column giving the unique sample identifiers found in e_data column names and other columns providing qualitative and/or quantitative traits of each sample.
-#' @param e_meta an optional data.frame with \eqn{p} rows. Each row corresponds to a metabolite with one column giving metabolite names (must be named the same as the column in \code{e_data}) and other columns giving meta information.
-#' @param edata_cname character string specifying the name of the column containing the metabolite identifiers in \code{e_data} and \code{e_meta} (if applicable).
-#' @param emeta_cname character string specifying the name of the column containing the mapped identifiers in \code{e_meta} (if applicable). Defaults to NULL. If \code{e_meta} is NULL, then either do not specify \code{emeta_cname} or specify it as NULL. If \code{e_meta} is NULL, then specify \code{emeta_cname} as NULL.
-#' @param fdata_cname character string specifying the name of the column containing the sample identifiers in \code{f_data}.
-#' @param techrep_cname character string specifying the name of the column in \code{f_data} containing the identifiers for the biological samples if the observations represent technical replicates.  This column is used to collapse the data when \code{combine_techreps} is called on this object.  Defaults to NULL (no technical replicates). 
+#' @param e_data a \eqn{p \times n + 1} data.frame of expression data, where
+#'   \eqn{p} is the number of metabolites observed and \eqn{n} is the number of
+#'   samples. Each row corresponds to data for each metabolite. One column
+#'   specifying a unique identifier for each metabolite (row) must be present.
+#' @param f_data a data.frame with \eqn{n} rows. Each row corresponds to a
+#'   sample with one column giving the unique sample identifiers found in e_data
+#'   column names and other columns providing qualitative and/or quantitative
+#'   traits of each sample.
+#' @param e_meta an optional data.frame with \eqn{p} rows. Each row corresponds
+#'   to a metabolite with one column giving metabolite names (must be named the
+#'   same as the column in \code{e_data}) and other columns giving meta
+#'   information.
+#' @param edata_cname character string specifying the name of the column
+#'   containing the metabolite identifiers in \code{e_data} and \code{e_meta}
+#'   (if applicable).
+#' @param emeta_cname character string specifying the name of the column
+#'   containing the mapped identifiers in \code{e_meta} (if applicable).
+#'   Defaults to NULL. If \code{e_meta} is NULL, then either do not specify
+#'   \code{emeta_cname} or specify it as NULL. If \code{e_meta} is NULL, then
+#'   specify \code{emeta_cname} as NULL.
+#' @param fdata_cname character string specifying the name of the column
+#'   containing the sample identifiers in \code{f_data}.
+#' @param techrep_cname character string specifying the name of the column in
+#'   \code{f_data} containing the identifiers for the biological samples if the
+#'   observations represent technical replicates.  This column is used to
+#'   collapse the data when \code{combine_techreps} is called on this object.
+#'   Defaults to NULL (no technical replicates).
+#'
+#' @param data_scale_orig A character string indicating what scale the data are
+#'   on. Acceptable values are "abundance", "log", "log2", and "log10".
+#'
 #' @param ... further arguments
 #'
-#' @details Objects of class 'nmrData' contain some attributes that are referenced by downstream functions. These attributes can be changed from their default value by manual specification. A list of these attributes as well as their default values are as follows:
-#' \tabular{ll}{
-#' data_scale \tab Scale of the data provided in \code{e_data}. Acceptable values are 'log2', 'log10', 'log', and 'abundance', which indicate data is log base 2, base 10, natural log transformed, and raw abundance, respectively. Default is 'abundance'. \cr
-#' \tab \cr
-#' is_normalized \tab A logical argument, specifying whether the data has been normalized or not. Default value is FALSE. \cr
-#' \tab \cr
-#' nmr_norm \tab A logical argument, specifying whether the data has been normalized either to a spiked in metabolite or to a property 
-#' taking sample-specific values \cr
-#' #' \tab \cr
-#' norm_info \tab Default value is an empty list, which will be populated with a single named element \code{is_normalized = is_normalized}. When a normalization is applied to the data, this becomes populated with a list containing the normalization function, normalization subset and subset parameters, the location and scale parameters used to normalize the data, and the location and scale parameters used to backtransform the data (if applicable). \cr
-#' \tab \cr
-#' data_types \tab Character string describing the type of data (e.g.'binned' or 'identified', for NMR data). Default value is NULL. \cr
-#' \tab \cr
-#' check.names \tab Logical defaults to TRUE. Indicates whether 'check.names' attribute of returned omicsData object is TRUE or FALSE. \cr
-#' }
-#' Computed values included in the \code{data_info} attribute are as follows:
-#' \tabular{ll}{
-#' num_edata \tab The number of unique \code{edata_cname} entries.\cr
-#' \tab \cr
-#' num_miss_obs \tab The number of missing observations.\cr
-#' \tab \cr
-#' num_emeta \tab The number of unique \code{emeta_cname} entries. \cr
-#' \tab \cr
-#' prop_missing \tab The proportion of \code{e_data} values that are NA. \cr
-#' \tab \cr
-#' num_samps \tab The number of samples that make up the columns of \code{e_data}.\cr
-#' \tab \cr
-#' meta_info \tab A logical argument, specifying where the \code{e_meta} is provided.\cr
-#' \tab \cr
-#' }
+#' @details Objects of class 'nmrData' contain some attributes that are
+#'   referenced by downstream functions. These attributes can be changed from
+#'   their default value by manual specification. A list of these attributes as
+#'   well as their default values are as follows: \tabular{ll}{ data_scale \tab
+#'   Scale of the data provided in \code{e_data}. Acceptable values are 'log2',
+#'   'log10', 'log', and 'abundance', which indicate data is log base 2, base
+#'   10, natural log transformed, and raw abundance, respectively. Default is
+#'   'abundance'. \cr \tab \cr is_normalized \tab A logical argument, specifying
+#'   whether the data has been normalized or not. Default value is FALSE. \cr
+#'   \tab \cr nmr_norm \tab A logical argument, specifying whether the data has
+#'   been normalized either to a spiked in metabolite or to a property taking
+#'   sample-specific values \cr #' \tab \cr norm_info \tab Default value is an
+#'   empty list, which will be populated with a single named element
+#'   \code{is_normalized = is_normalized}. When a normalization is applied to
+#'   the data, this becomes populated with a list containing the normalization
+#'   function, normalization subset and subset parameters, the location and
+#'   scale parameters used to normalize the data, and the location and scale
+#'   parameters used to backtransform the data (if applicable). \cr \tab \cr
+#'   data_types \tab Character string describing the type of data (e.g.'binned'
+#'   or 'identified', for NMR data). Default value is NULL. \cr \tab \cr
+#'   check.names \tab Logical defaults to TRUE. Indicates whether 'check.names'
+#'   attribute of returned omicsData object is TRUE or FALSE. \cr } Computed
+#'   values included in the \code{data_info} attribute are as follows:
+#'   \tabular{ll}{ num_edata \tab The number of unique \code{edata_cname}
+#'   entries.\cr \tab \cr num_miss_obs \tab The number of missing
+#'   observations.\cr \tab \cr num_emeta \tab The number of unique
+#'   \code{emeta_cname} entries. \cr \tab \cr prop_missing \tab The proportion
+#'   of \code{e_data} values that are NA. \cr \tab \cr num_samps \tab The number
+#'   of samples that make up the columns of \code{e_data}.\cr \tab \cr meta_info
+#'   \tab A logical argument, specifying where the \code{e_meta} is provided.\cr
+#'   \tab \cr }
 #'
 #' @examples
-#' dontrun{
+#' \dontrun{
 #' library(pmartRdata)
 #' data("nmr_edata_identified")
 #' data("nmr_fdata_identified")
-#' mynmrData <- as.nmrData(e_data = nmr_edata_identified, f_data = nmr_fdata_identified, edata_cname = "Metabolite", fdata_cname = "SampleID", data_type = "identified")
-#'}
+#' mynmrData <- as.nmrData(e_data = nmr_edata_identified,
+#'                         f_data = nmr_fdata_identified,
+#'                         edata_cname = "Metabolite",
+#'                         fdata_cname = "SampleID",
+#'                         data_type = "identified")
+#' }
 #'
 #' @author Lisa Bramer, Kelly Stratton
 #' @seealso \code{\link{as.metabData}}
@@ -58,18 +92,23 @@
 #' @seealso \code{\link{as.proData}}
 #'
 #' @export
-as.nmrData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname,
-                       emeta_cname = NULL, techrep_cname = NULL, ...){
-  .as.nmrData(e_data, f_data, e_meta, edata_cname, fdata_cname,
-              emeta_cname, techrep_cname, ...)
+#' 
+as.nmrData <- function (e_data, f_data, e_meta = NULL,
+                        edata_cname, fdata_cname, emeta_cname = NULL,
+                        techrep_cname = NULL, data_scale_orig = NULL, ...) {
+  .as.nmrData(e_data, f_data, e_meta, edata_cname, fdata_cname, emeta_cname,
+              techrep_cname, data_scale_orig, ...)
 }
 
 ## metabolite data ##
-.as.nmrData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname,
-                        emeta_cname = NULL, techrep_cname = NULL,
-                        data_scale = "abundance", is_normalized = FALSE,
-                        nmr_norm = FALSE, norm_info = list(), data_types = NULL,
-                        check.names = TRUE) {
+.as.nmrData <- function (e_data, f_data, e_meta = NULL, edata_cname,
+                         fdata_cname, emeta_cname = NULL,
+                         techrep_cname = NULL,
+                         data_scale_orig = NULL,
+                         data_scale = data_scale_orig,
+                         is_normalized = FALSE, nmr_norm = FALSE,
+                         norm_info = list(), data_types = NULL,
+                         check.names = TRUE) {
   
   # Define the dType variable. This is used for customizing the warnings and
   # errors according to the data type (peptide, protein, lipid, ...).
@@ -84,6 +123,7 @@ as.nmrData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname,
                     fdata_cname = fdata_cname,
                     emeta_cname = emeta_cname,
                     techrep_cname = techrep_cname,
+                    data_scale_orig = data_scale_orig,
                     data_scale = data_scale,
                     is_normalized = is_normalized,
                     norm_info = norm_info,
@@ -103,6 +143,7 @@ as.nmrData <- function(e_data, f_data, e_meta = NULL, edata_cname, fdata_cname,
   # Compute the data_info attributes.
   attr(res, "data_info") <- set_data_info(e_data = res$e_data,
                                           edata_cname = edata_cname,
+                                          data_scale_orig = data_scale_orig,
                                           data_scale = data_scale,
                                           data_types = data_types,
                                           norm_info = norm_info,

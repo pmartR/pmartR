@@ -12,7 +12,8 @@ pre_flight <- function (e_data,
                         fdata_cname,
                         emeta_cname = NULL,
                         techrep_cname = NULL,
-                        data_scale = "abundance",
+                        data_scale_orig = NULL,
+                        data_scale = data_scale_orig,
                         is_normalized = FALSE,
                         norm_info = list(),
                         data_types = NULL,
@@ -114,16 +115,20 @@ pre_flight <- function (e_data,
     
   }
   
-  # check that data_scale is one of the acceptable options #
-  if(!(data_scale %in% c('log2', 'log10', 'log', 'count', 'abundance'))) {
+  # Make sure data_scale_orig is present.
+  if (is.null(data_scale_orig)) {
     
-    # Thrown down an error to demonstrate the users inability to follow simple
-    # instructions.
-    stop (paste(data_scale,
-                "is not a valid option for 'data_scale'.",
-                "See details of",
-                dType[[2]],
-                "for specifics.",
+    # Throw an error because data_scale_orig must be present.
+    stop (paste("data_scale_orig must be specified. Acceptable forms are:",
+                "'abundance', 'log', 'log2', or 'log10'.",
+                sep = " "))
+    
+    # Runs if data_scale_orig is not null.
+  } else if (!(data_scale_orig %in% c("abundance", "log", "log2", "log10"))) {
+    
+    # Throw an error because data_scale_orig is not an acceptable form.
+    stop (paste("data_scale_orig must be one of the following:",
+                "'abundance', 'log', 'log2', or 'log10'.",
                 sep = " "))
     
   }

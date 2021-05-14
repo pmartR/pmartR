@@ -14,7 +14,8 @@ test_that('edata_transform correctly transforms the data',{
                       e_meta = emeta,
                       edata_cname = 'Mass_Tag_ID',
                       fdata_cname = 'SampleID',
-                      emeta_cname = 'Protein')
+                      emeta_cname = 'Protein',
+                      data_scale_orig = "abundance")
   
   # Create test standards ------------------------------------------------------
   
@@ -29,7 +30,7 @@ test_that('edata_transform correctly transforms the data',{
                        edata_cname = 'Mass_Tag_ID',
                        fdata_cname = 'SampleID',
                        emeta_cname = 'Protein',
-                       data_scale = "log")
+                       data_scale_orig = "log")
   
   # Log base 2 transfiguration ---------------
   
@@ -42,7 +43,7 @@ test_that('edata_transform correctly transforms the data',{
                         edata_cname = 'Mass_Tag_ID',
                         fdata_cname = 'SampleID',
                         emeta_cname = 'Protein',
-                        data_scale = "log2")
+                        data_scale_orig = "log2")
   
   # Log base 10 transfiguration ---------------
   
@@ -55,7 +56,7 @@ test_that('edata_transform correctly transforms the data',{
                          edata_cname = 'Mass_Tag_ID',
                          fdata_cname = 'SampleID',
                          emeta_cname = 'Protein',
-                         data_scale = "log10")
+                         data_scale_orig = "log10")
   
   # Fabricate an attribute list that will be used for testing the data_info
   # attributes (except for the data_scale attribute).
@@ -106,12 +107,14 @@ test_that('edata_transform correctly transforms the data',{
   transmuted <- edata_transform(omicsData = pdata,
                                 data_scale = 'log')
   
-  # Ensure the data_scale attribute is correct.
+  # Ensure the data_scale attributes are correct.
+  expect_equal(attr(transmuted, "data_info")$data_scale_orig,
+               "abundance")
   expect_equal(attr(transmuted, 'data_info')$data_scale,
-               'log')
+               "log")
   
   # Check that the remaining data_info elements have not changed.
-  expect_equal(attr(transmuted, 'data_info')[-1],
+  expect_equal(attr(transmuted, 'data_info')[-c(1, 2)],
                data_info_standard)
   
   # Make sure the values of the e_data data frame match the standard.
@@ -122,12 +125,14 @@ test_that('edata_transform correctly transforms the data',{
   transmuted <- edata_transform(omicsData = pdata,
                                 data_scale = 'log2')
   
-  # Ensure the data_scale attribute is correct.
+  # Ensure the data_scale attributes are correct.
+  expect_equal(attr(transmuted, "data_info")$data_scale_orig,
+               "abundance")
   expect_equal(attr(transmuted, 'data_info')$data_scale,
-               'log2')
+               "log2")
   
   # Check that the remaining data_info elements have not changed.
-  expect_equal(attr(transmuted, 'data_info')[-1],
+  expect_equal(attr(transmuted, 'data_info')[-c(1, 2)],
                data_info_standard)
   
   # Make sure the values of the e_data data frame match the standard.
@@ -138,12 +143,14 @@ test_that('edata_transform correctly transforms the data',{
   transmuted <- edata_transform(omicsData = pdata,
                                 data_scale = 'log10')
   
-  # Ensure the data_scale attribute is correct.
+  # Ensure the data_scale attributes are correct.
+  expect_equal(attr(transmuted, "data_info")$data_scale_orig,
+               "abundance")
   expect_equal(attr(transmuted, 'data_info')$data_scale,
-               'log10')
+               "log10")
   
   # Check that the remaining data_info elements have not changed.
-  expect_equal(attr(transmuted, 'data_info')[-1],
+  expect_equal(attr(transmuted, 'data_info')[-c(1, 2)],
                data_info_standard)
   
   # Make sure the values of the e_data data frame match the standard.
@@ -168,12 +175,14 @@ test_that('edata_transform correctly transforms the data',{
   transmuted <- edata_transform(omicsData = lpdata,
                                 data_scale = 'abundance')
   
-  # Ensure the data_scale attribute is correct.
+  # Ensure the data_scale attributes are correct.
+  expect_equal(attr(transmuted, "data_info")$data_scale_orig,
+               "log")
   expect_equal(attr(transmuted, 'data_info')$data_scale,
-               'abundance')
+               "abundance")
   
   # Check that the remaining data_info elements have not changed.
-  expect_equal(attr(transmuted, 'data_info')[-1],
+  expect_equal(attr(transmuted, 'data_info')[-c(1, 2)],
                data_info_standard)
   
   # Make sure the values of the e_data data frame match the standard.
@@ -184,12 +193,14 @@ test_that('edata_transform correctly transforms the data',{
   transmuted <- edata_transform(omicsData = lpdata,
                                 data_scale = 'log2')
   
-  # Ensure the data_scale attribute is correct.
+  # Ensure the data_scale attributes are correct.
+  expect_equal(attr(transmuted, "data_info")$data_scale_orig,
+               "log")
   expect_equal(attr(transmuted, 'data_info')$data_scale,
-               'log2')
+               "log2")
   
   # Check that the remaining data_info elements have not changed.
-  expect_equal(attr(transmuted, 'data_info')[-1],
+  expect_equal(attr(transmuted, 'data_info')[-c(1, 2)],
                data_info_standard)
   
   # Make sure the values of the e_data data frame match the standard.
@@ -200,12 +211,14 @@ test_that('edata_transform correctly transforms the data',{
   transmuted <- edata_transform(omicsData = lpdata,
                                 data_scale = 'log10')
   
-  # Ensure the data_scale attribute is correct.
+  # Ensure the data_scale attributes are correct.
+  expect_equal(attr(transmuted, "data_info")$data_scale_orig,
+               "log")
   expect_equal(attr(transmuted, 'data_info')$data_scale,
-               'log10')
+               "log10")
   
   # Check that the remaining data_info elements have not changed.
-  expect_equal(attr(transmuted, 'data_info')[-1],
+  expect_equal(attr(transmuted, 'data_info')[-c(1, 2)],
                data_info_standard)
   
   # Make sure the values of the e_data data frame match the standard.
@@ -218,12 +231,14 @@ test_that('edata_transform correctly transforms the data',{
   transmuted <- edata_transform(omicsData = l2pdata,
                                 data_scale = 'abundance')
   
-  # Ensure the data_scale attribute is correct.
+  # Ensure the data_scale attributes are correct.
+  expect_equal(attr(transmuted, "data_info")$data_scale_orig,
+               "log2")
   expect_equal(attr(transmuted, 'data_info')$data_scale,
-               'abundance')
+               "abundance")
   
   # Check that the remaining data_info elements have not changed.
-  expect_equal(attr(transmuted, 'data_info')[-1],
+  expect_equal(attr(transmuted, 'data_info')[-c(1, 2)],
                data_info_standard)
   
   # Make sure the values of the e_data data frame match the standard.
@@ -234,12 +249,14 @@ test_that('edata_transform correctly transforms the data',{
   transmuted <- edata_transform(omicsData = l2pdata,
                                 data_scale = 'log')
   
-  # Ensure the data_scale attribute is correct.
+  # Ensure the data_scale attributes are correct.
+  expect_equal(attr(transmuted, "data_info")$data_scale_orig,
+               "log2")
   expect_equal(attr(transmuted, 'data_info')$data_scale,
-               'log')
+               "log")
   
   # Check that the remaining data_info elements have not changed.
-  expect_equal(attr(transmuted, 'data_info')[-1],
+  expect_equal(attr(transmuted, 'data_info')[-c(1, 2)],
                data_info_standard)
   
   # Make sure the values of the e_data data frame match the standard.
@@ -250,12 +267,14 @@ test_that('edata_transform correctly transforms the data',{
   transmuted <- edata_transform(omicsData = l2pdata,
                                 data_scale = 'log10')
   
-  # Ensure the data_scale attribute is correct.
+  # Ensure the data_scale attributes are correct.
+  expect_equal(attr(transmuted, "data_info")$data_scale_orig,
+               "log2")
   expect_equal(attr(transmuted, 'data_info')$data_scale,
-               'log10')
+               "log10")
   
   # Check that the remaining data_info elements have not changed.
-  expect_equal(attr(transmuted, 'data_info')[-1],
+  expect_equal(attr(transmuted, 'data_info')[-c(1, 2)],
                data_info_standard)
   
   # Make sure the values of the e_data data frame match the standard.
@@ -268,12 +287,14 @@ test_that('edata_transform correctly transforms the data',{
   transmuted <- edata_transform(omicsData = l10pdata,
                                 data_scale = 'abundance')
   
-  # Ensure the data_scale attribute is correct.
+  # Ensure the data_scale attributes are correct.
+  expect_equal(attr(transmuted, "data_info")$data_scale_orig,
+               "log10")
   expect_equal(attr(transmuted, 'data_info')$data_scale,
-               'abundance')
+               "abundance")
   
   # Check that the remaining data_info elements have not changed.
-  expect_equal(attr(transmuted, 'data_info')[-1],
+  expect_equal(attr(transmuted, 'data_info')[-c(1, 2)],
                data_info_standard)
   
   # Make sure the values of the e_data data frame match the standard.
@@ -284,12 +305,14 @@ test_that('edata_transform correctly transforms the data',{
   transmuted <- edata_transform(omicsData = l10pdata,
                                 data_scale = 'log')
   
-  # Ensure the data_scale attribute is correct.
+  # Ensure the data_scale attributes are correct.
+  expect_equal(attr(transmuted, "data_info")$data_scale_orig,
+               "log10")
   expect_equal(attr(transmuted, 'data_info')$data_scale,
-               'log')
+               "log")
   
   # Check that the remaining data_info elements have not changed.
-  expect_equal(attr(transmuted, 'data_info')[-1],
+  expect_equal(attr(transmuted, 'data_info')[-c(1, 2)],
                data_info_standard)
   
   # Make sure the values of the e_data data frame match the standard.
@@ -300,12 +323,14 @@ test_that('edata_transform correctly transforms the data',{
   transmuted <- edata_transform(omicsData = l10pdata,
                                 data_scale = 'log2')
   
-  # Ensure the data_scale attribute is correct.
+  # Ensure the data_scale attributes are correct.
+  expect_equal(attr(transmuted, "data_info")$data_scale_orig,
+               "log10")
   expect_equal(attr(transmuted, 'data_info')$data_scale,
-               'log2')
+               "log2")
   
   # Check that the remaining data_info elements have not changed.
-  expect_equal(attr(transmuted, 'data_info')[-1],
+  expect_equal(attr(transmuted, 'data_info')[-c(1, 2)],
                data_info_standard)
   
   # Make sure the values of the e_data data frame match the standard.

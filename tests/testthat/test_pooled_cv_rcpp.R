@@ -190,7 +190,8 @@ test_that('pooled_cv_rcpp correctly calculates the CV by group',{
                       e_meta = emeta,
                       edata_cname = "Mass_Tag_ID",
                       fdata_cname = "SampleID",
-                      emeta_cname = "Protein")
+                      emeta_cname = "Protein",
+                      data_scale_orig = "abundance")
   
   # Forge a group_DF attribute for pdata.
   pdata_gdf <- group_designation(omicsData = pdata,
@@ -235,7 +236,8 @@ test_that('pooled_cv_rcpp correctly calculates the CV by group',{
   pdata_s <- as.pepData(e_data = edata_s,
                         f_data = fdata_s,
                         edata_cname = "Mass_Tag_ID",
-                        fdata_cname = "SampleID")
+                        fdata_cname = "SampleID",
+                        data_scale_orig = "abundance")
   
   # Forge a group_DF attribute for pdata.
   pdata_s_gdf <- group_designation(omicsData = pdata_s,

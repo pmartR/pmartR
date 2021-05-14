@@ -9,8 +9,8 @@ edata_replace(omicsData, x, y)
 \arguments{
 \item{omicsData}{an object of the class 'pepData', 'proData', 'metabData',
 'lipidData', or 'nmrData' usually created by \code{\link{pepData}},
-\code{\link{proData}}, \code{\link{metabData}},
-\code{\link{lipidData}}, or \code{\link{as.nmrData}}, respectively.}
+\code{\link{proData}}, \code{\link{metabData}}, \code{\link{lipidData}}, or
+\code{\link{as.nmrData}}, respectively.}
 
 \item{x}{value to be replaced, usually numeric or NA}
 
@@ -25,14 +25,15 @@ replaces them with y
 }
 \details{
 This function is often used to replace any 0 values in peptide,
-         protein, metabolite, or lipid data with NA's.
+  protein, metabolite, or lipid data with NA's.
 }
 \examples{
-dontrun{
+\dontrun{
 library(pmartRdata)
 data(metab_object)
 metab_object2 <- edata_replace(omicsData = metab_object, x=0, y=NA)
 }
+
 }
 \author{
 Kelly Stratton

@@ -14,7 +14,8 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
                       e_meta = emeta,
                       edata_cname = "Mass_Tag_ID",
                       fdata_cname = "SampleID",
-                      emeta_cname = "Protein")
+                      emeta_cname = "Protein",
+                      data_scale_orig = "abundance")
   
   # Group designate the pdata object.
   pdata_gdf <- group_designation(omicsData = pdata,
@@ -24,7 +25,8 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
   no_emeta <- as.pepData(e_data = edata,
                          f_data = fdata,
                          edata_cname = "Mass_Tag_ID",
-                         fdata_cname = "SampleID")
+                         fdata_cname = "SampleID",
+                         data_scale_orig = "abundance")
   
   # Run the group_designation function on pepData without e_meta.
   no_emeta <- group_designation(omicsData = no_emeta,
@@ -38,7 +40,8 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
                            e_meta = emeta,
                            edata_cname = "Mass_Tag_ID",
                            fdata_cname = "SampleID",
-                           emeta_cname = "Protein")
+                           emeta_cname = "Protein",
+                           data_scale_orig = "abundance")
   
   # Run the group_designation function on pdata_sg_1.
   pdata_sg_1 <- group_designation(omicsData = pdata_sg_1,
@@ -298,24 +301,25 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
                "anova")
   
   # Examinate the data_info attribute.
-  expect_equal(attr(aFiltered, 'data_info')$data_scale,
-               'abundance')
-  expect_false(attr(aFiltered, 'data_info')$norm_info$is_normalized,
-               FALSE)
-  expect_equal(attr(aFiltered, 'data_info')$num_edata,
-               110)
-  expect_equal(attr(aFiltered, 'data_info')$num_miss_obs,
-               50)
-  expect_equal(round(attr(aFiltered, 'data_info')$prop_missing, 4),
-               0.0379)
-  expect_equal(attr(aFiltered, 'data_info')$num_samps,
-               12)
-  expect_null(attr(aFiltered, 'data_info')$data_types)
+  expect_equal(
+    attr(aFiltered, "data_info"),
+    list(data_scale_orig = "abundance",
+         data_scale = "abundance",
+         norm_info = list(is_normalized = FALSE),
+         num_edata = length(unique(aFiltered$e_data[, 1])),
+         num_miss_obs = sum(is.na(aFiltered$e_data)),
+         prop_missing = (sum(is.na(aFiltered$e_data)) /
+                           prod(dim(aFiltered$e_data[, -1]))),
+         num_samps = ncol(aFiltered$e_data[, -1]),
+         data_types = NULL)
+  )
   
   # Explorate the meta_info attribute.
-  expect_true(attr(aFiltered, 'meta_info')$meta_data)
-  expect_equal(attr(aFiltered, 'meta_info')$num_emeta,
-               61)
+  expect_equal(
+    attr(aFiltered, "meta_info"),
+    list(meta_data = TRUE,
+         num_emeta = length(unique(aFiltered$e_meta$Protein)))
+  )
   
   # Checkerate the imdanova attribute. This attribute is added to the omicsData
   # object only when the imdanova filter functions are run.
@@ -357,24 +361,25 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
                "gtest")
   
   # Examinate the data_info attribute.
-  expect_equal(attr(gFiltered, 'data_info')$data_scale,
-               'abundance')
-  expect_false(attr(gFiltered, 'data_info')$norm_info$is_normalized,
-               FALSE)
-  expect_equal(attr(gFiltered, 'data_info')$num_edata,
-               136)
-  expect_equal(attr(gFiltered, 'data_info')$num_miss_obs,
-               194)
-  expect_equal(round(attr(gFiltered, 'data_info')$prop_missing, 4),
-               0.1189)
-  expect_equal(attr(gFiltered, 'data_info')$num_samps,
-               12)
-  expect_null(attr(gFiltered, 'data_info')$data_types)
+  expect_equal(
+    attr(gFiltered, "data_info"),
+    list(data_scale_orig = "abundance",
+         data_scale = "abundance",
+         norm_info = list(is_normalized = FALSE),
+         num_edata = length(unique(gFiltered$e_data[, 1])),
+         num_miss_obs = sum(is.na(gFiltered$e_data)),
+         prop_missing = (sum(is.na(gFiltered$e_data)) /
+                           prod(dim(gFiltered$e_data[, -1]))),
+         num_samps = ncol(gFiltered$e_data[, -1]),
+         data_types = NULL)
+  )
   
   # Explorate the meta_info attribute.
-  expect_true(attr(gFiltered, 'meta_info')$meta_data)
-  expect_equal(attr(gFiltered, 'meta_info')$num_emeta,
-               75)
+  expect_equal(
+    attr(gFiltered, "meta_info"),
+    list(meta_data = TRUE,
+         num_emeta = length(unique(gFiltered$e_meta$Protein)))
+  )
   
   # Checkerate the imdanova attribute. This attribute is added to the omicsData
   # object only when the imdanova filter functions are run.
@@ -416,24 +421,25 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
                "combined")
   
   # Examinate the data_info attribute.
-  expect_equal(attr(bFiltered, 'data_info')$data_scale,
-               'abundance')
-  expect_false(attr(bFiltered, 'data_info')$norm_info$is_normalized,
-               FALSE)
-  expect_equal(attr(bFiltered, 'data_info')$num_edata,
-               136)
-  expect_equal(attr(bFiltered, 'data_info')$num_miss_obs,
-               194)
-  expect_equal(round(attr(bFiltered, 'data_info')$prop_missing, 4),
-               0.1189)
-  expect_equal(attr(bFiltered, 'data_info')$num_samps,
-               12)
-  expect_null(attr(bFiltered, 'data_info')$data_types)
+  expect_equal(
+    attr(bFiltered, "data_info"),
+    list(data_scale_orig = "abundance",
+         data_scale = "abundance",
+         norm_info = list(is_normalized = FALSE),
+         num_edata = length(unique(bFiltered$e_data[, 1])),
+         num_miss_obs = sum(is.na(bFiltered$e_data)),
+         prop_missing = (sum(is.na(bFiltered$e_data)) /
+                           prod(dim(bFiltered$e_data[, -1]))),
+         num_samps = ncol(bFiltered$e_data[, -1]),
+         data_types = NULL)
+  )
   
   # Explorate the meta_info attribute.
-  expect_true(attr(bFiltered, 'meta_info')$meta_data)
-  expect_equal(attr(bFiltered, 'meta_info')$num_emeta,
-               75)
+  expect_equal(
+    attr(bFiltered, "meta_info"),
+    list(meta_data = TRUE,
+         num_emeta = length(unique(bFiltered$e_meta$Protein)))
+  )
   
   # Checkerate the imdanova attribute. This attribute is added to the omicsData
   # object only when the imdanova filter functions are run.
@@ -476,23 +482,25 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
                "anova")
   
   # Examinate the data_info attribute.
-  expect_equal(attr(filtered_ne, 'data_info')$data_scale,
-               'abundance')
-  expect_false(attr(filtered_ne, 'data_info')$norm_info$is_normalized,
-               FALSE)
-  expect_equal(attr(filtered_ne, 'data_info')$num_edata,
-               110)
-  expect_equal(attr(filtered_ne, 'data_info')$num_miss_obs,
-               50)
-  expect_equal(round(attr(filtered_ne, 'data_info')$prop_missing, 4),
-               0.0379)
-  expect_equal(attr(filtered_ne, 'data_info')$num_samps,
-               12)
-  expect_null(attr(filtered_ne, 'data_info')$data_types)
+  expect_equal(
+    attr(filtered_ne, "data_info"),
+    list(data_scale_orig = "abundance",
+         data_scale = "abundance",
+         norm_info = list(is_normalized = FALSE),
+         num_edata = length(unique(filtered_ne$e_data[, 1])),
+         num_miss_obs = sum(is.na(filtered_ne$e_data)),
+         prop_missing = (sum(is.na(filtered_ne$e_data)) /
+                           prod(dim(filtered_ne$e_data[, -1]))),
+         num_samps = ncol(filtered_ne$e_data[, -1]),
+         data_types = NULL)
+  )
   
   # Explorate the meta_info attribute.
-  expect_false(attr(filtered_ne, 'meta_info')$meta_data)
-  expect_null(attr(filtered_ne, 'meta_info')$num_emeta)
+  expect_equal(
+    attr(filtered_ne, "meta_info"),
+    list(meta_data = FALSE,
+         num_emeta = NULL)
+  )
   
   # Inspectate the filtered e_data, f_data, and e_meta data frames.
   expect_identical(dim(filtered_ne$e_data),
@@ -546,24 +554,25 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
                "anova")
   
   # Examinate the data_info attribute.
-  expect_equal(attr(aFiltered_sg, 'data_info')$data_scale,
-               'abundance')
-  expect_false(attr(aFiltered_sg, 'data_info')$norm_info$is_normalized,
-               FALSE)
-  expect_equal(attr(aFiltered_sg, 'data_info')$num_edata,
-               113)
-  expect_equal(attr(aFiltered_sg, 'data_info')$num_miss_obs,
-               23)
-  expect_equal(round(attr(aFiltered_sg, 'data_info')$prop_missing, 4),
-               0.0226)
-  expect_equal(attr(aFiltered_sg, 'data_info')$num_samps,
-               9)
-  expect_null(attr(aFiltered_sg, 'data_info')$data_types)
+  expect_equal(
+    attr(aFiltered_sg, "data_info"),
+    list(data_scale_orig = "abundance",
+         data_scale = "abundance",
+         norm_info = list(is_normalized = FALSE),
+         num_edata = length(unique(aFiltered_sg$e_data[, 1])),
+         num_miss_obs = sum(is.na(aFiltered_sg$e_data)),
+         prop_missing = (sum(is.na(aFiltered_sg$e_data)) /
+                           prod(dim(aFiltered_sg$e_data[, -1]))),
+         num_samps = ncol(aFiltered_sg$e_data[, -1]),
+         data_types = NULL)
+  )
   
   # Explorate the meta_info attribute.
-  expect_true(attr(aFiltered_sg, 'meta_info')$meta_data)
-  expect_equal(attr(aFiltered_sg, 'meta_info')$num_emeta,
-               65)
+  expect_equal(
+    attr(aFiltered_sg, "meta_info"),
+    list(meta_data = TRUE,
+         num_emeta = length(unique(aFiltered_sg$e_meta$Protein)))
+  )
   
   # Checkerate the imdanova attribute. This attribute is added to the omicsData
   # object only when the imdanova filter functions are run.
@@ -609,24 +618,25 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
                "gtest")
   
   # Examinate the data_info attribute.
-  expect_equal(attr(gFiltered_sg, 'data_info')$data_scale,
-               'abundance')
-  expect_false(attr(gFiltered_sg, 'data_info')$norm_info$is_normalized,
-               FALSE)
-  expect_equal(attr(gFiltered_sg, 'data_info')$num_edata,
-               128)
-  expect_equal(attr(gFiltered_sg, 'data_info')$num_miss_obs,
-               87)
-  expect_equal(round(attr(gFiltered_sg, 'data_info')$prop_missing, 4),
-               0.0755)
-  expect_equal(attr(gFiltered_sg, 'data_info')$num_samps,
-               9)
-  expect_null(attr(gFiltered_sg, 'data_info')$data_types)
+  expect_equal(
+    attr(gFiltered_sg, "data_info"),
+    list(data_scale_orig = "abundance",
+         data_scale = "abundance",
+         norm_info = list(is_normalized = FALSE),
+         num_edata = length(unique(gFiltered_sg$e_data[, 1])),
+         num_miss_obs = sum(is.na(gFiltered_sg$e_data)),
+         prop_missing = (sum(is.na(gFiltered_sg$e_data)) /
+                           prod(dim(gFiltered_sg$e_data[, -1]))),
+         num_samps = ncol(gFiltered_sg$e_data[, -1]),
+         data_types = NULL)
+  )
   
   # Explorate the meta_info attribute.
-  expect_true(attr(gFiltered_sg, 'meta_info')$meta_data)
-  expect_equal(attr(gFiltered_sg, 'meta_info')$num_emeta,
-               71)
+  expect_equal(
+    attr(gFiltered_sg, "meta_info"),
+    list(meta_data = TRUE,
+         num_emeta = length(unique(gFiltered_sg$e_meta$Protein)))
+  )
   
   # Checkerate the imdanova attribute. This attribute is added to the omicsData
   # object only when the imdanova filter functions are run.
@@ -672,24 +682,25 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
                "combined")
   
   # Examinate the data_info attribute.
-  expect_equal(attr(bFiltered_sg, 'data_info')$data_scale,
-               'abundance')
-  expect_false(attr(bFiltered_sg, 'data_info')$norm_info$is_normalized,
-               FALSE)
-  expect_equal(attr(bFiltered_sg, 'data_info')$num_edata,
-               128)
-  expect_equal(attr(bFiltered_sg, 'data_info')$num_miss_obs,
-               87)
-  expect_equal(round(attr(bFiltered_sg, 'data_info')$prop_missing, 4),
-               0.0755)
-  expect_equal(attr(bFiltered_sg, 'data_info')$num_samps,
-               9)
-  expect_null(attr(bFiltered_sg, 'data_info')$data_types)
+  expect_equal(
+    attr(bFiltered_sg, "data_info"),
+    list(data_scale_orig = "abundance",
+         data_scale = "abundance",
+         norm_info = list(is_normalized = FALSE),
+         num_edata = length(unique(bFiltered_sg$e_data[, 1])),
+         num_miss_obs = sum(is.na(bFiltered_sg$e_data)),
+         prop_missing = (sum(is.na(bFiltered_sg$e_data)) /
+                           prod(dim(bFiltered_sg$e_data[, -1]))),
+         num_samps = ncol(bFiltered_sg$e_data[, -1]),
+         data_types = NULL)
+  )
   
   # Explorate the meta_info attribute.
-  expect_true(attr(bFiltered_sg, 'meta_info')$meta_data)
-  expect_equal(attr(bFiltered_sg, 'meta_info')$num_emeta,
-               71)
+  expect_equal(
+    attr(bFiltered_sg, "meta_info"),
+    list(meta_data = TRUE,
+         num_emeta = length(unique(bFiltered_sg$e_meta$Protein)))
+  )
   
   # Checkerate the imdanova attribute. This attribute is added to the omicsData
   # object only when the imdanova filter functions are run.
@@ -710,7 +721,7 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
   expect_equal(dim(bFiltered_sg$e_meta),
                c(128, 4))
 
-  # Test applyFilt with ignoring singleton groups ------------------------------
+  # Test applyFilt anova ignoring singleton groups -----------------------------
   
   # Filter the reduced pepData object using anova.
   # _f: remove_singleton_groups is set to FALSE.
@@ -746,24 +757,25 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
                "anova")
   
   # Examinate the data_info attribute.
-  expect_equal(attr(aFiltered_sg_f, 'data_info')$data_scale,
-               'abundance')
-  expect_false(attr(aFiltered_sg_f, 'data_info')$norm_info$is_normalized,
-               FALSE)
-  expect_equal(attr(aFiltered_sg_f, 'data_info')$num_edata,
-               113)
-  expect_equal(attr(aFiltered_sg_f, 'data_info')$num_miss_obs,
-               31)
-  expect_equal(round(attr(aFiltered_sg_f, 'data_info')$prop_missing, 4),
-               0.0274)
-  expect_equal(attr(aFiltered_sg_f, 'data_info')$num_samps,
-               10)
-  expect_null(attr(aFiltered_sg_f, 'data_info')$data_types)
+  expect_equal(
+    attr(aFiltered_sg_f, "data_info"),
+    list(data_scale_orig = "abundance",
+         data_scale = "abundance",
+         norm_info = list(is_normalized = FALSE),
+         num_edata = length(unique(aFiltered_sg_f$e_data[, 1])),
+         num_miss_obs = sum(is.na(aFiltered_sg_f$e_data)),
+         prop_missing = (sum(is.na(aFiltered_sg_f$e_data)) /
+                           prod(dim(aFiltered_sg_f$e_data[, -1]))),
+         num_samps = ncol(aFiltered_sg_f$e_data[, -1]),
+         data_types = NULL)
+  )
   
   # Explorate the meta_info attribute.
-  expect_true(attr(aFiltered_sg_f, 'meta_info')$meta_data)
-  expect_equal(attr(aFiltered_sg_f, 'meta_info')$num_emeta,
-               65)
+  expect_equal(
+    attr(aFiltered_sg_f, "meta_info"),
+    list(meta_data = TRUE,
+         num_emeta = length(unique(aFiltered_sg_f$e_meta$Protein)))
+  )
   
   # Checkerate the imdanova attribute. This attribute is added to the omicsData
   # object only when the imdanova filter functions are run.
@@ -785,6 +797,163 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
                c(10, 2))
   expect_equal(dim(aFiltered_sg_f$e_meta),
                c(113, 4))
+  
+  # Test applyFilt gtest ignoring singleton groups -----------------------------
+  
+  # Filter the reduced pepData object using gtest.
+  # _f: remove_singleton_groups is set to FALSE.
+  expect_message(gFiltered_sg_f <- applyFilt(filter_object = filter_sg,
+                                             omicsData = pdata_sg,
+                                             min_nonmiss_anova = NULL, 
+                                             min_nonmiss_gtest = 3, 
+                                             remove_singleton_groups = FALSE),
+                 paste("You have specified remove_singleton_groups = FALSE, so",
+                       "the sample\\(s\\) corresponding to the singleton",
+                       "group\\(s\\) were not utilized in the IMD-ANOVA filter",
+                       "and will be retained in the resulting omicsData",
+                       "object.",
+                       sep = " "))
+  
+  # Ensure the class and attributes that shouldn't have changed didn't change.
+  expect_identical(attr(pdata_sg, 'cnames'),
+                   attr(gFiltered_sg_f, 'cnames'))
+  expect_identical(attr(pdata_sg, 'check.names'),
+                   attr(gFiltered_sg_f, 'check.names'))
+  expect_identical(class(pdata_sg),
+                   class(gFiltered_sg_f))
+  
+  # Investigate the filters attribute.
+  expect_equal(attr(gFiltered_sg_f, 'filters')[[1]]$type,
+               'imdanovaFilt')
+  expect_identical(attr(gFiltered_sg_f, 'filters')[[1]]$threshold,
+                   data.frame(min_nonmiss_anova = NA,
+                              min_nonmiss_gtest = 3))
+  expect_identical(attr(gFiltered_sg_f, 'filters')[[1]]$filtered,
+                   s_gtest_sg)
+  expect_equal(attr(gFiltered_sg_f, 'filters')[[1]]$method,
+               "gtest")
+  
+  # Examinate the data_info attribute.
+  expect_equal(
+    attr(gFiltered_sg_f, "data_info"),
+    list(data_scale_orig = "abundance",
+         data_scale = "abundance",
+         norm_info = list(is_normalized = FALSE),
+         num_edata = length(unique(gFiltered_sg_f$e_data[, 1])),
+         num_miss_obs = sum(is.na(gFiltered_sg_f$e_data)),
+         prop_missing = (sum(is.na(gFiltered_sg_f$e_data)) /
+                           prod(dim(gFiltered_sg_f$e_data[, -1]))),
+         num_samps = ncol(gFiltered_sg_f$e_data[, -1]),
+         data_types = NULL)
+  )
+  
+  # Explorate the meta_info attribute.
+  expect_equal(
+    attr(gFiltered_sg_f, "meta_info"),
+    list(meta_data = TRUE,
+         num_emeta = length(unique(gFiltered_sg_f$e_meta$Protein)))
+  )
+  
+  # Checkerate the imdanova attribute. This attribute is added to the omicsData
+  # object only when the imdanova filter functions are run.
+  expect_identical(attr(gFiltered_sg_f,
+                        "imdanova")$nonmiss_per_group$nonmiss_totals,
+                   filter_sg)
+  expect_identical(attr(gFiltered_sg_f,
+                        "imdanova")$nonmiss_per_group$group_sizes,
+                   attr(filter_sg, "group_sizes"))
+  expect_identical(attr(gFiltered_sg_f, "imdanova")$test_with_anova,
+                   NULL)
+  expect_identical(attr(gFiltered_sg_f, "imdanova")$test_with_gtest,
+                   setdiff(x = pdata_sg$e_data[, 1],
+                           y = s_gtest_sg))
+  
+  # Inspecticate the filtered e_data, f_data, and e_meta data frames.
+  expect_equal(dim(gFiltered_sg_f$e_data),
+               c(128, 11))
+  expect_equal(dim(gFiltered_sg_f$f_data),
+               c(10, 2))
+  expect_equal(dim(gFiltered_sg_f$e_meta),
+               c(128, 4))
+  
+  # Test applyFilt combined ignoring singleton groups ----------------------------
+  
+  # Filter the reduced pepData object using gtest.
+  # _f: remove_singleton_groups is set to FALSE.
+  expect_message(bFiltered_sg_f <- applyFilt(filter_object = filter_sg,
+                                             omicsData = pdata_sg,
+                                             min_nonmiss_anova = 3, 
+                                             min_nonmiss_gtest = 3, 
+                                             remove_singleton_groups = FALSE),
+                 paste("You have specified remove_singleton_groups = FALSE, so",
+                       "the sample\\(s\\) corresponding to the singleton",
+                       "group\\(s\\) were not utilized in the IMD-ANOVA filter",
+                       "and will be retained in the resulting omicsData",
+                       "object.",
+                       sep = " "))
+  
+  # Ensure the class and attributes that shouldn't have changed didn't change.
+  expect_identical(attr(pdata_sg, 'cnames'),
+                   attr(bFiltered_sg_f, 'cnames'))
+  expect_identical(attr(pdata_sg, 'check.names'),
+                   attr(bFiltered_sg_f, 'check.names'))
+  expect_identical(class(pdata_sg),
+                   class(bFiltered_sg_f))
+  
+  # Investigate the filters attribute.
+  expect_equal(attr(bFiltered_sg_f, 'filters')[[1]]$type,
+               'imdanovaFilt')
+  expect_identical(attr(bFiltered_sg_f, 'filters')[[1]]$threshold,
+                   data.frame(min_nonmiss_anova = 3,
+                              min_nonmiss_gtest = 3))
+  expect_identical(attr(bFiltered_sg_f, 'filters')[[1]]$filtered,
+                   s_both_sg)
+  expect_equal(attr(bFiltered_sg_f, 'filters')[[1]]$method,
+               "combined")
+  
+  # Examinate the data_info attribute.
+  expect_equal(
+    attr(bFiltered_sg_f, "data_info"),
+    list(data_scale_orig = "abundance",
+         data_scale = "abundance",
+         norm_info = list(is_normalized = FALSE),
+         num_edata = length(unique(bFiltered_sg_f$e_data[, 1])),
+         num_miss_obs = sum(is.na(bFiltered_sg_f$e_data)),
+         prop_missing = (sum(is.na(bFiltered_sg_f$e_data)) /
+                           prod(dim(bFiltered_sg_f$e_data[, -1]))),
+         num_samps = ncol(bFiltered_sg_f$e_data[, -1]),
+         data_types = NULL)
+  )
+  
+  # Explorate the meta_info attribute.
+  expect_equal(
+    attr(bFiltered_sg_f, "meta_info"),
+    list(meta_data = TRUE,
+         num_emeta = length(unique(bFiltered_sg_f$e_meta$Protein)))
+  )
+  
+  # Checkerate the imdanova attribute. This attribute is added to the omicsData
+  # object only when the imdanova filter functions are run.
+  expect_identical(attr(bFiltered_sg_f,
+                        "imdanova")$nonmiss_per_group$nonmiss_totals,
+                   filter_sg)
+  expect_identical(attr(bFiltered_sg_f,
+                        "imdanova")$nonmiss_per_group$group_sizes,
+                   attr(filter_sg, "group_sizes"))
+  expect_identical(attr(bFiltered_sg_f, "imdanova")$test_with_anova,
+                   setdiff(x = pdata_sg$e_data[, 1],
+                           y = s_anova_sg))
+  expect_identical(attr(bFiltered_sg_f, "imdanova")$test_with_gtest,
+                   setdiff(x = pdata_sg$e_data[, 1],
+                           y = s_gtest_sg))
+  
+  # Inspecticate the filtered e_data, f_data, and e_meta data frames.
+  expect_equal(dim(bFiltered_sg_f$e_data),
+               c(128, 11))
+  expect_equal(dim(bFiltered_sg_f$f_data),
+               c(10, 2))
+  expect_equal(dim(bFiltered_sg_f$e_meta),
+               c(128, 4))
   
   # Test applyFilt with a molecule filter applied first ------------------------
   

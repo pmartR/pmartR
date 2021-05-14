@@ -14,7 +14,8 @@ test_that('proteomics_filter and applyFilt produce the correct output',{
                       e_meta = emeta,
                       edata_cname = "Mass_Tag_ID",
                       fdata_cname = "SampleID",
-                      emeta_cname = "Protein")
+                      emeta_cname = "Protein",
+                      data_scale_orig = "abundance")
   
   # Create an emeta data frame with degenerate peptides.
   ignoble <- rbind(rapply(emeta,
@@ -32,7 +33,8 @@ test_that('proteomics_filter and applyFilt produce the correct output',{
                         e_meta = ignoble,
                         edata_cname = "Mass_Tag_ID",
                         fdata_cname = "SampleID",
-                        emeta_cname = "Protein")
+                        emeta_cname = "Protein",
+                        data_scale_orig = "abundance")
   
   # Count peptides and proteins for comparison purposes ------------------------
   
@@ -96,7 +98,8 @@ test_that('proteomics_filter and applyFilt produce the correct output',{
   expect_error(proteomics_filter(as.pepData(e_data = edata,
                                             f_data = fdata,
                                             edata_cname = "Mass_Tag_ID",
-                                            fdata_cname = "SampleID")),
+                                            fdata_cname = "SampleID",
+                                            data_scale_orig = "abundance")),
                paste("e_meta must be non-NULL",
                      sep = " "))
   
@@ -166,24 +169,25 @@ test_that('proteomics_filter and applyFilt produce the correct output',{
   expect_true(is.na(attr(filtered, 'filters')[[1]]$method))
   
   # Investigate the data_info attribute.
-  expect_equal(attr(filtered, 'data_info')$data_scale,
-               'abundance')
-  expect_false(attr(filtered, 'data_info')$norm_info$is_normalized,
-               FALSE)
-  expect_equal(attr(filtered, 'data_info')$num_edata,
-               94)
-  expect_equal(attr(filtered, 'data_info')$num_miss_obs,
-               173)
-  expect_equal(round(attr(filtered, 'data_info')$prop_missing, 4),
-               0.1534)
-  expect_equal(attr(filtered, 'data_info')$num_samps,
-               12)
-  expect_null(attr(filtered, 'data_info')$data_types)
+  expect_equal(
+    attr(filtered, "data_info"),
+    list(data_scale_orig = "abundance",
+         data_scale = "abundance",
+         norm_info = list(is_normalized = FALSE),
+         num_edata = length(unique(filtered$e_data[, 1])),
+         num_miss_obs = sum(is.na(filtered$e_data)),
+         prop_missing = (sum(is.na(filtered$e_data)) /
+                           prod(dim(filtered$e_data[, -1]))),
+         num_samps = ncol(filtered$e_data[, -1]),
+         data_types = NULL)
+  )
   
   # Explore the meta_info attribute.
-  expect_true(attr(filtered, 'meta_info')$meta_data)
-  expect_equal(attr(filtered, 'meta_info')$num_emeta,
-               27)
+  expect_equal(
+    attr(filtered, "meta_info"),
+    list(meta_data = TRUE,
+         num_emeta = length(unique(filtered$e_meta$Protein)))
+  )
   
   # Inspect the filtered e_data, f_data, and e_meta data frames.
   expect_equal(dim(filtered$e_data),
@@ -222,24 +226,25 @@ test_that('proteomics_filter and applyFilt produce the correct output',{
   expect_true(is.na(attr(sorfiltered, 'filters')[[1]]$method))
   
   # Investigate the data_info attribute.
-  expect_equal(attr(sorfiltered, 'data_info')$data_scale,
-               'abundance')
-  expect_false(attr(sorfiltered, 'data_info')$norm_info$is_normalized,
-               FALSE)
-  expect_equal(attr(sorfiltered, 'data_info')$num_edata,
-               91)
-  expect_equal(attr(sorfiltered, 'data_info')$num_miss_obs,
-               164)
-  expect_equal(round(attr(sorfiltered, 'data_info')$prop_missing, 4),
-               0.1502)
-  expect_equal(attr(sorfiltered, 'data_info')$num_samps,
-               12)
-  expect_null(attr(sorfiltered, 'data_info')$data_types)
+  expect_equal(
+    attr(sorfiltered, "data_info"),
+    list(data_scale_orig = "abundance",
+         data_scale = "abundance",
+         norm_info = list(is_normalized = FALSE),
+         num_edata = length(unique(sorfiltered$e_data[, 1])),
+         num_miss_obs = sum(is.na(sorfiltered$e_data)),
+         prop_missing = (sum(is.na(sorfiltered$e_data)) /
+                           prod(dim(sorfiltered$e_data[, -1]))),
+         num_samps = ncol(sorfiltered$e_data[, -1]),
+         data_types = NULL)
+  )
   
   # Explore the meta_info attribute.
-  expect_true(attr(sorfiltered, 'meta_info')$meta_data)
-  expect_equal(attr(sorfiltered, 'meta_info')$num_emeta,
-               27)
+  expect_equal(
+    attr(sorfiltered, "meta_info"),
+    list(meta_data = TRUE,
+         num_emeta = length(unique(sorfiltered$e_meta$Protein)))
+  )
   
   # Inspect the sorfiltered e_data, f_data, and e_meta data frames.
   expect_equal(dim(sorfiltered$e_data),
@@ -275,24 +280,25 @@ test_that('proteomics_filter and applyFilt produce the correct output',{
   expect_true(is.na(attr(sorfiltered2, 'filters')[[1]]$method))
   
   # Investigate the data_info attribute.
-  expect_equal(attr(sorfiltered2, 'data_info')$data_scale,
-               'abundance')
-  expect_false(attr(sorfiltered2, 'data_info')$norm_info$is_normalized,
-               FALSE)
-  expect_equal(attr(sorfiltered2, 'data_info')$num_edata,
-               147)
-  expect_equal(attr(sorfiltered2, 'data_info')$num_miss_obs,
-               332)
-  expect_equal(round(attr(sorfiltered2, 'data_info')$prop_missing, 4),
-               0.1882)
-  expect_equal(attr(sorfiltered2, 'data_info')$num_samps,
-               12)
-  expect_null(attr(sorfiltered2, 'data_info')$data_types)
+  expect_equal(
+    attr(sorfiltered2, "data_info"),
+    list(data_scale_orig = "abundance",
+         data_scale = "abundance",
+         norm_info = list(is_normalized = FALSE),
+         num_edata = length(unique(sorfiltered2$e_data[, 1])),
+         num_miss_obs = sum(is.na(sorfiltered2$e_data)),
+         prop_missing = (sum(is.na(sorfiltered2$e_data)) /
+                           prod(dim(sorfiltered2$e_data[, -1]))),
+         num_samps = ncol(sorfiltered2$e_data[, -1]),
+         data_types = NULL)
+  )
   
   # Explore the meta_info attribute.
-  expect_true(attr(sorfiltered2, 'meta_info')$meta_data)
-  expect_equal(attr(sorfiltered2, 'meta_info')$num_emeta,
-               83)
+  expect_equal(
+    attr(sorfiltered2, "meta_info"),
+    list(meta_data = TRUE,
+         num_emeta = length(unique(sorfiltered2$e_meta$Protein)))
+  )
   
   # Inspect the sorfiltered2 e_data, f_data, and e_meta data frames.
   expect_equal(dim(sorfiltered2$e_data),

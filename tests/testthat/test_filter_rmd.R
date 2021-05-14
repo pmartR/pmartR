@@ -15,7 +15,8 @@ test_that("rmd_filter and applyFilt produce the correct output",{
                       e_meta = emeta,
                       edata_cname = "Mass_Tag_ID",
                       fdata_cname = "SampleID",
-                      emeta_cname = "Protein")
+                      emeta_cname = "Protein",
+                      data_scale_orig = "abundance")
   
   # Log transfigure the peptide data.
   pdata <- edata_transform(omicsData = pdata,
@@ -32,7 +33,8 @@ test_that("rmd_filter and applyFilt produce the correct output",{
                          e_meta = emeta,
                          edata_cname = "Mass_Tag_ID",
                          fdata_cname = "SampleID",
-                         emeta_cname = "Protein")
+                         emeta_cname = "Protein",
+                         data_scale_orig = "abundance")
   
   # Log transmogrify the peptide data with a singleton group.
   pdata_sg <- edata_transform(omicsData = pdata_sg,
@@ -53,7 +55,8 @@ test_that("rmd_filter and applyFilt produce the correct output",{
                         e_meta = emeta,
                         edata_cname = 'Metabolite',
                         fdata_cname = 'SampleID',
-                        emeta_cname = 'nmrClass')
+                        emeta_cname = 'nmrClass',
+                        data_scale_orig = "abundance")
   
   # Log transmute the nmr data.
   nmrdata <- edata_transform(omicsData = nmrdata,
@@ -307,24 +310,25 @@ test_that("rmd_filter and applyFilt produce the correct output",{
   expect_true(is.na(attr(pfiltered, "filters")[[1]]$method))
   
   # Investigate the data_info attribute.
-  expect_equal(attr(pfiltered, "data_info")$data_scale,
-               "log")
-  expect_false(attr(pfiltered, "data_info")$norm_info$is_normalized,
-               FALSE)
-  expect_equal(attr(pfiltered, "data_info")$num_edata,
-               150)
-  expect_equal(attr(pfiltered, "data_info")$num_miss_obs,
-               318)
-  expect_equal(round(attr(pfiltered, "data_info")$prop_missing, 4),
-               0.1927)
-  expect_equal(attr(pfiltered, "data_info")$num_samps,
-               11)
-  expect_null(attr(pfiltered, "data_info")$data_types)
+  expect_equal(
+    attr(pfiltered, "data_info"),
+    list(data_scale_orig = "abundance",
+         data_scale = "log",
+         norm_info = list(is_normalized = FALSE),
+         num_edata = length(unique(pfiltered$e_data[, 1])),
+         num_miss_obs = sum(is.na(pfiltered$e_data)),
+         prop_missing = (sum(is.na(pfiltered$e_data)) /
+                           prod(dim(pfiltered$e_data[, -1]))),
+         num_samps = ncol(pfiltered$e_data[, -1]),
+         data_types = NULL)
+  )
   
   # Explore the meta_info attribute.
-  expect_true(attr(pfiltered, "meta_info")$meta_data)
-  expect_equal(attr(pfiltered, "meta_info")$num_emeta,
-               83)
+  expect_equal(
+    attr(pfiltered, "meta_info"),
+    list(meta_data = TRUE,
+         num_emeta = length(unique(pfiltered$e_meta$Protein)))
+  )
   
   # Dissect the group_DF attribute.
   expect_equal(dim(attr(pfiltered, "group_DF")),
@@ -378,24 +382,25 @@ test_that("rmd_filter and applyFilt produce the correct output",{
   expect_true(is.na(attr(nmrfiltered, "filters")[[1]]$method))
   
   # Investigate the data_info attribute.
-  expect_equal(attr(nmrfiltered, "data_info")$data_scale,
-               "log")
-  expect_false(attr(nmrfiltered, "data_info")$norm_info$is_normalized,
-               FALSE)
-  expect_equal(attr(nmrfiltered, "data_info")$num_edata,
-               38)
-  expect_equal(attr(nmrfiltered, "data_info")$num_miss_obs,
-               0)
-  expect_equal(round(attr(nmrfiltered, "data_info")$prop_missing, 4),
-               0)
-  expect_equal(attr(nmrfiltered, "data_info")$num_samps,
-               38)
-  expect_null(attr(nmrfiltered, "data_info")$data_types)
+  expect_equal(
+    attr(nmrfiltered, "data_info"),
+    list(data_scale_orig = "abundance",
+         data_scale = "log",
+         norm_info = list(is_normalized = FALSE),
+         num_edata = length(unique(nmrfiltered$e_data[, 1])),
+         num_miss_obs = sum(is.na(nmrfiltered$e_data)),
+         prop_missing = (sum(is.na(nmrfiltered$e_data)) /
+                           prod(dim(nmrfiltered$e_data[, -1]))),
+         num_samps = ncol(nmrfiltered$e_data[, -1]),
+         data_types = NULL)
+  )
   
   # Explore the meta_info attribute.
-  expect_true(attr(nmrfiltered, "meta_info")$meta_data)
-  expect_equal(attr(nmrfiltered, "meta_info")$num_emeta,
-               9)
+  expect_equal(
+    attr(nmrfiltered, "meta_info"),
+    list(meta_data = TRUE,
+         num_emeta = length(unique(nmrfiltered$e_meta$nmrClass)))
+  )
   
   # Dissect the group_DF attribute.
   expect_equal(dim(attr(nmrfiltered, "group_DF")),
@@ -443,24 +448,25 @@ test_that("rmd_filter and applyFilt produce the correct output",{
   expect_true(is.na(attr(pfiltered_sg, "filters")[[1]]$method))
 
   # Investigate the data_info attribute.
-  expect_equal(attr(pfiltered_sg, "data_info")$data_scale,
-               "log")
-  expect_false(attr(pfiltered_sg, "data_info")$norm_info$is_normalized,
-               FALSE)
-  expect_equal(attr(pfiltered_sg, "data_info")$num_edata,
-               150)
-  expect_equal(attr(pfiltered_sg, "data_info")$num_miss_obs,
-               236)
-  expect_equal(round(attr(pfiltered_sg, "data_info")$prop_missing, 4),
-               0.1967)
-  expect_equal(attr(pfiltered_sg, "data_info")$num_samps,
-               8)
-  expect_null(attr(pfiltered_sg, "data_info")$data_types)
-
+  expect_equal(
+    attr(pfiltered_sg, "data_info"),
+    list(data_scale_orig = "abundance",
+         data_scale = "log",
+         norm_info = list(is_normalized = FALSE),
+         num_edata = length(unique(pfiltered_sg$e_data[, 1])),
+         num_miss_obs = sum(is.na(pfiltered_sg$e_data)),
+         prop_missing = (sum(is.na(pfiltered_sg$e_data)) /
+                           prod(dim(pfiltered_sg$e_data[, -1]))),
+         num_samps = ncol(pfiltered_sg$e_data[, -1]),
+         data_types = NULL)
+  )
+  
   # Explore the meta_info attribute.
-  expect_true(attr(pfiltered_sg, "meta_info")$meta_data)
-  expect_equal(attr(pfiltered_sg, "meta_info")$num_emeta,
-               83)
+  expect_equal(
+    attr(pfiltered_sg, "meta_info"),
+    list(meta_data = TRUE,
+         num_emeta = length(unique(pfiltered_sg$e_meta$Protein)))
+  )
 
   # Dissect the group_DF attribute.
   expect_equal(dim(attr(pfiltered_sg, "group_DF")),
@@ -501,24 +507,25 @@ test_that("rmd_filter and applyFilt produce the correct output",{
   expect_true(is.na(attr(pfiltered_sg_f, "filters")[[1]]$method))
   
   # Investigate the data_info attribute.
-  expect_equal(attr(pfiltered_sg_f, "data_info")$data_scale,
-               "log")
-  expect_false(attr(pfiltered_sg_f, "data_info")$norm_info$is_normalized,
-               FALSE)
-  expect_equal(attr(pfiltered_sg_f, "data_info")$num_edata,
-               150)
-  expect_equal(attr(pfiltered_sg_f, "data_info")$num_miss_obs,
-               267)
-  expect_equal(round(attr(pfiltered_sg_f, "data_info")$prop_missing, 4),
-               0.1978)
-  expect_equal(attr(pfiltered_sg_f, "data_info")$num_samps,
-               9)
-  expect_null(attr(pfiltered_sg_f, "data_info")$data_types)
+  expect_equal(
+    attr(pfiltered_sg_f, "data_info"),
+    list(data_scale_orig = "abundance",
+         data_scale = "log",
+         norm_info = list(is_normalized = FALSE),
+         num_edata = length(unique(pfiltered_sg_f$e_data[, 1])),
+         num_miss_obs = sum(is.na(pfiltered_sg_f$e_data)),
+         prop_missing = (sum(is.na(pfiltered_sg_f$e_data)) /
+                           prod(dim(pfiltered_sg_f$e_data[, -1]))),
+         num_samps = ncol(pfiltered_sg_f$e_data[, -1]),
+         data_types = NULL)
+  )
   
   # Explore the meta_info attribute.
-  expect_true(attr(pfiltered_sg_f, "meta_info")$meta_data)
-  expect_equal(attr(pfiltered_sg_f, "meta_info")$num_emeta,
-               83)
+  expect_equal(
+    attr(pfiltered_sg_f, "meta_info"),
+    list(meta_data = TRUE,
+         num_emeta = length(unique(pfiltered_sg_f$e_meta$Protein)))
+  )
   
   # Dissect the group_DF attribute.
   expect_equal(dim(attr(pfiltered_sg_f, "group_DF")),
