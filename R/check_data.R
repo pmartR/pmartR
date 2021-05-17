@@ -7,17 +7,16 @@
 #
 pre_flight <- function (e_data,
                         f_data,
-                        e_meta = NULL,
+                        e_meta,
                         edata_cname,
                         fdata_cname,
-                        emeta_cname = NULL,
-                        techrep_cname = NULL,
-                        data_scale_orig = NULL,
-                        data_scale = data_scale_orig,
-                        is_normalized = FALSE,
-                        norm_info = list(),
-                        data_types = NULL,
-                        check.names = TRUE,
+                        emeta_cname,
+                        techrep_cname,
+                        data_scale,
+                        is_normalized,
+                        norm_info,
+                        data_types,
+                        check.names,
                         dType) {
   
   # Verify classes/values of arguments -----------------------------------------
@@ -115,19 +114,11 @@ pre_flight <- function (e_data,
     
   }
   
-  # Make sure data_scale_orig is present.
-  if (is.null(data_scale_orig)) {
+  # Make sure data_scale is one of the acceptable strings.
+  if (!(data_scale %in% c("abundance", "log", "log2", "log10"))) {
     
-    # Throw an error because data_scale_orig must be present.
-    stop (paste("data_scale_orig must be specified. Acceptable forms are:",
-                "'abundance', 'log', 'log2', or 'log10'.",
-                sep = " "))
-    
-    # Runs if data_scale_orig is not null.
-  } else if (!(data_scale_orig %in% c("abundance", "log", "log2", "log10"))) {
-    
-    # Throw an error because data_scale_orig is not an acceptable form.
-    stop (paste("data_scale_orig must be one of the following:",
+    # Throw an error because data_scale is not an acceptable form.
+    stop (paste("data_scale must be one of the following:",
                 "'abundance', 'log', 'log2', or 'log10'.",
                 sep = " "))
     

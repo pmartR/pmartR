@@ -16,8 +16,7 @@ test_that('edata_replace correctly replaces one value with another',{
                                 e_meta = emeta,
                                 edata_cname = 'Peptide',
                                 fdata_cname = 'Sample',
-                                emeta_cname = 'Protein',
-                                data_scale_orig = "abundance")
+                                emeta_cname = 'Protein')
   
   # Replace NAs with 0s in isodata.
   expect_message(isodata2 <- edata_replace(omicsData = isodata,
@@ -75,8 +74,7 @@ test_that('edata_replace correctly replaces one value with another',{
                         e_meta = emeta,
                         edata_cname = 'LipidCommonName',
                         fdata_cname = 'Sample_Name',
-                        emeta_cname = 'LipidClass',
-                        data_scale_orig = "abundance")
+                        emeta_cname = 'LipidClass')
   
   # Replace NAs with 0s in ldata.
   expect_message(ldata2 <- edata_replace(omicsData = ldata,
@@ -132,8 +130,7 @@ test_that('edata_replace correctly replaces one value with another',{
                         e_meta = emeta,
                         edata_cname = 'Metabolite',
                         fdata_cname = 'SampleID',
-                        emeta_cname = 'MClass',
-                        data_scale_orig = "abundance")
+                        emeta_cname = 'MClass')
   
   # Replace NAs with 0s in mdata.
   expect_message(mdata2 <- edata_replace(omicsData = mdata,
@@ -208,8 +205,7 @@ test_that('edata_replace correctly replaces one value with another',{
                         edata_cname = 'Metabolite',
                         fdata_cname = 'SampleID',
                         emeta_cname = 'nmrClass',
-                        check.names = FALSE,
-                        data_scale_orig = "abundance")
+                        check.names = FALSE)
   
   # Replace NAs with 0s in nmrdata.
   expect_message(nmrdata2 <- edata_replace(omicsData = nmrdata,
@@ -267,8 +263,7 @@ test_that('edata_replace correctly replaces one value with another',{
                       e_meta = emeta,
                       edata_cname = 'Mass_Tag_ID',
                       fdata_cname = 'SampleID',
-                      emeta_cname = 'Protein',
-                      data_scale_orig = "abundance")
+                      emeta_cname = 'Protein')
   
   # Replace NAs with 0s in pdata.
   expect_message(pdata2 <- edata_replace(omicsData = pdata,
@@ -324,8 +319,7 @@ test_that('edata_replace correctly replaces one value with another',{
                        e_meta = emeta,
                        edata_cname = 'Reference',
                        fdata_cname = 'SampleID',
-                       emeta_cname = 'PClass',
-                       data_scale_orig = "abundance")
+                       emeta_cname = 'PClass')
   
   # Replace NAs with 0s in prdata.
   expect_message(prdata2 <- edata_replace(omicsData = prdata,

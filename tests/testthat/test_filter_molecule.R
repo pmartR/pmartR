@@ -14,8 +14,7 @@ test_that('molecule_filter and applyFilt produce the correct output',{
                       e_meta = emeta,
                       edata_cname = "Mass_Tag_ID",
                       fdata_cname = "SampleID",
-                      emeta_cname = "Protein",
-                      data_scale_orig = "abundance")
+                      emeta_cname = "Protein")
   
   # Create a function to count the number of non-missing values to be used in
   # connection with apply.

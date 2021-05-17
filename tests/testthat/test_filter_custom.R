@@ -14,8 +14,7 @@ test_that('custom_filter and applyFilt produce the correct output',{
                       e_meta = emeta,
                       edata_cname = "Mass_Tag_ID",
                       fdata_cname = "SampleID",
-                      emeta_cname = "Protein",
-                      data_scale_orig = "abundance")
+                      emeta_cname = "Protein")
   
   # Test custom_filter preliminary checks --------------------------------------
   

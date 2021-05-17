@@ -16,8 +16,7 @@ test_that('as.pepData returns the correct data frame and attributes',{
                       e_meta = emeta,
                       edata_cname = 'Mass_Tag_ID',
                       fdata_cname = 'SampleID',
-                      emeta_cname = 'Protein',
-                      data_scale_orig = "abundance")
+                      emeta_cname = 'Protein')
 
   # Ensure the returned data frames are the correct dimension.
   expect_equal(dim(pdata$e_data),
@@ -75,8 +74,7 @@ test_that('as.pepData returns the correct data frame and attributes',{
                                      e_meta = NULL,
                                      edata_cname = 'Mass_Tag_ID',
                                      fdata_cname = 'SampleID',
-                                     emeta_cname = 'Test',
-                                     data_scale_orig = "abundance"),
+                                     emeta_cname = 'Test'),
                  "emeta_cname set to NULL, no e_meta object was provided.")
   
   # Ensure the returned data frames are the correct dimension.
@@ -137,8 +135,7 @@ test_that('as.pepData returns the correct data frame and attributes',{
                           e_meta = emeta,
                           edata_cname = 'Mass_Tag_ID',
                           fdata_cname = 'SampleID',
-                          emeta_cname = 'Protein',
-                          data_scale_orig = "abundance"),
+                          emeta_cname = 'Protein'),
                "1 samples from e_data not found in f_data")
 
   # Check for an error when e_data has more rows than e_meta.
@@ -147,8 +144,7 @@ test_that('as.pepData returns the correct data frame and attributes',{
                           e_meta = emeta[1:138, ],
                           edata_cname = 'Mass_Tag_ID',
                           fdata_cname = 'SampleID',
-                          emeta_cname = 'Protein',
-                          data_scale_orig = "abundance"),
+                          emeta_cname = 'Protein'),
                "Not all peptides in e_data are present in e_meta")
 
   # Create an f_data object with an extra row.
@@ -162,8 +158,7 @@ test_that('as.pepData returns the correct data frame and attributes',{
   expect_warning(pdata <- as.pepData(e_data = edata,
                                      f_data = fdata_1,
                                      edata_cname = 'Mass_Tag_ID',
-                                     fdata_cname = 'SampleID',
-                                     data_scale_orig = "abundance"),
+                                     fdata_cname = 'SampleID'),
                  paste("Extra samples were found in f_data that were not in",
                        "e_data. These have been removed from f_data.",
                        sep = ' '))
@@ -224,8 +219,7 @@ test_that('as.pepData returns the correct data frame and attributes',{
                                      e_meta = emeta,
                                      edata_cname = 'Mass_Tag_ID',
                                      fdata_cname = 'SampleID',
-                                     emeta_cname = 'Protein',
-                                     data_scale_orig = "abundance"),
+                                     emeta_cname = 'Protein'),
                  paste('Extra peptides were found in e_meta that were not in',
                        'e_data. These have been removed from e_meta.',
                        sep = ' '))
@@ -288,8 +282,7 @@ test_that('as.pepData returns the correct data frame and attributes',{
                           edata_cname = 'Mass_Tag_ID',
                           fdata_cname = 'SampleID',
                           emeta_cname = 'Protein',
-                          techrep_cname = 'tReps',
-                          data_scale_orig = "abundance"),
+                          techrep_cname = 'tReps'),
                paste('Specified technical replicate column had a unique value',
                      'for each row.  Values should specify groups of technical',
                      'replicates belonging to a biological sample.',
@@ -307,8 +300,7 @@ test_that('as.pepData returns the correct data frame and attributes',{
                       e_meta = emeta,
                       edata_cname = 'Mass_Tag_ID',
                       fdata_cname = 'SampleID',
-                      emeta_cname = 'Protein',
-                      data_scale_orig = "abundance")
+                      emeta_cname = 'Protein')
 
   # Verify that the returned data frames are the correct dimension.
   expect_equal(dim(pdata$e_data),
@@ -370,8 +362,7 @@ test_that('as.pepData returns the correct data frame and attributes',{
                           e_meta = emeta,
                           edata_cname = 'Mass_Tag_ID',
                           fdata_cname = 'SampleID',
-                          emeta_cname = 'Protein',
-                          data_scale_orig = "abundance"),
+                          emeta_cname = 'Protein'),
                "The 'edata_cname' identifier is non-unique.")
   
   # Check for an error when e_meta is non-null but emeta_cname is null.
@@ -380,8 +371,7 @@ test_that('as.pepData returns the correct data frame and attributes',{
                           e_meta = emeta,
                           edata_cname = 'Mass_Tag_ID',
                           fdata_cname = 'SampleID',
-                          emeta_cname = NULL,
-                          data_scale_orig = "abundance"),
+                          emeta_cname = NULL),
                'Since e_meta is non-NULL, emeta_cname must also be non-NULL.')
   
   # Verify there is an error when emeta_cname is not a column name in e_meta.
@@ -390,8 +380,7 @@ test_that('as.pepData returns the correct data frame and attributes',{
                           e_meta = emeta,
                           edata_cname = 'Mass_Tag_ID',
                           fdata_cname = 'SampleID',
-                          emeta_cname = 'Protein2',
-                          data_scale_orig = "abundance"),
+                          emeta_cname = 'Protein2'),
                paste('Mapping variable column',
                      'Protein2',
                      'not found in e_meta. See details of as.pepData for',

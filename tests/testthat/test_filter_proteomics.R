@@ -14,8 +14,7 @@ test_that('proteomics_filter and applyFilt produce the correct output',{
                       e_meta = emeta,
                       edata_cname = "Mass_Tag_ID",
                       fdata_cname = "SampleID",
-                      emeta_cname = "Protein",
-                      data_scale_orig = "abundance")
+                      emeta_cname = "Protein")
   
   # Create an emeta data frame with degenerate peptides.
   ignoble <- rbind(rapply(emeta,
@@ -33,8 +32,7 @@ test_that('proteomics_filter and applyFilt produce the correct output',{
                         e_meta = ignoble,
                         edata_cname = "Mass_Tag_ID",
                         fdata_cname = "SampleID",
-                        emeta_cname = "Protein",
-                        data_scale_orig = "abundance")
+                        emeta_cname = "Protein")
   
   # Count peptides and proteins for comparison purposes ------------------------
   
@@ -98,8 +96,7 @@ test_that('proteomics_filter and applyFilt produce the correct output',{
   expect_error(proteomics_filter(as.pepData(e_data = edata,
                                             f_data = fdata,
                                             edata_cname = "Mass_Tag_ID",
-                                            fdata_cname = "SampleID",
-                                            data_scale_orig = "abundance")),
+                                            fdata_cname = "SampleID")),
                paste("e_meta must be non-NULL",
                      sep = " "))
   

@@ -190,8 +190,7 @@ test_that('cv_filter and applyFilt produce the correct output',{
                       e_meta = emeta,
                       edata_cname = "Mass_Tag_ID",
                       fdata_cname = "SampleID",
-                      emeta_cname = "Protein",
-                      data_scale_orig = "abundance")
+                      emeta_cname = "Protein")
   
   # Forge a group_DF attribute for pdata.
   pdata_gdf <- group_designation(omicsData = pdata,

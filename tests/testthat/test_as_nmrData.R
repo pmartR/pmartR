@@ -16,8 +16,7 @@ test_that('as.nmrData returns the correct data frame and attributes',{
                         e_meta = emeta,
                         edata_cname = 'Metabolite',
                         fdata_cname = 'SampleID',
-                        emeta_cname = 'nmrClass',
-                        data_scale_orig = "abundance")
+                        emeta_cname = 'nmrClass')
   
   # Ensure the returned data frames are the correct dimension.
   expect_equal(dim(nmrdata$e_data),
@@ -81,8 +80,7 @@ test_that('as.nmrData returns the correct data frame and attributes',{
                                        f_data = fdata,
                                        edata_cname = 'Metabolite',
                                        fdata_cname = 'SampleID',
-                                       emeta_cname = 'Test',
-                                       data_scale_orig = "abundance"),
+                                       emeta_cname = 'Test'),
                  "emeta_cname set to NULL, no e_meta object was provided.")
   
   # Ensure the returned data frames are the correct dimension.
@@ -149,8 +147,7 @@ test_that('as.nmrData returns the correct data frame and attributes',{
                                               check.names = FALSE),
                           f_data = fdata,
                           edata_cname = 'Metabolite',
-                          fdata_cname = 'SampleID',
-                          data_scale_orig = "abundance"),
+                          fdata_cname = 'SampleID'),
                "1 samples from e_data not found in f_data")
   
   # Verify an error is thrown when edata has more rows than emeta.
@@ -159,8 +156,7 @@ test_that('as.nmrData returns the correct data frame and attributes',{
                           e_meta = emeta[1:15, ],
                           edata_cname = 'Metabolite',
                           fdata_cname = 'SampleID',
-                          emeta_cname = 'nmrClass',
-                          data_scale_orig = "abundance"))
+                          emeta_cname = 'nmrClass'))
   
   # Forge an f_data object with an extra row.
   fdata_1 <- rbind(fdata,
@@ -171,8 +167,7 @@ test_that('as.nmrData returns the correct data frame and attributes',{
   expect_warning(nmrdata <- as.nmrData(e_data = edata,
                                        f_data = fdata_1,
                                        edata_cname = 'Metabolite',
-                                       fdata_cname = 'SampleID',
-                                       data_scale_orig = "abundance"),
+                                       fdata_cname = 'SampleID'),
                  paste("Extra samples were found in f_data that were not in",
                        "e_data. These have been removed from f_data.",
                        sep = ' '))
@@ -240,8 +235,7 @@ test_that('as.nmrData returns the correct data frame and attributes',{
                                        e_meta = emeta,
                                        edata_cname = 'Metabolite',
                                        fdata_cname = 'SampleID',
-                                       emeta_cname = 'nmrClass',
-                                       data_scale_orig = "abundance"),
+                                       emeta_cname = 'nmrClass'),
                  paste('Extra metabolites were found in e_meta that were not',
                        'in e_data. These have been removed from e_meta.',
                        sep = ' '))
@@ -309,8 +303,7 @@ test_that('as.nmrData returns the correct data frame and attributes',{
                                               tReps = fdata[, 1]),
                           edata_cname = 'Metabolite',
                           fdata_cname = 'SampleID',
-                          techrep_cname = 'tReps',
-                          data_scale_orig = "abundance"),
+                          techrep_cname = 'tReps'),
                paste('Specified technical replicate column had a unique value',
                      'for each row.  Values should specify groups of technical',
                      'replicates belonging to a biological sample.',
@@ -326,8 +319,7 @@ test_that('as.nmrData returns the correct data frame and attributes',{
   nmrdata <- as.nmrData(e_data = edata_1,
                         f_data = fdata,
                         edata_cname = 'Metabolite',
-                        fdata_cname = 'SampleID',
-                        data_scale_orig = "abundance")
+                        fdata_cname = 'SampleID')
   
   # Verify that the returned data frames are the correct dimension.
   expect_equal(dim(nmrdata$e_data),
@@ -393,8 +385,7 @@ test_that('as.nmrData returns the correct data frame and attributes',{
   expect_error(as.nmrData(e_data = edata_1,
                           f_data = fdata,
                           edata_cname = 'Metabolite',
-                          fdata_cname = 'SampleID',
-                          data_scale_orig = "abundance"),
+                          fdata_cname = 'SampleID'),
                "The 'edata_cname' identifier is non-unique.")
   
   # Check for an error when e_meta is non-null but emeta_cname is null.
@@ -403,8 +394,7 @@ test_that('as.nmrData returns the correct data frame and attributes',{
                           e_meta = emeta,
                           edata_cname = 'Metabolite',
                           fdata_cname = 'SampleID',
-                          emeta_cname = NULL,
-                          data_scale_orig = "abundance"),
+                          emeta_cname = NULL),
                'Since e_meta is non-NULL, emeta_cname must also be non-NULL.')
   
   # Verify there is an error when emeta_cname is not a column name in e_meta.
@@ -413,8 +403,7 @@ test_that('as.nmrData returns the correct data frame and attributes',{
                           e_meta = emeta,
                           edata_cname = 'Metabolite',
                           fdata_cname = 'SampleID',
-                          emeta_cname = 'MetaboliteClass',
-                          data_scale_orig = "abundance"),
+                          emeta_cname = 'MetaboliteClass'),
                paste('Mapping variable column',
                      'MetaboliteClass',
                      'not found in e_meta. See details of as.nmrData for',

@@ -14,8 +14,7 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
                       e_meta = emeta,
                       edata_cname = "Mass_Tag_ID",
                       fdata_cname = "SampleID",
-                      emeta_cname = "Protein",
-                      data_scale_orig = "abundance")
+                      emeta_cname = "Protein")
   
   # Group designate the pdata object.
   pdata_gdf <- group_designation(omicsData = pdata,
@@ -25,8 +24,7 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
   no_emeta <- as.pepData(e_data = edata,
                          f_data = fdata,
                          edata_cname = "Mass_Tag_ID",
-                         fdata_cname = "SampleID",
-                         data_scale_orig = "abundance")
+                         fdata_cname = "SampleID")
   
   # Run the group_designation function on pepData without e_meta.
   no_emeta <- group_designation(omicsData = no_emeta,
@@ -40,8 +38,7 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
                            e_meta = emeta,
                            edata_cname = "Mass_Tag_ID",
                            fdata_cname = "SampleID",
-                           emeta_cname = "Protein",
-                           data_scale_orig = "abundance")
+                           emeta_cname = "Protein")
   
   # Run the group_designation function on pdata_sg_1.
   pdata_sg_1 <- group_designation(omicsData = pdata_sg_1,

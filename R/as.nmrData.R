@@ -35,9 +35,6 @@
 #'   collapse the data when \code{combine_techreps} is called on this object.
 #'   Defaults to NULL (no technical replicates).
 #'
-#' @param data_scale_orig A character string indicating what scale the data are
-#'   on. Acceptable values are "abundance", "log", "log2", and "log10".
-#'
 #' @param ... further arguments
 #'
 #' @details Objects of class 'nmrData' contain some attributes that are
@@ -95,20 +92,22 @@
 #' 
 as.nmrData <- function (e_data, f_data, e_meta = NULL,
                         edata_cname, fdata_cname, emeta_cname = NULL,
-                        techrep_cname = NULL, data_scale_orig = NULL, ...) {
+                        techrep_cname = NULL, ...) {
   .as.nmrData(e_data, f_data, e_meta, edata_cname, fdata_cname, emeta_cname,
-              techrep_cname, data_scale_orig, ...)
+              techrep_cname, ...)
 }
 
 ## metabolite data ##
 .as.nmrData <- function (e_data, f_data, e_meta = NULL, edata_cname,
                          fdata_cname, emeta_cname = NULL,
                          techrep_cname = NULL,
-                         data_scale_orig = NULL,
-                         data_scale = data_scale_orig,
+                         data_scale = "abundance",
                          is_normalized = FALSE, nmr_norm = FALSE,
                          norm_info = list(), data_types = NULL,
                          check.names = TRUE) {
+  
+  # Set the original data scale to the input data scale.
+  data_scale_orig <- data_scale
   
   # Define the dType variable. This is used for customizing the warnings and
   # errors according to the data type (peptide, protein, lipid, ...).
@@ -123,7 +122,6 @@ as.nmrData <- function (e_data, f_data, e_meta = NULL,
                     fdata_cname = fdata_cname,
                     emeta_cname = emeta_cname,
                     techrep_cname = techrep_cname,
-                    data_scale_orig = data_scale_orig,
                     data_scale = data_scale,
                     is_normalized = is_normalized,
                     norm_info = norm_info,

@@ -12,7 +12,6 @@ as.proData(
   fdata_cname,
   emeta_cname = NULL,
   techrep_cname = NULL,
-  data_scale_orig = NULL,
   ...
 )
 }
@@ -49,9 +48,6 @@ then either do not specify \code{emeta_cname} or specify it as NULL.}
 observations represent technical replicates.  This column is used to
 collapse the data when \code{combine_techreps} is called on this object.
 Defaults to NULL (no technical replicates).}
-
-\item{data_scale_orig}{A character string indicating what scale the data are
-on. Acceptable values are "abundance", "log", "log2", and "log10".}
 
 \item{...}{further arguments}
 }

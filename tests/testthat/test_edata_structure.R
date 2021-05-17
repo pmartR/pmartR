@@ -40,24 +40,21 @@ test_that('errors are thrown for bad data structures/values',{
   expect_error(as.pepData(e_data = sour_grapes,
                           f_data = fdata,
                           edata_cname = 'id',
-                          fdata_cname = 'sampleID',
-                          data_scale_orig = "abundance"),
+                          fdata_cname = 'sampleID'),
                'Columns 2 and 4 of e_data contain non-numeric values.')
   
   # Generate a lipidData object with sour_grapes_2.
   expect_error(as.lipidData(e_data = sour_grapes_2,
                             f_data = fdata,
                             edata_cname = 'id',
-                            fdata_cname = 'sampleID',
-                            data_scale_orig = "abundance"),
+                            fdata_cname = 'sampleID'),
                'Column 4 of e_data contains non-numeric values.')
   
   # forge a metabdata object with cantor.
   expect_error(as.metabData(e_data = cantor,
                             f_data = fdata,
                             edata_cname = 'id',
-                            fdata_cname = 'sampleID',
-                            data_scale_orig = "abundance"),
+                            fdata_cname = 'sampleID'),
                'Columns 3 and 6 of e_data contain infinite values.')
   
 })

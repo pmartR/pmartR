@@ -14,8 +14,7 @@ test_that('edata_transform correctly transforms the data',{
                       e_meta = emeta,
                       edata_cname = 'Mass_Tag_ID',
                       fdata_cname = 'SampleID',
-                      emeta_cname = 'Protein',
-                      data_scale_orig = "abundance")
+                      emeta_cname = 'Protein')
   
   # Create test standards ------------------------------------------------------
   
@@ -30,7 +29,7 @@ test_that('edata_transform correctly transforms the data',{
                        edata_cname = 'Mass_Tag_ID',
                        fdata_cname = 'SampleID',
                        emeta_cname = 'Protein',
-                       data_scale_orig = "log")
+                       data_scale = "log")
   
   # Log base 2 transfiguration ---------------
   
@@ -43,7 +42,7 @@ test_that('edata_transform correctly transforms the data',{
                         edata_cname = 'Mass_Tag_ID',
                         fdata_cname = 'SampleID',
                         emeta_cname = 'Protein',
-                        data_scale_orig = "log2")
+                        data_scale = "log2")
   
   # Log base 10 transfiguration ---------------
   
@@ -56,7 +55,7 @@ test_that('edata_transform correctly transforms the data',{
                          edata_cname = 'Mass_Tag_ID',
                          fdata_cname = 'SampleID',
                          emeta_cname = 'Protein',
-                         data_scale_orig = "log10")
+                         data_scale = "log10")
   
   # Fabricate an attribute list that will be used for testing the data_info
   # attributes (except for the data_scale attribute).

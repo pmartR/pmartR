@@ -19,8 +19,7 @@ test_that('as.xxx correctly replaces missing values (0s) with NAs',{
                                                e_meta = emeta,
                                                edata_cname = 'Peptide',
                                                fdata_cname = 'Sample',
-                                               emeta_cname = 'Protein',
-                                               data_scale_orig = "abundance"),
+                                               emeta_cname = 'Protein'),
                  '400 instances of 0 have been replaced with NA')
   
   # Check that the elements of the data_info attribute are all correct.
@@ -58,8 +57,7 @@ test_that('as.xxx correctly replaces missing values (0s) with NAs',{
                                        e_meta = emeta,
                                        edata_cname = 'LipidCommonName',
                                        fdata_cname = 'Sample_Name',
-                                       emeta_cname = 'LipidClass',
-                                       data_scale_orig = "abundance"),
+                                       emeta_cname = 'LipidClass'),
                  '884 instances of 0 have been replaced with NA')
   
   # Check that the elements of the data_info attribute are all correct.
@@ -97,8 +95,7 @@ test_that('as.xxx correctly replaces missing values (0s) with NAs',{
                                        e_meta = emeta,
                                        edata_cname = 'Metabolite',
                                        fdata_cname = 'SampleID',
-                                       emeta_cname = 'MClass',
-                                       data_scale_orig = "abundance"),
+                                       emeta_cname = 'MClass'),
                  '148 instances of 0 have been replaced with NA')
   
   # Check that the elements of the data_info attribute are all correct.
@@ -151,8 +148,7 @@ test_that('as.xxx correctly replaces missing values (0s) with NAs',{
                                        edata_cname = 'Metabolite',
                                        fdata_cname = 'SampleID',
                                        emeta_cname = 'nmrClass',
-                                       check.names = FALSE,
-                                       data_scale_orig = "abundance"),
+                                       check.names = FALSE),
                  '302 instances of 0 have been replaced with NA')
   
   # Check that the elements of the data_info attribute are all correct.
@@ -190,8 +186,7 @@ test_that('as.xxx correctly replaces missing values (0s) with NAs',{
                                      e_meta = emeta,
                                      edata_cname = 'Mass_Tag_ID',
                                      fdata_cname = 'SampleID',
-                                     emeta_cname = 'Protein',
-                                     data_scale_orig = "abundance"),
+                                     emeta_cname = 'Protein'),
                  '341 instances of 0 have been replaced with NA')
   
   # Check that the elements of the data_info attribute are all correct.
@@ -229,8 +224,7 @@ test_that('as.xxx correctly replaces missing values (0s) with NAs',{
                                       e_meta = emeta,
                                       edata_cname = 'Reference',
                                       fdata_cname = 'SampleID',
-                                      emeta_cname = 'PClass',
-                                      data_scale_orig = "abundance"),
+                                      emeta_cname = 'PClass'),
                  '234 instances of 0 have been replaced with NA')
   
   # Check that the elements of the data_info attribute are all correct.

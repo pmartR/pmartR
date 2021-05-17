@@ -15,8 +15,7 @@ test_that("rmd_filter and applyFilt produce the correct output",{
                       e_meta = emeta,
                       edata_cname = "Mass_Tag_ID",
                       fdata_cname = "SampleID",
-                      emeta_cname = "Protein",
-                      data_scale_orig = "abundance")
+                      emeta_cname = "Protein")
   
   # Log transfigure the peptide data.
   pdata <- edata_transform(omicsData = pdata,
@@ -33,8 +32,7 @@ test_that("rmd_filter and applyFilt produce the correct output",{
                          e_meta = emeta,
                          edata_cname = "Mass_Tag_ID",
                          fdata_cname = "SampleID",
-                         emeta_cname = "Protein",
-                         data_scale_orig = "abundance")
+                         emeta_cname = "Protein")
   
   # Log transmogrify the peptide data with a singleton group.
   pdata_sg <- edata_transform(omicsData = pdata_sg,
@@ -55,8 +53,7 @@ test_that("rmd_filter and applyFilt produce the correct output",{
                         e_meta = emeta,
                         edata_cname = 'Metabolite',
                         fdata_cname = 'SampleID',
-                        emeta_cname = 'nmrClass',
-                        data_scale_orig = "abundance")
+                        emeta_cname = 'nmrClass')
   
   # Log transmute the nmr data.
   nmrdata <- edata_transform(omicsData = nmrdata,

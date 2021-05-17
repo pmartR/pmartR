@@ -14,8 +14,7 @@ test_that('normalize_global produces the correct output',{
                       e_meta = emeta,
                       edata_cname = "Mass_Tag_ID",
                       fdata_cname = "SampleID",
-                      emeta_cname = "Protein",
-                      data_scale_orig = "abundance")
+                      emeta_cname = "Protein")
   
   # Natural logate the data.
   pdata <- edata_transform(omicsData = pdata,
