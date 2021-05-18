@@ -1,108 +1,137 @@
 #' Quantile Normalization
 #'
-#' Perform quantile normalization 
+#' Perform quantile normalization
 #'
-#' @param omicsData an object of the class 'pepData', 'proData', 'metabData', 'lipidData', 'nmrData', created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, respectively. The function \code{\link{group_designation}} must have been run on omicsData to use several of the subset functions (i.e. rip and ppp_rip).
+#' @param omicsData an object of the class 'pepData', 'proData', 'metabData',
+#'   'lipidData', 'nmrData', created by \code{\link{as.pepData}},
+#'   \code{\link{as.proData}}, \code{\link{as.metabData}},
+#'   \code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, respectively. The
+#'   function \code{\link{group_designation}} must have been run on omicsData to
+#'   use several of the subset functions (i.e. rip and ppp_rip).
 #'
-#' @details Quantile normalization is an algorithm for normalizing a set of data vectors by giving them the same distribution. It is applied to data on the abundance scale (e.g. not a log scale). It is often used for microarry data. 
-#' @return The normalized data is returned in an object of the appropriate S3 class (e.g. pepData), on the same scale as omicsData (e.g. if omicsData contains log2 transformed data, the normalization will be performed on the non-log2 scale and then re-scaled after normalization to be returned on the log2 scale).
-#' 
+#' @details Quantile normalization is an algorithm for normalizing a set of data
+#'   vectors by giving them the same distribution. It is applied to data on the
+#'   abundance scale (e.g. not a log scale). It is often used for microarry
+#'   data.
+#'
+#' @return The normalized data is returned in an object of the appropriate S3
+#'   class (e.g. pepData), on the same scale as omicsData (e.g. if omicsData
+#'   contains log2 transformed data, the normalization will be performed on the
+#'   non-log2 scale and then re-scaled after normalization to be returned on the
+#'   log2 scale).
+#'
 #' @examples
-#' dontrun{
+#' \dontrun{
 #' library(pmartRdata)
 #' data(lipid_object)
 #' norm_data <- normalize_quantile(omicsData = lipid_object)
-#'}
+#' }
 #'
 #' @author Kelly Stratton
+#'
 #' @references
 #'
 #' @export
-normalize_quantile <- function(omicsData){
+#'
+normalize_quantile <- function (omicsData) {
+  
   ## initial checks ##
   
-  omicsData_orig <- omicsData
-  
-  # Store data class as it will be referred to often
-  dat_class <- class(omicsData)
-  
   # check that omicsData is of the appropriate class
-  if(!inherits(omicsData, c("proData","pepData","lipidData", "metabData", "nmrData"))) stop("omicsData is not an object of appropriate class")
-  
-  # data should be on raw scale #
-  if(attr(omicsData, "data_info")$data_scale %in% c("log2", "log10", "log")){
-    omicsData <- edata_transform(omicsData, "abundance")
+  if (!inherits(omicsData, c("proData", "pepData", "lipidData",
+                             "metabData", "nmrData"))) {
+    
+    # Stop the user with an error for sullying the fine reputation of pmart.
+    # RESPECT THE STANDARDS!
+    stop ("omicsData is not an object of appropriate class")
+    
   }
   
   # give message if proportion of missing data is > 0
-  if(attributes(omicsData)$data_info$prop_missing > 0){
-    message(paste("The proportion of missing data is ", round(attributes(omicsData)$data_info$prop_missing, 2), ". Quantile normalization only works with complete data. Consider using SPANS to choose an appropriate normalization method for a dataset that includes missing values.", sep=""))
+  if (attributes(omicsData)$data_info$prop_missing > 0) {
+    
+    # Stop the user for their barbaric use of pmart tools on the data.
+    stop (paste("The proportion of missing data is ",
+                round(attributes(omicsData)$data_info$prop_missing, 2),
+                ". Quantile normalization only works with complete data. ",
+                "Consider using SPANS to choose an appropriate normalization ",
+                "method for a dataset that includes missing values.",
+                sep = ""))
+    
   }
   
-  check_names <- getchecknames(omicsData)
-  edata_id <- attr(omicsData, "cnames")$edata_cname
-  samp_id <- attr(omicsData, "cnames")$fdata_cname
+  # Fish out the data scale of the input data. This will be used to convert the
+  # data back to the correct scale if the data are input on the log scale.
+  input_data_scale <- get_data_scale(omicsData)
+  
+  # data should be on raw scale #
+  if (get_data_scale(omicsData) %in% c("log2", "log10", "log")) {
+    omicsData <- edata_transform(omicsData, "abundance")
+  }
   
   ## end of initial checks ##
   
-  edata <- omicsData$e_data
-  edata_cnames <- names(edata)
-  edata_rnames <- row.names(edata)
-  edata_idcol <- as.character(edata[, edata_id])
+  # Pluck out the index of the column containing the metabolite IDs.
+  id_col <- which(names(omicsData$e_data) == get_edata_cname(omicsData))
   
-  # 1. transpose data so it is samples by molecules #
-  x <- t(edata[, -1])
+  # Rearrange the names of edata (if the metabolite ID column is not the first
+  # colum) because after normalization the metabolite ID column will be the
+  # first column of e_data.
+  edata_cnames <- c(names(omicsData$e_data[id_col]),
+                    names(omicsData$e_data[-id_col]))
   
-  # 2. sort each column of x to get x_sort # 
-  x_sort <- apply(x, 2, function(c) sort(c, na.last = FALSE))
-  x_ord <- apply(x, 2, function(c) order(c, na.last = FALSE))
+  # Extract the column containing the metabolite IDs. This will be used to
+  # reassemble e_data after normalization.
+  edata_idcol <- omicsData$e_data[, id_col]
   
-  for(i in 1:ncol(x)){
-    x_ord[, i] <- match(x_sort[, i], x[, i])
-  }
+  # 1. Transpose and sort/order each column of e_data in ascending order.
+  x_sort <- apply(t(omicsData$e_data[, -id_col]), 2,
+                  function(c) sort(c, na.last = FALSE))
+  x_ord <- apply(t(omicsData$e_data[, -id_col]), 2,
+                 function(c) order(c, na.last = FALSE))
   
-  # 3. take means across rows of x_sort and assign the mean to each element in the row to get x_sort_prime #
+  # 2. Compute the mean for each sorted row. These values will replace the
+  # original counts according to their order within each colum.
   row_means <- rowMeans(x_sort, na.rm = TRUE)
-  x_sort_prime <- array(row_means, dim = dim(x_sort))
   
-  # 4. get x_norm by rearranging each column of x_sort_prime to have same ordering as the original x #
-  x_norm <- x
-  temp_x_sort_prime <- rep(NA, nrow(x_norm))
-  for(i in 1:ncol(x_norm)){
-    temp_x_sort_prime[x_ord[, i]] <- x_sort_prime[, i]
-    x_norm[, i] <- temp_x_sort_prime
-    x_norm[, i] <- as.numeric(x_norm[, i])
+  # 3. Replace, within every row, each abundance value with its corresponding
+  # mean. For example, in row one the smallest abundance value will be replaced
+  # with the smallest mean, the second smallest abundance value will be replaced
+  # with the second smallest mean, and so on. This will be done for each row of
+  # x_sort.
+  x_norm <- omicsData$e_data[, -id_col]
+  for (i in 1:ncol(x_sort)) {
+    
+    # Replace abundance values with their corresponding means. The order of the
+    # means corresponds with the original order of the abundance values. For
+    # example, if the smallest abundance value in the first column of e_data
+    # occurs in row 5 then the smallest mean for this column will also be in row
+    # five (since we are working on the transposed data the column/row indices
+    # are switched).
+    x_norm[i, x_ord[, i]] <- row_means
+    
   }
   
-  # re-assemble omicsData #
-  edata_norm <- data.frame(cbind(edata_idcol, t(x_norm)))
-  names(edata_norm) <- edata_cnames
-  
-  edata_norm[, edata_id] <- as.character(edata_norm[, edata_id])
-  edata_norm[, -which(names(edata_norm) == edata_id)] <- apply(edata_norm[, -which(names(edata_norm) == edata_id)], 1, as.numeric)
+  # Reassemble e_data with the normalized data. NOTE: The ID column will now be
+  # the first column of e_data if it wasn't already.
+  omicsData$e_data <- data.frame(edata_idcol, x_norm)
+  names(omicsData$e_data) <- edata_cnames
   
   
-  # assign attributes # 
-  omicsData$e_data <- edata_norm
-  attributes(omicsData)$data_info$norm_info$is_normalized <- TRUE
-  attributes(omicsData)$data_info$norm_info$norm_type <- "quantile" # new attribute as of 12/21/17
-  # none of these other attributes are applicable for quantile normalization #
-  # attributes(omicsData)$data_info$norm_info$subset_fn = subset_fn
-  # attributes(omicsData)$data_info$norm_info$subset_params = params
-  # attributes(omicsData)$data_info$norm_info$norm_fn = norm_fn
-  # attributes(omicsData)$data_info$norm_info$n_features_calc = length(peps)
-  # attributes(omicsData)$data_info$norm_info$prop_features_calc = length(peps)/nrow(omicsData$e_data)
-  # attributes(omicsData)$data_info$norm_info$params$norm_scale = norm_results$norm_params$scale
-  # attributes(omicsData)$data_info$norm_info$params$norm_location = norm_results$norm_params$location
-  # attributes(omicsData)$data_info$norm_info$params$bt_scale = norm_results$backtransform_params$scale
-  # attributes(omicsData)$data_info$norm_info$params$bt_location = norm_results$backtransform_params$location
+  # Update the norm_info list within the data_info attribute.
+  attributes(omicsData)$data_info$norm_info <- list(
+    is_normalized = TRUE,
+    norm_type = "quantile" # new attribute as of 12/21/17
+  )
   
-  if(attributes(omicsData_orig)$data_info$data_scale != "abundance"){
-    omicsData <- edata_transform(omicsData, attributes(omicsData_orig)$data_info$data_scale)
+  # Check if the input data was on a log scale.
+  if (input_data_scale != "abundance") {
+    
+    # Transfigure the data back to the correct log scale.
+    omicsData <- edata_transform(omicsData, input_data_scale)
+    
   }
   
-  res <- omicsData
-  
-  return(res)
+  return(omicsData)
   
 }
