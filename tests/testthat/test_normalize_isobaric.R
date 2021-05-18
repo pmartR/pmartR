@@ -135,10 +135,6 @@ test_that('normalize_isobaric produces the correct output',{
                    attr(spec1, "cnames"))
   expect_identical(attr(isodata, "cnames"),
                    attr(spec2, "cnames"))
-  expect_identical(attr(isodata, "data_info"),
-                   attr(spec1, "data_info"))
-  expect_identical(attr(isodata, "data_info"),
-                   attr(spec2, "data_info"))
   expect_identical(attr(isodata, "meta_info"),
                    attr(spec1, "meta_info"))
   expect_identical(attr(isodata, "meta_info"),
@@ -147,6 +143,32 @@ test_that('normalize_isobaric produces the correct output',{
                    attr(spec1, "filters"))
   expect_identical(attr(isodata, "filters"),
                    attr(spec2, "filters"))
+  
+  # Sleuth around the data_info attribute.
+  expect_equal(
+    attr(spec1, "data_info"),
+    list(data_scale_orig = "abundance",
+         data_scale = "log",
+         norm_info = list(is_normalized = FALSE),
+         num_edata = length(unique(spec1$e_data[, 1])),
+         num_miss_obs = sum(is.na(spec1$e_data)),
+         prop_missing = (sum(is.na(spec1$e_data)) /
+                           prod(dim(spec1$e_data[, -1]))),
+         num_samps = ncol(spec1$e_data[, -1]),
+         data_types = NULL)
+  )
+  expect_equal(
+    attr(spec2, "data_info"),
+    list(data_scale_orig = "abundance",
+         data_scale = "log",
+         norm_info = list(is_normalized = FALSE),
+         num_edata = length(unique(spec2$e_data[, 1])),
+         num_miss_obs = sum(is.na(spec2$e_data)),
+         prop_missing = (sum(is.na(spec2$e_data)) /
+                           prod(dim(spec2$e_data[, -1]))),
+         num_samps = ncol(spec2$e_data[, -1]),
+         data_types = NULL)
+  )
   
   # Confirm the isobaric_info attributes are correct.
   expect_identical(attr(spec1, "isobaric_info"),

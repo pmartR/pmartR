@@ -77,6 +77,7 @@
 normalize_isobaric <- function (omicsData, exp_cname = NULL, apply_norm = FALSE,
                                 channel_cname = NULL, refpool_channel = NULL,
                                 refpool_cname = NULL, refpool_notation = NULL) {
+  
   # initial checks #
   
   #check that omicsData is of correct class
@@ -101,7 +102,7 @@ normalize_isobaric <- function (omicsData, exp_cname = NULL, apply_norm = FALSE,
     stop ("omicsData$e_data must be log transformed")
     
   }
-
+  
   # check that exp_cname is in f_data #
   if (!(exp_cname %in% names(omicsData$f_data))) {
     
@@ -173,6 +174,8 @@ normalize_isobaric <- function (omicsData, exp_cname = NULL, apply_norm = FALSE,
     omicsData$f_data[ , fdata_cname]
   )
   
+  # Prepare possibility 1 info -------------------------------------------------
+  
   # if possibility 1 is used, check that refpool_cname is a value seen in each
   # experiment.
   if (poss1 == TRUE) {
@@ -207,6 +210,8 @@ normalize_isobaric <- function (omicsData, exp_cname = NULL, apply_norm = FALSE,
     }
     
   }
+  
+  # Prepare possibility 2 info -------------------------------------------------
   
   # if possibility 2 is used, check that refpool_channel is a value seen in each
   # experiment.
@@ -243,6 +248,8 @@ normalize_isobaric <- function (omicsData, exp_cname = NULL, apply_norm = FALSE,
     
   }
   
+  # Set reference column IDs and sample names ----------------------------------
+  
   # Set the reference column and reference sample names according to the user's
   # input.
   if (!is.null(refpool_channel) && !is.null(channel_cname)) {
@@ -252,7 +259,7 @@ normalize_isobaric <- function (omicsData, exp_cname = NULL, apply_norm = FALSE,
     
     # Set the name of the reference samples
     ref_name <- refpool_channel
-
+    
   } else if (!is.null(refpool_cname) && !is.null(refpool_notation)) {
     
     # Set the name of the reference column.
@@ -263,6 +270,7 @@ normalize_isobaric <- function (omicsData, exp_cname = NULL, apply_norm = FALSE,
     
   }
   
+  # Carry out normalization/create isobaricnormRes object ----------------------
   
   #case where apply_norm is TRUE
   if (apply_norm == TRUE) {
@@ -283,6 +291,18 @@ normalize_isobaric <- function (omicsData, exp_cname = NULL, apply_norm = FALSE,
       norm_info = list(is_normalized = TRUE)
     )
     
+    # Update the data_info attribute because the reference samples have been
+    # removed from e_data and f_data.
+    attr(omicsData, 'data_info') <- set_data_info(
+      e_data = omicsData$e_data,
+      edata_cname = get_edata_cname(omicsData),
+      data_scale_orig = get_data_scale_orig(omicsData),
+      data_scale = get_data_scale(omicsData),
+      data_types = get_data_info(omicsData)$data_types,
+      norm_info = get_data_info(omicsData)$norm_info,
+      is_normalized = get_data_info(omicsData)$norm_info$is_normalized
+    )
+    
     # Return the normalized omicsData object along with its updated attributes.
     return (omicsData)
     
@@ -295,14 +315,14 @@ normalize_isobaric <- function (omicsData, exp_cname = NULL, apply_norm = FALSE,
     ]
     
     # Subset the columns of e_data pertaining to the reference samples.
-    edata <- omicsData$e_data[
-      , which(names(omicsData$e_data) %in% c(edata_cname, rfrnc_nms))
-    ]
+    edata <- omicsData$e_data[, which(
+      names(omicsData$e_data) %in% c(edata_cname, rfrnc_nms)
+    )]
     
     # Subset the rows of f_data corresponding to the reference samples.
-    fdata <- omicsData$f_data[
-      which(omicsData$f_data[, fdata_cname] %in% rfrnc_nms),
-    ]
+    fdata <- omicsData$f_data[which(
+      omicsData$f_data[, fdata_cname] %in% rfrnc_nms
+    ), ]
     
     # Create a list containing the columns and rows from e_data and f_data
     # that correspond to the reference samples.
@@ -323,7 +343,7 @@ normalize_isobaric <- function (omicsData, exp_cname = NULL, apply_norm = FALSE,
     
     # Return the isobaricnormRes object!!!
     return(result)
-
+    
   }
   
 }
