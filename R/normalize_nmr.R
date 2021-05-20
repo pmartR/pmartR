@@ -1,128 +1,157 @@
 #' Normalize an object of class nmrData
-#' 
-#' The data is normalied either to a spiked in metabolite or to a property 
+#'
+#' The data is normalied either to a spiked in metabolite or to a property
 #' taking sample-specific values
-#' 
+#'
 #' @param omicsData an object of the class 'nmrData'
-#' @param apply_norm logical, indicates whether normalization should be applied 
-#' to omicsData$e_data. Defaults to FALSE. If TRUE, the normalization is applied 
-#' to the data and an S3 object of the same class as \code{omicsData} (e.g. 'nmrData') 
-#' with normalized values in \code{e_data} is returned. If FALSE, the normalization 
-#' is not applied and an S3 object of the class \code{nmrnormRes} is returned, 
-#' allowing some exploratory data analysis prior to subsequently applying the 
-#' normalization.
-#' @param backtransform logical argument indicating if parameters for back 
-#' transforming the data, after normalization, should be calculated. Defaults to 
-#' FALSE. If TRUE, the parameters for back transforming the data after normalization 
-#' will be calculated, and subsequently included in the data normalization if 
-#' \code{apply_norm} is TRUE or \code{\link{apply.normRes}} is used downstream. 
-#' See details for an explanation of how these factors are calculated.
-#' @param metabolite_name optional character string specifying the name of the 
-#' (spiked in) metabolite in \code{e_data} to use for instrument normalization 
-#' of the nmrData object. These values will be used to divide the raw abundance 
-#' of the corresponding sample in e_data (if e_data is log transformed, this 
-#' function accounts for that and returns normalized data on the same scale it 
-#' was provided). If using this argument, the 'sample_property_cname' argument 
-#' should not be specified.
-#' @param sample_property_cname optional character string specifying the name of 
-#' the column in f_data containing information to use for instrument normalization 
-#' of the nmrData object, such as a concentration. These values will be used to 
-#' divide the raw abundance of the corresponding sample in e_data (if e_data is 
-#' log transformed, this function accounts for that by temporarily un-log transforming the data 
-#' and then returning normalized data on the same scale it was provided). If 
-#' using this argument, the 'metabolite_name' argument should not be specified.
-#' @details 
-#' #' There are two ways to specify the information needed for performing 
-#' instrument normalization on an nmrData object:
-#' \enumerate{
-#' \item specify \code{metabolite_name}. This should be used when normalization 
-#' to a spiked in standard is desired. Here \code{metabolite_name} gives the name 
-#' of the metabolite in e_data (and e_meta, if present) corresponding to the 
-#' spiked in standard. If any samples have a missing value for this metabolite, 
-#' an error is returned.
-#' \item specify \code{sample_property_cname}. This should be used when 
-#' normalization to a sample property, such as concentration, is desired. Here, 
-#' \code{sample_property_cname} gives the name of the column in \code{f_data} 
-#' which contains the property to use for normalization. If any samples have a 
-#' missing value for this column, and error is returned.
-#' }
-#' @section Backtransform:
-#' The purpose of back transforming data is to ensure values are on a scale 
-#' similar to their raw values before normalization. The following values are 
-#' calculated and/or applied for backtransformation purposes:
-#' \tabular{ll}{
-#' If normalization using a metabolite in \code{e_data} is specified \tab location 
-#' parameter is the median of the values for  \code{metabolite_name} \cr
-#' \tab \cr
-#' If normalization using a sample property in \code{f_data} is specified \tab 
-#' location parameter is the median of the values in \code{sample_property} \cr
-#' }
-#' See examples below.
-#' @examples  
-#' dontrun{ 
+#'
+#' @param apply_norm logical, indicates whether normalization should be applied
+#'   to omicsData$e_data. Defaults to FALSE. If TRUE, the normalization is
+#'   applied to the data and an S3 object of the same class as \code{omicsData}
+#'   (e.g. 'nmrData') with normalized values in \code{e_data} is returned. If
+#'   FALSE, the normalization is not applied and an S3 object of the class
+#'   \code{nmrnormRes} is returned, allowing some exploratory data analysis
+#'   prior to subsequently applying the normalization.
+#'
+#' @param backtransform logical argument indicating if parameters for back
+#'   transforming the data, after normalization, should be calculated. Defaults
+#'   to FALSE. If TRUE, the parameters for back transforming the data after
+#'   normalization will be calculated, and subsequently included in the data
+#'   normalization if \code{apply_norm} is TRUE or \code{\link{apply.normRes}}
+#'   is used downstream. See details for an explanation of how these factors are
+#'   calculated.
+#'
+#' @param metabolite_name optional character string specifying the name of the
+#'   (spiked in) metabolite in \code{e_data} to use for instrument normalization
+#'   of the nmrData object. These values will be used to divide the raw
+#'   abundance of the corresponding sample in e_data (if e_data is log
+#'   transformed, this function accounts for that and returns normalized data on
+#'   the same scale it was provided). If using this argument, the
+#'   'sample_property_cname' argument should not be specified.
+#' 
+#' @param sample_property_cname optional character string specifying the name of
+#'   the column in f_data containing information to use for instrument
+#'   normalization of the nmrData object, such as a concentration. These values
+#'   will be used to divide the raw abundance of the corresponding sample in
+#'   e_data (if e_data is log transformed, this function accounts for that by
+#'   temporarily un-log transforming the data and then returning normalized data
+#'   on the same scale it was provided). If using this argument, the
+#'   'metabolite_name' argument should not be specified.
+#'
+#' @details #' There are two ways to specify the information needed for
+#' performing instrument normalization on an nmrData object: \enumerate{ \item
+#' specify \code{metabolite_name}. This should be used when normalization to a
+#' spiked in standard is desired. Here \code{metabolite_name} gives the name of
+#' the metabolite in e_data (and e_meta, if present) corresponding to the spiked
+#' in standard. If any samples have a missing value for this metabolite, an
+#' error is returned. \item specify \code{sample_property_cname}. This should be
+#' used when normalization to a sample property, such as concentration, is
+#' desired. Here, \code{sample_property_cname} gives the name of the column in
+#' \code{f_data} which contains the property to use for normalization. If any
+#' samples have a missing value for this column, and error is returned. }
+#' @section Backtransform: The purpose of back transforming data is to ensure
+#'   values are on a scale similar to their raw values before normalization. The
+#'   following values are calculated and/or applied for backtransformation
+#'   purposes: \tabular{ll}{ If normalization using a metabolite in
+#'   \code{e_data} is specified \tab location parameter is the median of the
+#'   values for  \code{metabolite_name} \cr \tab \cr If normalization using a
+#'   sample property in \code{f_data} is specified \tab location parameter is
+#'   the median of the values in \code{sample_property} \cr } See examples
+#'   below.
+#' 
+#' @examples
+#' \dontrun{
 #' library(pmartRdata)
 #' data(nmr_object_identified)
-#' 
+#'
 #' nmr_object = edata_transform(nmr_object_identified, "log2")
-#' nmr_norm = normalize_nmr(nmr_object, apply_norm = TRUE, metabolite_name = "unkm1.53")
-#' 
+#' nmr_norm = normalize_nmr(nmr_object, apply_norm = TRUE,
+#'                          metabolite_name = "unkm1.53")
+#'
 #' # alternate specification: #
 #' data(nmr_object_identified)
-#' 
-#' nmr_object = edata_transform(nmr_object, "log2")
-#' nmr_norm = normalize_nmr(nmr_object, apply_norm = TRUE, sample_property_cname = "Concentration")
-#' 
-#' }
-#' 
-#' @export
 #'
-normalize_nmr<- function(omicsData, apply_norm = FALSE, backtransform = FALSE, metabolite_name = NULL, sample_property_cname = NULL){
+#' nmr_object = edata_transform(nmr_object, "log2")
+#' nmr_norm = normalize_nmr(nmr_object, apply_norm = TRUE,
+#'                          sample_property_cname = "Concentration")
+#'
+#' }
+#'
+#' @export
+#' 
+normalize_nmr<- function (omicsData,
+                          apply_norm = FALSE,
+                          backtransform = FALSE,
+                          metabolite_name = NULL,
+                          sample_property_cname = NULL) {
   
   ### --------------------------------------------- ###
   ### initial checks ###
   
   # check that omicsData is of correct class
-  if(!inherits(omicsData, "nmrData")) stop("omicsData must be of the class 'nmrData'")
+  if (!inherits(omicsData, "nmrData")) {
+    
+    stop("omicsData must be of the class 'nmrData'")
+    
+  }
   
-  # check whether omicsData$e_data is log transformed
-  if(!(attr(omicsData, "data_info")$data_scale %in% c('log2', 'log10', 'log'))){
-    is_log <- FALSE
-  }else{
+  # Check the current and original data scale of omicsData.
+  if (get_data_scale(omicsData) %in% c('log2', 'log10', 'log')) {
     is_log <- TRUE
+  } else {
+    is_log <- FALSE
+  }
+  if (get_data_scale_orig(omicsData) %in% c("log", "log2", "log10")) {
+    is_log_orig <- TRUE
+  } else {
+    is_log_orig <- FALSE
   }
   
   # check that apply_norm is of class logical
   if(!is.logical(apply_norm)) stop("apply_norm must be of class 'logical'")
   
   #check that backtransform is T/F #
-  if(!inherits(backtransform, "logical")) stop("backtransform must be of class 'logical'")
-  if(backtransform == TRUE){
-    backtransform_value <- NA # set it later
-  }else{
-    # backtransform is FALSE #
-    message("backtransform is set to FALSE. Examine the distribution of your data to ensure this is reasonable.")
+  if(!inherits(backtransform, "logical")) {
+    
+    stop("backtransform must be of class 'logical'")
+    
   }
   
   # if apply_norm is FALSE and backtransform is TRUE, throw error #
-  if(apply_norm == FALSE & backtransform == TRUE){stop("apply_norm is set to FALSE and backtransform is set to TRUE; a backtransform cannot be applied if the normalization is not being applied.")}
+  if(apply_norm == FALSE & backtransform == TRUE) {
+    
+    stop (paste("apply_norm is set to FALSE and backtransform is set to TRUE;",
+                "a backtransform cannot be applied if the normalization is not",
+                "being applied.",
+                sep = " "))
+    
+  }
   
   # pull some attributes from omicsData #
   edata_cname <- get_edata_cname(omicsData)
+  edata_idx <- which(names(omicsData$e_data) == edata_cname)
+  emeta_idx <- which(names(omicsData$e_meta) == edata_cname)
   fdata_cname <- get_fdata_cname(omicsData)
-  
-  edata <- omicsData$e_data
-  fdata <- omicsData$f_data
-  check_names <- getchecknames(omicsData)
   
   # check that metabolite_cname is in e_data, if not NULL #
   if(!is.null(metabolite_name)){
-    if(!(metabolite_name %in% omicsData$e_data[, edata_cname])) stop(paste("Metabolite", metabolite_cname, "is not found in e_data. See details of as.nmrData for specifying column names.", sep = " "))
+    if(!(metabolite_name %in% omicsData$e_data[, edata_idx])) {
+      stop(paste("Metabolite", metabolite_cname,
+                 "is not found in e_data. See details of as.nmrData for",
+                 "specifying column names.", sep = " "))
+    }
   }
   
   # check that sample_property_cname is in f_data, if not NULL #
   if(!is.null(sample_property_cname)){
-    if(!(sample_property_cname %in% names(omicsData$f_data))) stop(paste("Sample characteristic to use for normalization", sample_property_cname, "is not found in f_data. See details of as.nmrData for specifying column names.", sep = " "))
+    if(!(sample_property_cname %in% names(omicsData$f_data))) {
+      stop(paste("Sample characteristic to use for normalization",
+                 sample_property_cname,
+                 "is not found in f_data. See details of as.nmrData for",
+                 "specifying column names.", sep = " "))
+    }
   }
+  
   # make sure the reference pool info info is specified appropriately #
   # possibility 1: specify metabolite_cname #
   poss1 = !is.null(metabolite_name)
@@ -130,270 +159,499 @@ normalize_nmr<- function(omicsData, apply_norm = FALSE, backtransform = FALSE, m
   poss2 = !is.null(sample_property_cname) 
   
   # throw an error if neither or both of these are true #
-  if((poss1 + poss2) != 1) stop("Reference metabolite or sample property information was not correctly specified. See Details and Examples for more information.")
-  
-  # if possibility 1 is used, check that metabolite_name corresponds to a metabolite seen in every sample #
-  if(poss1 == TRUE){
-    if(!is.character(metabolite_name)) stop("metabolite_name must be of class 'character'")
+  if ((poss1 + poss2) != 1) {
     
-    rowind <- which(omicsData$e_data[, edata_cname] == metabolite_name)
+    stop (paste("Reference metabolite or sample property information was not",
+                "correctly specified. See Details and Examples for more",
+                "information.",
+                sep = " "))
     
-    reference_metabolite <- omicsData$e_data[rowind , -which(names(omicsData$e_data) == edata_cname)]
-  
-    if(!all(unlist(lapply(reference_metabolite, class)) == "numeric")){
-      # if TRUE, there's a problem with the values since they aren't all numeric #
-      stop(paste("Values for", metabolite_name, "must be numeric"))
-    }
-    # convert to numeric vector from data.frame with single row #
-    reference_metabolite <- as.numeric(omicsData$e_data[rowind , -which(names(omicsData$e_data) == edata_cname)])
-    
-    backtransform_value <- median(reference_metabolite, na.rm = TRUE)
-    
-    # make sure none are NA #
-    if(any(is.na(reference_metabolite))){stop(paste("Metabolite = ", metabolite_name, " is not observed in every sample. See Details and Examples for more information."))}
-    
-    # make sure none are 0 #
-    if(any(reference_metabolite == 0)){stop(paste("Metabolite = ", metabolite_name, " is not non-zero in every sample. See Details and Examples for more information."))}
   }
   
-  # if possibility 2 is used, check that sample_property_cname is present for every sample AND is not zero #
-  if(poss2 == TRUE){
-    if(!is.character(sample_property_cname)) stop("sample_property_cname must be of class 'character'")
+  # Prepare possibility 1 info -------------------------------------------------
+  
+  # if possibility 1 is used, check that metabolite_name corresponds to a
+  # metabolite seen in every sample #
+  if (poss1 == TRUE) {
+    
+    # Make sure the name of the reference metabolite is a character string.
+    if (!is.character(metabolite_name)) {
+      
+      stop ("metabolite_name must be of class 'character'")
+      
+    }
+    
+    # Fish out the row index of the reference metabolite.
+    rowind <- which(omicsData$e_data[, edata_idx] == metabolite_name)
+    
+    # Extract the row vector (minus the metabolite ID column) corresponding to
+    # the reference metabolite.
+    reference_metabolite <- omicsData$e_data[rowind , -edata_idx]
+    
+    # Ensure all values in the row vector are numeric.
+    if(!all(unlist(lapply(reference_metabolite, class)) == "numeric")){
+      # if TRUE, there's a problem with the values since they aren't all numeric
+      stop(paste("Values for", metabolite_name, "must be numeric"))
+    }
+    
+    # make sure none of the reference metabolite values are NA #
+    if (any(is.na(reference_metabolite))) {
+      
+      stop (paste("Metabolite =",
+                  metabolite_name,
+                  "is not observed in every sample. See Details and Examples",
+                  "for more information.",
+                  sep = " "))
+      
+    }
+    
+    # make sure none of the reference metabolite values are 0 #
+    if (any(reference_metabolite == 0)) {
+      
+      stop (paste("Metabolite =",
+                  metabolite_name,
+                  "is not non-zero in every sample. See Details and Examples",
+                  "for more information.",
+                  sep = " "))
+      
+    }
+    
+    # Convert to numeric vector from data.frame with single row. This removes
+    # column names, row indices, and matrix/data frame dimensions.
+    reference_metabolite <- as.numeric(reference_metabolite)
+    
+    # Compute the median for backtransforming purposes.
+    backtransform_value <- median(reference_metabolite, na.rm = TRUE)
+    
+    # Remove the reference metabolite row from e_data.
+    omicsData$e_data <- omicsData$e_data[-rowind, ]
+    
+    # Find the row index that corresponds to the reference metabolite in e_meta.
+    emeta_rowind <- which(omicsData$e_meta[, emeta_idx] == metabolite_name)
+    
+    # Remove the reference metabolite row from e_meta.
+    omicsData$e_meta <- omicsData$e_meta[-emeta_rowind, ]
+    
+  }
+  
+  # Prepare possibility 2 info -------------------------------------------------
+  
+  # if possibility 2 is used, check that sample_property_cname is present for
+  # every sample AND is not zero #
+  if (poss2 == TRUE) {
+    
+    # Make sure the sample property column name input is a character string.
+    if (!is.character(sample_property_cname)) {
+      
+      stop ("sample_property_cname must be of class 'character'")
+      
+    }
+    
+    # Extract the column in f_data containing the normalizing values.
+    sample_property <- omicsData$f_data[, sample_property_cname]
     
     # make sure the values in the column are numeric! #
-    sample_property <- omicsData$f_data[, sample_property_cname]
     if(!all(unlist(lapply(sample_property, class)) == "numeric")){
-      # if TRUE, there's a problem with the values since they aren't all numeric #
+      # if TRUE, there's a problem with the values since they aren't all numeric
       stop(paste("Values for", sample_property_cname, "must be numeric"))
     }
     
-    sample_property <- as.numeric(sample_property)
+    # make sure none of the normalizing values are NA #
+    if (any(is.na(sample_property))) {
+      
+      stop (paste("sample_property_cname =",
+                  sample_property_cname,
+                  "is not present for every sample. See Details and Examples",
+                  "for more information.",
+                  sep = " "))
+      
+    }
+    
+    # make sure none of the normalizing values are 0 #
+    if (any(sample_property == 0)) {
+      
+      stop (paste("sample_property_cname =",
+                  sample_property_cname,
+                  "is not non-zero for every sample. See Details and Examples",
+                  "for more information.",
+                  sep = " "))
+      
+    }
+    
+    # Convert the column vector to a numeric vector. This removes any column
+    # names, row indices, and matrix/data frame dimensions. Change the scale if
+    # the original and current data scales differ. If the two data scales are
+    # the same no change will be made to the scale of the vector.
+    sample_property <- mutate_fdata(
+      ds = get_data_scale(omicsData),
+      ds_orig = get_data_scale_orig(omicsData),
+      is_log = is_log,
+      is_log_orig = is_log_orig,
+      sample_property = as.numeric(sample_property)
+    )
+    
+    # Compute the median for backtransforming purposes.
     backtransform_value <- median(sample_property, na.rm = TRUE)
     
-    # make sure none are NA #
-    if(any(is.na(sample_property))){stop(paste("sample_property_cname=", sample_property_cname, " is not present for every sample. See Details and Examples for more information."))}
-    
-    # make sure none are 0 #
-    if(any(sample_property == 0)){stop(paste("sample_property_cname=", sample_property_cname, " is not non-zero for every sample. See Details and Examples for more information."))}
   }
   
-  ### --------------------------------------------- ###
+  # Normalize using possibility 1 ----------------------------------------------
   
-  
-  # set up attributes for nmr normalization information #
-  attr(omicsData, "nmr_info") = list(metabolite_name = metabolite_name, sample_property_cname = sample_property_cname, norm_info = list(is_normalized = FALSE, backtransform = backtransform))
-  
-  
-  ### --------------------------------------------- ###
-  ### use a reference metabolite to normalize the other metabolites ###
-  
-  if(poss1 == TRUE){
+  if (poss1 == TRUE) {
     
-    if(apply_norm == TRUE){
-      # apply the normalization; remove the reference metabolite from edata as well as the edata_cname column #
-      edata_new <- edata[-which(edata[, edata_cname] == metabolite_name), -which(names(edata) == edata_cname)]
+    # Check if the normalization will be applied to the data.
+    if (apply_norm) {
       
-      if(is_log == TRUE){
+      # Check if the data is on the log scale.
+      if (is_log) {
+        
         # we need to subtract reference_metabolite from all the others #
-        # note that if we are on log scale, then the reference_metabolite AND the
-        # backtransform_value are both also on the log scale #
-        edata_new <- edata_new - reference_metabolite
-        if(backtransform == TRUE){
-          # which log scale is the data on? #
-          data_scale <- attributes(omicsData)$data_info$data_scale
-          if(data_scale == "log2"){
-            edata_new <- edata_new + backtransform_value
-          }else{
-            if(data_scale == "log10"){
-              edata_new <- edata_new + backtransform_value
-            }else{
-              if(data_scale == "ln"){
-                edata_new <- edata_new + backtransform_value
-              }else{
-                stop("data_scale is not recognized as valid. Check attributes(omcisData)$data_info$data_scale")
-              }
-            }
-          }
+        # note that if we are on log scale, then the reference_metabolite AND
+        # the backtransform_value are both also on the log scale #
+        omicsData$e_data[, -edata_idx] <- (omicsData$e_data[, -edata_idx] -
+                                             rep(
+                                               reference_metabolite,
+                                               each = nrow(omicsData$e_data)
+                                             ))
+        
+        # Check if we should backtransform the data when on the log scale.
+        if (backtransform) {
+          
+          # Add the backtransform value to the normalized data.
+          omicsData$e_data[, -edata_idx] <- (omicsData$e_data[, -edata_idx] +
+                                               backtransform_value)
+          
+          # The backtransform argument is set to FALSE.
+        } else {
+          
+          # Throw down a message to let the user know they better be thinking
+          # long and hard about the decisions they are making. 
+          message(paste("backtransform is set to FALSE. Examine the",
+                        "distribution of your data to ensure this is",
+                        "reasonable.",
+                        sep = " "))
+          
         }
-      }else{
-        # is_log == FALSE, so we need to divide all the others by reference_metabolite #
-        edata_new <- edata_new / reference_metabolite
-        if(backtransform == TRUE){
-          edata_new <- edata_new * backtransform_value
+        
+        # Runs when is_log is FALSE
+      } else if (!is_log) {
+        
+        # Divide all other metabolites by reference_metabolite.
+        omicsData$e_data[, -edata_idx] <- (omicsData$e_data[, -edata_idx] /
+                                             rep(
+                                               reference_metabolite,
+                                               each = nrow(omicsData$e_data)
+                                             ))
+        
+        # Check if we need to backtransmute when not on the log scale.
+        if (backtransform) {
+          
+          # Multiply the non-log normalized data by the backtransmogrify value.
+          omicsData$e_data[, -edata_idx] <- (omicsData$e_data[, -edata_idx] *
+                                               backtransform_value)
+          
+          # The backtransmogrify argument is set to FALSE.
+        } else {
+          
+          # Throw down a message to let the user know they better be thinking
+          # long and hard about the decisions they are making. 
+          message(paste("backtransform is set to FALSE. Examine the",
+                        "distribution of your data to ensure this is",
+                        "reasonable.",
+                        sep = " "))
+          
         }
+        
       }
-      # reattach the edata_cname column to edata_new
-      metabolites_new <- omicsData$e_data[, edata_cname]
-      metabolites_new <- metabolites_new[-which(omicsData$e_data[, edata_cname] == metabolite_name)]
-      edata_new <- cbind(metabolites_new, edata_new)
-      names(edata_new)[1] <- edata_cname
       
-      norm_string <- paste0("nmrObject was normalized using metabolite_name: ", metabolite_name)
-      norm_params <- reference_metabolite
+      # Forge the nmr_info attribute.
+      attr(omicsData, "nmr_info") <- list(
+        metabolite_name = metabolite_name,
+        sample_property_cname = sample_property_cname,
+        norm_info = list(
+          is_normalized = TRUE,
+          backtransform = backtransform,
+          norm_method = paste("nmrObject was normalized using",
+                              "metabolite_name:",
+                              metabolite_name,
+                              sep = " "),
+          norm_params = reference_metabolite
+        )
+      )
       
-      # replace omicsData$e_data with normalized edata
-      omicsData$e_data <- edata_new
+      # Extract data_info attribute from omicsData. Some of the elements will be
+      # used to update this attribute.
+      dInfo <- attr(omicsData, 'data_info')
       
-      # need to update attributes containing summary info, since number of metabolites will change in the case that a row in edata was used to normalize ... probably need to re-create the data object and set the other attributes to their previous values #
-      attributes(omicsData)$data_info$num_edata <- length(unique(omicsData$e_data[, edata_cname]))
-      attributes(omicsData)$data_info$num_miss_obs <- sum(is.na(omicsData$e_data[,-which(names(omicsData$e_data)==edata_cname)]))
-      attributes(omicsData)$data_info$prop_missing <- mean(is.na(omicsData$e_data[,-which(names(omicsData$e_data)==edata_cname)]))
-      attributes(omicsData)$data_info$num_samps <- ncol(omicsData$e_data) - 1
+      # Update the data_info attribute because we removed a row from e_data.
+      attr(omicsData, "data_info") <- set_data_info(
+        e_data = omicsData$e_data,
+        edata_cname = edata_cname,
+        data_scale_orig = get_data_scale_orig(omicsData),
+        data_scale = get_data_scale(omicsData),
+        data_types = dInfo$data_types,
+        norm_info = dInfo$norm_info,
+        is_normalized = dInfo$norm_info$is_normalized
+      )
       
+      # Update the meta_info attribute because we removed a row from e_meta.
+      attr(omicsData, 'meta_info') <- set_meta_info(
+        e_meta = omicsData$e_meta,
+        emeta_cname = get_emeta_cname(omicsData)
+      )
       
-      # update nmr norm flag
-      attr(omicsData, "nmr_info")$norm_info$is_normalized = TRUE
+      # Return the normalized nmrData object for possibility 1.
+      return (omicsData)
       
-      # update attribute stating how data was normalized #
-      attr(omicsData, "nmr_info")$norm_info$how_normalized <- norm_string
+      # Create a nmrnormRes object: apply_norm is FALSE.
+    } else {
       
-      result <- omicsData
+      # apply_norm is FALSE in the reference metabolite case # want a list:
+      # Sample (fdata_cname col from f_data), Metabolite (single metabolite
+      # name), value (values for that metabolite from e_data)
+      result <- list(Sample = omicsData$f_data[, fdata_cname],
+                     Metabolite = metabolite_name,
+                     value = reference_metabolite)
       
-    }else{
-      # apply_norm is FALSE in the reference metabolite case #
-      # want a list: Sample (fdata_cname col from f_data), Metabolite (single metabolite name), value (values for that metabolite from e_data)
-      rowind <- which(omicsData$e_data[, edata_cname] == metabolite_name)
-      result <- list(Sample = omicsData$f_data[, fdata_cname], Metabolite = metabolite_name, value = as.numeric(omicsData$e_data[rowind, -which(names(omicsData$e_data) == edata_cname)]))
-      
-      # set class #
+      # Lay down the class.
       class(result) <- c("nmrnormRes", "list")
       
-      # set attributes #
-      attr(result, "cnames")$edata_cname = edata_cname
-      attr(result, "cnames")$fdata_cname = fdata_cname
-      attr(result, "nmr_info")$sample_property_cname <- NULL
-      attr(result, "nmr_info")$metabolite_name <- metabolite_name
+      # Set column name attributes.
+      attr(result, "cnames") <- list(edata_cname = edata_cname,
+                                     fdata_cname = fdata_cname)
+      
+      # Prepare the nmr_info attribute.
+      attr(result, "nmr_info") <- list(metabolite_name = metabolite_name,
+                                       sample_property_cname = NULL)
+      
+      # Return the un-normalized nmrnormRes object for possibility 1.
+      return (result)
       
     }
-  }
-  
-  ### --------------------------------------------- ###
-  ### use a sample property from fdata to normalize the samples ###
-  
-  if(poss2 == TRUE){
     
-    if(apply_norm == TRUE){
+  }
+  
+  # Normalize using possibility 2 ----------------------------------------------
+  
+  if (poss2 == TRUE) {
+    
+    # Check if the normalization will be applied to the data.
+    if (apply_norm) {
       
-      edata_new <- edata[ , -which(names(edata) == edata_cname)]
-      if(is_log == TRUE){
-        # NEW: we need to un-log the data and divide the samples by their 
-        # corresponding sample property values; if backtransforming, multiply
-        # by that value; then re-log the data
-        
-        # which log scale is the data on? #
-        data_scale <- attributes(omicsData)$data_info$data_scale
-
-        if(backtransform == TRUE){
-          if(data_scale == "log2"){
-            # un-log2 the data and divide by sample property
-            edata_new <- 2^edata_new / matrix(sample_property, nrow = nrow(edata_new), ncol = ncol(edata_new), byrow = TRUE)
-            # do the backtransform
-            edata_new <- edata_new * backtransform_value
-            # re-log2 to the data
-            # edata_new < log2(edata_new) # this doesn't work...spits out matrix of FALSE and the edata_new itself doesn't get changed from before
-            edata_new <- apply(edata_new, 2, log2)
-          }else{
-            if(data_scale == "log10"){
-              # un-log10 the data and divide by sample property
-              edata_new <- 10^edata_new / matrix(sample_property, nrow = nrow(edata_new), ncol = ncol(edata_new), byrow = TRUE)
-              # do the backtransform
-              edata_new <- edata_new * log10(backtransform_value)
-              # re-log10 the data
-              # edata_new <- log10(edata_new)
-              edata_new <- apply(edata_new, 2, log10)
-            }else{
-              if(data_scale == "ln"){
-                # un ln the data and divide by sample property
-                edata_new <- exp(edata_new) / matrix(sample_property, nrow = nrow(edata_new), ncol = ncol(edata_new), byrow = TRUE)
-                # do the backtransform
-                edata_new <- edata_new * ln(backtransform_value)
-                # re-ln the data
-                # edata_new <- log(edata_new)
-                edata_new <- apply(edata_new, 2, log)
-              }else{
-                stop("data_scale is not recognized as valid. Check attributes(omcisData)$data_info$data_scale")
-              }
-            }
-          }
-        }else{ # backtransform == FALSE
-          if(data_scale == "log2"){
-            # un-log2 the data and divide by sample property
-            edata_new <- 2^edata_new / matrix(sample_property, nrow = nrow(edata_new), ncol = ncol(edata_new), byrow = TRUE)
-            # re-log2 to the data
-            # edata_new < log2(edata_new)
-            edata_new <- apply(edata_new, 2, log2)
-          }else{
-            if(data_scale == "log10"){
-              # un-log10 the data and divide by sample property
-              edata_new <- 10^edata_new / matrix(sample_property, nrow = nrow(edata_new), ncol = ncol(edata_new), byrow = TRUE)
-              # re-log10 the data
-              # edata_new <- log10(edata_new)
-              edata_new <- apply(edata_new, 2, log10)
-            }else{
-              if(data_scale == "ln"){
-                # un ln the data and divide by sample property
-                edata_new <- exp(edata_new) / matrix(sample_property, nrow = nrow(edata_new), ncol = ncol(edata_new), byrow = TRUE)
-                # re-ln the data
-                # edata_new <- log(edata_new)
-                edata_new <- apply(edata_new, 2, log)
-              }else{
-                stop("data_scale is not recognized as valid. Check attributes(omcisData)$data_info$data_scale")
-              }
-            }
-          }
-        }
-        
-        edata_new <- data.frame(edata_new, check.names = check_names) # convert back to data.frame since the apply statements above switch it to matrix, array
-        
-        
-      }else{
-        # is_log == FALSE, so we need to divide samples by the sample_property
-        # and do the backtransform, if specified to do so #
-        edata_new <- edata_new / matrix(sample_property, nrow = nrow(edata_new), ncol = ncol(edata_new), byrow = TRUE)
-        if(backtransform == TRUE){
-          edata_new <- edata_new * backtransform_value
-        }
-      }
-      edata_new <- cbind(edata[, grep(edata_cname, names(edata))], edata_new)
-      names(edata_new)[1] <- edata_cname
+      # NMR normalize the heck out of the data with possibility 2.
+      omicsData$e_data <- nmrnorm(omicsData = omicsData,
+                                  is_log = is_log,
+                                  is_log_orig = is_log_orig,
+                                  backtransform = backtransform,
+                                  edata_idx = edata_idx,
+                                  backtransform_value = backtransform_value,
+                                  sample_property = sample_property)
       
-      norm_string <- paste0("nmrObject was normalized using sample property: ", sample_property_cname)
-      norm_params <- sample_property
+      # Forge the nmr_info attribute.
+      attr(omicsData, "nmr_info") <- list(
+        metabolite_name = metabolite_name,
+        sample_property_cname = sample_property_cname,
+        norm_info = list(
+          is_normalized = TRUE,
+          backtransform = backtransform,
+          norm_method = paste("nmrObject was normalized using",
+                              "sample property:",
+                              sample_property_cname,
+                              sep = " "),
+          norm_params = sample_property
+        )
+      )
       
-      # replace omicsData$e_data with normalized edata
-      omicsData$e_data <- edata_new
+      #!#!#!#!#!
+      # NOTE: No need to recalculate data_info and meta_info attributes for
+      # possibility 2 because no rows were removed from e_data or e_meta.
+      #!#!#!#!#!
       
-      # need to update attributes containing summary info, since number of metabolites will change in the case that a row in edata was used to normalize ... probably need to re-create the data object and set the other attributes to their previous values #
-      attributes(omicsData)$data_info$num_edata <- length(unique(omicsData$e_data[, edata_cname]))
-      attributes(omicsData)$data_info$num_miss_obs <- sum(is.na(omicsData$e_data[,-which(names(omicsData$e_data)==edata_cname)]))
-      attributes(omicsData)$data_info$prop_missing <- mean(is.na(omicsData$e_data[,-which(names(omicsData$e_data)==edata_cname)]))
-      attributes(omicsData)$data_info$num_samps <- ncol(omicsData$e_data) - 1
+      # Return the normalized nmrData object for possibility 1.
+      return (omicsData)
       
+      # Create a nmrnormRes object: apply_norm is FALSE.
+    } else {
       
-      # update nmr norm flag
-      attr(omicsData, "nmr_info")$norm_info$is_normalized = TRUE
-      
-      # update attribute stating how data was normalized #
-      attr(omicsData, "nmr_info")$norm_info$how_normalized <- norm_string
-      
-      result <- omicsData
-      
-    }else{
-      # apply_norm is FALSE in the sample property case #  
-      # want a list: Sample (fdata_cname col from f_data), sample property name (single column name from f_data), value (values for that metabolite from e_data)
-      result <- list(Sample = omicsData$f_data[, fdata_cname], Property = sample_property_cname, value = omicsData$f_data[, sample_property_cname])
+      # apply_norm is FALSE in the sample property case # want a list: Sample
+      # (fdata_cname col from f_data), sample property name (single column name
+      # from f_data), value (values for that metabolite from e_data)
+      result <- list(Sample = omicsData$f_data[, fdata_cname],
+                     Property = sample_property_cname,
+                     value = omicsData$f_data[, sample_property_cname])
       
       # set class #
       class(result) <- c("nmrnormRes", "list")
       
-      # set attributes #
-      attr(result, "cnames")$edata_cname = edata_cname
-      attr(result, "cnames")$fdata_cname = fdata_cname
-      attr(result, "nmr_info")$sample_property_cname <- sample_property_cname
-      attr(result, "nmr_info")$metabolite_name <- NULL
+      # Set column name attributes.
+      attr(result, "cnames") <- list(edata_cname = edata_cname,
+                                     fdata_cname = fdata_cname)
+      
+      # Prepare the nmr_info attribute.
+      attr(result, "nmr_info") <- list(
+        metabolite_name = NULL,
+        sample_property_cname = sample_property_cname
+      )
+      
+      # Return the un-normalized nmrnormRes object for possibility 2.
+      return (result)
+      
     }
+    
   }
   
-  return(result)
 }
 
+nmrnorm <- function (omicsData,
+                     is_log,
+                     is_log_orig,
+                     backtransform,
+                     edata_idx,
+                     backtransform_value,
+                     sample_property) {
+  
+  # Scenario 1: Normalize on abundance scale -----------------------------------
+  
+  # In this scenario the current data scale is abundance and the original data
+  # scale is either abundance or one of the three log scales. If the original
+  # data scale is abundance we will normalize the data without any reservations
+  # because both data scales are the same. However, if the original data scale
+  # is one of the log scales the sample property column in f_data was previously
+  # converted to the abundance scale (instead of converting the entire e_data
+  # data frame to the log scale). The data will then be normalized on the
+  # abundance scale.
+  if ((!is_log_orig && !is_log) || (is_log_orig && !is_log)) {
+    
+    # Normalize the data on the abundance scale.
+    omicsData$e_data[, -edata_idx] <- (omicsData$e_data[ , -edata_idx] /
+                                         rep(sample_property,
+                                             each = nrow(omicsData$e_data)))
+    
+    # Check if we should backtransmute the data when on the abundance scale.
+    if (backtransform) {
+      
+      # Backtransfigure the data.
+      omicsData$e_data[, -edata_idx] <- (omicsData$e_data[ , -edata_idx] *
+                                           backtransform_value)
+      
+      # The backtransform argument is set to FALSE.
+    } else {
+      
+      # Throw down a message to let the user know they better be thinking
+      # long and hard about the decisions they are making. 
+      message(paste("backtransform is set to FALSE. Examine the",
+                    "distribution of your data to ensure this is",
+                    "reasonable.",
+                    sep = " "))
+      
+    }
+    
+  }
+  
+  # Scenario 2: Normalize on log scale -----------------------------------------
+  
+  # In this scenario the current data scale is one of the three log scales and
+  # the original data scale is either abundance or one of the three log scales.
+  # If the original data is on the abundance scale the sample property column in
+  # f_data was previously converted to the log scale and the data are normalized
+  # on the log scale. If the original data is also on the log scale no changes
+  # were made to the sample property column in f_data and the normalization can
+  # proceed on the log scale.
+  if ((!is_log_orig && is_log) || (is_log_orig && is_log)) {
+    
+    # Normalize the data on the log scale.
+    omicsData$e_data[, -edata_idx] <- (omicsData$e_data[ , -edata_idx] -
+                                         rep(sample_property,
+                                             each = nrow(omicsData$e_data)))
+    
+    # Check if we should backtransmute the data when on the log scale.
+    if (backtransform) {
+      
+      # Backtransfigure the data.
+      omicsData$e_data[, -edata_idx] <- (omicsData$e_data[ , -edata_idx] +
+                                           backtransform_value)
+      
+      # The backtransform argument is set to FALSE.
+    } else {
+      
+      # Throw down a message to let the user know they better be thinking
+      # long and hard about the decisions they are making. 
+      message(paste("backtransform is set to FALSE. Examine the",
+                    "distribution of your data to ensure this is",
+                    "reasonable.",
+                    sep = " "))
+      
+    }
+    
+  }
+  
+  # Return the normalized data.
+  return (omicsData$e_data)
+  
+}
+
+
+mutate_fdata <- function (ds,
+                          ds_orig,
+                          is_log,
+                          is_log_orig,
+                          sample_property) {
+  
+  # Original data scale - abundance and current data scale - log.
+  if (!is_log_orig && is_log) {
+    
+    # Convert the sample property to the correct log scale.
+    switch (ds,
+            
+            "log" = {
+              
+              return (log(sample_property))
+              
+            },
+            
+            "log2" = {
+              
+              return (log2(sample_property))
+              
+            },
+            
+            "log10" = {
+              
+              return (log10(sample_property))
+              
+            })
+    
+    # Original data scale - log and current data scale - abundance.
+  } else if (is_log_orig && !is_log) {
+    
+    # Convert the sample property to the abundance scale depending on which log
+    # scale the data was originally on.
+    switch (ds_orig,
+            
+            "log" = {
+              
+              return (exp(sample_property))
+              
+              },
+            
+            "log2" = {
+              
+              return (2^sample_property)
+              
+              },
+            
+            "log10" = {
+              
+              return (10^sample_property)
+              
+              })
+    
+    # If both data_scale_orig and data_scale are on the same scale return the
+    # original sample_property vector that was input to the function.
+  } else {
+    
+    return (sample_property)
+    
+  }
+  
+}
