@@ -20,6 +20,24 @@ test_that('normalize_nmr produces the correct output',{
   lognmrdata <- edata_transform(omicsData = nmrdata,
                                 data_scale = "log")
   
+  # Take the natural log of the Concentration column in f_data. This will be
+  # used for an nmrData object whose original scale is the log scale.
+  logfdata <- fdata
+  logfdata$Concentration <- log(fdata$Concentration)
+  
+  # Create an nmrData object whose original scale is the log scale.
+  lnmrdata <- as.nmrData(e_data = lognmrdata$e_data,
+                         f_data = logfdata,
+                         e_meta = emeta,
+                         edata_cname = "Metabolite",
+                         fdata_cname = "SampleID",
+                         emeta_cname = "Bin",
+                         data_scale = "log")
+  
+  # Abundate the logged nmrData object.
+  anmrdata <- edata_transform(omicsData = lnmrdata,
+                              data_scale = "abundance")
+  
   # Calculate the normalization standards --------------------------------------
   
   # Grab all of the row indices with the reference metabolite.
@@ -180,7 +198,8 @@ test_that('normalize_nmr produces the correct output',{
                         fdata_cname = "SampleID",
                         techrep_cname = NULL))
   expect_equal(attr(spec1, "data_info"),
-               list(data_scale = "abundance",
+               list(data_scale_orig = "abundance",
+                    data_scale = "abundance",
                     norm_info = list(is_normalized = FALSE),
                     num_edata = 37,
                     num_miss_obs = 0,
@@ -209,7 +228,8 @@ test_that('normalize_nmr produces the correct output',{
                         fdata_cname = "SampleID",
                         techrep_cname = NULL))
   expect_equal(attr(spec2, "data_info"),
-               list(data_scale = "abundance",
+               list(data_scale_orig = "abundance",
+                    data_scale = "abundance",
                     norm_info = list(is_normalized = FALSE),
                     num_edata = 38,
                     num_miss_obs = 0,
@@ -275,7 +295,8 @@ test_that('normalize_nmr produces the correct output',{
                         fdata_cname = "SampleID",
                         techrep_cname = NULL))
   expect_equal(attr(spec1_log, "data_info"),
-               list(data_scale = "log",
+               list(data_scale_orig = "abundance",
+                    data_scale = "log",
                     norm_info = list(is_normalized = FALSE),
                     num_edata = 37,
                     num_miss_obs = 0,
@@ -304,7 +325,8 @@ test_that('normalize_nmr produces the correct output',{
                         fdata_cname = "SampleID",
                         techrep_cname = NULL))
   expect_equal(attr(spec2_log, "data_info"),
-               list(data_scale = "log",
+               list(data_scale_orig = "abundance",
+                    data_scale = "log",
                     norm_info = list(is_normalized = FALSE),
                     num_edata = 38,
                     num_miss_obs = 0,
@@ -321,7 +343,7 @@ test_that('normalize_nmr produces the correct output',{
                                               "using sample property:",
                                               "Concentration",
                                               sep = " "),
-                          norm_params = ref_spec2))
+                          norm_params = ref_spec2_log))
   )
   expect_equal(attr(spec2_log, "meta_info"),
                list(meta_data = TRUE,
@@ -362,7 +384,8 @@ test_that('normalize_nmr produces the correct output',{
                         fdata_cname = "SampleID",
                         techrep_cname = NULL))
   expect_equal(attr(spec1_bt, "data_info"),
-               list(data_scale = "abundance",
+               list(data_scale_orig = "abundance",
+                    data_scale = "abundance",
                     norm_info = list(is_normalized = FALSE),
                     num_edata = 37,
                     num_miss_obs = 0,
@@ -391,7 +414,8 @@ test_that('normalize_nmr produces the correct output',{
                         fdata_cname = "SampleID",
                         techrep_cname = NULL))
   expect_equal(attr(spec2_bt, "data_info"),
-               list(data_scale = "abundance",
+               list(data_scale_orig = "abundance",
+                    data_scale = "abundance",
                     norm_info = list(is_normalized = FALSE),
                     num_edata = 38,
                     num_miss_obs = 0,
@@ -447,7 +471,8 @@ test_that('normalize_nmr produces the correct output',{
                         fdata_cname = "SampleID",
                         techrep_cname = NULL))
   expect_equal(attr(spec1_log_bt, "data_info"),
-               list(data_scale = "log",
+               list(data_scale_orig = "abundance",
+                    data_scale = "log",
                     norm_info = list(is_normalized = FALSE),
                     num_edata = 37,
                     num_miss_obs = 0,
@@ -476,7 +501,8 @@ test_that('normalize_nmr produces the correct output',{
                         fdata_cname = "SampleID",
                         techrep_cname = NULL))
   expect_equal(attr(spec2_log_bt, "data_info"),
-               list(data_scale = "log",
+               list(data_scale_orig = "abundance",
+                    data_scale = "log",
                     norm_info = list(is_normalized = FALSE),
                     num_edata = 38,
                     num_miss_obs = 0,
@@ -493,11 +519,203 @@ test_that('normalize_nmr produces the correct output',{
                                               "using sample property:",
                                               "Concentration",
                                               sep = " "),
-                          norm_params = ref_spec2))
+                          norm_params = ref_spec2_log))
   )
   expect_equal(attr(spec2_log_bt, "meta_info"),
                list(meta_data = TRUE,
                     num_emeta = 38))
   expect_identical(attr(spec2_log_bt, "filters"), list())
+  
+  # Test normalize_nmr: when original data scale is log ------------------------
+  
+  # No backtransform ---------------
+  
+  # Use the second specification for identifying the reference samples
+  expect_message(
+    spec2_l <- normalize_nmr(lnmrdata,
+                             apply_norm = TRUE,
+                             backtransform = FALSE,
+                             sample_property_cname = "Concentration"),
+    paste("backtransform is set to FALSE. Examine the",
+          "distribution of your data to ensure this is",
+          "reasonable.",
+          sep = " ")
+  )
+  
+  # Use the second specification for identifying the reference samples
+  expect_message(
+    spec2_a <- normalize_nmr(anmrdata,
+                             apply_norm = TRUE,
+                             backtransform = FALSE,
+                             sample_property_cname = "Concentration"),
+    paste("backtransform is set to FALSE. Examine the",
+          "distribution of your data to ensure this is",
+          "reasonable.",
+          sep = " ")
+  )
+  
+  # Compare the normalization to the standards.
+  expect_identical(spec2_l$e_data[, -1],
+                   norm_spec2_log)
+  expect_equal(spec2_a$e_data[, -1],
+               norm_spec2)
+  
+  # Have a looksie at the class of the output for the two specifications.
+  expect_s3_class(spec2_l, "nmrData")
+  expect_s3_class(spec2_a, "nmrData")
+  
+  # Sleuth around the nmr_info attribute.
+  expect_equal(
+    attr(spec2_l, "nmr_info"),
+    list(metabolite_name = NULL,
+         sample_property_cname = "Concentration",
+         norm_info = list(is_normalized = TRUE,
+                          backtransform = FALSE,
+                          norm_method = paste("nmrObject was normalized",
+                                              "using sample property:",
+                                              "Concentration",
+                                              sep = " "),
+                          norm_params = ref_spec2_log))
+  )
+  expect_equal(
+    attr(spec2_a, "nmr_info"),
+    list(metabolite_name = NULL,
+         sample_property_cname = "Concentration",
+         norm_info = list(is_normalized = TRUE,
+                          backtransform = FALSE,
+                          norm_method = paste("nmrObject was normalized",
+                                              "using sample property:",
+                                              "Concentration",
+                                              sep = " "),
+                          norm_params = ref_spec2))
+  )
+  
+  # Poke around the remaining attributes.
+  expect_identical(attr(spec2_l, "cnames"),
+                   list(edata_cname = "Metabolite",
+                        emeta_cname = "Bin",
+                        fdata_cname = "SampleID",
+                        techrep_cname = NULL))
+  expect_equal(attr(spec2_l, "data_info"),
+               list(data_scale_orig = "log",
+                    data_scale = "log",
+                    norm_info = list(is_normalized = FALSE),
+                    num_edata = 38,
+                    num_miss_obs = 0,
+                    prop_missing = 0,
+                    num_samps = 41,
+                    data_types = NULL))
+  expect_equal(attr(spec2_l, "meta_info"),
+               list(meta_data = TRUE,
+                    num_emeta = 38))
+  expect_identical(attr(spec2_l, "filters"), list())
+  
+  expect_identical(attr(spec2_a, "cnames"),
+                   list(edata_cname = "Metabolite",
+                        emeta_cname = "Bin",
+                        fdata_cname = "SampleID",
+                        techrep_cname = NULL))
+  expect_equal(attr(spec2_a, "data_info"),
+               list(data_scale_orig = "log",
+                    data_scale = "abundance",
+                    norm_info = list(is_normalized = FALSE),
+                    num_edata = 38,
+                    num_miss_obs = 0,
+                    prop_missing = 0,
+                    num_samps = 41,
+                    data_types = NULL))
+  expect_equal(attr(spec2_a, "meta_info"),
+               list(meta_data = TRUE,
+                    num_emeta = 38))
+  expect_identical(attr(spec2_a, "filters"), list())
+  
+  # With backtransform ---------------
+  
+  # Use the second specification for identifying the reference samples
+  spec2_l_bt <- normalize_nmr(lnmrdata,
+                              apply_norm = TRUE,
+                              backtransform = TRUE,
+                              sample_property_cname = "Concentration")
+  
+  # Use the second specification for identifying the reference samples
+  spec2_a_bt <- normalize_nmr(anmrdata,
+                              apply_norm = TRUE,
+                              backtransform = TRUE,
+                              sample_property_cname = "Concentration")
+  
+  # Compare the normalization to the standards.
+  expect_identical(spec2_l_bt$e_data[, -1],
+                   norm_spec2_log_bt)
+  expect_equal(spec2_a_bt$e_data[, -1],
+               norm_spec2_bt)
+  
+  # Have a looksie at the class of the output for the two specifications.
+  expect_s3_class(spec2_l_bt, "nmrData")
+  expect_s3_class(spec2_a_bt, "nmrData")
+  
+  # Sleuth around the nmr_info attribute.
+  expect_equal(
+    attr(spec2_l_bt, "nmr_info"),
+    list(metabolite_name = NULL,
+         sample_property_cname = "Concentration",
+         norm_info = list(is_normalized = TRUE,
+                          backtransform = TRUE,
+                          norm_method = paste("nmrObject was normalized",
+                                              "using sample property:",
+                                              "Concentration",
+                                              sep = " "),
+                          norm_params = ref_spec2_log))
+  )
+  expect_equal(
+    attr(spec2_a_bt, "nmr_info"),
+    list(metabolite_name = NULL,
+         sample_property_cname = "Concentration",
+         norm_info = list(is_normalized = TRUE,
+                          backtransform = TRUE,
+                          norm_method = paste("nmrObject was normalized",
+                                              "using sample property:",
+                                              "Concentration",
+                                              sep = " "),
+                          norm_params = ref_spec2))
+  )
+  
+  # Poke around the remaining attributes.
+  expect_identical(attr(spec2_l_bt, "cnames"),
+                   list(edata_cname = "Metabolite",
+                        emeta_cname = "Bin",
+                        fdata_cname = "SampleID",
+                        techrep_cname = NULL))
+  expect_equal(attr(spec2_l_bt, "data_info"),
+               list(data_scale_orig = "log",
+                    data_scale = "log",
+                    norm_info = list(is_normalized = FALSE),
+                    num_edata = 38,
+                    num_miss_obs = 0,
+                    prop_missing = 0,
+                    num_samps = 41,
+                    data_types = NULL))
+  expect_equal(attr(spec2_l_bt, "meta_info"),
+               list(meta_data = TRUE,
+                    num_emeta = 38))
+  expect_identical(attr(spec2_l_bt, "filters"), list())
+  
+  expect_identical(attr(spec2_a_bt, "cnames"),
+                   list(edata_cname = "Metabolite",
+                        emeta_cname = "Bin",
+                        fdata_cname = "SampleID",
+                        techrep_cname = NULL))
+  expect_equal(attr(spec2_a_bt, "data_info"),
+               list(data_scale_orig = "log",
+                    data_scale = "abundance",
+                    norm_info = list(is_normalized = FALSE),
+                    num_edata = 38,
+                    num_miss_obs = 0,
+                    prop_missing = 0,
+                    num_samps = 41,
+                    data_types = NULL))
+  expect_equal(attr(spec2_a_bt, "meta_info"),
+               list(meta_data = TRUE,
+                    num_emeta = 38))
+  expect_identical(attr(spec2_a_bt, "filters"), list())
   
 })
