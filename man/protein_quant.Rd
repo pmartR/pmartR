@@ -12,37 +12,62 @@ protein_quant(
   single_pep = FALSE,
   single_observation = FALSE,
   combine_fn = "median",
-  use_parallel = TRUE
+  use_parallel = TRUE,
+  emeta_cols = NULL
 )
 }
 \arguments{
 \item{pepData}{an omicsData object of the class 'pepData'.}
 
-\item{method}{is one of four protein quantification methods, 'rollup', 'rrollup', 'qrollup' and 'zrollup'. When 'rollup' is selected, combine_fn must also be provided and will determine whether pquant_mean or pquant_median function will be used.}
+\item{method}{is one of four protein quantification methods, 'rollup',
+'rrollup', 'qrollup' and 'zrollup'. When 'rollup' is selected, combine_fn
+must also be provided and will determine whether pquant_mean or
+pquant_median function will be used.}
 
-\item{isoformRes}{is a list of data frames, the result of applying the 'bpquant' function to original pepData object. Defaults to NULL.}
+\item{isoformRes}{is a list of data frames, the result of applying the
+'bpquant' function to original pepData object. Defaults to NULL.}
 
-\item{qrollup_thresh}{is a numeric value; is the peptide abundance cutoff value. Is an argument to qrollup function.}
+\item{qrollup_thresh}{is a numeric value; is the peptide abundance cutoff
+value. Is an argument to qrollup function.}
 
-\item{single_pep}{logical indicating whether or not to remove proteins that have just a single peptide mapping to them, defaults to FALSE.}
+\item{single_pep}{logical indicating whether or not to remove proteins that
+have just a single peptide mapping to them, defaults to FALSE.}
 
-\item{single_observation}{logical indicating whether or not to remove peptides that have just a single observation, defaults to FALSE.}
+\item{single_observation}{logical indicating whether or not to remove
+peptides that have just a single observation, defaults to FALSE.}
 
 \item{combine_fn}{can either be 'mean' or 'median'.}
 
-\item{use_parallel}{logical indicating whether or not to use "doParallel" loop in applying rollup functions. Defaults to TRUE. Is an argument of rrollup, qrollup and zrollup functions.}
+\item{use_parallel}{logical indicating whether or not to use "doParallel"
+loop in applying rollup functions. Defaults to TRUE. Is an argument of
+rrollup, qrollup and zrollup functions.}
+
+\item{emeta_cols}{A character vector indicating additional columns of e_meta
+that should be kept after rolling up to the protein level. The default,
+NULL, only keeps the column containing the mapping variable along with the
+new columns created (peps_per_pro and n_peps_used).}
 }
 \value{
 an omicsData object of the class 'proData'
 }
 \description{
-This function takes in a pepData object, method (quantification method, mean, median or rrollup), and the optional argument isoformRes (defaults to NULL). An object of the class 'proData' is returned.
+This function takes in a pepData object, method (quantification method, mean,
+median or rrollup), and the optional argument isoformRes (defaults to NULL).
+An object of the class 'proData' is returned.
 }
 \details{
-If isoformRes is provided then, a temporary pepData object is formed using the isoformRes information as the e_meta component and the original pepData object will be used for e_data and f_data components. The emeta_cname for the temporary pepData object will be the 'protein_isoform' column of isoformRes. Then one of the three 'method' functions can be applied to the temporary pepData object to return a proData object. If isofromRes is left NULL, then depending on the input for 'method', the correct 'method' function is applied directly to the input pepData object and a proData object is returned.
+If isoformRes is provided then, a temporary pepData object is formed
+  using the isoformRes information as the e_meta component and the original
+  pepData object will be used for e_data and f_data components. The
+  emeta_cname for the temporary pepData object will be the 'protein_isoform'
+  column of isoformRes. Then one of the three 'method' functions can be
+  applied to the temporary pepData object to return a proData object. If
+  isofromRes is left NULL, then depending on the input for 'method', the
+  correct 'method' function is applied directly to the input pepData object
+  and a proData object is returned.
 }
 \examples{
-dontrun{
+\dontrun{
 library(pmartR)
 library(pmartRdata)
 
@@ -65,5 +90,8 @@ results2 = protein_quant(pepData = pep_object, method = 'rollup', combine_fn = '
 
 }
 \references{
-Webb-Robertson, B.-J. M., Matzke, M. M., Datta, S., Payne, S. H., Kang, J., Bramer, L. M., ... Waters, K. M. (2014). \emph{Bayesian Proteoform Modeling Improves Protein Quantification of Global Proteomic Measurements}. Molecular & Cellular Proteomics.: MCP, 13(12), 3639-3646.
+Webb-Robertson, B.-J. M., Matzke, M. M., Datta, S., Payne, S. H.,
+  Kang, J., Bramer, L. M., ... Waters, K. M. (2014). \emph{Bayesian
+  Proteoform Modeling Improves Protein Quantification of Global Proteomic
+  Measurements}. Molecular & Cellular Proteomics.: MCP, 13(12), 3639-3646.
 }
