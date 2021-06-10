@@ -590,7 +590,17 @@ nmrnorm <- function (omicsData,
   
 }
 
-
+# Convert the column in f_data used for normalizing to the correct scale. We are
+# assuming that the data in this column of f_data is on the same sacle as the
+# data in e_data when it was read in. For example, if the original data scale of
+# e_data is abundance and the current data scale is log we will assume the data
+# in f_data is on the abundance scale. The data in f_data will then need to be
+# converted to the log scale.
+# ds - A character vector indicating the current data scale.
+# ds_orig - A character vector indicating the original data scale.
+# is_log - Logical. Indicates whether the current data is on a log scale.
+# is_log_orig - Logical. Indicates whether the original data is on a log scale.
+# sample_property - A column of f_data used to normalize e_data.
 mutate_fdata <- function (ds,
                           ds_orig,
                           is_log,
@@ -646,11 +656,97 @@ mutate_fdata <- function (ds,
               
               })
     
-    # If both data_scale_orig and data_scale are on the same scale return the
-    # original sample_property vector that was input to the function.
+    # Original data is on a log scale and the current data is on a different log
+    # scale.
+  } else if (is_log_orig && is_log) {
+    
+    # Check if both log scales are the same. If they are then the
+    # sample_property column can be returned unaltered.
+    if (ds_orig == ds) {
+      
+      return (sample_property)
+      
+      # The two log scales are different from each other.
+    } else {
+      
+      # Convert sample_property from one log scale to another.
+      return (logify(ds = ds,
+                     ds_orig = ds_orig,
+                     sample_property = sample_property))
+      
+    }
+    
+    # Both data_scale_orig and data_scale are on the abundance scale.
   } else {
     
     return (sample_property)
+    
+  }
+  
+}
+
+# Convert the sample_property vector from one log scale to another.
+# ds - A character vector indicating the current data scale.
+# ds_orig - A character vector indicating the original data scale.
+# sample_property - A column of f_data used to normalize e_data.
+logify <- function (ds,
+                    ds_orig,
+                    sample_property) {
+  
+  # Convert the original data from the natural log scale to another log scale.
+  if (ds_orig == "log") {
+    
+    switch (ds,
+            
+            "log2" = {
+              
+              return (log2(exp(sample_property)))
+              
+            },
+            
+            "log10" = {
+              
+              return (log10(exp(sample_property)))
+              
+            })
+    
+  }
+  
+  # Convert the original data from the log 2 scale to another log scale.
+  if (ds_orig == "log2") {
+    
+    switch (ds,
+            
+            "log" = {
+              
+              return (log(2^sample_property))
+              
+            },
+            
+            "log10" = {
+              
+              return (log10(2^sample_property))
+              
+            })
+    
+  }
+  
+  # Convert the original data from the log 10 scale to another log scale.
+  if (ds_orig == "log10") {
+    
+    switch (ds,
+            
+            "log" = {
+              
+              return (log(10^sample_property))
+              
+            },
+            
+            "log2" = {
+              
+              return (log2(10^sample_property))
+              
+            })
     
   }
   

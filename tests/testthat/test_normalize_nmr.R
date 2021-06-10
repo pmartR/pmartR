@@ -718,4 +718,48 @@ test_that('normalize_nmr produces the correct output',{
                     num_emeta = 38))
   expect_identical(attr(spec2_a_bt, "filters"), list())
   
+  # Test mutate_fdata ----------------------------------------------------------
+  
+  # Inspect output when the original data scale is log.
+  expect_equal(mutate_fdata(ds = "log2",
+                            ds_orig = "log",
+                            is_log = TRUE,
+                            is_log_orig = TRUE,
+                            sample_property = log(fdata$Concentration)),
+               log2(fdata$Concentration))
+  expect_equal(mutate_fdata(ds = "log10",
+                            ds_orig = "log",
+                            is_log = TRUE,
+                            is_log_orig = TRUE,
+                            sample_property = log(fdata$Concentration)),
+               log10(fdata$Concentration))
+  
+  # Inspect output when the original data scale is log2.
+  expect_equal(mutate_fdata(ds = "log",
+                            ds_orig = "log2",
+                            is_log = TRUE,
+                            is_log_orig = TRUE,
+                            sample_property = log2(fdata$Concentration)),
+               log(fdata$Concentration))
+  expect_equal(mutate_fdata(ds = "log10",
+                            ds_orig = "log2",
+                            is_log = TRUE,
+                            is_log_orig = TRUE,
+                            sample_property = log2(fdata$Concentration)),
+               log10(fdata$Concentration))
+  
+  # Inspect output when the original data scale is log10.
+  expect_equal(mutate_fdata(ds = "log",
+                            ds_orig = "log10",
+                            is_log = TRUE,
+                            is_log_orig = TRUE,
+                            sample_property = log10(fdata$Concentration)),
+               log(fdata$Concentration))
+  expect_equal(mutate_fdata(ds = "log2",
+                            ds_orig = "log10",
+                            is_log = TRUE,
+                            is_log_orig = TRUE,
+                            sample_property = log10(fdata$Concentration)),
+               log2(fdata$Concentration))
+  
 })
