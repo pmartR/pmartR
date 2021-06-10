@@ -8,7 +8,7 @@
 \alias{applyFilt.proteomicsFilt}
 \alias{applyFilt.imdanovaFilt}
 \alias{applyFilt.customFilt}
-\title{Apply a S3 filter  object to a pmartR S3 object}
+\title{Apply a S3 filter object to a pmartR S3 object}
 \usage{
 applyFilt(filter_object, omicsData, ...)
 
