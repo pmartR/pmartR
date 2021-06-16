@@ -62,7 +62,7 @@
 #' results<- protein_quant(pepData = mypepData, method = 'rollup', combine_fn = 'median', isoformRes = NULL)
 #'
 #' #case where isoformRes is provided:
-#' results2 = protein_quant(pepData = pep_object, method = 'rollup', combine_fn = 'mean', isoformRes = isoformRes)
+#' results2 = protein_quant(pepData = mypepData, method = 'rollup', combine_fn = 'mean', isoformRes = isoformRes)
 #' }
 #'
 #' @rdname protein_quant
@@ -109,17 +109,20 @@ protein_quant <- function (pepData, method, isoformRes = NULL,
   # Extricate e_data column name index.
   edata_cname_id<- which(names(pepData$e_data) == edata_cname)
   
-  e_meta<- pepData$e_meta
-  
   # Prepare attribute info when isoformRes is present.
   if (!is.null(isoformRes)) {
+    
+    # Keep a copy of the original e_meta data frame. This will be used to
+    # compute the number of peptides used per protein at the end of the
+    # function.
+    e_meta <- pepData$e_meta
     
     # The following attributes are reset when the as.pepData function is called
     # and will need to be manually updated after creating a new pepData object
     # with the isoformRes_subset attribute.
     filtas <- attr(pepData, "filters")
     groupies <- attr(pepData, "group_DF")
-    scales <- attr(pepData, "data_scale_orig")
+    scales <- get_data_scale_orig(pepData)
     inovas <- attr(pepData, "imdanova")
     
     # we will extract 'isoformRes_subset' attribute from isoformRes, which is
@@ -234,6 +237,8 @@ protein_quant <- function (pepData, method, isoformRes = NULL,
   
   # Update e_meta after quantitation -------------------------------------------
   
+  # Check if isoformRes is NULL. results$e_meta will be updated differently
+  # depending on whether isoformRes is present.
   if (is.null(isoformRes)) {
     
     # Update e_meta with peptide counts.
@@ -252,31 +257,72 @@ protein_quant <- function (pepData, method, isoformRes = NULL,
       # Move n_pep_used to the end. This line will only make a change to the
       # order of the columns when qrollup is selected.
       dplyr::relocate(n_peps_used, .after = dplyr::last_col()) %>%
+      # Keep the mapping variable and new columns created plus any columns
+      # specified by the user.
       dplyr::select(dplyr::any_of(c(emeta_cname, "peps_per_pro",
                                     "n_peps_used", emeta_cols))) %>%
+      # Only keep distinct combinations of the columns that are kept.
       dplyr::distinct(dplyr::all_of(.)) %>%
       data.frame()
     
+    # The following runs when isoformRes is present. In this case n_peps_used
+    # will be calculated based on protein isoform instead of protein (which
+    # includes all isoforms).
   } else {
     
-    # if isoform is specified, proteins used in rollup will be unique peptides/protein found in isoformRes2
-    peps_used <- isoformRes2 %>%
-      dplyr::group_by(!!rlang::sym(emeta_cname)) %>%
-      dplyr::mutate(n_peps_used = dplyr::n()) %>%
-      dplyr::select(!!rlang::sym(emeta_cname), n_peps_used) %>%
-      dplyr::slice(1)
+    # Count the number of peptides per isoform. If qrollup was used this was
+    # already done in the qrollup function otherwise the peptides per isoform
+    # will be counted from the isoformRes_subset data frame.
+    peps_used <- if ("n_peps_used" %in% colnames(results$e_meta)) {
+      
+      # Extract counts from e_meta because peptides were counted in qrollup.
+      results$e_meta %>%
+        dplyr::select(!!rlang::sym(emeta_cname), n_peps_used) %>%
+        # Only keep unique combinations of emeta_cname and n_peps_used
+        dplyr::distinct(dplyr::all_of(.))
+      
+    } else {
+      
+      # Count peptides per isoform from the bpquant output.
+      isoformRes2 %>%
+        dplyr::group_by(Protein_Isoform) %>%
+        dplyr::mutate(n_peps_used = dplyr::n()) %>%
+        # Only keep the first row of each group.
+        dplyr::slice(1) %>%
+        dplyr::ungroup() %>%
+        dplyr::select(!!rlang::sym(emeta_cname), n_peps_used)
+      
+    }
     
-    # store total number of peptides mapping to each protein (different from above)
+    # store total number of peptides mapping to each protein (different from
+    # above)
     peps_per_protein = e_meta %>%
       dplyr::group_by(!!rlang::sym(emeta_cname)) %>%
       dplyr::mutate(peps_per_pro = dplyr::n()) %>%
-      dplyr::select(!!rlang::sym(emeta_cname), peps_per_pro) %>%
-      dplyr::slice(1)
+      # Keep the mapping variable, pep_per_pro, and any columns specified by the
+      # user.
+      dplyr::select(dplyr::any_of(c(emeta_cname, "peps_per_pro",
+                                    emeta_cols)))
+    
+    # Check if n_peps_used is a column in e_meta. This will only be the case if
+    # qrollup was used.
+    if ("n_peps_used" %in% colnames(results$e_meta)) {
+      
+      # Remove the n_peps_used column.
+      results$e_meta <- results$e_meta %>%
+        dplyr::select(-n_peps_used)
+      
+    }
     
     # join the two count columns to the output e_meta
     results$e_meta <- results$e_meta %>%
       dplyr::left_join(peps_per_protein, by = emeta_cname) %>%
-      dplyr::left_join(peps_used, by = emeta_cname)
+      dplyr::left_join(peps_used, by = emeta_cname) %>%
+      # Move any columns specified by the user after n_peps_used.
+      dplyr::relocate(dplyr::any_of(emeta_cols), .after = n_peps_used) %>%
+      # Only keep distinct combinations of the columns that are kept.
+      dplyr::distinct(dplyr::all_of(.)) %>%
+      data.frame()
     
   }
   

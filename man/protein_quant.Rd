@@ -85,7 +85,7 @@ isoformRes = bpquant(statRes = imd_anova_res, pepData = mypepData)
 results<- protein_quant(pepData = mypepData, method = 'rollup', combine_fn = 'median', isoformRes = NULL)
 
 #case where isoformRes is provided:
-results2 = protein_quant(pepData = pep_object, method = 'rollup', combine_fn = 'mean', isoformRes = isoformRes)
+results2 = protein_quant(pepData = mypepData, method = 'rollup', combine_fn = 'mean', isoformRes = isoformRes)
 }
 
 }

@@ -140,7 +140,7 @@ bpquant<- function (statRes, pepData, pi_not = .9,
                       isoformRes_func,
                       emeta_cname = emeta_cname,
                       edata_cname = edata_cname)
- isoformRes2<- data.table::rbindlist(isoformRes2) 
+ isoformRes2<- data.frame(data.table::rbindlist(isoformRes2))
  
  attr(isoformRes, "isoformRes_subset")<- isoformRes2
  

@@ -24,9 +24,22 @@ test_that('each rollup method correctly quantifies proteins',{
   pdata2 <- group_designation(omicsData = pdata,
                               main_effects = "Condition")
   
+  # Apply an IMD-ANOVA filter to pdata2 and save as pdata3.
+  pdata3 <- applyFilt(filter_object = imdanova_filter(omicsData = pdata2),
+                      omicsData = pdata2,
+                      min_nonmiss_anova = 2)
+  
   # Apply a filter to pdata2.
   pdata2 <- applyFilt(filter_object = molecule_filter(pdata2),
                       omicsData = pdata2)
+  
+  # Run some statisiticalness on the filtered data.
+  inova <- imd_anova(omicsData = pdata3,
+                     test_method = 'comb',
+                     pval_adjust = 'bon')
+  
+  # Run bpquant pdata with the IMD-ANOVA output as the statRes object.
+  bayes <- bpquant(statRes = inova, pepData = pdata3, parallel = FALSE)
   
   # Create objects that will be used throughout --------------------------------
   
@@ -240,8 +253,6 @@ test_that('each rollup method correctly quantifies proteins',{
   
   # Quantitate without isoformRes - rrollup ------------------------------------
   
-  # No filters or group_DF ---------------
-  
   # Quantitate using rrollup - median.
   rr_med <- protein_quant(pepData = pdata,
                           method = 'rrollup',
@@ -330,8 +341,6 @@ test_that('each rollup method correctly quantifies proteins',{
   attr(stan_qr_med, "data_info")$data_scale_orig <- "abundance"
   
   # Quantitate without isoformRes - qrollup ------------------------------------
-  
-  # No filters or group_DF ---------------
   
   # Quantitate using qrollup - median.
   qr_med <- protein_quant(pepData = pdata,
@@ -432,8 +441,6 @@ test_that('each rollup method correctly quantifies proteins',{
   
   # Quantitate without isoformRes - zrollup ------------------------------------
   
-  # No filters or group_DF ---------------
-  
   # Quantitate using zrollup - median.
   zr_med <- protein_quant(pepData = pdata,
                           method = 'zrollup',
@@ -445,5 +452,137 @@ test_that('each rollup method correctly quantifies proteins',{
   
   # Compare the output to the standards.
   expect_identical(stan_zr_med, zr_med)
+  
+  # Calculate standards with isoformRes - rollup -------------------------------
+  
+  # Find peptides in both pdata3 and bayes.
+  pepes <- which(
+    pdata3$e_data[, "Mass_Tag_ID"] %in%
+      attr(bayes, "isoformRes_subset")[, "Mass_Tag_ID"]
+  )
+  
+  # Combine e_data and e_meta with output from the bayes object.
+  merged_bayes <- merge(x = attr(bayes, "isoformRes_subset"),
+                        y = pdata3$e_data[pepes, ],
+                        by = "Mass_Tag_ID",
+                        all.x = FALSE,
+                        all.y = TRUE)
+  
+  # Count number of peptides per protein in the original e_meta object.
+  pepes_per_pro <- emeta %>%
+    dplyr::group_by(Protein) %>%
+    dplyr::mutate(peps_per_pro = dplyr::n()) %>%
+    dplyr::select(Protein, peps_per_pro)
+  
+  # Count number of peptides per protein in the original e_meta object and keep
+  # the column containing the peptide sequences.
+  pepes_per_pro2 <- emeta %>%
+    dplyr::group_by(Protein) %>%
+    dplyr::mutate(peps_per_pro = dplyr::n()) %>%
+    dplyr::select(Protein, peps_per_pro, Peptide_Sequence)
+  
+  # Standard for rollup - median.
+  stan_med_bayes <- as.proData(
+    e_data = merged_bayes %>%
+      dplyr::select(-Mass_Tag_ID, -Protein) %>%
+      dplyr::group_by(Protein_Isoform) %>%
+      dplyr::mutate(dplyr::across(.fns = median, na.rm = TRUE)) %>%
+      data.frame(),
+    f_data = pdata3$f_data,
+    e_meta = attr(bayes, "isoformRes_subset") %>%
+      dplyr::select(-Mass_Tag_ID) %>%
+      dplyr::group_by(Protein_Isoform) %>%
+      dplyr::mutate(n_peps_used = dplyr::n()) %>%
+      dplyr::left_join(pepes_per_pro2, by = "Protein") %>%
+      dplyr::relocate(n_peps_used, .after = peps_per_pro) %>%
+      dplyr::distinct(Protein, Protein_Isoform, peps_per_pro,
+                      n_peps_used, Peptide_Sequence) %>%
+      data.frame(),
+    edata_cname = "Protein_Isoform",
+    fdata_cname = "SampleID",
+    emeta_cname = "Protein_Isoform",
+    data_scale = "log"
+  )
+  
+  # Set the original data scale to abundance.
+  attr(stan_med_bayes, "data_info")$data_scale_orig <- "abundance"
+  
+  # Quantitate with isoformRes - rollup ----------------------------------------
+  
+  # Rollup the pepes to proteins with isoformRes and pquant median.
+  pq_med_bayes <- protein_quant(pepData = pdata,
+                                method = 'rollup',
+                                combine_fn = 'median',
+                                use_parallel = FALSE,
+                                isoformRes = bayes,
+                                emeta_cols = c("Peptide_Sequence"))
+  
+  # Compare the output to the standards.
+  expect_identical(stan_med_bayes, pq_med_bayes)
+  
+  # Calculate standards with isoformRes - qrollup ------------------------------
+  
+  # Apply qrollup median.
+  edata_med <-  merged_bayes %>%
+    dplyr::select(-Mass_Tag_ID, -Protein) %>%
+    dplyr::nest_by(Protein_Isoform) %>%
+    dplyr::mutate(qtile = list(qtile(cData = data,
+                                     fn = combine_fn_median,
+                                     qthold = 0.4))) %>%
+    dplyr::select(Protein_Isoform, qtile) %>%
+    tidyr::unnest(cols = c(Protein_Isoform, qtile)) %>%
+    data.frame()
+  rownames(edata_med) <- NULL
+  
+  # Match the protein counts with proteins in e_meta.
+  qr_pepes <- dplyr::inner_join(x = attr(bayes, "isoformRes_subset"),
+                                y = edata_med[, c(1, 14)])
+  
+  # Standard for qrollup - median.
+  stan_qr_med_bayes <- as.proData(
+    e_data = edata_med[, -14],
+    f_data = pdata3$f_data,
+    e_meta = attr(bayes, "isoformRes_subset") %>%
+      dplyr::select(-Mass_Tag_ID) %>%
+      dplyr::group_by(Protein_Isoform) %>%
+      dplyr::mutate(n_peps_used = dplyr::n()) %>%
+      dplyr::left_join(pepes_per_pro, by = "Protein") %>%
+      dplyr::relocate(n_peps_used, .after = peps_per_pro) %>%
+      dplyr::distinct(Protein, Protein_Isoform, peps_per_pro, n_peps_used) %>%
+      data.frame(),
+    edata_cname = "Protein_Isoform",
+    fdata_cname = "SampleID",
+    emeta_cname = "Protein_Isoform",
+    data_scale = "log"
+  )
+  
+  # Update e_meta with the qrollup pepe counts.
+  stan_qr_med_bayes$e_meta$n_peps_used <- dplyr::distinct(
+    qr_pepes, Protein, n_pepes
+  )$n_pepes
+  
+  # Set the original data scale to abundance.
+  attr(stan_qr_med_bayes, "data_info")$data_scale_orig <- "abundance"
+  
+  # Quantitate with isoformRes - qrollup ---------------------------------------
+  
+  # Quantitate using qrollup - median.
+  qr_med_bayes <- protein_quant(pepData = pdata,
+                                method = 'qrollup',
+                                combine_fn = 'median',
+                                qrollup_thresh = 0.4,
+                                use_parallel = FALSE,
+                                isoformRes = bayes)
+  
+  # Reorder the rows in the standard because the nest_by function creates a
+  # different order than the qrollup function.
+  stan_qr_med_bayes$e_data <- stan_qr_med_bayes$e_data[match(
+    qr_med_bayes$e_data$Protein_Isoform,
+    stan_qr_med_bayes$e_data$Protein_Isoform
+  ), ]
+  rownames(stan_qr_med_bayes$e_data) <- NULL
+  
+  # Compare the output to the standards.
+  expect_identical(stan_qr_med_bayes, qr_med_bayes)
   
 })
