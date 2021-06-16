@@ -20,9 +20,7 @@ protein_quant(
 \item{pepData}{an omicsData object of the class 'pepData'.}
 
 \item{method}{is one of four protein quantification methods, 'rollup',
-'rrollup', 'qrollup' and 'zrollup'. When 'rollup' is selected, combine_fn
-must also be provided and will determine whether pquant_mean or
-pquant_median function will be used.}
+'rrollup', 'qrollup' and 'zrollup'.}
 
 \item{isoformRes}{is a list of data frames, the result of applying the
 'bpquant' function to original pepData object. Defaults to NULL.}

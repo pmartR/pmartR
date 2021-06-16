@@ -1017,6 +1017,11 @@ as.proData <- function (e_data, f_data, e_meta = NULL,
   # implemented on one data set.
   attr(res, "filters") <- list()
   
+  # Set the protein quantitation attribute to NA. This will be updated to one of
+  # rollup, qrollup, rrollup, or zrollup if/when a pepData object is rolled up
+  # to a proData object.
+  attr(res, "pro_quant_info") <- list(method = NA)
+  
   # set class of list #
   class(res) = "proData"
   

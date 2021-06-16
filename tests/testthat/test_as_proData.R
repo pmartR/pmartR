@@ -29,7 +29,7 @@ test_that('as.proData returns the correct data frame and attributes',{
   # Confirm the correct attributes are present in the proData object.
   expect_equal(names(attributes(prdata)),
                c("names", "cnames", "data_info", "check.names", "meta_info",
-                 "filters", "class"))
+                 "filters", "pro_quant_info", "class"))
   
   # Scrutinize the column names attribute.
   expect_equal(attr(prdata, "cnames"),
@@ -65,6 +65,9 @@ test_that('as.proData returns the correct data frame and attributes',{
   # Take a looksie at the filters attribute.
   expect_identical(attr(prdata, "filters"), list())
   
+  # Make sure the protein quantitation attribute is NA.
+  expect_true(is.na(attr(prdata, "pro_quant_info")$method))
+  
   # Ensure the omicsData object is classy.
   expect_s3_class(prdata, "proData")
   
@@ -86,7 +89,7 @@ test_that('as.proData returns the correct data frame and attributes',{
   # Confirm the correct attributes are present in the proData object.
   expect_equal(names(attributes(prdata)),
                c("names", "cnames", "data_info", "check.names", "meta_info",
-                 "filters", "class"))
+                 "filters", "pro_quant_info", "class"))
   
   # Scrutinize the column names attribute.
   expect_equal(attr(prdata, "cnames"),
@@ -121,6 +124,9 @@ test_that('as.proData returns the correct data frame and attributes',{
   
   # Take a looksie at the filters attribute.
   expect_identical(attr(prdata, "filters"), list())
+  
+  # Make sure the protein quantitation attribute is NA.
+  expect_true(is.na(attr(prdata, "pro_quant_info")$method))
   
   # Ensure the omicsData object is classy.
   expect_s3_class(prdata, "proData")
@@ -169,7 +175,7 @@ test_that('as.proData returns the correct data frame and attributes',{
   # Confirm the correct attributes are present in the proData object.
   expect_equal(names(attributes(prdata)),
                c("names", "cnames", "data_info", "check.names", "meta_info",
-                 "filters", "class"))
+                 "filters", "pro_quant_info", "class"))
   
   # Scrutinize the column names attribute.
   expect_equal(attr(prdata, "cnames"),
@@ -205,6 +211,9 @@ test_that('as.proData returns the correct data frame and attributes',{
   # Take a looksie at the filters attribute.
   expect_identical(attr(prdata, "filters"), list())
   
+  # Make sure the protein quantitation attribute is NA.
+  expect_true(is.na(attr(prdata, "pro_quant_info")$method))
+  
   # Ensure the omicsData object is classy.
   expect_s3_class(prdata, "proData")
   
@@ -231,7 +240,7 @@ test_that('as.proData returns the correct data frame and attributes',{
   # Confirm the correct attributes are present in the proData object.
   expect_equal(names(attributes(prdata)),
                c("names", "cnames", "data_info", "check.names", "meta_info",
-                 "filters", "class"))
+                 "filters", "pro_quant_info", "class"))
   
   # Scrutinize the column names attribute.
   expect_equal(attr(prdata, "cnames"),
@@ -266,6 +275,9 @@ test_that('as.proData returns the correct data frame and attributes',{
   
   # Take a looksie at the filters attribute.
   expect_identical(attr(prdata, "filters"), list())
+  
+  # Make sure the protein quantitation attribute is NA.
+  expect_true(is.na(attr(prdata, "pro_quant_info")$method))
   
   # Ensure the omicsData object is classy.
   expect_s3_class(prdata, "proData")
@@ -304,7 +316,7 @@ test_that('as.proData returns the correct data frame and attributes',{
   # Confirm the correct attributes are present in the proData object.
   expect_equal(names(attributes(prdata)),
                c("names", "cnames", "data_info", "check.names", "meta_info",
-                 "filters", "class"))
+                 "filters", "pro_quant_info", "class"))
   
   # Scrutinize the column names attribute.
   expect_equal(attr(prdata, "cnames"),
@@ -339,6 +351,9 @@ test_that('as.proData returns the correct data frame and attributes',{
   
   # Take a looksie at the filters attribute.
   expect_identical(attr(prdata, "filters"), list())
+  
+  # Make sure the protein quantitation attribute is NA.
+  expect_true(is.na(attr(prdata, "pro_quant_info")$method))
   
   # Ensure the omicsData object is classy.
   expect_s3_class(prdata, "proData")

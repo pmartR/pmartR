@@ -94,6 +94,9 @@ test_that('each rollup method correctly quantifies proteins',{
   # Set the original data scale to abundance.
   attr(stan_med, "data_info")$data_scale_orig <- "abundance"
   
+  # Set the protein quantitation method to rollup.
+  attr(stan_med, "pro_quant_info")$method <- "rollup"
+  
   # Standard for rollup - mean.
   stan_mea <- as.proData(
     e_data = merged %>%
@@ -118,6 +121,9 @@ test_that('each rollup method correctly quantifies proteins',{
   
   # Set the original data scale to abundance.
   attr(stan_mea, "data_info")$data_scale_orig <- "abundance"
+  
+  # Set the protein quantitation method to rollup.
+  attr(stan_mea, "pro_quant_info")$method <- "rollup"
   
   # With filters and group_DF ---------------
   
@@ -144,6 +150,9 @@ test_that('each rollup method correctly quantifies proteins',{
   
   # Set the original data scale to abundance.
   attr(stan_med2, "data_info")$data_scale_orig <- "abundance"
+  
+  # Set the protein quantitation method to rollup.
+  attr(stan_med2, "pro_quant_info")$method <- "rollup"
   
   # Update the group_DF attribute.
   attr(stan_med2, "group_DF") <- groupies
@@ -251,6 +260,9 @@ test_that('each rollup method correctly quantifies proteins',{
   # Set the original data scale to abundance.
   attr(stan_rr_med, "data_info")$data_scale_orig <- "abundance"
   
+  # Set the protein quantitation method to rrollup.
+  attr(stan_rr_med, "pro_quant_info")$method <- "rrollup"
+  
   # Quantitate without isoformRes - rrollup ------------------------------------
   
   # Quantitate using rrollup - median.
@@ -339,6 +351,9 @@ test_that('each rollup method correctly quantifies proteins',{
   
   # Set the original data scale to abundance.
   attr(stan_qr_med, "data_info")$data_scale_orig <- "abundance"
+  
+  # Set the protein quantitation method to qrollup.
+  attr(stan_qr_med, "pro_quant_info")$method <- "qrollup"
   
   # Quantitate without isoformRes - qrollup ------------------------------------
   
@@ -439,6 +454,9 @@ test_that('each rollup method correctly quantifies proteins',{
   # Set the original data scale to abundance.
   attr(stan_zr_med, "data_info")$data_scale_orig <- "abundance"
   
+  # Set the protein quantitation method to zrollup.
+  attr(stan_zr_med, "pro_quant_info")$method <- "zrollup"
+  
   # Quantitate without isoformRes - zrollup ------------------------------------
   
   # Quantitate using zrollup - median.
@@ -507,6 +525,9 @@ test_that('each rollup method correctly quantifies proteins',{
   # Set the original data scale to abundance.
   attr(stan_med_bayes, "data_info")$data_scale_orig <- "abundance"
   
+  # Set the protein quantitation method to rollup.
+  attr(stan_med_bayes, "pro_quant_info")$method <- "rollup"
+  
   # Quantitate with isoformRes - rollup ----------------------------------------
   
   # Rollup the pepes to proteins with isoformRes and pquant median.
@@ -563,6 +584,9 @@ test_that('each rollup method correctly quantifies proteins',{
   
   # Set the original data scale to abundance.
   attr(stan_qr_med_bayes, "data_info")$data_scale_orig <- "abundance"
+  
+  # Set the protein quantitation method to qrollup.
+  attr(stan_qr_med_bayes, "pro_quant_info")$method <- "qrollup"
   
   # Quantitate with isoformRes - qrollup ---------------------------------------
   
