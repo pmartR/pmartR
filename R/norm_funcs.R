@@ -97,7 +97,7 @@ median_center <- function (e_data,
       
       # Compute the global median (for the subsetted data). So it isn't quite a
       # global median :)
-      glob_median <- median(e_data[id_rows, -id_col], na.rm = TRUE)
+      glob_median <- median(as.matrix(e_data[id_rows, -id_col]), na.rm = TRUE)
       
     }
     
@@ -254,7 +254,7 @@ mean_center <- function (e_data,
       
       # Compute the global median (for the subsetted data). So it isn't quite a
       # global median :)
-      glob_median <- median(e_data[id_rows, -id_col], na.rm = TRUE)
+      glob_median <- median(as.matrix(e_data[id_rows, -id_col]), na.rm = TRUE)
       
     }
     
@@ -433,7 +433,7 @@ zscore_transform <- function (e_data,
       
       # Compute the global mean (for the subsetted data). So it isn't quite a
       # global mean :)
-      glob_mean <- mean(e_data[id_rows, -id_col], na.rm = TRUE)
+      glob_mean <- mean(as.matrix(e_data[id_rows, -id_col]), na.rm = TRUE)
       
     }
     
@@ -617,7 +617,7 @@ mad_transform <- function (e_data,
       
       # Compute the global median (for the subsetted data). So it isn't quite a
       # global median :)
-      glob_median <- median(e_data[id_rows, -id_col], na.rm = TRUE)
+      glob_median <- median(as.matrix(e_data[id_rows, -id_col]), na.rm = TRUE)
       
     }
     
