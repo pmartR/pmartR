@@ -99,6 +99,12 @@ test_that("rmd_filter and applyFilt produce the correct output",{
                  0.153, 0.260, 0.220, 0.167, 0.160, 0.167))
   
   # Inspectify the filter object attributes.
+  expect_equal(attr(pfilter_rmd, "sample_names"),
+               c("Infection1", "Infection2", "Infection3", "Infection4",
+                 "Infection5", "Infection6", "Infection7", "Infection8",
+                 "Infection9", "Mock1", "Mock2", "Mock3"))
+  expect_equal(attr(pfilter_rmd, "group_DF"),
+               attr(pdata, "group_DF"))
   expect_equal(attr(pfilter_rmd, "df"),
                5)
   expect_equal(attr(pfilter_rmd, "metrics"),
@@ -186,6 +192,16 @@ test_that("rmd_filter and applyFilt produce the correct output",{
                  0.913, 0.947, 0.948, 0.930, 0.922))
   
   # Run standard diagnostics on the filter object attributes.
+  expect_equal(attr(nmrfilter_rmd, "sample_names"),
+               c("F3-049", "F3-097", "F3-002", "F3-050", "F3-098", "F3-013",
+                 "F3-061", "F3-109", "F3-062", "F3-110", "F3-025", "F3-073",
+                 "F3-121", "F3-026", "F3-074", "F3-122", "F3-085", "F3-133",
+                 "F3-038", "F3-086", "F3-134", "F4-001", "F4-009", "F4-065",
+                 "F4-005", "F4-069", "F4-037", "F4-017", "F4-045", "F4-021",
+                 "F4-049", "F4-081", "F4-025", "F4-053", "F4-085", "F4-029",
+                 "F4-057", "F4-089", "F4-033", "F4-061", "F4-093"))
+  expect_equal(attr(nmrfilter_rmd, "group_DF"),
+               attr(nmrdata, "group_DF"))
   expect_equal(attr(nmrfilter_rmd, "df"),
                4)
   expect_equal(attr(nmrfilter_rmd, "metrics"),
@@ -233,6 +249,13 @@ test_that("rmd_filter and applyFilt produce the correct output",{
                  0.220, 0.153, 0.260, 0.220))
   
   # Inspectify the filter object attributes.
+  expect_equal(attr(pfilter_rmd_sg, "sample_names"),
+               c("Infection1", "Infection2", "Infection3", "Infection4",
+                 "Infection5", "Infection6", "Infection7", "Infection8",
+                 "Infection9"))
+  temp_grp_df <- attr(pdata_sg, "group_DF")[-10, ]
+  expect_equal(attr(pfilter_rmd_sg, "group_DF"),
+               temp_grp_df)
   expect_equal(attr(pfilter_rmd_sg, "df"),
                5)
   expect_equal(attr(pfilter_rmd_sg, "metrics"),
@@ -274,6 +297,12 @@ test_that("rmd_filter and applyFilt produce the correct output",{
                  0.220, 0.153, 0.260, 0.220, 0.167))
   
   # Inspectify the filter object attributes.
+  expect_equal(attr(pfilter_rmd_sg_f, "sample_names"),
+               c("Infection1", "Infection2", "Infection3", "Infection4",
+                 "Infection5", "Infection6", "Infection7", "Infection8",
+                 "Infection9", "Mock1"))
+  expect_equal(attr(pfilter_rmd_sg_f, "group_DF"),
+               attr(pdata_sg, "group_DF"))
   expect_equal(attr(pfilter_rmd_sg_f, "df"),
                5)
   expect_equal(attr(pfilter_rmd_sg_f, "metrics"),

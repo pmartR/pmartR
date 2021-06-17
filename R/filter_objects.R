@@ -728,6 +728,12 @@ rmd_filter <- function (omicsData,
   
   class(output) <- c("rmdFilt", orig_class)
   
+  # Add the sample names in e_data to attributes.
+  attr(output, "sample_names") <- names(omicsData$e_data[, -id_col])
+  
+  # Add the group designation information to the attributes.
+  attr(output, "group_DF") <- attr(omicsData, "group_DF")
+  
   # Sum the number of metrics actually calculated.
   attr(output, "df") <- sum(!is.na(metrics_final))
   
