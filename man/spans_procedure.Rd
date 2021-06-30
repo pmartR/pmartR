@@ -19,81 +19,146 @@ spans_procedure(
 )
 }
 \arguments{
-\item{omicsData}{an object of the class 'pepData' or 'proData' created by \code{\link{as.pepData}} or \code{\link{as.proData}} respectively. The data must be log transformed (using edata_transform()) and have a grouping structure, usually set by calling group_designation() on the object.}
+\item{omicsData}{an object of the class 'pepData' or 'proData' created by
+\code{\link{as.pepData}} or \code{\link{as.proData}} respectively. The data
+must be log transformed (using edata_transform()) and have a grouping
+structure, usually set by calling group_designation() on the object.}
 
-\item{norm_fn}{character vector indicating the normalization functions to test. See details for the current offerings.}
+\item{norm_fn}{character vector indicating the normalization functions to
+test. See details for the current offerings.}
 
-\item{subset_fn}{character vector indicating which subset functions to test. See details for the current offerings.}
+\item{subset_fn}{character vector indicating which subset functions to test.
+See details for the current offerings.}
 
-\item{params}{list of additional arguments passed to the chosen subset functions. See details for parameter specification and default values.}
+\item{params}{list of additional arguments passed to the chosen subset
+functions. See details for parameter specification and default values.}
 
-\item{group}{character specifying a column name in f_data that gives the group assignment of the samples.  Defaults to NULL, in which case the grouping structure given in \code{attr(omicsData, 'group_DF')} is used.}
+\item{group}{character specifying a column name in f_data that gives the
+group assignment of the samples.  Defaults to NULL, in which case the
+grouping structure given in \code{attr(omicsData, 'group_DF')} is used.}
 
-\item{n_iter}{number of iterations used in calculating the background distribution in step 0 of SPANS.  Defaults to 1000.}
+\item{n_iter}{number of iterations used in calculating the background
+distribution in step 0 of SPANS.  Defaults to 1000.}
 
-\item{sig_thresh}{numeric value that specifies the maximum p-value for which a biomolecule can be considered highly significant based on a Kruskal-Wallis test.  Defaults to 0.0001.}
+\item{sig_thresh}{numeric value that specifies the maximum p-value for which
+a biomolecule can be considered highly significant based on a
+Kruskal-Wallis test.  Defaults to 0.0001.}
 
-\item{nonsig_thresh}{numeric value that specifies the minimum p-value for which a biomolecule can be considered non-significant based on a Kruskal-Wallis test.  Defaults to 0.5.}
+\item{nonsig_thresh}{numeric value that specifies the minimum p-value for
+which a biomolecule can be considered non-significant based on a
+Kruskal-Wallis test.  Defaults to 0.5.}
 
-\item{min_nonsig}{integer value specifying the minimum number of non-significant biomolecules identified in step 0 of SPANS in order to proceed.  nonsig_thresh will be adjusted to the maximum value that gives this many biomolecules.}
+\item{min_nonsig}{integer value specifying the minimum number of
+non-significant biomolecules identified in step 0 of SPANS in order to
+proceed.  nonsig_thresh will be adjusted to the maximum value that gives
+this many biomolecules.}
 
-\item{min_sig}{integer value specifying the minimum number of highly significant biomolecules identified in step 0 of SPANS in order to proceed.  sig_thresh will be adjusted to the minimum value that gives this many biomolecules.}
+\item{min_sig}{integer value specifying the minimum number of highly
+significant biomolecules identified in step 0 of SPANS in order to proceed.
+sig_thresh will be adjusted to the minimum value that gives this many
+biomolecules.}
 
-\item{...}{Additional arguments
-\tabular{ll}{
-\code{location_thresh, scale_thresh} The minimum p-value resulting from a Kruskal-Wallis test on the location and scale parameters resulting from a normalization method in order for that method to be considered a candidate for scoring.\cr  
-\code{verbose} Logical specifying whether to print the completion of SPANS procedure steps to console.  Defaults to TRUE.\cr
-\code{parallel} Logical specifying whether to use a parallel backend.  Depending on the size of your data, setting this to FALSE can cause the algorithm to be very slow.  Defaults to TRUE.
-}}
+\item{...}{Additional arguments \tabular{ll}{ \code{location_thresh,
+scale_thresh} The minimum p-value resulting from a Kruskal-Wallis test on
+the location and scale parameters resulting from a normalization method in
+order for that method to be considered a candidate for scoring.\cr
+\code{verbose} Logical specifying whether to print the completion of SPANS
+procedure steps to console.  Defaults to TRUE.\cr \code{parallel} Logical
+specifying whether to use a parallel backend.  Depending on the size of
+your data, setting this to FALSE can cause the algorithm to be very slow.
+Defaults to TRUE. }}
 
-\item{max_sig/max_nonsig}{integer value specifying the maximum number of highly significant/non-significant biomolecules identified in step 0 if SPANS in order to proceed.  Excesses of highly significant/non-significant biomolecules will be randomly sampled down to these values.}
+\item{max_sig/max_nonsig}{integer value specifying the maximum number of
+highly significant/non-significant biomolecules identified in step 0 if
+SPANS in order to proceed.  Excesses of highly significant/non-significant
+biomolecules will be randomly sampled down to these values.}
 }
 \value{
-An object of class 'SPANSRes', which is a dataframe containing columns for the subset method and normalization used, the parameters used in the subset method, and the corresponding SPANS score.  \cr
+An object of class 'SPANSRes', which is a dataframe containing
+  columns for the subset method and normalization used, the parameters used
+  in the subset method, and the corresponding SPANS score.  \cr
 
-The column 'mols_used_in_norm' contains the number of molecules that were selected by the subset method and subsequently used to determine the location/scale parameters for normalization.  The column 'passed selection' is \code{TRUE} if the subset+normalization procedure was selected for scoring.\cr
+  The column 'mols_used_in_norm' contains the number of molecules that were
+  selected by the subset method and subsequently used to determine the
+  location/scale parameters for normalization.  The column 'passed selection'
+  is \code{TRUE} if the subset+normalization procedure was selected for
+  scoring.\cr
 
-The attribute 'method_selection_pvals' is a dataframe containing information on the p values used to determine if a method was selected for scoring (location_p_value, scale_p_value) as well as the probabilities (F_log_HSmPV, F_log_NSmPV) given by the empirical cdfs generated in the first step of SPANS.
+  The attribute 'method_selection_pvals' is a dataframe containing
+  information on the p values used to determine if a method was selected for
+  scoring (location_p_value, scale_p_value) as well as the probabilities
+  (F_log_HSmPV, F_log_NSmPV) given by the empirical cdfs generated in the
+  first step of SPANS.
 }
 \description{
-Ranks different combinations of subsetting and normalization methods based on a score that captures how much bias a particular normalization procedure introduces into the data.  Higher score implies less bias.
+Ranks different combinations of subsetting and normalization methods based on
+a score that captures how much bias a particular normalization procedure
+introduces into the data.  Higher score implies less bias.
 }
 \details{
 Below are details for specifying function and parameter options.
 }
 \section{Subset Functions}{
-
-Specifying a subset function indicates the subset of features (rows of \code{e_data}) that should be used for computing normalization factors. The following are valid options: "all", "los", "ppp", "rip", and "ppp_rip". \cr
-\tabular{ll}{
-\tab "all" is the subset that includes all features (i.e. no subsetting is done). \cr
-\tab "los" identifies the subset of the features associated with the top \code{L}, where \code{L} is a proportion between 0 and 1, order statistics. Specifically, the features with the top \code{L} proportion of highest absolute abundance are retained for each sample, and the union of these features is taken as the subset identified (Wang et al., 2006). \cr
-\tab "ppp" (orignally stands for percentage of peptides present) identifies the subset of features that are present/non-missing for a minimum \code{proportion} of samples (Karpievitch et al., 2009; Kultima et al., 2009). \cr
-\tab "complete" subset of features that have no missing data across all samples.  Equivalent to "ppp" with proportion = 1. \cr
-\tab "rip" identifies features with complete data that have a p-value greater than a defined threshold \code{alpha} (common values include 0.1 or 0.25) when subjected to a Kruskal-Wallis test based (non-parametric one-way ANOVA) on group membership (Webb-Robertson et al., 2011). \cr
-\tab "ppp_rip" is equivalent to "rip" however rather than requiring features with complete data, features with at least a \code{proportion} of non-missing values are subject to the Kruskal-Wallis test.\cr
-}
+ Specifying a subset function indicates the subset
+  of features (rows of \code{e_data}) that should be used for computing
+  normalization factors. The following are valid options: "all", "los",
+  "ppp", "rip", and "ppp_rip". \cr \tabular{ll}{ \tab "all" is the subset
+  that includes all features (i.e. no subsetting is done). \cr \tab "los"
+  identifies the subset of the features associated with the top \code{L},
+  where \code{L} is a proportion between 0 and 1, order statistics.
+  Specifically, the features with the top \code{L} proportion of highest
+  absolute abundance are retained for each sample, and the union of these
+  features is taken as the subset identified (Wang et al., 2006). \cr \tab
+  "ppp" (orignally stands for percentage of peptides present) identifies the
+  subset of features that are present/non-missing for a minimum
+  \code{proportion} of samples (Karpievitch et al., 2009; Kultima et al.,
+  2009). \cr \tab "complete" subset of features that have no missing data
+  across all samples.  Equivalent to "ppp" with proportion = 1. \cr \tab
+  "rip" identifies features with complete data that have a p-value greater
+  than a defined threshold \code{alpha} (common values include 0.1 or 0.25)
+  when subjected to a Kruskal-Wallis test based (non-parametric one-way
+  ANOVA) on group membership (Webb-Robertson et al., 2011). \cr \tab
+  "ppp_rip" is equivalent to "rip" however rather than requiring features
+  with complete data, features with at least a \code{proportion} of
+  non-missing values are subject to the Kruskal-Wallis test.\cr }
 }
 
 \section{Normalization Functions}{
-
-Specifying a normalization function indicates how normalization scale and location parameters should be calculated. The following are valid options: "median", "mean", "zscore", and "mad". Parameters for median centering are calculated if "median" is specified. The location estimates are the sample-wise medians of the subset data. There are no scale estimates for median centering. Parameters for mean centering are calculated if "mean" is specified. The location estimates are the sample-wise means of the subset data. There are no scale estimates for median centering. Parameters for z-score transformation are calculated if "zscore" is specified. The location estimates are the subset means for each sample. The scale estimates are the subset standard deviations for each sample. Parameters for median absolute deviation (MAD) transformation are calculated if "mad" is specified.
+ Specifying a normalization function
+  indicates how normalization scale and location parameters should be
+  calculated. The following are valid options: "median", "mean", "zscore",
+  and "mad". Parameters for median centering are calculated if "median" is
+  specified. The location estimates are the sample-wise medians of the subset
+  data. There are no scale estimates for median centering. Parameters for
+  mean centering are calculated if "mean" is specified. The location
+  estimates are the sample-wise means of the subset data. There are no scale
+  estimates for median centering. Parameters for z-score transformation are
+  calculated if "zscore" is specified. The location estimates are the subset
+  means for each sample. The scale estimates are the subset standard
+  deviations for each sample. Parameters for median absolute deviation (MAD)
+  transformation are calculated if "mad" is specified.
 }
 
 \section{Specifying Subset Parameters Using the \code{params} argument}{
 
-Parameters for the chosen subset function should be specified in a list.  The list elements should have names corresponding to the subset function inputs and contain a \emph{list} of numeric values.  The elements of ppp_rip will be length 2 numeric vectors, corresponding to the parameters for ppp and rip.  See examples.
+  Parameters for the chosen subset function should be specified in a list.
+  The list elements should have names corresponding to the subset function
+  inputs and contain a \emph{list} of numeric values.  The elements of
+  ppp_rip will be length 2 numeric vectors, corresponding to the parameters
+  for ppp and rip.  See examples.
 
-The following subset functions have parameters that can be specified:
-\tabular{ll}{
-los \tab list of values between 0 and 1 indicating the top proportion of order statistics. Defaults to list(0.05,0.1,0.2,0.3) if unspecified. \cr
-\tab \cr
-ppp \tab list of values between 0 and 1 specifying the proportion of samples that must have non-missing values for a feature to be retained. Defaults to list(0.1,0.25,0.50,0.75) if unspecified. \cr
-\tab \cr
-rip \tab list of values between 0 and 1 specifying the p-value threshold for determining rank invariance. Defaults to list(0.1,0.15,0.2,0.25) if unspecified. \cr
-\tab \cr
-ppp_rip \tab list of length 2 numeric vectors corresponding to the RIP and PPP parameters above. Defaults list(c(0.1,0.1), c(0.25, 0.15), c(0.5, 0.2), c(0.75,0.25)) if unspecified.
-\cr
-}
+  The following subset functions have parameters that can be specified:
+  \tabular{ll}{ los \tab list of values between 0 and 1 indicating the top
+  proportion of order statistics. Defaults to list(0.05,0.1,0.2,0.3) if
+  unspecified. \cr \tab \cr ppp \tab list of values between 0 and 1
+  specifying the proportion of samples that must have non-missing values for
+  a feature to be retained. Defaults to list(0.1,0.25,0.50,0.75) if
+  unspecified. \cr \tab \cr rip \tab list of values between 0 and 1
+  specifying the p-value threshold for determining rank invariance. Defaults
+  to list(0.1,0.15,0.2,0.25) if unspecified. \cr \tab \cr ppp_rip \tab list
+  of length 2 numeric vectors corresponding to the RIP and PPP parameters
+  above. Defaults list(c(0.1,0.1), c(0.25, 0.15), c(0.5, 0.2), c(0.75,0.25))
+  if unspecified. \cr }
 }
 
 \examples{
@@ -116,7 +181,10 @@ pep_object <- group_designation(pep_object, main_effects = "Condition")
 
 }
 \references{
-Webb-Robertson BJ, Matzke MM, Jacobs JM, Pounds JG, Waters KM. A statistical selection strategy for normalization procedures in LC-MS proteomics experiments through dataset-dependent ranking of normalization scaling factors. Proteomics. 2011;11(24):4736-41.
+Webb-Robertson BJ, Matzke MM, Jacobs JM, Pounds JG, Waters KM. A
+  statistical selection strategy for normalization procedures in LC-MS
+  proteomics experiments through dataset-dependent ranking of normalization
+  scaling factors. Proteomics. 2011;11(24):4736-41.
 }
 \author{
 Daniel Claborne

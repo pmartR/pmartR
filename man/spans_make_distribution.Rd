@@ -2,25 +2,47 @@
 % Please edit documentation in R/spans.R
 \name{spans_make_distribution}
 \alias{spans_make_distribution}
-\title{Creates the list of median p-values used to make the background distribution used to compute the SPANS score in step 2.}
+\title{Creates the list of median p-values used to make the background distribution
+used to compute the SPANS score in step 2.}
 \usage{
-spans_make_distribution(omicsData, norm_fn, sig_inds, nonsig_inds, select_n)
+spans_make_distribution(
+  omicsData,
+  group_vector,
+  norm_fn,
+  sig_inds,
+  nonsig_inds,
+  select_n
+)
 }
 \arguments{
-\item{omicsData}{an object of the class 'pepData', 'proData', 'lipidData', or 'metabData' usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.lipidData}}, or  \code{\link{as.metabData}}, respectively.}
+\item{omicsData}{an object of the class 'pepData', 'proData', 'lipidData', or
+'metabData' usually created by \code{\link{as.pepData}},
+\code{\link{as.proData}}, \code{\link{as.lipidData}}, or
+\code{\link{as.metabData}}, respectively.}
 
-\item{norm_fn}{a character vector of normalization methods to choose from.  Current options are 'mean', 'median', 'zscore', and 'mad'.}
+\item{group_vector}{A character vector from the group_DF attribute specifying
+the order of the samples. This order is the same as the order of the
+samples (columns) in e_data.}
 
-\item{sig_inds}{significant peptide indices (row indices) based on a Kruskal-Wallis test on the un-normalized data}
+\item{norm_fn}{a character vector of normalization methods to choose from.
+Current options are 'mean', 'median', 'zscore', and 'mad'.}
 
-\item{nonsig_inds}{non-significant peptide indices (row indices) based on a Kruskal-Wallis test on the un-normalized data}
+\item{sig_inds}{significant peptide indices (row indices) based on a
+Kruskal-Wallis test on the un-normalized data}
 
-\item{select_n}{number of peptide by sample indices in the data to randomly select to determine normalization parameters}
+\item{nonsig_inds}{non-significant peptide indices (row indices) based on a
+Kruskal-Wallis test on the un-normalized data}
+
+\item{select_n}{number of peptide by sample indices in the data to randomly
+select to determine normalization parameters}
 }
 \value{
-a list with 2 elements. The median of highly significant p-values, and the median of nonsignificant p-values.
- These are obtained from a SINGLE Kruskal-Wallis test on data normalized by scale/location factors determined from a randomly selected subset of peptides and normalization method
+a list with 2 elements. The median of highly significant p-values,
+  and the median of nonsignificant p-values. These are obtained from a SINGLE
+  Kruskal-Wallis test on data normalized by scale/location factors determined
+  from a randomly selected subset of peptides and normalization method
 }
 \description{
-Creates the list of median p-values used to make the background distribution used to compute the SPANS score in step 2.
+Creates the list of median p-values used to make the background distribution
+used to compute the SPANS score in step 2.
 }
