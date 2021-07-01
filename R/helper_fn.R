@@ -255,15 +255,11 @@ get_check_names <- function (omicsData) {
 get_isobaric_info <- function (omicsData) {
   
   # Check class of omicsData.
-  if (!inherits(omicsData, c("pepData",
-                             "proData",
-                             "metabData",
-                             "lipidData",
-                             "nmrData"))) {
+  if (!inherits(omicsData, c("isobaricpepData",
+                             "pepData"))) {
     
     # Lay down an error in the console.
-    stop (paste("omicsData must be of class 'pepData', 'proData',",
-                "'metabData', 'lipidData', or 'nmrData'",
+    stop (paste("omicsData must be of class 'isobaricpepData' and 'pepData'",
                 sep = " "))
     
   }
@@ -484,8 +480,7 @@ set_meta_info <- function (e_meta,
   
 }
 
-# Sets/updates the values in the isobaric_info attribute. This is kind of a
-# stupid function. Don't know why I wrote it.
+# Sets/updates the values in the isobaric_info attribute.
 #
 # @param exp_cname
 #
@@ -525,8 +520,7 @@ set_isobaric_info <- function (exp_cname,
   
 }
 
-# Sets/updates the values in the nmr_info attribute. Another kind of stupid
-# function. I am on a roll!!!
+# Sets/updates the values in the nmr_info attribute.
 #
 # @param metabolite_name
 #

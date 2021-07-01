@@ -78,7 +78,8 @@ test_that('normalize_isobaric produces the correct output',{
                         channel_cname = "iTRAQ.Channel",
                         refpool_channel = "116",
                         refpool_cname = NULL,
-                        refpool_notation = NULL))
+                        refpool_notation = NULL,
+                        norm_info = list(is_normalized = FALSE)))
   expect_identical(attr(spec2, "cnames"),
                    list(edata_cname = "Peptide",
                         fdata_cname = "Sample"))
@@ -87,7 +88,8 @@ test_that('normalize_isobaric produces the correct output',{
                         channel_cname = NULL,
                         refpool_channel = NULL,
                         refpool_cname = "Reference",
-                        refpool_notation = "Yes"))
+                        refpool_notation = "Yes",
+                        norm_info = list(is_normalized = FALSE)))
   
   # Test normalize_isobaric: apply normalization -------------------------------
   

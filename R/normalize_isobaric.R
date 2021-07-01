@@ -31,27 +31,28 @@
 #'   regarding reference pool samples. If using this argument, the
 #'   'refpool_cname' argument must also be specified; in this case,
 #'   'channel_cname' and 'refpool_channel' should not be specified.
-#' @details #' There are two ways to specify the information needed for
-#' identifying reference samples which should be used for normalization:
-#' \enumerate{ \item specify \code{channel_cname} and \code{refpool_channel}.
-#' This should be used when the reference sample for each experiment/plate was
-#' always located in the same channel. Here \code{channel_cname} gives the
-#' column name for the column in \code{f_data} which gives information about
-#' which channel each sample was run on, and \code{refpool_channel} is a
-#' character string specifying the value in \code{channel_colname} that
-#' corresponds to the reference sample channel. \item specify
-#' \code{refpool_cname} and \code{refpool_notation}. This should be used when
-#' the reference sample is not in a consistent channel across
-#' experiments/plates. Here, \code{refpool_cname} gives the name of the column
-#' in \code{f_data} which indicates whether a sample is a reference or not, and
-#' \code{refpool_notation} is a character string giving the value used to denote
-#' a reference sample in that column. } In both cases you must specify
-#' \code{exp_cname} which gives the column name for the column in \code{f_data}
-#' containing information about which experiment/plate a sample was run on.
+#' 
+#' @details There are two ways to specify the information needed for identifying
+#'   reference samples which should be used for normalization: \enumerate{ \item
+#'   specify \code{channel_cname} and \code{refpool_channel}. This should be
+#'   used when the reference sample for each experiment/plate was always located
+#'   in the same channel. Here \code{channel_cname} gives the column name for
+#'   the column in \code{f_data} which gives information about which channel
+#'   each sample was run on, and \code{refpool_channel} is a character string
+#'   specifying the value in \code{channel_colname} that corresponds to the
+#'   reference sample channel. \item specify \code{refpool_cname} and
+#'   \code{refpool_notation}. This should be used when the reference sample is
+#'   not in a consistent channel across experiments/plates. Here,
+#'   \code{refpool_cname} gives the name of the column in \code{f_data} which
+#'   indicates whether a sample is a reference or not, and
+#'   \code{refpool_notation} is a character string giving the value used to
+#'   denote a reference sample in that column. } In both cases you must specify
+#'   \code{exp_cname} which gives the column name for the column in
+#'   \code{f_data} containing information about which experiment/plate a sample
+#'   was run on.
 #'
-#' See examples below.
 #' @examples
-#' dontrun{
+#' \dontrun{
 #' library(pmartRdata)
 #' data(isobaric_object)
 #'
@@ -282,13 +283,14 @@ normalize_isobaric <- function (omicsData, exp_cname = NULL, apply_norm = FALSE,
                          ref_name = ref_name)
     
     # Include information for the isobaric_info attribute.
-    attr(omicsData, "isobaric_info") <- list(
+    attr(omicsData, "isobaric_info") <- set_isobaric_info(
       exp_cname = exp_cname, 
       channel_cname = channel_cname, 
       refpool_channel = refpool_channel, 
       refpool_cname = refpool_cname, 
-      refpool_notation = refpool_notation, 
-      norm_info = list(is_normalized = TRUE)
+      refpool_notation = refpool_notation,
+      norm_info = list(),
+      isobaric_norm = TRUE
     )
     
     # Update the data_info attribute because the reference samples have been
@@ -335,11 +337,15 @@ normalize_isobaric <- function (omicsData, exp_cname = NULL, apply_norm = FALSE,
     # Add helpful attributes to the isobaricnormRes object.
     attr(result, "cnames") <- list(edata_cname = edata_cname,
                                    fdata_cname = fdata_cname)
-    attr(result, "isobaric_info") <- list(exp_cname = exp_cname,
-                                          channel_cname = channel_cname,
-                                          refpool_channel = refpool_channel,
-                                          refpool_cname = refpool_cname,
-                                          refpool_notation = refpool_notation)
+    attr(result, "isobaric_info") <- set_isobaric_info(
+      exp_cname = exp_cname, 
+      channel_cname = channel_cname, 
+      refpool_channel = refpool_channel, 
+      refpool_cname = refpool_cname, 
+      refpool_notation = refpool_notation,
+      norm_info = list(),
+      isobaric_norm = FALSE
+    )
     
     # Return the isobaricnormRes object!!!
     return(result)
