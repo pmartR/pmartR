@@ -39,9 +39,15 @@ test_that('SPANS correctly spans the data',{
   # Scramble the order of the columns.
   eggs <- sample(1:12, 12)
   
-  # Reorder the sample columns in e_data but keep the ID column as the first
-  # column.
+  # Reorder the sample columns in e_data (keep the ID column as the first
+  # column) and reorder the column in f_data. This information will be used when
+  # correctly assign group membership when running group_designation().
   pdata_eggs$e_data <- pdata$e_data[, c(1, eggs + 1)]
+  pdata_eggs$f_data <- pdata$f_data[eggs, ]
+  
+  # Rerun the group designation function on the scrambled pepData object.
+  pdata_eggs <- group_designation(omicsData = pdata_eggs,
+                                  main_effects = "Condition")
   
   # Test spans_make_distribution separately ------------------------------------
   
@@ -188,22 +194,13 @@ test_that('SPANS correctly spans the data',{
   
   # Forge a data frame standard for the scrambled SPANSRes object.
   spandard_eggs <- data.frame(
-    subset_method = c("all", "all", "all", "all", "los", "ppp", "ppp", "rip",
-                      "ppp", "ppp_rip", "rip", "ppp", "los", "rip", "ppp_rip",
-                      "los", "ppp_rip", "los", "rip", "ppp_rip"),
-    normaliztion_method = c("mean", "zscore", "mad", "median", "mean", "mean",
-                            "zscore", "zscore", "median", "median", "mean",
-                            "mad", "median", "median", "mean", "zscore",
-                            "zscore", "mad", "mad", "mad"),
-    SPANS_score = c(0.66, 0.61, 0.61, 0.58, 0.53, 0.53, 0.53, 0.53, 0.52, 0.52,
-                    0.52, 0.52, NA, NA, NA, NA, NA, NA, NA, NA),
-    parameters = c("", "", "", "", "0.05", "0.5", "0.5", "0.2", "0.5",
-                   "0.5;0.2", "0.2", "0.5", "0.05", "0.2", "0.5;0.2", "0.05",
-                   "0.5;0.2", "0.05", "0.2", "0.5;0.2"),
-    mols_used_in_norm = c(150, 150, 150, 150, 14, 124, 124, 89, 124, 121, 89,
-                          124, 14, 89, 121, 14, 121, 14, 89, 121),
-    passed_selection = c(rep(TRUE, 12),
-                         rep(FALSE, 8))
+    subset_method = spandard$subset_method,
+    normaliztion_method = spandard$normalization_method,
+    SPANS_score = c(0.83, 0.83, 0.83, 0.83, 0.71, 0.71, 0.71, 0.66, 0.66, 0.61,
+                    0.61, 0.58, 0.53, 0.53, 0.53, 0.52, 0.52, NA, NA, NA),
+    parameters = spandard$parameters,
+    mols_used_in_norm = spandard$mols_used_in_norm,
+    passed_selection = spandard$passed_selection
   )
   
   # Set up the attributes for the spandard :)
@@ -216,25 +213,15 @@ test_that('SPANS correctly spans the data',{
       subset_method = spandard_eggs$subset_method,
       normalization_method = spandard_eggs$normaliztion_method,
       parameters = spandard_eggs$parameters,
-      location_p_value = c(0.116031614870982, 0.116031614870982,
-                           0.0522036353413146, 0.0522036353413146,
-                           0.0522036353413146, 0.0522036353413146,
-                           0.0522036353413146, 0.0789944358337225,
-                           0.0522036353413146, 0.0522036353413146,
-                           0.0789944358337225, 0.0522036353413146,
-                           0.020819004906484, 0.0334740651091333,
-                           0.0334740651091333, 0.0522036353413146,
-                           0.0334740651091333, 0.020819004906484,
-                           0.0334740651091333, 0.0522036353413146),
-      scale_p_value = c(NA, 0.405380556458942, 0.781511294998709, NA, NA, NA,
-                        0.781511294998709, 0.926340489251137, NA, NA, NA,
-                        0.0522036353413146, NA, NA, NA, 0.0125549185969666,
-                        0.926340489251137, 0.781511294998709, 0.309177044632912,
-                        0.0125549185969666),
-      F_log_HSmPV = c(rep(1, 12),
-                      rep(NA, 8)),
-      F_log_NSmPV = c(0.32, 0.22, 0.22, 0.16, 0.06, 0.06, 0.06, 0.06, 0.04,
-                      0.04, 0.04, 0.04, NA, NA, NA, NA, NA, NA, NA, NA)
+      location_p_value = attr(spandard,
+                              "method_selection_pvals")$location_p_value,
+      scale_p_value = attr(spandard,
+                           "method_selection_pvals")$scale_p_value,
+      F_log_HSmPV = attr(spandard,
+                         "method_selection_pvals")$F_log_HSmPV,
+      F_log_NSmPV = c(0.66, 0.66, 0.66, 0.66, 0.42, 0.42, 0.42, 0.32, 0.32,
+                      0.22, 0.22, 0.16, 0.06, 0.06, 0.06, 0.04, 0.04, NA, NA,
+                      NA)
     ),
     group_vector = group_eggs,
     significant_thresh = 1e-4,
