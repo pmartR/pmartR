@@ -7,21 +7,30 @@
 dim_reduction(omicsData, k = 2)
 }
 \arguments{
-\item{omicsData}{an object of the class 'pepdata', 'prodata', 'metabData', 'lipidData', 'nmrData' usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, \code{\link{as.nmrData}}, respectively.}
+\item{omicsData}{an object of the class 'pepdata', 'prodata', 'metabData',
+'lipidData', 'nmrData' usually created by \code{\link{as.pepData}},
+\code{\link{as.proData}}, \code{\link{as.metabData}},
+\code{\link{as.lipidData}}, \code{\link{as.nmrData}}, respectively.}
 
 \item{k}{integer number of principal components to return. Defaults to 2.}
 }
 \value{
-a data.frame with first \code{k} principal component scores, sample identifiers, and group membership for each sample (if group designation was previously run on the data).
+a data.frame with first \code{k} principal component scores, sample
+  identifiers, and group membership for each sample (if group designation was
+  previously run on the data).
 }
 \description{
-Calculate principal components using projection pursuit estimation, which implements an expectation-maximization (EM) estimation algorithm when data is missing.
+Calculate principal components using projection pursuit estimation, which
+implements an expectation-maximization (EM) estimation algorithm when data is
+missing.
 }
 \details{
-Any biomoleculs seen in only one sample or with a variance less than 1E-6 across all samples are not included in the PCA calculations. This function leverages code from \code{\link[pcaMethods]{pca}}.
+Any biomoleculs seen in only one sample or with a variance less than
+  1E-6 across all samples are not included in the PCA calculations. This
+  function leverages code from \code{\link[pcaMethods]{pca}}.
 }
 \examples{
-dontrun{
+\dontrun{
 library(pmartRdata)
 data(lipid_object)
 lipid_object <- edata_transform(omicsData = lipid_object, data_scale="log2")
@@ -33,5 +42,7 @@ summary(pca_lipids)
 
 }
 \references{
-Redestig, H., Stacklies, W., Scholz, M., Selbig, J., & Walther, D. (2007). \emph{pcaMethods - a bioconductor package providing PCA methods for incomplete data}. Bioinformatics. 23(9): 1164-7.
+Redestig, H., Stacklies, W., Scholz, M., Selbig, J., & Walther,
+  D. (2007). \emph{pcaMethods - a bioconductor package providing PCA methods
+  for incomplete data}. Bioinformatics. 23(9): 1164-7.
 }
