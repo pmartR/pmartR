@@ -1,41 +1,114 @@
-context("aggregate_tech_reps")
-library(testthat)
-library(pmartR)
-library(pmartRdata)
+context("combine technical replicates")
 
-techrep_pepData <- pmartRdata::techrep_pep_object
-
-pep_techrep_avg <- combine_techreps(techrep_pepData)
-techrep_cname = attr(pep_techrep_avg, "cnames")$techrep_cname
-
-pmartR:::verify_data_info(pep_techrep_avg)
-
-test_that("bad input throws error", {
-  # not a column
-  expect_error(combine_techreps(techrep_pepData, bio_sample_names = "asdf"))
-  # names do not correspond to biological sample assignment
-  expect_error(combine_techreps(techrep_pepData, bio_sample_names = "DILUTION"))
-  expect_error(combine_techreps(techrep_pepData, bio_sample_names = "FACTOR"))
-  expect_error(combine_techreps(techrep_pepData, bio_sample_names = "RunID"))
-})
-
-test_that("columns were correctly aggregated", {
-  # number of biological samples....
-  n_groups = length(unique(techrep_pepData$f_data[,techrep_cname]))
+test_that("combine_techreps properly aggregates technical replicates", {
   
-  # ...should equal the number of columns in the collapsed e_data - 1 
-  expect_equal(n_groups, length(colnames(pep_techrep_avg$e_data)) - 1)
-  # all rows should still have at least 1 nonmissing value
-  expect_true(all(rowSums(!is.na(pep_techrep_avg$e_data[,-which(colnames(pep_techrep_avg$e_data) == get_edata_cname(pep_techrep_avg))])) > 0))
-  # averaging should result in an e_data with a number of columns strictly less than that of the original data
-  expect_true(ncol(techrep_pepData$e_data) > ncol(pep_techrep_avg$e_data))
+  # Load the data and create a pepData object ----------------------------------
+  
+  load(system.file('testdata',
+                   'little_techdata.RData',
+                   package = 'pmartR'))
+  
+  # Construct a pepData object.
+  tdata <- as.pepData(e_data = edata,
+                      f_data = fdata,
+                      edata_cname = 'Mass_Tag_ID',
+                      fdata_cname = 'RunID',
+                      techrep_cname = 'TECH_REP')
+  
+  # Create edata standard ------------------------------------------------------
+  
+  # Create a counter that will be used to fill the standard data frame.
+  counter <- 1
+  
+  # Copy the first 33 rows of edata: one row for the ID column and the remaining
+  # 32 rows for the averaged technical replicates.
+  standard <- tdata$e_data[, 1:33]
+  
+  # Loop through each set of technical replicates and take their mean.
+  for (e in seq(from = 2, to = 64, by = 2)) {
+    
+    # Update the counter in order to add the tech rep average to the correct
+    # column of the standard.
+    counter <- counter + 1
+    
+    # Average the technical replicates.
+    standard[, counter] <- rowMeans(tdata$e_data[, e:(e + 1)],
+                                    na.rm = TRUE)
+    
+  }
+  
+  # Convert NaNs to NAs to make the standard directly comparable to the output
+  # from combine_techreps().
+  for (e in 2:33) standard[[e]][is.nan(standard[[e]])] <- NA
+  
+  # Rename the columns of the standard to the unique names in the TECH_REP
+  # column in f_data.
+  colnames(standard)[2:33] <- unique(fdata$TECH_REP)
+  
+  # Create a list to hold the names of the technical replicates. This list will
+  # become the standard for the tech_rep_info attribute.
+  the_list <- vector(mode = "list",
+                     length = 32)
+  
+  # Start a counter for filling in the_list.
+  counter <- 0
+  
+  # Loop through each tech rep and extract the RunIDs.
+  for (e in unique(tdata$f_data$TECH_REP)) {
+    
+    # Update the counter so the correct technical replicates are placed in the
+    # proper order of the list.
+    counter <- counter + 1
+    
+    the_list[[counter]] <- tdata$f_data$RunID[tdata$f_data$TECH_REP == e]
+    
+  }
+  
+  # Name the elements of the list with the technical replicate number.
+  names(the_list) <- unique(fdata$TECH_REP)
+  
+  # tech_replicate the heck out of the data ------------------------------------
+  
+  # Use default settings for combine_techreps (the current data won't allow for
+  # any other settings to be used).
+  techie <- combine_techreps(tdata)
+  
+  # Put on my sleuth hat and start the investigation!
+  expect_identical(techie$e_data, standard)
+  expect_equal(dim(techie$f_data),
+               c(32, 3))
+  expect_null(attr(techie, "cnames")$techrep_cname)
+  expect_identical(get_fdata_cname(techie), "TECH_REP")
+  expect_identical(attr(techie, "tech_rep_info")$combine_method, "mean")
+  expect_identical(attr(techie, "tech_rep_info")$tech_reps_by_sample,
+                   the_list)
+  expect_identical(attr(techie, "data_info")$num_edata,
+                   nrow(techie$e_data))
+  expect_identical(attr(techie, "data_info")$num_miss_obs,
+                   sum(is.na(techie$e_data)))
+  expect_identical(attr(techie, "data_info")$prop_missing,
+                   (sum(is.na(techie$e_data)) /
+                      prod(dim(techie$e_data[, -1]))))
+  expect_identical(attr(techie, "data_info")$num_edata,
+                   length(unique(techie$e_data[, 1])))
+  
+  # Test for errors when bio_sample_names does not fulfill the 1-to-1 mapping
+  # requirement with the tech_rep column.
+  expect_error(combine_techreps(tdata, bio_sample_names = "asdf"),
+               paste("Specified display name column was not found in",
+                     "f_data or was the same as fdata_cname",
+                     sep = " "))
+  expect_error(combine_techreps(tdata, bio_sample_names = "DILUTION"),
+               paste("Specified display name column did not have a",
+                     "one-to-one correspondence with the techrep ID column",
+                     sep = " "))
+  expect_error(combine_techreps(tdata, bio_sample_names = "FACTOR"),
+               paste("Specified display name column did not have a",
+                     "one-to-one correspondence with the techrep ID column",
+                     sep = " "))
+  expect_error(combine_techreps(tdata, bio_sample_names = "RunID"),
+               paste("Specified display name column was not found in",
+                     "f_data or was the same as fdata_cname",
+                     sep = " "))
+  
 })
-
-test_that("attributes correctly set", {
-  expect_false(get_fdata_cname(techrep_pepData) == get_fdata_cname(pep_techrep_avg))
-  expect_true(get_fdata_cname(pep_techrep_avg) == techrep_cname)
-  expect_equal(length(setdiff(names(attributes(pep_techrep_avg)$tech_rep_info$tech_reps_by_sample), as.character(pep_techrep_avg$f_data[, get_fdata_cname(pep_techrep_avg)]))), 0)
-  expect_true(setdiff(colnames(techrep_pepData$e_data), attributes(pep_techrep_avg)$tech_rep_info$tech_reps_by_sample %>% unlist()) == get_edata_cname(techrep_pepData))
-})
-
-

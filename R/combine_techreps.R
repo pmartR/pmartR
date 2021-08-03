@@ -1,32 +1,55 @@
 #' Combine technical replicates of an omicsData object
 #'
-#' For each biomolecule, aggregates the technical replicates within biological samples using a specified aggregation method
+#' For each biomolecule, aggregates the technical replicates within biological
+#' samples using a specified aggregation method
 #'
-#' @param omicsData an object of the class 'lipidData', 'metabData', 'pepData', 'proData', or 'nmrData', usually created by \code{\link{as.lipidData}}, \code{\link{as.metabData}}, \code{\link{as.pepData}}, \code{\link{as.proData}}, or \code{\link{as.nmrData}}, respectively.  The parameter techrep_cnames must have been specified when creating this object.
-#' @param combine_fn a character string specifying the function used to aggregate across technical replicates, currently only supports "mean".
-#' @param bio_sample_names a character string specifying a column in \code{f_data} which contains names by which to label aggregated samples in \code{omicsData$e_data} and \code{omicsData$f_data} OR a character vector with number of elements equal to the number of biological samples.  If a column name is specified, it should have a one-to-one correspondence with the technical replicate ID column in \code{f_data}.  Defaults to NULL, in which case default names are used according to the technical replicate ID column. 
-#' 
-#' @details Loss of information after aggregation
-#' \tabular{ll}{
-#' f_data: \tab   If there are columns of f_data that have more than 1 value per biological sample, then for each biological sample, only the first value in that column will be retained.  Technical replicate specific information will be lost.\cr
-#' group information:  \tab If a grouping structure has been set using a main effect from f_data that has more than 1 level within any given biological sample, that grouping structure will be removed.  Call \code{group_designation} again on the aggregated data to assign a grouping structure. \cr
-#' sample names:  \tab Identifiers for each biological sample will replace the identifiers for technical replicates as column names in e_data as well as the identifier column \code{attr(omicsData, 'fdata_cname')} in f_data. \cr
-#' }
-#' 
-#' @return An object with the same class as omicsData that has been aggregated to the biological sample level
-#' 
-#' @examples 
+#' @param omicsData an object of the class 'lipidData', 'metabData', 'pepData',
+#'   'proData', or 'nmrData', usually created by \code{\link{as.lipidData}},
+#'   \code{\link{as.metabData}}, \code{\link{as.pepData}},
+#'   \code{\link{as.proData}}, or \code{\link{as.nmrData}}, respectively.  The
+#'   parameter techrep_cnames must have been specified when creating this
+#'   object.
+#' @param combine_fn a character string specifying the function used to
+#'   aggregate across technical replicates, currently only supports "mean".
+#' @param bio_sample_names a character string specifying a column in
+#'   \code{f_data} which contains names by which to label aggregated samples in
+#'   \code{omicsData$e_data} and \code{omicsData$f_data} OR a character vector
+#'   with number of elements equal to the number of biological samples.  If a
+#'   column name is specified, it should have a one-to-one correspondence with
+#'   the technical replicate ID column in \code{f_data}.  Defaults to NULL, in
+#'   which case default names are used according to the technical replicate ID
+#'   column.
+#'
+#' @details Loss of information after aggregation \tabular{ll}{ f_data: \tab
+#'   If there are columns of f_data that have more than 1 value per biological
+#'   sample, then for each biological sample, only the first value in that
+#'   column will be retained.  Technical replicate specific information will be
+#'   lost.\cr group information:  \tab If a grouping structure has been set
+#'   using a main effect from f_data that has more than 1 level within any given
+#'   biological sample, that grouping structure will be removed.  Call
+#'   \code{group_designation} again on the aggregated data to assign a grouping
+#'   structure. \cr sample names:  \tab Identifiers for each biological sample
+#'   will replace the identifiers for technical replicates as column names in
+#'   e_data as well as the identifier column \code{attr(omicsData,
+#'   'fdata_cname')} in f_data. \cr }
+#'
+#' @return An object with the same class as omicsData that has been aggregated
+#'   to the biological sample level
+#'
+#' @examples
 #' library(pmartR)
 #' library(pmartRdata)
-#' 
+#'
 #' data(techrep_pep_object)
-#' 
+#'
 #' pep_object_averaged = combine_techreps(techrep_pep_object)
-#' 
+#'
 #' @author Daniel Claborne
-#' 
+#'
 #' @export
-combine_techreps <- function(omicsData, combine_fn = "mean", bio_sample_names = NULL){
+#' 
+combine_techreps <- function (omicsData, combine_fn = "mean",
+                              bio_sample_names = NULL) {
   
   # check that omicsData is of pmartR S3 class#
   if(!inherits(omicsData, c("pepData", "proData", "lipidData", "metabData", "nmrData"))) stop("omicsData must be of class 'pepData', 'proData', 'lipidData', 'metabData' or 'nmrData'")
@@ -154,6 +177,7 @@ combine_techreps <- function(omicsData, combine_fn = "mean", bio_sample_names = 
   # store new data and reset attributes
   omicsData$e_data <- new_edata
   omicsData$f_data <- new_fdata
+  attr(omicsData, "cnames")$techrep_cname <- NULL
   attr(omicsData, "group_DF") <- new_group_DF 
   attr(omicsData, "data_info")$num_samps = ncol(omicsData$e_data) - 1
   attr(omicsData, "data_info")$num_edata = length(unique(omicsData$e_data[, edata_cname]))
