@@ -7,16 +7,22 @@
 missingval_result(omicsData)
 }
 \arguments{
-\item{omicsData}{an object of class "pepData", "proData", "metabData", "lipidData", or "nmrData", created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, respectively.}
+\item{omicsData}{an object of class "pepData", "proData", "metabData",
+"lipidData", or "nmrData", created by \code{\link{as.pepData}},
+\code{\link{as.proData}}, \code{\link{as.metabData}},
+\code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, respectively.}
 }
 \value{
-outputs a list of two data frames, one contains NA by sample (missing values per sample), the second contains NA by molecule (missing values per molecule). The output is assigned class 'naRes'.
+outputs a list of two data frames, one contains NA by sample (missing
+  values per sample), the second contains NA by molecule (missing values per
+  molecule). The output is assigned class 'naRes'.
 }
 \description{
-This function takes in an omicsData object, outputs a list of two data frames, one contains NA by sample, the second contains NA by molecule
+This function takes in an omicsData object, outputs a list of two data
+frames, one contains NA by sample, the second contains NA by molecule
 }
 \examples{
-dontrun{
+\dontrun{
 library(pmartRdata)
 data("lipid_object")
 data("metab_object")
@@ -24,6 +30,6 @@ data("metab_object")
 result = missingval_result(lipid_object)
 result2 = missingval_result(metab_object)
 
-}  
+}
 
 }

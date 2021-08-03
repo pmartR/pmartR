@@ -29,6 +29,8 @@
 #' 
 missingval_result<- function(omicsData){
   
+  # Add a check 
+  
   #check for correct class
   if(!inherits(omicsData, c("pepData", "proData", "lipidData",
                             "metabData", "nmrData"))) {
@@ -59,19 +61,14 @@ missingval_result<- function(omicsData){
   # and VizSampNames is used to display shorter sample names.
   na_by_sample <- merge(na_by_sample, omicsData$f_data, by = fdata_cname)
   
-  # Check if the group designation function has been run. The group_DF info
-  # will be used to rename the grouping column in f_data.
+  # Check if the group designation function has been run. The group_DF info will
+  # be used to add the "Group" column to na_by_sample. This column may contain
+  # the same data as another column in f_data but it will have a different name
+  # from the f_data column.
   if (!is.null(attr(omicsData, "group_DF"))) {
-    
-    group_idx <- which(
-      names(na_by_sample) == attr(attr(omicsData, "group_DF"),
-                                  "main_effects")[[1]]
-                             
-    )
-    
-    # Rename the main_effects column as Group.
-    names(na_by_sample)[[group_idx]] <- "Group"
-    
+
+    na_by_sample <- merge(na_by_sample, attr(omicsData, "group_DF"))
+
   }
   
   # Count the number of NA values per row.
