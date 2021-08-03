@@ -2,7 +2,7 @@ context('normalize: global')
 
 test_that('normalize_global produces the correct output',{
   
-  # Load the reduced peptide data frames ---------------------------------------
+  # Load data and create pepData objects ---------------------------------------
   
   load(system.file('testdata',
                    'little_pdata.RData',
@@ -162,6 +162,29 @@ test_that('normalize_global produces the correct output',{
                kp_all)
   expect_identical(norm_all_med$prop_features_calc,
                    1)
+  
+  # Use same inputs as above except backtransmogrify the data.
+  tran_all_med <- normalize_global(omicsData = pdata,
+                                   subset_fn = "all",
+                                   norm_fn = "median",
+                                   apply_norm = FALSE,
+                                   backtransform = TRUE)
+  
+  # Scrutinize the backtransform elements.
+  expect_null(tran_all_med$parameters$backtransform$scale)
+  expect_equal(tran_all_med$parameters$backtransform$location,
+               median(as.matrix(pdata$e_data[, -1]), na.rm = TRUE))
+  
+  # Make sure other elements are the same as the non-backtransmogrified option.
+  expect_equal(tran_all_med$subset_fn, norm_all_med$subset_fn)
+  expect_equal(tran_all_med$norm_fn, norm_all_med$norm_fn)
+  expect_equal(tran_all_med$parameters$normalization,
+               norm_all_med$parameters$normalization)
+  expect_equal(tran_all_med$n_features_calc,
+               norm_all_med$n_features_calc)
+  expect_equal(tran_all_med$feature_subset, norm_all_med$feature_subset)
+  expect_equal(tran_all_med$prop_features_calc,
+               norm_all_med$prop_features_calc)
   
   # Fashion a normRes object with "ppp" and "median".
   norm_ppp_med <- normalize_global(omicsData = pdata,
