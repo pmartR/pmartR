@@ -7,7 +7,7 @@
  process is repeated on all rows of the matrix, the results are stored in a list, 
  and this list is the output of this function.*/
 
-/*The fuction group_size, takes one input, a vector of strings called group. This
+/*The function group_size, takes one input, a vector of strings called group. This
  vector is an ordered character vector indicating what "group" (factor level) a specific
  data element belongs to. This function makes a copy of group, called temp. Next a 
  unique function is applied to temp, exposing the levels of the factor. Next we 
@@ -51,32 +51,6 @@
 // [[Rcpp::depends(RcppArmadillo)]]
 using namespace Rcpp;
 
-std::vector<int> group_size(std::vector<std::string> group)
-{
-  std::vector<std::string> temp;
-  temp = group;
-  
-  //std::sort(temp.begin(),temp.end());
-  
-  temp.erase( std::unique( temp.begin(), temp.end() ), temp.end() );
-  int tempsize = 0;
-  
-  tempsize = temp.size();
-  
-  std::vector<int> gsize(tempsize);
-  
-  for(unsigned int i = 0;i<group.size();i++)
-  {
-    for(unsigned int k=0;k<temp.size();k++)
-    {
-      if(group[i]==temp[k])
-        gsize[k]++;
-    }
-  }
-  
-  return gsize;
-}
-
 double calculate_cv(std::vector<double> numbers)
 {
   double mean = 0, sum = 0;
@@ -109,15 +83,25 @@ double calculate_pool_cv(std::vector<double> cv, std::vector<double> non_na_valu
 
 // [[Rcpp::depends(RcppArmadillo)]]
 // [[Rcpp::export]]
-std::list<double> pooled_cv_rcpp(arma::mat mtr,std::vector<std::string> group)
-{
-  std::vector<int> gsize;
+std::list<double> pooled_cv_rcpp(arma::mat mtr,
+                                 std::vector<std::string> group) {
   
-  gsize = group_size(group); 
+  // Creates a copy of the input. This copy will be shortened to a vector of
+  // unique values.
+  std::vector<std::string> unique_groups = group;
+  
+  // Finds all unique elements from the unique_x vector.
+  std::set<std::string> s(unique_groups.begin(), unique_groups.end());
+  
+  // Assigns the unique elements to unique_x.
+  unique_groups.assign(s.begin(), s.end());
   
   std::list<double> final;
   std:: vector<double> cpy(mtr.n_cols);
-  std::vector<std::vector<double> >groups;
+  // groups is a vector of vectors. The first level corresponds to the group
+  // each sample belongs to. The second level corresponds to the numeric values
+  // present within each group (non-missing abundance values).
+  std::vector<std::vector<double>> groups;
   
   double tempcv = 0;
   int tempnonmis = 0;
@@ -130,25 +114,29 @@ std::list<double> pooled_cv_rcpp(arma::mat mtr,std::vector<std::string> group)
     
     cpy = arma::conv_to< std::vector<double> >::from(mtr.row(i));
     
-    for (unsigned int j = 0; j < gsize.size(); j++) {
+    for (unsigned int j = 0; j < unique_groups.size(); j++) {
       
-      for (unsigned int k = 0; k < gsize[j]; k++) {
+      for (unsigned int k = 0; k < cpy.size(); k++) {
         
         if (ISNAN(cpy[k])) {
           
           continue;
           
-        } else {
+          // Check if the current group (group[k]) belongs to the current unique
+          // group (unique_groups[i]). If it does the value in cpy will be added
+          // to temp. The temp vector is used later to calculate each groups CV.
+        } else if (unique_groups[j] == group[k]) {
           
+          // Append the current value of cpy to temp.
           temp.push_back(cpy[k]);
           
         }
+        
       }
       
       groups.push_back(temp);
-      cpy.erase(cpy.begin(),cpy.begin()+gsize[j]);
       temp.clear();
-
+      
     }
     
     // calculating cv for each group and pushing_back into gcv vector. Counting
@@ -173,9 +161,9 @@ std::list<double> pooled_cv_rcpp(arma::mat mtr,std::vector<std::string> group)
       }
       
     }
-  
+    
     pool_cv = calculate_pool_cv(groupcv, nonmiss);
-
+    
     final.push_back(pool_cv);
     
     // clearing these vectors so they will be ready to store the next row's
@@ -185,8 +173,8 @@ std::list<double> pooled_cv_rcpp(arma::mat mtr,std::vector<std::string> group)
     groupcv.clear();
     
   }
-    
-return final;
+  
+  return final;
   
 }
 
