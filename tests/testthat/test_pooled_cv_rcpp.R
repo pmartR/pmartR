@@ -247,16 +247,10 @@ test_that('pooled_cv_rcpp correctly calculates the CV by group',{
   # Go fishin for the group names from the group_DF attribute.
   groups_s <- attr(pdata_s_gdf, "group_DF")$Group
   
-  # There is a problem with giving C++ an unordered group argument. Every time
-  # pooled_cv_rcpp runs without ordering the elements of groups_s R aborts
-  # and has to restart.
-  # Calculate the CV with C++ functions.
-  # cv_cpp <- pooled_cv_rcpp(mtr = as.matrix(e_data_s),
-  #                          group = groups_s) * 100
-  
-  # order the samples before calculating the CV with C++.
-  cv_cpp_s <- pooled_cv_rcpp(mtr = as.matrix(e_data_s[, order(groups_s)]),
-                             group = groups_s[order(groups_s)]) * 100
+  # Calculate the CV with C++ functions when the order of the columns is
+  # scrambled.
+  cv_cpp_s <- pooled_cv_rcpp(mtr = as.matrix(e_data_s),
+                             group = groups_s) * 100
   
   # Calculate the CV with R functions.
   cv_r_s <- cv.calc.pooled(pdata_s_gdf,
@@ -269,6 +263,6 @@ test_that('pooled_cv_rcpp correctly calculates the CV by group',{
                c(1, 25, 27, 35, 53, 54, 59, 61, 68, 73))
   
   # See if R and C++ are playing nicely.
-  expect_equal(round(cv_cpp_s, 3), round(cv_r_s, 3))
+  expect_identical(round(cv_cpp_s, 3), round(cv_r_s, 3))
   
 })
