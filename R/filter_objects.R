@@ -220,20 +220,10 @@ cv_filter <- function(omicsData, use_groups = TRUE) {
       
     }
     
-    # Both cur_edata and group_dat must have the rows/columns ordered so all of
-    # the samples belonging to a group are grouped together. If they are not in
-    # order the C++ function will cause R to abort.
-    
-    # Reorder the columns of cur_edata so the C++ function that calculates the
-    # pooled CV can correctly account for group membership.
-    cur_edata <- cur_edata[, order(groupDF$Group)]
-    
-    # Reorder the groups so the C++ function that calculates the pooled CV can
-    # correctly account for group membership.
-    group_dat <- as.character(groupDF$Group[order(groupDF$Group)])
-    
-    # Calculate the pooled CV.
-    cvs <- pooled_cv_rcpp(as.matrix(cur_edata), group_dat)
+    # Calculate the pooled CV. The data needs to be converted to a matrix and
+    # the group names need to be converted to a character vector for
+    # pooled_cv_rcpp to run properly.
+    cvs <- pooled_cv_rcpp(as.matrix(cur_edata), as.character(groupDF$Group))
     
     # For mystifying reasons multiply the pooled CV values by 100.
     cvs <- cvs * 100

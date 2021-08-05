@@ -6,6 +6,11 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 // anova_cpp
 List anova_cpp(NumericMatrix data, NumericVector gp, int unequal_var, NumericVector df_red);
 RcppExport SEXP _pmartR_anova_cpp(SEXP dataSEXP, SEXP gpSEXP, SEXP unequal_varSEXP, SEXP df_redSEXP) {
