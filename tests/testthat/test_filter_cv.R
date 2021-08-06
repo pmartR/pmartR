@@ -214,6 +214,23 @@ test_that('cv_filter and applyFilt produce the correct output',{
   pdata_sg_gdf <- group_designation(omicsData = pdata_sg,
                                     main_effects = "Condition")
   
+  set.seed(38)
+  
+  # Scramble the order of the order of the samples.
+  scrambled <- sample(1:12, 12)
+  
+  # Generate a pepData object with the columns of just edata scrambled.
+  eggs <- as.pepData(e_data = edata[, c(1, scrambled + 1)],
+                     f_data = fdata,
+                     e_meta = emeta,
+                     edata_cname = "Mass_Tag_ID",
+                     fdata_cname = "SampleID",
+                     emeta_cname = "Protein")
+  
+  # Add groupies to the scrambled pepData object.
+  eggs_gdf <- group_designation(omicsData = eggs,
+                                main_effects = "Condition")
+  
   # Test cv_filter without groups ----------------------------------------------
   
   # Try creating a cvFilt object with an untoward input object.
@@ -294,9 +311,15 @@ test_that('cv_filter and applyFilt produce the correct output',{
                10)
   expect_true(attr(filter_gdf, 'pooled'))
   
+  # Run the CV filter on the data with scrambled columns.
+  filter_eggs <- cv_filter(omicsData = eggs_gdf)
+  
+  # Sleuth around the scrambled data.
+  expect_equal(filter_gdf, filter_eggs)
+  
   # Test cv_filter with singleton groups ---------------------------------------
   
-  # Calculate the pooled CV with R funcitons for data with singleton groups.
+  # Calculate the pooled CV with R functions for data with singleton groups.
   use_r_sg <- cv.calc.pooled(x = pdata_sg_gdf,
                              pooled = TRUE,
                              rm_single = TRUE)

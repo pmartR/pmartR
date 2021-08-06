@@ -252,17 +252,7 @@ test_that('pooled_cv_rcpp correctly calculates the CV by group',{
   cv_cpp_s <- pooled_cv_rcpp(mtr = as.matrix(e_data_s),
                              group = groups_s) * 100
   
-  # Calculate the CV with R functions.
-  cv_r_s <- cv.calc.pooled(pdata_s_gdf,
-                           pooled = TRUE,
-                           rm_single = FALSE)
-  names(cv_r_s) <- NULL
-  
-  # Check the number of NaN entries and where they occur.
-  expect_equal(which(is.na(cv_cpp_s)),
-               c(1, 25, 27, 35, 53, 54, 59, 61, 68, 73))
-  
-  # See if R and C++ are playing nicely.
-  expect_identical(round(cv_cpp_s, 3), round(cv_r_s, 3))
+  # Make sure the output hasn't changed even though the column order has.
+  expect_identical(round(cv_cpp_s, 3), round(cv_cpp, 3))
   
 })
