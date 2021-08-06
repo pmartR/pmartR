@@ -62,6 +62,11 @@ test_that('nonmissing_per_grp correctly counts non-missing values by group',{
   
   # Test nonmissing_per_grp with unordered columns -----------------------------
   
+  # The following tests are to make sure how the group information and the data
+  # matrix are ordered works properly. These objects are ordered within the
+  # nonmissing_per_group R function before calling the nonmissin_per_grp c++
+  # function.
+  
   # Reorder the samples.
   group_dat_s <- as.character(groupDF_s$Group[order(groupDF_s$Group)])
   
@@ -69,7 +74,7 @@ test_that('nonmissing_per_grp correctly counts non-missing values by group',{
   e_data_s <- pdata_s$e_data[, -1]
   e_data_s <- e_data_s[, order(groupDF_s$Group)]
   
-  #Run nonmissing_per_grp with the column order scrambled.
+  # Run nonmissing_per_grp with the column order scrambled and then reordered.
   nonmissing_s <- nonmissing_per_grp(as.matrix(e_data_s),
                                    group_dat_s)
   
