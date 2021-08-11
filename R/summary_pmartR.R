@@ -23,8 +23,6 @@
 #'@name summary-omicsData
 summary.pepData <- function(omicsData) {
   
-  verify_data_info(omicsData)
-  
   # get values #
   res <- list(class = class(omicsData), num_samps = attr(omicsData, "data_info")$num_samps,
               num_edata = attr(omicsData, "data_info")$num_edata,
@@ -76,8 +74,6 @@ summary.pepData <- function(omicsData) {
 #'@rdname summary-omicsData
 #'@name summary-omicsData
 summary.proData <- function(omicsData) {
-
-  verify_data_info(omicsData)
   
   # get values #
   res <- list(class = class(omicsData), num_samps = attr(omicsData, "data_info")$num_samps,
@@ -131,8 +127,6 @@ summary.proData <- function(omicsData) {
 #'@rdname summary-omicsData
 #'@name summary-omicsData
 summary.lipidData <- function(omicsData) {
-  
-  verify_data_info(omicsData)
   
   # get values #
   res <- list(class = class(omicsData), num_samps = attr(omicsData, "data_info")$num_samps,
@@ -188,8 +182,6 @@ summary.lipidData <- function(omicsData) {
 #'@name summary-omicsData
 summary.metabData <- function(omicsData) {
   
-  verify_data_info(omicsData)
-  
   # get values #
   res <- list(class = class(omicsData), num_samps = attr(omicsData, "data_info")$num_samps,
               num_edata = attr(omicsData, "data_info")$num_edata,
@@ -242,8 +234,6 @@ summary.metabData <- function(omicsData) {
 #'@rdname summary-omicsData
 #'@name summary-omicsData
 summary.nmrData <- function(omicsData) {
-  
-  verify_data_info(omicsData)
   
   # get values #
   res <- list(class = class(omicsData), num_samps = attr(omicsData, "data_info")$num_samps,
