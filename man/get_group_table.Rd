@@ -7,16 +7,16 @@
 get_group_table(omicsObject)
 }
 \arguments{
-\item{omicsObject}{an object of the class 'pepData', 'proData', 'metabData', 'lipidData', 'nmrData', 'statRes', or 'trellData', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, \code{\link{as.nmrData}}, \code{\link{imd_anova}}, or \code{\link{format_data}} respectively.}
+\item{omicsObject}{an object of the class 'pepData', 'proData', 'metabData',
+'lipidData', 'nmrData', 'statRes', or 'trellData', usually created by
+\code{\link{as.pepData}}, \code{\link{as.proData}},
+\code{\link{as.metabData}}, \code{\link{as.lipidData}},
+\code{\link{as.nmrData}}, \code{\link{imd_anova}}, or
+\code{\link{format_data}} respectively.}
 }
 \value{
 a table containing number of samples per group
 }
 \description{
 This function returns a table with number of samples per group
-}
-\examples{
-dontrun{
-get_group_table(omicsObject)
-}
 }

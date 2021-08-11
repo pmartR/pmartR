@@ -24,7 +24,7 @@ nonmissing_per_group <- function (omicsData) {
   id_col <- which(names(omicsData$e_data) == get_edata_cname(omicsData))
   
   # Extract the check.names attribute from omics data.
-  check_names <- getchecknames(omicsData)
+  check_names <- get_check_names(omicsData)
   
   # Make a copy of e_data so the sample columns can be reordered later.
   edata <- omicsData$e_data[, -id_col]

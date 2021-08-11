@@ -171,7 +171,7 @@ normalize_global <- function (omicsData, subset_fn, norm_fn, params = NULL,
     
   }
   
-  check_names = getchecknames(omicsData)
+  check_names = get_check_names(omicsData)
   edata_id <- attr(omicsData, "cnames")$edata_cname
   samp_id <- attr(omicsData, "cnames")$fdata_cname
   

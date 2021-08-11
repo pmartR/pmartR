@@ -10,22 +10,32 @@ get_data_class(dcObj)
 \item{dcObj}{an object of class 'statRes' or 'trellData'}
 }
 \value{
-returns the data_class attribute from a 'statRes' or 'trellData' object
+returns the data_class attribute from a 'statRes' or 'trellData'
+  object
 }
 \description{
-This function returns data_class attribute from statRes or trellData object, inherited from the omicsData used in \code{\link{imd_anova}} or \code{\link{format_data}}
+This function returns data_class attribute from statRes or trellData object,
+inherited from the omicsData used in \code{\link{imd_anova}} or
+\code{\link{format_data}}
 }
 \examples{
-dontrun{
-library(pmartR)
+\dontrun{
 library(pmartRdata)
 
-my_prodata = group_designation(omicsData = pro_object, main_effects = c("Condition"))
+my_prodata = group_designation(omicsData = pro_object,
+                               main_effects = c("Condition"))
 
 imdanova_Filt = imdanova_filter(omicsData = my_prodata)
-my_prodata = applyFilt(filter_object = imdanova_Filt, omicsData = my_prodata, min_nonmiss_anova=2) 
-imd_anova_res = imd_anova(omicsData = my_prodata, test_method = 'comb', pval_adjust='bon')
+
+my_prodata = applyFilt(filter_object = imdanova_Filt,
+                       omicsData = my_prodata,
+                       min_nonmiss_anova=2)
+
+imd_anova_res = imd_anova(omicsData = my_prodata,
+                          test_method = 'comb',
+                          pval_adjust='bon')
 
 result = get_data_class(imd_anova_res)
 }
+
 }

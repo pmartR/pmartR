@@ -2,21 +2,22 @@
 % Please edit documentation in R/helper_fn.R
 \name{get_data_scale}
 \alias{get_data_scale}
-\title{Get data scale}
+\title{Fetch the current data scale}
 \usage{
 get_data_scale(omicsObject)
 }
 \arguments{
-\item{omicsObject}{an object of the class 'pepData', 'proData', 'metabData', 'lipidData', 'nmrData', 'statRes', or 'trellData', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, \code{\link{as.nmrData}}, \code{\link{imd_anova}}, or \code{\link{format_data}} respectively.}
+\item{omicsObject}{an object of the class 'pepData', 'proData', 'metabData',
+'lipidData', 'nmrData', 'statRes', or 'trellData', usually created by
+\code{\link{as.pepData}}, \code{\link{as.proData}},
+\code{\link{as.metabData}}, \code{\link{as.lipidData}},
+\code{\link{as.nmrData}}, \code{\link{imd_anova}}, or
+\code{\link{format_data}} respectively.}
 }
 \value{
 a character string describing data scale
 }
 \description{
-This function returns data scale attribute
-}
-\examples{
-dontrun{
-get_data_scale(omicsObject)
-}
+This function returns current data scale which may be different from the
+original data scale (if \code{edata_transform} was used).
 }

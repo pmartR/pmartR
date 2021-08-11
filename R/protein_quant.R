@@ -456,7 +456,7 @@ pquant <- function (pepData,
 #' 
 rrollup <- function (pepData, combine_fn, parallel = TRUE) {
   
-  check_names = getchecknames(pepData)
+  check_names = get_check_names(pepData)
   
   # check that pepData is of appropraite class #
   if(!inherits(pepData, "pepData")) {
@@ -626,7 +626,7 @@ rrollup <- function (pepData, combine_fn, parallel = TRUE) {
 qrollup <- function (pepData, qrollup_thresh,
                      combine_fn, parallel = TRUE) {
   
-  check_names = getchecknames(pepData)
+  check_names = get_check_names(pepData)
   
   # check that pepData is of appropraite class #
   if(!inherits(pepData, "pepData")) stop("pepData is not an object of the appropriate class")
@@ -795,7 +795,7 @@ qrollup <- function (pepData, qrollup_thresh,
 #'   
 zrollup <- function (pepData, combine_fn, parallel = TRUE) {
   
-  check_names = getchecknames(pepData)
+  check_names = get_check_names(pepData)
   
   # check that pepData is of appropraite class #
   if(!inherits(pepData, "pepData")) stop("pepData is not an object of the appropriate class")

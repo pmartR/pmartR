@@ -2,21 +2,22 @@
 % Please edit documentation in R/helper_fn.R
 \name{get_fdata_cname}
 \alias{get_fdata_cname}
-\title{Get f_data cname}
+\title{Fetch the f_data column name}
 \usage{
 get_fdata_cname(omicsObject)
 }
 \arguments{
-\item{omicsObject}{an object of the class 'pepData', 'proData', 'metabData', 'lipidData', 'nmrData', 'statRes', or 'trellData', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, \code{\link{as.nmrData}}, \code{\link{imd_anova}}, or \code{\link{format_data}} respectively.}
+\item{omicsObject}{an object of the class 'pepData', 'proData', 'metabData',
+'lipidData', 'nmrData', 'statRes', or 'trellData', usually created by
+\code{\link{as.pepData}}, \code{\link{as.proData}},
+\code{\link{as.metabData}}, \code{\link{as.lipidData}},
+\code{\link{as.nmrData}}, \code{\link{imd_anova}}, or
+\code{\link{format_data}} respectively.}
 }
 \value{
 a character string describing f_data cname
 }
 \description{
-This function returns f_data cname
-}
-\examples{
-dontrun{
-get_fdata_cname(omicsObject)
-}
+This function returns the name of the column in f_data that contains the
+names of the samples.
 }
