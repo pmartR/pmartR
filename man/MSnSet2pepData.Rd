@@ -14,15 +14,25 @@ MSnSet2pepData(
 )
 }
 \arguments{
-\item{msnset_object}{is an object of class MSnSet, it stores quantification data and meta data. Creating an MSnSet object is described in the MSNbase package io vignette.}
+\item{msnset_object}{is an object of class MSnSet, it stores quantification
+data and meta data. Creating an MSnSet object is described in the MSNbase
+package io vignette.}
 
-\item{data_scale}{Scale of the data provided in \code{e_data}. Acceptable values are 'log2', 'log10', 'log', and 'abundance', which indicate data is log base 2, base 10, natural log transformed, and raw abundance, respectively.}
+\item{data_scale}{Scale of the data provided in \code{e_data}. Acceptable
+values are 'log2', 'log10', 'log', and 'abundance', which indicate data is
+log base 2, base 10, natural log transformed, and raw abundance,
+respectively.}
 
-\item{edata_cname}{character string specifying the name of the column containing the peptide identifiers in \code{e_data} and \code{e_meta} (if applicable).}
+\item{edata_cname}{character string specifying the name of the column
+containing the peptide identifiers in \code{e_data} and \code{e_meta} (if
+applicable).}
 
-\item{fdata_cname}{character string specifying the name of the column containing the sample identifiers in \code{f_data}.}
+\item{fdata_cname}{character string specifying the name of the column
+containing the sample identifiers in \code{f_data}.}
 
-\item{emeta_cname}{character string specifying the name of the column containing the protein identifiers (or other mapping variable) in \code{e_meta} (if applicable).}
+\item{emeta_cname}{character string specifying the name of the column
+containing the protein identifiers (or other mapping variable) in
+\code{e_meta} (if applicable).}
 }
 \value{
 pepData object
@@ -31,11 +41,16 @@ pepData object
 Converts an object of class MSnSet to an object of the class 'pepData'
 }
 \examples{
-dontrun{
+\dontrun{
 library(pmartR)
-library("MSnbase")
+library(MSnbase)
 data("msnset")
-result = MSnSet2pepData(msnset, data_scale = "log2", edata_cname = "UniqueID", fdata_cname = "SampleID", emeta_cname = "UniqueID", check.names = TRUE)
+result = MSnSet2pepData(msnset,
+                        data_scale = "log2",
+                        edata_cname = "UniqueID",
+                        fdata_cname = "SampleID",
+                        emeta_cname = "UniqueID",
+                        check.names = TRUE)
 }
 
 }
