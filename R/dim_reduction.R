@@ -26,8 +26,10 @@
 #' \dontrun{
 #' library(pmartRdata)
 #' data(lipid_object)
-#' lipid_object <- edata_transform(omicsData = lipid_object, data_scale="log2")
-#' lipid_object <- group_designation(omicsData = lipid_object, main_effects = "Condition")
+#' lipid_object <- edata_transform(omicsData = lipid_object,
+#'                                 data_scale="log2")
+#' lipid_object <- group_designation(omicsData = lipid_object,
+#'                                   main_effects = "Condition")
 #' pca_lipids <- dim_reduction(omicsData = lipid_object)
 #' plot(pca_lipids)
 #' summary(pca_lipids)
@@ -37,12 +39,20 @@
 #' @rdname dim_reduction
 #' @name dim_reduction
 #'
-dim_reduction <- function(omicsData, k = 2){
+dim_reduction <- function (omicsData, k = 2){
+  
   # check that omicsData is of appropriate class #
-  if(!inherits(omicsData, c("pepData","proData","metabData", "lipidData", "nmrData"))) stop("omicsData must be an object of class 'pepdata','prodata', 'metabData', 'lipidData', or 'nrmData'.")
+  if(!inherits(omicsData, c("pepData", "proData", "metabData",
+                            "lipidData", "nmrData")))
+    stop(paste("omicsData must be an object of class 'pepdata','prodata',",
+               "'metabData', 'lipidData', or 'nrmData'.",
+               sep = " "))
 
   # check that group designation has been run #
-  if(!("group_DF" %in% names(attributes(omicsData)))) warning("group_designation has not been run on this data and may limit plotting options")
+  if(!("group_DF" %in% names(attributes(omicsData))))
+    warning(paste("group_designation has not been run on this data and may",
+                  "limit plotting options",
+                  sep = " "))
 
   # data should be log transformed #
   if (get_data_scale(omicsData) == "abundance") {
@@ -55,7 +65,7 @@ dim_reduction <- function(omicsData, k = 2){
   temp_data = omicsData$e_data[, -which(names(omicsData$e_data) == pep_id)]
 
   ## check for samples seen in only one sample or no samples and remove ##
-  minsamps = which(apply(!is.na(temp_data), 1, sum) < 2)
+  minsamps = which(rowSums(!is.na(temp_data)) < 2)
   if(length(minsamps) > 0){
     temp_data = temp_data[-minsamps,]
   }
@@ -66,18 +76,20 @@ dim_reduction <- function(omicsData, k = 2){
     temp_data[-minvars, ]
   }
 
-  pca_res = pcaMethods::pca(object = as.matrix(t(temp_data)), method = "ppca", scale = "vector", nPcs = k)
+  pca_res = pcaMethods::pca(object = as.matrix(t(temp_data)),
+                            method = "ppca",
+                            scale = "vector",
+                            nPcs = k)
   pca_ests = pca_res@scores[,1:k]
 
   temp_res = data.frame(SampleID = names(temp_data), pca_ests)
 
   class(temp_res) <- "dimRes"
 
-  if(!is.null(attr(omicsData, "group_DF"))){
   attr(temp_res, "group_DF") <- attr(omicsData, "group_DF")
-  }else{attr(temp_res, "group_DF") <- NULL}
 
   attr(temp_res, "R2") <- pca_res@R2
 
   return(temp_res)
+  
 }

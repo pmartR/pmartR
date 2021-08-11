@@ -33,8 +33,10 @@ Any biomoleculs seen in only one sample or with a variance less than
 \dontrun{
 library(pmartRdata)
 data(lipid_object)
-lipid_object <- edata_transform(omicsData = lipid_object, data_scale="log2")
-lipid_object <- group_designation(omicsData = lipid_object, main_effects = "Condition")
+lipid_object <- edata_transform(omicsData = lipid_object,
+                                data_scale="log2")
+lipid_object <- group_designation(omicsData = lipid_object,
+                                  main_effects = "Condition")
 pca_lipids <- dim_reduction(omicsData = lipid_object)
 plot(pca_lipids)
 summary(pca_lipids)
