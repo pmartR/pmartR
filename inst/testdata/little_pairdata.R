@@ -7,7 +7,7 @@
 
 # Create the edata object and reduce it.
 edata <- pep_data$e_data
-edata <- edata[1:150, ]
+edata <- edata[1001:1150, ]
 
 # Create the emeta object and reduce it.
 emeta <- pep_data$e_meta
