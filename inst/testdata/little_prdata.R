@@ -15,6 +15,9 @@ data("pro_fdata")
 # Take a small subset of the rows in pro_edata to use for testing.
 edata <- pro_edata[1:150, ]
 
+# Remove factors from data columns to reduce the size of the .RData file.
+edata$Reference <- as.character(edata$Reference)
+
 # Keep a copy of the original pro_fdata data frame.
 fdata <- pro_fdata
 
