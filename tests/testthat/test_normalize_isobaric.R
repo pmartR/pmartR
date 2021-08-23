@@ -120,6 +120,10 @@ test_that('normalize_isobaric produces the correct output',{
   expect_identical(spec1$e_data, norm_standard)
   expect_identical(spec2$e_data, norm_standard)
   
+  # Change the "Group" column in f_data to "group" because the pre_flight
+  # function does not allow any column in f_data to be named "Group".
+  names(fdata)[5] <- "group"
+  
   # Make sure f_data has the correct rows removed. Metamorphose all columns into
   # character vectors. This way the comparisons are apples to apples instead of
   # something like apples to zombies.

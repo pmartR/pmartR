@@ -376,4 +376,21 @@ test_that('as.metabData returns the correct data frame and attributes',{
                      'specifying column names.',
                      sep = ' '))
   
+  # Make sure "Group" is not a column name in f_data ---------------------------
+  
+  # Change the column named "Condition" to "Group".
+  names(fdata)[2] <- "Group"
+  
+  expect_message(mdatag <- as.metabData(e_data = edata,
+                                        f_data = fdata,
+                                        edata_cname = 'Metabolite',
+                                        fdata_cname = 'SampleID'),
+                 paste("A column in f_data is named 'Group'. This name is",
+                       "reserved for use in the group_designation funtion. The",
+                       "column name has been changed to 'group'.",
+                       sep = " "))
+  
+  expect_equal(names(mdatag$f_data),
+               c("SampleID", "group"))
+  
 })

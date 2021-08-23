@@ -246,6 +246,27 @@ pre_flight <- function (e_data,
 
   }
   
+  # Make sure the word 'Group' does not appear in f_data column names.
+  if ("Group" %in% names(f_data)) {
+    
+    # Find the column number where the name "Group" occurs. This index will be
+    # used to change the name to "group" because the group_designation function
+    # creates a column named "Group". Some functions merge data frames with
+    # f_data and having two columns named "Group" causes issues.
+    group_idx <- which(names(f_data) == "Group")
+    
+    # Change the name to "group" so the merge function doesn't get confused.
+    names(f_data)[group_idx] <- "group"
+    
+    # Let the user know they have overstepped their bounds and must be put in
+    # their appropriate place.
+    message(paste("A column in f_data is named 'Group'. This name is reserved",
+                  "for use in the group_designation funtion. The column name",
+                  "has been changed to 'group'.",
+                  sep = " "))
+    
+  }
+  
   # Ensure the data frames agree with each other -------------------------------
 
   # check that all samples in e_data (column names of e_data) are present in
