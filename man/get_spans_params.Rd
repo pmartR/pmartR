@@ -7,10 +7,14 @@
 get_spans_params(SPANSRes_obj, sort_by_nmols = FALSE)
 }
 \arguments{
-\item{SPANSRes_obj}{an object of the class SPANSRes obtained by calling \code{spans_procedure()}}
+\item{SPANSRes_obj}{an object of the class SPANSRes obtained by calling
+\code{spans_procedure()}}
 }
 \value{
-A list of lists, where there are multiple sublists only if there were ties for the top SPANS score.  Each sublist contains named elements for the subset and normalization methods, and the parameters used for the subset method. \cr
+A list of lists, where there are multiple sublists only if there were
+  ties for the top SPANS score.  Each sublist contains named elements for the
+  subset and normalization methods, and the parameters used for the subset
+  method. \cr
 }
 \description{
 Gets the parameters for the highest ranked methods from spans.

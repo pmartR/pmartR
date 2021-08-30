@@ -17,7 +17,7 @@ data.frame object
 For creating a summary of an S3 object of type 'isobaricnormRes':
 }
 \examples{
-dontrun{
+\dontrun{
 library(pmartRdata)
 data(isobaric_object)
 

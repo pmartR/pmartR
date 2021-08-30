@@ -6,6 +6,11 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 // anova_cpp
 List anova_cpp(NumericMatrix data, NumericVector gp, int unequal_var, NumericVector df_red);
 RcppExport SEXP _pmartR_anova_cpp(SEXP dataSEXP, SEXP gpSEXP, SEXP unequal_varSEXP, SEXP df_redSEXP) {
@@ -17,6 +22,29 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type unequal_var(unequal_varSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type df_red(df_redSEXP);
     rcpp_result_gen = Rcpp::wrap(anova_cpp(data, gp, unequal_var, df_red));
+    return rcpp_result_gen;
+END_RCPP
+}
+// pooled_cv_rcpp
+std::list<double> pooled_cv_rcpp(arma::mat mtr, std::vector<std::string> group);
+RcppExport SEXP _pmartR_pooled_cv_rcpp(SEXP mtrSEXP, SEXP groupSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type mtr(mtrSEXP);
+    Rcpp::traits::input_parameter< std::vector<std::string> >::type group(groupSEXP);
+    rcpp_result_gen = Rcpp::wrap(pooled_cv_rcpp(mtr, group));
+    return rcpp_result_gen;
+END_RCPP
+}
+// unpooled_cv_rcpp
+std::list<double> unpooled_cv_rcpp(NumericMatrix mtr);
+RcppExport SEXP _pmartR_unpooled_cv_rcpp(SEXP mtrSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type mtr(mtrSEXP);
+    rcpp_result_gen = Rcpp::wrap(unpooled_cv_rcpp(mtr));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -178,28 +206,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// pooled_cv_rcpp
-std::list<double> pooled_cv_rcpp(arma::mat mtr, std::vector<std::string> group);
-RcppExport SEXP _pmartR_pooled_cv_rcpp(SEXP mtrSEXP, SEXP groupSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::mat >::type mtr(mtrSEXP);
-    Rcpp::traits::input_parameter< std::vector<std::string> >::type group(groupSEXP);
-    rcpp_result_gen = Rcpp::wrap(pooled_cv_rcpp(mtr, group));
-    return rcpp_result_gen;
-END_RCPP
-}
-// rcpp_hello_world
-List rcpp_hello_world();
-RcppExport SEXP _pmartR_rcpp_hello_world() {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    rcpp_result_gen = Rcpp::wrap(rcpp_hello_world());
-    return rcpp_result_gen;
-END_RCPP
-}
 // ptukey_speed
 NumericMatrix ptukey_speed(NumericMatrix qstats, NumericVector sizes);
 RcppExport SEXP _pmartR_ptukey_speed(SEXP qstatsSEXP, SEXP sizesSEXP) {
@@ -230,6 +236,8 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_pmartR_anova_cpp", (DL_FUNC) &_pmartR_anova_cpp, 4},
+    {"_pmartR_pooled_cv_rcpp", (DL_FUNC) &_pmartR_pooled_cv_rcpp, 2},
+    {"_pmartR_unpooled_cv_rcpp", (DL_FUNC) &_pmartR_unpooled_cv_rcpp, 1},
     {"_pmartR_count_missing_cpp", (DL_FUNC) &_pmartR_count_missing_cpp, 2},
     {"_pmartR_proj_mat_cpp", (DL_FUNC) &_pmartR_proj_mat_cpp, 2},
     {"_pmartR_project_to_null_cpp", (DL_FUNC) &_pmartR_project_to_null_cpp, 3},
@@ -243,8 +251,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_pmartR_holm_cpp", (DL_FUNC) &_pmartR_holm_cpp, 1},
     {"_pmartR_kw_rcpp", (DL_FUNC) &_pmartR_kw_rcpp, 2},
     {"_pmartR_nonmissing_per_grp", (DL_FUNC) &_pmartR_nonmissing_per_grp, 2},
-    {"_pmartR_pooled_cv_rcpp", (DL_FUNC) &_pmartR_pooled_cv_rcpp, 2},
-    {"_pmartR_rcpp_hello_world", (DL_FUNC) &_pmartR_rcpp_hello_world, 0},
     {"_pmartR_ptukey_speed", (DL_FUNC) &_pmartR_ptukey_speed, 2},
     {"_pmartR_two_factor_anova_cpp", (DL_FUNC) &_pmartR_two_factor_anova_cpp, 5},
     {NULL, NULL, 0}

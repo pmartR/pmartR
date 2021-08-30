@@ -4,38 +4,52 @@
 \alias{bpquant}
 \title{Runs BP-Quant}
 \usage{
-bpquant(statRes, pepData, pi_not = 0.9, max_proteoforms = 5)
+bpquant(statRes, pepData, pi_not = 0.9, max_proteoforms = 5, parallel = TRUE)
 }
 \arguments{
 \item{statRes}{an object of the class 'statRes'}
 
 \item{pepData}{is an omicsData object of the class 'pepData'}
 
-\item{pi_not}{is a numeric value between 0 and 1 indicating the background probability/frequency of a zero signature.}
+\item{pi_not}{is a numeric value between 0 and 1 indicating the background
+probability/frequency of a zero signature.}
 
-\item{max_proteoforms}{a numeric value, a maximum threshold for the number of possible proteoforms.}
+\item{max_proteoforms}{a numeric value, a maximum threshold for the number of
+possible proteoforms.}
 }
 \value{
-a list of data frames, one for each unique protein. The data frames have three columns, "Protein", "Mass_Tag_ID" (which is molecule ID), and "ProteoformID". The class of this list is 'isoformRes'.
+a list of data frames, one for each unique protein. The data frames
+  have three columns, "Protein", "Mass_Tag_ID" (which is molecule ID), and
+  "ProteoformID". The class of this list is 'isoformRes'.
 }
 \description{
 Applies BP-Quant to a pepData object
 }
 \details{
-The statRes object contains the signatures data frame, the pepData object is used for its e_meta data frame. Next the signatures data frame and e_meta are merged by their edata_cname (“Peptide”) columns, this new data frame called protein_sig_data will be input to bpquant_mod in a “foreach” statement. “Foreach” will subset protein_sig_data for each unique protein and apply bpquant_mod to each subset and store the results.
+The statRes object contains the signatures data frame, the pepData
+  object is used for its e_meta data frame. Next the signatures data frame
+  and e_meta are merged by their edata_cname (“Peptide”) columns, this new
+  data frame called protein_sig_data will be input to bpquant_mod in a
+  “foreach” statement. “Foreach” will subset protein_sig_data for each unique
+  protein and apply bpquant_mod to each subset and store the results.
 }
 \examples{
-dontrun{
+\dontrun{
 library(pmartR)
 library(pmartRdata)
 
-mypepData <- group_designation(omicsData = pep_object, main_effects = c("Condition"))
+mypepData <- group_designation(omicsData = pep_object,
+                               main_effects = c("Condition"))
 mypepData = edata_transform(mypepData, "log2")
 
 imdanova_Filt <- imdanova_filter(omicsData = mypepData)
-mypepData <- applyFilt(filter_object = imdanova_Filt, omicsData = mypepData, min_nonmiss_anova=2)
+mypepData <- applyFilt(filter_object = imdanova_Filt,
+                       omicsData = mypepData,
+                       min_nonmiss_anova=2)
 
-imd_anova_res <- imd_anova(omicsData = mypepData, test_method = 'comb', pval_adjust='bon')
+imd_anova_res <- imd_anova(omicsData = mypepData,
+                           test_method = 'comb',
+                           pval_adjust='bon')
 
 result = bpquant(statRes = imd_anova_res, pepData = mypepData)
 

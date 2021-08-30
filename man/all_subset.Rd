@@ -21,7 +21,7 @@ Selects features for normalization via choosing all features currently in the da
 This function returns the subset of all features. These will be used for normalization.
 }
 \examples{
-dontrun{
+\dontrun{
 library(pmartRdata)
 data(pep_edata)
 keep <- none_subset(e_data = pep_edata, edata_id = "Mass_Tag_ID")

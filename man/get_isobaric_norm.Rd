@@ -2,21 +2,20 @@
 % Please edit documentation in R/helper_fn.R
 \name{get_isobaric_norm}
 \alias{get_isobaric_norm}
-\title{Get isobaric norm}
+\title{Fetch the isobaric normalization info}
 \usage{
 get_isobaric_norm(omicsData)
 }
 \arguments{
-\item{omicsData}{an object of the class 'pepData', 'isobaricpepData' or 'proData', usually created by \code{\link{as.pepData}}, \code{\link{as.isobaricpepData}}.}
+\item{omicsData}{an object of the class 'pepData', 'isobaricpepData' or
+'proData', usually created by \code{\link{as.pepData}},
+\code{\link{as.isobaricpepData}}.}
 }
 \value{
-a character string describing isobaric norm attribute
+A logical value indicating whether the data have been isobaric
+  normalized.
 }
 \description{
-This function returns the isobaric norm attribute
-}
-\examples{
-dontrun{
-get_isobaric_norm(omicsData)
-}
+This function returns the norm_info element of the isobaric_info attribute
+which indicates if the data have been isobaric normalized.
 }

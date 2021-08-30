@@ -1,25 +1,33 @@
 #' Creates custom sample names for plots
-#' 
-#' This helper function creates custom sample names for plot data object function
-#' 
-#' @param omicsData omicsData an object of the class 'pepData', 'proData', 'metabData', or 'lipidData', usually created by \code{pepData}, \code{proData}, \code{metabData}, or \code{lipidData}, respectively.
-#' @param firstn is an integer specifying the first n characters to keep as the sample name
-#' @param from is an integer specifying the start of the range of characters to keep as the sample name
-#' @param to is an integer specifying the end of the range of characters to keep as the sample name
+#'
+#' This helper function creates custom sample names for plot data object
+#' function
+#'
+#' @param omicsData omicsData an object of the class 'pepData', 'proData',
+#'   'metabData', or 'lipidData', usually created by \code{pepData},
+#'   \code{proData}, \code{metabData}, or \code{lipidData}, respectively.
+#' @param firstn is an integer specifying the first n characters to keep as the
+#'   sample name
+#' @param from is an integer specifying the start of the range of characters to
+#'   keep as the sample name
+#' @param to is an integer specifying the end of the range of characters to keep
+#'   as the sample name
 #' @param delim is a delimiter to separate sample name components by
-#' @param components an integer vector specifying which components separated by delim to keep as sample name
-#' 
-#' @details 
-#' 
+#' @param components an integer vector specifying which components separated by
+#'   delim to keep as sample name
+#'
+#' @details
+#'
 #' @examples
-#' dontrun{
+#' \dontrun{
 #' data(pep_object)
 #' results = custom_sampnames(pep_object, firstn = 5)
-#' } 
-#' 
+#' }
+#'
 #' @export
-
-custom_sampnames = function(omicsData, firstn = NULL, from = NULL, to = NULL, delim = NULL, components = NULL){
+#' 
+custom_sampnames <- function (omicsData, firstn = NULL, from = NULL,
+                              to = NULL, delim = NULL, components = NULL){
   
   #extract sample names from omicsData object
   fdata_cname = attr(omicsData, "cnames")$fdata_cname

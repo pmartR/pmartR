@@ -2,21 +2,22 @@
 % Please edit documentation in R/helper_fn.R
 \name{get_data_norm}
 \alias{get_data_norm}
-\title{Get data norm}
+\title{Fetch the normalization status of the data}
 \usage{
 get_data_norm(omicsObject)
 }
 \arguments{
-\item{omicsObject}{an object of the class 'pepData', 'proData', 'metabData', 'lipidData', 'nmrData', 'statRes', or 'trellData', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, \code{\link{as.nmrData}}, \code{\link{imd_anova}}, or \code{\link{format_data}} respectively.}
+\item{omicsObject}{an object of the class 'pepData', 'proData', 'metabData',
+'lipidData', 'nmrData', 'statRes', or 'trellData', usually created by
+\code{\link{as.pepData}}, \code{\link{as.proData}},
+\code{\link{as.metabData}}, \code{\link{as.lipidData}},
+\code{\link{as.nmrData}}, \code{\link{imd_anova}}, or
+\code{\link{format_data}} respectively.}
 }
 \value{
-a character string describing data norm
+A logical value indicating whether the data have been normalized.
 }
 \description{
-This function returns data norm attribute
-}
-\examples{
-dontrun{
-get_data_norm(omicsObject)
-}
+This function returns the norm_info element of the data_info attribute
+indicating whether the data have been normalized.
 }

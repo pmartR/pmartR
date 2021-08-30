@@ -2,21 +2,32 @@
 % Please edit documentation in R/helper_fn.R
 \name{get_filters}
 \alias{get_filters}
-\title{Get Filters}
+\title{Fetch the filters attribute}
 \usage{
 get_filters(omicsData)
 }
 \arguments{
-\item{omicsData}{an object of the class 'pepData', 'proData', 'metabData', 'lipidData', or 'nmrData', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, respectively.}
+\item{omicsData}{An object of class pepData, proData, metabData, lipidData,
+or nmrData.}
 }
 \value{
-a vector of filter names
+A list containing filter class objects. Each element in this list
+        corresponds to a filter applied to the data. The filters will be
+        listed in the order they were applied. A filter object contains two
+        elements:
+        \itemize{
+        
+          \item threshold -- The threshold used to filter \code{e_data}. This
+          value depends on the type of filter applied.
+          
+          \item filtered -- A vector containing the identifiers from the 
+          \code{edata_cname} column that will be filtered.
+          
+          \item method -- A character string indicating the type of method
+          used to filter. This only applies when imdanova_filter is used.
+        
+        }
 }
 \description{
-This function returns filters attribute
-}
-\examples{
-dontrun{
-get_filters(omicsData)
-}
+Retrieves the values in the filters attribute from an omicsData object.
 }

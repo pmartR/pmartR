@@ -2,47 +2,38 @@
 % Please edit documentation in R/edata_replace.R
 \name{edata_replace}
 \alias{edata_replace}
-\alias{edata_replace.pepData}
-\alias{edata_replace.proData}
-\alias{edata_replace.metabData}
-\alias{edata_replace.lipidData}
-\alias{edata_replace.nmrData}
 \title{Replace Values Equal to x with y}
 \usage{
 edata_replace(omicsData, x, y)
-
-\method{edata_replace}{pepData}(omicsData, x, y)
-
-\method{edata_replace}{proData}(omicsData, x, y)
-
-\method{edata_replace}{metabData}(omicsData, x, y)
-
-\method{edata_replace}{lipidData}(omicsData, x, y)
-
-\method{edata_replace}{nmrData}(omicsData, x, y)
 }
 \arguments{
-\item{omicsData}{an object of the class 'pepData', 'proData', 'metabData', 'lipidData', or 'nmrData' usually created by \code{\link{pepData}}, \code{\link{proData}}, \code{\link{metabData}}, \code{\link{lipidData}}, or \code{\link{as.nmrData}}, respectively.}
+\item{omicsData}{an object of the class 'pepData', 'proData', 'metabData',
+'lipidData', or 'nmrData' usually created by \code{\link{pepData}},
+\code{\link{proData}}, \code{\link{metabData}}, \code{\link{lipidData}}, or
+\code{\link{as.nmrData}}, respectively.}
 
 \item{x}{value to be replaced, usually numeric or NA}
 
-\item{y}{replacment value, usually numeric or NA}
+\item{y}{replacement value, usually numeric or NA}
 }
 \value{
 data object of the same class as omicsData
 }
 \description{
-This function finds all values of x in the e_data element of omicsData and replaces them with y
+This function finds all values of x in the e_data element of omicsData and
+replaces them with y
 }
 \details{
-This function is often used to replace any 0 values in peptide, protein, metabolite, or lipid data with NA's.
+This function is often used to replace any 0 values in peptide,
+  protein, metabolite, or lipid data with NA's.
 }
 \examples{
-dontrun{
+\dontrun{
 library(pmartRdata)
 data(metab_object)
 metab_object2 <- edata_replace(omicsData = metab_object, x=0, y=NA)
 }
+
 }
 \author{
 Kelly Stratton

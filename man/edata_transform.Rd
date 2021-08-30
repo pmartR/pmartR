@@ -2,24 +2,9 @@
 % Please edit documentation in R/edata_transform.R
 \name{edata_transform}
 \alias{edata_transform}
-\alias{edata_transform.pepData}
-\alias{edata_transform.proData}
-\alias{edata_transform.metabData}
-\alias{edata_transform.lipidData}
-\alias{edata_transform.nmrData}
 \title{Apply a Transformation to the Data}
 \usage{
 edata_transform(omicsData, data_scale)
-
-\method{edata_transform}{pepData}(omicsData, data_scale)
-
-\method{edata_transform}{proData}(omicsData, data_scale)
-
-\method{edata_transform}{metabData}(omicsData, data_scale)
-
-\method{edata_transform}{lipidData}(omicsData, data_scale)
-
-\method{edata_transform}{nmrData}(omicsData, data_scale)
 }
 \arguments{
 \item{omicsData}{an object of the class 'pepData', 'proData', 'metabData', 'lipidData', or 'nmrData' usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, \code{\link{as.nmrData}}, respectively.}

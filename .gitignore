@@ -1,12 +1,14 @@
 *.Rproj.user
 *.Rhistory
-*.RData
+
 *.Ruserdata
 *.Rproj
 src/*.o
 src/*.so
 *.dll
 .Rproj.user
+.DS_Store
+.Rapp.history
 
 # dont commit saved images or logs
 /tests/testthat/logs_*

@@ -55,39 +55,44 @@ regarding reference pool samples. If using this argument, the
 The samples are normalized to their corresponding reference pool sample
 }
 \details{
-#' There are two ways to specify the information needed for
-identifying reference samples which should be used for normalization:
-\enumerate{ \item specify \code{channel_cname} and \code{refpool_channel}.
-This should be used when the reference sample for each experiment/plate was
-always located in the same channel. Here \code{channel_cname} gives the
-column name for the column in \code{f_data} which gives information about
-which channel each sample was run on, and \code{refpool_channel} is a
-character string specifying the value in \code{channel_colname} that
-corresponds to the reference sample channel. \item specify
-\code{refpool_cname} and \code{refpool_notation}. This should be used when
-the reference sample is not in a consistent channel across
-experiments/plates. Here, \code{refpool_cname} gives the name of the column
-in \code{f_data} which indicates whether a sample is a reference or not, and
-\code{refpool_notation} is a character string giving the value used to denote
-a reference sample in that column. } In both cases you must specify
-\code{exp_cname} which gives the column name for the column in \code{f_data}
-containing information about which experiment/plate a sample was run on.
-
-See examples below.
+There are two ways to specify the information needed for identifying
+  reference samples which should be used for normalization: \enumerate{ \item
+  specify \code{channel_cname} and \code{refpool_channel}. This should be
+  used when the reference sample for each experiment/plate was always located
+  in the same channel. Here \code{channel_cname} gives the column name for
+  the column in \code{f_data} which gives information about which channel
+  each sample was run on, and \code{refpool_channel} is a character string
+  specifying the value in \code{channel_colname} that corresponds to the
+  reference sample channel. \item specify \code{refpool_cname} and
+  \code{refpool_notation}. This should be used when the reference sample is
+  not in a consistent channel across experiments/plates. Here,
+  \code{refpool_cname} gives the name of the column in \code{f_data} which
+  indicates whether a sample is a reference or not, and
+  \code{refpool_notation} is a character string giving the value used to
+  denote a reference sample in that column. } In both cases you must specify
+  \code{exp_cname} which gives the column name for the column in
+  \code{f_data} containing information about which experiment/plate a sample
+  was run on.
 }
 \examples{
-dontrun{
+\dontrun{
 library(pmartRdata)
 data(isobaric_object)
 
 isobaric_object = edata_transform(isobaric_object, "log2")
-isobaric_norm = normalize_isobaric(isobaric_object, exp_cname = "Set", apply_norm = TRUE, channel_cname = "iTRAQ.Channel", refpool_channel = "116")
+isobaric_norm = normalize_isobaric(isobaric_object, exp_cname = "Set",
+                                   apply_norm = TRUE,
+                                   channel_cname = "iTRAQ.Channel",
+                                   refpool_channel = "116")
 
 # alternate specification: #
 data(isobaric_object)
 
 isobaric_object = edata_transform(isobaric_object, "log2")
-isobaric_norm = normalize_isobaric(isobaric_object, exp_cname = "Set", apply_norm = TRUE, refpool_cname = "Reference", refpool_notation = "Yes")
+isobaric_norm = normalize_isobaric(isobaric_object, exp_cname = "Set",
+                                   apply_norm = TRUE,
+                                   refpool_cname = "Reference",
+                                   refpool_notation = "Yes")
 
 }
 

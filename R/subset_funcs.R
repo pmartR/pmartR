@@ -1,5 +1,3 @@
-
-
 #' Identifies the 'subset' of All Features
 #'
 #' Selects features for normalization via choosing all features currently in the data
@@ -12,7 +10,7 @@
 #' @return Character vector containing all features.
 #'
 #' @examples
-#' dontrun{
+#' \dontrun{
 #' library(pmartRdata)
 #' data(pep_edata)
 #' keep <- none_subset(e_data = pep_edata, edata_id = "Mass_Tag_ID")
@@ -20,9 +18,6 @@
 #'
 #' @author Kelly Stratton
 #'
-
-
-
 all_subset <- function(e_data, edata_id){
 
   # pull off the column for edata_id
@@ -35,7 +30,6 @@ all_subset <- function(e_data, edata_id){
 
   return(peps)
 }
-
 
 #' Identify Features from the Top L Order Statistics
 #'
@@ -59,8 +53,6 @@ all_subset <- function(e_data, edata_id){
 #'
 #' @author Kelly Stratton, Lisa Bramer
 #'
-
-
 los <- function(e_data, edata_id, L =.05){
 
   # pull off the column for edata_id
@@ -98,7 +90,6 @@ los <- function(e_data, edata_id, L =.05){
   return(kp)
 }
 
-
 #' Identify Proportion of the Peptides Present (PPP) Biomolecules
 #'
 #' Selects features for normalization via the method of percentage of the peptides (or proteins, metabolites, etc.) present (PPP)
@@ -122,36 +113,24 @@ los <- function(e_data, edata_id, L =.05){
 #'
 #' @author Kelly Stratton
 #'
-
-
-
 ppp <- function(e_data, edata_id, proportion=0.5){
 
   # pull off the column for edata_id
   edata_id_ind <- which(colnames(e_data)==edata_id)
 
-  # subset to features present in at least proportion samples
-  peps <- e_data[, edata_id_ind]
-  row.names(e_data) <- peps
-  mydata <- e_data[, -edata_id_ind]
-
-  # get matrix of !is.na's #
-  mydata_present <- !is.na(mydata)
-
   # get column of proportion present #
-  mydata_pct_present <- rowSums(mydata_present)/ncol(mydata_present)
+  mydata_pct_present <- rowSums(!is.na(e_data[, -edata_id_ind])) /
+    ncol(e_data[, -edata_id_ind])
 
   # which features have proportion present above the value of "proportion" #
   inds <- which(mydata_pct_present >= proportion)
-  mydata <- mydata[inds,]
 
-  subset_peps <- as.character(row.names(mydata))
+  subset_peps <- as.character(e_data[inds, edata_id_ind])
 
   if(length(subset_peps)<2) stop("There are <2 biomolecules in the subset; cannot proceed.")
 
   return(subset_peps)
 }
-
 
 #' Identify Proportion of Peptides Present (PPP) and Rank Invariant Peptides (RIP)
 #'
@@ -178,9 +157,6 @@ ppp <- function(e_data, edata_id, proportion=0.5){
 #'
 #' @author Kelly Stratton
 #'
-
-
-
 ppp_rip <- function(e_data, edata_id, fdata_id, groupDF, alpha=0.2, proportion=0.5){
 
   samp_id = fdata_id
@@ -190,55 +166,33 @@ ppp_rip <- function(e_data, edata_id, fdata_id, groupDF, alpha=0.2, proportion=0
   
   # subset to features present in at least proportion samples
   peps <- e_data[, edata_id_ind]
-  #row.names(e_data) <- peps
-  mydata <- e_data#[, -edata_id_ind]
-  
-  # get matrix of !is.na's #
-  mydata_present <- !is.na(mydata)
   
   # get column of proportion present #
-  mydata_pct_present <- rowSums(mydata_present)/ncol(mydata_present)
+  mydata_pct_present <- rowSums(!is.na(e_data[, -edata_id_ind])) /
+    ncol(e_data[, -edata_id_ind])
   
   # which features have proportion present above the value of "proportion" #
   inds <- which(mydata_pct_present >= proportion)
-  mydata <- mydata[inds,]
+  mydata <- e_data[inds, -edata_id_ind]
   peps <- peps[inds]
-##########
-#  pvals <- data.frame(rep(NA, nrow(mydata)))
-#  for(i in 1:nrow(mydata)){
-#    # check to see whether all observations are in the same group
-#    nonmiss <- nonmissing_per_group(e_data = mydata[i,], groupDF= groupDF, cname_id=edata_id, samp_id=samp_id)$nonmiss_totals
-#    if(sum(nonmiss[-1]==0) > (length(nonmiss[-1])-2)){
-#      # if so, return 0 (we don't want to keep this one)
-#      pvals[i,1] <- 0
-#    }else{
-#      # otherwise, return the p-value
-#      pvals[i,1] <- kruskal.test(as.numeric(mydata[i,-1])~as.factor(groupDF$Group), na.action="na.omit")$p.value
-#    }
-#
-#  }
-#  #row.names(pvals) <- row.names(mydata)
-##########
   
   #added 2/6/17 lines 223-231 iobani
-  mydata = mydata[, -which(names(mydata) %in% edata_id)]
   group_dat = as.character(groupDF$Group[order(groupDF$Group)])
-  rtemp = mydata[, match(groupDF[, samp_id], names(mydata))]
-  rtemp2 = rtemp[, order(groupDF$Group)]
+  mydata = mydata[, order(groupDF$Group)]
   
   # conduct K-W test using kw_rcpp function 
-  pvals = kw_rcpp(as.matrix(rtemp2), group_dat)
-  pvals= data.frame(pvals)
+  pvals = kw_rcpp(as.matrix(mydata), group_dat)
+  pvals = data.frame(pvals)
   
-  RIPeps <- as.character(peps[as.numeric(pvals[, 1]) > alpha & !is.na(as.numeric(pvals[, 1]))])
+  RIPeps <- as.character(peps[as.numeric(pvals[, 1]) > alpha &
+                                !is.na(as.numeric(pvals[, 1]))])
 
   if(length(RIPeps)<2) stop("There are <2 biomolecules in the subset; cannot proceed.")
 
 
   return(RIPeps)
+  
 }
-
-
 
 #' Identify Rank-Invariant Peptides
 #'
@@ -264,9 +218,6 @@ ppp_rip <- function(e_data, edata_id, fdata_id, groupDF, alpha=0.2, proportion=0
 #'
 #' @author Kelly Stratton
 #'
-
-
-
 rip <- function(e_data, edata_id, fdata_id, groupDF, alpha=.2){
 
   # pull off the column for edata_id
@@ -274,33 +225,20 @@ rip <- function(e_data, edata_id, fdata_id, groupDF, alpha=.2){
 
   # subset to complete cases (features with complete data)
   peps <- e_data[, edata_id_ind]
-  row.names(e_data) <- as.character(peps)
-  mydata <- e_data[, -edata_id_ind]
-  inds <- which(complete.cases(mydata) == TRUE)
-  mydata <- mydata[inds,]
- 
-##########
-#  pvals <- data.frame(rep(NA, nrow(mydata)))
-#  for(i in 1:nrow(mydata)){
-#    pvals[i,1] <- kruskal.test(as.numeric(mydata[i,])~as.factor(groupDF$Group))$p.value
-#  }
-##########
+  inds <- which(complete.cases(e_data[, -edata_id_ind]) == TRUE)
+  mydata <- e_data[inds, -edata_id_ind]
+  peps <- peps[inds]
   
   #added 2/6/17 iobani
-  samp_id = fdata_id
   group_dat = as.character(groupDF$Group[order(groupDF$Group)])
-    
-  rtemp =  mydata[, match(groupDF[, samp_id], names(mydata))]
-  rtemp2 =  rtemp[, order(groupDF$Group)]
+  mydata <- mydata[, order(groupDF$Group)]
     
   # conduct K-W test on un-normalized data, used kw_rcpp function 
-  pvals = kw_rcpp(as.matrix(rtemp2), group_dat)
+  pvals = kw_rcpp(as.matrix(mydata), group_dat)
   pvals = data.frame(pvals)
- 
-  
-  row.names(pvals) <- row.names(mydata)
 
-  RIPeps <- as.character(row.names(pvals)[as.numeric(pvals[, 1]) > alpha])
+  RIPeps <- as.character(peps[as.numeric(pvals[, 1]) > alpha &
+                                !is.na(as.numeric(pvals[, 1]))])
 
   if(length(RIPeps)<2) stop("There are <2 biomolecules in the subset; cannot proceed.")
 
@@ -330,7 +268,7 @@ complete_mols <- function(e_data, edata_id){
   edata_id_ind <- which(colnames(e_data)==edata_id)
   
   # rows with no missing values
-  complete_inds <- which(rowSums(is.na(e_data[-edata_id_ind])) == 0)
+  complete_inds <- which(complete.cases(e_data[, -edata_id_ind]) == TRUE)
   
   # retain only character peptide names for complete rows
   peps <- as.character(e_data[complete_inds, edata_id_ind])

@@ -7,7 +7,10 @@
 cor_result(omicsData)
 }
 \arguments{
-\item{omicsData}{an object of the class 'pepData', 'proData', 'metabData', 'lipidData', or 'nmrData' created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, \code{\link{as.nmrData}}, respectively.}
+\item{omicsData}{an object of the class 'pepData', 'proData', 'metabData',
+'lipidData', or 'nmrData' created by \code{\link{as.pepData}},
+\code{\link{as.proData}}, \code{\link{as.metabData}},
+\code{\link{as.lipidData}}, \code{\link{as.nmrData}}, respectively.}
 }
 \value{
 An \eqn{n \times n} matrix giving the correlation between samples.
@@ -16,14 +19,20 @@ An \eqn{n \times n} matrix giving the correlation between samples.
 This function returns an object of class corRes (correlation Result)
 }
 \details{
-The Pearson correlation between samples is calculated based on biomolecules that are observed in both samples.  the \eqn{n \times n} correlation matrix of normalized data. See \code{\link{cor}} for further details.
+The Pearson correlation between samples is calculated based on
+  biomolecules that are observed in both samples.  the \eqn{n \times n}
+  correlation matrix of normalized data. See \code{\link{cor}} for further
+  details.
 }
 \examples{
-dontrun{
+\dontrun{
 library(pmartR)
+
 data(pep_object)
+
 my_correlation <- cor_result(omicsData = pep_object)
 }
+
 }
 \author{
 Kelly Stratton, Lisa Bramer

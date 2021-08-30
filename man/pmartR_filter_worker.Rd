@@ -7,15 +7,22 @@
 pmartR_filter_worker(filter_object, omicsData)
 }
 \arguments{
-\item{filter_object}{a list created by the functions above}
+\item{filter_object}{A list of three elements. Each element contains a set of
+names to either remove or keep from e_data, f_data, and e_meta.}
 
-\item{omicsData}{an object of the class \code{pepData}, \code{proData}, \code{lipidData}, or \code{metabData}, usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.lipidData}}, or \code{\link{as.metabData}}, respectively.}
+\item{omicsData}{an object of the class \code{pepData}, \code{proData},
+\code{lipidData}, or \code{metabData}, usually created by
+\code{\link{as.pepData}}, \code{\link{as.proData}},
+\code{\link{as.lipidData}}, or \code{\link{as.metabData}}, respectively.}
 }
 \value{
-list
+A list with three elements: first is the filtered e_data object,
+        second is the filtered f_data object, and third is the filtered 
+        e_meta object.
 }
 \description{
-This function removes
+This function removes rows and columns in e_data, f_data, and e_meta based
+on either remove or keep criteria.
 }
 \author{
 Kelly Stratton, Lisa Bramer

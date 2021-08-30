@@ -8,7 +8,7 @@
 #' 
 #' 
 #' @examples
-#' dontrun{
+#' \dontrun{
 #' library(pmartRdata)
 #' data(isobaric_object)
 #' 
@@ -16,34 +16,68 @@
 #' result = normalize_isobaric(isobaric_object, exp_cname = "Set", apply_norm = FALSE, channel_cname = "iTRAQ.Channel", refpool_channel = "116")
 #' 
 #' summary(result)
-#'}
+#' }
 #' 
-#'@export
-#'@rdname summary-isobaricnormRes
-#'@name summary-pmartR
-#'
-summary.isobaricnormRes<-function(isobaricnormRes_object){
+#' @export
+#' @rdname summary-isobaricnormRes
+#' @name summary-pmartR
+#' 
+summary.isobaricnormRes <- function (isobaricnormRes_object) {
   
   #check for an isobaricnormRes object #
-  if(!inherits(isobaricnormRes_object, "isobaricnormRes")) stop("object must be of class 'isobaricnormRes'")
+  if(!inherits(isobaricnormRes_object, "isobaricnormRes")) {
+    
+    stop("object must be of class 'isobaricnormRes'")
+    
+  }
   
   #extract attributes from isobaricnomrRes_object
-  exp_cname = attr(isobaricnormRes_object, "isobaric_info")$exp_cname
+  exp_cname <- attr(isobaricnormRes_object, "isobaric_info")$exp_cname
+  fdata_cname <- attr(isobaricnormRes_object, "cnames")$fdata_cname
   
-  exp_cname_ind = which(names(isobaricnormRes_object) %in% exp_cname)
-  value_col_ind = which(names(isobaricnormRes_object) == "value")
+  # Fish out all unique experiments.
+  xprmnts <- unique(isobaricnormRes_object$f_data[, exp_cname])
   
-  #subset data columns
-  data = as.data.frame(isobaricnormRes_object[c(exp_cname_ind, value_col_ind)])
+  # Assemble a data frame with the experiment levels/values.
+  dfxprmnts <- data.frame(xprmnts)
+  names(dfxprmnts) <- exp_cname
   
-  split_data = split(data, data[[exp_cname]])
+  # Create a list that will hold the samples belonging to each experiment.
+  smpls <- vector(mode = "list",
+                  length = length(xprmnts))
   
-  res_median = lapply(split_data, function(item){median(item[["value"]], na.rm = T)})
-  res_sd = lapply(split_data, function(item){sd(item[["value"]], na.rm = T)})
+  # Generate a vector for the median for the samples in each experiment.
+  medi <- vector(mode = "numeric",
+                 length = length(xprmnts))
   
-  final_res = as.data.frame(cbind(names(res_median), res_median, res_sd))
-  row.names(final_res) = NULL
-  names(final_res) = c(exp_cname, "Median", "SD")
+  # Produce a vector for the standard deviation of the samples in each
+  # experiment.
+  stdev <- vector(mode = "numeric",
+                  length = length(xprmnts))
   
-  return(final_res)
+  # Loop through each level of experiment and extract all sample names
+  # corresponding to each experiment.
+  for (e in 1:length(xprmnts)) {
+    
+    # Grab the row indices of f_data for the eth experiment.
+    idx <- which(isobaricnormRes_object$f_data[, exp_cname] == xprmnts[[e]])
+    
+    # Seize the sample names corresponding to the eth experiment.
+    smpls[[e]] <- isobaricnormRes_object$f_data[idx, fdata_cname]
+    
+    # Compute the median for the samples in the eth experiment.
+    medi[[e]] <- median(isobaricnormRes_object$e_data[, smpls[[e]]],
+                        na.rm = TRUE)
+    
+    # Calculate the standard deviation for the samples in the eth experiment.
+    stdev[[e]] <- sd(isobaricnormRes_object$e_data[, smpls[[e]]],
+                     na.rm = TRUE)
+    
+  }
+  
+  # Unite the median and standard deviation vectors in a data frame.
+  return (data.frame(dfxprmnts,
+                     Median = medi,
+                     SD = stdev))
+  
 }

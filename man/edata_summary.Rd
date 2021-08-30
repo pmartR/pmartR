@@ -7,29 +7,51 @@
 edata_summary(omicsData, by = "sample", groupvar = NULL)
 }
 \arguments{
-\item{omicsData}{an object of the class 'lipidData', 'metabData', 'pepData', 'proData', or 'nmrData' usually created by \code{\link{as.lipidData}}, \code{\link{as.metabData}}, \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.nmrData}}, respectively.}
+\item{omicsData}{an object of the class 'lipidData', 'metabData', 'pepData',
+'proData', or 'nmrData' usually created by \code{\link{as.lipidData}},
+\code{\link{as.metabData}}, \code{\link{as.pepData}},
+\code{\link{as.proData}}, \code{\link{as.nmrData}}, respectively.}
 
-\item{by}{a character string indicating whether summarizing metrics will be applied by 'sample' or by 'molecule'.  Defaults to 'sample'.}
+\item{by}{a character string indicating whether summarizing metrics will be
+applied by 'sample' or by 'molecule'.  Defaults to 'sample'.}
 
-\item{groupvar}{a character vector with no more than two variable names that should be used to determine group membership of samples. The variable name must match a column name from \code{f_data}. Defaults to NULL, in which case group_DF attribute will be used.}
+\item{groupvar}{a character vector with no more than two variable names that
+should be used to determine group membership of samples. The variable name
+must match a column name from \code{f_data}. Defaults to NULL, in which
+case group_DF attribute will be used.}
 }
 \value{
-A list of six data frames, which are the results of applying the metrics (mean, standard deviation, median, percent observed, minimum and maximum) to omicsData$e_data
+A list of six data frames, which are the results of applying the
+  metrics (mean, standard deviation, median, percent observed, minimum and
+  maximum) to omicsData$e_data
 }
 \description{
-This function takes in an omicsData object and returns a summary of the e_data component. The six summarizing metrics include the mean, standard deviation, median, percent observed, minimum, and maximum.
+This function takes in an omicsData object and returns a summary of the
+e_data component. The six summarizing metrics include the mean, standard
+deviation, median, percent observed, minimum, and maximum.
 }
 \details{
-If groupvar is NULL and group_designation has not been applied to omicsData, then the metrics will be applied to each column of e_data (when by = 'sample) or to each row of e_data (when by = 'molecule'). When groupvar is provided, it must match a column name from \code{f_data}, this column of f_data is used to group e_data in order to apply the metrics.
+If groupvar is NULL and group_designation has not been applied to
+  omicsData, then the metrics will be applied to each column of e_data (when
+  by = 'sample) or to each row of e_data (when by = 'molecule'). When
+  groupvar is provided, it must match a column name from \code{f_data}, this
+  column of f_data is used to group e_data in order to apply the metrics.
 }
 \examples{
-dontrun{
+\dontrun{
 library(pmartRdata)
+
 data(lipid_object)
-lipid_object2 <- edata_transform(omicsData = lipid_object, data_scale = "log2")
-lipid_object2 <- group_designation(omicsData = lipid_object, main_effects = "Condition")
+
+lipid_object2 <- edata_transform(omicsData = lipid_object,
+                                 data_scale = "log2")
+
+lipid_object2 <- group_designation(omicsData = lipid_object,
+                                   main_effects = "Condition")
+
 edata_summary(omicsData = lipid_object2, by = "sample", groupvar = NULL)
 }
 
-
+formula'
+formula'
 }

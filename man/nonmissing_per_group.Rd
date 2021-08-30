@@ -4,43 +4,26 @@
 \alias{nonmissing_per_group}
 \title{Computes the Number of Non-Missing Data Points by Group}
 \usage{
-nonmissing_per_group(
-  omicsData = NULL,
-  e_data = NULL,
-  groupDF = NULL,
-  cname_id = NULL,
-  samp_id = NULL,
-  check.names = NULL
-)
+nonmissing_per_group(omicsData)
 }
 \arguments{
-\item{omicsData}{an optional object of one of the classes "pepData", "proData", "metabData",  "lipidData", or "nmrData", usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, respectively. Either omicsData or all of e_data, groupDF, cname_id, and samp_id must be provided.}
-
-\item{e_data}{an optional a \eqn{p \times n + 1} data.frame of expression data, where \eqn{p} is the number of lipids observed and \eqn{n} is the number of samples. Each row corresponds to data for each lipid. One column specifying a unique identifier for each lipid (row) must be present. Not required if omicsData is provided.}
-
-\item{groupDF}{data.frame created by \code{group_designation} with columns for the sample identifier and the designated group. Not required if omicsData is provided.}
-
-\item{cname_id}{character string specifying the name of the column containing the biomolecule identifiers in \code{e_data} and \code{e_meta} (if applicable). Not required if omicsData is provided.}
-
-\item{samp_id}{character string specifying the name of the column containing the sample identifiers in \code{groupDF}. Not required if omicsData is provided.}
-
-\item{check.names}{Logical, determines whether check.names argument of the data.frame function is TRUE or FALSE. Not required if omicsData is provided.}
+\item{omicsData}{an optional object of one of the classes "pepData",
+"proData", "metabData",  "lipidData", or "nmrData", usually created by
+\code{\link{as.pepData}}, \code{\link{as.proData}},
+\code{\link{as.metabData}}, \code{\link{as.lipidData}}, or
+\code{\link{as.nmrData}}, respectively. Either omicsData or all of
+e_data, groupDF, cname_id, and samp_id must be provided.}
 }
 \value{
-a list of length two. The first element giving the total number of possible samples for each group. The second element giving a data.frame with the first column giving the peptide and the second through kth columns giving the number of non-missing observations for each of the \code{k} groups.
+a list of length two. The first element giving the total number of
+        possible samples for each group. The second element giving a
+        data.frame with the first column giving the peptide and the second
+        through kth columns giving the number of non-missing observations for
+        each of the \code{k} groups.
 }
 \description{
-This function computes the number of non-missing observations for samples, based on a group designation, for every biomolecule in the dataset
-}
-\examples{
-dontrun{
-library(pmartRdata)
-data(pep_object)
-pep_object2 <- group_designation(omicsData = pep_object, main_effects = "Condition")
-nonmissing_result <- nonmissing_per_group(omicsData = pep_object2)
-nonmissing_result <- nonmissing_per_group(e_data = pep_object2$e_data, groupDF = attr(pep_object2, "group_DF"), cname_id = attr(pep_object2, "cnames")$edata_cname, samp_id = attr(pep_object2, "cnames")$fdata_cname)
-}
-
+This function computes the number of non-missing observations for samples,
+based on a group designation, for every biomolecule in the dataset
 }
 \author{
 Lisa Bramer, Kelly Stratton

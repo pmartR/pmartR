@@ -5,6 +5,14 @@ anova_cpp <- function(data, gp, unequal_var, df_red) {
     .Call('_pmartR_anova_cpp', PACKAGE = 'pmartR', data, gp, unequal_var, df_red)
 }
 
+pooled_cv_rcpp <- function(mtr, group) {
+    .Call('_pmartR_pooled_cv_rcpp', PACKAGE = 'pmartR', mtr, group)
+}
+
+unpooled_cv_rcpp <- function(mtr) {
+    .Call('_pmartR_unpooled_cv_rcpp', PACKAGE = 'pmartR', mtr)
+}
+
 count_missing_cpp <- function(data, gp) {
     .Call('_pmartR_count_missing_cpp', PACKAGE = 'pmartR', data, gp)
 }
@@ -55,15 +63,6 @@ kw_rcpp <- function(mtr, group) {
 
 nonmissing_per_grp <- function(mtr, group) {
     .Call('_pmartR_nonmissing_per_grp', PACKAGE = 'pmartR', mtr, group)
-}
-
-pooled_cv_rcpp <- function(mtr, group) {
-    .Call('_pmartR_pooled_cv_rcpp', PACKAGE = 'pmartR', mtr, group)
-}
-
-#' @export
-rcpp_hello_world <- function() {
-    .Call('_pmartR_rcpp_hello_world', PACKAGE = 'pmartR')
 }
 
 ptukey_speed <- function(qstats, sizes) {

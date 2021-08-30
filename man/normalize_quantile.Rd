@@ -7,19 +7,31 @@
 normalize_quantile(omicsData)
 }
 \arguments{
-\item{omicsData}{an object of the class 'pepData', 'proData', 'metabData', 'lipidData', 'nmrData', created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, respectively. The function \code{\link{group_designation}} must have been run on omicsData to use several of the subset functions (i.e. rip and ppp_rip).}
+\item{omicsData}{an object of the class 'pepData', 'proData', 'metabData',
+'lipidData', 'nmrData', created by \code{\link{as.pepData}},
+\code{\link{as.proData}}, \code{\link{as.metabData}},
+\code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, respectively. The
+function \code{\link{group_designation}} must have been run on omicsData to
+use several of the subset functions (i.e. rip and ppp_rip).}
 }
 \value{
-The normalized data is returned in an object of the appropriate S3 class (e.g. pepData), on the same scale as omicsData (e.g. if omicsData contains log2 transformed data, the normalization will be performed on the non-log2 scale and then re-scaled after normalization to be returned on the log2 scale).
+The normalized data is returned in an object of the appropriate S3
+  class (e.g. pepData), on the same scale as omicsData (e.g. if omicsData
+  contains log2 transformed data, the normalization will be performed on the
+  non-log2 scale and then re-scaled after normalization to be returned on the
+  log2 scale).
 }
 \description{
 Perform quantile normalization
 }
 \details{
-Quantile normalization is an algorithm for normalizing a set of data vectors by giving them the same distribution. It is applied to data on the abundance scale (e.g. not a log scale). It is often used for microarry data.
+Quantile normalization is an algorithm for normalizing a set of data
+  vectors by giving them the same distribution. It is applied to data on the
+  abundance scale (e.g. not a log scale). It is often used for microarry
+  data.
 }
 \examples{
-dontrun{
+\dontrun{
 library(pmartRdata)
 data(lipid_object)
 norm_data <- normalize_quantile(omicsData = lipid_object)

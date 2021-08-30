@@ -14,28 +14,35 @@ custom_sampnames(
 )
 }
 \arguments{
-\item{omicsData}{omicsData an object of the class 'pepData', 'proData', 'metabData', or 'lipidData', usually created by \code{pepData}, \code{proData}, \code{metabData}, or \code{lipidData}, respectively.}
+\item{omicsData}{omicsData an object of the class 'pepData', 'proData',
+'metabData', or 'lipidData', usually created by \code{pepData},
+\code{proData}, \code{metabData}, or \code{lipidData}, respectively.}
 
-\item{firstn}{is an integer specifying the first n characters to keep as the sample name}
+\item{firstn}{is an integer specifying the first n characters to keep as the
+sample name}
 
-\item{from}{is an integer specifying the start of the range of characters to keep as the sample name}
+\item{from}{is an integer specifying the start of the range of characters to
+keep as the sample name}
 
-\item{to}{is an integer specifying the end of the range of characters to keep as the sample name}
+\item{to}{is an integer specifying the end of the range of characters to keep
+as the sample name}
 
 \item{delim}{is a delimiter to separate sample name components by}
 
-\item{components}{an integer vector specifying which components separated by delim to keep as sample name}
+\item{components}{an integer vector specifying which components separated by
+delim to keep as sample name}
 }
 \description{
-This helper function creates custom sample names for plot data object function
+This helper function creates custom sample names for plot data object
+function
 }
 \details{
 
 }
 \examples{
-dontrun{
+\dontrun{
 data(pep_object)
 results = custom_sampnames(pep_object, firstn = 5)
-} 
+}
 
 }

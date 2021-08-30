@@ -19,517 +19,152 @@
 #' @author Kelly Stratton, Natalie Heller
 #'
 #' @export
-edata_transform <- function(omicsData, data_scale){
-  ## some initial checks ##
+#' 
+edata_transform <- function (omicsData, data_scale) {
+  
+  # Initial checks -------------------------------------------------------------
 
   # check that omicsData is of appropriate class #
-  if(!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData", "nmrData"))) stop("omicsData must be of class 'pepData', 'proData', 'metabData', 'lipidData', or 'nmrData'")
+  if (!inherits(omicsData, c("pepData", "proData", "metabData",
+                             "lipidData", "nmrData"))) {
+    
+    # Throw an error that the input for omicsData is not the appropriate class.
+    stop(paste("omicsData must be of class 'pepData', 'proData', 'metabData',",
+               "'lipidData', or 'nmrData'",
+               sep = ' '))
+    
+  } 
 
   # check that data_scale is one of the acceptable options #
-  if(!(data_scale %in% c('log2', 'log10', 'log', 'abundance'))) stop(paste(data_scale, " is not a valid option for 'data_scale'. See details of as.pepData for specifics.", sep=""))
-
-  # if desired scale is log scale, check to make sure data is not already on log scale #
-  if(attr(omicsData, "data_info")$data_scale == "log2" & data_scale == "log2"){
-    stop("Data is already on log2 scale.")
-  }
-  if(attr(omicsData, "data_info")$data_scale == "log10" & data_scale == "log10"){
-    stop("Data is already on log10 scale.")
-  }
-  if(attr(omicsData, "data_info")$data_scale == "log" & data_scale == "log"){
-    stop("Data is already on (natural) log scale.")
-  }
-
-  # if desired scale is abundance, check to make sure data is not already on abundance scale #
-  if(data_scale=="abundance" & attr(omicsData, "data_info")$data_scale == "abundance"){
-    stop("Data is already on abundance scale.")
-  }
-
-  UseMethod("edata_transform")
-}
-
-
-
-# function for peptides #
-#' @export
-#' @name edata_transform
-#' @rdname edata_transform
-edata_transform.pepData <- function(omicsData, data_scale){
-  
-  check_names = getchecknames(omicsData)
-  edata_id = attr(omicsData, "cnames")$edata_cname
-
-  edata <- omicsData$e_data
-  feature_names <- edata[which(names(edata)==edata_id)]
-  # pull off the identifier column #
-  edata <- edata[, -which(colnames(edata)==edata_id)]
-
-  # apply the transformation #
-  if(attr(omicsData, "data_info")$data_scale == "abundance"){
-    if(data_scale == "log"){
-      edata_new <- log(edata)
-    }else{
-      if(data_scale == "log2"){
-        edata_new <- log2(edata)
-      }else{
-        if(data_scale == "log10"){
-          edata_new <- log10(edata)
-        }
-      }
-    }
-  }else{
-    if(attr(omicsData, "data_info")$data_scale == "log"){
-      if(data_scale == "abundance"){
-        edata_new <- exp(edata)
-      }else{
-        if(data_scale == "log2"){
-          edata_new <- log2(exp(edata))
-        }else{
-          if(data_scale == "log10"){
-            edata_new <- log10(exp(edata))
-          }
-        }
-      }
-    }else{
-      if(attr(omicsData, "data_info")$data_scale == "log2"){
-        if(data_scale == "abundance"){
-          edata_new <- 2^(edata)
-        }else{
-          if(data_scale == "log"){
-            edata_new <- log(2^(edata))
-          }else{
-            if(data_scale == "log10"){
-              edata_new <- log10(2^(edata))
-            }
-          }
-        }
-      }else{
-        if(attr(omicsData, "data_info")$data_scale == "log10"){
-          if(data_scale == "abundance"){
-            edata_new <- 10^(edata)
-          }else{
-            if(data_scale == "log"){
-              edata_new <- log(10^(edata))
-            }else{
-              if(data_scale == "log2"){
-                edata_new <- log2(10^(edata))
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
-  # add the identifier column back #
-  edata_new <- data.frame(edata_id=feature_names, edata_new, check.names=check_names)
-
-  if(is.null(omicsData$e_meta)){
-    emeta_cname = NULL
-  }else{
-    emeta_cname = attr(omicsData, "cnames")$emeta_cname
-  }
-
-  # create an updated pepData object #
-  updated_data <- as.pepData(e_data = edata_new, f_data = omicsData$f_data, e_meta = omicsData$e_meta, edata_cname = edata_id, emeta_cname=emeta_cname, fdata_cname = attr(omicsData, "cnames")$fdata_cname, techrep_cname = attr(omicsData, "cnames")$techrep_cname,
-                             data_scale = data_scale, norm_info=attr(omicsData, "data_info")$norm_info,  is_normalized = attr(omicsData, "data_info")$norm_info$is_normalized, data_types=attr(omicsData, "data_info")$data_types, check.names = check_names)
-  
-  #check for isobaricpepData class
-  if(inherits(omicsData, "isobaricpepData")){
-    #updated_data <- as.isobaricpepData(e_data = edata_new, f_data = omicsData$f_data, e_meta = omicsData$e_meta, edata_cname = edata_id, emeta_cname=emeta_cname, fdata_cname = attr(omicsData, "cnames")$fdata_cname, techrep_cname = attr(omicsData, "cnames")$techrep_cname, exp_cname = attr(omicsData, "isobaric_info")$exp_cname, channel_cname = attr(omicsData, "isobaric_info")$channel_cname, refpool_channel = attr(omicsData, "isobaric_info")$refpool_channel, refpool_cname = attr(omicsData, "isobaric_info")$refpool_cname, refpool_notation = attr(omicsData, "isobaric_info")$refpool_notation, data_scale = data_scale, is_normalized = attr(omicsData, "data_info")$norm_info$is_normalized, isobaric_norm = attr(omicsData, "isobaric_info")$norm_info$is_normalized, norm_info=attr(omicsData, "data_info")$norm_info, data_types=attr(omicsData, "data_info")$data_types, check.names = check_names)
+  if (!(data_scale %in% c('log2', 'log10', 'log', 'abundance'))) {
     
-    # Attributes set previously in as.isobaricpepData (or other functions) should remain the same with the exception of data_info$data_scale
-    updated_data <- omicsData
-    updated_data$e_data <- edata_new
-    attr(updated_data, "data_info")$data_scale <- data_scale
+    # Tell the user that the input to data_scale is an abomination!
+    stop (paste(data_scale, "is not a valid option for 'data_scale'.",
+                "See details of as.pepData for specifics.",
+                sep=" "))
+    
+  }
+
+  # Check to make sure the data isn't already on the scale input by the user.
+  if(attr(omicsData, "data_info")$data_scale == data_scale) {
+    
+    # Stop all further calculations with an error message.
+    stop(paste("Data is already on",
+               data_scale,
+               "scale.",
+               sep = " "))
+    
   }
   
-  attributes(updated_data)$group_DF <- attributes(omicsData)$group_DF
-  attributes(updated_data)$filters <- attributes(omicsData)$filters
-  attributes(updated_data)$meta_info <- attributes(omicsData)$meta_info
-  attributes(updated_data)$imdanova <- attributes(omicsData)$imdanova
+  # Perform the actual transmogrification --------------------------------------
   
-  return(updated_data)
+  # Fish out the column index where edata_cname occurs.
+  iCol <- which(names(omicsData$e_data) == attr(omicsData,
+                                                'cnames')$edata_cname)
+  
+  # Extract the data_scale from the omics data object.
+  scale <- get_data_scale(omicsData)
+  
+  # Execute the transmogrification given the current scale and the input scale.
+  switch(scale,
+         
+         # Transmogrify the data from abundance to something else.
+         'abundance' = {
+           
+           # Find input data scale and "make that change".
+           if (data_scale == "log"){
+             
+             # Natural logify the data.
+             omicsData$e_data[, -iCol] <- log(omicsData$e_data[, -iCol])
+             
+           } else if (data_scale == "log2") {
+             
+             # Log base 2ify the data.
+             omicsData$e_data[, -iCol] <- log2(omicsData$e_data[, -iCol])
+             
+           } else if (data_scale == "log10") {
+             
+             # Log base 10ify the data.
+             omicsData$e_data[, -iCol] <- log10(omicsData$e_data[, -iCol])
+             
+           }
+           
+         },
+         
+         # Mutate the data from log to another scale.
+         'log' = {
+           
+           # Find input data scale and "make that change".
+           if (data_scale == "abundance"){
+             
+             # Natural logify the data.
+             omicsData$e_data[, -iCol] <- exp(omicsData$e_data[, -iCol])
+             
+           } else if (data_scale == "log2") {
+             
+             # Log base 2ify the data.
+             omicsData$e_data[, -iCol] <- log2(exp(omicsData$e_data[, -iCol]))
+             
+           } else if (data_scale == "log10") {
+             
+             # Log base 10ify the data.
+             omicsData$e_data[, -iCol] <- log10(exp(omicsData$e_data[, -iCol]))
+             
+           }
+           
+         },
+         
+         # Recast the data from the log2 scale to another scale.
+         'log2' = {
+           
+           # Find input data scale and "make that change".
+           if (data_scale == "abundance"){
+             
+             # Natural logify the data.
+             omicsData$e_data[, -iCol] <- 2^(omicsData$e_data[, -iCol])
+             
+           } else if (data_scale == "log") {
+             
+             # Log base 2ify the data.
+             omicsData$e_data[, -iCol] <- log(2^(omicsData$e_data[, -iCol]))
+             
+           } else if (data_scale == "log10") {
+             
+             # Log base 10ify the data.
+             omicsData$e_data[, -iCol] <- log10(2^(omicsData$e_data[, -iCol]))
+             
+           }
+           
+         },
+         
+         # Change the data from the log10 scale to a different one.
+         'log10' = {
+           
+           # Find input data scale and "make that change".
+           if (data_scale == "abundance"){
+             
+             # Natural logify the data.
+             omicsData$e_data[, -iCol] <- 10^(omicsData$e_data[, -iCol])
+             
+           } else if (data_scale == "log") {
+             
+             # Log base 2ify the data.
+             omicsData$e_data[, -iCol] <- log(10^(omicsData$e_data[, -iCol]))
+             
+           } else if (data_scale == "log2") {
+             
+             # Log base 10ify the data.
+             omicsData$e_data[, -iCol] <- log2(10^(omicsData$e_data[, -iCol]))
+             
+           }
+           
+         })
+  
+  # Update data_scale in the data_info attribute.
+  attr(omicsData, 'data_info')$data_scale <- data_scale
+  
+  # Return the transmogrified omics object along with its attributes (some of
+  # them updated and others left alone).
+  return (omicsData)
+
 }
-
-
-
-# function for proteins #
-#' @export
-#' @name edata_transform
-#' @rdname edata_transform
-edata_transform.proData <- function(omicsData, data_scale){
-
-  check_names = getchecknames(omicsData)
-  edata_id = attr(omicsData, "cnames")$edata_cname
-
-  edata <- omicsData$e_data
-  feature_names <- edata[which(names(edata)==edata_id)]
-  # pull off the identifier column #
-  edata <- edata[, -which(colnames(edata)==edata_id)]
-
-  # apply the transformation #
-  if(attr(omicsData, "data_info")$data_scale == "abundance"){
-    if(data_scale == "log"){
-      edata_new <- log(edata)
-    }else{
-      if(data_scale == "log2"){
-        edata_new <- log2(edata)
-      }else{
-        if(data_scale == "log10"){
-          edata_new <- log10(edata)
-        }
-      }
-    }
-  }else{
-    if(attr(omicsData, "data_info")$data_scale == "log"){
-      if(data_scale == "abundance"){
-        edata_new <- exp(edata)
-      }else{
-        if(data_scale == "log2"){
-          edata_new <- log2(exp(edata))
-        }else{
-          if(data_scale == "log10"){
-            edata_new <- log10(exp(edata))
-          }
-        }
-      }
-    }else{
-      if(attr(omicsData, "data_info")$data_scale == "log2"){
-        if(data_scale == "abundance"){
-          edata_new <- 2^(edata)
-        }else{
-          if(data_scale == "log"){
-            edata_new <- log(2^(edata))
-          }else{
-            if(data_scale == "log10"){
-              edata_new <- log10(2^(edata))
-            }
-          }
-        }
-      }else{
-        if(attr(omicsData, "data_info")$data_scale == "log10"){
-          if(data_scale == "abundance"){
-            edata_new <- 10^(edata)
-          }else{
-            if(data_scale == "log"){
-              edata_new <- log(10^(edata))
-            }else{
-              if(data_scale == "log2"){
-                edata_new <- log2(10^(edata))
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
-
-  # add the identifier column back #
-  edata_new <- data.frame(edata_id=feature_names, edata_new, check.names=check_names)
-
-  if(is.null(omicsData$e_meta)){
-    emeta_cname = NULL
-  }else{
-    emeta_cname = attr(omicsData, "cnames")$emeta_cname
-  }
-
-  # create an updated proData object #
-  updated_data <- as.proData(e_data = edata_new, f_data = omicsData$f_data, e_meta = omicsData$e_meta, edata_cname = edata_id, emeta_cname=emeta_cname, fdata_cname = attr(omicsData, "cnames")$fdata_cname, techrep_cname = attr(omicsData, "cnames")$techrep_cname, 
-                             data_scale = data_scale,  norm_info=attr(omicsData, "data_info")$norm_info, is_normalized = attr(omicsData, "data_info")$norm_info$is_normalized, data_types=attr(omicsData, "data_info")$data_types, check.names = check_names)
-
-  attributes(updated_data)$group_DF <- attributes(omicsData)$group_DF
-  attributes(updated_data)$filters <- attributes(omicsData)$filters
-  attributes(updated_data)$meta_info <- attributes(omicsData)$meta_info
-  attributes(updated_data)$imdanova <- attributes(omicsData)$imdanova
-  
-  return(updated_data)
-}
-
-
-
-# function for metabolites #
-#' @export
-#' @name edata_transform
-#' @rdname edata_transform
-edata_transform.metabData <- function(omicsData, data_scale){
-
-  check_names = getchecknames(omicsData)
-  edata_id = attr(omicsData, "cnames")$edata_cname
-
-  edata <- omicsData$e_data
-  feature_names <- edata[which(names(edata)==edata_id)]
-  # pull off the identifier column #
-  edata <- edata[, -which(colnames(edata)==edata_id)]
-
-  # apply the transformation #
-  if(attr(omicsData, "data_info")$data_scale == "abundance"){
-    if(data_scale == "log"){
-      edata_new <- log(edata)
-    }else{
-      if(data_scale == "log2"){
-        edata_new <- log2(edata)
-      }else{
-        if(data_scale == "log10"){
-          edata_new <- log10(edata)
-        }
-      }
-    }
-  }else{
-    if(attr(omicsData, "data_info")$data_scale == "log"){
-      if(data_scale == "abundance"){
-        edata_new <- exp(edata)
-      }else{
-        if(data_scale == "log2"){
-          edata_new <- log2(exp(edata))
-        }else{
-          if(data_scale == "log10"){
-            edata_new <- log10(exp(edata))
-          }
-        }
-      }
-    }else{
-      if(attr(omicsData, "data_info")$data_scale == "log2"){
-        if(data_scale == "abundance"){
-          edata_new <- 2^(edata)
-        }else{
-          if(data_scale == "log"){
-            edata_new <- log(2^(edata))
-          }else{
-            if(data_scale == "log10"){
-              edata_new <- log10(2^(edata))
-            }
-          }
-        }
-      }else{
-        if(attr(omicsData, "data_info")$data_scale == "log10"){
-          if(data_scale == "abundance"){
-            edata_new <- 10^(edata)
-          }else{
-            if(data_scale == "log"){
-              edata_new <- log(10^(edata))
-            }else{
-              if(data_scale == "log2"){
-                edata_new <- log2(10^(edata))
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
-
-  # add the identifier column back #
-  edata_new <- data.frame(edata_id=feature_names, edata_new, check.names=check_names)
-
-  if(is.null(omicsData$e_meta)){
-    emeta_cname = NULL
-  }else{
-    emeta_cname = attr(omicsData, "cnames")$emeta_cname
-  }
-
-  # create an updated metabData object #
-  updated_data <- as.metabData(e_data = edata_new, f_data = omicsData$f_data, e_meta = omicsData$e_meta, edata_cname = edata_id, emeta_cname=emeta_cname, fdata_cname = attr(omicsData, "cnames")$fdata_cname, techrep_cname = attr(omicsData, "cnames")$techrep_cname, 
-                               data_scale = data_scale, norm_info=attr(omicsData, "data_info")$norm_info,  is_normalized = attr(omicsData, "data_info")$norm_info$is_normalized, data_types=attr(omicsData, "data_info")$data_types, check.names = check_names)
-
-  attributes(updated_data)$group_DF <- attributes(omicsData)$group_DF
-  attributes(updated_data)$filters <- attributes(omicsData)$filters
-  attributes(updated_data)$meta_info <- attributes(omicsData)$meta_info
-  attributes(updated_data)$imdanova <- attributes(omicsData)$imdanova
-  
-  return(updated_data)
-}
-
-
-# function for lipids #
-#' @export
-#' @name edata_transform
-#' @rdname edata_transform
-edata_transform.lipidData <- function(omicsData, data_scale){
-
-  check_names = getchecknames(omicsData)
-  edata_id = attr(omicsData, "cnames")$edata_cname
-
-  edata <- omicsData$e_data
-  feature_names <- edata[which(names(edata)==edata_id)]
-  # pull off the identifier column #
-  edata <- edata[, -which(colnames(edata)==edata_id)]
-
-  # apply the transformation #
-  if(attr(omicsData, "data_info")$data_scale == "abundance"){
-    if(data_scale == "log"){
-      edata_new <- log(edata)
-    }else{
-      if(data_scale == "log2"){
-        edata_new <- log2(edata)
-      }else{
-        if(data_scale == "log10"){
-          edata_new <- log10(edata)
-        }
-      }
-    }
-  }else{
-    if(attr(omicsData, "data_info")$data_scale == "log"){
-      if(data_scale == "abundance"){
-        edata_new <- exp(edata)
-      }else{
-        if(data_scale == "log2"){
-          edata_new <- log2(exp(edata))
-        }else{
-          if(data_scale == "log10"){
-            edata_new <- log10(exp(edata))
-          }
-        }
-      }
-    }else{
-      if(attr(omicsData, "data_info")$data_scale == "log2"){
-        if(data_scale == "abundance"){
-          edata_new <- 2^(edata)
-        }else{
-          if(data_scale == "log"){
-            edata_new <- log(2^(edata))
-          }else{
-            if(data_scale == "log10"){
-              edata_new <- log10(2^(edata))
-            }
-          }
-        }
-      }else{
-        if(attr(omicsData, "data_info")$data_scale == "log10"){
-          if(data_scale == "abundance"){
-            edata_new <- 10^(edata)
-          }else{
-            if(data_scale == "log"){
-              edata_new <- log(10^(edata))
-            }else{
-              if(data_scale == "log2"){
-                edata_new <- log2(10^(edata))
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
-
-  # add the identifier column back #
-  edata_new <- data.frame(edata_id=feature_names, edata_new, check.names=check_names)
-
-  if(is.null(omicsData$e_meta)){
-    emeta_cname = NULL
-  }else{
-    emeta_cname = attr(omicsData, "cnames")$emeta_cname
-  }
-
-  # create an updated lipidData object #
-  updated_data <- as.lipidData(e_data = edata_new, f_data = omicsData$f_data, e_meta = omicsData$e_meta, edata_cname = edata_id, emeta_cname=emeta_cname, fdata_cname = attr(omicsData, "cnames")$fdata_cname, techrep_cname = attr(omicsData, "cnames")$techrep_cname, 
-                               data_scale = data_scale, norm_info = attr(omicsData, "data_info")$norm_info, is_normalized = attr(omicsData, "data_info")$norm_info$is_normalized, data_types=attr(omicsData, "data_info")$data_types, check.names = check_names)
-
-  attributes(updated_data)$group_DF <- attributes(omicsData)$group_DF
-  attributes(updated_data)$filters <- attributes(omicsData)$filters
-  attributes(updated_data)$meta_info <- attributes(omicsData)$meta_info
-  attributes(updated_data)$imdanova <- attributes(omicsData)$imdanova
-
-  return(updated_data)
-}
-
-
-
-# function for NMR data #
-#' @export
-#' @name edata_transform
-#' @rdname edata_transform
-edata_transform.nmrData <- function(omicsData, data_scale){
-  
-  check_names = getchecknames(omicsData)
-  edata_id = attr(omicsData, "cnames")$edata_cname
-  
-  edata <- omicsData$e_data
-  feature_names <- edata[which(names(edata)==edata_id)]
-  # pull off the identifier column #
-  edata <- edata[, -which(colnames(edata)==edata_id)]
-  
-  # apply the transformation #
-  if(attr(omicsData, "data_info")$data_scale == "abundance"){
-    if(data_scale == "log"){
-      edata_new <- log(edata)
-    }else{
-      if(data_scale == "log2"){
-        edata_new <- log2(edata)
-      }else{
-        if(data_scale == "log10"){
-          edata_new <- log10(edata)
-        }
-      }
-    }
-  }else{
-    if(attr(omicsData, "data_info")$data_scale == "log"){
-      if(data_scale == "abundance"){
-        edata_new <- exp(edata)
-      }else{
-        if(data_scale == "log2"){
-          edata_new <- log2(exp(edata))
-        }else{
-          if(data_scale == "log10"){
-            edata_new <- log10(exp(edata))
-          }
-        }
-      }
-    }else{
-      if(attr(omicsData, "data_info")$data_scale == "log2"){
-        if(data_scale == "abundance"){
-          edata_new <- 2^(edata)
-        }else{
-          if(data_scale == "log"){
-            edata_new <- log(2^(edata))
-          }else{
-            if(data_scale == "log10"){
-              edata_new <- log10(2^(edata))
-            }
-          }
-        }
-      }else{
-        if(attr(omicsData, "data_info")$data_scale == "log10"){
-          if(data_scale == "abundance"){
-            edata_new <- 10^(edata)
-          }else{
-            if(data_scale == "log"){
-              edata_new <- log(10^(edata))
-            }else{
-              if(data_scale == "log2"){
-                edata_new <- log2(10^(edata))
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  
-  
-  # add the identifier column back #
-  edata_new <- data.frame(edata_id=feature_names, edata_new, check.names=check_names)
-  
-  if(is.null(omicsData$e_meta)){
-    emeta_cname = NULL
-  }else{
-    emeta_cname = attr(omicsData, "cnames")$emeta_cname
-  }
-  
-  # create an updated metabData object #
-  updated_data <- as.nmrData(e_data = edata_new, f_data = omicsData$f_data, e_meta = omicsData$e_meta, edata_cname = edata_id, emeta_cname=emeta_cname, fdata_cname = attr(omicsData, "cnames")$fdata_cname, techrep_cname = attr(omicsData, "cnames")$techrep_cname, 
-                               data_scale = data_scale, norm_info=attr(omicsData, "data_info")$norm_info,  is_normalized = attr(omicsData, "data_info")$norm_info$is_normalized, data_types=attr(omicsData, "data_info")$data_types, check.names = check_names)
-  
-  attributes(updated_data)$group_DF <- attributes(omicsData)$group_DF
-  attributes(updated_data)$filters <- attributes(omicsData)$filters
-  attributes(updated_data)$meta_info <- attributes(omicsData)$meta_info
-  attributes(updated_data)$imdanova <- attributes(omicsData)$imdanova
-  
-  return(updated_data)
-}
-
-
-
-

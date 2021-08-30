@@ -7,6 +7,7 @@
 mad_transform(
   e_data,
   edata_id,
+  subset_fn,
   feature_subset,
   backtransform = FALSE,
   apply_norm = FALSE,
@@ -17,6 +18,8 @@ mad_transform(
 \item{e_data}{a \eqn{p \times n + 1} data.frame, where \eqn{p} is the number of peptides, lipids, or metabolites and \eqn{n} is the number of samples. Each row corresponds to data for a peptide, lipid, or metabolite, with a column giving the identifer name.}
 
 \item{edata_id}{character string indicating the name of the peptide, protein, lipid, or metabolite identifier. Usually obtained by calling \code{attr(omicsData, "cnames")$edata_cname}.}
+
+\item{subset_fn}{character string indicating the subset function to use for normalization.}
 
 \item{feature_subset}{character vector containing the feature names in the subset to be used for normalization}
 
@@ -51,7 +54,7 @@ Calculate normalization parameters for the data via median absolute deviation (M
 Each feature is scaled by subtracting the median of the feature subset specified for normalization and then dividing the result by the median absolute deviation (MAD) of the feature subset specified for normalization to get the normalized data. The location estimates are the subset medians for each sample. The scale estimates are the subset MADs for each sample. Medians are taken ignoring any NA values. If backtransform is TRUE, the normalized feature values are multiplied by a pooled MAD (estimated from all samples) and a global median of the subset data (across all samples) is added back to the normalized values.
 }
 \examples{
-dontrun{
+\dontrun{
 library(pmartRdata)
 data(lipid_object)
 lipid_object2 <- group_designation(omicsData = lipid_object, main_effects = "Condition")
