@@ -44,7 +44,7 @@ applyFilt(filter_object, omicsData, ...)
 \item{omicsData}{an object of the class \code{pepData}, \code{proData},
 \code{lipidData}, \code{metabData}, or \code{nmrData} usually created by
 \code{\link{as.pepData}}, \code{\link{as.proData}},
-\code{\link{as.lipidData}}, \code{\link{as.metabData}}, or 
+\code{\link{as.lipidData}}, \code{\link{as.metabData}}, or
 \code{\link{as.nmrData}}, respectively.}
 
 \item{...}{further arguments}
@@ -56,9 +56,9 @@ An object of the class \code{pepData}, \code{proData},
   edata_cnames, and emeta_cnames filtered out of the appropriate datasets.
 }
 \description{
-This function takes a filter object of class 'cvFilt', 'rmdFilt', 
-  'moleculeFilt', 'proteomicsFilt', 'imdanovaFilt', or 'customFilt' and 
-  applies the filter to a dataset of \code{pepData}, \code{proData}, 
+This function takes a filter object of class 'cvFilt', 'rmdFilt',
+  'moleculeFilt', 'proteomicsFilt', 'imdanovaFilt', or 'customFilt' and
+  applies the filter to a dataset of \code{pepData}, \code{proData},
   \code{lipidData}, \code{metabData}, or \code{nmrData}.
 }
 \details{
