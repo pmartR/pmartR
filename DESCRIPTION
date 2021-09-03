@@ -32,7 +32,8 @@ Imports:
     reshape2,
     RcppArmadillo,
     RColorBrewer,
-    magrittr
+    magrittr,
+    patchwork
 Suggests:
     knitr,
     rmarkdown,
