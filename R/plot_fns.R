@@ -5110,7 +5110,6 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
     ggplot2::ylab(ylabel) +
     ggplot2::scale_color_discrete(legend_title)
 
-
   # Farm boy, add limits to my plot. As you wish.
   if (!is.null(ylimit)) {
     p <- p + ggplot2::scale_y_continuous(limits = ylimit)
