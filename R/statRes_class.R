@@ -120,7 +120,7 @@ print.statRes <- function(x,...){
 #' 
 #' @param x `statRes` object to be plotted, usually the result of `imd_anova`
 #' @param plot_type defines which plots to be produced, options are "bar", "heatmap", "volcano"; defaults to "bar"
-#' @param fc_threshold optional threshold value for fold change estimates that's added to the volcano plot
+#' @param fc_threshold optional threshold value for fold change estimates.  Modifies the volcano plot as follows:  Vertical lines are added at (+/-)\code{fc_threshold} and all observations that have absolute fold change less than \code{abs(fc_threshold)} are colored as 'non-significant' (as specified by \code{fc_colors}).
 #' @param fc_colors vector of length three with character color values interpretable by ggplot. i.e. c("orange", "black", "blue") with the values being used to color negative, non-significant, and positive fold changes respectively
 #' @param stacked TRUE/FALSE for whether to stack positive and negative fold change sections in the barplot, defaults to FALSE
 #' @param interactive TRUE/FALSE for whether to create an interactive plot using plotly
@@ -314,11 +314,19 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, fc_colors = 
       cols_anova <- c("-2" = fc_colors[2], "-1" = fc_colors[1], "0" = fc_colors[2], "1" = fc_colors[3], "2" = fc_colors[2])
       
       # temp data with rows only for ANOVA
-      temp_data_anova <- volcano %>% dplyr::filter(Type == "ANOVA") %>% 
-        dplyr::mutate(Fold_change_flag = dplyr::case_when(Fold_change > 0 & P_value <= attr(x, "pval_thresh") ~  "1", 
-                                                          Fold_change < 0 & P_value <= attr(x, "pval_thresh") ~ "-1", 
-                                                          is.na(Fold_change) ~ "0",
-                                                          TRUE ~ Fold_change_flag))
+      temp_data_anova <- volcano %>% 
+        dplyr::filter(Type == "ANOVA") %>%
+        dplyr::mutate(
+          Fold_change_flag = dplyr::case_when(
+            is.na(Fold_change) |
+              abs(Fold_change) < ifelse(rlang::is_empty(fc_threshold), 0, abs(fc_threshold)) ~ "0",
+            Fold_change > 0 &
+              P_value <= attr(x, "pval_thresh") ~  "1",
+            Fold_change < 0 &
+              P_value <= attr(x, "pval_thresh") ~ "-1",
+            TRUE ~ Fold_change_flag
+          )
+        )
       
       # interactive plots need manual text applied to prepare for ggplotly conversion
       if(interactive){
@@ -344,10 +352,16 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, fc_colors = 
       cols_gtest <- c("-2" = fc_colors[1], "-1" = fc_colors[2], "0" = fc_colors[2], "1" = fc_colors[2], "2" = fc_colors[3])
       temp_data_gtest <- volcano %>% 
         dplyr::filter(Type == "G-test") %>% 
-        dplyr::mutate(Fold_change_flag = dplyr::case_when(Prop_First_Group > Prop_Second_Group & P_value <= attr(x, "pval_thresh") ~  "2", 
-                                                          Prop_First_Group < Prop_Second_Group & P_value <= attr(x, "pval_thresh") ~ "-2", 
-                                                          is.na(Fold_change) ~ "0",
-                                                          TRUE ~ Fold_change_flag))
+        dplyr::mutate(
+          Fold_change_flag = dplyr::case_when(
+            Prop_First_Group > Prop_Second_Group &
+              P_value <= attr(x, "pval_thresh") ~  "2",
+            Prop_First_Group < Prop_Second_Group &
+              P_value <= attr(x, "pval_thresh") ~ "-2",
+            is.na(Fold_change) ~ "0",
+            TRUE ~ Fold_change_flag
+          )
+        )
       
       if(interactive){
         p2 <- ggplot(temp_data_gtest, aes(Count_Second_Group, Count_First_Group, text = paste("ID:", !!rlang::sym(idcol), "<br>", "Pval:", round(P_value, 4))))
