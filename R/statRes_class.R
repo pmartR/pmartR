@@ -414,8 +414,7 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, fc_colors = 
       }
       
       else{
-        gridExtra::grid.arrange(p1,p2,nrow = 2)
-        return(invisible(list(p1,p2)))
+        return(p1 + p2)
       }
     }
   }
