@@ -164,11 +164,6 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, fc_colors = 
                           title_theme = element_text(size = 14), axis_text_theme = element_text(size = 12), axis_title_theme = element_text(size = 14),
                           legend_title_theme = element_text(size = 10), legend_text_theme = element_text(size = 8), strip_text_theme  = element_text(size = 12),
                           custom_theme = NULL){
-  #For now require ggplot2, consider adding base graphics option too
-  if(!require(ggplot2)){
-    stop("ggplot2 is required, base graphics aren't available yet")
-  }
-  
   #Most plots are based on "number_significant" data frame so pull it out
   comp_df <- attr(x,"number_significant")
   
