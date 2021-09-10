@@ -20,7 +20,7 @@
 
 \item{plot_type}{defines which plots to be produced, options are "bar", "heatmap", "volcano"; defaults to "bar"}
 
-\item{fc_threshold}{optional threshold value for fold change estimates that's added to the volcano plot}
+\item{fc_threshold}{optional threshold value for fold change estimates.  Modifies the volcano plot as follows:  Vertical lines are added at (+/-)\code{fc_threshold} and all observations that have absolute fold change less than \code{abs(fc_threshold)} are colored as 'non-significant' (as specified by \code{fc_colors}).}
 
 \item{fc_colors}{vector of length three with character color values interpretable by ggplot. i.e. c("orange", "black", "blue") with the values being used to color negative, non-significant, and positive fold changes respectively}
 
