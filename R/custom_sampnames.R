@@ -89,11 +89,11 @@ subset_names <- function(x, firstn, from, to, delim, components, pattern, ...){
     if(!is.null(from) | !is.null(to) | !is.null(delim) | !is.null(components) | !is.null(pattern)) stop("only firstn argument is needed")
     if(!is.numeric(firstn)) stop("firstn must be a non-negative numeric value less than the number of characters in the smallest sample name")
 
-    output = lapply(x, function(x){temp = strsplit(x, split = "")[[1]]
-    if(firstn > length(temp)) warning(paste("there are less than", firstn, "characters in a sample name, nothing was truncated", sep = " "))
-    temp <- temp[1:firstn]
-    temp2 = paste(temp[!is.na(temp)], collapse = "")
-    return(temp2)})
+    output = lapply(names, function(x){temp = strsplit(x, split = "")[[1]]
+                                       if(firstn > length(temp)) warning(paste("there are less than", firstn, "characters in a sample name, nothing was truncated", sep = " "))
+                                       temp <- temp[1:firstn]
+                                       temp2 = paste(temp[!is.na(temp)], collapse = "")
+                                       return(temp2)})
     output = unlist(output)
   }
 
