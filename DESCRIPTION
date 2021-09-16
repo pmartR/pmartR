@@ -28,11 +28,11 @@ Imports:
     rlang,
     rrcov,
     scales,
-    gridExtra,
     reshape2,
     RcppArmadillo,
     RColorBrewer,
-    magrittr
+    magrittr,
+    patchwork
 Suggests:
     knitr,
     rmarkdown,

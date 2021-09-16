@@ -246,7 +246,9 @@ plot.dataRes <- function (dataRes_obj, metric = NULL, density = FALSE,
     } else {
 
       # Combine the plots into one plot when interactive is FALSE.
-      gridExtra::grid.arrange(q, p, ncol = 2)
+
+      q + p
+
 
     }
 
@@ -2708,7 +2710,8 @@ plot.proteomicsFilt <- function (filter_obj, min_num_peps = NULL,
 
     } else {
 
-      gridExtra::grid.arrange(p, q, ncol = 2)
+      p + q
+
 
     }
 
@@ -2777,8 +2780,10 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
                           x_lab_size = 11, y_lab_size = 11, x_lab_angle = 90,
                           title_lab = NULL, title_lab_size = 14,
                           legend_lab = NULL, legend_position = "right",
+
                           point_size = 3, bw_theme = TRUE, palette = NULL,
                           use_VizSampNames = FALSE) {
+
 
   # Preliminaries --------------------------------------------------------------
 
@@ -2927,6 +2932,7 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
           size = point_size
         )
 
+
       # Start plot when there are two main effects.
     } else {
 
@@ -2938,6 +2944,7 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
                        shape = !!rlang::sym(main_eff_names[2])),
           size = point_size
         )
+
 
     }
 
@@ -3076,6 +3083,7 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
     }
 
   }
+
 
   # Farm boy, make the plot interactive. As you wish.
   if (interactive) p <- plotly::ggplotly(p)
@@ -3481,7 +3489,8 @@ plot.normRes <- function (normRes_obj, order_by = NULL, color_by = NULL,
   if (!interactive) {
 
     # Return the regular plots side-by-side.
-    gridExtra::grid.arrange(p_raw, p_norm, ncol = 2)
+
+    p_raw + p_norm
 
   } else {
 
@@ -4258,7 +4267,8 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
     ggplot2::ggtitle(title, subtitle) +
     ggplot2::xlab(xlabel) +
     ggplot2::ylab(ylabel) +
-    ggplot2::scale_fill_discrete(legend_title)
+    ggplot2::scale_color_discrete(legend_title)
+
 
   # Farm boy, add limits to my plot. As you wish.
   if (!is.null(ylimit)) {
