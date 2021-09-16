@@ -20,7 +20,8 @@
   legend_position = "right",
   point_size = 3,
   bw_theme = TRUE,
-  palette = NULL
+  palette = NULL,
+  use_VizSampNames = FALSE
 )
 }
 \arguments{
@@ -76,6 +77,9 @@ is 3.}
 \item{palette}{A character string indicating the name of the RColorBrewer
 palette to use. For a list of available options see the details section in
 \code{\link[RColorBrewer]{RColorBrewer}}.}
+
+\item{use_VizSampNames}{Logical. Indicates whether to use custom sample
+names. The default is FALSE.}
 }
 \description{
 For plotting an S3 object of type 'rmdFilt'
