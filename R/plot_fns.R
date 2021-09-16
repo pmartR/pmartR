@@ -246,7 +246,9 @@ plot.dataRes <- function (dataRes_obj, metric = NULL, density = FALSE,
     } else {
 
       # Combine the plots into one plot when interactive is FALSE.
+
       q + p
+
 
     }
 
@@ -2710,6 +2712,7 @@ plot.proteomicsFilt <- function (filter_obj, min_num_peps = NULL,
 
       p + q
 
+
     }
 
   } else {
@@ -2765,6 +2768,8 @@ plot.proteomicsFilt <- function (filter_obj, min_num_peps = NULL,
 #' @param palette A character string indicating the name of the RColorBrewer
 #'   palette to use. For a list of available options see the details section in
 #'   \code{\link[RColorBrewer]{RColorBrewer}}.
+#' @param use_VizSampNames Logical. Indicates whether to use custom sample
+#'   names. The default is FALSE.
 #'
 #' @rdname plot-rmdFilt
 #'
@@ -2775,7 +2780,10 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
                           x_lab_size = 11, y_lab_size = 11, x_lab_angle = 90,
                           title_lab = NULL, title_lab_size = 14,
                           legend_lab = NULL, legend_position = "right",
-                          point_size = 3, bw_theme = TRUE, palette = NULL) {
+
+                          point_size = 3, bw_theme = TRUE, palette = NULL,
+                          use_VizSampNames = FALSE) {
+
 
   # Preliminaries --------------------------------------------------------------
 
@@ -2917,20 +2925,26 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
     if (length(main_eff_names) == 1) {
 
       p <- p +
-        ggplot2::geom_point(ggplot2::aes_string(x = samp_id,
-                                                y = "Log2.md",
-                                                color = main_eff_names[1]),
-                            size = point_size)
+        ggplot2::geom_point(
+          ggplot2::aes(x = forcats::fct_inorder(!!rlang::sym(samp_id)),
+                       y = Log2.md,
+                       color = !!rlang::sym(main_eff_names[1])),
+          size = point_size
+        )
+
 
       # Start plot when there are two main effects.
     } else {
 
       p <- p +
-        ggplot2::geom_point(ggplot2::aes_string(x = samp_id,
-                                                y = "Log2.md",
-                                                color = main_eff_names[1],
-                                                shape = main_eff_names[2]),
-                            size = point_size)
+        ggplot2::geom_point(
+          ggplot2::aes(x = forcats::fct_inorder(!!rlang::sym(samp_id)),
+                       y = Log2.md,
+                       color = !!rlang::sym(main_eff_names[1]),
+                       shape = !!rlang::sym(main_eff_names[2])),
+          size = point_size
+        )
+
 
     }
 
@@ -3045,6 +3059,31 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
 
   # Farm boy, add the thematic elements you created to the plot. As you wish.
   p <- p + mytheme
+
+  # Farm boy, use my custom sample names in the plot. As you wish.
+  if (use_VizSampNames) {
+
+    # Change the sample names of the scatter plot.
+    p <- p +
+      ggplot2::scale_x_discrete(labels = attr(filter_obj, "VizSampNames"))
+
+    # We only want to change the legend if the box plots are created.
+    if (!is.null(sampleID)) {
+
+      # Nab the indices of the samples that will be highlighted in the box
+      # plots.
+      idx <- which(attr(filter_obj, "sample_names") %in% sampleID)
+
+      # Change the names in the legend of the box plots.
+      p <- p +
+        ggplot2::scale_color_hue(
+          labels = attr(filter_obj, "VizSampNames")[idx]
+        )
+
+    }
+
+  }
+
 
   # Farm boy, make the plot interactive. As you wish.
   if (interactive) p <- plotly::ggplotly(p)
@@ -3450,6 +3489,7 @@ plot.normRes <- function (normRes_obj, order_by = NULL, color_by = NULL,
   if (!interactive) {
 
     # Return the regular plots side-by-side.
+
     p_raw + p_norm
 
   } else {
@@ -4228,6 +4268,7 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
     ggplot2::xlab(xlabel) +
     ggplot2::ylab(ylabel) +
     ggplot2::scale_color_discrete(legend_title)
+
 
   # Farm boy, add limits to my plot. As you wish.
   if (!is.null(ylimit)) {

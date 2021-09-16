@@ -153,43 +153,43 @@ test_that("rmd_filter and applyFilt produce the correct output",{
   expect_equal(dim(nmrfilter_rmd),
                c(41, 8))
   expect_equal(round(nmrfilter_rmd$Log2.md, 3),
-               c(0.785,  0.897,  1.360,  0.095,  1.471,  3.913,  3.937,  1.553,
-                 1.447,  1.995,  1.066,  2.728,  3.022,  2.919,  5.230,  1.644,
-                 2.126,  1.256,  0.999,  1.966,  2.122, -1.172,  5.708,  4.629,
-                 1.666,  1.107,  0.100,  1.712,  1.832,  4.236,  2.165,  2.833,
-                 0.131,  1.757,  2.577,  2.262,  3.163,  2.180,  1.718,  3.113,
-                 2.010))
+
+               c(3.913, 2.919, 0.785, 3.937, 5.23, 0.897, 1.553, 1.644, 1.447,
+                 2.126, 1.36, 1.995, 1.256, 0.095, 1.066, 0.999, 2.728, 1.966,
+                 1.471, 3.022, 2.122, -1.172, 4.629, 2.262, 5.708, 3.163, 4.236,
+                 1.666, 2.165, 1.107, 2.833, 2.18, 0.1, 0.131, 1.718, 1.712,
+                 1.757, 3.113, 1.832, 2.577, 2.01))
   expect_equal(round(nmrfilter_rmd$pvalue, 3),
-               c(0.786, 0.761, 0.633, 0.899, 0.597, 0.005, 0.004, 0.569, 0.605,
-                 0.408, 0.719, 0.157, 0.087, 0.109, 0.000, 0.537, 0.359, 0.665,
-                 0.736, 0.419, 0.360, 0.979, 0.000, 0.000, 0.529, 0.708, 0.899,
-                 0.513, 0.469, 0.001, 0.344, 0.130, 0.895, 0.496, 0.202, 0.309,
-                 0.062, 0.339, 0.511, 0.070, 0.402))
+               c(0.005, 0.109, 0.786, 0.004, 0, 0.761, 0.569, 0.537, 0.605,
+                 0.359, 0.633, 0.408, 0.665, 0.899, 0.719, 0.736, 0.157, 0.419,
+                 0.597, 0.087, 0.36, 0.979, 0, 0.309, 0, 0.062, 0.001, 0.529,
+                 0.344, 0.708, 0.13, 0.339, 0.899, 0.895, 0.511, 0.513, 0.496,
+                 0.07, 0.469, 0.202, 0.402))
   expect_equal(round(nmrfilter_rmd$MAD, 3),
-               c(1.411, 1.173, 1.234, 1.463, 1.632, 0.922, 0.951, 1.245, 1.176,
-                 1.260, 1.461, 1.328, 1.264, 0.978, 1.047, 1.271, 1.365, 1.270,
-                 1.390, 1.435, 1.650, 1.286, 0.788, 1.018, 1.120, 1.404, 1.409,
-                 1.403, 1.529, 0.967, 1.197, 1.619, 1.409, 1.654, 1.634, 1.040,
-                 0.997, 1.486, 1.413, 1.503, 1.502))
+               c(0.922, 0.978, 1.411, 0.951, 1.047, 1.173, 1.245, 1.271, 1.176,
+                 1.365, 1.234, 1.26, 1.27, 1.463, 1.461, 1.39, 1.328, 1.435,
+                 1.632, 1.264, 1.65, 1.286, 1.018, 1.04, 0.788, 0.997, 0.967,
+                 1.12, 1.197, 1.404, 1.619, 1.486, 1.409, 1.409, 1.413, 1.403,
+                 1.654, 1.503, 1.529, 1.634, 1.502))
   expect_equal(round(nmrfilter_rmd$Kurtosis, 3),
-               c(-0.268, -0.094, -0.105, -0.369, -0.642,  0.004, -0.114, -0.168,
-                 -0.082, -0.216, -0.529, -0.619, -0.752, -0.022, -0.297, -0.371,
-                 -0.090, -0.372, -0.418, -0.376, -0.774, -0.378, -0.173, -0.206,
-                 -0.087, -0.380, -0.332, -0.194, -0.478, -0.283, -0.282, -0.580,
-                 -0.430, -0.506, -0.652, -0.374, -0.324, -0.591, -0.509, -0.578,
+               c(0.004, -0.022, -0.268, -0.114, -0.297, -0.094, -0.168, -0.371,
+                 -0.082, -0.09, -0.105, -0.216, -0.372, -0.369, -0.529, -0.418,
+                 -0.619, -0.376, -0.642, -0.752, -0.774, -0.378, -0.206, -0.374,
+                 -0.173, -0.324, -0.283, -0.087, -0.282, -0.38, -0.58, -0.591,
+                 -0.332, -0.43, -0.509, -0.194, -0.506, -0.578, -0.478, -0.652,
                  -0.374))
   expect_equal(round(nmrfilter_rmd$Skewness, 3),
-               c(0.638, 0.750, 0.772, 0.578, 0.440, 0.828, 0.730, 0.713, 0.808,
-                 0.695, 0.430, 0.576, 0.490, 0.874, 0.517, 0.575, 0.788, 0.538,
-                 0.551, 0.704, 0.385, 0.578, 0.494, 0.778, 0.868, 0.534, 0.575,
-                 0.794, 0.632, 0.645, 0.750, 0.470, 0.517, 0.544, 0.508, 0.620,
-                 0.618, 0.371, 0.448, 0.602, 0.721))
+               c(0.828, 0.874, 0.638, 0.73, 0.517, 0.75, 0.713, 0.575, 0.808,
+                 0.788, 0.772, 0.695, 0.538, 0.578, 0.43, 0.551, 0.576, 0.704,
+                 0.44, 0.49, 0.385, 0.578, 0.778, 0.62, 0.494, 0.618, 0.645,
+                 0.868, 0.75, 0.534, 0.47, 0.371, 0.575, 0.517, 0.448, 0.794,
+                 0.544, 0.602, 0.632, 0.508, 0.721))
   expect_equal(round(nmrfilter_rmd$Corr, 3),
-               c(0.949, 0.954, 0.954, 0.940, 0.915, 0.917, 0.914, 0.957, 0.951,
-                 0.957, 0.941, 0.921, 0.907, 0.922, 0.896, 0.951, 0.955, 0.951,
-                 0.946, 0.932, 0.902, 0.939, 0.910, 0.885, 0.931, 0.951, 0.946,
-                 0.932, 0.926, 0.899, 0.940, 0.945, 0.943, 0.925, 0.926, 0.918,
-                 0.913, 0.947, 0.948, 0.930, 0.922))
+               c(0.917, 0.922, 0.949, 0.914, 0.896, 0.954, 0.957, 0.951, 0.951,
+                 0.955, 0.954, 0.957, 0.951, 0.94, 0.941, 0.946, 0.921, 0.932,
+                 0.915, 0.907, 0.902, 0.939, 0.885, 0.918, 0.91, 0.913, 0.899,
+                 0.931, 0.94, 0.951, 0.945, 0.947, 0.946, 0.943, 0.948, 0.932,
+                 0.925, 0.93, 0.926, 0.926, 0.922))
 
   # Run standard diagnostics on the filter object attributes.
   expect_equal(attr(nmrfilter_rmd, "sample_names"),
@@ -404,7 +404,7 @@ test_that("rmd_filter and applyFilt produce the correct output",{
   expect_identical(attr(nmrfiltered, "filters")[[1]]$threshold,
                    0.0001)
   expect_equal(attr(nmrfiltered, "filters")[[1]]$filtered,
-               c("F3-098", "F4-005", "F4-009"))
+               c("F3-098", "F4-009", "F4-005"))
   expect_true(is.na(attr(nmrfiltered, "filters")[[1]]$method))
 
   # Investigate the data_info attribute.
@@ -569,21 +569,72 @@ test_that("rmd_filter and applyFilt produce the correct output",{
   expect_equal(dim(pfiltered_sg_f$e_meta),
                c(150, 4))
 
-  # Test scenario when nothing is filtered -------------------------------------
 
-  # Apply the filter with a value for pvalue_threshold that will not filter any
-  # rows.
-  expect_message(noFilta <- applyFilt(filter_object = pfilter_rmd,
-                                      omicsData = pdata,
-                                      pvalue_threshold = 0.00000001,
-                                      min_num_biomolecules = 50),
-                 paste("No samples were filtered with the value specified",
-                       "for the pvalue_threshold argument.",
-                       sep = " "))
+  # Test VizSampNames attribute ------------------------------------------------
 
-  # The output of applyFilt should be the same as the omicsData object used as
-  # the input because the filter was not applied. Therefore, the filters
-  # attribute should remain how it was before running applyFilt.
-  expect_identical(noFilta, pdata)
+  # Assemble long sample names to make sure the VizSampNames attribute is
+  # created correctly.
+  names(pdata$e_data) <- c("Mass_Tag_ID",
+                           "qwerty_one_infection1_asdf",
+                           "qwerty_two_infection2_asdf",
+                           "qwerty_three_infection3_asdf",
+                           "qwerty_four_infection4_asdf",
+                           "qwerty_five_infection5_asdf",
+                           "qwerty_six_infection6_asdf",
+                           "qwerty_seven_infection7_asdf",
+                           "qwerty_eight_infection8_asdf",
+                           "qwerty_nine_infection9_asdf",
+                           "qwerty_one_mock1_asdf",
+                           "qwerty_two_mock2_asdf",
+                           "qwerty_three_mock3_asdf")
+
+  # Change to the new long names in f_data
+  pdata$f_data$SampleID <- c("qwerty_one_infection1_asdf",
+                             "qwerty_two_infection2_asdf",
+                             "qwerty_three_infection3_asdf",
+                             "qwerty_four_infection4_asdf",
+                             "qwerty_five_infection5_asdf",
+                             "qwerty_six_infection6_asdf",
+                             "qwerty_seven_infection7_asdf",
+                             "qwerty_eight_infection8_asdf",
+                             "qwerty_nine_infection9_asdf",
+                             "qwerty_one_mock1_asdf",
+                             "qwerty_two_mock2_asdf",
+                             "qwerty_three_mock3_asdf")
+
+  # Use delim and components to make tiny sample names.
+  delim_u <- custom_sampnames(pdata, delim = "_", components = 3)
+
+  # Don't forget to rerun the group_designation function!!
+  delim_u <- group_designation(omicsData = delim_u,
+                               main_effects = "Condition")
+
+  # Forge a filter object for the peptide data with tiny sample names.
+  delim_rmd <- rmd_filter(omicsData = delim_u,
+                          ignore_singleton_groups = FALSE)
+
+  # Sleuth around the sample names attributes.
+  expect_equal(attr(delim_rmd, "sample_names"),
+               c("qwerty_one_infection1_asdf", "qwerty_two_infection2_asdf",
+                 "qwerty_three_infection3_asdf", "qwerty_four_infection4_asdf",
+                 "qwerty_five_infection5_asdf", "qwerty_six_infection6_asdf",
+                 "qwerty_seven_infection7_asdf", "qwerty_eight_infection8_asdf",
+                 "qwerty_nine_infection9_asdf", "qwerty_one_mock1_asdf",
+                 "qwerty_two_mock2_asdf", "qwerty_three_mock3_asdf"))
+  expect_equal(attr(delim_rmd, "VizSampNames"),
+               c("infection1", "infection2", "infection3", "infection4",
+                 "infection5", "infection6", "infection7", "infection8",
+                 "infection9", "mock1", "mock2", "mock3"))
+
+  # Make sure the output is in the same order even though the names changed.
+  expect_identical(delim_rmd$Group, pfilter_rmd$Group)
+  expect_identical(delim_rmd$Log2.md, pfilter_rmd$Log2.md)
+  expect_identical(delim_rmd$pvalue, pfilter_rmd$pvalue)
+  expect_identical(delim_rmd$MAD, pfilter_rmd$MAD)
+  expect_identical(delim_rmd$Kurtosis, pfilter_rmd$Kurtosis)
+  expect_identical(delim_rmd$Skewness, pfilter_rmd$Skewness)
+  expect_identical(delim_rmd$Corr, pfilter_rmd$Corr)
+  expect_identical(delim_rmd$Proportion_Missing, pfilter_rmd$Proportion_Missing)
+
 
 })
