@@ -225,10 +225,10 @@ total_count_filter <- function (omicsData) {
     stop (paste("omicsData must be of class 'seqData'.",sep = ' '))
     
   }
-  
+
   # Extricate the column number of the ID column.
   id_col <- which(names(omicsData$e_data) == get_edata_cname(omicsData))
-  
+
   # Compute the number of non-missing values for each row.
   count_total <- rowSums(omicsData$e_data[, -id_col])
   
@@ -244,7 +244,7 @@ total_count_filter <- function (omicsData) {
   
   # Return the completed object!!!
   return(output)
-  
+
 }
 
 
