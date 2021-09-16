@@ -741,9 +741,17 @@ rmd_filter <- function (omicsData,
   # If there are custom sample names in f_data add them as an attribute.
   if ("VizSampNames" %in% names(omicsData$f_data)) {
 
+    # Nab the order of the samples in f_data in relation to the order of the
+    # sample names in e_data which are the column names of e_data minus the
+    # column containing the biomolecule IDs.
+    oder <- match(names(omicsData$e_data[, -id_col]),
+                  omicsData$f_data[[get_fdata_cname(omicsData)]])
+
     # Add the custom sample names as its own attribute. This attribute can/will
-    # be used in the plot.rmdFilt function.
-    attr(output, "VizSampNames") <- omicsData$f_data$VizSampNames
+    # be used in the plot.rmdFilt function. The sample names of this attribute
+    # will be in the same order as the sample names in e_data (column names of
+    # e_data).
+    attr(output, "VizSampNames") <- omicsData$f_data$VizSampNames[oder]
 
   }
 
