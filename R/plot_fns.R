@@ -2969,10 +2969,6 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
     df <- attributes(filter_obj)$df
     yint <- log(qchisq(1 - pvalue_threshold, df = df), base = 2)
 
-    # divide data by the threshold
-    sub1 <- subset(filter_obj, pvalue < pvalue_threshold)
-    sub2 <- subset(filter_obj, pvalue >= pvalue_threshold)
-
     # make title
     if(is.null(title_lab)) {
       plot_title <- "Sample Outlier Results"
@@ -2984,35 +2980,33 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
     xlabel <- ifelse(is.null(x_lab), "Samples", x_lab)
     ylabel <- ifelse(is.null(y_lab), "log2(Robust Mahalanobis Distance)", y_lab)
 
+    # Start scatter plot skeleton when a p-value threshold is specified.
+    p <- ggplot2::ggplot(filter_obj)
+
     # Start scatter plot skeleton when a p-value threshold has been provided.
     if (length(main_eff_names) == 1) {
 
-      p <- ggplot2::ggplot(sub1) +
-        ggplot2::geom_point(ggplot2::aes_string(x = samp_id,
-                                                y = "Log2.md",
-                                                col = main_eff_names),
-                            size = point_size) +
-        ggplot2::geom_point(data = sub2,
-                            ggplot2::aes_string(x = samp_id,
-                                                y = "Log2.md",
-                                                col = main_eff_names),
-                            alpha = 0.5,
-                            size = point_size)
+      p <- p +
+        ggplot2::geom_point(
+          ggplot2::aes(x = forcats::fct_inorder(!!rlang::sym(samp_id)),
+                       y = Log2.md,
+                       col = !!rlang::sym(main_eff_names)),
+          alpha = ifelse(filter_obj$pvalue < pvalue_threshold, 1, 0.5),
+          size = point_size
+        )
+
     } else {
 
-      p <- ggplot2::ggplot(sub1) +
-        ggplot2::geom_point(ggplot2::aes_string(x = samp_id,
-                                                y = "Log2.md",
-                                                col = main_eff_names[1],
-                                                shape = main_eff_names[2]),
-                            size = point_size) +
-        ggplot2::geom_point(data = sub2,
-                            ggplot2::aes_string(x = samp_id,
-                                                y = "Log2.md",
-                                                col = main_eff_names[1],
-                                                shape = main_eff_names[2]),
-                            alpha = 0.5,
-                            size = point_size)
+      p <- p +
+        ggplot2::geom_point(
+          ggplot2::aes(x = forcats::fct_inorder(!!rlang::sym(samp_id)),
+                       y = Log2.md,
+                       col = !!rlang::sym(main_eff_names[1]),
+                       shape = !!rlang::sym(main_eff_names[2])),
+          alpha = ifelse(filter_obj$pvalue < pvalue_threshold, 1, 0.5),
+          size = point_size
+        )
+
     }
 
     # Add title, axis labels, and other crap.
