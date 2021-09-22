@@ -163,7 +163,7 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, fc_colors = 
 .plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, fc_colors = c("red", "black", "green"), stacked = FALSE, interactive = FALSE, bw_theme = FALSE, 
                           title_theme = element_text(size = 14), axis_text_theme = element_text(size = 12), axis_title_theme = element_text(size = 14),
                           legend_title_theme = element_text(size = 10), legend_text_theme = element_text(size = 8), strip_text_theme  = element_text(size = 12),
-                          custom_theme = NULL){
+                          custom_theme = NULL, show_sig = TRUE, sig_text = TRUE){
   #Most plots are based on "number_significant" data frame so pull it out
   comp_df <- attr(x,"number_significant")
   
@@ -230,154 +230,23 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, fc_colors = 
   
   #Both the volcano plot and heatmap need a dataframe of fold changes by comparison/biomolecule
   if("volcano" %in%plot_type | "heatmap"%in%plot_type){
-    # fold change values for volcano plot
-    fc_data <- x$Full_results[,c(1,grep("^Fold_change",colnames(x$Full_results)))]
-    colnames(fc_data) <- gsub(pattern = "^Fold_change_",replacement = "",x = colnames(fc_data))
-    fc_data <- reshape2::melt(fc_data,id.vars=1,variable.name="Comparison",value.name="Fold_change")
-    
-    # fold change flags for coloring 
-    fc_flags <- x$Flags
-    fc_flags <- reshape2::melt(fc_flags,id.vars=1,variable.name="Comparison",value.name="Fold_change_flag") %>%
-      dplyr::mutate(Fold_change_flag = as.character(Fold_change_flag))
-    
-    # p values for labeling and y axis in anova volcano plot
-    p_data <- x$Full_results[c(1,grep("^P_value",colnames(x$Full_results)))]
-    pvals <- reshape2::melt(p_data,id.vars=1,variable.name="Comparison",value.name="P_value")
-    
-    # grouping column based on test type
-    if(attr(x,"statistical_test")=="combined"){
-      pvals$Type <- "G-test"
-      pvals$Type[grep(pattern="^P_value_T_",x=pvals$Comparison)] <- "ANOVA"
-    }else if(attr(x,"statistical_test")=="gtest"){
-      pvals$Type <- "G-test"
-    }else if(attr(x,"statistical_test")=="anova"){
-      pvals$Type <- "ANOVA"
-    }
-    
-    levels(pvals$Comparison) <- gsub(pattern="^P_value_G_",replacement = "",levels(pvals$Comparison))
-    levels(pvals$Comparison) <- gsub(pattern="^P_value_T_",replacement = "",levels(pvals$Comparison))
-    
-    volcano <- merge(merge(fc_data,pvals,all=TRUE), fc_flags, all = TRUE)
-    
-    # levels of comparison now of the form 'GROUPNAME_X vs GROUPNAME_Y'
-    levels(volcano$Comparison) <- gsub(pattern = "_vs_",replacement = " vs ",levels(volcano$Comparison))
-    
-    # create counts for gtest plot (number present in each group)
-    if(attr(x, "statistical_test") %in% c("gtest", "combined")){
-      counts <- x$Full_results[c(1, grep("^Count_", colnames(x$Full_results)))]
-      
-      # trim column names so they are just group names
-      colnames(counts) <- gsub("^Count_", replacement = "", colnames(counts))
-      
-      counts_df <- data.frame()
-      for(comp in as.character(unique(volcano$Comparison))){
-        #create a vector of the two group names being compared
-        groups = strsplit(comp, " vs ")[[1]]
-        gsize_1 = nrow(attr(x, "group_DF") %>% dplyr::filter(Group == groups[1]))
-        gsize_2 = nrow(attr(x, "group_DF") %>% dplyr::filter(Group == groups[2]))
-        
-        # will contain ID column and count column corresponding to the two groups
-        temp_df <- counts[c(1,which(colnames(counts) == groups[1]), which(colnames(counts) == groups[2]))]
-        temp_df$Comparison <- comp
-        
-        # rename the columns to something static so they can be rbind-ed
-        colnames(temp_df)[which(colnames(temp_df)%in% groups)] <- c("Count_First_Group", "Count_Second_Group") 
-        
-        # store proportion of nonmissing to color g-test values in volcano plot
-        temp_df$Prop_First_Group <- temp_df$Count_First_Group/gsize_1
-        temp_df$Prop_Second_Group <- temp_df$Count_Second_Group/gsize_2
-        
-        counts_df <- rbind(counts_df, temp_df)
-      }
-      
-      # should automatically left join by ID AND Comparison
-      suppressWarnings(
-        volcano <- volcano %>% dplyr::left_join(counts_df)
-      )
-    }
+    volcano <- make_volcano_plot_df(x)
   }
   
   #Volcano plot 
   if("volcano"%in%plot_type){
-
-    # global jitter parameter and ID column
-    jitter <- position_jitter(width = 0.4, height = 0.4)
-    idcol <- colnames(volcano)[1]
     
     if(attr(x, "statistical_test") %in% c("anova", "combined")){
-      # color vector which assigns black to gtest flag values (-2, 2)
-      cols_anova <- c("-2" = fc_colors[2], "-1" = fc_colors[1], "0" = fc_colors[2], "1" = fc_colors[3], "2" = fc_colors[2])
-      
-      # temp data with rows only for ANOVA
-      temp_data_anova <- volcano %>% 
-        dplyr::filter(Type == "ANOVA") %>%
-        dplyr::mutate(
-          Fold_change_flag = dplyr::case_when(
-            is.na(Fold_change) |
-              abs(Fold_change) < ifelse(rlang::is_empty(fc_threshold), 0, abs(fc_threshold)) ~ "0",
-            Fold_change > 0 &
-              P_value <= attr(x, "pval_thresh") ~  "1",
-            Fold_change < 0 &
-              P_value <= attr(x, "pval_thresh") ~ "-1",
-            TRUE ~ Fold_change_flag
-          )
-        )
-      
-      # interactive plots need manual text applied to prepare for ggplotly conversion
-      if(interactive){
-        p1 <- ggplot(temp_data_anova, aes(Fold_change,-log(P_value,base=10), text = paste("ID:", !!rlang::sym(idcol), "<br>", "Pval:", round(P_value, 4))))
-      }
-      else p1 <- ggplot(data = temp_data_anova, aes(Fold_change,-log(P_value,base=10))) 
-      
-      p1 <- p1 +
-          geom_point(aes(color = Fold_change_flag), shape = 1)+
-          facet_wrap(~Comparison) +
-          ylab("-log[10](p-value)")+xlab(sprintf("Fold-change (%s)", attr(x, 'data_info')$data_scale)) +
-          scale_color_manual(values = cols_anova, name = "Fold Change", 
-                             labels = c("Neg(Anova)", "0", "Pos(Anova)"),
-                             breaks = c("-1", "0", "1"))
+      p1 <- statres_volcano_plot(volcano, fc_colors, fc_threshold, interactive)
       
       if(bw_theme) p1 <- p1 + theme_bw()
       
       p1 <- p1 + mytheme
     }
     
+    # g-test heatmap
     if(attr(x, "statistical_test") %in% c("gtest", "combined")){
-      # assign black to anova flag values and filter down to G-test rows, reassign significant g-test flags so that anova significance doesn't cover them up
-      cols_gtest <- c("-2" = fc_colors[1], "-1" = fc_colors[2], "0" = fc_colors[2], "1" = fc_colors[2], "2" = fc_colors[3])
-      temp_data_gtest <- volcano %>% 
-        dplyr::filter(Type == "G-test") %>% 
-        dplyr::mutate(
-          Fold_change_flag = dplyr::case_when(
-            Prop_First_Group > Prop_Second_Group &
-              P_value <= attr(x, "pval_thresh") ~  "2",
-            Prop_First_Group < Prop_Second_Group &
-              P_value <= attr(x, "pval_thresh") ~ "-2",
-            is.na(Fold_change) ~ "0",
-            TRUE ~ Fold_change_flag
-          )
-        )
-      
-      if(interactive){
-        p2 <- ggplot(temp_data_gtest, aes(Count_Second_Group, Count_First_Group, text = paste("ID:", !!rlang::sym(idcol), "<br>", "Pval:", round(P_value, 4))))
-      }
-      else p2 <- ggplot(data=temp_data_gtest, aes(Count_Second_Group, Count_First_Group))
-      
-      p2 <- p2 +
-        geom_point(data = temp_data_gtest %>% dplyr::filter(Fold_change_flag %in% c(-1,0,1)), aes(color = Fold_change_flag), position = jitter, shape = 1) +
-        geom_point(data = temp_data_gtest %>% dplyr::filter(!(Fold_change_flag %in% c(-1,0,1))), aes(color = Fold_change_flag), position = jitter) +
-        facet_wrap(~Comparison) +
-        geom_vline(xintercept = c(unique(temp_data_gtest$Count_Second_Group) + 0.5, min(temp_data_gtest$Count_Second_Group) - 0.5)) +
-        geom_hline(yintercept = c(unique(temp_data_gtest$Count_First_Group) + 0.5, min(temp_data_gtest$Count_First_Group) - 0.5)) +
-        ylab("No. present in first group")+xlab("No. present in second group") +
-        scale_color_manual(values = cols_gtest, name = "Fold Change", 
-                           labels = c("Neg(Gtest)", "0", "Pos(Gtest)"),
-                           breaks = c("-2", "0", "2")) + 
-        scale_x_continuous(breaks = unique(temp_data_gtest$Count_Second_Group), labels = as.character(unique(temp_data_gtest$Count_Second_Group))) +
-        scale_y_continuous(breaks = unique(temp_data_gtest$Count_First_Group), labels = as.character(unique(temp_data_gtest$Count_First_Group)))
-      
-      if(bw_theme) p2 <- p2 + theme_bw()
-      
+      p2 <- gtest_heatmap(volcano, show_sig = show_sig, sig_text = sig_text)
       p2 <- p2 + mytheme
     }
     
@@ -399,9 +268,9 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, fc_colors = 
         p1 <- p1 %>% plotly::ggplotly(tooltip = c("text"))
         p2 <- p2 %>% plotly::ggplotly(tooltip = c("text"))
         suppressWarnings(
-          p <- plotly::subplot(p1, p2, nrows = 2) %>% 
+          p <- plotly::subplot(p1, p2, nrows = 1) %>% 
             plotly::layout(showlegend = FALSE, 
-                           title = sprintf("TOP: -log10-pvalue vs %s fold change | BOTTOM:  #Present in each group | Colored by fold change direction",
+                           title = sprintf("LEFT: -log10-pvalue vs %s fold change | RIGHT:  # Present in each group | Colored by # of biomolecules",
                                                                attr(x, 'data_info')$data_scale),
                            font = list(size = 10))
         )
@@ -433,4 +302,196 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, fc_colors = 
     if(interactive) return(plotly::ggplotly(p, tooltip = c("text"))) else return(p)
   }
   #invisible(all_plts)
+}
+
+#' Create a plotting dataframe for volcano plots and heatmaps.
+#' 
+#' A function internal to \link{pmartR::plot.statRes} which creates the 
+#' dataframe necessary to construct volcano plots and heatmaps.
+#' 
+#' @param x `statRes` object to be plotted, usually the result of `imd_anova`
+#' 
+#' @returns `data.frame` object with plotting information about each biomolecule
+#' such as missing counts per group, and p-values for t and g-tests.
+make_volcano_plot_df <- function(x) {
+  # fold change values for volcano plot
+  fc_data <- x$Full_results[,c(1,grep("^Fold_change",colnames(x$Full_results)))]
+  colnames(fc_data) <- gsub(pattern = "^Fold_change_",replacement = "",x = colnames(fc_data))
+  fc_data <- reshape2::melt(fc_data,id.vars=1,variable.name="Comparison",value.name="Fold_change")
+  
+  # fold change flags for coloring 
+  fc_flags <- x$Flags
+  fc_flags <- reshape2::melt(fc_flags,id.vars=1,variable.name="Comparison",value.name="Fold_change_flag") %>%
+    dplyr::mutate(Fold_change_flag = as.character(Fold_change_flag))
+  
+  # p values for labeling and y axis in anova volcano plot
+  p_data <- x$Full_results[c(1,grep("^P_value",colnames(x$Full_results)))]
+  pvals <- reshape2::melt(p_data,id.vars=1,variable.name="Comparison",value.name="P_value")
+  
+  # grouping column based on test type
+  if(attr(x,"statistical_test")=="combined"){
+    pvals$Type <- "G-test"
+    pvals$Type[grep(pattern="^P_value_T_",x=pvals$Comparison)] <- "ANOVA"
+  }else if(attr(x,"statistical_test")=="gtest"){
+    pvals$Type <- "G-test"
+  }else if(attr(x,"statistical_test")=="anova"){
+    pvals$Type <- "ANOVA"
+  }
+  
+  levels(pvals$Comparison) <- gsub(pattern="^P_value_G_",replacement = "",levels(pvals$Comparison))
+  levels(pvals$Comparison) <- gsub(pattern="^P_value_T_",replacement = "",levels(pvals$Comparison))
+  
+  volcano <- merge(merge(fc_data,pvals,all=TRUE), fc_flags, all = TRUE)
+  
+  # levels of comparison now of the form 'GROUPNAME_X vs GROUPNAME_Y'
+  levels(volcano$Comparison) <- gsub(pattern = "_vs_",replacement = " vs ",levels(volcano$Comparison))
+  
+  # create counts for gtest plot (number present in each group)
+  if(attr(x, "statistical_test") %in% c("gtest", "combined")){
+    counts <- x$Full_results[c(1, grep("^Count_", colnames(x$Full_results)))]
+    
+    # trim column names so they are just group names
+    colnames(counts) <- gsub("^Count_", replacement = "", colnames(counts))
+    
+    counts_df <- data.frame()
+    for(comp in as.character(unique(volcano$Comparison))){
+      #create a vector of the two group names being compared
+      groups = strsplit(comp, " vs ")[[1]]
+      gsize_1 = nrow(attr(x, "group_DF") %>% dplyr::filter(Group == groups[1]))
+      gsize_2 = nrow(attr(x, "group_DF") %>% dplyr::filter(Group == groups[2]))
+      
+      # will contain ID column and count column corresponding to the two groups
+      temp_df <- counts[c(1,which(colnames(counts) == groups[1]), which(colnames(counts) == groups[2]))]
+      temp_df$Comparison <- comp
+      
+      # rename the columns to something static so they can be rbind-ed
+      colnames(temp_df)[which(colnames(temp_df)%in% groups)] <- c("Count_First_Group", "Count_Second_Group") 
+      
+      # store proportion of nonmissing to color g-test values in volcano plot
+      temp_df$Prop_First_Group <- temp_df$Count_First_Group/gsize_1
+      temp_df$Prop_Second_Group <- temp_df$Count_Second_Group/gsize_2
+      
+      counts_df <- rbind(counts_df, temp_df)
+    }
+    
+    # should automatically left join by ID AND Comparison
+    suppressWarnings(
+      volcano <- volcano %>% dplyr::left_join(counts_df)
+    )
+  }
+  
+  return(volcano)
+}
+
+#' Plot a heatmap for the g-test results of imd-anova 
+#' 
+#' Plots a heatmap showing bins for combinations of # of biomolecules present
+#' across groups.  Bins are colored by the number of biomolecules falling into
+#' each bin, and have indicators for significance by g-test.
+#' 
+#' @param volcano `data.frame` produced by \link{pmartR::make_volcano_plot_df}
+#' @param show_sig Boolean whether to show the visual indicator that a certain bin
+#' combination is significant by the g-test
+#' @param sig_text Boolean whether to show the text indicating the number of 
+#' biomolecules falling into each bin. (in addition to the legend)
+#' 
+#' @return `ggplot` object. A g-test heatmap
+#' 
+gtest_heatmap <- function(volcano, show_sig = TRUE, sig_text = TRUE) {
+  
+  temp_data_gtest <- volcano %>% 
+    dplyr::filter(Type == "G-test") %>% 
+    dplyr::mutate(
+      Fold_change_flag = dplyr::case_when(
+        Prop_First_Group > Prop_Second_Group &
+          P_value <= attr(x, "pval_thresh") ~  "2",
+        Prop_First_Group < Prop_Second_Group &
+          P_value <= attr(x, "pval_thresh") ~ "-2",
+        is.na(Fold_change) ~ "0",
+        TRUE ~ Fold_change_flag
+      )
+    )
+  
+  # summarized data frame of # of biomolecules per count combination.
+  gtest_counts <- temp_data_gtest %>% 
+    group_by(Count_First_Group, Count_Second_Group) %>% 
+    summarise(n = n(), sig = all(P_value < 0.05)) %>% 
+    mutate(Count_First_Group = as.character(Count_First_Group), Count_Second_Group = as.character(Count_Second_Group))
+  
+  p <- ggplot(gtest_counts) + 
+    theme_minimal() +
+    geom_tile(aes(Count_First_Group, Count_Second_Group, fill = n), color = "black")
+  
+  if(show_sig) {
+    p <- p + geom_point(
+      data = gtest_counts %>% filter(sig),
+      aes(Count_First_Group, Count_Second_Group, shape = "1"),
+      fill = "yellow"
+    ) +
+      scale_shape_manual(name = "Statistically significant",
+                         labels = "",
+                         values = 21)
+  }
+  
+  if(sig_text) {
+    p <- p + geom_text(
+      aes(Count_First_Group, Count_Second_Group, label = n),
+      nudge_x = -0.5, nudge_y = 0.5, hjust = -0.1, vjust = 1.5,
+      color = "white", size = 3
+    )
+  }
+    
+  p <- p +
+    scale_fill_continuous(name = "Number of biomolecules") + 
+    xlab("Count (first group)") + 
+    ylab("Count (second group)")
+  
+  return(p)
+}
+
+#' Volcano plot for the anova results of imd-anova
+#' 
+#' Plots a volcano plot showing negative log10 p-values on the y axis and fold
+#' change on the x axis. Each point is colored by fold change direction and 
+#' whether or not it was significant by ANOVA.
+#' 
+#' @param volcano `data.frame` produced by \link{pmartR::make_volcano_plot_df}
+#' @param fc_colors,fc_threshold,interactive 
+#' passed from \code{\link[pmartR::plot.statRes]}
+#' 
+#' @return `ggplot` object.  A volcano plot.
+#' 
+statres_volcano_plot <- function(volcano, fc_colors, fc_threshold, interactive) {
+  # color vector which assigns black to gtest flag values (-2, 2)
+  cols_anova <- c("-2" = fc_colors[2], "-1" = fc_colors[1], "0" = fc_colors[2], "1" = fc_colors[3], "2" = fc_colors[2])
+  
+  # temp data with rows only for ANOVA
+  temp_data_anova <- volcano %>% 
+    dplyr::filter(Type == "ANOVA") %>%
+    dplyr::mutate(
+      Fold_change_flag = dplyr::case_when(
+        is.na(Fold_change) |
+          abs(Fold_change) < ifelse(rlang::is_empty(fc_threshold), 0, abs(fc_threshold)) ~ "0",
+        Fold_change > 0 &
+          P_value <= attr(x, "pval_thresh") ~  "1",
+        Fold_change < 0 &
+          P_value <= attr(x, "pval_thresh") ~ "-1",
+        TRUE ~ Fold_change_flag
+      )
+    )
+  
+  # interactive plots need manual text applied to prepare for ggplotly conversion
+  if(interactive){
+    p <- ggplot(temp_data_anova, aes(Fold_change,-log(P_value,base=10), text = paste("ID:", !!rlang::sym(colnames(volcano)[1]), "<br>", "Pval:", round(P_value, 4))))
+  }
+  else p <- ggplot(data = temp_data_anova, aes(Fold_change,-log(P_value,base=10))) 
+  
+  p <- p +
+    geom_point(aes(color = Fold_change_flag), shape = 1)+
+    facet_wrap(~Comparison) +
+    ylab("-log[10](p-value)")+xlab(sprintf("Fold-change (%s)", attr(x, 'data_info')$data_scale)) +
+    scale_color_manual(values = cols_anova, name = "Fold Change", 
+                       labels = c("Neg(Anova)", "0", "Pos(Anova)"),
+                       breaks = c("-1", "0", "1"))
+  return(p)
 }
