@@ -4116,13 +4116,11 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
     # specified variable as the main effect.
     if (order_by != "Group") {
 
-      # Fish out the group_DF data frame from omicsData after creating the
-      # group_DF attribute with the order_by input. This will be combined with
-      # the plot_data object so the samples can be ordered by the main effect.
-      orderDF <- attr(
-        group_designation(omicsData = omicsData, main_effects = order_by),
-        "group_DF"
-      )
+      # Select the column in f_data containing the sample name as well as the
+      # column corresponding to the order_by input.
+      orderDF <- dplyr::select(omicsData$f_data,
+                               !!rlang::sym(get_fdata_cname(omicsData)),
+                               !!rlang::sym(order_by))
 
     } else {
 
@@ -4214,9 +4212,9 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
   } else {
 
     p <- p +
-      ggplot2::geom_boxplot(ggplot2::aes_string(x = "variable",
-                                                y = "value",
-                                                fill = color_by))
+      ggplot2::geom_boxplot(ggplot2::aes(x = variable,
+                                         y = value,
+                                         fill = !!rlang::sym(color_by)))
 
   }
 
