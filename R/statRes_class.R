@@ -224,13 +224,13 @@ plot.statRes <- function(x,
     if(!inherits(custom_theme, c("theme", "gg"))) stop("custom_theme must be a valid 'theme' object as used in ggplot")
     mytheme = custom_theme
   }
-  else mytheme = theme(
-    plot.title = element_text(size = 14),
-    axis.title = element_text(size = 14),
-    axis.text = element_text(size = 12),
-    legend.title = element_text(size = 10),
-    legend.text = element_text(size = 8),
-    strip.text = element_text(size = 12)
+  else mytheme = ggplot2::theme(
+    plot.title = ggplot2::element_text(size = 14),
+    axis.title = ggplot2::element_text(size = 14),
+    axis.text = ggplot2::element_text(size = 12),
+    legend.title = ggplot2::element_text(size = 10),
+    legend.text = ggplot2::element_text(size = 8),
+    strip.text = ggplot2::element_text(size = 12)
   )
   
   # Both the volcano plot and heatmaps need a dataframe of fold changes by comparison/biomolecule
@@ -242,7 +242,7 @@ plot.statRes <- function(x,
   if("bar"%in%plot_type){
     p <- statres_barplot(x, stacked)
     
-    if(bw_theme) p <- p + theme_bw()
+    if(bw_theme) p <- p + ggplot2::theme_bw()
     
     return(p + mytheme)
   }
@@ -264,7 +264,7 @@ plot.statRes <- function(x,
         interactive
       )
     
-    if(bw_theme) p <- p + theme_bw()
+    if(bw_theme) p <- p + ggplot2::theme_bw()
     
     p <- p + mytheme
     
@@ -301,10 +301,10 @@ plot.statRes <- function(x,
     colnames(volcano_sigs)[1] <- "Biomolecule"
     volcano_sigs$Biomolecule <- as.factor(volcano_sigs$Biomolecule)
     
-    p <- ggplot(volcano_sigs, aes(Biomolecule, Comparison, text = paste("ID:", Biomolecule, "<br>", "Pval:", P_value))) +
-          geom_tile(aes(fill = Fold_change), color = "white") +
-          scale_fill_gradient(low = fc_colors[1], high = fc_colors[3]) +
-          ggtitle("Average Log Fold Change") +
+    p <- ggplot2::ggplot(volcano_sigs, ggplot2::aes(Biomolecule, Comparison, text = paste("ID:", Biomolecule, "<br>", "Pval:", P_value))) +
+          ggplot2::geom_tile(ggplot2::aes(fill = Fold_change), color = "white") +
+          ggplot2::scale_fill_gradient(low = fc_colors[1], high = fc_colors[3]) +
+          ggplot2::ggtitle("Average Log Fold Change") +
           mytheme
     if(interactive) return(plotly::ggplotly(p, tooltip = c("text"))) else return(p)
   }
@@ -471,21 +471,21 @@ statres_barplot <- function(x, stacked = FALSE,
       dplyr::mutate(whichtest = attr(x, "statistical_test"))
   }
   
-  p <- ggplot(data = comp_df_melt, aes(Comparison, Count)) +
-    geom_bar(aes(x = whichtest, fill = posneg, group = whichtest), stat =
+  p <- ggplot2::ggplot(data = comp_df_melt, ggplot2::aes(Comparison, Count)) +
+    ggplot2::geom_bar(ggplot2::aes(x = whichtest, fill = posneg, group = whichtest), stat =
                'identity') +
-    geom_text(aes(x = whichtest, label = ifelse(abs(Count) > 0, abs(Count), "")),
-              position = position_stack(vjust = 0.5),
+    ggplot2::geom_text(ggplot2::aes(x = whichtest, label = ifelse(abs(Count) > 0, abs(Count), "")),
+              position = ggplot2::position_stack(vjust = 0.5),
               size = 3) +
-    geom_hline(aes(yintercept = 0), colour = 'gray50') +
-    scale_fill_manual(
+    ggplot2::geom_hline(ggplot2::aes(yintercept = 0), colour = 'gray50') +
+    ggplot2::scale_fill_manual(
       values = c(fc_colors[1], fc_colors[3]),
       labels = c("Negative", "Positive"),
       name = "Fold Change Sign"
     ) +
-    facet_wrap( ~ Comparison) +
-    xlab("Statistical test, by group comparison") + ylab("Count of Biomolecules") +
-    ggtitle("Number of DE Biomolecules Between Groups")
+    ggplot2::facet_wrap( ~ Comparison) +
+    ggplot2::xlab("Statistical test, by group comparison") + ylab("Count of Biomolecules") +
+    ggplot2::ggtitle("Number of DE Biomolecules Between Groups")
   
     return(p)
 }
@@ -542,9 +542,9 @@ gtest_heatmap <-
   
   # summarized data frame of # of biomolecules per count combination.
   gtest_counts <- temp_data_gtest %>%
-    group_by(Count_First_Group, Count_Second_Group, Comparison) %>%
-    summarise(n = n(), sig = all(P_value < 0.05)) %>%
-    mutate(
+    dplyr::group_by(Count_First_Group, Count_Second_Group, Comparison) %>%
+    dplyr::summarise(n = dplyr::n(), sig = all(P_value < 0.05)) %>%
+    dplyr::mutate(
       Count_First_Group = as.character(Count_First_Group),
       Count_Second_Group = as.character(Count_Second_Group)
     )
@@ -558,41 +558,41 @@ gtest_heatmap <-
     unique(gtest_counts$Comparison), stringsAsFactors = F) %>% 
     `colnames<-`(c("Count_First_Group", "Count_Second_Group", "Comparison"))
   
-  gtest_counts <- all_counts %>% left_join(gtest_counts)
+  gtest_counts <- all_counts %>% dplyr::left_join(gtest_counts)
   
   if(!interactive) {
-    p <- ggplot(gtest_counts) +
-      theme_minimal() + 
-      geom_tile(aes(Count_First_Group, Count_Second_Group, fill = n), color = "black")
+    p <- ggplot2::ggplot(gtest_counts) +
+      ggplot2::theme_minimal() + 
+      ggplot2::geom_tile(ggplot2::aes(Count_First_Group, Count_Second_Group, fill = n), color = "black")
     
     if(show_sig) {
-      p <- p + geom_point(
-        data = gtest_counts %>% filter(sig),
-        aes(Count_First_Group, Count_Second_Group, shape = "1"),
+      p <- p + ggplot2::geom_point(
+        data = gtest_counts %>% dplyr::filter(sig),
+        ggplot2::aes(Count_First_Group, Count_Second_Group, shape = "1"),
         fill = "white"
       ) +
-        scale_shape_manual(name = "Statistically significant",
+        ggplot2::scale_shape_manual(name = "Statistically significant",
                            labels = "",
                            values = 21)
     }
     
     if(sig_text) {
-      p <- p + geom_text(
-        aes(Count_First_Group, Count_Second_Group, label = n),
+      p <- p + ggplot2::geom_text(
+        ggplot2::aes(Count_First_Group, Count_Second_Group, label = n),
         nudge_x = -0.5, nudge_y = 0.5, hjust = -0.1, vjust = 1.5,
         color = "white", size = 3
       )
     }
       
     p <- p +
-      facet_wrap(~ Comparison) + 
-      scale_fill_gradient(
+      ggplot2::facet_wrap(~ Comparison) + 
+      ggplot2::scale_fill_gradient(
         name = "Number of biomolecules \nin this bin",
         low = if (is.null(color_low)) "#132B43" else color_low,
         high = if (is.null(color_high)) "#56B1F7" else color_high
       ) + 
-      xlab("Nonmissing (first group)") + 
-      ylab("Nonmissing (second group)")
+      ggplot2::xlab("Nonmissing (first group)") + 
+      ggplot2::ylab("Nonmissing (second group)")
     
   } else {
     comps <- unique(gtest_counts$Comparison)
@@ -602,10 +602,10 @@ gtest_heatmap <-
     subtext = if(length(comps) == 1) "\n(star indicates statistical significance)" else ""
     
     for(i in 1:length(comps)){
-      data <- gtest_counts %>% filter(Comparison == comps[i])
+      data <- gtest_counts %>% dplyr::filter(Comparison == comps[i])
       
-      p <- plot_ly() %>% 
-        add_trace(data = data,
+      p <- plotly::plot_ly() %>% 
+        plotly::add_trace(data = data,
                   x =  ~ as.numeric(Count_First_Group),
                   y =  ~ as.numeric(Count_Second_Group),
                   z = ~ n,
@@ -634,7 +634,7 @@ gtest_heatmap <-
           ),
           inherit = FALSE
         ) %>% 
-        add_annotations(
+        plotly::add_annotations(
           text = comps[[i]],
           x = 0.5,
           y = 1,
@@ -668,11 +668,11 @@ gtest_heatmap <-
         p <- do.call(plotly::layout, c(list(p), plotly_layout))
       }
       
-      subplots[[length(subplots) + 1]] <- p 
+      plotly::subplots[[length(subplots) + 1]] <- p 
     }
     
     p <- plotly::subplot(subplots, shareY = T) %>%
-      layout(
+      plotly::layout(
         xaxis = list(title = "Nonmissing (first group)"),
         yaxis = list(title = "Nonmissing (second group)")
       )
@@ -734,7 +734,7 @@ statres_volcano_plot <-
   # interactive plots need manual text applied to prepare for ggplotly conversion
   if (interactive) {
     p <-
-      ggplot(temp_data_anova, aes(
+      ggplot2::ggplot(temp_data_anova, ggplot2::aes(
         Fold_change,
         -log(P_value, base = 10),
         text = paste(
@@ -748,21 +748,22 @@ statres_volcano_plot <-
   }
   else {
     p <-
-      ggplot(data = temp_data_anova, aes(Fold_change, -log(P_value, base = 10))) 
+      ggplot2::ggplot(data = temp_data_anova, ggplot2::aes(Fold_change, -log(P_value, base = 10))) 
   }
   
   # draw vertical lines at +- fc threshold
   if(!rlang::is_empty(fc_threshold)){
     p <- p + 
-      geom_vline(aes(xintercept=abs(fc_threshold)), lty = 2) + 
-      geom_vline(aes(xintercept = abs(fc_threshold)*(-1)), lty = 2)
+      ggplot2::geom_vline(ggplot2::aes(xintercept=abs(fc_threshold)), lty = 2) + 
+      ggplot2::geom_vline(ggplot2::aes(xintercept = abs(fc_threshold)*(-1)), lty = 2)
   }
   
   p <- p +
-    geom_point(aes(color = Fold_change_flag), shape = 1) +
-    facet_wrap( ~ Comparison) +
-    ylab("-log[10](p-value)") + xlab(sprintf("Fold-change (%s)", data_scale)) +
-    scale_color_manual(
+    ggplot2::geom_point(ggplot2::aes(color = Fold_change_flag), shape = 1) +
+    ggplot2::facet_wrap( ~ Comparison) +
+    ggplot2::ylab("-log[10](p-value)") + 
+    ggplot2::xlab(sprintf("Fold-change (%s)", data_scale)) +
+    ggplot2::scale_color_manual(
       values = cols_anova,
       name = "Fold Change",
       labels = c("Neg(Anova)", "0", "Pos(Anova)"),
