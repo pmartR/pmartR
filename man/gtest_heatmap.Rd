@@ -12,7 +12,8 @@ gtest_heatmap(
   interactive = FALSE,
   color_low = NULL,
   color_high = NULL,
-  plotly_layout = NULL
+  plotly_layout = NULL,
+  ...
 )
 }
 \arguments{
@@ -43,7 +44,6 @@ to TRUE or FALSE respectively. A g-test heatmap
 \description{
 Plots a heatmap showing bins for combinations of # of biomolecules present
 across groups.  Bins are colored by the number of biomolecules falling into
-each bin, and have indicators for significance by g-test.  Internal to 
-\link{pmartR::plot.statRes}
+each bin, and have indicators for significance by g-test.
 }
 \keyword{internal}
