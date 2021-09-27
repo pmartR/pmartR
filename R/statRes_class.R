@@ -597,7 +597,7 @@ gtest_heatmap <-
     
   } else {
     comps <- unique(gtest_counts$Comparison)
-    subplots <- list()
+    subplot_list <- list()
     limits = range(gtest_counts$n)
     # legend entry will not appear for a single plot, so putting info in title
     subtext = if(length(comps) == 1) "\n(star indicates statistical significance)" else ""
@@ -669,10 +669,10 @@ gtest_heatmap <-
         p <- do.call(plotly::layout, c(list(p), plotly_layout))
       }
       
-      plotly::subplots[[length(subplots) + 1]] <- p 
+      subplot_list[[length(subplot_list) + 1]] <- p 
     }
     
-    p <- plotly::subplot(subplots, shareY = T) %>%
+    p <- plotly::subplot(subplot_list, shareY = T) %>%
       plotly::layout(
         xaxis = list(title = "Nonmissing (first group)"),
         yaxis = list(title = "Nonmissing (second group)")
