@@ -240,7 +240,7 @@ plot.statRes <- function(x,
   
   #Bar plot
   if("bar"%in%plot_type){
-    p <- statres_barplot(x, stacked)
+    p <- statres_barplot(x, stacked, fc_colors)
     
     if(bw_theme) p <- p + ggplot2::theme_bw()
     
@@ -484,7 +484,8 @@ statres_barplot <- function(x, stacked = FALSE,
       name = "Fold Change Sign"
     ) +
     ggplot2::facet_wrap( ~ Comparison) +
-    ggplot2::xlab("Statistical test, by group comparison") + ylab("Count of Biomolecules") +
+    ggplot2::xlab("Statistical test, by group comparison") + 
+    ggplot2::ylab("Count of Biomolecules") +
     ggplot2::ggtitle("Number of DE Biomolecules Between Groups")
   
     return(p)
