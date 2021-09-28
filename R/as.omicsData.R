@@ -89,7 +89,7 @@
 #'                                 fdata_cname = "Sample",
 #'                                 emeta_cname = "Protein")
 #' }
-#' 
+#'
 #' @author Lisa Bramer
 #' @seealso \code{\link{as.pepData}}
 #' @seealso \code{\link{normalize_isobaric}}
@@ -106,19 +106,19 @@ as.isobaricpepData <- function (e_data, f_data, e_meta = NULL, edata_cname,
 ## peptide data ##
 .as.isobaricpepData <- function (e_data, f_data, e_meta = NULL, edata_cname,
                                  fdata_cname, emeta_cname = NULL,
-                                 techrep_cname = NULL, 
+                                 techrep_cname = NULL,
                                  data_scale = "abundance",
                                  is_normalized = FALSE, isobaric_norm = FALSE,
                                  norm_info = list(),  data_types = NULL,
                                  check.names = TRUE) {
-  
+
   # Set the original data scale to the input data scale.
   data_scale_orig <- data_scale
-  
+
   # Define the dType variable. This is used for customizing the warnings and
   # errors according to the data type (peptide, protein, lipid, ...).
   dType <- c('peptides', 'as.isobaricpepData')
-  
+
   # Perform pre analysis checks. Return updated data frames if they all receive
   # a gold star.
   res <- pre_flight(e_data = e_data,
@@ -134,16 +134,22 @@ as.isobaricpepData <- function (e_data, f_data, e_meta = NULL, edata_cname,
                     data_types = data_types,
                     check.names = check.names,
                     dType = dType)
-  
+
   # Set the (possibly new) emeta_cname.
   emeta_cname <- res$emeta_cname
-  
+
+  # Remove the emeta_cname element from the res list. That way only the e_data,
+  # f_data, and e_meta (when applicable) data frames will be part of the output.
+  # emeta_cname will no longer be an element of and omicsData object.
+  res <- res %>%
+    purrr::list_modify("emeta_cname" = NULL)
+
   # set column name attributes #
   attr(res, "cnames") = list(edata_cname = edata_cname,
                              emeta_cname = emeta_cname,
                              fdata_cname = fdata_cname,
                              techrep_cname = techrep_cname)
-  
+
   # Compute the data_info attributes.
   attr(res, "data_info") <- set_data_info(e_data = res$e_data,
                                           edata_cname = edata_cname,
@@ -152,37 +158,37 @@ as.isobaricpepData <- function (e_data, f_data, e_meta = NULL, edata_cname,
                                           data_types = data_types,
                                           norm_info = norm_info,
                                           is_normalized = is_normalized)
-  
+
   # Set isobaric specific attribute.
-  attr(res, "isobaric_info") <- set_isobaric_info(exp_cname = NA, 
-                                                  channel_cname = NA, 
-                                                  refpool_channel = NA, 
-                                                  refpool_cname = NA, 
-                                                  refpool_notation = NA, 
+  attr(res, "isobaric_info") <- set_isobaric_info(exp_cname = NA,
+                                                  channel_cname = NA,
+                                                  refpool_channel = NA,
+                                                  refpool_cname = NA,
+                                                  refpool_notation = NA,
                                                   norm_info = norm_info,
                                                   isobaric_norm = isobaric_norm)
-  
+
   # set check.names attribute #
-  attr(res, "check.names") = check.names 
-  
+  attr(res, "check.names") = check.names
+
   # set meta data attributes #
   attr(res, "meta_info") <- set_meta_info(e_meta = res$e_meta,
                                           emeta_cname = emeta_cname)
-  
+
   # set group dataframe attribute to NULL, will be filled in after running
   # group_designation function #
   attr(res, "group_DF") = NULL
-  
+
   # Initialize the filters attribute with a list. This list will be populated
   # with filter class objects as filters are applied. Multiple filters can be
   # implemented on one data set.
   attr(res, "filters") <- list()
-  
+
   # set class of list #
   class(res) = c("isobaricpepData", "pepData")
-  
+
   return(res)
-  
+
 }
 
 #' Convert Data to Appropriate pmartR Class
@@ -268,7 +274,7 @@ as.isobaricpepData <- function (e_data, f_data, e_meta = NULL, edata_cname,
 #' @seealso \code{\link{as.proData}}
 #'
 #' @export
-#' 
+#'
 as.lipidData <- function (e_data, f_data, e_meta = NULL,
                           edata_cname, fdata_cname, emeta_cname = NULL,
                           techrep_cname = NULL, ...) {
@@ -283,14 +289,14 @@ as.lipidData <- function (e_data, f_data, e_meta = NULL,
                            data_scale = "abundance",
                            is_normalized = FALSE, norm_info = list(),
                            data_types = NULL, check.names = TRUE) {
-  
+
   # Set the original data scale to the input data scale.
   data_scale_orig <- data_scale
-  
+
   # Define the dType variable. This is used for customizing the warnings and
   # errors according to the data type (peptide, protein, lipid, ...).
   dType <- c('lipids', 'as.lipidData')
-  
+
   # Perform pre analysis checks. Return updated data frames if they all receive
   # a gold star.
   res <- pre_flight(e_data = e_data,
@@ -306,16 +312,22 @@ as.lipidData <- function (e_data, f_data, e_meta = NULL,
                     data_types = data_types,
                     check.names = check.names,
                     dType = dType)
-  
+
   # Set the (possibly new) emeta_cname.
   emeta_cname <- res$emeta_cname
-  
+
+  # Remove the emeta_cname element from the res list. That way only the e_data,
+  # f_data, and e_meta (when applicable) data frames will be part of the output.
+  # emeta_cname will no longer be an element of and omicsData object.
+  res <- res %>%
+    purrr::list_modify("emeta_cname" = NULL)
+
   # set column name attributes #
   attr(res, "cnames") = list(edata_cname = edata_cname,
                              emeta_cname = emeta_cname,
                              fdata_cname = fdata_cname,
                              techrep_cname = techrep_cname)
-  
+
   # Compute the data_info attributes.
   attr(res, "data_info") <- set_data_info(e_data = res$e_data,
                                           edata_cname = edata_cname,
@@ -324,28 +336,28 @@ as.lipidData <- function (e_data, f_data, e_meta = NULL,
                                           data_types = data_types,
                                           norm_info = norm_info,
                                           is_normalized = is_normalized)
-  
+
   #set check.names attribute #
-  attr(res, "check.names") = check.names 
-  
+  attr(res, "check.names") = check.names
+
   # set meta data attributes #
   attr(res, "meta_info") <- set_meta_info(e_meta = res$e_meta,
                                           emeta_cname = emeta_cname)
-  
+
   # set group dataframe attribute to NULL, will be filled in after running
   # group_designation function #
   attr(res, "group_DF") = NULL
-  
+
   # Initialize the filters attribute with a list. This list will be populated
   # with filter class objects as filters are applied. Multiple filters can be
   # implemented on one data set.
   attr(res, "filters") <- list()
-  
+
   # set class of list #
   class(res) = "lipidData"
-  
+
   return(res)
-  
+
 }
 
 #' Convert Data to Appropriate pmartR Class
@@ -432,7 +444,7 @@ as.lipidData <- function (e_data, f_data, e_meta = NULL,
 #' @seealso \code{\link{as.proData}}
 #'
 #' @export
-#' 
+#'
 as.metabData <- function (e_data, f_data, e_meta = NULL,
                           edata_cname, fdata_cname, emeta_cname = NULL,
                           techrep_cname = NULL, ...) {
@@ -447,14 +459,14 @@ as.metabData <- function (e_data, f_data, e_meta = NULL,
                            data_scale = "abundance",
                            is_normalized = FALSE, norm_info = list(),
                            data_types = NULL, check.names = TRUE) {
-  
+
   # Set the original data scale to the input data scale.
   data_scale_orig <- data_scale
-  
+
   # Define the dType variable. This is used for customizing the warnings and
   # errors according to the data type (peptide, protein, lipid, ...).
   dType <- c('metabolites', 'as.metabData')
-  
+
   # Perform pre analysis checks. Return updated data frames if they all receive
   # a gold star.
   res <- pre_flight(e_data = e_data,
@@ -470,16 +482,22 @@ as.metabData <- function (e_data, f_data, e_meta = NULL,
                     data_types = data_types,
                     check.names = check.names,
                     dType = dType)
-  
+
   # Set the (possibly new) emeta_cname.
   emeta_cname <- res$emeta_cname
-  
+
+  # Remove the emeta_cname element from the res list. That way only the e_data,
+  # f_data, and e_meta (when applicable) data frames will be part of the output.
+  # emeta_cname will no longer be an element of and omicsData object.
+  res <- res %>%
+    purrr::list_modify("emeta_cname" = NULL)
+
   # set column name attributes #
   attr(res, "cnames") = list(edata_cname = edata_cname,
                              emeta_cname = emeta_cname,
                              fdata_cname = fdata_cname,
                              techrep_cname = techrep_cname)
-  
+
   # Compute the data_info attributes.
   attr(res, "data_info") <- set_data_info(e_data = res$e_data,
                                           edata_cname = edata_cname,
@@ -488,28 +506,28 @@ as.metabData <- function (e_data, f_data, e_meta = NULL,
                                           data_types = data_types,
                                           norm_info = norm_info,
                                           is_normalized = is_normalized)
-  
+
   #set check.names attribute #
-  attr(res, "check.names") = check.names 
-  
+  attr(res, "check.names") = check.names
+
   # set meta data attributes #
   attr(res, "meta_info") <- set_meta_info(e_meta = res$e_meta,
                                           emeta_cname = emeta_cname)
-  
+
   # set group dataframe attribute to NULL, will be filled in after running
   # group_designation function #
   attr(res, "group_DF") = NULL
-  
+
   # Initialize the filters attribute with a list. This list will be populated
   # with filter class objects as filters are applied. Multiple filters can be
   # implemented on one data set.
   attr(res, "filters") <- list()
-  
+
   # set class of list #
   class(res) = "metabData"
-  
+
   return(res)
-  
+
 }
 
 #' Convert Data to Appropriate pmartR Class
@@ -603,7 +621,7 @@ as.metabData <- function (e_data, f_data, e_meta = NULL,
 #' @seealso \code{\link{as.proData}}
 #'
 #' @export
-#' 
+#'
 as.nmrData <- function (e_data, f_data, e_meta = NULL,
                         edata_cname, fdata_cname, emeta_cname = NULL,
                         techrep_cname = NULL, ...) {
@@ -619,14 +637,14 @@ as.nmrData <- function (e_data, f_data, e_meta = NULL,
                          is_normalized = FALSE, nmr_norm = FALSE,
                          norm_info = list(), data_types = NULL,
                          check.names = TRUE) {
-  
+
   # Set the original data scale to the input data scale.
   data_scale_orig <- data_scale
-  
+
   # Define the dType variable. This is used for customizing the warnings and
   # errors according to the data type (peptide, protein, lipid, ...).
   dType <- c('metabolites', 'as.nmrData')
-  
+
   # Perform pre analysis checks. Return updated data frames if they all receive
   # a gold star.
   res <- pre_flight(e_data = e_data,
@@ -642,16 +660,22 @@ as.nmrData <- function (e_data, f_data, e_meta = NULL,
                     data_types = data_types,
                     check.names = check.names,
                     dType = dType)
-  
+
   # Set the (possibly new) emeta_cname.
   emeta_cname <- res$emeta_cname
-  
+
+  # Remove the emeta_cname element from the res list. That way only the e_data,
+  # f_data, and e_meta (when applicable) data frames will be part of the output.
+  # emeta_cname will no longer be an element of and omicsData object.
+  res <- res %>%
+    purrr::list_modify("emeta_cname" = NULL)
+
   # set column name attributes #
   attr(res, "cnames") = list(edata_cname = edata_cname,
                              emeta_cname = emeta_cname,
                              fdata_cname = fdata_cname,
                              techrep_cname = techrep_cname)
-  
+
   # Compute the data_info attributes.
   attr(res, "data_info") <- set_data_info(e_data = res$e_data,
                                           edata_cname = edata_cname,
@@ -660,35 +684,35 @@ as.nmrData <- function (e_data, f_data, e_meta = NULL,
                                           data_types = data_types,
                                           norm_info = norm_info,
                                           is_normalized = is_normalized)
-  
+
   # Set nmr specific attribute.
   attr(res, "nmr_info") <- set_nmr_info(metabolite_name = NA,
                                         sample_property_cname = NA,
                                         norm_info = norm_info,
                                         nmr_norm = nmr_norm,
                                         backtransform = NA)
-  
+
   #set check.names attribute #
-  attr(res, "check.names") = check.names 
-  
+  attr(res, "check.names") = check.names
+
   # set meta data attributes #
   attr(res, "meta_info") <- set_meta_info(e_meta = res$e_meta,
                                           emeta_cname = emeta_cname)
-  
+
   # set group dataframe attribute to NULL, will be filled in after running
   # group_designation function #
   attr(res, "group_DF") = NULL
-  
+
   # Initialize the filters attribute with a list. This list will be populated
   # with filter class objects as filters are applied. Multiple filters can be
   # implemented on one data set.
   attr(res, "filters") <- list()
-  
+
   # set class of list #
-  class(res) = c("nmrData") 
-  
+  class(res) = c("nmrData")
+
   return(res)
-  
+
 }
 
 #' Convert Data to Appropriate pmartR Class
@@ -773,14 +797,14 @@ as.nmrData <- function (e_data, f_data, e_meta = NULL,
 #'                         fdata_cname = "SampleID",
 #'                         emeta_cname = "Mass_Tag_ID")
 #' }
-#' 
+#'
 #' @author Kelly Stratton, Lisa Bramer
 #' @seealso \code{\link{as.proData}}
 #' @seealso \code{\link{as.lipidData}}
 #' @seealso \code{\link{as.metabData}}
 #'
 #' @export
-#' 
+#'
 as.pepData <- function (e_data, f_data, e_meta = NULL,
                         edata_cname, fdata_cname, emeta_cname = NULL,
                         techrep_cname = NULL, ...) {
@@ -789,20 +813,20 @@ as.pepData <- function (e_data, f_data, e_meta = NULL,
 }
 
 ## peptide data ##
-.as.pepData <- function (e_data, f_data, e_meta = NULL, edata_cname, 
+.as.pepData <- function (e_data, f_data, e_meta = NULL, edata_cname,
                          fdata_cname, emeta_cname = NULL,
                          techrep_cname = NULL,
                          data_scale = "abundance",
                          is_normalized = FALSE, norm_info = list(),
                          data_types = NULL, check.names = TRUE) {
-  
+
   # Set the original data scale to the input data scale.
   data_scale_orig <- data_scale
-  
+
   # Define the dType variable. This is used for customizing the warnings and
   # errors according to the data type (peptide, protein, lipid, ...).
   dType <- c('peptides', 'as.pepData')
-  
+
   # Perform pre analysis checks. Return updated data frames if they all receive
   # a gold star.
   res <- pre_flight(e_data = e_data,
@@ -818,16 +842,22 @@ as.pepData <- function (e_data, f_data, e_meta = NULL,
                     data_types = data_types,
                     check.names = check.names,
                     dType = dType)
-  
+
   # Set the (possibly new) emeta_cname.
   emeta_cname <- res$emeta_cname
-  
+
+  # Remove the emeta_cname element from the res list. That way only the e_data,
+  # f_data, and e_meta (when applicable) data frames will be part of the output.
+  # emeta_cname will no longer be an element of and omicsData object.
+  res <- res %>%
+    purrr::list_modify("emeta_cname" = NULL)
+
   # set column name attributes #
   attr(res, "cnames") = list(edata_cname = edata_cname,
                              emeta_cname = emeta_cname,
                              fdata_cname = fdata_cname,
                              techrep_cname = techrep_cname)
-  
+
   # Compute the data_info attributes.
   attr(res, "data_info") <- set_data_info(e_data = res$e_data,
                                           edata_cname = edata_cname,
@@ -836,28 +866,28 @@ as.pepData <- function (e_data, f_data, e_meta = NULL,
                                           data_types = data_types,
                                           norm_info = norm_info,
                                           is_normalized = is_normalized)
-  
+
   # set check.names attribute #
-  attr(res, "check.names") = check.names 
-  
+  attr(res, "check.names") = check.names
+
   # set meta data attributes #
   attr(res, "meta_info") <- set_meta_info(e_meta = res$e_meta,
                                           emeta_cname = emeta_cname)
-  
+
   # set group dataframe attribute to NULL, will be filled in after running
   # group_designation function #
   attr(res, "group_DF") = NULL
-  
+
   # Initialize the filters attribute with a list. This list will be populated
   # with filter class objects as filters are applied. Multiple filters can be
   # implemented on one data set.
   attr(res, "filters") <- list()
-  
+
   # set class of list #
   class(res) = "pepData"
-  
+
   return(res)
-  
+
 }
 
 #' Convert Data to Appropriate pmartR Class
@@ -937,14 +967,14 @@ as.pepData <- function (e_data, f_data, e_meta = NULL,
 #'                         fdata_cname = "SampleID",
 #'                         is_normalized = TRUE)
 #' }
-#' 
+#'
 #' @author Kelly Stratton, Lisa Bramer
 #' @seealso \code{\link{as.pepData}}
 #' @seealso \code{\link{as.lipidData}}
 #' @seealso \code{\link{as.metabData}}
 #'
 #' @export
-#' 
+#'
 as.proData <- function (e_data, f_data, e_meta = NULL,
                         edata_cname, fdata_cname, emeta_cname = NULL,
                         techrep_cname = NULL, ...) {
@@ -959,14 +989,14 @@ as.proData <- function (e_data, f_data, e_meta = NULL,
                          data_scale = "abundance",
                          is_normalized = FALSE, norm_info = list(),
                          data_types = NULL, check.names = TRUE) {
-  
+
   # Set the original data scale to the input data scale.
   data_scale_orig <- data_scale
-  
+
   # Define the dType variable. This is used for customizing the warnings and
   # errors according to the data type (peptide, protein, lipid, ...).
   dType <- c('proteins', 'as.proData')
-  
+
   # Perform pre analysis checks. Return updated data frames if they all receive
   # a gold star.
   res <- pre_flight(e_data = e_data,
@@ -982,16 +1012,22 @@ as.proData <- function (e_data, f_data, e_meta = NULL,
                     data_types = data_types,
                     check.names = check.names,
                     dType = dType)
-  
+
   # Set the (possibly new) emeta_cname.
   emeta_cname <- res$emeta_cname
-  
+
+  # Remove the emeta_cname element from the res list. That way only the e_data,
+  # f_data, and e_meta (when applicable) data frames will be part of the output.
+  # emeta_cname will no longer be an element of and omicsData object.
+  res <- res %>%
+    purrr::list_modify("emeta_cname" = NULL)
+
   # set column name attributes #
   attr(res, "cnames") = list(edata_cname = edata_cname,
                              emeta_cname = emeta_cname,
                              fdata_cname = fdata_cname,
                              techrep_cname = techrep_cname)
-  
+
   # Compute the data_info attributes.
   attr(res, "data_info") <- set_data_info(e_data = res$e_data,
                                           edata_cname = edata_cname,
@@ -1000,31 +1036,31 @@ as.proData <- function (e_data, f_data, e_meta = NULL,
                                           data_types = data_types,
                                           norm_info = norm_info,
                                           is_normalized = is_normalized)
-  
+
   #set check.names attribute #
-  attr(res, "check.names") = check.names 
-  
+  attr(res, "check.names") = check.names
+
   # set meta data attributes #
   attr(res, "meta_info") <- set_meta_info(e_meta = res$e_meta,
                                           emeta_cname = emeta_cname)
-  
+
   # set group dataframe attribute to NULL, will be filled in after running
   # group_designation function #
   attr(res, "group_DF") = NULL
-  
+
   # Initialize the filters attribute with a list. This list will be populated
   # with filter class objects as filters are applied. Multiple filters can be
   # implemented on one data set.
   attr(res, "filters") <- list()
-  
+
   # Set the protein quantitation attribute to NA. This will be updated to one of
   # rollup, qrollup, rrollup, or zrollup if/when a pepData object is rolled up
   # to a proData object.
   attr(res, "pro_quant_info") <- list(method = NA)
-  
+
   # set class of list #
   class(res) = "proData"
-  
+
   return(res)
-  
+
 }
