@@ -12,6 +12,7 @@
   stacked = FALSE,
   interactive = FALSE,
   bw_theme = FALSE,
+  custom_theme = NULL,
   ...
 )
 }
@@ -30,11 +31,11 @@
 
 \item{bw_theme}{TRUE/FALSE for whether to apply a black-white background theme, does not affect all plots.}
 
+\item{custom_theme}{a ggplot `theme` object to be applied to non-interactive plots, or those converted by plotly::ggplotly().}
+
 \item{...}{extra arguments passed to internal functions such as 
 \code{\link[pmartR:plot.statRes]{sub-function pmartR::.plot.statRes()}}
 \code{\link[pmartR:plot.statRes]{pmartR::gtest_heatmap()}}}
-
-\item{custom_theme}{a ggplot `theme` object to be applied to non-interactive plots, or those converted by plotly::ggplotly().}
 }
 \description{
 Produces plots that summarize the results contained in a `statRes` object.

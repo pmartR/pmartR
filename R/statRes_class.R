@@ -177,6 +177,7 @@ plot.statRes <- function(x,
                          stacked = FALSE,
                          interactive = FALSE,
                          bw_theme = FALSE,
+                         custom_theme = NULL,
                          ...) {
   .plot.statRes(
     x = x,
@@ -186,6 +187,7 @@ plot.statRes <- function(x,
     stacked = stacked,
     interactive = interactive,
     bw_theme = bw_theme,
+    custom_theme = custom_theme,
     ...
   )
 }
@@ -500,10 +502,11 @@ statres_barplot <- function(x, stacked = FALSE,
 #' @param volcano `data.frame` produced by \link{pmartR::make_volcano_plot_df}
 #' @param show_sig Boolean whether to show the visual indicator that a certain 
 #' bin combination is significant by the g-test
-#' @param sig_text Boolean whether to show the text indicating the number of 
-#' biomolecules falling into each bin. (in addition to the legend)
-#' @param interactive passed from \code{\link[pmartR:plot.statRes]{pmartR::plot.statRes()}}.  If T, 
-#' will build a plotly version of the plot.
+#' @param count_text_size In non-interactive mode, the size of the text 
+#' indicating the number of biomolecules to be displayed inside the tile.  
+#' Defaults to 3.  Setting this to zero causes no text to be shown.
+#' @param interactive passed from \code{\link[pmartR:plot.statRes]{pmartR::plot.statRes()}}.  
+#' If T, will build a plotly version of the plot.  Defaults to FALSE.
 #' @param color_low A character string specifying the color of the gradient for
 #'   low count values.
 #' @param color_high A character string specifying the color of the gradient for
@@ -521,7 +524,7 @@ gtest_heatmap <-
   function(volcano,
            pval_thresh = 0.05,
            show_sig = TRUE,
-           sig_text = TRUE,
+           count_text_size = 3,
            interactive = FALSE,
            color_low = NULL,
            color_high = NULL,
@@ -577,11 +580,11 @@ gtest_heatmap <-
                            values = 21)
     }
     
-    if(sig_text) {
+    if(count_text_size > 0) {
       p <- p + ggplot2::geom_text(
         ggplot2::aes(Count_First_Group, Count_Second_Group, label = n),
         nudge_x = -0.5, nudge_y = 0.5, hjust = -0.1, vjust = 1.5,
-        color = "white", size = 3
+        color = "white", size = count_text_size
       )
     }
       

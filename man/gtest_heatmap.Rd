@@ -8,7 +8,7 @@ gtest_heatmap(
   volcano,
   pval_thresh = 0.05,
   show_sig = TRUE,
-  sig_text = TRUE,
+  count_text_size = 3,
   interactive = FALSE,
   color_low = NULL,
   color_high = NULL,
@@ -22,11 +22,12 @@ gtest_heatmap(
 \item{show_sig}{Boolean whether to show the visual indicator that a certain 
 bin combination is significant by the g-test}
 
-\item{sig_text}{Boolean whether to show the text indicating the number of 
-biomolecules falling into each bin. (in addition to the legend)}
+\item{count_text_size}{In non-interactive mode, the size of the text 
+indicating the number of biomolecules to be displayed inside the tile.  
+Defaults to 3.  Setting this to zero causes no text to be shown.}
 
-\item{interactive}{passed from \code{\link[pmartR:plot.statRes]{pmartR::plot.statRes()}}.  If T, 
-will build a plotly version of the plot.}
+\item{interactive}{passed from \code{\link[pmartR:plot.statRes]{pmartR::plot.statRes()}}.
+If T, will build a plotly version of the plot.  Defaults to FALSE.}
 
 \item{color_low}{A character string specifying the color of the gradient for
 low count values.}
