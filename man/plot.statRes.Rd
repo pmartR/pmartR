@@ -12,13 +12,14 @@
   stacked = FALSE,
   interactive = FALSE,
   bw_theme = FALSE,
+  custom_theme = NULL,
   ...
 )
 }
 \arguments{
 \item{x}{`statRes` object to be plotted, usually the result of `imd_anova`}
 
-\item{plot_type}{defines which plots to be produced, options are "bar", "heatmap", "volcano"; defaults to "bar"}
+\item{plot_type}{defines which plots to be produced, options are "bar", "volcano", "gheatmap", "fcheatmap"; defaults to "bar".  See details for plot descriptions.}
 
 \item{fc_threshold}{optional threshold value for fold change estimates.  Modifies the volcano plot as follows:  Vertical lines are added at (+/-)\code{fc_threshold} and all observations that have absolute fold change less than \code{abs(fc_threshold)} are colored as 'non-significant' (as specified by \code{fc_colors}).}
 
@@ -26,12 +27,27 @@
 
 \item{stacked}{TRUE/FALSE for whether to stack positive and negative fold change sections in the barplot, defaults to FALSE}
 
-\item{interactive}{TRUE/FALSE for whether to create an interactive plot using plotly}
+\item{interactive}{TRUE/FALSE for whether to create an interactive plot using plotly.  Not valid for all plots.}
 
-\item{bw_theme}{TRUE/FALSE for whether to apply a black-white background theme}
+\item{bw_theme}{TRUE/FALSE for whether to apply a black-white background theme, does not affect all plots.}
+
+\item{custom_theme}{a ggplot `theme` object to be applied to non-interactive plots, or those converted by plotly::ggplotly().}
+
+\item{...}{extra arguments passed to internal functions such as 
+\code{\link[pmartR:plot.statRes]{sub-function pmartR::.plot.statRes()}}
+\code{\link[pmartR:plot.statRes]{pmartR::gtest_heatmap()}}}
 }
 \description{
 Produces plots that summarize the results contained in a `statRes` object.
+}
+\details{
+Plot types:
+\itemize{
+ \item{"bar"} \code{?pmartR::statres_barplot} Bar-chart with bar heights indicating the number of significant biomolecules, grouped by test type and fold change direction.
+ \item{"volcano"} \code{?pmartR::statres_volcano_plot} Scatterplot showing negative-log-pvalues against fold change.  Colored by statistical significance and fold change.
+ \item{"gheatmap"} \code{?pmartR::gtest_heatmap} Heatmap with x and y axes indicating the number of nonmissing values for two groups.  Colored by number of biomolecules that fall into that combination of nonmissing values.
+ \item{"fcheatmap"} Heatmap showing all biomolecules across comparisons, colored by fold change.
+}
 }
 \examples{
 dontrun{
@@ -53,7 +69,9 @@ plot(anova_res, plot_type = "volcano")
 
 imd_res <- imd_anova(omicsData = myproData, test_method = 'gtest')
 plot(imd_res)
-plot(imd_res, plot_type = "volcano")
+plot(imd_res, plot_type = "gheatmap")
+# using arguments of internal functions:
+plot(imd_res, plot_type = "gheatmap", color_low = "red", color_high = "green")
 
 imd_anova_res <- imd_anova(omicsData = myproData, test_method = 'comb', pval_adjust='bon')
 plot(imd_anova_res, bw_theme = TRUE)
