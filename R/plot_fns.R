@@ -2594,10 +2594,17 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
                    label = Count_biomolecules),
       size = text_size,
       hjust = -0.5
+    ) +
+    ggplot2::geom_text(
+      data = plotter2,
+      ggplot2::aes(x = Count_biomolecules,
+                   y = Min_obs,
+                   label = Count_biomolecules),
+      size = text_size,
+      hjust = -0.5
     )
 
-
-  # Evan, add gtest threshold to the plot. As you wish.
+  # Evan, add gtest info to the plot. As you wish.
   if (!is.null(min_nonmiss_gtest)) {
 
     # Evan, add a vertical line for the gtest threshold. As you wish.
