@@ -2247,6 +2247,25 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
                                      color = Statistic),
                         size = point_size)
 
+  # Evan, display the counts on the plot. As you wish.
+  if (display_count) p <- p +
+    ggplot2::geom_text(
+      data = plotter1,
+      ggplot2::aes(x = Count_biomolecules,
+                   y = Min_obs,
+                   label = Count_biomolecules),
+      size = text_size,
+      hjust = -0.5
+    ) +
+    ggplot2::geom_text(
+      data = plotter2,
+      ggplot2::aes(x = Count_biomolecules,
+                   y = Min_obs,
+                   label = Count_biomolecules),
+      size = text_size,
+      hjust = -0.5
+    )
+
   # Evan, add gtest info to the plot. As you wish.
   if (!is.null(min_nonmiss_gtest)) {
 
@@ -2257,17 +2276,6 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
         linetype = "dashed",
         size = if (is.null(line_size)) 1 else line_size
       )
-
-    # Evan, display the counts on the plot. As you wish.
-    if (display_count) p <- p +
-        ggplot2::geom_text(
-          data = plotter2,
-          ggplot2::aes(x = Count_biomolecules,
-                       y = Min_obs,
-                       label = Count_biomolecules),
-          size = text_size,
-          hjust = -0.5
-        )
 
   }
 
@@ -2281,17 +2289,6 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
         linetype = "dashed",
         size = if (is.null(line_size)) 1 else line_size
       )
-
-    # Evan, display the counts on the plot. As you wish.
-    if (display_count) p <- p +
-        ggplot2::geom_text(
-          data = plotter1,
-          ggplot2::aes(x = Count_biomolecules,
-                       y = Min_obs,
-                       label = Count_biomolecules),
-          size = text_size,
-          hjust = -0.5
-        )
 
   }
 
