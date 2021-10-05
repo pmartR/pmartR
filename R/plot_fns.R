@@ -2231,15 +2231,45 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
     ggplot2::ylab(ylabel) +
     ggplot2::ggtitle(titleLabel)
 
+  # Evan, add the gtest points to the plot. As you wish.
+  p <- p +
+    ggplot2::geom_point(data = plotter2,
+                        ggplot2::aes(x = Count_biomolecules,
+                                     y = Min_obs,
+                                     color = Statistic),
+                        size = point_size)
+
+  # Evan, add the anova points to the plot. As you wish.
+  p <- p +
+    ggplot2::geom_point(data = plotter1,
+                        ggplot2::aes(x = Count_biomolecules,
+                                     y = Min_obs,
+                                     color = Statistic),
+                        size = point_size)
+
+  # Evan, display the counts on the plot. As you wish.
+  if (display_count) p <- p +
+    ggplot2::geom_text(
+      data = plotter1,
+      ggplot2::aes(x = Count_biomolecules,
+                   y = Min_obs,
+                   label = Count_biomolecules),
+      size = text_size,
+      hjust = -0.5
+    ) +
+    ggplot2::geom_text(
+      data = plotter2,
+      ggplot2::aes(x = Count_biomolecules,
+                   y = Min_obs,
+                   label = Count_biomolecules),
+      size = text_size,
+      hjust = -0.5
+    )
+
   # Evan, add gtest info to the plot. As you wish.
   if (!is.null(min_nonmiss_gtest)) {
 
     p <- p +
-      ggplot2::geom_point(data = plotter2,
-                          ggplot2::aes(x = Count_biomolecules,
-                                       y = Min_obs,
-                                       color = Statistic),
-                          size = point_size) +
       ggplot2::geom_vline(
         ggplot2::aes(xintercept = n_biomolecules_gtest[min_nonmiss_gtest + 1],
                      color = "G-test applied filter"),
@@ -2247,28 +2277,12 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
         size = if (is.null(line_size)) 1 else line_size
       )
 
-    # Evan, display the counts on the plot. As you wish.
-    if (display_count) p <- p +
-        ggplot2::geom_text(
-          data = plotter2,
-          ggplot2::aes(x = Count_biomolecules,
-                       y = Min_obs,
-                       label = Count_biomolecules),
-          size = text_size,
-          hjust = -0.5
-        )
-
   }
 
   # Evan, add anova info to the plot. As you wish.
   if (!is.null(min_nonmiss_anova)) {
 
     p <- p +
-      ggplot2::geom_point(data = plotter1,
-                          ggplot2::aes(x = Count_biomolecules,
-                                       y = Min_obs,
-                                       color = Statistic),
-                          size = point_size) +
       ggplot2::geom_vline(
         ggplot2::aes(xintercept = n_biomolecules_anova[min_nonmiss_anova + 1],
                      color = "ANOVA applied filter"),
@@ -2276,20 +2290,10 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
         size = if (is.null(line_size)) 1 else line_size
       )
 
-    # Evan, display the counts on the plot. As you wish.
-    if (display_count) p <- p +
-        ggplot2::geom_text(
-          data = plotter1,
-          ggplot2::aes(x = Count_biomolecules,
-                       y = Min_obs,
-                       label = Count_biomolecules),
-          size = text_size,
-          hjust = -0.5
-        )
-
   }
 
   # Evan, add a custom legend according to anova and gtest inputs. As you wish.
+  # A minimum for gtest IS supplied and a minimum for anova IS NOT supplied.
   if (!is.null(min_nonmiss_gtest) && is.null(min_nonmiss_anova)) {
 
     # Add a customized legend when min_nonmiss_gtest is not NULL and
@@ -2298,24 +2302,34 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
       ggplot2::scale_color_manual(
         name = if (is.null(legend_lab)) "" else legend_lab,
         values = c(
-          if (is.null(palette)) "#FFC107" else colas[[2]],
-          if (is.null(palette)) "#FFC107" else colas[[2]]
+          `Within 1+ groups (G-Test)` = if (is.null(palette))
+            "#FFC107" else
+              colas[[2]],
+          `G-test applied filter` = if (is.null(palette))
+            "#FFC107" else
+              colas[[2]],
+          `Within 2+ groups (ANOVA)` = if (is.null(palette))
+            "#004D40" else
+              colas[[3]]
         ),
         breaks = c(
-          plotter2$Statistic[[1]], "G-test applied filter"
+          plotter2$Statistic[[1]], "G-test applied filter",
+          plotter1$Statistic[[1]], "ANOVA applied filter"
         ),
         guide = ggplot2::guide_legend(
           override.aes = list(
-            linetype = c(0, 2),
-            shape = c(16, NA),
+            linetype = c(0, 2, 0),
+            shape = c(16, NA, 16),
             color = c(
               if (is.null(palette)) "#FFC107" else colas[[2]],
-              if (is.null(palette)) "#FFC107" else colas[[2]]
+              if (is.null(palette)) "#FFC107" else colas[[2]],
+              if (is.null(palette)) "#004D40" else colas[[3]]
             )
           )
         )
       )
 
+    # A minimum for gtest IS NOT supplied and a minimum for anova IS supplied.
   } else if (is.null(min_nonmiss_gtest) && !is.null(min_nonmiss_anova)) {
 
     # Add a customized legend when min_nonmiss_gtest is NULL and
@@ -2324,17 +2338,26 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
       ggplot2::scale_color_manual(
         name = if (is.null(legend_lab)) "" else legend_lab,
         values = c(
-          if (is.null(palette)) "#004D40" else colas[[3]],
-          if (is.null(palette)) "#004D40" else colas[[3]]
+          `Within 1+ groups (G-Test)` = if (is.null(palette))
+            "#FFC107" else
+              colas[[2]],
+          `Within 2+ groups (ANOVA)` = if (is.null(palette))
+            "#004D40" else
+              colas[[3]],
+          `ANOVA applied filter` = if (is.null(palette))
+            "#004D40" else
+              colas[[3]]
         ),
         breaks = c(
+          plotter2$Statistic[[1]], "G-test applied filter",
           plotter1$Statistic[[1]], "ANOVA applied filter"
         ),
         guide = ggplot2::guide_legend(
           override.aes = list(
-            linetype = c(0, 2),
-            shape = c(16, NA),
+            linetype = c(0, 0, 2),
+            shape = c(16, 16, NA),
             color = c(
+              if (is.null(palette)) "#FFC107" else colas[[2]],
               if (is.null(palette)) "#004D40" else colas[[3]],
               if (is.null(palette)) "#004D40" else colas[[3]]
             )
@@ -2342,7 +2365,8 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
         )
       )
 
-  } else {
+    # A minimum for gtest AND anova IS supplied.
+  } else if (!is.null(min_nonmiss_gtest) && !is.null(min_nonmiss_anova)) {
 
     # Add a customized legend when both min_nonmiss_gtest and min_nonmiss_anova
     # are not NULL.
@@ -2367,6 +2391,29 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
               if (is.null(palette)) "#FFC107" else colas[[2]],
               if (is.null(palette)) "#FFC107" else colas[[2]],
               if (is.null(palette)) "#004D40" else colas[[3]],
+              if (is.null(palette)) "#004D40" else colas[[3]]
+            )
+          )
+        )
+      )
+
+    # Neither a minimum for gtest nor anova is supplied.
+  } else {
+
+    # Add a customized legend when both min_nonmiss_gtest and min_nonmiss_anova
+    # are NULL.
+    p <- p +
+      ggplot2::scale_color_manual(
+        name = if (is.null(legend_lab)) "" else legend_lab,
+        values = c(
+          if (is.null(palette)) "#FFC107" else colas[[2]],
+          if (is.null(palette)) "#004D40" else colas[[3]]
+        ),
+        guide = ggplot2::guide_legend(
+          override.aes = list(
+            shape = c(16, 16),
+            color = c(
+              if (is.null(palette)) "#FFC107" else colas[[2]],
               if (is.null(palette)) "#004D40" else colas[[3]]
             )
           )

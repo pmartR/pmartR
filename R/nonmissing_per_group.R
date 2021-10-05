@@ -15,20 +15,17 @@
 #'         data.frame with the first column giving the peptide and the second
 #'         through kth columns giving the number of non-missing observations for
 #'         each of the \code{k} groups.
-#' 
+#'
 #' @author Lisa Bramer, Kelly Stratton
 #'
 nonmissing_per_group <- function (omicsData) {
-  
+
   # Extract the ID column.
   id_col <- which(names(omicsData$e_data) == get_edata_cname(omicsData))
-  
-  # Extract the check.names attribute from omics data.
-  check_names <- get_check_names(omicsData)
-  
+
   # Make a copy of e_data so the sample columns can be reordered later.
   edata <- omicsData$e_data[, -id_col]
-  
+
   # Fish out information from the group_DF attribute.
   groupDF <- attr(omicsData, "group_DF")
 
@@ -45,7 +42,7 @@ nonmissing_per_group <- function (omicsData) {
   # group sizes assumes the samples are ordered by group in the omicsData data
   # frames.
   group_dat <- as.character(groupDF$Group[order(groupDF$Group)])
-  
+
   # Reorder the columns of e_data. This needs to be done so the e_data columns
   # will match the order of the group_data vector. These are ordered because the
   # following C++ function assumes the samples are in order.
@@ -56,25 +53,34 @@ nonmissing_per_group <- function (omicsData) {
   # across the columns.
   nonmissing <- nonmissing_per_grp(as.matrix(edata),
                                    group_dat)
-  
-  # Convert from a matrix to a data frame.
-  nonmissing <- data.frame(nonmissing,
-                           check.names = check_names)
-  
-  # Name the columns according to the groups present.
-  colnames(nonmissing) <- unique(group_dat)
-  
+
   # Add the biomolecule IDs to the group counts.
   nonmiss_totals <- data.frame(as.character(omicsData$e_data[, id_col]),
                                nonmissing,
-                               stringsAsFactors = FALSE,
-                               check.names = check_names)
-  
-  # Name the ID column according to the name in omicsData.
-  names(nonmiss_totals)[1] <- get_edata_cname(omicsData)
-  
+                               stringsAsFactors = FALSE)
+                               # check.names = check_names)
+  # BEWARE! DON'T UNCOMMENT!! Or uncomment and see what happens ;)
+  # The check.names argument was commented out because it placed an "X" in front
+  # of the column name if the column name was a number (even if the number was a
+  # character string e.g., "1"). This lead to problems when running a summary on
+  # the filtered data because the group names in the group_DF attribute did not
+  # match the column names of the filter object. For example, if the group names
+  # were "1", "2", and "3" the column names would be "X1", "X2", and "X3".
+  # Because of this discrepancy the summary would incorrectly print that all
+  # biomolecules would be filtered. NOTE: The explanation above is outdated
+  # because Evan A Martin on 10/05/2021 changed how the nonmiss_totals data
+  # frame is created and how the column names are updated. However, I am leaving
+  # the explanation for future generations of pmartR coding slaves in hopes it
+  # will help them through this trying time in their lives.
+
+  # Rename the columns according to the edata_cname in omicsData and the names
+  # in the group_DF attribute. The order of the names in group_dat will always
+  # match the order of the columns in nonmiss_totals because they were
+  # previously placed in the same order.
+  names(nonmiss_totals) <- c(get_edata_cname(omicsData), unique(group_dat))
+
 
   return (list(group_sizes = tot_samps,
                nonmiss_totals = nonmiss_totals))
-  
+
 }
