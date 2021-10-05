@@ -2602,8 +2602,13 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
 
     # Evan, add a vertical line for the gtest threshold. As you wish.
     p <- p +
+
       ggplot2::geom_hline(
         ggplot2::aes(yintercept = min_nonmiss_gtest,
+
+#      ggplot2::geom_vline(
+#        ggplot2::aes(xintercept = n_biomolecules_gtest[min_nonmiss_gtest + 1],   ########
+
                      color = "G-test applied filter"),
         linetype = "dashed",
         size = if (is.null(line_size)) 1 else line_size
@@ -2616,8 +2621,12 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
 
     # Evan, add a vertical line for the anova threshold. As you wish.
     p <- p +
-      ggplot2::geom_hline(
-        ggplot2::aes(yintercept = min_nonmiss_anova,
+
+ #     ggplot2::geom_hline(
+  #      ggplot2::aes(yintercept = min_nonmiss_anova,
+
+      ggplot2::geom_vline(
+        ggplot2::aes(xintercept = n_biomolecules_anova[min_nonmiss_anova + 1],
                      color = "ANOVA applied filter"),
         linetype = "dotted",
         size = if (is.null(line_size)) 1 else line_size
@@ -2662,6 +2671,7 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
         )
       )
 
+    # A minimum for gtest IS NOT supplied and a minimum for anova IS supplied.
   } else if (is.null(min_nonmiss_gtest) && !is.null(min_nonmiss_anova)) {
 
     # Add a customized legend when min_nonmiss_gtest is NULL and
@@ -2686,7 +2696,8 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
         ),
         guide = ggplot2::guide_legend(
           override.aes = list(
-            linetype = c(0, 0, 3),
+           # linetype = c(0, 0, 3),
+            linetype = c(0, 0, 2),
             shape = c(16, 16, NA),
             color = c(
               if (is.null(palette)) "#FFC107" else colas[[2]],
