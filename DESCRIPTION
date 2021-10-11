@@ -21,6 +21,7 @@ Imports:
     dplyr,
     ggplot2,
     e1071,
+    forcats,
     foreach,
     limma,
     pcaMethods,
