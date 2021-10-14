@@ -61,7 +61,7 @@ a list of \code{data.frame} objects \tabular{ll}{ Full_Results \tab
 This is IMD-ANOVA test proposed in Webb-Robertson et al. (2010).
 }
 \examples{
-dontrun{
+\dontrun{
 library(pmartR)
 library(pmartRdata)
 #Transform the data
@@ -97,6 +97,7 @@ ovarian_res_twofac <- imd_anova(omicsData = tcga_ovarian_pepdata_bp, test_method
 comp_df <- data.frame(Control=c("Alive","G2"), Test=c("Dead","G3"))
 ovarian_res_twofac_main_effects <- imd_anova(omicsData = tcga_ovarian_pepdata_bp, comparisons = comp_df, test_method='comb')
 }
+
 }
 \references{
 Webb-Robertson, Bobbie-Jo M., et al. "Combined statistical

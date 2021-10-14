@@ -47,9 +47,9 @@ This is the ANOVA part of the IMD-ANOVA test proposed in Webb-Robertson et al. (
 \details{
 The order in which different scenarios are handeled:
 \enumerate{
- \item If the data are paired, then the pairing is accounted for first then each of the next steps is carried out on the new variable that is 
+ \item If the data are paired, then the pairing is accounted for first then each of the next steps is carried out on the new variable that is
  the difference in the paired individuals.<br>
- \item If covariates are provided, their effect is removed before testing for group differences though mathematically covariates and grouping 
+ \item If covariates are provided, their effect is removed before testing for group differences though mathematically covariates and grouping
  effects are accounted for simultaneously
  \item ANOVA is executed to assess the effect of each main effects, results in a vector of group means for each biomolecule and variance estimate
  \item Group comparisons defined by `comaprison` argument are implemented use parameter vector and variance estimates in ANOVA step
@@ -63,13 +63,13 @@ mypepData <- edata_transform(omicsData = pep_object, data_scale = "log2")
 mypepData <- group_designation(omicsData = mypepData, main_effects = c("Condition"))
 
 #Try running anova_test without filtering, should get warning because the data haven't been filtered yet
-anova_res <- anova_test(omicsData = mypepData) 
+anova_res <- anova_test(omicsData = mypepData)
 
 #Now filter and run again
 imdanova_Filt <- imdanova_filter(omicsData = mypepData)
 mypepData <- applyFilt(filter_object = imdanova_Filt, omicsData = mypepData, min_nonmiss_anova=2)
 anova_res <- anova_test(omicsData = mypepData)
-anova_res_tukey <- anova_test(omicsData = mypepData, pval_adjust = 'tukey') 
+anova_res_tukey <- anova_test(omicsData = mypepData, pval_adjust = 'tukey')
 #Should be equivalent to above since only making one comparison
 all(anova_res$Comparison==anova_res_tukey$Comparisons)
 
@@ -86,11 +86,11 @@ tcga_ovarian_pepdata_bp <- group_designation(omicsData = tcga_ovarian_pepdata_bp
 tcga_ovarian_pepdata_bp <- edata_transform(tcga_ovarian_pepdata_bp, "log2")
 imdanova_Filt <- imdanova_filter(omicsData = tcga_ovarian_pepdata_bp)
 tcga_ovarian_pepdata_bp <- applyFilt(filter_object = imdanova_Filt, omicsData = tcga_ovarian_pepdata_bp, min_nonmiss_anova=2)
-ovarian_res <- anova_test(omicsData = tcga_ovarian_pepdata_bp) 
+ovarian_res <- anova_test(omicsData = tcga_ovarian_pepdata_bp)
 #Tukey adjustment is super slow right now because "ptukey" is super slow, not sure how to fix that
-ovarian_res_tukey <- anova_test(omicsData = tcga_ovarian_pepdata_bp, pval_adjust = 'tukey') 
+ovarian_res_tukey <- anova_test(omicsData = tcga_ovarian_pepdata_bp, pval_adjust = 'tukey')
 #Dunnett adjustment, super slow because mvtnorm::pmvt is super slow
-ovarian_res_dunnett <- anova_test(omicsData = tcga_ovarian_pepdata_bp, pval_adjust = 'dunnett') 
+ovarian_res_dunnett <- anova_test(omicsData = tcga_ovarian_pepdata_bp, pval_adjust = 'dunnett')
 
 #Test really big dataset, two factors, all pairwise comparisons
 tcga_ovarian_pepdata_bp <- group_designation(omicsData = tcga_ovarian_pepdata_bp, main_effects = c("vital_status","neoplasm_histologic_grade"))
