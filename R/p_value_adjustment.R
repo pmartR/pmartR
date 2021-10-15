@@ -9,49 +9,35 @@
 #' @param diff_mean A matrix (or \code{data.frame}) of groups means that are to be compared
 #' @param t_stats A matrix (or \code{data.frame}) of t-test statistics resulting from from standard procedures
 #' @param sizes A matrix (or \code{data.frame}) of group sizes
-#' @param pval_adjust character vector specifying the type of multiple comparisons adjustment to implement. A NULL value corresponds to no adjustment. Valid options include: holm, bonferroni, dunnett, tukey or none. 
+#' @param pval_adjust character vector specifying the type of multiple comparisons adjustment to implement. A NULL value corresponds to no adjustment. Valid options include: holm, bonferroni, dunnett, tukey or none.
 #'
 #' @return a data frame with the following columns: group means, global G-test statistic and corresponding p-value
 #'
 #' @author Bryan Stanfill
-#' @examples 
-#' dontrun{
-#' library(pmartRdata)
-#' library(pmartR)
-#' mypepData <- edata_transform(omicsData = pep_object, data_scale = "log2")
-#' mypepData <- group_designation(omicsData = mypepData, main_effects = c("Condition"))
-#' group_df <- attr(mypepData, "group_DF")
-#' imdanova_Filt <- imdanova_filter(omicsData = mypepData)
-#' mypepData <- applyFilt(filter_object = imdanova_Filt, omicsData = mypepData, min_nonmiss_anova=2)
-#' anova_res <- anova_test(omicsData = mypepData)
-#' 
-#' adjusted_pvalues <- p_adjustment_anova(p_values = anova_res$Fold_change_pvalues, diff_mean = anova_res$Results[, grep("Mean", names(anova_res$Results))])
-#' }
-#' @export
-
+#'
 p_adjustment_anova <- function(p_values = NULL, diff_mean = NULL, t_stats = NULL, sizes = NULL, pval_adjust = "None"){
-  
+
   #Match provided 'pval_adjust' to available options
   pval_adjust <- try(match.arg(tolower(pval_adjust),c("bonferroni","none","tukey","dunnett","holm")),silent=TRUE)
-  
+
   if(class(pval_adjust)=='try-error')
     stop("Provided 'pval_adjust' argument is invalid, please select 'holm', 'bonferroni', 'tukey', 'dunnett' or 'none'.")
-  
-  
+
+
   if(pval_adjust=="tukey" | pval_adjust=="dunnett"){
-    
+
     #Tukey-Kramer statistics are t-statistic/sqrt(2)
     if(is.null(t_stats) | is.null(sizes)){
       stop("The standard t-tests and group sizes need to be supplied in order to apply Tukey-Kramer adjustment.")
     }
-    
+
     n_compares <- ncol(t_stats)
-    
+
     if(n_compares==1){
       #Tukey adjustment is not done if only one comparison is provided
       pval_adjust <- 'none'
     }else{
-      
+
       if(pval_adjust=="tukey"){
         tukey_stats <- data.matrix(t_stats*sqrt(2))
         #Tukey only needs sizes for the rows, not individual group sizes
@@ -60,14 +46,14 @@ p_adjustment_anova <- function(p_values = NULL, diff_mean = NULL, t_stats = NULL
         }else if(is.matrix(sizes)){
           sizes <- rowSums(sizes)
         }
-        
+
         #Rcpp::sourceCpp('src/tukey_helper.cpp') #Use for debugging
         adjusted_pvals <- ptukey_speed(tukey_stats,sizes)
 
       }else{#Dunnett adjustment - Needs to be sped up
         adjusted_pvals <- matrix(NA,nrow(t_stats), ncol(t_stats))
         #colnames(adjusted_pvals) <- colnames(t_stats)
-        
+
         for(i in 1:nrow(adjusted_pvals)){
           k <- length(which(!is.na(p_values[i,])))
           if(k>0){
@@ -83,24 +69,24 @@ p_adjustment_anova <- function(p_values = NULL, diff_mean = NULL, t_stats = NULL
           }
         }
       }
-      
+
       colnames(adjusted_pvals) <- colnames(t_stats)
       colnames(adjusted_pvals) <- gsub("Test-Stat","p-value",colnames(adjusted_pvals)) #This is a band-aid right now, may need to make more general later
     }
   }
-  
+
   #Don't make this an "else if" because pval_adjust can be changed to 'none' if n_compares==1
   if(pval_adjust%in%c('none',"bonferroni","holm")){
-    
+
     #p_values needs to be supplied to apply bonferroni adjustment, if it's NULL tell them that's a problem
     if(is.null(p_values)){
       stop("The `p_values` argument must be supplied to perform the selected `pval_adjust` method")
     }
-    
+
     if(is.null(dim(p_values)) || ncol(p_values)==1){ # leaving this as "||" because only evaluating the 1st argument is fine in this case, as it returns TRUE when p_values is a vector (and thus ncol(p_values) does not compute and using a "|" gives an error)
       pval_adjust='none'
     }
-    
+
     if(pval_adjust !='holm'){
       #For bonferroni adjustment, multiply p_values by number of comparisons (columns in p_values) else do no adjustment
       multiplier <- ifelse(pval_adjust=="bonferroni",ncol(p_values),1)
@@ -116,12 +102,12 @@ p_adjustment_anova <- function(p_values = NULL, diff_mean = NULL, t_stats = NULL
         adjusted_pvals[,i][nan_pvals[[i]]] <- NaN
       }
     }
-    
+
   }
-  
+
   ##############
   #Return the adjusted p-values
-  
+
   return(pvalues=data.frame(adjusted_pvals))
 }
 

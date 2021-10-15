@@ -32,20 +32,6 @@ means are used to compute new statistics, p-values are computed and compared aga
 of the tests are significant, 1 if significant or 0 if insignificant.  If \code{means} is also provided and the p-value is signficant then the direction
 of the change is indicated by the sign on 1, i.e., means<0 and p_value<pval_thresh will return -1, similarly for means>0.
 }
-\examples{
-dontrun{
-library(pmartRdata)
-library(pmartR)
-mypepData <- edata_transform(omicsData = pep_object, data_scale = "log2")
-mypepData <- group_designation(omicsData = mypepData, main_effects = c("Condition"))
-group_df <- attr(mypepData, "group_DF")
-imdanova_Filt <- imdanova_filter(omicsData = mypepData)
-mypepData <- applyFilt(filter_object = imdanova_Filt, omicsData = mypepData, min_nonmiss_anova=2)
-anova_res <- anova_test(omicsData = mypepData)
-
-adjusted_pvalues <- p_adjustment_anova(p_values = anova_res$Fold_change_pvalues, diff_mean = anova_res$Results[, grep("Mean", names(anova_res$Results))])
-}
-}
 \author{
 Bryan Stanfill
 }

@@ -30,5 +30,5 @@ statRes_output(
 the final object of class statRes
 }
 \description{
-Not really an interesting function.  Just exporting it so Natalie can use in a different function.
+Function to take raw output of `imd_anova` and create output for `statRes` object
 }

@@ -34,46 +34,9 @@ Flags  \tab Indicator of statistical significance where the sign of the flag ref
 }
 \description{
 Tests the null hypothesis that the number of missing observations is independent of the groups.  A g-test is used to test this null hypothese
-against the alternative that the groups and missing data are related.  This is usually performed in conjuction with an ANOVA which tests if 
+against the alternative that the groups and missing data are related.  This is usually performed in conjuction with an ANOVA which tests if
 the mean response (which varies with data type) is the same across groups; this combination is called IMD_ANOVA.  It's probably a good idea
 to first filter the data with `imd_anova_filter` to see if there is enough infomration to even do this test.  See Webb-Robertson et al. (2010) for more.
-}
-\examples{
-dontrun{
-library(pmartRdata)
-library(pmartR)
-#Add attribute required by MSomicsQC
-mypepData <- edata_transform(omicsData = pep_object, data_scale = "log2")
-mypepData <- group_designation(omicsData = mypepData, main_effects = c("Condition"))
-
-#Haven't filtered yet, should get warning
-com_df <- data.frame(Control="Mock",Test="Infection")
-imd_res <- imd_test(omicsData = mypepData,comparisons=com_df)
-
-#Now filter and run again
-imdanova_Filt <- imdanova_filter(omicsData = mypepData)
-mypepData <- applyFilt(filter_object = imdanova_Filt, omicsData = mypepData, min_nonmiss_gtest=3)
-imd_res <- imd_test(omicsData = mypepData)
-imd_res_holm <- imd_test(omicsData = mypepData, pval_adjust = 'holm')
-
-###
-#Are the comparisons names "Test_vs_Control"?
-comp_df <- data.frame(Test="Infection",Control="Mock")
-imd_res <- imd_test(omicsData = mypepData,comparisons = comp_df)
-comp_df_rev <- data.frame(Control="Infection",Test="Mock")
-imd_res_rev <- imd_test(omicsData = mypepData,comparisons = comp_df_rev)
-
-####
-#Test with a bigger dataset
-library(OvarianPepdataBP)
-tcga_ovarian_pepdata_bp <- as.pepData(e_data = tcga_ovarian_pepdata_bp$e_data, f_data = tcga_ovarian_pepdata_bp$f_data, e_meta = tcga_ovarian_pepdata_bp$e_meta)
-tcga_ovarian_pepdata_bp <- group_designation(omicsData = tcga_ovarian_pepdata_bp, main_effects = c("initial_pathologic_diagnosis_method"))
-ovarian_res <- imd_test(omicsData = tcga_ovarian_pepdata_bp)
-#Holm adjustment
-ovarian_res_holm <- imd_test(omicsData = tcga_ovarian_pepdata_bp, pval_adjust = 'holm')
-#Bonferonni adjustment
-ovarian_res_bon <- imd_test(omicsData = tcga_ovarian_pepdata_bp, pval_adjust = 'bonf')
-}
 }
 \references{
 Webb-Robertson, Bobbie-Jo M., et al. "Combined statistical analyses of peptide intensities and peptide occurrences improves identification of significant peptides from MS-based proteomics data." Journal of proteome research 9.11 (2010): 5748-5756.
