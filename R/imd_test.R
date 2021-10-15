@@ -1,32 +1,48 @@
-#' Tests for the independence of missing data across groups (aka factors, aka main effects)
+#' Tests for the independence of missing data across groups (aka factors, aka
+#' main effects)
 #'
-#' Tests the null hypothesis that the number of missing observations is independent of the groups.  A g-test is used to test this null hypothese
-#' against the alternative that the groups and missing data are related.  This is usually performed in conjuction with an ANOVA which tests if
-#' the mean response (which varies with data type) is the same across groups; this combination is called IMD_ANOVA.  It's probably a good idea
-#' to first filter the data with `imd_anova_filter` to see if there is enough infomration to even do this test.  See Webb-Robertson et al. (2010) for more.
+#' Tests the null hypothesis that the number of missing observations is
+#' independent of the groups.  A g-test is used to test this null hypothese
+#' against the alternative that the groups and missing data are related.  This
+#' is usually performed in conjuction with an ANOVA which tests if the mean
+#' response (which varies with data type) is the same across groups; this
+#' combination is called IMD_ANOVA.  It's probably a good idea to first filter
+#' the data with `imd_anova_filter` to see if there is enough infomration to
+#' even do this test.  See Webb-Robertson et al. (2010) for more.
 #'
 #' @param omicsData A pmartR data object of any class
-#' @param comparisons `data.frame` with columns for "Control" and "Test" containing the different comparisons of interest. Comparisons will be made between the Test and the corresponding Control  If left NULL, then all pairwise comparisons are executed.
-#' @param pval_adjust character vector specifying the type of multiple comparisons adjustment to implement. The default setting is to not apply an adjustment. Valid options include: holm, bonferonni and none. See \code{\link{p.adjust}} for some details.
-#' @param pval_thresh numeric p-value threshold, below or equal to which peptides are considered differentially expressed. Defaults to 0.05
+#' @param comparisons `data.frame` with columns for "Control" and "Test"
+#'   containing the different comparisons of interest. Comparisons will be made
+#'   between the Test and the corresponding Control  If left NULL, then all
+#'   pairwise comparisons are executed.
+#' @param pval_adjust A character string specifying the type of multiple
+#'   comparisons adjustment to implement. The default setting, "none", is to not
+#'   apply an adjustment. Valid options include: "bonferroni" and "holm".
+#' @param pval_thresh numeric p-value threshold, below or equal to which
+#'   peptides are considered differentially expressed. Defaults to 0.05
 #'
 #' @return  a list of `data.frame`s
-#' \tabular{ll}{
-#' Results  \tab e_data cname, Count of non-missing data for each group, Global G-test statistic and p-value\cr
-#'  \tab \cr
-#' Gstats  \tab Value of the g statistics for each of the pairwise comparisons specified by the `comparisons` argument \cr
-#'  \tab \cr
-#' Pvalues  \tab p-values for each of the pairwise comparisons specified by `comparisons` argument \cr
-#'  \tab \cr
-#' Flags  \tab Indicator of statistical significance where the sign of the flag reflects the difference in the ratio of non-missing observations (0/+-2 to if adjusted p-value>=pval_thresh or p-value<pval_thresh) \cr
-#'  }
+#'   \tabular{ll}{
+#'   Results  \tab e_data cname,
+#'   Count of non-missing data for each group, Global G-test statistic and
+#'   p-value\cr \tab \cr Gstats  \tab Value of the g statistics for each of the
+#'   pairwise comparisons specified by the `comparisons` argument \cr \tab \cr
+#'   Pvalues  \tab p-values for each of the pairwise comparisons specified by
+#'   `comparisons` argument \cr \tab \cr Flags  \tab Indicator of statistical
+#'   significance where the sign of the flag reflects the difference in the
+#'   ratio of non-missing observations (0/+-2 to if adjusted
+#'   p-value>=pval_thresh or p-value<pval_thresh) \cr
+#'   }
 #'
 #' @author Bryan Stanfill
 #'
-#' @references
-#' Webb-Robertson, Bobbie-Jo M., et al. "Combined statistical analyses of peptide intensities and peptide occurrences improves identification of significant peptides from MS-based proteomics data." Journal of proteome research 9.11 (2010): 5748-5756.
+#' @references Webb-Robertson, Bobbie-Jo M., et al. "Combined statistical
+#' analyses of peptide intensities and peptide occurrences improves
+#' identification of significant peptides from MS-based proteomics data."
+#' Journal of proteome research 9.11 (2010): 5748-5756.
 #'
-imd_test <- function(omicsData, comparisons=NULL, pval_adjust = 'none', pval_thresh = 0.05){
+imd_test <- function (omicsData, comparisons, pval_adjust, pval_thresh) {
+
   # check that omicsData is of the appropriate class
   if(!inherits(omicsData, c("proData","pepData","lipidData", "metabData", "nmrData"))) stop("omicsData is not an object of appropriate class")
 

@@ -4,12 +4,20 @@
 #' @param omicsData A pmartR data object of any class, which has a `group_df` attribute that is usually created by the `group_designation()` function
 #' @param comparisons the comparisons made
 #' @param test_method the test method
-#' @param pval_adjust pvalue adjustment method
+#' @param pval_adjust_a p-value adjustment method for ANOVA
+#' @param pval_adjust_g p-value adjustment method for G-test
 #' @param pval_thresh p-value threshold value
 #'
 #' @return the final object of class statRes
 #'
-statRes_output <- function(imd_out,omicsData,comparisons,test_method,pval_adjust,pval_thresh){
+statRes_output <- function (imd_out,
+                            omicsData,
+                            comparisons,
+                            test_method,
+                            pval_adjust_a,
+                            pval_adjust_g,
+                            pval_thresh) {
+
   # check that omicsData is of the appropriate class
   if(!inherits(omicsData, c("proData","pepData","lipidData", "metabData", "nmrData"))) stop("omicsData is not an object of appropriate class")
 
@@ -50,7 +58,8 @@ statRes_output <- function(imd_out,omicsData,comparisons,test_method,pval_adjust
                                                      Down_gtest = apply(flags, 2, function(x){length(which(x == -2))})
                                                      )
   attr(imd_out,"statistical_test") <- test_method
-  attr(imd_out, "adjustment_method") <- pval_adjust
+  attr(imd_out, "adjustment_method_a") <- pval_adjust_a
+  attr(imd_out, "adjustment_method_g") <- pval_adjust_g
   attr(imd_out, "pval_thresh") <- pval_thresh
   attr(imd_out, "data_info") <- attr(omicsData, "data_info")
   class(imd_out) <- "statRes"
@@ -71,7 +80,8 @@ setOldClass("statRes")
 #' @method summary statRes
 summary.statRes <- function(x,...){
   cat("Type of test:",attr(x,"statistical_test"),"\n\n")
-  cat("Multiple comparison adjustment:",attr(x,"adjustment_method"),"\n\n")
+  cat("Multiple comparison adjustment ANOVA:",attr(x,"adjustment_method_a"),"\n\n")
+  cat("Multiple comparison adjustment G-test:",attr(x,"adjustment_method_g"),"\n\n")
   cat("p-value threshold:",attr(x,"pval_thresh"),"\n\n")
   cat("Number of significant biomolecules by comparison.  Columns specify fold change direction and type of test:\n\n")
 
@@ -90,8 +100,13 @@ summary.statRes <- function(x,...){
 
   print(table)
 
-  return(invisible(list(test_type = attr(x,"statistical_test"), adjustment = attr(x,"adjustment_method"), pval_thresh = attr(x,"pval_thresh"), sig_table = table,
-                        comparisons = attr(x, "comparisons"), group_DF = attr(x,"group_DF"))))
+  return(invisible(list(test_type = attr(x,"statistical_test"),
+                        adjustment_a = attr(x,"adjustment_method_a"),
+                        adjustment_g = attr(x,"adjustment_method_g"),
+                        pval_thresh = attr(x,"pval_thresh"),
+                        sig_table = table,
+                        comparisons = attr(x, "comparisons"),
+                        group_DF = attr(x,"group_DF"))))
 }
 
 #' @export

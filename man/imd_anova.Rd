@@ -9,7 +9,8 @@ imd_anova(
   omicsData,
   comparisons = NULL,
   test_method,
-  pval_adjust = "none",
+  pval_adjust_a = "none",
+  pval_adjust_g = "none",
   pval_thresh = 0.05,
   covariates = NULL,
   paired = FALSE,
@@ -29,12 +30,15 @@ pairwise comparisons are executed.}
 "combined", "gtest", or "anova". "combined" implements both the gtest and
 anova filters.}
 
-\item{pval_adjust}{character vector specifying the type of multiple
-comparisons adjustment to implement via \code{\link{p.adjust}}. A NULL
-value corresponds to no adjustment. Valid options for ANOVA include: holm,
-hochberg, hommel, bonferroni, BH, BY, fdr, none. Valid options for g-test
-include: holm, bonferonni and none. See \code{\link{p.adjust}} for some
-details.}
+\item{pval_adjust_a}{A character string specifying the type of multiple
+comparison adjustment to implement for ANOVA tests. Valid options include:
+"bonferroni", "holm", "tukey", and "dunnett". The default is "none" which
+corresponds to no p-value adjustment.}
+
+\item{pval_adjust_g}{A character string specifying the type of multiple
+comparison adjustment to implement for G-test tests. Valid options include:
+"bonverroni" and "holm". The default is "none" which corresponds to no
+p-value adjustment.}
 
 \item{pval_thresh}{numeric p-value threshold, below or equal to which
 peptides are considered differentially expressed. Defaults to 0.05}

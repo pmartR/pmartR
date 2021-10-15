@@ -12,12 +12,14 @@
 #' @param test_method character string specifying the filter method to use:
 #'   "combined", "gtest", or "anova". "combined" implements both the gtest and
 #'   anova filters.
-#' @param pval_adjust character vector specifying the type of multiple
-#'   comparisons adjustment to implement via \code{\link{p.adjust}}. A NULL
-#'   value corresponds to no adjustment. Valid options for ANOVA include: holm,
-#'   hochberg, hommel, bonferroni, BH, BY, fdr, none. Valid options for g-test
-#'   include: holm, bonferonni and none. See \code{\link{p.adjust}} for some
-#'   details.
+#' @param pval_adjust_a A character string specifying the type of multiple
+#'   comparison adjustment to implement for ANOVA tests. Valid options include:
+#'   "bonferroni", "holm", "tukey", and "dunnett". The default is "none" which
+#'   corresponds to no p-value adjustment.
+#' @param pval_adjust_g A character string specifying the type of multiple
+#'   comparison adjustment to implement for G-test tests. Valid options include:
+#'   "bonverroni" and "holm". The default is "none" which corresponds to no
+#'   p-value adjustment.
 #' @param pval_thresh numeric p-value threshold, below or equal to which
 #'   peptides are considered differentially expressed. Defaults to 0.05
 #' @param covariates data.frame similar to \code{groupData} consisting of two
@@ -86,11 +88,14 @@
 imd_anova <- function (omicsData,
                        comparisons = NULL,
                        test_method,
-                       pval_adjust = 'none',
+                       pval_adjust_a = 'none',
+                       pval_adjust_g = 'none',
                        pval_thresh = 0.05,
                        covariates = NULL,
                        paired = FALSE,
                        equal_var = TRUE) {
+
+  # Preliminaries --------------------------------------------------------------
 
   # check that omicsData is of the appropriate class
   if (!inherits(omicsData,
@@ -124,7 +129,6 @@ imd_anova <- function (omicsData,
     stop("Data must be log transformed in order to implement ANOVA.")
   }
 
-  ############
   # Check for anova filter - give warning if not present then let `imd_test` and `anova_test` do the actual filtering
   if(is.null(attr(omicsData,"imdanova"))){
     warning("These data haven't been filtered, see `?imdanova_filter` for details.")
@@ -137,14 +141,42 @@ imd_anova <- function (omicsData,
   #    omicsData$e_data <- omicsData$e_data[filterrows,]
   #}
 
-  ############
+  # Check if combined results was selected. If it is make sure the ANOVA and
+  # G-test p-value adjustment arguments are both the same.
+  if (test_method == "combined" && pval_adjust_a != pval_adjust_g) {
+
+    # Dear pmartR user,
+    #
+    #   Please stop making my life difficult. I have enough problems as it is. I
+    # do not need you complicating things further. I would really appreciate it
+    # if you would read the instructions carefully, consider your options
+    # thoroughly, and act wisely based on the outcome of the previous two steps.
+    #
+    #                                                 Sincerely,
+    #                                                 pmartR programmer
+    message(paste("The p-value adjustment method selected for ANOVA and G-test",
+                  "are different. Check the input to pval_adjust_a and",
+                  "pval_adjust_g.",
+                  sep = " "))
+
+  }
+
+  # Statisticalness!!! ---------------------------------------------------------
+
   # Use imd_test() to test for independence of missing data (qualitative difference between groups)
   if(test_method=='anova'){
     #If they don't want the g-test done, save some time by removing comparisons and the pval_adjust arguments
-    #Also make the gtest_pvalues NULL so nothing's returned
-    imd_results_full <- imd_test(omicsData, comparisons = NULL, pval_adjust = 'none', pval_thresh = pval_thresh)
+    #Also make the gtest_pvalues NULL so nothing's returned.
+    # NOTE: The code below doesn't do what the comments above say they want done.
+    imd_results_full <- imd_test(omicsData,
+                                 comparisons = NULL, # This actually performs all pairwise comparisons.
+                                 pval_adjust = 'none',
+                                 pval_thresh = pval_thresh)
   }else{
-    imd_results_full <- imd_test(omicsData, comparisons = comparisons, pval_adjust = pval_adjust, pval_thresh = pval_thresh)
+    imd_results_full <- imd_test(omicsData,
+                                 comparisons = comparisons,
+                                 pval_adjust = pval_adjust_g,
+                                 pval_thresh = pval_thresh)
     gtest_pvalues <- imd_results_full$Pvalues
     colnames(gtest_pvalues) <- paste0("P_value_G_",colnames(gtest_pvalues))
     gtest_flags <- imd_results_full$Flags
@@ -161,9 +193,21 @@ imd_anova <- function (omicsData,
   if(test_method=='gtest'){
     #If they only want the g-test, used anova_test to compute means, fold changes but
     #don't return flags or p-values
-    anova_results_full <- anova_test(omicsData, comparisons = comparisons, pval_adjust = 'none', pval_thresh = pval_thresh, covariates = covariates, paired = paired, equal_var = equal_var)
+    anova_results_full <- anova_test(omicsData,
+                                     comparisons = comparisons,
+                                     pval_adjust = 'none',
+                                     pval_thresh = pval_thresh,
+                                     covariates = covariates,
+                                     paired = paired,
+                                     equal_var = equal_var)
   }else{
-    anova_results_full <- anova_test(omicsData, comparisons = comparisons, pval_adjust = pval_adjust, pval_thresh = pval_thresh, covariates = covariates, paired = paired, equal_var = equal_var)
+    anova_results_full <- anova_test(omicsData,
+                                     comparisons = comparisons,
+                                     pval_adjust = pval_adjust_a,
+                                     pval_thresh = pval_thresh,
+                                     covariates = covariates,
+                                     paired = paired,
+                                     equal_var = equal_var)
     anova_fold_flags <- anova_results_full$Flags
     colnames(anova_fold_flags) <- paste0("Flag_",colnames(anova_fold_flags))
     anova_pvalues <- anova_results_full$Fold_change_pvalues
@@ -194,7 +238,13 @@ imd_anova <- function (omicsData,
     colnames(anova_fold_flags) <- gsub("^Flag_","",colnames(anova_fold_flags))
     imd_out$Flags <- anova_fold_flags
 
-    final_out <- statRes_output(imd_out,omicsData,comparisons,test_method,pval_adjust,pval_thresh)
+    final_out <- statRes_output(imd_out,
+                                omicsData,
+                                comparisons,
+                                test_method,
+                                pval_adjust_a,
+                                pval_adjust_g,
+                                pval_thresh)
     attr(final_out, "cnames") = attr(omicsData, "cnames")
     attr(final_out, "data_class") = attr(omicsData, "class")
     return(final_out)
@@ -215,7 +265,13 @@ imd_anova <- function (omicsData,
     colnames(gtest_flags) <- gsub("^Flag_","",colnames(gtest_flags))
     imd_out$Flags <- gtest_flags
 
-    final_out <- statRes_output(imd_out,omicsData,comparisons,test_method,pval_adjust,pval_thresh)
+    final_out <- statRes_output(imd_out,
+                                omicsData,
+                                comparisons,
+                                test_method,
+                                pval_adjust_a,
+                                pval_adjust_g,
+                                pval_thresh)
     attr(final_out, "cnames") = attr(omicsData, "cnames")
     attr(final_out, "data_class") = attr(omicsData, "class")
     return(final_out)
@@ -235,7 +291,10 @@ imd_anova <- function (omicsData,
     to_fix <- Full_results[msng_cnts,get_edata_cname(omicsData)]
     omicsData2 <- omicsData
     omicsData2$e_data <- omicsData$e_data%>%dplyr::filter(!!rlang::sym(get_edata_cname(omicsData))%in%as.character(to_fix))
-    new_cnts <- imd_test(omicsData = omicsData2, comparisons = NULL, pval_adjust = 'none', pval_thresh = pval_thresh)
+    new_cnts <- imd_test(omicsData = omicsData2,
+                         comparisons = NULL,
+                         pval_adjust = 'none',
+                         pval_thresh = pval_thresh)
     rm(omicsData2)
     #Replace the NA counts with the correct counts
     Full_results[msng_cnts,grep("Count",colnames(Full_results))] <- new_cnts$Results[,grep("Count",colnames(new_cnts$Results))]
@@ -307,7 +366,13 @@ imd_anova <- function (omicsData,
                   Flags = data.frame(imd_flags, check.names = FALSE),
                   P_values = data.frame(imd_pvals, check.names = FALSE))
 
-  final_out <- statRes_output(imd_out,omicsData,comparisons,test_method,pval_adjust,pval_thresh)
+  final_out <- statRes_output(imd_out,
+                              omicsData,
+                              comparisons,
+                              test_method,
+                              pval_adjust_a,
+                              pval_adjust_g,
+                              pval_thresh)
 
   attr(final_out, "cnames") = attr(omicsData, "cnames")
   attr(final_out, "data_class") = attr(omicsData, "class")

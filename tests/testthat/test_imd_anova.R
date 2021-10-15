@@ -330,7 +330,8 @@ test_that('all tests conform to the decrees of the God of Stats',{
     row.names = c("Infection_vs_Mock")
   )
   attr(astan_1_0_2, "statistical_test") <- "anova"
-  attr(astan_1_0_2, "adjustment_method") <- "none"
+  attr(astan_1_0_2, "adjustment_method_a") <- "none"
+  attr(astan_1_0_2, "adjustment_method_g") <- "none"
   attr(astan_1_0_2, "pval_thresh") <- 0.05
   attr(astan_1_0_2, "data_info") <- list(
     data_scale_orig = "abundance",
@@ -510,7 +511,8 @@ test_that('all tests conform to the decrees of the God of Stats',{
                   "Infection_low_vs_Mock_none")
   )
   attr(astan_2_0_3, "statistical_test") <- "anova"
-  attr(astan_2_0_3, "adjustment_method") <- "none"
+  attr(astan_2_0_3, "adjustment_method_a") <- "none"
+  attr(astan_2_0_3, "adjustment_method_g") <- "none"
   attr(astan_2_0_3, "pval_thresh") <- 0.05
   attr(astan_2_0_3, "data_info") <- list(
     data_scale_orig = "abundance",
@@ -799,7 +801,8 @@ test_that('all tests conform to the decrees of the God of Stats',{
                   "zombie_vs_human")
   )
   attr(astan_1_1_3, "statistical_test") <- "anova"
-  attr(astan_1_1_3, "adjustment_method") <- "none"
+  attr(astan_1_1_3, "adjustment_method_a") <- "none"
+  attr(astan_1_1_3, "adjustment_method_g") <- "none"
   attr(astan_1_1_3, "pval_thresh") <- 0.05
   attr(astan_1_1_3, "data_info") <- list(
     data_scale_orig = "abundance",
@@ -988,7 +991,8 @@ test_that('all tests conform to the decrees of the God of Stats',{
     row.names = c("Infection_vs_Mock")
   )
   attr(gstan_1_0_2, "statistical_test") <- "gtest"
-  attr(gstan_1_0_2, "adjustment_method") <- "none"
+  attr(gstan_1_0_2, "adjustment_method_a") <- "none"
+  attr(gstan_1_0_2, "adjustment_method_g") <- "none"
   attr(gstan_1_0_2, "pval_thresh") <- 0.05
   attr(gstan_1_0_2, "data_info") <- list(
     data_scale_orig = "abundance",
@@ -1148,7 +1152,8 @@ test_that('all tests conform to the decrees of the God of Stats',{
                   "Infection_low_vs_Mock_none")
   )
   attr(gstan_2_0_3, "statistical_test") <- "gtest"
-  attr(gstan_2_0_3, "adjustment_method") <- "none"
+  attr(gstan_2_0_3, "adjustment_method_a") <- "none"
+  attr(gstan_2_0_3, "adjustment_method_g") <- "none"
   attr(gstan_2_0_3, "pval_thresh") <- 0.05
   attr(gstan_2_0_3, "data_info") <- list(
     data_scale_orig = "abundance",
@@ -1214,54 +1219,54 @@ test_that('all tests conform to the decrees of the God of Stats',{
   # Adjusted p-values ---------------
 
   afruit_bon_1_0_2 <- imd_anova(afilta_1_0_2, test_method = "anova",
-                                pval_adjust = "bonferroni")
+                                pval_adjust_a = "bonferroni")
   afruit_holm_1_0_2 <- imd_anova(afilta_1_0_2, test_method = "anova",
-                                 pval_adjust = "holm")
+                                 pval_adjust_a = "holm")
   afruit_tuk_1_0_2 <- imd_anova(afilta_1_0_2, test_method = "anova",
-                                pval_adjust = "tukey")
+                                pval_adjust_a = "tukey")
   afruit_dun_1_0_2 <- imd_anova(afilta_1_0_2, test_method = "anova",
-                                pval_adjust = "dunnett")
+                                pval_adjust_a = "dunnett")
 
   afruit_bon_2_0_3 <- imd_anova(afilta_2_0_3, test_method = "anova",
-                                pval_adjust = "bonferroni")
+                                pval_adjust_a = "bonferroni")
   afruit_holm_2_0_3 <- imd_anova(afilta_2_0_3, test_method = "anova",
-                                 pval_adjust = "holm")
+                                 pval_adjust_a = "holm")
   afruit_tuk_2_0_3 <- imd_anova(afilta_2_0_3, test_method = "anova",
-                                pval_adjust = "tukey")
+                                pval_adjust_a = "tukey")
   # Set a seed because the mvtnorm::pmvt function--which is called when doing a
   # Dunnett p-value correction--has a random process.
   set.seed(4)
   afruit_dun_2_0_3 <- imd_anova(afilta_2_0_3, test_method = "anova",
-                                pval_adjust = "dunnett")
+                                pval_adjust_a = "dunnett")
   # Still gives an error even though all case-vs-control comparisons are being
   # made. Hmmmmmmmm. I took out the if statement that checks if a Dunnett
   # correction can be used because it throws an error when the conditions to be
   # used are met.
 
   afruit_bon_1_1_3 <- imd_anova(afilta_1_1_3, test_method = "anova",
-                                pval_adjust = "bonferroni",
+                                pval_adjust_a = "bonferroni",
                                 covariates = fdataZ[, c(1, 3)])
   afruit_holm_1_1_3 <- imd_anova(afilta_1_1_3, test_method = "anova",
-                                 pval_adjust = "holm",
+                                 pval_adjust_a = "holm",
                                  covariates = fdataZ[, c(1, 3)])
   afruit_tuk_1_1_3 <- imd_anova(afilta_1_1_3, test_method = "anova",
-                                pval_adjust = "tukey",
+                                pval_adjust_a = "tukey",
                                 covariates = fdataZ[, c(1, 3)])
   # Set a seed because the mvtnorm::pmvt function--which is called when doing a
   # Dunnett p-value correction--has a random process.
   set.seed(3)
   afruit_dun_1_1_3 <- imd_anova(afilta_1_1_3, test_method = "anova",
-                                pval_adjust = "dunnett",
+                                pval_adjust_a = "dunnett",
                                 covariates = fdataZ[, c(1, 3)])
 
   gfruit_bon_1_0_2 <- imd_anova(gfilta_1_0_2, test_method = "gtest",
-                                pval_adjust = "bonferroni")
+                                pval_adjust_g = "bonferroni")
   gfruit_holm_1_0_2 <- imd_anova(gfilta_1_0_2, test_method = "gtest",
-                                 pval_adjust = "holm")
+                                 pval_adjust_g = "holm")
   gfruit_bon_2_0_3 <- imd_anova(gfilta_2_0_3, test_method = "gtest",
-                                pval_adjust = "bonferroni")
+                                pval_adjust_g = "bonferroni")
   gfruit_holm_2_0_3 <- imd_anova(gfilta_2_0_3, test_method = "gtest",
-                                 pval_adjust = "holm")
+                                 pval_adjust_g = "holm")
 
   # Holy IMD-ANOVA unit tests, Statman! ----------------------------------------
 

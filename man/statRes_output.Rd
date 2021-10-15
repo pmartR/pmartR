@@ -9,7 +9,8 @@ statRes_output(
   omicsData,
   comparisons,
   test_method,
-  pval_adjust,
+  pval_adjust_a,
+  pval_adjust_g,
   pval_thresh
 )
 }
@@ -22,7 +23,9 @@ statRes_output(
 
 \item{test_method}{the test method}
 
-\item{pval_adjust}{pvalue adjustment method}
+\item{pval_adjust_a}{p-value adjustment method for ANOVA}
+
+\item{pval_adjust_g}{p-value adjustment method for G-test}
 
 \item{pval_thresh}{p-value threshold value}
 }
