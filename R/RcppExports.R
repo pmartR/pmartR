@@ -49,10 +49,6 @@ group_comparison_anova_cpp <- function(means, sizes, sigma2, C) {
     .Call('_pmartR_group_comparison_anova_cpp', PACKAGE = 'pmartR', means, sizes, sigma2, C)
 }
 
-gtest_cpp <- function(data, gp) {
-    .Call('_pmartR_gtest_cpp', PACKAGE = 'pmartR', data, gp)
-}
-
 holm_cpp <- function(ps) {
     .Call('_pmartR_holm_cpp', PACKAGE = 'pmartR', ps)
 }

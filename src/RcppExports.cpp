@@ -159,18 +159,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// gtest_cpp
-List gtest_cpp(NumericMatrix data, NumericVector gp);
-RcppExport SEXP _pmartR_gtest_cpp(SEXP dataSEXP, SEXP gpSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericMatrix >::type data(dataSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type gp(gpSEXP);
-    rcpp_result_gen = Rcpp::wrap(gtest_cpp(data, gp));
-    return rcpp_result_gen;
-END_RCPP
-}
 // holm_cpp
 NumericVector holm_cpp(NumericVector ps);
 RcppExport SEXP _pmartR_holm_cpp(SEXP psSEXP) {
@@ -247,7 +235,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_pmartR_fold_change_diff_na_okay", (DL_FUNC) &_pmartR_fold_change_diff_na_okay, 2},
     {"_pmartR_fold_change_diff_copy", (DL_FUNC) &_pmartR_fold_change_diff_copy, 2},
     {"_pmartR_group_comparison_anova_cpp", (DL_FUNC) &_pmartR_group_comparison_anova_cpp, 4},
-    {"_pmartR_gtest_cpp", (DL_FUNC) &_pmartR_gtest_cpp, 2},
     {"_pmartR_holm_cpp", (DL_FUNC) &_pmartR_holm_cpp, 1},
     {"_pmartR_kw_rcpp", (DL_FUNC) &_pmartR_kw_rcpp, 2},
     {"_pmartR_nonmissing_per_grp", (DL_FUNC) &_pmartR_nonmissing_per_grp, 2},
