@@ -1,16 +1,16 @@
 #' Function to take raw output of `imd_anova` and create output for `statRes` object
 #'
-#' @param imd_out Data.frame containing the results of the imd anova call
+#' @param imd_anova_out A \code{ata.frame} containing the results of the \code{imd_anova} call.
 #' @param omicsData A pmartR data object of any class, which has a `group_df` attribute that is usually created by the `group_designation()` function
-#' @param comparisons the comparisons made
-#' @param test_method the test method
-#' @param pval_adjust_a p-value adjustment method for ANOVA
-#' @param pval_adjust_g p-value adjustment method for G-test
-#' @param pval_thresh p-value threshold value
+#' @param comparisons The comparisons made.
+#' @param test_method The test method used ("anova", "gtest", or "combined").
+#' @param pval_adjust_a The p-value adjustment method for ANOVA.
+#' @param pval_adjust_g The p-value adjustment method for G-test.
+#' @param pval_thresh The p-value threshold value.
 #'
 #' @return the final object of class statRes
 #'
-statRes_output <- function (imd_out,
+statRes_output <- function (imd_anova_out,
                             omicsData,
                             comparisons,
                             test_method,
@@ -28,42 +28,62 @@ statRes_output <- function (imd_out,
     groupData <- attr(omicsData, "group_DF")
   }
 
-  #Flags to determine number of significant
-  imd_out_flags <- imd_out[[grep("^flag",tolower(names(imd_out)))]]
-  flags <- data.matrix(imd_out_flags)
+  # Create data matrix with just G-test flags to determine number of significant
+  # fold changes.
+  imd_flags <- imd_anova_out[, grepl("^Flag_G", names(imd_anova_out))] %>%
+    data.matrix()
 
+  # Check if imd_flags has zero columns. If it does this means there are no
+  # columns for G-test flags and it needs to be set to a zero matrix with one
+  # row and column. This will allow it to be used in the apply function later.
+  if (dim(imd_flags)[[2]] == 0) {
 
-  #Add biomolecule to P_values and Flags
-  meta <- imd_out$Full_results[,1]
-  imd_out$Flags <- cbind.data.frame(meta, flags)
-  colnames(imd_out$Flags)[1] <- colnames(imd_out$Full_results)[1]
+    imd_flags <- matrix(0, nrow = 1, ncol = 1)
 
-  imd_out_pvals <- imd_out[[grep("^p_values",tolower(names(imd_out)))]]
-  pvals <- data.matrix(imd_out_pvals)
-  imd_out$P_values <- cbind.data.frame(imd_out$Full_results[,1],pvals)
-  colnames(imd_out$P_values)[1] <- colnames(imd_out$Full_results)[1]
+  }
 
-  #Add attributes
-  attr(imd_out, "group_DF") <- groupData
-  #if(is.null(comparisons)){
-  comparisons <- colnames(imd_out_flags)
-  #}
-  attr(imd_out, "comparisons") <- comparisons
-  attr(imd_out, "number_significant") <-  data.frame(Comparison=comparisons,
-                                                     Up_total = apply(flags,2,function(x){length(which(x>0))}),
-                                                     Down_total = apply(flags,2,function(x){length(which(x<0))}),
-                                                     Up_anova = apply(flags, 2, function(x){length(which(x == 1))}),
-                                                     Down_anova = apply(flags, 2, function(x){length(which(x == -1))}),
-                                                     Up_gtest = apply(flags, 2, function(x){length(which(x == 2))}),
-                                                     Down_gtest = apply(flags, 2, function(x){length(which(x == -2))})
-                                                     )
-  attr(imd_out,"statistical_test") <- test_method
-  attr(imd_out, "adjustment_method_a") <- pval_adjust_a
-  attr(imd_out, "adjustment_method_g") <- pval_adjust_g
-  attr(imd_out, "pval_thresh") <- pval_thresh
-  attr(imd_out, "data_info") <- attr(omicsData, "data_info")
-  class(imd_out) <- "statRes"
-  return(imd_out)
+  anova_flags <- imd_anova_out[, grepl("^Flag_A", names(imd_anova_out))] %>%
+    data.matrix()
+
+  # Check if anova_flags has zero columns. If it does this means there are no
+  # columns for ANOVA flags and it needs to be set to a zero matrix with one
+  # row and column. This will allow it to be used in the apply function later.
+  if (dim(anova_flags)[[2]] == 0) {
+
+    anova_flags <- matrix(0, nrow = 1, ncol = 1)
+
+  }
+
+  # Add attributes -------------------------------------------------------------
+
+  attr(imd_anova_out, "group_DF") <- groupData
+  attr(imd_anova_out, "comparisons") <- comparisons
+
+  # All this flag crap is really more trouble than it is worth!!
+  up_a <- apply(anova_flags, 2, function(x){length(which(x == 1))})
+  down_a <- apply(anova_flags, 2, function(x){length(which(x == -1))})
+  up_g <- apply(imd_flags, 2, function(x){length(which(x == 1))})
+  down_g <- apply(imd_flags, 2, function(x){length(which(x == -1))})
+  attr(imd_anova_out, "number_significant") <-  data.frame(
+    Comparison = comparisons,
+    Up_total = up_a + up_g,
+    Down_total = down_a + down_g,
+    Up_anova = up_a,
+    Down_anova = down_a,
+    Up_gtest = up_g,
+    Down_gtest = down_g,
+    row.names = NULL
+  )
+  attr(imd_anova_out,"statistical_test") <- test_method
+  attr(imd_anova_out, "adjustment_method_a") <- pval_adjust_a
+  attr(imd_anova_out, "adjustment_method_g") <- pval_adjust_g
+  attr(imd_anova_out, "pval_thresh") <- pval_thresh
+  attr(imd_anova_out, "data_info") <- attr(omicsData, "data_info")
+
+  class(imd_anova_out) <- c("statRes", "data.frame")
+
+  return (imd_anova_out)
+
 }
 
 #' statRes class.

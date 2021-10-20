@@ -5,7 +5,7 @@
 \title{Function to take raw output of `imd_anova` and create output for `statRes` object}
 \usage{
 statRes_output(
-  imd_out,
+  imd_anova_out,
   omicsData,
   comparisons,
   test_method,
@@ -15,19 +15,19 @@ statRes_output(
 )
 }
 \arguments{
-\item{imd_out}{Data.frame containing the results of the imd anova call}
+\item{imd_anova_out}{A \code{ata.frame} containing the results of the \code{imd_anova} call.}
 
 \item{omicsData}{A pmartR data object of any class, which has a `group_df` attribute that is usually created by the `group_designation()` function}
 
-\item{comparisons}{the comparisons made}
+\item{comparisons}{The comparisons made.}
 
-\item{test_method}{the test method}
+\item{test_method}{The test method used ("anova", "gtest", or "combined").}
 
-\item{pval_adjust_a}{p-value adjustment method for ANOVA}
+\item{pval_adjust_a}{The p-value adjustment method for ANOVA.}
 
-\item{pval_adjust_g}{p-value adjustment method for G-test}
+\item{pval_adjust_g}{The p-value adjustment method for G-test.}
 
-\item{pval_thresh}{p-value threshold value}
+\item{pval_thresh}{The p-value threshold value.}
 }
 \value{
 the final object of class statRes

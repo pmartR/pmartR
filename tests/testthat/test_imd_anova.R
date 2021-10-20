@@ -197,23 +197,6 @@ test_that('all tests conform to the decrees of the God of Stats',{
 
   }
 
-  # a2 <- function (data, main1, main2) {
-  #
-  #   nova <- vector(length = nrow(data))
-  #
-  #   for (e in 1:nrow(data)) {
-  #
-  #     nova[[e]] <- tryCatch (anova(
-  #       lm(as.numeric(data[e, ]) ~ as.factor(main1) * as.factor(main2))
-  #     )$`Pr(>F)`[[2]],
-  #     error = function (e) {NaN})
-  #
-  #   }
-  #
-  #   return (nova)
-  #
-  # }
-
   # A function for calculating the g-test statistic for two groups.
   g <- function (obs1, obs2, abs1, abs2, n1, n2, n_total) {
 
@@ -247,7 +230,7 @@ test_that('all tests conform to the decrees of the God of Stats',{
 
     knight[which(pvals >= cutoff)] <- 0
 
-    return (2 * unname(knight))
+    return (unname(knight))
 
   }
 
@@ -288,34 +271,20 @@ test_that('all tests conform to the decrees of the God of Stats',{
     )
   )
 
-  astan_1_0_2 <- list(
-    Full_results = data.frame(
-      Mass_Tag_ID = afilta_1_0_2$e_data$Mass_Tag_ID,
-      Count_Infection = unname(rowSums(!is.na(afilta_1_0_2$e_data[, 2:10]))),
-      Count_Mock = unname(rowSums(!is.na(afilta_1_0_2$e_data[, 11:13]))),
-      mean_a_1_0_2,
-      P_value_T_Infection_vs_Mock = pval_a_1_0_2$Infection_vs_Mock,
-      Fold_change_Infection_vs_Mock = (
-        mean_a_1_0_2[, 1] - mean_a_1_0_2[, 2]
-      ),
-      Flag_Infection_vs_Mock = flag_a_1_0_2$Infection_vs_Mock,
-      row.names = NULL
+  astan_1_0_2 <- data.frame(
+    Mass_Tag_ID = afilta_1_0_2$e_data$Mass_Tag_ID,
+    Count_Infection = unname(rowSums(!is.na(afilta_1_0_2$e_data[, 2:10]))),
+    Count_Mock = unname(rowSums(!is.na(afilta_1_0_2$e_data[, 11:13]))),
+    mean_a_1_0_2,
+    Fold_change_Infection_vs_Mock = (
+      mean_a_1_0_2[, 1] - mean_a_1_0_2[, 2]
     ),
-
-    Flags = data.frame(
-      Mass_Tag_ID = afilta_1_0_2$e_data$Mass_Tag_ID,
-      Infection_vs_Mock = flag_a_1_0_2$Infection_vs_Mock,
-      row.names = NULL
-    ),
-
-    P_values = data.frame(
-      Mass_Tag_ID = afilta_1_0_2$e_data$Mass_Tag_ID,
-      Infection_vs_Mock = pval_a_1_0_2$Infection_vs_Mock,
-      row.names = NULL
-    )
+    P_value_T_Infection_vs_Mock = pval_a_1_0_2$Infection_vs_Mock,
+    Flag_A_Infection_vs_Mock = flag_a_1_0_2$Infection_vs_Mock,
+    row.names = NULL
   )
 
-  class(astan_1_0_2) <- "statRes"
+  class(astan_1_0_2) <- c("statRes", "data.frame")
 
   attr(astan_1_0_2, "group_DF") <- groupDF_1_0_2
   attr(astan_1_0_2, "comparisons") <- c("Infection_vs_Mock")
@@ -327,7 +296,7 @@ test_that('all tests conform to the decrees of the God of Stats',{
     Down_anova = c(length(which(flag_a_1_0_2[, 1] == -1))),
     Up_gtest = c(0),
     Down_gtest = c(0),
-    row.names = c("Infection_vs_Mock")
+    row.names = NULL
   )
   attr(astan_1_0_2, "statistical_test") <- "anova"
   attr(astan_1_0_2, "adjustment_method_a") <- "none"
@@ -343,6 +312,10 @@ test_that('all tests conform to the decrees of the God of Stats',{
                       prod(dim(afilta_1_0_2$e_data[, -1]))),
     num_samps = dim(afilta_1_0_2$f_data)[1],
     data_types = NULL
+  )
+  attr(astan_1_0_2, "bpFlags") <- data.frame(
+    Mass_Tag_ID = afilta_1_0_2$e_data$Mass_Tag_ID,
+    flag_a_1_0_2
   )
   attr(astan_1_0_2, "cnames") <- list(
     edata_cname = "Mass_Tag_ID",
@@ -438,51 +411,33 @@ test_that('all tests conform to the decrees of the God of Stats',{
     )
   )
 
-  astan_2_0_3 <- list(
-    Full_results = data.frame(
-      Mass_Tag_ID = afilta_2_0_3$e_data$Mass_Tag_ID,
-      Count_Infection_high = unname(
-        rowSums(!is.na(afilta_2_0_3$e_data[, c(2:4, 7:8)]))
-      ),
-      Count_Infection_low = unname(
-        rowSums(!is.na(afilta_2_0_3$e_data[, c(5:6, 9:10)]))
-      ),
-      Count_Mock_none = unname(rowSums(!is.na(afilta_2_0_3$e_data[, 11:13]))),
-      mean_a_2_0_3,
-      pval_a_2_0_3,
-      Fold_change_Infection_high_vs_Infection_low = (
-        mean_a_2_0_3[, 1] - mean_a_2_0_3[, 2]
-      ),
-      Fold_change_Infection_high_vs_Mock_none = (
-        mean_a_2_0_3[, 1] - mean_a_2_0_3[, 3]
-      ),
-      Fold_change_Infection_low_vs_Mock_none = (
-        mean_a_2_0_3[, 2] - mean_a_2_0_3[, 3]
-      ),
-      Flag_Infection_high_vs_Infection_low = flag_a_2_0_3[, 1],
-      Flag_Infection_high_vs_Mock_none = flag_a_2_0_3[, 2],
-      Flag_Infection_low_vs_Mock_none = flag_a_2_0_3[, 3],
-      row.names = NULL
+  astan_2_0_3 <- data.frame(
+    Mass_Tag_ID = afilta_2_0_3$e_data$Mass_Tag_ID,
+    Count_Infection_high = unname(
+      rowSums(!is.na(afilta_2_0_3$e_data[, c(2:4, 7:8)]))
     ),
-
-    Flags = data.frame(
-      Mass_Tag_ID = afilta_2_0_3$e_data$Mass_Tag_ID,
-      Infection_high_vs_Infection_low = flag_a_2_0_3[, 1],
-      Infection_high_vs_Mock_none = flag_a_2_0_3[, 2],
-      Infection_low_vs_Mock_none = flag_a_2_0_3[, 3],
-      row.names = NULL
+    Count_Infection_low = unname(
+      rowSums(!is.na(afilta_2_0_3$e_data[, c(5:6, 9:10)]))
     ),
-
-    P_values = data.frame(
-      Mass_Tag_ID = afilta_2_0_3$e_data$Mass_Tag_ID,
-      Infection_high_vs_Infection_low = pval_a_2_0_3[, 1],
-      Infection_high_vs_Mock_none = pval_a_2_0_3[, 2],
-      Infection_low_vs_Mock_none = pval_a_2_0_3[, 3],
-      row.names = NULL
-    )
+    Count_Mock_none = unname(rowSums(!is.na(afilta_2_0_3$e_data[, 11:13]))),
+    mean_a_2_0_3,
+    Fold_change_Infection_high_vs_Infection_low = (
+      mean_a_2_0_3[, 1] - mean_a_2_0_3[, 2]
+    ),
+    Fold_change_Infection_high_vs_Mock_none = (
+      mean_a_2_0_3[, 1] - mean_a_2_0_3[, 3]
+    ),
+    Fold_change_Infection_low_vs_Mock_none = (
+      mean_a_2_0_3[, 2] - mean_a_2_0_3[, 3]
+    ),
+    pval_a_2_0_3,
+    Flag_A_Infection_high_vs_Infection_low = flag_a_2_0_3[, 1],
+    Flag_A_Infection_high_vs_Mock_none = flag_a_2_0_3[, 2],
+    Flag_A_Infection_low_vs_Mock_none = flag_a_2_0_3[, 3],
+    row.names = NULL
   )
 
-  class(astan_2_0_3) <- "statRes"
+  class(astan_2_0_3) <- c("statRes", "data.frame")
 
   attr(astan_2_0_3, "group_DF") <- groupDF_2_0_3
   attr(astan_2_0_3, "comparisons") <- c("Infection_high_vs_Infection_low",
@@ -506,9 +461,7 @@ test_that('all tests conform to the decrees of the God of Stats',{
                    length(which(flag_a_2_0_3[, 3] == -1))),
     Up_gtest = c(0, 0, 0),
     Down_gtest = c(0, 0, 0),
-    row.names = c("Infection_high_vs_Infection_low",
-                  "Infection_high_vs_Mock_none",
-                  "Infection_low_vs_Mock_none")
+    row.names = NULL
   )
   attr(astan_2_0_3, "statistical_test") <- "anova"
   attr(astan_2_0_3, "adjustment_method_a") <- "none"
@@ -524,6 +477,10 @@ test_that('all tests conform to the decrees of the God of Stats',{
                       prod(dim(afilta_2_0_3$e_data[, -1]))),
     num_samps = dim(afilta_2_0_3$f_data)[1],
     data_types = NULL
+  )
+  attr(astan_2_0_3, "bpFlags") <- data.frame(
+    Mass_Tag_ID = afilta_2_0_3$e_data$Mass_Tag_ID,
+    flag_a_2_0_3
   )
   attr(astan_2_0_3, "cnames") <- list(
     edata_cname = "Mass_Tag_ID",
@@ -732,47 +689,29 @@ test_that('all tests conform to the decrees of the God of Stats',{
     )
   )
 
-  astan_1_1_3 <- list(
-    Full_results = data.frame(
-      Mass_Tag_ID = afilta_1_1_3$e_data$Mass_Tag_ID,
-      Count_mutant = group_counts_1_1_3$nona_mutant,
-      Count_zombie = group_counts_1_1_3$nona_zombie,
-      Count_human = group_counts_1_1_3$nona_human,
-      mean_a_1_1_3,
-      pval_a_1_1_3,
-      Fold_change_mutant_vs_zombie = (
-        mean_a_1_1_3[, 1] - mean_a_1_1_3[, 2]
-      ),
-      Fold_change_mutant_vs_human = (
-        mean_a_1_1_3[, 1] - mean_a_1_1_3[, 3]
-      ),
-      Fold_change_zombie_vs_human = (
-        mean_a_1_1_3[, 2] - mean_a_1_1_3[, 3]
-      ),
-      Flag_mutant_vs_zombie = flag_a_1_1_3[, 1],
-      Flag_mutant_vs_human = flag_a_1_1_3[, 2],
-      Flag_zombie_vs_human = flag_a_1_1_3[, 3],
-      row.names = NULL
+  astan_1_1_3 <- data.frame(
+    Mass_Tag_ID = afilta_1_1_3$e_data$Mass_Tag_ID,
+    Count_mutant = group_counts_1_1_3$nona_mutant,
+    Count_zombie = group_counts_1_1_3$nona_zombie,
+    Count_human = group_counts_1_1_3$nona_human,
+    mean_a_1_1_3,
+    Fold_change_mutant_vs_zombie = (
+      mean_a_1_1_3[, 1] - mean_a_1_1_3[, 2]
     ),
-
-    Flags = data.frame(
-      Mass_Tag_ID = afilta_1_1_3$e_data$Mass_Tag_ID,
-      mutant_vs_zombie = flag_a_1_1_3[, 1],
-      mutant_vs_human = flag_a_1_1_3[, 2],
-      zombie_vs_human = flag_a_1_1_3[, 3],
-      row.names = NULL
+    Fold_change_mutant_vs_human = (
+      mean_a_1_1_3[, 1] - mean_a_1_1_3[, 3]
     ),
-
-    P_values = data.frame(
-      Mass_Tag_ID = afilta_1_1_3$e_data$Mass_Tag_ID,
-      mutant_vs_zombie = pval_a_1_1_3[, 1],
-      mutant_vs_human = pval_a_1_1_3[, 2],
-      zombie_vs_human = pval_a_1_1_3[, 3],
-      row.names = NULL
-    )
+    Fold_change_zombie_vs_human = (
+      mean_a_1_1_3[, 2] - mean_a_1_1_3[, 3]
+    ),
+    pval_a_1_1_3,
+    Flag_A_mutant_vs_zombie = flag_a_1_1_3[, 1],
+    Flag_A_mutant_vs_human = flag_a_1_1_3[, 2],
+    Flag_A_zombie_vs_human = flag_a_1_1_3[, 3],
+    row.names = NULL
   )
 
-  class(astan_1_1_3) <- "statRes"
+  class(astan_1_1_3) <- c("statRes", "data.frame")
 
   attr(astan_1_1_3, "group_DF") <- groupDF_1_1_3
   attr(astan_1_1_3, "comparisons") <- c("mutant_vs_zombie",
@@ -796,9 +735,7 @@ test_that('all tests conform to the decrees of the God of Stats',{
                    length(which(flag_a_1_1_3[, 3] == -1))),
     Up_gtest = c(0, 0, 0),
     Down_gtest = c(0, 0, 0),
-    row.names = c("mutant_vs_zombie",
-                  "mutant_vs_human",
-                  "zombie_vs_human")
+    row.names = NULL
   )
   attr(astan_1_1_3, "statistical_test") <- "anova"
   attr(astan_1_1_3, "adjustment_method_a") <- "none"
@@ -814,6 +751,10 @@ test_that('all tests conform to the decrees of the God of Stats',{
                       prod(dim(afilta_1_1_3$e_data[, -1]))),
     num_samps = dim(afilta_1_1_3$f_data)[1],
     data_types = NULL
+  )
+  attr(astan_1_1_3, "bpFlags") <- data.frame(
+    Mass_Tag_ID = afilta_1_1_3$e_data$Mass_Tag_ID,
+    flag_a_1_1_3
   )
   attr(astan_1_1_3, "cnames") <- list(
     edata_cname = "Mass_Tag_ID",
@@ -917,6 +858,8 @@ test_that('all tests conform to the decrees of the God of Stats',{
   abs_inf_low_2_0_3 <- rowSums(is.na(gfilta_2_0_3$e_data[, c(5:6, 9:10)]))
   abs_mock_2_0_3 <- rowSums(is.na(gfilta_2_0_3$e_data[, 11:13]))
 
+  # main effects: 1; covariates: 0; groups: 2 ---------------
+
   pval_g_1_0_2 <- data.frame(
     Infection_vs_Mock = pchisq(
       q = g(obs1 = obs_inf_1_0_2,
@@ -949,46 +892,32 @@ test_that('all tests conform to the decrees of the God of Stats',{
                          na.rm = TRUE)
   )
 
-  gstan_1_0_2 <- list(
-    Full_results = data.frame(
-      Mass_Tag_ID = gfilta_1_0_2$e_data$Mass_Tag_ID,
-      Count_Infection = unname(obs_inf_1_0_2),
-      Count_Mock = unname(obs_mock_1_0_2),
-      P_value_G_Infection_vs_Mock = pval_g_1_0_2[, 1],
-      Flag_Infection_vs_Mock = flag_g_1_0_2[, 1],
-      mean_1_0_2,
-      Fold_change_Infection_vs_Mock = (
-        mean_1_0_2[, 1] - mean_1_0_2[, 2]
-      ),
-      row.names = NULL
+  gstan_1_0_2 <- data.frame(
+    Mass_Tag_ID = gfilta_1_0_2$e_data$Mass_Tag_ID,
+    Count_Infection = unname(obs_inf_1_0_2),
+    Count_Mock = unname(obs_mock_1_0_2),
+    mean_1_0_2,
+    Fold_change_Infection_vs_Mock = (
+      mean_1_0_2[, 1] - mean_1_0_2[, 2]
     ),
-
-    Flags = data.frame(
-      Mass_Tag_ID = gfilta_1_0_2$e_data$Mass_Tag_ID,
-      flag_g_1_0_2,
-      row.names = NULL
-    ),
-
-    P_values = data.frame(
-      Mass_Tag_ID = gfilta_1_0_2$e_data$Mass_Tag_ID,
-      pval_g_1_0_2,
-      row.names = NULL
-    )
+    P_value_G_Infection_vs_Mock = pval_g_1_0_2[, 1],
+    Flag_G_Infection_vs_Mock = flag_g_1_0_2[, 1],
+    row.names = NULL
   )
 
-  class(gstan_1_0_2) <- "statRes"
+  class(gstan_1_0_2) <- c("statRes", "data.frame")
 
   attr(gstan_1_0_2, "group_DF") <- groupDF_1_0_2
   attr(gstan_1_0_2, "comparisons") <- c("Infection_vs_Mock")
   attr(gstan_1_0_2, "number_significant") <- data.frame(
     Comparison = c("Infection_vs_Mock"),
-    Up_total = c(length(which(flag_g_1_0_2[, 1] == 2))),
-    Down_total = c(length(which(flag_g_1_0_2[, 1] == -2))),
+    Up_total = c(length(which(flag_g_1_0_2[, 1] == 1))),
+    Down_total = c(length(which(flag_g_1_0_2[, 1] == -1))),
     Up_anova = c(0),
     Down_anova = c(0),
-    Up_gtest = c(length(which(flag_g_1_0_2[, 1] == 2))),
-    Down_gtest = c(length(which(flag_g_1_0_2[, 1] == -2))),
-    row.names = c("Infection_vs_Mock")
+    Up_gtest = c(length(which(flag_g_1_0_2[, 1] == 1))),
+    Down_gtest = c(length(which(flag_g_1_0_2[, 1] == -1))),
+    row.names = NULL
   )
   attr(gstan_1_0_2, "statistical_test") <- "gtest"
   attr(gstan_1_0_2, "adjustment_method_a") <- "none"
@@ -1012,6 +941,8 @@ test_that('all tests conform to the decrees of the God of Stats',{
     techrep_cname = NULL
   )
   attr(gstan_1_0_2, "data_class") <- "pepData"
+
+  # main effects: 2; covariates: 0; groups: 3 ---------------
 
   pval_g_2_0_3 <- data.frame(
     Infection_high_vs_Infection_low = pchisq(
@@ -1085,45 +1016,31 @@ test_that('all tests conform to the decrees of the God of Stats',{
                               na.rm = TRUE)
   )
 
-  gstan_2_0_3 <- list(
-    Full_results = data.frame(
-      Mass_Tag_ID = gfilta_2_0_3$e_data$Mass_Tag_ID,
-      Count_Infection_high = unname(obs_inf_high_2_0_3),
-      Count_Infection_low = unname(obs_inf_low_2_0_3),
-      Count_Mock_none = unname(obs_mock_2_0_3),
-      P_value_G_Infection_high_vs_Infection_low = pval_g_2_0_3[, 1],
-      P_value_G_Infection_high_vs_Mock_none = pval_g_2_0_3[, 2],
-      P_value_G_Infection_low_vs_Mock_none = pval_g_2_0_3[, 3],
-      Flag_Infection_high_vs_Infection_low = flag_g_2_0_3[, 1],
-      Flag_Infection_high_vs_Mock_none = flag_g_2_0_3[, 2],
-      Flag_Infection_low_vs_Mock_none = flag_g_2_0_3[, 3],
-      mean_2_0_3,
-      Fold_change_Infection_high_vs_Infection_low = (
-        mean_2_0_3[, 1] - mean_2_0_3[, 2]
-      ),
-      Fold_change_Infection_high_vs_Mock_none = (
-        mean_2_0_3[, 1] - mean_2_0_3[, 3]
-      ),
-      Fold_change_Infection_low_vs_Mock_none = (
-        mean_2_0_3[, 2] - mean_2_0_3[, 3]
-      ),
-      row.names = NULL
+  gstan_2_0_3 <- data.frame(
+    Mass_Tag_ID = gfilta_2_0_3$e_data$Mass_Tag_ID,
+    Count_Infection_high = unname(obs_inf_high_2_0_3),
+    Count_Infection_low = unname(obs_inf_low_2_0_3),
+    Count_Mock_none = unname(obs_mock_2_0_3),
+    mean_2_0_3,
+    Fold_change_Infection_high_vs_Infection_low = (
+      mean_2_0_3[, 1] - mean_2_0_3[, 2]
     ),
-
-    Flags = data.frame(
-      Mass_Tag_ID = gfilta_2_0_3$e_data$Mass_Tag_ID,
-      flag_g_2_0_3,
-      row.names = NULL
+    Fold_change_Infection_high_vs_Mock_none = (
+      mean_2_0_3[, 1] - mean_2_0_3[, 3]
     ),
-
-    P_values = data.frame(
-      Mass_Tag_ID = gfilta_2_0_3$e_data$Mass_Tag_ID,
-      pval_g_2_0_3,
-      row.names = NULL
-    )
+    Fold_change_Infection_low_vs_Mock_none = (
+      mean_2_0_3[, 2] - mean_2_0_3[, 3]
+    ),
+    P_value_G_Infection_high_vs_Infection_low = pval_g_2_0_3[, 1],
+    P_value_G_Infection_high_vs_Mock_none = pval_g_2_0_3[, 2],
+    P_value_G_Infection_low_vs_Mock_none = pval_g_2_0_3[, 3],
+    Flag_G_Infection_high_vs_Infection_low = flag_g_2_0_3[, 1],
+    Flag_G_Infection_high_vs_Mock_none = flag_g_2_0_3[, 2],
+    Flag_G_Infection_low_vs_Mock_none = flag_g_2_0_3[, 3],
+    row.names = NULL
   )
 
-  class(gstan_2_0_3) <- "statRes"
+  class(gstan_2_0_3) <- c("statRes", "data.frame")
 
   attr(gstan_2_0_3, "group_DF") <- groupDF_2_0_3
   attr(gstan_2_0_3, "comparisons") <- c("Infection_high_vs_Infection_low",
@@ -1133,23 +1050,21 @@ test_that('all tests conform to the decrees of the God of Stats',{
     Comparison = c("Infection_high_vs_Infection_low",
                    "Infection_high_vs_Mock_none",
                    "Infection_low_vs_Mock_none"),
-    Up_total = c(length(which(flag_g_2_0_3[, 1] == 2)),
-                 length(which(flag_g_2_0_3[, 2] == 2)),
-                 length(which(flag_g_2_0_3[, 3] == 2))),
-    Down_total = c(length(which(flag_g_2_0_3[, 1] == -2)),
-                   length(which(flag_g_2_0_3[, 2] == -2)),
-                   length(which(flag_g_2_0_3[, 3] == -2))),
+    Up_total = c(length(which(flag_g_2_0_3[, 1] == 1)),
+                 length(which(flag_g_2_0_3[, 2] == 1)),
+                 length(which(flag_g_2_0_3[, 3] == 1))),
+    Down_total = c(length(which(flag_g_2_0_3[, 1] == -1)),
+                   length(which(flag_g_2_0_3[, 2] == -1)),
+                   length(which(flag_g_2_0_3[, 3] == -1))),
     Up_anova = c(0, 0, 0),
     Down_anova = c(0, 0, 0),
-    Up_gtest = c(length(which(flag_g_2_0_3[, 1] == 2)),
-                 length(which(flag_g_2_0_3[, 2] == 2)),
-                 length(which(flag_g_2_0_3[, 3] == 2))),
-    Down_gtest = c(length(which(flag_g_2_0_3[, 1] == -2)),
-                   length(which(flag_g_2_0_3[, 2] == -2)),
-                   length(which(flag_g_2_0_3[, 3] == -2))),
-    row.names = c("Infection_high_vs_Infection_low",
-                  "Infection_high_vs_Mock_none",
-                  "Infection_low_vs_Mock_none")
+    Up_gtest = c(length(which(flag_g_2_0_3[, 1] == 1)),
+                 length(which(flag_g_2_0_3[, 2] == 1)),
+                 length(which(flag_g_2_0_3[, 3] == 1))),
+    Down_gtest = c(length(which(flag_g_2_0_3[, 1] == -1)),
+                   length(which(flag_g_2_0_3[, 2] == -1)),
+                   length(which(flag_g_2_0_3[, 3] == -1))),
+    row.names = NULL
   )
   attr(gstan_2_0_3, "statistical_test") <- "gtest"
   attr(gstan_2_0_3, "adjustment_method_a") <- "none"
@@ -1173,6 +1088,230 @@ test_that('all tests conform to the decrees of the God of Stats',{
     techrep_cname = NULL
   )
   attr(gstan_2_0_3, "data_class") <- "pepData"
+
+  # Create combined standards --------------------------------------------------
+
+  # main effects: 1; covariates: 0; groups: 2 ---------------
+
+  # Combine the G-test and ANOVA results and place columns in correct order.
+  cstan_1_0_2 <- dplyr::full_join(gstan_1_0_2[, c(1:3, 7:8)],
+                                  astan_1_0_2) %>%
+    dplyr::relocate(
+      dplyr::starts_with("Count_", vars = colnames(.data)),
+      .after = "Mass_Tag_ID"
+    ) %>%
+    dplyr::relocate(
+      dplyr::starts_with("Mean_", vars = colnames(.data)),
+      .after = dplyr::last_col()
+    ) %>%
+    dplyr::relocate(
+      dplyr::starts_with("Fold_change_", vars = colnames(.data)),
+      .after = dplyr::last_col()
+    ) %>%
+    dplyr::relocate(
+      dplyr::starts_with("P_value_T", vars = colnames(.data)),
+      .after = dplyr::last_col()
+    ) %>%
+    dplyr::relocate(
+      dplyr::starts_with("P_value_G", vars = colnames(.data)),
+      .after = dplyr::last_col()
+    ) %>%
+    dplyr::relocate(
+      dplyr::starts_with("Flag_A", vars = colnames(.data)),
+      .after = dplyr::last_col()
+    ) %>%
+    dplyr::relocate(
+      dplyr::starts_with("Flag_G", vars = colnames(.data)),
+      .after = dplyr::last_col()
+    )
+
+  # Replace all NaN values with NA.
+  cstan_1_0_2[is.nan(data.matrix(cstan_1_0_2))] <- NA
+
+  class(cstan_1_0_2) <- c("statRes", "data.frame")
+
+  attr(cstan_1_0_2, "group_DF") <- groupDF_1_0_2
+  attr(cstan_1_0_2, "comparisons") <- c("Infection_vs_Mock")
+  attr(cstan_1_0_2, "number_significant") <- data.frame(
+    Comparison = c("Infection_vs_Mock"),
+    Up_total = sum(length(which(flag_g_1_0_2[, 1] == 1)),
+                   length(which(flag_a_1_0_2[, 1] == 1))),
+    Down_total = sum(length(which(flag_g_1_0_2[, 1] == -1)),
+                     length(which(flag_a_1_0_2[, 1] == -1))),
+    Up_anova = c(length(which(flag_a_1_0_2[, 1] == 1))),
+    Down_anova = c(length(which(flag_a_1_0_2[, 1] == -1))),
+    Up_gtest = c(length(which(flag_g_1_0_2[, 1] == 1))),
+    Down_gtest = c(length(which(flag_g_1_0_2[, 1] == -1))),
+    row.names = NULL
+  )
+  attr(cstan_1_0_2, "statistical_test") <- "combined"
+  attr(cstan_1_0_2, "adjustment_method_a") <- "none"
+  attr(cstan_1_0_2, "adjustment_method_g") <- "none"
+  attr(cstan_1_0_2, "pval_thresh") <- 0.05
+  attr(cstan_1_0_2, "data_info") <- list(
+    data_scale_orig = "abundance",
+    data_scale = "log",
+    norm_info = list(is_normalized = FALSE),
+    num_edata = length(unique(gfilta_1_0_2$e_data$Mass_Tag_ID)),
+    num_miss_obs = sum(is.na(gfilta_1_0_2$e_data[, -1])),
+    prop_missing = (sum(is.na(gfilta_1_0_2$e_data[, -1])) /
+                      prod(dim(gfilta_1_0_2$e_data[, -1]))),
+    num_samps = dim(gfilta_1_0_2$f_data)[1],
+    data_types = NULL
+  )
+  attr(cstan_1_0_2, "bpFlags") <- data.frame(
+    Mass_Tag_ID = gfilta_1_0_2$e_data$Mass_Tag_ID,
+    Infection_vs_Mock = dplyr::case_when(
+      is.na(cstan_1_0_2$Flag_A_Infection_vs_Mock) ~
+        cstan_1_0_2$Flag_G_Infection_vs_Mock,
+      (cstan_1_0_2$P_value_T_Infection_vs_Mock > 0.05 &
+         cstan_1_0_2$P_value_G_Infection_vs_Mock < 0.05) ~
+        cstan_1_0_2$Flag_G_Infection_vs_Mock,
+      !is.na(cstan_1_0_2$Flag_A_Infection_vs_Mock) ~
+        cstan_1_0_2$Flag_A_Infection_vs_Mock
+    )
+  )
+  attr(cstan_1_0_2, "cnames") <- list(
+    edata_cname = "Mass_Tag_ID",
+    emeta_cname = "Protein",
+    fdata_cname = "SampleID",
+    techrep_cname = NULL
+  )
+  attr(cstan_1_0_2, "data_class") <- "pepData"
+
+  # main effects: 2; covariates: 0; groups: 3 ---------------
+
+  # Combine the G-test and ANOVA results and place columns in correct order.
+  cstan_2_0_3 <- dplyr::full_join(gstan_2_0_3[, c(1:4, 11:16)],
+                                  astan_2_0_3) %>%
+    dplyr::relocate(
+      dplyr::starts_with("Count_", vars = colnames(.data)),
+      .after = "Mass_Tag_ID"
+    ) %>%
+    dplyr::relocate(
+      dplyr::starts_with("Mean_", vars = colnames(.data)),
+      .after = dplyr::last_col()
+    ) %>%
+    dplyr::relocate(
+      dplyr::starts_with("Fold_change_", vars = colnames(.data)),
+      .after = dplyr::last_col()
+    ) %>%
+    dplyr::relocate(
+      dplyr::starts_with("P_value_T", vars = colnames(.data)),
+      .after = dplyr::last_col()
+    ) %>%
+    dplyr::relocate(
+      dplyr::starts_with("P_value_G", vars = colnames(.data)),
+      .after = dplyr::last_col()
+    ) %>%
+    dplyr::relocate(
+      dplyr::starts_with("Flag_A", vars = colnames(.data)),
+      .after = dplyr::last_col()
+    ) %>%
+    dplyr::relocate(
+      dplyr::starts_with("Flag_G", vars = colnames(.data)),
+      .after = dplyr::last_col()
+    )
+
+  # Replace all NaN values with NA.
+  cstan_2_0_3[is.nan(data.matrix(cstan_2_0_3))] <- NA
+
+  class(cstan_2_0_3) <- c("statRes", "data.frame")
+
+  attr(cstan_2_0_3, "group_DF") <- groupDF_2_0_3
+  attr(cstan_2_0_3, "comparisons") <- c(
+    "Infection_high_vs_Infection_low",
+    "Infection_high_vs_Mock_none",
+    "Infection_low_vs_Mock_none"
+  )
+  attr(cstan_2_0_3, "number_significant") <- data.frame(
+    Comparison = c("Infection_high_vs_Infection_low",
+                   "Infection_high_vs_Mock_none",
+                   "Infection_low_vs_Mock_none"),
+    Up_total = c(sum(length(which(flag_g_2_0_3[, 1] == 1)),
+                     length(which(flag_a_2_0_3[, 1] == 1))),
+                 sum(length(which(flag_g_2_0_3[, 2] == 1)),
+                     length(which(flag_a_2_0_3[, 2] == 1))),
+                 sum(length(which(flag_g_2_0_3[, 3] == 1)),
+                     length(which(flag_a_2_0_3[, 3] == 1)))),
+    Down_total = c(sum(length(which(flag_g_2_0_3[, 1] == -1)),
+                       length(which(flag_a_2_0_3[, 1] == -1))),
+                   sum(length(which(flag_g_2_0_3[, 2] == -1)),
+                       length(which(flag_a_2_0_3[, 2] == -1))),
+                   sum(length(which(flag_g_2_0_3[, 3] == -1)),
+                       length(which(flag_a_2_0_3[, 3] == -1)))),
+    Up_anova = c(length(which(flag_a_2_0_3[, 1] == 1)),
+                 length(which(flag_a_2_0_3[, 2] == 1)),
+                 length(which(flag_a_2_0_3[, 3] == 1))),
+    Down_anova = c(length(which(flag_a_2_0_3[, 1] == -1)),
+                   length(which(flag_a_2_0_3[, 2] == -1)),
+                   length(which(flag_a_2_0_3[, 3] == -1))),
+    Up_gtest = c(length(which(flag_g_2_0_3[, 1] == 1)),
+                 length(which(flag_g_2_0_3[, 2] == 1)),
+                 length(which(flag_g_2_0_3[, 3] == 1))),
+    Down_gtest = c(length(which(flag_g_2_0_3[, 1] == -1)),
+                   length(which(flag_g_2_0_3[, 2] == -1)),
+                   length(which(flag_g_2_0_3[, 3] == -1))),
+    row.names = NULL
+  )
+  attr(cstan_2_0_3, "statistical_test") <- "combined"
+  attr(cstan_2_0_3, "adjustment_method_a") <- "none"
+  attr(cstan_2_0_3, "adjustment_method_g") <- "none"
+  attr(cstan_2_0_3, "pval_thresh") <- 0.05
+  attr(cstan_2_0_3, "data_info") <- list(
+    data_scale_orig = "abundance",
+    data_scale = "log",
+    norm_info = list(is_normalized = FALSE),
+    num_edata = length(unique(gfilta_2_0_3$e_data$Mass_Tag_ID)),
+    num_miss_obs = sum(is.na(gfilta_2_0_3$e_data[, -1])),
+    prop_missing = (sum(is.na(gfilta_2_0_3$e_data[, -1])) /
+                      prod(dim(gfilta_2_0_3$e_data[, -1]))),
+    num_samps = dim(gfilta_2_0_3$f_data)[1],
+    data_types = NULL
+  )
+  attr(cstan_2_0_3, "bpFlags") <- data.frame(
+    Mass_Tag_ID = gfilta_2_0_3$e_data$Mass_Tag_ID,
+    Infection_high_vs_Infection_low = dplyr::case_when(
+      is.na(cstan_2_0_3$Flag_A_Infection_high_vs_Infection_low) ~
+        cstan_2_0_3$Flag_G_Infection_high_vs_Infection_low,
+      is.na(cstan_2_0_3$P_value_T_Infection_high_vs_Infection_low) ~
+        cstan_2_0_3$Flag_G_Infection_high_vs_Infection_low,
+      (cstan_2_0_3$P_value_T_Infection_high_vs_Infection_low > 0.05 &
+         cstan_2_0_3$P_value_G_Infection_high_vs_Infection_low < 0.05) ~
+        cstan_2_0_3$Flag_G_Infection_high_vs_Infection_low,
+      !is.na(cstan_2_0_3$Flag_A_Infection_high_vs_Infection_low) ~
+        cstan_2_0_3$Flag_A_Infection_high_vs_Infection_low
+    ),
+    Infection_high_vs_Mock_none = dplyr::case_when(
+      is.na(cstan_2_0_3$Flag_A_Infection_high_vs_Mock_none) ~
+        cstan_2_0_3$Flag_G_Infection_high_vs_Mock_none,
+      is.na(cstan_2_0_3$P_value_T_Infection_high_vs_Mock_none) ~
+        cstan_2_0_3$Flag_G_Infection_high_vs_Mock_none,
+      (cstan_2_0_3$P_value_T_Infection_high_vs_Mock_none > 0.05 &
+         cstan_2_0_3$P_value_G_Infection_high_vs_Mock_none < 0.05) ~
+        cstan_2_0_3$Flag_G_Infection_high_vs_Mock_none,
+      !is.na(cstan_2_0_3$Flag_A_Infection_high_vs_Mock_none) ~
+        cstan_2_0_3$Flag_A_Infection_high_vs_Mock_none
+    ),
+    Infection_low_vs_Mock_none = dplyr::case_when(
+      is.na(cstan_2_0_3$Flag_A_Infection_low_vs_Mock_none) ~
+        cstan_2_0_3$Flag_G_Infection_low_vs_Mock_none,
+      is.na(cstan_2_0_3$P_value_T_Infection_low_vs_Mock_none) ~
+        cstan_2_0_3$Flag_G_Infection_low_vs_Mock_none,
+      (cstan_2_0_3$P_value_T_Infection_low_vs_Mock_none > 0.05 &
+         cstan_2_0_3$P_value_G_Infection_low_vs_Mock_none < 0.05) ~
+        cstan_2_0_3$Flag_G_Infection_low_vs_Mock_none,
+      !is.na(cstan_2_0_3$Flag_A_Infection_low_vs_Mock_none) ~
+        cstan_2_0_3$Flag_A_Infection_low_vs_Mock_none
+    )
+  )
+  attr(cstan_2_0_3, "cnames") <- list(
+    edata_cname = "Mass_Tag_ID",
+    emeta_cname = NULL,
+    fdata_cname = "SampleID",
+    techrep_cname = NULL
+  )
+  attr(cstan_2_0_3, "data_class") <- "pepData"
 
   # Compare IMD-ANOVAly --------------------------------------------------------
 
@@ -1282,32 +1421,32 @@ test_that('all tests conform to the decrees of the God of Stats',{
 
   # Assure adjusted p-values are the same as unadjusted p-values when there
   # is only one test between two groups.
-  expect_equal(afruit_1_0_2$Full_results$P_value_G_Infection_vs_Mock,
-               afruit_bon_1_0_2$Full_results$P_value_G_Infection_vs_Mock)
-  expect_equal(afruit_1_0_2$Full_results$P_value_G_Infection_vs_Mock,
-               afruit_holm_1_0_2$Full_results$P_value_G_Infection_vs_Mock)
-  expect_equal(afruit_1_0_2$Full_results$P_value_G_Infection_vs_Mock,
-               afruit_tuk_1_0_2$Full_results$P_value_G_Infection_vs_Mock)
-  expect_equal(afruit_1_0_2$Full_results$P_value_G_Infection_vs_Mock,
-               afruit_dun_1_0_2$Full_results$P_value_G_Infection_vs_Mock)
+  expect_equal(afruit_1_0_2$P_value_G_Infection_vs_Mock,
+               afruit_bon_1_0_2$P_value_G_Infection_vs_Mock)
+  expect_equal(afruit_1_0_2$P_value_G_Infection_vs_Mock,
+               afruit_holm_1_0_2$P_value_G_Infection_vs_Mock)
+  expect_equal(afruit_1_0_2$P_value_G_Infection_vs_Mock,
+               afruit_tuk_1_0_2$P_value_G_Infection_vs_Mock)
+  expect_equal(afruit_1_0_2$P_value_G_Infection_vs_Mock,
+               afruit_dun_1_0_2$P_value_G_Infection_vs_Mock)
 
   # ANOVA: Adjusted p-values ---------------
 
   expect_equal(
-    afruit_bon_2_0_3$Full_results[, 8:10],
-    data.frame(data.matrix(astan_2_0_3$Full_results[, 8:10] * 3))
+    data.matrix(afruit_bon_2_0_3[, 11:13]),
+    data.matrix(astan_2_0_3[, 11:13] * 3)
   )
   # Calculate the Holm adjusted p-values.
   # Current implementation adjusts p-values even if only one test is performed.
   # expect_equal(
-  #   afruit_holm_2_0_3$Full_results[, 8:10],
-  #   data.frame(t(apply(astan_2_0_3$Full_results[, 8:10],
+  #   afruit_holm_2_0_3[, 11:13],
+  #   data.frame(t(apply(astan_2_0_3[, 11:13],
   #                      1,
   #                      p.adjust,
   #                      method = "holm")))
   # )
   expect_equal(
-    afruit_tuk_2_0_3$Full_results[, 8:10],
+    data.frame(afruit_tuk_2_0_3[, 11:13]),
     tukey_pval_2_0_3
   )
   # Because of the random process in the mvtnorm::pmvt function we test the
@@ -1322,7 +1461,7 @@ test_that('all tests conform to the decrees of the God of Stats',{
   # 10,000 runs.
   expect_true(
     mean(
-      abs(data.matrix(afruit_dun_2_0_3$Full_results[, 8:10]) -
+      abs(data.matrix(afruit_dun_2_0_3[, 11:13]) -
             data.matrix(dunnett_2_0_3[, 9:11])),
       na.rm = TRUE
     ) < 0.0001132809
@@ -1331,31 +1470,31 @@ test_that('all tests conform to the decrees of the God of Stats',{
   # NOTE: Currently commented out because the current version of imd_anova
   # produces p-values greater than 1. Holy inconceivable p-values, Statman!
   expect_equal(
-    afruit_bon_1_1_3$Full_results[, 8:10],
-    data.frame(data.matrix(astan_1_1_3$Full_results[, 8:10] * 3))
+    data.matrix(afruit_bon_1_1_3[, 11:13]),
+    data.matrix(astan_1_1_3[, 11:13] * 3)
   )
   # Calculate the Holm adjusted p-values.
   # Current implementation adjusts p-values even if only one test is performed.
   # expect_equal(
-  #   afruit_holm_1_1_3$Full_results[, 8:10],
-  #   data.frame(t(apply(astan_1_1_3$Full_results[, 8:10],
+  #   afruit_holm_1_1_3[, 11:13],
+  #   data.frame(t(apply(astan_1_1_3[, 11:13],
   #                      1,
   #                      p.adjust,
   #                      method = "holm")))
   # )
   expect_equal(
-    afruit_tuk_1_1_3$Full_results[, 8:10],
+    data.frame(afruit_tuk_1_1_3[, 11:13]),
     tukey_pval_1_1_3
   )
   expect_true(
     mean(
-      abs(data.matrix(afruit_dun_1_1_3$Full_results[, 8:10]) -
+      abs(data.matrix(afruit_dun_1_1_3[, 11:13]) -
             data.matrix(dunnett_1_1_3[, 9:11])),
       na.rm = TRUE
     ) < 0.0001132809
   )
 
-  # G-Test stuffs ---------------
+  # G-Test: Unadjusted p-values ---------------
 
   expect_equal(gfruit_1_0_2, gstan_1_0_2)
   expect_equal(gfruit_2_0_3, gstan_2_0_3)
@@ -1366,24 +1505,31 @@ test_that('all tests conform to the decrees of the God of Stats',{
 
   # Make sure adjusted p-values are the same as unadjusted p-values when there
   # is only one test between two groups.
-  expect_equal(gfruit_1_0_2$Full_results$P_value_G_Infection_vs_Mock,
-               gfruit_bon_1_0_2$Full_results$P_value_G_Infection_vs_Mock)
-  expect_equal(gfruit_1_0_2$Full_results$P_value_G_Infection_vs_Mock,
-               gfruit_holm_1_0_2$Full_results$P_value_G_Infection_vs_Mock)
+  expect_equal(gfruit_1_0_2$P_value_G_Infection_vs_Mock,
+               gfruit_bon_1_0_2$P_value_G_Infection_vs_Mock)
+  expect_equal(gfruit_1_0_2$P_value_G_Infection_vs_Mock,
+               gfruit_holm_1_0_2$P_value_G_Infection_vs_Mock)
+
+  # G-Test: Adjusted p-values ---------------
 
   expect_equal(
-    gfruit_bon_2_0_3$Full_results[, 5:7],
-    data.frame(pmin(data.matrix(gstan_2_0_3$Full_results[, 5:7] * 2), 1))
+    data.frame(gfruit_bon_2_0_3[, 11:13]),
+    data.frame(pmin(data.matrix(gstan_2_0_3[, 11:13] * 2), 1))
   )
   expect_equal(
-    gfruit_holm_2_0_3$Full_results[, 5:7],
-    data.frame(t(apply(gstan_2_0_3$Full_results[, 5:7],
+    data.frame(gfruit_holm_2_0_3[, 11:13]),
+    data.frame(t(apply(gstan_2_0_3[, 11:13],
                        1,
                        p.adjust,
                        method = "holm")))
   )
 
-  # Combined stuffs ---------------
+  # Combined: Unadjusted p-values ---------------
+
+  expect_equal(cfruit_1_0_2, cstan_1_0_2)
+  expect_equal(cfruit_2_0_3, cstan_2_0_3)
+
+  # Combined: Adjusted p-values ---------------
 
   # Test argument checks -------------------------------------------------------
 

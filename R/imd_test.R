@@ -193,7 +193,7 @@ imd_test <- function (omicsData, comparisons, pval_adjust, pval_thresh) {
   sig_indicators <- data.matrix(adjusted_pvals)
   sigs <- which(sig_indicators<pval_thresh)
   if(length(sigs)>0){
-    sig_indicators[sigs] <- 2*sign(ratio_diff[sigs])
+    sig_indicators[sigs] <- sign(ratio_diff[sigs])
     sig_indicators[-sigs] <- 0
   }else{
     sig_indicators[which(sig_indicators>=pval_thresh)] <- 0
@@ -204,10 +204,5 @@ imd_test <- function (omicsData, comparisons, pval_adjust, pval_thresh) {
   #colnames(sig_indicators)[1] <- colnames(adjusted_pvals)[1]
 
   return(list(Results=Global_results,Gstats=pairwise_stats,Pvalues=adjusted_pvals,Flags=sig_indicators))
+
 }
-
-
-
-
-
-
