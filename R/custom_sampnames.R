@@ -83,45 +83,45 @@ custom_sampnames <- function (omicsData, firstn = NULL, from = NULL,
   return(omicsData)
 }
 
-subset_names <- function(x, firstn, from, to, delim, components, pattern, ...){
-
+#'
+#'@export
+subset_names <- function(x, firstn = NULL, from = NULL,
+                         to = NULL, delim = NULL, components = NULL, 
+                         pattern = NULL, ...){
+  
   if(!is.null(firstn)){
     if(!is.null(from) | !is.null(to) | !is.null(delim) | !is.null(components) | !is.null(pattern)) stop("only firstn argument is needed")
     if(!is.numeric(firstn)) stop("firstn must be a non-negative numeric value less than the number of characters in the smallest sample name")
-
-    output = lapply(names, function(x){temp = strsplit(x, split = "")[[1]]
-                                       if(firstn > length(temp)) warning(paste("there are less than", firstn, "characters in a sample name, nothing was truncated", sep = " "))
-                                       temp <- temp[1:firstn]
-                                       temp2 = paste(temp[!is.na(temp)], collapse = "")
-                                       return(temp2)})
+    
+    output = lapply(x, function(x){temp = strsplit(x, split = "")[[1]]
+    if(firstn > length(temp)) warning(paste("there are less than", firstn, "characters in a sample name, nothing was truncated", sep = " "))
+    temp <- temp[1:firstn]
+    temp2 = paste(temp[!is.na(temp)], collapse = "")
+    return(temp2)})
     output = unlist(output)
   }
-
+  
   else if((!is.null(from)) & (!is.null(to))){
     if(!is.null(firstn) | !is.null(delim) | !is.null(components) | !is.null(pattern)) stop("only from and to arguments are needed")
     if(!is.numeric(from) | !is.numeric(to)) stop("'from' and 'to' must be non-negative numeric values")
     if(to < from) stop("'to' must be less than 'from'")
-
     output = lapply(x, function(x){temp = strsplit(x, split = "")
     if(!(from %in% 1:length(temp[[1]])) & !(to %in% 1:length(temp[[1]]))) stop(paste(from, to, "are not in the range of the length of at least one sample name", sep = " "))
     temp2 = paste(temp[[1]][from:min(to, length(temp[[1]]))], collapse = "")
     return(temp2)})
-
     output = unlist(output)
   }
-
+  
   else if((!is.null(delim)) & (!is.null(components))){
     if(!is.null(firstn) | !is.null(from) | !is.null(to) | !is.null(pattern)) stop("only delim and components arguments are needed")
-
     output = lapply(x, function(x){temp = strsplit(x, split = delim)[[1]]
     if(length(components) > length(temp)) stop(paste("the length of 'components vector must be less than", length(temp), sep = " "))
     if(!any(components %in% 1:length(temp))) stop("none of the indices specified in 'components' match indices of the split sample name")
     temp <- temp[components]
     temp2 = paste(temp[!is.na(temp)], collapse = delim)
     return(temp2)})
-
     output = unlist(output)
-
+    
   }
   else if(!is.null(pattern)) {
     matches = regexpr(pattern, x, ...)
@@ -133,17 +133,17 @@ subset_names <- function(x, firstn, from, to, delim, components, pattern, ...){
       output = c(output, tmp_chr)
     }
   }
-
+  
   # Check if all short sample names are unique.
   if (length(unique(output)) != length(x)) {
-
+    
     display_df = data.frame("Names" = x, "Extracted" = output)
-
+    
     # Holy non-unique sample names, Batman!
     stop ("The input used does not produce a unique sample name for each sample.\n",
           paste(capture.output(print(display_df)), collapse = "\n")
     )
   }
-
+  
   return(output)
 }
