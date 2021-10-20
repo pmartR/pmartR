@@ -1514,7 +1514,7 @@ test_that('all tests conform to the decrees of the God of Stats',{
 
   expect_equal(
     data.frame(gfruit_bon_2_0_3[, 11:13]),
-    data.frame(pmin(data.matrix(gstan_2_0_3[, 11:13] * 2), 1))
+    data.frame(pmin(data.matrix(gstan_2_0_3[, 11:13] * 3), 1))
   )
   expect_equal(
     data.frame(gfruit_holm_2_0_3[, 11:13]),

@@ -181,7 +181,7 @@ imd_test <- function (omicsData, comparisons, pval_adjust, pval_thresh) {
     pval_adjust <- 'none'
 
   if(pval_adjust=="bonferroni"){
-    adjusted_pvals <- pmin(data.matrix(pairwise_pvals*(ncol(pairwise_pvals)-1)),1)
+    adjusted_pvals <- pmin(data.matrix(pairwise_pvals*(ncol(pairwise_pvals))),1)
   }else if(pval_adjust=="holm"){
     adjusted_pvals <- t(apply(pairwise_pvals,1,ranked_holm_cpp))
     colnames(adjusted_pvals) <- colnames(pairwise_pvals)
