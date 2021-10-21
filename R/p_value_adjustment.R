@@ -90,7 +90,7 @@ p_adjustment_anova <- function(p_values = NULL, diff_mean = NULL, t_stats = NULL
     if(pval_adjust !='holm'){
       #For bonferroni adjustment, multiply p_values by number of comparisons (columns in p_values) else do no adjustment
       multiplier <- ifelse(pval_adjust=="bonferroni",ncol(p_values),1)
-      adjusted_pvals <- multiplier*p_values
+      adjusted_pvals <- pmin(data.matrix(multiplier*p_values), 1)
     }else{
       #Rcpp::sourceCpp('src/holm_adjustment.cpp') #For debugging
       #source('~/pmartR/R/support_p_adjustment.R') #For debugging

@@ -1434,7 +1434,7 @@ test_that('all tests conform to the decrees of the God of Stats',{
 
   expect_equal(
     data.matrix(afruit_bon_2_0_3[, 11:13]),
-    data.matrix(astan_2_0_3[, 11:13] * 3)
+    pmin(data.matrix(astan_2_0_3[, 11:13] * 3), 1)
   )
   # Calculate the Holm adjusted p-values.
   # Current implementation adjusts p-values even if only one test is performed.
@@ -1471,7 +1471,7 @@ test_that('all tests conform to the decrees of the God of Stats',{
   # produces p-values greater than 1. Holy inconceivable p-values, Statman!
   expect_equal(
     data.matrix(afruit_bon_1_1_3[, 11:13]),
-    data.matrix(astan_1_1_3[, 11:13] * 3)
+    pmin(data.matrix(astan_1_1_3[, 11:13] * 3), 1)
   )
   # Calculate the Holm adjusted p-values.
   # Current implementation adjusts p-values even if only one test is performed.
