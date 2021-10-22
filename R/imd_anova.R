@@ -209,7 +209,7 @@ imd_anova <- function (omicsData,
     anova_fold_flags <- anova_results_full$Flags
     colnames(anova_fold_flags) <- paste0("Flag_A_",colnames(anova_fold_flags))
     anova_pvalues <- anova_results_full$Fold_change_pvalues
-    colnames(anova_pvalues) <- paste0("P_value_T_",colnames(anova_pvalues))
+    colnames(anova_pvalues) <- paste0("P_value_A_",colnames(anova_pvalues))
   }
 
   #Group means and fold changes should be returned even if they only ask for g-test
@@ -285,7 +285,7 @@ imd_anova <- function (omicsData,
 
     # Start with the anova p-values (extracted from combined results) and
     # replace if missing [see (2)] or G-test is significant [see (6)]
-    imd_pvals <- data.matrix(Full_results[grep("^P_value_T_",
+    imd_pvals <- data.matrix(Full_results[grep("^P_value_A_",
                                                colnames(Full_results))])
     imd_flags <- data.matrix(Full_results[grep("^Flag_A_",
                                                colnames(Full_results))])
@@ -356,7 +356,7 @@ imd_anova <- function (omicsData,
       .after = dplyr::last_col()
     ) %>%
     dplyr::relocate(
-      dplyr::starts_with("P_value_T", vars = colnames(.data)),
+      dplyr::starts_with("P_value_A", vars = colnames(.data)),
       .after = dplyr::last_col()
     ) %>%
     dplyr::relocate(

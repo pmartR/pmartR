@@ -284,7 +284,7 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, fc_colors = 
     # grouping column based on test type
     if(attr(x,"statistical_test")=="combined"){
       pvals$Type <- "G-test"
-      pvals$Type[grep(pattern="^P_value_T_",x=pvals$Comparison)] <- "ANOVA"
+      pvals$Type[grep(pattern="^P_value_A_",x=pvals$Comparison)] <- "ANOVA"
     }else if(attr(x,"statistical_test")=="gtest"){
       pvals$Type <- "G-test"
     }else if(attr(x,"statistical_test")=="anova"){
@@ -292,7 +292,7 @@ plot.statRes <- function(x, plot_type = "bar", fc_threshold = NULL, fc_colors = 
     }
 
     levels(pvals$Comparison) <- gsub(pattern="^P_value_G_",replacement = "",levels(pvals$Comparison))
-    levels(pvals$Comparison) <- gsub(pattern="^P_value_T_",replacement = "",levels(pvals$Comparison))
+    levels(pvals$Comparison) <- gsub(pattern="^P_value_A_",replacement = "",levels(pvals$Comparison))
 
     volcano <- merge(merge(fc_data,pvals,all=TRUE), fc_flags, all = TRUE)
 

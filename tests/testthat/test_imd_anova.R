@@ -279,7 +279,7 @@ test_that('all tests conform to the decrees of the God of Stats',{
     Fold_change_Infection_vs_Mock = (
       mean_a_1_0_2[, 1] - mean_a_1_0_2[, 2]
     ),
-    P_value_T_Infection_vs_Mock = pval_a_1_0_2$Infection_vs_Mock,
+    P_value_A_Infection_vs_Mock = pval_a_1_0_2$Infection_vs_Mock,
     Flag_A_Infection_vs_Mock = flag_a_1_0_2$Infection_vs_Mock,
     row.names = NULL
   )
@@ -378,25 +378,25 @@ test_that('all tests conform to the decrees of the God of Stats',{
 
   pval_a_2_0_3 <- test_stat_2_0_3 %>%
     dplyr::mutate(
-      P_value_T_Infection_high_vs_Infection_low = pt(
+      P_value_A_Infection_high_vs_Infection_low = pt(
         q = abs(stat_high_low),
         df = nona_counts_2_0_3 - nona_grps_2_0_3,
         lower.tail = FALSE
       ) * 2,
-      P_value_T_Infection_high_vs_Mock_none = pt(
+      P_value_A_Infection_high_vs_Mock_none = pt(
         q = abs(stat_high_none),
         df = nona_counts_2_0_3 - nona_grps_2_0_3,
         lower.tail = FALSE
       ) * 2,
-      P_value_T_Infection_low_vs_Mock_none = pt(
+      P_value_A_Infection_low_vs_Mock_none = pt(
         q = abs(stat_low_none),
         df = nona_counts_2_0_3 - nona_grps_2_0_3,
         lower.tail = FALSE
       ) * 2
     ) %>%
-    dplyr::select(P_value_T_Infection_high_vs_Infection_low,
-                  P_value_T_Infection_high_vs_Mock_none,
-                  P_value_T_Infection_low_vs_Mock_none)
+    dplyr::select(P_value_A_Infection_high_vs_Infection_low,
+                  P_value_A_Infection_high_vs_Mock_none,
+                  P_value_A_Infection_low_vs_Mock_none)
 
   flag_a_2_0_3 <- data.frame(
     Infection_high_vs_Infection_low = aflag(
@@ -502,21 +502,21 @@ test_that('all tests conform to the decrees of the God of Stats',{
   suppressWarnings(
     tukey_pval_2_0_3 <- tukey_stat_2_0_3 %>%
       dplyr::mutate(
-        P_value_T_Infection_high_vs_Infection_low = ptukey(
+        P_value_A_Infection_high_vs_Infection_low = ptukey(
           abs(stat_high_low),
           nranges = 1,
           nmeans = 3,
           df = nona_counts_2_0_3 - 3,
           lower.tail = FALSE
         ),
-        P_value_T_Infection_high_vs_Mock_none = ptukey(
+        P_value_A_Infection_high_vs_Mock_none = ptukey(
           abs(stat_high_none),
           nranges = 1,
           nmeans = 3,
           df = nona_counts_2_0_3 - 3,
           lower.tail = FALSE
         ),
-        P_value_T_Infection_low_vs_Mock_none = ptukey(
+        P_value_A_Infection_low_vs_Mock_none = ptukey(
           abs(stat_low_none),
           nranges = 1,
           nmeans = 3,
@@ -524,9 +524,9 @@ test_that('all tests conform to the decrees of the God of Stats',{
           lower.tail = FALSE
         )
       ) %>%
-      dplyr::select(P_value_T_Infection_high_vs_Infection_low,
-                    P_value_T_Infection_high_vs_Mock_none,
-                    P_value_T_Infection_low_vs_Mock_none) %>%
+      dplyr::select(P_value_A_Infection_high_vs_Infection_low,
+                    P_value_A_Infection_high_vs_Mock_none,
+                    P_value_A_Infection_low_vs_Mock_none) %>%
       `rownames<-`(NULL)
   )
 
@@ -655,25 +655,25 @@ test_that('all tests conform to the decrees of the God of Stats',{
   pval_a_1_1_3 <- test_stat_1_1_3 %>%
     dplyr::mutate(
       lg = group_counts_1_1_3$n_grp,
-      P_value_T_mutant_vs_zombie = pt(
+      P_value_A_mutant_vs_zombie = pt(
         q = abs(stat_m_z),
         df = nona_counts_1_1_3 - (3 - lg),
         lower.tail = FALSE
       ) * 2,
-      P_value_T_mutant_vs_human = pt(
+      P_value_A_mutant_vs_human = pt(
         q = abs(stat_m_h),
         df = nona_counts_1_1_3 - (3 - lg),
         lower.tail = FALSE
       ) * 2,
-      P_value_T_zombie_vs_human = pt(
+      P_value_A_zombie_vs_human = pt(
         q = abs(stat_z_h),
         df = nona_counts_1_1_3 - (3 - lg),
         lower.tail = FALSE
       ) * 2
     ) %>%
-    dplyr::select(P_value_T_mutant_vs_zombie,
-                  P_value_T_mutant_vs_human,
-                  P_value_T_zombie_vs_human) %>%
+    dplyr::select(P_value_A_mutant_vs_zombie,
+                  P_value_A_mutant_vs_human,
+                  P_value_A_zombie_vs_human) %>%
     `row.names<-`(NULL)
 
   flag_a_1_1_3 <- data.frame(
@@ -776,21 +776,21 @@ test_that('all tests conform to the decrees of the God of Stats',{
   suppressWarnings(
     tukey_pval_1_1_3 <- tukey_stat_1_1_3 %>%
       dplyr::mutate(
-        P_value_T_mutant_vs_zombie = ptukey(
+        P_value_A_mutant_vs_zombie = ptukey(
           abs(stat_m_z),
           nranges = 1,
           nmeans = 3,
           df = nona_counts_1_1_3 - 3,
           lower.tail = FALSE
         ),
-        P_value_T_mutant_vs_human = ptukey(
+        P_value_A_mutant_vs_human = ptukey(
           abs(stat_m_h),
           nranges = 1,
           nmeans = 3,
           df = nona_counts_1_1_3 - 3,
           lower.tail = FALSE
         ),
-        P_value_T_zombie_vs_human = ptukey(
+        P_value_A_zombie_vs_human = ptukey(
           abs(stat_z_h),
           nranges = 1,
           nmeans = 3,
@@ -798,9 +798,9 @@ test_that('all tests conform to the decrees of the God of Stats',{
           lower.tail = FALSE
         )
       ) %>%
-      dplyr::select(P_value_T_mutant_vs_zombie,
-                    P_value_T_mutant_vs_human,
-                    P_value_T_zombie_vs_human) %>%
+      dplyr::select(P_value_A_mutant_vs_zombie,
+                    P_value_A_mutant_vs_human,
+                    P_value_A_zombie_vs_human) %>%
       `rownames<-`(NULL)
   )
 
@@ -1117,7 +1117,7 @@ test_that('all tests conform to the decrees of the God of Stats',{
       .after = dplyr::last_col()
     ) %>%
     dplyr::relocate(
-      dplyr::starts_with("P_value_T", vars = colnames(.data)),
+      dplyr::starts_with("P_value_A", vars = colnames(.data)),
       .after = dplyr::last_col()
     ) %>%
     dplyr::relocate(
@@ -1172,7 +1172,7 @@ test_that('all tests conform to the decrees of the God of Stats',{
     Infection_vs_Mock = dplyr::case_when(
       is.na(cstan_1_0_2$Flag_A_Infection_vs_Mock) ~
         cstan_1_0_2$Flag_G_Infection_vs_Mock,
-      (cstan_1_0_2$P_value_T_Infection_vs_Mock > 0.05 &
+      (cstan_1_0_2$P_value_A_Infection_vs_Mock > 0.05 &
          cstan_1_0_2$P_value_G_Infection_vs_Mock < 0.05) ~
         cstan_1_0_2$Flag_G_Infection_vs_Mock,
       !is.na(cstan_1_0_2$Flag_A_Infection_vs_Mock) ~
@@ -1205,7 +1205,7 @@ test_that('all tests conform to the decrees of the God of Stats',{
       .after = dplyr::last_col()
     ) %>%
     dplyr::relocate(
-      dplyr::starts_with("P_value_T", vars = colnames(.data)),
+      dplyr::starts_with("P_value_A", vars = colnames(.data)),
       .after = dplyr::last_col()
     ) %>%
     dplyr::relocate(
@@ -1282,9 +1282,9 @@ test_that('all tests conform to the decrees of the God of Stats',{
     Infection_high_vs_Infection_low = dplyr::case_when(
       is.na(cstan_2_0_3$Flag_A_Infection_high_vs_Infection_low) ~
         cstan_2_0_3$Flag_G_Infection_high_vs_Infection_low,
-      is.na(cstan_2_0_3$P_value_T_Infection_high_vs_Infection_low) ~
+      is.na(cstan_2_0_3$P_value_A_Infection_high_vs_Infection_low) ~
         cstan_2_0_3$Flag_G_Infection_high_vs_Infection_low,
-      (cstan_2_0_3$P_value_T_Infection_high_vs_Infection_low > 0.05 &
+      (cstan_2_0_3$P_value_A_Infection_high_vs_Infection_low > 0.05 &
          cstan_2_0_3$P_value_G_Infection_high_vs_Infection_low < 0.05) ~
         cstan_2_0_3$Flag_G_Infection_high_vs_Infection_low,
       !is.na(cstan_2_0_3$Flag_A_Infection_high_vs_Infection_low) ~
@@ -1293,9 +1293,9 @@ test_that('all tests conform to the decrees of the God of Stats',{
     Infection_high_vs_Mock_none = dplyr::case_when(
       is.na(cstan_2_0_3$Flag_A_Infection_high_vs_Mock_none) ~
         cstan_2_0_3$Flag_G_Infection_high_vs_Mock_none,
-      is.na(cstan_2_0_3$P_value_T_Infection_high_vs_Mock_none) ~
+      is.na(cstan_2_0_3$P_value_A_Infection_high_vs_Mock_none) ~
         cstan_2_0_3$Flag_G_Infection_high_vs_Mock_none,
-      (cstan_2_0_3$P_value_T_Infection_high_vs_Mock_none > 0.05 &
+      (cstan_2_0_3$P_value_A_Infection_high_vs_Mock_none > 0.05 &
          cstan_2_0_3$P_value_G_Infection_high_vs_Mock_none < 0.05) ~
         cstan_2_0_3$Flag_G_Infection_high_vs_Mock_none,
       !is.na(cstan_2_0_3$Flag_A_Infection_high_vs_Mock_none) ~
@@ -1304,9 +1304,9 @@ test_that('all tests conform to the decrees of the God of Stats',{
     Infection_low_vs_Mock_none = dplyr::case_when(
       is.na(cstan_2_0_3$Flag_A_Infection_low_vs_Mock_none) ~
         cstan_2_0_3$Flag_G_Infection_low_vs_Mock_none,
-      is.na(cstan_2_0_3$P_value_T_Infection_low_vs_Mock_none) ~
+      is.na(cstan_2_0_3$P_value_A_Infection_low_vs_Mock_none) ~
         cstan_2_0_3$Flag_G_Infection_low_vs_Mock_none,
-      (cstan_2_0_3$P_value_T_Infection_low_vs_Mock_none > 0.05 &
+      (cstan_2_0_3$P_value_A_Infection_low_vs_Mock_none > 0.05 &
          cstan_2_0_3$P_value_G_Infection_low_vs_Mock_none < 0.05) ~
         cstan_2_0_3$Flag_G_Infection_low_vs_Mock_none,
       !is.na(cstan_2_0_3$Flag_A_Infection_low_vs_Mock_none) ~
