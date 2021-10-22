@@ -1446,13 +1446,15 @@ test_that('all tests conform to the decrees of the God of Stats',{
   )
   # Calculate the Holm adjusted p-values.
   # Current implementation adjusts p-values even if only one test is performed.
-  # expect_equal(
-  #   afruit_holm_2_0_3[, 11:13],
-  #   data.frame(t(apply(astan_2_0_3[, 11:13],
-  #                      1,
-  #                      p.adjust,
-  #                      method = "holm")))
-  # )
+  expect_equal(
+    unclass(afruit_holm_2_0_3[, 11:13]),
+    unclass(
+      data.frame(t(apply(astan_2_0_3[, 11:13],
+                         1,
+                         p.adjust,
+                         method = "holm")))
+    )
+  )
   expect_equal(
     data.frame(afruit_tuk_2_0_3[, 11:13]),
     tukey_pval_2_0_3
@@ -1483,13 +1485,15 @@ test_that('all tests conform to the decrees of the God of Stats',{
   )
   # Calculate the Holm adjusted p-values.
   # Current implementation adjusts p-values even if only one test is performed.
-  # expect_equal(
-  #   afruit_holm_1_1_3[, 11:13],
-  #   data.frame(t(apply(astan_1_1_3[, 11:13],
-  #                      1,
-  #                      p.adjust,
-  #                      method = "holm")))
-  # )
+  expect_equal(
+    unclass(afruit_holm_1_1_3[, 11:13]),
+    unclass(
+      data.frame(t(apply(astan_1_1_3[, 11:13],
+                         1,
+                         p.adjust,
+                         method = "holm")))
+    )
+  )
   expect_equal(
     data.frame(afruit_tuk_1_1_3[, 11:13]),
     tukey_pval_1_1_3
