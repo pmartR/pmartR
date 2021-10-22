@@ -342,6 +342,8 @@ test_that('all tests conform to the decrees of the God of Stats',{
     nona_mNone = rowSums(!is.na(afilta_2_0_3$e_data[, 11:13]))
   )
 
+  nona_grps_2_0_3 <- rowSums(group_counts_2_0_3 != 0)
+
   sigma_2_0_3 <- dplyr::rowwise(afilta_2_0_3$e_data[, -1]) %>%
     dplyr::mutate(
       stdev = summary(lm(
@@ -376,15 +378,21 @@ test_that('all tests conform to the decrees of the God of Stats',{
 
   pval_a_2_0_3 <- test_stat_2_0_3 %>%
     dplyr::mutate(
-      P_value_T_Infection_high_vs_Infection_low = pt(q = abs(stat_high_low),
-                                                     df = nona_counts_2_0_3 - 3,
-                                                     lower.tail = FALSE) * 2,
-      P_value_T_Infection_high_vs_Mock_none = pt(q = abs(stat_high_none),
-                                                 df = nona_counts_2_0_3 - 3,
-                                                 lower.tail = FALSE) * 2,
-      P_value_T_Infection_low_vs_Mock_none = pt(q = abs(stat_low_none),
-                                                df = nona_counts_2_0_3 - 3,
-                                                lower.tail = FALSE) * 2
+      P_value_T_Infection_high_vs_Infection_low = pt(
+        q = abs(stat_high_low),
+        df = nona_counts_2_0_3 - nona_grps_2_0_3,
+        lower.tail = FALSE
+      ) * 2,
+      P_value_T_Infection_high_vs_Mock_none = pt(
+        q = abs(stat_high_none),
+        df = nona_counts_2_0_3 - nona_grps_2_0_3,
+        lower.tail = FALSE
+      ) * 2,
+      P_value_T_Infection_low_vs_Mock_none = pt(
+        q = abs(stat_low_none),
+        df = nona_counts_2_0_3 - nona_grps_2_0_3,
+        lower.tail = FALSE
+      ) * 2
     ) %>%
     dplyr::select(P_value_T_Infection_high_vs_Infection_low,
                   P_value_T_Infection_high_vs_Mock_none,
@@ -649,17 +657,17 @@ test_that('all tests conform to the decrees of the God of Stats',{
       lg = group_counts_1_1_3$n_grp,
       P_value_T_mutant_vs_zombie = pt(
         q = abs(stat_m_z),
-        df = nona_counts_1_1_3 - 3,
+        df = nona_counts_1_1_3 - (3 - lg),
         lower.tail = FALSE
       ) * 2,
       P_value_T_mutant_vs_human = pt(
         q = abs(stat_m_h),
-        df = nona_counts_1_1_3 - 3,
+        df = nona_counts_1_1_3 - (3 - lg),
         lower.tail = FALSE
       ) * 2,
       P_value_T_zombie_vs_human = pt(
         q = abs(stat_z_h),
-        df = nona_counts_1_1_3 - 3,
+        df = nona_counts_1_1_3 - (3 - lg),
         lower.tail = FALSE
       ) * 2
     ) %>%
@@ -1524,12 +1532,10 @@ test_that('all tests conform to the decrees of the God of Stats',{
                        method = "holm")))
   )
 
-  # Combined: Unadjusted p-values ---------------
+  # Combined output ---------------
 
   expect_equal(cfruit_1_0_2, cstan_1_0_2)
   expect_equal(cfruit_2_0_3, cstan_2_0_3)
-
-  # Combined: Adjusted p-values ---------------
 
   # Test argument checks -------------------------------------------------------
 
