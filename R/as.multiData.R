@@ -2,26 +2,42 @@
 #'
 #'@param ... At least two objects of type 'pepData', 'proData', 'metabData',
 #'   'lipidData', or 'nmrData', usually created by \code{\link{as.pepData}}
-#'@param f_meta A data.frame containing sample and group information for all 
+#'@param f_meta A data.frame containing sample and group information for all
 #'omicsData objects supplied to the function.
 #'@param sample_intersect Should only the samples that are common across all
 #'datasets be kept in f_meta?  See details for how samples will be dropped.
-#'@param combine_lipids Whether to combine lipid-data objects if two are present
-#'defaults to FALSE.
+#'@param combine_lipids Whether to combine lipid-data objects if two are 
+#'present.  Defaults to FALSE.
+#'@param match_samples Whether to attempt to match the names in the sample 
+#'columns in f_data across all objects in an attempt to align them in f_meta.
+#'Defaults to TRUE.
+#'@param keep_sample_info Whether to attempt to append sample information 
+#'contained in the objects f_data to the final f_meta via a series of left 
+#'joins.  Defaults to FALSE.
+#'@param auto_fmeta Whether to attempt to automatically construct f_meta from
+#'objects sample information.  Defaults to FALSE.
 #'
 #'@export
-as.multiData <- function(..., f_meta = NULL, sample_intersect = F, combine_lipids = F) {
+as.multiData <-
+  function(...,
+           f_meta = NULL,
+           sample_intersect = F,
+           combine_lipids = F,
+           match_samples = T,
+           keep_sample_info = F,
+           auto_fmeta = F) {
   omicsData_objects <- list(...)
-  
+    
   if(length(omicsData_objects) < 2) stop("Must provide at least two datasets.")
   
   # combine lipids, return if there is only one lipid object.
+  obj_types <- sapply(omicsData_objects, class)
+  
   if (combine_lipids & sum(obj_types %in% c("lipidData")) == 2) {
-    obj_types <- sapply(omicsData_objects, class)
     lipid_objects = omicsData_objects[which(obj_types %in% c("lipidData"))]
     combined_lipids = combine_omicsData(lipid_objects[[1]], lipid_objects[[2]])
     
-    omicsData_objects = omicsData_objects[-which(!(obj_types %in% c("lipidData")))]
+    omicsData_objects = omicsData_objects[-which(obj_types %in% c("lipidData"))]
     omicsData_objects[[length(omicsData_objects) + 1]] = combined_lipids
     
     if(length(omicsData_objects) < 2){
@@ -31,12 +47,35 @@ as.multiData <- function(..., f_meta = NULL, sample_intersect = F, combine_lipid
     }
   }
   
+  # Objects must either be all ungrouped ...
+  is_grouped <- sapply(omicsData_objects, 
+                         function(x) !is.null(attr(x, "group_DF")))
+  if(length(unique(is_grouped)) != 1) {
+    stop("All objects must be grouped or ungrouped")
+  }
+  
+  # ... or all grouped and have the same sample names.
+  if(all(is_grouped)) {
+    for(i in 1:(length(omicsData_objects) - 1)) {
+      g1 = attr(omicsData_objects[[i]], "group_DF")$Group
+      g2 = attr(omicsData_objects[[i + 1]], "group_DF")$Group
+      grp_diff = setdiff(
+        union(g1, g2),
+        intersect(g1, g2)
+      )
+      
+      if(length(grp_diff) > 0) stop("If objects are grouped, they must have the same group assignments")
+    }
+  }
+  
   # validate object types
   for(obj in omicsData_objects){
     if(!inherits(obj, c('pepData', 'proData', 'metabData','lipidData', 'nmrData'))){
-      stop(sprintf("Object was expected to have one of type 'pepData', 'proData',
-                   'metabData','lipidData', or 'nmrData', but was of type %s",
-                   paste(class(obj), collapse = ", ")))
+      wrap_stop( 
+        sprintf("Object was expected to have one of type 'pepData', 'proData', 
+                'metabData','lipidData', or 'nmrData', but was of type %s",
+                 paste(class(obj), collapse = ", "))
+        )
     }
   }
   
@@ -46,8 +85,8 @@ as.multiData <- function(..., f_meta = NULL, sample_intersect = F, combine_lipid
   })
   
   if(length(unique(data_scales)) != 1) {
-    stop(sprintf("Expected all data to be on the same scale, got data scales:
-                 %s", paste(data_scales, collapse = ", ")))
+    stop(sprintf("Expected all data to be on the same scale, got data scales: %s", 
+                 paste(data_scales, collapse = ", ")))
   } 
   
   is_normed <- sapply(omicsData_objects, function(obj) {
@@ -55,8 +94,11 @@ as.multiData <- function(..., f_meta = NULL, sample_intersect = F, combine_lipid
   })
   
   if(length(unique(is_normed)) != 1) {
-    stop(sprintf("Expected all data to be either normalized or unnormalized, 
-                 got normalizations statuses: %s", paste(is_normed, collapse = ", ")))
+    wrap_stop(
+          sprintf("Expected all data to be either normalized or unnormalized, 
+                  got normalizations statuses: %s", 
+                 paste(is_normed, collapse = ", "))
+          )
   }
   ##
   
@@ -76,67 +118,137 @@ as.multiData <- function(..., f_meta = NULL, sample_intersect = F, combine_lipid
     stop("There must be no more than 1 object of type 'nmrData'")
   }
   
+  ## f_meta construction
   if(!is.null(f_meta)) {
     res <- fmeta_matches(omicsData_objects, f_meta)
+    
     if(any(sapply(res, length) == 0)) {
       bad_object_classes = classes[sapply(res, length) == 0]
-      stop(sprintf("Objects of the following types did not have a column in
-                   f_meta that contained all samples: %s", 
-                   paste(bad_object_classes, collapse = " | ")))
+      wrap_stop(sprintf(
+          "Objects of the following types did not have a column in f_meta that 
+          contained all samples: %s", 
+          paste(bad_object_classes, collapse = " | ")
+        )
+      )
     }
-  } else {
-    message("Manually combining sample information to make f_meta, this assumes 
-            that your sample information is row-aligned.")
     
+    fmeta_cnames <- find_fmeta_cnames(res)
+    
+  } else if (auto_fmeta){
+    # Check here if f_meta is all the same
+    message("Manually combining sample information to make f_meta.")
     fmeta_cols <- lapply(omicsData_objects, function(obj) {
       obj$f_data[,get_fdata_cname(obj)]
     })
     
-    # pad the length of each sample info vector the max length
+    # pad the length of each sample info vector to the max length
     maxlen = max(sapply(fmeta_cols, length))
     
-    f_meta_cols <- lapply(fmeta_cols, function(x) {
+    fmeta_cols <- lapply(fmeta_cols, function(x) {
       length(x) <- maxlen
       return(x)
     })
     
-    f_meta_cnames <- sapply(omicsData_objects, function(obj) {
+    ## Sample matching and intersect.
+    
+    # 
+    allsamps <- unique(unlist(fmeta_cols))
+    allsamps <- allsamps[!is.na(allsamps)]
+    
+    shared_samps <- allsamps
+    for(col in fmeta_cols) {
+      shared_samps <- intersect(shared_samps, col)
+    }
+    
+    if(match_samples) {
+      extra_samps = setdiff(allsamps, shared_samps)
+      
+      fmeta_cols <- lapply(fmeta_cols, function(col) {
+        append_samps = extra_samps
+        append_samps[which(!(extra_samps %in% col))] <- NA
+        c(shared_samps, append_samps)
+      })
+    } else {
+      wrap_message(
+        "You chose not to match samples across datasets when creating f_meta 
+        from sample information.  This assumes your sample identifiers are 
+        row-aligned.")
+    }
+    
+    # 
+    fmeta_cnames <- sapply(omicsData_objects, function(obj) {
       paste(get_fdata_cname(obj), class(obj), sep = "_")
-    })
+    }) %>% make.unique()
     
     if(sample_intersect) {
-      allsamps <- unique(unlist(f_meta))
-      allsamps <- allsamps[!is.na(allsamps)]
-      
-      for(col in f_meta_cols) {
-        allsamps <- intersect(allsamps, col)
-      }
-      
-      if(length(allsamps) < 3) stop("There were fewer than 3 samples that appear in all datasets.")
-      
       # f_meta will simply be the concatenation of the same vector, which is the
       # intersection of all sample ids.
       f_meta <- cbind.data.frame(
-        lapply(1:length(f_meta_cnames), function(x) allsamps)
+        lapply(1:length(fmeta_cnames), function(x) shared_samps)
       ) 
       
       # apply a custom filter to all datasets, keeping only the intersect of
       # all samples
       omicsData_objects <- lapply(omicsData_objects, function(obj) {
-        filt_ <- custom_filter(obj, f_data_keep = allsamps)
+        filt_ <- custom_filter(obj, f_data_keep = shared_samps)
         applyFilt(filt_, obj)
       })
       
     } else {
+      if(any(sapply(fmeta_cols, function(x) any(is.na(x))))) {
+        wrap_message( 
+          "Some samples are not present across all datasets, consider keeping 
+          only the intersect with sample_intersect = TRUE")
+      }
       f_meta <- cbind.data.frame(fmeta_cols) 
     }
-  
-    colnames(f_meta) <- f_meta_cnames
     
-    # Do we want to left join the f_data information from all datasets?
+    colnames(f_meta) <- fmeta_cnames
+  } else {
+    check_fdatas <- lapply(omicsData_objects, function(obj) {
+      fmeta_matches(omicsData_objects, obj$f_data)
+    })
+    
+    unique_cols <- sapply(check_fdatas, function(x) {
+      if(all(sapply(x, length) > 0)) {
+        unique(unlist(x))
+      } else NULL
+    })
+    
+    if(!any(!is.null(unique_cols))) {
+      wrap_stop("No f_meta was provided, and none of the sample information
+                were valid f_meta.  Either provide a valid f_meta, or specify
+                auto_fmeta = T to try and have an f_meta constructed from 
+                combined sample information.")
+    }
+    
+    max_vals = which.max(sapply(unique_cols, length))
+    res <- check_fdatas[[max_vals]]
+    
+    fmeta_cnames <- find_fmeta_cnames(res)
+    
+    f_meta <- omicsData_objects[[max_vals]] %>% 
+      dplyr::select(fmeta_cnames)
+    
+  }
+  
+  if(any(sapply(f_meta, function(x) sum(!is.na(x))) < 3)) {
+    stop("There were fewer than 3 samples that appear in all datasets.")
+  }
+  
+  #' left join sample info across all objects
+  if(keep_sample_info) {
+    for(i in 1:length(omicsData_objects)) {
+      f_meta <- f_meta %>% 
+        dplyr::left_join(
+          omicsData_objects[[i]]$f_data, 
+          by = setNames(get_fdata_cname(omicsData_objects[[i]]), fmeta_cnames[i])
+        )
+    }
   }
   
   res <- list("omicsData" = omicsData_objects, "f_meta" = f_meta)
+  attr(res, "fmeta_samp_cname") <- fmeta_cnames
   class(res) <- "multiData"
   
   return(res)
@@ -149,6 +261,9 @@ as.multiData <- function(..., f_meta = NULL, sample_intersect = F, combine_lipid
 #' information matching that in f_meta
 #' @param f_meta passed from \code{as.multiData}
 #' 
+#' @return A list, each element of which contains a character vector of column
+#' name matches in f_meta for each omicsData object.
+#' 
 #' @keywords internal
 fmeta_matches <- function(omicsData_objects, f_meta){
   res <- lapply(omicsData_objects, function(obj) {
@@ -159,6 +274,26 @@ fmeta_matches <- function(omicsData_objects, f_meta){
     if(sum(has_col) > 0) colnames(f_meta)[has_col] else NULL
     
   })
+  
+  return(res)
+}
+
+#' Set column names in f_meta for each object.  May result in duplicates.
+#' 
+#' @param res The output of \code{fmeta_matches}, A list, the i-th element of 
+#' which contains a character vector of column name matches in f_meta for the 
+#' i-th omicsData object.
+#' 
+#' @return Character vector containing a column name in f_meta that the i-th 
+#' object matches to
+find_fmeta_cnames <- function(res) {
+  fmeta_cnames <- character(length(res))
+  
+  for(i in order(sapply(res, length))){
+    rem_cols <- setdiff(res[[i]], fmeta_cnames)
+    fmeta_cnames[i] <- if(length(rem_cols) == 0) res[[i]][1] else rem_cols[1]
+  }
+  return(fmeta_cnames)
 }
 
 #' 

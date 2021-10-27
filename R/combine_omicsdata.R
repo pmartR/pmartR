@@ -110,7 +110,7 @@ combine_omicsData <- function(obj_1, obj_2, retain_groups = FALSE, retain_filter
     
     if (length(unique(new_emeta_ids)) != 
         length(unique(emeta_ids_1)) + length(unique(emeta_ids_2))) {
-      warning("There were e_meta identifiers that occurred in both datasets,
+      wrap_warning("There were e_meta identifiers that occurred in both datasets,
               they have been duplicated in the new object's e_meta.")
     }
     
