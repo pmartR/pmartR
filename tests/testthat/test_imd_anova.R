@@ -47,6 +47,7 @@ test_that('all tests conform to the decrees of the God of Stats',{
   fdataZ$Condition <- c(sample(c("zombie", "mutant"), 9, replace = TRUE),
                         "human", "human", "human")
   fdataZ$Gender <- sample(c("F", "M"), 12, replace = TRUE)
+  fdataZ$Age <- round(runif(12, min = 19, max = 89), 2)
 
   # Create pepData objects, log the data, add group_DF attributes --------------
 
@@ -499,28 +500,31 @@ test_that('all tests conform to the decrees of the God of Stats',{
   attr(astan_2_0_3, "data_class") <- "pepData"
 
   tukey_stat_2_0_3 <- test_stat_2_0_3 * sqrt(2)
+
+  n_tests_2_0_3 <- rowSums(!is.na(tukey_stat_2_0_3))
+
   suppressWarnings(
     tukey_pval_2_0_3 <- tukey_stat_2_0_3 %>%
       dplyr::mutate(
         P_value_A_Infection_high_vs_Infection_low = ptukey(
           abs(stat_high_low),
           nranges = 1,
-          nmeans = 3,
-          df = nona_counts_2_0_3 - 3,
+          nmeans = n_tests_2_0_3,
+          df = nona_counts_2_0_3 - n_tests_2_0_3,
           lower.tail = FALSE
         ),
         P_value_A_Infection_high_vs_Mock_none = ptukey(
           abs(stat_high_none),
           nranges = 1,
-          nmeans = 3,
-          df = nona_counts_2_0_3 - 3,
+          nmeans = n_tests_2_0_3,
+          df = nona_counts_2_0_3 - n_tests_2_0_3,
           lower.tail = FALSE
         ),
         P_value_A_Infection_low_vs_Mock_none = ptukey(
           abs(stat_low_none),
           nranges = 1,
-          nmeans = 3,
-          df = nona_counts_2_0_3 - 3,
+          nmeans = n_tests_2_0_3,
+          df = nona_counts_2_0_3 - n_tests_2_0_3,
           lower.tail = FALSE
         )
       ) %>%
@@ -605,6 +609,8 @@ test_that('all tests conform to the decrees of the God of Stats',{
     dplyr::rowwise() %>%
     dplyr::mutate(n_grp = sum(dplyr::c_across(nona_mutant:nona_human) == 0)) %>%
     dplyr::ungroup()
+
+  nona_grps_1_1_3 <- rowSums(group_counts_1_1_3[, 1:3] != 0)
 
   vari_1_1_3 <- adj_data_1_1_3 %>%
     dplyr::mutate(mMutant = mean_a_1_1_3$Mean_mutant,
@@ -773,28 +779,31 @@ test_that('all tests conform to the decrees of the God of Stats',{
   attr(astan_1_1_3, "data_class") <- "pepData"
 
   tukey_stat_1_1_3 <- test_stat_1_1_3 * sqrt(2)
+
+  n_tests_1_1_3 <- rowSums(!is.na(tukey_stat_1_1_3))
+
   suppressWarnings(
     tukey_pval_1_1_3 <- tukey_stat_1_1_3 %>%
       dplyr::mutate(
         P_value_A_mutant_vs_zombie = ptukey(
           abs(stat_m_z),
           nranges = 1,
-          nmeans = 3,
-          df = nona_counts_1_1_3 - 3,
+          nmeans = n_tests_1_1_3,
+          df = nona_counts_1_1_3 - n_tests_1_1_3,
           lower.tail = FALSE
         ),
         P_value_A_mutant_vs_human = ptukey(
           abs(stat_m_h),
           nranges = 1,
-          nmeans = 3,
-          df = nona_counts_1_1_3 - 3,
+          nmeans = n_tests_1_1_3,
+          df = nona_counts_1_1_3 - n_tests_1_1_3,
           lower.tail = FALSE
         ),
         P_value_A_zombie_vs_human = ptukey(
           abs(stat_z_h),
           nranges = 1,
-          nmeans = 3,
-          df = nona_counts_1_1_3 - 3,
+          nmeans = n_tests_1_1_3,
+          df = nona_counts_1_1_3 - n_tests_1_1_3,
           lower.tail = FALSE
         )
       ) %>%
@@ -1335,7 +1344,7 @@ test_that('all tests conform to the decrees of the God of Stats',{
 
   afruit_1_1_3 <- imd_anova(afilta_1_1_3,
                             test_method = "anova",
-                            covariates = fdataZ[, c(1, 3)])
+                            covariates = "Gender")
   gfruit_1_1_3 <- imd_anova(gfilta_1_1_3, test_method = "gtest")
   cfruit_1_1_3 <- imd_anova(cfilta_1_1_3, test_method = "combined")
 
@@ -1392,19 +1401,19 @@ test_that('all tests conform to the decrees of the God of Stats',{
 
   afruit_bon_1_1_3 <- imd_anova(afilta_1_1_3, test_method = "anova",
                                 pval_adjust_a = "bonferroni",
-                                covariates = fdataZ[, c(1, 3)])
+                                covariates = "Gender")
   afruit_holm_1_1_3 <- imd_anova(afilta_1_1_3, test_method = "anova",
                                  pval_adjust_a = "holm",
-                                 covariates = fdataZ[, c(1, 3)])
+                                 covariates = "Gender")
   afruit_tuk_1_1_3 <- imd_anova(afilta_1_1_3, test_method = "anova",
                                 pval_adjust_a = "tukey",
-                                covariates = fdataZ[, c(1, 3)])
+                                covariates = "Gender")
   # Set a seed because the mvtnorm::pmvt function--which is called when doing a
   # Dunnett p-value correction--has a random process.
   set.seed(3)
   afruit_dun_1_1_3 <- imd_anova(afilta_1_1_3, test_method = "anova",
                                 pval_adjust_a = "dunnett",
-                                covariates = fdataZ[, c(1, 3)])
+                                covariates = "Gender")
 
   gfruit_bon_1_0_2 <- imd_anova(gfilta_1_0_2, test_method = "gtest",
                                 pval_adjust_g = "bonferroni")
