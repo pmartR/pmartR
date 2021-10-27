@@ -1020,10 +1020,6 @@ wrap_message <- function(..., prefix = " ", initial = ""){
   message(strwrap(..., prefix = prefix, initial = initial))
 }
 
-wrap_stop <- function(..., prefix = " ", initial = ""){
-  stop(strwrap(..., prefix = prefix, initial = initial))
-}
-
 wrap_warning <- function(..., prefix = " ", initial = ""){
   warning(strwrap(..., prefix = prefix, initial = initial))
 }
