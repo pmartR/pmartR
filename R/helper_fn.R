@@ -1030,3 +1030,17 @@ wrap_stop <- function(..., prefix = " ", initial = ""){
 wrap_warning <- function(..., prefix = " ", initial = ""){
   warning(strwrap(..., prefix = prefix, initial = initial))
 }
+
+#' Custom message functions to pretty-print text with newlines so you can follow
+#' character limit guidelines in source code.
+wrap_message <- function(..., prefix = " ", initial = ""){
+  message(strwrap(..., prefix = prefix, initial = initial))
+}
+
+wrap_stop <- function(..., prefix = " ", initial = ""){
+  stop(strwrap(..., prefix = prefix, initial = initial))
+}
+
+wrap_warning <- function(..., prefix = " ", initial = ""){
+  warning(strwrap(..., prefix = prefix, initial = initial))
+}
