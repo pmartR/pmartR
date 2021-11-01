@@ -1,6 +1,6 @@
-#' Combines two omicsdata objects with identical sample information.
+#' Combines two omicsData objects with identical sample information.
 #'
-#' @param obj_1/obj_2 Two omicsData objects of the same supported type, 
+#' @param obj_1,obj_2 Two omicsData objects of the same supported type, 
 #' currently "lipidData".  See details for more requirements.
 #' @param retain_groups Whether to attempt to apply existing group information 
 #' to the new object (defaults to FALSE).
@@ -18,8 +18,10 @@
 #' * group designation:  Objects must have the same grouping structure if retain_groups = T.
 #' 
 #' @md
+#'
 #' @export
-combine_omicsData <- function(obj_1, obj_2, retain_groups = FALSE, retain_filters = FALSE) {
+#' 
+combine_lipidData <- function(obj_1, obj_2, retain_groups = FALSE, retain_filters = FALSE) {
   if (class(obj_1) != class(obj_2)) {
     stop(sprintf(
       "Objects must be of the same class, found %s and %s",
@@ -69,8 +71,8 @@ combine_omicsData <- function(obj_1, obj_2, retain_groups = FALSE, retain_filter
   
   ## Create the combined e_data
   
-  #' we will use the e_data cname from the first object, we did not require that
-  #' they both have the same e_data_cname.
+  # we will use the e_data cname from the first object, we did not require that
+  # they both have the same e_data_cname.
   new_edata_cname = get_edata_cname(obj_1)
   
   # bind the two data frames
@@ -83,13 +85,13 @@ combine_omicsData <- function(obj_1, obj_2, retain_groups = FALSE, retain_filter
       ))
   )
   
-  #' Combined f_data is simply a left join, since we require the sample names
-  #' are the same.
+  # Combined f_data is simply a left join, since we require the sample names
+  # are the same.
   new_fdata <- obj_1$f_data %>% 
     dplyr::left_join(obj_2$f_data, 
                      by = setNames(get_fdata_cname(obj_2), get_fdata_cname(obj_1)))
   
-  #' Combine e_meta in the same way as e_data if it exists in both datasets.
+  # Combine e_meta in the same way as e_data if it exists in both datasets.
   if(!is.null(obj_1$e_meta) & !is.null(obj_2$e_meta)) {
     new_emeta_cname = get_emeta_cname(obj_1)
     
@@ -102,8 +104,8 @@ combine_omicsData <- function(obj_1, obj_2, retain_groups = FALSE, retain_filter
         ))
     )
     
-    #' Check and warn about non-unique e_meta identifiers, this is pre-empting a
-    #' situation where this function can take objects with pepData-like e_meta.
+    # Check and warn about non-unique e_meta identifiers, this is pre-empting a
+    # situation where this function can take objects with pepData-like e_meta.
     new_emeta_ids = new_emeta[,new_emeta_cname]
     emeta_ids_1 = obj_1$e_meta[,get_emeta_cname(obj_1)]
     emeta_ids_2 = obj_2$e_meta[,get_emeta_cname(obj_2)]
@@ -142,8 +144,8 @@ combine_omicsData <- function(obj_1, obj_2, retain_groups = FALSE, retain_filter
     attr(new_object, "filters") = filters
   }
   
-  #' Set the group designation of the new object, we assume that the grouping is
-  #' consistent across both objects.
+  # Set the group designation of the new object, we assume that the grouping is
+  # consistent across both objects.
   if(retain_groups) {
     if(is.null(attr(obj_1, "group_DF")) & is.null(attr(obj_2, "group_DF"))) {
       stop("At least one object must have group information")

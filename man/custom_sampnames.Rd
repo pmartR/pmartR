@@ -10,7 +10,9 @@ custom_sampnames(
   from = NULL,
   to = NULL,
   delim = NULL,
-  components = NULL
+  components = NULL,
+  pattern = NULL,
+  ...
 )
 }
 \arguments{
@@ -31,6 +33,11 @@ as the sample name}
 
 \item{components}{an integer vector specifying which components separated by
 delim to keep as sample name}
+
+\item{pattern}{string, regex pattern to use to extract substrings from the 
+sample names.}
+
+\item{...}{extra arguments passed to regexpr if pattern is specified}
 }
 \description{
 This helper function creates custom sample names for plot data object

@@ -1,54 +1,79 @@
-#'Create a `multiData` object from multiple omicsData objects
+#' Create a `multiData` object from multiple omicsData objects
 #'
-#'@param ... At least two objects of type 'pepData', 'proData', 'metabData',
+#' @param ... At least two objects of type 'pepData', 'proData', 'metabData',
 #'   'lipidData', or 'nmrData', usually created by \code{\link{as.pepData}}
-#'@param f_meta A data.frame containing sample and group information for all
-#'omicsData objects supplied to the function.
-#'@param sample_intersect Should only the samples that are common across all
-#'datasets be kept in f_meta?  See details for how samples will be dropped.
-#'@param combine_lipids Whether to combine lipid-data objects if two are 
-#'present.  Defaults to FALSE.
-#'@param keep_sample_info Whether to attempt to append sample information 
-#'contained in the objects f_data to the final f_meta via a series of left 
-#'joins.  Defaults to FALSE.
-#'@param auto_fmeta Whether to attempt to automatically construct f_meta from
-#'objects sample information.  Defaults to FALSE.
-#'@param match_samples If auto_fmeta = T, whether to attempt to match the 
-#'names in the sample columns in f_data across all objects in an attempt to 
-#'align them in f_meta.  Defaults to TRUE.
+#' @param f_meta A data.frame containing sample and group information for all
+#' omicsData objects supplied to the function.
+#' @param sample_intersect Should only the samples that are common across all
+#' datasets be kept in f_meta?  See details for how samples will be dropped.
+#' @param keep_sample_info Whether to attempt to append sample information 
+#' contained in the objects f_data to the final f_meta via a series of left 
+#' joins.  Defaults to FALSE.
+#' @param auto_fmeta Whether to attempt to automatically construct f_meta from
+#' objects sample information.  Defaults to FALSE.
+#' @param match_samples If auto_fmeta = T, whether to attempt to match the 
+#' names in the sample columns in f_data across all objects in an attempt to 
+#' align them in f_meta.  Defaults to TRUE.
 #'
-#'@return Object of class 'multiData' containing the omicsData objects, and the
+#' @return Object of class 'multiData' containing the omicsData objects, and the
 #'sample alignment information f_meta.
 #'
-#'@export
+#' @details 
+#' Object limits:  Currently, as.multiData accepts at most one object from each 
+#' of classes 'pepData/proData', 'metabData', 'nmrData', and at most two objects 
+#' of class 'lipidData'. 
+#' 
+#' \code{sample_intersect} will auto-align samples that occur in all datasets.
+#' Specifically, it creates a vector of all samples that are common across all
+#' datasets, and simply create an f_meta by copying this vector for each
+#' dataset and column-binding them.
+#' 
+#' 
+#' @seealso \code{\link{combine_lipidData}} If you want to combine lipidData objects
+#' before providing them to as.multiData
+#' 
+#' @examples
+#'
+#' \dontrun{
+#' library(pmartRdata)
+#' library(pmartR)
+#' 
+#' # Combine lipid and protein object into multidata, both must be log2 + normalized.
+#' mylipid_object <- edata_transform(lipid_object, "log2")
+#' mylipid_object <- normalize_global(mylipid_object, "all", "median", apply_norm = T)
+#' 
+#' # Combine without specifically supplying f_meta, either directly, or as one
+#' # of the f_datas in any object.
+#' mymultidata <- as.multiData(pro_object, mylipid_object, auto_fmeta = T)
+#' 
+#' # Manually supply an f_meta
+#' f_meta <- data.frame(
+#' "Proteins" = c(paste0("Mock", 1:3), paste0("Infection", c(1:7)), NA,  "Infection9"),
+#' "Lipids" = c(paste0("Mock", 1:3), paste0("Infection", c(1:4)), NA, paste0("Infection", c(6:9))),
+#' "Metabolites" = c(paste0("Mock", 1:3), paste0("Infection", c(1:9))),
+#' "Condition" = c(rep("A", 3), rep("B", 9))
+#' )
+#' 
+#' mymetab_object <- edata_transform(metab_object, "log2")
+#' mymetab_object <- normalize_global(mymetab_object, "all", "median", apply_norm = T)
+#' 
+#' as.multiData(mylipid_object, pro_object, mymetab_object, f_meta = f_meta)
+#' # remove samples that are not common across all data.
+#' as.multiData(mylipid_object, pro_object, mymetab_object, f_meta = f_meta, sample_intersect = T)
+#' }
+#' 
+#' @export
+#'
 as.multiData <-
   function(...,
            f_meta = NULL,
            sample_intersect = F,
-           combine_lipids = F,
            match_samples = T,
            keep_sample_info = F,
            auto_fmeta = F) {
   omicsData_objects <- list(...)
     
   if(length(omicsData_objects) < 2) stop("Must provide at least two datasets.")
-  
-  # combine lipids, return if there is only one lipid object.
-  obj_types <- sapply(omicsData_objects, class)
-  
-  if (combine_lipids & sum(obj_types %in% c("lipidData")) == 2) {
-    lipid_objects = omicsData_objects[which(obj_types %in% c("lipidData"))]
-    combined_lipids = combine_omicsData(lipid_objects[[1]], lipid_objects[[2]])
-    
-    omicsData_objects = omicsData_objects[-which(obj_types %in% c("lipidData"))]
-    omicsData_objects[[length(omicsData_objects) + 1]] = combined_lipids
-    
-    if(length(omicsData_objects) < 2){
-      res <- list("omicsData" = omicsData_objects, "f_meta" = NULL)
-      class(res) <- "multiData"
-      return(res)
-    }
-  }
   
   # Objects must either be all ungrouped ...
   is_grouped <- sapply(omicsData_objects, 
@@ -165,8 +190,8 @@ as.multiData <-
       return(x)
     })
     
-    #' only match samples in auto_fmeta mode, trust that data frames with sample
-    #' information are properly aligned
+    # only match samples in auto_fmeta mode, trust that data frames with sample
+    # information are properly aligned
     if(match_samples) {
       allsamps <- unique(unlist(fmeta_cols))
       allsamps <- allsamps[!is.na(allsamps)]
@@ -310,6 +335,8 @@ fmeta_matches <- function(omicsData_objects, f_meta){
 #' 
 #' @return Character vector containing a column name in f_meta that the i-th 
 #' object matches to
+#' 
+#' @keywords internal
 find_fmeta_cnames <- function(res) {
   fmeta_cnames <- character(length(res))
   

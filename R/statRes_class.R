@@ -138,6 +138,7 @@ print.statRes <- function(x,...){
 #'  \item{"fcheatmap"} Heatmap showing all biomolecules across comparisons, colored by fold change.
 #' }
 #' 
+#' @importFrom patchwork plot_layout
 #' @export
 #' @method plot statRes
 #' @examples 

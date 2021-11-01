@@ -1000,7 +1000,7 @@ combine_fn_median <- function (x) median(x, na.rm = T)
 #'@return vector of column names of df that contain exactly all the elements of
 #'the input column
 #'
-#'@keywords Internal
+#'@keywords internal
 column_matches_exact <- function(df, col) {
   diffs = lapply(df, function(df_col) {
     length(setdiff(
@@ -1016,6 +1016,7 @@ column_matches_exact <- function(df, col) {
 
 #' Custom message functions to pretty-print text with newlines so you can follow
 #' character limit guidelines in source code.
+#' @noRd
 wrap_message <- function(..., prefix = " ", initial = ""){
   message(strwrap(..., prefix = prefix, initial = initial))
 }
