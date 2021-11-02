@@ -327,7 +327,8 @@ fmeta_matches <- function(omicsData_objects, f_meta){
   return(res)
 }
 
-#' Set column names in f_meta for each object.  May result in duplicates.
+#' Find column names in f_meta for each object.  May return in two objects
+#' sharing the same column name.
 #' 
 #' @param res The output of \code{fmeta_matches}, A list, the i-th element of 
 #' which contains a character vector of column name matches in f_meta for the 
