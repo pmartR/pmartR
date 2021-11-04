@@ -107,19 +107,31 @@ anova_test <- function (omicsData, comparisons, pval_adjust,
   #   stop("Dunnett adjustment for multiple comparisions should only be used when all case-vs-control comparisons are being made; try a 'Tukey' adjustment.")
   # }
 
-  #------Remove rows in "groupData" that don't have corresponding columns in 'omicsData$edata'-------###
+  # Delete the following line? -------------------------------------------------
   samp_cname <- attr(omicsData,"cnames")$samp_cname
   if(is.null(samp_cname)){ #Added becuase "samp_cname" has been replaced with "fdata_cname"
     samp_cname <- attr(omicsData,"cnames")$fdata_cname
   }
-  group_samp_cname <- groupData[,samp_cname] #The sampleIDs in groupData (possibly more than is in the e_data)
-  groupData <- groupData[group_samp_cname%in%colnames(omicsData$e_data),] #Only keep the rows of groupData that have columns in e_data
+
+  # 10/27/2021 Not sure when/if the columns in e_data could be different from
+  # the rows in group_DF. We are leaving the following code how it is to prevent
+  # any unforeseen and unfortunate cases where groupData (the group_DF
+  # attribute) has more columns than e_data (yikes!).
+
+  # Remove rows in "groupData" that don't have corresponding columns in
+  # 'omicsData$edata'
+  # The sampleIDs in groupData (possibly more than is in the e_data)
+  group_samp_cname <- groupData[,samp_cname]
+  # Only keep the rows of groupData that have columns in e_data
+  groupData <- groupData[group_samp_cname%in%colnames(omicsData$e_data),]
 
   #Create a data matrix that only includes the samples in "groupData" and put them in the order specified by
   #"groupData"
   data <- omicsData$e_data[,as.character(groupData[,samp_cname])]
 
-  ###--------If paired==TRUE then use the pairing to create pair adjusted abundances-------------###
+  # Paired stuffs --------------------------------------------------------------
+
+  # If paired==TRUE then use the pairing to create pair adjusted abundances.
   if(paired){
     ##--- check for one and only one "pair" column in f_data ----##
     fdata_names <- tolower(colnames(omicsData$f_data))
@@ -181,7 +193,10 @@ anova_test <- function (omicsData, comparisons, pval_adjust,
     }
   }
 
-  #-----If covariates are provided, remove their effect before computing group means/variances------#
+  # Covariate stuffs -----------------------------------------------------------
+
+  # If covariates are provided, remove their effect before computing group
+  # means/variances.
   if(!is.null(covariates)){
 
     # Extract the covariates data frame from the group_DF attribute. This will
@@ -221,10 +236,15 @@ anova_test <- function (omicsData, comparisons, pval_adjust,
       # the covariates data frame with the actual input to the covariates input.
       cov_idx <- which(names(cov_data) %in% covariates)
 
-      # Combine main effect and covariate data. Again, the 1 is hard coded
-      # because the sample ID column will always be the first column in the
-      # covariate data frame.
-      covariates <- merge(groupData,
+      # Combine main effect and covariate data. We only want two columns from
+      # the main effect data frame (groupData). These columns are the sample ID
+      # column and the Group column. The Group column contains all the
+      # information we need for creating the X matrix. We also need the sample
+      # ID column from the covariate data frame along with the corresponding
+      # columns for any covariates in the input. The 1 is hard coded because the
+      # sample ID column will always be the first column in the covariate data
+      # frame.
+      covariates <- merge(groupData[c(samp_cname, "Group")],
                           cov_data[, c(1, cov_idx)],
                           sort = FALSE)
       cov_samp_col <- which(colnames(covariates)==samp_cname)
