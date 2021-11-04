@@ -86,7 +86,7 @@ data(pep_object)
 
 pep_object <- group_designation(omicsData = pep_object,
                                 main_effects = "Condition")
-                                
+
 cvfilt <- cv_filter(pep_object)
 
 plot(cvfilt, cv_threshold = 20)

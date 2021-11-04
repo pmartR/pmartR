@@ -17,7 +17,7 @@ names to either remove or keep from e_data, f_data, and e_meta.}
 }
 \value{
 A list with three elements: first is the filtered e_data object,
-        second is the filtered f_data object, and third is the filtered 
+        second is the filtered f_data object, and third is the filtered
         e_meta object.
 }
 \description{
