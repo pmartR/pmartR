@@ -459,7 +459,7 @@ plot.isobaricnormRes <- function (isobaricnormRes_obj, order = FALSE,
     p <- ggplot2::ggplot(data = tall_data,
                          ggplot2::aes(x = .data[[exp_cname]],
                                       y = values,
-                                      fill = Sample))
+                                      fill = .data[[exp_cname]]))
 
     # Otherwise separate the box plots by sample name.
   } else {
@@ -467,7 +467,7 @@ plot.isobaricnormRes <- function (isobaricnormRes_obj, order = FALSE,
     p <- ggplot2::ggplot(data = tall_data,
                          ggplot2::aes(x = .data[[fdata_cname]],
                                       y = values,
-                                      fill = Sample))
+                                      fill = .data[[exp_cname]]))
 
   }
 
@@ -488,7 +488,7 @@ plot.isobaricnormRes <- function (isobaricnormRes_obj, order = FALSE,
       plot.title = ggplot2::element_text(size = title_lab_size),
       axis.title.x = ggplot2::element_text(size = x_lab_size),
       axis.title.y = ggplot2::element_text(size = y_lab_size),
-      axis.text.x = ggplot2::element_text(angle = x_lab_angle, hjust = 1),
+      axis.text.x = ggplot2::element_text(angle = x_lab_angle),
       legend.position = legend_position
     )
 
