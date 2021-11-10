@@ -8,12 +8,16 @@ gtest_heatmap(
   volcano,
   pval_thresh = 0.05,
   show_sig = TRUE,
-  count_text_size = 3,
   interactive = FALSE,
   color_low = NULL,
   color_high = NULL,
   plotly_layout = NULL,
-  ...
+  text_size,
+  display_count,
+  x_lab,
+  y_lab,
+  title_lab,
+  legend_lab
 )
 }
 \arguments{
@@ -22,12 +26,9 @@ gtest_heatmap(
 \item{show_sig}{Boolean whether to show the visual indicator that a certain
 bin combination is significant by the g-test}
 
-\item{count_text_size}{In non-interactive mode, the size of the text
-indicating the number of biomolecules to be displayed inside the tile.
-Defaults to 3.  Setting this to zero causes no text to be shown.}
-
-\item{interactive}{passed from \code{\link[pmartR:plot.statRes]{pmartR::plot.statRes()}}.
-If T, will build a plotly version of the plot.  Defaults to FALSE.}
+\item{interactive}{passed from
+\code{\link[pmartR:plot.statRes]{pmartR::plot.statRes()}}. If T, will build
+a plotly version of the plot.  Defaults to FALSE.}
 
 \item{color_low}{A character string specifying the color of the gradient for
 low count values.}
@@ -37,6 +38,24 @@ high count values.}
 
 \item{plotly_layout}{A list of arguments, not including the plot, to be
 passed to plotly::layout if interactive = T.}
+
+\item{text_size}{An integer specifying the size of the text (number of
+non-missing values) within the plot. The default is 3.}
+
+\item{display_count}{Logical. Indicates whether the non-missing counts will
+be displayed on the bar plot. The default is TRUE.}
+
+\item{x_lab}{A character string specifying the x-axis label.}
+
+\item{y_lab}{A character string specifying the y-axis label.}
+
+\item{title_lab}{A character string specifying the plot title.}
+
+\item{legend_lab}{A character string specifying the legend title.}
+
+\item{count_text_size}{In non-interactive mode, the size of the text
+indicating the number of biomolecules to be displayed inside the tile.
+Defaults to 3.  Setting this to zero causes no text to be shown.}
 }
 \value{
 `ggplot or plotly` object, depending on if \code{interactive} is set

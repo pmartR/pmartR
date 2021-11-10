@@ -4,10 +4,35 @@
 \alias{statres_barplot}
 \title{Fold change barplots for statres objects}
 \usage{
-statres_barplot(x, stacked = FALSE, fc_colors = c("red", "black", "green"))
+statres_barplot(
+  x,
+  stacked = FALSE,
+  fc_colors = c("red", "black", "green"),
+  text_size,
+  display_count,
+  x_lab,
+  y_lab,
+  title_lab,
+  legend_lab
+)
 }
 \arguments{
-\item{x, stacked, fc_colors}{passed from \code{\link[pmartR:plot.statRes]{pmartR::plot.statRes()}}}
+\item{x, stacked, fc_colors}{passed from
+\code{\link[pmartR:plot.statRes]{pmartR::plot.statRes()}}}
+
+\item{text_size}{An integer specifying the size of the text (number of
+non-missing values) within the plot. The default is 3.}
+
+\item{display_count}{Logical. Indicates whether the non-missing counts will
+be displayed on the bar plot. The default is TRUE.}
+
+\item{x_lab}{A character string specifying the x-axis label.}
+
+\item{y_lab}{A character string specifying the y-axis label.}
+
+\item{title_lab}{A character string specifying the plot title.}
+
+\item{legend_lab}{A character string specifying the legend title.}
 }
 \value{
 `ggplot` object - barplot.

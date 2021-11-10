@@ -457,7 +457,7 @@ plot.isobaricnormRes <- function (isobaricnormRes_obj, order = FALSE,
     p <- ggplot2::ggplot(data = tall_data,
                          ggplot2::aes(x = .data[[exp_cname]],
                                       y = values,
-                                      fill = Sample))
+                                      fill = .data[[exp_cname]]))
 
     # Otherwise separate the box plots by sample name.
   } else {
@@ -465,7 +465,7 @@ plot.isobaricnormRes <- function (isobaricnormRes_obj, order = FALSE,
     p <- ggplot2::ggplot(data = tall_data,
                          ggplot2::aes(x = .data[[fdata_cname]],
                                       y = values,
-                                      fill = Sample))
+                                      fill = .data[[exp_cname]]))
 
   }
 
@@ -486,7 +486,7 @@ plot.isobaricnormRes <- function (isobaricnormRes_obj, order = FALSE,
       plot.title = ggplot2::element_text(size = title_lab_size),
       axis.title.x = ggplot2::element_text(size = x_lab_size),
       axis.title.y = ggplot2::element_text(size = y_lab_size),
-      axis.text.x = ggplot2::element_text(angle = x_lab_angle, hjust = 1),
+      axis.text.x = ggplot2::element_text(angle = x_lab_angle),
       legend.position = legend_position
     )
 
@@ -4268,13 +4268,27 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
 #'   change sections in the barplot, defaults to FALSE
 #' @param interactive TRUE/FALSE for whether to create an interactive plot using
 #'   plotly.  Not valid for all plots.
-#' @param bw_theme TRUE/FALSE for whether to apply a black-white background
-#'   theme, does not affect all plots.
+#' @param x_lab A character string specifying the x-axis label.
+#' @param x_lab_size An integer value indicating the font size for the x-axis.
+#'   The default is 11.
+#' @param x_lab_angle An integer value indicating the angle of x-axis labels.
+#' @param y_lab A character string specifying the y-axis label.
+#' @param y_lab_size An integer value indicating the font size for the y-axis.
+#'   The default is 11.
+#' @param title_lab A character string specifying the plot title.
+#' @param title_lab_size An integer value indicating the font size of the plot
+#'   title. The default is 14.
+#' @param legend_lab A character string specifying the legend title.
+#' @param legend_position A character string specifying the position of the
+#'   legend. Can be one of "right", "left", "top", "bottom", or "none". The
+#'   default is "none".
+#' @param text_size An integer specifying the size of the text (number of
+#'   non-missing values) within the plot. The default is 3.
+#' @param bw_theme Logical. If TRUE uses the ggplot2 black and white theme.
+#' @param display_count Logical. Indicates whether the non-missing counts will
+#'   be displayed on the bar plot. The default is TRUE.
 #' @param custom_theme a ggplot `theme` object to be applied to non-interactive
 #'   plots, or those converted by plotly::ggplotly().
-#' @param ... extra arguments passed to internal functions such as
-#'   \code{\link[pmartR:plot.statRes]{sub-function pmartR::.plot.statRes()}}
-#'   \code{\link[pmartR:plot.statRes]{pmartR::gtest_heatmap()}}
 #'
 #' @details Plot types:
 #' \itemize{
@@ -4338,18 +4352,37 @@ plot.statRes <- function (x,
                           fc_colors = c("red", "black", "green"),
                           stacked = FALSE,
                           interactive = FALSE,
-                          bw_theme = FALSE,
-                          custom_theme = NULL,
-                          ...) {
+                          x_lab = NULL,
+                          x_lab_size = 11,
+                          x_lab_angle = NULL,
+                          y_lab = NULL,
+                          y_lab_size = 11,
+                          title_lab = NULL,
+                          title_lab_size = 14,
+                          legend_lab = NULL,
+                          legend_position = "right",
+                          text_size = 3,
+                          bw_theme = TRUE,
+                          display_count = TRUE,
+                          custom_theme = NULL) {
+
+  # Farm boy, fix all the problems. As you wish.
 
   #Most plots are based on "number_significant" data frame so pull it out
   comp_df <- attr(x, "number_significant")
 
   ##--------##
   #Go through the given plot_types and remove any that aren't currently avilable
-  plt_tyj <- try(match.arg(tolower(plot_type),c("bar","volcano", "gheatmap", "fcheatmap")),silent=TRUE)
+  plt_tyj <- try(match.arg(tolower(plot_type),
+                           c("bar",
+                             "volcano",
+                             "gheatmap",
+                             "fcheatmap")),
+                 silent=TRUE)
   if(class(plt_tyj)=='try-error'){
-    warning(paste0("Plot type '",plot_type,"' is not currently available, defaulting to bar plot."))
+    warning(paste0("Plot type '",
+                   plot_type,
+                   "' is not currently available, defaulting to bar plot."))
     plot_type <- "bar"
   }else{
     plot_type <- plt_tyj
@@ -4357,34 +4390,49 @@ plot.statRes <- function (x,
 
   #Don't make biomolecule heatmaps if there's only one comparison
   if(plot_type %in% c("fcheatmap") & nrow(comp_df)==1){
-    stop("Fold change heatmaps not supported when only one comparison is being made.")
+    stop(paste("Fold change heatmaps not supported when only one comparison",
+               "is being made.",
+               sep = " "))
   }
 
   # specified theme parameters
   if(!is.null(custom_theme)){
-    if(bw_theme) warning("Setting both bw_theme to TRUE and specifying a custom theme may cause undesirable results")
-    if(!inherits(custom_theme, c("theme", "gg"))) stop("custom_theme must be a valid 'theme' object as used in ggplot")
+    if(bw_theme)
+      warning(paste("Setting both bw_theme to TRUE and specifying a custom",
+                    "theme may cause undesirable results",
+                    sep = " "))
+    if(!inherits(custom_theme, c("theme", "gg")))
+      stop("custom_theme must be a valid 'theme' object as used in ggplot")
     mytheme = custom_theme
   }
   else mytheme = ggplot2::theme(
-    plot.title = ggplot2::element_text(size = 14),
-    axis.title = ggplot2::element_text(size = 14),
-    axis.text = ggplot2::element_text(size = 12),
-    legend.title = ggplot2::element_text(size = 10),
-    legend.text = ggplot2::element_text(size = 8),
-    strip.text = ggplot2::element_text(size = 12)
+    plot.title = ggplot2::element_text(size = title_lab_size),
+    axis.title.x = ggplot2::element_text(size = x_lab_size),
+    axis.title.y = ggplot2::element_text(size = y_lab_size),
+    axis.text.x = ggplot2::element_text(angle = x_lab_angle),
+    legend.position = legend_position
   )
 
-  # Both the volcano plot and heatmaps need a dataframe of fold changes by comparison/biomolecule
+  # Both the volcano plot and heatmaps need a dataframe of fold changes by
+  # comparison/biomolecule
   if(plot_type %in% c("volcano", "gheatmap", "fcheatmap")){
     volcano <- make_volcano_plot_df(x)
   }
 
-  #Bar plot
-  if("bar"%in%plot_type){
-    p <- statres_barplot(x, stacked, fc_colors)
+  # Bar plot -------------------------------------------------------------------
 
-    if(bw_theme) p <- p + ggplot2::theme_bw()
+  if("bar"%in%plot_type){
+    p <- statres_barplot(x, stacked, fc_colors,
+                         text_size = text_size,
+                         display_count = display_count,
+                         x_lab = x_lab,
+                         y_lab = y_lab,
+                         title_lab = title_lab,
+                         legend_lab = legend_lab)
+
+    if(bw_theme) p <- p +
+        ggplot2::theme_bw() +
+        ggplot2::theme(strip.background = ggplot2::element_rect(fill = "white"))
 
     return(p + mytheme)
   }
@@ -4392,7 +4440,9 @@ plot.statRes <- function (x,
   # Volcano plot
   else if("volcano"%in%plot_type){
     if(!attr(x, "statistical_test") %in% c("anova", "combined")){
-      stop("imd_anova must have been run with test_method = 'anova' or 'combined' to make the volcano plot")
+      stop(paste("imd_anova must have been run with test_method = 'anova' or",
+                 "'combined' to make the volcano plot",
+                 sep = " "))
     }
 
     # still returns a ggplot, even if interactive = T
@@ -4403,20 +4453,31 @@ plot.statRes <- function (x,
         pval_thresh = attr(x, "pval_thresh"),
         fc_colors,
         fc_threshold,
-        interactive
+        interactive,
+        x_lab = x_lab,
+        y_lab = y_lab,
+        title_lab = title_lab,
+        legend_lab = legend_lab
       )
 
-    if(bw_theme) p <- p + ggplot2::theme_bw()
+    if(bw_theme) p <- p +
+      ggplot2::theme_bw() +
+      ggplot2::theme(strip.background = ggplot2::element_rect(fill = "white"))
 
     p <- p + mytheme
 
-    if(interactive) return(plotly::ggplotly(p, tooltip = c("text"))) else return(p)
+    if(interactive)
+      return(plotly::ggplotly(p, tooltip = c("text"))) else
+        return(p)
   }
 
-  # g-test heatmap
+  # g-test heat map ------------------------------------------------------------
+
   else if("gheatmap" %in% plot_type){
     if(!attr(x, "statistical_test") %in% c("gtest", "combined")){
-      stop("imd_anova must have been run with test_method = 'gtest' or 'combined' to make the g-test heatmap")
+      stop(paste("imd_anova must have been run with test_method = 'gtest' or",
+                 "'combined' to make the g-test heatmap",
+                 sep = " "))
     }
 
     p <-
@@ -4424,7 +4485,12 @@ plot.statRes <- function (x,
         volcano,
         pval_thresh = attr(x, "pval_thresh"),
         interactive = interactive,
-        ...
+        text_size = text_size,
+        display_count = display_count,
+        x_lab = x_lab,
+        y_lab = y_lab,
+        title_lab = title_lab,
+        legend_lab = legend_lab
       )
 
     if(!interactive){
@@ -4435,20 +4501,48 @@ plot.statRes <- function (x,
   # biomolecule fold change heatmap
   else if("fcheatmap"%in%plot_type){
 
+    # Farm boy, do all the tedious label crap. As you wish.
+    the_x_label <- if (is.null(x_lab))
+      "Biomolecule" else
+        x_lab
+    the_y_label <- if (is.null(y_lab))
+      "Comparison" else
+        y_lab
+    the_title_label <- if (is.null(title_lab))
+      "Average Log Fold Change" else
+        title_lab
+    the_legend_label <- if (is.null(legend_lab))
+      "Fold Change" else
+        legend_lab
+
     #For now just consider biomolecules significant with respect to ANOVA
     volcano <- dplyr::filter(volcano,Type=="ANOVA")
 
     volcano_sigs <- dplyr::filter(volcano,P_value<attr(x,"pval_thresh"))
-    if(!(nrow(volcano_sigs)) > 0) warning("No molecules significant at the provided p-value threshold")
+    if(!(nrow(volcano_sigs)) > 0)
+      warning("No molecules significant at the provided p-value threshold")
     colnames(volcano_sigs)[1] <- "Biomolecule"
     volcano_sigs$Biomolecule <- as.factor(volcano_sigs$Biomolecule)
 
-    p <- ggplot2::ggplot(volcano_sigs, ggplot2::aes(Biomolecule, Comparison, text = paste("ID:", Biomolecule, "<br>", "Pval:", P_value))) +
+    p <- ggplot2::ggplot(volcano_sigs,
+                         ggplot2::aes(Biomolecule,
+                                      Comparison,
+                                      text = paste("ID:",
+                                                   Biomolecule,
+                                                   "<br>",
+                                                   "Pval:",
+                                                   P_value))) +
       ggplot2::geom_tile(ggplot2::aes(fill = Fold_change), color = "white") +
-      ggplot2::scale_fill_gradient(low = fc_colors[1], high = fc_colors[3]) +
-      ggplot2::ggtitle("Average Log Fold Change") +
+      ggplot2::scale_fill_gradient(low = fc_colors[1],
+                                   high = fc_colors[3],
+                                   name = the_legend_label) +
+      ggplot2::xlab(the_x_label) +
+      ggplot2::ylab(the_y_label) +
+      ggplot2::ggtitle(the_title_label) +
       mytheme
-    if(interactive) return(plotly::ggplotly(p, tooltip = c("text"))) else return(p)
+    if(interactive)
+      return(plotly::ggplotly(p, tooltip = c("text"))) else
+        return(p)
   }
 
   return(p)
@@ -4475,8 +4569,11 @@ prep_flags <- function (x, test) {
       x[, grep("^Flag_A_", colnames(x))]
     )
 
-    # Remove "Flag_A_" from column names.
-    colnames(da_flag) <- gsub("^Flag_A_", "", colnames(da_flag))
+    # Remove "Flag_A_" from column names. The first column name is removed
+    # because it corresponds to the biomolecule ID column.
+    colnames(da_flag)[-1] <- gsub("^Flag_A_",
+                                  "",
+                                  colnames(x)[grep("^Flag_A_", colnames(x))])
 
   } else if (test == "gtest") {
 
@@ -4489,8 +4586,11 @@ prep_flags <- function (x, test) {
     # Change -1 and 1 to -2 and 2 respectively.
     da_flag[, -1] <- da_flag[, -1] * 2
 
-    # Remove "Flag_G_" from column names.
-    colnames(da_flag) <- gsub("^Flag_G_", "", colnames(da_flag))
+    # Remove "Flag_G_" from column names. The first column name is removed
+    # because it corresponds to the biomolecule ID column.
+    colnames(da_flag)[-1] <- gsub("^Flag_G_",
+                                  "",
+                                  colnames(x)[grep("^Flag_G_", colnames(x))])
 
   } else {
 
@@ -4551,11 +4651,12 @@ prep_flags <- function (x, test) {
     }
 
     # Remove "Flag_A_" from column names.
-    colnames(imd_flags) <- gsub("^Flag_A_", "", colnames(imd_flags))
+    colnames(imd_flags) <- gsub("^Flag_A_",
+                                "",
+                                colnames(x)[grep("^Flag_A_", colnames(x))])
 
-    # Create a variable for the combined flags. This will be added as an
-    # attribute of the statRes object and used in the bpquant function to create
-    # the signatures variable.
+    # Assemble the flags data frame with the first column containing the
+    # biomolecule IDs and the remaining columns containing the flags.
     da_flag <- data.frame(x[, 1, drop = FALSE], imd_flags)
 
   }
@@ -4664,7 +4765,9 @@ make_volcano_plot_df <- function(x) {
 
       # will contain ID column and count column corresponding to the two groups
       temp_df <-
-        counts[c(1, which(colnames(counts) == groups[1]), which(colnames(counts) == groups[2]))]
+        counts[c(1,
+                 which(colnames(counts) == groups[1]),
+                 which(colnames(counts) == groups[2]))]
       temp_df$Comparison <- comp
 
       # rename the columns to something static so they can be rbind-ed
@@ -4692,30 +4795,75 @@ make_volcano_plot_df <- function(x) {
 #' Plots a bar-chart with bar heights indicating the number of significant
 #' biomolecules, grouped by test type and fold change direction.
 #'
-#' @param x,stacked,fc_colors
-#' passed from \code{\link[pmartR:plot.statRes]{pmartR::plot.statRes()}}
+#' @param x,stacked,fc_colors passed from
+#'   \code{\link[pmartR:plot.statRes]{pmartR::plot.statRes()}}
+#' @param text_size An integer specifying the size of the text (number of
+#'   non-missing values) within the plot. The default is 3.
+#' @param display_count Logical. Indicates whether the non-missing counts will
+#'   be displayed on the bar plot. The default is TRUE.
+#' @param x_lab A character string specifying the x-axis label.
+#' @param y_lab A character string specifying the y-axis label.
+#' @param title_lab A character string specifying the plot title.
+#' @param legend_lab A character string specifying the legend title.
 #'
 #' @return `ggplot` object - barplot.
 #'
 #' @keywords internal
 #'
 statres_barplot <- function(x, stacked = FALSE,
-                            fc_colors = c("red", "black", "green")) {
+                            fc_colors = c("red", "black", "green"),
+                            text_size,
+                            display_count,
+                            x_lab,
+                            y_lab,
+                            title_lab,
+                            legend_lab) {
+
+  # Farm boy, do all the tedious label crap. As you wish.
+  the_x_label <- if (is.null(x_lab))
+    "Statistical test, by group comparison" else
+      x_lab
+  the_y_label <- if (is.null(y_lab))
+    "Count of Biomolecules" else
+      y_lab
+  the_title_label <- if (is.null(title_lab))
+    "Number of DE Biomolecules Between Groups" else
+      title_lab
+  the_legend_label <- if (is.null(legend_lab))
+    "Fold Change Sign" else
+      legend_lab
+
   comp_df <- attr(x, "number_significant")
 
-  comp_df_melt <- reshape2::melt(comp_df,id.vars="Comparison",value.name="Count",variable.name="Direction")
-  levels(comp_df_melt$Comparison) <- gsub(pattern = "_",replacement = " ",levels(comp_df_melt$Comparison))
+  comp_df_melt <- reshape2::melt(comp_df,
+                                 id.vars="Comparison",
+                                 value.name="Count",
+                                 variable.name="Direction")
+  levels(comp_df_melt$Comparison) <- gsub(pattern = "_",
+                                          replacement = " ",
+                                          levels(comp_df_melt$Comparison))
 
-  #Bar plots side-by-side, both going up
-  #ggplot(data=comp_df_melt,aes(Comparison,Count,fill=Direction))+geom_bar(stat='identity',position='dodge')
+  # Bar plots side-by-side, both going up
+  # ggplot(data=comp_df_melt,aes(Comparison,Count,fill=Direction))+
+  #   geom_bar(stat='identity',position='dodge')
 
   ##Up direction is positive, down direction is negative
-  if(!stacked) comp_df_melt[grep("Down", comp_df_melt$Direction),]$Count <- (-comp_df_melt[grep("Down", comp_df_melt$Direction),]$Count)
+  if(!stacked)
+    comp_df_melt[grep("Down", comp_df_melt$Direction),]$Count <- (
+      -comp_df_melt[grep("Down", comp_df_melt$Direction),]$Count
+    )
 
-  # add whichtest, and posneg columns used for plot grouping and label adjustment
+  # add whichtest, and posneg columns used for plot grouping and label
+  # adjustment
   comp_df_melt <- comp_df_melt %>%
-    dplyr::mutate(whichtest = ifelse(grepl("anova", Direction), "anova", ifelse(grepl("gtest", Direction), "gtest", "total")),
-                  posneg = ifelse(grepl("Up", Direction), "Positive", "Negative")) %>%
+    dplyr::mutate(whichtest = ifelse(grepl("anova", Direction),
+                                     "anova",
+                                     ifelse(grepl("gtest", Direction),
+                                            "gtest",
+                                            "total")),
+                  posneg = ifelse(grepl("Up", Direction),
+                                  "Positive",
+                                  "Negative")) %>%
     dplyr::arrange(desc(posneg))
 
   # get only anova or only g-test rows if user did not specify combined
@@ -4726,21 +4874,33 @@ statres_barplot <- function(x, stacked = FALSE,
   }
 
   p <- ggplot2::ggplot(data = comp_df_melt, ggplot2::aes(Comparison, Count)) +
-    ggplot2::geom_bar(ggplot2::aes(x = whichtest, fill = posneg, group = whichtest), stat =
-                        'identity') +
-    ggplot2::geom_text(ggplot2::aes(x = whichtest, label = ifelse(abs(Count) > 0, abs(Count), "")),
-                       position = ggplot2::position_stack(vjust = 0.5),
-                       size = 3) +
+    ggplot2::geom_bar(ggplot2::aes(x = whichtest,
+                                   fill = posneg,
+                                   group = whichtest),
+                      stat = 'identity') +
     ggplot2::geom_hline(ggplot2::aes(yintercept = 0), colour = 'gray50') +
     ggplot2::scale_fill_manual(
       values = c(fc_colors[1], fc_colors[3]),
       labels = c("Negative", "Positive"),
-      name = "Fold Change Sign"
+      name = the_legend_label
     ) +
     ggplot2::facet_wrap( ~ Comparison) +
-    ggplot2::xlab("Statistical test, by group comparison") +
-    ggplot2::ylab("Count of Biomolecules") +
-    ggplot2::ggtitle("Number of DE Biomolecules Between Groups")
+    ggplot2::xlab(the_x_label) +
+    ggplot2::ylab(the_y_label) +
+    ggplot2::ggtitle(the_title_label)
+
+  # Farm boy, display the counts on the plot. As you wish
+  if (display_count) {
+
+    p <- p +
+      ggplot2::geom_text(ggplot2::aes(x = whichtest,
+                                      label = ifelse(abs(Count) > 0,
+                                                     abs(Count),
+                                                     "")),
+                         position = ggplot2::position_stack(vjust = 0.5),
+                         size = text_size)
+
+  }
 
   return(p)
 }
@@ -4753,19 +4913,27 @@ statres_barplot <- function(x, stacked = FALSE,
 #'
 #' @param volcano `data.frame` produced by \link{pmartR::make_volcano_plot_df}
 #' @param show_sig Boolean whether to show the visual indicator that a certain
-#' bin combination is significant by the g-test
+#'   bin combination is significant by the g-test
 #' @param count_text_size In non-interactive mode, the size of the text
-#' indicating the number of biomolecules to be displayed inside the tile.
-#' Defaults to 3.  Setting this to zero causes no text to be shown.
-#' @param interactive passed from \code{\link[pmartR:plot.statRes]{pmartR::plot.statRes()}}.
-#' If T, will build a plotly version of the plot.  Defaults to FALSE.
+#'   indicating the number of biomolecules to be displayed inside the tile.
+#'   Defaults to 3.  Setting this to zero causes no text to be shown.
+#' @param interactive passed from
+#'   \code{\link[pmartR:plot.statRes]{pmartR::plot.statRes()}}. If T, will build
+#'   a plotly version of the plot.  Defaults to FALSE.
 #' @param color_low A character string specifying the color of the gradient for
 #'   low count values.
 #' @param color_high A character string specifying the color of the gradient for
 #'   high count values.
 #' @param plotly_layout A list of arguments, not including the plot, to be
-#' passed to plotly::layout if interactive = T.
-#'
+#'   passed to plotly::layout if interactive = T.
+#' @param text_size An integer specifying the size of the text (number of
+#'   non-missing values) within the plot. The default is 3.
+#' @param display_count Logical. Indicates whether the non-missing counts will
+#'   be displayed on the bar plot. The default is TRUE.
+#' @param x_lab A character string specifying the x-axis label.
+#' @param y_lab A character string specifying the y-axis label.
+#' @param title_lab A character string specifying the plot title.
+#' @param legend_lab A character string specifying the legend title.
 #'
 #' @return `ggplot or plotly` object, depending on if \code{interactive} is set
 #' to TRUE or FALSE respectively. A g-test heatmap
@@ -4776,12 +4944,30 @@ gtest_heatmap <-
   function(volcano,
            pval_thresh = 0.05,
            show_sig = TRUE,
-           count_text_size = 3,
            interactive = FALSE,
            color_low = NULL,
            color_high = NULL,
            plotly_layout = NULL,
-           ...) {
+           text_size,
+           display_count,
+           x_lab,
+           y_lab,
+           title_lab,
+           legend_lab) {
+
+    # Farm boy, do all the tedious label crap. As you wish.
+    the_x_label <- if (is.null(x_lab))
+      "Nonmissing (first group)" else
+        x_lab
+    the_y_label <- if (is.null(y_lab))
+      "Nonmissing (second group)" else
+        y_lab
+    the_title_label <- if (is.null(title_lab))
+      "Count of non-missing values in each group" else
+        title_lab
+    the_legend_label <- if (is.null(legend_lab))
+      "Number of biomolecules \nin this bin" else
+        legend_lab
 
     temp_data_gtest <- volcano %>%
       dplyr::filter(Type == "G-test") %>%
@@ -4819,7 +5005,10 @@ gtest_heatmap <-
     if(!interactive) {
       p <- ggplot2::ggplot(gtest_counts) +
         ggplot2::theme_minimal() +
-        ggplot2::geom_tile(ggplot2::aes(Count_First_Group, Count_Second_Group, fill = n), color = "black")
+        ggplot2::geom_tile(ggplot2::aes(Count_First_Group,
+                                        Count_Second_Group,
+                                        fill = n),
+                           color = "black")
 
       if(show_sig) {
         p <- p + ggplot2::geom_point(
@@ -4832,30 +5021,33 @@ gtest_heatmap <-
                                       values = 21)
       }
 
-      if(count_text_size > 0) {
+      if(display_count) {
         p <- p + ggplot2::geom_text(
           ggplot2::aes(Count_First_Group, Count_Second_Group, label = n),
           nudge_x = -0.5, nudge_y = 0.5, hjust = -0.1, vjust = 1.5,
-          color = "white", size = count_text_size
+          color = "white", size = text_size
         )
       }
 
       p <- p +
         ggplot2::facet_wrap(~ Comparison) +
         ggplot2::scale_fill_gradient(
-          name = "Number of biomolecules \nin this bin",
+          name = the_legend_label,
           low = if (is.null(color_low)) "#132B43" else color_low,
           high = if (is.null(color_high)) "#56B1F7" else color_high
         ) +
-        ggplot2::xlab("Nonmissing (first group)") +
-        ggplot2::ylab("Nonmissing (second group)")
+        ggplot2::xlab(the_x_label) +
+        ggplot2::ylab(the_y_label) +
+        ggplot2::ggtitle(the_title_label)
 
     } else {
       comps <- unique(gtest_counts$Comparison)
       subplot_list <- list()
       limits = range(gtest_counts$n)
       # legend entry will not appear for a single plot, so putting info in title
-      subtext = if(length(comps) == 1) "\n(star indicates statistical significance)" else ""
+      subtext = if(length(comps) == 1)
+        "\n(star indicates statistical significance)" else
+          ""
 
       for(i in 1:length(comps)){
         data <- gtest_counts %>% dplyr::filter(Comparison == comps[i])
@@ -4869,14 +5061,18 @@ gtest_heatmap <-
                             hoverinfo = 'text',
                             text = ~sprintf("%s biomolecules in this bin.", n),
                             colors = grDevices::colorRamp(
-                              c(if (is.null(color_low)) "#132B43" else color_low,
-                                if (is.null(color_high)) "#56B1F7" else color_high)
+                              c(if (is.null(color_low))
+                                "#132B43" else
+                                  color_low,
+                                if (is.null(color_high))
+                                  "#56B1F7" else
+                                    color_high)
                             ),
                             showscale = i == length(comps),
                             xgap = 0.6, ygap = 0.6
           ) %>%
           plotly::add_trace(
-            data = data %>% filter(sig),
+            data = data %>% dplyr::filter(sig),
             x =  ~ as.numeric(Count_First_Group),
             y =  ~ as.numeric(Count_Second_Group),
             type = 'scatter',
@@ -4902,7 +5098,9 @@ gtest_heatmap <-
           )
 
         if(i == length(comps)) {
-          p <- p %>% plotly::colorbar(title = "Count biomolecules \nin this bin.", limits = limits)
+          p <- p %>% plotly::colorbar(
+            title = "Count biomolecules \nin this bin.", limits = limits
+          )
         }
 
 
@@ -4911,7 +5109,7 @@ gtest_heatmap <-
             plotly::layout(
               plot_bgcolor = 'grey',
               title = list(
-                text = sprintf("Count nonmissing in each group.%s", subtext),
+                text = paste(the_title_label, subtext),
                 font = list(size = 14),
                 y = 0.95, yanchor = "top"
               ),
@@ -4929,8 +5127,8 @@ gtest_heatmap <-
 
       p <- plotly::subplot(subplot_list, shareY = T) %>%
         plotly::layout(
-          xaxis = list(title = "Nonmissing (first group)"),
-          yaxis = list(title = "Nonmissing (second group)")
+          xaxis = list(title = the_x_label),
+          yaxis = list(title = the_y_label)
         )
     }
 
@@ -4945,10 +5143,14 @@ gtest_heatmap <-
 #'
 #' @param volcano `data.frame` produced by \link{pmartR::make_volcano_plot_df}
 #' @param pval_thresh alpha level to determine significance.  Any values that
-#' are significant at this level will be colored based on fc_colors.
+#'   are significant at this level will be colored based on fc_colors.
 #' @param data_scale One of c("log2","log","log10"), for labeling purposes.
-#' @param fc_colors,fc_threshold,interactive
-#' passed from \code{\link[pmartR:plot.statRes]{pmartR::plot.statRes()}}
+#' @param fc_colors,fc_threshold,interactive passed from
+#'   \code{\link[pmartR:plot.statRes]{pmartR::plot.statRes()}}
+#' @param x_lab A character string specifying the x-axis label.
+#' @param y_lab A character string specifying the y-axis label.
+#' @param title_lab A character string specifying the plot title.
+#' @param legend_lab A character string specifying the legend title.
 #'
 #' @return `ggplot` object.  A volcano plot.
 #'
@@ -4960,7 +5162,25 @@ statres_volcano_plot <-
            pval_thresh = 0.05,
            fc_colors = c("red", "black", "green"),
            fc_threshold = NULL,
-           interactive = F) {
+           interactive = F,
+           x_lab,
+           y_lab,
+           title_lab,
+           legend_lab) {
+
+    # Farm boy, do all the tedious label crap. As you wish.
+    the_x_label <- if (is.null(x_lab))
+      paste("Fold-change (", data_scale, ")", sep = "") else
+        x_lab
+    the_y_label <- if (is.null(y_lab))
+      "-log[10](p-value)" else
+        y_lab
+    the_title_label <- if (is.null(title_lab))
+      "" else
+        title_lab
+    the_legend_label <- if (is.null(legend_lab))
+      "Fold Change" else
+        legend_lab
 
     # color vector which assigns black to gtest flag values (-2, 2)
     cols_anova <-
@@ -4978,7 +5198,9 @@ statres_volcano_plot <-
       dplyr::mutate(
         Fold_change_flag = dplyr::case_when(
           is.na(Fold_change) |
-            abs(Fold_change) < ifelse(rlang::is_empty(fc_threshold), 0, abs(fc_threshold)) ~ "0",
+            abs(Fold_change) < ifelse(rlang::is_empty(fc_threshold),
+                                      0,
+                                      abs(fc_threshold)) ~ "0",
           Fold_change > 0 &
             P_value <= pval_thresh ~  "1",
           Fold_change < 0 &
@@ -4987,7 +5209,8 @@ statres_volcano_plot <-
         )
       )
 
-    # interactive plots need manual text applied to prepare for ggplotly conversion
+    # interactive plots need manual text applied to prepare for ggplotly
+    # conversion
     if (interactive) {
       p <-
         ggplot2::ggplot(temp_data_anova, ggplot2::aes(
@@ -5004,24 +5227,29 @@ statres_volcano_plot <-
     }
     else {
       p <-
-        ggplot2::ggplot(data = temp_data_anova, ggplot2::aes(Fold_change, -log(P_value, base = 10)))
+        ggplot2::ggplot(data = temp_data_anova,
+                        ggplot2::aes(Fold_change,
+                                     -log(P_value, base = 10)))
     }
 
     # draw vertical lines at +- fc threshold
     if(!rlang::is_empty(fc_threshold)){
       p <- p +
-        ggplot2::geom_vline(ggplot2::aes(xintercept=abs(fc_threshold)), lty = 2) +
-        ggplot2::geom_vline(ggplot2::aes(xintercept = abs(fc_threshold)*(-1)), lty = 2)
+        ggplot2::geom_vline(ggplot2::aes(xintercept=abs(fc_threshold)),
+                            lty = 2) +
+        ggplot2::geom_vline(ggplot2::aes(xintercept = abs(fc_threshold)*(-1)),
+                            lty = 2)
     }
 
     p <- p +
       ggplot2::geom_point(ggplot2::aes(color = Fold_change_flag), shape = 1) +
       ggplot2::facet_wrap( ~ Comparison) +
-      ggplot2::ylab("-log[10](p-value)") +
-      ggplot2::xlab(sprintf("Fold-change (%s)", data_scale)) +
+      ggplot2::ylab(the_y_label) +
+      ggplot2::xlab(the_x_label) +
+      ggplot2::ggtitle(the_title_label) +
       ggplot2::scale_color_manual(
         values = cols_anova,
-        name = "Fold Change",
+        name = the_legend_label,
         labels = c("Neg(Anova)", "0", "Pos(Anova)"),
         breaks = c("-1", "0", "1")
       )

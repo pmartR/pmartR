@@ -10,7 +10,11 @@ statres_volcano_plot(
   pval_thresh = 0.05,
   fc_colors = c("red", "black", "green"),
   fc_threshold = NULL,
-  interactive = F
+  interactive = F,
+  x_lab,
+  y_lab,
+  title_lab,
+  legend_lab
 )
 }
 \arguments{
@@ -21,7 +25,16 @@ statres_volcano_plot(
 \item{pval_thresh}{alpha level to determine significance.  Any values that
 are significant at this level will be colored based on fc_colors.}
 
-\item{fc_colors, fc_threshold, interactive}{passed from \code{\link[pmartR:plot.statRes]{pmartR::plot.statRes()}}}
+\item{fc_colors, fc_threshold, interactive}{passed from
+\code{\link[pmartR:plot.statRes]{pmartR::plot.statRes()}}}
+
+\item{x_lab}{A character string specifying the x-axis label.}
+
+\item{y_lab}{A character string specifying the y-axis label.}
+
+\item{title_lab}{A character string specifying the plot title.}
+
+\item{legend_lab}{A character string specifying the legend title.}
 }
 \value{
 `ggplot` object.  A volcano plot.

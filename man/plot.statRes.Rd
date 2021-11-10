@@ -11,9 +11,19 @@
   fc_colors = c("red", "black", "green"),
   stacked = FALSE,
   interactive = FALSE,
-  bw_theme = FALSE,
-  custom_theme = NULL,
-  ...
+  x_lab = NULL,
+  x_lab_size = 11,
+  x_lab_angle = NULL,
+  y_lab = NULL,
+  y_lab_size = 11,
+  title_lab = NULL,
+  title_lab_size = 14,
+  legend_lab = NULL,
+  legend_position = "right",
+  text_size = 3,
+  bw_theme = TRUE,
+  display_count = TRUE,
+  custom_theme = NULL
 )
 }
 \arguments{
@@ -40,15 +50,39 @@ change sections in the barplot, defaults to FALSE}
 \item{interactive}{TRUE/FALSE for whether to create an interactive plot using
 plotly.  Not valid for all plots.}
 
-\item{bw_theme}{TRUE/FALSE for whether to apply a black-white background
-theme, does not affect all plots.}
+\item{x_lab}{A character string specifying the x-axis label.}
+
+\item{x_lab_size}{An integer value indicating the font size for the x-axis.
+The default is 11.}
+
+\item{x_lab_angle}{An integer value indicating the angle of x-axis labels.}
+
+\item{y_lab}{A character string specifying the y-axis label.}
+
+\item{y_lab_size}{An integer value indicating the font size for the y-axis.
+The default is 11.}
+
+\item{title_lab}{A character string specifying the plot title.}
+
+\item{title_lab_size}{An integer value indicating the font size of the plot
+title. The default is 14.}
+
+\item{legend_lab}{A character string specifying the legend title.}
+
+\item{legend_position}{A character string specifying the position of the
+legend. Can be one of "right", "left", "top", "bottom", or "none". The
+default is "none".}
+
+\item{text_size}{An integer specifying the size of the text (number of
+non-missing values) within the plot. The default is 3.}
+
+\item{bw_theme}{Logical. If TRUE uses the ggplot2 black and white theme.}
+
+\item{display_count}{Logical. Indicates whether the non-missing counts will
+be displayed on the bar plot. The default is TRUE.}
 
 \item{custom_theme}{a ggplot `theme` object to be applied to non-interactive
 plots, or those converted by plotly::ggplotly().}
-
-\item{...}{extra arguments passed to internal functions such as
-\code{\link[pmartR:plot.statRes]{sub-function pmartR::.plot.statRes()}}
-\code{\link[pmartR:plot.statRes]{pmartR::gtest_heatmap()}}}
 }
 \description{
 Produces plots that summarize the results contained in a `statRes` object.
