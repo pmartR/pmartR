@@ -50,6 +50,26 @@ p_adjustment_anova <- function(p_values = NULL, diff_mean = NULL, t_stats = NULL
         #Rcpp::sourceCpp('src/tukey_helper.cpp') #Use for debugging
         adjusted_pvals <- ptukey_speed(tukey_stats,sizes)
 
+        # Need to find all rows where only one test was performed and replace
+        # the adjusted p-value with the original p-value.
+        just_one <- which(rowSums(!is.na(t_stats)) == 1)
+
+        # Find the non-missing values from the original p-value data frame.
+        # These are the p-values that need to replace the incorrectly adjusted
+        # p-values (because only one test was performed). The numbers returned
+        # from this code will be the indices of the data frame as a vector (not
+        # a row/column index). R's convention is to number down the rows then
+        # across the columns. For example,
+        # matrix(1:25, nrow = 5, byrow = TRUE)[c(3, 5)]
+        # [1] 11 21
+        not_na <- which(!is.na(p_values[just_one, ]))
+
+        # Replace all unjustly adjusted p-values with the original p-value.
+        # These are the rows where only one p-value was calculated.
+        adjusted_pvals[just_one, ][not_na] <- data.matrix(
+          p_values[just_one, ]
+        )[not_na]
+
       }else{#Dunnett adjustment - Needs to be sped up
         adjusted_pvals <- matrix(NA,nrow(t_stats), ncol(t_stats))
         #colnames(adjusted_pvals) <- colnames(t_stats)
