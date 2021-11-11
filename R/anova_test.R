@@ -107,11 +107,7 @@ anova_test <- function (omicsData, comparisons, pval_adjust,
   #   stop("Dunnett adjustment for multiple comparisions should only be used when all case-vs-control comparisons are being made; try a 'Tukey' adjustment.")
   # }
 
-  # Delete the following line? -------------------------------------------------
-  samp_cname <- attr(omicsData,"cnames")$samp_cname
-  if(is.null(samp_cname)){ #Added becuase "samp_cname" has been replaced with "fdata_cname"
-    samp_cname <- attr(omicsData,"cnames")$fdata_cname
-  }
+  samp_cname <- attr(omicsData,"cnames")$fdata_cname
 
   # 10/27/2021 Not sure when/if the columns in e_data could be different from
   # the rows in group_DF. We are leaving the following code how it is to prevent
@@ -272,7 +268,7 @@ anova_test <- function (omicsData, comparisons, pval_adjust,
 
   }
 
-  ###-------- Use one or 2 factor ANOVA to compute group means and common variance--------###
+  # ANOVA stuffs ---------------------------------------------------------------
 
   if(ncol(groupData)==2){
     ##---- One factor ANOVA ----##
@@ -326,14 +322,16 @@ anova_test <- function (omicsData, comparisons, pval_adjust,
   }
 
 
-  #--------Adjust fold-change p-values if applicable-----------##
+  # p-value correction stuffs --------------------------------------------------
+
   p_values_adjust <- p_adjustment_anova(p_values = group_comp$p_values, diff_mean = group_comp$diff_mat, t_stats = group_comp$t_tests,
                                   sizes = raw_results$group_sizes, pval_adjust = pval_adjust)
   colnames(p_values_adjust) <- colnames(fold_change)
 
 
-  #-------Use the adjusted_pvals object to create significance flags-------------##
-  #Create object to be returned
+  # Flag stuffs ----------------------------------------------------------------
+
+  # Create object to be returned
   sig_indicators <- data.matrix(p_values_adjust)
 
   sigs <- which(sig_indicators<pval_thresh)
@@ -351,10 +349,9 @@ anova_test <- function (omicsData, comparisons, pval_adjust,
   return(list(Results = results, Fold_changes = fold_change, Fold_change_pvalues = p_values_adjust, Flags = sig_indicators))
 }
 
-#########
 #I HAVE QUESTIONS ABOUT FOLD CHANGES.  BELOW IS MY ORGIGINAL CODE, WHICH HAS BEEN COMMENTED OUT.
 #THE NEW CODE SIMPLY RETURNS DIFFERENCE IF LOG (BASE E OR 2) SCALE AND RATIO OTHERWISE.  WHICH IS CORRECT?
-#############
+
 #Use appropriate function to compute fold change of data based on scaling
 # if(attr(omicsData,"data_info")$data_scale=="log2"){
 #   fold_change <- fold_change_logbase2(means, Cmat)
