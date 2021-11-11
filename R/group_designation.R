@@ -17,6 +17,16 @@
 #'   should be used as covariates in downstream analyses. Covariates are
 #'   typically variables that a user wants to account for in the analysis but
 #'   quantifying/examining the effect of the variable is not of interest.
+#' @param cov_type An optional character vector (must be the same length as
+#'   \code{covariates} if used) indicating the class or type of each covariate.
+#'   For example, "numeric", "character", or "factor". Partial matching ("num"
+#'   for "numeric") is NOT used and the entire class/type must be typed out. If
+#'   the class of a covariate does not match the input to \code{cov_type} the
+#'   covariate will be coerced to that type. For example, if the covariate is a
+#'   numeric vector of 0s and 1s (indicating two categories) and the input to
+#'   \code{cov_type} is a class other than numeric this vector will be coerced
+#'   to a character vector. The default value is NULL. In this case the class of
+#'   the covariates is neither checked nor altered.
 #' @param time_course an optional character string specifying the variable name
 #'   of a time course variable, if applicable to the experimental data.
 #'   CURRENTLY NOT SUPPORTED
@@ -54,7 +64,9 @@
 #' @export
 #'
 group_designation <- function (omicsData, main_effects,
-                               covariates = NULL, time_course = NULL) {
+                               covariates = NULL,
+                               cov_type = NULL,
+                               time_course = NULL) {
 
   # Initial checks on input arguments ------------------------------------------
 
@@ -140,6 +152,52 @@ group_designation <- function (omicsData, main_effects,
     if (sum(covariates %in% names(omicsData$f_data)) != length(covariates)) {
 
       stop("One or more of the covariates is not found in f_data of omicsData")
+
+    }
+
+    # Check if the covariate types are specified.
+    if (!is.null(cov_type)) {
+
+      # Make sure the length of covariates and cov_type are the same.
+      if (length(covariates) != length(cov_type)) {
+
+        stop ("The length of covariates and cov_type must be the same.")
+
+      }
+
+      # Loop through all covariates and compare their class to the cov_type
+      # input. If the classes do not match the covariate will be converted to a
+      # character vector.
+      for (e in 1:length(covariates)) {
+
+        # Nab the class of the eth covariate.
+        da_class <- class(omicsData$f_data[[covariates[[e]]]])
+
+        # Check class and convert to character if the class does not match the
+        # covariate type. We cannot simply check if da_class and cov_type are
+        # the same and convert the covariate to a character vector if they are
+        # not. This is an insufficient check because the type of vector could be
+        # "double" but the cov_type is "numeric". In this case the covariate
+        # would incorrectly be converted to a character vector.
+        if (da_class %in% c("numeric", "integer", "double") &&
+            !(cov_type[[e]] %in% c("numeric", "integer", "double"))) {
+
+          # Convert the covariate to a character vector.
+          omicsData$f_data[[covariates[[e]]]] <- as.character(
+            omicsData$f_data[[covariates[[e]]]]
+          )
+
+        } else if (!(da_class %in% c("numeric", "integer", "double")) &&
+                   da_class != cov_type[[e]]) {
+
+          # Convert the covariate to a character vector.
+          omicsData$f_data[[covariates[[e]]]] <- as.character(
+            omicsData$f_data[[covariates[[e]]]]
+          )
+
+        }
+
+      }
 
     }
 

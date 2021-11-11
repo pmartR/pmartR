@@ -9,6 +9,7 @@ group_designation(
   omicsData,
   main_effects,
   covariates = NULL,
+  cov_type = NULL,
   time_course = NULL
 )
 }
@@ -28,6 +29,17 @@ samples. The variable name must match a column name from \code{f_data}.}
 should be used as covariates in downstream analyses. Covariates are
 typically variables that a user wants to account for in the analysis but
 quantifying/examining the effect of the variable is not of interest.}
+
+\item{cov_type}{An optional character vector (must be the same length as
+\code{covariates} if used) indicating the class or type of each covariate.
+For example, "numeric", "character", or "factor". Partial matching ("num"
+for "numeric") is NOT used and the entire class/type must be typed out. If
+the class of a covariate does not match the input to \code{cov_type} the
+covariate will be coerced to that type. For example, if the covariate is a
+numeric vector of 0s and 1s (indicating two categories) and the input to
+\code{cov_type} is a class other than numeric this vector will be coerced
+to a character vector. The default value is NULL. In this case the class of
+the covariates is neither checked nor altered.}
 
 \item{time_course}{an optional character string specifying the variable name
 of a time course variable, if applicable to the experimental data.
