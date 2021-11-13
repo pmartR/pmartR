@@ -739,14 +739,13 @@ plot.SPANSRes <- function (SPANSRes_obj, interactive = FALSE,
                             "normalization_method",
                             "parameters"))
 
-  # get subset/normalization names for the best scored methods
-  best_ss <- SPANSRes_obj %>%
-    dplyr::top_n(1, wt = SPANS_score) %>%
-    {.$ss_par}
-
-  best_norm <- SPANSRes_obj %>%
-    dplyr::top_n(1, wt = SPANS_score) %>%
-    {.$normalization_method}
+  # Farm boy, fix all the problems. As you wish. Filter rows with the highest
+  # SPANS score. This subsetted/filtered data frame will be used to add points
+  # to the plot for the best scoring methods. The best methods are those with
+  # the highest SPANS_score. The slice_max function will select ALL rows where
+  # the highest score occurs.
+  da_best <- SPANSRes_obj %>%
+    dplyr::slice_max(SPANS_score)
 
   # Do all the tedious plot label crap.
   xlabel <- if (is.null(x_lab)) "Normalization Method" else x_lab
@@ -765,11 +764,10 @@ plot.SPANSRes <- function (SPANSRes_obj, interactive = FALSE,
                                     y = ss_par,
                                     fill = SPANS_score),
                        color = 'black') +
-    ggplot2::geom_point(data = SPANSRes_obj %>%
-                          dplyr::filter(ss_par %in% best_ss,
-                                        normalization_method %in% best_norm),
+    ggplot2::geom_point(data = da_best,
                         ggplot2::aes(x = normalization_method,
-                                     y = ss_par, shape = '1')) +
+                                     y = ss_par,
+                                     shape = '1')) +
     ggplot2::scale_alpha_continuous(name = 'Not Scored',
                                     labels = '') +
     ggplot2::scale_shape_discrete(name = 'Best Scores',
@@ -791,7 +789,7 @@ plot.SPANSRes <- function (SPANSRes_obj, interactive = FALSE,
       plot.title = ggplot2::element_text(size = title_lab_size),
       axis.title.x = ggplot2::element_text(size = x_lab_size),
       axis.title.y = ggplot2::element_text(size = y_lab_size),
-      axis.text.x = ggplot2::element_text(angle = x_lab_angle, hjust = 1),
+      axis.text.x = ggplot2::element_text(angle = x_lab_angle),
       legend.position = legend_position,
       panel.border = ggplot2::element_blank(),
       panel.grid.major = ggplot2::element_blank(),
@@ -822,8 +820,8 @@ plot.SPANSRes <- function (SPANSRes_obj, interactive = FALSE,
           if (is.null(color_high)) "#56B1F7" else color_high)
       ),
       type = "heatmap") %>%
-      plotly::add_trace(x = best_norm,
-                        y = best_ss,
+      plotly::add_trace(x = da_best$normalization_method,
+                        y = da_best$ss_par,
                         type = 'scatter',
                         mode = "markers",
                         marker = list(color = "black"),
