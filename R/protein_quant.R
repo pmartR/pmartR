@@ -23,7 +23,7 @@
 #'   that should be kept after rolling up to the protein level. The default,
 #'   NULL, only keeps the column containing the mapping variable along with the
 #'   new columns created (peps_per_pro and n_peps_used).
-#' 
+#'
 #' @return an omicsData object of the class 'proData'
 #'
 #' @details If isoformRes is provided then, a temporary pepData object is formed
@@ -65,56 +65,56 @@
 #'
 #' @rdname protein_quant
 #' @export
-#' 
+#'
 protein_quant <- function (pepData, method, isoformRes = NULL,
                            qrollup_thresh = NULL, single_pep = FALSE,
                            single_observation = FALSE, combine_fn = "median",
                            use_parallel = TRUE, emeta_cols = NULL) {
-  
+
   # Preflight checks -----------------------------------------------------------
-  
+
   # Make sure the data are on one of the log scales.
   if (get_data_scale(pepData) == "abundance") {
-    
+
     stop (paste("The data must be log transformed. Use edata_transform to",
                 "convert to the log scale.",
                 sep = " "))
-    
+
   }
-  
+
   if(!inherits(pepData, "pepData")) stop("pepData must be an object of class pepData")
   if(!(method %in% c('rollup', 'rrollup', 'qrollup', 'zrollup'))) stop("method must be one of, rollup, rrollup, qrollup, zrollup")
   if(!(combine_fn %in% c('median', 'mean'))) stop("combine_fn must be either 'mean' or 'median'")
-  
+
   #gives message if single_pep and single_observation are TRUE and method is not zrollup
   if (method != 'zrollup' && (single_pep == TRUE || single_observation == TRUE)) message("single_pep and single_observation will be ignored, as they are only applicable if method is zrollup")
-  
+
   #gives message if qrollup_thresh is not NULL and method is not qrollup
   if(method != 'qrollup' && !is.null(qrollup_thresh)) message("qrollup_thresh argument will be ignored, as it is only applicable if method is qrollup")
-  
+
   # Set the combine_fn input to the appropriate function.
   if(combine_fn == "median"){
     chosen_combine_fn <- combine_fn_median
   }else{chosen_combine_fn <- combine_fn_mean}
-  
+
   # Extract attribute info to be used throughout the function ------------------
-  
+
   # Pull out column names from e_data, f_data, and e_meta.
   edata_cname <- attr(pepData, "cnames")$edata_cname
   fdata_cname <- attr(pepData, "cnames")$fdata_cname
   emeta_cname <- attr(pepData, "cnames")$emeta_cname
-  
+
   # Extricate e_data column name index.
   edata_cname_id<- which(names(pepData$e_data) == edata_cname)
-  
+
   # Prepare attribute info when isoformRes is present.
   if (!is.null(isoformRes)) {
-    
+
     # Keep a copy of the original e_meta data frame. This will be used to
     # compute the number of peptides used per protein at the end of the
     # function.
     e_meta <- pepData$e_meta
-    
+
     # The following attributes are reset when the as.pepData function is called
     # and will need to be manually updated after creating a new pepData object
     # with the isoformRes_subset attribute.
@@ -122,20 +122,20 @@ protein_quant <- function (pepData, method, isoformRes = NULL,
     groupies <- attr(pepData, "group_DF")
     scales <- get_data_scale_orig(pepData)
     inovas <- attr(pepData, "imdanova")
-    
+
     # we will extract 'isoformRes_subset' attribute from isoformRes, which is
     # all the proteins that mapped to a nonzero proteoformID
     isoformRes2 <- attr(isoformRes, "isoformRes_subset")
-    
+
     # Extract more attributes to create the new pepData object.
     data_scale <- get_data_scale(pepData)
     is_normalized <- attr(pepData, "data_info")$norm_info$is_normalized
-    
+
     # Find the peptides that occur in both e_data and isoformRes_subset.
     peptides <- which(
       pepData$e_data[, edata_cname] %in% isoformRes2[, edata_cname]
     )
-    
+
     # Produce a pepData object with the reduced e_data object.
     pepData <- as.pepData(e_data = pepData$e_data[peptides, ],
                           f_data = pepData$f_data,
@@ -145,100 +145,100 @@ protein_quant <- function (pepData, method, isoformRes = NULL,
                           emeta_cname = "Protein_Isoform",
                           data_scale = data_scale,
                           is_normalized = is_normalized)
-    
+
     # Update the attributes that are reset in as.pepData.
     attr(pepData, "filters") <- filtas
     attr(pepData, "group_DF") <- groupies
     attr(pepData, "data_info")$data_scale_orig <- scales
     attr(pepData, "imdanova") <- inovas
-    
+
   }
-  
+
   # Quantitate the heck out of the peptides ------------------------------------
-  
+
   if (method == 'rollup') {
-    
+
     results <- pquant(pepData = pepData,
                       combine_fn = chosen_combine_fn)
-    
+
   }
-  
+
   if (method == 'rrollup') {
     results <- rrollup(pepData,
                        combine_fn = chosen_combine_fn,
                        parallel = use_parallel)
   }
-  
+
   if (method == 'qrollup') {
-    
+
     if (is.null(qrollup_thresh)) {
-      
-      stop ("qrollup_thresh parameter value must be specified") 
-      
+
+      stop ("qrollup_thresh parameter value must be specified")
+
     }
-    
+
     results <- qrollup(pepData,
                        qrollup_thresh = qrollup_thresh,
                        combine_fn = chosen_combine_fn,
                        parallel = use_parallel)
   }
-  
+
   if (method == 'zrollup') {
-    
+
     # Create both a proteomics and molecule filter object. These filter
     # objects will be used based on the input to single_pep and
     # single_observation arguments.
     proteomicsfilt <- proteomics_filter(pepData)
     moleculefilt <- molecule_filter(pepData)
-    
+
     # Check for single pepes and single observations.
     if (single_pep == FALSE && single_observation == FALSE) {
-      
+
       # Throw errors for unruly data.
       if(any(moleculefilt$Num_Observations == 1) && any(proteomicsfilt$counts_by_pro == 1)) stop("There are peptides with less than 2 observations and proteins with just a single peptide mapping to them. The method zrollup cannot be applied when this is the case. If you would like to filter out these peptides/proteins and then run zrollup, set both 'single_observation' and 'single_pep' arguments to TRUE")
       if(any(moleculefilt$Num_Observations == 1)) stop("There are peptides with less than 2 observations. The method zrollup cannot be applied when this is the case. If you would like to filter out these peptides and then run zrollup, set the 'single_observation' argument to TRUE.")
       if(any(proteomicsfilt$counts_by_pro == 1)) stop ("There are proteins with just a single peptide mapping to them. The method zrollup cannot be applied when this is the case. If you would like to filter out these single peptide to protein mappings and then run zrollup, set the 'single_pep' input argument to TRUE")
-      
+
     }
-    
+
     if (single_pep == TRUE && single_observation == FALSE) {
-      
+
       # since single_pep is TRUE we will remove proteins with single peptide
       # mapped to them
       pepData = applyFilt(proteomicsfilt, pepData, min_num_peps = 2)
-      
+
       if(any(moleculefilt$Num_Observations == 1)) stop("There are peptides with less than 2 observations. If you would like to filter out these peptides and then run zrollup, set the 'single_observation' argument to TRUE.")
-      
+
     }
-    
+
     if(single_pep == FALSE && single_observation == TRUE){
-      
+
       # since single_observation is TRUE we will remove peptides with single
       # observation
       pepData = applyFilt(moleculefilt, pepData)
-      
+
       if(any(proteomicsfilt$counts_by_pro == 1)) stop ("There are proteins with just a single peptide mapping to them. The method zrollup cannot be applied when this is the case. If you would like to filter out these single peptide to protein mappings and then run zrollup, set the 'single_pep' input argument to TRUE.")
-      
+
     }
-    
+
     if (single_pep == TRUE && single_observation == TRUE) {
-      
+
       pepData0 = applyFilt(moleculefilt, pepData, min_num = 2)
       pepData = applyFilt(proteomicsfilt, pepData0, min_num_peps = 2)
-      
+
     }
-    
+
     results <- zrollup(pepData,
                        combine_fn = chosen_combine_fn,
                        parallel = use_parallel)
   }
-  
+
   # Update e_meta after quantitation -------------------------------------------
-  
+
   # Check if isoformRes is NULL. results$e_meta will be updated differently
   # depending on whether isoformRes is present.
   if (is.null(isoformRes)) {
-    
+
     # Update e_meta with peptide counts.
     results$e_meta <- results$e_meta %>%
       dplyr::group_by(!!rlang::sym(emeta_cname)) %>%
@@ -262,25 +262,25 @@ protein_quant <- function (pepData, method, isoformRes = NULL,
       # Only keep distinct combinations of the columns that are kept.
       dplyr::distinct(dplyr::all_of(.)) %>%
       data.frame()
-    
+
     # The following runs when isoformRes is present. In this case n_peps_used
     # will be calculated based on protein isoform instead of protein (which
     # includes all isoforms).
   } else {
-    
+
     # Count the number of peptides per isoform. If qrollup was used this was
     # already done in the qrollup function otherwise the peptides per isoform
     # will be counted from the isoformRes_subset data frame.
     peps_used <- if ("n_peps_used" %in% colnames(results$e_meta)) {
-      
+
       # Extract counts from e_meta because peptides were counted in qrollup.
       results$e_meta %>%
         dplyr::select(!!rlang::sym(emeta_cname), n_peps_used) %>%
         # Only keep unique combinations of emeta_cname and n_peps_used
         dplyr::distinct(dplyr::all_of(.))
-      
+
     } else {
-      
+
       # Count peptides per isoform from the bpquant output.
       isoformRes2 %>%
         dplyr::group_by(Protein_Isoform) %>%
@@ -289,9 +289,9 @@ protein_quant <- function (pepData, method, isoformRes = NULL,
         dplyr::slice(1) %>%
         dplyr::ungroup() %>%
         dplyr::select(!!rlang::sym(emeta_cname), n_peps_used)
-      
+
     }
-    
+
     # store total number of peptides mapping to each protein (different from
     # above)
     peps_per_protein = e_meta %>%
@@ -301,17 +301,17 @@ protein_quant <- function (pepData, method, isoformRes = NULL,
       # user.
       dplyr::select(dplyr::any_of(c(emeta_cname, "peps_per_pro",
                                     emeta_cols)))
-    
+
     # Check if n_peps_used is a column in e_meta. This will only be the case if
     # qrollup was used.
     if ("n_peps_used" %in% colnames(results$e_meta)) {
-      
+
       # Remove the n_peps_used column.
       results$e_meta <- results$e_meta %>%
         dplyr::select(-n_peps_used)
-      
+
     }
-    
+
     # join the two count columns to the output e_meta
     results$e_meta <- results$e_meta %>%
       dplyr::left_join(peps_per_protein, by = emeta_cname) %>%
@@ -321,11 +321,11 @@ protein_quant <- function (pepData, method, isoformRes = NULL,
       # Only keep distinct combinations of the columns that are kept.
       dplyr::distinct(dplyr::all_of(.)) %>%
       data.frame()
-    
+
   }
-  
+
   # Update proData attributes --------------------------------------------------
-  
+
   # Update the original data scale for the proData object. This needs to be
   # manually updated because the original data scale for the proData object will
   # be set to the current data scale of the pepData object when the as.proData
@@ -333,55 +333,55 @@ protein_quant <- function (pepData, method, isoformRes = NULL,
   # to set the original data scale for the proData object to the original data
   # scale of the pepData object.
   attr(results, "data_info")$data_scale_orig <- get_data_scale_orig(pepData)
-  
+
   # Update the group_DF attribute (if it exists). This attribute will be "reset"
   # when the as.proData function is called in the rollup functions. It will need
   # to be manually updated to reflect anything done to the peptide data before
   # protein_quant.
   attr(results, "group_DF") <- attr(pepData, "group_DF")
-  
+
   # Update the pro_quant_info attribute to reflect which rollup method was used.
   attr(results, "pro_quant_info")$method <- method
-  
+
   return(results)
-  
+
 }
 
 #' Protein Quantitation using Mean or Median Peptide Abundances
-#' 
+#'
 #' This function takes in a pepData object and returns a proData object
-#' 
+#'
 #' @param pepData omicsData object of class 'pepData'
-#' 
+#'
 #' @param combine_fn A character string that can either be 'mean' or 'median'.
-#' 
+#'
 #' @return An omicsData object of class 'proData'
-#' 
+#'
 pquant <- function (pepData,
                     combine_fn) {
-  
+
   # check that pepData is of appropraite class #
   if (!inherits(pepData, "pepData")) {
-    
+
     stop ("pepData is not an object of the appropriate class")
-    
+
   }
-  
+
   # check that a protein mapping is provided #
   if (is.null(pepData$e_meta)) {
-    
+
     stop (paste("A mapping to proteins must be provided in order to use the",
                 "protein_filter function.",
                 sep = " "))
-    
+
   }
-  
+
   # Fish out the e_data, f_data, and e_meta column names corresponding to the
   # peptide, sample, and protein IDs.
   pep_id <- attr(pepData, "cnames")$edata_cname
   samp_id = attr(pepData, "cnames")$fdata_cname
   pro_id <- attr(pepData, "cnames")$emeta_cname
-  
+
   # Quantitate the heck out of the peptides!
   res <- merge(x = pepData$e_meta[, c(pep_id, pro_id)],
                y = pepData$e_data,
@@ -393,13 +393,13 @@ pquant <- function (pepData,
     dplyr::mutate(dplyr::across(.cols = -dplyr::any_of(pro_id),
                                 .fns = combine_fn)) %>%
     data.frame()
-  
-  
+
+
   # Extricate attribute info for creating the proData object.
   check_names <- attr(pepData, "check.names")
   data_scale <- attr(pepData, "data_info")$data_scale
   is_normalized <- attr(pepData, "data_info")$norm_info$is_normalized
-  
+
   # Create a proData object with the quantitated proteins.
   prodata <- as.proData(e_data = res,
                         f_data = pepData$f_data,
@@ -411,9 +411,9 @@ pquant <- function (pepData,
                         data_scale = data_scale,
                         is_normalized = is_normalized,
                         check.names = check_names)
-  
+
   return (prodata)
-  
+
 }
 
 #' Applies rrollup function
@@ -422,10 +422,10 @@ pquant <- function (pepData,
 #' protein and returns a proData object.
 #'
 #' @param pepData an omicsData object of class 'pepData'
-#' 
+#'
 #' @param combine_fn logical indicating what combine_fn to use, defaults to
 #'   median, other option is mean
-#'   
+#'
 #' @param parallel logical indicating whether or not to use "doParallel" loop in
 #'   applying rrollup function. Defaults to TRUE.
 #'
@@ -439,7 +439,7 @@ pquant <- function (pepData,
 #'   comparative analysis of computational approaches to relative protein
 #'   quantification using peptide peak intensities in label-free LC-MS
 #'   proteomics experiments}. Proteomics, 13(0), 493-503.
-#'   
+#'
 #'   Polpitiya, A. D., Qian, W.-J., Jaitly, N., Petyuk, V. A., Adkins, J. N.,
 #'   Camp, D. G., ... Smith, R. D. (2008). \emph{DAnTE: a statistical tool for
 #'   quantitative analysis of -omics data}. Bioinformatics (Oxford, England),
@@ -453,29 +453,29 @@ pquant <- function (pepData,
 #' }
 #'
 #' @rdname rrollup
-#' 
+#'
 rrollup <- function (pepData, combine_fn, parallel = TRUE) {
-  
+
   check_names = get_check_names(pepData)
-  
+
   # check that pepData is of appropraite class #
   if(!inherits(pepData, "pepData")) {
-    
+
     stop("pepData is not an object of the appropriate class")
-    
+
   }
-  
+
   # check that a protein mapping is provided #
   if(is.null(pepData$e_meta)){
     stop("A mapping to proteins must be provided in order to use the protein_filter function.")
   }
-  
+
   # Fish out the e_data, f_data, and e_meta column names corresponding to the
   # peptide, sample, and protein IDs.
   pep_id <- attr(pepData, "cnames")$edata_cname
   samp_id = attr(pepData, "cnames")$fdata_cname
   pro_id <- attr(pepData, "cnames")$emeta_cname
-  
+
   # Combine e_data and e_meta (just the peptide and protein ID columns) into one
   # data frame by peptide ID. This is a right join with e_meta being the data
   # frame on the right.
@@ -486,10 +486,10 @@ rrollup <- function (pepData, combine_fn, parallel = TRUE) {
                 all.y = TRUE) %>%
     dplyr::select(-rlang::sym(pep_id)) %>%
     data.frame()
-  
+
   #pull protein column from temp and apply unique function
   unique_proteins <- unique(temp[[pro_id]])
-  
+
   # set up parallel backend
   if(parallel == TRUE){
     cores<- parallel::detectCores()
@@ -499,22 +499,22 @@ rrollup <- function (pepData, combine_fn, parallel = TRUE) {
   } else {
     foreach::registerDoSEQ()
   }
-  
+
   r <- foreach::foreach(i=1:length(unique_proteins))%dopar%{
-    
+
     row_ind<- which(temp[ ,pro_id] == unique_proteins[i])
     current_subset<- temp[row_ind,]
     current_subset<- current_subset[,-which(names(temp) == pro_id)]
-    
+
     #### Perform R_Rollup ####
     ## store number of peptides ##
     num_peps = nrow(current_subset)
-    
+
     # Create a matrix with one row and the same number of columns as the number
     # of samples. This will be used to create a data frame with only one row
     # after using the apply function columnwise.
     res = matrix(NA, nrow = 1, ncol =  ncol(current_subset))
-    
+
     ## if only 1 peptide, set the protein value to the peptide ##
     if(num_peps==1){
       protein_val = unlist(current_subset)
@@ -523,14 +523,14 @@ rrollup <- function (pepData, combine_fn, parallel = TRUE) {
       ## missing data ##
       na.cnt = apply(is.na(current_subset),1,sum)
       least.na = which(na.cnt == min(na.cnt))
-      
+
       ## If tied, select one with highest median abundance##
       if(length(least.na)>1){
         mds = apply(current_subset,1,median,na.rm=T)[least.na]
-        least.na = least.na[which(mds==max(mds))]		
+        least.na = least.na[which(mds==max(mds))]
       }
       prot_val = unlist(current_subset[least.na,])
-      
+
       ## Step 2: Ratio all peptides to the reference.  Since the data is on the
       ## log scale, this is the difference ##
       scaling_factor = apply(rep(as.numeric(prot_val),
@@ -538,42 +538,42 @@ rrollup <- function (pepData, combine_fn, parallel = TRUE) {
                              1,
                              median,
                              na.rm=T)
-      
+
       ## Step 3: Use the median of the ratio as a scaling factor for each
       ## peptide ##
       x_scaled = current_subset + rep(scaling_factor, ncol(current_subset))
-      
+
       ## Step 4: Set Abundance as Median Peptide Abundance ##
       protein_val = apply(x_scaled, 2, combine_fn)
-      
+
     }
-    
+
     # Convert protein_val to a matrix. This needs to be done because a vector
     # cannot be converted to a single row data frame.
     res[1,] = protein_val
-    
+
     # Convert the single row matrix to a single row data frame and rename the
     # columns to the original column names.
     res <- data.frame(res)
     names(res) <- names(current_subset)
-    
+
     # Using the foreach function with %dopar% will assign the last element
     # within the curly brackets to the object when foreach is called. In this
     # case res will be assigned to the ith element of r.
     res
-    
+
   }
-  
+
   # Combine the protein abundances (or is it abundanci?).
   final_result <- data.frame(unique_proteins,
                              data.table::rbindlist(r))
   names(final_result)[1] <- pro_id
-  
+
   # Extricate attribute info for creating the proData object.
   check_names <- attr(pepData, "check.names")
   data_scale <- attr(pepData, "data_info")$data_scale
   is_normalized <- attr(pepData, "data_info")$norm_info$is_normalized
-  
+
   # Create a proData object with the quantitated proteins.
   prodata <- as.proData(e_data = final_result,
                         f_data = pepData$f_data,
@@ -585,9 +585,9 @@ rrollup <- function (pepData, combine_fn, parallel = TRUE) {
                         data_scale = data_scale,
                         is_normalized = is_normalized,
                         check.names = check_names)
-  
+
   return (prodata)
-  
+
 }
 
 #' Applies qrollup function
@@ -622,15 +622,15 @@ rrollup <- function (pepData, combine_fn, parallel = TRUE) {
 #' }
 #'
 #' @rdname qrollup
-#'   
+#'
 qrollup <- function (pepData, qrollup_thresh,
                      combine_fn, parallel = TRUE) {
-  
+
   check_names = get_check_names(pepData)
-  
+
   # check that pepData is of appropraite class #
   if(!inherits(pepData, "pepData")) stop("pepData is not an object of the appropriate class")
-  
+
   # check that a protein mapping is provided #
   if(is.null(pepData$e_meta)){
     stop("A mapping to proteins must be provided in order to use the protein_filter function.")
@@ -639,13 +639,13 @@ qrollup <- function (pepData, qrollup_thresh,
   if(!is.numeric(qrollup_thresh) || qrollup_thresh > 1 || qrollup_thresh < 0){
     stop("qrollup_thresh must be Numeric and between 0 and 1")
   }
-  
+
   # Fish out the e_data, f_data, and e_meta column names corresponding to the
   # peptide, sample, and protein IDs.
   pep_id <- attr(pepData, "cnames")$edata_cname
   samp_id = attr(pepData, "cnames")$fdata_cname
   pro_id <- attr(pepData, "cnames")$emeta_cname
-  
+
   # Combine e_data and e_meta (just the peptide and protein ID columns) into one
   # data frame by peptide ID. This is a right join with e_meta being the data
   # frame on the right.
@@ -656,10 +656,10 @@ qrollup <- function (pepData, qrollup_thresh,
                 all.y = TRUE) %>%
     dplyr::select(-rlang::sym(pep_id)) %>%
     data.frame()
-  
+
   #pull protein column from temp and apply unique function
   unique_proteins<- unique(temp[[pro_id]])
-  
+
   # set up parallel backend
   if(parallel == TRUE){
     cores<- parallel::detectCores()
@@ -669,17 +669,17 @@ qrollup <- function (pepData, qrollup_thresh,
   } else {
     foreach::registerDoSEQ()
   }
-  
+
   r<-foreach::foreach(i=1:length(unique_proteins))%dopar%{
-    
+
     row_ind<- which(temp[ ,pro_id] == unique_proteins[i])
     current_subset<- temp[row_ind,]
     current_subset<- current_subset[,-which(names(temp) == pro_id)]
-    
+
     #### Perform Q_Rollup ####
     ## store number of peptides ##
     num_peps = nrow(current_subset)
-    
+
     res = matrix(NA, nrow = 1, ncol =  ncol(current_subset))
     ## if only 1 peptide, set the protein value to the peptide ##
     if(num_peps==1){
@@ -689,48 +689,48 @@ qrollup <- function (pepData, qrollup_thresh,
       ## Step 1: Subset peptides whose abundance is >= to qrollup_thresh ##
       means = apply(current_subset,1,mean,na.rm=T)
       quantil = quantile(means, probs = qrollup_thresh, na.rm = T)
-      
+
       new_subset = current_subset[which(means >= quantil), ]
       peps_used <- nrow(new_subset)
-      
+
       #after step 1 if only 1 peptide, set the protein value to the peptide
       if(nrow(new_subset) == 1){
         protein_val = unlist(new_subset)
       }else{
-        ## Step 2: Set protein abundance as the mean/median of peptide abundances 
+        ## Step 2: Set protein abundance as the mean/median of peptide abundances
         protein_val = apply(new_subset, 2, combine_fn)
       }
     }
-    
+
     # Convert protein_val to a matrix. This needs to be done because a vector
     # cannot be converted to a single row data frame.
     res[1,] <- protein_val
-    
+
     # Convert the single row matrix to a single row data frame and rename the
     # columns to the original column names.
     res <- data.frame(res)
     names(res) <- names(current_subset)
-    
+
     # Using the foreach function with %dopar% will assign the last element
     # within the curly brackets to the object when foreach is called. In this
     # case the list containing res and peps_used will be assigned to the ith
     # element of r.
     list(res, peps_used)
-    
+
   }
-  
+
   # Combine the protein abundances (or is it abundanci?).
   final_result <- data.frame(unique_proteins,
                              data.table::rbindlist(
                                lapply(r, function(x) x[[1]])
                              ))
   names(final_result)[1] <- pro_id
-  
+
   # Combine the peptide counts with their corresponding proteins.
   temp_pepes <- data.frame(final_result[, 1],
                            n_peps_used = sapply(r, function(x) x[[2]]))
   names(temp_pepes)[1] <- pro_id
-  
+
   # Combine the peptide counts with pepData$e_meta by protein. This is done to
   # preserve information in the rows of e_meta. For example, there could be
   # fewer unique proteins than there are rows of e_meta. If we do not combine
@@ -741,12 +741,12 @@ qrollup <- function (pepData, qrollup_thresh,
                                  by = pro_id) %>%
     # Remove peptide id column.
     dplyr::select(-rlang::sym(pep_id))
-  
+
   # Extricate attribute info for creating the proData object.
   check_names <- attr(pepData, "check.names")
   data_scale <- attr(pepData, "data_info")$data_scale
   is_normalized <- attr(pepData, "data_info")$norm_info$is_normalized
-  
+
   # Create a proData object with the quantitated proteins.
   prodata <- as.proData(e_data = final_result,
                         f_data = pepData$f_data,
@@ -757,9 +757,9 @@ qrollup <- function (pepData, qrollup_thresh,
                         data_scale = data_scale,
                         is_normalized = is_normalized,
                         check.names = check_names)
-  
+
   return(prodata)
-  
+
 }
 
 #' Applies zrollup function
@@ -792,25 +792,25 @@ qrollup <- function (pepData, qrollup_thresh,
 #' }
 #'
 #' @rdname zrollup
-#'   
+#'
 zrollup <- function (pepData, combine_fn, parallel = TRUE) {
-  
+
   check_names = get_check_names(pepData)
-  
+
   # check that pepData is of appropraite class #
   if(!inherits(pepData, "pepData")) stop("pepData is not an object of the appropriate class")
-  
+
   # check that a protein mapping is provided #
   if(is.null(pepData$e_meta)){
     stop("A mapping to proteins must be provided in order to use the protein_filter function.")
   }
-  
+
   # Fish out the e_data, f_data, and e_meta column names corresponding to the
   # peptide, sample, and protein IDs.
   pep_id <- attr(pepData, "cnames")$edata_cname
   samp_id = attr(pepData, "cnames")$fdata_cname
   pro_id <- attr(pepData, "cnames")$emeta_cname
-  
+
   # Combine e_data and e_meta (just the peptide and protein ID columns) into one
   # data frame by peptide ID. This is a right join with e_meta being the data
   # frame on the right.
@@ -821,10 +821,10 @@ zrollup <- function (pepData, combine_fn, parallel = TRUE) {
                 all.y = TRUE) %>%
     dplyr::select(-rlang::sym(pep_id)) %>%
     data.frame()
-  
+
   #pull protein column from temp and apply unique function
   unique_proteins <- unique(temp[[pro_id]])
-  
+
   # set up parallel backend
   if(parallel == TRUE){
     cores<- parallel::detectCores()
@@ -834,55 +834,55 @@ zrollup <- function (pepData, combine_fn, parallel = TRUE) {
   } else {
     foreach::registerDoSEQ()
   }
-  
+
   r <- foreach::foreach(i=1:length(unique_proteins))%dopar%{
-    
+
     row_ind<- which(temp[ ,pro_id] == unique_proteins[i])
     current_subset<- temp[row_ind,]
     current_subset<- current_subset[,-which(names(temp) == pro_id)]
-    
+
     #### Perform Z_Rollup ####
     ## store number of peptides ##
     num_peps = nrow(current_subset)
-    
+
     res = matrix(NA, nrow = 1, ncol =  ncol(current_subset))
     ## Step 1: Compute mean and sd of peptides ##
     mds = apply(current_subset, 1, median, na.rm = T)
     sds = apply(current_subset, 1, sd, na.rm = T)
-    
+
     ## Step 2: Scale peptide data as pep_scaled = (pep - median)/sd
     medians_mat = matrix(mds, nrow = num_peps, ncol = ncol(current_subset), byrow = F)
     standiv_mat = matrix(sds, nrow = num_peps, ncol = ncol(current_subset), byrow = F)
-    
+
     peptides_scaled = apply((current_subset - medians_mat)/standiv_mat,
                             2, combine_fn)
-    
+
     # Convert protein_val to a matrix. This needs to be done because a vector
     # cannot be converted to a single row data frame.
     res[1,] = peptides_scaled
-    
+
     # Convert the single row matrix to a single row data frame and rename the
     # columns to the original column names.
     res <- data.frame(res)
     names(res) <- names(current_subset)
-    
+
     # Using the foreach function with %dopar% will assign the last element
     # within the curly brackets to the object when foreach is called. In this
     # case res will be assigned to the ith element of r.
     res
-    
+
   }
-  
+
   # Combine the protein abundances (or is it abundanci?).
   final_result <- data.frame(unique_proteins,
                              data.table::rbindlist(r))
   names(final_result)[1] <- pro_id
-  
+
   # Extricate attribute info for creating the proData object.
   check_names <- attr(pepData, "check.names")
   data_scale <- attr(pepData, "data_info")$data_scale
   is_normalized <- attr(pepData, "data_info")$norm_info$is_normalized
-  
+
   # Create a proData object with the quantitated proteins.
   prodata <- as.proData(e_data = final_result,
                         f_data = pepData$f_data,
@@ -894,7 +894,19 @@ zrollup <- function (pepData, combine_fn, parallel = TRUE) {
                         data_scale = data_scale,
                         is_normalized = is_normalized,
                         check.names = check_names)
-  
+
   return (prodata)
-  
+
 }
+
+# Functions for combining data in rollup methods -------------------------------
+
+combine_fn_mean <- function (x) {
+
+  if (all(is.na(x)))
+    mean(x) else
+      mean(x, na.rm = T)
+
+}
+
+combine_fn_median <- function (x) median(x, na.rm = T)

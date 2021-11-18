@@ -296,7 +296,7 @@ imd_anova <- function (omicsData,
     g_flags <- data.matrix(Full_results[grep("^Flag_G_",
                                              colnames(Full_results))])
 
-    # Replance missing ANOVA p-values with g-test p-values
+    # Replace missing ANOVA p-values with g-test p-values
     if (any(is.na(imd_pvals))) {
 
       anova_NAs <- which(is.na(imd_pvals))
@@ -386,4 +386,1007 @@ imd_anova <- function (omicsData,
 
   return (final_out)
 
+}
+
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+# ANOVA FUNCTIONS --------------------------------------------------------------
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+#' Tests for a quantiative difference between groups (aka factors, aka main
+#' effects)
+#'
+#' This is the ANOVA part of the IMD-ANOVA test proposed in Webb-Robertson et
+#' al. (2010).
+#'
+#' The order in which different scenarios are handeled: \enumerate{ \item If the
+#' data are paired, then the pairing is accounted for first then each of the
+#' next steps is carried out on the new variable that is the difference in the
+#' paired individuals.<br> \item If covariates are provided, their effect is
+#' removed before testing for group differences though mathematically covariates
+#' and grouping effects are accounted for simultaneously \item ANOVA is executed
+#' to assess the effect of each main effects, results in a vector of group means
+#' for each biomolecule and variance estimate \item Group comparisons defined by
+#' `comaprison` argument are implemented use parameter vector and variance
+#' estimates in ANOVA step }
+#'
+#' @param omicsData A pmartR data object of any class
+#' @param comparisons data.frame with columns for "Control" and "Test"
+#'   containing the different comparisons of interest. Comparisons will be made
+#'   between the Test and the corresponding Control  If left NULL, then all
+#'   pairwise comparisons are executed.
+#' @param pval_adjust A character string specifying the type of multiple
+#'   comparisons adjustment to implement. The default, "none", corresponds to no
+#'   adjustment. Valid options include: "bonferroni", "holm", "tukey", and
+#'   "dunnett".
+#' @param pval_thresh numeric p-value threshold, below or equal to which
+#'   peptides are considered differentially expressed. Defaults to 0.05
+#' @param covariates data.frame similar to \code{groupData} consisting of two
+#'   columsn: the sample ID variable (with names matching column names in
+#'   \code{omicsData$e_data}) and a column containing the numeric or group data
+#'   for each sample
+#' @param paired logical; should the data be paired or not? if TRUE then the
+#'   `f_data` element of `omicsData` is checked for a "Pair" column, an error is
+#'   returned if none is found
+#' @param equal_var logical; should the variance across groups be assumed equal?
+#'
+#'
+#' @return  a list of `data.frame`s
+#'   \tabular{ll}{
+#'   Results  \tab Edata cname,
+#'   Variance Estimate, ANOVA F-Statistic, ANOVA p-value, Group means\cr \tab
+#'   \cr Fold_changes  \tab Estimated fold-changes for each comparison \cr \tab
+#'   \cr Fold_changes_pvalues  \tab P-values corresponding to the fold-changes
+#'   for each comparison \cr \tab \cr Fold_change_flags  \tab Indicator of
+#'   statistical significance (0/+-2 to if adjusted p-value>=pval_thresh or
+#'   p-value<pval_thresh) \cr
+#'   }
+#'
+#' @author Bryan Stanfill
+#'
+#' @references Webb-Robertson, Bobbie-Jo M., et al. "Combined statistical
+#'   analyses of peptide intensities and peptide occurrences improves
+#'   identification of significant peptides from MS-based proteomics data."
+#'   Journal of proteome research 9.11 (2010): 5748-5756.
+#'
+anova_test <- function (omicsData, comparisons, pval_adjust,
+                        pval_thresh, covariates, paired, equal_var) {
+
+  # check that omicsData is of the appropriate class
+  if(!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData", "nmrData"))) stop("omicsData must be of class 'pepData', 'proData', 'metabData', 'lipidData', or 'nmrData'.")
+
+  # Check for group_DF attribute #
+  if(!("group_DF" %in% names(attributes(omicsData)))){
+    stop("group_designation must be called in order to create a 'group_DF' attribute for omicsData.")
+  }else{
+    groupData <- attributes(omicsData)$group_DF
+  }
+
+  # Ensure a maximum of two covariates are input.
+  if (length(covariates) > 2) {
+
+    # Personal foul pmartR user. Excessive use of covariates.
+    stop ("A maximum of two covariates may be used.")
+
+  }
+
+  #Catch if number of groups is too small
+  k <- length(unique(groupData$Group))
+  if(k<2){
+    stop("At least two groups are necessary to perform an ANOVA.")
+  }
+
+  # Check for log transform #
+  if(!(attr(omicsData,"data_info")$data_scale%in%c("log2","log","log10"))){
+    stop("Data must be log transformed in order to implement ANOVA.")
+  }
+
+  ###--------Check for anova filter-------------###
+  if(is.null(attr(omicsData,"imdanova"))){
+    warning("These data haven't been filtered, see `?imdanova_filter` for details.")
+  }else{
+    cnames <- omicsData$e_data[,attr(omicsData,"cnames")$edata_cname]
+    filterrows <- which(cnames%in%attr(omicsData,"imdanova")$test_with_anova)
+    if(length(filterrows)>0)
+      omicsData$e_data <- omicsData$e_data[filterrows,]
+  }
+
+  #----Check to see if appropriate p-value adjustment technique is chosen----#
+  #all pairwise -> Tukey
+  #Case versus control -> Dunnett
+  if(length(unique(comparisons$Control))==1 & tolower(pval_adjust)=="tukey" & length(comparisons$Control)>1){
+    stop("Tukey adjustment for multiple comparisions should only be used when all pairwise comparisons are being made; try a 'Dunnett' adjustment.")
+  }
+
+  # if((length(unique(comparisons$Control))>1 | (is.null(comparisons) & length(unique(groupData$Group))>2)) & tolower(pval_adjust)=="dunnett"){
+  #   stop("Dunnett adjustment for multiple comparisions should only be used when all case-vs-control comparisons are being made; try a 'Tukey' adjustment.")
+  # }
+
+  samp_cname <- attr(omicsData,"cnames")$fdata_cname
+
+  # 10/27/2021 Not sure when/if the columns in e_data could be different from
+  # the rows in group_DF. We are leaving the following code how it is to prevent
+  # any unforeseen and unfortunate cases where groupData (the group_DF
+  # attribute) has more columns than e_data (yikes!).
+
+  # Remove rows in "groupData" that don't have corresponding columns in
+  # 'omicsData$edata'
+  # The sampleIDs in groupData (possibly more than is in the e_data)
+  group_samp_cname <- groupData[,samp_cname]
+  # Only keep the rows of groupData that have columns in e_data
+  groupData <- groupData[group_samp_cname%in%colnames(omicsData$e_data),]
+
+  #Create a data matrix that only includes the samples in "groupData" and put them in the order specified by
+  #"groupData"
+  data <- omicsData$e_data[,as.character(groupData[,samp_cname])]
+
+  # Paired stuffs --------------------------------------------------------------
+
+  # If paired==TRUE then use the pairing to create pair adjusted abundances.
+  if(paired){
+    ##--- check for one and only one "pair" column in f_data ----##
+    fdata_names <- tolower(colnames(omicsData$f_data))
+    pair_col <-grep("pair",fdata_names)
+    if(length(pair_col)==0){
+      stop("When `paired=TRUE`, a `Pair` column must be supplied within `f_data`")
+    }else if(length(pair_col)>1){
+      stop("Too many pair ID columns have been provided.  Please remove the redundant one.")
+    }
+
+    ##---- each pair must have two observations ----#
+    not_two <- which(unname(table(omicsData$f_data[,pair_col]))!=2)
+    if(length(not_two)>0){
+      pair_id <- names(table(omicsData$f_data[,pair_col]))[not_two]
+      stop(paste("Pair",pair_id,"does not have the two observations needed to form a pair."))
+    }
+
+    ##---- use the pairing info to form paired differences ------##
+    #source('~/pmartR/R/paired_supp_funs.R')
+    cols <- c(which(colnames(omicsData$f_data)==samp_cname),pair_col)
+    pid_matrix <- build_pair_mat(pair_df = omicsData$f_data[,cols])
+    #The new "data" are the paired differences, so overwrite data with paried differences
+    #Rcpp::sourceCpp('src/fc_functions.cpp')
+    #data <- fold_change_diff_na_okay(data = data.matrix(omicsData$e_data[,-1]),C = t(pid_matrix)) #This failed if columns didn't
+    data <- fold_change_diff_na_okay(data = data.matrix(omicsData$e_data[,as.character(omicsData$f_data[,samp_cname])]),C = t(pid_matrix))
+
+    #Add columns names
+    if(is.numeric(omicsData$f_data[,pair_col])){
+      colnames(data) <- paste("Pair",omicsData$f_data[,pair_col][apply(pid_matrix,1,function(x)return(any(x>0)))])
+    }else{
+      colnames(data) <- omicsData$f_data[,pair_col][apply(pid_matrix,1,function(x)return(any(x>0)))]
+    }
+    #pid_matrix could potentially be large, delete it
+    rm(pid_matrix)
+
+    #groupData needs to be updated so that pairs map to groups instead of observations
+    groupData <- merge(groupData,omicsData$f_data[,cols],sort = FALSE)
+    groupData <- groupData%>%group_by_at(vars(contains("pair")))%>%dplyr::summarize(NewGroup=first(Group))
+
+    colnames(groupData) <- c(samp_cname,"Group")
+    groupData <- data.frame(groupData)
+    if(is.numeric(omicsData$f_data[,pair_col])){
+      groupData[,which(colnames(groupData)==samp_cname)] <- paste("Pair",groupData[,which(colnames(groupData)==samp_cname)])
+    }
+    #k needs to be updated too
+    k <- length(unique(groupData$Group))
+
+    #If provided, covariate data needs to be updated too
+    if(!is.null(covariates)){
+      covariates <- merge(covariates,omicsData$f_data[,cols],sort = FALSE)
+      orig_colnames <- colnames(covariates)
+      colnames(covariates)[c(2,3)] <- c("Cov","PairID")
+      covariates <- covariates%>%group_by(PairID)%>%dplyr::summarize(NewCov=first(Cov))
+      colnames(covariates) <- c(samp_cname,orig_colnames[2])
+      covariates <- data.frame(covariates)
+      if(is.numeric(omicsData$f_data[,pair_col])){
+        covariates[,which(colnames(covariates)==samp_cname)] <- paste("Pair",covariates[,which(colnames(covariates)==samp_cname)])
+      }
+    }
+  }
+
+  # Covariate stuffs -----------------------------------------------------------
+
+  # If covariates are provided, remove their effect before computing group
+  # means/variances.
+  if(!is.null(covariates)){
+
+    # Extract the covariates data frame from the group_DF attribute. This will
+    # be used to combine with the main effects data to create the correct x
+    # matrix (when removing the effect of covariates).
+    cov_data <- attr(attr(omicsData, "group_DF"), "covariates")
+
+    # Nab the names of the covariates in the covariates data. This will be used
+    # to ensure the covariates entered by the user actually exist in the
+    # covariates attribute. --Even though they are working on advanced problems
+    # the user is usually dimwitted and messes up the inputs.-- The name of the
+    # sample ID will be removed because it is not needed when checking the
+    # input.
+    names_cov_data <- names(cov_data)[-1]
+
+    # Make sure all covariates from the input are in the group_DF attribute.
+    if (!all(covariates %in% names_cov_data)) {
+
+      stop (paste("The specified covariates are not in the group_DF attribute.",
+                  "Only covariates listed in this attribute can be used.",
+                  sep = " "))
+
+    }
+
+    # The -1 is hard coded because the sample ID name is ALWAYS the first column
+    # in the covariates data frame.
+    if (any(is.na(cov_data[, -1]))) {
+
+      warning("Missing values were detected in the provided covariates thus covariates will be ignored")
+      red_df <- matrix(rep(0,nrow(data)),ncol=1)
+
+    } else {
+
+      # The covariates data frame could have up to three columns: sample ID,
+      # covariate 1, and covariate 2. The user could only input one of the two
+      # covariates into the imd_anova function. We need to subset the columns of
+      # the covariates data frame with the actual input to the covariates input.
+      cov_idx <- which(names(cov_data) %in% covariates)
+
+      # Combine main effect and covariate data. We only want two columns from
+      # the main effect data frame (groupData). These columns are the sample ID
+      # column and the Group column. The Group column contains all the
+      # information we need for creating the X matrix. We also need the sample
+      # ID column from the covariate data frame along with the corresponding
+      # columns for any covariates in the input. The 1 is hard coded because the
+      # sample ID column will always be the first column in the covariate data
+      # frame.
+      covariates <- merge(groupData[c(samp_cname, "Group")],
+                          cov_data[, c(1, cov_idx)],
+                          sort = FALSE)
+      cov_samp_col <- which(colnames(covariates)==samp_cname)
+      #source('~/pmartR/R/covariate_supp_funs.R') #Run to debug
+      xmatrix <- build_x_mat(covariates[,-cov_samp_col]) #Build the appropriate X matrix based on the covariates data frame
+      xmatrix <- reduce_xmatrix(xmatrix,length(unique(groupData$Group)))
+
+      #Remove effect of covariates by projecting into the null space generated by the X matrix
+      allproj <- project_to_null_cpp(data.matrix(data),xmatrix,length(unique(groupData$Group)))
+      data <- allproj$data_no_x
+      red_df <- allproj$lost_df
+      #print(red_df)
+
+    }
+
+    # If covariates are adjusted for, then force equal variance assumption even
+    # if there are only two levels to main effect
+    equal_var <- TRUE
+
+  } else {
+
+    # Set the value of reduced degrees of freedom (the degrees of freedom used
+    # up for covariates) to zero because covariates were not used.
+    red_df <- matrix(rep(0,nrow(data)),ncol=1)
+
+  }
+
+  # ANOVA stuffs ---------------------------------------------------------------
+
+  if(ncol(groupData)==2){
+    ##---- One factor ANOVA ----##
+
+    ##Translate the groups into numeric labels for anova_cpp() function
+    gp <- factor(groupData$Group,labels=1:k,levels=unique(groupData$Group))
+
+    #Rcpp::sourceCpp('~/pmartR/src/anova_helper_funs.cpp') #Run if debugging code
+    raw_results <- anova_cpp(data.matrix(data),gp,1-equal_var,red_df)
+    group_names <- paste("Mean",as.character(unique(groupData$Group)),sep="_")
+
+  }else{
+    ##---- Two factor ANOVA ----##
+    #source('~/pmartR/R/anova_helper_fun.R') #Run if debugging
+    #source('~/pmartR/R/covariate_supp_funs.R')
+    #Rcpp::sourceCpp('~/pmartR/src/two_factor_anova.cpp')
+    raw_results <- run_twofactor_cpp(data=data.matrix(data),gpData=groupData,red_df)
+    group_names <- paste("Mean",colnames(raw_results$group_means),sep="_")
+  }
+
+  #The C++ function returns a list so we need to make it into a data.frame
+  results <- data.frame(raw_results$Sigma2, raw_results$group_means, raw_results$Fstats, raw_results$pvalue)
+
+  #Rename the columns to match group names
+  colnames(results) <- c("Variance",group_names,"F_Statistic","p_value")
+
+  #Pull off edata_cname and add to results df
+  edatacname <- attr(omicsData,"cnames")$edata_cname
+  results <- cbind(omicsData$e_data[edatacname],results)
+
+  ###-------Use group_comparison_anova() to compare the groups that were requested--------------##
+  #source('~/pmartR/R/group_comparison.R') # Run if debugging
+  #Rcpp::sourceCpp('~/pmartR/src/group_comparisons.cpp') #Run if debugging
+  group_comp <- group_comparison_anova(groupData=groupData,comparisons=comparisons,anova_results_full=list(Results=results,Sizes=raw_results$group_sizes))
+
+  #If there are only two levels, replace group_comp p-values with those taken from ANOVA function
+  if(k==2){
+    group_comp$p_values <- raw_results$pvalue
+  }
+
+  # Fold change stuffs ---------------------------------------------------------
+
+  #Different way to compute fold change: diff if log scale, ratio otherwise
+  if(attr(omicsData,"data_info")$data_scale%in%c("log2","log","log10")){
+    fold_change <- group_comp$diff_mat
+  }else{
+    # CONSIDER MAKING GROUP_COMPARISON RETURN THE CMAT ALONG WITH EVERYTHING
+    # ELSE INSTEAD OF RECREATING IT HERE
+    Cmat_res <- create_c_matrix(groupData, comparisons)
+    Cmat <- Cmat_res$cmat
+    fold_change <- fold_change_ratio(raw_results$group_means, Cmat)
+    fold_change <- data.frame(fold_change)
+    colnames(fold_change) <- colnames(group_comp$diff_mat)
+  }
+
+
+  # p-value correction stuffs --------------------------------------------------
+
+  p_values_adjust <- p_adjustment_anova(p_values = group_comp$p_values,
+                                        diff_mean = group_comp$diff_mat,
+                                        t_stats = group_comp$t_tests,
+                                        sizes = raw_results$group_sizes,
+                                        pval_adjust = pval_adjust)
+  colnames(p_values_adjust) <- colnames(fold_change)
+
+
+  # Flag stuffs ----------------------------------------------------------------
+
+  # Create object to be returned
+  sig_indicators <- data.matrix(p_values_adjust)
+
+  sigs <- which(sig_indicators<pval_thresh)
+  if(length(sigs)>0){
+    sig_indicators[sigs] <- sign(data.matrix(group_comp$diff_mat)[sigs])
+    sig_indicators[-sigs] <- 0
+  }else{
+    sig_indicators[which(sig_indicators>=pval_thresh)] <- 0
+  }
+  sig_indicators <- data.frame(sig_indicators)
+  colnames(sig_indicators) <- colnames(fold_change)
+
+  # Return stuffs --------------------------------------------------------------
+
+  # (estimated variance, F-statistic, p-value and group means), estimated fold
+  # changes, and adjusted p-values for the requested comparisons
+  return (list(Results = results,
+               Fold_changes = fold_change,
+               Fold_change_pvalues = p_values_adjust,
+               Flags = sig_indicators))
+
+}
+
+#Wrapper function for the two factor ANOVA function
+run_twofactor_cpp <- function(data,gpData,red_df){
+  #Create design matrix for reduced model, i.e., no interaction effect
+  colnames(gpData)[-c(1,2)] <- c("Factor1","Factor2")
+  gpData <- cbind(gpData,y=1:nrow(gpData))
+
+  #Create design matrix for the full model, i.e., all first order and
+  #interaction effects
+  Xred <- unname(model.matrix(lm(y~Factor1+Factor2-1,data=gpData)))
+  Xfull <- unname(model.matrix(lm(y~Factor1*Factor2-1,data=gpData)))
+
+  #Run the two factor ANOVA model
+  #Edit 2/16: add "group_ids" so C++ knows which groups belong to which columns,
+  #helps with handling NaNs
+  res <- two_factor_anova_cpp(
+    data,
+    Xfull,
+    Xred,
+    red_df,
+    group_ids=as.numeric(factor(gpData$Group,levels=unique(gpData$Group)))
+  )
+
+  #Get the unique group levels to translate ANOVA parameters into group means
+  red_gpData <- dplyr::distinct(gpData,Group,.keep_all=TRUE)
+  red_gpData <- dplyr::arrange(red_gpData,y)
+
+  means <- res$par_estimates[,1:length(red_gpData$Group)]
+  colnames(means) <- red_gpData$Group
+
+  res$group_means <- means
+  return(res)
+}
+
+#' Group comparisons for the anova test
+#'
+#' Takes the results of anova_test() and returns group comparison p-values
+#'
+#' @param groupData data frame that assigns sample names to groups
+#' @param comparisons dataframe that defiens the comparsions of interest
+#' @param anova_results results of the pmartR::anova_test() function
+#'
+#' @return A data.frame containing the p-values from the group comparisons.
+#'
+#' @author Bryan Stanfill
+#'
+group_comparison_anova <- function(groupData,comparisons,anova_results_full){
+
+  #The group means include the word "Group" in them so that is what will be passed
+  #to the group_comparison(...) and fold_change(...) functions along with estimated variance
+  anova_results <- anova_results_full$Results
+  means <- data.matrix(anova_results[,grep("Mean",colnames(anova_results))])
+  sigma2 <- data.matrix(anova_results$Variance)
+  sizes <- data.matrix(anova_results_full$Sizes)
+  #rm(anova_results_full)
+
+  #If "comparisons" is null, then do all pairwise comparisons, else use the "comparisons" df to
+  #create the appropriate C matrix
+
+  ##---- I used to deal with one vs two factor differently, that code is at the end of this script -----##
+  Cmat_res <- create_c_matrix(group_df = groupData, to_compare_df = comparisons)
+
+  Cmat <- Cmat_res$cmat
+  group_comp <- group_comparison_anova_cpp(means, sizes, sigma2, Cmat)
+
+  group_comp$diff_mat <- data.frame(group_comp$diff_mat)
+  colnames(group_comp$diff_mat) <- Cmat_res$names
+  colnames(group_comp$diff_ses) <- Cmat_res$names
+  colnames(group_comp$t_tests) <- paste(Cmat_res$names,"Test-Stat")
+  group_comp$p_values <- data.frame(group_comp$p_values)
+  colnames(group_comp$p_values) <- paste(Cmat_res$names,"p-value")
+  return(group_comp)
+}
+
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+# IMD FUNCTIONS ----------------------------------------------------------------
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+#' Tests for the independence of missing data across groups (aka factors, aka
+#' main effects)
+#'
+#' Tests the null hypothesis that the number of missing observations is
+#' independent of the groups.  A g-test is used to test this null hypothese
+#' against the alternative that the groups and missing data are related.  This
+#' is usually performed in conjuction with an ANOVA which tests if the mean
+#' response (which varies with data type) is the same across groups; this
+#' combination is called IMD_ANOVA.  It's probably a good idea to first filter
+#' the data with `imd_anova_filter` to see if there is enough infomration to
+#' even do this test.  See Webb-Robertson et al. (2010) for more.
+#'
+#' @param omicsData A pmartR data object of any class
+#' @param comparisons `data.frame` with columns for "Control" and "Test"
+#'   containing the different comparisons of interest. Comparisons will be made
+#'   between the Test and the corresponding Control  If left NULL, then all
+#'   pairwise comparisons are executed.
+#' @param pval_adjust A character string specifying the type of multiple
+#'   comparisons adjustment to implement. The default setting, "none", is to not
+#'   apply an adjustment. Valid options include: "bonferroni" and "holm".
+#' @param pval_thresh numeric p-value threshold, below or equal to which
+#'   peptides are considered differentially expressed. Defaults to 0.05
+#'
+#' @return  a list of `data.frame`s
+#'   \tabular{ll}{
+#'   Results  \tab e_data cname,
+#'   Count of non-missing data for each group, Global G-test statistic and
+#'   p-value\cr \tab \cr Gstats  \tab Value of the g statistics for each of the
+#'   pairwise comparisons specified by the `comparisons` argument \cr \tab \cr
+#'   Pvalues  \tab p-values for each of the pairwise comparisons specified by
+#'   `comparisons` argument \cr \tab \cr Flags  \tab Indicator of statistical
+#'   significance where the sign of the flag reflects the difference in the
+#'   ratio of non-missing observations (0/+-2 to if adjusted
+#'   p-value>=pval_thresh or p-value<pval_thresh) \cr
+#'   }
+#'
+#' @author Bryan Stanfill
+#'
+#' @references Webb-Robertson, Bobbie-Jo M., et al. "Combined statistical
+#' analyses of peptide intensities and peptide occurrences improves
+#' identification of significant peptides from MS-based proteomics data."
+#' Journal of proteome research 9.11 (2010): 5748-5756.
+#'
+imd_test <- function (omicsData, comparisons, pval_adjust, pval_thresh) {
+
+  # check that omicsData is of the appropriate class
+  if(!inherits(omicsData, c("proData","pepData","lipidData", "metabData", "nmrData"))) stop("omicsData is not an object of appropriate class")
+
+  # Check for group_DF attribute #
+  if(!("group_DF" %in% names(attributes(omicsData)))){
+    stop("group_designation must be called in order to create a 'group_DF' attribute for omicsData.")
+  }else{
+    groupData <- attributes(omicsData)$group_DF
+  }
+
+  #Catch if number of groups is too small
+  k <- length(unique(groupData$Group))
+  if(k<2){
+    stop("This test cannot be performed with less than two groups.")
+  }
+
+  #Check for gtest filter
+  if(is.null(attr(omicsData,"imdanova"))){
+    warning("These data haven't been filtered, see `?imdanova_filter` for details.")
+  }else{
+    cnames <- omicsData$e_data[,attr(omicsData,"cnames")$edata_cname]
+    filterrows <- which(cnames%in%attr(omicsData,"imdanova")$test_with_gtest)
+    if(length(filterrows)>0)
+      omicsData$e_data <- omicsData$e_data[filterrows,]
+  }
+
+  #Remove rows in "groupData" that don't have corresponding columns in 'omicsData$edata'
+  samp_cname <- attr(omicsData,"cnames")$samp_cname
+  if(is.null(samp_cname)){ #Added becuase "samp_cname" has been replaced with "fdata_cname"
+    samp_cname <- attr(omicsData,"cnames")$fdata_cname
+  }
+  group_samp_cname <- groupData[,samp_cname] #The sampleIDs in groupData (possibly more than is in the e_data)
+  groupData <- groupData[group_samp_cname%in%colnames(omicsData$e_data),] #Only keep the rows of groupData that have columns in e_data
+  #groupData <- dplyr::filter(groupData,SampleID%in%colnames(omicsData$e_data)) #This is faster but too specific to a cname of SampleID
+
+  #Create a data matrix that only includes the samples in "groupData" and put them in the order specified by
+  #"groupData"
+  data <- omicsData$e_data[,as.character(groupData[,samp_cname])]
+
+  #Find the number of times each peptide was absent for each of the experimental groups, matrix of CAk values
+  gp <- factor(groupData$Group,labels=1:k,levels=unique(groupData$Group))
+
+  #Number of samples associated with each group
+  nK <- as.numeric(table(gp))
+  label_map <- data.frame(Num_label=1:k,Group=unique(groupData$Group),nK=nK)
+
+  #----- Global IMD test - any pattern in missing across all groups? -----#
+
+  #Rcpp::sourceCpp('src/count_missing_cpp.cpp') #Run for debugging
+  absent <- count_missing_cpp(data.matrix(data),gp)
+  colnames(absent) <- label_map$Group
+
+  #Number of times each peptide was observed for each of the experimental groups, matrix of COk values
+  observed <- matrix(label_map$nK,nrow=nrow(absent),ncol=ncol(absent),byrow=TRUE)
+  observed <- observed-absent
+  colnames(observed) <- label_map$Group
+
+  #compute total number of samples from which each peptide is absent (mA) or observed (mO)
+  mA <- rowSums(absent)
+  mO <- rowSums(observed)
+  N <- mA+mO
+
+  #Expected number of absences (EAk) and observations (EOk) for each group
+  EAk <- (mA/N)*matrix(label_map$nK,nrow=nrow(absent),ncol=ncol(absent),byrow=TRUE)
+  EOk <- (mO/N)*matrix(label_map$nK,nrow=nrow(absent),ncol=ncol(absent),byrow=TRUE)
+
+  #Sum is only taken over non-zero counts; zero counts are turned into NaN so they need to be zeroed out
+  Gks <- observed*log(observed/EOk)
+  Gks[which(is.nan(Gks))] <- 0
+  GksA <- absent*log(absent/EAk)
+  GksA[which(is.nan(GksA))] <- 0
+  Gks <- Gks+GksA
+
+  #Compute test statistic but summing over all nonzero counts (na.rm=TRUE removes the zero counts)
+  Global_Gk <- 2*rowSums(Gks)
+
+  #Put the statistic, degrees of freedom and p-value into a data frame
+  Global_results <- data.frame(Statistic=Global_Gk, p_value=pchisq(Global_Gk,df=(k-1),lower.tail = FALSE))
+
+  #Pull off edata_cname and add to results df
+  edatacname <- attr(omicsData,"cnames")$edata_cname
+  colnames(observed) <- paste("Count",colnames(observed),sep='_')
+  Global_results <- cbind(omicsData$e_data[edatacname],observed,Global_results)
+
+
+  #----- Pairwise IMD test - any qualitative difference between groups? -----#
+  #Compute test statistic but summing over all nonzero counts (na.rm=TRUE removes the zero counts)
+  #source('~/Documents/MinT/MSomics/MSomicsSTAT/R/group_comparison.R') #Run to debug
+  if(k==2){
+    #If group_comparison_imd doesn't return Gstats, give them global Gstats
+    #pairwise_stats <- cbind(omicsData$e_data[edatacname],Global_Gk)
+    #pairwise_pvals <- cbind(omicsData$e_data[edatacname],Global_results$p_value)
+    pairwise_stats <- data.frame(Global_Gk)
+    pairwise_pvals <- data.frame(Global_results$p_value)
+    if(is.null(comparisons)){
+      colnames(pairwise_stats)[1] <- colnames(pairwise_pvals)[1] <- paste(label_map$Group[1],label_map$Group[2],sep="_vs_")
+    }else{
+      colnames(pairwise_stats)[1] <- colnames(pairwise_pvals)[1] <- paste(comparisons$Test[1],comparisons$Control[1],sep="_vs_")
+    }
+
+    #Signs for group comparisons
+    ratio_observed <- observed/(observed+absent)
+    cmat <- create_c_matrix(group_df = groupData,to_compare_df = comparisons)
+    ratio_diff <- ratio_observed%*%t(cmat$cmat)
+    colnames(ratio_diff) <- cmat$names
+
+  }else{
+    #source('~/Documents/MinT/MSomics/MSomicsSTAT/R/group_comparison.R') #Run for debugging
+    pairwise_gk <- group_comparison_imd(groupData,comparisons,observed,absent)
+
+    pairwise_stats <- data.frame(pairwise_gk$GStats)
+    pairwise_pvals <- data.frame(pairwise_gk$pvalues)
+    colnames(pairwise_pvals) <- colnames(pairwise_gk$pvalues)
+    ratio_diff <- pairwise_gk$signs
+    ##Add edata_cname
+    #pairwise_stats <- cbind(omicsData$e_data[edatacname],pairwise_gk$GStats)
+    #pairwise_pvals <- cbind(omicsData$e_data[edatacname],pairwise_gk$pvalues)
+  }
+
+  #----- P-value adjustment -----#
+  #Match provided 'pval_adjust' to available options
+  pval_adjust <- try(match.arg(tolower(pval_adjust),c("holm","bonferroni","none","tukey","dunnett")),silent=TRUE)
+
+  if(class(pval_adjust)=='try-error')
+    stop("Provided 'pval_adjust' argument is invalid, please select 'holm', 'bonferroni', 'tukey', 'dunnett' or 'none'.")
+
+  if(pval_adjust%in%c("tukey","dunnett")){
+    warning("Tukey and Dunnett corrections aren't available for the IMD test, replaced by Holm")
+    pval_adjust <- 'holm'
+  }
+
+  #Implement Bonferonni correction by multiplying by number of tests if requested, otherwise do nothing
+
+  if(ncol(pairwise_pvals)==1)
+    pval_adjust <- 'none'
+
+  if(pval_adjust=="bonferroni"){
+    adjusted_pvals <- pmin(data.matrix(pairwise_pvals*(ncol(pairwise_pvals))),1)
+  }else if(pval_adjust=="holm"){
+    adjusted_pvals <- t(apply(pairwise_pvals,1,ranked_holm_cpp))
+    colnames(adjusted_pvals) <- colnames(pairwise_pvals)
+  }else{
+    adjusted_pvals <- pairwise_pvals
+  }
+
+  #----- Create significance flag matrix -----#
+  sig_indicators <- data.matrix(adjusted_pvals)
+  sigs <- which(sig_indicators<pval_thresh)
+  if(length(sigs)>0){
+    sig_indicators[sigs] <- sign(ratio_diff[sigs])
+    sig_indicators[-sigs] <- 0
+  }else{
+    sig_indicators[which(sig_indicators>=pval_thresh)] <- 0
+  }
+
+  sig_indicators <- data.frame(sig_indicators)
+  #sig_indicators <- data.frame(adjusted_pvals[,1],sig_indicators)
+  #colnames(sig_indicators)[1] <- colnames(adjusted_pvals)[1]
+
+  return (list(Results=Global_results,
+               Gstats=pairwise_stats,
+               Pvalues=adjusted_pvals,
+               Flags=sig_indicators))
+
+}
+
+#' Group comparisons for the g-test
+#'
+#' Takes the results of imd_test() and returns group comparison p-values
+#'
+#' @param groupData data frame that assigns sample names to groups
+#' @param comparisons dataframe that defiens the comparsions of interest
+#' @param observed matrix of number of observed counts
+#' @param absent matrix of number of observed counts
+#'
+#' @return A data.frame containing the p-values from the group comparisons.
+#'
+#' @author Bryan Stanfill
+#'
+group_comparison_imd <- function(groupData,comparisons,observed,absent){
+
+  #If "comparisons" is null, then do all pairwise comparisons, else use the "comparisons" df to
+  #create the appropriate C matrix
+  Cmat_res <- create_c_matrix(groupData, comparisons)
+  Cmat <- abs(Cmat_res$cmat)
+
+  #Number of samples per group
+  nK <- observed[1,]+absent[1,]
+
+  moMat <- observed%*%t(Cmat)
+  maMat <- absent%*%t(Cmat)
+  N <- moMat[1,]+maMat[1,]
+
+  #CokMat <- CakMat <- EokMat <- EakMat <- NULL
+  Gstats <- matrix(0,ncol=nrow(Cmat),nrow=nrow(moMat))
+  for(i in 1:ncol(moMat)){
+    nk_N_ratio <- nK/N[i]*Cmat[i,]
+
+    EokMat <- matrix(moMat[,i],ncol=1)%*%matrix(nk_N_ratio,nrow=1)
+    EakMat <- matrix(maMat[,i],ncol=1)%*%matrix(nk_N_ratio,nrow=1)
+    CokMat <- observed*matrix(Cmat[i,],nrow=nrow(observed),ncol=ncol(Cmat),byrow=TRUE)
+    CakMat <- absent*matrix(Cmat[i,],nrow=nrow(observed),ncol=ncol(Cmat),byrow=TRUE)
+    GmatObs <- CokMat*log(CokMat/EokMat)
+    GmatAbs <- CakMat*log(CakMat/EakMat)
+    GmatObs[is.nan(GmatObs)] <- GmatAbs[is.nan(GmatAbs)] <- 0
+    Gstats[,i] <- 2*rowSums(GmatObs+GmatAbs)
+  }
+
+  colnames(Gstats) <- Cmat_res$names
+  pvals <- pchisq(Gstats, 1, lower.tail = FALSE)
+
+  #Return signs for imd_test flags, i.e., diff in proportion of observed values
+  signs <- sign((observed/(observed+absent))%*%t(Cmat_res$cmat))
+
+  return(list(GStats=Gstats,pvalues=pvals,signs=signs))
+}
+
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+# COMPARISON FUNCTIONS ---------------------------------------------------------
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+create_c_matrix <- function(group_df,to_compare_df=NULL){
+  #This function will create the C-matrix that defines the comparisons that are requested
+  #and returns a list of names that defines which two groups are being compared for each
+  #row of the C matrix
+
+  #group_df - defines which columns (`sample_name`) belong to which groups (`Group`)
+  groups_two_fac <- groups <- as.character(unique(group_df$Group))
+  ngroups <- length(groups)
+  compi <- NULL
+
+  if(is.null(to_compare_df)){
+
+    #Create the Cmatrix that corresponds to all pairwise comparisons
+    #With two factors, all pairwise includes the higher order terms
+    #THIS COULD PROBABLY BE MADE MUCH FASTER IN C++
+    n_comparisons <- choose(ngroups,2)
+    Cmat <- matrix(0,n_comparisons,ngroups)
+    row <- 1
+    for(i in 1:(ngroups-1)){
+      for(j in (i+1):ngroups){
+        Cmat[row,i] <- 1
+        Cmat[row,j] <- -1
+        row <- row+1
+        compi <- c(compi,paste0(groups[i],"_vs_",groups[j]))
+      }
+    }
+  }else{
+    n_comparisons <- nrow(to_compare_df)
+    Cmat <- matrix(0,n_comparisons,ngroups)
+    all_comp_levels <- as.character(unique(unlist(to_compare_df)))
+
+    if(ncol(group_df)>2){#Two factor case, allow for main effect tests so grow groups to include those
+      group_df[,-1] <- apply(group_df[,-1],2,as.factor)
+      groups_two_fac <- as.character(unique(unlist(group_df[,-1])))
+    }
+
+    #Check that all of the groups in "to_compare_df" are present in "group_df"
+    if(!all(all_comp_levels%in%groups_two_fac) & !all(all_comp_levels%in%groups)){
+      stop("Some groups listed in the 'comparisons' argument do not appear in the 'groupData' argument.")
+    }
+
+    for(i in 1:n_comparisons){
+      control_i <- grep(to_compare_df$Control[i],groups)
+      test_i <- grep(to_compare_df$Test[i],groups)
+      Cmat[i,control_i] <- (-1/length(control_i))
+      Cmat[i,test_i] <- 1/length(test_i)
+      compi <- c(compi,paste0(to_compare_df$Test[i],"_vs_",to_compare_df$Control[i]))
+    }
+
+  }
+
+  return(list(cmat=Cmat, names=compi))
+}
+
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+# P-VALUE FUNCTIONS ------------------------------------------------------------
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+#' Adjust p-values for multiple comparisons
+#'
+#' Depending upon the \code{pval_adjust} method selected, the supplied p_values are compared against an adjusted \code{pval_thresh} value or the provided
+#' means are used to compute new statistics, p-values are computed and compared against the provided \code{pval_thresh}.  A \code{data.frame} that indicates which
+#' of the tests are significant, 1 if significant or 0 if insignificant.  If \code{means} is also provided and the p-value is signficant then the direction
+#' of the change is indicated by the sign on 1, i.e., means<0 and p_value<pval_thresh will return -1, similarly for means>0.
+#'
+#' @param p_values A matrix (or \code{data.frame}) of p-values to be adjusted.
+#' @param diff_mean A matrix (or \code{data.frame}) of groups means that are to be compared
+#' @param t_stats A matrix (or \code{data.frame}) of t-test statistics resulting from from standard procedures
+#' @param sizes A matrix (or \code{data.frame}) of group sizes
+#' @param pval_adjust character vector specifying the type of multiple comparisons adjustment to implement. A NULL value corresponds to no adjustment. Valid options include: holm, bonferroni, dunnett, tukey or none.
+#'
+#' @return a data frame with the following columns: group means, global G-test statistic and corresponding p-value
+#'
+#' @author Bryan Stanfill
+#'
+p_adjustment_anova <- function(p_values = NULL,
+                               diff_mean = NULL,
+                               t_stats = NULL,
+                               sizes = NULL,
+                               pval_adjust = "None"){
+
+  #Match provided 'pval_adjust' to available options
+  pval_adjust <- try(match.arg(tolower(pval_adjust),c("bonferroni","none","tukey","dunnett","holm")),silent=TRUE)
+
+  if(class(pval_adjust)=='try-error')
+    stop("Provided 'pval_adjust' argument is invalid, please select 'holm', 'bonferroni', 'tukey', 'dunnett' or 'none'.")
+
+
+  if(pval_adjust=="tukey" | pval_adjust=="dunnett"){
+
+    #Tukey-Kramer statistics are t-statistic/sqrt(2)
+    if(is.null(t_stats) | is.null(sizes)){
+      stop("The standard t-tests and group sizes need to be supplied in order to apply Tukey-Kramer adjustment.")
+    }
+
+    n_compares <- ncol(t_stats)
+
+    if(n_compares==1){
+      #Tukey adjustment is not done if only one comparison is provided
+      pval_adjust <- 'none'
+    }else{
+
+      if(pval_adjust=="tukey"){
+        tukey_stats <- data.matrix(t_stats*sqrt(2))
+        #Tukey only needs sizes for the rows, not individual group sizes
+        if(is.data.frame(sizes)){
+          sizes <- rowSums(data.matrix(sizes))
+        }else if(is.matrix(sizes)){
+          sizes <- rowSums(sizes)
+        }
+
+        #Rcpp::sourceCpp('src/tukey_helper.cpp') #Use for debugging
+        adjusted_pvals <- ptukey_speed(tukey_stats,sizes)
+
+        # Need to find all rows where only one test was performed and replace
+        # the adjusted p-value with the original p-value.
+        just_one <- which(rowSums(!is.na(t_stats)) == 1)
+
+        # Find the non-missing values from the original p-value data frame.
+        # These are the p-values that need to replace the incorrectly adjusted
+        # p-values (because only one test was performed). The numbers returned
+        # from this code will be the indices of the data frame as a vector (not
+        # a row/column index). R's convention is to number down the rows then
+        # across the columns. For example,
+        # matrix(1:25, nrow = 5, byrow = TRUE)[c(3, 5)]
+        # [1] 11 21
+        not_na <- which(!is.na(p_values[just_one, ]))
+
+        # Replace all unjustly adjusted p-values with the original p-value.
+        # These are the rows where only one p-value was calculated.
+        adjusted_pvals[just_one, ][not_na] <- data.matrix(
+          p_values[just_one, ]
+        )[not_na]
+
+      }else{#Dunnett adjustment - Needs to be sped up
+        adjusted_pvals <- matrix(NA,nrow(t_stats), ncol(t_stats))
+        #colnames(adjusted_pvals) <- colnames(t_stats)
+
+        for(i in 1:nrow(adjusted_pvals)){
+          k <- length(which(!is.na(p_values[i,])))
+          if(k>0){
+            dfi <- sum(sizes[i,])-k
+            rm_nas <- which(is.na(p_values[i,]))
+            #Modified version of an example from "Additional multcomp Examples" viggnette of the multcomp package
+            #Until we add covariates the correlation matrix is assumed to be the identity
+            if(length(rm_nas)>0){
+              adjusted_pvals[i,-rm_nas] <- as.numeric(sapply(abs(t_stats[i,-rm_nas]), function(x,k,df) 1 - mvtnorm::pmvt(-rep(x, k), rep(x, k), df = df),k=k,df=dfi))
+            }else{
+              adjusted_pvals[i,] <- as.numeric(sapply(abs(t_stats[i,]), function(x,k,df) 1 - mvtnorm::pmvt(-rep(x, k), rep(x, k), df = df),k=k,df=dfi))
+            }
+          }
+        }
+      }
+
+      colnames(adjusted_pvals) <- colnames(t_stats)
+      colnames(adjusted_pvals) <- gsub("Test-Stat","p-value",colnames(adjusted_pvals)) #This is a band-aid right now, may need to make more general later
+    }
+  }
+
+  #Don't make this an "else if" because pval_adjust can be changed to 'none' if n_compares==1
+  if(pval_adjust%in%c('none',"bonferroni","holm")){
+
+    #p_values needs to be supplied to apply bonferroni adjustment, if it's NULL tell them that's a problem
+    if(is.null(p_values)){
+      stop("The `p_values` argument must be supplied to perform the selected `pval_adjust` method")
+    }
+
+    if(is.null(dim(p_values)) || ncol(p_values)==1){ # leaving this as "||" because only evaluating the 1st argument is fine in this case, as it returns TRUE when p_values is a vector (and thus ncol(p_values) does not compute and using a "|" gives an error)
+      pval_adjust='none'
+    }
+
+    if(pval_adjust !='holm'){
+      #For bonferroni adjustment, multiply p_values by number of comparisons (columns in p_values) else do no adjustment
+      multiplier <- ifelse(pval_adjust=="bonferroni",ncol(p_values),1)
+      adjusted_pvals <- pmin(data.matrix(multiplier*p_values), 1)
+    }else{
+      #Rcpp::sourceCpp('src/holm_adjustment.cpp') #For debugging
+      #source('~/pmartR/R/support_p_adjustment.R') #For debugging
+      adjusted_pvals <- t(apply(p_values,1,ranked_holm_cpp))
+
+      #NaN p-values should stay NaN
+      nan_pvals <- lapply(p_values,is.nan)
+      for(i in 1:ncol(adjusted_pvals)){
+        adjusted_pvals[,i][nan_pvals[[i]]] <- NaN
+      }
+    }
+
+  }
+
+  #Return the adjusted p-values
+
+  return(pvalues=data.frame(adjusted_pvals))
+}
+
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+# COVARIATE FUNCTIONS ----------------------------------------------------------
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+#Function to create an X matrix based on a covariate data frame
+build_x_mat <- function(cov_df){
+
+  if(is.null(ncol(cov_df))){
+    cov_df <- matrix(cov_df,ncol=1)
+  }
+
+  #If all covariates are numeric, simply return the same matrix back
+  if(is.numeric(cov_df)){
+    return(data.matrix(cov_df))
+  }
+
+  #If the covariates are a mix of numeric, factors and characters, return matrix
+  #of group identifiers
+  Xmatrix <- NULL
+  for(i in 1:ncol(cov_df)){
+
+    if(is.numeric(cov_df[,i])){
+      #If column i is numeric, append it to X
+      Xmatrix <- cbind(Xmatrix,cov_df[,i])
+    }else{
+      coli_levels <- unique(cov_df[,i])
+      n_levels <- length(coli_levels)
+      if(n_levels!=length(cov_df[,i])){
+        Xcoli <- matrix(0,nrow(cov_df),n_levels)
+
+        for(j in 1:n_levels){
+          Xcoli[cov_df[,i]==coli_levels[j],j] <- 1
+        }
+        Xmatrix <- cbind(Xmatrix,Xcoli)
+      }
+    }
+  }
+  return(Xmatrix)
+}
+
+#---Function to remove linearly dependent columns in x corresponding to group
+#levels----####
+reduce_xmatrix <- function(x,ngroups){
+  p <- ncol(x)
+  orig_rank <- qr(x)$rank
+  if(orig_rank<p){
+    #Remove constant columns
+    col_sds <- apply(x,2,sd)
+    if(any(col_sds==0)){
+      x <- x[,-which(col_sds==0)]
+    }else{
+      stdx <- apply(x,2,function(mat) (mat-mean(mat))/sd(mat))
+      dmat <- as.matrix(dist(t(stdx)))
+      dmat <- dmat[(1:ngroups),-(1:ngroups)]
+      if(any(dmat==0)){
+        ind_mat <- matrix(1:ngroups,ngroups,(p-ngroups))
+        cols_to_remove <- ind_mat[which(dmat==0)]
+        x[,cols_to_remove] <- 0
+      }
+    }
+  }
+  return(x)
+}
+
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+# PAIRED FUNCTIONS -------------------------------------------------------------
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+#Function to translate paired data into differences
+build_pair_mat <- function(pair_df){
+  #pair_df - data.frame with two columns: sampleIDs and PairIDs (in that order)
+
+  #Creat matrix of 1, -1 that will turn single observations into paired differences
+  coli_levels <- unique(pair_df[,2])
+  n_levels <- length(coli_levels)
+  Xmatrix <- matrix(0,nrow(pair_df),n_levels)
+
+  for(j in 1:n_levels){
+    if(length(which(pair_df[,2]==coli_levels[j]))>2){
+      stop(paste("Only two samples can be associated with the same 'pair'.  More than two samples are associated with pair",coli_levels[j],"."))
+    }
+    Xmatrix[pair_df[,2]==coli_levels[j],j] <- c(1,-1)
+  }
+
+  return(Xmatrix)
 }
