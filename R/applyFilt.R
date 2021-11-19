@@ -466,7 +466,7 @@ applyFilt.rmdFilt <- function (filter_object, omicsData,
   # Prepare the information needed to filter the data --------------------------
 
   # Extract the column number containing the sample IDs.
-  id_col <- which(names(omicsData$f_data) == get_fdata_cname(omicsData))
+  id_col <- which(names(filter_object) == get_fdata_cname(omicsData))
 
   # Sniff out the indices that fall below the threshold.
   inds <- which(filter_object$pvalue < pvalue_threshold)
