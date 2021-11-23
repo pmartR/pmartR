@@ -14,25 +14,6 @@ test_that('all tests conform to the decrees of the God of Stats',{
                    'standards_imd_anova.RData',
                    package = 'pmartR'))
 
-  # Load data and prepare omicsData objects ------------------------------------
-
-  # Paired data ---------------
-
-  # load(system.file('testdata',
-  #                  'little_pairdata.RData',
-  #                  package = 'pmartR'))
-  #
-  # pairdata <- as.pepData(e_data = edata,
-  #                        f_data = fdata,
-  #                        e_meta = emeta,
-  #                        edata_cname = "Mass_Tag_ID",
-  #                        fdata_cname = "Name",
-  #                        emeta_cname = "Protein")
-  #
-  # # Throw some natural logs on the data because the following functions require
-  # # the data to be logged.
-  # pairdata <- edata_transform(pairdata, "log")
-
   # Compare IMD-ANOVAly --------------------------------------------------------
 
   # Default comparisons ---------------
@@ -59,18 +40,18 @@ test_that('all tests conform to the decrees of the God of Stats',{
   gfruit_2_0_3 <- imd_anova(gfilta_2_0_3, test_method = "gtest")
   cfruit_2_0_3 <- imd_anova(cfilta_2_0_3, test_method = "combined")
 
-  afruit_2_1_3 <- imd_anova(afilta_2_1_3,
+  afruit_2_1_4 <- imd_anova(afilta_2_1_4,
                             test_method = "anova",
                             covariates = "Gender")
-  gfruit_2_1_3 <- imd_anova(gfilta_2_1_3, test_method = "gtest")
-  cfruit_2_1_3 <- imd_anova(cfilta_2_1_3, test_method = "combined",
+  gfruit_2_1_4 <- imd_anova(gfilta_2_1_4, test_method = "gtest")
+  cfruit_2_1_4 <- imd_anova(cfilta_2_1_4, test_method = "combined",
                             covariates = "Gender")
 
-  afruit_2_2_3 <- imd_anova(afilta_2_2_3,
+  afruit_2_2_4 <- imd_anova(afilta_2_2_4,
                             test_method = "anova",
                             covariates = c("Gender", "Age"))
-  gfruit_2_2_3 <- imd_anova(gfilta_2_2_3, test_method = "gtest")
-  cfruit_2_2_3 <- imd_anova(cfilta_2_2_3, test_method = "combined",
+  gfruit_2_2_4 <- imd_anova(gfilta_2_2_4, test_method = "gtest")
+  cfruit_2_2_4 <- imd_anova(cfilta_2_2_4, test_method = "combined",
                             covariates = c("Gender", "Age"))
 
   # Custom comparisons ---------------
@@ -156,35 +137,35 @@ test_that('all tests conform to the decrees of the God of Stats',{
   # correction can be used because it throws an error when the conditions to be
   # used are met.
 
-  afruit_bon_2_1_3 <- imd_anova(afilta_2_1_3, test_method = "anova",
+  afruit_bon_2_1_4 <- imd_anova(afilta_2_1_4, test_method = "anova",
                                 pval_adjust_a = "bonferroni",
                                 covariates = "Gender")
-  afruit_holm_2_1_3 <- imd_anova(afilta_2_1_3, test_method = "anova",
+  afruit_holm_2_1_4 <- imd_anova(afilta_2_1_4, test_method = "anova",
                                  pval_adjust_a = "holm",
                                  covariates = "Gender")
-  afruit_tuk_2_1_3 <- imd_anova(afilta_2_1_3, test_method = "anova",
+  afruit_tuk_2_1_4 <- imd_anova(afilta_2_1_4, test_method = "anova",
                                 pval_adjust_a = "tukey",
                                 covariates = "Gender")
   # Set a seed because the mvtnorm::pmvt function--which is called when doing a
   # Dunnett p-value correction--has a random process.
   set.seed(8)
-  afruit_dun_2_1_3 <- imd_anova(afilta_2_1_3, test_method = "anova",
+  afruit_dun_2_1_4 <- imd_anova(afilta_2_1_4, test_method = "anova",
                                 pval_adjust_a = "dunnett",
                                 covariates = "Gender")
 
-  afruit_bon_2_2_3 <- imd_anova(afilta_2_2_3, test_method = "anova",
+  afruit_bon_2_2_4 <- imd_anova(afilta_2_2_4, test_method = "anova",
                                 pval_adjust_a = "bonferroni",
                                 covariates = c("Gender", "Age"))
-  afruit_holm_2_2_3 <- imd_anova(afilta_2_2_3, test_method = "anova",
+  afruit_holm_2_2_4 <- imd_anova(afilta_2_2_4, test_method = "anova",
                                  pval_adjust_a = "holm",
                                  covariates = c("Gender", "Age"))
-  afruit_tuk_2_2_3 <- imd_anova(afilta_2_2_3, test_method = "anova",
+  afruit_tuk_2_2_4 <- imd_anova(afilta_2_2_4, test_method = "anova",
                                 pval_adjust_a = "tukey",
                                 covariates = c("Gender", "Age"))
   # Set a seed because the mvtnorm::pmvt function--which is called when doing a
   # Dunnett p-value correction--has a random process.
   set.seed(11)
-  afruit_dun_2_2_3 <- imd_anova(afilta_2_2_3, test_method = "anova",
+  afruit_dun_2_2_4 <- imd_anova(afilta_2_2_4, test_method = "anova",
                                 pval_adjust_a = "dunnett",
                                 covariates = c("Gender", "Age"))
 
@@ -205,8 +186,8 @@ test_that('all tests conform to the decrees of the God of Stats',{
   expect_equal(afruit_1_1_3, astan_1_1_3)
   expect_equal(afruit_1_2_3, astan_1_2_3)
   expect_equal(afruit_2_0_3, astan_2_0_3)
-  expect_equal(afruit_2_1_3, astan_2_1_3)
-  expect_equal(afruit_2_2_3, astan_2_2_3)
+  expect_equal(afruit_2_1_4, astan_2_1_4)
+  expect_equal(afruit_2_2_4, astan_2_2_4)
 
   # Make certain the custom comparisons create same output as the default when
   # all possible comparisons are used.
@@ -323,28 +304,28 @@ test_that('all tests conform to the decrees of the God of Stats',{
   # NOTE: Currently commented out because the current version of imd_anova
   # produces p-values greater than 1. Holy inconceivable p-values, Statman!
   expect_equal(
-    data.matrix(afruit_bon_2_1_3[, 11:13]),
-    pmin(data.matrix(astan_2_1_3[, 11:13] * 3), 1)
+    data.matrix(afruit_bon_2_1_4[, 16:21]),
+    pmin(data.matrix(astan_2_1_4[, 16:21] * 6), 1)
   )
   # Calculate the Holm adjusted p-values.
   # Current implementation adjusts p-values even if only one test is performed.
   expect_equal(
-    unclass(afruit_holm_2_1_3[, 11:13]),
+    unclass(afruit_holm_2_1_4[, 16:21]),
     unclass(
-      data.frame(t(apply(astan_2_1_3[, 11:13],
+      data.frame(t(apply(astan_2_1_4[, 16:21],
                          1,
                          p.adjust,
                          method = "holm")))
     )
   )
   expect_equal(
-    data.frame(afruit_tuk_2_1_3[, 11:13]),
-    tukey_pval_2_1_3
+    data.frame(afruit_tuk_2_1_4[, 16:21]),
+    tukey_pval_2_1_4
   )
   expect_true(
     mean(
-      abs(data.matrix(afruit_dun_2_1_3[, 11:13]) -
-            data.matrix(dunnett_2_1_3)),
+      abs(data.matrix(afruit_dun_2_1_4[, 16:21]) -
+            data.matrix(dunnett_2_1_4)),
       na.rm = TRUE
     ) < 0.0001132809
   )
@@ -352,28 +333,28 @@ test_that('all tests conform to the decrees of the God of Stats',{
   # NOTE: Currently commented out because the current version of imd_anova
   # produces p-values greater than 1. Holy inconceivable p-values, Statman!
   expect_equal(
-    data.matrix(afruit_bon_2_2_3[, 11:13]),
-    pmin(data.matrix(astan_2_2_3[, 11:13] * 3), 1)
+    data.matrix(afruit_bon_2_2_4[, 16:21]),
+    pmin(data.matrix(astan_2_2_4[, 16:21] * 6), 1)
   )
   # Calculate the Holm adjusted p-values.
   # Current implementation adjusts p-values even if only one test is performed.
   expect_equal(
-    unclass(afruit_holm_2_2_3[, 11:13]),
+    unclass(afruit_holm_2_2_4[, 16:21]),
     unclass(
-      data.frame(t(apply(astan_2_2_3[, 11:13],
+      data.frame(t(apply(astan_2_2_4[, 16:21],
                          1,
                          p.adjust,
                          method = "holm")))
     )
   )
   expect_equal(
-    data.frame(afruit_tuk_2_2_3[, 11:13]),
-    tukey_pval_2_2_3
+    data.frame(afruit_tuk_2_2_4[, 16:21]),
+    tukey_pval_2_2_4
   )
   expect_true(
     mean(
-      abs(data.matrix(afruit_dun_2_2_3[, 11:13]) -
-            data.matrix(dunnett_2_2_3)),
+      abs(data.matrix(afruit_dun_2_2_4[, 16:21]) -
+            data.matrix(dunnett_2_2_4)),
       na.rm = TRUE
     ) < 0.0001132809
   )

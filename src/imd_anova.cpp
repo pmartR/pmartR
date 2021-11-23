@@ -446,26 +446,19 @@ NumericVector holm_cpp(NumericVector ps) {
 
   NumericVector sorted_ps = clone(ps);
   NumericVector adj_ps(n);
-  int keep_going = 1;
 
   // Sort p-values in ascending order with NA/NaN at the end of the vector.
   std::sort(sorted_ps.begin(), sorted_ps.end(), withNaN);
 
-  adj_ps[0] = fmin(sorted_ps[0]*n,1.0);
+  adj_ps[0] = fmin(sorted_ps[0]*n, 1.0);
 
   for(int i=1; i<n; i++){
 
-    if(keep_going){
+    adj_ps[i] = fmin(sorted_ps[i]*(n - i), 1.0);
 
-      adj_ps[i] = fmin(sorted_ps[i]*(n-i),1.0);
+    if(adj_ps[i]<=adj_ps[i - 1]){
 
-    }else{
-      adj_ps[i] = fmax(adj_ps[i-1],sorted_ps[i]);
-    }
-
-    if(adj_ps[i]<=adj_ps[i-1]){
-      keep_going=0;
-      adj_ps[i] = adj_ps[i-1];
+      adj_ps[i] = adj_ps[i - 1];
     }
 
   }

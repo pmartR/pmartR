@@ -13,14 +13,6 @@ count_missing_cpp <- function(data, gp) {
     .Call('_pmartR_count_missing_cpp', PACKAGE = 'pmartR', data, gp)
 }
 
-kw_rcpp <- function(mtr, group) {
-    .Call('_pmartR_kw_rcpp', PACKAGE = 'pmartR', mtr, group)
-}
-
-nonmissing_per_grp <- function(mtr, group) {
-    .Call('_pmartR_nonmissing_per_grp', PACKAGE = 'pmartR', mtr, group)
-}
-
 anova_cpp <- function(data, gp, unequal_var, df_red) {
     .Call('_pmartR_anova_cpp', PACKAGE = 'pmartR', data, gp, unequal_var, df_red)
 }
@@ -63,5 +55,13 @@ proj_mat_cpp <- function(X, ngroups) {
 
 project_to_null_cpp <- function(data_mat, Xmatrix, ngroups) {
     .Call('_pmartR_project_to_null_cpp', PACKAGE = 'pmartR', data_mat, Xmatrix, ngroups)
+}
+
+kw_rcpp <- function(mtr, group) {
+    .Call('_pmartR_kw_rcpp', PACKAGE = 'pmartR', mtr, group)
+}
+
+nonmissing_per_grp <- function(mtr, group) {
+    .Call('_pmartR_nonmissing_per_grp', PACKAGE = 'pmartR', mtr, group)
 }
 
