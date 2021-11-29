@@ -3239,6 +3239,19 @@ plot.cvFilt <- function (filter_obj, cv_threshold = NULL,
   new_object <- filter_obj[!is.na(filter_obj$CV), ]
   max_x_val <- attributes(filter_obj)$max_x_val
 
+  # Check if any CV values are zero. If there are any zero values the log_scale
+  # input must be changed to FALSE.
+  if (any(new_object$CV == 0)) {
+
+    log_scale <- FALSE
+
+    message(paste("Because there are CV values = 0 the x-axis cannot be",
+                  "converted to the log2 scale.",
+                  "The original scale will be used.",
+                  sep = " "))
+
+  }
+
   # labels
   plot_title <- ifelse(is.null(title_lab),
                        "Coefficient of Variation (CV)",
