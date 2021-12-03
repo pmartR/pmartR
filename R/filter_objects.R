@@ -289,7 +289,8 @@ cv_filter <- function(omicsData, use_groups = TRUE) {
 
     # Extract the group_DF attribute to reduce typing below. Curse you S3
     # objects for not having a convenient way of extracting attributes!!
-    groupDF <- attr(omicsData, "group_DF")
+    # groupDF <- attr(omicsData, "group_DF")
+    groupDF <- get_group_DF(omicsData)
 
     # From the group_DF attribute extract the non-singleton group names.
     nonsingletons <- attr(groupDF, "nonsingleton_groups")
@@ -592,7 +593,8 @@ rmd_filter <- function (omicsData,
                                             get_fdata_cname(omicsData)])
     myfilter <- custom_filter(omicsData, f_data_remove = to_remove)
     omicsData <- applyFilt(myfilter, omicsData)
-    mintR_groupDF <- attr(omicsData, "group_DF")
+    # mintR_groupDF <- attr(omicsData, "group_DF")
+    mintR_groupDF <- get_group_DF(omicsData)
 
   }
 
@@ -860,7 +862,8 @@ rmd_filter <- function (omicsData,
   }
 
   # Add the group designation information to the attributes.
-  attr(output, "group_DF") <- attr(omicsData, "group_DF")
+  # attr(output, "group_DF") <- attr(omicsData, "group_DF")
+  attr(output, "group_DF") <- get_group_DF(omicsData)
 
   # Save fdata as an attribute. This is used in the summary.rmdFilt method.
   attr(output, "fdata") <- omicsData$f_data
@@ -1340,7 +1343,8 @@ imdanova_filter <- function (omicsData) {
   # Determine number of samples per group --------------------------------------
 
   # Extract the group_DF attribute.
-  groupDF <- attr(omicsData, "group_DF")
+  # groupDF <- attr(omicsData, "group_DF")
+  groupDF <- get_group_DF(omicsData)
 
   # if groupDF has column for TimeCourse, do the following within time point
   # (do not re-compute groupDF including TimeCourse as main effect--this was our

@@ -39,7 +39,8 @@ cor_result <- function(omicsData){
     
   }
 
-  edata_cname <- attr(omicsData, "cnames")$edata_cname
+  # edata_cname <- attr(omicsData, "cnames")$edata_cname
+  edata_cname <- get_edata_cname(omicsData)
   id_col <- which(colnames(omicsData$e_data) == edata_cname)
 
   output <- cor(omicsData$e_data[, -id_col],
@@ -52,19 +53,22 @@ cor_result <- function(omicsData){
   class(output) <- c("corRes", orig_class)
 
   attr(output, "sample_names") <- names(omicsData$e_data[, -id_col])
-  attr(output, "group_DF") <- attr(omicsData, "group_DF")
-  attr(output, "is_normalized") <- attr(omicsData, "data_info")$norm_info$is_normalized
+  # attr(output, "group_DF") <- attr(omicsData, "group_DF")
+  # attr(output, "is_normalized") <- attr(omicsData, "data_info")$norm_info$is_normalized
+  attr(output, "group_DF") <- get_group_DF(omicsData)
+  attr(output, "is_normalized") <- get_data_norm(omicsData)
   
   if (inherits(omicsData, "isobaricpepData")) {
     
-    attr(output, "isobaric_norm") <- attr(omicsData,"isobaric_info")$norm_info$is_normalized
-    attr(output, "is_normalized") <- attr(omicsData,"data_info")$norm_info$is_normalized
+    # attr(output, "isobaric_norm") <- attr(omicsData,"isobaric_info")$norm_info$is_normalized
+    # attr(output, "is_normalized") <- attr(omicsData,"data_info")$norm_info$is_normalized
+    attr(output, "isobaric_norm") <- get_isobaric_norm(omicsData)
     
   } else if (inherits(omicsData, "nmrData")) {
     
-    attr(output, "nmr_norm") <- attr(omicsData, "nmr_info")$norm_info$is_normalized
-    attr(output, "is_normalized") <- attr(omicsData,"data_info")$norm_info$is_normalized
-    
+    # attr(output, "nmr_norm") <- attr(omicsData, "nmr_info")$norm_info$is_normalized
+    # attr(output, "is_normalized") <- attr(omicsData,"data_info")$norm_info$is_normalized
+    attr(output, "nmr_norm") <- get_nmr_norm(omicsData)
   }
   
   return (output)

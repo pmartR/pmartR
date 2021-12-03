@@ -32,7 +32,8 @@ normalize_loess<- function(omicsData, method = "fast", span = .4){
   if(!(attr(omicsData, "data_info")$data_scale %in% c("log2", "log10", "log"))) stop("omicsData must be on log scale")
 
   #check that norm attribute is False
-  if(attr(omicsData, "data_info")$norm_info$is_normalized == TRUE) stop("data has already been normalized")
+  if(get_data_norm(omicsData)) stop("data has already been normalized")
+  # if(attr(omicsData, "data_info")$norm_info$is_normalized == TRUE) stop("data has already been normalized")
   
   #extract cname
   edata_cname = attr(omicsData, "cnames")$edata_cname

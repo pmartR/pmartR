@@ -136,7 +136,9 @@ imd_anova <- function (omicsData,
   }
 
   # Check for log transform #
-  if(!(attr(omicsData,"data_info")$data_scale%in%c("log2","log","log10"))&(test_method%in%c("combined","anova"))){
+  if(!(get_data_scale(omicsData) %in% c("log2","log","log10")) &
+  # if(!(attr(omicsData,"data_info")$data_scale%in%c("log2","log","log10")) &
+     (test_method %in% c("combined","anova"))){
     stop("Data must be log transformed in order to implement ANOVA.")
   }
 

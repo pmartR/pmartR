@@ -253,7 +253,8 @@ applyFilt.moleculeFilt <- function(filter_object, omicsData, min_num=2){
 
     # Extract data_info attribute from omicsData. Some of the elements will be
     # used to update this attribute.
-    dInfo <- attr(omicsData, 'data_info')
+    dInfo <- get_data_info(omicsData)
+    # dInfo <- attr(omicsData, 'data_info')
 
     # Update the data_info attribute.
     attr(omicsData, 'data_info') <- set_data_info(
@@ -412,7 +413,8 @@ applyFilt.cvFilt <- function (filter_object, omicsData, cv_threshold = 150) {
 
     # Extract data_info attribute from omicsData. Some of the elements will be
     # used to update this attribute.
-    dInfo <- attr(omicsData, 'data_info')
+    # dInfo <- attr(omicsData, 'data_info')
+    dInfo <- get_data_info(omicsData)
 
     # Update the data_info attribute.
     attr(omicsData, 'data_info') <- set_data_info(
@@ -621,7 +623,8 @@ applyFilt.rmdFilt <- function (filter_object, omicsData,
 
     # Extract data_info attribute from omicsData. Some of the elements will be
     # used to update this attribute.
-    dInfo <- attr(omicsData, 'data_info')
+    # dInfo <- attr(omicsData, 'data_info')
+    dInfo <- get_data_info(omicsData)
 
     # Update the data_info attribute.
     attr(omicsData, 'data_info') <- set_data_info(
@@ -888,7 +891,8 @@ applyFilt.proteomicsFilt <- function (filter_object,
 
     # Extract data_info attribute from omicsData. Some of the elements will be
     # used to update this attribute.
-    dInfo <- attr(omicsData, 'data_info')
+    # dInfo <- attr(omicsData, 'data_info')
+    dInfo <- get_data_info(omicsData)
 
     # Update the data_info attribute.
     attr(omicsData, 'data_info') <- set_data_info(
@@ -1141,8 +1145,14 @@ applyFilt.imdanovaFilt <- function (filter_object,
                                     f_data_remove = samps_to_rm)
       omicsData <- applyFilt(my_cust_filt, omicsData)
 
+      
+      # Get the total number of filters previously applied. This is the length
+      # of the filters attribute.
+      n_filtas <- length(get_filters(omicsData))
+      
       # Check the length of the filters attribute.
-      if (length(attr(omicsData, "filters")) == 1) {
+      if (n_filtas == 1) {
+      # if (length(attr(omicsData, "filters")) == 1) {
 
         # Reset the filters attribute to an empty list because no other filters
         # have been applied previously.
@@ -1152,12 +1162,12 @@ applyFilt.imdanovaFilt <- function (filter_object,
         # cannot be 0 because a custom filter was just applied.
       } else {
 
-        # Get the total number of filters previously applied. This is the length
-        # of the filters attribute.
-        n_filtas <- length(attr(omicsData, "filters"))
+        # # Get the total number of filters previously applied. This is the length
+        # # of the filters attribute.
+        # n_filtas <- length(get_filters(omicsData))
 
         # Remove the custom filter from the filters attribute.
-        attr(omicsData, "filters") <- attr(omicsData, "filters")[-n_filtas]
+        attr(omicsData, "filters") <- get_filters(omicsData)[-n_filtas]
 
       }
 
@@ -1351,7 +1361,8 @@ applyFilt.imdanovaFilt <- function (filter_object,
 
     # Extract data_info attribute from omicsData. Some of the elements will be
     # used to update this attribute.
-    dInfo <- attr(omicsData, 'data_info')
+    # dInfo <- attr(omicsData, 'data_info')
+    dInfo <- get_data_info(omicsData)
 
     # Update the data_info attribute.
     attr(omicsData, 'data_info') <- set_data_info(
@@ -1605,7 +1616,8 @@ applyFilt.customFilt <- function (filter_object, omicsData) {
 
     # Extract data_info attribute from omicsData. Some of the elements will be
     # used to update this attribute.
-    dInfo <- attr(omicsData, 'data_info')
+    # dInfo <- attr(omicsData, 'data_info')
+    dInfo <- get_data_info(omicsData)
 
     # Update the data_info attribute.
     attr(omicsData, 'data_info') <- set_data_info(

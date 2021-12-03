@@ -21,7 +21,8 @@ create_comparisonDF <- function(comp_type, omicsData, control_group=NULL){
   if(is.null(attr(omicsData, "group_DF"))){
     stop("group_designation must be called in order to create a 'group_DF' attribute for omicsData.")
   }else{
-    group_data <- attr(omicsData, "group_DF")
+    # group_data <- attr(omicsData, "group_DF")
+    group_data <- get_group_DF(omicsData)
   }
   
   # do we even run this if they want custom groups? 
