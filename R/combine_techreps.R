@@ -190,6 +190,8 @@ combine_techreps <- function (omicsData, combine_fn = NULL,
         dplyr::select(!!rlang::sym(techrep_cname), dplyr::everything(), -dplyr::one_of(fdata_cname)) %>%
         as.data.frame()
         
+        # colnames(new_group_DF)[which(colnames(new_group_DF) == techrep_cname)] <- attr(omicsData, "cnames")$fdata_cname # this attribute will always have been reset at this point
+        # if(!is.null(bio_sample_names)) new_group_DF[,attr(omicsData, "cnames")$fdata_cname] <- bio_sample_names # display names is always a vector of values at this point
         colnames(new_group_DF)[which(colnames(new_group_DF) == techrep_cname)] <- get_fdata_cname(omicsData) # this attribute will always have been reset at this point
         if(!is.null(bio_sample_names)) new_group_DF[,get_fdata_cname(omicsData)] <- bio_sample_names # display names is always a vector of values at this point
         
