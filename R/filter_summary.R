@@ -819,7 +819,6 @@ summary.customFilt <- function(filter_object){
   summary_orig <- summary(omicsData)
 
   # get names #
-
   edata_id <- get_edata_cname(omicsData)
   emeta_id <- get_emeta_cname(omicsData)
   samp_id <- get_fdata_cname(omicsData)
