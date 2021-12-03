@@ -35,7 +35,7 @@ summary.nmrnormRes<-function(nmrnormRes_object){
   if(!inherits(nmrnormRes_object, "nmrnormRes")) stop("object must be of class 'nmrnormRes'")
   
   #extract attributes from nmrnomrRes_object
-  sample_property_cname = attr(nmrnormRes_object, "nmr_info")$sample_property_cname
+  sample_property_cname <- attr(nmrnormRes_object, "nmr_info")$sample_property_cname
   metabolite_name <- attr(nmrnormRes_object, "nmr_info")$metabolite_name
   if(is.null(sample_property_cname)){
     normalized_using <- metabolite_name

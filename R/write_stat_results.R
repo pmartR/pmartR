@@ -42,10 +42,10 @@ write_stat_results <- function(omicsData, statResData, refCondition, filePath = 
     stop("'statResData' must be provided")
   }
   ## Make sure both are the correct class
-  if(!(class(omicsData) %in% c("pepData", "proData", "metabData", "lipidData"))){
+  if(!(inherits(omicsData, c("pepData", "proData", "metabData", "lipidData", "nmrData")))){ ### NMR data?
     stop("omicsData is not of the appopriate class")
   }
-  if(!(class(statResData) %in% c("statRes"))){
+  if(!(inherits(statResData, c("statRes")))){
     stop("statResData is not of the appropriate class")
   }
   ## END OF CHECKS ##
@@ -94,13 +94,13 @@ write_stat_results <- function(omicsData, statResData, refCondition, filePath = 
   outputData$Normalized_Data <- Normalized_Data
   outputData$DA_Test_Results <- DA_Test_Results
   
-  if(class(omicsData) == "metabData"){
+  if(inherits(omicsData, "metabData")){
     outputData$DA_Metabolites_Only <- DA_Only
   }else{
-    if(class(omicsData) == "pepData"){
+    if(inherits(omicsData, "pepData")){
       outputData$DA_Peptides_Only <- DA_Only
     }else{
-      if(class(omicsData) == "proData"){
+      if(inherits(omicsData, "proData")){
         outputData$DA_Proteins_Only <- DA_Only
       }else{
         outputData$DA_Lipids_Only <- DA_Only

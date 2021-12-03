@@ -720,10 +720,14 @@ summary.customFilt <- function(filter_object){
   summary_orig <- summary(omicsData)
 
   # get names #
-  edata_id <- attr(filter_object, "cnames")$edata_cname
-  emeta_id <- attr(filter_object, "cnames")$emeta_cname
-  samp_id <- attr(filter_object, "cnames")$fdata_cname
 
+  edata_id <- get_edata_cname(omicsData)
+  emeta_id <- get_emeta_cname(omicsData)
+  samp_id <- get_fdata_cname(omicsData)
+  # edata_id <- attr(filter_object, "cnames")$edata_cname
+  # emeta_id <- attr(filter_object, "cnames")$emeta_cname
+  # samp_id <- attr(filter_object, "cnames")$fdata_cname
+  
   # apply the filter #
   filtered_data <- applyFilt(filter_object, omicsData)
   summary_filt <- summary(filtered_data)

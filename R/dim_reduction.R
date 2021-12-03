@@ -102,7 +102,8 @@ dim_reduction <- function (omicsData, k = 2){
 
   class(temp_res) <- "dimRes"
 
-  attr(temp_res, "group_DF") <- attr(omicsData, "group_DF")
+  # attr(temp_res, "group_DF") <- attr(omicsData, "group_DF")
+  attr(temp_res, "group_DF") <- get_group_DF(omicsData)
 
   attr(temp_res, "R2") <- pca_res@R2
 

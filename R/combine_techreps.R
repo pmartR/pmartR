@@ -137,17 +137,19 @@ combine_techreps <- function (omicsData, combine_fn = "mean",
     }
     else if(length(bio_sample_names) > 1){
       new_fdata[techrep_cname] <- bio_sample_names
-      attr(omicsData, "cnames")$fdata_cname = techrep_cname
+      attr(omicsData, "cnames")$fdata_cname <- techrep_cname
     }
     colnames(new_edata)[-which(colnames(techrep_edata) == edata_cname)] <- bio_sample_names
   }
-  else attr(omicsData, "cnames")$fdata_cname = techrep_cname
+  else attr(omicsData, "cnames")$fdata_cname <- techrep_cname
   
   # Check for bad grouping structure and make new grouping DF
-  if(!is.null(attr(omicsData, "group_DF"))){
+  # if(!is.null(attr(omicsData, "group_DF"))){
+  if(!is.null(get_group_DF(omicsData))){
     
     # gives number of unique main effect levels in group_DF for a given group of technical replictes...
-    multiple_groups <- attr(omicsData, "group_DF") %>% 
+    # multiple_groups <- attr(omicsData, "group_DF") %>% 
+    multiple_groups <- get_group_DF(omicsData) %>%
       dplyr::left_join(f_data[c(fdata_cname, techrep_cname)], by = fdata_cname) %>%
       dplyr::group_by(!!rlang::sym(techrep_cname)) %>%
       dplyr::summarise_all(dplyr::n_distinct) %>%
@@ -160,15 +162,19 @@ combine_techreps <- function (omicsData, combine_fn = "mean",
     }
     # otherwise collapse the grouping structure around the newly created f_data
     else{
-      new_group_DF <- attr(omicsData, "group_DF") %>%
+      new_group_DF <- get_group_DF(omicsData) %>%
+      # new_group_DF <- attr(omicsData, "group_DF") %>%
         dplyr::left_join(f_data[c(fdata_cname, techrep_cname)], by = fdata_cname) %>% 
         dplyr::group_by(!!rlang::sym(techrep_cname)) %>%
         dplyr::slice(1) %>%
         dplyr::select(!!rlang::sym(techrep_cname), dplyr::everything(), -dplyr::one_of(fdata_cname)) %>%
         as.data.frame()
         
-        colnames(new_group_DF)[which(colnames(new_group_DF) == techrep_cname)] <- attr(omicsData, "cnames")$fdata_cname # this attribute will always have been reset at this point
-        if(!is.null(bio_sample_names)) new_group_DF[,attr(omicsData, "cnames")$fdata_cname] <- bio_sample_names # display names is always a vector of values at this point
+        # colnames(new_group_DF)[which(colnames(new_group_DF) == techrep_cname)] <- attr(omicsData, "cnames")$fdata_cname # this attribute will always have been reset at this point
+        # if(!is.null(bio_sample_names)) new_group_DF[,attr(omicsData, "cnames")$fdata_cname] <- bio_sample_names # display names is always a vector of values at this point
+        colnames(new_group_DF)[which(colnames(new_group_DF) == techrep_cname)] <- get_fdata_cname(omicsData) # this attribute will always have been reset at this point
+        if(!is.null(bio_sample_names)) new_group_DF[,get_fdata_cname(omicsData)] <- bio_sample_names # display names is always a vector of values at this point
+        
     }
     
   }else new_group_DF <- NULL

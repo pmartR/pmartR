@@ -1046,6 +1046,7 @@ plot.naRes <- function (naRes_obj, omicsData, plot_type = "bar",
   edata <- omicsData$e_data
   edata_cname_id <- which(names(edata) == edata_cname)
   group_df <- attr(omicsData, "group_DF")
+  group_df <- get_group_DF(omicsData)
 
   # Bar plot order_by and group_by crap ---------------
 
@@ -4455,32 +4456,60 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
 
   # Label crap ---------------
 
+  datatype_text <- switch(
+    class(omicsData)[1],
+    isobaricpepData = "Isobaric Peptide ",
+    pepData = "Peptide ",
+    proData = "Protein ",
+    lipidData = "Lipid ",
+    metabData = "Metabolite ",
+    nmrData = "NMR "
+    )
+  
+  norm_info <- get_data_norm(omicsData)
+  norm_text <- ifelse(norm_info, "Normalized ", "Un-Normalized ")
+  
+  ref_info <- if (inherits(omicsData, c("isobaricpepData", "nmrData"))){
+    infos <- c("isobaric_info", "nmr_info")
+    res <- sapply(infos, function(info){
+      norm <- attr(omicsData, info)$norm_info$is_normalized
+      !is.null(norm) && norm
+    })
+    any(res)
+  } else FALSE
+  ref_text <- if(norm_info) "Reference Standardized " else NULL
+  
+  maintitle <- paste0(
+    "Boxplots of ", ref_text, norm_text, datatype_text, "Data"
+    )
+  
+  ######## Is this right? This should be separate from statistical normalization? #########
   # Farm boy, make me a title depending on data type and norm_info. As you wish.
-  if (inherits(omicsData, "isobaricpepData")) {
-    maintitle <- if (attr(omicsData, "isobaric_info")$norm_info$is_normalized)
-      "Boxplots of Normalized Isobaric Peptide Data" else
-        "Boxplots of Un-Normalized Isobaric Peptide Data"
-  } else if(inherits(omicsData, "pepData")){
-    maintitle <- if (attr(omicsData, "data_info")$norm_info$is_normalized)
-      "Boxplots of Normalized Peptide Data" else
-        "Boxplots of Un-Normalized Peptide Data"
-  } else if(inherits(omicsData, "proData")){
-    maintitle <- if (attr(omicsData, "data_info")$norm_info$is_normalized)
-      "Boxplots of Normalized Protein Data" else
-        "Boxplots of Un-Normalized Protein Data"
-  } else if(inherits(omicsData, "lipidData")){
-    maintitle <- if (attr(omicsData, "data_info")$norm_info$is_normalized)
-      "Boxplots of Normalized Lipid Data" else
-        "Boxplots of Un-Normalized Lipid Data"
-  } else if(inherits(omicsData, "metabData")){
-    maintitle <- if (attr(omicsData, "data_info")$norm_info$is_normalized)
-      "Boxplots of Normalized Metabolite Data" else
-        "Boxplots of Un-Normalized Metabolite Data"
-  } else if(inherits(omicsData, "nmrData")){
-    maintitle <- if (attr(omicsData, "nmr_info")$norm_info$is_normalized)
-      "Boxplots of Normalized NMR Data" else
-        "Boxplots of Un-Normalized NMR Data"
-  }
+  # if (inherits(omicsData, "isobaricpepData")) {
+  #   maintitle <- if (attr(omicsData, "isobaric_info")$norm_info$is_normalized)
+  #     "Boxplots of Normalized Isobaric Peptide Data" else
+  #       "Boxplots of Un-Normalized Isobaric Peptide Data"
+  # } else if(inherits(omicsData, "pepData")){
+  #   maintitle <- if (attr(omicsData, "data_info")$norm_info$is_normalized)
+  #     "Boxplots of Normalized Peptide Data" else
+  #       "Boxplots of Un-Normalized Peptide Data"
+  # } else if(inherits(omicsData, "proData")){
+  #   maintitle <- if (attr(omicsData, "data_info")$norm_info$is_normalized)
+  #     "Boxplots of Normalized Protein Data" else
+  #       "Boxplots of Un-Normalized Protein Data"
+  # } else if(inherits(omicsData, "lipidData")){
+  #   maintitle <- if (attr(omicsData, "data_info")$norm_info$is_normalized)
+  #     "Boxplots of Normalized Lipid Data" else
+  #       "Boxplots of Un-Normalized Lipid Data"
+  # } else if(inherits(omicsData, "metabData")){
+  #   maintitle <- if (attr(omicsData, "data_info")$norm_info$is_normalized)
+  #     "Boxplots of Normalized Metabolite Data" else
+  #       "Boxplots of Un-Normalized Metabolite Data"
+  # } else if(inherits(omicsData, "nmrData")){
+  #   maintitle <- if (attr(omicsData, "nmr_info")$norm_info$is_normalized)
+  #     "Boxplots of Normalized NMR Data" else
+  #       "Boxplots of Un-Normalized NMR Data"
+  # }
 
   # Farm boy, create an  plot subtitle object. As you wish.
   subtitle <- NULL
@@ -4504,7 +4533,8 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
                               na.rm = TRUE)
 
   # Farm boy, extract the group_DF attribute. As you wish.
-  groupDF <- attr(omicsData, "group_DF")
+  # groupDF <- attr(omicsData, "group_DF")
+  groupDF <- get_group_DF(omicsData)
 
   # If facet_by is not null and isn't the same as either order_by or color_by.
   if (!is.null(facet_by)) {
@@ -4513,9 +4543,12 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
 
       # Extract the group_DF attribute. This will be used to facet the plots
       # later in the function.
-      facetDF <- attr(
-        group_designation(omicsData = omicsData, main_effects = facet_by),
-        "group_DF"
+      # facetDF <- attr(
+      #   group_designation(omicsData = omicsData, main_effects = facet_by),
+      #   "group_DF"
+      # )
+      facetDF <- get_group_DF(
+        group_designation(omicsData = omicsData, main_effects = facet_by)
       )
 
       # Rename the columns so they can be merged with the plot_data object and
@@ -4578,9 +4611,12 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
       # Extricate the group_DF data frame from omicsData after creating the
       # group_DF attribute with the color_by input. This will be combined with
       # the plot_data object so the samples can be colored by the main effect.
-      colorDF <- attr(
-        group_designation(omicsData = omicsData, main_effects = color_by),
-        "group_DF"
+      # colorDF <- attr(
+      #   group_designation(omicsData = omicsData, main_effects = color_by),
+      #   "group_DF"
+      # )
+      colorDF <- get_group_DF(
+        group_designation(omicsData = omicsData, main_effects = color_by)
       )
 
     } else {

@@ -43,9 +43,11 @@ missingval_result<- function(omicsData){
   
   
   # pulling cname attr
-  edata_cname<- attr(omicsData, "cnames")$edata_cname
-  edata_cname_id<- which(names(omicsData$e_data)== edata_cname)
-  fdata_cname<- attr(omicsData, "cnames")$fdata_cname
+  # edata_cname<- attr(omicsData, "cnames")$edata_cname
+  edata_cname<- get_edata_cname(omicsData)
+  edata_cname_id<- which(names(omicsData$e_data) == edata_cname)
+  # fdata_cname<- attr(omicsData, "cnames")$fdata_cname
+  fdata_cname<- get_fdata_cname(omicsData)
   
   # Count the number of NA values per column.
   na_per_col<- colSums(is.na(omicsData$e_data[, -edata_cname_id]))
