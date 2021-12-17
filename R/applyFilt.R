@@ -43,15 +43,15 @@
 #'   peptides that must map to a protein. Any protein with less than
 #'   \code{min_num_peps} mapping to it will be returned as a protein that should
 #'   be filtered. Default value is NULL. \cr \code{redundancy} \tab logical
-#'   indicator of whether to filter out degenerate peptides (TRUE) or not
-#'   (FALSE). Default value is FALSE.\cr } For a \code{filter_object} of type
-#'   'imdanovaFilt': \tabular{ll}{ \code{min_nonmiss_anova} \tab integer value
+#'   indicator of whether to filter out degenerate/redundant peptides (peptides
+#'   that map to more than one protein). Default value is FALSE.\cr } For a
+#'   \code{filter_object} of type 'imdanovaFilt': \tabular{ll}{
+#'   \code{min_nonmiss_anova} \tab integer value specifying the minimum number
+#'   of non-missing feature values allowed per group for \code{anova_filter}.
+#'   Default value is 2. \cr \code{min_nonmiss_gtest} \tab integer value
 #'   specifying the minimum number of non-missing feature values allowed per
-#'   group for \code{anova_filter}. Default value is 2. \cr
-#'   \code{min_nonmiss_gtest} \tab integer value specifying the minimum number
-#'   of non-missing feature values allowed per group for \code{gtest_filter}.
-#'   Default value is 3.\cr } There are no further arguments for a
-#'   \code{filter_object} of type 'customFilt'.
+#'   group for \code{gtest_filter}. Default value is 3.\cr } There are no
+#'   further arguments for a \code{filter_object} of type 'customFilt'.
 #'
 #' @examples
 #' \dontrun{
