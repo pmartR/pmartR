@@ -23,7 +23,7 @@ applyFilt(filter_object, omicsData, ...)
   min_num_biomolecules = 50
 )
 
-\method{applyFilt}{proteomicsFilt}(filter_object, omicsData, min_num_peps = NULL, degen_peps = FALSE)
+\method{applyFilt}{proteomicsFilt}(filter_object, omicsData, min_num_peps = NULL, redundancy = FALSE)
 
 \method{applyFilt}{imdanovaFilt}(
   filter_object,
@@ -83,7 +83,7 @@ Various further arguments can be specified depending on the class of
   map to a protein in omicsData. The value specifies the minimum number of
   peptides that must map to a protein. Any protein with less than
   \code{min_num_peps} mapping to it will be returned as a protein that should
-  be filtered. Default value is NULL. \cr \code{degen_peps} \tab logical
+  be filtered. Default value is NULL. \cr \code{redundancy} \tab logical
   indicator of whether to filter out degenerate peptides (TRUE) or not
   (FALSE). Default value is FALSE.\cr } For a \code{filter_object} of type
   'imdanovaFilt': \tabular{ll}{ \code{min_nonmiss_anova} \tab integer value

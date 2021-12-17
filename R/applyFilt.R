@@ -42,7 +42,7 @@
 #'   map to a protein in omicsData. The value specifies the minimum number of
 #'   peptides that must map to a protein. Any protein with less than
 #'   \code{min_num_peps} mapping to it will be returned as a protein that should
-#'   be filtered. Default value is NULL. \cr \code{degen_peps} \tab logical
+#'   be filtered. Default value is NULL. \cr \code{redundancy} \tab logical
 #'   indicator of whether to filter out degenerate peptides (TRUE) or not
 #'   (FALSE). Default value is FALSE.\cr } For a \code{filter_object} of type
 #'   'imdanovaFilt': \tabular{ll}{ \code{min_nonmiss_anova} \tab integer value
@@ -565,7 +565,7 @@ applyFilt.rmdFilt <- function (filter_object, omicsData,
 applyFilt.proteomicsFilt <- function (filter_object,
                                       omicsData,
                                       min_num_peps = NULL,
-                                      degen_peps = FALSE) {
+                                      redundancy = FALSE) {
 
   # Perform initial checks on the input arguments ------------------------------
 
@@ -578,12 +578,12 @@ applyFilt.proteomicsFilt <- function (filter_object,
   }
 
   # Make sure at least some of the peptides or proteins will be filtered. This
-  # means min_num_peps must not be null or degen_peps must not be FALSE.
-  if (is.null(min_num_peps) && !degen_peps) {
+  # means min_num_peps must not be null or redundancy must not be FALSE.
+  if (is.null(min_num_peps) && !redundancy) {
 
     # Warn the user that no filtering will actually occur.
     stop (paste("No peptides or proteins will be filtered. Either change",
-                "min_num_peps to an integer > 1 or change degen_peps to TRUE.",
+                "min_num_peps to an integer > 1 or change redundancy to TRUE.",
                 sep = " "))
 
   }
@@ -620,11 +620,11 @@ applyFilt.proteomicsFilt <- function (filter_object,
 
   }
 
-  # check that degen_peps is logical #
-  if (!inherits(degen_peps, "logical")) {
+  # check that redundancy is logical #
+  if (!inherits(redundancy, "logical")) {
 
     # Warn the illogical user that their inputs are also illogical.
-    stop ("degen_peps must be either TRUE or FALSE")
+    stop ("redundancy must be either TRUE or FALSE")
 
   }
 
@@ -636,8 +636,8 @@ applyFilt.proteomicsFilt <- function (filter_object,
   # Extract the column name containing the protein IDs.
   pro_id = attr(omicsData, "cnames")$emeta_cname
 
-  # Check if degen_peps is TRUE.
-  if (degen_peps) {
+  # Check if redundancy is TRUE.
+  if (redundancy) {
 
     count_bypep <- filter_object$counts_by_pep
 
@@ -799,7 +799,7 @@ applyFilt.proteomicsFilt <- function (filter_object,
     threshold = data.frame(min_num_peps = ifelse(is.null(min_num_peps),
                                                  NA,
                                                  min_num_peps),
-                           degen_peps = as.character(degen_peps)),
+                           redundancy = as.character(redundancy)),
     filtered = filter_object_new,
     method = NA
   )
