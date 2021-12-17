@@ -2403,32 +2403,37 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
 #'   the minimum number of peptides that must map to a protein. Any protein with
 #'   less than \code{min_num_peps} mapping to it will be returned as a protein
 #'   that should be filtered. Default value is NULL.
+#' @param view_num_peps Logical. If TRUE the plot is displayed that shows the
+#'   counts of proteins that have a specific number of peptides mapping to them.
+#'   The default value is TRUE.
+#' @param view_redundancy Logical. If TRUE the plot showing the counts of
+#'   peptides that map to a specific number of proteins is displayed. If all
+#'   peptides only map to a single protein this plot is not displayed. The
+#'   default value is TRUE.
 #'
 #' @param interactive Logical. If TRUE produces an interactive plot.
 #' @param x_lab_pep A character string used for the x-axis label for the
-#'   peptide-to-protein plot. The default is NULL in which case the default
-#'   x-axis label will be used.
+#'   num_peps plot. The default is NULL in which case the default x-axis label
+#'   will be used.
 #' @param x_lab_pro A character string used for the x-axis label for the
-#'   protein-to-peptide plot. The default is NULL in which case the default
-#'   x-axis label will be used.
+#'   redundancy plot. The default is NULL in which case the default x-axis label
+#'   will be used.
 #' @param y_lab_pep A character string used for the y-axis label for the
-#'   peptide-to-protein plot. The default is NULL in which case the default
-#'   y-axis label will be used.
+#'   num_peps plot. The default is NULL in which case the default y-axis label
+#'   will be used.
 #' @param y_lab_pro A character string used for the y-axis label for the
-#'   protein-to-peptide plot. The default is NULL in which case the default
-#'   y-axis label will be used.
+#'   redundancy plot. The default is NULL in which case the default y-axis label
+#'   will be used.
 #' @param x_lab_size An integer value indicating the font size for the x-axis.
 #'   The default is 11.
 #' @param y_lab_size An integer value indicating the font size for the y-axis.
 #'   The default is 11.
 #' @param x_lab_angle An integer value indicating the angle of x-axis labels.
 #'   The default is 0.
-#' @param title_lab_pep A character string specifying the peptide-to-protein
-#'   plot title. The default is NULL in which case the default title will be
-#'   used.
-#' @param title_lab_pro A character string specifying the protein-to-peptide
-#'   plot title. The default is NULL in which case the default title will be
-#'   used.
+#' @param title_lab_pep A character string specifying the num_peps plot title.
+#'   The default is NULL in which case the default title will be used.
+#' @param title_lab_pro A character string specifying the redundancy plot title.
+#'   The default is NULL in which case the default title will be used.
 #' @param title_lab_size An integer value indicating the font size of the plot
 #'   title. The default is 14.
 #' @param legend_lab A character string specifying the legend title.
@@ -2459,6 +2464,8 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
 #' @export
 #'
 plot.proteomicsFilt <- function (filter_obj, min_num_peps = NULL,
+                                 view_num_peps = TRUE,
+                                 view_redundancy = TRUE,
                                  interactive = FALSE, x_lab_pep = NULL,
                                  x_lab_pro = NULL, y_lab_pep = NULL,
                                  y_lab_pro = NULL, x_lab_size = 11,
@@ -2562,8 +2569,8 @@ plot.proteomicsFilt <- function (filter_obj, min_num_peps = NULL,
 
   # Manufacture phenomenal plots -----------------------------------------------
 
-  #!#!#!#! p represents the protein plot #!#!#!#!
-  #!#!#!#! q represents the pepe plot #!#!#!#!
+  #!#!#!#! p represents the protein plot (num_peps) #!#!#!#!
+  #!#!#!#! q represents the pepe plot (redundancy) #!#!#!#!
 
   # Create the bare bones protein and peptide plots.
   p <- ggplot2::ggplot(pro_counts_df)
@@ -2695,29 +2702,65 @@ plot.proteomicsFilt <- function (filter_obj, min_num_peps = NULL,
   p <- p + axs
   q <- q + axs
 
-  # Return both peptide and protein plots if there are degenerate peptides.
-  if (length(pep_bins) > 1) {
+  # Evan, just display the num_peps plot. As you wish.
+  if (view_num_peps && !view_redundancy) {
 
-    # Evan, make me an interactive plot. As you wish.
-    if (interactive) {
-
-      p <- plotly::ggplotly(p)
-      q <- plotly::ggplotly(q)
-
-      plotly::subplot(p, q, nrows = 1)
-
-    } else {
-
-      gridExtra::grid.arrange(p, q, ncol = 2)
-
-    }
-
-  } else {
-
-    # Evan, make me an interactive plot. As you wish.
+    # Evan, make me an interactive num_peps plot. As you wish.
     if (interactive) p <- plotly::ggplotly(p)
 
     return (p)
+
+    # Evan, just display the redundancy plot. As you wish.
+  } else if (!view_num_peps && view_redundancy) {
+
+    # Check for redundancy (multiple peptides mapping to a single protein).
+    if (length(pep_bins) == 1) {
+
+      # Send in the ROUSes because they are trying to plot just a large
+      # single-colored rectangle.
+      stop (paste("There are no redundant peptides in the data set; each",
+                  "peptide maps to a single protein. The redundancy plot is",
+                  "not displayed.",
+                  sep = " "))
+
+    }
+
+    # Evan, make me an interactive redundancy plot. As you wish.
+    if (interactive) q <- plotly::ggplotly(q)
+
+    return (q)
+
+  } else {
+
+    # If there is redundancy display both plots. Otherwise just display the
+    # num_peps plot.
+    if (length(pep_bins) > 1) {
+
+      # Evan, make me a combined interactive plot. As you wish.
+      if (interactive) {
+
+        p <- plotly::ggplotly(p)
+        q <- plotly::ggplotly(q)
+
+        plotly::subplot(p, q, nrows = 1)
+
+      } else {
+
+        # Evan, make me a combined plot that isn't interactive. As you wish.
+        gridExtra::grid.arrange(p, q, ncol = 2)
+
+      }
+
+      # The user asked for a redundancy plot but no redundancy exists so just
+      # the num_peps plot will be displayed.
+    } else {
+
+      # Evan, make me an interactive num_peps plot. As you wish.
+      if (interactive) p <- plotly::ggplotly(p)
+
+      return (p)
+
+    }
 
   }
 

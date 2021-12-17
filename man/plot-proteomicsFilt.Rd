@@ -7,6 +7,8 @@
 \method{plot}{proteomicsFilt}(
   filter_obj,
   min_num_peps = NULL,
+  view_num_peps = TRUE,
+  view_redundancy = TRUE,
   interactive = FALSE,
   x_lab_pep = NULL,
   x_lab_pro = NULL,
@@ -39,23 +41,32 @@ the minimum number of peptides that must map to a protein. Any protein with
 less than \code{min_num_peps} mapping to it will be returned as a protein
 that should be filtered. Default value is NULL.}
 
+\item{view_num_peps}{Logical. If TRUE the plot is displayed that shows the
+counts of proteins that have a specific number of peptides mapping to them.
+The default value is TRUE.}
+
+\item{view_redundancy}{Logical. If TRUE the plot showing the counts of
+peptides that map to a specific number of proteins is displayed. If all
+peptides only map to a single protein this plot is not displayed. The
+default value is TRUE.}
+
 \item{interactive}{Logical. If TRUE produces an interactive plot.}
 
 \item{x_lab_pep}{A character string used for the x-axis label for the
-peptide-to-protein plot. The default is NULL in which case the default
-x-axis label will be used.}
+num_peps plot. The default is NULL in which case the default x-axis label
+will be used.}
 
 \item{x_lab_pro}{A character string used for the x-axis label for the
-protein-to-peptide plot. The default is NULL in which case the default
-x-axis label will be used.}
+redundancy plot. The default is NULL in which case the default x-axis label
+will be used.}
 
 \item{y_lab_pep}{A character string used for the y-axis label for the
-peptide-to-protein plot. The default is NULL in which case the default
-y-axis label will be used.}
+num_peps plot. The default is NULL in which case the default y-axis label
+will be used.}
 
 \item{y_lab_pro}{A character string used for the y-axis label for the
-protein-to-peptide plot. The default is NULL in which case the default
-y-axis label will be used.}
+redundancy plot. The default is NULL in which case the default y-axis label
+will be used.}
 
 \item{x_lab_size}{An integer value indicating the font size for the x-axis.
 The default is 11.}
@@ -66,13 +77,11 @@ The default is 11.}
 \item{x_lab_angle}{An integer value indicating the angle of x-axis labels.
 The default is 0.}
 
-\item{title_lab_pep}{A character string specifying the peptide-to-protein
-plot title. The default is NULL in which case the default title will be
-used.}
+\item{title_lab_pep}{A character string specifying the num_peps plot title.
+The default is NULL in which case the default title will be used.}
 
-\item{title_lab_pro}{A character string specifying the protein-to-peptide
-plot title. The default is NULL in which case the default title will be
-used.}
+\item{title_lab_pro}{A character string specifying the redundancy plot title.
+The default is NULL in which case the default title will be used.}
 
 \item{title_lab_size}{An integer value indicating the font size of the plot
 title. The default is 14.}
