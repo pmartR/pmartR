@@ -2576,6 +2576,20 @@ plot.proteomicsFilt <- function (filter_obj, min_num_peps = NULL,
   p <- ggplot2::ggplot(pro_counts_df)
   q <- ggplot2::ggplot(pep_counts_df)
 
+  # Create an object for the first default ggplot2 color.
+  hideous <- grDevices::hcl(h = 15,
+                            c = 100,
+                            l = 65)
+
+  # Check if palette is NULL or not. Hopefully it isn't so the plot will be
+  # created with colors other than the super hideous default ggplot2 colors.
+  if (!is.null(palette)) {
+
+    # Create a color from the color brewer package if a palette is provided.
+    colas <- RColorBrewer::brewer.pal(5, palette)
+
+  }
+
   # if min_num_peps is specified, add a coloring variable that is red for
   # dropped values and green for retained values
   if (!is.null(min_num_peps)) {
@@ -2605,20 +2619,6 @@ plot.proteomicsFilt <- function (filter_obj, min_num_peps = NULL,
     # charts with groups).
   } else {
 
-    # Check if palette is NULL or not. Hopefully it isn't so the plot will be
-    # created with colors other than the super hideous default ggplot2 colors.
-    if (!is.null(palette)) {
-
-      # Create a color from the color brewer package if a palette is provided.
-      colas <- RColorBrewer::brewer.pal(5, palette)
-
-    }
-
-    # Create an object for the first default ggplot2 color.
-    hideous <- grDevices::hcl(h = 15,
-                              c = 100,
-                              l = 65)
-
     # We change bins to a factor so the x-axis tick labels are the value in bins
     # but the width of the bars and x-axis does not change according to the
     # numeric value of bins.
@@ -2632,18 +2632,26 @@ plot.proteomicsFilt <- function (filter_obj, min_num_peps = NULL,
         stat = "identity",
         width = bar_width
       )
-    q <- q +
-      ggplot2::geom_bar(
-        ggplot2::aes(x = as.factor(bins),
-                     y = counts),
-        fill = if (is.null(palette))
-          hideous else
-            colas[[3]],
-        stat = "identity",
-        width = bar_width
-      )
 
   }
+
+  # Evan, deal with all the issues when we ask you to make seemingly small
+  # changes to functions. AS YOU WISH.
+  # The q plot (redundant plot) has to be created outside the if else statement
+  # above because this plot does not change based on the input to min_num_peps.
+  # I tried to be smooth and leave the function mostly the same and add changes
+  # to the q plot together with the p plot when min_num_peps is specified.
+  # However, that turned out to be a nightmare. This attempt better work without
+  # any issues. Maybe I was too wishful: This attempt better not have the same
+  # completely ridiculous and unsolvable errors as the last attempt.
+  q <- q +
+    ggplot2::geom_bar(
+      ggplot2::aes(x = as.factor(bins),
+                   y = counts),
+      fill = if (is.null(palette)) hideous else colas[[3]],
+      stat = "identity",
+      width = bar_width
+    )
 
   # Evan, add plot labels for me. As you wish.
   p <- p +
@@ -2671,11 +2679,16 @@ plot.proteomicsFilt <- function (filter_obj, min_num_peps = NULL,
       ggplot2::scale_fill_brewer(palette = palette,
                                  name = legend_lab)
 
+    q <- q +
+      ggplot2::scale_fill_brewer(palette = palette)
+
   } else {
 
     p <- p + ggplot2::scale_fill_manual(name = legend_lab,
                                         values = c("dropped" = "red",
                                                    "retained" = "green"))
+
+    q <- q + ggplot2::scale_fill_manual(values = c("redundant" = "blue"))
 
   }
 
