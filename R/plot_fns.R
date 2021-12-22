@@ -1365,6 +1365,12 @@ na_scatter <- function (edata, group_df, na.by.sample, num_missing_vals,
 #'   \code{\link{as.pepData}}, \code{\link{as.isobaricpepData}},
 #'   \code{\link{as.proData}}, \code{\link{as.lipidData}},
 #'   \code{\link{as.metabData}}, or\code{\link{as.nmrData}}, respectively.
+#' @param order_by A character string specifying a main effect by which to order
+#'   the correlation heat map. This main effect must be found in the column
+#'   names of f_data in the omicsData object. If \code{order_by} is "Group", the
+#'   correlation heat map will be ordered by the group variable from the
+#'   group_designation function. If NULL (default), the correlation heat map
+#'   will be displayed in the order the samples appear in the data.
 #' @param x_text Logical. Indicates whether the x-axis will be labeled with the
 #'   sample names. The default is TRUE.
 #' @param y_text Logical. Indicates whether the y-axis will be labeled with the
@@ -1402,10 +1408,11 @@ na_scatter <- function (edata, group_df, na.by.sample, num_missing_vals,
 #'
 #' @export
 #'
-plot.corRes <- function (corRes_obj, omicsData = NULL, colorbar_lim = c(NA, NA),
-                         x_text = TRUE, y_text = TRUE, interactive = FALSE,
-                         x_lab = NULL, y_lab = NULL, x_lab_size = 11,
-                         y_lab_size = 11, x_lab_angle = 90, title_lab = NULL,
+plot.corRes <- function (corRes_obj, omicsData = NULL, order_by = NULL,
+                         colorbar_lim = c(NA, NA), x_text = TRUE,
+                         y_text = TRUE, interactive = FALSE, x_lab = NULL,
+                         y_lab = NULL, x_lab_size = 11, y_lab_size = 11,
+                         x_lab_angle = 90, title_lab = NULL,
                          title_lab_size = 14, legend_lab = NULL,
                          legend_position = "right", color_low = NULL,
                          color_high = NULL, bw_theme = TRUE,
@@ -1444,17 +1451,114 @@ plot.corRes <- function (corRes_obj, omicsData = NULL, colorbar_lim = c(NA, NA),
 
   }
 
+  if (!is.null(order_by)) {
+
+    # If order_by is not NULL omicsData must also not be NULL.
+    if (is.null(omicsData)) {
+
+      # Get used to disappointment.
+      stop ("If order_by is not NULL omicsData must also not be NULL.")
+
+    }
+
+    if (!is.character(order_by) || length(order_by) > 1) {
+
+      # Your plot is now mostly dead. Good luck trying to revive it.
+      stop ("order_by must be a character vector of length 1")
+
+    }
+
+    # Make sure the group designation function has been run.
+    if (is.null(attr(omicsData, "group_DF"))) {
+
+      # Do you hear that? Those are the shrieking eels!
+      stop (paste("group_DF must not be NULL. Run the group_designation",
+                  "function prior to plotting with the order_by argument.",
+                  sep = " "))
+
+    }
+
+  }
+
+  # Create plot data matrix ----------------------------------------------------
+
   # Workaround for certain "check" warnings
   Var1 <- Var2 <- value <- NULL
 
+  # Nab groupDF when omicsData is available and order_by is specified. BOOM!
+  if (!is.null(order_by)) {
+
+    # Farm boy, extract the group_DF attribute. As you wish.
+    groupDF <- attr(omicsData, "group_DF")
+
+    # If order_by is not "Group" then run group designation with the specified
+    # variable as the main effect.
+    if (order_by != "Group") {
+
+      # Fish out the group_DF data frame from omicsData after creating the
+      # group_DF attribute with the order_by input. This will be combined with
+      # the plot_data object so the samples can be ordered by the main effect.
+      orderDF <- attr(
+        group_designation(omicsData = omicsData, main_effects = order_by),
+        "group_DF"
+      )
+
+    } else {
+
+      # Use the original group_DF attribute for ordering the samples. This
+      # occurs when order_by = "group_DF".
+      orderDF <- groupDF
+
+    }
+
+    # Reorder the orderDF according to the order_by input. We can subset using
+    # "Group" because it will always be the column we are after. If the input to
+    # order_by = "Group" we will use the Group column from the group_DF
+    # attribute from the original input. If order_by is a variable other than
+    # group, we will run the group_designation function and the name of this
+    # variable will be changed to Group.
+    orderDF <- orderDF[order(orderDF$Group), ]
+
+    # "Hey, farm boy. I would like to order the samples in the corRes plots."
+    # Should be a simple change. Right? WRONG!!! It is never a simple change
+    # when it comes to pmartR. There are always many negative downstream side
+    # effects or loose ends that need to be addressed. For example, the corRes
+    # object has attributes that you lose when you overwrite the correlation
+    # matrix with an updated one that you need for ordering the plot. Now the
+    # attributes need to be saved before changing row and column order and then
+    # added back after the change.
+    normal_attr <- attr(corRes_obj, "is_normalized")
+
+    # Reorder the rows and columns of the corRes object to match the order of
+    # the samples in orderDF. This better make the order of the rows and columns
+    # in the corRes plot match the order of the orderDF object. If not Lisa and
+    # Kelly are going to have to find a new farm boy to update/fix pmartR.
+    # We can hard-code the first column of orderDF because this will always be
+    # the column containing the sample names. This is the order the
+    # group_designation function outputs columns.
+    # 1. Reorder the columns of corRes_obj to match the order of orderDF.
+    corRes_obj <- corRes_obj[, match(orderDF[, 1], colnames(corRes_obj))]
+    # 2. Reorder the rows of corRes_obj to match the order of orderDF.
+    corRes_obj <- corRes_obj[match(orderDF[, 1], rownames(corRes_obj)), ]
+
+    # Add the lost attributes back to the corRes_obj because they are needed
+    # later on.
+    attr(corRes_obj, "is_normalized") <- normal_attr
+
+  }
+
   # Create the data frame that will be used to produce the correlation heatmap.
   corRes_melt <- reshape2::melt(corRes_obj)
-  corRes_melt$Var1 <- abbreviate(corRes_melt$Var1, minlength = 20)
-  corRes_melt$Var2 <- abbreviate(corRes_melt$Var2, minlength = 20)
-  sampleIDx = ordered(corRes_melt$Var2,
-                      levels = rev(sort(unique(corRes_melt$Var2))))
-  sampleIDy = ordered(corRes_melt$Var1,
-                      levels = rev(sort(unique(corRes_melt$Var1))))
+  # The y-axis will be Var1 in the plot.
+  corRes_melt$Var1 <- factor(
+    abbreviate(corRes_melt$Var1, minlength = 20),
+    levels = abbreviate(rownames(corRes_obj), minlength = 20)
+  )
+  # The x-axis will be Var2 in the plot.
+  corRes_melt$Var2 <- factor(
+    abbreviate(corRes_melt$Var2, minlength = 20),
+    levels = abbreviate(rownames(corRes_obj), minlength = 20)
+  )
 
   # Create all the plot labels. Life is pain!!!
   xlabel <- if (is.null(x_lab)) "" else x_lab
@@ -1484,8 +1588,8 @@ plot.corRes <- function (corRes_obj, omicsData = NULL, colorbar_lim = c(NA, NA),
 
   # Start the skeleton of the heat map. Other aspects are forthcoming.
   hm <- ggplot2::ggplot(corRes_melt,
-                        ggplot2::aes(x = sampleIDx,
-                                     y = sampleIDy)) +
+                        ggplot2::aes(x = Var2,
+                                     y = Var1)) +
     ggplot2::geom_tile(ggplot2::aes(fill = value))
 
   # Farm boy, make me a plot with the black and white theme. As you wish.
