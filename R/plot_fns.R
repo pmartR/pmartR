@@ -1519,23 +1519,14 @@ plot.corRes <- function (corRes_obj, omicsData = NULL, order_by = NULL,
     # variable will be changed to Group.
     orderDF <- orderDF[order(orderDF$Group), ]
 
-    # "Hey, farm boy. I would like to order the samples in the corRes plots."
-    # Should be a simple change. Right? WRONG!!! It is never a simple change
-    # when it comes to pmartR. There are always many negative downstream side
-    # effects or loose ends that need to be addressed. For example, the corRes
-    # object has attributes that you lose when you overwrite the correlation
-    # matrix with an updated one that you need for ordering the plot. Now the
-    # attributes need to be saved before changing row and column order and then
-    # added back after the change.
+    # Save the original is_normalized attribute. This attribute is erased when
+    # the rows and columns are reordered based on the orderDF object. This
+    # attribute is needed later in the function to correctly label the plot.
     normal_attr <- attr(corRes_obj, "is_normalized")
 
     # Reorder the rows and columns of the corRes object to match the order of
-    # the samples in orderDF. This better make the order of the rows and columns
-    # in the corRes plot match the order of the orderDF object. If not Lisa and
-    # Kelly are going to have to find a new farm boy to update/fix pmartR.
-    # We can hard-code the first column of orderDF because this will always be
-    # the column containing the sample names. This is the order the
-    # group_designation function outputs columns.
+    # the groups in orderDF. We can hard-code the first column of orderDF
+    # because this will always be the column containing the sample names.
     # 1. Reorder the columns of corRes_obj to match the order of orderDF.
     corRes_obj <- corRes_obj[, match(orderDF[, 1], colnames(corRes_obj))]
     # 2. Reorder the rows of corRes_obj to match the order of orderDF.
@@ -1547,7 +1538,7 @@ plot.corRes <- function (corRes_obj, omicsData = NULL, order_by = NULL,
 
   }
 
-  # Create the data frame that will be used to produce the correlation heatmap.
+  # Create the data frame that will be used to produce the correlation heat map.
   corRes_melt <- reshape2::melt(corRes_obj)
   # The y-axis will be Var1 in the plot.
   corRes_melt$Var1 <- factor(
