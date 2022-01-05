@@ -590,7 +590,10 @@ trelli_group_by <- function(trelliData, group) {
 #' trelli_group_by(trelliData = trelliData, group = "Sample") %>% trelli_abundance_boxplot()
 #' 
 #' ## Build the abundance boxplot with an omicsData object. Generate trelliData in as.trelliData
-#' trelli_group_by(trelliData = trelliData2, group = "LipidCommonName") %>% trelli_abundance_boxplot()
+#' trelli_group_by(trelliData = trelliData2, group = "LipidCommonName") %>% 
+#'    trelli_abundance_boxplot(test_mode = T, test_example = 1:10)
+#'     
+#'    
 #' 
 #' }
 #' 
@@ -693,8 +696,8 @@ trelli_abundance_boxplot <- function(trelliData,
   
   # Second, create the cognostic function to return
   box_cog_fun <- function(DF) {
-    
-    # Set basic cognostics that will always apply 
+  
+    # Set basic cognostics for ungrouped data 
     cog <- list(
      "n" = dplyr::tibble(`Count` = trelliscopejs::cog(sum(!is.na(DF$Abundance)), desc = "Biomolecule Count")),
      "mean" = dplyr::tibble(`Mean Abundance` = trelliscopejs::cog(round(mean(DF$Abundance, na.rm = T), 4), desc = "Mean Abundance")), 
@@ -703,21 +706,57 @@ trelli_abundance_boxplot <- function(trelliData,
      "skew" = dplyr::tibble(`Skew Abundance` = trelliscopejs::cog(round(e1071::skewness(DF$Abundance, na.rm = T), 4), desc= "Abundance Skewness"))
     )
     
-    # Add cognostics that only apply when there is grouping  
+    # Start list of cogs
+    cog_to_trelli <- do.call(cbind, lapply(cognostics, function(x) {cog[[x]]})) %>% tibble::tibble()
+    
     if (!is.null(attributes(trelliData$omicsData)$group_DF)) {
-        
       
-    } 
+      # A quick cognostic function 
+      quick_cog <- function(name, value) {
+        dplyr::tibble(!!rlang::sym(name) := trelliscopejs::cog(value, desc = name))
+      }
+      
+      # Create a list to convert from short name to long
+      name_converter <- list("n" = "Count", "mean" = "Mean Abundance", 
+        "median" = "Median Abundance", "sd" = "Standard Deviation Abundance", 
+        "skew" = "Skew Abundance")
+      
+      # Since the number of groups is unknown, first group_by the Groups,
+      # then calculate all summary statistics, pivot to long format,
+      # subset down to requested statistics, switch name to a more specific name, 
+      # combine group and name, and generate the cognostic tibble
+      cogs_to_add <- DF %>%
+        dplyr::group_by(Group) %>%
+        dplyr::summarise(
+          "n" = sum(!is.na(Abundance)), 
+          "mean" = round(mean(Abundance, na.rm = T), 4),
+          "median" = round(median(Abundance, na.rm = T), 4),
+          "sd" = round(sd(Abundance, na.rm = T), 4),
+          "skew" = round(e1071::skewness(Abundance, na.rm = T), 4)
+        ) %>%
+        tidyr::pivot_longer(c(n, mean, median, sd, skew)) %>%
+        dplyr::filter(name %in% cognostics) %>%
+        dplyr::mutate(
+          name = paste(Group, lapply(name, function(x) {name_converter[[x]]}) %>% unlist())
+        ) %>%
+        dplyr::ungroup() %>%
+        dplyr::select(-Group) 
+      
+      # Add new cognostics 
+      cog_to_trelli <- cbind(cog_to_trelli, do.call(cbind, lapply(1:nrow(cogs_to_add), function(row) {
+        quick_cog(cogs_to_add$name[row], cogs_to_add$value[row])
+      })) %>% tibble::tibble()) %>% tibble::tibble()
+        
+    }
     
     # Add cognostics that only apply when there is stats data
     if (!is.null(trelliData$trelliData.stat)) {
       
+      browser()
       
     }
 
-    return(
-      do.call(cbind, lapply(cognostics, function(x) {cog[[x]]})) %>% tibble::tibble()
-    )
+    return(cog_to_trelli)
     
   }
   
@@ -725,8 +764,8 @@ trelli_abundance_boxplot <- function(trelliData,
   
   # If test_mode is on, then just build the required panels
   if (test_mode) {toBuild <- trelliData$trelliData.omics[test_example,]} 
-  else {toBuild <- trelliDatat$trelliData.omics}
-    
+  else {toBuild <- trelliData$trelliData.omics}
+  
   # Build trelliscope 
   toBuild %>%
     dplyr::mutate(
