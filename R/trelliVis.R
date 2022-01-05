@@ -422,7 +422,7 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL, ...) {
   # been grouped by. And "group_by" tracks whether the group_by function has been
   # applied or not. 
   group_options <- c(colnames(trelliData.omics), colnames(trelliData.stat)) %>% unique()
-  group_nonoptions <- c("Abundance", "Comparison", "P_value", "Fold_change")
+  group_nonoptions <- c("Abundance", "Comparison", "P_value", "Fold_change", "Group")
   group_options <- group_options[group_options %in% group_nonoptions == FALSE]
   attr(trelliData, "group_by_options") <- group_options
   attr(trelliData, "group_by_omics") <- NA
@@ -575,24 +575,36 @@ trelli_group_by <- function(trelliData, group) {
 #' @param interactive A logical argument indicating whether the plots should be interactive
 #'    or not. Interactive plots are ggplots piped to ggplotly (for now). Default is FALSE.  
 #' @param path The base directory of the trelliscope application. Default is Downloads. 
+#' @param name The name of the display. Default is Trelliscope.
+#' @param test_mode A logical to return a smaller trelliscope to confirm plot and design.
+#'    Default is FALSE.
+#' @param test_example The index number of the plot to return for test_mode. Default is 1. 
+#' 
 #'    
 #' @examples
 #' \dontrun{
 #' 
-#' ## build the abundance boxplot with an edata file. Generate with example code in as.trelliData.edata
-#' trelli_group_by(trelliData = trelliData, group = "LipidCommonName") %>% trelli_boxplot()
-#' trelli_group_by(trelliData = trelliData, group = "Sample")
+#' ## Build the abundance boxplot with an edata file. Generate trelliData in as.trelliData.edata
+#' trelli_group_by(trelliData = trelliData, group = "LipidCommonName") %>% 
+#'    trelli_abundance_boxplot(test_mode = T, test_example = 1:10)
+#' trelli_group_by(trelliData = trelliData, group = "Sample") %>% trelli_abundance_boxplot()
+#' 
+#' ## Build the abundance boxplot with an omicsData object. Generate trelliData in as.trelliData
+#' trelli_group_by(trelliData = trelliData2, group = "LipidCommonName") %>% trelli_abundance_boxplot()
 #' 
 #' }
 #' 
 #' @author David Degnan
 #' 
 #' @export
-trelli_boxplot <- function(trelliData,
+trelli_abundance_boxplot <- function(trelliData,
                            cognostics = c("n", "mean", "median", "sd", "skew"),
                            ggplot_params = NULL,
                            interactive = FALSE,
-                           path = "~/Downloads",
+                           path = "~/Downloads/Trelliscope",
+                           name = "Trelliscope",
+                           test_mode = FALSE,
+                           test_example = 1,
                            ...) {
   
   # Run initial checks----------------------------------------------------------
@@ -635,27 +647,43 @@ trelli_boxplot <- function(trelliData,
   }
   if (is.na(interactive)) {interactive <- FALSE}
   
+  # test_mode must be a TRUE/FALSE
+  if (!is.logical(test_mode)) {
+    stop("test_mode must be a true or false")
+  }
+  if (is.na(test_mode)) {test_mode <- FALSE}
+  
+  # Ensure that test_example is an integer
+  if (!is.numeric(test_example) | 0 %in% test_example) {
+    "test_example should be non-zero integers."
+  }
+  test_example <- unique(abs(round(test_example)))
+  
+  # Ensure that test_example is in the range of possibilities 
+  if (max(test_example) > nrow(trelliData$trelliData.omics)) {
+    stop(paste("test_example must be in the range of possibilities, of 1 to", nrow(trelliData$trelliData.omics)))
+  }
+  
   # Make boxplot function-------------------------------------------------------
   
   # First, generate the boxplot function
   box_plot_fun <- function(DF, title) {
     
-    # Add groups by group_designation
-    if (is.null(attributes(trelliData$omicsData)$group_DF)) {DF$X <- "x"} else {
-      browser()
-    }
+    # Add a blank group if no group designation was given
+    if (is.null(attributes(trelliData$omicsData)$group_DF)) {DF$Group <- "x"} 
     
     # Build plot 
-    boxplot <- ggplot2::ggplot(DF, ggplot2::aes(x = X, fill = X, y = Abundance)) + 
+    boxplot <- ggplot2::ggplot(DF, ggplot2::aes(x = Group, fill = Group, y = Abundance)) + 
       ggplot2::geom_boxplot() + ggplot2::geom_point() + ggplot2::theme_bw() + 
+      ggplot2::ggtitle(title) +
       ggplot2::theme(legend.position = "none", plot.title = ggplot2::element_text(hjust = 0.5)) + 
-      ggplot2::ggtitle(title) + 
       ggplot2::ylab(paste(attr(trelliData$omicsData, "data_info")$data_scale, "Abundance"))
     
     # Remove x axis if no groups
     if (is.null(attributes(trelliData$omicsData)$group_DF)) {
       boxplot <- boxplot + ggplot2::theme(axis.title.x = ggplot2::element_blank(),
-                                          axis.ticks.x = ggplot2::element_blank(), axis.text.x = ggplot2::element_blank())
+                                          axis.ticks.x = ggplot2::element_blank(), 
+                                          axis.text.x = ggplot2::element_blank())
     }
     
     return(boxplot)
@@ -666,29 +694,45 @@ trelli_boxplot <- function(trelliData,
   # Second, create the cognostic function to return
   box_cog_fun <- function(DF) {
     
-    if (is.null(attributes(trelliData$omicsData)$group_DF)) {
+    # Set basic cognostics that will always apply 
+    cog <- list(
+     "n" = dplyr::tibble(`Count` = trelliscopejs::cog(sum(!is.na(DF$Abundance)), desc = "Biomolecule Count")),
+     "mean" = dplyr::tibble(`Mean Abundance` = trelliscopejs::cog(round(mean(DF$Abundance, na.rm = T), 4), desc = "Mean Abundance")), 
+     "median" = dplyr::tibble(`Median Abundance` = trelliscopejs::cog(round(median(DF$Abundance, na.rm = T), 4), desc = "Median Abundance")), 
+     "sd" = dplyr::tibble(`Standard Deviation Abundance` = trelliscopejs::cog(round(sd(DF$Abundance, na.rm = T), 4), desc = "Abundance Standard Deviation")), 
+     "skew" = dplyr::tibble(`Skew Abundance` = trelliscopejs::cog(round(e1071::skewness(DF$Abundance, na.rm = T), 4), desc= "Abundance Skewness"))
+    )
+    
+    # Add cognostics that only apply when there is grouping  
+    if (!is.null(attributes(trelliData$omicsData)$group_DF)) {
+        
       
-      cog <- function(cog_choice) {
-        switch(cog_choice, 
-               "n" = dplyr::tibble(`Count` = trelliscopejs::cog(nrow(x), desc = "Biomolecule Count")),
-               "mean" = dplyr::tibble(`Mean Abundance` = trelliscopejs::cog(mean(x, na.rm = T), desc = "Mean Abundance")), 
-               "median" = dplyr::tibble(`Median Abundance` = trelliscopejs::cog(median(x, na.rm = T), desc = "Median Abundance")), 
-               "sd" = dplyr::tibble(`Standard Deviation Abundance` = trelliscopejs::cog(sd(x, na.rm = T), desc = "Abundance Standard Deviation")), 
-               "skew" = dplyr::tibble(`Skew Abundance` = trelliscopejs::cog(e1071::skewness(x, na.rm = T), desc= "Abundance Skewness"))
-        )
-      }
+    } 
+    
+    # Add cognostics that only apply when there is stats data
+    if (!is.null(trelliData$trelliData.stat)) {
       
-    } else {
-      
-      #browser()
       
     }
-    
+
+    return(
+      do.call(cbind, lapply(cognostics, function(x) {cog[[x]]})) %>% tibble::tibble()
+    )
     
   }
-  #browser()
   
+  # Build trelliscope display---------------------------------------------------
   
-  
+  # If test_mode is on, then just build the required panels
+  if (test_mode) {toBuild <- trelliData$trelliData.omics[test_example,]} 
+  else {toBuild <- trelliDatat$trelliData.omics}
+    
+  # Build trelliscope 
+  toBuild %>%
+    dplyr::mutate(
+      panel = trelliscopejs::map2_plot(Nested_DF, as.character(unlist(toBuild[,1])), box_plot_fun),
+      cogs = trelliscopejs::map_cog(Nested_DF, box_cog_fun)
+    ) %>%
+    trelliscopejs::trelliscope(path = path, name = name, nrow = 1, ncol = 1, thumb = T, ...)
   
 }
