@@ -689,6 +689,11 @@ trelli_abundance_boxplot <- function(trelliData,
                                           axis.text.x = ggplot2::element_blank())
     }
     
+    # Add additional parameters
+    if (!is.null(ggplot_params)) {
+      boxplot <- boxplot + unquote(ggplot_params)
+    }
+    
     return(boxplot)
   }
   
@@ -697,7 +702,7 @@ trelli_abundance_boxplot <- function(trelliData,
   # Second, create the cognostic function to return
   box_cog_fun <- function(DF) {
   
-    # Set basic cognostics for ungrouped data 
+    # Set basic cognostics for ungrouped data or in case when data is not split by fdata_cname
     cog <- list(
      "n" = dplyr::tibble(`Count` = trelliscopejs::cog(sum(!is.na(DF$Abundance)), desc = "Biomolecule Count")),
      "mean" = dplyr::tibble(`Mean Abundance` = trelliscopejs::cog(round(mean(DF$Abundance, na.rm = T), 4), desc = "Mean Abundance")), 
@@ -709,7 +714,13 @@ trelli_abundance_boxplot <- function(trelliData,
     # Start list of cogs
     cog_to_trelli <- do.call(cbind, lapply(cognostics, function(x) {cog[[x]]})) %>% tibble::tibble()
     
-    if (!is.null(attributes(trelliData$omicsData)$group_DF)) {
+    # Get fdata cname and group_by selection
+    fdata_cname <- pmartR::get_fdata_cname(trelliData$omicsData)
+    group_by_choice <- attr(trelliData, "group_by_omics")
+    
+    # Additional group cognostics can be added only if group_designation was set and
+    # trelli_group_by is not the fdata_cname
+    if (!is.null(attributes(trelliData$omicsData)$group_DF) & fdata_cname != group_by_choice) {
       
       # A quick cognostic function 
       quick_cog <- function(name, value) {
