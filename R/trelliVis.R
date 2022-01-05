@@ -316,7 +316,7 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL, ...) {
   if (!is.null(statRes)) {
     
     # ...it must be a statRes object
-    if (class(statRes) != "statRes") {
+    if ("statRes" %in% class(statRes) == FALSE) {
       stop("statRes must be an object of the statRes class. See ?imd_anova.")
     }
     
@@ -331,7 +331,7 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL, ...) {
     edata_cname <- pmartR::get_edata_cname(omicsData)
     
     # Confirm that all statRes biomolecules are in omicsData.
-    if (!all(statRes$Full_results[[edata_cname]] %in% omicsData$e_data[[edata_cname]])) {
+    if (!all(statRes[[edata_cname]] %in% omicsData$e_data[[edata_cname]])) {
       stop("omicsData and statRes are from different datasets.")
     }
     
@@ -383,30 +383,20 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL, ...) {
     edata_cname <- pmartR::get_edata_cname(statRes)
     
     # Get column names of all fold changes, as well as p-values
-    pvalue_cols <- colnames(statRes$Full_results)[grepl("P_value", colnames(statRes$Full_results))]
-    fold_change_cols <- colnames(statRes$Full_results)[grepl("Fold_change", colnames(statRes$Full_results))]
+    pvalue_cols <- colnames(statRes)[grepl("P_value", colnames(statRes))]
+    fold_change_cols <- colnames(statRes)[grepl("Fold_change", colnames(statRes))]
     
-    # Pull pvalue data 
-    pvalue_data <- statRes$Full_results %>%
-      dplyr::select(c(edata_cname, pvalue_cols)) %>%
+    # Pivot_longer pvalue and fold change data 
+    trelliData.stat <- statRes %>%
+      dplyr::select(c(edata_cname, pvalue_cols, fold_change_cols))  %>%
       tidyr::pivot_longer(pvalue_cols) %>%
       dplyr::rename(Comparison = name, P_value = value) %>%
       dplyr::mutate(Comparison = lapply(Comparison, function(x) {
-        gsub("P_value_T_", "", x)
-      }) %>% unlist())
-    
-    
-    # Pull foldchange data 
-    foldchange_data <- statRes$Full_results %>%
-      dplyr::select(c(edata_cname, fold_change_cols)) %>%
+        gsub("P_value_A_", "", x)
+      }) %>% unlist()) %>%
       tidyr::pivot_longer(fold_change_cols) %>%
-      dplyr::rename(Comparison = name, Fold_change = value) %>%
-      dplyr::mutate(Comparison = lapply(Comparison, function(x) {
-        gsub("Fold_change_", "", x)
-      }) %>% unlist())
-    
-    # Generate trelliData.stat object
-    trelliData.stat <- merge(pvalue_data, foldchange_data, by = c("LipidCommonName", "Comparison"))
+      dplyr::select(-name) %>%
+      dplyr::rename(Fold_change = value)
     
     # Add emeta columns if emeta exists
     if (!is.null(omicsData$e_meta)) {
