@@ -749,7 +749,7 @@ trelli_abundance_boxplot <- function(trelliData,
       # Create a list to convert from short name to long
       name_converter <- list("n" = "Count", "mean" = "Mean Abundance", 
         "median" = "Median Abundance", "sd" = "Standard Deviation Abundance", 
-        "skew" = "Skew Abundance", "p_value" = "Median P Value", "fold_change" = "Median Fold Change")
+        "skew" = "Skew Abundance", "p_value" = "P Value", "fold_change" = "Fold Change")
       
       # Since the number of groups is unknown, first group_by the Groups,
       # then calculate all summary statistics, pivot to long format,
@@ -783,6 +783,8 @@ trelli_abundance_boxplot <- function(trelliData,
     # same column as omicsData
     if (!is.null(trelliData$trelliData.stat) && attr(trelliData, "group_by_omics") == attr(trelliData, "group_by_stat")) {
       
+      # FIX trelliData.stat (should be one P_value and one Fold_change)
+      
       # Subset down the dataframe down to group, unnest the dataframe, 
       # subset columns to requested statistics, switch name to a more specific name
       trelliData$trelliData.stat %>%
@@ -796,7 +798,8 @@ trelli_abundance_boxplot <- function(trelliData,
           name = paste(Comparison, lapply(name, function(x) {name_converter[[x]]}) %>% unlist())
         ) %>%
         dplyr::select(name, value) %>% 
-        unique()
+        dplyr::group_by(name) %>%
+        dplyr::summarise(Median = round(mean(value, na.rm = T), 4))
       
       
     }
