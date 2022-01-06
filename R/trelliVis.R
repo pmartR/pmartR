@@ -386,17 +386,25 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL, ...) {
     pvalue_cols <- colnames(statRes)[grepl("P_value", colnames(statRes))]
     fold_change_cols <- colnames(statRes)[grepl("Fold_change", colnames(statRes))]
     
-    # Pivot_longer pvalue and fold change data 
+    # Pivot longer so that the first column is the edata_cname, extract comparison,
+    # group_by comparison, nest dataframes, and then extract the p_value and fold_change
+    # for each group
     trelliData.stat <- statRes %>%
       dplyr::select(c(edata_cname, pvalue_cols, fold_change_cols))  %>%
-      tidyr::pivot_longer(pvalue_cols) %>%
-      dplyr::rename(Comparison = name, P_value = value) %>%
-      dplyr::mutate(Comparison = lapply(Comparison, function(x) {
-        gsub("P_value_A_", "", x)
-      }) %>% unlist()) %>%
-      tidyr::pivot_longer(fold_change_cols) %>%
-      dplyr::select(-name) %>%
-      dplyr::rename(Fold_change = value)
+      tidyr::pivot_longer(c(pvalue_cols, fold_change_cols)) %>%
+      dplyr::mutate(
+        Comparison = gsub("P_value_A_|Fold_change_", "", name),
+        name = lapply(1:length(name), function(el) {
+          gsub(paste0("_", Comparison[el]), "", name[el])
+        }) %>% unlist()
+      ) %>%
+      dplyr::group_by(dplyr::across(c(Comparison, !!rlang::sym(edata_cname)))) %>%
+      tidyr::nest() %>%
+      dplyr::mutate(
+        "p_value" = purrr::map(data, function(x) {unlist(x[x$name == "P_value_A", "value"])}) %>% unlist(),
+        "fold_change" = purrr::map(data, function(x) {unlist(x[x$name == "Fold_change", "value"])}) %>% unlist()
+      ) %>%
+      dplyr::select(-data)
     
     # Add emeta columns if emeta exists
     if (!is.null(omicsData$e_meta)) {
@@ -599,6 +607,7 @@ trelli_group_by <- function(trelliData, group) {
 #' ## Build the abundance boxplot with an omicsData and statRes object. Generate trelliData in as.trelliData.
 #' trelli_group_by(trelliData = trelliData4, group = "LipidCommonName") %>%
 #'    trelli_abundance_boxplot(test_mode = T, test_example = 1:10)
+#' trelli_group_by(trelliData = trelliData4, group = "LipidFamily") %>% trelli_abundance_boxplot()
 #'    
 #' 
 #' }
@@ -783,24 +792,29 @@ trelli_abundance_boxplot <- function(trelliData,
     # same column as omicsData
     if (!is.null(trelliData$trelliData.stat) && attr(trelliData, "group_by_omics") == attr(trelliData, "group_by_stat")) {
       
-      # FIX trelliData.stat (should be one P_value and one Fold_change)
+      # Get edata cname
+      edata_cname <- pmartR::get_edata_cname(trelliData$statRes)
       
       # Subset down the dataframe down to group, unnest the dataframe, 
-      # subset columns to requested statistics, switch name to a more specific name
-      trelliData$trelliData.stat %>%
-        dplyr::filter(trelliData$trelliData.stat[,1] == group) %>%
+      # pivot_longer to comparison, subset columns to requested statistics, 
+      # switch name to a more specific name
+      cogs_to_add <- trelliData$trelliData.stat %>%
+        dplyr::filter(trelliData$trelliData.stat[[edata_cname]] == group) %>%
         dplyr::select(Nested_DF) %>%
         tidyr::unnest(cols = c(Nested_DF)) %>%
-        dplyr::rename(p_value = P_value, fold_change = Fold_change) %>%
+        dplyr::select(c(Comparison, p_value, fold_change)) %>%
         tidyr::pivot_longer(c(p_value, fold_change)) %>%
-        dplyr::filter(name %in% cognostics) %>%
         dplyr::mutate(
-          name = paste(Comparison, lapply(name, function(x) {name_converter[[x]]}) %>% unlist())
+          name = paste(Comparison, lapply(name, function(x) {name_converter[[x]]}) %>% unlist()),
+          value = round(value, 4)
         ) %>%
-        dplyr::select(name, value) %>% 
-        dplyr::group_by(name) %>%
-        dplyr::summarise(Median = round(mean(value, na.rm = T), 4))
+        dplyr::ungroup() %>%
+        dplyr::select(-Comparison)
       
+      # Add new cognostics 
+      cog_to_trelli <- cbind(cog_to_trelli, do.call(cbind, lapply(1:nrow(cogs_to_add), function(row) {
+        quick_cog(cogs_to_add$name[row], cogs_to_add$value[row])
+      })) %>% tibble::tibble()) %>% tibble::tibble()
       
     }
 
