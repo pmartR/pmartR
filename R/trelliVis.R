@@ -568,7 +568,9 @@ trelli_group_by <- function(trelliData, group) {
 #' @param trelliData A trelliscope data object made by as.trelliData or as.trelliData.edata,
 #'    and grouped by trelli_group_by. Required. 
 #' @param cognostics A vector of cognostic options for each plot. Valid entries are
-#'    n, mean, median, sd, and skew for abundance. 
+#'    n, mean, median, sd, and skew for abundance. If statRes data is included, 
+#'    p_value and fold_change cognostics can be added. If no cognostics are desired,
+#'    set to NULL. 
 #' @param ggplot_params An optional string of ggplot parameters to the backend ggplot
 #'    function. For example "ylab('Group') + xlab('Abundance') + ylim(c(2,20))".
 #'    Default is NULL. 
@@ -592,7 +594,11 @@ trelli_group_by <- function(trelliData, group) {
 #' ## Build the abundance boxplot with an omicsData object. Generate trelliData in as.trelliData
 #' trelli_group_by(trelliData = trelliData2, group = "LipidCommonName") %>% 
 #'    trelli_abundance_boxplot(test_mode = T, test_example = 1:10)
+#' trelli_group_by(trelliData = trelliData2, group = "LipidFamily") %>% trelli_abundance_boxplot()
 #'     
+#' ## Build the abundance boxplot with an omicsData and statRes object. Generate trelliData in as.trelliData.
+#' trelli_group_by(trelliData = trelliData4, group = "LipidCommonName") %>%
+#'    trelli_abundance_boxplot(test_mode = T, test_example = 1:10)
 #'    
 #' 
 #' }
@@ -601,7 +607,7 @@ trelli_group_by <- function(trelliData, group) {
 #' 
 #' @export
 trelli_abundance_boxplot <- function(trelliData,
-                           cognostics = c("n", "mean", "median", "sd", "skew"),
+                           cognostics = c("n", "mean", "median", "sd", "skew", "p_value", "fold_change"),
                            ggplot_params = NULL,
                            interactive = FALSE,
                            path = "~/Downloads/Trelliscope",
@@ -627,12 +633,25 @@ trelli_abundance_boxplot <- function(trelliData,
     stop("trelliData must have omicsData for this abundance boxplot function.")
   }
   
-  # Assert that cognostics are acceptable options 
-  cog_options <- c("n", "mean", "median", "sd", "skew")
-  if (all(cognostics %in% cog_options) == FALSE) {
-    stop(paste("Unacceptable cognostic option included. Acceptable options are: ", 
-               paste(cog_options, sep = ", ")))
+  # If cognostics are not NULL...
+  if (!is.null(cognostics)) {
+    
+    # ...assert that cognostics are acceptable options 
+    cog_options <- c("n", "mean", "median", "sd", "skew", "p_value", "fold_change")
+    if (all(cognostics %in% cog_options) == FALSE) {
+      stop(paste("Unacceptable cognostic option included. Acceptable options are: ", 
+                 paste(cog_options, collapse = ", ")))
+    }
+    
+    # ...remove stat specific options 
+    if (any(c("p_value", "fold_change") %in% cognostics) & is.null(trelliData$trelliData.stat)) {
+      cognostics <- cognostics[-match(c("p_value", "fold_change"), cognostics, nomatch = 0)]
+    }
+    
   }
+  
+  # If no cognostics, set to NULL
+  if (length(cognostics) == 0) {cognostics <- NULL}
   
   # If ggplot_params is not null...
   if (!is.null(ggplot_params)) {
@@ -699,9 +718,9 @@ trelli_abundance_boxplot <- function(trelliData,
   
   # Create cognostic function---------------------------------------------------
   
-  # Second, create the cognostic function to return
-  box_cog_fun <- function(DF) {
-  
+  # Second, create function to return cognostics
+  box_cog_fun <- function(DF, group) {
+    
     # Set basic cognostics for ungrouped data or in case when data is not split by fdata_cname
     cog <- list(
      "n" = dplyr::tibble(`Count` = trelliscopejs::cog(sum(!is.na(DF$Abundance)), desc = "Biomolecule Count")),
@@ -712,7 +731,7 @@ trelli_abundance_boxplot <- function(trelliData,
     )
     
     # Start list of cogs
-    cog_to_trelli <- do.call(cbind, lapply(cognostics, function(x) {cog[[x]]})) %>% tibble::tibble()
+    cog_to_trelli <- do.call(dplyr::bind_cols, lapply(cognostics, function(x) {cog[[x]]})) %>% tibble::tibble()
     
     # Get fdata cname and group_by selection
     fdata_cname <- pmartR::get_fdata_cname(trelliData$omicsData)
@@ -730,7 +749,7 @@ trelli_abundance_boxplot <- function(trelliData,
       # Create a list to convert from short name to long
       name_converter <- list("n" = "Count", "mean" = "Mean Abundance", 
         "median" = "Median Abundance", "sd" = "Standard Deviation Abundance", 
-        "skew" = "Skew Abundance")
+        "skew" = "Skew Abundance", "p_value" = "Median P Value", "fold_change" = "Median Fold Change")
       
       # Since the number of groups is unknown, first group_by the Groups,
       # then calculate all summary statistics, pivot to long format,
@@ -760,10 +779,25 @@ trelli_abundance_boxplot <- function(trelliData,
         
     }
     
-    # Add cognostics that only apply when there is stats data
-    if (!is.null(trelliData$trelliData.stat)) {
+    # Add cognostics that only apply when there is stats data and it is the 
+    # same column as omicsData
+    if (!is.null(trelliData$trelliData.stat) && attr(trelliData, "group_by_omics") == attr(trelliData, "group_by_stat")) {
       
-      browser()
+      # Subset down the dataframe down to group, unnest the dataframe, 
+      # subset columns to requested statistics, switch name to a more specific name
+      trelliData$trelliData.stat %>%
+        dplyr::filter(trelliData$trelliData.stat[,1] == group) %>%
+        dplyr::select(Nested_DF) %>%
+        tidyr::unnest(cols = c(Nested_DF)) %>%
+        dplyr::rename(p_value = P_value, fold_change = Fold_change) %>%
+        tidyr::pivot_longer(c(p_value, fold_change)) %>%
+        dplyr::filter(name %in% cognostics) %>%
+        dplyr::mutate(
+          name = paste(Comparison, lapply(name, function(x) {name_converter[[x]]}) %>% unlist())
+        ) %>%
+        dplyr::select(name, value) %>% 
+        unique()
+      
       
     }
 
@@ -777,12 +811,24 @@ trelli_abundance_boxplot <- function(trelliData,
   if (test_mode) {toBuild <- trelliData$trelliData.omics[test_example,]} 
   else {toBuild <- trelliData$trelliData.omics}
   
-  # Build trelliscope 
-  toBuild %>%
-    dplyr::mutate(
-      panel = trelliscopejs::map2_plot(Nested_DF, as.character(unlist(toBuild[,1])), box_plot_fun),
-      cogs = trelliscopejs::map_cog(Nested_DF, box_cog_fun)
-    ) %>%
-    trelliscopejs::trelliscope(path = path, name = name, nrow = 1, ncol = 1, thumb = T, ...)
-  
+  # Build trelliscope without cognostics if none are provided. Otherwise, build with cognostics.
+  if (is.null(cognostics)) {
+    
+    toBuild %>%
+      dplyr::mutate(
+        panel = trelliscopejs::map2_plot(Nested_DF, as.character(unlist(toBuild[,1])), box_plot_fun)
+      ) %>%
+      trelliscopejs::trelliscope(path = path, name = name, nrow = 1, ncol = 1, thumb = T, ...)
+    
+  } else {
+    
+    toBuild %>%
+      dplyr::mutate(
+        panel = trelliscopejs::map2_plot(Nested_DF, as.character(unlist(toBuild[,1])), box_plot_fun),
+        cog = trelliscopejs::map2_cog(Nested_DF, as.character(unlist(toBuild[,1])), box_cog_fun)
+      ) %>%
+      trelliscopejs::trelliscope(path = path, name = name, nrow = 1, ncol = 1, thumb = T, ...)
+
+  }
+
 }
