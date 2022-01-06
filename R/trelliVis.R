@@ -579,9 +579,8 @@ trelli_group_by <- function(trelliData, group) {
 #'    n, mean, median, sd, and skew for abundance. If statRes data is included, 
 #'    p_value and fold_change cognostics can be added. If no cognostics are desired,
 #'    set to NULL. 
-#' @param ggplot_params An optional string of ggplot parameters to the backend ggplot
-#'    function. For example "ylab('Group') + xlab('Abundance') + ylim(c(2,20))".
-#'    Default is NULL. 
+#' @param ggplot_params An optional vector of strings of ggplot parameters to the backend ggplot
+#'    function. For example, c("ylab('')", "ylim(c(2,20))"). Default is NULL. 
 #' @param interactive A logical argument indicating whether the plots should be interactive
 #'    or not. Interactive plots are ggplots piped to ggplotly (for now). Default is FALSE.  
 #' @param path The base directory of the trelliscope application. Default is Downloads. 
@@ -609,6 +608,13 @@ trelli_group_by <- function(trelliData, group) {
 #'    trelli_abundance_boxplot(test_mode = T, test_example = 1:10)
 #' trelli_group_by(trelliData = trelliData4, group = "LipidFamily") %>% trelli_abundance_boxplot()
 #'    
+#' ## Other options include modifying the ggplot  
+#' trelli_group_by(trelliData = trelliData, group = "LipidCommonName") %>% 
+#'    trelli_abundance_boxplot(test_mode = T, test_example = 1:10, 
+#'      ggplot_params = c("ylab('')", "ylim(c(2,20))"))
+#' 
+#' ## Or making the plot interactive 
+#' trelli_group_by(trelliData = trelliData4, group = "LipidFamily") %>% trelli_abundance_boxplot(interactive = T)
 #' 
 #' }
 #' 
@@ -666,8 +672,8 @@ trelli_abundance_boxplot <- function(trelliData,
   if (!is.null(ggplot_params)) {
     
     # ...and ggplot_params is not a character or is a vector of greater than 1, 
-    if (!is.character(ggplot_params) | length(ggplot_params) > 1) {
-      stop("ggplot_params must be a single character string or NULL.")
+    if (!is.character(ggplot_params)) {
+      stop("ggplot_params must be a string, vector of strings, or NULL.")
     }
     
   }
@@ -708,7 +714,7 @@ trelli_abundance_boxplot <- function(trelliData,
       ggplot2::geom_boxplot() + ggplot2::geom_point() + ggplot2::theme_bw() + 
       ggplot2::ggtitle(title) +
       ggplot2::theme(legend.position = "none", plot.title = ggplot2::element_text(hjust = 0.5)) + 
-      ggplot2::ylab(paste(attr(trelliData$omicsData, "data_info")$data_scale, "Abundance"))
+      ggplot2::ylab(paste(attr(trelliData$omicsData, "data_info")$data_scale, "Abundance")) 
     
     # Remove x axis if no groups
     if (is.null(attributes(trelliData$omicsData)$group_DF)) {
@@ -719,7 +725,14 @@ trelli_abundance_boxplot <- function(trelliData,
     
     # Add additional parameters
     if (!is.null(ggplot_params)) {
-      boxplot <- boxplot + unquote(ggplot_params)
+      for (param in ggplot_params) {
+        boxplot <- boxplot + eval(parse(text = paste0("ggplot2::", param)))
+      }
+    }
+    
+    # If interactive, pipe to ggplotly
+    if (interactive) {
+      boxplot <- boxplot %>% plotly::ggplotly()
     }
     
     return(boxplot)
@@ -728,7 +741,7 @@ trelli_abundance_boxplot <- function(trelliData,
   # Create cognostic function---------------------------------------------------
   
   # Second, create function to return cognostics
-  box_cog_fun <- function(DF, group) {
+  box_cog_fun <- function(DF, biomolecule) {
     
     # Set basic cognostics for ungrouped data or in case when data is not split by fdata_cname
     cog <- list(
@@ -788,18 +801,16 @@ trelli_abundance_boxplot <- function(trelliData,
         
     }
     
-    # Add cognostics that only apply when there is stats data and it is the 
-    # same column as omicsData
-    if (!is.null(trelliData$trelliData.stat) && attr(trelliData, "group_by_omics") == attr(trelliData, "group_by_stat")) {
-      
-      # Get edata cname
-      edata_cname <- pmartR::get_edata_cname(trelliData$statRes)
+    # Add cognostics that only apply when stats data is grouped by edata_cname
+    edata_cname <- pmartR::get_edata_cname(trelliData$omicsData)
+    
+    if (!is.null(trelliData$trelliData.stat) && edata_cname == attr(trelliData, "group_by_stat")) {
       
       # Subset down the dataframe down to group, unnest the dataframe, 
       # pivot_longer to comparison, subset columns to requested statistics, 
       # switch name to a more specific name
       cogs_to_add <- trelliData$trelliData.stat %>%
-        dplyr::filter(trelliData$trelliData.stat[[edata_cname]] == group) %>%
+        dplyr::filter(trelliData$trelliData.stat[[edata_cname]] == biomolecule) %>%
         dplyr::select(Nested_DF) %>%
         tidyr::unnest(cols = c(Nested_DF)) %>%
         dplyr::select(c(Comparison, p_value, fold_change)) %>%
@@ -849,3 +860,20 @@ trelli_abundance_boxplot <- function(trelliData,
   }
 
 }
+
+# trelli_abundance_histogram (edata only)
+
+# trelli_abundance_heatmap (emeta only)
+
+# trelli_missingness_bar 
+
+# trelli_foldchange_bar (no emeta only)
+
+# trelli_foldchange_boxplot (emeta only)
+
+# trelli_foldchange_volcano (emeta only)
+
+# trelli_foldchange_heatmap (emeta only)
+
+
+
