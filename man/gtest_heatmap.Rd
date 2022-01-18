@@ -6,12 +6,12 @@
 \usage{
 gtest_heatmap(
   volcano,
-  pval_thresh = 0.05,
-  show_sig = TRUE,
-  interactive = FALSE,
-  color_low = NULL,
-  color_high = NULL,
-  plotly_layout = NULL,
+  pval_thresh,
+  show_sig,
+  interactive,
+  color_low,
+  color_high,
+  plotly_layout,
   text_size,
   display_count,
   x_lab,

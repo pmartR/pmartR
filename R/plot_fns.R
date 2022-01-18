@@ -4417,6 +4417,18 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
 #'   respectively
 #' @param stacked TRUE/FALSE for whether to stack positive and negative fold
 #'   change sections in the barplot, defaults to FALSE
+#' @param show_sig This input is used when \code{plot_type = "gheatmap"}. A
+#'   logical value. If TRUE a visual indicator that a certain bin combination is
+#'   significant by the g-test is shown.
+#' @param color_low This input is used when \code{plot_type = "gheatmap"}. A
+#'   character string specifying the color of the gradient for low count values.
+#' @param color_high This input is used when \code{plot_type = "gheatmap"}. A
+#'   character string specifying the color of the gradient for high count
+#'   values.
+#' @param plotly_layout This input is used when \code{plot_type = "gheatmap"}. A
+#'   list of arguments, not including the plot, to be passed to
+#'   \code{plotly::layout} if \code{interactive = TRUE}.
+#'
 #' @param interactive TRUE/FALSE for whether to create an interactive plot using
 #'   plotly.  Not valid for all plots.
 #' @param x_lab A character string specifying the x-axis label.
@@ -4502,6 +4514,10 @@ plot.statRes <- function (x,
                           fc_threshold = NULL,
                           fc_colors = c("red", "black", "green"),
                           stacked = FALSE,
+                          show_sig = TRUE,
+                          color_low = NULL,
+                          color_high = NULL,
+                          plotly_layout = NULL,
                           interactive = FALSE,
                           x_lab = NULL,
                           x_lab_size = 11,
@@ -4573,13 +4589,17 @@ plot.statRes <- function (x,
   # Bar plot -------------------------------------------------------------------
 
   if("bar"%in%plot_type){
-    p <- statres_barplot(x, stacked, fc_colors,
-                         text_size = text_size,
-                         display_count = display_count,
-                         x_lab = x_lab,
-                         y_lab = y_lab,
-                         title_lab = title_lab,
-                         legend_lab = legend_lab)
+    p <- statres_barplot(
+      x = x,
+      stacked = stacked,
+      fc_colors = fc_colors,
+      text_size = text_size,
+      display_count = display_count,
+      x_lab = x_lab,
+      y_lab = y_lab,
+      title_lab = title_lab,
+      legend_lab = legend_lab
+    )
 
     if(bw_theme) p <- p +
         ggplot2::theme_bw() +
@@ -4599,12 +4619,12 @@ plot.statRes <- function (x,
     # still returns a ggplot, even if interactive = T
     p <-
       statres_volcano_plot(
-        volcano,
+        volcano = volcano,
         data_scale = attr(x, "data_info")$data_scale,
         pval_thresh = attr(x, "pval_thresh"),
-        fc_colors,
-        fc_threshold,
-        interactive,
+        fc_colors = fc_colors,
+        fc_threshold = fc_threshold,
+        interactive = interactive,
         x_lab = x_lab,
         y_lab = y_lab,
         title_lab = title_lab,
@@ -4633,9 +4653,13 @@ plot.statRes <- function (x,
 
     p <-
       gtest_heatmap(
-        volcano,
+        volcano = volcano,
         pval_thresh = attr(x, "pval_thresh"),
+        show_sig = show_sig,
         interactive = interactive,
+        color_low = color_low,
+        color_high = color_high,
+        plotly_layout = plotly_layout,
         text_size = text_size,
         display_count = display_count,
         x_lab = x_lab,
@@ -4961,8 +4985,9 @@ make_volcano_plot_df <- function(x) {
 #'
 #' @keywords internal
 #'
-statres_barplot <- function(x, stacked = FALSE,
-                            fc_colors = c("red", "black", "green"),
+statres_barplot <- function(x,
+                            stacked,
+                            fc_colors,
                             text_size,
                             display_count,
                             x_lab,
@@ -5093,12 +5118,12 @@ statres_barplot <- function(x, stacked = FALSE,
 #'
 gtest_heatmap <-
   function(volcano,
-           pval_thresh = 0.05,
-           show_sig = TRUE,
-           interactive = FALSE,
-           color_low = NULL,
-           color_high = NULL,
-           plotly_layout = NULL,
+           pval_thresh,
+           show_sig,
+           interactive,
+           color_low,
+           color_high,
+           plotly_layout,
            text_size,
            display_count,
            x_lab,
@@ -5310,10 +5335,10 @@ gtest_heatmap <-
 statres_volcano_plot <-
   function(volcano,
            data_scale,
-           pval_thresh = 0.05,
-           fc_colors = c("red", "black", "green"),
-           fc_threshold = NULL,
-           interactive = F,
+           pval_thresh,
+           fc_colors,
+           fc_threshold,
+           interactive,
            x_lab,
            y_lab,
            title_lab,
