@@ -4231,6 +4231,81 @@ plot.nmrData <- function (omicsData, order_by = NULL, color_by = NULL,
 
 }
 
+#' plot.seqData
+#'
+#' For plotting seqData S3 objects
+#'
+#' @param omicsData An seqData object.
+#' @param order_by A character string specifying a main effect by which to order
+#'   the boxplots. This main effect must be found in the column names of f_data
+#'   in the omicsData object. If \code{order_by} is "Group", the boxplots
+#'   will be ordered by the group variable from the group_designation function.
+#'   If NULL (default), the boxplots will be displayed in the order they appear
+#'   in the data.
+#' @param color_by A character string specifying a main effect by which to color
+#'   the boxplots. This main effect must be found in the column names of f_data
+#'   in the omicsData object. If \code{color_by} is "Group", the boxplots
+#'   will be colored by the group variable from the group_designation function.
+#'   If NULL (default), the boxplots will have one default color.
+#' @param facet_by A character string specifying a main effect with which to
+#'   create a facet plot. This main effect must be found in the column names of
+#'   f_data in the omicsData object. Default value is NULL.
+#' @param facet_cols An optional integer specifying the number of columns to
+#'   show in the facet plot.
+#'
+#' @param interactive Logical. If TRUE produces an interactive plot.
+#' @param x_lab A character string specifying the x-axis label.
+#' @param y_lab A character string specifying the y-axis label. The default is
+#'   NULL in which case the y-axis label will be the metric selected for the
+#'   \code{metric} argument.
+#' @param x_lab_size An integer value indicating the font size for the x-axis.
+#'   The default is 11.
+#' @param y_lab_size An integer value indicating the font size for the y-axis.
+#'   The default is 11.
+#' @param x_lab_angle An integer value indicating the angle of x-axis labels.
+#'   The default is 0.
+#' @param title_lab A character string specifying the plot title.
+#' @param title_lab_size An integer value indicating the font size of the plot
+#'   title. The default is 14.
+#' @param legend_lab A character string specifying the legend title.
+#' @param legend_position A character string specifying the position of the
+#'   legend. Can be one of "right", "left", "top", "bottom", or "none". The
+#'   default is "none".
+#' @param ylimit A numeric vector of length 2 specifying y-axis lower and upper
+#'   limits.
+#' @param bw_theme Logical. If TRUE uses the ggplot2 black and white theme.
+#' @param palette A character string indicating the name of the RColorBrewer
+#'   palette to use. For a list of available options see the details section in
+#'   \code{\link[RColorBrewer]{RColorBrewer}}.
+#' @param use_VizSampNames Logical. Indicates whether to use custom sample
+#'   names. The default is FALSE.
+#'
+#' @rdname plot-seqData
+#'
+#' @export
+#'
+plot.seqData <- function (omicsData, order_by = NULL, color_by = NULL,
+                          facet_by = NULL, facet_cols = NULL,
+                          interactive = FALSE, x_lab = NULL, y_lab = NULL,
+                          x_lab_size = 11, y_lab_size = 11, x_lab_angle = 90,
+                          title_lab = NULL, title_lab_size = 14,
+                          legend_lab = NULL, legend_position = "right",
+                          ylimit = NULL, bw_theme = TRUE, palette = NULL,
+                          use_VizSampNames = FALSE) {
+  
+  # Farm boy, make me a plot with a seqData object. As you wish.
+  plot_omicsData(omicsData = omicsData, order_by = order_by,
+                 color_by = color_by, facet_by = facet_by,
+                 facet_cols = facet_cols, interactive = interactive,
+                 x_lab = x_lab, y_lab = y_lab, x_lab_size = x_lab_size,
+                 y_lab_size = y_lab_size, x_lab_angle = x_lab_angle,
+                 title_lab = title_lab, title_lab_size = title_lab_size,
+                 legend_lab = legend_lab, legend_position = legend_position,
+                 ylimit = ylimit, bw_theme = bw_theme, palette = palette,
+                 use_VizSampNames = use_VizSampNames)
+  
+}
+
 #' plot.pepData
 #'
 #' For plotting pepData S3 objects
@@ -4396,7 +4471,7 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
   # Farm boy, make sure the data is the correct class. As you wish.
   # check that omicsData is of appropriate class #
   if (!inherits(omicsData, c("pepData", "proData", "metabData",
-                             "lipidData", "nmrData"))) {
+                             "lipidData", "nmrData", "seqData"))) {
 
     # INCONCEIVABLE!!!
     stop (paste("omicsData must be of class 'isobaricpepData', 'lipidData'",
@@ -4463,7 +4538,8 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
     proData = "Protein ",
     lipidData = "Lipid ",
     metabData = "Metabolite ",
-    nmrData = "NMR "
+    nmrData = "NMR ",
+    seqData = "Transcript "
     )
   
   norm_info <- get_data_norm(omicsData)
@@ -4518,9 +4594,21 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
   title <- if (is.null(title_lab)) maintitle else title_lab
   xlabel <- if (is.null(x_lab)) "Sample" else x_lab
   ylabel <- if (is.null(y_lab)) {
-    if (get_data_scale(omicsData) == "abundance")
-      "Abundance" else
+    
+    # Abundance based
+    if (get_data_scale(omicsData) == "abundance") "Abundance" 
+    else if (get_data_scale(omicsData) %in% c("log", "log2", "log10"))
         paste(get_data_scale(omicsData), "Abundance", sep = " ")
+    
+    # SeqData
+    else if (get_data_scale(omicsData) == "counts") "Counts" 
+    else if (get_data_scale(omicsData) == "upper")
+      paste("Upper Quantile transformed Counts", sep = " ")
+    else if (get_data_scale(omicsData) == "lcpm")
+      paste("LCPM transformed Counts", sep = " ")
+    else if (get_data_scale(omicsData) == "median")
+      paste("Median transformed Counts", sep = " ")
+    
   } else y_lab
   legend_title <- if (is.null(legend_lab)) color_by else legend_lab
 
