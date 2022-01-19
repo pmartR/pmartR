@@ -61,6 +61,10 @@ combine_techreps <- function (omicsData, combine_fn = NULL,
     combine_fn <- ifelse(inherits(omicsData, "seqData"), "sum", "mean")
   }
   
+  if(is.null(combine_fn)){
+    combine_fn <- ifelse(inherits(omicsData, "seqData"), "sum", "mean")
+  }
+  
   f_data = omicsData$f_data
   e_data = omicsData$e_data
   fdata_cname = attr(omicsData, "cnames")$fdata_cname
