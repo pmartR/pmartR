@@ -4849,15 +4849,18 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
   ylabel <- if (is.null(y_lab)) {
     
     # Abundance based
-    out <- if (get_data_scale(omicsData) == "abundance"){
-      "Abundance" 
-    } else if (get_data_scale(omicsData) %in% c("log", "log2", "log10")){
-      paste(get_data_scale(omicsData), "Abundance", sep = " ")
-    } else if (get_data_scale(omicsData) == "counts"){ 
-      "Counts"
-    }
-      
-    out
+    if (get_data_scale(omicsData) == "abundance") "Abundance" 
+    else if (get_data_scale(omicsData) %in% c("log", "log2", "log10"))
+        paste(get_data_scale(omicsData), "Abundance", sep = " ")
+    
+    # SeqData
+    else if (get_data_scale(omicsData) == "counts") "Counts" 
+    else if (get_data_scale(omicsData) == "upper")
+      paste("Upper Quantile transformed Counts", sep = " ")
+    else if (get_data_scale(omicsData) == "lcpm")
+      paste("LCPM transformed Counts", sep = " ")
+    else if (get_data_scale(omicsData) == "median")
+      paste("Median transformed Counts", sep = " ")
     
   } else y_lab
   legend_title <- if (is.null(legend_lab)) color_by else legend_lab
