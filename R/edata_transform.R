@@ -2,8 +2,8 @@
 #'
 #' This function applies a transformation to the e_data element of omicsData
 #'
-#' @param omicsData an object of the class 'pepData', 'proData', 'metabData', 'lipidData', or 'nmrData' usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, \code{\link{as.nmrData}}, respectively.
-#' @param data_scale a character string indicating the type of transformation to be applied to the data. Valid values are: 'log2', 'log', 'log10', or 'abundance'. A value of 'abundance' indicates the data has previously undergone one of the log transformations and should be transformed back to raw values with no transformation applied.
+#' @param omicsData an object of the class 'pepData', 'proData', 'metabData', 'lipidData', 'nmrData', or 'seqData', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, \code{\link{as.nmrData}}, \code{\link{as.seqData}}, respectively.
+#' @param data_scale a character string indicating the type of transformation to be applied to the data. Valid values for 'pepData', 'proData', 'metabData', 'lipidData', or 'nmrData': 'log2', 'log', 'log10', or 'abundance'. Valid values for 'seqData': 'upper', 'median', 'lcpm'. A value of 'abundance' indicates the data has previously undergone one of the log transformations and should be transformed back to raw values with no transformation applied. For 'seqData', 'lcpm' transforms by log2 counts per million, 'upper' transforms by the upper quartile of non-zero counts, and 'median' transforms by the median of non-zero counts. 
 #' 
 #' @details This function is intended to be used before analysis of the data begins. Data are typically analyzed on a log scale.
 #'
@@ -26,17 +26,40 @@ edata_transform <- function (omicsData, data_scale) {
 
   # check that omicsData is of appropriate class #
   if (!inherits(omicsData, c("pepData", "proData", "metabData",
-                             "lipidData", "nmrData"))) {
+                             "lipidData", "nmrData", "seqData"))) {
     
     # Throw an error that the input for omicsData is not the appropriate class.
     stop(paste("omicsData must be of class 'pepData', 'proData', 'metabData',",
-               "'lipidData', or 'nmrData'",
+               "'lipidData', 'nmrData', or 'seqData'",
                sep = ' '))
+    
+  } 
+  
+  # guidance for those with seqData #
+  if (inherits(omicsData, "seqData")) {
+    
+    # Throw an error that the input for omicsData is not the appropriate class.
+    warning("Only raw counts are supported for statistical analysis of seqData objects. Please only use for visualization.")
+
+    if(get_data_scale(omicsData) != "counts"){
+      stop (paste("edata_transform cannot be applied to transformed seqData.",
+                  "Please run on raw counts.",
+                  sep=" "))
+    }
     
   } 
 
   # check that data_scale is one of the acceptable options #
-  if (!(data_scale %in% c('log2', 'log10', 'log', 'abundance'))) {
+  if(inherits(omicsData, "seqData")){
+    
+    if(!(data_scale %in% c('lcpm', 'upper',  'median'))){
+      # Tell the user that the input to data_scale is an abomination!
+      stop (paste(data_scale, "is not a valid option for 'data_scale'.",
+                  "Refer to ?edata_transform for specific seqData options.",
+                  sep=" "))
+    }
+    
+  } else if (!(data_scale %in% c('log2', 'log10', 'log', 'abundance'))) {
     
     # Tell the user that the input to data_scale is an abomination!
     stop (paste(data_scale, "is not a valid option for 'data_scale'.",
@@ -46,7 +69,7 @@ edata_transform <- function (omicsData, data_scale) {
   }
 
   # Check to make sure the data isn't already on the scale input by the user.
-  if(attr(omicsData, "data_info")$data_scale == data_scale) {
+  if(get_data_scale(omicsData) == data_scale) {
     
     # Stop all further calculations with an error message.
     stop(paste("Data is already on",
@@ -59,8 +82,7 @@ edata_transform <- function (omicsData, data_scale) {
   # Perform the actual transmogrification --------------------------------------
   
   # Fish out the column index where edata_cname occurs.
-  iCol <- which(names(omicsData$e_data) == attr(omicsData,
-                                                'cnames')$edata_cname)
+  iCol <- which(names(omicsData$e_data) == get_edata_cname(omicsData))
   
   # Extract the data_scale from the omics data object.
   scale <- get_data_scale(omicsData)
@@ -158,7 +180,61 @@ edata_transform <- function (omicsData, data_scale) {
              
            }
            
-         })
+         },
+         
+         ## seqData only
+         'counts' = {
+           
+           temp_data <- omicsData$e_data[, -iCol]
+           temp_data[temp_data == 0] <- NA
+           
+           if (data_scale == 'lcpm'){
+             
+             warning("Zeros in seqData will be treated as NA")
+             
+             # grab per million counts across sample columns
+             samp_mils <- apply(temp_data, 2, sum, na.rm = T)/1000000
+             
+             # Divide each count by the million count in respective columns
+             ## Use temp_data since zeros are not viable for log transform
+             div_mil <- sweep(temp_data, 2, samp_mils, `/`)
+             
+             # Set new data with log2 applied
+             omicsData$e_data[, -iCol] <- log2(div_mil)
+             
+           } else if (data_scale == 'upper'){
+             
+             # Grab non-zero upper quantile of data
+             samp_upper <- apply(omicsData$e_data[, -iCol], 
+                                 2, 
+                                 quantile,
+                                 na.rm = TRUE,
+                                 probs = .75)
+             
+             # Divide each count by the upper quantile in respective columns
+             div_75 <- sweep(myseqData$e_data[, -iCol], 2, samp_upper, `/`)
+             
+             # Set new data
+             omicsData$e_data[, -iCol] <- div_75
+             
+           } else if(data_scale == 'median'){
+             
+             # Grab non-zero median of data
+             samp_med <- apply(omicsData$e_data[, -iCol], 
+                               2, 
+                               median,
+                               na.rm = TRUE)
+             
+             # Divide each count by the upper quantile in respective columns
+             div_med <- sweep(myseqData$e_data[, -iCol], 2, samp_med, `/`)
+             
+             # Set new data
+             omicsData$e_data[, -iCol] <- div_med
+             
+           }
+         }
+         
+         )
   
   # Update data_scale in the data_info attribute.
   attr(omicsData, 'data_info')$data_scale <- data_scale

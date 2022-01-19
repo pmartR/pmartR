@@ -10,7 +10,8 @@
 #'   parameter techrep_cnames must have been specified when creating this
 #'   object.
 #' @param combine_fn a character string specifying the function used to
-#'   aggregate across technical replicates, currently only supports "mean".
+#'   aggregate across technical replicates, currently only supports 'sum' and 
+#'   'mean'. Defaults to 'sum' for seqData and mean for all other omicsData.
 #' @param bio_sample_names a character string specifying a column in
 #'   \code{f_data} which contains names by which to label aggregated samples in
 #'   \code{omicsData$e_data} and \code{omicsData$f_data} OR a character vector
@@ -48,11 +49,15 @@
 #'
 #' @export
 #' 
-combine_techreps <- function (omicsData, combine_fn = "mean",
+combine_techreps <- function (omicsData, combine_fn = NULL,
                               bio_sample_names = NULL) {
   
   # check that omicsData is of pmartR S3 class#
   if(!inherits(omicsData, c("pepData", "proData", "lipidData", "metabData", "nmrData"))) stop("omicsData must be of class 'pepData', 'proData', 'lipidData', 'metabData' or 'nmrData'")
+  
+  if(is.null(combine_fn)){
+    combine_fn <- ifelse(inherits(omicsData, "seqData"), "sum", "mean")
+  }
   
   f_data = omicsData$f_data
   e_data = omicsData$e_data
