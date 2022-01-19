@@ -6,9 +6,8 @@
 \usage{
 \method{plot}{proteomicsFilt}(
   filter_obj,
+  plot_type = "num_peps",
   min_num_peps = NULL,
-  view_num_peps = TRUE,
-  view_redundancy = TRUE,
   interactive = FALSE,
   x_lab_pep = NULL,
   x_lab_pro = NULL,
@@ -35,20 +34,18 @@ two elements. The first element is a data frame with the counts of proteins
 mapping to each peptide. The second element is also a data frame with the
 counts of peptides mapping to each protein.}
 
+\item{plot_type}{A character string specifying the type of plot to be
+displayed. The available options are "num_peps" or "redundancy". If
+"num_peps" the plot is displayed that shows the counts of proteins that
+have a specific number of peptides mapping to them. If "redundancy" the
+plot showing the counts of peptides that map to a specific number of
+proteins is displayed.}
+
 \item{min_num_peps}{an optional integer value between 1 and the maximum
 number of peptides that map to a protein in the data. The value specifies
 the minimum number of peptides that must map to a protein. Any protein with
 less than \code{min_num_peps} mapping to it will be returned as a protein
 that should be filtered. Default value is NULL.}
-
-\item{view_num_peps}{Logical. If TRUE the plot is displayed that shows the
-counts of proteins that have a specific number of peptides mapping to them.
-The default value is TRUE.}
-
-\item{view_redundancy}{Logical. If TRUE the plot showing the counts of
-peptides that map to a specific number of proteins is displayed. If all
-peptides only map to a single protein this plot is not displayed. The
-default value is TRUE.}
 
 \item{interactive}{Logical. If TRUE produces an interactive plot.}
 
