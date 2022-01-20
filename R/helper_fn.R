@@ -978,3 +978,4 @@ get_group_table <- function (omicsObject) {
   return (table(group))
 
 }
+

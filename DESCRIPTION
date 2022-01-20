@@ -21,6 +21,7 @@ Imports:
     dplyr,
     ggplot2,
     e1071,
+    forcats,
     foreach,
     limma,
     pcaMethods,
@@ -28,11 +29,11 @@ Imports:
     rlang,
     rrcov,
     scales,
-    gridExtra,
     reshape2,
     RcppArmadillo,
     RColorBrewer,
-    magrittr
+    magrittr,
+    patchwork
 Suggests:
     knitr,
     rmarkdown,

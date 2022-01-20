@@ -227,6 +227,7 @@ applyFilt.moleculeFilt <- function(filter_object, omicsData, min_num=2){
 
     # Re-run group_designation in case filtering any items impacted the group
     # structure. The attributes will also be updated in this function.
+
     omicsData <- group_designation(
       omicsData = omicsData,
       main_effects = attr(get_group_DF(omicsData),
@@ -360,6 +361,7 @@ applyFilt.cvFilt <- function (filter_object, omicsData, cv_threshold = 150) {
 
     # Re-run group_designation in case filtering any items impacted the group
     # structure. The attributes will also be updated in this function.
+
     omicsData <- group_designation(
       omicsData = omicsData,
       main_effects = attr(get_group_DF(omicsData),
@@ -456,7 +458,7 @@ applyFilt.rmdFilt <- function (filter_object, omicsData,
   # Prepare the information needed to filter the data --------------------------
 
   # Extract the column number containing the sample IDs.
-  id_col <- which(names(omicsData$f_data) == get_fdata_cname(omicsData))
+  id_col <- which(names(filter_object) == get_fdata_cname(omicsData))
 
   # Sniff out the indices that fall below the threshold.
   inds <- which(filter_object$pvalue < pvalue_threshold)
@@ -733,7 +735,7 @@ applyFilt.proteomicsFilt <- function (filter_object,
 
   if (all(omicsData$e_data[[pep_id]] %in% filter_object_new$e_data_remove)) {
 
-    stop ("filter_object specifies all peps in e_data")
+    stop ("filter_object specifies all peptides in e_data")
 
   }
 
@@ -1483,7 +1485,7 @@ pmartR_filter_worker <- function (filter_object, omicsData) {
         %in% mols
       )
 
-      # Only keep the rows in e_data corresponding to the biomolucules that
+      # Only keep the rows in e_data corresponding to the biomolecules that
       # should not be removed.
       omicsData$e_data <- omicsData$e_data[inds, ]
 
@@ -1494,7 +1496,7 @@ pmartR_filter_worker <- function (filter_object, omicsData) {
         %in% mols
       )
 
-      # Only keep the rows in e_meta corresponding to the biomolucules that
+      # Only keep the rows in e_meta corresponding to the biomolecules that
       # should not be removed.
       omicsData$e_meta <- omicsData$e_meta[inds, ]
 

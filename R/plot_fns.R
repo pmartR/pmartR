@@ -246,7 +246,8 @@ plot.dataRes <- function (dataRes_obj, metric = NULL, density = FALSE,
     } else {
 
       # Combine the plots into one plot when interactive is FALSE.
-      gridExtra::grid.arrange(q, p, ncol = 2)
+
+      q + p
 
     }
 
@@ -737,14 +738,13 @@ plot.SPANSRes <- function (SPANSRes_obj, interactive = FALSE,
                             "normalization_method",
                             "parameters"))
 
-  # get subset/normalization names for the best scored methods
-  best_ss <- SPANSRes_obj %>%
-    dplyr::top_n(1, wt = SPANS_score) %>%
-    {.$ss_par}
-
-  best_norm <- SPANSRes_obj %>%
-    dplyr::top_n(1, wt = SPANS_score) %>%
-    {.$normalization_method}
+  # Farm boy, fix all the problems. As you wish. Filter rows with the highest
+  # SPANS score. This subsetted/filtered data frame will be used to add points
+  # to the plot for the best scoring methods. The best methods are those with
+  # the highest SPANS_score. The slice_max function will select ALL rows where
+  # the highest score occurs.
+  da_best <- SPANSRes_obj %>%
+    dplyr::slice_max(SPANS_score)
 
   # Do all the tedious plot label crap.
   xlabel <- if (is.null(x_lab)) "Normalization Method" else x_lab
@@ -763,11 +763,10 @@ plot.SPANSRes <- function (SPANSRes_obj, interactive = FALSE,
                                     y = ss_par,
                                     fill = SPANS_score),
                        color = 'black') +
-    ggplot2::geom_point(data = SPANSRes_obj %>%
-                          dplyr::filter(ss_par %in% best_ss,
-                                        normalization_method %in% best_norm),
+    ggplot2::geom_point(data = da_best,
                         ggplot2::aes(x = normalization_method,
-                                     y = ss_par, shape = '1')) +
+                                     y = ss_par,
+                                     shape = '1')) +
     ggplot2::scale_alpha_continuous(name = 'Not Scored',
                                     labels = '') +
     ggplot2::scale_shape_discrete(name = 'Best Scores',
@@ -789,7 +788,7 @@ plot.SPANSRes <- function (SPANSRes_obj, interactive = FALSE,
       plot.title = ggplot2::element_text(size = title_lab_size),
       axis.title.x = ggplot2::element_text(size = x_lab_size),
       axis.title.y = ggplot2::element_text(size = y_lab_size),
-      axis.text.x = ggplot2::element_text(angle = x_lab_angle, hjust = 1),
+      axis.text.x = ggplot2::element_text(angle = x_lab_angle),
       legend.position = legend_position,
       panel.border = ggplot2::element_blank(),
       panel.grid.major = ggplot2::element_blank(),
@@ -820,8 +819,8 @@ plot.SPANSRes <- function (SPANSRes_obj, interactive = FALSE,
           if (is.null(color_high)) "#56B1F7" else color_high)
       ),
       type = "heatmap") %>%
-      plotly::add_trace(x = best_norm,
-                        y = best_ss,
+      plotly::add_trace(x = da_best$normalization_method,
+                        y = da_best$ss_par,
                         type = 'scatter',
                         mode = "markers",
                         marker = list(color = "black"),
@@ -2328,11 +2327,6 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
   if (!is.null(min_nonmiss_gtest)) {
 
     p <- p +
-      ggplot2::geom_point(data = plotter2,
-                          ggplot2::aes(x = Count_biomolecules,
-                                       y = Min_obs,
-                                       color = Statistic),
-                          size = point_size) +
       ggplot2::geom_vline(
         ggplot2::aes(xintercept = n_biomolecules_gtest[min_nonmiss_gtest + 1],
                      color = "G-test applied filter"),
@@ -2357,11 +2351,6 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
   if (!is.null(min_nonmiss_anova)) {
 
     p <- p +
-      ggplot2::geom_point(data = plotter1,
-                          ggplot2::aes(x = Count_biomolecules,
-                                       y = Min_obs,
-                                       color = Statistic),
-                          size = point_size) +
       ggplot2::geom_vline(
         ggplot2::aes(xintercept = n_biomolecules_anova[min_nonmiss_anova + 1],
                      color = "ANOVA applied filter"),
@@ -2383,6 +2372,7 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
   }
 
   # Evan, add a custom legend according to anova and gtest inputs. As you wish.
+  # A minimum for gtest IS supplied and a minimum for anova IS NOT supplied.
   if (!is.null(min_nonmiss_gtest) && is.null(min_nonmiss_anova)) {
 
     # Add a customized legend when min_nonmiss_gtest is not NULL and
@@ -2391,19 +2381,28 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
       ggplot2::scale_color_manual(
         name = if (is.null(legend_lab)) "" else legend_lab,
         values = c(
-          if (is.null(palette)) "#FFC107" else colas[[2]],
-          if (is.null(palette)) "#FFC107" else colas[[2]]
+          `Within 1+ groups (G-Test)` = if (is.null(palette))
+            "#FFC107" else
+              colas[[2]],
+          `G-test applied filter` = if (is.null(palette))
+            "#FFC107" else
+              colas[[2]],
+          `Within 2+ groups (ANOVA)` = if (is.null(palette))
+            "#004D40" else
+              colas[[3]]
         ),
         breaks = c(
-          plotter2$Statistic[[1]], "G-test applied filter"
+          plotter2$Statistic[[1]], "G-test applied filter",
+          plotter1$Statistic[[1]], "ANOVA applied filter"
         ),
         guide = ggplot2::guide_legend(
           override.aes = list(
-            linetype = c(0, 2),
-            shape = c(16, NA),
+            linetype = c(0, 2, 0),
+            shape = c(16, NA, 16),
             color = c(
               if (is.null(palette)) "#FFC107" else colas[[2]],
-              if (is.null(palette)) "#FFC107" else colas[[2]]
+              if (is.null(palette)) "#FFC107" else colas[[2]],
+              if (is.null(palette)) "#004D40" else colas[[3]]
             )
           )
         )
@@ -2417,17 +2416,26 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
       ggplot2::scale_color_manual(
         name = if (is.null(legend_lab)) "" else legend_lab,
         values = c(
-          if (is.null(palette)) "#004D40" else colas[[3]],
-          if (is.null(palette)) "#004D40" else colas[[3]]
+          `Within 1+ groups (G-Test)` = if (is.null(palette))
+            "#FFC107" else
+              colas[[2]],
+          `Within 2+ groups (ANOVA)` = if (is.null(palette))
+            "#004D40" else
+              colas[[3]],
+          `ANOVA applied filter` = if (is.null(palette))
+            "#004D40" else
+              colas[[3]]
         ),
         breaks = c(
+          plotter2$Statistic[[1]], "G-test applied filter",
           plotter1$Statistic[[1]], "ANOVA applied filter"
         ),
         guide = ggplot2::guide_legend(
           override.aes = list(
-            linetype = c(0, 2),
-            shape = c(16, NA),
+            linetype = c(0, 0, 2),
+            shape = c(16, 16, NA),
             color = c(
+              if (is.null(palette)) "#FFC107" else colas[[2]],
               if (is.null(palette)) "#004D40" else colas[[3]],
               if (is.null(palette)) "#004D40" else colas[[3]]
             )
@@ -2695,6 +2703,7 @@ plot.proteomicsFilt <- function (filter_obj,
 
   # If min_num_peps is specified, add a coloring variable that shows whether a
   # peptide will be retained or dropped based on the input provided.
+
   if (!is.null(min_num_peps)) {
 
     fill <- ifelse(pro_bins >= min_num_peps, "retained", "dropped")
@@ -2879,6 +2888,8 @@ plot.proteomicsFilt <- function (filter_obj,
 #' @param palette A character string indicating the name of the RColorBrewer
 #'   palette to use. For a list of available options see the details section in
 #'   \code{\link[RColorBrewer]{RColorBrewer}}.
+#' @param use_VizSampNames Logical. Indicates whether to use custom sample
+#'   names. The default is FALSE.
 #'
 #' @rdname plot-rmdFilt
 #'
@@ -2889,7 +2900,8 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
                           x_lab_size = 11, y_lab_size = 11, x_lab_angle = 90,
                           title_lab = NULL, title_lab_size = 14,
                           legend_lab = NULL, legend_position = "right",
-                          point_size = 3, bw_theme = TRUE, palette = NULL) {
+                          point_size = 3, bw_theme = TRUE, palette = NULL,
+                          use_VizSampNames = FALSE) {
 
   # Preliminaries --------------------------------------------------------------
 
@@ -3031,20 +3043,26 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
     if (length(main_eff_names) == 1) {
 
       p <- p +
-        ggplot2::geom_point(ggplot2::aes_string(x = samp_id,
-                                                y = "Log2.md",
-                                                color = main_eff_names[1]),
-                            size = point_size)
+        ggplot2::geom_point(
+          ggplot2::aes(x = forcats::fct_inorder(!!rlang::sym(samp_id)),
+                       y = Log2.md,
+                       color = !!rlang::sym(main_eff_names[1])),
+          size = point_size
+        )
+
 
       # Start plot when there are two main effects.
     } else {
 
       p <- p +
-        ggplot2::geom_point(ggplot2::aes_string(x = samp_id,
-                                                y = "Log2.md",
-                                                color = main_eff_names[1],
-                                                shape = main_eff_names[2]),
-                            size = point_size)
+        ggplot2::geom_point(
+          ggplot2::aes(x = forcats::fct_inorder(!!rlang::sym(samp_id)),
+                       y = Log2.md,
+                       color = !!rlang::sym(main_eff_names[1]),
+                       shape = !!rlang::sym(main_eff_names[2])),
+          size = point_size
+        )
+
 
     }
 
@@ -3069,10 +3087,6 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
     df <- attributes(filter_obj)$df
     yint <- log(qchisq(1 - pvalue_threshold, df = df), base = 2)
 
-    # divide data by the threshold
-    sub1 <- subset(filter_obj, pvalue < pvalue_threshold)
-    sub2 <- subset(filter_obj, pvalue >= pvalue_threshold)
-
     # make title
     if(is.null(title_lab)) {
       plot_title <- "Sample Outlier Results"
@@ -3084,35 +3098,33 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
     xlabel <- ifelse(is.null(x_lab), "Samples", x_lab)
     ylabel <- ifelse(is.null(y_lab), "log2(Robust Mahalanobis Distance)", y_lab)
 
+    # Start scatter plot skeleton when a p-value threshold is specified.
+    p <- ggplot2::ggplot(filter_obj)
+
     # Start scatter plot skeleton when a p-value threshold has been provided.
     if (length(main_eff_names) == 1) {
 
-      p <- ggplot2::ggplot(sub1) +
-        ggplot2::geom_point(ggplot2::aes_string(x = samp_id,
-                                                y = "Log2.md",
-                                                col = main_eff_names),
-                            size = point_size) +
-        ggplot2::geom_point(data = sub2,
-                            ggplot2::aes_string(x = samp_id,
-                                                y = "Log2.md",
-                                                col = main_eff_names),
-                            alpha = 0.5,
-                            size = point_size)
+      p <- p +
+        ggplot2::geom_point(
+          ggplot2::aes(x = forcats::fct_inorder(!!rlang::sym(samp_id)),
+                       y = Log2.md,
+                       col = !!rlang::sym(main_eff_names)),
+          alpha = ifelse(filter_obj$pvalue < pvalue_threshold, 1, 0.5),
+          size = point_size
+        )
+
     } else {
 
-      p <- ggplot2::ggplot(sub1) +
-        ggplot2::geom_point(ggplot2::aes_string(x = samp_id,
-                                                y = "Log2.md",
-                                                col = main_eff_names[1],
-                                                shape = main_eff_names[2]),
-                            size = point_size) +
-        ggplot2::geom_point(data = sub2,
-                            ggplot2::aes_string(x = samp_id,
-                                                y = "Log2.md",
-                                                col = main_eff_names[1],
-                                                shape = main_eff_names[2]),
-                            alpha = 0.5,
-                            size = point_size)
+      p <- p +
+        ggplot2::geom_point(
+          ggplot2::aes(x = forcats::fct_inorder(!!rlang::sym(samp_id)),
+                       y = Log2.md,
+                       col = !!rlang::sym(main_eff_names[1]),
+                       shape = !!rlang::sym(main_eff_names[2])),
+          alpha = ifelse(filter_obj$pvalue < pvalue_threshold, 1, 0.5),
+          size = point_size
+        )
+
     }
 
     # Add title, axis labels, and other crap.
@@ -3159,6 +3171,30 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
 
   # Farm boy, add the thematic elements you created to the plot. As you wish.
   p <- p + mytheme
+
+  # Farm boy, use my custom sample names in the plot. As you wish.
+  if (use_VizSampNames) {
+
+    # Change the sample names of the scatter plot.
+    p <- p +
+      ggplot2::scale_x_discrete(labels = attr(filter_obj, "VizSampNames"))
+
+    # We only want to change the legend if the box plots are created.
+    if (!is.null(sampleID)) {
+
+      # Nab the indices of the samples that will be highlighted in the box
+      # plots.
+      idx <- which(attr(filter_obj, "sample_names") %in% sampleID)
+
+      # Change the names in the legend of the box plots.
+      p <- p +
+        ggplot2::scale_color_hue(
+          labels = attr(filter_obj, "VizSampNames")[idx]
+        )
+
+    }
+
+  }
 
   # Farm boy, make the plot interactive. As you wish.
   if (interactive) p <- plotly::ggplotly(p)
@@ -3274,6 +3310,19 @@ plot.cvFilt <- function (filter_obj, cv_threshold = NULL,
   # plotting object
   new_object <- filter_obj[!is.na(filter_obj$CV), ]
   max_x_val <- attributes(filter_obj)$max_x_val
+
+  # Check if any CV values are zero. If there are any zero values the log_scale
+  # input must be changed to FALSE.
+  if (any(new_object$CV == 0)) {
+
+    log_scale <- FALSE
+
+    message(paste("Because there are CV values = 0 the x-axis cannot be",
+                  "converted to the log2 scale.",
+                  "The original scale will be used.",
+                  sep = " "))
+
+  }
 
   # labels
   plot_title <- ifelse(is.null(title_lab),
@@ -3564,7 +3613,8 @@ plot.normRes <- function (normRes_obj, order_by = NULL, color_by = NULL,
   if (!interactive) {
 
     # Return the regular plots side-by-side.
-    gridExtra::grid.arrange(p_raw, p_norm, ncol = 2)
+
+    p_raw + p_norm
 
   } else {
 
@@ -4196,13 +4246,11 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
     # specified variable as the main effect.
     if (order_by != "Group") {
 
-      # Fish out the group_DF data frame from omicsData after creating the
-      # group_DF attribute with the order_by input. This will be combined with
-      # the plot_data object so the samples can be ordered by the main effect.
-      orderDF <- attr(
-        group_designation(omicsData = omicsData, main_effects = order_by),
-        "group_DF"
-      )
+      # Select the column in f_data containing the sample name as well as the
+      # column corresponding to the order_by input.
+      orderDF <- dplyr::select(omicsData$f_data,
+                               !!rlang::sym(get_fdata_cname(omicsData)),
+                               !!rlang::sym(order_by))
 
     } else {
 
@@ -4294,9 +4342,9 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
   } else {
 
     p <- p +
-      ggplot2::geom_boxplot(ggplot2::aes_string(x = "variable",
-                                                y = "value",
-                                                fill = color_by))
+      ggplot2::geom_boxplot(ggplot2::aes(x = variable,
+                                         y = value,
+                                         fill = !!rlang::sym(color_by)))
 
   }
 
@@ -4341,7 +4389,8 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
     ggplot2::ggtitle(title, subtitle) +
     ggplot2::xlab(xlabel) +
     ggplot2::ylab(ylabel) +
-    ggplot2::scale_fill_discrete(legend_title)
+    ggplot2::scale_color_discrete(legend_title)
+
 
   # Farm boy, add limits to my plot. As you wish.
   if (!is.null(ylimit)) {
