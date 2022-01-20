@@ -1,14 +1,14 @@
 context('quantitation: Reverend Bayes')
 
 test_that('bpquant produces correct isoforms',{
-  
+
   # Load and preprocess data ---------------------------------------------------
-  
+
   # Load peptide data.
   load(system.file('testdata',
                    'little_pdata.RData',
                    package = 'pmartR'))
-  
+
   # Construct a pepData object.
   pdata <- as.pepData(e_data = edata,
                       f_data = fdata,
@@ -16,30 +16,31 @@ test_that('bpquant produces correct isoforms',{
                       edata_cname = 'Mass_Tag_ID',
                       fdata_cname = 'SampleID',
                       emeta_cname = 'Protein')
-  
+
   # Log transmute the peptide data.
   pdata <- edata_transform(pdata, "log")
-  
+
   # Add some groups.
   pdata <- group_designation(omicsData = pdata,
                              main_effects = "Condition")
-  
+
   # Apply an IMD-ANOVA filter.
   ifilter <- imdanova_filter(omicsData = pdata)
   pdata <- applyFilt(filter_object = ifilter,
                      omicsData = pdata,
                      min_nonmiss_anova = 2)
-  
+
   # Run some statisiticalness on the filtered data.
   inova <- imd_anova(omicsData = pdata,
                      test_method = 'comb',
-                     pval_adjust = 'bon')
-  
+                     pval_adjust_a = 'bon',
+                     pval_adjust_g = 'bon')
+
   # Quantitate with Reverend Bayes ---------------------------------------------
-  
+
   # Run bpquant pdata with the IMD-ANOVA output as the statRes object.
   bayes <- bpquant(statRes = inova, pepData = pdata, parallel = FALSE)
-  
+
   # Vector of unique proteins from the reduced pdata object. Will be used to
   # test the isoformRes_subset attribute from the bpquant function.
   prots <- c("ALBU_HUMAN", "ALBU_HUMAN", "ALBU_HUMAN", "ALBU_HUMAN",
@@ -66,7 +67,7 @@ test_that('bpquant produces correct isoforms',{
              "SND1_HUMAN", "HNRPU_HUMAN", "RS7_HUMAN", "H2A1_HUMAN",
              "COR1C_HUMAN", "NPM_HUMAN", "HNRPF_HUMAN", "RTCB_HUMAN",
              "HNRPK_HUMAN", "H2AY_HUMAN", "EF1G_HUMAN", "4F2_HUMAN")
-  
+
   # Vector of peptide IDs from the reduced pdata object. This will be used to
   # test the isoformRes_subset attribute.
   pepe_ids <- as.character(c(1104, 1237, 1768, 4198254, 1246, 1253, 1110, 1214,
@@ -87,7 +88,7 @@ test_that('bpquant produces correct isoforms',{
                              6948878, 6948880, 6948887, 6948895, 6948896,
                              6948897, 6948898, 6948900, 6948903, 6948904,
                              6948905, 6948906, 6948907, 6948911, 6948915))
-  
+
   # Sleuth around the isoformRes object.
   expect_s3_class(bayes, "isoformRes")
   expect_equal(length(bayes), 66)
@@ -121,14 +122,14 @@ test_that('bpquant produces correct isoforms',{
                prots)
   expect_equal(attr(bayes, "isoformRes_subset")$Mass_Tag_ID,
                pepe_ids)
-  
+
   # Test internals of Rev Bayes quantitation -----------------------------------
-  
+
   # Run bpquant_mod on the flags for ALBU_HUMAN.
   bayes_mod <- bpquant_mod(protein_sig = data.frame(flags1 = c(-1, 1, 1, 1, 1)),
                            pi_not = 0.9,
                            max_proteoforms = 5)
-  
+
   # Go over output with a fine-tooth comb.
   expect_equal(round(bayes_mod$post_prob, 5),
                round(c(4.827795e-04, 8.469562e-01, 8.691286e-05, 1.524741e-01),
@@ -146,7 +147,7 @@ test_that('bpquant produces correct isoforms',{
                         1, 1),
                       nrow = 4,
                       byrow = TRUE))
-  
+
   # Run isoformRes_func on the output for ALBU_HUMAN.
   iso_fun <- isoformRes_func(
     df = data.frame(Protein = rep("ALBU_HUMAN", 4),
@@ -155,7 +156,7 @@ test_that('bpquant produces correct isoforms',{
     emeta_cname = "Protein",
     edata_cname = "Mass_Tag_ID"
   )
-  
+
   # Sniff around the output for isoformRes_func.
   expect_identical(
     iso_fun,
@@ -163,14 +164,14 @@ test_that('bpquant produces correct isoforms',{
                Protein_Isoform = rep("ALBU_HUMAN", 4),
                Mass_Tag_ID = c("1104", "1237", "1768", "4198254"))
   )
-  
+
   # Run bpquant_mod on the flags for 6PGL_HUMAN.
   bayes_mod <- bpquant_mod(
     protein_sig = data.frame(flags1 = c(-1, -1, -1, 1, 1)),
     pi_not = 0.9,
     max_proteoforms = 5
   )
-  
+
   # Go over output with a fine-tooth comb.
   expect_equal(round(bayes_mod$post_prob, 5),
                round(c(0.006577728, 0.298581994, 0.014977305, 0.679862973),
@@ -188,7 +189,7 @@ test_that('bpquant produces correct isoforms',{
                         1, 1),
                       nrow = 4,
                       byrow = TRUE))
-  
+
   # Run isoformRes_func on the output for 6PGL_HUMAN.
   iso_fun <- isoformRes_func(
     df = data.frame(Protein = rep("6PGL_HUMAN", 5),
@@ -198,7 +199,7 @@ test_that('bpquant produces correct isoforms',{
     emeta_cname = "Protein",
     edata_cname = "Mass_Tag_ID"
   )
-  
+
   # Sniff around the output for isoformRes_func.
   expect_identical(
     iso_fun,
@@ -209,5 +210,5 @@ test_that('bpquant produces correct isoforms',{
                Mass_Tag_ID = c("8622908", "8655070", "9513231", "34862026",
                                "65465565"))
   )
-  
+
 })

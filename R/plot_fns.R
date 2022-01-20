@@ -249,7 +249,6 @@ plot.dataRes <- function (dataRes_obj, metric = NULL, density = FALSE,
 
       q + p
 
-
     }
 
 
@@ -1365,6 +1364,12 @@ na_scatter <- function (edata, group_df, na.by.sample, num_missing_vals,
 #'   \code{\link{as.pepData}}, \code{\link{as.isobaricpepData}},
 #'   \code{\link{as.proData}}, \code{\link{as.lipidData}},
 #'   \code{\link{as.metabData}}, or\code{\link{as.nmrData}}, respectively.
+#' @param order_by A character string specifying a main effect by which to order
+#'   the correlation heat map. This main effect must be found in the column
+#'   names of f_data in the omicsData object. If \code{order_by} is "Group", the
+#'   correlation heat map will be ordered by the group variable from the
+#'   group_designation function. If NULL (default), the correlation heat map
+#'   will be displayed in the order the samples appear in the data.
 #' @param x_text Logical. Indicates whether the x-axis will be labeled with the
 #'   sample names. The default is TRUE.
 #' @param y_text Logical. Indicates whether the y-axis will be labeled with the
@@ -1402,10 +1407,11 @@ na_scatter <- function (edata, group_df, na.by.sample, num_missing_vals,
 #'
 #' @export
 #'
-plot.corRes <- function (corRes_obj, omicsData = NULL, colorbar_lim = c(NA, NA),
-                         x_text = TRUE, y_text = TRUE, interactive = FALSE,
-                         x_lab = NULL, y_lab = NULL, x_lab_size = 11,
-                         y_lab_size = 11, x_lab_angle = 90, title_lab = NULL,
+plot.corRes <- function (corRes_obj, omicsData = NULL, order_by = NULL,
+                         colorbar_lim = c(NA, NA), x_text = TRUE,
+                         y_text = TRUE, interactive = FALSE, x_lab = NULL,
+                         y_lab = NULL, x_lab_size = 11, y_lab_size = 11,
+                         x_lab_angle = 90, title_lab = NULL,
                          title_lab_size = 14, legend_lab = NULL,
                          legend_position = "right", color_low = NULL,
                          color_high = NULL, bw_theme = TRUE,
@@ -1444,17 +1450,105 @@ plot.corRes <- function (corRes_obj, omicsData = NULL, colorbar_lim = c(NA, NA),
 
   }
 
+  if (!is.null(order_by)) {
+
+    # If order_by is not NULL omicsData must also not be NULL.
+    if (is.null(omicsData)) {
+
+      # Get used to disappointment.
+      stop ("If order_by is not NULL omicsData must also not be NULL.")
+
+    }
+
+    if (!is.character(order_by) || length(order_by) > 1) {
+
+      # Your plot is now mostly dead. Good luck trying to revive it.
+      stop ("order_by must be a character vector of length 1")
+
+    }
+
+    # Make sure the group designation function has been run.
+    if (is.null(attr(omicsData, "group_DF"))) {
+
+      # Do you hear that? Those are the shrieking eels!
+      stop (paste("group_DF must not be NULL. Run the group_designation",
+                  "function prior to plotting with the order_by argument.",
+                  sep = " "))
+
+    }
+
+  }
+
+  # Create plot data matrix ----------------------------------------------------
+
   # Workaround for certain "check" warnings
   Var1 <- Var2 <- value <- NULL
 
-  # Create the data frame that will be used to produce the correlation heatmap.
+  # Nab groupDF when omicsData is available and order_by is specified. BOOM!
+  if (!is.null(order_by)) {
+
+    # Farm boy, extract the group_DF attribute. As you wish.
+    groupDF <- attr(omicsData, "group_DF")
+
+    # If order_by is not "Group" then run group designation with the specified
+    # variable as the main effect.
+    if (order_by != "Group") {
+
+      # Fish out the group_DF data frame from omicsData after creating the
+      # group_DF attribute with the order_by input. This will be combined with
+      # the plot_data object so the samples can be ordered by the main effect.
+      orderDF <- attr(
+        group_designation(omicsData = omicsData, main_effects = order_by),
+        "group_DF"
+      )
+
+    } else {
+
+      # Use the original group_DF attribute for ordering the samples. This
+      # occurs when order_by = "group_DF".
+      orderDF <- groupDF
+
+    }
+
+    # Reorder the orderDF according to the order_by input. We can subset using
+    # "Group" because it will always be the column we are after. If the input to
+    # order_by = "Group" we will use the Group column from the group_DF
+    # attribute from the original input. If order_by is a variable other than
+    # group, we will run the group_designation function and the name of this
+    # variable will be changed to Group.
+    orderDF <- orderDF[order(orderDF$Group), ]
+
+    # Save the original is_normalized attribute. This attribute is erased when
+    # the rows and columns are reordered based on the orderDF object. This
+    # attribute is needed later in the function to correctly label the plot.
+    normal_attr <- attr(corRes_obj, "is_normalized")
+
+    # Reorder the rows and columns of the corRes object to match the order of
+    # the groups in orderDF. We can hard-code the first column of orderDF
+    # because this will always be the column containing the sample names.
+    # 1. Reorder the columns of corRes_obj to match the order of orderDF.
+    corRes_obj <- corRes_obj[, match(orderDF[, 1], colnames(corRes_obj))]
+    # 2. Reorder the rows of corRes_obj to match the order of orderDF.
+    corRes_obj <- corRes_obj[match(orderDF[, 1], rownames(corRes_obj)), ]
+
+    # Add the lost attributes back to the corRes_obj because they are needed
+    # later on.
+    attr(corRes_obj, "is_normalized") <- normal_attr
+
+  }
+
+  # Create the data frame that will be used to produce the correlation heat map.
   corRes_melt <- reshape2::melt(corRes_obj)
-  corRes_melt$Var1 <- abbreviate(corRes_melt$Var1, minlength = 20)
-  corRes_melt$Var2 <- abbreviate(corRes_melt$Var2, minlength = 20)
-  sampleIDx = ordered(corRes_melt$Var2,
-                      levels = rev(sort(unique(corRes_melt$Var2))))
-  sampleIDy = ordered(corRes_melt$Var1,
-                      levels = rev(sort(unique(corRes_melt$Var1))))
+  # The y-axis will be Var1 in the plot.
+  corRes_melt$Var1 <- factor(
+    abbreviate(corRes_melt$Var1, minlength = 20),
+    levels = abbreviate(rownames(corRes_obj), minlength = 20)
+  )
+  # The x-axis will be Var2 in the plot.
+  corRes_melt$Var2 <- factor(
+    abbreviate(corRes_melt$Var2, minlength = 20),
+    levels = abbreviate(rownames(corRes_obj), minlength = 20)
+  )
 
   # Create all the plot labels. Life is pain!!!
   xlabel <- if (is.null(x_lab)) "" else x_lab
@@ -1484,8 +1578,8 @@ plot.corRes <- function (corRes_obj, omicsData = NULL, colorbar_lim = c(NA, NA),
 
   # Start the skeleton of the heat map. Other aspects are forthcoming.
   hm <- ggplot2::ggplot(corRes_melt,
-                        ggplot2::aes(x = sampleIDx,
-                                     y = sampleIDy)) +
+                        ggplot2::aes(x = Var2,
+                                     y = Var1)) +
     ggplot2::geom_tile(ggplot2::aes(fill = value))
 
   # Farm boy, make me a plot with the black and white theme. As you wish.
@@ -2229,41 +2323,6 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
     ggplot2::ylab(ylabel) +
     ggplot2::ggtitle(titleLabel)
 
-  # Evan, add the gtest points to the plot. As you wish.
-  p <- p +
-    ggplot2::geom_point(data = plotter2,
-                        ggplot2::aes(x = Count_biomolecules,
-                                     y = Min_obs,
-                                     color = Statistic),
-                        size = point_size)
-
-  # Evan, add the anova points to the plot. As you wish.
-  p <- p +
-    ggplot2::geom_point(data = plotter1,
-                        ggplot2::aes(x = Count_biomolecules,
-                                     y = Min_obs,
-                                     color = Statistic),
-                        size = point_size)
-
-  # Evan, display the counts on the plot. As you wish.
-  if (display_count) p <- p +
-    ggplot2::geom_text(
-      data = plotter1,
-      ggplot2::aes(x = Count_biomolecules,
-                   y = Min_obs,
-                   label = Count_biomolecules),
-      size = text_size,
-      hjust = -0.5
-    ) +
-    ggplot2::geom_text(
-      data = plotter2,
-      ggplot2::aes(x = Count_biomolecules,
-                   y = Min_obs,
-                   label = Count_biomolecules),
-      size = text_size,
-      hjust = -0.5
-    )
-
   # Evan, add gtest info to the plot. As you wish.
   if (!is.null(min_nonmiss_gtest)) {
 
@@ -2274,6 +2333,17 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
         linetype = "dashed",
         size = if (is.null(line_size)) 1 else line_size
       )
+
+    # Evan, display the counts on the plot. As you wish.
+    if (display_count) p <- p +
+        ggplot2::geom_text(
+          data = plotter2,
+          ggplot2::aes(x = Count_biomolecules,
+                       y = Min_obs,
+                       label = Count_biomolecules),
+          size = text_size,
+          hjust = -0.5
+        )
 
   }
 
@@ -2287,6 +2357,17 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
         linetype = "dashed",
         size = if (is.null(line_size)) 1 else line_size
       )
+
+    # Evan, display the counts on the plot. As you wish.
+    if (display_count) p <- p +
+        ggplot2::geom_text(
+          data = plotter1,
+          ggplot2::aes(x = Count_biomolecules,
+                       y = Min_obs,
+                       label = Count_biomolecules),
+          size = text_size,
+          hjust = -0.5
+        )
 
   }
 
@@ -2327,7 +2408,6 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
         )
       )
 
-    # A minimum for gtest IS NOT supplied and a minimum for anova IS supplied.
   } else if (is.null(min_nonmiss_gtest) && !is.null(min_nonmiss_anova)) {
 
     # Add a customized legend when min_nonmiss_gtest is NULL and
@@ -2363,8 +2443,7 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
         )
       )
 
-    # A minimum for gtest AND anova IS supplied.
-  } else if (!is.null(min_nonmiss_gtest) && !is.null(min_nonmiss_anova)) {
+  } else {
 
     # Add a customized legend when both min_nonmiss_gtest and min_nonmiss_anova
     # are not NULL.
@@ -2389,29 +2468,6 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
               if (is.null(palette)) "#FFC107" else colas[[2]],
               if (is.null(palette)) "#FFC107" else colas[[2]],
               if (is.null(palette)) "#004D40" else colas[[3]],
-              if (is.null(palette)) "#004D40" else colas[[3]]
-            )
-          )
-        )
-      )
-
-    # Neither a minimum for gtest nor anova is supplied.
-  } else {
-
-    # Add a customized legend when both min_nonmiss_gtest and min_nonmiss_anova
-    # are NULL.
-    p <- p +
-      ggplot2::scale_color_manual(
-        name = if (is.null(legend_lab)) "" else legend_lab,
-        values = c(
-          if (is.null(palette)) "#FFC107" else colas[[2]],
-          if (is.null(palette)) "#004D40" else colas[[3]]
-        ),
-        guide = ggplot2::guide_legend(
-          override.aes = list(
-            shape = c(16, 16),
-            color = c(
-              if (is.null(palette)) "#FFC107" else colas[[2]],
               if (is.null(palette)) "#004D40" else colas[[3]]
             )
           )
@@ -2445,6 +2501,12 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
 #'   two elements. The first element is a data frame with the counts of proteins
 #'   mapping to each peptide. The second element is also a data frame with the
 #'   counts of peptides mapping to each protein.
+#' @param plot_type A character string specifying the type of plot to be
+#'   displayed. The available options are "num_peps" or "redundancy". If
+#'   "num_peps" the plot is displayed that shows the counts of proteins that
+#'   have a specific number of peptides mapping to them. If "redundancy" the
+#'   plot showing the counts of peptides that map to a specific number of
+#'   proteins is displayed.
 #' @param min_num_peps an optional integer value between 1 and the maximum
 #'   number of peptides that map to a protein in the data. The value specifies
 #'   the minimum number of peptides that must map to a protein. Any protein with
@@ -2453,29 +2515,27 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
 #'
 #' @param interactive Logical. If TRUE produces an interactive plot.
 #' @param x_lab_pep A character string used for the x-axis label for the
-#'   peptide-to-protein plot. The default is NULL in which case the default
-#'   x-axis label will be used.
+#'   num_peps plot. The default is NULL in which case the default x-axis label
+#'   will be used.
 #' @param x_lab_pro A character string used for the x-axis label for the
-#'   protein-to-peptide plot. The default is NULL in which case the default
-#'   x-axis label will be used.
+#'   redundancy plot. The default is NULL in which case the default x-axis label
+#'   will be used.
 #' @param y_lab_pep A character string used for the y-axis label for the
-#'   peptide-to-protein plot. The default is NULL in which case the default
-#'   y-axis label will be used.
+#'   num_peps plot. The default is NULL in which case the default y-axis label
+#'   will be used.
 #' @param y_lab_pro A character string used for the y-axis label for the
-#'   protein-to-peptide plot. The default is NULL in which case the default
-#'   y-axis label will be used.
+#'   redundancy plot. The default is NULL in which case the default y-axis label
+#'   will be used.
 #' @param x_lab_size An integer value indicating the font size for the x-axis.
 #'   The default is 11.
 #' @param y_lab_size An integer value indicating the font size for the y-axis.
 #'   The default is 11.
 #' @param x_lab_angle An integer value indicating the angle of x-axis labels.
 #'   The default is 0.
-#' @param title_lab_pep A character string specifying the peptide-to-protein
-#'   plot title. The default is NULL in which case the default title will be
-#'   used.
-#' @param title_lab_pro A character string specifying the protein-to-peptide
-#'   plot title. The default is NULL in which case the default title will be
-#'   used.
+#' @param title_lab_pep A character string specifying the num_peps plot title.
+#'   The default is NULL in which case the default title will be used.
+#' @param title_lab_pro A character string specifying the redundancy plot title.
+#'   The default is NULL in which case the default title will be used.
 #' @param title_lab_size An integer value indicating the font size of the plot
 #'   title. The default is 14.
 #' @param legend_lab A character string specifying the legend title.
@@ -2505,7 +2565,9 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
 #'
 #' @export
 #'
-plot.proteomicsFilt <- function (filter_obj, min_num_peps = NULL,
+plot.proteomicsFilt <- function (filter_obj,
+                                 plot_type = "num_peps",
+                                 min_num_peps = NULL,
                                  interactive = FALSE, x_lab_pep = NULL,
                                  x_lab_pro = NULL, y_lab_pep = NULL,
                                  y_lab_pro = NULL, x_lab_size = 11,
@@ -2561,6 +2623,12 @@ plot.proteomicsFilt <- function (filter_obj, min_num_peps = NULL,
                   sep = " "))
   }
 
+  if (!plot_type %in% c("num_peps", "redundancy")) {
+
+    stop ("plot_type must be either 'num_peps' or 'redundancy'.")
+
+  }
+
   # Seize unique values for peptide to protein and protein to peptide counts:
   # These bins represent the number of PROTEINS each peptide maps to. Unless
   # there are degenerate peptides this will be a vector with one value: 1.
@@ -2587,11 +2655,11 @@ plot.proteomicsFilt <- function (filter_obj, min_num_peps = NULL,
 
   # Mind numbing label making bit.
   xlabel_pep <- if (is.null(x_lab_pep))
-    "Number of Peptides" else
+    "Number of Proteins" else
       x_lab_pep
-  ylabel_pep <- if (is.null(y_lab_pep)) "Count of Proteins" else y_lab_pep
+  ylabel_pep <- if (is.null(y_lab_pep)) "Count of Peptides" else y_lab_pep
   titleLabelPep <- if (is.null(title_lab_pep))
-    "Y peptides mapped to by exactly X proteins" else
+    "Y peptides map to exactly X proteins" else
       title_lab_pep
   xlabel_pro <- if (is.null(x_lab_pro))
     "Number of Peptides" else
@@ -2609,15 +2677,33 @@ plot.proteomicsFilt <- function (filter_obj, min_num_peps = NULL,
 
   # Manufacture phenomenal plots -----------------------------------------------
 
-  #!#!#!#! p represents the protein plot #!#!#!#!
-  #!#!#!#! q represents the pepe plot #!#!#!#!
+  #!#!#!#! p represents the protein plot (num_peps) #!#!#!#!
+  #!#!#!#! q represents the pepe plot (redundancy) #!#!#!#!
 
   # Create the bare bones protein and peptide plots.
   p <- ggplot2::ggplot(pro_counts_df)
   q <- ggplot2::ggplot(pep_counts_df)
 
-  # if min_num_peps is specified, add a coloring variable that is red for
-  # dropped values and green for retained values
+  # Create an object for the first default ggplot2 color.
+  hideous <- grDevices::hcl(h = 15,
+                            c = 100,
+                            l = 65)
+
+  # Check if palette is NULL or not. Hopefully it isn't so the plot will be
+  # created with colors other than the super hideous default ggplot2 colors.
+  if (!is.null(palette)) {
+
+    # Create a color from the color brewer package if a palette is provided.
+    # This color will be used if the plot only has one color. For example, when
+    # redundancy is selected or if num_peps is selected but
+    # min_num_peps is not specified.
+    colas <- RColorBrewer::brewer.pal(5, palette)
+
+  }
+
+  # If min_num_peps is specified, add a coloring variable that shows whether a
+  # peptide will be retained or dropped based on the input provided.
+
   if (!is.null(min_num_peps)) {
 
     fill <- ifelse(pro_bins >= min_num_peps, "retained", "dropped")
@@ -2645,20 +2731,6 @@ plot.proteomicsFilt <- function (filter_obj, min_num_peps = NULL,
     # charts with groups).
   } else {
 
-    # Check if palette is NULL or not. Hopefully it isn't so the plot will be
-    # created with colors other than the super hideous default ggplot2 colors.
-    if (!is.null(palette)) {
-
-      # Create a color from the color brewer package if a palette is provided.
-      colas <- RColorBrewer::brewer.pal(5, palette)
-
-    }
-
-    # Create an object for the first default ggplot2 color.
-    hideous <- grDevices::hcl(h = 15,
-                              c = 100,
-                              l = 65)
-
     # We change bins to a factor so the x-axis tick labels are the value in bins
     # but the width of the bars and x-axis does not change according to the
     # numeric value of bins.
@@ -2672,18 +2744,26 @@ plot.proteomicsFilt <- function (filter_obj, min_num_peps = NULL,
         stat = "identity",
         width = bar_width
       )
-    q <- q +
-      ggplot2::geom_bar(
-        ggplot2::aes(x = as.factor(bins),
-                     y = counts),
-        fill = if (is.null(palette))
-          hideous else
-            colas[[3]],
-        stat = "identity",
-        width = bar_width
-      )
 
   }
+
+  # Evan, deal with all the issues when we ask you to make seemingly small
+  # changes to functions. AS YOU WISH.
+  # The q plot (redundant plot) has to be created outside the if else statement
+  # above because this plot does not change based on the input to min_num_peps.
+  # I tried to be smooth and leave the function mostly the same and add changes
+  # to the q plot together with the p plot when min_num_peps is specified.
+  # However, that turned out to be a nightmare. This attempt better work without
+  # any issues. Maybe I was too wishful: This attempt better not have the same
+  # completely ridiculous and unsolvable errors as the last attempt.
+  q <- q +
+    ggplot2::geom_bar(
+      ggplot2::aes(x = as.factor(bins),
+                   y = counts),
+      fill = if (is.null(palette)) hideous else colas[[3]],
+      stat = "identity",
+      width = bar_width
+    )
 
   # Evan, add plot labels for me. As you wish.
   p <- p +
@@ -2704,6 +2784,10 @@ plot.proteomicsFilt <- function (filter_obj, min_num_peps = NULL,
   }
 
   # Evan, make me a plot with beautiful colors. As you wish.
+  # NOTE: This code only changes colors if not all bars will have the same color
+  # in the num_peps plot. If a plot has bars with all the same color, the
+  # coloring (according to whether palette was specified) was taken care of
+  # previously.
   if (!is.null(palette)) {
 
     # Use the ColorBrewer color and create the legend title
@@ -2742,30 +2826,21 @@ plot.proteomicsFilt <- function (filter_obj, min_num_peps = NULL,
   p <- p + axs
   q <- q + axs
 
-  # Return both peptide and protein plots if there are degenerate peptides.
-  if (length(pep_bins) > 1) {
+  # Evan, just display the num_peps plot. As you wish.
+  if (plot_type == "num_peps") {
 
-    # Evan, make me an interactive plot. As you wish.
-    if (interactive) {
-
-      p <- plotly::ggplotly(p)
-      q <- plotly::ggplotly(q)
-
-      plotly::subplot(p, q, nrows = 1)
-
-    } else {
-
-      p + q
-
-
-    }
-
-  } else {
-
-    # Evan, make me an interactive plot. As you wish.
+    # Evan, make me an interactive num_peps plot. As you wish.
     if (interactive) p <- plotly::ggplotly(p)
 
     return (p)
+
+    # Evan, just display the redundancy plot. As you wish.
+  } else if (plot_type == "redundancy") {
+
+    # Evan, make me an interactive redundancy plot. As you wish.
+    if (interactive) q <- plotly::ggplotly(q)
+
+    return (q)
 
   }
 
@@ -2825,10 +2900,8 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
                           x_lab_size = 11, y_lab_size = 11, x_lab_angle = 90,
                           title_lab = NULL, title_lab_size = 14,
                           legend_lab = NULL, legend_position = "right",
-
                           point_size = 3, bw_theme = TRUE, palette = NULL,
                           use_VizSampNames = FALSE) {
-
 
   # Preliminaries --------------------------------------------------------------
 
@@ -3122,7 +3195,6 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
     }
 
   }
-
 
   # Farm boy, make the plot interactive. As you wish.
   if (interactive) p <- plotly::ggplotly(p)
@@ -4337,3 +4409,1038 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
   return (p)
 
 }
+
+#' Plotting function for `statRes` objects
+#'
+#' Produces plots that summarize the results contained in a `statRes` object.
+#'
+#' @param x `statRes` object to be plotted, usually the result of `imd_anova`
+#' @param plot_type defines which plots to be produced, options are "bar",
+#'   "volcano", "gheatmap", "fcheatmap"; defaults to "bar".  See details for
+#'   plot descriptions.
+#' @param fc_threshold optional threshold value for fold change estimates.
+#'   Modifies the volcano plot as follows:  Vertical lines are added at
+#'   (+/-)\code{fc_threshold} and all observations that have absolute fold
+#'   change less than \code{abs(fc_threshold)} are colored as 'non-significant'
+#'   (as specified by \code{fc_colors}).
+#' @param fc_colors vector of length three with character color values
+#'   interpretable by ggplot. i.e. c("orange", "black", "blue") with the values
+#'   being used to color negative, non-significant, and positive fold changes
+#'   respectively
+#' @param stacked TRUE/FALSE for whether to stack positive and negative fold
+#'   change sections in the barplot, defaults to FALSE
+#' @param show_sig This input is used when \code{plot_type = "gheatmap"}. A
+#'   logical value. If TRUE a visual indicator that a certain bin combination is
+#'   significant by the g-test is shown.
+#' @param color_low This input is used when \code{plot_type = "gheatmap"}. A
+#'   character string specifying the color of the gradient for low count values.
+#' @param color_high This input is used when \code{plot_type = "gheatmap"}. A
+#'   character string specifying the color of the gradient for high count
+#'   values.
+#' @param plotly_layout This input is used when \code{plot_type = "gheatmap"}. A
+#'   list of arguments, not including the plot, to be passed to
+#'   \code{plotly::layout} if \code{interactive = TRUE}.
+#'
+#' @param interactive TRUE/FALSE for whether to create an interactive plot using
+#'   plotly.  Not valid for all plots.
+#' @param x_lab A character string specifying the x-axis label.
+#' @param x_lab_size An integer value indicating the font size for the x-axis.
+#'   The default is 11.
+#' @param x_lab_angle An integer value indicating the angle of x-axis labels.
+#' @param y_lab A character string specifying the y-axis label.
+#' @param y_lab_size An integer value indicating the font size for the y-axis.
+#'   The default is 11.
+#' @param title_lab A character string specifying the plot title.
+#' @param title_lab_size An integer value indicating the font size of the plot
+#'   title. The default is 14.
+#' @param legend_lab A character string specifying the legend title.
+#' @param legend_position A character string specifying the position of the
+#'   legend. Can be one of "right", "left", "top", "bottom", or "none". The
+#'   default is "none".
+#' @param text_size An integer specifying the size of the text (number of
+#'   non-missing values) within the plot. The default is 3.
+#' @param bw_theme Logical. If TRUE uses the ggplot2 black and white theme.
+#' @param display_count Logical. Indicates whether the non-missing counts will
+#'   be displayed on the bar plot. The default is TRUE.
+#' @param custom_theme a ggplot `theme` object to be applied to non-interactive
+#'   plots, or those converted by plotly::ggplotly().
+#'
+#' @details Plot types:
+#' \itemize{
+#'  \item{"bar"} \code{?pmartR::statres_barplot} Bar-chart with bar heights
+#'  indicating the number of significant biomolecules, grouped by test type and
+#'  fold change direction.
+#'  \item{"volcano"} \code{?pmartR::statres_volcano_plot} Scatterplot showing
+#'  negative-log-pvalues against fold change.  Colored by statistical
+#'  significance and fold change.
+#'  \item{"gheatmap"} \code{?pmartR::gtest_heatmap} Heatmap with x and y axes
+#'  indicating the number of nonmissing values for two groups.  Colored by
+#'  number of biomolecules that fall into that combination of nonmissing values.
+#'  \item{"fcheatmap"} Heatmap showing all biomolecules across comparisons,
+#'  colored by fold change.
+#' }
+#'
+#' @export
+#' @method plot statRes
+#' @examples
+#' \dontrun{
+#' library(pmartR)
+#' library(pmartRdata)
+#' #Transform the data
+#'
+#' #Group the data by condition
+#' myproData <- group_designation(omicsData = pro_object,
+#'                                main_effects = c("Condition"))
+#'
+#' #Apply the IMD ANOVA filter
+#' imdanova_Filt <- imdanova_filter(omicsData = myproData)
+#' myproData <- applyFilt(filter_object = imdanova_Filt,
+#'                        omicsData = myproData,
+#'                        min_nonmiss_anova=2)
+#'
+#' #Implement the IMD ANOVA method and compuate all pairwise comparisons
+#' #(i.e. leave the `comparisons` argument NULL)
+#' anova_res <- imd_anova(omicsData = myproData, test_method = 'anova')
+#' plot(anova_res)
+#' plot(anova_res, plot_type = "volcano")
+#'
+#' imd_res <- imd_anova(omicsData = myproData, test_method = 'gtest')
+#' plot(imd_res)
+#' plot(imd_res, plot_type = "gheatmap")
+#' # using arguments of internal functions:
+#' plot(imd_res,
+#'      plot_type = "gheatmap",
+#'      color_low = "red",
+#'      color_high = "green")
+#'
+#' imd_anova_res <- imd_anova(omicsData = myproData,
+#'                            test_method = 'comb',
+#'                            pval_adjust='bon')
+#' plot(imd_anova_res, bw_theme = TRUE)
+#' plot(imd_anova_res, plot_type = "volcano", bw_theme = TRUE)
+#'
+#' }
+#'
+plot.statRes <- function (x,
+                          plot_type = "bar",
+                          fc_threshold = NULL,
+                          fc_colors = c("red", "black", "green"),
+                          stacked = FALSE,
+                          show_sig = TRUE,
+                          color_low = NULL,
+                          color_high = NULL,
+                          plotly_layout = NULL,
+                          interactive = FALSE,
+                          x_lab = NULL,
+                          x_lab_size = 11,
+                          x_lab_angle = NULL,
+                          y_lab = NULL,
+                          y_lab_size = 11,
+                          title_lab = NULL,
+                          title_lab_size = 14,
+                          legend_lab = NULL,
+                          legend_position = "right",
+                          text_size = 3,
+                          bw_theme = TRUE,
+                          display_count = TRUE,
+                          custom_theme = NULL) {
+
+  # Farm boy, fix all the problems. As you wish.
+
+  #Most plots are based on "number_significant" data frame so pull it out
+  comp_df <- attr(x, "number_significant")
+
+  ##--------##
+  #Go through the given plot_types and remove any that aren't currently avilable
+  plt_tyj <- try(match.arg(tolower(plot_type),
+                           c("bar",
+                             "volcano",
+                             "gheatmap",
+                             "fcheatmap")),
+                 silent=TRUE)
+  if(class(plt_tyj)=='try-error'){
+    warning(paste0("Plot type '",
+                   plot_type,
+                   "' is not currently available, defaulting to bar plot."))
+    plot_type <- "bar"
+  }else{
+    plot_type <- plt_tyj
+  }
+
+  #Don't make biomolecule heatmaps if there's only one comparison
+  if(plot_type %in% c("fcheatmap") & nrow(comp_df)==1){
+    stop(paste("Fold change heatmaps not supported when only one comparison",
+               "is being made.",
+               sep = " "))
+  }
+
+  # specified theme parameters
+  if(!is.null(custom_theme)){
+    if(bw_theme)
+      warning(paste("Setting both bw_theme to TRUE and specifying a custom",
+                    "theme may cause undesirable results",
+                    sep = " "))
+    if(!inherits(custom_theme, c("theme", "gg")))
+      stop("custom_theme must be a valid 'theme' object as used in ggplot")
+    mytheme = custom_theme
+  }
+  else mytheme = ggplot2::theme(
+    plot.title = ggplot2::element_text(size = title_lab_size),
+    axis.title.x = ggplot2::element_text(size = x_lab_size),
+    axis.title.y = ggplot2::element_text(size = y_lab_size),
+    axis.text.x = ggplot2::element_text(angle = x_lab_angle),
+    legend.position = legend_position
+  )
+
+  # Both the volcano plot and heatmaps need a dataframe of fold changes by
+  # comparison/biomolecule
+  if(plot_type %in% c("volcano", "gheatmap", "fcheatmap")){
+    volcano <- make_volcano_plot_df(x)
+  }
+
+  # Bar plot -------------------------------------------------------------------
+
+  if("bar"%in%plot_type){
+    p <- statres_barplot(
+      x = x,
+      stacked = stacked,
+      fc_colors = fc_colors,
+      text_size = text_size,
+      display_count = display_count,
+      x_lab = x_lab,
+      y_lab = y_lab,
+      title_lab = title_lab,
+      legend_lab = legend_lab
+    )
+
+    if(bw_theme) p <- p +
+        ggplot2::theme_bw() +
+        ggplot2::theme(strip.background = ggplot2::element_rect(fill = "white"))
+
+    return(p + mytheme)
+  }
+
+  # Volcano plot
+  else if("volcano"%in%plot_type){
+    if(!attr(x, "statistical_test") %in% c("anova", "combined")){
+      stop(paste("imd_anova must have been run with test_method = 'anova' or",
+                 "'combined' to make the volcano plot",
+                 sep = " "))
+    }
+
+    # still returns a ggplot, even if interactive = T
+    p <-
+      statres_volcano_plot(
+        volcano = volcano,
+        data_scale = attr(x, "data_info")$data_scale,
+        pval_thresh = attr(x, "pval_thresh"),
+        fc_colors = fc_colors,
+        fc_threshold = fc_threshold,
+        interactive = interactive,
+        x_lab = x_lab,
+        y_lab = y_lab,
+        title_lab = title_lab,
+        legend_lab = legend_lab
+      )
+
+    if(bw_theme) p <- p +
+      ggplot2::theme_bw() +
+      ggplot2::theme(strip.background = ggplot2::element_rect(fill = "white"))
+
+    p <- p + mytheme
+
+    if(interactive)
+      return(plotly::ggplotly(p, tooltip = c("text"))) else
+        return(p)
+  }
+
+  # g-test heat map ------------------------------------------------------------
+
+  else if("gheatmap" %in% plot_type){
+    if(!attr(x, "statistical_test") %in% c("gtest", "combined")){
+      stop(paste("imd_anova must have been run with test_method = 'gtest' or",
+                 "'combined' to make the g-test heatmap",
+                 sep = " "))
+    }
+
+    p <-
+      gtest_heatmap(
+        volcano = volcano,
+        pval_thresh = attr(x, "pval_thresh"),
+        show_sig = show_sig,
+        interactive = interactive,
+        color_low = color_low,
+        color_high = color_high,
+        plotly_layout = plotly_layout,
+        text_size = text_size,
+        display_count = display_count,
+        x_lab = x_lab,
+        y_lab = y_lab,
+        title_lab = title_lab,
+        legend_lab = legend_lab
+      )
+
+    if(!interactive){
+      p <- p + mytheme
+    }
+  }
+
+  # biomolecule fold change heatmap
+  else if("fcheatmap"%in%plot_type){
+
+    # Farm boy, do all the tedious label crap. As you wish.
+    the_x_label <- if (is.null(x_lab))
+      "Biomolecule" else
+        x_lab
+    the_y_label <- if (is.null(y_lab))
+      "Comparison" else
+        y_lab
+    the_title_label <- if (is.null(title_lab))
+      "Average Log Fold Change" else
+        title_lab
+    the_legend_label <- if (is.null(legend_lab))
+      "Fold Change" else
+        legend_lab
+
+    #For now just consider biomolecules significant with respect to ANOVA
+    volcano <- dplyr::filter(volcano,Type=="ANOVA")
+
+    volcano_sigs <- dplyr::filter(volcano,P_value<attr(x,"pval_thresh"))
+    if(!(nrow(volcano_sigs)) > 0)
+      warning("No molecules significant at the provided p-value threshold")
+    colnames(volcano_sigs)[1] <- "Biomolecule"
+    volcano_sigs$Biomolecule <- as.factor(volcano_sigs$Biomolecule)
+
+    p <- ggplot2::ggplot(volcano_sigs,
+                         ggplot2::aes(Biomolecule,
+                                      Comparison,
+                                      text = paste("ID:",
+                                                   Biomolecule,
+                                                   "<br>",
+                                                   "Pval:",
+                                                   P_value))) +
+      ggplot2::geom_tile(ggplot2::aes(fill = Fold_change), color = "white") +
+      ggplot2::scale_fill_gradient(low = fc_colors[1],
+                                   high = fc_colors[3],
+                                   name = the_legend_label) +
+      ggplot2::xlab(the_x_label) +
+      ggplot2::ylab(the_y_label) +
+      ggplot2::ggtitle(the_title_label) +
+      mytheme
+    if(interactive)
+      return(plotly::ggplotly(p, tooltip = c("text"))) else
+        return(p)
+  }
+
+  return(p)
+
+}
+
+#' Extract flag columns from a statRes object
+#'
+#' Changes the flags columns from a statRes object into a format that the
+#' statRes plot funcitons can handle. pmartR is an unruly beast that cannot be
+#' tamed!!
+#'
+#' @param x A statRes object.
+#'
+#' @param test A character string indicating the type of test run.
+#'
+prep_flags <- function (x, test) {
+
+  if (test == "anova") {
+
+    # Assemble a data frame with the sample IDs and anova flags.
+    da_flag <- data.frame(
+      x[, 1, drop = FALSE],
+      x[, grep("^Flag_A_", colnames(x))]
+    )
+
+    # Remove "Flag_A_" from column names. The first column name is removed
+    # because it corresponds to the biomolecule ID column.
+    colnames(da_flag)[-1] <- gsub("^Flag_A_",
+                                  "",
+                                  colnames(x)[grep("^Flag_A_", colnames(x))])
+
+  } else if (test == "gtest") {
+
+    # Assemble a data frame with the sample IDs and gtest flags.
+    da_flag <- data.frame(
+      x[, 1, drop = FALSE],
+      x[, grep("^Flag_G_", colnames(x))]
+    )
+
+    # Change -1 and 1 to -2 and 2 respectively.
+    da_flag[, -1] <- da_flag[, -1] * 2
+
+    # Remove "Flag_G_" from column names. The first column name is removed
+    # because it corresponds to the biomolecule ID column.
+    colnames(da_flag)[-1] <- gsub("^Flag_G_",
+                                  "",
+                                  colnames(x)[grep("^Flag_G_", colnames(x))])
+
+  } else {
+
+    # Criteria for reporting p-values when combined test is selected:
+    # (1)   If ANOVA flag but no G-test flag, report ANOVA flag
+    # (2)   If G-test flag but no ANOVA flag, report G-test flag
+    # (3)   If neither are present, report NA
+    # (4)   If both are present but corresponding p-values are not significant,
+    #       report ANOVA flag
+    # (5)   If both are present but ANOVA is p-value is significant, report
+    #       ANOVA flag
+    # (6)   If both are present but G-test p-value is significant, report G-test
+    #       flag
+
+    # Start with the anova p-values (extracted from combined results) and
+    # replace if missing [see (2)] or G-test is significant [see (6)]
+    imd_pvals <- data.matrix(x[, grep("^P_value_A_", colnames(x))])
+    imd_flags <- data.matrix(x[, grep("^Flag_A_", colnames(x))])
+
+    # Extract G-test p-values and flags.
+    g_pvals <- data.matrix(x[, grep("^P_value_G_", colnames(x))])
+    g_flags <- data.matrix(x[, grep("^Flag_G_", colnames(x))])
+
+    # Change G-test flags to -2, 0, 2. This is necessary because the plot
+    # functions depend on this distinction between ANOVA and G-test.
+    g_flags <- g_flags * 2
+
+    # Replace missing ANOVA p-values with g-test p-values
+    if (any(is.na(imd_pvals))) {
+
+      anova_NAs <- which(is.na(imd_pvals))
+      imd_pvals[anova_NAs] <- g_pvals[anova_NAs]
+      imd_flags[anova_NAs] <- g_flags[anova_NAs]
+
+    }
+
+    # Replace insignificant ANOVA p-values with significant g-test:
+    # Insignificant ANOVA p-value indices.
+    insig_anova <- which(imd_pvals > attr(x, "pval_thresh"))
+
+    if (any(insig_anova)) {
+
+      # Nab significant G-test p-value indices.
+      sig_gtest <- which(g_pvals <= attr(x, "pval_thresh"))
+
+      # Find overlap between the significant G-test p-values and the
+      # insignificant ANOVA p-values.
+      overlap <- sig_gtest[sig_gtest %in% insig_anova]
+
+      if (any(overlap)) {
+
+        # Replace ANOVA flags (with insignificant p-values) with G-test flags
+        # (that have significant p-values).
+        imd_flags[overlap] <- g_flags[overlap]
+
+      }
+
+    }
+
+    # Remove "Flag_A_" from column names.
+    colnames(imd_flags) <- gsub("^Flag_A_",
+                                "",
+                                colnames(x)[grep("^Flag_A_", colnames(x))])
+
+    # Assemble the flags data frame with the first column containing the
+    # biomolecule IDs and the remaining columns containing the flags.
+    da_flag <- data.frame(x[, 1, drop = FALSE], imd_flags)
+
+  }
+
+  return (da_flag)
+
+}
+
+#' Create a plotting dataframe for volcano plots and heatmaps.
+#'
+#' A function internal to \link{pmartR::plot.statRes} which creates the
+#' dataframe necessary to construct volcano plots and heatmaps.
+#'
+#' @param x `statRes` object to be plotted, usually the result of `imd_anova`
+#'
+#' @returns `data.frame` object with plotting information about each biomolecule
+#' such as missing counts per group, and p-values for t and g-tests.
+#'
+#' @keywords internal
+#'
+make_volcano_plot_df <- function(x) {
+  # fold change values for volcano plot
+  fc_data <-
+    x[, c(1, grep("^Fold_change", colnames(x)))]
+  colnames(fc_data) <-
+    gsub(pattern = "^Fold_change_",
+         replacement = "",
+         x = colnames(fc_data))
+  fc_data <-
+    reshape2::melt(
+      fc_data,
+      id.vars = 1,
+      variable.name = "Comparison",
+      value.name = "Fold_change"
+    )
+
+  # Run the cmbn_flags function here.
+
+  # fold change flags for coloring
+  fc_flags <- prep_flags(x = x,
+                         test = attr(x, "statistical_test"))
+  fc_flags <-
+    reshape2::melt(
+      fc_flags,
+      id.vars = 1,
+      variable.name = "Comparison",
+      value.name = "Fold_change_flag"
+    ) %>%
+    dplyr::mutate(Fold_change_flag = as.character(Fold_change_flag))
+
+  # p values for labeling and y axis in anova volcano plot
+  p_data <-
+    x[, c(1, grep("^P_value", colnames(x)))]
+  pvals <-
+    reshape2::melt(
+      p_data,
+      id.vars = 1,
+      variable.name = "Comparison",
+      value.name = "P_value"
+    )
+
+  # grouping column based on test type
+  if (attr(x, "statistical_test") == "combined") {
+    pvals$Type <- "G-test"
+    pvals$Type[grep(pattern = "^P_value_A_", x = pvals$Comparison)] <-
+      "ANOVA"
+  } else if (attr(x, "statistical_test") == "gtest") {
+    pvals$Type <- "G-test"
+  } else if (attr(x, "statistical_test") == "anova") {
+    pvals$Type <- "ANOVA"
+  }
+
+  levels(pvals$Comparison) <-
+    gsub(pattern = "^P_value_G_",
+         replacement = "",
+         levels(pvals$Comparison))
+  levels(pvals$Comparison) <-
+    gsub(pattern = "^P_value_A_",
+         replacement = "",
+         levels(pvals$Comparison))
+
+  volcano <-
+    merge(merge(fc_data, pvals, all = TRUE), fc_flags, all = TRUE)
+
+  # levels of comparison now of the form 'GROUPNAME_X vs GROUPNAME_Y'
+  levels(volcano$Comparison) <-
+    gsub(pattern = "_vs_",
+         replacement = " vs ",
+         levels(volcano$Comparison))
+
+  # create counts for gtest plot (number present in each group)
+  if (attr(x, "statistical_test") %in% c("gtest", "combined")) {
+    counts <-
+      x[c(1, grep("^Count_", colnames(x)))]
+
+    # trim column names so they are just group names
+    colnames(counts) <-
+      gsub("^Count_", replacement = "", colnames(counts))
+
+    counts_df <- data.frame()
+    for (comp in as.character(unique(volcano$Comparison))) {
+      #create a vector of the two group names being compared
+      groups = strsplit(comp, " vs ")[[1]]
+      gsize_1 = nrow(attr(x, "group_DF") %>% dplyr::filter(Group == groups[1]))
+      gsize_2 = nrow(attr(x, "group_DF") %>% dplyr::filter(Group == groups[2]))
+
+      # will contain ID column and count column corresponding to the two groups
+      temp_df <-
+        counts[c(1,
+                 which(colnames(counts) == groups[1]),
+                 which(colnames(counts) == groups[2]))]
+      temp_df$Comparison <- comp
+
+      # rename the columns to something static so they can be rbind-ed
+      colnames(temp_df)[which(colnames(temp_df) %in% groups)] <-
+        c("Count_First_Group", "Count_Second_Group")
+
+      # store proportion of nonmissing to color g-test values in volcano plot
+      temp_df$Prop_First_Group <- temp_df$Count_First_Group / gsize_1
+      temp_df$Prop_Second_Group <-
+        temp_df$Count_Second_Group / gsize_2
+
+      counts_df <- rbind(counts_df, temp_df)
+    }
+
+    # should automatically left join by ID AND Comparison
+    suppressWarnings(volcano <-
+                       volcano %>% dplyr::left_join(counts_df))
+  }
+
+  return(volcano)
+}
+
+#' Fold change barplots for statres objects
+#'
+#' Plots a bar-chart with bar heights indicating the number of significant
+#' biomolecules, grouped by test type and fold change direction.
+#'
+#' @param x,stacked,fc_colors passed from
+#'   \code{\link[pmartR:plot.statRes]{pmartR::plot.statRes()}}
+#' @param text_size An integer specifying the size of the text (number of
+#'   non-missing values) within the plot. The default is 3.
+#' @param display_count Logical. Indicates whether the non-missing counts will
+#'   be displayed on the bar plot. The default is TRUE.
+#' @param x_lab A character string specifying the x-axis label.
+#' @param y_lab A character string specifying the y-axis label.
+#' @param title_lab A character string specifying the plot title.
+#' @param legend_lab A character string specifying the legend title.
+#'
+#' @return `ggplot` object - barplot.
+#'
+#' @keywords internal
+#'
+statres_barplot <- function(x,
+                            stacked,
+                            fc_colors,
+                            text_size,
+                            display_count,
+                            x_lab,
+                            y_lab,
+                            title_lab,
+                            legend_lab) {
+
+  # Farm boy, do all the tedious label crap. As you wish.
+  the_x_label <- if (is.null(x_lab))
+    "Statistical test, by group comparison" else
+      x_lab
+  the_y_label <- if (is.null(y_lab))
+    "Count of Biomolecules" else
+      y_lab
+  the_title_label <- if (is.null(title_lab))
+    "Number of DE Biomolecules Between Groups" else
+      title_lab
+  the_legend_label <- if (is.null(legend_lab))
+    "Fold Change Sign" else
+      legend_lab
+
+  comp_df <- attr(x, "number_significant")
+
+  comp_df_melt <- reshape2::melt(comp_df,
+                                 id.vars="Comparison",
+                                 value.name="Count",
+                                 variable.name="Direction")
+  levels(comp_df_melt$Comparison) <- gsub(pattern = "_",
+                                          replacement = " ",
+                                          levels(comp_df_melt$Comparison))
+
+  # Bar plots side-by-side, both going up
+  # ggplot(data=comp_df_melt,aes(Comparison,Count,fill=Direction))+
+  #   geom_bar(stat='identity',position='dodge')
+
+  ##Up direction is positive, down direction is negative
+  if(!stacked)
+    comp_df_melt[grep("Down", comp_df_melt$Direction),]$Count <- (
+      -comp_df_melt[grep("Down", comp_df_melt$Direction),]$Count
+    )
+
+  # add whichtest, and posneg columns used for plot grouping and label
+  # adjustment
+  comp_df_melt <- comp_df_melt %>%
+    dplyr::mutate(whichtest = ifelse(grepl("anova", Direction),
+                                     "anova",
+                                     ifelse(grepl("gtest", Direction),
+                                            "gtest",
+                                            "total")),
+                  posneg = ifelse(grepl("Up", Direction),
+                                  "Positive",
+                                  "Negative")) %>%
+    dplyr::arrange(desc(posneg))
+
+  # get only anova or only g-test rows if user did not specify combined
+  if(attr(x, "statistical_test") %in% c("anova", "gtest")){
+    comp_df_melt <- comp_df_melt %>%
+      dplyr::filter(whichtest == "total") %>%
+      dplyr::mutate(whichtest = attr(x, "statistical_test"))
+  }
+
+  p <- ggplot2::ggplot(data = comp_df_melt, ggplot2::aes(Comparison, Count)) +
+    ggplot2::geom_bar(ggplot2::aes(x = whichtest,
+                                   fill = posneg,
+                                   group = whichtest),
+                      stat = 'identity') +
+    ggplot2::geom_hline(ggplot2::aes(yintercept = 0), colour = 'gray50') +
+    ggplot2::scale_fill_manual(
+      values = c(fc_colors[1], fc_colors[3]),
+      labels = c("Negative", "Positive"),
+      name = the_legend_label
+    ) +
+    ggplot2::facet_wrap( ~ Comparison) +
+    ggplot2::xlab(the_x_label) +
+    ggplot2::ylab(the_y_label) +
+    ggplot2::ggtitle(the_title_label)
+
+  # Farm boy, display the counts on the plot. As you wish
+  if (display_count) {
+
+    p <- p +
+      ggplot2::geom_text(ggplot2::aes(x = whichtest,
+                                      label = ifelse(abs(Count) > 0,
+                                                     abs(Count),
+                                                     "")),
+                         position = ggplot2::position_stack(vjust = 0.5),
+                         size = text_size)
+
+  }
+
+  return(p)
+}
+
+#' Plot a heatmap for the g-test results of imd-anova
+#'
+#' Plots a heatmap showing bins for combinations of # of biomolecules present
+#' across groups.  Bins are colored by the number of biomolecules falling into
+#' each bin, and have indicators for significance by g-test.
+#'
+#' @param volcano `data.frame` produced by \link{pmartR::make_volcano_plot_df}
+#' @param show_sig Boolean whether to show the visual indicator that a certain
+#'   bin combination is significant by the g-test
+#' @param count_text_size In non-interactive mode, the size of the text
+#'   indicating the number of biomolecules to be displayed inside the tile.
+#'   Defaults to 3.  Setting this to zero causes no text to be shown.
+#' @param interactive passed from
+#'   \code{\link[pmartR:plot.statRes]{pmartR::plot.statRes()}}. If T, will build
+#'   a plotly version of the plot.  Defaults to FALSE.
+#' @param color_low A character string specifying the color of the gradient for
+#'   low count values.
+#' @param color_high A character string specifying the color of the gradient for
+#'   high count values.
+#' @param plotly_layout A list of arguments, not including the plot, to be
+#'   passed to plotly::layout if interactive = T.
+#' @param text_size An integer specifying the size of the text (number of
+#'   non-missing values) within the plot. The default is 3.
+#' @param display_count Logical. Indicates whether the non-missing counts will
+#'   be displayed on the bar plot. The default is TRUE.
+#' @param x_lab A character string specifying the x-axis label.
+#' @param y_lab A character string specifying the y-axis label.
+#' @param title_lab A character string specifying the plot title.
+#' @param legend_lab A character string specifying the legend title.
+#'
+#' @return `ggplot or plotly` object, depending on if \code{interactive} is set
+#' to TRUE or FALSE respectively. A g-test heatmap
+#'
+#' @keywords internal
+#'
+gtest_heatmap <-
+  function(volcano,
+           pval_thresh,
+           show_sig,
+           interactive,
+           color_low,
+           color_high,
+           plotly_layout,
+           text_size,
+           display_count,
+           x_lab,
+           y_lab,
+           title_lab,
+           legend_lab) {
+
+    # Farm boy, do all the tedious label crap. As you wish.
+    the_x_label <- if (is.null(x_lab))
+      "Nonmissing (first group)" else
+        x_lab
+    the_y_label <- if (is.null(y_lab))
+      "Nonmissing (second group)" else
+        y_lab
+    the_title_label <- if (is.null(title_lab))
+      "Count of non-missing values in each group" else
+        title_lab
+    the_legend_label <- if (is.null(legend_lab))
+      "Number of biomolecules \nin this bin" else
+        legend_lab
+
+    temp_data_gtest <- volcano %>%
+      dplyr::filter(Type == "G-test") %>%
+      dplyr::mutate(
+        Fold_change_flag = dplyr::case_when(
+          Prop_First_Group > Prop_Second_Group &
+            P_value <= pval_thresh ~  "2",
+          Prop_First_Group < Prop_Second_Group &
+            P_value <= pval_thresh ~ "-2",
+          is.na(Fold_change) ~ "0",
+          TRUE ~ Fold_change_flag
+        )
+      )
+
+    # summarized data frame of # of biomolecules per count combination.
+    gtest_counts <- temp_data_gtest %>%
+      dplyr::group_by(Count_First_Group, Count_Second_Group, Comparison) %>%
+      dplyr::summarise(n = dplyr::n(), sig = all(P_value < 0.05)) %>%
+      dplyr::mutate(
+        Count_First_Group = as.character(Count_First_Group),
+        Count_Second_Group = as.character(Count_Second_Group)
+      )
+
+    g1_counts <- unique(as.numeric(gtest_counts$Count_First_Group))
+    g2_counts <- unique(as.numeric(gtest_counts$Count_Second_Group))
+
+    all_counts <- expand.grid(
+      as.character(g1_counts),
+      as.character(g2_counts),
+      unique(gtest_counts$Comparison), stringsAsFactors = F) %>%
+      `colnames<-`(c("Count_First_Group", "Count_Second_Group", "Comparison"))
+
+    gtest_counts <- all_counts %>% dplyr::left_join(gtest_counts)
+
+    if(!interactive) {
+      p <- ggplot2::ggplot(gtest_counts) +
+        ggplot2::theme_minimal() +
+        ggplot2::geom_tile(ggplot2::aes(Count_First_Group,
+                                        Count_Second_Group,
+                                        fill = n),
+                           color = "black")
+
+      if(show_sig) {
+        p <- p + ggplot2::geom_point(
+          data = gtest_counts %>% dplyr::filter(sig),
+          ggplot2::aes(Count_First_Group, Count_Second_Group, shape = "1"),
+          fill = "white"
+        ) +
+          ggplot2::scale_shape_manual(name = "Statistically significant",
+                                      labels = "",
+                                      values = 21)
+      }
+
+      if(display_count) {
+        p <- p + ggplot2::geom_text(
+          ggplot2::aes(Count_First_Group, Count_Second_Group, label = n),
+          nudge_x = -0.5, nudge_y = 0.5, hjust = -0.1, vjust = 1.5,
+          color = "white", size = text_size
+        )
+      }
+
+      p <- p +
+        ggplot2::facet_wrap(~ Comparison) +
+        ggplot2::scale_fill_gradient(
+          name = the_legend_label,
+          low = if (is.null(color_low)) "#132B43" else color_low,
+          high = if (is.null(color_high)) "#56B1F7" else color_high
+        ) +
+        ggplot2::xlab(the_x_label) +
+        ggplot2::ylab(the_y_label) +
+        ggplot2::ggtitle(the_title_label)
+
+    } else {
+      comps <- unique(gtest_counts$Comparison)
+      subplot_list <- list()
+      limits = range(gtest_counts$n)
+      # legend entry will not appear for a single plot, so putting info in title
+      subtext = if(length(comps) == 1)
+        "\n(star indicates statistical significance)" else
+          ""
+
+      for(i in 1:length(comps)){
+        data <- gtest_counts %>% dplyr::filter(Comparison == comps[i])
+
+        p <- plotly::plot_ly() %>%
+          plotly::add_trace(data = data,
+                            x =  ~ as.numeric(Count_First_Group),
+                            y =  ~ as.numeric(Count_Second_Group),
+                            z = ~ n,
+                            type = "heatmap",
+                            hoverinfo = 'text',
+                            text = ~sprintf("%s biomolecules in this bin.", n),
+                            colors = grDevices::colorRamp(
+                              c(if (is.null(color_low))
+                                "#132B43" else
+                                  color_low,
+                                if (is.null(color_high))
+                                  "#56B1F7" else
+                                    color_high)
+                            ),
+                            showscale = i == length(comps),
+                            xgap = 0.6, ygap = 0.6
+          ) %>%
+          plotly::add_trace(
+            data = data %>% dplyr::filter(sig),
+            x =  ~ as.numeric(Count_First_Group),
+            y =  ~ as.numeric(Count_Second_Group),
+            type = 'scatter',
+            mode = "markers",
+            showlegend = i == length(comps),
+            name = "Statistically significant",
+            marker = list(
+              symbol = "star",
+              color = "white",
+              line = list(color = "black", width = 0.5)
+            ),
+            inherit = FALSE
+          ) %>%
+          plotly::add_annotations(
+            text = comps[[i]],
+            x = 0.5,
+            y = 1,
+            xref = "paper",
+            yref = "paper",
+            showarrow = FALSE,
+            yanchor = "bottom",
+            font = list(size = 14)
+          )
+
+        if(i == length(comps)) {
+          p <- p %>% plotly::colorbar(
+            title = "Count biomolecules \nin this bin.", limits = limits
+          )
+        }
+
+
+        if(is.null(plotly_layout)) {
+          p <- p %>%
+            plotly::layout(
+              plot_bgcolor = 'grey',
+              title = list(
+                text = paste(the_title_label, subtext),
+                font = list(size = 14),
+                y = 0.95, yanchor = "top"
+              ),
+              margin = list(t = 65),
+              xaxis = list(tickvals = g1_counts, zeroline = F),
+              yaxis = list(tickvals = g2_counts, zeroline = F)
+            )
+        }
+        else {
+          p <- do.call(plotly::layout, c(list(p), plotly_layout))
+        }
+
+        subplot_list[[length(subplot_list) + 1]] <- p
+      }
+
+      p <- plotly::subplot(subplot_list, shareY = T) %>%
+        plotly::layout(
+          xaxis = list(title = the_x_label),
+          yaxis = list(title = the_y_label)
+        )
+    }
+
+    return(p)
+  }
+
+#' Volcano plot for the anova results of imd-anova
+#'
+#' Plots a volcano plot showing negative log10 p-values on the y axis and fold
+#' change on the x axis. Each point is colored by fold change direction and
+#' whether or not it was significant by ANOVA.
+#'
+#' @param volcano `data.frame` produced by \link{pmartR::make_volcano_plot_df}
+#' @param pval_thresh alpha level to determine significance.  Any values that
+#'   are significant at this level will be colored based on fc_colors.
+#' @param data_scale One of c("log2","log","log10"), for labeling purposes.
+#' @param fc_colors,fc_threshold,interactive passed from
+#'   \code{\link[pmartR:plot.statRes]{pmartR::plot.statRes()}}
+#' @param x_lab A character string specifying the x-axis label.
+#' @param y_lab A character string specifying the y-axis label.
+#' @param title_lab A character string specifying the plot title.
+#' @param legend_lab A character string specifying the legend title.
+#'
+#' @return `ggplot` object.  A volcano plot.
+#'
+#' @keywords internal
+#'
+statres_volcano_plot <-
+  function(volcano,
+           data_scale,
+           pval_thresh,
+           fc_colors,
+           fc_threshold,
+           interactive,
+           x_lab,
+           y_lab,
+           title_lab,
+           legend_lab) {
+
+    # Farm boy, do all the tedious label crap. As you wish.
+    the_x_label <- if (is.null(x_lab))
+      paste("Fold-change (", data_scale, ")", sep = "") else
+        x_lab
+    the_y_label <- if (is.null(y_lab))
+      "-log[10](p-value)" else
+        y_lab
+    the_title_label <- if (is.null(title_lab))
+      "" else
+        title_lab
+    the_legend_label <- if (is.null(legend_lab))
+      "Fold Change" else
+        legend_lab
+
+    # color vector which assigns black to gtest flag values (-2, 2)
+    cols_anova <-
+      c(
+        "-2" = fc_colors[2],
+        "-1" = fc_colors[1],
+        "0" = fc_colors[2],
+        "1" = fc_colors[3],
+        "2" = fc_colors[2]
+      )
+
+    # temp data with rows only for ANOVA
+    temp_data_anova <- volcano %>%
+      dplyr::filter(Type == "ANOVA") %>%
+      dplyr::mutate(
+        Fold_change_flag = dplyr::case_when(
+          is.na(Fold_change) |
+            abs(Fold_change) < ifelse(rlang::is_empty(fc_threshold),
+                                      0,
+                                      abs(fc_threshold)) ~ "0",
+          Fold_change > 0 &
+            P_value <= pval_thresh ~  "1",
+          Fold_change < 0 &
+            P_value <= pval_thresh ~ "-1",
+          TRUE ~ Fold_change_flag
+        )
+      )
+
+    # interactive plots need manual text applied to prepare for ggplotly
+    # conversion
+    if (interactive) {
+      p <-
+        ggplot2::ggplot(temp_data_anova, ggplot2::aes(
+          Fold_change,
+          -log(P_value, base = 10),
+          text = paste(
+            "ID:",
+            !!rlang::sym(colnames(volcano)[1]),
+            "<br>",
+            "Pval:",
+            round(P_value, 4)
+          )
+        ))
+    }
+    else {
+      p <-
+        ggplot2::ggplot(data = temp_data_anova,
+                        ggplot2::aes(Fold_change,
+                                     -log(P_value, base = 10)))
+    }
+
+    # draw vertical lines at +- fc threshold
+    if(!rlang::is_empty(fc_threshold)){
+      p <- p +
+        ggplot2::geom_vline(ggplot2::aes(xintercept=abs(fc_threshold)),
+                            lty = 2) +
+        ggplot2::geom_vline(ggplot2::aes(xintercept = abs(fc_threshold)*(-1)),
+                            lty = 2)
+    }
+
+    p <- p +
+      ggplot2::geom_point(ggplot2::aes(color = Fold_change_flag), shape = 1) +
+      ggplot2::facet_wrap( ~ Comparison) +
+      ggplot2::ylab(the_y_label) +
+      ggplot2::xlab(the_x_label) +
+      ggplot2::ggtitle(the_title_label) +
+      ggplot2::scale_color_manual(
+        values = cols_anova,
+        name = the_legend_label,
+        labels = c("Neg(Anova)", "0", "Pos(Anova)"),
+        breaks = c("-1", "0", "1")
+      )
+
+    return(p)
+  }

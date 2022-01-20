@@ -158,7 +158,7 @@ test_that('proteomics_filter and applyFilt produce the correct output',{
                'proteomicsFilt')
   expect_identical(attr(filtered, 'filters')[[1]]$threshold,
                    data.frame(min_num_peps = 2,
-                              degen_peps = as.character(FALSE)))
+                              redundancy = as.character(FALSE)))
   expect_equal(attr(filtered, 'filters')[[1]]$filtered$e_meta_remove,
                lil_pro)
   expect_equal(attr(filtered, 'filters')[[1]]$filtered$e_data_remove,
@@ -200,7 +200,7 @@ test_that('proteomics_filter and applyFilt produce the correct output',{
   sorfiltered <- applyFilt(filter_object = sorfilter,
                            omicsData = sordata,
                            min_num_peps = 2,
-                           degen_peps = TRUE)
+                           redundancy = TRUE)
 
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(sordata, 'cnames'),
@@ -215,7 +215,7 @@ test_that('proteomics_filter and applyFilt produce the correct output',{
                'proteomicsFilt')
   expect_identical(attr(sorfiltered, 'filters')[[1]]$threshold,
                    data.frame(min_num_peps = 2,
-                              degen_peps = "TRUE"))
+                              redundancy = "TRUE"))
   expect_equal(attr(sorfiltered, 'filters')[[1]]$filtered$e_meta_remove,
                c(amoral_prots, lil_pro))
   expect_equal(attr(sorfiltered, 'filters')[[1]]$filtered$e_data_remove,
@@ -254,7 +254,7 @@ test_that('proteomics_filter and applyFilt produce the correct output',{
   # Apply the proteomics filter just with degenerate peptides.
   sorfiltered2 <- applyFilt(filter_object = sorfilter,
                             omicsData = sordata,
-                            degen_peps = TRUE)
+                            redundancy = TRUE)
 
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(sordata, 'cnames'),
@@ -269,7 +269,7 @@ test_that('proteomics_filter and applyFilt produce the correct output',{
                'proteomicsFilt')
   expect_identical(attr(sorfiltered2, 'filters')[[1]]$threshold,
                    data.frame(min_num_peps = NA,
-                              degen_peps = "TRUE"))
+                              redundancy = "TRUE"))
   expect_equal(attr(sorfiltered2, 'filters')[[1]]$filtered$e_meta_remove,
                amoral_prots)
   expect_equal(attr(sorfiltered2, 'filters')[[1]]$filtered$e_data_remove,
@@ -323,7 +323,7 @@ test_that('proteomics_filter and applyFilt produce the correct output',{
                'proteomicsFilt')
   expect_identical(attr(sorfiltered3, 'filters')[[1]]$threshold,
                    data.frame(min_num_peps = 2,
-                              degen_peps = "FALSE"))
+                              redundancy = "FALSE"))
   expect_setequal(attr(sorfiltered3, 'filters')[[1]]$filtered$e_meta_remove,
                   c(attr(filtered, "filters")[[1]]$filtered$e_meta_remove,
                     amoral_prots))
@@ -346,37 +346,5 @@ test_that('proteomics_filter and applyFilt produce the correct output',{
                dim(filtered$f_data))
   expect_equal(dim(sorfiltered3$e_meta),
                dim(filtered$e_meta))
-
-  # Test scenario when nothing is filtered -------------------------------------
-
-  # Find all proteins that map to 2 or more peptides. The data will be subsetted
-  # to just these proteins and their corresponding peptides. This data set will
-  # be used to test the proteomics filter when nothing is filtered.
-  proKeepers <- proCount[which(proCount$n > 1), ]$Protein
-  pepKeepers <- emeta[emeta$Protein %in% proKeepers, ]$Mass_Tag_ID
-
-  lilpdata <- as.pepData(e_data = edata[edata$Mass_Tag_ID %in% pepKeepers, ],
-                         f_data = fdata,
-                         e_meta = emeta[emeta$Protein %in% proKeepers, ],
-                         edata_cname = "Mass_Tag_ID",
-                         fdata_cname = "SampleID",
-                         emeta_cname = "Protein")
-
-  filter <- proteomics_filter(omicsData = lilpdata)
-
-  # Apply the filter with a value for min_num_peps and degen_peps (FALSE) that
-  # will not filter any rows.
-  expect_message(noFilta <- applyFilt(filter_object = filter,
-                                      omicsData = lilpdata,
-                                      min_num_peps = 2),
-                 paste("No peptides/proteins were filtered with the values",
-                       "specified for the min_num_peps and degen_peps",
-                       "arguments.",
-                       sep = " "))
-
-  # The output of applyFilt should be the same as the omicsData object used as
-  # the input because the filter was not applied. Therefore, the filters
-  # attribute should remain how it was before running applyFilt.
-  expect_identical(noFilta, lilpdata)
 
 })

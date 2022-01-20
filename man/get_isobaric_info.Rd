@@ -13,21 +13,21 @@ or nmrData.}
 \value{
 A list containing the following six elements:
         \itemize{
-        
-          \item exp_cname -- 
-          
-          \item channel_cname -- 
-          
-          \item refpool_channel -- 
-          
-          \item refpool_cname -- 
-          
-          \item refpool_notation -- 
-          
+
+          \item exp_cname --
+
+          \item channel_cname --
+
+          \item refpool_channel --
+
+          \item refpool_cname --
+
+          \item refpool_notation --
+
           \item norm_info -- A list containing a single logical element that
           indicates whether the data have been normalized to a reference
           pool.
-        
+
         }
 }
 \description{

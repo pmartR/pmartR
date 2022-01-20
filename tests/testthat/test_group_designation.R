@@ -1,15 +1,15 @@
 context('populate the group_DF attribute')
 
 test_that('the correct group data frame and attributes are created',{
-  
+
   # Load the reduced peptide data frames ---------------------------------------
-  
+
   load(system.file('testdata',
                    'little_pdata.RData',
                    package = 'pmartR'))
-  
+
   # Fabricate objects and tests for 1 main effect ------------------------------
-  
+
   # Construct a pepData object with the edata, fdata, and emeta data frames.
   pdata <- as.pepData(e_data = edata,
                       f_data = fdata,
@@ -17,11 +17,11 @@ test_that('the correct group data frame and attributes are created',{
                       edata_cname = 'Mass_Tag_ID',
                       fdata_cname = 'SampleID',
                       emeta_cname = 'Protein')
-  
+
   # Forge a group_DF attribute for pdata.
   pdata_gdf <- group_designation(omicsData = pdata,
                                  main_effects = 'Condition')
-  
+
   # Investigate the e_data, f_data, and e_meta data frames.
   expect_equal(dim(pdata_gdf$e_data),
                c(150, 13))
@@ -29,13 +29,13 @@ test_that('the correct group data frame and attributes are created',{
                c(12, 2))
   expect_equal(dim(pdata_gdf$e_meta),
                c(150, 4))
-  
+
   # Examinate the group_DF data frame.
   expect_equal(data.frame(attr(pdata_gdf, 'group_DF')),
                data.frame(SampleID = as.character(fdata$SampleID),
                           Group = as.character(fdata$Condition),
                           stringsAsFactors = FALSE))
-  
+
   # Inspecticate the attributes of the group_DF data frame.
   expect_equal(attributes(attr(pdata_gdf, 'group_DF'))$main_effects,
                'Condition')
@@ -43,7 +43,7 @@ test_that('the correct group data frame and attributes are created',{
                c('Infection', 'Mock'))
   expect_null(attributes(attr(pdata_gdf, 'group_DF'))$covariates)
   expect_null(attributes(attr(pdata_gdf, 'group_DF'))$time_course)
-  
+
   # Ensurate the remaining attributes have not changed.
   expect_identical(attr(pdata, 'cnames'),
                    attr(pdata_gdf, 'cnames'))
@@ -53,16 +53,16 @@ test_that('the correct group data frame and attributes are created',{
                    attr(pdata_gdf, 'meta_info'))
   expect_identical(attr(pdata, 'filters'),
                    attr(pdata_gdf, 'filters'))
-  
+
   # Generate objects and tests for 2 main effects ------------------------------
-  
+
   # Add another column to fdata for a second main effect.
   fdata_2 <- data.frame(fdata,
                         Intensity = c('low', 'low', 'high', 'low', 'high',
                                       'high', 'high', 'high', 'low', 'none',
                                       'none', 'none'),
                         stringsAsFactors = FALSE)
-  
+
   # Produce a pepData object with the new f_data data frame.
   pdata_2 <- as.pepData(e_data = edata,
                         f_data = fdata_2,
@@ -70,11 +70,11 @@ test_that('the correct group data frame and attributes are created',{
                         edata_cname = 'Mass_Tag_ID',
                         fdata_cname = 'SampleID',
                         emeta_cname = 'Protein')
-  
+
   # Run group_designation with two main effects.
   pdata_gdf_2 <- group_designation(omicsData = pdata_2,
                                    main_effects = c('Condition', 'Intensity'))
-  
+
   # Investigate the e_data, f_data, and e_meta data frames.
   expect_equal(dim(pdata_gdf_2$e_data),
                c(150, 13))
@@ -82,7 +82,7 @@ test_that('the correct group data frame and attributes are created',{
                c(12, 3))
   expect_equal(dim(pdata_gdf_2$e_meta),
                c(150, 4))
-  
+
   # Examinate the group_DF data frame.
   expect_equal(data.frame(attr(pdata_gdf_2, 'group_DF')),
                data.frame(SampleID = as.character(fdata_2$SampleID),
@@ -92,7 +92,7 @@ test_that('the correct group data frame and attributes are created',{
                           Condition = as.character(fdata_2$Condition),
                           Intensity = as.character(fdata_2$Intensity),
                           stringsAsFactors = FALSE))
-  
+
   # Inspecticate the attributes of the group_DF data frame.
   expect_equal(attributes(attr(pdata_gdf_2, 'group_DF'))$main_effects,
                c('Condition', 'Intensity'))
@@ -100,7 +100,7 @@ test_that('the correct group data frame and attributes are created',{
                c('Infection_high', 'Infection_low', 'Mock_none'))
   expect_null(attributes(attr(pdata_gdf_2, 'group_DF'))$covariates)
   expect_null(attributes(attr(pdata_gdf_2, 'group_DF'))$time_course)
-  
+
   # Ensurate the remaining attributes have not changed.
   expect_identical(attr(pdata_2, 'cnames'),
                    attr(pdata_gdf_2, 'cnames'))
@@ -110,14 +110,14 @@ test_that('the correct group data frame and attributes are created',{
                    attr(pdata_gdf_2, 'meta_info'))
   expect_identical(attr(pdata_2, 'filters'),
                    attr(pdata_gdf_2, 'filters'))
-  
+
   # Add another column to fdata for a second main effect with some NA values.
   fdata_2 <- data.frame(fdata,
                         Intensity = c('low', 'low', 'high', 'low', 'high',
                                       'high', 'high', 'high', 'low', NA, NA,
                                       NA),
                         stringsAsFactors = FALSE)
-  
+
   # Produce a pepData object with the new f_data data frame.
   pdata_2 <- as.pepData(e_data = edata,
                         f_data = fdata_2,
@@ -125,7 +125,7 @@ test_that('the correct group data frame and attributes are created',{
                         edata_cname = 'Mass_Tag_ID',
                         fdata_cname = 'SampleID',
                         emeta_cname = 'Protein')
-  
+
   # Run group_designation with two main effects.
   expect_warning(pdata_gdf_2 <- group_designation(omicsData = pdata_2,
                                                   main_effects = c('Condition',
@@ -134,7 +134,7 @@ test_that('the correct group data frame and attributes are created',{
                        'from the dataset due to missing group information:',
                        'Mock1, Mock2, Mock3',
                        sep = ' '))
-  
+
   # Investigate the e_data, f_data, and e_meta data frames.
   expect_equal(dim(pdata_gdf_2$e_data),
                c(150, 10))
@@ -142,7 +142,7 @@ test_that('the correct group data frame and attributes are created',{
                c(9, 3))
   expect_equal(dim(pdata_gdf_2$e_meta),
                c(150, 4))
-  
+
   # Examinate the group_DF data frame.
   expect_equal(data.frame(attr(pdata_gdf_2, 'group_DF')),
                data.frame(SampleID = as.character(fdata_2$SampleID[1:9]),
@@ -152,7 +152,7 @@ test_that('the correct group data frame and attributes are created',{
                           Condition = as.character(fdata_2$Condition[1:9]),
                           Intensity = as.character(fdata_2$Intensity[1:9]),
                           stringsAsFactors = FALSE))
-  
+
   # Inspecticate the attributes of the group_DF data frame.
   expect_equal(attributes(attr(pdata_gdf_2, 'group_DF'))$main_effects,
                c('Condition', 'Intensity'))
@@ -160,7 +160,7 @@ test_that('the correct group data frame and attributes are created',{
                c('Infection_high', 'Infection_low'))
   expect_null(attributes(attr(pdata_gdf_2, 'group_DF'))$covariates)
   expect_null(attributes(attr(pdata_gdf_2, 'group_DF'))$time_course)
-  
+
   # Checkerate the data_info attribute. The elements below should not be the
   # same as the original pepData object because the Mock samples were removed.
   expect_equal(get_data_info(pdata_gdf_2)$num_miss_obs,
@@ -170,7 +170,7 @@ test_that('the correct group data frame and attributes are created',{
                0.1978)
   expect_equal(get_data_info(pdata_gdf_2)$num_samps,
                9)
-  
+
   # The following elements of data_info should be the same as the original
   # pepData object because they were not affected by removing the Mock samples.
   expect_identical(get_data_scale_orig(pdata),
@@ -183,5 +183,149 @@ test_that('the correct group data frame and attributes are created',{
                    get_data_info(pdata_gdf_2)$num_edata)
   expect_identical(get_data_info(pdata)$data_types,
                    get_data_info(pdata_gdf_2)$data_types)
-  
+
+  # Create objects and tests for covariates ------------------------------------
+
+  # Copy edata so the names of the samples can be changed.
+  edata_3 <- edata
+
+  # Change some of the Infection samples to Mock samples.
+  names(edata_3) <- c("Mass_Tag_ID",
+                       paste0("Infection", 1:6),
+                       paste0("Mock", 1:6))
+
+  # Create additional f_data objects with different main effects and covariates.
+  fdata_3 <- fdata
+
+  # Update the sample names in f_data.
+  fdata_3$SampleID <- c(paste0("Infection", 1:6),
+                         paste0("Mock", 1:6))
+
+  # Update the first main effect to account for changing some infection samples
+  # to mock samples.
+  fdata_3$Condition <- c(rep("Infection", 6),
+                          rep("Mock", 6))
+
+  # Add a second main effect and two covariates.
+  fdata_3$Level <- c("high", "low", "high", "low", "high", "low", "high",
+                     "high", "low", "low", "low", "high")
+  set.seed(720)
+  fdata_3$Gender <- sample(c("F", "M"), 12, replace = TRUE)
+  fdata_3$Age <- round(runif(12, min = 19, max = 89), 2)
+
+  # Create a pepData object and run group_designation.
+  pdata_3 <- as.pepData(e_data = edata_3,
+                        f_data = fdata_3,
+                        edata_cname = "Mass_Tag_ID",
+                        fdata_cname = "SampleID")
+  pdata_gdf_3 <- group_designation(omicsData = pdata_3,
+                                   main_effects = c("Condition", "Level"),
+                                   covariates = c("Gender", "Age"))
+
+  # Investigate the covariates attribute.
+  expect_identical(attr(attr(pdata_gdf_3, "group_DF"), "covariates"),
+                   pdata_3$f_data[, c(1, 4, 5)])
+
+  # Use a covariate that is a factor.
+  fdata_3.2 <- fdata_3
+
+  # Convert from a factor to a character.
+  fdata_3.2$Gender <- factor(fdata_3$Gender,
+                             levels = c("F", "M"))
+
+  # Create a pepData object and run group_designation.
+  pdata_3.2 <- as.pepData(e_data = edata_3,
+                          f_data = fdata_3,
+                          edata_cname = "Mass_Tag_ID",
+                          fdata_cname = "SampleID")
+
+  # Make a feeble attempt at changing the covariate to something other than a
+  # character vector. Quickly give up and let fate overtake me as I realize it
+  # is impossible.
+  pdata_gdf_3.2 <- group_designation(omicsData = pdata_3.2,
+                                     main_effects = c("Condition", "Level"),
+                                     covariates = c("Gender", "Age"),
+                                     cov_type = c("logical", "numeric"))
+
+  # Exploricate the covariates attribute.
+  expect_type(pdata_gdf_3.2$f_data$Gender, "character")
+  expect_type(pdata_gdf_3.2$f_data$Age, "double")
+  expect_type(attr(attr(pdata_gdf_3.2, "group_DF"), "covariates")$Gender,
+              "character")
+  expect_type(attr(attr(pdata_gdf_3.2, "group_DF"), "covariates")$Age,
+              "double")
+
+  # Correctly specify that the Gender covariate should be a character vector.
+  pdata_gdf_3.4 <- group_designation(omicsData = pdata_3.2,
+                                     main_effects = c("Condition", "Level"),
+                                     covariates = c("Gender", "Age"),
+                                     cov_type = c("character", "numeric"))
+
+  # Interrogate the covariates attribute.
+  expect_type(pdata_gdf_3.4$f_data$Gender, "character")
+  expect_type(pdata_gdf_3.4$f_data$Age, "double")
+  expect_type(attr(attr(pdata_gdf_3.4, "group_DF"), "covariates")$Gender,
+              "character")
+  expect_type(attr(attr(pdata_gdf_3.4, "group_DF"), "covariates")$Age,
+              "double")
+
+  # Assemble another f_data object with 0/1 representing m/f. This will be a
+  # numeric vector that should be changed to a character vector after running
+  # group_designation.
+  fdata_4 <- fdata_3
+  set.seed(85)
+  fdata_4$Gender <- sample(0:1, 12, replace = TRUE)
+  fdata_4$Age <- fdata_3$Age
+
+  # Create a pepData object and run group_designation with the cov_type input.
+  pdata_4 <- as.pepData(e_data = edata_3,
+                        f_data = fdata_4,
+                        edata_cname = "Mass_Tag_ID",
+                        fdata_cname = "SampleID")
+  pdata_gdf_4 <- group_designation(omicsData = pdata_4,
+                                   main_effects = c("Condition", "Level"),
+                                   covariates = c("Gender", "Age"),
+                                   cov_type = c("numeric", "numeric"))
+
+  # Examinate the covariates attribute.
+  expect_identical(attr(attr(pdata_gdf_4, "group_DF"), "covariates"),
+                   pdata_4$f_data[, c(1, 4, 5)])
+
+  # Change the Gender covariate to a character vector.
+  pdata_gdf_4.3 <- group_designation(omicsData = pdata_4,
+                                     main_effects = c("Condition", "Level"),
+                                     covariates = c("Gender", "Age"),
+                                     cov_type = c("character", "numeric"))
+
+  # Checkipate the type of the covariates before and after group_designation.
+  expect_type(pdata_4$f_data$Gender, "integer")
+  expect_type(pdata_4$f_data$Age, "double")
+  expect_type(pdata_gdf_4.3$f_data$Gender, "character")
+  expect_type(pdata_gdf_4.3$f_data$Age, "double")
+  expect_type(attr(attr(pdata_gdf_4.3, "group_DF"), "covariates")$Gender,
+              "character")
+  expect_type(attr(attr(pdata_gdf_4.3, "group_DF"), "covariates")$Age,
+              "double")
+
+  # Try to change the covariates to something other than a character vector.
+  pdata_gdf_4.5 <- group_designation(omicsData = pdata_4,
+                                     main_effects = c("Condition", "Level"),
+                                     covariates = c("Gender", "Age"),
+                                     cov_type = c("logical", "raw"))
+
+  # Diagnosticate the group_DF attribute. BAM!
+  expect_type(pdata_gdf_4.5$f_data$Gender, "character")
+  expect_type(pdata_gdf_4.5$f_data$Age, "character")
+  expect_type(attr(attr(pdata_gdf_4.5, "group_DF"), "covariates")$Gender,
+              "character")
+  expect_type(attr(attr(pdata_gdf_4.5, "group_DF"), "covariates")$Age,
+              "character")
+
+  # Make sure pmart correctly brains the user with an error when the covariates
+  # and cov_type vectors are not the same length.
+  expect_error(group_designation(omicsData = pdata_4,
+                                 main_effects = c("Condition", "Level"),
+                                 covariates = c("Gender", "Age"),
+                                 cov_type = c("character")))
+
 })

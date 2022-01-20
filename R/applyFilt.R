@@ -42,16 +42,16 @@
 #'   map to a protein in omicsData. The value specifies the minimum number of
 #'   peptides that must map to a protein. Any protein with less than
 #'   \code{min_num_peps} mapping to it will be returned as a protein that should
-#'   be filtered. Default value is NULL. \cr \code{degen_peps} \tab logical
-#'   indicator of whether to filter out degenerate peptides (TRUE) or not
-#'   (FALSE). Default value is FALSE.\cr } For a \code{filter_object} of type
-#'   'imdanovaFilt': \tabular{ll}{ \code{min_nonmiss_anova} \tab integer value
+#'   be filtered. Default value is NULL. \cr \code{redundancy} \tab logical
+#'   indicator of whether to filter out degenerate/redundant peptides (peptides
+#'   that map to more than one protein). Default value is FALSE.\cr } For a
+#'   \code{filter_object} of type 'imdanovaFilt': \tabular{ll}{
+#'   \code{min_nonmiss_anova} \tab integer value specifying the minimum number
+#'   of non-missing feature values allowed per group for \code{anova_filter}.
+#'   Default value is 2. \cr \code{min_nonmiss_gtest} \tab integer value
 #'   specifying the minimum number of non-missing feature values allowed per
-#'   group for \code{anova_filter}. Default value is 2. \cr
-#'   \code{min_nonmiss_gtest} \tab integer value specifying the minimum number
-#'   of non-missing feature values allowed per group for \code{gtest_filter}.
-#'   Default value is 3.\cr } There are no further arguments for a
-#'   \code{filter_object} of type 'customFilt'.
+#'   group for \code{gtest_filter}. Default value is 3.\cr } There are no
+#'   further arguments for a \code{filter_object} of type 'customFilt'.
 #'
 #' @examples
 #' \dontrun{
@@ -195,16 +195,9 @@ applyFilt.moleculeFilt <- function(filter_object, omicsData, min_num=2){
   # Compute the length of the inds vector and specify filter.edata accordingly.
   if (length(inds) < 1) {
 
-    # Throw down a message that nothing was filtered and return the omicsData
-    # object exactly how it is because nothing was filtered.
-    message(paste("No biomolecules were filtered with the value specified for",
-                  "the min_num argument.",
-                  sep = " "))
-
-    # Return the omicsData object that was used as the input to applyFilt. No
-    # filtering occurred so the filters attribute should remain how it was
-    # before calling the applyFilt function.
-    return (omicsData)
+    # Set filter.edata to NULL because no rows in omicsData$e_data will be
+    # filtered out.
+    filter.edata <- NULL
 
   } else {
 
@@ -234,13 +227,16 @@ applyFilt.moleculeFilt <- function(filter_object, omicsData, min_num=2){
 
     # Re-run group_designation in case filtering any items impacted the group
     # structure. The attributes will also be updated in this function.
-    omicsData <- group_designation(omicsData = omicsData,
-                                   main_effects = attr(get_group_DF(omicsData),
-                                                       "main_effects"),
-                                   covariates = attr(get_group_DF(omicsData),
-                                                     "covariates"),
-                                   time_course = attr(get_group_DF(omicsData),
-                                                      "time_course"))
+
+    omicsData <- group_designation(
+      omicsData = omicsData,
+      main_effects = attr(get_group_DF(omicsData),
+                          "main_effects"),
+      covariates = names(attr(get_group_DF(omicsData),
+                              "covariates"))[-1],
+      time_course = attr(get_group_DF(omicsData),
+                         "time_course")
+    )
 
   } else {
 
@@ -333,16 +329,9 @@ applyFilt.cvFilt <- function (filter_object, omicsData, cv_threshold = 150) {
   # Compute the length of the inds vector and specify filter.edata accordingly.
   if (length(inds) < 1) {
 
-    # Throw down a message that nothing was filtered and return the omicsData
-    # object exactly how it is because nothing was filtered.
-    message(paste("No biomolecules were filtered with the value specified for",
-                  "the cv_threshold argument.",
-                  sep = " "))
-
-    # Return the omicsData object that was used as the input to applyFilt. No
-    # filtering occurred so the filters attribute should remain how it was
-    # before calling the applyFilt function.
-    return (omicsData)
+    # Set filter.edata to NULL because no rows in omicsData$e_data will be
+    # filtered out.
+    filter.edata <- NULL
 
   } else {
 
@@ -372,13 +361,16 @@ applyFilt.cvFilt <- function (filter_object, omicsData, cv_threshold = 150) {
 
     # Re-run group_designation in case filtering any items impacted the group
     # structure. The attributes will also be updated in this function.
-    omicsData <- group_designation(omicsData = omicsData,
-                                   main_effects = attr(get_group_DF(omicsData),
-                                                       "main_effects"),
-                                   covariates = attr(get_group_DF(omicsData),
-                                                     "covariates"),
-                                   time_course = attr(get_group_DF(omicsData),
-                                                      "time_course"))
+
+    omicsData <- group_designation(
+      omicsData = omicsData,
+      main_effects = attr(get_group_DF(omicsData),
+                          "main_effects"),
+      covariates = names(attr(get_group_DF(omicsData),
+                              "covariates"))[-1],
+      time_course = attr(get_group_DF(omicsData),
+                         "time_course")
+    )
 
   } else {
 
@@ -474,16 +466,9 @@ applyFilt.rmdFilt <- function (filter_object, omicsData,
   # Compute the length of the inds vector and specify filter.samp accordingly.
   if (length(inds) < 1) {
 
-    # Throw down a message that nothing was filtered and return the omicsData
-    # object exactly how it is because nothing was filtered.
-    message(paste("No samples were filtered with the value specified for",
-                  "the pvalue_threshold argument.",
-                  sep = " "))
-
-    # Return the omicsData object that was used as the input to applyFilt. No
-    # filtering occurred so the filters attribute should remain how it was
-    # before calling the applyFilt function.
-    return (omicsData)
+    # Set filter.samp to NULL because no columns in omicsData$e_data will be
+    # filtered out.
+    filter.samp <- NULL
 
     # Check if the number of indices to filter is equal to the total number of
     # samples.
@@ -520,13 +505,15 @@ applyFilt.rmdFilt <- function (filter_object, omicsData,
 
     # Re-run group_designation in case filtering any items impacted the group
     # structure. The attributes will also be updated in this function.
-    omicsData <- group_designation(omicsData = omicsData,
-                                   main_effects = attr(get_group_DF(omicsData),
-                                                       "main_effects"),
-                                   covariates = attr(get_group_DF(omicsData),
-                                                     "covariates"),
-                                   time_course = attr(get_group_DF(omicsData),
-                                                      "time_course"))
+    omicsData <- group_designation(
+      omicsData = omicsData,
+      main_effects = attr(get_group_DF(omicsData),
+                          "main_effects"),
+      covariates = names(attr(get_group_DF(omicsData),
+                              "covariates"))[-1],
+      time_course = attr(get_group_DF(omicsData),
+                         "time_course")
+    )
 
   } else {
 
@@ -580,7 +567,7 @@ applyFilt.rmdFilt <- function (filter_object, omicsData,
 applyFilt.proteomicsFilt <- function (filter_object,
                                       omicsData,
                                       min_num_peps = NULL,
-                                      degen_peps = FALSE) {
+                                      redundancy = FALSE) {
 
   # Perform initial checks on the input arguments ------------------------------
 
@@ -592,14 +579,13 @@ applyFilt.proteomicsFilt <- function (filter_object,
 
   }
 
-  # Make sure either min_num_peps or degen_peps is specified. This means
-  # min_num_peps must not be NULL or degen_peps must not be FALSE.
-  if (is.null(min_num_peps) && !degen_peps) {
+  # Make sure at least some of the peptides or proteins will be filtered. This
+  # means min_num_peps must not be null or redundancy must not be FALSE.
+  if (is.null(min_num_peps) && !redundancy) {
 
     # Warn the user that no filtering will actually occur.
-    stop (paste("Either min_num_peps or degen_peps must be specified. Change",
-                "either min_num_peps to an integer > 1 or change degen_peps",
-                "to TRUE.",
+    stop (paste("No peptides or proteins will be filtered. Either change",
+                "min_num_peps to an integer > 1 or change redundancy to TRUE.",
                 sep = " "))
 
   }
@@ -636,11 +622,11 @@ applyFilt.proteomicsFilt <- function (filter_object,
 
   }
 
-  # check that degen_peps is logical #
-  if (!inherits(degen_peps, "logical")) {
+  # check that redundancy is logical #
+  if (!inherits(redundancy, "logical")) {
 
     # Warn the illogical user that their inputs are also illogical.
-    stop ("degen_peps must be either TRUE or FALSE")
+    stop ("redundancy must be either TRUE or FALSE")
 
   }
 
@@ -652,8 +638,8 @@ applyFilt.proteomicsFilt <- function (filter_object,
   # Extract the column name containing the protein IDs.
   pro_id = attr(omicsData, "cnames")$emeta_cname
 
-  # Check if degen_peps is TRUE.
-  if (degen_peps) {
+  # Check if redundancy is TRUE.
+  if (redundancy) {
 
     count_bypep <- filter_object$counts_by_pep
 
@@ -733,25 +719,6 @@ applyFilt.proteomicsFilt <- function (filter_object,
 
   }
 
-  # Check if all of the elements in both pepe and pepe2 are NULL. If they are
-  # then nothing will be filtered. In R TRUE is represented by a one. If the
-  # sum of the two vectors: is.null(pepe) and is.null(pepe2) is 4 that means all
-  # elements in these two lists is NULL and nothing will be filtered.
-  if (sum(sapply(pepe2, is.null), sapply(pepe, is.null)) == 4) {
-
-    # Throw down a message that nothing was filtered and return the omicsData
-    # object exactly how it is because nothing was filtered.
-    message(paste("No peptides/proteins were filtered with the values",
-                  "specified for the min_num_peps and degen_peps arguments.",
-                  sep = " "))
-
-    # Return the omicsData object that was used as the input to applyFilt. No
-    # filtering occurred so the filters attribute should remain how it was
-    # before calling the applyFilt function.
-    return (omicsData)
-
-  }
-
   # Consolidate pepe and pepe2 to pass to the pmartR_filter_worker function.
   filter_object_new <- list(e_meta_remove = unique(c(pepe$e_meta_remove,
                                                      pepe2$e_meta_remove)),
@@ -788,13 +755,15 @@ applyFilt.proteomicsFilt <- function (filter_object,
 
     # Re-run group_designation in case filtering any items impacted the group
     # structure. The attributes will also be updated in this function.
-    omicsData <- group_designation(omicsData = omicsData,
-                                   main_effects = attr(get_group_DF(omicsData),
-                                                       "main_effects"),
-                                   covariates = attr(get_group_DF(omicsData),
-                                                     "covariates"),
-                                   time_course = attr(get_group_DF(omicsData),
-                                                      "time_course"))
+    omicsData <- group_designation(
+      omicsData = omicsData,
+      main_effects = attr(get_group_DF(omicsData),
+                          "main_effects"),
+      covariates = names(attr(get_group_DF(omicsData),
+                              "covariates"))[-1],
+      time_course = attr(get_group_DF(omicsData),
+                         "time_course")
+    )
 
   } else {
 
@@ -832,7 +801,7 @@ applyFilt.proteomicsFilt <- function (filter_object,
     threshold = data.frame(min_num_peps = ifelse(is.null(min_num_peps),
                                                  NA,
                                                  min_num_peps),
-                           degen_peps = as.character(degen_peps)),
+                           redundancy = as.character(redundancy)),
     filtered = filter_object_new,
     method = NA
   )
@@ -1133,16 +1102,9 @@ applyFilt.imdanovaFilt <- function (filter_object,
   # removed
   if (length(filter.edata) < 1) {
 
-    # Throw down a message that nothing was filtered and return the omicsData
-    # object exactly how it is because nothing was filtered.
-    message(paste("No biomolecules were filtered with the values specified for",
-                  "the min_nonmiss_anova and/or min_nonmiss_gtest arguments.",
-                  sep = " "))
-
-    # Return the omicsData object that was used as the input to applyFilt. No
-    # filtering occurred so the filters attribute should remain how it was
-    # before calling the applyFilt function.
-    return (omicsData)
+    # Stop the remainder of the function from running because none of the
+    # samples will be filtered.
+    stop ("None of the samples will be removed with the current thresholds.")
 
   } else {
 
@@ -1169,13 +1131,15 @@ applyFilt.imdanovaFilt <- function (filter_object,
 
     # Re-run group_designation in case filtering any items impacted the group
     # structure. The attributes will also be updated in this function.
-    omicsData <- group_designation(omicsData = omicsData,
-                                   main_effects = attr(get_group_DF(omicsData),
-                                                       "main_effects"),
-                                   covariates = attr(get_group_DF(omicsData),
-                                                     "covariates"),
-                                   time_course = attr(get_group_DF(omicsData),
-                                                      "time_course"))
+    omicsData <- group_designation(
+      omicsData = omicsData,
+      main_effects = attr(get_group_DF(omicsData),
+                          "main_effects"),
+      covariates = names(attr(get_group_DF(omicsData),
+                              "covariates"))[-1],
+      time_course = attr(get_group_DF(omicsData),
+                         "time_course")
+    )
 
   } else {
 
@@ -1341,13 +1305,15 @@ applyFilt.customFilt <- function (filter_object, omicsData) {
 
     # Re-run group_designation in case filtering any items impacted the group
     # structure. The attributes will also be updated in this function.
-    omicsData <- group_designation(omicsData = omicsData,
-                                   main_effects = attr(get_group_DF(omicsData),
-                                                       "main_effects"),
-                                   covariates = attr(get_group_DF(omicsData),
-                                                     "covariates"),
-                                   time_course = attr(get_group_DF(omicsData),
-                                                      "time_course"))
+    omicsData <- group_designation(
+      omicsData = omicsData,
+      main_effects = attr(get_group_DF(omicsData),
+                          "main_effects"),
+      covariates = names(attr(get_group_DF(omicsData),
+                              "covariates"))[-1],
+      time_course = attr(get_group_DF(omicsData),
+                         "time_course")
+    )
 
   } else {
 

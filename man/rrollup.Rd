@@ -40,7 +40,7 @@ Matzke, M. M., Brown, J. N., Gritsenko, M. A., Metz, T. O.,
   comparative analysis of computational approaches to relative protein
   quantification using peptide peak intensities in label-free LC-MS
   proteomics experiments}. Proteomics, 13(0), 493-503.
-  
+
   Polpitiya, A. D., Qian, W.-J., Jaitly, N., Petyuk, V. A., Adkins, J. N.,
   Camp, D. G., ... Smith, R. D. (2008). \emph{DAnTE: a statistical tool for
   quantitative analysis of -omics data}. Bioinformatics (Oxford, England),
