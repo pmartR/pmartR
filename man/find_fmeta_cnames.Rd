@@ -2,7 +2,8 @@
 % Please edit documentation in R/as.multiData.R
 \name{find_fmeta_cnames}
 \alias{find_fmeta_cnames}
-\title{Set column names in f_meta for each object.  May result in duplicates.}
+\title{Find column names in f_meta for each object.  May return in two objects
+sharing the same column name.}
 \usage{
 find_fmeta_cnames(res)
 }
@@ -16,6 +17,7 @@ Character vector containing a column name in f_meta that the i-th
 object matches to
 }
 \description{
-Set column names in f_meta for each object.  May result in duplicates.
+Find column names in f_meta for each object.  May return in two objects
+sharing the same column name.
 }
 \keyword{internal}
