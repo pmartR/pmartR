@@ -979,3 +979,13 @@ get_group_table <- function (omicsObject) {
 
 }
 
+#' Custom message functions to pretty-print text with newlines so you can follow
+#' character limit guidelines in source code.
+#' @noRd
+wrap_message <- function(..., prefix = " ", initial = ""){
+  message(strwrap(..., prefix = prefix, initial = initial))
+}
+
+wrap_warning <- function(..., prefix = " ", initial = ""){
+  warning(strwrap(..., prefix = prefix, initial = initial))
+}
