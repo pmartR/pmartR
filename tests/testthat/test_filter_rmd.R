@@ -636,5 +636,21 @@ test_that("rmd_filter and applyFilt produce the correct output",{
   expect_identical(delim_rmd$Corr, pfilter_rmd$Corr)
   expect_identical(delim_rmd$Proportion_Missing, pfilter_rmd$Proportion_Missing)
 
+  # Test scenario when nothing is filtered -------------------------------------
+
+  # Apply the filter with a value for pvalue_threshold that will not filter any
+  # samples.
+  expect_message(noFilta <- applyFilt(filter_object = pfilter_rmd,
+                                      omicsData = pdata,
+                                      pvalue_threshold = 0.0000000000000000001,
+                                      min_num_biomolecules = 50),
+                 paste("No samples were filtered with the value specified",
+                       "for the pvalue_threshold argument.",
+                       sep = " "))
+
+  # The output of applyFilt should be the same as the omicsData object used as
+  # the input because the filter was not applied. Therefore, the filters
+  # attribute should remain how it was before running applyFilt.
+  expect_identical(noFilta, pdata)
 
 })
