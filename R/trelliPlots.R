@@ -100,6 +100,16 @@ trelli_precheck <- function(trelliData, trelliCheck,
   
 }
 
+# A quick cognostic function 
+quick_cog <- function(name, value) {
+  dplyr::tibble(!!rlang::sym(name) := trelliscopejs::cog(value, desc = name))
+}
+
+# Create a list to convert from short name to long
+name_converter <- list("n" = "Count", "mean" = "Mean Abundance", 
+                       "median" = "Median Abundance", "sd" = "Standard Deviation Abundance", 
+                       "skew" = "Skew Abundance", "p_value" = "P Value", "fold_change" = "Fold Change")
+
 # This function builds all trelliscopes.
 trelli_builder <- function(toBuild, cognostics, plotFUN, cogFUN, path, name, ...) {
   
@@ -263,8 +273,10 @@ trelli_abundance_boxplot <- function(trelliData,
       "skew" = dplyr::tibble(`Skew Abundance` = trelliscopejs::cog(round(e1071::skewness(DF$Abundance, na.rm = T), 4), desc= "Abundance Skewness"))
     )
     
-    # Start list of cogs
-    cog_to_trelli <- do.call(dplyr::bind_cols, lapply(cognostics, function(x) {cog[[x]]})) %>% tibble::tibble()
+    # If cognostics are any of the cog, then add them 
+    if (any(cognostics %in% c("n", "mean", "median", "sd", "skew"))) {
+      cog_to_trelli <- do.call(dplyr::bind_cols, lapply(cognostics, function(x) {cog[[x]]})) %>% tibble::tibble()
+    } else {cog_to_trelli <- NULL}
     
     # Get fdata cname and group_by selection
     fdata_cname <- pmartR::get_fdata_cname(trelliData$omicsData)
@@ -272,17 +284,7 @@ trelli_abundance_boxplot <- function(trelliData,
     
     # Additional group cognostics can be added only if group_designation was set and
     # trelli_group_by is not the fdata_cname
-    if (!is.null(attributes(trelliData$omicsData)$group_DF) & fdata_cname != group_by_choice) {
-      
-      # A quick cognostic function 
-      quick_cog <- function(name, value) {
-        dplyr::tibble(!!rlang::sym(name) := trelliscopejs::cog(value, desc = name))
-      }
-      
-      # Create a list to convert from short name to long
-      name_converter <- list("n" = "Count", "mean" = "Mean Abundance", 
-                             "median" = "Median Abundance", "sd" = "Standard Deviation Abundance", 
-                             "skew" = "Skew Abundance", "p_value" = "P Value", "fold_change" = "Fold Change")
+    if (!is.null(attributes(trelliData$omicsData)$group_DF) & fdata_cname != group_by_choice & !is.null(cog_to_trelli)) {
       
       # Since the number of groups is unknown, first group_by the Groups,
       # then calculate all summary statistics, pivot to long format,
@@ -317,26 +319,40 @@ trelli_abundance_boxplot <- function(trelliData,
     
     if (!is.null(trelliData$trelliData.stat) && edata_cname == attr(trelliData, "group_by_stat")) {
       
-      # Subset down the dataframe down to group, unnest the dataframe, 
-      # pivot_longer to comparison, subset columns to requested statistics, 
-      # switch name to a more specific name
-      cogs_to_add <- trelliData$trelliData.stat %>%
-        dplyr::filter(trelliData$trelliData.stat[[edata_cname]] == biomolecule) %>%
-        dplyr::select(Nested_DF) %>%
-        tidyr::unnest(cols = c(Nested_DF)) %>%
-        dplyr::select(c(Comparison, p_value, fold_change)) %>%
-        tidyr::pivot_longer(c(p_value, fold_change)) %>%
-        dplyr::mutate(
-          name = paste(Comparison, lapply(name, function(x) {name_converter[[x]]}) %>% unlist()),
-          value = round(value, 4)
-        ) %>%
-        dplyr::ungroup() %>%
-        dplyr::select(-Comparison)
+      # Downselect to only stats 
+      stat_cogs <- cognostics[cognostics %in% c("fold_change", "p_value")]
       
-      # Add new cognostics 
-      cog_to_trelli <- cbind(cog_to_trelli, do.call(cbind, lapply(1:nrow(cogs_to_add), function(row) {
-        quick_cog(cogs_to_add$name[row], cogs_to_add$value[row])
-      })) %>% tibble::tibble()) %>% tibble::tibble()
+      if (length(stat_cogs) != 0) {
+        
+        # Subset down the dataframe down to group, unnest the dataframe, 
+        # pivot_longer to comparison, subset columns to requested statistics, 
+        # switch name to a more specific name
+        cogs_to_add <- trelliData$trelliData.stat %>%
+          dplyr::filter(trelliData$trelliData.stat[[edata_cname]] == biomolecule) %>%
+          dplyr::select(Nested_DF) %>%
+          tidyr::unnest(cols = c(Nested_DF)) %>%
+          dplyr::select(c(Comparison, stat_cogs)) %>%
+          tidyr::pivot_longer(stat_cogs) %>%
+          dplyr::mutate(
+            name = paste(Comparison, lapply(name, function(x) {name_converter[[x]]}) %>% unlist()),
+            value = round(value, 4)
+          ) %>%
+          dplyr::ungroup() %>%
+          dplyr::select(-Comparison)
+        
+        # Generate new cognostics 
+        new_cogs <- do.call(cbind, lapply(1:nrow(cogs_to_add), function(row) {
+          quick_cog(cogs_to_add$name[row], cogs_to_add$value[row])
+        })) %>% tibble::tibble()
+        
+        # Add new cognostics 
+        if (!is.null(cog_to_trelli)) {
+          cog_to_trelli <- cbind(cog_to_trelli, new_cogs) %>% tibble::tibble()
+        } else {
+          cog_to_trelli <- new_cogs
+        }
+        
+      }
       
     }
     
@@ -390,16 +406,18 @@ trelli_abundance_boxplot <- function(trelliData,
 #' 
 #' ## Build the abundance boxplot with an omicsData object. Generate trelliData in as.trelliData
 #' trelli_group_by(trelliData = trelliData2, group = "LipidCommonName") %>% 
-#'    trelli_abundance_boxplot(test_mode = T, test_example = 1:10)
+#'    trelli_abundance_histogram(test_mode = T, test_example = 1:10)
 #'     
 #' ## Build the abundance boxplot with an omicsData and statRes object. Generate trelliData in as.trelliData.
 #' trelli_group_by(trelliData = trelliData4, group = "LipidCommonName") %>%
-#'    trelli_abundance_boxplot(test_mode = T, test_example = 1:10)
+#'    trelli_abundance_histogram(test_mode = T, test_example = 1:10)
 #'    
-#' ## Users can modify the plotting function with ggplot parameters and interactivity.     
+#' ## Users can modify the plotting function with ggplot parameters and interactivity, 
+#' ## and can also select certain cognostics.     
 #' trelli_group_by(trelliData = trelliData, group = "LipidCommonName") %>% 
 #'    trelli_abundance_histogram(test_mode = T, test_example = 1:10, 
-#'      ggplot_params = c("ylab('')", "ylim(c(1,2))"), interactive = TRUE)  
+#'      ggplot_params = c("ylab('')", "xlab('Abundance')"), interactive = TRUE,
+#'      cognostics = c("mean", "median"))  
 #'    
 #' }
 #' 
@@ -450,6 +468,9 @@ trelli_abundance_histogram <- function(trelliData,
   # First, generate the boxplot function
   hist_plot_fun <- function(DF, title) {
     
+    # Remove NAs
+    DF <- DF[!is.na(DF$Abundance),]
+    
     # Build plot 
     histogram <- ggplot2::ggplot(DF, ggplot2::aes(x = Abundance)) + 
       ggplot2::geom_histogram(bins = 10, fill = "steelblue", color = "black") + ggplot2::ggtitle(title) +
@@ -488,32 +509,48 @@ trelli_abundance_histogram <- function(trelliData,
       "skew" = dplyr::tibble(`Skew Abundance` = trelliscopejs::cog(round(e1071::skewness(DF$Abundance, na.rm = T), 4), desc= "Abundance Skewness"))
     )
     
-    # Start list of cogs
-    cog_to_trelli <- do.call(dplyr::bind_cols, lapply(cognostics, function(x) {cog[[x]]})) %>% tibble::tibble()
+    # If cognostics are any of the cog, then add them 
+    if (any(cognostics %in% c("n", "mean", "median", "sd", "skew"))) {
+      cog_to_trelli <- do.call(dplyr::bind_cols, lapply(cognostics, function(x) {cog[[x]]})) %>% tibble::tibble()
+    } else {cog_to_trelli <- NULL}
     
     # Add statistics if applicable 
     if (!is.null(trelliData$trelliData.stat)) {
       
-      # Subset down the dataframe down to group, unnest the dataframe, 
-      # pivot_longer to comparison, subset columns to requested statistics, 
-      # switch name to a more specific name
-      cogs_to_add <- trelliData$trelliData.stat %>%
-        dplyr::filter(trelliData$trelliData.stat[[edata_cname]] == biomolecule) %>%
-        dplyr::select(Nested_DF) %>%
-        tidyr::unnest(cols = c(Nested_DF)) %>%
-        dplyr::select(c(Comparison, p_value, fold_change)) %>%
-        tidyr::pivot_longer(c(p_value, fold_change)) %>%
-        dplyr::mutate(
-          name = paste(Comparison, lapply(name, function(x) {name_converter[[x]]}) %>% unlist()),
-          value = round(value, 4)
-        ) %>%
-        dplyr::ungroup() %>%
-        dplyr::select(-Comparison)
+      # Downselect to only stats 
+      stat_cogs <- cognostics[cognostics %in% c("fold_change", "p_value")]
       
-      # Add new cognostics 
-      cog_to_trelli <- cbind(cog_to_trelli, do.call(cbind, lapply(1:nrow(cogs_to_add), function(row) {
-        quick_cog(cogs_to_add$name[row], cogs_to_add$value[row])
-      })) %>% tibble::tibble()) %>% tibble::tibble()
+      if (length(stat_cogs) != 0) {
+        
+        # Subset down the dataframe down to group, unnest the dataframe, 
+        # pivot_longer to comparison, subset columns to requested statistics, 
+        # switch name to a more specific name
+        cogs_to_add <- trelliData$trelliData.stat %>%
+          dplyr::filter(trelliData$trelliData.stat[[edata_cname]] == biomolecule) %>%
+          dplyr::select(Nested_DF) %>%
+          tidyr::unnest(cols = c(Nested_DF)) %>%
+          dplyr::select(c(Comparison, stat_cogs)) %>%
+          tidyr::pivot_longer(stat_cogs) %>%
+          dplyr::mutate(
+            name = paste(Comparison, lapply(name, function(x) {name_converter[[x]]}) %>% unlist()),
+            value = round(value, 4)
+          ) %>%
+          dplyr::ungroup() %>%
+          dplyr::select(-Comparison)
+        
+        # Generate new cognostics 
+        new_cogs <- do.call(cbind, lapply(1:nrow(cogs_to_add), function(row) {
+          quick_cog(cogs_to_add$name[row], cogs_to_add$value[row])
+        })) %>% tibble::tibble()
+        
+        # Add new cognostics 
+        if (!is.null(cog_to_trelli)) {
+          cog_to_trelli <- cbind(cog_to_trelli, new_cogs) %>% tibble::tibble()
+        } else {
+          cog_to_trelli <- new_cogs
+        }
+        
+      }
       
     }
     
