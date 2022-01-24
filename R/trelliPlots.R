@@ -134,6 +134,16 @@ trelli_builder <- function(toBuild, cognostics, plotFUN, cogFUN, path, name, ...
   }
 }
 
+# Get downloads folder
+getDownloadsFolder <- function() {
+  if (Sys.info()['sysname'] == "Windows")
+    folder <- dirname("~")
+  else
+    folder <- path.expand("~")
+  folder <- file.path(folder, "Downloads")
+  folder <- paste0(folder, .Platform$file.sep)
+  return(folder)
+}
 
 #' @name trelli_abundance_boxplot
 #' 
@@ -193,7 +203,7 @@ trelli_abundance_boxplot <- function(trelliData,
                                      cognostics = c("n", "mean", "median", "sd", "skew", "p_value", "fold_change"),
                                      ggplot_params = NULL,
                                      interactive = FALSE,
-                                     path = "~/Downloads/Trelliscope",
+                                     path = getDownloadsFolder(),
                                      name = "Trelliscope",
                                      test_mode = FALSE,
                                      test_example = 1,
@@ -384,9 +394,10 @@ trelli_abundance_boxplot <- function(trelliData,
 #'    Main_effects grouping are ignored. Data must be grouped by edata_cname. 
 #' 
 #' @param trelliData A trelliscope data object made by as.trelliData or as.trelliData.edata,
-#'    and grouped by trelli_group_by. Required. 
+#'    and grouped by edata_cname in trelli_group_by. Required. 
 #' @param cognostics A vector of cognostic options for each plot. Valid entries are
-#'    n, mean, median, sd, and skew.
+#'    n, mean, median, sd, and skew. p_value and fold_change can be added if statRes
+#'    is included.
 #' @param ggplot_params An optional vector of strings of ggplot parameters to the backend ggplot
 #'    function. For example, c("ylab('')", "ylim(c(1,2))"). Default is NULL. 
 #' @param interactive A logical argument indicating whether the plots should be interactive
@@ -426,14 +437,14 @@ trelli_abundance_boxplot <- function(trelliData,
 #' 
 #' @export
 trelli_abundance_histogram <- function(trelliData,
-                                     cognostics = c("n", "mean", "median", "sd", "skew", "p_value", "fold_change"),
-                                     ggplot_params = NULL,
-                                     interactive = FALSE,
-                                     path = "~/Downloads/Trelliscope",
-                                     name = "Trelliscope",
-                                     test_mode = FALSE,
-                                     test_example = 1,
-                                     ...) {
+                                       cognostics = c("n", "mean", "median", "sd", "skew", "p_value", "fold_change"),
+                                       ggplot_params = NULL,
+                                       interactive = FALSE,
+                                       path = getDownloadsFolder(),
+                                       name = "Trelliscope",
+                                       test_mode = FALSE,
+                                       test_example = 1,
+                                       ...) {
   
   # Run initial checks----------------------------------------------------------
   
@@ -465,7 +476,7 @@ trelli_abundance_histogram <- function(trelliData,
   
   # Make histogram function-----------------------------------------------------
   
-  # First, generate the boxplot function
+  # First, generate the histogram function
   hist_plot_fun <- function(DF, title) {
     
     # Remove NAs
@@ -574,8 +585,165 @@ trelli_abundance_histogram <- function(trelliData,
   
 }
 
+#' @name trelli_abundance_heatmap
+#' 
+#' @title Heatmap trelliscope building function for abundance data   
+#' 
+#' @description Specify a plot design and cognostics for the abundance heatmap trelliscope.
+#'    Data must be grouped by an emeta column. Main_effects order the y-variables. All 
+#'    statRes data is ignored. 
+#' 
+#' @param trelliData A trelliscope data object made by as.trelliData,
+#'    and grouped by an emeta variable. Required. 
+#' @param cognostics A vector of cognostic options for each plot. Valid entries are
+#'    n, mean, median, sd, and skew per "main_effects" group designation. Otherwise, 
+#'    no cognostics are returned. 
+#' @param ggplot_params An optional vector of strings of ggplot parameters to the backend ggplot
+#'    function. For example, c("ylab('')", "xlab('')"). Default is NULL. 
+#' @param interactive A logical argument indicating whether the plots should be interactive
+#'    or not. Interactive plots are ggplots piped to ggplotly (for now). Default is FALSE.  
+#' @param path The base directory of the trelliscope application. Default is Downloads. 
+#' @param name The name of the display. Default is Trelliscope.
+#' @param test_mode A logical to return a smaller trelliscope to confirm plot and design.
+#'    Default is FALSE.
+#' @param test_example The index number of the plot to return for test_mode. Default is 1. 
+#' 
+#' @examples
+#' \dontrun{
+#' 
+#' ## Build the abundance histogram with an omicsData object with emeta variables. Generate trelliData in as.trelliData.
+#' trelli_group_by(trelliData = trelliData2, group = "LipidFamily") %>% 
+#'    trelli_abundance_heatmap(test_mode = T, test_example = 1:3)
+#'    
+#' ## Users can modify the plotting function with ggplot parameters and interactivity, 
+#' ## and can also select certain cognostics.     
+#' trelli_group_by(trelliData = trelliData4, group = "LipidFamily") %>% 
+#'    trelli_abundance_heatmap(test_mode = T, test_example = 1:5, 
+#'      ggplot_params = c("ylab('')", "xlab('')"), interactive = TRUE, cognostics = c("mean", "median"))  
+#'    
+#' }
+#' 
+#' 
+#' @author David Degnan, Lisa Bramer
+#' 
+#' @export
+trelli_abundance_heatmap <- function(trelliData,
+                                     cognostics = c("n", "mean", "median", "sd", "skew"),
+                                     ggplot_params = NULL,
+                                     interactive = FALSE,
+                                     path = getDownloadsFolder(),
+                                     name = "Trelliscope",
+                                     test_mode = FALSE,
+                                     test_example = 1,
+                                     ...) {
+  
+  # Run initial checks----------------------------------------------------------
+  
+  # Run generic checks 
+  trelli_precheck(trelliData = trelliData, 
+                  trelliCheck = "omics",
+                  cognostics = cognostics,
+                  acceptable_cognostics = c("n", "mean", "median", "sd", "skew", "p_value", "fold_change"),
+                  ggplot_params = ggplot_params,
+                  interactive = interactive,
+                  test_mode = test_mode, 
+                  test_example = test_example)
+  
+  # Round test example to integer 
+  if (test_mode) {test_example <- unique(abs(round(test_example)))}
+  
+  # Check that group data is grouped by an e_meta variable
+  if (attr(trelliData, "group_by_omics") %in% attr(trelliData, "emeta_col") == FALSE) {
+    stop("trelliData must be grouped_by an e_meta column.")
+  }
+  
+  # If no group designation, set cognostics to NULL. 
+  if (is.null(attributes(trelliData2$omicsData)$group_DF)) {
+    congnostics <- NULL
+  }
+  
+  # Make heatmap function-------------------------------------------------------
+  
+  # First, generate the heatmap function
+  hm_plot_fun <- function(DF, title) {
+    
+    # If group designation was set, then convert Group to a factor variable 
+    if (is.null(attributes(trelliData$omicsData)$group_DF)) {
+      DF$Group <- factor(DF$Sample_Name, levels = attributes(trelliData2$omicsData)$group_DF$Sample_Name)
+    } 
+    
+    # Build plot 
+    hm <- ggplot2::ggplot(DF, ggplot2::aes(x = LipidCommonName, y = Sample_Name, fill = Abundance)) +
+      ggplot2::geom_tile() + ggplot2::theme_bw() + ggplot2::ylab("Sample") + ggplot2::xlab("Biomolecule") +
+      ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5), 
+                     axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+      ggplot2::scale_fill_gradient(low = "blue", high = "red", na.value = "white") +
+      ggplot2::ggtitle(title)
 
-# trelli_abundance_heatmap (emeta only)
+    # Add additional parameters
+    if (!is.null(ggplot_params)) {
+      for (param in ggplot_params) {
+        hm <- hm + eval(parse(text = paste0("ggplot2::", param)))
+      }
+    }
+    
+    # If interactive, pipe to ggplotly
+    if (interactive) {
+      hm <- hm %>% plotly::ggplotly()
+    }
+    
+    return(hm)
+    
+  }
+  
+  # Create cognostic function---------------------------------------------------
+  
+  hm_cog_fun <- function(DF, emeta_var) {
+    
+    # Subset down the dataframe down to group, unnest the dataframe, 
+    # pivot_longer to comparison, subset columns to requested statistics, 
+    # switch name to a more specific name
+    cogs_to_add <- DF %>%
+      dplyr::group_by(Group) %>%
+      dplyr::summarise(
+        "n" = sum(!is.na(Abundance)), 
+        "mean" = round(mean(Abundance, na.rm = T), 4),
+        "median" = round(median(Abundance, na.rm = T), 4),
+        "sd" = round(sd(Abundance, na.rm = T), 4),
+        "skew" = round(e1071::skewness(Abundance, na.rm = T), 4)
+      ) %>%
+      tidyr::pivot_longer(c(n, mean, median, sd, skew)) %>%
+      dplyr::filter(name %in% cognostics) %>%
+      dplyr::mutate(
+        name = paste(Group, lapply(name, function(x) {name_converter[[x]]}) %>% unlist())
+      ) %>%
+      dplyr::ungroup() %>%
+      dplyr::select(-Group) 
+    
+    # Add new cognostics 
+    cog_to_trelli <- do.call(cbind, lapply(1:nrow(cogs_to_add), function(row) {
+      quick_cog(cogs_to_add$name[row], cogs_to_add$value[row])
+    })) %>% tibble::tibble() 
+    
+    return(cog_to_trelli)
+    
+  } 
+  
+  # Build trelliscope display---------------------------------------------------
+  
+  # If test_mode is on, then just build the required panels
+  if (test_mode) {toBuild <- trelliData$trelliData.omics[test_example,]} else {toBuild <- trelliData$trelliData.omics}
+  
+  # Pass parameters to trelli_builder function
+  trelli_builder(toBuild = toBuild,
+                 cognostics = cognostics, 
+                 plotFUN = hm_plot_fun,
+                 cogFUN = hm_cog_fun,
+                 path = path,
+                 name = name,
+                 ...)
+  
+}
 
 # trelli_missingness_bar 
 
