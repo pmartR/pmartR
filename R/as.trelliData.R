@@ -92,7 +92,7 @@
 #'                                   
 #' }   
 #'           
-#' @author David Degnan, Daniel Claborne
+#' @author David Degnan, Daniel Claborne, Lisa Bramer
 #' 
 #' @export
 as.trelliData.edata <- function(e_data, 
@@ -264,7 +264,7 @@ as.trelliData.edata <- function(e_data,
 #' trelliData4 <- as.trelliData(omicsData = omicsData, statRes = statRes)
 #' }
 #' 
-#' @author David Degnan
+#' @author David Degnan, Lisa Bramer
 #' 
 #' @export
 as.trelliData <- function(omicsData = NULL, statRes = NULL, ...) {
@@ -491,7 +491,7 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL, ...) {
 #' 
 #' }  
 #' 
-#' @author David Degnan
+#' @author David Degnan, Lisa Bramer
 #' 
 #' @export
 trelli_group_by <- function(trelliData, group) {
@@ -555,7 +555,6 @@ trelli_group_by <- function(trelliData, group) {
   # Group and nest samples------------------------------------------------------
   
   .group_samples <- function(trelliData_subclass) {
-    
     trelliData_subclass %>%
       dplyr::group_by_at(group) %>%
       tidyr::nest() %>%

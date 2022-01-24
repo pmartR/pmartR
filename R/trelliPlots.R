@@ -1,8 +1,128 @@
+# This function runs necessary checks for pmartR trelliscope plotting functions. 
+# It cleans any parameters (rounding numerics to integers, etc.), and returns them.
+trelli_precheck <- function(trelliData, trelliCheck,
+                            cognostics, acceptable_cognostics,
+                            ggplot_params,
+                            interactive, 
+                            test_mode,
+                            test_example) {
+  
+  #######################
+  ## trelliData checks ##
+  #######################
+  
+  # trelliData object must be of the trelliData class
+  if (any(class(trelliData) %in% c("trelliData")) == FALSE) {
+    stop("trelliData must be of the class trelliData.")
+  }
+  
+  # Check that trelliData has been passed to the "trelli_group_by" function.
+  if (!attr(trelliData, "group_by")) {
+    stop("trelliData must be grouped with trelli_group_by.")
+  }
+  
+  # Check that omics data exists
+  if ("omics" %in% trelliCheck) {
+    
+    # Assert that trelliData has omicsData
+    if (is.null(trelliData$trelliData.omics)) {
+      stop("trelliData must have omicsData for this plotting function.")
+    }
+    
+  }
+  
+  # Check that statRes data exists 
+  if ("stat" %in% trelliCheck) {
+    
+    # Assert that trelliData has statRes
+    if (is.null(trelliData$trelliData.stat)) {
+      stop("trelliData must have statRes for this plotting function.")
+    }
+    
+  }
+  
+  ######################
+  ## COGNOSTIC CHECKS ##
+  ######################
+  
+  # If cognostics are not NULL...
+  if (!is.null(cognostics)) {
+    
+    # ...assert that cognostics are acceptable options 
+    if (all(cognostics %in% acceptable_cognostics) == FALSE) {
+      stop(paste("Unacceptable cognostic option included. Acceptable options are: ", 
+                 paste(acceptable_cognostics, collapse = ", ")))
+    }
+    
+  }
+  
+  #########################
+  ## GGPLOT PARAMS CHECK ##
+  #########################
+  
+  # If ggplot_params is not null...
+  if (!is.null(ggplot_params)) {
+    
+    # ...and ggplot_params is not a character or is a vector of greater than 1, 
+    if (!is.character(ggplot_params)) {
+      stop("ggplot_params must be a string, vector of strings, or NULL.")
+    }
+    
+  }
+  
+  ####################
+  ## LOGICAL CHECKS ##
+  ####################
+  
+  # If interactive is not TRUE/FALSE, inform the user
+  if (!is.logical(interactive) & !is.na(interactive)) {
+    stop("interactive must be a true or false.")
+  }
+  
+  # test_mode must be a TRUE/FALSE
+  if (!is.logical(test_mode) & !is.na(test_mode)) {
+    stop("test_mode must be a true or false")
+  }
 
+  #########################
+  ## TEST EXAMPLE CHECKS ##
+  #########################
+  
+  # Ensure that test_example is an integer
+  if (!is.numeric(test_example) | 0 %in% test_example) {
+    "test_example should be a non-zero integer."
+  }
+  
+  # Ensure that test_example is in the range of possibilities 
+  if (max(test_example) > nrow(trelliData$trelliData.omics)) {
+    stop(paste("test_example must be in the range of possibilities, of 1 to", nrow(trelliData$trelliData.omics)))
+  }
+  
+}
 
-
-
-
+# This function builds all trelliscopes.
+trelli_builder <- function(toBuild, cognostics, plotFUN, cogFUN, path, name, ...) {
+  
+  # Build trelliscope without cognostics if none are provided. Otherwise, build with cognostics.
+  if (is.null(cognostics)) {
+    
+    toBuild %>%
+      dplyr::mutate(
+        panel = trelliscopejs::map2_plot(Nested_DF, as.character(unlist(toBuild[,1])), plotFUN)
+      ) %>%
+      trelliscopejs::trelliscope(path = path, name = name, nrow = 1, ncol = 1, thumb = T, ...)
+    
+  } else {
+    
+    toBuild %>%
+      dplyr::mutate(
+        panel = trelliscopejs::map2_plot(Nested_DF, as.character(unlist(toBuild[,1])), plotFUN),
+        cog = trelliscopejs::map2_cog(Nested_DF, as.character(unlist(toBuild[,1])), cogFUN)
+      ) %>%
+      trelliscopejs::trelliscope(path = path, name = name, nrow = 1, ncol = 1, thumb = T, ...)
+    
+  }
+}
 
 
 #' @name trelli_abundance_boxplot
@@ -56,7 +176,7 @@
 #' 
 #' }
 #' 
-#' @author David Degnan
+#' @author David Degnan, Lisa Bramer
 #' 
 #' @export
 trelli_abundance_boxplot <- function(trelliData,
@@ -71,74 +191,27 @@ trelli_abundance_boxplot <- function(trelliData,
   
   # Run initial checks----------------------------------------------------------
   
-  # trelliData object must be of the trelliData class
-  if (any(class(trelliData) %in% c("trelliData")) == FALSE) {
-    stop("trelliData must be of the class trelliData from as.trelliData or as.trelliData.edata.")
-  }
+  # Run generic checks 
+  trelli_precheck(trelliData = trelliData, 
+                  trelliCheck = "omics",
+                  cognostics = cognostics,
+                  acceptable_cognostics = c("n", "mean", "median", "sd", "skew", "p_value", "fold_change"),
+                  ggplot_params = ggplot_params,
+                  interactive = interactive,
+                  test_mode = test_mode, 
+                  test_example = test_example)
   
-  # Check that trelliData has been passed to the "trelli_group_by" function
-  if (!attr(trelliData, "group_by")) {
-    stop("trelliData must be grouped with trelli_group_by.")
-  }
   
-  # Assert that trelliData has omicsData
-  if (is.null(trelliData$trelliData.omics)) {
-    stop("trelliData must have omicsData for this abundance boxplot function.")
-  }
-  
-  # If cognostics are not NULL...
-  if (!is.null(cognostics)) {
-    
-    # ...assert that cognostics are acceptable options 
-    cog_options <- c("n", "mean", "median", "sd", "skew", "p_value", "fold_change")
-    if (all(cognostics %in% cog_options) == FALSE) {
-      stop(paste("Unacceptable cognostic option included. Acceptable options are: ", 
-                 paste(cog_options, collapse = ", ")))
-    }
-    
-    # ...remove stat specific options 
+  # Remove stat specific options if no stats data was provided 
+  if (is.null(trelliData$trelliData.stat)) {
     if (any(c("p_value", "fold_change") %in% cognostics) & is.null(trelliData$trelliData.stat)) {
       cognostics <- cognostics[-match(c("p_value", "fold_change"), cognostics, nomatch = 0)]
-    }
-    
+    }    
   }
   
-  # If no cognostics, set to NULL
-  if (length(cognostics) == 0) {cognostics <- NULL}
-  
-  # If ggplot_params is not null...
-  if (!is.null(ggplot_params)) {
-    
-    # ...and ggplot_params is not a character or is a vector of greater than 1, 
-    if (!is.character(ggplot_params)) {
-      stop("ggplot_params must be a string, vector of strings, or NULL.")
-    }
-    
-  }
-  
-  # If interactive is not TRUE/FALSE, inform the user
-  if (!is.logical(interactive)) {
-    stop("interactive must be a true or false.")
-  }
-  if (is.na(interactive)) {interactive <- FALSE}
-  
-  # test_mode must be a TRUE/FALSE
-  if (!is.logical(test_mode)) {
-    stop("test_mode must be a true or false")
-  }
-  if (is.na(test_mode)) {test_mode <- FALSE}
-  
-  # Ensure that test_example is an integer
-  if (!is.numeric(test_example) | 0 %in% test_example) {
-    "test_example should be non-zero integers."
-  }
-  test_example <- unique(abs(round(test_example)))
-  
-  # Ensure that test_example is in the range of possibilities 
-  if (max(test_example) > nrow(trelliData$trelliData.omics)) {
-    stop(paste("test_example must be in the range of possibilities, of 1 to", nrow(trelliData$trelliData.omics)))
-  }
-  
+  # Round test example to integer 
+  if (test_mode) {test_example <- unique(abs(round(test_example)))}
+
   # Make boxplot function-------------------------------------------------------
   
   # First, generate the boxplot function
@@ -274,28 +347,16 @@ trelli_abundance_boxplot <- function(trelliData,
   # Build trelliscope display---------------------------------------------------
   
   # If test_mode is on, then just build the required panels
-  if (test_mode) {toBuild <- trelliData$trelliData.omics[test_example,]} 
-  else {toBuild <- trelliData$trelliData.omics}
+  if (test_mode) {toBuild <- trelliData$trelliData.omics[test_example,]} else {toBuild <- trelliData$trelliData.omics}
   
-  # Build trelliscope without cognostics if none are provided. Otherwise, build with cognostics.
-  if (is.null(cognostics)) {
-    
-    toBuild %>%
-      dplyr::mutate(
-        panel = trelliscopejs::map2_plot(Nested_DF, as.character(unlist(toBuild[,1])), box_plot_fun)
-      ) %>%
-      trelliscopejs::trelliscope(path = path, name = name, nrow = 1, ncol = 1, thumb = T, ...)
-    
-  } else {
-    
-    toBuild %>%
-      dplyr::mutate(
-        panel = trelliscopejs::map2_plot(Nested_DF, as.character(unlist(toBuild[,1])), box_plot_fun),
-        cog = trelliscopejs::map2_cog(Nested_DF, as.character(unlist(toBuild[,1])), box_cog_fun)
-      ) %>%
-      trelliscopejs::trelliscope(path = path, name = name, nrow = 1, ncol = 1, thumb = T, ...)
-    
-  }
+  # Pass parameters to trelli_builder function
+  trelli_builder(toBuild = toBuild,
+                 cognostics = cognostics, 
+                 plotFUN = box_plot_fun,
+                 cogFUN = box_cog_fun,
+                 path = path,
+                 name = name,
+                 ...)
   
 }
 
@@ -304,14 +365,14 @@ trelli_abundance_boxplot <- function(trelliData,
 #' @title Histogram trelliscope building function for abundance data   
 #' 
 #' @description Specify a plot design and cognostics for the abundance histogram trelliscope.
-#'    The only acceptable input is a trelliData.edata object. 
+#'    Main_effects grouping are ignored. Data must be grouped by edata_cname. 
 #' 
 #' @param trelliData A trelliscope data object made by as.trelliData or as.trelliData.edata,
 #'    and grouped by trelli_group_by. Required. 
 #' @param cognostics A vector of cognostic options for each plot. Valid entries are
 #'    n, mean, median, sd, and skew.
 #' @param ggplot_params An optional vector of strings of ggplot parameters to the backend ggplot
-#'    function. For example, c("ylab('')", "ylim(c(2,20))"). Default is NULL. 
+#'    function. For example, c("ylab('')", "ylim(c(1,2))"). Default is NULL. 
 #' @param interactive A logical argument indicating whether the plots should be interactive
 #'    or not. Interactive plots are ggplots piped to ggplotly (for now). Default is FALSE.  
 #' @param path The base directory of the trelliscope application. Default is Downloads. 
@@ -319,8 +380,163 @@ trelli_abundance_boxplot <- function(trelliData,
 #' @param test_mode A logical to return a smaller trelliscope to confirm plot and design.
 #'    Default is FALSE.
 #' @param test_example The index number of the plot to return for test_mode. Default is 1. 
+#' 
+#' @examples
+#' \dontrun{
+#' 
+#' ## Build the abundance histogram with an edata file. Generate trelliData in as.trelliData.edata
+#' trelli_group_by(trelliData = trelliData, group = "LipidCommonName") %>% 
+#'    trelli_abundance_histogram(test_mode = T, test_example = 1:10)
+#' 
+#' ## Build the abundance boxplot with an omicsData object. Generate trelliData in as.trelliData
+#' trelli_group_by(trelliData = trelliData2, group = "LipidCommonName") %>% 
+#'    trelli_abundance_boxplot(test_mode = T, test_example = 1:10)
+#'     
+#' ## Build the abundance boxplot with an omicsData and statRes object. Generate trelliData in as.trelliData.
+#' trelli_group_by(trelliData = trelliData4, group = "LipidCommonName") %>%
+#'    trelli_abundance_boxplot(test_mode = T, test_example = 1:10)
+#'    
+#' ## Users can modify the plotting function with ggplot parameters and interactivity.     
+#' trelli_group_by(trelliData = trelliData, group = "LipidCommonName") %>% 
+#'    trelli_abundance_histogram(test_mode = T, test_example = 1:10, 
+#'      ggplot_params = c("ylab('')", "ylim(c(1,2))"), interactive = TRUE)  
+#'    
+#' }
+#' 
+#' 
+#' @author David Degnan, Lisa Bramer
+#' 
+#' @export
+trelli_abundance_histogram <- function(trelliData,
+                                     cognostics = c("n", "mean", "median", "sd", "skew", "p_value", "fold_change"),
+                                     ggplot_params = NULL,
+                                     interactive = FALSE,
+                                     path = "~/Downloads/Trelliscope",
+                                     name = "Trelliscope",
+                                     test_mode = FALSE,
+                                     test_example = 1,
+                                     ...) {
+  
+  # Run initial checks----------------------------------------------------------
+  
+  # Run generic checks 
+  trelli_precheck(trelliData = trelliData, 
+                  trelliCheck = "omics",
+                  cognostics = cognostics,
+                  acceptable_cognostics = c("n", "mean", "median", "sd", "skew", "p_value", "fold_change"),
+                  ggplot_params = ggplot_params,
+                  interactive = interactive,
+                  test_mode = test_mode, 
+                  test_example = test_example)
 
-#trelli_abundance_histogram 
+  # Remove stat specific options if no stats data was provided 
+  if (is.null(trelliData$trelliData.stat)) {
+    if (any(c("p_value", "fold_change") %in% cognostics) & is.null(trelliData$trelliData.stat)) {
+      cognostics <- cognostics[-match(c("p_value", "fold_change"), cognostics, nomatch = 0)]
+    }    
+  }
+  
+  # Round test example to integer 
+  if (test_mode) {test_example <- unique(abs(round(test_example)))}
+  
+  # Check that group data is edata_cname
+  edata_cname <- pmartR::get_edata_cname(trelliData$omicsData)
+  if (edata_cname != attr(trelliData, "group_by_omics")) {
+    stop("trelliData must be grouped by edata_cname.")
+  }
+  
+  # Make histogram function-----------------------------------------------------
+  
+  # First, generate the boxplot function
+  hist_plot_fun <- function(DF, title) {
+    
+    # Build plot 
+    histogram <- ggplot2::ggplot(DF, ggplot2::aes(x = Abundance)) + 
+      ggplot2::geom_histogram(bins = 10, fill = "steelblue", color = "black") + ggplot2::ggtitle(title) +
+      ggplot2::theme_bw() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) + 
+      ggplot2::xlab(paste(attr(trelliData$omicsData, "data_info")$data_scale, "Abundance")) +
+      ggplot2::ylab("Frequency")
+    
+    # Add additional parameters
+    if (!is.null(ggplot_params)) {
+      for (param in ggplot_params) {
+        histogram <- histogram + eval(parse(text = paste0("ggplot2::", param)))
+      }
+    }
+    
+    # If interactive, pipe to ggplotly
+    if (interactive) {
+      histogram <- histogram %>% plotly::ggplotly()
+    }
+   
+    return(histogram)
+     
+  }
+  
+  
+  # Create cognostic function---------------------------------------------------
+  
+  # Second, create function to return cognostics
+  hist_cog_fun <- function(DF, biomolecule) {
+    
+    # Set basic cognostics for ungrouped data or in case when data is not split by fdata_cname
+    cog <- list(
+      "n" = dplyr::tibble(`Count` = trelliscopejs::cog(sum(!is.na(DF$Abundance)), desc = "Biomolecule Count")),
+      "mean" = dplyr::tibble(`Mean Abundance` = trelliscopejs::cog(round(mean(DF$Abundance, na.rm = T), 4), desc = "Mean Abundance")), 
+      "median" = dplyr::tibble(`Median Abundance` = trelliscopejs::cog(round(median(DF$Abundance, na.rm = T), 4), desc = "Median Abundance")), 
+      "sd" = dplyr::tibble(`Standard Deviation Abundance` = trelliscopejs::cog(round(sd(DF$Abundance, na.rm = T), 4), desc = "Abundance Standard Deviation")), 
+      "skew" = dplyr::tibble(`Skew Abundance` = trelliscopejs::cog(round(e1071::skewness(DF$Abundance, na.rm = T), 4), desc= "Abundance Skewness"))
+    )
+    
+    # Start list of cogs
+    cog_to_trelli <- do.call(dplyr::bind_cols, lapply(cognostics, function(x) {cog[[x]]})) %>% tibble::tibble()
+    
+    # Add statistics if applicable 
+    if (!is.null(trelliData$trelliData.stat)) {
+      
+      # Subset down the dataframe down to group, unnest the dataframe, 
+      # pivot_longer to comparison, subset columns to requested statistics, 
+      # switch name to a more specific name
+      cogs_to_add <- trelliData$trelliData.stat %>%
+        dplyr::filter(trelliData$trelliData.stat[[edata_cname]] == biomolecule) %>%
+        dplyr::select(Nested_DF) %>%
+        tidyr::unnest(cols = c(Nested_DF)) %>%
+        dplyr::select(c(Comparison, p_value, fold_change)) %>%
+        tidyr::pivot_longer(c(p_value, fold_change)) %>%
+        dplyr::mutate(
+          name = paste(Comparison, lapply(name, function(x) {name_converter[[x]]}) %>% unlist()),
+          value = round(value, 4)
+        ) %>%
+        dplyr::ungroup() %>%
+        dplyr::select(-Comparison)
+      
+      # Add new cognostics 
+      cog_to_trelli <- cbind(cog_to_trelli, do.call(cbind, lapply(1:nrow(cogs_to_add), function(row) {
+        quick_cog(cogs_to_add$name[row], cogs_to_add$value[row])
+      })) %>% tibble::tibble()) %>% tibble::tibble()
+      
+    }
+    
+    return(cog_to_trelli)
+    
+  }
+  
+  # Build trelliscope display---------------------------------------------------
+  
+  # If test_mode is on, then just build the required panels
+  if (test_mode) {toBuild <- trelliData$trelliData.omics[test_example,]} else {toBuild <- trelliData$trelliData.omics}
+  
+  # Pass parameters to trelli_builder function
+  trelli_builder(toBuild = toBuild,
+                 cognostics = cognostics, 
+                 plotFUN = hist_plot_fun,
+                 cogFUN = hist_cog_fun,
+                 path = path,
+                 name = name,
+                 ...)
+  
+}
+
 
 # trelli_abundance_heatmap (emeta only)
 
