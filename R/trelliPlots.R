@@ -672,7 +672,7 @@ trelli_abundance_heatmap <- function(trelliData,
       DF$Group <- factor(DF$Sample_Name, levels = attributes(trelliData2$omicsData)$group_DF$Sample_Name)
     } 
     
-    # Build plot 
+    # Build plot: this should be edata_cname
     hm <- ggplot2::ggplot(DF, ggplot2::aes(x = LipidCommonName, y = Sample_Name, fill = Abundance)) +
       ggplot2::geom_tile() + ggplot2::theme_bw() + ggplot2::ylab("Sample") + ggplot2::xlab("Biomolecule") +
       ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5), 
