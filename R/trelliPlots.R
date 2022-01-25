@@ -415,11 +415,11 @@ trelli_abundance_boxplot <- function(trelliData,
 #' trelli_group_by(trelliData = trelliData, group = "LipidCommonName") %>% 
 #'    trelli_abundance_histogram(test_mode = T, test_example = 1:10)
 #' 
-#' ## Build the abundance boxplot with an omicsData object. Generate trelliData in as.trelliData
+#' ## Build the abundance histogram with an omicsData object. Generate trelliData in as.trelliData
 #' trelli_group_by(trelliData = trelliData2, group = "LipidCommonName") %>% 
 #'    trelli_abundance_histogram(test_mode = T, test_example = 1:10)
 #'     
-#' ## Build the abundance boxplot with an omicsData and statRes object. Generate trelliData in as.trelliData.
+#' ## Build the abundance histogram with an omicsData and statRes object. Generate trelliData in as.trelliData.
 #' trelli_group_by(trelliData = trelliData4, group = "LipidCommonName") %>%
 #'    trelli_abundance_histogram(test_mode = T, test_example = 1:10)
 #'    
@@ -611,7 +611,7 @@ trelli_abundance_histogram <- function(trelliData,
 #' @examples
 #' \dontrun{
 #' 
-#' ## Build the abundance histogram with an omicsData object with emeta variables. Generate trelliData in as.trelliData.
+#' ## Build the abundance heatmap with an omicsData object with emeta variables. Generate trelliData in as.trelliData.
 #' trelli_group_by(trelliData = trelliData2, group = "LipidFamily") %>% 
 #'    trelli_abundance_heatmap(test_mode = T, test_example = 1:3)
 #'    
@@ -745,7 +745,9 @@ trelli_abundance_heatmap <- function(trelliData,
   
 }
 
-#' @name trelli_missing_bar
+# TODO: Finish this for statRes object
+
+#' @name trelli_missingness_bar
 #' 
 #' @title Bar chart trelliscope building function for missing data   
 #' 
@@ -769,28 +771,26 @@ trelli_abundance_heatmap <- function(trelliData,
 #' @examples
 #' \dontrun{
 #' 
-#' ## Build the abundance boxplot with an edata file. Generate trelliData in as.trelliData.edata
+#' ## Build the missingness bar plot with an edata file. Generate trelliData in as.trelliData.edata
 #' trelli_group_by(trelliData = trelliData, group = "LipidCommonName") %>% 
-#'   trelli_missing_bar(test_mode = T, test_example = 1:10)
-#' trelli_group_by(trelliData = trelliData, group = "Sample") %>% trelli_missing_bar()
+#'   trelli_missingness_bar(test_mode = T, test_example = 1:10)
+#' trelli_group_by(trelliData = trelliData, group = "Sample") %>% trelli_missingness_bar()
 #' 
-#' ## Build the abundance boxplot with an omicsData object. Generate trelliData in as.trelliData
+#' ## Build the missingness bar plot with an omicsData object. Generate trelliData in as.trelliData
 #' trelli_group_by(trelliData = trelliData2, group = "LipidCommonName") %>% 
-#'   trelli_missing_bar(test_mode = T, test_example = 1:10)
-#' trelli_group_by(trelliData = trelliData2, group = "LipidFamily") %>% trelli_missing_bar()
+#'   trelli_missingness_bar(test_mode = T, test_example = 1:10)
 #' 
-#' ## Build the abundance boxplot with an omicsData and statRes object. Generate trelliData in as.trelliData.
+#' ## Build the missingness bar plot with a statRes object. Generate trelliData in as.trelliData
+#' trelli_group_by(trelliData = trelliData3, group = "LipidCommonName") %>%
+#'   trelli_missingness_bar(test_mode = T, test_example = 1:10)
+#' 
+#' ## Build the missingness bar plot with an omicsData and statRes object. Generate trelliData in as.trelliData.
 #' trelli_group_by(trelliData = trelliData4, group = "LipidCommonName") %>%
-#'   trelli_missing_bar(test_mode = T, test_example = 1:10)
-#' trelli_group_by(trelliData = trelliData4, group = "LipidFamily") %>% trelli_missing_bar()
-#' 
-#' ## Other options include modifying the ggplot  
-#' trelli_group_by(trelliData = trelliData, group = "LipidCommonName") %>% 
-#'   trelli_missing_bar(test_mode = T, test_example = 1:10, 
-#'                            ggplot_params = c("ylab('')", "ylim(c(2,20))"))
+#'   trelli_missingness_bar(test_mode = T, test_example = 1:10) 
 #' 
 #' ## Or making the plot interactive 
-#' trelli_group_by(trelliData = trelliData4, group = "LipidFamily") %>% trelli_missing_bar(interactive = T)
+#' trelli_group_by(trelliData = trelliData2, group = "LipidCommonName") %>% 
+#'    trelli_missingness_bar(test_mode = T, test_example = 1:5)
 #'    
 #' }
 #' 
@@ -811,7 +811,7 @@ trelli_missingness_bar <- function(trelliData,
   
   # Run generic checks 
   trelli_precheck(trelliData = trelliData, 
-                  trelliCheck = c("omics", "stat"),
+                  trelliCheck = c("either"),
                   cognostics = cognostics,
                   acceptable_cognostics = "n",
                   ggplot_params = ggplot_params,
@@ -822,10 +822,9 @@ trelli_missingness_bar <- function(trelliData,
   # Round test example to integer 
   if (test_mode) {test_example <- unique(abs(round(test_example)))}
   
-  # Make missingness bar function-----------------------------------------------
+  # Generate a function to make missingness dataframes--------------------------
   
-  # First, generate the boxplot function
-  missing_bar_plot_fun <- function(DF, title) {
+  get_missing_DF <- function(DF) {
     
     # Add a blank group if no group designation was given
     if (is.null(attributes(trelliData$omicsData)$group_DF)) {DF$Group <- "x"} 
@@ -837,13 +836,37 @@ trelli_missingness_bar <- function(trelliData,
         Absent = sum(is.na(Abundance)),
         Present = sum(!is.na(Abundance))
       ) %>%
-      tidyr::pivot_longer(c(Absent, Present)) %>%
-      dplyr::rename(`# Samples` = value)
+      tidyr::pivot_longer(c(Absent, Present))
+    
+    # Get groupings
+    groupings <- c(attr(trelliData, "group_by_omics"), attr(trelliData, "group_by_stat"))
+    groupings <- groupings[!is.na(groupings)]
+    
+    # If grouped by edata_cname, the count is by sample
+    if (get_edata_cname(trelliData$omicsData) %in% groupings) { 
+      Missingness <- Missingness %>%
+        dplyr::rename(`# Samples` = value)
+    } else {
+      Missingness <- Missingness %>%
+        dplyr::rename(`# Biomolecules` = value)
+    }
+    
+    return(Missingness)
+    
+  }
+  
+  # Make missingness bar function-----------------------------------------------
+  
+  # First, generate the boxplot function
+  missing_bar_plot_fun <- function(DF, title) {
+    
+    # Get missingness dataframe
+    Missingness <- get_missing_DF(DF)
     
     # Build plot 
-    missing_bar <- ggplot2::ggplot(Missingness, ggplot2::aes(x = Group, y = `# Samples`, fill = name)) + 
+    missing_bar <- ggplot2::ggplot(Missingness, ggplot2::aes(x = Group, y = unlist(Missingness[,3]), fill = name)) + 
       ggplot2::geom_bar(stat = "identity", position = "stack", color = "black") + ggplot2::theme_bw() + 
-      ggplot2::ggtitle(title) + 
+      ggplot2::ggtitle(title) + ggplot2::ylab(colnames(Missingness)[3]) +
       ggplot2::scale_fill_manual(values = c("Present" = "steelblue", "Absent" = "black")) +
       ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5),
                      legend.title = ggplot2::element_blank()) 
@@ -870,13 +893,43 @@ trelli_missingness_bar <- function(trelliData,
     return(missing_bar)
   }
   
+  # Create the cognostic function-----------------------------------------------
   
+  # Next, generate the cognostic function
+  missing_bar_cog_fun <- function(DF, GroupingVar) {
+    
+    # Get missingness dataframe
+    Missingness <- get_missing_DF(DF)
+    
+    # If no more than one group, just return the two counts
+    if (length(unique(Missingness$Group)) == 1) {
+      cog_to_trelli <- cbind(
+        quick_cog(paste(colnames(Missingness)[3], "Absent"), unlist(Missingness[Missingness$name == "Absent", 3])),
+        quick_cog(paste(colnames(Missingness)[3], "Present"), unlist(Missingness[Missingness$name == "Present", 3]))
+      ) %>% tibble::tibble()
+    } else {
+      cog_to_trelli <- do.call(cbind, lapply(1:nrow(Missingness), function(row) {
+        quick_cog(paste(Missingness[row, 1], Missingness[row, 2]), unlist(Missingness[row, 3]))
+      })) %>% tibble::tibble()
+    }
+    
+    return(cog_to_trelli)
+    
+  }
   
+  # Build trelliscope display---------------------------------------------------
   
+  # If test_mode is on, then just build the required panels
+  if (test_mode) {toBuild <- trelliData$trelliData.omics[test_example,]} else {toBuild <- trelliData$trelliData.omics}
   
-  
-  
-  
+  # Pass parameters to trelli_builder function
+  trelli_builder(toBuild = toBuild,
+                 cognostics = cognostics, 
+                 plotFUN = missing_bar_plot_fun,
+                 cogFUN = missing_bar_cog_fun,
+                 path = path,
+                 name = name,
+                 ...)
   
 }
 
