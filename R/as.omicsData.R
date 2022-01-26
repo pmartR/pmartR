@@ -1229,8 +1229,8 @@ as.seqData <- function (e_data, f_data, e_meta = NULL,
   # Analyses must have raw counts
   
   nums <- e_data[which(colnames(e_data) != edata_cname)]
-  notint <- rowSums(nums%%1) !=  0
-  if(any(notint)){
+  notint <- any(apply(nums, 2, function(col) !(sum(col%%1, na.rm = T) != 0)))
+  if(notint){
     warning("Non-integers detected. Analyses supported by pmartR for RNA-seq data require raw counts.")
   }
   
@@ -1681,6 +1681,11 @@ pre_flight <- function (e_data,
     e_data <- replace_zeros(edata = e_data,
                             edata_cname = edata_cname)
     
+  } else if (data_scale == 'counts' && any(is.na(e_data))){
+    
+    # Exchange NA for 0 in edata.
+    e_data <- replace_nas(edata = e_data,
+                            edata_cname = edata_cname)
   }
   
   # Perform checks on f_data ---------------------------------------------------
@@ -1949,3 +1954,47 @@ replace_zeros <- function(edata,
   return (edata)
   
 }
+
+#' Replace NA with 0
+#'
+#' This function finds all instances of NA in e_data and replaces them with 0.
+#'
+#' @param e_data A \eqn{p \times n + 1} data frame of expression data, where
+#'        \eqn{p} is the number of xxx observed and \eqn{n} is the
+#'        number of samples.
+#'
+#' @param edata_cname A character string specifying the name of the ID column in
+#'        the e_data data frame.
+#'
+#' @details This function is used in the as.seqData functions to
+#'          replace any NA values with 0s.
+#'
+#' @return An updated e_data data frame where all instances of NA have been
+#'         replaced with 0.
+#'
+replace_nas <- function(edata,
+                          edata_cname) {
+  
+  # Acquire the index of the edata_cname column.
+  id_col <- which(names(edata) == edata_cname)
+  num_cols <- edata[, -id_col]
+  
+  # Enumerate the number of zeros to be replaced with NA
+  n_nas <- sum(is.na(num_cols))
+  
+  num_cols[is.na(num_cols)] <- 0
+  edata[, -id_col] <- num_cols
+  
+  # Report the number of replaced elements in e_data
+  message(paste(n_nas,
+                "instances of",
+                NA,
+                "have been replaced with",
+                0,
+                sep = " "))
+  
+  # Return the updated edata object.
+  return (edata)
+  
+}
+

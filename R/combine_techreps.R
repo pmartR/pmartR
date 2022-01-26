@@ -53,13 +53,7 @@ combine_techreps <- function (omicsData, combine_fn = NULL,
                               bio_sample_names = NULL) {
   
   # check that omicsData is of pmartR S3 class#
-  if(!inherits(omicsData, 
-               c("pepData", "proData", "lipidData", "metabData", "nmrData", "seqData"))
-     ) stop("omicsData must be of class 'pepData', 'proData', 'lipidData', 'metabData', 'nmrData', or 'seqData'")
-  
-  if(is.null(combine_fn)){
-    combine_fn <- ifelse(inherits(omicsData, "seqData"), "sum", "mean")
-  }
+  if(!inherits(omicsData, c("pepData", "proData", "lipidData", "metabData", "nmrData"))) stop("omicsData must be of class 'pepData', 'proData', 'lipidData', 'metabData' or 'nmrData'")
   
   if(is.null(combine_fn)){
     combine_fn <- ifelse(inherits(omicsData, "seqData"), "sum", "mean")
@@ -87,7 +81,8 @@ combine_techreps <- function (omicsData, combine_fn = NULL,
       one_to_one <- f_data[c(bio_sample_names, techrep_cname)] %>% unique() %>% nrow() 
       unique_bio_sample_names <- length(unique(f_data[,bio_sample_names]))
       if(any(c(one_to_one, unique_bio_sample_names) != length(unique(f_data[,techrep_cname])))) stop("Specified display name column did not have a one-to-one correspondence with the techrep ID column")
-    } else if(length(bio_sample_names) > 1){
+    } 
+    if(length(bio_sample_names) > 1){
       if(length(unique(bio_sample_names)) != length(unique(f_data[,techrep_cname]))) stop("character vector of sample names does not have the same number of names as the number of biological samples")
     }
   }
@@ -97,17 +92,9 @@ combine_techreps <- function (omicsData, combine_fn = NULL,
   bio_sample_list = list()
   
   for(el in as.character(unique(f_data[,which(names(f_data) == techrep_cname)]))){
-    bio_sample_list[[el]] = unique(
-      f_data %>% 
-        dplyr::filter(!!rlang::sym(techrep_cname) == el) %>%
-        {.[,fdata_cname]}) %>% as.character()
+    bio_sample_list[[el]] = unique(f_data %>% dplyr::filter(!!rlang::sym(techrep_cname) == el) %>% {.[,fdata_cname]}) %>% as.character()
   }
   #
-  
-  if(combine_fn == "sum" && 
-     length(unique(sapply(bio_sample_list, length))) != 1){
-    stop("Differing number of technical replicates per sample; sum is an invalid combine option.")
-  }
   
   ### Do certain columns in f_data have multiple values per biological sample?.....
   
@@ -134,20 +121,16 @@ combine_techreps <- function (omicsData, combine_fn = NULL,
     as.data.frame()
   
   # create new, collapsed e_data object, averaged over technical replicates
-  new_edata <- e_data[get_edata_cname(omicsData)]
+  new_edata <- e_data[which(names(e_data) == attr(omicsData, "cnames")$edata_cname)]
   for(el in names(bio_sample_list)){
     edata_subsample <- e_data %>% dplyr::select(dplyr::one_of(bio_sample_list[[el]]))
-    if(combine_fn == "mean"){
-      new_edata[el] <- rowMeans(edata_subsample, na.rm = TRUE)
-    }else if(combine_fn == "sum"){
-      new_edata[el] <- rowSums(edata_subsample, na.rm = TRUE)
-    }
+    if(combine_fn == "mean") new_edata[el] = rowMeans(edata_subsample, na.rm = TRUE)
+    if(combine_fn == "sum") new_edata[el] = rowSums(edata_subsample, na.rm = TRUE)
     # other combine methods coming soon! #
   }
   
   # NaN to NA
-  new_edata[is.na(new_edata)] <- NA
-  if(inherits(omicsData, "seqData")) new_edata[is.na(new_edata)] <- 0
+  new_edata[is.na(new_edata)] = NA
   
   # Assign column names to e_data + 
   # Assign new ID column to f_data
@@ -159,21 +142,23 @@ combine_techreps <- function (omicsData, combine_fn = NULL,
       bio_sample_names <- new_fdata[,bio_sample_names] 
     }
     else if(length(bio_sample_names) > 1){
+      names(bio_sample_list) <- bio_sample_names
       bsn <- bio_sample_names
       names(bsn) <- f_data[,techrep_cname]
       new_fdata[techrep_cname] <- bsn[new_fdata[[techrep_cname]]]
-      names(bio_sample_list) <- bsn[names(bio_sample_list)]
-      bio_sample_names <- bsn[colnames(new_edata)[-which(colnames(new_edata) == edata_cname)]]
       attr(omicsData, "cnames")$fdata_cname <- techrep_cname
     }
     colnames(new_edata)[-which(colnames(new_edata) == edata_cname)] <- bio_sample_names
   }
   else attr(omicsData, "cnames")$fdata_cname <- techrep_cname
   
+  browser()
+  
   # Check for bad grouping structure and make new grouping DF
   if(!is.null(attr(omicsData, "group_DF"))){ ## needed if done before grouping
     
     # gives number of unique main effect levels in group_DF for a given group of technical replictes...
+    # multiple_groups <- attr(omicsData, "group_DF") %>% 
     multiple_groups <- get_group_DF(omicsData) %>%
       dplyr::left_join(f_data[c(fdata_cname, techrep_cname)], by = fdata_cname) %>%
       dplyr::group_by(!!rlang::sym(techrep_cname)) %>%
@@ -188,6 +173,7 @@ combine_techreps <- function (omicsData, combine_fn = NULL,
     # otherwise collapse the grouping structure around the newly created f_data
     else{
       new_group_DF <- get_group_DF(omicsData) %>%
+      # new_group_DF <- attr(omicsData, "group_DF") %>%
         dplyr::left_join(f_data[c(fdata_cname, techrep_cname)], by = fdata_cname) %>% 
         dplyr::group_by(!!rlang::sym(techrep_cname)) %>%
         dplyr::slice(1) %>%
@@ -202,23 +188,18 @@ combine_techreps <- function (omicsData, combine_fn = NULL,
     }
     
   }else new_group_DF <- NULL
+  
 
   # store new data and reset attributes
   omicsData$e_data <- new_edata
   omicsData$f_data <- new_fdata
-  id_col <- which(names(omicsData$e_data)==edata_cname)
   attr(omicsData, "cnames")$techrep_cname <- NULL
   attr(omicsData, "group_DF") <- new_group_DF 
   attr(omicsData, "data_info")$num_samps = ncol(omicsData$e_data) - 1
   attr(omicsData, "data_info")$num_edata = length(unique(omicsData$e_data[, edata_cname]))
-  if(inherits(omicsData, "seqData")){
-    attr(omicsData, "data_info")$num_zero_obs <- sum(omicsData$e_data[,-id_col] == 0)
-    attr(omicsData, "data_info")$prop_zeros  <- mean(omicsData$e_data[,-id_col] == 0)
-  } else {
-    attr(omicsData, "data_info")$num_miss_obs = sum(is.na(omicsData$e_data[,-id_col]))
-    attr(omicsData, "data_info")$prop_missing = mean(is.na(omicsData$e_data[,-id_col]))
-  }
-
+  attr(omicsData, "data_info")$num_miss_obs = sum(is.na(omicsData$e_data[,-which(names(omicsData$e_data)==edata_cname)]))
+  attr(omicsData, "data_info")$prop_missing = mean(is.na(omicsData$e_data[,-which(names(omicsData$e_data)==edata_cname)]))
+  
   # technical replicate specific attributes
   attributes(omicsData)$tech_rep_info$tech_reps_by_sample = bio_sample_list
   attributes(omicsData)$tech_rep_info$combine_method = combine_fn
