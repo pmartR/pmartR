@@ -92,11 +92,12 @@ group_designation <- function (omicsData,
 
   # check that omicsData is of appropriate class #
   if (!inherits(omicsData, c("pepData", "proData", "metabData",
-                             "isobaricpepData", "lipidData", "nmrData"))) {
-
+                             "isobaricpepData", "lipidData", "nmrData", 
+                             "seqData"))) {
+    
     # Throw an error that the input for omicsData is not the appropriate class.
     stop(paste("omicsData must be of class 'pepData', 'proData', 'metabData',",
-               "'isobaricpepData', 'lipidData', or 'nmrData'",
+               "'isobaricpepData', 'lipidData', 'nmrData', or 'seqData'",
                sep = ' '))
 
   }

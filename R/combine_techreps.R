@@ -76,8 +76,8 @@ combine_techreps <- function (omicsData, combine_fn = NULL,
   # legit display name column or vector of display names
   if(!is.null(bio_sample_names)){
     if(!inherits(bio_sample_names, "character") | length(techrep_cname) == 0) stop("bio_sample_names must be a character string specifying a column in f_data")
-    if(!(bio_sample_names %in% colnames(f_data[,-which(names(f_data) == fdata_cname)]))) stop("Specified display name column was not found in f_data or was the same as fdata_cname")
     if(length(bio_sample_names) == 1){
+      if(!(bio_sample_names %in% colnames(f_data[,-which(names(f_data) == fdata_cname)]))) stop("Specified display name column was not found in f_data or was the same as fdata_cname")
       one_to_one <- f_data[c(bio_sample_names, techrep_cname)] %>% unique() %>% nrow() 
       unique_bio_sample_names <- length(unique(f_data[,bio_sample_names]))
       if(any(c(one_to_one, unique_bio_sample_names) != length(unique(f_data[,techrep_cname])))) stop("Specified display name column did not have a one-to-one correspondence with the techrep ID column")
@@ -125,6 +125,7 @@ combine_techreps <- function (omicsData, combine_fn = NULL,
   for(el in names(bio_sample_list)){
     edata_subsample <- e_data %>% dplyr::select(dplyr::one_of(bio_sample_list[[el]]))
     if(combine_fn == "mean") new_edata[el] = rowMeans(edata_subsample, na.rm = TRUE)
+    if(combine_fn == "sum") new_edata[el] = rowSums(edata_subsample, na.rm = TRUE)
     # other combine methods coming soon! #
   }
   
@@ -141,16 +142,20 @@ combine_techreps <- function (omicsData, combine_fn = NULL,
       bio_sample_names <- new_fdata[,bio_sample_names] 
     }
     else if(length(bio_sample_names) > 1){
-      new_fdata[techrep_cname] <- bio_sample_names
+      names(bio_sample_list) <- bio_sample_names
+      bsn <- bio_sample_names
+      names(bsn) <- f_data[,techrep_cname]
+      new_fdata[techrep_cname] <- bsn[new_fdata[[techrep_cname]]]
       attr(omicsData, "cnames")$fdata_cname <- techrep_cname
     }
-    colnames(new_edata)[-which(colnames(techrep_edata) == edata_cname)] <- bio_sample_names
+    colnames(new_edata)[-which(colnames(new_edata) == edata_cname)] <- bio_sample_names
   }
   else attr(omicsData, "cnames")$fdata_cname <- techrep_cname
   
+  browser()
+  
   # Check for bad grouping structure and make new grouping DF
-  # if(!is.null(attr(omicsData, "group_DF"))){
-  if(!is.null(get_group_DF(omicsData))){
+  if(!is.null(attr(omicsData, "group_DF"))){ ## needed if done before grouping
     
     # gives number of unique main effect levels in group_DF for a given group of technical replictes...
     # multiple_groups <- attr(omicsData, "group_DF") %>% 

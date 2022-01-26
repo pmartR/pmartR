@@ -4,7 +4,7 @@
 \alias{combine_techreps}
 \title{Combine technical replicates of an omicsData object}
 \usage{
-combine_techreps(omicsData, combine_fn = "mean", bio_sample_names = NULL)
+combine_techreps(omicsData, combine_fn = NULL, bio_sample_names = NULL)
 }
 \arguments{
 \item{omicsData}{an object of the class 'lipidData', 'metabData', 'pepData',
@@ -15,7 +15,8 @@ parameter techrep_cnames must have been specified when creating this
 object.}
 
 \item{combine_fn}{a character string specifying the function used to
-aggregate across technical replicates, currently only supports "mean".}
+aggregate across technical replicates, currently only supports 'sum' and 
+'mean'. Defaults to 'sum' for seqData and mean for all other omicsData.}
 
 \item{bio_sample_names}{a character string specifying a column in
 \code{f_data} which contains names by which to label aggregated samples in

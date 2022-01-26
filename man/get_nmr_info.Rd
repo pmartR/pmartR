@@ -13,17 +13,17 @@ or nmrData.}
 \value{
 A list containing the following three elements:
         \itemize{
-
-          \item metabolite_name --
-
-          \item sample_property_cname --
-
+        
+          \item metabolite_name -- 
+          
+          \item sample_property_cname -- 
+          
           \item norm_info -- A list containing two logical elements that
           indicate i) whether the data have been normalized to a spiked in
           metabolite or to a property taking sample-specific values and ii)
           whether the data have been back transformed so the values are on a
           similar scale to the raw values before normalization.
-
+        
         }
 }
 \description{

@@ -832,9 +832,9 @@ set_check_names <- function (omicsData, set_to = TRUE) {
 
   # check that omicsData is of appropriate class #
   if(!inherits(omicsData, c("pepData", "proData", "metabData",
-                            "lipidData", "nmrData")))
+                            "lipidData", "nmrData", "seqData")))
     stop (paste("omicsData must be of class 'pepData', 'proData',",
-                "'metabData', 'lipidData', or 'nmrData'",
+                "'metabData', 'lipidData', 'nmrData', or 'seqData'",
                 sep = " "))
 
   #check that set_to is logical
