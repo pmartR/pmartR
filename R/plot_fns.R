@@ -4601,8 +4601,11 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
         paste(get_data_scale(omicsData), "Abundance", sep = " ")
     
     # SeqData
-    else if (get_data_scale(omicsData) == "counts") "Counts" 
-    else if (get_data_scale(omicsData) == "upper")
+    else if (get_data_scale(omicsData) == "counts"){
+      warning(paste0("Using edata_transform() on counts is reccomended for visualization. ",
+                     "See ?edata_transform() for details."))
+      return("Counts")
+    } else if (get_data_scale(omicsData) == "upper")
       paste("Upper Quantile transformed Counts", sep = " ")
     else if (get_data_scale(omicsData) == "lcpm")
       paste("LCPM transformed Counts", sep = " ")
