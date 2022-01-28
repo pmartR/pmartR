@@ -7,6 +7,15 @@ trelli_precheck <- function(trelliData, trelliCheck,
                             test_mode,
                             test_example) {
   
+  #########################
+  ## TEST EXAMPLE CHECKS ##
+  #########################
+  
+  # Ensure that test_example is an integer
+  if (!is.numeric(test_example) | 0 %in% test_example) {
+    "test_example should be a non-zero integer."
+  }
+  
   #######################
   ## trelliData checks ##
   #######################
@@ -29,6 +38,11 @@ trelli_precheck <- function(trelliData, trelliCheck,
       stop("trelliData must have omicsData for this plotting function.")
     }
     
+    # Ensure that test_example is in the range of possibilities 
+    if (max(test_example) > nrow(trelliData$trelliData.omics)) {
+      stop(paste("test_example must be in the range of possibilities, of 1 to", nrow(trelliData$trelliData.omics)))
+    }
+    
   }
   
   # Check that statRes data exists 
@@ -37,6 +51,11 @@ trelli_precheck <- function(trelliData, trelliCheck,
     # Assert that trelliData has statRes
     if (is.null(trelliData$trelliData.stat)) {
       stop("trelliData must have statRes for this plotting function.")
+    }
+    
+    # Ensure that test_example is in the range of possibilities 
+    if (max(test_example) > nrow(trelliData$trelliData.stat)) {
+      stop(paste("test_example must be in the range of possibilities, of 1 to", nrow(trelliData$trelliData.omics)))
     }
     
   }
@@ -82,20 +101,6 @@ trelli_precheck <- function(trelliData, trelliCheck,
   # test_mode must be a TRUE/FALSE
   if (!is.logical(test_mode) & !is.na(test_mode)) {
     stop("test_mode must be a true or false")
-  }
-
-  #########################
-  ## TEST EXAMPLE CHECKS ##
-  #########################
-  
-  # Ensure that test_example is an integer
-  if (!is.numeric(test_example) | 0 %in% test_example) {
-    "test_example should be a non-zero integer."
-  }
-  
-  # Ensure that test_example is in the range of possibilities 
-  if (max(test_example) > nrow(trelliData$trelliData.omics)) {
-    stop(paste("test_example must be in the range of possibilities, of 1 to", nrow(trelliData$trelliData.omics)))
   }
   
 }
@@ -672,8 +677,11 @@ trelli_abundance_heatmap <- function(trelliData,
       DF$Group <- factor(DF$Sample_Name, levels = attributes(trelliData2$omicsData)$group_DF$Sample_Name)
     } 
     
+    # Get edata cname
+    edata_cname <- get_edata_cname(trelliData$omicsData)
+    
     # Build plot: this should be edata_cname
-    hm <- ggplot2::ggplot(DF, ggplot2::aes(x = LipidCommonName, y = Sample_Name, fill = Abundance)) +
+    hm <- ggplot2::ggplot(DF, ggplot2::aes(x = .data[[edata_cname]], y = Sample_Name, fill = Abundance)) +
       ggplot2::geom_tile() + ggplot2::theme_bw() + ggplot2::ylab("Sample") + ggplot2::xlab("Biomolecule") +
       ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5), 
                      axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1)) + 
@@ -745,8 +753,6 @@ trelli_abundance_heatmap <- function(trelliData,
   
 }
 
-# TODO: Finish this for statRes object
-
 #' @name trelli_missingness_bar
 #' 
 #' @title Bar chart trelliscope building function for missing data   
@@ -757,7 +763,9 @@ trelli_abundance_heatmap <- function(trelliData,
 #' 
 #' @param trelliData A trelliscope data object made by as.trelliData.edata or as.trelliData. Required. 
 #' @param cognostics A vector of cognostic options for each plot. Valid entries are
-#'    is n.
+#'    is n and proportion.
+#' @param proportion A logical to determine whether plots should display counts or proportions.
+#'    Default is TRUE.     
 #' @param ggplot_params An optional vector of strings of ggplot parameters to the backend ggplot
 #'    function. For example, c("ylab('')", "xlab('')"). Default is NULL. 
 #' @param interactive A logical argument indicating whether the plots should be interactive
@@ -792,6 +800,10 @@ trelli_abundance_heatmap <- function(trelliData,
 #' trelli_group_by(trelliData = trelliData2, group = "LipidCommonName") %>% 
 #'    trelli_missingness_bar(test_mode = T, test_example = 1:5)
 #'    
+#' ## Or visualize only count data 
+#' trelli_group_by(trelliData = trelliData2, group = "LipidCommonName") %>% 
+#'    trelli_missingness_bar(test_mode = T, test_example = 1:5, cognostics = "n", proportion = FALSE)
+#'    
 #' }
 #' 
 #' 
@@ -799,7 +811,8 @@ trelli_abundance_heatmap <- function(trelliData,
 #' 
 #' @export
 trelli_missingness_bar <- function(trelliData,
-                                   cognostics = "n",
+                                   cognostics = c("n", "proportion"),
+                                   proportion = TRUE,
                                    ggplot_params = NULL,
                                    interactive = FALSE,
                                    path = getDownloadsFolder(),
@@ -813,17 +826,21 @@ trelli_missingness_bar <- function(trelliData,
   trelli_precheck(trelliData = trelliData, 
                   trelliCheck = c("either"),
                   cognostics = cognostics,
-                  acceptable_cognostics = "n",
+                  acceptable_cognostics = c("n", "proportion"),
                   ggplot_params = ggplot_params,
                   interactive = interactive,
                   test_mode = test_mode, 
                   test_example = test_example)
   
+  # Check that proportion is a non NA logical
+  if (!is.logical(proportion) | is.na(proportion)) {
+    stop("proportion must be a TRUE or FALSE.")
+  }
+  
   # Round test example to integer 
   if (test_mode) {test_example <- unique(abs(round(test_example)))}
   
   # Generate a function to make missingness dataframes--------------------------
-  
   get_missing_DF <- function(DF) {
     
     # Add a blank group if no group designation was given
@@ -833,23 +850,11 @@ trelli_missingness_bar <- function(trelliData,
     Missingness <- DF %>%
       dplyr::group_by(Group) %>%
       dplyr::summarise(
-        Absent = sum(is.na(Abundance)),
-        Present = sum(!is.na(Abundance))
-      ) %>%
-      tidyr::pivot_longer(c(Absent, Present))
-    
-    # Get groupings
-    groupings <- c(attr(trelliData, "group_by_omics"), attr(trelliData, "group_by_stat"))
-    groupings <- groupings[!is.na(groupings)]
-    
-    # If grouped by edata_cname, the count is by sample
-    if (get_edata_cname(trelliData$omicsData) %in% groupings) { 
-      Missingness <- Missingness %>%
-        dplyr::rename(`# Samples` = value)
-    } else {
-      Missingness <- Missingness %>%
-        dplyr::rename(`# Biomolecules` = value)
-    }
+        `Absent Count` = sum(is.na(Abundance)),
+        `Present Count` = sum(!is.na(Abundance)),
+        `Absent Proportion` = round(`Absent Count` / sum(c(`Absent Count`, `Present Count`)), 4),
+        `Present Proportion` = round(`Present Count` / sum(c(`Absent Count`, `Present Count`)), 4)
+      ) 
     
     return(Missingness)
     
@@ -863,11 +868,26 @@ trelli_missingness_bar <- function(trelliData,
     # Get missingness dataframe
     Missingness <- get_missing_DF(DF)
     
+    # Subset based on count or proportion 
+    if (proportion) {
+      MissPlotDF <- Missingness %>%
+        dplyr::select(c(Group, `Absent Proportion`, `Present Proportion`)) %>%
+        dplyr::rename(Absent = `Absent Proportion`, Present = `Present Proportion`) %>%
+        tidyr::pivot_longer(c(Absent, Present))
+      ylab <- "Proportion"
+    } else {
+      MissPlotDF <- Missingness %>%
+        dplyr::select(c(Group, `Absent Count`, `Present Count`)) %>%
+        dplyr::rename(Absent = `Absent Count`, Present = `Present Count`) %>%
+        tidyr::pivot_longer(c(Absent, Present))
+      ylab <- "Count"
+    }
+    
     # Build plot 
-    missing_bar <- ggplot2::ggplot(Missingness, ggplot2::aes(x = Group, y = unlist(Missingness[,3]), fill = name)) + 
+    missing_bar <- ggplot2::ggplot(MissPlotDF, ggplot2::aes(x = Group, y = value, fill = name)) + 
       ggplot2::geom_bar(stat = "identity", position = "stack", color = "black") + ggplot2::theme_bw() + 
-      ggplot2::ggtitle(title) + ggplot2::ylab(colnames(Missingness)[3]) +
-      ggplot2::scale_fill_manual(values = c("Present" = "steelblue", "Absent" = "black")) +
+      ggplot2::ggtitle(title) + ggplot2::ylab(ylab) +
+      ggplot2::scale_fill_manual(values = c("black", "steelblue")) +
       ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5),
                      legend.title = ggplot2::element_blank()) 
     
@@ -901,17 +921,31 @@ trelli_missingness_bar <- function(trelliData,
     # Get missingness dataframe
     Missingness <- get_missing_DF(DF)
     
-    # If no more than one group, just return the two counts
-    if (length(unique(Missingness$Group)) == 1) {
-      cog_to_trelli <- cbind(
-        quick_cog(paste(colnames(Missingness)[3], "Absent"), unlist(Missingness[Missingness$name == "Absent", 3])),
-        quick_cog(paste(colnames(Missingness)[3], "Present"), unlist(Missingness[Missingness$name == "Present", 3]))
-      ) %>% tibble::tibble()
-    } else {
-      cog_to_trelli <- do.call(cbind, lapply(1:nrow(Missingness), function(row) {
-        quick_cog(paste(Missingness[row, 1], Missingness[row, 2]), unlist(Missingness[row, 3]))
-      })) %>% tibble::tibble()
+    # Build cognostics 
+    Miss_Cog <- Missingness %>%
+      tidyr::pivot_longer(c(`Absent Count`, `Present Count`, `Absent Proportion`, `Present Proportion`))
+    
+    # Add grouping data if there's more than one group 
+    if (length(unique(Miss_Cog$Group)) > 1) {
+      Miss_Cog <- Miss_Cog %>% dplyr::mutate(name = paste(Group, name))
     }
+      
+    # Remove group column
+    Miss_Cog <- Miss_Cog %>% dplyr::select(c(name, value))
+    
+    # Subset down to selected cognostics
+    if (length(cognostics) == 1) {
+      if (cognostics == "n") {
+        Miss_Cog <- Miss_Cog %>% dplyr::filter(grepl("Count", name))
+      } else if (cognostics == "proportion") {
+        Miss_Cog <- Miss_Cog %>% dplyr::filter(grepl("Proportion", name))
+      }
+    }
+    
+    # Generate cognostics 
+    cog_to_trelli <- do.call(cbind, lapply(1:nrow(Miss_Cog), function(row) {
+      quick_cog(name = Miss_Cog$name[row], value = Miss_Cog$value[row])
+    })) %>% tibble::tibble()
     
     return(cog_to_trelli)
     
