@@ -29,11 +29,11 @@ metab_grouped = group_designation(metab_object_proc, main_effects = "Condition")
 lipid_grouped = group_designation(lipid_object_proc, main_effects = "Condition")
 
 mdata_man_fmeta1 = as.multiData(lipid_object_proc, metab_object_proc, pro_object_proc, f_meta = f_meta)
-mdata_man_fmeta2 = as.multiData(metab_object_proc, pro_object, lipid_object_proc, f_meta = f_meta)
-mdata_auto_fmeta = as.multiData(metab_object_proc, pro_object, lipid_object_proc, auto_fmeta = T)
-mdata_auto_fmeta_sinter = as.multiData(metab_object_proc, lipid_object_proc, pro_object, auto_fmeta = T, sample_intersect = T)
-mdata_auto_fmeta_noarr = as.multiData(metab_object_proc, lipid_object_proc, pro_object, auto_fmeta = T, match_samples = F)
-mdata_noarr_sint = as.multiData(metab_object_proc, lipid_object_proc, pro_object, auto_fmeta = T, match_samples = F, sample_intersect = T)
+mdata_man_fmeta2 = as.multiData(metab_object_proc, pro_object_proc, lipid_object_proc, f_meta = f_meta)
+mdata_auto_fmeta = as.multiData(metab_object_proc, pro_object_proc, lipid_object_proc, auto_fmeta = T)
+mdata_auto_fmeta_sinter = as.multiData(metab_object_proc, lipid_object_proc, pro_object_proc, auto_fmeta = T, sample_intersect = T)
+mdata_auto_fmeta_noarr = as.multiData(metab_object_proc, lipid_object_proc, pro_object_proc, auto_fmeta = T, match_samples = F)
+mdata_noarr_sint = as.multiData(metab_object_proc, lipid_object_proc, pro_object_proc, auto_fmeta = T, match_samples = F, sample_intersect = T)
 mdata_grouped = as.multiData(metab_grouped, lipid_grouped, pro_grouped, auto_fmeta = T, sample_intersect = T, keep_sample_info = T)
 
 obj_list = list(mdata_man_fmeta1 , mdata_man_fmeta2, mdata_auto_fmeta, mdata_auto_fmeta_sinter, mdata_grouped)
@@ -42,10 +42,10 @@ test_that("Bad input throws error", {
   # objects with different log2/normalization
   expect_error(as.multiData(ldata, prdata))
   expect_error(as.multiData(edata_transform(ldata, "log2"), prdata))
-  expect_error(as.multiData(normalize_global(mdata, "all", "median", apply_norm = T), pro_object))
+  expect_error(as.multiData(normalize_global(mdata, "all", "median", apply_norm = T), pro_object_proc))
   
   # not both grouped
-  expect_error(as.multiData(group_designation(lipid_object_proc, main_effects = "Condition"), pro_object))
+  expect_error(as.multiData(group_designation(lipid_object_proc, main_effects = "Condition"), pro_object_proc))
   
   # f_meta not provided and f_datas are not valid f_metas
   expect_error(as.multiData(lipid_object_proc, pro_object_proc))
