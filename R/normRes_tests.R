@@ -13,74 +13,80 @@
 #'   the location and scale (if it exists) parameters.
 #'
 #' @export
-#' 
+#'
 normRes_tests <- function (norm_obj, test_fn = "kw") {
-  
+
   obj_classes <-  c("pepData", "proData", "lipidData", "metabData",
                     "isobaricpepData")
-  
+
   # object is of correct class and groupie is a character vector
   if(!inherits(norm_obj, c(obj_classes, "normRes")))
     stop("This object is not of class 'pepData', 'proData', 'lipidData', 'metabData', 'isobaricpepData' or 'normRes'")
-  
+
   # if this is an omicsData object, test that is has been normalized and has a
   # group DF ... if so store the location and scale vectors that should be
   # under $data_info$norm_info and get the group vector from group DF is none
   # was specified
-  
+
   # Extract information when an omicsData object is the input. ---------
   if (inherits(norm_obj, obj_classes)) {
-    
+
     if (!attributes(norm_obj)$data_info$norm_info$is_normalized)
       stop ("Normalization has not been run on this data")
     if (is.null(attributes(norm_obj)$group_DF))
       stop ("No grouping structure present in object")
-    
+
     location <- attributes(norm_obj)$data_info$norm_info$params$norm_location
     scale <- attributes(norm_obj)$data_info$norm_info$params$norm_scale
     groupDF <- attributes(norm_obj)$group_DF
-    
+
     # Extract sample names from omicsData$e_data. This will be used to order the
     # group column from the groupDF attribute.
     enames <- names(norm_obj$e_data)
-    
+
     # Find the index of the biomolecule ID column in e_data. It will be removed
     # from the names vector later on.
     eidx <- which(enames == get_edata_cname(norm_obj))
-    
+
+    # Nab fdata_cname from the omicsData object.
+    fname <- get_fdata_cname(norm_obj)
+
     # Extract information when a normRes object is the input. ---------
   } else if (inherits(norm_obj, "normRes")) {
-    
+
    if (is.null(attr(attr(norm_obj, "omicsData"), "group_DF")))
      stop ("No grouping structure present in object")
-   
+
    location <- norm_obj$parameters$normalization$location
    scale <- norm_obj$parameters$normalization$scale
    groupDF <- attr(attr(norm_obj, "omicsData"), "group_DF")
-   
+
    # Extract sample names from omicsData$e_data. This will be used to order the
    # group column from the groupDF attribute.
    enames <- names(attr(norm_obj, "omicsData")$e_data)
-   
+
    # Find the index of the biomolecule ID column in e_data. It will be removed
    # from the names vector later on.
    eidx <- which(enames == get_edata_cname(attr(norm_obj, "omicsData")))
-   
+
+   # Nab fdata_cname from the omicsData object.
+   fname <- get_fdata_cname(attr(norm_obj, "omicsData"))
+
   }
-  
+
   # Order the groups so they are in the same order as the samples of e_data.
-  groupie <- groupDF$Group[match(enames[-eidx], groupDF$SampleID)]
-  
+  groupie <- groupDF$Group[match(enames[-eidx], groupDF[[fname]])]
+
   # get p values using the value and group vectors and selected test
   if (test_fn == "kw") {
-    
+
     p_location <- kw_rcpp(matrix(location, nrow = 1), groupie)
     p_scale <- if(!is.null(scale))
       kw_rcpp(matrix(scale, nrow = 1), groupie) else
         NULL
-    
+
   } else if (test_fn == "anova") {
-    
+
     p_location <- aov(location ~ groupie) %>%
       summary() %>%
       {.[[1]]$`Pr(>F)`[1]}
@@ -89,11 +95,11 @@ normRes_tests <- function (norm_obj, test_fn = "kw") {
       summary() %>%
       {.[[1]]$`Pr(>F)`[1]} else
         NULL
-    
+
   }
-  
+
   res <- list(p_location = p_location, p_scale = p_scale)
-  
+
   return (res)
-  
+
 }
