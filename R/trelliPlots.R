@@ -806,7 +806,6 @@ trelli_abundance_heatmap <- function(trelliData,
 #'    
 #' }
 #' 
-#' 
 #' @author David Degnan, Lisa Bramer
 #' 
 #' @export
@@ -1017,10 +1016,157 @@ trelli_missingness_bar <- function(trelliData,
   
 }
 
+#' @name trelli_foldchange_bar
+#' 
+#' @title Bar chart trelliscope building function for fold_change   
+#' 
+#' @description Specify a plot design and cognostics for the fold_change barchart trelliscope.
+#'    Fold change must be grouped by edata_cname. 
+#' 
+#' @param trelliData A trelliscope data object with statRes results. Required. 
+#' @param cognostics A vector of cognostic options for each plot. Valid entries are
+#'    are fold_change and p_value.
+#' @param p_value_thresh A value between 0 and 1 to indicate a threshold to highlight
+#'    significant biomolecules. Default is 0.05. Selecting 0 will remove this feature. 
+#' @param ggplot_params An optional vector of strings of ggplot parameters to the backend ggplot
+#'    function. For example, c("ylab('')", "xlab('')"). Default is NULL. 
+#' @param interactive A logical argument indicating whether the plots should be interactive
+#'    or not. Interactive plots are ggplots piped to ggplotly (for now). Default is FALSE.  
+#' @param path The base directory of the trelliscope application. Default is Downloads. 
+#' @param name The name of the display. Default is Trelliscope.
+#' @param test_mode A logical to return a smaller trelliscope to confirm plot and design.
+#'    Default is FALSE.
+#' @param test_example The index number of the plot to return for test_mode. Default is 1. 
+#' 
+#' @examples
+#' \dontrun{
+#' 
+#' ## Build fold_change bar plot with statRes data grouped by edata_colname.
+#' trelli_group_by(trelliData = trelliData3, group = "LipidCommonName") %>% 
+#'   trelli_foldchange_bar(test_mode = T, test_example = 1:10)
+#'   
+#' ## Or make the plot interactive  
+#' trelli_group_by(trelliData = trelliData4, group = "LipidCommonName") %>% 
+#'   trelli_foldchange_bar(test_mode = T, test_example = 1:10, interactive = T) 
+#'    
+#' }
+#' 
+#' @author David Degnan, Lisa Bramer
+#' 
+#' @export
+trelli_foldchange_bar <- function(trelliData,
+                                  cognostics = c("fold_change", "p_value"),
+                                  p_value_thresh = 0.05,
+                                  ggplot_params = NULL,
+                                  interactive = FALSE,
+                                  path = getDownloadsFolder(),
+                                  name = "Trelliscope",
+                                  test_mode = FALSE,
+                                  test_example = 1,
+                                  ...) {
+  
+  # Run initial checks----------------------------------------------------------
+  
+  # Run generic checks 
+  trelli_precheck(trelliData = trelliData, 
+                  trelliCheck = "stat",
+                  cognostics = cognostics,
+                  acceptable_cognostics = c("p_value", "fold_change"),
+                  ggplot_params = ggplot_params,
+                  interactive = interactive,
+                  test_mode = test_mode, 
+                  test_example = test_example)
+  
+  # Round test example to integer 
+  if (test_mode) {test_example <- unique(abs(round(test_example)))}
+  
+  # Check that group data is edata_cname
+  edata_cname <- pmartR::get_edata_cname(trelliData$statRes)
+  if (edata_cname != attr(trelliData, "group_by_stat")) {
+    stop("trelliData must be grouped by edata_cname.")
+  }
+  
+  # Check p_value threshold
+  if (!is.numeric(p_value_thresh)) {
+    stop("p_value_thresh must be a numeric.")
+  }
+  if (p_value_thresh < 0 | p_value_thresh > 1) {
+    stop("p_value_thresh must be between 0 and 1.")
+  }
+  
+  
+  # Make foldchange bar function------------------------------------------------
+  
+  fc_bar_plot_fun <- function(DF, title) {
+    
+    # Change NaN to 0 just for the plotting functions
+    DF$p_value[is.nan(DF$p_value)] <- 0
+    DF$fold_change[is.nan(DF$fold_change)] <- 0
+    
+    # Indicate which comparisons should be highlighted
+    Significant <- ifelse(DF$p_value <= p_value_thresh, "black", NA)
+    
+    # Make bar plot 
+    bar <- ggplot2::ggplot(DF, ggplot2::aes(x = Comparison, y = fold_change, fill = Comparison)) +
+      ggplot2::geom_bar(stat = "identity", color = Significant) + ggplot2::theme_bw() + ggplot2::ggtitle(title) +
+      ggplot2::theme(
+        plot.title = ggplot2::element_text(hjust = 0.5), 
+        axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1),
+        legend.position = "none"
+      ) + ggplot2::ylab("Fold Change")
+    
+    # Add additional parameters
+    if (!is.null(ggplot_params)) {
+      for (param in ggplot_params) {
+        bar <- bar + eval(parse(text = paste0("ggplot2::", param)))
+      }
+    }
+    
+    # If interactive, pipe to ggplotly
+    if (interactive) {
+      bar <- bar %>% plotly::ggplotly()
+    }
+     
+    return(bar)
+    
+  }
+  
+  
+  # Create the cognostic function-----------------------------------------------
+  
+  fc_bar_cog_fun <- function(DF, Biomolecule) {
+    
+    # Prepare DF for quick_cog function
+    PreCog <- DF %>%
+      tidyr::pivot_longer(cognostics) %>%
+      dplyr::mutate(Comparison = paste(Comparison, name)) %>%
+      dplyr::select(-name)
+    
+    # Make quick cognostics
+    cog_to_trelli <- do.call(cbind, lapply(1:nrow(PreCog), function(row) {
+      quick_cog(gsub("_", " ", PreCog$Comparison[row]), round(PreCog$value[row], 4))
+    })) %>% tibble::tibble()
+    
+    return(cog_to_trelli)
+    
+  }
+  
+  # Build trelliscope function--------------------------------------------------
+  
+  # Subset down to test example if applicable
+  if (test_mode) {toBuild <- trelliData$trelliData.stat[test_example,]} else {toBuild <- trelliData$trelliData.stat}
+  
+  # Pass parameters to trelli_builder function
+  trelli_builder(toBuild = toBuild,
+                 cognostics = cognostics, 
+                 plotFUN = fc_bar_plot_fun,
+                 cogFUN = fc_bar_cog_fun,
+                 path = path,
+                 name = name,
+                 ...)
+  
+}
 
-
-
-# trelli_foldchange_bar (no emeta only)
 
 # trelli_foldchange_boxplot (emeta only)
 
