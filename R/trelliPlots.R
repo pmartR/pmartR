@@ -1557,23 +1557,23 @@ trelli_foldchange_heatmap <- function(trelliData,
   
   fc_hm_plot_fun <- function(DF, title) {
     
-    browser()
-    
     # Change NaN to 0 just for the plotting functions
     DF$p_value[is.nan(DF$p_value)] <- 0
-    DF$fold_change[is.nan(DF$fold_change)] <- 0
     
     # Indicate which comparisons should be highlighted
-    Significant <- ifelse(DF$p_value <= p_value_thresh & DF$p_value != 0, "red", "black")
+    Significant <- ifelse(DF$p_value <= p_value_thresh & DF$p_value != 0, "black", NA)
     
-    # Make boxplot
-    boxplot <- ggplot2::ggplot(DF, ggplot2::aes(x = Comparison, y = fold_change, fill = Comparison)) +
-      ggplot2::geom_boxplot() + ggplot2::geom_point(color = Significant) + ggplot2::theme_bw() +
-      ggplot2::theme(
-        plot.title = ggplot2::element_text(hjust = 0.5), 
-        axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1),
-        legend.position = "none"
-      ) + ggplot2::ylab("Fold Change") + ggplot2::ggtitle(title)
+    # Get edata cname
+    edata_cname <- get_edata_cname(trelliData$statRes)
+    
+    # Make heatmap
+    hm <- ggplot2::ggplot(DF, ggplot2::aes(x = Comparison, y = .data[[edata_cname]], fill = fold_change)) +
+      ggplot2::geom_tile() + ggplot2::theme_bw() + ggplot2::ylab("Biomolecule") + 
+      ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5), 
+                     axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1)) +
+      ggplot2::labs(fill = "Fold Change") +
+      ggplot2::scale_fill_gradient(low = "blue", high = "red", na.value = "white") +
+      ggplot2::ggtitle(title)
     
     # Add additional parameters
     if (!is.null(ggplot_params)) {
