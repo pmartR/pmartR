@@ -1434,7 +1434,32 @@ trelli_foldchange_volcano <- function(trelliData,
   fc_volcano_cog_fun <- function(DF, Group) {
     
     # Get count 
-    browser()
+    counts <- lapply(1:nrow(DF), function(row) {
+      if (!is.nan(DF$p_value[row]) && !is.nan(DF$fold_change[row]) && DF$p_value[row] <= p_value_thresh) {
+        ifelse(DF$fold_change[row] > 0, "High", "Low")
+      } else {return("Not Significant")}
+    }) %>% 
+      unlist() %>%
+      table(dnn = "Cog") %>%
+      data.table::data.table()
+    
+    # Add 0's if necessary
+    if (nrow(counts) != 3) {
+      all_options <- c("High", "Low", "Not Significant")
+      missing <- all_options[all_options %in% counts$Cog == FALSE]
+      counts <- rbind(counts, data.frame(Cog = missing, N = 0))
+    }
+    
+    # Set order
+    counts <- counts[order(counts$Cog),]
+    counts$N <- as.numeric(counts$N)
+    
+    # Convert to trelliscope cogs
+    cog_to_trelli <- do.call(cbind, lapply(1:nrow(counts), function(row) {
+      quick_cog(paste(counts$Cog[row], "Count"), counts$N[row])
+    })) %>% tibble::tibble()
+    
+    return(cog_to_trelli)
     
   }
   
