@@ -111,9 +111,11 @@ quick_cog <- function(name, value) {
 }
 
 # Create a list to convert from short name to long
-name_converter <- list("n" = "Count", "mean" = "Mean Abundance", 
+name_converter_abundance <- list("n" = "Count", "mean" = "Mean Abundance", 
                        "median" = "Median Abundance", "sd" = "Standard Deviation Abundance", 
                        "skew" = "Skew Abundance", "p_value" = "P Value", "fold_change" = "Fold Change")
+name_converter_foldchange <- list("n" = "Count", "mean" = "Mean Fold Change", 
+                                  "median" = "Median Fold Change", "sd" = "Standard Deviation Fold Change")
 
 # This function builds all trelliscopes.
 trelli_builder <- function(toBuild, cognostics, plotFUN, cogFUN, path, name, ...) {
@@ -317,7 +319,7 @@ trelli_abundance_boxplot <- function(trelliData,
         tidyr::pivot_longer(c(n, mean, median, sd, skew)) %>%
         dplyr::filter(name %in% cognostics) %>%
         dplyr::mutate(
-          name = paste(Group, lapply(name, function(x) {name_converter[[x]]}) %>% unlist())
+          name = paste(Group, lapply(name, function(x) {name_converter_abundance[[x]]}) %>% unlist())
         ) %>%
         dplyr::ungroup() %>%
         dplyr::select(-Group) 
@@ -349,7 +351,7 @@ trelli_abundance_boxplot <- function(trelliData,
           dplyr::select(c(Comparison, stat_cogs)) %>%
           tidyr::pivot_longer(stat_cogs) %>%
           dplyr::mutate(
-            name = paste(Comparison, lapply(name, function(x) {name_converter[[x]]}) %>% unlist()),
+            name = paste(Comparison, lapply(name, function(x) {name_converter_abundance[[x]]}) %>% unlist()),
             value = round(value, 4)
           ) %>%
           dplyr::ungroup() %>%
@@ -1279,7 +1281,29 @@ trelli_foldchange_boxplot <- function(trelliData,
   
   fc_box_cog_fun <- function(DF, Group) {
     
-    browser()
+    # Calculate stats and subset to selected choices 
+    cog_to_trelli <- DF %>%
+      dplyr::group_by(Comparison) %>%
+      dplyr::summarise(
+        "n" = sum(!is.nan(fold_change)), 
+        "mean" = round(mean(fold_change, na.rm = T), 4),
+        "median" = round(median(fold_change, na.rm = T), 4),
+        "sd" = round(sd(fold_change, na.rm = T), 4)
+      ) %>%
+     tidyr::pivot_longer(c(n, mean, median, sd)) %>%
+     dplyr::filter(name %in% cognostics) %>%
+     dplyr::mutate(
+      name = paste(Comparison, lapply(name, function(x) {name_converter_foldchange[[x]]}) %>% unlist())
+     ) %>%
+    dplyr::ungroup() %>%
+    dplyr::select(-Comparison) 
+    
+    # Add new cognostics 
+    cog_to_trelli <- do.call(cbind, lapply(1:nrow(cog_to_trelli), function(row) {
+      quick_cog(gsub("_", " ", cog_to_trelli$name[row]), cog_to_trelli$value[row])
+    })) %>% tibble::tibble()
+    
+    return(cog_to_trelli)
     
   }
   
