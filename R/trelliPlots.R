@@ -1176,7 +1176,7 @@ trelli_foldchange_bar <- function(trelliData,
 #'    Fold change must be grouped by an emeta column, which means both an omicsData
 #'    object and statRes are required to make this plot. 
 #' 
-#' @param trelliData A trelliscope data object with statRes results. Required. 
+#' @param trelliData A trelliscope data object with omicsData and statRes results. Required. 
 #' @param cognostics A vector of cognostic options for each plot. Valid entries are
 #'    are n ,mean, median, and sd. 
 #' @param p_value_thresh A value between 0 and 1 to indicate a threshold to highlight
@@ -1323,8 +1323,137 @@ trelli_foldchange_boxplot <- function(trelliData,
   
 }
 
+#' @name trelli_foldchange_volcano
+#' 
+#' @title Volcano trelliscope building function for fold_change   
+#' 
+#' @description Specify a plot design and cognostics for the fold_change volcano trelliscope.
+#'    Fold change must be grouped by an emeta column, which means both an omicsData
+#'    object and statRes are required to make this plot. 
+#' 
+#' @param trelliData A trelliscope data object with omicsData and statRes results. Required. 
+#' @param cognostics A vector of cognostic options for each plot. Valid entry is n. 
+#' @param p_value_thresh A value between 0 and 1 to indicate a threshold to highlight
+#'    significant biomolecules. Default is 0.05. Selecting 0 will remove this feature. 
+#' @param ggplot_params An optional vector of strings of ggplot parameters to the backend ggplot
+#'    function. For example, c("ylab('')", "xlab('')"). Default is NULL. 
+#' @param interactive A logical argument indicating whether the plots should be interactive
+#'    or not. Interactive plots are ggplots piped to ggplotly (for now). Default is FALSE.  
+#' @param path The base directory of the trelliscope application. Default is Downloads. 
+#' @param name The name of the display. Default is Trelliscope.
+#' @param test_mode A logical to return a smaller trelliscope to confirm plot and design.
+#'    Default is FALSE.
+#' @param test_example The index number of the plot to return for test_mode. Default is 1. 
+#' 
+#' @examples
+#' \dontrun{ 
+#' 
+#' ## Build fold_change bar plot with statRes data grouped by edata_colname.
+#' trelli_group_by(trelliData = trelliData4, group = "LipidFamily") %>% 
+#'   trelli_foldchange_volcano()
+#'
+#' }
+#' 
+#' @author David Degnan, Lisa Bramer
+#' 
+#' @export
+trelli_foldchange_volcano <- function(trelliData,
+                                      cognostics = c("n"),
+                                      p_value_thresh = 0.05,
+                                      ggplot_params = NULL,
+                                      interactive = FALSE,
+                                      path = getDownloadsFolder(),
+                                      name = "Trelliscope",
+                                      test_mode = FALSE,
+                                      test_example = 1,
+                                      ...) {
+  
+  # Run initial checks----------------------------------------------------------
+  
+  # Run generic checks 
+  trelli_precheck(trelliData = trelliData, 
+                  trelliCheck = c("omics", "stat"),
+                  cognostics = cognostics,
+                  acceptable_cognostics = c("n"),
+                  ggplot_params = ggplot_params,
+                  interactive = interactive,
+                  test_mode = test_mode, 
+                  test_example = test_example)
+  
+  # Round test example to integer 
+  if (test_mode) {test_example <- unique(abs(round(test_example)))}
+  
+  # Check that group data is an emeta column
+  if (attr(trelliData, "group_by_omics") %in% attr(trelliData, "emeta_col") == FALSE) {
+    stop("trelliData must be grouped_by an e_meta column.")
+  }
+  
+  # Check p_value threshold
+  if (!is.numeric(p_value_thresh)) {
+    stop("p_value_thresh must be a numeric.")
+  }
+  if (p_value_thresh < 0 | p_value_thresh > 1) {
+    stop("p_value_thresh must be between 0 and 1.")
+  }
+  
+  # Make foldchange volcano function--------------------------------------------
+  
+  fc_volcano_plot_fun <- function(DF, title) {
+    
+    # Indicate which comparisons should be highlighted
+    DF$Significant <- lapply(1:nrow(DF), function(row) {
+      if (!is.nan(DF$p_value[row]) && !is.nan(DF$fold_change[row]) && DF$p_value[row] <= p_value_thresh) {
+        ifelse(DF$fold_change[row] > 0, "High", "Low")
+      } else {return("Not Significant")}
+    }) %>% unlist()
+    
+    # Make volcano plot
+    volcano <- ggplot2::ggplot(DF, ggplot2::aes(x = fold_change, y = -log10(p_value), color = Significant)) +
+      ggplot2::geom_point() + ggplot2::theme_bw() + ggplot2::ggtitle(title) +
+      ggplot2::scale_color_manual(values = c("Low" = "blue", "Not Significant" = "black", "High" = "red")) +
+      ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) +
+      ggplot2::xlab("Fold Change") + ggplot2::ylab("-Log10 P Value")
+    
+    # Add additional parameters
+    if (!is.null(ggplot_params)) {
+      for (param in ggplot_params) {
+        volcano <- volcano + eval(parse(text = paste0("ggplot2::", param)))
+      }
+    }
+    
+    # If interactive, pipe to ggplotly
+    if (interactive) {
+      volcano <- volcano %>% plotly::ggplotly()
+    }
+    
+    return(volcano)
+  }
+  
+  # Make cognostic function-----------------------------------------------------
+  
+  fc_volcano_cog_fun <- function(DF, Group) {
+    
+    # Get count 
+    browser()
+    
+  }
+  
+  # Build the trelliscope-------------------------------------------------------
+  
+  # Subset down to test example if applicable
+  if (test_mode) {toBuild <- trelliData$trelliData.stat[test_example,]} else {toBuild <- trelliData$trelliData.stat}
+  
+  # Pass parameters to trelli_builder function
+  trelli_builder(toBuild = toBuild,
+                 cognostics = cognostics, 
+                 plotFUN = fc_volcano_plot_fun,
+                 cogFUN = fc_volcano_cog_fun,
+                 path = path,
+                 name = name,
+                 ...)
+  
+}
 
-# trelli_foldchange_volcano (emeta only)
 
 # trelli_foldchange_heatmap (emeta only)
 
