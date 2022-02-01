@@ -843,18 +843,39 @@ trelli_missingness_bar <- function(trelliData,
   # Generate a function to make missingness dataframes--------------------------
   get_missing_DF <- function(DF) {
     
-    # Add a blank group if no group designation was given
-    if (is.null(attributes(trelliData$omicsData)$group_DF)) {DF$Group <- "x"} 
-    
-    # Create missingness data.frame
-    Missingness <- DF %>%
-      dplyr::group_by(Group) %>%
-      dplyr::summarise(
-        `Absent Count` = sum(is.na(Abundance)),
-        `Present Count` = sum(!is.na(Abundance)),
-        `Absent Proportion` = round(`Absent Count` / sum(c(`Absent Count`, `Present Count`)), 4),
-        `Present Proportion` = round(`Present Count` / sum(c(`Absent Count`, `Present Count`)), 4)
-      ) 
+    # If there is no omics data, use statRes 
+    if (is.null(trelliData$omicsData)) {
+      
+      # Add to total counts 
+      Missingness <- data.table::data.table(
+        Group = gsub("Count_", "", colnames(DF)),
+        `Present Count` = unlist(DF)
+      ) %>%
+        merge(totalCounts, by = "Group") %>%
+        dplyr::mutate(
+          `Absent Count` = Total - `Present Count`, 
+          `Absent Proportion` = `Absent Count` / Total,
+          `Present Proportion` = `Present Count` / Total
+        ) %>%
+        dplyr::select(-Total) %>%
+        dplyr::mutate(Group, `Absent Count`, `Present Count`, `Absent Proportion`, `Present Proportion`)
+      
+    } else {
+      
+      # Add a blank group if no group designation was given
+      if (is.null(attributes(trelliData$omicsData)$group_DF)) {DF$Group <- "x"} 
+      
+      # Create missingness data.frame
+      Missingness <- DF %>%
+        dplyr::group_by(Group) %>%
+        dplyr::summarise(
+          `Absent Count` = sum(is.na(Abundance)),
+          `Present Count` = sum(!is.na(Abundance)),
+          `Absent Proportion` = round(`Absent Count` / sum(c(`Absent Count`, `Present Count`)), 4),
+          `Present Proportion` = round(`Present Count` / sum(c(`Absent Count`, `Present Count`)), 4)
+        ) 
+      
+    }
     
     return(Missingness)
     
@@ -892,7 +913,7 @@ trelli_missingness_bar <- function(trelliData,
                      legend.title = ggplot2::element_blank()) 
     
     # Remove x axis if no groups
-    if (is.null(attributes(trelliData$omicsData)$group_DF)) {
+    if (is.null(attributes(trelliData$omicsData)$group_DF) & stats_mode == FALSE) {
       missing_bar <- missing_bar + ggplot2::theme(axis.title.x = ggplot2::element_blank(),
                                                   axis.ticks.x = ggplot2::element_blank(), 
                                                   axis.text.x = ggplot2::element_blank())
@@ -953,8 +974,37 @@ trelli_missingness_bar <- function(trelliData,
   
   # Build trelliscope display---------------------------------------------------
   
-  # If test_mode is on, then just build the required panels
-  if (test_mode) {toBuild <- trelliData$trelliData.omics[test_example,]} else {toBuild <- trelliData$trelliData.omics}
+  # If test_mode is on, then just build the required panels. If the data is statRes, we 
+  # will need to restructure the data a bit. 
+  if (!is.null(trelliData$trelliData.omics)) {
+    stats_mode <- FALSE
+    if (test_mode) {toBuild <- trelliData$trelliData.omics[test_example,]} else {toBuild <- trelliData$trelliData.omics}
+  } else {
+    
+    stats_mode <- TRUE
+    
+    # Get the edata column name 
+    edata_cname <- get_edata_cname(trelliData$statRes)
+    
+    # Get the columns with counts 
+    count_cols <- colnames(trelliData$statRes)[grepl("Count", colnames(trelliData$statRes))]
+    
+    # Build toBuild dataframe
+    toBuild <- trelliData$statRes %>%
+      dplyr::select(c(edata_cname, count_cols)) %>%
+      dplyr::group_by(!!rlang::sym(edata_cname)) %>%
+      tidyr::nest() %>%
+      dplyr::ungroup() %>%
+      dplyr::rename(Nested_DF = data)
+    
+    # Save total counts 
+    totalCounts <- attr(statRes, "group_DF")$Group %>% 
+      table(dnn = "Group") %>% 
+      data.frame() %>% 
+      dplyr::rename(Total = Freq)
+    
+    if (test_mode) {toBuild <- toBuild[test_example,]} 
+  }
   
   # Pass parameters to trelli_builder function
   trelli_builder(toBuild = toBuild,
@@ -966,6 +1016,9 @@ trelli_missingness_bar <- function(trelliData,
                  ...)
   
 }
+
+
+
 
 # trelli_foldchange_bar (no emeta only)
 
