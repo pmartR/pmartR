@@ -550,7 +550,7 @@ trelli_abundance_histogram <- function(trelliData,
           dplyr::select(c(Comparison, stat_cogs)) %>%
           tidyr::pivot_longer(stat_cogs) %>%
           dplyr::mutate(
-            name = paste(Comparison, lapply(name, function(x) {name_converter[[x]]}) %>% unlist()),
+            name = paste(Comparison, lapply(name, function(x) {name_converter_abundance[[x]]}) %>% unlist()),
             value = round(value, 4)
           ) %>%
           dplyr::ungroup() %>%
@@ -725,7 +725,7 @@ trelli_abundance_heatmap <- function(trelliData,
       tidyr::pivot_longer(c(n, mean, median, sd, skew)) %>%
       dplyr::filter(name %in% cognostics) %>%
       dplyr::mutate(
-        name = paste(Group, lapply(name, function(x) {name_converter[[x]]}) %>% unlist())
+        name = paste(Group, lapply(name, function(x) {name_converter_abundance[[x]]}) %>% unlist())
       ) %>%
       dplyr::ungroup() %>%
       dplyr::select(-Group) 
@@ -1479,8 +1479,159 @@ trelli_foldchange_volcano <- function(trelliData,
   
 }
 
+#' @name trelli_foldchange_heatmap
+#' 
+#' @title Heatmap trelliscope building function for fold_change   
+#' 
+#' @description Specify a plot design and cognostics for the fold_change heatmap trelliscope.
+#'    Fold change must be grouped by an emeta column, which means both an omicsData
+#'    object and statRes are required to make this plot. 
+#' 
+#' @param trelliData A trelliscope data object with omicsData and statRes results. Required. 
+#' @param cognostics A vector of cognostic options for each plot. Valid entries are
+#'    are n, mean, median, and sd. 
+#' @param p_value_thresh A value between 0 and 1 to indicate a threshold to highlight
+#'    significant biomolecules. Default is 0.05. Selecting 0 will remove this feature. 
+#' @param ggplot_params An optional vector of strings of ggplot parameters to the backend ggplot
+#'    function. For example, c("ylab('')", "xlab('')"). Default is NULL. 
+#' @param interactive A logical argument indicating whether the plots should be interactive
+#'    or not. Interactive plots are ggplots piped to ggplotly (for now). Default is FALSE.  
+#' @param path The base directory of the trelliscope application. Default is Downloads. 
+#' @param name The name of the display. Default is Trelliscope.
+#' @param test_mode A logical to return a smaller trelliscope to confirm plot and design.
+#'    Default is FALSE.
+#' @param test_example The index number of the plot to return for test_mode. Default is 1. 
+#' 
+#' @examples
+#' \dontrun{ 
+#' 
+#' ## Build fold_change bar plot with statRes data grouped by edata_colname.
+#' trelli_group_by(trelliData = trelliData4, group = "LipidFamily") %>% 
+#'   trelli_foldchange_heatmap()
+#'
+#' }
+#' 
+#' @author David Degnan, Lisa Bramer
+#' 
+#' @export
+trelli_foldchange_heatmap <- function(trelliData,
+                                      cognostics = c("n", "median", "mean", "sd"),
+                                      p_value_thresh = 0.05,
+                                      ggplot_params = NULL,
+                                      interactive = FALSE,
+                                      path = getDownloadsFolder(),
+                                      name = "Trelliscope",
+                                      test_mode = FALSE,
+                                      test_example = 1,
+                                      ...) {
+  
+  # Run initial checks----------------------------------------------------------
+  
+  # Run generic checks 
+  trelli_precheck(trelliData = trelliData, 
+                  trelliCheck = c("omics", "stat"),
+                  cognostics = cognostics,
+                  acceptable_cognostics = c("n", "median", "mean", "sd"),
+                  ggplot_params = ggplot_params,
+                  interactive = interactive,
+                  test_mode = test_mode, 
+                  test_example = test_example)
+  
+  # Round test example to integer 
+  if (test_mode) {test_example <- unique(abs(round(test_example)))}
+  
+  # Check that group data is an emeta column
+  if (attr(trelliData, "group_by_omics") %in% attr(trelliData, "emeta_col") == FALSE) {
+    stop("trelliData must be grouped_by an e_meta column.")
+  }
+  
+  # Check p_value threshold
+  if (!is.numeric(p_value_thresh)) {
+    stop("p_value_thresh must be a numeric.")
+  }
+  if (p_value_thresh < 0 | p_value_thresh > 1) {
+    stop("p_value_thresh must be between 0 and 1.")
+  }
+  
+  # Make foldchange boxplot function--------------------------------------------
+  
+  fc_hm_plot_fun <- function(DF, title) {
+    
+    browser()
+    
+    # Change NaN to 0 just for the plotting functions
+    DF$p_value[is.nan(DF$p_value)] <- 0
+    DF$fold_change[is.nan(DF$fold_change)] <- 0
+    
+    # Indicate which comparisons should be highlighted
+    Significant <- ifelse(DF$p_value <= p_value_thresh & DF$p_value != 0, "red", "black")
+    
+    # Make boxplot
+    boxplot <- ggplot2::ggplot(DF, ggplot2::aes(x = Comparison, y = fold_change, fill = Comparison)) +
+      ggplot2::geom_boxplot() + ggplot2::geom_point(color = Significant) + ggplot2::theme_bw() +
+      ggplot2::theme(
+        plot.title = ggplot2::element_text(hjust = 0.5), 
+        axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1),
+        legend.position = "none"
+      ) + ggplot2::ylab("Fold Change") + ggplot2::ggtitle(title)
+    
+    # Add additional parameters
+    if (!is.null(ggplot_params)) {
+      for (param in ggplot_params) {
+        hm <- hm + eval(parse(text = paste0("ggplot2::", param)))
+      }
+    }
+    
+    # If interactive, pipe to ggplotly
+    if (interactive) {
+      hm <- hm %>% plotly::ggplotly()
+    }
+    
+    return(hm)
+  }
+  
+  # Make cognostic function-----------------------------------------------------
+  
+  fc_hm_cog_fun <- function(DF, Group) {
+    
+    # Calculate stats and subset to selected choices 
+    cog_to_trelli <- DF %>%
+      dplyr::group_by(Comparison) %>%
+      dplyr::summarise(
+        "n" = sum(!is.nan(fold_change)), 
+        "mean" = round(mean(fold_change, na.rm = T), 4),
+        "median" = round(median(fold_change, na.rm = T), 4),
+        "sd" = round(sd(fold_change, na.rm = T), 4)
+      ) %>%
+      tidyr::pivot_longer(c(n, mean, median, sd)) %>%
+      dplyr::filter(name %in% cognostics) %>%
+      dplyr::mutate(
+        name = paste(Comparison, lapply(name, function(x) {name_converter_foldchange[[x]]}) %>% unlist())
+      ) %>%
+      dplyr::ungroup() %>%
+      dplyr::select(-Comparison) 
+    
+    # Add new cognostics 
+    cog_to_trelli <- do.call(cbind, lapply(1:nrow(cog_to_trelli), function(row) {
+      quick_cog(gsub("_", " ", cog_to_trelli$name[row]), cog_to_trelli$value[row])
+    })) %>% tibble::tibble()
+    
+    return(cog_to_trelli)
+    
+  }
+  
+  # Build the trelliscope-------------------------------------------------------
+  
+  # Subset down to test example if applicable
+  if (test_mode) {toBuild <- trelliData$trelliData.stat[test_example,]} else {toBuild <- trelliData$trelliData.stat}
+  
+  # Pass parameters to trelli_builder function
+  trelli_builder(toBuild = toBuild,
+                 cognostics = cognostics, 
+                 plotFUN = fc_hm_plot_fun,
+                 cogFUN = fc_hm_cog_fun,
+                 path = path,
+                 name = name,
+                 ...)
 
-# trelli_foldchange_heatmap (emeta only)
-
-
-
+}
