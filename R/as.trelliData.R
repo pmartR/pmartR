@@ -644,7 +644,7 @@ summary.trelliData <- function(trelliData) {
     
     # Extract emeta colnames
     emeta_cols <- attr(trelliData, "emeta_col")
-    emeta_cols_missing <- is.null(emeta_cname)
+    emeta_cols_missing <- is.null(emeta_cols)
     
   }
   
@@ -674,7 +674,27 @@ summary.trelliData <- function(trelliData) {
     if (omics == FALSE) {All_Options <- All_Options %>% dyplr::filter(`Data Type` != "omics" | is.na(`Data Type`))}
     if (stat == FALSE) {All_Options <- All_Options %>% dplyr::filter(`Data Type` != "stat" | is.na(`Data Type`))}
     
-    # Replace 
+    # Remove data type and add a holder for count
+    All_Options <- All_Options %>%
+      dplyr::select(-`Data Type`) %>%
+      dplyr::mutate(`Number of Plots` = 0)
+    
+    # Replace names and get counts 
+    if ("e_data cname" %in% All_Options$`Group By Choice`) {
+      All_Options[All_Options$`Group By Choice` == "e_data cname", "Number of Plots"] <- trelliData$omicsData$e_data %>% nrow()
+      All_Options[All_Options$`Group By Choice` == "e_data cname", "Group By Choice"] <- edata_cname
+    }
+    
+    if ("f_data cname" %in% All_Options$`Group By Choice`) {
+      All_Options[All_Options$`Group By Choice` == "f_data cname", "Number of Plots"] <- trelliData$omicsData$f_data %>% nrow()
+      All_Options[All_Options$`Group By Choice` == "f_data cname", "Group By Choice"] <- fdata_cname
+    }
+    
+    if ("e_meta column" %in% All_Options$`Group By Choice`) {browser()}
+    
+    browser()
+    
+    
   }
   
 }
