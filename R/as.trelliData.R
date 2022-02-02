@@ -194,7 +194,7 @@ as.trelliData.edata <- function(e_data,
   # the column name of the trelliData.omics/trelliData.stat that the data has 
   # been grouped by. And "group_by" tracks whether the group_by function has been
   # applied or not. 
-  attr(trelliData, "fdata_col") <- NULL
+  attr(trelliData, "fdata_col") <- "Sample"
   attr(trelliData, "emeta_col") <- NULL
   attr(trelliData, "group_by_options") <- c(edata_cname, fdata_cname)
   attr(trelliData, "group_by_omics") <- NA
@@ -577,5 +577,104 @@ trelli_group_by <- function(trelliData, group) {
   # Export results--------------------------------------------------------------
   attr(trelliData, "group_by") <- TRUE
   return(trelliData)
+  
+}
+
+#' Summarizes potential plotting options for a trelliData object 
+#' 
+#' @param trelliData An object of the as.trelliData.edata or as.trelliData functions. 
+#' 
+#' @examples 
+#' \dontrun{
+#' 
+#' library(dplyr)
+#' 
+#' # Use an edata example. Build with as.trelliData.edata.
+#' summary(trelliData)
+#' summary(trelliData %>% trelli_group_by("LipidCommonName"))
+#' summary(trelliData %>% trelli_group_by("Sample"))
+#' 
+#' 
+#' 
+#' }
+#' 
+#' @export
+#' @rdname summary-trelliData
+#' @name summary-trelliData
+summary.trelliData <- function(trelliData) {
+  
+  ##################
+  ## CHECK INPUTS ##
+  ##################
+  
+  if (!inherits(trelliData, "trelliData")) {
+    stop("trelliData must be a trelliData object from as.trelliData.edata or as.trelliData.")
+  }
+  
+  #######################################
+  ## EXTRACT ATTRIBUTES AND PROPERTIES ##
+  #######################################
+  
+  # First, we must know if this data has been grouped at all
+  Group_By <- attr(trelliData, "group_by")
+  
+  # Second, let's determine if there's omicsData or statRes or both in this object
+  omics <- !is.null(trelliData$trelliData.omics)
+  stat <- !is.null(trelliData$trelliData.stat)
+  
+  # Third, let's determine if this object is a trelliData.edata
+  edata_only <- inherits(trelliData, "trelliData.edata")
+  
+  # If the data has been grouped, collect grouping information
+  if (Group_By) {
+    
+    
+    
+  # Otherwise, get potential group_by options  
+  } else {
+    
+    # Get edata_cname
+    if (omics) {edata_cname <- get_edata_cname(trelliData$omicsData)} else {
+      edata_cname <- get_edata_cname(trelliData$statRes)
+    }
+    
+    # Extract fdata_cname
+    fdata_cname <- attr(trelliData, "fdata_col")
+    fdata_cname_missing <- is.null(fdata_cname)
+    
+    # Extract emeta colnames
+    emeta_cols <- attr(trelliData, "emeta_col")
+    emeta_cols_missing <- is.null(emeta_cname)
+    
+  }
+  
+  #####################
+  ## BUILD DATAFRAME ##
+  #####################
+  
+  # If there is no grouping information, we should suggest potential plots. 
+  if (Group_By == FALSE) {
+    
+    # Create a base data.frame which can be filtered
+    All_Options <- data.table::data.table(
+      `Group By Choice` = c(rep("e_data cname", 4), rep("f_data cname", 2), rep("e_meta column", 6)),
+       Plot = c("abundance boxplot", "abundance histogram", "missingness barplot", 
+               "fold change barplot","abundance boxplot", "missingness barplot", 
+               "abundance boxplot", "abundance heatmap", "missingness barplot",
+               "fold change boxplot", "fold change heatmap", "fold change volcano"),
+      `Data Type` = c("omics", "omics", NA, "stat", "omics", NA, "omics", "omics", 
+                      NA, "stat", "stat", "stat")
+    )
+    
+    # Filter by "Group by" choices 
+    if (fdata_cname_missing) {All_Options <- All_Options %>% dplyr::filter(`Group By Choice` != "f_data cname")}
+    if (emeta_cols_missing) {All_Options <- All_Options %>% dplyr::filter(`Group By Choice` != "e_meta column")}
+    
+    # Filter by "Data Type"
+    if (omics == FALSE) {All_Options <- All_Options %>% dyplr::filter(`Data Type` != "omics" | is.na(`Data Type`))}
+    if (stat == FALSE) {All_Options <- All_Options %>% dplyr::filter(`Data Type` != "stat" | is.na(`Data Type`))}
+    
+    # Replace 
+  }
   
 }
