@@ -6,8 +6,8 @@
 \usage{
 statres_barplot(
   x,
-  stacked = FALSE,
-  fc_colors = c("red", "black", "green"),
+  stacked,
+  fc_colors,
   text_size,
   display_count,
   x_lab,

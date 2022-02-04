@@ -10,6 +10,10 @@
   fc_threshold = NULL,
   fc_colors = c("red", "black", "green"),
   stacked = FALSE,
+  show_sig = TRUE,
+  color_low = NULL,
+  color_high = NULL,
+  plotly_layout = NULL,
   interactive = FALSE,
   x_lab = NULL,
   x_lab_size = 11,
@@ -46,6 +50,21 @@ respectively}
 
 \item{stacked}{TRUE/FALSE for whether to stack positive and negative fold
 change sections in the barplot, defaults to FALSE}
+
+\item{show_sig}{This input is used when \code{plot_type = "gheatmap"}. A
+logical value. If TRUE a visual indicator that a certain bin combination is
+significant by the g-test is shown.}
+
+\item{color_low}{This input is used when \code{plot_type = "gheatmap"}. A
+character string specifying the color of the gradient for low count values.}
+
+\item{color_high}{This input is used when \code{plot_type = "gheatmap"}. A
+character string specifying the color of the gradient for high count
+values.}
+
+\item{plotly_layout}{This input is used when \code{plot_type = "gheatmap"}. A
+list of arguments, not including the plot, to be passed to
+\code{plotly::layout} if \code{interactive = TRUE}.}
 
 \item{interactive}{TRUE/FALSE for whether to create an interactive plot using
 plotly.  Not valid for all plots.}

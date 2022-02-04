@@ -246,7 +246,8 @@ plot.dataRes <- function (dataRes_obj, metric = NULL, density = FALSE,
     } else {
 
       # Combine the plots into one plot when interactive is FALSE.
-      gridExtra::grid.arrange(q, p, ncol = 2)
+
+      q + p
 
     }
 
@@ -737,14 +738,13 @@ plot.SPANSRes <- function (SPANSRes_obj, interactive = FALSE,
                             "normalization_method",
                             "parameters"))
 
-  # get subset/normalization names for the best scored methods
-  best_ss <- SPANSRes_obj %>%
-    dplyr::top_n(1, wt = SPANS_score) %>%
-    {.$ss_par}
-
-  best_norm <- SPANSRes_obj %>%
-    dplyr::top_n(1, wt = SPANS_score) %>%
-    {.$normalization_method}
+  # Farm boy, fix all the problems. As you wish. Filter rows with the highest
+  # SPANS score. This subsetted/filtered data frame will be used to add points
+  # to the plot for the best scoring methods. The best methods are those with
+  # the highest SPANS_score. The slice_max function will select ALL rows where
+  # the highest score occurs.
+  da_best <- SPANSRes_obj %>%
+    dplyr::slice_max(SPANS_score)
 
   # Do all the tedious plot label crap.
   xlabel <- if (is.null(x_lab)) "Normalization Method" else x_lab
@@ -763,11 +763,10 @@ plot.SPANSRes <- function (SPANSRes_obj, interactive = FALSE,
                                     y = ss_par,
                                     fill = SPANS_score),
                        color = 'black') +
-    ggplot2::geom_point(data = SPANSRes_obj %>%
-                          dplyr::filter(ss_par %in% best_ss,
-                                        normalization_method %in% best_norm),
+    ggplot2::geom_point(data = da_best,
                         ggplot2::aes(x = normalization_method,
-                                     y = ss_par, shape = '1')) +
+                                     y = ss_par,
+                                     shape = '1')) +
     ggplot2::scale_alpha_continuous(name = 'Not Scored',
                                     labels = '') +
     ggplot2::scale_shape_discrete(name = 'Best Scores',
@@ -789,7 +788,7 @@ plot.SPANSRes <- function (SPANSRes_obj, interactive = FALSE,
       plot.title = ggplot2::element_text(size = title_lab_size),
       axis.title.x = ggplot2::element_text(size = x_lab_size),
       axis.title.y = ggplot2::element_text(size = y_lab_size),
-      axis.text.x = ggplot2::element_text(angle = x_lab_angle, hjust = 1),
+      axis.text.x = ggplot2::element_text(angle = x_lab_angle),
       legend.position = legend_position,
       panel.border = ggplot2::element_blank(),
       panel.grid.major = ggplot2::element_blank(),
@@ -820,8 +819,8 @@ plot.SPANSRes <- function (SPANSRes_obj, interactive = FALSE,
           if (is.null(color_high)) "#56B1F7" else color_high)
       ),
       type = "heatmap") %>%
-      plotly::add_trace(x = best_norm,
-                        y = best_ss,
+      plotly::add_trace(x = da_best$normalization_method,
+                        y = da_best$ss_par,
                         type = 'scatter',
                         mode = "markers",
                         marker = list(color = "black"),
@@ -2328,11 +2327,6 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
   if (!is.null(min_nonmiss_gtest)) {
 
     p <- p +
-      ggplot2::geom_point(data = plotter2,
-                          ggplot2::aes(x = Count_biomolecules,
-                                       y = Min_obs,
-                                       color = Statistic),
-                          size = point_size) +
       ggplot2::geom_vline(
         ggplot2::aes(xintercept = n_biomolecules_gtest[min_nonmiss_gtest + 1],
                      color = "G-test applied filter"),
@@ -2357,11 +2351,6 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
   if (!is.null(min_nonmiss_anova)) {
 
     p <- p +
-      ggplot2::geom_point(data = plotter1,
-                          ggplot2::aes(x = Count_biomolecules,
-                                       y = Min_obs,
-                                       color = Statistic),
-                          size = point_size) +
       ggplot2::geom_vline(
         ggplot2::aes(xintercept = n_biomolecules_anova[min_nonmiss_anova + 1],
                      color = "ANOVA applied filter"),
@@ -2383,6 +2372,7 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
   }
 
   # Evan, add a custom legend according to anova and gtest inputs. As you wish.
+  # A minimum for gtest IS supplied and a minimum for anova IS NOT supplied.
   if (!is.null(min_nonmiss_gtest) && is.null(min_nonmiss_anova)) {
 
     # Add a customized legend when min_nonmiss_gtest is not NULL and
@@ -2391,19 +2381,28 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
       ggplot2::scale_color_manual(
         name = if (is.null(legend_lab)) "" else legend_lab,
         values = c(
-          if (is.null(palette)) "#FFC107" else colas[[2]],
-          if (is.null(palette)) "#FFC107" else colas[[2]]
+          `Within 1+ groups (G-Test)` = if (is.null(palette))
+            "#FFC107" else
+              colas[[2]],
+          `G-test applied filter` = if (is.null(palette))
+            "#FFC107" else
+              colas[[2]],
+          `Within 2+ groups (ANOVA)` = if (is.null(palette))
+            "#004D40" else
+              colas[[3]]
         ),
         breaks = c(
-          plotter2$Statistic[[1]], "G-test applied filter"
+          plotter2$Statistic[[1]], "G-test applied filter",
+          plotter1$Statistic[[1]], "ANOVA applied filter"
         ),
         guide = ggplot2::guide_legend(
           override.aes = list(
-            linetype = c(0, 2),
-            shape = c(16, NA),
+            linetype = c(0, 2, 0),
+            shape = c(16, NA, 16),
             color = c(
               if (is.null(palette)) "#FFC107" else colas[[2]],
-              if (is.null(palette)) "#FFC107" else colas[[2]]
+              if (is.null(palette)) "#FFC107" else colas[[2]],
+              if (is.null(palette)) "#004D40" else colas[[3]]
             )
           )
         )
@@ -2417,17 +2416,26 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
       ggplot2::scale_color_manual(
         name = if (is.null(legend_lab)) "" else legend_lab,
         values = c(
-          if (is.null(palette)) "#004D40" else colas[[3]],
-          if (is.null(palette)) "#004D40" else colas[[3]]
+          `Within 1+ groups (G-Test)` = if (is.null(palette))
+            "#FFC107" else
+              colas[[2]],
+          `Within 2+ groups (ANOVA)` = if (is.null(palette))
+            "#004D40" else
+              colas[[3]],
+          `ANOVA applied filter` = if (is.null(palette))
+            "#004D40" else
+              colas[[3]]
         ),
         breaks = c(
+          plotter2$Statistic[[1]], "G-test applied filter",
           plotter1$Statistic[[1]], "ANOVA applied filter"
         ),
         guide = ggplot2::guide_legend(
           override.aes = list(
-            linetype = c(0, 2),
-            shape = c(16, NA),
+            linetype = c(0, 0, 2),
+            shape = c(16, 16, NA),
             color = c(
+              if (is.null(palette)) "#FFC107" else colas[[2]],
               if (is.null(palette)) "#004D40" else colas[[3]],
               if (is.null(palette)) "#004D40" else colas[[3]]
             )
@@ -2493,18 +2501,17 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
 #'   two elements. The first element is a data frame with the counts of proteins
 #'   mapping to each peptide. The second element is also a data frame with the
 #'   counts of peptides mapping to each protein.
+#' @param plot_type A character string specifying the type of plot to be
+#'   displayed. The available options are "num_peps" or "redundancy". If
+#'   "num_peps" the plot is displayed that shows the counts of proteins that
+#'   have a specific number of peptides mapping to them. If "redundancy" the
+#'   plot showing the counts of peptides that map to a specific number of
+#'   proteins is displayed.
 #' @param min_num_peps an optional integer value between 1 and the maximum
 #'   number of peptides that map to a protein in the data. The value specifies
 #'   the minimum number of peptides that must map to a protein. Any protein with
 #'   less than \code{min_num_peps} mapping to it will be returned as a protein
 #'   that should be filtered. Default value is NULL.
-#' @param view_num_peps Logical. If TRUE the plot is displayed that shows the
-#'   counts of proteins that have a specific number of peptides mapping to them.
-#'   The default value is TRUE.
-#' @param view_redundancy Logical. If TRUE the plot showing the counts of
-#'   peptides that map to a specific number of proteins is displayed. If all
-#'   peptides only map to a single protein this plot is not displayed. The
-#'   default value is TRUE.
 #'
 #' @param interactive Logical. If TRUE produces an interactive plot.
 #' @param x_lab_pep A character string used for the x-axis label for the
@@ -2558,9 +2565,9 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
 #'
 #' @export
 #'
-plot.proteomicsFilt <- function (filter_obj, min_num_peps = NULL,
-                                 view_num_peps = TRUE,
-                                 view_redundancy = TRUE,
+plot.proteomicsFilt <- function (filter_obj,
+                                 plot_type = "num_peps",
+                                 min_num_peps = NULL,
                                  interactive = FALSE, x_lab_pep = NULL,
                                  x_lab_pro = NULL, y_lab_pep = NULL,
                                  y_lab_pro = NULL, x_lab_size = 11,
@@ -2616,6 +2623,12 @@ plot.proteomicsFilt <- function (filter_obj, min_num_peps = NULL,
                   sep = " "))
   }
 
+  if (!plot_type %in% c("num_peps", "redundancy")) {
+
+    stop ("plot_type must be either 'num_peps' or 'redundancy'.")
+
+  }
+
   # Seize unique values for peptide to protein and protein to peptide counts:
   # These bins represent the number of PROTEINS each peptide maps to. Unless
   # there are degenerate peptides this will be a vector with one value: 1.
@@ -2642,11 +2655,11 @@ plot.proteomicsFilt <- function (filter_obj, min_num_peps = NULL,
 
   # Mind numbing label making bit.
   xlabel_pep <- if (is.null(x_lab_pep))
-    "Number of Peptides" else
+    "Number of Proteins" else
       x_lab_pep
-  ylabel_pep <- if (is.null(y_lab_pep)) "Count of Proteins" else y_lab_pep
+  ylabel_pep <- if (is.null(y_lab_pep)) "Count of Peptides" else y_lab_pep
   titleLabelPep <- if (is.null(title_lab_pep))
-    "Y peptides mapped to by exactly X proteins" else
+    "Y peptides map to exactly X proteins" else
       title_lab_pep
   xlabel_pro <- if (is.null(x_lab_pro))
     "Number of Peptides" else
@@ -2681,12 +2694,16 @@ plot.proteomicsFilt <- function (filter_obj, min_num_peps = NULL,
   if (!is.null(palette)) {
 
     # Create a color from the color brewer package if a palette is provided.
+    # This color will be used if the plot only has one color. For example, when
+    # redundancy is selected or if num_peps is selected but
+    # min_num_peps is not specified.
     colas <- RColorBrewer::brewer.pal(5, palette)
 
   }
 
-  # if min_num_peps is specified, add a coloring variable that is red for
-  # dropped values and green for retained values
+  # If min_num_peps is specified, add a coloring variable that shows whether a
+  # peptide will be retained or dropped based on the input provided.
+
   if (!is.null(min_num_peps)) {
 
     fill <- ifelse(pro_bins >= min_num_peps, "retained", "dropped")
@@ -2767,6 +2784,10 @@ plot.proteomicsFilt <- function (filter_obj, min_num_peps = NULL,
   }
 
   # Evan, make me a plot with beautiful colors. As you wish.
+  # NOTE: This code only changes colors if not all bars will have the same color
+  # in the num_peps plot. If a plot has bars with all the same color, the
+  # coloring (according to whether palette was specified) was taken care of
+  # previously.
   if (!is.null(palette)) {
 
     # Use the ColorBrewer color and create the legend title
@@ -2774,16 +2795,11 @@ plot.proteomicsFilt <- function (filter_obj, min_num_peps = NULL,
       ggplot2::scale_fill_brewer(palette = palette,
                                  name = legend_lab)
 
-    q <- q +
-      ggplot2::scale_fill_brewer(palette = palette)
-
   } else {
 
     p <- p + ggplot2::scale_fill_manual(name = legend_lab,
                                         values = c("dropped" = "red",
                                                    "retained" = "green"))
-
-    q <- q + ggplot2::scale_fill_manual(values = c("redundant" = "blue"))
 
   }
 
@@ -2811,7 +2827,7 @@ plot.proteomicsFilt <- function (filter_obj, min_num_peps = NULL,
   q <- q + axs
 
   # Evan, just display the num_peps plot. As you wish.
-  if (view_num_peps && !view_redundancy) {
+  if (plot_type == "num_peps") {
 
     # Evan, make me an interactive num_peps plot. As you wish.
     if (interactive) p <- plotly::ggplotly(p)
@@ -2819,56 +2835,12 @@ plot.proteomicsFilt <- function (filter_obj, min_num_peps = NULL,
     return (p)
 
     # Evan, just display the redundancy plot. As you wish.
-  } else if (!view_num_peps && view_redundancy) {
-
-    # Check for redundancy (multiple peptides mapping to a single protein).
-    if (length(pep_bins) == 1) {
-
-      # Send in the ROUSes because they are trying to plot just a large
-      # single-colored rectangle.
-      stop (paste("There are no redundant peptides in the data set; each",
-                  "peptide maps to a single protein. The redundancy plot is",
-                  "not displayed.",
-                  sep = " "))
-
-    }
+  } else if (plot_type == "redundancy") {
 
     # Evan, make me an interactive redundancy plot. As you wish.
     if (interactive) q <- plotly::ggplotly(q)
 
     return (q)
-
-  } else {
-
-    # If there is redundancy display both plots. Otherwise just display the
-    # num_peps plot.
-    if (length(pep_bins) > 1) {
-
-      # Evan, make me a combined interactive plot. As you wish.
-      if (interactive) {
-
-        p <- plotly::ggplotly(p)
-        q <- plotly::ggplotly(q)
-
-        plotly::subplot(p, q, nrows = 1)
-
-      } else {
-
-        # Evan, make me a combined plot that isn't interactive. As you wish.
-        gridExtra::grid.arrange(p, q, ncol = 2)
-
-      }
-
-      # The user asked for a redundancy plot but no redundancy exists so just
-      # the num_peps plot will be displayed.
-    } else {
-
-      # Evan, make me an interactive num_peps plot. As you wish.
-      if (interactive) p <- plotly::ggplotly(p)
-
-      return (p)
-
-    }
 
   }
 
@@ -2916,6 +2888,8 @@ plot.proteomicsFilt <- function (filter_obj, min_num_peps = NULL,
 #' @param palette A character string indicating the name of the RColorBrewer
 #'   palette to use. For a list of available options see the details section in
 #'   \code{\link[RColorBrewer]{RColorBrewer}}.
+#' @param use_VizSampNames Logical. Indicates whether to use custom sample
+#'   names. The default is FALSE.
 #'
 #' @rdname plot-rmdFilt
 #'
@@ -2926,7 +2900,8 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
                           x_lab_size = 11, y_lab_size = 11, x_lab_angle = 90,
                           title_lab = NULL, title_lab_size = 14,
                           legend_lab = NULL, legend_position = "right",
-                          point_size = 3, bw_theme = TRUE, palette = NULL) {
+                          point_size = 3, bw_theme = TRUE, palette = NULL,
+                          use_VizSampNames = FALSE) {
 
   # Preliminaries --------------------------------------------------------------
 
@@ -3068,20 +3043,26 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
     if (length(main_eff_names) == 1) {
 
       p <- p +
-        ggplot2::geom_point(ggplot2::aes_string(x = samp_id,
-                                                y = "Log2.md",
-                                                color = main_eff_names[1]),
-                            size = point_size)
+        ggplot2::geom_point(
+          ggplot2::aes(x = forcats::fct_inorder(!!rlang::sym(samp_id)),
+                       y = Log2.md,
+                       color = !!rlang::sym(main_eff_names[1])),
+          size = point_size
+        )
+
 
       # Start plot when there are two main effects.
     } else {
 
       p <- p +
-        ggplot2::geom_point(ggplot2::aes_string(x = samp_id,
-                                                y = "Log2.md",
-                                                color = main_eff_names[1],
-                                                shape = main_eff_names[2]),
-                            size = point_size)
+        ggplot2::geom_point(
+          ggplot2::aes(x = forcats::fct_inorder(!!rlang::sym(samp_id)),
+                       y = Log2.md,
+                       color = !!rlang::sym(main_eff_names[1]),
+                       shape = !!rlang::sym(main_eff_names[2])),
+          size = point_size
+        )
+
 
     }
 
@@ -3106,10 +3087,6 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
     df <- attributes(filter_obj)$df
     yint <- log(qchisq(1 - pvalue_threshold, df = df), base = 2)
 
-    # divide data by the threshold
-    sub1 <- subset(filter_obj, pvalue < pvalue_threshold)
-    sub2 <- subset(filter_obj, pvalue >= pvalue_threshold)
-
     # make title
     if(is.null(title_lab)) {
       plot_title <- "Sample Outlier Results"
@@ -3121,35 +3098,33 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
     xlabel <- ifelse(is.null(x_lab), "Samples", x_lab)
     ylabel <- ifelse(is.null(y_lab), "log2(Robust Mahalanobis Distance)", y_lab)
 
+    # Start scatter plot skeleton when a p-value threshold is specified.
+    p <- ggplot2::ggplot(filter_obj)
+
     # Start scatter plot skeleton when a p-value threshold has been provided.
     if (length(main_eff_names) == 1) {
 
-      p <- ggplot2::ggplot(sub1) +
-        ggplot2::geom_point(ggplot2::aes_string(x = samp_id,
-                                                y = "Log2.md",
-                                                col = main_eff_names),
-                            size = point_size) +
-        ggplot2::geom_point(data = sub2,
-                            ggplot2::aes_string(x = samp_id,
-                                                y = "Log2.md",
-                                                col = main_eff_names),
-                            alpha = 0.5,
-                            size = point_size)
+      p <- p +
+        ggplot2::geom_point(
+          ggplot2::aes(x = forcats::fct_inorder(!!rlang::sym(samp_id)),
+                       y = Log2.md,
+                       col = !!rlang::sym(main_eff_names)),
+          alpha = ifelse(filter_obj$pvalue < pvalue_threshold, 1, 0.5),
+          size = point_size
+        )
+
     } else {
 
-      p <- ggplot2::ggplot(sub1) +
-        ggplot2::geom_point(ggplot2::aes_string(x = samp_id,
-                                                y = "Log2.md",
-                                                col = main_eff_names[1],
-                                                shape = main_eff_names[2]),
-                            size = point_size) +
-        ggplot2::geom_point(data = sub2,
-                            ggplot2::aes_string(x = samp_id,
-                                                y = "Log2.md",
-                                                col = main_eff_names[1],
-                                                shape = main_eff_names[2]),
-                            alpha = 0.5,
-                            size = point_size)
+      p <- p +
+        ggplot2::geom_point(
+          ggplot2::aes(x = forcats::fct_inorder(!!rlang::sym(samp_id)),
+                       y = Log2.md,
+                       col = !!rlang::sym(main_eff_names[1]),
+                       shape = !!rlang::sym(main_eff_names[2])),
+          alpha = ifelse(filter_obj$pvalue < pvalue_threshold, 1, 0.5),
+          size = point_size
+        )
+
     }
 
     # Add title, axis labels, and other crap.
@@ -3196,6 +3171,30 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
 
   # Farm boy, add the thematic elements you created to the plot. As you wish.
   p <- p + mytheme
+
+  # Farm boy, use my custom sample names in the plot. As you wish.
+  if (use_VizSampNames) {
+
+    # Change the sample names of the scatter plot.
+    p <- p +
+      ggplot2::scale_x_discrete(labels = attr(filter_obj, "VizSampNames"))
+
+    # We only want to change the legend if the box plots are created.
+    if (!is.null(sampleID)) {
+
+      # Nab the indices of the samples that will be highlighted in the box
+      # plots.
+      idx <- which(attr(filter_obj, "sample_names") %in% sampleID)
+
+      # Change the names in the legend of the box plots.
+      p <- p +
+        ggplot2::scale_color_hue(
+          labels = attr(filter_obj, "VizSampNames")[idx]
+        )
+
+    }
+
+  }
 
   # Farm boy, make the plot interactive. As you wish.
   if (interactive) p <- plotly::ggplotly(p)
@@ -3311,6 +3310,19 @@ plot.cvFilt <- function (filter_obj, cv_threshold = NULL,
   # plotting object
   new_object <- filter_obj[!is.na(filter_obj$CV), ]
   max_x_val <- attributes(filter_obj)$max_x_val
+
+  # Check if any CV values are zero. If there are any zero values the log_scale
+  # input must be changed to FALSE.
+  if (any(new_object$CV == 0)) {
+
+    log_scale <- FALSE
+
+    message(paste("Because there are CV values = 0 the x-axis cannot be",
+                  "converted to the log2 scale.",
+                  "The original scale will be used.",
+                  sep = " "))
+
+  }
 
   # labels
   plot_title <- ifelse(is.null(title_lab),
@@ -3601,7 +3613,8 @@ plot.normRes <- function (normRes_obj, order_by = NULL, color_by = NULL,
   if (!interactive) {
 
     # Return the regular plots side-by-side.
-    gridExtra::grid.arrange(p_raw, p_norm, ncol = 2)
+
+    p_raw + p_norm
 
   } else {
 
@@ -4233,13 +4246,11 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
     # specified variable as the main effect.
     if (order_by != "Group") {
 
-      # Fish out the group_DF data frame from omicsData after creating the
-      # group_DF attribute with the order_by input. This will be combined with
-      # the plot_data object so the samples can be ordered by the main effect.
-      orderDF <- attr(
-        group_designation(omicsData = omicsData, main_effects = order_by),
-        "group_DF"
-      )
+      # Select the column in f_data containing the sample name as well as the
+      # column corresponding to the order_by input.
+      orderDF <- dplyr::select(omicsData$f_data,
+                               !!rlang::sym(get_fdata_cname(omicsData)),
+                               !!rlang::sym(order_by))
 
     } else {
 
@@ -4331,9 +4342,9 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
   } else {
 
     p <- p +
-      ggplot2::geom_boxplot(ggplot2::aes_string(x = "variable",
-                                                y = "value",
-                                                fill = color_by))
+      ggplot2::geom_boxplot(ggplot2::aes(x = variable,
+                                         y = value,
+                                         fill = !!rlang::sym(color_by)))
 
   }
 
@@ -4378,7 +4389,8 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
     ggplot2::ggtitle(title, subtitle) +
     ggplot2::xlab(xlabel) +
     ggplot2::ylab(ylabel) +
-    ggplot2::scale_fill_discrete(legend_title)
+    ggplot2::scale_color_discrete(legend_title)
+
 
   # Farm boy, add limits to my plot. As you wish.
   if (!is.null(ylimit)) {
@@ -4417,6 +4429,18 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
 #'   respectively
 #' @param stacked TRUE/FALSE for whether to stack positive and negative fold
 #'   change sections in the barplot, defaults to FALSE
+#' @param show_sig This input is used when \code{plot_type = "gheatmap"}. A
+#'   logical value. If TRUE a visual indicator that a certain bin combination is
+#'   significant by the g-test is shown.
+#' @param color_low This input is used when \code{plot_type = "gheatmap"}. A
+#'   character string specifying the color of the gradient for low count values.
+#' @param color_high This input is used when \code{plot_type = "gheatmap"}. A
+#'   character string specifying the color of the gradient for high count
+#'   values.
+#' @param plotly_layout This input is used when \code{plot_type = "gheatmap"}. A
+#'   list of arguments, not including the plot, to be passed to
+#'   \code{plotly::layout} if \code{interactive = TRUE}.
+#'
 #' @param interactive TRUE/FALSE for whether to create an interactive plot using
 #'   plotly.  Not valid for all plots.
 #' @param x_lab A character string specifying the x-axis label.
@@ -4502,6 +4526,10 @@ plot.statRes <- function (x,
                           fc_threshold = NULL,
                           fc_colors = c("red", "black", "green"),
                           stacked = FALSE,
+                          show_sig = TRUE,
+                          color_low = NULL,
+                          color_high = NULL,
+                          plotly_layout = NULL,
                           interactive = FALSE,
                           x_lab = NULL,
                           x_lab_size = 11,
@@ -4573,13 +4601,17 @@ plot.statRes <- function (x,
   # Bar plot -------------------------------------------------------------------
 
   if("bar"%in%plot_type){
-    p <- statres_barplot(x, stacked, fc_colors,
-                         text_size = text_size,
-                         display_count = display_count,
-                         x_lab = x_lab,
-                         y_lab = y_lab,
-                         title_lab = title_lab,
-                         legend_lab = legend_lab)
+    p <- statres_barplot(
+      x = x,
+      stacked = stacked,
+      fc_colors = fc_colors,
+      text_size = text_size,
+      display_count = display_count,
+      x_lab = x_lab,
+      y_lab = y_lab,
+      title_lab = title_lab,
+      legend_lab = legend_lab
+    )
 
     if(bw_theme) p <- p +
         ggplot2::theme_bw() +
@@ -4599,12 +4631,12 @@ plot.statRes <- function (x,
     # still returns a ggplot, even if interactive = T
     p <-
       statres_volcano_plot(
-        volcano,
+        volcano = volcano,
         data_scale = attr(x, "data_info")$data_scale,
         pval_thresh = attr(x, "pval_thresh"),
-        fc_colors,
-        fc_threshold,
-        interactive,
+        fc_colors = fc_colors,
+        fc_threshold = fc_threshold,
+        interactive = interactive,
         x_lab = x_lab,
         y_lab = y_lab,
         title_lab = title_lab,
@@ -4633,9 +4665,13 @@ plot.statRes <- function (x,
 
     p <-
       gtest_heatmap(
-        volcano,
+        volcano = volcano,
         pval_thresh = attr(x, "pval_thresh"),
+        show_sig = show_sig,
         interactive = interactive,
+        color_low = color_low,
+        color_high = color_high,
+        plotly_layout = plotly_layout,
         text_size = text_size,
         display_count = display_count,
         x_lab = x_lab,
@@ -4961,8 +4997,9 @@ make_volcano_plot_df <- function(x) {
 #'
 #' @keywords internal
 #'
-statres_barplot <- function(x, stacked = FALSE,
-                            fc_colors = c("red", "black", "green"),
+statres_barplot <- function(x,
+                            stacked,
+                            fc_colors,
                             text_size,
                             display_count,
                             x_lab,
@@ -5093,12 +5130,12 @@ statres_barplot <- function(x, stacked = FALSE,
 #'
 gtest_heatmap <-
   function(volcano,
-           pval_thresh = 0.05,
-           show_sig = TRUE,
-           interactive = FALSE,
-           color_low = NULL,
-           color_high = NULL,
-           plotly_layout = NULL,
+           pval_thresh,
+           show_sig,
+           interactive,
+           color_low,
+           color_high,
+           plotly_layout,
            text_size,
            display_count,
            x_lab,
@@ -5310,10 +5347,10 @@ gtest_heatmap <-
 statres_volcano_plot <-
   function(volcano,
            data_scale,
-           pval_thresh = 0.05,
-           fc_colors = c("red", "black", "green"),
-           fc_threshold = NULL,
-           interactive = F,
+           pval_thresh,
+           fc_colors,
+           fc_threshold,
+           interactive,
            x_lab,
            y_lab,
            title_lab,

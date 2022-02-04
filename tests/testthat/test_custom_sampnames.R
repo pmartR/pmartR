@@ -1,13 +1,13 @@
 context("custom_sampnames")
 
 test_that("sample names are properly abridged",{
-  
+
   # Load the data and create a pepData object ----------------------------------
-  
+
   load(system.file('testdata',
                    'little_pdata.RData',
                    package = 'pmartR'))
-  
+
   # Construct a pepData object.
   pdata <- as.pepData(e_data = edata,
                       f_data = fdata,
@@ -15,73 +15,145 @@ test_that("sample names are properly abridged",{
                       edata_cname = 'Mass_Tag_ID',
                       fdata_cname = 'SampleID',
                       emeta_cname = 'Protein')
-  
+
+  # Make long sample names that can be used to test each method for reducing the
+  # length of the sample names.
+  names(pdata$e_data) <- c("Mass_Tag_ID",
+                           "qwerty_one_infection1_asdf",
+                           "qwerty_two_infection2_asdf",
+                           "qwerty_three_infection3_asdf",
+                           "qwerty_four_infection4_asdf",
+                           "qwerty_five_infection5_asdf",
+                           "qwerty_six_infection6_asdf",
+                           "qwerty_seven_infection7_asdf",
+                           "qwerty_eight_infection8_asdf",
+                           "qwerty_nine_infection9_asdf",
+                           "qwerty_one_mock1_asdf",
+                           "qwerty_two_mock2_asdf",
+                           "qwerty_three_mock3_asdf")
+
+  # Change to the new long names in f_data
+  pdata$f_data$SampleID <- c("qwerty_one_infection1_asdf",
+                             "qwerty_two_infection2_asdf",
+                             "qwerty_three_infection3_asdf",
+                             "qwerty_four_infection4_asdf",
+                             "qwerty_five_infection5_asdf",
+                             "qwerty_six_infection6_asdf",
+                             "qwerty_seven_infection7_asdf",
+                             "qwerty_eight_infection8_asdf",
+                             "qwerty_nine_infection9_asdf",
+                             "qwerty_one_mock1_asdf",
+                             "qwerty_two_mock2_asdf",
+                             "qwerty_three_mock3_asdf")
+
   # Holy short sample names, Batman! -------------------------------------------
-  
+
   # firstn ---------------
-  
+
+  # Create short sample names with firstn that are not unique
+  expect_error(custom_sampnames(pdata, firstn = 6),
+               paste("The input used does not produce a unique sample name",
+                     "for each sample.",
+                     sep = " "))
+
   # Create short names with the first four characters of the sample names using
   # the firstn argument.
-  firstn_4 <- custom_sampnames(pdata, firstn = 4)
-  
+  firstn_16 <- custom_sampnames(pdata, firstn = 16)
+
   # Make sure attributes have not been changed after adding short names.
-  expect_identical(attributes(pdata), attributes(firstn_4))
+  expect_identical(attributes(pdata), attributes(firstn_16))
   # Make sure the short sample names are present and correct.
-  expect_equal(dim(firstn_4$f_data),
+  expect_equal(dim(firstn_16$f_data),
                c(12, 3))
-  expect_equal(firstn_4$f_data$VizSampNames,
-               c(rep("Infe", 9), rep("Mock", 3)))
-  
-  # Create not so short sample names (the input to firstn is larger than the 
+  expect_equal(firstn_16$f_data$VizSampNames,
+               c("qwerty_one_infec",
+                 "qwerty_two_infec",
+                 "qwerty_three_inf",
+                 "qwerty_four_infe",
+                 "qwerty_five_infe",
+                 "qwerty_six_infec",
+                 "qwerty_seven_inf",
+                 "qwerty_eight_inf",
+                 "qwerty_nine_infe",
+                 "qwerty_one_mock1",
+                 "qwerty_two_mock2",
+                 "qwerty_three_moc"))
+
+  # Create not so short sample names (the input to firstn is larger than the
   # longest sample name).
-  expect_warning(firstn_11 <- custom_sampnames(pdata, firstn = 11))
-  
+  expect_warning(firstn_35 <- custom_sampnames(pdata, firstn = 35))
+
   # Make sure nothing changes if firstn is larger than largest sample name.
-  expect_equal(as.character(firstn_11$f_data$SampleID),
-               firstn_11$f_data$VizSampNames)
-  
+  expect_identical(as.character(firstn_35$f_data$SampleID),
+                   firstn_35$f_data$VizSampNames)
+
   # from to ---------------
-  
+
   # Range completely excludes some or all sample names.
-  expect_error(custom_sampnames(pdata, from = 6, to = 10))
-  expect_error(custom_sampnames(pdata, from = 11, to = 12))
-  
+  expect_error(custom_sampnames(pdata, from = 16, to = 22))
+  expect_error(custom_sampnames(pdata, from = 30, to = 33))
+
   # Non-numeric inputs for from and to.
   expect_error(custom_sampnames(pdata, from = "2", to = "10"))
-  
+
   # The value for to is less than from.
   expect_error(custom_sampnames(pdata, from = 3, to = 2))
-  
+
   # Create short names using the from/to combo.
-  from_to <- custom_sampnames(pdata, from = 3, to = 5)
-  
+  from_to <- custom_sampnames(pdata, from = 8, to = 16)
+
   # Make sure attributes have not been changed after adding short names.
   expect_identical(attributes(pdata), attributes(from_to))
   # Make sure the short sample names are present and correct.
   expect_equal(dim(from_to$f_data),
                c(12, 3))
   expect_equal(from_to$f_data$VizSampNames,
-               c(rep("fec", 9), paste0("ck", 1:3)))
-  
+               c("one_infec",
+                 "two_infec",
+                 "three_inf",
+                 "four_infe",
+                 "five_infe",
+                 "six_infec",
+                 "seven_inf",
+                 "eight_inf",
+                 "nine_infe",
+                 "one_mock1",
+                 "two_mock2",
+                 "three_moc"))
+
   # delim ---------------
-  
+
   # Use delim and components to make tiny sample names.
-  delim_c <- custom_sampnames(pdata, delim = "c", components = 1)
-  delim_empty <- custom_sampnames(pdata, delim = "", components = 5)
-  
+  delim_u <- custom_sampnames(pdata, delim = "_", components = 3)
+  delim_empty <- custom_sampnames(pdata, delim = "", components = 8:16)
+
   # Make sure attributes have not been changed after adding short names.
-  expect_identical(attributes(pdata), attributes(delim_c))
+  expect_identical(attributes(pdata), attributes(delim_u))
   # Make sure the short sample names are present and correct.
-  expect_equal(dim(delim_c$f_data),
+  expect_equal(dim(delim_u$f_data),
                c(12, 3))
-  expect_equal(delim_c$f_data$VizSampNames,
-               c(rep("Infe", 9), rep("Mo", 3)))
+  expect_equal(delim_u$f_data$VizSampNames,
+               c(paste0("infection", 1:9), paste0("mock", 1:3)))
   expect_equal(dim(delim_empty$f_data),
                c(12, 3))
   expect_equal(delim_empty$f_data$VizSampNames,
-               c(rep("c", 9), as.character(1:3)))
-  
+               c("one_infec",
+                 "two_infec",
+                 "three_inf",
+                 "four_infe",
+                 "five_infe",
+                 "six_infec",
+                 "seven_inf",
+                 "eight_inf",
+                 "nine_infe",
+                 "one_mock1",
+                 "two_mock2",
+                 "three_moc"))
+
   # Components does not specify an index created by delim that exists.
-  expect_error(custom_sampnames(pdata, delim = "c", components = 4))
-  
+  expect_error(custom_sampnames(pdata, delim = "_", components = 20),
+               paste("none of the indices specified in 'components' match",
+                     "indices of the split sample name",
+                     sep = " "))
+
 })
