@@ -369,12 +369,11 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL, ...) {
     # Add emeta columns if emeta exists
     if (!is.null(omicsData$e_meta)) {
       
-      # Pull emeta and emeta_colname
-      emeta_cname <- pmartR::get_emeta_cname(omicsData)
+      # Pull emeta
       emeta <- omicsData$e_meta
       
       # Add emeta columns
-      trelliData.omics <- merge(trelliData.omics, emeta, by = emeta_cname)
+      trelliData.omics <- merge(trelliData.omics, emeta, by = edata_cname)
       
     }
     
@@ -433,7 +432,7 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL, ...) {
     attr(trelliData, "fdata_col") <- fdata_cname
   }
   
-  if (!is.null(emeta_cname)) {
+  if (!is.null(omicsData$e_meta)) {
     attr(trelliData, "emeta_col") <- colnames(omicsData$e_meta)[colnames(omicsData$e_meta) != edata_cname]
   } else {
     attr(trelliData, "emeta_col") <- NULL
@@ -445,7 +444,7 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL, ...) {
   # been grouped by. And "group_by" tracks whether the group_by function has been
   # applied or not. 
   group_options <- c(colnames(trelliData.omics), colnames(trelliData.stat)) %>% unique()
-  group_nonoptions <- c("Abundance", "Comparison", "P_value", "Fold_change", "Group")
+  group_nonoptions <- c("Abundance", "Comparison", "p_value", "fold_change", "Group")
   group_options <- group_options[group_options %in% group_nonoptions == FALSE]
   attr(trelliData, "group_by_options") <- group_options
   attr(trelliData, "group_by_omics") <- NA

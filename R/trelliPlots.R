@@ -169,6 +169,7 @@ getDownloadsFolder <- function() {
 #'    function. For example, c("ylab('')", "ylim(c(2,20))"). Default is NULL. 
 #' @param interactive A logical argument indicating whether the plots should be interactive
 #'    or not. Interactive plots are ggplots piped to ggplotly (for now). Default is FALSE.  
+#' @param jitter Add points as a geom_jitter. Default is TRUE. 
 #' @param path The base directory of the trelliscope application. Default is Downloads. 
 #' @param name The name of the display. Default is Trelliscope.
 #' @param test_mode A logical to return a smaller trelliscope to confirm plot and design.
@@ -210,6 +211,7 @@ trelli_abundance_boxplot <- function(trelliData,
                                      cognostics = c("n", "mean", "median", "sd", "skew", "p_value", "fold_change"),
                                      ggplot_params = NULL,
                                      interactive = FALSE,
+                                     jitter = TRUE,
                                      path = getDownloadsFolder(),
                                      name = "Trelliscope",
                                      test_mode = FALSE,
@@ -238,6 +240,11 @@ trelli_abundance_boxplot <- function(trelliData,
   
   # Round test example to integer 
   if (test_mode) {test_example <- unique(abs(round(test_example)))}
+  
+  # Make sure jitter is a true or false
+  if (!is.logical(jitter) & !is.na(jitter)) {
+    stop("jitter must be a true or false.")
+  }
 
   # Make boxplot function-------------------------------------------------------
   
@@ -249,10 +256,15 @@ trelli_abundance_boxplot <- function(trelliData,
     
     # Build plot 
     boxplot <- ggplot2::ggplot(DF, ggplot2::aes(x = Group, fill = Group, y = Abundance)) + 
-      ggplot2::geom_boxplot() + ggplot2::geom_point() + ggplot2::theme_bw() + 
+      ggplot2::geom_boxplot(outlier.shape = NA) + ggplot2::theme_bw() + 
       ggplot2::ggtitle(title) +
       ggplot2::theme(legend.position = "none", plot.title = ggplot2::element_text(hjust = 0.5)) + 
       ggplot2::ylab(paste(attr(trelliData$omicsData, "data_info")$data_scale, "Abundance")) 
+    
+    # Add jitter or point
+    if (jitter) {
+      boxplot <- boxplot + ggplot2::geom_jitter(height = 0, width = 0.25)
+    } 
     
     # Remove x axis if no groups
     if (is.null(attributes(trelliData$omicsData)$group_DF)) {
