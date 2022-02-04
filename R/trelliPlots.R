@@ -346,7 +346,7 @@ trelli_abundance_boxplot <- function(trelliData,
     # Add cognostics that only apply when stats data is grouped by edata_cname
     edata_cname <- pmartR::get_edata_cname(trelliData$omicsData)
     
-    if (!is.null(trelliData$trelliData.stat) && edata_cname == attr(trelliData, "group_by_stat")) {
+    if (!is.null(trelliData$trelliData.stat) && !is.na(attr(trelliData, "group_by_stat")) && edata_cname == attr(trelliData, "group_by_stat")) {
       
       # Downselect to only stats 
       stat_cogs <- cognostics[cognostics %in% c("fold_change", "p_value")]
@@ -691,7 +691,7 @@ trelli_abundance_heatmap <- function(trelliData,
     
     # If group designation was set, then convert Group to a factor variable 
     if (!is.null(attributes(trelliData$omicsData)$group_DF)) {
-      theLevels <- attr(trelliData$omicsData, "group_DF") %>% dplyr::arrange(Group) %>% dplyr::select(SampleID) %>% unlist()
+      theLevels <- attr(trelliData$omicsData, "group_DF") %>% dplyr::arrange(Group) %>% dplyr::select(fdata_cname) %>% unlist()
       DF[,fdata_cname] <- factor(unlist(DF[,fdata_cname]), levels = theLevels)
     } else {
       DF[,fdata_cname] <- as.factor(unlist(DF[,fdata_cname]))
@@ -1199,6 +1199,7 @@ trelli_foldchange_bar <- function(trelliData,
 #'    are n ,mean, median, and sd. 
 #' @param p_value_thresh A value between 0 and 1 to indicate a threshold to highlight
 #'    significant biomolecules. Default is 0.05. Selecting 0 will remove this feature. 
+#' @param jitter Add points. Default is TRUE. 
 #' @param ggplot_params An optional vector of strings of ggplot parameters to the backend ggplot
 #'    function. For example, c("ylab('')", "xlab('')"). Default is NULL. 
 #' @param interactive A logical argument indicating whether the plots should be interactive
@@ -1224,6 +1225,7 @@ trelli_foldchange_bar <- function(trelliData,
 trelli_foldchange_boxplot <- function(trelliData,
                                       cognostics = c("n", "median", "mean", "sd"),
                                       p_value_thresh = 0.05,
+                                      jitter = TRUE,
                                       ggplot_params = NULL,
                                       interactive = FALSE,
                                       path = getDownloadsFolder(),
@@ -1260,6 +1262,11 @@ trelli_foldchange_boxplot <- function(trelliData,
     stop("p_value_thresh must be between 0 and 1.")
   }
   
+  # Make sure jitter is a true or false
+  if (!is.logical(jitter) & !is.na(jitter)) {
+    stop("jitter must be a true or false.")
+  }
+  
   # Make foldchange boxplot function--------------------------------------------
   
   fc_box_plot_fun <- function(DF, title) {
@@ -1273,12 +1280,17 @@ trelli_foldchange_boxplot <- function(trelliData,
     
     # Make boxplot
     boxplot <- ggplot2::ggplot(DF, ggplot2::aes(x = Comparison, y = fold_change, fill = Comparison)) +
-      ggplot2::geom_boxplot() + ggplot2::geom_point(color = Significant) + ggplot2::theme_bw() +
+      ggplot2::geom_boxplot() + ggplot2::theme_bw() +
       ggplot2::theme(
         plot.title = ggplot2::element_text(hjust = 0.5), 
         axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1),
         legend.position = "none"
       ) + ggplot2::ylab("Fold Change") + ggplot2::ggtitle(title)
+    
+    # Add jitter
+    if (jitter) {
+      boxplot <- boxplot + ggplot2::geom_jitter(color = Significant, height = 0, width = 0.25)
+    }
     
     # Add additional parameters
     if (!is.null(ggplot_params)) {
@@ -1585,7 +1597,7 @@ trelli_foldchange_heatmap <- function(trelliData,
     edata_cname <- get_edata_cname(trelliData$statRes)
     
     # Make heatmap
-    hm <- ggplot2::ggplot(DF, ggplot2::aes(x = Comparison, y = .data[[edata_cname]], fill = fold_change)) +
+    hm <- ggplot2::ggplot(DF, ggplot2::aes(x = Comparison, y = as.factor(.data[[edata_cname]]), fill = fold_change)) +
       ggplot2::geom_tile() + ggplot2::theme_bw() + ggplot2::ylab("Biomolecule") + 
       ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5), 
                      axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1)) +

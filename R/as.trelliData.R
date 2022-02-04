@@ -286,18 +286,18 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL, ...) {
   if (!is.null(omicsData)) {
     
     # ...it must be an omics data object
-    if (class(omicsData) %in% c("pepData", "isobaricpepData", "proData", "metabData", "lipidData", "nmrData") == FALSE) {
+    if (any(class(omicsData) %in% c("pepData", "isobaricpepData", "proData", "metabData", "lipidData", "nmrData")) == FALSE) {
       stop(paste(class(omicsData), "is not a supported omicsData class."))
     }
     
     # ...it must be log transformed if it's not NMR or isobaric
-    if (class(omicsData) %in% c("nmrData", "isobaricpepData") == FALSE & 
+    if (any(class(omicsData) %in% c("nmrData", "isobaricpepData")) == FALSE & 
         get_data_scale(omicsData) %in% c("log2", "log", "log10") == FALSE) {
       stop("omicsData must be log transformed.")
     }
     
     # ...it must be normalized if it's not NMR nor isobaric 
-    if (require_normalization & class(omicsData) %in% c("isobaricpepData", "nmrData") == FALSE) {
+    if (require_normalization & any(class(omicsData) %in% c("isobaricpepData", "nmrData")) == FALSE) {
       if (!get_data_norm(omicsData)) {
         stop("omicsData must be normalized.")
       }
@@ -346,7 +346,7 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL, ...) {
   trelliData.stat <- NULL
   fdata_cname <- NULL
   emeta_cname <- NULL
-  
+
   # Format omicsData if applicable
   if (!is.null(omicsData)) {
     
@@ -363,7 +363,7 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL, ...) {
     
     # Add group_designation if it exists
     if (!is.null(attributes(omicsData)$group_DF)) {
-      trelliData.omics <- merge(trelliData.omics, attributes(omicsData)$group_DF, by = fdata_cname)
+      trelliData.omics <- dplyr::left_join(trelliData.omics, attributes(omicsData)$group_DF, by = fdata_cname)
     }
     
     # Add emeta columns if emeta exists
@@ -373,7 +373,7 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL, ...) {
       emeta <- omicsData$e_meta
       
       # Add emeta columns
-      trelliData.omics <- merge(trelliData.omics, emeta, by = edata_cname)
+      trelliData.omics <- dplyr::left_join(trelliData.omics, emeta, by = edata_cname)
       
     }
     
@@ -413,7 +413,7 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL, ...) {
     if (!is.null(omicsData$e_meta)) {
       
       # Add emeta columns
-      trelliData.stat <- merge(trelliData.stat, emeta, by = emeta_cname)
+      trelliData.stat <- dplyr::left_join(trelliData.stat, emeta, by = emeta_cname)
       
     }
     
@@ -684,7 +684,7 @@ summary.trelliData <- function(trelliData) {
     }
     
     if ("f_data cname" %in% All_Options$`Group By Choice`) {
-      sample_count <- ifelse(omics, nrow(trelliData$omicsData$f_data), browser())
+      sample_count <- ifelse(omics, nrow(trelliData$omicsData$f_data), attr(trelliData$statRes, "group_DF") %>% nrow())
       All_Options[All_Options$`Group By Choice` == "f_data cname", "Number of Plots"] <- sample_count %>% as.character()
       All_Options[All_Options$`Group By Choice` == "f_data cname", "Group By Choice"] <- fdata_cname
     }
@@ -716,7 +716,7 @@ summary.trelliData <- function(trelliData) {
       count <- ifelse(omics, nrow(trelliData$trelliData.omics), nrow(trelliData$trelliData.stat))
     } else if (theMatch == 2) {
       group_by_choice <- "f_data cname"
-      count <- ifelse(omics, nrow(trelliData$omicsData$f_data), browser())
+      count <- ifelse(omics, nrow(trelliData$omicsData$f_data), attr(trelliData$statRes, "group_DF") %>% nrow())
     } else {
       group_by_choice <- "e_meta column"
       count <- trelliData$omicsData$e_meta[[Grouped]] %>% unique() %>% length()
