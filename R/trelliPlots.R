@@ -677,7 +677,7 @@ trelli_abundance_heatmap <- function(trelliData,
   }
   
   # If no group designation, set cognostics to NULL. 
-  if (is.null(attributes(trelliData2$omicsData)$group_DF)) {
+  if (is.null(attributes(trelliData$omicsData)$group_DF)) {
     congnostics <- NULL
   }
   
@@ -686,16 +686,22 @@ trelli_abundance_heatmap <- function(trelliData,
   # First, generate the heatmap function
   hm_plot_fun <- function(DF, title) {
     
-    # If group designation was set, then convert Group to a factor variable 
-    if (is.null(attributes(trelliData$omicsData)$group_DF)) {
-      DF$Group <- factor(DF$Sample_Name, levels = attributes(trelliData2$omicsData)$group_DF$Sample_Name)
-    } 
+    # Get fdata_cname
+    fdata_cname <- get_fdata_cname(trelliData$omicsData)
     
-    # Get edata cname
+    # If group designation was set, then convert Group to a factor variable 
+    if (!is.null(attributes(trelliData$omicsData)$group_DF)) {
+      theLevels <- attr(trelliData$omicsData, "group_DF") %>% dplyr::arrange(Group) %>% dplyr::select(SampleID) %>% unlist()
+      DF[,fdata_cname] <- factor(unlist(DF[,fdata_cname]), levels = theLevels)
+    } else {
+      DF[,fdata_cname] <- as.factor(unlist(DF[,fdata_cname]))
+    }
+    
+    # Get edata and fdata cname
     edata_cname <- get_edata_cname(trelliData$omicsData)
     
     # Build plot: this should be edata_cname
-    hm <- ggplot2::ggplot(DF, ggplot2::aes(x = .data[[edata_cname]], y = Sample_Name, fill = Abundance)) +
+    hm <- ggplot2::ggplot(DF, ggplot2::aes(x = as.factor(.data[[edata_cname]]), y = .data[[fdata_cname]], fill = Abundance)) +
       ggplot2::geom_tile() + ggplot2::theme_bw() + ggplot2::ylab("Sample") + ggplot2::xlab("Biomolecule") +
       ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5), 
                      axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1)) + 
@@ -1011,7 +1017,7 @@ trelli_missingness_bar <- function(trelliData,
       dplyr::rename(Nested_DF = data)
     
     # Save total counts 
-    totalCounts <- attr(statRes, "group_DF")$Group %>% 
+    totalCounts <- attr(trelliData$statRes, "group_DF")$Group %>% 
       table(dnn = "Group") %>% 
       data.frame() %>% 
       dplyr::rename(Total = Freq)
