@@ -49,6 +49,12 @@ molecule_filter <- function (omicsData) {
 
   ordering = omicsData$e_data[,id_col]
   
+  # Compute the number of non-missing values for each row.
+  if(inherits(omicsData, "seqData")){
+    num_obs <- rowSums(omicsData$e_data[, -id_col] != 0)
+  } else {
+    num_obs <- rowSums(!is.na(omicsData$e_data[, -id_col]))
+  }
 
   # SCENARIO 1: use_groups = FALSE, use_batch = FALSE
   # we run the scenario as before
@@ -248,7 +254,7 @@ total_count_filter <- function (omicsData) {
 }
 
 
-#' Filter Based on Pooled Coefficient of Variation (CV) Values
+#'Filter Based on Pooled Coefficient of Variation (CV) Values
 #'
 #' A pooled CV is calculated for each biomolecule.
 #'
