@@ -12,8 +12,8 @@ These objects are imported from other packages. Follow the links
 below to see their documentation.
 
 \describe{
-  \item{foreach}{\code{\link[foreach]{\%dopar\%}}}
+  \item{foreach}{\code{\link[foreach:foreach]{\%dopar\%}}}
 
-  \item{magrittr}{\code{\link[magrittr]{\%>\%}}}
+  \item{magrittr}{\code{\link[magrittr:pipe]{\%>\%}}}
 }}
 

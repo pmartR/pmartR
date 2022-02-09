@@ -46,8 +46,8 @@ edata_summary <- function (omicsData, by = 'sample', groupvar = NULL) {
 
   #some checks
   if(!inherits(omicsData, c('pepData', 'proData', 'lipidData',
-                            'metabData', 'nmrData')))
-    stop("omicsData must be an object of class pepData, proData, lipidData, metabData, or nmrData")
+                            'metabData', 'nmrData', 'seqData')))
+    stop("omicsData must be an object of class pepData, proData, lipidData, metabData, nmrData, or seqData")
   if(!isTRUE(by %in% c('sample', 'molecule')))
     stop("by must be either sample or molecule")
   if(isTRUE(groupvar == attr(omicsData, "cnames")$fdata_cname))

@@ -17,8 +17,9 @@ custom_sampnames(
 }
 \arguments{
 \item{omicsData}{omicsData an object of the class 'pepData', 'proData',
-'metabData', or 'lipidData', usually created by \code{pepData},
-\code{proData}, \code{metabData}, or \code{lipidData}, respectively.}
+'metabData', 'lipidData', 'nmrData', or 'seqData', usually created by \code{as.pepData},
+\code{as.proData}, \code{as.metabData}, \code{as.lipidData}, \code{as.nmrData},
+or \code{as.seqData}, respectively.}
 
 \item{firstn}{is an integer specifying the first n characters to keep as the
 sample name}

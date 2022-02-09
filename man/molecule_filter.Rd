@@ -8,9 +8,10 @@ molecule_filter(omicsData, use_groups = FALSE, use_batch = FALSE)
 }
 \arguments{
 \item{omicsData}{an object of the class 'pepData', 'proData', 'metabData',
-'lipidData', or 'nmrData', usually created by \code{\link{as.pepData}},
+'lipidData', 'nmrData', or 'seqData', usually created by \code{\link{as.pepData}},
 \code{\link{as.proData}}, \code{\link{as.metabData}},
-\code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, respectively.}
+\code{\link{as.lipidData}}, \code{\link{as.nmrData}}, \
+or \code{\link{as.seqData}} respectively.}
 
 \item{use_batch}{logical indicator for whether to utilize batch information
 from \code{\link{group_designation}} when calculating the molecule filter.
