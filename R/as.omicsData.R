@@ -1229,7 +1229,7 @@ as.seqData <- function (e_data, f_data, e_meta = NULL,
   # Analyses must have raw counts
   
   nums <- e_data[which(colnames(e_data) != edata_cname)]
-  notint <- any(apply(nums, 2, function(col) !(sum(col%%1, na.rm = T) != 0)))
+  notint <- any(apply(nums, 2, function(col) (sum(col%%1, na.rm = T) != 0)))
   if(notint){
     warning("Non-integers detected. Analyses supported by pmartR for RNA-seq data require raw counts.")
   }
