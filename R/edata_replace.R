@@ -39,7 +39,7 @@ edata_replace <- function(omicsData, x, y) {
     # Bestow an error on the user because the input does not have the correct
     # class.
     stop (paste("omicsData must be of class 'pepData', 'proData',",
-                "'metabData', 'lipidData', 'nmrData'. ",
+                "'metabData', 'lipidData', or 'nmrData'. ",
                 #, or 'seqData'. ",
                 sep = " "))
     

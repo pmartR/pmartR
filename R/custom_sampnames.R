@@ -4,8 +4,9 @@
 #' function
 #'
 #' @param omicsData omicsData an object of the class 'pepData', 'proData',
-#'   'metabData', or 'lipidData', usually created by \code{pepData},
-#'   \code{proData}, \code{metabData}, or \code{lipidData}, respectively.
+#'   'metabData', 'lipidData', 'nmrData', or 'seqData', usually created by \code{as.pepData},
+#'   \code{as.proData}, \code{as.metabData}, \code{as.lipidData}, \code{as.nmrData},
+#'   or \code{as.seqData}, respectively.
 #' @param firstn is an integer specifying the first n characters to keep as the
 #'   sample name
 #' @param from is an integer specifying the start of the range of characters to
@@ -35,6 +36,27 @@ custom_sampnames <- function (omicsData, firstn = NULL, from = NULL,
                               to = NULL, delim = NULL, components = NULL,
                               pattern = NULL, ...){
 
+  if(sum(c(is.null(from), is.null(to))) == 1){
+    stop("Please specify both 'from' and 'to' if either argument is used.")
+  }
+  
+  if(sum(c(is.null(delim), is.null(components))) == 1){
+    stop("Please specify both 'delim' and 'components' if either argument is used.")
+  }
+  
+  # check that omicsData is of appropriate class #
+  if (!inherits(omicsData, c("pepData", "proData", "metabData",
+                             "lipidData", "nmrData", "seqData"
+  ))) {
+    
+    # Bestow an error on the user because the input does not have the correct
+    # class.
+    stop (paste("omicsData must be of class 'pepData', 'proData',",
+                "'metabData', 'lipidData', 'nmrData', or 'seqData'. ",
+                sep = " "))
+    
+  }
+  
   #extract sample names from omicsData object
   fdata_cname = attr(omicsData, "cnames")$fdata_cname
   names = as.list(as.character(omicsData$f_data[[fdata_cname]]))

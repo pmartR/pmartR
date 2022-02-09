@@ -33,10 +33,10 @@ missingval_result<- function(omicsData){
   
   #check for correct class
   if(!inherits(omicsData, c("pepData", "proData", "lipidData",
-                            "metabData", "nmrData"))) {
+                            "metabData", "nmrData", "seqData"))) {
     
     stop (paste("omicsData must have class of the following, 'pepData',",
-                "'proData', 'lipidData', 'metabData', 'nmrData'",
+                "'proData', 'lipidData', 'metabData', 'nmrData', 'seqData'",
                 sep = " "))
     
   }
@@ -50,12 +50,20 @@ missingval_result<- function(omicsData){
   fdata_cname<- get_fdata_cname(omicsData)
   
   # Count the number of NA values per column.
-  na_per_col<- colSums(is.na(omicsData$e_data[, -edata_cname_id]))
+  if(inherits(omicsData, "seqData")){
+    na_per_col<- colSums((omicsData$e_data[, -edata_cname_id]) == 0)
+    na_by_sample<- data.frame(
+      "sample_names" = names(omicsData$e_data[, -edata_cname_id]),
+      "num_zeros" = as.numeric(na_per_col)
+    )
+  } else {
+    na_per_col<- colSums(is.na(omicsData$e_data[, -edata_cname_id]))
+    na_by_sample<- data.frame(
+      "sample_names" = names(omicsData$e_data[, -edata_cname_id]),
+      "num_NA" = as.numeric(na_per_col)
+    )
+  }
   
-  na_by_sample<- data.frame(
-    "sample_names" = names(omicsData$e_data[, -edata_cname_id]),
-    "num_NA" = as.numeric(na_per_col)
-  )
   names(na_by_sample)[1] <- fdata_cname
   
   # Merge na_by_sample with f_data to get additional columns of f_data. For
@@ -75,16 +83,34 @@ missingval_result<- function(omicsData){
   
   # Count the number of NA values per row.
   na_per_row <- rowSums(is.na(omicsData$e_data[, -edata_cname_id]))
+  
   na_by_molecule <- data.frame("molecule"= omicsData$e_data[, edata_cname_id],
                               "num_NA"= as.numeric(na_per_row))
-  names(na_by_molecule)[1] <- edata_cname
-  
-  result<- list("na.by.sample" = na_by_sample,
-                "na.by.molecule" = na_by_molecule)
-  class(result) <- "naRes"
-  
-  attr(result, "cnames") <- list("edata_cname" = edata_cname,
-                                 "fdata_cname" = fdata_cname)
+  if(inherits(omicsData, "seqData")){
+    
+    na_by_molecule <- data.frame("molecule"= omicsData$e_data[, edata_cname_id],
+                                 "num_zeros"= as.numeric(na_per_row))
+    names(na_by_molecule)[1] <- edata_cname
+    
+    result<- list("zeros.by.sample" = na_by_sample,
+                  "zeros.by.molecule" = na_by_molecule)
+    class(result) <- "naRes"
+    
+    attr(result, "cnames") <- list("edata_cname" = edata_cname,
+                                   "fdata_cname" = fdata_cname)
+    
+  } else {
+    na_by_molecule <- data.frame("molecule"= omicsData$e_data[, edata_cname_id],
+                                 "num_NA"= as.numeric(na_per_row))
+    names(na_by_molecule)[1] <- edata_cname
+    
+    result<- list("na.by.sample" = na_by_sample,
+                  "na.by.molecule" = na_by_molecule)
+    class(result) <- "naRes"
+    
+    attr(result, "cnames") <- list("edata_cname" = edata_cname,
+                                   "fdata_cname" = fdata_cname)
+  }
 
   return (result)  
   

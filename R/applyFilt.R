@@ -84,11 +84,11 @@ applyFilt <- function (filter_object, omicsData, ...) {
 
   # check that omicsData is of pmartR S3 class#
   if (!inherits(omicsData, c("pepData", "proData", "lipidData", "metabData",
-                             "nmrData"))) {
+                             "nmrData", "seqData"))) {
 
     # Throw down an error for blatant abuse of the pmartR standards.
     stop (paste("omicsData must be of class 'pepData', 'proData', 'lipidData',",
-                "'metabData' or 'nmrData'",
+                "'metabData', 'nmrData', or 'seqData'",
                 sep = " "))
 
   }
