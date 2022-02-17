@@ -32,6 +32,7 @@
 #'
 molecule_filter <- function (omicsData) {
   ## some initial checks ##
+  # test#
 
   # check that omicsData is of appropriate class #
   if (!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData",
