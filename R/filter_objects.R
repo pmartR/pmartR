@@ -32,60 +32,66 @@
 #'
 #' @export
 #'
-molecule_filter <- function (omicsData) {
-  molecule_filter <- function (omicsData,group = FALSE, batchName = "BatchName") {
-    # require tidyverse
-    require(tidyverse)
-    ## some initial checks ##
-    # test#
+molecule_filter <- function (omicsData,use_groups = FALSE) {
+  require(tidyverse)
+  ## some initial checks ##
+  # test#
+  
+  # check that omicsData is of appropriate class #
+  if (!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData",
+                             "nmrData"))) {
     
-    # check that omicsData is of appropriate class #
-    if (!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData",
-                               "nmrData"))) {
-      
-      stop (paste("omicsData must be of class 'pepData', 'proData', 'metabData',",
-                  "'lipidData', or 'nmrData'",
-                  sep = ' '))
-    }
+    stop (paste("omicsData must be of class 'pepData', 'proData', 'metabData',",
+                "'lipidData', or 'nmrData'",
+                sep = ' '))
+  }
+  
+  # check that omicsData has group data if specified
+  if(is.null(attr(omicsData,"group_DF")) && use_groups == TRUE){
+    stop (paste("omicsData must have group_designation specified"))
+  }
+  
+  if(use_groups == FALSE | is.null(attr(omicsData, "group_DF"))){
+    # Extricate the column number of the ID column.
+    id_col <- which(names(omicsData$e_data) == get_edata_cname(omicsData))
+    get_edata_cname(omicsData)
     
-    if(group == FALSE){
-      # Extricate the column number of the ID column.
-      id_col <- which(names(omicsData$e_data) == get_edata_cname(omicsData))
-      get_edata_cname(omicsData)
-      # Compute the number of non-missing values
-      num_obs <- rowSums(!is.na(omicsData$e_data[, -id_col]))
-      
-      # Create a data frame with the ID column and the number of non-missing values.
-      output <- data.frame(omicsData$e_data[, id_col], num_obs)
-    } else{
-      # create a dataframe with ID columns and the number of non-missin values per group
-      output <- omicsData$e_data %>%
-        pivot_longer(cols = -id_col, names_to = get_fdata_cname(omicsData), values_to = "log2_norm") %>%
-        left_join(omicsData$f_data, by = get_fdata_cname(omicsData)) 
-      batch_col <- which(names(output) == "BatchName")
-      output <- output %>%
-        group_by(across(id_col), across(batch_col)) %>%
-        summarise(num_obs = sum(!is.na(log2_norm))) %>%
-        group_by(across(id_col)) %>%
-        summarise(min_num_obs = min(num_obs))
-    }
+    # Compute the number of non-missing values
+    num_obs <- rowSums(!is.na(omicsData$e_data[, -id_col]))
     
-    # change the names of the data.frame
-    names(output) <- c(get_edata_cname(omicsData), "Num_Observations")
-    
-    # Extract the 'data.frame' class from the the output data frame.
-    orig_class <- class(output)
-    
-    # Create the moleculeFilt class and attach the data.frame class to it as well.
-    class(output) <- c("moleculeFilt", orig_class)
-    
-    # Fabricate an attribute that has the total number of samples (columns in
-    # e_data minus the ID column). This will be used to ensure someone doesn't try
-    # to filter e_data using a threshold larger than the number of samples.
-    attr(output, "num_samps") <- get_data_info(omicsData)$num_samps
-    
-    # Return the completed object!!!
-    return(output)
+    # Create a data frame with the ID column and the number of non-missing values.
+    output <- data.frame(omicsData$e_data[, id_col], num_obs)
+  } 
+  else if(use_groups == TRUE & !is.null(attr(omicsData, "group_DF"))){
+    # create a dataframe with ID columns and the number of non-missing values per group
+    # save the group dataframe
+    groupDat <- attr(omicsData,"group_DF")
+    # Create a datafarme with the ID columns and the minimum number of non-missing values per grouping
+    output <- omicsData$e_data %>%
+      pivot_longer(cols = -id_col, names_to = names(groupDat)[1], values_to = "value") %>%
+      left_join(groupDat) %>%
+      group_by(across(id_col), Group) %>%
+      summarise(num_obs = sum(!is.na(value))) %>%
+      group_by(across(id_col)) %>%
+      summarise(min_num_obs = min(num_obs))
+  }
+  
+  # change the names of the data.frame
+  names(output) <- c(get_edata_cname(omicsData), "Num_Observations")
+  
+  # Extract the 'data.frame' class from the the output data frame.
+  orig_class <- class(output)
+  
+  # Create the moleculeFilt class and attach the data.frame class to it as well.
+  class(output) <- c("moleculeFilt", orig_class)
+  
+  # Fabricate an attribute that has the total number of samples (columns in
+  # e_data minus the ID column). This will be used to ensure someone doesn't try
+  # to filter e_data using a threshold larger than the number of samples.
+  attr(output, "num_samps") <- get_data_info(omicsData)$num_samps
+  
+  # Return the completed object!!!
+  return(output)
 }
 
 #'Filter Based on Pooled Coefficient of Variation (CV) Values
