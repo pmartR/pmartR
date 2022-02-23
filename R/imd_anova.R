@@ -26,6 +26,9 @@
 #'   that will be used as covariates in the IMD-ANOVA analysis.
 #' @param paired logical - should the data be paired or not; if TRUE the
 #'   attribute "pairing" cannot be `NULL`
+#' @param use_parallel A logical value indicating whether or not to use a
+#'   "doParallel" loop when running the G-Test with covariates. The default is
+#'   TRUE.
 #'
 #' @return  a list of \code{data.frame} objects \tabular{ll}{ Full_Results \tab
 #'   Columns: e_data cname, group counts, group means, ANOVA p-values, IMD
@@ -91,7 +94,8 @@ imd_anova <- function (omicsData,
                        pval_thresh = 0.05,
                        covariates = NULL,
                        paired = FALSE,
-                       equal_var = TRUE) {
+                       equal_var = TRUE,
+                       use_parallel = TRUE) {
 
   # Preliminaries --------------------------------------------------------------
 
@@ -191,7 +195,8 @@ imd_anova <- function (omicsData,
                                  comparisons = NULL, # This actually performs all pairwise comparisons.
                                  pval_adjust = 'none',
                                  pval_thresh = pval_thresh,
-                                 covariates = NULL)
+                                 covariates = NULL,
+                                 use_parallel = use_parallel)
     # NOTE: covariates = NULL in the above call to imd_test because the
     # covariate portion of the code is the slowest part of the imd_test
     # function. In addition, the covariates portion of the results are not used
@@ -201,7 +206,8 @@ imd_anova <- function (omicsData,
                                  comparisons = comparisons,
                                  pval_adjust = pval_adjust_g,
                                  pval_thresh = pval_thresh,
-                                 covariates = covariates)
+                                 covariates = covariates,
+                                 use_parallel = use_parallel)
     gtest_pvalues <- imd_results_full$Pvalues
     colnames(gtest_pvalues) <- paste0("P_value_G_",colnames(gtest_pvalues))
     gtest_flags <- imd_results_full$Flags
@@ -875,6 +881,9 @@ group_comparison_anova <- function(groupData,comparisons,anova_results_full){
 #'   peptides are considered differentially expressed. Defaults to 0.05
 #' @param covariates A character vector with no more than two variable names
 #'   that will be used as covariates in the IMD-ANOVA analysis.
+#' @param use_parallel A logical value indicating whether or not to use a
+#'   "doParallel" loop when running the G-Test with covariates. The default is
+#'   TRUE.
 #'
 #' @return  a list of `data.frame`s
 #'   \tabular{ll}{
@@ -897,7 +906,7 @@ group_comparison_anova <- function(groupData,comparisons,anova_results_full){
 #' Journal of proteome research 9.11 (2010): 5748-5756.
 #'
 imd_test <- function (omicsData, comparisons, pval_adjust,
-                      pval_thresh, covariates) {
+                      pval_thresh, covariates, use_parallel) {
 
   # check that omicsData is of the appropriate class
   if(!inherits(omicsData, c("proData","pepData","lipidData", "metabData", "nmrData"))) stop("omicsData is not an object of appropriate class")
@@ -1009,7 +1018,8 @@ imd_test <- function (omicsData, comparisons, pval_adjust,
         data = omicsData$e_data[, -edataIdx],
         groupData = groupData,
         cmat = cmat,
-        covariates = covariates
+        covariates = covariates,
+        use_parallel = use_parallel
       )
 
       pairwise_stats <- interim$tstats
@@ -1045,7 +1055,8 @@ imd_test <- function (omicsData, comparisons, pval_adjust,
         data = omicsData$e_data[, -edataIdx],
         groupData = groupData,
         cmat = cmat,
-        covariates = covariates
+        covariates = covariates,
+        use_parallel = use_parallel
       )
 
       pairwise_stats <- interim$tstats
@@ -1169,12 +1180,16 @@ group_comparison_imd <- function(groupData,comparisons,observed,absent){
 #
 # @param covariates A character vector specifying the covariates.
 #
+# @param use_parallel A logical value indicating whether or not to use a
+#   "doParallel" loop when running the G-Test with covariates. The default is
+#   TRUE.
+#
 # @return A list of two data frames. The first data frame contains the test
 #   statistics for each pairwise comparison across all biomolecules. The second
 #   contains the corresponding p-values.
 #
 # @Author Evan A Martin
-imd_cov <- function (data, groupData, cmat, covariates) {
+imd_cov <- function (data, groupData, cmat, covariates, use_parallel) {
 
   # Create an object that will correctly subset the anova output given the
   # number of covariates present.
@@ -1192,10 +1207,16 @@ imd_cov <- function (data, groupData, cmat, covariates) {
   # pairwise test.
   list_anova <- vector(mode = "list", length = length(cmat$names))
 
-  cores <- parallel::detectCores()
-  cl <- parallel::makeCluster(cores - 1)
-  on.exit(parallel::stopCluster(cl))
-  doParallel::registerDoParallel(cl)
+
+  # Set up parallel backend.
+  if (use_parallel) {
+    cores <- parallel::detectCores()
+    cl <- parallel::makeCluster(cores - 1)
+    on.exit(parallel::stopCluster(cl))
+    doParallel::registerDoParallel(cl)
+  } else {
+    foreach::registerDoSEQ()
+  }
 
   # Loop through each comparison and compute the test statistic and p-value for
   # each row in e_data.
@@ -1217,27 +1238,31 @@ imd_cov <- function (data, groupData, cmat, covariates) {
       # Run anova and glm depending on the number of covariates present.
       if (gem == 3) {
 
-        ninja <- anova(
-          glm(
-            as.numeric(!is.na(data[v, groupIdx])) ~
-              attr(groupData, "covariates")[groupIdx, covIdx] +
-              groupData$Group[groupIdx],
-            family = binomial
-          ),
-          test = "Chisq"
+        suppressWarnings(
+          ninja <- anova(
+            glm(
+              as.numeric(!is.na(data[v, groupIdx])) ~
+                attr(groupData, "covariates")[groupIdx, covIdx] +
+                groupData$Group[groupIdx],
+              family = binomial
+            ),
+            test = "Chisq"
+          )
         )
 
       } else {
 
-        ninja <- anova(
-          glm(
-            as.numeric(!is.na(data[v, groupIdx])) ~
-              attr(groupData, "covariates")[groupIdx, covIdx[[1]]] +
-              attr(groupData, "covariates")[groupIdx, covIdx[[2]]] +
-              groupData$Group[groupIdx],
-            family = binomial
-          ),
-          test = "Chisq"
+        suppressWarnings(
+          ninja <- anova(
+            glm(
+              as.numeric(!is.na(data[v, groupIdx])) ~
+                attr(groupData, "covariates")[groupIdx, covIdx[[1]]] +
+                attr(groupData, "covariates")[groupIdx, covIdx[[2]]] +
+                groupData$Group[groupIdx],
+              family = binomial
+            ),
+            test = "Chisq"
+          )
         )
 
       }
