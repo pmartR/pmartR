@@ -32,7 +32,7 @@
 #'
 #' @export
 #'
-molecule_filter <- function (omicsData,use_groups = FALSE) {
+molecule_filter <- function (omicsData,use_batch = FALSE) {
   require(tidyverse)
   ## some initial checks ##
   # test#
@@ -46,15 +46,17 @@ molecule_filter <- function (omicsData,use_groups = FALSE) {
                 sep = ' '))
   }
   
-  # check that omicsData has group data if specified
-  if(is.null(attr(omicsData,"group_DF")) && use_groups == TRUE){
-    stop (paste("omicsData must have group_designation specified"))
+  # check that omicsData has batch_id data if specified
+  if(is.null(attributes(attr(omicsData,"group_DF"))$batch_id) && use_batch == TRUE){
+    stop (paste("omicsData must have batch_id specified"))
   }
   
-  if(use_groups == FALSE | is.null(attr(omicsData, "group_DF"))){
+  # find the column which has the edata cname
+  id_col <- which(names(omicsData$e_data) == get_edata_cname(omicsData))
+  
+  if(use_batch == FALSE | is.null(attributes(attr(omicsData,"group_DF"))$batch_id)){
     # Extricate the column number of the ID column.
-    id_col <- which(names(omicsData$e_data) == get_edata_cname(omicsData))
-    get_edata_cname(omicsData)
+
     
     # Compute the number of non-missing values
     num_obs <- rowSums(!is.na(omicsData$e_data[, -id_col]))
@@ -62,15 +64,16 @@ molecule_filter <- function (omicsData,use_groups = FALSE) {
     # Create a data frame with the ID column and the number of non-missing values.
     output <- data.frame(omicsData$e_data[, id_col], num_obs)
   } 
-  else if(use_groups == TRUE & !is.null(attr(omicsData, "group_DF"))){
+  else if(use_batch == TRUE & !is.null(attributes(attr(omicsData,"group_DF"))$batch_id)){
     # create a dataframe with ID columns and the number of non-missing values per group
     # save the group dataframe
-    groupDat <- attr(omicsData,"group_DF")
+    batchDat <- attributes(attr(x,"group_DF"))$batch_id
+    colnames(batchDat)[2] <- "Batch"
     # Create a datafarme with the ID columns and the minimum number of non-missing values per grouping
     output <- omicsData$e_data %>%
-      pivot_longer(cols = -id_col, names_to = names(groupDat)[1], values_to = "value") %>%
-      left_join(groupDat) %>%
-      group_by(across(id_col), Group) %>%
+      pivot_longer(cols = -id_col, names_to = names(batchDat)[1], values_to = "value") %>%
+      left_join(batchDat, by = "SampleID") %>%
+      group_by(across(id_col), Batch) %>%
       summarise(num_obs = sum(!is.na(value))) %>%
       group_by(across(id_col)) %>%
       summarise(min_num_obs = min(num_obs))
