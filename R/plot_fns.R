@@ -2022,6 +2022,8 @@ plot.moleculeFilt <- function (filter_obj, min_num = NULL, cumulative = TRUE,
   # values that will be updated depending on input
   fill <- 0
   hline <- NULL
+  # create a TRUE/FALSE for if we are working with batch or not
+  use_batch <- attributes(filter_obj)$batch_id
 
   if(cumulative) {
     # cumulative counts (>=)
@@ -2046,12 +2048,18 @@ plot.moleculeFilt <- function (filter_obj, min_num = NULL, cumulative = TRUE,
       linetype = "dashed"
     ) else NULL
 
-    xlabel <- if (is.null(x_lab)) "Number of samples" else x_lab
+    xlabel <- if (is.null(x_lab)){
+      if(!use_batch) "Number of samples" 
+      else "Number of Samples Per Batch"
+    } else x_lab
 
     ylabel <- ifelse(is.null(y_lab), "Count of Biomolecules", y_lab)
 
-    plot_title <- if (is.null(title_lab))
-      "Count of biomolecules observed in at least X number of samples" else
+    plot_title <- if (is.null(title_lab)){
+      if(!use_batch) "Count of biomolecules observed in at least X number of samples"
+      else "Minimum count of biomolecules observed in at least X number of sample per batch"
+    }
+       else
         title_lab
 
   } else if (!cumulative) {
