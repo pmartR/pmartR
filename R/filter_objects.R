@@ -33,7 +33,6 @@
 #' @export
 #'
 molecule_filter <- function (omicsData,use_batch = FALSE) {
-  require(tidyverse)
   ## some initial checks ##
   # test#
   
@@ -67,16 +66,16 @@ molecule_filter <- function (omicsData,use_batch = FALSE) {
   else if(use_batch == TRUE & !is.null(attributes(attr(omicsData,"group_DF"))$batch_id)){
     # create a dataframe with ID columns and the number of non-missing values per group
     # save the group dataframe
-    batchDat <- attributes(attr(x,"group_DF"))$batch_id
+    batchDat <- attributes(attr(omicsData,"group_DF"))$batch_id
     colnames(batchDat)[2] <- "Batch"
     # Create a datafarme with the ID columns and the minimum number of non-missing values per grouping
     output <- omicsData$e_data %>%
-      pivot_longer(cols = -id_col, names_to = names(batchDat)[1], values_to = "value") %>%
-      left_join(batchDat, by = "SampleID") %>%
-      group_by(across(id_col), Batch) %>%
-      summarise(num_obs = sum(!is.na(value))) %>%
-      group_by(across(id_col)) %>%
-      summarise(min_num_obs = min(num_obs))
+      tidyr::pivot_longer(cols = -id_col, names_to = names(batchDat)[1], values_to = "value") %>%
+      dplyr::left_join(batchDat, by = "SampleID") %>%
+      dplyr::group_by(across(id_col), Batch) %>%
+      dplyr::summarise(num_obs = sum(!is.na(value))) %>%
+      dplyr::group_by(across(id_col)) %>%
+      dplyr::summarise(min_num_obs = min(num_obs))
   }
   
   # change the names of the data.frame
