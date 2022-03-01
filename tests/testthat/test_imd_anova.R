@@ -25,15 +25,23 @@ test_that('all tests conform to the decrees of the God of Stats',{
   afruit_1_1_3 <- imd_anova(afilta_1_1_3,
                             test_method = "anova",
                             covariates = "Gender")
-  gfruit_1_1_3 <- imd_anova(gfilta_1_1_3, test_method = "gtest")
-  cfruit_1_1_3 <- imd_anova(cfilta_1_1_3, test_method = "combined",
+  gfruit_1_1_3 <- imd_anova(gfilta_1_1_3,
+                            test_method = "gtest",
+                            covariates = "Gender",
+                            use_parallel = FALSE)
+  cfruit_1_1_3 <- imd_anova(cfilta_1_1_3,
+                            test_method = "combined",
                             covariates = "Gender")
 
   afruit_1_2_3 <- imd_anova(afilta_1_2_3,
                             test_method = "anova",
                             covariates = c("Gender", "Age"))
-  gfruit_1_2_3 <- imd_anova(gfilta_1_2_3, test_method = "gtest")
-  cfruit_1_2_3 <- imd_anova(cfilta_1_2_3, test_method = "combined",
+  gfruit_1_2_3 <- imd_anova(gfilta_1_2_3,
+                            test_method = "gtest",
+                            covariates = c("Gender", "Age"),
+                            use_parallel = FALSE)
+  cfruit_1_2_3 <- imd_anova(cfilta_1_2_3,
+                            test_method = "combined",
                             covariates = c("Gender", "Age"))
 
   afruit_2_0_3 <- imd_anova(afilta_2_0_3, test_method = "anova")
@@ -43,15 +51,23 @@ test_that('all tests conform to the decrees of the God of Stats',{
   afruit_2_1_4 <- imd_anova(afilta_2_1_4,
                             test_method = "anova",
                             covariates = "Gender")
-  gfruit_2_1_4 <- imd_anova(gfilta_2_1_4, test_method = "gtest")
-  cfruit_2_1_4 <- imd_anova(cfilta_2_1_4, test_method = "combined",
+  gfruit_2_1_4 <- imd_anova(gfilta_2_1_4,
+                            test_method = "gtest",
+                            covariates = "Gender",
+                            use_parallel = FALSE)
+  cfruit_2_1_4 <- imd_anova(cfilta_2_1_4,
+                            test_method = "combined",
                             covariates = "Gender")
 
   afruit_2_2_4 <- imd_anova(afilta_2_2_4,
                             test_method = "anova",
                             covariates = c("Gender", "Age"))
-  gfruit_2_2_4 <- imd_anova(gfilta_2_2_4, test_method = "gtest")
-  cfruit_2_2_4 <- imd_anova(cfilta_2_2_4, test_method = "combined",
+  gfruit_2_2_4 <- imd_anova(gfilta_2_2_4,
+                            test_method = "gtest",
+                            covariates = c("Gender", "Age"),
+                            use_parallel = FALSE)
+  cfruit_2_2_4 <- imd_anova(cfilta_2_2_4,
+                            test_method = "combined",
                             covariates = c("Gender", "Age"))
 
   # Custom comparisons ---------------
@@ -78,7 +94,7 @@ test_that('all tests conform to the decrees of the God of Stats',{
                                 ),
                                 test_method = "gtest")
 
-  # Adjusted p-values ---------------
+  # ANOVA: Adjusted p-values ---------------
 
   afruit_bon_1_0_2 <- imd_anova(afilta_1_0_2, test_method = "anova",
                                 pval_adjust_a = "bonferroni")
@@ -169,6 +185,8 @@ test_that('all tests conform to the decrees of the God of Stats',{
                                 pval_adjust_a = "dunnett",
                                 covariates = c("Gender", "Age"))
 
+  # G-Test: Adjusted p-values ---------------
+
   gfruit_bon_1_0_2 <- imd_anova(gfilta_1_0_2, test_method = "gtest",
                                 pval_adjust_g = "bonferroni")
   gfruit_holm_1_0_2 <- imd_anova(gfilta_1_0_2, test_method = "gtest",
@@ -177,6 +195,12 @@ test_that('all tests conform to the decrees of the God of Stats',{
                                 pval_adjust_g = "bonferroni")
   gfruit_holm_2_0_3 <- imd_anova(gfilta_2_0_3, test_method = "gtest",
                                  pval_adjust_g = "holm")
+  gfruit_bon_2_1_4 <- imd_anova(gfilta_2_1_4, test_method = "gtest",
+                                pval_adjust_g = "bonferroni",
+                                covariates = "Gender")
+  gfruit_holm_2_1_4 <- imd_anova(gfilta_2_1_4, test_method = "gtest",
+                                 pval_adjust_g = "holm",
+                                 covariates = "Gender")
 
   # Holy IMD-ANOVA unit tests, Statman! ----------------------------------------
 
@@ -362,7 +386,11 @@ test_that('all tests conform to the decrees of the God of Stats',{
   # G-Test: Unadjusted p-values ---------------
 
   expect_equal(gfruit_1_0_2, gstan_1_0_2)
+  expect_equal(gfruit_1_1_3, gstan_1_1_3)
+  expect_equal(gfruit_1_2_3, gstan_1_2_3)
   expect_equal(gfruit_2_0_3, gstan_2_0_3)
+  expect_equal(gfruit_2_1_4, gstan_2_1_4)
+  expect_equal(gfruit_2_2_4, gstan_2_2_4)
 
   # Ensure the custom comparisons create same output as the default when all
   # possible comparisons are used.
@@ -389,10 +417,26 @@ test_that('all tests conform to the decrees of the God of Stats',{
                        method = "holm")))
   )
 
+  expect_equal(
+    data.frame(gfruit_bon_2_1_4[, 16:21]),
+    data.frame(pmin(data.matrix(gstan_2_1_4[, 16:21] * 6), 1))
+  )
+  expect_equal(
+    data.frame(gfruit_holm_2_1_4[, 16:21]),
+    data.frame(t(apply(gstan_2_1_4[, 16:21],
+                       1,
+                       p.adjust,
+                       method = "holm")))
+  )
+
   # Combined output ---------------
 
   expect_equal(cfruit_1_0_2, cstan_1_0_2)
+  expect_equal(cfruit_1_1_3, cstan_1_1_3)
+  expect_equal(cfruit_1_2_3, cstan_1_2_3)
   expect_equal(cfruit_2_0_3, cstan_2_0_3)
+  expect_equal(cfruit_2_1_4, cstan_2_1_4)
+  expect_equal(cfruit_2_2_4, cstan_2_2_4)
 
   # Test argument checks -------------------------------------------------------
 
