@@ -9,8 +9,8 @@
 #'   \code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, respectively.
 #' @param min_num an integer value specifying the minimum number of times each
 #'   feature must be observed across all samples. Default value is 2.
-#' @param group
-#' @param batchName
+#' @param use_group
+#' @param use_batch
 #'
 #' @details Attribute of molecule_filt object is "total_poss_obs", the number of
 #'   total possible observations for each feature (same as the number of
@@ -32,7 +32,7 @@
 #'
 #' @export
 #'
-molecule_filter <- function (omicsData,use_batch = FALSE) {
+molecule_filter <- function (omicsData,use_groups = FALSE, use_batch = FALSE) {
   ## some initial checks ##
   # test#
   
@@ -44,7 +44,7 @@ molecule_filter <- function (omicsData,use_batch = FALSE) {
                 "'lipidData', or 'nmrData'",
                 sep = ' '))
   }
-  
+
   # check that omicsData has batch_id data if specified
   if(is.null(attributes(attr(omicsData,"group_DF"))$batch_id) && use_batch == TRUE){
     stop (paste("omicsData must have batch_id specified"))
@@ -53,9 +53,10 @@ molecule_filter <- function (omicsData,use_batch = FALSE) {
   # find the column which has the edata cname
   id_col <- which(names(omicsData$e_data) == get_edata_cname(omicsData))
   
-  if(use_batch == FALSE | is.null(attributes(attr(omicsData,"group_DF"))$batch_id)){
+  # SCENARIO 1: use_groups = FALSE, use_batch = FALSE
+  # we run the scenario as before
+  if((use_batch == FALSE | is.null(attributes(attr(omicsData,"group_DF"))$batch_id)) & (use_groups == FALSE | is.null(attr(omicsData,"group_DF")))){
     # Extricate the column number of the ID column.
-
     
     # Compute the number of non-missing values
     num_obs <- rowSums(!is.na(omicsData$e_data[, -id_col]))
@@ -63,19 +64,55 @@ molecule_filter <- function (omicsData,use_batch = FALSE) {
     # Create a data frame with the ID column and the number of non-missing values.
     output <- data.frame(omicsData$e_data[, id_col], num_obs)
   } 
-  else if(use_batch == TRUE & !is.null(attributes(attr(omicsData,"group_DF"))$batch_id)){
-    # create a dataframe with ID columns and the number of non-missing values per group
-    # save the group dataframe
+  
+  # SCENARIO 2: use_groups = FALSE, use_batch = TRUE
+  else if((use_batch == TRUE & !is.null(attributes(attr(omicsData,"group_DF"))$batch_id)) & (use_groups == FALSE | is.null(attr(omicsData,"group_DF")))){
+    # create a data frame with ID columns and the number of non-missing values per group
+    # save the group data frame
     batchDat <- attributes(attr(omicsData,"group_DF"))$batch_id
     colnames(batchDat)[2] <- "Batch"
-    # Create a datafarme with the ID columns and the minimum number of non-missing values per grouping
+    # Create a data frame with the ID columns and the minimum number of non-missing values per grouping
     output <- omicsData$e_data %>%
-      tidyr::pivot_longer(cols = -id_col, names_to = names(batchDat)[1], values_to = "value") %>%
+      tidyr::pivot_longer(cols = -tidyselect::all_of(id_col), names_to = names(batchDat)[1], values_to = "value") %>%
       dplyr::left_join(batchDat, by = "SampleID") %>%
       dplyr::group_by(across(id_col), Batch) %>%
-      dplyr::summarise(num_obs = sum(!is.na(value))) %>%
+      dplyr::summarise(num_obs = sum(!is.na(value)),.groups = "keep") %>%
       dplyr::group_by(across(id_col)) %>%
-      dplyr::summarise(min_num_obs = min(num_obs))
+      dplyr::summarise(min_num_obs = min(num_obs),.groups = "keep") %>%
+      dplyr::ungroup()
+  }
+  
+  # SCENARIO 3: use_groups = TRUE, use_batch = FALSE
+  else if((use_batch == FALSE| is.null(attributes(attr(omicsData,"group_DF"))$batch_id)) & (use_groups == TRUE & !is.null(attr(omicsData,"group_DF")))){
+    # create a data frame with ID columns and the number of non-missing values per group
+    # save the group data frame
+    groupDat <- attr(omicsData,"group_DF")
+    # Create a data frame with the ID columns and the minimum number of non-missing values per grouping
+    output <- omicsData$e_data %>%
+      tidyr::pivot_longer(cols = -tidyselect::all_of(id_col), names_to = names(groupDat)[1], values_to = "value") %>%
+      dplyr::left_join(groupDat, by = "SampleID") %>%
+      dplyr::group_by(across(id_col), Group) %>%
+      dplyr::summarise(num_obs = sum(!is.na(value)),.groups = "keep") %>%
+      dplyr::group_by(across(id_col)) %>%
+      dplyr::summarise(min_num_obs = min(num_obs),.groups = "keep") %>%
+      dplyr::ungroup()
+  }
+  
+  # SCENARIO 4: use_groups = TRUE, use_batch = TRUE
+  else {
+    groupDat <- attr(omicsData,"group_DF")
+    batchDat <- attributes(attr(omicsData,"group_DF"))$batch_id
+    colnames(batchDat)[2] <- "Batch"
+
+    output <- omicsData$e_data %>%
+      tidyr::pivot_longer(cols = -tidyselect::all_of(id_col), names_to = names(groupDat)[1], values_to = "value") %>%
+      dplyr::left_join(groupDat, by = "SampleID") %>%
+      dplyr::left_join(batchDat, by = "SampleID") %>%
+      dplyr::group_by(across(id_col), Group, Batch) %>%
+      dplyr::summarise(num_obs = sum(!is.na(value)),.groups = "keep") %>%
+      dplyr::group_by(across(id_col)) %>%
+      dplyr::summarise(min_num_obs = min(num_obs),.groups = "keep") %>%
+      dplyr::ungroup()
   }
   
   # change the names of the data.frame

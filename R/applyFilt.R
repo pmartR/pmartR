@@ -241,6 +241,7 @@ applyFilt.moleculeFilt <- function(filter_object, omicsData, min_num=2){
                           "main_effects"),
       covariates = names(attr(get_group_DF(omicsData),
                               "covariates"))[-1],
+      batch_id = names(attr(get_group_DF(omicsData),"batch_id"))[-1],
       time_course = attr(get_group_DF(omicsData),
                          "time_course")
     )
