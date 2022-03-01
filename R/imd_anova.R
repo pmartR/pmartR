@@ -226,7 +226,7 @@ imd_anova <- function (omicsData,
                                      comparisons = comparisons,
                                      pval_adjust = 'none',
                                      pval_thresh = pval_thresh,
-                                     covariates = covariates,
+                                     covariates = NULL,
                                      paired = paired,
                                      equal_var = equal_var)
   }else{
