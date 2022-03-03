@@ -220,14 +220,9 @@ total_count_filter <- function (omicsData) {
   ## some initial checks ##
   
   # check that omicsData is of appropriate class #
-  if (!inherits(omicsData, c(
-    #"pepData", "proData", "metabData", "lipidData", "nmrData", 
-                             "seqData"))) {
+  if (!inherits(omicsData, c( "seqData"))) {
     
-    stop (paste("omicsData must be of class 'seqData'.",
-                #'pepData', 'proData', 'metabData',",
-                #"'lipidData', 'nmrData'",
-                sep = ' '))
+    stop (paste("omicsData must be of class 'seqData'.",sep = ' '))
     
   }
   
