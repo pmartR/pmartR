@@ -113,7 +113,8 @@ quick_cog <- function(name, value) {
 # Create a list to convert from short name to long
 name_converter_abundance <- list("n" = "Count", "mean" = "Mean Abundance", 
                        "median" = "Median Abundance", "sd" = "Standard Deviation Abundance", 
-                       "skew" = "Skew Abundance", "p_value" = "P Value", "fold_change" = "Fold Change")
+                       "skew" = "Skew Abundance", "p_value_anova" = "Anova P Value",
+                       "p_value_gtest" = "G-Test P Value", "fold_change" = "Fold Change")
 name_converter_foldchange <- list("n" = "Count", "mean" = "Mean Fold Change", 
                                   "median" = "Median Fold Change", "sd" = "Standard Deviation Fold Change")
 
@@ -356,6 +357,15 @@ trelli_abundance_boxplot <- function(trelliData,
         # Subset down the dataframe down to group, unnest the dataframe, 
         # pivot_longer to comparison, subset columns to requested statistics, 
         # switch name to a more specific name
+        
+        # Update stat cogs to accept the new p-value groups
+        if ("p_value" %in% stat_cogs) {
+          theNames <- trelliData$trelliData.stat$Nested_DF[[1]] %>% colnames()
+          p_value_cols <- theNames[grepl("p_value", theNames)]
+          stat_cogs <- stat_cogs[stat_cogs != "p_value"]
+          stat_cogs <- c(stat_cogs, p_value_cols)
+        }
+        
         cogs_to_add <- trelliData$trelliData.stat %>%
           dplyr::filter(trelliData$trelliData.stat[[edata_cname]] == biomolecule) %>%
           dplyr::select(Nested_DF) %>%
@@ -551,6 +561,14 @@ trelli_abundance_histogram <- function(trelliData,
       stat_cogs <- cognostics[cognostics %in% c("fold_change", "p_value")]
       
       if (length(stat_cogs) != 0) {
+        
+        # Update stat cogs to accept the new p-value groups
+        if ("p_value" %in% stat_cogs) {
+          theNames <- trelliData$trelliData.stat$Nested_DF[[1]] %>% colnames()
+          p_value_cols <- theNames[grepl("p_value", theNames)]
+          stat_cogs <- stat_cogs[stat_cogs != "p_value"]
+          stat_cogs <- c(stat_cogs, p_value_cols)
+        }
         
         # Subset down the dataframe down to group, unnest the dataframe, 
         # pivot_longer to comparison, subset columns to requested statistics, 
