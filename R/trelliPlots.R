@@ -1527,11 +1527,26 @@ trelli_foldchange_volcano <- function(trelliData,
   
   fc_volcano_plot_fun <- function(DF, title) {
     
+    # Change NaN to 0 just for the plotting functions
+    DF$p_value_anova[is.nan(DF$p_value_anova)] <- 0
+    DF$p_value_gtest[is.nan(DF$p_value_gtest)] <- 0
+    DF$fold_change[is.nan(DF$fold_change)] <- 0
     
+    if (!is.null(p_value_test) && p_value_thresh != 0) {
+      
+      # Get which p_value to test
+      if (p_value_test == "anova") {DF$p_value <- DF$p_value_anova} else 
+      if (p_value_test == "g-test") {DF$p_value <- DF$p_value_gtest} else
+      if (p_value_test == "both") {DF$p_value <- lapply(1:nrow(DF), function(row) {
+            DF$p_value <- mean(c(DF$p_value_anova[row], DF$p_value_gtest[row]))}) %>% unlist()}
+      
+    } else {
+      DF$p_value <- 0
+    }
     
     # Indicate which comparisons should be highlighted
     DF$Significant <- lapply(1:nrow(DF), function(row) {
-      if (!is.nan(DF$p_value[row]) && !is.nan(DF$fold_change[row]) && DF$p_value[row] <= p_value_thresh) {
+      if (DF$p_value[row] <= p_value_thresh & DF$p_value[row] != 0) {
         ifelse(DF$fold_change[row] > 0, "High", "Low")
       } else {return("Not Significant")}
     }) %>% unlist()
@@ -1562,9 +1577,26 @@ trelli_foldchange_volcano <- function(trelliData,
   
   fc_volcano_cog_fun <- function(DF, Group) {
     
+    # Change NaN to 0 just for the plotting functions
+    DF$p_value_anova[is.nan(DF$p_value_anova)] <- 0
+    DF$p_value_gtest[is.nan(DF$p_value_gtest)] <- 0
+    DF$fold_change[is.nan(DF$fold_change)] <- 0
+    
+    if (!is.null(p_value_test) && p_value_thresh != 0) {
+      
+      # Get which p_value to test
+      if (p_value_test == "anova") {DF$p_value <- DF$p_value_anova} else 
+        if (p_value_test == "g-test") {DF$p_value <- DF$p_value_gtest} else
+          if (p_value_test == "both") {DF$p_value <- lapply(1:nrow(DF), function(row) {
+            DF$p_value <- mean(c(DF$p_value_anova[row], DF$p_value_gtest[row]))}) %>% unlist()}
+      
+    } else {
+      DF$p_value <- 0
+    }
+    
     # Get count 
     counts <- lapply(1:nrow(DF), function(row) {
-      if (!is.nan(DF$p_value[row]) && !is.nan(DF$fold_change[row]) && DF$p_value[row] <= p_value_thresh) {
+      if (DF$p_value[row] <= p_value_thresh & DF$p_value[row] != 0) {
         ifelse(DF$fold_change[row] > 0, "High", "Low")
       } else {return("Not Significant")}
     }) %>% 
@@ -1619,10 +1651,6 @@ trelli_foldchange_volcano <- function(trelliData,
 #' @param trelliData A trelliscope data object with omicsData and statRes results. Required. 
 #' @param cognostics A vector of cognostic options for each plot. Valid entries are
 #'    are n, mean, median, and sd. 
-#' @param p_value_thresh A value between 0 and 1 to indicate a threshold to highlight
-#'    significant biomolecules. Default is 0.05. Selecting 0 will remove this feature. 
-#' @param p_value_test  A string to indicate which test to use for p_value_thresh. Acceptable
-#'    entries are "anova", "g-test", or "both". Selecting NULL will remove this feature.   
 #' @param ggplot_params An optional vector of strings of ggplot parameters to the backend ggplot
 #'    function. For example, c("ylab('')", "xlab('')"). Default is NULL. 
 #' @param interactive A logical argument indicating whether the plots should be interactive
@@ -1638,7 +1666,7 @@ trelli_foldchange_volcano <- function(trelliData,
 #' 
 #' ## Build fold_change bar plot with statRes data grouped by edata_colname.
 #' trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") %>% 
-#'   trelli_foldchange_heatmap(p_value_test = "anova")
+#'   trelli_foldchange_heatmap()
 #'
 #' }
 #' 
@@ -1647,8 +1675,6 @@ trelli_foldchange_volcano <- function(trelliData,
 #' @export
 trelli_foldchange_heatmap <- function(trelliData,
                                       cognostics = c("n", "median", "mean", "sd"),
-                                      p_value_thresh = 0.05,
-                                      p_value_test = NULL,
                                       ggplot_params = NULL,
                                       interactive = FALSE,
                                       path = getDownloadsFolder(),
@@ -1677,30 +1703,9 @@ trelli_foldchange_heatmap <- function(trelliData,
     stop("trelliData must be grouped_by an e_meta column.")
   }
   
-  # Check p_value threshold
-  if (!is.numeric(p_value_thresh)) {
-    stop("p_value_thresh must be a numeric.")
-  }
-  if (p_value_thresh < 0 | p_value_thresh > 1) {
-    stop("p_value_thresh must be between 0 and 1.")
-  }
-  
-  # Check p_value test
-  if (!is.null(p_value_test)) {
-    if (!is.character(p_value_test) || p_value_test %in% c("anova", "g-test", "both") == FALSE) {
-      stop("p_value_test must be anova, g-test, both, or NULL.")
-    }
-  }
-  
   # Make foldchange boxplot function--------------------------------------------
   
   fc_hm_plot_fun <- function(DF, title) {
-    
-    # Change NaN to 0 just for the plotting functions
-    DF$p_value[is.nan(DF$p_value)] <- 0
-    
-    # Indicate which comparisons should be highlighted
-    Significant <- ifelse(DF$p_value <= p_value_thresh & DF$p_value != 0, "black", NA)
     
     # Get edata cname
     edata_cname <- get_edata_cname(trelliData$statRes)
