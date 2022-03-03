@@ -256,7 +256,7 @@ as.trelliData.edata <- function(e_data,
 #' omicsData <- normalize_global(omicsData, "subset_fn" = "all", "norm_fn" = "median", "apply_norm" = TRUE, "backtransform" = TRUE)
 #' 
 #' # Implement the IMD ANOVA method and compute all pairwise comparisons (i.e. leave the `comparisons` argument NULL)
-#' statRes <- imd_anova(omicsData = omicsData, test_method = 'anova')
+#' statRes <- imd_anova(omicsData = omicsData, test_method = 'combined')
 #' 
 #' # Generate the trelliData object 
 #' trelliData2 <- as.trelliData(omicsData = omicsData)
@@ -396,18 +396,20 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL, ...) {
       dplyr::select(c(edata_cname, pvalue_cols, fold_change_cols))  %>%
       tidyr::pivot_longer(c(pvalue_cols, fold_change_cols)) %>%
       dplyr::mutate(
-        Comparison = gsub("P_value_A_|Fold_change_", "", name),
-        name = lapply(1:length(name), function(el) {
-          gsub(paste0("_", Comparison[el]), "", name[el])
+        Comparison = gsub("P_value_A_|P_value_G_|Fold_change_", "", name), 
+        Metric = lapply(name, function(x) {
+          if (grepl("P_value_A", x)) {return("p_value_anova")} else
+          if (grepl("P_value_G", x)) {return("p_value_gtest")} else {return("fold_change")}
         }) %>% unlist()
       ) %>%
+      dplyr::select(-name) %>%
       dplyr::group_by(dplyr::across(c(Comparison, !!rlang::sym(edata_cname)))) %>%
-      tidyr::nest() %>%
-      dplyr::mutate(
-        "p_value" = purrr::map(data, function(x) {unlist(x[x$name == "P_value_A", "value"])}) %>% unlist(),
-        "fold_change" = purrr::map(data, function(x) {unlist(x[x$name == "Fold_change", "value"])}) %>% unlist()
+      dplyr::summarise(
+        "p_value_anova" = value[which(Metric == "p_value_anova")], 
+        "p_value_gtest" = value[which(Metric == "p_value_gtest")],
+        "fold_change" = value[which(Metric == "fold_change")]
       ) %>%
-      dplyr::select(-data)
+      dplyr::relocate(!!rlang::sym(edata_cname))
     
     # Add emeta columns if emeta exists
     if (!is.null(omicsData$e_meta)) {

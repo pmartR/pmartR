@@ -169,7 +169,7 @@ getDownloadsFolder <- function() {
 #'    function. For example, c("ylab('')", "ylim(c(2,20))"). Default is NULL. 
 #' @param interactive A logical argument indicating whether the plots should be interactive
 #'    or not. Interactive plots are ggplots piped to ggplotly (for now). Default is FALSE.  
-#' @param jitter Add points as a geom_jitter. Default is TRUE. 
+#' @param include_points Add points as a geom_jitter. Default is TRUE. 
 #' @param path The base directory of the trelliscope application. Default is Downloads. 
 #' @param name The name of the display. Default is Trelliscope.
 #' @param test_mode A logical to return a smaller trelliscope to confirm plot and design.
@@ -211,7 +211,7 @@ trelli_abundance_boxplot <- function(trelliData,
                                      cognostics = c("n", "mean", "median", "sd", "skew", "p_value", "fold_change"),
                                      ggplot_params = NULL,
                                      interactive = FALSE,
-                                     jitter = TRUE,
+                                     include_points = TRUE,
                                      path = getDownloadsFolder(),
                                      name = "Trelliscope",
                                      test_mode = FALSE,
@@ -241,9 +241,9 @@ trelli_abundance_boxplot <- function(trelliData,
   # Round test example to integer 
   if (test_mode) {test_example <- unique(abs(round(test_example)))}
   
-  # Make sure jitter is a true or false
-  if (!is.logical(jitter) & !is.na(jitter)) {
-    stop("jitter must be a true or false.")
+  # Make sure include_points is a true or false
+  if (!is.logical(include_points) & !is.na(include_points)) {
+    stop("include_points must be a true or false.")
   }
 
   # Make boxplot function-------------------------------------------------------
@@ -261,8 +261,8 @@ trelli_abundance_boxplot <- function(trelliData,
       ggplot2::theme(legend.position = "none", plot.title = ggplot2::element_text(hjust = 0.5)) + 
       ggplot2::ylab(paste(attr(trelliData$omicsData, "data_info")$data_scale, "Abundance")) 
     
-    # Add jitter or point
-    if (jitter) {
+    # Add include_points 
+    if (include_points) {
       boxplot <- boxplot + ggplot2::geom_jitter(height = 0, width = 0.25)
     } 
     
@@ -1199,7 +1199,7 @@ trelli_foldchange_bar <- function(trelliData,
 #'    are n ,mean, median, and sd. 
 #' @param p_value_thresh A value between 0 and 1 to indicate a threshold to highlight
 #'    significant biomolecules. Default is 0.05. Selecting 0 will remove this feature. 
-#' @param jitter Add points. Default is TRUE. 
+#' @param include_points Add points. Default is TRUE. 
 #' @param ggplot_params An optional vector of strings of ggplot parameters to the backend ggplot
 #'    function. For example, c("ylab('')", "xlab('')"). Default is NULL. 
 #' @param interactive A logical argument indicating whether the plots should be interactive
@@ -1225,7 +1225,7 @@ trelli_foldchange_bar <- function(trelliData,
 trelli_foldchange_boxplot <- function(trelliData,
                                       cognostics = c("n", "median", "mean", "sd"),
                                       p_value_thresh = 0.05,
-                                      jitter = TRUE,
+                                      include_points = TRUE,
                                       ggplot_params = NULL,
                                       interactive = FALSE,
                                       path = getDownloadsFolder(),
@@ -1262,9 +1262,9 @@ trelli_foldchange_boxplot <- function(trelliData,
     stop("p_value_thresh must be between 0 and 1.")
   }
   
-  # Make sure jitter is a true or false
-  if (!is.logical(jitter) & !is.na(jitter)) {
-    stop("jitter must be a true or false.")
+  # Make sure include_points is a true or false
+  if (!is.logical(include_points) & !is.na(include_points)) {
+    stop("include_points must be a true or false.")
   }
   
   # Make foldchange boxplot function--------------------------------------------
@@ -1287,8 +1287,8 @@ trelli_foldchange_boxplot <- function(trelliData,
         legend.position = "none"
       ) + ggplot2::ylab("Fold Change") + ggplot2::ggtitle(title)
     
-    # Add jitter
-    if (jitter) {
+    # Add include_points
+    if (include_points) {
       boxplot <- boxplot + ggplot2::geom_jitter(color = Significant, height = 0, width = 0.25)
     }
     
