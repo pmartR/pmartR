@@ -1065,7 +1065,9 @@ trelli_missingness_bar <- function(trelliData,
 #' @param cognostics A vector of cognostic options for each plot. Valid entries are
 #'    are fold_change and p_value.
 #' @param p_value_thresh A value between 0 and 1 to indicate a threshold to highlight
-#'    significant biomolecules. Default is 0.05. Selecting 0 will remove this feature. 
+#'    significant biomolecules. Default is 0.05. Selecting 0 will remove this feature.
+#' @param p_value_test A string to indicate which test to use for p_value_thresh. Acceptable
+#'    entries are "anova", "g-test", or "both". Selecting NULL will remove this feature. 
 #' @param ggplot_params An optional vector of strings of ggplot parameters to the backend ggplot
 #'    function. For example, c("ylab('')", "xlab('')"). Default is NULL. 
 #' @param interactive A logical argument indicating whether the plots should be interactive
@@ -1081,11 +1083,11 @@ trelli_missingness_bar <- function(trelliData,
 #' 
 #' ## Build fold_change bar plot with statRes data grouped by edata_colname.
 #' trelli_panel_by(trelliData = trelliData3, panel = "LipidCommonName") %>% 
-#'   trelli_foldchange_bar(test_mode = T, test_example = 1:10)
+#'   trelli_foldchange_bar(test_mode = T, test_example = 1:10, p_value_test = "anova")
 #'   
 #' ## Or make the plot interactive  
 #' trelli_panel_by(trelliData = trelliData4, panel = "LipidCommonName") %>% 
-#'   trelli_foldchange_bar(test_mode = T, test_example = 1:10, interactive = T) 
+#'   trelli_foldchange_bar(test_mode = T, test_example = 1:10, p_value_test = "both", interactive = T) 
 #'    
 #' }
 #' 
@@ -1095,6 +1097,7 @@ trelli_missingness_bar <- function(trelliData,
 trelli_foldchange_bar <- function(trelliData,
                                   cognostics = c("fold_change", "p_value"),
                                   p_value_thresh = 0.05,
+                                  p_value_test = NULL,
                                   ggplot_params = NULL,
                                   interactive = FALSE,
                                   path = getDownloadsFolder(),
@@ -1132,20 +1135,47 @@ trelli_foldchange_bar <- function(trelliData,
     stop("p_value_thresh must be between 0 and 1.")
   }
   
+  # Check p_value test
+  if (!is.null(p_value_test)) {
+    if (!is.character(p_value_test) || p_value_test %in% c("anova", "g-test", "both") == FALSE) {
+      stop("p_value_test must be anova, g-test, both, or NULL.")
+    }
+  }
+  
   # Make foldchange bar function------------------------------------------------
   
   fc_bar_plot_fun <- function(DF, title) {
     
     # Change NaN to 0 just for the plotting functions
-    DF$p_value[is.nan(DF$p_value)] <- 0
+    DF$p_value_anova[is.nan(DF$p_value_anova)] <- 0
+    DF$p_value_gtest[is.nan(DF$p_value_gtest)] <- 0
     DF$fold_change[is.nan(DF$fold_change)] <- 0
     
-    # Indicate which comparisons should be highlighted
-    Significant <- ifelse(DF$p_value <= p_value_thresh & DF$p_value != 0, "black", NA)
+    if (!is.null(p_value_test) && p_value_thresh != 0) {
+      
+      # Get which p_value to test
+      if (p_value_test == "anova") {DF$p_value <- DF$p_value_anova} else 
+      if (p_value_test == "g-test") {DF$p_value <- DF$p_value_gtest} else
+      if (p_value_test == "both") {DF$p_value <- lapply(1:nrow(DF), function(row) {
+        DF$p_value <- mean(c(DF$p_value_anova[row], DF$p_value_gtest[row]))}) %>% unlist()}
+      
+      # Indicate which comparisons should be highlighted
+      Significant <- ifelse(DF$p_value <= p_value_thresh & DF$p_value != 0, "black", NA)
+      
+      # Make bar plot 
+      bar <- ggplot2::ggplot(DF, ggplot2::aes(x = Comparison, y = fold_change, fill = Comparison)) +
+        ggplot2::geom_bar(stat = "identity", color = Significant) 
+      
+    } else {
+      
+      # Make bar plot
+      bar <- ggplot2::ggplot(DF, ggplot2::aes(x = Comparison, y = fold_change, fill = Comparison)) +
+        ggplot2::geom_bar(stat = "identity") 
+      
+    }
     
-    # Make bar plot 
-    bar <- ggplot2::ggplot(DF, ggplot2::aes(x = Comparison, y = fold_change, fill = Comparison)) +
-      ggplot2::geom_bar(stat = "identity", color = Significant) + ggplot2::theme_bw() + ggplot2::ggtitle(title) +
+    # Extend bar plot
+    bar <- bar + ggplot2::theme_bw() + ggplot2::ggtitle(title) +
       ggplot2::theme(
         plot.title = ggplot2::element_text(hjust = 0.5), 
         axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1),
@@ -1172,6 +1202,14 @@ trelli_foldchange_bar <- function(trelliData,
   # Create the cognostic function-----------------------------------------------
   
   fc_bar_cog_fun <- function(DF, Biomolecule) {
+    
+    # Extend cognostics if p_value is in it
+    if ("p_value" %in% cognostics) {
+      theNames <- trelliData$trelliData.stat$Nested_DF[[1]] %>% colnames()
+      p_value_cols <- theNames[grepl("p_value", theNames)]
+      cognostics <- cognostics[cognostics != "p_value"]
+      cognostics <- c(cognostics, p_value_cols)
+    }
     
     # Prepare DF for quick_cog function
     PreCog <- DF %>%
@@ -1217,6 +1255,8 @@ trelli_foldchange_bar <- function(trelliData,
 #'    are n ,mean, median, and sd. 
 #' @param p_value_thresh A value between 0 and 1 to indicate a threshold to highlight
 #'    significant biomolecules. Default is 0.05. Selecting 0 will remove this feature. 
+#' @param p_value_test A string to indicate which test to use for p_value_thresh. Acceptable
+#'    entries are "anova", "g-test", or "both". Selecting NULL will remove this feature.
 #' @param include_points Add points. Default is TRUE. 
 #' @param ggplot_params An optional vector of strings of ggplot parameters to the backend ggplot
 #'    function. For example, c("ylab('')", "xlab('')"). Default is NULL. 
@@ -1243,6 +1283,7 @@ trelli_foldchange_bar <- function(trelliData,
 trelli_foldchange_boxplot <- function(trelliData,
                                       cognostics = c("n", "median", "mean", "sd"),
                                       p_value_thresh = 0.05,
+                                      p_value_test = NULL,
                                       include_points = TRUE,
                                       ggplot_params = NULL,
                                       interactive = FALSE,
@@ -1290,12 +1331,20 @@ trelli_foldchange_boxplot <- function(trelliData,
   fc_box_plot_fun <- function(DF, title) {
     
     # Change NaN to 0 just for the plotting functions
-    DF$p_value[is.nan(DF$p_value)] <- 0
+    DF$p_value_anova[is.nan(DF$p_value_anova)] <- 0
+    DF$p_value_gtest[is.nan(DF$p_value_gtest)] <- 0
     DF$fold_change[is.nan(DF$fold_change)] <- 0
     
-    # Indicate which comparisons should be highlighted
-    Significant <- ifelse(DF$p_value <= p_value_thresh & DF$p_value != 0, "red", "black")
-    
+    if (!is.null(p_value_test) && p_value_thresh != 0) {
+      
+      # Get which p_value to test
+      if (p_value_test == "anova") {DF$p_value <- DF$p_value_anova} else 
+      if (p_value_test == "g-test") {DF$p_value <- DF$p_value_gtest} else
+      if (p_value_test == "both") {DF$p_value <- lapply(1:nrow(DF), function(row) {
+        DF$p_value <- mean(c(DF$p_value_anova[row], DF$p_value_gtest[row]))}) %>% unlist()}
+      
+    }
+  
     # Make boxplot
     boxplot <- ggplot2::ggplot(DF, ggplot2::aes(x = Comparison, y = fold_change, fill = Comparison)) +
       ggplot2::geom_boxplot() + ggplot2::theme_bw() +
@@ -1307,7 +1356,12 @@ trelli_foldchange_boxplot <- function(trelliData,
     
     # Add include_points
     if (include_points) {
-      boxplot <- boxplot + ggplot2::geom_jitter(color = Significant, height = 0, width = 0.25)
+      if (!is.null(p_value_test) && p_value_thresh != 0) {
+        Significant <- ifelse(DF$p_value <= p_value_thresh & DF$p_value != 0, "red", "black")
+        boxplot <- boxplot + ggplot2::geom_jitter(color = Significant, height = 0, width = 0.25) 
+      } else {
+        boxplot <- boxplot + ggplot2::geom_jitter(height = 0, width = 0.25)
+      }
     }
     
     # Add additional parameters
@@ -1328,6 +1382,14 @@ trelli_foldchange_boxplot <- function(trelliData,
   # Make cognostic function-----------------------------------------------------
   
   fc_box_cog_fun <- function(DF, Group) {
+    
+    # Extend cognostics if p_value is in it
+    if ("p_value" %in% cognostics) {
+      theNames <- trelliData$trelliData.stat$Nested_DF[[1]] %>% colnames()
+      p_value_cols <- theNames[grepl("p_value", theNames)]
+      cognostics <- cognostics[cognostics != "p_value"]
+      cognostics <- c(cognostics, p_value_cols)
+    }
     
     # Calculate stats and subset to selected choices 
     cog_to_trelli <- DF %>%
