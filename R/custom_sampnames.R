@@ -84,7 +84,7 @@ custom_sampnames <- function (omicsData, firstn = NULL, from = NULL,
 }
 
 #'
-#'@export
+#' @export
 subset_names <- function(x, firstn = NULL, from = NULL,
                          to = NULL, delim = NULL, components = NULL, 
                          pattern = NULL, ...){
