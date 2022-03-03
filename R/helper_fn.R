@@ -620,7 +620,9 @@ set_data_info <- function (e_data,
                            data_scale,
                            data_types,
                            norm_info,
-                           is_normalized) {
+                           is_normalized,
+                           batch_info,
+                           is_bc) {
 
   # Identify the column number that contains the IDs.
   id_col <- which(names(e_data) == edata_cname)
@@ -639,6 +641,8 @@ set_data_info <- function (e_data,
 
   # Set data normalization information.
   norm_info$is_normalized <- is_normalized
+  
+  batch_info$is_bc <- is_bc
 
   # Return all of the information that belongs in the data_info attribute.
   return (list(data_scale_orig = data_scale_orig,
@@ -648,7 +652,8 @@ set_data_info <- function (e_data,
                num_miss_obs = num_miss_obs,
                prop_missing = prop_missing,
                num_samps = num_samps,
-               data_types = data_types))
+               data_types = data_types,
+               batch_info = batch_info))
 
 }
 

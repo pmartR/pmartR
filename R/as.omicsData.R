@@ -110,6 +110,7 @@ as.isobaricpepData <- function (e_data, f_data, e_meta = NULL, edata_cname,
                                  data_scale = "abundance",
                                  is_normalized = FALSE, isobaric_norm = FALSE,
                                  norm_info = list(),  data_types = NULL,
+                                 is_bc = FALSE, batch_info = list(),
                                  check.names = TRUE) {
 
   # Set the original data scale to the input data scale.
@@ -133,7 +134,9 @@ as.isobaricpepData <- function (e_data, f_data, e_meta = NULL, edata_cname,
                     norm_info = norm_info,
                     data_types = data_types,
                     check.names = check.names,
-                    dType = dType)
+                    dType = dType,
+                    is_bc = is_bc,
+                    batch_info = batch_info)
 
   # Set the (possibly new) emeta_cname.
   emeta_cname <- res$emeta_cname
@@ -157,7 +160,9 @@ as.isobaricpepData <- function (e_data, f_data, e_meta = NULL, edata_cname,
                                           data_scale = data_scale,
                                           data_types = data_types,
                                           norm_info = norm_info,
-                                          is_normalized = is_normalized)
+                                          is_normalized = is_normalized,
+                                          batch_info = batch_info,
+                                          is_bc = is_bc)
 
   # Set isobaric specific attribute.
   attr(res, "isobaric_info") <- set_isobaric_info(exp_cname = NA,
@@ -288,6 +293,7 @@ as.lipidData <- function (e_data, f_data, e_meta = NULL,
                            techrep_cname = NULL,
                            data_scale = "abundance",
                            is_normalized = FALSE, norm_info = list(),
+                           is_bc = FALSE, batch_info = list(),
                            data_types = NULL, check.names = TRUE) {
 
   # Set the original data scale to the input data scale.
@@ -311,7 +317,9 @@ as.lipidData <- function (e_data, f_data, e_meta = NULL,
                     norm_info = norm_info,
                     data_types = data_types,
                     check.names = check.names,
-                    dType = dType)
+                    dType = dType,
+                    is_bc = is_bc,
+                    batch_info = batch_info)
 
   # Set the (possibly new) emeta_cname.
   emeta_cname <- res$emeta_cname
@@ -335,7 +343,9 @@ as.lipidData <- function (e_data, f_data, e_meta = NULL,
                                           data_scale = data_scale,
                                           data_types = data_types,
                                           norm_info = norm_info,
-                                          is_normalized = is_normalized)
+                                          is_normalized = is_normalized,
+                                          batch_info = batch_info,
+                                          is_bc = is_bc)
 
   #set check.names attribute #
   attr(res, "check.names") = check.names
@@ -458,7 +468,10 @@ as.metabData <- function (e_data, f_data, e_meta = NULL,
                            techrep_cname = NULL,
                            data_scale = "abundance",
                            is_normalized = FALSE, norm_info = list(),
-                           data_types = NULL, check.names = TRUE) {
+                           is_bc = FALSE, batch_info = list(),
+                           is_bc = FALSE, batch_info = list(),
+                           data_types = NULL, check.names = TRUE
+                           ) {
 
   # Set the original data scale to the input data scale.
   data_scale_orig <- data_scale
@@ -481,7 +494,9 @@ as.metabData <- function (e_data, f_data, e_meta = NULL,
                     norm_info = norm_info,
                     data_types = data_types,
                     check.names = check.names,
-                    dType = dType)
+                    dType = dType,
+                    is_bc = is_bc,
+                    batch_info = batch_info)
 
   # Set the (possibly new) emeta_cname.
   emeta_cname <- res$emeta_cname
@@ -505,7 +520,9 @@ as.metabData <- function (e_data, f_data, e_meta = NULL,
                                           data_scale = data_scale,
                                           data_types = data_types,
                                           norm_info = norm_info,
-                                          is_normalized = is_normalized)
+                                          is_normalized = is_normalized,
+                                          batch_info = batch_info,
+                                          is_bc = is_bc)
 
   #set check.names attribute #
   attr(res, "check.names") = check.names
@@ -636,6 +653,7 @@ as.nmrData <- function (e_data, f_data, e_meta = NULL,
                          data_scale = "abundance",
                          is_normalized = FALSE, nmr_norm = FALSE,
                          norm_info = list(), data_types = NULL,
+                         is_bc = FALSE, batch_info = list(),
                          check.names = TRUE) {
 
   # Set the original data scale to the input data scale.
@@ -659,7 +677,9 @@ as.nmrData <- function (e_data, f_data, e_meta = NULL,
                     norm_info = norm_info,
                     data_types = data_types,
                     check.names = check.names,
-                    dType = dType)
+                    dType = dType,
+                    is_bc = is_bc,
+                    batch_info = batch_info)
 
   # Set the (possibly new) emeta_cname.
   emeta_cname <- res$emeta_cname
@@ -683,7 +703,9 @@ as.nmrData <- function (e_data, f_data, e_meta = NULL,
                                           data_scale = data_scale,
                                           data_types = data_types,
                                           norm_info = norm_info,
-                                          is_normalized = is_normalized)
+                                          is_normalized = is_normalized,
+                                          batch_info = batch_info,
+                                          is_bc = is_bc)
 
   # Set nmr specific attribute.
   attr(res, "nmr_info") <- set_nmr_info(metabolite_name = NA,
@@ -818,6 +840,7 @@ as.pepData <- function (e_data, f_data, e_meta = NULL,
                          techrep_cname = NULL,
                          data_scale = "abundance",
                          is_normalized = FALSE, norm_info = list(),
+                         is_bc = FALSE, batch_info = list(),
                          data_types = NULL, check.names = TRUE) {
 
   # Set the original data scale to the input data scale.
@@ -841,7 +864,9 @@ as.pepData <- function (e_data, f_data, e_meta = NULL,
                     norm_info = norm_info,
                     data_types = data_types,
                     check.names = check.names,
-                    dType = dType)
+                    dType = dType,
+                    is_bc = is_bc,
+                    batch_info = batch_info)
 
   # Set the (possibly new) emeta_cname.
   emeta_cname <- res$emeta_cname
@@ -865,7 +890,9 @@ as.pepData <- function (e_data, f_data, e_meta = NULL,
                                           data_scale = data_scale,
                                           data_types = data_types,
                                           norm_info = norm_info,
-                                          is_normalized = is_normalized)
+                                          is_normalized = is_normalized,
+                                          batch_info = batch_info,
+                                          is_bc = is_bc)
 
   # set check.names attribute #
   attr(res, "check.names") = check.names
@@ -988,6 +1015,7 @@ as.proData <- function (e_data, f_data, e_meta = NULL,
                          techrep_cname = NULL,
                          data_scale = "abundance",
                          is_normalized = FALSE, norm_info = list(),
+                         is_bc = FALSE, batch_info = list(),
                          data_types = NULL, check.names = TRUE) {
 
   # Set the original data scale to the input data scale.
@@ -1011,7 +1039,9 @@ as.proData <- function (e_data, f_data, e_meta = NULL,
                     norm_info = norm_info,
                     data_types = data_types,
                     check.names = check.names,
-                    dType = dType)
+                    dType = dType,
+                    is_bc = is_bc,
+                    batch_info = batch_info)
 
   # Set the (possibly new) emeta_cname.
   emeta_cname <- res$emeta_cname
@@ -1035,7 +1065,9 @@ as.proData <- function (e_data, f_data, e_meta = NULL,
                                           data_scale = data_scale,
                                           data_types = data_types,
                                           norm_info = norm_info,
-                                          is_normalized = is_normalized)
+                                          is_normalized = is_normalized,
+                                          batch_info = batch_info,
+                                          is_bc = is_bc)
 
   #set check.names attribute #
   attr(res, "check.names") = check.names
@@ -1084,7 +1116,9 @@ pre_flight <- function (e_data,
                         norm_info,
                         data_types,
                         check.names,
-                        dType) {
+                        dType,
+                        is_bc,
+                        batch_info) {
 
   # Verify classes/values of arguments -----------------------------------------
 
@@ -1175,6 +1209,18 @@ pre_flight <- function (e_data,
     }
 
   }
+  
+  # Inspect the is_bc argument
+  if (!is.null(is_bc)) {
+    
+    # Make sure it is logical
+    if (!inherits(is_bc, "logical")) {
+      
+      stop ("is_bc must be of the class 'logical'")
+      
+    }
+    
+  }
 
   # Examine the norm_info argument. Ensure it is a list.
   if (!inherits(norm_info, "list")) {
@@ -1182,6 +1228,13 @@ pre_flight <- function (e_data,
     # Throw an error at the user.
     stop ("norm_info must be of the class 'list'")
 
+  }
+  
+  # Examine the batch_info argument. Ensure it is a list.
+  if (!inherits(batch_info, "list")) {
+    
+    # Throw an error at the user
+    stop ("batch_info must be of the class 'list'")
   }
 
   # Check the data_types argument.

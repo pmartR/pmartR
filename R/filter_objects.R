@@ -128,6 +128,8 @@ molecule_filter <- function (omicsData,use_groups = FALSE, use_batch = FALSE) {
   # e_data minus the ID column). This will be used to ensure someone doesn't try
   # to filter e_data using a threshold larger than the number of samples.
   attr(output, "num_samps") <- get_data_info(omicsData)$num_samps
+  
+  # Fabricate an attribute that states whether or not we have added a batch_id
   attr(output, "batch_id") <- ifelse(use_batch == FALSE,FALSE,TRUE)
   
   # Return the completed object!!!
