@@ -189,17 +189,17 @@ as.trelliData.edata <- function(e_data,
     statRes = NULL
   )
   
-  # Save group by information and set class."group_by_options" list the potential
-  # inputs for the group_by function. "group_by_omics"/"group_by_stat" will hold 
+  # Save Panel By information and set class."panel_by_options" list the potential
+  # inputs for the panel_by function. "panel_by_omics"/"panel_by_stat" will hold 
   # the column name of the trelliData.omics/trelliData.stat that the data has 
-  # been grouped by. And "group_by" tracks whether the group_by function has been
+  # been grouped by. And "panel_by" tracks whether the panel_by function has been
   # applied or not. 
   attr(trelliData, "fdata_col") <- "Sample"
   attr(trelliData, "emeta_col") <- NULL
-  attr(trelliData, "group_by_options") <- c(edata_cname, fdata_cname)
-  attr(trelliData, "group_by_omics") <- NA
-  attr(trelliData, "group_by_stat") <- NA
-  attr(trelliData, "group_by") <- FALSE
+  attr(trelliData, "panel_by_options") <- c(edata_cname, fdata_cname)
+  attr(trelliData, "panel_by_omics") <- NA
+  attr(trelliData, "panel_by_stat") <- NA
+  attr(trelliData, "panel_by") <- FALSE
   class(trelliData) <- c("trelliData", "trelliData.edata")
   
   return(trelliData)
@@ -390,7 +390,7 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL, ...) {
     fold_change_cols <- colnames(statRes)[grepl("Fold_change", colnames(statRes))]
     
     # Pivot longer so that the first column is the edata_cname, extract comparison,
-    # group_by comparison, nest dataframes, and then extract the p_value and fold_change
+    # panel_by comparison, nest dataframes, and then extract the p_value and fold_change
     # for each group
     trelliData.stat <- statRes %>%
       dplyr::select(c(edata_cname, pvalue_cols, fold_change_cols))  %>%
@@ -438,33 +438,33 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL, ...) {
     attr(trelliData, "emeta_col") <- NULL
   }
   
-  # Save group by information and set class."group_by_options" list the potential
-  # inputs for the group_by function. "group_by_omics"/"group_by_stat" will hold 
+  # Save Panel By information and set class."panel_by_options" list the potential
+  # inputs for the panel_by function. "panel_by_omics"/"panel_by_stat" will hold 
   # the column name of the trelliData.omics/trelliData.stat that the data has 
-  # been grouped by. And "group_by" tracks whether the group_by function has been
+  # been grouped by. And "panel_by" tracks whether the panel_by function has been
   # applied or not. 
   group_options <- c(colnames(trelliData.omics), colnames(trelliData.stat)) %>% unique()
   group_nonoptions <- c("Abundance", "Comparison", "p_value", "fold_change", "Group")
   group_options <- group_options[group_options %in% group_nonoptions == FALSE]
-  attr(trelliData, "group_by_options") <- group_options
-  attr(trelliData, "group_by_omics") <- NA
-  attr(trelliData, "group_by_stat") <- NA
-  attr(trelliData, "group_by") <- FALSE
+  attr(trelliData, "panel_by_options") <- group_options
+  attr(trelliData, "panel_by_omics") <- NA
+  attr(trelliData, "panel_by_stat") <- NA
+  attr(trelliData, "panel_by") <- FALSE
   class(trelliData) <- c("trelliData")
   
   return(trelliData)
   
 }
 
-#' @name trelli_group_by
+#' @name trelli_panel_by
 #' 
-#' @title Set the "group_by" variable for a trelliData object 
+#' @title Set the "panel_by" variable for a trelliData object 
 #'    
 #' @description Allows for grouping omics or stats data for downstream plotting 
 #'     and cognostic functions
 #'     
 #' @param trelliData A trelliscope data object made by as.trelliData or as.trelliData.edata. Required.
-#' @param group The name of a column in trelliData to group the data by. Required. 
+#' @param panel The name of a column in trelliData to panel the data by. Required. 
 #' 
 #' @examples
 #' \dontrun{
@@ -472,28 +472,28 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL, ...) {
 #' library(pmartRdata)
 #' library(pmartR)
 #' 
-#' ## "group_by" with an edata file. Generate with example code in as.trelliData.edata
-#' trelli_group_by(trelliData = trelliData, group = "LipidCommonName")
-#' trelli_group_by(trelliData = trelliData, group = "Sample")
+#' ## "panel_by" with an edata file. Generate with example code in as.trelliData.edata
+#' trelli_panel_by(trelliData = trelliData, panel = "LipidCommonName")
+#' trelli_panel_by(trelliData = trelliData, panel = "Sample")
 #' 
-#' ## "group_by" with trelliData containing omicsData. Generate with example code in as.trelliData
-#' trelli_group_by(trelliData = trelliData2, group = "LipidCommonName")
-#' trelli_group_by(trelliData = trelliData2, group = "LipidFamily")
+#' ## "panel_by" with trelliData containing omicsData. Generate with example code in as.trelliData
+#' trelli_panel_by(trelliData = trelliData2, panel = "LipidCommonName")
+#' trelli_panel_by(trelliData = trelliData2, panel = "LipidFamily")
 #' 
-#' ## "group_by" with trelliData containing statRes. Generate with example code in as.trelliData
-#' trelli_group_by(trelliData = trelliData3, group = "LipidCommonName")
+#' ## "panel_by" with trelliData containing statRes. Generate with example code in as.trelliData
+#' trelli_panel_by(trelliData = trelliData3, panel = "LipidCommonName")
 #' 
-#' ## "group_by" with trelliData containing both omicsData and statRes. Generate with example code in as.trelliData
-#' trelli_group_by(trelliData = trelliData4, group = "LipidFamily")
-#' trelli_group_by(trelliData = trelliData4, group = "LipidCommonName")
-#' trelli_group_by(trelliData = trelliData4, group = "Sample_Name")
+#' ## "panel_by" with trelliData containing both omicsData and statRes. Generate with example code in as.trelliData
+#' trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily")
+#' trelli_panel_by(trelliData = trelliData4, panel = "LipidCommonName")
+#' trelli_panel_by(trelliData = trelliData4, panel = "Sample_Name")
 #' 
 #' }  
 #' 
 #' @author David Degnan, Lisa Bramer
 #' 
 #' @export
-trelli_group_by <- function(trelliData, group) {
+trelli_panel_by <- function(trelliData, panel) {
   
   # Run initial checks----------------------------------------------------------
   
@@ -502,18 +502,18 @@ trelli_group_by <- function(trelliData, group) {
     stop("trelliData must be of the class trelliData from as.trelliData or as.trelliData.edata.")
   }
   
-  # Confirm that group is an acceptable option
-  if (group %in% attr(trelliData, "group_by_options") == FALSE) {
-    stop(paste("groups is not an acceptable option. The following can be selected:", 
-               paste(attr(trelliData, "group_by_options"), collapse = ", ")))
+  # Confirm that panel is an acceptable option
+  if (panel %in% attr(trelliData, "panel_by_options") == FALSE) {
+    stop(paste("panel is not an acceptable option. The following can be selected:", 
+               paste(attr(trelliData, "panel_by_options"), collapse = ", ")))
   }
   
-  # Confirm that group_by is false
-  if (attr(trelliData, "group_by")) {
+  # Confirm that panel_by is false
+  if (attr(trelliData, "panel_by")) {
     
-    # If group_by has already been conducted with this group, write a message and return trelliData
-    if (attr(trelliData, "group_by") == group) {
-      stop(paste("trelliData has already been grouped by", group))
+    # If panel_by has already been conducted with this panel, write a message and return trelliData
+    if (attr(trelliData, "panel_by") == panel) {
+      stop(paste("trelliData has already been paneled by", panel))
     } 
     
   }
@@ -521,28 +521,28 @@ trelli_group_by <- function(trelliData, group) {
   # Determine which dataframes this grouping variable applies to----------------
   
   # Test if grouping applies to omicsData 
-  if (!is.null(trelliData$trelliData.omics) && group %in% colnames(trelliData$trelliData.omics)) {
+  if (!is.null(trelliData$trelliData.omics) && panel %in% colnames(trelliData$trelliData.omics)) {
     apply_to_omics <- TRUE} else {apply_to_omics <- FALSE}
   
   # Test if grouping applies to statRes 
-  if (!is.null(trelliData$trelliData.stat) && group %in% colnames(trelliData$trelliData.stat)) {
+  if (!is.null(trelliData$trelliData.stat) && panel %in% colnames(trelliData$trelliData.stat)) {
     apply_to_stat <- TRUE} else {apply_to_stat <- FALSE}
   
-  # Test group_by option--------------------------------------------------------
+  # Test panel_by option--------------------------------------------------------
   
   # If there are instances of groups with less than 3 data points, it is not a good grouping option. 
   .test_grouping <- function(trelliData_subclass, trelliData_subclass_name) {
     
     # Get the smallest group size
     smallest_group_size <- trelliData_subclass %>% 
-      dplyr::group_by_at(group) %>% 
+      dplyr::group_by_at(panel) %>% 
       dplyr::summarize(N = dplyr::n()) %>%
       dplyr::select(N) %>%
       min()
     
     # If the smallest group size is less than 3, then don't proceed 
     if (smallest_group_size < 3) {
-      warning(paste0("Grouping by ", group, " results in groups with less than 3 ",
+      warning(paste0("Grouping by ", panel, " results in panels with less than 3 ",
                      "data points in ", trelliData_subclass_name, "."))
     }
     
@@ -555,7 +555,7 @@ trelli_group_by <- function(trelliData, group) {
   
   .group_samples <- function(trelliData_subclass) {
     trelliData_subclass %>%
-      dplyr::group_by_at(group) %>%
+      dplyr::group_by_at(panel) %>%
       tidyr::nest() %>%
       dplyr::ungroup() %>%
       dplyr::rename(Nested_DF = data)
@@ -564,17 +564,17 @@ trelli_group_by <- function(trelliData, group) {
   # Group omicsData
   if (apply_to_omics) {
     trelliData$trelliData.omics <- .group_samples(trelliData$trelliData.omics)
-    attr(trelliData, "group_by_omics") <- group
+    attr(trelliData, "panel_by_omics") <- panel
   }
   
   # Group statRes
   if (apply_to_stat) {
     trelliData$trelliData.stat <- .group_samples(trelliData$trelliData.stat)
-    attr(trelliData, "group_by_stat") <- group
+    attr(trelliData, "panel_by_stat") <- panel
   }
   
   # Export results--------------------------------------------------------------
-  attr(trelliData, "group_by") <- TRUE
+  attr(trelliData, "panel_by") <- TRUE
   return(trelliData)
   
 }
@@ -590,8 +590,8 @@ trelli_group_by <- function(trelliData, group) {
 #' 
 #' # Use an edata example. Build with as.trelliData.edata.
 #' summary(trelliData)
-#' summary(trelliData %>% trelli_group_by("LipidCommonName"))
-#' summary(trelliData %>% trelli_group_by("Sample"))
+#' summary(trelliData %>% trelli_panel_by("LipidCommonName"))
+#' summary(trelliData %>% trelli_panel_by("Sample"))
 #' 
 #' # Use an omicsData example. Build with as.trelliData.
 #' summary(trelliData2)
@@ -619,7 +619,7 @@ summary.trelliData <- function(trelliData) {
   #######################################
   
   # First, we must know if this data has been grouped at all
-  Group_By <- attr(trelliData, "group_by")
+  panel_by <- attr(trelliData, "panel_by")
   
   # Second, let's determine if there's omicsData or statRes or both in this object
   omics <- !is.null(trelliData$trelliData.omics)
@@ -647,7 +647,7 @@ summary.trelliData <- function(trelliData) {
   
   # Create a base data.frame which can be filtered
   All_Options <- data.table::data.table(
-    `Group By Choice` = c(rep("e_data cname", 4), rep("f_data cname", 2), rep("e_meta column", 6)),
+    `Panel By Choice` = c(rep("e_data cname", 4), rep("f_data cname", 2), rep("e_meta column", 6)),
     Plot = c("abundance boxplot", "abundance histogram", "missingness barplot", 
              "fold change barplot","abundance boxplot", "missingness barplot", 
              "abundance boxplot", "abundance heatmap", "missingness barplot",
@@ -665,11 +665,11 @@ summary.trelliData <- function(trelliData) {
   if (stat == FALSE) {All_Options <- All_Options %>% dplyr::filter(`Data Type` != "stat" | is.na(`Data Type`))}
   
   # If there is no grouping information, we should suggest potential plots. 
-  if (Group_By == FALSE) {
+  if (panel_by == FALSE) {
     
-    # Filter by "Group by" choices 
-    if (fdata_cname_missing) {All_Options <- All_Options %>% dplyr::filter(`Group By Choice` != "f_data cname")}
-    if (emeta_cols_missing) {All_Options <- All_Options %>% dplyr::filter(`Group By Choice` != "e_meta column")}
+    # Filter by "Panel By" choices 
+    if (fdata_cname_missing) {All_Options <- All_Options %>% dplyr::filter(`Panel By Choice` != "f_data cname")}
+    if (emeta_cols_missing) {All_Options <- All_Options %>% dplyr::filter(`Panel By Choice` != "e_meta column")}
     
     # Remove data type and add a holder for count
     All_Options <- All_Options %>%
@@ -677,19 +677,19 @@ summary.trelliData <- function(trelliData) {
       dplyr::mutate(`Number of Plots` = 0)
     
     # Replace names and get counts 
-    if ("e_data cname" %in% All_Options$`Group By Choice`) {
+    if ("e_data cname" %in% All_Options$`Panel By Choice`) {
       bio_count <- ifelse(omics, nrow(trelliData$omicsData$e_data), nrow(trelliData$statRes))
-      All_Options[All_Options$`Group By Choice` == "e_data cname", "Number of Plots"] <- bio_count %>% as.character()
-      All_Options[All_Options$`Group By Choice` == "e_data cname", "Group By Choice"] <- edata_cname
+      All_Options[All_Options$`Panel By Choice` == "e_data cname", "Number of Plots"] <- bio_count %>% as.character()
+      All_Options[All_Options$`Panel By Choice` == "e_data cname", "Panel By Choice"] <- edata_cname
     }
     
-    if ("f_data cname" %in% All_Options$`Group By Choice`) {
+    if ("f_data cname" %in% All_Options$`Panel By Choice`) {
       sample_count <- ifelse(omics, nrow(trelliData$omicsData$f_data), attr(trelliData$statRes, "group_DF") %>% nrow())
-      All_Options[All_Options$`Group By Choice` == "f_data cname", "Number of Plots"] <- sample_count %>% as.character()
-      All_Options[All_Options$`Group By Choice` == "f_data cname", "Group By Choice"] <- fdata_cname
+      All_Options[All_Options$`Panel By Choice` == "f_data cname", "Number of Plots"] <- sample_count %>% as.character()
+      All_Options[All_Options$`Panel By Choice` == "f_data cname", "Panel By Choice"] <- fdata_cname
     }
     
-    if ("e_meta column" %in% All_Options$`Group By Choice`) {
+    if ("e_meta column" %in% All_Options$`Panel By Choice`) {
       
       # Get counts per e_meta variable
       emeta_counts <- lapply(emeta_cols, function(name) {
@@ -699,35 +699,35 @@ summary.trelliData <- function(trelliData) {
         paste(collapse = ", ")
       
       # Add counts 
-      All_Options[All_Options$`Group By Choice` == "e_meta column", "Number of Plots"] <- emeta_counts
-      All_Options[All_Options$`Group By Choice` == "e_meta column", "Group By Choice"] <- paste(emeta_cols, collapse = ", ")
+      All_Options[All_Options$`Panel By Choice` == "e_meta column", "Number of Plots"] <- emeta_counts
+      All_Options[All_Options$`Panel By Choice` == "e_meta column", "Panel By Choice"] <- paste(emeta_cols, collapse = ", ")
       
     }
     
   } else {
     
     # Determine what the data has been grouped by 
-    Grouped <- ifelse(omics, attr(trelliData, "group_by_omics"), attr(trelliData, "group_by_stat"))
+    Grouped <- ifelse(omics, attr(trelliData, "panel_by_omics"), attr(trelliData, "panel_by_stat"))
     
     # Determine if group variable is edata_cname, fdata_cname, or an emeta column, and get a count
     theMatch <- match(Grouped, c(edata_cname, fdata_cname, emeta_cols))
     if (theMatch == 1) {
-      group_by_choice <- "e_data cname"
+      panel_by_choice <- "e_data cname"
       count <- ifelse(omics, nrow(trelliData$trelliData.omics), nrow(trelliData$trelliData.stat))
     } else if (theMatch == 2) {
-      group_by_choice <- "f_data cname"
+      panel_by_choice <- "f_data cname"
       count <- ifelse(omics, nrow(trelliData$omicsData$f_data), attr(trelliData$statRes, "group_DF") %>% nrow())
     } else {
-      group_by_choice <- "e_meta column"
+      panel_by_choice <- "e_meta column"
       count <- trelliData$omicsData$e_meta[[Grouped]] %>% unique() %>% length()
     }
     
     # Finally, subset down the table, remove data type, and add a count
     All_Options <- All_Options %>%
-      dplyr::filter(`Group By Choice` == group_by_choice) %>%
+      dplyr::filter(`Panel By Choice` == panel_by_choice) %>%
       dplyr::select(-`Data Type`) %>%
       dplyr::mutate(`Number of Plots` = count) %>%
-      dplyr::mutate(`Group By Choice` = Grouped)
+      dplyr::mutate(`Panel By Choice` = Grouped)
     
   }
   

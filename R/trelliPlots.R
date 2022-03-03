@@ -25,9 +25,9 @@ trelli_precheck <- function(trelliData, trelliCheck,
     stop("trelliData must be of the class trelliData.")
   }
   
-  # Check that trelliData has been passed to the "trelli_group_by" function.
-  if (!attr(trelliData, "group_by")) {
-    stop("trelliData must be grouped with trelli_group_by.")
+  # Check that trelliData has been passed to the "trelli_panel_by" function.
+  if (!attr(trelliData, "panel_by")) {
+    stop("trelliData must be grouped with trelli_panel_by.")
   }
   
   # Check that omics data exists
@@ -160,7 +160,7 @@ getDownloadsFolder <- function() {
 #'    Each boxplot will have its own groups as specified by the first main effect in group_designation.
 #' 
 #' @param trelliData A trelliscope data object made by as.trelliData or as.trelliData.edata,
-#'    and grouped by trelli_group_by. Required. 
+#'    and grouped by trelli_panel_by. Required. 
 #' @param cognostics A vector of cognostic options for each plot. Valid entries are
 #'    n, mean, median, sd, and skew for abundance. If statRes data is included, 
 #'    p_value and fold_change cognostics can be added. If no cognostics are desired,
@@ -180,27 +180,27 @@ getDownloadsFolder <- function() {
 #' \dontrun{
 #' 
 #' ## Build the abundance boxplot with an edata file. Generate trelliData in as.trelliData.edata
-#' trelli_group_by(trelliData = trelliData, group = "LipidCommonName") %>% 
+#' trelli_panel_by(trelliData = trelliData, panel = "LipidCommonName") %>% 
 #'    trelli_abundance_boxplot(test_mode = T, test_example = 1:10)
-#' trelli_group_by(trelliData = trelliData, group = "Sample") %>% trelli_abundance_boxplot()
+#' trelli_panel_by(trelliData = trelliData, panel = "Sample") %>% trelli_abundance_boxplot()
 #' 
 #' ## Build the abundance boxplot with an omicsData object. Generate trelliData in as.trelliData
-#' trelli_group_by(trelliData = trelliData2, group = "LipidCommonName") %>% 
+#' trelli_panel_by(trelliData = trelliData2, panel = "LipidCommonName") %>% 
 #'    trelli_abundance_boxplot(test_mode = T, test_example = 1:10)
-#' trelli_group_by(trelliData = trelliData2, group = "LipidFamily") %>% trelli_abundance_boxplot()
+#' trelli_panel_by(trelliData = trelliData2, panel = "LipidFamily") %>% trelli_abundance_boxplot()
 #'     
 #' ## Build the abundance boxplot with an omicsData and statRes object. Generate trelliData in as.trelliData.
-#' trelli_group_by(trelliData = trelliData4, group = "LipidCommonName") %>%
+#' trelli_panel_by(trelliData = trelliData4, panel = "LipidCommonName") %>%
 #'    trelli_abundance_boxplot(test_mode = T, test_example = 1:10)
-#' trelli_group_by(trelliData = trelliData4, group = "LipidFamily") %>% trelli_abundance_boxplot()
+#' trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") %>% trelli_abundance_boxplot()
 #'    
 #' ## Other options include modifying the ggplot  
-#' trelli_group_by(trelliData = trelliData, group = "LipidCommonName") %>% 
+#' trelli_panel_by(trelliData = trelliData, panel = "LipidCommonName") %>% 
 #'    trelli_abundance_boxplot(test_mode = T, test_example = 1:10, 
 #'      ggplot_params = c("ylab('')", "ylim(c(2,20))"))
 #' 
 #' ## Or making the plot interactive 
-#' trelli_group_by(trelliData = trelliData4, group = "LipidFamily") %>% trelli_abundance_boxplot(interactive = T)
+#' trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") %>% trelli_abundance_boxplot(interactive = T)
 #' 
 #' }
 #' 
@@ -307,15 +307,15 @@ trelli_abundance_boxplot <- function(trelliData,
       cog_to_trelli <- do.call(dplyr::bind_cols, lapply(cognostics, function(x) {cog[[x]]})) %>% tibble::tibble()
     } else {cog_to_trelli <- NULL}
     
-    # Get fdata cname and group_by selection
+    # Get fdata cname and panel_by selection
     fdata_cname <- pmartR::get_fdata_cname(trelliData$omicsData)
-    group_by_choice <- attr(trelliData, "group_by_omics")
+    panel_by_choice <- attr(trelliData, "panel_by_omics")
     
     # Additional group cognostics can be added only if group_designation was set and
-    # trelli_group_by is not the fdata_cname
-    if (!is.null(attributes(trelliData$omicsData)$group_DF) & fdata_cname != group_by_choice & !is.null(cog_to_trelli)) {
+    # trelli_panel_by is not the fdata_cname
+    if (!is.null(attributes(trelliData$omicsData)$group_DF) & fdata_cname != panel_by_choice & !is.null(cog_to_trelli)) {
       
-      # Since the number of groups is unknown, first group_by the Groups,
+      # Since the number of groups is unknown, first panel_by the Groups,
       # then calculate all summary statistics, pivot to long format,
       # subset down to requested statistics, switch name to a more specific name, 
       # combine group and name, and generate the cognostic tibble
@@ -346,7 +346,7 @@ trelli_abundance_boxplot <- function(trelliData,
     # Add cognostics that only apply when stats data is grouped by edata_cname
     edata_cname <- pmartR::get_edata_cname(trelliData$omicsData)
     
-    if (!is.null(trelliData$trelliData.stat) && !is.na(attr(trelliData, "group_by_stat")) && edata_cname == attr(trelliData, "group_by_stat")) {
+    if (!is.null(trelliData$trelliData.stat) && !is.na(attr(trelliData, "panel_by_stat")) && edata_cname == attr(trelliData, "panel_by_stat")) {
       
       # Downselect to only stats 
       stat_cogs <- cognostics[cognostics %in% c("fold_change", "p_value")]
@@ -413,7 +413,7 @@ trelli_abundance_boxplot <- function(trelliData,
 #'    Main_effects grouping are ignored. Data must be grouped by edata_cname. 
 #' 
 #' @param trelliData A trelliscope data object made by as.trelliData or as.trelliData.edata,
-#'    and grouped by edata_cname in trelli_group_by. Required. 
+#'    and grouped by edata_cname in trelli_panel_by. Required. 
 #' @param cognostics A vector of cognostic options for each plot. Valid entries are
 #'    n, mean, median, sd, and skew. p_value and fold_change can be added if statRes
 #'    is included.
@@ -431,20 +431,20 @@ trelli_abundance_boxplot <- function(trelliData,
 #' \dontrun{
 #' 
 #' ## Build the abundance histogram with an edata file. Generate trelliData in as.trelliData.edata
-#' trelli_group_by(trelliData = trelliData, group = "LipidCommonName") %>% 
+#' trelli_panel_by(trelliData = trelliData, panel = "LipidCommonName") %>% 
 #'    trelli_abundance_histogram(test_mode = T, test_example = 1:10)
 #' 
 #' ## Build the abundance histogram with an omicsData object. Generate trelliData in as.trelliData
-#' trelli_group_by(trelliData = trelliData2, group = "LipidCommonName") %>% 
+#' trelli_panel_by(trelliData = trelliData2, panel = "LipidCommonName") %>% 
 #'    trelli_abundance_histogram(test_mode = T, test_example = 1:10)
 #'     
 #' ## Build the abundance histogram with an omicsData and statRes object. Generate trelliData in as.trelliData.
-#' trelli_group_by(trelliData = trelliData4, group = "LipidCommonName") %>%
+#' trelli_panel_by(trelliData = trelliData4, panel = "LipidCommonName") %>%
 #'    trelli_abundance_histogram(test_mode = T, test_example = 1:10)
 #'    
 #' ## Users can modify the plotting function with ggplot parameters and interactivity, 
 #' ## and can also select certain cognostics.     
-#' trelli_group_by(trelliData = trelliData, group = "LipidCommonName") %>% 
+#' trelli_panel_by(trelliData = trelliData, panel = "LipidCommonName") %>% 
 #'    trelli_abundance_histogram(test_mode = T, test_example = 1:10, 
 #'      ggplot_params = c("ylab('')", "xlab('Abundance')"), interactive = TRUE,
 #'      cognostics = c("mean", "median"))  
@@ -489,7 +489,7 @@ trelli_abundance_histogram <- function(trelliData,
   
   # Check that group data is edata_cname
   edata_cname <- pmartR::get_edata_cname(trelliData$omicsData)
-  if (edata_cname != attr(trelliData, "group_by_omics")) {
+  if (edata_cname != attr(trelliData, "panel_by_omics")) {
     stop("trelliData must be grouped by edata_cname.")
   }
   
@@ -631,12 +631,12 @@ trelli_abundance_histogram <- function(trelliData,
 #' \dontrun{
 #' 
 #' ## Build the abundance heatmap with an omicsData object with emeta variables. Generate trelliData in as.trelliData.
-#' trelli_group_by(trelliData = trelliData2, group = "LipidFamily") %>% 
+#' trelli_panel_by(trelliData = trelliData2, panel = "LipidFamily") %>% 
 #'    trelli_abundance_heatmap(test_mode = T, test_example = 1:3)
 #'    
 #' ## Users can modify the plotting function with ggplot parameters and interactivity, 
 #' ## and can also select certain cognostics.     
-#' trelli_group_by(trelliData = trelliData4, group = "LipidFamily") %>% 
+#' trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") %>% 
 #'    trelli_abundance_heatmap(test_mode = T, test_example = 1:5, 
 #'      ggplot_params = c("ylab('')", "xlab('')"), interactive = TRUE, cognostics = c("mean", "median"))  
 #'    
@@ -672,7 +672,7 @@ trelli_abundance_heatmap <- function(trelliData,
   if (test_mode) {test_example <- unique(abs(round(test_example)))}
   
   # Check that group data is grouped by an e_meta variable
-  if (attr(trelliData, "group_by_omics") %in% attr(trelliData, "emeta_col") == FALSE) {
+  if (attr(trelliData, "panel_by_omics") %in% attr(trelliData, "emeta_col") == FALSE) {
     stop("trelliData must be grouped_by an e_meta column.")
   }
   
@@ -778,7 +778,7 @@ trelli_abundance_heatmap <- function(trelliData,
 #' @title Bar chart trelliscope building function for missing data   
 #' 
 #' @description Specify a plot design and cognostics for the missing barchart trelliscope.
-#'    Missingness is displayed per group_by variable. Main_effects data is used to
+#'    Missingness is displayed per panel_by variable. Main_effects data is used to
 #'    split samples when applicable. 
 #' 
 #' @param trelliData A trelliscope data object made by as.trelliData.edata or as.trelliData. Required. 
@@ -800,28 +800,28 @@ trelli_abundance_heatmap <- function(trelliData,
 #' \dontrun{
 #' 
 #' ## Build the missingness bar plot with an edata file. Generate trelliData in as.trelliData.edata
-#' trelli_group_by(trelliData = trelliData, group = "LipidCommonName") %>% 
+#' trelli_panel_by(trelliData = trelliData, panel = "LipidCommonName") %>% 
 #'   trelli_missingness_bar(test_mode = T, test_example = 1:10)
-#' trelli_group_by(trelliData = trelliData, group = "Sample") %>% trelli_missingness_bar()
+#' trelli_panel_by(trelliData = trelliData, panel = "Sample") %>% trelli_missingness_bar()
 #' 
 #' ## Build the missingness bar plot with an omicsData object. Generate trelliData in as.trelliData
-#' trelli_group_by(trelliData = trelliData2, group = "LipidCommonName") %>% 
+#' trelli_panel_by(trelliData = trelliData2, panel = "LipidCommonName") %>% 
 #'   trelli_missingness_bar(test_mode = T, test_example = 1:10)
 #' 
 #' ## Build the missingness bar plot with a statRes object. Generate trelliData in as.trelliData
-#' trelli_group_by(trelliData = trelliData3, group = "LipidCommonName") %>%
+#' trelli_panel_by(trelliData = trelliData3, panel = "LipidCommonName") %>%
 #'   trelli_missingness_bar(test_mode = T, test_example = 1:10)
 #' 
 #' ## Build the missingness bar plot with an omicsData and statRes object. Generate trelliData in as.trelliData.
-#' trelli_group_by(trelliData = trelliData4, group = "LipidCommonName") %>%
+#' trelli_panel_by(trelliData = trelliData4, panel = "LipidCommonName") %>%
 #'   trelli_missingness_bar(test_mode = T, test_example = 1:10) 
 #' 
 #' ## Or making the plot interactive 
-#' trelli_group_by(trelliData = trelliData2, group = "LipidCommonName") %>% 
+#' trelli_panel_by(trelliData = trelliData2, panel = "LipidCommonName") %>% 
 #'    trelli_missingness_bar(test_mode = T, test_example = 1:5)
 #'    
 #' ## Or visualize only count data 
-#' trelli_group_by(trelliData = trelliData2, group = "LipidCommonName") %>% 
+#' trelli_panel_by(trelliData = trelliData2, panel = "LipidCommonName") %>% 
 #'    trelli_missingness_bar(test_mode = T, test_example = 1:5, cognostics = "n", proportion = FALSE)
 #'    
 #' }
@@ -1062,11 +1062,11 @@ trelli_missingness_bar <- function(trelliData,
 #' \dontrun{
 #' 
 #' ## Build fold_change bar plot with statRes data grouped by edata_colname.
-#' trelli_group_by(trelliData = trelliData3, group = "LipidCommonName") %>% 
+#' trelli_panel_by(trelliData = trelliData3, panel = "LipidCommonName") %>% 
 #'   trelli_foldchange_bar(test_mode = T, test_example = 1:10)
 #'   
 #' ## Or make the plot interactive  
-#' trelli_group_by(trelliData = trelliData4, group = "LipidCommonName") %>% 
+#' trelli_panel_by(trelliData = trelliData4, panel = "LipidCommonName") %>% 
 #'   trelli_foldchange_bar(test_mode = T, test_example = 1:10, interactive = T) 
 #'    
 #' }
@@ -1102,7 +1102,7 @@ trelli_foldchange_bar <- function(trelliData,
   
   # Check that group data is edata_cname
   edata_cname <- pmartR::get_edata_cname(trelliData$statRes)
-  if (edata_cname != attr(trelliData, "group_by_stat")) {
+  if (edata_cname != attr(trelliData, "panel_by_stat")) {
     stop("trelliData must be grouped by edata_cname.")
   }
   
@@ -1214,7 +1214,7 @@ trelli_foldchange_bar <- function(trelliData,
 #' \dontrun{ 
 #' 
 #' ## Build fold_change bar plot with statRes data grouped by edata_colname.
-#' trelli_group_by(trelliData = trelliData4, group = "LipidFamily") %>% 
+#' trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") %>% 
 #'   trelli_foldchange_boxplot()
 #'
 #' }
@@ -1250,7 +1250,7 @@ trelli_foldchange_boxplot <- function(trelliData,
   if (test_mode) {test_example <- unique(abs(round(test_example)))}
   
   # Check that group data is an emeta column
-  if (attr(trelliData, "group_by_omics") %in% attr(trelliData, "emeta_col") == FALSE) {
+  if (attr(trelliData, "panel_by_omics") %in% attr(trelliData, "emeta_col") == FALSE) {
     stop("trelliData must be grouped_by an e_meta column.")
   }
   
@@ -1379,7 +1379,7 @@ trelli_foldchange_boxplot <- function(trelliData,
 #' \dontrun{ 
 #' 
 #' ## Build fold_change bar plot with statRes data grouped by edata_colname.
-#' trelli_group_by(trelliData = trelliData4, group = "LipidFamily") %>% 
+#' trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") %>% 
 #'   trelli_foldchange_volcano()
 #'
 #' }
@@ -1414,7 +1414,7 @@ trelli_foldchange_volcano <- function(trelliData,
   if (test_mode) {test_example <- unique(abs(round(test_example)))}
   
   # Check that group data is an emeta column
-  if (attr(trelliData, "group_by_omics") %in% attr(trelliData, "emeta_col") == FALSE) {
+  if (attr(trelliData, "panel_by_omics") %in% attr(trelliData, "emeta_col") == FALSE) {
     stop("trelliData must be grouped_by an e_meta column.")
   }
   
@@ -1536,7 +1536,7 @@ trelli_foldchange_volcano <- function(trelliData,
 #' \dontrun{ 
 #' 
 #' ## Build fold_change bar plot with statRes data grouped by edata_colname.
-#' trelli_group_by(trelliData = trelliData4, group = "LipidFamily") %>% 
+#' trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") %>% 
 #'   trelli_foldchange_heatmap()
 #'
 #' }
@@ -1571,7 +1571,7 @@ trelli_foldchange_heatmap <- function(trelliData,
   if (test_mode) {test_example <- unique(abs(round(test_example)))}
   
   # Check that group data is an emeta column
-  if (attr(trelliData, "group_by_omics") %in% attr(trelliData, "emeta_col") == FALSE) {
+  if (attr(trelliData, "panel_by_omics") %in% attr(trelliData, "emeta_col") == FALSE) {
     stop("trelliData must be grouped_by an e_meta column.")
   }
   
