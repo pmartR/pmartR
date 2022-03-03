@@ -25,9 +25,9 @@
 #' 
 #'}
 #' 
-#'@export
-#'@rdname summary-nmrnormRes
-#'@name summary-pmartR
+#' @export
+#' @rdname summary-nmrnormRes
+#' @name summary-pmartR
 #'
 summary.nmrnormRes<-function(nmrnormRes_object){
   

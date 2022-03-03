@@ -67,9 +67,10 @@ summary.moleculeFilt <- function(filter_object, min_num=NULL){
 #' Print method for summary of molecule filter
 #'
 #' Print method for summary of molecule filter
-#'
-#'@export
-#'@name print.moleculeFilterSummary
+#' 
+#' @export
+#' @name print.moleculeFilterSummary
+
 print.moleculeFilterSummary <- function(object){
   # create output #
   cat("\nSummary of Molecule Filter \n----------------------------------\n")
@@ -101,10 +102,9 @@ print.moleculeFilterSummary <- function(object){
 #'
 #' @author Lisa Bramer
 #'
+#' @rdname summary.proteomicsFilt
+#' @name summary.proteomicsFilt
 #' @export
-#'@rdname summary.proteomicsFilt
-#'@name summary.proteomicsFilt
-#'@export
 summary.proteomicsFilt <- function(filter_object, min_num_peps=NULL, degen_peps=FALSE){
 
   # error checks for min_num_peps, if not NULL #
@@ -191,8 +191,8 @@ summary.proteomicsFilt <- function(filter_object, min_num_peps=NULL, degen_peps=
 #' Print method for summary of proteomics filter
 #'
 #' Print method for summary of proteomics filter
-#'
-#'@export
+#' 
+#' @export
 #'
 print.proteomicsFilterSummary <- function(object){
 
@@ -231,6 +231,8 @@ print.proteomicsFilterSummary <- function(object){
 #'
 #' @author Lisa Bramer
 #'
+#' @rdname summary.imdanovaFilt
+#' @name summary.imdanovaFilt
 #' @export
 #' @rdname summary.imdanovaFilt
 #' @name summary.imdanovaFilt
@@ -519,8 +521,8 @@ summary.imdanovaFilt <- function(filter_object, min_nonmiss_anova = NULL,
 
 
 #' Print method for summary of imdanova filter
-#'
-#'@export
+#' 
+#' @export
 #'
 print.imdanovaFilterSummary <- function(object){
   # create output #
@@ -554,9 +556,9 @@ print.imdanovaFilterSummary <- function(object){
 #'
 #' @author Lisa Bramer, Kelly Stratton
 #'
-#'@export
-#'@rdname summary.rmdFilt
-#'@name summary.rmdFilt
+#' @export
+#' @rdname summary.rmdFilt
+#' @name summary.rmdFilt
 summary.rmdFilt <- function(filter_object, pvalue_threshold = NULL){
 
   # check that pvalue_threshold is numeric [0,1] #
@@ -620,7 +622,7 @@ summary.rmdFilt <- function(filter_object, pvalue_threshold = NULL){
   return(res)
 }
 
-#'@export
+#' @export
 #'
 print.rmdFilterSummary <- function(object){
   # create output #
@@ -642,9 +644,9 @@ print.rmdFilterSummary <- function(object){
 #'
 #' @author Lisa Bramer
 #'
-#'@export
-#'@rdname summary.cvFilt
-#'@name summary.cvFilt
+#' @export
+#' @rdname summary.cvFilt
+#' @name summary.cvFilt
 summary.cvFilt <- function(filter_object, cv_threshold = NULL){
 
   # checks for cv_threshold if not null #
@@ -684,8 +686,8 @@ summary.cvFilt <- function(filter_object, cv_threshold = NULL){
 #' Print method for summary of CV filter
 #'
 #' Print method for summary of CV filter
-#'
-#'@export
+#' 
+#' @export
 #'
 print.cvFilterSummary <- function(object){
   # create output #

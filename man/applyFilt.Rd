@@ -3,6 +3,7 @@
 \name{applyFilt}
 \alias{applyFilt}
 \alias{applyFilt.moleculeFilt}
+\alias{applyFilt.totalCountFilt}
 \alias{applyFilt.cvFilt}
 \alias{applyFilt.rmdFilt}
 \alias{applyFilt.proteomicsFilt}
@@ -13,6 +14,8 @@
 applyFilt(filter_object, omicsData, ...)
 
 \method{applyFilt}{moleculeFilt}(filter_object, omicsData, min_num = 2)
+
+\method{applyFilt}{totalCountFilt}(filter_object, omicsData, min_count)
 
 \method{applyFilt}{cvFilt}(filter_object, omicsData, cv_threshold = 150)
 
