@@ -405,8 +405,8 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL, ...) {
       dplyr::select(-name) %>%
       dplyr::group_by(dplyr::across(c(Comparison, !!rlang::sym(edata_cname)))) %>%
       dplyr::summarise(
-        "p_value_anova" = value[which(Metric == "p_value_anova")], 
-        "p_value_gtest" = value[which(Metric == "p_value_gtest")],
+        "p_value_anova" = ifelse(length(value[which(Metric == "p_value_anova")]) == 0, NA, value[which(Metric == "p_value_anova")]), 
+        "p_value_gtest" = ifelse(length(value[which(Metric == "p_value_gtest")]) == 0, NA, value[which(Metric == "p_value_gtest")]),
         "fold_change" = value[which(Metric == "fold_change")]
       ) %>%
       dplyr::relocate(!!rlang::sym(edata_cname))
