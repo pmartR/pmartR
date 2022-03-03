@@ -605,33 +605,33 @@ get_emeta_cname <- function (omicsObject) {
   
 }
 
-# Functions to set omicsData attributes ----------------------------------------
+#' Functions to set omicsData attributes ----------------------------------------
+#' 
+#' Create a set function that will return the value for each attribute. For 
+#' example, set_data_info will perform all of the calculations to fill in the
+#' data_info attribute. These functions will be called in the as.xxx functions
+#' to create an xxxData object but can be used individually to update any one of
+#' the attributes at a later time.
 
-# Create a set function that will return the value for each attribute. For 
-# example, set_data_info will perform all of the calculations to fill in the
-# data_info attribute. These functions will be called in the as.xxx functions
-# to create an xxxData object but can be used individually to update any one of
-# the attributes at a later time.
-
-# Sets/updates the values in the data_info attribute
-#
-# @param e_data 
-#
-# @param edata_cname
-#
-# @param data_scale_orig
-#
-# @param data_scale
-#
-# @param data_types
-#
-# @param norm_info
-#
-# @param is_normalized
-#
-# @return A list containing all the elements in the data_info attribute:
-#         (list all attributes)
-#
+#' Sets/updates the values in the data_info attribute
+#' 
+#' @param e_data 
+#' 
+#' @param edata_cname
+#' 
+#' @param data_scale_orig
+#' 
+#' @param data_scale
+#' 
+#' @param data_types
+#' 
+#' @param norm_info
+#' 
+#' @param is_normalized
+#' 
+#' @return A list containing all the elements in the data_info attribute:
+#'        (list all attributes)
+#' 
 set_data_info <- function (e_data,
                            edata_cname,
                            data_scale_orig,
@@ -677,15 +677,15 @@ set_data_info <- function (e_data,
 
 }
 
-# Sets/updates the values in the meta_info attribute
-#
-# @param e_data 
-#
-# @param emeta_cname
-#
-# @return A list containing all the elements in the meta_info attribute:
-#         (list all attributes)
-#
+#' Sets/updates the values in the meta_info attribute
+#' 
+#' @param e_data 
+#' 
+#' @param emeta_cname
+#' 
+#' @return A list containing all the elements in the meta_info attribute:
+#'        (list all attributes)
+#' 
 set_meta_info <- function (e_meta,
                            emeta_cname) {
   
@@ -713,25 +713,25 @@ set_meta_info <- function (e_meta,
   
 }
 
-# Sets/updates the values in the isobaric_info attribute.
-#
-# @param exp_cname
-#
-# @param channel_cname
-#
-# @param refpool_channel
-#
-# @param refpool_cname
-#
-# @param refpool_notation
-#
-# @param norm_info
-#
-# @param isobaric_norm
-#
-# @return A list containing all the elements in the isobaric_info attribute:
-#         (list all attributes)
-#
+#' Sets/updates the values in the isobaric_info attribute.
+#' 
+#' @param exp_cname
+#' 
+#' @param channel_cname
+#' 
+#' @param refpool_channel
+#' 
+#' @param refpool_cname
+#' 
+#' @param refpool_notation
+#' 
+#' @param norm_info
+#' 
+#' @param isobaric_norm
+#' 
+#' @return A list containing all the elements in the isobaric_info attribute:
+#'         (list all attributes)
+#' 
 set_isobaric_info <- function (exp_cname, 
                                channel_cname, 
                                refpool_channel, 
@@ -753,21 +753,21 @@ set_isobaric_info <- function (exp_cname,
   
 }
 
-# Sets/updates the values in the nmr_info attribute.
-#
-# @param metabolite_name
-#
-# @param sample_property_cname
-#
-# @param norm_info
-#
-# @param nmr_norm
-#
-# @param backtransform
-#
-# @return A list containing all the elements in the nmr_info attribute:
-#         (list all attributes)
-#
+#'  Sets/updates the values in the nmr_info attribute.
+#' 
+#' @param metabolite_name
+#' 
+#' @param sample_property_cname
+#' 
+#' @param norm_info
+#' 
+#' @param nmr_norm
+#' 
+#' @param backtransform
+#' 
+#' @return A list containing all the elements in the nmr_info attribute:
+#'         (list all attributes)
+#' 
 set_nmr_info <- function (metabolite_name,
                           sample_property_cname,
                           norm_info,
@@ -785,24 +785,24 @@ set_nmr_info <- function (metabolite_name,
   
 }
 
-# Sets/updates the filters attribute with a filter class object.
-#
-# This function will create a filter class object. The output will always have
-# the same elements but not all of them will be used for every filter type. This
-# object will be appended to the list in the filters attribute for an omicsData
-# object.
-#
-# @param filter_type
-#
-# @param threshold
-#
-# @param filtered
-#
-# @param filter_method
-#
-# @return A list containing all the elements in the filters attribute:
-#         (list all attributes)
-#
+#' Sets/updates the filters attribute with a filter class object.
+#' 
+#' This function will create a filter class object. The output will always have
+#' the same elements but not all of them will be used for every filter type. This
+#' object will be appended to the list in the filters attribute for an omicsData
+#' object.
+#' 
+#' @param filter_type
+#' 
+#' @param threshold
+#' 
+#' @param filtered
+#' 
+#' @param filter_method
+#' 
+#' @return A list containing all the elements in the filters attribute:
+#'         (list all attributes)
+#' 
 set_filter <- function (type,
                         threshold,
                         filtered,

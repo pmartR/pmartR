@@ -1178,7 +1178,7 @@ as.proData <- function (e_data, f_data, e_meta = NULL,
 #'                         emeta_cname = "Seq_Tag_ID")
 #' }
 #'
-#' @author Kelly Stratton, Lisa Bramer
+#' @author Rachel Richardson, Kelly Stratton, Lisa Bramer
 #' @seealso \code{\link{as.proData}}
 #' @seealso \code{\link{as.pepData}}
 #' @seealso \code{\link{as.lipidData}}
@@ -1674,18 +1674,30 @@ pre_flight <- function (e_data,
     
   }
   
-  # Verify the data scale and if there are zeros in edata.
-  if (data_scale == 'abundance' && any(na.omit(e_data == 0))) {
+  # Depending on scale, check if there are zeros in edata and auto-remove all 0/na rows
+  if (data_scale == 'abundance') {
     
-    # Exchange 0 for NA in edata.
-    e_data <- replace_zeros(edata = e_data,
-                            edata_cname = edata_cname)
+    if(any(na.omit(e_data == 0))){
+      # Exchange 0 for NA in edata.
+      e_data <- replace_zeros(edata = e_data,
+                              edata_cname = edata_cname)
+    }
+    
+    # Auto remove all NA data 
+    e_data <- e_data[apply(is.na(e_data), 1, sum) < 2,]
     
   } else if (data_scale == 'counts' && any(is.na(e_data))){
     
-    # Exchange NA for 0 in edata.
-    e_data <- replace_nas(edata = e_data,
+    if(any(is.na(e_data))){
+      # Exchange NA for 0 in edata.
+      e_data <- replace_nas(edata = e_data,
                             edata_cname = edata_cname)
+    }
+    
+    # Auto-remove all 0 data
+    select <- which(colnames(e_data) != edata_cname)
+    e_data <- e_data[apply(e_data[select] != 0, 1, any),]
+    
   }
   
   # Perform checks on f_data ---------------------------------------------------

@@ -254,7 +254,7 @@ total_count_filter <- function (omicsData) {
 }
 
 
-#'Filter Based on Pooled Coefficient of Variation (CV) Values
+#' Filter Based on Pooled Coefficient of Variation (CV) Values
 #'
 #' A pooled CV is calculated for each biomolecule.
 #'
