@@ -1273,7 +1273,7 @@ trelli_foldchange_bar <- function(trelliData,
 #' 
 #' ## Build fold_change bar plot with statRes data grouped by edata_colname.
 #' trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") %>% 
-#'   trelli_foldchange_boxplot()
+#'   trelli_foldchange_boxplot(p_value_test = "anova")
 #'
 #' }
 #' 
@@ -1319,6 +1319,13 @@ trelli_foldchange_boxplot <- function(trelliData,
   }
   if (p_value_thresh < 0 | p_value_thresh > 1) {
     stop("p_value_thresh must be between 0 and 1.")
+  }
+  
+  # Check p_value test
+  if (!is.null(p_value_test)) {
+    if (!is.character(p_value_test) || p_value_test %in% c("anova", "g-test", "both") == FALSE) {
+      stop("p_value_test must be anova, g-test, both, or NULL.")
+    }
   }
   
   # Make sure include_points is a true or false
@@ -1444,7 +1451,9 @@ trelli_foldchange_boxplot <- function(trelliData,
 #' @param trelliData A trelliscope data object with omicsData and statRes results. Required. 
 #' @param cognostics A vector of cognostic options for each plot. Valid entry is n. 
 #' @param p_value_thresh A value between 0 and 1 to indicate a threshold to highlight
-#'    significant biomolecules. Default is 0.05. Selecting 0 will remove this feature. 
+#'    significant biomolecules. Default is 0.05. Selecting 0 will remove this feature.
+#' @param p_value_test  A string to indicate which test to use for p_value_thresh. Acceptable
+#'    entries are "anova", "g-test", or "both". Selecting NULL will remove this feature.   
 #' @param ggplot_params An optional vector of strings of ggplot parameters to the backend ggplot
 #'    function. For example, c("ylab('')", "xlab('')"). Default is NULL. 
 #' @param interactive A logical argument indicating whether the plots should be interactive
@@ -1460,7 +1469,7 @@ trelli_foldchange_boxplot <- function(trelliData,
 #' 
 #' ## Build fold_change bar plot with statRes data grouped by edata_colname.
 #' trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") %>% 
-#'   trelli_foldchange_volcano()
+#'   trelli_foldchange_volcano(p_value_test = "anova")
 #'
 #' }
 #' 
@@ -1470,6 +1479,7 @@ trelli_foldchange_boxplot <- function(trelliData,
 trelli_foldchange_volcano <- function(trelliData,
                                       cognostics = c("n"),
                                       p_value_thresh = 0.05,
+                                      p_value_test = NULL,
                                       ggplot_params = NULL,
                                       interactive = FALSE,
                                       path = getDownloadsFolder(),
@@ -1506,9 +1516,18 @@ trelli_foldchange_volcano <- function(trelliData,
     stop("p_value_thresh must be between 0 and 1.")
   }
   
+  # Check p_value test
+  if (!is.null(p_value_test)) {
+    if (!is.character(p_value_test) || p_value_test %in% c("anova", "g-test", "both") == FALSE) {
+      stop("p_value_test must be anova, g-test, both, or NULL.")
+    }
+  }
+  
   # Make foldchange volcano function--------------------------------------------
   
   fc_volcano_plot_fun <- function(DF, title) {
+    
+    
     
     # Indicate which comparisons should be highlighted
     DF$Significant <- lapply(1:nrow(DF), function(row) {
@@ -1602,6 +1621,8 @@ trelli_foldchange_volcano <- function(trelliData,
 #'    are n, mean, median, and sd. 
 #' @param p_value_thresh A value between 0 and 1 to indicate a threshold to highlight
 #'    significant biomolecules. Default is 0.05. Selecting 0 will remove this feature. 
+#' @param p_value_test  A string to indicate which test to use for p_value_thresh. Acceptable
+#'    entries are "anova", "g-test", or "both". Selecting NULL will remove this feature.   
 #' @param ggplot_params An optional vector of strings of ggplot parameters to the backend ggplot
 #'    function. For example, c("ylab('')", "xlab('')"). Default is NULL. 
 #' @param interactive A logical argument indicating whether the plots should be interactive
@@ -1617,7 +1638,7 @@ trelli_foldchange_volcano <- function(trelliData,
 #' 
 #' ## Build fold_change bar plot with statRes data grouped by edata_colname.
 #' trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") %>% 
-#'   trelli_foldchange_heatmap()
+#'   trelli_foldchange_heatmap(p_value_test = "anova")
 #'
 #' }
 #' 
@@ -1627,6 +1648,7 @@ trelli_foldchange_volcano <- function(trelliData,
 trelli_foldchange_heatmap <- function(trelliData,
                                       cognostics = c("n", "median", "mean", "sd"),
                                       p_value_thresh = 0.05,
+                                      p_value_test = NULL,
                                       ggplot_params = NULL,
                                       interactive = FALSE,
                                       path = getDownloadsFolder(),
@@ -1661,6 +1683,13 @@ trelli_foldchange_heatmap <- function(trelliData,
   }
   if (p_value_thresh < 0 | p_value_thresh > 1) {
     stop("p_value_thresh must be between 0 and 1.")
+  }
+  
+  # Check p_value test
+  if (!is.null(p_value_test)) {
+    if (!is.character(p_value_test) || p_value_test %in% c("anova", "g-test", "both") == FALSE) {
+      stop("p_value_test must be anova, g-test, both, or NULL.")
+    }
   }
   
   # Make foldchange boxplot function--------------------------------------------
