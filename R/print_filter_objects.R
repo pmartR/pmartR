@@ -2,8 +2,8 @@
 #' 
 #' For printing an S3 object of type 'moleculeFilt':
 #' 
-#'@rdname print-moleculeFilt
-#'@export
+#' @rdname print-moleculeFilt
+#' @export
 #'
 print.moleculeFilt<- function(filter_object){
   if(!inherits(filter_object, "moleculeFilt")) stop("filter object must be of the class 'moleculeFilt'")

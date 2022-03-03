@@ -117,5 +117,5 @@ mypepData <- as.seqData(e_data = seq_edata,
 \code{\link{as.nmrData}}
 }
 \author{
-Kelly Stratton, Lisa Bramer
+Rachel richardson, Kelly Stratton, Lisa Bramer
 }

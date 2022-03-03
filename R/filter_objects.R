@@ -253,33 +253,33 @@ total_count_filter <- function (omicsData) {
 }
 
 
-#'Filter Based on Pooled Coefficient of Variation (CV) Values
+#' Filter Based on Pooled Coefficient of Variation (CV) Values
 #'
-#'A pooled CV is calculated for each biomolecule.
+#' A pooled CV is calculated for each biomolecule.
 #'
-#'@param omicsData an object of the class 'pepData', 'proData', 'metabData',
+#' @param omicsData an object of the class 'pepData', 'proData', 'metabData',
 #'  'lipidData', or 'nmrData' created by \code{\link{as.pepData}},
 #'  \code{\link{as.proData}}, \code{\link{as.metabData}},
 #'  \code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, respectively. Note,
 #'  if \code{\link{group_designation}} has not been run, the CV is calculated
 #'  based on all samples for each biomolecule.
-#'@param use_groups logical indicator for whether to utilize group information
+#' @param use_groups logical indicator for whether to utilize group information
 #'  from \code{\link{group_designation}} when calculating the CV. Defaults to
 #'  TRUE. If use_groups is set to TRUE but \code{\link{group_designation}} has
 #'  not been run on the omicsData object, use_groups will be treated as FALSE.
 #'
-#'@return  An S3 object of class 'cvFilt' giving the pooled CV for each
+#' @return  An S3 object of class 'cvFilt' giving the pooled CV for each
 #'  biomolecule and additional attributes used for plotting a data.frame with a
 #'  column giving the biomolecule name and a column giving the pooled CV value.
 #'
-#'@details For each biomolecule, the CV of each group is calculated as the
+#' @details For each biomolecule, the CV of each group is calculated as the
 #'  standard deviation divided by the mean, excluding missing values. A pooled
 #'  CV estimate is then calculated based on the methods of Ahmed (1995). Any
 #'  groups consisting of a single sample are excluded from the CV calculation,
 #'  and thus, from the cv_filter result. If group_designation has not been run
 #'  on the omicsData object, all samples are considered to belong to the same
 #'  group.
-#'@references Ahmed, S.E. (1995). \emph{A pooling methodology for coefficient of
+#' @references Ahmed, S.E. (1995). \emph{A pooling methodology for coefficient of
 #'  variation}. The Indian Journal of Statistics. 57: 57-75.
 #'
 #' @examples
@@ -292,9 +292,9 @@ total_count_filter <- function (omicsData) {
 #' summary(to_filter, cv_threshold = 30)
 #'}
 #'
-#'@author Lisa Bramer, Kelly Stratton
+#' @author Lisa Bramer, Kelly Stratton
 #'
-#'@export
+#' @export
 #'
 cv_filter <- function(omicsData, use_groups = TRUE) {
 
