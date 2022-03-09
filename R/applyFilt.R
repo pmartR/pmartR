@@ -260,7 +260,9 @@ applyFilt.moleculeFilt <- function(filter_object, omicsData, min_num=2){
       data_scale = get_data_scale(omicsData),
       data_types = dInfo$data_types,
       norm_info = dInfo$norm_info,
-      is_normalized = dInfo$norm_info$is_normalized
+      is_normalized = dInfo$norm_info$is_normalized,
+      batch_info = dInfo$batch_info,
+      is_bc = dInfo$batch_info$is_bc
     )
 
 
@@ -401,7 +403,9 @@ applyFilt.cvFilt <- function (filter_object, omicsData, cv_threshold = 150) {
       data_scale = get_data_scale(omicsData),
       data_types = dInfo$data_types,
       norm_info = dInfo$norm_info,
-      is_normalized = dInfo$norm_info$is_normalized
+      is_normalized = dInfo$norm_info$is_normalized,
+      batch_info = dInfo$batch_info,
+      is_bc = dInfo$batch_info$is_bc
     )
 
     # Update the meta_info attribute.
@@ -551,7 +555,9 @@ applyFilt.rmdFilt <- function (filter_object, omicsData,
       data_scale = get_data_scale(omicsData),
       data_types = dInfo$data_types,
       norm_info = dInfo$norm_info,
-      is_normalized = dInfo$norm_info$is_normalized
+      is_normalized = dInfo$norm_info$is_normalized,
+      batch_info = dInfo$batch_info,
+      is_bc = dInfo$batch_info$is_bc
     )
 
 
@@ -801,7 +807,9 @@ applyFilt.proteomicsFilt <- function (filter_object,
       data_scale = get_data_scale(omicsData),
       data_types = dInfo$data_types,
       norm_info = dInfo$norm_info,
-      is_normalized = dInfo$norm_info$is_normalized
+      is_normalized = dInfo$norm_info$is_normalized,
+      batch_info = dInfo$batch_info,
+      is_bc = dInfo$batch_info$is_bc
     )
 
     # Update the meta_info attribute.
@@ -1184,7 +1192,9 @@ applyFilt.imdanovaFilt <- function (filter_object,
       data_scale = get_data_scale(omicsData),
       data_types = dInfo$data_types,
       norm_info = dInfo$norm_info,
-      is_normalized = dInfo$norm_info$is_normalized
+      is_normalized = dInfo$norm_info$is_normalized,
+      batch_info = dInfo$batch_info,
+      is_bc = dInfo$batch_info$is_bc
     )
 
     # Update the meta_info attribute.
@@ -1358,7 +1368,9 @@ applyFilt.customFilt <- function (filter_object, omicsData) {
       data_scale = get_data_scale(omicsData),
       data_types = dInfo$data_types,
       norm_info = dInfo$norm_info,
-      is_normalized = dInfo$norm_info$is_normalized
+      is_normalized = dInfo$norm_info$is_normalized,
+      batch_info = dInfo$batch_info,
+      is_bc = dInfo$batch_info$is_bc
     )
 
     # Update the meta_info attribute.
