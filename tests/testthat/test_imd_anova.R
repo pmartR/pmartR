@@ -429,7 +429,7 @@ test_that('all tests conform to the decrees of the God of Stats',{
                        method = "holm")))
   )
 
-  # Combined output ---------------
+  # Combined: Unadjusted p-values ---------------
 
   expect_equal(cfruit_1_0_2, cstan_1_0_2)
   expect_equal(cfruit_1_1_3, cstan_1_1_3)
