@@ -582,7 +582,9 @@ anova_test <- function (omicsData, comparisons, pval_adjust,
 
     #groupData needs to be updated so that pairs map to groups instead of observations
     groupData <- merge(groupData,omicsData$f_data[,cols],sort = FALSE)
-    groupData <- groupData%>%group_by_at(vars(contains("pair")))%>%dplyr::summarize(NewGroup=first(Group))
+    groupData <- groupData %>%
+      dplyr::group_by(dplyr::across(tidyselect::contains("pair"))) %>%
+      dplyr::summarize(NewGroup = dplyr::first(Group))
 
     colnames(groupData) <- c(samp_cname,"Group")
     groupData <- data.frame(groupData)
