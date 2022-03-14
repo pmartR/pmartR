@@ -5,7 +5,8 @@ trelli_precheck <- function(trelliData, trelliCheck,
                             ggplot_params,
                             interactive, 
                             test_mode,
-                            test_example) {
+                            test_example,
+                            single_plot) {
   
   #########################
   ## TEST EXAMPLE CHECKS ##
@@ -95,12 +96,17 @@ trelli_precheck <- function(trelliData, trelliCheck,
   
   # If interactive is not TRUE/FALSE, inform the user
   if (!is.logical(interactive) & !is.na(interactive)) {
-    stop("interactive must be a true or false.")
+    stop("interactive must be a TRUE or FALSE.")
   }
   
   # test_mode must be a TRUE/FALSE
   if (!is.logical(test_mode) & !is.na(test_mode)) {
-    stop("test_mode must be a true or false")
+    stop("test_mode must be a TRUE or FALSE")
+  }
+  
+  # single_plot must be a TRUE/FALSE
+  if (!is.logical(single_plot) & !is.na(single_plot)) {
+    stop("single_plot must be a TRUE or FALSE.")
   }
   
 }
@@ -176,6 +182,8 @@ getDownloadsFolder <- function() {
 #' @param test_mode A logical to return a smaller trelliscope to confirm plot and design.
 #'    Default is FALSE.
 #' @param test_example The index number of the plot to return for test_mode. Default is 1. 
+#' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a trelliscope) should be returned. 
+#'    Default is FALSE. 
 #' 
 #' @examples
 #' \dontrun{
@@ -217,6 +225,7 @@ trelli_abundance_boxplot <- function(trelliData,
                                      name = "Trelliscope",
                                      test_mode = FALSE,
                                      test_example = 1,
+                                     single_plot = FALSE,
                                      ...) {
   
   # Run initial checks----------------------------------------------------------
@@ -229,7 +238,8 @@ trelli_abundance_boxplot <- function(trelliData,
                   ggplot_params = ggplot_params,
                   interactive = interactive,
                   test_mode = test_mode, 
-                  test_example = test_example)
+                  test_example = test_example,
+                  single_plot = single_plot)
   
   
   # Remove stat specific options if no stats data was provided 
@@ -401,17 +411,27 @@ trelli_abundance_boxplot <- function(trelliData,
   
   # Build trelliscope display---------------------------------------------------
   
-  # If test_mode is on, then just build the required panels
-  if (test_mode) {toBuild <- trelliData$trelliData.omics[test_example,]} else {toBuild <- trelliData$trelliData.omics}
+  # Return a single plot if single_plot is TRUE
+  if (single_plot) {
+    
+    singleData <- trelliData$trelliData.omics[test_example[1],]
+    return(box_plot_fun(singleData$Nested_DF[[1]], unlist(singleData[1, 1])))
+    
+  } else {
   
-  # Pass parameters to trelli_builder function
-  trelli_builder(toBuild = toBuild,
-                 cognostics = cognostics, 
-                 plotFUN = box_plot_fun,
-                 cogFUN = box_cog_fun,
-                 path = path,
-                 name = name,
-                 ...)
+    # If test_mode is on, then just build the required panels
+    if (test_mode) {toBuild <- trelliData$trelliData.omics[test_example,]} else {toBuild <- trelliData$trelliData.omics}
+    
+    # Pass parameters to trelli_builder function
+    trelli_builder(toBuild = toBuild,
+                   cognostics = cognostics, 
+                   plotFUN = box_plot_fun,
+                   cogFUN = box_cog_fun,
+                   path = path,
+                   name = name,
+                   ...)
+    
+  }
   
 }
 
@@ -436,6 +456,8 @@ trelli_abundance_boxplot <- function(trelliData,
 #' @param test_mode A logical to return a smaller trelliscope to confirm plot and design.
 #'    Default is FALSE.
 #' @param test_example The index number of the plot to return for test_mode. Default is 1. 
+#' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a trelliscope) should be returned. 
+#'    Default is FALSE. 
 #' 
 #' @examples
 #' \dontrun{
@@ -473,6 +495,7 @@ trelli_abundance_histogram <- function(trelliData,
                                        name = "Trelliscope",
                                        test_mode = FALSE,
                                        test_example = 1,
+                                       single_plot = FALSE, 
                                        ...) {
   
   # Run initial checks----------------------------------------------------------
@@ -485,7 +508,8 @@ trelli_abundance_histogram <- function(trelliData,
                   ggplot_params = ggplot_params,
                   interactive = interactive,
                   test_mode = test_mode, 
-                  test_example = test_example)
+                  test_example = test_example,
+                  single_plot = single_plot)
 
   # Remove stat specific options if no stats data was provided 
   if (is.null(trelliData$trelliData.stat)) {
@@ -608,17 +632,27 @@ trelli_abundance_histogram <- function(trelliData,
   
   # Build trelliscope display---------------------------------------------------
   
-  # If test_mode is on, then just build the required panels
-  if (test_mode) {toBuild <- trelliData$trelliData.omics[test_example,]} else {toBuild <- trelliData$trelliData.omics}
+  # Return a single plot if single_plot is TRUE
+  if (single_plot) {
+    
+    singleData <- trelliData$trelliData.omics[test_example[1],]
+    return(hist_plot_fun(singleData$Nested_DF[[1]], unlist(singleData[1, 1])))
+    
+  } else {
   
-  # Pass parameters to trelli_builder function
-  trelli_builder(toBuild = toBuild,
-                 cognostics = cognostics, 
-                 plotFUN = hist_plot_fun,
-                 cogFUN = hist_cog_fun,
-                 path = path,
-                 name = name,
-                 ...)
+    # If test_mode is on, then just build the required panels
+    if (test_mode) {toBuild <- trelliData$trelliData.omics[test_example,]} else {toBuild <- trelliData$trelliData.omics}
+    
+    # Pass parameters to trelli_builder function
+    trelli_builder(toBuild = toBuild,
+                   cognostics = cognostics, 
+                   plotFUN = hist_plot_fun,
+                   cogFUN = hist_cog_fun,
+                   path = path,
+                   name = name,
+                   ...)
+    
+  }
   
 }
 
@@ -644,6 +678,8 @@ trelli_abundance_histogram <- function(trelliData,
 #' @param test_mode A logical to return a smaller trelliscope to confirm plot and design.
 #'    Default is FALSE.
 #' @param test_example The index number of the plot to return for test_mode. Default is 1. 
+#' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a trelliscope) should be returned. 
+#'    Default is FALSE.
 #' 
 #' @examples
 #' \dontrun{
@@ -672,6 +708,7 @@ trelli_abundance_heatmap <- function(trelliData,
                                      name = "Trelliscope",
                                      test_mode = FALSE,
                                      test_example = 1,
+                                     single_plot = FALSE,
                                      ...) {
   
   # Run initial checks----------------------------------------------------------
@@ -684,7 +721,8 @@ trelli_abundance_heatmap <- function(trelliData,
                   ggplot_params = ggplot_params,
                   interactive = interactive,
                   test_mode = test_mode, 
-                  test_example = test_example)
+                  test_example = test_example,
+                  single_plot = single_plot)
   
   # Round test example to integer 
   if (test_mode) {test_example <- unique(abs(round(test_example)))}
@@ -777,17 +815,27 @@ trelli_abundance_heatmap <- function(trelliData,
   
   # Build trelliscope display---------------------------------------------------
   
-  # If test_mode is on, then just build the required panels
-  if (test_mode) {toBuild <- trelliData$trelliData.omics[test_example,]} else {toBuild <- trelliData$trelliData.omics}
-  
-  # Pass parameters to trelli_builder function
-  trelli_builder(toBuild = toBuild,
-                 cognostics = cognostics, 
-                 plotFUN = hm_plot_fun,
-                 cogFUN = hm_cog_fun,
-                 path = path,
-                 name = name,
-                 ...)
+  # Return a single plot if single_plot is TRUE
+  if (single_plot) {
+    
+    singleData <- trelliData$trelliData.omics[test_example[1],]
+    return(hm_plot_fun(singleData$Nested_DF[[1]], unlist(singleData[1, 1])))
+    
+  } else {
+    
+    # If test_mode is on, then just build the required panels
+    if (test_mode) {toBuild <- trelliData$trelliData.omics[test_example,]} else {toBuild <- trelliData$trelliData.omics}
+    
+    # Pass parameters to trelli_builder function
+    trelli_builder(toBuild = toBuild,
+                   cognostics = cognostics, 
+                   plotFUN = hm_plot_fun,
+                   cogFUN = hm_cog_fun,
+                   path = path,
+                   name = name,
+                   ...) 
+    
+  }
   
 }
 
@@ -813,6 +861,8 @@ trelli_abundance_heatmap <- function(trelliData,
 #' @param test_mode A logical to return a smaller trelliscope to confirm plot and design.
 #'    Default is FALSE.
 #' @param test_example The index number of the plot to return for test_mode. Default is 1. 
+#' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a trelliscope) should be returned. 
+#'    Default is FALSE.
 #' 
 #' @examples
 #' \dontrun{
@@ -856,6 +906,7 @@ trelli_missingness_bar <- function(trelliData,
                                    name = "Trelliscope",
                                    test_mode = FALSE,
                                    test_example = 1,
+                                   single_plot = FALSE,
                                    ...) {
   # Run initial checks----------------------------------------------------------
   
@@ -867,7 +918,8 @@ trelli_missingness_bar <- function(trelliData,
                   ggplot_params = ggplot_params,
                   interactive = interactive,
                   test_mode = test_mode, 
-                  test_example = test_example)
+                  test_example = test_example,
+                  single_plot = single_plot)
   
   # Check that proportion is a non NA logical
   if (!is.logical(proportion) | is.na(proportion)) {
@@ -1043,14 +1095,26 @@ trelli_missingness_bar <- function(trelliData,
     if (test_mode) {toBuild <- toBuild[test_example,]} 
   }
   
-  # Pass parameters to trelli_builder function
-  trelli_builder(toBuild = toBuild,
-                 cognostics = cognostics, 
-                 plotFUN = missing_bar_plot_fun,
-                 cogFUN = missing_bar_cog_fun,
-                 path = path,
-                 name = name,
-                 ...)
+  # Return a single plot if single_plot is TRUE
+  if (single_plot) {
+    
+    singleData <- toBuild[test_example[1],]
+    return(missing_bar_plot_fun(singleData$Nested_DF[[1]], unlist(singleData[1, 1])))
+    
+  } else {
+    
+    # Pass parameters to trelli_builder function
+    trelli_builder(toBuild = toBuild,
+                   cognostics = cognostics, 
+                   plotFUN = missing_bar_plot_fun,
+                   cogFUN = missing_bar_cog_fun,
+                   path = path,
+                   name = name,
+                   ...)
+    
+  }
+  
+
   
 }
 
@@ -1077,6 +1141,8 @@ trelli_missingness_bar <- function(trelliData,
 #' @param test_mode A logical to return a smaller trelliscope to confirm plot and design.
 #'    Default is FALSE.
 #' @param test_example The index number of the plot to return for test_mode. Default is 1. 
+#' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a trelliscope) should be returned. 
+#'    Default is FALSE.
 #' 
 #' @examples
 #' \dontrun{
@@ -1104,6 +1170,7 @@ trelli_foldchange_bar <- function(trelliData,
                                   name = "Trelliscope",
                                   test_mode = FALSE,
                                   test_example = 1,
+                                  single_plot = FALSE,
                                   ...) {
   
   # Run initial checks----------------------------------------------------------
@@ -1116,7 +1183,8 @@ trelli_foldchange_bar <- function(trelliData,
                   ggplot_params = ggplot_params,
                   interactive = interactive,
                   test_mode = test_mode, 
-                  test_example = test_example)
+                  test_example = test_example,
+                  single_plot = single_plot)
   
   # Round test example to integer 
   if (test_mode) {test_example <- unique(abs(round(test_example)))}
@@ -1228,6 +1296,15 @@ trelli_foldchange_bar <- function(trelliData,
   
   # Build trelliscope function--------------------------------------------------
   
+  # Return a single plot if single_plot is TRUE
+  if (single_plot) {
+    
+    singleData <- trelliData$trelliData.stat[test_example[1],]
+    return(fc_bar_plot_fun(singleData$Nested_DF[[1]], unlist(singleData[1, 1])))
+    
+  }
+  
+  
   # Subset down to test example if applicable
   if (test_mode) {toBuild <- trelliData$trelliData.stat[test_example,]} else {toBuild <- trelliData$trelliData.stat}
   
@@ -1267,6 +1344,8 @@ trelli_foldchange_bar <- function(trelliData,
 #' @param test_mode A logical to return a smaller trelliscope to confirm plot and design.
 #'    Default is FALSE.
 #' @param test_example The index number of the plot to return for test_mode. Default is 1. 
+#' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a trelliscope) should be returned. 
+#'    Default is FALSE.
 #' 
 #' @examples
 #' \dontrun{ 
@@ -1291,6 +1370,7 @@ trelli_foldchange_boxplot <- function(trelliData,
                                       name = "Trelliscope",
                                       test_mode = FALSE,
                                       test_example = 1,
+                                      single_plot = FALSE,
                                       ...) {
   
   # Run initial checks----------------------------------------------------------
@@ -1303,7 +1383,8 @@ trelli_foldchange_boxplot <- function(trelliData,
                   ggplot_params = ggplot_params,
                   interactive = interactive,
                   test_mode = test_mode, 
-                  test_example = test_example)
+                  test_example = test_example,
+                  single_plot = single_plot)
   
   # Round test example to integer 
   if (test_mode) {test_example <- unique(abs(round(test_example)))}
@@ -1426,18 +1507,27 @@ trelli_foldchange_boxplot <- function(trelliData,
   
   # Build the trelliscope-------------------------------------------------------
   
-  # Subset down to test example if applicable
-  if (test_mode) {toBuild <- trelliData$trelliData.stat[test_example,]} else {toBuild <- trelliData$trelliData.stat}
+  # Return a single plot if single_plot is TRUE
+  if (single_plot) {
+    
+    singleData <- trelliData$trelliData.stat[test_example[1],]
+    return(fc_box_plot_fun(singleData$Nested_DF[[1]], unlist(singleData[1, 1])))
+    
+  } else {
   
-  # Pass parameters to trelli_builder function
-  trelli_builder(toBuild = toBuild,
-                 cognostics = cognostics, 
-                 plotFUN = fc_box_plot_fun,
-                 cogFUN = fc_box_cog_fun,
-                 path = path,
-                 name = name,
-                 ...)
-  
+    # Subset down to test example if applicable
+    if (test_mode) {toBuild <- trelliData$trelliData.stat[test_example,]} else {toBuild <- trelliData$trelliData.stat}
+    
+    # Pass parameters to trelli_builder function
+    trelli_builder(toBuild = toBuild,
+                   cognostics = cognostics, 
+                   plotFUN = fc_box_plot_fun,
+                   cogFUN = fc_box_cog_fun,
+                   path = path,
+                   name = name,
+                   ...)
+  }
+    
 }
 
 #' @name trelli_foldchange_volcano
@@ -1463,6 +1553,8 @@ trelli_foldchange_boxplot <- function(trelliData,
 #' @param test_mode A logical to return a smaller trelliscope to confirm plot and design.
 #'    Default is FALSE.
 #' @param test_example The index number of the plot to return for test_mode. Default is 1. 
+#' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a trelliscope) should be returned. 
+#'    Default is FALSE.
 #' 
 #' @examples
 #' \dontrun{ 
@@ -1486,6 +1578,7 @@ trelli_foldchange_volcano <- function(trelliData,
                                       name = "Trelliscope",
                                       test_mode = FALSE,
                                       test_example = 1,
+                                      single_plot = FALSE,
                                       ...) {
   
   # Run initial checks----------------------------------------------------------
@@ -1498,7 +1591,8 @@ trelli_foldchange_volcano <- function(trelliData,
                   ggplot_params = ggplot_params,
                   interactive = interactive,
                   test_mode = test_mode, 
-                  test_example = test_example)
+                  test_example = test_example,
+                  single_plot = single_plot)
   
   # Round test example to integer 
   if (test_mode) {test_example <- unique(abs(round(test_example)))}
@@ -1626,17 +1720,27 @@ trelli_foldchange_volcano <- function(trelliData,
   
   # Build the trelliscope-------------------------------------------------------
   
-  # Subset down to test example if applicable
-  if (test_mode) {toBuild <- trelliData$trelliData.stat[test_example,]} else {toBuild <- trelliData$trelliData.stat}
+  # Return a single plot if single_plot is TRUE
+  if (single_plot) {
+    
+    singleData <- trelliData$trelliData.stat[test_example[1],]
+    return(fc_volcano_plot_fun(singleData$Nested_DF[[1]], unlist(singleData[1, 1])))
+    
+  } else {
   
-  # Pass parameters to trelli_builder function
-  trelli_builder(toBuild = toBuild,
-                 cognostics = cognostics, 
-                 plotFUN = fc_volcano_plot_fun,
-                 cogFUN = fc_volcano_cog_fun,
-                 path = path,
-                 name = name,
-                 ...)
+    # Subset down to test example if applicable
+    if (test_mode) {toBuild <- trelliData$trelliData.stat[test_example,]} else {toBuild <- trelliData$trelliData.stat}
+    
+    # Pass parameters to trelli_builder function
+    trelli_builder(toBuild = toBuild,
+                   cognostics = cognostics, 
+                   plotFUN = fc_volcano_plot_fun,
+                   cogFUN = fc_volcano_cog_fun,
+                   path = path,
+                   name = name,
+                   ...)
+    
+  }
   
 }
 
@@ -1660,6 +1764,8 @@ trelli_foldchange_volcano <- function(trelliData,
 #' @param test_mode A logical to return a smaller trelliscope to confirm plot and design.
 #'    Default is FALSE.
 #' @param test_example The index number of the plot to return for test_mode. Default is 1. 
+#' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a trelliscope) should be returned. 
+#'    Default is FALSE.
 #' 
 #' @examples
 #' \dontrun{ 
@@ -1681,6 +1787,7 @@ trelli_foldchange_heatmap <- function(trelliData,
                                       name = "Trelliscope",
                                       test_mode = FALSE,
                                       test_example = 1,
+                                      single_plot = FALSE,
                                       ...) {
   
   # Run initial checks----------------------------------------------------------
@@ -1693,7 +1800,8 @@ trelli_foldchange_heatmap <- function(trelliData,
                   ggplot_params = ggplot_params,
                   interactive = interactive,
                   test_mode = test_mode, 
-                  test_example = test_example)
+                  test_example = test_example,
+                  single_plot = single_plot)
   
   # Round test example to integer 
   if (test_mode) {test_example <- unique(abs(round(test_example)))}
@@ -1766,16 +1874,26 @@ trelli_foldchange_heatmap <- function(trelliData,
   
   # Build the trelliscope-------------------------------------------------------
   
-  # Subset down to test example if applicable
-  if (test_mode) {toBuild <- trelliData$trelliData.stat[test_example,]} else {toBuild <- trelliData$trelliData.stat}
-  
-  # Pass parameters to trelli_builder function
-  trelli_builder(toBuild = toBuild,
-                 cognostics = cognostics, 
-                 plotFUN = fc_hm_plot_fun,
-                 cogFUN = fc_hm_cog_fun,
-                 path = path,
-                 name = name,
-                 ...)
+  # Return a single plot if single_plot is TRUE
+  if (single_plot) {
+    
+    singleData <- trelliData$trelliData.stat[test_example[1],]
+    return(fc_hm_plot_fun(singleData$Nested_DF[[1]], unlist(singleData[1, 1])))
+    
+  } else {
+    
+    # Subset down to test example if applicable
+    if (test_mode) {toBuild <- trelliData$trelliData.stat[test_example,]} else {toBuild <- trelliData$trelliData.stat}
+    
+    # Pass parameters to trelli_builder function
+    trelli_builder(toBuild = toBuild,
+                   cognostics = cognostics, 
+                   plotFUN = fc_hm_plot_fun,
+                   cogFUN = fc_hm_cog_fun,
+                   path = path,
+                   name = name,
+                   ...)
+    
+  }
 
 }
