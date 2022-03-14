@@ -979,13 +979,32 @@ get_group_table <- function (omicsObject) {
 
 }
 
-#' Custom message functions to pretty-print text with newlines so you can follow
+#'Helper to find the names of columns of a data.frame that contain exactly all
+#'the elements of an input column
+#'
+#'@param df A data.frame whose columns we want to match to some query column.
+#'@param col Vector of values which will be compared to a column in df.
+#'
+#'@return vector of column names of df that contain exactly all the elements of
+#'the input column
+#'
+#'@keywords internal
+column_matches_exact <- function(df, col) {
+  diffs = lapply(df, function(df_col) {
+    length(setdiff(
+      union(df_col, col),
+      intersect(df_col, col)
+    ))
+  })
+  
+  matched_cnames = names(diffs)[which(diffs == 0)] 
+  
+  return(matched_cnames)
+}
+
+#' Custom message function to pretty-print text with newlines so you can follow
 #' character limit guidelines in source code.
 #' @noRd
 wrap_message <- function(..., prefix = " ", initial = ""){
   message(strwrap(..., prefix = prefix, initial = initial))
-}
-
-wrap_warning <- function(..., prefix = " ", initial = ""){
-  warning(strwrap(..., prefix = prefix, initial = initial))
 }
