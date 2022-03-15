@@ -50,7 +50,8 @@ test_that('as.isobaricpepData returns the correct data frame and attributes',{
          prop_missing = (sum(is.na(isodata$e_data)) /
                            prod(dim(isodata$e_data[, -1]))),
          num_samps = ncol(isodata$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
   
   # Sleuth around the isobaric attributes.
@@ -117,7 +118,8 @@ test_that('as.isobaricpepData returns the correct data frame and attributes',{
          prop_missing = (sum(is.na(isodata$e_data)) /
                            prod(dim(isodata$e_data[, -1]))),
          num_samps = ncol(isodata$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
   
   # Sleuth around the isobaric attributes.
@@ -213,7 +215,8 @@ test_that('as.isobaricpepData returns the correct data frame and attributes',{
          prop_missing = (sum(is.na(isodata$e_data)) /
                            prod(dim(isodata$e_data[, -1]))),
          num_samps = ncol(isodata$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
   
   # Sleuth around the isobaric attributes.
@@ -284,7 +287,8 @@ test_that('as.isobaricpepData returns the correct data frame and attributes',{
          prop_missing = (sum(is.na(isodata$e_data)) /
                            prod(dim(isodata$e_data[, -1]))),
          num_samps = ncol(isodata$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
   
   # Sleuth around the isobaric attributes.
@@ -371,7 +375,8 @@ test_that('as.isobaricpepData returns the correct data frame and attributes',{
          prop_missing = (sum(is.na(isodata$e_data)) /
                            prod(dim(isodata$e_data[, -1]))),
          num_samps = ncol(isodata$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
   
   # Sleuth around the isobaric attributes.
