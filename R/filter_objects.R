@@ -50,9 +50,10 @@ molecule_filter <- function (omicsData,use_groups = FALSE, use_batch = FALSE) {
     stop (paste("omicsData must have batch_id specified if use_batch = TRUE"))
   }
   
-  if(is.null(attr(omicsData,"group_DF") && use_groups == TRUE) {
-    stop (paste("omicsData must have group_designation specified if use_groups = TRUE"))
-  })
+  # if(is.null(attr(omicsData,"group_DF")) && use_groups == TRUE) {
+  #   stop (paste("omicsData must have group_designation specified if use_groups = TRUE",
+  #               sep = ' '))
+  # })
   
   # find the column which has the edata cname
   id_col <- which(names(omicsData$e_data) == get_edata_cname(omicsData))
