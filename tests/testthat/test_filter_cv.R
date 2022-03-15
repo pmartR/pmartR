@@ -390,7 +390,8 @@ test_that('cv_filter and applyFilt produce the correct output',{
          prop_missing = (sum(is.na(filtered$e_data)) /
                            prod(dim(filtered$e_data[, -1]))),
          num_samps = ncol(filtered$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
 
   # Explore the meta_info attribute.
@@ -443,7 +444,8 @@ test_that('cv_filter and applyFilt produce the correct output',{
          prop_missing = (sum(is.na(filtered_gdf$e_data)) /
                            prod(dim(filtered_gdf$e_data[, -1]))),
          num_samps = ncol(filtered_gdf$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
 
   # Explore the meta_info attribute.
@@ -496,7 +498,8 @@ test_that('cv_filter and applyFilt produce the correct output',{
          prop_missing = (sum(is.na(filtered_sg_gdf$e_data)) /
                            prod(dim(filtered_sg_gdf$e_data[, -1]))),
          num_samps = ncol(filtered_sg_gdf$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
 
   # Explore the meta_info attribute.

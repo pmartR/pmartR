@@ -409,3 +409,4 @@ test_that('the correct group data frame and attributes are created',{
   expect_type(attr(attr(pdata_gdf_5.2, "group_DF"),"batch_id")$BatchName,"character")
 
 })
+ 

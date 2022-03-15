@@ -346,7 +346,8 @@ test_that("rmd_filter and applyFilt produce the correct output",{
          prop_missing = (sum(is.na(pfiltered$e_data)) /
                            prod(dim(pfiltered$e_data[, -1]))),
          num_samps = ncol(pfiltered$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
 
   # Explore the meta_info attribute.
@@ -418,7 +419,8 @@ test_that("rmd_filter and applyFilt produce the correct output",{
          prop_missing = (sum(is.na(nmrfiltered$e_data)) /
                            prod(dim(nmrfiltered$e_data[, -1]))),
          num_samps = ncol(nmrfiltered$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
 
   # Explore the meta_info attribute.
@@ -484,7 +486,8 @@ test_that("rmd_filter and applyFilt produce the correct output",{
          prop_missing = (sum(is.na(pfiltered_sg$e_data)) /
                            prod(dim(pfiltered_sg$e_data[, -1]))),
          num_samps = ncol(pfiltered_sg$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
 
   # Explore the meta_info attribute.
@@ -543,7 +546,8 @@ test_that("rmd_filter and applyFilt produce the correct output",{
          prop_missing = (sum(is.na(pfiltered_sg_f$e_data)) /
                            prod(dim(pfiltered_sg_f$e_data[, -1]))),
          num_samps = ncol(pfiltered_sg_f$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
 
   # Explore the meta_info attribute.
