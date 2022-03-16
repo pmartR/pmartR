@@ -35,7 +35,8 @@ test_that('edata_replace correctly replaces one value with another',{
          prop_missing = (sum(is.na(isodata2$e_data)) /
                            prod(dim(isodata2$e_data[, -1]))),
          num_samps = ncol(isodata2$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
   
   # Make sure all other attributes have not changed.
@@ -93,7 +94,8 @@ test_that('edata_replace correctly replaces one value with another',{
          prop_missing = (sum(is.na(ldata2$e_data)) /
                            prod(dim(ldata2$e_data[, -1]))),
          num_samps = ncol(ldata2$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
   
   # Make sure all other attributes have not changed.
@@ -149,7 +151,8 @@ test_that('edata_replace correctly replaces one value with another',{
          prop_missing = (sum(is.na(mdata2$e_data)) /
                            prod(dim(mdata2$e_data[, -1]))),
          num_samps = ncol(mdata2$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
   
   # Make sure all other attributes have not changed.
@@ -224,7 +227,8 @@ test_that('edata_replace correctly replaces one value with another',{
          prop_missing = (sum(is.na(nmrdata2$e_data)) /
                            prod(dim(nmrdata2$e_data[, -1]))),
          num_samps = ncol(nmrdata2$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
   
   # Make sure all other attributes have not changed.
@@ -282,7 +286,8 @@ test_that('edata_replace correctly replaces one value with another',{
          prop_missing = (sum(is.na(pdata2$e_data)) /
                            prod(dim(pdata2$e_data[, -1]))),
          num_samps = ncol(pdata2$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
   
   # Make sure all other attributes have not changed.
@@ -338,7 +343,8 @@ test_that('edata_replace correctly replaces one value with another',{
          prop_missing = (sum(is.na(prdata2$e_data)) /
                            prod(dim(prdata2$e_data[, -1]))),
          num_samps = ncol(prdata2$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
   
   # Make sure all other attributes have not changed.

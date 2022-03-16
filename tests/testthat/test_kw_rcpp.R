@@ -40,7 +40,7 @@ test_that('kw_rcpp calculates the correct p-values by group',{
   )
   
   # Perform KW test in C++.
-  kw_cpp <- kw_rcpp(pe_data %>%
+  kw_cpp <- pmartR:::kw_rcpp(pe_data %>%
                       as.matrix(), groups)
   
   # Compare R and C++ on the field of battle.
@@ -52,7 +52,7 @@ test_that('kw_rcpp calculates the correct p-values by group',{
   eggs <- sample(1:12, 12)
   
   # Scramble the order of the groups.
-  kw_eggs <- kw_rcpp(pe_data[, eggs] %>%
+  kw_eggs <- pmartR:::kw_rcpp(pe_data[, eggs] %>%
                        as.matrix(), groups[eggs])
   
   # Ensure the p-values are the same even if the data/groups are scrambled.

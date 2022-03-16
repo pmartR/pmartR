@@ -225,9 +225,9 @@ test_that('molecule_filter and applyFilt produce the correct output',{
   
   # Show errors if batch or group not specified and we use use_batch and use_groups
   expect_error(molecule_filter(omicsData = pdata,use_batch = TRUE),
-               paste("omicsData must have batch_id specified"))
-  # expect_error(molecule_filter(omicsData = pdata,use_groups = TRUE),
-  #              paste("omicsData must have batch_id specified"))
+               paste("omicsData must have batch_id specified if use_batch = TRUE"))
+  expect_error(molecule_filter(omicsData = pdata,use_groups = TRUE),
+                paste("omicsData must have groups specified if use_groups = TRUE"))
   
   pdata_gp <- group_designation(pdata,main_effects = "Condition",
                                 batch_id = "Batch")
