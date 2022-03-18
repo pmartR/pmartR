@@ -43,9 +43,7 @@ Suggested value is 3.}
 
 \item{x_lab}{A character string specifying the x-axis label.}
 
-\item{y_lab}{A character string specifying the y-axis label. The default is
-NULL in which case the y-axis label will be the metric selected for the
-\code{metric} argument.}
+\item{y_lab}{A character string specifying the y-axis label.}
 
 \item{x_lab_size}{An integer value indicating the font size for the x-axis.
 The default is 11.}
