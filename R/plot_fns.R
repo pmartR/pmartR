@@ -2191,9 +2191,7 @@ plot.moleculeFilt <- function (filter_obj, min_num = NULL, cumulative = TRUE,
 #'
 #' @param interactive Logical. If TRUE produces an interactive plot.
 #' @param x_lab A character string specifying the x-axis label.
-#' @param y_lab A character string specifying the y-axis label. The default is
-#'   NULL in which case the y-axis label will be the metric selected for the
-#'   \code{metric} argument.
+#' @param y_lab A character string specifying the y-axis label.
 #' @param x_lab_size An integer value indicating the font size for the x-axis.
 #'   The default is 11.
 #' @param y_lab_size An integer value indicating the font size for the y-axis.
@@ -2304,7 +2302,7 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
   xlabel <- if (is.null(x_lab)) "Number of biomolecules" else x_lab
   ylabel <- if (is.null(y_lab))
     "Minimum number of observations per group" else
-        y_lab
+      y_lab
   titleLabel <- if (is.null(title_lab)) "IMD-ANOVA filter" else title_lab
 
   # Fabricate glorious plots ---------------------------------------------------
@@ -2323,51 +2321,70 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
     ggplot2::ylab(ylabel) +
     ggplot2::ggtitle(titleLabel)
 
-  # Evan, add gtest info to the plot. As you wish.
+  # Evan, add the gtest points to the plot. As you wish.
+  p <- p +
+    ggplot2::geom_point(data = plotter2,
+                        ggplot2::aes(x = Count_biomolecules,
+                                     y = Min_obs,
+                                     color = Statistic),
+                        size = point_size)
+
+  # Evan, display the counts on the plot. As you wish.
+  if (display_count) p <- p +
+    ggplot2::geom_text(
+      data = plotter2,
+      ggplot2::aes(x = Count_biomolecules,
+                   y = Min_obs,
+                   label = Count_biomolecules),
+      size = text_size,
+      hjust = -0.5
+    )
+
+  # Evan, add the anova points to the plot. As you wish.
+  p <- p +
+    ggplot2::geom_point(data = plotter1,
+                        ggplot2::aes(x = Count_biomolecules,
+                                     y = Min_obs,
+                                     color = Statistic),
+                        size = point_size)
+
+  # Evan, display the counts on the plot. As you wish.
+  if (display_count) p <- p +
+    ggplot2::geom_text(
+      data = plotter1,
+      ggplot2::aes(x = Count_biomolecules,
+                   y = Min_obs,
+                   label = Count_biomolecules),
+      size = text_size,
+      hjust = -0.5
+    )
+
+
+  # Evan, add gtest threshold to the plot. As you wish.
   if (!is.null(min_nonmiss_gtest)) {
 
+    # Evan, add a vertical line for the gtest threshold. As you wish.
     p <- p +
-      ggplot2::geom_vline(
-        ggplot2::aes(xintercept = n_biomolecules_gtest[min_nonmiss_gtest + 1],
+      ggplot2::geom_hline(
+        ggplot2::aes(yintercept = min_nonmiss_gtest,
                      color = "G-test applied filter"),
         linetype = "dashed",
         size = if (is.null(line_size)) 1 else line_size
       )
 
-    # Evan, display the counts on the plot. As you wish.
-    if (display_count) p <- p +
-        ggplot2::geom_text(
-          data = plotter2,
-          ggplot2::aes(x = Count_biomolecules,
-                       y = Min_obs,
-                       label = Count_biomolecules),
-          size = text_size,
-          hjust = -0.5
-        )
-
   }
 
-  # Evan, add anova info to the plot. As you wish.
+  # Evan, add anova threshold to the plot. As you wish.
   if (!is.null(min_nonmiss_anova)) {
 
+    # Evan, add a vertical line for the anova threshold. As you wish.
     p <- p +
-      ggplot2::geom_vline(
-        ggplot2::aes(xintercept = n_biomolecules_anova[min_nonmiss_anova + 1],
+      ggplot2::geom_hline(
+        ggplot2::aes(yintercept = min_nonmiss_anova,
                      color = "ANOVA applied filter"),
-        linetype = "dashed",
+        linetype = "dotted",
         size = if (is.null(line_size)) 1 else line_size
       )
-
-    # Evan, display the counts on the plot. As you wish.
-    if (display_count) p <- p +
-        ggplot2::geom_text(
-          data = plotter1,
-          ggplot2::aes(x = Count_biomolecules,
-                       y = Min_obs,
-                       label = Count_biomolecules),
-          size = text_size,
-          hjust = -0.5
-        )
 
   }
 
@@ -2432,7 +2449,7 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
         ),
         guide = ggplot2::guide_legend(
           override.aes = list(
-            linetype = c(0, 0, 2),
+            linetype = c(0, 0, 3),
             shape = c(16, 16, NA),
             color = c(
               if (is.null(palette)) "#FFC107" else colas[[2]],
@@ -2443,7 +2460,8 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
         )
       )
 
-  } else {
+    # A minimum for gtest AND anova IS supplied.
+  } else if (!is.null(min_nonmiss_gtest) && !is.null(min_nonmiss_anova)) {
 
     # Add a customized legend when both min_nonmiss_gtest and min_nonmiss_anova
     # are not NULL.
@@ -2462,12 +2480,35 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
         ),
         guide = ggplot2::guide_legend(
           override.aes = list(
-            linetype = c(0, 2, 0, 2),
+            linetype = c(0, 2, 0, 3),
             shape = c(16, NA, 16, NA),
             color = c(
               if (is.null(palette)) "#FFC107" else colas[[2]],
               if (is.null(palette)) "#FFC107" else colas[[2]],
               if (is.null(palette)) "#004D40" else colas[[3]],
+              if (is.null(palette)) "#004D40" else colas[[3]]
+            )
+          )
+        )
+      )
+
+    # Neither a minimum for gtest nor anova is supplied.
+  } else {
+
+    # Add a customized legend when both min_nonmiss_gtest and min_nonmiss_anova
+    # are NULL.
+    p <- p +
+      ggplot2::scale_color_manual(
+        name = if (is.null(legend_lab)) "" else legend_lab,
+        values = c(
+          if (is.null(palette)) "#FFC107" else colas[[2]],
+          if (is.null(palette)) "#004D40" else colas[[3]]
+        ),
+        guide = ggplot2::guide_legend(
+          override.aes = list(
+            shape = c(16, 16),
+            color = c(
+              if (is.null(palette)) "#FFC107" else colas[[2]],
               if (is.null(palette)) "#004D40" else colas[[3]]
             )
           )
