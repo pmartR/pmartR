@@ -89,7 +89,8 @@ test_that('molecule_filter and applyFilt produce the correct output',{
                    2)
   expect_equal(attr(filtered, 'filters')[[1]]$filtered,
                s_pepes)
-  expect_true(is.na(attr(filtered, 'filters')[[1]]$method))
+  expect_equal(attr(filtered, 'filters')[[1]]$method$use_groups,FALSE)
+  expect_equal(attr(filtered, 'filters')[[1]]$method$use_batch,FALSE)
 
   # Investigate the data_info attribute.
   expect_equal(
@@ -168,7 +169,8 @@ test_that('molecule_filter and applyFilt produce the correct output',{
                    2)
   expect_equal(attr(filtered_2, 'filters')[[1]]$filtered,
                s_pepes)
-  expect_true(is.na(attr(filtered, 'filters')[[1]]$method))
+  expect_equal(attr(filtered_2, 'filters')[[1]]$method$use_groups,FALSE)
+  expect_equal(attr(filtered_2, 'filters')[[1]]$method$use_batch,FALSE)
 
   # Examine the second element in the filters attribute.
   expect_equal(attr(filtered_2, 'filters')[[2]]$type,
@@ -177,7 +179,9 @@ test_that('molecule_filter and applyFilt produce the correct output',{
                    3)
   expect_equal(attr(filtered_2, 'filters')[[2]]$filtered,
                s_pepes_2)
-  expect_true(is.na(attr(filtered_2, 'filters')[[2]]$method))
+  
+  expect_equal(attr(filtered_2, 'filters')[[2]]$method$use_groups,FALSE)
+  expect_equal(attr(filtered_2, 'filters')[[2]]$method$use_batch,FALSE)
 
   # Investigate the data_info attribute.
   expect_equal(
@@ -286,7 +290,8 @@ test_that('molecule_filter and applyFilt produce the correct output',{
                    2)
   expect_equal(attr(filtered_b, 'filters')[[1]]$filtered,
                s_pepes)
-  expect_true(is.na(attr(filtered_b, 'filters')[[1]]$method))
+  expect_equal(attr(filtered_b, 'filters')[[1]]$method$use_groups,FALSE)
+  expect_equal(attr(filtered_b, 'filters')[[1]]$method$use_batch,TRUE)
   
   # Investigate the data_info attribute.
   expect_equal(
@@ -372,7 +377,8 @@ test_that('molecule_filter and applyFilt produce the correct output',{
                    2)
   expect_equal(attr(filtered_g, 'filters')[[1]]$filtered,
                s_pepes)
-  expect_true(is.na(attr(filtered_g, 'filters')[[1]]$method))
+  expect_equal(attr(filtered_g, 'filters')[[1]]$method$use_groups,TRUE)
+  expect_equal(attr(filtered_g, 'filters')[[1]]$method$use_batch,FALSE)
   
   # Investigate the data_info attribute.
   expect_equal(
@@ -460,7 +466,8 @@ test_that('molecule_filter and applyFilt produce the correct output',{
                    2)
   expect_equal(attr(filtered_bg, 'filters')[[1]]$filtered,
                s_pepes)
-  expect_true(is.na(attr(filtered_bg, 'filters')[[1]]$method))
+  expect_equal(attr(filtered_bg, 'filters')[[1]]$method$use_groups,TRUE)
+  expect_equal(attr(filtered_bg, 'filters')[[1]]$method$use_batch,TRUE)
   
   # Investigate the data_info attribute.
   expect_equal(

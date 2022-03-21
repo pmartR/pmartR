@@ -82,8 +82,9 @@ molecule_filter <- function (omicsData,use_groups = FALSE, use_batch = FALSE) {
       dplyr::group_by(across(id_col), Batch) %>%
       dplyr::summarise(num_obs = sum(!is.na(value)),.groups = "keep") %>%
       dplyr::group_by(across(id_col)) %>%
-      dplyr::summarise(min_num_obs = min(num_obs),.groups = "keep") %>%
-      dplyr::ungroup()
+      dplyr::summarise(min_num_obs = as.numeric(min(num_obs)),.groups = "keep") %>%
+      dplyr::ungroup() %>%
+      data.frame()
   }
   
   # SCENARIO 3: use_groups = TRUE, use_batch = FALSE
@@ -98,8 +99,9 @@ molecule_filter <- function (omicsData,use_groups = FALSE, use_batch = FALSE) {
       dplyr::group_by(across(id_col), Group) %>%
       dplyr::summarise(num_obs = sum(!is.na(value)),.groups = "keep") %>%
       dplyr::group_by(across(id_col)) %>%
-      dplyr::summarise(min_num_obs = min(num_obs),.groups = "keep") %>%
-      dplyr::ungroup()
+      dplyr::summarise(min_num_obs = as.numeric(min(num_obs)),.groups = "keep") %>%
+      dplyr::ungroup() %>%
+      data.frame()
   }
   
   # SCENARIO 4: use_groups = TRUE, use_batch = TRUE
@@ -115,8 +117,9 @@ molecule_filter <- function (omicsData,use_groups = FALSE, use_batch = FALSE) {
       dplyr::group_by(across(id_col), Group, Batch) %>%
       dplyr::summarise(num_obs = sum(!is.na(value)),.groups = "keep") %>%
       dplyr::group_by(across(id_col)) %>%
-      dplyr::summarise(min_num_obs = min(num_obs),.groups = "keep") %>%
-      dplyr::ungroup()
+      dplyr::summarise(min_num_obs = as.numeric(min(num_obs)),.groups = "keep") %>%
+      dplyr::ungroup() %>%
+      data.frame()
   }
   
   # change the names of the data.frame
@@ -134,7 +137,8 @@ molecule_filter <- function (omicsData,use_groups = FALSE, use_batch = FALSE) {
   attr(output, "num_samps") <- get_data_info(omicsData)$num_samps
   
   # Fabricate an attribute that states whether or not we have added a batch_id
-  attr(output, "batch_id") <- ifelse(use_batch == FALSE,FALSE,TRUE)
+  attr(output, "use_batch") <- ifelse(use_batch == FALSE,FALSE,TRUE)
+  attr(output, "use_groups") <- ifelse(use_groups == FALSE,FALSE,TRUE)
   
   # Return the completed object!!!
   return(output)
@@ -340,6 +344,8 @@ cv_filter <- function(omicsData, use_groups = TRUE) {
   attr(output, "pooled") <- is_pooled
   attr(output, "max_x_val") <- x.max
   attr(output, "tot_nas") <- tot.nas
+  attr(output, "use_groups") <- ifelse(use_groups == FALSE,FALSE,TRUE)
+  
 
   # Return the completed object. We did it!!!
   return (output)

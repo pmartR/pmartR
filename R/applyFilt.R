@@ -278,13 +278,17 @@ applyFilt.moleculeFilt <- function(filter_object, omicsData, min_num=2){
   # will include the current filter object in the next available space of the
   # filters attribute list.
   n_filters <- length(attr(omicsData, 'filters')) + 1
+  
+  # determine if we have group and batch effects from filter
+  use_batch <- attributes(filter_object)$use_batch
+  use_groups <- attributes(filter_object)$use_groups
 
   # Update the filters attribute.
   attr(omicsData, 'filters')[[n_filters]] <- set_filter(
     type = class(filter_object)[[1]],
     threshold = min_num,
     filtered = filter.edata,
-    method = NA
+    method = list(use_groups = use_groups,use_batch = use_batch)
   )
 
   # RETURN THE FILTERED OMICSDATA OBJECT! YAY!!!
@@ -420,13 +424,16 @@ applyFilt.cvFilt <- function (filter_object, omicsData, cv_threshold = 150) {
   # will include the current filter object in the next available space of the
   # filters attribute list.
   n_filters <- length(attr(omicsData, 'filters')) + 1
-
+  
+  # determine if we have use_groups
+  use_groups <- attributes(filter_object)$use_groups
+  
   # Update the filters attribute.
   attr(omicsData, 'filters')[[n_filters]] <- set_filter(
     type = class(filter_object)[[1]],
     threshold = cv_threshold,
     filtered = filter.edata,
-    method = NA
+    method = list(use_groups = use_groups)
   )
 
   # We did it! Kudos to us!!
