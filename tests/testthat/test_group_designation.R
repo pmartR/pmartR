@@ -42,6 +42,7 @@ test_that('the correct group data frame and attributes are created',{
   expect_equal(attributes(attr(pdata_gdf, 'group_DF'))$nonsingleton_groups,
                c('Infection', 'Mock'))
   expect_null(attributes(attr(pdata_gdf, 'group_DF'))$covariates)
+  expect_null(attributes(attr(pdata_gdf, 'group_DF'))$pairs)
   expect_null(attributes(attr(pdata_gdf, 'group_DF'))$time_course)
 
   # Ensurate the remaining attributes have not changed.
@@ -99,6 +100,7 @@ test_that('the correct group data frame and attributes are created',{
   expect_equal(attributes(attr(pdata_gdf_2, 'group_DF'))$nonsingleton_groups,
                c('Infection_high', 'Infection_low', 'Mock_none'))
   expect_null(attributes(attr(pdata_gdf_2, 'group_DF'))$covariates)
+  expect_null(attributes(attr(pdata_gdf_2, 'group_DF'))$pairs)
   expect_null(attributes(attr(pdata_gdf_2, 'group_DF'))$time_course)
 
   # Ensurate the remaining attributes have not changed.
@@ -159,6 +161,7 @@ test_that('the correct group data frame and attributes are created',{
   expect_equal(attributes(attr(pdata_gdf_2, 'group_DF'))$nonsingleton_groups,
                c('Infection_high', 'Infection_low'))
   expect_null(attributes(attr(pdata_gdf_2, 'group_DF'))$covariates)
+  expect_null(attributes(attr(pdata_gdf_2, 'group_DF'))$pairs)
   expect_null(attributes(attr(pdata_gdf_2, 'group_DF'))$time_course)
 
   # Checkerate the data_info attribute. The elements below should not be the
@@ -327,5 +330,33 @@ test_that('the correct group data frame and attributes are created',{
                                  main_effects = c("Condition", "Level"),
                                  covariates = c("Gender", "Age"),
                                  cov_type = c("character")))
+
+  # Create objects and tests for paired data -----------------------------------
+
+  load(system.file('testdata',
+                   'little_pairdata.RData',
+                   package = 'pmartR'))
+
+  pairdata <- as.pepData(e_data = edata,
+                         f_data = fdata,
+                         e_meta = emeta,
+                         edata_cname = 'Mass_Tag_ID',
+                         fdata_cname = 'Name',
+                         emeta_cname = 'Protein')
+  pairdata <- edata_transform(pairdata,
+                              data_scale = "log")
+  pairdata <- group_designation(pairdata,
+                                main_effects = "Virus",
+                                pairs = "PairID")
+
+  expect_identical(
+    attributes(attr(pairdata, "group_DF")),
+    list(names = c("Name", "Group"),
+         class = "data.frame",
+         row.names = 1:30,
+         main_effects = "Virus",
+         pairs = "PairID",
+         nonsingleton_groups = c("AM", "FM", "Mock"))
+  )
 
 })

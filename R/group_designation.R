@@ -27,6 +27,9 @@
 #'   \code{cov_type} is a class other than numeric this vector will be coerced
 #'   to a character vector. The default value is NULL. In this case the class of
 #'   the covariates is neither checked nor altered.
+#' @param pairs A character string indicating the column in \code{f_data} that
+#'   contains the pairing information. This string must match the column name
+#'   exactly.
 #' @param time_course an optional character string specifying the variable name
 #'   of a time course variable, if applicable to the experimental data.
 #'   CURRENTLY NOT SUPPORTED
@@ -66,6 +69,7 @@
 group_designation <- function (omicsData, main_effects,
                                covariates = NULL,
                                cov_type = NULL,
+                               pairs = NULL,
                                time_course = NULL) {
 
   # Initial checks on input arguments ------------------------------------------
@@ -198,6 +202,55 @@ group_designation <- function (omicsData, main_effects,
         }
 
       }
+
+    }
+
+  }
+
+  # Check pairs ---------------
+
+  # Have a looksie at the pairs argument. If it is present put it through the
+  # usual methods of information extraction and verification.
+  if (!is.null(pairs)) {
+
+    # Check that pairs is a character vector.
+    if (!is.character(pairs)) {
+
+      # Holy inappropriate input type, Batman.
+      stop ("pairs must be a character vector.")
+
+    }
+
+    # Make sure there is only one character string specified.
+    if (length(pairs) > 1) {
+
+      # Holy too many pairs, Batman!
+      stop ("Only one paired variable can be specified.")
+
+    }
+
+    # Make sure the paired variable exists in f_data. How can we subset by
+    # something that doesn't exist?!
+    if (!(pairs %in% names(omicsData$f_data))) {
+
+      # Holy missing variable, Batman!
+      stop ("The variable specified for pairs does not exist in f_data.")
+
+    }
+
+    # Count the number of pair IDs that do not have two entries in f_data.
+    not_two <- which(unname(table(omicsData$f_data[, pairs])) != 2)
+
+    # Ensure each pair has two observations in f_data.
+    if (length(not_two) > 0) {
+
+      pair_id <- names(table(omicsData$f_data[, pairs]))[not_two]
+
+      stop (
+        paste("Pair",
+              pair_id,
+              "does not have the two observations needed to form a pair.")
+      )
 
     }
 
@@ -432,6 +485,11 @@ group_designation <- function (omicsData, main_effects,
   }
 
   attr(output, "covariates") <- holy_covariates_batman
+
+  # Include the name of the variable containing the paired information as an
+  # attribute of group_DF. This will be used in the functions that compute the
+  # difference between each pair.
+  attr(output, "pairs") <- pairs
 
   ### changed to NA Aug 2020 ###
   attr(output, "time_course") = NULL #time_course
