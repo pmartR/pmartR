@@ -549,56 +549,65 @@ anova_test <- function (omicsData, comparisons, pval_adjust,
   # Paired stuffs --------------------------------------------------------------
 
   # If paired==TRUE then use the pairing to create pair adjusted abundances.
-  if(paired){
-    ##--- check for one and only one "pair" column in f_data ----##
-    fdata_names <- tolower(colnames(omicsData$f_data))
-    pair_col <-grep("pair",fdata_names)
-    if(length(pair_col)==0){
-      stop("When `paired=TRUE`, a `Pair` column must be supplied within `f_data`")
-    }else if(length(pair_col)>1){
-      stop("Too many pair ID columns have been provided.  Please remove the redundant one.")
+  if (paired) {
+
+    # Create a catchy name for the paired variable in f_data. The trick is to
+    # make it readable but not too long. For example, using da instead of the
+    # creates a name with one character less. These are the types of tricks you
+    # learn when obtaining an advanced degree.
+    da_pair_name <- attr(attr(omicsData, "group_DF"), "pairs")
+
+    # Make sure the paired column wasn't deleted between calling
+    # group_designation and imd_anova. It is essential that you carry out all of
+    # these tedious checks. The user is generally unstable when it comes to
+    # following instructions. If you don't create all these safeguards they can
+    # really do a number on your hard work. Then they come complaining to you as
+    # if it was your fault they couldn't take the time to read and follow your
+    # very clear (and amazing) instructions.
+    if (!da_pair_name %in% names(omicsData$f_data)) {
+
+      stop ("The pair ID variable is not present in f_data.")
+
+
     }
 
-    ##---- each pair must have two observations ----#
-    not_two <- which(unname(table(omicsData$f_data[,pair_col]))!=2)
-    if(length(not_two)>0){
-      pair_id <- names(table(omicsData$f_data[,pair_col]))[not_two]
-      stop(paste("Pair",pair_id,"does not have the two observations needed to form a pair."))
-    }
+    # New steps for creating pair data:
+    # 1. call function to take differences
+    # 2. nab sample names according to type of data in pairing column
+    # 3. update column (sample) names in data
+    # 4. update groupData according to reduced number of samples in paired data
+    # 5. update cov_data according to reduced number of samples in paired data
 
-    ##---- use the pairing info to form paired differences ------##
-    cols <- c(which(colnames(omicsData$f_data)==samp_cname),pair_col)
-    pid_matrix <- build_pair_mat(pair_df = omicsData$f_data[,cols])
-    #The new "data" are the paired differences, so overwrite data with paried differences
-    data <- fold_change_diff_na_okay(data = data.matrix(omicsData$e_data[,as.character(omicsData$f_data[,samp_cname])]),C = t(pid_matrix))
+    # 1-3.
+    # Take the difference between sample pairs. The columns of this data matrix
+    # have been renamed according to the values in the pair ID column of f_data.
+    data <- take_diff(omicsData)
 
-    #Add columns names
-    if(is.numeric(omicsData$f_data[,pair_col])){
-      colnames(data) <- paste("Pair",omicsData$f_data[,pair_col][apply(pid_matrix,1,function(x)return(any(x>0)))])
-    }else{
-      colnames(data) <- omicsData$f_data[,pair_col][apply(pid_matrix,1,function(x)return(any(x>0)))]
-    }
-    #pid_matrix could potentially be large, delete it
-    rm(pid_matrix)
-
+    # 4.
     # The data has previously been combined into one value (the difference was
-    # taken between each pair). This means groupData also needs to be collapsed.
-    # Otherwise the dimensions of the data matrix and groupData will not match.
-    # There will be twice as many rows in groupData as columns in the data
-    # matrix. Here we will select the first row in groupData while grouping by
-    # the column with the pairing information.
-    groupData <- merge(groupData,omicsData$f_data[,cols],sort = FALSE)
-    groupData <- groupData %>%
-      dplyr::group_by(dplyr::across(tidyselect::contains("pair"))) %>%
-      dplyr::summarize(NewGroup = dplyr::first(Group))
+    # taken between each pair of samples). This means groupData also needs to be
+    # collapsed. Otherwise the dimensions of the data matrix and groupData will
+    # not match and the remaining pipeline will explode because the column names
+    # of e_data will not match the sample names in f_data. There will be twice
+    # as many rows in groupData as columns in the data matrix. Here we will
+    # select the first row in groupData while grouping by the column with the
+    # pairing information.
+    groupData <- merge(
+      groupData,
+      omicsData$f_data[, c(samp_cname, da_pair_name)],
+      sort = FALSE
+    ) %>%
+      dplyr::group_by(!!rlang::sym(da_pair_name)) %>%
+      dplyr::slice(1) %>%
+      data.frame()
 
-    colnames(groupData) <- c(samp_cname,"Group")
-    groupData <- data.frame(groupData)
-    if(is.numeric(omicsData$f_data[,pair_col])){
-      groupData[,which(colnames(groupData)==samp_cname)] <- paste("Pair",groupData[,which(colnames(groupData)==samp_cname)])
-    }
-    #k needs to be updated too
-    k <- length(unique(groupData$Group))
+    # Update the sample names in the groupData object according to the column
+    # names of data (the paired difference data matrix).
+    groupData[, samp_cname] <- colnames(data)
+
+    # Update the number of groups. This should be the same as before but we are
+    # proceeding with an "overabundance of caution".
+    k <- dplyr::n_distinct(groupData$Group)
 
     #If provided, covariate data needs to be updated too
     if (!is.null(covariates)) {
@@ -607,10 +616,11 @@ anova_test <- function (omicsData, comparisons, pval_adjust,
       # The sample ID column will always be the first element of the cols vector
       # and pair ID will always be the second element of that vector.
       cov_data <- dplyr::inner_join(
-        x = omicsData$f_data[, cols],
+        x = omicsData$f_data[, c(samp_cname, da_pair_name)],
         y = attr(attr(omicsData, "group_DF"), "covariates")
       )
 
+      # 5.
       # The data has previously been combined into one value (the difference was
       # taken between each pair). This means the covariate data also needs to be
       # collapsed. Otherwise the dimensions of the data matrix and the covariate
@@ -618,33 +628,18 @@ anova_test <- function (omicsData, comparisons, pval_adjust,
       # each difference. Here we will select the first row in cov_data while
       # grouping by the column with the pairing information.
       cov_data <- cov_data %>%
-        dplyr::group_by(dplyr::across(tidyselect::contains("pair"))) %>%
+        dplyr::group_by(!!rlang::sym(da_pair_name)) %>%
         dplyr::slice(1) %>%
+        # The second column will always be the pair ID column because we created
+        # the cov_data object to be that way above. Remove this column because
+        # it is not needed. We don't need it messing up our hard work in
+        # unpredictable ways in other functions.
+        dplyr::select(-2) %>%
         data.frame()
 
-      # Check if the column with the pairing information is numeric. If it is
-      # the sample names will be changed.
-      if (is.numeric(omicsData$f_data[, pair_col])) {
-
-        # Update the sample ID column with Pair_(pair#) for each sample. For
-        # example, the name for the difference between the first pairs will be
-        # Pair_1. Don't let the simpleness of this naming scheme fool you into
-        # believing that no creativity was used in coming up with this naming
-        # convention.
-        cov_data <- cov_data %>%
-          dplyr::mutate(
-            dplyr::across(
-              .cols = tidyselect::contains(samp_cname),
-              .fns = ~ paste("Pair", cov_data[, 2])
-              # The 2 above is hard coded because of how cov_data is created
-              # when joining omicsData$f_data and the covariates attribute.
-            )
-          ) %>%
-          # Remove the column with the paired IDs.
-          dplyr::select(-2)
-
-      }
-
+      # Update the sample names in the cov_data object according to the column
+      # names of data (the paired difference data matrix).
+      cov_data[, da_pair_name] <- colnames(data)
 
     }
 
@@ -901,6 +896,70 @@ group_comparison_anova <- function(groupData,comparisons,anova_results_full){
   return(group_comp)
 }
 
+#' Compute pairwise differences
+#'
+#' Computes the differences for paired data according to the information in the
+#' pairing column of f_data. This variable name is also an attribute of the
+#' group_DF attribute.
+#'
+#' @param omicsData Any one of the omicsData objects (pepData, metabData, ...).
+#'
+#' @return A data.frame containing the differences between paired samples.
+#'
+#' @author Evan A Martin
+#'
+take_diff <- function (omicsData) {
+
+  # Apprehend the index in f_data for the sample ID and pair ID columns.
+  samp_idx <- which(names(omicsData$f_data) == get_fdata_cname(omicsData))
+  pair_idx <- which(
+    names(omicsData$f_data) == attr(attr(omicsData, "group_DF"), "pairs")
+  )
+
+  # Create a matrix with -1 and 1 in the corresponding rows to calculate the
+  # difference between the paried samples. This matrix is created according to
+  # the column in f_data containing the paired information.
+  pid_matrix <- build_pair_mat(
+    pair_df = omicsData$f_data[, c(samp_idx, pair_idx)]
+  )
+
+  # Find the biomolecule ID index in e_data.
+  bio_idx <- which(
+    names(omicsData$e_data) == get_edata_cname(omicsData)
+  )
+
+  # Compute the differences between paired samples according to the pid matrix.
+  diff_data <- fold_change_diff_na_okay(
+    data = data.matrix(omicsData$e_data[, -bio_idx]),
+    C = t(pid_matrix)
+  )
+
+  # Extract the first occurance of each pair variable in f_data. These will be
+  # used later to rename the columns of diff_data.
+  moniker <- omicsData$f_data %>%
+    dplyr::group_by(dplyr::across(pair_idx)) %>%
+    dplyr::slice(1) %>%
+    dplyr::pull(pair_idx)
+
+  # Check if the data from the pair ID column is numeric. If it is the word
+  # "Pair" will be added before each number. That way data.frame() won't
+  # complain because the column names of the difference data will not be
+  # numbers. Everyone wins!!!
+  if (is.numeric(moniker)) {
+
+    moniker <- paste("Pair", moniker,
+                     sep = "_")
+
+  }
+
+  # Rename the columns of e_data to reflect that the paired differences were
+  # calculated.
+  colnames(diff_data) <- moniker
+
+  return (diff_data)
+
+}
+
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 # IMD FUNCTIONS ----------------------------------------------------------------
@@ -993,12 +1052,20 @@ imd_test <- function (omicsData, comparisons, pval_adjust,
   groupData <- groupData[group_samp_cname%in%colnames(omicsData$e_data),] #Only keep the rows of groupData that have columns in e_data
   #groupData <- dplyr::filter(groupData,SampleID%in%colnames(omicsData$e_data)) #This is faster but too specific to a cname of SampleID
 
+  #!#!#!#!#!#!#!#!#!#!
+  # Start paired portion of code. This section will just handle the creation of
+  # data and gp and it will update groupData if the data are paried. Later on
+  # there will be other sections to further process the data if it is paired.
+
   #Create a data matrix that only includes the samples in "groupData" and put them in the order specified by
   #"groupData"
   data <- omicsData$e_data[,as.character(groupData[,samp_cname])]
 
   #Find the number of times each peptide was absent for each of the experimental groups, matrix of CAk values
   gp <- factor(groupData$Group,labels=1:k,levels=unique(groupData$Group))
+
+  # End paired portion of code.
+  #!#!#!#!#!#!#!#!#!#!
 
   #Number of samples associated with each group
   nK <- as.numeric(table(gp))
