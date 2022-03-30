@@ -11,6 +11,7 @@ imd_test(
   pval_adjust,
   pval_thresh,
   covariates,
+  paired,
   use_parallel
 )
 }

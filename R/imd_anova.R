@@ -196,6 +196,7 @@ imd_anova <- function (omicsData,
                                  pval_adjust = 'none',
                                  pval_thresh = pval_thresh,
                                  covariates = NULL,
+                                 paired = paired,
                                  use_parallel = use_parallel)
     # NOTE: covariates = NULL in the above call to imd_test because the
     # covariate portion of the code is the slowest part of the imd_test
@@ -207,6 +208,7 @@ imd_anova <- function (omicsData,
                                  pval_adjust = pval_adjust_g,
                                  pval_thresh = pval_thresh,
                                  covariates = covariates,
+                                 paired = paired,
                                  use_parallel = use_parallel)
     gtest_pvalues <- imd_results_full$Pvalues
     colnames(gtest_pvalues) <- paste0("P_value_G_",colnames(gtest_pvalues))
@@ -1015,7 +1017,7 @@ take_diff <- function (omicsData) {
 #' Journal of proteome research 9.11 (2010): 5748-5756.
 #'
 imd_test <- function (omicsData, comparisons, pval_adjust,
-                      pval_thresh, covariates, use_parallel) {
+                      pval_thresh, covariates, paired, use_parallel) {
 
   # check that omicsData is of the appropriate class
   if(!inherits(omicsData, c("proData","pepData","lipidData", "metabData", "nmrData"))) stop("omicsData is not an object of appropriate class")
@@ -1052,20 +1054,13 @@ imd_test <- function (omicsData, comparisons, pval_adjust,
   groupData <- groupData[group_samp_cname%in%colnames(omicsData$e_data),] #Only keep the rows of groupData that have columns in e_data
   #groupData <- dplyr::filter(groupData,SampleID%in%colnames(omicsData$e_data)) #This is faster but too specific to a cname of SampleID
 
-  #!#!#!#!#!#!#!#!#!#!
-  # Start paired portion of code. This section will just handle the creation of
-  # data and gp and it will update groupData if the data are paried. Later on
-  # there will be other sections to further process the data if it is paired.
-
-  #Create a data matrix that only includes the samples in "groupData" and put them in the order specified by
-  #"groupData"
+  # Create a data matrix that only includes the samples in "groupData" and put
+  # them in the order specified by "groupData"
   data <- omicsData$e_data[,as.character(groupData[,samp_cname])]
 
-  #Find the number of times each peptide was absent for each of the experimental groups, matrix of CAk values
+  # Find the number of times each peptide was absent for each of the
+  # experimental groups, matrix of CAk values
   gp <- factor(groupData$Group,labels=1:k,levels=unique(groupData$Group))
-
-  # End paired portion of code.
-  #!#!#!#!#!#!#!#!#!#!
 
   #Number of samples associated with each group
   nK <- as.numeric(table(gp))
@@ -1123,8 +1118,8 @@ imd_test <- function (omicsData, comparisons, pval_adjust,
   # removes the zero counts)
   if(k==2){
 
-    # Determine if covariates should be accounted for.
-    if (is.null(covariates)) {
+    # Determine if covariates/paired data should be accounted for.
+    if (is.null(covariates) || paired) {
 
       pairwise_stats <- data.frame(Global_Gk)
       pairwise_pvals <- data.frame(Global_results$p_value)
@@ -1134,8 +1129,10 @@ imd_test <- function (omicsData, comparisons, pval_adjust,
       interim <- imd_cov(
         data = omicsData$e_data[, -edataIdx],
         groupData = groupData,
+        fdata = omicsData$f_data,
         cmat = cmat,
         covariates = covariates,
+        paired = paired,
         use_parallel = use_parallel
       )
 
@@ -1158,7 +1155,8 @@ imd_test <- function (omicsData, comparisons, pval_adjust,
 
   }else{
 
-    if (is.null(covariates)) {
+    # Determine if covariates/paired data should be accounted for.
+    if (is.null(covariates) || paired) {
 
       pairwise_gk <- group_comparison_imd(groupData,comparisons,observed,absent)
       pairwise_stats <- data.frame(pairwise_gk$GStats)
@@ -1171,8 +1169,10 @@ imd_test <- function (omicsData, comparisons, pval_adjust,
       interim <- imd_cov(
         data = omicsData$e_data[, -edataIdx],
         groupData = groupData,
+        fdata = omicsData$f_data,
         cmat = cmat,
         covariates = covariates,
+        paired = paired,
         use_parallel = use_parallel
       )
 
@@ -1287,15 +1287,20 @@ group_comparison_imd <- function(groupData,comparisons,observed,absent){
   return(list(GStats=Gstats,pvalues=pvals,signs=signs))
 }
 
-# imd_cov carries out pairwise G-tests on the groups specified in comparisons
+# imd_cov carries out pairwise G-tests on all possible pairs of groups
+# accounting for covariates and (when present) paired samples.
 #
 # @param data The e_data object without the biomolecule ID column.
 #
 # @param groupData The group_DF attribute.
 #
+# @param fdata The f_data object. This will only be used if the data are paired.
+#
 # @param cmat A list output by the create_c_matrix function.
 #
 # @param covariates A character vector specifying the covariates.
+#
+# @param paired A logical value indicating whether the data is paired.
 #
 # @param use_parallel A logical value indicating whether or not to use a
 #   "doParallel" loop when running the G-Test with covariates. The default is
@@ -1306,11 +1311,18 @@ group_comparison_imd <- function(groupData,comparisons,observed,absent){
 #   contains the corresponding p-values.
 #
 # @Author Evan A Martin
-imd_cov <- function (data, groupData, cmat, covariates, use_parallel) {
+imd_cov <- function (data, groupData, fdata, cmat,
+                     covariates, paired, use_parallel) {
 
-  # Create an object that will correctly subset the anova output given the
-  # number of covariates present.
-  if (length(covariates) == 1) {
+  # Create an object that will correctly subset the anova(glm()) output given
+  # the number of covariates present.
+  if (paired && is.null(covariates)) {
+    gem <- 3
+  } else if (paired && length(covariates) == 1) {
+    gem <- 4
+  } else if (paired && length(covariates) == 2) {
+    gem <- 5
+  } else if (!paired && length(covariates) == 1) {
     gem <- 3
   } else {
     gem <- 4
@@ -1319,6 +1331,9 @@ imd_cov <- function (data, groupData, cmat, covariates, use_parallel) {
   # Lay hold on the appropriate indices of covariates attribute of the groupData
   # object using the names of the covariates in the input.
   covIdx <- which(colnames(attr(groupData, "covariates")) %in% covariates)
+
+  # Snag the index of the pair ID variable in f_data.
+  pairIdx <- which(names(fdata) == attr(groupData, "pairs"))
 
   # Create a list for the test statistics and p-values from anova for each
   # pairwise test.
@@ -1352,9 +1367,61 @@ imd_cov <- function (data, groupData, cmat, covariates, use_parallel) {
 
     nova <- foreach::foreach(v = 1:nrow(data)) %dopar% {
 
-      # Run anova and glm depending on the number of covariates present.
-      if (gem == 3) {
+      # Account for paired data when covariates are NOT present.
+      if (paired && is.null(covariates)) {
 
+        # Run the G-test with the pairing information and no covariates.
+        suppressWarnings(
+          ninja <- anova(
+            glm(
+              as.numeric(!is.na(data[v, groupIdx])) ~
+                factor(fdata[groupIdx, pairIdx]) +
+                groupData$Group[groupIdx],
+              family = binomial
+            ),
+            test = "Chisq"
+          )
+        )
+
+        # Account for paired data and one covariate.
+      } else if (paired && length(covariates) == 1) {
+
+        # Run the G-test with the pairing information and the covariate.
+        suppressWarnings(
+          ninja <- anova(
+            glm(
+              as.numeric(!is.na(data[v, groupIdx])) ~
+                factor(fdata[groupIdx, pairIdx]) +
+                attr(groupData, "covariates")[groupIdx, covIdx] +
+                groupData$Group[groupIdx],
+              family = binomial
+            ),
+            test = "Chisq"
+          )
+        )
+
+        # Account for paired data and two covariates.
+      } else if (paired && length(covariates) == 2) {
+
+        # Run the G-test with the pairing information and the covariates.
+        suppressWarnings(
+          ninja <- anova(
+            glm(
+              as.numeric(!is.na(data[v, groupIdx])) ~
+                factor(fdata[groupIdx, pairIdx]) +
+                attr(groupData, "covariates")[groupIdx, covIdx[[1]]] +
+                attr(groupData, "covariates")[groupIdx, covIdx[[2]]] +
+                groupData$Group[groupIdx],
+              family = binomial
+            ),
+            test = "Chisq"
+          )
+        )
+
+        # Account for one covariate when data are NOT paired.
+      } else if (!paired && length(covariates) == 1) {
+
+        # Run the G-test with one covariate.
         suppressWarnings(
           ninja <- anova(
             glm(
@@ -1367,8 +1434,10 @@ imd_cov <- function (data, groupData, cmat, covariates, use_parallel) {
           )
         )
 
+        # Account for two covariates when data are NOT paired.
       } else {
 
+        # Run the G-test with two covariates.
         suppressWarnings(
           ninja <- anova(
             glm(
@@ -1384,6 +1453,7 @@ imd_cov <- function (data, groupData, cmat, covariates, use_parallel) {
 
       }
 
+      # Snag the test statistic and p-value from the anova(glm()) output.
       dragon <- data.frame(daStats = ninja$Deviance[[gem]],
                            daPvals = ninja$`Pr(>Chi)`[[gem]])
 
