@@ -66,7 +66,8 @@
 #'
 #' @export
 #'
-group_designation <- function (omicsData, main_effects,
+group_designation <- function (omicsData,
+                               main_effects = NULL,
                                covariates = NULL,
                                cov_type = NULL,
                                pairs = NULL,
@@ -101,33 +102,60 @@ group_designation <- function (omicsData, main_effects,
 
   # Check main_effects ---------------
 
-  # Check that main_effects is a character vector #
-  if (!is.character(main_effects)) {
+  # A main effect does not need to be supplied if a pairing variable is.
+  if (is.null(main_effects) && is.null(pairs)) {
 
-   # Stop production with a character vector error.
-    stop ("main_effects must be a character vector.")
-
-  }
-
-  # Check that main_effects is of an appropriate length. The point is to be like
-  # Goldilocks.
-  if (length(main_effects) < 1) {
-
-   # Error out with too few main effects.
-    stop("No main effects were provided")
-
-  }
-  if (length(main_effects) > 2) {
-
-   # Error out with too many main effects.
-    stop ("No more than two main effects can be provided")
+    # A main effect must be specified unless a pairs variable is specified.
+    stop (
+      paste("A main effect must be specified unless the data are paired.",
+            "In the case of paired data 'pairs' must be specified if",
+            "there are no main effects.",
+            sep = " ")
+    )
 
   }
 
-  # Check that main_effects given are in f_data #
-  if (sum(main_effects %in% names(omicsData$f_data)) != length(main_effects)) {
+  # Check if any main effects have been provided.
+  if (!is.null(main_effects)) {
 
-    stop("One or more of the main_effects is not found in f_data of omicsData")
+    # Make sure the user does not use the forbidden main effect name. We must
+    # defend the secrets of pmartR!
+    if ("no_main_effects" %in% main_effects) {
+
+      # Stop! You shall not pass!
+      stop ("The name 'no_main_effects' cannot be used as a main effect name.")
+
+    }
+
+    # Check that main_effects is a character vector #
+    if (!is.character(main_effects)) {
+
+      # Stop production with a character vector error.
+      stop ("main_effects must be a character vector.")
+
+    }
+
+    # Check that main_effects is of an appropriate length. The point is to be
+    # like Goldilocks.
+    if (length(main_effects) < 1) {
+
+      # Error out with too few main effects.
+      stop("No main effects were provided")
+
+    }
+    if (length(main_effects) > 2) {
+
+      # Error out with too many main effects.
+      stop ("No more than two main effects can be provided")
+
+    }
+
+    # Check that main_effects given are in f_data #
+    if (sum(main_effects %in% names(omicsData$f_data)) != length(main_effects)) {
+
+      stop("One or more of the main_effects is not found in f_data of omicsData")
+
+    }
 
   }
 
@@ -254,6 +282,108 @@ group_designation <- function (omicsData, main_effects,
 
     }
 
+    # Check that the main effect(s) are the same for each pair.
+    if (!is.null(main_effects)) {
+
+      # If there are two main effects create a new variable where the main
+      # effects are combined with a "_" between them.
+      if (length(main_effects) == 2) {
+
+        # Count the number of unique combined main effect values for each pair.
+        # The format for combined main effects is me1_me2.
+        reprobates <- omicsData$f_data %>%
+          dplyr::rowwise() %>%
+          dplyr::mutate(
+            both_me = paste(!!rlang::sym(main_effects[[1]]),
+                            !!rlang::sym(main_effects[[2]]),
+                            sep = "_")
+          ) %>%
+          dplyr::ungroup() %>%
+          dplyr::group_by(!!rlang::sym(pairs)) %>%
+          dplyr::mutate(n_me = dplyr::n_distinct(both_me)) %>%
+          dplyr::ungroup() %>%
+          dplyr::filter(n_me > 1) %>%
+          dplyr::pull(get_fdata_cname(omicsData))
+
+        # Use the main effect variable directly (only one main effect exists).
+      } else {
+
+        # Count the number of unique main effect values for each pair.
+        reprobates <- omicsData$f_data %>%
+          dplyr::group_by(!!rlang::sym(pairs)) %>%
+          dplyr::mutate(
+            n_me = dplyr::n_distinct(!!rlang::sym(main_effects))
+          ) %>%
+          dplyr::ungroup() %>%
+          dplyr::filter(n_me > 1) %>%
+          dplyr::pull(get_fdata_cname(omicsData))
+
+      }
+
+      # Check if some main effects differ between pairs.
+      if (length(reprobates) > 0) {
+
+        # Let them have it for making my life miserable.
+        stop (paste("The following samples have main effects that differ",
+                    "between pairs:",
+                    knitr::combine_words(reprobates),
+                    sep = " "))
+
+      }
+
+    }
+
+    # Check that the covariate(s) are the same for each pair.
+    if (!is.null(covariates)) {
+
+      # If there are two covariates create a new variable where the covariates
+      # are combined with a "_" between them.
+      if (length(covariates) == 2) {
+
+        # Count the number of unique combined covariate values for each pair.
+        # The format for combined covariates is cov1_cov2.
+        reprobates <- omicsData$f_data %>%
+          dplyr::rowwise() %>%
+          dplyr::mutate(
+            both_cov = paste(!!rlang::sym(covariates[[1]]),
+                             !!rlang::sym(covariates[[2]]),
+                             sep = "_")
+          ) %>%
+          dplyr::ungroup() %>%
+          dplyr::group_by(!!rlang::sym(pairs)) %>%
+          dplyr::mutate(n_cov = dplyr::n_distinct(both_cov)) %>%
+          dplyr::ungroup() %>%
+          dplyr::filter(n_cov > 1) %>%
+          dplyr::pull(get_fdata_cname(omicsData))
+
+        # Use the covariate variable directly (only one covariate exists).
+      } else {
+
+        # Count the number of unique covariate values for each pair.
+        reprobates <- omicsData$f_data %>%
+          dplyr::group_by(!!rlang::sym(pairs)) %>%
+          dplyr::mutate(
+            n_cov = dplyr::n_distinct(!!rlang::sym(covariates))
+          ) %>%
+          dplyr::ungroup() %>%
+          dplyr::filter(n_cov > 1) %>%
+          dplyr::pull(get_fdata_cname(omicsData))
+
+      }
+
+      # Check if some covariates differ between pairs.
+      if (length(reprobates) > 0) {
+
+        # Let them have it for making my life miserable.
+        stop (paste("The following samples have covariates that differ",
+                    "between pairs:",
+                    knitr::combine_words(reprobates),
+                    sep = " "))
+
+      }
+
+    }
+
   }
 
   # Check time_course ---------------
@@ -296,6 +426,23 @@ group_designation <- function (omicsData, main_effects,
   }
 
   # Create the group data frame and attributes ---------------------------------
+
+  # If no main effect was provided but the data are paired create a substitute
+  # main effects variable with just one level.
+  if (is.null(main_effects) && !is.null(pairs)) {
+
+    # Add a main effect name. This will be used as a place holder because later
+    # in this function and downstream functions expect a main effect variable to
+    # be present.
+    main_effects <- "no_main_effect"
+
+    # Create a main effect with just one level. I tried to select something that
+    # won't show up as an actual main effect level in someone's study. However,
+    # this rarely goes well and someone at some point will come crying to us
+    # because pmartR is giving them crazy output and/or errors.
+    omicsData$f_data$no_main_effect <- "zzzz"
+
+  }
 
   # pull sample id column name #
   samp_id <- get_fdata_cname(omicsData)

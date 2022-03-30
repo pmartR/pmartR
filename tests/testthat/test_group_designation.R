@@ -331,12 +331,13 @@ test_that('the correct group data frame and attributes are created',{
                                  covariates = c("Gender", "Age"),
                                  cov_type = c("character")))
 
-  # Create objects and tests for paired data -----------------------------------
+  # Create objects for paired data ---------------------------------------------
 
   load(system.file('testdata',
                    'little_pairdata.RData',
                    package = 'pmartR'))
 
+  # Create a pepData object with the original main effect and pairing variable.
   pairdata <- as.pepData(e_data = edata,
                          f_data = fdata,
                          e_meta = emeta,
@@ -345,18 +346,120 @@ test_that('the correct group data frame and attributes are created',{
                          emeta_cname = 'Protein')
   pairdata <- edata_transform(pairdata,
                               data_scale = "log")
-  pairdata <- group_designation(pairdata,
-                                main_effects = "Virus",
-                                pairs = "PairID")
 
+  # Create additional an additional main effect.
+  pairdata_2_me <- pairdata
+  pairdata_2_me$f_data$subclass <- c(
+    rep(c("one", "one", "two", "two", "one"), 2),
+    rep(c("two", "two", "two", "one", "one"), 2),
+    rep(c("two", "two", "one", "one", "two"), 2)
+  )
+
+  # Generate a covariate.
+  set.seed(12)
+  pairdata_cov <- pairdata
+  pairdata_cov$f_data$age <- c(
+    rep(sample(runif(5)), 2),
+    rep(sample(runif(5)), 2),
+    rep(sample(runif(5)), 2)
+  )
+
+  # Create a scenario where one of the main effects does not match between the
+  # two pairs.
+  pairdata_bad_me <- pairdata_2_me
+  pairdata_bad_me$f_data$subclass[[7]] <- "five"
+
+  # Make a situation where the covariate is not the same for a pair.
+  pairdata_bad_cov <- pairdata_cov
+  pairdata_bad_cov$f_data$age[[29]] <- rcauchy(1)
+
+  # Holy paired group designation tests, Batman --------------------------------
+
+  # One main effect.
   expect_identical(
-    attributes(attr(pairdata, "group_DF")),
+    attributes(
+      attr(group_designation(pairdata,
+                             main_effects = "Virus",
+                             pairs = "PairID"),
+           "group_DF")
+    ),
     list(names = c("Name", "Group"),
          class = "data.frame",
          row.names = 1:30,
          main_effects = "Virus",
          pairs = "PairID",
          nonsingleton_groups = c("AM", "FM", "Mock"))
+  )
+
+  # Two main effects.
+  expect_identical(
+    attributes(
+      attr(group_designation(pairdata_2_me,
+                             main_effects = c("Virus", "subclass"),
+                             pairs = "PairID"),
+           "group_DF")
+    ),
+    list(names = c("Name", "Group", "Virus", "subclass"),
+         class = "data.frame",
+         row.names = 1:30,
+         main_effects = c("Virus", "subclass"),
+         pairs = "PairID",
+         nonsingleton_groups = c("AM_one", "AM_two", "FM_one",
+                                 "FM_two", "Mock_one", "Mock_two"))
+  )
+
+  # No main effects.
+  expect_identical(
+    attributes(
+      attr(group_designation(pairdata,
+                             pairs = "PairID"),
+           "group_DF")
+    ),
+    list(names = c("Name", "Group"),
+         class = "data.frame",
+         row.names = 1:30,
+         main_effects = "no_main_effect",
+         pairs = "PairID",
+         nonsingleton_groups = "zzzz")
+  )
+
+  expect_identical(
+    attributes(
+      attr(group_designation(pairdata_cov,
+                             main_effects = "Virus",
+                             covariates = "age",
+                             pairs = "PairID"),
+           "group_DF")
+    ),
+    list(names = c("Name", "Group"),
+         class = "data.frame",
+         row.names = 1:30,
+         main_effects = "Virus",
+         covariates = data.frame(
+           Name = fdata$Name,
+           age = pairdata_cov$f_data$age
+         ),
+         pairs = "PairID",
+         nonsingleton_groups = c("AM", "FM", "Mock"))
+  )
+
+  expect_error(
+      group_designation(pairdata_bad_me,
+                             main_effects = c("Virus", "subclass"),
+                             pairs = "PairID"),
+    paste("The following samples have main effects that differ between",
+          "pairs: Mock_0hr_2 and Mock_18hr_2",
+          sep = " ")
+  )
+
+  expect_error(
+    group_designation(pairdata_bad_cov,
+                      main_effects = "Virus",
+                      covariates = "age",
+                      pairs = "PairID"),
+    paste("The following samples have covariates that differ between",
+          "pairs: AM_0hr_4 and AM_18hr_4",
+          sep = " ")
   )
 
 })

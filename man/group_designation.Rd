@@ -7,7 +7,7 @@ Specified Main Effects}
 \usage{
 group_designation(
   omicsData,
-  main_effects,
+  main_effects = NULL,
   covariates = NULL,
   cov_type = NULL,
   pairs = NULL,
