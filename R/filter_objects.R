@@ -136,6 +136,9 @@ molecule_filter <- function (omicsData,use_groups = FALSE, use_batch = FALSE) {
   # to filter e_data using a threshold larger than the number of samples.
   attr(output, "num_samps") <- get_data_info(omicsData)$num_samps
   
+  # Add the group designation information to the attributes.
+  attr(output, "group_DF") <- attr(omicsData, "group_DF")
+  
   # Fabricate an attribute that states whether or not we have added a batch_id
   attr(output, "use_batch") <- ifelse(use_batch == FALSE,FALSE,TRUE)
   attr(output, "use_groups") <- ifelse(use_groups == FALSE,FALSE,TRUE)
@@ -340,6 +343,9 @@ cv_filter <- function(omicsData, use_groups = TRUE) {
   orig_class <- class(output)
 
   class(output) <- c("cvFilt", orig_class)
+  
+  # Add the group designation information to the attributes.
+  attr(output, "group_DF") <- attr(omicsData, "group_DF")
 
   attr(output, "pooled") <- is_pooled
   attr(output, "max_x_val") <- x.max
@@ -1379,6 +1385,8 @@ imdanova_filter <- function (omicsData) {
 
   orig_class <- class(output)
   class(output) <- c("imdanovaFilt", orig_class)
+  
+  
 
   attr(output, "group_sizes") <- nonmiss_per_group$group_sizes
   # KS added attribute for nonsingleton groups 12/3/2020 #
@@ -1670,6 +1678,9 @@ custom_filter <- function (omicsData,
   # Save the entire omicsData object as an attribute. This is used in the
   # summary.customFilt method.
   attr(filter_object, "omicsData") = omicsData # added 12/5/2017 by KS #
+  
+  # Add the group designation information to the attributes.
+  attr(filter_object, "group_DF") <- attr(omicsData, "group_DF")
 
   # Return the customated filter object. Good on us!!!
   return (filter_object)

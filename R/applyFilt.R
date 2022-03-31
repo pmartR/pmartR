@@ -389,6 +389,7 @@ applyFilt.cvFilt <- function (filter_object, omicsData, cv_threshold = 150) {
                           "main_effects"),
       covariates = names(attr(get_group_DF(omicsData),
                               "covariates"))[-1],
+      batch_id = names(attr(get_group_DF(omicsData),"batch_id"))[-1],
       time_course = attr(get_group_DF(omicsData),
                          "time_course")
     )
@@ -544,6 +545,7 @@ applyFilt.rmdFilt <- function (filter_object, omicsData,
                           "main_effects"),
       covariates = names(attr(get_group_DF(omicsData),
                               "covariates"))[-1],
+      batch_id = names(attr(get_group_DF(omicsData),"batch_id"))[-1],
       time_course = attr(get_group_DF(omicsData),
                          "time_course")
     )
@@ -796,6 +798,7 @@ applyFilt.proteomicsFilt <- function (filter_object,
                           "main_effects"),
       covariates = names(attr(get_group_DF(omicsData),
                               "covariates"))[-1],
+      batch_id = names(attr(get_group_DF(omicsData),"batch_id"))[-1],
       time_course = attr(get_group_DF(omicsData),
                          "time_course")
     )
@@ -1181,6 +1184,7 @@ applyFilt.imdanovaFilt <- function (filter_object,
                           "main_effects"),
       covariates = names(attr(get_group_DF(omicsData),
                               "covariates"))[-1],
+      batch_id = names(attr(get_group_DF(omicsData),"batch_id"))[-1],
       time_course = attr(get_group_DF(omicsData),
                          "time_course")
     )
@@ -1357,6 +1361,7 @@ applyFilt.customFilt <- function (filter_object, omicsData) {
                           "main_effects"),
       covariates = names(attr(get_group_DF(omicsData),
                               "covariates"))[-1],
+      batch_id = names(attr(get_group_DF(omicsData),"batch_id"))[-1],
       time_course = attr(get_group_DF(omicsData),
                          "time_course")
     )
