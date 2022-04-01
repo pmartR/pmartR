@@ -51,7 +51,7 @@ test_that('nonmissing_per_grp correctly counts non-missing values by group',{
   e_data <- pdata$e_data[, -1]
   
   # Run nonmissing_per_grp with the columns in the original order.
-  nonmissing <- nonmissing_per_grp(as.matrix(e_data),
+  nonmissing <- pmartR:::nonmissing_per_grp(as.matrix(e_data),
                                    group_dat)
   
   # Check the counts for each column in nonmissing are correct.
@@ -75,7 +75,7 @@ test_that('nonmissing_per_grp correctly counts non-missing values by group',{
   e_data_s <- e_data_s[, order(groupDF_s$Group)]
   
   # Run nonmissing_per_grp with the column order scrambled and then reordered.
-  nonmissing_s <- nonmissing_per_grp(as.matrix(e_data_s),
+  nonmissing_s <- pmartR:::nonmissing_per_grp(as.matrix(e_data_s),
                                    group_dat_s)
   
   # Check the counts for each column in nonmissing_s match those from before.

@@ -2022,6 +2022,9 @@ plot.moleculeFilt <- function (filter_obj, min_num = NULL, cumulative = TRUE,
   # values that will be updated depending on input
   fill <- 0
   hline <- NULL
+  # create a TRUE/FALSE for if we are working with batch or not
+  use_batch <- attributes(filter_obj)$use_batch
+  use_groups <- attributes(filter_obj)$use_groups
 
   if(cumulative) {
     # cumulative counts (>=)
@@ -2045,13 +2048,23 @@ plot.moleculeFilt <- function (filter_obj, min_num = NULL, cumulative = TRUE,
       yintercept = counts[min_num],
       linetype = "dashed"
     ) else NULL
-
-    xlabel <- if (is.null(x_lab)) "Number of samples" else x_lab
+    
+    xlabel <- if (is.null(x_lab)){
+      if(!use_batch & !use_groups) "Number of Samples"
+      else if(use_batch & !use_groups) "Number of Samples per Batch"
+      else if(!use_batch & use_groups) "Number of Samples per Group"
+      else "Number of Samples per Batch per Group"
+    }
 
     ylabel <- ifelse(is.null(y_lab), "Count of Biomolecules", y_lab)
 
-    plot_title <- if (is.null(title_lab))
-      "Count of biomolecules observed in at least X number of samples" else
+    plot_title <- if (is.null(title_lab)){
+      if(!use_batch & !use_groups) "Count of biomolecules observed in at least X number of samples"
+      else if(use_batch & !use_groups) "Minimum count of biomolecules observed in at least X number of samples per batch"
+      else if(!use_batch & use_groups) "Minimum count of biomolecules observed in at least X number of samples per group"
+      else "Minimum count of biomolecules observed in at least X number of samples per batch per group"
+    }
+       else
         title_lab
 
   } else if (!cumulative) {
@@ -2143,7 +2156,7 @@ plot.moleculeFilt <- function (filter_obj, min_num = NULL, cumulative = TRUE,
   # Add the theme elements to the plot.
   p <- p +
     ggplot2::theme(
-      plot.title = ggplot2::element_text(size = title_lab_size),
+      plot.title = ggplot2::element_text(size = ifelse(use_batch|use_groups,11,title_lab_size)),
       axis.title.x = ggplot2::element_text(size = x_lab_size),
       axis.title.y = ggplot2::element_text(size = y_lab_size),
       axis.text.x = ggplot2::element_text(angle = x_lab_angle, hjust = 1),

@@ -308,7 +308,8 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
          prop_missing = (sum(is.na(aFiltered$e_data)) /
                            prod(dim(aFiltered$e_data[, -1]))),
          num_samps = ncol(aFiltered$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
 
   # Explorate the meta_info attribute.
@@ -368,7 +369,8 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
          prop_missing = (sum(is.na(gFiltered$e_data)) /
                            prod(dim(gFiltered$e_data[, -1]))),
          num_samps = ncol(gFiltered$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
 
   # Explorate the meta_info attribute.
@@ -428,7 +430,8 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
          prop_missing = (sum(is.na(bFiltered$e_data)) /
                            prod(dim(bFiltered$e_data[, -1]))),
          num_samps = ncol(bFiltered$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
 
   # Explorate the meta_info attribute.
@@ -489,7 +492,8 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
          prop_missing = (sum(is.na(filtered_ne$e_data)) /
                            prod(dim(filtered_ne$e_data[, -1]))),
          num_samps = ncol(filtered_ne$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
 
   # Explorate the meta_info attribute.
@@ -561,7 +565,8 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
          prop_missing = (sum(is.na(aFiltered_sg$e_data)) /
                            prod(dim(aFiltered_sg$e_data[, -1]))),
          num_samps = ncol(aFiltered_sg$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
 
   # Explorate the meta_info attribute.
@@ -625,7 +630,8 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
          prop_missing = (sum(is.na(gFiltered_sg$e_data)) /
                            prod(dim(gFiltered_sg$e_data[, -1]))),
          num_samps = ncol(gFiltered_sg$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
 
   # Explorate the meta_info attribute.
@@ -689,7 +695,8 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
          prop_missing = (sum(is.na(bFiltered_sg$e_data)) /
                            prod(dim(bFiltered_sg$e_data[, -1]))),
          num_samps = ncol(bFiltered_sg$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
 
   # Explorate the meta_info attribute.
@@ -764,7 +771,8 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
          prop_missing = (sum(is.na(aFiltered_sg_f$e_data)) /
                            prod(dim(aFiltered_sg_f$e_data[, -1]))),
          num_samps = ncol(aFiltered_sg_f$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
 
   # Explorate the meta_info attribute.
@@ -841,7 +849,8 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
          prop_missing = (sum(is.na(gFiltered_sg_f$e_data)) /
                            prod(dim(gFiltered_sg_f$e_data[, -1]))),
          num_samps = ncol(gFiltered_sg_f$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
 
   # Explorate the meta_info attribute.
@@ -919,7 +928,8 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
          prop_missing = (sum(is.na(bFiltered_sg_f$e_data)) /
                            prod(dim(bFiltered_sg_f$e_data[, -1]))),
          num_samps = ncol(bFiltered_sg_f$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
 
   # Explorate the meta_info attribute.

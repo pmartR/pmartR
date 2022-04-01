@@ -205,7 +205,8 @@ test_that('normalize_nmr produces the correct output',{
                     num_miss_obs = 0,
                     prop_missing = 0,
                     num_samps = 41,
-                    data_types = NULL))
+                    data_types = NULL,
+                    batch_info = list(is_bc = FALSE)))
   expect_equal(
     attr(spec1, "nmr_info"),
     list(metabolite_name = "unkm1.53",
@@ -235,7 +236,8 @@ test_that('normalize_nmr produces the correct output',{
                     num_miss_obs = 0,
                     prop_missing = 0,
                     num_samps = 41,
-                    data_types = NULL))
+                    data_types = NULL,
+                    batch_info = list(is_bc = FALSE)))
   expect_equal(
     attr(spec2, "nmr_info"),
     list(metabolite_name = NULL,
@@ -302,7 +304,8 @@ test_that('normalize_nmr produces the correct output',{
                     num_miss_obs = 0,
                     prop_missing = 0,
                     num_samps = 41,
-                    data_types = NULL))
+                    data_types = NULL,
+                    batch_info = list(is_bc = FALSE)))
   expect_equal(
     attr(spec1_log, "nmr_info"),
     list(metabolite_name = "unkm1.53",
@@ -332,7 +335,8 @@ test_that('normalize_nmr produces the correct output',{
                     num_miss_obs = 0,
                     prop_missing = 0,
                     num_samps = 41,
-                    data_types = NULL))
+                    data_types = NULL,
+                    batch_info = list(is_bc = FALSE)))
   expect_equal(
     attr(spec2_log, "nmr_info"),
     list(metabolite_name = NULL,
@@ -391,7 +395,8 @@ test_that('normalize_nmr produces the correct output',{
                     num_miss_obs = 0,
                     prop_missing = 0,
                     num_samps = 41,
-                    data_types = NULL))
+                    data_types = NULL,
+                    batch_info = list(is_bc = FALSE)))
   expect_equal(
     attr(spec1_bt, "nmr_info"),
     list(metabolite_name = "unkm1.53",
@@ -421,7 +426,8 @@ test_that('normalize_nmr produces the correct output',{
                     num_miss_obs = 0,
                     prop_missing = 0,
                     num_samps = 41,
-                    data_types = NULL))
+                    data_types = NULL,
+                    batch_info = list(is_bc = FALSE)))
   expect_equal(
     attr(spec2_bt, "nmr_info"),
     list(metabolite_name = NULL,
@@ -478,7 +484,8 @@ test_that('normalize_nmr produces the correct output',{
                     num_miss_obs = 0,
                     prop_missing = 0,
                     num_samps = 41,
-                    data_types = NULL))
+                    data_types = NULL,
+                    batch_info = list(is_bc = FALSE)))
   expect_equal(
     attr(spec1_log_bt, "nmr_info"),
     list(metabolite_name = "unkm1.53",
@@ -508,7 +515,8 @@ test_that('normalize_nmr produces the correct output',{
                     num_miss_obs = 0,
                     prop_missing = 0,
                     num_samps = 41,
-                    data_types = NULL))
+                    data_types = NULL,
+                    batch_info = list(is_bc = FALSE)))
   expect_equal(
     attr(spec2_log_bt, "nmr_info"),
     list(metabolite_name = NULL,
@@ -604,7 +612,8 @@ test_that('normalize_nmr produces the correct output',{
                     num_miss_obs = 0,
                     prop_missing = 0,
                     num_samps = 41,
-                    data_types = NULL))
+                    data_types = NULL,
+                    batch_info = list(is_bc = FALSE)))
   expect_equal(attr(spec2_l, "meta_info"),
                list(meta_data = TRUE,
                     num_emeta = 38))
@@ -623,7 +632,8 @@ test_that('normalize_nmr produces the correct output',{
                     num_miss_obs = 0,
                     prop_missing = 0,
                     num_samps = 41,
-                    data_types = NULL))
+                    data_types = NULL,
+                    batch_info = list(is_bc = FALSE)))
   expect_equal(attr(spec2_a, "meta_info"),
                list(meta_data = TRUE,
                     num_emeta = 38))
@@ -693,7 +703,8 @@ test_that('normalize_nmr produces the correct output',{
                     num_miss_obs = 0,
                     prop_missing = 0,
                     num_samps = 41,
-                    data_types = NULL))
+                    data_types = NULL,
+                    batch_info = list(is_bc = FALSE)))
   expect_equal(attr(spec2_l_bt, "meta_info"),
                list(meta_data = TRUE,
                     num_emeta = 38))
@@ -712,7 +723,8 @@ test_that('normalize_nmr produces the correct output',{
                     num_miss_obs = 0,
                     prop_missing = 0,
                     num_samps = 41,
-                    data_types = NULL))
+                    data_types = NULL,
+                    batch_info = list(is_bc = FALSE)))
   expect_equal(attr(spec2_a_bt, "meta_info"),
                list(meta_data = TRUE,
                     num_emeta = 38))
@@ -721,13 +733,13 @@ test_that('normalize_nmr produces the correct output',{
   # Test mutate_fdata ----------------------------------------------------------
   
   # Inspect output when the original data scale is log.
-  expect_equal(mutate_fdata(ds = "log2",
+  expect_equal(pmartR:::mutate_fdata(ds = "log2",
                             ds_orig = "log",
                             is_log = TRUE,
                             is_log_orig = TRUE,
                             sample_property = log(fdata$Concentration)),
                log2(fdata$Concentration))
-  expect_equal(mutate_fdata(ds = "log10",
+  expect_equal(pmartR:::mutate_fdata(ds = "log10",
                             ds_orig = "log",
                             is_log = TRUE,
                             is_log_orig = TRUE,
@@ -735,13 +747,13 @@ test_that('normalize_nmr produces the correct output',{
                log10(fdata$Concentration))
   
   # Inspect output when the original data scale is log2.
-  expect_equal(mutate_fdata(ds = "log",
+  expect_equal(pmartR:::mutate_fdata(ds = "log",
                             ds_orig = "log2",
                             is_log = TRUE,
                             is_log_orig = TRUE,
                             sample_property = log2(fdata$Concentration)),
                log(fdata$Concentration))
-  expect_equal(mutate_fdata(ds = "log10",
+  expect_equal(pmartR:::mutate_fdata(ds = "log10",
                             ds_orig = "log2",
                             is_log = TRUE,
                             is_log_orig = TRUE,
@@ -749,13 +761,13 @@ test_that('normalize_nmr produces the correct output',{
                log10(fdata$Concentration))
   
   # Inspect output when the original data scale is log10.
-  expect_equal(mutate_fdata(ds = "log",
+  expect_equal(pmartR:::mutate_fdata(ds = "log",
                             ds_orig = "log10",
                             is_log = TRUE,
                             is_log_orig = TRUE,
                             sample_property = log10(fdata$Concentration)),
                log(fdata$Concentration))
-  expect_equal(mutate_fdata(ds = "log2",
+  expect_equal(pmartR:::mutate_fdata(ds = "log2",
                             ds_orig = "log10",
                             is_log = TRUE,
                             is_log_orig = TRUE,

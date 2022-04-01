@@ -9,6 +9,8 @@
 #'   \code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, respectively.
 #' @param min_num an integer value specifying the minimum number of times each
 #'   feature must be observed across all samples. Default value is 2.
+#' @param use_group
+#' @param use_batch
 #'
 #' @details Attribute of molecule_filt object is "total_poss_obs", the number of
 #'   total possible observations for each feature (same as the number of
@@ -30,43 +32,119 @@
 #'
 #' @export
 #'
-molecule_filter <- function (omicsData) {
+molecule_filter <- function (omicsData,use_groups = FALSE, use_batch = FALSE) {
   ## some initial checks ##
-
+  # test#
+  
   # check that omicsData is of appropriate class #
   if (!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData",
                              "nmrData"))) {
-
+    
     stop (paste("omicsData must be of class 'pepData', 'proData', 'metabData',",
-               "'lipidData', or 'nmrData'",
-               sep = ' '))
-
+                "'lipidData', or 'nmrData'",
+                sep = ' '))
   }
-
-  # Extricate the column number of the ID column.
+  
+  # check that omicsData has batch_id data if specified
+  if(is.null(attributes(attr(omicsData,"group_DF"))$batch_id) && use_batch == TRUE){
+    stop (paste("omicsData must have batch_id specified if use_batch = TRUE"))
+  }
+  
+  if(is.null(attr(omicsData,"group_DF")) && use_groups == TRUE){
+    stop (paste("omicsData must have groups specified if use_groups = TRUE"))
+  }
+  
+  # find the column which has the edata cname
   id_col <- which(names(omicsData$e_data) == get_edata_cname(omicsData))
+  
+  # SCENARIO 1: use_groups = FALSE, use_batch = FALSE
+  # we run the scenario as before
+  if((use_batch == FALSE | is.null(attributes(attr(omicsData,"group_DF"))$batch_id)) & (use_groups == FALSE | is.null(attr(omicsData,"group_DF")))){
+    # Extricate the column number of the ID column.
+    
+    # Compute the number of non-missing values
+    num_obs <- rowSums(!is.na(omicsData$e_data[, -id_col]))
+    
+    # Create a data frame with the ID column and the number of non-missing values.
+    output <- data.frame(omicsData$e_data[, id_col], num_obs)
+  } 
+  
+  # SCENARIO 2: use_groups = FALSE, use_batch = TRUE
+  else if((use_batch == TRUE & !is.null(attributes(attr(omicsData,"group_DF"))$batch_id)) & (use_groups == FALSE | is.null(attr(omicsData,"group_DF")))){
+    # create a data frame with ID columns and the number of non-missing values per group
+    # save the group data frame
+    batchDat <- attributes(attr(omicsData,"group_DF"))$batch_id
+    colnames(batchDat)[2] <- "Batch"
+    # Create a data frame with the ID columns and the minimum number of non-missing values per grouping
+    output <- omicsData$e_data %>%
+      tidyr::pivot_longer(cols = -tidyselect::all_of(id_col), names_to = names(batchDat)[1], values_to = "value") %>%
+      dplyr::left_join(batchDat, by = "SampleID") %>%
+      dplyr::group_by(dplyr::across(id_col), Batch) %>%
+      dplyr::summarise(num_obs = sum(!is.na(value)),.groups = "keep") %>%
+      dplyr::group_by(dplyr::across(id_col)) %>%
+      dplyr::summarise(min_num_obs = as.numeric(min(num_obs)),.groups = "keep") %>%
+      dplyr::ungroup() %>%
+      data.frame()
+  }
+  
+  # SCENARIO 3: use_groups = TRUE, use_batch = FALSE
+  else if((use_batch == FALSE| is.null(attributes(attr(omicsData,"group_DF"))$batch_id)) & (use_groups == TRUE & !is.null(attr(omicsData,"group_DF")))){
+    # create a data frame with ID columns and the number of non-missing values per group
+    # save the group data frame
+    groupDat <- attr(omicsData,"group_DF")
+    # Create a data frame with the ID columns and the minimum number of non-missing values per grouping
+    output <- omicsData$e_data %>%
+      tidyr::pivot_longer(cols = -tidyselect::all_of(id_col), names_to = names(groupDat)[1], values_to = "value") %>%
+      dplyr::left_join(groupDat, by = "SampleID") %>%
+      dplyr::group_by(dplyr::across(id_col), Group) %>%
+      dplyr::summarise(num_obs = sum(!is.na(value)),.groups = "keep") %>%
+      dplyr::group_by(dplyr::across(id_col)) %>%
+      dplyr::summarise(min_num_obs = as.numeric(min(num_obs)),.groups = "keep") %>%
+      dplyr::ungroup() %>%
+      data.frame()
+  }
+  
+  # SCENARIO 4: use_groups = TRUE, use_batch = TRUE
+  else {
+    groupDat <- attr(omicsData,"group_DF")
+    batchDat <- attributes(attr(omicsData,"group_DF"))$batch_id
+    colnames(batchDat)[2] <- "Batch"
 
-  # Compute the number of non-missing values for each row.
-  num_obs <- rowSums(!is.na(omicsData$e_data[, -id_col]))
-
-  # Create a data frame with the ID column and the number of non-missing values.
-  output <- data.frame(omicsData$e_data[, id_col], num_obs)
+    output <- omicsData$e_data %>%
+      tidyr::pivot_longer(cols = -tidyselect::all_of(id_col), names_to = names(groupDat)[1], values_to = "value") %>%
+      dplyr::left_join(groupDat, by = "SampleID") %>%
+      dplyr::left_join(batchDat, by = "SampleID") %>%
+      dplyr::group_by(dplyr::across(id_col), Group, Batch) %>%
+      dplyr::summarise(num_obs = sum(!is.na(value)),.groups = "keep") %>%
+      dplyr::group_by(dplyr::across(id_col)) %>%
+      dplyr::summarise(min_num_obs = as.numeric(min(num_obs)),.groups = "keep") %>%
+      dplyr::ungroup() %>%
+      data.frame()
+  }
+  
+  # change the names of the data.frame
   names(output) <- c(get_edata_cname(omicsData), "Num_Observations")
-
+  
   # Extract the 'data.frame' class from the the output data frame.
   orig_class <- class(output)
-
+  
   # Create the moleculeFilt class and attach the data.frame class to it as well.
   class(output) <- c("moleculeFilt", orig_class)
-
+  
   # Fabricate an attribute that has the total number of samples (columns in
   # e_data minus the ID column). This will be used to ensure someone doesn't try
   # to filter e_data using a threshold larger than the number of samples.
   attr(output, "num_samps") <- get_data_info(omicsData)$num_samps
-
+  
+  # Add the group designation information to the attributes.
+  attr(output, "group_DF") <- attr(omicsData, "group_DF")
+  
+  # Fabricate an attribute that states whether or not we have added a batch_id
+  attr(output, "use_batch") <- ifelse(use_batch == FALSE,FALSE,TRUE)
+  attr(output, "use_groups") <- ifelse(use_groups == FALSE,FALSE,TRUE)
+  
   # Return the completed object!!!
   return(output)
-
 }
 
 #'Filter Based on Pooled Coefficient of Variation (CV) Values
@@ -265,10 +343,15 @@ cv_filter <- function(omicsData, use_groups = TRUE) {
   orig_class <- class(output)
 
   class(output) <- c("cvFilt", orig_class)
+  
+  # Add the group designation information to the attributes.
+  attr(output, "group_DF") <- attr(omicsData, "group_DF")
 
   attr(output, "pooled") <- is_pooled
   attr(output, "max_x_val") <- x.max
   attr(output, "tot_nas") <- tot.nas
+  attr(output, "use_groups") <- ifelse(use_groups == FALSE,FALSE,TRUE)
+  
 
   # Return the completed object. We did it!!!
   return (output)
@@ -1302,6 +1385,8 @@ imdanova_filter <- function (omicsData) {
 
   orig_class <- class(output)
   class(output) <- c("imdanovaFilt", orig_class)
+  
+  
 
   attr(output, "group_sizes") <- nonmiss_per_group$group_sizes
   # KS added attribute for nonsingleton groups 12/3/2020 #
@@ -1593,6 +1678,9 @@ custom_filter <- function (omicsData,
   # Save the entire omicsData object as an attribute. This is used in the
   # summary.customFilt method.
   attr(filter_object, "omicsData") = omicsData # added 12/5/2017 by KS #
+  
+  # Add the group designation information to the attributes.
+  attr(filter_object, "group_DF") <- attr(omicsData, "group_DF")
 
   # Return the customated filter object. Good on us!!!
   return (filter_object)
