@@ -79,9 +79,9 @@ molecule_filter <- function (omicsData,use_groups = FALSE, use_batch = FALSE) {
     output <- omicsData$e_data %>%
       tidyr::pivot_longer(cols = -tidyselect::all_of(id_col), names_to = names(batchDat)[1], values_to = "value") %>%
       dplyr::left_join(batchDat, by = "SampleID") %>%
-      dplyr::group_by(across(id_col), Batch) %>%
+      dplyr::group_by(dplyr::across(id_col), Batch) %>%
       dplyr::summarise(num_obs = sum(!is.na(value)),.groups = "keep") %>%
-      dplyr::group_by(across(id_col)) %>%
+      dplyr::group_by(dplyr::across(id_col)) %>%
       dplyr::summarise(min_num_obs = as.numeric(min(num_obs)),.groups = "keep") %>%
       dplyr::ungroup() %>%
       data.frame()
@@ -96,9 +96,9 @@ molecule_filter <- function (omicsData,use_groups = FALSE, use_batch = FALSE) {
     output <- omicsData$e_data %>%
       tidyr::pivot_longer(cols = -tidyselect::all_of(id_col), names_to = names(groupDat)[1], values_to = "value") %>%
       dplyr::left_join(groupDat, by = "SampleID") %>%
-      dplyr::group_by(across(id_col), Group) %>%
+      dplyr::group_by(dplyr::across(id_col), Group) %>%
       dplyr::summarise(num_obs = sum(!is.na(value)),.groups = "keep") %>%
-      dplyr::group_by(across(id_col)) %>%
+      dplyr::group_by(dplyr::across(id_col)) %>%
       dplyr::summarise(min_num_obs = as.numeric(min(num_obs)),.groups = "keep") %>%
       dplyr::ungroup() %>%
       data.frame()
@@ -114,9 +114,9 @@ molecule_filter <- function (omicsData,use_groups = FALSE, use_batch = FALSE) {
       tidyr::pivot_longer(cols = -tidyselect::all_of(id_col), names_to = names(groupDat)[1], values_to = "value") %>%
       dplyr::left_join(groupDat, by = "SampleID") %>%
       dplyr::left_join(batchDat, by = "SampleID") %>%
-      dplyr::group_by(across(id_col), Group, Batch) %>%
+      dplyr::group_by(dplyr::across(id_col), Group, Batch) %>%
       dplyr::summarise(num_obs = sum(!is.na(value)),.groups = "keep") %>%
-      dplyr::group_by(across(id_col)) %>%
+      dplyr::group_by(dplyr::across(id_col)) %>%
       dplyr::summarise(min_num_obs = as.numeric(min(num_obs)),.groups = "keep") %>%
       dplyr::ungroup() %>%
       data.frame()
