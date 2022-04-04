@@ -49,7 +49,8 @@ test_that('as.pepData returns the correct data frame and attributes',{
          prop_missing = (sum(is.na(pdata$e_data)) /
                            prod(dim(pdata$e_data[, -1]))),
          num_samps = ncol(pdata$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
   
   # Check the checkers.
@@ -107,7 +108,8 @@ test_that('as.pepData returns the correct data frame and attributes',{
          prop_missing = (sum(is.na(pdata$e_data)) /
                            prod(dim(pdata$e_data[, -1]))),
          num_samps = ncol(pdata$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
   
   # Check the checkers.
@@ -193,7 +195,8 @@ test_that('as.pepData returns the correct data frame and attributes',{
          prop_missing = (sum(is.na(pdata$e_data)) /
                            prod(dim(pdata$e_data[, -1]))),
          num_samps = ncol(pdata$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
   
   # Check the checkers.
@@ -255,7 +258,8 @@ test_that('as.pepData returns the correct data frame and attributes',{
          prop_missing = (sum(is.na(pdata$e_data)) /
                            prod(dim(pdata$e_data[, -1]))),
          num_samps = ncol(pdata$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
   
   # Check the checkers.
@@ -333,7 +337,8 @@ test_that('as.pepData returns the correct data frame and attributes',{
          prop_missing = (sum(is.na(pdata$e_data)) /
                            prod(dim(pdata$e_data[, -1]))),
          num_samps = ncol(pdata$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
   
   # Check the checkers.

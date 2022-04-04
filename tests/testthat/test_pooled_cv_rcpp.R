@@ -205,7 +205,7 @@ test_that('pooled_cv_rcpp correctly calculates the CV by group',{
   # Test pooled_cv_rcpp with ordered rows --------------------------------------
   
   # Calculate the CV with C++ functions.
-  cv_cpp <- pooled_cv_rcpp(mtr = as.matrix(e_data),
+  cv_cpp <- pmartR:::pooled_cv_rcpp(mtr = as.matrix(e_data),
                            group = groups) * 100
   
   # Calculate the CV with R functions.
@@ -249,7 +249,7 @@ test_that('pooled_cv_rcpp correctly calculates the CV by group',{
   
   # Calculate the CV with C++ functions when the order of the columns is
   # scrambled.
-  cv_cpp_s <- pooled_cv_rcpp(mtr = as.matrix(e_data_s),
+  cv_cpp_s <- pmartR:::pooled_cv_rcpp(mtr = as.matrix(e_data_s),
                              group = groups_s) * 100
   
   # Make sure the output hasn't changed even though the column order has.

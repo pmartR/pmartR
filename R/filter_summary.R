@@ -58,6 +58,9 @@ summary.moleculeFilt <- function(filter_object, min_num=NULL){
   
   class(res) = c("moleculeFilterSummary", "list")
   
+  attr(res,"use_batch") <- attr(filter_object,"use_batch")
+  attr(res,"use_groups") <- attr(filter_object,"use_groups")
+  
   return(res)
 }
 
@@ -70,6 +73,16 @@ summary.moleculeFilt <- function(filter_object, min_num=NULL){
 print.moleculeFilterSummary <- function(object){
   # create output #
   cat("\nSummary of Molecule Filter \n----------------------------------\n")
+  if(attr(object,"use_batch") & !attr(object,"use_groups")){
+    cat("\nMinimum Number is Minimum Number per Batch \n----------------------------------\n")
+  }
+  if(!attr(object,"use_batch") & attr(object,"use_groups")){
+    cat("\nMinimum Number is Minimum Number per Group \n----------------------------------\n")
+  }
+  if(attr(object,"use_batch") & attr(object,"use_groups")){
+    cat("\nMinimum Number is Minimum Number per Batch and Group \n----------------------------------\n")
+  }
+  
   if(!is.null(object$min_num)){
   cat(sprintf("Minimum Number:%d\nFiltered:%d\nNot Filtered:%d\n\n", object$min_num, object$num_filtered, object$num_not_filtered))
   }

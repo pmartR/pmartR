@@ -126,7 +126,7 @@ test_that('bpquant produces correct isoforms',{
   # Test internals of Rev Bayes quantitation -----------------------------------
 
   # Run bpquant_mod on the flags for ALBU_HUMAN.
-  bayes_mod <- bpquant_mod(protein_sig = data.frame(flags1 = c(-1, 1, 1, 1, 1)),
+  bayes_mod <- pmartR:::bpquant_mod(protein_sig = data.frame(flags1 = c(-1, 1, 1, 1, 1)),
                            pi_not = 0.9,
                            max_proteoforms = 5)
 
@@ -149,7 +149,7 @@ test_that('bpquant produces correct isoforms',{
                       byrow = TRUE))
 
   # Run isoformRes_func on the output for ALBU_HUMAN.
-  iso_fun <- isoformRes_func(
+  iso_fun <- pmartR:::isoformRes_func(
     df = data.frame(Protein = rep("ALBU_HUMAN", 4),
                     Mass_Tag_ID = c("1104", "1237", "1768", "4198254"),
                     proteoformID = c(1, 1, 1, 1)),
@@ -166,7 +166,7 @@ test_that('bpquant produces correct isoforms',{
   )
 
   # Run bpquant_mod on the flags for 6PGL_HUMAN.
-  bayes_mod <- bpquant_mod(
+  bayes_mod <- pmartR:::bpquant_mod(
     protein_sig = data.frame(flags1 = c(-1, -1, -1, 1, 1)),
     pi_not = 0.9,
     max_proteoforms = 5
@@ -191,7 +191,7 @@ test_that('bpquant produces correct isoforms',{
                       byrow = TRUE))
 
   # Run isoformRes_func on the output for 6PGL_HUMAN.
-  iso_fun <- isoformRes_func(
+  iso_fun <- pmartR:::isoformRes_func(
     df = data.frame(Protein = rep("6PGL_HUMAN", 5),
                     Mass_Tag_ID = c("8622908", "8655070", "9513231", "34862026",
                                     "65465565"),

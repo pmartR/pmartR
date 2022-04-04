@@ -72,7 +72,9 @@ edata_replace <- function(omicsData, x, y) {
     data_scale = get_data_scale(omicsData),
     data_types = get_data_info(omicsData)$data_types,
     norm_info = get_data_info(omicsData)$norm_info,
-    is_normalized = get_data_info(omicsData)$norm_info$is_normalized
+    is_normalized = get_data_info(omicsData)$norm_info$is_normalized,
+    batch_info = get_data_info(omicsData)$batch_info,
+    is_bc = get_data_info(omicsData)$batch_info$is_bc
   )
   
   # Report the number of replaced elements in e_data

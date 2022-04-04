@@ -65,7 +65,8 @@ test_that('edata_transform correctly transforms the data',{
                              prop_missing = attr(pdata,
                                                  'data_info')$prop_missing,
                              num_samps = 12,
-                             data_types = NULL)
+                             data_types = NULL,
+                             batch_info = list(is_bc = FALSE))
   
   # Run tests on the transformed data ------------------------------------------
   
