@@ -898,70 +898,6 @@ group_comparison_anova <- function(groupData,comparisons,anova_results_full){
   return(group_comp)
 }
 
-#' Compute pairwise differences
-#'
-#' Computes the differences for paired data according to the information in the
-#' pairing column of f_data. This variable name is also an attribute of the
-#' group_DF attribute.
-#'
-#' @param omicsData Any one of the omicsData objects (pepData, metabData, ...).
-#'
-#' @return A data.frame containing the differences between paired samples.
-#'
-#' @author Evan A Martin
-#'
-take_diff <- function (omicsData) {
-
-  # Apprehend the index in f_data for the sample ID and pair ID columns.
-  samp_idx <- which(names(omicsData$f_data) == get_fdata_cname(omicsData))
-  pair_idx <- which(
-    names(omicsData$f_data) == attr(attr(omicsData, "group_DF"), "pairs")
-  )
-
-  # Create a matrix with -1 and 1 in the corresponding rows to calculate the
-  # difference between the paried samples. This matrix is created according to
-  # the column in f_data containing the paired information.
-  pid_matrix <- build_pair_mat(
-    pair_df = omicsData$f_data[, c(samp_idx, pair_idx)]
-  )
-
-  # Find the biomolecule ID index in e_data.
-  bio_idx <- which(
-    names(omicsData$e_data) == get_edata_cname(omicsData)
-  )
-
-  # Compute the differences between paired samples according to the pid matrix.
-  diff_data <- fold_change_diff_na_okay(
-    data = data.matrix(omicsData$e_data[, -bio_idx]),
-    C = t(pid_matrix)
-  )
-
-  # Extract the first occurance of each pair variable in f_data. These will be
-  # used later to rename the columns of diff_data.
-  moniker <- omicsData$f_data %>%
-    dplyr::group_by(dplyr::across(pair_idx)) %>%
-    dplyr::slice(1) %>%
-    dplyr::pull(pair_idx)
-
-  # Check if the data from the pair ID column is numeric. If it is the word
-  # "Pair" will be added before each number. That way data.frame() won't
-  # complain because the column names of the difference data will not be
-  # numbers. Everyone wins!!!
-  if (is.numeric(moniker)) {
-
-    moniker <- paste("Pair", moniker,
-                     sep = "_")
-
-  }
-
-  # Rename the columns of e_data to reflect that the paired differences were
-  # calculated.
-  colnames(diff_data) <- moniker
-
-  return (diff_data)
-
-}
-
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 # IMD FUNCTIONS ----------------------------------------------------------------
@@ -1808,4 +1744,68 @@ build_pair_mat <- function(pair_df){
   }
 
   return(Xmatrix)
+}
+
+#' Compute pairwise differences
+#'
+#' Computes the differences for paired data according to the information in the
+#' pairing column of f_data. This variable name is also an attribute of the
+#' group_DF attribute.
+#'
+#' @param omicsData Any one of the omicsData objects (pepData, metabData, ...).
+#'
+#' @return A data.frame containing the differences between paired samples.
+#'
+#' @author Evan A Martin
+#'
+take_diff <- function (omicsData) {
+
+  # Apprehend the index in f_data for the sample ID and pair ID columns.
+  samp_idx <- which(names(omicsData$f_data) == get_fdata_cname(omicsData))
+  pair_idx <- which(
+    names(omicsData$f_data) == attr(attr(omicsData, "group_DF"), "pairs")
+  )
+
+  # Create a matrix with -1 and 1 in the corresponding rows to calculate the
+  # difference between the paried samples. This matrix is created according to
+  # the column in f_data containing the paired information.
+  pid_matrix <- build_pair_mat(
+    pair_df = omicsData$f_data[, c(samp_idx, pair_idx)]
+  )
+
+  # Find the biomolecule ID index in e_data.
+  bio_idx <- which(
+    names(omicsData$e_data) == get_edata_cname(omicsData)
+  )
+
+  # Compute the differences between paired samples according to the pid matrix.
+  diff_data <- fold_change_diff_na_okay(
+    data = data.matrix(omicsData$e_data[, -bio_idx]),
+    C = t(pid_matrix)
+  )
+
+  # Extract the first occurance of each pair variable in f_data. These will be
+  # used later to rename the columns of diff_data.
+  moniker <- omicsData$f_data %>%
+    dplyr::group_by(dplyr::across(pair_idx)) %>%
+    dplyr::slice(1) %>%
+    dplyr::pull(pair_idx)
+
+  # Check if the data from the pair ID column is numeric. If it is the word
+  # "Pair" will be added before each number. That way data.frame() won't
+  # complain because the column names of the difference data will not be
+  # numbers. Everyone wins!!!
+  if (is.numeric(moniker)) {
+
+    moniker <- paste("Pair", moniker,
+                     sep = "_")
+
+  }
+
+  # Rename the columns of e_data to reflect that the paired differences were
+  # calculated.
+  colnames(diff_data) <- moniker
+
+  return (diff_data)
+
 }
