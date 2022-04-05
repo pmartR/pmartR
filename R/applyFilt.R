@@ -500,8 +500,40 @@ applyFilt.rmdFilt <- function (filter_object, omicsData,
 
   } else {
 
-    # Fish out the sample IDs that will be filtered.
+    # Snatch the sample name and pair name as they will be used in multiple
+    # places. It will save some typing. ... However, all the typing I just saved
+    # has probably been undone by writing this comment.
+    sample_name <- get_fdata_cname(omicsData)
+    pair_name <- attr(attr(omicsData, "group_DF"), "pairs")
+
     filter.samp <- as.character(filter_object[inds, id_col])
+
+    # If the data are paired make sure all necessary samples are filtered.
+    if (!is.null(pair_name)) {
+
+      #!#!#!#!#!#!#!#!#!#!
+      # The following code checks if the samples in a pair will be split. For
+      # example, one sample in a pair will be filtered and another sample in the
+      # pair will not be filtered. If a pair is split remove ALL samples
+      # associated with that pair.
+      #!#!#!#!#!#!#!#!#!#!
+
+      # Snag the associated pair IDs for the samples that will be filtered.
+      filtered_pairs <- omicsData$f_data %>%
+        dplyr::filter(!!rlang::sym(sample_name) %in% filter.samp) %>%
+        dplyr::pull(!!rlang::sym(pair_name))
+
+      # Go back to f_data and nab all the sample names corresponding to the pair
+      # IDs associated with the original samples that were selected for removal.
+      # These sample names will be used to filter the data. This vector will not
+      # be the same as the original vector if any pairs were split. If there
+      # were no pairs split the two vectors will be the same.
+      filter.samp <- omicsData$f_data %>%
+        dplyr::filter(!!rlang::sym(pair_name) %in% filtered_pairs) %>%
+        dplyr::pull(!!rlang::sym(sample_name)) %>%
+        as.character()
+
+    }
 
   }
 
@@ -879,7 +911,7 @@ applyFilt.imdanovaFilt <- function (filter_object,
   if (class(remove_singleton_groups) != "logical") {
 
     # Stop the illogical user in their tracks for using illogical inputs.
-    stop ("remove_singletong_groups must be TRUE or FALSE")
+    stop ("remove_singleton_groups must be TRUE or FALSE")
 
   }
 
@@ -1043,7 +1075,7 @@ applyFilt.imdanovaFilt <- function (filter_object,
                     sep = " "))
     }
 
-    # Will run if remove_singleton_gropus is FALSE.
+    # Will run if remove_singleton_groups is FALSE.
   } else {
 
     # Check for singleton groups.
@@ -1061,10 +1093,68 @@ applyFilt.imdanovaFilt <- function (filter_object,
 
   }
 
-  # Create a list with the appropriate information for the anova_filter and
-  # gtest filter functions.
-  nonmiss_per_group <- list(nonmiss_totals = filter_object,
-                            group_sizes = attributes(filter_object)$group_sizes)
+  # Paired data ----------------------------------------------------------------
+
+  # Do the thing if data are paired.
+  if (!is.null(attr(attr(omicsData, "group_DF"), "pairs"))) {
+
+    # Take the difference here and call the imdanova_filt function to create a
+    # new filter object with the difference data.
+
+    # Compute the difference and create a new edata object from the differences.
+    diff_edata <- take_diff(omicsData)
+    diff_edata <- data.frame(omicsData$e_data[, get_edata_cname(omicsData)],
+                             diff_edata)
+    names(diff_edata)[[1]] <- get_edata_cname(omicsData)
+
+    # Only keep the first row for each pair. This will reduce the number of rows
+    # in f_data to match the number of columns in e_data.
+    diff_fdata <- omicsData$f_data %>%
+      dplyr::group_by(
+        !!rlang::sym(attr(attr(omicsData, "group_DF"), "pairs"))
+      ) %>%
+      dplyr::slice(1)
+
+    # Change the sample names in f_data to match the sample names in e_data. The
+    # names from the pairing variable are the new sample names and must be
+    # updated to create a new omicsData object.
+    diff_fdata[, get_fdata_cname(omicsData)] <- names(diff_edata)[-1]
+
+    # Create a new omicsData object with the difference data. This is necessary
+    # as a new filter object (with the difference data) needs to be created to
+    # account for counts of differences.
+    diff_omicsData <- as.anyData(omics_type = class(omicsData)[[1]],
+                                 edata = diff_edata,
+                                 fdata = diff_fdata,
+                                 edata_cname = get_edata_cname(omicsData),
+                                 fdata_cname = get_fdata_cname(omicsData))
+    diff_omicsData <- group_designation(
+      omicsData = diff_omicsData,
+      main_effects = attr(attr(omicsData, "group_DF"), "main_effects"),
+      covariates = attr(attr(omicsData, "group_DF"), "covariates")
+    )
+
+    # Create a new filter object with the differenced data.
+    diff_filter_object <- imdanova_filter(diff_omicsData)
+
+    # Create a list with the appropriate information for the anova_filter and
+    # gtest filter functions.
+    nonmiss_per_group <- list(
+      nonmiss_totals = diff_filter_object,
+      group_sizes = attributes(diff_filter_object)$group_sizes
+    )
+
+    # The following code runs if data are not paired.
+  } else {
+
+    # Create a list with the appropriate information for the anova_filter and
+    # gtest filter functions.
+    nonmiss_per_group <- list(
+      nonmiss_totals = filter_object,
+      group_sizes = attributes(filter_object)$group_sizes
+    )
+
+  }
 
   edata_cname <- get_edata_cname(omicsData)
   samp_cname <- get_fdata_cname(omicsData)
@@ -1293,6 +1383,88 @@ applyFilt.customFilt <- function (filter_object, omicsData) {
 
     # Slap the users wrist with a warning.
     warning ('A custom filter has already been applied to this data set.')
+
+  }
+
+  # Grab some names to save typing later on.
+  sample_name <- get_fdata_cname(omicsData)
+  pair_name <- attr(attr(omicsData, "group_DF"), "pairs")
+
+  #!#!#!#!#!#!#!#!#!#!
+  # The following if statements check if the samples in a pair will be split by
+  # the custom filter. For example, one sample in a pair will be filtered and
+  # another sample in the pair will not be filtered. If a pair is split we will
+  # throw an error and make the user filter (or keep) ALL samples belonging to a
+  # pair.
+  #!#!#!#!#!#!#!#!#!#!
+
+  # Check if samples will be filtered and the data are paired.
+  if (!is.null(filter_object$f_data_remove) &&
+      !is.null(attr(attr(omicsData, "group_DF"), "pairs"))) {
+
+    # Snag the associated pair IDs for the samples that will be filtered.
+    filtered_pairs <- omicsData$f_data %>%
+      dplyr::filter(
+        !!rlang::sym(sample_name) %in% filter_object$f_data_remove
+      ) %>%
+      dplyr::pull(!!rlang::sym(pair_name))
+
+    # Go back to f_data and nab all the sample names corresponding to the pair
+    # IDs associated with the original samples that were selected for removal.
+    # If this vector is not the same as the input we will throw an error because
+    # one or more pairs are being split.
+    filter_samp <- omicsData$f_data %>%
+      dplyr::filter(!!rlang::sym(pair_name) %in% filtered_pairs) %>%
+      dplyr::pull(!!rlang::sym(sample_name)) %>%
+      as.character()
+
+    # If samples are split throw an error.
+    if (!setequal(filter_samp, as.character(filter_object$f_data_remove))) {
+
+      stop (
+        paste("The following samples should also be removed based on the ",
+              "input: ",
+              knitr::combine_words(
+                setdiff(filter_samp, as.character(filter_object$f_data_remove))
+              ),
+              ". Samples in a pair must be removed together.",
+              sep = "")
+      )
+
+    }
+
+  } else if (!is.null(filter_object$f_data_keep) &&
+             !is.null(attr(attr(omicsData, "group_DF"), "pairs"))) {
+
+    # Snag the associated pair IDs for the samples that will be kept.
+    filtered_pairs <- omicsData$f_data %>%
+      dplyr::filter(
+        !!rlang::sym(sample_name) %in% filter_object$f_data_keep
+      ) %>%
+      dplyr::pull(!!rlang::sym(pair_name))
+
+    # Go back to f_data and nab all the sample names corresponding to the pair
+    # IDs associated with the original samples that were chosen to be kept.
+    # If this vector is not the same as the input we will throw an error because
+    # one or more pairs are being split.
+    filter_samp <- omicsData$f_data %>%
+      dplyr::filter(!!rlang::sym(pair_name) %in% filtered_pairs) %>%
+      dplyr::pull(!!rlang::sym(sample_name)) %>%
+      as.character()
+
+    # If samples are split throw an error.
+    if (!setequal(filter_samp, as.character(filter_object$f_data_keep))) {
+
+      stop (
+        paste("The following samples should also be kept based on the input: ",
+              knitr::combine_words(
+                setdiff(filter_samp, as.character(filter_object$f_data_keep))
+              ),
+              ". Samples in a pair must be kept together.",
+              sep = "")
+      )
+
+    }
 
   }
 
@@ -1870,5 +2042,71 @@ gtest_filter <- function (nonmiss_per_group,
   # Extract the biomolecule IDs corresponding to counts that fall below the
   # minimum. These are the biomolecules that will be filtered out.
   return (as.character(nonmiss_per_group$nonmiss_totals[!trueFalse, 1]))
+
+}
+
+# A switch function to create an omicsData object based on the class of the
+# input.
+as.anyData <- function (omics_type,
+                        edata,
+                        fdata,
+                        edata_cname,
+                        fdata_cname) {
+
+  switch (omics_type,
+
+          "isobaricpepData" = {
+
+            return (as.isobaricpepData(e_data = edata,
+                                       f_data = fdata,
+                                       edata_cname = edata_cname,
+                                       fdata_cname = fdata_cname))
+
+          },
+
+          "lipidData" = {
+
+            return (as.lipidData(e_data = edata,
+                                 f_data = fdata,
+                                 edata_cname = edata_cname,
+                                 fdata_cname = fdata_cname))
+
+          },
+
+          "metabData" = {
+
+            return (as.metabData(e_data = edata,
+                                 f_data = fdata,
+                                 edata_cname = edata_cname,
+                                 fdata_cname = fdata_cname))
+
+          },
+
+          "nmrData" = {
+
+            return (as.nmrData(e_data = edata,
+                               f_data = fdata,
+                               edata_cname = edata_cname,
+                               fdata_cname = fdata_cname))
+
+          },
+
+          "pepData" = {
+
+            return (as.pepData(e_data = edata,
+                               f_data = fdata,
+                               edata_cname = edata_cname,
+                               fdata_cname = fdata_cname))
+
+          },
+
+          "proData" = {
+
+            return (as.proData(e_data = edata,
+                               f_data = fdata,
+                               edata_cname = edata_cname,
+                               fdata_cname = fdata_cname))
+
+          })
 
 }
