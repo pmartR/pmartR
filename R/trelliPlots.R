@@ -131,19 +131,21 @@ trelli_builder <- function(toBuild, cognostics, plotFUN, cogFUN, path, name, ...
   if (is.null(cognostics)) {
     
     toBuild %>%
+      dplyr::ungroup() %>%
       dplyr::mutate(
         panel = trelliscopejs::map2_plot(Nested_DF, as.character(unlist(toBuild[,1])), plotFUN)
       ) %>%
-      trelliscopejs::trelliscope(path = path, name = name, nrow = 1, ncol = 1, thumb = T, ...)
+      trelliscopejs::trelliscope(path = path, name = name, nrow = 1, ncol = 1, thumb = T, ...) 
     
   } else {
     
     toBuild %>%
+      dplyr::ungroup() %>%
       dplyr::mutate(
         panel = trelliscopejs::map2_plot(Nested_DF, as.character(unlist(toBuild[,1])), plotFUN),
         cog = trelliscopejs::map2_cog(Nested_DF, as.character(unlist(toBuild[,1])), cogFUN)
       ) %>%
-      trelliscopejs::trelliscope(path = path, name = name, nrow = 1, ncol = 1, thumb = T, ...)
+      trelliscopejs::trelliscope(path = path, name = name, nrow = 1, ncol = 1, thumb = T, ...) 
     
   }
 }
