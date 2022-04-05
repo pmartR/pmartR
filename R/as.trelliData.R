@@ -138,7 +138,7 @@ as.trelliData.edata <- function(e_data,
   # Build an omics data object--------------------------------------------------
   
   # Generate a f data frame 
-  fdata <- data.frame("Sample" = colnames(edata), "Condition" = NA)
+  fdata <- data.frame("Sample" = colnames(edata)[colnames(edata) != edata_cname], "Condition" = NA)
   fdata_cname <- "Sample"
   
   # Build the omics object 
