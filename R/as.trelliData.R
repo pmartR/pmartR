@@ -53,16 +53,14 @@
 #'    need to be normalized. 
 #'  
 #' @param e_data a \eqn{p * (n + 1)} data.frame of expression data, where
-#'   \eqn{p} is the number of peptides observed and \eqn{n} is the number of
-#'   samples (an additional peptide identifier/name column should also be
+#'   \eqn{p} is the number of biomolecules observed and \eqn{n} is the number of
+#'   samples (an additional biomolecule identifier/name column should also be
 #'   present anywhere in the data.frame). Each row corresponds to data for each
-#'   peptide. One column specifying a unique identifier for each peptide (row)
+#'   biomolecule. One column specifying a unique identifier for each biomolecule (row)
 #'   must be present.
 #' @param edata_cname character string specifying the name of the column
-#'   containing the protein identifiers (or other mapping variable) in
-#'   \code{e_meta} (if applicable). Defaults to NULL. If \code{e_meta} is NULL,
-#'   then either do not specify \code{emeta_cname} or specify it as NULL. If
-#'   \code{e_meta} is NULL, then specify \code{emeta_cname} as NULL.
+#'   containing the biomolecule identifiers. It should be the only non-numeric colummn
+#'   in edata.
 #' @param omics_type A string of the data type. Acceptable options are "pepData",
 #'   "isobaricpepData", "proData", "metabData", "lipidData", or "nmrData".
 #' @param data_scale_original A character string indicating original scale 
