@@ -176,7 +176,8 @@ test_that('proteomics_filter and applyFilt produce the correct output',{
          prop_missing = (sum(is.na(filtered$e_data)) /
                            prod(dim(filtered$e_data[, -1]))),
          num_samps = ncol(filtered$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
 
   # Explore the meta_info attribute.
@@ -233,7 +234,8 @@ test_that('proteomics_filter and applyFilt produce the correct output',{
          prop_missing = (sum(is.na(sorfiltered$e_data)) /
                            prod(dim(sorfiltered$e_data[, -1]))),
          num_samps = ncol(sorfiltered$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
 
   # Explore the meta_info attribute.
@@ -287,7 +289,8 @@ test_that('proteomics_filter and applyFilt produce the correct output',{
          prop_missing = (sum(is.na(sorfiltered2$e_data)) /
                            prod(dim(sorfiltered2$e_data[, -1]))),
          num_samps = ncol(sorfiltered2$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
 
   # Explore the meta_info attribute.

@@ -49,7 +49,8 @@ test_that('as.nmrData returns the correct data frame and attributes',{
          prop_missing = (sum(is.na(nmrdata$e_data)) /
                            prod(dim(nmrdata$e_data[, -1]))),
          num_samps = ncol(nmrdata$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
   
   # Sleuth around the nmr attributes.
@@ -113,7 +114,8 @@ test_that('as.nmrData returns the correct data frame and attributes',{
          prop_missing = (sum(is.na(nmrdata$e_data)) /
                            prod(dim(nmrdata$e_data[, -1]))),
          num_samps = ncol(nmrdata$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
   
   # Sleuth around the nmr attributes.
@@ -202,7 +204,8 @@ test_that('as.nmrData returns the correct data frame and attributes',{
          prop_missing = (sum(is.na(nmrdata$e_data)) /
                            prod(dim(nmrdata$e_data[, -1]))),
          num_samps = ncol(nmrdata$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
   
   # Sleuth around the nmr attributes.
@@ -271,7 +274,8 @@ test_that('as.nmrData returns the correct data frame and attributes',{
          prop_missing = (sum(is.na(nmrdata$e_data)) /
                            prod(dim(nmrdata$e_data[, -1]))),
          num_samps = ncol(nmrdata$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
   
   # Sleuth around the nmr attributes.
@@ -351,7 +355,8 @@ test_that('as.nmrData returns the correct data frame and attributes',{
          prop_missing = (sum(is.na(nmrdata$e_data)) /
                            prod(dim(nmrdata$e_data[, -1]))),
          num_samps = ncol(nmrdata$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
   
   # Sleuth around the nmr attributes.

@@ -74,7 +74,7 @@ test_that('SPANS correctly spans the data',{
   for (e in 1:length(select_n)) {
     
     # Create a background distribution (whatever that is).
-    test_md[[e]] <- spans_make_distribution(omicsData = pdata,
+    test_md[[e]] <- pmartR:::spans_make_distribution(omicsData = pdata,
                                             group_vector = group,
                                             norm_fn = c("median",
                                                         "mean",
@@ -105,7 +105,7 @@ test_that('SPANS correctly spans the data',{
   for (e in 1:length(select_n)) {
     
     # Create a background distribution (whatever that is).
-    test_eggs[[e]] <- spans_make_distribution(omicsData = pdata_eggs,
+    test_eggs[[e]] <- pmartR:::spans_make_distribution(omicsData = pdata_eggs,
                                               group_vector = group_eggs,
                                               norm_fn = c("median",
                                                           "mean",

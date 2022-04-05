@@ -89,7 +89,8 @@ test_that('normalize_quantile produces the correct output',{
                     num_miss_obs = 0,
                     prop_missing = 0,
                     num_samps = 41,
-                    data_types = NULL))
+                    data_types = NULL,
+                    batch_info = list(is_bc = FALSE)))
   
   # Normalize the data with the mixed up columns.
   mixed_norm <- normalize_quantile(omicsData = mixed_nmr)
@@ -128,7 +129,8 @@ test_that('normalize_quantile produces the correct output',{
                     num_miss_obs = 0,
                     prop_missing = 0,
                     num_samps = 41,
-                    data_types = NULL))
+                    data_types = NULL,
+                    batch_info = list(is_bc = FALSE)))
   
   # Normailze data with missing values -----------------------------------------
   

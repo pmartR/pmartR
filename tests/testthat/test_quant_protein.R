@@ -103,7 +103,7 @@ test_that('each rollup method correctly quantifies proteins',{
     e_data = merged %>%
       dplyr::select(-Mass_Tag_ID) %>%
       dplyr::group_by(Protein) %>%
-      dplyr::mutate(dplyr::across(.fns = combine_fn_mean)) %>%
+      dplyr::mutate(dplyr::across(.fns = pmartR:::combine_fn_mean)) %>%
       data.frame(),
     f_data = pdata$f_data,
     e_meta = pdata$e_meta %>%
@@ -232,7 +232,7 @@ test_that('each rollup method correctly quantifies proteins',{
     dplyr::select(-Mass_Tag_ID) %>%
     dplyr::nest_by(Protein) %>%
     dplyr::mutate(ratio = list(ratio(cData = data,
-                                     fn = combine_fn_median)))
+                                     fn = pmartR:::combine_fn_median)))
 
   # Produce an e_data object to create the rrollup standard.
   edata_med <- data.frame(temp_med$Protein,
@@ -315,7 +315,7 @@ test_that('each rollup method correctly quantifies proteins',{
     dplyr::select(-Mass_Tag_ID) %>%
     dplyr::nest_by(Protein) %>%
     dplyr::mutate(qtile = list(qtile(cData = data,
-                                     fn = combine_fn_median,
+                                     fn = pmartR:::combine_fn_median,
                                      qthold = 0.4)))
 
   # Produce an e_data object to create the qrollup standard.
@@ -426,7 +426,7 @@ test_that('each rollup method correctly quantifies proteins',{
     dplyr::select(-Mass_Tag_ID) %>%
     dplyr::nest_by(Protein) %>%
     dplyr::mutate(zombie = list(zombie(cData = data,
-                                       fn = combine_fn_median)))
+                                       fn = pmartR:::combine_fn_median)))
 
   # Produce an e_data object to create the qrollup standard.
   edata_med <- data.frame(temp_med$Protein,
@@ -549,7 +549,7 @@ test_that('each rollup method correctly quantifies proteins',{
     dplyr::select(-Mass_Tag_ID, -Protein) %>%
     dplyr::nest_by(Protein_Isoform) %>%
     dplyr::mutate(qtile = list(qtile(cData = data,
-                                     fn = combine_fn_median,
+                                     fn = pmartR:::combine_fn_median,
                                      qthold = 0.4))) %>%
     dplyr::select(Protein_Isoform, qtile) %>%
     tidyr::unnest(cols = c(Protein_Isoform, qtile)) %>%

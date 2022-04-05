@@ -49,7 +49,8 @@ test_that('as.lipidData returns the correct data frame and attributes',{
          prop_missing = (sum(is.na(ldata$e_data)) /
                            prod(dim(ldata$e_data[, -1]))),
          num_samps = ncol(ldata$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
   
   # Check the checkers.
@@ -106,7 +107,8 @@ test_that('as.lipidData returns the correct data frame and attributes',{
          prop_missing = (sum(is.na(ldata$e_data)) /
                            prod(dim(ldata$e_data[, -1]))),
          num_samps = ncol(ldata$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
   
   # Check the checkers.
@@ -189,7 +191,8 @@ test_that('as.lipidData returns the correct data frame and attributes',{
          prop_missing = (sum(is.na(ldata$e_data)) /
                            prod(dim(ldata$e_data[, -1]))),
          num_samps = ncol(ldata$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
   
   # Check the checkers.
@@ -251,7 +254,8 @@ test_that('as.lipidData returns the correct data frame and attributes',{
          prop_missing = (sum(is.na(ldata$e_data)) /
                            prod(dim(ldata$e_data[, -1]))),
          num_samps = ncol(ldata$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
   
   # Check the checkers.
@@ -324,7 +328,8 @@ test_that('as.lipidData returns the correct data frame and attributes',{
          prop_missing = (sum(is.na(ldata$e_data)) /
                            prod(dim(ldata$e_data[, -1]))),
          num_samps = ncol(ldata$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
   
   # Check the checkers.
