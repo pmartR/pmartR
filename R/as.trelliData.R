@@ -57,7 +57,8 @@
 #'   samples (an additional biomolecule identifier/name column should also be
 #'   present anywhere in the data.frame). Each row corresponds to data for each
 #'   biomolecule. One column specifying a unique identifier for each biomolecule (row)
-#'   must be present.
+#'   must be present. We do not recommend passing data that requires reference 
+#'   normalization (isobaric, nmr, etc.)
 #' @param edata_cname character string specifying the name of the column
 #'   containing the biomolecule identifiers. It should be the only non-numeric colummn
 #'   in edata.
