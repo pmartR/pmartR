@@ -40,6 +40,25 @@ test_that("An edata object passed to trelliData edata returns correct data frame
   expect_equal(attributes(pep_trelli_edata$omicsData)$data_info$norm_info$subset_fn, "all")
   expect_equal(attributes(pep_trelli_edata$omicsData)$data_info$norm_info$norm_fn, "median")
   
+  # Now, test again with a different normalization method 
+  pep_trelli_edata2 <- as.trelliData.edata(
+    e_data = edata, 
+    edata_cname = "Mass_Tag_ID",
+    omics_type = "pepData",
+    data_scale_original = "abundance",
+    data_scale = "log2",
+    normalization_fun = "global",
+    normalization_params = list(subset_fn = "ppp", norm_fn = "mean", apply_norm = TRUE,
+                                params = list(ppp = 0.75), backtransform = TRUE)
+  )
+  
+  # Test normalization parameters where normalization function should be mean, 
+  # subset_function should be ppp, and the parameters list should be 0.75.
+  expect_equal(attributes(pep_trelli_edata2$omicsData)$data_info$norm_info$norm_type, "global")
+  expect_equal(attributes(pep_trelli_edata2$omicsData)$data_info$norm_info$norm_fn, "mean")
+  expect_equal(attributes(pep_trelli_edata2$omicsData)$data_info$norm_info$subset_fn, "ppp")
+  expect_equal(attributes(pep_trelli_edata2$omicsData)$data_info$norm_info$subset_params$ppp, 0.75)
+  
   # The rest are generic checks that are the same for every data type. Define a function to re-use. 
   run_generic_tests <- function(trelliData, edata_cname) {
     
@@ -116,6 +135,8 @@ test_that("An edata object passed to trelliData edata returns correct data frame
                    'lipidData.RData',
                    package = 'pmartR'))
   
+  # Test: lipid expression data-------------------------------------------------
+  
   # Here, we will test with log10 transformation and loess normalization with the 
   # affy method and a span of 0.2. 
   lip_trelli_edata <- as.trelliData.edata(
@@ -157,6 +178,8 @@ test_that("An edata object passed to trelliData edata returns correct data frame
                    'metaboliteData.RData',
                    package = 'pmartR'))
   
+  # Test: metabolite expression data--------------------------------------------
+  
   # Here, we will test with ln transformation and quantile normalization. First, 
   # let's fill in the gaps in edata. 
   edata[is.na(edata)] <- rnorm(length(edata[is.na(edata)]), 20000, 1000)
@@ -172,6 +195,104 @@ test_that("An edata object passed to trelliData edata returns correct data frame
     normalization_params = NULL
   )
   
+  # Check the 4 resulting data.frames. First, trelliData.omics should exist and contain 
+  # 3 colummns: edata_cname, Sample, and Abundance. It should also have 960 rows.
+  expect_equal(
+    colnames(metab_trelli_edata$trelliData.omics),
+    c("Metabolite", "Sample", "Abundance")
+  )
   
+  expect_equal(nrow(metab_trelli_edata$trelliData.omics), 960)
+  
+  # omicsData must be of the class metabData
+  expect_equal(class(metab_trelli_edata$omicsData), "metabData")
+  
+  # omicsData must be originally abundance and transformed to log. 
+  expect_equal(attributes(metab_trelli_edata$omicsData)$data_info$data_scale_orig, "abundance")
+  expect_equal(attributes(metab_trelli_edata$omicsData)$data_info$data_scale, "log")
+  
+  # The normalization should be quantile
+  expect_equal(attributes(metab_trelli_edata$omicsData)$data_info$norm_info$norm_type, "quantile")
+
+  # Now, run the generic checks
+  run_generic_tests(metab_trelli_edata, "Metabolite")
+  
+  # Load: nmr expression data---------------------------------------------------
+  
+  load(system.file('testdata',
+                   'nmrData.RData',
+                   package = 'pmartR'))
+  
+  # Test: nmr expression data---------------------------------------------------
+  
+  # Let skip transformation. Normalization should be skipped as well because it's NMR data. 
+  nmr_trelli_edata <- as.trelliData.edata(
+    e_data = edata, 
+    edata_cname = "Metabolite",
+    omics_type = "nmrData",
+    data_scale_original = "abundance",
+    data_scale = "abundance"
+  )
+  
+  # Check the 4 resulting data.frames. First, trelliData.omics should exist and contain 
+  # 3 colummns: edata_cname, Sample, and Abundance. It should also have 1558 rows.
+  expect_equal(
+    colnames(nmr_trelli_edata$trelliData.omics),
+    c("Metabolite", "Sample", "Abundance")
+  )
+  
+  expect_equal(nrow(nmr_trelli_edata$trelliData.omics), 1558)
+  
+  # omicsData must be of the class nmrData
+  expect_equal(class(nmr_trelli_edata$omicsData), "nmrData")
+  
+  # omicsData must be originally abundance and not transformed.
+  expect_equal(attributes(nmr_trelli_edata$omicsData)$data_info$data_scale_orig, "abundance")
+  expect_equal(attributes(nmr_trelli_edata$omicsData)$data_info$data_scale, "abundance")
+  
+  # No normalization should have occurred. 
+  expect_false(attributes(nmr_trelli_edata$omicsData)$data_info$norm_info$is_normalized)
+  
+  # Now, run the generic checks
+  run_generic_tests(nmr_trelli_edata, "Metabolite")
+  
+  # Load: isobaric expression data----------------------------------------------
+  
+  load(system.file('testdata',
+                   'little_isodata.RData',
+                   package = 'pmartR'))
+  
+  # Test: isobaric expression data----------------------------------------------
+  
+  # Let's log transform. Normalization should be skipped as well because it's isobaric data. 
+  iso_trelli_edata <- as.trelliData.edata(
+    e_data = edata, 
+    edata_cname = "Peptide",
+    omics_type = "isobaricpepData",
+    data_scale_original = "abundance",
+    data_scale = "log2"
+  )
+  
+  # Check the 4 resulting data.frames. First, trelliData.omics should exist and contain 
+  # 3 colummns: edata_cname, Sample, and Abundance. It should also have 1800 rows.
+  expect_equal(
+    colnames(iso_trelli_edata$trelliData.omics),
+    c("Peptide", "Sample", "Abundance")
+  )
+  
+  expect_equal(nrow(iso_trelli_edata$trelliData.omics), 1800)
+  
+  # omicsData must be of the class nmrData
+  expect_equal(class(iso_trelli_edata$omicsData), c("isobaricpepData", "pepData"))
+  
+  # omicsData must be originally abundance and not transformed.
+  expect_equal(attributes(iso_trelli_edata$omicsData)$data_info$data_scale_orig, "abundance")
+  expect_equal(attributes(iso_trelli_edata$omicsData)$data_info$data_scale, "log2")
+  
+  # No normalization should have occurred. 
+  expect_false(attributes(iso_trelli_edata$omicsData)$data_info$norm_info$is_normalized)
+  
+  # Now, run the generic checks
+  run_generic_tests(iso_trelli_edata, "Peptide")
   
 })

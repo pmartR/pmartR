@@ -136,6 +136,13 @@ as.trelliData.edata <- function(e_data,
     stop(paste(normalization_fun, "is not an acceptable normalization function type."))
   }
   
+  # Normalization parameters should have apply_norm in it
+  if (!is.null(normalization_params) && normalization_fun == "global") {
+    if ("apply_norm" %in% names(normalization_params) == FALSE || (normalization_params$apply_norm == FALSE)) {
+      stop("apply_norm must be TRUE to apply normalization parameters.")
+    }
+  } 
+  
   # Build an omics data object--------------------------------------------------
   
   # Generate a f data frame 
@@ -176,7 +183,7 @@ as.trelliData.edata <- function(e_data,
     attr(omicsData, "data_info")$norm_info$is_normalized <- TRUE
   }
   
-  # Finally, generate the trelliData object-----------------------------------
+  # Finally, generate the trelliData object-------------------------------------
   
   # Put the edata into the trelliData omics slot 
   trelliData <- list(
