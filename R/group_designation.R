@@ -267,18 +267,18 @@ group_designation <- function (omicsData,
     }
 
     # Count the number of pair IDs that do not have two entries in f_data.
-    not_two <- which(unname(table(omicsData$f_data[, pairs])) != 2)
+    not_two <- which(unname(table(omicsData$f_data[, pairs])) < 2)
 
-    # Ensure each pair has two observations in f_data.
+    # Ensure each pair has at least two observations in f_data.
     if (length(not_two) > 0) {
 
       pair_id <- names(table(omicsData$f_data[, pairs]))[not_two]
 
-      stop (
-        paste("Pair",
-              pair_id,
-              "does not have the two observations needed to form a pair.")
-      )
+      stop (paste("The following pairs do not have at least two samples to ",
+                  "form a pair: ",
+                  knitr::combine_words(pair_id),
+                  ".",
+                  sep = ""))
 
     }
 
