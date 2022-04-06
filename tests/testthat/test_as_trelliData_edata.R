@@ -36,7 +36,9 @@ test_that("An edata object passed to trelliData edata returns correct data frame
   
   # The normalization should be global, with an "all" subset function and median 
   # normalization function.
-  
+  expect_equal(attributes(pep_trelli_edata$omicsData)$data_info$norm_info$norm_type, "global")
+  expect_equal(attributes(pep_trelli_edata$omicsData)$data_info$norm_info$subset_fn, "all")
+  expect_equal(attributes(pep_trelli_edata$omicsData)$data_info$norm_info$norm_fn, "median")
 
   # Also, assert fdata of exactly the number of columns - 1, and absolutely no emeta. 
   expect_equal(nrow(pep_trelli_edata$omicsData$f_data), 12)
@@ -46,15 +48,18 @@ test_that("An edata object passed to trelliData edata returns correct data frame
   expect_null(pep_trelli_edata$trelliData.stat)
   expect_null(pep_trelli_edata$statRes)
   
-  # Check attributes. Fdata column should be listed as the "invented" fdata column.
-  # Check potential panel_by_options. Nothing should be in the panel_by_omics or stat,
-  # since panel_by should be FALSE. The class will be both trelliData and trelli.edata.
-  
+  # Check attributes. Fdata column should be listed as the "invented" fdata column "Sample".
+  # Check potential panel_by_options which sould be edata_cname and Sample.
+  # Nothing should be in the panel_by_omics or stat, since panel_by should be FALSE. 
+  # The class will be both trelliData and trelli.edata.
   expect_equal(attr(pep_trelli_edata, "fdata_col"), "Sample")
   expect_equal(attr(pep_trelli_edata, "panel_by_options"), c(edata_cname, "Sample"))
   expect_equal(attr(pep_trelli_edata, "panel_by_omics"), NA)
   expect_equal(attr(pep_trelli_edata, "panel_by_stat"), NA)
   expect_false(attr(pep_trelli_edata, "panel_by"))
+  
+  
+  # Load: protein expression data-----------------------------------------------
   
   
   
