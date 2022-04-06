@@ -137,6 +137,41 @@ test_that("An edata object passed to trelliData edata returns correct data frame
   
   expect_equal(nrow(lip_trelli_edata$trelliData.omics), 1606)
   
+  # omicsData must be of the class lipdData
+  expect_equal(class(lip_trelli_edata$omicsData), "lipidData")
+  
+  # omicsData must be originally abundance and transformed to log2, which is the default. 
+  expect_equal(attributes(lip_trelli_edata$omicsData)$data_info$data_scale_orig, "abundance")
+  expect_equal(attributes(lip_trelli_edata$omicsData)$data_info$data_scale, "log10")
+  
+  # The normalization should be loess, with an "affy" method and span of 0.2. 
+  # The only info tracked is that normalization has happened 
+  expect_true(attributes(lip_trelli_edata$omicsData)$data_info$norm_info$is_normalized)
+  
+  # Now, run the generic checks
+  run_generic_tests(lip_trelli_edata, "LipidCommonName")
+  
+  # Load: metabolite expression data--------------------------------------------
+  
+  load(system.file('testdata',
+                   'metaboliteData.RData',
+                   package = 'pmartR'))
+  
+  # Here, we will test with ln transformation and quantile normalization. First, 
+  # let's fill in the gaps in edata. 
+  edata[is.na(edata)] <- rnorm(length(edata[is.na(edata)]), 20000, 1000)
+  
+  # Then, let's do the quantile normalization
+  metab_trelli_edata <- as.trelliData.edata(
+    e_data = edata, 
+    edata_cname = "Metabolite",
+    omics_type = "metabData",
+    data_scale_original = "abundance",
+    data_scale = "log",
+    normalization_fun = "quantile",
+    normalization_params = NULL
+  )
+  
   
   
 })
