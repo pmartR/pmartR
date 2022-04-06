@@ -632,6 +632,10 @@ anova_test <- function (omicsData, comparisons, pval_adjust,
       cov_data <- cov_data %>%
         dplyr::group_by(!!rlang::sym(da_pair_name)) %>%
         dplyr::slice(1) %>%
+        # Remove the grouping structure. If we don't then the pair ID variable
+        # will be added to the beginning of the data frame after removing it
+        # with select.
+        dplyr::ungroup() %>%
         # The second column will always be the pair ID column because we created
         # the cov_data object to be that way above. Remove this column because
         # it is not needed. We don't need it messing up our hard work in
@@ -641,7 +645,7 @@ anova_test <- function (omicsData, comparisons, pval_adjust,
 
       # Update the sample names in the cov_data object according to the column
       # names of data (the paired difference data matrix).
-      cov_data[, da_pair_name] <- colnames(data)
+      cov_data[, samp_cname] <- colnames(data)
 
     }
 
@@ -734,7 +738,7 @@ anova_test <- function (omicsData, comparisons, pval_adjust,
 
   # ANOVA stuffs ---------------------------------------------------------------
 
-  if(ncol(groupData)==2){
+  if (length(attr(get_group_DF(omicsData), "main_effects")) == 1) {
     ##---- One factor ANOVA ----##
 
     ##Translate the groups into numeric labels for anova_cpp() function
