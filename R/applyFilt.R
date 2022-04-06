@@ -242,7 +242,8 @@ applyFilt.moleculeFilt <- function(filter_object, omicsData, min_num=2){
       covariates = names(attr(get_group_DF(omicsData),
                               "covariates"))[-1],
       time_course = attr(get_group_DF(omicsData),
-                         "time_course")
+                         "time_course"),
+      pairs = attr(get_group_DF(omicsData), "pairs")
     )
 
   } else {
@@ -383,7 +384,8 @@ applyFilt.cvFilt <- function (filter_object, omicsData, cv_threshold = 150) {
       covariates = names(attr(get_group_DF(omicsData),
                               "covariates"))[-1],
       time_course = attr(get_group_DF(omicsData),
-                         "time_course")
+                         "time_course"),
+      pairs = attr(get_group_DF(omicsData), "pairs")
     )
 
   } else {
@@ -565,7 +567,8 @@ applyFilt.rmdFilt <- function (filter_object, omicsData,
       covariates = names(attr(get_group_DF(omicsData),
                               "covariates"))[-1],
       time_course = attr(get_group_DF(omicsData),
-                         "time_course")
+                         "time_course"),
+      pairs = attr(get_group_DF(omicsData), "pairs")
     )
 
   } else {
@@ -815,7 +818,8 @@ applyFilt.proteomicsFilt <- function (filter_object,
       covariates = names(attr(get_group_DF(omicsData),
                               "covariates"))[-1],
       time_course = attr(get_group_DF(omicsData),
-                         "time_course")
+                         "time_course"),
+      pairs = attr(get_group_DF(omicsData), "pairs")
     )
 
   } else {
@@ -1128,13 +1132,20 @@ applyFilt.imdanovaFilt <- function (filter_object,
                                  fdata = diff_fdata,
                                  edata_cname = get_edata_cname(omicsData),
                                  fdata_cname = get_fdata_cname(omicsData))
+
+    # Create the group designation attribute for the differences. Don't include
+    # the pairs argument because the data just had the difference taken and
+    # there are no longer pairs in the data (just a difference between pairs).
     diff_omicsData <- group_designation(
       omicsData = diff_omicsData,
       main_effects = attr(attr(omicsData, "group_DF"), "main_effects"),
-      covariates = attr(attr(omicsData, "group_DF"), "covariates")
+      covariates = names(attr(attr(omicsData, "group_DF"), "covariates"))
     )
 
-    # Create a new filter object with the differenced data.
+    # Create a new filter object with the differenced data. (For future readers:
+    # I meant to use the word "differenced". I hope it made you chuckle.) We
+    # need this object for the counts based on differences instead of pairs
+    # because later we will filter and perform statistics on the differences.
     diff_filter_object <- imdanova_filter(diff_omicsData)
 
     # Create a list with the appropriate information for the anova_filter and
@@ -1256,7 +1267,8 @@ applyFilt.imdanovaFilt <- function (filter_object,
       covariates = names(attr(get_group_DF(omicsData),
                               "covariates"))[-1],
       time_course = attr(get_group_DF(omicsData),
-                         "time_course")
+                         "time_course"),
+      pairs = attr(get_group_DF(omicsData), "pairs")
     )
 
   } else {
@@ -1512,7 +1524,8 @@ applyFilt.customFilt <- function (filter_object, omicsData) {
       covariates = names(attr(get_group_DF(omicsData),
                               "covariates"))[-1],
       time_course = attr(get_group_DF(omicsData),
-                         "time_course")
+                         "time_course"),
+      pairs = attr(get_group_DF(omicsData), "pairs")
     )
 
   } else {
