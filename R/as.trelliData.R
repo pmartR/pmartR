@@ -452,7 +452,7 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL, ...) {
   # been grouped by. And "panel_by" tracks whether the panel_by function has been
   # applied or not. 
   group_options <- c(colnames(trelliData.omics), colnames(trelliData.stat)) %>% unique()
-  group_nonoptions <- c("Abundance", "Comparison", "p_value", "fold_change", "Group")
+  group_nonoptions <- c("Abundance", "Comparison", "p_value_anova", "p_value_gtest", "fold_change", "Group")
   group_options <- group_options[group_options %in% group_nonoptions == FALSE]
   attr(trelliData, "panel_by_options") <- group_options
   attr(trelliData, "panel_by_omics") <- NA
