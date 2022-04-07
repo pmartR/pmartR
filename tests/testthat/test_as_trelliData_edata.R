@@ -295,4 +295,30 @@ test_that("as.trelliData.edata returns correct data frames and attributes",{
   # Now, run the generic checks
   run_generic_tests(iso_trelli_edata, "Peptide")
   
+  # Test: Input checking--------------------------------------------------------
+  
+  # Here, I will run specific tests that should all fail to ensure the parameter
+  # validation portion of the code is running correctly. 
+  
+  # Anything besides edata should fail 
+  expect_error(
+    suppressMessages({
+      as.trelliData.edata(
+        e_data = fdata, 
+        edata_cname = "Metabolite",
+        omics_type = "nmrData"
+      )
+    })
+  )
+  
+  expect_error(
+    suppressMessages({
+      as.trelliData.edata(
+        e_data = emeta, 
+        edata_cname = "Metabolite",
+        omics_type = "nmrData"
+      )
+    })
+  )
+  
 })

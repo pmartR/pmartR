@@ -232,8 +232,6 @@ test_that("as.trelliData and trelli_panel_by returns correct data frames and att
     attributes(pepTrelli_both_emetacol)[c("fdata_col", "emeta_col", "panel_by_options", "class")]
   )
   
-  
-  
-  
+
   
 })
