@@ -145,4 +145,34 @@ test_that("as.trelliData and trelli_panel_by returns correct data frames and att
   
   ## Both omicsData and statRes checks 
   
+  # trelliData should have both omicsData and statRes
+  expect_equal(pepTrelli_both$omicsData, pepOmics)
+  expect_equal(pepTrelli_both$statRes, pepStat)
+  
+  # Now, check the trelliData.omics object. Should be the same as when we just supplied omicsData. 
+  expect_equal(colnames(pepTrelli_both$trelliData.omics), c(edata_cname, fdata_cname, "Abundance", "Group", emeta_cols))
+  
+  # The trelliData.stat object should hav ethe same categories as when we just supplied
+  # statRes, with the emeta cols. 
+  expect_equal(
+    colnames(pepTrelli_both$trelliData.stat), 
+    c(edata_cname, "Comparison", "p_value_anova", "p_value_gtest", "fold_change", emeta_cols)
+  )
+  
+  # Check trelliData attributes. The only fdata column should always be 
+  # fdata_cname. Emeta columns should include everything but the edata_cname.
+  # Panel by options will include emeta_cname, and the aforementioned columns.
+  # All panel_by properties should be FALSE. 
+  expect_equal(attr(pepTrelli_both, "fdata_col"), fdata_cname)
+  expect_equal(attr(pepTrelli_both, "emeta_col"), emeta_cols)
+  expect_equal(attr(pepTrelli_both, "panel_by_options"), c(edata_cname, fdata_cname, emeta_cols))
+  expect_false(attr(pepTrelli_both, "panel_by"))
+  expect_equal(attr(pepTrelli_both, "panel_by_omics"), NA)
+  expect_equal(attr(pepTrelli_both, "panel_by_stat"), NA)
+  
+  
+  
+  
+  
+  
 })
