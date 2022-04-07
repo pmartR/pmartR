@@ -1,6 +1,6 @@
 context("class: trelliData edata")
 
-test_that("An edata object passed to trelliData edata returns correct data frames and attributes",{
+test_that("as.trelliData.edata returns correct data frames and attributes",{
   
   # Load: peptide expression data-----------------------------------------------
   
