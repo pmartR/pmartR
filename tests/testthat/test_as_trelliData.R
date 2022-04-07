@@ -97,7 +97,9 @@ test_that("as.trelliData and trelli_panel_by returns correct data frames and att
   expect_equal(attr(pepTrelli_omics_emetacol, "panel_by_stat"), NA)
   expect_equal(
     attributes(pepTrelli_omics)[c("fdata_col", "emeta_col", "panel_by_options", "class")],
-    attributes(pepTrelli_omics_edatacname)[c("fdata_col", "emeta_col", "panel_by_options", "class")],
+    attributes(pepTrelli_omics_edatacname)[c("fdata_col", "emeta_col", "panel_by_options", "class")]
+  )
+  expect_equal(
     attributes(pepTrelli_omics_fdatacname)[c("fdata_col", "emeta_col", "panel_by_options", "class")],
     attributes(pepTrelli_omics_emetacol)[c("fdata_col", "emeta_col", "panel_by_options", "class")]
   )
@@ -170,6 +172,65 @@ test_that("as.trelliData and trelli_panel_by returns correct data frames and att
   expect_equal(attr(pepTrelli_both, "panel_by_omics"), NA)
   expect_equal(attr(pepTrelli_both, "panel_by_stat"), NA)
   
+  # Test the only panel by edata_cname, fdata_cname, and an emeta_coumns
+  pepTrelli_both_edatacname <- trelli_panel_by(pepTrelli_both, edata_cname)
+  pepTrelli_both_fdatacname <- trelli_panel_by(pepTrelli_both, fdata_cname)
+  pepTrelli_both_emetacol <- trelli_panel_by(pepTrelli_both, emeta_cols[2])
+  
+  # After paneling by an acceptable choice, the number of plots should equal the 
+  # number of unique entries in that category across omicsData and statRes. 
+  
+  # Number of biomolecules should be the same in both omicsData and statRes
+  expect_equal(
+    pepTrelli_both_edatacname$trelliData.omics %>% nrow(),
+    pepTrelli_both$trelliData.omics[[edata_cname]] %>% unique() %>% length()
+  )
+  expect_equal(
+    pepTrelli_both_edatacname$trelliData.stat %>% nrow(),
+    pepTrelli_both$trelliData.stat[[edata_cname]] %>% unique() %>% length()
+  )
+
+  # Only omicsData can be paneled_by sample 
+  expect_equal(
+    pepTrelli_both_fdatacname$trelliData.omics %>% nrow(),
+    pepTrelli_both$trelliData.omics[[fdata_cname]] %>% unique() %>% length()
+  )
+  
+  # Number of emeta categories should be the same in both omicsData and statRes
+  expect_equal(
+    pepTrelli_both_emetacol$trelliData.omics %>% nrow(),
+    pepTrelli_both$trelliData.omics[[emeta_cols[2]]] %>% unique() %>% length()
+  )
+  expect_equal(
+    pepTrelli_both_emetacol$trelliData.stat %>% nrow(),
+    pepTrelli_both$trelliData.stat[[emeta_cols[2]]] %>% unique() %>% length()
+  )
+
+  # Check that the correct attributes were changed after paneling. Only "panel_by_omics" 
+  # should contain the panel_by variable. The rest (besides panel_by flag) should be the same. 
+  expect_true(attr(pepTrelli_both_edatacname, "panel_by"))
+  expect_equal(attr(pepTrelli_both_edatacname, "panel_by_omics"), edata_cname)
+  expect_equal(attr(pepTrelli_both_edatacname, "panel_by_stat"), edata_cname)
+  expect_equal(
+    attributes(pepTrelli_both)[c("fdata_col", "emeta_col", "panel_by_options", "class")],
+    attributes(pepTrelli_both_edatacname)[c("fdata_col", "emeta_col", "panel_by_options", "class")]
+  )
+  
+  expect_true(attr(pepTrelli_both_fdatacname, "panel_by"))
+  expect_equal(attr(pepTrelli_both_fdatacname, "panel_by_omics"), fdata_cname)
+  expect_equal(attr(pepTrelli_both_fdatacname, "panel_by_stat"), NA)
+  expect_equal(
+    attributes(pepTrelli_both)[c("fdata_col", "emeta_col", "panel_by_options", "class")],
+    attributes(pepTrelli_both_fdatacname)[c("fdata_col", "emeta_col", "panel_by_options", "class")]
+  )
+
+  expect_true(attr(pepTrelli_both_emetacol, "panel_by"))
+  expect_equal(attr(pepTrelli_both_emetacol, "panel_by_omics"), emeta_cols[2])
+  expect_equal(attr(pepTrelli_both_emetacol, "panel_by_stat"), emeta_cols[2])
+  expect_equal(
+    attributes(pepTrelli_both)[c("fdata_col", "emeta_col", "panel_by_options", "class")],
+    attributes(pepTrelli_both_emetacol)[c("fdata_col", "emeta_col", "panel_by_options", "class")]
+  )
   
   
   
