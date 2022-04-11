@@ -24,8 +24,6 @@
 #'   peptides are considered differentially expressed. Defaults to 0.05
 #' @param covariates A character vector with no more than two variable names
 #'   that will be used as covariates in the IMD-ANOVA analysis.
-#' @param paired logical - should the data be paired or not; if TRUE the
-#'   attribute "pairing" cannot be `NULL`
 #' @param use_parallel A logical value indicating whether or not to use a
 #'   "doParallel" loop when running the G-Test with covariates. The default is
 #'   TRUE.
@@ -93,7 +91,6 @@ imd_anova <- function (omicsData,
                        pval_adjust_g = 'none',
                        pval_thresh = 0.05,
                        covariates = NULL,
-                       paired = FALSE,
                        equal_var = TRUE,
                        use_parallel = TRUE) {
 
@@ -182,6 +179,14 @@ imd_anova <- function (omicsData,
 
     }
 
+  }
+
+  # Check if the data are paired. The paired object is used by multiple
+  # functions within imd_anova.
+  if (is.null(attr(attr(omicsData, "group_DF"), "pairs"))) {
+    paired <- FALSE
+  } else {
+    paired <- TRUE
   }
 
   # Statisticalness!!! ---------------------------------------------------------
@@ -1096,7 +1101,7 @@ imd_test <- function (omicsData, comparisons, pval_adjust,
   }else{
 
     # Determine if covariates/paired data should be accounted for.
-    if (is.null(covariates) || paired) {
+    if (is.null(covariates) && !paired) {
 
       pairwise_gk <- group_comparison_imd(groupData,comparisons,observed,absent)
       pairwise_stats <- data.frame(pairwise_gk$GStats)
@@ -1315,7 +1320,7 @@ imd_cov <- function (data, groupData, fdata, cmat,
           ninja <- anova(
             glm(
               as.numeric(!is.na(data[v, groupIdx])) ~
-                factor(fdata[groupIdx, pairIdx]) +
+                fdata[groupIdx, pairIdx] +
                 groupData$Group[groupIdx],
               family = binomial
             ),
@@ -1331,7 +1336,7 @@ imd_cov <- function (data, groupData, fdata, cmat,
           ninja <- anova(
             glm(
               as.numeric(!is.na(data[v, groupIdx])) ~
-                factor(fdata[groupIdx, pairIdx]) +
+                fdata[groupIdx, pairIdx] +
                 attr(groupData, "covariates")[groupIdx, covIdx] +
                 groupData$Group[groupIdx],
               family = binomial
@@ -1348,7 +1353,7 @@ imd_cov <- function (data, groupData, fdata, cmat,
           ninja <- anova(
             glm(
               as.numeric(!is.na(data[v, groupIdx])) ~
-                factor(fdata[groupIdx, pairIdx]) +
+                fdata[groupIdx, pairIdx] +
                 attr(groupData, "covariates")[groupIdx, covIdx[[1]]] +
                 attr(groupData, "covariates")[groupIdx, covIdx[[2]]] +
                 groupData$Group[groupIdx],
