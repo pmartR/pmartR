@@ -295,7 +295,22 @@ test_that("as.trelliData.edata returns correct data frames and attributes",{
   # Now, run the generic checks
   run_generic_tests(iso_trelli_edata, "Peptide")
   
-  # Test: Input checking--------------------------------------------------------
+  # Test: Input checking for is_edata-------------------------------------------
+  
+  # Here, I will catch specific errors with the is_edata function that didn't fit
+  # as a test anywhere else in this script. 
+  
+  load(system.file('testdata',
+                   'little_pdata.Rdata',
+                   package = 'pmartR'))
+  
+  # Catch no edata (passed a null)
+  expect_message(.is_edata(NULL), "edata must be a data.frame.")
+  
+  # Catch a wrong data type type 
+  expect_message(.is_edata(as.matrix(edata)),  "edata must be a data.frame.")
+  
+  # Test: Input checking for as.trelliData.edata--------------------------------
   
   # Here, I will run specific tests that should all fail to ensure the parameter
   # validation portion of the code is running correctly. 
@@ -305,8 +320,8 @@ test_that("as.trelliData.edata returns correct data frames and attributes",{
     suppressMessages({
       as.trelliData.edata(
         e_data = fdata, 
-        edata_cname = "Metabolite",
-        omics_type = "nmrData"
+        edata_cname = "Mass_Tag_ID",
+        omics_type = "pepData"
       )
     })
   )
@@ -315,10 +330,63 @@ test_that("as.trelliData.edata returns correct data frames and attributes",{
     suppressMessages({
       as.trelliData.edata(
         e_data = emeta, 
-        edata_cname = "Metabolite",
-        omics_type = "nmrData"
+        edata_cname = "Mass_Tag_ID",
+        omics_type = "pepData"
       )
     })
+  )
+  
+  # A fake omics type should trigger an error 
+  expect_error(
+    as.trelliData.edata(
+      e_data = edata, 
+      edata_cname = "Mass_Tag_ID",
+      omics_type = "volitomeData"
+    ),
+    "volitomeData is not an acceptable omics_type."
+  )
+  
+  # Now trigger unacceptable data_scales
+  expect_error(
+    as.trelliData.edata(
+      e_data = edata, 
+      edata_cname = "Mass_Tag_ID",
+      omics_type = "pepData",
+      data_scale_original = "log3"
+    ),
+    "log3 is not an acceptable data scale."
+  )
+  expect_error(
+    as.trelliData.edata(
+      e_data = edata, 
+      edata_cname = "Mass_Tag_ID",
+      omics_type = "pepData",
+      data_scale = "log3"
+    ),
+    "log3 is not an acceptable data scale."
+  )
+  
+  # Now trigger a wrong normalization choice
+  expect_error(
+    as.trelliData.edata(
+      e_data = edata, 
+      edata_cname = "Mass_Tag_ID",
+      omics_type = "pepData",
+      normalization_fun = "reference_pool"
+    ),
+    "reference_pool is not an acceptable normalization function type."
+  )
+  
+  # Include a normalization example where the user doesn't apply the normalization
+  expect_error(
+    as.trelliData.edata(
+      e_data = edata, 
+      edata_cname = "Mass_Tag_ID",
+      omics_type = "pepData",
+      normalization_params = list(subset_fn = "all", norm_fn = "median", 
+                                  apply_norm = FALSE, backtransform = TRUE)
+    ),
+    "apply_norm must be TRUE to apply normalization parameters."
   )
   
 })

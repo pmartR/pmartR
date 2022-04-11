@@ -232,6 +232,15 @@ test_that("as.trelliData and trelli_panel_by returns correct data frames and att
     attributes(pepTrelli_both_emetacol)[c("fdata_col", "emeta_col", "panel_by_options", "class")]
   )
   
+  # Test: Input checking for as.trelliData--------------------------------------
+  
+  # Here, I will run specific tests that should all fail to ensure the parameter
+  # validation portion of the code is running correctly
+  
+  # No data should return an error
+  expect_error(as.trelliData(), "At least 1 omicsData or 1 statRes object must be provided.")
+  
+  # Create a wrong omics class
 
   
 })
