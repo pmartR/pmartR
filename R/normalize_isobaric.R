@@ -302,7 +302,9 @@ normalize_isobaric <- function (omicsData, exp_cname = NULL, apply_norm = FALSE,
       data_scale = get_data_scale(omicsData),
       data_types = get_data_info(omicsData)$data_types,
       norm_info = get_data_info(omicsData)$norm_info,
-      is_normalized = get_data_info(omicsData)$norm_info$is_normalized
+      is_normalized = get_data_info(omicsData)$norm_info$is_normalized,
+      batch_info = get_data_info(omicsData)$batch_info,
+      is_bc = get_data_info(omicsData)$batch_info$is_bc
     )
     
     # Return the normalized omicsData object along with its updated attributes.

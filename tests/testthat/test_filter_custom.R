@@ -326,7 +326,8 @@ test_that('custom_filter and applyFilt produce the correct output',{
          prop_missing = (sum(is.na(filtered_edr$e_data[, -1])) /
                            prod(dim(filtered_edr$e_data[, -1]))),
          num_samps = ncol(filtered_edr$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
 
   # Explorate the meta_info attribute.
@@ -380,7 +381,8 @@ test_that('custom_filter and applyFilt produce the correct output',{
          prop_missing = (sum(is.na(filtered_fdr$e_data[, -1])) /
                            prod(dim(filtered_fdr$e_data[, -1]))),
          num_samps = ncol(filtered_fdr$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
 
   # Explorate the meta_info attribute.
@@ -434,7 +436,8 @@ test_that('custom_filter and applyFilt produce the correct output',{
          prop_missing = (sum(is.na(filtered_emr$e_data[, -1])) /
                            prod(dim(filtered_emr$e_data[, -1]))),
          num_samps = ncol(filtered_emr$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
 
   # Explorate the meta_info attribute.
@@ -491,7 +494,8 @@ test_that('custom_filter and applyFilt produce the correct output',{
          prop_missing = (sum(is.na(filtered_efdr$e_data[, -1])) /
                            prod(dim(filtered_efdr$e_data[, -1]))),
          num_samps = ncol(filtered_efdr$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
 
   # Explorate the meta_info attribute.
@@ -548,7 +552,8 @@ test_that('custom_filter and applyFilt produce the correct output',{
          prop_missing = (sum(is.na(filtered_edemr$e_data[, -1])) /
                            prod(dim(filtered_edemr$e_data[, -1]))),
          num_samps = ncol(filtered_edemr$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
 
   # Explorate the meta_info attribute.
@@ -607,7 +612,8 @@ test_that('custom_filter and applyFilt produce the correct output',{
          prop_missing = (sum(is.na(filtered_efer$e_data[, -1])) /
                            prod(dim(filtered_efer$e_data[, -1]))),
          num_samps = ncol(filtered_efer$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
 
   # Explorate the meta_info attribute.
@@ -661,7 +667,8 @@ test_that('custom_filter and applyFilt produce the correct output',{
          prop_missing = (sum(is.na(filtered_fdr_grp$e_data[, -1])) /
                            prod(dim(filtered_fdr_grp$e_data[, -1]))),
          num_samps = ncol(filtered_fdr_grp$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
 
   # Explorate the meta_info attribute.
@@ -724,7 +731,8 @@ test_that('custom_filter and applyFilt produce the correct output',{
          prop_missing = (sum(is.na(filtered_edk$e_data[, -1])) /
                            prod(dim(filtered_edk$e_data[, -1]))),
          num_samps = ncol(filtered_edk$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
 
   # Explorate the meta_info attribute.
@@ -778,7 +786,8 @@ test_that('custom_filter and applyFilt produce the correct output',{
          prop_missing = (sum(is.na(filtered_fdk$e_data[, -1])) /
                            prod(dim(filtered_fdk$e_data[, -1]))),
          num_samps = ncol(filtered_fdk$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
 
   # Explorate the meta_info attribute.
@@ -832,7 +841,8 @@ test_that('custom_filter and applyFilt produce the correct output',{
          prop_missing = (sum(is.na(filtered_emk$e_data[, -1])) /
                            prod(dim(filtered_emk$e_data[, -1]))),
          num_samps = ncol(filtered_emk$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
 
   # Explorate the meta_info attribute.
@@ -889,7 +899,8 @@ test_that('custom_filter and applyFilt produce the correct output',{
          prop_missing = (sum(is.na(filtered_efdk$e_data[, -1])) /
                            prod(dim(filtered_efdk$e_data[, -1]))),
          num_samps = ncol(filtered_efdk$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
 
   # Explorate the meta_info attribute.
@@ -946,7 +957,8 @@ test_that('custom_filter and applyFilt produce the correct output',{
          prop_missing = (sum(is.na(filtered_edemk$e_data[, -1])) /
                            prod(dim(filtered_edemk$e_data[, -1]))),
          num_samps = ncol(filtered_edemk$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
 
   # Explorate the meta_info attribute.
@@ -1005,7 +1017,8 @@ test_that('custom_filter and applyFilt produce the correct output',{
          prop_missing = (sum(is.na(filtered_efek$e_data[, -1])) /
                            prod(dim(filtered_efek$e_data[, -1]))),
          num_samps = ncol(filtered_efek$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
 
   # Explorate the meta_info attribute.
@@ -1059,7 +1072,8 @@ test_that('custom_filter and applyFilt produce the correct output',{
          prop_missing = (sum(is.na(filtered_fdk_grp$e_data[, -1])) /
                            prod(dim(filtered_fdk_grp$e_data[, -1]))),
          num_samps = ncol(filtered_fdk_grp$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
 
   # Explorate the meta_info attribute.

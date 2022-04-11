@@ -241,6 +241,7 @@ applyFilt.moleculeFilt <- function(filter_object, omicsData, min_num=2){
                           "main_effects"),
       covariates = names(attr(get_group_DF(omicsData),
                               "covariates"))[-1],
+      batch_id = names(attr(get_group_DF(omicsData),"batch_id"))[-1],
       time_course = attr(get_group_DF(omicsData),
                          "time_course"),
       pairs = attr(get_group_DF(omicsData), "pairs")
@@ -260,7 +261,9 @@ applyFilt.moleculeFilt <- function(filter_object, omicsData, min_num=2){
       data_scale = get_data_scale(omicsData),
       data_types = dInfo$data_types,
       norm_info = dInfo$norm_info,
-      is_normalized = dInfo$norm_info$is_normalized
+      is_normalized = dInfo$norm_info$is_normalized,
+      batch_info = dInfo$batch_info,
+      is_bc = dInfo$batch_info$is_bc
     )
 
 
@@ -276,13 +279,17 @@ applyFilt.moleculeFilt <- function(filter_object, omicsData, min_num=2){
   # will include the current filter object in the next available space of the
   # filters attribute list.
   n_filters <- length(attr(omicsData, 'filters')) + 1
+  
+  # determine if we have group and batch effects from filter
+  use_batch <- attributes(filter_object)$use_batch
+  use_groups <- attributes(filter_object)$use_groups
 
   # Update the filters attribute.
   attr(omicsData, 'filters')[[n_filters]] <- set_filter(
     type = class(filter_object)[[1]],
     threshold = min_num,
     filtered = filter.edata,
-    method = NA
+    method = list(use_groups = use_groups,use_batch = use_batch)
   )
 
   # RETURN THE FILTERED OMICSDATA OBJECT! YAY!!!
@@ -383,6 +390,7 @@ applyFilt.cvFilt <- function (filter_object, omicsData, cv_threshold = 150) {
                           "main_effects"),
       covariates = names(attr(get_group_DF(omicsData),
                               "covariates"))[-1],
+      batch_id = names(attr(get_group_DF(omicsData),"batch_id"))[-1],
       time_course = attr(get_group_DF(omicsData),
                          "time_course"),
       pairs = attr(get_group_DF(omicsData), "pairs")
@@ -402,7 +410,9 @@ applyFilt.cvFilt <- function (filter_object, omicsData, cv_threshold = 150) {
       data_scale = get_data_scale(omicsData),
       data_types = dInfo$data_types,
       norm_info = dInfo$norm_info,
-      is_normalized = dInfo$norm_info$is_normalized
+      is_normalized = dInfo$norm_info$is_normalized,
+      batch_info = dInfo$batch_info,
+      is_bc = dInfo$batch_info$is_bc
     )
 
     # Update the meta_info attribute.
@@ -417,13 +427,16 @@ applyFilt.cvFilt <- function (filter_object, omicsData, cv_threshold = 150) {
   # will include the current filter object in the next available space of the
   # filters attribute list.
   n_filters <- length(attr(omicsData, 'filters')) + 1
-
+  
+  # determine if we have use_groups
+  use_groups <- attributes(filter_object)$use_groups
+  
   # Update the filters attribute.
   attr(omicsData, 'filters')[[n_filters]] <- set_filter(
     type = class(filter_object)[[1]],
     threshold = cv_threshold,
     filtered = filter.edata,
-    method = NA
+    method = list(use_groups = use_groups)
   )
 
   # We did it! Kudos to us!!
@@ -566,6 +579,7 @@ applyFilt.rmdFilt <- function (filter_object, omicsData,
                           "main_effects"),
       covariates = names(attr(get_group_DF(omicsData),
                               "covariates"))[-1],
+      batch_id = names(attr(get_group_DF(omicsData),"batch_id"))[-1],
       time_course = attr(get_group_DF(omicsData),
                          "time_course"),
       pairs = attr(get_group_DF(omicsData), "pairs")
@@ -585,7 +599,9 @@ applyFilt.rmdFilt <- function (filter_object, omicsData,
       data_scale = get_data_scale(omicsData),
       data_types = dInfo$data_types,
       norm_info = dInfo$norm_info,
-      is_normalized = dInfo$norm_info$is_normalized
+      is_normalized = dInfo$norm_info$is_normalized,
+      batch_info = dInfo$batch_info,
+      is_bc = dInfo$batch_info$is_bc
     )
 
 
@@ -817,6 +833,7 @@ applyFilt.proteomicsFilt <- function (filter_object,
                           "main_effects"),
       covariates = names(attr(get_group_DF(omicsData),
                               "covariates"))[-1],
+      batch_id = names(attr(get_group_DF(omicsData),"batch_id"))[-1],
       time_course = attr(get_group_DF(omicsData),
                          "time_course"),
       pairs = attr(get_group_DF(omicsData), "pairs")
@@ -836,7 +853,9 @@ applyFilt.proteomicsFilt <- function (filter_object,
       data_scale = get_data_scale(omicsData),
       data_types = dInfo$data_types,
       norm_info = dInfo$norm_info,
-      is_normalized = dInfo$norm_info$is_normalized
+      is_normalized = dInfo$norm_info$is_normalized,
+      batch_info = dInfo$batch_info,
+      is_bc = dInfo$batch_info$is_bc
     )
 
     # Update the meta_info attribute.
@@ -1266,6 +1285,7 @@ applyFilt.imdanovaFilt <- function (filter_object,
                           "main_effects"),
       covariates = names(attr(get_group_DF(omicsData),
                               "covariates"))[-1],
+      batch_id = names(attr(get_group_DF(omicsData),"batch_id"))[-1],
       time_course = attr(get_group_DF(omicsData),
                          "time_course"),
       pairs = attr(get_group_DF(omicsData), "pairs")
@@ -1285,7 +1305,9 @@ applyFilt.imdanovaFilt <- function (filter_object,
       data_scale = get_data_scale(omicsData),
       data_types = dInfo$data_types,
       norm_info = dInfo$norm_info,
-      is_normalized = dInfo$norm_info$is_normalized
+      is_normalized = dInfo$norm_info$is_normalized,
+      batch_info = dInfo$batch_info,
+      is_bc = dInfo$batch_info$is_bc
     )
 
     # Update the meta_info attribute.
@@ -1523,6 +1545,7 @@ applyFilt.customFilt <- function (filter_object, omicsData) {
                           "main_effects"),
       covariates = names(attr(get_group_DF(omicsData),
                               "covariates"))[-1],
+      batch_id = names(attr(get_group_DF(omicsData),"batch_id"))[-1],
       time_course = attr(get_group_DF(omicsData),
                          "time_course"),
       pairs = attr(get_group_DF(omicsData), "pairs")
@@ -1542,7 +1565,9 @@ applyFilt.customFilt <- function (filter_object, omicsData) {
       data_scale = get_data_scale(omicsData),
       data_types = dInfo$data_types,
       norm_info = dInfo$norm_info,
-      is_normalized = dInfo$norm_info$is_normalized
+      is_normalized = dInfo$norm_info$is_normalized,
+      batch_info = dInfo$batch_info,
+      is_bc = dInfo$batch_info$is_bc
     )
 
     # Update the meta_info attribute.

@@ -47,7 +47,8 @@ test_that('MSnSet objects are correctly converted to pepData objects',{
          prop_missing = (sum(is.na(msn_pepe$e_data)) /
                            prod(dim(msn_pepe$e_data[, -1]))),
          num_samps = ncol(msn_pepe$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
   
   # Check the checkers.

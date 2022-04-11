@@ -161,7 +161,8 @@ test_that('normalize_isobaric produces the correct output',{
          prop_missing = (sum(is.na(spec1$e_data)) /
                            prod(dim(spec1$e_data[, -1]))),
          num_samps = ncol(spec1$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
   expect_equal(
     attr(spec2, "data_info"),
@@ -173,7 +174,8 @@ test_that('normalize_isobaric produces the correct output',{
          prop_missing = (sum(is.na(spec2$e_data)) /
                            prod(dim(spec2$e_data[, -1]))),
          num_samps = ncol(spec2$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
   
   # Confirm the isobaric_info attributes are correct.

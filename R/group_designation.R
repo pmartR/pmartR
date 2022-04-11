@@ -30,6 +30,10 @@
 #' @param pairs A character string indicating the column in \code{f_data} that
 #'   contains the pairing information. This string must match the column name
 #'   exactly.
+#' @param batch_id an optional character vector of no more than one variable that 
+#'  should be used as batch information for downstream analyses. Batch ID is
+#'  similar to covariates but unlike covariates it is specific to that of specific
+#'  batch effects
 #' @param time_course an optional character string specifying the variable name
 #'   of a time course variable, if applicable to the experimental data.
 #'   CURRENTLY NOT SUPPORTED
@@ -71,6 +75,7 @@ group_designation <- function (omicsData,
                                covariates = NULL,
                                cov_type = NULL,
                                pairs = NULL,
+                               batch_id = NULL,
                                time_course = NULL) {
 
   # Initial checks on input arguments ------------------------------------------
@@ -233,6 +238,34 @@ group_designation <- function (omicsData,
 
     }
 
+  }
+  
+  # Check batch_id ---------------
+  
+  # See if batch_id is present
+  if (!is.null(batch_id)) {
+    
+    # Check that batch_id is a character vector #
+    if (!is.character(batch_id)) {
+      
+      # Stop production with a character vector error
+      stop ("batch_id must be a character vector.")
+    }
+    
+    # Check that batch_id is an appropriate length
+    if (length(batch_id) > 1){
+      
+      # Error out with too many batch_ids
+      stop ("No more than one batch_id can be provided.")
+    }
+    
+    # Check that batch_id is given in f_data #
+    if (!(batch_id %in% names(omicsData$f_data))) {
+      
+      stop ("batch_id is not found in f_data of omicsData")
+    }
+    
+    
   }
 
   # Check pairs ---------------
@@ -638,6 +671,25 @@ group_designation <- function (omicsData,
   # difference between each pair.
   attr(output, "pairs") <- pairs
 
+  # Set the batch_id attribute according to the input
+  if (is.null(batch_id)) {
+    
+    holy_batch_robin <- NULL
+  } else {
+    
+    # make the data frame with the Sample ID as the first column and the batch id
+    # as the second column
+    holy_batch_robin <- data.frame(
+      sample_id = as.character(omicsData$f_data[, samp_id]),
+      batch = omicsData$f_data[, batch_id],
+      stringsAsFactors = FALSE
+    )
+    # rename columns to match the names in f_data
+    names(holy_batch_robin) <- c(samp_id, batch_id)
+  }
+  
+  attr(output, "batch_id") <- holy_batch_robin
+  
   ### changed to NA Aug 2020 ###
   attr(output, "time_course") = NULL #time_course
   ## added attribute that lists groups with 2 or more samples Nov 2020 ##
@@ -656,7 +708,9 @@ group_designation <- function (omicsData,
     data_scale = get_data_scale(omicsData),
     data_types = get_data_info(omicsData)$data_types,
     norm_info = get_data_info(omicsData)$norm_info,
-    is_normalized = get_data_info(omicsData)$norm_info$is_normalized
+    is_normalized = get_data_info(omicsData)$norm_info$is_normalized,
+    batch_info = get_data_info(omicsData)$batch_info,
+    is_bc = get_data_info(omicsData)$batch_info$is_bc
   )
 
   # Update the meta_info attribute.

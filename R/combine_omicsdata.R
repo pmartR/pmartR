@@ -85,6 +85,12 @@ combine_lipidData <- function(obj_1, obj_2, retain_groups = FALSE, retain_filter
       ))
   )
   
+  molnames <- new_edata[,get_edata_cname(obj_1)]
+  
+  if(length(molnames) != length(unique(molnames))) {
+    message("Duplicate molecule identifiers were found in your combined data.")
+  }
+  
   # Combined f_data is simply a left join, since we require the sample names
   # are the same.
   new_fdata <- obj_1$f_data %>% 
@@ -98,7 +104,7 @@ combine_lipidData <- function(obj_1, obj_2, retain_groups = FALSE, retain_filter
     new_emeta <- dplyr::bind_rows(
       obj_1$e_meta, 
       obj_2$e_meta %>% 
-        rename(setNames(
+        dplyr::rename(setNames(
           get_emeta_cname(obj_2), 
           get_emeta_cname(obj_1)
         ))
@@ -112,8 +118,7 @@ combine_lipidData <- function(obj_1, obj_2, retain_groups = FALSE, retain_filter
     
     if (length(unique(new_emeta_ids)) != 
         length(unique(emeta_ids_1)) + length(unique(emeta_ids_2))) {
-      wrap_warning("There were e_meta identifiers that occurred in both datasets,
-              they have been duplicated in the new object's e_meta.")
+      warning("There were e_meta identifiers that occurred in both datasets, they have been duplicated in the new object's e_meta.")
     }
     
   } else{
@@ -167,7 +172,11 @@ combine_lipidData <- function(obj_1, obj_2, retain_groups = FALSE, retain_filter
     }) %>% unlist()
     
     covariate_matches = if(!is.null(attr(group_df, "covariates"))) {
-      lapply(attr(group_df, "covariates"), function(x) {
+      covnames = attr(group_df, "covariates") %>% 
+        dplyr::select(-one_of(get_fdata_cname(obj_1))) %>% 
+        colnames()
+      
+      lapply(covnames, function(x) {
         column_matches_exact(samp_info, tmp_fdata[,x])[1]
       }) %>% unlist()
     } else NULL
