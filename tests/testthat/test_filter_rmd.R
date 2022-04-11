@@ -742,7 +742,8 @@ test_that("rmd_filter and applyFilt produce the correct output",{
          prop_missing = (sum(is.na(pair_filtered$e_data)) /
                            prod(dim(pair_filtered$e_data[, -1]))),
          num_samps = ncol(pair_filtered$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
   expect_equal(
     attr(pair_filtered, "meta_info"),

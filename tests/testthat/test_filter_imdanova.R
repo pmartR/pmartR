@@ -1173,7 +1173,8 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
          prop_missing = (sum(is.na(anova_2$e_data)) /
                            prod(dim(anova_2$e_data[, -1]))),
          num_samps = ncol(anova_2$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
 
   # meta_info attribute
@@ -1237,7 +1238,8 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
          prop_missing = (sum(is.na(gtest_2$e_data)) /
                            prod(dim(gtest_2$e_data[, -1]))),
          num_samps = ncol(gtest_2$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
 
   # meta_info attribute
