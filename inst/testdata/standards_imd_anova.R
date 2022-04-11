@@ -1,23 +1,10 @@
+# Load functions for calculating IMD-ANOVA standards ---------------------------
+
+source (system.file("testdata",
+                    "imd_anova_standard_fns.R",
+                    package = "pmartR"))
+
 # Load data and prepare omicsData objects --------------------------------------
-
-# Paired data ---------------
-
-# load(system.file('testdata',
-#                  'little_pairdata.RData',
-#                  package = 'pmartR'))
-#
-# pairdata <- as.pepData(e_data = edata,
-#                        f_data = fdata,
-#                        e_meta = emeta,
-#                        edata_cname = "Mass_Tag_ID",
-#                        fdata_cname = "Name",
-#                        emeta_cname = "Protein")
-#
-# # Throw some natural logs on the data because the following functions require
-# # the data to be logged.
-# pairdata <- edata_transform(pairdata, "log")
-
-# Not so paired data ---------------
 
 load(system.file('testdata',
                  'little_pdata.RData',
@@ -195,7 +182,7 @@ cfilta_2_0_3 <- applyFilt(filta_2_0_3, pdata_2_0_3,
                           min_nonmiss_gtest = 2,
                           remove_singleton_groups = FALSE)
 
-# Two main effects, one covariate, three groups
+# Two main effects, one covariate, four groups
 filta_2_1_4 <- imdanova_filter(pdata_2_1_4)
 afilta_2_1_4 <- applyFilt(filta_2_1_4, pdata_2_1_4,
                           min_nonmiss_anova = 2,
@@ -208,7 +195,7 @@ cfilta_2_1_4 <- applyFilt(filta_2_1_4, pdata_2_1_4,
                           min_nonmiss_gtest = 2,
                           remove_singleton_groups = FALSE)
 
-# Two main effects, two covariates, three groups
+# Two main effects, two covariates, four groups
 filta_2_2_4 <- imdanova_filter(pdata_2_2_4)
 afilta_2_2_4 <- applyFilt(filta_2_2_4, pdata_2_2_4,
                           min_nonmiss_anova = 2,
@@ -251,346 +238,6 @@ cfilta_2_2_4 <- applyFilt(filta_2_2_4, pdata_2_2_4,
 #
 #   file = "/Users/mart077/pmartR/inst/testdata/standards_filter.RData"
 # )
-
-# ANOVA and G-test functions ---------------------------------------------------
-
-# Function to construct the null space projection matrix.
-proj_mat <- function(X, ngroups){
-  #If the X matrix has atleast two rows, find projection matrix
-  #into the null space corresponding to X
-  if(!is.null(nrow(X))){
-    Imat <- diag(1,nrow(X))
-    Px <- MASS::ginv(t(X)%*%X)%*%t(X)
-    # Zero out the first ngroups rows of Px because we only want to remove the
-    # effect of the covariates (which appear in the last n_covariates rows of
-    # Px).
-    Px[1:ngroups, ] <- 0
-    Px <- X%*%Px
-    return(Imat-Px)
-  }
-
-  #If only one datapoint is left then just return 1
-  return(1)
-}
-
-
-# Project each row of the data.matrix into X's null space.
-project_to_null <- function(data_mat, Xmatrix, ngroups){
-
-  data_no_x <- data_mat
-
-  for(i in 1:nrow(data_mat)){
-
-    to_rem <- which(is.na(data_mat[i,]))
-    if(length(to_rem)>0){
-      roi <-  data_mat[i,-to_rem]
-      IPxi <- proj_mat(Xmatrix[-to_rem,], ngroups)
-      data_no_x[i,-to_rem] <- IPxi%*%matrix(roi,ncol=1)
-    }else{
-      roi <- data_mat[i,]
-      IPxi <- proj_mat(Xmatrix, ngroups)
-      data_no_x[i,] <- IPxi%*%matrix(roi,ncol=1)
-    }
-
-  }
-
-  return(data.frame(data_no_x))
-
-}
-
-# This function and the following function, two_factor_anova_r, are used for two
-# main effects (with or without covariates) when there is a significant
-# interaction between the main effects for some of the biomolecules (rows of
-# e_data). These functions are not used for examples when there is no
-# significant interaction between the main effects, for any of the biomolecules,
-# because the mean and variance computations are the same for every row.
-run_two_factor <- function (data, gpData, red_df) {
-
-  #Create design matrix for reduced model, i.e., no interaction effect
-  colnames(gpData)[-c(1,2)] <- c("Factor1","Factor2")
-  gpData <- cbind(gpData,y=1:nrow(gpData))
-
-  #Create design matrix for the full model, i.e., all first order and
-  #interaction effects
-  Xred <- unname(model.matrix(lm(y ~ Factor1 + Factor2 - 1, data = gpData)))
-  Xfull <- unname(model.matrix(lm(y ~ Factor1*Factor2 - 1, data = gpData)))
-
-  res <- two_factor_anova_r(
-    y = data,
-    X_full = Xfull,
-    X_red = Xred,
-    red_df = red_df,
-    group_ids = as.numeric(factor(gpData$Group,
-                                  levels = unique(gpData$Group)))
-  )
-
-  #Get the unique group levels to translate ANOVA parameters into group means
-  red_gpData <- dplyr::distinct(gpData, Group, .keep_all=TRUE)
-  red_gpData <- dplyr::arrange(red_gpData, y)
-
-  res$par_estimates <- res$par_estimates[, 1:length(red_gpData$Group)]
-  colnames(res$par_estimates) <- red_gpData$Group
-
-  return (res)
-
-}
-
-two_factor_anova_r <- function (y,
-                                X_full,
-                                X_red,
-                                red_df,
-                                group_ids) {
-
-  n <- nrow(y)
-  p_red <- ncol(X_red)
-  p_full <- ncol(X_full)
-  pval <- vector(mode = "numeric", length = n)
-  Fstat <- vector(mode = "numeric", length = n)
-  sig_est <- vector(mode = "numeric", length = n)
-  par_ests <- vector(mode = "numeric", length = p_full)
-
-  parmat <- matrix(nrow = n,
-                   ncol = p_full)
-  group_sizes <- matrix(nrow = n,
-                        ncol = p_full)
-
-  #Loop over rows in y
-  for (i in 1:n) {
-
-    yrowi <- y[i, ]
-    to_remove <- which(!is.finite(yrowi))
-
-    yrowi_nona <- yrowi
-    X_red_nona <- X_red
-    X_full_nona <- X_full
-    num_to_remove <- length(to_remove)
-    group_ids_nona <- group_ids # -1 #Make group_ids zero indexed
-    # Indices in R start at 1. There is no need to subtract 1 from group_ids to
-    # correctly subset rows/columns by group.
-
-    if (num_to_remove > 0) {
-
-      # Subset matrices by the to_remove object.
-      yrowi_nona <- yrowi_nona[-to_remove]
-      X_red_nona <- X_red_nona[-to_remove, ]
-      X_full_nona <- X_full_nona[-to_remove, ]
-      group_ids_nona <- group_ids_nona[-to_remove]
-
-    }
-
-    # Remove completely empty columns.
-    csums <- colSums(X_full_nona)
-    zero_cols <- which(csums == 0)
-    non_zero_cols <- X_full_nona[, -zero_cols]
-
-    #Subtract off df spent elsewhere, e.g., on covariates
-    df_red <- (nrow(X_red_nona) -
-                 Matrix::rankMatrix(X_red_nona)[[1]] -
-                 red_df[i, ])
-    df_full <- (nrow(X_full_nona) -
-                  Matrix::rankMatrix(X_full_nona)[[1]] -
-                  red_df[i, ])
-
-    PxRed <- X_red_nona %*% MASS::ginv(
-      t(X_red_nona) %*% X_red_nona
-    ) %*% t(X_red_nona)
-
-    # Create an identity matrix with the same dimension as PxRed
-    diag_mat <- diag(nrow(PxRed))
-
-    sigma2_red <- yrowi_nona %*% (diag_mat - PxRed) %*% yrowi_nona / df_red
-
-
-    if ((df_red - df_full) <= 0) {
-
-      #If interaction can't be estimated, automatically select smaller model
-      pval[[i]] <- 1
-      Fstat[[i]] <- 0
-
-    } else {
-
-      PxFull <- (X_full_nona %*% MASS::ginv(t(X_full_nona) %*% X_full_nona) %*%
-                   t(X_full_nona))
-
-      # Create an identity matrix with the same dimension as PxFull
-      diag_mat <- diag(nrow(PxFull))
-
-      sigma2_full <- (yrowi_nona %*% (diag_mat - PxFull) %*% yrowi_nona /
-                        df_full)
-
-      Fstat[[i]] <- (sigma2_red  * df_red - sigma2_full * df_full) / sigma2_full
-      pval[[i]] <- pf(q = Fstat[[i]],
-                      df1 = df_red - df_full,
-                      df2 = df_full,
-                      lower.tail = FALSE,
-                      log.p = FALSE)
-
-      if (!is.finite(pval[[i]])) {
-
-        pval[[i]] <- 1
-
-      }
-
-    }
-
-    if (pval[[i]] < 0.05) {
-
-      #Reject null hypothesis that reduced model is good enough, use full model
-      XFinal <- X_full_nona
-      sig_est[[i]] <- sigma2_full
-
-    } else {
-
-      XFinal <- X_full_nona
-
-      # Zero out the interaction terms if they're insignificant.
-      XFinal[, (p_red + 1):p_full] <- 0
-      sig_est[[i]] <- sigma2_red
-
-    }
-
-    #"Parameter estimates" are the group means: Xbeta_hat=X(XpX)^{-1}XpY
-    par_ests_temp <- (XFinal %*% MASS::ginv(t(XFinal) %*% XFinal) %*%
-                        t(XFinal) %*% yrowi_nona)
-
-    #Find groups that had at least one non-missing value
-    group_ids_nona_unq <- unique(group_ids_nona)
-
-    # Fill in the par_ests vector, put NaN if group was missing or the average
-    # effect in groups with no missing data
-    if (length(group_ids_nona_unq) < p_full) {
-
-      for (j in 1:p_full) {
-
-        missing_gp <- which(group_ids_nona_unq == j)
-
-        if (length(missing_gp) > 0) {
-
-          par_ests[[j]] <- mean(par_ests_temp[which(group_ids_nona == j)])
-
-        } else {
-
-          par_ests[[j]] <- NA
-
-        }
-
-      }
-
-    } else {
-
-      for (k in 1:p_full) {
-
-        par_ests[[k]] <- mean(par_ests_temp[which(group_ids_nona == k)])
-
-      }
-
-    }
-
-    parmat[i, ] <- par_ests
-
-    gsizes <- rep(0, p_full)
-
-    # Compute group sizes after accounting for NaNs
-    for (j in 1:p_full) {
-
-      size_j <- which(group_ids_nona == j)
-
-      if (length(size_j) > 0) {
-
-        gsizes[[j]] <- length(size_j)
-
-      }
-
-    }
-
-    group_sizes[i, ] <- gsizes # For now don't return the interaction groups
-
-  }
-
-  return (list(par_estimates = parmat,
-               group_sizes = group_sizes,
-               Sigma2 = sig_est,
-               Fstats = Fstat,
-               pvalue = pval))
-
-}
-
-a <- function (data, groups) {
-
-  # nas <- !is.na(data)
-
-  nova <- vector(length = nrow(data))
-
-  for (e in 1:nrow(data)) {
-
-    # nova[[e]] <- tryCatch (
-    #   summary(
-    #     aov(as.numeric(data[e, nas[e, ]]) ~ groups[nas[e, ]])
-    #   )[[1]]$`Pr(>F)`[[1]],
-    #   error = function (e) {NaN}
-    # )
-
-    nova[[e]] <- tryCatch (
-      anova(
-        lm(as.numeric(data[e, ]) ~ groups)
-      )$`Pr(>F)`[[1]],
-      error = function (e) {NaN}
-    )
-
-  }
-
-  return (nova)
-
-}
-
-# A function for calculating the g-test statistic for two groups.
-g <- function (obs1, obs2, abs1, abs2, n1, n2, n_total) {
-
-  samurai_obs <- obs1 * log(obs1 / ((obs1 + obs2) * n1 / n_total))
-  samurai_obs[is.na(samurai_obs)] <- 0
-  samurai_abs <- abs1 * log(abs1 / ((abs1 + abs2) * n1 / n_total))
-  samurai_abs[is.na(samurai_abs)] <- 0
-
-  samurai <- samurai_obs + samurai_abs
-
-  katana_obs <- obs2 * log(obs2 / ((obs1 + obs2) * n2 / n_total))
-  katana_obs[is.na(katana_obs)] <- 0
-  katana_abs <- abs2 * log(abs2 / ((abs1 + abs2) * n2 / n_total))
-  katana_abs[is.na(katana_abs)] <- 0
-
-  katana <- katana_obs + katana_abs
-
-  fierce <- unname(samurai + katana)
-
-  return (2 * fierce)
-
-}
-
-gflag <- function (obs1, obs2, abs1, abs2, pvals, cutoff) {
-
-  maiden <- obs1 / (obs1 + abs1)
-
-  dragon <- obs2 / (obs2 + abs2)
-
-  knight <- sign(maiden - dragon)
-
-  knight[which(pvals >= cutoff)] <- 0
-
-  return (unname(knight))
-
-}
-
-aflag <- function (grp1, grp2, pvals, cutoff) {
-
-  ninja <- rep(0, length(pvals))
-
-  star <- which(pvals < cutoff)
-
-  ninja[star] <- sign(grp1 - grp2)[star]
-
-  return (ninja)
-
-}
 
 # Assemble ANOVA standards -----------------------------------------------------
 
@@ -2020,32 +1667,34 @@ diffs_2_2_4 <- mean_a_2_2_4 %>%
   dplyr::select(diff_ih_il, diff_ih_mh, diff_ih_ml,
                 diff_il_mh, diff_il_ml, diff_mh_ml)
 
-test_stat_2_2_4 <- diffs_2_2_4 %>%
-  cbind(group_counts_2_2_4) %>%
-  dplyr::mutate(
-    stat_ih_il = (diff_ih_il /
-                    sqrt((1/nona_Infection_high +
-                            1/nona_Infection_low) * sigma_2_2_4)),
-    stat_ih_mh = (diff_ih_mh /
-                    sqrt((1/nona_Infection_high +
-                            1/nona_Mock_high) * sigma_2_2_4)),
-    stat_ih_ml = (diff_ih_ml /
-                    sqrt((1/nona_Infection_high +
-                            1/nona_Mock_low) * sigma_2_2_4)),
-    stat_il_mh = (diff_il_mh /
-                    sqrt((1/nona_Infection_low +
-                            1/nona_Mock_high) * sigma_2_2_4)),
-    stat_il_ml = (diff_il_ml /
-                    sqrt((1/nona_Infection_low +
-                            1/nona_Mock_low) * sigma_2_2_4)),
-    stat_mh_ml = (diff_mh_ml /
-                    sqrt((1/nona_Mock_high +
-                            1/nona_Mock_low) * sigma_2_2_4))
-  ) %>%
-  dplyr::select(stat_ih_il, stat_ih_mh, stat_ih_ml,
-                stat_il_mh, stat_il_ml, stat_mh_ml) %>%
-  dplyr::ungroup() %>%
-  `row.names<-`(NULL)
+suppressWarnings(
+  test_stat_2_2_4 <- diffs_2_2_4 %>%
+    cbind(group_counts_2_2_4) %>%
+    dplyr::mutate(
+      stat_ih_il = (diff_ih_il /
+                      sqrt((1/nona_Infection_high +
+                              1/nona_Infection_low) * sigma_2_2_4)),
+      stat_ih_mh = (diff_ih_mh /
+                      sqrt((1/nona_Infection_high +
+                              1/nona_Mock_high) * sigma_2_2_4)),
+      stat_ih_ml = (diff_ih_ml /
+                      sqrt((1/nona_Infection_high +
+                              1/nona_Mock_low) * sigma_2_2_4)),
+      stat_il_mh = (diff_il_mh /
+                      sqrt((1/nona_Infection_low +
+                              1/nona_Mock_high) * sigma_2_2_4)),
+      stat_il_ml = (diff_il_ml /
+                      sqrt((1/nona_Infection_low +
+                              1/nona_Mock_low) * sigma_2_2_4)),
+      stat_mh_ml = (diff_mh_ml /
+                      sqrt((1/nona_Mock_high +
+                              1/nona_Mock_low) * sigma_2_2_4))
+    ) %>%
+    dplyr::select(stat_ih_il, stat_ih_mh, stat_ih_ml,
+                  stat_il_mh, stat_il_ml, stat_mh_ml) %>%
+    dplyr::ungroup() %>%
+    `row.names<-`(NULL)
+)
 
 pval_a_2_2_4 <- test_stat_2_2_4 %>%
   dplyr::mutate(
@@ -2397,12 +2046,44 @@ obs_mock_1_0_2 <- rowSums(!is.na(gfilta_1_0_2$e_data[, 11:13]))
 abs_inf_1_0_2 <- rowSums(is.na(gfilta_1_0_2$e_data[, 2:10]))
 abs_mock_1_0_2 <- rowSums(is.na(gfilta_1_0_2$e_data[, 11:13]))
 
+obs_mut_1_1_3 <- rowSums(!is.na(gfilta_1_1_3$e_data[, c(2, 4, 5, 10)]))
+obs_zom_1_1_3 <- rowSums(!is.na(gfilta_1_1_3$e_data[, c(3, 6:9)]))
+obs_hum_1_1_3 <- rowSums(!is.na(gfilta_1_1_3$e_data[, c(11:13)]))
+abs_mut_1_1_3 <- rowSums(is.na(gfilta_1_1_3$e_data[, c(2, 4, 5, 10)]))
+abs_zom_1_1_3 <- rowSums(is.na(gfilta_1_1_3$e_data[, c(3, 6:9)]))
+abs_hum_1_1_3 <- rowSums(is.na(gfilta_1_1_3$e_data[, c(11:13)]))
+
+obs_mut_1_2_3 <- rowSums(!is.na(gfilta_1_2_3$e_data[, c(2, 4, 5, 10)]))
+obs_zom_1_2_3 <- rowSums(!is.na(gfilta_1_2_3$e_data[, c(3, 6:9)]))
+obs_hum_1_2_3 <- rowSums(!is.na(gfilta_1_2_3$e_data[, c(11:13)]))
+abs_mut_1_2_3 <- rowSums(is.na(gfilta_1_2_3$e_data[, c(2, 4, 5, 10)]))
+abs_zom_1_2_3 <- rowSums(is.na(gfilta_1_2_3$e_data[, c(3, 6:9)]))
+abs_hum_1_2_3 <- rowSums(is.na(gfilta_1_2_3$e_data[, c(11:13)]))
+
 obs_inf_high_2_0_3 <- rowSums(!is.na(gfilta_2_0_3$e_data[, c(2:4, 7:8)]))
 obs_inf_low_2_0_3 <- rowSums(!is.na(gfilta_2_0_3$e_data[, c(5:6, 9:10)]))
 obs_mock_2_0_3 <- rowSums(!is.na(gfilta_2_0_3$e_data[, 11:13]))
 abs_inf_high_2_0_3 <- rowSums(is.na(gfilta_2_0_3$e_data[, c(2:4, 7:8)]))
 abs_inf_low_2_0_3 <- rowSums(is.na(gfilta_2_0_3$e_data[, c(5:6, 9:10)]))
 abs_mock_2_0_3 <- rowSums(is.na(gfilta_2_0_3$e_data[, 11:13]))
+
+obs_ih_2_1_4 <- rowSums(!is.na(gfilta_2_1_4$e_data[, c(2, 4, 6)]))
+obs_il_2_1_4 <- rowSums(!is.na(gfilta_2_1_4$e_data[, c(3, 5, 7)]))
+obs_mh_2_1_4 <- rowSums(!is.na(gfilta_2_1_4$e_data[, c(8, 9, 13)]))
+obs_ml_2_1_4 <- rowSums(!is.na(gfilta_2_1_4$e_data[, 10:12]))
+abs_ih_2_1_4 <- rowSums(is.na(gfilta_2_1_4$e_data[, c(2, 4, 6)]))
+abs_il_2_1_4 <- rowSums(is.na(gfilta_2_1_4$e_data[, c(3, 5, 7)]))
+abs_mh_2_1_4 <- rowSums(is.na(gfilta_2_1_4$e_data[, c(8, 9, 13)]))
+abs_ml_2_1_4 <- rowSums(is.na(gfilta_2_1_4$e_data[, 10:12]))
+
+obs_ih_2_2_4 <- rowSums(!is.na(gfilta_2_2_4$e_data[, c(2, 4, 6)]))
+obs_il_2_2_4 <- rowSums(!is.na(gfilta_2_2_4$e_data[, c(3, 5, 7)]))
+obs_mh_2_2_4 <- rowSums(!is.na(gfilta_2_2_4$e_data[, c(8, 9, 13)]))
+obs_ml_2_2_4 <- rowSums(!is.na(gfilta_2_2_4$e_data[, 10:12]))
+abs_ih_2_2_4 <- rowSums(is.na(gfilta_2_2_4$e_data[, c(2, 4, 6)]))
+abs_il_2_2_4 <- rowSums(is.na(gfilta_2_2_4$e_data[, c(3, 5, 7)]))
+abs_mh_2_2_4 <- rowSums(is.na(gfilta_2_2_4$e_data[, c(8, 9, 13)]))
+abs_ml_2_2_4 <- rowSums(is.na(gfilta_2_2_4$e_data[, 10:12]))
 
 # main effects: 1; covariates: 0; groups: 2 ---------------
 
@@ -2487,6 +2168,299 @@ attr(gstan_1_0_2, "cnames") <- list(
   techrep_cname = NULL
 )
 attr(gstan_1_0_2, "data_class") <- "pepData"
+
+# main effects: 1; covariates: 1; groups: 3 ---------------
+
+pval_g_1_1_3 <- data.frame(
+  P_value_G_mutant_vs_zombie = rep(0, nrow(gfilta_1_1_3$e_data)),
+  P_value_G_mutant_vs_human = rep(0, nrow(gfilta_1_1_3$e_data)),
+  P_value_G_zombie_vs_human = rep(0, nrow(gfilta_1_1_3$e_data))
+)
+
+for (e in 1:nrow(gfilta_1_1_3$e_data)) {
+
+  pval_g_1_1_3[e, 1] <- anova(
+    glm(
+      as.numeric(!is.na(gfilta_1_1_3$e_data[e, 2:10])) ~
+        attr(groupDF_1_1_3, "covariates")$Gender[1:9] +
+        groupDF_1_1_3$Group[1:9],
+      family = binomial
+    ),
+    test = "Chisq"
+  )$`Pr(>Chi)`[[3]]
+  pval_g_1_1_3[e, 2] <- anova(
+    glm(
+      as.numeric(!is.na(gfilta_1_1_3$e_data[e, c(2, 4, 5, 10:13)])) ~
+        attr(groupDF_1_1_3, "covariates")$Gender[c(1, 3, 4, 9:12)] +
+        groupDF_1_1_3$Group[c(1, 3, 4, 9:12)],
+      family = binomial
+    ),
+    test = "Chisq"
+  )$`Pr(>Chi)`[[3]]
+  pval_g_1_1_3[e, 3] <- anova(
+    glm(
+      as.numeric(!is.na(gfilta_1_1_3$e_data[e, c(3, 6:9, 11:13)])) ~
+        attr(groupDF_1_1_3, "covariates")$Gender[c(2, 5:8, 10:12)] +
+        groupDF_1_1_3$Group[c(2, 5:8, 10:12)],
+      family = binomial
+    ),
+    test = "Chisq"
+  )$`Pr(>Chi)`[[3]]
+
+}
+
+flag_g_1_1_3 <- data.frame(
+  Flag_G_mutant_vs_zombie = gflag(
+    obs1 = obs_mut_1_1_3,
+    obs2 = obs_zom_1_1_3,
+    abs1 = abs_mut_1_1_3,
+    abs2 = abs_zom_1_1_3,
+    pvals = pval_g_1_1_3[, 1],
+    cutoff = 0.05
+  ),
+  Flag_G_mutant_vs_human = gflag(
+    obs1 = obs_mut_1_1_3,
+    obs2 = obs_hum_1_1_3,
+    abs1 = abs_mut_1_1_3,
+    abs2 = abs_hum_1_1_3,
+    pvals = pval_g_1_1_3[, 2],
+    cutoff = 0.05
+  ),
+  Flag_G_zombie_vs_human = gflag(
+    obs1 = obs_zom_1_1_3,
+    obs2 = obs_hum_1_1_3,
+    abs1 = abs_zom_1_1_3,
+    abs2 = abs_hum_1_1_3,
+    pvals = pval_g_1_1_3[, 3],
+    cutoff = 0.05
+  )
+)
+
+mean_1_1_3 <- data.frame(
+  Mean_mutant = rowMeans(gfilta_1_1_3$e_data[, c(2, 4, 5, 10)],
+                         na.rm = TRUE),
+  Mean_zombie = rowMeans(gfilta_1_1_3$e_data[, c(3, 6:9)],
+                         na.rm = TRUE),
+  Mean_human = rowMeans(gfilta_1_1_3$e_data[, c(11:13)],
+                        na.rm = TRUE)
+)
+
+gstan_1_1_3 <- data.frame(
+  Mass_Tag_ID = gfilta_1_1_3$e_data$Mass_Tag_ID,
+  Count_mutant = unname(obs_mut_1_1_3),
+  Count_zombie = unname(obs_zom_1_1_3),
+  Count_human = unname(obs_hum_1_1_3),
+  mean_1_1_3,
+  Fold_change_mutant_vs_zombie = (
+    mean_1_1_3[, 1] - mean_1_1_3[, 2]
+  ),
+  Fold_change_mutant_vs_human = (
+    mean_1_1_3[, 1] - mean_1_1_3[, 3]
+  ),
+  Fold_change_zombie_vs_human = (
+    mean_1_1_3[, 2] - mean_1_1_3[, 3]
+  ),
+  pval_g_1_1_3,
+  flag_g_1_1_3,
+  row.names = NULL
+)
+
+class(gstan_1_1_3) <- c("statRes", "data.frame")
+
+attr(gstan_1_1_3, "group_DF") <- groupDF_1_1_3
+attr(gstan_1_1_3, "comparisons") <- c("mutant_vs_zombie",
+                                      "mutant_vs_human",
+                                      "zombie_vs_human")
+attr(gstan_1_1_3, "number_significant") <- data.frame(
+  Comparison = c("mutant_vs_zombie",
+                 "mutant_vs_human",
+                 "zombie_vs_human"),
+  Up_total = c(length(which(flag_g_1_1_3[, 1] == 1)),
+               length(which(flag_g_1_1_3[, 2] == 1)),
+               length(which(flag_g_1_1_3[, 3] == 1))),
+  Down_total = c(length(which(flag_g_1_1_3[, 1] == -1)),
+                 length(which(flag_g_1_1_3[, 2] == -1)),
+                 length(which(flag_g_1_1_3[, 3] == -1))),
+  Up_anova = c(0, 0, 0),
+  Down_anova = c(0, 0, 0),
+  Up_gtest = c(length(which(flag_g_1_1_3[, 1] == 1)),
+               length(which(flag_g_1_1_3[, 2] == 1)),
+               length(which(flag_g_1_1_3[, 3] == 1))),
+  Down_gtest = c(length(which(flag_g_1_1_3[, 1] == -1)),
+                 length(which(flag_g_1_1_3[, 2] == -1)),
+                 length(which(flag_g_1_1_3[, 3] == -1))),
+  row.names = NULL
+)
+attr(gstan_1_1_3, "statistical_test") <- "gtest"
+attr(gstan_1_1_3, "adjustment_method_a") <- "none"
+attr(gstan_1_1_3, "adjustment_method_g") <- "none"
+attr(gstan_1_1_3, "pval_thresh") <- 0.05
+attr(gstan_1_1_3, "data_info") <- list(
+  data_scale_orig = "abundance",
+  data_scale = "log",
+  norm_info = list(is_normalized = FALSE),
+  num_edata = length(unique(gfilta_1_1_3$e_data$Mass_Tag_ID)),
+  num_miss_obs = sum(is.na(gfilta_1_1_3$e_data[, -1])),
+  prop_missing = (sum(is.na(gfilta_1_1_3$e_data[, -1])) /
+                    prod(dim(gfilta_1_1_3$e_data[, -1]))),
+  num_samps = dim(gfilta_1_1_3$f_data)[1],
+  data_types = NULL
+)
+attr(gstan_1_1_3, "cnames") <- list(
+  edata_cname = "Mass_Tag_ID",
+  emeta_cname = "Protein",
+  fdata_cname = "SampleID",
+  techrep_cname = NULL
+)
+attr(gstan_1_1_3, "data_class") <- "pepData"
+
+# main effects: 1; covariates: 2; groups: 3 ---------------
+
+pval_g_1_2_3 <- data.frame(
+  P_value_G_mutant_vs_zombie = rep(0, nrow(gfilta_1_2_3$e_data)),
+  P_value_G_mutant_vs_human = rep(0, nrow(gfilta_1_2_3$e_data)),
+  P_value_G_zombie_vs_human = rep(0, nrow(gfilta_1_2_3$e_data))
+)
+
+for (e in 1:nrow(gfilta_1_2_3$e_data)) {
+
+  pval_g_1_2_3[e, 1] <- anova(
+    glm(
+      as.numeric(!is.na(gfilta_1_2_3$e_data[e, 2:10])) ~
+        attr(groupDF_1_2_3, "covariates")$Gender[1:9] +
+        attr(groupDF_1_2_3, "covariates")$Age[1:9] +
+        groupDF_1_2_3$Group[1:9],
+      family = binomial
+    ),
+    test = "Chisq"
+  )$`Pr(>Chi)`[[4]]
+  pval_g_1_2_3[e, 2] <- anova(
+    glm(
+      as.numeric(!is.na(gfilta_1_2_3$e_data[e, c(2, 4, 5, 10:13)])) ~
+        attr(groupDF_1_2_3, "covariates")$Gender[c(1, 3, 4, 9:12)] +
+        attr(groupDF_1_2_3, "covariates")$Age[c(1, 3, 4, 9:12)] +
+        groupDF_1_2_3$Group[c(1, 3, 4, 9:12)],
+      family = binomial
+    ),
+    test = "Chisq"
+  )$`Pr(>Chi)`[[4]]
+  pval_g_1_2_3[e, 3] <- anova(
+    glm(
+      as.numeric(!is.na(gfilta_1_2_3$e_data[e, c(3, 6:9, 11:13)])) ~
+        attr(groupDF_1_2_3, "covariates")$Gender[c(2, 5:8, 10:12)] +
+        attr(groupDF_1_2_3, "covariates")$Age[c(2, 5:8, 10:12)] +
+        groupDF_1_2_3$Group[c(2, 5:8, 10:12)],
+      family = binomial
+    ),
+    test = "Chisq"
+  )$`Pr(>Chi)`[[4]]
+
+}
+
+flag_g_1_2_3 <- data.frame(
+  Flag_G_mutant_vs_zombie = gflag(
+    obs1 = obs_mut_1_2_3,
+    obs2 = obs_zom_1_2_3,
+    abs1 = abs_mut_1_2_3,
+    abs2 = abs_zom_1_2_3,
+    pvals = pval_g_1_2_3[, 1],
+    cutoff = 0.05
+  ),
+  Flag_G_mutant_vs_human = gflag(
+    obs1 = obs_mut_1_2_3,
+    obs2 = obs_hum_1_2_3,
+    abs1 = abs_mut_1_2_3,
+    abs2 = abs_hum_1_2_3,
+    pvals = pval_g_1_2_3[, 2],
+    cutoff = 0.05
+  ),
+  Flag_G_zombie_vs_human = gflag(
+    obs1 = obs_zom_1_2_3,
+    obs2 = obs_hum_1_2_3,
+    abs1 = abs_zom_1_2_3,
+    abs2 = abs_hum_1_2_3,
+    pvals = pval_g_1_2_3[, 3],
+    cutoff = 0.05
+  )
+)
+
+mean_1_2_3 <- data.frame(
+  Mean_mutant = rowMeans(gfilta_1_2_3$e_data[, c(2, 4, 5, 10)],
+                         na.rm = TRUE),
+  Mean_zombie = rowMeans(gfilta_1_2_3$e_data[, c(3, 6:9)],
+                         na.rm = TRUE),
+  Mean_human = rowMeans(gfilta_1_2_3$e_data[, c(11:13)],
+                        na.rm = TRUE)
+)
+
+gstan_1_2_3 <- data.frame(
+  Mass_Tag_ID = gfilta_1_2_3$e_data$Mass_Tag_ID,
+  Count_mutant = unname(obs_mut_1_2_3),
+  Count_zombie = unname(obs_zom_1_2_3),
+  Count_human = unname(obs_hum_1_2_3),
+  mean_1_2_3,
+  Fold_change_mutant_vs_zombie = (
+    mean_1_2_3[, 1] - mean_1_2_3[, 2]
+  ),
+  Fold_change_mutant_vs_human = (
+    mean_1_2_3[, 1] - mean_1_2_3[, 3]
+  ),
+  Fold_change_zombie_vs_human = (
+    mean_1_2_3[, 2] - mean_1_2_3[, 3]
+  ),
+  pval_g_1_2_3,
+  flag_g_1_2_3,
+  row.names = NULL
+)
+
+class(gstan_1_2_3) <- c("statRes", "data.frame")
+
+attr(gstan_1_2_3, "group_DF") <- groupDF_1_2_3
+attr(gstan_1_2_3, "comparisons") <- c("mutant_vs_zombie",
+                                      "mutant_vs_human",
+                                      "zombie_vs_human")
+attr(gstan_1_2_3, "number_significant") <- data.frame(
+  Comparison = c("mutant_vs_zombie",
+                 "mutant_vs_human",
+                 "zombie_vs_human"),
+  Up_total = c(length(which(flag_g_1_2_3[, 1] == 1)),
+               length(which(flag_g_1_2_3[, 2] == 1)),
+               length(which(flag_g_1_2_3[, 3] == 1))),
+  Down_total = c(length(which(flag_g_1_2_3[, 1] == -1)),
+                 length(which(flag_g_1_2_3[, 2] == -1)),
+                 length(which(flag_g_1_2_3[, 3] == -1))),
+  Up_anova = c(0, 0, 0),
+  Down_anova = c(0, 0, 0),
+  Up_gtest = c(length(which(flag_g_1_2_3[, 1] == 1)),
+               length(which(flag_g_1_2_3[, 2] == 1)),
+               length(which(flag_g_1_2_3[, 3] == 1))),
+  Down_gtest = c(length(which(flag_g_1_2_3[, 1] == -1)),
+                 length(which(flag_g_1_2_3[, 2] == -1)),
+                 length(which(flag_g_1_2_3[, 3] == -1))),
+  row.names = NULL
+)
+attr(gstan_1_2_3, "statistical_test") <- "gtest"
+attr(gstan_1_2_3, "adjustment_method_a") <- "none"
+attr(gstan_1_2_3, "adjustment_method_g") <- "none"
+attr(gstan_1_2_3, "pval_thresh") <- 0.05
+attr(gstan_1_2_3, "data_info") <- list(
+  data_scale_orig = "abundance",
+  data_scale = "log",
+  norm_info = list(is_normalized = FALSE),
+  num_edata = length(unique(gfilta_1_2_3$e_data$Mass_Tag_ID)),
+  num_miss_obs = sum(is.na(gfilta_1_2_3$e_data[, -1])),
+  prop_missing = (sum(is.na(gfilta_1_2_3$e_data[, -1])) /
+                    prod(dim(gfilta_1_2_3$e_data[, -1]))),
+  num_samps = dim(gfilta_1_2_3$f_data)[1],
+  data_types = NULL
+)
+attr(gstan_1_2_3, "cnames") <- list(
+  edata_cname = "Mass_Tag_ID",
+  emeta_cname = "Protein",
+  fdata_cname = "SampleID",
+  techrep_cname = NULL
+)
+attr(gstan_1_2_3, "data_class") <- "pepData"
 
 # main effects: 2; covariates: 0; groups: 3 ---------------
 
@@ -2635,6 +2609,487 @@ attr(gstan_2_0_3, "cnames") <- list(
 )
 attr(gstan_2_0_3, "data_class") <- "pepData"
 
+# main effects: 2; covariates: 1; groups: 4 ---------------
+
+pval_g_2_1_4 <- data.frame(
+  P_value_G_Infection_high_vs_Infection_low = rep(0, nrow(gfilta_2_1_4$e_data)),
+  P_value_G_Infection_high_vs_Mock_high = rep(0, nrow(gfilta_2_1_4$e_data)),
+  P_value_G_Infection_high_vs_Mock_low = rep(0, nrow(gfilta_2_1_4$e_data)),
+  P_value_G_Infection_low_vs_Mock_high = rep(0, nrow(gfilta_2_1_4$e_data)),
+  P_value_G_Infection_low_vs_Mock_low = rep(0, nrow(gfilta_2_1_4$e_data)),
+  P_value_G_Mock_high_vs_Mock_low = rep(0, nrow(gfilta_2_1_4$e_data))
+)
+
+for (e in 1:nrow(gfilta_2_1_4$e_data)) {
+
+  # Compute the p-value for the Infection_high_vs_Infection_low test.
+  pval_g_2_1_4[e, 1] <- anova(
+    glm(
+      as.numeric(!is.na(gfilta_2_1_4$e_data[e, 2:7])) ~
+        attr(groupDF_2_1_4, "covariates")$Gender[1:6] +
+        groupDF_2_1_4$Group[1:6],
+      family = binomial
+    ),
+    test = "Chisq"
+  )$`Pr(>Chi)`[[3]]
+  # Compute the p-value for the Infection_high_vs_Mock_high test.
+  pval_g_2_1_4[e, 2] <- anova(
+    glm(
+      as.numeric(!is.na(gfilta_2_1_4$e_data[e, c(2, 4, 6, 8, 9, 13)])) ~
+        attr(groupDF_2_1_4, "covariates")$Gender[c(1, 3, 5, 7, 8, 12)] +
+        groupDF_2_1_4$Group[c(1, 3, 5, 7, 8, 12)],
+      family = binomial
+    ),
+    test = "Chisq"
+  )$`Pr(>Chi)`[[3]]
+  # Compute the p-value for the Infection_high_vs_Mock_low test.
+  pval_g_2_1_4[e, 3] <- anova(
+    glm(
+      as.numeric(!is.na(gfilta_2_1_4$e_data[e, c(2, 4, 6, 10:12)])) ~
+        attr(groupDF_2_1_4, "covariates")$Gender[c(1, 3, 5, 9:11)] +
+        groupDF_2_1_4$Group[c(1, 3, 5, 9:11)],
+      family = binomial
+    ),
+    test = "Chisq"
+  )$`Pr(>Chi)`[[3]]
+  # Compute the p-value for the Infection_low_vs_Mock_high test.
+  pval_g_2_1_4[e, 4] <- anova(
+    glm(
+      as.numeric(!is.na(gfilta_2_1_4$e_data[e, c(3, 5, 7, 8, 9, 13)])) ~
+        attr(groupDF_2_1_4, "covariates")$Gender[c(2, 4, 6, 7, 8, 12)] +
+        groupDF_2_1_4$Group[c(2, 4, 6, 7, 8, 12)],
+      family = binomial
+    ),
+    test = "Chisq"
+  )$`Pr(>Chi)`[[3]]
+  # Compute the p-value for the Infection_low_vs_Mock_low test.
+  pval_g_2_1_4[e, 5] <- anova(
+    glm(
+      as.numeric(!is.na(gfilta_2_1_4$e_data[e, c(3, 5, 7, 10:12)])) ~
+        attr(groupDF_2_1_4, "covariates")$Gender[c(2, 4, 6, 9:11)] +
+        groupDF_2_1_4$Group[c(2, 4, 6, 9:11)],
+      family = binomial
+    ),
+    test = "Chisq"
+  )$`Pr(>Chi)`[[3]]
+  # Compute the p-value for the Mock_high_vs_Mock_low test.
+  pval_g_2_1_4[e, 6] <- anova(
+    glm(
+      as.numeric(!is.na(gfilta_2_1_4$e_data[e, 8:13])) ~
+        attr(groupDF_2_1_4, "covariates")$Gender[7:12] +
+        groupDF_2_1_4$Group[7:12],
+      family = binomial
+    ),
+    test = "Chisq"
+  )$`Pr(>Chi)`[[3]]
+
+}
+
+flag_g_2_1_4 <- data.frame(
+  Flag_G_Infection_high_vs_Infection_low = gflag(
+    obs1 = obs_ih_2_1_4,
+    obs2 = obs_il_2_1_4,
+    abs1 = abs_ih_2_1_4,
+    abs2 = abs_il_2_1_4,
+    pvals = pval_g_2_1_4[, 1],
+    cutoff = 0.05
+  ),
+  Flag_G_Infection_high_vs_Mock_high = gflag(
+    obs1 = obs_ih_2_1_4,
+    obs2 = obs_mh_2_1_4,
+    abs1 = abs_ih_2_1_4,
+    abs2 = abs_mh_2_1_4,
+    pvals = pval_g_2_1_4[, 2],
+    cutoff = 0.05
+  ),
+  Flag_G_Infection_high_vs_Mock_low = gflag(
+    obs1 = obs_ih_2_1_4,
+    obs2 = obs_ml_2_1_4,
+    abs1 = abs_ih_2_1_4,
+    abs2 = abs_ml_2_1_4,
+    pvals = pval_g_2_1_4[, 3],
+    cutoff = 0.05
+  ),
+  Flag_G_Infection_low_vs_Mock_high = gflag(
+    obs1 = obs_il_2_1_4,
+    obs2 = obs_mh_2_1_4,
+    abs1 = abs_il_2_1_4,
+    abs2 = abs_mh_2_1_4,
+    pvals = pval_g_2_1_4[, 4],
+    cutoff = 0.05
+  ),
+  Flag_G_Infection_low_vs_Mock_low = gflag(
+    obs1 = obs_il_2_1_4,
+    obs2 = obs_ml_2_1_4,
+    abs1 = abs_il_2_1_4,
+    abs2 = abs_ml_2_1_4,
+    pvals = pval_g_2_1_4[, 5],
+    cutoff = 0.05
+  ),
+  Flag_G_Mock_high_vs_Mock_low = gflag(
+    obs1 = obs_mh_2_1_4,
+    obs2 = obs_ml_2_1_4,
+    abs1 = abs_mh_2_1_4,
+    abs2 = abs_ml_2_1_4,
+    pvals = pval_g_2_1_4[, 6],
+    cutoff = 0.05
+  )
+)
+
+dragon <- run_two_factor(data = data.matrix(gfilta_2_1_4$e_data[, -1]),
+                         gpData = groupDF_2_1_4,
+                         red_df = matrix(0,
+                                         nrow = nrow(gfilta_2_1_4$e_data),
+                                         ncol = 1))
+
+mean_2_1_4 <- data.frame(
+  Mean_Infection_high = dragon$par_estimates[, 1],
+  Mean_Infection_low = dragon$par_estimates[, 2],
+  Mean_Mock_high = dragon$par_estimates[, 3],
+  Mean_Mock_low = dragon$par_estimates[, 4]
+)
+
+gstan_2_1_4 <- data.frame(
+  Mass_Tag_ID = gfilta_2_1_4$e_data$Mass_Tag_ID,
+  Count_Infection_high = unname(obs_ih_2_1_4),
+  Count_Infection_low = unname(obs_il_2_1_4),
+  Count_Mock_high = unname(obs_mh_2_1_4),
+  Count_Mock_low = unname(obs_ml_2_1_4),
+  mean_2_1_4,
+  Fold_change_Infection_high_vs_Infection_low = (
+    mean_2_1_4[, 1] - mean_2_1_4[, 2]
+  ),
+  Fold_change_Infection_high_vs_Mock_high = (
+    mean_2_1_4[, 1] - mean_2_1_4[, 3]
+  ),
+  Fold_change_Infection_high_vs_Mock_low = (
+    mean_2_1_4[, 1] - mean_2_1_4[, 4]
+  ),
+  Fold_change_Infection_low_vs_Mock_high = (
+    mean_2_1_4[, 2] - mean_2_1_4[, 3]
+  ),
+  Fold_change_Infection_low_vs_Mock_low = (
+    mean_2_1_4[, 2] - mean_2_1_4[, 4]
+  ),
+  Fold_change_Mock_high_vs_Mock_low = (
+    mean_2_1_4[, 3] - mean_2_1_4[, 4]
+  ),
+  pval_g_2_1_4,
+  flag_g_2_1_4,
+  row.names = NULL
+)
+
+class(gstan_2_1_4) <- c("statRes", "data.frame")
+
+attr(gstan_2_1_4, "group_DF") <- groupDF_2_1_4
+attr(gstan_2_1_4, "comparisons") <- c("Infection_high_vs_Infection_low",
+                                      "Infection_high_vs_Mock_high",
+                                      "Infection_high_vs_Mock_low",
+                                      "Infection_low_vs_Mock_high",
+                                      "Infection_low_vs_Mock_low",
+                                      "Mock_high_vs_Mock_low")
+attr(gstan_2_1_4, "number_significant") <- data.frame(
+  Comparison = c("Infection_high_vs_Infection_low",
+                 "Infection_high_vs_Mock_high",
+                 "Infection_high_vs_Mock_low",
+                 "Infection_low_vs_Mock_high",
+                 "Infection_low_vs_Mock_low",
+                 "Mock_high_vs_Mock_low"),
+  Up_total = c(length(which(flag_g_2_1_4[, 1] == 1)),
+               length(which(flag_g_2_1_4[, 2] == 1)),
+               length(which(flag_g_2_1_4[, 3] == 1)),
+               length(which(flag_g_2_1_4[, 4] == 1)),
+               length(which(flag_g_2_1_4[, 5] == 1)),
+               length(which(flag_g_2_1_4[, 6] == 1))),
+  Down_total = c(length(which(flag_g_2_1_4[, 1] == -1)),
+                 length(which(flag_g_2_1_4[, 2] == -1)),
+                 length(which(flag_g_2_1_4[, 3] == -1)),
+                 length(which(flag_g_2_1_4[, 4] == -1)),
+                 length(which(flag_g_2_1_4[, 5] == -1)),
+                 length(which(flag_g_2_1_4[, 6] == -1))),
+  Up_anova = c(0, 0, 0, 0, 0, 0),
+  Down_anova = c(0, 0, 0, 0, 0, 0),
+  Up_gtest = c(length(which(flag_g_2_1_4[, 1] == 1)),
+               length(which(flag_g_2_1_4[, 2] == 1)),
+               length(which(flag_g_2_1_4[, 3] == 1)),
+               length(which(flag_g_2_1_4[, 4] == 1)),
+               length(which(flag_g_2_1_4[, 5] == 1)),
+               length(which(flag_g_2_1_4[, 6] == 1))),
+  Down_gtest = c(length(which(flag_g_2_1_4[, 1] == -1)),
+                 length(which(flag_g_2_1_4[, 2] == -1)),
+                 length(which(flag_g_2_1_4[, 3] == -1)),
+                 length(which(flag_g_2_1_4[, 4] == -1)),
+                 length(which(flag_g_2_1_4[, 5] == -1)),
+                 length(which(flag_g_2_1_4[, 6] == -1))),
+  row.names = NULL
+)
+attr(gstan_2_1_4, "statistical_test") <- "gtest"
+attr(gstan_2_1_4, "adjustment_method_a") <- "none"
+attr(gstan_2_1_4, "adjustment_method_g") <- "none"
+attr(gstan_2_1_4, "pval_thresh") <- 0.05
+attr(gstan_2_1_4, "data_info") <- list(
+  data_scale_orig = "abundance",
+  data_scale = "log",
+  norm_info = list(is_normalized = FALSE),
+  num_edata = length(unique(gfilta_2_1_4$e_data$Mass_Tag_ID)),
+  num_miss_obs = sum(is.na(gfilta_2_1_4$e_data[, -1])),
+  prop_missing = (sum(is.na(gfilta_2_1_4$e_data[, -1])) /
+                    prod(dim(gfilta_2_1_4$e_data[, -1]))),
+  num_samps = dim(gfilta_2_1_4$f_data)[1],
+  data_types = NULL
+)
+attr(gstan_2_1_4, "cnames") <- list(
+  edata_cname = "Mass_Tag_ID",
+  emeta_cname = NULL,
+  fdata_cname = "SampleID",
+  techrep_cname = NULL
+)
+attr(gstan_2_1_4, "data_class") <- "pepData"
+
+# main effects: 2; covariates: 2; groups: 4 ---------------
+
+pval_g_2_2_4 <- data.frame(
+  P_value_G_Infection_high_vs_Infection_low = rep(0, nrow(gfilta_2_2_4$e_data)),
+  P_value_G_Infection_high_vs_Mock_high = rep(0, nrow(gfilta_2_2_4$e_data)),
+  P_value_G_Infection_high_vs_Mock_low = rep(0, nrow(gfilta_2_2_4$e_data)),
+  P_value_G_Infection_low_vs_Mock_high = rep(0, nrow(gfilta_2_2_4$e_data)),
+  P_value_G_Infection_low_vs_Mock_low = rep(0, nrow(gfilta_2_2_4$e_data)),
+  P_value_G_Mock_high_vs_Mock_low = rep(0, nrow(gfilta_2_2_4$e_data))
+)
+
+for (e in 1:nrow(gfilta_2_2_4$e_data)) {
+
+  # Compute the p-value for the Infection_high_vs_Infection_low test.
+  pval_g_2_2_4[e, 1] <- anova(
+    glm(
+      as.numeric(!is.na(gfilta_2_2_4$e_data[e, 2:7])) ~
+        attr(groupDF_2_2_4, "covariates")$Gender[1:6] +
+        attr(groupDF_2_2_4, "covariates")$Age[1:6] +
+        groupDF_2_2_4$Group[1:6],
+      family = binomial
+    ),
+    test = "Chisq"
+  )$`Pr(>Chi)`[[4]]
+  # Compute the p-value for the Infection_high_vs_Mock_high test.
+  pval_g_2_2_4[e, 2] <- anova(
+    glm(
+      as.numeric(!is.na(gfilta_2_2_4$e_data[e, c(2, 4, 6, 8, 9, 13)])) ~
+        attr(groupDF_2_2_4, "covariates")$Gender[c(1, 3, 5, 7, 8, 12)] +
+        attr(groupDF_2_2_4, "covariates")$Age[c(1, 3, 5, 7, 8, 12)] +
+        groupDF_2_2_4$Group[c(1, 3, 5, 7, 8, 12)],
+      family = binomial
+    ),
+    test = "Chisq"
+  )$`Pr(>Chi)`[[4]]
+  # Compute the p-value for the Infection_high_vs_Mock_low test.
+  pval_g_2_2_4[e, 3] <- anova(
+    glm(
+      as.numeric(!is.na(gfilta_2_2_4$e_data[e, c(2, 4, 6, 10:12)])) ~
+        attr(groupDF_2_2_4, "covariates")$Gender[c(1, 3, 5, 9:11)] +
+        attr(groupDF_2_2_4, "covariates")$Age[c(1, 3, 5, 9:11)] +
+        groupDF_2_2_4$Group[c(1, 3, 5, 9:11)],
+      family = binomial
+    ),
+    test = "Chisq"
+  )$`Pr(>Chi)`[[4]]
+  # Compute the p-value for the Infection_low_vs_Mock_high test.
+  pval_g_2_2_4[e, 4] <- anova(
+    glm(
+      as.numeric(!is.na(gfilta_2_2_4$e_data[e, c(3, 5, 7, 8, 9, 13)])) ~
+        attr(groupDF_2_2_4, "covariates")$Gender[c(2, 4, 6, 7, 8, 12)] +
+        attr(groupDF_2_2_4, "covariates")$Age[c(2, 4, 6, 7, 8, 12)] +
+        groupDF_2_2_4$Group[c(2, 4, 6, 7, 8, 12)],
+      family = binomial
+    ),
+    test = "Chisq"
+  )$`Pr(>Chi)`[[4]]
+  # Compute the p-value for the Infection_low_vs_Mock_low test.
+  pval_g_2_2_4[e, 5] <- anova(
+    glm(
+      as.numeric(!is.na(gfilta_2_2_4$e_data[e, c(3, 5, 7, 10:12)])) ~
+        attr(groupDF_2_2_4, "covariates")$Gender[c(2, 4, 6, 9:11)] +
+        attr(groupDF_2_2_4, "covariates")$Age[c(2, 4, 6, 9:11)] +
+        groupDF_2_2_4$Group[c(2, 4, 6, 9:11)],
+      family = binomial
+    ),
+    test = "Chisq"
+  )$`Pr(>Chi)`[[4]]
+  # Compute the p-value for the Mock_high_vs_Mock_low test.
+  pval_g_2_2_4[e, 6] <- anova(
+    glm(
+      as.numeric(!is.na(gfilta_2_2_4$e_data[e, 8:13])) ~
+        attr(groupDF_2_2_4, "covariates")$Gender[7:12] +
+        attr(groupDF_2_2_4, "covariates")$Age[7:12] +
+        groupDF_2_2_4$Group[7:12],
+      family = binomial
+    ),
+    test = "Chisq"
+  )$`Pr(>Chi)`[[4]]
+
+}
+
+flag_g_2_2_4 <- data.frame(
+  Flag_G_Infection_high_vs_Infection_low = gflag(
+    obs1 = obs_ih_2_2_4,
+    obs2 = obs_il_2_2_4,
+    abs1 = abs_ih_2_2_4,
+    abs2 = abs_il_2_2_4,
+    pvals = pval_g_2_2_4[, 1],
+    cutoff = 0.05
+  ),
+  Flag_G_Infection_high_vs_Mock_high = gflag(
+    obs1 = obs_ih_2_2_4,
+    obs2 = obs_mh_2_2_4,
+    abs1 = abs_ih_2_2_4,
+    abs2 = abs_mh_2_2_4,
+    pvals = pval_g_2_2_4[, 2],
+    cutoff = 0.05
+  ),
+  Flag_G_Infection_high_vs_Mock_low = gflag(
+    obs1 = obs_ih_2_2_4,
+    obs2 = obs_ml_2_2_4,
+    abs1 = abs_ih_2_2_4,
+    abs2 = abs_ml_2_2_4,
+    pvals = pval_g_2_2_4[, 3],
+    cutoff = 0.05
+  ),
+  Flag_G_Infection_low_vs_Mock_high = gflag(
+    obs1 = obs_il_2_2_4,
+    obs2 = obs_mh_2_2_4,
+    abs1 = abs_il_2_2_4,
+    abs2 = abs_mh_2_2_4,
+    pvals = pval_g_2_2_4[, 4],
+    cutoff = 0.05
+  ),
+  Flag_G_Infection_low_vs_Mock_low = gflag(
+    obs1 = obs_il_2_2_4,
+    obs2 = obs_ml_2_2_4,
+    abs1 = abs_il_2_2_4,
+    abs2 = abs_ml_2_2_4,
+    pvals = pval_g_2_2_4[, 5],
+    cutoff = 0.05
+  ),
+  Flag_G_Mock_high_vs_Mock_low = gflag(
+    obs1 = obs_mh_2_2_4,
+    obs2 = obs_ml_2_2_4,
+    abs1 = abs_mh_2_2_4,
+    abs2 = abs_ml_2_2_4,
+    pvals = pval_g_2_2_4[, 6],
+    cutoff = 0.05
+  )
+)
+
+mustang <- run_two_factor(data = data.matrix(gfilta_2_1_4$e_data[, -1]),
+                          gpData = groupDF_2_1_4,
+                          red_df = matrix(0,
+                                          nrow = nrow(gfilta_2_1_4$e_data),
+                                          ncol = 1))
+
+mean_2_2_4 <- data.frame(
+  Mean_Infection_high = mustang$par_estimates[, 1],
+  Mean_Infection_low = mustang$par_estimates[, 2],
+  Mean_Mock_high = mustang$par_estimates[, 3],
+  Mean_Mock_low = mustang$par_estimates[, 4]
+)
+
+gstan_2_2_4 <- data.frame(
+  Mass_Tag_ID = gfilta_2_2_4$e_data$Mass_Tag_ID,
+  Count_Infection_high = unname(obs_ih_2_2_4),
+  Count_Infection_low = unname(obs_il_2_2_4),
+  Count_Mock_high = unname(obs_mh_2_2_4),
+  Count_Mock_low = unname(obs_ml_2_2_4),
+  mean_2_2_4,
+  Fold_change_Infection_high_vs_Infection_low = (
+    mean_2_2_4[, 1] - mean_2_2_4[, 2]
+  ),
+  Fold_change_Infection_high_vs_Mock_high = (
+    mean_2_2_4[, 1] - mean_2_2_4[, 3]
+  ),
+  Fold_change_Infection_high_vs_Mock_low = (
+    mean_2_2_4[, 1] - mean_2_2_4[, 4]
+  ),
+  Fold_change_Infection_low_vs_Mock_high = (
+    mean_2_2_4[, 2] - mean_2_2_4[, 3]
+  ),
+  Fold_change_Infection_low_vs_Mock_low = (
+    mean_2_2_4[, 2] - mean_2_2_4[, 4]
+  ),
+  Fold_change_Mock_high_vs_Mock_low = (
+    mean_2_2_4[, 3] - mean_2_2_4[, 4]
+  ),
+  pval_g_2_2_4,
+  flag_g_2_2_4,
+  row.names = NULL
+)
+
+class(gstan_2_2_4) <- c("statRes", "data.frame")
+
+attr(gstan_2_2_4, "group_DF") <- groupDF_2_2_4
+attr(gstan_2_2_4, "comparisons") <- c("Infection_high_vs_Infection_low",
+                                      "Infection_high_vs_Mock_high",
+                                      "Infection_high_vs_Mock_low",
+                                      "Infection_low_vs_Mock_high",
+                                      "Infection_low_vs_Mock_low",
+                                      "Mock_high_vs_Mock_low")
+attr(gstan_2_2_4, "number_significant") <- data.frame(
+  Comparison = c("Infection_high_vs_Infection_low",
+                 "Infection_high_vs_Mock_high",
+                 "Infection_high_vs_Mock_low",
+                 "Infection_low_vs_Mock_high",
+                 "Infection_low_vs_Mock_low",
+                 "Mock_high_vs_Mock_low"),
+  Up_total = c(length(which(flag_g_2_2_4[, 1] == 1)),
+               length(which(flag_g_2_2_4[, 2] == 1)),
+               length(which(flag_g_2_2_4[, 3] == 1)),
+               length(which(flag_g_2_2_4[, 4] == 1)),
+               length(which(flag_g_2_2_4[, 5] == 1)),
+               length(which(flag_g_2_2_4[, 6] == 1))),
+  Down_total = c(length(which(flag_g_2_2_4[, 1] == -1)),
+                 length(which(flag_g_2_2_4[, 2] == -1)),
+                 length(which(flag_g_2_2_4[, 3] == -1)),
+                 length(which(flag_g_2_2_4[, 4] == -1)),
+                 length(which(flag_g_2_2_4[, 5] == -1)),
+                 length(which(flag_g_2_2_4[, 6] == -1))),
+  Up_anova = c(0, 0, 0, 0, 0, 0),
+  Down_anova = c(0, 0, 0, 0, 0, 0),
+  Up_gtest = c(length(which(flag_g_2_2_4[, 1] == 1)),
+               length(which(flag_g_2_2_4[, 2] == 1)),
+               length(which(flag_g_2_2_4[, 3] == 1)),
+               length(which(flag_g_2_2_4[, 4] == 1)),
+               length(which(flag_g_2_2_4[, 5] == 1)),
+               length(which(flag_g_2_2_4[, 6] == 1))),
+  Down_gtest = c(length(which(flag_g_2_2_4[, 1] == -1)),
+                 length(which(flag_g_2_2_4[, 2] == -1)),
+                 length(which(flag_g_2_2_4[, 3] == -1)),
+                 length(which(flag_g_2_2_4[, 4] == -1)),
+                 length(which(flag_g_2_2_4[, 5] == -1)),
+                 length(which(flag_g_2_2_4[, 6] == -1))),
+  row.names = NULL
+)
+attr(gstan_2_2_4, "statistical_test") <- "gtest"
+attr(gstan_2_2_4, "adjustment_method_a") <- "none"
+attr(gstan_2_2_4, "adjustment_method_g") <- "none"
+attr(gstan_2_2_4, "pval_thresh") <- 0.05
+attr(gstan_2_2_4, "data_info") <- list(
+  data_scale_orig = "abundance",
+  data_scale = "log",
+  norm_info = list(is_normalized = FALSE),
+  num_edata = length(unique(gfilta_2_2_4$e_data$Mass_Tag_ID)),
+  num_miss_obs = sum(is.na(gfilta_2_2_4$e_data[, -1])),
+  prop_missing = (sum(is.na(gfilta_2_2_4$e_data[, -1])) /
+                    prod(dim(gfilta_2_2_4$e_data[, -1]))),
+  num_samps = dim(gfilta_2_2_4$f_data)[1],
+  data_types = NULL
+)
+attr(gstan_2_2_4, "cnames") <- list(
+  edata_cname = "Mass_Tag_ID",
+  emeta_cname = NULL,
+  fdata_cname = "SampleID",
+  techrep_cname = NULL
+)
+attr(gstan_2_2_4, "data_class") <- "pepData"
+
+
 # Create combined standards ----------------------------------------------------
 
 # main effects: 1; covariates: 0; groups: 2 ---------------
@@ -2724,6 +3179,270 @@ attr(cstan_1_0_2, "cnames") <- list(
   techrep_cname = NULL
 )
 attr(cstan_1_0_2, "data_class") <- "pepData"
+
+# main effects: 1; covariates: 1; groups: 3 ---------------
+
+# Combine the G-test and ANOVA results and place columns in correct order.
+cstan_1_1_3 <- dplyr::full_join(gstan_1_1_3[, c(1:4, 11:16)],
+                                astan_1_1_3) %>%
+  dplyr::relocate(
+    dplyr::starts_with("Count_", vars = colnames(.data)),
+    .after = "Mass_Tag_ID"
+  ) %>%
+  dplyr::relocate(
+    dplyr::starts_with("Mean_", vars = colnames(.data)),
+    .after = dplyr::last_col()
+  ) %>%
+  dplyr::relocate(
+    dplyr::starts_with("Fold_change_", vars = colnames(.data)),
+    .after = dplyr::last_col()
+  ) %>%
+  dplyr::relocate(
+    dplyr::starts_with("P_value_A", vars = colnames(.data)),
+    .after = dplyr::last_col()
+  ) %>%
+  dplyr::relocate(
+    dplyr::starts_with("P_value_G", vars = colnames(.data)),
+    .after = dplyr::last_col()
+  ) %>%
+  dplyr::relocate(
+    dplyr::starts_with("Flag_A", vars = colnames(.data)),
+    .after = dplyr::last_col()
+  ) %>%
+  dplyr::relocate(
+    dplyr::starts_with("Flag_G", vars = colnames(.data)),
+    .after = dplyr::last_col()
+  )
+
+# Replace all NaN values with NA.
+cstan_1_1_3[is.nan(data.matrix(cstan_1_1_3))] <- NA
+
+class(cstan_1_1_3) <- c("statRes", "data.frame")
+
+attr(cstan_1_1_3, "group_DF") <- groupDF_1_1_3
+attr(cstan_1_1_3, "comparisons") <- c("mutant_vs_zombie",
+                                      "mutant_vs_human",
+                                      "zombie_vs_human")
+attr(cstan_1_1_3, "number_significant") <- data.frame(
+  Comparison = c("mutant_vs_zombie",
+                 "mutant_vs_human",
+                 "zombie_vs_human"),
+  Up_total = c(sum(length(which(flag_g_1_1_3[, 1] == 1)),
+                   length(which(flag_a_1_1_3[, 1] == 1))),
+               sum(length(which(flag_g_1_1_3[, 2] == 1)),
+                   length(which(flag_a_1_1_3[, 2] == 1))),
+               sum(length(which(flag_g_1_1_3[, 3] == 1)),
+                   length(which(flag_a_1_1_3[, 3] == 1)))),
+  Down_total = c(sum(length(which(flag_g_1_1_3[, 1] == -1)),
+                     length(which(flag_a_1_1_3[, 1] == -1))),
+                 sum(length(which(flag_g_1_1_3[, 2] == -1)),
+                     length(which(flag_a_1_1_3[, 2] == -1))),
+                 sum(length(which(flag_g_1_1_3[, 3] == -1)),
+                     length(which(flag_a_1_1_3[, 3] == -1)))),
+  Up_anova = c(length(which(flag_a_1_1_3[, 1] == 1)),
+               length(which(flag_a_1_1_3[, 2] == 1)),
+               length(which(flag_a_1_1_3[, 3] == 1))),
+  Down_anova = c(length(which(flag_a_1_1_3[, 1] == -1)),
+                 length(which(flag_a_1_1_3[, 2] == -1)),
+                 length(which(flag_a_1_1_3[, 3] == -1))),
+  Up_gtest = c(length(which(flag_g_1_1_3[, 1] == 1)),
+               length(which(flag_g_1_1_3[, 2] == 1)),
+               length(which(flag_g_1_1_3[, 3] == 1))),
+  Down_gtest = c(length(which(flag_g_1_1_3[, 1] == -1)),
+                 length(which(flag_g_1_1_3[, 2] == -1)),
+                 length(which(flag_g_1_1_3[, 3] == -1))),
+  row.names = NULL
+)
+attr(cstan_1_1_3, "statistical_test") <- "combined"
+attr(cstan_1_1_3, "adjustment_method_a") <- "none"
+attr(cstan_1_1_3, "adjustment_method_g") <- "none"
+attr(cstan_1_1_3, "pval_thresh") <- 0.05
+attr(cstan_1_1_3, "data_info") <- list(
+  data_scale_orig = "abundance",
+  data_scale = "log",
+  norm_info = list(is_normalized = FALSE),
+  num_edata = length(unique(gfilta_1_1_3$e_data$Mass_Tag_ID)),
+  num_miss_obs = sum(is.na(gfilta_1_1_3$e_data[, -1])),
+  prop_missing = (sum(is.na(gfilta_1_1_3$e_data[, -1])) /
+                    prod(dim(gfilta_1_1_3$e_data[, -1]))),
+  num_samps = dim(gfilta_1_1_3$f_data)[1],
+  data_types = NULL
+)
+attr(cstan_1_1_3, "bpFlags") <- data.frame(
+  Mass_Tag_ID = gfilta_1_1_3$e_data$Mass_Tag_ID,
+  mutant_vs_zombie = dplyr::case_when(
+    is.na(cstan_1_1_3$Flag_A_mutant_vs_zombie) ~
+      cstan_1_1_3$Flag_G_mutant_vs_zombie,
+    is.na(cstan_1_1_3$P_value_A_mutant_vs_zombie) ~
+      cstan_1_1_3$Flag_G_mutant_vs_zombie,
+    (cstan_1_1_3$P_value_A_mutant_vs_zombie > 0.05 &
+       cstan_1_1_3$P_value_G_mutant_vs_zombie < 0.05) ~
+      cstan_1_1_3$Flag_G_mutant_vs_zombie,
+    !is.na(cstan_1_1_3$Flag_A_mutant_vs_zombie) ~
+      cstan_1_1_3$Flag_A_mutant_vs_zombie
+  ),
+  mutant_vs_human = dplyr::case_when(
+    is.na(cstan_1_1_3$Flag_A_mutant_vs_human) ~
+      cstan_1_1_3$Flag_G_mutant_vs_human,
+    is.na(cstan_1_1_3$P_value_A_mutant_vs_human) ~
+      cstan_1_1_3$Flag_G_mutant_vs_human,
+    (cstan_1_1_3$P_value_A_mutant_vs_human > 0.05 &
+       cstan_1_1_3$P_value_G_mutant_vs_human < 0.05) ~
+      cstan_1_1_3$Flag_G_mutant_vs_human,
+    !is.na(cstan_1_1_3$Flag_A_mutant_vs_human) ~
+      cstan_1_1_3$Flag_A_mutant_vs_human
+  ),
+  zombie_vs_human = dplyr::case_when(
+    is.na(cstan_1_1_3$Flag_A_zombie_vs_human) ~
+      cstan_1_1_3$Flag_G_zombie_vs_human,
+    is.na(cstan_1_1_3$P_value_A_zombie_vs_human) ~
+      cstan_1_1_3$Flag_G_zombie_vs_human,
+    (cstan_1_1_3$P_value_A_zombie_vs_human > 0.05 &
+       cstan_1_1_3$P_value_G_zombie_vs_human < 0.05) ~
+      cstan_1_1_3$Flag_G_zombie_vs_human,
+    !is.na(cstan_1_1_3$Flag_A_zombie_vs_human) ~
+      cstan_1_1_3$Flag_A_zombie_vs_human
+  )
+)
+attr(cstan_1_1_3, "cnames") <- list(
+  edata_cname = "Mass_Tag_ID",
+  emeta_cname = "Protein",
+  fdata_cname = "SampleID",
+  techrep_cname = NULL
+)
+attr(cstan_1_1_3, "data_class") <- "pepData"
+
+# main effects: 1; covariates: 2; groups: 3 ---------------
+
+# Combine the G-test and ANOVA results and place columns in correct order.
+cstan_1_2_3 <- dplyr::full_join(gstan_1_2_3[, c(1:4, 11:16)],
+                                astan_1_2_3) %>%
+  dplyr::relocate(
+    dplyr::starts_with("Count_", vars = colnames(.data)),
+    .after = "Mass_Tag_ID"
+  ) %>%
+  dplyr::relocate(
+    dplyr::starts_with("Mean_", vars = colnames(.data)),
+    .after = dplyr::last_col()
+  ) %>%
+  dplyr::relocate(
+    dplyr::starts_with("Fold_change_", vars = colnames(.data)),
+    .after = dplyr::last_col()
+  ) %>%
+  dplyr::relocate(
+    dplyr::starts_with("P_value_A", vars = colnames(.data)),
+    .after = dplyr::last_col()
+  ) %>%
+  dplyr::relocate(
+    dplyr::starts_with("P_value_G", vars = colnames(.data)),
+    .after = dplyr::last_col()
+  ) %>%
+  dplyr::relocate(
+    dplyr::starts_with("Flag_A", vars = colnames(.data)),
+    .after = dplyr::last_col()
+  ) %>%
+  dplyr::relocate(
+    dplyr::starts_with("Flag_G", vars = colnames(.data)),
+    .after = dplyr::last_col()
+  )
+
+# Replace all NaN values with NA.
+cstan_1_2_3[is.nan(data.matrix(cstan_1_2_3))] <- NA
+
+class(cstan_1_2_3) <- c("statRes", "data.frame")
+
+attr(cstan_1_2_3, "group_DF") <- groupDF_1_2_3
+attr(cstan_1_2_3, "comparisons") <- c("mutant_vs_zombie",
+                                      "mutant_vs_human",
+                                      "zombie_vs_human")
+attr(cstan_1_2_3, "number_significant") <- data.frame(
+  Comparison = c("mutant_vs_zombie",
+                 "mutant_vs_human",
+                 "zombie_vs_human"),
+  Up_total = c(sum(length(which(flag_g_1_2_3[, 1] == 1)),
+                   length(which(flag_a_1_2_3[, 1] == 1))),
+               sum(length(which(flag_g_1_2_3[, 2] == 1)),
+                   length(which(flag_a_1_2_3[, 2] == 1))),
+               sum(length(which(flag_g_1_2_3[, 3] == 1)),
+                   length(which(flag_a_1_2_3[, 3] == 1)))),
+  Down_total = c(sum(length(which(flag_g_1_2_3[, 1] == -1)),
+                     length(which(flag_a_1_2_3[, 1] == -1))),
+                 sum(length(which(flag_g_1_2_3[, 2] == -1)),
+                     length(which(flag_a_1_2_3[, 2] == -1))),
+                 sum(length(which(flag_g_1_2_3[, 3] == -1)),
+                     length(which(flag_a_1_2_3[, 3] == -1)))),
+  Up_anova = c(length(which(flag_a_1_2_3[, 1] == 1)),
+               length(which(flag_a_1_2_3[, 2] == 1)),
+               length(which(flag_a_1_2_3[, 3] == 1))),
+  Down_anova = c(length(which(flag_a_1_2_3[, 1] == -1)),
+                 length(which(flag_a_1_2_3[, 2] == -1)),
+                 length(which(flag_a_1_2_3[, 3] == -1))),
+  Up_gtest = c(length(which(flag_g_1_2_3[, 1] == 1)),
+               length(which(flag_g_1_2_3[, 2] == 1)),
+               length(which(flag_g_1_2_3[, 3] == 1))),
+  Down_gtest = c(length(which(flag_g_1_2_3[, 1] == -1)),
+                 length(which(flag_g_1_2_3[, 2] == -1)),
+                 length(which(flag_g_1_2_3[, 3] == -1))),
+  row.names = NULL
+)
+attr(cstan_1_2_3, "statistical_test") <- "combined"
+attr(cstan_1_2_3, "adjustment_method_a") <- "none"
+attr(cstan_1_2_3, "adjustment_method_g") <- "none"
+attr(cstan_1_2_3, "pval_thresh") <- 0.05
+attr(cstan_1_2_3, "data_info") <- list(
+  data_scale_orig = "abundance",
+  data_scale = "log",
+  norm_info = list(is_normalized = FALSE),
+  num_edata = length(unique(gfilta_1_2_3$e_data$Mass_Tag_ID)),
+  num_miss_obs = sum(is.na(gfilta_1_2_3$e_data[, -1])),
+  prop_missing = (sum(is.na(gfilta_1_2_3$e_data[, -1])) /
+                    prod(dim(gfilta_1_2_3$e_data[, -1]))),
+  num_samps = dim(gfilta_1_2_3$f_data)[1],
+  data_types = NULL
+)
+attr(cstan_1_2_3, "bpFlags") <- data.frame(
+  Mass_Tag_ID = gfilta_1_2_3$e_data$Mass_Tag_ID,
+  mutant_vs_zombie = dplyr::case_when(
+    is.na(cstan_1_2_3$Flag_A_mutant_vs_zombie) ~
+      cstan_1_2_3$Flag_G_mutant_vs_zombie,
+    is.na(cstan_1_2_3$P_value_A_mutant_vs_zombie) ~
+      cstan_1_2_3$Flag_G_mutant_vs_zombie,
+    (cstan_1_2_3$P_value_A_mutant_vs_zombie > 0.05 &
+       cstan_1_2_3$P_value_G_mutant_vs_zombie < 0.05) ~
+      cstan_1_2_3$Flag_G_mutant_vs_zombie,
+    !is.na(cstan_1_2_3$Flag_A_mutant_vs_zombie) ~
+      cstan_1_2_3$Flag_A_mutant_vs_zombie
+  ),
+  mutant_vs_human = dplyr::case_when(
+    is.na(cstan_1_2_3$Flag_A_mutant_vs_human) ~
+      cstan_1_2_3$Flag_G_mutant_vs_human,
+    is.na(cstan_1_2_3$P_value_A_mutant_vs_human) ~
+      cstan_1_2_3$Flag_G_mutant_vs_human,
+    (cstan_1_2_3$P_value_A_mutant_vs_human > 0.05 &
+       cstan_1_2_3$P_value_G_mutant_vs_human < 0.05) ~
+      cstan_1_2_3$Flag_G_mutant_vs_human,
+    !is.na(cstan_1_2_3$Flag_A_mutant_vs_human) ~
+      cstan_1_2_3$Flag_A_mutant_vs_human
+  ),
+  zombie_vs_human = dplyr::case_when(
+    is.na(cstan_1_2_3$Flag_A_zombie_vs_human) ~
+      cstan_1_2_3$Flag_G_zombie_vs_human,
+    is.na(cstan_1_2_3$P_value_A_zombie_vs_human) ~
+      cstan_1_2_3$Flag_G_zombie_vs_human,
+    (cstan_1_2_3$P_value_A_zombie_vs_human > 0.05 &
+       cstan_1_2_3$P_value_G_zombie_vs_human < 0.05) ~
+      cstan_1_2_3$Flag_G_zombie_vs_human,
+    !is.na(cstan_1_2_3$Flag_A_zombie_vs_human) ~
+      cstan_1_2_3$Flag_A_zombie_vs_human
+  )
+)
+attr(cstan_1_2_3, "cnames") <- list(
+  edata_cname = "Mass_Tag_ID",
+  emeta_cname = "Protein",
+  fdata_cname = "SampleID",
+  techrep_cname = NULL
+)
+attr(cstan_1_2_3, "data_class") <- "pepData"
 
 # main effects: 2; covariates: 0; groups: 3 ---------------
 
@@ -2859,6 +3578,396 @@ attr(cstan_2_0_3, "cnames") <- list(
 )
 attr(cstan_2_0_3, "data_class") <- "pepData"
 
+# main effects: 2; covariates: 1; groups: 4 ---------------
+
+# Combine the G-test and ANOVA results and place columns in correct order.
+cstan_2_1_4 <- dplyr::full_join(gstan_2_1_4[, c(1:5, 16:27)],
+                                astan_2_1_4) %>%
+  dplyr::relocate(
+    dplyr::starts_with("Count_", vars = colnames(.data)),
+    .after = "Mass_Tag_ID"
+  ) %>%
+  dplyr::relocate(
+    dplyr::starts_with("Mean_", vars = colnames(.data)),
+    .after = dplyr::last_col()
+  ) %>%
+  dplyr::relocate(
+    dplyr::starts_with("Fold_change_", vars = colnames(.data)),
+    .after = dplyr::last_col()
+  ) %>%
+  dplyr::relocate(
+    dplyr::starts_with("P_value_A", vars = colnames(.data)),
+    .after = dplyr::last_col()
+  ) %>%
+  dplyr::relocate(
+    dplyr::starts_with("P_value_G", vars = colnames(.data)),
+    .after = dplyr::last_col()
+  ) %>%
+  dplyr::relocate(
+    dplyr::starts_with("Flag_A", vars = colnames(.data)),
+    .after = dplyr::last_col()
+  ) %>%
+  dplyr::relocate(
+    dplyr::starts_with("Flag_G", vars = colnames(.data)),
+    .after = dplyr::last_col()
+  )
+
+# Replace all NaN values with NA.
+cstan_2_1_4[is.nan(data.matrix(cstan_2_1_4))] <- NA
+
+class(cstan_2_1_4) <- c("statRes", "data.frame")
+
+attr(cstan_2_1_4, "group_DF") <- groupDF_2_1_4
+attr(cstan_2_1_4, "comparisons") <- c("Infection_high_vs_Infection_low",
+                                      "Infection_high_vs_Mock_high",
+                                      "Infection_high_vs_Mock_low",
+                                      "Infection_low_vs_Mock_high",
+                                      "Infection_low_vs_Mock_low",
+                                      "Mock_high_vs_Mock_low")
+attr(cstan_2_1_4, "number_significant") <- data.frame(
+  Comparison = c("Infection_high_vs_Infection_low",
+                 "Infection_high_vs_Mock_high",
+                 "Infection_high_vs_Mock_low",
+                 "Infection_low_vs_Mock_high",
+                 "Infection_low_vs_Mock_low",
+                 "Mock_high_vs_Mock_low"),
+  Up_total = c(sum(length(which(flag_g_2_1_4[, 1] == 1)),
+                   length(which(flag_a_2_1_4[, 1] == 1))),
+               sum(length(which(flag_g_2_1_4[, 2] == 1)),
+                   length(which(flag_a_2_1_4[, 2] == 1))),
+               sum(length(which(flag_g_2_1_4[, 3] == 1)),
+                   length(which(flag_a_2_1_4[, 3] == 1))),
+               sum(length(which(flag_g_2_1_4[, 4] == 1)),
+                   length(which(flag_a_2_1_4[, 4] == 1))),
+               sum(length(which(flag_g_2_1_4[, 5] == 1)),
+                   length(which(flag_a_2_1_4[, 5] == 1))),
+               sum(length(which(flag_g_2_1_4[, 6] == 1)),
+                   length(which(flag_a_2_1_4[, 6] == 1)))),
+  Down_total = c(sum(length(which(flag_g_2_1_4[, 1] == -1)),
+                     length(which(flag_a_2_1_4[, 1] == -1))),
+                 sum(length(which(flag_g_2_1_4[, 2] == -1)),
+                     length(which(flag_a_2_1_4[, 2] == -1))),
+                 sum(length(which(flag_g_2_1_4[, 3] == -1)),
+                     length(which(flag_a_2_1_4[, 3] == -1))),
+                 sum(length(which(flag_g_2_1_4[, 4] == -1)),
+                     length(which(flag_a_2_1_4[, 4] == -1))),
+                 sum(length(which(flag_g_2_1_4[, 5] == -1)),
+                     length(which(flag_a_2_1_4[, 5] == -1))),
+                 sum(length(which(flag_g_2_1_4[, 6] == -1)),
+                     length(which(flag_a_2_1_4[, 6] == -1)))),
+  Up_anova = c(length(which(flag_a_2_1_4[, 1] == 1)),
+               length(which(flag_a_2_1_4[, 2] == 1)),
+               length(which(flag_a_2_1_4[, 3] == 1)),
+               length(which(flag_a_2_1_4[, 4] == 1)),
+               length(which(flag_a_2_1_4[, 5] == 1)),
+               length(which(flag_a_2_1_4[, 6] == 1))),
+  Down_anova = c(length(which(flag_a_2_1_4[, 1] == -1)),
+                 length(which(flag_a_2_1_4[, 2] == -1)),
+                 length(which(flag_a_2_1_4[, 3] == -1)),
+                 length(which(flag_a_2_1_4[, 4] == -1)),
+                 length(which(flag_a_2_1_4[, 5] == -1)),
+                 length(which(flag_a_2_1_4[, 6] == -1))),
+  Up_gtest = c(length(which(flag_g_2_1_4[, 1] == 1)),
+               length(which(flag_g_2_1_4[, 2] == 1)),
+               length(which(flag_g_2_1_4[, 3] == 1)),
+               length(which(flag_g_2_1_4[, 4] == 1)),
+               length(which(flag_g_2_1_4[, 5] == 1)),
+               length(which(flag_g_2_1_4[, 6] == 1))),
+  Down_gtest = c(length(which(flag_g_2_1_4[, 1] == -1)),
+                 length(which(flag_g_2_1_4[, 2] == -1)),
+                 length(which(flag_g_2_1_4[, 3] == -1)),
+                 length(which(flag_g_2_1_4[, 4] == -1)),
+                 length(which(flag_g_2_1_4[, 5] == -1)),
+                 length(which(flag_g_2_1_4[, 6] == -1))),
+  row.names = NULL
+)
+attr(cstan_2_1_4, "statistical_test") <- "combined"
+attr(cstan_2_1_4, "adjustment_method_a") <- "none"
+attr(cstan_2_1_4, "adjustment_method_g") <- "none"
+attr(cstan_2_1_4, "pval_thresh") <- 0.05
+attr(cstan_2_1_4, "data_info") <- list(
+  data_scale_orig = "abundance",
+  data_scale = "log",
+  norm_info = list(is_normalized = FALSE),
+  num_edata = length(unique(gfilta_2_1_4$e_data$Mass_Tag_ID)),
+  num_miss_obs = sum(is.na(gfilta_2_1_4$e_data[, -1])),
+  prop_missing = (sum(is.na(gfilta_2_1_4$e_data[, -1])) /
+                    prod(dim(gfilta_2_1_4$e_data[, -1]))),
+  num_samps = dim(gfilta_2_1_4$f_data)[1],
+  data_types = NULL
+)
+attr(cstan_2_1_4, "bpFlags") <- data.frame(
+  Mass_Tag_ID = gfilta_2_1_4$e_data$Mass_Tag_ID,
+  Infection_high_vs_Infection_low = dplyr::case_when(
+    is.na(cstan_2_1_4$Flag_A_Infection_high_vs_Infection_low) ~
+      cstan_2_1_4$Flag_G_Infection_high_vs_Infection_low,
+    is.na(cstan_2_1_4$P_value_A_Infection_high_vs_Infection_low) ~
+      cstan_2_1_4$Flag_G_Infection_high_vs_Infection_low,
+    (cstan_2_1_4$P_value_A_Infection_high_vs_Infection_low > 0.05 &
+       cstan_2_1_4$P_value_G_Infection_high_vs_Infection_low < 0.05) ~
+      cstan_2_1_4$Flag_G_Infection_high_vs_Infection_low,
+    !is.na(cstan_2_1_4$Flag_A_Infection_high_vs_Infection_low) ~
+      cstan_2_1_4$Flag_A_Infection_high_vs_Infection_low
+  ),
+  Infection_high_vs_Mock_high = dplyr::case_when(
+    is.na(cstan_2_1_4$Flag_A_Infection_high_vs_Mock_high) ~
+      cstan_2_1_4$Flag_G_Infection_high_vs_Mock_high,
+    is.na(cstan_2_1_4$P_value_A_Infection_high_vs_Mock_high) ~
+      cstan_2_1_4$Flag_G_Infection_high_vs_Mock_high,
+    (cstan_2_1_4$P_value_A_Infection_high_vs_Mock_high > 0.05 &
+       cstan_2_1_4$P_value_G_Infection_high_vs_Mock_high < 0.05) ~
+      cstan_2_1_4$Flag_G_Infection_high_vs_Mock_high,
+    !is.na(cstan_2_1_4$Flag_A_Infection_high_vs_Mock_high) ~
+      cstan_2_1_4$Flag_A_Infection_high_vs_Mock_high
+  ),
+  Infection_high_vs_Mock_low = dplyr::case_when(
+    is.na(cstan_2_1_4$Flag_A_Infection_high_vs_Mock_low) ~
+      cstan_2_1_4$Flag_G_Infection_high_vs_Mock_low,
+    is.na(cstan_2_1_4$P_value_A_Infection_high_vs_Mock_low) ~
+      cstan_2_1_4$Flag_G_Infection_high_vs_Mock_low,
+    (cstan_2_1_4$P_value_A_Infection_high_vs_Mock_low > 0.05 &
+       cstan_2_1_4$P_value_G_Infection_high_vs_Mock_low < 0.05) ~
+      cstan_2_1_4$Flag_G_Infection_high_vs_Mock_low,
+    !is.na(cstan_2_1_4$Flag_A_Infection_high_vs_Mock_low) ~
+      cstan_2_1_4$Flag_A_Infection_high_vs_Mock_low
+  ),
+  Infection_low_vs_Mock_high = dplyr::case_when(
+    is.na(cstan_2_1_4$Flag_A_Infection_low_vs_Mock_high) ~
+      cstan_2_1_4$Flag_G_Infection_low_vs_Mock_high,
+    is.na(cstan_2_1_4$P_value_A_Infection_low_vs_Mock_high) ~
+      cstan_2_1_4$Flag_G_Infection_low_vs_Mock_high,
+    (cstan_2_1_4$P_value_A_Infection_low_vs_Mock_high > 0.05 &
+       cstan_2_1_4$P_value_G_Infection_low_vs_Mock_high < 0.05) ~
+      cstan_2_1_4$Flag_G_Infection_low_vs_Mock_high,
+    !is.na(cstan_2_1_4$Flag_A_Infection_low_vs_Mock_high) ~
+      cstan_2_1_4$Flag_A_Infection_low_vs_Mock_high
+  ),
+  Infection_low_vs_Mock_low = dplyr::case_when(
+    is.na(cstan_2_1_4$Flag_A_Infection_low_vs_Mock_low) ~
+      cstan_2_1_4$Flag_G_Infection_low_vs_Mock_low,
+    is.na(cstan_2_1_4$P_value_A_Infection_low_vs_Mock_low) ~
+      cstan_2_1_4$Flag_G_Infection_low_vs_Mock_low,
+    (cstan_2_1_4$P_value_A_Infection_low_vs_Mock_low > 0.05 &
+       cstan_2_1_4$P_value_G_Infection_low_vs_Mock_low < 0.05) ~
+      cstan_2_1_4$Flag_G_Infection_low_vs_Mock_low,
+    !is.na(cstan_2_1_4$Flag_A_Infection_low_vs_Mock_low) ~
+      cstan_2_1_4$Flag_A_Infection_low_vs_Mock_low
+  ),
+  Mock_high_vs_Mock_low = dplyr::case_when(
+    is.na(cstan_2_1_4$Flag_A_Mock_high_vs_Mock_low) ~
+      cstan_2_1_4$Flag_G_Mock_high_vs_Mock_low,
+    is.na(cstan_2_1_4$P_value_A_Mock_high_vs_Mock_low) ~
+      cstan_2_1_4$Flag_G_Mock_high_vs_Mock_low,
+    (cstan_2_1_4$P_value_A_Mock_high_vs_Mock_low > 0.05 &
+       cstan_2_1_4$P_value_G_Mock_high_vs_Mock_low < 0.05) ~
+      cstan_2_1_4$Flag_G_Mock_high_vs_Mock_low,
+    !is.na(cstan_2_1_4$Flag_A_Mock_high_vs_Mock_low) ~
+      cstan_2_1_4$Flag_A_Mock_high_vs_Mock_low
+  )
+)
+attr(cstan_2_1_4, "cnames") <- list(
+  edata_cname = "Mass_Tag_ID",
+  emeta_cname = NULL,
+  fdata_cname = "SampleID",
+  techrep_cname = NULL
+)
+attr(cstan_2_1_4, "data_class") <- "pepData"
+
+# main effects: 2; covariates: 2; groups: 4 ---------------
+
+# Combine the G-test and ANOVA results and place columns in correct order.
+cstan_2_2_4 <- dplyr::full_join(gstan_2_2_4[, c(1:5, 16:27)],
+                                astan_2_2_4) %>%
+  dplyr::relocate(
+    dplyr::starts_with("Count_", vars = colnames(.data)),
+    .after = "Mass_Tag_ID"
+  ) %>%
+  dplyr::relocate(
+    dplyr::starts_with("Mean_", vars = colnames(.data)),
+    .after = dplyr::last_col()
+  ) %>%
+  dplyr::relocate(
+    dplyr::starts_with("Fold_change_", vars = colnames(.data)),
+    .after = dplyr::last_col()
+  ) %>%
+  dplyr::relocate(
+    dplyr::starts_with("P_value_A", vars = colnames(.data)),
+    .after = dplyr::last_col()
+  ) %>%
+  dplyr::relocate(
+    dplyr::starts_with("P_value_G", vars = colnames(.data)),
+    .after = dplyr::last_col()
+  ) %>%
+  dplyr::relocate(
+    dplyr::starts_with("Flag_A", vars = colnames(.data)),
+    .after = dplyr::last_col()
+  ) %>%
+  dplyr::relocate(
+    dplyr::starts_with("Flag_G", vars = colnames(.data)),
+    .after = dplyr::last_col()
+  )
+
+# Replace all NaN values with NA.
+cstan_2_2_4[is.nan(data.matrix(cstan_2_2_4))] <- NA
+
+class(cstan_2_2_4) <- c("statRes", "data.frame")
+
+attr(cstan_2_2_4, "group_DF") <- groupDF_2_2_4
+attr(cstan_2_2_4, "comparisons") <- c("Infection_high_vs_Infection_low",
+                                      "Infection_high_vs_Mock_high",
+                                      "Infection_high_vs_Mock_low",
+                                      "Infection_low_vs_Mock_high",
+                                      "Infection_low_vs_Mock_low",
+                                      "Mock_high_vs_Mock_low")
+attr(cstan_2_2_4, "number_significant") <- data.frame(
+  Comparison = c("Infection_high_vs_Infection_low",
+                 "Infection_high_vs_Mock_high",
+                 "Infection_high_vs_Mock_low",
+                 "Infection_low_vs_Mock_high",
+                 "Infection_low_vs_Mock_low",
+                 "Mock_high_vs_Mock_low"),
+  Up_total = c(sum(length(which(flag_g_2_2_4[, 1] == 1)),
+                   length(which(flag_a_2_2_4[, 1] == 1))),
+               sum(length(which(flag_g_2_2_4[, 2] == 1)),
+                   length(which(flag_a_2_2_4[, 2] == 1))),
+               sum(length(which(flag_g_2_2_4[, 3] == 1)),
+                   length(which(flag_a_2_2_4[, 3] == 1))),
+               sum(length(which(flag_g_2_2_4[, 4] == 1)),
+                   length(which(flag_a_2_2_4[, 4] == 1))),
+               sum(length(which(flag_g_2_2_4[, 5] == 1)),
+                   length(which(flag_a_2_2_4[, 5] == 1))),
+               sum(length(which(flag_g_2_2_4[, 6] == 1)),
+                   length(which(flag_a_2_2_4[, 6] == 1)))),
+  Down_total = c(sum(length(which(flag_g_2_2_4[, 1] == -1)),
+                     length(which(flag_a_2_2_4[, 1] == -1))),
+                 sum(length(which(flag_g_2_2_4[, 2] == -1)),
+                     length(which(flag_a_2_2_4[, 2] == -1))),
+                 sum(length(which(flag_g_2_2_4[, 3] == -1)),
+                     length(which(flag_a_2_2_4[, 3] == -1))),
+                 sum(length(which(flag_g_2_2_4[, 4] == -1)),
+                     length(which(flag_a_2_2_4[, 4] == -1))),
+                 sum(length(which(flag_g_2_2_4[, 5] == -1)),
+                     length(which(flag_a_2_2_4[, 5] == -1))),
+                 sum(length(which(flag_g_2_2_4[, 6] == -1)),
+                     length(which(flag_a_2_2_4[, 6] == -1)))),
+  Up_anova = c(length(which(flag_a_2_2_4[, 1] == 1)),
+               length(which(flag_a_2_2_4[, 2] == 1)),
+               length(which(flag_a_2_2_4[, 3] == 1)),
+               length(which(flag_a_2_2_4[, 4] == 1)),
+               length(which(flag_a_2_2_4[, 5] == 1)),
+               length(which(flag_a_2_2_4[, 6] == 1))),
+  Down_anova = c(length(which(flag_a_2_2_4[, 1] == -1)),
+                 length(which(flag_a_2_2_4[, 2] == -1)),
+                 length(which(flag_a_2_2_4[, 3] == -1)),
+                 length(which(flag_a_2_2_4[, 4] == -1)),
+                 length(which(flag_a_2_2_4[, 5] == -1)),
+                 length(which(flag_a_2_2_4[, 6] == -1))),
+  Up_gtest = c(length(which(flag_g_2_2_4[, 1] == 1)),
+               length(which(flag_g_2_2_4[, 2] == 1)),
+               length(which(flag_g_2_2_4[, 3] == 1)),
+               length(which(flag_g_2_2_4[, 4] == 1)),
+               length(which(flag_g_2_2_4[, 5] == 1)),
+               length(which(flag_g_2_2_4[, 6] == 1))),
+  Down_gtest = c(length(which(flag_g_2_2_4[, 1] == -1)),
+                 length(which(flag_g_2_2_4[, 2] == -1)),
+                 length(which(flag_g_2_2_4[, 3] == -1)),
+                 length(which(flag_g_2_2_4[, 4] == -1)),
+                 length(which(flag_g_2_2_4[, 5] == -1)),
+                 length(which(flag_g_2_2_4[, 6] == -1))),
+  row.names = NULL
+)
+attr(cstan_2_2_4, "statistical_test") <- "combined"
+attr(cstan_2_2_4, "adjustment_method_a") <- "none"
+attr(cstan_2_2_4, "adjustment_method_g") <- "none"
+attr(cstan_2_2_4, "pval_thresh") <- 0.05
+attr(cstan_2_2_4, "data_info") <- list(
+  data_scale_orig = "abundance",
+  data_scale = "log",
+  norm_info = list(is_normalized = FALSE),
+  num_edata = length(unique(gfilta_2_2_4$e_data$Mass_Tag_ID)),
+  num_miss_obs = sum(is.na(gfilta_2_2_4$e_data[, -1])),
+  prop_missing = (sum(is.na(gfilta_2_2_4$e_data[, -1])) /
+                    prod(dim(gfilta_2_2_4$e_data[, -1]))),
+  num_samps = dim(gfilta_2_2_4$f_data)[1],
+  data_types = NULL
+)
+attr(cstan_2_2_4, "bpFlags") <- data.frame(
+  Mass_Tag_ID = gfilta_2_2_4$e_data$Mass_Tag_ID,
+  Infection_high_vs_Infection_low = dplyr::case_when(
+    is.na(cstan_2_2_4$Flag_A_Infection_high_vs_Infection_low) ~
+      cstan_2_2_4$Flag_G_Infection_high_vs_Infection_low,
+    is.na(cstan_2_2_4$P_value_A_Infection_high_vs_Infection_low) ~
+      cstan_2_2_4$Flag_G_Infection_high_vs_Infection_low,
+    (cstan_2_2_4$P_value_A_Infection_high_vs_Infection_low > 0.05 &
+       cstan_2_2_4$P_value_G_Infection_high_vs_Infection_low < 0.05) ~
+      cstan_2_2_4$Flag_G_Infection_high_vs_Infection_low,
+    !is.na(cstan_2_2_4$Flag_A_Infection_high_vs_Infection_low) ~
+      cstan_2_2_4$Flag_A_Infection_high_vs_Infection_low
+  ),
+  Infection_high_vs_Mock_high = dplyr::case_when(
+    is.na(cstan_2_2_4$Flag_A_Infection_high_vs_Mock_high) ~
+      cstan_2_2_4$Flag_G_Infection_high_vs_Mock_high,
+    is.na(cstan_2_2_4$P_value_A_Infection_high_vs_Mock_high) ~
+      cstan_2_2_4$Flag_G_Infection_high_vs_Mock_high,
+    (cstan_2_2_4$P_value_A_Infection_high_vs_Mock_high > 0.05 &
+       cstan_2_2_4$P_value_G_Infection_high_vs_Mock_high < 0.05) ~
+      cstan_2_2_4$Flag_G_Infection_high_vs_Mock_high,
+    !is.na(cstan_2_2_4$Flag_A_Infection_high_vs_Mock_high) ~
+      cstan_2_2_4$Flag_A_Infection_high_vs_Mock_high
+  ),
+  Infection_high_vs_Mock_low = dplyr::case_when(
+    is.na(cstan_2_2_4$Flag_A_Infection_high_vs_Mock_low) ~
+      cstan_2_2_4$Flag_G_Infection_high_vs_Mock_low,
+    is.na(cstan_2_2_4$P_value_A_Infection_high_vs_Mock_low) ~
+      cstan_2_2_4$Flag_G_Infection_high_vs_Mock_low,
+    (cstan_2_2_4$P_value_A_Infection_high_vs_Mock_low > 0.05 &
+       cstan_2_2_4$P_value_G_Infection_high_vs_Mock_low < 0.05) ~
+      cstan_2_2_4$Flag_G_Infection_high_vs_Mock_low,
+    !is.na(cstan_2_2_4$Flag_A_Infection_high_vs_Mock_low) ~
+      cstan_2_2_4$Flag_A_Infection_high_vs_Mock_low
+  ),
+  Infection_low_vs_Mock_high = dplyr::case_when(
+    is.na(cstan_2_2_4$Flag_A_Infection_low_vs_Mock_high) ~
+      cstan_2_2_4$Flag_G_Infection_low_vs_Mock_high,
+    is.na(cstan_2_2_4$P_value_A_Infection_low_vs_Mock_high) ~
+      cstan_2_2_4$Flag_G_Infection_low_vs_Mock_high,
+    (cstan_2_2_4$P_value_A_Infection_low_vs_Mock_high > 0.05 &
+       cstan_2_2_4$P_value_G_Infection_low_vs_Mock_high < 0.05) ~
+      cstan_2_2_4$Flag_G_Infection_low_vs_Mock_high,
+    !is.na(cstan_2_2_4$Flag_A_Infection_low_vs_Mock_high) ~
+      cstan_2_2_4$Flag_A_Infection_low_vs_Mock_high
+  ),
+  Infection_low_vs_Mock_low = dplyr::case_when(
+    is.na(cstan_2_2_4$Flag_A_Infection_low_vs_Mock_low) ~
+      cstan_2_2_4$Flag_G_Infection_low_vs_Mock_low,
+    is.na(cstan_2_2_4$P_value_A_Infection_low_vs_Mock_low) ~
+      cstan_2_2_4$Flag_G_Infection_low_vs_Mock_low,
+    (cstan_2_2_4$P_value_A_Infection_low_vs_Mock_low > 0.05 &
+       cstan_2_2_4$P_value_G_Infection_low_vs_Mock_low < 0.05) ~
+      cstan_2_2_4$Flag_G_Infection_low_vs_Mock_low,
+    !is.na(cstan_2_2_4$Flag_A_Infection_low_vs_Mock_low) ~
+      cstan_2_2_4$Flag_A_Infection_low_vs_Mock_low
+  ),
+  Mock_high_vs_Mock_low = dplyr::case_when(
+    is.na(cstan_2_2_4$Flag_A_Mock_high_vs_Mock_low) ~
+      cstan_2_2_4$Flag_G_Mock_high_vs_Mock_low,
+    is.na(cstan_2_2_4$P_value_A_Mock_high_vs_Mock_low) ~
+      cstan_2_2_4$Flag_G_Mock_high_vs_Mock_low,
+    (cstan_2_2_4$P_value_A_Mock_high_vs_Mock_low > 0.05 &
+       cstan_2_2_4$P_value_G_Mock_high_vs_Mock_low < 0.05) ~
+      cstan_2_2_4$Flag_G_Mock_high_vs_Mock_low,
+    !is.na(cstan_2_2_4$Flag_A_Mock_high_vs_Mock_low) ~
+      cstan_2_2_4$Flag_A_Mock_high_vs_Mock_low
+  )
+)
+attr(cstan_2_2_4, "cnames") <- list(
+  edata_cname = "Mass_Tag_ID",
+  emeta_cname = NULL,
+  fdata_cname = "SampleID",
+  techrep_cname = NULL
+)
+attr(cstan_2_2_4, "data_class") <- "pepData"
+
 # Save standards for IMD-ANOVA tests -------------------------------------------
 
 # save(
@@ -2867,14 +3976,24 @@ attr(cstan_2_0_3, "data_class") <- "pepData"
 #   cstan_1_0_2,
 #
 #   astan_1_1_3,
+#   gstan_1_1_3,
+#   cstan_1_1_3,
+#
 #   astan_1_2_3,
+#   gstan_1_2_3,
+#   cstan_1_2_3,
 #
 #   astan_2_0_3,
 #   gstan_2_0_3,
 #   cstan_2_0_3,
 #
 #   astan_2_1_4,
+#   gstan_2_1_4,
+#   cstan_2_1_4,
+#
 #   astan_2_2_4,
+#   gstan_2_2_4,
+#   cstan_2_2_4,
 #
 #   tukey_pval_1_1_3,
 #   tukey_pval_1_2_3,

@@ -1059,4 +1059,220 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
   # attribute should remain how it was before running applyFilt.
   expect_identical(noFilta, nmrdata)
 
+  # Create paired objects ------------------------------------------------------
+
+  load(system.file('testdata',
+                   'little_pairdata.RData',
+                   package = 'pmartR'))
+
+  # Create a pepData object with the original main effect and pairing variable.
+  pairdata <- as.pepData(e_data = edata,
+                         f_data = fdata,
+                         e_meta = emeta,
+                         edata_cname = 'Mass_Tag_ID',
+                         fdata_cname = 'Name',
+                         emeta_cname = 'Protein')
+  pairdata <- edata_transform(pairdata,
+                              data_scale = "log")
+  pairdata <- group_designation(pairdata,
+                                main_effects = "Virus",
+                                pairs = "PairID")
+
+  pair_filter <- imdanova_filter(omicsData = pairdata)
+
+  anova_2 <- applyFilt(filter_object = pair_filter,
+                       omicsData = pairdata,
+                       min_nonmiss_anova = 2,
+                       remove_singleton_groups = FALSE)
+
+  gtest_2 <- applyFilt(filter_object = pair_filter,
+                       omicsData = pairdata,
+                       min_nonmiss_gtest = 2,
+                       remove_singleton_groups = FALSE)
+
+  combined_2 <- applyFilt(filter_object = pair_filter,
+                          omicsData = pairdata,
+                          min_nonmiss_anova = 2,
+                          min_nonmiss_gtest = 2,
+                          remove_singleton_groups = FALSE)
+
+  differential <- data.frame(
+    Mass_Tag_ID = pairdata$e_data$Mass_Tag_ID,
+    Mock_1 = pairdata$e_data$Mock_0hr_1 - pairdata$e_data$Mock_18hr_1,
+    Mock_2 = pairdata$e_data$Mock_0hr_2 - pairdata$e_data$Mock_18hr_2,
+    Mock_3 = pairdata$e_data$Mock_0hr_3 - pairdata$e_data$Mock_18hr_3,
+    Mock_4 = pairdata$e_data$Mock_0hr_4 - pairdata$e_data$Mock_18hr_4,
+    Mock_5 = pairdata$e_data$Mock_0hr_5 - pairdata$e_data$Mock_18hr_5,
+    FM_1 = pairdata$e_data$FM_0hr_1 - pairdata$e_data$FM_18hr_1,
+    FM_2 = pairdata$e_data$FM_0hr_2 - pairdata$e_data$FM_18hr_2,
+    FM_3 = pairdata$e_data$FM_0hr_3 - pairdata$e_data$FM_18hr_3,
+    FM_4 = pairdata$e_data$FM_0hr_4 - pairdata$e_data$FM_18hr_4,
+    FM_5 = pairdata$e_data$FM_0hr_5 - pairdata$e_data$FM_18hr_5,
+    AM_1 = pairdata$e_data$AM_0hr_1 - pairdata$e_data$AM_18hr_1,
+    AM_2 = pairdata$e_data$AM_0hr_2 - pairdata$e_data$AM_18hr_2,
+    AM_3 = pairdata$e_data$AM_0hr_3 - pairdata$e_data$AM_18hr_3,
+    AM_4 = pairdata$e_data$AM_0hr_4 - pairdata$e_data$AM_18hr_4,
+    AM_5 = pairdata$e_data$AM_0hr_5 - pairdata$e_data$AM_18hr_5,
+    row.names = NULL
+  )
+
+  count_diff <- data.frame(
+    Mass_Tag_ID = differential$Mass_Tag_ID,
+    count_mock = rowSums(!is.na(differential[, 2:6])),
+    count_fm = rowSums(!is.na(differential[, 7:11])),
+    count_am = rowSums(!is.na(differential[, 12:16]))
+  )
+
+  # Holy paired IMD-ANOVA filter tests, Batman ---------------------------------
+
+  # Filter object tests ---------------
+
+  expect_equal(pair_filter$AM,
+               unname(rowSums(!is.na(pairdata$e_data[, 22:31]))))
+  expect_equal(pair_filter$FM,
+               unname(rowSums(!is.na(pairdata$e_data[, 12:21]))))
+  expect_equal(pair_filter$Mock,
+               unname(rowSums(!is.na(pairdata$e_data[, 2:11]))))
+  expect_equal(
+    attributes(pair_filter),
+    list(
+     names = c("Mass_Tag_ID", "AM", "FM", "Mock"),
+     class = c("imdanovaFilt", "data.frame"),
+     row.names = 1:150,
+     group_sizes = data.frame(
+       Group = c("AM", "FM", "Mock"),
+       n_group = rep(10, 3)
+     ),
+     nonsingleton_groups = c("AM", "FM", "Mock")
+    )
+  )
+
+  # Apply filter tests: ANOVA ---------------
+
+  # filters attribute
+  expect_equal(attr(anova_2, "filters")[[1]]$type,
+               "imdanovaFilt")
+  expect_identical(attr(anova_2, "filters")[[1]]$threshold,
+                   data.frame(min_nonmiss_anova = 2,
+                              min_nonmiss_gtest = NA))
+  expect_identical(
+    attr(anova_2, "filters")[[1]]$filtered,
+    as.character(count_diff[which(rowSums(count_diff[, -1] >= 2) < 2), 1])
+  )
+  expect_equal(attr(anova_2, "filters")[[1]]$method,
+               "anova")
+
+  # data_info attribute
+  expect_equal(
+    attr(anova_2, "data_info"),
+    list(data_scale_orig = "abundance",
+         data_scale = "log",
+         norm_info = list(is_normalized = FALSE),
+         num_edata = length(unique(anova_2$e_data[, 1])),
+         num_miss_obs = sum(is.na(anova_2$e_data)),
+         prop_missing = (sum(is.na(anova_2$e_data)) /
+                           prod(dim(anova_2$e_data[, -1]))),
+         num_samps = ncol(anova_2$e_data[, -1]),
+         data_types = NULL)
+  )
+
+  # meta_info attribute
+  expect_equal(
+    attr(anova_2, "meta_info"),
+    list(meta_data = TRUE,
+         num_emeta = length(unique(anova_2$e_meta$Protein)))
+  )
+
+  # imdanova attribute
+  expect_equal(
+    attr(anova_2, "imdanova")$nonmiss_per_group$nonmiss_totals$Mock,
+    rowSums(!is.na(differential[, 2:6]))
+  )
+  expect_equal(
+    attr(anova_2, "imdanova")$nonmiss_per_group$nonmiss_totals$FM,
+    rowSums(!is.na(differential[, 7:11]))
+  )
+  expect_equal(
+    attr(anova_2, "imdanova")$nonmiss_per_group$nonmiss_totals$AM,
+    rowSums(!is.na(differential[, 12:16]))
+  )
+  expect_equal(attr(anova_2, "imdanova")$nonmiss_per_group$group_sizes,
+               data.frame(Group = c("AM", "FM", "Mock"),
+                          n_group = rep(5, 3)))
+  expect_identical(attr(anova_2, "imdanova")$test_with_anova,
+                   count_diff[which(rowSums(count_diff[, -1] >= 2) >= 2), 1])
+  expect_null(attr(anova_2, "imdanova")$test_with_gtest)
+
+  # Dimensions of e_data, f_data, and e_meta
+  expect_equal(dim(anova_2$e_data),
+               c(104, 31))
+  expect_equal(dim(anova_2$f_data),
+               c(30, 5))
+  expect_equal(dim(anova_2$e_meta),
+               c(119, 6))
+
+  # Apply filter tests: G-test ---------------
+
+  # filters attribute
+  expect_equal(attr(gtest_2, "filters")[[1]]$type,
+               "imdanovaFilt")
+  expect_identical(attr(gtest_2, "filters")[[1]]$threshold,
+                   data.frame(min_nonmiss_anova = NA,
+                              min_nonmiss_gtest = 2))
+  expect_identical(
+    attr(gtest_2, "filters")[[1]]$filtered,
+    as.character(count_diff[which(apply(count_diff[, -1], 1, max) < 2), 1])
+  )
+  expect_equal(attr(gtest_2, "filters")[[1]]$method,
+               "gtest")
+
+  # data_info attribute
+  expect_equal(
+    attr(gtest_2, "data_info"),
+    list(data_scale_orig = "abundance",
+         data_scale = "log",
+         norm_info = list(is_normalized = FALSE),
+         num_edata = length(unique(gtest_2$e_data[, 1])),
+         num_miss_obs = sum(is.na(gtest_2$e_data)),
+         prop_missing = (sum(is.na(gtest_2$e_data)) /
+                           prod(dim(gtest_2$e_data[, -1]))),
+         num_samps = ncol(gtest_2$e_data[, -1]),
+         data_types = NULL)
+  )
+
+  # meta_info attribute
+  expect_equal(
+    attr(gtest_2, "meta_info"),
+    list(meta_data = TRUE,
+         num_emeta = length(unique(gtest_2$e_meta$Protein)))
+  )
+
+  # imdanova attribute
+  expect_equal(
+    attr(gtest_2, "imdanova")$nonmiss_per_group$nonmiss_totals$Mock,
+    rowSums(!is.na(differential[, 2:6]))
+  )
+  expect_equal(
+    attr(gtest_2, "imdanova")$nonmiss_per_group$nonmiss_totals$FM,
+    rowSums(!is.na(differential[, 7:11]))
+  )
+  expect_equal(
+    attr(gtest_2, "imdanova")$nonmiss_per_group$nonmiss_totals$AM,
+    rowSums(!is.na(differential[, 12:16]))
+  )
+  expect_equal(attr(gtest_2, "imdanova")$nonmiss_per_group$group_sizes,
+               data.frame(Group = c("AM", "FM", "Mock"),
+                          n_group = rep(5, 3)))
+  expect_identical(attr(gtest_2, "imdanova")$test_with_gtest,
+                   count_diff[which(apply(count_diff[, -1], 1, max) >= 2), 1])
+  expect_null(attr(gtest_2, "imdanova")$test_with_anova)
+
+  # Dimensions of e_data, f_data, and e_meta
+  expect_equal(dim(gtest_2$e_data),
+               c(124, 31))
+  expect_equal(dim(gtest_2$f_data),
+               c(30, 5))
+  expect_equal(dim(gtest_2$e_meta),
+               c(144, 6))
+
 })

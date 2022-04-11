@@ -657,4 +657,109 @@ test_that("rmd_filter and applyFilt produce the correct output",{
   # attribute should remain how it was before running applyFilt.
   expect_identical(noFilta, pdata)
 
+  # Create paired objects ------------------------------------------------------
+
+  load(system.file('testdata',
+                   'little_pairdata.RData',
+                   package = 'pmartR'))
+
+  # Create a pepData object with the original main effect and pairing variable.
+  pairdata <- as.pepData(e_data = edata,
+                         f_data = fdata,
+                         e_meta = emeta,
+                         edata_cname = 'Mass_Tag_ID',
+                         fdata_cname = 'Name',
+                         emeta_cname = 'Protein')
+  pairdata <- edata_transform(pairdata,
+                              data_scale = "log")
+  pairdata <- group_designation(pairdata,
+                                pairs = "PairID")
+
+  pair_filter <- rmd_filter(omicsData = pairdata)
+
+  pair_filtered <- applyFilt(filter_object = pair_filter,
+                             omicsData = pairdata,
+                             pvalue_threshold = 0.001,
+                             min_num_biomolecules = 50)
+
+  # Holy paired rmd filter tests with no main effects, Batman! -----------------
+
+  # Test all aspects of the rmd filter object.
+  expect_equal(dim(pair_filter), c(30, 9))
+  expect_equal(pair_filter$Name, fdata$Name)
+  expect_equal(pair_filter$Group, rep("zzzz", 30))
+  expect_equal(round(pair_filter$Log2.md, 3),
+               c(1.201, 0.455, 4.439, 2.086, 1.153, 0.794, 1.472, 0.316, 2.123,
+                 1.651, 2.345, 3.44, 2.028, 1.374, 3.235, 2.474, 2.488, 2.533,
+                 2.363, 2.58, 1.186, 1.056, 1.451, 1.504, -0.005, 2.21, 4.319,
+                 1.654, 2.1, 2.47))
+  expect_equal(round(pair_filter$pvalue, 3),
+               c(0.807, 0.927, 0.001, 0.515, 0.817, 0.885, 0.735, 0.941, 0.499,
+                 0.678, 0.406, 0.054, 0.538, 0.763, 0.094, 0.352, 0.346, 0.327,
+                 0.399, 0.308, 0.81, 0.838, 0.741, 0.725, 0.963, 0.463, 0.001,
+                 0.677, 0.509, 0.354))
+  expect_equal(round(pair_filter$MAD, 3),
+               c(0.1, 0.087, 0.09, 0.076, 0.094, 0.076, 0.095, 0.091, 0.091,
+                 0.081, 0.075, 0.077, 0.07, 0.075, 0.091, 0.097, 0.089, 0.089,
+                 0.084, 0.091, 0.088, 0.077, 0.09, 0.082, 0.088, 0.092, 0.099,
+                 0.102, 0.105, 0.082))
+  expect_equal(round(pair_filter$Kurtosis, 3),
+               c(-0.212, -0.775, 0.196, -0.974, -0.511, -0.689, -0.784, -0.175,
+                 -0.45, -0.248, -0.742, 0.279, -0.692, -0.763, 0.491, -0.939,
+                 -0.962, 0.258, -0.767, -0.908, -0.434, -0.459, -0.43, -0.637,
+                 -0.377, -0.646, 0.729, -0.238, -0.447, -0.799))
+  expect_equal(round(pair_filter$Skewness, 3),
+               c(-0.479, -0.123, -0.661, 0.104, -0.358, -0.094, -0.128, -0.423,
+                 -0.331, -0.262, -0.128, -0.597, -0.05, 0.058, -0.685, -0.173,
+                 0.109, -0.705, 0.057, -0.118, -0.25, -0.187, -0.433, -0.156,
+                 -0.303, -0.322, -0.774, -0.435, -0.44, -0.215))
+  expect_equal(round(pair_filter$Corr, 3),
+               c(0.881, 0.867, 0.808, 0.896, 0.915, 0.88, 0.903, 0.889, 0.921,
+                 0.86, 0.897, 0.86, 0.857, 0.873, 0.884, 0.862, 0.884, 0.898,
+                 0.836, 0.877, 0.91, 0.899, 0.884, 0.892, 0.896, 0.915, 0.87,
+                 0.901, 0.872, 0.877))
+  expect_equal(round(pair_filter$Proportion_Missing, 3),
+               c(0.22, 0.247, 0.353, 0.287, 0.267, 0.253, 0.273, 0.3, 0.187,
+                 0.213, 0.207, 0.293, 0.267, 0.273, 0.233, 0.253, 0.18, 0.3,
+                 0.26, 0.387, 0.207, 0.273, 0.287, 0.18, 0.213, 0.34, 0.333,
+                 0.32, 0.233, 0.253))
+
+  # Test the particulars of the filtered object.
+  expect_equal(attr(pair_filtered, "filters")[[1]]$type,
+               "rmdFilt")
+  expect_identical(attr(pair_filtered, "filters")[[1]]$threshold,
+                   0.001)
+  expect_equal(attr(pair_filtered, "filters")[[1]]$filtered,
+               c("Mock_0hr_3", "Mock_18hr_3"))
+  expect_true(is.na(attr(pair_filtered, "filters")[[1]]$method))
+  expect_equal(
+    attr(pair_filtered, "data_info"),
+    list(data_scale_orig = "abundance",
+         data_scale = "log",
+         norm_info = list(is_normalized = FALSE),
+         num_edata = length(unique(pair_filtered$e_data[, 1])),
+         num_miss_obs = sum(is.na(pair_filtered$e_data)),
+         prop_missing = (sum(is.na(pair_filtered$e_data)) /
+                           prod(dim(pair_filtered$e_data[, -1]))),
+         num_samps = ncol(pair_filtered$e_data[, -1]),
+         data_types = NULL)
+  )
+  expect_equal(
+    attr(pair_filtered, "meta_info"),
+    list(meta_data = TRUE,
+         num_emeta = length(unique(pair_filtered$e_meta$Protein)))
+  )
+  expect_equal(dim(attr(pair_filtered, "group_DF")),
+               c(28, 2))
+  expect_equal(attr(attr(pair_filtered, "group_DF"), "main_effects"),
+               "no_main_effect")
+  expect_equal(attr(attr(pair_filtered, "group_DF"), "nonsingleton_groups"),
+               "zzzz")
+  expect_equal(dim(pair_filtered$e_data),
+               c(150, 29))
+  expect_equal(dim(pair_filtered$f_data),
+               c(28, 6))
+  expect_equal(dim(pair_filtered$e_meta),
+               c(175, 6))
+
 })

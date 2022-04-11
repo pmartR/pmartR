@@ -5,7 +5,15 @@
 \title{Tests for the independence of missing data across groups (aka factors, aka
 main effects)}
 \usage{
-imd_test(omicsData, comparisons, pval_adjust, pval_thresh)
+imd_test(
+  omicsData,
+  comparisons,
+  pval_adjust,
+  pval_thresh,
+  covariates,
+  paired,
+  use_parallel
+)
 }
 \arguments{
 \item{omicsData}{A pmartR data object of any class}
@@ -21,6 +29,13 @@ apply an adjustment. Valid options include: "bonferroni" and "holm".}
 
 \item{pval_thresh}{numeric p-value threshold, below or equal to which
 peptides are considered differentially expressed. Defaults to 0.05}
+
+\item{covariates}{A character vector with no more than two variable names
+that will be used as covariates in the IMD-ANOVA analysis.}
+
+\item{use_parallel}{A logical value indicating whether or not to use a
+"doParallel" loop when running the G-Test with covariates. The default is
+TRUE.}
 }
 \value{
 a list of `data.frame`s

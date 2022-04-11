@@ -7,9 +7,10 @@ Specified Main Effects}
 \usage{
 group_designation(
   omicsData,
-  main_effects,
+  main_effects = NULL,
   covariates = NULL,
   cov_type = NULL,
+  pairs = NULL,
   time_course = NULL
 )
 }
@@ -40,6 +41,10 @@ numeric vector of 0s and 1s (indicating two categories) and the input to
 \code{cov_type} is a class other than numeric this vector will be coerced
 to a character vector. The default value is NULL. In this case the class of
 the covariates is neither checked nor altered.}
+
+\item{pairs}{A character string indicating the column in \code{f_data} that
+contains the pairing information. This string must match the column name
+exactly.}
 
 \item{time_course}{an optional character string specifying the variable name
 of a time course variable, if applicable to the experimental data.

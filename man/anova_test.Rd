@@ -31,10 +31,8 @@ adjustment. Valid options include: "bonferroni", "holm", "tukey", and
 \item{pval_thresh}{numeric p-value threshold, below or equal to which
 peptides are considered differentially expressed. Defaults to 0.05}
 
-\item{covariates}{data.frame similar to \code{groupData} consisting of two
-columsn: the sample ID variable (with names matching column names in
-\code{omicsData$e_data}) and a column containing the numeric or group data
-for each sample}
+\item{covariates}{A character vector with no more than two variable names
+that will be used as covariates in the IMD-ANOVA analysis.}
 
 \item{paired}{logical; should the data be paired or not? if TRUE then the
 `f_data` element of `omicsData` is checked for a "Pair" column, an error is

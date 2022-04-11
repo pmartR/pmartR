@@ -1,4 +1,4 @@
-source(system.file('testdata', 'load_data.R', package = 'pmartR'))
+source(system.file('testdata', 'load_data.R', package = 'pmartR'), local = T)
 
 f_meta <- data.frame(
   "Proteins" = c(paste0("Mock", 1:3), paste0("Infection", c(1:7)), NA,  "Infection9"),
@@ -43,14 +43,14 @@ test_that("Bad input throws error", {
   expect_error(as.multiData(ldata, prdata))
   expect_error(as.multiData(edata_transform(ldata, "log2"), prdata))
   expect_error(as.multiData(normalize_global(mdata, "all", "median", apply_norm = T), pro_object_proc))
-  
+
   # not both grouped
   expect_error(as.multiData(group_designation(lipid_object_proc, main_effects = "Condition"), pro_object_proc))
-  
+
   # f_meta not provided and f_datas are not valid f_metas
   expect_error(as.multiData(lipid_object_proc, pro_object_proc))
   expect_error(as.multiData(metab_object_proc, pro_object_proc, lipid_object_proc))
-  
+
   # isobaric object is not reference normalized
   expect_error(as.multiData(ldata, isodata))
 })
@@ -68,7 +68,7 @@ test_that("multiData attributes are aligned with <object>$omicsData", {
 
 test_that("multiData options produce expected output", {
   na_inds_counts <- function(x) {
-    na_rows = which(rowSums(is.na(x$f_meta[,attr(x, "fmeta_samp_cname")])) > 0) 
+    na_rows = which(rowSums(is.na(x$f_meta[,attr(x, "fmeta_samp_cname")])) > 0)
     row_unique_counts = sapply(1:(nrow(x$f_meta) - length(na_rows)), function(i) {
       length(unique(unlist(x$f_meta[i,]))) == 1
     })
@@ -78,23 +78,23 @@ test_that("multiData options produce expected output", {
   res <- na_inds_counts(mdata_auto_fmeta)
   expect_true(length(res[["nas"]]) > 0)
   expect_true(all(res[["runq"]]))
-  
+
   # taking the sample intersect should remove samples Infection 8 and Infection 5
   expect_true(nrow(mdata_auto_fmeta_sinter$f_meta) < nrow(mdata_auto_fmeta$f_meta))
   res <- na_inds_counts(mdata_auto_fmeta_sinter)
 
   expect_true(length(res[["nas"]]) == 0)
   expect_true(all(res[["runq"]]))
-  
+
   # if match_samples = False, then there should be mis-aligned f_meta
   res <- na_inds_counts(mdata_auto_fmeta_noarr)
   expect_true(length(res[["nas"]]) == 0)
   expect_true(!all(res[["runq"]]))
-  
+
   # sample intersect should remove bad alignment resulting from match_samples = False
   res <- na_inds_counts(mdata_noarr_sint)
   expect_true(length(res[["nas"]]) == 0)
   expect_true(all(res[["runq"]]))
-  
+
   # TODO:  Group assignments are aligned
 })

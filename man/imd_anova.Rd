@@ -13,8 +13,8 @@ imd_anova(
   pval_adjust_g = "none",
   pval_thresh = 0.05,
   covariates = NULL,
-  paired = FALSE,
-  equal_var = TRUE
+  equal_var = TRUE,
+  use_parallel = TRUE
 )
 }
 \arguments{
@@ -43,13 +43,12 @@ p-value adjustment.}
 \item{pval_thresh}{numeric p-value threshold, below or equal to which
 peptides are considered differentially expressed. Defaults to 0.05}
 
-\item{covariates}{data.frame similar to \code{groupData} consisting of two
-columns: the sample ID variable (with names matching column names in
-\code{omicsData$e_data}) and a column containing the numeric or group data
-for each sample}
+\item{covariates}{A character vector with no more than two variable names
+that will be used as covariates in the IMD-ANOVA analysis.}
 
-\item{paired}{logical - should the data be paired or not; if TRUE the
-attribute "pairing" cannot be `NULL`}
+\item{use_parallel}{A logical value indicating whether or not to use a
+"doParallel" loop when running the G-Test with covariates. The default is
+TRUE.}
 }
 \value{
 a list of \code{data.frame} objects \tabular{ll}{ Full_Results \tab
