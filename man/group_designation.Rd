@@ -11,6 +11,7 @@ group_designation(
   covariates = NULL,
   cov_type = NULL,
   pairs = NULL,
+  batch_id = NULL,
   time_course = NULL
 )
 }
@@ -45,6 +46,11 @@ the covariates is neither checked nor altered.}
 \item{pairs}{A character string indicating the column in \code{f_data} that
 contains the pairing information. This string must match the column name
 exactly.}
+
+\item{batch_id}{an optional character vector of no more than one variable that 
+should be used as batch information for downstream analyses. Batch ID is
+similar to covariates but unlike covariates it is specific to that of specific
+batch effects}
 
 \item{time_course}{an optional character string specifying the variable name
 of a time course variable, if applicable to the experimental data.
