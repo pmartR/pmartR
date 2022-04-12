@@ -240,7 +240,58 @@ test_that("as.trelliData and trelli_panel_by returns correct data frames and att
   # No data should return an error
   expect_error(as.trelliData(), "At least 1 omicsData or 1 statRes object must be provided.")
   
-  # Create a wrong omics class
-
+  # Test a wrong omics class
+  wrongOmic <- pepOmics
+  class(wrongOmic) <- "volitalomeData"
+  expect_error(
+    as.trelliData(omicsData = wrongOmic), 
+    "volitalomeData is not a supported omicsData class."
+  )
+  
+  # Test a non-log transformed omicsData
+  pepNotTransformed <- as.pepData(e_data = edata, 
+                                  f_data = fdata, 
+                                  edata_cname = "Mass_Tag_ID", 
+                                  fdata_cname = "SampleID")
+  expect_error(
+    as.trelliData(omicsData = pepNotTransformed),
+    "omicsData must be log transformed."
+  )
+  
+  # Test a non-normalized omicsData
+  pepNotNormalized <- edata_transform(pepNotTransformed, "log2")
+  expect_error(
+    as.trelliData(omicsData = pepNotNormalized),
+    "omicsData must be normalized."
+  )        
+  
+  # Create a group designation with singletons to get singleton warning 
+  fdata_single <- fdata
+  fdata_single[12,2] <- "Mock2"
+  pepSingle <- as.pepData(e_data = edata, 
+                          f_data = fdata_single, 
+                          edata_cname = "Mass_Tag_ID", 
+                          fdata_cname = "SampleID")
+  pepSingle <- edata_transform(pepSingle, "log2")
+  pepSingle <- group_designation(pepSingle, "Condition")
+  pepSingle <- normalize_global(omicsData = pepSingle,
+                                subset_fn = "all",
+                                norm_fn = "median",
+                                apply_norm = TRUE)
+  expect_warning(
+    as.trelliData(omicsData = pepSingle),
+    "singleton groups found in group_designation: Mock2"
+  )
+  
+  # Pass a wrong object to statRes
+  expect_error(
+    as.trelliData(statRes = pepOmics),
+    "statRes must be an object of the statRes class. See ?imd_anova.", 
+    fixed = T
+  )
+  
+  # Mismatch an omics and statRes dataset 
+  
+  
   
 })
