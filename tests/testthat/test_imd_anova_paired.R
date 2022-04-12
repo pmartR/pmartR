@@ -16,41 +16,23 @@ test_that('all paired tests conform to the decrees of the God of Stats',{
 
   # Compare IMD-ANOVAly --------------------------------------------------------
 
-  expect_warning(
-    afruit_1_0_3 <- imd_anova(afilta_1_0_3,
-                              test_method = "anova",
-                              paired = TRUE)
-  )
-  expect_warning(
-    gfruit_1_0_3 <- imd_anova(gfilta_1_0_3,
-                              test_method = "gtest",
-                              paired = TRUE)
-  )
-  expect_warning(
-    cfruit_1_0_3 <- imd_anova(cfilta_1_0_3,
-                              test_method = "combined",
-                              paired = TRUE)
-  )
+  afruit_1_0_3 <- imd_anova(afilta_1_0_3,
+                            test_method = "anova")
+  gfruit_1_0_3 <- imd_anova(gfilta_1_0_3,
+                            test_method = "gtest")
+  cfruit_1_0_3 <- imd_anova(cfilta_1_0_3,
+                            test_method = "combined")
 
-  expect_warning(
-    afruit_1_1_3 <- imd_anova(afilta_1_1_3,
-                              test_method = "anova",
-                              covariates = "Gender",
-                              paired = TRUE)
-  )
-  expect_warning(
-    gfruit_1_1_3 <- imd_anova(gfilta_1_1_3,
-                              test_method = "gtest",
-                              covariates = "Gender",
-                              use_parallel = FALSE,
-                              paired = TRUE)
-  )
-  expect_warning(
-    cfruit_1_1_3 <- imd_anova(cfilta_1_1_3,
-                              test_method = "combined",
-                              covariates = "Gender",
-                              paired = TRUE)
-  )
+  afruit_1_1_3 <- imd_anova(afilta_1_1_3,
+                            test_method = "anova",
+                            covariates = "Gender")
+  gfruit_1_1_3 <- imd_anova(gfilta_1_1_3,
+                            test_method = "gtest",
+                            covariates = "Gender",
+                            use_parallel = FALSE)
+  cfruit_1_1_3 <- imd_anova(cfilta_1_1_3,
+                            test_method = "combined",
+                            covariates = "Gender")
 
   # Holy IMD-ANOVA unit tests, Statman! ----------------------------------------
 
