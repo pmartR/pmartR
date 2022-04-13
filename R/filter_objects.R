@@ -1303,12 +1303,13 @@ imdanova_filter <- function (omicsData) {
 
   # Check the number of groups. There must be more than one group if the data
   # are not paired.
-  if (length(names(get_group_table(omicsData))) < 2) {
+  if (length(names(get_group_table(omicsData))) < 2 &&
+      is.null(attr(attr(omicsData, "group_DF"), "pairs"))) {
 
     # Let the user know that they cannot compare statistics between groups if
     # there is only one group!!
     stop (paste("There must be more than one group in order to create an",
-                "imdanovaFilt object.",
+                "imdanovaFilt object if the data are not paired.",
                 sep = " "))
 
   }
@@ -1388,11 +1389,8 @@ imdanova_filter <- function (omicsData) {
 
   }
 
-
   orig_class <- class(output)
   class(output) <- c("imdanovaFilt", orig_class)
-
-
 
   attr(output, "group_sizes") <- nonmiss_per_group$group_sizes
   # KS added attribute for nonsingleton groups 12/3/2020 #

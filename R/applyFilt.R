@@ -279,7 +279,7 @@ applyFilt.moleculeFilt <- function(filter_object, omicsData, min_num=2){
   # will include the current filter object in the next available space of the
   # filters attribute list.
   n_filters <- length(attr(omicsData, 'filters')) + 1
-  
+
   # determine if we have group and batch effects from filter
   use_batch <- attributes(filter_object)$use_batch
   use_groups <- attributes(filter_object)$use_groups
@@ -427,10 +427,10 @@ applyFilt.cvFilt <- function (filter_object, omicsData, cv_threshold = 150) {
   # will include the current filter object in the next available space of the
   # filters attribute list.
   n_filters <- length(attr(omicsData, 'filters')) + 1
-  
+
   # determine if we have use_groups
   use_groups <- attributes(filter_object)$use_groups
-  
+
   # Update the filters attribute.
   attr(omicsData, 'filters')[[n_filters]] <- set_filter(
     type = class(filter_object)[[1]],
@@ -920,12 +920,13 @@ applyFilt.imdanovaFilt <- function (filter_object,
 
   # Check the number of columns in filter_object. If there are only two columns
   # then there is only one non-singleton group and an imdanova filter cannot be
-  # applied.
-  if (dim(filter_object)[2] == 2) {
+  # applied unless the data are paired.
+  if (dim(filter_object)[2] == 2 &&
+      is.null(attr(attr(omicsData, "group_DF"), "pairs"))) {
 
     # Throw an error for too few samples to run an imdanova filter.
     stop (paste("An IMD-ANOVA filter cannot be used because there is only one",
-                "non-singleton group.",
+                "non-singleton group and the data are not paired.",
                 sep = " "))
 
   }
@@ -1160,6 +1161,12 @@ applyFilt.imdanovaFilt <- function (filter_object,
       main_effects = attr(attr(omicsData, "group_DF"), "main_effects"),
       covariates = names(attr(attr(omicsData, "group_DF"), "covariates"))
     )
+
+    # The data are paired and the pairs have been taken so there is no paired
+    # attribute in group_DF. If there is only one group this will cause problems
+    # when calling imdanova_filter on the differences. Add a pairs attribute to
+    # group_DF that will allow there to be only one group.
+    attr(attr(diff_omicsData, "group_DF"), "pairs") <- "difference taken"
 
     # Create a new filter object with the differenced data. (For future readers:
     # I meant to use the word "differenced". I hope it made you chuckle.) We
@@ -1972,18 +1979,33 @@ anova_filter <- function (nonmiss_per_group,
 
   }
 
-  # Remove the column with the biomolecule IDs and any columns that have an NA
-  # as the column name. Then sum (by row) the number of groups that meet the
-  # non-missing per group requirement. Then extract the rows that do not meet
-  # the requirement of at least two groups with non-missing counts higher than
-  # the threshold. These are the rows that will be filtered out later.
-  inds_rm <- which(rowSums(
-    nonmiss_per_group$nonmiss_totals[, -c(
-      1,
-      which(names(nonmiss_per_group$nonmiss_totals) %in%
-              c(NA, "<NA>", "NA.", "NA"))
-    )] >= min_nonmiss_anova
-  ) < 2)
+  # Check if there is only one group. This is possible because we allow paired
+  # data to have no main effects. If this is the case we need to filter the rows
+  # differently.
+  if ("no_group" %in% names(nonmiss_per_group$nonmiss_totals)) {
+
+    # Remove any rows that fall below the specified threshold. There are no main
+    # effects in this scenario so there is only one group.
+    inds_rm <- which(
+      nonmiss_per_group$nonmiss_totals[, "no_group"] < min_nonmiss_anova
+    )
+
+  } else {
+
+    # Remove the column with the biomolecule IDs and any columns that have an NA
+    # as the column name. Then sum (by row) the number of groups that meet the
+    # non-missing per group requirement. Then extract the rows that do not meet
+    # the requirement of at least two groups with non-missing counts higher than
+    # the threshold. These are the rows that will be filtered out later.
+    inds_rm <- which(rowSums(
+      nonmiss_per_group$nonmiss_totals[, -c(
+        1,
+        which(names(nonmiss_per_group$nonmiss_totals) %in%
+                c(NA, "<NA>", "NA.", "NA"))
+      )] >= min_nonmiss_anova
+    ) < 2)
+
+  }
 
   # get names of biomolecules to be filtered
   return (as.character(nonmiss_per_group$nonmiss_totals[inds_rm, 1]))
@@ -2072,7 +2094,7 @@ gtest_filter <- function (nonmiss_per_group,
       1,
       which(names(nonmiss_per_group$nonmiss_totals) %in%
               c(NA, "<NA>", "NA.", "NA"))
-    )],
+    ), drop = FALSE],
     1,
     function (x) max(x) >= min_nonmiss_gtest
   )
