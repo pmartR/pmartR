@@ -261,7 +261,7 @@ test_that('the correct group data frame and attributes are created',{
   expect_type(attr(attr(pdata_gdf_3.2, "group_DF"), "covariates")$Age,
               "double")
   expect_null(attributes(attr(pdata_gdf_3.2, 'group_DF'))$batch_id)
-  
+
   # Correctly specify that the Gender covariate should be a character vector.
   pdata_gdf_3.4 <- group_designation(omicsData = pdata_3.2,
                                      main_effects = c("Condition", "Level"),
@@ -276,7 +276,7 @@ test_that('the correct group data frame and attributes are created',{
   expect_type(attr(attr(pdata_gdf_3.4, "group_DF"), "covariates")$Age,
               "double")
   expect_null(attributes(attr(pdata_gdf_3.4, 'group_DF'))$batch_id)
-  
+
 
   # Assemble another f_data object with 0/1 representing m/f. This will be a
   # numeric vector that should be changed to a character vector after running
@@ -316,7 +316,7 @@ test_that('the correct group data frame and attributes are created',{
   expect_type(attr(attr(pdata_gdf_4.3, "group_DF"), "covariates")$Age,
               "double")
   expect_null(attributes(attr(pdata_gdf_4.3, 'group_DF'))$batch_id)
-  
+
   # Try to change the covariates to something other than a character vector.
   pdata_gdf_4.5 <- group_designation(omicsData = pdata_4,
                                      main_effects = c("Condition", "Level"),
@@ -338,45 +338,45 @@ test_that('the correct group data frame and attributes are created',{
                                  main_effects = c("Condition", "Level"),
                                  covariates = c("Gender", "Age"),
                                  cov_type = c("character")))
-  
+
   # Create objects and tests for batch_id -------------------------------------
   # Copy edata so the names of the samples can be changed.
   edata_5 <- edata
-  
+
   # Change some of the Infection samples to Mock samples.
   names(edata_5) <- c("Mass_Tag_ID",
                       paste0("Infection", 1:6),
                       paste0("Mock", 1:6))
-  
+
   # Create additional f_data objects with different main effects and covariates.
   fdata_5 <- fdata
-  
+
   # Update the sample names in f_data.
   fdata_5$SampleID <- c(paste0("Infection", 1:6),
                         paste0("Mock", 1:6))
-  
+
   # Update the first main effect to account for changing some infection samples
   # to mock samples.
   fdata_5$Condition <- c(rep("Infection", 6),
                          rep("Mock", 6))
-  
+
   # Add a second main effect and two covariates.
   fdata_5$Level <- c("high", "low", "high", "low", "high", "low", "high",
                      "high", "low", "low", "low", "high")
   set.seed(720)
   fdata_5$Gender <- sample(c("F", "M"), 12, replace = TRUE)
   fdata_5$Age <- round(runif(12, min = 19, max = 89), 2)
-  
+
   # Add a batch id
   fdata_5$BatchID <- rep(seq(1:2),6)
   fdata_5$BatchName <- rep(c("Batch1","Batch2"),6)
-  
+
   # Create a pepData object and run group_designation.
   pdata_5 <- as.pepData(e_data = edata_5,
                         f_data = fdata_5,
                         edata_cname = "Mass_Tag_ID",
                         fdata_cname = "SampleID")
-  
+
   # run a very simple model with just one main effect and batch id
   pdata_gdf_5 <- group_designation(omicsData = pdata_5,
                                    main_effects = "Condition",
@@ -384,7 +384,7 @@ test_that('the correct group data frame and attributes are created',{
   # Investigate the batch_id attribute
   expect_identical(attr(attr(pdata_gdf_5, "group_DF"), "batch_id"),
                    pdata_5$f_data[,c(1,6)])
-  
+
   # create a more complex model with two main effects and two covariates and batch_id
   pdata_gdf_5.1 <- group_designation(omicsData = pdata_5,
                                    main_effects = c("Condition", "Level"),
@@ -397,13 +397,13 @@ test_that('the correct group data frame and attributes are created',{
   # Investigate the batch_id attribute
   expect_identical(attr(attr(pdata_gdf_5.1, "group_DF"), "batch_id"),
                    pdata_5$f_data[,c(1,6)])
-  
+
   # Use a batch_id that is a factor rather than number
   pdata_gdf_5.2 <- group_designation(omicsData = pdata_5,
                                      main_effects = c("Condition", "Level"),
                                      covariates = c("Gender", "Age"),
                                      batch_id = "BatchName")
-  
+
   # Exploricate the covariates attribute.
   # Investigate the batch_id attribute
   expect_identical(attr(attr(pdata_gdf_5.2, "group_DF"), "batch_id"),
@@ -500,7 +500,7 @@ test_that('the correct group data frame and attributes are created',{
          row.names = 1:30,
          main_effects = "no_main_effect",
          pairs = "PairID",
-         nonsingleton_groups = "zzzz")
+         nonsingleton_groups = "no_group")
   )
 
   expect_identical(
@@ -543,4 +543,3 @@ test_that('the correct group data frame and attributes are created',{
   )
 
 })
- 

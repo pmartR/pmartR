@@ -47,7 +47,7 @@ the covariates is neither checked nor altered.}
 contains the pairing information. This string must match the column name
 exactly.}
 
-\item{batch_id}{an optional character vector of no more than one variable that 
+\item{batch_id}{an optional character vector of no more than one variable that
 should be used as batch information for downstream analyses. Batch ID is
 similar to covariates but unlike covariates it is specific to that of specific
 batch effects}

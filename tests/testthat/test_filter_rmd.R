@@ -687,7 +687,7 @@ test_that("rmd_filter and applyFilt produce the correct output",{
   # Test all aspects of the rmd filter object.
   expect_equal(dim(pair_filter), c(30, 9))
   expect_equal(pair_filter$Name, fdata$Name)
-  expect_equal(pair_filter$Group, rep("zzzz", 30))
+  expect_equal(pair_filter$Group, rep("no_group", 30))
   expect_equal(round(pair_filter$Log2.md, 3),
                c(1.201, 0.455, 4.439, 2.086, 1.153, 0.794, 1.472, 0.316, 2.123,
                  1.651, 2.345, 3.44, 2.028, 1.374, 3.235, 2.474, 2.488, 2.533,
@@ -755,7 +755,7 @@ test_that("rmd_filter and applyFilt produce the correct output",{
   expect_equal(attr(attr(pair_filtered, "group_DF"), "main_effects"),
                "no_main_effect")
   expect_equal(attr(attr(pair_filtered, "group_DF"), "nonsingleton_groups"),
-               "zzzz")
+               "no_group")
   expect_equal(dim(pair_filtered$e_data),
                c(150, 29))
   expect_equal(dim(pair_filtered$f_data),
