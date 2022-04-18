@@ -840,7 +840,7 @@ as.pepData <- function (e_data, f_data, e_meta = NULL,
                          data_scale = "abundance",
                          is_normalized = FALSE, norm_info = list(),
                          is_bc = FALSE, batch_info = list(),
-                         data_types = NULL, check.names = FALSE) {
+                         data_types = NULL, check.names = TRUE) {
 
   # Set the original data scale to the input data scale.
   data_scale_orig <- data_scale
