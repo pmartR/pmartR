@@ -225,7 +225,7 @@ imd_anova <- function (omicsData,
       imd_results_full <- list(
         Results = data.frame(
           ids = omicsData$e_data[, edata_idx],
-          Count_no_group = rowSums(!is.na(omicsData$e_data[, -edata_idx]))
+          Count_paired_diff = rowSums(!is.na(omicsData$e_data[, -edata_idx]))
         )
       )
 
@@ -991,7 +991,7 @@ paired_test <- function (data, bio_ids, cutoff, use_parallel) {
   # will consist of two columns. The first contains the biomolecule IDs and the
   # second is the mean of differences.
   results <- cbind(bio_ids, rowMeans(data, na.rm = TRUE))
-  names(results)[2] <- "Mean_no_group"
+  names(results)[2] <- "Mean_paired_diff"
 
   # Set up parallel backend.
   if (use_parallel) {
@@ -1021,13 +1021,13 @@ paired_test <- function (data, bio_ids, cutoff, use_parallel) {
 
   # Use the fold change (mean across columns) and the p-value to determine the
   # flag.
-  banner[siggy] <- sign(results$Mean_no_group)[siggy]
+  banner[siggy] <- sign(results$Mean_paired_diff)[siggy]
 
   return (
     list(Results = results,
-         Fold_changes = data.frame(no_group = results$Mean_no_group),
-         Fold_change_pvalues = data.frame(no_group = t_pval),
-         Flags = data.frame(no_group = banner))
+         Fold_changes = data.frame(paired_diff = results$Mean_paired_diff),
+         Fold_change_pvalues = data.frame(paired_diff = t_pval),
+         Flags = data.frame(paired_diff = banner))
   )
 
 }

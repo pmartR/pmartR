@@ -500,7 +500,7 @@ test_that('the correct group data frame and attributes are created',{
          row.names = 1:30,
          main_effects = "no_main_effect",
          pairs = "PairID",
-         nonsingleton_groups = "no_group")
+         nonsingleton_groups = "paired_diff")
   )
 
   expect_identical(

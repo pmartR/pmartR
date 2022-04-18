@@ -1982,12 +1982,12 @@ anova_filter <- function (nonmiss_per_group,
   # Check if there is only one group. This is possible because we allow paired
   # data to have no main effects. If this is the case we need to filter the rows
   # differently.
-  if ("no_group" %in% names(nonmiss_per_group$nonmiss_totals)) {
+  if ("paired_diff" %in% names(nonmiss_per_group$nonmiss_totals)) {
 
     # Remove any rows that fall below the specified threshold. There are no main
     # effects in this scenario so there is only one group.
     inds_rm <- which(
-      nonmiss_per_group$nonmiss_totals[, "no_group"] < min_nonmiss_anova
+      nonmiss_per_group$nonmiss_totals[, "paired_diff"] < min_nonmiss_anova
     )
 
   } else {

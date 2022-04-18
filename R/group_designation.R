@@ -473,7 +473,7 @@ group_designation <- function (omicsData,
     # won't show up as an actual main effect level in someone's study. However,
     # this rarely goes well and someone at some point will come crying to us
     # because pmartR is giving them crazy output and/or errors.
-    omicsData$f_data$no_main_effect <- "no_group"
+    omicsData$f_data$no_main_effect <- "paired_diff"
 
   }
 
