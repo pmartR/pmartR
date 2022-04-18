@@ -123,6 +123,22 @@ imd_anova <- function (omicsData,
     stop("Provided 'test_method' argument is invalid, please select 'anova','gtest' or 'combined'.")
   }
 
+  # Throw an error if there are no main effects and gtest or combined is
+  # selected.
+  if (
+    "no_main_effect" %in% attr(groupData, "main_effects") &&
+    test_method %in% c("gtest", "combined")
+  ) {
+
+    stop (
+      paste(
+        "If there are no main effects test_method cannot be gtest or combined.",
+        sep = " "
+      )
+    )
+
+  }
+
   # Check for log transform #
   if(!(attr(omicsData,"data_info")$data_scale%in%c("log2","log","log10"))&(test_method%in%c("combined","anova"))){
     stop("Data must be log transformed in order to implement ANOVA.")
@@ -193,20 +209,50 @@ imd_anova <- function (omicsData,
 
   # Use imd_test() to test for independence of missing data (qualitative difference between groups)
   if(test_method=='anova'){
-    #If they don't want the g-test done, save some time by removing comparisons and the pval_adjust arguments
-    #Also make the gtest_pvalues NULL so nothing's returned.
-    # NOTE: The code below doesn't do what the comments above say they want done.
-    imd_results_full <- imd_test(omicsData,
-                                 comparisons = NULL, # This actually performs all pairwise comparisons.
-                                 pval_adjust = 'none',
-                                 pval_thresh = pval_thresh,
-                                 covariates = NULL,
-                                 paired = paired,
-                                 use_parallel = use_parallel)
-    # NOTE: covariates = NULL in the above call to imd_test because the
-    # covariate portion of the code is the slowest part of the imd_test
-    # function. In addition, the covariates portion of the results are not used
-    # when test_method = anova.
+
+    # If there are no main effects we just need the biomolecule ID column and
+    # the counts.
+    if ("no_main_effect" %in% attr(groupData, "main_effects")) {
+
+      # Snag the index in e_data of the biomolecule ID column.
+      edata_idx <- which(
+        names(omicsData$e_data) == get_edata_cname(omicsData)
+      )
+
+      # Create a very watered down list similar to the output from imd_test.
+      # This list will only contain the Results data frame with the biomolecule
+      # ID and counts across all samples.
+      imd_results_full <- list(
+        Results = data.frame(
+          ids = omicsData$e_data[, edata_idx],
+          Count_no_group = rowSums(!is.na(omicsData$e_data[, -edata_idx]))
+        )
+      )
+
+      # Rename the ID column with the appropriate name.
+      names(imd_results_full$Results)[1] <- get_edata_cname(omicsData)
+
+    } else {
+
+      #If they don't want the g-test done, save some time by removing
+      #comparisons and the pval_adjust arguments Also make the gtest_pvalues
+      #NULL so nothing's returned.
+      # NOTE: The code below doesn't do what the comments above say they want
+      # done.
+      imd_results_full <- imd_test(omicsData,
+                                   comparisons = NULL, # This actually performs all pairwise comparisons.
+                                   pval_adjust = 'none',
+                                   pval_thresh = pval_thresh,
+                                   covariates = NULL,
+                                   paired = paired,
+                                   use_parallel = use_parallel)
+      # NOTE: covariates = NULL in the above call to imd_test because the
+      # covariate portion of the code is the slowest part of the imd_test
+      # function. In addition, the covariates portion of the results are not
+      # used when test_method = anova.
+
+    }
+
   }else{
     imd_results_full <- imd_test(omicsData,
                                  comparisons = comparisons,
@@ -235,7 +281,8 @@ imd_anova <- function (omicsData,
                                      pval_thresh = pval_thresh,
                                      covariates = NULL,
                                      paired = paired,
-                                     equal_var = equal_var)
+                                     equal_var = equal_var,
+                                     use_parallel = use_parallel)
   }else{
     anova_results_full <- anova_test(omicsData,
                                      comparisons = comparisons,
@@ -243,7 +290,8 @@ imd_anova <- function (omicsData,
                                      pval_thresh = pval_thresh,
                                      covariates = covariates,
                                      paired = paired,
-                                     equal_var = equal_var)
+                                     equal_var = equal_var,
+                                     use_parallel = use_parallel)
     anova_fold_flags <- anova_results_full$Flags
     colnames(anova_fold_flags) <- paste0("Flag_A_",colnames(anova_fold_flags))
     anova_pvalues <- anova_results_full$Fold_change_pvalues
@@ -466,6 +514,8 @@ imd_anova <- function (omicsData,
 #'   `f_data` element of `omicsData` is checked for a "Pair" column, an error is
 #'   returned if none is found
 #' @param equal_var logical; should the variance across groups be assumed equal?
+#' @param use_parallel A logical value indicating if the t test should be run in
+#'   parallel.
 #'
 #'
 #' @return  a list of `data.frame`s
@@ -486,8 +536,8 @@ imd_anova <- function (omicsData,
 #'   identification of significant peptides from MS-based proteomics data."
 #'   Journal of proteome research 9.11 (2010): 5748-5756.
 #'
-anova_test <- function (omicsData, comparisons, pval_adjust,
-                        pval_thresh, covariates, paired, equal_var) {
+anova_test <- function (omicsData, comparisons, pval_adjust, pval_thresh,
+                        covariates, paired, equal_var, use_parallel) {
 
   # check that omicsData is of the appropriate class
   if(!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData", "nmrData"))) stop("omicsData must be of class 'pepData', 'proData', 'metabData', 'lipidData', or 'nmrData'.")
@@ -501,8 +551,8 @@ anova_test <- function (omicsData, comparisons, pval_adjust,
 
   #Catch if number of groups is too small
   k <- length(unique(groupData$Group))
-  if(k<2){
-    stop("At least two groups are necessary to perform an ANOVA.")
+  if (k < 2 && !"no_main_effect" %in% attr(groupData, "main_effects")) {
+    stop ("At least two groups are necessary to perform an ANOVA if the data are not paired.")
   }
 
   # Check for log transform #
@@ -611,6 +661,17 @@ anova_test <- function (omicsData, comparisons, pval_adjust,
     # Update the sample names in the groupData object according to the column
     # names of data (the paired difference data matrix).
     groupData[, samp_cname] <- colnames(data)
+
+    # Add the original main_effects, pairs, and nonsingleton_groups attributes
+    # to the updated groupData object. These attributes will be used in various
+    # locations throughout the remainder of anova_test().
+    attr(groupData, "main_effects") <- attr(
+      attr(omicsData, "group_DF"), "main_effects"
+    )
+    attr(groupData, "pairs") <- attr(attr(omicsData, "group_DF"), "pairs")
+    attr(groupData, "nonsingleton_groups") <- attr(
+      attr(omicsData, "group_DF"), "nonsingleton_groups"
+    )
 
     # Update the number of groups. This should be the same as before but we are
     # proceeding with an "overabundance of caution".
@@ -738,6 +799,19 @@ anova_test <- function (omicsData, comparisons, pval_adjust,
     # Set the value of reduced degrees of freedom (the degrees of freedom used
     # up for covariates) to zero because covariates were not used.
     red_df <- matrix(rep(0,nrow(data)),ncol=1)
+
+  }
+
+  # paired t test stuffs -------------------------------------------------------
+
+  if ("no_main_effect" %in% attr(groupData, "main_effects")) {
+
+    return (
+      paired_test(data = data,
+                  bio_ids = omicsData$e_data[get_edata_cname(omicsData)],
+                  cutoff = pval_thresh,
+                  use_parallel = use_parallel)
+    )
 
   }
 
@@ -905,6 +979,57 @@ group_comparison_anova <- function(groupData,comparisons,anova_results_full){
   group_comp$p_values <- data.frame(group_comp$p_values)
   colnames(group_comp$p_values) <- paste(Cmat_res$names,"p-value")
   return(group_comp)
+}
+
+# Runs a t test on the difference between paired data when there are no main
+# effects.
+
+# @author Evan A Martin
+paired_test <- function (data, bio_ids, cutoff, use_parallel) {
+
+  # Create the results data frame. With no main effects and paired data this
+  # will consist of two columns. The first contains the biomolecule IDs and the
+  # second is the mean of differences.
+  results <- cbind(bio_ids, rowMeans(data, na.rm = TRUE))
+  names(results)[2] <- "Mean_no_group"
+
+  # Set up parallel backend.
+  if (use_parallel) {
+    cores <- parallel::detectCores()
+    cl <- parallel::makeCluster(cores - 1)
+    on.exit(parallel::stopCluster(cl))
+    doParallel::registerDoParallel(cl)
+  } else {
+    foreach::registerDoSEQ()
+  }
+
+  t_pval <- foreach::foreach(v = 1:nrow(data), .combine = "c") %dopar% {
+
+    # Run the t test on each row of the difference data frame. Only the p-value
+    # will be kept. This will be used to determine the flags and returned in the
+    # final statRes object.
+    t.test(data[v, ])$p.value
+
+  }
+
+  # Create a vector of zeros for the flag. If a p-value is significant the flag
+  # will be changed to either -1 or 1 depending on the sign of the fold change.
+  banner <- rep(0, nrow(data))
+
+  # Determine which p-values fall below the threshold.
+  siggy <- which(t_pval < cutoff)
+
+  # Use the fold change (mean across columns) and the p-value to determine the
+  # flag.
+  banner[siggy] <- sign(results$Mean_no_group)[siggy]
+
+  return (
+    list(Results = results,
+         Fold_changes = data.frame(no_group = results$Mean_no_group),
+         Fold_change_pvalues = data.frame(no_group = t_pval),
+         Flags = data.frame(no_group = banner))
+  )
+
 }
 
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
