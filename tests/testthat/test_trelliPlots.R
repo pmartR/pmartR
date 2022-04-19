@@ -118,19 +118,37 @@ test_that("trelliPlots check the correct inputs", {
   testFolder <- file.path(getDownloadsFolder(), "/Trelli_Tests")
   
   # If the folder exists, remove it
-  if (file.exists(testFolder)) {file.remove(testFolder)}
+  if (file.exists(testFolder)) {unlink(testFolder, recursive = TRUE, force = TRUE)}
   
-  # Make two example trelliscopes, 
+  # Build a trelliscope that tests multiple functions 
   suppressWarnings(mtrelliData4 %>% trelli_panel_by("Metabolite") %>% 
-    trelli_abundance_boxplot(path = file.path(testFolder, "AbundanceTest"), 
+    trelli_abundance_boxplot(path = file.path(testFolder, "AbundanceTest1"), 
                              test_mode = TRUE, 
                              test_example = 2,
                              ggplot_params = "xlab('')",
-                             interactive = TRUE)
+                             interactive = TRUE,
+                             jsonp = FALSE)
   )
-  expect_true(file.exists(file.path(testFolder, "AbundanceTest")))
+  expect_true(file.exists(file.path(testFolder, "AbundanceTest1")))
   
+  # Build a trelliscope that tries to call stats cognostics without stats data and
+  # has one plot
+  singlePlot <- mtrelliData1 %>% trelli_panel_by("Metabolite") 
+  singlePlot$trelliData.omics <- singlePlot$trelliData.omics[1,]
+  suppressWarnings(singlePlot %>% 
+   trelli_abundance_boxplot(path = file.path(testFolder, "AbundanceTest2"), 
+                            cognostics = "p_value")
+  )
+  expect_true(file.exists(file.path(testFolder, "AbundanceTest2")))
   
+  # Build a trelliscope that tries to call stats cognostics without cognostics data 
+  suppressWarnings(mtrelliData1 %>% trelli_panel_by("Metabolite") %>% 
+                     trelli_abundance_boxplot(path = file.path(testFolder, "AbundanceTest3"), 
+                                              test_mode = TRUE, 
+                                              test_example = 2,
+                                              cognostics = NULL)
+  )
+  expect_true(file.exists(file.path(testFolder, "AbundanceTest3")))
   
   
   
