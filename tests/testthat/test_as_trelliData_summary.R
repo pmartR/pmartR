@@ -30,11 +30,22 @@ test_that("Check that trelliData objects return the correct data frames",{
   pepOmics <- normalize_global(pepOmics, "subset_fn" = "all", "norm_fn" = "median", "apply_norm" = TRUE, "backtransform" = TRUE)
   pepStat <- imd_anova(omicsData = pepOmics, test_method = "combined")
   
+  # Make pepTrelli objects
+  pepTrelli1 <- as.trelliData.edata(e_data = edata, edata_cname = "Mass_Tag_ID", omics_type = "pepData")
+  pepTrelli2 <- as.trelliData(omicsData = pepOmics)
+  pepTrelli3 <- as.trelliData(statRes = pepStat)
+  pepTrelli4 <- as.trelliData(omicsData = pepOmics, statRes = pepStat)
+  
   # Make each of the four objects 
-  suppressWarnings({pepSummary1 <- as.trelliData.edata(e_data = edata, edata_cname = "Mass_Tag_ID", omics_type = "pepData") %>% summary()})
-  suppressWarnings({pepSummary2 <- as.trelliData(omicsData = pepOmics) %>% summary()})
-  suppressWarnings({pepSummary3 <- as.trelliData(statRes = pepStat) %>% summary()})
-  suppressWarnings({pepSummary4 <- as.trelliData(omicsData = pepOmics, statRes = pepStat) %>% summary()})
+  suppressWarnings({pepSummary1 <- pepTrelli1 %>% summary()})
+  suppressWarnings({pepSummary2 <- pepTrelli2 %>% summary()})
+  suppressWarnings({pepSummary3 <- pepTrelli3 %>% summary()})
+  suppressWarnings({pepSummary4 <- pepTrelli4 %>% summary()})
+  
+  # Panel by each options
+  suppressWarnings({pepSumEdata <- pepTrelli4 %>% trelli_panel_by("Mass_Tag_ID") %>% summary()})
+  suppressWarnings({pepSumFdata <- pepTrelli4 %>% trelli_panel_by("SampleID") %>% summary()})
+  suppressWarnings({pepSumEmeta <- pepTrelli4 %>% trelli_panel_by("Ref_ID") %>% summary()})
   
   # Test: summary of the trelliData objects-------------------------------------
   
@@ -43,6 +54,8 @@ test_that("Check that trelliData objects return the correct data frames",{
   expect_equal(8, nrow(pepSummary2))
   expect_equal(2, nrow(pepSummary3))
   expect_equal(12, nrow(pepSummary4))
-  
+  expect_equal(4, nrow(pepSumEdata))
+  expect_equal(2, nrow(pepSumFdata))
+  expect_equal(6, nrow(pepSumEmeta))
   
 })
