@@ -1,6 +1,6 @@
 context("summary: trelliData edata and trelliData")
 
-test_that("Check that trelliData objects return the correct data frames",{ 
+test_that("trelliData object summaries return the correct data frames",{ 
   
   # Load: peptide expression data-----------------------------------------------
   

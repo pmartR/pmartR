@@ -12,10 +12,19 @@ trelli_precheck <- function(trelliData, trelliCheck,
   ## TEST EXAMPLE CHECKS ##
   #########################
   
-  # Ensure that test_example is an integer
-  if (!is.numeric(test_example) | 0 %in% test_example) {
-    "test_example should be a non-zero integer."
+  # Assert that test mode is a true or false
+  if (!is.logical(test_mode) & !is.na(test_mode)) {
+    stop("test_mode must be a TRUE or FALSE")
   }
+  
+  # Ensure that test_example is an integer
+  if (test_mode) {
+    if (!is.numeric(test_example) | 0 %in% test_example) {
+      stop("test_example should be a non-zero integer.")
+    }
+    test_example <- unique(abs(round(test_example)))
+  }
+
   
   #######################
   ## trelliData checks ##
@@ -28,7 +37,7 @@ trelli_precheck <- function(trelliData, trelliCheck,
   
   # Check that trelliData has been passed to the "trelli_panel_by" function.
   if (!attr(trelliData, "panel_by")) {
-    stop("trelliData must be grouped with trelli_panel_by.")
+    stop("trelliData must be paneled with trelli_panel_by.")
   }
   
   # Check that omics data exists
@@ -40,10 +49,12 @@ trelli_precheck <- function(trelliData, trelliCheck,
     }
     
     # Ensure that test_example is in the range of possibilities 
-    if (max(test_example) > nrow(trelliData$trelliData.omics)) {
-      stop(paste("test_example must be in the range of possibilities, of 1 to", nrow(trelliData$trelliData.omics)))
+    if (test_mode) {
+      if (max(test_example) > nrow(trelliData$trelliData.omics)) {
+        stop(paste("test_example must be in the range of possibilities, of 1 to", nrow(trelliData$trelliData.omics)))
+      }
     }
-    
+
   }
   
   # Check that statRes data exists 
@@ -55,8 +66,10 @@ trelli_precheck <- function(trelliData, trelliCheck,
     }
     
     # Ensure that test_example is in the range of possibilities 
-    if (max(test_example) > nrow(trelliData$trelliData.stat)) {
-      stop(paste("test_example must be in the range of possibilities, of 1 to", nrow(trelliData$trelliData.omics)))
+    if (test_mode) {
+      if (max(test_example) > nrow(trelliData$trelliData.stat)) {
+        stop(paste("test_example must be in the range of possibilities, of 1 to", nrow(trelliData$trelliData.omics)))
+      }
     }
     
   }
@@ -97,11 +110,6 @@ trelli_precheck <- function(trelliData, trelliCheck,
   # If interactive is not TRUE/FALSE, inform the user
   if (!is.logical(interactive) & !is.na(interactive)) {
     stop("interactive must be a TRUE or FALSE.")
-  }
-  
-  # test_mode must be a TRUE/FALSE
-  if (!is.logical(test_mode) & !is.na(test_mode)) {
-    stop("test_mode must be a TRUE or FALSE")
   }
   
   # single_plot must be a TRUE/FALSE
@@ -256,7 +264,7 @@ trelli_abundance_boxplot <- function(trelliData,
   
   # Make sure include_points is a true or false
   if (!is.logical(include_points) & !is.na(include_points)) {
-    stop("include_points must be a true or false.")
+    stop("include_points must be a TRUE or FALSE.")
   }
 
   # Make boxplot function-------------------------------------------------------

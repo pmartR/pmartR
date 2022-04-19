@@ -25,14 +25,6 @@
 #' @name summary-trelliData
 summary.trelliData <- function(trelliData) {
   
-  ##################
-  ## CHECK INPUTS ##
-  ##################
-  
-  if (!inherits(trelliData, "trelliData")) {
-    stop("trelliData must be a trelliData object from as.trelliData.edata or as.trelliData.")
-  }
-  
   #######################################
   ## EXTRACT ATTRIBUTES AND PROPERTIES ##
   #######################################
