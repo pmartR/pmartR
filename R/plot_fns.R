@@ -2048,7 +2048,7 @@ plot.moleculeFilt <- function (filter_obj, min_num = NULL, cumulative = TRUE,
       yintercept = counts[min_num],
       linetype = "dashed"
     ) else NULL
-    
+
     xlabel <- if (is.null(x_lab)){
       if(!use_batch & !use_groups) "Number of Samples"
       else if(use_batch & !use_groups) "Number of Samples per Batch"
@@ -4898,7 +4898,9 @@ prep_flags <- function (x, test) {
 
     # Assemble the flags data frame with the first column containing the
     # biomolecule IDs and the remaining columns containing the flags.
-    da_flag <- data.frame(x[, 1, drop = FALSE], imd_flags)
+    da_flag <- data.frame(x[, 1, drop = FALSE],
+                          imd_flags,
+                          check.names = FALSE)
 
   }
 
