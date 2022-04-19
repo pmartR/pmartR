@@ -291,7 +291,56 @@ test_that("as.trelliData and trelli_panel_by returns correct data frames and att
   )
   
   # Mismatch an omics and statRes dataset 
+  load(system.file('testdata',
+                   'nmrData.RData',
+                   package = 'pmartR'))
+  nmrData <- as.nmrData(e_data = edata,
+                        f_data = fdata,
+                        edata_cname = "Metabolite",
+                        fdata_cname = "SampleID")
   
+  expect_error(
+    as.trelliData(omicsData = nmrData, statRes = pepStat),
+    "omicsData and statRes are from different datasets."
+  )
+  
+  # Test: Input checking for trelli_panel_by------------------------------------
+  
+  # Here, I will run specific tests that should all fail to ensure the parameter
+  # validation portion of the code is running correctly
+  
+  # Only trelliData objects can be paneled
+  expect_error(
+    trelli_panel_by(trelliData = pepOmics, panel = "Mass_Tag_ID"),
+    "trelliData must be of the class trelliData from as.trelliData or as.trelliData.edata."
+  )
+  
+  # trelliData objects can only be paneled by variables in the list 
+  expect_error(
+    trelli_panel_by(trelliData = pepTrelli_both, panel = "Condition"),
+    "panel is not an acceptable option. The following can be selected: Mass_Tag_ID, SampleID, Protein, Ref_ID, Peptide_Sequence"
+  )
+  
+  # Try to panel an already paneled object 
+  pepTrelliPanel <- trelli_panel_by(pepTrelli_both, panel = "SampleID")
+  expect_error(
+    trelli_panel_by(pepTrelliPanel, "Mass_Tag_ID"),
+    "trelliData has already been paneled by SampleID"
+  )
+  
+  pepTrelliStatPanel <- trelli_panel_by(pepTrelli_stat, panel = "Mass_Tag_ID")
+  expect_error(
+    trelli_panel_by(pepTrelliStatPanel, "Mass_Tag_ID"),
+    "trelliData has already been paneled by Mass_Tag_ID"
+  )
+  
+  # Finally, test the warning with the small groups 
+  tinyNMR <- as.nmrData(e_data = edata[1,1:2], f_data = fdata[1,], edata_cname = "Metabolite", fdata_cname = "SampleID")
+  
+  expect_warning(
+    as.trelliData(tinyNMR) %>% trelli_panel_by("Metabolite"),
+    "Grouping by Metabolite results in panels with less than 3 data points in trelliData.omics."
+  )
   
   
 })

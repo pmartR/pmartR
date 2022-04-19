@@ -339,7 +339,7 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL, ...) {
     edata_cname <- pmartR::get_edata_cname(omicsData)
     
     # Confirm that all statRes biomolecules are in omicsData.
-    if (!all(statRes[[edata_cname]] %in% omicsData$e_data[[edata_cname]])) {
+    if (is.null(statRes[[edata_cname]])) {
       stop("omicsData and statRes are from different datasets.")
     }
     
@@ -519,10 +519,10 @@ trelli_panel_by <- function(trelliData, panel) {
   # Confirm that panel_by is false
   if (attr(trelliData, "panel_by")) {
     
-    # If panel_by has already been conducted with this panel, write a message and return trelliData
-    if (attr(trelliData, "panel_by") == panel) {
-      stop(paste("trelliData has already been paneled by", panel))
-    } 
+    if (is.na(attr(trelliData, "panel_by_omics"))) {
+      paneled_by <- attr(trelliData, "panel_by_stat")
+    } else {paneled_by <- attr(trelliData, "panel_by_omics")}
+    stop(paste("trelliData has already been paneled by", paneled_by))
     
   }
   
@@ -548,7 +548,7 @@ trelli_panel_by <- function(trelliData, panel) {
       dplyr::select(N) %>%
       min()
     
-    # If the smallest group size is less than 3, then don't proceed 
+    # If the smallest group size is less than 3, then give warning
     if (smallest_group_size < 3) {
       warning(paste0("Grouping by ", panel, " results in panels with less than 3 ",
                      "data points in ", trelliData_subclass_name, "."))
