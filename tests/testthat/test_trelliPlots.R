@@ -42,7 +42,7 @@ test_that("trelliPlots check the correct inputs", {
   
   # Test: trelli plotting functions---------------------------------------------
   
-  ## Let's try the trelli abundance boxplot
+  ## trelli_abundance_boxplot
   
   # The object must be a trelliData object 
   expect_error(
@@ -111,8 +111,8 @@ test_that("trelliPlots check the correct inputs", {
   )
   
   # Expect a single plot object to be made 
-  plot <- mtrelliData1 %>% trelli_panel_by("Metabolite") %>% trelli_abundance_boxplot(single_plot = TRUE)
-  expect_true(inherits(plot, "ggplot"))
+  abun_boxplot <- mtrelliData1 %>% trelli_panel_by("Metabolite") %>% trelli_abundance_boxplot(single_plot = TRUE)
+  expect_true(inherits(abun_boxplot, "ggplot"))
   
   # Generate a tests folder
   testFolder <- file.path(getDownloadsFolder(), "/Trelli_Tests")
@@ -122,33 +122,84 @@ test_that("trelliPlots check the correct inputs", {
   
   # Build a trelliscope that tests multiple functions 
   suppressWarnings(mtrelliData4 %>% trelli_panel_by("Metabolite") %>% 
-    trelli_abundance_boxplot(path = file.path(testFolder, "AbundanceTest1"), 
+    trelli_abundance_boxplot(path = file.path(testFolder, "BoxAbundanceTest1"), 
                              test_mode = TRUE, 
                              test_example = 2,
                              ggplot_params = "xlab('')",
-                             interactive = TRUE,
-                             jsonp = FALSE)
+                             interactive = TRUE)
   )
-  expect_true(file.exists(file.path(testFolder, "AbundanceTest1")))
+  expect_true(file.exists(file.path(testFolder, "BoxAbundanceTest1")))
   
   # Build a trelliscope that tries to call stats cognostics without stats data and
   # has one plot
   singlePlot <- mtrelliData1 %>% trelli_panel_by("Metabolite") 
   singlePlot$trelliData.omics <- singlePlot$trelliData.omics[1,]
   suppressWarnings(singlePlot %>% 
-   trelli_abundance_boxplot(path = file.path(testFolder, "AbundanceTest2"), 
+   trelli_abundance_boxplot(path = file.path(testFolder, "BoxAbundanceTest2"), 
                             cognostics = "p_value")
   )
-  expect_true(file.exists(file.path(testFolder, "AbundanceTest2")))
+  expect_true(file.exists(file.path(testFolder, "BoxAbundanceTest2")))
   
   # Build a trelliscope that tries to call stats cognostics without cognostics data 
   suppressWarnings(mtrelliData1 %>% trelli_panel_by("Metabolite") %>% 
-                     trelli_abundance_boxplot(path = file.path(testFolder, "AbundanceTest3"), 
+                     trelli_abundance_boxplot(path = file.path(testFolder, "BoxAbundanceTest3"), 
                                               test_mode = TRUE, 
                                               test_example = 2,
                                               cognostics = NULL)
   )
-  expect_true(file.exists(file.path(testFolder, "AbundanceTest3")))
+  expect_true(file.exists(file.path(testFolder, "BoxAbundanceTest3")))
+  
+  ## trelli_abundance_histogram
+  
+  # trelliData must be grouped by edata_cname
+  expect_error(
+    mtrelliData2 %>% trelli_panel_by("SampleID") %>% trelli_abundance_histogram(), 
+    "trelliData must be grouped by edata_cname."
+  )
+  
+  # Expect a single plot object to be made 
+  abun_histplot <- mtrelliData1 %>% trelli_panel_by("Metabolite") %>% trelli_abundance_histogram(single_plot = TRUE)
+  expect_true(inherits(abun_histplot, "ggplot"))
+  
+  
+  # Test that trelliscope builds when passed cognostic doesn't exist  
+  suppressWarnings(mtrelliData1 %>% trelli_panel_by("Metabolite") %>% 
+    trelli_abundance_histogram(path = file.path(testFolder, "HistAbundanceTest1"),
+                               test_mode = TRUE, 
+                               test_example = 2,
+                               ggplot_params = "xlab('')",
+                               cognostics = c("n", "p_value"),
+                               interactive = TRUE)
+  )
+  expect_true(file.exists(file.path(testFolder, "HistAbundanceTest1")))
+  
+  # Test that trelliscope builds even with missing cognostics and a single omic
+  suppressWarnings(singlePlot %>% 
+                     trelli_abundance_histogram(path = file.path(testFolder, "HistAbundanceTest2"),
+                                                cognostics = NULL)
+  )
+  expect_true(file.exists(file.path(testFolder, "HistAbundanceTest2")))
+  
+  # Test that trelliscope builds with all cognostics 
+  suppressWarnings(mtrelliData4 %>% trelli_panel_by("Metabolite") %>% 
+                     trelli_abundance_histogram(path = file.path(testFolder, "HistAbundanceTest3"),
+                                                test_mode = TRUE, 
+                                                test_example = 3)
+  )
+  expect_true(file.exists(file.path(testFolder, "HistAbundanceTest3")))
+  
+  ## trelli_abundance_heatmap
+  
+  # Test that the data has been grouped by an emeta column 
+  
+  
+  # Test that trelliscope builds with all cognostics 
+  suppressWarnings(mtrelliData4 %>% trelli_panel_by("MClass") %>% 
+                     trelli_abundance_heatmap(path = file.path(testFolder, "HmAbundanceTest1"),
+                                                test_mode = TRUE, 
+                                                test_example = 2)
+  )
+  expect_true(file.exists(file.path(testFolder, "HmAbundanceTest1")))
   
   
   

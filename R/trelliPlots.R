@@ -405,8 +405,12 @@ trelli_abundance_boxplot <- function(trelliData,
         })) %>% tibble::tibble()
         
         # Add new cognostics 
-        cog_to_trelli <- cbind(cog_to_trelli, new_cogs) %>% tibble::tibble()
-
+        if (!is.null(cog_to_trelli)) {
+          cog_to_trelli <- cbind(cog_to_trelli, new_cogs) %>% tibble::tibble()
+        } else {
+          cog_to_trelli <- new_cogs
+        }
+        
       }
       
     }
@@ -651,7 +655,11 @@ trelli_abundance_histogram <- function(trelliData,
   } else {
   
     # If test_mode is on, then just build the required panels
-    if (test_mode) {toBuild <- trelliData$trelliData.omics[test_example,]} else {toBuild <- trelliData$trelliData.omics}
+    if (test_mode) {
+      toBuild <- trelliData$trelliData.omics[test_example,]
+    } else {
+      toBuild <- trelliData$trelliData.omics
+    }
     
     # Pass parameters to trelli_builder function
     trelli_builder(toBuild = toBuild,
