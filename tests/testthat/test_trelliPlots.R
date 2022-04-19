@@ -191,16 +191,104 @@ test_that("trelliPlots check the correct inputs", {
   ## trelli_abundance_heatmap
   
   # Test that the data has been grouped by an emeta column 
+  expect_error(
+    mtrelliData1 %>% trelli_panel_by("Metabolite") %>% trelli_abundance_heatmap(),
+    "trelliData must be grouped_by an e_meta column."
+  )
   
+  # Return a single interactive plot 
+  abun_hmplot <- mtrelliData4 %>% trelli_panel_by("MClass") %>% 
+    trelli_abundance_heatmap(single_plot = TRUE, ggplot_params = "xlab('')", interactive = TRUE)
+  expect_true(inherits(abun_hmplot, "plotly"))
   
   # Test that trelliscope builds with all cognostics 
   suppressWarnings(mtrelliData4 %>% trelli_panel_by("MClass") %>% 
-                     trelli_abundance_heatmap(path = file.path(testFolder, "HmAbundanceTest1"),
-                                                test_mode = TRUE, 
-                                                test_example = 2)
+     trelli_abundance_heatmap(path = file.path(testFolder, "HmAbundanceTest1"),
+                              test_mode = TRUE, 
+                              test_example = 2)
   )
   expect_true(file.exists(file.path(testFolder, "HmAbundanceTest1")))
   
+  # Test that the trelliscope still builds without group data and only one plot
+  nogroup <- mtrelliData4 %>% trelli_panel_by("MClass")
+  attributes(nogroup$omicsData)$group_DF <- NULL
+  nogroup$trelliData.omics <- nogroup$trelliData.omics[1,]
+  suppressWarnings(nogroup %>% 
+     trelli_abundance_heatmap(path = file.path(testFolder, "HmAbundanceTest2"))
+  )
+  expect_true(file.exists(file.path(testFolder, "HmAbundanceTest2")))
+  
+  ## trelli_missingness_bar
+  
+  # Test trelliscope builds with all cognostics
+  suppressWarnings(mtrelliData1 %>% trelli_panel_by("Metabolite") %>% 
+    trelli_missingness_bar(path = file.path(testFolder, "MissingTest1"),
+                           ggplot_params = "ylab('')",
+                           test_mode = TRUE, 
+                           test_example = 2,
+                           cognostics = "proportion",
+                           interactive = TRUE)
+  )
+  expect_true(file.exists(file.path(testFolder, "MissingTest1")))
+  
+  # Test trelliscope with just a statRes object 
+  suppressWarnings(mtrelliData3 %>% trelli_panel_by("Metabolite") %>% 
+                     trelli_missingness_bar(path = file.path(testFolder, "MissingTest2"),
+                                            test_mode = TRUE, 
+                                            test_example = 2,
+                                            proportion = FALSE,
+                                            cognostics = "n")
+  )
+  expect_true(file.exists(file.path(testFolder, "MissingTest2")))
+  
+  
+  ## trelli_foldchange_bar
+  
+  suppressWarnings(mtrelliData3 %>% trelli_panel_by("Metabolite") %>% 
+     trelli_foldchange_bar(path = file.path(testFolder, "barFoldChangeTest1"),
+                           ggplot_params = "ylab('')",
+                           test_mode = TRUE, 
+                           test_example = 2,
+                           cognostics = "p_value",
+                           p_value_test = "anova",
+                           interactive = TRUE)
+  )
+  expect_true(file.exists(file.path(testFolder, "barFoldChangeTest1")))
+  
+  ## trelli_foldchange_boxplot
+  
+  suppressWarnings(mtrelliData4 %>% trelli_panel_by("MClass") %>% 
+   trelli_foldchange_boxplot(path = file.path(testFolder, "boxFoldChangeTest1"),
+                             ggplot_params = "xlab('')",
+                             test_mode = TRUE, 
+                             test_example = 2,
+                             p_value_test = "anova",
+                             interactive = TRUE)
+  )
+  expect_true(file.exists(file.path(testFolder, "boxFoldChangeTest1")))
+  
+  ## trelli_foldchange_volcano
+  
+  suppressWarnings(mtrelliData4 %>% trelli_panel_by("MClass") %>% 
+   trelli_foldchange_volcano(path = file.path(testFolder, "volFoldChangeTest1"),
+                             ggplot_params = "xlab('')",
+                             test_mode = TRUE, 
+                             test_example = 2,
+                             p_value_test = "anova",
+                             interactive = TRUE)
+  )
+  expect_true(file.exists(file.path(testFolder, "volFoldChangeTest1")))
+  
+  ## trelli_foldchange_heatmap
+  
+  suppressWarnings(mtrelliData4 %>% trelli_panel_by("MClass") %>% 
+   trelli_foldchange_heatmap(path = file.path(testFolder, "hmFoldChangeTest1"),
+                             ggplot_params = "xlab('')",
+                             test_mode = TRUE, 
+                             test_example = 2,
+                             interactive = TRUE)
+  )
+  expect_true(file.exists(file.path(testFolder, "hmFoldChangeTest1")))
   
   
 })  

@@ -842,7 +842,11 @@ trelli_abundance_heatmap <- function(trelliData,
   } else {
     
     # If test_mode is on, then just build the required panels
-    if (test_mode) {toBuild <- trelliData$trelliData.omics[test_example,]} else {toBuild <- trelliData$trelliData.omics}
+    if (test_mode) {
+      toBuild <- trelliData$trelliData.omics[test_example,]
+    } else {
+      toBuild <- trelliData$trelliData.omics
+    }
     
     # Pass parameters to trelli_builder function
     trelli_builder(toBuild = toBuild,
@@ -1085,7 +1089,11 @@ trelli_missingness_bar <- function(trelliData,
   # will need to restructure the data a bit. 
   if (!is.null(trelliData$trelliData.omics)) {
     stats_mode <- FALSE
-    if (test_mode) {toBuild <- trelliData$trelliData.omics[test_example,]} else {toBuild <- trelliData$trelliData.omics}
+    if (test_mode) {
+      toBuild <- trelliData$trelliData.omics[test_example,]
+    } else {
+      toBuild <- trelliData$trelliData.omics
+    }
   } else {
     
     stats_mode <- TRUE
@@ -1324,7 +1332,11 @@ trelli_foldchange_bar <- function(trelliData,
   
   
   # Subset down to test example if applicable
-  if (test_mode) {toBuild <- trelliData$trelliData.stat[test_example,]} else {toBuild <- trelliData$trelliData.stat}
+  if (test_mode) {
+    toBuild <- trelliData$trelliData.stat[test_example,]
+  } else {
+    toBuild <- trelliData$trelliData.stat
+  }
   
   # Pass parameters to trelli_builder function
   trelli_builder(toBuild = toBuild,
@@ -1534,7 +1546,11 @@ trelli_foldchange_boxplot <- function(trelliData,
   } else {
   
     # Subset down to test example if applicable
-    if (test_mode) {toBuild <- trelliData$trelliData.stat[test_example,]} else {toBuild <- trelliData$trelliData.stat}
+    if (test_mode) {
+      toBuild <- trelliData$trelliData.stat[test_example,]
+    } else {
+      toBuild <- trelliData$trelliData.stat
+    }
     
     # Pass parameters to trelli_builder function
     trelli_builder(toBuild = toBuild,
@@ -1747,7 +1763,11 @@ trelli_foldchange_volcano <- function(trelliData,
   } else {
   
     # Subset down to test example if applicable
-    if (test_mode) {toBuild <- trelliData$trelliData.stat[test_example,]} else {toBuild <- trelliData$trelliData.stat}
+    if (test_mode) {
+      toBuild <- trelliData$trelliData.stat[test_example,]
+    } else {
+      toBuild <- trelliData$trelliData.stat
+    }
     
     # Pass parameters to trelli_builder function
     trelli_builder(toBuild = toBuild,
@@ -1901,7 +1921,11 @@ trelli_foldchange_heatmap <- function(trelliData,
   } else {
     
     # Subset down to test example if applicable
-    if (test_mode) {toBuild <- trelliData$trelliData.stat[test_example,]} else {toBuild <- trelliData$trelliData.stat}
+    if (test_mode) {
+      toBuild <- trelliData$trelliData.stat[test_example,]
+    } else {
+      toBuild <- trelliData$trelliData.stat
+    }
     
     # Pass parameters to trelli_builder function
     trelli_builder(toBuild = toBuild,
