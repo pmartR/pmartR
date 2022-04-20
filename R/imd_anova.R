@@ -18,7 +18,7 @@
 #'   corresponds to no p-value adjustment.
 #' @param pval_adjust_g A character string specifying the type of multiple
 #'   comparison adjustment to implement for G-test tests. Valid options include:
-#'   "bonverroni" and "holm". The default is "none" which corresponds to no
+#'   "bonferroni" and "holm". The default is "none" which corresponds to no
 #'   p-value adjustment.
 #' @param pval_thresh numeric p-value threshold, below or equal to which
 #'   peptides are considered differentially expressed. Defaults to 0.05
