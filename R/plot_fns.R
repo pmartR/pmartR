@@ -3090,6 +3090,13 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
 
   } else if (is.null(pvalue_threshold)) {
 
+    # If there are no main effects do not print a legend.
+    if ("paired_diff" %in% attr(filter_obj, "group_DF")$Group) {
+
+      legend_position <- "none"
+
+    }
+
     # Start scatter plot skeleton when there is no p-value threshold.
     p <- ggplot2::ggplot(filter_obj)
 
@@ -3136,6 +3143,13 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
     # Stunning scatter plots: with threshold ---------------
 
   } else {
+
+    # If there are no main effects do not print a legend.
+    if ("paired_diff" %in% attr(filter_obj, "group_DF")$Group) {
+
+      legend_position <- "none"
+
+    }
 
     # get y-intercept for line
     df <- attributes(filter_obj)$df
