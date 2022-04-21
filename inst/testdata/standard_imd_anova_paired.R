@@ -100,27 +100,27 @@ cfilta_1_1_3 <- applyFilt(filta_1_1_3, pairdata_1_1_3,
 
 # Save filter objects  ---------------------------------------------------------
 
-save(
-
-  # afilta_0_0_3,
-  # gfilta_0_0_3,
-  # cfilta_0_0_3,
-
-  afilta_1_0_3,
-  gfilta_1_0_3,
-  cfilta_1_0_3,
-
-  afilta_1_1_3,
-  gfilta_1_1_3,
-  cfilta_1_1_3,
-
-  file = file.path("/Users/mart077/Documents/r_packages/pmartR",
-                   "inst/testdata/standards_filter_paired.RData")
-)
+# save(
+#
+#   afilta_0_0_3,
+#   gfilta_0_0_3,
+#   cfilta_0_0_3,
+#
+#   afilta_1_0_3,
+#   gfilta_1_0_3,
+#   cfilta_1_0_3,
+#
+#   afilta_1_1_3,
+#   gfilta_1_1_3,
+#   cfilta_1_1_3,
+#
+#   file = file.path("/Users/mart077/Documents/r_packages/pmartR",
+#                    "inst/testdata/standards_filter_paired.RData")
+# )
 
 # Prepare paired objects -------------------------------------------------------
 
-diff_a <- data.frame(
+diff_a_1_0_3 <- data.frame(
   Mass_Tag_ID = afilta_1_0_3$e_data$Mass_Tag_ID,
   Pair_1 = afilta_1_0_3$e_data$Mock_0hr_1 - afilta_1_0_3$e_data$Mock_18hr_1,
   Pair_2 = afilta_1_0_3$e_data$Mock_0hr_2 - afilta_1_0_3$e_data$Mock_18hr_2,
@@ -137,6 +137,26 @@ diff_a <- data.frame(
   Pair_13 = afilta_1_0_3$e_data$AM_0hr_3 - afilta_1_0_3$e_data$AM_18hr_3,
   Pair_14 = afilta_1_0_3$e_data$AM_0hr_4 - afilta_1_0_3$e_data$AM_18hr_4,
   Pair_15 = afilta_1_0_3$e_data$AM_0hr_5 - afilta_1_0_3$e_data$AM_18hr_5,
+  row.names = NULL
+)
+
+diff_a_0_0_3 <- data.frame(
+  Mass_Tag_ID = afilta_0_0_3$e_data$Mass_Tag_ID,
+  Pair_1 = afilta_0_0_3$e_data$Mock_0hr_1 - afilta_0_0_3$e_data$Mock_18hr_1,
+  Pair_2 = afilta_0_0_3$e_data$Mock_0hr_2 - afilta_0_0_3$e_data$Mock_18hr_2,
+  Pair_3 = afilta_0_0_3$e_data$Mock_0hr_3 - afilta_0_0_3$e_data$Mock_18hr_3,
+  Pair_4 = afilta_0_0_3$e_data$Mock_0hr_4 - afilta_0_0_3$e_data$Mock_18hr_4,
+  Pair_5 = afilta_0_0_3$e_data$Mock_0hr_5 - afilta_0_0_3$e_data$Mock_18hr_5,
+  Pair_6 = afilta_0_0_3$e_data$FM_0hr_1 - afilta_0_0_3$e_data$FM_18hr_1,
+  Pair_7 = afilta_0_0_3$e_data$FM_0hr_2 - afilta_0_0_3$e_data$FM_18hr_2,
+  Pair_8 = afilta_0_0_3$e_data$FM_0hr_3 - afilta_0_0_3$e_data$FM_18hr_3,
+  Pair_9 = afilta_0_0_3$e_data$FM_0hr_4 - afilta_0_0_3$e_data$FM_18hr_4,
+  Pair_10 = afilta_0_0_3$e_data$FM_0hr_5 - afilta_0_0_3$e_data$FM_18hr_5,
+  Pair_11 = afilta_0_0_3$e_data$AM_0hr_1 - afilta_0_0_3$e_data$AM_18hr_1,
+  Pair_12 = afilta_0_0_3$e_data$AM_0hr_2 - afilta_0_0_3$e_data$AM_18hr_2,
+  Pair_13 = afilta_0_0_3$e_data$AM_0hr_3 - afilta_0_0_3$e_data$AM_18hr_3,
+  Pair_14 = afilta_0_0_3$e_data$AM_0hr_4 - afilta_0_0_3$e_data$AM_18hr_4,
+  Pair_15 = afilta_0_0_3$e_data$AM_0hr_5 - afilta_0_0_3$e_data$AM_18hr_5,
   row.names = NULL
 )
 
@@ -167,26 +187,98 @@ groupie <- data.frame(
 
 # Assemble ANOVA standards -----------------------------------------------------
 
+# main effects: 0; covariates: 0; groups: 3 ---------------
+
+pval_a_0_0_3 <- data.frame(
+  P_value_A_paired_diff = diff_a_0_0_3[, -1] %>%
+    apply( 1, t.test) %>%
+    lapply(`[[`, "p.value") %>%
+    unlist()
+)
+
+flag_a_0_0_3 <- data.frame(
+  Flag_A_paired_diff = aflag_diff(
+    diff = rowMeans(diff_a_0_0_3[, 2:16],
+                    na.rm = TRUE),
+    pvals = pval_a_0_0_3[, 1],
+    cutoff = 0.05
+  )
+)
+
+astan_0_0_3 <- data.frame(
+  Mass_Tag_ID = diff_a_0_0_3$Mass_Tag_ID,
+  Count_paired_diff = unname(rowSums(!is.na(afilta_0_0_3$e_data[, 2:31]))),
+  Mean_paired_diff = rowMeans(diff_a_0_0_3[, 2:16],
+                       na.rm = TRUE),
+  Fold_change_paired_diff = rowMeans(diff_a_0_0_3[, 2:16],
+                              na.rm = TRUE), # Usually mean(grp1) - mean(grp2)
+  pval_a_0_0_3,
+  flag_a_0_0_3,
+  row.names = NULL
+)
+
+class(astan_0_0_3) <- c("statRes", "data.frame")
+
+attr(astan_0_0_3, "group_DF") <- attr(afilta_0_0_3, "group_DF")
+attr(astan_0_0_3, "comparisons") <- c("paired_diff")
+attr(astan_0_0_3, "number_significant") <- data.frame(
+  Comparison = c("paired_diff"),
+  Up_total = c(length(which(flag_a_0_0_3[, 1] == 1))),
+  Down_total = c(length(which(flag_a_0_0_3[, 1] == -1))),
+  Up_anova = c(length(which(flag_a_0_0_3[, 1] == 1))),
+  Down_anova = c(length(which(flag_a_0_0_3[, 1] == -1))),
+  Up_gtest = c(0),
+  Down_gtest = c(0),
+  row.names = NULL
+)
+attr(astan_0_0_3, "statistical_test") <- "anova"
+attr(astan_0_0_3, "adjustment_method_a") <- "none"
+attr(astan_0_0_3, "adjustment_method_g") <- "none"
+attr(astan_0_0_3, "pval_thresh") <- 0.05
+attr(astan_0_0_3, "data_info") <- list(
+  data_scale_orig = "abundance",
+  data_scale = "log",
+  norm_info = list(is_normalized = FALSE),
+  num_edata = length(unique(diff_a_0_0_3$Mass_Tag_ID)),
+  num_miss_obs = sum(is.na(afilta_0_0_3$e_data[, -1])),
+  prop_missing = (sum(is.na(afilta_0_0_3$e_data[, -1])) /
+                    prod(dim(afilta_0_0_3$e_data[, -1]))),
+  num_samps = dim(afilta_0_0_3$f_data)[1],
+  data_types = NULL,
+  batch_info = list(is_bc = FALSE)
+)
+attr(astan_0_0_3, "bpFlags") <- data.frame(
+  Mass_Tag_ID = afilta_0_0_3$e_data$Mass_Tag_ID,
+  paired_diff = flag_a_0_0_3$Flag_A_paired_diff
+)
+attr(astan_0_0_3, "cnames") <- list(
+  edata_cname = "Mass_Tag_ID",
+  emeta_cname = "Protein",
+  fdata_cname = "Name",
+  techrep_cname = NULL
+)
+attr(astan_0_0_3, "data_class") <- "pepData"
+
 # main effects: 1; covariates: 0; groups: 3 ---------------
 
 mean_a_1_0_3 <- data.frame(
-  Mean_Mock = rowMeans(diff_a[, 2:6],
+  Mean_Mock = rowMeans(diff_a_1_0_3[, 2:6],
                        na.rm = TRUE),
-  Mean_FM = rowMeans(diff_a[, 7:11],
+  Mean_FM = rowMeans(diff_a_1_0_3[, 7:11],
                      na.rm = TRUE),
-  Mean_AM = rowMeans(diff_a[, 12:16],
+  Mean_AM = rowMeans(diff_a_1_0_3[, 12:16],
                      na.rm = TRUE)
 )
 
 group_counts_1_0_3 <- data.frame(
-  nona_Mock = rowSums(!is.na(diff_a[, 2:6])),
-  nona_FM = rowSums(!is.na(diff_a[, 7:11])),
-  nona_AM = rowSums(!is.na(diff_a[, 12:16]))
+  nona_Mock = rowSums(!is.na(diff_a_1_0_3[, 2:6])),
+  nona_FM = rowSums(!is.na(diff_a_1_0_3[, 7:11])),
+  nona_AM = rowSums(!is.na(diff_a_1_0_3[, 12:16]))
 )
 
 nona_grps_1_0_3 <- rowSums(group_counts_1_0_3 != 0)
 
-sigma_1_0_3 <- dplyr::rowwise(diff_a[, -1]) %>%
+sigma_1_0_3 <- dplyr::rowwise(diff_a_1_0_3[, -1]) %>%
   dplyr::mutate(
     stdev = tryCatch (
       summary(lm(
@@ -197,7 +289,7 @@ sigma_1_0_3 <- dplyr::rowwise(diff_a[, -1]) %>%
   ) %>%
   dplyr::pull(stdev)
 
-nona_counts_1_0_3 <- rowSums(!is.na(diff_a[, -1]))
+nona_counts_1_0_3 <- rowSums(!is.na(diff_a_1_0_3[, -1]))
 
 diffs_1_0_3 <- mean_a_1_0_3 %>%
   dplyr::mutate(
@@ -265,7 +357,7 @@ flag_a_1_0_3 <- data.frame(
 )
 
 astan_1_0_3 <- data.frame(
-  Mass_Tag_ID = diff_a$Mass_Tag_ID,
+  Mass_Tag_ID = diff_a_1_0_3$Mass_Tag_ID,
   Count_Mock = unname(rowSums(!is.na(afilta_1_0_3$e_data[, 2:11]))),
   Count_FM = unname(rowSums(!is.na(afilta_1_0_3$e_data[, 12:21]))),
   Count_AM = unname(rowSums(!is.na(afilta_1_0_3$e_data[, 22:31]))),
@@ -320,7 +412,7 @@ attr(astan_1_0_3, "data_info") <- list(
   data_scale_orig = "abundance",
   data_scale = "log",
   norm_info = list(is_normalized = FALSE),
-  num_edata = length(unique(diff_a$Mass_Tag_ID)),
+  num_edata = length(unique(diff_a_1_0_3$Mass_Tag_ID)),
   num_miss_obs = sum(is.na(afilta_1_0_3$e_data[, -1])),
   prop_missing = (sum(is.na(afilta_1_0_3$e_data[, -1])) /
                     prod(dim(afilta_1_0_3$e_data[, -1]))),
@@ -344,7 +436,7 @@ attr(astan_1_0_3, "data_class") <- "pepData"
 
 # Adjust the means to remove effect of covariates.
 adj_data_1_1_3 <- project_to_null(
-  data_mat = data.matrix(diff_a[, -1]),
+  data_mat = data.matrix(diff_a_1_0_3[, -1]),
   Xmatrix = structure(c(1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                         0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                         0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1,
@@ -1105,6 +1197,8 @@ attr(cstan_1_1_3, "data_class") <- "pepData"
 # Save standards for paired IMD-ANOVA tests ------------------------------------
 
 # save(
+#
+#   astan_0_0_3,
 #
 #   astan_1_0_3,
 #   gstan_1_0_3,
