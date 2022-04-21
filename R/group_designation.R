@@ -105,6 +105,18 @@ group_designation <- function (omicsData,
   # no need for an analogous check for nmrData objects because there are not
   # entire samples that are used for normalization of NMR data
 
+  # Don't allow the airhead running the computer to specify a covariate if they
+  # didn't also specify a main effect.
+  if (is.null(main_effects) && !is.null(covariates)) {
+
+    # I will be a merciful coding lord and stop the user from continuing through
+    # the entire pmartR pipeline with this abominable error.
+    stop (
+      "A covariate cannot be specified unless a main effect is also specified."
+    )
+
+  }
+
   # Check main_effects ---------------
 
   # A main effect does not need to be supplied if a pairing variable is.

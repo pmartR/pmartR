@@ -139,6 +139,16 @@ imd_anova <- function (omicsData,
 
   }
 
+  # Throw down an error if the idiot user tries to use covariates when there are
+  # no main effects. Honestly!
+  if ("no_main_effect" %in% attr(groupData, "main_effects") &&
+      !is.null(covariates)) {
+
+    # How can you have a covariate without a main effect? ICONCEIVABLE!!!
+    stop ("A covariate cannot be specified when there is no main effect.")
+
+  }
+
   # Check for log transform #
   if(!(attr(omicsData,"data_info")$data_scale%in%c("log2","log","log10"))&(test_method%in%c("combined","anova"))){
     stop("Data must be log transformed in order to implement ANOVA.")
