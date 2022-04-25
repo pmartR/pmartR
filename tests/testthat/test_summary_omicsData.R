@@ -99,7 +99,7 @@ test_that('the omicsData summaries are all square',{
     summary(pdata_2_2_4),
     data.frame(
       temp = c("pepData", "12", "150", "NA", "341", "0.189",
-               "3", "3", "3", "3", "5", "7", "12"),
+               "3", "3", "3", "3", "Gender, Age"),
       row.names = c("Class", "Unique Mass_Tag_IDs (e_data)",
                     "Unique SampleIDs (f_data)", "Rows (e_meta)",
                     "Missing Observations", "Proportion Missing",
@@ -107,9 +107,7 @@ test_that('the omicsData summaries are all square',{
                     "Samples per group: Infection_low",
                     "Samples per group: Mock_high",
                     "Samples per group: Mock_low",
-                    "Samples per covariate: Gender_M",
-                    "Samples per covariate: Gender_F",
-                    "Samples per covariate: Age")
+                    "Covariates")
     ) %>%
       `names<-`(NULL)
   )

@@ -154,62 +154,18 @@ summarizer <- function (omicsData) {
 
     # Add covariate counts ---------------
 
-    # Check for covariates. If they exist we will tell the user how many.
+    # Check for covariates. If they exist we will tell the user what they are.
     if (!is.null(attr(get_group_DF(omicsData), "covariates"))) {
 
-      # Nab the covariate data frame. This will be used later for sundry
+      # Nab the covariates data frame. This will be used later for sundry
       # purposes.
       covies <- attr(get_group_DF(omicsData), "covariates")
 
-      # Determine the number of covariates. This is the number of columns in the
-      # covariates attribute minus one (because of the sample name column).
-      n_cov <- dim(covies)[[2]] - 1
+      # Add the covariate names to res.
+      res <- c(res, paste0(names(covies[, -1]), collapse = ", "))
 
-      # Loop through each covariate, check its class (e.g., numeric, character,
-      # factor), and count the number of samples in each level.
-      for (e in 1:n_cov) {
-
-        # Check if the covariate is categorical (i.e., the class is character or
-        # factor).
-        if (is.character(covies[, e + 1]) || is.factor(covies[, e + 1])) {
-
-          # Count the number of levels in the current covariate and create a
-          # list to hold the number of samples in each level.
-          cov_level <- as.character(unique(covies[, e + 1]))
-          level_count <- vector(mode = "list", length = length(cov_level))
-
-          # Loop through each level and count the number of samples.
-          for (v in 1:length(cov_level)) {
-
-            # Determine the number of samples in the current level.
-            level_count[[v]] <- length(which(covies[, e + 1] == cov_level[[v]]))
-
-          }
-
-          # Name the counts with their corresponding covariate/level names.
-          names(level_count) <- paste(names(covies)[e + 1],
-                                      cov_level,
-                                      sep = "_")
-
-          # Runs when the covariate is numeric.
-        } else {
-
-          # The covariate is continuous: We will just report the name of the
-          # covaraite along with the total number of samples for this covariate.
-          level_count <- list(nrow(covies))
-          names(level_count) <- names(covies)[e + 1]
-
-        }
-
-        # Add the covariate counts to res.
-        res <- c(res, level_count)
-
-        # Add the name of the covariate levels to res_names.
-        res_names <- c(res_names,
-                       paste("Samples per covariate:",
-                             names(level_count), sep = " "))
-
-      }
+      # Add the name of the covariate levels to res_names.
+      res_names <- c(res_names, "Covariates")
 
     }
 
