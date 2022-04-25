@@ -4183,21 +4183,6 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
       stop("facet_by must be a character vector of length 1")
   }
 
-  if (!is.null(order_by) || !is.null(color_by) || !is.null(facet_by)) {
-
-    # Make sure the group designation function has been run.
-    if (is.null(attr(omicsData, "group_DF"))) {
-
-      # Welcome to the pit of despair!! You will never escape!!!
-      stop (paste("group_DF must not be NULL. Run the group_designation",
-                  "function prior to plotting with any of the order_by,",
-                  "color_by, or facet_by arguments.",
-                  sep = " "))
-
-    }
-
-  }
-
   if(!is.null(facet_cols)) {
     if(is.null(facet_by))
       stop("facet_by cannot be NULL when facet_cols is specified")
