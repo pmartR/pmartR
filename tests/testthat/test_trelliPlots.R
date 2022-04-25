@@ -110,12 +110,28 @@ test_that("trelliPlots check the correct inputs", {
     "single_plot must be a TRUE or FALSE."
   )
   
+  # Blank biomolecules should be removed, and if no data, an error produced 
+  blankExample <- mtrelliData1 %>% trelli_panel_by("Metabolite")
+  blankExample$trelliData.omics <- blankExample$trelliData.omics[1,]
+  blankExample$trelliData.omics$Metabolite <- ""
+  
+  expect_error(
+    suppressMessages(blankExample %>% trelli_abundance_boxplot()),
+    "No data to build trelliscope with."
+  )
+  
+  # Test mode for windows should pass 
+  expect_equal(
+    .getDownloadsFolder(.test_mode = TRUE),
+    dirname("~")
+  )
+  
   # Expect a single plot object to be made 
   abun_boxplot <- mtrelliData1 %>% trelli_panel_by("Metabolite") %>% trelli_abundance_boxplot(single_plot = TRUE)
   expect_true(inherits(abun_boxplot, "ggplot"))
   
   # Generate a tests folder
-  testFolder <- file.path(getDownloadsFolder(), "/Trelli_Tests")
+  testFolder <- file.path(.getDownloadsFolder(), "/Trelli_Tests")
   
   # If the folder exists, remove it
   if (file.exists(testFolder)) {unlink(testFolder, recursive = TRUE, force = TRUE)}
@@ -193,7 +209,7 @@ test_that("trelliPlots check the correct inputs", {
   # Test that the data has been grouped by an emeta column 
   expect_error(
     mtrelliData1 %>% trelli_panel_by("Metabolite") %>% trelli_abundance_heatmap(),
-    "trelliData must be grouped_by an e_meta column."
+    "trelliData must be paneled_by an e_meta column."
   )
   
   # Return a single interactive plot 
@@ -220,6 +236,12 @@ test_that("trelliPlots check the correct inputs", {
   
   ## trelli_missingness_bar
   
+  # Trigger proportion check warning with something outrageous 
+  expect_error(
+    mtrelliData3 %>% trelli_panel_by("Metabolite") %>% trelli_missingness_bar(proportion = "cantelope"),
+    "proportion must be a TRUE or FALSE."
+  )
+  
   # Test trelliscope builds with all cognostics
   suppressWarnings(mtrelliData1 %>% trelli_panel_by("Metabolite") %>% 
     trelli_missingness_bar(path = file.path(testFolder, "MissingTest1"),
@@ -241,9 +263,57 @@ test_that("trelliPlots check the correct inputs", {
   )
   expect_true(file.exists(file.path(testFolder, "MissingTest2")))
   
+  # Build a single plot
+  miss_plot <- singlePlot %>% trelli_missingness_bar(single_plot = TRUE)
+  expect_true(inherits(miss_plot, "ggplot"))
   
   ## trelli_foldchange_bar
   
+  # statRes data is required for this function
+  expect_error(
+    mtrelliData2 %>% trelli_panel_by("Metabolite") %>% trelli_foldchange_bar(),
+    "trelliData must have statRes for this plotting function."
+  )
+  
+  # Requested test example must not be out of the range of possibilities 
+  expect_error(
+    mtrelliData3 %>% trelli_panel_by("Metabolite") %>% trelli_foldchange_bar(test_mode = TRUE, test_example = -2000.3),
+    "test_example must be in the range of possibilities, of 1 to 65"
+  )
+  
+  # trelliData must be paneled_by edata_cname
+  expect_error(
+    mtrelliData4 %>% trelli_panel_by("SampleID") %>% trelli_foldchange_bar(),
+    "trelliData must be grouped by edata_cname."
+  )
+  
+  # Test that the p-value threshold is a numeric
+  expect_error(
+    mtrelliData4 %>% trelli_panel_by("Metabolite") %>% trelli_foldchange_bar(p_value_thresh = "test"),
+    "p_value_thresh must be a numeric."
+  )
+  
+  # Test that the p-value threshold is a number between 0 and 1 
+  expect_error(
+    mtrelliData4 %>% trelli_panel_by("Metabolite") %>% trelli_foldchange_bar(p_value_thresh = -0.05),
+    "p_value_thresh must be between 0 and 1."
+  )
+  expect_error(
+    mtrelliData4 %>% trelli_panel_by("Metabolite") %>% trelli_foldchange_bar(p_value_thresh = 5),
+    "p_value_thresh must be between 0 and 1."
+  )
+  
+  # Test that the p-value test is an acceptable entry of anova, g-test, both, or null
+  expect_error(
+    mtrelliData4 %>% trelli_panel_by("Metabolite") %>% trelli_foldchange_bar(p_value_test = c("g-test", "anova")),
+    "p_value_test must be anova, g-test, both, or NULL."
+  )
+  expect_error(
+    mtrelliData4 %>% trelli_panel_by("Metabolite") %>% trelli_foldchange_bar(p_value_test = c("test")),
+    "p_value_test must be anova, g-test, both, or NULL."
+  )
+  
+  # Generate a trelliscope without proportions
   suppressWarnings(mtrelliData3 %>% trelli_panel_by("Metabolite") %>% 
      trelli_foldchange_bar(path = file.path(testFolder, "barFoldChangeTest1"),
                            ggplot_params = "ylab('')",
@@ -254,6 +324,36 @@ test_that("trelliPlots check the correct inputs", {
                            interactive = TRUE)
   )
   expect_true(file.exists(file.path(testFolder, "barFoldChangeTest1")))
+  
+  # Generate a trelliscope with proportions and a g-test
+  suppressWarnings(mtrelliData3 %>% trelli_panel_by("Metabolite") %>% 
+                     trelli_foldchange_bar(path = file.path(testFolder, "barFoldChangeTest2"),
+                                           ggplot_params = "ylab('')",
+                                           test_mode = TRUE, 
+                                           test_example = 2,
+                                           cognostics = "p_value",
+                                           p_value_test = "g-test",
+                                           interactive = TRUE)
+  )
+  expect_true(file.exists(file.path(testFolder, "barFoldChangeTest2")))
+  
+  # Generate a trelliscope with proportions and combined p-values
+  suppressWarnings(mtrelliData3 %>% trelli_panel_by("Metabolite") %>% 
+                     trelli_foldchange_bar(path = file.path(testFolder, "barFoldChangeTest3"),
+                                           test_mode = TRUE, 
+                                           test_example = 2,
+                                           p_value_test = "combined")
+  )
+  expect_true(file.exists(file.path(testFolder, "barFoldChangeTest3")))
+  
+  # Generate a trelliscope with proportions and no p-values
+  fc_barplot <- mtrelliData3 %>% trelli_panel_by("Metabolite") %>% 
+                     trelli_foldchange_bar(test_mode = TRUE, 
+                                           test_example = 2,
+                                           p_value_test = "anova",
+                                           p_value_thresh = 0,
+                                           single_plot = TRUE)
+  expect_true(inherits(fc_barplot, "ggplot"))
   
   ## trelli_foldchange_boxplot
   

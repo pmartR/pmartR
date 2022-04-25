@@ -68,7 +68,7 @@ trelli_precheck <- function(trelliData, trelliCheck,
     # Ensure that test_example is in the range of possibilities 
     if (test_mode) {
       if (max(test_example) > nrow(trelliData$trelliData.stat)) {
-        stop(paste("test_example must be in the range of possibilities, of 1 to", nrow(trelliData$trelliData.omics)))
+        stop(paste("test_example must be in the range of possibilities, of 1 to", nrow(trelliData$trelliData.stat)))
       }
     }
     
@@ -135,6 +135,16 @@ name_converter_foldchange <- list("n" = "Count", "mean" = "Mean Fold Change",
 # This function builds all trelliscopes.
 trelli_builder <- function(toBuild, cognostics, plotFUN, cogFUN, path, name, ...) {
   
+  # Remove any blank names 
+  if ("" %in% unlist(toBuild[,1])) {
+    message(paste("Removing", length(sum("" %in% toBuild[,1])), "blank biomolecule names."))
+    toBuild <- toBuild[toBuild[,1] != "",]
+  }
+  
+  if (nrow(toBuild) == 0) {
+    stop("No data to build trelliscope with.")
+  }
+  
   # Build trelliscope without cognostics if none are provided. Otherwise, build with cognostics.
   if (is.null(cognostics)) {
     
@@ -159,14 +169,17 @@ trelli_builder <- function(toBuild, cognostics, plotFUN, cogFUN, path, name, ...
 }
 
 # Get downloads folder
-getDownloadsFolder <- function() {
-  if (Sys.info()['sysname'] == "Windows")
+#' @export
+.getDownloadsFolder <- function(.test_mode = FALSE) {
+  if (Sys.info()['sysname'] == "Windows" | .test_mode) {
     folder <- dirname("~")
-  else
+    return(folder)
+  } else {
     folder <- path.expand("~")
-  folder <- file.path(folder, "Downloads")
-  folder <- paste0(folder, .Platform$file.sep)
-  return(folder)
+    folder <- file.path(folder, "Downloads")
+    folder <- paste0(folder, .Platform$file.sep)
+    return(folder)
+  }
 }
 
 #' @name trelli_abundance_boxplot
@@ -231,7 +244,7 @@ trelli_abundance_boxplot <- function(trelliData,
                                      ggplot_params = NULL,
                                      interactive = FALSE,
                                      include_points = TRUE,
-                                     path = getDownloadsFolder(),
+                                     path = .getDownloadsFolder(),
                                      name = "Trelliscope",
                                      test_mode = FALSE,
                                      test_example = 1,
@@ -403,13 +416,10 @@ trelli_abundance_boxplot <- function(trelliData,
         new_cogs <- do.call(cbind, lapply(1:nrow(cogs_to_add), function(row) {
           quick_cog(cogs_to_add$name[row], cogs_to_add$value[row])
         })) %>% tibble::tibble()
+
         
-        # Add new cognostics 
-        if (!is.null(cog_to_trelli)) {
-          cog_to_trelli <- cbind(cog_to_trelli, new_cogs) %>% tibble::tibble()
-        } else {
-          cog_to_trelli <- new_cogs
-        }
+        # Add new cognostics, removing when it is NULL 
+        cog_to_trelli <- cbind(cog_to_trelli, new_cogs) %>% tibble::tibble()
         
       }
       
@@ -505,7 +515,7 @@ trelli_abundance_histogram <- function(trelliData,
                                        cognostics = c("n", "mean", "median", "sd", "skew", "p_value", "fold_change"),
                                        ggplot_params = NULL,
                                        interactive = FALSE,
-                                       path = getDownloadsFolder(),
+                                       path = .getDownloadsFolder(),
                                        name = "Trelliscope",
                                        test_mode = FALSE,
                                        test_example = 1,
@@ -588,9 +598,7 @@ trelli_abundance_histogram <- function(trelliData,
     )
     
     # If cognostics are any of the cog, then add them 
-    if (any(cognostics %in% c("n", "mean", "median", "sd", "skew"))) {
-      cog_to_trelli <- do.call(dplyr::bind_cols, lapply(cognostics, function(x) {cog[[x]]})) %>% tibble::tibble()
-    } else {cog_to_trelli <- NULL}
+    cog_to_trelli <- do.call(dplyr::bind_cols, lapply(cognostics, function(x) {cog[[x]]})) %>% tibble::tibble()
     
     # Add statistics if applicable 
     if (!is.null(trelliData$trelliData.stat)) {
@@ -630,11 +638,8 @@ trelli_abundance_histogram <- function(trelliData,
         })) %>% tibble::tibble()
         
         # Add new cognostics 
-        if (!is.null(cog_to_trelli)) {
-          cog_to_trelli <- cbind(cog_to_trelli, new_cogs) %>% tibble::tibble()
-        } else {
-          cog_to_trelli <- new_cogs
-        }
+        cog_to_trelli <- cbind(cog_to_trelli, new_cogs) %>% tibble::tibble()
+      
         
       }
       
@@ -722,7 +727,7 @@ trelli_abundance_heatmap <- function(trelliData,
                                      cognostics = c("n", "mean", "median", "sd", "skew"),
                                      ggplot_params = NULL,
                                      interactive = FALSE,
-                                     path = getDownloadsFolder(),
+                                     path = .getDownloadsFolder(),
                                      name = "Trelliscope",
                                      test_mode = FALSE,
                                      test_example = 1,
@@ -747,7 +752,7 @@ trelli_abundance_heatmap <- function(trelliData,
   
   # Check that group data is grouped by an e_meta variable
   if (attr(trelliData, "panel_by_omics") %in% attr(trelliData, "emeta_col") == FALSE) {
-    stop("trelliData must be grouped_by an e_meta column.")
+    stop("trelliData must be paneled_by an e_meta column.")
   }
   
   # If no group designation, set cognostics to NULL. 
@@ -924,7 +929,7 @@ trelli_missingness_bar <- function(trelliData,
                                    proportion = TRUE,
                                    ggplot_params = NULL,
                                    interactive = FALSE,
-                                   path = getDownloadsFolder(),
+                                   path = .getDownloadsFolder(),
                                    name = "Trelliscope",
                                    test_mode = FALSE,
                                    test_example = 1,
@@ -1192,7 +1197,7 @@ trelli_foldchange_bar <- function(trelliData,
                                   p_value_test = NULL,
                                   ggplot_params = NULL,
                                   interactive = FALSE,
-                                  path = getDownloadsFolder(),
+                                  path = .getDownloadsFolder(),
                                   name = "Trelliscope",
                                   test_mode = FALSE,
                                   test_example = 1,
@@ -1217,7 +1222,7 @@ trelli_foldchange_bar <- function(trelliData,
   
   # Check that group data is edata_cname
   edata_cname <- pmartR::get_edata_cname(trelliData$statRes)
-  if (edata_cname != attr(trelliData, "panel_by_stat")) {
+  if (is.na(attr(trelliData, "panel_by_stat")) || edata_cname != attr(trelliData, "panel_by_stat")) {
     stop("trelliData must be grouped by edata_cname.")
   }
   
@@ -1231,6 +1236,9 @@ trelli_foldchange_bar <- function(trelliData,
   
   # Check p_value test
   if (!is.null(p_value_test)) {
+    if (length(p_value_test) > 1) {
+      stop("p_value_test must be anova, g-test, both, or NULL.")
+    }
     if (!is.character(p_value_test) || p_value_test %in% c("anova", "g-test", "both") == FALSE) {
       stop("p_value_test must be anova, g-test, both, or NULL.")
     }
@@ -1396,7 +1404,7 @@ trelli_foldchange_boxplot <- function(trelliData,
                                       include_points = TRUE,
                                       ggplot_params = NULL,
                                       interactive = FALSE,
-                                      path = getDownloadsFolder(),
+                                      path = .getDownloadsFolder(),
                                       name = "Trelliscope",
                                       test_mode = FALSE,
                                       test_example = 1,
@@ -1421,7 +1429,7 @@ trelli_foldchange_boxplot <- function(trelliData,
   
   # Check that group data is an emeta column
   if (attr(trelliData, "panel_by_omics") %in% attr(trelliData, "emeta_col") == FALSE) {
-    stop("trelliData must be grouped_by an e_meta column.")
+    stop("trelliData must be paneled_by an e_meta column.")
   }
   
   # Check p_value threshold
@@ -1608,7 +1616,7 @@ trelli_foldchange_volcano <- function(trelliData,
                                       p_value_test = NULL,
                                       ggplot_params = NULL,
                                       interactive = FALSE,
-                                      path = getDownloadsFolder(),
+                                      path = .getDownloadsFolder(),
                                       name = "Trelliscope",
                                       test_mode = FALSE,
                                       test_example = 1,
@@ -1633,7 +1641,7 @@ trelli_foldchange_volcano <- function(trelliData,
   
   # Check that group data is an emeta column
   if (attr(trelliData, "panel_by_omics") %in% attr(trelliData, "emeta_col") == FALSE) {
-    stop("trelliData must be grouped_by an e_meta column.")
+    stop("trelliData must be paneled_by an e_meta column.")
   }
   
   # Check p_value threshold
@@ -1821,7 +1829,7 @@ trelli_foldchange_heatmap <- function(trelliData,
                                       cognostics = c("n", "median", "mean", "sd"),
                                       ggplot_params = NULL,
                                       interactive = FALSE,
-                                      path = getDownloadsFolder(),
+                                      path = .getDownloadsFolder(),
                                       name = "Trelliscope",
                                       test_mode = FALSE,
                                       test_example = 1,
@@ -1846,7 +1854,7 @@ trelli_foldchange_heatmap <- function(trelliData,
   
   # Check that group data is an emeta column
   if (attr(trelliData, "panel_by_omics") %in% attr(trelliData, "emeta_col") == FALSE) {
-    stop("trelliData must be grouped_by an e_meta column.")
+    stop("trelliData must be paneled_by an e_meta column.")
   }
   
   # Make foldchange boxplot function--------------------------------------------
