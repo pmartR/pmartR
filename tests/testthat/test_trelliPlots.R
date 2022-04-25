@@ -289,43 +289,42 @@ test_that("trelliPlots check the correct inputs", {
   
   # Test that the p-value threshold is a numeric
   expect_error(
-    mtrelliData4 %>% trelli_panel_by("Metabolite") %>% trelli_foldchange_bar(p_value_thresh = "test"),
+    mtrelliData4 %>% trelli_panel_by("Metabolite") %>% trelli_foldchange_bar(p_value_test = "anova", p_value_thresh = "test"),
     "p_value_thresh must be a numeric."
   )
   
   # Test that the p-value threshold is a number between 0 and 1 
   expect_error(
-    mtrelliData4 %>% trelli_panel_by("Metabolite") %>% trelli_foldchange_bar(p_value_thresh = -0.05),
+    mtrelliData4 %>% trelli_panel_by("Metabolite") %>% trelli_foldchange_bar(p_value_test = "anova", p_value_thresh = -0.05),
     "p_value_thresh must be between 0 and 1."
   )
   expect_error(
-    mtrelliData4 %>% trelli_panel_by("Metabolite") %>% trelli_foldchange_bar(p_value_thresh = 5),
+    mtrelliData4 %>% trelli_panel_by("Metabolite") %>% trelli_foldchange_bar(p_value_test = "anova", p_value_thresh = 5),
     "p_value_thresh must be between 0 and 1."
   )
   
   # Test that the p-value test is an acceptable entry of anova, g-test, both, or null
   expect_error(
     mtrelliData4 %>% trelli_panel_by("Metabolite") %>% trelli_foldchange_bar(p_value_test = c("g-test", "anova")),
-    "p_value_test must be anova, g-test, both, or NULL."
+    "p_value_test must be anova, g-test, combined, or NULL."
   )
   expect_error(
     mtrelliData4 %>% trelli_panel_by("Metabolite") %>% trelli_foldchange_bar(p_value_test = c("test")),
-    "p_value_test must be anova, g-test, both, or NULL."
+    "p_value_test must be anova, g-test, combined, or NULL."
   )
   
-  # Generate a trelliscope without proportions
-  suppressWarnings(mtrelliData3 %>% trelli_panel_by("Metabolite") %>% 
+  # Generate a trelliscope without proportions and a single plot
+  singleStatPlot <- mtrelliData4 %>% trelli_panel_by("Metabolite")
+  suppressWarnings(singleStatPlot %>%
      trelli_foldchange_bar(path = file.path(testFolder, "barFoldChangeTest1"),
                            ggplot_params = "ylab('')",
-                           test_mode = TRUE, 
-                           test_example = 2,
                            cognostics = "p_value",
                            p_value_test = "anova",
                            interactive = TRUE)
   )
   expect_true(file.exists(file.path(testFolder, "barFoldChangeTest1")))
   
-  # Generate a trelliscope with proportions and a g-test
+  # Generate a trelliscope with proportions and a g-test 
   suppressWarnings(mtrelliData3 %>% trelli_panel_by("Metabolite") %>% 
                      trelli_foldchange_bar(path = file.path(testFolder, "barFoldChangeTest2"),
                                            ggplot_params = "ylab('')",

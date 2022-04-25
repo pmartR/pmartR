@@ -1,12 +1,16 @@
 # This function runs necessary checks for pmartR trelliscope plotting functions. 
 # It cleans any parameters (rounding numerics to integers, etc.), and returns them.
-trelli_precheck <- function(trelliData, trelliCheck,
-                            cognostics, acceptable_cognostics,
+trelli_precheck <- function(trelliData, 
+                            trelliCheck,
+                            cognostics, 
+                            acceptable_cognostics,
                             ggplot_params,
                             interactive, 
                             test_mode,
                             test_example,
-                            single_plot) {
+                            single_plot,
+                            p_value_thresh,
+                            p_value_test) {
   
   #########################
   ## TEST EXAMPLE CHECKS ##
@@ -115,6 +119,31 @@ trelli_precheck <- function(trelliData, trelliCheck,
   # single_plot must be a TRUE/FALSE
   if (!is.logical(single_plot) & !is.na(single_plot)) {
     stop("single_plot must be a TRUE or FALSE.")
+  }
+  
+  #############################
+  ## P-VALUE SPECIFIC CHECKS ##
+  #############################
+  
+  # Check p_value test
+  if (!is.null(p_value_test)) {
+    
+    # Check p-value test method 
+    if (length(p_value_test) > 1) {
+      stop("p_value_test must be anova, g-test, combined, or NULL.")
+    }
+    if (!is.character(p_value_test) || p_value_test %in% c("anova", "g-test", "combined") == FALSE) {
+      stop("p_value_test must be anova, g-test, combined, or NULL.")
+    }
+    
+    # Check p_value threshold
+    if (!is.numeric(p_value_thresh)) {
+      stop("p_value_thresh must be a numeric.")
+    }
+    if (p_value_thresh < 0 | p_value_thresh > 1) {
+      stop("p_value_thresh must be between 0 and 1.")
+    }
+    
   }
   
 }
@@ -262,7 +291,9 @@ trelli_abundance_boxplot <- function(trelliData,
                   interactive = interactive,
                   test_mode = test_mode, 
                   test_example = test_example,
-                  single_plot = single_plot)
+                  single_plot = single_plot,
+                  p_value_thresh = NULL,
+                  p_value_test = NULL)
   
   
   # Remove stat specific options if no stats data was provided 
@@ -533,7 +564,9 @@ trelli_abundance_histogram <- function(trelliData,
                   interactive = interactive,
                   test_mode = test_mode, 
                   test_example = test_example,
-                  single_plot = single_plot)
+                  single_plot = single_plot,
+                  p_value_thresh = NULL,
+                  p_value_test = NULL)
 
   # Remove stat specific options if no stats data was provided 
   if (is.null(trelliData$trelliData.stat)) {
@@ -745,7 +778,9 @@ trelli_abundance_heatmap <- function(trelliData,
                   interactive = interactive,
                   test_mode = test_mode, 
                   test_example = test_example,
-                  single_plot = single_plot)
+                  single_plot = single_plot,
+                  p_value_thresh = NULL,
+                  p_value_test = NULL)
   
   # Round test example to integer 
   if (test_mode) {test_example <- unique(abs(round(test_example)))}
@@ -946,7 +981,9 @@ trelli_missingness_bar <- function(trelliData,
                   interactive = interactive,
                   test_mode = test_mode, 
                   test_example = test_example,
-                  single_plot = single_plot)
+                  single_plot = single_plot,
+                  p_value_thresh = NULL,
+                  p_value_test = NULL)
   
   # Check that proportion is a non NA logical
   if (!is.logical(proportion) | is.na(proportion)) {
@@ -1149,6 +1186,14 @@ trelli_missingness_bar <- function(trelliData,
   
 }
 
+subset_pvalue <- function(DF, p_value_test) {
+  if (p_value_test == "anova") {DF$p_value <- DF$p_value_anova} else 
+  if (p_value_test == "g-test") {DF$p_value <- DF$p_value_gtest} else
+  if (p_value_test == "combined") {DF$p_value <- lapply(1:nrow(DF), function(row) {
+    DF$p_value <- mean(c(DF$p_value_anova[row], DF$p_value_gtest[row]))}) %>% unlist()}
+  return(DF)
+}
+
 #' @name trelli_foldchange_bar
 #' 
 #' @title Bar chart trelliscope building function for fold_change   
@@ -1162,7 +1207,7 @@ trelli_missingness_bar <- function(trelliData,
 #' @param p_value_thresh A value between 0 and 1 to indicate a threshold to highlight
 #'    significant biomolecules. Default is 0.05. Selecting 0 will remove this feature.
 #' @param p_value_test A string to indicate which test to use for p_value_thresh. Acceptable
-#'    entries are "anova", "g-test", or "both". Selecting NULL will remove this feature. 
+#'    entries are "anova", "g-test", or "combined". Selecting NULL will remove this feature. 
 #' @param ggplot_params An optional vector of strings of ggplot parameters to the backend ggplot
 #'    function. For example, c("ylab('')", "xlab('')"). Default is NULL. 
 #' @param interactive A logical argument indicating whether the plots should be interactive
@@ -1184,7 +1229,7 @@ trelli_missingness_bar <- function(trelliData,
 #'   
 #' ## Or make the plot interactive  
 #' trelli_panel_by(trelliData = trelliData4, panel = "LipidCommonName") %>% 
-#'   trelli_foldchange_bar(test_mode = T, test_example = 1:10, p_value_test = "both", interactive = T) 
+#'   trelli_foldchange_bar(test_mode = T, test_example = 1:10, p_value_test = "combined", interactive = T) 
 #'    
 #' }
 #' 
@@ -1215,7 +1260,9 @@ trelli_foldchange_bar <- function(trelliData,
                   interactive = interactive,
                   test_mode = test_mode, 
                   test_example = test_example,
-                  single_plot = single_plot)
+                  single_plot = single_plot,
+                  p_value_thresh = p_value_thresh,
+                  p_value_test = p_value_test)
   
   # Round test example to integer 
   if (test_mode) {test_example <- unique(abs(round(test_example)))}
@@ -1224,24 +1271,6 @@ trelli_foldchange_bar <- function(trelliData,
   edata_cname <- pmartR::get_edata_cname(trelliData$statRes)
   if (is.na(attr(trelliData, "panel_by_stat")) || edata_cname != attr(trelliData, "panel_by_stat")) {
     stop("trelliData must be grouped by edata_cname.")
-  }
-  
-  # Check p_value threshold
-  if (!is.numeric(p_value_thresh)) {
-    stop("p_value_thresh must be a numeric.")
-  }
-  if (p_value_thresh < 0 | p_value_thresh > 1) {
-    stop("p_value_thresh must be between 0 and 1.")
-  }
-  
-  # Check p_value test
-  if (!is.null(p_value_test)) {
-    if (length(p_value_test) > 1) {
-      stop("p_value_test must be anova, g-test, both, or NULL.")
-    }
-    if (!is.character(p_value_test) || p_value_test %in% c("anova", "g-test", "both") == FALSE) {
-      stop("p_value_test must be anova, g-test, both, or NULL.")
-    }
   }
   
   # Make foldchange bar function------------------------------------------------
@@ -1256,10 +1285,7 @@ trelli_foldchange_bar <- function(trelliData,
     if (!is.null(p_value_test) && p_value_thresh != 0) {
       
       # Get which p_value to test
-      if (p_value_test == "anova") {DF$p_value <- DF$p_value_anova} else 
-      if (p_value_test == "g-test") {DF$p_value <- DF$p_value_gtest} else
-      if (p_value_test == "both") {DF$p_value <- lapply(1:nrow(DF), function(row) {
-        DF$p_value <- mean(c(DF$p_value_anova[row], DF$p_value_gtest[row]))}) %>% unlist()}
+      DF <- subset_pvalue(DF, p_value_test)
       
       # Indicate which comparisons should be highlighted
       Significant <- ifelse(DF$p_value <= p_value_thresh & DF$p_value != 0, "black", NA)
@@ -1371,7 +1397,7 @@ trelli_foldchange_bar <- function(trelliData,
 #' @param p_value_thresh A value between 0 and 1 to indicate a threshold to highlight
 #'    significant biomolecules. Default is 0.05. Selecting 0 will remove this feature. 
 #' @param p_value_test A string to indicate which test to use for p_value_thresh. Acceptable
-#'    entries are "anova", "g-test", or "both". Selecting NULL will remove this feature.
+#'    entries are "anova", "g-test", or "combined". Selecting NULL will remove this feature.
 #' @param include_points Add points. Default is TRUE. 
 #' @param ggplot_params An optional vector of strings of ggplot parameters to the backend ggplot
 #'    function. For example, c("ylab('')", "xlab('')"). Default is NULL. 
@@ -1422,7 +1448,9 @@ trelli_foldchange_boxplot <- function(trelliData,
                   interactive = interactive,
                   test_mode = test_mode, 
                   test_example = test_example,
-                  single_plot = single_plot)
+                  single_plot = single_plot,
+                  p_value_thresh = p_value_thresh,
+                  p_value_test = p_value_test)
   
   # Round test example to integer 
   if (test_mode) {test_example <- unique(abs(round(test_example)))}
@@ -1430,21 +1458,6 @@ trelli_foldchange_boxplot <- function(trelliData,
   # Check that group data is an emeta column
   if (attr(trelliData, "panel_by_omics") %in% attr(trelliData, "emeta_col") == FALSE) {
     stop("trelliData must be paneled_by an e_meta column.")
-  }
-  
-  # Check p_value threshold
-  if (!is.numeric(p_value_thresh)) {
-    stop("p_value_thresh must be a numeric.")
-  }
-  if (p_value_thresh < 0 | p_value_thresh > 1) {
-    stop("p_value_thresh must be between 0 and 1.")
-  }
-  
-  # Check p_value test
-  if (!is.null(p_value_test)) {
-    if (!is.character(p_value_test) || p_value_test %in% c("anova", "g-test", "both") == FALSE) {
-      stop("p_value_test must be anova, g-test, both, or NULL.")
-    }
   }
   
   # Make sure include_points is a true or false
@@ -1464,10 +1477,7 @@ trelli_foldchange_boxplot <- function(trelliData,
     if (!is.null(p_value_test) && p_value_thresh != 0) {
       
       # Get which p_value to test
-      if (p_value_test == "anova") {DF$p_value <- DF$p_value_anova} else 
-      if (p_value_test == "g-test") {DF$p_value <- DF$p_value_gtest} else
-      if (p_value_test == "both") {DF$p_value <- lapply(1:nrow(DF), function(row) {
-        DF$p_value <- mean(c(DF$p_value_anova[row], DF$p_value_gtest[row]))}) %>% unlist()}
+      DF <- subset_pvalue(DF, p_value_test)
       
     }
   
@@ -1585,7 +1595,7 @@ trelli_foldchange_boxplot <- function(trelliData,
 #' @param p_value_thresh A value between 0 and 1 to indicate a threshold to highlight
 #'    significant biomolecules. Default is 0.05. Selecting 0 will remove this feature.
 #' @param p_value_test  A string to indicate which test to use for p_value_thresh. Acceptable
-#'    entries are "anova", "g-test", or "both". Selecting NULL will remove this feature.   
+#'    entries are "anova", "g-test", or "combined". Selecting NULL will remove this feature.   
 #' @param ggplot_params An optional vector of strings of ggplot parameters to the backend ggplot
 #'    function. For example, c("ylab('')", "xlab('')"). Default is NULL. 
 #' @param interactive A logical argument indicating whether the plots should be interactive
@@ -1634,7 +1644,9 @@ trelli_foldchange_volcano <- function(trelliData,
                   interactive = interactive,
                   test_mode = test_mode, 
                   test_example = test_example,
-                  single_plot = single_plot)
+                  single_plot = single_plot,
+                  p_value_thresh = p_value_thresh,
+                  p_value_test = p_value_test)
   
   # Round test example to integer 
   if (test_mode) {test_example <- unique(abs(round(test_example)))}
@@ -1642,21 +1654,6 @@ trelli_foldchange_volcano <- function(trelliData,
   # Check that group data is an emeta column
   if (attr(trelliData, "panel_by_omics") %in% attr(trelliData, "emeta_col") == FALSE) {
     stop("trelliData must be paneled_by an e_meta column.")
-  }
-  
-  # Check p_value threshold
-  if (!is.numeric(p_value_thresh)) {
-    stop("p_value_thresh must be a numeric.")
-  }
-  if (p_value_thresh < 0 | p_value_thresh > 1) {
-    stop("p_value_thresh must be between 0 and 1.")
-  }
-  
-  # Check p_value test
-  if (!is.null(p_value_test)) {
-    if (!is.character(p_value_test) || p_value_test %in% c("anova", "g-test", "both") == FALSE) {
-      stop("p_value_test must be anova, g-test, both, or NULL.")
-    }
   }
   
   # Make foldchange volcano function--------------------------------------------
@@ -1671,10 +1668,7 @@ trelli_foldchange_volcano <- function(trelliData,
     if (!is.null(p_value_test) && p_value_thresh != 0) {
       
       # Get which p_value to test
-      if (p_value_test == "anova") {DF$p_value <- DF$p_value_anova} else 
-      if (p_value_test == "g-test") {DF$p_value <- DF$p_value_gtest} else
-      if (p_value_test == "both") {DF$p_value <- lapply(1:nrow(DF), function(row) {
-            DF$p_value <- mean(c(DF$p_value_anova[row], DF$p_value_gtest[row]))}) %>% unlist()}
+      DF <- subset_pvalue(DF, p_value_test)
       
     } else {
       DF$p_value <- 0
@@ -1721,10 +1715,7 @@ trelli_foldchange_volcano <- function(trelliData,
     if (!is.null(p_value_test) && p_value_thresh != 0) {
       
       # Get which p_value to test
-      if (p_value_test == "anova") {DF$p_value <- DF$p_value_anova} else 
-        if (p_value_test == "g-test") {DF$p_value <- DF$p_value_gtest} else
-          if (p_value_test == "both") {DF$p_value <- lapply(1:nrow(DF), function(row) {
-            DF$p_value <- mean(c(DF$p_value_anova[row], DF$p_value_gtest[row]))}) %>% unlist()}
+      DF <- subset_pvalue(DF, p_value_test)
       
     } else {
       DF$p_value <- 0
@@ -1847,7 +1838,9 @@ trelli_foldchange_heatmap <- function(trelliData,
                   interactive = interactive,
                   test_mode = test_mode, 
                   test_example = test_example,
-                  single_plot = single_plot)
+                  single_plot = single_plot,
+                  p_value_thresh = NULL,
+                  p_value_test = NULL)
   
   # Round test example to integer 
   if (test_mode) {test_example <- unique(abs(round(test_example)))}
