@@ -1393,7 +1393,7 @@ trelli_foldchange_bar <- function(trelliData,
 #' 
 #' @param trelliData A trelliscope data object with omicsData and statRes results. Required. 
 #' @param cognostics A vector of cognostic options for each plot. Valid entries are
-#'    are n ,mean, median, and sd. 
+#'    are n, mean, median, and sd. 
 #' @param p_value_thresh A value between 0 and 1 to indicate a threshold to highlight
 #'    significant biomolecules. Default is 0.05. Selecting 0 will remove this feature. 
 #' @param p_value_test A string to indicate which test to use for p_value_thresh. Acceptable
@@ -1462,7 +1462,7 @@ trelli_foldchange_boxplot <- function(trelliData,
   
   # Make sure include_points is a true or false
   if (!is.logical(include_points) & !is.na(include_points)) {
-    stop("include_points must be a true or false.")
+    stop("include_points must be a TRUE or FALSE.")
   }
   
   # Make foldchange boxplot function--------------------------------------------
@@ -1518,14 +1518,6 @@ trelli_foldchange_boxplot <- function(trelliData,
   # Make cognostic function-----------------------------------------------------
   
   fc_box_cog_fun <- function(DF, Group) {
-    
-    # Extend cognostics if p_value is in it
-    if ("p_value" %in% cognostics) {
-      theNames <- trelliData$trelliData.stat$Nested_DF[[1]] %>% colnames()
-      p_value_cols <- theNames[grepl("p_value", theNames)]
-      cognostics <- cognostics[cognostics != "p_value"]
-      cognostics <- c(cognostics, p_value_cols)
-    }
     
     # Calculate stats and subset to selected choices 
     cog_to_trelli <- DF %>%

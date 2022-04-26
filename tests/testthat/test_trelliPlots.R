@@ -315,6 +315,8 @@ test_that("trelliPlots check the correct inputs", {
   
   # Generate a trelliscope without proportions and a single plot
   singleStatPlot <- mtrelliData4 %>% trelli_panel_by("Metabolite")
+  singleStatPlot$trelliData.omics <- singleStatPlot$trelliData.omics[1,]
+  singleStatPlot$trelliData.stat <- singleStatPlot$trelliData.stat[singleStatPlot$trelliData.stat$Metabolite == singleStatPlot$trelliData.omics$Metabolite,]
   suppressWarnings(singleStatPlot %>%
      trelli_foldchange_bar(path = file.path(testFolder, "barFoldChangeTest1"),
                            ggplot_params = "ylab('')",
@@ -356,6 +358,19 @@ test_that("trelliPlots check the correct inputs", {
   
   ## trelli_foldchange_boxplot
   
+  # Data must be grouped by an e_meta column
+  expect_error(
+    mtrelliData4 %>% trelli_panel_by("Metabolite") %>% trelli_foldchange_boxplot(),
+    "trelliData must be paneled_by an e_meta column."
+  )
+  
+  # Include points should be a true or false
+  expect_error(
+    mtrelliData4 %>% trelli_panel_by("MClass") %>% trelli_foldchange_boxplot(include_points = "FALSE"),
+    "include_points must be a TRUE or FALSE."
+  )
+  
+  # Run a standard trelli foldchange boxplot with change ggplot parameters 
   suppressWarnings(mtrelliData4 %>% trelli_panel_by("MClass") %>% 
    trelli_foldchange_boxplot(path = file.path(testFolder, "boxFoldChangeTest1"),
                              ggplot_params = "xlab('')",
@@ -366,8 +381,31 @@ test_that("trelliPlots check the correct inputs", {
   )
   expect_true(file.exists(file.path(testFolder, "boxFoldChangeTest1")))
   
+  # Create a second trelliscope from the single data with no include_points and p_value in the cognostics
+  singleEmetaPlot <- mtrelliData4 %>% trelli_panel_by("MClass")
+  singleEmetaPlot$trelliData.omics <- singleEmetaPlot$trelliData.omics[singleEmetaPlot$trelliData.omics$MClass == "MClass5",]
+  singleEmetaPlot$trelliData.stat <- singleEmetaPlot$trelliData.stat[singleEmetaPlot$trelliData.stat$MClass == "MClass5",]
+  
+  suppressWarnings(singleEmetaPlot %>%
+                     trelli_foldchange_boxplot(path = file.path(testFolder, "boxFoldChangeTest2"),
+                                               p_value_test = NULL,
+                                               include_points = TRUE)
+  )
+  expect_true(file.exists(file.path(testFolder, "boxFoldChangeTest2")))
+  
+  # Generate a single plot
+  fc_boxplot <- singleEmetaPlot %>% trelli_foldchange_boxplot(single_plot = T)
+  expect_true(inherits(fc_boxplot, "ggplot"))
+  
   ## trelli_foldchange_volcano
   
+  # Data must be grouped by an e_meta column
+  expect_error(
+    mtrelliData4 %>% trelli_panel_by("Metabolite") %>% trelli_foldchange_volcano(),
+    "trelliData must be paneled_by an e_meta column."
+  )
+  
+  # Generate a volcano trelliscope with a modified ggplot parameter
   suppressWarnings(mtrelliData4 %>% trelli_panel_by("MClass") %>% 
    trelli_foldchange_volcano(path = file.path(testFolder, "volFoldChangeTest1"),
                              ggplot_params = "xlab('')",
@@ -378,8 +416,26 @@ test_that("trelliPlots check the correct inputs", {
   )
   expect_true(file.exists(file.path(testFolder, "volFoldChangeTest1")))
   
+  # Generate a single plot volcano trelliscope with no p_value
+  suppressWarnings(singleEmetaPlot %>%
+                     trelli_foldchange_volcano(path = file.path(testFolder, "volFoldChangeTest2"),
+                                               p_value_test = NULL)
+  )
+  expect_true(file.exists(file.path(testFolder, "volFoldChangeTest2")))
+  
+  # Test the creation of a single plot
+  fc_volcano <- singleEmetaPlot %>% trelli_foldchange_volcano(single_plot = T)
+  expect_true(inherits(fc_boxplot, "ggplot"))
+  
   ## trelli_foldchange_heatmap
   
+  # Data must be grouped by an e_meta column
+  expect_error(
+    mtrelliData4 %>% trelli_panel_by("Metabolite") %>% trelli_foldchange_heatmap(),
+    "trelliData must be paneled_by an e_meta column."
+  )
+  
+  # Generate the fold change heatmap trelliscope with a modified ggplot parameter 
   suppressWarnings(mtrelliData4 %>% trelli_panel_by("MClass") %>% 
    trelli_foldchange_heatmap(path = file.path(testFolder, "hmFoldChangeTest1"),
                              ggplot_params = "xlab('')",
@@ -389,5 +445,15 @@ test_that("trelliPlots check the correct inputs", {
   )
   expect_true(file.exists(file.path(testFolder, "hmFoldChangeTest1")))
   
+  # Generate the fold change heatmap trelliscope with smaller dataset
+  suppressWarnings(singleEmetaPlot %>%
+                     trelli_foldchange_heatmap(path = file.path(testFolder, "hmFoldChangeTest2"),
+                  )
+  )
+  expect_true(file.exists(file.path(testFolder, "hmFoldChangeTest2")))
+  
+  # Generate a single plot
+  fc_heatmap <- singleEmetaPlot %>% trelli_foldchange_heatmap(single_plot = T)
+  expect_true(inherits(fc_heatmap, "ggplot"))
   
 })  
