@@ -56,6 +56,7 @@ molecule_filter <- function (omicsData,use_groups = FALSE, use_batch = FALSE) {
   
   # find the column which has the edata cname
   id_col <- which(names(omicsData$e_data) == get_edata_cname(omicsData))
+  ordering = omicsData$e_data[,id_col]
   
   # SCENARIO 1: use_groups = FALSE, use_batch = FALSE
   # we run the scenario as before
@@ -84,7 +85,10 @@ molecule_filter <- function (omicsData,use_groups = FALSE, use_batch = FALSE) {
       dplyr::group_by(dplyr::across(id_col)) %>%
       dplyr::summarise(min_num_obs = as.numeric(min(num_obs)),.groups = "keep") %>%
       dplyr::ungroup() %>%
+      dplyr::rename(molecule = id_col) %>% 
+      dplyr::arrange(match(molecule,ordering)) %>% 
       data.frame()
+    colnames(output)[1] <- get_edata_cname(omicsData)
   }
   
   # SCENARIO 3: use_groups = TRUE, use_batch = FALSE
@@ -101,7 +105,10 @@ molecule_filter <- function (omicsData,use_groups = FALSE, use_batch = FALSE) {
       dplyr::group_by(dplyr::across(id_col)) %>%
       dplyr::summarise(min_num_obs = as.numeric(min(num_obs)),.groups = "keep") %>%
       dplyr::ungroup() %>%
+      dplyr::rename(molecule = id_col) %>%
+      dplyr::arrange(match(molecule,ordering)) %>%
       data.frame()
+    colnames(output)[1] <- get_edata_cname(omicsData)
   }
   
   # SCENARIO 4: use_groups = TRUE, use_batch = TRUE
@@ -119,7 +126,10 @@ molecule_filter <- function (omicsData,use_groups = FALSE, use_batch = FALSE) {
       dplyr::group_by(dplyr::across(id_col)) %>%
       dplyr::summarise(min_num_obs = as.numeric(min(num_obs)),.groups = "keep") %>%
       dplyr::ungroup() %>%
+      dplyr::rename(molecule = id_col) %>%
+      dplyr::arrange(match(molecule,ordering)) %>%
       data.frame()
+    colnames(output)[1] <- get_edata_cname(omicsData)
   }
   
   # change the names of the data.frame
