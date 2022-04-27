@@ -185,6 +185,32 @@ imd_anova <- function (omicsData,
 
   }
 
+  # Farm boy, check the inputs. Farm boy, fix all the problems. Farm boy, hurry
+  # up. Farm boy, why is the user an idiot? Farm boy, make everything uniform.
+  # Farm boy, do all the tedious crap. AS YOU WISH!
+  if (!pval_adjust_a %in% c("bonferroni", "holm", "tukey", "dunnett", "none")) {
+
+    # I clearly told you what you could choose from in the documentation.
+    # Obviously it is too much to ask for you to read the instructions!
+    stop (
+      paste("The available options for pval_adjust_a are: 'bonferroni',",
+      "'holm', 'tukey', 'dunnett', and 'none'.",
+            sep = " ")
+    )
+
+  }
+  if (!pval_adjust_g %in% c("bonferroni", "holm", "none")) {
+
+    # I cannot make this any easier for you. Please seek the help you
+    # desperately need.
+    stop (
+      paste("The available options for pval_adjust_g are: 'bonferroni',",
+            "'holm', and 'none'.",
+            sep = " ")
+    )
+
+  }
+
 
   # Have a looksie at the covariates argument.
   if (!is.null(covariates)) {
@@ -213,6 +239,27 @@ imd_anova <- function (omicsData,
     paired <- FALSE
   } else {
     paired <- TRUE
+  }
+
+  # Check the input to the pval_thresh argument.
+  if (!is.numeric(pval_thresh)) {
+
+    # Why the heck would you input the p-value threshold as a character
+    # vector?!?!?! In what universe does that make any sense?! I am still
+    # baffled that we have run into this situation. I can feel my eye starting
+    # to twitch.
+    stop ("pval_thresh must be numeric.")
+
+  }
+
+  # Make sure pval_thresh is between 0 and 1.
+  if (pval_thresh < 0 || pval_thresh > 1) {
+
+    # If Lisa comes to me asking me to find out why the user's plots are
+    # obviously not correct and it is because pval_thresh is not between 0 and 1
+    # I will lose it. The Hulk will have nothing on me at that point.
+    stop ("pval_thresh must be between 0 and 1.")
+
   }
 
   # Statisticalness!!! ---------------------------------------------------------
