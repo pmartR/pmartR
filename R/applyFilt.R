@@ -333,6 +333,14 @@ applyFilt.cvFilt <- function (filter_object, omicsData, cv_threshold = 150) {
 
   }
 
+  # Check if cv_threshold is numeric. Honestly!
+  if (!is.numeric(cv_threshold)) {
+
+    # User. My life is looking bleak right now because of you.
+    stop ("cv_threshold must be numeric.")
+
+  }
+
   # Prepare the information needed to filter the data --------------------------
 
   # Extract the column number containing the identifiers.
@@ -462,12 +470,30 @@ applyFilt.rmdFilt <- function (filter_object, omicsData,
 
   }
 
+  # Check if pvalue_threshold is numeric.
+  if (!is.numeric(pvalue_threshold)) {
+
+    # User. It is very aggravating trying to figure out all the ways you can
+    # screw up the analysis and write checks for them.
+    stop ("value_threshold must be numeric.")
+
+  }
+
   # check that pvalue_threshold is between 0 and 1 #
   if (pvalue_threshold < 0 || pvalue_threshold > 1) {
 
     # Figuratively smack the user with an error for not knowing what a p-value
     # is (or what values it can take).
     stop ("pvalue_threshold must be between 0 and 1.")
+
+  }
+
+  # Check that min_num_biomolecules is numeric.
+  if (!is.numeric(min_num_biomolecules)) {
+
+    # User. I am too tired to continue writing snide remarks about you and all
+    # the pain you cause me.
+    stop ("min_num_biomolecules must be numeric.")
 
   }
 
@@ -670,6 +696,17 @@ applyFilt.proteomicsFilt <- function (filter_object,
 
       # Warn the user of their treachery with an error.
       stop ("min_num_peps must be of length 1")
+
+    }
+
+    # Check if min_num_peps is numeric.
+    if (!is.numeric(min_num_peps)) {
+
+      # Am still wondering why someone would make an obviously numeric input a
+      # character string. Oh well. Hope this error brings everything crashing
+      # down around them. Maybe they can build something slightly useful from
+      # the ruins.
+      stop ("min_num_peps must be numeric.")
 
     }
 
@@ -893,6 +930,7 @@ applyFilt.proteomicsFilt <- function (filter_object,
 #' @rdname applyFilt
 applyFilt.imdanovaFilt <- function (filter_object,
                                     omicsData,
+                                    comparisons = NULL,
                                     min_nonmiss_anova = NULL,
                                     min_nonmiss_gtest = NULL,
                                     remove_singleton_groups = TRUE) {
@@ -926,7 +964,7 @@ applyFilt.imdanovaFilt <- function (filter_object,
 
     # Throw an error for too few samples to run an imdanova filter.
     stop (paste("An IMD-ANOVA filter cannot be used because there is only one",
-                "non-singleton group and the data are not paired.",
+                "non-singleton group.",
                 sep = " "))
 
   }
@@ -967,6 +1005,30 @@ applyFilt.imdanovaFilt <- function (filter_object,
 
   #### End object creation for preliminary checking purposes. ####
 
+  # Check that comparisons is a data frame with appropriate group names.
+  if (!is.null(comparisons)) {
+
+    # Check that comparisons is a data frame.
+    if (class(comparisons) != "data.frame") {
+
+      # I am at a loss for words. That doesn't happen very often when I am
+      # writing comments in my code.
+      stop ("comparisons must be a data frame.")
+
+    }
+
+    # Check that the groups specified are present in f_data.
+    if (!all(unlist(comparisons, use.names = FALSE) %in% groupDF$Group)) {
+
+      # Trying to compare groups that don't exist? ... Huh?
+      stop (
+        "One or more groups specified in comparisons do not exist in f_data."
+      )
+
+    }
+
+  }
+
   # Check if min_nonmiss_anova is present.
   if (!is.null(min_nonmiss_anova)) {
 
@@ -975,6 +1037,14 @@ applyFilt.imdanovaFilt <- function (filter_object,
 
       # Warn the user of their treachery with an error.
       stop ("min_nonmiss_anova must be of length 1")
+
+    }
+
+    # Check if min_nonmiss_anova is numeric.
+    if (!is.numeric(min_nonmiss_anova)) {
+
+      # ...
+      stop ("min_nonmiss_anova must be numeric.")
 
     }
 
@@ -1004,6 +1074,14 @@ applyFilt.imdanovaFilt <- function (filter_object,
 
       # Warn the user of their treachery with an error.
       stop ("min_nonmiss_gtest must be of length 1")
+
+    }
+
+    # Check if min_nonmiss_gtest is numeric.
+    if (!is.numeric(min_nonmiss_gtest)) {
+
+      # Inconceivable!!!
+      stop ("min_nonmiss_gtest must be numeric.")
 
     }
 
