@@ -7,6 +7,7 @@ effects)}
 \usage{
 anova_test(
   omicsData,
+  groupData,
   comparisons,
   pval_adjust,
   pval_thresh,

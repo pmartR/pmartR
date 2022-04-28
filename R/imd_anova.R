@@ -117,7 +117,6 @@ imd_anova <- function (omicsData,
   test_method <- try(match.arg(tolower(test_method),
                                c("combined", "gtest", "anova")),
                      silent = TRUE)
-
   if(!(test_method%in%c("combined","gtest","anova"))){
     #If test-method isn't valid, stop and tell them
     stop("Provided 'test_method' argument is invalid, please select 'anova','gtest' or 'combined'.")
@@ -188,18 +187,28 @@ imd_anova <- function (omicsData,
   # Farm boy, check the inputs. Farm boy, fix all the problems. Farm boy, hurry
   # up. Farm boy, why is the user an idiot? Farm boy, make everything uniform.
   # Farm boy, do all the tedious crap. AS YOU WISH!
-  if (!pval_adjust_a %in% c("bonferroni", "holm", "tukey", "dunnett", "none")) {
+  pval_adjust_a <- try(
+    match.arg(tolower(pval_adjust_a),
+              c("bonferroni", "tukey", "dunnett", "holm", "none")),
+    silent = TRUE
+  )
+  if (class(pval_adjust_a) == 'try-error') {
 
     # I clearly told you what you could choose from in the documentation.
     # Obviously it is too much to ask for you to read the instructions!
     stop (
       paste("The available options for pval_adjust_a are: 'bonferroni',",
-      "'holm', 'tukey', 'dunnett', and 'none'.",
+            "'holm', 'tukey', 'dunnett', and 'none'.",
             sep = " ")
     )
 
   }
-  if (!pval_adjust_g %in% c("bonferroni", "holm", "none")) {
+  pval_adjust_g <- try(
+    match.arg(tolower(pval_adjust_g),
+              c("bonferroni", "holm", "none")),
+    silent = TRUE
+  )
+  if (class(pval_adjust_g) == 'try-error') {
 
     # I cannot make this any easier for you. Please seek the help you
     # desperately need.
@@ -210,7 +219,6 @@ imd_anova <- function (omicsData,
     )
 
   }
-
 
   # Have a looksie at the covariates argument.
   if (!is.null(covariates)) {
@@ -297,6 +305,7 @@ imd_anova <- function (omicsData,
       # NOTE: The code below doesn't do what the comments above say they want
       # done.
       imd_results_full <- imd_test(omicsData,
+                                   groupData = groupData,
                                    comparisons = NULL, # This actually performs all pairwise comparisons.
                                    pval_adjust = 'none',
                                    pval_thresh = pval_thresh,
@@ -312,6 +321,7 @@ imd_anova <- function (omicsData,
 
   }else{
     imd_results_full <- imd_test(omicsData,
+                                 groupData = groupData,
                                  comparisons = comparisons,
                                  pval_adjust = pval_adjust_g,
                                  pval_thresh = pval_thresh,
@@ -333,6 +343,7 @@ imd_anova <- function (omicsData,
     #If they only want the g-test, used anova_test to compute means, fold changes but
     #don't return flags or p-values
     anova_results_full <- anova_test(omicsData,
+                                     groupData = groupData,
                                      comparisons = comparisons,
                                      pval_adjust = 'none',
                                      pval_thresh = pval_thresh,
@@ -342,6 +353,7 @@ imd_anova <- function (omicsData,
                                      use_parallel = use_parallel)
   }else{
     anova_results_full <- anova_test(omicsData,
+                                     groupData = groupData,
                                      comparisons = comparisons,
                                      pval_adjust = pval_adjust_a,
                                      pval_thresh = pval_thresh,
@@ -593,18 +605,9 @@ imd_anova <- function (omicsData,
 #'   identification of significant peptides from MS-based proteomics data."
 #'   Journal of proteome research 9.11 (2010): 5748-5756.
 #'
-anova_test <- function (omicsData, comparisons, pval_adjust, pval_thresh,
-                        covariates, paired, equal_var, use_parallel) {
-
-  # check that omicsData is of the appropriate class
-  if(!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData", "nmrData"))) stop("omicsData must be of class 'pepData', 'proData', 'metabData', 'lipidData', or 'nmrData'.")
-
-  # Check for group_DF attribute #
-  if(!("group_DF" %in% names(attributes(omicsData)))){
-    stop("group_designation must be called in order to create a 'group_DF' attribute for omicsData.")
-  }else{
-    groupData <- attributes(omicsData)$group_DF
-  }
+anova_test <- function (omicsData, groupData, comparisons, pval_adjust,
+                        pval_thresh, covariates, paired, equal_var,
+                        use_parallel) {
 
   #Catch if number of groups is too small
   k <- length(unique(groupData$Group))
@@ -1143,18 +1146,8 @@ paired_test <- function (data, bio_ids, cutoff, use_parallel) {
 #' identification of significant peptides from MS-based proteomics data."
 #' Journal of proteome research 9.11 (2010): 5748-5756.
 #'
-imd_test <- function (omicsData, comparisons, pval_adjust,
+imd_test <- function (omicsData, groupData, comparisons, pval_adjust,
                       pval_thresh, covariates, paired, use_parallel) {
-
-  # check that omicsData is of the appropriate class
-  if(!inherits(omicsData, c("proData","pepData","lipidData", "metabData", "nmrData"))) stop("omicsData is not an object of appropriate class")
-
-  # Check for group_DF attribute #
-  if(!("group_DF" %in% names(attributes(omicsData)))){
-    stop("group_designation must be called in order to create a 'group_DF' attribute for omicsData.")
-  }else{
-    groupData <- attributes(omicsData)$group_DF
-  }
 
   #Catch if number of groups is too small
   k <- length(unique(groupData$Group))
@@ -1316,17 +1309,6 @@ imd_test <- function (omicsData, comparisons, pval_adjust,
   }
 
   # P-value adjustment ---------------------------------------------------------
-
-  #Match provided 'pval_adjust' to available options
-  pval_adjust <- try(match.arg(tolower(pval_adjust),c("holm","bonferroni","none","tukey","dunnett")),silent=TRUE)
-
-  if(class(pval_adjust)=='try-error')
-    stop("Provided 'pval_adjust' argument is invalid, please select 'holm', 'bonferroni', 'tukey', 'dunnett' or 'none'.")
-
-  if(pval_adjust%in%c("tukey","dunnett")){
-    warning("Tukey and Dunnett corrections aren't available for the IMD test, replaced by Holm")
-    pval_adjust <- 'holm'
-  }
 
   #Implement Bonferonni correction by multiplying by number of tests if requested, otherwise do nothing
 
@@ -1721,18 +1703,8 @@ create_c_matrix <- function(group_df,to_compare_df=NULL){
 #'
 #' @author Bryan Stanfill
 #'
-p_adjustment_anova <- function(p_values = NULL,
-                               diff_mean = NULL,
-                               t_stats = NULL,
-                               sizes = NULL,
-                               pval_adjust = "None"){
-
-  #Match provided 'pval_adjust' to available options
-  pval_adjust <- try(match.arg(tolower(pval_adjust),c("bonferroni","none","tukey","dunnett","holm")),silent=TRUE)
-
-  if(class(pval_adjust)=='try-error')
-    stop("Provided 'pval_adjust' argument is invalid, please select 'holm', 'bonferroni', 'tukey', 'dunnett' or 'none'.")
-
+p_adjustment_anova <- function (p_values, diff_mean, t_stats,
+                                sizes, pval_adjust) {
 
   if(pval_adjust=="tukey" | pval_adjust=="dunnett"){
 
