@@ -4,13 +4,7 @@
 \alias{p_adjustment_anova}
 \title{Adjust p-values for multiple comparisons}
 \usage{
-p_adjustment_anova(
-  p_values = NULL,
-  diff_mean = NULL,
-  t_stats = NULL,
-  sizes = NULL,
-  pval_adjust = "None"
-)
+p_adjustment_anova(p_values, diff_mean, t_stats, sizes, pval_adjust)
 }
 \arguments{
 \item{p_values}{A matrix (or \code{data.frame}) of p-values to be adjusted.}
