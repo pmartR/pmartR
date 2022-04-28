@@ -50,7 +50,21 @@ bpquant<- function (statRes, pepData, pi_not = .9,
                     max_proteoforms = 5, parallel = TRUE) {
 
   #some checks
+
+  if (!is.numeric(pi_not)) {
+
+    # Again! When will you look at the examples and follow them?
+    stop ("pi_not must be numeric.")
+
+  }
   if(pi_not < 0 || pi_not > 1) stop("pi_not must be between 0 and 1")
+
+  if (!is.numeric(max_proteoforms)) {
+
+    # Hmmmmm. I can totally see that a number should be input as a character.
+    stop ("max_proteoforms must be numeric.")
+
+  }
   if(max_proteoforms <= 0) stop("max_proteoforms must be 1 or greater")
 
   if(!inherits(statRes, "statRes")) stop("statRes must be an object of class statRes")
