@@ -50,6 +50,10 @@ molecule_filter <- function (omicsData,use_groups = FALSE, use_batch = FALSE) {
                 sep = ' '))
   }
 
+  # Make sure the arguemnts are logical.
+  if (!is.logical(use_groups)) stop ("use_groups must be logical.")
+  if (!is.logical(use_batch)) stop ("use_batch must be logical.")
+
   # check that omicsData has batch_id data if specified
   if(is.null(attributes(attr(omicsData,"group_DF"))$batch_id) && use_batch == TRUE){
     stop (paste("omicsData must have batch_id specified if use_batch = TRUE"))
@@ -1364,9 +1368,9 @@ imdanova_filter <- function (omicsData) {
 
   } else { # end of if-statement for the presence of TimeCourse variable
 
-    # Count the number of nonmissing elements per group per biomolecule. For
-    # example if group A has 5 samples and 4 of the samples have missing values
-    # then the count for group A will be 1.
+    # Count the number of non-missing values for all groups. For example, if
+    # group A has 5 samples and 4 of the samples have missing values then the
+    # count for group A will be 1.
     nonmiss_per_group <- nonmissing_per_group(omicsData = omicsData)
 
     # Extract the data frame that contains a column for the biomolecule IDs and
@@ -1374,7 +1378,6 @@ imdanova_filter <- function (omicsData) {
     output <- nonmiss_per_group$nonmiss_totals
 
   } # end of else-stament for the absence of TimeCourse variable
-
 
   # remove columns of output that correspond to any singleton groups present #
   singleton_groups <- setdiff(unique(groupDF$Group),
