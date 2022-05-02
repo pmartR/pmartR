@@ -2035,37 +2035,9 @@ pmartR_filter_worker <- function (filter_object, omicsData) {
 #'
 #' @author Kelly Stratton
 #'
-#' @export
-#'
 anova_filter <- function (nonmiss_per_group,
                           min_nonmiss_anova,
                           comparisons) {
-
-  # check that min_nonmiss_anova is of length 1 #
-  if (length(min_nonmiss_anova) != 1) {
-
-    # Warn the user of their treachery with an error.
-    stop ("min_nonmiss_anova must be of length 1")
-
-  }
-
-  # min_nonmiss_anova must be >=2
-  if (!is.null(min_nonmiss_anova)) {
-
-    if (min_nonmiss_anova < 2) {
-
-      stop ("min_nonmiss_anova must be >=2")
-
-    }
-
-  }
-
-  # check that nonmiss_per_group is a list of length 2 #
-  if (!inherits(nonmiss_per_group, "list") || length(nonmiss_per_group) != 2) {
-
-    stop ("nonmiss_per_group must be a list of length 2.")
-
-  }
 
   # Check if there is only one group. This is possible because we allow paired
   # data to have no main effects. If this is the case we need to filter the rows
@@ -2232,37 +2204,9 @@ anova_filter <- function (nonmiss_per_group,
 #'
 #' @author Kelly Stratton
 #'
-#' @export
-#'
 gtest_filter <- function (nonmiss_per_group,
                           min_nonmiss_gtest,
                           comparisons) {
-
-  # check that min_nonmiss_gtest is of length 1 #
-  if (length(min_nonmiss_gtest) != 1) {
-
-    # Warn the user of their treachery with an error.
-    stop ("min_nonmiss_gtest must be of length 1")
-
-  }
-
-  # min_nonmiss_gtest must be >=2
-  if (!is.null(min_nonmiss_gtest)) {
-
-    if (min_nonmiss_gtest < 2) {
-
-      stop ("min_nonmiss_gtest must be >=2")
-
-    }
-
-  }
-
-  # check that nonmiss_per_group is a list of length 2 #
-  if (!inherits(nonmiss_per_group, "list") || length(nonmiss_per_group) != 2) {
-
-    stop ("nonmiss_per_group must be a list of length 2.")
-
-  }
 
   if (is.null(comparisons)) {
 
