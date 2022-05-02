@@ -28,6 +28,7 @@ applyFilt(filter_object, omicsData, ...)
 \method{applyFilt}{imdanovaFilt}(
   filter_object,
   omicsData,
+  comparisons = NULL,
   min_nonmiss_anova = NULL,
   min_nonmiss_gtest = NULL,
   remove_singleton_groups = TRUE

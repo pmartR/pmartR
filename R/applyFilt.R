@@ -1295,22 +1295,26 @@ applyFilt.imdanovaFilt <- function (filter_object,
   if (filter_method == "anova") {
 
     filter.edata <- anova_filter(nonmiss_per_group = nonmiss_per_group,
-                                 min_nonmiss_anova = min_nonmiss_anova)
+                                 min_nonmiss_anova = min_nonmiss_anova,
+                                 comparisons = comparisons)
 
   } else if (filter_method == "gtest") {
 
     filter.edata <- gtest_filter(nonmiss_per_group = nonmiss_per_group,
-                                 min_nonmiss_gtest = min_nonmiss_gtest)
+                                 min_nonmiss_gtest = min_nonmiss_gtest,
+                                 comparisons = comparisons)
 
   } else if(filter_method == "combined") {
 
     # Run the gtest filter.
     filter.edata.gtest <- gtest_filter(nonmiss_per_group = nonmiss_per_group,
-                                       min_nonmiss_gtest = min_nonmiss_gtest)
+                                       min_nonmiss_gtest = min_nonmiss_gtest,
+                                       comparisons = comparisons)
 
     # Run the anova filter.
     filter.edata.anova <- anova_filter(nonmiss_per_group = nonmiss_per_group,
-                                       min_nonmiss_anova = min_nonmiss_anova)
+                                       min_nonmiss_anova = min_nonmiss_anova,
+                                       comparisons = comparisons)
 
     # Only filter samples found in both filters.
     filter.edata <- intersect(filter.edata.anova, filter.edata.gtest)
@@ -2002,6 +2006,11 @@ pmartR_filter_worker <- function (filter_object, omicsData) {
 #'   required, in each group, in order for the biomolecule to not be filtered.
 #'   Must be greater than or equal to 2; default value is 2.
 #'
+#' @param comparisons data.frame with columns for "Control" and "Test"
+#'   containing the different comparisons of interest. Comparisons will be made
+#'   between the Test and the corresponding Control. If left NULL, then all
+#'   pairwise comparisons are executed.
+#'
 #' @details This function filters biomolecules that do not have at least
 #'   \code{min.nonmiss.allowed} values per group, where groups are from
 #'   \code{group_designation}.
@@ -2029,7 +2038,8 @@ pmartR_filter_worker <- function (filter_object, omicsData) {
 #' @export
 #'
 anova_filter <- function (nonmiss_per_group,
-                          min_nonmiss_anova = 2) {
+                          min_nonmiss_anova,
+                          comparisons) {
 
   # check that min_nonmiss_anova is of length 1 #
   if (length(min_nonmiss_anova) != 1) {
@@ -2064,29 +2074,113 @@ anova_filter <- function (nonmiss_per_group,
 
     # Remove any rows that fall below the specified threshold. There are no main
     # effects in this scenario so there is only one group.
-    inds_rm <- which(
-      nonmiss_per_group$nonmiss_totals[, "paired_diff"] < min_nonmiss_anova
-    )
+    junk <- nonmiss_per_group$nonmiss_totals %>%
+      # Keep rows that fall below the cutoff. These will be removed in the
+      # applyFilt function.
+      dplyr::filter(paired_diff < min_nonmiss_anova) %>%
+      # Nab the biomolecule IDs that will be removed.
+      dplyr::pull(1) %>%
+      # Convert to a character string. Why? Because it was done in the past so
+      # I am doing it now. That's why!
+      as.character()
 
+    # The code below runs where there is more than one group (one or more main
+    # effects exist).
   } else {
 
-    # Remove the column with the biomolecule IDs and any columns that have an NA
-    # as the column name. Then sum (by row) the number of groups that meet the
-    # non-missing per group requirement. Then extract the rows that do not meet
-    # the requirement of at least two groups with non-missing counts higher than
-    # the threshold. These are the rows that will be filtered out later.
-    inds_rm <- which(rowSums(
-      nonmiss_per_group$nonmiss_totals[, -c(
-        1,
-        which(names(nonmiss_per_group$nonmiss_totals) %in%
-                c(NA, "<NA>", "NA.", "NA"))
-      )] >= min_nonmiss_anova
-    ) < 2)
+    # dplyr mumbo jumbo!
+    junk <- nonmiss_per_group$nonmiss_totals %>%
+      # Don't know why there would be columns with these names but I am
+      # including the following line just in case. (This was in the previous
+      # version of this function.)
+      dplyr::select(-dplyr::any_of(c("<NA>", "NA.", "NA"))) %>%
+      # Determine which groups have non-missing counts above the cutoff.
+      dplyr::mutate(dplyr::across(-1, ~ . >= min_nonmiss_anova))
+
+    # Check if comparisons is specified and filter the data accordingly. If
+    # comparisons were specified determine if one group will be compared to
+    # multiple other groups. The filtering needs to be done differently if this
+    # is the case.
+    if (is.null(comparisons)) {
+
+      # Remove rows with less than two groups with counts above the cutoff.
+      junk <- junk %>%
+        # Count the number of groups above the cutoff.
+        dplyr::mutate(n_groups = rowSums(dplyr::across(-1))) %>%
+        # Remove rows with fewer than two groups with non-missing values above
+        # the cutoff.
+        dplyr::filter(n_groups < 2) %>%
+        # Nab the biomolecule IDs slated for the slaughterhouse.
+        dplyr::pull(1) %>%
+        # Convert to a character string. Why? Because it was done in the past so
+        # I am doing it now. That's why!
+        as.character()
+
+      # The following code runs when custom comparisons are specified.
+    } else {
+
+      # Grab the groups in the Test and Control columns.
+      testers <- unique(comparisons$Test)
+      controllers <- unique(comparisons$Control)
+      combiners <- unique(c(testers, controllers))
+
+      # Sum across the unique groups in test, control, and combined (the unique
+      # set of groups from both test and control). This will be used to
+      # determine which rows need to be filtered depending on which scenario we
+      # are in. Remember the rows that are kept in this function are the rows
+      # that will be removed in applyFilt.
+      junk <- junk %>%
+        dplyr::mutate(
+          n_test = rowSums(dplyr::across(dplyr::all_of(testers))),
+          n_control = rowSums(dplyr::across(dplyr::all_of(controllers))),
+          n_combine = rowSums(dplyr::across(dplyr::all_of(combiners)))
+        )
+
+      # Scenario 1: one group is compared to multiple other groups.
+      if (length(controllers) == 1) {
+
+        junk <- junk %>%
+          # Filter rows without any groups above the cutoff in test or control.
+          #
+          # In other words, we can't test one thing against nothing :)
+          dplyr::filter(n_test == 0 | n_control == 0) %>%
+          # Nab the biomolecule IDs that will get the axe.
+          dplyr::pull(1) %>%
+          # Convert to a character string. Why? Because it was done in the past
+          # so I am doing it now. That's why!
+          as.character()
+
+        # Scenario 2: Some groups are compared to some other groups. In this
+        # scenario a group can be in both test and control.
+      } else {
+
+        junk <- junk %>%
+          # Filter rows without any groups above the cutoff in control or test
+          # and rows where there is at least one group in test or control but
+          # the count of combined groups is less than two. This is the scenario
+          # where only one group is above the cutoff but it is in both test and
+          # control.
+          #
+          # In other words, we can't test one thing against nothing nor can we
+          # test one thing against itself :)
+          dplyr::filter(
+            (n_test == 0 | n_control == 0) |
+              (n_test > 0 & n_control > 0 & n_combine < 2)
+          ) %>%
+          # Nab the biomolecule IDs that will get the axe.
+          dplyr::pull(1) %>%
+          # Convert to a character string. Why? Because it was done in the past
+          # so I am doing it now. That's why!
+          as.character()
+
+      }
+
+    }
 
   }
 
-  # get names of biomolecules to be filtered
-  return (as.character(nonmiss_per_group$nonmiss_totals[inds_rm, 1]))
+  # Return the IDs of the biomolecules that will be filtered in applyFilt.
+  return (junk)
 
 }
 
@@ -2103,6 +2197,11 @@ anova_filter <- function (nonmiss_per_group,
 #'
 #' @param min_nonmiss_gtest the minimum number of non-missing peptide values
 #'   allowed in a minimum of one group. Default value is 3.
+#'
+#' @param comparisons data.frame with columns for "Control" and "Test"
+#'   containing the different comparisons of interest. Comparisons will be made
+#'   between the Test and the corresponding Control. If left NULL, then all
+#'   pairwise comparisons are executed.
 #'
 #' @details Two methods are available for determining the peptides to be
 #'   filtered. The naive approach is based on \code{min.nonmiss.allowed}, and
@@ -2136,7 +2235,8 @@ anova_filter <- function (nonmiss_per_group,
 #' @export
 #'
 gtest_filter <- function (nonmiss_per_group,
-                          min_nonmiss_gtest = 3) {
+                          min_nonmiss_gtest,
+                          comparisons) {
 
   # check that min_nonmiss_gtest is of length 1 #
   if (length(min_nonmiss_gtest) != 1) {
@@ -2164,22 +2264,48 @@ gtest_filter <- function (nonmiss_per_group,
 
   }
 
-  # remove the column with Peptide info and any NA's
-  # for each peptide/row, need max(nonmiss_per_group$nonmiss_totals[,-1]) to be
-  # >= min_nonmiss_gtest
-  trueFalse <- apply(
-    nonmiss_per_group$nonmiss_totals[, -c(
-      1,
-      which(names(nonmiss_per_group$nonmiss_totals) %in%
-              c(NA, "<NA>", "NA.", "NA"))
-    ), drop = FALSE],
-    1,
-    function (x) max(x) >= min_nonmiss_gtest
-  )
+  if (is.null(comparisons)) {
 
-  # Extract the biomolecule IDs corresponding to counts that fall below the
-  # minimum. These are the biomolecules that will be filtered out.
-  return (as.character(nonmiss_per_group$nonmiss_totals[!trueFalse, 1]))
+    # dplyr mumbo jumbo!
+    junk <- nonmiss_per_group$nonmiss_totals %>%
+      # Don't know why there would be columns with these names but I am
+      # including the following line just in case. (This was in the previous
+      # version of this function.)
+      dplyr::select(-dplyr::any_of(c("<NA>", "NA.", "NA"))) %>%
+      # Determine which groups have non-missing counts above the cutoff.
+      dplyr::mutate(
+        nuff = purrr::pmap(dplyr::across(-1), max) >= min_nonmiss_gtest
+      ) %>%
+      # Keep the rows that do not have counts >= the cutoff.
+      dplyr::filter(!nuff) %>%
+      # Grab the biomolecule IDs that will be removed under the cover of dark.
+      dplyr::pull(1) %>%
+      # Convert the IDs to a character string prior to their demise.
+      as.character()
+
+  } else {
+
+    # Grab the groups in both the Test and Control columns.
+    combiners <- unique(c(comparisons$Test, comparisons$Control))
+
+    # dplyr mumbo jumbo!
+    junk <- nonmiss_per_group$nonmiss_totals %>%
+      # Determine which groups have non-missing counts above the cutoff.
+      dplyr::mutate(
+        nuff = purrr::pmap(dplyr::across(dplyr::all_of(combiners)),
+                           max) >= min_nonmiss_gtest
+      ) %>%
+      # Keep the rows that do not have counts >= the cutoff.
+      dplyr::filter(!nuff) %>%
+      # Grab the biomolecule IDs that will be removed under the cover of dark.
+      dplyr::pull(1) %>%
+      # Convert the IDs to a character string prior to their demise.
+      as.character()
+
+  }
+
+  # Return the biomolecule IDs that will be filtered out.
+  return (junk)
 
 }
 
