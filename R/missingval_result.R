@@ -49,22 +49,22 @@ missingval_result<- function(omicsData){
   # fdata_cname<- attr(omicsData, "cnames")$fdata_cname
   fdata_cname<- get_fdata_cname(omicsData)
   
-  # Count the number of NA values per column.
+  # Count the number of NA or zeros values per column.
   if(inherits(omicsData, "seqData")){
-    na_per_col<- colSums((omicsData$e_data[, -edata_cname_id]) == 0)
-    na_by_sample<- data.frame(
+    res_per_col<- colSums((omicsData$e_data[, -edata_cname_id]) == 0)
+    res_by_sample<- data.frame(
       "sample_names" = names(omicsData$e_data[, -edata_cname_id]),
-      "num_zeros" = as.numeric(na_per_col)
+      "num_zeros" = as.numeric(res_per_col)
     )
   } else {
-    na_per_col<- colSums(is.na(omicsData$e_data[, -edata_cname_id]))
-    na_by_sample<- data.frame(
+    res_per_col<- colSums(is.na(omicsData$e_data[, -edata_cname_id]))
+    res_by_sample<- data.frame(
       "sample_names" = names(omicsData$e_data[, -edata_cname_id]),
-      "num_NA" = as.numeric(na_per_col)
+      "num_NA" = as.numeric(res_per_col)
     )
   }
   
-  names(na_by_sample)[1] <- fdata_cname
+  names(res_by_sample)[1] <- fdata_cname
   
   # Merge res_by_sample with f_data to get additional columns of f_data. For
   # example, the Group and VizSampNames columns. Group is used to color the plot
@@ -82,30 +82,31 @@ missingval_result<- function(omicsData){
   }
   
   # Count the number of NA values per row.
-  na_per_row <- rowSums(is.na(omicsData$e_data[, -edata_cname_id]))
   
-  na_by_molecule <- data.frame("molecule"= omicsData$e_data[, edata_cname_id],
-                              "num_NA"= as.numeric(na_per_row))
   if(inherits(omicsData, "seqData")){
     
-    na_by_molecule <- data.frame("molecule"= omicsData$e_data[, edata_cname_id],
-                                 "num_zeros"= as.numeric(na_per_row))
-    names(na_by_molecule)[1] <- edata_cname
+    res_per_row <- rowSums(omicsData$e_data[, -edata_cname_id] == 0)
     
-    result<- list("zeros.by.sample" = na_by_sample,
-                  "zeros.by.molecule" = na_by_molecule)
+    res_by_molecule <- data.frame("molecule"= omicsData$e_data[, edata_cname_id],
+                                 "num_zeros"= as.numeric(res_per_row))
+    names(res_by_molecule)[1] <- edata_cname
+    
+    result<- list("zeros.by.sample" = res_by_sample,
+                  "zeros.by.molecule" = res_by_molecule)
     class(result) <- "naRes"
     
     attr(result, "cnames") <- list("edata_cname" = edata_cname,
                                    "fdata_cname" = fdata_cname)
     
   } else {
-    na_by_molecule <- data.frame("molecule"= omicsData$e_data[, edata_cname_id],
-                                 "num_NA"= as.numeric(na_per_row))
-    names(na_by_molecule)[1] <- edata_cname
     
-    result<- list("na.by.sample" = na_by_sample,
-                  "na.by.molecule" = na_by_molecule)
+    res_per_row <- rowSums(is.na(omicsData$e_data[, -edata_cname_id]))
+    res_by_molecule <- data.frame("molecule"= omicsData$e_data[, edata_cname_id],
+                                 "num_NA"= as.numeric(res_per_row))
+    names(res_by_molecule)[1] <- edata_cname
+    
+    result<- list("na.by.sample" = res_by_sample,
+                  "na.by.molecule" = res_by_molecule)
     class(result) <- "naRes"
     
     attr(result, "cnames") <- list("edata_cname" = edata_cname,
