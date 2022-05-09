@@ -1557,16 +1557,10 @@ plot.corRes <- function (corRes_obj, omicsData = NULL, order_by = NULL,
   legendLabel <- if (is.null(legend_lab)) "Correlation" else legend_lab
   if (is.null(title_lab)) {
 
-    # Determine the plot's title based on whether the data have been normalized.
-    if (attributes(corRes_obj)$is_normalized) {
-
-      plotTitle <- "Correlations Among Samples (Normalized Data)"
-
-    } else {
-
-      plotTitle <- "Correlations Among Samples (Un-Normalized Data)"
-
-    }
+    # include correlation method in title
+    plotTitle <- paste0("Correlations Among Samples (", 
+                         str_to_title(attr(corRes_obj, "cor_method")), 
+                         ")")
 
     # Runs when title_lab is not NULL (the user specified title).
   } else {
@@ -1840,12 +1834,6 @@ plot.dimRes <- function (dimRes_obj, interactive = FALSE, x_lab = NULL,
 
   }
 
-  # axis labels #
-  xr2 <- paste(" = ", round(attr(dimRes_obj, "R2")[1],3), ")", sep = "")
-  yr2 <- paste(" = ", round(attr(dimRes_obj, "R2")[2],3), ")", sep = "")
-  pc1 <- "PC1 ("
-  pc2 <- "PC2 ("
-
   # custom legend names #
   if(!is.null(legend_lab)) {
     # make the vector at least length 2 to avoid errors in the plot
@@ -1854,7 +1842,11 @@ plot.dimRes <- function (dimRes_obj, interactive = FALSE, x_lab = NULL,
   }
 
   # title #
-  plot_title <- ifelse(is.null(title_lab), "Principal Components", title_lab)
+  title_default <- ifelse(is.null(attr(dimRes_obj, "R2")), 
+                          "Principal Components (GLM-PCA)",
+                          "Principal Components")
+  
+  plot_title <- ifelse(is.null(title_lab), title_default, title_lab)
 
   # Construct impressive plots -------------------------------------------------
 
@@ -1868,24 +1860,31 @@ plot.dimRes <- function (dimRes_obj, interactive = FALSE, x_lab = NULL,
   # Evan, make me a plot with the black and white theme. As you wish.
   if (bw_theme) p <- p + ggplot2::theme_bw()
 
-  # Create objects for the percent variation for PC1 and PC2
-  pc1 <- round(attr(dimRes_obj, "R2")[1], 3)
-  pc2 <- round(attr(dimRes_obj, "R2")[2], 3)
-
-  # Tedious label making crap.
-  # These two lines don't currently work as intended. They display R^2 without
-  # the 2 as a superscript. However, the label cannot be created with substitute
-  # because it throws an error when converting to an interactive plot.
-  x_lab <- if (is.null(x_lab)) paste0("PC1 (",
-                                      expression(R^2),
-                                      " = ",
-                                      pc1,
-                                      ")") else x_lab
-  y_lab <- if (is.null(y_lab)) paste0("PC2 (",
-                                      expression(R^2),
-                                      " = ",
-                                      pc2,
-                                      ")") else y_lab
+  if(is.null(attr(dimRes_obj, "R2"))){
+    
+    x_lab <- ifelse(is.null(x_lab), "PC1",  x_lab)
+    y_lab <- ifelse(is.null(y_lab), "PC2", y_lab)
+    
+  } else {
+    # Create objects for the percent variation for PC1 and PC2
+    pc1 <- round(attr(dimRes_obj, "R2")[1], 3)
+    pc2 <- round(attr(dimRes_obj, "R2")[2], 3)
+    
+    # Tedious label making crap.
+    # These two lines don't currently work as intended. They display R^2 without
+    # the 2 as a superscript. However, the label cannot be created with substitute
+    # because it throws an error when converting to an interactive plot.
+    x_lab <- if (is.null(x_lab)) paste0("PC1 (",
+                                        expression(R^2),
+                                        " = ",
+                                        pc1,
+                                        ")") else x_lab
+    y_lab <- if (is.null(y_lab)) paste0("PC2 (",
+                                        expression(R^2),
+                                        " = ",
+                                        pc2,
+                                        ")") else y_lab
+  }
 
   # Add labels and thematic elements.
   p <- p +
@@ -2187,6 +2186,212 @@ plot.moleculeFilt <- function (filter_obj, min_num = NULL, cumulative = TRUE,
 
   return (p)
 
+}
+
+
+#' plot.totalCountFilt
+#'
+#' For plotting an S3 object of type 'totalCountFilt':
+#'
+#' @param filter_obj An object of class totalCountFilt that contains the molecule
+#'   identifier and the number of total counts for which the molecule was measured
+#'   (not NA).
+#' @param min_count An integer specifying the minimum number of samples in which a
+#'   biomolecule must appear. If a value is specified, a horizontal line will be
+#'   drawn when \code{cumulative=TRUE}, and bars will be colored appropriately
+#'   if \code{cumulative=FALSE}.  Defaults to NULL.
+#' @param cumulative logical indicating whether the number of biomolecules
+#'   observed in \emph{at least} (TRUE) x number of samples or \emph{exactly}
+#'   (FALSE) x number of samples should be plotted.  Defaults to TRUE.
+#'
+#' @param interactive Logical. If TRUE produces an interactive plot.
+#' @param x_lab A character string specifying the x-axis label.
+#' @param y_lab A character string specifying the y-axis label. The default is
+#'   NULL in which case the y-axis label will be the metric selected for the
+#'   \code{metric} argument.
+#' @param x_lab_size An integer value indicating the font size for the x-axis.
+#'   The default is 11.
+#' @param y_lab_size An integer value indicating the font size for the y-axis.
+#'   The default is 11.
+#' @param x_lab_angle An integer value indicating the angle of x-axis labels.
+#'   The default is 0.
+#' @param title_lab A character string specifying the plot title.
+#' @param title_lab_size An integer value indicating the font size of the plot
+#'   title. The default is 14.
+#' @param legend_lab A character string specifying the legend title.
+#' @param legend_position A character string specifying the position of the
+#'   legend. Can be one of "right", "left", "top", "bottom", or "none". The
+#'   default is "none".
+#' @param text_size An integer specifying the size of the text (number of
+#'   biomolecules by sample) within the bar plot. The default is 3.
+#' @param bar_width An integer indicating the width of the bars in the bar plot.
+#'   The default is 0.8.
+#' @param bw_theme Logical. If TRUE uses the ggplot2 black and white theme.
+#' @param palette A character string indicating the name of the RColorBrewer
+#'   palette to use. For a list of available options see the details section in
+#'   \code{\link[RColorBrewer]{RColorBrewer}}.
+#' @param log_total_counts Logical. Indicates if the X-axis should be on 
+#'   the log scale. The default is TRUE.
+#'
+#' @examples
+#' \dontrun{
+#' data(seq_object)
+#' seqfilt <- total_count_filter(pep_object)
+#' plot(seqfilt, min_count = 5)
+#' }
+#'
+#' @rdname plot-totalCountFilt
+#'
+#' @export
+#'
+plot.totalCountFilt <- function (filter_obj, min_count = NULL,
+                               interactive = FALSE, x_lab = NULL, y_lab = NULL,
+                               x_lab_size = 11, y_lab_size = 11,
+                               x_lab_angle = 0, title_lab = NULL,
+                               title_lab_size = 14, legend_lab = "",
+                               legend_position = "right", text_size = 3,
+                               bar_width = 0.8, bw_theme = TRUE,
+                               log_total_counts = TRUE,
+                               palette = NULL) {
+  
+  # Preliminaries --------------------------------------------------------------
+
+  # Have a looksie at the class of the filter object.
+  if (!inherits(filter_obj, "totalCountFilt")) {
+    
+    # Fezzik, tear his arms off.
+    stop ("filter_obj must be of class totalCountFilt")
+    
+  }
+  
+  # Make sure palette is one of the RColorBrewer options if it is not NULL.
+  if (!is.null(palette)) {
+    
+    if (!(palette %in% c("YlOrRd", "YlOrBr", "YlGnBu", "YlGn", "Reds","RdPu",
+                         "Purples", "PuRd", "PuBuGn", "PuBu", "OrRd","Oranges",
+                         "Greys", "Greens", "GnBu", "BuPu","BuGn","Blues",
+                         "Set3", "Set2", "Set1", "Pastel2", "Pastel1", "Paired",
+                         "Dark2", "Accent", "Spectral", "RdYlGn", "RdYlBu",
+                         "RdGy", "RdBu", "PuOr","PRGn", "PiYG", "BrBG"))) {
+      
+      # INCONCEIVABLE!!!
+      stop ("palette must be an RColorBrewer palette")
+      
+    }
+    
+  }
+  
+  # Forge sensational plots ----------------------------------------------------
+  
+  # make counts, colors, and plot shape based on value of cumulative
+  
+  # values that will be updated depending on input
+
+  counts <- cumsum(rev(table(filter_obj$Total_Counts)))
+  
+  # create plotting dataframe
+  observation_counts <- data.frame(
+    sum_counts = as.numeric(names(counts)),
+    n_biomolecules = as.numeric(counts),
+    color = if(!is.null(min_count)){
+      ifelse(
+        as.numeric(names(counts)) >= min_count,
+        "retained",
+        "dropped")
+      } else "default"
+    )
+  
+  ## Establish ggplot components
+  shape <- ggplot2::geom_line(
+    ggplot2::aes(x = sum_counts, y = n_biomolecules, color = color
+    ), show.legend = !is.null(min_count)
+  )
+  
+  if (!is.null(min_count)){
+    line <- ggplot2::geom_vline(xintercept = min_count)
+    retained_biomolecules <- min(as.numeric(names(counts))[as.numeric(names(counts)) > min_count])
+    retained_biomolecules <- as.numeric(counts[[as.character(retained_biomolecules)]])
+    point <- ggplot2::geom_point(x = ifelse(log_total_counts, 
+                                            log10(min_count), min_count),
+                                 y = retained_biomolecules, color = "black")
+    text <- ggplot2::geom_text(x = ifelse(log_total_counts, 
+                                          log10(min_count), min_count),
+                               y = retained_biomolecules, 
+                               label = paste0("Retained: ", retained_biomolecules),
+                               color = "black",
+                               hjust = -0.25,
+                               size = text_size
+                               )
+    if(interactive) text <- NULL
+  } else {
+    line <- NULL
+    point <- NULL
+    text <- NULL
+  }
+    
+  xlabel <- if (is.null(x_lab)) "Biomolecule Sum of Counts" else x_lab
+  ylabel <- ifelse(is.null(y_lab), "N Biomolecules", y_lab)
+  plot_title <- ifelse(
+    is.null(title_lab),
+    "N biomolecules observed with at least X total counts",
+    title_lab
+  )
+  
+  if(log_total_counts){
+    log <- ggplot2::scale_x_continuous(trans='log10')
+  } else log <- NULL
+  
+  # plot #
+  p <- ggplot2::ggplot(observation_counts) +
+    shape +
+    line +
+    point +
+    text +
+    log +
+    ggplot2::xlab(xlabel) +
+    ggplot2::ylab(ylabel) +
+    ggplot2::ggtitle(plot_title)
+  
+  # Evan, make me a plot with the black and white theme. As you wish.
+  if (bw_theme) p <- p + ggplot2::theme_bw()
+  
+  # Add the theme elements to the plot.
+  p <- p +
+    ggplot2::theme(
+      plot.title = ggplot2::element_text(size = title_lab_size),
+      axis.title.x = ggplot2::element_text(size = x_lab_size),
+      axis.title.y = ggplot2::element_text(size = y_lab_size),
+      axis.text.x = ggplot2::element_text(angle = x_lab_angle, hjust = 1),
+      legend.position = legend_position
+    )
+  
+  # Evan, make me a plot with beautiful colors. As you wish.
+  values <- if (!is.null(palette)) {
+    c("dropped" =  RColorBrewer::brewer.pal(5, palette)[[3]],
+      "retained" =  RColorBrewer::brewer.pal(5, palette)[[5]]
+      )
+    
+    } else {
+      c("dropped" =  "red",
+        "retained" =  "green"
+        )
+    }
+  
+
+  if(is.null(min_count)) values <- c(values, 
+                                     "default" = as.character(values[1]))
+    
+  # Use the ColorBrewer color and create the legend title
+  p <- p +
+    ggplot2::scale_color_manual(
+      name = legend_lab,
+      values = values)
+  
+  # Evan, make me an interactive plot. As you wish.
+  if (interactive) p <- plotly::ggplotly(p)
+  
+  return (p)
+  
 }
 
 #' plot.imdanovaFilt
@@ -4279,7 +4484,16 @@ plot.nmrData <- function (omicsData, order_by = NULL, color_by = NULL,
 #'   \code{\link[RColorBrewer]{RColorBrewer}}.
 #' @param use_VizSampNames Logical. Indicates whether to use custom sample
 #'   names. The default is FALSE.
-#'
+#' @param transformation Character string. String of length 1 defining a
+#'   transformation for visualizing count data. Valid options are 'lcpm', 
+#'   'upper', and 'median'. 'lcpm' - For each column: scale column intensities by 
+#'   (total column sum/1 million), then log2 transform. 'median' - For each 
+#'   column: scale column intensities by median column intensities, then 
+#'   back-transform to original scale. 'upper' - For each column: scale column 
+#'   intensities by 75th quantile column intensities, then back-transform to 
+#'   original scale. For 'median' and 'upper' options, all zeros are converted 
+#'   to NAs.
+#'   
 #' @rdname plot-seqData
 #'
 #' @export
@@ -4291,7 +4505,7 @@ plot.seqData <- function (omicsData, order_by = NULL, color_by = NULL,
                           title_lab = NULL, title_lab_size = 14,
                           legend_lab = NULL, legend_position = "right",
                           ylimit = NULL, bw_theme = TRUE, palette = NULL,
-                          use_VizSampNames = FALSE) {
+                          use_VizSampNames = FALSE, transformation = NULL) {
   
   # Farm boy, make me a plot with a seqData object. As you wish.
   plot_omicsData(omicsData = omicsData, order_by = order_by,
@@ -4302,7 +4516,8 @@ plot.seqData <- function (omicsData, order_by = NULL, color_by = NULL,
                  title_lab = title_lab, title_lab_size = title_lab_size,
                  legend_lab = legend_lab, legend_position = legend_position,
                  ylimit = ylimit, bw_theme = bw_theme, palette = palette,
-                 use_VizSampNames = use_VizSampNames)
+                 use_VizSampNames = use_VizSampNames, 
+                 transformation = transformation)
   
 }
 
@@ -4462,7 +4677,7 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
                             interactive, x_lab, y_lab, x_lab_size, y_lab_size,
                             x_lab_angle, title_lab, title_lab_size, legend_lab,
                             legend_position, ylimit, bw_theme, palette,
-                            use_VizSampNames) {
+                            use_VizSampNames, transformation = NULL) {
 
   # Preliminaries --------------------------------------------------------------
 
@@ -4475,10 +4690,30 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
 
     # INCONCEIVABLE!!!
     stop (paste("omicsData must be of class 'isobaricpepData', 'lipidData'",
-                "'metabData', 'nmrData', 'pepData', or 'proData'.",
+                "'metabData', 'nmrData', 'pepData', 'proData', or 'seqData'.",
                 sep = " "))
 
   }
+  
+  if(inherits(omicsData, "seqData")){
+    if(!is.null(transformation)){
+      
+      if(!(transformation %in% c('lcpm', 'upper',  'median'))){
+        # Tell the user that the input to data_scale is an abomination!
+        stop (paste(transformation, "is not a valid option for 'transformation'.",
+                    "Refer to ?seqData.plot for specific seqData options.",
+                    sep=" "))
+      }
+    } else {
+      warning(paste0("Using transformation argument for plotting on counts",
+      "is recommended for seqData visualization. See ?seqData.plot for details."))
+    }
+  }
+  
+  if(!inherits(omicsData, "seqData") && !is.null(transformation)){
+    warning("Transformation agrument is only applicable for seqData -- this argument is otherwise ignored.")
+  }
+    
 
   if(!is.null(order_by)) {
     if(!is.character(order_by) || length(order_by) > 1)
@@ -4601,15 +4836,7 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
     } else if (get_data_scale(omicsData) %in% c("log", "log2", "log10")){
       paste(get_data_scale(omicsData), "Abundance", sep = " ")
     } else if (get_data_scale(omicsData) == "counts"){ 
-      warning(paste0("Using edata_transform() on counts is reccomended for visualization. ",
-                     "See ?edata_transform() for details."))
       "Counts"
-    } else if (get_data_scale(omicsData) == "upper") {
-      paste("Upper Quantile transformed Counts", sep = " ")
-    } else if (get_data_scale(omicsData) == "lcpm") {
-      paste("LCPM transformed Counts", sep = " ")
-    } else if (get_data_scale(omicsData) == "median"){
-      paste("Median transformed Counts", sep = " ")
     }
       
     out
@@ -4621,7 +4848,81 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
 
   # Farm boy, melt the data for me. As you wish.
   e_data_cname <- get_edata_cname(omicsData)
-  plot_data <- reshape2::melt(omicsData$e_data,
+  
+  temp_data <- omicsData$e_data
+  iCol <- which(names(omicsData$e_data) == get_edata_cname(omicsData))
+  
+  if(!is.null(transformation)){
+    transform_data <- temp_data[, -iCol]
+    
+    if (transformation == 'lcpm'){
+      
+      ## log cpm, limma voom method and a similar method used for visualizations in edgeR
+      
+      ## EdgeR
+      # First scales the prior.count/pseudo-count and adds 2x the scaled prior count to the libsize
+      # prior.count.scaled <- lib.size/mean(lib.size)*prior.count
+      # lib.size <- lib.size+2*prior.count.scaled
+      # lib.size <- 1e-6*lib.size
+      # Calculates log2 log2(t( (t(x)+prior.count.scaled) / lib.size ))
+      
+      # sum library size
+      samp_sum <- apply(transform_data, 
+                        2, 
+                        sum,
+                        na.rm = TRUE) + 1
+      
+      # divide adjusted (ensure non-zero) counts by library size
+      div_sum <- sweep((transform_data + .5), 2, samp_sum, `/`)
+      
+      # Apply per million multiplier and log2
+      temp_data[, -iCol] <- log2(div_sum * 10^6)
+      
+    } else if (transformation == 'upper'){
+      
+      warning("Zeros will be regarded as NA for 'upper' transformation")
+      
+      transform_data[transform_data == 0] <- NA
+      
+      # Grab non-zero upper quantile of data
+      samp_upper <- apply(transform_data, 
+                          2, 
+                          quantile,
+                          na.rm = TRUE,
+                          probs = .75)
+      
+      g.q <- quantile(unlist(transform_data), probs = .75, na.rm=TRUE)
+      
+      # Divide each count by the upper quantile in respective columns
+      div_75 <- sweep(transform_data, 2, samp_upper, `/`)
+      
+      # Set new data
+      temp_data[, -iCol] <- div_75*g.q # back transform
+      
+    } else if(transformation == 'median'){
+      
+      warning("Zeros will be regarded as NA for 'median' transformation")
+      
+      transform_data[transform_data == 0] <- NA
+      
+      # Grab non-zero median of data
+      samp_med <- apply(transform_data, 
+                        2, 
+                        median,
+                        na.rm = TRUE)
+      
+      # Divide each count by the upper quantile in respective columns
+      div_med <- sweep(transform_data, 2, samp_med, `/`)
+      
+      g.q <- median(unlist(transform_data), na.rm=TRUE)
+      
+      # Set new data
+      temp_data[, -iCol] <- div_med*g.q
+      
+    } 
+  }
+  
+  plot_data <- reshape2::melt(temp_data,
                               id = e_data_cname,
                               na.rm = TRUE)
 

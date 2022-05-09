@@ -26,40 +26,17 @@ edata_transform <- function (omicsData, data_scale) {
 
   # check that omicsData is of appropriate class #
   if (!inherits(omicsData, c("pepData", "proData", "metabData",
-                             "lipidData", "nmrData", "seqData"))) {
+                             "lipidData", "nmrData"))) {
     
     # Throw an error that the input for omicsData is not the appropriate class.
     stop(paste("omicsData must be of class 'pepData', 'proData', 'metabData',",
-               "'lipidData', 'nmrData', or 'seqData'",
+               "'lipidData', or 'nmrData'",
                sep = ' '))
     
   } 
   
-  # guidance for those with seqData #
-  if (inherits(omicsData, "seqData")) {
-    
-    # Throw an error that the input for omicsData is not the appropriate class.
-    warning("Only raw counts are supported for statistical analysis of seqData objects. Please only use for visualization.")
-
-    if(get_data_scale(omicsData) != "counts"){
-      stop (paste("edata_transform cannot be applied to transformed seqData.",
-                  "Please run on raw counts.",
-                  sep=" "))
-    }
-    
-  } 
-
   # check that data_scale is one of the acceptable options #
-  if(inherits(omicsData, "seqData")){
-    
-    if(!(data_scale %in% c('lcpm', 'upper',  'median', 'clr', 'iqlr'))){
-      # Tell the user that the input to data_scale is an abomination!
-      stop (paste(data_scale, "is not a valid option for 'data_scale'.",
-                  "Refer to ?edata_transform for specific seqData options.",
-                  sep=" "))
-    }
-    
-  } else if (!(data_scale %in% c('log2', 'log10', 'log', 'abundance'))) {
+  if (!(data_scale %in% c('log2', 'log10', 'log', 'abundance'))) {
     
     # Tell the user that the input to data_scale is an abomination!
     stop (paste(data_scale, "is not a valid option for 'data_scale'.",
@@ -212,6 +189,8 @@ edata_transform <- function (omicsData, data_scale) {
              
            } else if (data_scale == 'upper'){
              
+             warning("Zeros will be regarded as NA for 'upper' transformation")
+             
              temp_data[temp_data == 0] <- NA
              
              # Grab non-zero upper quantile of data
@@ -230,6 +209,8 @@ edata_transform <- function (omicsData, data_scale) {
              omicsData$e_data[, -iCol] <- div_75*g.q # back transform
              
            } else if(data_scale == 'median'){
+             
+             warning("Zeros will be regarded as NA for 'median' transformation")
              
              temp_data[temp_data == 0] <- NA
              

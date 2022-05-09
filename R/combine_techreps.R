@@ -200,13 +200,19 @@ combine_techreps <- function (omicsData, combine_fn = NULL,
   # store new data and reset attributes
   omicsData$e_data <- new_edata
   omicsData$f_data <- new_fdata
+  id_col <- which(names(omicsData$e_data)==edata_cname)
   attr(omicsData, "cnames")$techrep_cname <- NULL
   attr(omicsData, "group_DF") <- new_group_DF 
   attr(omicsData, "data_info")$num_samps = ncol(omicsData$e_data) - 1
   attr(omicsData, "data_info")$num_edata = length(unique(omicsData$e_data[, edata_cname]))
-  attr(omicsData, "data_info")$num_miss_obs = sum(is.na(omicsData$e_data[,-which(names(omicsData$e_data)==edata_cname)]))
-  attr(omicsData, "data_info")$prop_missing = mean(is.na(omicsData$e_data[,-which(names(omicsData$e_data)==edata_cname)]))
-  
+  if(inherits(omicsData, "seqData")){
+    attr(omicsData, "data_info")$num_zero_obs <- sum(omicsData$e_data[,-id_col] == 0)
+    attr(omicsData, "data_info")$prop_zeros  <- mean(omicsData$e_data[,-id_col] == 0)
+  } else {
+    attr(omicsData, "data_info")$num_miss_obs = sum(is.na(omicsData$e_data[,-id_col]))
+    attr(omicsData, "data_info")$prop_missing = mean(is.na(omicsData$e_data[,-id_col]))
+  }
+
   # technical replicate specific attributes
   attributes(omicsData)$tech_rep_info$tech_reps_by_sample = bio_sample_list
   attributes(omicsData)$tech_rep_info$combine_method = combine_fn

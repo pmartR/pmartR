@@ -2,12 +2,16 @@
 #'
 #' Calculate principal components using projection pursuit estimation, which
 #' implements an expectation-maximization (EM) estimation algorithm when data is
-#' missing.
+#' missing. For seqData counts, a generalized version of principal components 
+#' analysis for non-normally distributed data is calculated under the assumption 
+#' of a negative binomial distribution with global dispersion.
 #'
 #' @param omicsData an object of the class 'pepdata', 'prodata', 'metabData',
-#'   'lipidData', 'nmrData' usually created by \code{\link{as.pepData}},
+#'   'lipidData', 'nmrData', or 'seqData', 
+#'   usually created by \code{\link{as.pepData}},
 #'   \code{\link{as.proData}}, \code{\link{as.metabData}},
-#'   \code{\link{as.lipidData}}, \code{\link{as.nmrData}}, respectively.
+#'   \code{\link{as.lipidData}}, \code{\link{as.nmrData}}, or
+#'   \code{\link{as.seqData}}, respectively.
 #' @param k integer number of principal components to return. Defaults to 2.
 #'
 #' @return a data.frame with first \code{k} principal component scores, sample
@@ -17,12 +21,18 @@
 #' @references Redestig, H., Stacklies, W., Scholz, M., Selbig, J., & Walther,
 #'   D. (2007). \emph{pcaMethods - a bioconductor package providing PCA methods
 #'   for incomplete data}. Bioinformatics. 23(9): 1164-7.
+#'   
+#'   Implements a generalized version of principal components analysis (GLM-PCA) 
+#'   for dimension reduction of non-normally distributed data such as counts or 
+#'   binary matrices. Townes FW, Hicks SC, Aryee MJ, Irizarry RA (2019) 
+#'   <doi:10.1186/s13059-019-1861-6>. Townes FW (2019) <arXiv:1907.02647>.
 #'
-#' @details Any biomoleculs seen in only one sample or with a variance less than
+#' @details Any biomolecules seen in only one sample or with a variance less than
 #'   1E-6 across all samples are not included in the PCA calculations. This
-#'   function leverages code from \code{\link[pcaMethods]{pca}}.
-#'
-#' @examples
+#'   function leverages code from \code{\link[pcaMethods]{pca}} and 
+#'   \code{\link[glmpca]{glmpca}} .
+#' 
+#' @examples 
 #' \dontrun{
 #' library(pmartRdata)
 #' data(lipid_object)
@@ -34,35 +44,19 @@
 #' plot(pca_lipids)
 #' summary(pca_lipids)
 #' }
-#'
+#' 
 #' @export
 #' @rdname dim_reduction
 #' @name dim_reduction
 #'
 dim_reduction <- function (omicsData, k = 2){
-
+  
   # check that omicsData is of appropriate class #
   if(!inherits(omicsData, c("pepData", "proData", "metabData",
-                            "lipidData", "nmrData")))
+                            "lipidData", "nmrData", "seqData")))
     stop(paste("omicsData must be an object of class 'pepdata','prodata',",
-               "'metabData', 'lipidData', or 'nrmData'.",
+               "'metabData', 'lipidData', 'nrmData', or 'seqData'.",
                sep = " "))
-
-  # Check if k is numeric.
-  if (!is.numeric(k)) {
-
-    # Hold the phone! Why are we converting a number to a character?
-    stop ("k must be numeric.")
-
-  }
-
-  # Check if k is positive.
-  if (k < 1) {
-
-    # Why even run dim_reduction if you don't want to keep any PCs?
-    stop ("k must be greater than zero.")
-
-  }
 
   # check that group designation has been run #
   if(!("group_DF" %in% names(attributes(omicsData))))
@@ -73,6 +67,15 @@ dim_reduction <- function (omicsData, k = 2){
   # data should be log transformed #
   if (get_data_scale(omicsData) == "abundance") {
     stop ("omicsData must be log transformed prior to calling dim_reduction.")
+  }
+  
+  # Check the data scale. Data must be on one of the log scales.
+  if (inherits(omicsData, "seqData") && 
+      get_data_scale(omicsData) != "counts" ) {
+    
+    # Welcome to the pit of despair!
+    stop ("seqData must be untransformed prior to calling dim_reduction.")
+    
   }
 
   samp_id = attr(omicsData, "cnames")$fdata_cname
@@ -91,22 +94,38 @@ dim_reduction <- function (omicsData, k = 2){
   if(length(minvars) > 0){
     temp_data = temp_data[-minvars, ]
   }
+  
+  if(inherits(omicsData, "seqData")){
+    # GLM-PCA
+    # https://www.bioconductor.org/packages/devel/workflows/vignettes/rnaseqGene/inst/doc/rnaseqGene.html#pca-plot-using-generalized-pca
+    
+    ## Supposed to be performed on raw counts
+    ## Temp data looks like an e_data w/o the identifier column
+    pca_res <- glmpca::glmpca(temp_data, L=k, fam = "nb")
+    pca_ests <- pca_res$factors ### Plot from here for PC1 and PC2
+    colnames(pca_ests) <- paste0("PC", 1:ncol(pca_ests))
 
-  pca_res = pcaMethods::pca(object = as.matrix(t(temp_data)),
-                            method = "ppca",
-                            scale = "vector",
-                            nPcs = k)
-  pca_ests = pca_res@scores[,1:k]
+  } else {
+    
+    pca_res = pcaMethods::pca(object = as.matrix(t(temp_data)),
+                              method = "ppca",
+                              scale = "vector",
+                              nPcs = k)
+    pca_ests = pca_res@scores[,1:k]
+    
+  }
 
   temp_res = data.frame(SampleID = names(temp_data), pca_ests)
 
   class(temp_res) <- "dimRes"
 
-  # attr(temp_res, "group_DF") <- attr(omicsData, "group_DF")
   attr(temp_res, "group_DF") <- get_group_DF(omicsData)
 
-  attr(temp_res, "R2") <- pca_res@R2
+  
+  if(!inherits(pca_res, "glmpca")){
+    attr(temp_res, "R2") <- pca_res@R2
+  }
 
   return(temp_res)
-
+  
 }
