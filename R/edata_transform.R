@@ -34,6 +34,16 @@ edata_transform <- function (omicsData, data_scale) {
                sep = ' '))
     
   } 
+  
+  # check that data_scale is one of the acceptable options #
+  if (!(data_scale %in% c('log2', 'log10', 'log', 'abundance'))) {
+    
+    # Tell the user that the input to data_scale is an abomination!
+    stop (paste(data_scale, "is not a valid option for 'data_scale'.",
+                "See details of as.pepData for specifics.",
+                sep=" "))
+    
+  }
 
   # Check to make sure the data isn't already on the scale input by the user.
   if(get_data_scale(omicsData) == data_scale) {

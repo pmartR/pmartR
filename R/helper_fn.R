@@ -21,6 +21,9 @@
 #'         
 #'           \item num_miss_obs -- An integer. The number of missing
 #'           observations in \code{e_data}.
+#'           
+#'           \item num_zero_obs -- An integer. The number of zeros 
+#'           in \code{e_data} for seqData objects.
 #'         
 #'           \item prop_missing -- A number between 0 and 1. The proportion of
 #'           missing observations in \code{e_data}.
@@ -647,11 +650,16 @@ set_data_info <- function (e_data,
   
   # Count the number of missing values in e_data.
   if(data_scale == "counts"){
-    num_miss_obs <- sum(e_data[, -id_col] == 0)
-  } else num_miss_obs <- sum(is.na(e_data[, -id_col]))
-  
-  # Calculate the proportion of missing data in e_data.
-  prop_missing <- num_miss_obs / prod(dim(e_data[, -id_col]))
+    num_zero_obs <- sum(e_data[, -id_col] == 0)
+    
+    # Calculate the proportion of missing data in e_data.
+    prop_zeros <- mean(e_data[, -id_col] == 0)
+  } else{
+    num_miss_obs <- sum(is.na(e_data[, -id_col]))
+    
+    # Calculate the proportion of missing data in e_data.
+    prop_missing <- mean(is.na(e_data[, -id_col]))
+  }
   
   # Extract the number of things (e.g., peptides, lipids, metabolites, ...).
   num_edata <- nrow(e_data)
@@ -665,16 +673,27 @@ set_data_info <- function (e_data,
   batch_info$is_bc <- is_bc
 
   # Return all of the information that belongs in the data_info attribute.
-  return (list(data_scale_orig = data_scale_orig,
-               data_scale = data_scale,
-               norm_info = norm_info,
-               num_edata = num_edata,
-               num_miss_obs = num_miss_obs,
-               prop_missing = prop_missing,
-               num_samps = num_samps,
-               data_types = data_types,
-               batch_info = batch_info))
-
+  
+  if(data_scale == "counts"){
+    return (list(data_scale_orig = data_scale_orig,
+                 data_scale = data_scale,
+                 norm_info = norm_info,
+                 num_edata = num_edata,
+                 num_zero_obs = num_zero_obs,
+                 prop_zeros = prop_zeros,
+                 num_samps = num_samps,
+                 data_types = data_types))
+  } else{
+    return (list(data_scale_orig = data_scale_orig,
+                 data_scale = data_scale,
+                 norm_info = norm_info,
+                 num_edata = num_edata,
+                 num_miss_obs = num_miss_obs,
+                 prop_missing = prop_missing,
+                 num_samps = num_samps,
+                 data_types = data_types))
+  }
+  
 }
 
 #' Sets/updates the values in the meta_info attribute

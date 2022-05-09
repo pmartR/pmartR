@@ -211,8 +211,8 @@ summary.seqData <- function(omicsData) {
   res <- list(class = class(omicsData), num_samps = attr(omicsData, "data_info")$num_samps,
               num_edata = attr(omicsData, "data_info")$num_edata,
               num_emeta = attr(omicsData, "meta_info")$num_emeta,
-              num_miss_obs = attr(omicsData, "data_info")$num_miss_obs,
-              prop_missing = round(attr(omicsData, "data_info")$prop_missing, 3))
+              num_zero_obs = attr(omicsData, "data_info")$num_zero_obs,
+              prop_zeros = round(attr(omicsData, "data_info")$prop_zeros, 3))
   
   # construct output #
   newres <- lapply(res, function(x) ifelse(is.null(x), "NA", as.character(x)))
@@ -228,7 +228,7 @@ summary.seqData <- function(omicsData) {
   }
   
   colnames(catmat) <- NULL
-  rownames(catmat) <- c("Class", fdata_name, edata_name, emeta_name, "Zero-Count Observations ", "Proportion Zeros ")
+  rownames(catmat) <- c("Class", fdata_name, edata_name, emeta_name, "Observed Zero-Counts ", "Proportion Zeros ")
   
   #if group_DF attr is present
   if(!is.null(get_group_DF(omicsData))){
@@ -246,7 +246,9 @@ summary.seqData <- function(omicsData) {
     newres2<- c(newres, newres2)
     catmat2 <- data.frame(unlist(newres2, use.names = FALSE))
     colnames(catmat2) <- NULL
-    rownames(catmat2) <- c("Class", fdata_name, edata_name, emeta_name, "Zero-Count Observations ", "Proportion Zeros ", paste("Samples per group:", levels, sep = " "))
+    rownames(catmat2) <- c("Class", fdata_name, edata_name, emeta_name, 
+                           "Observed Zero-Counts ", "Proportion Zeros ", 
+                           paste("Samples per group:", levels, sep = " "))
     
     catmat<- catmat2
   }
