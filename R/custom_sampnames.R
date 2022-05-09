@@ -35,6 +35,19 @@
 custom_sampnames <- function (omicsData, firstn = NULL, from = NULL,
                               to = NULL, delim = NULL, components = NULL,
                               pattern = NULL, ...){
+  
+  
+  # check that omicsData is of appropriate class #
+  if (!inherits(omicsData, c("pepData", "proData", "metabData",
+                             "isobaricpepData", "lipidData", "nmrData", 
+                             "seqData"))) {
+    
+    # Throw an error that the input for omicsData is not the appropriate class.
+    stop(paste("omicsData must be of class 'pepData', 'proData', 'metabData',",
+               "'isobaricpepData', 'lipidData', 'nmrData', or 'seqData'",
+               sep = ' '))
+    
+  }
 
   if(sum(c(is.null(from), is.null(to))) == 1){
     stop("Please specify both 'from' and 'to' if either argument is used.")

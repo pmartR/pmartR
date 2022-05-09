@@ -82,7 +82,7 @@ Objects of class 'seqData' contain some attributes that are
   attribute of returned omicsData object is TRUE or FALSE. \cr } Computed
   values included in the \code{data_info} attribute are as follows:
   \tabular{ll}{ num_edata \tab The number of unique \code{edata_cname}
-  entries.\cr \tab \cr num_miss_obs \tab The number of missing
+  entries.\cr \tab \cr num_zero_obs \tab The number of zero-value
   observations.\cr \tab \cr num_emeta \tab The number of unique
   \code{emeta_cname} entries. \cr \tab \cr prop_missing \tab The proportion
   of \code{e_data} values that are NA. \cr \tab \cr num_samps \tab The number

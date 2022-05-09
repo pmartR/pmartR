@@ -25,6 +25,9 @@ A list containing seven elements:
         
           \item num_miss_obs -- An integer. The number of missing
           observations in \code{e_data}.
+          
+          \item num_zero_obs -- An integer. The number of zeros 
+          in \code{e_data} for seqData objects.
         
           \item prop_missing -- A number between 0 and 1. The proportion of
           missing observations in \code{e_data}.

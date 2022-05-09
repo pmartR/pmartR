@@ -23,7 +23,8 @@
   ylimit = NULL,
   bw_theme = TRUE,
   palette = NULL,
-  use_VizSampNames = FALSE
+  use_VizSampNames = FALSE,
+  transformation = NULL
 )
 }
 \arguments{
@@ -88,6 +89,16 @@ palette to use. For a list of available options see the details section in
 
 \item{use_VizSampNames}{Logical. Indicates whether to use custom sample
 names. The default is FALSE.}
+
+\item{transformation}{Character string. String of length 1 defining a
+transformation for visualizing count data. Valid options are 'lcpm', 
+'upper', and 'median'. 'lcpm' - For each column: scale column intensities by 
+(total column sum/1 million), then log2 transform. 'median' - For each 
+column: scale column intensities by median column intensities, then 
+back-transform to original scale. 'upper' - For each column: scale column 
+intensities by 75th quantile column intensities, then back-transform to 
+original scale. For 'median' and 'upper' options, all zeros are converted 
+to NAs.}
 }
 \description{
 For plotting seqData S3 objects

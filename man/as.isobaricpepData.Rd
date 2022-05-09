@@ -93,12 +93,14 @@ The class 'isobaricpepData' is meant to deal with peptide data
  TRUE or FALSE. \cr } Computed values included in the \code{data_info}
  attribute are as follows: \tabular{ll}{ num_edata \tab The number of unique
  \code{edata_cname} entries.\cr \tab \cr num_miss_obs \tab The number of
- missing observations.\cr \tab \cr num_emeta \tab The number of unique
+ missing observations.\cr \tab \cr num_zero_obs \tab For seqData only: The 
+ number of zero observations.\cr \tab \cr num_emeta \tab The number of unique
  \code{emeta_cname} entries. \cr \tab \cr prop_missing \tab The proportion of
- \code{e_data} values that are NA. \cr \tab \cr num_samps \tab The number of
- samples that make up the columns of \code{e_data}.\cr \tab \cr meta_info
- \tab A logical argument, specifying whether \code{e_meta} is provided.\cr
- \tab \cr }
+ \code{e_data} values that are NA. \cr \tab \cr prop_zeros \tab For seqData
+ only: the proportion of zero counts observed in \code{e_data} values. \cr 
+ \tab \cr num_samps \tab The number of samples that make up the columns of 
+ \code{e_data}.\cr \tab \cr meta_info \tab A logical argument, specifying 
+ whether \code{e_meta} is provided.\cr \tab \cr }
 }
 \examples{
 \dontrun{

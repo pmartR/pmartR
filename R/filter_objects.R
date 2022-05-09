@@ -239,7 +239,7 @@ total_count_filter <- function (omicsData) {
   # Extract the 'data.frame' class from the the output data frame.
   orig_class <- class(output)
   
-  # Create the moleculeFilt class and attach the data.frame class to it as well.
+  # Create the totalCountFilt class and attach the data.frame class to it as well.
   class(output) <- c("totalCountFilt", orig_class)
   
   # Return the completed object!!!
@@ -442,7 +442,13 @@ cv_filter <- function(omicsData, use_groups = TRUE) {
   }
 
   ## generate some summary stats for CV values, for PMART purposes only ##
-  tot.nas <- sum(is.na(pool_cv$CV))
+  if(get_data_scale(omicsData) == "counts"){
+    ################################################ what makes sense here? #####
+    tot.zeros <- sum(pool_cv$CV == 0)
+    #tot.zeros <- get_data_info(omicsData)$num_zero_obs
+  } else {
+    tot.nas <- sum(is.na(pool_cv$CV))
+  }
 
   output <- data.frame(pool_cv, row.names = NULL)
 
@@ -452,7 +458,12 @@ cv_filter <- function(omicsData, use_groups = TRUE) {
 
   attr(output, "pooled") <- is_pooled
   attr(output, "max_x_val") <- x.max
-  attr(output, "tot_nas") <- tot.nas
+  
+  if(get_data_scale(omicsData) == "counts"){
+    attr(output, "tot_zeros") <- tot.zeros
+  } else {
+    attr(output, "tot_nas") <- tot.nas
+  }
 
   # Return the completed object. We did it!!!
   return (output)
