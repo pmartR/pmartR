@@ -28,15 +28,12 @@ test_that('all paired tests conform to the decrees of the God of Stats',{
                             test_method = "combined")
 
   afruit_1_1_3 <- imd_anova(afilta_1_1_3,
-                            test_method = "anova",
-                            covariates = "Gender")
+                            test_method = "anova")
   gfruit_1_1_3 <- imd_anova(gfilta_1_1_3,
                             test_method = "gtest",
-                            covariates = "Gender",
                             use_parallel = FALSE)
   cfruit_1_1_3 <- imd_anova(cfilta_1_1_3,
-                            test_method = "combined",
-                            covariates = "Gender")
+                            test_method = "combined")
 
   # Holy IMD-ANOVA unit tests, Statman! ----------------------------------------
 

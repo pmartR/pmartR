@@ -22,8 +22,6 @@
 #'   p-value adjustment.
 #' @param pval_thresh numeric p-value threshold, below or equal to which
 #'   peptides are considered differentially expressed. Defaults to 0.05
-#' @param covariates A character vector with no more than two variable names
-#'   that will be used as covariates in the IMD-ANOVA analysis.
 #' @param use_parallel A logical value indicating whether or not to use a
 #'   "doParallel" loop when running the G-Test with covariates. The default is
 #'   TRUE.
@@ -90,7 +88,6 @@ imd_anova <- function (omicsData,
                        pval_adjust_a = 'none',
                        pval_adjust_g = 'none',
                        pval_thresh = 0.05,
-                       covariates = NULL,
                        equal_var = TRUE,
                        use_parallel = TRUE) {
 
@@ -135,16 +132,6 @@ imd_anova <- function (omicsData,
         sep = " "
       )
     )
-
-  }
-
-  # Throw down an error if the idiot user tries to use covariates when there are
-  # no main effects. Honestly!
-  if ("no_main_effect" %in% attr(groupData, "main_effects") &&
-      !is.null(covariates)) {
-
-    # How can you have a covariate without a main effect? ICONCEIVABLE!!!
-    stop ("A covariate cannot be specified when there is no main effect.")
 
   }
 
@@ -220,24 +207,20 @@ imd_anova <- function (omicsData,
 
   }
 
-  # Have a looksie at the covariates argument.
-  if (!is.null(covariates)) {
+  # Have a looksie at the covariates attribute.
+  if (is.null(attr(attr(omicsData, "group_DF"), "covariates"))) {
 
-    # Make sure the covariates argument is a character vector.
-    if (class(covariates) != "character") {
+    covariates <- NULL
 
-      # Technical foul pmartR user. Input argument class violation.
-      stop ("The covariates argument must be a character vector.")
+  } else {
 
-    }
-
-    # Ensure a maximum of two covariates are input.
-    if (length(covariates) > 2) {
-
-      # Personal foul pmartR user. Excessive use of covariates.
-      stop ("A maximum of two covariates may be used.")
-
-    }
+    # Grab the names of the covariates from the group_DF attribute. This is
+    # necessary because covariates used to be an argument to the imd_anova
+    # function. It is easier to create an object that contains the covariate
+    # names than to change every instance where covariates show up. The code
+    # would be much better if. ... I am going to stop there and not say what I
+    # think about how things were done in the past.
+    covariates <- names(attr(attr(omicsData, "group_DF"), "covariates"))[-1]
 
   }
 
@@ -615,11 +598,6 @@ anova_test <- function (omicsData, groupData, comparisons, pval_adjust,
     stop ("At least two groups are necessary to perform an ANOVA if the data are not paired.")
   }
 
-  # Check for log transform #
-  if(!(attr(omicsData,"data_info")$data_scale%in%c("log2","log","log10"))){
-    stop("Data must be log transformed in order to implement ANOVA.")
-  }
-
   ###--------Check for anova filter-------------###
   if(is.null(attr(omicsData,"imdanova"))){
     warning("These data haven't been filtered, see `?imdanova_filter` for details.")
@@ -794,23 +772,6 @@ anova_test <- function (omicsData, groupData, comparisons, pval_adjust,
 
     }
 
-    # Nab the names of the covariates in the covariates data. This will be used
-    # to ensure the covariates entered by the user actually exist in the
-    # covariates attribute. --Even though they are working on advanced problems
-    # the user is usually dimwitted and messes up the inputs.-- The name of the
-    # sample ID will be removed because it is not needed when checking the
-    # input.
-    names_cov_data <- names(cov_data)[-1]
-
-    # Make sure all covariates from the input are in the group_DF attribute.
-    if (!all(covariates %in% names_cov_data)) {
-
-      stop (paste("The specified covariates are not in the group_DF attribute.",
-                  "Only covariates listed in this attribute can be used.",
-                  sep = " "))
-
-    }
-
     # The -1 is hard coded because the sample ID name is ALWAYS the first column
     # in the covariates data frame.
     if (any(is.na(cov_data[, -1]))) {
@@ -820,22 +781,14 @@ anova_test <- function (omicsData, groupData, comparisons, pval_adjust,
 
     } else {
 
-      # The covariates data frame could have up to three columns: sample ID,
-      # covariate 1, and covariate 2. The user could only input one of the two
-      # covariates into the imd_anova function. We need to subset the columns of
-      # the covariates data frame with the actual input to the covariates input.
-      cov_idx <- which(names(cov_data) %in% covariates)
-
       # Combine main effect and covariate data. We only want two columns from
       # the main effect data frame (groupData). These columns are the sample ID
       # column and the Group column. The Group column contains all the
       # information we need for creating the X matrix. We also need the sample
       # ID column from the covariate data frame along with the corresponding
-      # columns for any covariates in the input. The 1 is hard coded because the
-      # sample ID column will always be the first column in the covariate data
-      # frame.
+      # columns for any covariates in the input.
       covariates <- merge(groupData[c(samp_cname, "Group")],
-                          cov_data[, c(1, cov_idx)],
+                          cov_data,
                           sort = FALSE)
       cov_samp_col <- which(colnames(covariates)==samp_cname)
       #source('~/pmartR/R/covariate_supp_funs.R') #Run to debug
