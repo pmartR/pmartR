@@ -106,8 +106,8 @@ summarizer <- function (omicsData) {
   # covariates, and whether the data are paired.
   res_names <- c(
     "Class",
-    paste("Unique ", get_edata_cname(omicsData), "s (e_data)", sep = ""),
     paste("Unique ", get_fdata_cname(omicsData), "s (f_data)", sep = ""),
+    paste("Unique ", get_edata_cname(omicsData), "s (e_data)", sep = ""),
     if (is.null(get_emeta_cname(omicsData)))
       "Rows (e_meta)" else
         paste("Unique ", get_emeta_cname(omicsData), "s (e_meta)", sep = ""),
