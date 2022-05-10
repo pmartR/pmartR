@@ -76,8 +76,8 @@ test_that('the omicsData summaries are all square',{
     summary(pdata),
     data.frame(
       temp = c("pepData", "12", "150", "83", "341", "0.189"),
-      row.names = c("Class", "Unique Mass_Tag_IDs (e_data)",
-                    "Unique SampleIDs (f_data)", "Unique Proteins (e_meta)",
+      row.names = c("Class", "Unique SampleIDs (f_data)",
+                    "Unique Mass_Tag_IDs (e_data)", "Unique Proteins (e_meta)",
                     "Missing Observations", "Proportion Missing")
     ) %>%
       `names<-`(NULL)
@@ -87,8 +87,8 @@ test_that('the omicsData summaries are all square',{
     summary(pdata_gdf),
     data.frame(
       temp = c("pepData", "12", "150", "83", "341", "0.189", "9", "3"),
-      row.names = c("Class", "Unique Mass_Tag_IDs (e_data)",
-                    "Unique SampleIDs (f_data)", "Unique Proteins (e_meta)",
+      row.names = c("Class", "Unique SampleIDs (f_data)",
+                    "Unique Mass_Tag_IDs (e_data)", "Unique Proteins (e_meta)",
                     "Missing Observations", "Proportion Missing",
                     "Samples per group: Infection", "Samples per group: Mock")
     ) %>%
@@ -100,8 +100,8 @@ test_that('the omicsData summaries are all square',{
     data.frame(
       temp = c("pepData", "12", "150", "NA", "341", "0.189",
                "3", "3", "3", "3", "Gender, Age"),
-      row.names = c("Class", "Unique Mass_Tag_IDs (e_data)",
-                    "Unique SampleIDs (f_data)", "Rows (e_meta)",
+      row.names = c("Class", "Unique SampleIDs (f_data)",
+                    "Unique Mass_Tag_IDs (e_data)", "Rows (e_meta)",
                     "Missing Observations", "Proportion Missing",
                     "Samples per group: Infection_high",
                     "Samples per group: Infection_low",
@@ -116,8 +116,8 @@ test_that('the omicsData summaries are all square',{
     summary(pairdata),
     data.frame(
       temp = c("pepData", "30", "150", "16", "1184", "0.263", "30", "15"),
-      row.names = c("Class", "Unique Mass_Tag_IDs (e_data)",
-                    "Unique Names (f_data)", "Unique Proteins (e_meta)",
+      row.names = c("Class", "Unique Names (f_data)",
+                    "Unique Mass_Tag_IDs (e_data)", "Unique Proteins (e_meta)",
                     "Missing Observations", "Proportion Missing",
                     "Total Samples", "Pairs")
     ) %>%
