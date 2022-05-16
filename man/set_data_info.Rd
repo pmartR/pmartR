@@ -11,7 +11,9 @@ set_data_info(
   data_scale,
   data_types,
   norm_info,
-  is_normalized
+  is_normalized,
+  batch_info,
+  is_bc
 )
 }
 \arguments{

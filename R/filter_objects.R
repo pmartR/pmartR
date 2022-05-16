@@ -6,10 +6,17 @@
 #' @param omicsData an object of the class 'pepData', 'proData', 'metabData',
 #'   'lipidData', 'nmrData', or 'seqData', usually created by \code{\link{as.pepData}},
 #'   \code{\link{as.proData}}, \code{\link{as.metabData}},
-#'   \code{\link{as.lipidData}}, \code{\link{as.nmrData}}, \
-#'   or \code{\link{as.seqData}} respectively.
+#'   \code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, 
+#'   or \code{\link{as.nmrData}}, respectively.
 #' @param min_num an integer value specifying the minimum number of times each
 #'   feature must be observed across all samples. Default value is 2.
+#' @param use_group logical indicator for whether to utilize group information
+#'   from \code{\link{group_designation}} when calculating the molecule filter.
+#'   Defaults to FALSE.
+#' @param use_batch logical indicator for whether to utilize batch information
+#'   from \code{\link{group_designation}} when calculating the molecule filter.
+#'   Defaults to FALSE. Necessary to be set to TRUE if running ComBat batch
+#'   correction.
 #'
 #' @details Attribute of molecule_filt object is "total_poss_obs", the number of
 #'   total possible observations for each feature (same as the number of
@@ -31,20 +38,33 @@
 #'
 #' @export
 #'
-molecule_filter <- function (omicsData) {
+molecule_filter <- function (omicsData,use_groups = FALSE, use_batch = FALSE) {
   ## some initial checks ##
-
+  # test#
+  
   # check that omicsData is of appropriate class #
   if (!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData",
                              "nmrData", "seqData"))) {
-
+    
     stop (paste("omicsData must be of class 'pepData', 'proData', 'metabData',",
-               "'lipidData', 'nmrData', or 'seqData'",
-               sep = ' '))
-
+                "'lipidData', 'nmrData', or 'seqData'",
+                sep = ' '))
   }
-
-  # Extricate the column number of the ID column.
+  
+  # Make sure the arguemnts are logical.
+  if (!is.logical(use_groups)) stop ("use_groups must be logical.")
+  if (!is.logical(use_batch)) stop ("use_batch must be logical.")
+  
+  # check that omicsData has batch_id data if specified
+  if(is.null(attributes(attr(omicsData,"group_DF"))$batch_id) && use_batch == TRUE){
+    stop (paste("omicsData must have batch_id specified if use_batch = TRUE"))
+  }
+  
+  if(is.null(attr(omicsData,"group_DF")) && use_groups == TRUE){
+    stop (paste("omicsData must have groups specified if use_groups = TRUE"))
+  }
+  
+  # find the column which has the edata cname
   id_col <- which(names(omicsData$e_data) == get_edata_cname(omicsData))
 
   ordering = omicsData$e_data[,id_col]
@@ -175,21 +195,27 @@ molecule_filter <- function (omicsData) {
 
   # change the names of the data.frame
   names(output) <- c(get_edata_cname(omicsData), "Num_Observations")
-
+  
   # Extract the 'data.frame' class from the the output data frame.
   orig_class <- class(output)
-
+  
   # Create the moleculeFilt class and attach the data.frame class to it as well.
   class(output) <- c("moleculeFilt", orig_class)
-
+  
   # Fabricate an attribute that has the total number of samples (columns in
   # e_data minus the ID column). This will be used to ensure someone doesn't try
   # to filter e_data using a threshold larger than the number of samples.
   attr(output, "num_samps") <- get_data_info(omicsData)$num_samps
-
+  
+  # Add the group designation information to the attributes.
+  attr(output, "group_DF") <- attr(omicsData, "group_DF")
+  
+  # Fabricate an attribute that states whether or not we have added a batch_id
+  attr(output, "use_batch") <- ifelse(use_batch == FALSE,FALSE,TRUE)
+  attr(output, "use_groups") <- ifelse(use_groups == FALSE,FALSE,TRUE)
+  
   # Return the completed object!!!
   return(output)
-
 }
 
 #' Total Count filter object

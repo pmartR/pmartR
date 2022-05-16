@@ -1202,7 +1202,8 @@ as.seqData <- function (e_data, f_data, e_meta = NULL,
                          techrep_cname = NULL,
                          data_scale = "counts",
                          is_normalized = FALSE, norm_info = list(),
-                         data_types = NULL, check.names = TRUE) {
+                         data_types = NULL, check.names = TRUE,
+                         is_bc = FALSE, batch_info = list()) {
   
   # Set the original data scale to the input data scale.
   data_scale_orig <- data_scale
@@ -1225,7 +1226,9 @@ as.seqData <- function (e_data, f_data, e_meta = NULL,
                     norm_info = norm_info,
                     data_types = data_types,
                     check.names = check.names,
-                    dType = dType)
+                    dType = dType,
+                    is_bc = is_bc,
+                    batch_info = batch_info)
   
   ### Should we add these to pre_flight? 
   # Analyses must have raw counts
@@ -1258,7 +1261,9 @@ as.seqData <- function (e_data, f_data, e_meta = NULL,
                                           data_scale = data_scale,
                                           data_types = data_types,
                                           norm_info = norm_info,
-                                          is_normalized = is_normalized)
+                                          is_normalized = is_normalized,
+                                          batch_info = batch_info,
+                                          is_bc = is_bc)
   
   # set check.names attribute #
   attr(res, "check.names") = check.names
@@ -1306,7 +1311,6 @@ pre_flight <- function (e_data,
                         dType,
                         is_bc,
                         batch_info) {
-
   # Verify classes/values of arguments -----------------------------------------
   
   # Check if e_data is a tibble or data.table. If it is convert to a data frame.
@@ -1466,8 +1470,8 @@ pre_flight <- function (e_data,
       
       # Throw an error because data_scale is not an acceptable form.
       stop (paste0("data_scale must be one of the following for ",
-                  dType[[2]], ":",
-                  " 'abundance', 'log', 'log2', or 'log10'."))
+                   dType[[2]], ":",
+                   " 'abundance', 'log', 'log2', or 'log10'."))
       
     }
   }
@@ -1782,78 +1786,78 @@ pre_flight <- function (e_data,
 #
 str_col <- function (edata,
                      edata_cname) {
-  
+
   # Determine the index of the id column
   id_col <- which(names(edata) == edata_cname)
-  
+
   # Determine the number of columns in edata without the id column.
   n_col <- length(edata)
-  
+
   # Create a vector that will hold the column indices for non numeric columns.
   non_numeric <- NULL
-  
+
   # Create a vector that will hold the column indices for columns that contain
   # infinite values.
   too_vast <- NULL
-  
+
   # Create a counter that will fill in the vector containing the column number
   # for the non-numeric columns.
   v <- 0
-  
+
   # Create a counter that will fill in the vector containing the column number
   # for the columns containing infinite values.
   a <- 0
-  
+
   # Loop through each column of edata (minus the id column). The call to seq_len
   # will loop through each index of edata except the one belonging to the column
   # that contains the IDs. For example, if the first column contains the IDs
   # the for loop will start at 2.
   for (e in seq_len(n_col)[-id_col]) {
-    
+
     # Check if the current column is not numeric.
     if (!inherits(edata[, e],
                   c('integer', 'double', 'numeric'))) {
-      
+
       # Update the counter used to fill in the non_numeric vector.
       v <- v + 1
-      
+
       # Append the column number to the non_numeric vector.
       non_numeric[[v]] <- e
-      
+
       # If the column is numeric the following code will run.
     } else {
-      
+
       # Check if the column contains infinite values.
       if (any(is.infinite(edata[, e]))) {
-        
+
         # Update the counter used to fill in the too_vast vector.
         a <- a + 1
-        
+
         # Include the column number in the too_vast vector.
         too_vast[[a]] <- e
-        
+
       }
-      
+
     }
-    
+
   }
-  
+
   # Confirm whether or not there are any non-numeric columns
   if (length(non_numeric) > 0) {
-    
+
     # Check the length of non_numeric.
     if (length(non_numeric) == 1) {
-      
+
       # Use proper English grammar when there is one naughty column.
       grammar <- c('Column', 'contains')
-      
+
     } else {
-      
+
       # Use proper English grammar when there are multiple naughty columns.
       grammar <- c('Columns', 'contain')
-      
+
     }
-    
+
     # Forcefully tell the user their data is not acceptable. In other words, we
     # don't want their crap data because our life is crazy enough already.
     stop (paste(grammar[[1]],
@@ -1862,25 +1866,25 @@ str_col <- function (edata,
                 grammar[[2]],
                 'non-numeric values.',
                 sep = ' '))
-    
+
   }
-  
+
   # Confirm whether or not there are any columns containing infinity.
   if (length(too_vast) > 0) {
-    
+
     # Check the length of too_vast.
     if (length(too_vast) == 1) {
-      
+
       # Use proper English grammar when there is one boundless column.
       grammar <- c('Column', 'contains')
-      
+
     } else {
-      
+
       # Use proper English grammar when there are multiple boundless columns.
       grammar <- c('Columns', 'contain')
-      
+
     }
-    
+
     # Throw down an error letting the user know it is impossible to have an
     # infinite number of something in their sample. (How would it all fit?)
     stop (paste(grammar[[1]],
@@ -1889,9 +1893,9 @@ str_col <- function (edata,
                 grammar[[2]],
                 'infinite values.',
                 sep = ' '))
-    
+
   }
-  
+
 }
 
 #' Replace 0 with NA
@@ -1914,48 +1918,48 @@ str_col <- function (edata,
 #'
 replace_zeros <- function(edata,
                           edata_cname) {
-  
+
   # Acquire the index of the edata_cname column.
   id_col <- which(names(edata) == edata_cname)
-  
+
   # Enumerate the number of zeros to be replaced with NA
   n_zeros <- sum(edata[, -id_col] == 0,
                  na.rm = TRUE)
-  
+
   # Loop through each column in e_data.
   for (e in 1:ncol(edata)) {
-    
+
     # Check if the current column is NOT the ID column.
     if (e != id_col) {
-      
+
       # Find indices where the value is 0.
       inds <- which(edata[, e] == 0)
-      
+
       # Check if any values in the eth column of edata match 0. If there are no
       # matches then which() will return integer(0) -- which has length 0.
       if (length(inds) == 0) {
-        
+
         # Move to the next column in the data frame.
         next
-        
+
         # If the length of inds is greater than 0 enter the else statement.
       } else {
-        
+
         # Replace 0 with NA.
         edata[inds, e] <- NA
-        
+
       }
-      
+
       # If e is equal to the index of the ID column enter the else statement.
     } else {
-      
+
       # Move to the next column in the data frame.
       next
-      
+
     }
-    
+
   }
-  
+
   # Report the number of replaced elements in e_data
   message(paste(n_zeros,
                 "instances of",
@@ -1963,10 +1967,10 @@ replace_zeros <- function(edata,
                 "have been replaced with",
                 NA,
                 sep = " "))
-  
+
   # Return the updated edata object.
   return (edata)
-  
+
 }
 
 #' Replace NA with 0
