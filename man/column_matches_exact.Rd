@@ -6,6 +6,8 @@
 the elements of an input column}
 \usage{
 column_matches_exact(df, col)
+
+column_matches_exact(df, col)
 }
 \arguments{
 \item{df}{A data.frame whose columns we want to match to some query column.}
@@ -15,8 +17,14 @@ column_matches_exact(df, col)
 \value{
 vector of column names of df that contain exactly all the elements of
 the input column
+
+vector of column names of df that contain exactly all the elements of
+the input column
 }
 \description{
+Helper to find the names of columns of a data.frame that contain exactly all
+the elements of an input column
+
 Helper to find the names of columns of a data.frame that contain exactly all
 the elements of an input column
 }
