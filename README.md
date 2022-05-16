@@ -26,13 +26,4 @@ To cite this package, please use the following:
 
 Stratton KG, Webb-Robertson BJ, McCue LA, Stanfill B, Claborne D, Godinez I, Johansen T, Thompson AM, Burnum-Johnson KE, Waters KM, Bramer LM. pmartR: quality control and statistics for mass spectrometry-based biological data. Journal of proteome research. 2019 Jan 14;18(3):1418-25.
 
-@article{stratton2019pmartr,
-  title={pmartR: quality control and statistics for mass spectrometry-based biological data},
-  author={Stratton, Kelly G and Webb-Robertson, Bobbie-Jo M and McCue, Lee Ann and Stanfill, Bryan and Claborne, Daniel and Godinez, Iobani and Johansen, Thomas and Thompson, Allison M and Burnum-Johnson, Kristin E and Waters, Katrina M and others},
-  journal={Journal of proteome research},
-  volume={18},
-  number={3},
-  pages={1418--1425},
-  year={2019},
-  publisher={ACS Publications}
-}
+[Click here for BibTex](https://scholar.googleusercontent.com/scholar.bib?q=info:6IcjsBn7MfQJ:scholar.google.com/&output=citation&scisdr=CgUDaqVkEMukmBJ56W4:AAGBfm0AAAAAYoJ_8W5KJCkfr8y5SqFSCCskqfO4aFmW&scisig=AAGBfm0AAAAAYoJ_8a-EXGaZOqyQW4KM5X6XJDLc-z-s&scisf=4&ct=citation&cd=-1&hl=en) 
