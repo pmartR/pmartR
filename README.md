@@ -20,4 +20,19 @@ To get started, see the package documentation and function reference located [he
 
 Example peptide (both unlabeled and isobaric labeled), protein, metabolite and lipid data are available in the __pmartRdata__ package available on Github, [here](https://github.com/pmartR/pmartRdata)
  
+## Citation:
 
+To cite this package, please use the following:
+
+Stratton KG, Webb-Robertson BJ, McCue LA, Stanfill B, Claborne D, Godinez I, Johansen T, Thompson AM, Burnum-Johnson KE, Waters KM, Bramer LM. pmartR: quality control and statistics for mass spectrometry-based biological data. Journal of proteome research. 2019 Jan 14;18(3):1418-25.
+
+@article{stratton2019pmartr,
+  title={pmartR: quality control and statistics for mass spectrometry-based biological data},
+  author={Stratton, Kelly G and Webb-Robertson, Bobbie-Jo M and McCue, Lee Ann and Stanfill, Bryan and Claborne, Daniel and Godinez, Iobani and Johansen, Thomas and Thompson, Allison M and Burnum-Johnson, Kristin E and Waters, Katrina M and others},
+  journal={Journal of proteome research},
+  volume={18},
+  number={3},
+  pages={1418--1425},
+  year={2019},
+  publisher={ACS Publications}
+}
