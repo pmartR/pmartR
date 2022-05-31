@@ -1,3 +1,6 @@
+## File contains wrappers for DESeq2, EdgeR, and limma-voom as well as plotting function for limma-voom
+
+
 #' Wrapper for DESeq2 workflow
 #' 
 #' For generating statistics for 'seqData' objects
@@ -24,8 +27,8 @@
 #' @param addMLE an object of type 'seqData', created by \code{\link{as.seqData}}  
 #' @param plotMA an object of type 'seqData', created by \code{\link{as.seqData}}
 #' @param plotDispEsts an object of type 'seqData', created by \code{\link{as.seqData}} 
+#' @param p_cutoff an object of type 'seqData', created by \code{\link{as.seqData}}  
 #' 
-#'
 #' @return data.frame object
 #' 
 #' 
@@ -49,23 +52,25 @@ Deseq2_wrapper <- function(
     independentFiltering = TRUE, alpha = 0.1, 
     format = "DataFrame",
     addMLE = FALSE,
-    plotMA = F, plotDispEsts = F
+    plotMA = F, plotDispEsts = F,
+    p_cutoff = 0.05
 ){
   
   ## Normal p_value adjustments, test can either be "Wald" or liklihood ratio "LRT"
-  
-  grouping_info <- get_group_DF(omicsData)[-1]
   edata_cname <- get_edata_cname(omicsData)
+  fdata_cname <- get_fdata_cname(omicsData)
+  grouping_info <- get_group_DF(omicsData)[colnames(omicsData$f_data) != fdata_cname]
+  e_data_counts <- omicsData$e_data[colnames(omicsData$e_data) != edata_cname]
   
   if(is.null(comparisons)) comparisons <- unique(grouping_info[["Group"]])
   
-  edata_deseq <- DESeqDataSetFromMatrix(
-    omicsData$e_data[colnames(omicsData$e_data) != edata_cname], 
+  edata_deseq <- DESeq2::DESeqDataSetFromMatrix(
+    e_data_counts, 
     colData = grouping_info,
     design = ~Group ## Figure out design designation
   )
   
-  run_stats_deseq <- DESeq(
+  run_stats_deseq <- DESeq2::DESeq(
     edata_deseq,
     test = test, ## reasonable to allow change in pmartR
     
@@ -107,9 +112,9 @@ Deseq2_wrapper <- function(
     # minmu = NULL ##  lower bound on the estimated count for fitting gene-wise dispersion and for use with nbinomWaldTest and nbinomLRT. If fitType="glmGamPoi", then 1e-6 will be used (as this fitType is optimized for single cell data, where a lower minmu is recommended), otherwise the default value as evaluated on bulk datasets is 0.5
   )
   
-  cob_list <- combn(comparisons, 2)
+  cob_list <- utils::combn(comparisons, 2)
   
-  all_res <- map(1:ncol(cob_list), function(combo_n){
+  all_res <- purrr::map(1:ncol(cob_list), function(combo_n){
     
     combo <- cob_list[,combo_n]
     
@@ -135,22 +140,82 @@ Deseq2_wrapper <- function(
       # minmu = NULL ## Lower bound on estimated count (used when calulating contrasts)
     )
     
+    # Flag stuffs ----------------------------------------------------------------
+    sigs <- which(res[["padj"]] < p_cutoff)
+    res[[paste0("Flag_", test)]] <- 0
+    if(length(sigs)>0){
+      res[[paste0("Flag_", test)]][sigs] <- sign(res$log2FoldChange[sigs])
+    }
+    
     res[["row"]] <- NULL
-    colnames(res) <- paste0(paste0(combo[1], "_vs_", combo[2], "_"), colnames(res))
+    colnames(res) <- paste0(
+      colnames(res), 
+      paste0("_", combo[1], "_vs_", combo[2])
+      )
+
+    ## Non-zero counts ##
+    cmb1 <- e_data_counts[grouping_info$Group == combo[1]]
+    res[[paste0("NonZero_Count_", combo[1])]] <- rowSums(cmb1 != 0)
+    
+    cmb2 <- e_data_counts[grouping_info$Group == combo[2]]
+    res[[paste0("NonZero_Count_", combo[2])]] <- rowSums(cmb2 != 0)
+
     row.names(res) <- NULL
     res[[edata_cname]] <- omicsData$e_data[[edata_cname]]
     res[c(ncol(res), 1:(ncol(res) - 1))]
   })
   
-  all_cont <- all_res[[1]]
-  if(length(all_res) > 1){
-    for(i in 2:length(all_res)) all_cont <- full_join(all_cont, all_res[[i]])
+  #merge all data frames in list
+  all_cont <- all_res %>% purrr::reduce(full_join)
+  
+  count_cols <- grep("^NonZero_Count_", colnames(all_cont))
+  mean_cols <- grep("^Mean", colnames(all_cont))
+  lfc_cols <- grep("^log2FoldChange", colnames(all_cont))
+  # pval_cols <- grep(colnames(all_cont), "_pvalue")
+  padj_cols <- grep("^padj", colnames(all_cont))
+  flag_cols <- grep("^Flag", colnames(all_cont))
+  
+  colnames(all_cont)[-1] <- gsub("^baseMean", "Mean", colnames(all_cont)[-1])
+  colnames(all_cont)[-1] <- gsub("^log2FoldChange", "Fold_change", colnames(all_cont)[-1])
+  colnames(all_cont)[-1] <- gsub("^padj", paste0("P_value_", test), colnames(all_cont)[-1])
+  
+  results <- all_cont[c(1, count_cols, mean_cols, 
+                        lfc_cols, padj_cols, flag_cols)]
+  
+  attr_list <- c("cnames", "data_info", "filters", "group_DF")
+  keep_attr <- attributes(results)[names(attributes(results)) %in% attr_list]
+  attributes(results) <- c(attributes(results), keep_attr)
+  
+  ## sig totes
+  flag_df <- reshape2::melt(
+    all_cont[flag_cols], 
+    variable.name = "Comparison", 
+    value.name = "Flags"
+    )
+  flag_df$Comparison <- gsub("Flag_(Wald|LRT)_", "", flag_df$Comparison )
+  attr(results, "number_significant") <- flag_df %>%
+    dplyr::group_by(Comparison) %>%
+    dplyr::summarise(
+      Up_total = sum(Flags > 0, na.rm = T),
+      Down_total = sum(Flags < 0, na.rm = T),
+      row.names = NULL
+  )
+  
+  attr(results, "comparisons") <- comparisons
+  attr(results, "statistical_test") <- paste0("DESeq_", test)
+  attr(results, "adjustment_method") <- p_adjust
+  attr(results, "pval_thresh") <- p_cutoff
+  attr(results, "data_class") <- attr(omicsData, "class")
+  class(results) <- c("statRes", class(results))
+  
+  if(plotDispEsts){
+    attr(results, "plotDispEsts") <- run_stats_deseq
+    DESeq2::plotDispEsts(run_stats_deseq)
   }
-  
-  results <- list(Full_results = all_cont)
-  
-  if(plotDispEsts) results$plotDispEsts <- plotDispEsts(run_stats_deseq)
-  if(plotMA) results$plotMA <- plotMA(fetch_results)
+  if(plotMA){
+    attr(results, "plotMA") <- run_stats_deseq
+    DESeq2::plotMA(run_stats_deseq)
+  }
   
   return(results)
   
@@ -184,66 +249,128 @@ EdgeR_wrapper <- function(
     plotMDS = F, plotBCV = F
 ){
   
-  if(is.null(comparisons)) comparisons <- unique(get_group_DF(omicsData)$Group)
+  edata_cname <- get_edata_cname(omicsData)
+  fdata_cname <- get_fdata_cname(omicsData)
+  e_data_counts <- omicsData$e_data[colnames(omicsData$e_data) != edata_cname]
+  grouping_info <- get_group_DF(omicsData)[colnames(omicsData$f_data) != fdata_cname]
   
-  
+  ### Combinations ###
+  if(is.null(comparisons)) comparisons <- unique(grouping_info$Group)
   cob_list <- combn(comparisons, 2)
+  all_contrasts <- purrr::map_chr(
+    1:ncol(cob_list), 
+    function(combo_n) paste0(cob_list[,combo_n], collapse = "-")
+  )
   
-  edata_egdeR <- DGEList(omicsData$e_data[-1]) 
-  norm_factors_edgeR <- calcNormFactors(edata_egdeR)
+  edata_egdeR <- edgeR::DGEList(e_data_counts) 
+  norm_factors_edgeR <- edgeR::calcNormFactors(edata_egdeR)
   
-  design_matrix_edgeR <- model.matrix(~Group, get_group_DF(omicsData))
+  design_matrix_edgeR <- model.matrix(~Group, grouping_info)
   
-  GCD_edgeR <- estimateGLMCommonDisp(norm_factors_edgeR,
+  GCD_edgeR <- edgeR::estimateGLMCommonDisp(norm_factors_edgeR,
                                      design_matrix_edgeR)
   
-  GTD_edgeR <- estimateGLMTrendedDisp(GCD_edgeR,
+  GTD_edgeR <- edgeR::estimateGLMTrendedDisp(GCD_edgeR,
                                       design_matrix_edgeR,
                                       method="power")
   
-  GTagD_edgeR <- estimateGLMTagwiseDisp(GTD_edgeR,
-                                        design_matrix_edgeR)
+  GTagD_edgeR <- edgeR::estimateGLMTagwiseDisp(GTD_edgeR, design_matrix_edgeR)
   
+  fit_edgeR <- edgeR::glmQLFit(GTagD_edgeR, design_matrix_edgeR)
   
-  fit_edgeR <- glmQLFit(GTagD_edgeR, design_matrix_edgeR)
-  
-  all_contrasts <- map_chr(1:ncol(cob_list), 
-                           function(combo_n) paste0(cob_list[,combo_n], collapse = "-"))
-  
-  ## user specified pair-wise vs levels
-  
-  
+
   #### Make p-value adjustments across # of comparisons too ??
   ## Row numbers in excess of edata nrow
-  res_contrasts <- map(1:length(all_contrasts), function(n){
+  res_contrasts <- purrr::map(1:length(all_contrasts), function(n){
     combo <- cob_list[,n]
-    CONTRASTS <- makeContrasts(
+    CONTRASTS <- limma::makeContrasts(
       contrasts = all_contrasts[n], 
       levels = comparisons)
-    res_stats <- glmQLFTest(fit_edgeR, contrast = CONTRASTS)
-    res <- topTags(res_stats, p.value = p_cutoff, n = Inf) ### allow custom p-value cut-off?
-    colnames(res$table) <- paste0(paste0(combo[1], "_vs_", combo[2], "_"), colnames(res$table))
-    res <- as.data.frame(res)
+    res_stats <- edgeR::glmQLFTest(fit_edgeR, contrast = CONTRASTS)
+    res <- edgeR::topTags(res_stats, n = Inf, adjust.method = p_adjust, 
+                   sort.by = "none")
+    res <- as.data.frame(res$table)
+    
+    sig_col <- if("FDR" %in% colnames(res)) "FDR" else "FWER"
+
+    # Flag stuffs ----------------------------------------------------------------
+    sigs <- which(res[[sig_col]] < p_cutoff)
+    res[["Flag_LRT"]] <- 0
+    if(length(sigs) > 0){
+      res[["Flag_LRT"]][sigs] <- sign(res[["logFC"]][sigs])
+    }
+    
+    colnames(res) <- paste0(colnames(res), 
+                            paste0("_", combo[1], "_vs_", combo[2]))
+    
+    ## Non-zero counts and means##
+    cmb1 <- e_data_counts[grouping_info$Group == combo[1]]
+    res[[paste0("NonZero_Count_", combo[1])]] <- rowSums(cmb1 != 0)
+    res[[paste0("Mean_", combo[1])]] <- apply(cmb1, 1, mean, na.rm = T)
+    
+    cmb2 <- e_data_counts[grouping_info$Group == combo[2]]
+    res[[paste0("NonZero_Count_", combo[2])]] <- rowSums(cmb2 != 0)
+    res[[paste0("Mean_", combo[2])]] <- apply(cmb2, 1, mean, na.rm = T)
+    
     res[[get_edata_cname(omicsData)]] <- row.names(res)
     row.names(res) <- NULL
     res[c(ncol(res), 1:(ncol(res) - 1))]
   })
   
-  all_cont <- res_contrasts[[1]]
-  if(length(res_contrasts) > 1){
-    for(i in 2:length(res_contrasts)){
-      if(length(res_contrasts[[i]]) > 0){
-        all_cont <- full_join(all_cont, res_contrasts[[i]])
-      }
-    }
-  }
+  all_cont <- res_contrasts[map_int(res_contrasts, nrow) != 0] %>% 
+    reduce(full_join)
   
-  results <- list(Full_results = all_cont)
+  # mean_cols <- str_detect(colnames(all_cont), "^logCPM")
+  # f_cols <- str_detect(colnames(all_cont), "^F_")
+  
+  count_cols <- grep("^NonZero_Count_", colnames(all_cont))
+  mean_cols <- grep("^Mean", colnames(all_cont))
+  lfc_cols <- grep("^logFC", colnames(all_cont))
+  # pval_cols <- grep(colnames(all_cont), "_pvalue")
+  padj_cols <- grep("^(FDR|FWER)", colnames(all_cont))
+  flag_cols <- grep("^Flag", colnames(all_cont))
+  
+  colnames(all_cont)[-1] <- gsub("^logFC", "Fold_change", colnames(all_cont)[-1])
+  colnames(all_cont)[-1] <- gsub("^(FDR|FWER)", "P_value_LRT", colnames(all_cont)[-1])
+  
+  ## Ordering
+  results <- all_cont[c(1, count_cols, mean_cols, 
+                        lfc_cols, padj_cols, flag_cols)]
+  
+  attr_list <- c("cnames", "data_info", "filters", "group_DF")
+  keep_attr <- attributes(results)[names(attributes(results)) %in% attr_list]
+  attributes(results) <- c(attributes(results), keep_attr)
+  
+  ## sig totes
+  flag_df <- reshape2::melt(all_cont[flag_cols], 
+                            variable.name = "Comparison", 
+                            value.name = "Flags")
+  flag_df$Comparison <- gsub("Flag_LRT_", "", flag_df$Comparison )
+  attr(results, "number_significant") <- flag_df %>%
+    dplyr::group_by(Comparison) %>%
+    dplyr::summarise(
+      Up_total = sum(Flags > 0, na.rm = T),
+      Down_total = sum(Flags < 0, na.rm = T),
+      row.names = NULL
+    )
+  
+  attr(results, "comparisons") <- comparisons
+  attr(results, "statistical_test") <- "EdgeR_LRT"
+  attr(results, "adjustment_method") <- p_adjust
+  attr(results, "pval_thresh") <- p_cutoff
+  attr(results, "data_class") <- attr(omicsData, "class")
+  class(results) <- c("statRes", class(results))
   
   # viz
-  if(plotMDS) results$plotMDS <- plotMDS(norm_factors_edgeR)
-  if(plotBCV) results$plotBCV <- plotBCV(GTagD_edgeR)
-  
+  if(plotMDS){
+    attr(results, "plotMDS") <- norm_factors_edgeR
+    plotMDS(norm_factors_edgeR)
+  }
+  if(plotBCV){
+    attr(results, "plotBCV") <- GTagD_edgeR
+    plotBCV(GTagD_edgeR)
+  }
+
   return(results)
   
 }
@@ -276,72 +403,147 @@ Voom_wrapper <- function(
     plotVoom = F
 ){
   
-  if(is.null(comparisons)) comparisons <- unique(get_group_DF(omicsData)$Group)
+  edata_cname <- get_edata_cname(omicsData)
+  fdata_cname <- get_fdata_cname(omicsData)
+  e_data_counts <- omicsData$e_data[colnames(omicsData$e_data) != edata_cname]
+  grouping_info <- get_group_DF(omicsData)[colnames(omicsData$f_data) != fdata_cname]
   
+  if(is.null(comparisons)) comparisons <- unique(grouping_info$Group)
   cob_list <- combn(comparisons, 2)
   
-  edata_limma <- DGEList(omicsData$e_data[-1]) 
-  norm_factors_limma <- calcNormFactors(edata_limma)
-  design_matrix_limma <- model.matrix(~0 + Group, get_group_DF(omicsData))
-  limma_voom <- voom(norm_factors_limma, design_matrix_limma, save.plot = plotVoom)
-  limma_vfit <- lmFit(limma_voom, design_matrix_limma)
+  edata_limma <- edgeR::DGEList(e_data_counts) 
+  norm_factors_limma <- edgeR::calcNormFactors(edata_limma)
+  design_matrix_limma <- model.matrix(~0 + Group, grouping_info)
+  limma_voom <- limma::voom(norm_factors_limma, design_matrix_limma, save.plot = plotVoom)
+  limma_vfit <- limma::lmFit(limma_voom, design_matrix_limma)
   
-  all_contrasts <- map_chr(1:ncol(cob_list), 
-                           function(combo_n) paste0(paste0("Group", cob_list[,combo_n]), collapse = "-"))
+  all_contrasts <- purrr::map_chr(1:ncol(cob_list), 
+                           function(combo_n) paste0(paste0("Group", 
+                                                           cob_list[,combo_n]), 
+                                                    collapse = "-"))
   
-  res_contrasts <- map(1:length(all_contrasts), function(n){
+  res_contrasts <- purrr::map(1:length(all_contrasts), function(n){
     combo <- cob_list[,n]
-    CONTRASTS <- makeContrasts(
+    CONTRASTS <- limma::makeContrasts(
       contrasts = all_contrasts[n], 
       levels = paste0("Group", comparisons))
-    tmp <- contrasts.fit(limma_vfit, CONTRASTS)
-    fit <- eBayes(tmp)
+    tmp <- limma::contrasts.fit(limma_vfit, CONTRASTS)
+    fit <- limma::eBayes(tmp)
     
     # topTable uses adjust method  = "BH"
-    res <- topTable(fit, n = Inf, p.value = p_cutoff)
+    res <- limma::topTable(fit, n = Inf, adjust.method = p_adjust, sort.by = "none")
+    
     if(nrow(res) > 1){
-      colnames(res) <- paste0(paste0(combo[1], "_vs_", combo[2], "_"), colnames(res))
+      
+      # Flag stuffs ----------------------------------------------------------------
+      sigs <- which(res[["adj.P.Val"]] < p_cutoff)
+      res[["Flag_T"]] <- 0
+      if(length(sigs) >0 ){
+        res[["Flag_T"]][sigs] <- sign(res[["logFC"]][sigs])
+      }
+      
+      colnames(res) <- paste0(colnames(res), paste0("_", combo[1], "_vs_", combo[2]))
+      
+      ## Non-zero counts and means##
+      cmb1 <- e_data_counts[grouping_info$Group == combo[1]]
+      res[[paste0("NonZero_Count_", combo[1])]] <- rowSums(cmb1 != 0)
+      res[[paste0("Mean_", combo[1])]] <- apply(cmb1, 1, mean, na.rm = T)
+      
+      cmb2 <- e_data_counts[grouping_info$Group == combo[2]]
+      res[[paste0("NonZero_Count_", combo[2])]] <- rowSums(cmb2 != 0)
+      res[[paste0("Mean_", combo[2])]] <- apply(cmb2, 1, mean, na.rm = T)
+      
       res[[get_edata_cname(omicsData)]] <- row.names(res)
       row.names(res) <- NULL
       return(res[c(ncol(res), 1:(ncol(res) - 1))])
     } else return()
   })
   
-  all_cont <- res_contrasts[[1]]
-  if(length(res_contrasts) > 1){
-    for(i in 2:length(res_contrasts)){
-      if(length(res_contrasts[[i]]) > 0){
-        all_cont <- full_join(all_cont, res_contrasts[[i]])
-      }
-    }
-  }
+  all_cont <- res_contrasts[map_int(res_contrasts, nrow) != 0] %>% 
+    reduce(full_join)
   
-  results <- list(Full_results = all_cont)
+  count_cols <- grep("^NonZero", colnames(all_cont))
+  mean_cols <- grep("^Mean", colnames(all_cont))
+  lfc_cols <- grep("^logFC", colnames(all_cont))
+  # pval_cols <- grep(colnames(all_cont), "_pvalue")
+  padj_cols <- grep("^adj.P.Val", colnames(all_cont))
+  flag_cols <- grep("^Flag", colnames(all_cont))
+  
+  colnames(all_cont)[-1] <- gsub("^logFC", "Fold_change", colnames(all_cont)[-1])
+  colnames(all_cont)[-1] <- gsub("^adj.P.Val", "P_value_T", colnames(all_cont)[-1])
+  
+  
+  results <- all_cont[c(1, count_cols, mean_cols, 
+                        lfc_cols, padj_cols, flag_cols)]
+  
+  attr_list <- c("cnames", "data_info", "filters", "group_DF")
+  keep_attr <- attributes(results)[names(attributes(results)) %in% attr_list]
+  attributes(results) <- c(attributes(results), keep_attr)
+  
+  ## sig totes
+  flag_df <- reshape2::melt(all_cont[flag_cols], 
+                            variable.name = "Comparison", 
+                            value.name = "Flags")
+  flag_df$Comparison <- gsub("Flag_T_", "", flag_df$Comparison )
+  attr(results, "number_significant") <- flag_df %>%
+    dplyr::group_by(Comparison) %>%
+    dplyr::summarise(
+      Up_total = sum(Flags > 0, na.rm = T),
+      Down_total = sum(Flags < 0, na.rm = T),
+      row.names = NULL
+    )
+  
+  attr(results, "comparisons") <- comparisons
+  attr(results, "statistical_test") <- "Voom T"
+  attr(results, "adjustment_method") <- p_adjust
+  attr(results, "pval_thresh") <- p_cutoff
+  attr(results, "data_class") <- attr(omicsData, "class")
+  class(results) <- c("statRes", class(results))
   
   # viz
   if(plotVoom){
-    
-    df_points <- data.frame(
-      x =  limma_voom$voom.xy$x,
-      y = limma_voom$voom.xy$y
-    )
-    
-    df_line <- data.frame(
-      x_line =  limma_voom$voom.line$x,
-      y_line = limma_voom$voom.line$y
-    )
-    
-    results$plotVoom <- ggplot2::ggplot(
-      data = df_points, 
-      mapping = ggplot2::aes(x = x, y = y)) + 
-      ggplot2::geom_point() +
-      ggplot2::geom_line(inherit.aes = F, data = df_line, 
-                         mapping = ggplot2::aes(x = x_line, y = y_line), color = "red") +
-      ggplot2::labs(x =  limma_voom$voom.xy$xlab, y = limma_voom$voom.xy$ylab) +
-      ggplot2::theme_bw()
+    attr(results, "plotVoom") <- limma_voom
+    plotVoom(limma_voom)
   }
   
   return(results)
   
 }
 
+
+#' Plot for voom wrapper
+#' 
+#' For generating statistics for 'seqData' objects
+#' 
+#' @param limma_voom attribute passed in statRes object from seqData where LimmaVoom was run
+#'
+#' @return plot result
+#' 
+#' @examples
+#' \dontrun{
+#' }
+#' 
+#' @export
+#' @rdname plotVoom
+#' @name plotVoom
+#' 
+plotVoom <- function(limma_voom){
+  df_points <- data.frame(
+    x =  limma_voom$voom.xy$x,
+    y = limma_voom$voom.xy$y
+  )
+  
+  df_line <- data.frame(
+    x_line =  limma_voom$voom.line$x,
+    y_line = limma_voom$voom.line$y
+  )
+  
+  ggplot2::ggplot(
+    data = df_points, 
+    mapping = ggplot2::aes(x = x, y = y)) + 
+    ggplot2::geom_point() +
+    ggplot2::geom_line(inherit.aes = F, data = df_line, 
+                       mapping = ggplot2::aes(x = x_line, y = y_line), color = "red") +
+    ggplot2::labs(x =  limma_voom$voom.xy$xlab, y = limma_voom$voom.xy$ylab) +
+    ggplot2::theme_bw()
+}

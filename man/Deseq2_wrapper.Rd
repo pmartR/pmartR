@@ -28,7 +28,8 @@ Deseq2_wrapper(
   format = "DataFrame",
   addMLE = FALSE,
   plotMA = F,
-  plotDispEsts = F
+  plotDispEsts = F,
+  p_cutoff = 0.05
 )
 }
 \arguments{
@@ -75,6 +76,8 @@ Deseq2_wrapper(
 \item{plotMA}{an object of type 'seqData', created by \code{\link{as.seqData}}}
 
 \item{plotDispEsts}{an object of type 'seqData', created by \code{\link{as.seqData}}}
+
+\item{p_cutoff}{an object of type 'seqData', created by \code{\link{as.seqData}}}
 }
 \value{
 data.frame object
