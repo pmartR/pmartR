@@ -219,7 +219,7 @@ summary.totalCountFilt <- function(filter_object, min_count = NULL){
 #'
 print.totalCountFiltSummary <- function(object){
   # create output #
-  cat(c("\nSummary of Total Count Filter\n----------------------\nCountss:\n", 
+  cat(c("\nSummary of Total Count Filter\n----------------------\nCounts:\n", 
         capture.output(object$Summary_all)), sep = "\n")
   cat(c("\nNumber Filtered Biomolecules:", paste(object$filtered_biomolecules, collapse = ", "), "\n\n"))
   

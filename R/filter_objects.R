@@ -38,7 +38,7 @@
 #'
 #' @export
 #'
-molecule_filter <- function (omicsData,use_groups = FALSE, use_batch = FALSE) {
+molecule_filter <- function (omicsData, use_groups = FALSE, use_batch = FALSE) {
   ## some initial checks ##
   # test#
   

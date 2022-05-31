@@ -5200,6 +5200,7 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
 #'   be displayed on the bar plot. The default is TRUE.
 #' @param custom_theme a ggplot `theme` object to be applied to non-interactive
 #'   plots, or those converted by plotly::ggplotly().
+#' @param cluster logical for heatmaps; T will cluster biomolecules on X axis
 #'
 #' @details Plot types:
 #' \itemize{
@@ -5279,7 +5280,8 @@ plot.statRes <- function (x,
                           text_size = 3,
                           bw_theme = TRUE,
                           display_count = TRUE,
-                          custom_theme = NULL) {
+                          custom_theme = NULL,
+                          cluster = F) {
 
   # Farm boy, fix all the problems. As you wish.
 
@@ -5358,13 +5360,17 @@ plot.statRes <- function (x,
 
   # Volcano plot
   else if("volcano"%in%plot_type){
-    if(!attr(x, "statistical_test") %in% c("anova", "combined")){
+    if(!attr(x, "statistical_test") %in% c(
+      "anova", "combined", "EdgeR_LRT", "Voom_T", "DESeq_Wald", "DESeq_LRT")
+      ){
       stop(paste("imd_anova must have been run with test_method = 'anova' or",
-                 "'combined' to make the volcano plot",
+                 "'combined' to make the volcano plot. For seqData,",
+                 "DE_wrapper must have been run.",
                  sep = " "))
     }
 
     # still returns a ggplot, even if interactive = T
+    
     p <-
       statres_volcano_plot(
         volcano = volcano,
@@ -5395,7 +5401,7 @@ plot.statRes <- function (x,
   else if("gheatmap" %in% plot_type){
     if(!attr(x, "statistical_test") %in% c("gtest", "combined")){
       stop(paste("imd_anova must have been run with test_method = 'gtest' or",
-                 "'combined' to make the g-test heatmap",
+                 "'combined' to make the g-test heatmap. Not valid for seqData.",
                  sep = " "))
     }
 
@@ -5439,14 +5445,35 @@ plot.statRes <- function (x,
         legend_lab
 
     #For now just consider biomolecules significant with respect to ANOVA
-    volcano <- dplyr::filter(volcano,Type=="ANOVA")
+    volcano <- dplyr::filter(volcano, Type %in% c("ANOVA", "EdgeR_LRT", 
+                                                 "Voom_T", "DESeq_Wald", 
+                                                 "DESeq_LRT"))
 
     volcano_sigs <- dplyr::filter(volcano,P_value<attr(x,"pval_thresh"))
     if(!(nrow(volcano_sigs)) > 0)
       warning("No molecules significant at the provided p-value threshold")
     colnames(volcano_sigs)[1] <- "Biomolecule"
-    volcano_sigs$Biomolecule <- as.factor(volcano_sigs$Biomolecule)
-
+    
+    if(cluster){
+      browser()
+      wide <- reshape2::dcast(volcano_sigs,
+                    Biomolecule ~ Comparison,
+                    value.var = "Fold_change",
+                    fun.aggregate = mean, na.rm = T
+      )
+      wide <- wide[!is.na(wide$Biomolecule),]
+      row.names(wide) <- wide$Biomolecule
+      dist_mat <- dist(wide[-1])
+      res_hclust <- hclust(dist_mat)
+      order_biom <- rev(res_hclust$labels[res_hclust$order])
+      
+      volcano_sigs$Biomolecule <- as.character(volcano_sigs$Biomolecule)
+      volcano_sigs$Biomolecule <- factor(volcano_sigs$Biomolecule, 
+                                         levels = order_biom)
+    } else {
+      volcano_sigs$Biomolecule <- as.factor(volcano_sigs$Biomolecule)
+    }
+    
     p <- ggplot2::ggplot(volcano_sigs,
                          ggplot2::aes(Biomolecule,
                                       Comparison,
@@ -5515,6 +5542,16 @@ prep_flags <- function (x, test) {
                                   "",
                                   colnames(x)[grep("^Flag_G_", colnames(x))])
 
+  } else if(test %in% c("EdgeR_LRT", "Voom_T", "DESeq_Wald", "DESeq_LRT")){
+    
+    # Assemble a data frame with the sample IDs and flags.
+    flag_cols <- grep("^Flag_(Wald|LRT|T)_", colnames(x))
+    da_flag <- x[c(1, flag_cols)]
+
+    # Remove "Flag_A_" from column names. The first column name is removed
+    # because it corresponds to the biomolecule ID column.
+    colnames(da_flag)[-1] <- gsub("^Flag_(Wald|LRT|T)_", "", colnames(da_flag)[-1])
+    
   } else {
 
     # Criteria for reporting p-values when combined test is selected:
@@ -5604,6 +5641,7 @@ prep_flags <- function (x, test) {
 #'
 make_volcano_plot_df <- function(x) {
   # fold change values for volcano plot
+  
   fc_data <-
     x[, c(1, grep("^Fold_change", colnames(x)))]
   colnames(fc_data) <-
@@ -5652,14 +5690,10 @@ make_volcano_plot_df <- function(x) {
     pvals$Type <- "G-test"
   } else if (attr(x, "statistical_test") == "anova") {
     pvals$Type <- "ANOVA"
-  }
+  } else pvals$Type <- attr(x, "statistical_test")
 
   levels(pvals$Comparison) <-
-    gsub(pattern = "^P_value_G_",
-         replacement = "",
-         levels(pvals$Comparison))
-  levels(pvals$Comparison) <-
-    gsub(pattern = "^P_value_A_",
+    gsub(pattern = "^P_value_(Wald|LRT|T|G|A)_",
          replacement = "",
          levels(pvals$Comparison))
 
@@ -6120,7 +6154,8 @@ statres_volcano_plot <-
 
     # temp data with rows only for ANOVA
     temp_data_anova <- volcano %>%
-      dplyr::filter(Type == "ANOVA") %>%
+      dplyr::filter(Type %in% c(
+        "ANOVA", "EdgeR_LRT", "Voom_T", "DESeq_Wald", "DESeq_LRT")) %>%
       dplyr::mutate(
         Fold_change_flag = dplyr::case_when(
           is.na(Fold_change) |
@@ -6134,7 +6169,7 @@ statres_volcano_plot <-
           TRUE ~ Fold_change_flag
         )
       )
-
+    
     # interactive plots need manual text applied to prepare for ggplotly
     # conversion
     if (interactive) {
@@ -6176,7 +6211,8 @@ statres_volcano_plot <-
       ggplot2::scale_color_manual(
         values = cols_anova,
         name = the_legend_label,
-        labels = c("Neg(Anova)", "0", "Pos(Anova)"),
+        labels = c(paste0("Neg(", unique(temp_data_anova$Type), ")"), 
+                   "0", paste0("Pos(", unique(temp_data_anova$Type), ")")),
         breaks = c("-1", "0", "1")
       )
 
