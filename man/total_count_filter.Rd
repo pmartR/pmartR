@@ -8,16 +8,13 @@ total_count_filter(omicsData)
 }
 \arguments{
 \item{omicsData}{an object of the class 'seqData', usually created by \code{\link{as.seqData}}}
-
-\item{min_count}{an integer value specifying the minimum number of total counts 
-(across all samples) observed each feature. Default value is 10.}
 }
 \value{
 Object of class totalcountFilt (also a data.frame) that contains the
   molecule identifier and the total count of observed reads.
 }
 \description{
-This function returns a intensityFilt object for use with
+This function returns a totalcountFilt object for use with
 \code{\link{applyFilt}}
 }
 \details{
@@ -30,8 +27,8 @@ http://f1000research.com/articles/5-1438
 \examples{
 \dontrun{
 library(pmartRdata)
-data("pep_object")
-to_filter <- total_count_filter(omicsData = pep_object)
+data("seq_object")
+to_filter <- total_count_filter(omicsData = seq_object)
 summary(to_filter, min_num = 2)
 }
 

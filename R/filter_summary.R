@@ -167,6 +167,162 @@ print.moleculeFilterSummary <- function(object){
   
 }
 
+#' Produce a basic summary of a RNAFilt object
+#'
+#' This function will provide basic summary statistics for the molecule_filter object.
+#'
+#' @param filter_object S3 object of class 'RNAFilt' created by \code{\link{molecule_filter}}.
+#' @param min_nonzero Integer or float between 0 and 1. Cut-off for number of 
+#' unique biomolecules with non-zero counts or as a proportion of total 
+#' biomolecules. Defaults to NULL.
+#' @param size_library Integer. Cut-off for sample library size (i.e. number 
+#' of reads). Defaults to NULL.
+#' 
+#' @return a summary table giving the minimum, maximum, interquartiles, mean and 
+#' standard deviation for library size,  the number of unique biomolecules with 
+#' non-zero observations per sample, and the proportion of non-zero observations 
+#' over the total number of biomolecules.
+#'
+#' @examples
+#' dontrun{
+#' library(pmartRdata)
+#' data("pep_object")
+#' myfilter <- molecule_filter(pep_object)
+#' summary(myfilter)
+#' summary(myfilter, min_num = 2)
+#'}
+#'
+#' @author Lisa Bramer, Kelly Stratton
+#'
+#' @export
+#'@rdname summary.RNAFilt
+#'@name summary.RNAFilt
+
+summary.RNAFilt <- function(filter_object, 
+                            size_library = NULL, 
+                            min_nonzero = NULL){
+  
+  # Have a looksie at the class of the filter object.
+  if (!inherits(filter_obj, "RNAFilt")) {
+    
+    # Fezzik, tear his arms off.
+    stop ("filter_obj must be of class RNAFilt")
+    
+  }
+  
+  ## Checks for size_library as single integer
+  if(!is.null(size_library) && 
+     (length(size_library) > 1 || 
+      size_library%%1 != 0 ||
+      size_library > max(filter_obj$LibrarySize)
+     )
+  ) stop(
+    paste0(
+      "size_library must be integer of length 1 less than max library size (",
+      max(filter_obj$LibrarySize),
+      ")"
+    )
+  )
+  
+  ## Checks for min_nonzero as single numeric
+  if(!is.null(min_nonzero)){
+    
+    ## Length
+    if(length(min_nonzero) > 1) stop("min_nonzero must be length 1")
+      
+    ## proportion or int
+    if(!(min_nonzero%%1 == 0 || (min_nonzero > 0 && min_nonzero < 1))) stop(
+      "min_nonzero must be integer or numeric between 0 and 1.")
+    
+    ## Within appropriate bounds
+    if(min_nonzero%%1 == 0 && min_nonzero > max(filter_obj$NonZero)) stop(
+      paste0("min_nonzero exceeds maximum number of non-zero biomolecules (",
+             max(filter_obj$NonZero),
+             ")"
+      )
+    )
+    
+    if(min_nonzero%%1 != 0 && 
+       min_nonzero > max(filter_obj$ProportionNonZero)) stop(
+         paste0(
+           "min_nonzero exceeds maximum proportion of non-zero biomolecules (",
+           signif(max(filter_obj$ProportionNonZero)), 
+           ")")
+       )
+    
+    
+  }
+  
+  #---------------
+  temp_obj <- filter_obj
+  if(!is.null(min_nonzero)){
+    
+    column_use <- ifelse(min_nonzero%%1 == 0, 
+                         "NonZero", "ProportionNonZero")
+    temp_obj <- temp_obj[temp_obj[[column_use]] >= min_nonzero,]
+  }
+  
+  if(!is.null(size_library)){
+    temp_obj <- temp_obj[temp_obj[["LibrarySize"]] >= size_library,]
+  }
+  
+  ## Pre-filter
+  df <- as.data.frame(apply(temp_obj[-1], 2, summary))
+  df["SD",] <- apply(temp_obj[-1], 2, sd)
+  
+  rmved <- !(filter_obj$SampleID %in% temp_obj$SampleID)
+  
+  res <- list(
+    Summary = df,
+    samples_filtered = filter_obj$SampleID[rmved],
+    num_filtered = sum(rmved),
+    num_not_filtered = sum(!rmved),
+    nonzero_thresh = min_nonzero,
+    library_thresh = size_library
+  )
+  
+  class(res) = c("RNAFiltSummary", class(res))
+  
+  return(res)
+}
+
+
+#' Print method for summary of RNAFilt
+#' 
+#' Print method for summary of RNAFilt
+#' 
+#' @export
+#' @name print.RNAFiltSummary
+print.RNAFiltSummary <- function(object){
+  # create output #
+  cat("\nSummary of RNA Filter \n----------------------------------\n")
+  
+  if(!is.null(object$library_thresh)){
+    cat(sprintf("Library size cut-off: %d\n\n", 
+                object$library_thresh))
+  }
+  
+  if(!is.null(object$nonzero_thresh)){
+    
+    if(object$nonzero_thresh%%1 == 0){
+      cat(sprintf("N Non-zero biomolecule cut-off: %d\n\n", 
+                  object$nonzero_thresh))
+    } else {
+      cat(sprintf("Proportion Non-zero biomolecule cut-off: %d\n\n", 
+                  object$nonzero_thresh))
+    }
+  }
+  
+  if(length(object$samples_filtered) > 0){
+    cat(sprintf("Samples Filtered:%d\n Samples Not Filtered:%d\n\n",
+                object$num_filtered, 
+                object$num_not_filtered))
+  }
+  
+  print(object$Summary)
+  
+}
+
 
 #' Produce a basic summary of a totalCountFilt object
 #'

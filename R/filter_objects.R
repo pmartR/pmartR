@@ -220,12 +220,10 @@ molecule_filter <- function (omicsData, use_groups = FALSE, use_batch = FALSE) {
 
 #' Total Count filter object
 #'
-#' This function returns a intensityFilt object for use with
+#' This function returns a totalcountFilt object for use with
 #' \code{\link{applyFilt}}
 #'
 #' @param omicsData an object of the class 'seqData', usually created by \code{\link{as.seqData}}
-#' @param min_count an integer value specifying the minimum number of total counts 
-#' (across all samples) observed each feature. Default value is 10.
 #'
 #' @details Filter is based off of recommendations in edgeR processing:
 #' Chen Y, Lun ATL, and Smyth, GK (2016). From reads to genes to pathways: 
@@ -239,8 +237,8 @@ molecule_filter <- function (omicsData, use_groups = FALSE, use_batch = FALSE) {
 #' @examples
 #' \dontrun{
 #' library(pmartRdata)
-#' data("pep_object")
-#' to_filter <- total_count_filter(omicsData = pep_object)
+#' data("seq_object")
+#' to_filter <- total_count_filter(omicsData = seq_object)
 #' summary(to_filter, min_num = 2)
 #' }
 #'
@@ -262,10 +260,13 @@ total_count_filter <- function (omicsData) {
   id_col <- which(names(omicsData$e_data) == get_edata_cname(omicsData))
 
   # Compute the number of non-missing values for each row.
-  count_total <- rowSums(omicsData$e_data[, -id_col])
+  temp_data <- omicsData$e_data[, -id_col]
+  
+  # Compute the number of non-missing values for each row.
+  count_data <- rowSums(temp_data)
   
   # Create a data frame with the ID column and the number of non-missing values.
-  output <- data.frame(omicsData$e_data[, id_col], count_total)
+  output <- data.frame(omicsData$e_data[, id_col], count_data)
   names(output) <- c(get_edata_cname(omicsData), "Total_Counts")
   
   # Extract the 'data.frame' class from the the output data frame.
@@ -274,39 +275,123 @@ total_count_filter <- function (omicsData) {
   # Create the totalCountFilt class and attach the data.frame class to it as well.
   class(output) <- c("totalCountFilt", orig_class)
   
+  ## Store density info ##
+  ## LCPM transform
+  samp_sum <- apply(temp_data, 2, sum, na.rm = TRUE) + 1
+  div_sum <- sweep((temp_data + .5), 2, samp_sum, `/`)
+  lcpm <- log2(div_sum * 10^6)
+  lcpm[[get_edata_cname(omicsData)]] <- omicsData$e_data[[id_col]]
+  density_data <- reshape2::melt(lcpm, 
+                                 id.var = get_edata_cname(omicsData),
+                                 variable.name = "Sample",
+                                 value.name = "lcpm")
+  attr(output, "e_data_lcpm") <- density_data
+  
   # Return the completed object!!!
   return(output)
   
 }
 
 
-#' Filter Based on Pooled Coefficient of Variation (CV) Values
+#' RNA filter object
 #'
-#' A pooled CV is calculated for each biomolecule.
+#' This function returns a RNAFilt object for use with
+#' \code{\link{applyFilt}}
 #'
-#' @param omicsData an object of the class 'pepData', 'proData', 'metabData',
+#' @param omicsData an object of the class 'seqData', usually created by \code{\link{as.seqData}}
+#'
+#' @details Filter omicsData samples by library size (number of reads) or number
+#' of unique non-zero biomolecules per sample.
+#'
+#' @return Object of class RNAFilt (also a data.frame) that contains the
+#'   sample identifiers, library size, the number of unique biomolecules with 
+#'   non-zero observations per sample, and the proportion of non-zero 
+#'   observations over the total number of biomolecules.
+#'
+#' @examples
+#' \dontrun{
+#' library(pmartRdata)
+#' data("seq_object")
+#' to_filter <- RNAFilter(omicsData = seq_object)
+#' plot(to_filter)
+#' summary(to_filter, size_library = 10000)
+#' summary(to_filter, min_nonzero = 5000)
+#' summary(to_filter, min_nonzero = .2)
+#' }
+#'
+#' @author Rachel Richardson
+#'
+#' @export
+#'
+RNAFilter <- function (omicsData) {
+  ## some initial checks ##
+  
+  # check that omicsData is of appropriate class #
+  if (!inherits(omicsData, c( "seqData"))) {
+    
+    stop (paste("omicsData must be of class 'seqData'.",sep = ' '))
+    
+  }
+  
+  # Extricate the column number of the ID column.
+  id_col <- which(names(omicsData$e_data) == get_edata_cname(omicsData))
+  
+  # Compute the number of non-missing values for each row.
+  temp_data <- omicsData$e_data[, -id_col]
+  
+  # Compute the library size for each column
+  lib_sizes <- colSums(temp_data)
+  
+  # Compute the number of biomolecules with non-zero counts
+  # unique biomolecules by edata definition
+  non_zeros <- apply(temp_data != 0, 2, sum)
+  
+  output <- data.frame(
+    SampleID = names(lib_sizes),
+    LibrarySize = as.integer(lib_sizes),
+    NonZero = as.integer(non_zeros),
+    ProportionNonZero = as.numeric(non_zeros/nrow(temp_data))
+  )
+  
+  # Extract the 'data.frame' class from the the output data frame.
+  orig_class <- class(output)
+  
+  # Create the totalCountFilt class and attach the data.frame class to it as well.
+  class(output) <- c("RNAFilt", orig_class)
+  
+  # Return the completed object!!!
+  return(output)
+  
+}
+
+
+##'Filter Based on Pooled Coefficient of Variation (CV) Values
+#'
+#'A pooled CV is calculated for each biomolecule.
+#'
+#'@param omicsData an object of the class 'pepData', 'proData', 'metabData',
 #'  'lipidData', or 'nmrData' created by \code{\link{as.pepData}},
 #'  \code{\link{as.proData}}, \code{\link{as.metabData}},
 #'  \code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, respectively. Note,
 #'  if \code{\link{group_designation}} has not been run, the CV is calculated
 #'  based on all samples for each biomolecule.
-#' @param use_groups logical indicator for whether to utilize group information
+#'@param use_groups logical indicator for whether to utilize group information
 #'  from \code{\link{group_designation}} when calculating the CV. Defaults to
 #'  TRUE. If use_groups is set to TRUE but \code{\link{group_designation}} has
 #'  not been run on the omicsData object, use_groups will be treated as FALSE.
 #'
-#' @return  An S3 object of class 'cvFilt' giving the pooled CV for each
+#'@return  An S3 object of class 'cvFilt' giving the pooled CV for each
 #'  biomolecule and additional attributes used for plotting a data.frame with a
 #'  column giving the biomolecule name and a column giving the pooled CV value.
 #'
-#' @details For each biomolecule, the CV of each group is calculated as the
+#'@details For each biomolecule, the CV of each group is calculated as the
 #'  standard deviation divided by the mean, excluding missing values. A pooled
 #'  CV estimate is then calculated based on the methods of Ahmed (1995). Any
 #'  groups consisting of a single sample are excluded from the CV calculation,
 #'  and thus, from the cv_filter result. If group_designation has not been run
 #'  on the omicsData object, all samples are considered to belong to the same
 #'  group.
-#' @references Ahmed, S.E. (1995). \emph{A pooling methodology for coefficient of
+#'@references Ahmed, S.E. (1995). \emph{A pooling methodology for coefficient of
 #'  variation}. The Indian Journal of Statistics. 57: 57-75.
 #'
 #' @examples
@@ -319,104 +404,99 @@ total_count_filter <- function (omicsData) {
 #' summary(to_filter, cv_threshold = 30)
 #'}
 #'
-#' @author Lisa Bramer, Kelly Stratton
+#'@author Lisa Bramer, Kelly Stratton
 #'
-#' @export
+#'@export
 #'
 cv_filter <- function(omicsData, use_groups = TRUE) {
-
+  
   # Run some preliminary checks ------------------------------------------------
-
+  
   # check that omicsData is of appropriate class #
   if (!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData",
-                             "nmrData", "seqData"))) {
-
+                             "nmrData"))) {
+    
     # Follow the instructions foul creature!!!
     stop (paste("omicsData must be of class 'pepData', 'proData', 'metabData',",
-                "'lipidData', 'nmrData', or 'seqData'",
+                "'lipidData', or 'nmrData'",
                 sep = ' '))
-
+    
   }
-
+  
   # check that use_groups is valid #
   if (!is.logical(use_groups)) {
-
+    
     # Let the user know with an error that they are not logical.
     stop ("Argument 'use_groups' must be either TRUE or FALSE")
-
+    
   }
-
+  
   # Check if use_groups is TRUE but the group_designation function has not been
   # run yet.
   if (use_groups == TRUE && is.null(attr(omicsData, "group_DF"))) {
-
+    
     # Set use groups to FALSE and continue running. At this point it is clear
     # the user doesn't get it. We will help them out a little by doing some of
     # the work for them.
     use_groups <- FALSE
-
+    
   }
-
+  
   # Prepare data for CV calculations -------------------------------------------
-
+  
   # Extricate the column number of the ID column.
   id_col <- which(names(omicsData$e_data) == get_edata_cname(omicsData))
-
+  
   # Check the data scale.
-  if (get_data_scale(omicsData) %in% c("abundance", "counts")) {
-
+  if (get_data_scale(omicsData) == "abundance") {
+    
     # Create a copy of the original data. This copy is created so we don't have
     # to repeat the code below (with a different name for omicsData$e_data)
     # depending on what scale the input data are in.
     cur_edata <- omicsData$e_data[, -id_col]
-
+    
     # The following code is run if the data is NOT on the abundance scale.
   } else {
-
-    if(get_data_scale(omicsData) %in% c("lcpm", "upper", "median")){
-      stop("Filtering seqData is only valid for raw counts")
-    }
-      
+    
     # Convert the data back to the abundance scale to perform the CV
     # calculations. Remove the column containing the biomolecule IDs.
     cur_edata <- edata_transform(omicsData = omicsData,
                                  data_scale = "abundance")$e_data[, -id_col]
-
+    
   }
-
+  
   # Conduct CV calculations ----------------------------------------------------
-
+  
   # Calculate the unpooled CV if group_designation has not been run or if
   # use_groups = FALSE.
   if (use_groups == FALSE || is.null(attr(omicsData, "group_DF"))) {
-
+    
     # Calculate the unpooled coefficient of variation.
     cvs <- unpooled_cv_rcpp(as.matrix(cur_edata))
-
+    
     # For mysterious reasons multiply the unpooled CV by 100.
     cvs <- 100 * cvs
-
+    
     # Set the is_pooled variable to FALSE (because we didn't pool the CV).
     is_pooled <- FALSE
-
+    
     # Calculate the pooled CV if use_groups is TRUE and the group_designation
     # function has been run.
   } else if (use_groups == TRUE && !is.null(attr(omicsData, "group_DF"))) {
-
+    
     # Extract the group_DF attribute to reduce typing below. Curse you S3
     # objects for not having a convenient way of extracting attributes!!
-    # groupDF <- attr(omicsData, "group_DF")
-    groupDF <- get_group_DF(omicsData)
-
+    groupDF <- attr(omicsData, "group_DF")
+    
     # From the group_DF attribute extract the non-singleton group names.
     nonsingletons <- attr(groupDF, "nonsingleton_groups")
-
+    
     # Check if any groups are singletons.
     # The following if statement removes any singleton samples from cur_edata.
     # These samples will not be part of the CV calculation and they will not be
     # filtered out of the omicsData object when the filter is applied.
     if (!setequal(unique(groupDF$Group), nonsingletons)) {
-
+      
       # Give a warning that singleton groups will not be used to determine
       # which biomolecules will be filtered.
       warning (paste("Grouping information is being utilized when calculating",
@@ -424,83 +504,78 @@ cv_filter <- function(omicsData, use_groups = TRUE) {
                      "sample. The singleton group(s) will be ignored by this",
                      "filter.",
                      sep = " "))
-
+      
       # Keep rows in groupDF that correspond to non-singleton groups.
       groupDF <- groupDF[which(groupDF$Group %in% nonsingletons), ]
-
+      
       # Fish out the name of the column that contains the sample names.
       sID <- get_fdata_cname(omicsData)
-
+      
       # Keep columns in cur_edata corresponding to non-singleton groups.
       cur_edata <- cur_edata[, which(names(cur_edata) %in% groupDF[, sID])]
-
+      
     }
-
+    
     # Make sure the order of the groups in group_DF matches the order of the
     # sample names in cur_edata.
     groupie <- groupDF$Group[match(names(cur_edata), groupDF$SampleID)]
-
+    
     # Calculate the pooled CV. The data needs to be converted to a matrix and
     # the group names need to be converted to a character vector for
     # pooled_cv_rcpp to run properly.
     cvs <- pooled_cv_rcpp(as.matrix(cur_edata), as.character(groupie))
-
+    
     # For mystifying reasons multiply the pooled CV values by 100.
     cvs <- cvs * 100
-
+    
     # Set the is_pooled variable to TRUE (because we pooled the CV).
     is_pooled <- TRUE
-
+    
   }
-
+  
   # Create and add attributes to the cv filter data frame ----------------------
-
+  
   # Create a data frame with the ID column from e_data and the CV values. This
   # data frame is called pool_cv even though the CV may not be pooled (this
   # makes us mysterious).
   pool_cv <- data.frame(omicsData$e_data[, id_col],
                         CV = cvs)
   names(pool_cv)[1] <- get_edata_cname(omicsData)
-
+  
   ## determine plotting window cutoff ##
   # calculate percentage of observations with CV <= 200 #
   prct.less200 <- (sum(pool_cv$CV <= 200, na.rm = T) /
                      length(pool_cv$CV[!is.na(pool_cv$CV)]))
-
+  
   if (prct.less200 > 0.95) {
     x.max = min(200, quantile(pool_cv$CV, 0.99, na.rm = TRUE))
   } else{
     x.max = quantile(pool_cv$CV, 0.95, na.rm = TRUE)
   }
-
+  
   ## generate some summary stats for CV values, for PMART purposes only ##
-  if(get_data_scale(omicsData) == "counts"){
-    ################################################ what makes sense here? #####
-    tot.zeros <- sum(pool_cv$CV == 0)
-    #tot.zeros <- get_data_info(omicsData)$num_zero_obs
-  } else {
-    tot.nas <- sum(is.na(pool_cv$CV))
-  }
-
+  tot.nas <- sum(is.na(pool_cv$CV))
+  
   output <- data.frame(pool_cv, row.names = NULL)
-
+  
   orig_class <- class(output)
-
+  
   class(output) <- c("cvFilt", orig_class)
-
+  
+  # Add the group designation information to the attributes.
+  attr(output, "group_DF") <- attr(omicsData, "group_DF")
+  
   attr(output, "pooled") <- is_pooled
   attr(output, "max_x_val") <- x.max
+  attr(output, "tot_nas") <- tot.nas
+  attr(output, "use_groups") <- ifelse(use_groups == FALSE,FALSE,TRUE)
   
-  if(get_data_scale(omicsData) == "counts"){
-    attr(output, "tot_zeros") <- tot.zeros
-  } else {
-    attr(output, "tot_nas") <- tot.nas
-  }
-
+  
   # Return the completed object. We did it!!!
   return (output)
-
+  
 }
+
 
 #' RMD Runs
 #'
