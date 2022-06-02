@@ -2197,12 +2197,7 @@ plot.moleculeFilt <- function (filter_obj, min_num = NULL, cumulative = TRUE,
 #'   identifier and the number of total counts for which the molecule was measured
 #'   (not NA).
 #' @param min_count An integer specifying the minimum number of samples in which a
-#'   biomolecule must appear. If a value is specified, a horizontal line will be
-#'   drawn when \code{cumulative=TRUE}, and bars will be colored appropriately
-#'   if \code{cumulative=FALSE}.  Defaults to NULL.
-#' @param cumulative logical indicating whether the number of biomolecules
-#'   observed in \emph{at least} (TRUE) x number of samples or \emph{exactly}
-#'   (FALSE) x number of samples should be plotted.  Defaults to TRUE.
+#'   biomolecule must appear. Defaults to NULL.
 #'
 #' @param interactive Logical. If TRUE produces an interactive plot.
 #' @param x_lab A character string specifying the x-axis label.
@@ -2230,8 +2225,6 @@ plot.moleculeFilt <- function (filter_obj, min_num = NULL, cumulative = TRUE,
 #' @param palette A character string indicating the name of the RColorBrewer
 #'   palette to use. For a list of available options see the details section in
 #'   \code{\link[RColorBrewer]{RColorBrewer}}.
-#' @param log_total_counts Logical. Indicates if the X-axis should be on 
-#'   the log scale. The default is TRUE.
 #'
 #' @examples
 #' \dontrun{
@@ -2251,8 +2244,10 @@ plot.totalCountFilt <- function (filter_obj, min_count = NULL,
                                title_lab_size = 14, legend_lab = "",
                                legend_position = "right", text_size = 3,
                                bar_width = 0.8, bw_theme = TRUE,
-                               log_total_counts = TRUE,
                                palette = NULL) {
+  
+  # @param log_total_counts Logical. Indicates if the X-axis should be on
+  #   the log scale. The default is TRUE.
   
   # Preliminaries --------------------------------------------------------------
 
@@ -2281,76 +2276,54 @@ plot.totalCountFilt <- function (filter_obj, min_count = NULL,
     
   }
   
+  ## Checks for min_count as single numeric
+  if(!is.null(min_count) && 
+     (length(min_count) > 1 || 
+      !is.numeric(min_count))) stop("min_count must be numeric of length 1")
+  
+  
+  
   # Forge sensational plots ----------------------------------------------------
-  
-  # make counts, colors, and plot shape based on value of cumulative
-  
-  # values that will be updated depending on input
 
-  counts <- cumsum(rev(table(filter_obj$Total_Counts)))
+  plot_data <- attr(filter_obj, "e_data_lcpm")
+  title_default <- "Observation Density by LCPM"
+  if(!is.null(min_count)){
+    biomols <- filter_obj[[1]][filter_obj$Total_Counts >= min_count]
+    if(length(biomols) == 0) stop(
+      "min_count exceeds maximum total count (", 
+      max(filter_obj$Total_Counts), ")"
+      )
+    plot_data <- plot_data[plot_data[[1]] %in% biomols,]
+    subtitle <- paste0(min_count, "+ total counts per transcript")
+  } else subtitle <- NULL
   
-  # create plotting dataframe
-  observation_counts <- data.frame(
-    sum_counts = as.numeric(names(counts)),
-    n_biomolecules = as.numeric(counts),
-    color = if(!is.null(min_count)){
-      ifelse(
-        as.numeric(names(counts)) >= min_count,
-        "retained",
-        "dropped")
-      } else "default"
-    )
-  
-  ## Establish ggplot components
-  shape <- ggplot2::geom_line(
-    ggplot2::aes(x = sum_counts, y = n_biomolecules, color = color
-    ), show.legend = !is.null(min_count)
-  )
-  
-  if (!is.null(min_count)){
-    line <- ggplot2::geom_vline(xintercept = min_count)
-    retained_biomolecules <- min(as.numeric(names(counts))[as.numeric(names(counts)) > min_count])
-    retained_biomolecules <- as.numeric(counts[[as.character(retained_biomolecules)]])
-    point <- ggplot2::geom_point(x = ifelse(log_total_counts, 
-                                            log10(min_count), min_count),
-                                 y = retained_biomolecules, color = "black")
-    text <- ggplot2::geom_text(x = ifelse(log_total_counts, 
-                                          log10(min_count), min_count),
-                               y = retained_biomolecules, 
-                               label = paste0("Retained: ", retained_biomolecules),
-                               color = "black",
-                               hjust = -0.25,
-                               size = text_size
-                               )
-    if(interactive) text <- NULL
-  } else {
-    line <- NULL
-    point <- NULL
-    text <- NULL
-  }
-    
-  xlabel <- if (is.null(x_lab)) "Biomolecule Sum of Counts" else x_lab
-  ylabel <- ifelse(is.null(y_lab), "N Biomolecules", y_lab)
+  xlabel <- if (is.null(x_lab)) "Log Counts per Million" else x_lab
+  ylabel <- ifelse(is.null(y_lab), "Observation Density", y_lab)
   plot_title <- ifelse(
     is.null(title_lab),
-    "N biomolecules observed with at least X total counts",
+    title_default,
     title_lab
   )
   
-  if(log_total_counts){
-    log <- ggplot2::scale_x_continuous(trans='log10')
-  } else log <- NULL
+  # Use the ColorBrewer color
+  values <- if (!is.null(palette)) {
+    c("Samples" = RColorBrewer::brewer.pal(5, palette)[[3]], 
+      "Average Density" = RColorBrewer::brewer.pal(5, palette)[[5]])
+  } else {
+    c("Samples" = "grey", "Average Density" = "black")
+  }
   
-  # plot #
-  p <- ggplot2::ggplot(observation_counts) +
-    shape +
-    line +
-    point +
-    text +
-    log +
-    ggplot2::xlab(xlabel) +
-    ggplot2::ylab(ylabel) +
-    ggplot2::ggtitle(plot_title)
+  # Plot
+  p <- ggplot2::ggplot(plot_data, ggplot2::aes(x=lcpm)) + 
+    ggplot2::geom_density(ggplot2::aes(group = Sample, color = "Samples")) + 
+    ggplot2::geom_density(ggplot2::aes(color = "Average Density")) + 
+    ggplot2::scale_color_manual(
+      name = legend_lab,
+      values = values,
+      aesthetics = c("color")) +
+    ggplot2::labs(title = plot_title, 
+                  subtitle = subtitle,
+                  x = xlabel, y = ylabel)
   
   # Evan, make me a plot with the black and white theme. As you wish.
   if (bw_theme) p <- p + ggplot2::theme_bw()
@@ -2365,27 +2338,259 @@ plot.totalCountFilt <- function (filter_obj, min_count = NULL,
       legend.position = legend_position
     )
   
-  # Evan, make me a plot with beautiful colors. As you wish.
-  values <- if (!is.null(palette)) {
-    c("dropped" =  RColorBrewer::brewer.pal(5, palette)[[3]],
-      "retained" =  RColorBrewer::brewer.pal(5, palette)[[5]]
-      )
-    
-    } else {
-      c("dropped" =  "red",
-        "retained" =  "green"
-        )
-    }
+  # Evan, make me an interactive plot. As you wish.
+  if (interactive) p <- plotly::ggplotly(p)
   
+  return (p)
+  
+}
 
-  if(is.null(min_count)) values <- c(values, 
-                                     "default" = as.character(values[1]))
+#' plot.RNAFilt
+#'
+#' For plotting an S3 object of type 'RNAFilt':
+#'
+#' @param filter_obj An object of class RNAFilt that contains the sample
+#'   identifier, library size, number of non-zero biomolecules, and proportion 
+#'   of non-zero biomolecules.
+#' @param plot_type Character string, specified as "library" or "biomolecule".
+#' "library" displays library size for each sample, "biomolecule" displays the 
+#' number of unique biomolecules with non-zero counts per sample.
+#' @param min_nonzero Integer or float between 0 and 1. Cut-off for number of 
+#' unique biomolecules with non-zero counts or as a proportion of total 
+#' biomolecules. Defaults to NULL.
+#' @param size_library Integer. Cut-off for sample library size (i.e. number 
+#' of reads). Defaults to NULL.
+#' @param interactive Logical. If TRUE produces an interactive plot.
+#' @param x_lab A character string specifying the x-axis label.
+#' @param y_lab A character string specifying the y-axis label. The default is
+#'   NULL in which case the y-axis label will be the metric selected for the
+#'   \code{metric} argument.
+#' @param x_lab_size An integer value indicating the font size for the x-axis.
+#'   The default is 11.
+#' @param y_lab_size An integer value indicating the font size for the y-axis.
+#'   The default is 11.
+#' @param x_lab_angle An integer value indicating the angle of x-axis labels.
+#'   The default is 0.
+#' @param title_lab A character string specifying the plot title.
+#' @param title_lab_size An integer value indicating the font size of the plot
+#'   title. The default is 14.
+#' @param legend_lab A character string specifying the legend title.
+#' @param legend_position A character string specifying the position of the
+#'   legend. Can be one of "right", "left", "top", "bottom", or "none". The
+#'   default is "none".
+#' @param text_size An integer specifying the size of the text (number of
+#'   biomolecules by sample) within the bar plot. The default is 3.
+#' @param bar_width An integer indicating the width of the bars in the bar plot.
+#'   The default is 0.8.
+#' @param bw_theme Logical. If TRUE uses the ggplot2 black and white theme.
+#' @param palette A character string indicating the name of the RColorBrewer
+#'   palette to use. For a list of available options see the details section in
+#'   \code{\link[RColorBrewer]{RColorBrewer}}.
+#'
+#' @examples
+#' \dontrun{
+#' data(seq_object)
+#' seqfilt <- total_count_filter(pep_object)
+#' plot(seqfilt, min_count = 5)
+#' }
+#'
+#' @rdname plot-RNAFilt
+#'
+#' @export
+#'
+plot.RNAFilt <- function (filter_obj, plot_type = "library",
+                          size_library = NULL, min_nonzero = NULL, 
+                          interactive = FALSE, 
+                          x_lab = NULL, y_lab = NULL,
+                          x_lab_size = 11, y_lab_size = 11,
+                          x_lab_angle = 90, title_lab = NULL,
+                          title_lab_size = 14, legend_lab = "",
+                          legend_position = "right", text_size = 3,
+                          bar_width = 0.8, bw_theme = TRUE,
+                          palette = NULL) {
+  
+  # @param log_total_counts Logical. Indicates if the X-axis should be on
+  #   the log scale. The default is TRUE.
+  
+  # Preliminaries --------------------------------------------------------------
+  
+  # Have a looksie at the class of the filter object.
+  if (!inherits(filter_obj, "RNAFilt")) {
     
-  # Use the ColorBrewer color and create the legend title
+    # Fezzik, tear his arms off.
+    stop ("filter_obj must be of class RNAFilt")
+    
+  }
+  
+  # Make sure palette is one of the RColorBrewer options if it is not NULL.
+  if (!is.null(palette)) {
+    
+    if (!(palette %in% c("YlOrRd", "YlOrBr", "YlGnBu", "YlGn", "Reds","RdPu",
+                         "Purples", "PuRd", "PuBuGn", "PuBu", "OrRd","Oranges",
+                         "Greys", "Greens", "GnBu", "BuPu","BuGn","Blues",
+                         "Set3", "Set2", "Set1", "Pastel2", "Pastel1", "Paired",
+                         "Dark2", "Accent", "Spectral", "RdYlGn", "RdYlBu",
+                         "RdGy", "RdBu", "PuOr","PRGn", "PiYG", "BrBG"))) {
+      
+      # INCONCEIVABLE!!!
+      stop ("palette must be an RColorBrewer palette")
+      
+    }
+    
+  }
+  
+  ## Checks for plot_type as single string
+  if(is.null(plot_type) ||
+     length(plot_type) > 1 || 
+      !(plot_type %in% c('library', 'biomolecule'))) stop(
+        "plot_type must be either 'library' or 'biomolecule'")
+  
+  ## Checks for size_library as single integer
+  if(!is.null(size_library) && 
+    (length(size_library) > 1 || 
+     size_library%%1 != 0 ||
+     size_library > max(filter_obj$LibrarySize)
+     )
+    ) stop(
+      paste0(
+        "size_library must be integer of length 1 less than max library size (",
+        max(filter_obj$LibrarySize),
+        ")"
+        )
+    )
+  
+  ## Checks for min_nonzero as single numeric
+  if(!is.null(min_nonzero)){
+    
+    ## Length
+    if(length(min_nonzero) > 1) stop("min_nonzero must be length 1")
+    
+    ## proportion or int
+    if(!(min_nonzero%%1 == 0 || (min_nonzero > 0 && min_nonzero < 1))) stop(
+           "min_nonzero must be integer or numeric between 0 and 1.")
+    
+    ## Within appropriate bounds
+    if(min_nonzero%%1 == 0 && min_nonzero > max(filter_obj$NonZero)) stop(
+      paste0("min_nonzero exceeds maximum number of non-zero biomolecules (",
+             max(filter_obj$NonZero),
+             ")"
+             )
+    )
+
+    if(min_nonzero%%1 != 0 && 
+       min_nonzero > max(filter_obj$ProportionNonZero)) stop(
+      paste0(
+        "min_nonzero exceeds maximum proportion of non-zero biomolecules (",
+        signif(max(filter_obj$ProportionNonZero)), 
+        ")")
+    )
+    
+    
+  }
+  
+  # Forge sensational plots ----------------------------------------------------
+  
+  filter_obj
+  ## Set labels
+  xlabel <- if (is.null(x_lab)) "SampleID" else x_lab
+  plot_title <- ifelse(is.null(title_lab), "Library Size by Sample", title_lab)
+  
+  if(plot_type == "library"){
+    ylabel <- ifelse(is.null(y_lab), "Library Size (Total Reads)", y_lab)
+  } else {
+    ylabel <- ifelse(is.null(y_lab), "N Non-zero Biomolecules", y_lab)
+  }
+  
+  subtitle <- ""
+  
+  if(!is.null(min_nonzero)){
+    
+    subtitle <- paste0(
+      subtitle,
+      ifelse(min_nonzero%%1 == 0,
+             paste0("At least ", min_nonzero, " non-zero biomolecules"),
+             paste0("At least ", min_nonzero*100, "% non-zero biomolecules")
+             ))
+    
+  }
+  
+  if(!is.null(size_library)){
+    subtitle <- paste0(
+      subtitle,
+      ifelse(subtitle == "",
+             "",
+             "\n"
+      ),
+      paste0("At least ", size_library, " reads in sample library")
+      )
+  }
+  
+  # Use the ColorBrewer color
+  values <- if (!is.null(palette)) {
+    RColorBrewer::brewer.pal(5, palette)[[3]]
+  } else {
+    "deepskyblue3"
+  }
+  
+  temp_obj <- filter_obj
+  if(!is.null(min_nonzero)){
+    
+    column_use <- ifelse(min_nonzero%%1 == 0, 
+                         "NonZero", "ProportionNonZero")
+    temp_obj <- temp_obj[temp_obj[[column_use]] >= min_nonzero,]
+  }
+  
+  if(!is.null(size_library)){
+    temp_obj <- temp_obj[temp_obj[["LibrarySize"]] >= size_library,]
+  }
+  
+  
+  # Plot
+  if(plot_type == "library"){
+    p <- ggplot2::ggplot(
+      temp_obj, ggplot2::aes(x=SampleID, y = LibrarySize, fill = "")) + 
+      ggplot2::geom_col(show.legend = F) +
+      ggplot2::scale_fill_manual(
+        name = legend_lab,
+        values = values,
+        aesthetics = c("fill")) +
+      ggplot2::labs(title = plot_title, 
+                    subtitle = subtitle,
+                    x = xlabel, y = ylabel)
+      
+  } else {
+    
+    mt <- round(filter_object$NonZero[[1]]/filter_object$ProportionNonZero[[1]])
+    
+    p <- ggplot2::ggplot(
+      temp_obj, ggplot2::aes(x=SampleID, y = NonZero, fill = "")) + 
+      ggplot2::scale_y_continuous(
+        sec.axis = ggplot2::sec_axis(trans=~./mt, 
+                          name="Proportion of all biomolecules")
+        ) +
+      ggplot2::geom_col(show.legend = F) +
+      ggplot2::scale_fill_manual(
+        name = legend_lab,
+        values = values,
+        aesthetics = c("fill")) +
+      ggplot2::labs(title = plot_title, 
+                    subtitle = subtitle,
+                    x = xlabel, y = ylabel)
+    
+  }
+  
+  # Evan, make me a plot with the black and white theme. As you wish.
+  if (bw_theme) p <- p + ggplot2::theme_bw()
+  
+  # Add the theme elements to the plot.
   p <- p +
-    ggplot2::scale_color_manual(
-      name = legend_lab,
-      values = values)
+    ggplot2::theme(
+      plot.title = ggplot2::element_text(size = title_lab_size),
+      axis.title.x = ggplot2::element_text(size = x_lab_size),
+      axis.title.y = ggplot2::element_text(size = y_lab_size),
+      axis.text.x = ggplot2::element_text(angle = x_lab_angle, hjust = 1),
+      legend.position = legend_position
+    )
   
   # Evan, make me an interactive plot. As you wish.
   if (interactive) p <- plotly::ggplotly(p)
@@ -2393,6 +2598,7 @@ plot.totalCountFilt <- function (filter_obj, min_count = NULL,
   return (p)
   
 }
+
 
 #' plot.imdanovaFilt
 #'
@@ -4836,11 +5042,20 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
     } else if (get_data_scale(omicsData) %in% c("log", "log2", "log10")){
       paste(get_data_scale(omicsData), "Abundance", sep = " ")
     } else if (get_data_scale(omicsData) == "counts"){ 
-      "Counts"
+      if(!is.null(transformation)){
+        "Counts"
+      } else {
+        
+        switch(
+          transformation,
+          lcpm = "Log Counts per Million",
+          upper = "Upper-quantile transformed Counts",
+          median = "Median Counts"
+        )
+        
+      }
     }
-      
     out
-    
   } else y_lab
   legend_title <- if (is.null(legend_lab)) color_by else legend_lab
 
@@ -5183,7 +5398,9 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
 #'   be displayed on the bar plot. The default is TRUE.
 #' @param custom_theme a ggplot `theme` object to be applied to non-interactive
 #'   plots, or those converted by plotly::ggplotly().
-#' @param cluster logical for heatmaps; T will cluster biomolecules on X axis
+#' @param top_n numeric for heatmaps; defaults to NULL.
+#' @param cluster logical for heatmaps; T will cluster biomolecules on X axis.
+#' defaults to T for seqData statistics and F for all others.
 #'
 #' @details Plot types:
 #' \itemize{
