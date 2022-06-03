@@ -1117,7 +1117,7 @@ test_that('custom_filter and applyFilt produce the correct output',{
                               data_scale = "log")
   pairdata <- group_designation(pairdata,
                                 main_effects = "Virus",
-                                pairs = "PairID")
+                                pair_id = "PairID")
 
   split_remove <- custom_filter(
     pairdata,

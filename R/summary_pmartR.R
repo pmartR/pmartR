@@ -173,10 +173,10 @@ summarizer <- function (omicsData) {
 
     # Check if the data are paired. If they are the number of pairs will be
     # added to the beautiful summary we are creating!
-    if (!is.null(attr(get_group_DF(omicsData), "pairs"))) {
+    if (!is.null(attr(get_group_DF(omicsData), "pair_id"))) {
 
       # Nab the name of the pair variable. This will be used to subset f_data.
-      pair_name <- attr(get_group_DF(omicsData), "pairs")
+      pair_name <- attr(get_group_DF(omicsData), "pair_id")
 
       # Add the number of pairs to res.
       res <- c(res,

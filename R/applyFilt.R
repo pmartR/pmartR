@@ -244,7 +244,7 @@ applyFilt.moleculeFilt <- function(filter_object, omicsData, min_num=2){
       batch_id = names(attr(get_group_DF(omicsData),"batch_id"))[-1],
       time_course = attr(get_group_DF(omicsData),
                          "time_course"),
-      pairs = attr(get_group_DF(omicsData), "pairs")
+      pair_id = attr(get_group_DF(omicsData), "pair_id")
     )
 
   } else {
@@ -401,7 +401,7 @@ applyFilt.cvFilt <- function (filter_object, omicsData, cv_threshold = 150) {
       batch_id = names(attr(get_group_DF(omicsData),"batch_id"))[-1],
       time_course = attr(get_group_DF(omicsData),
                          "time_course"),
-      pairs = attr(get_group_DF(omicsData), "pairs")
+      pair_id = attr(get_group_DF(omicsData), "pair_id")
     )
 
   } else {
@@ -545,7 +545,7 @@ applyFilt.rmdFilt <- function (filter_object, omicsData,
     # places. It will save some typing. ... However, all the typing I just saved
     # has probably been undone by writing this comment.
     sample_name <- get_fdata_cname(omicsData)
-    pair_name <- attr(attr(omicsData, "group_DF"), "pairs")
+    pair_name <- attr(attr(omicsData, "group_DF"), "pair_id")
 
     filter.samp <- as.character(filter_object[inds, id_col])
 
@@ -608,7 +608,7 @@ applyFilt.rmdFilt <- function (filter_object, omicsData,
       batch_id = names(attr(get_group_DF(omicsData),"batch_id"))[-1],
       time_course = attr(get_group_DF(omicsData),
                          "time_course"),
-      pairs = attr(get_group_DF(omicsData), "pairs")
+      pair_id = attr(get_group_DF(omicsData), "pair_id")
     )
 
   } else {
@@ -873,7 +873,7 @@ applyFilt.proteomicsFilt <- function (filter_object,
       batch_id = names(attr(get_group_DF(omicsData),"batch_id"))[-1],
       time_course = attr(get_group_DF(omicsData),
                          "time_course"),
-      pairs = attr(get_group_DF(omicsData), "pairs")
+      pair_id = attr(get_group_DF(omicsData), "pair_id")
     )
 
   } else {
@@ -960,7 +960,7 @@ applyFilt.imdanovaFilt <- function (filter_object,
   # then there is only one non-singleton group and an imdanova filter cannot be
   # applied unless the data are paired.
   if (dim(filter_object)[2] == 2 &&
-      is.null(attr(attr(omicsData, "group_DF"), "pairs"))) {
+      is.null(attr(attr(omicsData, "group_DF"), "pair_id"))) {
 
     # Throw an error for too few samples to run an imdanova filter.
     stop (paste("An IMD-ANOVA filter cannot be used because there is only one",
@@ -1198,7 +1198,7 @@ applyFilt.imdanovaFilt <- function (filter_object,
   # Paired data ----------------------------------------------------------------
 
   # Do the thing if data are paired.
-  if (!is.null(attr(attr(omicsData, "group_DF"), "pairs"))) {
+  if (!is.null(attr(attr(omicsData, "group_DF"), "pair_id"))) {
 
     # Take the difference here and call the imdanova_filt function to create a
     # new filter object with the difference data.
@@ -1213,7 +1213,7 @@ applyFilt.imdanovaFilt <- function (filter_object,
     # in f_data to match the number of columns in e_data.
     diff_fdata <- omicsData$f_data %>%
       dplyr::group_by(
-        !!rlang::sym(attr(attr(omicsData, "group_DF"), "pairs"))
+        !!rlang::sym(attr(attr(omicsData, "group_DF"), "pair_id"))
       ) %>%
       dplyr::slice(1)
 
@@ -1244,7 +1244,7 @@ applyFilt.imdanovaFilt <- function (filter_object,
     # attribute in group_DF. If there is only one group this will cause problems
     # when calling imdanova_filter on the differences. Add a pairs attribute to
     # group_DF that will allow there to be only one group.
-    attr(attr(diff_omicsData, "group_DF"), "pairs") <- "difference taken"
+    attr(attr(diff_omicsData, "group_DF"), "pair_id") <- "difference taken"
 
     # Create a new filter object with the differenced data. (For future readers:
     # I meant to use the word "differenced". I hope it made you chuckle.) We
@@ -1377,7 +1377,7 @@ applyFilt.imdanovaFilt <- function (filter_object,
       batch_id = names(attr(get_group_DF(omicsData),"batch_id"))[-1],
       time_course = attr(get_group_DF(omicsData),
                          "time_course"),
-      pairs = attr(get_group_DF(omicsData), "pairs")
+      pair_id = attr(get_group_DF(omicsData), "pair_id")
     )
 
   } else {
@@ -1511,7 +1511,7 @@ applyFilt.customFilt <- function (filter_object, omicsData) {
 
   # Grab some names to save typing later on.
   sample_name <- get_fdata_cname(omicsData)
-  pair_name <- attr(attr(omicsData, "group_DF"), "pairs")
+  pair_name <- attr(attr(omicsData, "group_DF"), "pair_id")
 
   #!#!#!#!#!#!#!#!#!#!
   # The following if statements check if the samples in a pair will be split by
@@ -1523,7 +1523,7 @@ applyFilt.customFilt <- function (filter_object, omicsData) {
 
   # Check if samples will be filtered and the data are paired.
   if (!is.null(filter_object$f_data_remove) &&
-      !is.null(attr(attr(omicsData, "group_DF"), "pairs"))) {
+      !is.null(attr(attr(omicsData, "group_DF"), "pair_id"))) {
 
     # Snag the associated pair IDs for the samples that will be filtered.
     filtered_pairs <- omicsData$f_data %>%
@@ -1557,7 +1557,7 @@ applyFilt.customFilt <- function (filter_object, omicsData) {
     }
 
   } else if (!is.null(filter_object$f_data_keep) &&
-             !is.null(attr(attr(omicsData, "group_DF"), "pairs"))) {
+             !is.null(attr(attr(omicsData, "group_DF"), "pair_id"))) {
 
     # Snag the associated pair IDs for the samples that will be kept.
     filtered_pairs <- omicsData$f_data %>%
@@ -1637,7 +1637,7 @@ applyFilt.customFilt <- function (filter_object, omicsData) {
       batch_id = names(attr(get_group_DF(omicsData),"batch_id"))[-1],
       time_course = attr(get_group_DF(omicsData),
                          "time_course"),
-      pairs = attr(get_group_DF(omicsData), "pairs")
+      pair_id = attr(get_group_DF(omicsData), "pair_id")
     )
 
   } else {

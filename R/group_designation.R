@@ -27,8 +27,8 @@
 #'   \code{cov_type} is a class other than numeric this vector will be coerced
 #'   to a character vector. The default value is NULL. In this case the class of
 #'   the covariates is neither checked nor altered.
-#' @param pairs A character string indicating the column in \code{f_data} that
-#'   contains the pairing information. This string must match the column name
+#' @param pair_id A character string indicating the column in \code{f_data} that
+#'   contains the IDs for each pair. This string must match the column name
 #'   exactly.
 #' @param batch_id an optional character vector of no more than one variable that
 #'  should be used as batch information for downstream analyses. Batch ID is
@@ -74,7 +74,7 @@ group_designation <- function (omicsData,
                                main_effects = NULL,
                                covariates = NULL,
                                cov_type = NULL,
-                               pairs = NULL,
+                               pair_id = NULL,
                                batch_id = NULL,
                                time_course = NULL) {
 
@@ -120,12 +120,12 @@ group_designation <- function (omicsData,
   # Check main_effects ---------------
 
   # A main effect does not need to be supplied if a pairing variable is.
-  if (is.null(main_effects) && is.null(pairs)) {
+  if (is.null(main_effects) && is.null(pair_id)) {
 
-    # A main effect must be specified unless a pairs variable is specified.
+    # A main effect must be specified unless a pair_id variable is specified.
     stop (
       paste("A main effect must be specified unless the data are paired.",
-            "In the case of paired data 'pairs' must be specified if",
+            "In the case of paired data 'pair_id' must be specified if",
             "there are no main effects.",
             sep = " ")
     )
@@ -282,44 +282,44 @@ group_designation <- function (omicsData,
 
   # Check pairs ---------------
 
-  # Have a looksie at the pairs argument. If it is present put it through the
+  # Have a looksie at the pair_id argument. If it is present put it through the
   # usual methods of information extraction and verification.
-  if (!is.null(pairs)) {
+  if (!is.null(pair_id)) {
 
-    # Check that pairs is a character vector.
-    if (!is.character(pairs)) {
+    # Check that pair_id is a character vector.
+    if (!is.character(pair_id)) {
 
       # Holy inappropriate input type, Batman.
-      stop ("pairs must be a character vector.")
+      stop ("pair_id must be a character vector.")
 
     }
 
     # Make sure there is only one character string specified.
-    if (length(pairs) > 1) {
+    if (length(pair_id) > 1) {
 
-      # Holy too many pairs, Batman!
+      # Holy too many pair_id, Batman!
       stop ("Only one paired variable can be specified.")
 
     }
 
     # Make sure the paired variable exists in f_data. How can we subset by
     # something that doesn't exist?!
-    if (!(pairs %in% names(omicsData$f_data))) {
+    if (!(pair_id %in% names(omicsData$f_data))) {
 
       # Holy missing variable, Batman!
-      stop ("The variable specified for pairs does not exist in f_data.")
+      stop ("The variable specified for pair_id does not exist in f_data.")
 
     }
 
     # Count the number of pair IDs that do not have two entries in f_data.
-    not_two <- which(unname(table(omicsData$f_data[, pairs])) < 2)
+    not_two <- which(unname(table(omicsData$f_data[, pair_id])) < 2)
 
     # Ensure each pair has at least two observations in f_data.
     if (length(not_two) > 0) {
 
-      pair_id <- names(table(omicsData$f_data[, pairs]))[not_two]
+      pair_id <- names(table(omicsData$f_data[, pair_id]))[not_two]
 
-      stop (paste("The following pairs do not have at least two samples to ",
+      stop (paste("The following pair IDs do not have at least two samples to ",
                   "form a pair: ",
                   knitr::combine_words(pair_id),
                   ".",
@@ -344,7 +344,7 @@ group_designation <- function (omicsData,
                             sep = "_")
           ) %>%
           dplyr::ungroup() %>%
-          dplyr::group_by(!!rlang::sym(pairs)) %>%
+          dplyr::group_by(!!rlang::sym(pair_id)) %>%
           dplyr::mutate(n_me = dplyr::n_distinct(both_me)) %>%
           dplyr::ungroup() %>%
           dplyr::filter(n_me > 1) %>%
@@ -355,7 +355,7 @@ group_designation <- function (omicsData,
 
         # Count the number of unique main effect values for each pair.
         reprobates <- omicsData$f_data %>%
-          dplyr::group_by(!!rlang::sym(pairs)) %>%
+          dplyr::group_by(!!rlang::sym(pair_id)) %>%
           dplyr::mutate(
             n_me = dplyr::n_distinct(!!rlang::sym(main_effects))
           ) %>%
@@ -365,7 +365,7 @@ group_designation <- function (omicsData,
 
       }
 
-      # Check if some main effects differ between pairs.
+      # Check if some main effects differ between pair_id.
       if (length(reprobates) > 0) {
 
         # Let them have it for making my life miserable.
@@ -395,7 +395,7 @@ group_designation <- function (omicsData,
                              sep = "_")
           ) %>%
           dplyr::ungroup() %>%
-          dplyr::group_by(!!rlang::sym(pairs)) %>%
+          dplyr::group_by(!!rlang::sym(pair_id)) %>%
           dplyr::mutate(n_cov = dplyr::n_distinct(both_cov)) %>%
           dplyr::ungroup() %>%
           dplyr::filter(n_cov > 1) %>%
@@ -406,7 +406,7 @@ group_designation <- function (omicsData,
 
         # Count the number of unique covariate values for each pair.
         reprobates <- omicsData$f_data %>%
-          dplyr::group_by(!!rlang::sym(pairs)) %>%
+          dplyr::group_by(!!rlang::sym(pair_id)) %>%
           dplyr::mutate(
             n_cov = dplyr::n_distinct(!!rlang::sym(covariates))
           ) %>%
@@ -474,7 +474,7 @@ group_designation <- function (omicsData,
 
   # If no main effect was provided but the data are paired create a substitute
   # main effects variable with just one level.
-  if (is.null(main_effects) && !is.null(pairs)) {
+  if (is.null(main_effects) && !is.null(pair_id)) {
 
     # Add a main effect name. This will be used as a place holder because later
     # in this function and downstream functions expect a main effect variable to
@@ -681,7 +681,7 @@ group_designation <- function (omicsData,
   # Include the name of the variable containing the paired information as an
   # attribute of group_DF. This will be used in the functions that compute the
   # difference between each pair.
-  attr(output, "pairs") <- pairs
+  attr(output, "pair_id") <- pair_id
 
   # Set the batch_id attribute according to the input
   if (is.null(batch_id)) {

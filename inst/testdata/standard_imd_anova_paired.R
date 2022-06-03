@@ -31,7 +31,7 @@ pairdata_0_0_3 <- as.pepData(e_data = edata,
 pairdata_0_0_3 <- edata_transform(pairdata_0_0_3,
                                   data_scale = "log")
 pairdata_0_0_3 <- group_designation(pairdata_0_0_3,
-                                    pairs = "PairID")
+                                    pair_id = "PairID")
 
 # Paired data, one main effect, zero covariates, three groups
 pairdata_1_0_3 <- as.pepData(e_data = edata,
@@ -44,7 +44,7 @@ pairdata_1_0_3 <- edata_transform(pairdata_1_0_3,
                                   data_scale = "log")
 pairdata_1_0_3 <- group_designation(pairdata_1_0_3,
                                     main_effects = "Virus",
-                                    pairs = "PairID")
+                                    pair_id = "PairID")
 
 # Paired data, one main effect, one covariate, three groups
 pairdata_1_1_3 <- as.pepData(e_data = edata,
@@ -58,7 +58,7 @@ pairdata_1_1_3 <- edata_transform(pairdata_1_1_3,
 pairdata_1_1_3 <- group_designation(pairdata_1_1_3,
                                     main_effects = "Virus",
                                     covariates = "Gender",
-                                    pairs = "PairID")
+                                    pair_id = "PairID")
 
 # Filter IMD-ANOVAly -----------------------------------------------------------
 

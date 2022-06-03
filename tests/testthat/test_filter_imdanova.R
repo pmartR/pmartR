@@ -1076,7 +1076,7 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
                               data_scale = "log")
   pairdata <- group_designation(pairdata,
                                 main_effects = "Virus",
-                                pairs = "PairID")
+                                pair_id = "PairID")
 
   pair_filter <- imdanova_filter(omicsData = pairdata)
 

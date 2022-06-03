@@ -68,7 +68,7 @@ test_that('the omicsData summaries are all square',{
                          emeta_cname = 'Protein')
 
   pairdata <- group_designation(pairdata,
-                                pairs = "PairID")
+                                pair_id = "PairID")
 
   # Carpe unitae testum --------------------------------------------------------
 

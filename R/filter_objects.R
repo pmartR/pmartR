@@ -1308,7 +1308,7 @@ imdanova_filter <- function (omicsData) {
   # Check the number of groups. There must be more than one group if the data
   # are not paired.
   if (length(names(get_group_table(omicsData))) < 2 &&
-      is.null(attr(attr(omicsData, "group_DF"), "pairs"))) {
+      is.null(attr(attr(omicsData, "group_DF"), "pair_id"))) {
 
     # Let the user know that they cannot compare statistics between groups if
     # there is only one group!!

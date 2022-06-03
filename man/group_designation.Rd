@@ -10,7 +10,7 @@ group_designation(
   main_effects = NULL,
   covariates = NULL,
   cov_type = NULL,
-  pairs = NULL,
+  pair_id = NULL,
   batch_id = NULL,
   time_course = NULL
 )
@@ -43,8 +43,8 @@ numeric vector of 0s and 1s (indicating two categories) and the input to
 to a character vector. The default value is NULL. In this case the class of
 the covariates is neither checked nor altered.}
 
-\item{pairs}{A character string indicating the column in \code{f_data} that
-contains the pairing information. This string must match the column name
+\item{pair_id}{A character string indicating the column in \code{f_data} that
+contains the IDs for each pair. This string must match the column name
 exactly.}
 
 \item{batch_id}{an optional character vector of no more than one variable that

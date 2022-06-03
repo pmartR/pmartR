@@ -226,7 +226,7 @@ imd_anova <- function (omicsData,
 
   # Check if the data are paired. The paired object is used by multiple
   # functions within imd_anova.
-  if (is.null(attr(attr(omicsData, "group_DF"), "pairs"))) {
+  if (is.null(attr(attr(omicsData, "group_DF"), "pair_id"))) {
     paired <- FALSE
   } else {
     paired <- TRUE
@@ -650,7 +650,7 @@ anova_test <- function (omicsData, groupData, comparisons, pval_adjust,
     # make it readable but not too long. For example, using da instead of the
     # creates a name with one character less. These are the types of tricks you
     # learn when obtaining an advanced degree.
-    da_pair_name <- attr(attr(omicsData, "group_DF"), "pairs")
+    da_pair_name <- attr(attr(omicsData, "group_DF"), "pair_id")
 
     # Make sure the paired column wasn't deleted between calling
     # group_designation and imd_anova. It is essential that you carry out all of
@@ -706,7 +706,7 @@ anova_test <- function (omicsData, groupData, comparisons, pval_adjust,
     attr(groupData, "main_effects") <- attr(
       attr(omicsData, "group_DF"), "main_effects"
     )
-    attr(groupData, "pairs") <- attr(attr(omicsData, "group_DF"), "pairs")
+    attr(groupData, "pair_id") <- attr(attr(omicsData, "group_DF"), "pair_id")
     attr(groupData, "nonsingleton_groups") <- attr(
       attr(omicsData, "group_DF"), "nonsingleton_groups"
     )
@@ -1395,7 +1395,7 @@ imd_cov <- function (data, groupData, fdata, cmat,
   covIdx <- which(colnames(attr(groupData, "covariates")) %in% covariates)
 
   # Snag the index of the pair ID variable in f_data.
-  pairIdx <- which(names(fdata) == attr(groupData, "pairs"))
+  pairIdx <- which(names(fdata) == attr(groupData, "pair_id"))
 
   # Create a list for the test statistics and p-values from anova for each
   # pairwise test.
@@ -1879,7 +1879,7 @@ take_diff <- function (omicsData) {
   # Apprehend the index in f_data for the sample ID and pair ID columns.
   samp_idx <- which(names(omicsData$f_data) == get_fdata_cname(omicsData))
   pair_idx <- which(
-    names(omicsData$f_data) == attr(attr(omicsData, "group_DF"), "pairs")
+    names(omicsData$f_data) == attr(attr(omicsData, "group_DF"), "pair_id")
   )
 
   # Create a matrix with -1 and 1 in the corresponding rows to calculate the
