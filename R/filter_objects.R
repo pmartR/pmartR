@@ -850,6 +850,13 @@ rmd_filter <- function (omicsData,
   # Add the group designation information to the attributes.
   attr(output, "group_DF") <- attr(omicsData, "group_DF")
 
+  # Save fdata as an attribute. This is used in the summary.rmdFilt method.
+  attr(output, "fdata") <- omicsData$f_data
+
+  # We also need the name of the sample ID column in fdata in the
+  # summary.rmdFilt method.
+  attr(output, "fdata_cname") <- get_fdata_cname(omicsData)
+
   # Sum the number of metrics actually calculated.
   attr(output, "df") <- sum(!is.na(metrics_final))
 
@@ -1394,6 +1401,10 @@ imdanova_filter <- function (omicsData) {
 
   orig_class <- class(output)
   class(output) <- c("imdanovaFilt", orig_class)
+
+  # Save the entire omicsData object as an attribute. This will be used in the
+  # summary.imdanovaFilt method when data are paired.
+  attr(output, "omicsData") <- omicsData
 
   attr(output, "group_sizes") <- nonmiss_per_group$group_sizes
   # KS added attribute for nonsingleton groups 12/3/2020 #
