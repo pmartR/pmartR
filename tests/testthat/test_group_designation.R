@@ -460,7 +460,9 @@ test_that('the correct group data frame and attributes are created',{
     attributes(
       attr(group_designation(pairdata,
                              main_effects = "Virus",
-                             pair_id = "PairID"),
+                             pair_id = "PairID",
+                             pair_group = "Time",
+                             pair_denom = "0"),
            "group_DF")
     ),
     list(names = c("Name", "Group"),
@@ -468,6 +470,8 @@ test_that('the correct group data frame and attributes are created',{
          row.names = 1:30,
          main_effects = "Virus",
          pair_id = "PairID",
+         pair_group = "Time",
+         pair_denom = "0",
          nonsingleton_groups = c("AM", "FM", "Mock"))
   )
 
@@ -476,7 +480,9 @@ test_that('the correct group data frame and attributes are created',{
     attributes(
       attr(group_designation(pairdata_2_me,
                              main_effects = c("Virus", "subclass"),
-                             pair_id = "PairID"),
+                             pair_id = "PairID",
+                             pair_group = "Time",
+                             pair_denom = "0"),
            "group_DF")
     ),
     list(names = c("Name", "Group", "Virus", "subclass"),
@@ -484,6 +490,8 @@ test_that('the correct group data frame and attributes are created',{
          row.names = 1:30,
          main_effects = c("Virus", "subclass"),
          pair_id = "PairID",
+         pair_group = "Time",
+         pair_denom = "0",
          nonsingleton_groups = c("AM_one", "AM_two", "FM_one",
                                  "FM_two", "Mock_one", "Mock_two"))
   )
@@ -492,7 +500,9 @@ test_that('the correct group data frame and attributes are created',{
   expect_identical(
     attributes(
       attr(group_designation(pairdata,
-                             pair_id = "PairID"),
+                             pair_id = "PairID",
+                             pair_group = "Time",
+                             pair_denom = "0"),
            "group_DF")
     ),
     list(names = c("Name", "Group"),
@@ -500,6 +510,8 @@ test_that('the correct group data frame and attributes are created',{
          row.names = 1:30,
          main_effects = "no_main_effect",
          pair_id = "PairID",
+         pair_group = "Time",
+         pair_denom = "0",
          nonsingleton_groups = "paired_diff")
   )
 
@@ -508,7 +520,9 @@ test_that('the correct group data frame and attributes are created',{
       attr(group_designation(pairdata_cov,
                              main_effects = "Virus",
                              covariates = "age",
-                             pair_id = "PairID"),
+                             pair_id = "PairID",
+                             pair_group = "Time",
+                             pair_denom = "0"),
            "group_DF")
     ),
     list(names = c("Name", "Group"),
@@ -520,13 +534,17 @@ test_that('the correct group data frame and attributes are created',{
            age = pairdata_cov$f_data$age
          ),
          pair_id = "PairID",
+         pair_group = "Time",
+         pair_denom = "0",
          nonsingleton_groups = c("AM", "FM", "Mock"))
   )
 
   expect_error(
       group_designation(pairdata_bad_me,
                              main_effects = c("Virus", "subclass"),
-                             pair_id = "PairID"),
+                             pair_id = "PairID",
+                        pair_group = "Time",
+                        pair_denom = "0"),
     paste("The following samples have main effects that differ between",
           "pairs: Mock_0hr_2 and Mock_18hr_2",
           sep = " ")
@@ -536,7 +554,9 @@ test_that('the correct group data frame and attributes are created',{
     group_designation(pairdata_bad_cov,
                       main_effects = "Virus",
                       covariates = "age",
-                      pair_id = "PairID"),
+                      pair_id = "PairID",
+                      pair_group = "Time",
+                      pair_denom = "0"),
     paste("The following samples have covariates that differ between",
           "pairs: AM_0hr_4 and AM_18hr_4",
           sep = " ")

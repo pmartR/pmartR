@@ -1076,7 +1076,9 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
                               data_scale = "log")
   pairdata <- group_designation(pairdata,
                                 main_effects = "Virus",
-                                pair_id = "PairID")
+                                pair_id = "PairID",
+                                pair_group = "Time",
+                                pair_denom = "18")
 
   pair_filter <- imdanova_filter(omicsData = pairdata)
 
@@ -1139,6 +1141,7 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
      names = c("Mass_Tag_ID", "AM", "FM", "Mock"),
      class = c("imdanovaFilt", "data.frame"),
      row.names = 1:150,
+     omicsData = pairdata,
      group_sizes = data.frame(
        Group = c("AM", "FM", "Mock"),
        n_group = rep(10, 3)

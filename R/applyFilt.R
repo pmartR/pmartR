@@ -244,7 +244,9 @@ applyFilt.moleculeFilt <- function(filter_object, omicsData, min_num=2){
       batch_id = names(attr(get_group_DF(omicsData),"batch_id"))[-1],
       time_course = attr(get_group_DF(omicsData),
                          "time_course"),
-      pair_id = attr(get_group_DF(omicsData), "pair_id")
+      pair_id = attr(get_group_DF(omicsData), "pair_id"),
+      pair_group = attr(get_group_DF(omicsData), "pair_group"),
+      pair_denom = attr(get_group_DF(omicsData), "pair_denom")
     )
 
   } else {
@@ -401,7 +403,9 @@ applyFilt.cvFilt <- function (filter_object, omicsData, cv_threshold = 150) {
       batch_id = names(attr(get_group_DF(omicsData),"batch_id"))[-1],
       time_course = attr(get_group_DF(omicsData),
                          "time_course"),
-      pair_id = attr(get_group_DF(omicsData), "pair_id")
+      pair_id = attr(get_group_DF(omicsData), "pair_id"),
+      pair_group = attr(get_group_DF(omicsData), "pair_group"),
+      pair_denom = attr(get_group_DF(omicsData), "pair_denom")
     )
 
   } else {
@@ -608,7 +612,9 @@ applyFilt.rmdFilt <- function (filter_object, omicsData,
       batch_id = names(attr(get_group_DF(omicsData),"batch_id"))[-1],
       time_course = attr(get_group_DF(omicsData),
                          "time_course"),
-      pair_id = attr(get_group_DF(omicsData), "pair_id")
+      pair_id = attr(get_group_DF(omicsData), "pair_id"),
+      pair_group = attr(get_group_DF(omicsData), "pair_group"),
+      pair_denom = attr(get_group_DF(omicsData), "pair_denom")
     )
 
   } else {
@@ -873,7 +879,9 @@ applyFilt.proteomicsFilt <- function (filter_object,
       batch_id = names(attr(get_group_DF(omicsData),"batch_id"))[-1],
       time_course = attr(get_group_DF(omicsData),
                          "time_course"),
-      pair_id = attr(get_group_DF(omicsData), "pair_id")
+      pair_id = attr(get_group_DF(omicsData), "pair_id"),
+      pair_group = attr(get_group_DF(omicsData), "pair_group"),
+      pair_denom = attr(get_group_DF(omicsData), "pair_denom")
     )
 
   } else {
@@ -1200,51 +1208,8 @@ applyFilt.imdanovaFilt <- function (filter_object,
   # Do the thing if data are paired.
   if (!is.null(attr(attr(omicsData, "group_DF"), "pair_id"))) {
 
-    # Take the difference here and call the imdanova_filt function to create a
-    # new filter object with the difference data.
-
-    # Compute the difference and create a new edata object from the differences.
-    diff_edata <- take_diff(omicsData)
-    diff_edata <- data.frame(omicsData$e_data[, get_edata_cname(omicsData)],
-                             diff_edata)
-    names(diff_edata)[[1]] <- get_edata_cname(omicsData)
-
-    # Only keep the first row for each pair. This will reduce the number of rows
-    # in f_data to match the number of columns in e_data.
-    diff_fdata <- omicsData$f_data %>%
-      dplyr::group_by(
-        !!rlang::sym(attr(attr(omicsData, "group_DF"), "pair_id"))
-      ) %>%
-      dplyr::slice(1)
-
-    # Change the sample names in f_data to match the sample names in e_data. The
-    # names from the pairing variable are the new sample names and must be
-    # updated to create a new omicsData object.
-    diff_fdata[, get_fdata_cname(omicsData)] <- names(diff_edata)[-1]
-
-    # Create a new omicsData object with the difference data. This is necessary
-    # as a new filter object (with the difference data) needs to be created to
-    # account for counts of differences.
-    diff_omicsData <- as.anyData(omics_type = class(omicsData)[[1]],
-                                 edata = diff_edata,
-                                 fdata = diff_fdata,
-                                 edata_cname = get_edata_cname(omicsData),
-                                 fdata_cname = get_fdata_cname(omicsData))
-
-    # Create the group designation attribute for the differences. Don't include
-    # the pairs argument because the data just had the difference taken and
-    # there are no longer pairs in the data (just a difference between pairs).
-    diff_omicsData <- group_designation(
-      omicsData = diff_omicsData,
-      main_effects = attr(attr(omicsData, "group_DF"), "main_effects"),
-      covariates = names(attr(attr(omicsData, "group_DF"), "covariates"))
-    )
-
-    # The data are paired and the pairs have been taken so there is no paired
-    # attribute in group_DF. If there is only one group this will cause problems
-    # when calling imdanova_filter on the differences. Add a pairs attribute to
-    # group_DF that will allow there to be only one group.
-    attr(attr(diff_omicsData, "group_DF"), "pair_id") <- "difference taken"
+    # Create an omicsData object on the differences.
+    diff_omicsData <- as.diffData(omicsData)
 
     # Create a new filter object with the differenced data. (For future readers:
     # I meant to use the word "differenced". I hope it made you chuckle.) We
@@ -1377,7 +1342,9 @@ applyFilt.imdanovaFilt <- function (filter_object,
       batch_id = names(attr(get_group_DF(omicsData),"batch_id"))[-1],
       time_course = attr(get_group_DF(omicsData),
                          "time_course"),
-      pair_id = attr(get_group_DF(omicsData), "pair_id")
+      pair_id = attr(get_group_DF(omicsData), "pair_id"),
+      pair_group = attr(get_group_DF(omicsData), "pair_group"),
+      pair_denom = attr(get_group_DF(omicsData), "pair_denom")
     )
 
   } else {
@@ -1637,7 +1604,9 @@ applyFilt.customFilt <- function (filter_object, omicsData) {
       batch_id = names(attr(get_group_DF(omicsData),"batch_id"))[-1],
       time_course = attr(get_group_DF(omicsData),
                          "time_course"),
-      pair_id = attr(get_group_DF(omicsData), "pair_id")
+      pair_id = attr(get_group_DF(omicsData), "pair_id"),
+      pair_group = attr(get_group_DF(omicsData), "pair_group"),
+      pair_denom = attr(get_group_DF(omicsData), "pair_denom")
     )
 
   } else {
@@ -2253,8 +2222,66 @@ gtest_filter <- function (nonmiss_per_group,
 
 }
 
+# A function to create an omicsData object on paired data. This function is
+# specifically written to be called within the applyFilt function. Not all
+# information in a usual omicsData object is needed and is omitted in this
+# function.
+#
+# @authour Evan A Martin
+as.diffData <- function (omicsData) {
+
+  # Compute the difference and create a new edata object from the differences.
+  diff_edata <- take_diff(omicsData)
+  diff_edata <- data.frame(omicsData$e_data[, get_edata_cname(omicsData)],
+                           diff_edata)
+  names(diff_edata)[[1]] <- get_edata_cname(omicsData)
+
+  # Only keep the first row for each pair. This will reduce the number of rows
+  # in f_data to match the number of columns in e_data.
+  diff_fdata <- omicsData$f_data %>%
+    dplyr::group_by(
+      !!rlang::sym(attr(attr(omicsData, "group_DF"), "pair_id"))
+    ) %>%
+    dplyr::slice(1)
+
+  # Change the sample names in f_data to match the sample names in e_data. The
+  # names from the pairing variable are the new sample names and must be
+  # updated to create a new omicsData object.
+  diff_fdata[, get_fdata_cname(omicsData)] <- names(diff_edata)[-1]
+
+  # Create a new omicsData object with the difference data. This is necessary
+  # as a new filter object (with the difference data) needs to be created to
+  # account for counts of differences.
+  diff_omicsData <- as.anyData(omics_type = class(omicsData)[[1]],
+                               edata = diff_edata,
+                               fdata = diff_fdata,
+                               edata_cname = get_edata_cname(omicsData),
+                               fdata_cname = get_fdata_cname(omicsData))
+
+  # Create the group designation attribute for the differences. Don't include
+  # the pairs argument because the data just had the difference taken and
+  # there are no longer pairs in the data (just a difference between pairs).
+  diff_omicsData <- group_designation(
+    omicsData = diff_omicsData,
+    main_effects = attr(attr(omicsData, "group_DF"), "main_effects"),
+    covariates = names(attr(attr(omicsData, "group_DF"), "covariates"))
+  )
+
+  # The difference has been taken so there is no paired attribute in group_DF.
+  # If there is only one group this will cause problems when calling
+  # imdanova_filter on the differences. Add a pairs attribute to group_DF that
+  # will allow there to be only one group.
+  attr(attr(diff_omicsData, "group_DF"), "pair_id") <- "difference taken"
+
+  return (diff_omicsData)
+
+}
+
 # A switch function to create an omicsData object based on the class of the
-# input.
+# input. The e_meta argument is omitted because it is not needed for how this
+# function is used within as.diffData.
+#
+# @author Evan A Martin
 as.anyData <- function (omics_type,
                         edata,
                         fdata,

@@ -31,7 +31,9 @@ pairdata_0_0_3 <- as.pepData(e_data = edata,
 pairdata_0_0_3 <- edata_transform(pairdata_0_0_3,
                                   data_scale = "log")
 pairdata_0_0_3 <- group_designation(pairdata_0_0_3,
-                                    pair_id = "PairID")
+                                    pair_id = "PairID",
+                                    pair_group = "Time",
+                                    pair_denom = "18")
 
 # Paired data, one main effect, zero covariates, three groups
 pairdata_1_0_3 <- as.pepData(e_data = edata,
@@ -44,7 +46,9 @@ pairdata_1_0_3 <- edata_transform(pairdata_1_0_3,
                                   data_scale = "log")
 pairdata_1_0_3 <- group_designation(pairdata_1_0_3,
                                     main_effects = "Virus",
-                                    pair_id = "PairID")
+                                    pair_id = "PairID",
+                                    pair_group = "Time",
+                                    pair_denom = "18")
 
 # Paired data, one main effect, one covariate, three groups
 pairdata_1_1_3 <- as.pepData(e_data = edata,
@@ -58,7 +62,9 @@ pairdata_1_1_3 <- edata_transform(pairdata_1_1_3,
 pairdata_1_1_3 <- group_designation(pairdata_1_1_3,
                                     main_effects = "Virus",
                                     covariates = "Gender",
-                                    pair_id = "PairID")
+                                    pair_id = "PairID",
+                                    pair_group = "Time",
+                                    pair_denom = "18")
 
 # Filter IMD-ANOVAly -----------------------------------------------------------
 
@@ -120,6 +126,13 @@ cfilta_1_1_3 <- applyFilt(filta_1_1_3, pairdata_1_1_3,
 
 # Prepare paired objects -------------------------------------------------------
 
+# Use 18hr as the control because this is how the original functions to take the
+# difference were written (the second half of a pair was always subtracted from
+# the first half). The order of a pair was determined by the order of the
+# samples in fdata. For example, if the 0hr sample occurred in row one and the
+# 18hr sample in row two the difference would be take by 0hr - 18hr. If the
+# order was mixed up (18hr occurred before 0hr in fdata) then for that pair 0hr
+# would be subtracted from 18hr.
 diff_a_1_0_3 <- data.frame(
   Mass_Tag_ID = afilta_1_0_3$e_data$Mass_Tag_ID,
   Pair_1 = afilta_1_0_3$e_data$Mock_0hr_1 - afilta_1_0_3$e_data$Mock_18hr_1,

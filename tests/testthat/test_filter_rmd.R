@@ -673,7 +673,9 @@ test_that("rmd_filter and applyFilt produce the correct output",{
   pairdata <- edata_transform(pairdata,
                               data_scale = "log")
   pairdata <- group_designation(pairdata,
-                                pair_id = "PairID")
+                                pair_id = "PairID",
+                                pair_group = "Time",
+                                pair_denom = "18")
 
   pair_filter <- rmd_filter(omicsData = pairdata)
 

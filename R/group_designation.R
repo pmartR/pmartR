@@ -30,6 +30,14 @@
 #' @param pair_id A character string indicating the column in \code{f_data} that
 #'   contains the IDs for each pair. This string must match the column name
 #'   exactly.
+#' @param pair_group A character string specifying the column in \code{f_data}
+#'   that indicates which group each pair belongs to. This variable must contain
+#'   just two levels or values (e.g., "before" and "after"). Numeric values can
+#'   be used (e.g., 0 and 1). However, they will be converted to character
+#'   strings.
+#' @param pair_denom A character string specifying which pair group is the
+#'   "control". When taking the difference, the value for the control group will
+#'   be subtracted from the non-control group value.
 #' @param batch_id an optional character vector of no more than one variable that
 #'  should be used as batch information for downstream analyses. Batch ID is
 #'  similar to covariates but unlike covariates it is specific to that of specific
@@ -75,6 +83,8 @@ group_designation <- function (omicsData,
                                covariates = NULL,
                                cov_type = NULL,
                                pair_id = NULL,
+                               pair_group = NULL,
+                               pair_denom = NULL,
                                batch_id = NULL,
                                time_course = NULL) {
 
@@ -286,28 +296,82 @@ group_designation <- function (omicsData,
   # usual methods of information extraction and verification.
   if (!is.null(pair_id)) {
 
-    # Check that pair_id is a character vector.
+    # If data are paired pair_group and pair_denom must also be specified.
+    if (is.null(pair_group) || is.null(pair_denom)) {
+
+      # Holy missing information, Batman.
+      stop ("pair_group and pair_denom must be specified if data are paired.")
+
+    }
+
+    # Check that pair_id, pair_group, and pair_denom are a character vectors.
     if (!is.character(pair_id)) {
 
-      # Holy inappropriate input type, Batman.
+      # Holy inappropriate ID input type, Batman.
       stop ("pair_id must be a character vector.")
+
+    }
+    if (!is.character(pair_group)) {
+
+      # Holy inappropriate group input type, Batman.
+      stop ("pair_group must be a character vector.")
+
+    }
+    if (!is.character(pair_denom)) {
+
+      # Holy inappropriate input type, Batman.
+      stop ("pair_denom must be a character vector.")
 
     }
 
     # Make sure there is only one character string specified.
     if (length(pair_id) > 1) {
 
-      # Holy too many pair_id, Batman!
-      stop ("Only one paired variable can be specified.")
+      # Holy too many pair IDs, Batman!
+      stop ("Only one pair ID variable can be specified.")
+
+    }
+    if (length(pair_group) > 1) {
+
+      # Holy too many pair groups, Batman!
+      stop ("Only one pair group variable can be specified.")
+
+    }
+    if (length(pair_denom) > 1) {
+
+      # Holy too many control groups, Batman!
+      stop ("Only one control group can be specified.")
 
     }
 
-    # Make sure the paired variable exists in f_data. How can we subset by
+    # Make sure the paired variables exists in f_data. How can we subset by
     # something that doesn't exist?!
     if (!(pair_id %in% names(omicsData$f_data))) {
 
-      # Holy missing variable, Batman!
+      # Holy missing pair ID variable, Batman!
       stop ("The variable specified for pair_id does not exist in f_data.")
+
+    }
+    if (!(pair_group %in% names(omicsData$f_data))) {
+
+      # Holy missing pair group variable, Batman!
+      stop ("The variable specified for pair_group does not exist in f_data.")
+
+    }
+
+    # Ensure there are only two levels or values in pair_group.
+    if (dplyr::n_distinct(omicsData$f_data[, pair_group]) != 2) {
+
+      # Holy too many pairing groups, Batman.
+      stop ("Only two levels or values are allowed in pair_group.")
+
+    }
+
+    # Make sure the control is in the pair_group variable.
+    if (!pair_denom %in% unique(as.character(omicsData$f_data[, pair_group]))) {
+
+      # Holy missing control group, Batman!
+      stop ("The control group is not present in the pair_group variable.")
 
     }
 
@@ -678,10 +742,12 @@ group_designation <- function (omicsData,
 
   attr(output, "covariates") <- holy_covariates_batman
 
-  # Include the name of the variable containing the paired information as an
-  # attribute of group_DF. This will be used in the functions that compute the
-  # difference between each pair.
+  # Include the pair ID, group, and denom information as attributes of group_DF.
+  # These objects will be used in the functions that compute the difference
+  # between each pair.
   attr(output, "pair_id") <- pair_id
+  attr(output, "pair_group") <- pair_group
+  attr(output, "pair_denom") <- pair_denom
 
   # Set the batch_id attribute according to the input
   if (is.null(batch_id)) {

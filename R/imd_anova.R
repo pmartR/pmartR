@@ -696,9 +696,25 @@ anova_test <- function (omicsData, groupData, comparisons, pval_adjust,
       dplyr::slice(1) %>%
       data.frame()
 
-    # Update the sample names in the groupData object according to the column
-    # names of data (the paired difference data matrix).
-    groupData[, samp_cname] <- colnames(data)
+    # Grab the column containing the pair ID. This will be used to create the
+    # new sample name for the paired differences.
+    moniker <- groupData[, da_pair_name]
+
+    # If the pair IDs are numbers paste "Pair_" before each number to create new
+    # sample names. If we don't do this the data.frame function will complain at
+    # some point and ruin all of our hard work by throwing an uninterpretable
+    # error or (even worse) producing incorrect results. At this point pmartR
+    # users will complain to Lisa and Kelly and then they will yell at me.
+    if (is.numeric(moniker)) {
+
+      moniker <- paste("Pair", moniker,
+                       sep = "_")
+
+    }
+
+    # Update the sample names in groupData according to the newly created paired
+    # sample names.
+    groupData[, samp_cname] <- moniker
 
     # Add the original main_effects, pairs, and nonsingleton_groups attributes
     # to the updated groupData object. These attributes will be used in various
@@ -747,9 +763,9 @@ anova_test <- function (omicsData, groupData, comparisons, pval_adjust,
         dplyr::select(-2) %>%
         data.frame()
 
-      # Update the sample names in the cov_data object according to the column
-      # names of data (the paired difference data matrix).
-      cov_data[, samp_cname] <- colnames(data)
+      # Update the sample names in cov_data according to the newly created
+      # paired sample names.
+      cov_data[, samp_cname] <- moniker
 
     }
 
@@ -1844,22 +1860,62 @@ reduce_xmatrix <- function(x,ngroups){
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 #Function to translate paired data into differences
-build_pair_mat <- function(pair_df){
-  #pair_df - data.frame with two columns: sampleIDs and PairIDs (in that order)
+build_pair_mat <- function (omicsData) {
 
-  #Creat matrix of 1, -1 that will turn single observations into paired differences
-  coli_levels <- unique(pair_df[,2])
-  n_levels <- length(coli_levels)
-  Xmatrix <- matrix(0,nrow(pair_df),n_levels)
+  # Nab all the info we need from the group_DF attribute.
+  pairID <- attr(attr(omicsData, "group_DF"), "pair_id")
+  pairGroup <- attr(attr(omicsData, "group_DF"), "pair_group")
+  pairDenom <- attr(attr(omicsData, "group_DF"), "pair_denom")
 
-  for(j in 1:n_levels){
-    if(length(which(pair_df[,2]==coli_levels[j]))>2){
-      stop(paste("Only two samples can be associated with the same 'pair'.  More than two samples are associated with pair",coli_levels[j],"."))
-    }
-    Xmatrix[pair_df[,2]==coli_levels[j],j] <- c(1,-1)
+  # Snag the index of the biomolecule ID in e_data.
+  edata_idx <- which(names(omicsData$e_data) == get_edata_cname(omicsData))
+
+  # Create a copy of f_data. The copy will be reordered to match the order of
+  # e_data.
+  fdata <- omicsData$f_data
+
+  # Reorder the rows of f_data to match the order of the rows in e_data.
+  fdata <- fdata[match(fdata[, get_fdata_cname(omicsData)],
+                       names(omicsData$e_data)[-edata_idx]), ]
+
+  # Find unique pair IDs. The unique IDs will be used to correctly subset fdata
+  # when matching sample IDs between edata and fdata.
+  distinct_pairs <- unique(fdata[, pairID])
+
+  # Grab the number of pairs in the data. This will be used to create the
+  # correct number of columns in the matrix used to calculate the difference
+  # between pairs.
+  n_pairs <- length(distinct_pairs)
+
+  # Create a matrix of zeros. Each column represents a pair and each row
+  # represents a sample. A 1 and -1 will be added column-wise to specify which
+  # sample in the pair will be subtracted from the other.
+  Xmatrix <- matrix(0, nrow(fdata), n_pairs)
+
+  for (e in 1:n_pairs) {
+
+    # Determine which rows in fdata correspond to the current pair ID.
+    current_pairs <- which(fdata[, pairID] == distinct_pairs[[e]])
+
+    # Set the rows in Xmatrix to 1 that correspond to the current pair ID.
+    Xmatrix[current_pairs, e] <- 1
+
+    # Determine which row index for the current pair corresponds to pairDenom.
+    # This is the sample that will be subtracted from the other sample and the
+    # value in Xmatrix will be changed to -1.
+    denom_idx <- which(
+      as.character(fdata[current_pairs, pairGroup]) == pairDenom
+    )
+
+    # Change the value to -1 in Xmatrix that corresponds to pairDenom. The
+    # abundance value for this sample will be subtracted from the abundance
+    # value of the other sample.
+    Xmatrix[current_pairs[[denom_idx]], e] <- -1
+
   }
 
-  return(Xmatrix)
+  return (Xmatrix)
+
 }
 
 #' Compute pairwise differences
@@ -1883,11 +1939,9 @@ take_diff <- function (omicsData) {
   )
 
   # Create a matrix with -1 and 1 in the corresponding rows to calculate the
-  # difference between the paried samples. This matrix is created according to
+  # difference between the paired samples. This matrix is created according to
   # the column in f_data containing the paired information.
-  pid_matrix <- build_pair_mat(
-    pair_df = omicsData$f_data[, c(samp_idx, pair_idx)]
-  )
+  pid_matrix <- build_pair_mat(omicsData)
 
   # Find the biomolecule ID index in e_data.
   bio_idx <- which(
@@ -1900,7 +1954,7 @@ take_diff <- function (omicsData) {
     C = t(pid_matrix)
   )
 
-  # Extract the first occurance of each pair variable in f_data. These will be
+  # Extract the first occurrence of each pair variable in f_data. These will be
   # used later to rename the columns of diff_data.
   moniker <- omicsData$f_data %>%
     dplyr::group_by(dplyr::across(pair_idx)) %>%
