@@ -2278,15 +2278,33 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
   max_x <- min(group_sizes_valid)
   obs <- as.data.frame(filter_obj)[-1]
 
+  # Count number of groups in each row of the obs data frame that have > 0, > 1,
+  # ..., > max_x non-missing values. For ANOVA we need at least two groups that
+  # meet this criteria unless the data are paired and there are no main effects.
   n_biomolecules_anova <- purrr::map_int(0:max_x, function (num) {
 
     # Number of groups greater than num
     n_greater_obs <- apply(obs, 1, function (row) sum(!(row < num)))
-    # Must be in at least two groups for ANOVA
-    sum(n_greater_obs > 1)
+
+    # If there are no main effects we need to count differently (in this case we
+    # do not need at least two groups to run ANOVA).
+    if ("paired_diff" %in% names(obs)) {
+
+      # biomolecules with 1+ group > num
+      n_greater_obs <- sum(apply(obs, 1, function (row) any(!(row < num))))
+
+    } else {
+
+      # Biomolecules with 2+ group > num.
+      sum(n_greater_obs > 1)
+
+    }
 
   })
 
+  # Count number of groups in each row of the obs data frame that have > 0, > 1,
+  # ..., > max_x non-missing values. For G-Test we need at least one group that
+  # meets this criteria.
   n_biomolecules_gtest <- purrr::map_int(0:max_x, function (num) {
 
     # biomolecules with 1+ group > num
