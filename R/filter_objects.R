@@ -79,13 +79,13 @@ molecule_filter <- function (omicsData,use_groups = FALSE, use_batch = FALSE) {
     # Create a data frame with the ID columns and the minimum number of non-missing values per grouping
     output <- omicsData$e_data %>%
       tidyr::pivot_longer(cols = -tidyselect::all_of(id_col), names_to = names(batchDat)[1], values_to = "value") %>%
-      dplyr::left_join(batchDat, by = "SampleID") %>%
-      dplyr::group_by(dplyr::across(id_col), Batch) %>%
+      dplyr::left_join(batchDat, by = pmartR::get_fdata_cname(omicsData)) %>%
+      dplyr::group_by(dplyr::across(tidyselect::all_of(id_col)), Batch) %>%
       dplyr::summarise(num_obs = sum(!is.na(value)),.groups = "keep") %>%
-      dplyr::group_by(dplyr::across(id_col)) %>%
+      dplyr::group_by(dplyr::across(tidyselect::all_of(id_col))) %>%
       dplyr::summarise(min_num_obs = as.numeric(min(num_obs)),.groups = "keep") %>%
       dplyr::ungroup() %>%
-      dplyr::rename(molecule = id_col) %>% 
+      dplyr::rename(molecule = tidyselect::all_of(id_col)) %>% 
       dplyr::arrange(match(molecule,ordering)) %>% 
       data.frame()
     colnames(output)[1] <- get_edata_cname(omicsData)
@@ -99,13 +99,13 @@ molecule_filter <- function (omicsData,use_groups = FALSE, use_batch = FALSE) {
     # Create a data frame with the ID columns and the minimum number of non-missing values per grouping
     output <- omicsData$e_data %>%
       tidyr::pivot_longer(cols = -tidyselect::all_of(id_col), names_to = names(groupDat)[1], values_to = "value") %>%
-      dplyr::left_join(groupDat, by = "SampleID") %>%
-      dplyr::group_by(dplyr::across(id_col), Group) %>%
+      dplyr::left_join(groupDat, by = pmartR::get_fdata_cname(omicsData)) %>%
+      dplyr::group_by(dplyr::across(tidyselect::all_of(id_col)), Group) %>%
       dplyr::summarise(num_obs = sum(!is.na(value)),.groups = "keep") %>%
-      dplyr::group_by(dplyr::across(id_col)) %>%
+      dplyr::group_by(dplyr::across(tidyselect::all_of(id_col))) %>%
       dplyr::summarise(min_num_obs = as.numeric(min(num_obs)),.groups = "keep") %>%
       dplyr::ungroup() %>%
-      dplyr::rename(molecule = id_col) %>%
+      dplyr::rename(molecule = tidyselect::all_of(id_col)) %>%
       dplyr::arrange(match(molecule,ordering)) %>%
       data.frame()
     colnames(output)[1] <- get_edata_cname(omicsData)
@@ -119,14 +119,14 @@ molecule_filter <- function (omicsData,use_groups = FALSE, use_batch = FALSE) {
 
     output <- omicsData$e_data %>%
       tidyr::pivot_longer(cols = -tidyselect::all_of(id_col), names_to = names(groupDat)[1], values_to = "value") %>%
-      dplyr::left_join(groupDat, by = "SampleID") %>%
-      dplyr::left_join(batchDat, by = "SampleID") %>%
-      dplyr::group_by(dplyr::across(id_col), Group, Batch) %>%
+      dplyr::left_join(groupDat, by = pmartR::get_fdata_cname(omicsData)) %>%
+      dplyr::left_join(batchDat, by = pmartR::get_fdata_cname(omicsData)) %>%
+      dplyr::group_by(dplyr::across(tidyselect::all_of(id_col)), Group, Batch) %>%
       dplyr::summarise(num_obs = sum(!is.na(value)),.groups = "keep") %>%
-      dplyr::group_by(dplyr::across(id_col)) %>%
+      dplyr::group_by(dplyr::across(tidyselect::all_of(id_col))) %>%
       dplyr::summarise(min_num_obs = as.numeric(min(num_obs)),.groups = "keep") %>%
       dplyr::ungroup() %>%
-      dplyr::rename(molecule = id_col) %>%
+      dplyr::rename(molecule = tidyselect::all_of(id_col)) %>%
       dplyr::arrange(match(molecule,ordering)) %>%
       data.frame()
     colnames(output)[1] <- get_edata_cname(omicsData)
