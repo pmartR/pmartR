@@ -699,18 +699,20 @@ print.cvFilterSummary <- function(object){
 
 #' Produce a basic summary of a custom_filter object
 #'
-#' This function will provide basic summary statistics for the custom_filter object.
+#' This function will provide basic summary statistics for the custom_filter
+#' object.
 #'
-#' @param filter_object S3 object of class 'customFilt' created by \code{\link{custom_filter}}.
-#' @return a summary of the items in e_data, f_data, and e_meta that will be removed as a result of applying the custom filter.
+#' @param filter_object S3 object of class 'customFilt' created by
+#'   \code{\link{custom_filter}}.
 #'
+#' @return a summary of the items in e_data, f_data, and e_meta that will be
+#'   removed as a result of applying the custom filter.
 #'
 #' @author Lisa Bramer
 #'
-#'@export
-#'@export
-#'@rdname summary.customFilt
-#'@name summary.customFilt
+#' @export
+#' @rdname summary.customFilt
+#' @name summary.customFilt
 summary.customFilt <- function(filter_object){
 
   # get omicsData object #
@@ -827,12 +829,23 @@ summary.customFilt <- function(filter_object){
 
   }
 
+  class(disp) = c("customFilterSummary", "data.frame")
+
+  return (disp)
+
+}
+
+
+#' Print method for summary of custom filter
+#'
+#' @export
+#'
+print.customFilterSummary <- function (object) {
+
   ## Display output ##
   cat("\nSummary of Custom Filter\n\n")
-  cat(capture.output(disp), sep = "\n")
+  cat(capture.output(object), sep = "\n")
   cat("\n")
-
-  return (invisible(disp))
 
 }
 

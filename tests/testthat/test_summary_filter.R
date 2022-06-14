@@ -322,7 +322,7 @@ test_that('the filter object summaries are all square',{
         Total = c(12, 150, 83)
       ),
       names = c("Filtered", "Remaining", "Total"),
-      class = "data.frame",
+      class = c("customFilterSummary", "data.frame"),
       row.names = c("SampleIDs (f_data)", "Mass_Tag_IDs (e_data)",
                     "Proteins (e_meta)")
     )
@@ -337,7 +337,7 @@ test_that('the filter object summaries are all square',{
         Total = c(12, 150, 83)
       ),
       names = c("Filtered", "Remaining", "Total"),
-      class = "data.frame",
+      class = c("customFilterSummary", "data.frame"),
       row.names = c("SampleIDs (f_data)", "Mass_Tag_IDs (e_data)",
                     "Proteins (e_meta)")
     )
@@ -352,7 +352,7 @@ test_that('the filter object summaries are all square',{
         Total = c(12, 150, 83)
       ),
       names = c("Filtered", "Remaining", "Total"),
-      class = "data.frame",
+      class = c("customFilterSummary", "data.frame"),
       row.names = c("SampleIDs (f_data)", "Mass_Tag_IDs (e_data)",
                     "Proteins (e_meta)")
     )
