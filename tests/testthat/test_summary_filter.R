@@ -23,39 +23,39 @@ test_that('the filter object summaries are all square',{
   # Create pepData objects to test multiple main effects and covariates --------
 
   # Copy edata so the names of the samples can be changed.
-  edata2_2 <- edata
+  edata_2 <- edata
 
   # Change some of the Infection samples to Mock samples.
-  names(edata2_2) <- c("Mass_Tag_ID",
-                       paste0("Infection", 1:6),
-                       paste0("Mock", 1:6))
+  names(edata_2) <- c("Mass_Tag_ID",
+                      paste0("Infection", 1:6),
+                      paste0("Mock", 1:6))
 
   # Create additional f_data objects with different main effects and covariates.
-  fdata2_2 <- fdata
+  fdata_2 <- fdata
 
   # Update the sample names in f_data.
-  fdata2_2$SampleID <- c(paste0("Infection", 1:6),
-                         paste0("Mock", 1:6))
+  fdata_2$SampleID <- c(paste0("Infection", 1:6),
+                        paste0("Mock", 1:6))
 
   # Update the first main effect to account for changing some infection samples to
   # mock samples.
-  fdata2_2$Condition <- c(rep("Infection", 6),
-                          rep("Mock", 6))
+  fdata_2$Condition <- c(rep("Infection", 6),
+                         rep("Mock", 6))
 
-  fdata2_2$Level <- c("high", "low", "high", "low", "high", "low", "high",
-                      "high", "low", "low", "low", "high")
-  fdata2_2$Gender <- c("M", "F", "M", "F", "M", "F",
-                       "F", "M", "F", "F", "M", "F")
-  fdata2_2$Age <- round(runif(12, min = 19, max = 89), 2)
+  fdata_2$Level <- c("high", "low", "high", "low", "high", "low", "high",
+                     "high", "low", "low", "low", "high")
+  fdata_2$Gender <- c("M", "F", "M", "F", "M", "F",
+                      "F", "M", "F", "F", "M", "F")
+  fdata_2$Age <- round(runif(12, min = 19, max = 89), 2)
 
-  pdata_2_2_4 <- as.pepData(e_data = edata2_2,
-                            f_data = fdata2_2,
-                            edata_cname = "Mass_Tag_ID",
-                            fdata_cname = "SampleID")
-  pdata_2_2_4 <- edata_transform(pdata_2_2_4, "log")
-  pdata_2_2_4 <- group_designation(omicsData = pdata_2_2_4,
-                                   main_effects = c("Condition", "Level"),
-                                   covariates = c("Gender", "Age"))
+  pdata_2 <- as.pepData(e_data = edata_2,
+                        f_data = fdata_2,
+                        edata_cname = "Mass_Tag_ID",
+                        fdata_cname = "SampleID")
+  pdata_2 <- edata_transform(pdata_2, "log")
+  pdata_2 <- group_designation(omicsData = pdata_2,
+                               main_effects = c("Condition", "Level"),
+                               covariates = c("Gender", "Age"))
 
   # Create pepData objects to test paired data ---------------------------------
 
@@ -122,10 +122,10 @@ test_that('the filter object summaries are all square',{
   # RMD filter ---------------
 
   expect_equal(
-    summary(rmd_filter(pdata_2_2_4), pvalue_threshold = 0.01),
+    summary(rmd_filter(pdata_2), pvalue_threshold = 0.01),
     structure(
       list(
-        pvalue = summary(rmd_filter(pdata_2_2_4)$pvalue),
+        pvalue = summary(rmd_filter(pdata_2)$pvalue),
         metrics = c("MAD", "Kurtosis", "Skewness",
                     "Corr", "Proportion_Missing"),
         filtered_samples = "Mock2"
@@ -170,7 +170,7 @@ test_that('the filter object summaries are all square',{
   # IMD-ANOVA filter ---------------
 
   expect_equal(
-    summary(imdanova_filter(pdata_2_2_4), min_nonmiss_anova = 2),
+    summary(imdanova_filter(pdata_2), min_nonmiss_anova = 2),
     structure(
       list(
         pep_observation_counts = 150,
@@ -183,7 +183,7 @@ test_that('the filter object summaries are all square',{
   )
 
   expect_equal(
-    summary(imdanova_filter(pdata_2_2_4), min_nonmiss_gtest = 3),
+    summary(imdanova_filter(pdata_2), min_nonmiss_gtest = 3),
     structure(
       list(
         pep_observation_counts = 150,
@@ -196,7 +196,7 @@ test_that('the filter object summaries are all square',{
   )
 
   expect_equal(
-    summary(imdanova_filter(pdata_2_2_4),
+    summary(imdanova_filter(pdata_2),
             min_nonmiss_anova = 2,
             min_nonmiss_gtest = 3),
     structure(
@@ -245,6 +245,66 @@ test_that('the filter object summaries are all square',{
         pep_observation_counts = 150,
         num_filtered = 19,
         num_not_filtered = 131
+      ),
+      names = c("pep_observation_counts", "num_filtered", "num_not_filtered"),
+      class = c("imdanovaFilterSummary", "list")
+    )
+  )
+
+  expect_equal(
+    summary(
+      imdanova_filter(pdata_2),
+      min_nonmiss_anova = 2,
+      comparisons = data.frame(
+        Test = c("Infection_high", "Infection_low"),
+        Control = rep("Mock_low", 2)
+      )
+    ),
+    structure(
+      list(
+        pep_observation_counts = 150,
+        num_filtered = 33,
+        num_not_filtered = 117
+      ),
+      names = c("pep_observation_counts", "num_filtered", "num_not_filtered"),
+      class = c("imdanovaFilterSummary", "list")
+    )
+  )
+
+  expect_equal(
+    summary(
+      imdanova_filter(pdata_2),
+      min_nonmiss_anova = 2,
+      comparisons = data.frame(
+        Test = c("Infection_high", "Mock_high"),
+        Control = c("Mock_high", "Infection_low")
+      )
+    ),
+    structure(
+      list(
+        pep_observation_counts = 150,
+        num_filtered = 27,
+        num_not_filtered = 123
+      ),
+      names = c("pep_observation_counts", "num_filtered", "num_not_filtered"),
+      class = c("imdanovaFilterSummary", "list")
+    )
+  )
+
+  expect_equal(
+    summary(
+      imdanova_filter(pdata_2),
+      min_nonmiss_gtest = 3,
+      comparisons = data.frame(
+        Test = c("Infection_high", "Infection_low"),
+        Control = rep("Mock_low", 2)
+      )
+    ),
+    structure(
+      list(
+        pep_observation_counts = 150,
+        num_filtered = 29,
+        num_not_filtered = 121
       ),
       names = c("pep_observation_counts", "num_filtered", "num_not_filtered"),
       class = c("imdanovaFilterSummary", "list")

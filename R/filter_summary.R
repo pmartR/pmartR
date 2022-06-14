@@ -211,22 +211,32 @@ print.proteomicsFilterSummary <- function(object){
 
 #' Produce a basic summary of a imdanova_filter object
 #'
-#' This function will provide basic summary statistics for the imdanova_filter object.
+#' This function will provide basic summary statistics for the imdanova_filter
+#' object.
 #'
-#' @param filter_object S3 object of class 'imdanovaFilt' created by \code{\link{imdanova_filter}}.
-#'@param min_nonmiss_gtest the minimum number of non-missing feature values allowed per group for \code{gtest_filter}. Defaults to NULL. Suggested value is 3.
-#'@param min_nonmiss_anova the minimum number of non-missing feature values allowed per group for \code{anova_filter}. Defaults to NULL. Suggested value is 2.
+#' @param filter_object S3 object of class 'imdanovaFilt' created by
+#'   \code{\link{imdanova_filter}}.
+#' @param min_nonmiss_gtest the minimum number of non-missing feature values
+#'   allowed per group for \code{gtest_filter}. Defaults to NULL. Suggested
+#'   value is 3.
+#' @param min_nonmiss_anova the minimum number of non-missing feature values
+#'   allowed per group for \code{anova_filter}. Defaults to NULL. Suggested
+#'   value is 2.
+#' @param comparisons data.frame with columns for "Control" and "Test"
+#'   containing the different comparisons of interest. Comparisons will be made
+#'   between the Test and the corresponding Control.
 #'
-#' @return If min_nonmiss_gtest or min_nonmiss_anova is specified, the number of biomolecules to be filtered with the specified threshold are reported.
-#'
+#' @return If min_nonmiss_gtest or min_nonmiss_anova is specified, the number of
+#'   biomolecules to be filtered with the specified threshold are reported.
 #'
 #' @author Lisa Bramer
 #'
 #' @export
-#'@rdname summary.imdanovaFilt
-#'@name summary.imdanovaFilt
-#'@export
-summary.imdanovaFilt <- function(filter_object, min_nonmiss_anova=NULL, min_nonmiss_gtest=NULL){
+#' @rdname summary.imdanovaFilt
+#' @name summary.imdanovaFilt
+#' @export
+summary.imdanovaFilt <- function(filter_object, min_nonmiss_anova = NULL,
+                                 min_nonmiss_gtest = NULL, comparisons = NULL){
 
   ## initial checks ##
 
@@ -261,9 +271,9 @@ summary.imdanovaFilt <- function(filter_object, min_nonmiss_anova=NULL, min_nonm
 
   # Check if data are paired. If they are we will filter biomolecules on paired
   # differences.
-  if (
-    !is.null(attr(attr(attr(filter_object, "omicsData"), "group_DF"), "pair_id"))
-  ) {
+  if (!is.null(
+    attr(attr(attr(filter_object, "omicsData"), "group_DF"), "pair_id")
+  )) {
 
     # Create an omicsData object on the differences.
     diff_omicsData <- as.diffData(attr(filter_object, "omicsData"))
@@ -284,6 +294,7 @@ summary.imdanovaFilt <- function(filter_object, min_nonmiss_anova=NULL, min_nonm
   # if min_nonmiss_gtest is not provided, the vector of zeros will indicate nothing needs removing
   inds_rm_gtest <- rep(0, nrow(filter_object))
 
+  # Determine what will be filtered: ANOVA -------------------------------------
 
   # if min_nonmiss_anova is provided
   if(!is.null(min_nonmiss_anova)){
@@ -295,19 +306,113 @@ summary.imdanovaFilt <- function(filter_object, min_nonmiss_anova=NULL, min_nonm
 
     } else {
 
-      # need at least n=min_nonmiss_anova per group in at least 2 groups in
-      # order to keep the peptide
-      temp_anova <- (filter_object[,which(names(filter_object) %in% my_names)] >= min_nonmiss_anova)
+      # dplyr mumbo jumbo!
+      # Determine which groups meet the min_nonmiss_anova criterion.
+      inds_rm_anova <- filter_object %>%
+        # Determine which groups have non-missing counts above the cutoff.
+        dplyr::mutate(
+          dplyr::across(dplyr::any_of(my_names), ~ . >= min_nonmiss_anova)
+        ) %>%
+        # Count the number of groups above the cutoff.
+        dplyr::mutate(
+          n_groups = rowSums(dplyr::across(dplyr::any_of(my_names)))
+        )
 
-      # sum the number of groups that meet the nonmissing per group requirement
-      # these are the rows to remove since they do not have at least 2 groups
-      # not meeting nonmissing requirements
-      inds_rm_anova <- rowSums(temp_anova) < 2
+      # Determine what will be filtered when comparisons is NULL.
+      if (is.null(comparisons)) {
+
+        # dplyr mumbo jumbo!
+        # When comparisons are NULL we need at least two groups (across all
+        # groups) that have counts above the min_nonmiss_anova threshold.
+        inds_rm_anova <- inds_rm_anova %>%
+          # Count the number of groups above the cutoff.
+          dplyr::mutate(insufficient = n_groups < 2) %>%
+          dplyr::pull(insufficient)
+
+      } else {
+
+        # Grab the groups in the Test and Control columns.
+        testers <- unique(comparisons$Test)
+        controllers <- unique(comparisons$Control)
+        combiners <- unique(c(testers, controllers))
+
+        # Sum across the unique groups in test, control, and combined (the
+        # unique set of groups from both test and control). This will be used to
+        # determine which rows need to be filtered depending on which scenario
+        # we are in.
+        inds_rm_anova <- inds_rm_anova %>%
+          dplyr::mutate(
+            n_test = rowSums(dplyr::across(dplyr::all_of(testers))),
+            n_control = rowSums(dplyr::across(dplyr::all_of(controllers))),
+            n_combine = rowSums(dplyr::across(dplyr::all_of(combiners)))
+          )
+
+        # Scenario 1: one group is compared to multiple other groups.
+        if (length(controllers) == 1) {
+
+          inds_rm_anova <- inds_rm_anova %>%
+            # Count the number of groups above the cutoff.
+            dplyr::mutate(insufficient = n_groups < 2) %>%
+            # We can't filter the rows like the code does in applyFilt because
+            # the length of inds_rm_anova and inds_rm_gest need to be the same.
+            # Filtering either inds_rm_anova or inds_rm_gtest would break the
+            # code at the end that counts the number of biomolecules that are
+            # either filtered or not filtered.
+            #
+            # Change values in insufficient according to the values in n_test
+            # and n_control. Rows in insufficient without any groups above the
+            # cutoff in test or control must be TRUE (the corresponding
+            # biomolecule is removed).
+            #
+            # We can't test one thing against nothing :)
+            dplyr::mutate(
+              insufficient = dplyr::case_when(
+                n_test == 0 | n_control == 0 ~ TRUE,
+                TRUE ~ insufficient
+              )
+            ) %>%
+            dplyr::pull(insufficient)
+
+          # Scenario 2: Some groups are compared to some other groups. In this
+          # scenario a group can be in both test and control.
+        } else {
+
+          inds_rm_anova <- inds_rm_anova %>%
+            # Count the number of groups above the cutoff.
+            dplyr::mutate(insufficient = n_groups < 2) %>%
+            # We can't filter the rows like the code does in applyFilt because
+            # the length of inds_rm_anova and inds_rm_gest need to be the same.
+            # Filtering either inds_rm_anova or inds_rm_gtest would break the
+            # code at the end that counts the number of biomolecules that are
+            # either filtered or not filtered.
+            #
+            # Change values in insufficient according to the values in n_test,
+            # n_control and n_combine. Rows in insufficient without any groups
+            # above the cutoff in control or test and rows where there is at
+            # least one group in test or control but the count of combined
+            # groups is less than two need to be TRUE (the corresponding
+            # biomolecule is removed).
+            #
+            # We can't test one thing against nothing nor can we test one thing
+            # against itself :)
+            dplyr::mutate(
+              insufficient = dplyr::case_when(
+                (n_test == 0 | n_control == 0) |
+                  (n_test > 0 & n_control > 0 & n_combine < 2) ~ TRUE,
+                TRUE ~ insufficient
+              )
+            ) %>%
+            dplyr::pull(insufficient)
+
+        }
+
+      }
 
     }
 
   }
 
+  # Determine what will be filtered: G-Test ------------------------------------
 
   # if min_nonmiss_gtest is provided
   if(!is.null(min_nonmiss_gtest)){
@@ -321,16 +426,49 @@ summary.imdanovaFilt <- function(filter_object, min_nonmiss_anova=NULL, min_nonm
 
     } else {
 
-      # need at least min_nonmiss_gtest peptide IDs in one group #
-      temp_gtest <- (filter_object[,which(names(filter_object) %in% my_names)] >= min_nonmiss_gtest)
+      # Determine what will be filtered when comparisons is NULL.
+      if (is.null(comparisons)) {
 
-      # sum the number of groups that meet the nonmissing per group requirement
-      # remove these rows since no groups meet the requirement
-      inds_rm_gtest <- rowSums(temp_gtest) == 0
+        # dplyr mumbo jumbo!
+        # When comparisons are NULL we need at least one group (across all
+        # groups) that has a count above min_nonmiss_gtest.
+        inds_rm_gtest <- filter_object %>%
+          # Determine which groups have non-missing counts above the cutoff.
+          dplyr::mutate(
+            # Find groups above G-Test criterion.
+            dplyr::across(dplyr::all_of(my_names), ~ . >= min_nonmiss_gtest),
+            # Count number of groups above G-Test criterion.
+            n_groups = rowSums(dplyr::across(dplyr::all_of(my_names))),
+            # Determine which biomolecules have insufficient data.
+            insufficient = n_groups == 0
+          ) %>%
+          dplyr::pull(insufficient)
+
+        # Determine what will be filtered when custom comparisons are provided.
+      } else {
+
+        # Grab the groups in both the Test and Control columns.
+        combiners <- unique(c(comparisons$Test, comparisons$Control))
+
+        # dplyr mumbo jumbo!
+        inds_rm_gtest <- filter_object %>%
+          dplyr::mutate(
+            # Find groups specified in comparisons above G-Test criterion.
+            dplyr::across(dplyr::all_of(combiners), ~ . >= min_nonmiss_gtest),
+            # Count number of groups above G-Test criterion.
+            n_groups = rowSums(dplyr::across(dplyr::all_of(combiners))),
+            # Determine which biomolecules have insufficient data.
+            insufficient = n_groups == 0
+          ) %>%
+          dplyr::pull(insufficient)
+
+      }
 
     }
 
   }
+
+  # Count number of things that will be filtered -------------------------------
 
   #if-statement for the case where both min_nonmiss_anova and min_nonmiss_gtest
   #are non-NULL. Note: num_not_tested will be the count of (inds_rm_anova +
@@ -370,7 +508,9 @@ summary.imdanovaFilt <- function(filter_object, min_nonmiss_anova=NULL, min_nonm
     num_filtered = NULL
   }
 
-  res <- list(pep_observation_counts = nrow(filter_object), num_filtered = num_filtered, num_not_filtered = num_not_filtered)
+  res <- list(pep_observation_counts = nrow(filter_object),
+              num_filtered = num_filtered,
+              num_not_filtered = num_not_filtered)
 
   class(res) = c("imdanovaFilterSummary","list")
 
@@ -687,15 +827,12 @@ summary.customFilt <- function(filter_object){
 
   }
 
-
   ## Display output ##
   cat("\nSummary of Custom Filter\n\n")
   cat(capture.output(disp), sep = "\n")
   cat("\n")
 
-  return(invisible(disp))
+  return (invisible(disp))
+
 }
-
-
-
 
