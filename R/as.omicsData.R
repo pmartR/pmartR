@@ -1522,6 +1522,22 @@ pre_flight <- function (e_data,
     }
 
   }
+  
+  # if e_meta is provided check that there are no duplicates of edata_cname and 
+  # emeta_cname combinations in the e_meta
+  if(!is.null(e_meta)){
+    # identify which columns are edata and emeta cnames in the emeta dataset
+    id_edat_cname = which(colnames(e_meta) == edata_cname)
+    id_emet_cname = which(colnames(e_meta) == emeta_cname)
+    
+    # find the subset of just those 2 columns
+    sub_emeta <- unique(data.frame(e_meta[,id_edat_cname],e_meta[,id_emet_cname]))
+    
+    # are the two number of rows equal to each other?
+    if(nrow(sub_emeta) != nrow(e_meta)){
+      stop (paste("Not all e_data cname and e_meta cname combinations are unique"))
+    }
+  }
 
   # Return the (possibly updated) data frames and cnames.
   return (list(e_data = e_data,
