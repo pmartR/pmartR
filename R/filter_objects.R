@@ -66,6 +66,9 @@ molecule_filter <- function (omicsData,use_groups = FALSE, use_batch = FALSE) {
   # find the column which has the edata cname
   id_col <- which(names(omicsData$e_data) == get_edata_cname(omicsData))
 
+  ordering = omicsData$e_data[,id_col]
+  
+
   # SCENARIO 1: use_groups = FALSE, use_batch = FALSE
   # we run the scenario as before
   if((use_batch == FALSE | is.null(attributes(attr(omicsData,"group_DF"))$batch_id)) & (use_groups == FALSE | is.null(attr(omicsData,"group_DF")))){
@@ -87,13 +90,16 @@ molecule_filter <- function (omicsData,use_groups = FALSE, use_batch = FALSE) {
     # Create a data frame with the ID columns and the minimum number of non-missing values per grouping
     output <- omicsData$e_data %>%
       tidyr::pivot_longer(cols = -tidyselect::all_of(id_col), names_to = names(batchDat)[1], values_to = "value") %>%
-      dplyr::left_join(batchDat, by = "SampleID") %>%
-      dplyr::group_by(dplyr::across(id_col), Batch) %>%
+      dplyr::left_join(batchDat, by = pmartR::get_fdata_cname(omicsData)) %>%
+      dplyr::group_by(dplyr::across(tidyselect::all_of(id_col)), Batch) %>%
       dplyr::summarise(num_obs = sum(!is.na(value)),.groups = "keep") %>%
-      dplyr::group_by(dplyr::across(id_col)) %>%
+      dplyr::group_by(dplyr::across(tidyselect::all_of(id_col))) %>%
       dplyr::summarise(min_num_obs = as.numeric(min(num_obs)),.groups = "keep") %>%
       dplyr::ungroup() %>%
+      dplyr::rename(molecule = tidyselect::all_of(id_col)) %>% 
+      dplyr::arrange(match(molecule,ordering)) %>% 
       data.frame()
+    colnames(output)[1] <- get_edata_cname(omicsData)
   }
 
   # SCENARIO 3: use_groups = TRUE, use_batch = FALSE
@@ -104,13 +110,16 @@ molecule_filter <- function (omicsData,use_groups = FALSE, use_batch = FALSE) {
     # Create a data frame with the ID columns and the minimum number of non-missing values per grouping
     output <- omicsData$e_data %>%
       tidyr::pivot_longer(cols = -tidyselect::all_of(id_col), names_to = names(groupDat)[1], values_to = "value") %>%
-      dplyr::left_join(groupDat, by = "SampleID") %>%
-      dplyr::group_by(dplyr::across(id_col), Group) %>%
+      dplyr::left_join(groupDat, by = pmartR::get_fdata_cname(omicsData)) %>%
+      dplyr::group_by(dplyr::across(tidyselect::all_of(id_col)), Group) %>%
       dplyr::summarise(num_obs = sum(!is.na(value)),.groups = "keep") %>%
-      dplyr::group_by(dplyr::across(id_col)) %>%
+      dplyr::group_by(dplyr::across(tidyselect::all_of(id_col))) %>%
       dplyr::summarise(min_num_obs = as.numeric(min(num_obs)),.groups = "keep") %>%
       dplyr::ungroup() %>%
+      dplyr::rename(molecule = tidyselect::all_of(id_col)) %>%
+      dplyr::arrange(match(molecule,ordering)) %>%
       data.frame()
+    colnames(output)[1] <- get_edata_cname(omicsData)
   }
 
   # SCENARIO 4: use_groups = TRUE, use_batch = TRUE
@@ -121,14 +130,17 @@ molecule_filter <- function (omicsData,use_groups = FALSE, use_batch = FALSE) {
 
     output <- omicsData$e_data %>%
       tidyr::pivot_longer(cols = -tidyselect::all_of(id_col), names_to = names(groupDat)[1], values_to = "value") %>%
-      dplyr::left_join(groupDat, by = "SampleID") %>%
-      dplyr::left_join(batchDat, by = "SampleID") %>%
-      dplyr::group_by(dplyr::across(id_col), Group, Batch) %>%
+      dplyr::left_join(groupDat, by = pmartR::get_fdata_cname(omicsData)) %>%
+      dplyr::left_join(batchDat, by = pmartR::get_fdata_cname(omicsData)) %>%
+      dplyr::group_by(dplyr::across(tidyselect::all_of(id_col)), Group, Batch) %>%
       dplyr::summarise(num_obs = sum(!is.na(value)),.groups = "keep") %>%
-      dplyr::group_by(dplyr::across(id_col)) %>%
+      dplyr::group_by(dplyr::across(tidyselect::all_of(id_col))) %>%
       dplyr::summarise(min_num_obs = as.numeric(min(num_obs)),.groups = "keep") %>%
       dplyr::ungroup() %>%
+      dplyr::rename(molecule = tidyselect::all_of(id_col)) %>%
+      dplyr::arrange(match(molecule,ordering)) %>%
       data.frame()
+    colnames(output)[1] <- get_edata_cname(omicsData)
   }
 
   # change the names of the data.frame
