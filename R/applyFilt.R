@@ -244,7 +244,9 @@ applyFilt.moleculeFilt <- function(filter_object, omicsData, min_num=2){
       batch_id = names(attr(get_group_DF(omicsData),"batch_id"))[-1],
       time_course = attr(get_group_DF(omicsData),
                          "time_course"),
-      pairs = attr(get_group_DF(omicsData), "pairs")
+      pair_id = attr(get_group_DF(omicsData), "pair_id"),
+      pair_group = attr(get_group_DF(omicsData), "pair_group"),
+      pair_denom = attr(get_group_DF(omicsData), "pair_denom")
     )
 
   } else {
@@ -279,7 +281,7 @@ applyFilt.moleculeFilt <- function(filter_object, omicsData, min_num=2){
   # will include the current filter object in the next available space of the
   # filters attribute list.
   n_filters <- length(attr(omicsData, 'filters')) + 1
-  
+
   # determine if we have group and batch effects from filter
   use_batch <- attributes(filter_object)$use_batch
   use_groups <- attributes(filter_object)$use_groups
@@ -330,6 +332,14 @@ applyFilt.cvFilt <- function (filter_object, omicsData, cv_threshold = 150) {
     # Throw an error because the user does not understand basic number line
     # protocol.
     stop ("cv_threshold cannot be greater than the largest CV value.")
+
+  }
+
+  # Check if cv_threshold is numeric. Honestly!
+  if (!is.numeric(cv_threshold)) {
+
+    # User. My life is looking bleak right now because of you.
+    stop ("cv_threshold must be numeric.")
 
   }
 
@@ -393,7 +403,9 @@ applyFilt.cvFilt <- function (filter_object, omicsData, cv_threshold = 150) {
       batch_id = names(attr(get_group_DF(omicsData),"batch_id"))[-1],
       time_course = attr(get_group_DF(omicsData),
                          "time_course"),
-      pairs = attr(get_group_DF(omicsData), "pairs")
+      pair_id = attr(get_group_DF(omicsData), "pair_id"),
+      pair_group = attr(get_group_DF(omicsData), "pair_group"),
+      pair_denom = attr(get_group_DF(omicsData), "pair_denom")
     )
 
   } else {
@@ -427,10 +439,10 @@ applyFilt.cvFilt <- function (filter_object, omicsData, cv_threshold = 150) {
   # will include the current filter object in the next available space of the
   # filters attribute list.
   n_filters <- length(attr(omicsData, 'filters')) + 1
-  
+
   # determine if we have use_groups
   use_groups <- attributes(filter_object)$use_groups
-  
+
   # Update the filters attribute.
   attr(omicsData, 'filters')[[n_filters]] <- set_filter(
     type = class(filter_object)[[1]],
@@ -462,12 +474,30 @@ applyFilt.rmdFilt <- function (filter_object, omicsData,
 
   }
 
+  # Check if pvalue_threshold is numeric.
+  if (!is.numeric(pvalue_threshold)) {
+
+    # User. It is very aggravating trying to figure out all the ways you can
+    # screw up the analysis and write checks for them.
+    stop ("value_threshold must be numeric.")
+
+  }
+
   # check that pvalue_threshold is between 0 and 1 #
   if (pvalue_threshold < 0 || pvalue_threshold > 1) {
 
     # Figuratively smack the user with an error for not knowing what a p-value
     # is (or what values it can take).
     stop ("pvalue_threshold must be between 0 and 1.")
+
+  }
+
+  # Check that min_num_biomolecules is numeric.
+  if (!is.numeric(min_num_biomolecules)) {
+
+    # User. I am too tired to continue writing snide remarks about you and all
+    # the pain you cause me.
+    stop ("min_num_biomolecules must be numeric.")
 
   }
 
@@ -519,7 +549,7 @@ applyFilt.rmdFilt <- function (filter_object, omicsData,
     # places. It will save some typing. ... However, all the typing I just saved
     # has probably been undone by writing this comment.
     sample_name <- get_fdata_cname(omicsData)
-    pair_name <- attr(attr(omicsData, "group_DF"), "pairs")
+    pair_name <- attr(attr(omicsData, "group_DF"), "pair_id")
 
     filter.samp <- as.character(filter_object[inds, id_col])
 
@@ -582,7 +612,9 @@ applyFilt.rmdFilt <- function (filter_object, omicsData,
       batch_id = names(attr(get_group_DF(omicsData),"batch_id"))[-1],
       time_course = attr(get_group_DF(omicsData),
                          "time_course"),
-      pairs = attr(get_group_DF(omicsData), "pairs")
+      pair_id = attr(get_group_DF(omicsData), "pair_id"),
+      pair_group = attr(get_group_DF(omicsData), "pair_group"),
+      pair_denom = attr(get_group_DF(omicsData), "pair_denom")
     )
 
   } else {
@@ -670,6 +702,17 @@ applyFilt.proteomicsFilt <- function (filter_object,
 
       # Warn the user of their treachery with an error.
       stop ("min_num_peps must be of length 1")
+
+    }
+
+    # Check if min_num_peps is numeric.
+    if (!is.numeric(min_num_peps)) {
+
+      # Am still wondering why someone would make an obviously numeric input a
+      # character string. Oh well. Hope this error brings everything crashing
+      # down around them. Maybe they can build something slightly useful from
+      # the ruins.
+      stop ("min_num_peps must be numeric.")
 
     }
 
@@ -836,7 +879,9 @@ applyFilt.proteomicsFilt <- function (filter_object,
       batch_id = names(attr(get_group_DF(omicsData),"batch_id"))[-1],
       time_course = attr(get_group_DF(omicsData),
                          "time_course"),
-      pairs = attr(get_group_DF(omicsData), "pairs")
+      pair_id = attr(get_group_DF(omicsData), "pair_id"),
+      pair_group = attr(get_group_DF(omicsData), "pair_group"),
+      pair_denom = attr(get_group_DF(omicsData), "pair_denom")
     )
 
   } else {
@@ -893,6 +938,7 @@ applyFilt.proteomicsFilt <- function (filter_object,
 #' @rdname applyFilt
 applyFilt.imdanovaFilt <- function (filter_object,
                                     omicsData,
+                                    comparisons = NULL,
                                     min_nonmiss_anova = NULL,
                                     min_nonmiss_gtest = NULL,
                                     remove_singleton_groups = TRUE) {
@@ -920,8 +966,9 @@ applyFilt.imdanovaFilt <- function (filter_object,
 
   # Check the number of columns in filter_object. If there are only two columns
   # then there is only one non-singleton group and an imdanova filter cannot be
-  # applied.
-  if (dim(filter_object)[2] == 2) {
+  # applied unless the data are paired.
+  if (dim(filter_object)[2] == 2 &&
+      is.null(attr(attr(omicsData, "group_DF"), "pair_id"))) {
 
     # Throw an error for too few samples to run an imdanova filter.
     stop (paste("An IMD-ANOVA filter cannot be used because there is only one",
@@ -966,6 +1013,30 @@ applyFilt.imdanovaFilt <- function (filter_object,
 
   #### End object creation for preliminary checking purposes. ####
 
+  # Check that comparisons is a data frame with appropriate group names.
+  if (!is.null(comparisons)) {
+
+    # Check that comparisons is a data frame.
+    if (class(comparisons) != "data.frame") {
+
+      # I am at a loss for words. That doesn't happen very often when I am
+      # writing comments in my code.
+      stop ("comparisons must be a data frame.")
+
+    }
+
+    # Check that the groups specified are present in f_data.
+    if (!all(unlist(comparisons, use.names = FALSE) %in% groupDF$Group)) {
+
+      # Trying to compare groups that don't exist? ... Huh?
+      stop (
+        "One or more groups specified in comparisons do not exist in f_data."
+      )
+
+    }
+
+  }
+
   # Check if min_nonmiss_anova is present.
   if (!is.null(min_nonmiss_anova)) {
 
@@ -974,6 +1045,14 @@ applyFilt.imdanovaFilt <- function (filter_object,
 
       # Warn the user of their treachery with an error.
       stop ("min_nonmiss_anova must be of length 1")
+
+    }
+
+    # Check if min_nonmiss_anova is numeric.
+    if (!is.numeric(min_nonmiss_anova)) {
+
+      # ...
+      stop ("min_nonmiss_anova must be numeric.")
 
     }
 
@@ -1003,6 +1082,14 @@ applyFilt.imdanovaFilt <- function (filter_object,
 
       # Warn the user of their treachery with an error.
       stop ("min_nonmiss_gtest must be of length 1")
+
+    }
+
+    # Check if min_nonmiss_gtest is numeric.
+    if (!is.numeric(min_nonmiss_gtest)) {
+
+      # Inconceivable!!!
+      stop ("min_nonmiss_gtest must be numeric.")
 
     }
 
@@ -1119,47 +1206,10 @@ applyFilt.imdanovaFilt <- function (filter_object,
   # Paired data ----------------------------------------------------------------
 
   # Do the thing if data are paired.
-  if (!is.null(attr(attr(omicsData, "group_DF"), "pairs"))) {
+  if (!is.null(attr(attr(omicsData, "group_DF"), "pair_id"))) {
 
-    # Take the difference here and call the imdanova_filt function to create a
-    # new filter object with the difference data.
-
-    # Compute the difference and create a new edata object from the differences.
-    diff_edata <- take_diff(omicsData)
-    diff_edata <- data.frame(omicsData$e_data[, get_edata_cname(omicsData)],
-                             diff_edata)
-    names(diff_edata)[[1]] <- get_edata_cname(omicsData)
-
-    # Only keep the first row for each pair. This will reduce the number of rows
-    # in f_data to match the number of columns in e_data.
-    diff_fdata <- omicsData$f_data %>%
-      dplyr::group_by(
-        !!rlang::sym(attr(attr(omicsData, "group_DF"), "pairs"))
-      ) %>%
-      dplyr::slice(1)
-
-    # Change the sample names in f_data to match the sample names in e_data. The
-    # names from the pairing variable are the new sample names and must be
-    # updated to create a new omicsData object.
-    diff_fdata[, get_fdata_cname(omicsData)] <- names(diff_edata)[-1]
-
-    # Create a new omicsData object with the difference data. This is necessary
-    # as a new filter object (with the difference data) needs to be created to
-    # account for counts of differences.
-    diff_omicsData <- as.anyData(omics_type = class(omicsData)[[1]],
-                                 edata = diff_edata,
-                                 fdata = diff_fdata,
-                                 edata_cname = get_edata_cname(omicsData),
-                                 fdata_cname = get_fdata_cname(omicsData))
-
-    # Create the group designation attribute for the differences. Don't include
-    # the pairs argument because the data just had the difference taken and
-    # there are no longer pairs in the data (just a difference between pairs).
-    diff_omicsData <- group_designation(
-      omicsData = diff_omicsData,
-      main_effects = attr(attr(omicsData, "group_DF"), "main_effects"),
-      covariates = names(attr(attr(omicsData, "group_DF"), "covariates"))
-    )
+    # Create an omicsData object on the differences.
+    diff_omicsData <- as.diffData(omicsData)
 
     # Create a new filter object with the differenced data. (For future readers:
     # I meant to use the word "differenced". I hope it made you chuckle.) We
@@ -1210,22 +1260,26 @@ applyFilt.imdanovaFilt <- function (filter_object,
   if (filter_method == "anova") {
 
     filter.edata <- anova_filter(nonmiss_per_group = nonmiss_per_group,
-                                 min_nonmiss_anova = min_nonmiss_anova)
+                                 min_nonmiss_anova = min_nonmiss_anova,
+                                 comparisons = comparisons)
 
   } else if (filter_method == "gtest") {
 
     filter.edata <- gtest_filter(nonmiss_per_group = nonmiss_per_group,
-                                 min_nonmiss_gtest = min_nonmiss_gtest)
+                                 min_nonmiss_gtest = min_nonmiss_gtest,
+                                 comparisons = comparisons)
 
   } else if(filter_method == "combined") {
 
     # Run the gtest filter.
     filter.edata.gtest <- gtest_filter(nonmiss_per_group = nonmiss_per_group,
-                                       min_nonmiss_gtest = min_nonmiss_gtest)
+                                       min_nonmiss_gtest = min_nonmiss_gtest,
+                                       comparisons = comparisons)
 
     # Run the anova filter.
     filter.edata.anova <- anova_filter(nonmiss_per_group = nonmiss_per_group,
-                                       min_nonmiss_anova = min_nonmiss_anova)
+                                       min_nonmiss_anova = min_nonmiss_anova,
+                                       comparisons = comparisons)
 
     # Only filter samples found in both filters.
     filter.edata <- intersect(filter.edata.anova, filter.edata.gtest)
@@ -1288,7 +1342,9 @@ applyFilt.imdanovaFilt <- function (filter_object,
       batch_id = names(attr(get_group_DF(omicsData),"batch_id"))[-1],
       time_course = attr(get_group_DF(omicsData),
                          "time_course"),
-      pairs = attr(get_group_DF(omicsData), "pairs")
+      pair_id = attr(get_group_DF(omicsData), "pair_id"),
+      pair_group = attr(get_group_DF(omicsData), "pair_group"),
+      pair_denom = attr(get_group_DF(omicsData), "pair_denom")
     )
 
   } else {
@@ -1422,7 +1478,7 @@ applyFilt.customFilt <- function (filter_object, omicsData) {
 
   # Grab some names to save typing later on.
   sample_name <- get_fdata_cname(omicsData)
-  pair_name <- attr(attr(omicsData, "group_DF"), "pairs")
+  pair_name <- attr(attr(omicsData, "group_DF"), "pair_id")
 
   #!#!#!#!#!#!#!#!#!#!
   # The following if statements check if the samples in a pair will be split by
@@ -1434,7 +1490,7 @@ applyFilt.customFilt <- function (filter_object, omicsData) {
 
   # Check if samples will be filtered and the data are paired.
   if (!is.null(filter_object$f_data_remove) &&
-      !is.null(attr(attr(omicsData, "group_DF"), "pairs"))) {
+      !is.null(attr(attr(omicsData, "group_DF"), "pair_id"))) {
 
     # Snag the associated pair IDs for the samples that will be filtered.
     filtered_pairs <- omicsData$f_data %>%
@@ -1468,7 +1524,7 @@ applyFilt.customFilt <- function (filter_object, omicsData) {
     }
 
   } else if (!is.null(filter_object$f_data_keep) &&
-             !is.null(attr(attr(omicsData, "group_DF"), "pairs"))) {
+             !is.null(attr(attr(omicsData, "group_DF"), "pair_id"))) {
 
     # Snag the associated pair IDs for the samples that will be kept.
     filtered_pairs <- omicsData$f_data %>%
@@ -1548,7 +1604,9 @@ applyFilt.customFilt <- function (filter_object, omicsData) {
       batch_id = names(attr(get_group_DF(omicsData),"batch_id"))[-1],
       time_course = attr(get_group_DF(omicsData),
                          "time_course"),
-      pairs = attr(get_group_DF(omicsData), "pairs")
+      pair_id = attr(get_group_DF(omicsData), "pair_id"),
+      pair_group = attr(get_group_DF(omicsData), "pair_group"),
+      pair_denom = attr(get_group_DF(omicsData), "pair_denom")
     )
 
   } else {
@@ -1917,6 +1975,11 @@ pmartR_filter_worker <- function (filter_object, omicsData) {
 #'   required, in each group, in order for the biomolecule to not be filtered.
 #'   Must be greater than or equal to 2; default value is 2.
 #'
+#' @param comparisons data.frame with columns for "Control" and "Test"
+#'   containing the different comparisons of interest. Comparisons will be made
+#'   between the Test and the corresponding Control. If left NULL, then all
+#'   pairwise comparisons are executed.
+#'
 #' @details This function filters biomolecules that do not have at least
 #'   \code{min.nonmiss.allowed} values per group, where groups are from
 #'   \code{group_designation}.
@@ -1941,52 +2004,124 @@ pmartR_filter_worker <- function (filter_object, omicsData) {
 #'
 #' @author Kelly Stratton
 #'
-#' @export
-#'
 anova_filter <- function (nonmiss_per_group,
-                          min_nonmiss_anova = 2) {
+                          min_nonmiss_anova,
+                          comparisons) {
 
-  # check that min_nonmiss_anova is of length 1 #
-  if (length(min_nonmiss_anova) != 1) {
+  # Check if there is only one group. This is possible because we allow paired
+  # data to have no main effects. If this is the case we need to filter the rows
+  # differently.
+  if ("paired_diff" %in% names(nonmiss_per_group$nonmiss_totals)) {
 
-    # Warn the user of their treachery with an error.
-    stop ("min_nonmiss_anova must be of length 1")
+    # Remove any rows that fall below the specified threshold. There are no main
+    # effects in this scenario so there is only one group.
+    junk <- nonmiss_per_group$nonmiss_totals %>%
+      # Keep rows that fall below the cutoff. These will be removed in the
+      # applyFilt function.
+      dplyr::filter(paired_diff < min_nonmiss_anova) %>%
+      # Nab the biomolecule IDs that will be removed.
+      dplyr::pull(1) %>%
+      # Convert to a character string. Why? Because it was done in the past so
+      # I am doing it now. That's why!
+      as.character()
 
-  }
+    # The code below runs where there is more than one group (one or more main
+    # effects exist).
+  } else {
 
-  # min_nonmiss_anova must be >=2
-  if (!is.null(min_nonmiss_anova)) {
+    # dplyr mumbo jumbo!
+    junk <- nonmiss_per_group$nonmiss_totals %>%
+      # Don't know why there would be columns with these names but I am
+      # including the following line just in case. (This was in the previous
+      # version of this function.)
+      dplyr::select(-dplyr::any_of(c("<NA>", "NA.", "NA"))) %>%
+      # Determine which groups have non-missing counts above the cutoff.
+      dplyr::mutate(dplyr::across(-1, ~ . >= min_nonmiss_anova))
 
-    if (min_nonmiss_anova < 2) {
+    # Check if comparisons is specified and filter the data accordingly. If
+    # comparisons were specified determine if one group will be compared to
+    # multiple other groups. The filtering needs to be done differently if this
+    # is the case.
+    if (is.null(comparisons)) {
 
-      stop ("min_nonmiss_anova must be >=2")
+      # Remove rows with less than two groups with counts above the cutoff.
+      junk <- junk %>%
+        # Count the number of groups above the cutoff.
+        dplyr::mutate(n_groups = rowSums(dplyr::across(-1))) %>%
+        # Remove rows with fewer than two groups with non-missing values above
+        # the cutoff.
+        dplyr::filter(n_groups < 2) %>%
+        # Nab the biomolecule IDs slated for the slaughterhouse.
+        dplyr::pull(1) %>%
+        # Convert to a character string. Why? Because it was done in the past so
+        # I am doing it now. That's why!
+        as.character()
+
+      # The following code runs when custom comparisons are specified.
+    } else {
+
+      # Grab the groups in the Test and Control columns.
+      testers <- unique(comparisons$Test)
+      controllers <- unique(comparisons$Control)
+      combiners <- unique(c(testers, controllers))
+
+      # Sum across the unique groups in test, control, and combined (the unique
+      # set of groups from both test and control). This will be used to
+      # determine which rows need to be filtered depending on which scenario we
+      # are in. Remember the rows that are kept in this function are the rows
+      # that will be removed in applyFilt.
+      junk <- junk %>%
+        dplyr::mutate(
+          n_test = rowSums(dplyr::across(dplyr::all_of(testers))),
+          n_control = rowSums(dplyr::across(dplyr::all_of(controllers))),
+          n_combine = rowSums(dplyr::across(dplyr::all_of(combiners)))
+        )
+
+      # Scenario 1: one group is compared to multiple other groups.
+      if (length(controllers) == 1) {
+
+        junk <- junk %>%
+          # Filter rows without any groups above the cutoff in test or control.
+          #
+          # In other words, we can't test one thing against nothing :)
+          dplyr::filter(n_test == 0 | n_control == 0) %>%
+          # Nab the biomolecule IDs that will get the axe.
+          dplyr::pull(1) %>%
+          # Convert to a character string. Why? Because it was done in the past
+          # so I am doing it now. That's why!
+          as.character()
+
+        # Scenario 2: Some groups are compared to some other groups. In this
+        # scenario a group can be in both test and control.
+      } else {
+
+        junk <- junk %>%
+          # Filter rows without any groups above the cutoff in control or test
+          # and rows where there is at least one group in test or control but
+          # the count of combined groups is less than two. This is the scenario
+          # where only one group is above the cutoff but it is in both test and
+          # control.
+          #
+          # In other words, we can't test one thing against nothing nor can we
+          # test one thing against itself :)
+          dplyr::filter(
+            (n_test == 0 | n_control == 0) |
+              (n_test > 0 & n_control > 0 & n_combine < 2)
+          ) %>%
+          # Nab the biomolecule IDs that will get the axe.
+          dplyr::pull(1) %>%
+          # Convert to a character string. Why? Because it was done in the past
+          # so I am doing it now. That's why!
+          as.character()
+
+      }
 
     }
 
   }
 
-  # check that nonmiss_per_group is a list of length 2 #
-  if (!inherits(nonmiss_per_group, "list") || length(nonmiss_per_group) != 2) {
-
-    stop ("nonmiss_per_group must be a list of length 2.")
-
-  }
-
-  # Remove the column with the biomolecule IDs and any columns that have an NA
-  # as the column name. Then sum (by row) the number of groups that meet the
-  # non-missing per group requirement. Then extract the rows that do not meet
-  # the requirement of at least two groups with non-missing counts higher than
-  # the threshold. These are the rows that will be filtered out later.
-  inds_rm <- which(rowSums(
-    nonmiss_per_group$nonmiss_totals[, -c(
-      1,
-      which(names(nonmiss_per_group$nonmiss_totals) %in%
-              c(NA, "<NA>", "NA.", "NA"))
-    )] >= min_nonmiss_anova
-  ) < 2)
-
-  # get names of biomolecules to be filtered
-  return (as.character(nonmiss_per_group$nonmiss_totals[inds_rm, 1]))
+  # Return the IDs of the biomolecules that will be filtered in applyFilt.
+  return (junk)
 
 }
 
@@ -2003,6 +2138,11 @@ anova_filter <- function (nonmiss_per_group,
 #'
 #' @param min_nonmiss_gtest the minimum number of non-missing peptide values
 #'   allowed in a minimum of one group. Default value is 3.
+#'
+#' @param comparisons data.frame with columns for "Control" and "Test"
+#'   containing the different comparisons of interest. Comparisons will be made
+#'   between the Test and the corresponding Control. If left NULL, then all
+#'   pairwise comparisons are executed.
 #'
 #' @details Two methods are available for determining the peptides to be
 #'   filtered. The naive approach is based on \code{min.nonmiss.allowed}, and
@@ -2033,58 +2173,115 @@ anova_filter <- function (nonmiss_per_group,
 #'
 #' @author Kelly Stratton
 #'
-#' @export
-#'
 gtest_filter <- function (nonmiss_per_group,
-                          min_nonmiss_gtest = 3) {
+                          min_nonmiss_gtest,
+                          comparisons) {
 
-  # check that min_nonmiss_gtest is of length 1 #
-  if (length(min_nonmiss_gtest) != 1) {
+  if (is.null(comparisons)) {
 
-    # Warn the user of their treachery with an error.
-    stop ("min_nonmiss_gtest must be of length 1")
+    # dplyr mumbo jumbo!
+    junk <- nonmiss_per_group$nonmiss_totals %>%
+      # Don't know why there would be columns with these names but I am
+      # including the following line just in case. (This was in the previous
+      # version of this function.)
+      dplyr::select(-dplyr::any_of(c("<NA>", "NA.", "NA"))) %>%
+      # Determine which groups have non-missing counts above the cutoff.
+      dplyr::mutate(
+        nuff = purrr::pmap(dplyr::across(-1), max) >= min_nonmiss_gtest
+      ) %>%
+      # Keep the rows that do not have counts >= the cutoff.
+      dplyr::filter(!nuff) %>%
+      # Grab the biomolecule IDs that will be removed under the cover of dark.
+      dplyr::pull(1) %>%
+      # Convert the IDs to a character string prior to their demise.
+      as.character()
+
+  } else {
+
+    # Grab the groups in both the Test and Control columns.
+    combiners <- unique(c(comparisons$Test, comparisons$Control))
+
+    # dplyr mumbo jumbo!
+    junk <- nonmiss_per_group$nonmiss_totals %>%
+      # Determine which groups have non-missing counts above the cutoff.
+      dplyr::mutate(
+        nuff = purrr::pmap(dplyr::across(dplyr::all_of(combiners)),
+                           max) >= min_nonmiss_gtest
+      ) %>%
+      # Keep the rows that do not have counts >= the cutoff.
+      dplyr::filter(!nuff) %>%
+      # Grab the biomolecule IDs that will be removed under the cover of dark.
+      dplyr::pull(1) %>%
+      # Convert the IDs to a character string prior to their demise.
+      as.character()
 
   }
 
-  # min_nonmiss_gtest must be >=2
-  if (!is.null(min_nonmiss_gtest)) {
+  # Return the biomolecule IDs that will be filtered out.
+  return (junk)
 
-    if (min_nonmiss_gtest < 2) {
+}
 
-      stop ("min_nonmiss_gtest must be >=2")
+# A function to create an omicsData object on paired data. This function is
+# specifically written to be called within the applyFilt function. Not all
+# information in a usual omicsData object is needed and is omitted in this
+# function.
+#
+# @authour Evan A Martin
+as.diffData <- function (omicsData) {
 
-    }
+  # Compute the difference and create a new edata object from the differences.
+  diff_edata <- take_diff(omicsData)
+  diff_edata <- data.frame(omicsData$e_data[, get_edata_cname(omicsData)],
+                           diff_edata)
+  names(diff_edata)[[1]] <- get_edata_cname(omicsData)
 
-  }
+  # Only keep the first row for each pair. This will reduce the number of rows
+  # in f_data to match the number of columns in e_data.
+  diff_fdata <- omicsData$f_data %>%
+    dplyr::group_by(
+      !!rlang::sym(attr(attr(omicsData, "group_DF"), "pair_id"))
+    ) %>%
+    dplyr::slice(1)
 
-  # check that nonmiss_per_group is a list of length 2 #
-  if (!inherits(nonmiss_per_group, "list") || length(nonmiss_per_group) != 2) {
+  # Change the sample names in f_data to match the sample names in e_data. The
+  # names from the pairing variable are the new sample names and must be
+  # updated to create a new omicsData object.
+  diff_fdata[, get_fdata_cname(omicsData)] <- names(diff_edata)[-1]
 
-    stop ("nonmiss_per_group must be a list of length 2.")
+  # Create a new omicsData object with the difference data. This is necessary
+  # as a new filter object (with the difference data) needs to be created to
+  # account for counts of differences.
+  diff_omicsData <- as.anyData(omics_type = class(omicsData)[[1]],
+                               edata = diff_edata,
+                               fdata = diff_fdata,
+                               edata_cname = get_edata_cname(omicsData),
+                               fdata_cname = get_fdata_cname(omicsData))
 
-  }
-
-  # remove the column with Peptide info and any NA's
-  # for each peptide/row, need max(nonmiss_per_group$nonmiss_totals[,-1]) to be
-  # >= min_nonmiss_gtest
-  trueFalse <- apply(
-    nonmiss_per_group$nonmiss_totals[, -c(
-      1,
-      which(names(nonmiss_per_group$nonmiss_totals) %in%
-              c(NA, "<NA>", "NA.", "NA"))
-    )],
-    1,
-    function (x) max(x) >= min_nonmiss_gtest
+  # Create the group designation attribute for the differences. Don't include
+  # the pairs argument because the data just had the difference taken and
+  # there are no longer pairs in the data (just a difference between pairs).
+  diff_omicsData <- group_designation(
+    omicsData = diff_omicsData,
+    main_effects = attr(attr(omicsData, "group_DF"), "main_effects"),
+    covariates = names(attr(attr(omicsData, "group_DF"), "covariates"))
   )
 
-  # Extract the biomolecule IDs corresponding to counts that fall below the
-  # minimum. These are the biomolecules that will be filtered out.
-  return (as.character(nonmiss_per_group$nonmiss_totals[!trueFalse, 1]))
+  # The difference has been taken so there is no paired attribute in group_DF.
+  # If there is only one group this will cause problems when calling
+  # imdanova_filter on the differences. Add a pairs attribute to group_DF that
+  # will allow there to be only one group.
+  attr(attr(diff_omicsData, "group_DF"), "pair_id") <- "difference taken"
+
+  return (diff_omicsData)
 
 }
 
 # A switch function to create an omicsData object based on the class of the
-# input.
+# input. The e_meta argument is omitted because it is not needed for how this
+# function is used within as.diffData.
+#
+# @author Evan A Martin
 as.anyData <- function (omics_type,
                         edata,
                         fdata,

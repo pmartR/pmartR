@@ -10,7 +10,10 @@ group_designation(
   main_effects = NULL,
   covariates = NULL,
   cov_type = NULL,
-  pairs = NULL,
+  pair_id = NULL,
+  pair_group = NULL,
+  pair_denom = NULL,
+  batch_id = NULL,
   time_course = NULL
 )
 }
@@ -42,9 +45,24 @@ numeric vector of 0s and 1s (indicating two categories) and the input to
 to a character vector. The default value is NULL. In this case the class of
 the covariates is neither checked nor altered.}
 
-\item{pairs}{A character string indicating the column in \code{f_data} that
-contains the pairing information. This string must match the column name
+\item{pair_id}{A character string indicating the column in \code{f_data} that
+contains the IDs for each pair. This string must match the column name
 exactly.}
+
+\item{pair_group}{A character string specifying the column in \code{f_data}
+that indicates which group each pair belongs to. This variable must contain
+just two levels or values (e.g., "before" and "after"). Numeric values can
+be used (e.g., 0 and 1). However, they will be converted to character
+strings.}
+
+\item{pair_denom}{A character string specifying which pair group is the
+"control". When taking the difference, the value for the control group will
+be subtracted from the non-control group value.}
+
+\item{batch_id}{an optional character vector of no more than one variable that
+should be used as batch information for downstream analyses. Batch ID is
+similar to covariates but unlike covariates it is specific to that of specific
+batch effects}
 
 \item{time_course}{an optional character string specifying the variable name
 of a time course variable, if applicable to the experimental data.

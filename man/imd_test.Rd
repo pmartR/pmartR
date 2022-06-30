@@ -7,6 +7,7 @@ main effects)}
 \usage{
 imd_test(
   omicsData,
+  groupData,
   comparisons,
   pval_adjust,
   pval_thresh,

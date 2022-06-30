@@ -92,6 +92,24 @@ protein_quant <- function (pepData, method, isoformRes = NULL,
   #gives message if qrollup_thresh is not NULL and method is not qrollup
   if(method != 'qrollup' && !is.null(qrollup_thresh)) message("qrollup_thresh argument will be ignored, as it is only applicable if method is qrollup")
 
+  # Check if isoformRes is actually and isoformRes.
+  if (!is.null(isoformRes) && class(isoformRes) != "isoformRes") {
+    stop ("The input for isoformRes must be of class 'isoformRes'.")
+  }
+
+  # Why must you be so illogical?! WWHHHHYYYYYY??
+  if (!is.logical(single_pep)) stop ("sinlge_pep must be either TRUE or FALSE.")
+  if (!is.logical(single_observation)) {
+    stop ("sinlge_observation must be either TRUE or FALSE.")
+  }
+
+  # Make sure emeta_cols is a character vector.
+  if (!is.null(emeta_cols) && !is.character(emeta_cols)) {
+
+    stop ("emeta_cols must be a character vector.")
+
+  }
+
   # Set the combine_fn input to the appropriate function.
   if(combine_fn == "median"){
     chosen_combine_fn <- combine_fn_median

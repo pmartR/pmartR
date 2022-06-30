@@ -1,4 +1,4 @@
-source(system.file('testdata', 'load_data.R', package = 'pmartR'))
+source(system.file('testdata', 'load_data.R', package = 'pmartR'), local = T)
 
 obj1 <- edata_transform(ldata, "log2")
 obj1 <- normalize_global(obj1, "all", "median", apply_norm = T)
@@ -28,32 +28,32 @@ test_that("attributes correctly stored", {
     is.null(attr(combn1, "group_DF")),
     length(attr(combn1, "filters")) == 0
   ))
-  
+
   # drop filters and grouping info
   expect_true(all(
     !is.null(attr(combn2, "group_DF")),
     length(attr(combn2, "filters")) == 0
   ))
-  
+
   # no filters, keep groups
   expect_true(all(
     !is.null(attr(combn2, "group_DF")),
     length(attr(combn2, "filters")) == 0
   ))
-  
+
   ### no groups, keep filters
-  ftypes <- attr(combn3, "filters") %>% 
+  ftypes <- attr(combn3, "filters") %>%
     lapply(function(x) x$type)
-  
+
   expect_true(all(
     is.null(attr(combn3, "group_DF")),
     length(ftypes) == 2,
     all(ftypes == c("moleculeFilt", "cvFilt"))
   ))
-  
-  ftypes <- attr(combn4, "filters") %>% 
+
+  ftypes <- attr(combn4, "filters") %>%
     lapply(function(x) x$type)
-  
+
   # keep both filters and groups
   expect_true(all(
     !is.null(attr(combn4, "group_DF")),

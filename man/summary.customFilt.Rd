@@ -7,13 +7,16 @@
 \method{summary}{customFilt}(filter_object)
 }
 \arguments{
-\item{filter_object}{S3 object of class 'customFilt' created by \code{\link{custom_filter}}.}
+\item{filter_object}{S3 object of class 'customFilt' created by
+\code{\link{custom_filter}}.}
 }
 \value{
-a summary of the items in e_data, f_data, and e_meta that will be removed as a result of applying the custom filter.
+a summary of the items in e_data, f_data, and e_meta that will be
+  removed as a result of applying the custom filter.
 }
 \description{
-This function will provide basic summary statistics for the custom_filter object.
+This function will provide basic summary statistics for the custom_filter
+object.
 }
 \author{
 Lisa Bramer

@@ -4,7 +4,7 @@
 \alias{gtest_filter}
 \title{Identifies peptides to be filtered out in preparation for IMD-ANOVA.}
 \usage{
-gtest_filter(nonmiss_per_group, min_nonmiss_gtest = 3)
+gtest_filter(nonmiss_per_group, min_nonmiss_gtest, comparisons)
 }
 \arguments{
 \item{nonmiss_per_group}{list created by \code{\link{nonmissing_per_group}}.
@@ -15,6 +15,11 @@ non-missing observations for each of the \code{k} groups.}
 
 \item{min_nonmiss_gtest}{the minimum number of non-missing peptide values
 allowed in a minimum of one group. Default value is 3.}
+
+\item{comparisons}{data.frame with columns for "Control" and "Test"
+containing the different comparisons of interest. Comparisons will be made
+between the Test and the corresponding Control. If left NULL, then all
+pairwise comparisons are executed.}
 }
 \value{
 filter.peps a character vector of the peptides to be filtered out

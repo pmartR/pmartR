@@ -4,7 +4,7 @@
 \alias{molecule_filter}
 \title{Molecule filter object}
 \usage{
-molecule_filter(omicsData)
+molecule_filter(omicsData, use_groups = FALSE, use_batch = FALSE)
 }
 \arguments{
 \item{omicsData}{an object of the class 'pepData', 'proData', 'metabData',
@@ -12,8 +12,17 @@ molecule_filter(omicsData)
 \code{\link{as.proData}}, \code{\link{as.metabData}},
 \code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, respectively.}
 
+\item{use_batch}{logical indicator for whether to utilize batch information
+from \code{\link{group_designation}} when calculating the molecule filter.
+Defaults to FALSE. Necessary to be set to TRUE if running ComBat batch
+correction.}
+
 \item{min_num}{an integer value specifying the minimum number of times each
 feature must be observed across all samples. Default value is 2.}
+
+\item{use_group}{logical indicator for whether to utilize group information
+from \code{\link{group_designation}} when calculating the molecule filter.
+Defaults to FALSE.}
 }
 \value{
 Object of class moleculeFilt (also a data.frame) that contains the

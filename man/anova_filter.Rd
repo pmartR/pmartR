@@ -4,7 +4,7 @@
 \alias{anova_filter}
 \title{Identifies biomolecules to be filtered in preparation for IMD-ANOVA.}
 \usage{
-anova_filter(nonmiss_per_group, min_nonmiss_anova = 2)
+anova_filter(nonmiss_per_group, min_nonmiss_anova, comparisons)
 }
 \arguments{
 \item{nonmiss_per_group}{a list of length two. The first element giving the
@@ -17,6 +17,11 @@ observations for each of the \code{k} groups. Usually the result of
 \item{min_nonmiss_anova}{the minimum number of nonmissing biomolecule values
 required, in each group, in order for the biomolecule to not be filtered.
 Must be greater than or equal to 2; default value is 2.}
+
+\item{comparisons}{data.frame with columns for "Control" and "Test"
+containing the different comparisons of interest. Comparisons will be made
+between the Test and the corresponding Control. If left NULL, then all
+pairwise comparisons are executed.}
 }
 \value{
 filter.peps a character vector of the biomolecules to be filtered out

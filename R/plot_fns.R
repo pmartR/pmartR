@@ -2048,7 +2048,7 @@ plot.moleculeFilt <- function (filter_obj, min_num = NULL, cumulative = TRUE,
       yintercept = counts[min_num],
       linetype = "dashed"
     ) else NULL
-    
+
     xlabel <- if (is.null(x_lab)){
       if(!use_batch & !use_groups) "Number of Samples"
       else if(use_batch & !use_groups) "Number of Samples per Batch"
@@ -2278,15 +2278,33 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
   max_x <- min(group_sizes_valid)
   obs <- as.data.frame(filter_obj)[-1]
 
+  # Count number of groups in each row of the obs data frame that have > 0, > 1,
+  # ..., > max_x non-missing values. For ANOVA we need at least two groups that
+  # meet this criteria unless the data are paired and there are no main effects.
   n_biomolecules_anova <- purrr::map_int(0:max_x, function (num) {
 
     # Number of groups greater than num
     n_greater_obs <- apply(obs, 1, function (row) sum(!(row < num)))
-    # Must be in at least two groups for ANOVA
-    sum(n_greater_obs > 1)
+
+    # If there are no main effects we need to count differently (in this case we
+    # do not need at least two groups to run ANOVA).
+    if ("paired_diff" %in% names(obs)) {
+
+      # biomolecules with 1+ group > num
+      n_greater_obs <- sum(apply(obs, 1, function (row) any(!(row < num))))
+
+    } else {
+
+      # Biomolecules with 2+ group > num.
+      sum(n_greater_obs > 1)
+
+    }
 
   })
 
+  # Count number of groups in each row of the obs data frame that have > 0, > 1,
+  # ..., > max_x non-missing values. For G-Test we need at least one group that
+  # meets this criteria.
   n_biomolecules_gtest <- purrr::map_int(0:max_x, function (num) {
 
     # biomolecules with 1+ group > num
@@ -3025,7 +3043,7 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
     return(string)
   }
 
-  # Shorten the names of the main effects (if the are over 25 characters). This
+  # Shorten the names of the main effects (if they are over 25 characters). This
   # vector will have more than one element if there is more than one main
   # effect.
   display_names <- sapply(main_eff_names, abbrev_fun)
@@ -3137,6 +3155,71 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
 
   } else {
 
+    # Determine which samples fall below the p-value threshold. This is a
+    # logical vector that will be used to find pairs that are split (one sample
+    # is filtered and the other is not) and to change the transparency of the
+    # point in the plot.
+    goodies_alpha <- filter_obj$pvalue < pvalue_threshold
+
+    # If data are paired make sure no sample is left behind!
+    if (!is.null(attr(attr(filter_obj, "group_DF"), "pair_id"))) {
+
+      # Find the corresponding sample(s) if one sample from a pair is below the
+      # p-value threshold and the other sample is not.
+      if (sum(goodies_alpha) > 0) {
+
+        # Snatch the sample name and pair name as they will be used in multiple
+        # places. It will save some typing. ... However, all the typing I just
+        # saved has probably been undone by writing this comment.
+        sample_name <- attr(filter_obj, "fdata_cname")
+        pair_name <- attr(attr(filter_obj, "group_DF"), "pair_id")
+
+        # Grab the names of filtered samples.
+        filtad <- as.character(filter_obj[goodies_alpha, sample_name])
+
+        #!#!#!#!#!#!#!#!#!#!
+        # The following code checks if the samples in a pair will be split. For
+        # example, one sample in a pair will be filtered and another sample in
+        # the pair will not be filtered. If a pair is split remove ALL samples
+        # associated with that pair.
+        #!#!#!#!#!#!#!#!#!#!
+
+        # Snag the associated pair IDs for the samples that will be filtered.
+        filtad_pairs <- attr(filter_obj, "fdata") %>%
+          dplyr::filter(!!rlang::sym(sample_name) %in% filtad) %>%
+          dplyr::pull(!!rlang::sym(pair_name))
+
+        # Go back to f_data and nab all the sample names corresponding to the
+        # pair IDs associated with the original samples that were selected for
+        # removal. These sample names will be used to change the point shape.
+        # The points that will be different are the ones corresponding to the
+        # samples that belong to pair where only one sample falls below the
+        # threshold.
+        filtad_too <- attr(filter_obj, "fdata") %>%
+          dplyr::filter(!!rlang::sym(pair_name) %in% filtad_pairs) %>%
+          dplyr::pull(!!rlang::sym(sample_name)) %>%
+          as.character()
+
+        # Update the goodies_alpha vector to reflect the additional samples that
+        # will be filtered.
+        goodies_alpha <- filter_obj[, sample_name] %in% filtad_too
+
+        # Create a vector of samples who are guilty by association. (They do not
+        # fall below the threshold but their partners do.)
+        condemned <- setdiff(filtad_too, filtad)
+
+        # Create a logical vector that will determine the point shape.
+        goodies_pch <- filter_obj[, sample_name] %in% condemned
+
+      }
+
+    } else {
+
+      # The data are not paired so all points should be a solid circle.
+      goodies_pch <- rep(FALSE, nrow(filter_obj))
+
+    }
+
     # get y-intercept for line
     df <- attributes(filter_obj)$df
     yint <- log(qchisq(1 - pvalue_threshold, df = df), base = 2)
@@ -3160,23 +3243,51 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
 
       p <- p +
         ggplot2::geom_point(
-          ggplot2::aes(x = forcats::fct_inorder(!!rlang::sym(samp_id)),
-                       y = Log2.md,
-                       col = !!rlang::sym(main_eff_names)),
-          alpha = ifelse(filter_obj$pvalue < pvalue_threshold, 1, 0.5),
-          size = point_size
+          ggplot2::aes(
+            x = forcats::fct_inorder(!!rlang::sym(samp_id)),
+            y = Log2.md,
+            col = !!rlang::sym(main_eff_names),
+            # Add a fill layer that will not affect how the plot looks. This
+            # layer is used to create a legend when one sample from a pair is an
+            # outlier but the other sample belonging to the pair is not.
+            fill = "Removed because paired with outlier"
+          ),
+          alpha = ifelse(goodies_alpha, 1, 0.5),
+          size = point_size,
+          shape = ifelse(goodies_pch, 15, 16)
         )
 
     } else {
 
       p <- p +
         ggplot2::geom_point(
-          ggplot2::aes(x = forcats::fct_inorder(!!rlang::sym(samp_id)),
-                       y = Log2.md,
-                       col = !!rlang::sym(main_eff_names[1]),
-                       shape = !!rlang::sym(main_eff_names[2])),
-          alpha = ifelse(filter_obj$pvalue < pvalue_threshold, 1, 0.5),
-          size = point_size
+          ggplot2::aes(
+            x = forcats::fct_inorder(!!rlang::sym(samp_id)),
+            y = Log2.md,
+            col = !!rlang::sym(main_eff_names[1]),
+            shape = !!rlang::sym(main_eff_names[2]),
+            # Add a fill layer that will not affect how the plot looks. This
+            # layer is used to create a legend when one sample from a pair is an
+            # outlier but the other sample belonging to the pair is not.
+            fill = "Removed because paired with outlier"
+          ),
+          alpha = ifelse(goodies_alpha, 1, 0.5),
+          # Make guilty-by-association points really small because we will plot
+          # a square point over them with the next lines of code. We don't want
+          # the edges of a circle or triangle peeking out from behind a square.
+          # That would make a hideous and confusing plot if that happened.
+          size = ifelse(goodies_pch, 0, point_size)
+        ) +
+        # Add another layer of points with guilty-by-association samples plotted
+        # as a square.
+        ggplot2::geom_point(
+          ggplot2::aes(
+            x = forcats::fct_inorder(!!rlang::sym(samp_id)),
+            y = Log2.md,
+            col = !!rlang::sym(main_eff_names[1])
+          ),
+          size = ifelse(goodies_pch, point_size, 0),
+          shape = ifelse(goodies_pch, 15, 16)
         )
 
     }
@@ -3192,6 +3303,24 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
                       shape = ggplot2::guide_legend(ncol = 1)) +
       ggplot2::labs(color = legend_title_color,
                     shape = legend_title_shape)
+
+    # Add a manual legend that describes the shape of the points that are
+    # removed because they belong to a pair with one sample being an outlier.
+    if (sum(goodies_pch > 0)) {
+
+      p <- p +
+        ggplot2::scale_fill_manual(
+          name = NULL,
+          values = 1,
+          breaks = "Removed because paired with outlier",
+          guide = ggplot2::guide_legend(
+            override.aes = list(linetype = 0,
+                                shape = 15,
+                                color = "black")
+          )
+        )
+
+    }
 
   }
 
@@ -3247,6 +3376,19 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
         )
 
     }
+
+  }
+
+  # Farm boy, remove the default legend(s) if the data are paired and there are
+  # no main effects. As you wish.
+  # If there are no main effects do not print a legend.
+  if ("paired_diff" %in% attr(filter_obj, "group_DF")$Group) {
+
+    # Remove the color legend. This legend is automatically created because we
+    # specified a variable to color by in aes().
+    p <- p +
+      ggplot2::guides(color = "none")
+
 
   }
 
@@ -4169,21 +4311,6 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
       stop("facet_by must be a character vector of length 1")
   }
 
-  if (!is.null(order_by) || !is.null(color_by) || !is.null(facet_by)) {
-
-    # Make sure the group designation function has been run.
-    if (is.null(attr(omicsData, "group_DF"))) {
-
-      # Welcome to the pit of despair!! You will never escape!!!
-      stop (paste("group_DF must not be NULL. Run the group_designation",
-                  "function prior to plotting with any of the order_by,",
-                  "color_by, or facet_by arguments.",
-                  sep = " "))
-
-    }
-
-  }
-
   if(!is.null(facet_cols)) {
     if(is.null(facet_by))
       stop("facet_by cannot be NULL when facet_cols is specified")
@@ -4548,7 +4675,7 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
 #'
 #' #Apply the IMD ANOVA filter
 #' imdanova_Filt <- imdanova_filter(omicsData = myproData)
-#' myproData <- applyFilt(filter_object = imdanova_Filt,
+#' myproData <- applyFilt(filter_obj = imdanova_Filt,
 #'                        omicsData = myproData,
 #'                        min_nonmiss_anova=2)
 #'
@@ -4898,7 +5025,9 @@ prep_flags <- function (x, test) {
 
     # Assemble the flags data frame with the first column containing the
     # biomolecule IDs and the remaining columns containing the flags.
-    da_flag <- data.frame(x[, 1, drop = FALSE], imd_flags)
+    da_flag <- data.frame(x[, 1, drop = FALSE],
+                          imd_flags,
+                          check.names = FALSE)
 
   }
 

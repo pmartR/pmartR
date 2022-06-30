@@ -1076,7 +1076,9 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
                               data_scale = "log")
   pairdata <- group_designation(pairdata,
                                 main_effects = "Virus",
-                                pairs = "PairID")
+                                pair_id = "PairID",
+                                pair_group = "Time",
+                                pair_denom = "18")
 
   pair_filter <- imdanova_filter(omicsData = pairdata)
 
@@ -1139,6 +1141,7 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
      names = c("Mass_Tag_ID", "AM", "FM", "Mock"),
      class = c("imdanovaFilt", "data.frame"),
      row.names = 1:150,
+     omicsData = pairdata,
      group_sizes = data.frame(
        Group = c("AM", "FM", "Mock"),
        n_group = rep(10, 3)
@@ -1173,7 +1176,8 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
          prop_missing = (sum(is.na(anova_2$e_data)) /
                            prod(dim(anova_2$e_data[, -1]))),
          num_samps = ncol(anova_2$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
 
   # meta_info attribute
@@ -1237,7 +1241,8 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
          prop_missing = (sum(is.na(gtest_2$e_data)) /
                            prod(dim(gtest_2$e_data[, -1]))),
          num_samps = ncol(gtest_2$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
 
   # meta_info attribute
@@ -1274,5 +1279,130 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
                c(30, 5))
   expect_equal(dim(gtest_2$e_meta),
                c(144, 6))
+
+  # Custom comparisons tests ---------------------------------------------------
+
+  load(system.file('testdata',
+                   'little_pdata.RData',
+                   package = 'pmartR'))
+
+  # Copy edata so the names of the samples can be changed.
+  edata_2 <- edata
+
+  # Change some of the Infection samples to Mock samples.
+  names(edata_2) <- c("Mass_Tag_ID",
+                      paste0("Infection", 1:6),
+                      paste0("Mock", 1:6))
+
+  # Create additional f_data object with different main effects.
+  fdata_2 <- fdata
+
+  # Update the sample names in f_data.
+  fdata_2$SampleID <- c(paste0("Infection", 1:6),
+                        paste0("Mock", 1:6))
+
+  # Update the first main effect to account for changing some infection samples
+  # to mock samples.
+  fdata_2$Condition <- c(rep("Infection", 6),
+                         rep("Mock", 6))
+
+  # Add second main effect.
+  fdata_2$Level <- c("high", "low", "high", "low", "high", "low", "high",
+                     "high", "low", "low", "low", "high")
+
+  pdata_2 <- as.pepData(e_data = edata_2,
+                        f_data = fdata_2,
+                        edata_cname = "Mass_Tag_ID",
+                        fdata_cname = "SampleID")
+
+  # Group designate the pdata object.
+  pdata_2 <- group_designation(omicsData = pdata_2,
+                               main_effects = c("Condition", "Level"))
+
+  # Create IMD-ANOVA filter object.
+  filta_2 <- imdanova_filter(pdata_2)
+
+  # Apply anova filter with custom comparisons.
+  acustom_1 <- applyFilt(
+    filta_2,
+    pdata_2,
+    min_nonmiss_anova = 2,
+    remove_singleton_groups = FALSE,
+    comparisons = data.frame(
+      Test = c("Infection_high", "Infection_low"),
+      Control = rep("Mock_low", 2)
+    )
+  )
+
+  # Make sure the correct pepes are filtered.
+  expect_equal(
+    attr(acustom_1, "filters")[[1]]$filtered,
+    filta_2 %>%
+      dplyr::filter(
+        Mock_low < 2 | (Infection_high < 2 & Infection_low < 2)
+      ) %>%
+      dplyr::pull(Mass_Tag_ID) %>%
+      as.character()
+  )
+
+  # Apply anova filter with different custom comparisons.
+  acustom_2 <- applyFilt(
+    filta_2,
+    pdata_2,
+    min_nonmiss_anova = 2,
+    remove_singleton_groups = FALSE,
+    comparisons = data.frame(
+      Test = c("Infection_high", "Mock_high"),
+      Control = c("Mock_high", "Infection_low")
+    )
+  )
+
+  # Make sure the correct pepes are filtered.
+  expect_equal(
+    attr(acustom_2, "filters")[[1]]$filtered,
+    filta_2 %>%
+      dplyr::mutate(
+        n_ih = dplyr::case_when(Infection_high < 2  ~ 0,
+                                Infection_high >= 2 ~ 1),
+        n_il = dplyr::case_when(Infection_low < 2  ~ 0,
+                                Infection_low >= 2 ~ 1),
+        n_mh = dplyr::case_when(Mock_high < 2  ~ 0,
+                                Mock_high >= 2 ~ 1),
+        n_total = rowSums(dplyr::across(n_ih:n_mh))
+      ) %>%
+      dplyr::filter(
+        Infection_high < 2 | Infection_low < 2 | Mock_high < 2,
+        n_total < 2
+      ) %>%
+      dplyr::pull(Mass_Tag_ID) %>%
+      as.character()
+  )
+
+  # Apply gtest filter with custom comparisons.
+  gcustom_1 <- applyFilt(
+    filta_2,
+    pdata_2,
+    min_nonmiss_gtest = 3,
+    remove_singleton_groups = FALSE,
+    comparisons = data.frame(
+      Test = c("Infection_high", "Infection_low"),
+      Control = rep("Mock_low", 2)
+    )
+  )
+
+  # Make sure the correct pepes are filtered.
+  expect_equal(
+    attr(gcustom_1, "filters")[[1]]$filtered,
+    filta_2 %>%
+      dplyr::rowwise() %>%
+      dplyr::mutate(
+        da_max = max(dplyr::c_across(c("Infection_high",
+                                       "Infection_low",
+                                       "Mock_low")))
+      ) %>%
+      dplyr::filter(da_max < 3) %>%
+      dplyr::pull(Mass_Tag_ID) %>%
+      as.character()
+  )
 
 })
