@@ -2006,7 +2006,7 @@ pmartR_filter_worker <- function (filter_object, omicsData) {
 #'
 anova_filter <- function (nonmiss_per_group,
                           min_nonmiss_anova,
-                          comparisons) {
+                          comparisons = NULL) {
 
   # Check if there is only one group. This is possible because we allow paired
   # data to have no main effects. If this is the case we need to filter the rows
@@ -2175,7 +2175,7 @@ anova_filter <- function (nonmiss_per_group,
 #'
 gtest_filter <- function (nonmiss_per_group,
                           min_nonmiss_gtest,
-                          comparisons) {
+                          comparisons = NULL) {
 
   if (is.null(comparisons)) {
 
