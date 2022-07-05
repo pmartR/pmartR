@@ -23,7 +23,7 @@ Deseq2_wrapper(
   BPPARAM = NULL,
   lfcThreshold = 0,
   altHypothesis = "greaterAbs",
-  independentFiltering = TRUE,
+  independentFiltering = FALSE,
   alpha = 0.1,
   format = "DataFrame",
   addMLE = FALSE,
@@ -39,7 +39,10 @@ Deseq2_wrapper(
 
 \item{p_adjust}{an object of type 'seqData', created by \code{\link{as.seqData}}}
 
-\item{comparisons}{an object of type 'seqData', created by \code{\link{as.seqData}}}
+\item{comparisons}{data.frame with columns for "Control" and "Test" 
+containing the different comparisons of interest. Comparisons will be made 
+between the Test and the corresponding Control. If left NULL, then all 
+pairwise comparisons are executed.}
 
 \item{fitType}{an object of type 'seqData', created by \code{\link{as.seqData}}}
 

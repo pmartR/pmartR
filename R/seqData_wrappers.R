@@ -8,7 +8,10 @@
 #' @param omicsData an object of type 'seqData', created by \code{\link{as.seqData}}
 #' @param test an object of type 'seqData', created by \code{\link{as.seqData}}  
 #' @param p_adjust an object of type 'seqData', created by \code{\link{as.seqData}}
-#' @param comparisons an object of type 'seqData', created by \code{\link{as.seqData}}  
+#' @param comparisons data.frame with columns for "Control" and "Test" 
+#' containing the different comparisons of interest. Comparisons will be made 
+#' between the Test and the corresponding Control. If left NULL, then all 
+#' pairwise comparisons are executed.  
 #' @param fitType an object of type 'seqData', created by \code{\link{as.seqData}}
 #' @param sfType an object of type 'seqData', created by \code{\link{as.seqData}}  
 #' @param full an object of type 'seqData', created by \code{\link{as.seqData}}
@@ -49,7 +52,7 @@ Deseq2_wrapper <- function(
     parallel = FALSE, BPPARAM = NULL, lfcThreshold = 0,
     altHypothesis = "greaterAbs",
     # cooksCutoff, filter, theta, filterFun, 
-    independentFiltering = TRUE, alpha = 0.1, 
+    independentFiltering = FALSE, alpha = 0.1, 
     format = "DataFrame",
     addMLE = FALSE,
     plotMA = F, plotDispEsts = F,
@@ -62,7 +65,13 @@ Deseq2_wrapper <- function(
   grouping_info <- get_group_DF(omicsData)[colnames(omicsData$f_data) != fdata_cname]
   e_data_counts <- omicsData$e_data[colnames(omicsData$e_data) != edata_cname]
   
-  if(is.null(comparisons)) comparisons <- unique(grouping_info[["Group"]])
+  if(is.null(comparisons)){
+    comparisons <- unique(grouping_info[["Group"]])
+    cob_list <- utils::combn(comparisons, 2)
+    row.names(cob_list) <- c("Test", "Control")
+  } else {
+    cob_list <- t(comparisons[c("Test", "Control")])
+  }
   
   edata_deseq <- DESeq2::DESeqDataSetFromMatrix(
     e_data_counts, 
@@ -111,8 +120,6 @@ Deseq2_wrapper <- function(
     
     # minmu = NULL ##  lower bound on the estimated count for fitting gene-wise dispersion and for use with nbinomWaldTest and nbinomLRT. If fitType="glmGamPoi", then 1e-6 will be used (as this fitType is optimized for single cell data, where a lower minmu is recommended), otherwise the default value as evaluated on bulk datasets is 0.5
   )
-  
-  cob_list <- utils::combn(comparisons, 2)
   
   all_res <- purrr::map(1:ncol(cob_list), function(combo_n){
     
@@ -201,7 +208,7 @@ Deseq2_wrapper <- function(
       row.names = NULL
   )
   
-  attr(results, "comparisons") <- comparisons
+  attr(results, "comparisons") <- apply(cob_list, 2, paste, collapse = "_vs_")
   attr(results, "statistical_test") <- paste0("DESeq_", test)
   attr(results, "adjustment_method") <- p_adjust
   attr(results, "pval_thresh") <- p_cutoff
@@ -229,8 +236,6 @@ Deseq2_wrapper <- function(
 #' @param p_adjust an object of type 'seqData', created by \code{\link{as.seqData}}
 #' @param comparisons an object of type 'seqData', created by \code{\link{as.seqData}}  
 #' @param p_cutoff an object of type 'seqData', created by \code{\link{as.seqData}}  
-#' @param plotMDS an object of type 'seqData', created by \code{\link{as.seqData}}
-#' @param plotBCV an object of type 'seqData', created by \code{\link{as.seqData}} 
 #' 
 #'
 #' @return data.frame object
@@ -245,8 +250,7 @@ Deseq2_wrapper <- function(
 #' @name EdgeR_wrapper
 #' 
 EdgeR_wrapper <- function(
-    omicsData, p_adjust = "BH", comparisons = NULL, p_cutoff = 0.05,
-    plotMDS = F, plotBCV = F
+    omicsData, p_adjust = "BH", comparisons = NULL, p_cutoff = 0.05
 ){
   
   edata_cname <- get_edata_cname(omicsData)
@@ -255,12 +259,15 @@ EdgeR_wrapper <- function(
   grouping_info <- get_group_DF(omicsData)[colnames(omicsData$f_data) != fdata_cname]
   
   ### Combinations ###
-  if(is.null(comparisons)) comparisons <- unique(grouping_info$Group)
-  cob_list <- combn(comparisons, 2)
-  all_contrasts <- purrr::map_chr(
-    1:ncol(cob_list), 
-    function(combo_n) paste0(cob_list[,combo_n], collapse = "-")
-  )
+  if(is.null(comparisons)){
+    comparisons <- unique(grouping_info[["Group"]])
+    cob_list <- utils::combn(comparisons, 2)
+    row.names(cob_list) <- c("Test", "Control")
+  } else {
+    cob_list <- t(comparisons[c("Test", "Control")])
+  }
+  
+  all_contrasts <- apply(cob_list, 2, paste, collapse = "-")
   
   edata_egdeR <- edgeR::DGEList(e_data_counts) 
   norm_factors_edgeR <- edgeR::calcNormFactors(edata_egdeR)
@@ -271,8 +278,7 @@ EdgeR_wrapper <- function(
                                      design_matrix_edgeR)
   
   GTD_edgeR <- edgeR::estimateGLMTrendedDisp(GCD_edgeR,
-                                      design_matrix_edgeR,
-                                      method="power")
+                                      design_matrix_edgeR)
   
   GTagD_edgeR <- edgeR::estimateGLMTagwiseDisp(GTD_edgeR, design_matrix_edgeR)
   
@@ -283,9 +289,13 @@ EdgeR_wrapper <- function(
   ## Row numbers in excess of edata nrow
   res_contrasts <- purrr::map(1:length(all_contrasts), function(n){
     combo <- cob_list[,n]
+    
+    ## We need assistance here #################################################
     CONTRASTS <- limma::makeContrasts(
       contrasts = all_contrasts[n], 
-      levels = comparisons)
+      levels = unique(as.vector(cob_list)))
+    
+    
     res_stats <- edgeR::glmQLFTest(fit_edgeR, contrast = CONTRASTS)
     res <- edgeR::topTags(res_stats, n = Inf, adjust.method = p_adjust, 
                    sort.by = "none")
@@ -354,22 +364,12 @@ EdgeR_wrapper <- function(
       row.names = NULL
     )
   
-  attr(results, "comparisons") <- comparisons
+  attr(results, "comparisons") <- apply(cob_list, 2, paste, collapse = "_vs_")
   attr(results, "statistical_test") <- "EdgeR_LRT"
   attr(results, "adjustment_method") <- p_adjust
   attr(results, "pval_thresh") <- p_cutoff
   attr(results, "data_class") <- attr(omicsData, "class")
   class(results) <- c("statRes", class(results))
-  
-  # viz
-  if(plotMDS){
-    attr(results, "plotMDS") <- norm_factors_edgeR
-    plotMDS(norm_factors_edgeR)
-  }
-  if(plotBCV){
-    attr(results, "plotBCV") <- GTagD_edgeR
-    plotBCV(GTagD_edgeR)
-  }
 
   return(results)
   
@@ -399,8 +399,7 @@ EdgeR_wrapper <- function(
 #' @name Voom_wrapper
 #' 
 Voom_wrapper <- function(
-    omicsData,  p_adjust = "BH", comparisons = NULL, p_cutoff = 0.05,
-    plotVoom = F
+    omicsData,  p_adjust = "BH", comparisons = NULL, p_cutoff = 0.05
 ){
   
   edata_cname <- get_edata_cname(omicsData)
@@ -408,19 +407,21 @@ Voom_wrapper <- function(
   e_data_counts <- omicsData$e_data[colnames(omicsData$e_data) != edata_cname]
   grouping_info <- get_group_DF(omicsData)[colnames(omicsData$f_data) != fdata_cname]
   
-  if(is.null(comparisons)) comparisons <- unique(grouping_info$Group)
-  cob_list <- combn(comparisons, 2)
+  if(is.null(comparisons)){
+    comparisons <- unique(grouping_info[["Group"]])
+    cob_list <- utils::combn(comparisons, 2)
+    row.names(cob_list) <- c("Test", "Control")
+  } else {
+    cob_list <- t(comparisons[c("Test", "Control")])
+  }
   
   edata_limma <- edgeR::DGEList(e_data_counts) 
   norm_factors_limma <- edgeR::calcNormFactors(edata_limma)
   design_matrix_limma <- model.matrix(~0 + Group, grouping_info)
-  limma_voom <- limma::voom(norm_factors_limma, design_matrix_limma, save.plot = plotVoom)
+  limma_voom <- limma::voom(norm_factors_limma, design_matrix_limma)
   limma_vfit <- limma::lmFit(limma_voom, design_matrix_limma)
   
-  all_contrasts <- purrr::map_chr(1:ncol(cob_list), 
-                           function(combo_n) paste0(paste0("Group", 
-                                                           cob_list[,combo_n]), 
-                                                    collapse = "-"))
+  all_contrasts <- apply(paste0("Group", cob_list), 2, paste, collapse = "-")
   
   res_contrasts <- purrr::map(1:length(all_contrasts), function(n){
     combo <- cob_list[,n]
@@ -493,57 +494,264 @@ Voom_wrapper <- function(
       row.names = NULL
     )
   
-  attr(results, "comparisons") <- comparisons
+  attr(results, "comparisons") <- apply(cob_list, 2, paste, collapse = "_vs_")
   attr(results, "statistical_test") <- "Voom T"
   attr(results, "adjustment_method") <- p_adjust
   attr(results, "pval_thresh") <- p_cutoff
   attr(results, "data_class") <- attr(omicsData, "class")
   class(results) <- c("statRes", class(results))
   
-  # viz
-  if(plotVoom){
-    attr(results, "plotVoom") <- limma_voom
-    plotVoom(limma_voom)
-  }
-  
   return(results)
   
 }
 
 
-#' Plot for voom wrapper
-#' 
+#' Diagnostic plot for seqData
+#'
 #' For generating statistics for 'seqData' objects
-#' 
-#' @param limma_voom attribute passed in statRes object from seqData where LimmaVoom was run
+#'
+#' @param omicsData seqData object used to terst dispersions
+#' @param comparisons Comparisons used in dispersion estimates
+#' @param method either "DESeq2", "edgeR", or "voom" for testing dispersion
+#' @param interactive Logical. If TRUE produces an interactive plot.
+#' @param x_lab A character string specifying the x-axis label when the metric
+#'   argument is NULL. The default is NULL in which case the x-axis label will
+#'   be "count".
+#' @param y_lab A character string specifying the y-axis label. The default is
+#'   NULL in which case the y-axis label will be the metric selected for the
+#'   \code{metric} argument.
+#' @param x_lab_size An integer value indicating the font size for the x-axis.
+#'   The default is 11.
+#' @param y_lab_size An integer value indicating the font size for the y-axis.
+#'   The default is 11.
+#' @param x_lab_angle An integer value indicating the angle of x-axis labels.
+#' @param title_lab A character string specifying the plot title when the
+#'   \code{metric} argument is NULL.
+#' @param title_lab_size An integer value indicating the font size of the plot
+#'   title. The default is 14.
+#' @param legend_lab A character string specifying the legend title.
+#' @param legend_position A character string specifying the position of the
+#'   legend. Can be one of "right", "left", "top", or "bottom". The default is
+#'   "right".
+#' @param point_size An integer specifying the size of the points. The default
+#'   is 0.2.
+#' @param bw_theme Logical. If TRUE uses the ggplot2 black and white theme.
+#' @param palette A character string indicating the name of the RColorBrewer
+#'   palette to use. For a list of available options see the details section in
+#'   \code{\link[RColorBrewer]{RColorBrewer}}.
+#' @param custom_theme a ggplot `theme` object to be applied to non-interactive
+#'   plots, or those converted by plotly::ggplotly().
 #'
 #' @return plot result
-#' 
+#'
 #' @examples
 #' \dontrun{
 #' }
-#' 
+#'
 #' @export
-#' @rdname plotVoom
-#' @name plotVoom
-#' 
-plotVoom <- function(limma_voom){
-  df_points <- data.frame(
-    x =  limma_voom$voom.xy$x,
-    y = limma_voom$voom.xy$y
+#' @rdname dispersion_est
+#' @name dispersion_est
+#'
+dispersion_est <- function(omicsData, method,
+                           comparisons = NULL,
+                           interactive = FALSE,
+                           x_lab = NULL,
+                           x_lab_size = 11,
+                           x_lab_angle = NULL,
+                           y_lab = NULL,
+                           y_lab_size = 11,
+                           title_lab = NULL,
+                           title_lab_size = 14,
+                           legend_lab = NULL,
+                           legend_position = "right",
+                           bw_theme = TRUE,
+                           palette = NULL,
+                           point_size = 0.2,
+                           custom_theme = NULL){
+  
+  if(!is.null(custom_theme)){
+    if(bw_theme)
+      warning(paste("Setting both bw_theme to TRUE and specifying a custom",
+                    "theme may cause undesirable results",
+                    sep = " "))
+    if(!inherits(custom_theme, c("theme", "gg")))
+      stop("custom_theme must be a valid 'theme' object as used in ggplot")
+    mytheme = custom_theme
+  } else mytheme = ggplot2::theme(
+    plot.title = ggplot2::element_text(size = title_lab_size),
+    axis.title.x = ggplot2::element_text(size = x_lab_size),
+    axis.title.y = ggplot2::element_text(size = y_lab_size),
+    axis.text.x = ggplot2::element_text(angle = x_lab_angle),
+    legend.position = legend_position
   )
   
-  df_line <- data.frame(
-    x_line =  limma_voom$voom.line$x,
-    y_line = limma_voom$voom.line$y
-  )
+  edata_cname <- get_edata_cname(omicsData)
+  fdata_cname <- get_fdata_cname(omicsData)
+  grouping_info <- get_group_DF(omicsData)[colnames(omicsData$f_data) != fdata_cname]
+  e_data_counts <- omicsData$e_data[colnames(omicsData$e_data) != edata_cname]
   
-  ggplot2::ggplot(
-    data = df_points, 
-    mapping = ggplot2::aes(x = x, y = y)) + 
-    ggplot2::geom_point() +
-    ggplot2::geom_line(inherit.aes = F, data = df_line, 
-                       mapping = ggplot2::aes(x = x_line, y = y_line), color = "red") +
-    ggplot2::labs(x =  limma_voom$voom.xy$xlab, y = limma_voom$voom.xy$ylab) +
-    ggplot2::theme_bw()
+  if(is.null(comparisons)){
+    comparisons <- unique(grouping_info[["Group"]])
+    cob_list <- utils::combn(comparisons, 2)
+    row.names(cob_list) <- c("Test", "Control")
+  } else {
+    cob_list <- t(comparisons[c("Test", "Control")])
+  }
+  
+  if(method == "DESeq2"){
+    
+    # Farm boy, do all the tedious label crap. As you wish.
+    the_x_label <- if (is.null(x_lab)) "Mean of Normalized Counts" else x_lab
+    the_y_label <- if (is.null(y_lab)) "Dispersion" else y_lab
+    the_title_label <- if (is.null(title_lab)) "DESeq2 dispersion fit" else title_lab
+    the_legend_label <- if (is.null(legend_lab)) "" else legend_lab
+    cols <- if (is.null(palette)) c("black","blue", "red") else RColorBrewer::brewer.pal(3, palette)
+    
+    edata_deseq <- DESeq2::DESeqDataSetFromMatrix(
+      e_data_counts, 
+      colData = grouping_info,
+      design = ~Group ## Figure out design designation
+    )
+    
+    dds <- DESeq2::estimateSizeFactors(edata_deseq)
+    dds <- DESeq2::estimateDispersions(dds)
+    
+    ## only plots for those above 0
+    df1 <- as.data.frame(mcols(dds))
+    
+
+    p <- ggplot2::ggplot(data = df1, 
+                         ggplot2::aes(x = baseMean, y = dispGeneEst)) +
+      ggplot2::geom_point(color = "black", size = point_size) +
+      ggplot2::geom_point(ggplot2::aes(y = dispersion, color = "blue"), alpha = 0.25, size = point_size) + 
+      ggplot2::geom_point(ggplot2::aes(y = dispFit, color = "red"), size = point_size) + 
+      ggplot2::scale_y_continuous(trans='log10') + 
+      ggplot2::scale_x_continuous(trans='log10') + 
+      ggplot2::scale_colour_manual(name = legend_lab, 
+                                   values =c('black'=cols[1],'red'=cols[3], "blue" = cols[2]), 
+                                   labels = c('Gene-est','Fitted', 'Final'))
+    
+  } else if (method == "edgeR"){
+    
+    # Farm boy, do all the tedious label crap. As you wish.
+    the_x_label <- if (is.null(x_lab)) "Average Log2 CPM" else x_lab
+    the_y_label <- if (is.null(y_lab)) "Quarter-Root Mean Deviance" else y_lab
+    the_title_label <- if (is.null(title_lab)) "EdgeR dispersion fit" else title_lab
+    the_legend_label <- if (is.null(legend_lab)) "" else legend_lab
+    cols <- if (is.null(palette)) c("black", "red") else RColorBrewer::brewer.pal(2, palette)
+    
+    edata_egdeR <- edgeR::DGEList(e_data_counts) 
+    norm_factors_edgeR <- edgeR::calcNormFactors(edata_egdeR)
+    design_matrix_edgeR <- model.matrix(~Group, grouping_info)
+    GCD_edgeR <- edgeR::estimateGLMCommonDisp(norm_factors_edgeR,
+                                              design_matrix_edgeR)
+    GTD_edgeR <- edgeR::estimateGLMTrendedDisp(GCD_edgeR,
+                                               design_matrix_edgeR)
+    GTagD_edgeR <- edgeR::estimateGLMTagwiseDisp(GTD_edgeR, design_matrix_edgeR)
+    
+    fit_edgeR <- edgeR::glmQLFit(GTagD_edgeR, design_matrix_edgeR)
+    
+    
+    ## squeezed points, closest to plotQLDisp
+    # plot(y = (fit_edgeR$var.post)^(1/4), 
+    #      x = fit_edgeR$AveLogCPM, pch = 20, cex = 0.2)
+    # points(y = (fit_edgeR$var.prior)^(1/4), 
+    #      x = fit_edgeR$AveLogCPM, pch = 20, cex = 0.2, col = "blue")
+    
+    ## Blue points with horizontal line
+    ## Common line can be removed
+    ## new RMD with plot(s) for each method + diagnostic guidance
+    ## NMDC studff :)
+    ## Touch base with Emily? -- intro from Kelly + Lisa
+    ## To do: write some tests :) test set to be processed, take part as exemplar dataset (include reminder in email)
+    
+    # plotQLDisp(fit_edgeR)
+    plotBCV(GTagD_edgeR, log = "y")
+    plotQLDisp(fit_edgeR)
+    
+    ## Other attempts
+    # plot(y = (GTagD_edgeR$tagwise.dispersion)^(1/4), 
+    #      x = fit_edgeR$AveLogCPM, pch = 20, cex = 0.2, log = "y")
+    # plot(y = sqrt(fit_edgeR$deviance) ^(1/4), 
+    #      x = fit_edgeR$AveLogCPM, pch = 20, cex = 0.2, log = "y")
+
+    ## Checking which points fit
+    # plotQLDisp(fit_edgeR)
+    # points(y = (fit_edgeR$var.post)^(1/4), 
+    #        x = fit_edgeR$AveLogCPM, pch = 20, cex = 0.1, col = "purple")
+    
+    df2 <- data.frame(
+      CD = GTagD_edgeR$common.dispersion,
+      TD = GTagD_edgeR$trended.dispersion,
+      TagD = GTagD_edgeR$tagwise.dispersion,
+      fitD1 = fit_edgeR$var.prior,
+      fitD2 = fit_edgeR$var.post,
+      AveLogCPM = fit_edgeR$AveLogCPM
+    )
+    
+    ## attempt at deseq-like: not quite equal elements to extract from :(
+    # p <- ggplot2::ggplot(data = df2,
+    #                      ggplot2::aes(x = AveLogCPM, y = sqrt(TagD))) +
+    #   ggplot2::geom_point() +
+    #   # ggplot2::geom_point(ggplot2::aes(y = sqrt(fitD2)), color = "blue", alpha = 0.25) +
+    #   ggplot2::geom_point(ggplot2::aes(y = sqrt(TD)), color = "red") +
+    #   ggplot2::scale_y_continuous(trans='log10')
+    
+    p <- ggplot2::ggplot(data = df2, 
+                         ggplot2::aes(x = AveLogCPM, y = (fitD2)^(1/4), color = "black")) +
+      ggplot2::geom_point( size = point_size) +
+      ggplot2::geom_line(ggplot2::aes(y = (fitD1)^(1/4), color = "red")) +
+      ggplot2::scale_colour_manual(name = legend_lab, 
+                          values =c('black'=cols[1],'red'=cols[2]), 
+                          labels = c('Squeezed Dispersion','Trend'))
+
+    
+  } else if (method == "voom"){
+    
+    # Farm boy, do all the tedious label crap. As you wish.
+    the_x_label <- if (is.null(x_lab)) "Sqrt (Standard Deviation)" else x_lab
+    the_y_label <- if (is.null(y_lab)) "Log (count size + 0.5)" else y_lab
+    the_title_label <- if (is.null(title_lab)) "Limma-Voom Dispersion Fit" else title_lab
+    the_legend_label <- if (is.null(legend_lab)) "" else legend_lab
+    cols <- if (is.null(palette)) c("black", "red") else RColorBrewer::brewer.pal(2, palette)
+    
+    edata_limma <- edgeR::DGEList(e_data_counts) 
+    norm_factors_limma <- edgeR::calcNormFactors(edata_limma)
+    design_matrix_limma <- model.matrix(~0 + Group, grouping_info)
+    limma_voom <- limma::voom(norm_factors_limma, design_matrix_limma, save.plot = T)
+    limma_vfit <- limma::lmFit(limma_voom, design_matrix_limma)
+    efit <- eBayes(limma_vfit)
+    
+    limma::voom(norm_factors_limma, design_matrix_limma, plot = T)
+    
+    df3 <- data.frame(
+      x_disp = limma_voom$voom.xy$x,
+      y_disp = limma_voom$voom.xy$y,
+      x_fit = limma_voom$voom.line$x,
+      y_fit = limma_voom$voom.line$y,
+      y_fitted = efit$sigma
+    )
+    
+    p <- ggplot2::ggplot(data = df3, 
+                         ggplot2::aes(x = x_disp, y = y_disp, color = "black")) +
+      ggplot2::geom_point( size = point_size) +
+      # ggplot2::geom_point(ggplot2::aes(y = sqrt(y_fitted)), alpha = 0.25, color = "blue") +
+      ggplot2::geom_point(ggplot2::aes(x = x_fit, y = y_fit, color = "red"), size = point_size) +
+      ggplot2::scale_y_continuous(trans='log10') +
+      ggplot2::scale_colour_manual(name = legend_lab, 
+                                   values =c('black'=cols[1],'red'=cols[2]), 
+                                   labels = c('Mean-Varience','Trend'))
+
+  }
+  
+  if(bw_theme) p <- p +
+    ggplot2::theme_bw() +
+    ggplot2::theme(strip.background = ggplot2::element_rect(fill = "white"))
+  
+  p <- p + mytheme
+  
+  if(interactive)
+    return(plotly::ggplotly(p, tooltip = c("text"))) else
+      return(p)
+  
 }
