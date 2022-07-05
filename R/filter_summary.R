@@ -203,10 +203,10 @@ summary.RNAFilt <- function(filter_object,
                             min_nonzero = NULL){
   
   # Have a looksie at the class of the filter object.
-  if (!inherits(filter_obj, "RNAFilt")) {
+  if (!inherits(filter_object, "RNAFilt")) {
     
     # Fezzik, tear his arms off.
-    stop ("filter_obj must be of class RNAFilt")
+    stop ("filter_object must be of class RNAFilt")
     
   }
   
@@ -214,12 +214,12 @@ summary.RNAFilt <- function(filter_object,
   if(!is.null(size_library) && 
      (length(size_library) > 1 || 
       size_library%%1 != 0 ||
-      size_library > max(filter_obj$LibrarySize)
+      size_library > max(filter_object$LibrarySize)
      )
   ) stop(
     paste0(
       "size_library must be integer of length 1 less than max library size (",
-      max(filter_obj$LibrarySize),
+      max(filter_object$LibrarySize),
       ")"
     )
   )
@@ -235,18 +235,18 @@ summary.RNAFilt <- function(filter_object,
       "min_nonzero must be integer or numeric between 0 and 1.")
     
     ## Within appropriate bounds
-    if(min_nonzero%%1 == 0 && min_nonzero > max(filter_obj$NonZero)) stop(
+    if(min_nonzero%%1 == 0 && min_nonzero > max(filter_object$NonZero)) stop(
       paste0("min_nonzero exceeds maximum number of non-zero biomolecules (",
-             max(filter_obj$NonZero),
+             max(filter_object$NonZero),
              ")"
       )
     )
     
     if(min_nonzero%%1 != 0 && 
-       min_nonzero > max(filter_obj$ProportionNonZero)) stop(
+       min_nonzero > max(filter_object$ProportionNonZero)) stop(
          paste0(
            "min_nonzero exceeds maximum proportion of non-zero biomolecules (",
-           signif(max(filter_obj$ProportionNonZero)), 
+           signif(max(filter_object$ProportionNonZero)), 
            ")")
        )
     
@@ -254,7 +254,7 @@ summary.RNAFilt <- function(filter_object,
   }
   
   #---------------
-  temp_obj <- filter_obj
+  temp_obj <- filter_object
   if(!is.null(min_nonzero)){
     
     column_use <- ifelse(min_nonzero%%1 == 0, 
@@ -270,11 +270,11 @@ summary.RNAFilt <- function(filter_object,
   df <- as.data.frame(apply(temp_obj[-1], 2, summary))
   df["SD",] <- apply(temp_obj[-1], 2, sd)
   
-  rmved <- !(filter_obj$SampleID %in% temp_obj$SampleID)
+  rmved <- !(filter_object$SampleID %in% temp_obj$SampleID)
   
   res <- list(
     Summary = df,
-    samples_filtered = filter_obj$SampleID[rmved],
+    samples_filtered = filter_object$SampleID[rmved],
     num_filtered = sum(rmved),
     num_not_filtered = sum(!rmved),
     nonzero_thresh = min_nonzero,

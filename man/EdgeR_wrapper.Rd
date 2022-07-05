@@ -4,14 +4,7 @@
 \alias{EdgeR_wrapper}
 \title{Wrapper for EdgeR workflow}
 \usage{
-EdgeR_wrapper(
-  omicsData,
-  p_adjust = "BH",
-  comparisons = NULL,
-  p_cutoff = 0.05,
-  plotMDS = F,
-  plotBCV = F
-)
+EdgeR_wrapper(omicsData, p_adjust = "BH", comparisons = NULL, p_cutoff = 0.05)
 }
 \arguments{
 \item{omicsData}{an object of type 'seqData', created by \code{\link{as.seqData}}}
@@ -21,10 +14,6 @@ EdgeR_wrapper(
 \item{comparisons}{an object of type 'seqData', created by \code{\link{as.seqData}}}
 
 \item{p_cutoff}{an object of type 'seqData', created by \code{\link{as.seqData}}}
-
-\item{plotMDS}{an object of type 'seqData', created by \code{\link{as.seqData}}}
-
-\item{plotBCV}{an object of type 'seqData', created by \code{\link{as.seqData}}}
 }
 \value{
 data.frame object

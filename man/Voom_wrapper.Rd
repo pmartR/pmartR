@@ -4,13 +4,7 @@
 \alias{Voom_wrapper}
 \title{Wrapper for limma-voom workflow}
 \usage{
-Voom_wrapper(
-  omicsData,
-  p_adjust = "BH",
-  comparisons = NULL,
-  p_cutoff = 0.05,
-  plotVoom = F
-)
+Voom_wrapper(omicsData, p_adjust = "BH", comparisons = NULL, p_cutoff = 0.05)
 }
 \arguments{
 \item{omicsData}{an object of type 'seqData', created by \code{\link{as.seqData}}}

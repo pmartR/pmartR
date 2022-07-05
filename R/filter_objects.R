@@ -312,7 +312,7 @@ total_count_filter <- function (omicsData) {
 #' \dontrun{
 #' library(pmartRdata)
 #' data("seq_object")
-#' to_filter <- RNAFilter(omicsData = seq_object)
+#' to_filter <- RNA_filter(omicsData = seq_object)
 #' plot(to_filter)
 #' summary(to_filter, size_library = 10000)
 #' summary(to_filter, min_nonzero = 5000)
@@ -323,7 +323,7 @@ total_count_filter <- function (omicsData) {
 #'
 #' @export
 #'
-RNAFilter <- function (omicsData) {
+RNA_filter <- function (omicsData) {
   ## some initial checks ##
   
   # check that omicsData is of appropriate class #

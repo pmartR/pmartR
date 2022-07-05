@@ -1559,7 +1559,7 @@ plot.corRes <- function (corRes_obj, omicsData = NULL, order_by = NULL,
 
     # include correlation method in title
     plotTitle <- paste0("Correlations Among Samples (", 
-                         str_to_title(attr(corRes_obj, "cor_method")), 
+                         stringr::str_to_title(attr(corRes_obj, "cor_method")), 
                          ")")
 
     # Runs when title_lab is not NULL (the user specified title).
@@ -2560,7 +2560,7 @@ plot.RNAFilt <- function (filter_obj, plot_type = "library",
       
   } else {
     
-    mt <- round(filter_object$NonZero[[1]]/filter_object$ProportionNonZero[[1]])
+    mt <- round(filter_obj$NonZero[[1]]/filter_obj$ProportionNonZero[[1]])
     
     p <- ggplot2::ggplot(
       temp_obj, ggplot2::aes(x=SampleID, y = NonZero, fill = "")) + 
