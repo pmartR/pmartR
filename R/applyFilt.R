@@ -1468,14 +1468,6 @@ applyFilt.customFilt <- function (filter_object, omicsData) {
 
   # Perform initial checks on the input arguments ------------------------------
 
-  # Check if a custom filter has already been applied.
-  if ('customFilt' %in% get_filter_type(omicsData)) {
-
-    # Slap the users wrist with a warning.
-    warning ('A custom filter has already been applied to this data set.')
-
-  }
-
   # Grab some names to save typing later on.
   sample_name <- get_fdata_cname(omicsData)
   pair_name <- attr(attr(omicsData, "group_DF"), "pair_id")
