@@ -130,6 +130,10 @@ protein_quant <- function (pepData, method, isoformRes = NULL,
   # between the old and new omicsData objects which leads to errors.
   fijate <- get_check_names(pepData)
 
+  # Grab more attributes that will be used at some point somewhere.
+  data_scale <- get_data_scale(pepData)
+  is_normalized <- attr(pepData, "data_info")$norm_info$is_normalized
+
   # Prepare attribute info when isoformRes is present.
   if (!is.null(isoformRes)) {
 
@@ -149,10 +153,6 @@ protein_quant <- function (pepData, method, isoformRes = NULL,
     # we will extract 'isoformRes_subset' attribute from isoformRes, which is
     # all the proteins that mapped to a nonzero proteoformID
     isoformRes2 <- attr(isoformRes, "isoformRes_subset")
-
-    # Extract more attributes to create the new pepData object.
-    data_scale <- get_data_scale(pepData)
-    is_normalized <- attr(pepData, "data_info")$norm_info$is_normalized
 
     # Find the peptides that occur in both e_data and isoformRes_subset.
     peptides <- which(
@@ -176,6 +176,18 @@ protein_quant <- function (pepData, method, isoformRes = NULL,
     attr(pepData, "data_info")$data_scale_orig <- scales
     attr(pepData, "imdanova") <- inovas
 
+    # Grab the new e_meta because it has the columns we need to create the
+    # proData object at the end of this function. Only keep the protein ID and
+    # Protein_Isoform columns. More will be added later if they pass the new
+    # pre_flight check that is causing all sorts of trouble.
+    e_meta_iso <- pepData$e_meta %>%
+      dplyr::select(
+        dplyr::any_of(c(emeta_cname, "Protein_Isoform"))
+      )
+
+    # Update emeta_cname because it is different when using the isoform crap.
+    emeta_cname_iso <- "Protein_Isoform"
+
   }
 
   # Quantitate the heck out of the peptides ------------------------------------
@@ -188,9 +200,11 @@ protein_quant <- function (pepData, method, isoformRes = NULL,
   }
 
   if (method == 'rrollup') {
+
     results <- rrollup(pepData,
                        combine_fn = chosen_combine_fn,
                        parallel = use_parallel)
+
   }
 
   if (method == 'qrollup') {
@@ -208,6 +222,8 @@ protein_quant <- function (pepData, method, isoformRes = NULL,
   }
 
   if (method == 'zrollup') {
+
+    # Update pepData -----------------------------------------------------------
 
     # Create both a proteomics and molecule filter object. These filter
     # objects will be used based on the input to single_pep and
@@ -255,9 +271,62 @@ protein_quant <- function (pepData, method, isoformRes = NULL,
     results <- zrollup(pepData,
                        combine_fn = chosen_combine_fn,
                        parallel = use_parallel)
+
   }
 
   # Update e_meta after quantitation -------------------------------------------
+
+  # Check if emeta_cols is NULL. If it is everything can proceed as usual. If it
+  # is not NULL we have to check if the number of unique rows in e_meta is the
+  # same as the number of rows in e_data. If they aren't the pre_flight function
+  # will throw an error. To avoid this we will set emeta_cols to NULL. This will
+  # only keep the protein ID, n_peps_used, and peps_per_pro columns.
+  if (!is.null(emeta_cols)) {
+
+    # Nab number of rows in e_data to compare with number of rows in e_meta.
+    n_row_edata <- nrow(results$e_data)
+
+    # Grab the number of rows in e_meta depending on the rollup method used.
+    n_row_emeta <- if (is.null(results$e_meta)) {
+      # Use either the original or isoform e_meta depending on the input.
+      if (is.null(isoformRes)) {
+        nrow(unique(pepData$e_meta))
+      } else {
+        nrow(e_meta_iso)
+      }
+    } else {
+      nrow(unique(results$e_meta))
+    }
+
+    # Change emeta_cols to NULL if the number of e_data and unique e_meta rows
+    # do not match.
+    if (n_row_edata != n_row_emeta) {
+
+      emeta_cols <- NULL
+
+    }
+
+  }
+
+  # The rollup functions now return a list containing e_data and e_meta. The
+  # e_meta element of this list is NULL except for the case when qrollup is
+  # used. Check if e_meta is NULL and do stuff accordingly.
+  if (is.null(results$e_meta)) {
+
+    # The isoformRes portion of the code changes the pepData object. This causes
+    # trouble when isoformRes is present. If isoformRes is not null use the
+    # emeta object created previously instead of pepData$e_meta.
+    if (!is.null(isoformRes)) {
+
+      results$e_meta <- e_meta_iso
+
+    } else {
+
+      results$e_meta <- pepData$e_meta
+
+    }
+
+  }
 
   # Check if isoformRes is NULL. results$e_meta will be updated differently
   # depending on whether isoformRes is present.
@@ -323,8 +392,7 @@ protein_quant <- function (pepData, method, isoformRes = NULL,
       dplyr::mutate(peps_per_pro = dplyr::n()) %>%
       # Keep the mapping variable, pep_per_pro, and any columns specified by the
       # user.
-      dplyr::select(dplyr::any_of(c(emeta_cname, "peps_per_pro",
-                                    emeta_cols)))
+      dplyr::select(dplyr::any_of(c(emeta_cname, "peps_per_pro", emeta_cols)))
 
     # Check if n_peps_used is a column in e_meta. This will only be the case if
     # qrollup was used.
@@ -348,6 +416,28 @@ protein_quant <- function (pepData, method, isoformRes = NULL,
 
   }
 
+  # Create a proData object ----------------------------------------------------
+
+  # The isoform crap is making this really difficult. When creating the
+  # data frames above emeta_cname needs to be the protein ID column. However,
+  # when creating the proData object the column name changes to
+  # "Protein_isoform".
+  if (!is.null(isoformRes)) {
+
+    emeta_cname <- emeta_cname_iso
+
+  }
+
+  prodata <- as.proData(e_data = results$e_data,
+                        f_data = pepData$f_data,
+                        e_meta = results$e_meta,
+                        edata_cname = emeta_cname,
+                        fdata_cname = fdata_cname,
+                        emeta_cname = emeta_cname,
+                        data_scale = get_data_scale(pepData),
+                        is_normalized = is_normalized,
+                        check.names = fijate)
+
   # Update proData attributes --------------------------------------------------
 
   # Update the original data scale for the proData object. This needs to be
@@ -356,18 +446,18 @@ protein_quant <- function (pepData, method, isoformRes = NULL,
   # function was called. If these two scales are different this is the only way
   # to set the original data scale for the proData object to the original data
   # scale of the pepData object.
-  attr(results, "data_info")$data_scale_orig <- get_data_scale_orig(pepData)
+  attr(prodata, "data_info")$data_scale_orig <- get_data_scale_orig(pepData)
 
   # Update the group_DF attribute (if it exists). This attribute will be "reset"
   # when the as.proData function is called in the rollup functions. It will need
   # to be manually updated to reflect anything done to the peptide data before
   # protein_quant.
-  attr(results, "group_DF") <- attr(pepData, "group_DF")
+  attr(prodata, "group_DF") <- attr(pepData, "group_DF")
 
   # Update the pro_quant_info attribute to reflect which rollup method was used.
-  attr(results, "pro_quant_info")$method <- method
+  attr(prodata, "pro_quant_info")$method <- method
 
-  return(results)
+  return (prodata)
 
 }
 
@@ -421,26 +511,32 @@ pquant <- function (pepData,
     dplyr::group_by(!!rlang::sym(pro_id)) %>%
     dplyr::mutate(dplyr::across(.cols = -dplyr::any_of(pro_id),
                                 .fns = combine_fn)) %>%
+    dplyr::distinct() %>%
     data.frame(check.names = check_names)
 
 
   # Extricate attribute info for creating the proData object.
-  data_scale <- attr(pepData, "data_info")$data_scale
-  is_normalized <- attr(pepData, "data_info")$norm_info$is_normalized
+  # data_scale <- attr(pepData, "data_info")$data_scale
+  # is_normalized <- attr(pepData, "data_info")$norm_info$is_normalized
+
+  # Add check here from Lisa's email -------------------------------------------
 
   # Create a proData object with the quantitated proteins.
-  prodata <- as.proData(e_data = res,
-                        f_data = pepData$f_data,
-                        e_meta = dplyr::select(pepData$e_meta,
-                                               -rlang::sym(pep_id)),
-                        edata_cname = pro_id,
-                        fdata_cname = samp_id,
-                        emeta_cname = pro_id,
-                        data_scale = data_scale,
-                        is_normalized = is_normalized,
-                        check.names = check_names)
+  # prodata <- as.proData(e_data = res,
+  #                       f_data = pepData$f_data,
+  #                       e_meta = dplyr::select(pepData$e_meta,
+  #                                              -rlang::sym(pep_id)),
+  #                       edata_cname = pro_id,
+  #                       fdata_cname = samp_id,
+  #                       emeta_cname = pro_id,
+  #                       data_scale = data_scale,
+  #                       is_normalized = is_normalized,
+  #                       check.names = check_names)
 
-  return (prodata)
+  return (
+    list(e_data = res,
+         e_meta = NULL)
+  )
 
 }
 
@@ -602,22 +698,27 @@ rrollup <- function (pepData, combine_fn, parallel = TRUE) {
   names(final_result)[1] <- pro_id
 
   # Extricate attribute info for creating the proData object.
-  data_scale <- attr(pepData, "data_info")$data_scale
-  is_normalized <- attr(pepData, "data_info")$norm_info$is_normalized
+  # data_scale <- attr(pepData, "data_info")$data_scale
+  # is_normalized <- attr(pepData, "data_info")$norm_info$is_normalized
+
+  # Add check here from Lisa's email -------------------------------------------
 
   # Create a proData object with the quantitated proteins.
-  prodata <- as.proData(e_data = final_result,
-                        f_data = pepData$f_data,
-                        e_meta = dplyr::select(pepData$e_meta,
-                                               -rlang::sym(pep_id)),
-                        edata_cname = pro_id,
-                        fdata_cname = samp_id,
-                        emeta_cname = pro_id,
-                        data_scale = data_scale,
-                        is_normalized = is_normalized,
-                        check.names = check_names)
+  # prodata <- as.proData(e_data = final_result,
+  #                       f_data = pepData$f_data,
+  #                       e_meta = dplyr::select(pepData$e_meta,
+  #                                              -rlang::sym(pep_id)),
+  #                       edata_cname = pro_id,
+  #                       fdata_cname = samp_id,
+  #                       emeta_cname = pro_id,
+  #                       data_scale = data_scale,
+  #                       is_normalized = is_normalized,
+  #                       check.names = check_names)
 
-  return (prodata)
+  return (
+    list(e_data = final_result,
+         e_meta = NULL)
+  )
 
 }
 
@@ -779,21 +880,26 @@ qrollup <- function (pepData, qrollup_thresh,
     dplyr::select(-rlang::sym(pep_id))
 
   # Extricate attribute info for creating the proData object.
-  data_scale <- attr(pepData, "data_info")$data_scale
-  is_normalized <- attr(pepData, "data_info")$norm_info$is_normalized
+  # data_scale <- attr(pepData, "data_info")$data_scale
+  # is_normalized <- attr(pepData, "data_info")$norm_info$is_normalized
+
+  # Add check here from Lisa's email -------------------------------------------
 
   # Create a proData object with the quantitated proteins.
-  prodata <- as.proData(e_data = final_result,
-                        f_data = pepData$f_data,
-                        e_meta = temp_emeta,
-                        edata_cname = pro_id,
-                        fdata_cname = samp_id,
-                        emeta_cname = pro_id,
-                        data_scale = data_scale,
-                        is_normalized = is_normalized,
-                        check.names = check_names)
+  # prodata <- as.proData(e_data = final_result,
+  #                       f_data = pepData$f_data,
+  #                       e_meta = temp_emeta,
+  #                       edata_cname = pro_id,
+  #                       fdata_cname = samp_id,
+  #                       emeta_cname = pro_id,
+  #                       data_scale = data_scale,
+  #                       is_normalized = is_normalized,
+  #                       check.names = check_names)
 
-  return(prodata)
+  return (
+    list(e_data = final_result,
+         e_meta = temp_emeta)
+  )
 
 }
 
@@ -830,6 +936,8 @@ qrollup <- function (pepData, qrollup_thresh,
 #'
 zrollup <- function (pepData, combine_fn, parallel = TRUE) {
 
+  # Preliminary checks ---------------------------------------------------------
+
   # Nab the check names attribute because data.frame conventions are making my
   # life miserable. In fact, if it weren't for check.names and COVID my life
   # would be pretty awesome right now.
@@ -842,6 +950,8 @@ zrollup <- function (pepData, combine_fn, parallel = TRUE) {
   if(is.null(pepData$e_meta)){
     stop("A mapping to proteins must be provided in order to use the protein_filter function.")
   }
+
+  # Grab useful stuff ----------------------------------------------------------
 
   # Fish out the e_data, f_data, and e_meta column names corresponding to the
   # peptide, sample, and protein IDs.
@@ -918,22 +1028,27 @@ zrollup <- function (pepData, combine_fn, parallel = TRUE) {
   names(final_result)[1] <- pro_id
 
   # Extricate attribute info for creating the proData object.
-  data_scale <- attr(pepData, "data_info")$data_scale
-  is_normalized <- attr(pepData, "data_info")$norm_info$is_normalized
+  # data_scale <- attr(pepData, "data_info")$data_scale
+  # is_normalized <- attr(pepData, "data_info")$norm_info$is_normalized
+
+  # Add check here from Lisa's email -------------------------------------------
 
   # Create a proData object with the quantitated proteins.
-  prodata <- as.proData(e_data = final_result,
-                        f_data = pepData$f_data,
-                        e_meta = dplyr::select(pepData$e_meta,
-                                               -rlang::sym(pep_id)),
-                        edata_cname = pro_id,
-                        fdata_cname = samp_id,
-                        emeta_cname = pro_id,
-                        data_scale = data_scale,
-                        is_normalized = is_normalized,
-                        check.names = check_names)
+  # prodata <- as.proData(e_data = final_result,
+  #                       f_data = pepData$f_data,
+  #                       e_meta = dplyr::select(pepData$e_meta,
+  #                                              -rlang::sym(pep_id)),
+  #                       edata_cname = pro_id,
+  #                       fdata_cname = samp_id,
+  #                       emeta_cname = pro_id,
+  #                       data_scale = data_scale,
+  #                       is_normalized = is_normalized,
+  #                       check.names = check_names)
 
-  return (prodata)
+  return (
+    list(e_data = final_result,
+         e_meta = NULL)
+  )
 
 }
 

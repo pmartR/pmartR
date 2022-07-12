@@ -77,6 +77,7 @@ test_that('each rollup method correctly quantifies proteins',{
       dplyr::select(-Mass_Tag_ID) %>%
       dplyr::group_by(Protein) %>%
       dplyr::mutate(dplyr::across(.fns = median, na.rm = TRUE)) %>%
+      dplyr::distinct() %>%
       data.frame(),
     f_data = pdata$f_data,
     e_meta = pdata$e_meta %>%
@@ -104,6 +105,7 @@ test_that('each rollup method correctly quantifies proteins',{
       dplyr::select(-Mass_Tag_ID) %>%
       dplyr::group_by(Protein) %>%
       dplyr::mutate(dplyr::across(.fns = pmartR:::combine_fn_mean)) %>%
+      dplyr::distinct() %>%
       data.frame(),
     f_data = pdata$f_data,
     e_meta = pdata$e_meta %>%
@@ -111,7 +113,7 @@ test_that('each rollup method correctly quantifies proteins',{
       dplyr::group_by(Protein) %>%
       dplyr::mutate(peps_per_pro = dplyr::n()) %>%
       dplyr::mutate(n_peps_used = peps_per_pro) %>%
-      dplyr::select(Protein, peps_per_pro, n_peps_used, Peptide_Sequence) %>%
+      dplyr::select(Protein, peps_per_pro, n_peps_used) %>%
       dplyr::distinct(.) %>%
       data.frame(),
     edata_cname = "Protein",
@@ -134,6 +136,7 @@ test_that('each rollup method correctly quantifies proteins',{
       dplyr::select(-Mass_Tag_ID) %>%
       dplyr::group_by(Protein) %>%
       dplyr::mutate(dplyr::across(.fns = median, na.rm = TRUE)) %>%
+      dplyr::distinct() %>%
       data.frame(),
     f_data = pdata2$f_data,
     e_meta = pdata2$e_meta %>%
@@ -506,6 +509,7 @@ test_that('each rollup method correctly quantifies proteins',{
       dplyr::select(-Mass_Tag_ID, -Protein) %>%
       dplyr::group_by(Protein_Isoform) %>%
       dplyr::mutate(dplyr::across(.fns = median, na.rm = TRUE)) %>%
+      dplyr::distinct() %>%
       data.frame(),
     f_data = pdata3$f_data,
     e_meta = attr(bayes, "isoformRes_subset") %>%
@@ -515,7 +519,7 @@ test_that('each rollup method correctly quantifies proteins',{
       dplyr::left_join(pepes_per_pro2, by = "Protein") %>%
       dplyr::relocate(n_peps_used, .after = peps_per_pro) %>%
       dplyr::distinct(Protein, Protein_Isoform, peps_per_pro,
-                      n_peps_used, Peptide_Sequence) %>%
+                      n_peps_used) %>%
       data.frame(),
     edata_cname = "Protein_Isoform",
     fdata_cname = "SampleID",
