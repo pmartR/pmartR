@@ -49,7 +49,7 @@
 #' 
 #' @export
 #' 
-combine_lipidData <- function(obj_1, obj_2, retain_groups = FALSE, retain_filters = FALSE, ...) {
+combine_lipidData <- function(obj_1, obj_2, retain_groups = FALSE, retain_filters = FALSE, drop_duplicate_emeta = TRUE, ...) {
   if (class(obj_1) != class(obj_2)) {
     stop(sprintf(
       "Objects must be of the same class, found %s and %s",
@@ -152,7 +152,13 @@ combine_lipidData <- function(obj_1, obj_2, retain_groups = FALSE, retain_filter
     
     if (length(unique(new_emeta_ids)) != 
         length(unique(emeta_ids_1)) + length(unique(emeta_ids_2))) {
-      warning("There were e_meta identifiers that occurred in both datasets, they have been duplicated in the new object's e_meta.")
+      
+      if(drop_duplicate_emeta) {
+        warning("There were non-unique molecule identifiers in e_meta, dropping these duplicates, some meta-data information may be lost.") 
+        new_emeta <- new_emeta %>% dplyr::distinct(!!rlang::sym(new_edata_cname), .keep_all = TRUE)
+      } else {
+        warning("There were non-unique molecule identifiers in e_meta, this may cause the object construction to fail if edata_cname and emeta_cname do not specify unique rows in the combined e_meta")
+      }
     }
     
   } else{

@@ -54,7 +54,7 @@ test_that("bad group/covariate structures throw an error", {
 
 test_that("warnings thrown for duplicate e_data/e_meta identifiers", {
   expect_warning(combine_lipidData(obj1, obj5), regexp = "Duplicate molecule identifiers")
-  expect_warning(combine_lipidData(obj1, obj2), regexp = "e_meta identifiers")
+  expect_warning(combine_lipidData(obj1, obj2), regexp = "molecule identifiers")
 })
 
 test_that("attributes correctly stored", {
