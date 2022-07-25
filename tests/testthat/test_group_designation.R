@@ -453,7 +453,21 @@ test_that('the correct group data frame and attributes are created',{
   pairdata_bad_cov <- pairdata_cov
   pairdata_bad_cov$f_data$age[[29]] <- rcauchy(1)
 
+  # Make a situation where the pair_group column doesn't contain exactly one
+  # occurrence of pair_denom for one of the pairs
+  pairdata_bad_pair_group <- pairdata_cov
+  pairdata_bad_pair_group$f_data$Time[[4]] <- 18
+
   # Holy paired group designation tests, Batman --------------------------------
+
+  expect_error(
+    group_designation(pairdata_bad_pair_group,
+                      main_effects = "Virus",
+                      pair_id = "PairID",
+                      pair_group = "Time",
+                      pair_denom = "0"),
+    regexp = "Each pair must have exactly 1 entry in the pair_group column"
+  )
 
   # One main effect.
   expect_identical(

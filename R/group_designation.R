@@ -391,6 +391,24 @@ group_designation <- function (omicsData,
 
     }
 
+    # Check that each pair has exactly one corresponding entry in pair_group
+    # that is equal to pair_denom
+    denom_in_pair <-
+      sapply(unique(omicsData$f_data[, pair_id]), function(x) {
+        pair_levels <-
+          unique(omicsData$f_data[omicsData$f_data[, pair_id] == x, pair_group])
+        sum(pair_levels == pair_denom)
+      })
+
+    if(!all(denom_in_pair == 1)) {
+      stop(paste(
+        "Each pair must have exactly 1 entry in the pair_group column that ",
+        "is equal to pair_denom.",
+        sep = ""
+      )
+      )
+    }
+
     # Check that the main effect(s) are the same for each pair.
     if (!is.null(main_effects)) {
 
