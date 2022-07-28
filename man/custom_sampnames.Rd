@@ -44,7 +44,9 @@ This helper function creates custom sample names for plot data object
 function
 }
 \details{
-
+This function can be used to create custom (and shorter) sample
+  names to be used when plotting so that axis labels are not so long that
+  they interfere with the graph itself.
 }
 \examples{
 \dontrun{
