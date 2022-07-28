@@ -3240,56 +3240,103 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
 
     # Start scatter plot skeleton when a p-value threshold has been provided.
     if (length(main_eff_names) == 1) {
-
-      p <- p +
-        ggplot2::geom_point(
-          ggplot2::aes(
-            x = forcats::fct_inorder(!!rlang::sym(samp_id)),
-            y = Log2.md,
-            col = !!rlang::sym(main_eff_names),
-            # Add a fill layer that will not affect how the plot looks. This
-            # layer is used to create a legend when one sample from a pair is an
-            # outlier but the other sample belonging to the pair is not.
-            fill = "Removed because paired with outlier"
-          ),
-          alpha = ifelse(goodies_alpha, 1, 0.5),
-          size = point_size,
-          shape = ifelse(goodies_pch, 15, 16)
-        )
+      
+      # we need separate plots for if we have pair id or not
+      
+      if (!is.null(attr(attr(filter_obj, "group_DF"), "pair_id"))) {
+        # if !null then we need to include pair fill information
+        p <- p +
+          ggplot2::geom_point(
+            ggplot2::aes(
+              x = forcats::fct_inorder(!!rlang::sym(samp_id)),
+              y = Log2.md,
+              col = !!rlang::sym(main_eff_names),
+              # Add a fill layer that will not affect how the plot looks. This
+              # layer is used to create a legend when one sample from a pair is an
+              # outlier but the other sample belonging to the pair is not.
+              fill = "Removed because paired with outlier"
+            ),
+            alpha = ifelse(goodies_alpha, 1, 0.5),
+            size = point_size,
+            shape = ifelse(goodies_pch, 15, 16)
+          )
+      } else {
+        # if null pair id then we do not need to account for fill
+        p <- p +
+          ggplot2::geom_point(
+            ggplot2::aes(
+              x = forcats::fct_inorder(!!rlang::sym(samp_id)),
+              y = Log2.md,
+              col = !!rlang::sym(main_eff_names)
+            ),
+            alpha = ifelse(goodies_alpha, 1, 0.5),
+            size = point_size,
+            shape = ifelse(goodies_pch, 15, 16)
+          )
+      }
 
     } else {
-
-      p <- p +
-        ggplot2::geom_point(
-          ggplot2::aes(
-            x = forcats::fct_inorder(!!rlang::sym(samp_id)),
-            y = Log2.md,
-            col = !!rlang::sym(main_eff_names[1]),
-            shape = !!rlang::sym(main_eff_names[2]),
-            # Add a fill layer that will not affect how the plot looks. This
-            # layer is used to create a legend when one sample from a pair is an
-            # outlier but the other sample belonging to the pair is not.
-            fill = "Removed because paired with outlier"
-          ),
-          alpha = ifelse(goodies_alpha, 1, 0.5),
-          # Make guilty-by-association points really small because we will plot
-          # a square point over them with the next lines of code. We don't want
-          # the edges of a circle or triangle peeking out from behind a square.
-          # That would make a hideous and confusing plot if that happened.
-          size = ifelse(goodies_pch, 0, point_size)
-        ) +
-        # Add another layer of points with guilty-by-association samples plotted
-        # as a square.
-        ggplot2::geom_point(
-          ggplot2::aes(
-            x = forcats::fct_inorder(!!rlang::sym(samp_id)),
-            y = Log2.md,
-            col = !!rlang::sym(main_eff_names[1])
-          ),
-          size = ifelse(goodies_pch, point_size, 0),
-          shape = ifelse(goodies_pch, 15, 16)
-        )
-
+      if (!is.null(attr(attr(filter_obj, "group_DF"), "pair_id"))) {
+        # if !null then we need to include pair fill information
+        p <- p +
+          ggplot2::geom_point(
+            ggplot2::aes(
+              x = forcats::fct_inorder(!!rlang::sym(samp_id)),
+              y = Log2.md,
+              col = !!rlang::sym(main_eff_names[1]),
+              shape = !!rlang::sym(main_eff_names[2]),
+              # Add a fill layer that will not affect how the plot looks. This
+              # layer is used to create a legend when one sample from a pair is an
+              # outlier but the other sample belonging to the pair is not.
+              fill = "Removed because paired with outlier"
+            ),
+            alpha = ifelse(goodies_alpha, 1, 0.5),
+            # Make guilty-by-association points really small because we will plot
+            # a square point over them with the next lines of code. We don't want
+            # the edges of a circle or triangle peeking out from behind a square.
+            # That would make a hideous and confusing plot if that happened.
+            size = ifelse(goodies_pch, 0, point_size)
+          ) +
+          # Add another layer of points with guilty-by-association samples plotted
+          # as a square.
+          ggplot2::geom_point(
+            ggplot2::aes(
+              x = forcats::fct_inorder(!!rlang::sym(samp_id)),
+              y = Log2.md,
+              col = !!rlang::sym(main_eff_names[1])
+            ),
+            size = ifelse(goodies_pch, point_size, 0),
+            shape = ifelse(goodies_pch, 15, 16)
+          )
+      } else{
+        # if null pair id then we do not need to account for fill
+        p <- p +
+          ggplot2::geom_point(
+            ggplot2::aes(
+              x = forcats::fct_inorder(!!rlang::sym(samp_id)),
+              y = Log2.md,
+              col = !!rlang::sym(main_eff_names[1]),
+              shape = !!rlang::sym(main_eff_names[2])
+            ),
+            alpha = ifelse(goodies_alpha, 1, 0.5),
+            # Make guilty-by-association points really small because we will plot
+            # a square point over them with the next lines of code. We don't want
+            # the edges of a circle or triangle peeking out from behind a square.
+            # That would make a hideous and confusing plot if that happened.
+            size = ifelse(goodies_pch, 0, point_size)
+          ) +
+          # Add another layer of points with guilty-by-association samples plotted
+          # as a square.
+          ggplot2::geom_point(
+            ggplot2::aes(
+              x = forcats::fct_inorder(!!rlang::sym(samp_id)),
+              y = Log2.md,
+              col = !!rlang::sym(main_eff_names[1])
+            ),
+            size = ifelse(goodies_pch, point_size, 0),
+            shape = ifelse(goodies_pch, 15, 16)
+          )
+      }
     }
 
     # Add title, axis labels, and other crap.
