@@ -340,3 +340,15 @@ aflag <- function (grp1, grp2, pvals, cutoff) {
   return (ninja)
 
 }
+
+aflag_diff <- function (diff, pvals, cutoff) {
+
+  sorceress <- rep(0, length(pvals))
+
+  spell <- which(pvals < cutoff)
+
+  sorceress[spell] <- sign(diff)[spell]
+
+  return (sorceress)
+
+}

@@ -4,7 +4,13 @@
 \alias{combine_lipidData}
 \title{Combines two omicsData objects with identical sample information.}
 \usage{
-combine_lipidData(obj_1, obj_2, retain_groups = FALSE, retain_filters = FALSE)
+combine_lipidData(
+  obj_1,
+  obj_2,
+  retain_groups = FALSE,
+  retain_filters = FALSE,
+  ...
+)
 }
 \arguments{
 \item{obj_1, obj_2}{Two omicsData objects of the same supported type,
@@ -15,6 +21,8 @@ to the new object (defaults to FALSE).}
 
 \item{retain_filters}{Whether to retain filter information in the new object
 (defaults to FALSE).}
+
+\item{...}{Extra arguments, not one of 'omicsData', 'main_effects', or 'covariates' to be passed to \code{pmartR::group_designation}.}
 }
 \value{
 An object of the same type as the two input objects, with their
@@ -30,4 +38,32 @@ General requirements:
 \item data attributes:  Objects must be on the same scale and both be either normalized or unnormalized.
 \item group designation:  Objects must have the same grouping structure if retain_groups = T.
 }
+}
+\examples{
+library(pmartR)
+library(pmartRdata)
+
+obj_1 <- pmartRdata::lipid_object_neg
+obj_2 <- pmartRdata::lipid_object_pos
+
+# de-dupe any duplicate edata identifiers
+obj_2$e_data[,get_edata_cname(obj_2)] <- paste0("obj_2_", obj_2$e_data[,get_edata_cname(obj_2)])
+
+combine_object <- combine_lipidData(obj_1, obj_2)
+
+# preprocess and group the data and keep filters/grouping structure
+
+obj_1 <- edata_transform(obj_1, "log2")
+obj_1 <- normalize_global(obj_1, "all", "median", apply_norm = T)
+obj_2 <- edata_transform(obj_2, "log2")
+obj_2 <- normalize_global(obj_2, "all", "median", apply_norm = T)
+
+obj_1 <- group_designation(obj_1, "Condition")
+obj_2 <- group_designation(obj_2, "Condition")
+
+obj_1 <- applyFilt(molecule_filter(obj_1), obj_1, min_num = 2)
+obj_2 <- applyFilt(cv_filter(obj_2),obj_2, cv_thresh = 60)
+
+combine_lipidData(obj_1, obj_2, retain_groups = T, retain_filters = T)
+
 }

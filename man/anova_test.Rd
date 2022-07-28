@@ -7,12 +7,14 @@ effects)}
 \usage{
 anova_test(
   omicsData,
+  groupData,
   comparisons,
   pval_adjust,
   pval_thresh,
   covariates,
   paired,
-  equal_var
+  equal_var,
+  use_parallel
 )
 }
 \arguments{
@@ -39,6 +41,9 @@ that will be used as covariates in the IMD-ANOVA analysis.}
 returned if none is found}
 
 \item{equal_var}{logical; should the variance across groups be assumed equal?}
+
+\item{use_parallel}{A logical value indicating if the t test should be run in
+parallel.}
 }
 \value{
 a list of `data.frame`s

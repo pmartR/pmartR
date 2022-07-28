@@ -34,7 +34,7 @@ as the sample name}
 \item{components}{an integer vector specifying which components separated by
 delim to keep as sample name}
 
-\item{pattern}{string, regex pattern to use to extract substrings from the 
+\item{pattern}{string, regex pattern to use to extract substrings from the
 sample names.}
 
 \item{...}{extra arguments passed to regexpr if pattern is specified}

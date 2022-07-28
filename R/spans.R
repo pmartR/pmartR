@@ -234,6 +234,8 @@ spans_procedure <- function(omicsData,
 
   # misc input checks
   if(!inherits(attr(omicsData, "group_DF"), "data.frame")) stop("the omicsData object must have a grouping structure, usually set by calling group_designation() on the object")
+  if (!is.numeric(min_nonsig)) stop ("min_nonsig must be numeric.")
+  if (!is.numeric(min_sig)) stop ("min_sig must be numeric.")
   if(any(c(min_nonsig, min_sig) < 1) | any(c(min_nonsig, min_sig) > nrow(omicsData$e_data))) stop("min_nonsig and min_sig must be an integer value no greater than the number of observed biomolecules")
   if(!is.null(max_sig)){
     if(!is.numeric(max_sig) | max_sig <= min_sig) stop('max_sig must be an integer value greater than min_sig')
@@ -241,6 +243,8 @@ spans_procedure <- function(omicsData,
   if(!is.null(max_nonsig)){
     if(!is.numeric(max_nonsig) | max_nonsig <= min_nonsig) stop('max_nonsig must be an integer value greater than min_nonsig')
   }
+  if (!is.numeric(sig_thresh)) stop ("sig_thresh must be numeric.")
+  if (!is.numeric(nonsig_thresh)) stop ("nonsig_thresh must be numeric.")
   if(any(c(sig_thresh, nonsig_thresh) > 1) | any(c(sig_thresh, nonsig_thresh) < 0)) stop("sig_thresh and nonsig_thresh must be numeric values between 0 and 1")
   if(isTRUE(attributes(omicsData)$data_info$norm_info$norm_type == "global")) stop("a global normalization scheme has already been applied to this data, SPANS should be run on an unnormalized log-transformed pepData or proData object.")
   if(!isTRUE(grepl("log", attr(omicsData, "data_info")$data_scale))) stop("omicsData object must have been transformed to the log scale.  Either specify the attribute attr(omicsData, 'data_info')$data_scale or call edata_transform() on the omicsData object.")

@@ -673,7 +673,9 @@ test_that("rmd_filter and applyFilt produce the correct output",{
   pairdata <- edata_transform(pairdata,
                               data_scale = "log")
   pairdata <- group_designation(pairdata,
-                                pairs = "PairID")
+                                pair_id = "PairID",
+                                pair_group = "Time",
+                                pair_denom = "18")
 
   pair_filter <- rmd_filter(omicsData = pairdata)
 
@@ -687,7 +689,7 @@ test_that("rmd_filter and applyFilt produce the correct output",{
   # Test all aspects of the rmd filter object.
   expect_equal(dim(pair_filter), c(30, 9))
   expect_equal(pair_filter$Name, fdata$Name)
-  expect_equal(pair_filter$Group, rep("zzzz", 30))
+  expect_equal(pair_filter$Group, rep("paired_diff", 30))
   expect_equal(round(pair_filter$Log2.md, 3),
                c(1.201, 0.455, 4.439, 2.086, 1.153, 0.794, 1.472, 0.316, 2.123,
                  1.651, 2.345, 3.44, 2.028, 1.374, 3.235, 2.474, 2.488, 2.533,
@@ -742,7 +744,8 @@ test_that("rmd_filter and applyFilt produce the correct output",{
          prop_missing = (sum(is.na(pair_filtered$e_data)) /
                            prod(dim(pair_filtered$e_data[, -1]))),
          num_samps = ncol(pair_filtered$e_data[, -1]),
-         data_types = NULL)
+         data_types = NULL,
+         batch_info = list(is_bc = FALSE))
   )
   expect_equal(
     attr(pair_filtered, "meta_info"),
@@ -754,7 +757,7 @@ test_that("rmd_filter and applyFilt produce the correct output",{
   expect_equal(attr(attr(pair_filtered, "group_DF"), "main_effects"),
                "no_main_effect")
   expect_equal(attr(attr(pair_filtered, "group_DF"), "nonsingleton_groups"),
-               "zzzz")
+               "paired_diff")
   expect_equal(dim(pair_filtered$e_data),
                c(150, 29))
   expect_equal(dim(pair_filtered$f_data),

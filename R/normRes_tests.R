@@ -23,10 +23,20 @@ normRes_tests <- function (norm_obj, test_fn = "kw") {
   if(!inherits(norm_obj, c(obj_classes, "normRes")))
     stop("This object is not of class 'pepData', 'proData', 'lipidData', 'metabData', 'isobaricpepData' or 'normRes'")
 
-  # if this is an omicsData object, test that is has been normalized and has a
+  # if this is an omicsData object, test that it has been normalized and has a
   # group DF ... if so store the location and scale vectors that should be
-  # under $data_info$norm_info and get the group vector from group DF is none
+  # under $data_info$norm_info and get the group vector from group DF if none
   # was specified
+
+  # Make sure test_fn is one of the possible options.
+  if (!test_fn %in% c("anova", "kw")) {
+
+    # Stop! You are attempting to call a function that does not exist. This is
+    # similar to trying to divide by zero. I am stopping you before you cause
+    # severe mental and physical harm to yourself and others.
+    stop ("test_fn must be either 'anova' or 'kw'.")
+
+  }
 
   # Extract information when an omicsData object is the input. ---------
   if (inherits(norm_obj, obj_classes)) {

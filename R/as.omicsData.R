@@ -1126,7 +1126,7 @@ pre_flight <- function (e_data,
       inherits(e_data, "tbl") ||
       inherits(e_data, "data.table")) {
 
-    e_data <- data.frame(e_data)
+    e_data <- data.frame(e_data, check.names = check.names)
 
   }
 
@@ -1142,7 +1142,7 @@ pre_flight <- function (e_data,
       inherits(f_data, "tbl") ||
       inherits(f_data, "data.table")) {
 
-    f_data <- data.frame(f_data)
+    f_data <- data.frame(f_data, check.names = check.names)
 
   }
 
@@ -1162,7 +1162,7 @@ pre_flight <- function (e_data,
         inherits(e_meta, "tbl") ||
         inherits(e_meta, "data.table")) {
 
-      e_meta <- data.frame(e_meta)
+      e_meta <- data.frame(e_meta, check.names = check.names)
 
     }
 
@@ -1208,17 +1208,17 @@ pre_flight <- function (e_data,
     }
 
   }
-  
+
   # Inspect the is_bc argument
   if (!is.null(is_bc)) {
-    
+
     # Make sure it is logical
     if (!inherits(is_bc, "logical")) {
-      
+
       stop ("is_bc must be of the class 'logical'")
-      
+
     }
-    
+
   }
 
   # Examine the norm_info argument. Ensure it is a list.
@@ -1228,10 +1228,10 @@ pre_flight <- function (e_data,
     stop ("norm_info must be of the class 'list'")
 
   }
-  
+
   # Examine the batch_info argument. Ensure it is a list.
   if (!inherits(batch_info, "list")) {
-    
+
     # Throw an error at the user
     stop ("batch_info must be of the class 'list'")
   }

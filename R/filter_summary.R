@@ -22,7 +22,7 @@
 #'@name summary.moleculeFilt
 
 summary.moleculeFilt <- function(filter_object, min_num=NULL){
-  
+
   if(!is.null(min_num)) {
     # check that min_num is not a vector #
     if(length(min_num) > 1) stop("min_num must be of length 1")
@@ -33,41 +33,41 @@ summary.moleculeFilt <- function(filter_object, min_num=NULL){
     # check that min_num is less than the max number of observations #
     if(min_num > max(filter_object$Num_Observations)) stop("min_num cannot be greater than the number of samples")
   }
-  
+
   # return the numeric version of plot, the threshold used, the number that would be tested and the number that would not be tested
-  
+
   # how many peptides appear in the dataset once, twice, 3 times, etc.
   cut_data <- table(cut(filter_object$Num_Observations, breaks = -1:max(filter_object$Num_Observations)))
   cumcounts <- cumsum(cut_data)
   pep_observation_counts <- data.frame(num_observations=0:(length(cumcounts)-1), frequency_counts=cumcounts)
-  
+
   if(!is.null(min_num)){
     # get number molecules tested
     num_not_tested <- pep_observation_counts$frequency_counts[pep_observation_counts$num_observations==(min_num-1)]
-    
+
     # get number molecules not tested
     num_tested <- pep_observation_counts$frequency_counts[nrow(pep_observation_counts)]-num_not_tested
-    
+
   }else{
     num_tested = NULL
     num_not_tested = NULL
     min_num = NULL
   }
-  
+
   res <- list(pep_observation_counts=pep_observation_counts[-1,], min_num=min_num, num_not_filtered=num_tested, num_filtered=num_not_tested)
-  
+
   class(res) = c("moleculeFilterSummary", "list")
-  
+
   attr(res,"use_batch") <- attr(filter_object,"use_batch")
   attr(res,"use_groups") <- attr(filter_object,"use_groups")
-  
+
   return(res)
 }
 
 #' Print method for summary of molecule filter
-#' 
+#'
 #' Print method for summary of molecule filter
-#' 
+#'
 #'@export
 #'@name print.moleculeFilterSummary
 print.moleculeFilterSummary <- function(object){
@@ -82,12 +82,12 @@ print.moleculeFilterSummary <- function(object){
   if(attr(object,"use_batch") & attr(object,"use_groups")){
     cat("\nMinimum Number is Minimum Number per Batch and Group \n----------------------------------\n")
   }
-  
+
   if(!is.null(object$min_num)){
   cat(sprintf("Minimum Number:%d\nFiltered:%d\nNot Filtered:%d\n\n", object$min_num, object$num_filtered, object$num_not_filtered))
   }
   print(object$pep_observation_counts, row.names = FALSE)
-  
+
 }
 
 #' Produce a basic summary of a proteomics_filter object
@@ -106,7 +106,7 @@ print.moleculeFilterSummary <- function(object){
 #'@name summary.proteomicsFilt
 #'@export
 summary.proteomicsFilt <- function(filter_object, min_num_peps=NULL, degen_peps=FALSE){
-  
+
   # error checks for min_num_peps, if not NULL #
   if(!is.null(min_num_peps)) {
     # check that min_num_peps is not a vector #
@@ -122,117 +122,127 @@ summary.proteomicsFilt <- function(filter_object, min_num_peps=NULL, degen_peps=
   }
   # check that degen_peps is logical #
   if(!is.logical(degen_peps)) stop("degen_peps must be either TRUE or FALSE")
-  
-  
+
+
   pep_sum <- summary(filter_object$counts_by_pep$n)
   pro_sum <- summary(filter_object$counts_by_pro$n)
-  
+
   if(!is.null(min_num_peps)){
     count_bypro <- filter_object$counts_by_pro
     count_bypep <- filter_object$counts_by_pep
-    
+
     pro_id <- names(count_bypro)[names(count_bypro) != "n"]
     pep_id <- names(count_bypep)[names(count_bypep) != "n"]
     pro_filt <- as.character(data.frame(count_bypro[which(count_bypro$n < min_num_peps), ])[, pro_id])
-    
+
     # determine which peptides no longer have a protein to map to  #
     ## find rows in peptide.info that correspond to proteins to be filtered ##
     protfilt.ids <- which(attr(filter_object, "e_meta")[,pro_id] %in% pro_filt)
-    
-    
+
+
     ## find the peptides that are in the filter list but are not in the unfiltered lists ##
     pep_filt <- as.character(setdiff(attr(filter_object, "e_meta")[protfilt.ids, pep_id], attr(filter_object, "e_meta")[-protfilt.ids, pep_id]))
-    
-    
+
+
     if(length(pep_filt)==0) {pep_filt = NULL}
     if(length(pro_filt)==0) {pro_filt = NULL}
-    
+
     filter_object_new2 <- list(proteins_filt = pro_filt, peptides_filt = pep_filt)
-    
+
   }else{
     filter_object_new2 <- list(peptides_filt = c(), proteins_filt = c())
   }
-  
+
   if(degen_peps){
     count_bypro <- filter_object$counts_by_pro
     count_bypep <- filter_object$counts_by_pep
-    
+
     pro_id <- names(count_bypro)[names(count_bypro) != "n"]
     pep_id <- names(count_bypep)[names(count_bypep) != "n"]
     degen_peptides <- as.character(data.frame(count_bypep[which(count_bypep$n > 1), ])[, pep_id])
-    
+
     ## identify any proteins that now will not have peptides mapping to them ##
     ## find rows in e_meta that correspond to peptides to be filtered ##
     pepfilt.ids <- which(attr(filter_object, "e_meta")[,pep_id] %in% degen_peptides)
-    
+
     ## find the proteins that are in the filter list but are not in the unfiltered lists ##
     add_prots <- as.character(setdiff(attr(filter_object, "e_meta")[pepfilt.ids, pro_id], attr(filter_object, "e_meta")[-pepfilt.ids, pro_id]))
-    
+
     if(length(add_prots)==0) {add_prots = NULL}
     if(length(degen_peptides)==0) {degen_peptides = NULL}
     filter_object_new1 <- list(peptides_filt = degen_peptides, proteins_filt = add_prots)
   } else {
     filter_object_new1 <- list(peptides_filt = c(), proteins_filt = c())
   }
-  
+
   ## consolidate filter_object_new1 and filter_object_new2 ##
   filter_object_new <- list(proteins_filt = unique(c(filter_object_new1$proteins_filt, filter_object_new2$proteins_filt)), peptides_filt = unique(c(filter_object_new1$peptides_filt, filter_object_new2$peptides_filt)))
-  
+
   num_filtered <- lapply(filter_object_new, length)
   # return the 5 number summary for both parts of the filter, give total number of peps and/or prots filtered
   res <- list(num_per_pep=pep_sum, num_per_pro=pro_sum, num_pep_filtered=num_filtered$peptides_filt, num_pro_filtered=num_filtered$proteins_filt)
   res$num_pro_notfiltered = nrow(filter_object$counts_by_pro)-res$num_pro_filtered
   res$num_pep_notfiltered = nrow(filter_object$counts_by_pep)-res$num_pep_filtered
   class(res) = c("proteomicsFilterSummary", "list")
-  
+
   return(res)
 }
 
 #' Print method for summary of proteomics filter
-#' 
+#'
 #' Print method for summary of proteomics filter
-#' 
+#'
 #'@export
 #'
 print.proteomicsFilterSummary <- function(object){
-  
+
   # create output #
   catmat <- data.frame(c(object$num_per_pep, " ", object$num_pep_filtered, object$num_pep_notfiltered),
                        c(object$num_per_pro, " ", object$num_pro_filtered, object$num_pro_notfiltered))
   colnames(catmat) <- c("Obs Proteins Per Peptide", "Obs Peptides Per Protein")
   rownames(catmat) <- c(names(object$num_per_pep), " ", "Filtered", "Not Filtered")
-  
+
   cat("\nSummary of Proteomics Filter \n\n")
   cat(capture.output(catmat), sep="\n")
   cat("\n")
-  
+
 
 }
 
 #' Produce a basic summary of a imdanova_filter object
 #'
-#' This function will provide basic summary statistics for the imdanova_filter object.
+#' This function will provide basic summary statistics for the imdanova_filter
+#' object.
 #'
-#' @param filter_object S3 object of class 'imdanovaFilt' created by \code{\link{imdanova_filter}}.
-#'@param min_nonmiss_gtest the minimum number of non-missing feature values allowed per group for \code{gtest_filter}. Defaults to NULL. Suggested value is 3.
-#'@param min_nonmiss_anova the minimum number of non-missing feature values allowed per group for \code{anova_filter}. Defaults to NULL. Suggested value is 2.
+#' @param filter_object S3 object of class 'imdanovaFilt' created by
+#'   \code{\link{imdanova_filter}}.
+#' @param min_nonmiss_gtest the minimum number of non-missing feature values
+#'   allowed per group for \code{gtest_filter}. Defaults to NULL. Suggested
+#'   value is 3.
+#' @param min_nonmiss_anova the minimum number of non-missing feature values
+#'   allowed per group for \code{anova_filter}. Defaults to NULL. Suggested
+#'   value is 2.
+#' @param comparisons data.frame with columns for "Control" and "Test"
+#'   containing the different comparisons of interest. Comparisons will be made
+#'   between the Test and the corresponding Control.
 #'
-#' @return If min_nonmiss_gtest or min_nonmiss_anova is specified, the number of biomolecules to be filtered with the specified threshold are reported.
-#'
+#' @return If min_nonmiss_gtest or min_nonmiss_anova is specified, the number of
+#'   biomolecules to be filtered with the specified threshold are reported.
 #'
 #' @author Lisa Bramer
 #'
 #' @export
-#'@rdname summary.imdanovaFilt
-#'@name summary.imdanovaFilt
-#'@export
-summary.imdanovaFilt <- function(filter_object, min_nonmiss_anova=NULL, min_nonmiss_gtest=NULL){
-  
+#' @rdname summary.imdanovaFilt
+#' @name summary.imdanovaFilt
+#' @export
+summary.imdanovaFilt <- function(filter_object, min_nonmiss_anova = NULL,
+                                 min_nonmiss_gtest = NULL, comparisons = NULL){
+
   ## initial checks ##
-  
+
   # it is fine if both min_nonmiss_anova and min_nonmiss_gtest are NULL in the summary function #
-  
-  # check that if they aren't NULL, min_nonmiss_anova and min_nonmiss_gtest are numeric, >=2 and >=3, respectively, 
+
+  # check that if they aren't NULL, min_nonmiss_anova and min_nonmiss_gtest are numeric, >=2 and >=3, respectively,
   # and neither are bigger than the minimum group size (group_sizes in an attribute of the filter_object, see below) #
   if(!is.null(min_nonmiss_anova)) {
     # check that min_nonmiss_anova is not a vector #
@@ -256,73 +266,260 @@ summary.imdanovaFilt <- function(filter_object, min_nonmiss_anova=NULL, min_nonm
     nonsingleton_groups <- attributes(filter_object)$nonsingleton_groups
     if(min_nonmiss_gtest > min(attributes(filter_object)$group_sizes$n_group[which(attributes(filter_object)$group_sizes$Group %in% nonsingleton_groups)])) stop("min_nonmiss_gtest cannot be greater than the minimum group size")
   }
-  
+
   ## end of initial checks ##
-  
-  
+
+  # Check if data are paired. If they are we will filter biomolecules on paired
+  # differences.
+  if (!is.null(
+    attr(attr(attr(filter_object, "omicsData"), "group_DF"), "pair_id")
+  )) {
+
+    # Create an omicsData object on the differences.
+    diff_omicsData <- as.diffData(attr(filter_object, "omicsData"))
+
+    # Create a new filter object with the differenced data. (For future readers:
+    # I meant to use the word "differenced". I hope it made you chuckle.) We
+    # need this object for the counts based on differences instead of pairs
+    # because later we will filter and perform statistics on the differences.
+    filter_object <- imdanova_filter(diff_omicsData)
+
+  }
+
   my_names <- as.character(attr(filter_object, "group_sizes")$Group)
-  
+
   # if min_nonmiss_anova is not provided, the vector of zeros will indicate nothing needs removing
   inds_rm_anova <- rep(0, nrow(filter_object))
-  
+
   # if min_nonmiss_gtest is not provided, the vector of zeros will indicate nothing needs removing
   inds_rm_gtest <- rep(0, nrow(filter_object))
-  
-  
+
+  # Determine what will be filtered: ANOVA -------------------------------------
+
   # if min_nonmiss_anova is provided
   if(!is.null(min_nonmiss_anova)){
-    # need at least n=min_nonmiss_anova per group in at least 2 groups in order to keep the peptide
-    temp_anova <- (filter_object[,which(names(filter_object) %in% my_names)] >= min_nonmiss_anova)
-    
-    # sum the number of groups that meet the nonmissing per group requirement
-    # these are the rows to remove since they do not have at least 2 groups not meeting nonmissing requirements
-    inds_rm_anova <- rowSums(temp_anova) < 2
+
+    # Check if there are no main effects. This can occur when data are paired.
+    if ("paired_diff" %in% my_names) {
+
+      inds_rm_anova <- filter_object$paired_diff < min_nonmiss_anova
+
+    } else {
+
+      # dplyr mumbo jumbo!
+      # Determine which groups meet the min_nonmiss_anova criterion.
+      inds_rm_anova <- filter_object %>%
+        # Determine which groups have non-missing counts above the cutoff.
+        dplyr::mutate(
+          dplyr::across(dplyr::any_of(my_names), ~ . >= min_nonmiss_anova)
+        ) %>%
+        # Count the number of groups above the cutoff.
+        dplyr::mutate(
+          n_groups = rowSums(dplyr::across(dplyr::any_of(my_names)))
+        )
+
+      # Determine what will be filtered when comparisons is NULL.
+      if (is.null(comparisons)) {
+
+        # dplyr mumbo jumbo!
+        # When comparisons are NULL we need at least two groups (across all
+        # groups) that have counts above the min_nonmiss_anova threshold.
+        inds_rm_anova <- inds_rm_anova %>%
+          # Count the number of groups above the cutoff.
+          dplyr::mutate(insufficient = n_groups < 2) %>%
+          dplyr::pull(insufficient)
+
+      } else {
+
+        # Grab the groups in the Test and Control columns.
+        testers <- unique(comparisons$Test)
+        controllers <- unique(comparisons$Control)
+        combiners <- unique(c(testers, controllers))
+
+        # Sum across the unique groups in test, control, and combined (the
+        # unique set of groups from both test and control). This will be used to
+        # determine which rows need to be filtered depending on which scenario
+        # we are in.
+        inds_rm_anova <- inds_rm_anova %>%
+          dplyr::mutate(
+            n_test = rowSums(dplyr::across(dplyr::all_of(testers))),
+            n_control = rowSums(dplyr::across(dplyr::all_of(controllers))),
+            n_combine = rowSums(dplyr::across(dplyr::all_of(combiners)))
+          )
+
+        # Scenario 1: one group is compared to multiple other groups.
+        if (length(controllers) == 1) {
+
+          inds_rm_anova <- inds_rm_anova %>%
+            # Count the number of groups above the cutoff.
+            dplyr::mutate(insufficient = n_groups < 2) %>%
+            # We can't filter the rows like the code does in applyFilt because
+            # the length of inds_rm_anova and inds_rm_gest need to be the same.
+            # Filtering either inds_rm_anova or inds_rm_gtest would break the
+            # code at the end that counts the number of biomolecules that are
+            # either filtered or not filtered.
+            #
+            # Change values in insufficient according to the values in n_test
+            # and n_control. Rows in insufficient without any groups above the
+            # cutoff in test or control must be TRUE (the corresponding
+            # biomolecule is removed).
+            #
+            # We can't test one thing against nothing :)
+            dplyr::mutate(
+              insufficient = dplyr::case_when(
+                n_test == 0 | n_control == 0 ~ TRUE,
+                TRUE ~ insufficient
+              )
+            ) %>%
+            dplyr::pull(insufficient)
+
+          # Scenario 2: Some groups are compared to some other groups. In this
+          # scenario a group can be in both test and control.
+        } else {
+
+          inds_rm_anova <- inds_rm_anova %>%
+            # Count the number of groups above the cutoff.
+            dplyr::mutate(insufficient = n_groups < 2) %>%
+            # We can't filter the rows like the code does in applyFilt because
+            # the length of inds_rm_anova and inds_rm_gest need to be the same.
+            # Filtering either inds_rm_anova or inds_rm_gtest would break the
+            # code at the end that counts the number of biomolecules that are
+            # either filtered or not filtered.
+            #
+            # Change values in insufficient according to the values in n_test,
+            # n_control and n_combine. Rows in insufficient without any groups
+            # above the cutoff in control or test and rows where there is at
+            # least one group in test or control but the count of combined
+            # groups is less than two need to be TRUE (the corresponding
+            # biomolecule is removed).
+            #
+            # We can't test one thing against nothing nor can we test one thing
+            # against itself :)
+            dplyr::mutate(
+              insufficient = dplyr::case_when(
+                (n_test == 0 | n_control == 0) |
+                  (n_test > 0 & n_control > 0 & n_combine < 2) ~ TRUE,
+                TRUE ~ insufficient
+              )
+            ) %>%
+            dplyr::pull(insufficient)
+
+        }
+
+      }
+
+    }
+
   }
-  
-  
+
+  # Determine what will be filtered: G-Test ------------------------------------
+
   # if min_nonmiss_gtest is provided
   if(!is.null(min_nonmiss_gtest)){
-    # need at least min_nonmiss_gtest peptide IDs in one group #
-    temp_gtest <- (filter_object[,which(names(filter_object) %in% my_names)] >= min_nonmiss_gtest)
-    
-    # sum the number of groups that meet the nonmissing per group requirement
-    inds_rm_gtest <- rowSums(temp_gtest) == 0 # remove these rows since no groups meet the requirement
+
+    # Check if there are no main effects. This can occur when data are paired.
+    if ("paired_diff" %in% my_names) {
+
+      # We cannot run a gtest when there are no main effects. Create a vector of
+      # zeros so the gtest will not affect the counting below.
+      inds_rm_gtest <- rep(0, dim(filter_object)[[1]])
+
+    } else {
+
+      # Determine what will be filtered when comparisons is NULL.
+      if (is.null(comparisons)) {
+
+        # dplyr mumbo jumbo!
+        # When comparisons are NULL we need at least one group (across all
+        # groups) that has a count above min_nonmiss_gtest.
+        inds_rm_gtest <- filter_object %>%
+          # Determine which groups have non-missing counts above the cutoff.
+          dplyr::mutate(
+            # Find groups above G-Test criterion.
+            dplyr::across(dplyr::all_of(my_names), ~ . >= min_nonmiss_gtest),
+            # Count number of groups above G-Test criterion.
+            n_groups = rowSums(dplyr::across(dplyr::all_of(my_names))),
+            # Determine which biomolecules have insufficient data.
+            insufficient = n_groups == 0
+          ) %>%
+          dplyr::pull(insufficient)
+
+        # Determine what will be filtered when custom comparisons are provided.
+      } else {
+
+        # Grab the groups in both the Test and Control columns.
+        combiners <- unique(c(comparisons$Test, comparisons$Control))
+
+        # dplyr mumbo jumbo!
+        inds_rm_gtest <- filter_object %>%
+          dplyr::mutate(
+            # Find groups specified in comparisons above G-Test criterion.
+            dplyr::across(dplyr::all_of(combiners), ~ . >= min_nonmiss_gtest),
+            # Count number of groups above G-Test criterion.
+            n_groups = rowSums(dplyr::across(dplyr::all_of(combiners))),
+            # Determine which biomolecules have insufficient data.
+            insufficient = n_groups == 0
+          ) %>%
+          dplyr::pull(insufficient)
+
+      }
+
+    }
+
   }
-  
-  
-  #if-statement for the case where both min_nonmiss_anova and min_nonmiss_gtest are non-NULL. Note: num_not_tested will be the count of (inds_rm_anova + inds_rm_gtest) that sum to 2. That is the intersection of both filters. 
+
+  # Count number of things that will be filtered -------------------------------
+
+  #if-statement for the case where both min_nonmiss_anova and min_nonmiss_gtest
+  #are non-NULL. Note: num_not_tested will be the count of (inds_rm_anova +
+  #inds_rm_gtest) that sum to 2. That is the intersection of both filters.
   if(!is.null(min_nonmiss_anova) & !is.null(min_nonmiss_gtest)){
-    # get number molecules not tested
-    num_filtered <- sum((inds_rm_anova + inds_rm_gtest) > 1)
-    
+
+    # We will count differently if the data are paired and there are no main
+    # effects. In this case we only need the sum of inds_rm_anova and
+    # inds_rm_gtest to be greater than zero.
+    if ("paired_diff" %in% my_names) {
+
+      # get number molecules not tested
+      num_filtered <- sum((inds_rm_anova + inds_rm_gtest) > 0)
+
+    } else {
+
+      # get number molecules not tested
+      num_filtered <- sum((inds_rm_anova + inds_rm_gtest) > 1)
+
+    }
+
     # get number molecules tested
     num_not_filtered <- nrow(filter_object) - num_filtered
-    
+
   }
-  
+
   else if(!is.null(min_nonmiss_anova) | !is.null(min_nonmiss_gtest)){
     # get number molecules not tested
     num_filtered <- sum((inds_rm_anova + inds_rm_gtest) > 0)
-    
+
     # get number molecules tested
     num_not_filtered <- nrow(filter_object) - num_filtered
-    
+
   }
   else{
     num_not_filtered = NULL
     num_filtered = NULL
   }
-  
-  res <- list(pep_observation_counts = nrow(filter_object), num_filtered = num_filtered, num_not_filtered = num_not_filtered)
-  
+
+  res <- list(pep_observation_counts = nrow(filter_object),
+              num_filtered = num_filtered,
+              num_not_filtered = num_not_filtered)
+
   class(res) = c("imdanovaFilterSummary","list")
-  
+
   return(res)
 }
 
 
 #' Print method for summary of imdanova filter
-#' 
+#'
 #'@export
 #'
 print.imdanovaFilterSummary <- function(object){
@@ -330,19 +527,19 @@ print.imdanovaFilterSummary <- function(object){
   if(is.null(object$num_filtered)){
     object$num_filtered <- NA
   }
-  
+
   if(is.null(object$num_not_filtered)){
     object$num_not_filtered <- NA
   }
-  
+
   catmat <- data.frame(c(object$pep_observation_counts, object$num_filtered, object$num_not_filtered))
   rownames(catmat) <- c("Total Observations: ", "Filtered: ", "Not Filtered: ")
-  
+
   colnames(catmat) <- NULL
-  
+
   cat("\nSummary of IMD Filter\n")
   cat(capture.output(catmat), sep="\n")
-  
+
 }
 
 
@@ -361,31 +558,65 @@ print.imdanovaFilterSummary <- function(object){
 #'@rdname summary.rmdFilt
 #'@name summary.rmdFilt
 summary.rmdFilt <- function(filter_object, pvalue_threshold = NULL){
-  
+
   # check that pvalue_threshold is numeric [0,1] #
   if(!is.null(pvalue_threshold)) {
     if(!is.numeric(pvalue_threshold)) stop("pvalue_threshold must be numeric between 0 and 1")
     if(pvalue_threshold < 0 | pvalue_threshold > 1) stop("pvalue_threshold must be numeric between 0 and 1")
   }
-  
+
   # get metrics used #
   samp_id <- names(attr(filter_object, "group_DF"))[1]
   metrics <- attributes(filter_object)$metrics
-  
+
   # get samples filtered out, if pvalue_threshold is specified #
   filt <- NULL
   if(!is.null(pvalue_threshold)) {
     filt <- as.character(filter_object[filter_object$pvalue < pvalue_threshold, samp_id])
     if(length(filt)==0) filt <- NULL
   }
-  
+
+  # Check if data are paired. If they are we will make sure no pairs are split
+  # (e.g., one sample in a pair will be filtered but the other sample will not).
+  if (!is.null(attr(attr(filter_object, "group_DF"), "pair_id"))) {
+
+    # Snatch the sample name and pair name as they will be used in multiple
+    # places. It will save some typing. ... However, all the typing I just saved
+    # has probably been undone by writing this comment.
+    sample_name <- attr(filter_object, "fdata_cname")
+    pair_name <- attr(attr(filter_object, "group_DF"), "pair_id")
+
+    #!#!#!#!#!#!#!#!#!#!
+    # The following code checks if the samples in a pair will be split. For
+    # example, one sample in a pair will be filtered and another sample in the
+    # pair will not be filtered. If a pair is split remove ALL samples
+    # associated with that pair.
+    #!#!#!#!#!#!#!#!#!#!
+
+    # Snag the associated pair IDs for the samples that will be filtered.
+    filtered_pairs <- attr(filter_object, "fdata") %>%
+      dplyr::filter(!!rlang::sym(sample_name) %in% filt) %>%
+      dplyr::pull(!!rlang::sym(pair_name))
+
+    # Go back to f_data and nab all the sample names corresponding to the pair
+    # IDs associated with the original samples that were selected for removal.
+    # These sample names will be used to filter the data. This vector will not
+    # be the same as the original vector if any pairs were split. If there
+    # were no pairs split the two vectors will be the same.
+    filt <- attr(filter_object, "fdata") %>%
+      dplyr::filter(!!rlang::sym(pair_name) %in% filtered_pairs) %>%
+      dplyr::pull(!!rlang::sym(sample_name)) %>%
+      as.character()
+
+  }
+
   # for display #
   if(is.null(filt)) {filt <- "NULL"}
-  
+
   res <- list(pvalue = summary(filter_object$pvalue), metrics = metrics, filtered_samples = filt)
-  
+
   class(res) = c("rmdFilterSummary","list")
-  
+
   return(res)
 }
 
@@ -396,7 +627,7 @@ print.rmdFilterSummary <- function(object){
   cat(c("\nSummary of RMD Filter\n----------------------\nP-values:\n", capture.output(object$pvalue)), sep = "\n")
   cat(c("\nMetrics Used:", paste(object$metrics, collapse = ", "), "\n"))
   cat(c("\nFiltered Samples:", paste(object$filtered_samples, collapse = ", "), "\n\n"))
-  
+
 }
 
 
@@ -415,7 +646,7 @@ print.rmdFilterSummary <- function(object){
 #'@rdname summary.cvFilt
 #'@name summary.cvFilt
 summary.cvFilt <- function(filter_object, cv_threshold = NULL){
-  
+
   # checks for cv_threshold if not null #
   if(!is.null(cv_threshold)) {
     # check that cv_threshold is numeric
@@ -425,35 +656,35 @@ summary.cvFilt <- function(filter_object, cv_threshold = NULL){
     # check that cv_threshold is more than 1 and less than max CV value
     if(cv_threshold <= 1 | cv_threshold >= max(filter_object$CV, na.rm = TRUE)) stop("cv_threshold must be greater than 1 and less than the maximum CV value")
   }
-  
+
   # get rid of NAs #
   new_object <- filter_object[!is.na(filter_object$CV),]
-  
+
   # get summary of CVs #
   CVs <- summary(new_object$CV)
-  
+
   # get total NAs, total non-NAs #
   tot_NAs <- attributes(filter_object)$tot_nas
   tot_non_NAs <- nrow(filter_object) - tot_NAs
-  
+
   # get biomolecules to filter if cv_threshold is not NULL #
   filt <- NULL
   if(!is.null(cv_threshold)) {
     filt <- as.character(new_object[new_object$CV > cv_threshold, 1])
     if(length(filt)==0) filt <- NULL
   }
-  
+
   res <- list(CVs = CVs, tot_NAs = tot_NAs, tot_non_NAs = tot_non_NAs, filtered_biomolecules = length(filt))
-  
+
   class(res) = c("cvFilterSummary","list")
-  
+
   return(res)
 }
 
 #' Print method for summary of CV filter
-#' 
+#'
 #' Print method for summary of CV filter
-#' 
+#'
 #'@export
 #'
 print.cvFilterSummary <- function(object){
@@ -462,39 +693,41 @@ print.cvFilterSummary <- function(object){
   cat(c("\nTotal NAs:", object$tot_NAs))
   cat(c("\nTotal Non-NAs:", object$tot_non_NAs, "\n"))
   cat(c("\nNumber Filtered Biomolecules:", paste(object$filtered_biomolecules, collapse = ", "), "\n\n"))
-  
+
 }
 
 
 #' Produce a basic summary of a custom_filter object
 #'
-#' This function will provide basic summary statistics for the custom_filter object.
+#' This function will provide basic summary statistics for the custom_filter
+#' object.
 #'
-#' @param filter_object S3 object of class 'customFilt' created by \code{\link{custom_filter}}.
-#' @return a summary of the items in e_data, f_data, and e_meta that will be removed as a result of applying the custom filter.
+#' @param filter_object S3 object of class 'customFilt' created by
+#'   \code{\link{custom_filter}}.
 #'
+#' @return a summary of the items in e_data, f_data, and e_meta that will be
+#'   removed as a result of applying the custom filter.
 #'
 #' @author Lisa Bramer
 #'
-#'@export
-#'@export
-#'@rdname summary.customFilt
-#'@name summary.customFilt
+#' @export
+#' @rdname summary.customFilt
+#' @name summary.customFilt
 summary.customFilt <- function(filter_object){
-  
+
   # get omicsData object #
   omicsData <- attr(filter_object, "omicsData")
   summary_orig <- summary(omicsData)
-  
+
   # get names #
   edata_id <- attr(filter_object, "cnames")$edata_cname
   emeta_id <- attr(filter_object, "cnames")$emeta_cname
   samp_id <- attr(filter_object, "cnames")$fdata_cname
-  
+
   # apply the filter #
   filtered_data <- applyFilt(filter_object, omicsData)
   summary_filt <- summary(filtered_data)
-  
+
   #if filter_object contains removes
   if(!is.null(filter_object$e_data_remove)|!is.null(filter_object$f_data_remove)|!is.null(filter_object$e_meta_remove))
   {
@@ -507,7 +740,7 @@ summary.customFilt <- function(filter_object){
       samps_filt <- 0
       samps_left <- num_samples
     }
-    
+
     # e_data #
     num_edata <- attributes(filter_object)$num_edata
     if(!is.null(filter_object$e_data_remove)) {
@@ -517,7 +750,7 @@ summary.customFilt <- function(filter_object){
       edata_filt <- num_edata - nrow(filtered_data$e_data)
       edata_left <- nrow(filtered_data$e_data)
     }
-    
+
     # e_meta #
     if(!is.null(filtered_data$e_meta)){
       num_emeta <- attributes(filter_object)$num_emeta
@@ -530,11 +763,11 @@ summary.customFilt <- function(filter_object){
       }
     }
     # Display #
-    
+
     samp_id <- paste(samp_id, "s (f_data)", sep="")
     edata_id <- paste(edata_id, "s (e_data)", sep="")
     display_emeta_id <- paste(emeta_id, "s (e_meta)", sep="")
-    
+
     ## construct data frame ##
     if(is.null(emeta_id)) {
       disp <- data.frame(Filtered = c(samps_filt, edata_filt), Remaining = c(samps_left, edata_left), Total = c(num_samples, num_edata))
@@ -543,9 +776,9 @@ summary.customFilt <- function(filter_object){
       disp <- data.frame(Filtered = c(samps_filt, edata_filt, emeta_filt), Remaining = c(samps_left, edata_left, emeta_left), Total = c(num_samples, num_edata, num_emeta))
       rownames(disp) <- c(samp_id, edata_id, display_emeta_id)
     }
-    
+
   }
-  
+
   #if filter_object contains keeps
   if(!is.null(filter_object$e_data_keep)|!is.null(filter_object$f_data_keep)|!is.null(filter_object$e_meta_keep))
   {
@@ -558,7 +791,7 @@ summary.customFilt <- function(filter_object){
       samps_keep <- num_samples
       samps_discard <- 0
     }
-    
+
     # e_data #
     num_edata <- attributes(filter_object)$num_edata
     if(!is.null(filter_object$e_data_keep)) {
@@ -568,7 +801,7 @@ summary.customFilt <- function(filter_object){
       edata_keep <- nrow(filtered_data$e_data)
       edata_discard <- num_edata - nrow(filtered_data$e_data)
     }
-    
+
     # e_meta #
     num_emeta <- attributes(filter_object)$num_emeta
     if(!is.null(filter_object$e_meta_keep)) {
@@ -578,13 +811,13 @@ summary.customFilt <- function(filter_object){
       emeta_keep <- length(unique(filtered_data$e_meta[, emeta_id] ))
       emeta_discard <- num_emeta - length(unique(filtered_data$e_meta[, emeta_id] ))
     }
-    
+
     # Display #
-    
+
     samp_id <- paste(samp_id, "s (f_data)", sep="")
     edata_id <- paste(edata_id, "s (e_data)", sep="")
     display_emeta_id <- paste(emeta_id, "s (e_meta)", sep="")
-    
+
     ## construct data frame ##
     if(is.null(emeta_id)) {
       disp <- data.frame(Kept = c(samps_keep, edata_keep), Discarded = c(samps_discard, edata_discard), Total = c(num_samples, num_edata))
@@ -593,18 +826,26 @@ summary.customFilt <- function(filter_object){
       disp <- data.frame(Kept = c(samps_keep, edata_keep, emeta_keep), Discarded = c(samps_discard, edata_discard, emeta_discard), Total = c(num_samples, num_edata, num_emeta))
       rownames(disp) <- c(samp_id, edata_id, display_emeta_id)
     }
-    
+
   }
-  
-  
-  ## Display output ##
-  cat("\nSummary of Custom Filter\n\n")
-  cat(capture.output(disp), sep = "\n")
-  cat("\n")
-  
-  return(invisible(disp))
+
+  class(disp) = c("customFilterSummary", "data.frame")
+
+  return (disp)
+
 }
 
 
+#' Print method for summary of custom filter
+#'
+#' @export
+#'
+print.customFilterSummary <- function (object) {
 
+  ## Display output ##
+  cat("\nSummary of Custom Filter\n\n")
+  cat(capture.output(object), sep = "\n")
+  cat("\n")
+
+}
 

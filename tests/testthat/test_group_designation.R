@@ -42,7 +42,7 @@ test_that('the correct group data frame and attributes are created',{
   expect_equal(attributes(attr(pdata_gdf, 'group_DF'))$nonsingleton_groups,
                c('Infection', 'Mock'))
   expect_null(attributes(attr(pdata_gdf, 'group_DF'))$covariates)
-  expect_null(attributes(attr(pdata_gdf, 'group_DF'))$pairs)
+  expect_null(attributes(attr(pdata_gdf, 'group_DF'))$pair_id)
   expect_null(attributes(attr(pdata_gdf, 'group_DF'))$batch_id)
   expect_null(attributes(attr(pdata_gdf, 'group_DF'))$time_course)
 
@@ -101,7 +101,7 @@ test_that('the correct group data frame and attributes are created',{
   expect_equal(attributes(attr(pdata_gdf_2, 'group_DF'))$nonsingleton_groups,
                c('Infection_high', 'Infection_low', 'Mock_none'))
   expect_null(attributes(attr(pdata_gdf_2, 'group_DF'))$covariates)
-  expect_null(attributes(attr(pdata_gdf_2, 'group_DF'))$pairs)
+  expect_null(attributes(attr(pdata_gdf_2, 'group_DF'))$pair_id)
   expect_null(attributes(attr(pdata_gdf_2, 'group_DF'))$batch_id)
   expect_null(attributes(attr(pdata_gdf_2, 'group_DF'))$time_course)
 
@@ -163,7 +163,7 @@ test_that('the correct group data frame and attributes are created',{
   expect_equal(attributes(attr(pdata_gdf_2, 'group_DF'))$nonsingleton_groups,
                c('Infection_high', 'Infection_low'))
   expect_null(attributes(attr(pdata_gdf_2, 'group_DF'))$covariates)
-  expect_null(attributes(attr(pdata_gdf_2, 'group_DF'))$pairs)
+  expect_null(attributes(attr(pdata_gdf_2, 'group_DF'))$pair_id)
   expect_null(attributes(attr(pdata_gdf_2, 'group_DF'))$batch_id)
   expect_null(attributes(attr(pdata_gdf_2, 'group_DF'))$time_course)
 
@@ -261,7 +261,7 @@ test_that('the correct group data frame and attributes are created',{
   expect_type(attr(attr(pdata_gdf_3.2, "group_DF"), "covariates")$Age,
               "double")
   expect_null(attributes(attr(pdata_gdf_3.2, 'group_DF'))$batch_id)
-  
+
   # Correctly specify that the Gender covariate should be a character vector.
   pdata_gdf_3.4 <- group_designation(omicsData = pdata_3.2,
                                      main_effects = c("Condition", "Level"),
@@ -276,7 +276,7 @@ test_that('the correct group data frame and attributes are created',{
   expect_type(attr(attr(pdata_gdf_3.4, "group_DF"), "covariates")$Age,
               "double")
   expect_null(attributes(attr(pdata_gdf_3.4, 'group_DF'))$batch_id)
-  
+
 
   # Assemble another f_data object with 0/1 representing m/f. This will be a
   # numeric vector that should be changed to a character vector after running
@@ -316,7 +316,7 @@ test_that('the correct group data frame and attributes are created',{
   expect_type(attr(attr(pdata_gdf_4.3, "group_DF"), "covariates")$Age,
               "double")
   expect_null(attributes(attr(pdata_gdf_4.3, 'group_DF'))$batch_id)
-  
+
   # Try to change the covariates to something other than a character vector.
   pdata_gdf_4.5 <- group_designation(omicsData = pdata_4,
                                      main_effects = c("Condition", "Level"),
@@ -338,45 +338,45 @@ test_that('the correct group data frame and attributes are created',{
                                  main_effects = c("Condition", "Level"),
                                  covariates = c("Gender", "Age"),
                                  cov_type = c("character")))
-  
+
   # Create objects and tests for batch_id -------------------------------------
   # Copy edata so the names of the samples can be changed.
   edata_5 <- edata
-  
+
   # Change some of the Infection samples to Mock samples.
   names(edata_5) <- c("Mass_Tag_ID",
                       paste0("Infection", 1:6),
                       paste0("Mock", 1:6))
-  
+
   # Create additional f_data objects with different main effects and covariates.
   fdata_5 <- fdata
-  
+
   # Update the sample names in f_data.
   fdata_5$SampleID <- c(paste0("Infection", 1:6),
                         paste0("Mock", 1:6))
-  
+
   # Update the first main effect to account for changing some infection samples
   # to mock samples.
   fdata_5$Condition <- c(rep("Infection", 6),
                          rep("Mock", 6))
-  
+
   # Add a second main effect and two covariates.
   fdata_5$Level <- c("high", "low", "high", "low", "high", "low", "high",
                      "high", "low", "low", "low", "high")
   set.seed(720)
   fdata_5$Gender <- sample(c("F", "M"), 12, replace = TRUE)
   fdata_5$Age <- round(runif(12, min = 19, max = 89), 2)
-  
+
   # Add a batch id
   fdata_5$BatchID <- rep(seq(1:2),6)
   fdata_5$BatchName <- rep(c("Batch1","Batch2"),6)
-  
+
   # Create a pepData object and run group_designation.
   pdata_5 <- as.pepData(e_data = edata_5,
                         f_data = fdata_5,
                         edata_cname = "Mass_Tag_ID",
                         fdata_cname = "SampleID")
-  
+
   # run a very simple model with just one main effect and batch id
   pdata_gdf_5 <- group_designation(omicsData = pdata_5,
                                    main_effects = "Condition",
@@ -384,7 +384,7 @@ test_that('the correct group data frame and attributes are created',{
   # Investigate the batch_id attribute
   expect_identical(attr(attr(pdata_gdf_5, "group_DF"), "batch_id"),
                    pdata_5$f_data[,c(1,6)])
-  
+
   # create a more complex model with two main effects and two covariates and batch_id
   pdata_gdf_5.1 <- group_designation(omicsData = pdata_5,
                                    main_effects = c("Condition", "Level"),
@@ -397,13 +397,13 @@ test_that('the correct group data frame and attributes are created',{
   # Investigate the batch_id attribute
   expect_identical(attr(attr(pdata_gdf_5.1, "group_DF"), "batch_id"),
                    pdata_5$f_data[,c(1,6)])
-  
+
   # Use a batch_id that is a factor rather than number
   pdata_gdf_5.2 <- group_designation(omicsData = pdata_5,
                                      main_effects = c("Condition", "Level"),
                                      covariates = c("Gender", "Age"),
                                      batch_id = "BatchName")
-  
+
   # Exploricate the covariates attribute.
   # Investigate the batch_id attribute
   expect_identical(attr(attr(pdata_gdf_5.2, "group_DF"), "batch_id"),
@@ -453,21 +453,39 @@ test_that('the correct group data frame and attributes are created',{
   pairdata_bad_cov <- pairdata_cov
   pairdata_bad_cov$f_data$age[[29]] <- rcauchy(1)
 
+  # Make a situation where the pair_group column doesn't contain exactly one
+  # occurrence of pair_denom for one of the pairs
+  pairdata_bad_pair_group <- pairdata_cov
+  pairdata_bad_pair_group$f_data$Time[[4]] <- 18
+
   # Holy paired group designation tests, Batman --------------------------------
+
+  expect_error(
+    group_designation(pairdata_bad_pair_group,
+                      main_effects = "Virus",
+                      pair_id = "PairID",
+                      pair_group = "Time",
+                      pair_denom = "0"),
+    regexp = "Each pair must have exactly 1 entry in the pair_group column"
+  )
 
   # One main effect.
   expect_identical(
     attributes(
       attr(group_designation(pairdata,
                              main_effects = "Virus",
-                             pairs = "PairID"),
+                             pair_id = "PairID",
+                             pair_group = "Time",
+                             pair_denom = "0"),
            "group_DF")
     ),
     list(names = c("Name", "Group"),
          class = "data.frame",
          row.names = 1:30,
          main_effects = "Virus",
-         pairs = "PairID",
+         pair_id = "PairID",
+         pair_group = "Time",
+         pair_denom = "0",
          nonsingleton_groups = c("AM", "FM", "Mock"))
   )
 
@@ -476,14 +494,18 @@ test_that('the correct group data frame and attributes are created',{
     attributes(
       attr(group_designation(pairdata_2_me,
                              main_effects = c("Virus", "subclass"),
-                             pairs = "PairID"),
+                             pair_id = "PairID",
+                             pair_group = "Time",
+                             pair_denom = "0"),
            "group_DF")
     ),
     list(names = c("Name", "Group", "Virus", "subclass"),
          class = "data.frame",
          row.names = 1:30,
          main_effects = c("Virus", "subclass"),
-         pairs = "PairID",
+         pair_id = "PairID",
+         pair_group = "Time",
+         pair_denom = "0",
          nonsingleton_groups = c("AM_one", "AM_two", "FM_one",
                                  "FM_two", "Mock_one", "Mock_two"))
   )
@@ -492,15 +514,19 @@ test_that('the correct group data frame and attributes are created',{
   expect_identical(
     attributes(
       attr(group_designation(pairdata,
-                             pairs = "PairID"),
+                             pair_id = "PairID",
+                             pair_group = "Time",
+                             pair_denom = "0"),
            "group_DF")
     ),
     list(names = c("Name", "Group"),
          class = "data.frame",
          row.names = 1:30,
          main_effects = "no_main_effect",
-         pairs = "PairID",
-         nonsingleton_groups = "zzzz")
+         pair_id = "PairID",
+         pair_group = "Time",
+         pair_denom = "0",
+         nonsingleton_groups = "paired_diff")
   )
 
   expect_identical(
@@ -508,7 +534,9 @@ test_that('the correct group data frame and attributes are created',{
       attr(group_designation(pairdata_cov,
                              main_effects = "Virus",
                              covariates = "age",
-                             pairs = "PairID"),
+                             pair_id = "PairID",
+                             pair_group = "Time",
+                             pair_denom = "0"),
            "group_DF")
     ),
     list(names = c("Name", "Group"),
@@ -519,14 +547,18 @@ test_that('the correct group data frame and attributes are created',{
            Name = fdata$Name,
            age = pairdata_cov$f_data$age
          ),
-         pairs = "PairID",
+         pair_id = "PairID",
+         pair_group = "Time",
+         pair_denom = "0",
          nonsingleton_groups = c("AM", "FM", "Mock"))
   )
 
   expect_error(
       group_designation(pairdata_bad_me,
                              main_effects = c("Virus", "subclass"),
-                             pairs = "PairID"),
+                             pair_id = "PairID",
+                        pair_group = "Time",
+                        pair_denom = "0"),
     paste("The following samples have main effects that differ between",
           "pairs: Mock_0hr_2 and Mock_18hr_2",
           sep = " ")
@@ -536,11 +568,12 @@ test_that('the correct group data frame and attributes are created',{
     group_designation(pairdata_bad_cov,
                       main_effects = "Virus",
                       covariates = "age",
-                      pairs = "PairID"),
+                      pair_id = "PairID",
+                      pair_group = "Time",
+                      pair_denom = "0"),
     paste("The following samples have covariates that differ between",
           "pairs: AM_0hr_4 and AM_18hr_4",
           sep = " ")
   )
 
 })
- 

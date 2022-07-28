@@ -134,7 +134,7 @@ myproData <- group_designation(omicsData = pro_object,
 
 #Apply the IMD ANOVA filter
 imdanova_Filt <- imdanova_filter(omicsData = myproData)
-myproData <- applyFilt(filter_object = imdanova_Filt,
+myproData <- applyFilt(filter_obj = imdanova_Filt,
                        omicsData = myproData,
                        min_nonmiss_anova=2)
 

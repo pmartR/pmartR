@@ -24,26 +24,26 @@
 #' @return A list of six data frames, which are the results of applying the
 #'   metrics (mean, standard deviation, median, percent observed, minimum and
 #'   maximum) to omicsData$e_data
-#' 
+#'
 #' @export
-#' 
+#'
 #' @examples
 #' \dontrun{
 #' library(pmartRdata)
-#' 
+#'
 #' data(lipid_object)
-#' 
+#'
 #' lipid_object2 <- edata_transform(omicsData = lipid_object,
 #'                                  data_scale = "log2")
-#' 
+#'
 #' lipid_object2 <- group_designation(omicsData = lipid_object,
 #'                                    main_effects = "Condition")
-#' 
+#'
 #' edata_summary(omicsData = lipid_object2, by = "sample", groupvar = NULL)
 #' }
-#' 
+#'
 edata_summary <- function (omicsData, by = 'sample', groupvar = NULL) {
-  
+
   #some checks
   if(!inherits(omicsData, c('pepData', 'proData', 'lipidData',
                             'metabData', 'nmrData')))
@@ -52,7 +52,13 @@ edata_summary <- function (omicsData, by = 'sample', groupvar = NULL) {
     stop("by must be either sample or molecule")
   if(isTRUE(groupvar == attr(omicsData, "cnames")$fdata_cname))
     stop("The sample ID column in f_data cannot be used as a grouping column.  Specify by = 'sample' to see a by-sample summary of the data")
-  
+  if (!all(groupvar %in% names(omicsData$f_data))) {
+
+    # Why do you think you can group by variables that do not exist?!
+    stop ("The variable(s) in groupvar are not present in f_data.")
+
+  }
+
   #pull cnames attr from omicsData
   edata = omicsData$e_data
   fdata = omicsData$f_data
@@ -61,21 +67,21 @@ edata_summary <- function (omicsData, by = 'sample', groupvar = NULL) {
   edata_cname_id = which(names(edata) == edata_cname)
   fdata_cname_id = which(names(fdata) == fdata_cname)
   groupDF = attr(omicsData, "group_DF")
-  
+
   # all groupvars must be present in fdata
   if (any((groupvar %in% names(fdata)) == F)) {
-    
+
     stop(paste0("The following variables were not present in f_data: '",
                 groupvar[which((groupvar %in% names(fdata)) == F)],
                 "'"))
-    
+
   }
   if (length(groupvar) > 2) stop("No more than two groupvar can be provided")
-  
+
   if(by == 'sample'){
     #check that groupvar is NULL, groupvar is only used when by == 'molecule'
     if(!is.null(groupvar)) stop("groupvar is only used when by == 'molecule'")
-  
+
     avg = as.data.frame(apply(edata[, -edata_cname_id], 2,
                               function(x){if(all(is.na(x))){
                                 mean(x)
@@ -85,33 +91,33 @@ edata_summary <- function (omicsData, by = 'sample', groupvar = NULL) {
     avg = cbind(names(edata[, -edata_cname_id]), avg)
     names(avg)<- c("sample", "mean")
     rownames(avg)<- NULL
-    
+
     sd = as.data.frame(apply(edata[,-edata_cname_id], 2, sd, na.rm = T))
     sd = cbind(names(edata[,-edata_cname_id]), sd)
     names(sd)<- c("sample", "sd")
     rownames(sd)<- NULL
-    
+
     mds = as.data.frame(apply(edata[,-edata_cname_id], 2, median, na.rm = T))
     mds = cbind(names(edata[,-edata_cname_id]), mds)
     names(mds)<- c("sample", "median")
     rownames(mds)<- NULL
-    
+
     pct_obs = as.data.frame(apply(edata[,-edata_cname_id], 2,
                                   function(x){sum(!is.na(x))/length(x)}))
     pct_obs = cbind(names(edata[,-edata_cname_id]), pct_obs)
     names(pct_obs)<- c("sample", "pct_obs")
     rownames(pct_obs)<- NULL
-    
+
     min = as.data.frame(apply(edata[,-edata_cname_id], 2, min, na.rm = T))
     min = cbind(names(edata[,-edata_cname_id]), min)
     names(min)<- c("sample", "min")
     rownames(min)<- NULL
-  
+
     max = as.data.frame(apply(edata[,-edata_cname_id], 2, max, na.rm = T))
     max = cbind(names(edata[,-edata_cname_id]), max)
     names(max)<- c("sample", "max")
     rownames(max)<- NULL
-        
+
     res_list = list(mean = avg,
                     sd = sd,
                     median = mds,
@@ -125,7 +131,7 @@ edata_summary <- function (omicsData, by = 'sample', groupvar = NULL) {
                                     "fdata_cname" = fdata_cname)
     attr(res_list, "data_scale") <- get_data_scale(omicsData)
   }
-  
+
   if(by == "molecule"){
     if(is.null(groupvar)){
       if(is.null(groupDF)){
@@ -167,7 +173,7 @@ edata_summary <- function (omicsData, by = 'sample', groupvar = NULL) {
                          max = max,
                          stringsAsFactors = F)
         names(max)[1]<- edata_cname
-        
+
         res_list = list(mean = avg,
                         sd = sd,
                         median = mds,
@@ -181,10 +187,10 @@ edata_summary <- function (omicsData, by = 'sample', groupvar = NULL) {
                                         "fdata_cname" = fdata_cname)
         attr(res_list, "group_DF")<- groupDF
         attr(res_list, "data_scale") <- get_data_scale(omicsData)
-        
+
       } else if (!is.null(groupDF)) {
         #when groupvar is NULL but group_designation has been run
-        
+
         # check that there are atleast 2 samples in each group and remove groups
         # that have less than two samples per group
         n_per_grp = as.data.frame(groupDF %>%
@@ -197,17 +203,17 @@ edata_summary <- function (omicsData, by = 'sample', groupvar = NULL) {
           n_per_grp = n_per_grp[-which(n_per_grp$count<2),]
           groupDF = groupDF[-which(groupDF$Group %in% remove_group),]
         }
-        
+
          #rearranging edata
         edata_melt = reshape2::melt(edata, id.vars = edata_cname)
         names(edata_melt)[2]<- fdata_cname
         edata_melt = merge.data.frame(edata_melt, groupDF, by = fdata_cname)
         edata_melt = edata_melt[, -which(names(edata_melt) == fdata_cname)]
-        
+
         #checking that n_per_grp group order matches that of edata_melt
         n_per_grp = n_per_grp[match(unique(edata_melt$Group),
                                     n_per_grp$Group), ]
-        
+
         # here we are creating a string to input for dcast function argument
         # 'formula'
         formula1 = paste(edata_cname, "+Group~...", sep = "")
@@ -247,7 +253,7 @@ edata_summary <- function (omicsData, by = 'sample', groupvar = NULL) {
                                }})
         names(maxs)[which(colnames(maxs)== ".")]<- "value"
         maxs = reshape2::dcast(maxs, formula = formula2)
-        
+
         res_list = list(n_per_grp = n_per_grp,
                         mean = avg,
                         sd = std_dev,
@@ -267,7 +273,7 @@ edata_summary <- function (omicsData, by = 'sample', groupvar = NULL) {
       ####case where groupvar is provided and has length 1####
       temp_fdata = fdata[, c(fdata_cname_id, which(names(fdata) == groupvar))]
       names(temp_fdata)[2]<- "Group"
-      
+
       # check that there are atleast 2 samples in each group and remove groups
       # that have less than two samples per group
       n_per_grp = as.data.frame(temp_fdata %>%
@@ -278,24 +284,24 @@ edata_summary <- function (omicsData, by = 'sample', groupvar = NULL) {
         n_per_grp = n_per_grp[-which(n_per_grp$count<2),]
         temp_fdata = temp_fdata[-which(temp_fdata$Group %in% remove_group),]
       }
-      
+
       # check to see if grouping structure was 1 sample per group
       if(nrow(temp_fdata) == 0) stop("The grouping variable must assign more than 1 sample to at least one group level")
-      
+
       #rearranging edata
       edata_melt = reshape2::melt(omicsData$e_data, id.vars = edata_cname)
       names(edata_melt)[2]<- fdata_cname
       edata_melt = merge.data.frame(edata_melt, temp_fdata, by = fdata_cname)
       edata_melt = edata_melt[, -which(names(edata_melt) == fdata_cname)]
-      
+
       #checking that n_per_grp group order matches that of edata_melt
       n_per_grp = n_per_grp[match(unique(edata_melt$Group), n_per_grp$Group), ]
-      
+
       #here we are creating a string to input for dcast function argument
       #'formula'
       formula1 = paste(edata_cname, "+Group~...", sep = "")
       formula2 = paste(edata_cname, "~...", sep = "")
-      
+
       avg = reshape2::dcast(edata_melt, formula = formula1,
                             function(x){if(all(is.na(x))){
                               mean(x)
@@ -330,7 +336,7 @@ edata_summary <- function (omicsData, by = 'sample', groupvar = NULL) {
                              }})
       names(maxs)[which(colnames(maxs)== ".")]<- "value"
       maxs = reshape2::dcast(maxs, formula = formula2)
-      
+
       res_list = list(n_per_grp = n_per_grp,
                       mean = avg,
                       sd = std_dev,
@@ -344,29 +350,29 @@ edata_summary <- function (omicsData, by = 'sample', groupvar = NULL) {
       attr(res_list, "cnames")<- list("edata_cname" = edata_cname,
                                       "fdata_cname" = fdata_cname)
       attr(res_list, "data_scale") <- get_data_scale(omicsData)
-      
+
     }else if(length(groupvar) == 2){
       ####case where length of groupvar is 2####
-      
+
       group_vars = fdata[names(fdata) %in% groupvar]
       group_vars <- apply(group_vars, 2, as.character)
-      
+
       # create a group variable and paste grouvar levels together for samples #
       # samples with a value of NA for either groupvar will have a Group value
       # of NA #
       Group = rep(NA, nrow(fdata))
-      
+
       # identify samples that will have a Group membership that is not missing #
       nonna.group = (!is.na(group_vars[,1]) & !is.na(group_vars[,2]))
       Group[nonna.group] = paste(as.character(group_vars[nonna.group,1]),
                                  as.character(group_vars[nonna.group,2]),
                                  sep = "_")
-      
+
       # create output formatted with first column being fdata_cname and second
       # column group id #
       output = data.frame(Sample.ID = fdata[,fdata_cname], Group = Group)
       names(output)[1] = fdata_cname
-      
+
       #check that there are atleast 2 samples in each group and remove groups
       #that have less than two samples per group
       n_per_grp = as.data.frame(output %>%
@@ -377,23 +383,23 @@ edata_summary <- function (omicsData, by = 'sample', groupvar = NULL) {
         n_per_grp = n_per_grp[-which(n_per_grp$count<2),]
         output = output[-which(output$Group %in% remove_group),]
       }
-      
+
       if(nrow(output) == 0) stop("The grouping structure must assign more than 1 sample to at least one group level")
-      
+
       #groupvar was provided, rearranging edata
       edata_melt = reshape2::melt(omicsData$e_data, id.vars = edata_cname)
       names(edata_melt)[2]<- fdata_cname
       edata_melt = merge.data.frame(edata_melt, output, by = fdata_cname)
       edata_melt = edata_melt[, -which(names(edata_melt) == fdata_cname)]
-      
+
       #checking that n_per_grp group order matches that of edata_melt
       n_per_grp = n_per_grp[match(unique(edata_melt$Group), n_per_grp$Group), ]
-      
+
       #here we are creating a string to input for dcast function argument
       #'formula'
       formula1 = paste(edata_cname, "+Group~...", sep = "")
       formula2 = paste(edata_cname, "~...", sep = "")
-      
+
       avg = reshape2::dcast(edata_melt, formula = formula1,
                             function(x){if(all(is.na(x))){
                               mean(x)
@@ -428,14 +434,14 @@ edata_summary <- function (omicsData, by = 'sample', groupvar = NULL) {
                              }})
       names(maxs)[which(colnames(maxs)== ".")]<- "value"
       maxs = reshape2::dcast(maxs, formula = formula2)
-      
+
       res_list = list(n_per_grp = n_per_grp,
                       mean = avg,
                       sd = std_dev,
                       median = mds,
                       pct_obs = pct_obs,
                       min = mins,
-                      max = maxs) 
+                      max = maxs)
       class(res_list)<- "dataRes"
       attr(res_list, "by")<- by
       attr(res_list, "groupvar")<- groupvar
@@ -444,7 +450,7 @@ edata_summary <- function (omicsData, by = 'sample', groupvar = NULL) {
       attr(res_list, "data_scale") <- get_data_scale(omicsData)
     }
   }
-  
+
   return(res_list)
-  
+
 }

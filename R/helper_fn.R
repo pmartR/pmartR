@@ -176,10 +176,15 @@ get_filters <- function (omicsData) {
 
     message("No filters have been applied.")
 
-  }
+    # Return NULL if there are no filters for the pmart app people.
+    return (NULL)
 
-  # Extract and return the filters attribute.
-  return (attr(omicsData, 'filters'))
+  } else {
+
+    # Extract and return the filters attribute.
+    return (attr(omicsData, 'filters'))
+
+  }
 
 }
 
@@ -578,11 +583,6 @@ get_emeta_cname <- function (omicsObject) {
                 "'lipidData', 'nmrData', 'statRes', or 'trellData'",
                 sep = " "))
 
-  if(is.null(omicsObject$e_meta) &&  inherits(omicsObject, "statRes"))
-    stop (paste("emeta_cname of input statsRes object is dependent on",
-                "omicsData used in imd_anova; emeta_cname is NULL",
-                sep = " "))
-
   return (attr(omicsObject, "cnames")$emeta_cname)
 
 }
@@ -641,7 +641,7 @@ set_data_info <- function (e_data,
 
   # Set data normalization information.
   norm_info$is_normalized <- is_normalized
-  
+
   batch_info$is_bc <- is_bc
 
   # Return all of the information that belongs in the data_info attribute.
@@ -888,17 +888,22 @@ get_comparisons<- function(compObj){
     stop("object must be of class 'statRes' or 'trellData'")
 
   #check that compObj object is of 'statRes' or 'trellData' class
-  if(inherits(compObj, "trellData") && is.null(attr(compObj, "comparisons")))
-    stop("trellData object did not inherit 'comparisons' attribute; value is NULL")
+  if(inherits(compObj, "trellData") && is.null(attr(compObj, "comparisons"))) {
 
-  #pull comparisons attribute
-  comp = attr(compObj, "comparisons")
+    return (NULL)
 
-  result = data.frame("comparisons" = as.character(comp),
-                      "index" = 1:length(comp),
-                      stringsAsFactors = FALSE)
+  } else {
 
-  return(result)
+    #pull comparisons attribute
+    comp = attr(compObj, "comparisons")
+
+    result = data.frame("comparisons" = as.character(comp),
+                        "index" = 1:length(comp),
+                        stringsAsFactors = FALSE)
+
+    return(result)
+
+  }
 
 }
 
@@ -973,14 +978,19 @@ get_group_table <- function (omicsObject) {
                 "'lipidData', 'nmrData', 'statRes', or 'trellData'",
                 sep = " "))
 
-  if(is.null(attr(omicsObject, "group_DF")))
-    stop("group_designation has not been run for omicsObject")
+  if(is.null(attr(omicsObject, "group_DF"))) {
 
-  # should the result be constructed from omicsObject$f_data or from the
-  # group_DF attr? if so...
-  group = attr(omicsObject, "group_DF")$Group
+    return (NULL)
 
-  return (table(group))
+  } else {
+
+    # should the result be constructed from omicsObject$f_data or from the
+    # group_DF attr? if so...
+    group = attr(omicsObject, "group_DF")$Group
+
+    return (table(group))
+
+  }
 
 }
 
@@ -1001,9 +1011,9 @@ column_matches_exact <- function(df, col) {
       intersect(df_col, col)
     ))
   })
-  
-  matched_cnames = names(diffs)[which(diffs == 0)] 
-  
+
+  matched_cnames = names(diffs)[which(diffs == 0)]
+
   return(matched_cnames)
 }
 

@@ -21,8 +21,8 @@
 #' @details Any biomoleculs seen in only one sample or with a variance less than
 #'   1E-6 across all samples are not included in the PCA calculations. This
 #'   function leverages code from \code{\link[pcaMethods]{pca}}.
-#' 
-#' @examples 
+#'
+#' @examples
 #' \dontrun{
 #' library(pmartRdata)
 #' data(lipid_object)
@@ -34,19 +34,35 @@
 #' plot(pca_lipids)
 #' summary(pca_lipids)
 #' }
-#' 
+#'
 #' @export
 #' @rdname dim_reduction
 #' @name dim_reduction
 #'
 dim_reduction <- function (omicsData, k = 2){
-  
+
   # check that omicsData is of appropriate class #
   if(!inherits(omicsData, c("pepData", "proData", "metabData",
                             "lipidData", "nmrData")))
     stop(paste("omicsData must be an object of class 'pepdata','prodata',",
                "'metabData', 'lipidData', or 'nrmData'.",
                sep = " "))
+
+  # Check if k is numeric.
+  if (!is.numeric(k)) {
+
+    # Hold the phone! Why are we converting a number to a character?
+    stop ("k must be numeric.")
+
+  }
+
+  # Check if k is positive.
+  if (k < 1) {
+
+    # Why even run dim_reduction if you don't want to keep any PCs?
+    stop ("k must be greater than zero.")
+
+  }
 
   # check that group designation has been run #
   if(!("group_DF" %in% names(attributes(omicsData))))
@@ -73,7 +89,7 @@ dim_reduction <- function (omicsData, k = 2){
   ## check for near zero variance features and remove ##
   minvars = which(apply(temp_data, 1, var, na.rm = T) < 0.000001)
   if(length(minvars) > 0){
-    temp_data[-minvars, ]
+    temp_data = temp_data[-minvars, ]
   }
 
   pca_res = pcaMethods::pca(object = as.matrix(t(temp_data)),
@@ -91,5 +107,5 @@ dim_reduction <- function (omicsData, k = 2){
   attr(temp_res, "R2") <- pca_res@R2
 
   return(temp_res)
-  
+
 }
