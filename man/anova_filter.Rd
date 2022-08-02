@@ -4,7 +4,7 @@
 \alias{anova_filter}
 \title{Identifies biomolecules to be filtered in preparation for IMD-ANOVA.}
 \usage{
-anova_filter(nonmiss_per_group, min_nonmiss_anova, comparisons)
+anova_filter(nonmiss_per_group, min_nonmiss_anova, comparisons = NULL)
 }
 \arguments{
 \item{nonmiss_per_group}{a list of length two. The first element giving the

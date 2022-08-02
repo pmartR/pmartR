@@ -9,6 +9,7 @@ combine_lipidData(
   obj_2,
   retain_groups = FALSE,
   retain_filters = FALSE,
+  drop_duplicate_emeta = TRUE,
   ...
 )
 }

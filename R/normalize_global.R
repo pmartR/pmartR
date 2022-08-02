@@ -126,7 +126,10 @@
 #'
 #' @author Lisa Bramer
 #'
-#' @references
+#' @references Webb-Robertson BJ, Matzke MM, Jacobs JM, Pounds JG, Waters KM. A
+#'   statistical selection strategy for normalization procedures in LC-MS
+#'   proteomics experiments through dataset-dependent ranking of normalization
+#'   scaling factors. Proteomics. 2011;11(24):4736-41.
 #'
 #' @export
 #'

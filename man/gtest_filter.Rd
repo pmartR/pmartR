@@ -4,7 +4,7 @@
 \alias{gtest_filter}
 \title{Identifies peptides to be filtered out in preparation for IMD-ANOVA.}
 \usage{
-gtest_filter(nonmiss_per_group, min_nonmiss_gtest, comparisons)
+gtest_filter(nonmiss_per_group, min_nonmiss_gtest, comparisons = NULL)
 }
 \arguments{
 \item{nonmiss_per_group}{list created by \code{\link{nonmissing_per_group}}.
