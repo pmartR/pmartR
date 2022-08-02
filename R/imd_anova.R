@@ -320,6 +320,13 @@ imd_anova <- function (omicsData,
 
   # Statisticalness!!! ---------------------------------------------------------
 
+  # Determine the non-missing per group counts for ALL biomolecules. Depending
+  # on the filter and the choice of test method there could be NAs in the Count_
+  # columns (which should never happen). Five demerits for the programmer that
+  # didn't foresee this problem that I am now attempting to fix without causing
+  # additional problems in the current pipeline.
+  nmpg <- nonmissing_per_group(omicsData)$nonmiss_totals
+
   # Use imd_test() to test for independence of missing data (qualitative difference between groups)
   if(test_method=='anova'){
 
@@ -586,6 +593,33 @@ imd_anova <- function (omicsData,
   attr(final_out, "bpFlags") <- the_flag
   attr(final_out, "cnames") = attr(omicsData, "cnames")
   attr(final_out, "data_class") = attr(omicsData, "class")
+
+  # Update the non-missing counts ----------------------------------------------
+
+  # Determine which columns contain counts. The column indices will be used to
+  # overwrite the group counts.
+  has_counts <- stringr::str_detect(names(final_out), "^Count_")
+
+  # I am assuming the order of the counts in statRes will not always match the
+  # order of the output from nonmissing_per_group. Here I will match the order
+  # of the columns between the two data frames.
+  statRes_names <- stringr::str_remove(names(final_out)[has_counts], "Count_")
+
+  # Order the names from the non-missing count data frame to match the statRes
+  # object. These indices will be used to correctly subset the non-missing count
+  # data frame when updating the counts columns.
+  order_name <- match(statRes_names, names(nmpg)[-1])
+
+  # Nab the name of the biomolecule ID column.
+  bio_id_name <- get_edata_cname(omicsData)
+
+  # Find the biomolecules from the statRes object that are in the entire data
+  # set.
+  order_bio_id <- match(final_out[, bio_id_name],
+                        nmpg[, bio_id_name])
+
+  # Update the statRes object counts with the entire omicsData counts.
+  final_out[, has_counts] <- nmpg[order_bio_id, (1 + order_name)]
 
   return (final_out)
 
