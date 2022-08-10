@@ -1,0 +1,65 @@
+---
+title: "RNAseq Data Processing"
+author: "Rachel Richardson, Kelly Stratton, Lisa Bramer"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    df_print: paged
+    rmarkdown::html_vignette:
+    fig_caption: yes
+    self_contained: yes
+    toc: true
+bibliography: bibliography.bib
+vignette: >
+  %\VignetteIndexEntry{pmartR-RNAseq} 
+  %\VignetteEngine{knitr::rmarkdown} 
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(rmarkdown.html_vignette.check_title = FALSE)
+```
+
+## Overview
+
+RNAseq data in `pmartR` follows a different workflow compared to the other data types, with different filtering, plot, and statistical options. This vignette walks through the RNAseq workflow, including the use of all three statistical analysis options, DEseq2 [@deseq2], edgeR [@edger], or limmaVOOM [@limmavoom].
+
+
+## Data Set-up
+
+Data upload, create object
+
+Not requiring log transform
+
+plot(rnaSeqData) provides box plots of lcpm
+
+group_designation
+
+
+## Quality Control
+
+### Filters
+
+total count filter (RNAseq data only)
+molecule filter is still available if someone wants it
+custom filter
+no CV filter, no imdanova filter, no rmd-pav filter
+total library size filter (to remove samples)? – call it "rna_filter"
+number unique genes with non-zero counts for each sample
+number of nonzero reads for each sample
+
+
+## Normalization & Statistical Comparisons
+
+Stats/normalization
+
+Give guidance/table with pros cons of the 3 methods
+User picks a method, then we show them the dispersion plot
+User says "ok looks fine, given me the stat results" or "nope. no good, I'll try another method"
+
+Plot of stat results - option for either volcano or MA plot, heat maps with option to subset to most significant molecules (based on p-value)
+
+
+## References
+

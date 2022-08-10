@@ -60,7 +60,7 @@ spiked in standard is desired. Here \code{metabolite_name} gives the name of
 the metabolite in e_data (and e_meta, if present) corresponding to the spiked
 in standard. If any samples have a missing value for this metabolite, an
 error is returned. \item specify \code{sample_property_cname}. This should be
-used when normalization to a sample property, such as concentration, is
+used when normalizing to a sample property, such as concentration, is
 desired. Here, \code{sample_property_cname} gives the name of the column in
 \code{f_data} which contains the property to use for normalization. If any
 samples have a missing value for this column, and error is returned. }

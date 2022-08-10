@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Bryan Stanfill, Kelly Stratton, Lisa Bramer" />
+
+<meta name="date" content="2022-08-08" />
+
+<title>Statistical Analysis with the pmartR Package</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  TeX: { equationNumbers: { autoNumber: "AMS" } }
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<style type="text/css">
+/* for pandoc --citeproc since 2.11 */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Statistical Analysis with the
+<code>pmartR</code> Package</h1>
+<h4 class="author">Bryan Stanfill, Kelly Stratton, Lisa Bramer</h4>
+<h4 class="date">2022-08-08</h4>
+
+
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>The <code>pmartR</code> package includes functions to analyze omics
+data using the most recent statistical methods. Qualitative and
+quantitative differences in abundance data are tested using the
+IMD-ANOVA method described in <span class="citation">Webb-Robertson et
+al. (2010)</span>. Our IMD-ANOVA functionality can handle omics datasets
+with various experimental designs, including up to two grouping factors
+with or without additional covariate information. The data can be paired
+or not.</p>
+<p>The functionality of the <code>pmartR</code> package will be
+illustrated with peptide data available from the <code>pmartRdata</code>
+package called <code>pep_object</code>. In a nutshell, the
+<code>pep_object</code> object is a list of length three of the class
+<code>pepData</code>. The <code>e_data</code> element contains all of
+the peptide abundance data, the <code>f_data</code> object contains
+sample information and the <code>e_meta</code> object contains meta
+information related to the peptides in the dataset. See the
+<code>?pmartRdata</code> for more on this data set.</p>
+<p>The <code>imd_anova()</code> function is a wrapper for the
+<code>anova_test()</code> and <code>imd_test()</code> functions. Below,
+descriptions of <code>anova_test()</code> and <code>imd_test()</code>
+functionality are followed by a description of <code>imd_anova()</code>
+functionality.</p>
+</div>
+<div id="analysis-of-variance" class="section level2">
+<h2>Analysis of Variance</h2>
+<p>Quantitative test for differential abundance of pan-omic data is
+accomplished using the function <code>anova_test()</code> which
+implements an analysis of variance (ANOVA) to each biomolecule. <a href="https://cran.r-project.org/web/packages/Rcpp/index.html"><code>Rcpp</code></a>
+is used to speed up computation (<span class="citation">Eddelbuettel
+(2013)</span>). Different ANOVA implementations are applied depending on
+the complexity of the supplied data. For example, if only two groups are
+supplied then ANOVA reduces to a two sample <span class="math inline">\(t\)</span>-test that assumes equal variance for
+the two groups. Alternatively, if two groups are present and a covariate
+correction is required then the effect of the covariates is removed
+using a reduced maximum likelihood approach. After the covariate
+correction is applied, a two-factor ANOVA is used to detect difference
+between all combinations of groups or between main effects as
+appropriate. Details on generalizations to these two approaches are
+given in the next two subsections.</p>
+<div id="one-group" class="section level3">
+<h3>One-group</h3>
+<p>If there is only one grouping factor and that factor has more than
+two levels, then a one-way ANOVA tests for quantitative differences
+between the groups. Let <span class="math inline">\(y_{ik}\)</span>
+represent the biomolecue abundance for observation <span class="math inline">\(k=1,\dots,n_i\)</span> in group <span class="math inline">\(i=1,\dots,m\)</span> on the log base 2 scale then
+we assume <span class="math display">\[\begin{equation}
+y_{ik}=\mu_i+e_{ik},
+\label{eq:one_group}
+\end{equation}\]</span> where <span class="math inline">\(\mu_i\)</span>
+represents the mean abundance of group <span class="math inline">\(i\)</span> (on the log-scale) and <span class="math inline">\(e_{ik}\)</span> are the error terms that are
+assumed to be independent and identically distributed (iid) according to
+the normal distribution with mean <span class="math inline">\(0\)</span>
+and variance <span class="math inline">\(\sigma^2\)</span>.</p>
+<p>The code below will group the peptide data by Condition, which is a
+categorical variable with two levels: “Infection” and “Mock”. Then the
+<code>anova_test</code> function fits the model described above and
+tests for differential abundance between Infection and Mock for every
+peptide.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pep_object <span class="ot">&lt;-</span> <span class="fu">group_designation</span>(<span class="at">omicsData =</span> pep_object, <span class="at">main_effects =</span> <span class="fu">c</span>(<span class="st">&quot;Condition&quot;</span>))</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>myfilt <span class="ot">&lt;-</span> <span class="fu">imdanova_filter</span>(<span class="at">omicsData =</span> pep_object)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>pep_object <span class="ot">&lt;-</span> <span class="fu">applyFilt</span>(<span class="at">filter_object =</span> myfilt, <span class="at">omicsData =</span> pep_object, <span class="at">min_nonmiss_anova =</span> <span class="dv">2</span>, <span class="at">min_nonmiss_gtest =</span> <span class="dv">3</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>all_pairwise_results <span class="ot">&lt;-</span> <span class="fu">anova_test</span>(<span class="at">omicsData =</span> pep_object)</span></code></pre></div>
+<p>The function <code>anova_test</code> returns a length four list. The
+first element is called <code>Results</code> which contains the best
+linear unbiased estimators of <span class="math inline">\(\mu_i\)</span>
+in the rows called <code>Mean_i</code> where <code>i</code> is replaced
+by the group name supplied as an attribute of the <code>omicsData</code>
+argument, an estimate <span class="math inline">\(\sigma^2\)</span> in
+the column <code>Variance</code>, the global <span class="math inline">\(F\)</span>-test statistic and <span class="math inline">\(p\)</span>-value in the <code>F_Statistic</code>
+and <code>p_value</code> columns, respectively. Because every group is
+assumed to have the same variance, <code>Variance</code> is the maximum
+likelihood estimators. The remaining three elements,
+<code>Fold_changes</code>, <code>Fold_change_pvalues</code> and
+<code>Flags</code>, contain the fold change estimates, <span class="math inline">\(p\)</span>-values and indicators of significance,
+respectively, for all pairwise comparisons of groups. Each column of the
+<code>Flags</code> element is a <span class="math inline">\(\pm1\)</span> or 0 depending on if that fold
+change was or was not statistically significant from zero, respectively,
+according to the <span class="math inline">\(p\)</span>-values contained
+in the <code>Fold_change_pvalues</code> <code>data.frame</code> and the
+specificed <span class="math inline">\(p\)</span>-value threshold set by
+the <code>pval_thresh</code> argument. A value of <span class="math inline">\(-1\)</span> implies the control group is
+significantly under expressed compared to the test group, and the
+converse is true for <span class="math inline">\(+1\)</span>.</p>
+<p>The <span class="math inline">\(p\)</span>-values associated with
+each group comparison can be adjusted to multiple comparisons. A
+detailed look at the available <span class="math inline">\(p\)</span>-value adjustment methods and when they
+should be applied are discussed later in this vignette, but the use of
+the Tukey multiple comparison method is illustrated in the
+following.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>all_pairwise_results_adjusted <span class="ot">&lt;-</span> <span class="fu">anova_test</span>(<span class="at">omicsData =</span> pep_object, <span class="at">pval_adjust =</span> <span class="st">&quot;Tukey&quot;</span>)</span></code></pre></div>
+<p>By default, all pairwise comparisons are made. Custom comparisons can
+by defined by passing a <code>data.frame</code> to the
+<code>comparisons</code> argument with column names “Test” and
+“Control”. In the below the, we modify the groupings to demonstrate use
+of all pairwise comparisons. Now, group “A” is treated as the control
+group and the remaining groups are compared to it.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>pep_object<span class="sc">$</span>f_data<span class="sc">$</span>Condition2 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="st">&quot;A&quot;</span>,<span class="dv">3</span>), <span class="fu">rep</span>(<span class="st">&quot;B&quot;</span>, <span class="dv">3</span>), <span class="fu">rep</span>(<span class="st">&quot;C&quot;</span>, <span class="dv">3</span>), <span class="fu">rep</span>(<span class="st">&quot;D&quot;</span>, <span class="dv">3</span>))</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>pep_object <span class="ot">&lt;-</span> <span class="fu">group_designation</span>(pep_object, <span class="at">main_effects =</span> <span class="st">&quot;Condition2&quot;</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>one_vs_all <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">Control=</span><span class="fu">rep</span>(<span class="st">&quot;A&quot;</span>,<span class="dv">3</span>),<span class="at">Test=</span><span class="fu">c</span>(<span class="st">&quot;B&quot;</span>,<span class="st">&quot;C&quot;</span>,<span class="st">&quot;D&quot;</span>))</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>one_vs_all_results <span class="ot">&lt;-</span> <span class="fu">anova_test</span>(<span class="at">omicsData =</span> pep_object, <span class="at">comparisons =</span> one_vs_all)</span></code></pre></div>
+<p>If the grouping variable has only two levels, <span class="math inline">\(m=2\)</span>, then a Welch’s <span class="math inline">\(t\)</span>-test is performed instead of an ANOVA.
+That is, the model defined in Equation (\ref{eq:one_group}) is still
+fit, but the two groups of the grouping factor are allowed to have
+different variances. In particular, the error terms <span class="math inline">\(e_{ik}\)</span> are assumed to be independently
+distributed according to the normal distribution with mean <span class="math inline">\(0\)</span> and variance <span class="math inline">\(\sigma^2_i\)</span>. To determine if the
+biomolecules are differentially expressed, <span class="math inline">\(p\)</span>-values are derived from a <span class="math inline">\(t\)</span>-distribution with degrees of freedom
+approximated by the Satterthwaite equation. The value for
+<code>Variance</code>, which is not a pooled variance estimates, scaled
+by the Satterthwaite approximate degrees of freedom. To illustrate this
+the data are grouped by Condition, then fit with
+<code>anova_test()</code>.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>pep_object <span class="ot">&lt;-</span> <span class="fu">group_designation</span>(<span class="at">omicsData =</span> pep_object, <span class="at">main_effects =</span> <span class="fu">c</span>(<span class="st">&quot;Condition&quot;</span>))</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>all_pairwise_results <span class="ot">&lt;-</span> <span class="fu">anova_test</span>(<span class="at">omicsData =</span> pep_object)</span></code></pre></div>
+<p>When this model is fit, it is imperative the researcher check the
+assumptions of the model. In particular for the <span class="math inline">\(m&gt;2\)</span> case, the residuals <span class="math inline">\(\hat e_{ik}=y_{ik}-\hat \mu_i\)</span> are assumed
+to be independent, normally distributed and have a common variance
+across groups. The appropriateness of this assumption can be assessed
+using quantile-quantile plots and comparisons of each group’s
+variance.</p>
+</div>
+<div id="two-groups" class="section level3">
+<h3>Two-groups</h3>
+<p>Next we consider the case where there are two grouping factors again
+in the context of biomolecule abundance. Let <span class="math inline">\(y_{ijk}\)</span> represent the biomolecule
+abundance for observation <span class="math inline">\(k=1,\dots,n_{ij}\)</span> in group <span class="math inline">\(i=1,\dots,m\)</span> and group <span class="math inline">\(j=1,\dots,p\)</span> on the log base 2 scale then
+we assume <span class="math display">\[\begin{equation}
+y_{ijk}=\mu_i+\alpha_j+\gamma_{ij}+e_{ijk},
+\label{eq:full_model}
+\end{equation}\]</span> where <span class="math inline">\(\mu_i+\alpha_j+\gamma_{ij}\)</span> represents the
+mean abundance for an observation in <span class="math inline">\(i\)</span>th first group and <span class="math inline">\(j\)</span>th second group which have marginal
+means <span class="math inline">\(\mu_i\)</span> and <span class="math inline">\(\alpha_j\)</span>, respectively. Finally, <span class="math inline">\(\gamma_{ij}\)</span> is the interaction effect of
+group <span class="math inline">\(ij\)</span>, and <span class="math inline">\(e_{ijk}\)</span> are the error terms that are
+assumed to be iid according to the normal distribution with mean <span class="math inline">\(0\)</span> and variance <span class="math inline">\(\sigma^2\)</span>.</p>
+<p>For each biomolecule, the <code>anova_test()</code> function
+automatically tests if the <span class="math inline">\(\gamma_{ij}\)</span> effect is statistically
+significant from zero using a full and reduced model <span class="math inline">\(F\)</span>-test. That is, in addition to the model
+above, the reduced model <span class="math display">\[\begin{equation}
+y_{ijk}=\mu_i+\alpha_j+e_{ijk}
+\label{eq:red_model}
+\end{equation}\]</span> is also fit and the test statistic <span class="math display">\[F^*=\frac{MSE_F}{(SSE_R-SSE_F)/(df_R-df_F)}\]</span>
+is computed where <span class="math inline">\(MSE_\cdot\)</span> and
+<span class="math inline">\(df_\cdot\)</span> are the mean square error
+and degrees of freedom for the full (F; \ref{eq:full_model}) or reduced
+(R; \ref{eq:red_model}) model, respectively. A <span class="math inline">\(p\)</span>-value is computed based on <span class="math inline">\(F^*\)</span> as <span class="math inline">\(p=P(F^*&gt;F_{a,b})\)</span> where <span class="math inline">\(F_{a,b}\)</span> is compared to an <span class="math inline">\(F\)</span> distribution with degrees of freedom
+<span class="math inline">\(a=df_F\)</span> and <span class="math inline">\(b=df_R-df_F\)</span>. If <span class="math inline">\(p&lt;0.05\)</span> then there is significant
+evidence to reject the null hypothesis that the reduced model
+\eqref{eq:red_model} is adequate and the full model
+\eqref{eq:full_model} is used to test for group differences. Conversely,
+if <span class="math inline">\(p\geq 0.05\)</span> then there is not
+enough evidence to reject the null hypothesis and the reduced model
+\eqref{eq:red_model} is used.</p>
+<p>Regardless of if the full or reduced model is used, both assume that
+the residuals are independent and normally distributed with a common
+variance for all groups. These assumptions must be checked before the
+results of the model are used to assess differential abundance.</p>
+</div>
+<div id="covariate-adjustment" class="section level3">
+<h3>Covariate adjustment</h3>
+<p>If, in addition to a single grouping factor, there are covariates
+that are to be accounted for when testing for differential abundance
+then a linear model of the form <span class="math display">\[\begin{equation}
+y_{ik}=\mu_i+\mathbf{x}_{ik}^\top \beta +u_{ik}
+\label{eq:covar_adj}
+\end{equation}\]</span> is fit to the transformed abundance data <span class="math inline">\(y_{ik}\)</span> where <span class="math inline">\(\mu_i\)</span> is the marginal mean of group <span class="math inline">\(i\)</span>, <span class="math inline">\(\mathbf{x}_{ik}\)</span> is a vector of covariates
+for observation <span class="math inline">\(k\)</span> in group <span class="math inline">\(i\)</span>, <span class="math inline">\(\mathbf{\beta}\)</span> is the corresponding
+vector of parameters to be estimated and <span class="math inline">\(u_{ik}\)</span> are the error terms. An analogous
+model can be fit when there are two grouping factors of interest. If one
+of the covariates is colinear with a grouping variable then that
+covariate is removed from the model, that is, priority is given to the
+grouping variable over the covariate.</p>
+<p>In practice, the covariate adjustment is applied then the one-factor
+ANOVA model is fit to the covariate adjusted data. That is, after the
+vector of parameters <span class="math inline">\(\mathbf{\beta}\)</span>
+in <span class="math inline">\(\eqref{eq:cover_adj}\)</span> is
+estimated, the response <span class="math inline">\(y_{ik}\)</span> in
+<span class="math inline">\(\eqref{eq:one_group}\)</span> is replaced
+with <span class="math inline">\(y_{ik}^*=y_{ik}-\mathbf{x}_{ik}^\top\mathbf{\beta}\)</span>.
+Though this results in the marginal group means <span class="math inline">\(\mu_i\)</span> being estimated multiple times, it
+makes the workflow smoother.</p>
+</div>
+</div>
+<div id="test-for-independence-of-missing-data" class="section level2">
+<h2>Test for Independence of Missing Data</h2>
+<p>In the event that there aren’t enough data to test for a quantitative
+difference in abundance between groups, one could still test for a
+<em>qualitative</em> difference in groups using the independence of
+missing data (IMD) test. This is often the case for proteomics data
+where several peptide or proteins could have missing data for one of
+several reasons. The idea is to assess if there are more missing data in
+one group compared to another. If there are an adequate number of
+non-missing data available, then the <span class="math inline">\(chi^2\)</span> test of independence can be used.
+This assumption often fails, however, so a modified version of the <span class="math inline">\(chi^2\)</span> test, called the <span class="math inline">\(G\)</span>-test, should be used.</p>
+<p>The test statistic associated with the IMD test for each biomolecule
+is given by <span class="math display">\[\begin{equation}
+G=2\sum_{k=1}^K\left[C_{Ok}\ln\left(\frac{C_{Ok}}{E_{Ok}}\right)+C_{Ak}\ln\left(\frac{C_{Ak}}{E_{Ak}}\right)
+\right]
+\label{eq:gtest}
+\end{equation}\]</span> where <span class="math inline">\(C_{Ok}\)</span> and <span class="math inline">\(E_{Ok}\)</span> are the observed and expected
+number of non-missing values for group <span class="math inline">\(k\)</span>, respectively. The quantities <span class="math inline">\(C_{Ak}\)</span> <span class="math inline">\(E_{Ak}\)</span> are similarly defined for the
+missing (absent) values. Further, the expected number of non-missing
+values is <span class="math inline">\(E_{Ok}=(m_On_k)/N\)</span> where
+<span class="math inline">\(n_k\)</span> is the number of samples
+associated with group <span class="math inline">\(k\)</span>, <span class="math inline">\(N\)</span> is the total number of samples and
+<span class="math inline">\(m_O\)</span> is the number of samples with
+this biomolecule missing.</p>
+<p>The function <code>imd_test()</code> will perform the test for
+missing data. The arguments passed to <code>imd_test()</code> are the
+same as those for <code>anova_test()</code> and the results object
+returned by <code>imd_test()</code> is of the same class as
+<code>anova_test()</code>. A list of four items is returned:</p>
+<ol style="list-style-type: decimal">
+<li><code>Results</code> - the results of the global IMD test, including
+biomolecue identifier, count of observed and missing observations, the
+<span class="math inline">\(G\)</span>-statistic and corresponding <span class="math inline">\(p\)</span>-value. This “global” <span class="math inline">\(G\)</span>-statistic determines if there is a
+qualitative difference between any of the groups.</li>
+<li><code>Gstats</code> - <span class="math inline">\(G\)</span>-statistics computed for each of the
+comparisons defined by the <code>comparison</code> argument</li>
+<li><code>Pvalues</code> - <span class="math inline">\(p\)</span>-values
+associated with the <span class="math inline">\(G\)</span>-statistics in
+the <code>Gstats</code> <code>data.frame</code></li>
+<li><code>Flags</code> - Flags (<span class="math inline">\(\pm
+2\)</span>) to indicate for which biomoleuces the groups are qualitative
+different as measured by the IMD test. A positive value indicates the
+control group had more missing data than the test group; the opposite is
+true for negative flags.</li>
+</ol>
+</div>
+<div id="imd-anova-test-for-differential-abundance" class="section level2">
+<h2>IMD-ANOVA Test for Differential Abundance</h2>
+<p>The <code>imd_anova()</code> function is used to implement the IMD
+test, ANOVA test, or combined IMD-ANOVA test. If the combined test is
+implemented, then the IMD and ANOVA tests are implemented using
+<code>imd_test()</code> and <code>anova_test()</code>, respectively,
+then the results combined such that the ANOVA results are given priority
+because the ANOVA results are widely preferred, but IMD results are
+preferred to nothing.</p>
+<ul>
+<li>For reporting p-values when combining the IMD and ANOVA tests,
+<ul>
+<li>If ANOVA p-value but no g-test p-value, report ANOVA p-value</li>
+<li>If g-test p-value but no ANOVA p-value, report g-test p-value</li>
+<li>If neither, report NA</li>
+<li>If both but neither is significant, report ANOVA</li>
+<li>If both but ANOVA is significant, report ANOVA</li>
+<li>If both but g-test is significant, report g-test</li>
+</ul></li>
+</ul>
+<p>The same decision process is applied to the final flags as well.</p>
+<div id="output" class="section level3">
+<h3>Output</h3>
+<p>The <code>imd_anova()</code> function returns an object of class
+<code>statRes</code> that is a list of three items in addition to some
+attributes. The list is comprised of:</p>
+<ol style="list-style-type: decimal">
+<li><code>Full_Results</code> - a <code>data.frame</code> with columns
+for the group means, group counts of non missing data, an estimate of
+the common variance and a few other things (<em>update when this is
+finalize</em>).<br />
+</li>
+<li><code>Flags</code> - a <code>data.frame</code> of flags that
+indicate which biomolecules were significant at the specified <span class="math inline">\(p\)</span>-value threshold
+(<code>pval_thresh</code>) for each comparison.<br />
+</li>
+<li><code>P_values</code> - a <code>data.frame</code> that contains the
+<span class="math inline">\(p\)</span>-values associated with each
+biomolecule and comparison evaluated.</li>
+</ol>
+<p>The <code>statRes</code> object also consists of several attributes
+which specify the methods used to arrive at the results. This way, the
+results object is self-contained and can be passed to other functions
+for further analysis with ease. In particular, the attributes are</p>
+<ul>
+<li><code>group_DF</code> - <code>data.frame</code> defining which
+samples are associated with which groups</li>
+<li><code>comparisons</code> - <code>data.frame</code> defining the
+comparisons that were tested</li>
+<li><code>number_significant</code> - <code>data.frame</code> giving the
+number of significant biomolecules (up and down) for each
+comparison</li>
+<li><code>statistical_test</code> - character string giving the
+statistical test(s) run</li>
+<li><code>adjustment_method</code> - character string giving the
+adjustment for multiple comparisons that was used; NA if none was
+used</li>
+<li><code>pval_thresh</code> - the numeric value that was an input to
+<code>anova_test()</code></li>
+</ul>
+<p>Several methods are defined for objects of class <code>statRes</code>
+including <code>summary()</code>, <code>print()</code> and
+<code>plot()</code>, which are discussed more in depth in a later
+section.</p>
+</div>
+<div id="methods-for-results-objects" class="section level3">
+<h3>Methods for Results Objects</h3>
+<p>Special functions are available for objects of class
+<code>statRes</code> including <code>print()</code>,
+<code>summary()</code> and <code>plot()</code>. Due to the typical size
+the <code>statRes</code> objects, only the head of each element in a
+<code>statRes</code> object is printed along with the summarized
+attributes; use <code>print.default()</code> to see the full object. The
+<code>summary()</code> functions prints the type of test that was run,
+any adjustments that were made, the <span class="math inline">\(p\)</span>-value threshold used to define
+significance and a table that summarizes the number of significant
+biomolecules (up or down) for each comparison. See below for an
+illustration.</p>
+<p>The <code>plot()</code> function can be used to produce any subset of
+the following four plots specified by the <code>plot_type</code>
+argument. If not <code>plot_type</code> is supplied, then all four are
+created, otherwise on the subset specified is produced.</p>
+<ul>
+<li><code>&quot;bar&quot;</code> - shows the number of significant biomolecules
+grouped by comparisons</li>
+<li><code>&quot;volcano&quot;</code> - a plot of the <span class="math inline">\(p\)</span>-value by the fold-change estimate
+differentiated by test and faceted by comparison</li>
+<li><code>&quot;heatmap&quot;</code> - illustrates the fold changes for the
+statistically significant biomolecules (only available if more than one
+comparison is done)</li>
+</ul>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>stat_results <span class="ot">&lt;-</span> <span class="fu">imd_anova</span>(<span class="at">omicsData =</span> pep_object, <span class="at">test_method =</span> <span class="st">&quot;combined&quot;</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(stat_results)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(stat_results)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(stat_results)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(stat_results, <span class="at">plot_type =</span> <span class="st">&quot;volcano&quot;</span>)</span></code></pre></div>
+<p>##<span class="math inline">\(p\)</span>-value Adjustment Methods</p>
+<p>If several comparisons are being made then it is a good idea to
+adjust the <span class="math inline">\(p\)</span>-values in order to
+control the false positive rate. Currently <span class="math inline">\(p\)</span>-value adjustments are made at the
+biomolecule level (i.e., adjustments are made for the number of groups
+being compared), but adjustments across biomolecules will be added in
+the near future. The available <span class="math inline">\(p\)</span>-value adjustments are described in the
+following table. The “Appropriate Comparison” column refers to which
+correction method is preferred based on the type of comparisons being
+made, i.e, all pairwise or case-to-control. Check marks in the “ANOVA?”
+and “IMD?” columns indicate if that correction method is appropriate for
+ANOVA or IMD comparisons.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Method Name</th>
+<th>Appropriate Comparison</th>
+<th>ANOVA</th>
+<th>IMD</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Bonferroni</td>
+<td>Both</td>
+<td><span class="math inline">\(\sqrt{}\)</span></td>
+<td><span class="math inline">\(\sqrt{}\)</span></td>
+</tr>
+<tr class="even">
+<td>Dunnett</td>
+<td>Case-vs-control</td>
+<td><span class="math inline">\(\sqrt{}\)</span></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Holm</td>
+<td>Both</td>
+<td><span class="math inline">\(\sqrt{}\)</span></td>
+<td><span class="math inline">\(\sqrt{}\)</span></td>
+</tr>
+<tr class="even">
+<td>Tukey</td>
+<td>All pairwise</td>
+<td><span class="math inline">\(\sqrt{}\)</span></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="references" class="section level2 unnumbered">
+<h2 class="unnumbered">References</h2>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-rcpp_book" class="csl-entry">
+Eddelbuettel, Dirk. 2013. <em>Seamless <span>R</span> and
+<span>C++</span> Integration with <span>Rcpp</span></em>. New York:
+Springer.
+</div>
+<div id="ref-webb2010combined" class="csl-entry">
+Webb-Robertson, Bobbie-Jo M, Lee Ann McCue, Katrina M Waters, Melissa M
+Matzke, Jon M Jacobs, Thomas O Metz, Susan M Varnum, and Joel G Pounds.
+2010. <span>“Combined Statistical Analyses of Peptide Intensities and
+Peptide Occurrences Improves Identification of Significant Peptides from
+MS-Based Proteomics Data.”</span> <em>Journal of Proteome Research</em>
+9 (11): 5748–56.
+</div>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

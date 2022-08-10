@@ -15,7 +15,8 @@ bibliography: pmartRstat_lit.bib
 ---
 
 ```{r global_options, include = FALSE}
-knitr::opts_chunk$set(warning=FALSE, message = FALSE, fig.width = 10, fig.height = 8)
+knitr::opts_chunk$set(warning=FALSE, message = FALSE, fig.width = 10, fig.height = 8, eval = FALSE)
+options(rmarkdown.html_vignette.check_title = FALSE)
 ```
 
 ```{r setup,include=FALSE,warning=FALSE}

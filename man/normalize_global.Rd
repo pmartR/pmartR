@@ -69,12 +69,12 @@ Below are details for specifying function and parameter options.
   normalization factors. The following are valid options: "all", "los",
   "ppp", "complete", "rip", and "ppp_rip". The option "all" is the subset
   that includes all features (i.e. no subsetting is done). The option "los"
-  identifies the subset of the features associated with the top \code{L},
-  where \code{L} is a proportion between 0 and 1, order statistics.
+  identifies the subset of the features associated with the top \code{L} order statistics,
+  where \code{L} is a proportion between 0 and 1.
   Specifically, the features with the top \code{L} proportion of highest
   absolute abundance are retained for each sample, and the union of these
   features is taken as the subset identified (Wang et al., 2006). The option
-  "ppp" (orignally stands for percentage of peptides present) identifies the
+  "ppp" (originally stands for percentage of peptides present) identifies the
   subset of features that are present/non-missing for a minimum
   \code{proportion} of samples (Karpievitch et al., 2009; Kultima et al.,
   2009). The option "complete" retains molecules with no missing data across
@@ -97,7 +97,7 @@ Below are details for specifying function and parameter options.
   data. There are no scale estimates for median centering. Parameters for
   mean centering are calculated if "mean" is specified. The location
   estimates are the sample-wise means of the subset data. There are no scale
-  estimates for median centering. Parameters for z-score transformation are
+  estimates for mean centering. Parameters for z-score transformation are
   calculated if "zscore" is specified. The location estimates are the subset
   means for each sample. The scale estimates are the subset standard
   deviations for each sample. Parameters for median absolute deviation (MAD)
