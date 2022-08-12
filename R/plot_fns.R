@@ -2935,6 +2935,12 @@ plot.proteomicsFilt <- function (filter_obj,
 #'   If specified, the plot function produces a boxplot instead of a
 #'   scatterplot. A point, colored by sample, will be placed on each boxplot for
 #'   that sample's value for the given metric. The default value is NULL.
+#' @param order_by A character string specifying a variable by which to order
+#'   the samples in the plot. This variable must be found in the column names of
+#'   fdata from the rmdFilt object. If \code{order_by} is "Group", the plot will
+#'   be ordered by the group variable from the group_designation function. If
+#'   NULL (default), the samples will be displayed in the order in which they
+#'   first appear.
 #'
 #' @param interactive Logical. If TRUE produces an interactive plot.
 #' @param x_lab A character string specifying the x-axis label.
@@ -2968,11 +2974,12 @@ plot.proteomicsFilt <- function (filter_obj,
 #' @export
 #'
 plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
-                          interactive = FALSE, x_lab = NULL, y_lab = NULL,
-                          x_lab_size = 11, y_lab_size = 11, x_lab_angle = 90,
-                          title_lab = NULL, title_lab_size = 14,
-                          legend_lab = NULL, legend_position = "right",
-                          point_size = 3, bw_theme = TRUE, palette = NULL,
+                          order_by = NULL, interactive = FALSE, x_lab = NULL,
+                          y_lab = NULL, x_lab_size = 11, y_lab_size = 11,
+                          x_lab_angle = 90, title_lab = NULL,
+                          title_lab_size = 14, legend_lab = NULL,
+                          legend_position = "right", point_size = 3,
+                          bw_theme = TRUE, palette = NULL,
                           use_VizSampNames = FALSE) {
 
   # Preliminaries --------------------------------------------------------------
@@ -2997,6 +3004,24 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
 
       # INCONCEIVABLE!!!
       stop ("palette must be an RColorBrewer palette")
+
+    }
+
+  }
+
+  # Check if order_by is present. If it is additional checks need to be
+  # performed to make sure it is a valid input.
+  if (!is.null(order_by)) {
+
+    # Make sure order_by is either "Group" or is in f_data.
+    if (order_by != "Group" &&
+        !(order_by %in% names(attr(filter_obj, "fdata")))) {
+
+      # Your plot is only mostly dead! There is still a slim hope that you can
+      # save it.
+      stop (paste("order_by must either be 'Group' or the name of a column",
+                  "from f_data.",
+                  sep = " "))
 
     }
 
@@ -3070,8 +3095,42 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
 
   # Assemble captivating plots -------------------------------------------------
 
-  # Create plot skeleton that will be filled in depending on the input to the
-  # pvalue_threshold argument.
+  # Order the samples according to the order_argument. If order_by is not
+  # provided order the samples according to the order they appear in the filter
+  # object.
+  if (!is.null(order_by)) {
+
+    if (order_by == "Group") {
+
+      # Order the samples by the Group column from group_DF.
+      filter_obj[[samp_id]] <- factor(
+        filter_obj[[samp_id]],
+        levels = filter_obj[[samp_id]][order(attr(filter_obj,
+                                                  "group_DF")$Group)],
+        ordered = TRUE
+      )
+
+    } else {
+
+      # Order the samples by the specified column from f_data.
+      filter_obj[[samp_id]] <- factor(
+        filter_obj[[samp_id]],
+        levels = filter_obj[[samp_id]][order(attr(filter_obj,
+                                                  "fdata")[[order_by]])],
+        ordered = TRUE
+      )
+
+    }
+
+  } else {
+
+    # Order the data in the order the samples appear in the samp_id column.
+    filter_obj[[samp_id]] <- factor(
+      filter_obj[[samp_id]]
+    ) %>%
+      forcats::fct_inorder()
+
+  }
 
   # Beautiful box plots ---------------
 
@@ -3116,7 +3175,7 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
 
       p <- p +
         ggplot2::geom_point(
-          ggplot2::aes(x = forcats::fct_inorder(!!rlang::sym(samp_id)),
+          ggplot2::aes(x = !!rlang::sym(samp_id),
                        y = Log2.md,
                        color = !!rlang::sym(main_eff_names[1])),
           size = point_size
@@ -3128,7 +3187,7 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
 
       p <- p +
         ggplot2::geom_point(
-          ggplot2::aes(x = forcats::fct_inorder(!!rlang::sym(samp_id)),
+          ggplot2::aes(x = !!rlang::sym(samp_id),
                        y = Log2.md,
                        color = !!rlang::sym(main_eff_names[1]),
                        shape = !!rlang::sym(main_eff_names[2])),
@@ -3240,20 +3299,20 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
 
     # Start scatter plot skeleton when a p-value threshold has been provided.
     if (length(main_eff_names) == 1) {
-      
+
       # we need separate plots for if we have pair id or not
-      
+
       if (!is.null(attr(attr(filter_obj, "group_DF"), "pair_id"))) {
         # if !null then we need to include pair fill information
         p <- p +
           ggplot2::geom_point(
             ggplot2::aes(
-              x = forcats::fct_inorder(!!rlang::sym(samp_id)),
+              x = !!rlang::sym(samp_id),
               y = Log2.md,
               col = !!rlang::sym(main_eff_names),
               # Add a fill layer that will not affect how the plot looks. This
-              # layer is used to create a legend when one sample from a pair is an
-              # outlier but the other sample belonging to the pair is not.
+              # layer is used to create a legend when one sample from a pair is
+              # an outlier but the other sample belonging to the pair is not.
               fill = "Removed because paired with outlier"
             ),
             alpha = ifelse(goodies_alpha, 1, 0.5),
@@ -3265,7 +3324,7 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
         p <- p +
           ggplot2::geom_point(
             ggplot2::aes(
-              x = forcats::fct_inorder(!!rlang::sym(samp_id)),
+              x = !!rlang::sym(samp_id),
               y = Log2.md,
               col = !!rlang::sym(main_eff_names)
             ),
@@ -3281,27 +3340,28 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
         p <- p +
           ggplot2::geom_point(
             ggplot2::aes(
-              x = forcats::fct_inorder(!!rlang::sym(samp_id)),
+              x = !!rlang::sym(samp_id),
               y = Log2.md,
               col = !!rlang::sym(main_eff_names[1]),
               shape = !!rlang::sym(main_eff_names[2]),
               # Add a fill layer that will not affect how the plot looks. This
-              # layer is used to create a legend when one sample from a pair is an
-              # outlier but the other sample belonging to the pair is not.
+              # layer is used to create a legend when one sample from a pair is
+              # an outlier but the other sample belonging to the pair is not.
               fill = "Removed because paired with outlier"
             ),
             alpha = ifelse(goodies_alpha, 1, 0.5),
-            # Make guilty-by-association points really small because we will plot
-            # a square point over them with the next lines of code. We don't want
-            # the edges of a circle or triangle peeking out from behind a square.
-            # That would make a hideous and confusing plot if that happened.
+            # Make guilty-by-association points really small because we will
+            # plot a square point over them with the next lines of code. We
+            # don't want the edges of a circle or triangle peeking out from
+            # behind a square. That would make a hideous and confusing plot if
+            # that happened.
             size = ifelse(goodies_pch, 0, point_size)
           ) +
-          # Add another layer of points with guilty-by-association samples plotted
-          # as a square.
+          # Add another layer of points with guilty-by-association samples
+          # plotted as a square.
           ggplot2::geom_point(
             ggplot2::aes(
-              x = forcats::fct_inorder(!!rlang::sym(samp_id)),
+              x = !!rlang::sym(samp_id),
               y = Log2.md,
               col = !!rlang::sym(main_eff_names[1])
             ),
@@ -3313,23 +3373,24 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
         p <- p +
           ggplot2::geom_point(
             ggplot2::aes(
-              x = forcats::fct_inorder(!!rlang::sym(samp_id)),
+              x = !!rlang::sym(samp_id),
               y = Log2.md,
               col = !!rlang::sym(main_eff_names[1]),
               shape = !!rlang::sym(main_eff_names[2])
             ),
             alpha = ifelse(goodies_alpha, 1, 0.5),
-            # Make guilty-by-association points really small because we will plot
-            # a square point over them with the next lines of code. We don't want
-            # the edges of a circle or triangle peeking out from behind a square.
-            # That would make a hideous and confusing plot if that happened.
+            # Make guilty-by-association points really small because we will
+            # plot a square point over them with the next lines of code. We
+            # don't want the edges of a circle or triangle peeking out from
+            # behind a square. That would make a hideous and confusing plot if
+            # that happened.
             size = ifelse(goodies_pch, 0, point_size)
           ) +
-          # Add another layer of points with guilty-by-association samples plotted
-          # as a square.
+          # Add another layer of points with guilty-by-association samples
+          # plotted as a square.
           ggplot2::geom_point(
             ggplot2::aes(
-              x = forcats::fct_inorder(!!rlang::sym(samp_id)),
+              x = !!rlang::sym(samp_id),
               y = Log2.md,
               col = !!rlang::sym(main_eff_names[1])
             ),
@@ -4483,7 +4544,7 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
     } else {
 
       # Use the original group_DF attribute for ordering the samples. This
-      # occurs when order_by = "group_DF".
+      # occurs when order_by = "Group".
       orderDF <- groupDF
 
     }
