@@ -27,7 +27,7 @@ Perform quantile normalization
 \details{
 Quantile normalization is an algorithm for normalizing a set of data
   vectors by giving them the same distribution. It is applied to data on the
-  abundance scale (e.g. not a log scale). It is often used for microarry
+  abundance scale (e.g. not a log scale). It is often used for microarray
   data.
 }
 \examples{
@@ -39,7 +39,10 @@ norm_data <- normalize_quantile(omicsData = lipid_object)
 
 }
 \references{
-
+Bolstad, B. M., Irizarry, R. A., Åstrand, M., & Speed, T. P.
+  (2003). A comparison of normalization methods for high density
+  oligonucleotide array data based on variance and bias. Bioinformatics,
+  19(2), 185-193.
 }
 \author{
 Kelly Stratton
