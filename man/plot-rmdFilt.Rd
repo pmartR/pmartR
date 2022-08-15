@@ -8,6 +8,7 @@
   filter_obj,
   pvalue_threshold = NULL,
   sampleID = NULL,
+  order_by = NULL,
   interactive = FALSE,
   x_lab = NULL,
   y_lab = NULL,
@@ -40,6 +41,13 @@ nothing. Default value is NULL.}
 If specified, the plot function produces a boxplot instead of a
 scatterplot. A point, colored by sample, will be placed on each boxplot for
 that sample's value for the given metric. The default value is NULL.}
+
+\item{order_by}{A character string specifying a variable by which to order
+the samples in the plot. This variable must be found in the column names of
+fdata from the rmdFilt object. If \code{order_by} is "Group", the plot will
+be ordered by the group variable from the group_designation function. If
+NULL (default), the samples will be displayed in the order in which they
+first appear.}
 
 \item{interactive}{Logical. If TRUE produces an interactive plot.}
 
