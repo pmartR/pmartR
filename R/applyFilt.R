@@ -95,13 +95,13 @@ applyFilt <- function (filter_object, omicsData, ...) {
 
   # check that filter_object is of an appropriate class#
   if (!inherits(filter_object, c("cvFilt", "proteomicsFilt", "moleculeFilt",
-                                 "rmdFilt", "imdanovaFilt", "customFilt", 
-                                 "totalCountFilt"))) {
+                                 "RNAFilt", "rmdFilt", "imdanovaFilt", 
+                                 "customFilt", "totalCountFilt"))) {
 
     # Throw an error for unholy argument specification.
     stop (paste("filter_object must be of  'cvFilt', 'proteomicsFilt',",
                 "'moleculeFilt', 'rmdFilt', 'imdanovaFilt', 'customFilt',", 
-                "or 'totalCountFilt'.",
+                "'RNAFilt', or 'totalCountFilt'.",
                 sep = " "))
 
   }
@@ -453,12 +453,12 @@ applyFilt.RNAFilt <- function(filter_object, omicsData,
   if(!is.null(size_library) && 
      (length(size_library) > 1 || 
       size_library%%1 != 0 ||
-      size_library > max(filter_obj$LibrarySize)
+      size_library > max(filter_object$LibrarySize)
      )
   ) stop(
     paste0(
       "size_library must be integer of length 1 less than max library size (",
-      max(filter_obj$LibrarySize),
+      max(filter_object$LibrarySize),
       ")"
     )
   )
@@ -474,18 +474,18 @@ applyFilt.RNAFilt <- function(filter_object, omicsData,
       "min_nonzero must be integer or numeric between 0 and 1.")
     
     ## Within appropriate bounds
-    if(min_nonzero%%1 == 0 && min_nonzero > max(filter_obj$NonZero)) stop(
+    if(min_nonzero%%1 == 0 && min_nonzero > max(filter_object$NonZero)) stop(
       paste0("min_nonzero exceeds maximum number of non-zero biomolecules (",
-             max(filter_obj$NonZero),
+             max(filter_object$NonZero),
              ")"
       )
     )
     
     if(min_nonzero%%1 != 0 && 
-       min_nonzero > max(filter_obj$ProportionNonZero)) stop(
+       min_nonzero > max(filter_object$ProportionNonZero)) stop(
          paste0(
            "min_nonzero exceeds maximum proportion of non-zero biomolecules (",
-           signif(max(filter_obj$ProportionNonZero)), 
+           signif(max(filter_object$ProportionNonZero)), 
            ")")
        )
     
@@ -495,10 +495,7 @@ applyFilt.RNAFilt <- function(filter_object, omicsData,
   # Prepare the information needed to filter the data --------------------------
   
   # Extract the column number containing the identifiers.
-  id_col <- which(names(omicsData$e_data) == get_edata_cname(omicsData))
-  
-  browser()
-  
+  id_col <- which(names(omicsData$f_data) == get_fdata_cname(omicsData))
   inds <- c()
   
   if(!is.null(min_nonzero)){
@@ -506,38 +503,38 @@ applyFilt.RNAFilt <- function(filter_object, omicsData,
     column_use <- ifelse(min_nonzero%%1 == 0, 
                          "NonZero", "ProportionNonZero")
     mnz <- filter_object[[column_use]] >= min_nonzero
-  } 
+  } else mnz <- rep(TRUE, nrow(filter_object))
   
   if(!is.null(size_library)){
     sl <- filter_object[["LibrarySize"]] >= size_library
-  }
+  } else sl <- rep(TRUE, nrow(filter_object))
   
   # Sniff out the indices that fall below the threshold.
-  inds <- which(filter_object$Total_Counts < min_count)
+  inds <- which(!Reduce("&", list(mnz, sl)))
   
-  # Compute the length of the inds vector and specify filter.edata accordingly.
+  # Compute the length of the inds vector and specify filter.fdata accordingly.
   if (length(inds) < 1) {
     
-    # Set filter.edata to NULL because no rows in omicsData$e_data will be
+    # Set filter.fdata to NULL because no rows in omicsData$f_data will be
     # filtered out.
-    filter.edata <- NULL
+    filter.fdata <- NULL
     
   } else {
     
     # Fish out the identifiers that will be filtered.
-    filter.edata <- omicsData$e_data[, id_col][inds]
+    filter.fdata <- filter_object[, id_col][inds]
     
   }
   
   # Create a list that is used in the pmartR_filter_worker function.
-  filter_object_new <- list(e_data_remove = filter.edata,
+  filter_object_new <- list(e_data_remove = NULL,
                             e_meta_remove = NULL,
-                            f_data_remove = NULL)
+                            f_data_remove = filter.fdata)
   
   # Filter the data and update the attributes ----------------------------------
   
   # call the function that does the filter application
-  results_pieces <- pmartR_filter_worker(filter_object = filter_object_new,
+  results_pieces <- pmartR:::pmartR_filter_worker(filter_object = filter_object_new,
                                          omicsData = omicsData)
   
   # Update the omicsData data frames.
@@ -595,8 +592,8 @@ applyFilt.RNAFilt <- function(filter_object, omicsData,
   # Update the filters attribute.
   attr(omicsData, 'filters')[[n_filters]] <- set_filter(
     type = class(filter_object)[[1]],
-    threshold = min_count,
-    filtered = filter.edata,
+    threshold = list(size_library = size_library, min_nonzero = min_nonzero),
+    filtered = filter.fdata,
     method = NA
   )
   

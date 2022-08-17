@@ -6,7 +6,6 @@
 \usage{
 \method{plot}{statRes}(
   x,
-  omicsData = NULL,
   plot_type = "bar",
   fc_threshold = NULL,
   fc_colors = c("red", "black", "green"),
@@ -29,15 +28,11 @@
   bw_theme = TRUE,
   display_count = TRUE,
   custom_theme = NULL,
-  top_n = NULL,
-  cluster = NULL
+  cluster = F
 )
 }
 \arguments{
 \item{x}{`statRes` object to be plotted, usually the result of `imd_anova`}
-
-\item{omicsData}{`omicsData` object to be plotted, usually the result of wrapper 
-functions. Only applicable for "fcheatmap" using seqData results.}
 
 \item{plot_type}{defines which plots to be produced, options are "bar",
 "volcano", "gheatmap", "fcheatmap"; defaults to "bar".  See details for
@@ -109,12 +104,10 @@ be displayed on the bar plot. The default is TRUE.}
 \item{custom_theme}{a ggplot `theme` object to be applied to non-interactive
 plots, or those converted by plotly::ggplotly().}
 
-\item{top_n}{numeric integer for heatmaps; defaults to NULL except for 
-seqData statistics, where default is 100. Reccommended for many biomolecules. 
-Maximum = 100.}
+\item{cluster}{logical for heatmaps; T will cluster biomolecules on X axis.
+defaults to T for seqData statistics and F for all others.}
 
-\item{cluster}{logical for seqData stats heatmaps only; T will cluster 
-biomolecules on X axis. Defaults to T for seqData statistics.}
+\item{top_n}{numeric for heatmaps; defaults to NULL.}
 }
 \description{
 Produces plots that summarize the results contained in a `statRes` object.

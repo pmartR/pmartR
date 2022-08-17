@@ -2490,7 +2490,6 @@ plot.RNAFilt <- function (filter_obj, plot_type = "library",
   
   # Forge sensational plots ----------------------------------------------------
   
-  filter_obj
   ## Set labels
   xlabel <- if (is.null(x_lab)) "SampleID" else x_lab
   plot_title <- ifelse(is.null(title_lab), "Library Size by Sample", title_lab)
@@ -2527,28 +2526,33 @@ plot.RNAFilt <- function (filter_obj, plot_type = "library",
   
   # Use the ColorBrewer color
   values <- if (!is.null(palette)) {
-    RColorBrewer::brewer.pal(5, palette)[[3]]
+    RColorBrewer::brewer.pal(5, palette)[2, 4]
   } else {
-    "deepskyblue3"
+    c(Keep = "deepskyblue3", Remove = "tomato")
   }
   
   temp_obj <- filter_obj
+  temp_obj$keep_nz <- T
+  temp_obj$keep_sz <- T
+  
   if(!is.null(min_nonzero)){
     
     column_use <- ifelse(min_nonzero%%1 == 0, 
                          "NonZero", "ProportionNonZero")
-    temp_obj <- temp_obj[temp_obj[[column_use]] >= min_nonzero,]
+    temp_obj$keep_nz <- temp_obj[[column_use]] >= min_nonzero
   }
   
   if(!is.null(size_library)){
-    temp_obj <- temp_obj[temp_obj[["LibrarySize"]] >= size_library,]
+    temp_obj$keep_sz <- temp_obj[["LibrarySize"]] >= size_library
   }
   
+  temp_obj$color <- as.character(Reduce("&", list(temp_obj$keep_nz, temp_obj$keep_sz)))
+  temp_obj$color <- gsub("FALSE", "Remove", gsub("TRUE", "Keep",  temp_obj$color))
   
   # Plot
   if(plot_type == "library"){
     p <- ggplot2::ggplot(
-      temp_obj, ggplot2::aes(x=SampleID, y = LibrarySize, fill = "")) + 
+      temp_obj, ggplot2::aes(x=SampleID, y = LibrarySize, fill = color)) + 
       ggplot2::geom_col(show.legend = F) +
       ggplot2::scale_fill_manual(
         name = legend_lab,
@@ -2557,13 +2561,19 @@ plot.RNAFilt <- function (filter_obj, plot_type = "library",
       ggplot2::labs(title = plot_title, 
                     subtitle = subtitle,
                     x = xlabel, y = ylabel)
+    
+    if(!is.null(size_library)){
+      p <- p + ggplot2::geom_segment(y = size_library, yend = size_library, 
+                                     xend = length(unique(temp_obj$SampleID))+.5, 
+                                     x = 0, linetype = "dashed")
+    }
       
   } else {
     
     mt <- round(filter_obj$NonZero[[1]]/filter_obj$ProportionNonZero[[1]])
     
     p <- ggplot2::ggplot(
-      temp_obj, ggplot2::aes(x=SampleID, y = NonZero, fill = "")) + 
+      temp_obj, ggplot2::aes(x=SampleID, y = NonZero, fill = color)) + 
       ggplot2::scale_y_continuous(
         sec.axis = ggplot2::sec_axis(trans=~./mt, 
                           name="Proportion of all biomolecules")
@@ -2576,6 +2586,12 @@ plot.RNAFilt <- function (filter_obj, plot_type = "library",
       ggplot2::labs(title = plot_title, 
                     subtitle = subtitle,
                     x = xlabel, y = ylabel)
+    
+    if(!is.null(min_nonzero)){
+      p <- p + ggplot2::geom_segment(y = min_nonzero, yend = min_nonzero,
+                                     xend = length(unique(temp_obj$SampleID))+.5,
+                                     x = 0, linetype = "dashed")
+    }
     
   }
   
@@ -4912,7 +4928,7 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
       }
     } else {
       warning(paste0("Using transformation argument for plotting on counts",
-      "is recommended for seqData visualization. See ?seqData.plot for details."))
+      " is recommended for seqData visualization. See ?seqData.plot for details."))
     }
   }
   
@@ -5037,16 +5053,17 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
   ylabel <- if (is.null(y_lab)) {
     
     # Abundance based
-    out <- if (get_data_scale(omicsData) == "abundance"){
-      "Abundance" 
+    if (get_data_scale(omicsData) == "abundance"){
+      out <- "Abundance" 
     } else if (get_data_scale(omicsData) %in% c("log", "log2", "log10")){
-      paste(get_data_scale(omicsData), "Abundance", sep = " ")
+      out <- paste(get_data_scale(omicsData), "Abundance", sep = " ")
     } else if (get_data_scale(omicsData) == "counts"){ 
-      if(!is.null(transformation)){
-        "Counts"
+      
+      if(is.null(transformation)){
+        out <- "Counts"
       } else {
         
-        switch(
+        out <- switch(
           transformation,
           lcpm = "Log Counts per Million",
           upper = "Upper-quantile transformed Counts",
@@ -5494,7 +5511,8 @@ plot.statRes <- function (x,
                            c("bar",
                              "volcano",
                              "gheatmap",
-                             "fcheatmap")),
+                             "fcheatmap", 
+                             "ma")),
                  silent=TRUE)
   if(class(plt_tyj)=='try-error'){
     warning(paste0("Plot type '",
@@ -5510,6 +5528,11 @@ plot.statRes <- function (x,
     stop(paste("Fold change heatmaps not supported when only one comparison",
                "is being made.",
                sep = " "))
+  }
+  
+  if(plot_type %in% c("ma") && attr(x, "data_class") != "seqData"){
+    stop("MA plots are only supported for transcriptomic data.",
+               sep = " ")
   }
 
   # specified theme parameters
@@ -5638,7 +5661,7 @@ plot.statRes <- function (x,
       "Comparison" else
         y_lab
     the_title_label <- if (is.null(title_lab))
-      "Average Log Fold Change" else
+      "Log Fold Change" else
         title_lab
     the_legend_label <- if (is.null(legend_lab))
       "Fold Change" else
@@ -5655,7 +5678,6 @@ plot.statRes <- function (x,
     colnames(volcano_sigs)[1] <- "Biomolecule"
     
     if(cluster){
-      browser()
       wide <- reshape2::dcast(volcano_sigs,
                     Biomolecule ~ Comparison,
                     value.var = "Fold_change",
@@ -5668,8 +5690,10 @@ plot.statRes <- function (x,
       order_biom <- rev(res_hclust$labels[res_hclust$order])
       
       volcano_sigs$Biomolecule <- as.character(volcano_sigs$Biomolecule)
-      volcano_sigs$Biomolecule <- factor(volcano_sigs$Biomolecule, 
-                                         levels = order_biom)
+      volcano_sigs$Biomolecule <- factor(
+        volcano_sigs$Biomolecule, 
+        levels = unique(paste0(order_biom, volcano_sigs$Biomolecule)))
+      
     } else {
       volcano_sigs$Biomolecule <- as.factor(volcano_sigs$Biomolecule)
     }
@@ -5695,6 +5719,118 @@ plot.statRes <- function (x,
         return(p)
   }
 
+  else if("ma" %in% plot_type){
+    
+    comps <- strsplit(attr(x, "comparisons"), "_vs_")
+    
+    plotter <- map_dfr(1:length(comps), function(n_comp){
+      label <- attr(x, "comparisons")[n_comp]
+      comp <- paste("Mean", comps[[n_comp]], sep = "_")
+      pval <-  grep(paste0("^P_value_.+", label), colnames(x), value = T)
+      
+      v1 <- x[[comp[1]]]
+      v2 <- x[[comp[2]]]
+      v3 <- x[[pval]]
+      
+      if(length(v1) == 0){
+        v1 <- NA
+        v2 <- NA
+        v3 <- NA
+      }
+      
+      data.frame(var1 = v1,var2 = v2, pval = v3, comp = label)
+    })
+    
+    if(all(is.na(plotter$var1))){
+      
+      plotter <- map_dfr(1:length(comps), function(n_comp){
+        label <- attr(x, "comparisons")[n_comp]
+        comp <- paste("Mean", label, sep = "_")
+        comp2 <- paste("Fold_change", label, sep = "_")
+        pval <-  grep(paste0("^P_value_.+", label), colnames(x), value = T)
+        
+        v1 <- x[[comp]]
+        v2 <- x[[comp2]]
+        v3 <-  pval
+        
+        data.frame(var1 = v1,var2 = v2, pval = pval, comp = label)
+      })
+      
+      p <- ggplot2::ggplot(
+        plotter, 
+        ggplot2::aes(
+          x = log2(var1),
+          y = log2(var2)
+        )) + 
+        ggplot2::geom_hex(ggplot2::aes(fill = stat(log2(count)))) +
+        ggplot2::geom_density2d(color =  gsub(TRUE, "Significant", 
+                                              gsub(FALSE, "Non-Significant", 
+                                                   plotter$pval < 0.05)),
+                              alpha = 0.5, inherit.aes = F) +
+        ggplot2::facet_wrap(~comp) +
+        ggplot2::geom_segment(
+          y = 0, yend = 0, linetype = "dashed", color = "red",
+          x = min(log2(plotter$var1), na.rm = T),
+          xend = max(log2(plotter$var1), na.rm = T)
+        ) + ggplot2::labs(
+          x = "A (Log2 Average Expression)", 
+          y = "M (Log2 Fold Change)",
+          fill = "Log2 (N Transcripts)"
+        ) + ggplot2::theme_bw()
+      
+      pval_plotter <- plotter[plotter$pval < 0.05,]
+      
+      p <- p + ggplot2::geom_density2d(
+        data = pval_plotter, ggplot2::aes(
+          color = log10(..density..),
+          x = log2((var1 + var2)/2),
+          y = log2(var1/var2)
+        ))
+      
+    } else {
+      
+      p <- ggplot2::ggplot(
+        plotter, 
+        ggplot2::aes(
+          x = log2((var1 + var2)/2),
+          y = log2(var1/var2)
+        )) + 
+        ggplot2::geom_hex(ggplot2::aes(fill = stat(log2(count)))) +
+        ggplot2::facet_wrap(~comp) +
+        ggplot2::geom_segment(
+          y = 0, yend = 0, linetype = "dashed", color = "red",
+          x = min(log2((plotter$var1 + plotter$var2)/2), na.rm = T),
+          xend = max(log2((plotter$var1 + plotter$var2)/2), na.rm = T)
+        ) + ggplot2::labs(
+          x = "A (Log2 Average Expression)", 
+          y = "M (Log2 Fold change)",
+          fill = "Log2 (N Transcripts)"
+        ) + ggplot2::theme_bw()
+      
+      # pval_plotter <- plotter[plotter$pval < 0.05,]
+      # pval_plotter <- na.omit(pval_plotter)
+      # 
+      # find_hull <- function(df) df[chull(df$eff, df$man), ]
+      # hulls <- plyr::ddply(pval_plotter, "comp", find_hull)
+      # 
+      # # p <- p + ggplot2::geom_polygon(data = hulls, alpha = 0.5)
+      
+      # breaks <- c(0.01, 0.001, 0.0001)
+      # pval_plotter$cols <- "< 0.05"
+      # for(cut in breaks){
+      #   pval_plotter$cols[pval_plotter$pval < cut] <- paste0("< ", cut)
+      # }
+      
+      # p <- p + ggplot2::geom_density_2d(data = pval_plotter, ggplot2::aes(
+      #   colour = cols,
+      #   x = log2((var1 + var2)/2),
+      #   y = log2(var1/var2)
+      # ))
+      
+    }
+    
+  }
+  
   return(p)
 
 }
