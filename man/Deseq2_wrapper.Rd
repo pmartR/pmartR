@@ -27,8 +27,6 @@ Deseq2_wrapper(
   alpha = 0.1,
   format = "DataFrame",
   addMLE = FALSE,
-  plotMA = F,
-  plotDispEsts = F,
   p_cutoff = 0.05
 )
 }
@@ -76,11 +74,11 @@ pairwise comparisons are executed.}
 
 \item{addMLE}{an object of type 'seqData', created by \code{\link{as.seqData}}}
 
+\item{p_cutoff}{an object of type 'seqData', created by \code{\link{as.seqData}}}
+
 \item{plotMA}{an object of type 'seqData', created by \code{\link{as.seqData}}}
 
 \item{plotDispEsts}{an object of type 'seqData', created by \code{\link{as.seqData}}}
-
-\item{p_cutoff}{an object of type 'seqData', created by \code{\link{as.seqData}}}
 }
 \value{
 data.frame object

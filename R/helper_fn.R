@@ -196,9 +196,17 @@ get_filters <- function (omicsData) {
 
 }
 
-# Extracts the types of filters that have been applied. This function will be
-# used at the beginning of the applyFilt function to give a warning if the
-# same type of filter has already been applied.
+#' Extracts the types of filters that have been applied. This function will be
+#' used at the beginning of the applyFilt function to give a warning if the
+#' same type of filter has already been applied.
+#' 
+#' Retrieves the values in the filters attribute from an omicsData object.
+#' 
+#' @param omicsData An object of class pepData, proData, metabData, lipidData,
+#'                  seqData, or nmrData.
+#'                  
+#' @return vector of filters used on omicsData
+#' 
 get_filter_type <- function (omicsData) {
   
   # Store the filters attribute from the previous filters (if any).

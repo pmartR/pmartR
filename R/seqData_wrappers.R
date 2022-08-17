@@ -55,14 +55,24 @@ Deseq2_wrapper <- function(
     independentFiltering = FALSE, alpha = 0.1, 
     format = "DataFrame",
     addMLE = FALSE,
-    plotMA = F, plotDispEsts = F,
+    # plotMA = F, plotDispEsts = F,
     p_cutoff = 0.05
 ){
   
   ## Normal p_value adjustments, test can either be "Wald" or liklihood ratio "LRT"
   edata_cname <- get_edata_cname(omicsData)
   fdata_cname <- get_fdata_cname(omicsData)
-  grouping_info <- get_group_DF(omicsData)[colnames(omicsData$f_data) != fdata_cname]
+  grouping_info <- get_group_DF(omicsData)
+  
+  ## If pairs, add to group_df
+  pairs <- attr(get_group_DF(omicsData), "pairs")
+  if(!is.null(pairs)){
+    keepcols <- which(colnames(omicsData$f_data) %in% c(pairs, fdata_cname))
+    grouping_info <- left_join(grouping_info, omicsData$f_data[keepcols])
+  }
+  
+  grouping_info <- grouping_info[colnames(grouping_info) != fdata_cname]
+  
   e_data_counts <- omicsData$e_data[colnames(omicsData$e_data) != edata_cname]
   
   if(is.null(comparisons)){
@@ -73,11 +83,22 @@ Deseq2_wrapper <- function(
     cob_list <- t(comparisons[c("Test", "Control")])
   }
   
-  edata_deseq <- DESeq2::DESeqDataSetFromMatrix(
-    e_data_counts, 
-    colData = grouping_info,
-    design = ~Group ## Figure out design designation
-  )
+  ## Pairs design matrix
+  if(!is.null(pairs)){
+    edata_deseq <- DESeq2::DESeqDataSetFromMatrix(
+      e_data_counts, 
+      colData = grouping_info,
+      design = ~!!rlang::sym(pairs) + Group ## Figure out design designation
+    )
+  } else {
+    edata_deseq <- DESeq2::DESeqDataSetFromMatrix(
+      e_data_counts, 
+      colData = grouping_info,
+      design = ~Group ## Figure out design designation
+    )
+  }
+  
+  # dds$condition <- relevel(dds$condition, ref = "untreated")
   
   run_stats_deseq <- DESeq2::DESeq(
     edata_deseq,
@@ -172,11 +193,12 @@ Deseq2_wrapper <- function(
     res[c(ncol(res), 1:(ncol(res) - 1))]
   })
   
+  
   #merge all data frames in list
   all_cont <- all_res %>% purrr::reduce(full_join)
   
   count_cols <- grep("^NonZero_Count_", colnames(all_cont))
-  mean_cols <- grep("^Mean", colnames(all_cont))
+  mean_cols <- grep("^baseMean", colnames(all_cont))
   lfc_cols <- grep("^log2FoldChange", colnames(all_cont))
   # pval_cols <- grep(colnames(all_cont), "_pvalue")
   padj_cols <- grep("^padj", colnames(all_cont))
@@ -215,14 +237,14 @@ Deseq2_wrapper <- function(
   attr(results, "data_class") <- attr(omicsData, "class")
   class(results) <- c("statRes", class(results))
   
-  if(plotDispEsts){
-    attr(results, "plotDispEsts") <- run_stats_deseq
-    DESeq2::plotDispEsts(run_stats_deseq)
-  }
-  if(plotMA){
-    attr(results, "plotMA") <- run_stats_deseq
-    DESeq2::plotMA(run_stats_deseq)
-  }
+  # if(plotDispEsts){
+  #   attr(results, "plotDispEsts") <- run_stats_deseq
+  #   DESeq2::plotDispEsts(run_stats_deseq)
+  # }
+  # if(plotMA){
+  #   attr(results, "plotMA") <- run_stats_deseq
+  #   DESeq2::plotMA(run_stats_deseq)
+  # }
   
   return(results)
   
@@ -256,7 +278,16 @@ EdgeR_wrapper <- function(
   edata_cname <- get_edata_cname(omicsData)
   fdata_cname <- get_fdata_cname(omicsData)
   e_data_counts <- omicsData$e_data[colnames(omicsData$e_data) != edata_cname]
-  grouping_info <- get_group_DF(omicsData)[colnames(omicsData$f_data) != fdata_cname]
+  grouping_info <- get_group_DF(omicsData)
+  
+  ## If pairs, add to group
+  pairs <- attr(get_group_DF(omicsData), "pairs")
+  if(!is.null(pairs)){
+    keepcols <- which(colnames(omicsData$f_data) %in% c(pairs, fdata_cname))
+    grouping_info <- left_join(grouping_info, omicsData$f_data[keepcols])
+  }
+  
+  grouping_info <- grouping_info[colnames(grouping_info) != fdata_cname]
   
   ### Combinations ###
   if(is.null(comparisons)){
@@ -272,7 +303,13 @@ EdgeR_wrapper <- function(
   edata_egdeR <- edgeR::DGEList(e_data_counts) 
   norm_factors_edgeR <- edgeR::calcNormFactors(edata_egdeR)
   
-  design_matrix_edgeR <- model.matrix(~Group, grouping_info)
+  ## Zeros or not??
+  if(!is.null(pairs)){
+    design_matrix_edgeR <- model.matrix(~0 + !!rlang::sym(pairs) + Group, 
+                                        grouping_info)
+  } else {
+    design_matrix_edgeR <- model.matrix(~0 + Group, grouping_info)
+  }
   
   GCD_edgeR <- edgeR::estimateGLMCommonDisp(norm_factors_edgeR,
                                      design_matrix_edgeR)
@@ -290,7 +327,7 @@ EdgeR_wrapper <- function(
   res_contrasts <- purrr::map(1:length(all_contrasts), function(n){
     combo <- cob_list[,n]
     
-    ## We need assistance here #################################################
+    ## We need assistance here? #################################################
     CONTRASTS <- limma::makeContrasts(
       contrasts = all_contrasts[n], 
       levels = unique(as.vector(cob_list)))
@@ -405,7 +442,15 @@ Voom_wrapper <- function(
   edata_cname <- get_edata_cname(omicsData)
   fdata_cname <- get_fdata_cname(omicsData)
   e_data_counts <- omicsData$e_data[colnames(omicsData$e_data) != edata_cname]
-  grouping_info <- get_group_DF(omicsData)[colnames(omicsData$f_data) != fdata_cname]
+  grouping_info <- get_group_DF(omicsData)
+  
+  ## If pairs, add to group
+  pairs <- attr(get_group_DF(omicsData), "pairs")
+  if(!is.null(pairs)){
+    keepcols <- which(colnames(omicsData$f_data) %in% c(pairs, fdata_cname))
+    grouping_info <- left_join(grouping_info, omicsData$f_data[keepcols])
+  }
+  grouping_info <- grouping_info[colnames(grouping_info) != fdata_cname]
   
   if(is.null(comparisons)){
     comparisons <- unique(grouping_info[["Group"]])
@@ -417,11 +462,22 @@ Voom_wrapper <- function(
   
   edata_limma <- edgeR::DGEList(e_data_counts) 
   norm_factors_limma <- edgeR::calcNormFactors(edata_limma)
-  design_matrix_limma <- model.matrix(~0 + Group, grouping_info)
+  
+  ## Pairs design matrix
+  if(!is.null(pairs)){
+    design_matrix_limma <- model.matrix(~0 + !!rlang::sym(pairs) + Group, 
+                                        grouping_info)
+  } else {
+    design_matrix_limma <- model.matrix(~0 + Group, grouping_info)
+  }
+
   limma_voom <- limma::voom(norm_factors_limma, design_matrix_limma)
   limma_vfit <- limma::lmFit(limma_voom, design_matrix_limma)
   
-  all_contrasts <- apply(paste0("Group", cob_list), 2, paste, collapse = "-")
+  all_contrasts <- apply(matrix(paste0("Group", cob_list), 
+                                nrow = nrow(cob_list),
+                                ncol = ncol(cob_list)), 
+                         2, paste, collapse = "-")
   
   res_contrasts <- purrr::map(1:length(all_contrasts), function(n){
     combo <- cob_list[,n]
@@ -576,8 +632,8 @@ dispersion_est <- function(omicsData, method,
                     sep = " "))
     if(!inherits(custom_theme, c("theme", "gg")))
       stop("custom_theme must be a valid 'theme' object as used in ggplot")
-    mytheme = custom_theme
-  } else mytheme = ggplot2::theme(
+    mytheme <-  custom_theme
+  } else mytheme <-  ggplot2::theme(
     plot.title = ggplot2::element_text(size = title_lab_size),
     axis.title.x = ggplot2::element_text(size = x_lab_size),
     axis.title.y = ggplot2::element_text(size = y_lab_size),
@@ -597,6 +653,15 @@ dispersion_est <- function(omicsData, method,
   } else {
     cob_list <- t(comparisons[c("Test", "Control")])
   }
+  
+  # Both packages will do the job when it comes to detecting DE genes in a routine analysis. 
+  # limma (+ voom) is faster and has access to more methodology (e.g., duplicateCorrelation) 
+  # compared to edgeR, courtesy of lots of things being easier when you assume normality. 
+  # However, voom does rely on the presence of a well-fitted mean-variance trend to estimate 
+  # the precision weights. For some applications (though not usually DE analyses), the spread 
+  # of abundances is too low to stably fit the trend, and in such cases edgeR will give better 
+  # performance. edgeR also handles low counts better, which is worth considering if you want 
+  # to focus on lowly-expressed genes or are dealing with very low-coverage data (e.g., single-cell stuff).
   
   if(method == "DESeq2"){
     
