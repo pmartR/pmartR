@@ -694,7 +694,9 @@ dispersion_est <- function(omicsData, method,
       ggplot2::scale_x_continuous(trans='log10') + 
       ggplot2::scale_colour_manual(name = legend_lab, 
                                    values =c('black'=cols[1],'red'=cols[3], "blue" = cols[2]), 
-                                   labels = c('Gene-est','Fitted', 'Final'))
+                                   labels = c('Gene-est','Fitted', 'Final')) +
+      ggplot2::labs(x = the_x_label, y = the_y_label, 
+                    title = the_title_label, color = the_legend_label)
     
   } else if (method == "edgeR"){
     
@@ -703,7 +705,7 @@ dispersion_est <- function(omicsData, method,
     the_y_label <- if (is.null(y_lab)) "Quarter-Root Mean Deviance" else y_lab
     the_title_label <- if (is.null(title_lab)) "EdgeR dispersion fit" else title_lab
     the_legend_label <- if (is.null(legend_lab)) "" else legend_lab
-    cols <- if (is.null(palette)) c("black", "red") else RColorBrewer::brewer.pal(2, palette)
+    cols <- if (is.null(palette)) c("black","blue", "red") else RColorBrewer::brewer.pal(3, palette)
     
     edata_egdeR <- edgeR::DGEList(e_data_counts) 
     norm_factors_edgeR <- edgeR::calcNormFactors(edata_egdeR)
@@ -731,8 +733,7 @@ dispersion_est <- function(omicsData, method,
     ## To do: write some tests :) test set to be processed, take part as exemplar dataset (include reminder in email)
     
     # plotQLDisp(fit_edgeR)
-    plotBCV(GTagD_edgeR, log = "y")
-    plotQLDisp(fit_edgeR)
+    # plotBCV(GTagD_edgeR, log = "y")
     
     ## Other attempts
     # plot(y = (GTagD_edgeR$tagwise.dispersion)^(1/4), 
@@ -754,21 +755,29 @@ dispersion_est <- function(omicsData, method,
       AveLogCPM = fit_edgeR$AveLogCPM
     )
     
-    ## attempt at deseq-like: not quite equal elements to extract from :(
-    # p <- ggplot2::ggplot(data = df2,
-    #                      ggplot2::aes(x = AveLogCPM, y = sqrt(TagD))) +
-    #   ggplot2::geom_point() +
-    #   # ggplot2::geom_point(ggplot2::aes(y = sqrt(fitD2)), color = "blue", alpha = 0.25) +
-    #   ggplot2::geom_point(ggplot2::aes(y = sqrt(TD)), color = "red") +
-    #   ggplot2::scale_y_continuous(trans='log10')
-    
-    p <- ggplot2::ggplot(data = df2, 
-                         ggplot2::aes(x = AveLogCPM, y = (fitD2)^(1/4), color = "black")) +
-      ggplot2::geom_point( size = point_size) +
-      ggplot2::geom_line(ggplot2::aes(y = (fitD1)^(1/4), color = "red")) +
+    ## Remake of plotBCV(GTagD_edgeR, log = "y")
+    df2_melt <- reshape2::melt(df2[c("AveLogCPM", "TagD", "TD", "CD")], id.var = "AveLogCPM")
+    p <- ggplot2::ggplot(data = df2_melt,
+                         ggplot2::aes(x = AveLogCPM, y = sqrt(value), color = variable)) +
+      ggplot2::geom_point() +
       ggplot2::scale_colour_manual(name = legend_lab, 
-                          values =c('black'=cols[1],'red'=cols[2]), 
-                          labels = c('Squeezed Dispersion','Trend'))
+                                   values = c( TagD = cols[1], 
+                                               TD = cols[2], 
+                                               CD = cols[3]),
+                                   labels = c(TagD = 'Tagwise', CD = 'Common',TD = 'Trend')) +
+      ggplot2::scale_y_continuous(trans='log10') + 
+      ggplot2::labs(x = the_x_label, y = the_y_label, 
+                    title = the_title_label, color = the_legend_label)
+    
+    # p <- ggplot2::ggplot(data = df2, 
+    #                      ggplot2::aes(x = AveLogCPM, y = (fitD2)^(1/4), color = "black")) +
+    #   ggplot2::geom_point( size = point_size) +
+    #   ggplot2::geom_line(ggplot2::aes(y = (fitD1)^(1/4), color = "red")) +
+    #   ggplot2::scale_colour_manual(name = legend_lab, 
+    #                       values =c('black'=cols[1],'red'=cols[2]), 
+    #                       labels = c('Squeezed Dispersion','Trend')) +
+    #   ggplot2::labs(x = the_x_label, y = the_y_label, 
+    #                 title = the_title_label, color = the_legend_label)
 
     
   } else if (method == "voom"){
@@ -787,16 +796,14 @@ dispersion_est <- function(omicsData, method,
     limma_vfit <- limma::lmFit(limma_voom, design_matrix_limma)
     efit <- eBayes(limma_vfit)
     
-    limma::voom(norm_factors_limma, design_matrix_limma, plot = T)
-    
     df3 <- data.frame(
       x_disp = limma_voom$voom.xy$x,
       y_disp = limma_voom$voom.xy$y,
       x_fit = limma_voom$voom.line$x,
-      y_fit = limma_voom$voom.line$y,
-      y_fitted = efit$sigma
+      y_fit = limma_voom$voom.line$y
     )
     
+    y_fitted <- efit$sigma
     p <- ggplot2::ggplot(data = df3, 
                          ggplot2::aes(x = x_disp, y = y_disp, color = "black")) +
       ggplot2::geom_point( size = point_size) +
@@ -805,7 +812,9 @@ dispersion_est <- function(omicsData, method,
       ggplot2::scale_y_continuous(trans='log10') +
       ggplot2::scale_colour_manual(name = legend_lab, 
                                    values =c('black'=cols[1],'red'=cols[2]), 
-                                   labels = c('Mean-Varience','Trend'))
+                                   labels = c('Mean-Varience','Trend')) +
+      ggplot2::labs(x = the_x_label, y = the_y_label, 
+                    title = the_title_label, color = the_legend_label)
 
   }
   

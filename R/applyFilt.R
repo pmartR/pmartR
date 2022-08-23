@@ -442,13 +442,13 @@ applyFilt.RNAFilt <- function(filter_object, omicsData,
   # Perform some initial checks on the input arguments -------------------------
   
   # Check if a molecule filter has already been applied.
-  if ('RNAFilt' %in% get_filter_type(omicsData)) {
+  if ('RNAFilt' %in% suppressMessages(get_filter_type(omicsData))) {
     
     # Gently tell the user they have already applied a molecule filter.
     warning ('An RNA filter has already been applied to this data set.')
     
   }
-  
+
   ## Checks for size_library as single integer
   if(!is.null(size_library) && 
      (length(size_library) > 1 || 
@@ -534,7 +534,7 @@ applyFilt.RNAFilt <- function(filter_object, omicsData,
   # Filter the data and update the attributes ----------------------------------
   
   # call the function that does the filter application
-  results_pieces <- pmartR:::pmartR_filter_worker(filter_object = filter_object_new,
+  results_pieces <- pmartR_filter_worker(filter_object = filter_object_new,
                                          omicsData = omicsData)
   
   # Update the omicsData data frames.
