@@ -1052,19 +1052,22 @@ summary.customFilt <- function(filter_object){
   edata_id <- get_edata_cname(omicsData)
   emeta_id <- get_emeta_cname(omicsData)
   samp_id <- get_fdata_cname(omicsData)
-  # edata_id <- attr(filter_object, "cnames")$edata_cname
-  # emeta_id <- attr(filter_object, "cnames")$emeta_cname
-  # samp_id <- attr(filter_object, "cnames")$fdata_cname
+
+  # get counts #
+  num_samples <- attr(filter_object, "num_samples")
+  num_edata <- attr(filter_object, "num_edata")
+  num_emeta <- attr(filter_object, "num_emeta") ## is null where not used
   
   # apply the filter #
   filtered_data <- applyFilt(filter_object, omicsData)
   summary_filt <- summary(filtered_data)
 
   #if filter_object contains removes
-  if(!is.null(filter_object$e_data_remove)|!is.null(filter_object$f_data_remove)|!is.null(filter_object$e_meta_remove))
+  if(!is.null(filter_object$e_data_remove)|
+     !is.null(filter_object$f_data_remove)|
+     !is.null(filter_object$e_meta_remove))
   {
     # samples #
-    num_samples <- attributes(filter_object)$num_samples
     if(!is.null(filter_object$f_data_remove)) {
       samps_filt <- length(filter_object$f_data_remove)
       samps_left <- num_samples - samps_filt
@@ -1074,7 +1077,6 @@ summary.customFilt <- function(filter_object){
     }
 
     # e_data #
-    num_edata <- attributes(filter_object)$num_edata
     if(!is.null(filter_object$e_data_remove)) {
       edata_filt <- length(filter_object$e_data_remove)
       edata_left <- num_edata - edata_filt
@@ -1084,8 +1086,7 @@ summary.customFilt <- function(filter_object){
     }
 
     # e_meta #
-    if(!is.null(filtered_data$e_meta)){
-      num_emeta <- attributes(filter_object)$num_emeta
+    if(!is.null(num_emeta)){
       if(!is.null(filter_object$e_meta_remove)) {
         emeta_filt <- length(filter_object$e_meta_remove)
         emeta_left <- num_emeta - emeta_filt
@@ -1094,28 +1095,17 @@ summary.customFilt <- function(filter_object){
         emeta_left <- length(unique(filtered_data$e_meta[, emeta_id] ))
       }
     }
-    # Display #
-
-    samp_id <- paste(samp_id, "s (f_data)", sep="")
-    edata_id <- paste(edata_id, "s (e_data)", sep="")
-    display_emeta_id <- paste(emeta_id, "s (e_meta)", sep="")
-
-    ## construct data frame ##
-    if(is.null(emeta_id)) {
-      disp <- data.frame(Filtered = c(samps_filt, edata_filt), Remaining = c(samps_left, edata_left), Total = c(num_samples, num_edata))
-      rownames(disp) <- c(samp_id, edata_id)
-    } else {
-      disp <- data.frame(Filtered = c(samps_filt, edata_filt, emeta_filt), Remaining = c(samps_left, edata_left, emeta_left), Total = c(num_samples, num_edata, num_emeta))
-      rownames(disp) <- c(samp_id, edata_id, display_emeta_id)
-    }
+    
+    disp_colnames <- c("Filtered", "Remaining", "Total")
 
   }
 
   #if filter_object contains keeps
-  if(!is.null(filter_object$e_data_keep)|!is.null(filter_object$f_data_keep)|!is.null(filter_object$e_meta_keep))
+  if(!is.null(filter_object$e_data_keep)|
+     !is.null(filter_object$f_data_keep)|
+     !is.null(filter_object$e_meta_keep))
   {
     # samples #
-    num_samples <- attributes(filter_object)$num_samples
     if(!is.null(filter_object$f_data_keep)) {
       samps_keep <- length(filter_object$f_data_keep)
       samps_discard <- num_samples - samps_keep
@@ -1125,7 +1115,6 @@ summary.customFilt <- function(filter_object){
     }
 
     # e_data #
-    num_edata <- attributes(filter_object)$num_edata
     if(!is.null(filter_object$e_data_keep)) {
       edata_keep <- length(filter_object$e_data_keep)
       edata_discard <- num_edata - edata_keep
@@ -1135,32 +1124,45 @@ summary.customFilt <- function(filter_object){
     }
 
     # e_meta #
-    num_emeta <- attributes(filter_object)$num_emeta
-    if(!is.null(filter_object$e_meta_keep)) {
-      emeta_keep <- length(filter_object$e_meta_keep)
-      emeta_discard <- num_emeta - emeta_keep
-    } else {
-      emeta_keep <- length(unique(filtered_data$e_meta[, emeta_id] ))
-      emeta_discard <- num_emeta - length(unique(filtered_data$e_meta[, emeta_id] ))
+    if(!is.null(num_emeta)){
+      if(!is.null(filter_object$e_meta_keep)) {
+        emeta_keep <- length(filter_object$e_meta_keep)
+        emeta_discard <- num_emeta - emeta_keep
+      } else {
+        emeta_keep <- length(unique(filtered_data$e_meta[, emeta_id] ))
+        emeta_discard <- num_emeta - length(unique(filtered_data$e_meta[, emeta_id] ))
+      }
     }
 
-    # Display #
-
-    samp_id <- paste(samp_id, "s (f_data)", sep="")
-    edata_id <- paste(edata_id, "s (e_data)", sep="")
-    display_emeta_id <- paste(emeta_id, "s (e_meta)", sep="")
-
-    ## construct data frame ##
-    if(is.null(emeta_id)) {
-      disp <- data.frame(Kept = c(samps_keep, edata_keep), Discarded = c(samps_discard, edata_discard), Total = c(num_samples, num_edata))
-      rownames(disp) <- c(samp_id, edata_id)
-    } else {
-      disp <- data.frame(Kept = c(samps_keep, edata_keep, emeta_keep), Discarded = c(samps_discard, edata_discard, emeta_discard), Total = c(num_samples, num_edata, num_emeta))
-      rownames(disp) <- c(samp_id, edata_id, display_emeta_id)
-    }
+    disp_colnames <- c("Kept", "Discarded", "Total")
 
   }
-
+  
+  # Display #
+  
+  ## Display text ##
+  edata_plural_text <- ifelse(length(grep("s$", edata_id)) > 0,  " ", "s ")
+  emeta_plural_text <- ifelse(length(grep("s$", emeta_id)) > 0,  " ", "s ")
+  samp_plural_text <- ifelse(length(grep("s$", samp_id)) > 0,  " ", "s ")
+  samp_id <- paste(samp_id, samp_plural_text, "(f_data)", sep="")
+  edata_id <- paste(edata_id, edata_plural_text, "(e_data)", sep="")
+  display_emeta_id <- paste(emeta_id, emeta_plural_text, "(e_meta)", sep="")
+  
+  ## construct data frame ##
+  if(is.null(emeta_id)) {
+    disp <- data.frame(c(samps_filt, edata_filt), 
+                       c(samps_left, edata_left), 
+                       c(num_samples, num_edata))
+    rownames(disp) <- c(samp_id, edata_id)
+  } else {
+    disp <- data.frame(c(samps_filt, edata_filt, emeta_filt), 
+                       c(samps_left, edata_left, emeta_left), 
+                       c(num_samples, num_edata, num_emeta))
+    rownames(disp) <- c(samp_id, edata_id, display_emeta_id)
+  }
+  
+  colnames(disp) <- disp_colnames
+  
   class(disp) = c("customFilterSummary", "data.frame")
 
   return (disp)
@@ -1176,7 +1178,7 @@ print.customFilterSummary <- function (object) {
 
   ## Display output ##
   cat("\nSummary of Custom Filter\n\n")
-  cat(capture.output(object), sep = "\n")
+  print.data.frame(object)
   cat("\n")
 
 }
