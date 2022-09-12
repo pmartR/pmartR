@@ -43,24 +43,54 @@ Labeled proteomics data, such as that generated via TMT (tandem mass tag) or iTR
 
 #### Usage
 
-When working with labeled proteomics data, an `isobaricpepData` object should be used. To perform the reference pool normalization, use the `normalize_isobaric()` function. 
+When working with labeled proteomics data, an `isobaricpepData` object should be used. To perform the reference pool normalization, use the `normalize_isobaric()` function on data that has already been log transformed. 
+
+```{r load_example_isobaricpepData}
+data(isobaric_object)
+class(isobaric_object)
+
+isobaric_object <- edata_transform(isobaric_object, 
+                                   data_scale = "log2")
+```
+
 
 There are two ways to specify the information needed for identifying reference samples which should be used for normalization: 
 
-1. Specify the `channel_cname` and `refpool_channel`. This should be used when the reference sample for each plex/plate/experiment was always located in the same channel. Here `channel_cname` gives the column name for the column in `f_data` which gives information about which channel each sample was run on, and `refpool_channel` is a character string specifying the value in `channel_colname` that corresponds to the reference sample channel. 
-
-2. Specify the `refpool_cname` and `refpool_notation`. This should be used when the reference sample is not in a consistent channel across experiments/plates. Here, `refpool_cname` gives the name of the column in `f_data` which indicates whether a sample is a reference or not, and `refpool_notation` is a character string giving the value used to denote a reference sample in that column. } In both cases you must specify `exp_cname` which gives the column name for the column in `f_data` containing information about which plex/plate/experiment a sample was run on.
-
-
-```{r specify_channels}
-
-```
+1. Specify the `refpool_cname` and `refpool_notation`. This should be used when the reference sample is not in a consistent channel across experiments/plates. Here, `refpool_cname` gives the name of the column in `f_data` which indicates whether a sample is a reference or not, and `refpool_notation` is a character string giving the value used to denote a reference sample in that column. } In both cases you must specify `exp_cname` which gives the column name for the column in `f_data` containing information about which plex/plate/experiment a sample was run on.
 
 
 ```{r specify_refpool}
+# do not apply the normalization until we have looked at the distribution of peptides within the reference pool samples
+iso_norm <- normalize_isobaric(isobaric_object, 
+                               exp_cname = "Plex",
+                               apply_norm = FALSE,
+                               refpool_cname = "Virus",
+                               refpool_notation = "Pool")
 
+# look at the distribution of peptides within the reference pool samples
+plot(iso_norm)
+
+# now apply the normalization
+isobaric_object_normalized <- normalize_isobaric(isobaric_object, 
+                               exp_cname = "Plex",
+                               apply_norm = TRUE,
+                               refpool_cname = "Virus",
+                               refpool_notation = "Pool")
+
+# look at boxplots of the data after normalization to the reference pool samples
+plot(isobaric_object_normalized)
 ```
 
+2. Specify the `channel_cname` and `refpool_channel`. This should be used when the reference sample for each plex/plate/experiment was always located in the same channel. Here `channel_cname` gives the column name for the column in `f_data` which gives information about which channel each sample was run on, and `refpool_channel` is a character string specifying the value in `channel_colname` that corresponds to the reference sample channel. 
+
+```{r specify_channels, eval = FALSE}
+# not run because this data does not actually contain channel_cname or refpool_channel information
+iso_norm <- normalize_isobaric(isobaric_object, 
+                               exp_cname = "Plex",
+                               apply_norm = FALSE,
+                               channel_cname = "SampleChannel", # this column in f_data would specify a number corresponding to the channel for each sample
+                               refpool_channel = 4) # this value in the SampleChannel column would always correspond to a reference pool sample
+```
 
 
 ### NMR
