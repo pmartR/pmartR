@@ -5779,11 +5779,12 @@ plot.statRes <- function (x,
           x = log2(var1),
           y = log2(var2)
         )) + 
-        ggplot2::geom_hex(ggplot2::aes(fill = stat(log2(count)))) +
-        ggplot2::geom_density2d(color =  gsub(TRUE, "Significant", 
-                                              gsub(FALSE, "Non-Significant", 
-                                                   plotter$pval < 0.05)),
-                              alpha = 0.5, inherit.aes = F) +
+        ggplot2::geom_point() +
+        # ggplot2::geom_hex(ggplot2::aes(fill = stat(log2(count)))) +
+        # ggplot2::geom_density2d(color =  gsub(TRUE, "Significant", 
+        #                                       gsub(FALSE, "Non-Significant", 
+        #                                            plotter$pval < 0.05)),
+        #                       alpha = 0.5, inherit.aes = F) +
         ggplot2::facet_wrap(~comp) +
         ggplot2::geom_segment(
           y = 0, yend = 0, linetype = "dashed", color = "red",
@@ -5812,7 +5813,8 @@ plot.statRes <- function (x,
           x = log2((var1 + var2)/2),
           y = log2(var1/var2)
         )) + 
-        ggplot2::geom_hex(ggplot2::aes(fill = stat(log2(count)))) +
+        # ggplot2::geom_hex(ggplot2::aes(fill = stat(log2(count)))) +
+        ggplot2::geom_point() +
         ggplot2::facet_wrap(~comp) +
         ggplot2::geom_segment(
           y = 0, yend = 0, linetype = "dashed", color = "red",
@@ -6190,7 +6192,8 @@ statres_barplot <- function(x,
     ggplot2::geom_bar(ggplot2::aes(x = whichtest,
                                    fill = posneg,
                                    group = whichtest),
-                      stat = 'identity') +
+                      stat = 'identity',
+                      position = "dodge") +
     ggplot2::geom_hline(ggplot2::aes(yintercept = 0), colour = 'gray50') +
     ggplot2::scale_fill_manual(
       values = c(fc_colors[1], fc_colors[3]),
@@ -6210,7 +6213,7 @@ statres_barplot <- function(x,
                                       label = ifelse(abs(Count) > 0,
                                                      abs(Count),
                                                      "")),
-                         position = ggplot2::position_stack(vjust = 0.5),
+                         position = "dodge",#ggplot2::position_stack(vjust = 0.5),
                          size = text_size)
 
   }

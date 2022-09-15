@@ -690,7 +690,8 @@ set_data_info <- function (e_data,
                  num_zero_obs = num_zero_obs,
                  prop_zeros = prop_zeros,
                  num_samps = num_samps,
-                 data_types = data_types))
+                 data_types = data_types,
+                 batch_info = batch_info))
   } else{
     return (list(data_scale_orig = data_scale_orig,
                  data_scale = data_scale,
@@ -699,7 +700,8 @@ set_data_info <- function (e_data,
                  num_miss_obs = num_miss_obs,
                  prop_missing = prop_missing,
                  num_samps = num_samps,
-                 data_types = data_types))
+                 data_types = data_types,
+                 batch_info = batch_info))
   }
   
 }

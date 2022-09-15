@@ -551,7 +551,7 @@ Voom_wrapper <- function(
     )
   
   attr(results, "comparisons") <- apply(cob_list, 2, paste, collapse = "_vs_")
-  attr(results, "statistical_test") <- "Voom T"
+  attr(results, "statistical_test") <- "Voom_T"
   attr(results, "adjustment_method") <- p_adjust
   attr(results, "pval_thresh") <- p_cutoff
   attr(results, "data_class") <- attr(omicsData, "class")
