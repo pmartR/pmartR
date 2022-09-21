@@ -403,7 +403,9 @@ applyFilt.totalCountFilt <- function(filter_object, omicsData, min_count){
       data_scale = get_data_scale(omicsData),
       data_types = dInfo$data_types,
       norm_info = dInfo$norm_info,
-      is_normalized = dInfo$norm_info$is_normalized
+      is_normalized = dInfo$norm_info$is_normalized,
+      batch_info = dInfo$batch_info,
+      is_bc = dInfo$batch_info$is_bc
     )
     
     
@@ -572,7 +574,9 @@ applyFilt.RNAFilt <- function(filter_object, omicsData,
       data_scale = get_data_scale(omicsData),
       data_types = dInfo$data_types,
       norm_info = dInfo$norm_info,
-      is_normalized = dInfo$norm_info$is_normalized
+      is_normalized = dInfo$norm_info$is_normalized,
+      batch_info = dInfo$batch_info,
+      is_bc = dInfo$batch_info$is_bc
     )
     
     
