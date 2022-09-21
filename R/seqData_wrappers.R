@@ -675,14 +675,14 @@ dispersion_est <- function(omicsData, method,
     edata_deseq <- DESeq2::DESeqDataSetFromMatrix(
       e_data_counts, 
       colData = grouping_info,
-      design = ~Group ## Figure out design designation
+      design = ~Group
     )
     
     dds <- DESeq2::estimateSizeFactors(edata_deseq)
     dds <- DESeq2::estimateDispersions(dds)
     
     ## only plots for those above 0
-    df1 <- as.data.frame(mcols(dds))
+    df1 <- as.data.frame(S4Vectors::mcols(dds))
     
 
     p <- ggplot2::ggplot(data = df1, 
@@ -794,7 +794,12 @@ dispersion_est <- function(omicsData, method,
     design_matrix_limma <- model.matrix(~0 + Group, grouping_info)
     limma_voom <- limma::voom(norm_factors_limma, design_matrix_limma, save.plot = T)
     limma_vfit <- limma::lmFit(limma_voom, design_matrix_limma)
-    efit <- eBayes(limma_vfit)
+    ## Exclude covariates
+    contrast_mod1 <- makeContrasts( 
+      DISvTE = DIS - TE,
+      levels=mod1)
+    
+    efit <- limma::eBayes(limma_vfit)
     
     df3 <- data.frame(
       x_disp = limma_voom$voom.xy$x,
