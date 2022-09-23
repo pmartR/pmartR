@@ -444,6 +444,11 @@ Voom_wrapper <- function(
   e_data_counts <- omicsData$e_data[colnames(omicsData$e_data) != edata_cname]
   grouping_info <- get_group_DF(omicsData)
   
+  ## Warning for levels that are not "correct" in R
+  if(grouping_info$Group != make.names(grouping_info$Group)){
+    stop("Main effects are not in R-acceptable format (A syntactically valid name consists of letters, numbers and the dot or underline characters and starts with a letter or the dot not followed by a number). Limma-voom processing will not be available unless all main effects meet this condition.")
+  }
+  
   ## If pairs, add to group
   pairs <- attr(get_group_DF(omicsData), "pairs")
   if(!is.null(pairs)){
@@ -643,7 +648,7 @@ dispersion_est <- function(omicsData, method,
   
   edata_cname <- get_edata_cname(omicsData)
   fdata_cname <- get_fdata_cname(omicsData)
-  grouping_info <- get_group_DF(omicsData)[colnames(omicsData$f_data) != fdata_cname]
+  grouping_info <- get_group_DF(omicsData)[colnames(get_group_DF(omicsData)) != fdata_cname]
   e_data_counts <- omicsData$e_data[colnames(omicsData$e_data) != edata_cname]
   
   if(is.null(comparisons)){

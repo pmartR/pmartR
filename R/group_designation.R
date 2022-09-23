@@ -794,6 +794,11 @@ group_designation <- function (omicsData,
   nonsingleton_groups <- names(which(table(output$Group) > 1))
   attr(output, "nonsingleton_groups") <- nonsingleton_groups
 
+  ## Warning for levels that are not "correct" in R
+  if(output$Group != make.names(output$Group) && inherits(omicsData, "seqData")){
+    warning("Main effects are not in R-acceptable format (A syntactically valid name consists of letters, numbers and the dot or underline characters and starts with a letter or the dot not followed by a number). Limma-voom processing will not be available unless all main effects meet this condition.")
+  }
+  
   # Add the group information to the group_DF attribute in the omicsData object.
   attr(omicsData, "group_DF") = output
 
