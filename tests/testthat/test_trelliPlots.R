@@ -289,28 +289,24 @@ test_that("trelliPlots check the correct inputs", {
   
   # Test that the p-value threshold is a numeric
   expect_error(
-    mtrelliData4 %>% trelli_panel_by("Metabolite") %>% trelli_foldchange_bar(p_value_test = "anova", p_value_thresh = "test"),
+    mtrelliData4 %>% trelli_panel_by("Metabolite") %>% trelli_foldchange_bar(p_value_test = TRUE, p_value_thresh = "test"),
     "p_value_thresh must be a numeric."
   )
   
   # Test that the p-value threshold is a number between 0 and 1 
   expect_error(
-    mtrelliData4 %>% trelli_panel_by("Metabolite") %>% trelli_foldchange_bar(p_value_test = "anova", p_value_thresh = -0.05),
+    mtrelliData4 %>% trelli_panel_by("Metabolite") %>% trelli_foldchange_bar(p_value_test = TRUE, p_value_thresh = -0.05),
     "p_value_thresh must be between 0 and 1."
   )
   expect_error(
-    mtrelliData4 %>% trelli_panel_by("Metabolite") %>% trelli_foldchange_bar(p_value_test = "anova", p_value_thresh = 5),
+    mtrelliData4 %>% trelli_panel_by("Metabolite") %>% trelli_foldchange_bar(p_value_test = TRUE, p_value_thresh = 5),
     "p_value_thresh must be between 0 and 1."
   )
   
   # Test that the p-value test is an acceptable entry of anova, gtest, both, or null
   expect_error(
-    mtrelliData4 %>% trelli_panel_by("Metabolite") %>% trelli_foldchange_bar(p_value_test = c("gtest", "anova")),
-    "p_value_test must be anova, gtest, combined, or NULL."
-  )
-  expect_error(
-    mtrelliData4 %>% trelli_panel_by("Metabolite") %>% trelli_foldchange_bar(p_value_test = c("test")),
-    "p_value_test must be anova, gtest, combined, or NULL."
+    mtrelliData4 %>% trelli_panel_by("Metabolite") %>% trelli_foldchange_bar(p_value_test = "test"),
+    "p_value_test must be a single TRUE or FALSE."
   )
   
   # Generate a trelliscope without proportions and a single plot
@@ -321,7 +317,7 @@ test_that("trelliPlots check the correct inputs", {
      trelli_foldchange_bar(path = file.path(testFolder, "barFoldChangeTest1"),
                            ggplot_params = "ylab('')",
                            cognostics = "p_value",
-                           p_value_test = "anova",
+                           p_value_test = TRUE,
                            interactive = TRUE)
   )
   expect_true(file.exists(file.path(testFolder, "barFoldChangeTest1")))
@@ -333,7 +329,7 @@ test_that("trelliPlots check the correct inputs", {
                                            test_mode = TRUE, 
                                            test_example = 2,
                                            cognostics = "p_value",
-                                           p_value_test = "gtest",
+                                           p_value_test = TRUE,
                                            interactive = TRUE)
   )
   expect_true(file.exists(file.path(testFolder, "barFoldChangeTest2")))
@@ -343,7 +339,7 @@ test_that("trelliPlots check the correct inputs", {
                      trelli_foldchange_bar(path = file.path(testFolder, "barFoldChangeTest3"),
                                            test_mode = TRUE, 
                                            test_example = 2,
-                                           p_value_test = "combined")
+                                           p_value_test = TRUE)
   )
   expect_true(file.exists(file.path(testFolder, "barFoldChangeTest3")))
   
@@ -351,7 +347,7 @@ test_that("trelliPlots check the correct inputs", {
   fc_barplot <- mtrelliData3 %>% trelli_panel_by("Metabolite") %>% 
                      trelli_foldchange_bar(test_mode = TRUE, 
                                            test_example = 2,
-                                           p_value_test = "anova",
+                                           p_value_test = TRUE,
                                            p_value_thresh = 0,
                                            single_plot = TRUE)
   expect_true(inherits(fc_barplot, "ggplot"))
@@ -376,7 +372,7 @@ test_that("trelliPlots check the correct inputs", {
                              ggplot_params = "xlab('')",
                              test_mode = TRUE, 
                              test_example = 2,
-                             p_value_test = "anova",
+                             p_value_test = TRUE,
                              interactive = TRUE)
   )
   expect_true(file.exists(file.path(testFolder, "boxFoldChangeTest1")))
@@ -388,7 +384,7 @@ test_that("trelliPlots check the correct inputs", {
   
   suppressWarnings(singleEmetaPlot %>%
                      trelli_foldchange_boxplot(path = file.path(testFolder, "boxFoldChangeTest2"),
-                                               p_value_test = NULL,
+                                               p_value_test = FALSE,
                                                include_points = TRUE)
   )
   expect_true(file.exists(file.path(testFolder, "boxFoldChangeTest2")))
@@ -401,31 +397,32 @@ test_that("trelliPlots check the correct inputs", {
   
   # Data must be grouped by an e_meta column
   expect_error(
-    mtrelliData4 %>% trelli_panel_by("Metabolite") %>% trelli_foldchange_volcano(),
+    mtrelliData4 %>% trelli_panel_by("Metabolite") %>% trelli_foldchange_volcano(comparison = "Mock_vs_InfectionA"),
     "trelliData must be paneled_by an e_meta column."
   )
   
   # Generate a volcano trelliscope with a modified ggplot parameter
   suppressWarnings(mtrelliData4 %>% trelli_panel_by("MClass") %>% 
    trelli_foldchange_volcano(path = file.path(testFolder, "volFoldChangeTest1"),
+                             comparison = "Mock_vs_InfectionA",
                              ggplot_params = "xlab('')",
                              test_mode = TRUE, 
                              test_example = 2,
-                             p_value_test = "anova",
+                             p_value_test = TRUE,
                              interactive = TRUE)
   )
   expect_true(file.exists(file.path(testFolder, "volFoldChangeTest1")))
   
   # Generate a single plot volcano trelliscope with no p_value
   suppressWarnings(singleEmetaPlot %>%
-                     trelli_foldchange_volcano(path = file.path(testFolder, "volFoldChangeTest2"),
-                                               p_value_test = NULL)
+                     trelli_foldchange_volcano(path = file.path(testFolder, "volFoldChangeTest2"), comparison = "Mock_vs_InfectionA",
+                                               p_value_test = FALSE)
   )
   expect_true(file.exists(file.path(testFolder, "volFoldChangeTest2")))
   
   # Test the creation of a single plot
-  fc_volcano <- singleEmetaPlot %>% trelli_foldchange_volcano(single_plot = T)
-  expect_true(inherits(fc_boxplot, "ggplot"))
+  fc_volcano <- singleEmetaPlot %>% trelli_foldchange_volcano(single_plot = TRUE, p_value_test = FALSE, comparison = "Mock_vs_InfectionA")
+  expect_true(inherits(fc_volcano, "ggplot"))
   
   ## trelli_foldchange_heatmap
   
