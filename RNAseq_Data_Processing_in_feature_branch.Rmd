@@ -1,0 +1,254 @@
+---
+title: "RNAseq Data Processing"
+author: "Kelly Stratton, Rachel Richardson, Lisa Bramer"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    df_print: paged
+    rmarkdown::html_vignette:
+    fig_caption: yes
+    self_contained: yes
+    toc: true
+bibliography: bibliography.bib
+vignette: >
+  %\VignetteIndexEntry{pmartR-RNAseq} 
+  %\VignetteEngine{knitr::rmarkdown} 
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(rmarkdown.html_vignette.check_title = FALSE)
+
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install(c("DESeq2", "edgeR", "limma"))
+
+library(pmartRdata)
+```
+
+## Overview
+
+RNAseq data in `pmartR` follows a different workflow compared to the other data types, with different pre-processing, filtering, plot, and statistical options. This vignette walks through the RNAseq workflow, including the use of all three statistical analysis options, DEseq2 [@deseq2], edgeR [@edger], or limmaVOOM [@limmavoom].
+
+
+## Data Set-up
+
+To create a `seqData` object, an expression data frame (of count data) is required, as well as a data frame containing sample information. Transcript metadata is optional. Below we create a `seqData` object from example data frames in the `pmartRdata` package.
+
+```{r libraries}
+library(pmartR)
+library(pmartRdata)
+library(pander)
+```
+
+```{r data}
+data(rnaseq_edata)
+data(rnaseq_fdata)
+data(rnaseq_emeta)
+
+mydata <- as.seqData(e_data = rnaseq_edata, f_data = rnaseq_fdata, e_meta = rnaseq_emeta,
+                     edata_cname = "Transcript", fdata_cname = "SampleName", emeta_cname = "Gene",
+                     data_scale = "counts", check.names = FALSE)
+```
+
+Extra information was present in the transcript metadata compared to the expression data, so `pmartR` removed the excess information.
+
+Different from the other omic types for which `pmartR` automatically converts any 0's to NA's upon data object creation, for seqData, any NA's are converted to 0's.
+
+As with the other data types supported by `pmartR`, we can assign up to two main effects (groups of interest) for downstream statistical comparisons, as well as up to two covariates. The main effects are variables for which we want to obtain estimates and p-values; the covariates are variables which must be accounted for in the statistical model used, but are not of direct interest (no estimates or p-values).
+
+```{r groups}
+mydata <- group_designation(mydata, main_effects = c("Virus"))
+pander(table(mydata$f_data$Virus, useNA = "ifany"))
+```
+
+
+Unlike the other data types in `pmartR`, seqData objects are not transformed to a log scale as part of the standard workflow. However, to aid in the visualization of the data, the `plot()` function has an optional argument to transform the count data to one of the following:
+
+- lcpm: log counts per million
+
+- upper: 75th quantile scaling
+
+- median: median scaling
+
+```{r lcpm plot}
+plot(mydata, transformation = "lcpm", order_by = "Virus", color_by = "Virus")
+```
+
+```{r upper plot}
+plot(mydata, transformation = "upper", order_by = "Virus", color_by = "Virus")
+```
+
+```{r median plot}
+plot(mydata, transformation = "median", order_by = "Virus", color_by = "Virus")
+```
+
+
+
+## Quality Control
+
+### Filters
+
+Many of the available filters are specific to sequence (count) data:
+
+- Total count filter = enables removal of genes that do not have at least some minimum number of reads in ___ samples (integer greater than or equal to 2)
+
+- RNA_filter = enables removal of samples/genes? based on (1) total library size (number of reads) or (2) the number of unique non-zero transcripts per sample
+
+- number of nonzero reads for each sample
+
+The molecule_filter and custom_filter functions are available for seqData objects, however the cv_filter, imdanova_filter, and rmd_filter do not work for seqData objects.
+
+The molecule filter is useful to remove any transcripts not observed in at least a minimum number of samples; we commonly use a minimum of two samples.
+
+```{r molecule filter}
+my_mol_filt <- molecule_filter(mydata)
+summary(my_mol_filt, min_num = 2)
+
+mydata <- applyFilt(my_mol_filt, mydata, min_num = 2)
+```
+
+The total count filter ...
+
+```{r}
+# total count filter
+my_count_filt <- total_count_filter(mydata)
+
+plot(total_count_filter(mydata))
+```
+
+We can specify a minimum count for the filter, to see the effect of its application.
+
+```{r}
+plot(total_count_filter(mydata), min_count = 50)
+plot(total_count_filter(mydata), palette = "Blues", min_count = 20)
+plot(total_count_filter(mydata), palette = "Blues", 
+     min_count = 20, interactive = T) # why is there a line at zero??
+```
+
+The RNA filter has two options for removing transcripts--based on the library size or on the number of non-zero counts.
+
+```{r}
+# RNA filter
+my_rna_filt <- RNA_filter(mydata)
+
+plot(RNA_filter(mydata))
+```
+
+We can plot the RNA filter using a few different settings, depending on the goal of the filter.
+
+plot_type = "library" (displays library size for each sample) or "biomolecule" (displays the number of unique transcripts with non-zero counts within each sample)
+
+size_library = cut-off for sample library size (number of reads)
+
+min_nonzero = cut-off for number of transcripts with non-zero counts (within a sample?)
+
+```{r}
+plot(my_rna_filt, size_library = 2000000, plot_type = "library")
+summary(my_rna_filt, size_library = 2000000)
+plot(my_rna_filt, size_library = 10000, plot_type = "biomolecule")
+summary(my_rna_filt, size_library = 10000)
+
+# plot(RNA_filter(mydata), plot_type = "biomolecule")
+plot(my_rna_filt, min_nonzero = 700, plot_type = "library")
+summary(my_rna_filt, min_nonzero = 700)
+plot(my_rna_filt, min_nonzero = 700, plot_type = "biomolecule")
+
+```
+
+
+
+## Exploratory Data Analysis & Plots
+
+GLM-PCA
+
+```{r}
+dimred <- dim_reduction(mydata)
+
+plot(dimred)
+```
+
+The Spearman correlation between all samples can be computed and plotted in a heatmap.
+
+```{r}
+corres <- cor_result(mydata)
+
+plot(corres)
+```
+
+
+## Normalization & Statistical Comparisons
+
+Differential expression comparisons between main effects specified via the group_designation function can be conducted with wrappers built for the limma-voom, DESeq, and edgeR packages. To evaluate which package would be most appropriate for the data, a diagnostic plot function is included which demonstrates each method’s fit to dispersion-like estimates provided in the respective package. A poorly fit diagnostic plot may indicate bias specific to each method for the data or a need for additional filtering before con-ducting the statistical analysis. Wrappers for limma-voom, DESeq2 (Fig. 2e), and edgeR packages are available to the user using the default workflows with generalized linear model functionality to account for complex experimental designs.7-9
+
+### limma-voom
+
+```{r}
+### Dispersion estimate wrapper
+dispersion_est(mydata, "voom")
+
+voom_res <- Voom_wrapper(mydata)
+
+plot(voom_res, plot_type = "bar")
+plot(voom_res, plot_type = "volcano")
+plot(voom_res, plot_type = "MA")
+
+```
+
+### DESeq2
+
+```{r}
+### Dispersion estimate wrapper
+dispersion_est(mydata, "DESeq2")
+
+deseq_res <- Deseq2_wrapper(mydata)
+plot(deseq_res, plot_type = "bar")
+plot(deseq_res, plot_type = "volcano")
+plot(deseq_res, plot_type = "MA")
+
+```
+
+### edgeR
+
+```{r}
+### Dispersion estimate wrapper
+dispersion_est(mydata, "edgeR")
+
+edger_res <- EdgeR_wrapper(mydata)
+
+plot(edger_res, plot_type = "bar") 
+plot(edger_res, plot_type = "volcano")
+plot(edger_res, plot_type = "MA")
+```
+
+User says "ok looks fine, given me the stat results" or "nope. no good, I'll try another method"
+
+Plot of stat results - option for either volcano or MA plot, heat maps with option to subset to most significant molecules (based on p-value)
+
+```{r}
+
+
+
+```
+
+
+```{r}
+
+
+
+```
+
+
+```{r}
+
+
+
+```
+
+
+
+
+## References
+
