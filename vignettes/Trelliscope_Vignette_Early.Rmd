@@ -18,7 +18,7 @@ vignette: >
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 library(pmartRdata)
-#library(pmartR)
+library(pmartR)
 library(data.table)
 library(DT)
 library(dplyr)
@@ -74,7 +74,7 @@ parameter in pmartR::group_designation plot was set.
 
 ## Plot Summary 
 
-```{r}
+```{r, echo = FALSE}
 knitr::include_graphics("TrelliData_Plotting_Options.png")
 ```
 
@@ -133,7 +133,7 @@ of more than 1,000 plots can take several minutes to be made.
 
 To set the panels for the trelliscope, use the `?trelli_panel_by` function. We only
 have two options in this case, so a summary for plots where each panel is the 
-biomolecule (edata_cname = "LipidD") looks like this:
+biomolecule (edata_cname = "Lipid") looks like this:
 
 ```{r}
 summary(trelliData1 %>% trelli_panel_by("Lipid")) 
@@ -201,7 +201,7 @@ Abun_Box_Edata <- trelli_abundance_boxplot(MassGroups, single_plot = TRUE, test_
 
 # Make an abundance boxplot without the points 
 Abun_Box_Sample <- trelli_abundance_boxplot(SampleGroups, include_points = F, single_plot = T,
-                                            ggplot_params = "scale_fill_manual(values = 'steelblue')")
+                                            ggplot_params = "scale_fill_manual(values = 'forestgreen')")
 
 # Use patchwork to put plots together
 Abun_Box_Edata + Abun_Box_Sample
@@ -218,17 +218,29 @@ trelli_abundance_histogram(MassGroups, single_plot = TRUE, test_example = 3)
 
 **Missingness Barplot**
 
-We can also build a missingness bar plot for this data.
+We can also build a missingness bar plots. In this data, there is no missingness, 
+so we will use a different dataset to better demonstrate how these plots look. 
 If we would rather see count information in the bar plot instead of proportions, 
 we can easily set proportion to FALSE. 
 
 ```{r}
+# Pull from the smoking dataset
+smoke_trelliData <- as.trelliData.edata(
+  e_data = pmartRdata::smoke_edata,
+  edata_cname = "Mass_Tag_ID",
+  omics_type = "pepData"
+)
+
 # Create an example bar plot 
-Miss_Bar_Edata <- trelli_missingness_bar(MassGroups, single_plot = TRUE, test_example = 3)
+Miss_Bar_Edata <- trelli_missingness_bar(trelli_panel_by(smoke_trelliData, "Mass_Tag_ID"), 
+                                         single_plot = TRUE, test_example = 3,
+                                         ggplot_params = "ggtitle('Biomolecule')")
 
 # Make a missingness barplot 
-Miss_Bar_Sample <- trelli_missingness_bar(SampleGroups, include_points = F, 
-                                          proportion = FALSE, single_plot = T)
+Miss_Bar_Sample <- trelli_missingness_bar(trelli_panel_by(smoke_trelliData, "Sample"), 
+                                          include_points = F, 
+                                          proportion = FALSE, single_plot = T,
+                                          ggplot_params = "ggtitle('Sample')")
 
 # Put plots together with patchwork
 Miss_Bar_Edata + Miss_Bar_Sample
@@ -247,22 +259,29 @@ either an omicsData or statRes object.
 # Pull the lipids data frame 
 lipids <- pmartRdata::lipid_pos_object
 
+# Extract and add lipid family information
+lipids$e_meta$Family <- lipids$e_meta$Lipid %>% 
+  strsplit("(", fixed = T) %>% 
+  lapply(function(x) {head(x, 1)}) %>% 
+  unlist()
+
 # Log transform the edata file 
 lipids <- edata_transform(omicsData = lipids, data_scale = "log2")
 
 # Set the group designation main effects 
-peptides <- group_designation(omicsData = peptides, main_effects = c("Condition"))
+lipids <- group_designation(omicsData = lipids, main_effects = c("Virus"))
 
 # Filter the data to run the imd_anova
-imdanova_Filt <- imdanova_filter(omicsData = peptides)
-peptides <- applyFilt(filter_object = imdanova_Filt, omicsData = peptides, min_nonmiss_anova=2)
+imdanova_Filt <- imdanova_filter(omicsData = lipids)
+lipids <- applyFilt(filter_object = imdanova_Filt, omicsData = lipids, min_nonmiss_anova=2)
 
-# Normalize the data 
-peptides <- normalize_global(peptides, subset_fn = "all", norm_fn = "median", 
+# Normalize the data. You may use the Kruskal-Wallis test from normRes_tests to 
+# confirm that your normalization choice does not induce nor remove significance. 
+lipids <- normalize_global(lipids, subset_fn = "rip", norm_fn = "median", 
                              apply_norm = TRUE, backtransform = TRUE)
 
 # Create trelliData object
-trelliData2 <- as.trelliData(omicsData = peptides)
+trelliData2 <- as.trelliData(omicsData = lipids)
 ```
 
 If we summarize the plot options with `summary`, we get: 
@@ -281,21 +300,21 @@ sections on how each e_meta and group_designation affect each plot.
 **Abundance Boxplot**
 
 The group_designation variables are utilized in the abundance boxplot when paneling
-by edata_cname ("Mass_Tag_ID")...
+by edata_cname ("Lipid")...
 
 ```{r}
 trelliData2 %>% 
-  trelli_panel_by("Mass_Tag_ID") %>% 
-  trelli_abundance_boxplot(test_example = 3, single_plot = T)
+  trelli_panel_by("Lipid") %>% 
+  trelli_abundance_boxplot(test_example = 3, single_plot = T, ggplot_params = "xlab('Viral Strain')")
 ```
 
-...or e_meta variable. In this case, our options include Protein, Reference_ID, 
-and Peptide_Sequence. Note that group_designation is used if included: 
+...or e_meta variable. In this case, our options include Row, Retention_Time, and Family. 
+Note that group_designation is used if included: 
 
 ```{r}
 trelliData2 %>% 
-  trelli_panel_by("Protein") %>% 
-  trelli_abundance_boxplot(test_example = 3, single_plot = T)
+  trelli_panel_by("Family") %>% 
+  trelli_abundance_boxplot(test_example = 6, single_plot = T)
 ```
 
 If we panel by the sample, the plot remains the same as in example case 1. 
@@ -303,7 +322,7 @@ If we panel by the sample, the plot remains the same as in example case 1.
 **Abundance Histogram**
 
 Since group_designation is not used in the histogram trelliscope plotting function,
-it remains the same as above. 
+it remains the same as in Example Case 1.
 
 **Missingness Bar**
 
@@ -312,21 +331,21 @@ variable is an e_meta variable.
 
 ```{r}
 trelliData2 %>% 
-  trelli_panel_by("Protein") %>% 
+  trelli_panel_by("Family") %>% 
   trelli_missingness_bar(test_example = 3, single_plot = T)
 ```
 
 **Abundance Heatmap**
 
 An advantage to including e_meta variables is the ability to use heatmaps, where 
-each panel is an "e_meta" variable, the x-axis are the biomolecules within that 
-biomolecule category, and the y-axis is the samples in order by the "group_by"
-designation. 
+each panel is an "e_meta" variable, one axis is the biomolecules within that 
+biomolecule class, and the other axis is the samples in order by the "group_by"
+designation.
 
 ```{r}
 trelliData2 %>% 
-  trelli_panel_by("Protein") %>% 
-  trelli_abundance_heatmap(test_example = 3, single_plot = T)
+  trelli_panel_by("Family") %>% 
+  trelli_abundance_heatmap(test_example = 2, single_plot = T, ggplot_params = "coord_flip()")
 ```
 
 ## Example Case 3: statRes Only
@@ -336,28 +355,28 @@ To get a statRes object, pass your transformed, filtered, and normalized data to
 the `?imd_anova` function. 
 
 ```{r}
-# Run an imd_anova with both an anova and a g-test
-pepStats <- imd_anova(peptides, test_method = "combined")
+# Since nothing is missing from this dataset, there is no need to run the G-test. 
+lipidStats <- imd_anova(lipids, test_method = "anova")
 
 # Pass that dataframe to the trelliData object builder
-trelliData3 <- as.trelliData(statRes = pepStats)
+trelliData3 <- as.trelliData(statRes = lipidStats)
 
 # Run the summary function
 summary(trelliData3)
 ```
 
-There are only two trelliscope plotting options for statRes objects by themself. 
+There are only two trelliscope plotting options for statRes objects by themselves. 
 The missingness plot, which we have seen above, and a fold change bar plot. 
 Fold change plots have two additional parameters: p_value_test, which allows users to
-choose "anova", "g-test", "combined", or NULL for determining which significance
+choose TRUE/FALSE for determining which significance
 tests should be highlighted at a specific p value threshold (p_value_thresh). 
 
 **Foldchange Bar**
 
 ```{r}
 trelliData3 %>%
-  trelli_panel_by("Mass_Tag_ID") %>%
-  trelli_foldchange_bar(p_value_thresh = 0.05, p_value_test = "anova", 
+  trelli_panel_by("Lipid") %>%
+  trelli_foldchange_bar(p_value_thresh = 0.05, p_value_test = TRUE, 
                         test_example = 3, single_plot = TRUE)
 ```
 
@@ -372,7 +391,7 @@ plots that we have yet to see.
 
 ```{r}
 # Build a trelliData object with both omicsData and statRes
-trelliData4 <- as.trelliData(omicsData = peptides, statRes = pepStats)
+trelliData4 <- as.trelliData(omicsData = lipids, statRes = lipidStats)
 
 summary(trelliData4)
 ```
@@ -381,14 +400,15 @@ summary(trelliData4)
 
 To create a fold change boxplot, the input data must be paneled by an e_meta
 variable. If p_value_test is enabled, any points with a significant value are 
-colored red. 
+shaped as squares.
 
 ```{r}
 trelliData4 %>%
-  trelli_panel_by("Protein") %>%
+  trelli_panel_by("Family") %>%
   trelli_foldchange_boxplot(
     single_plot = TRUE,
-    p_value_test = "combined"
+    p_value_test = TRUE,
+    test_example = 4
   )
 ```
 
@@ -399,7 +419,7 @@ comparison (x-axis).
 
 ```{r}
 trelliData4 %>%
-  trelli_panel_by("Protein") %>%
+  trelli_panel_by("Family") %>%
   trelli_foldchange_heatmap(
     single_plot = TRUE
   )
@@ -408,14 +428,16 @@ trelliData4 %>%
 **Fold Change Volcano**
 
 Volcano plots display the -log10 p-value versus the fold change values. Significant
-values with a low fold change are colored blue, and high ones are colored red. 
+values with a low fold change are colored blue, and high ones are colored red. These
+plots require that a specific comparison is selected.
 
 ```{r}
 trelliData4 %>%
-  trelli_panel_by("Protein") %>%
+  trelli_panel_by("Family") %>%
   trelli_foldchange_volcano(
+    comparison = "StrainA_vs_StrainB",
     test_example = 3,
-    p_value_test = "anova",
+    p_value_test = TRUE,
     single_plot = TRUE
   )
 ```
@@ -429,7 +451,7 @@ For example:
 
 ```{r}
 trelliData2 %>% 
-  trelli_panel_by("Protein") %>% 
+  trelli_panel_by("Lipid") %>% 
   trelli_abundance_boxplot(test_example = 3, single_plot = T,
     ggplot_params = c("ggtitle('CYC Human')", 
                       "ylab('Log Adjusted Abundance')",
@@ -474,7 +496,7 @@ Every plot has an interactive option by making interactive=TRUE.
 
 ```{r}
 trelliData2 %>% 
-  trelli_panel_by("Protein") %>% 
+  trelli_panel_by("Lipid") %>% 
   trelli_abundance_boxplot(test_example = 3, single_plot = T, interactive = T)
 ```
 
