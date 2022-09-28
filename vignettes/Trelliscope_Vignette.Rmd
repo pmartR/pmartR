@@ -104,7 +104,7 @@ log transformation and normalization parameters.
 ```{r}
 trelliData1 <- as.trelliData.edata(
   e_data = pmartRdata::lipid_edata_pos,
-  edata_cname = "Lipid",
+  edata_cname = "LipidCommonName",
   omics_type = "lipidData",
   data_scale_original = "abundance",
   data_scale = "log2",
@@ -123,7 +123,7 @@ summary(trelliData1)
 ```
 
 With only an e_data file, there are only two potential options for panel by variables, 
-which include the edata_cname (in this case, Lipid), and a "Sample" category which 
+which include the edata_cname (in this case, "LipidCommonName"), and a "Sample" category which 
 is comprised of the name of every column besides edata_cname. The plot, which 
 corresponds to the table in the introduction, can be further investigated with
 adding trelli and underscores to the name. For example, the "abundance boxplot" 
@@ -136,7 +136,7 @@ have two options in this case, so a summary for plots where each panel is the
 biomolecule (edata_cname = "Lipid") looks like this:
 
 ```{r}
-summary(trelliData1 %>% trelli_panel_by("Lipid")) 
+summary(trelliData1 %>% trelli_panel_by("LipidCommonName")) 
 ```
 
 which is the above table subsetted down to the only options available to plot
@@ -161,7 +161,7 @@ See an example of how to use one of these functions below, with test_mode enable
 
 ```{r, echo = T, eval = F}
 trelli_abundance_boxplot(
-  trelli_panel_by(trelliData1, "Lipid"),
+  trelli_panel_by(trelliData1, "LipidCommonName"),
   cognostics = c("n", "mean", "median", "sd"),
   interactive = TRUE,
   include_points = TRUE,
@@ -186,12 +186,12 @@ abundance with include_points = TRUE, we would get too many points to view. Thus
 set include_points to FALSE. Since we've set "single_plot" to TRUE, we get an
 example of one of the many plots that will be made and passed to trelliscope. We
 can change which plot we're looking at with "test_example". On the left, we have 
-a "Lipid" example and on the right, a "Sample" example, with the color changed
+a "LipidCommonName" example and on the right, a "Sample" example, with the color changed
 to avoid confusion. 
 
 ```{r}
 # Panel by Mass Tag ID  
-MassGroups <- trelli_panel_by(trelliData1, "Lipid")
+MassGroups <- trelli_panel_by(trelliData1, "LipidCommonName")
 
 # Panel by Sample
 SampleGroups <- trelliData1 %>% trelli_panel_by("Sample") 
@@ -256,20 +256,27 @@ isobaric and nmr data) can be passed to the `as.trelliData` function which requi
 either an omicsData or statRes object. 
 
 ```{r}
-# Pull the lipids data frame 
-lipids <- pmartRdata::lipid_pos_object
-
 # Extract and add lipid family information
-lipids$e_meta$Family <- lipids$e_meta$Lipid %>% 
-  strsplit("(", fixed = T) %>% 
-  lapply(function(x) {head(x, 1)}) %>% 
-  unlist()
+lipid_emeta <- data.frame("LipidCommonName" = lipid_edata_pos$LipidCommonName, 
+  "LipidFamily" = lipid_edata_pos$LipidCommonName %>% as.character() %>% 
+    strsplit("(", fixed = T) %>% lapply(function(el) {el[1]}) %>% unlist())
+
+# Extend fdata to have two infection groups 
+lipid_fdata_pos2 <- data.frame("Sample_Name" = lipid_fdata_pos$Sample_Name, 
+  "Condition" = c(rep("Mock", 3), rep("Infection_A", 4), rep("Infection_B", 4)),
+  "Weight" = runif(11))
+
+# Build lipid data object
+lipids <- as.lipidData(e_data = lipid_edata_pos, f_data = lipid_fdata_pos2, e_meta = lipid_emeta,
+  edata_cname = "LipidCommonName", fdata_cname = "Sample_Name", 
+  emeta_cname = "LipidCommonName")
+
 
 # Log transform the edata file 
 lipids <- edata_transform(omicsData = lipids, data_scale = "log2")
 
 # Set the group designation main effects 
-lipids <- group_designation(omicsData = lipids, main_effects = c("Virus"))
+lipids <- group_designation(omicsData = lipids, main_effects = c("Condition"))
 
 # Filter the data to run the imd_anova
 imdanova_Filt <- imdanova_filter(omicsData = lipids)
@@ -300,20 +307,20 @@ sections on how each e_meta and group_designation affect each plot.
 **Abundance Boxplot**
 
 The group_designation variables are utilized in the abundance boxplot when paneling
-by edata_cname ("Lipid")...
+by edata_cname ("LipidCommonName")...
 
 ```{r}
 trelliData2 %>% 
-  trelli_panel_by("Lipid") %>% 
+  trelli_panel_by("LipidCommonName") %>% 
   trelli_abundance_boxplot(test_example = 3, single_plot = T, ggplot_params = "xlab('Viral Strain')")
 ```
 
-...or e_meta variable. In this case, our options include Row, Retention_Time, and Family. 
+...or e_meta variable. In this case, our options include LipidFamily. 
 Note that group_designation is used if included: 
 
 ```{r}
 trelliData2 %>% 
-  trelli_panel_by("Family") %>% 
+  trelli_panel_by("LipidFamily") %>% 
   trelli_abundance_boxplot(test_example = 6, single_plot = T)
 ```
 
@@ -331,7 +338,7 @@ variable is an e_meta variable.
 
 ```{r}
 trelliData2 %>% 
-  trelli_panel_by("Family") %>% 
+  trelli_panel_by("LipidFamily") %>% 
   trelli_missingness_bar(test_example = 3, single_plot = T)
 ```
 
@@ -344,7 +351,7 @@ designation.
 
 ```{r}
 trelliData2 %>% 
-  trelli_panel_by("Family") %>% 
+  trelli_panel_by("LipidFamily") %>% 
   trelli_abundance_heatmap(test_example = 2, single_plot = T, ggplot_params = "coord_flip()")
 ```
 
@@ -375,7 +382,7 @@ tests should be highlighted at a specific p value threshold (p_value_thresh).
 
 ```{r}
 trelliData3 %>%
-  trelli_panel_by("Lipid") %>%
+  trelli_panel_by("LipidCommonName") %>%
   trelli_foldchange_bar(p_value_thresh = 0.05, p_value_test = TRUE, 
                         test_example = 3, single_plot = TRUE)
 ```
@@ -404,11 +411,11 @@ shaped as squares.
 
 ```{r}
 trelliData4 %>%
-  trelli_panel_by("Family") %>%
+  trelli_panel_by("LipidFamily") %>%
   trelli_foldchange_boxplot(
     single_plot = TRUE,
     p_value_test = TRUE,
-    test_example = 4
+    test_example = 5
   )
 ```
 
@@ -419,7 +426,7 @@ comparison (x-axis).
 
 ```{r}
 trelliData4 %>%
-  trelli_panel_by("Family") %>%
+  trelli_panel_by("LipidFamily") %>%
   trelli_foldchange_heatmap(
     single_plot = TRUE
   )
@@ -433,12 +440,11 @@ plots require that a specific comparison is selected.
 
 ```{r}
 trelliData4 %>%
-  trelli_panel_by("Family") %>%
+  trelli_panel_by("LipidFamily") %>%
   trelli_foldchange_volcano(
-    comparison = "StrainA_vs_StrainB",
-    test_example = 3,
-    p_value_test = TRUE,
-    single_plot = TRUE
+    comparison = "Infection_A_vs_Infection_B",
+    test_example = 5,
+    single_plot = T
   )
 ```
 
@@ -451,7 +457,7 @@ For example:
 
 ```{r}
 trelliData2 %>% 
-  trelli_panel_by("Lipid") %>% 
+  trelli_panel_by("LipidCommonName") %>% 
   trelli_abundance_boxplot(test_example = 3, single_plot = T,
     ggplot_params = c("ggtitle('CYC Human')", 
                       "ylab('Log Adjusted Abundance')",
@@ -496,7 +502,7 @@ Every plot has an interactive option by making interactive=TRUE.
 
 ```{r}
 trelliData2 %>% 
-  trelli_panel_by("Lipid") %>% 
+  trelli_panel_by("LipidCommonName") %>% 
   trelli_abundance_boxplot(test_example = 3, single_plot = T, interactive = T)
 ```
 
