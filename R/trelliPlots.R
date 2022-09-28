@@ -1,5 +1,17 @@
 # This function runs necessary checks for pmartR trelliscope plotting functions. 
 # It cleans any parameters (rounding numerics to integers, etc.), and returns them.
+#' @param trelliData The trelliData object the user passed to a plotting function.
+#' @param trelliCheck Check if the object type is supposed to be "omics", "statRes" or put a vector of both.
+#' @param cognostics A vector of the user provided cognstics. 
+#' @param acceptable_cognostics The acceptable cognostics for this plot. 
+#' @param ggplot_params The vector of user provided ggplots. 
+#' @param interactive The user provided logical for whether the plot should be interactive.
+#' @param test_mode The user provided logical for whether a smaller trelliscope should be returned
+#' @param test_example The user provided vector of plot indices
+#' @param single_plot The user provided logical for whether a single plot should be returned
+#' @param p_value_skip Whether to skip specific p_value checks. Placeholder for potential future functions. 
+#' @param p_value_thresh The user provided threshold for plotting significant p-values.
+#' @param p_value_test The user provided provided logical for whether p-value testing should occur. 
 trelli_precheck <- function(trelliData, 
                             trelliCheck,
                             cognostics, 
@@ -208,7 +220,6 @@ trelli_builder <- function(toBuild, cognostics, plotFUN, cogFUN, path, name, ...
 }
 
 # Get downloads folder
-#' @export
 .getDownloadsFolder <- function(.test_mode = FALSE) {
   if (Sys.info()['sysname'] == "Windows" | .test_mode) {
     folder <- dirname("~")
@@ -243,7 +254,7 @@ trelli_builder <- function(toBuild, cognostics, plotFUN, cogFUN, path, name, ...
 #' @param name The name of the display. Default is Trelliscope.
 #' @param test_mode A logical to return a smaller trelliscope to confirm plot and design.
 #'    Default is FALSE.
-#' @param test_example The index number of the plot to return for test_mode. Default is 1. 
+#' @param test_example A vector of plot indices to return for test_mode. Default is 1.  
 #' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a trelliscope) should be returned. 
 #'    Default is FALSE. 
 #' 
@@ -520,7 +531,7 @@ trelli_abundance_boxplot <- function(trelliData,
 #' @param name The name of the display. Default is Trelliscope.
 #' @param test_mode A logical to return a smaller trelliscope to confirm plot and design.
 #'    Default is FALSE.
-#' @param test_example The index number of the plot to return for test_mode. Default is 1. 
+#' @param test_example A vector of plot indices to return for test_mode. Default is 1.  
 #' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a trelliscope) should be returned. 
 #'    Default is FALSE. 
 #' 
@@ -743,7 +754,7 @@ trelli_abundance_histogram <- function(trelliData,
 #' @param name The name of the display. Default is Trelliscope.
 #' @param test_mode A logical to return a smaller trelliscope to confirm plot and design.
 #'    Default is FALSE.
-#' @param test_example The index number of the plot to return for test_mode. Default is 1. 
+#' @param test_example A vector of plot indices to return for test_mode. Default is 1.  
 #' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a trelliscope) should be returned. 
 #'    Default is FALSE.
 #' 
@@ -932,7 +943,7 @@ trelli_abundance_heatmap <- function(trelliData,
 #' @param name The name of the display. Default is Trelliscope.
 #' @param test_mode A logical to return a smaller trelliscope to confirm plot and design.
 #'    Default is FALSE.
-#' @param test_example The index number of the plot to return for test_mode. Default is 1. 
+#' @param test_example A vector of plot indices to return for test_mode. Default is 1.  
 #' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a trelliscope) should be returned. 
 #'    Default is FALSE.
 #' 
@@ -1240,7 +1251,7 @@ determine_significance <- function(DF, p_value_thresh) {
 #' @param name The name of the display. Default is Trelliscope.
 #' @param test_mode A logical to return a smaller trelliscope to confirm plot and design.
 #'    Default is FALSE.
-#' @param test_example The index number of the plot to return for test_mode. Default is 1. 
+#' @param test_example A vector of plot indices to return for test_mode. Default is 1.  
 #' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a trelliscope) should be returned. 
 #'    Default is FALSE.
 #' 
@@ -1422,7 +1433,7 @@ trelli_foldchange_bar <- function(trelliData,
 #' @param name The name of the display. Default is Trelliscope.
 #' @param test_mode A logical to return a smaller trelliscope to confirm plot and design.
 #'    Default is FALSE.
-#' @param test_example The index number of the plot to return for test_mode. Default is 1. 
+#' @param test_example A vector of plot indices to return for test_mode. Default is 1.  
 #' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a trelliscope) should be returned. 
 #'    Default is FALSE.
 #' 
@@ -1605,7 +1616,7 @@ trelli_foldchange_boxplot <- function(trelliData,
 #' @param name The name of the display. Default is Trelliscope.
 #' @param test_mode A logical to return a smaller trelliscope to confirm plot and design.
 #'    Default is FALSE.
-#' @param test_example The index number of the plot to return for test_mode. Default is 1. 
+#' @param test_example A vector of plot indices to return for test_mode. Default is 1.  
 #' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a trelliscope) should be returned. 
 #'    Default is FALSE.
 #' 
@@ -1825,7 +1836,7 @@ trelli_foldchange_volcano <- function(trelliData,
 #' @param name The name of the display. Default is Trelliscope.
 #' @param test_mode A logical to return a smaller trelliscope to confirm plot and design.
 #'    Default is FALSE.
-#' @param test_example The index number of the plot to return for test_mode. Default is 1. 
+#' @param test_example A vector of plot indices to return for test_mode. Default is 1.  
 #' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a trelliscope) should be returned. 
 #'    Default is FALSE.
 #' 

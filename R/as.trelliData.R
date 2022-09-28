@@ -11,7 +11,6 @@
 #' .is_edata(pmartRdata::lipid_edata)
 #' 
 #' }
-#' @export
 .is_edata <- function(edata) {
   
   # If edata is NULL, return FALSE

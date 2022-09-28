@@ -64,13 +64,13 @@ data.table(
 
 where "Input Data" is the type of data that will be plotted and "Plot Type" describes what
 kind of plot would be generated in the trelliscope. "Uses e_data" describes plots
-that can be made with just an e_data object using the as.trelliData.edata function. 
+that can be made with just an e_data object using the `as.trelliData.edata` function. 
 Similarly, "Uses omicsData" describes plots that can be made with an omicsData object
-(pepData, proData, lipidData, nmrData, etc.) in the as.trelliData function. 
-"Uses statRes" describes plots that can be built with a statRes object in as.trelliData;
+(pepData, proData, lipidData, nmrData, etc.) in the `as.trelliData` function. 
+"Uses statRes" describes plots that can be built with a statRes object in `as.trelliData`;
 however, most of these plots "Require e_meta" from omicsData to determine trelliscope
 panels. The last column, "Main Effects used" describes any plot where the "main_effects" 
-parameter in pmartR::group_designation plot was set. 
+parameter in `pmartR::group_designation` plot was set. 
 
 ## Plot Summary 
 
@@ -84,7 +84,7 @@ Let's start with the simplest input data to run these trelliscope functions,
 e_data. For context, a typical e_data file looks like this: 
 
 ```{r, echo = F}
-datatable(head(pmartRdata::lipid_pos_edata), options = list(`scrollX` = T))
+datatable(head(pmartRdata::lipid_edata_pos), options = list(`scrollX` = T))
 ```
 
 where each of the rows are biomolecules and each of the columns are samples. Within
@@ -103,7 +103,7 @@ log transformation and normalization parameters.
 
 ```{r}
 trelliData1 <- as.trelliData.edata(
-  e_data = pmartRdata::lipid_pos_edata,
+  e_data = pmartRdata::lipid_edata_pos,
   edata_cname = "Lipid",
   omics_type = "lipidData",
   data_scale_original = "abundance",
