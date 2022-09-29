@@ -543,7 +543,7 @@ EdgeR_wrapper <- function(
       checker <- sub(el, "", checker)
     }
     
-    checkin <- map_lgl(purrr:::map(combo, stringr::str_detect, string = checker), any)
+    checkin <- purrr::map_lgl(purrr:::map(combo, stringr::str_detect, string = checker), any)
     
     if(all(checkin)){
       
@@ -595,7 +595,7 @@ EdgeR_wrapper <- function(
     res[c(ncol(res), 1:(ncol(res) - 1))]
   })
   
-  all_cont <- res_contrasts[map_int(res_contrasts, nrow) != 0] %>% 
+  all_cont <- res_contrasts[purrr::map_int(res_contrasts, nrow) != 0] %>% 
     purrr::reduce(dplyr:::full_join)
   
   count_cols <- grep("^NonZero_Count_", colnames(all_cont))
@@ -803,7 +803,7 @@ Voom_wrapper <- function(
       checker <- sub(el, "", checker)
     }
     
-    checkin <- map_lgl(purrr:::map(combo, stringr::str_detect, string = checker), any)
+    checkin <- purrr::map_lgl(purrr:::map(combo, stringr::str_detect, string = checker), any)
     
     if(all(checkin)){
       
@@ -851,7 +851,7 @@ Voom_wrapper <- function(
     } else return()
   })
   
-  all_cont <- res_contrasts[map_int(res_contrasts, nrow) != 0] %>% 
+  all_cont <- res_contrasts[purrr::map_int(res_contrasts, nrow) != 0] %>% 
     purrr::reduce(dplyr::full_join)
   
   results <- list(Full_results = all_cont)

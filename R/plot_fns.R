@@ -5741,7 +5741,7 @@ plot.statRes <- function (x,
     ## Color by significance
     comps <- strsplit(attr(x, "comparisons"), "_vs_")
     
-    plotter <- map_dfr(1:length(comps), function(n_comp){
+    plotter <- purrr::map_dfr(1:length(comps), function(n_comp){
       label <- attr(x, "comparisons")[n_comp]
       comp <- paste("Mean", comps[[n_comp]], sep = "_")
       pval <-  grep(paste0("^P_value_.+", label), colnames(x), value = T)
@@ -5761,7 +5761,7 @@ plot.statRes <- function (x,
     
     if(all(is.na(plotter$var1))){
       
-      plotter <- map_dfr(1:length(comps), function(n_comp){
+      plotter <- purrr::map_dfr(1:length(comps), function(n_comp){
         label <- attr(x, "comparisons")[n_comp]
         comp <- paste("Mean", label, sep = "_")
         comp2 <- paste("Fold_change", label, sep = "_")
