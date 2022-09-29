@@ -102,27 +102,20 @@ molecule_filter <- function (omicsData, use_groups = FALSE, use_batch = FALSE) {
     output <- omicsData$e_data %>%
       tidyr::pivot_longer(cols = -tidyselect::all_of(id_col), names_to = names(batchDat)[1], values_to = "value") %>%
       dplyr::left_join(batchDat, by = pmartR::get_fdata_cname(omicsData)) %>%
-      dplyr::group_by(dplyr::across(tidyselect::all_of(id_col)), Batch)
-
-    if(inherits(omicsData, "seqData")){
-      output <- output %>%
-      dplyr::summarise(num_obs = sum(value !=0 ),.groups = "keep") %>% ##
+      dplyr::group_by(dplyr::across(tidyselect::all_of(id_col)), Batch) %>%
+      {
+        if(inherits(omicsData, "seqData")) {
+           dplyr::summarise(., num_obs = sum(value != 0), .groups = "keep")
+        } else {
+           dplyr::summarise(., num_obs = sum(!is.na(value)),.groups = "keep")
+        }
+      } %>% 
       dplyr::group_by(dplyr::across(tidyselect::all_of(id_col))) %>%
       dplyr::summarise(min_num_obs = as.numeric(min(num_obs)),.groups = "keep") %>%
       dplyr::ungroup() %>%
       dplyr::rename(molecule = tidyselect::all_of(id_col)) %>% 
       dplyr::arrange(match(molecule,ordering)) %>% 
       data.frame()
-    } else {
-      output <- output %>%
-      dplyr::summarise(num_obs = sum(!is.na(value)),.groups = "keep") %>% ##
-      dplyr::group_by(dplyr::across(tidyselect::all_of(id_col))) %>%
-      dplyr::summarise(min_num_obs = as.numeric(min(num_obs)),.groups = "keep") %>%
-      dplyr::ungroup() %>%
-      dplyr::rename(molecule = tidyselect::all_of(id_col)) %>% 
-      dplyr::arrange(match(molecule,ordering)) %>% 
-      data.frame()
-    }
      
     colnames(output)[1] <- get_edata_cname(omicsData)
   }
@@ -136,26 +129,21 @@ molecule_filter <- function (omicsData, use_groups = FALSE, use_batch = FALSE) {
     output <- omicsData$e_data %>%
       tidyr::pivot_longer(cols = -tidyselect::all_of(id_col), names_to = names(groupDat)[1], values_to = "value") %>%
       dplyr::left_join(groupDat, by = pmartR::get_fdata_cname(omicsData)) %>%
-      dplyr::group_by(dplyr::across(tidyselect::all_of(id_col)), Group)
-    if(inherits(omicsData, "seqData")){ 
-      output <- output %>% 
-      dplyr::summarise(num_obs = sum(value != 0),.groups = "keep") %>%
+      dplyr::group_by(dplyr::across(tidyselect::all_of(id_col)), Group) %>%
+      {
+        if(inherits(omicsData, "seqData")) {
+           dplyr::summarise(., num_obs = sum(value != 0), .groups = "keep")
+        } else {
+           dplyr::summarise(., num_obs = sum(!is.na(value)),.groups = "keep")
+        }
+      } %>% 
       dplyr::group_by(dplyr::across(tidyselect::all_of(id_col))) %>%
       dplyr::summarise(min_num_obs = as.numeric(min(num_obs)),.groups = "keep") %>%
       dplyr::ungroup() %>%
       dplyr::rename(molecule = tidyselect::all_of(id_col)) %>%
       dplyr::arrange(match(molecule,ordering)) %>%
       data.frame()
-    } else {
-      output <- output %>% 
-      dplyr::summarise(num_obs = sum(!is.na(value)),.groups = "keep") %>% ###
-      dplyr::group_by(dplyr::across(tidyselect::all_of(id_col))) %>%
-      dplyr::summarise(min_num_obs = as.numeric(min(num_obs)),.groups = "keep") %>%
-      dplyr::ungroup() %>%
-      dplyr::rename(molecule = tidyselect::all_of(id_col)) %>%
-      dplyr::arrange(match(molecule,ordering)) %>%
-      data.frame()
-    }
+    
     colnames(output)[1] <- get_edata_cname(omicsData)
   }
 
@@ -169,27 +157,21 @@ molecule_filter <- function (omicsData, use_groups = FALSE, use_batch = FALSE) {
       tidyr::pivot_longer(cols = -tidyselect::all_of(id_col), names_to = names(groupDat)[1], values_to = "value") %>%
       dplyr::left_join(groupDat, by = pmartR::get_fdata_cname(omicsData)) %>%
       dplyr::left_join(batchDat, by = pmartR::get_fdata_cname(omicsData)) %>%
-      dplyr::group_by(dplyr::across(tidyselect::all_of(id_col)), Group, Batch)
-
-    if(inherits(omicsData, "seqData")){
-      output <- output %>%
-      dplyr::summarise(num_obs = sum(value != 0 ),.groups = "keep") %>% 
+      dplyr::group_by(dplyr::across(tidyselect::all_of(id_col)), Group, Batch) %>%
+      {
+        if(inherits(omicsData, "seqData")) {
+           dplyr::summarise(., num_obs = sum(value != 0), .groups = "keep")
+        } else {
+           dplyr::summarise(., num_obs = sum(!is.na(value)),.groups = "keep")
+        }
+      } %>% 
       dplyr::group_by(dplyr::across(tidyselect::all_of(id_col))) %>%
       dplyr::summarise(min_num_obs = as.numeric(min(num_obs)),.groups = "keep") %>%
       dplyr::ungroup() %>%
       dplyr::rename(molecule = tidyselect::all_of(id_col)) %>%
       dplyr::arrange(match(molecule,ordering)) %>%
       data.frame()
-    } else {
-      output <- output %>%
-      dplyr::summarise(num_obs = sum(!is.na(value)),.groups = "keep") %>%
-      dplyr::group_by(dplyr::across(tidyselect::all_of(id_col))) %>%
-      dplyr::summarise(min_num_obs = as.numeric(min(num_obs)),.groups = "keep") %>%
-      dplyr::ungroup() %>%
-      dplyr::rename(molecule = tidyselect::all_of(id_col)) %>%
-      dplyr::arrange(match(molecule,ordering)) %>%
-      data.frame()
-    }
+    
     colnames(output)[1] <- get_edata_cname(omicsData)
   }
 

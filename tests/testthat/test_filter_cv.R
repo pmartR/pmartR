@@ -431,7 +431,7 @@ test_that('cv_filter and applyFilt produce the correct output',{
                    60)
   expect_equal(attr(filtered_gdf, 'filters')[[1]]$filtered,
                c(6850636, 6948820, 6948835, 6948904))
-  expect_true(is.na(attr(filtered_gdf, 'filters')[[1]]$method))
+  expect_equal(attr(filtered_gdf, 'filters')[[1]]$method$use_groups, TRUE)
 
   # Investigate the data_info attribute.
   expect_equal(
@@ -485,7 +485,7 @@ test_that('cv_filter and applyFilt produce the correct output',{
                    60)
   expect_equal(attr(filtered_sg_gdf, 'filters')[[1]]$filtered,
                c(6948820, 6948835, 6948904))
-  expect_true(is.na(attr(filtered_sg_gdf, 'filters')[[1]]$method))
+  expect_equal(attr(filtered_sg_gdf, 'filters')[[1]]$method$use_groups, TRUE)
 
   # Investigate the data_info attribute.
   expect_equal(

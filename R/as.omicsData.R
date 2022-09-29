@@ -1682,28 +1682,28 @@ pre_flight <- function (e_data,
   
   # Depending on scale, check if there are zeros in edata and auto-remove all 0/na rows
   if (data_scale == 'abundance') {
-    
+
     if(any(na.omit(e_data == 0))){
       # Exchange 0 for NA in edata.
       e_data <- replace_zeros(edata = e_data,
                               edata_cname = edata_cname)
     }
-    
-    # Auto remove all NA data 
-    e_data <- e_data[apply(is.na(e_data), 1, sum) < 2,]
-    
+
+    # Auto remove all NA data
+    # e_data <- e_data[apply(is.na(e_data), 1, sum) < 2,]
+
   } else if (data_scale == 'counts'){
-    
+
     if(any(is.na(e_data))){
       # Exchange NA for 0 in edata.
       e_data <- replace_nas(edata = e_data,
                             edata_cname = edata_cname)
     }
-    
+
     # Auto-remove all 0 data
-    select <- which(colnames(e_data) != edata_cname)
-    e_data <- e_data[apply(e_data[select] != 0, 1, any),]
-    
+    # select <- which(colnames(e_data) != edata_cname)
+    # e_data <- e_data[apply(e_data[select] != 0, 1, any),]
+
   }
   
   # Perform checks on f_data ---------------------------------------------------

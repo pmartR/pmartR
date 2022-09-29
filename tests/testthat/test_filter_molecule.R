@@ -33,10 +33,7 @@ test_that('molecule_filter and applyFilt produce the correct output',{
   # Test molecule_filter -------------------------------------------------------
 
   # Try creating a moleculeFilt object with inappropriate input objects.
-  expect_error(molecule_filter(omicsData = edata),
-               paste("omicsData must be of class 'pepData', 'proData',",
-                     "'metabData', 'lipidData', or 'nmrData'",
-                     sep = ' '))
+  expect_error(molecule_filter(omicsData = edata), "omicsData must be of class")
 
   # Run molecule filter on the reduced data frame.
   filter <- molecule_filter(omicsData = pdata)
