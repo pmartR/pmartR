@@ -210,7 +210,7 @@ get_filters <- function (omicsData) {
 get_filter_type <- function (omicsData) {
   
   # Store the filters attribute from the previous filters (if any).
-  pFilters <- get_filters(omicsData)
+  pFilters <- suppressMessages(get_filters(omicsData))
   # pFilters <- attr(omicsData, 'filters')
   
   # Determine the length of the filters attribute. The length corresponds to the

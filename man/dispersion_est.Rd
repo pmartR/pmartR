@@ -7,7 +7,6 @@
 dispersion_est(
   omicsData,
   method,
-  comparisons = NULL,
   interactive = FALSE,
   x_lab = NULL,
   x_lab_size = 11,
@@ -28,8 +27,6 @@ dispersion_est(
 \item{omicsData}{seqData object used to terst dispersions}
 
 \item{method}{either "DESeq2", "edgeR", or "voom" for testing dispersion}
-
-\item{comparisons}{Comparisons used in dispersion estimates}
 
 \item{interactive}{Logical. If TRUE produces an interactive plot.}
 

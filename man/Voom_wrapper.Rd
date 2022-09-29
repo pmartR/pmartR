@@ -4,7 +4,13 @@
 \alias{Voom_wrapper}
 \title{Wrapper for limma-voom workflow}
 \usage{
-Voom_wrapper(omicsData, p_adjust = "BH", comparisons = NULL, p_cutoff = 0.05)
+Voom_wrapper(
+  omicsData,
+  p_adjust = "BH",
+  comparisons = NULL,
+  p_cutoff = 0.05,
+  ...
+)
 }
 \arguments{
 \item{omicsData}{an object of type 'seqData', created by \code{\link{as.seqData}}}
@@ -15,13 +21,18 @@ Voom_wrapper(omicsData, p_adjust = "BH", comparisons = NULL, p_cutoff = 0.05)
 
 \item{p_cutoff}{an object of type 'seqData', created by \code{\link{as.seqData}}}
 
-\item{plotVoom}{an object of type 'seqData', created by \code{\link{as.seqData}}}
+\item{...}{additional arguments passed to functions}
 }
 \value{
 data.frame object
 }
 \description{
 For generating statistics for 'seqData' objects
+}
+\details{
+Runs default edgeR workflow. Defaults to Wald test, no independent filtering, and 
+running in parallel. Additional arguments can be passed for use in the function, 
+refer to calcNormFactors() in edgeR package
 }
 \examples{
 \dontrun{

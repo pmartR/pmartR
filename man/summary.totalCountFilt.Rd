@@ -5,6 +5,8 @@
 \title{Produce a basic summary of a totalCountFilt object}
 \usage{
 \method{summary}{totalCountFilt}(filter_object, min_count = NULL)
+
+\method{summary}{totalCountFilt}(filter_object, min_count = NULL)
 }
 \arguments{
 \item{filter_object}{S3 object of class 'totalCountFilt' created by \code{\link{total_count_filter}}.}
@@ -13,10 +15,16 @@
 }
 \value{
 a summary of the Total Count values, number of zero values, and non-zero values. If a min_count is provided the biomolecules that would be filtered, at this threshold, are reported.
+
+a summary of the Total Count values, number of zero values, and non-zero values. If a min_count is provided the biomolecules that would be filtered, at this threshold, are reported.
 }
 \description{
 This function will provide basic summary statistics for the totalCountFilt object.
+
+This function will provide basic summary statistics for the totalCountFilt object.
 }
 \author{
+Lisa Bramer
+
 Lisa Bramer
 }
