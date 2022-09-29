@@ -688,6 +688,13 @@ normalize_global_basic <- function (edata, norm_fn) {
 #'
 get_spans_params <- function(SPANSRes_obj, sort_by_nmols = FALSE){
 
+  if (!inherits(SPANSRes_obj, "SPANSRes")) {
+    
+    # Suffer the wrath of Dread Pirate Roberts!!!!!
+    stop("object must be of class 'SPANSRes'")
+    
+  }
+  
   if(all(is.na(SPANSRes_obj$SPANS_score))) stop("No methods were selected for scoring, there is no 'best' set of parameters to return.")
 
   # get rows that are tied for top score

@@ -33,7 +33,8 @@ Imports:
     RcppArmadillo,
     RColorBrewer,
     magrittr,
-    patchwork
+    patchwork,
+    glmpca
 Suggests:
     knitr,
     rmarkdown,

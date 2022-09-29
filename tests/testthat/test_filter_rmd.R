@@ -153,7 +153,6 @@ test_that("rmd_filter and applyFilt produce the correct output",{
   expect_equal(dim(nmrfilter_rmd),
                c(41, 8))
   expect_equal(round(nmrfilter_rmd$Log2.md, 3),
-
                c(3.913, 2.919, 0.785, 3.937, 5.23, 0.897, 1.553, 1.644, 1.447,
                  2.126, 1.36, 1.995, 1.256, 0.095, 1.066, 0.999, 2.728, 1.966,
                  1.471, 3.022, 2.122, -1.172, 4.629, 2.262, 5.708, 3.163, 4.236,
@@ -572,7 +571,6 @@ test_that("rmd_filter and applyFilt produce the correct output",{
                c(9, 2))
   expect_equal(dim(pfiltered_sg_f$e_meta),
                c(150, 4))
-
 
   # Test VizSampNames attribute ------------------------------------------------
 

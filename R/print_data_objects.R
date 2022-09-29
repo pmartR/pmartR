@@ -350,6 +350,94 @@ print.lipidData<- function(lipidData){
   }
 }
 
+#' print.seqData
+#' 
+#' For printing an S3 object of type 'seqData':
+#' 
+#'@rdname print-seqData
+#'@export
+#'
+print.seqData<- function(seqData){
+  if(!inherits(seqData, "seqData")) stop("lipid_object must be of the class 'seqData'")
+  
+  e_data<- as.data.frame(lapply(seqData$e_data, as.character), stringsAsFactors = FALSE, check.names = attr(seqData, "check.names"))
+  f_data<- as.data.frame(lapply(seqData$f_data, as.character), stringsAsFactors = FALSE, check.names = attr(seqData, "check.names"))
+  edata_ncols<- ncol(e_data)
+  fdata_ncols<- ncol(f_data)
+  blank_row = rep("----", 5)
+  
+  if(!is.null(seqData$e_meta)){
+    e_meta<- as.data.frame(lapply(seqData$e_meta, as.character), stringsAsFactors = FALSE, check.names = attr(seqData, "check.names"))
+    emeta_ncols<- ncol(e_meta)
+    
+    if(nrow(e_data) >= 9){
+      e_data_head = head(e_data, 4)[, 1:min(edata_ncols, 5)]
+      e_data_tail = tail(e_data, 4)[, 1:min(edata_ncols, 5)]
+      edata = rbind(e_data_head, blank_row, e_data_tail)
+    }else{
+      edata = e_data
+    }
+    
+    if(nrow(f_data) >= 9){
+      f_data_head = head(f_data, 4)[, 1:min(fdata_ncols, 5)]
+      f_data_tail = tail(f_data, 4)[, 1:min(fdata_ncols, 5)]
+      fdata = rbind(f_data_head, blank_row, f_data_tail)
+    }else{
+      fdata = f_data
+    }
+    
+    if(nrow(e_meta) >= 9){
+      e_meta_head = head(e_meta, 4)[, 1:min(emeta_ncols, 5)]
+      e_meta_tail = tail(e_meta, 4)[, 1:min(emeta_ncols, 5)]
+      emeta = rbind(e_meta_head, blank_row, e_meta_tail)
+    }else{
+      emeta = e_meta
+    }
+    
+    if(edata_ncols > 5) message("only first 5 columns are shown")
+    cat("e_data\n")
+    cat(capture.output(edata), sep = "\n")
+    cat("\n")
+    
+    if(fdata_ncols > 5) message("only first 5 columns are shown")
+    cat("f_data\n")
+    cat(capture.output(fdata), sep = "\n")
+    cat("\n")
+    
+    if(emeta_ncols > 5) message("only first 5 columns are shown")
+    cat("e_meta\n")
+    cat(capture.output(emeta), sep = "\n")
+    cat("\n")
+    
+  }else{
+    if(nrow(e_data) >= 9){
+      e_data_head = head(e_data, 4)[, 1:min(edata_ncols, 5)]
+      e_data_tail = tail(e_data, 4)[, 1:min(edata_ncols, 5)]
+      edata = rbind(e_data_head, blank_row, e_data_tail)
+    }else{
+      edata = e_data
+    }
+    
+    if(nrow(f_data) >= 9){
+      f_data_head = head(f_data, 4)[, 1:min(fdata_ncols, 5)]
+      f_data_tail = tail(f_data, 4)[, 1:min(fdata_ncols, 5)]
+      fdata = rbind(f_data_head, blank_row, f_data_tail)
+    }else{
+      fdata = f_data
+    }
+    
+    if(edata_ncols > 5) message("only first 5 columns are shown")
+    cat("e_data\n")
+    cat(capture.output(edata), sep = "\n")
+    cat("\n")
+    
+    if(fdata_ncols > 5) message("only first 5 columns are shown")
+    cat("f_data\n")
+    cat(capture.output(fdata), sep = "\n")
+    cat("\n")
+  }
+}
+
 
 #' print.dataRes
 #' 

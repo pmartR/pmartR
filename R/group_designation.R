@@ -92,11 +92,12 @@ group_designation <- function (omicsData,
 
   # check that omicsData is of appropriate class #
   if (!inherits(omicsData, c("pepData", "proData", "metabData",
-                             "isobaricpepData", "lipidData", "nmrData"))) {
-
+                             "isobaricpepData", "lipidData", "nmrData", 
+                             "seqData"))) {
+    
     # Throw an error that the input for omicsData is not the appropriate class.
     stop(paste("omicsData must be of class 'pepData', 'proData', 'metabData',",
-               "'isobaricpepData', 'lipidData', or 'nmrData'",
+               "'isobaricpepData', 'lipidData', 'nmrData', or 'seqData'",
                sep = ' '))
 
   }
@@ -793,6 +794,13 @@ group_designation <- function (omicsData,
   nonsingleton_groups <- names(which(table(output$Group) > 1))
   attr(output, "nonsingleton_groups") <- nonsingleton_groups
 
+  ## Warning for levels that are not "correct" in R
+  if(!is.numeric(output$Group) && 
+     !identical(output$Group, make.names(output$Group)) &&
+     inherits(omicsData, "seqData")){
+    warning("Main effects levels are not in R-acceptable format (A syntactically valid name consists of letters, numbers and the dot or underline characters and starts with a letter or the dot not followed by a number). Limma-voom processing will not be available unless all main effects meet this condition.")
+  }
+  
   # Add the group information to the group_DF attribute in the omicsData object.
   attr(omicsData, "group_DF") = output
 

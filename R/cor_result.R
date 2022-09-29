@@ -7,8 +7,10 @@
 #'   \code{\link{as.proData}}, \code{\link{as.metabData}},
 #'   \code{\link{as.lipidData}}, \code{\link{as.nmrData}}, respectively.
 #'
-#' @details The Pearson correlation between samples is calculated based on
-#'   biomolecules that are observed in both samples.  the \eqn{n \times n}
+#' @details The correlation between samples is calculated based on
+#'   biomolecules that are observed in both samples. For seqData objects, 
+#'   Spearman correlation is used. For all other data types, Pearson 
+#'   correlation is used.  the \eqn{n \times n}
 #'   correlation matrix of normalized data. See \code{\link{cor}} for further
 #'   details.
 #'
@@ -29,7 +31,8 @@
 #' 
 cor_result <- function(omicsData){
 
-  if (!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData", "nmrData"))) stop("omicsData must be of class 'pepData', 'proData', 'metabData', 'lipidData', or 'nmrData'")
+  if (!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData", "nmrData", "seqData"))) 
+    stop("omicsData must be of class 'pepData', 'proData', 'metabData', 'lipidData', 'nmrData', or 'seqData'")
   
   # Check the data scale. Data must be on one of the log scales.
   if (get_data_scale(omicsData) == "abundance") {
@@ -38,12 +41,22 @@ cor_result <- function(omicsData){
     stop ("Data must be on the log scale.")
     
   }
+  
+  # Check the data scale. Data must be on one of the log scales.
+  if (inherits(omicsData, "seqData") && get_data_scale(omicsData) != "counts") {
+    
+    # Welcome to the pit of despair!
+    stop ("seqData must be untransformed prior to running cor_result.")
+    
+  }
 
-  edata_cname <- attr(omicsData, "cnames")$edata_cname
+  edata_cname <- get_edata_cname(omicsData)
   id_col <- which(colnames(omicsData$e_data) == edata_cname)
 
   output <- cor(omicsData$e_data[, -id_col],
-                use = "pairwise.complete.obs")
+                use = "pairwise.complete.obs",
+                method = ifelse(inherits(omicsData, "seqData"), 
+                                "spearman", "pearson"))
 
   rownames(output) <- names(omicsData$e_data[, -id_col])
 
@@ -52,19 +65,22 @@ cor_result <- function(omicsData){
   class(output) <- c("corRes", orig_class)
 
   attr(output, "sample_names") <- names(omicsData$e_data[, -id_col])
-  attr(output, "group_DF") <- attr(omicsData, "group_DF")
-  attr(output, "is_normalized") <- attr(omicsData, "data_info")$norm_info$is_normalized
+  attr(output, "group_DF") <- get_group_DF(omicsData)
+  attr(output, "is_normalized") <- get_data_norm(omicsData)
+  attr(output, "cor_method") <- ifelse(inherits(omicsData, "seqData"),
+                                       "spearman", "pearson")
   
   if (inherits(omicsData, "isobaricpepData")) {
     
-    attr(output, "isobaric_norm") <- attr(omicsData,"isobaric_info")$norm_info$is_normalized
-    attr(output, "is_normalized") <- attr(omicsData,"data_info")$norm_info$is_normalized
+    # attr(output, "isobaric_norm") <- attr(omicsData,"isobaric_info")$norm_info$is_normalized
+    # attr(output, "is_normalized") <- attr(omicsData,"data_info")$norm_info$is_normalized
+    attr(output, "isobaric_norm") <- get_isobaric_norm(omicsData)
     
   } else if (inherits(omicsData, "nmrData")) {
     
-    attr(output, "nmr_norm") <- attr(omicsData, "nmr_info")$norm_info$is_normalized
-    attr(output, "is_normalized") <- attr(omicsData,"data_info")$norm_info$is_normalized
-    
+    # attr(output, "nmr_norm") <- attr(omicsData, "nmr_info")$norm_info$is_normalized
+    # attr(output, "is_normalized") <- attr(omicsData,"data_info")$norm_info$is_normalized
+    attr(output, "nmr_norm") <- get_nmr_norm(omicsData)
   }
   
   return (output)

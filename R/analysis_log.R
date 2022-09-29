@@ -16,7 +16,12 @@ analysis_log<- function(omicsData){
   library(rmarkdown)
   
   # check that omicsData is of correct class #
-  if(!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData", "nmrData"))) stop("omicsData must be of class 'pepData', 'proData', 'metabData', 'lipidData', or 'nmrData'.")
+  if(
+    !inherits(
+      omicsData, 
+      c("pepData", "proData", 
+        "metabData", "lipidData", "nmrData", "seqData"))) stop(
+          "omicsData must be of class 'pepData', 'proData', 'metabData', 'lipidData', 'nmrData', or 'seqData'.")
   
   data <- omicsData
   classes <- class(data)

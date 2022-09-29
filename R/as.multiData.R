@@ -121,7 +121,8 @@ as.multiData <-
   } 
   
   is_normed <- sapply(omicsData_objects, function(obj) {
-    attr(obj, "data_info")$norm_info$is_normalized
+    get_data_norm(obj)
+    # attr(obj, "data_info")$norm_info$is_normalized
   })
   
   if(length(unique(is_normed)) != 1) {
@@ -364,8 +365,10 @@ print.multiData <- function(multiData, ...) {
 #'@export
 summary.multiData <- function(multiData, ...) {
   # Assume data scale and norm status will be consistent across all objects.
-  data_scale = unique(sapply(multiData$omicsData, function(x) attr(x, "data_info")$data_scale))
-  is_normed <- all(sapply(multiData$omicsData, function(x) attr(x, "data_info")$norm_info$is_normalized))
+  # data_scale = unique(sapply(multiData$omicsData, function(x) attr(x, "data_info")$data_scale))
+  # is_normed <- all(sapply(multiData$omicsData, function(x) attr(x, "data_info")$norm_info$is_normalized))
+  data_scale = unique(sapply(multiData$omicsData, get_data_scale))
+  is_normed <- all(sapply(multiData$omicsData, get_data_norm))
   
   cat(sprintf("multiData object containing %s %s omicsData objects on the %s scale\n", 
               length(multiData$omicsData),

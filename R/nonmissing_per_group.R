@@ -27,7 +27,8 @@ nonmissing_per_group <- function (omicsData) {
   edata <- omicsData$e_data[, -id_col]
 
   # Fish out information from the group_DF attribute.
-  groupDF <- attr(omicsData, "group_DF")
+  # groupDF <- attr(omicsData, "group_DF")
+  groupDF <- get_group_DF(omicsData)
 
   # Count the number of samples per group from the group_DF data frame.
   tot_samps <- groupDF %>%
