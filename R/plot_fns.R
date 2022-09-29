@@ -5721,6 +5721,7 @@ plot.statRes <- function (x,
 
   else if("ma" %in% plot_type){
     
+    ## Color by significance
     comps <- strsplit(attr(x, "comparisons"), "_vs_")
     
     plotter <- map_dfr(1:length(comps), function(n_comp){
@@ -5751,23 +5752,19 @@ plot.statRes <- function (x,
         
         v1 <- x[[comp]]
         v2 <- x[[comp2]]
-        v3 <-  pval
+        v3 <-  x[[pval]]
         
-        data.frame(var1 = v1,var2 = v2, pval = pval, comp = label)
+        data.frame(var1 = v1,var2 = v2, pval = v3, comp = label)
       })
       
       p <- ggplot2::ggplot(
         plotter, 
         ggplot2::aes(
           x = log2(var1),
-          y = log2(var2)
+          y = var2,
+          color = pval < attr(x, "pval_thresh")
         )) + 
         ggplot2::geom_point() +
-        # ggplot2::geom_hex(ggplot2::aes(fill = stat(log2(count)))) +
-        # ggplot2::geom_density2d(color =  gsub(TRUE, "Significant", 
-        #                                       gsub(FALSE, "Non-Significant", 
-        #                                            plotter$pval < 0.05)),
-        #                       alpha = 0.5, inherit.aes = F) +
         ggplot2::facet_wrap(~comp) +
         ggplot2::geom_segment(
           y = 0, yend = 0, linetype = "dashed", color = "red",
@@ -5776,17 +5773,8 @@ plot.statRes <- function (x,
         ) + ggplot2::labs(
           x = "A (Log2 Average Expression)", 
           y = "M (Log2 Fold Change)",
-          fill = "Log2 (N Transcripts)"
-        ) + ggplot2::theme_bw()
-      
-      pval_plotter <- plotter[plotter$pval < 0.05,]
-      
-      p <- p + ggplot2::geom_density2d(
-        data = pval_plotter, ggplot2::aes(
-          color = log10(..density..),
-          x = log2((var1 + var2)/2),
-          y = log2(var1/var2)
-        ))
+          color = paste("Significance < ", attr(x, "pval_thresh"))
+        )
       
     } else {
       
@@ -5794,7 +5782,8 @@ plot.statRes <- function (x,
         plotter, 
         ggplot2::aes(
           x = log2((var1 + var2)/2),
-          y = log2(var1/var2)
+          y = log2(var1/var2),
+          color = pval < attr(x, "pval_thresh")
         )) + 
         # ggplot2::geom_hex(ggplot2::aes(fill = stat(log2(count)))) +
         ggplot2::geom_point() +
@@ -5806,30 +5795,20 @@ plot.statRes <- function (x,
         ) + ggplot2::labs(
           x = "A (Log2 Average Expression)", 
           y = "M (Log2 Fold change)",
-          fill = "Log2 (N Transcripts)"
-        ) + ggplot2::theme_bw()
-      
-      # pval_plotter <- plotter[plotter$pval < 0.05,]
-      # pval_plotter <- na.omit(pval_plotter)
-      # 
-      # find_hull <- function(df) df[chull(df$eff, df$man), ]
-      # hulls <- plyr::ddply(pval_plotter, "comp", find_hull)
-      # 
-      # # p <- p + ggplot2::geom_polygon(data = hulls, alpha = 0.5)
-      
-      # breaks <- c(0.01, 0.001, 0.0001)
-      # pval_plotter$cols <- "< 0.05"
-      # for(cut in breaks){
-      #   pval_plotter$cols[pval_plotter$pval < cut] <- paste0("< ", cut)
-      # }
-      
-      # p <- p + ggplot2::geom_density_2d(data = pval_plotter, ggplot2::aes(
-      #   colour = cols,
-      #   x = log2((var1 + var2)/2),
-      #   y = log2(var1/var2)
-      # ))
+          color = paste("Significance < ", attr(x, "pval_thresh"))
+        )
       
     }
+    
+    if(bw_theme) p <- p +
+      ggplot2::theme_bw() +
+      ggplot2::theme(strip.background = ggplot2::element_rect(fill = "white"))
+    
+    p <- p + mytheme
+    
+    if(interactive)
+      return(plotly::ggplotly(p, tooltip = c("text"))) else
+        return(p)
     
   }
   
@@ -6140,7 +6119,7 @@ statres_barplot <- function(x,
   levels(comp_df_melt$Comparison) <- gsub(pattern = "_",
                                           replacement = " ",
                                           levels(comp_df_melt$Comparison))
-
+  
   # Bar plots side-by-side, both going up
   # ggplot(data=comp_df_melt,aes(Comparison,Count,fill=Direction))+
   #   geom_bar(stat='identity',position='dodge')
@@ -6175,8 +6154,9 @@ statres_barplot <- function(x,
     ggplot2::geom_bar(ggplot2::aes(x = whichtest,
                                    fill = posneg,
                                    group = whichtest),
-                      stat = 'identity',
-                      position = "dodge") +
+                      stat = 'identity'#,
+                      #position = "dodge"
+                      ) +
     ggplot2::geom_hline(ggplot2::aes(yintercept = 0), colour = 'gray50') +
     ggplot2::scale_fill_manual(
       values = c(fc_colors[1], fc_colors[3]),
@@ -6196,7 +6176,7 @@ statres_barplot <- function(x,
                                       label = ifelse(abs(Count) > 0,
                                                      abs(Count),
                                                      "")),
-                         position = "dodge",#ggplot2::position_stack(vjust = 0.5),
+                         # position = "dodge",#ggplot2::position_stack(vjust = 0.5),
                          size = text_size)
 
   }

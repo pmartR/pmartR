@@ -9,25 +9,8 @@ Deseq2_wrapper(
   test = "Wald",
   p_adjust = "BH",
   comparisons = NULL,
-  fitType = NULL,
-  sfType = NULL,
-  betaPrior = FALSE,
-  full = NULL,
-  reduced = NULL,
-  quiet = TRUE,
-  minReplicatesForReplace = Inf,
-  modelMatrixType = NULL,
-  useT = FALSE,
-  minmu = 0.5,
-  parallel = FALSE,
-  BPPARAM = NULL,
-  lfcThreshold = 0,
-  altHypothesis = "greaterAbs",
-  independentFiltering = FALSE,
-  alpha = 0.1,
-  format = "DataFrame",
-  addMLE = FALSE,
-  p_cutoff = 0.05
+  p_cutoff = 0.05,
+  ...
 )
 }
 \arguments{
@@ -37,54 +20,20 @@ Deseq2_wrapper(
 
 \item{p_adjust}{an object of type 'seqData', created by \code{\link{as.seqData}}}
 
-\item{comparisons}{data.frame with columns for "Control" and "Test" 
-containing the different comparisons of interest. Comparisons will be made 
-between the Test and the corresponding Control. If left NULL, then all 
-pairwise comparisons are executed.}
+\item{comparisons}{an object of type 'seqData', created by \code{\link{as.seqData}}}
 
-\item{fitType}{an object of type 'seqData', created by \code{\link{as.seqData}}}
-
-\item{sfType}{an object of type 'seqData', created by \code{\link{as.seqData}}}
-
-\item{full}{an object of type 'seqData', created by \code{\link{as.seqData}}}
-
-\item{reduced}{an object of type 'seqData', created by \code{\link{as.seqData}}}
-
-\item{quiet}{an object of type 'seqData', created by \code{\link{as.seqData}}}
-
-\item{minReplicatesForReplace}{an object of type 'seqData', created by \code{\link{as.seqData}}}
-
-\item{modelMatrixType}{an object of type 'seqData', created by \code{\link{as.seqData}}}
-
-\item{useT}{an object of type 'seqData', created by \code{\link{as.seqData}}}
-
-\item{parallel}{an object of type 'seqData', created by \code{\link{as.seqData}}}
-
-\item{BPPARAM}{an object of type 'seqData', created by \code{\link{as.seqData}}}
-
-\item{lfcThreshold}{an object of type 'seqData', created by \code{\link{as.seqData}}}
-
-\item{altHypothesis}{an object of type 'seqData', created by \code{\link{as.seqData}}}
-
-\item{independentFiltering}{an object of type 'seqData', created by \code{\link{as.seqData}}}
-
-\item{alpha}{an object of type 'seqData', created by \code{\link{as.seqData}}}
-
-\item{format}{an object of type 'seqData', created by \code{\link{as.seqData}}}
-
-\item{addMLE}{an object of type 'seqData', created by \code{\link{as.seqData}}}
-
-\item{p_cutoff}{an object of type 'seqData', created by \code{\link{as.seqData}}}
-
-\item{plotMA}{an object of type 'seqData', created by \code{\link{as.seqData}}}
-
-\item{plotDispEsts}{an object of type 'seqData', created by \code{\link{as.seqData}}}
+\item{...}{additional arguments passed to function}
 }
 \value{
-data.frame object
+statres data.frame object
 }
 \description{
 For generating statistics for 'seqData' objects
+}
+\details{
+Runs default DESeq workflow. Defaults to Wald test, no independent filtering, and 
+running in parallel. Additional arguments can be passed for use in the function, 
+refer to DESeq() and results() in DESeq2 package
 }
 \examples{
 \dontrun{

@@ -1454,7 +1454,7 @@ applyFilt.imdanovaFilt <- function (filter_object,
       
       # Get the total number of filters previously applied. This is the length
       # of the filters attribute.
-      n_filtas <- length(get_filters(omicsData))
+      n_filtas <- length(suppressMessages(get_filters(omicsData)))
       
       # Check the length of the filters attribute.
       if (n_filtas == 1) {
@@ -1473,7 +1473,7 @@ applyFilt.imdanovaFilt <- function (filter_object,
         # n_filtas <- length(get_filters(omicsData))
 
         # Remove the custom filter from the filters attribute.
-        attr(omicsData, "filters") <- get_filters(omicsData)[-n_filtas]
+        attr(omicsData, "filters") <- suppressMessages(get_filters(omicsData)[-n_filtas])
 
       }
 

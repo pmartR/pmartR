@@ -540,9 +540,6 @@ print.proteomicsFilterSummary <- function(object){
 #' @rdname summary.imdanovaFilt
 #' @name summary.imdanovaFilt
 #' @export
-#' @rdname summary.imdanovaFilt
-#' @name summary.imdanovaFilt
-#' @export
 summary.imdanovaFilt <- function(filter_object, min_nonmiss_anova = NULL,
                                  min_nonmiss_gtest = NULL, comparisons = NULL){
 
