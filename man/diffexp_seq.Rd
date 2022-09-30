@@ -6,7 +6,7 @@
 \usage{
 diffexp_seq(
   omicsData,
-  method = "EdgeR",
+  method = "edgeR",
   p_adjust = "BH",
   comparisons = NULL,
   p_cutoff = 0.05,

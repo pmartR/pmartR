@@ -56,7 +56,9 @@ write_stat_results <- function(omicsData, statResData, refCondition, filePath = 
   ## END OF CHECKS ##
   
   ## First get the Normalized Data tab with metadata
-  if(!is.null(get_emeta_cname(myseqData))){
+  if(inherits(omicsData, "seqData")){
+    Normalized_Data <- NULL
+  } else if(!is.null(get_emeta_cname(myseqData))){
     Normalized_Data <- left_join(omicsData$e_meta, omicsData$e_data, 
                                  by = intersect(names(omicsData$e_meta), 
                                                 names(omicsData$e_data)))

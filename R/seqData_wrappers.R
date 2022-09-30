@@ -28,7 +28,7 @@
 #' @rdname diffexp_seq
 #' @name diffexp_seq
 #' 
-diffexp_seq <- function(omicsData, method = "EdgeR", p_adjust = "BH", 
+diffexp_seq <- function(omicsData, method = "edgeR", p_adjust = "BH", 
                         comparisons = NULL, p_cutoff = 0.05, ...){
   
   ## check inputs
@@ -60,18 +60,18 @@ diffexp_seq <- function(omicsData, method = "EdgeR", p_adjust = "BH",
   
   if(method == 'edgeR'){
     
-    EdgeR_wrapper(omicsData, p_adjust, 
-                  comparisons, p_cutoff, ...)
+    edgeR_wrapper(omicsData = omicsData, p_adjust = p_adjust, 
+                  comparisons = comparisons, p_cutoff = p_cutoff, ...)
     
   } else if(method == "DESeq2"){
     
-    Deseq2_wrapper(omicsData, p_adjust, 
-                   comparisons, p_cutoff, ...)
+    DESeq2_wrapper(omicsData = omicsData, p_adjust = p_adjust, 
+                   comparisons = comparisons, p_cutoff = p_cutoff, ...)
     
-  } else {
+  } else if(method == "voom"){
     
-    Voom_wrapper(omicsData, p_adjust, 
-                 comparisons, p_cutoff, ...)
+    voom_wrapper(omicsData = omicsData, p_adjust = p_adjust, 
+                 comparisons = comparisons, p_cutoff = p_cutoff, ...)
     
   }
 }
@@ -116,10 +116,10 @@ diffexp_seq <- function(omicsData, method = "EdgeR", p_adjust = "BH",
 #' }
 #' 
 #' @export
-#' @rdname Deseq2_wrapper
-#' @name Deseq2_wrapper
+#' @rdname DESeq2_wrapper
+#' @name DESeq2_wrapper
 #' 
-Deseq2_wrapper <- function(
+DESeq2_wrapper <- function(
     omicsData, test = "Wald",  p_adjust = "BH", comparisons = NULL,
     p_cutoff = 0.05, ...
 ){
@@ -387,10 +387,10 @@ Deseq2_wrapper <- function(
 #' }
 #' 
 #' @export
-#' @rdname EdgeR_wrapper
-#' @name EdgeR_wrapper
+#' @rdname edgeR_wrapper
+#' @name edgeR_wrapper
 #' 
-EdgeR_wrapper <- function(
+edgeR_wrapper <- function(
     omicsData, p_adjust = "BH", comparisons = NULL, p_cutoff = 0.05,
     ...
 ){
@@ -666,10 +666,10 @@ EdgeR_wrapper <- function(
 #' }
 #' 
 #' @export
-#' @rdname Voom_wrapper
-#' @name Voom_wrapper
+#' @rdname voom_wrapper
+#' @name voom_wrapper
 #' 
-Voom_wrapper <- function(
+voom_wrapper <- function(
     omicsData,  p_adjust = "BH", comparisons = NULL, p_cutoff = 0.05, ...
 ){
   
