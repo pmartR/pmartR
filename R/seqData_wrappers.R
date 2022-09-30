@@ -115,8 +115,6 @@ diffexp_seq <- function(omicsData, method = "edgeR", p_adjust = "BH",
 #' \dontrun{
 #' }
 #' 
-#' @rdname DESeq2_wrapper
-#' @name DESeq2_wrapper
 #' 
 DESeq2_wrapper <- function(
     omicsData, test = "Wald",  p_adjust = "BH", comparisons = NULL,
@@ -384,9 +382,6 @@ DESeq2_wrapper <- function(
 #' @examples
 #' \dontrun{
 #' }
-#' 
-#' @rdname edgeR_wrapper
-#' @name edgeR_wrapper
 #' 
 edgeR_wrapper <- function(
     omicsData, p_adjust = "BH", comparisons = NULL, p_cutoff = 0.05,
@@ -662,9 +657,6 @@ edgeR_wrapper <- function(
 #' @examples
 #' \dontrun{
 #' }
-#' 
-#' @rdname voom_wrapper
-#' @name voom_wrapper
 #' 
 voom_wrapper <- function(
     omicsData,  p_adjust = "BH", comparisons = NULL, p_cutoff = 0.05, ...
