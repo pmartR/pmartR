@@ -64,12 +64,15 @@ summary.moleculeFilt <- function(filter_object, min_num=NULL){
   return(res)
 }
 
+
+
 #' Print method for summary of molecule filter
 #'
 #' Print method for summary of molecule filter
-#'
-#'@export
-#'@name print.moleculeFilterSummary
+#' 
+#' @export
+#' @name print.moleculeFilterSummary
+
 print.moleculeFilterSummary <- function(object){
   # create output #
   cat("\nSummary of Molecule Filter \n----------------------------------\n")
@@ -90,6 +93,310 @@ print.moleculeFilterSummary <- function(object){
 
 }
 
+
+#' Produce a basic summary of a totalCountFilt object
+#'
+#' This function will provide basic summary statistics for the totalCountFilt object.
+#'
+#' @param filter_object S3 object of class 'totalCountFilt' created by \code{\link{total_count_filter}}.
+#' @param min_count numeric value greater than 1 and less than the value given by filter_object$Total_Count.  Values below min_count are filtered out. Default value is NULL.
+#' @return a summary of the Total Count values, number of zero values, and non-zero values. If a min_count is provided the biomolecules that would be filtered, at this threshold, are reported.
+#'
+#'
+#' @author Lisa Bramer
+#'
+#' @export
+#' @rdname summary.totalCountFilt
+#' @name summary.totalCountFilt
+summary.totalCountFilt <- function(filter_object, min_count = NULL){
+  
+  # checks for cv_threshold if not null #
+  if(!is.null(min_count)) {
+    # check that cv_threshold is numeric
+    if(!is.numeric(min_count)) stop("cv_threshold must be numeric of length 1")
+    # chack that cv_threshold is of length 1
+    if(length(min_count)>1) stop("cv_threshold must be numeric of length 1")
+    # check that cv_threshold is more than 1 and less than max CV value
+    if(min_count <= 1 | min_count >= max(filter_object$Total_Counts, na.rm = TRUE)) stop("cv_threshold must be greater than 1 and less than the maximum CV value")
+  }
+  
+  # get summary of Total_Counts #
+  count_sum <- summary(filter_object$Total_Counts)
+  
+  # get biomolecules to filter if min_count is not NULL #
+  if(!is.null(min_count)) {
+    filt <- as.character(filter_object[filter_object$Total_Counts < min_count, 1])
+    if(length(filt)==0) filt <- NULL
+  } else filt <- NULL
+  
+  res <- list(Summary_all = count_sum,
+              filtered_biomolecules = length(filt))
+  
+  class(res) = c("totalCountFiltSummary","list")
+  
+  return(res)
+}
+
+#' Print method for summary of Total Count filter
+#' 
+#' Print method for summary of Total Count filter
+#' 
+#' @export
+#'
+print.totalCountFiltSummary <- function(object){
+  # create output #
+  cat(c("\nSummary of Total Count Filter\n----------------------\nCountss:\n", 
+        capture.output(object$Summary_all)), sep = "\n")
+  cat(c("\nNumber Filtered Biomolecules:", paste(object$filtered_biomolecules, collapse = ", "), "\n\n"))
+  
+}
+
+#' Print method for summary of molecule filter
+#' 
+#' Print method for summary of molecule filter
+#' 
+#' @export
+#' @name print.moleculeFilterSummary
+print.moleculeFilterSummary <- function(object){
+  # create output #
+  cat("\nSummary of Molecule Filter \n----------------------------------\n")
+  if(!is.null(object$min_num)){
+    cat(sprintf("Minimum Number:%d\nFiltered:%d\nNot Filtered:%d\n\n", object$min_num, object$num_filtered, object$num_not_filtered))
+  }
+  print(object$pep_observation_counts, row.names = FALSE)
+  
+}
+
+#' Produce a basic summary of a RNAFilt object
+#'
+#' This function will provide basic summary statistics for the molecule_filter object.
+#'
+#' @param filter_object S3 object of class 'RNAFilt' created by \code{\link{molecule_filter}}.
+#' @param min_nonzero Integer or float between 0 and 1. Cut-off for number of 
+#' unique biomolecules with non-zero counts or as a proportion of total 
+#' biomolecules. Defaults to NULL.
+#' @param size_library Integer. Cut-off for sample library size (i.e. number 
+#' of reads). Defaults to NULL.
+#' 
+#' @return a summary table giving the minimum, maximum, interquartiles, mean and 
+#' standard deviation for library size,  the number of unique biomolecules with 
+#' non-zero observations per sample, and the proportion of non-zero observations 
+#' over the total number of biomolecules.
+#'
+#' @examples
+#' dontrun{
+#' library(pmartRdata)
+#' data("pep_object")
+#' myfilter <- molecule_filter(pep_object)
+#' summary(myfilter)
+#' summary(myfilter, min_num = 2)
+#'}
+#'
+#' @author Lisa Bramer, Kelly Stratton
+#'
+#' @export
+#'@rdname summary.RNAFilt
+#'@name summary.RNAFilt
+
+summary.RNAFilt <- function(filter_object, 
+                            size_library = NULL, 
+                            min_nonzero = NULL){
+  
+  # Have a looksie at the class of the filter object.
+  if (!inherits(filter_object, "RNAFilt")) {
+    
+    # Fezzik, tear his arms off.
+    stop ("filter_object must be of class RNAFilt")
+    
+  }
+  
+  ## Checks for size_library as single integer
+  if(!is.null(size_library) && 
+     (length(size_library) > 1 || 
+      size_library%%1 != 0 ||
+      size_library > max(filter_object$LibrarySize)
+     )
+  ) stop(
+    paste0(
+      "size_library must be integer of length 1 less than max library size (",
+      max(filter_object$LibrarySize),
+      ")"
+    )
+  )
+  
+  ## Checks for min_nonzero as single numeric
+  if(!is.null(min_nonzero)){
+    
+    ## Length
+    if(length(min_nonzero) > 1) stop("min_nonzero must be length 1")
+      
+    ## proportion or int
+    if(!(min_nonzero%%1 == 0 || (min_nonzero > 0 && min_nonzero < 1))) stop(
+      "min_nonzero must be integer or numeric between 0 and 1.")
+    
+    ## Within appropriate bounds
+    if(min_nonzero%%1 == 0 && min_nonzero > max(filter_object$NonZero)) stop(
+      paste0("min_nonzero exceeds maximum number of non-zero biomolecules (",
+             max(filter_object$NonZero),
+             ")"
+      )
+    )
+    
+    if(min_nonzero%%1 != 0 && 
+       min_nonzero > max(filter_object$ProportionNonZero)) stop(
+         paste0(
+           "min_nonzero exceeds maximum proportion of non-zero biomolecules (",
+           signif(max(filter_object$ProportionNonZero)), 
+           ")")
+       )
+    
+    
+  }
+  
+  #---------------
+  temp_obj <- filter_object
+  if(!is.null(min_nonzero)){
+    
+    column_use <- ifelse(min_nonzero%%1 == 0, 
+                         "NonZero", "ProportionNonZero")
+    temp_obj <- temp_obj[temp_obj[[column_use]] >= min_nonzero,]
+  }
+  
+  if(!is.null(size_library)){
+    temp_obj <- temp_obj[temp_obj[["LibrarySize"]] >= size_library,]
+  }
+  
+  ## Pre-filter
+  df <- as.data.frame(apply(temp_obj[-1], 2, summary))
+  df["SD",] <- apply(temp_obj[-1], 2, sd)
+  
+  rmved <- !(filter_object$SampleID %in% temp_obj$SampleID)
+  
+  res <- list(
+    Summary = df,
+    samples_filtered = filter_object$SampleID[rmved],
+    num_filtered = sum(rmved),
+    num_not_filtered = sum(!rmved),
+    nonzero_thresh = min_nonzero,
+    library_thresh = size_library
+  )
+  
+  class(res) = c("RNAFiltSummary", class(res))
+  
+  return(res)
+}
+
+
+#' Print method for summary of RNAFilt
+#' 
+#' Print method for summary of RNAFilt
+#' 
+#' @export
+#' @name print.RNAFiltSummary
+print.RNAFiltSummary <- function(object){
+  # create output #
+  cat("\nSummary of RNA Filter \n----------------------------------\n")
+  
+  if(!is.null(object$library_thresh)){
+    cat(sprintf("Library size cut-off: %d\n\n", 
+                object$library_thresh))
+  }
+  
+  if(!is.null(object$nonzero_thresh)){
+    
+    if(object$nonzero_thresh%%1 == 0){
+      cat(sprintf("N Non-zero biomolecule cut-off: %d\n\n", 
+                  object$nonzero_thresh))
+    } else {
+      cat(sprintf("Proportion Non-zero biomolecule cut-off: %d\n\n", 
+                  object$nonzero_thresh))
+    }
+  }
+  
+  if(length(object$samples_filtered) > 0){
+    cat(sprintf("Samples Filtered:%d\n Samples Not Filtered:%d\n\n",
+                object$num_filtered, 
+                object$num_not_filtered))
+  }
+  
+  print(object$Summary)
+  
+}
+
+
+#' Produce a basic summary of a totalCountFilt object
+#'
+#' This function will provide basic summary statistics for the totalCountFilt object.
+#'
+#' @param filter_object S3 object of class 'totalCountFilt' created by \code{\link{total_count_filter}}.
+#' @param min_count numeric value greater than 1 and less than the value given by filter_object$Total_Count.  Values below min_count are filtered out. Default value is NULL.
+#' @return a summary of the Total Count values, number of zero values, and non-zero values. If a min_count is provided the biomolecules that would be filtered, at this threshold, are reported.
+#'
+#'
+#' @author Lisa Bramer
+#'
+#' @export
+#' @rdname summary.totalCountFilt
+#' @name summary.totalCountFilt
+summary.totalCountFilt <- function(filter_object, min_count = NULL){
+  
+  # checks for cv_threshold if not null #
+  if(!is.null(min_count)) {
+    # check that cv_threshold is numeric
+    if(!is.numeric(min_count)) stop("cv_threshold must be numeric of length 1")
+    # chack that cv_threshold is of length 1
+    if(length(min_count)>1) stop("cv_threshold must be numeric of length 1")
+    # check that cv_threshold is more than 1 and less than max CV value
+    if(min_count <= 1 | min_count >= max(filter_object$Total_Counts, na.rm = TRUE)) stop("cv_threshold must be greater than 1 and less than the maximum CV value")
+  }
+  
+  # get summary of Total_Counts #
+  count_sum <- summary(filter_object$Total_Counts)
+  
+  # get biomolecules to filter if min_count is not NULL #
+  if(!is.null(min_count)) {
+    filt <- as.character(filter_object[filter_object$Total_Counts < min_count, 1])
+    if(length(filt)==0) filt <- NULL
+  } else filt <- NULL
+  
+  res <- list(Summary_all = count_sum,
+              filtered_biomolecules = length(filt))
+  
+  class(res) = c("totalCountFiltSummary","list")
+  
+  return(res)
+}
+
+#' Print method for summary of Total Count filter
+#' 
+#' Print method for summary of Total Count filter
+#' 
+#' @export
+#'
+print.totalCountFiltSummary <- function(object){
+  # create output #
+  cat(c("\nSummary of Total Count Filter\n----------------------\nCounts:\n", 
+        capture.output(object$Summary_all)), sep = "\n")
+  cat(c("\nNumber Filtered Biomolecules:", paste(object$filtered_biomolecules, collapse = ", "), "\n\n"))
+  
+}
+
+#' Print method for summary of molecule filter
+#' 
+#' Print method for summary of molecule filter
+#' 
+#' @export
+#' @name print.moleculeFilterSummary
+print.moleculeFilterSummary <- function(object){
+  # create output #
+  cat("\nSummary of Molecule Filter \n----------------------------------\n")
+  if(!is.null(object$min_num)){
+    cat(sprintf("Minimum Number:%d\nFiltered:%d\nNot Filtered:%d\n\n", object$min_num, object$num_filtered, object$num_not_filtered))
+  }
+  print(object$pep_observation_counts, row.names = FALSE)
+  
+}
+
 #' Produce a basic summary of a proteomics_filter object
 #'
 #' This function will provide basic summary statistics for the proteomics_filter object.
@@ -101,10 +408,9 @@ print.moleculeFilterSummary <- function(object){
 #'
 #' @author Lisa Bramer
 #'
+#' @rdname summary.proteomicsFilt
+#' @name summary.proteomicsFilt
 #' @export
-#'@rdname summary.proteomicsFilt
-#'@name summary.proteomicsFilt
-#'@export
 summary.proteomicsFilt <- function(filter_object, min_num_peps=NULL, degen_peps=FALSE){
 
   # error checks for min_num_peps, if not NULL #
@@ -191,8 +497,8 @@ summary.proteomicsFilt <- function(filter_object, min_num_peps=NULL, degen_peps=
 #' Print method for summary of proteomics filter
 #'
 #' Print method for summary of proteomics filter
-#'
-#'@export
+#' 
+#' @export
 #'
 print.proteomicsFilterSummary <- function(object){
 
@@ -231,7 +537,6 @@ print.proteomicsFilterSummary <- function(object){
 #'
 #' @author Lisa Bramer
 #'
-#' @export
 #' @rdname summary.imdanovaFilt
 #' @name summary.imdanovaFilt
 #' @export
@@ -519,8 +824,8 @@ summary.imdanovaFilt <- function(filter_object, min_nonmiss_anova = NULL,
 
 
 #' Print method for summary of imdanova filter
-#'
-#'@export
+#' 
+#' @export
 #'
 print.imdanovaFilterSummary <- function(object){
   # create output #
@@ -554,9 +859,9 @@ print.imdanovaFilterSummary <- function(object){
 #'
 #' @author Lisa Bramer, Kelly Stratton
 #'
-#'@export
-#'@rdname summary.rmdFilt
-#'@name summary.rmdFilt
+#' @export
+#' @rdname summary.rmdFilt
+#' @name summary.rmdFilt
 summary.rmdFilt <- function(filter_object, pvalue_threshold = NULL){
 
   # check that pvalue_threshold is numeric [0,1] #
@@ -620,7 +925,7 @@ summary.rmdFilt <- function(filter_object, pvalue_threshold = NULL){
   return(res)
 }
 
-#'@export
+#' @export
 #'
 print.rmdFilterSummary <- function(object){
   # create output #
@@ -642,9 +947,9 @@ print.rmdFilterSummary <- function(object){
 #'
 #' @author Lisa Bramer
 #'
-#'@export
-#'@rdname summary.cvFilt
-#'@name summary.cvFilt
+#' @export
+#' @rdname summary.cvFilt
+#' @name summary.cvFilt
 summary.cvFilt <- function(filter_object, cv_threshold = NULL){
 
   # checks for cv_threshold if not null #
@@ -662,20 +967,36 @@ summary.cvFilt <- function(filter_object, cv_threshold = NULL){
 
   # get summary of CVs #
   CVs <- summary(new_object$CV)
-
-  # get total NAs, total non-NAs #
-  tot_NAs <- attributes(filter_object)$tot_nas
-  tot_non_NAs <- nrow(filter_object) - tot_NAs
-
+  
+  if(!is.null(attributes(filter_object)$tot_nas)){
+    # get total NAs, total non-NAs #
+    tot_NAs <- attributes(filter_object)$tot_nas
+    tot_non_NAs <- nrow(filter_object) - tot_NAs
+  } else {
+    # get total zeros, total non-zeros #
+    tot_zeros <- attributes(filter_object)$tot_zeros
+    tot_non_zeros <- nrow(filter_object) - tot_zeros
+  }
+  
   # get biomolecules to filter if cv_threshold is not NULL #
   filt <- NULL
   if(!is.null(cv_threshold)) {
     filt <- as.character(new_object[new_object$CV > cv_threshold, 1])
     if(length(filt)==0) filt <- NULL
   }
-
-  res <- list(CVs = CVs, tot_NAs = tot_NAs, tot_non_NAs = tot_non_NAs, filtered_biomolecules = length(filt))
-
+  
+  if(!is.null(attributes(filter_object)$tot_nas)){
+    res <- list(CVs = CVs, 
+                tot_NAs = tot_NAs,
+                tot_non_NAs = tot_non_NAs,
+                filtered_biomolecules = length(filt))
+  } else {
+    res <- list(CVs = CVs, 
+                tot_zeros = tot_zeros,
+                tot_non_zeros = tot_non_zeros,
+                filtered_biomolecules = length(filt))
+  }
+  
   class(res) = c("cvFilterSummary","list")
 
   return(res)
@@ -684,14 +1005,19 @@ summary.cvFilt <- function(filter_object, cv_threshold = NULL){
 #' Print method for summary of CV filter
 #'
 #' Print method for summary of CV filter
-#'
-#'@export
+#' 
+#' @export
 #'
 print.cvFilterSummary <- function(object){
   # create output #
   cat(c("\nSummary of Coefficient of Variation (CV) Filter\n----------------------\nCVs:\n", capture.output(object$CVs)), sep = "\n")
-  cat(c("\nTotal NAs:", object$tot_NAs))
-  cat(c("\nTotal Non-NAs:", object$tot_non_NAs, "\n"))
+  if(!is.null(object$tot_NAs)){
+    cat(c("\nTotal NAs:", object$tot_NAs))
+    cat(c("\nTotal Non-NAs:", object$tot_non_NAs, "\n"))
+  } else {
+    cat(c("\nTotal zeros:", object$tot_zeros))
+    cat(c("\nTotal Non-zeros:", object$tot_non_zeros, "\n"))
+  }
   cat(c("\nNumber Filtered Biomolecules:", paste(object$filtered_biomolecules, collapse = ", "), "\n\n"))
 
 }
@@ -720,19 +1046,25 @@ summary.customFilt <- function(filter_object){
   summary_orig <- summary(omicsData)
 
   # get names #
-  edata_id <- attr(filter_object, "cnames")$edata_cname
-  emeta_id <- attr(filter_object, "cnames")$emeta_cname
-  samp_id <- attr(filter_object, "cnames")$fdata_cname
+  edata_id <- get_edata_cname(omicsData)
+  emeta_id <- get_emeta_cname(omicsData)
+  samp_id <- get_fdata_cname(omicsData)
 
+  # get counts #
+  num_samples <- attr(filter_object, "num_samples")
+  num_edata <- attr(filter_object, "num_edata")
+  num_emeta <- attr(filter_object, "num_emeta") ## is null where not used
+  
   # apply the filter #
   filtered_data <- applyFilt(filter_object, omicsData)
   summary_filt <- summary(filtered_data)
 
   #if filter_object contains removes
-  if(!is.null(filter_object$e_data_remove)|!is.null(filter_object$f_data_remove)|!is.null(filter_object$e_meta_remove))
+  if(!is.null(filter_object$e_data_remove)|
+     !is.null(filter_object$f_data_remove)|
+     !is.null(filter_object$e_meta_remove))
   {
     # samples #
-    num_samples <- attributes(filter_object)$num_samples
     if(!is.null(filter_object$f_data_remove)) {
       samps_filt <- length(filter_object$f_data_remove)
       samps_left <- num_samples - samps_filt
@@ -742,7 +1074,6 @@ summary.customFilt <- function(filter_object){
     }
 
     # e_data #
-    num_edata <- attributes(filter_object)$num_edata
     if(!is.null(filter_object$e_data_remove)) {
       edata_filt <- length(filter_object$e_data_remove)
       edata_left <- num_edata - edata_filt
@@ -752,8 +1083,7 @@ summary.customFilt <- function(filter_object){
     }
 
     # e_meta #
-    if(!is.null(filtered_data$e_meta)){
-      num_emeta <- attributes(filter_object)$num_emeta
+    if(!is.null(num_emeta)){
       if(!is.null(filter_object$e_meta_remove)) {
         emeta_filt <- length(filter_object$e_meta_remove)
         emeta_left <- num_emeta - emeta_filt
@@ -762,28 +1092,17 @@ summary.customFilt <- function(filter_object){
         emeta_left <- length(unique(filtered_data$e_meta[, emeta_id] ))
       }
     }
-    # Display #
-
-    samp_id <- paste(samp_id, "s (f_data)", sep="")
-    edata_id <- paste(edata_id, "s (e_data)", sep="")
-    display_emeta_id <- paste(emeta_id, "s (e_meta)", sep="")
-
-    ## construct data frame ##
-    if(is.null(emeta_id)) {
-      disp <- data.frame(Filtered = c(samps_filt, edata_filt), Remaining = c(samps_left, edata_left), Total = c(num_samples, num_edata))
-      rownames(disp) <- c(samp_id, edata_id)
-    } else {
-      disp <- data.frame(Filtered = c(samps_filt, edata_filt, emeta_filt), Remaining = c(samps_left, edata_left, emeta_left), Total = c(num_samples, num_edata, num_emeta))
-      rownames(disp) <- c(samp_id, edata_id, display_emeta_id)
-    }
+    
+    disp_colnames <- c("Filtered", "Remaining", "Total")
 
   }
 
   #if filter_object contains keeps
-  if(!is.null(filter_object$e_data_keep)|!is.null(filter_object$f_data_keep)|!is.null(filter_object$e_meta_keep))
+  if(!is.null(filter_object$e_data_keep)|
+     !is.null(filter_object$f_data_keep)|
+     !is.null(filter_object$e_meta_keep))
   {
     # samples #
-    num_samples <- attributes(filter_object)$num_samples
     if(!is.null(filter_object$f_data_keep)) {
       samps_keep <- length(filter_object$f_data_keep)
       samps_discard <- num_samples - samps_keep
@@ -793,7 +1112,6 @@ summary.customFilt <- function(filter_object){
     }
 
     # e_data #
-    num_edata <- attributes(filter_object)$num_edata
     if(!is.null(filter_object$e_data_keep)) {
       edata_keep <- length(filter_object$e_data_keep)
       edata_discard <- num_edata - edata_keep
@@ -803,32 +1121,45 @@ summary.customFilt <- function(filter_object){
     }
 
     # e_meta #
-    num_emeta <- attributes(filter_object)$num_emeta
-    if(!is.null(filter_object$e_meta_keep)) {
-      emeta_keep <- length(filter_object$e_meta_keep)
-      emeta_discard <- num_emeta - emeta_keep
-    } else {
-      emeta_keep <- length(unique(filtered_data$e_meta[, emeta_id] ))
-      emeta_discard <- num_emeta - length(unique(filtered_data$e_meta[, emeta_id] ))
+    if(!is.null(num_emeta)){
+      if(!is.null(filter_object$e_meta_keep)) {
+        emeta_keep <- length(filter_object$e_meta_keep)
+        emeta_discard <- num_emeta - emeta_keep
+      } else {
+        emeta_keep <- length(unique(filtered_data$e_meta[, emeta_id] ))
+        emeta_discard <- num_emeta - length(unique(filtered_data$e_meta[, emeta_id] ))
+      }
     }
 
-    # Display #
-
-    samp_id <- paste(samp_id, "s (f_data)", sep="")
-    edata_id <- paste(edata_id, "s (e_data)", sep="")
-    display_emeta_id <- paste(emeta_id, "s (e_meta)", sep="")
-
-    ## construct data frame ##
-    if(is.null(emeta_id)) {
-      disp <- data.frame(Kept = c(samps_keep, edata_keep), Discarded = c(samps_discard, edata_discard), Total = c(num_samples, num_edata))
-      rownames(disp) <- c(samp_id, edata_id)
-    } else {
-      disp <- data.frame(Kept = c(samps_keep, edata_keep, emeta_keep), Discarded = c(samps_discard, edata_discard, emeta_discard), Total = c(num_samples, num_edata, num_emeta))
-      rownames(disp) <- c(samp_id, edata_id, display_emeta_id)
-    }
+    disp_colnames <- c("Kept", "Discarded", "Total")
 
   }
-
+  
+  # Display #
+  
+  ## Display text ##
+  edata_plural_text <- ifelse(length(grep("s$", edata_id)) > 0,  " ", "s ")
+  emeta_plural_text <- ifelse(length(grep("s$", emeta_id)) > 0,  " ", "s ")
+  samp_plural_text <- ifelse(length(grep("s$", samp_id)) > 0,  " ", "s ")
+  samp_id <- paste(samp_id, samp_plural_text, "(f_data)", sep="")
+  edata_id <- paste(edata_id, edata_plural_text, "(e_data)", sep="")
+  display_emeta_id <- paste(emeta_id, emeta_plural_text, "(e_meta)", sep="")
+  
+  ## construct data frame ##
+  if(is.null(emeta_id)) {
+    disp <- data.frame(c(samps_filt, edata_filt), 
+                       c(samps_left, edata_left), 
+                       c(num_samples, num_edata))
+    rownames(disp) <- c(samp_id, edata_id)
+  } else {
+    disp <- data.frame(c(samps_filt, edata_filt, emeta_filt), 
+                       c(samps_left, edata_left, emeta_left), 
+                       c(num_samples, num_edata, num_emeta))
+    rownames(disp) <- c(samp_id, edata_id, display_emeta_id)
+  }
+  
+  colnames(disp) <- disp_colnames
+  
   class(disp) = c("customFilterSummary", "data.frame")
 
   return (disp)
@@ -844,7 +1175,7 @@ print.customFilterSummary <- function (object) {
 
   ## Display output ##
   cat("\nSummary of Custom Filter\n\n")
-  cat(capture.output(object), sep = "\n")
+  print.data.frame(object)
   cat("\n")
 
 }

@@ -42,17 +42,26 @@ write_stat_results <- function(omicsData, statResData, refCondition, filePath = 
     stop("'statResData' must be provided")
   }
   ## Make sure both are the correct class
-  if(!(class(omicsData) %in% c("pepData", "proData", "metabData", "lipidData"))){
+  if(!(inherits(omicsData, c("pepData", "proData", "metabData", 
+                             "lipidData", 
+                             "nmrData", 
+                             "seqData"
+                             )))
+     ){
     stop("omicsData is not of the appopriate class")
   }
-  if(!(class(statResData) %in% c("statRes"))){
+  if(!(inherits(statResData, c("statRes")))){
     stop("statResData is not of the appropriate class")
   }
   ## END OF CHECKS ##
   
   ## First get the Normalized Data tab with metadata
-  if("e_meta" %in% attributes(omicsData)$names){
-    Normalized_Data <- left_join(omicsData$e_meta, omicsData$e_data, by = intersect(names(omicsData$e_meta), names(omicsData$e_data)))
+  if(inherits(omicsData, "seqData")){
+    Normalized_Data <- NULL
+  } else if(!is.null(get_emeta_cname(myseqData))){
+    Normalized_Data <- left_join(omicsData$e_meta, omicsData$e_data, 
+                                 by = intersect(names(omicsData$e_meta), 
+                                                names(omicsData$e_data)))
   }else{
     Normalized_Data <- omicsData$e_data
   }
@@ -64,7 +73,7 @@ write_stat_results <- function(omicsData, statResData, refCondition, filePath = 
   
   pval <- statResData$P_values
   flag <- statResData$Flags
-  fc <- statResData$Full_results[, c(which(attributes(omicsData)$cname$edata_cname == colnames(statResData$Full_results)), grep("fold_change", tolower(colnames(statResData$Full_results))))]
+  fc <- statResData[, c(which(attributes(omicsData)$cname$edata_cname == colnames(statResData)), grep("fold_change", tolower(colnames(statResData))))]
   
   # Rename columns of pval
   a1 <- which(attributes(omicsData)$cname$edata_cname == colnames(pval))
@@ -94,19 +103,17 @@ write_stat_results <- function(omicsData, statResData, refCondition, filePath = 
   outputData$Normalized_Data <- Normalized_Data
   outputData$DA_Test_Results <- DA_Test_Results
   
-  if(class(omicsData) == "metabData"){
-    outputData$DA_Metabolites_Only <- DA_Only
-  }else{
-    if(class(omicsData) == "pepData"){
-      outputData$DA_Peptides_Only <- DA_Only
-    }else{
-      if(class(omicsData) == "proData"){
-        outputData$DA_Proteins_Only <- DA_Only
-      }else{
-        outputData$DA_Lipids_Only <- DA_Only
-      }
-    }
-  }
+  switch_name <- class(omicsData)[length(class(omicsData))]
+  name_use <- switch(
+    metabData = "Metabolites",
+    pepData = "Peptides",
+    proData = "Proteins",
+    lipidData = "Lipids",
+    seqData = "Transcript"
+  )
+  
+  outputData[[paste0("DA_", name_use, "_Only")]] <- DA_Only
+  
   if(!is.null(filePath)){
     write.xlsx(x = outputData, file = filePath)
   }

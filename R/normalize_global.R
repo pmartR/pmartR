@@ -186,9 +186,9 @@ normalize_global <- function (omicsData, subset_fn, norm_fn, params = NULL,
   }
 
   check_names = get_check_names(omicsData)
-  edata_id <- attr(omicsData, "cnames")$edata_cname
-  samp_id <- attr(omicsData, "cnames")$fdata_cname
-
+  edata_id <- get_edata_cname(omicsData)
+  samp_id <- get_fdata_cname(omicsData)
+  
   #Use default normalization and subsetting if not specified
   if(missing(subset_fn)) stop("subset_fn wasn't specified")
   if(missing(norm_fn)) stop("norm_fn wasn't specified")

@@ -84,22 +84,24 @@ applyFilt <- function (filter_object, omicsData, ...) {
 
   # check that omicsData is of pmartR S3 class#
   if (!inherits(omicsData, c("pepData", "proData", "lipidData", "metabData",
-                             "nmrData"))) {
+                             "nmrData", "seqData"))) {
 
     # Throw down an error for blatant abuse of the pmartR standards.
     stop (paste("omicsData must be of class 'pepData', 'proData', 'lipidData',",
-                "'metabData' or 'nmrData'",
+                "'metabData', 'nmrData', or 'seqData'",
                 sep = " "))
 
   }
 
   # check that filter_object is of an appropriate class#
   if (!inherits(filter_object, c("cvFilt", "proteomicsFilt", "moleculeFilt",
-                                 "rmdFilt", "imdanovaFilt", "customFilt"))) {
+                                 "RNAFilt", "rmdFilt", "imdanovaFilt", 
+                                 "customFilt", "totalCountFilt"))) {
 
     # Throw an error for unholy argument specification.
     stop (paste("filter_object must be of  'cvFilt', 'proteomicsFilt',",
-                "'moleculeFilt', 'rmdFilt', 'imdanovaFilt', or 'customFilt.",
+                "'moleculeFilt', 'rmdFilt', 'imdanovaFilt', 'customFilt',", 
+                "'RNAFilt', or 'totalCountFilt'.",
                 sep = " "))
 
   }
@@ -253,7 +255,8 @@ applyFilt.moleculeFilt <- function(filter_object, omicsData, min_num=2){
 
     # Extract data_info attribute from omicsData. Some of the elements will be
     # used to update this attribute.
-    dInfo <- attr(omicsData, 'data_info')
+    dInfo <- get_data_info(omicsData)
+    # dInfo <- attr(omicsData, 'data_info')
 
     # Update the data_info attribute.
     attr(omicsData, 'data_info') <- set_data_info(
@@ -297,6 +300,310 @@ applyFilt.moleculeFilt <- function(filter_object, omicsData, min_num=2){
   # RETURN THE FILTERED OMICSDATA OBJECT! YAY!!!
   return(omicsData)
 
+}
+
+
+# function for moleculeFilt
+#' @export
+#' @name applyFilt
+#' @rdname applyFilt
+applyFilt.totalCountFilt <- function(filter_object, omicsData, min_count){
+  
+  # Perform some initial checks on the input arguments -------------------------
+  
+  # Check if a molecule filter has already been applied.
+  if ('totalCountFilt' %in% get_filter_type(omicsData)) {
+    
+    # Gently tell the user they have already applied a molecule filter.
+    warning ('A total count filter has already been applied to this data set.')
+    
+  }
+  
+  # check that min_count is of length 1 #
+  if (length(min_count) != 1) {
+    
+    # Warn the user of their treachery with an error.
+    stop ("min_count must be of length 1")
+    
+  }
+  
+  # The min_count argument must be an integer and >= 1.
+  if (min_count %% 1 != 0 || min_count < 2) {
+    
+    # Denounce the users heinous actions with an error.
+    stop ("min_count must be an integer greater than or equal to 2")
+    
+  }
+  
+  # Prepare the information needed to filter the data --------------------------
+  
+  # Extract the column number containing the identifiers.
+  id_col <- which(names(omicsData$e_data) == get_edata_cname(omicsData))
+  
+  # Sniff out the indices that fall below the threshold.
+  inds <- which(filter_object$Total_Counts < min_count)
+  
+  # Compute the length of the inds vector and specify filter.edata accordingly.
+  if (length(inds) < 1) {
+    
+    # Set filter.edata to NULL because no rows in omicsData$e_data will be
+    # filtered out.
+    filter.edata <- NULL
+    
+  } else {
+    
+    # Fish out the identifiers that will be filtered.
+    filter.edata <- omicsData$e_data[, id_col][inds]
+    
+  }
+  
+  # Create a list that is used in the pmartR_filter_worker function.
+  filter_object_new <- list(e_data_remove = filter.edata,
+                            e_meta_remove = NULL,
+                            f_data_remove = NULL)
+  
+  # Filter the data and update the attributes ----------------------------------
+  
+  # call the function that does the filter application
+  results_pieces <- pmartR_filter_worker(filter_object = filter_object_new,
+                                         omicsData = omicsData)
+  
+  # Update the omicsData data frames.
+  omicsData$e_data <- results_pieces$temp.edata
+  omicsData$f_data <- results_pieces$temp.fdata
+  omicsData$e_meta <- results_pieces$temp.emeta
+  
+  # Check if group_DF attribute is present.
+  if (!is.null(attr(omicsData, "group_DF"))) {
+    
+    # Re-run group_designation in case filtering any items impacted the group
+    # structure. The attributes will also be updated in this function.
+    omicsData <- group_designation(
+      omicsData = omicsData,
+      main_effects = attr(get_group_DF(omicsData),
+                          "main_effects"),
+      covariates = names(attr(get_group_DF(omicsData),
+                              "covariates"))[-1],
+      time_course = attr(get_group_DF(omicsData),
+                         "time_course")
+    )
+    
+  } else {
+    
+    # Extract data_info attribute from omicsData. Some of the elements will be
+    # used to update this attribute.
+    dInfo <- get_data_info(omicsData)
+    # dInfo <- attr(omicsData, 'data_info')
+    
+    # Update the data_info attribute.
+    attr(omicsData, 'data_info') <- set_data_info(
+      e_data = omicsData$e_data,
+      edata_cname = get_edata_cname(omicsData),
+      data_scale_orig = get_data_scale_orig(omicsData),
+      data_scale = get_data_scale(omicsData),
+      data_types = dInfo$data_types,
+      norm_info = dInfo$norm_info,
+      is_normalized = dInfo$norm_info$is_normalized,
+      batch_info = dInfo$batch_info,
+      is_bc = dInfo$batch_info$is_bc
+    )
+    
+    
+    # Update the meta_info attribute.
+    attr(omicsData, 'meta_info') <- set_meta_info(
+      e_meta = omicsData$e_meta,
+      emeta_cname = get_emeta_cname(omicsData)
+    )
+    
+  }
+  
+  # Determine the number of filters applied previously and add one to it. This
+  # will include the current filter object in the next available space of the
+  # filters attribute list.
+  n_filters <- length(attr(omicsData, 'filters')) + 1
+  
+  # Update the filters attribute.
+  attr(omicsData, 'filters')[[n_filters]] <- set_filter(
+    type = class(filter_object)[[1]],
+    threshold = min_count,
+    filtered = filter.edata,
+    method = NA
+  )
+  
+  # RETURN THE FILTERED OMICSDATA OBJECT! YAY!!!
+  return(omicsData)
+  
+}
+
+#' @export
+#' @name applyFilt
+#' @rdname applyFilt
+applyFilt.RNAFilt <- function(filter_object, omicsData, 
+                              min_nonzero = NULL, size_library = NULL){
+  
+  # Perform some initial checks on the input arguments -------------------------
+  
+  # Check if a molecule filter has already been applied.
+  if ('RNAFilt' %in% suppressMessages(get_filter_type(omicsData))) {
+    
+    # Gently tell the user they have already applied a molecule filter.
+    warning ('An RNA filter has already been applied to this data set.')
+    
+  }
+
+  ## Checks for size_library as single integer
+  if(!is.null(size_library) && 
+     (length(size_library) > 1 || 
+      size_library%%1 != 0 ||
+      size_library > max(filter_object$LibrarySize)
+     )
+  ) stop(
+    paste0(
+      "size_library must be integer of length 1 less than max library size (",
+      max(filter_object$LibrarySize),
+      ")"
+    )
+  )
+  
+  ## Checks for min_nonzero as single numeric
+  if(!is.null(min_nonzero)){
+    
+    ## Length
+    if(length(min_nonzero) > 1) stop("min_nonzero must be length 1")
+    
+    ## proportion or int
+    if(!(min_nonzero%%1 == 0 || (min_nonzero > 0 && min_nonzero < 1))) stop(
+      "min_nonzero must be integer or numeric between 0 and 1.")
+    
+    ## Within appropriate bounds
+    if(min_nonzero%%1 == 0 && min_nonzero > max(filter_object$NonZero)) stop(
+      paste0("min_nonzero exceeds maximum number of non-zero biomolecules (",
+             max(filter_object$NonZero),
+             ")"
+      )
+    )
+    
+    if(min_nonzero%%1 != 0 && 
+       min_nonzero > max(filter_object$ProportionNonZero)) stop(
+         paste0(
+           "min_nonzero exceeds maximum proportion of non-zero biomolecules (",
+           signif(max(filter_object$ProportionNonZero)), 
+           ")")
+       )
+    
+    
+  }
+  
+  # Prepare the information needed to filter the data --------------------------
+  
+  # Extract the column number containing the identifiers.
+  id_col <- which(names(omicsData$f_data) == get_fdata_cname(omicsData))
+  inds <- c()
+  
+  if(!is.null(min_nonzero)){
+    
+    column_use <- ifelse(min_nonzero%%1 == 0, 
+                         "NonZero", "ProportionNonZero")
+    mnz <- filter_object[[column_use]] >= min_nonzero
+  } else mnz <- rep(TRUE, nrow(filter_object))
+  
+  if(!is.null(size_library)){
+    sl <- filter_object[["LibrarySize"]] >= size_library
+  } else sl <- rep(TRUE, nrow(filter_object))
+  
+  # Sniff out the indices that fall below the threshold.
+  inds <- which(!Reduce("&", list(mnz, sl)))
+  
+  # Compute the length of the inds vector and specify filter.fdata accordingly.
+  if (length(inds) < 1) {
+    
+    # Set filter.fdata to NULL because no rows in omicsData$f_data will be
+    # filtered out.
+    filter.fdata <- NULL
+    
+  } else {
+    
+    # Fish out the identifiers that will be filtered.
+    filter.fdata <- filter_object[, id_col][inds]
+    
+  }
+  
+  # Create a list that is used in the pmartR_filter_worker function.
+  filter_object_new <- list(e_data_remove = NULL,
+                            e_meta_remove = NULL,
+                            f_data_remove = filter.fdata)
+  
+  # Filter the data and update the attributes ----------------------------------
+  
+  # call the function that does the filter application
+  results_pieces <- pmartR_filter_worker(filter_object = filter_object_new,
+                                         omicsData = omicsData)
+  
+  # Update the omicsData data frames.
+  omicsData$e_data <- results_pieces$temp.edata
+  omicsData$f_data <- results_pieces$temp.fdata
+  omicsData$e_meta <- results_pieces$temp.emeta
+  
+  # Check if group_DF attribute is present.
+  if (!is.null(attr(omicsData, "group_DF"))) {
+    
+    # Re-run group_designation in case filtering any items impacted the group
+    # structure. The attributes will also be updated in this function.
+    omicsData <- group_designation(
+      omicsData = omicsData,
+      main_effects = attr(get_group_DF(omicsData),
+                          "main_effects"),
+      covariates = names(attr(get_group_DF(omicsData),
+                              "covariates"))[-1],
+      time_course = attr(get_group_DF(omicsData),
+                         "time_course")
+    )
+    
+  } else {
+    
+    # Extract data_info attribute from omicsData. Some of the elements will be
+    # used to update this attribute.
+    dInfo <- get_data_info(omicsData)
+    # dInfo <- attr(omicsData, 'data_info')
+    
+    # Update the data_info attribute.
+    attr(omicsData, 'data_info') <- set_data_info(
+      e_data = omicsData$e_data,
+      edata_cname = get_edata_cname(omicsData),
+      data_scale_orig = get_data_scale_orig(omicsData),
+      data_scale = get_data_scale(omicsData),
+      data_types = dInfo$data_types,
+      norm_info = dInfo$norm_info,
+      is_normalized = dInfo$norm_info$is_normalized,
+      batch_info = dInfo$batch_info,
+      is_bc = dInfo$batch_info$is_bc
+    )
+    
+    
+    # Update the meta_info attribute.
+    attr(omicsData, 'meta_info') <- set_meta_info(
+      e_meta = omicsData$e_meta,
+      emeta_cname = get_emeta_cname(omicsData)
+    )
+    
+  }
+  
+  # Determine the number of filters applied previously and add one to it. This
+  # will include the current filter object in the next available space of the
+  # filters attribute list.
+  n_filters <- length(attr(omicsData, 'filters')) + 1
+  
+  # Update the filters attribute.
+  attr(omicsData, 'filters')[[n_filters]] <- set_filter(
+    type = class(filter_object)[[1]],
+    threshold = list(size_library = size_library, min_nonzero = min_nonzero),
+    filtered = filter.fdata,
+    method = NA
+  )
+  
+  # RETURN THE FILTERED OMICSDATA OBJECT! YAY!!!
+  return(omicsData)
+  
 }
 
 # function for cvFilt
@@ -412,7 +719,8 @@ applyFilt.cvFilt <- function (filter_object, omicsData, cv_threshold = 150) {
 
     # Extract data_info attribute from omicsData. Some of the elements will be
     # used to update this attribute.
-    dInfo <- attr(omicsData, 'data_info')
+    # dInfo <- attr(omicsData, 'data_info')
+    dInfo <- get_data_info(omicsData)
 
     # Update the data_info attribute.
     attr(omicsData, 'data_info') <- set_data_info(
@@ -621,7 +929,8 @@ applyFilt.rmdFilt <- function (filter_object, omicsData,
 
     # Extract data_info attribute from omicsData. Some of the elements will be
     # used to update this attribute.
-    dInfo <- attr(omicsData, 'data_info')
+    # dInfo <- attr(omicsData, 'data_info')
+    dInfo <- get_data_info(omicsData)
 
     # Update the data_info attribute.
     attr(omicsData, 'data_info') <- set_data_info(
@@ -888,7 +1197,8 @@ applyFilt.proteomicsFilt <- function (filter_object,
 
     # Extract data_info attribute from omicsData. Some of the elements will be
     # used to update this attribute.
-    dInfo <- attr(omicsData, 'data_info')
+    # dInfo <- attr(omicsData, 'data_info')
+    dInfo <- get_data_info(omicsData)
 
     # Update the data_info attribute.
     attr(omicsData, 'data_info') <- set_data_info(
@@ -1141,8 +1451,14 @@ applyFilt.imdanovaFilt <- function (filter_object,
                                     f_data_remove = samps_to_rm)
       omicsData <- applyFilt(my_cust_filt, omicsData)
 
+      
+      # Get the total number of filters previously applied. This is the length
+      # of the filters attribute.
+      n_filtas <- length(suppressMessages(get_filters(omicsData)))
+      
       # Check the length of the filters attribute.
-      if (length(attr(omicsData, "filters")) == 1) {
+      if (n_filtas == 1) {
+      # if (length(attr(omicsData, "filters")) == 1) {
 
         # Reset the filters attribute to an empty list because no other filters
         # have been applied previously.
@@ -1152,12 +1468,12 @@ applyFilt.imdanovaFilt <- function (filter_object,
         # cannot be 0 because a custom filter was just applied.
       } else {
 
-        # Get the total number of filters previously applied. This is the length
-        # of the filters attribute.
-        n_filtas <- length(attr(omicsData, "filters"))
+        # # Get the total number of filters previously applied. This is the length
+        # # of the filters attribute.
+        # n_filtas <- length(get_filters(omicsData))
 
         # Remove the custom filter from the filters attribute.
-        attr(omicsData, "filters") <- attr(omicsData, "filters")[-n_filtas]
+        attr(omicsData, "filters") <- suppressMessages(get_filters(omicsData)[-n_filtas])
 
       }
 
@@ -1351,7 +1667,8 @@ applyFilt.imdanovaFilt <- function (filter_object,
 
     # Extract data_info attribute from omicsData. Some of the elements will be
     # used to update this attribute.
-    dInfo <- attr(omicsData, 'data_info')
+    # dInfo <- attr(omicsData, 'data_info')
+    dInfo <- get_data_info(omicsData)
 
     # Update the data_info attribute.
     attr(omicsData, 'data_info') <- set_data_info(
@@ -1605,7 +1922,8 @@ applyFilt.customFilt <- function (filter_object, omicsData) {
 
     # Extract data_info attribute from omicsData. Some of the elements will be
     # used to update this attribute.
-    dInfo <- attr(omicsData, 'data_info')
+    # dInfo <- attr(omicsData, 'data_info')
+    dInfo <- get_data_info(omicsData)
 
     # Update the data_info attribute.
     attr(omicsData, 'data_info') <- set_data_info(

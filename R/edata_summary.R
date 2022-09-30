@@ -46,8 +46,8 @@ edata_summary <- function (omicsData, by = 'sample', groupvar = NULL) {
 
   #some checks
   if(!inherits(omicsData, c('pepData', 'proData', 'lipidData',
-                            'metabData', 'nmrData')))
-    stop("omicsData must be an object of class pepData, proData, lipidData, metabData, or nmrData")
+                            'metabData', 'nmrData', 'seqData')))
+    stop("omicsData must be an object of class pepData, proData, lipidData, metabData, nmrData, or seqData")
   if(!isTRUE(by %in% c('sample', 'molecule')))
     stop("by must be either sample or molecule")
   if(isTRUE(groupvar == attr(omicsData, "cnames")$fdata_cname))
@@ -102,11 +102,21 @@ edata_summary <- function (omicsData, by = 'sample', groupvar = NULL) {
     names(mds)<- c("sample", "median")
     rownames(mds)<- NULL
 
-    pct_obs = as.data.frame(apply(edata[,-edata_cname_id], 2,
-                                  function(x){sum(!is.na(x))/length(x)}))
-    pct_obs = cbind(names(edata[,-edata_cname_id]), pct_obs)
-    names(pct_obs)<- c("sample", "pct_obs")
-    rownames(pct_obs)<- NULL
+    if(inherits(omicsData, "seqData")){
+      pct_obs = as.data.frame(apply(edata[,-edata_cname_id], 2,
+                                    function(x){sum(x != 0)/length(x)}))
+      pct_obs = cbind(names(edata[,-edata_cname_id]), pct_obs)
+      
+      names(pct_obs)<- c("sample", "pct_nonzero_obs")
+      rownames(pct_obs)<- NULL
+    } else {
+      pct_obs = as.data.frame(apply(edata[,-edata_cname_id], 2,
+                                    function(x){sum(!is.na(x))/length(x)}))
+      pct_obs = cbind(names(edata[,-edata_cname_id]), pct_obs)
+      
+      names(pct_obs)<- c("sample", "pct_obs")
+      rownames(pct_obs)<- NULL
+    }
 
     min = as.data.frame(apply(edata[,-edata_cname_id], 2, min, na.rm = T))
     min = cbind(names(edata[,-edata_cname_id]), min)

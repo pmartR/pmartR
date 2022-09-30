@@ -33,9 +33,9 @@ summary.pepData <- function(omicsData) {
 
 }
 
-#'@export
-#'@rdname summary-omicsData
-#'@name summary-omicsData
+#' @export
+#' @rdname summary-omicsData
+#' @name summary-omicsData
 summary.proData <- function(omicsData) {
 
   # Army captain, "Nooooo! ... General, the enemy is about to overtake us!"
@@ -201,3 +201,59 @@ summarizer <- function (omicsData) {
   return (catmat)
 
 }
+
+#'@export
+#'@rdname summary-omicsData
+#'@name summary-omicsData
+summary.seqData <- function(omicsData) {
+  
+  # get values #
+  res <- list(class = class(omicsData), num_samps = attr(omicsData, "data_info")$num_samps,
+              num_edata = attr(omicsData, "data_info")$num_edata,
+              num_emeta = attr(omicsData, "meta_info")$num_emeta,
+              num_zero_obs = attr(omicsData, "data_info")$num_zero_obs,
+              prop_zeros = round(attr(omicsData, "data_info")$prop_zeros, 3))
+  
+  # construct output #
+  newres <- lapply(res, function(x) ifelse(is.null(x), "NA", as.character(x)))
+  catmat <- data.frame(unlist(newres, use.names = FALSE))
+  
+  # assemble text strings #
+  edata_name <- paste("Unique ", attributes(omicsData)$cnames$edata_cname, "s (e_data)", sep="")
+  fdata_name <- paste("Unique ", attributes(omicsData)$cnames$fdata_cname, "s (f_data)", sep="")
+  if(!is.null(attributes(omicsData)$cnames$emeta_cname)){
+    emeta_name <- paste("Unique ", attributes(omicsData)$cnames$emeta_cname, "s (e_meta)", sep="")
+  }else{
+    emeta_name <- "Rows (e_meta) "
+  }
+  
+  colnames(catmat) <- NULL
+  rownames(catmat) <- c("Class", fdata_name, edata_name, emeta_name, "Observed Zero-Counts ", "Proportion Zeros ")
+  
+  #if group_DF attr is present
+  if(!is.null(get_group_DF(omicsData))){
+    group_vec<- get_group_DF(omicsData)$Group
+    levels<- unique(get_group_DF(omicsData)$Group)
+    counts <- vector(mode="numeric", length=length(levels))
+    
+    for(i in 1:length(levels)){
+      counts[i]<- length(which(group_vec == levels[i]))
+    }
+    res2<- as.list(counts)
+    names(res2)<- levels
+    newres2 <- lapply(res2, function(x) ifelse(is.null(x), "NA", as.character(x)))
+    
+    newres2<- c(newres, newres2)
+    catmat2 <- data.frame(unlist(newres2, use.names = FALSE))
+    colnames(catmat2) <- NULL
+    rownames(catmat2) <- c("Class", fdata_name, edata_name, emeta_name, 
+                           "Observed Zero-Counts ", "Proportion Zeros ", 
+                           paste("Samples per group:", levels, sep = " "))
+    
+    catmat<- catmat2
+  }
+  
+  return(catmat)
+}
+
+
