@@ -15,9 +15,6 @@ NumericMatrix count_missing_cpp(NumericMatrix data, NumericVector gp) {
   
   NumericMatrix num_missing(n,m);
   
-  printf("n is %d \n", n);
-  printf("p is %d \n", p);
-  
   //Iterate over the matrix rows
   for(i=0; i<n; i++){
     
