@@ -61,10 +61,11 @@ combine_lipidData <- function(obj_1, obj_2, retain_groups = FALSE, retain_filter
   # Check that it is among supported objects
   if(!(class(obj_1) %in% c("lipidData"))) stop("Currently only support lipidData")
   
-  if(attr(obj_1, "data_info")$norm_info$is_normalized != 
-     attr(obj_2, "data_info")$norm_info$is_normalized) {
-    stop("Both objects must have the same normalization status (normalized/unnormalized)") 
-  }
+  if(get_data_norm(obj_1) != get_data_norm(obj_2)) stop("Both objects must have the same normalization status (normalized/unnormalized)") 
+  # if(attr(obj_1, "data_info")$norm_info$is_normalized != 
+  #    attr(obj_2, "data_info")$norm_info$is_normalized) {
+    # stop("Both objects must have the same normalization status (normalized/unnormalized)") 
+  # }
   
   if(attr(obj_1, "data_info")$data_scale != 
      attr(obj_2, "data_info")$data_scale) {
@@ -175,8 +176,10 @@ combine_lipidData <- function(obj_1, obj_2, retain_groups = FALSE, retain_filter
     fdata_cname = get_fdata_cname(obj_1),
     e_meta = new_emeta, 
     emeta_cname = new_emeta_cname,
-    data_scale = attr(obj_1, "data_info")$data_scale,
-    is_normalized = attr(obj_1, "data_info")$norm_info$is_normalized
+    # data_scale = attr(obj_1, "data_info")$data_scale,
+    data_scale = get_data_scale(obj_1),
+    # is_normalized = attr(obj_1, "data_info")$norm_info$is_normalized
+    is_normalized = get_data_norm(obj_1)
   )
   
   # Retain filter information and store it in the new object

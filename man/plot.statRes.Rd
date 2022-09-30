@@ -27,7 +27,8 @@
   text_size = 3,
   bw_theme = TRUE,
   display_count = TRUE,
-  custom_theme = NULL
+  custom_theme = NULL,
+  cluster = F
 )
 }
 \arguments{
@@ -102,6 +103,11 @@ be displayed on the bar plot. The default is TRUE.}
 
 \item{custom_theme}{a ggplot `theme` object to be applied to non-interactive
 plots, or those converted by plotly::ggplotly().}
+
+\item{cluster}{logical for heatmaps; T will cluster biomolecules on X axis.
+defaults to T for seqData statistics and F for all others.}
+
+\item{top_n}{numeric for heatmaps; defaults to NULL.}
 }
 \description{
 Produces plots that summarize the results contained in a `statRes` object.

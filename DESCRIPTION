@@ -1,8 +1,8 @@
 Package: pmartR
 Type: Package
 Title: Panomics Marketplace - Quality Control and Statistical Analysis for Panomics Data
-Version: 2.1.0
-Date: 2022-09-26
+Version: 2.2.0
+Date: 2022-09-30
 Authors@R: c(person("Lisa", "Bramer", email = "lisa.bramer@pnnl.gov", role = c("aut", "cre")), person("Kelly", "Stratton", email = "kelly.stratton@pnnl.gov", role = c("aut")))
 Description: Provides functionality for quality control processing and statistical analysis of mass spectrometry (MS) omics data, in particular proteomic (either at the peptide or the protein level), lipidomic, and metabolomic data. This includes data transformation, specification of groups that are to be compared against each other, filtering of features and/or samples, data normalization, data summarization (correlation, PCA), and statistical comparisons between defined groups.
 License: BSD + file LICENSE
@@ -33,7 +33,8 @@ Imports:
     RcppArmadillo,
     RColorBrewer,
     magrittr,
-    patchwork
+    patchwork,
+    glmpca
 Suggests:
     knitr,
     rmarkdown,

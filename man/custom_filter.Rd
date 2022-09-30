@@ -15,10 +15,11 @@ custom_filter(
 )
 }
 \arguments{
-\item{omicsData}{an object of class "pepData", "proData", "metabData",
-"lipidData", or "nmrData, created by \code{\link{as.pepData}},
+\item{omicsData}{an object of class 'pepData', 'proData', 'metabData',
+'lipidData', 'nmrData', or 'seqData', created by \code{\link{as.pepData}},
 \code{\link{as.proData}}, \code{\link{as.metabData}},
-\code{\link{as.lipidData}}, \code{\link{as.nmrData}}, respectively.}
+\code{\link{as.lipidData}}, \code{\link{as.nmrData}},
+\code{\link{as.seqData}}, respectively.}
 
 \item{e_data_remove}{character vector specifying the names of the e_data
 identifiers to remove from the data. This argument can only be specified

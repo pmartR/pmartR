@@ -2,8 +2,8 @@
 #' 
 #' For printing an S3 object of type 'moleculeFilt':
 #' 
-#'@rdname print-moleculeFilt
-#'@export
+#' @rdname print-moleculeFilt
+#' @export
 #'
 print.moleculeFilt<- function(filter_object){
   if(!inherits(filter_object, "moleculeFilt")) stop("filter object must be of the class 'moleculeFilt'")
@@ -20,6 +20,49 @@ print.moleculeFilt<- function(filter_object){
   cat("\n")
 }
 
+#' print.totalCountFilt
+#' 
+#' For printing an S3 object of type 'totalCountFilt':
+#' 
+#' @rdname print-totalCountFilt
+#' @export
+#'
+print.totalCountFilt <- function(filter_object){
+  if(!inherits(filter_object, "totalCountFilt")) stop("filter object must be of the class 'totalCountFilt'")
+  filter_object<- as.data.frame(lapply(filter_object, as.character), stringsAsFactors = FALSE)
+  
+  filter_object_head = head(filter_object, 4)[, 1:ncol(filter_object)]
+  filter_object_tail = tail(filter_object, 4)[, 1:ncol(filter_object)]
+  blank_row = rep("---", ncol(filter_object))
+  
+  result<- rbind(filter_object_head, blank_row, filter_object_tail)
+  
+  cat("totalCountFilt object\n")
+  cat(capture.output(result), sep = "\n")
+  cat("\n")
+}
+
+#' print.RNAFilt
+#' 
+#' For printing an S3 object of type 'RNAFilt':
+#' 
+#' @rdname print-RNAFilt
+#' @export
+#'
+print.RNAFilt <- function(filter_object){
+  if(!inherits(filter_object, "RNAFilt")) stop("filter object must be of the class 'RNAFilt'")
+  filter_object<- as.data.frame(lapply(filter_object, as.character), stringsAsFactors = FALSE)
+  
+  filter_object_head = head(filter_object, 4)[, 1:ncol(filter_object)]
+  filter_object_tail = tail(filter_object, 4)[, 1:ncol(filter_object)]
+  blank_row = rep("---", ncol(filter_object))
+  
+  result<- rbind(filter_object_head, blank_row, filter_object_tail)
+  
+  cat("RNAFilt object\n")
+  cat(capture.output(result), sep = "\n")
+  cat("\n")
+}
 
 #' print.proteomicsFilt
 #' 

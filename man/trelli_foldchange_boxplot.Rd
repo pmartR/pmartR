@@ -47,7 +47,7 @@ or not. Interactive plots are ggplots piped to ggplotly (for now). Default is FA
 \item{test_mode}{A logical to return a smaller trelliscope to confirm plot and design.
 Default is FALSE.}
 
-\item{test_example}{The index number of the plot to return for test_mode. Default is 1.}
+\item{test_example}{A vector of plot indices to return for test_mode. Default is 1.}
 
 \item{single_plot}{A TRUE/FALSE to indicate whether 1 plot (not a trelliscope) should be returned. 
 Default is FALSE.}

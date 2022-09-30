@@ -7,6 +7,7 @@
 \alias{summary.lipidData}
 \alias{summary.metabData}
 \alias{summary.nmrData}
+\alias{summary.seqData}
 \title{Produce a basic summary of a pmartR omicsData S3 Object}
 \usage{
 \method{summary}{pepData}(omicsData)
@@ -18,6 +19,8 @@
 \method{summary}{metabData}(omicsData)
 
 \method{summary}{nmrData}(omicsData)
+
+\method{summary}{seqData}(omicsData)
 }
 \arguments{
 \item{omicsData}{an object of the class 'lipidData', 'metabData', 'pepData',

@@ -2,8 +2,8 @@
 #'
 #' This function applies a transformation to the e_data element of omicsData
 #'
-#' @param omicsData an object of the class 'pepData', 'proData', 'metabData', 'lipidData', or 'nmrData' usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, \code{\link{as.nmrData}}, respectively.
-#' @param data_scale a character string indicating the type of transformation to be applied to the data. Valid values are: 'log2', 'log', 'log10', or 'abundance'. A value of 'abundance' indicates the data has previously undergone one of the log transformations and should be transformed back to raw values with no transformation applied.
+#' @param omicsData an object of the class 'pepData', 'proData', 'metabData', 'lipidData', 'nmrData', or 'seqData', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, \code{\link{as.nmrData}}, \code{\link{as.seqData}}, respectively.
+#' @param data_scale a character string indicating the type of transformation to be applied to the data. Valid values for 'pepData', 'proData', 'metabData', 'lipidData', or 'nmrData': 'log2', 'log', 'log10', or 'abundance'. Valid values for 'seqData': 'upper', 'median', 'lcpm'. A value of 'abundance' indicates the data has previously undergone one of the log transformations and should be transformed back to raw values with no transformation applied. For 'seqData', 'lcpm' transforms by log2 counts per million, 'upper' transforms by the upper quartile of non-zero counts, and 'median' transforms by the median of non-zero counts. 
 #' 
 #' @details This function is intended to be used before analysis of the data begins. Data are typically analyzed on a log scale.
 #'
@@ -34,7 +34,7 @@ edata_transform <- function (omicsData, data_scale) {
                sep = ' '))
     
   } 
-
+  
   # check that data_scale is one of the acceptable options #
   if (!(data_scale %in% c('log2', 'log10', 'log', 'abundance'))) {
     
@@ -46,7 +46,7 @@ edata_transform <- function (omicsData, data_scale) {
   }
 
   # Check to make sure the data isn't already on the scale input by the user.
-  if(attr(omicsData, "data_info")$data_scale == data_scale) {
+  if(get_data_scale(omicsData) == data_scale) {
     
     # Stop all further calculations with an error message.
     stop(paste("Data is already on",
@@ -59,8 +59,7 @@ edata_transform <- function (omicsData, data_scale) {
   # Perform the actual transmogrification --------------------------------------
   
   # Fish out the column index where edata_cname occurs.
-  iCol <- which(names(omicsData$e_data) == attr(omicsData,
-                                                'cnames')$edata_cname)
+  iCol <- which(names(omicsData$e_data) == get_edata_cname(omicsData))
   
   # Extract the data_scale from the omics data object.
   scale <- get_data_scale(omicsData)
@@ -158,7 +157,9 @@ edata_transform <- function (omicsData, data_scale) {
              
            }
            
-         })
+         }
+         
+         )
   
   # Update data_scale in the data_info attribute.
   attr(omicsData, 'data_info')$data_scale <- data_scale

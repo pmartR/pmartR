@@ -136,7 +136,9 @@ imd_anova <- function (omicsData,
   }
 
   # Check for log transform #
-  if(!(attr(omicsData,"data_info")$data_scale%in%c("log2","log","log10"))&(test_method%in%c("combined","anova"))){
+  if(!(get_data_scale(omicsData) %in% c("log2","log","log10")) &
+  # if(!(attr(omicsData,"data_info")$data_scale%in%c("log2","log","log10")) &
+     (test_method %in% c("combined","anova"))){
     stop("Data must be log transformed in order to implement ANOVA.")
   }
 
@@ -696,6 +698,11 @@ anova_test <- function (omicsData, groupData, comparisons, pval_adjust,
   if (k < 2 && !"no_main_effect" %in% attr(groupData, "main_effects")) {
     stop ("At least two groups are necessary to perform an ANOVA if the data are not paired.")
   }
+  
+  ###--------forbidden omicsData-------------###
+  if(inherits(omicsData, "seqData")){
+    stop("Not valid for seqData objects")
+  }
 
   ###--------Check for anova filter-------------###
   if(is.null(attr(omicsData,"imdanova"))){
@@ -1223,6 +1230,10 @@ imd_test <- function (omicsData, groupData, comparisons, pval_adjust,
     stop("This test cannot be performed with less than two groups.")
   }
 
+  if(inherits(omicsData, "seqData")){
+    stop("Not valid for seqData objects")
+  }
+  
   #Check for gtest filter
   if(is.null(attr(omicsData,"imdanova"))){
     warning("These data haven't been filtered, see `?imdanova_filter` for details.")

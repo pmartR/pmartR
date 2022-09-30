@@ -19,8 +19,10 @@ An \eqn{n \times n} matrix giving the correlation between samples.
 This function returns an object of class corRes (correlation Result)
 }
 \details{
-The Pearson correlation between samples is calculated based on
-  biomolecules that are observed in both samples.  the \eqn{n \times n}
+The correlation between samples is calculated based on
+  biomolecules that are observed in both samples. For seqData objects, 
+  Spearman correlation is used. For all other data types, Pearson 
+  correlation is used.  the \eqn{n \times n}
   correlation matrix of normalized data. See \code{\link{cor}} for further
   details.
 }

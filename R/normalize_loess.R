@@ -26,13 +26,18 @@
 #' @export
 normalize_loess<- function(omicsData, method = "fast", span = .4){
   # check that omicsData is of the appropriate class
-  if(!inherits(omicsData, c("proData","pepData","lipidData", "metabData", "nmrData"))) stop("omicsData is not an object of appropriate class")
+  if(!inherits(omicsData, c("proData","pepData","lipidData", "metabData", "nmrData"))){
+    stop("omicsData must be of class 'pepData', 'proData', 'lipidData', 'metabData' or 'nmrData'")
+  } 
   
   # data should be on log scale #
-  if(!(attr(omicsData, "data_info")$data_scale %in% c("log2", "log10", "log"))) stop("omicsData must be on log scale")
+  if(!(attr(omicsData, "data_info")$data_scale %in% c("log2", "log10", "log"))){
+    stop("omicsData must be on log scale")
+  }
 
   #check that norm attribute is False
-  if(attr(omicsData, "data_info")$norm_info$is_normalized == TRUE) stop("data has already been normalized")
+  if(get_data_norm(omicsData)) stop("data has already been normalized")
+  # if(attr(omicsData, "data_info")$norm_info$is_normalized == TRUE) stop("data has already been normalized")
   
   #extract cname
   edata_cname = attr(omicsData, "cnames")$edata_cname

@@ -4,9 +4,10 @@
 #' \code{\link{applyFilt}}
 #'
 #' @param omicsData an object of the class 'pepData', 'proData', 'metabData',
-#'   'lipidData', or 'nmrData', usually created by \code{\link{as.pepData}},
+#'   'lipidData', 'nmrData', or 'seqData', usually created by \code{\link{as.pepData}},
 #'   \code{\link{as.proData}}, \code{\link{as.metabData}},
-#'   \code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, respectively.
+#'   \code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, 
+#'   or \code{\link{as.nmrData}}, respectively.
 #' @param min_num an integer value specifying the minimum number of times each
 #'   feature must be observed across all samples. Default value is 2.
 #' @param use_group logical indicator for whether to utilize group information
@@ -37,37 +38,43 @@
 #'
 #' @export
 #'
-molecule_filter <- function (omicsData,use_groups = FALSE, use_batch = FALSE) {
+molecule_filter <- function (omicsData, use_groups = FALSE, use_batch = FALSE) {
   ## some initial checks ##
   # test#
-
+  
   # check that omicsData is of appropriate class #
   if (!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData",
-                             "nmrData"))) {
-
+                             "nmrData", "seqData"))) {
+    
     stop (paste("omicsData must be of class 'pepData', 'proData', 'metabData',",
-                "'lipidData', or 'nmrData'",
+                "'lipidData', 'nmrData', or 'seqData'",
                 sep = ' '))
   }
-
+  
   # Make sure the arguemnts are logical.
   if (!is.logical(use_groups)) stop ("use_groups must be logical.")
   if (!is.logical(use_batch)) stop ("use_batch must be logical.")
-
+  
   # check that omicsData has batch_id data if specified
   if(is.null(attributes(attr(omicsData,"group_DF"))$batch_id) && use_batch == TRUE){
     stop (paste("omicsData must have batch_id specified if use_batch = TRUE"))
   }
-
+  
   if(is.null(attr(omicsData,"group_DF")) && use_groups == TRUE){
     stop (paste("omicsData must have groups specified if use_groups = TRUE"))
   }
-
+  
   # find the column which has the edata cname
   id_col <- which(names(omicsData$e_data) == get_edata_cname(omicsData))
 
   ordering = omicsData$e_data[,id_col]
   
+  # Compute the number of non-missing values for each row.
+  if(inherits(omicsData, "seqData")){
+    num_obs <- rowSums(omicsData$e_data[, -id_col] != 0)
+  } else {
+    num_obs <- rowSums(!is.na(omicsData$e_data[, -id_col]))
+  }
 
   # SCENARIO 1: use_groups = FALSE, use_batch = FALSE
   # we run the scenario as before
@@ -75,7 +82,11 @@ molecule_filter <- function (omicsData,use_groups = FALSE, use_batch = FALSE) {
     # Extricate the column number of the ID column.
 
     # Compute the number of non-missing values
-    num_obs <- rowSums(!is.na(omicsData$e_data[, -id_col]))
+    if(inherits(omicsData, "seqData")){
+    num_obs <- rowSums(omicsData$e_data[, -id_col] != 0)
+    } else {
+      num_obs <- rowSums(!is.na(omicsData$e_data[, -id_col]))
+    }
 
     # Create a data frame with the ID column and the number of non-missing values.
     output <- data.frame(omicsData$e_data[, id_col], num_obs)
@@ -92,13 +103,20 @@ molecule_filter <- function (omicsData,use_groups = FALSE, use_batch = FALSE) {
       tidyr::pivot_longer(cols = -tidyselect::all_of(id_col), names_to = names(batchDat)[1], values_to = "value") %>%
       dplyr::left_join(batchDat, by = pmartR::get_fdata_cname(omicsData)) %>%
       dplyr::group_by(dplyr::across(tidyselect::all_of(id_col)), Batch) %>%
-      dplyr::summarise(num_obs = sum(!is.na(value)),.groups = "keep") %>%
+      {
+        if(inherits(omicsData, "seqData")) {
+           dplyr::summarise(., num_obs = sum(value != 0), .groups = "keep")
+        } else {
+           dplyr::summarise(., num_obs = sum(!is.na(value)),.groups = "keep")
+        }
+      } %>% 
       dplyr::group_by(dplyr::across(tidyselect::all_of(id_col))) %>%
       dplyr::summarise(min_num_obs = as.numeric(min(num_obs)),.groups = "keep") %>%
       dplyr::ungroup() %>%
       dplyr::rename(molecule = tidyselect::all_of(id_col)) %>% 
       dplyr::arrange(match(molecule,ordering)) %>% 
       data.frame()
+     
     colnames(output)[1] <- get_edata_cname(omicsData)
   }
 
@@ -112,13 +130,20 @@ molecule_filter <- function (omicsData,use_groups = FALSE, use_batch = FALSE) {
       tidyr::pivot_longer(cols = -tidyselect::all_of(id_col), names_to = names(groupDat)[1], values_to = "value") %>%
       dplyr::left_join(groupDat, by = pmartR::get_fdata_cname(omicsData)) %>%
       dplyr::group_by(dplyr::across(tidyselect::all_of(id_col)), Group) %>%
-      dplyr::summarise(num_obs = sum(!is.na(value)),.groups = "keep") %>%
+      {
+        if(inherits(omicsData, "seqData")) {
+           dplyr::summarise(., num_obs = sum(value != 0), .groups = "keep")
+        } else {
+           dplyr::summarise(., num_obs = sum(!is.na(value)),.groups = "keep")
+        }
+      } %>% 
       dplyr::group_by(dplyr::across(tidyselect::all_of(id_col))) %>%
       dplyr::summarise(min_num_obs = as.numeric(min(num_obs)),.groups = "keep") %>%
       dplyr::ungroup() %>%
       dplyr::rename(molecule = tidyselect::all_of(id_col)) %>%
       dplyr::arrange(match(molecule,ordering)) %>%
       data.frame()
+    
     colnames(output)[1] <- get_edata_cname(omicsData)
   }
 
@@ -133,42 +158,196 @@ molecule_filter <- function (omicsData,use_groups = FALSE, use_batch = FALSE) {
       dplyr::left_join(groupDat, by = pmartR::get_fdata_cname(omicsData)) %>%
       dplyr::left_join(batchDat, by = pmartR::get_fdata_cname(omicsData)) %>%
       dplyr::group_by(dplyr::across(tidyselect::all_of(id_col)), Group, Batch) %>%
-      dplyr::summarise(num_obs = sum(!is.na(value)),.groups = "keep") %>%
+      {
+        if(inherits(omicsData, "seqData")) {
+           dplyr::summarise(., num_obs = sum(value != 0), .groups = "keep")
+        } else {
+           dplyr::summarise(., num_obs = sum(!is.na(value)),.groups = "keep")
+        }
+      } %>% 
       dplyr::group_by(dplyr::across(tidyselect::all_of(id_col))) %>%
       dplyr::summarise(min_num_obs = as.numeric(min(num_obs)),.groups = "keep") %>%
       dplyr::ungroup() %>%
       dplyr::rename(molecule = tidyselect::all_of(id_col)) %>%
       dplyr::arrange(match(molecule,ordering)) %>%
       data.frame()
+    
     colnames(output)[1] <- get_edata_cname(omicsData)
   }
 
   # change the names of the data.frame
   names(output) <- c(get_edata_cname(omicsData), "Num_Observations")
-
+  
   # Extract the 'data.frame' class from the the output data frame.
   orig_class <- class(output)
-
+  
   # Create the moleculeFilt class and attach the data.frame class to it as well.
   class(output) <- c("moleculeFilt", orig_class)
-
+  
   # Fabricate an attribute that has the total number of samples (columns in
   # e_data minus the ID column). This will be used to ensure someone doesn't try
   # to filter e_data using a threshold larger than the number of samples.
   attr(output, "num_samps") <- get_data_info(omicsData)$num_samps
-
+  
   # Add the group designation information to the attributes.
   attr(output, "group_DF") <- attr(omicsData, "group_DF")
-
+  
   # Fabricate an attribute that states whether or not we have added a batch_id
   attr(output, "use_batch") <- ifelse(use_batch == FALSE,FALSE,TRUE)
   attr(output, "use_groups") <- ifelse(use_groups == FALSE,FALSE,TRUE)
-
+  
   # Return the completed object!!!
   return(output)
 }
 
-#'Filter Based on Pooled Coefficient of Variation (CV) Values
+#' Total Count filter object
+#'
+#' This function returns a totalcountFilt object for use with
+#' \code{\link{applyFilt}}
+#'
+#' @param omicsData an object of the class 'seqData', usually created by \code{\link{as.seqData}}
+#'
+#' @details Filter is based off of recommendations in edgeR processing:
+#' Chen Y, Lun ATL, and Smyth, GK (2016). From reads to genes to pathways: 
+#' differential expression analysis of RNA-Seq experiments using Rsubread and 
+#' the edgeR quasi-likelihood pipeline. F1000Research 5, 1438. 
+#' http://f1000research.com/articles/5-1438
+#'
+#' @return Object of class totalcountFilt (also a data.frame) that contains the
+#'   molecule identifier and the total count of observed reads.
+#'
+#' @examples
+#' \dontrun{
+#' library(pmartRdata)
+#' data("seq_object")
+#' to_filter <- total_count_filter(omicsData = seq_object)
+#' summary(to_filter, min_num = 2)
+#' }
+#'
+#' @author Rachel Richardson
+#'
+#' @export
+#'
+total_count_filter <- function (omicsData) {
+  ## some initial checks ##
+  
+  # check that omicsData is of appropriate class #
+  if (!inherits(omicsData, c( "seqData"))) {
+    
+    stop (paste("omicsData must be of class 'seqData'.",sep = ' '))
+    
+  }
+  
+  # Extricate the column number of the ID column.
+  id_col <- which(names(omicsData$e_data) == get_edata_cname(omicsData))
+  
+  # Compute the number of non-missing values for each row.
+  temp_data <- omicsData$e_data[, -id_col]
+  
+  # Compute the number of non-missing values for each row.
+  count_data <- rowSums(temp_data)
+  
+  # Create a data frame with the ID column and the number of non-missing values.
+  output <- data.frame(omicsData$e_data[, id_col], count_data)
+  names(output) <- c(get_edata_cname(omicsData), "Total_Counts")
+  
+  # Extract the 'data.frame' class from the the output data frame.
+  orig_class <- class(output)
+  
+  # Create the totalCountFilt class and attach the data.frame class to it as well.
+  class(output) <- c("totalCountFilt", orig_class)
+  
+  ## Store density info ##
+  ## LCPM transform
+  samp_sum <- apply(temp_data, 2, sum, na.rm = TRUE) + 1
+  div_sum <- sweep((temp_data + .5), 2, samp_sum, `/`)
+  lcpm <- log2(div_sum * 10^6)
+  lcpm[[get_edata_cname(omicsData)]] <- omicsData$e_data[[id_col]]
+  density_data <- reshape2::melt(lcpm, 
+                                 id.var = get_edata_cname(omicsData),
+                                 variable.name = "Sample",
+                                 value.name = "lcpm")
+  attr(output, "e_data_lcpm") <- density_data
+  
+  # Return the completed object!!!
+  return(output)
+  
+}
+
+
+#' RNA filter object
+#'
+#' This function returns a RNAFilt object for use with
+#' \code{\link{applyFilt}}
+#'
+#' @param omicsData an object of the class 'seqData', usually created by \code{\link{as.seqData}}
+#'
+#' @details Filter omicsData samples by library size (number of reads) or number
+#' of unique non-zero biomolecules per sample.
+#'
+#' @return Object of class RNAFilt (also a data.frame) that contains the
+#'   sample identifiers, library size, the number of unique biomolecules with 
+#'   non-zero observations per sample, and the proportion of non-zero 
+#'   observations over the total number of biomolecules.
+#'
+#' @examples
+#' \dontrun{
+#' library(pmartRdata)
+#' data("seq_object")
+#' to_filter <- RNA_filter(omicsData = seq_object)
+#' plot(to_filter)
+#' summary(to_filter, size_library = 10000)
+#' summary(to_filter, min_nonzero = 5000)
+#' summary(to_filter, min_nonzero = .2)
+#' }
+#'
+#' @author Rachel Richardson
+#'
+#' @export
+#'
+RNA_filter <- function (omicsData) {
+  ## some initial checks ##
+  
+  # check that omicsData is of appropriate class #
+  if (!inherits(omicsData, c( "seqData"))) {
+    
+    stop (paste("omicsData must be of class 'seqData'.",sep = ' '))
+    
+  }
+  
+  # Extricate the column number of the ID column.
+  id_col <- which(names(omicsData$e_data) == get_edata_cname(omicsData))
+  
+  # Compute the number of non-missing values for each row.
+  temp_data <- omicsData$e_data[, -id_col]
+  
+  # Compute the library size for each column
+  lib_sizes <- colSums(temp_data)
+  
+  # Compute the number of biomolecules with non-zero counts
+  # unique biomolecules by edata definition
+  non_zeros <- apply(temp_data != 0, 2, sum)
+  
+  output <- data.frame(
+    SampleID = names(lib_sizes),
+    LibrarySize = as.integer(lib_sizes),
+    NonZero = as.integer(non_zeros),
+    ProportionNonZero = as.numeric(non_zeros/nrow(temp_data))
+  )
+  
+  # Extract the 'data.frame' class from the the output data frame.
+  orig_class <- class(output)
+  
+  # Create the totalCountFilt class and attach the data.frame class to it as well.
+  class(output) <- c("RNAFilt", orig_class)
+  
+  # Return the completed object!!!
+  return(output)
+  
+}
+
+
+##'Filter Based on Pooled Coefficient of Variation (CV) Values
 #'
 #'A pooled CV is calculated for each biomolecule.
 #'
@@ -212,94 +391,94 @@ molecule_filter <- function (omicsData,use_groups = FALSE, use_batch = FALSE) {
 #'@export
 #'
 cv_filter <- function(omicsData, use_groups = TRUE) {
-
+  
   # Run some preliminary checks ------------------------------------------------
-
+  
   # check that omicsData is of appropriate class #
   if (!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData",
                              "nmrData"))) {
-
+    
     # Follow the instructions foul creature!!!
     stop (paste("omicsData must be of class 'pepData', 'proData', 'metabData',",
                 "'lipidData', or 'nmrData'",
                 sep = ' '))
-
+    
   }
-
+  
   # check that use_groups is valid #
   if (!is.logical(use_groups)) {
-
+    
     # Let the user know with an error that they are not logical.
     stop ("Argument 'use_groups' must be either TRUE or FALSE")
-
+    
   }
-
+  
   # Check if use_groups is TRUE but the group_designation function has not been
   # run yet.
   if (use_groups == TRUE && is.null(attr(omicsData, "group_DF"))) {
-
+    
     # Set use groups to FALSE and continue running. At this point it is clear
     # the user doesn't get it. We will help them out a little by doing some of
     # the work for them.
     use_groups <- FALSE
-
+    
   }
-
+  
   # Prepare data for CV calculations -------------------------------------------
-
+  
   # Extricate the column number of the ID column.
   id_col <- which(names(omicsData$e_data) == get_edata_cname(omicsData))
-
+  
   # Check the data scale.
   if (get_data_scale(omicsData) == "abundance") {
-
+    
     # Create a copy of the original data. This copy is created so we don't have
     # to repeat the code below (with a different name for omicsData$e_data)
     # depending on what scale the input data are in.
     cur_edata <- omicsData$e_data[, -id_col]
-
+    
     # The following code is run if the data is NOT on the abundance scale.
   } else {
-
+    
     # Convert the data back to the abundance scale to perform the CV
     # calculations. Remove the column containing the biomolecule IDs.
     cur_edata <- edata_transform(omicsData = omicsData,
                                  data_scale = "abundance")$e_data[, -id_col]
-
+    
   }
-
+  
   # Conduct CV calculations ----------------------------------------------------
-
+  
   # Calculate the unpooled CV if group_designation has not been run or if
   # use_groups = FALSE.
   if (use_groups == FALSE || is.null(attr(omicsData, "group_DF"))) {
-
+    
     # Calculate the unpooled coefficient of variation.
     cvs <- unpooled_cv_rcpp(as.matrix(cur_edata))
-
+    
     # For mysterious reasons multiply the unpooled CV by 100.
     cvs <- 100 * cvs
-
+    
     # Set the is_pooled variable to FALSE (because we didn't pool the CV).
     is_pooled <- FALSE
-
+    
     # Calculate the pooled CV if use_groups is TRUE and the group_designation
     # function has been run.
   } else if (use_groups == TRUE && !is.null(attr(omicsData, "group_DF"))) {
-
+    
     # Extract the group_DF attribute to reduce typing below. Curse you S3
     # objects for not having a convenient way of extracting attributes!!
     groupDF <- attr(omicsData, "group_DF")
-
+    
     # From the group_DF attribute extract the non-singleton group names.
     nonsingletons <- attr(groupDF, "nonsingleton_groups")
-
+    
     # Check if any groups are singletons.
     # The following if statement removes any singleton samples from cur_edata.
     # These samples will not be part of the CV calculation and they will not be
     # filtered out of the omicsData object when the filter is applied.
     if (!setequal(unique(groupDF$Group), nonsingletons)) {
-
+      
       # Give a warning that singleton groups will not be used to determine
       # which biomolecules will be filtered.
       warning (paste("Grouping information is being utilized when calculating",
@@ -307,77 +486,78 @@ cv_filter <- function(omicsData, use_groups = TRUE) {
                      "sample. The singleton group(s) will be ignored by this",
                      "filter.",
                      sep = " "))
-
+      
       # Keep rows in groupDF that correspond to non-singleton groups.
       groupDF <- groupDF[which(groupDF$Group %in% nonsingletons), ]
-
+      
       # Fish out the name of the column that contains the sample names.
       sID <- get_fdata_cname(omicsData)
-
+      
       # Keep columns in cur_edata corresponding to non-singleton groups.
       cur_edata <- cur_edata[, which(names(cur_edata) %in% groupDF[, sID])]
-
+      
     }
-
+    
     # Make sure the order of the groups in group_DF matches the order of the
     # sample names in cur_edata.
     groupie <- groupDF$Group[match(names(cur_edata), groupDF$SampleID)]
-
+    
     # Calculate the pooled CV. The data needs to be converted to a matrix and
     # the group names need to be converted to a character vector for
     # pooled_cv_rcpp to run properly.
     cvs <- pooled_cv_rcpp(as.matrix(cur_edata), as.character(groupie))
-
+    
     # For mystifying reasons multiply the pooled CV values by 100.
     cvs <- cvs * 100
-
+    
     # Set the is_pooled variable to TRUE (because we pooled the CV).
     is_pooled <- TRUE
-
+    
   }
-
+  
   # Create and add attributes to the cv filter data frame ----------------------
-
+  
   # Create a data frame with the ID column from e_data and the CV values. This
   # data frame is called pool_cv even though the CV may not be pooled (this
   # makes us mysterious).
   pool_cv <- data.frame(omicsData$e_data[, id_col],
                         CV = cvs)
   names(pool_cv)[1] <- get_edata_cname(omicsData)
-
+  
   ## determine plotting window cutoff ##
   # calculate percentage of observations with CV <= 200 #
   prct.less200 <- (sum(pool_cv$CV <= 200, na.rm = T) /
                      length(pool_cv$CV[!is.na(pool_cv$CV)]))
-
+  
   if (prct.less200 > 0.95) {
     x.max = min(200, quantile(pool_cv$CV, 0.99, na.rm = TRUE))
   } else{
     x.max = quantile(pool_cv$CV, 0.95, na.rm = TRUE)
   }
-
+  
   ## generate some summary stats for CV values, for PMART purposes only ##
   tot.nas <- sum(is.na(pool_cv$CV))
-
+  
   output <- data.frame(pool_cv, row.names = NULL)
-
+  
   orig_class <- class(output)
-
+  
   class(output) <- c("cvFilt", orig_class)
-
+  
   # Add the group designation information to the attributes.
   attr(output, "group_DF") <- attr(omicsData, "group_DF")
-
+  
   attr(output, "pooled") <- is_pooled
   attr(output, "max_x_val") <- x.max
   attr(output, "tot_nas") <- tot.nas
   attr(output, "use_groups") <- ifelse(use_groups == FALSE,FALSE,TRUE)
-
-
+  
+  
   # Return the completed object. We did it!!!
   return (output)
-
+  
 }
+
 
 #' RMD Runs
 #'
@@ -592,7 +772,8 @@ rmd_filter <- function (omicsData,
                                             get_fdata_cname(omicsData)])
     myfilter <- custom_filter(omicsData, f_data_remove = to_remove)
     omicsData <- applyFilt(myfilter, omicsData)
-    mintR_groupDF <- attr(omicsData, "group_DF")
+    # mintR_groupDF <- attr(omicsData, "group_DF")
+    mintR_groupDF <- get_group_DF(omicsData)
 
   }
 
@@ -860,7 +1041,8 @@ rmd_filter <- function (omicsData,
   }
 
   # Add the group designation information to the attributes.
-  attr(output, "group_DF") <- attr(omicsData, "group_DF")
+  # attr(output, "group_DF") <- attr(omicsData, "group_DF")
+  attr(output, "group_DF") <- get_group_DF(omicsData)
 
   # Save fdata as an attribute. This is used in the summary.rmdFilt method.
   attr(output, "fdata") <- omicsData$f_data
@@ -1022,9 +1204,9 @@ run_skewness <- function(data_only){
 #' samples that have the same group membership
 #'
 #' @param omicsData an object of the class 'pepData', 'proData', 'metabData', or
-#'   'lipidData' usually created by \code{\link{as.pepData}},
-#'   \code{\link{as.proData}}, \code{\link{as.metabData}}, or
-#'   \code{\link{as.lipidData}}, respectively.
+#'   'lipidData' usually created 
+#'   by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, 
+#'   or \code{\link{as.lipidData}}, respectively.
 #' @param mintR_groupDF data.frame created by \code{\link{group_designation}}
 #'   with columns for sample.id and group.
 #' @param use_singletons logical indicator of whether to include singleton
@@ -1329,10 +1511,11 @@ imdanova_filter <- function (omicsData) {
   if (length(names(get_group_table(omicsData))) < 2 &&
       is.null(attr(attr(omicsData, "group_DF"), "pair_id"))) {
 
+
     # Let the user know that they cannot compare statistics between groups if
     # there is only one group!!
     stop (paste("There must be more than one group in order to create an",
-                "imdanovaFilt object if the data are not paired.",
+                "imdanovaFilt object.",
                 sep = " "))
 
   }
@@ -1340,7 +1523,8 @@ imdanova_filter <- function (omicsData) {
   # Determine number of samples per group --------------------------------------
 
   # Extract the group_DF attribute.
-  groupDF <- attr(omicsData, "group_DF")
+  # groupDF <- attr(omicsData, "group_DF")
+  groupDF <- get_group_DF(omicsData)
 
   # if groupDF has column for TimeCourse, do the following within time point
   # (do not re-compute groupDF including TimeCourse as main effect--this was our
@@ -1387,9 +1571,9 @@ imdanova_filter <- function (omicsData) {
 
   } else { # end of if-statement for the presence of TimeCourse variable
 
-    # Count the number of non-missing values for all groups. For example, if
-    # group A has 5 samples and 4 of the samples have missing values then the
-    # count for group A will be 1.
+    # Count the number of nonmissing elements per group per biomolecule. For
+    # example if group A has 5 samples and 4 of the samples have missing values
+    # then the count for group A will be 1.
     nonmiss_per_group <- nonmissing_per_group(omicsData = omicsData)
 
     # Extract the data frame that contains a column for the biomolecule IDs and
@@ -1397,6 +1581,7 @@ imdanova_filter <- function (omicsData) {
     output <- nonmiss_per_group$nonmiss_totals
 
   } # end of else-stament for the absence of TimeCourse variable
+
 
   # remove columns of output that correspond to any singleton groups present #
   singleton_groups <- setdiff(unique(groupDF$Group),
@@ -1410,6 +1595,7 @@ imdanova_filter <- function (omicsData) {
     output <- output[, -which(names(output) %in% singleton_groups)]
 
   }
+
 
   orig_class <- class(output)
   class(output) <- c("imdanovaFilt", orig_class)
@@ -1434,10 +1620,11 @@ imdanova_filter <- function (omicsData) {
 #' This function creates a customFilt S3 object based on user-specified items to
 #' filter out of the dataset
 #'
-#' @param omicsData an object of class "pepData", "proData", "metabData",
-#'   "lipidData", or "nmrData, created by \code{\link{as.pepData}},
+#' @param omicsData an object of class 'pepData', 'proData', 'metabData',
+#'   'lipidData', 'nmrData', or 'seqData', created by \code{\link{as.pepData}},
 #'   \code{\link{as.proData}}, \code{\link{as.metabData}},
-#'   \code{\link{as.lipidData}}, \code{\link{as.nmrData}}, respectively.
+#'   \code{\link{as.lipidData}}, \code{\link{as.nmrData}},
+#'   \code{\link{as.seqData}}, respectively.
 #'
 #' @param e_data_remove character vector specifying the names of the e_data
 #'   identifiers to remove from the data. This argument can only be specified
@@ -1493,11 +1680,11 @@ custom_filter <- function (omicsData,
 
   # check that omicsData is of appropriate class #
   if (!inherits(omicsData, c("pepData", "proData", "metabData", "lipidData",
-                             "nmrData"))) {
+                             "nmrData", "seqData"))) {
 
     # Follow the instructions foul creature!!!
     stop (paste("omicsData must be of class 'pepData', 'proData', 'metabData',",
-                "'lipidData', or 'nmrData'",
+                "'lipidData', 'nmrData', or 'seqData'",
                 sep = " "))
 
   }
@@ -1708,9 +1895,6 @@ custom_filter <- function (omicsData,
   # Save the entire omicsData object as an attribute. This is used in the
   # summary.customFilt method.
   attr(filter_object, "omicsData") = omicsData # added 12/5/2017 by KS #
-
-  # Add the group designation information to the attributes.
-  attr(filter_object, "group_DF") <- attr(omicsData, "group_DF")
 
   # Return the customated filter object. Good on us!!!
   return (filter_object)

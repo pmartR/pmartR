@@ -46,7 +46,7 @@ normalize_quantile <- function (omicsData) {
     
     # Stop the user with an error for sullying the fine reputation of pmart.
     # RESPECT THE STANDARDS!
-    stop ("omicsData is not an object of appropriate class")
+    stop ("omicsData must be of class 'pepData', 'proData', 'lipidData', 'metabData' or 'nmrData'")
     
   }
   

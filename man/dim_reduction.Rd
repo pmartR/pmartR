@@ -8,9 +8,11 @@ dim_reduction(omicsData, k = 2)
 }
 \arguments{
 \item{omicsData}{an object of the class 'pepdata', 'prodata', 'metabData',
-'lipidData', 'nmrData' usually created by \code{\link{as.pepData}},
+'lipidData', 'nmrData', or 'seqData', 
+usually created by \code{\link{as.pepData}},
 \code{\link{as.proData}}, \code{\link{as.metabData}},
-\code{\link{as.lipidData}}, \code{\link{as.nmrData}}, respectively.}
+\code{\link{as.lipidData}}, \code{\link{as.nmrData}}, or
+\code{\link{as.seqData}}, respectively.}
 
 \item{k}{integer number of principal components to return. Defaults to 2.}
 }
@@ -22,12 +24,15 @@ a data.frame with first \code{k} principal component scores, sample
 \description{
 Calculate principal components using projection pursuit estimation, which
 implements an expectation-maximization (EM) estimation algorithm when data is
-missing.
+missing. For seqData counts, a generalized version of principal components 
+analysis for non-normally distributed data is calculated under the assumption 
+of a negative binomial distribution with global dispersion.
 }
 \details{
-Any biomoleculs seen in only one sample or with a variance less than
+Any biomolecules seen in only one sample or with a variance less than
   1E-6 across all samples are not included in the PCA calculations. This
-  function leverages code from \code{\link[pcaMethods]{pca}}.
+  function leverages code from \code{\link[pcaMethods]{pca}} and 
+  \code{\link[glmpca]{glmpca}} .
 }
 \examples{
 \dontrun{
@@ -47,4 +52,9 @@ summary(pca_lipids)
 Redestig, H., Stacklies, W., Scholz, M., Selbig, J., & Walther,
   D. (2007). \emph{pcaMethods - a bioconductor package providing PCA methods
   for incomplete data}. Bioinformatics. 23(9): 1164-7.
+  
+  Implements a generalized version of principal components analysis (GLM-PCA) 
+  for dimension reduction of non-normally distributed data such as counts or 
+  binary matrices. Townes FW, Hicks SC, Aryee MJ, Irizarry RA (2019) 
+  <doi:10.1186/s13059-019-1861-6>. Townes FW (2019) <arXiv:1907.02647>.
 }
