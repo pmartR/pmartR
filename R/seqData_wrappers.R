@@ -115,7 +115,6 @@ diffexp_seq <- function(omicsData, method = "edgeR", p_adjust = "BH",
 #' \dontrun{
 #' }
 #' 
-#' @export
 #' @rdname DESeq2_wrapper
 #' @name DESeq2_wrapper
 #' 
@@ -386,7 +385,6 @@ DESeq2_wrapper <- function(
 #' \dontrun{
 #' }
 #' 
-#' @export
 #' @rdname edgeR_wrapper
 #' @name edgeR_wrapper
 #' 
@@ -665,7 +663,6 @@ edgeR_wrapper <- function(
 #' \dontrun{
 #' }
 #' 
-#' @export
 #' @rdname voom_wrapper
 #' @name voom_wrapper
 #' 

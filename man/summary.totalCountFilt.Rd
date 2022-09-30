@@ -25,6 +25,4 @@ This function will provide basic summary statistics for the totalCountFilt objec
 }
 \author{
 Lisa Bramer
-
-Lisa Bramer
 }
