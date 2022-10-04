@@ -308,7 +308,7 @@ DESeq2_wrapper <- function(
     cmb2 <- e_data_counts[grouping_info$Group == combo[2]]
     res[[paste0("NonZero_Count_", combo[2])]] <- rowSums(cmb2 != 0)
     row.names(res) <- NULL
-    res[[edata_cname]] <- omicsData$e_data[[edata_cname]]
+    res[[edata_cname]] <- as.character(omicsData$e_data[[edata_cname]])
     res[c(ncol(res), 1:(ncol(res) - 1))]
   })
   
@@ -582,8 +582,7 @@ edgeR_wrapper <- function(
     res[[paste0("NonZero_Count_", combo[2])]] <- rowSums(cmb2 != 0)
     res[[paste0("Mean_", combo[2])]] <- apply(cmb2, 1, mean, na.rm = T)
     
-
-    res[[get_edata_cname(omicsData)]] <- omicsData[[get_edata_cname(omicsData)]][row.names(res)]
+    res[[get_edata_cname(omicsData)]] <- as.character(omicsData$e_data[[get_edata_cname(omicsData)]])
     row.names(res) <- NULL
     res[c(ncol(res), 1:(ncol(res) - 1))]
   })
@@ -834,7 +833,8 @@ voom_wrapper <- function(
       if(length(cmb2) == 0) cmb2 <- e_data_counts[grouping_info[[attr(grouping_info, "pair_group")]] == combo[2]]
       res[[paste0("NonZero_Count_", combo[2])]] <- rowSums(cmb2 != 0)
       res[[paste0("Mean_", combo[2])]] <- apply(cmb2, 1, mean, na.rm = T)
-      res[[get_edata_cname(omicsData)]] <- omicsData[[get_edata_cname(omicsData)]][row.names(res)]
+
+      res[[get_edata_cname(omicsData)]] <- as.character(omicsData$e_data[[get_edata_cname(omicsData)]])
       row.names(res) <- NULL
       return(res[c(ncol(res), 1:(ncol(res) - 1))])
     } else return()
