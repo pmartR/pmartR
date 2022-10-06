@@ -908,7 +908,7 @@ get_group_formula <- function(omicsData){
   e_data_index <- which(colnames(omicsData$e_data) %in% get_edata_cname(omicsData))
   collist <- colnames(omicsData$e_data[-e_data_index])
   collist_group <- grouping_info[[get_fdata_cname(omicsData)]]
-  grouping_info <- grouping_info[match(collist_group, collist),]
+  grouping_info <- grouping_info[match(collist, collist_group),]
   
   ## If pairs, add to group_df
   pairs <- attr(grouping_info, "pair_id")
