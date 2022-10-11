@@ -19,30 +19,52 @@ diffexp_seq(
 \item{method}{a character string of length one specifying which wrapper to use. 
 Can be 'edgeR', 'DESeq2', or 'limma-voom'}
 
-\item{p_adjust}{an object of type 'seqData', created by \code{\link{as.seqData}}}
+\item{p_adjust}{Character string for p-value correction method, refer to 
+?p.adjust() for valid options. Defaults to "BH" (Benjamini & Hochberg)}
 
 \item{comparisons}{`data.frame` with columns for "Control" and "Test"
 containing the different comparisons of interest. Comparisons will be made
 between the Test and the corresponding Control  If left NULL, then all
 pairwise comparisons are executed.}
 
-\item{p_cutoff}{an object of type 'seqData', created by \code{\link{as.seqData}}}
+\item{p_cutoff}{Numeric value between 0 and 1 for setting p-value significance threshold}
 
 \item{...}{additional arguments passed to methods functions. Note, formatting 
 option changes will interfere with wrapping functionality.}
 }
 \value{
-data.frame object
+a statRes object (data.frame)
 }
 \description{
 For generating statistics for 'seqData' objects
 }
 \details{
-Runs default differential expression workflows. Refer to ?Deseq2_wrapper,
-?Voom_wrapper, and ?EdgeR_wrapper for additional details.
+Runs default differential expression workflows. Refer to ?pmartR:::DESeq2_wrapper,
+?pmartR:::voom_wrapper, and ?pmartR:::edgeR_wrapper for additional default details.
+
+Flags (signatures) -	Indicator of statistical significance for computed test. 
+Zeros indicate no significance, while +/- 1 indicates direction of significance.
 }
 \examples{
 \dontrun{
+
+library(pmartRdata)
+myseqData <- rnaseq_object
+myseqData <- group_designation(omicsData = myseqData, main_effects = "Virus")
+statsresults <- diffexp_seq(omicsData = myseqData, method = "edgeR")
+
 }
 
+}
+\references{
+Robinson MD, McCarthy DJ, Smyth GK (2010). “edgeR: a Bioconductor package 
+ for differential expression analysis of digital gene expression data.” 
+ Bioinformatics, 26(1), 139-140. doi: 10.1093/bioinformatics/btp616.
+ 
+ Love, M.I., Huber, W., Anders, S. Moderated estimation of fold change and 
+ dispersion for RNA-seq data with DESeq2 Genome Biology 15(12):550 (2014)
+ 
+ Ritchie, M.E., Phipson, B., Wu, D., Hu, Y., Law, C.W., Shi, W., and Smyth, 
+ G.K. (2015). limma powers differential expression analyses for 
+ RNA-sequencing and microarray studies. Nucleic Acids Research 43(7), e47.
 }

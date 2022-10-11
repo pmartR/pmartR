@@ -1,25 +1,27 @@
 #' Apply a S3 filter object to a pmartR S3 object
 #'
 #' This function takes a filter object of class 'cvFilt', 'rmdFilt',
-#'   'moleculeFilt', 'proteomicsFilt', 'imdanovaFilt', or 'customFilt' and
-#'   applies the filter to a dataset of \code{pepData}, \code{proData},
-#'   \code{lipidData}, \code{metabData}, or \code{nmrData}.
+#'   'moleculeFilt', 'proteomicsFilt', 'imdanovaFilt', 'RNAFilt', 'totalCountFilt', 
+#'   or 'customFilt' and  applies the filter to a dataset of \code{pepData}, 
+#'   \code{proData}, \code{lipidData}, \code{metabData}, \code{nmrData} or 
+#'   \code{seqData}.
 #'
 #' @param filter_object an object of the class 'cvFilt', 'proteomicsFilt',
-#'   'rmdFilt', 'moleculeFilt', 'imdanovaFilt', or 'customFilt' created by
-#'   \code{cv_filter}, \code{proteomics_filter}, \code{rmd_filter},
-#'   \code{molecule_filter}, or \code{imdanova_filter}, respectively.
+#'   'rmdFilt', 'moleculeFilt', 'imdanovaFilt', 'customFilt', 'RNAFilt', or 
+#'   'totalCountFilt' created by \code{cv_filter}, \code{proteomics_filter},
+#'    \code{rmd_filter}, \code{molecule_filter}, \code{imdanova_filter}, 
+#'    \code{total_count_filter}, or \code{RNA_filter}, respectively.
 #' @param omicsData an object of the class \code{pepData}, \code{proData},
-#'   \code{lipidData}, \code{metabData}, or \code{nmrData} usually created by
-#'   \code{\link{as.pepData}}, \code{\link{as.proData}},
-#'   \code{\link{as.lipidData}}, \code{\link{as.metabData}}, or
-#'   \code{\link{as.nmrData}}, respectively.
+#'   \code{lipidData}, \code{metabData}, \code{nmrData}, or \code{seqData} 
+#'   usually created by \code{\link{as.pepData}}, \code{\link{as.proData}},
+#'   \code{\link{as.lipidData}}, \code{\link{as.metabData}}, 
+#'   \code{\link{as.nmrData}}, \code{\link{as.seqData}}, respectively.
 #' @param ... further arguments
 #'
 #' @return An object of the class \code{pepData}, \code{proData},
-#'   \code{lipidData}, \code{metabData}, or \code{nmrData} with specified
-#'   cname_ids,
-#'   edata_cnames, and emeta_cnames filtered out of the appropriate datasets.
+#'   \code{lipidData}, \code{metabData}, \code{nmrData}, or \code{seqData} with 
+#'   specified cname_ids, edata_cnames, and emeta_cnames filtered out of the 
+#'   appropriate datasets.
 #'
 #' @details Various further arguments can be specified depending on the class of
 #'   the \code{filter_object} being applied. For a \code{filter_object} of type
@@ -50,8 +52,16 @@
 #'   of non-missing feature values allowed per group for \code{anova_filter}.
 #'   Default value is 2. \cr \code{min_nonmiss_gtest} \tab integer value
 #'   specifying the minimum number of non-missing feature values allowed per
-#'   group for \code{gtest_filter}. Default value is 3.\cr } There are no
-#'   further arguments for a \code{filter_object} of type 'customFilt'.
+#'   group for \code{gtest_filter}. Default value is 3.\cr } For a
+#'   \code{filter_object} of type 'totalCountFilt': \tabular{ll}{
+#'   \code{min_count} \tab integer value specifying the minimum number
+#'   of biomolecule counts observed over all samples \cr } For a 
+#'   \code{filter_object} of type 'RNAFilt': \tabular{ll}{ \code{min_nonzero} 
+#'   \tab integer value specifying the minimum number of non-zero feature values 
+#'   per sample. \cr \code{size_library} \tab integer value or fraction between
+#'   0 and 1 specifying the minimum number of total reads per sample. \cr } 
+#'   There are no further arguments for a \code{filter_object} of type '
+#'   customFilt'.
 #'
 #' @examples
 #' \dontrun{

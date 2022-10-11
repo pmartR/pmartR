@@ -18,14 +18,23 @@ DESeq2_wrapper(
 
 \item{test}{an object of type 'seqData', created by \code{\link{as.seqData}}}
 
-\item{p_adjust}{an object of type 'seqData', created by \code{\link{as.seqData}}}
+\item{p_adjust}{Character string for p-value correction method, refer to 
+?p.adjust() for valid options. Defaults to "BH" (Benjamini & Hochberg)}
 
-\item{comparisons}{an object of type 'seqData', created by \code{\link{as.seqData}}}
+\item{comparisons}{`data.frame` with columns for "Control" and "Test"
+containing the different comparisons of interest. Comparisons will be made
+between the Test and the corresponding Control  If left NULL, then all
+pairwise comparisons are executed.}
+
+\item{p_cutoff}{Numeric value between 0 and 1 for setting p-value significance threshold}
 
 \item{...}{additional arguments passed to function}
+
+\item{method}{a character string of length one specifying which wrapper to use. 
+Can be 'edgeR', 'DESeq2', or 'limma-voom'}
 }
 \value{
-statres data.frame object
+a statRes object (data.frame)
 }
 \description{
 For generating statistics for 'seqData' objects
@@ -34,10 +43,23 @@ For generating statistics for 'seqData' objects
 Runs default DESeq workflow. Defaults to Wald test, no independent filtering, and 
 running in parallel. Additional arguments can be passed for use in the function, 
 refer to DESeq() and results() in DESeq2 package
+
+Flags (signatures) -	Indicator of statistical significance for computed test. 
+Zeros indicate no significance, while +/- 1 indicates direction of significance.
 }
 \examples{
 \dontrun{
+
+library(pmartRdata)
+myseqData <- rnaseq_object
+myseqData <- group_designation(omicsData = myseqData, main_effects = "Virus")
+statsresults <- pmartR:::DESeq2_wrapper(omicsData = myseqData)
+
 }
 
 
+}
+\references{
+Love, M.I., Huber, W., Anders, S. Moderated estimation of fold change and 
+ dispersion for RNA-seq data with DESeq2 Genome Biology 15(12):550 (2014)
 }
