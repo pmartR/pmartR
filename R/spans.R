@@ -714,7 +714,7 @@ get_spans_params <- function(SPANSRes_obj, sort_by_nmols = FALSE){
       params[[i]][["params"]] = list(NULL)
     } else if(params[[i]][["subset_fn"]] %in% c("los", "rip", "ppp")){
       sublist = list()
-      sublist[[params[[i]]["subset_fn"]]] <- pars_from_df
+      sublist[[params[[i]][["subset_fn"]]]] <- pars_from_df
       params[[i]][["params"]] <- sublist
     }
   }

@@ -4,3 +4,7 @@
 ^_pkgdown\.yml$
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^\.github$
+tests/testthat/test_MSnSet2pepData.R
+^doc$
+^Meta$

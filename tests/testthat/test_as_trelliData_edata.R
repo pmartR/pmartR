@@ -5,7 +5,7 @@ test_that("as.trelliData.edata returns correct data frames and attributes",{
   # Load: peptide expression data-----------------------------------------------
   
   load(system.file('testdata',
-                   'little_pdata.Rdata',
+                   'little_pdata.RData',
                    package = 'pmartR'))
   
   # Test: peptide expression data-----------------------------------------------
@@ -88,7 +88,7 @@ test_that("as.trelliData.edata returns correct data frames and attributes",{
   # Load: protein expression data-----------------------------------------------
   
   load(system.file('testdata',
-                   'little_prdata.Rdata',
+                   'little_prdata.RData',
                    package = 'pmartR'))
   
   # Test: protein expression data-----------------------------------------------
@@ -301,7 +301,7 @@ test_that("as.trelliData.edata returns correct data frames and attributes",{
   # as a test anywhere else in this script. 
   
   load(system.file('testdata',
-                   'little_pdata.Rdata',
+                   'little_pdata.RData',
                    package = 'pmartR'))
   
   # Catch no edata (passed a null)
