@@ -1058,11 +1058,17 @@ summary.customFilt <- function(filter_object){
   # apply the filter #
   filtered_data <- applyFilt(filter_object, omicsData)
   summary_filt <- summary(filtered_data)
-
+  
+  mode_rmv <- !is.null(filter_object$e_data_remove)|
+    !is.null(filter_object$f_data_remove)|
+    !is.null(filter_object$e_meta_remove)
+  
+  mode_kp <- !is.null(filter_object$e_data_keep)|
+    !is.null(filter_object$f_data_keep)|
+    !is.null(filter_object$e_meta_keep)
+  
   #if filter_object contains removes
-  if(!is.null(filter_object$e_data_remove)|
-     !is.null(filter_object$f_data_remove)|
-     !is.null(filter_object$e_meta_remove))
+  if(mode_rmv)
   {
     # samples #
     if(!is.null(filter_object$f_data_remove)) {
@@ -1098,40 +1104,39 @@ summary.customFilt <- function(filter_object){
   }
 
   #if filter_object contains keeps
-  if(!is.null(filter_object$e_data_keep)|
-     !is.null(filter_object$f_data_keep)|
-     !is.null(filter_object$e_meta_keep))
+  # tags of `_left` and `_filt` correspond to items kept and items not kept
+  if(mode_kp)
   {
     # samples #
     if(!is.null(filter_object$f_data_keep)) {
-      samps_keep <- length(filter_object$f_data_keep)
-      samps_discard <- num_samples - samps_keep
+      samps_left <- length(filter_object$f_data_keep)
+      samps_filt <- num_samples - samps_left
     } else {
-      samps_keep <- num_samples
-      samps_discard <- 0
+      samps_left <- num_samples
+      samps_filt <- 0
     }
 
     # e_data #
     if(!is.null(filter_object$e_data_keep)) {
-      edata_keep <- length(filter_object$e_data_keep)
-      edata_discard <- num_edata - edata_keep
+      edata_left <- length(filter_object$e_data_keep)
+      edata_filt <- num_edata - edata_left
     } else {
-      edata_keep <- nrow(filtered_data$e_data)
-      edata_discard <- num_edata - nrow(filtered_data$e_data)
+      edata_left <- nrow(filtered_data$e_data)
+      edata_filt <- num_edata - nrow(filtered_data$e_data)
     }
 
     # e_meta #
     if(!is.null(num_emeta)){
       if(!is.null(filter_object$e_meta_keep)) {
-        emeta_keep <- length(filter_object$e_meta_keep)
-        emeta_discard <- num_emeta - emeta_keep
+        emeta_left <- length(filter_object$e_meta_keep)
+        emeta_filt <- num_emeta - emeta_left
       } else {
-        emeta_keep <- length(unique(filtered_data$e_meta[, emeta_id] ))
-        emeta_discard <- num_emeta - length(unique(filtered_data$e_meta[, emeta_id] ))
+        emeta_left <- length(unique(filtered_data$e_meta[, emeta_id] ))
+        emeta_filt <- num_emeta - length(unique(filtered_data$e_meta[, emeta_id] ))
       }
     }
 
-    disp_colnames <- c("Kept", "Discarded", "Total")
+    disp_colnames <- c("Discarded", "Kept", "Total")
 
   }
   
