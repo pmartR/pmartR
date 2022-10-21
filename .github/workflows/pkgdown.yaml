@@ -33,7 +33,10 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::pkgdown, local::.
+          extra-packages: | 
+            any::pkgdown
+            local::.
+            github::pmartR/pmartRdata@master
           needs: website
 
       - name: Build site
