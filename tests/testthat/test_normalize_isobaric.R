@@ -33,6 +33,10 @@ test_that('normalize_isobaric produces the correct output',{
   
   # Test normalize_isobaric: isobaricnormRes -----------------------------------
   
+  # Test error throwing
+  err_1 <- "omicsData must be of the class 'isobaricpepData'"
+  testthat::expect_error(normalize_isobaric(60), err_1)
+  
   # Use the first specification for identifying the reference samples.
   spec1 <- normalize_isobaric(isodata,
                               exp_cname = "Set",

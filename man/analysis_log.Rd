@@ -13,7 +13,7 @@ analysis_log(omicsData)
 Creates R markdown document report
 }
 \examples{
-dontrun{
+\dontrun{
 library(pmartRdata)
 data(metab_object)
 result = analysis_log(metab_object)

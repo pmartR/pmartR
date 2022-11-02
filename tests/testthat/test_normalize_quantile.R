@@ -62,6 +62,11 @@ test_that('normalize_quantile produces the correct output',{
   # Natural logate the normalized standard.
   edata_stand_log[, -1] <- log(edata_stand[, -1])
   
+  # test error for inccorect class
+  expect_error(normalize_quantile(omicsData = fdata), 
+               "omicsData must be of class 'pepData', 'proData', ")
+  
+  
   # Normalize data: abundance scale --------------------------------------------
   
   # Normalize the nmr data on the abundance scale.

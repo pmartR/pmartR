@@ -33,7 +33,7 @@ For generating statistics for 'seqData' objects
 \details{
 Runs default DESeq workflow. Defaults to Wald test, no independent filtering, and 
 running in parallel. Additional arguments can be passed for use in the function, 
-refer to DESeq() and results() in DESeq2 package
+refer to DESeq() and results() in DESeq2 package. Requires package "survival" to be available.
 }
 \examples{
 \dontrun{

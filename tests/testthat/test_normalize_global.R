@@ -126,6 +126,37 @@ test_that('normalize_global produces the correct output',{
   # Determine which peptide IDs to keep based on the p-value from the KW test.
   kp_pip <- as.character(pdata_gdf$e_data[c_idx[which(pvals > 0.2)], 1])
   
+  pdata_bad <- pdata
+  pdata_bad$e_data <- pdata_bad$e_data[1,]
+  pdata_bad <- group_designation(pdata_bad, "Condition")
+  
+  test <- purrr::map2(list("all", #"los", 
+                   "ppp", "rip", "ppp_rip"),
+              list(NULL, 
+                   #list(los = 0.1),
+                   list(ppp = 0.1),
+                   list(rip = 0.1),
+                   list(ppp_rip = list(ppp = 0.5, rip = 0.2))
+                   ), 
+                   function(method, param){
+    expect_error(
+      normalize_global(omicsData = pdata_bad,
+                       subset_fn = method,
+                       norm_fn = "mean",
+                       apply_norm = FALSE,
+                       params = param,
+                       backtransform = FALSE),
+      "There are <2 biomolecules in the subset; cannot proceed."
+    )
+  })
+  
+  
+  norm_all_med <- normalize_global(omicsData = pdata,
+                                   subset_fn = "all",
+                                   norm_fn = "median",
+                                   apply_norm = FALSE,
+                                   backtransform = FALSE)
+  
   # Test normalize_global: normRes ---------------------------------------------
   
   # Fashion a normRes object with "all" and "median".

@@ -337,9 +337,6 @@ applyFilt.totalCountFilt <- function(filter_object, omicsData, min_count){
   
   # Prepare the information needed to filter the data --------------------------
   
-  # Extract the column number containing the identifiers.
-  id_col <- which(names(omicsData$e_data) == get_edata_cname(omicsData))
-  
   # Sniff out the indices that fall below the threshold.
   inds <- which(filter_object$Total_Counts < min_count)
   
@@ -353,7 +350,7 @@ applyFilt.totalCountFilt <- function(filter_object, omicsData, min_count){
   } else {
     
     # Fish out the identifiers that will be filtered.
-    filter.edata <- omicsData$e_data[, id_col][inds]
+    filter.edata <- filter_object[[1]][inds]
     
   }
   
@@ -597,7 +594,7 @@ applyFilt.RNAFilt <- function(filter_object, omicsData,
   attr(omicsData, 'filters')[[n_filters]] <- set_filter(
     type = class(filter_object)[[1]],
     threshold = list(size_library = size_library, min_nonzero = min_nonzero),
-    filtered = filter.fdata,
+    filtered = sort(filter.fdata),
     method = NA
   )
   

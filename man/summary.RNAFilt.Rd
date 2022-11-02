@@ -26,7 +26,7 @@ over the total number of biomolecules.
 This function will provide basic summary statistics for the molecule_filter object.
 }
 \examples{
-dontrun{
+\dontrun{
 library(pmartRdata)
 data("pep_object")
 myfilter <- molecule_filter(pep_object)

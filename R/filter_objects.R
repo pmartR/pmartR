@@ -251,6 +251,11 @@ total_count_filter <- function (omicsData) {
   output <- data.frame(omicsData$e_data[, id_col], count_data)
   names(output) <- c(get_edata_cname(omicsData), "Total_Counts")
   
+  output[[get_edata_cname(omicsData)]] <- as.character(output[[get_edata_cname(omicsData)]])
+  output <- dplyr::arrange(output, !!rlang::sym(get_edata_cname(omicsData)),
+                          Total_Counts)
+  row.names(output) <- NULL
+  
   # Extract the 'data.frame' class from the the output data frame.
   orig_class <- class(output)
   
@@ -265,8 +270,18 @@ total_count_filter <- function (omicsData) {
   lcpm[[get_edata_cname(omicsData)]] <- omicsData$e_data[[id_col]]
   density_data <- reshape2::melt(lcpm, 
                                  id.var = get_edata_cname(omicsData),
-                                 variable.name = "Sample",
+                                 variable.name = get_fdata_cname(omicsData),
                                  value.name = "lcpm")
+  
+  density_data[[get_edata_cname(omicsData)]] <- as.character(density_data[[get_edata_cname(omicsData)]])
+  density_data[[get_fdata_cname(omicsData)]] <- as.character(density_data[[get_fdata_cname(omicsData)]])
+  
+  density_data <- dplyr::arrange(density_data, 
+                          !!rlang::sym(get_edata_cname(omicsData)),
+                          !!rlang::sym(get_fdata_cname(omicsData)), 
+                          lcpm)
+  row.names(output) <- NULL
+  
   attr(output, "e_data_lcpm") <- density_data
   
   # Return the completed object!!!
@@ -329,11 +344,16 @@ RNA_filter <- function (omicsData) {
   non_zeros <- apply(temp_data != 0, 2, sum)
   
   output <- data.frame(
-    SampleID = names(lib_sizes),
+    SampleID = as.character(names(lib_sizes)),
     LibrarySize = as.integer(lib_sizes),
     NonZero = as.integer(non_zeros),
     ProportionNonZero = as.numeric(non_zeros/nrow(temp_data))
   )
+  
+  output <- dplyr::arrange(output, SampleID, LibrarySize, NonZero, ProportionNonZero)
+  row.names(output) <- NULL
+  colnames(output) <- c(get_edata_cname(omicsData), "LibrarySize", 
+                        "NonZero", "ProportionNonZero")
   
   # Extract the 'data.frame' class from the the output data frame.
   orig_class <- class(output)

@@ -17,7 +17,7 @@ data.frame object
 For creating a summary of an S3 object of type 'nmrnormRes':
 }
 \examples{
-dontrun{
+\dontrun{
 library(pmartRdata)
 data(nmr_object_identified)
 

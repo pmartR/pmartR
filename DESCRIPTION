@@ -38,7 +38,8 @@ Imports:
 Suggests:
     knitr,
     rmarkdown,
-    testthat
+    testthat,
+    survival
 Remotes:
     hafen/trelliscopejs
 RoxygenNote: 7.2.1

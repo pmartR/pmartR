@@ -168,11 +168,33 @@ test_that('independece tests output correct p-values based on group info',{
   
   # file_coverage("R/normRes_tests.R", "tests/testthat/test_normRes_tests.R")
   # 
-  # expect_error(normRes_tests(pdata),
-  #              "Normalization has not been run on this data")
+  expect_error(normRes_tests(pdata),
+               "Normalization has not been run on this data")
   # expect_error(normRes_tests(normalize_global(pdata,
   #                                             subset_fn = "all",
   #                                             norm_fn = "median")),
   #              "No grouping structure present in object")
+  
+  
+  expect_error(normRes_tests(5, test_fn = "kw"),
+               "This object is not of class 'pepData'")
+  
+  expect_error(normRes_tests(pdata, test_fn = "tiger"),
+               "'anova' or 'kw'.")
+  
+  expect_error(normRes_tests(pdata, test_fn = "kw"),
+               "Normalization has not been run on this data")
+  
+  expect_error(normRes_tests(normalize_global(pdata, subset_fn = "all",
+                                              norm_fn = "zscore",
+                                              apply_norm = FALSE,
+                                              backtransform = FALSE), test_fn = "kw"),
+               "No grouping structure present in object")
+  
+  expect_error(normRes_tests(normalize_global(pdata, subset_fn = "all",
+                                              norm_fn = "zscore",
+                                              apply_norm = TRUE,
+                                              backtransform = FALSE), test_fn = "kw"),
+               "No grouping structure present in object")
   
 })

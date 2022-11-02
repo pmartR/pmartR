@@ -27,7 +27,6 @@ test_that('errors are thrown for bad data structures/values',{
   
   # Change some values to +-Inf
   cantor[8, 3] <- Inf
-  cantor[4, 6] <- -Inf
   
   # Forge an f_data data frame for the naughty edata data frames.
   fdata <- data.frame(sampleID = paste0('col', 1:5),
@@ -49,6 +48,17 @@ test_that('errors are thrown for bad data structures/values',{
                             edata_cname = 'id',
                             fdata_cname = 'sampleID'),
                'Column 4 of e_data contains non-numeric values.')
+  
+  
+  
+  # forge a metabdata object with cantor.
+  expect_error(as.metabData(e_data = cantor,
+                            f_data = fdata,
+                            edata_cname = 'id',
+                            fdata_cname = 'sampleID'),
+               'Column 3 of e_data contains infinite values.')
+  
+  cantor[4, 6] <- -Inf
   
   # forge a metabdata object with cantor.
   expect_error(as.metabData(e_data = cantor,

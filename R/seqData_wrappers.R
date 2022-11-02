@@ -53,10 +53,11 @@ diffexp_seq <- function(omicsData, method = "edgeR", p_adjust = "BH",
   }
   
   # check method #
-  if(length(method) != 1 && !(method %in% c('edgeR', 'DESeq2','limma-voom'))){
-    stop("method must a single character string of length 1 in 'edgeR', 'DESeq2', or 'limma-voom'")
+  if(length(method) != 1 || !(method %in% c('edgeR', 'DESeq2','voom'))){
+    stop("method must a single character string of length 1 in 'edgeR', 'DESeq2', or 'voom'")
     
   }
+  
   
   if(method == 'edgeR'){
     
@@ -106,7 +107,7 @@ diffexp_seq <- function(omicsData, method = "edgeR", p_adjust = "BH",
 #' 
 #' @details Runs default DESeq workflow. Defaults to Wald test, no independent filtering, and 
 #' running in parallel. Additional arguments can be passed for use in the function, 
-#' refer to DESeq() and results() in DESeq2 package
+#' refer to DESeq() and results() in DESeq2 package. Requires package "survival" to be available.
 #'
 #' @return statres data.frame object
 #' 
@@ -121,6 +122,13 @@ DESeq2_wrapper <- function(
     p_cutoff = 0.05, ...
 ){
   
+  
+  df_test <- installed.packages()
+  if(!("survival" %in% df_test)){
+    stop("package 'survival' required for DESeq2 processing")
+  }
+  require("survival")
+  
   l <- list(...)
   
   DESeq_args <- l[names(l) %in% names(formals(DESeq2::DESeq))]
@@ -132,21 +140,6 @@ DESeq2_wrapper <- function(
   group_res <- get_group_formula(omicsData)
   grouping_info <- group_res[[1]]
   grouping_formula <- group_res[[2]]
-  
-  ## Get comparisons
-  # if(is.null(comparisons) && attr(grouping_info, "main_effects") != "no_main_effect"){
-  #   comparisons <- unique(grouping_info[["Group"]])
-  #   cob_list <- utils::combn(comparisons, 2)
-  #   row.names(cob_list) <- c("Test", "Control")
-  # } else if (is.null(comparisons)){
-  #   comparisons <- c(
-  #     unique(grouping_info[[attr(grouping_info, "pair_id")]]),
-  #     unique(grouping_info[[attr(grouping_info, "pair_group")]]))
-  #   cob_list <- utils::combn(comparisons, 2)
-  #   row.names(cob_list) <- c("Test", "Control")
-  # } else {
-  #   cob_list <- t(comparisons[c("Test", "Control")])
-  # }
   
   all_cols <- stringr::str_trim(
     stringr::str_split(
@@ -179,8 +172,13 @@ DESeq2_wrapper <- function(
     
   } else {
     
-    all_contrasts_comp <- paste0(comparisons$Control, comparisons$Test, sep = "-")
+    all_contrasts <- unique(c(all_contrasts,
+                              apply(cob_list[nrow(cob_list):1,], 2, paste, collapse = "-")))
+    
+    cob_list <- cbind(cob_list, cob_list[nrow(cob_list):1,])
+    all_contrasts_comp <- paste(comparisons$Control, comparisons$Test, sep = "-")
     interesting_comparisons <- which(all_contrasts %in% all_contrasts_comp)
+    if(length(interesting_comparisons) == 0) stop("Invalid comparisons given")
     
   }
   
@@ -216,19 +214,6 @@ DESeq2_wrapper <- function(
     run_deseq <- run_deseq[!duplicated(names(run_deseq))]
     
   run_stats_deseq <- do.call(DESeq2::DESeq, args = run_deseq)
-  #   edata_deseq,
-  #   test = test, ## reasonable to allow change in pmartR
-  #   fitType = "parametric", #fitting of dispersions to the mean intensity
-  #   quiet = T,
-  #   minReplicatesForReplace = Inf, ## cook's distance used to flag outliers, require at least n replicates to replace flagged outliers-- defined as .99 quantile of the F(p, m - p) distribution, where p is the number of parameters and m is the number of samples. Replacement is values predicted by the trimmed mean over all samples (and adjusted by size factor or normalization factor). Inf disables replacement
-  #   modelMatrixType = "standard", ## If we need anything fancier than what is defined by "Group" we should consider this argument for the glm use case -- betapriors req for expanded
-  #   parallel = T,
-  #   
-  #   ## Waldy
-  #   betaPrior = F, 
-  #   #whether or not to put a zero-mean normal prior on the non-intercept coefficients See nbinomWaldTest for description of the calculation of the beta prior.In versions >=1.16, the default is set to FALSE, and shrunken LFCs are obtained afterwards using lfcShrink.
-  #   useT = F ## only for waldtest, uses a t-distribution instead of a normal distribution)
-  # )
   
   ## Args
   
@@ -265,28 +250,6 @@ DESeq2_wrapper <- function(
     
     res <- do.call(DESeq2::results, args = run_results)
     
-    ## Run tests
-    # res <- DESeq2::results(
-    #   run_stats_deseq, 
-    #   lfcThreshold = 0,
-    #   altHypothesis = "greaterAbs",
-    #   contrast = c("Group", combo[1], combo[2]),
-    #   cooksCutoff = FALSE, 
-    #   ## Fiters by distance, default it filters .99 quantile of the F(p, m-p) 
-    #   ## distribution, where p is the number of coefficients being fitted 
-    #   ## and m is the number of samples. Excludes groups w/ only 2 samples
-    #   independentFiltering = FALSE,
-    #   pAdjustMethod = p_adjust,
-    #   # format = "DataFrame",
-    #   tidy = T,
-    #   parallel = T
-    #   
-    #   # alpha = 0.1, used for independent filtering
-    #   # filterFun = NULL, ## You can specify a custom filtering method,
-    #   # addMLE = F ## backwards compatibility argument, specifies if the "unshrunken" maximum likelihood estimates (MLE) of log2 fold change should be added as a column to the results table 
-    #   # minmu = NULL ## Lower bound on estimated count (used when calulating contrasts)
-    # )
-    
     res[["row"]] <- NULL
     # Flag stuffs ----------------------------------------------------------------
     sigs <- which(res[["padj"]] < p_cutoff)
@@ -317,18 +280,29 @@ DESeq2_wrapper <- function(
   all_cont <- all_res %>% purrr::reduce(dplyr::full_join)
   
   count_cols <- grep("^NonZero_Count_", colnames(all_cont))
-  mean_cols <- grep("^baseMean", colnames(all_cont))
+  
+  ## Re-calc the means cause DESeq2 is silly
+  groups_used <- unique(as.vector(cob_list[,interesting_comparisons]))
+  group_means <- purrr::map_dfc(groups_used, function(grp){
+    rows_use <- apply(group_res[[1]] == grp, 1, any)
+    samples <- group_res[[1]][rows_use,][[get_fdata_cname(omicsData)]]
+    df <- data.frame(apply(omicsData$e_data[samples], 1, mean, na.rm = T))
+    colnames(df) <- paste0("Mean_", grp)
+    df
+  })
+  group_means <- cbind(omicsData$e_data[get_edata_cname(omicsData)], group_means)
+
   lfc_cols <- grep("^log2FoldChange", colnames(all_cont))
   # pval_cols <- grep(colnames(all_cont), "_pvalue")
   padj_cols <- grep("^padj", colnames(all_cont))
   flag_cols <- grep("^Flag", colnames(all_cont))
   
-  colnames(all_cont)[-1] <- gsub("^baseMean", "Mean", colnames(all_cont)[-1])
+  # colnames(all_cont)[-1] <- gsub("^baseMean", "Mean", colnames(all_cont)[-1])
   colnames(all_cont)[-1] <- gsub("^log2FoldChange", "Fold_change", colnames(all_cont)[-1])
   colnames(all_cont)[-1] <- gsub("^padj", paste0("P_value_", test), colnames(all_cont)[-1])
   
-  results <- all_cont[c(1, count_cols, mean_cols, 
-                        lfc_cols, padj_cols, flag_cols)]
+  results <- cbind(dplyr::left_join(all_cont[c(1, count_cols)], group_means), 
+                   all_cont[c(lfc_cols, padj_cols, flag_cols)])
   
   attr_list <- c("cnames", "data_info", "filters", "group_DF")
   keep_attr <- attributes(results)[names(attributes(results)) %in% attr_list]
@@ -390,8 +364,8 @@ edgeR_wrapper <- function(
   
   l <- list(...)
   
-  NF_args <- l[names(l) %in% names(formals(edgeR::calcNormFactors))]
-  QLFit_args <- l[names(l) %in% names(formals(edgeR::glmQLFit))]
+  NF_args <- l[names(l) %in% names(formals(edgeR::calcNormFactors.DGEList))]
+  QLFit_args <- l[names(l) %in% names(formals(edgeR::glmQLFit.DGEList))]
   
   ## Get useful variables ##
   edata_cname <- get_edata_cname(omicsData)
@@ -455,20 +429,6 @@ edgeR_wrapper <- function(
     all_contrasts_group <- apply(cob_list_group, 2, paste, collapse = "-")
     interesting_comparisons <- which(all_contrasts %in% all_contrasts_group)
     
-    # if (!is.null(attr(grouping_info, "covariates"))){
-    #   ## factor level
-    #   comparisons <- c(comparisons,
-    #                    unique(as.character(grouping_info[[attr(grouping_info, "pair_id")]])),
-    #                    unique(as.character(grouping_info[[attr(grouping_info, "pair_group")]])))
-    #   ## Numeric
-    #   
-    # }
-    # 
-    # if (!is.null(attr(grouping_info, "pair_id"))){
-    #   comparisons <- c(comparisons,
-    #                    unique(as.character(grouping_info[[attr(grouping_info, "pair_id")]])),
-    #                    unique(as.character(grouping_info[[attr(grouping_info, "pair_group")]])))
-    # }
   } else if (is.null(comparisons)){
     
     comparisons <- c()
@@ -479,9 +439,13 @@ edgeR_wrapper <- function(
     
   } else {
     
-    all_contrasts_comp <- paste0(comparisons$Control, comparisons$Test, sep = "-")
+    all_contrasts <- unique(c(all_contrasts,
+                       apply(cob_list[nrow(cob_list):1,], 2, paste, collapse = "-")))
+
+    cob_list <- cbind(cob_list, cob_list[nrow(cob_list):1,])
+    all_contrasts_comp <- paste(comparisons$Control, comparisons$Test, sep = "-")
     interesting_comparisons <- which(all_contrasts %in% all_contrasts_comp)
-    
+    if(length(interesting_comparisons) == 0) stop("Invalid comparisons given")
   }
   
   # cob_list <- combn(comparisons, 2)
@@ -500,15 +464,11 @@ edgeR_wrapper <- function(
   run_NF <- run_NF[!duplicated(names(run_NF))]
   
   norm_factors_edgeR <- do.call(edgeR::calcNormFactors, run_NF)
-  GCD_edgeR <- edgeR::estimateGLMCommonDisp(norm_factors_edgeR,
-                                     design_matrix_edgeR)
-  GTD_edgeR <- edgeR::estimateGLMTrendedDisp(GCD_edgeR,
-                                      design_matrix_edgeR)
-  GTagD_edgeR <- edgeR::estimateGLMTagwiseDisp(GTD_edgeR,
-                                        design_matrix_edgeR)
+  D_edgeR <- edgeR::estimateDisp(norm_factors_edgeR,
+                      design_matrix_edgeR)
   
   list_defaults <- list(
-    y = GTagD_edgeR,
+    y = D_edgeR,
     design = design_matrix_edgeR
   )
   
@@ -536,7 +496,7 @@ edgeR_wrapper <- function(
       checker <- sub(el, "", checker)
     }
     
-    checkin <- map_lgl(purrr:::map(combo, stringr::str_detect, string = checker), any)
+    checkin <- purrr::map_lgl(purrr:::map(combo, stringr::str_detect, string = checker), any)
     
     if(all(checkin)){
       
@@ -561,9 +521,9 @@ edgeR_wrapper <- function(
     
     # Flag stuffs ----------------------------------------------------------------
     sigs <- which(res[[sig_col]] < p_cutoff)
-    res[["Flag_LRT"]] <- 0
+    res[["Flag_F"]] <- 0
     if(length(sigs) > 0){
-      res[["Flag_LRT"]][sigs] <- sign(res[["logFC"]][sigs])
+      res[["Flag_F"]][sigs] <- sign(res[["logFC"]][sigs])
     }
     
     colnames(res) <- paste0(colnames(res), 
@@ -587,7 +547,7 @@ edgeR_wrapper <- function(
     res[c(ncol(res), 1:(ncol(res) - 1))]
   })
   
-  all_cont <- res_contrasts[map_int(res_contrasts, nrow) != 0] %>% 
+  all_cont <- res_contrasts[purrr::map_int(res_contrasts, nrow) != 0] %>% 
     purrr::reduce(dplyr:::full_join)
   
   count_cols <- grep("^NonZero_Count_", colnames(all_cont))
@@ -598,7 +558,7 @@ edgeR_wrapper <- function(
   flag_cols <- grep("^Flag", colnames(all_cont))
   
   colnames(all_cont)[-1] <- gsub("^logFC", "Fold_change", colnames(all_cont)[-1])
-  colnames(all_cont)[-1] <- gsub("^(FDR|FWER)", "P_value_LRT", colnames(all_cont)[-1])
+  colnames(all_cont)[-1] <- gsub("^(FDR|FWER)", "P_value_F", colnames(all_cont)[-1])
   
   ## Ordering
   results <- all_cont[c(1, count_cols, mean_cols, 
@@ -612,7 +572,7 @@ edgeR_wrapper <- function(
   flag_df <- reshape2::melt(all_cont[flag_cols], 
                             variable.name = "Comparison", 
                             value.name = "Flags")
-  flag_df$Comparison <- gsub("Flag_LRT_", "", flag_df$Comparison )
+  flag_df$Comparison <- gsub("Flag_F_", "", flag_df$Comparison )
   attr(results, "number_significant") <- flag_df %>%
     dplyr::group_by(Comparison) %>%
     dplyr::summarise(
@@ -625,7 +585,7 @@ edgeR_wrapper <- function(
     combo <- cob_list[,n]
     paste0(combo[1], "_vs_", combo[2])
   })
-  attr(results, "statistical_test") <- "EdgeR_LRT"
+  attr(results, "statistical_test") <- "EdgeR_F"
   attr(results, "adjustment_method") <- p_adjust
   attr(results, "pval_thresh") <- p_cutoff
   attr(results, "data_class") <- attr(omicsData, "class")
@@ -663,7 +623,7 @@ voom_wrapper <- function(
   
   l <- list(...)
   
-  NF_args <- l[names(l) %in% names(formals(edgeR::calcNormFactors))]
+  NF_args <- l[names(l) %in% names(formals(edgeR::calcNormFactors.DGEList))]
   
   edata_cname <- get_edata_cname(omicsData)
   fdata_cname <- get_fdata_cname(omicsData)
@@ -694,24 +654,7 @@ voom_wrapper <- function(
   }
   
   design_matrix_limma <- model.matrix(as.formula(grouping_formula), grouping_info)
-  
-  # ## Get comparisons
-  # if(is.null(comparisons) && attr(grouping_info, "main_effects") != "no_main_effect"){
-  #   comparisons <- unique(grouping_info[["Group"]])
-  #   cob_list <- utils::combn(comparisons, 2)
-  #   row.names(cob_list) <- c("Test", "Control")
-  # } else if (is.null(comparisons)){
-  #     comparisons <- c(
-  #       unique(as.character(grouping_info[[attr(grouping_info, "pair_id")]])),
-  #       unique(as.character(grouping_info[[attr(grouping_info, "pair_group")]])))
-  #   cob_list <- utils::combn(comparisons, 2)
-  #   row.names(cob_list) <- c("Test", "Control")
-  # } else {
-  #   cob_list <- t(comparisons[c("Test", "Control")])
-  # }
-  # 
-  # all_contrasts <- apply(cob_list, 2, paste, collapse = "-")
-  
+
   all_cols <- stringr::str_trim(
     stringr::str_split(
       stringr::str_remove(
@@ -732,20 +675,6 @@ voom_wrapper <- function(
     all_contrasts_group <- apply(cob_list_group, 2, paste, collapse = "-")
     interesting_comparisons <- which(all_contrasts %in% all_contrasts_group)
     
-    # if (!is.null(attr(grouping_info, "covariates"))){
-    #   ## factor level
-    #   comparisons <- c(comparisons,
-    #                    unique(as.character(grouping_info[[attr(grouping_info, "pair_id")]])),
-    #                    unique(as.character(grouping_info[[attr(grouping_info, "pair_group")]])))
-    #   ## Numeric
-    #   
-    # }
-    # 
-    # if (!is.null(attr(grouping_info, "pair_id"))){
-    #   comparisons <- c(comparisons,
-    #                    unique(as.character(grouping_info[[attr(grouping_info, "pair_id")]])),
-    #                    unique(as.character(grouping_info[[attr(grouping_info, "pair_group")]])))
-    # }
   } else if (is.null(comparisons)){
     
     comparisons <- c()
@@ -756,8 +685,13 @@ voom_wrapper <- function(
     
   } else {
     
-    all_contrasts_comp <- paste0(comparisons$Control, comparisons$Test, sep = "-")
+    all_contrasts <- unique(c(all_contrasts,
+                              apply(cob_list[nrow(cob_list):1,], 2, paste, collapse = "-")))
+    
+    cob_list <- cbind(cob_list, cob_list[nrow(cob_list):1,])
+    all_contrasts_comp <- paste(comparisons$Control, comparisons$Test, sep = "-")
     interesting_comparisons <- which(all_contrasts %in% all_contrasts_comp)
+    if(length(interesting_comparisons) == 0) stop("Invalid comparisons given")
     
   }
   
@@ -791,7 +725,7 @@ voom_wrapper <- function(
       checker <- sub(el, "", checker)
     }
     
-    checkin <- map_lgl(purrr:::map(combo, stringr::str_detect, string = checker), any)
+    checkin <- purrr::map_lgl(purrr:::map(combo, stringr::str_detect, string = checker), any)
     
     if(all(checkin)){
       
@@ -840,7 +774,7 @@ voom_wrapper <- function(
     } else return()
   })
   
-  all_cont <- res_contrasts[map_int(res_contrasts, nrow) != 0] %>% 
+  all_cont <- res_contrasts[purrr::map_int(res_contrasts, nrow) != 0] %>% 
     purrr::reduce(dplyr::full_join)
   
   results <- list(Full_results = all_cont)
@@ -905,10 +839,12 @@ voom_wrapper <- function(
 get_group_formula <- function(omicsData){
   
   grouping_info <- get_group_DF(omicsData)
+  if(is.null(grouping_info)) stop("group_designation has not been run")
   e_data_index <- which(colnames(omicsData$e_data) %in% get_edata_cname(omicsData))
   collist <- colnames(omicsData$e_data[-e_data_index])
   collist_group <- grouping_info[[get_fdata_cname(omicsData)]]
   grouping_info <- grouping_info[match(collist, collist_group),]
+
   
   ## If pairs, add to group_df
   pairs <- attr(grouping_info, "pair_id")
@@ -932,14 +868,14 @@ get_group_formula <- function(omicsData){
       design_matrix_add_pairs <- paste(pairs, pair_group, sep = " + ")
     } else {
       
-      grouping_info <- arrange(grouping_info, 
+      grouping_info <- dplyr::arrange(grouping_info, 
                                Group, 
                                !!rlang::sym(pair_group), !!rlang::sym(pairs))
       
       all_mult_levels <- table(apply(grouping_info[c("Group", pair_group)], 
                                      1, paste, collapse = ""))
       
-      grouping_info[[pairs]] <- unlist(map(all_mult_levels, function(el){
+      grouping_info[[pairs]] <- unlist(purrr::map(all_mult_levels, function(el){
         paste0("new_pair_name", 1:el)
       }))
       
@@ -977,7 +913,7 @@ get_group_formula <- function(omicsData){
       })
       
       if(any(redun)){
-        warning("At least 1 detected covariate is confounded with Group will not be used in final model.")
+        warning("At least 1 detected covariate is confounded with Group and will not be used in final model.")
         covariates <- covariates[c(TRUE, !redun)]
       }
     }
@@ -992,7 +928,7 @@ get_group_formula <- function(omicsData){
   } else design_matrix_add_covariates <- NULL
   
   
-  formula_string <- paste0("~0 +", design_matrix_add_pairs, 
+  formula_string <- paste0("~0 + ", design_matrix_add_pairs, 
                            design_matrix_add_covariates, 
                            design_matrix_add_group)
   
@@ -1036,6 +972,8 @@ get_group_formula <- function(omicsData){
 #' @param custom_theme a ggplot `theme` object to be applied to non-interactive
 #'   plots, or those converted by plotly::ggplotly().
 #'
+#' @details  DESeq2 option requires package "survival" to be available.
+#'
 #' @return plot result
 #'
 #' @examples
@@ -1063,6 +1001,17 @@ dispersion_est <- function(omicsData, method,
                            point_size = 0.2,
                            custom_theme = NULL){
   
+  # check that omicsData is of appropriate class #
+  if (!inherits(omicsData, c("seqData"))) {
+    # Throw an error that the input for omicsData is not the appropriate class.
+    stop("omicsData must be of class 'seqData'")
+  }
+  
+  # check method #
+  if(length(method) != 1 || !(method %in% c('edgeR', 'DESeq2','voom'))){
+    stop("method must a single character string of length 1 in 'edgeR', 'DESeq2', or 'voom'")
+  }
+  
   if(!is.null(custom_theme)){
     if(bw_theme)
       warning(paste("Setting both bw_theme to TRUE and specifying a custom",
@@ -1084,6 +1033,10 @@ dispersion_est <- function(omicsData, method,
   fdata_cname <- get_fdata_cname(omicsData)
   e_data_counts <- omicsData$e_data[colnames(omicsData$e_data) != edata_cname]
   
+  if(is.null(get_group_DF(omicsData))) stop(
+    "OmicsData requires group_designation for statistical analysis"
+  )
+  
   ## Snag appropriate formula ##
   group_res <- get_group_formula(omicsData)
   grouping_info <- group_res[[1]]
@@ -1100,6 +1053,12 @@ dispersion_est <- function(omicsData, method,
   # to focus on lowly-expressed genes or are dealing with very low-coverage data (e.g., single-cell stuff).
   
   if(method == "DESeq2"){
+    
+    df_test <- installed.packages()
+    if(!("survival" %in% df_test)){
+      stop("package 'survival' required for DESeq2 processing")
+    }
+    require("survival")
     
     # Farm boy, do all the tedious label crap. As you wish.
     the_x_label <- if (is.null(x_lab)) "Mean of Normalized Counts" else x_lab
