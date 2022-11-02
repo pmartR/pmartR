@@ -10,7 +10,7 @@ RNA_filter(omicsData)
 \item{omicsData}{an object of the class 'seqData', usually created by \code{\link{as.seqData}}}
 }
 \value{
-Object of class RNAFilt (also a data.frame) that contains the
+Object of class RNAFilt (data.frame) that contains the
   sample identifiers, library size, the number of unique biomolecules with 
   non-zero observations per sample, and the proportion of non-zero 
   observations over the total number of biomolecules.
@@ -21,13 +21,14 @@ This function returns a RNAFilt object for use with
 }
 \details{
 Filter omicsData samples by library size (number of reads) or number
-of unique non-zero biomolecules per sample.
+of unique non-zero biomolecules per sample. Useful for visualizing if a sample
+contains lower than expected number of reads.
 }
 \examples{
 \dontrun{
 library(pmartRdata)
-data("seq_object")
-to_filter <- RNA_filter(omicsData = seq_object)
+data("rnaseq_object")
+to_filter <- RNA_filter(omicsData = rnaseq_object)
 plot(to_filter)
 summary(to_filter, size_library = 10000)
 summary(to_filter, min_nonzero = 5000)

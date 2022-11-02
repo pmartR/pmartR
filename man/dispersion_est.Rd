@@ -78,6 +78,25 @@ For generating statistics for 'seqData' objects
 }
 \examples{
 \dontrun{
+
+library(pmartRdata)
+myseqData <- rnaseq_object
+myseqData <- group_designation(omicsData = myseqData, main_effects = "Virus")
+disp_est <- dispersion_est(omicsData = myseqData, method = "edgeR")
+
+
 }
 
+}
+\references{
+Robinson MD, McCarthy DJ, Smyth GK (2010). “edgeR: a Bioconductor package 
+ for differential expression analysis of digital gene expression data.” 
+ Bioinformatics, 26(1), 139-140. doi: 10.1093/bioinformatics/btp616.
+ 
+ Love, M.I., Huber, W., Anders, S. Moderated estimation of fold change and 
+ dispersion for RNA-seq data with DESeq2 Genome Biology 15(12):550 (2014)
+ 
+ Ritchie, M.E., Phipson, B., Wu, D., Hu, Y., Law, C.W., Shi, W., and Smyth, 
+ G.K. (2015). limma powers differential expression analyses for 
+ RNA-sequencing and microarray studies. Nucleic Acids Research 43(7), e47.
 }

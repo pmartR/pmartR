@@ -312,7 +312,10 @@ test_that('the filter object summaries are all square',{
   )
 
   # Custom filter ---------------
-
+  
+  ## Test with remove arguments
+  
+  # remove e_data
   expect_equal(
     summary(custom_filter(pdata, e_data_remove = "1406")),
     structure(
@@ -327,7 +330,8 @@ test_that('the filter object summaries are all square',{
                     "Proteins (e_meta)")
     )
   )
-
+  
+  # remove f_data
   expect_equal(
     summary(custom_filter(pdata, f_data_remove = "Infection4")),
     structure(
@@ -343,6 +347,7 @@ test_that('the filter object summaries are all square',{
     )
   )
 
+  # remove e_meta
   expect_equal(
     summary(custom_filter(pdata, e_meta_remove = "ALBU_HUMAN")),
     structure(
@@ -357,5 +362,113 @@ test_that('the filter object summaries are all square',{
                     "Proteins (e_meta)")
     )
   )
-
+  
+  # combination
+  expect_equal(
+    summary(
+      custom_filter(
+        pdata, 
+        e_data_remove = "6948840",
+        f_data_remove = "Mock2",
+        e_meta_remove = "COR1C_HUMAN"
+      )
+    ),
+    structure(
+      data.frame(
+        Filtered = c(1, 1, 1),
+        Remaining = c(11, 149, 82),
+        Total = c(12, 150, 83)
+      ),
+      names = c("Filtered", "Remaining", "Total"),
+      class = c("customFilterSummary", "data.frame"),
+      row.names = c("SampleIDs (f_data)", "Mass_Tag_IDs (e_data)",
+                    "Proteins (e_meta)")
+    )
+  )
+  
+  ## Test with keep arguments
+  
+  # e_meta keep
+  expect_equal(
+    summary(
+      custom_filter(
+        pdata, e_meta_keep = c("ALBU_HUMAN",  "RL40_HUMAN",  "ALBU_HUMAN")
+      )
+    ),
+    structure(
+      data.frame(
+        Discarded = c(0, 141, 80),
+        Kept = c(12, 9, 3),
+        Total = c(12, 150, 83)
+      ),
+      names = c("Discarded", "Kept", "Total"),
+      class = c("customFilterSummary", "data.frame"),
+      row.names = c("SampleIDs (f_data)", "Mass_Tag_IDs (e_data)",
+                    "Proteins (e_meta)")
+    )
+  )
+  
+  # f_data keep
+  expect_equal(
+    summary(
+      custom_filter(
+        pdata, f_data_keep = c("Infection1", "Infection2", "Mock1", "Mock2", "Mock3")
+      )
+    ),
+    structure(
+      data.frame(
+        Discarded = c(7, 0, 0),
+        Kept = c(5, 150, 83),
+        Total = c(12, 150, 83)
+      ),
+      names = c("Discarded", "Kept", "Total"),
+      class = c("customFilterSummary", "data.frame"),
+      row.names = c("SampleIDs (f_data)", "Mass_Tag_IDs (e_data)",
+                    "Proteins (e_meta)")
+    )
+  )
+  
+  # e_data keep
+  expect_equal(
+    summary(
+      custom_filter(
+        pdata, 
+        e_data_keep = c("1024",  "4198254",  "6637724", "216191"),
+        f_data_keep = c("Infection1", "Infection2", "Mock1", "Mock2", "Mock3"),
+        e_meta_keep = c("ALBU_HUMAN",  "RL40_HUMAN",  "ALBU_HUMAN")
+      )
+    ),
+    structure(
+      data.frame(
+        Discarded = c(7, 146, 80),
+        Kept = c(5, 4, 3),
+        Total = c(12, 150, 83)
+      ),
+      names = c("Discarded", "Kept", "Total"),
+      class = c("customFilterSummary", "data.frame"),
+      row.names = c("SampleIDs (f_data)", "Mass_Tag_IDs (e_data)",
+                    "Proteins (e_meta)")
+    )
+  )
+  
+  # combination
+  expect_equal(
+    summary(
+      custom_filter(
+        pdata, e_data_keep = c("1024",  "4198254",  "6637724", "216191")
+      )
+    ),
+    structure(
+      data.frame(
+        Discarded = c(0, 146, 79),
+        Kept = c(12, 4, 4),
+        Total = c(12, 150, 83)
+      ),
+      names = c("Discarded", "Kept", "Total"),
+      class = c("customFilterSummary", "data.frame"),
+      row.names = c("SampleIDs (f_data)", "Mass_Tag_IDs (e_data)",
+                    "Proteins (e_meta)")
+    )
+  )
+  
 })
