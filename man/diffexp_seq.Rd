@@ -39,11 +39,22 @@ a statRes object (data.frame)
 For generating statistics for 'seqData' objects
 }
 \details{
-Runs default differential expression workflows. Refer to ?pmartR:::DESeq2_wrapper,
-?pmartR:::voom_wrapper, and ?pmartR:::edgeR_wrapper for additional default details.
+Runs default differential expression workflows.
 
 Flags (signatures) -	Indicator of statistical significance for computed test. 
 Zeros indicate no significance, while +/- 1 indicates direction of significance.
+
+Method "edgeR" - Runs default edgeR workflow with empirical Bayes quasi-likelihood F-tests.
+Additional arguments can be passed for use in the function, 
+refer to calcNormFactors() and glmQLFit() in edgeR package.
+
+Method "DESeq2" - Runs default DESeq workflow. Defaults to Wald test, no independent filtering, and 
+running in parallel. Additional arguments can be passed for use in the function, 
+refer to DESeq() and results() in DESeq2 package. Requires 'survival' package to run.
+
+Method "voom" - Runs default limma-voom workflow using empirical Bayes moderated t-statistics.
+Additional arguments can be passed for use in the function, 
+refer to calcNormFactors() in edgeR package.
 }
 \examples{
 \dontrun{
