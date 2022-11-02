@@ -18,11 +18,22 @@
 #'
 #' @return a statRes object (data.frame)
 #'
-#' @details Runs default differential expression workflows. Refer to ?pmartR:::DESeq2_wrapper,
-#' ?pmartR:::voom_wrapper, and ?pmartR:::edgeR_wrapper for additional default details.
+#' @details Runs default differential expression workflows.
 #' 
 #' Flags (signatures) -	Indicator of statistical significance for computed test. 
 #' Zeros indicate no significance, while +/- 1 indicates direction of significance.
+#'
+#' Method "edgeR" - Runs default edgeR workflow with empirical Bayes quasi-likelihood F-tests.
+#' Additional arguments can be passed for use in the function, 
+#' refer to calcNormFactors() and glmQLFit() in edgeR package.
+#'
+#' Method "DESeq2" - Runs default DESeq workflow. Defaults to Wald test, no independent filtering, and 
+#' running in parallel. Additional arguments can be passed for use in the function, 
+#' refer to DESeq() and results() in DESeq2 package. Requires 'survival' package to run.
+#' 
+#' Method "voom" - Runs default limma-voom workflow using empirical Bayes moderated t-statistics.
+#' Additional arguments can be passed for use in the function, 
+#' refer to calcNormFactors() in edgeR package.
 #' 
 #' @references 
 #'  Robinson MD, McCarthy DJ, Smyth GK (2010). “edgeR: a Bioconductor package 
@@ -121,7 +132,7 @@ diffexp_seq <- function(omicsData, method = "edgeR", p_adjust = "BH",
 #' 
 #' @details Runs default DESeq workflow. Defaults to Wald test, no independent filtering, and 
 #' running in parallel. Additional arguments can be passed for use in the function, 
-#' refer to DESeq() and results() in DESeq2 package
+#' refer to DESeq() and results() in DESeq2 package. Requires 'survival' package to run.
 #'
 #' Flags (signatures) -	Indicator of statistical significance for computed test. 
 #' Zeros indicate no significance, while +/- 1 indicates direction of significance.
@@ -361,9 +372,9 @@ DESeq2_wrapper <- function(
 #'
 #' @return a statRes object (data.frame)
 #' 
-#' @details Runs default edgeR workflow. Defaults to Wald test, no independent filtering, and 
-#' running in parallel. Additional arguments can be passed for use in the function, 
-#' refer to calcNormFactors() and glmQLFit() in edgeR package
+#' @details Runs default edgeR workflow with empirical Bayes quasi-likelihood F-tests.
+#' Additional arguments can be passed for use in the function, 
+#' refer to calcNormFactors() and glmQLFit() in edgeR package.
 #' 
 #' Flags (signatures) -	Indicator of statistical significance for computed test. 
 #' Zeros indicate no significance, while +/- 1 indicates direction of significance.
@@ -635,9 +646,9 @@ edgeR_wrapper <- function(
 #' @param ... additional arguments passed to methods functions. Note, formatting 
 #' option changes will interfere with wrapping functionality.
 #' 
-#' @details Runs default edgeR workflow. Defaults to Wald test, no independent filtering, and 
-#' running in parallel. Additional arguments can be passed for use in the function, 
-#' refer to calcNormFactors() in edgeR package
+#' @details Runs default limma-voom workflow using empirical Bayes moderated t-statistics.
+#' Additional arguments can be passed for use in the function, 
+#' refer to calcNormFactors() in edgeR package.
 #' @return data.frame object
 #' 
 #' @references 
