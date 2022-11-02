@@ -5,15 +5,7 @@
 \title{Print method for summary of molecule filter}
 \usage{
 \method{print}{moleculeFilterSummary}(object)
-
-\method{print}{moleculeFilterSummary}(object)
-
-\method{print}{moleculeFilterSummary}(object)
 }
 \description{
-Print method for summary of molecule filter
-
-Print method for summary of molecule filter
-
 Print method for summary of molecule filter
 }

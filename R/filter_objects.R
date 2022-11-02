@@ -207,21 +207,27 @@ molecule_filter <- function (omicsData, use_groups = FALSE, use_batch = FALSE) {
 #'
 #' @param omicsData an object of the class 'seqData', usually created by \code{\link{as.seqData}}
 #'
-#' @details Filter is based off of recommendations in edgeR processing:
+#' @details Filter is based off of recommendations in edgeR processing, where 
+#' the low-observed biomolecules are removed from processing. Default 
+#' recommendation in edgeR is at least 10 total counts observed across samples 
+#' (i.e., if the sum of counts in a row of e_data is < 10, default edgeR 
+#' filtering would remove this biomolecule).
+#' 
+#' @references 
 #' Chen Y, Lun ATL, and Smyth, GK (2016). From reads to genes to pathways: 
 #' differential expression analysis of RNA-Seq experiments using Rsubread and 
 #' the edgeR quasi-likelihood pipeline. F1000Research 5, 1438. 
 #' http://f1000research.com/articles/5-1438
 #'
-#' @return Object of class totalcountFilt (also a data.frame) that contains the
+#' @return Object of class totalcountFilt (data.frame) that contains the
 #'   molecule identifier and the total count of observed reads.
 #'
 #' @examples
 #' \dontrun{
 #' library(pmartRdata)
-#' data("seq_object")
-#' to_filter <- total_count_filter(omicsData = seq_object)
-#' summary(to_filter, min_num = 2)
+#' data("rnaseq_object")
+#' to_filter <- total_count_filter(omicsData = rnaseq_object)
+#' summary(to_filter, min_count = 10)
 #' }
 #'
 #' @author Rachel Richardson
@@ -283,9 +289,10 @@ total_count_filter <- function (omicsData) {
 #' @param omicsData an object of the class 'seqData', usually created by \code{\link{as.seqData}}
 #'
 #' @details Filter omicsData samples by library size (number of reads) or number
-#' of unique non-zero biomolecules per sample.
+#' of unique non-zero biomolecules per sample. Useful for visualizing if a sample
+#' contains lower than expected number of reads.
 #'
-#' @return Object of class RNAFilt (also a data.frame) that contains the
+#' @return Object of class RNAFilt (data.frame) that contains the
 #'   sample identifiers, library size, the number of unique biomolecules with 
 #'   non-zero observations per sample, and the proportion of non-zero 
 #'   observations over the total number of biomolecules.
@@ -293,8 +300,8 @@ total_count_filter <- function (omicsData) {
 #' @examples
 #' \dontrun{
 #' library(pmartRdata)
-#' data("seq_object")
-#' to_filter <- RNA_filter(omicsData = seq_object)
+#' data("rnaseq_object")
+#' to_filter <- RNA_filter(omicsData = rnaseq_object)
 #' plot(to_filter)
 #' summary(to_filter, size_library = 10000)
 #' summary(to_filter, min_nonzero = 5000)
