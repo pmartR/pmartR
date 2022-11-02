@@ -375,7 +375,8 @@ DESeq2_wrapper <- function(
 #' 
 #' @details Runs default edgeR workflow. Defaults to Wald test, no independent filtering, and 
 #' running in parallel. Additional arguments can be passed for use in the function, 
-#' refer to calcNormFactors() and glmQLFit() in edgeR package
+#' refer to calcNormFactors() and glmQLFit() in edgeR package. Workflow uses edgeR function
+#' estimateDisp() to calculate dispersion estimates.
 #' @return data.frame object
 #' 
 #' 
@@ -499,16 +500,12 @@ edgeR_wrapper <- function(
   run_NF <- c(NF_args, list_defaults)
   run_NF <- run_NF[!duplicated(names(run_NF))]
   
-  norm_factors_edgeR <- do.call(edgeR::calcNormFactors, run_NF)
-  GCD_edgeR <- edgeR::estimateGLMCommonDisp(norm_factors_edgeR,
-                                     design_matrix_edgeR)
-  GTD_edgeR <- edgeR::estimateGLMTrendedDisp(GCD_edgeR,
-                                      design_matrix_edgeR)
-  GTagD_edgeR <- edgeR::estimateGLMTagwiseDisp(GTD_edgeR,
-                                        design_matrix_edgeR)
+  norm_factors_edgeR <- do.call(edgeR::calcNormFactors, run_NF)  
+  D_edgeR <- edgeR::estimateDisp(norm_factors_edgeR,
+                      design_matrix_edgeR)
   
   list_defaults <- list(
-    y = GTagD_edgeR,
+    y = D_edgeR,
     design = design_matrix_edgeR
   )
   
