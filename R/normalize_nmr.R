@@ -386,7 +386,8 @@ normalize_nmr<- function (omicsData,
       
       # Extract data_info attribute from omicsData. Some of the elements will be
       # used to update this attribute.
-      dInfo <- attr(omicsData, 'data_info')
+      dInfo <- get_data_info(omicsData)
+      # dInfo <- attr(omicsData, 'data_info')
       
       # Update the data_info attribute because we removed a row from e_data.
       attr(omicsData, "data_info") <- set_data_info(

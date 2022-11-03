@@ -16,16 +16,16 @@ A list containing filter class objects. Each element in this list
         listed in the order they were applied. A filter object contains two
         elements:
         \itemize{
-
+        
           \item threshold -- The threshold used to filter \code{e_data}. This
           value depends on the type of filter applied.
-
-          \item filtered -- A vector containing the identifiers from the
+          
+          \item filtered -- A vector containing the identifiers from the 
           \code{edata_cname} column that will be filtered.
-
+          
           \item method -- A character string indicating the type of method
           used to filter. This only applies when imdanova_filter is used.
-
+        
         }
 }
 \description{

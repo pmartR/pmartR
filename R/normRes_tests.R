@@ -43,7 +43,8 @@ normRes_tests <- function (norm_obj, test_fn = "kw") {
 
     if (!attributes(norm_obj)$data_info$norm_info$is_normalized)
       stop ("Normalization has not been run on this data")
-    if (is.null(attributes(norm_obj)$group_DF))
+    if (is.null(get_group_DF(norm_obj)))
+      # if (is.null(attributes(norm_obj)$group_DF))
       stop ("No grouping structure present in object")
 
     location <- attributes(norm_obj)$data_info$norm_info$params$norm_location

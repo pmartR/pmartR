@@ -62,6 +62,7 @@ test_that('cor_result correctly calcualtes the correlation',{
   # Add the attributes to the standard.
   attr(standard, "sample_names") <- names(pdata$e_data[, -1])
   attr(standard, "is_normalized") <- FALSE
+  attr(standard, "cor_method") <- "pearson"
   
   # Use cor_result to calculate the correlation.
   iocor <- cor_result(pdata)
@@ -82,6 +83,7 @@ test_that('cor_result correctly calcualtes the correlation',{
   attr(standard, "sample_names") <- names(isodata$e_data[, -1])
   attr(standard, "isobaric_norm") <- FALSE
   attr(standard, "is_normalized") <- FALSE
+  attr(standard, "cor_method") <- "pearson"
   
   # Use cor_result to calculate the correlation.
   iocor <- cor_result(isodata)
@@ -102,6 +104,7 @@ test_that('cor_result correctly calcualtes the correlation',{
   attr(standard, "sample_names") <- names(nmrdata$e_data[, -1])
   attr(standard, "nmr_norm") <- FALSE
   attr(standard, "is_normalized") <- FALSE
+  attr(standard, "cor_method") <- "pearson"
   
   # Use cor_result to calculate the correlation.
   iocor <- cor_result(nmrdata)

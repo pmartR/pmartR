@@ -33,13 +33,23 @@ edata_replace <- function(omicsData, x, y) {
   
   # check that omicsData is of appropriate class #
   if (!inherits(omicsData, c("pepData", "proData", "metabData",
-                             "lipidData", "nmrData"))) {
+                             "lipidData", "nmrData"#, "seqData"
+                             ))) {
     
     # Bestow an error on the user because the input does not have the correct
     # class.
     stop (paste("omicsData must be of class 'pepData', 'proData',",
-                "'metabData', 'lipidData', or 'nmrData'",
+                "'metabData', 'lipidData', or 'nmrData'. ",
                 sep = " "))
+    
+  }
+  
+  # check that omicsData is of appropriate class #
+  if (inherits(omicsData, "seqData") && is.na(y)) {
+    
+    # Bestow an error on the user because the input does not have the correct
+    # class.
+    stop ("NAs values are not valid for seqData processing.")
     
   }
   
