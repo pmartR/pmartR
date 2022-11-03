@@ -39,10 +39,7 @@ Suggests:
     knitr,
     rmarkdown,
     testthat
-<<<<<<< .merge_file_qZrfEx
-=======
 Remotes:
     hafen/trelliscopejs
->>>>>>> .merge_file_SiYdnT
 RoxygenNote: 7.2.1
 Encoding: UTF-8
