@@ -2,22 +2,42 @@
 % Please edit documentation in R/filter_summary.R
 \name{summary.proteomicsFilt}
 \alias{summary.proteomicsFilt}
-\title{Produce a basic summary of a proteomics_filter object}
+\title{Proteomics Filter Summary}
 \usage{
 \method{summary}{proteomicsFilt}(filter_object, min_num_peps = NULL, degen_peps = FALSE)
 }
 \arguments{
-\item{filter_object}{S3 object of class 'proteomicsFilt' created by \code{\link{proteomics_filter}}.}
+\item{filter_object}{S3 object of class 'proteomicsFilt' created by
+\code{\link{proteomics_filter}}.}
 
-\item{min_num_peps}{an optional integer value between 1 and the maximum number of peptides that map to a protein in the data. The value specifies the minimum number of peptides that must map to a protein. Any protein with less than \code{min_num_peps} mapping to it will be returned as a protein that should be filtered. Default value is NULL.}
+\item{min_num_peps}{optional integer value between 1 and the maximum
+number of peptides that map to a protein in the data. The value specifies
+the minimum number of peptides that must map to a protein. Any protein with
+less than \code{min_num_peps} mapping to it will be returned as a protein
+that should be filtered. Default value is NULL.}
 
-\item{degen_peps}{logical indicator of whether to filter out degenerate peptides (i.e. peptides mapping to multiple proteins) (TRUE) or not (FALSE). Default value is FALSE.}
+\item{degen_peps}{logical indicator of whether to filter out 'degenerate' or 'redundant'
+peptides (i.e. peptides mapping to multiple proteins) (TRUE) or not
+(FALSE). Default value is FALSE.}
 }
 \value{
-a summary table giving the number of Observed Proteins per Peptide and number of Observed Peptides per Protein. If min_num_peps is specified and/or degen_peps is TRUE, the number of biomolecules to be filtered with the specified threshold(s) are reported.
+a summary table giving the number of Observed Proteins per Peptide
+  and number of Observed Peptides per Protein. If min_num_peps is specified
+  and/or degen_peps is TRUE, the number of biomolecules to be filtered with
+  the specified threshold(s) are reported.
 }
 \description{
-This function will provide basic summary statistics for the proteomics_filter object.
+Provide summary of a proteomicsFilt S3 object
+}
+\examples{
+library(pmartRdata)
+myfilt <- proteomics_filter(omicsData = pep_object)
+summary(filter_object = myfilt, degen_peps = TRUE) # there are no degenerate peptides to filter out
+summary(filter_object = myfilt, min_num_peps = 2)
+
+}
+\seealso{
+\code{\link{proteomics_filter}}
 }
 \author{
 Lisa Bramer

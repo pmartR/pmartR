@@ -2,38 +2,39 @@
 % Please edit documentation in R/filter_summary.R
 \name{summary.RNAFilt}
 \alias{summary.RNAFilt}
-\title{Produce a basic summary of a RNAFilt object}
+\title{RNA Filter Summary}
 \usage{
 \method{summary}{RNAFilt}(filter_object, size_library = NULL, min_nonzero = NULL)
 }
 \arguments{
-\item{filter_object}{S3 object of class 'RNAFilt' created by \code{\link{molecule_filter}}.}
+\item{filter_object}{S3 object of class 'RNAFilt' created by
+\code{\link{RNA_filter}}.}
 
-\item{size_library}{Integer. Cut-off for sample library size (i.e. number 
-of reads). Defaults to NULL.}
+\item{size_library}{integer cut-off for sample library size (i.e. number of
+reads). Defaults to NULL.}
 
-\item{min_nonzero}{Integer or float between 0 and 1. Cut-off for number of 
-unique biomolecules with non-zero counts or as a proportion of total 
+\item{min_nonzero}{integer or float between 0 and 1. Cut-off for number of
+unique biomolecules with non-zero counts or as a proportion of total
 biomolecules. Defaults to NULL.}
 }
 \value{
-a summary table giving the minimum, maximum, interquartiles, mean and 
-standard deviation for library size,  the number of unique biomolecules with 
-non-zero observations per sample, and the proportion of non-zero observations 
-over the total number of biomolecules.
+a summary table giving the minimum, maximum, 1st and 3rd quartiles,
+  mean and standard deviation for library size (the number of unique
+  biomolecules with non-zero observations per sample), and the proportion of
+  non-zero observations over the total number of biomolecules.
 }
 \description{
-This function will provide basic summary statistics for the molecule_filter object.
+Provide summary of a RNAFilt S3 object
 }
 \examples{
-dontrun{
 library(pmartRdata)
-data("pep_object")
-myfilter <- molecule_filter(pep_object)
-summary(myfilter)
-summary(myfilter, min_num = 2)
-}
+myfilter <- RNA_filter(omicsData = rnaseq_object)
+summary(filter_object = myfilter)
+summary(filter_object = myfilter, min_num = 2)
 
+}
+\seealso{
+\code{\link{RNA_filter}}
 }
 \author{
 Rachel Richardson
