@@ -63,13 +63,11 @@ ggplot2 plot object if interactive is FALSE, or plotly plot object if
 Creates a scatter plot for an S3 object of type 'nmrnormRes'
 }
 \examples{
-\dontrun{
 library(pmartRdata)
 mynmr <- edata_transform(omicsData = nmr_identified_object, data_scale = "log2")
 mynmr <- normalize_nmr(omicsData = mynmr,
                          apply_norm = FALSE,
                          metabolite_name = "unkm1.53")
 plot(mynmr)
-}
 
 }

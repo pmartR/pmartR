@@ -118,13 +118,11 @@ This function can only create plots for dataRes objects whose 'by' =
   'molecule' and 'groupvar' attribute is non NULL
 }
 \examples{
-\dontrun{
 library (pmartRdata)
 mylipid <- edata_transform(omicsData = lipid_pos_object, data_scale = "log2")
 result <- edata_summary(omicsData = mylipid,
                        by = "molecule",
                        groupvar = "Virus")
 plot(result)
-}
 
 }

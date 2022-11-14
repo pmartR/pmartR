@@ -88,7 +88,7 @@ Objects of class 'seqData' contain some attributes that are
 }
 \examples{
 library(pmartRdata)
-mypepData <- as.seqData(e_data = rnaseq_edata,
+myseq <- as.seqData(e_data = rnaseq_edata,
                         e_meta = rnaseq_emeta,
                         f_data = rnaseq_fdata,
                         edata_cname = "Transcript",

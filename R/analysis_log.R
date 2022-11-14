@@ -7,7 +7,7 @@
 #'  \code{\link{as.nmrData}}, or \code{\link{as.seqData}}, respectively.
 #'
 #' @examples
-#' dontrun{
+#' \dontrun{
 #' library(pmartRdata)
 #' data(omicsData = metab_object)
 #' result <- analysis_log(omicsData = metab_object)

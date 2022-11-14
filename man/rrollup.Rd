@@ -27,11 +27,9 @@ In the rrollup method, peptides are scaled based on a reference
   peptide and protein abundance is set as the mean of these scaled peptides.
 }
 \examples{
-\dontrun{
 library(pmartRdata)
-data(pep_object)
+data(omicsData = pep_object)
 result = rrollup(pepData = pep_object)
-}
 
 }
 \references{

@@ -79,16 +79,26 @@ protein_quant <- function (pepData, method, isoformRes = NULL,
 
   }
 
-  if(!inherits(pepData, "pepData")) stop("pepData must be an object of class pepData")
-  if(!(method %in% c('rollup', 'rrollup', 'qrollup', 'zrollup'))) stop("method must be one of, rollup, rrollup, qrollup, zrollup")
-  if(!(combine_fn %in% c('median', 'mean'))) stop("combine_fn must be either 'mean' or 'median'")
-
+  if(!inherits(pepData, "pepData"))
+    stop("pepData must be an object of class pepData")
+  if (!(method %in% c('rollup', 'rrollup', 'qrollup', 'zrollup')))
+    stop("method must be one of, rollup, rrollup, qrollup, zrollup")
+  if (!(combine_fn %in% c('median', 'mean')))
+    stop("combine_fn must be either 'mean' or 'median'")
+  
   #gives message if single_pep and single_observation are TRUE and method is not zrollup
-  if (method != 'zrollup' && (single_pep == TRUE || single_observation == TRUE)) message("single_pep and single_observation will be ignored, as they are only applicable if method is zrollup")
-
+  if (method != 'zrollup' &&
+      (single_pep == TRUE ||
+       single_observation == TRUE))
+    message(
+      "single_pep and single_observation will be ignored, as they are only applicable if method is zrollup"
+    )
+  
   #gives message if qrollup_thresh is not NULL and method is not qrollup
-  if(method != 'qrollup' && !is.null(qrollup_thresh)) message("qrollup_thresh argument will be ignored, as it is only applicable if method is qrollup")
-
+  if (method != 'qrollup' &&
+      !is.null(qrollup_thresh))
+    message("qrollup_thresh argument will be ignored, as it is only applicable if method is qrollup")
+  
   # Check if isoformRes is actually and isoformRes.
   if (!is.null(isoformRes) && class(isoformRes) != "isoformRes") {
     stop ("The input for isoformRes must be of class 'isoformRes'.")
@@ -567,11 +577,9 @@ pquant <- function (pepData,
 #'   24(13), 1556-1558.
 #'
 #' @examples
-#' \dontrun{
 #' library(pmartRdata)
-#' data(pep_object)
+#' data(omicsData = pep_object)
 #' result = rrollup(pepData = pep_object)
-#' }
 #'
 #' @rdname rrollup
 #'
@@ -655,7 +663,7 @@ rrollup <- function (pepData, combine_fn, parallel = TRUE) {
       }
       prot_val = unlist(current_subset[least.na,])
 
-      ## Step 2: Ratio all peptides to the reference.  Since the data is on the
+      ## Step 2: Ratio all peptides to the reference. Since the data is on the
       ## log scale, this is the difference ##
       scaling_factor = apply(rep(as.numeric(prot_val),
                                  each = nrow(current_subset)) - current_subset,
@@ -744,11 +752,9 @@ rrollup <- function (pepData, combine_fn, parallel = TRUE) {
 #'   England), 24(13), 1556-1558.
 #'
 #' @examples
-#' \dontrun{
 #' library(pmartRdata)
 #' data(pep_object)
 #' result = qrollup(pepData = pep_object, qrollup_thresh = 2)
-#' }
 #'
 #' @rdname qrollup
 #'
@@ -923,11 +929,9 @@ qrollup <- function (pepData, qrollup_thresh,
 #'   England), 24(13), 1556-1558.
 #'
 #' @examples
-#' \dontrun{
 #' library(pmartRdata)
 #' data(pep_object)
 #' result = zrollup(pepData = pep_object)
-#' }
 #'
 #' @rdname zrollup
 #'

@@ -142,10 +142,13 @@ This function takes in an object of class naRes and creates either a
   be colored by group.
 }
 \examples{
-\dontrun{
 library(pmartRdata)
-result <- missingval_result(lipid_neg_object)
-plot(naRes_obj = result, omicsData = lipid_neg_object, plot_type = "bar", x_lab_angle = 50)
-}
+mylipid <- group_designation(omicsData = lipid_neg_object, main_effects = "Virus")
+result <- missingval_result(omicsData = mylipid)
+plot(naRes_obj = result, omicsData = mylipid, plot_type = "bar", x_lab_angle = 50, order_by = "Virus", color_by = "Virus")
+plot(naRes_obj = result, omicsData = mylipid, plot_type = "scatter", x_lab_angle = 50, color_by = "Virus")
+
+result <- missingval_result(omicsData = rnaseq_object)
+plot(naRes_obj = result, omicsData = rnaseq_object, plot_type = "bar")
 
 }

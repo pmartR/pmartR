@@ -94,10 +94,8 @@ ggplot2 plot object if interactive is FALSE, or plotly plot object if
 For plotting nmrData S3 objects
 }
 \examples{
-\dontrun{
 library(pmartRdata)
 mynmr <- edata_transform(omicsData = nmr_identified_object, data_scale = "log2")
 plot(omicsData = mynmr)
-}
   
 }

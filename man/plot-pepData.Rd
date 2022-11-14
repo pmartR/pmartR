@@ -94,10 +94,8 @@ ggplot2 plot object if interactive is FALSE, or plotly plot object if
 For plotting pepData S3 objects
 }
 \examples{
-\dontrun{
 library(pmartRdata)
 mypep <- edata_transform(omicsData = pep_object, data_scale = "log2")
 plot(omicsData = mypep, order_by = "Phenotype", color_by = "Phenotype")
-}
   
 }

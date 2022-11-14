@@ -42,10 +42,9 @@ Two methods are available for determining the peptides to be
 }
 \examples{
 library(pmartR)
-data(pep_object)
 
 pep_object2 <- group_designation(omicsData = pep_object,
-                                 main_effects = "Condition")
+                                 main_effects = "Phenotype")
 
 nonmissing_result <- nonmissing_per_group(omicsData = pep_object2)
 

@@ -105,9 +105,7 @@ ggplot2 plot object if interactive is FALSE, or plotly plot object if
 For plotting seqData S3 objects
 }
 \examples{
-\dontrun{
 library(pmartRdata)
 plot(omicsData = rnaseq_object, transformation = "lcpm")
-}   
   
 }

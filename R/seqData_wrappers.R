@@ -998,16 +998,6 @@ get_group_formula <- function(omicsData){
 #'
 #' @return plot result
 #'
-#' @examples
-#' \dontrun{
-#' 
-#' library(pmartRdata)
-#' myseqData <- rnaseq_object
-#' myseqData <- group_designation(omicsData = myseqData, main_effects = "Virus")
-#' disp_est <- dispersion_est(omicsData = myseqData, method = "edgeR")
-#' 
-#' 
-#' }
 #'
 #' @references 
 #'  Robinson MD, McCarthy DJ, Smyth GK (2010). “edgeR: a Bioconductor package 

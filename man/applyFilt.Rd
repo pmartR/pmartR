@@ -130,12 +130,11 @@ Further arguments can be specified depending on the class of the
 }
 \examples{
 library(pmartRdata)
-data("pep_object")
 to_filter <- molecule_filter(omicsData = pep_object)
-summary(filter_object = to_filter, min_num = 2)
+summary(to_filter, min_num = 2)
 pep_object2 <- applyFilt(filter_object = to_filter,
                          omicsData = pep_object, min_num = 2)
-summary(filter_object = pep_object2) # number of Peptides is as expected based on summary of the filter object that was applied
+summary(pep_object2) # number of Peptides is as expected based on summary of the filter object that was applied
 pep_object2 <- group_designation(omicsData = pep_object2, main_effects = "Phenotype")
 to_filter2 <- imdanova_filter(omicsData = pep_object2)
 pep_object3 <- applyFilt(filter_object = to_filter2,

@@ -28,11 +28,9 @@ In the zrollup method, peptides are scaled as, pep_scaled = (pep -
   peptides.
 }
 \examples{
-\dontrun{
 library(pmartRdata)
 data(pep_object)
 result = zrollup(pepData = pep_object)
-}
 
 }
 \references{

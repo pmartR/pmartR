@@ -33,9 +33,7 @@
 #'
 #' @examples
 #'
-#' \dontrun{
 #' library(pmartRdata)
-#' library(pmartR)
 #' 
 #' # Combine metabolomics and protein object into multidata, both must be log2 
 #' # and normalized.
@@ -50,14 +48,13 @@
 #' 
 #' # Manually supply an f_meta
 #' f_meta <- data.frame(
-#'    "Proteins" = mypro$f_data$SampleID,
-#'    "Metabolites" = mymetab$f_data$SampleID[match(mypro$f_data$SampleID, mymetab$f_data$SampleID)],
-#'    "Condition" = mymetab$f_data$Phenotype[match(mypro$f_data$SampleID, mymetab$f_data$SampleID)])
+#'    "Proteins" = mypro$f_data$SampleID[match(mymetab$f_data$SampleID, mypro$f_data$SampleID)],
+#'    "Metabolites" = mymetab$f_data$SampleID,
+#'    "Condition" = mymetab$f_data$Phenotype[match(mymetab$f_data$SampleID, mypro$f_data$SampleID)])
 #' 
 #' mymultidata <- as.multiData(mymetab, mypro, f_meta = f_meta)
 #' # remove samples that are not common across all data.
 #' mymultidata <- as.multiData(mymetab, mypro, f_meta = f_meta, sample_intersect = TRUE)
-#' }
 #' 
 #' @export
 #'

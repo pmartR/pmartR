@@ -60,7 +60,6 @@ The only acceptable input file type is a single edata file.
 }
 \examples{
 library(pmartRdata)
-data("lipid_edata_pos")
 
 # Simple example 
 trelliData <- as.trelliData.edata(e_data = lipid_pos_edata,

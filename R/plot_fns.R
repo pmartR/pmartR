@@ -60,14 +60,12 @@
 #'   interactive is TRUE
 #'
 #' @examples
-#' \dontrun{
 #' library (pmartRdata)
 #' mylipid <- edata_transform(omicsData = lipid_pos_object, data_scale = "log2")
 #' result <- edata_summary(omicsData = mylipid,
 #'                        by = "molecule",
 #'                        groupvar = "Virus")
 #' plot(result)
-#' }
 #'
 #' @rdname plot-dataRes
 #'
@@ -371,7 +369,6 @@ plot.dataRes <- function (dataRes_obj, metric = NULL, density = FALSE,
 #'   interactive is TRUE
 #'
 #' @examples
-#' \dontrun{
 #' library(pmartRdata)
 #' myiso <- edata_transform(omicsData = isobaric_object, data_scale = "log2")
 #' myiso_norm <- normalize_isobaric(myiso, exp_cname = "Plex",
@@ -379,7 +376,6 @@ plot.dataRes <- function (dataRes_obj, metric = NULL, density = FALSE,
 #'                                    refpool_cname = "Virus",
 #'                                    refpool_notation = "Pool")
 #' plot(result)
-#' }
 #'
 #' @importFrom rlang .data
 #'
@@ -564,14 +560,12 @@ prime_iso <- function (isonormRes, exp_cname,
 #'   interactive is TRUE
 #'
 #' @examples
-#' \dontrun{
 #' library(pmartRdata)
 #' mynmr <- edata_transform(omicsData = nmr_identified_object, data_scale = "log2")
 #' mynmr <- normalize_nmr(omicsData = mynmr,
 #'                          apply_norm = FALSE,
 #'                          metabolite_name = "unkm1.53")
 #' plot(mynmr)
-#' }
 #'
 #' @rdname plot-nmrnormRes
 #' @export
@@ -689,13 +683,11 @@ plot.nmrnormRes <- function (nmrnormRes_obj, interactive = FALSE,
 #'   interactive is TRUE
 #'   
 #' @examples 
-#' \dontrun{
 #' library(pmartRdata)
 #' mypep <- edata_transform(omicsData = pep_object, data_scale = "log2")
 #' mypep <- group_designation(omicsData = mypep, main_effects = "Phenotype")
 #' myspans <- spans_procedure(omicsData = mypep)
 #' plot(myspans)
-#' }
 #'
 #' @rdname plot-SPANSRes
 #'
@@ -909,11 +901,14 @@ plot.SPANSRes <- function (SPANSRes_obj, interactive = FALSE,
 #'   be colored by group.
 #'
 #' @examples
-#' \dontrun{
 #' library(pmartRdata)
-#' result <- missingval_result(lipid_neg_object)
-#' plot(naRes_obj = result, omicsData = lipid_neg_object, plot_type = "bar", x_lab_angle = 50)
-#' }
+#' mylipid <- group_designation(omicsData = lipid_neg_object, main_effects = "Virus")
+#' result <- missingval_result(omicsData = mylipid)
+#' plot(naRes_obj = result, omicsData = mylipid, plot_type = "bar", x_lab_angle = 50, order_by = "Virus", color_by = "Virus")
+#' plot(naRes_obj = result, omicsData = mylipid, plot_type = "scatter", x_lab_angle = 50, color_by = "Virus")
+#' 
+#' result <- missingval_result(omicsData = rnaseq_object)
+#' plot(naRes_obj = result, omicsData = rnaseq_object, plot_type = "bar")
 #'
 #' @rdname plot-naRes
 #'
@@ -939,7 +934,7 @@ plot.naRes <- function (naRes_obj, omicsData, plot_type = "bar",
 
   # Check that omicsData is the correct class.
   if (!inherits(omicsData, c("proData", "pepData", "lipidData",
-                                 "metabData", "nmrData"))) {
+                                 "metabData", "nmrData", "seqData"))) {
 
     # Fezzik, tear his arms off.
     stop ("omicsData is not an appropriate class")
@@ -1022,9 +1017,19 @@ plot.naRes <- function (naRes_obj, omicsData, plot_type = "bar",
   }
 
   # Extract info from naRes_obj
-  na.by.sample <- naRes_obj$na.by.sample
-  na.by.molecule <- naRes_obj$na.by.molecule
-  num_missing_vals <- na.by.molecule$num_NA
+  if(inherits(omicsData, "seqData")){
+    na.by.sample <- naRes_obj$zeros.by.sample
+    na.by.molecule <- naRes_obj$zeros.by.molecule
+    num_missing_vals <- na.by.molecule$num_zeros
+    names(na.by.sample)[which(names(na.by.sample) == "num_zeros")] <- "num_NA"
+    names(na.by.molecule)[which(names(na.by.molecule) == "num_zeros")] <- "num_NA"
+  }else{
+    na.by.sample <- naRes_obj$na.by.sample
+    na.by.molecule <- naRes_obj$na.by.molecule
+    num_missing_vals <- na.by.molecule$num_NA
+  } 
+  
+  
   edata_cname <- attr(naRes_obj, "cnames")$edata_cname
   fdata_cname <- attr(naRes_obj, "cnames")$fdata_cname
 
@@ -1395,7 +1400,6 @@ na_scatter <- function (edata, group_df, na.by.sample, num_missing_vals,
 #' @rdname plot-corRes
 #' 
 #' @examples 
-#' \dontrun{
 #' library(pmartRdata)
 #' mymetab <- edata_transform(omicsData = metab_object, data_scale = "log2")
 #' mymetab <- group_designation(omicsData = mymetab, main_effects = "Phenotype")
@@ -1404,7 +1408,6 @@ na_scatter <- function (edata, group_df, na.by.sample, num_missing_vals,
 #' 
 #' myseq_correlation <- cor_result(omicsData = rnaseq_object)
 #' plot(myseq_correlation)
-#' }
 #'
 #' @export
 #'
@@ -1443,7 +1446,7 @@ plot.corRes <- function (corRes_obj, omicsData = NULL, order_by = NULL,
   if(!is.null(omicsData)){
 
     if (!inherits(omicsData, c("pepData", "proData", "metabData",
-                               "lipidData", "nmrData"))) {
+                               "lipidData", "nmrData", "seqData"))) {
 
       stop ("omicsData is not an appropriate class")
 
@@ -1699,7 +1702,6 @@ plot.corRes <- function (corRes_obj, omicsData = NULL, order_by = NULL,
 #'   interactive is TRUE
 #'   
 #' @examples 
-#' \dontrun{
 #' library(pmartRdata)
 #' 
 #' mylipid <- edata_transform(omicsData = lipid_neg_object, data_scale="log2")
@@ -1710,7 +1712,6 @@ plot.corRes <- function (corRes_obj, omicsData = NULL, order_by = NULL,
 #' myseq <- group_designation(omicsData = rnaseq_object, main_effects = "Virus")
 #' pca_seq <- dim_reduction(omicsData = myseq)
 #' plot(pca_seq)
-#' }
 #'   
 #' @rdname plot-dimRes
 #'
@@ -1987,12 +1988,10 @@ plot.dimRes <- function (dimRes_obj, interactive = FALSE, x_lab = NULL,
 #'   interactive is TRUE
 #'   
 #' @examples
-#' \dontrun{
 #' data(pep_object)
 #' molfilt <- molecule_filter(omicsData = pep_object)
 #' plot(molfilt, min_num = 5)
 #' plot(molfilt, min_num = 3, cumulative = FALSE)
-#' }
 #'
 #' @rdname plot-moleculeFilt
 #'
@@ -2248,11 +2247,9 @@ plot.moleculeFilt <- function (filter_object, min_num = NULL, cumulative = TRUE,
 #'   interactive is TRUE
 #'   
 #' @examples
-#' \dontrun{
 #' library(pmartRdata)
 #' seqfilt <- total_count_filter(omicsData = rnaseq_object)
 #' plot(seqfilt, min_count = 5)
-#' }
 #'
 #' @rdname plot-totalCountFilt
 #'
@@ -2412,11 +2409,9 @@ plot.totalCountFilt <- function (filter_object, min_count = NULL,
 #'   interactive is TRUE
 #'   
 #' @examples
-#' \dontrun{
 #' library(pmartRdata)
 #' seqfilt <- RNA_filter(omicsData = rnaseq_object)
 #' plot(seqfilt)
-#' }
 #'
 #' @rdname plot-RNAFilt
 #'
@@ -2686,13 +2681,11 @@ plot.RNAFilt <- function (filter_object, plot_type = "library",
 #'   interactive is TRUE
 #'   
 #' @examples
-#' \dontrun{
 #' library(pmartRdata)
 #' mypep <- group_designation(omicsData = pep_object, main_effects = "Phenotype")
 #' to_filter <- imdanova_filter(omicsData = mypep)
-#' plot(to_filter, min_nonmiss_anova = 2)  
-#' } 
-#'   
+#' plot(to_filter, min_nonmiss_anova = 2, min_nonmiss_gtest = 3)  
+#' 
 #' @rdname plot-imdanovaFilt
 #'
 #' @export
@@ -3091,11 +3084,10 @@ plot.imdanovaFilt <- function (filter_object, min_nonmiss_anova = NULL,
 #'   interactive is TRUE
 #'   
 #' @examples
-#' \dontrun{
 #' library(pmartRdata)
 #' my_filter <- proteomics_filter(omicsData = pep_object)
 #' plot(my_filter, min_num_peps = 3)
-#' }
+#' plot(my_filter, plot_type = "redundancy")
 #'
 #' @rdname plot-proteomicsFilt
 #'
@@ -3434,13 +3426,11 @@ plot.proteomicsFilt <- function (filter_object,
 #'   interactive is TRUE
 #'   
 #' @examples
-#' \dontrun{
 #' library(pmartRdata)
 #' mymetab <- edata_transform(omicsData = metab_object, data_scale = "log2")
 #' mymetab <- group_designation(omicsData = mymetab, main_effects = "Phenotype")
 #' rmd_results <- rmd_filter(omicsData = mymetab, metrics=c("MAD", "Skewness", "Correlation"))
-#' plot(rmd_results, pvalue_threshold = 0.0001)
-#' }
+#' plot(rmd_results, pvalue_threshold = 0.0001, order_by = "Phenotype")
 #' 
 #' @rdname plot-rmdFilt
 #'
@@ -4023,7 +4013,6 @@ plot.rmdFilt <- function (filter_object, pvalue_threshold = NULL, sampleID = NUL
 #'   interactive is TRUE
 #'
 #' @examples
-#' \dontrun{
 #' library(pmartRdata)
 #' mypep <- group_designation(omicsData = pep_object,
 #'                                 main_effects = "Phenotype")
@@ -4032,7 +4021,6 @@ plot.rmdFilt <- function (filter_object, pvalue_threshold = NULL, sampleID = NUL
 #'
 #' plot(cvfilt, cv_threshold = 20)
 #' plot(cvfilt, cv_threshold = 10, log_scale = FALSE)
-#' }
 #'
 #' @rdname plot-cvFilt
 #'
@@ -4275,8 +4263,7 @@ plot.customFilt <- function (filter_object) {
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
 #'   interactive is TRUE
 #'   
-#' @examples 
-#' \dontrun{
+#' @examples
 #' library(pmartRdata)
 #' mymetab <- edata_transform(omicsData = metab_object,
 #'                                 data_scale = "log2")
@@ -4285,8 +4272,7 @@ plot.customFilt <- function (filter_object) {
 #' norm_object <- normalize_global(omicsData = mymetab,
 #'                                 subset_fn = "all",
 #'                                 norm_fn = "median")
-#' plot(norm_object)
-#' }
+#' plot(norm_object, order_by = "Phenotype", color_by = "Phenotype")
 #'   
 #' @rdname plot-normRes
 #'
@@ -4461,11 +4447,9 @@ plot.normRes <- function (normRes_obj, order_by = NULL, color_by = NULL,
 #'   interactive is TRUE
 #'   
 #' @examples 
-#' \dontrun{
 #' library(pmartRdata)
 #' myiso <- edata_transform(omicsData = isobaric_object, data_scale = "log2")
-#' plot(omicsData = myiso)
-#' }      
+#' plot(myiso)
 #'   
 #' @rdname plot-isobaricpepData
 #'
@@ -4543,11 +4527,9 @@ plot.isobaricpepData <- function (omicsData, order_by = NULL, color_by = NULL,
 #'   interactive is TRUE
 #'   
 #' @examples 
-#' \dontrun{
 #' library(pmartRdata)
 #' mylipid <- edata_transform(omicsData = lipid_pos_object, data_scale = "log2")
 #' plot(omicsData = mylipid, order_by = "Virus", color_by = "Virus")
-#' }      
 #'   
 #' @rdname plot-lipidData
 #'
@@ -4624,11 +4606,9 @@ plot.lipidData <- function (omicsData, order_by = NULL, color_by = NULL,
 #'   interactive is TRUE
 #'   
 #' @examples 
-#' \dontrun{
 #' library(pmartRdata)
 #' mymetab <- edata_transform(omicsData = metab_object, data_scale = "log2")
 #' plot(omicsData = mymetab, order_by = "Phenotype", color_by = "Phenotype")
-#' }   
 #'   
 #' @rdname plot-metabData
 #'
@@ -4705,11 +4685,9 @@ plot.metabData <- function (omicsData, order_by = NULL, color_by = NULL,
 #'   interactive is TRUE
 #'   
 #' @examples 
-#' \dontrun{
 #' library(pmartRdata)
 #' mynmr <- edata_transform(omicsData = nmr_identified_object, data_scale = "log2")
 #' plot(omicsData = mynmr)
-#' }
 #'   
 #' @rdname plot-nmrData
 #'
@@ -4795,10 +4773,8 @@ plot.nmrData <- function (omicsData, order_by = NULL, color_by = NULL,
 #'   interactive is TRUE   
 #'   
 #' @examples 
-#' \dontrun{
 #' library(pmartRdata)
 #' plot(omicsData = rnaseq_object, transformation = "lcpm")
-#' }   
 #'   
 #' @rdname plot-seqData
 #'
@@ -4876,11 +4852,9 @@ plot.seqData <- function (omicsData, order_by = NULL, color_by = NULL,
 #'   interactive is TRUE
 #'   
 #' @examples 
-#' \dontrun{
 #' library(pmartRdata)
 #' mypep <- edata_transform(omicsData = pep_object, data_scale = "log2")
 #' plot(omicsData = mypep, order_by = "Phenotype", color_by = "Phenotype")
-#' }
 #'   
 #' @rdname plot-pepData
 #'
@@ -4957,11 +4931,9 @@ plot.pepData <- function (omicsData, order_by = NULL, color_by = NULL,
 #'   interactive is TRUE
 #'   
 #' @examples 
-#' \dontrun{
 #' library(pmartRdata)
 #' mypro <- edata_transform(omicsData = pro_object, data_scale = "log2")
 #' plot(omicsData = mypro, order_by = "Phenotype", color_by = "Phenotype")
-#' }
 #'   
 #' @rdname plot-proData
 #'
@@ -5535,7 +5507,6 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
 #' @export
 #' @method plot statRes
 #' @examples
-#' \dontrun{
 #' library(pmartRdata)
 #' #Group the data by condition
 #' mypro <- group_designation(omicsData = pro_object,
@@ -5569,7 +5540,6 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
 #' plot(imd_anova_res, bw_theme = TRUE)
 #' plot(imd_anova_res, plot_type = "volcano", bw_theme = TRUE)
 #'
-#' }
 #'
 plot.statRes <- function (x,
                           plot_type = "bar",

@@ -31,11 +31,9 @@ In the qrollup method, peptides are selected according to a user
   set as the mean of these selected peptides.
 }
 \examples{
-\dontrun{
 library(pmartRdata)
 data(pep_object)
 result = qrollup(pepData = pep_object, qrollup_thresh = 2)
-}
 
 }
 \references{

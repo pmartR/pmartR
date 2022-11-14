@@ -1128,7 +1128,7 @@ as.proData <- function (e_data, f_data, e_meta = NULL,
 #'
 #' @examples
 #' library(pmartRdata)
-#' mypepData <- as.seqData(e_data = rnaseq_edata,
+#' myseq <- as.seqData(e_data = rnaseq_edata,
 #'                         e_meta = rnaseq_emeta,
 #'                         f_data = rnaseq_fdata,
 #'                         edata_cname = "Transcript",

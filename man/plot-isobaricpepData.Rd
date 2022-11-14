@@ -94,10 +94,8 @@ ggplot2 plot object if interactive is FALSE, or plotly plot object if
 For plotting isobaricpepData S3 objects
 }
 \examples{
-\dontrun{
 library(pmartRdata)
 myiso <- edata_transform(omicsData = isobaric_object, data_scale = "log2")
-plot(omicsData = myiso)
-}      
+plot(myiso)
   
 }

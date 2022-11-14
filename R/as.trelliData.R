@@ -83,7 +83,6 @@
 #'  
 #' @examples
 #' library(pmartRdata)
-#' data("lipid_edata_pos")
 #' 
 #' # Simple example 
 #' trelliData <- as.trelliData.edata(e_data = lipid_pos_edata,

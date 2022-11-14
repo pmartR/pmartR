@@ -83,7 +83,6 @@ ggplot2 plot object if interactive is FALSE, or plotly plot object if
 For plotting an S3 object of type 'cvFilt'
 }
 \examples{
-\dontrun{
 library(pmartRdata)
 mypep <- group_designation(omicsData = pep_object,
                                 main_effects = "Phenotype")
@@ -92,6 +91,5 @@ cvfilt <- cv_filter(omicsData = mypep)
 
 plot(cvfilt, cv_threshold = 20)
 plot(cvfilt, cv_threshold = 10, log_scale = FALSE)
-}
 
 }

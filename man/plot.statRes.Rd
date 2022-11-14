@@ -133,7 +133,6 @@ Plot types:
 }
 }
 \examples{
-\dontrun{
 library(pmartRdata)
 #Group the data by condition
 mypro <- group_designation(omicsData = pro_object,
@@ -167,6 +166,5 @@ imd_anova_res <- imd_anova(omicsData = mypro,
 plot(imd_anova_res, bw_theme = TRUE)
 plot(imd_anova_res, plot_type = "volcano", bw_theme = TRUE)
 
-}
 
 }

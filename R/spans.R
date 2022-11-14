@@ -657,17 +657,13 @@ normalize_global_basic <- function (edata, norm_fn) {
 #'   method. \cr
 #'
 #' @examples
-#'
-#' library(pmartR)
 #' library(pmartRdata)
 #'
-#' data(pep_object)
-#'
 #' # data must be log transformed and grouped
-#' myobject <- edata_transform(pep_object, data_scale = "log2")
-#' myobject <- group_designation(myobject, main_effects = "Condition")
+#' myobject <- edata_transform(omicsData = pep_object, data_scale = "log2")
+#' myobject <- group_designation(omicsData = myobject, main_effects = "Phenotype")
 #'
-#' spans_result <- spans_procedure(myobject)
+#' spans_result <- spans_procedure(omicsData = myobject)
 #'
 #' # a list of the parameters for any normalization procedure with the best SPANS score
 #' best_params <- get_spans_params(spans_result)
@@ -676,6 +672,7 @@ normalize_global_basic <- function (edata, norm_fn) {
 #' subset_fn = best_params[[1]]$subset_fn
 #' norm_fn = best_params[[1]]$norm_fn
 #' params = best_params[[1]]$params
+#' if(is.null(params[[1]])){params = NULL}
 #'
 #' # pass arguments to normalize global
 #' norm_object <- normalize_global(omicsData = myobject, subset_fn = subset_fn, norm_fn = norm_fn, params = params)

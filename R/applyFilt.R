@@ -82,12 +82,11 @@
 #'
 #' @examples
 #' library(pmartRdata)
-#' data("pep_object")
 #' to_filter <- molecule_filter(omicsData = pep_object)
-#' summary(filter_object = to_filter, min_num = 2)
+#' summary(to_filter, min_num = 2)
 #' pep_object2 <- applyFilt(filter_object = to_filter,
 #'                          omicsData = pep_object, min_num = 2)
-#' summary(filter_object = pep_object2) # number of Peptides is as expected based on summary of the filter object that was applied
+#' summary(pep_object2) # number of Peptides is as expected based on summary of the filter object that was applied
 #' pep_object2 <- group_designation(omicsData = pep_object2, main_effects = "Phenotype")
 #' to_filter2 <- imdanova_filter(omicsData = pep_object2)
 #' pep_object3 <- applyFilt(filter_object = to_filter2,
@@ -2324,17 +2323,6 @@ pmartR_filter_worker <- function (filter_object, omicsData) {
 #' @return filter.peps a character vector of the biomolecules to be filtered out
 #'   prior to ANOVA or IMD-ANOVA
 #'
-#' @examples
-#' library(pmartRdata)
-#' data("pep_object")
-#'
-#' pep_object2 <- group_designation(pep_object, main_effects = "Condition")
-#'
-#' nonmissing_result <- nonmissing_per_group(omicsData = pep_object2)
-#'
-#' to_filter <- anova_filter(nonmiss_per_group = nonmissing_result,
-#'                           min_nonmiss_anova = 2)
-#'
 #' @seealso \code{\link{nonmissing_per_group}}
 #'
 #' @author Kelly Stratton
@@ -2494,10 +2482,9 @@ anova_filter <- function (nonmiss_per_group,
 #'
 #' @examples
 #' library(pmartR)
-#' data(pep_object)
 #'
 #' pep_object2 <- group_designation(omicsData = pep_object,
-#'                                  main_effects = "Condition")
+#'                                  main_effects = "Phenotype")
 #'
 #' nonmissing_result <- nonmissing_per_group(omicsData = pep_object2)
 #'

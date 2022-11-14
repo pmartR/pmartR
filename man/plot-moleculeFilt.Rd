@@ -90,11 +90,9 @@ ggplot2 plot object if interactive is FALSE, or plotly plot object if
 For plotting an S3 object of type 'moleculeFilt':
 }
 \examples{
-\dontrun{
 data(pep_object)
 molfilt <- molecule_filter(omicsData = pep_object)
 plot(molfilt, min_num = 5)
 plot(molfilt, min_num = 3, cumulative = FALSE)
-}
 
 }
