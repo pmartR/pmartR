@@ -7,77 +7,92 @@
 #'   \code{seqData}.
 #'
 #' @param filter_object an object of the class 'cvFilt', 'proteomicsFilt',
-#'   'rmdFilt', 'moleculeFilt', 'imdanovaFilt', 'customFilt', 'RNAFilt', or 
+#'   'rmdFilt', 'moleculeFilt', 'imdanovaFilt', 'customFilt', 'RNAFilt', or
 #'   'totalCountFilt' created by \code{cv_filter}, \code{proteomics_filter},
-#'    \code{rmd_filter}, \code{molecule_filter}, \code{imdanova_filter}, 
-#'    \code{total_count_filter}, or \code{RNA_filter}, respectively.
+#'   \code{rmd_filter}, \code{molecule_filter}, \code{imdanova_filter},
+#'   \code{custom_filter}, \code{RNA_filter}, or \code{total_count_filter},
+#'   respectively.
 #' @param omicsData an object of the class \code{pepData}, \code{proData},
-#'   \code{lipidData}, \code{metabData}, \code{nmrData}, or \code{seqData} 
+#'   \code{lipidData}, \code{metabData}, \code{nmrData}, or \code{seqData}
 #'   usually created by \code{\link{as.pepData}}, \code{\link{as.proData}},
-#'   \code{\link{as.lipidData}}, \code{\link{as.metabData}}, 
-#'   \code{\link{as.nmrData}}, \code{\link{as.seqData}}, respectively.
+#'   \code{\link{as.lipidData}}, \code{\link{as.metabData}},
+#'   \code{\link{as.nmrData}}, or \code{\link{as.seqData}}, respectively.
 #' @param ... further arguments
 #'
 #' @return An object of the class \code{pepData}, \code{proData},
-#'   \code{lipidData}, \code{metabData}, \code{nmrData}, or \code{seqData} with 
-#'   specified cname_ids, edata_cnames, and emeta_cnames filtered out of the 
+#'   \code{lipidData}, \code{metabData}, \code{nmrData}, or \code{seqData} with
+#'   specified cname_ids, edata_cnames, and emeta_cnames filtered out of the
 #'   appropriate datasets.
 #'
-#' @details Various further arguments can be specified depending on the class of
-#'   the \code{filter_object} being applied. For a \code{filter_object} of type
-#'   'moleculeFilt': \tabular{ll}{ \code{min_num} \tab an integer value
-#'   specifying the minimum number of times each biomolecule must be observed
-#'   across all samples in order to retain the biomolecule. Default value is 2.
-#'   \cr } For a \code{filter_object} of type 'cvFilt': \tabular{ll}{
+#' @details Further arguments can be specified depending on the class of the
+#'   \code{filter_object} being applied.
+#'
+#'   For a \code{filter_object} of type 'moleculeFilt': \tabular{ll}{
+#'   \code{min_num} \tab an integer value specifying the minimum number of times
+#'   each biomolecule must be observed across all samples in order to retain the
+#'   biomolecule. Default value is 2. \cr }
+#'
+#'   For a \code{filter_object} of type 'cvFilt': \tabular{ll}{
 #'   \code{cv_threshold} \tab an integer value specifying the maximum
 #'   coefficient of variation (CV) threshold for the biomolecules. Biomolecules
-#'   with CV greater than this threshold will be filtered. Default is 150. \cr }
+#'   with CV greater than this threshold will be filtered. Default threshold is
+#'   150. \cr }
+#'   
 #'   For a \code{filter_object} of type 'rmdFilt': \tabular{ll}{
 #'   \code{pvalue_threshold} \tab numeric value between 0 and 1, specifying the
-#'   p-value, below which samples will be removed from the dataset. Default is
+#'   p-value below which samples will be removed from the dataset. Default is
 #'   0.001. \cr \code{min_num_biomolecules} \tab numeric value greater than 10
 #'   (preferably greater than 50) that specifies the minimum number of
 #'   biomolecules that must be present in order to create an rmdFilt object.
-#'   Using values less than 50 is not advised. \cr } For a \code{filter_object}
-#'   of type 'proteomicsFilt': \tabular{ll}{ \code{min_num_peps} \tab an
+#'   Using values less than 50 is not advised. \cr }
+#'   
+#'   For a \code{filter_object} of type 'proteomicsFilt' either or both of the
+#'   following can be applied: \tabular{ll}{ \code{min_num_peps} \tab an
 #'   optional integer value between 1 and the maximum number of peptides that
 #'   map to a protein in omicsData. The value specifies the minimum number of
 #'   peptides that must map to a protein. Any protein with less than
-#'   \code{min_num_peps} mapping to it will be returned as a protein that should
-#'   be filtered. Default value is NULL. \cr \code{redundancy} \tab logical
-#'   indicator of whether to filter out degenerate/redundant peptides (peptides
-#'   that map to more than one protein). Default value is FALSE.\cr } For a
-#'   \code{filter_object} of type 'imdanovaFilt': \tabular{ll}{
+#'   \code{min_num_peps} mapping to it will be removed from the dataset. Default
+#'   value is NULL, meaning that this filter is not applied. \cr
+#'   \code{redundancy} \tab logical indicator of whether to filter out
+#'   degenerate/redundant peptides (peptides that map to more than one protein).
+#'   Default value is FALSE. \cr }
+#'   
+#'   For a \code{filter_object} of type 'imdanovaFilt': \tabular{ll}{
 #'   \code{min_nonmiss_anova} \tab integer value specifying the minimum number
 #'   of non-missing feature values allowed per group for \code{anova_filter}.
 #'   Default value is 2. \cr \code{min_nonmiss_gtest} \tab integer value
 #'   specifying the minimum number of non-missing feature values allowed per
-#'   group for \code{gtest_filter}. Default value is 3.\cr } For a
-#'   \code{filter_object} of type 'totalCountFilt': \tabular{ll}{
-#'   \code{min_count} \tab integer value specifying the minimum number
-#'   of biomolecule counts observed over all samples \cr } For a 
-#'   \code{filter_object} of type 'RNAFilt': \tabular{ll}{ \code{min_nonzero} 
-#'   \tab integer value specifying the minimum number of non-zero feature values 
-#'   per sample. \cr \code{size_library} \tab integer value or fraction between
-#'   0 and 1 specifying the minimum number of total reads per sample. \cr } 
+#'   group for \code{gtest_filter}. Default value is 3.\cr }
+#'
+#'   For a \code{filter_object} of type 'totalCountFilt': \tabular{ll}{
+#'   \code{min_count} \tab integer value specifying the minimum number of
+#'   biomolecule counts observed across all samples in order for the biomolecule
+#'   to be retained in the dataset. This filter is only applicable for
+#'   \code{seqData} objects. \cr }
+#'
+#'   For a \code{filter_object} of type 'RNAFilt' either or both of the
+#'   following can be applied: \tabular{ll}{ \code{min_nonzero} \tab integer
+#'   value specifying the minimum number of non-zero feature values per sample.
+#'   \cr \code{size_library} \tab integer value or fraction between 0 and 1
+#'   specifying the minimum number of total reads per sample. This filter is
+#'   only applicable for \code{seqData} objects. \cr }
+#'
 #'   There are no further arguments for a \code{filter_object} of type '
 #'   customFilt'.
 #'
 #' @examples
-#' \dontrun{
 #' library(pmartRdata)
 #' data("pep_object")
 #' to_filter <- molecule_filter(omicsData = pep_object)
+#' summary(filter_object = to_filter, min_num = 2)
 #' pep_object2 <- applyFilt(filter_object = to_filter,
 #'                          omicsData = pep_object, min_num = 2)
-#' print(str(attributes(pep_object2)$filters))
-#' pep_object2 <- group_designation(pep_object2, main_effects = "Condition")
+#' summary(filter_object = pep_object2) # number of Peptides is as expected based on summary of the filter object that was applied
+#' pep_object2 <- group_designation(omicsData = pep_object2, main_effects = "Phenotype")
 #' to_filter2 <- imdanova_filter(omicsData = pep_object2)
 #' pep_object3 <- applyFilt(filter_object = to_filter2,
 #'                          omicsData = pep_object2,
 #'                          min_nonmiss_anova = 3)
-#' print(str(attributes(pep_object3)$filters))
-#' }
 #'
 #' @seealso \code{\link{molecule_filter}}
 #' @seealso \code{\link{imdanova_filter}}
@@ -85,6 +100,8 @@
 #' @seealso \code{\link{cv_filter}}
 #' @seealso \code{\link{proteomics_filter}}
 #' @seealso \code{\link{custom_filter}}
+#' @seealso \code{\link{RNA_filter}}
+#' @seealso \code{\link{total_count_filter}}
 #'
 #' @author Lisa Bramer, Kelly Stratton
 #'
@@ -188,7 +205,7 @@ applyFilt.moleculeFilt <- function(filter_object, omicsData, min_num=2){
   }
 
   # check that min_num is less than the total number of samples #
-  if (min_num >= attr(filter_object, "num_samps")) {
+  if (min_num > attr(filter_object, "num_samps")) {
 
     # Throw an error for the users audacity to besmirch the arguments in such a
     # foul manner.
@@ -2308,7 +2325,6 @@ pmartR_filter_worker <- function (filter_object, omicsData) {
 #'   prior to ANOVA or IMD-ANOVA
 #'
 #' @examples
-#' \dontrun{
 #' library(pmartRdata)
 #' data("pep_object")
 #'
@@ -2318,7 +2334,6 @@ pmartR_filter_worker <- function (filter_object, omicsData) {
 #'
 #' to_filter <- anova_filter(nonmiss_per_group = nonmissing_result,
 #'                           min_nonmiss_anova = 2)
-#' }
 #'
 #' @seealso \code{\link{nonmissing_per_group}}
 #'
@@ -2478,7 +2493,6 @@ anova_filter <- function (nonmiss_per_group,
 #'   prior to the G-test or IMD-ANOVA
 #'
 #' @examples
-#' \dontrun{
 #' library(pmartR)
 #' data(pep_object)
 #'
@@ -2489,7 +2503,6 @@ anova_filter <- function (nonmiss_per_group,
 #'
 #' to_filter <- gtest_filter(nonmiss_per_group = nonmissing_result,
 #'                           min_nonmiss_gtest = 3)
-#' }
 #'
 #' @author Kelly Stratton
 #'
