@@ -14,42 +14,43 @@ as.multiData(
 )
 }
 \arguments{
-\item{...}{At least two objects of type 'pepData', 'proData', 'metabData',
-'lipidData', or 'nmrData', usually created by \code{\link{as.pepData}}}
+\item{...}{two or more objects of type 'pepData', 'proData', 'metabData',
+'lipidData', or 'nmrData', created by \code{\link{as.pepData}}}
 
 \item{f_meta}{A data.frame containing sample and group information for all
 omicsData objects supplied to the function.}
 
-\item{sample_intersect}{Should only the samples that are common across all
-datasets be kept in f_meta?  See details for how samples will be dropped.}
+\item{sample_intersect}{logical indicator for whether only the samples that
+are common across all datasets be kept in f_meta. See details for how
+samples will be dropped.}
 
-\item{match_samples}{If auto_fmeta = T, whether to attempt to match the 
-names in the sample columns in f_data across all objects in an attempt to 
-align them in f_meta.  Defaults to TRUE.}
+\item{match_samples}{logical indicator. If auto_fmeta = T, whether to attempt
+to match the names in the sample columns in f_data across all objects in an
+attempt to align them in f_meta. Defaults to TRUE.}
 
-\item{keep_sample_info}{Whether to attempt to append sample information 
-contained in the objects f_data to the final f_meta via a series of left 
-joins.  Defaults to FALSE.}
+\item{keep_sample_info}{logical indicator for whether to attempt to append
+sample information contained in the objects' f_data to the final f_meta via
+a series of left joins. Defaults to FALSE.}
 
-\item{auto_fmeta}{Whether to attempt to automatically construct f_meta from
-objects sample information.  Defaults to FALSE.}
+\item{auto_fmeta}{logical indicator for whether to attempt to automatically
+construct f_meta from the objects' sample information. Defaults to FALSE.}
 }
 \value{
 Object of class 'multiData' containing the omicsData objects, and the
-sample alignment information f_meta.
+ sample alignment information f_meta.
 }
 \description{
 Create a `multiData` object from multiple omicsData objects
 }
 \details{
-Object limits:  Currently, as.multiData accepts at most one object from each 
-of classes 'pepData/proData', 'metabData', 'nmrData', and at most two objects 
-of class 'lipidData'. 
+Object limits: Currently, as.multiData accepts at most one object
+from each of classes 'pepData/proData', 'metabData', 'nmrData', and at most
+two objects of class 'lipidData'.
 
 \code{sample_intersect} will auto-align samples that occur in all datasets.
 Specifically, it creates a vector of all samples that are common across all
-datasets, and simply create an f_meta by copying this vector for each
-dataset and column-binding them.
+datasets, and simply creates an f_meta by copying this vector for each dataset
+and column-binding them.
 }
 \examples{
 
@@ -57,32 +58,30 @@ dataset and column-binding them.
 library(pmartRdata)
 library(pmartR)
 
-# Combine lipid and protein object into multidata, both must be log2 + normalized.
-mylipid_object <- edata_transform(lipid_object, "log2")
-mylipid_object <- normalize_global(mylipid_object, "all", "median", apply_norm = T)
+# Combine metabolomics and protein object into multidata, both must be log2 
+# and normalized.
+mymetab <- edata_transform(omicsData = metab_object, data_scale = "log2")
+mymetab <- normalize_global(omicsData = mymetab, subset_fn = "all", norm_fn = "median", apply_norm = T)
+
+mypro <- pro_object
 
 # Combine without specifically supplying f_meta, either directly, or as one
 # of the f_datas in any object.
-mymultidata <- as.multiData(pro_object, mylipid_object, auto_fmeta = T)
+mymultidata <- as.multiData(mymetab, mypro, auto_fmeta = TRUE, sample_intersect = TRUE)
 
 # Manually supply an f_meta
 f_meta <- data.frame(
-"Proteins" = c(paste0("Mock", 1:3), paste0("Infection", c(1:7)), NA,  "Infection9"),
-"Lipids" = c(paste0("Mock", 1:3), paste0("Infection", c(1:4)), NA, paste0("Infection", c(6:9))),
-"Metabolites" = c(paste0("Mock", 1:3), paste0("Infection", c(1:9))),
-"Condition" = c(rep("A", 3), rep("B", 9))
-)
+   "Proteins" = mypro$f_data$SampleID,
+   "Metabolites" = mymetab$f_data$SampleID[match(mypro$f_data$SampleID, mymetab$f_data$SampleID)],
+   "Condition" = mymetab$f_data$Phenotype[match(mypro$f_data$SampleID, mymetab$f_data$SampleID)])
 
-mymetab_object <- edata_transform(metab_object, "log2")
-mymetab_object <- normalize_global(mymetab_object, "all", "median", apply_norm = T)
-
-as.multiData(mylipid_object, pro_object, mymetab_object, f_meta = f_meta)
+mymultidata <- as.multiData(mymetab, mypro, f_meta = f_meta)
 # remove samples that are not common across all data.
-as.multiData(mylipid_object, pro_object, mymetab_object, f_meta = f_meta, sample_intersect = T)
+mymultidata <- as.multiData(mymetab, mypro, f_meta = f_meta, sample_intersect = TRUE)
 }
 
 }
 \seealso{
-\code{\link{combine_lipidData}} If you want to combine lipidData objects
-before providing them to as.multiData
+\code{\link{combine_lipidData}} if you want to combine lipidData
+ objects before providing them to as.multiData.
 }

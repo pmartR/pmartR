@@ -2,7 +2,7 @@
 % Please edit documentation in R/as.omicsData.R
 \name{as.isobaricpepData}
 \alias{as.isobaricpepData}
-\title{Convert Data to Appropriate pmartR Class}
+\title{Create pmartR Object of Class isobaricpepData}
 \usage{
 as.isobaricpepData(
   e_data,
@@ -16,21 +16,21 @@ as.isobaricpepData(
 )
 }
 \arguments{
-\item{e_data}{a \eqn{p \times n + 1} data.frame of expression data, where
+\item{e_data}{a \eqn{p \times n + 1} data frame of expression data, where
 \eqn{p} is the number of peptides observed and \eqn{n} is the number of
 samples (an additional peptide identifier/name column should also be
-present anywhere in the data.frame). Each row corresponds to data for each
+present in the data frame). Each row corresponds to data for one
 peptide. One column specifying a unique identifier for each peptide (row)
 must be present.}
 
-\item{f_data}{a data.frame with \eqn{n} rows. Each row corresponds to a
+\item{f_data}{a data frame with \eqn{n} rows. Each row corresponds to a
 sample with one column giving the unique sample identifiers found in e_data
 column names and other columns providing qualitative and/or quantitative
 traits of each sample.}
 
-\item{e_meta}{an optional data.frame with at least \eqn{p} rows. Each row
+\item{e_meta}{an optional data frame with at least \eqn{p} rows. Each row
 corresponds to a peptide with one column giving peptide names (must be
-named the same as the column in \code{e_data}) and other columns giving
+named the same as the column in \code{e_data}) and other columns giving biomolecule
 meta information (e.g. mappings of peptides to proteins).}
 
 \item{edata_cname}{character string specifying the name of the column
@@ -43,8 +43,7 @@ containing the sample identifiers in \code{f_data}.}
 \item{emeta_cname}{character string specifying the name of the column
 containing the protein identifiers (or other mapping variable) in
 \code{e_meta} (if applicable). Defaults to NULL. If \code{e_meta} is NULL,
-then either do not specify \code{emeta_cname} or specify it as NULL. If
-\code{e_meta} is NULL, then specify \code{emeta_cname} as NULL.}
+then either do not specify \code{emeta_cname} or specify it as NULL.}
 
 \item{techrep_cname}{character string specifying the name of the column in
 \code{f_data} containing the identifiers for the biological samples if the
@@ -54,20 +53,22 @@ Defaults to NULL (no technical replicates).}
 
 \item{...}{further arguments}
 }
+\value{
+Object of class isobaricpepData and pepData.
+}
 \description{
-Converts a list object or several data.frames of isobaric peptide-level data
+Converts several data frames of isobaric peptide data
 to an object of the class 'isobaricpepData'. Objects of the class
-'isobaricpepData' are lists with two obligatory components \code{e_data} and
-\code{f_data}. An optional list component \code{e_meta} is used if analysis
+'isobaricpepData' are lists with two obligatory components, \code{e_data} and
+\code{f_data}. An optional list component, \code{e_meta}, is used if analysis
 or visualization at other levels (e.g. protein) is also desired.
 }
 \details{
-The class 'isobaricpepData' is meant to deal with peptide data
-  generated on instruments where a reference pool for normalization is
-  available (e.g. TMT, iTRAQ).
+The class 'isobaricpepData' is meant to deal with labeled peptide data
+  generated on instruments (e.g. TMT, iTRAQ) where a reference pool sample will be utilized for normalization.
 
  If your data has already undergone normalization to the reference pool, you
- should speficy \code{isobaric_norm = T}.
+ should specify \code{isobaric_norm = T}.
 
  Objects of class 'isobaricpepData' contain some attributes that are
  referenced by downstream functions. These attributes can be changed from
@@ -77,9 +78,9 @@ The class 'isobaricpepData' is meant to deal with peptide data
  'log10', 'log', and 'abundance', which indicate data is log base 2, base 10,
  natural log transformed, and raw abundance, respectively. Default is
  'abundance'. \cr \tab \cr is_normalized \tab A logical argument, specifying
- whether the data has been normalized or not. Default value is FALSE. \cr
+ whether the data has been normalized or not (this normalization refers to a statistical normalization, such as median centering or other methods). Default value is FALSE. \cr
  \tab \cr isobaric_norm \tab A logical argument, specifying whether the data
- has been normalized to the approporiate reference pool sample or not.
+ has been normalized to the appropriate reference pool sample or not.
  Default value is FALSE \cr \tab \cr norm_info \tab Default value is an empty
  list, which will be populated with a single named element
  \code{is_normalized = is_normalized}. When a normalization is applied to the
@@ -87,7 +88,7 @@ The class 'isobaricpepData' is meant to deal with peptide data
  function, normalization subset and subset parameters, the location and scale
  parameters used to normalize the data, and the location and scale parameters
  used to backtransform the data (if applicable). \cr \tab \cr data_types \tab
- Character string describing the type of data (e.g.'Positive ion'). Default
+ Character string describing the type of data, most commonly used for lipidomic data (lipidData objects) or NMR data (nmrData objects) but available for other data classes as well. Default
  value is NULL. \cr \tab \cr check.names \tab Logical defaults to TRUE.
  Indicates whether 'check.names' attribute of returned omicsData object is
  TRUE or FALSE. \cr } Computed values included in the \code{data_info}
@@ -103,18 +104,13 @@ The class 'isobaricpepData' is meant to deal with peptide data
  whether \code{e_meta} is provided.\cr \tab \cr }
 }
 \examples{
-\dontrun{
 library(pmartRdata)
-data("isobaric_edata")
-data("isobaric_fdata")
-data("isobaric_emeta")
-mypepData <- as.isobaricpepData(e_data = isobaric_edata,
-                                e_meta = isobaric_emeta,
-                                f_data = isobaric_fdata,
-                                edata_cname = "Peptide",
-                                fdata_cname = "Sample",
-                                emeta_cname = "Protein")
-}
+mypep <- as.isobaricpepData(e_data = isobaric_edata,
+                            e_meta = isobaric_emeta,
+                            f_data = isobaric_fdata,
+                            edata_cname = "Peptide",
+                            fdata_cname = "SampleID",
+                            emeta_cname = "Protein")
 
 }
 \seealso{

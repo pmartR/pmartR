@@ -2,7 +2,7 @@
 % Please edit documentation in R/as.omicsData.R
 \name{as.seqData}
 \alias{as.seqData}
-\title{Convert Data to Appropriate pmartR Class}
+\title{Create pmartR Object of Class seqData}
 \usage{
 as.seqData(
   e_data,
@@ -16,23 +16,23 @@ as.seqData(
 )
 }
 \arguments{
-\item{e_data}{a \eqn{p \times n + 1} data.frame of expression data, where
+\item{e_data}{a \eqn{p \times n + 1} data frame of expression data, where
 \eqn{p} is the number of RNA transcripts observed and \eqn{n} is the number
 of samples (an additional transcript identifier/name column should also be
-present anywhere in the data.frame). Each row corresponds to data for each
-transcript One column specifying a unique identifier for each transcript
+present somewhere in the data frame). Each row corresponds to data for one
+transcript. One column specifying a unique identifier for each transcript
 (row) must be present. All counts are required to be raw for processing.}
 
-\item{f_data}{a data.frame with \eqn{n} rows. Each row corresponds to a
+\item{f_data}{a data frame with \eqn{n} rows. Each row corresponds to a
 sample with one column giving the unique sample identifiers found in e_data
 column names and other columns providing qualitative and/or quantitative
-traits of each sample. For library size normalization, this can be provided
-here or calculated from columns in e_data.}
+traits of each sample. For library size normalization, this can be provided as part of f_data
+or calculated from columns in e_data.}
 
-\item{e_meta}{an optional data.frame with at least \eqn{p} rows. Each row
+\item{e_meta}{an optional data frame with at least \eqn{p} rows. Each row
 corresponds to a transcript with one column giving transcript names (must be
-named the same as the column in \code{e_data}) and other columns giving
-meta information (e.g. mappings of transcripts to genes or proteins).}
+named the same as the column in \code{e_data}) and other columns giving biomolecule
+meta information (e.g. mappings of transcripts to genes or proteins). Can be the same as edata_cname, if desired.}
 
 \item{edata_cname}{character string specifying the name of the column
 containing the transcript identifiers in \code{e_data} and \code{e_meta} 
@@ -44,22 +44,23 @@ containing the sample identifiers in \code{f_data}.}
 \item{emeta_cname}{character string specifying the name of the column
 containing the gene identifiers (or other mapping variable) in
 \code{e_meta} (if applicable). Defaults to NULL. If \code{e_meta} is NULL,
-then either do not specify \code{emeta_cname} or specify it as NULL. If
-\code{e_meta} is NULL, then specify \code{emeta_cname} as NULL.}
+then either do not specify \code{emeta_cname} or specify it as NULL.}
 
 \item{techrep_cname}{character string specifying the name of the column in
-\code{f_data} containing the identifiers for the biological samples if the
-observations represent technical replicates.  This column is used to
+\code{f_data} that specifies which samples are technical replicates. This column is used to
 collapse the data when \code{combine_techreps} is called on this object.
 Defaults to NULL (no technical replicates).}
 
 \item{...}{further arguments}
 }
+\value{
+Object of class seqData
+}
 \description{
-Converts a list object or several data.frames of RNA-seq transcript data to
+Converts several data frames of RNA-seq transcript data to
 an object of the class 'seqData'. Objects of the class 'seqData' are lists
-with two obligatory components \code{e_data} and \code{f_data}. An optional
-list component \code{e_meta} is used if analysis or visualization at other
+with two obligatory components, \code{e_data} and \code{f_data}. An optional
+list component, \code{e_meta}, is used if analysis or visualization at other
 levels (e.g. gene, protein, pathway) is also desired.
 }
 \details{
@@ -72,12 +73,7 @@ Objects of class 'seqData' contain some attributes that are
   whether the data has been normalized or not. Default value is FALSE. \cr
   \tab \cr norm_info \tab Default value is an empty list, which will be
   populated with a single named element \code{is_normalized = is_normalized}.
-  When a normalization is applied to the data, this becomes populated with a
-  list containing the normalization function, normalization subset and subset
-  parameters, the location and scale parameters used to normalize the data,
-  and the location and scale parameters used to backtransform the data (if
-  applicable). \cr \tab \cr data_types \tab Character string describing the
-  type of data (e.g.'Positive ion'). Default value is NULL. \cr \tab \cr
+  \cr \tab \cr data_types \tab Character string describing the type of data, most commonly used for lipidomic data (lipidData objects) or NMR data (nmrData objects) but available for other data classes as well. Default value is NULL. \cr \tab \cr
   check.names \tab Logical defaults to TRUE. Indicates whether 'check.names'
   attribute of returned omicsData object is TRUE or FALSE. \cr } Computed
   values included in the \code{data_info} attribute are as follows:
@@ -91,18 +87,13 @@ Objects of class 'seqData' contain some attributes that are
   \tab \cr }
 }
 \examples{
-\dontrun{
 library(pmartRdata)
-data("seq_edata")
-data("seq_fdata")
-data("seq_emeta")
-mypepData <- as.seqData(e_data = seq_edata,
-                        e_meta = seq_emeta,
-                        f_data = seq_fdata,
-                        edata_cname = "Seq_Tag_ID",
-                        fdata_cname = "SampleID",
-                        emeta_cname = "Seq_Tag_ID")
-}
+mypepData <- as.seqData(e_data = rnaseq_edata,
+                        e_meta = rnaseq_emeta,
+                        f_data = rnaseq_fdata,
+                        edata_cname = "Transcript",
+                        fdata_cname = "SampleName",
+                        emeta_cname = "Transcript")
 
 }
 \seealso{
