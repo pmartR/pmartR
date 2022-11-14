@@ -7,5 +7,5 @@
 \method{print}{cvFilt}(filter_object)
 }
 \description{
-For printing an S3 object of type 'cvFilt':
+For printing an S3 object of type 'cvFilt'
 }

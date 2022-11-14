@@ -2,10 +2,10 @@
 % Please edit documentation in R/filter_summary.R
 \name{print.moleculeFilterSummary}
 \alias{print.moleculeFilterSummary}
-\title{Print method for summary of molecule filter}
+\title{Molecule Filter Print Method}
 \usage{
 \method{print}{moleculeFilterSummary}(object)
 }
 \description{
-Print method for summary of molecule filter
+Print method for moleculeFilt S3 object
 }
