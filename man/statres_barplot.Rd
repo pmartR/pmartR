@@ -23,16 +23,16 @@ statres_barplot(
 \item{text_size}{An integer specifying the size of the text (number of
 non-missing values) within the plot. The default is 3.}
 
-\item{display_count}{Logical. Indicates whether the non-missing counts will
+\item{display_count}{logical value. Indicates whether the non-missing counts will
 be displayed on the bar plot. The default is TRUE.}
 
-\item{x_lab}{A character string specifying the x-axis label.}
+\item{x_lab}{character string specifying the x-axis label.}
 
-\item{y_lab}{A character string specifying the y-axis label.}
+\item{y_lab}{character string specifying the y-axis label.}
 
-\item{title_lab}{A character string specifying the plot title.}
+\item{title_lab}{character string specifying the plot title.}
 
-\item{legend_lab}{A character string specifying the legend title.}
+\item{legend_lab}{character string specifying the legend title.}
 }
 \value{
 `ggplot` object - barplot.
