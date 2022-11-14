@@ -1,18 +1,24 @@
 #' Creates a list of three sheets, Normalized Data, DA Test Results, and Only DA biomolecules - for OMICS project
 #
 #' 
-#' @param omicsData an object of one of the classes "pepData", "proData", "metabData", or "lipidData", usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{lipidData}}, respectively.
-#' @param statResData an object of class statRes, created by \code{\link{imd_anova}}
-#' @param refCondition character string, what the reference condition looks like (e.g. "MOCK", "Mock", "mock", etc.)
-#' @param filePath default is NULL, if NULL then workbook will not be written out, if it is a character string specifying the file path, file name and .xlsx extension
-#' 
-#' @return a list of three data frames Normalized_Data, DA_Test_Results, and DA_"data type"_Only
+#' @param omicsData an object of one of the classes "pepData", "proData",
+#'   "metabData", or "lipidData", usually created by \code{\link{as.pepData}},
+#'   \code{\link{as.proData}}, \code{\link{as.metabData}}, or
+#'   \code{\link{lipidData}}, respectively.
+#' @param statResData an object of class statRes, created by
+#'   \code{\link{imd_anova}}
+#' @param refCondition character string specifying the reference condition 
+#' @param filePath default is NULL, if NULL then workbook will not be written
+#'   out, if it is a character string specifying the file path, file name and
+#'   .xlsx extension
+#'
+#' @return a list of three data frames Normalized_Data, DA_Test_Results, and
+#'   DA_"data type"_Only
 #' 
 #' @author Natalie Heller
 #' 
 #' @examples 
 #' dontrun{
-#' library(pmartR)
 #' library(pmartRdata)
 #' 
 #' myproData <- group_designation(omicsData = pro_object, main_effects = c("Condition"))

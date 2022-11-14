@@ -7,30 +7,32 @@
 report_dataRes(dataRes, minmax = FALSE, digits = 2)
 }
 \arguments{
-\item{minmax}{logical, for specifying whether or not to include minimum and maximum data in the returned data frame. Defaults to FALSE.}
+\item{minmax}{logical specifying whether or not to include minimum and
+maximum data in the returned data frame. Defaults to FALSE.}
 
 \item{digits}{integer indicating the number of decimal places to round}
 
-\item{statRes}{an object of the class 'statRes', created by \code{\link{summarize}}.}
+\item{statRes}{an object of the class 'dataRes', created by
+\code{\link{edata_summary}}.}
 }
 \value{
 prints a data frame
 }
 \description{
-This function takes in an object of class 'dataRes' and returns a data frame displaying a combination of metrics. The six summarizing metrics include, mean, standard deviation, median, percent observed, minimum and maximum.
+This function takes in an object of class 'dataRes' and returns a data frame
+displaying a combination of metrics. The six summarizing metrics include,
+mean, standard deviation, median, percent observed, minimum, and maximum.
 }
 \details{
-If the 'by' attribute of the input 'statRes' object is set to 'sample', then its groupvar attribute must be set to NULL
+When creating the 'dataRes' object via \code{\link{edata_summary}},
+  if the 'by' argument is set to 'sample', then the 'groupvar' argument must
+  be NULL
 }
 \examples{
-dontrun{
 library(pmartRdata)
-data(lipid_object)
-lipid_object2 <- edata_transform(omicsData = lipid_object, data_scale = "log2")
+mylipid <- edata_transform(omicsData = lipid_neg_object, data_scale = "log2")
 
-dataRes_sample = edata_summary(omicsData = lipid_object2, groupvar = NULL, by = "sample")
-report_dataRes(dataRes_sample)
-}
-
+dataRes_sample <- edata_summary(omicsData = mylipid, groupvar = NULL, by = "sample")
+my_output <- report_dataRes(dataRes_sample)
 
 }

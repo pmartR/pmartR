@@ -7,7 +7,11 @@
 analysis_log(omicsData)
 }
 \arguments{
-\item{omicsData}{an object of the class 'pepData', 'proData', 'metabData', 'lipidData', or 'nmrData', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.}
+\item{omicsData}{an object of the class 'pepData', 'proData', 'metabData',
+'lipidData', 'nmrData', or 'seqData', created by
+\code{\link{as.pepData}}, \code{\link{as.proData}},
+\code{\link{as.metabData}}, \code{\link{as.lipidData}},
+\code{\link{as.nmrData}}, or \code{\link{as.seqData}}, respectively.}
 }
 \description{
 Creates R markdown document report
@@ -15,8 +19,8 @@ Creates R markdown document report
 \examples{
 dontrun{
 library(pmartRdata)
-data(metab_object)
-result = analysis_log(metab_object)
+data(omicsData = metab_object)
+result <- analysis_log(omicsData = metab_object)
 }
 
 }
