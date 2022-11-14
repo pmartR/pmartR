@@ -1,25 +1,31 @@
-#' Produce a basic summary of a molecule_filter object
+#' Molecule Filter Summary
 #'
-#' This function will provide basic summary statistics for the molecule_filter object.
+#' Provide summary of a moleculeFilt S3 object
 #'
-#' @param filter_object S3 object of class 'moleculeFilt' created by \code{\link{molecule_filter}}.
-#' @param min_num an integer value specifying the minimum number of times each feature must be observed across all samples. Default value is NULL.
-#' @return a summary table giving the number of biomolecules by number of observed values across all samples. If min_num is specified, the number of biomolecules to be filtered with the specified threshold are reported.
-#'
+#' @param filter_object S3 object of class 'moleculeFilt' created by
+#'   \code{\link{molecule_filter}}
+#' @param min_num integer value specifying the minimum number of times each
+#'   feature must be observed across all samples. Default value is NULL.
+#' @return a summary table giving the number of biomolecules by number of
+#'   observed values across all samples. If min_num is specified, the numbers of
+#'   biomolecules to be filtered and to be retained based on the specified
+#'   threshold are reported. If, upon creation of moleculeFilt object,
+#'   \code{use_groups = TRUE} or \code{use_batches = TRUE} were specified, the
+#'   numbers reported by the summary are based on groups and/or batches.
+#'   
 #' @examples
-#' dontrun{
 #' library(pmartRdata)
-#' data("pep_object")
-#' myfilter <- molecule_filter(pep_object)
-#' summary(myfilter)
-#' summary(myfilter, min_num = 2)
-#'}
+#' myfilter <- molecule_filter(omicsData = pep_object)
+#' summary(filter_object = myfilter)
+#' summary(filter_object = myfilter, min_num = 2)
+#'
+#' @seealso \code{\link{molecule_filter}}
 #'
 #' @author Lisa Bramer, Kelly Stratton
 #'
 #' @export
-#'@rdname summary.moleculeFilt
-#'@name summary.moleculeFilt
+#' @rdname summary.moleculeFilt
+#' @name summary.moleculeFilt
 
 summary.moleculeFilt <- function(filter_object, min_num=NULL){
 
@@ -66,9 +72,9 @@ summary.moleculeFilt <- function(filter_object, min_num=NULL){
 
 
 
-#' Print method for summary of molecule filter
+#' Molecule Filter Print Method
 #'
-#' Print method for summary of molecule filter
+#' Print method for moleculeFilt S3 object
 #' 
 #' @export
 #' @name print.moleculeFilterSummary
@@ -93,36 +99,36 @@ print.moleculeFilterSummary <- function(object){
 
 }
 
-#' Produce a basic summary of a RNAFilt object
+#' RNA Filter Summary
 #'
-#' This function will provide basic summary statistics for the molecule_filter object.
+#' Provide summary of a RNAFilt S3 object
 #'
-#' @param filter_object S3 object of class 'RNAFilt' created by \code{\link{molecule_filter}}.
-#' @param min_nonzero Integer or float between 0 and 1. Cut-off for number of 
-#' unique biomolecules with non-zero counts or as a proportion of total 
-#' biomolecules. Defaults to NULL.
-#' @param size_library Integer. Cut-off for sample library size (i.e. number 
-#' of reads). Defaults to NULL.
+#' @param filter_object S3 object of class 'RNAFilt' created by
+#'   \code{\link{RNA_filter}}.
+#' @param min_nonzero integer or float between 0 and 1. Cut-off for number of
+#'   unique biomolecules with non-zero counts or as a proportion of total
+#'   biomolecules. Defaults to NULL.
+#' @param size_library integer cut-off for sample library size (i.e. number of
+#'   reads). Defaults to NULL.
 #' 
-#' @return a summary table giving the minimum, maximum, interquartiles, mean and 
-#' standard deviation for library size,  the number of unique biomolecules with 
-#' non-zero observations per sample, and the proportion of non-zero observations 
-#' over the total number of biomolecules.
+#' @return a summary table giving the minimum, maximum, 1st and 3rd quartiles,
+#'   mean and standard deviation for library size (the number of unique
+#'   biomolecules with non-zero observations per sample), and the proportion of
+#'   non-zero observations over the total number of biomolecules.
 #'
 #' @examples
-#' dontrun{
 #' library(pmartRdata)
-#' data("pep_object")
-#' myfilter <- molecule_filter(pep_object)
-#' summary(myfilter)
-#' summary(myfilter, min_num = 2)
-#'}
+#' myfilter <- RNA_filter(omicsData = rnaseq_object)
+#' summary(filter_object = myfilter)
+#' summary(filter_object = myfilter, min_num = 2)
 #'
 #' @author Rachel Richardson
+#'  
+#' @seealso \code{\link{RNA_filter}}
 #'
 #' @export
-#'@rdname summary.RNAFilt
-#'@name summary.RNAFilt
+#' @rdname summary.RNAFilt
+#' @name summary.RNAFilt
 
 summary.RNAFilt <- function(filter_object, 
                             size_library = NULL, 
@@ -213,7 +219,7 @@ summary.RNAFilt <- function(filter_object,
 }
 
 
-#' Print method for summary of RNAFilt
+#' RNA Filter Print Method
 #' 
 #' Print method for summary of RNAFilt
 #' 
@@ -234,7 +240,7 @@ print.RNAFiltSummary <- function(object){
       cat(sprintf("N Non-zero biomolecule cut-off: %d\n\n", 
                   object$nonzero_thresh))
     } else {
-      cat(sprintf("Proportion Non-zero biomolecule cut-off: %d\n\n", 
+      cat(sprintf("Proportion Non-zero biomolecule cut-off: %f\n\n", 
                   object$nonzero_thresh))
     }
   }
@@ -250,21 +256,27 @@ print.RNAFiltSummary <- function(object){
 }
 
 
-#' Produce a basic summary of a totalCountFilt object
+#' Total Count Filter Summary
 #'
-#' This function will provide basic summary statistics for the totalCountFilt object.
+#' Provide summary of a totalCountFilt S3 object
 #'
 #' @param filter_object S3 object of class 'totalCountFilt' created by 
 #' \code{\link{total_count_filter}}.
 #' @param min_count numeric value greater than 1 and less than the value 
-#' given by filter_object$Total_Count.  Values below min_count are filtered out. 
+#' given by filter_object$Total_Count. Values below min_count are filtered out. 
 #' Default value is NULL.
 #' @return a summary of the Total Count values, number of zero values, and 
 #' non-zero values. If a min_count is provided the biomolecules that would be 
-#' filtered, at this threshold, are reported.
+#' filtered at this threshold are reported.
 #'
+#' @examples 
+#' library(pmartRdata)
+#' myfilt <- total_count_filter(omicsData = rnaseq_object)
+#' summary(filter_object = myfilt, min_count = 2)
 #'
 #' @author Rachel Richardson
+#' 
+#' @seealso \code{\link{total_count_filter}}
 #'
 #' @export
 #' @rdname summary.totalCountFilt
@@ -298,11 +310,12 @@ summary.totalCountFilt <- function(filter_object, min_count = NULL){
   return(res)
 }
 
-#' Print method for summary of Total Count filter
+#' Total Count Filter Print Method
 #' 
 #' Print method for summary of Total Count filter
 #' 
 #' @export
+#' @name print.totalCountFiltSummary
 #'
 print.totalCountFiltSummary <- function(object){
   # create output #
@@ -312,16 +325,35 @@ print.totalCountFiltSummary <- function(object){
   
 }
 
-#' Produce a basic summary of a proteomics_filter object
+
+#' Proteomics Filter Summary
 #'
-#' This function will provide basic summary statistics for the proteomics_filter object.
+#' Provide summary of a proteomicsFilt S3 object
 #'
-#' @param filter_object S3 object of class 'proteomicsFilt' created by \code{\link{proteomics_filter}}.
-#' @param min_num_peps an optional integer value between 1 and the maximum number of peptides that map to a protein in the data. The value specifies the minimum number of peptides that must map to a protein. Any protein with less than \code{min_num_peps} mapping to it will be returned as a protein that should be filtered. Default value is NULL.
-#' @param degen_peps logical indicator of whether to filter out degenerate peptides (i.e. peptides mapping to multiple proteins) (TRUE) or not (FALSE). Default value is FALSE.
-#' @return a summary table giving the number of Observed Proteins per Peptide and number of Observed Peptides per Protein. If min_num_peps is specified and/or degen_peps is TRUE, the number of biomolecules to be filtered with the specified threshold(s) are reported.
+#' @param filter_object S3 object of class 'proteomicsFilt' created by
+#'   \code{\link{proteomics_filter}}.
+#' @param min_num_peps optional integer value between 1 and the maximum
+#'   number of peptides that map to a protein in the data. The value specifies
+#'   the minimum number of peptides that must map to a protein. Any protein with
+#'   less than \code{min_num_peps} mapping to it will be returned as a protein
+#'   that should be filtered. Default value is NULL.
+#' @param degen_peps logical indicator of whether to filter out 'degenerate' or 'redundant'
+#'   peptides (i.e. peptides mapping to multiple proteins) (TRUE) or not
+#'   (FALSE). Default value is FALSE.
+#' @return a summary table giving the number of Observed Proteins per Peptide
+#'   and number of Observed Peptides per Protein. If min_num_peps is specified
+#'   and/or degen_peps is TRUE, the number of biomolecules to be filtered with
+#'   the specified threshold(s) are reported.
+#'
+#' @examples 
+#' library(pmartRdata)
+#' myfilt <- proteomics_filter(omicsData = pep_object)
+#' summary(filter_object = myfilt, degen_peps = TRUE) # there are no degenerate peptides to filter out
+#' summary(filter_object = myfilt, min_num_peps = 2)
 #'
 #' @author Lisa Bramer
+#' 
+#' @seealso \code{\link{proteomics_filter}}
 #'
 #' @rdname summary.proteomicsFilt
 #' @name summary.proteomicsFilt
@@ -409,11 +441,12 @@ summary.proteomicsFilt <- function(filter_object, min_num_peps=NULL, degen_peps=
   return(res)
 }
 
-#' Print method for summary of proteomics filter
+#' Proteomics Filter Print Method
 #'
 #' Print method for summary of proteomics filter
 #' 
 #' @export
+#' @name print.proteomicsFilterSummary
 #'
 print.proteomicsFilterSummary <- function(object){
 
@@ -427,28 +460,35 @@ print.proteomicsFilterSummary <- function(object){
   cat(capture.output(catmat), sep="\n")
   cat("\n")
 
-
 }
 
-#' Produce a basic summary of a imdanova_filter object
+#' IMD-ANOVA Filter Summary
 #'
-#' This function will provide basic summary statistics for the imdanova_filter
-#' object.
+#' Provide summary of a imdanovaFilt S3 object
 #'
 #' @param filter_object S3 object of class 'imdanovaFilt' created by
 #'   \code{\link{imdanova_filter}}.
-#' @param min_nonmiss_gtest the minimum number of non-missing feature values
-#'   allowed per group for \code{gtest_filter}. Defaults to NULL. Suggested
-#'   value is 3.
-#' @param min_nonmiss_anova the minimum number of non-missing feature values
-#'   allowed per group for \code{anova_filter}. Defaults to NULL. Suggested
-#'   value is 2.
-#' @param comparisons data.frame with columns for "Control" and "Test"
+#' @param min_nonmiss_gtest integer value specifying the minimum number of
+#'   non-missing feature values allowed per group for \code{gtest_filter}.
+#'   Defaults to NULL. Suggested value is 3.
+#' @param min_nonmiss_anova integer value specifying the minimum number of
+#'   non-missing feature values allowed per group for \code{anova_filter}.
+#'   Defaults to NULL. Suggested value is 2.
+#' @param comparisons data frame with columns for "Control" and "Test"
 #'   containing the different comparisons of interest. Comparisons will be made
-#'   between the Test and the corresponding Control.
+#'   between the Test and the corresponding Control (e.g. Control is the
+#'   reference group).
 #'
 #' @return If min_nonmiss_gtest or min_nonmiss_anova is specified, the number of
 #'   biomolecules to be filtered with the specified threshold are reported.
+#'   
+#' @examples 
+#' library(pmartRdata)
+#' mypep <- group_designation(omicsData = pep_object, main_effects = "Phenotype")
+#' myfilt <- imdanova_filter(omicsData = mypep)
+#' summary(filter_object = myfilt, min_nonmiss_anova = 2, min_nonmiss_gtest = 3)
+#' 
+#' @seealso \code{\link{imdanova_filter}}
 #'
 #' @author Lisa Bramer
 #'
@@ -738,9 +778,12 @@ summary.imdanovaFilt <- function(filter_object, min_nonmiss_anova = NULL,
 }
 
 
+#' IMD-ANOVA Filter Print Method
+#' 
 #' Print method for summary of imdanova filter
 #' 
 #' @export
+#' @name print.imdanovaFilterSummary
 #'
 print.imdanovaFilterSummary <- function(object){
   # create output #
@@ -757,22 +800,35 @@ print.imdanovaFilterSummary <- function(object){
 
   colnames(catmat) <- NULL
 
-  cat("\nSummary of IMD Filter\n")
+  cat("\nSummary of IMD-ANOVA Filter\n")
   cat(capture.output(catmat), sep="\n")
 
 }
 
 
-#' Produce a basic summary of a rmd_filter object
+#' RMD Filter Summary
 #'
-#' This function will provide basic summary statistics for the rmd_filter object.
+#' Provide summary of a rmdFilt S3 object
 #'
-#' @param filter_object S3 object of class 'rmdFilt' created by \code{\link{rmd_filter}}.
-#' @param pvalue_threshold A threshold for the Robust Mahalanobis Distance (RMD) p-value. All samples below the threshold will be filtered out. Default value is NULL. Suggested value is 0.0001
-#' @return a summary of the p-values associated with running RMD-PAV across all samples. If a p-value threshold is provided the samples that would be filtered, at this threshold, are reported.
+#' @param filter_object S3 object of class 'rmdFilt' created by
+#'   \code{\link{rmd_filter}}.
+#' @param pvalue_threshold A threshold for the Robust Mahalanobis Distance (RMD)
+#'   p-value. All samples with p-values below the threshold will be filtered
+#'   out. Default value is NULL. Suggested value is 0.0001
+#' @return a summary of the p-values associated with running RMD-PAV across all
+#'   samples. If a p-value threshold is provided the samples that would be
+#'   filtered at this threshold are reported.
 #'
+#' @examples 
+#' library(pmartRdata)
+#' mymetab <- group_designation(omicsData = metab_object, main_effects = "Phenotype")
+#' mymetab <- edata_transform(omicsData = mymetab, data_scale = "log2")
+#' myfilt <- rmd_filter(omicsData = mymetab) 
+#' summary(filter_object = myfilt, pvalue_threshold = 0.001)
 #'
 #' @author Lisa Bramer, Kelly Stratton
+#' 
+#' @seealso \code{\link{rmd_filter}}
 #'
 #' @export
 #' @rdname summary.rmdFilt
@@ -840,7 +896,12 @@ summary.rmdFilt <- function(filter_object, pvalue_threshold = NULL){
   return(res)
 }
 
+#' RMD Filter Print Method
+#' 
+#' Print method for summary of RMD filter
+#' 
 #' @export
+#' @name print.rmdFilterSummary
 #'
 print.rmdFilterSummary <- function(object){
   # create output #
@@ -851,16 +912,28 @@ print.rmdFilterSummary <- function(object){
 }
 
 
-#' Produce a basic summary of a cv_filter object
+#' Coefficient of Variation (CV) Filter Summary
 #'
-#' This function will provide basic summary statistics for the cv_filter object.
+#' Provide summary of a cvFilt S3 object
 #'
-#' @param filter_object S3 object of class 'cvFilt' created by \code{\link{cv_filter}}.
-#' @param cv_threshold numeric value greater than 1 and less than the value given by filter_object$CV.  CV values above cv_threshold are filtered out. Default value is NULL.
-#' @return a summary of the CV values, number of NA values, and non-NA values. If a CV threshold is provided the biomolecules that would be filtered, at this threshold, are reported.
+#' @param filter_object S3 object of class 'cvFilt' created by
+#'   \code{\link{cv_filter}}.
+#' @param cv_threshold numeric value greater than 1 and less than the value
+#'   given by filter_object$CV. CV values above cv_threshold are filtered out.
+#'   Default value is NULL.
+#' @return a summary of the CV values, number of NA values, and non-NA values.
+#'   If a CV threshold is provided, the biomolecules that would be filtered
+#'   based on this threshold are reported.
 #'
+#' @examples 
+#' library(pmartRdata)
+#' mypep <- group_designation(omicsData = pep_object, main_effects = "Phenotype")
+#' to_filter <- cv_filter(omicsData = mypep, use_groups = TRUE)
+#' summary(filter_object = to_filter, cv_threshold = 30)
 #'
 #' @author Lisa Bramer
+#' 
+#' @seealso \code{\link{cv_filter}}
 #'
 #' @export
 #' @rdname summary.cvFilt
@@ -917,11 +990,12 @@ summary.cvFilt <- function(filter_object, cv_threshold = NULL){
   return(res)
 }
 
-#' Print method for summary of CV filter
+#' CV Filter Print Method
 #'
 #' Print method for summary of CV filter
 #' 
 #' @export
+#' @name print.cvSummary
 #'
 print.cvFilterSummary <- function(object){
   # create output #
@@ -938,10 +1012,9 @@ print.cvFilterSummary <- function(object){
 }
 
 
-#' Produce a basic summary of a custom_filter object
+#' Custom Filter Summary
 #'
-#' This function will provide basic summary statistics for the custom_filter
-#' object.
+#' Provide summary of a customFilt S3 object
 #'
 #' @param filter_object S3 object of class 'customFilt' created by
 #'   \code{\link{custom_filter}}.
@@ -949,7 +1022,17 @@ print.cvFilterSummary <- function(object){
 #' @return a summary of the items in e_data, f_data, and e_meta that will be
 #'   removed as a result of applying the custom filter.
 #'
+#' @examples
+#' library(pmartRdata)
+#' to_filter <- custom_filter(omicsData = metab_object, e_data_remove = "fumaric acid", f_data_remove = "Sample_1_Phenotype2_B")
+#' summary(filter_object = to_filter)
+#'
+#' to_filter2 <- custom_filter(omicsData = metab_object, f_data_keep = metab_object$f_data$SampleID[1:10])
+#' summary(filter_object = to_filter2)
+#'
 #' @author Lisa Bramer
+#'
+#' @seealso \code{\link{custom_filter}}
 #'
 #' @export
 #' @rdname summary.customFilt
@@ -1087,9 +1170,12 @@ summary.customFilt <- function(filter_object){
 }
 
 
+#' Custom Filter Print Method
+#' 
 #' Print method for summary of custom filter
 #'
 #' @export
+#' @name print.customFilterSummary
 #'
 print.customFilterSummary <- function (object) {
 

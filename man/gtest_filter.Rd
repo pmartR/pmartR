@@ -41,7 +41,6 @@ Two methods are available for determining the peptides to be
   groups.
 }
 \examples{
-\dontrun{
 library(pmartR)
 data(pep_object)
 
@@ -52,7 +51,6 @@ nonmissing_result <- nonmissing_per_group(omicsData = pep_object2)
 
 to_filter <- gtest_filter(nonmiss_per_group = nonmissing_result,
                           min_nonmiss_gtest = 3)
-}
 
 }
 \author{

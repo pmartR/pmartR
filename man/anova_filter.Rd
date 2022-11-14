@@ -37,7 +37,6 @@ This function filters biomolecules that do not have at least
   \code{group_designation}.
 }
 \examples{
-\dontrun{
 library(pmartRdata)
 data("pep_object")
 
@@ -47,7 +46,6 @@ nonmissing_result <- nonmissing_per_group(omicsData = pep_object2)
 
 to_filter <- anova_filter(nonmiss_per_group = nonmissing_result,
                           min_nonmiss_anova = 2)
-}
 
 }
 \seealso{
