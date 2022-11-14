@@ -7,13 +7,13 @@
 edata_summary(omicsData, by = "sample", groupvar = NULL)
 }
 \arguments{
-\item{omicsData}{an object of the class 'lipidData', 'metabData', 'pepData',
-'proData', or 'nmrData' usually created by \code{\link{as.lipidData}},
+\item{omicsData}{object of the class 'lipidData', 'metabData', 'pepData',
+'proData', or 'nmrData' created by \code{\link{as.lipidData}},
 \code{\link{as.metabData}}, \code{\link{as.pepData}},
 \code{\link{as.proData}}, \code{\link{as.nmrData}}, respectively.}
 
-\item{by}{a character string indicating whether summarizing metrics will be
-applied by 'sample' or by 'molecule'.  Defaults to 'sample'.}
+\item{by}{character string indicating whether summarizing metrics will be
+applied by 'sample' or by 'molecule'. Defaults to 'sample'.}
 
 \item{groupvar}{a character vector with no more than two variable names that
 should be used to determine group membership of samples. The variable name
@@ -21,9 +21,9 @@ must match a column name from \code{f_data}. Defaults to NULL, in which
 case group_DF attribute will be used.}
 }
 \value{
-A list of six data frames, which are the results of applying the
-  metrics (mean, standard deviation, median, percent observed, minimum and
-  maximum) to omicsData$e_data
+A list of six data frames, of class 'dataRes' (data Result), which
+  are the results of applying the metrics (mean, standard deviation, median,
+  percent observed, minimum and maximum) to omicsData$e_data.
 }
 \description{
 This function takes in an omicsData object and returns a summary of the
@@ -38,19 +38,12 @@ If groupvar is NULL and group_designation has not been applied to
   column of f_data is used to group e_data in order to apply the metrics.
 }
 \examples{
-\dontrun{
 library(pmartRdata)
 
-data(lipid_object)
+mylipid <- edata_transform(omicsData = lipid_pos_object, data_scale = "log2")
+mylipid <- group_designation(omicsData = mylipid, main_effects = "Virus")
+result <- edata_summary(omicsData = mylipid, by = "sample", groupvar = NULL)
 
-lipid_object2 <- edata_transform(omicsData = lipid_object,
-                                 data_scale = "log2")
-
-lipid_object2 <- group_designation(omicsData = lipid_object,
-                                   main_effects = "Condition")
-
-edata_summary(omicsData = lipid_object2, by = "sample", groupvar = NULL)
-}
 
 formula'
 formula'

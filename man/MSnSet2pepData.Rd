@@ -14,7 +14,7 @@ MSnSet2pepData(
 )
 }
 \arguments{
-\item{msnset_object}{is an object of class MSnSet, it stores quantification
+\item{msnset_object}{an object of class MSnSet, which stores quantification
 data and meta data. Creating an MSnSet object is described in the MSNbase
 package io vignette.}
 
@@ -40,6 +40,9 @@ pepData object
 \description{
 Converts an object of class MSnSet to an object of the class 'pepData'
 }
+\details{
+The MSnbase package is available via Bioconductor
+}
 \examples{
 \dontrun{
 library(pmartR)
@@ -53,4 +56,13 @@ result = MSnSet2pepData(msnset,
                         check.names = TRUE)
 }
 
+}
+\references{
+Gatto L, Lilley K (2012). “MSnbase - an R/Bioconductor package
+  for isobaric tagged mass spectrometry data visualization, processing and
+  quantitation.” Bioinformatics, 28, 288-289.
+
+Gatto L, Gibb S, Rainer J (2020). “MSnbase, efficient and elegant
+  R-based processing and visualisation of raw mass spectrometry data.”
+  bioRxiv.
 }

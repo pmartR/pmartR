@@ -2,7 +2,7 @@
 #'
 #' Converts an object of class MSnSet to an object of the class 'pepData'
 #'
-#' @param msnset_object is an object of class MSnSet, it stores quantification
+#' @param msnset_object an object of class MSnSet, which stores quantification
 #'   data and meta data. Creating an MSnSet object is described in the MSNbase
 #'   package io vignette.
 #' @param edata_cname character string specifying the name of the column
@@ -19,6 +19,16 @@
 #'   respectively.
 #'
 #' @return pepData object
+#' 
+#' @details The MSnbase package is available via Bioconductor
+#' 
+#' @references Gatto L, Lilley K (2012). “MSnbase - an R/Bioconductor package
+#'   for isobaric tagged mass spectrometry data visualization, processing and
+#'   quantitation.” Bioinformatics, 28, 288-289.
+#'
+#' @references Gatto L, Gibb S, Rainer J (2020). “MSnbase, efficient and elegant
+#'   R-based processing and visualisation of raw mass spectrometry data.”
+#'   bioRxiv.
 #'
 #' @examples
 #' \dontrun{

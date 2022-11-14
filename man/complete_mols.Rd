@@ -7,22 +7,20 @@
 complete_mols(e_data, edata_id)
 }
 \arguments{
-\item{e_data}{a \eqn{p \times n + 1} data.frame, where \eqn{p} is the number of peptides, proteins, lipids, or metabolites and \eqn{n} is the number of samples. Each row corresponds to data for a peptide, protein, lipid, or metabolite, with a column giving the identifer name.}
+\item{e_data}{a \eqn{p \times n + 1} data.frame, where \eqn{p} is the number
+of peptides, proteins, lipids, or metabolites and \eqn{n} is the number of
+samples. Each row corresponds to data for a peptide, protein, lipid, or
+metabolite, with one column giving the biomolecule identifier name.}
 
-\item{edata_id}{character string indicating the name of the peptide, protein, lipid, or metabolite identifier. Usually obtained by calling \code{attr(omicsData, "cnames")$edata_cname}.}
+\item{edata_id}{character string indicating the name of the peptide, protein,
+lipid, or metabolite identifier. Usually obtained by calling
+\code{attr(omicsData, "cnames")$edata_cname}.}
 }
 \value{
-Character vector containing the features with no missing values across all samples.
+Character vector containing the biomolecules with no missing values
+  across all samples.
 }
 \description{
-Selects biomolecules that have complete rows in e_data, equivalent to 'ppp' with proportion = 1.
-}
-\examples{
-\dontrun{
-library(pmartRdata)
-data(pep_pepData)
-complete_peps <- complete_mols(e_data = pep_pepData$e_data, edata_id = attr(pep_pepData, "cnames")$edata_cname)
-
-}
-
+Selects biomolecules that have complete rows in e_data, equivalent to 'ppp'
+with proportion = 1.
 }

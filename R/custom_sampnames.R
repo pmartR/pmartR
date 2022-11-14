@@ -1,34 +1,58 @@
-#' Creates custom sample names for plots
+#' Creates custom sample names to be used in plots
 #'
 #' This helper function creates custom sample names for plot data object
-#' function
+#' functions
 #'
-#' @param omicsData omicsData an object of the class 'pepData', 'proData',
-#'   'metabData', 'lipidData', 'nmrData', or 'seqData', usually created by \code{as.pepData},
+#' @param omicsData an object of the class 'pepData', 'proData',
+#'   'metabData', 'lipidData', 'nmrData', or 'seqData', created by \code{as.pepData},
 #'   \code{as.proData}, \code{as.metabData}, \code{as.lipidData}, \code{as.nmrData},
 #'   or \code{as.seqData}, respectively.
-#' @param firstn is an integer specifying the first n characters to keep as the
-#'   sample name
-#' @param from is an integer specifying the start of the range of characters to
-#'   keep as the sample name
-#' @param to is an integer specifying the end of the range of characters to keep
-#'   as the sample name
-#' @param delim is a delimiter to separate sample name components by
-#' @param components an integer vector specifying which components separated by
-#'   delim to keep as sample name
-#' @param pattern string, regex pattern to use to extract substrings from the
-#' sample names.
+#' @param firstn an integer specifying the first n characters to keep as the
+#'   sample name. This argument is optional.
+#' @param from an integer specifying the start of the range of characters to
+#'   keep as the sample name. This argument is optional. If this argument is
+#'   specified, 'to' must also be specified.
+#' @param to an integer specifying the end of the range of characters to keep as
+#'   the sample name. This argument is optional. If this argument is specified,
+#'   'from' must also be specified.
+#' @param delim character delimiter by which to separate sample name components.
+#'   This argument is optional. If this argument is specified, 'components' must
+#'   also be specified.
+#' @param components integer vector specifying which components separated by the
+#'   delimiter should be kept as the custom sample name. This argument is
+#'   optional. If this argument is specified, 'delim' must also be specified.
+#' @param pattern character string specifying the regex pattern to use to
+#'   extract substrings from the sample names
 #' @param ... extra arguments passed to regexpr if pattern is specified
+#'
+#' @return Object of same class as omicsData, with added column in f_data named
+#'   'VizSampNames'.
 #'
 #' @details This function can be used to create custom (and shorter) sample
 #'   names to be used when plotting so that axis labels are not so long that
-#'   they interfere with the graph itself.
+#'   they interfere with the graph itself. To use the custom sample names when
+#'   plotting, specify the optional argument 'use_VizSampNames = TRUE'.
 #'
 #' @examples
-#' \dontrun{
-#' data(pep_object)
-#' results = custom_sampnames(pep_object, firstn = 5)
-#' }
+#' library(pmartR)
+#' library(pmartRdata)
+#' 
+#' mypep <- edata_transform(omicsData = pep_object, data_scale = "log2")
+#' plot(mypep)
+#' 
+#' # specify new names using firstn argument
+#' results <- custom_sampnames(omicsData = mypep, firstn = 9)
+#' plot(results, use_VizSampNames = TRUE)
+#' 
+#' # specify new names using from and to arguments
+#' results <- custom_sampnames(omicsData = mypep, from = 1, to = 9)
+#' plot(results, use_VizSampNames = TRUE)
+#' 
+#' # specify new names using delim and components arguments
+#' results <- custom_sampnames(omicsData = mypep, delim = "_", components = c(1, 2))
+#' plot(results, use_VizSampNames = TRUE)
+#' 
+#' # specify new names using pattern arguments
 #'
 #' @export
 #'
@@ -74,7 +98,7 @@ custom_sampnames <- function (omicsData, firstn = NULL, from = NULL,
   fdata_cname = attr(omicsData, "cnames")$fdata_cname
   names = as.list(as.character(omicsData$f_data[[fdata_cname]]))
 
-  output = subset_names(names, firstn = firstn, from = from, to = to,
+  output = pmartR:::subset_names(names, firstn = firstn, from = from, to = to,
                         delim = delim, components = components,
                         pattern = pattern, ...)
 
