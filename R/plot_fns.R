@@ -1,75 +1,71 @@
-#' Plots an object of class dataRes
+#' Plot dataRes object
 #'
 #' For plotting an S3 object of type dataRes
 #'
-#' @param dataRes_obj An object of class dataRes. A dataRes object is created by
-#'   the \code{edata_summary} function.
-#' @param metric A character string indicating which metric to use in plot, one
-#'   of 'mean', 'median', 'sd, 'pct_obs', 'min', or 'max'
-#' @param density logical default to FALSE, if set to true a density plot of the
-#'   specified metric is returned
-#' @param ncols An integer specifying the number columns for the histogram
+#' @param dataRes_obj object of class dataRes, created by the
+#'   \code{\link{edata_summary}} function
+#' @param metric character string indicating which metric to use in plot:
+#'   'mean', 'median', 'sd, 'pct_obs', 'min', or 'max'
+#' @param density logical value, defaults to FALSE. If TRUE, a density plot of
+#'   the specified metric is returned.
+#' @param ncols integer value specifying the number columns for the histogram
 #'   facet_wrap. This argument is used when \code{metric} is not null. The
 #'   default is NULL.
-#'
-#' @param interactive Logical. If TRUE produces an interactive plot.
-#' @param x_lab A character string specifying the x-axis label when the metric
+#' @param interactive logical value. If TRUE, produces an interactive plot.
+#' @param x_lab character string specifying the x-axis label when the metric
 #'   argument is NULL. The default is NULL in which case the x-axis label will
 #'   be "count".
-#' @param x_lab_sd A character string used for the x-axis label for the
+#' @param x_lab_sd character string used for the x-axis label for the
 #'   mean/standard deviation plot when the \code{metric} argument is not NULL.
-#' @param x_lab_median A character string used for the x-axis label for the
+#' @param x_lab_median character string used for the x-axis label for the
 #'   mean/median plot when the \code{metric} argument is not NULL.
-#' @param y_lab A character string specifying the y-axis label. The default is
+#' @param y_lab character string specifying the y-axis label. The default is
 #'   NULL in which case the y-axis label will be the metric selected for the
 #'   \code{metric} argument.
-#' @param y_lab_sd A character string used for the y-axis label for the
+#' @param y_lab_sd character string used for the y-axis label for the
 #'   mean/standard deviation plot when the \code{metric} argument is not NULL.
-#' @param y_lab_median A character string used for the y-axis label for the
+#' @param y_lab_median character string used for the y-axis label for the
 #'   mean/median plot when the \code{metric} argument is not NULL.
-#' @param x_lab_size An integer value indicating the font size for the x-axis.
-#'   The default is 11.
-#' @param y_lab_size An integer value indicating the font size for the y-axis.
-#'   The default is 11.
-#' @param x_lab_angle An integer value indicating the angle of x-axis labels.
-#' @param title_lab A character string specifying the plot title when the
+#' @param x_lab_size integer value indicating the font size for the x-axis. The
+#'   default is 11.
+#' @param y_lab_size integer value indicating the font size for the y-axis. The
+#'   default is 11.
+#' @param x_lab_angle integer value indicating the angle of x-axis labels
+#' @param title_lab character string specifying the plot title when the
 #'   \code{metric} argument is NULL.
-#' @param title_lab_sd A character string used for the plot title for the
+#' @param title_lab_sd character string used for the plot title for the
 #'   mean/standard deviation plot when the \code{metric} argument is not NULL.
-#' @param title_lab_median A character string used for the plot title for the
+#' @param title_lab_median character string used for the plot title for the
 #'   mean/median plot when the \code{metric} argument is not NULL.
-#' @param title_lab_size An integer value indicating the font size of the plot
+#' @param title_lab_size integer value indicating the font size of the plot
 #'   title. The default is 14.
-#' @param legend_lab A character string specifying the legend title.
-#' @param legend_position A character string specifying the position of the
+#' @param legend_lab character string specifying the legend title.
+#' @param legend_position character string specifying the position of the
 #'   legend. Can be one of "right", "left", "top", or "bottom". The default is
 #'   "right".
-#' @param point_size An integer specifying the size of the points. The default
-#'   is 2.
-#' @param bin_width An integer indicating the bin width in a histogram. The
-#'   default is 0.5.
-#' @param bw_theme Logical. If TRUE uses the ggplot2 black and white theme.
-#' @param palette A character string indicating the name of the RColorBrewer
+#' @param point_size integer specifying the size of the points. The default is
+#'   2.
+#' @param bin_width integer indicating the bin width in a histogram. The default
+#'   is 0.5.
+#' @param bw_theme logical value. If TRUE, uses the ggplot2 black and white
+#'   theme.
+#' @param palette character string indicating the name of the RColorBrewer
 #'   palette to use. For a list of available options see the details section in
 #'   \code{\link[RColorBrewer]{RColorBrewer}}.
 #'
-#' @details This function can only create plots of dataRes objects whose 'by' ==
+#' @details This function can only create plots for dataRes objects whose 'by' =
 #'   'molecule' and 'groupvar' attribute is non NULL
 #'
-#' @return plots ggplot2 object
+#' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
+#'   interactive is TRUE
 #'
 #' @examples
 #' \dontrun{
 #' library (pmartRdata)
-#'
-#' data(lipid_object)
-#'
-#' lipid_object = edata_transform(lipid_object, "log2")
-#'
-#' result = edata_summary(omicsData = lipid_object,
+#' mylipid <- edata_transform(omicsData = lipid_pos_object, data_scale = "log2")
+#' result <- edata_summary(omicsData = mylipid,
 #'                        by = "molecule",
-#'                        groupvar = "Condition")
-#'
+#'                        groupvar = "Virus")
 #' plot(result)
 #' }
 #'
@@ -342,50 +338,46 @@ plot.dataRes <- function (dataRes_obj, metric = NULL, density = FALSE,
 
 }
 
-#' Plots an object of class isobaricnormRes
+#' Plot isobaricnormRes object
 #'
 #' Creates box plots for an S3 object of type 'isobaricnormRes'
 #'
 #' @param isobaricnormRes_obj an object of type isobaricnormRes, created by
-#'   \code{\link{normalize_isobaric}}
-#' @param order Logical. If TRUE the samples will be ordered by the column of
-#'   f_data containing the experiment/plate information.
-#'
-#' @param interactive Logical. If TRUE produces an interactive plot.
-#' @param x_lab A character string specifying the x-axis label.
-#' @param y_lab A character string specifying the y-axis label.
-#' @param x_lab_size An integer value indicating the font size for the x-axis.
-#'   The default is 11.
-#' @param y_lab_size An integer value indicating the font size for the y-axis.
-#'   The default is 11.
-#' @param x_lab_angle An integer value indicating the angle of x-axis labels.
-#' @param title_lab A character string specifying the plot title.
-#' @param title_lab_size An integer value indicating the font size of the plot
+#'   \code{\link{normalize_isobaric}} with apply_norm = FALSE
+#' @param order logical value. If TRUE the samples will be ordered by the column
+#'   of f_data containing the experiment/plate information.
+#' @param interactive logical value. If TRUE produces an interactive plot.
+#' @param x_lab character string specifying the x-axis label
+#' @param y_lab character string specifying the y-axis label
+#' @param x_lab_size integer value indicating the font size for the x-axis. The
+#'   default is 11.
+#' @param y_lab_size integer value indicating the font size for the y-axis. The
+#'   default is 11.
+#' @param x_lab_angle integer value indicating the angle of x-axis labels.
+#' @param title_lab character string specifying the plot title.
+#' @param title_lab_size integer value indicating the font size of the plot
 #'   title. The default is 14.
-#' @param legend_lab A character string specifying the legend title.
-#' @param legend_position A character string specifying the position of the
+#' @param legend_lab character string specifying the legend title.
+#' @param legend_position character string specifying the position of the
 #'   legend. Can be one of "right", "left", "top", "bottom", or "none". The
 #'   default is "none".
-#' @param bw_theme Logical. If TRUE uses the ggplot2 black and white theme.
-#' @param palette A character string indicating the name of the RColorBrewer
+#' @param bw_theme logical value. If TRUE uses the ggplot2 black and white
+#'   theme.
+#' @param palette character string indicating the name of the RColorBrewer
 #'   palette to use. For a list of available options see the details section in
 #'   \code{\link[RColorBrewer]{RColorBrewer}}.
 #'
-#' @return plots ggplot2 object
+#' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
+#'   interactive is TRUE
 #'
 #' @examples
 #' \dontrun{
 #' library(pmartRdata)
-#'
-#' data(isobaric_object)
-#'
-#' isobaric_object = edata_transform(isobaric_object, "log2")
-#'
-#' result = normalize_isobaric(isobaric_object, exp_cname = "Set",
-#'                             apply_norm = FALSE,
-#'                             channel_cname = "iTRAQ.Channel",
-#'                             refpool_channel = "116")
-#'
+#' myiso <- edata_transform(omicsData = isobaric_object, data_scale = "log2")
+#' myiso_norm <- normalize_isobaric(myiso, exp_cname = "Plex",
+#'                                    apply_norm = FALSE,
+#'                                    refpool_cname = "Virus",
+#'                                    refpool_notation = "Pool")
 #' plot(result)
 #' }
 #'
@@ -542,57 +534,46 @@ prime_iso <- function (isonormRes, exp_cname,
 
 }
 
-#' Plots an object of class nmrnormRes
+#' Plot nmrnormRes Object
 #'
 #' Creates a scatter plot for an S3 object of type 'nmrnormRes'
 #'
 #' @param nmrnormRes_obj an object of type nmrnormRes, created by
 #'   \code{\link{normalize_nmr}}
-#'
-#' @param interactive Logical. If TRUE produces an interactive plot.
-#' @param x_lab A character string specifying the x-axis label.
-#' @param y_lab A character string specifying the y-axis label.
-#' @param x_lab_size An integer value indicating the font size for the x-axis.
-#'   The default is 11.
-#' @param y_lab_size An integer value indicating the font size for the y-axis.
-#'   The default is 11.
-#' @param x_lab_angle An integer value indicating the angle of x-axis labels.
-#' @param title_lab A character string specifying the plot title.
-#' @param title_lab_size An integer value indicating the font size of the plot
+#' @param interactive logical value. If TRUE produces an interactive plot.
+#' @param x_lab character string specifying the x-axis label
+#' @param y_lab character string specifying the y-axis label
+#' @param x_lab_size integer value indicating the font size for the x-axis. The
+#'   default is 11.
+#' @param y_lab_size integer value indicating the font size for the y-axis. The
+#'   default is 11.
+#' @param x_lab_angle integer value indicating the angle of x-axis labels.
+#' @param title_lab character string specifying the plot title.
+#' @param title_lab_size integer value indicating the font size of the plot
 #'   title. The default is 14.
-#' @param legend_lab A character string specifying the legend title.
-#' @param legend_position A character string specifying the position of the
+#' @param legend_lab character string specifying the legend title.
+#' @param legend_position character string specifying the position of the
 #'   legend. Can be one of "right", "left", "top", "bottom", or "none". The
 #'   default is "none".
-#' @param point_size An integer specifying the size of the points. The default
-#'   is 2.
-#' @param bw_theme Logical. If TRUE uses the ggplot2 black and white theme.
+#' @param point_size integer specifying the size of the points. The default is
+#'   2.
+#' @param bw_theme logical value. If TRUE uses the ggplot2 black and white
+#'   theme.
 #'
-#' @return plots ggplot2 object
+#' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
+#'   interactive is TRUE
 #'
 #' @examples
 #' \dontrun{
 #' library(pmartRdata)
-#' data(nmr_object_identified)
-#'
-#' nmr_object = edata_transform(nmr_object_identified, "log2")
-#' nmr_norm = normalize_nmr(nmr_object,
+#' mynmr <- edata_transform(omicsData = nmr_identified_object, data_scale = "log2")
+#' mynmr <- normalize_nmr(omicsData = mynmr,
 #'                          apply_norm = FALSE,
 #'                          metabolite_name = "unkm1.53")
-#' plot(nmr_norm)
-#'
-#' # alternate specification: #
-#' data(nmr_object_identified)
-#'
-#' nmr_object = edata_transform(nmr_object, "log2")
-#' nmr_norm = normalize_nmr(nmr_object,
-#'                          apply_norm = FALSE,
-#'                          sample_property_cname = "Concentration")
-#' plot(nmr_norm)
+#' plot(mynmr)
 #' }
 #'
 #' @rdname plot-nmrnormRes
-#'
 #' @export
 #'
 plot.nmrnormRes <- function (nmrnormRes_obj, interactive = FALSE,
@@ -676,36 +657,45 @@ plot.nmrnormRes <- function (nmrnormRes_obj, interactive = FALSE,
 
 }
 
-#' Plots an object of class SPANSRes
+#' Plot SPANSRes Object
 #'
 #' For plotting an S3 object of type 'SPANSRes'
 #'
-#' @param SPANSRes_obj an object of the class 'SPANSRes', usually created by
-#'   \code{\link{spans_procedure()}}.
-#'
-#' @param interactive Logical. If TRUE produces an interactive plot.
-#' @param x_lab A character string specifying the x-axis label.
-#' @param y_lab A character string specifying the y-axis label.
-#' @param x_lab_size An integer value indicating the font size for the x-axis.
+#' @param SPANSRes_obj an object of the class 'SPANSRes', created by
+#'   \code{\link{spans_procedure()}}
+#' @param interactive logical value. If TRUE produces an interactive plot.
+#' @param x_lab character string specifying the x-axis label.
+#' @param y_lab character string specifying the y-axis label.
+#' @param x_lab_size integer value indicating the font size for the x-axis.
 #'   The default is 11.
-#' @param y_lab_size An integer value indicating the font size for the y-axis.
+#' @param y_lab_size integer value indicating the font size for the y-axis.
 #'   The default is 11.
-#' @param x_lab_angle An integer value indicating the angle of x-axis labels.
+#' @param x_lab_angle integer value indicating the angle of x-axis labels.
 #'   The default is NULL.
-#' @param title_lab A character string specifying the plot title.
-#' @param title_lab_size An integer value indicating the font size of the plot
+#' @param title_lab character string specifying the plot title
+#' @param title_lab_size integer value indicating the font size of the plot
 #'   title. The default is 14.
-#' @param legend_lab A character string specifying the legend title.
-#' @param legend_position A character string specifying the position of the
+#' @param legend_lab character string specifying the legend title
+#' @param legend_position character string specifying the position of the
 #'   legend. Can be one of "right", "left", "top", "bottom", or "none". The
 #'   default is "none".
-#' @param color_low A character string specifying the color of the gradient for
+#' @param color_low character string specifying the color of the gradient for
 #'   low values.
-#' @param color_high A character string specifying the color of the gradient for
-#'   high values.
-#' @param bw_theme Logical. If TRUE uses the ggplot2 black and white theme.
+#' @param color_high character string specifying the color of the gradient for
+#'   high values
+#' @param bw_theme logical value. If TRUE uses the ggplot2 black and white theme.
 #'
-#' @return plots a plotly object
+#' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
+#'   interactive is TRUE
+#'   
+#' @examples 
+#' \dontrun{
+#' library(pmartRdata)
+#' mypep <- edata_transform(omicsData = pep_object, data_scale = "log2")
+#' mypep <- group_designation(omicsData = mypep, main_effects = "Phenotype")
+#' myspans <- spans_procedure(omicsData = mypep)
+#' plot(myspans)
+#' }
 #'
 #' @rdname plot-SPANSRes
 #'
@@ -839,56 +829,55 @@ plot.SPANSRes <- function (SPANSRes_obj, interactive = FALSE,
 
 }
 
-#' Plots an object of class naRes
+#' Plot naRes Object
 #'
 #' For plotting an S3 object of type 'naRes'
 #'
-#' @param naRes_obj A list of two data frames, one contains NA values by sample,
-#'   the second contains NA values by molecule
-#' @param omicsData an object of class 'pepData', 'proData', 'metabData',
-#'   'lipidData', or 'nmrData', created by \code{\link{as.pepData}},
+#' @param naRes_obj list of two data frames, one containing the number of
+#'   missing values by sample, and the other containing missing values by
+#'   molecule
+#' @param omicsData object of class 'pepData', 'proData', 'metabData',
+#'   'lipidData', nmrData', or 'seqData', created by \code{\link{as.pepData}},
 #'   \code{\link{as.proData}}, \code{\link{as.metabData}},
-#'   \code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, respectively.
-#' @param plot_type A character string specifying which type of plot to produce.
+#'   \code{\link{as.lipidData}}, \code{\link{as.nmrData}}, or \code{\link{as.seqData}}, respectively.
+#' @param plot_type character string specifying which type of plot to produce.
 #'   The two options are 'bar' or 'scatter'.
-#' @param order_by A character string specifying a main effect by which to order
+#' @param order_by character string specifying a main effect by which to order
 #'   the bar plot. This main effect must be found in the column names of f_data
 #'   in the omicsData object. If \code{order_by} is "Group", the bar plot
 #'   will be ordered by the group variable from the group_designation function.
 #'   If NULL (default), the bar plot will be displayed in the order they appear
 #'   in the data.
-#' @param color_by A character string specifying a main effect by which to color
-#'   the bar plot. This main effect must be found in the column names of f_data
-#'   in the omicsData object. If \code{color_by} is "Group", the bar plot
-#'   will be colored by the group variable from the group_designation function.
-#'   If NULL (default), the bar plot will have one default color.
-#'
-#'
-#' @param interactive Logical. If TRUE produces an interactive plot.
-#' @param x_lab_bar A character string used for the x-axis label for the bar
-#'   plot.
-#' @param x_lab_scatter A character string used for the x-axis label for the
-#'   scatter plot.
-#' @param y_lab_bar A character string used for the y-axis label for the bar
-#'   plot.
-#' @param y_lab_scatter A character string used for the y-axis label for the
-#'   scatter plot.
-#' @param x_lab_size An integer value indicating the font size for the x-axis.
+#' @param color_by character string specifying a main effect by which to color
+#' the bar plot. This main effect must be found in the column names of f_data
+#' in the omicsData object. If \code{color_by} is "Group", the bar plot
+#' will be colored by the group variable from the group_designation function.
+#' If NULL (default), the bar plot will have one default color.
+#' @param interactive logical value. If TRUE produces an interactive plot.
+#' @param x_lab_bar character string used for the x-axis label for the bar
+#'   plot
+#' @param x_lab_scatter character string used for the x-axis label for the
+#'   scatter plot
+#' @param y_lab_bar character string used for the y-axis label for the bar
+#'   plot
+#' @param y_lab_scatter character string used for the y-axis label for the
+#'   scatter plot
+#' @param x_lab_size integer value indicating the font size for the x-axis.
 #'   The default is 11.
-#' @param y_lab_size An integer value indicating the font size for the y-axis.
+#' @param y_lab_size integer value indicating the font size for the y-axis.
 #'   The default is 11.
-#' @param x_lab_angle An integer value indicating the angle of x-axis labels.
-#' @param title_lab_bar A character string used for the plot title when
+#' @param x_lab_angle integer value indicating the angle of x-axis labels.
+#' @param title_lab_bar character string used for the plot title when
 #'   \code{plot_type} is 'bar'.
-#' @param title_lab_scatter A character string used for the plot title when
+#' @param title_lab_scatter character string used for the plot title when
 #'   \code{plot_type} is 'scatter'.
-#' @param title_lab_size An integer value indicating the font size of the plot
+#' @param title_lab_size integer value indicating the font size of the plot
 #'   title. The default is 14.
-#' @param legend_lab_bar A character string specifying the legend title when
+#' @param legend_lab_bar character string specifying the legend title when
 #'   creating a bar plot.
-#' @param legend_lab_scatter A character string specifying the legend title when
+#' @param legend_lab_scatter character string specifying the legend title when
 #'   creating a scatter plot.
-#' @param legend_position A character string specifying the position of the
+#' @param legend_position character string specifying the position of the
 #'   legend. Can be one of "right", "left", "top", or "bottom". The default is
 #'   "right".
 #' @param point_size An integer specifying the size of the points. The default
@@ -897,18 +886,19 @@ plot.SPANSRes <- function (SPANSRes_obj, interactive = FALSE,
 #'   missing values by sample) within the bar plot. The default is 3.
 #' @param bar_width An integer indicating the width of the bars in the bar plot.
 #'   The default is 0.8.
-#' @param bw_theme Logical. If TRUE uses the ggplot2 black and white theme.
-#' @param palette A character string indicating the name of the RColorBrewer
+#' @param bw_theme logical value. If TRUE uses the ggplot2 black and white theme.
+#' @param palette character string indicating the name of the RColorBrewer
 #'   palette to use. For a list of available options see the details section in
 #'   \code{\link[RColorBrewer]{RColorBrewer}}.
-#' @param display_count Logical. Indicates whether the missing value counts by
-#'   sample will be displayed on the bar plot. The default is TRUE.
-#' @param coordinate_flip Logical. Indicates whether the x and y axes will be
-#'   flipped. The default is FALSE.
-#' @param use_VizSampNames Logical. Indicates whether to use custom sample
+#' @param display_count logical value. Indicates whether the missing value
+#'   counts by sample will be displayed on the bar plot. The default is TRUE.
+#' @param coordinate_flip logical value. Indicates whether the x and y axes will
+#'   be flipped. The default is FALSE.
+#' @param use_VizSampNames logical value. Indicates whether to use custom sample
 #'   names. The default is FALSE.
 #'
-#' @return plots ggplot2 object
+#' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
+#'   interactive is TRUE
 #'
 #' @details This function takes in an object of class naRes and creates either a
 #'   bar or scatter plot of missing values. When plot_type = 'bar', a sample
@@ -921,12 +911,8 @@ plot.SPANSRes <- function (SPANSRes_obj, interactive = FALSE,
 #' @examples
 #' \dontrun{
 #' library(pmartRdata)
-#'
-#' data("lipid_object")
-#'
-#' result<- missingval_result(lipid_object)
-#'
-#' plot(result, plog_type = "bar", x_lab_angle = 50)
+#' result <- missingval_result(lipid_neg_object)
+#' plot(naRes_obj = result, omicsData = lipid_neg_object, plot_type = "bar", x_lab_angle = 50)
 #' }
 #'
 #' @rdname plot-naRes
@@ -1354,57 +1340,71 @@ na_scatter <- function (edata, group_df, na.by.sample, num_missing_vals,
 
 }
 
-#' plot.corRes
+#' Plot corRes Object
 #'
 #' For plotting an S3 object of type 'corRes'
 #'
-#' @param corRes_obj An object of class "corRes" created by calling
-#'   \code{cor_result} on an omicsData object.
+#' @param corRes_obj An object of class "corRes" created via \code{cor_result}
 #' @param omicsData an object of the class 'pepData', 'isobaricpepData',
-#'   'proData', 'lipidData', 'metabData', or 'nmrData' usually created by
+#'   'proData', 'lipidData', 'metabData', 'nmrData' or 'seqData' created via
 #'   \code{\link{as.pepData}}, \code{\link{as.isobaricpepData}},
 #'   \code{\link{as.proData}}, \code{\link{as.lipidData}},
-#'   \code{\link{as.metabData}}, or\code{\link{as.nmrData}}, respectively.
-#' @param order_by A character string specifying a main effect by which to order
+#'   \code{\link{as.metabData}}, \code{\link{as.nmrData}}, or
+#'   \code{\link{as.seqData}}, respectively.
+#' @param order_by character string specifying a main effect by which to order
 #'   the correlation heat map. This main effect must be found in the column
 #'   names of f_data in the omicsData object. If \code{order_by} is "Group", the
 #'   correlation heat map will be ordered by the group variable from the
 #'   group_designation function. If NULL (default), the correlation heat map
 #'   will be displayed in the order the samples appear in the data.
-#' @param x_text Logical. Indicates whether the x-axis will be labeled with the
-#'   sample names. The default is TRUE.
-#' @param y_text Logical. Indicates whether the y-axis will be labeled with the
-#'   sample names. The default is TRUE.
+#' @param x_text logical value. Indicates whether the x-axis will be labeled
+#'   with the sample names. The default is TRUE.
+#' @param y_text logical value. Indicates whether the y-axis will be labeled
+#'   with the sample names. The default is TRUE.
 #' @param colorbar_lim A pair of numeric values specifying the minimum and
 #'   maximum values to use in the heat map color bar. Defaults to 'c(NA, NA)',
 #'   in which case ggplot2 automatically sets the minimum and maximum values
 #'   based on the correlation values in the data.
-#'
-#' @param interactive Logical. If TRUE produces an interactive plot.
-#' @param x_lab A character string specifying the x-axis label.
-#' @param y_lab A character string specifying the y-axis label.
-#' @param x_lab_size An integer value indicating the font size for the x-axis.
+#' @param interactive logical value. If TRUE produces an interactive plot.
+#' @param x_lab character string specifying the x-axis label
+#' @param y_lab character string specifying the y-axis label
+#' @param x_lab_size integer value indicating the font size for the x-axis.
 #'   The default is 11.
-#' @param y_lab_size An integer value indicating the font size for the y-axis.
+#' @param y_lab_size integer value indicating the font size for the y-axis.
 #'   The default is 11.
-#' @param x_lab_angle An integer value indicating the angle of x-axis labels.
+#' @param x_lab_angle integer value indicating the angle of x-axis labels.
 #'   The default is 90.
-#' @param title_lab A character string specifying the plot title.
-#' @param title_lab_size An integer value indicating the font size of the plot
+#' @param title_lab character string specifying the plot title
+#' @param title_lab_size integer value indicating the font size of the plot
 #'   title. The default is 14.
-#' @param legend_lab A character string specifying the legend title.
-#' @param legend_position A character string specifying the position of the
+#' @param legend_lab character string specifying the legend title.
+#' @param legend_position character string specifying the position of the
 #'   legend. Can be one of "right", "left", "top", "bottom", or "none". The
 #'   default is "none".
-#' @param color_low A character string specifying the color of the gradient for
-#'   low values.
-#' @param color_high A character string specifying the color of the gradient for
-#'   high values.
-#' @param bw_theme Logical. If TRUE uses the ggplot2 black and white theme.
-#' @param use_VizSampNames Logical. Indicates whether to use custom sample
+#' @param color_low character string specifying the color of the gradient for
+#'   low values
+#' @param color_high character string specifying the color of the gradient for
+#'   high values
+#' @param bw_theme logical value. If TRUE uses the ggplot2 black and white theme.
+#' @param use_VizSampNames logical value. Indicates whether to use custom sample
 #'   names. The default is FALSE.
+#'   
+#' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
+#'   interactive is TRUE   
 #'
 #' @rdname plot-corRes
+#' 
+#' @examples 
+#' \dontrun{
+#' library(pmartRdata)
+#' mymetab <- edata_transform(omicsData = metab_object, data_scale = "log2")
+#' mymetab <- group_designation(omicsData = mymetab, main_effects = "Phenotype")
+#' my_correlation <- cor_result(omicsData = mymetab)
+#' plot(my_correlation, omicsData = mymetab, order_by = "Phenotype")
+#' 
+#' myseq_correlation <- cor_result(omicsData = rnaseq_object)
+#' plot(myseq_correlation)
+#' }
 #'
 #' @export
 #'
@@ -1663,38 +1663,55 @@ plot.corRes <- function (corRes_obj, omicsData = NULL, order_by = NULL,
 
 }
 
-#' plot.dimRes
+#' Plot dimRes Object
 #'
 #' For plotting an S3 object of type 'dimRes'
 #'
-#' @param dimRes_obj An object of class dimRes. A dimRes object is created by
-#'   the \code{dim_reduction} function.
+#' @param dimRes_obj object of class dimRes created by the \code{dim_reduction}
+#'   function
 #'
-#' @param interactive Logical. If TRUE produces an interactive plot.
-#' @param x_lab A character string specifying the x-axis label.
-#' @param y_lab A character string specifying the y-axis label. The default is
+#' @param interactive logical value. If TRUE produces an interactive plot.
+#' @param x_lab character string specifying the x-axis label
+#' @param y_lab character string specifying the y-axis label. The default is
 #'   NULL in which case the y-axis label will be the metric selected for the
 #'   \code{metric} argument.
-#' @param x_lab_size An integer value indicating the font size for the x-axis.
+#' @param x_lab_size integer value indicating the font size for the x-axis.
 #'   The default is 11.
-#' @param y_lab_size An integer value indicating the font size for the y-axis.
+#' @param y_lab_size integer value indicating the font size for the y-axis.
 #'   The default is 11.
-#' @param x_lab_angle An integer value indicating the angle of x-axis labels.
+#' @param x_lab_angle integer value indicating the angle of x-axis labels.
 #'   The default is 0.
-#' @param title_lab A character string specifying the plot title.
-#' @param title_lab_size An integer value indicating the font size of the plot
+#' @param title_lab character string specifying the plot title
+#' @param title_lab_size integer value indicating the font size of the plot
 #'   title. The default is 14.
-#' @param legend_lab A character string specifying the legend title.
-#' @param legend_position A character string specifying the position of the
+#' @param legend_lab character string specifying the legend title
+#' @param legend_position character string specifying the position of the
 #'   legend. Can be one of "right", "left", "top", "bottom", or "none". The
 #'   default is "none".
 #' @param point_size An integer specifying the size of the points. The default
 #'   is 4.
-#' @param bw_theme Logical. If TRUE uses the ggplot2 black and white theme.
-#' @param palette A character string indicating the name of the RColorBrewer
+#' @param bw_theme logical value. If TRUE uses the ggplot2 black and white theme.
+#' @param palette character string indicating the name of the RColorBrewer
 #'   palette to use. For a list of available options see the details section in
 #'   \code{\link[RColorBrewer]{RColorBrewer}}.
 #'
+#' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
+#'   interactive is TRUE
+#'   
+#' @examples 
+#' \dontrun{
+#' library(pmartRdata)
+#' 
+#' mylipid <- edata_transform(omicsData = lipid_neg_object, data_scale="log2")
+#' mylipid <- group_designation(omicsData = mylipid, main_effects = "Virus")
+#' pca_lipids <- dim_reduction(omicsData = mylipid)
+#' plot(pca_lipids)
+#' 
+#' myseq <- group_designation(omicsData = rnaseq_object, main_effects = "Virus")
+#' pca_seq <- dim_reduction(omicsData = myseq)
+#' plot(pca_seq)
+#' }
+#'   
 #' @rdname plot-dimRes
 #'
 #' @export
@@ -1923,54 +1940,56 @@ plot.dimRes <- function (dimRes_obj, interactive = FALSE, x_lab = NULL,
 
 }
 
-#' plot.moleculeFilt
+#' Plot moleculeFilt Object
 #'
 #' For plotting an S3 object of type 'moleculeFilt':
 #'
-#' @param filter_obj An object of class moleculeFilt that contains the molecule
+#' @param filter_object object of class moleculeFilt that contains the molecule
 #'   identifier and the number of samples for which the molecule was measured
-#'   (not NA).
+#'   (not NA)
 #' @param min_num An integer specifying the minimum number of samples in which a
 #'   biomolecule must appear. If a value is specified, a horizontal line will be
 #'   drawn when \code{cumulative=TRUE}, and bars will be colored appropriately
-#'   if \code{cumulative=FALSE}.  Defaults to NULL.
+#'   if \code{cumulative=FALSE}. Defaults to NULL.
 #' @param cumulative logical indicating whether the number of biomolecules
 #'   observed in \emph{at least} (TRUE) x number of samples or \emph{exactly}
 #'   (FALSE) x number of samples should be plotted.  Defaults to TRUE.
-#'
-#' @param interactive Logical. If TRUE produces an interactive plot.
-#' @param x_lab A character string specifying the x-axis label.
-#' @param y_lab A character string specifying the y-axis label. The default is
+#' @param interactive logical value. If TRUE produces an interactive plot.
+#' @param x_lab character string specifying the x-axis label
+#' @param y_lab character string specifying the y-axis label. The default is
 #'   NULL in which case the y-axis label will be the metric selected for the
 #'   \code{metric} argument.
-#' @param x_lab_size An integer value indicating the font size for the x-axis.
+#' @param x_lab_size integer value indicating the font size for the x-axis.
 #'   The default is 11.
-#' @param y_lab_size An integer value indicating the font size for the y-axis.
+#' @param y_lab_size integer value indicating the font size for the y-axis.
 #'   The default is 11.
-#' @param x_lab_angle An integer value indicating the angle of x-axis labels.
+#' @param x_lab_angle integer value indicating the angle of x-axis labels.
 #'   The default is 0.
-#' @param title_lab A character string specifying the plot title.
-#' @param title_lab_size An integer value indicating the font size of the plot
+#' @param title_lab character string specifying the plot title
+#' @param title_lab_size integer value indicating the font size of the plot
 #'   title. The default is 14.
-#' @param legend_lab A character string specifying the legend title.
-#' @param legend_position A character string specifying the position of the
+#' @param legend_lab character string specifying the legend title.
+#' @param legend_position character string specifying the position of the
 #'   legend. Can be one of "right", "left", "top", "bottom", or "none". The
 #'   default is "none".
-#' @param text_size An integer specifying the size of the text (number of
+#' @param text_size integer specifying the size of the text (number of
 #'   biomolecules by sample) within the bar plot. The default is 3.
-#' @param bar_width An integer indicating the width of the bars in the bar plot.
+#' @param bar_width integer indicating the width of the bars in the bar plot.
 #'   The default is 0.8.
-#' @param bw_theme Logical. If TRUE uses the ggplot2 black and white theme.
-#' @param palette A character string indicating the name of the RColorBrewer
+#' @param bw_theme logical value. If TRUE uses the ggplot2 black and white theme.
+#' @param palette character string indicating the name of the RColorBrewer
 #'   palette to use. For a list of available options see the details section in
 #'   \code{\link[RColorBrewer]{RColorBrewer}}.
-#' @param display_count Logical. Indicates whether the missing value counts by
+#' @param display_count logical value. Indicates whether the missing value counts by
 #'   sample will be displayed on the bar plot. The default is TRUE.
 #'
+#' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
+#'   interactive is TRUE
+#'   
 #' @examples
 #' \dontrun{
 #' data(pep_object)
-#' molfilt <- molecule_filter(pep_object)
+#' molfilt <- molecule_filter(omicsData = pep_object)
 #' plot(molfilt, min_num = 5)
 #' plot(molfilt, min_num = 3, cumulative = FALSE)
 #' }
@@ -1979,7 +1998,7 @@ plot.dimRes <- function (dimRes_obj, interactive = FALSE, x_lab = NULL,
 #'
 #' @export
 #'
-plot.moleculeFilt <- function (filter_obj, min_num = NULL, cumulative = TRUE,
+plot.moleculeFilt <- function (filter_object, min_num = NULL, cumulative = TRUE,
                                interactive = FALSE, x_lab = NULL, y_lab = NULL,
                                x_lab_size = 11, y_lab_size = 11,
                                x_lab_angle = 0, title_lab = NULL,
@@ -1991,10 +2010,10 @@ plot.moleculeFilt <- function (filter_obj, min_num = NULL, cumulative = TRUE,
   # Preliminaries --------------------------------------------------------------
 
   # Have a looksie at the class of the filter object.
-  if (!inherits(filter_obj, "moleculeFilt")) {
+  if (!inherits(filter_object, "moleculeFilt")) {
 
     # Fezzik, tear his arms off.
-    stop ("filter_obj must be of class moleculeFilt")
+    stop ("filter_object must be of class moleculeFilt")
 
   }
 
@@ -2023,19 +2042,19 @@ plot.moleculeFilt <- function (filter_obj, min_num = NULL, cumulative = TRUE,
   fill <- 0
   hline <- NULL
   # create a TRUE/FALSE for if we are working with batch or not
-  use_batch <- attributes(filter_obj)$use_batch
-  use_groups <- attributes(filter_obj)$use_groups
+  use_batch <- attributes(filter_object)$use_batch
+  use_groups <- attributes(filter_object)$use_groups
 
   if(cumulative) {
     # cumulative counts (>=)
-    counts <- sapply(1:max(filter_obj$Num_Observations), function(i){
-      filter_obj[filter_obj$Num_Observations >= i,]$Num_Observations %>% length()
+    counts <- sapply(1:max(filter_object$Num_Observations), function(i){
+      filter_object[filter_object$Num_Observations >= i,]$Num_Observations %>% length()
     })
 
     # append 1 to extend last step (looks awkward without this)
     counts <- c(counts, counts[length(counts)])
     # 1 appended step
-    num_obs <- 1:(max(filter_obj$Num_Observations)+1)
+    num_obs <- 1:(max(filter_object$Num_Observations)+1)
 
     # shape is a step function with fixed color
     shape <- ggplot2::geom_step(ggplot2::aes(x = num_observations,
@@ -2070,15 +2089,15 @@ plot.moleculeFilt <- function (filter_obj, min_num = NULL, cumulative = TRUE,
   } else if (!cumulative) {
 
     # counts for a specific number of nonmissing biomolecules (==)
-    counts <- sapply(1:max(filter_obj$Num_Observations), function (i) {
-      filter_obj[filter_obj$Num_Observations == i, ]$Num_Observations %>%
+    counts <- sapply(1:max(filter_object$Num_Observations), function (i) {
+      filter_object[filter_object$Num_Observations == i, ]$Num_Observations %>%
         length()
     })
 
     # color by which values are kept if min_num is specified
     if (!is.null(min_num)){
 
-      fill <- ifelse(1:max(filter_obj$Num_Observations) >= min_num,
+      fill <- ifelse(1:max(filter_object$Num_Observations) >= min_num,
                      "retained",
                      "dropped")
       shape <- ggplot2::geom_bar(ggplot2::aes(x = num_observations,
@@ -2113,7 +2132,7 @@ plot.moleculeFilt <- function (filter_obj, min_num = NULL, cumulative = TRUE,
 
     }
 
-    num_obs <- 1:max(filter_obj$Num_Observations)
+    num_obs <- 1:max(filter_object$Num_Observations)
 
     xlabel <- if (is.null(x_lab)) "Number of samples" else x_lab
     ylabel <- ifelse(is.null(y_lab), "Count of Biomolecules", y_lab)
@@ -2137,14 +2156,14 @@ plot.moleculeFilt <- function (filter_obj, min_num = NULL, cumulative = TRUE,
     ggplot2::xlab(xlabel) +
     ggplot2::ylab(ylabel) +
     ggplot2::ggtitle(plot_title) +
-    ggplot2::scale_x_continuous(breaks = max(filter_obj$Num_Observations):1)
+    ggplot2::scale_x_continuous(breaks = max(filter_object$Num_Observations):1)
 
   # Evan, make me a plot with the black and white theme. As you wish.
   if (bw_theme) p <- p + ggplot2::theme_bw()
 
   # Evan, display the biomolecule counts on the graph. As you wish.
   if (display_count) p <- p + ggplot2::geom_text(
-    data = pep_observation_counts[1:max(filter_obj$Num_Observations),],
+    data = pep_observation_counts[1:max(filter_object$Num_Observations),],
     ggplot2::aes(x = num_observations,
                  y = frequency_counts,
                  label = frequency_counts),
@@ -2189,47 +2208,49 @@ plot.moleculeFilt <- function (filter_obj, min_num = NULL, cumulative = TRUE,
 }
 
 
-#' plot.totalCountFilt
+#' Plot totalCountFilt Object
 #'
 #' For plotting an S3 object of type 'totalCountFilt':
 #'
-#' @param filter_obj An object of class totalCountFilt that contains the molecule
+#' @param filter_object object of class totalCountFilt that contains the molecule
 #'   identifier and the number of total counts for which the molecule was measured
 #'   (not NA).
-#' @param min_count An integer specifying the minimum number of samples in which a
+#' @param min_count integer specifying the minimum number of samples in which a
 #'   biomolecule must appear. Defaults to NULL.
-#'
-#' @param interactive Logical. If TRUE produces an interactive plot.
-#' @param x_lab A character string specifying the x-axis label.
-#' @param y_lab A character string specifying the y-axis label. The default is
+#' @param interactive logical value. If TRUE produces an interactive plot.
+#' @param x_lab character string specifying the x-axis label
+#' @param y_lab character string specifying the y-axis label. The default is
 #'   NULL in which case the y-axis label will be the metric selected for the
 #'   \code{metric} argument.
-#' @param x_lab_size An integer value indicating the font size for the x-axis.
+#' @param x_lab_size integer value indicating the font size for the x-axis.
 #'   The default is 11.
-#' @param y_lab_size An integer value indicating the font size for the y-axis.
+#' @param y_lab_size integer value indicating the font size for the y-axis.
 #'   The default is 11.
-#' @param x_lab_angle An integer value indicating the angle of x-axis labels.
+#' @param x_lab_angle integer value indicating the angle of x-axis labels.
 #'   The default is 0.
-#' @param title_lab A character string specifying the plot title.
-#' @param title_lab_size An integer value indicating the font size of the plot
+#' @param title_lab character string specifying the plot title
+#' @param title_lab_size integer value indicating the font size of the plot
 #'   title. The default is 14.
-#' @param legend_lab A character string specifying the legend title.
-#' @param legend_position A character string specifying the position of the
+#' @param legend_lab character string specifying the legend title
+#' @param legend_position character string specifying the position of the
 #'   legend. Can be one of "right", "left", "top", "bottom", or "none". The
 #'   default is "none".
-#' @param text_size An integer specifying the size of the text (number of
+#' @param text_size integer specifying the size of the text (number of
 #'   biomolecules by sample) within the bar plot. The default is 3.
-#' @param bar_width An integer indicating the width of the bars in the bar plot.
+#' @param bar_width integer indicating the width of the bars in the bar plot.
 #'   The default is 0.8.
-#' @param bw_theme Logical. If TRUE uses the ggplot2 black and white theme.
-#' @param palette A character string indicating the name of the RColorBrewer
+#' @param bw_theme logical value. If TRUE uses the ggplot2 black and white theme.
+#' @param palette character string indicating the name of the RColorBrewer
 #'   palette to use. For a list of available options see the details section in
 #'   \code{\link[RColorBrewer]{RColorBrewer}}.
 #'
+#' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
+#'   interactive is TRUE
+#'   
 #' @examples
 #' \dontrun{
-#' data(seq_object)
-#' seqfilt <- total_count_filter(pep_object)
+#' library(pmartRdata)
+#' seqfilt <- total_count_filter(omicsData = rnaseq_object)
 #' plot(seqfilt, min_count = 5)
 #' }
 #'
@@ -2237,7 +2258,7 @@ plot.moleculeFilt <- function (filter_obj, min_num = NULL, cumulative = TRUE,
 #'
 #' @export
 #'
-plot.totalCountFilt <- function (filter_obj, min_count = NULL,
+plot.totalCountFilt <- function (filter_object, min_count = NULL,
                                interactive = FALSE, x_lab = NULL, y_lab = NULL,
                                x_lab_size = 11, y_lab_size = 11,
                                x_lab_angle = 0, title_lab = NULL,
@@ -2246,16 +2267,16 @@ plot.totalCountFilt <- function (filter_obj, min_count = NULL,
                                bar_width = 0.8, bw_theme = TRUE,
                                palette = NULL) {
   
-  # @param log_total_counts Logical. Indicates if the X-axis should be on
+  # @param log_total_counts logical value. Indicates if the X-axis should be on
   #   the log scale. The default is TRUE.
   
   # Preliminaries --------------------------------------------------------------
 
   # Have a looksie at the class of the filter object.
-  if (!inherits(filter_obj, "totalCountFilt")) {
+  if (!inherits(filter_object, "totalCountFilt")) {
     
     # Fezzik, tear his arms off.
-    stop ("filter_obj must be of class totalCountFilt")
+    stop ("filter_object must be of class totalCountFilt")
     
   }
   
@@ -2285,13 +2306,13 @@ plot.totalCountFilt <- function (filter_obj, min_count = NULL,
   
   # Forge sensational plots ----------------------------------------------------
 
-  plot_data <- attr(filter_obj, "e_data_lcpm")
+  plot_data <- attr(filter_object, "e_data_lcpm")
   title_default <- "Observation Density by LCPM"
   if(!is.null(min_count)){
-    biomols <- filter_obj[[1]][filter_obj$Total_Counts >= min_count]
+    biomols <- filter_object[[1]][filter_object$Total_Counts >= min_count]
     if(length(biomols) == 0) stop(
       "min_count exceeds maximum total count (", 
-      max(filter_obj$Total_Counts), ")"
+      max(filter_object$Total_Counts), ")"
       )
     plot_data <- plot_data[plot_data[[1]] %in% biomols,]
     subtitle <- paste0(min_count, "+ total counts per transcript")
@@ -2345,60 +2366,63 @@ plot.totalCountFilt <- function (filter_obj, min_count = NULL,
   
 }
 
-#' plot.RNAFilt
+#' Plot RNAFilt Object
 #'
-#' For plotting an S3 object of type 'RNAFilt':
+#' For plotting an S3 object of type 'RNAFilt'
 #'
-#' @param filter_obj An object of class RNAFilt that contains the sample
+#' @param filter_object object of class RNAFilt that contains the sample
 #'   identifier, library size, number of non-zero biomolecules, and proportion 
-#'   of non-zero biomolecules.
-#' @param plot_type Character string, specified as "library" or "biomolecule".
+#'   of non-zero biomolecules
+#' @param plot_type character string, specified as "library" or "biomolecule".
 #' "library" displays library size for each sample, "biomolecule" displays the 
 #' number of unique biomolecules with non-zero counts per sample.
-#' @param min_nonzero Integer or float between 0 and 1. Cut-off for number of 
+#' @param min_nonzero integer or float between 0 and 1. Cut-off for number of 
 #' unique biomolecules with non-zero counts or as a proportion of total 
 #' biomolecules. Defaults to NULL.
-#' @param size_library Integer. Cut-off for sample library size (i.e. number 
+#' @param size_library integer cut-off for sample library size (i.e. number 
 #' of reads). Defaults to NULL.
-#' @param interactive Logical. If TRUE produces an interactive plot.
-#' @param x_lab A character string specifying the x-axis label.
-#' @param y_lab A character string specifying the y-axis label. The default is
+#' @param interactive logical value. If TRUE produces an interactive plot.
+#' @param x_lab character string specifying the x-axis label
+#' @param y_lab character string specifying the y-axis label. The default is
 #'   NULL in which case the y-axis label will be the metric selected for the
 #'   \code{metric} argument.
-#' @param x_lab_size An integer value indicating the font size for the x-axis.
+#' @param x_lab_size integer value indicating the font size for the x-axis.
 #'   The default is 11.
-#' @param y_lab_size An integer value indicating the font size for the y-axis.
+#' @param y_lab_size integer value indicating the font size for the y-axis.
 #'   The default is 11.
-#' @param x_lab_angle An integer value indicating the angle of x-axis labels.
+#' @param x_lab_angle integer value indicating the angle of x-axis labels.
 #'   The default is 0.
-#' @param title_lab A character string specifying the plot title.
-#' @param title_lab_size An integer value indicating the font size of the plot
+#' @param title_lab character string specifying the plot title
+#' @param title_lab_size integer value indicating the font size of the plot
 #'   title. The default is 14.
-#' @param legend_lab A character string specifying the legend title.
-#' @param legend_position A character string specifying the position of the
+#' @param legend_lab character string specifying the legend title
+#' @param legend_position character string specifying the position of the
 #'   legend. Can be one of "right", "left", "top", "bottom", or "none". The
 #'   default is "none".
 #' @param text_size An integer specifying the size of the text (number of
 #'   biomolecules by sample) within the bar plot. The default is 3.
 #' @param bar_width An integer indicating the width of the bars in the bar plot.
 #'   The default is 0.8.
-#' @param bw_theme Logical. If TRUE uses the ggplot2 black and white theme.
-#' @param palette A character string indicating the name of the RColorBrewer
+#' @param bw_theme logical value. If TRUE uses the ggplot2 black and white theme.
+#' @param palette character string indicating the name of the RColorBrewer
 #'   palette to use. For a list of available options see the details section in
 #'   \code{\link[RColorBrewer]{RColorBrewer}}.
-#'
+#' 
+#' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
+#'   interactive is TRUE
+#'   
 #' @examples
 #' \dontrun{
-#' data(seq_object)
-#' seqfilt <- total_count_filter(pep_object)
-#' plot(seqfilt, min_count = 5)
+#' library(pmartRdata)
+#' seqfilt <- RNA_filter(omicsData = rnaseq_object)
+#' plot(seqfilt)
 #' }
 #'
 #' @rdname plot-RNAFilt
 #'
 #' @export
 #'
-plot.RNAFilt <- function (filter_obj, plot_type = "library",
+plot.RNAFilt <- function (filter_object, plot_type = "library",
                           size_library = NULL, min_nonzero = NULL, 
                           interactive = FALSE, 
                           x_lab = NULL, y_lab = NULL,
@@ -2409,16 +2433,16 @@ plot.RNAFilt <- function (filter_obj, plot_type = "library",
                           bar_width = 0.8, bw_theme = TRUE,
                           palette = NULL) {
   
-  # @param log_total_counts Logical. Indicates if the X-axis should be on
+  # @param log_total_counts logical value. Indicates if the X-axis should be on
   #   the log scale. The default is TRUE.
   
   # Preliminaries --------------------------------------------------------------
   
   # Have a looksie at the class of the filter object.
-  if (!inherits(filter_obj, "RNAFilt")) {
+  if (!inherits(filter_object, "RNAFilt")) {
     
     # Fezzik, tear his arms off.
-    stop ("filter_obj must be of class RNAFilt")
+    stop ("filter_object must be of class RNAFilt")
     
   }
   
@@ -2449,12 +2473,12 @@ plot.RNAFilt <- function (filter_obj, plot_type = "library",
   if(!is.null(size_library) && 
     (length(size_library) > 1 || 
      size_library%%1 != 0 ||
-     size_library > max(filter_obj$LibrarySize)
+     size_library > max(filter_object$LibrarySize)
      )
     ) stop(
       paste0(
         "size_library must be integer of length 1 less than max library size (",
-        max(filter_obj$LibrarySize),
+        max(filter_object$LibrarySize),
         ")"
         )
     )
@@ -2470,18 +2494,18 @@ plot.RNAFilt <- function (filter_obj, plot_type = "library",
            "min_nonzero must be integer or numeric between 0 and 1.")
     
     ## Within appropriate bounds
-    if(min_nonzero%%1 == 0 && min_nonzero > max(filter_obj$NonZero)) stop(
+    if(min_nonzero%%1 == 0 && min_nonzero > max(filter_object$NonZero)) stop(
       paste0("min_nonzero exceeds maximum number of non-zero biomolecules (",
-             max(filter_obj$NonZero),
+             max(filter_object$NonZero),
              ")"
              )
     )
 
     if(min_nonzero%%1 != 0 && 
-       min_nonzero > max(filter_obj$ProportionNonZero)) stop(
+       min_nonzero > max(filter_object$ProportionNonZero)) stop(
       paste0(
         "min_nonzero exceeds maximum proportion of non-zero biomolecules (",
-        signif(max(filter_obj$ProportionNonZero)), 
+        signif(max(filter_object$ProportionNonZero)), 
         ")")
     )
     
@@ -2531,7 +2555,7 @@ plot.RNAFilt <- function (filter_obj, plot_type = "library",
     c(Keep = "deepskyblue3", Remove = "tomato")
   }
   
-  temp_obj <- filter_obj
+  temp_obj <- filter_object
   temp_obj$keep_nz <- T
   temp_obj$keep_sz <- T
   
@@ -2570,7 +2594,7 @@ plot.RNAFilt <- function (filter_obj, plot_type = "library",
       
   } else {
     
-    mt <- round(filter_obj$NonZero[[1]]/filter_obj$ProportionNonZero[[1]])
+    mt <- round(filter_object$NonZero[[1]]/filter_object$ProportionNonZero[[1]])
     
     p <- ggplot2::ggplot(
       temp_obj, ggplot2::aes(x=SampleID, y = NonZero, fill = color)) + 
@@ -2616,54 +2640,64 @@ plot.RNAFilt <- function (filter_obj, plot_type = "library",
 }
 
 
-#' plot.imdanovaFilt
+#' Plot imdanovaFilt Object
 #'
 #' For plotting an S3 object of type 'imdanovaFilt'
 #'
-#' @param filter_obj Object of class imdanovaFilt (also a data frame) containing
+#' @param filter_object Object of class imdanovaFilt (also a data frame) containing
 #'   the molecule identifier and number of samples in each group with
-#'   non-missing values for that molecule.
+#'   non-missing values for that molecule
 #' @param min_nonmiss_gtest An integer indicating the minimum number of
 #'   non-missing feature values allowed per group for \code{gtest_filter}.
 #'   Suggested value is 3.
 #' @param min_nonmiss_anova An integer indicating the minimum number of
 #'   non-missing feature values allowed per group for \code{anova_filter}.
 #'   Suggested value is 2.
-#'
-#' @param interactive Logical. If TRUE produces an interactive plot.
-#' @param x_lab A character string specifying the x-axis label.
-#' @param y_lab A character string specifying the y-axis label.
-#' @param x_lab_size An integer value indicating the font size for the x-axis.
+#' @param interactive logical value. If TRUE produces an interactive plot.
+#' @param x_lab character string specifying the x-axis label
+#' @param y_lab character string specifying the y-axis label
+#' @param x_lab_size integer value indicating the font size for the x-axis.
 #'   The default is 11.
-#' @param y_lab_size An integer value indicating the font size for the y-axis.
+#' @param y_lab_size integer value indicating the font size for the y-axis.
 #'   The default is 11.
-#' @param x_lab_angle An integer value indicating the angle of x-axis labels.
+#' @param x_lab_angle integer value indicating the angle of x-axis labels.
 #'   The default is 0.
-#' @param title_lab A character string specifying the plot title.
-#' @param title_lab_size An integer value indicating the font size of the plot
+#' @param title_lab character string specifying the plot title.
+#' @param title_lab_size integer value indicating the font size of the plot
 #'   title. The default is 14.
-#' @param legend_lab A character string specifying the legend title.
-#' @param legend_position A character string specifying the position of the
+#' @param legend_lab character string specifying the legend title.
+#' @param legend_position character string specifying the position of the
 #'   legend. Can be one of "right", "left", "top", "bottom", or "none". The
 #'   default is "none".
-#' @param point_size An integer specifying the size of the points. The default
+#' @param point_size integer specifying the size of the points. The default
 #'   is 3.
-#' @param line_size An integer specifying the thickness of the line. The default
+#' @param line_size integer specifying the thickness of the line. The default
 #'   is 0.75.
-#' @param text_size An integer specifying the size of the text (number of
+#' @param text_size integer specifying the size of the text (number of
 #'   biomolecules per group). The default is 3.
-#' @param bw_theme Logical. If TRUE uses the ggplot2 black and white theme.
-#' @param palette A character string indicating the name of the RColorBrewer
+#' @param bw_theme logical value. If TRUE uses the ggplot2 black and white theme.
+#' @param palette character string indicating the name of the RColorBrewer
 #'   palette to use. For a list of available options see the details section in
 #'   \code{\link[RColorBrewer]{RColorBrewer}}.
-#' @param display_count Logical. Indicates whether the missing value counts by
+#' @param display_count logical value. Indicates whether the missing value counts by
 #'   sample will be displayed on the bar plot. The default is TRUE.
-#'
+#' 
+#' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
+#'   interactive is TRUE
+#'   
+#' @examples
+#' \dontrun{
+#' library(pmartRdata)
+#' mypep <- group_designation(omicsData = pep_object, main_effects = "Phenotype")
+#' to_filter <- imdanova_filter(omicsData = mypep)
+#' plot(to_filter, min_nonmiss_anova = 2)  
+#' } 
+#'   
 #' @rdname plot-imdanovaFilt
 #'
 #' @export
 #'
-plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
+plot.imdanovaFilt <- function (filter_object, min_nonmiss_anova = NULL,
                                min_nonmiss_gtest = NULL, interactive = FALSE,
                                x_lab = NULL, y_lab = NULL, x_lab_size = 11,
                                y_lab_size = 11, x_lab_angle = 0,
@@ -2676,10 +2710,10 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
   # Preliminaries --------------------------------------------------------------
 
   # Have a looksie at the class of the filter object.
-  if (!inherits(filter_obj, "imdanovaFilt")) {
+  if (!inherits(filter_object, "imdanovaFilt")) {
 
-    # You used the wrong input for filter_obj. Savvy?
-    stop ("filter_obj must be of class imdanovaFilt")
+    # You used the wrong input for filter_object. Savvy?
+    stop ("filter_object must be of class imdanovaFilt")
 
   }
 
@@ -2701,10 +2735,10 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
   }
 
   # Nab group size minimum that is not a singleton
-  group_sizes <- attr(filter_obj, "group_sizes")$n_group
+  group_sizes <- attr(filter_object, "group_sizes")$n_group
   group_sizes_valid <- group_sizes[group_sizes > 1]
   max_x <- min(group_sizes_valid)
-  obs <- as.data.frame(filter_obj)[-1]
+  obs <- as.data.frame(filter_object)[-1]
 
   # Count number of groups in each row of the obs data frame that have > 0, > 1,
   # ..., > max_x non-missing values. For ANOVA we need at least two groups that
@@ -2993,15 +3027,15 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
 
 }
 
-#' plot.proteomicsFilt
+#' Plot proteomicsFilt Object
 #'
 #' For plotting an S3 object of type 'proteomicsFilt':
 #'
-#' @param filter_obj Object of class proteomicsFilt which is a list containing
-#'   two elements. The first element is a data frame with the counts of proteins
-#'   mapping to each peptide. The second element is also a data frame with the
-#'   counts of peptides mapping to each protein.
-#' @param plot_type A character string specifying the type of plot to be
+#' @param filter_object object of class proteomicsFilt, which is a list with two
+#'   elements. The first element is a data frame of counts for each unique
+#'   peptide. The second element is a data frame with the counts for the number
+#'   of peptides that map to each unique protein.
+#' @param plot_type character string specifying the type of plot to be
 #'   displayed. The available options are "num_peps" or "redundancy". If
 #'   "num_peps" the plot is displayed that shows the counts of proteins that
 #'   have a specific number of peptides mapping to them. If "redundancy" the
@@ -3012,34 +3046,33 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
 #'   the minimum number of peptides that must map to a protein. Any protein with
 #'   less than \code{min_num_peps} mapping to it will be returned as a protein
 #'   that should be filtered. Default value is NULL.
-#'
-#' @param interactive Logical. If TRUE produces an interactive plot.
-#' @param x_lab_pep A character string used for the x-axis label for the
+#' @param interactive logical value. If TRUE produces an interactive plot.
+#' @param x_lab_pep character string used for the x-axis label for the
 #'   num_peps plot. The default is NULL in which case the default x-axis label
 #'   will be used.
-#' @param x_lab_pro A character string used for the x-axis label for the
+#' @param x_lab_pro character string used for the x-axis label for the
 #'   redundancy plot. The default is NULL in which case the default x-axis label
 #'   will be used.
-#' @param y_lab_pep A character string used for the y-axis label for the
+#' @param y_lab_pep character string used for the y-axis label for the
 #'   num_peps plot. The default is NULL in which case the default y-axis label
 #'   will be used.
-#' @param y_lab_pro A character string used for the y-axis label for the
+#' @param y_lab_pro character string used for the y-axis label for the
 #'   redundancy plot. The default is NULL in which case the default y-axis label
 #'   will be used.
-#' @param x_lab_size An integer value indicating the font size for the x-axis.
+#' @param x_lab_size integer value indicating the font size for the x-axis.
 #'   The default is 11.
-#' @param y_lab_size An integer value indicating the font size for the y-axis.
+#' @param y_lab_size integer value indicating the font size for the y-axis.
 #'   The default is 11.
-#' @param x_lab_angle An integer value indicating the angle of x-axis labels.
+#' @param x_lab_angle integer value indicating the angle of x-axis labels.
 #'   The default is 0.
-#' @param title_lab_pep A character string specifying the num_peps plot title.
+#' @param title_lab_pep character string specifying the num_peps plot title.
 #'   The default is NULL in which case the default title will be used.
-#' @param title_lab_pro A character string specifying the redundancy plot title.
+#' @param title_lab_pro character string specifying the redundancy plot title.
 #'   The default is NULL in which case the default title will be used.
-#' @param title_lab_size An integer value indicating the font size of the plot
+#' @param title_lab_size integer value indicating the font size of the plot
 #'   title. The default is 14.
-#' @param legend_lab A character string specifying the legend title.
-#' @param legend_position A character string specifying the position of the
+#' @param legend_lab character string specifying the legend title
+#' @param legend_position character string specifying the position of the
 #'   legend. Can be one of "right", "left", "top", "bottom", or "none". The
 #'   default is "none".
 #' @param text_size An integer specifying the size of the text (number of
@@ -3047,25 +3080,28 @@ plot.imdanovaFilt <- function (filter_obj, min_nonmiss_anova = NULL,
 #'   default is 3.
 #' @param bar_width An integer indicating the width of the bars in the bar plot.
 #'   The default is 0.8.
-#' @param bw_theme Logical. If TRUE uses the ggplot2 black and white theme.
-#' @param palette A character string indicating the name of the RColorBrewer
+#' @param bw_theme logical value. If TRUE uses the ggplot2 black and white theme.
+#' @param palette character string indicating the name of the RColorBrewer
 #'   palette to use. For a list of available options see the details section in
 #'   \code{\link[RColorBrewer]{RColorBrewer}}.
-#' @param display_count Logical. Indicates whether the peptide or protein counts
+#' @param display_count logical value. Indicates whether the peptide or protein counts
 #'   will be displayed on the bar plot. The default is TRUE.
 #'
+#' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
+#'   interactive is TRUE
+#'   
 #' @examples
 #' \dontrun{
-#' data(pep_object)
-#' profilt <- proteomics_filter(pep_object)
-#' plot(profilt, min_num_peps = 5)
+#' library(pmartRdata)
+#' my_filter <- proteomics_filter(omicsData = pep_object)
+#' plot(my_filter, min_num_peps = 3)
 #' }
 #'
 #' @rdname plot-proteomicsFilt
 #'
 #' @export
 #'
-plot.proteomicsFilt <- function (filter_obj,
+plot.proteomicsFilt <- function (filter_object,
                                  plot_type = "num_peps",
                                  min_num_peps = NULL,
                                  interactive = FALSE, x_lab_pep = NULL,
@@ -3081,10 +3117,10 @@ plot.proteomicsFilt <- function (filter_obj,
   # Preliminaries --------------------------------------------------------------
 
   # Have a looksie at the class of the filter object.
-  if (!inherits(filter_obj, "proteomicsFilt")) {
+  if (!inherits(filter_object, "proteomicsFilt")) {
 
     # The filter object is the wrong class. Savvy?
-    stop ("filter_obj must be of class proteomicsFilt")
+    stop ("filter_object must be of class proteomicsFilt")
 
   }
 
@@ -3117,7 +3153,7 @@ plot.proteomicsFilt <- function (filter_obj,
     if (length(min_num_peps) != 1)
       stop ("min_num_peps must be of length 1")
     # check that min_num_peps is less than the total number of peptides #
-    if (min_num_peps > max(filter_obj$counts_by_pro$n))
+    if (min_num_peps > max(filter_object$counts_by_pro$n))
       stop (paste("min_num_peps cannot be greater than the maximum number of",
                   "peptides that map to a protein.",
                   sep = " "))
@@ -3132,20 +3168,20 @@ plot.proteomicsFilt <- function (filter_obj,
   # Seize unique values for peptide to protein and protein to peptide counts:
   # These bins represent the number of PROTEINS each peptide maps to. Unless
   # there are degenerate peptides this will be a vector with one value: 1.
-  pep_bins <- sort(unique(filter_obj$counts_by_pep$n))
+  pep_bins <- sort(unique(filter_object$counts_by_pep$n))
   # These bins represent the number of PEPTIDES each protein maps to.
-  pro_bins <- sort(unique(filter_obj$counts_by_pro$n))
+  pro_bins <- sort(unique(filter_object$counts_by_pro$n))
 
   # get counts of peptides that are mapped to by EXACTLY the number of
   # proteins given in pep_bins
   pep_counts <- sapply(pep_bins, function(x){
-    filter_obj$counts_by_pep[filter_obj$counts_by_pep$n == x,] %>% nrow()
+    filter_object$counts_by_pep[filter_object$counts_by_pep$n == x,] %>% nrow()
   })
 
   # get counts of proteins that are mapped to by EXACTLY the number of
   # peptides given in pro_bins
   pro_counts <- sapply(pro_bins, function(x){
-    filter_obj$counts_by_pro[filter_obj$counts_by_pro$n == x, ] %>% nrow()
+    filter_object$counts_by_pro[filter_object$counts_by_pro$n == x, ] %>% nrow()
   })
 
   # fill value and fill labels that will be given real values if certain
@@ -3346,62 +3382,71 @@ plot.proteomicsFilt <- function (filter_obj,
 
 }
 
-#' plot.rmdFilt
+#' Plot rmdFilt Object
 #'
 #' For plotting an S3 object of type 'rmdFilt'
 #'
-#' @param filter_obj An object of class rmdFilt which is a data frame containing
-#'   columns for the sample ID, group, log2 robust Mahalanobis distance,
-#'   p-values, and metrics used to calcualte the robust Mahalanobis distance.
-#' @param pvalue_threshold A threshold for the Robust Mahalanobis Distance (RMD)
+#' @param filter_object object of class rmdFilt created via \code{\link{rmd_filter}}
+#' @param pvalue_threshold numeric threshold for the Robust Mahalanobis Distance (RMD)
 #'   p-value. If \code{sampleID} is NULL (see \code{sampleID} below), a
 #'   horizontal line is plotted at the RMD value that corresponds with the
 #'   threshold, and all samples above the line have a p-value below the
 #'   threshold. If \code{sampleID} is not NULL, \code{pvalue_threshold} will do
 #'   nothing. Default value is NULL.
-#' @param sampleID A character vector specifying the sample names to be plotted.
+#' @param sampleID character vector specifying the sample names to be plotted.
 #'   If specified, the plot function produces a boxplot instead of a
 #'   scatterplot. A point, colored by sample, will be placed on each boxplot for
 #'   that sample's value for the given metric. The default value is NULL.
-#' @param order_by A character string specifying a variable by which to order
+#' @param order_by character string specifying a variable by which to order
 #'   the samples in the plot. This variable must be found in the column names of
 #'   fdata from the rmdFilt object. If \code{order_by} is "Group", the plot will
 #'   be ordered by the group variable from the group_designation function. If
 #'   NULL (default), the samples will be displayed in the order in which they
 #'   first appear.
-#'
-#' @param interactive Logical. If TRUE produces an interactive plot.
-#' @param x_lab A character string specifying the x-axis label.
-#' @param y_lab A character string specifying the y-axis label. The default is
+#' @param interactive logical value. If TRUE produces an interactive plot.
+#' @param x_lab character string specifying the x-axis label
+#' @param y_lab character string specifying the y-axis label. The default is
 #'   NULL in which case the y-axis label will be the metric selected for the
 #'   \code{metric} argument.
-#' @param x_lab_size An integer value indicating the font size for the x-axis.
+#' @param x_lab_size integer value indicating the font size for the x-axis.
 #'   The default is 11.
-#' @param y_lab_size An integer value indicating the font size for the y-axis.
+#' @param y_lab_size integer value indicating the font size for the y-axis.
 #'   The default is 11.
-#' @param x_lab_angle An integer value indicating the angle of x-axis labels.
+#' @param x_lab_angle integer value indicating the angle of x-axis labels.
 #'   The default is 90.
-#' @param title_lab A character string specifying the plot title.
-#' @param title_lab_size An integer value indicating the font size of the plot
+#' @param title_lab character string specifying the plot title.
+#' @param title_lab_size integer value indicating the font size of the plot
 #'   title. The default is 14.
-#' @param legend_lab A character string specifying the legend title.
-#' @param legend_position A character string specifying the position of the
+#' @param legend_lab character string specifying the legend title
+#' @param legend_position character string specifying the position of the
 #'   legend. Can be one of "right", "left", "top", "bottom", or "none". The
 #'   default is "none".
 #' @param point_size An integer specifying the size of the points. The default
 #'   is 3.
-#' @param bw_theme Logical. If TRUE uses the ggplot2 black and white theme.
-#' @param palette A character string indicating the name of the RColorBrewer
+#' @param bw_theme logical value. If TRUE uses the ggplot2 black and white theme.
+#' @param palette character string indicating the name of the RColorBrewer
 #'   palette to use. For a list of available options see the details section in
 #'   \code{\link[RColorBrewer]{RColorBrewer}}.
-#' @param use_VizSampNames Logical. Indicates whether to use custom sample
+#' @param use_VizSampNames logical value. Indicates whether to use custom sample
 #'   names. The default is FALSE.
-#'
+#' 
+#' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
+#'   interactive is TRUE
+#'   
+#' @examples
+#' \dontrun{
+#' library(pmartRdata)
+#' mymetab <- edata_transform(omicsData = metab_object, data_scale = "log2")
+#' mymetab <- group_designation(omicsData = mymetab, main_effects = "Phenotype")
+#' rmd_results <- rmd_filter(omicsData = mymetab, metrics=c("MAD", "Skewness", "Correlation"))
+#' plot(rmd_results, pvalue_threshold = 0.0001)
+#' }
+#' 
 #' @rdname plot-rmdFilt
 #'
 #' @export
 #'
-plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
+plot.rmdFilt <- function (filter_object, pvalue_threshold = NULL, sampleID = NULL,
                           order_by = NULL, interactive = FALSE, x_lab = NULL,
                           y_lab = NULL, x_lab_size = 11, y_lab_size = 11,
                           x_lab_angle = 90, title_lab = NULL,
@@ -3413,10 +3458,10 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
   # Preliminaries --------------------------------------------------------------
 
   # Have a looksie at the class of the filter object.
-  if (!inherits(filter_obj, "rmdFilt")) {
+  if (!inherits(filter_object, "rmdFilt")) {
 
     # The filter object is the wrong class. Savvy?
-    stop ("filter_obj must be of class rmdFilt")
+    stop ("filter_object must be of class rmdFilt")
 
   }
 
@@ -3443,7 +3488,7 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
 
     # Make sure order_by is either "Group" or is in f_data.
     if (order_by != "Group" &&
-        !(order_by %in% names(attr(filter_obj, "fdata")))) {
+        !(order_by %in% names(attr(filter_object, "fdata")))) {
 
       # Your plot is only mostly dead! There is still a slim hope that you can
       # save it.
@@ -3459,22 +3504,22 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
   if (!is.null(sampleID)) {
 
     # Make sure the sample IDs provided actually exist.
-    if (!all(sampleID %in% attr(filter_obj, "sample_names")))
+    if (!all(sampleID %in% attr(filter_object, "sample_names")))
       stop ("The sample IDs provided do not match the sample IDs in the data.")
 
   }
 
-  samp_id <- names(attr(filter_obj, "group_DF"))[1]
-  metrics <- attributes(filter_obj)$metrics
+  samp_id <- names(attr(filter_object, "group_DF"))[1]
+  metrics <- attributes(filter_object)$metrics
 
   # determine how to melt based on the number of main effects
-  group_df <- attributes(filter_obj)$group_DF
+  group_df <- attributes(filter_object)$group_DF
 
   # determine the main effects, then melt the df #
   if (ncol(group_df) == 2) {
 
     main_eff_names <- "Group"
-    dfmelt <- reshape2::melt(filter_obj, id = c(samp_id, main_eff_names))
+    dfmelt <- reshape2::melt(filter_object, id = c(samp_id, main_eff_names))
 
   } else if (ncol(group_df) > 2) {
 
@@ -3482,7 +3527,7 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
     temp <- droplevels(group_df[,-(1:2)])
     numlevels <- sapply(1:2, function (j) length(levels(as.factor(temp[, j]))))
     main_eff_names <- names(temp)[order(numlevels, decreasing = TRUE)]
-    dfmelt <- reshape2::melt(filter_obj[,-2], id = c(samp_id, main_eff_names))
+    dfmelt <- reshape2::melt(filter_object[,-2], id = c(samp_id, main_eff_names))
 
   }
 
@@ -3531,9 +3576,9 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
     if (order_by == "Group") {
 
       # Order the samples by the Group column from group_DF.
-      filter_obj[[samp_id]] <- factor(
-        filter_obj[[samp_id]],
-        levels = filter_obj[[samp_id]][order(attr(filter_obj,
+      filter_object[[samp_id]] <- factor(
+        filter_object[[samp_id]],
+        levels = filter_object[[samp_id]][order(attr(filter_object,
                                                   "group_DF")$Group)],
         ordered = TRUE
       )
@@ -3541,9 +3586,9 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
     } else {
 
       # Order the samples by the specified column from f_data.
-      filter_obj[[samp_id]] <- factor(
-        filter_obj[[samp_id]],
-        levels = filter_obj[[samp_id]][order(attr(filter_obj,
+      filter_object[[samp_id]] <- factor(
+        filter_object[[samp_id]],
+        levels = filter_object[[samp_id]][order(attr(filter_object,
                                                   "fdata")[[order_by]])],
         ordered = TRUE
       )
@@ -3553,8 +3598,8 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
   } else {
 
     # Order the data in the order the samples appear in the samp_id column.
-    filter_obj[[samp_id]] <- factor(
-      filter_obj[[samp_id]]
+    filter_object[[samp_id]] <- factor(
+      filter_object[[samp_id]]
     ) %>%
       forcats::fct_inorder()
 
@@ -3596,7 +3641,7 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
   } else if (is.null(pvalue_threshold)) {
 
     # Start scatter plot skeleton when there is no p-value threshold.
-    p <- ggplot2::ggplot(filter_obj)
+    p <- ggplot2::ggplot(filter_object)
 
     # Start plot when there is only one main effect.
     if (length(main_eff_names) == 1) {
@@ -3646,10 +3691,10 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
     # logical vector that will be used to find pairs that are split (one sample
     # is filtered and the other is not) and to change the transparency of the
     # point in the plot.
-    goodies_alpha <- filter_obj$pvalue < pvalue_threshold
+    goodies_alpha <- filter_object$pvalue < pvalue_threshold
 
     # If data are paired make sure no sample is left behind!
-    if (!is.null(attr(attr(filter_obj, "group_DF"), "pair_id"))) {
+    if (!is.null(attr(attr(filter_object, "group_DF"), "pair_id"))) {
 
       # Find the corresponding sample(s) if one sample from a pair is below the
       # p-value threshold and the other sample is not.
@@ -3658,11 +3703,11 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
         # Snatch the sample name and pair name as they will be used in multiple
         # places. It will save some typing. ... However, all the typing I just
         # saved has probably been undone by writing this comment.
-        sample_name <- attr(filter_obj, "fdata_cname")
-        pair_name <- attr(attr(filter_obj, "group_DF"), "pair_id")
+        sample_name <- attr(filter_object, "fdata_cname")
+        pair_name <- attr(attr(filter_object, "group_DF"), "pair_id")
 
         # Grab the names of filtered samples.
-        filtad <- as.character(filter_obj[goodies_alpha, sample_name])
+        filtad <- as.character(filter_object[goodies_alpha, sample_name])
 
         #!#!#!#!#!#!#!#!#!#!
         # The following code checks if the samples in a pair will be split. For
@@ -3672,7 +3717,7 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
         #!#!#!#!#!#!#!#!#!#!
 
         # Snag the associated pair IDs for the samples that will be filtered.
-        filtad_pairs <- attr(filter_obj, "fdata") %>%
+        filtad_pairs <- attr(filter_object, "fdata") %>%
           dplyr::filter(!!rlang::sym(sample_name) %in% filtad) %>%
           dplyr::pull(!!rlang::sym(pair_name))
 
@@ -3682,33 +3727,33 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
         # The points that will be different are the ones corresponding to the
         # samples that belong to pair where only one sample falls below the
         # threshold.
-        filtad_too <- attr(filter_obj, "fdata") %>%
+        filtad_too <- attr(filter_object, "fdata") %>%
           dplyr::filter(!!rlang::sym(pair_name) %in% filtad_pairs) %>%
           dplyr::pull(!!rlang::sym(sample_name)) %>%
           as.character()
 
         # Update the goodies_alpha vector to reflect the additional samples that
         # will be filtered.
-        goodies_alpha <- filter_obj[, sample_name] %in% filtad_too
+        goodies_alpha <- filter_object[, sample_name] %in% filtad_too
 
         # Create a vector of samples who are guilty by association. (They do not
         # fall below the threshold but their partners do.)
         condemned <- setdiff(filtad_too, filtad)
 
         # Create a logical vector that will determine the point shape.
-        goodies_pch <- filter_obj[, sample_name] %in% condemned
+        goodies_pch <- filter_object[, sample_name] %in% condemned
 
       }
 
     } else {
 
       # The data are not paired so all points should be a solid circle.
-      goodies_pch <- rep(FALSE, nrow(filter_obj))
+      goodies_pch <- rep(FALSE, nrow(filter_object))
 
     }
 
     # get y-intercept for line
-    df <- attributes(filter_obj)$df
+    df <- attributes(filter_object)$df
     yint <- log(qchisq(1 - pvalue_threshold, df = df), base = 2)
 
     # make title
@@ -3723,14 +3768,14 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
     ylabel <- ifelse(is.null(y_lab), "log2(Robust Mahalanobis Distance)", y_lab)
 
     # Start scatter plot skeleton when a p-value threshold is specified.
-    p <- ggplot2::ggplot(filter_obj)
+    p <- ggplot2::ggplot(filter_object)
 
     # Start scatter plot skeleton when a p-value threshold has been provided.
     if (length(main_eff_names) == 1) {
 
       # we need separate plots for if we have pair id or not
 
-      if (!is.null(attr(attr(filter_obj, "group_DF"), "pair_id"))) {
+      if (!is.null(attr(attr(filter_object, "group_DF"), "pair_id"))) {
         # if !null then we need to include pair fill information
         p <- p +
           ggplot2::geom_point(
@@ -3763,7 +3808,7 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
       }
 
     } else {
-      if (!is.null(attr(attr(filter_obj, "group_DF"), "pair_id"))) {
+      if (!is.null(attr(attr(filter_object, "group_DF"), "pair_id"))) {
         # if !null then we need to include pair fill information
         p <- p +
           ggplot2::geom_point(
@@ -3896,19 +3941,19 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
 
     # Change the sample names of the scatter plot.
     p <- p +
-      ggplot2::scale_x_discrete(labels = attr(filter_obj, "VizSampNames"))
+      ggplot2::scale_x_discrete(labels = attr(filter_object, "VizSampNames"))
 
     # We only want to change the legend if the box plots are created.
     if (!is.null(sampleID)) {
 
       # Nab the indices of the samples that will be highlighted in the box
       # plots.
-      idx <- which(attr(filter_obj, "sample_names") %in% sampleID)
+      idx <- which(attr(filter_object, "sample_names") %in% sampleID)
 
       # Change the names in the legend of the box plots.
       p <- p +
         ggplot2::scale_color_hue(
-          labels = attr(filter_obj, "VizSampNames")[idx]
+          labels = attr(filter_object, "VizSampNames")[idx]
         )
 
     }
@@ -3918,7 +3963,7 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
   # Farm boy, remove the default legend(s) if the data are paired and there are
   # no main effects. As you wish.
   # If there are no main effects do not print a legend.
-  if ("paired_diff" %in% attr(filter_obj, "group_DF")$Group) {
+  if ("paired_diff" %in% attr(filter_object, "group_DF")$Group) {
 
     # Remove the color legend. This legend is automatically created because we
     # specified a variable to color by in aes().
@@ -3936,56 +3981,54 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
 
 }
 
-#' plot.cvFilt
+#' Plot cvFilt Object
 #'
 #' For plotting an S3 object of type 'cvFilt'
 #'
-#' @param filter_obj An object of class cvFilt which is a data frame containing
-#'   a column of biomolecule IDs and a column with the coefficient of variation
-#'   (CV) for each biomolecule. If the group_designation function was run
-#'   previously the CV column will contain pooled CV values.
-#' @param cv_threshold draws a vertical line at the pooled cv cutoff, values to
-#'   the left of this cutoff are dropped if the filter is applied.
-#'
-#' @param interactive Logical. If TRUE produces an interactive plot.
-#' @param x_lab A character string specifying the x-axis label.
-#' @param y_lab A character string specifying the y-axis label. The default is
+#' @param filter_object object of class cvFilt generated via
+#'   \code{\link{cv_filter}}
+#' @param cv_threshold numeric value for cv threshold above which to remove the
+#'   corresponding biomolecules
+#' @param interactive logical value. If TRUE produces an interactive plot.
+#' @param x_lab character string specifying the x-axis label.
+#' @param y_lab character string specifying the y-axis label. The default is
 #'   NULL in which case the y-axis label will be the metric selected for the
 #'   \code{metric} argument.
-#' @param x_lab_size An integer value indicating the font size for the x-axis.
+#' @param x_lab_size integer value indicating the font size for the x-axis.
 #'   The default is 11.
-#' @param y_lab_size An integer value indicating the font size for the y-axis.
+#' @param y_lab_size integer value indicating the font size for the y-axis.
 #'   The default is 11.
-#' @param x_lab_angle An integer value indicating the angle of x-axis labels.
+#' @param x_lab_angle integer value indicating the angle of x-axis labels.
 #'   The default is 0.
-#' @param title_lab A character string specifying the plot title.
-#' @param title_lab_size An integer value indicating the font size of the plot
+#' @param title_lab character string specifying the plot title
+#' @param title_lab_size integer value indicating the font size of the plot
 #'   title. The default is 14.
-#' @param legend_lab A character string specifying the legend title.
-#' @param legend_position A character string specifying the position of the
+#' @param legend_lab character string specifying the legend title
+#' @param legend_position character string specifying the position of the
 #'   legend. Can be one of "right", "left", "top", "bottom", or "none". The
 #'   default is "none".
-#' @param log_scale Logical. Indicates whether to use a log2 transformed x-axis.
+#' @param log_scale logical value. Indicates whether to use a log2 transformed x-axis.
 #'   The default is TRUE.
-#' @param n_bins An integer value specifying the number of bins to draw in the
+#' @param n_bins integer value specifying the number of bins to draw in the
 #'   histogram.  The default is 30.
-#' @param n_breaks An integer value specifying the number of breaks to use. You
+#' @param n_breaks integer value specifying the number of breaks to use. You
 #'   may get less breaks if rounding causes certain values to become non-unique.
 #'   The default is 15.
-#' @param bw_theme Logical. If TRUE uses the ggplot2 black and white theme.
-#' @param palette A character string indicating the name of the RColorBrewer
+#' @param bw_theme logical value. If TRUE uses the ggplot2 black and white theme.
+#' @param palette character string indicating the name of the RColorBrewer
 #'   palette to use. For a list of available options see the details section in
 #'   \code{\link[RColorBrewer]{RColorBrewer}}.
 #'
+#' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
+#'   interactive is TRUE
 #'
 #' @examples
 #' \dontrun{
-#' data(pep_object)
+#' library(pmartRdata)
+#' mypep <- group_designation(omicsData = pep_object,
+#'                                 main_effects = "Phenotype")
 #'
-#' pep_object <- group_designation(omicsData = pep_object,
-#'                                 main_effects = "Condition")
-#'
-#' cvfilt <- cv_filter(pep_object)
+#' cvfilt <- cv_filter(omicsData = mypep)
 #'
 #' plot(cvfilt, cv_threshold = 20)
 #' plot(cvfilt, cv_threshold = 10, log_scale = FALSE)
@@ -3995,7 +4038,7 @@ plot.rmdFilt <- function (filter_obj, pvalue_threshold = NULL, sampleID = NULL,
 #'
 #' @export
 #'
-plot.cvFilt <- function (filter_obj, cv_threshold = NULL,
+plot.cvFilt <- function (filter_object, cv_threshold = NULL,
                          interactive = FALSE, x_lab = NULL, y_lab = NULL,
                          x_lab_size = 11, y_lab_size = 11, x_lab_angle = 0,
                          title_lab = NULL, title_lab_size = 14,
@@ -4014,7 +4057,7 @@ plot.cvFilt <- function (filter_obj, cv_threshold = NULL,
     if(length(cv_threshold)>1)
       stop("cv_threshold must be numeric of length 1")
     # check that cv_threshold is more than 1 and less than max CV value
-    if(cv_threshold <= 1 || cv_threshold >= max(filter_obj$CV, na.rm = TRUE))
+    if(cv_threshold <= 1 || cv_threshold >= max(filter_object$CV, na.rm = TRUE))
       stop("cv_threshold must be greater than 1 and less than the max CV value")
   }
 
@@ -4040,8 +4083,8 @@ plot.cvFilt <- function (filter_obj, cv_threshold = NULL,
   }
 
   # plotting object
-  new_object <- filter_obj[!is.na(filter_obj$CV), ]
-  max_x_val <- attributes(filter_obj)$max_x_val
+  new_object <- filter_object[!is.na(filter_object$CV), ]
+  max_x_val <- attributes(filter_object)$max_x_val
 
   # Check if any CV values are zero. If there are any zero values the log_scale
   # input must be changed to FALSE.
@@ -4064,7 +4107,7 @@ plot.cvFilt <- function (filter_obj, cv_threshold = NULL,
 
   # Label x-axis according to whether group_designation() was run.
   if (is.null(x_lab)) {
-    xlabel <- if (attributes(filter_obj)$pooled) "Pooled CV" else "CV"
+    xlabel <- if (attributes(filter_object)$pooled) "Pooled CV" else "CV"
   }
 
   ### Store ggplot2 layers
@@ -4166,17 +4209,17 @@ plot.cvFilt <- function (filter_obj, cv_threshold = NULL,
 
 }
 
-#' plot.customFilt
+#' Plot customFilt Object
 #'
 #' Currently plotting a customFilt object is not supported
 #'
-#' @param filter_obj An object of class customFilt.
-#'
+#' @param filter_object An object of class customFilt.
+#' 
 #' @rdname plot-customFilt
 #'
 #' @export
 #'
-plot.customFilt <- function (filter_obj) {
+plot.customFilt <- function (filter_object) {
 
   message (paste("There is no plot method for objects of class 'customFilt'.",
                  "See summary.customFilt instead.",
@@ -4184,55 +4227,67 @@ plot.customFilt <- function (filter_obj) {
 
 }
 
-#' plot.normRes
+#' Plot normRes Object
 #'
 #' For plotting an S3 object of type 'normRes'
 #'
-#' @param normRes A normRes object created by the normalize_global function.
-#' @param order_by A character string specifying a main effect by which to order
-#'   the boxplots. This main effect must be found in the column names of f_data
-#'   in the omicsData object. If \code{order_by} is "Group", the boxplots
+#' @param normRes normRes object created by the normalize_global function
+#' @param order_by character string specifying the column name of f_data by
+#'   which to order the boxplots. If \code{order_by} is "Group", the boxplots
 #'   will be ordered by the group variable from the group_designation function.
 #'   If NULL (default), the boxplots will be displayed in the order they appear
 #'   in the data.
-#' @param color_by A character string specifying a main effect by which to color
-#'   the boxplots. This main effect must be found in the column names of f_data
-#'   in the omicsData object. If \code{color_by} is "Group", the boxplots
+#' @param color_by character string specifying the column name of f_data by
+#'   which to color the boxplots. If \code{color_by} is "Group", the boxplots
 #'   will be colored by the group variable from the group_designation function.
 #'   If NULL (default), the boxplots will have one default color.
-#' @param facet_by A character string specifying a main effect with which to
-#'   create a facet plot. This main effect must be found in the column names of
-#'   f_data in the omicsData object. Default value is NULL.
-#' @param facet_cols An optional integer specifying the number of columns to
+#' @param facet_by character string specifying the column name of f_data with
+#'   which to create a facet plot. Default value is NULL.
+#' @param facet_cols optional integer specifying the number of columns to
 #'   show in the facet plot.
-#'
-#' @param interactive Logical. If TRUE produces an interactive plot.
-#' @param x_lab A character string specifying the x-axis label.
-#' @param y_lab A character string specifying the y-axis label. The default is
+#' @param interactive logical value. If TRUE produces an interactive plot.
+#' @param x_lab character string specifying the x-axis label.
+#' @param y_lab character string specifying the y-axis label. The default is
 #'   NULL in which case the y-axis label will be the metric selected for the
 #'   \code{metric} argument.
-#' @param x_lab_size An integer value indicating the font size for the x-axis.
+#' @param x_lab_size integer value indicating the font size for the x-axis.
 #'   The default is 11.
-#' @param y_lab_size An integer value indicating the font size for the y-axis.
+#' @param y_lab_size integer value indicating the font size for the y-axis.
 #'   The default is 11.
-#' @param x_lab_angle An integer value indicating the angle of x-axis labels.
+#' @param x_lab_angle integer value indicating the angle of x-axis labels.
 #'   The default is 0.
-#' @param title_lab A character string specifying the plot title.
-#' @param title_lab_size An integer value indicating the font size of the plot
+#' @param title_lab character string specifying the plot title.
+#' @param title_lab_size integer value indicating the font size of the plot
 #'   title. The default is 14.
-#' @param legend_lab A character string specifying the legend title.
-#' @param legend_position A character string specifying the position of the
+#' @param legend_lab character string specifying the legend title.
+#' @param legend_position character string specifying the position of the
 #'   legend. Can be one of "right", "left", "top", "bottom", or "none". The
 #'   default is "none".
-#' @param ylimit A numeric vector of length 2 specifying y-axis lower and upper
+#' @param ylimit numeric vector of length 2 specifying y-axis lower and upper
 #'   limits.
-#' @param bw_theme Logical. If TRUE uses the ggplot2 black and white theme.
-#' @param palette A character string indicating the name of the RColorBrewer
+#' @param bw_theme logical value. If TRUE uses the ggplot2 black and white theme.
+#' @param palette character string indicating the name of the RColorBrewer
 #'   palette to use. For a list of available options see the details section in
 #'   \code{\link[RColorBrewer]{RColorBrewer}}.
-#' @param use_VizSampNames Logical. Indicates whether to use custom sample
+#' @param use_VizSampNames logical value. Indicates whether to use custom sample
 #'   names. The default is FALSE.
 #'
+#' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
+#'   interactive is TRUE
+#'   
+#' @examples 
+#' \dontrun{
+#' library(pmartRdata)
+#' mymetab <- edata_transform(omicsData = metab_object,
+#'                                 data_scale = "log2")
+#' mymetab <- group_designation(omicsData = mymetab,
+#'                                   main_effects = "Phenotype")
+#' norm_object <- normalize_global(omicsData = mymetab,
+#'                                 subset_fn = "all",
+#'                                 norm_fn = "median")
+#' plot(norm_object)
+#' }
+#'   
 #' @rdname plot-normRes
 #'
 #' @export
@@ -4357,55 +4412,61 @@ plot.normRes <- function (normRes_obj, order_by = NULL, color_by = NULL,
 
 }
 
-#' plot.isobaricpepData
+#' Plot isobaricpepData Object
 #'
 #' For plotting isobaricpepData S3 objects
 #'
-#' @param omicsData An isobaricpepData object.
-#' @param order_by A character string specifying a main effect by which to order
-#'   the boxplots. This main effect must be found in the column names of f_data
-#'   in the omicsData object. If \code{order_by} is "Group", the boxplots
+#' @param omicsData An isobaricpepData object
+#' @param order_by character string specifying the column name of f_data by
+#'   which to order the boxplots. If \code{order_by} is "Group", the boxplots
 #'   will be ordered by the group variable from the group_designation function.
 #'   If NULL (default), the boxplots will be displayed in the order they appear
 #'   in the data.
-#' @param color_by A character string specifying a main effect by which to color
-#'   the boxplots. This main effect must be found in the column names of f_data
-#'   in the omicsData object. If \code{color_by} is "Group", the boxplots
+#' @param color_by character string specifying the column name of f_data by
+#'   which to color the boxplots. If \code{color_by} is "Group", the boxplots
 #'   will be colored by the group variable from the group_designation function.
 #'   If NULL (default), the boxplots will have one default color.
-#' @param facet_by A character string specifying a main effect with which to
-#'   create a facet plot. This main effect must be found in the column names of
-#'   f_data in the omicsData object. Default value is NULL.
-#' @param facet_cols An optional integer specifying the number of columns to
+#' @param facet_by character string specifying the column name of f_data with
+#'   which to create a facet plot. Default value is NULL.
+#' @param facet_cols optional integer specifying the number of columns to
 #'   show in the facet plot.
-#'
-#' @param interactive Logical. If TRUE produces an interactive plot.
-#' @param x_lab A character string specifying the x-axis label.
-#' @param y_lab A character string specifying the y-axis label. The default is
+#' @param interactive logical value. If TRUE produces an interactive plot.
+#' @param x_lab character string specifying the x-axis label.
+#' @param y_lab character string specifying the y-axis label. The default is
 #'   NULL in which case the y-axis label will be the metric selected for the
 #'   \code{metric} argument.
-#' @param x_lab_size An integer value indicating the font size for the x-axis.
+#' @param x_lab_size integer value indicating the font size for the x-axis.
 #'   The default is 11.
-#' @param y_lab_size An integer value indicating the font size for the y-axis.
+#' @param y_lab_size integer value indicating the font size for the y-axis.
 #'   The default is 11.
-#' @param x_lab_angle An integer value indicating the angle of x-axis labels.
+#' @param x_lab_angle integer value indicating the angle of x-axis labels.
 #'   The default is 0.
-#' @param title_lab A character string specifying the plot title.
-#' @param title_lab_size An integer value indicating the font size of the plot
+#' @param title_lab character string specifying the plot title.
+#' @param title_lab_size integer value indicating the font size of the plot
 #'   title. The default is 14.
-#' @param legend_lab A character string specifying the legend title.
-#' @param legend_position A character string specifying the position of the
+#' @param legend_lab character string specifying the legend title.
+#' @param legend_position character string specifying the position of the
 #'   legend. Can be one of "right", "left", "top", "bottom", or "none". The
 #'   default is "none".
-#' @param ylimit A numeric vector of length 2 specifying y-axis lower and upper
+#' @param ylimit numeric vector of length 2 specifying y-axis lower and upper
 #'   limits.
-#' @param bw_theme Logical. If TRUE uses the ggplot2 black and white theme.
-#' @param palette A character string indicating the name of the RColorBrewer
+#' @param bw_theme logical value. If TRUE uses the ggplot2 black and white theme.
+#' @param palette character string indicating the name of the RColorBrewer
 #'   palette to use. For a list of available options see the details section in
 #'   \code{\link[RColorBrewer]{RColorBrewer}}.
-#' @param use_VizSampNames Logical. Indicates whether to use custom sample
+#' @param use_VizSampNames logical value. Indicates whether to use custom sample
 #'   names. The default is FALSE.
 #'
+#' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
+#'   interactive is TRUE
+#'   
+#' @examples 
+#' \dontrun{
+#' library(pmartRdata)
+#' myiso <- edata_transform(omicsData = isobaric_object, data_scale = "log2")
+#' plot(omicsData = myiso)
+#' }      
+#'   
 #' @rdname plot-isobaricpepData
 #'
 #' @export
@@ -4433,55 +4494,61 @@ plot.isobaricpepData <- function (omicsData, order_by = NULL, color_by = NULL,
 
 }
 
-#' plot.lipidData
+#' Plot lipidData Object
 #'
 #' For plotting lipidData S3 objects
 #'
-#' @param omicsData A lipidData object.
-#' @param order_by A character string specifying a main effect by which to order
-#'   the boxplots. This main effect must be found in the column names of f_data
-#'   in the omicsData object. If \code{order_by} is "Group", the boxplots
+#' @param omicsData lipidData object
+#' @param order_by character string specifying the column name of f_data by
+#'   which to order the boxplots. If \code{order_by} is "Group", the boxplots
 #'   will be ordered by the group variable from the group_designation function.
 #'   If NULL (default), the boxplots will be displayed in the order they appear
 #'   in the data.
-#' @param color_by A character string specifying a main effect by which to color
-#'   the boxplots. This main effect must be found in the column names of f_data
-#'   in the omicsData object. If \code{color_by} is "Group", the boxplots
+#' @param color_by character string specifying the column name of f_data by
+#'   which to color the boxplots. If \code{color_by} is "Group", the boxplots
 #'   will be colored by the group variable from the group_designation function.
 #'   If NULL (default), the boxplots will have one default color.
-#' @param facet_by A character string specifying a main effect with which to
-#'   create a facet plot. This main effect must be found in the column names of
-#'   f_data in the omicsData object. Default value is NULL.
-#' @param facet_cols An optional integer specifying the number of columns to
+#' @param facet_by character string specifying the column name of f_data with
+#'   which to create a facet plot. Default value is NULL.
+#' @param facet_cols optional integer specifying the number of columns to
 #'   show in the facet plot.
-#'
-#' @param interactive Logical. If TRUE produces an interactive plot.
-#' @param x_lab A character string specifying the x-axis label.
-#' @param y_lab A character string specifying the y-axis label. The default is
+#' @param interactive logical value. If TRUE produces an interactive plot.
+#' @param x_lab character string specifying the x-axis label.
+#' @param y_lab character string specifying the y-axis label. The default is
 #'   NULL in which case the y-axis label will be the metric selected for the
 #'   \code{metric} argument.
-#' @param x_lab_size An integer value indicating the font size for the x-axis.
+#' @param x_lab_size integer value indicating the font size for the x-axis.
 #'   The default is 11.
-#' @param y_lab_size An integer value indicating the font size for the y-axis.
+#' @param y_lab_size integer value indicating the font size for the y-axis.
 #'   The default is 11.
-#' @param x_lab_angle An integer value indicating the angle of x-axis labels.
+#' @param x_lab_angle integer value indicating the angle of x-axis labels.
 #'   The default is 0.
-#' @param title_lab A character string specifying the plot title.
-#' @param title_lab_size An integer value indicating the font size of the plot
+#' @param title_lab character string specifying the plot title.
+#' @param title_lab_size integer value indicating the font size of the plot
 #'   title. The default is 14.
-#' @param legend_lab A character string specifying the legend title.
-#' @param legend_position A character string specifying the position of the
+#' @param legend_lab character string specifying the legend title.
+#' @param legend_position character string specifying the position of the
 #'   legend. Can be one of "right", "left", "top", "bottom", or "none". The
 #'   default is "none".
-#' @param ylimit A numeric vector of length 2 specifying y-axis lower and upper
+#' @param ylimit numeric vector of length 2 specifying y-axis lower and upper
 #'   limits.
-#' @param bw_theme Logical. If TRUE uses the ggplot2 black and white theme.
-#' @param palette A character string indicating the name of the RColorBrewer
+#' @param bw_theme logical value. If TRUE uses the ggplot2 black and white theme.
+#' @param palette character string indicating the name of the RColorBrewer
 #'   palette to use. For a list of available options see the details section in
 #'   \code{\link[RColorBrewer]{RColorBrewer}}.
-#' @param use_VizSampNames Logical. Indicates whether to use custom sample
+#' @param use_VizSampNames logical value. Indicates whether to use custom sample
 #'   names. The default is FALSE.
-#'
+#' 
+#' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
+#'   interactive is TRUE
+#'   
+#' @examples 
+#' \dontrun{
+#' library(pmartRdata)
+#' mylipid <- edata_transform(omicsData = lipid_pos_object, data_scale = "log2")
+#' plot(omicsData = mylipid, order_by = "Virus", color_by = "Virus")
+#' }      
+#'   
 #' @rdname plot-lipidData
 #'
 #' @export
@@ -4508,55 +4575,61 @@ plot.lipidData <- function (omicsData, order_by = NULL, color_by = NULL,
 
 }
 
-#' plot.metabData
+#' Plot metabData Object
 #'
 #' For plotting metabData S3 objects
 #'
-#' @param omicsData A metabData object.
-#' @param order_by A character string specifying a main effect by which to order
-#'   the boxplots. This main effect must be found in the column names of f_data
-#'   in the omicsData object. If \code{order_by} is "Group", the boxplots
+#' @param omicsData metabData object
+#' @param order_by character string specifying the column name of f_data by
+#'   which to order the boxplots. If \code{order_by} is "Group", the boxplots
 #'   will be ordered by the group variable from the group_designation function.
 #'   If NULL (default), the boxplots will be displayed in the order they appear
 #'   in the data.
-#' @param color_by A character string specifying a main effect by which to color
-#'   the boxplots. This main effect must be found in the column names of f_data
-#'   in the omicsData object. If \code{color_by} is "Group", the boxplots
+#' @param color_by character string specifying the column name of f_data by
+#'   which to color the boxplots. If \code{color_by} is "Group", the boxplots
 #'   will be colored by the group variable from the group_designation function.
 #'   If NULL (default), the boxplots will have one default color.
-#' @param facet_by A character string specifying a main effect with which to
-#'   create a facet plot. This main effect must be found in the column names of
-#'   f_data in the omicsData object. Default value is NULL.
-#' @param facet_cols An optional integer specifying the number of columns to
+#' @param facet_by character string specifying the column name of f_data with
+#'   which to create a facet plot. Default value is NULL.
+#' @param facet_cols optional integer specifying the number of columns to
 #'   show in the facet plot.
-#'
-#' @param interactive Logical. If TRUE produces an interactive plot.
-#' @param x_lab A character string specifying the x-axis label.
-#' @param y_lab A character string specifying the y-axis label. The default is
+#' @param interactive logical value. If TRUE produces an interactive plot.
+#' @param x_lab character string specifying the x-axis label.
+#' @param y_lab character string specifying the y-axis label. The default is
 #'   NULL in which case the y-axis label will be the metric selected for the
 #'   \code{metric} argument.
-#' @param x_lab_size An integer value indicating the font size for the x-axis.
+#' @param x_lab_size integer value indicating the font size for the x-axis.
 #'   The default is 11.
-#' @param y_lab_size An integer value indicating the font size for the y-axis.
+#' @param y_lab_size integer value indicating the font size for the y-axis.
 #'   The default is 11.
-#' @param x_lab_angle An integer value indicating the angle of x-axis labels.
+#' @param x_lab_angle integer value indicating the angle of x-axis labels.
 #'   The default is 0.
-#' @param title_lab A character string specifying the plot title.
-#' @param title_lab_size An integer value indicating the font size of the plot
+#' @param title_lab character string specifying the plot title.
+#' @param title_lab_size integer value indicating the font size of the plot
 #'   title. The default is 14.
-#' @param legend_lab A character string specifying the legend title.
-#' @param legend_position A character string specifying the position of the
+#' @param legend_lab character string specifying the legend title.
+#' @param legend_position character string specifying the position of the
 #'   legend. Can be one of "right", "left", "top", "bottom", or "none". The
 #'   default is "none".
-#' @param ylimit A numeric vector of length 2 specifying y-axis lower and upper
+#' @param ylimit numeric vector of length 2 specifying y-axis lower and upper
 #'   limits.
-#' @param bw_theme Logical. If TRUE uses the ggplot2 black and white theme.
-#' @param palette A character string indicating the name of the RColorBrewer
+#' @param bw_theme logical value. If TRUE uses the ggplot2 black and white theme.
+#' @param palette character string indicating the name of the RColorBrewer
 #'   palette to use. For a list of available options see the details section in
 #'   \code{\link[RColorBrewer]{RColorBrewer}}.
-#' @param use_VizSampNames Logical. Indicates whether to use custom sample
+#' @param use_VizSampNames logical value. Indicates whether to use custom sample
 #'   names. The default is FALSE.
 #'
+#' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
+#'   interactive is TRUE
+#'   
+#' @examples 
+#' \dontrun{
+#' library(pmartRdata)
+#' mymetab <- edata_transform(omicsData = metab_object, data_scale = "log2")
+#' plot(omicsData = mymetab, order_by = "Phenotype", color_by = "Phenotype")
+#' }   
+#'   
 #' @rdname plot-metabData
 #'
 #' @export
@@ -4583,55 +4656,61 @@ plot.metabData <- function (omicsData, order_by = NULL, color_by = NULL,
 
 }
 
-#' plot.nmrData
+#' Plot nmrData Object
 #'
 #' For plotting nmrData S3 objects
 #'
-#' @param omicsData An nmrData object.
-#' @param order_by A character string specifying a main effect by which to order
-#'   the boxplots. This main effect must be found in the column names of f_data
-#'   in the omicsData object. If \code{order_by} is "Group", the boxplots
+#' @param omicsData nmrData object
+#' @param order_by character string specifying the column name of f_data by
+#'   which to order the boxplots. If \code{order_by} is "Group", the boxplots
 #'   will be ordered by the group variable from the group_designation function.
 #'   If NULL (default), the boxplots will be displayed in the order they appear
 #'   in the data.
-#' @param color_by A character string specifying a main effect by which to color
-#'   the boxplots. This main effect must be found in the column names of f_data
-#'   in the omicsData object. If \code{color_by} is "Group", the boxplots
+#' @param color_by character string specifying the column name of f_data by
+#'   which to color the boxplots. If \code{color_by} is "Group", the boxplots
 #'   will be colored by the group variable from the group_designation function.
 #'   If NULL (default), the boxplots will have one default color.
-#' @param facet_by A character string specifying a main effect with which to
-#'   create a facet plot. This main effect must be found in the column names of
-#'   f_data in the omicsData object. Default value is NULL.
+#' @param facet_by character string specifying the column name of f_data with
+#'   which to create a facet plot. Default value is NULL.
 #' @param facet_cols An optional integer specifying the number of columns to
 #'   show in the facet plot.
-#'
-#' @param interactive Logical. If TRUE produces an interactive plot.
-#' @param x_lab A character string specifying the x-axis label.
-#' @param y_lab A character string specifying the y-axis label. The default is
+#' @param interactive logical value. If TRUE produces an interactive plot.
+#' @param x_lab character string specifying the x-axis label.
+#' @param y_lab character string specifying the y-axis label. The default is
 #'   NULL in which case the y-axis label will be the metric selected for the
 #'   \code{metric} argument.
-#' @param x_lab_size An integer value indicating the font size for the x-axis.
+#' @param x_lab_size integer value indicating the font size for the x-axis.
 #'   The default is 11.
-#' @param y_lab_size An integer value indicating the font size for the y-axis.
+#' @param y_lab_size integer value indicating the font size for the y-axis.
 #'   The default is 11.
-#' @param x_lab_angle An integer value indicating the angle of x-axis labels.
+#' @param x_lab_angle integer value indicating the angle of x-axis labels.
 #'   The default is 0.
-#' @param title_lab A character string specifying the plot title.
-#' @param title_lab_size An integer value indicating the font size of the plot
+#' @param title_lab character string specifying the plot title.
+#' @param title_lab_size integer value indicating the font size of the plot
 #'   title. The default is 14.
-#' @param legend_lab A character string specifying the legend title.
-#' @param legend_position A character string specifying the position of the
+#' @param legend_lab character string specifying the legend title.
+#' @param legend_position character string specifying the position of the
 #'   legend. Can be one of "right", "left", "top", "bottom", or "none". The
 #'   default is "none".
 #' @param ylimit A numeric vector of length 2 specifying y-axis lower and upper
 #'   limits.
-#' @param bw_theme Logical. If TRUE uses the ggplot2 black and white theme.
-#' @param palette A character string indicating the name of the RColorBrewer
+#' @param bw_theme logical value. If TRUE uses the ggplot2 black and white theme.
+#' @param palette character string indicating the name of the RColorBrewer
 #'   palette to use. For a list of available options see the details section in
 #'   \code{\link[RColorBrewer]{RColorBrewer}}.
-#' @param use_VizSampNames Logical. Indicates whether to use custom sample
+#' @param use_VizSampNames logical value. Indicates whether to use custom sample
 #'   names. The default is FALSE.
 #'
+#' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
+#'   interactive is TRUE
+#'   
+#' @examples 
+#' \dontrun{
+#' library(pmartRdata)
+#' mynmr <- edata_transform(omicsData = nmr_identified_object, data_scale = "log2")
+#' plot(omicsData = mynmr)
+#' }
+#'   
 #' @rdname plot-nmrData
 #'
 #' @export
@@ -4658,55 +4737,51 @@ plot.nmrData <- function (omicsData, order_by = NULL, color_by = NULL,
 
 }
 
-#' plot.seqData
+#' Plot seqData Object
 #'
 #' For plotting seqData S3 objects
 #'
-#' @param omicsData An seqData object.
-#' @param order_by A character string specifying a main effect by which to order
-#'   the boxplots. This main effect must be found in the column names of f_data
-#'   in the omicsData object. If \code{order_by} is "Group", the boxplots
+#' @param omicsData seqData object
+#' @param order_by character string specifying the column name of f_data by
+#'   which to order the boxplots. If \code{order_by} is "Group", the boxplots
 #'   will be ordered by the group variable from the group_designation function.
 #'   If NULL (default), the boxplots will be displayed in the order they appear
 #'   in the data.
-#' @param color_by A character string specifying a main effect by which to color
-#'   the boxplots. This main effect must be found in the column names of f_data
-#'   in the omicsData object. If \code{color_by} is "Group", the boxplots
+#' @param color_by character string specifying the column name of f_data by
+#'   which to color the boxplots. If \code{color_by} is "Group", the boxplots
 #'   will be colored by the group variable from the group_designation function.
 #'   If NULL (default), the boxplots will have one default color.
-#' @param facet_by A character string specifying a main effect with which to
-#'   create a facet plot. This main effect must be found in the column names of
-#'   f_data in the omicsData object. Default value is NULL.
-#' @param facet_cols An optional integer specifying the number of columns to
+#' @param facet_by character string specifying the column name of f_data with
+#'   which to create a facet plot. Default value is NULL.
+#' @param facet_cols optional integer specifying the number of columns to
 #'   show in the facet plot.
-#'
-#' @param interactive Logical. If TRUE produces an interactive plot.
-#' @param x_lab A character string specifying the x-axis label.
-#' @param y_lab A character string specifying the y-axis label. The default is
+#' @param interactive logical value. If TRUE produces an interactive plot.
+#' @param x_lab character string specifying the x-axis label.
+#' @param y_lab character string specifying the y-axis label. The default is
 #'   NULL in which case the y-axis label will be the metric selected for the
 #'   \code{metric} argument.
-#' @param x_lab_size An integer value indicating the font size for the x-axis.
+#' @param x_lab_size integer value indicating the font size for the x-axis.
 #'   The default is 11.
-#' @param y_lab_size An integer value indicating the font size for the y-axis.
+#' @param y_lab_size integer value indicating the font size for the y-axis.
 #'   The default is 11.
-#' @param x_lab_angle An integer value indicating the angle of x-axis labels.
+#' @param x_lab_angle integer value indicating the angle of x-axis labels.
 #'   The default is 0.
-#' @param title_lab A character string specifying the plot title.
-#' @param title_lab_size An integer value indicating the font size of the plot
+#' @param title_lab character string specifying the plot title.
+#' @param title_lab_size integer value indicating the font size of the plot
 #'   title. The default is 14.
-#' @param legend_lab A character string specifying the legend title.
-#' @param legend_position A character string specifying the position of the
+#' @param legend_lab character string specifying the legend title.
+#' @param legend_position character string specifying the position of the
 #'   legend. Can be one of "right", "left", "top", "bottom", or "none". The
 #'   default is "none".
-#' @param ylimit A numeric vector of length 2 specifying y-axis lower and upper
+#' @param ylimit numeric vector of length 2 specifying y-axis lower and upper
 #'   limits.
-#' @param bw_theme Logical. If TRUE uses the ggplot2 black and white theme.
-#' @param palette A character string indicating the name of the RColorBrewer
+#' @param bw_theme logical value. If TRUE uses the ggplot2 black and white theme.
+#' @param palette character string indicating the name of the RColorBrewer
 #'   palette to use. For a list of available options see the details section in
 #'   \code{\link[RColorBrewer]{RColorBrewer}}.
-#' @param use_VizSampNames Logical. Indicates whether to use custom sample
+#' @param use_VizSampNames logical value. Indicates whether to use custom sample
 #'   names. The default is FALSE.
-#' @param transformation Character string. String of length 1 defining a
+#' @param transformation character string. String of length 1 defining a
 #'   transformation for visualizing count data. Valid options are 'lcpm', 
 #'   'upper', and 'median'. 'lcpm' - For each column: scale column intensities by 
 #'   (total column sum/1 million), then log2 transform. 'median' - For each 
@@ -4715,6 +4790,15 @@ plot.nmrData <- function (omicsData, order_by = NULL, color_by = NULL,
 #'   intensities by 75th quantile column intensities, then back-transform to 
 #'   original scale. For 'median' and 'upper' options, all zeros are converted 
 #'   to NAs.
+#'   
+#' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
+#'   interactive is TRUE   
+#'   
+#' @examples 
+#' \dontrun{
+#' library(pmartRdata)
+#' plot(omicsData = rnaseq_object, transformation = "lcpm")
+#' }   
 #'   
 #' @rdname plot-seqData
 #'
@@ -4743,55 +4827,61 @@ plot.seqData <- function (omicsData, order_by = NULL, color_by = NULL,
   
 }
 
-#' plot.pepData
+#' Plot pepData Object
 #'
 #' For plotting pepData S3 objects
 #'
-#' @param omicsData A pepData object.
-#' @param order_by A character string specifying a main effect by which to order
-#'   the boxplots. This main effect must be found in the column names of f_data
-#'   in the omicsData object. If \code{order_by} is "Group", the boxplots
+#' @param omicsData pepData object
+#' @param order_by character string specifying the column name of f_data by
+#'   which to order the boxplots. If \code{order_by} is "Group", the boxplots
 #'   will be ordered by the group variable from the group_designation function.
 #'   If NULL (default), the boxplots will be displayed in the order they appear
 #'   in the data.
-#' @param color_by A character string specifying a main effect by which to color
-#'   the boxplots. This main effect must be found in the column names of f_data
-#'   in the omicsData object. If \code{color_by} is "Group", the boxplots
+#' @param color_by character string specifying the column name of f_data by
+#'   which to color the boxplots. If \code{color_by} is "Group", the boxplots
 #'   will be colored by the group variable from the group_designation function.
 #'   If NULL (default), the boxplots will have one default color.
-#' @param facet_by A character string specifying a main effect with which to
-#'   create a facet plot. This main effect must be found in the column names of
-#'   f_data in the omicsData object. Default value is NULL.
+#' @param facet_by character string specifying the column name of f_data with
+#'   which to create a facet plot. Default value is NULL.
 #' @param facet_cols An optional integer specifying the number of columns to
 #'   show in the facet plot.
-#'
-#' @param interactive Logical. If TRUE produces an interactive plot.
-#' @param x_lab A character string specifying the x-axis label.
-#' @param y_lab A character string specifying the y-axis label. The default is
+#' @param interactive logical value. If TRUE produces an interactive plot.
+#' @param x_lab character string specifying the x-axis label.
+#' @param y_lab character string specifying the y-axis label. The default is
 #'   NULL in which case the y-axis label will be the metric selected for the
 #'   \code{metric} argument.
-#' @param x_lab_size An integer value indicating the font size for the x-axis.
+#' @param x_lab_size integer value indicating the font size for the x-axis.
 #'   The default is 11.
-#' @param y_lab_size An integer value indicating the font size for the y-axis.
+#' @param y_lab_size integer value indicating the font size for the y-axis.
 #'   The default is 11.
-#' @param x_lab_angle An integer value indicating the angle of x-axis labels.
+#' @param x_lab_angle integer value indicating the angle of x-axis labels.
 #'   The default is 0.
-#' @param title_lab A character string specifying the plot title.
-#' @param title_lab_size An integer value indicating the font size of the plot
+#' @param title_lab character string specifying the plot title.
+#' @param title_lab_size integer value indicating the font size of the plot
 #'   title. The default is 14.
-#' @param legend_lab A character string specifying the legend title.
-#' @param legend_position A character string specifying the position of the
+#' @param legend_lab character string specifying the legend title.
+#' @param legend_position character string specifying the position of the
 #'   legend. Can be one of "right", "left", "top", "bottom", or "none". The
 #'   default is "none".
-#' @param ylimit A numeric vector of length 2 specifying y-axis lower and upper
+#' @param ylimit numeric vector of length 2 specifying y-axis lower and upper
 #'   limits.
-#' @param bw_theme Logical. If TRUE uses the ggplot2 black and white theme.
-#' @param palette A character string indicating the name of the RColorBrewer
+#' @param bw_theme logical value. If TRUE uses the ggplot2 black and white theme.
+#' @param palette character string indicating the name of the RColorBrewer
 #'   palette to use. For a list of available options see the details section in
 #'   \code{\link[RColorBrewer]{RColorBrewer}}.
-#' @param use_VizSampNames Logical. Indicates whether to use custom sample
+#' @param use_VizSampNames logical value. Indicates whether to use custom sample
 #'   names. The default is FALSE.
 #'
+#' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
+#'   interactive is TRUE
+#'   
+#' @examples 
+#' \dontrun{
+#' library(pmartRdata)
+#' mypep <- edata_transform(omicsData = pep_object, data_scale = "log2")
+#' plot(omicsData = mypep, order_by = "Phenotype", color_by = "Phenotype")
+#' }
+#'   
 #' @rdname plot-pepData
 #'
 #' @export
@@ -4818,55 +4908,61 @@ plot.pepData <- function (omicsData, order_by = NULL, color_by = NULL,
 
 }
 
-#' plot.proData
+#' Plot proData Object
 #'
 #' For plotting proData S3 objects
 #'
-#' @param omicsData A proData object.
-#' @param order_by A character string specifying a main effect by which to order
-#'   the boxplots. This main effect must be found in the column names of f_data
-#'   in the omicsData object. If \code{order_by} is "Group", the boxplots
+#' @param omicsData proData object
+#' @param order_by character string specifying the column name of f_data by
+#'   which to order the boxplots. If \code{order_by} is "Group", the boxplots
 #'   will be ordered by the group variable from the group_designation function.
 #'   If NULL (default), the boxplots will be displayed in the order they appear
 #'   in the data.
-#' @param color_by A character string specifying a main effect by which to color
-#'   the boxplots. This main effect must be found in the column names of f_data
-#'   in the omicsData object. If \code{color_by} is "Group", the boxplots
+#' @param color_by character string specifying the column name of f_data by
+#'   which to color the boxplots. If \code{color_by} is "Group", the boxplots
 #'   will be colored by the group variable from the group_designation function.
 #'   If NULL (default), the boxplots will have one default color.
-#' @param facet_by A character string specifying a main effect with which to
-#'   create a facet plot. This main effect must be found in the column names of
-#'   f_data in the omicsData object. Default value is NULL.
-#' @param facet_cols An optional integer specifying the number of columns to
+#' @param facet_by character string specifying the column name of f_data with
+#'   which to create a facet plot. Default value is NULL.
+#' @param facet_cols optional integer specifying the number of columns to
 #'   show in the facet plot.
-#'
-#' @param interactive Logical. If TRUE produces an interactive plot.
-#' @param x_lab A character string specifying the x-axis label.
-#' @param y_lab A character string specifying the y-axis label. The default is
+#' @param interactive logical value. If TRUE produces an interactive plot.
+#' @param x_lab character string specifying the x-axis label.
+#' @param y_lab character string specifying the y-axis label. The default is
 #'   NULL in which case the y-axis label will be the metric selected for the
 #'   \code{metric} argument.
-#' @param x_lab_size An integer value indicating the font size for the x-axis.
+#' @param x_lab_size integer value indicating the font size for the x-axis.
 #'   The default is 11.
-#' @param y_lab_size An integer value indicating the font size for the y-axis.
+#' @param y_lab_size integer value indicating the font size for the y-axis.
 #'   The default is 11.
-#' @param x_lab_angle An integer value indicating the angle of x-axis labels.
+#' @param x_lab_angle integer value indicating the angle of x-axis labels.
 #'   The default is 0.
-#' @param title_lab A character string specifying the plot title.
-#' @param title_lab_size An integer value indicating the font size of the plot
+#' @param title_lab character string specifying the plot title.
+#' @param title_lab_size integer value indicating the font size of the plot
 #'   title. The default is 14.
-#' @param legend_lab A character string specifying the legend title.
-#' @param legend_position A character string specifying the position of the
+#' @param legend_lab character string specifying the legend title.
+#' @param legend_position character string specifying the position of the
 #'   legend. Can be one of "right", "left", "top", "bottom", or "none". The
 #'   default is "none".
-#' @param ylimit A numeric vector of length 2 specifying y-axis lower and upper
+#' @param ylimit numeric vector of length 2 specifying y-axis lower and upper
 #'   limits.
-#' @param bw_theme Logical. If TRUE uses the ggplot2 black and white theme.
-#' @param palette A character string indicating the name of the RColorBrewer
+#' @param bw_theme logical value. If TRUE uses the ggplot2 black and white theme.
+#' @param palette character string indicating the name of the RColorBrewer
 #'   palette to use. For a list of available options see the details section in
 #'   \code{\link[RColorBrewer]{RColorBrewer}}.
-#' @param use_VizSampNames Logical. Indicates whether to use custom sample
+#' @param use_VizSampNames logical value. Indicates whether to use custom sample
 #'   names. The default is FALSE.
 #'
+#' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
+#'   interactive is TRUE
+#'   
+#' @examples 
+#' \dontrun{
+#' library(pmartRdata)
+#' mypro <- edata_transform(omicsData = pro_object, data_scale = "log2")
+#' plot(omicsData = mypro, order_by = "Phenotype", color_by = "Phenotype")
+#' }
+#'   
 #' @rdname plot-proData
 #'
 #' @export
@@ -5361,7 +5457,7 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
 
 }
 
-#' Plotting function for `statRes` objects
+#' Plot statRes Object
 #'
 #' Produces plots that summarize the results contained in a `statRes` object.
 #'
@@ -5391,74 +5487,73 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
 #' @param plotly_layout This input is used when \code{plot_type = "gheatmap"}. A
 #'   list of arguments, not including the plot, to be passed to
 #'   \code{plotly::layout} if \code{interactive = TRUE}.
-#'
 #' @param interactive TRUE/FALSE for whether to create an interactive plot using
-#'   plotly.  Not valid for all plots.
-#' @param x_lab A character string specifying the x-axis label.
-#' @param x_lab_size An integer value indicating the font size for the x-axis.
+#'   plotly. Not valid for all plots.
+#' @param x_lab character string specifying the x-axis label.
+#' @param x_lab_size integer value indicating the font size for the x-axis.
 #'   The default is 11.
-#' @param x_lab_angle An integer value indicating the angle of x-axis labels.
-#' @param y_lab A character string specifying the y-axis label.
-#' @param y_lab_size An integer value indicating the font size for the y-axis.
+#' @param x_lab_angle integer value indicating the angle of x-axis labels.
+#' @param y_lab character string specifying the y-axis label.
+#' @param y_lab_size integer value indicating the font size for the y-axis.
 #'   The default is 11.
-#' @param title_lab A character string specifying the plot title.
-#' @param title_lab_size An integer value indicating the font size of the plot
+#' @param title_lab character string specifying the plot title.
+#' @param title_lab_size integer value indicating the font size of the plot
 #'   title. The default is 14.
-#' @param legend_lab A character string specifying the legend title.
-#' @param legend_position A character string specifying the position of the
+#' @param legend_lab character string specifying the legend title.
+#' @param legend_position character string specifying the position of the
 #'   legend. Can be one of "right", "left", "top", "bottom", or "none". The
 #'   default is "none".
-#' @param text_size An integer specifying the size of the text (number of
+#' @param text_size integer specifying the size of the text (number of
 #'   non-missing values) within the plot. The default is 3.
-#' @param bw_theme Logical. If TRUE uses the ggplot2 black and white theme.
-#' @param display_count Logical. Indicates whether the non-missing counts will
+#' @param bw_theme logical value. If TRUE uses the ggplot2 black and white theme.
+#' @param display_count logical value. Indicates whether the non-missing counts will
 #'   be displayed on the bar plot. The default is TRUE.
 #' @param custom_theme a ggplot `theme` object to be applied to non-interactive
 #'   plots, or those converted by plotly::ggplotly().
 #' @param top_n numeric for heatmaps; defaults to NULL.
-#' @param cluster logical for heatmaps; T will cluster biomolecules on X axis.
-#' defaults to T for seqData statistics and F for all others.
+#' @param cluster logical for heatmaps; TRUE will cluster biomolecules on X axis.
+#' defaults to TRUE for seqData statistics and FALSE for all others.
 #'
 #' @details Plot types:
 #' \itemize{
 #'  \item{"bar"} \code{?pmartR::statres_barplot} Bar-chart with bar heights
 #'  indicating the number of significant biomolecules, grouped by test type and
 #'  fold change direction.
-#'  \item{"volcano"} \code{?pmartR::statres_volcano_plot} Scatterplot showing
-#'  negative-log-pvalues against fold change.  Colored by statistical
+#'  \item{"volcano"} \code{?pmartR::statres_volcano_plot} Scatter plot showing
+#'  negative-log-pvalues against fold change. Colored by statistical
 #'  significance and fold change.
 #'  \item{"gheatmap"} \code{?pmartR::gtest_heatmap} Heatmap with x and y axes
-#'  indicating the number of nonmissing values for two groups.  Colored by
+#'  indicating the number of nonmissing values for two groups. Colored by
 #'  number of biomolecules that fall into that combination of nonmissing values.
 #'  \item{"fcheatmap"} Heatmap showing all biomolecules across comparisons,
 #'  colored by fold change.
 #' }
 #'
+#' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
+#'   interactive is TRUE
+#'   
 #' @export
 #' @method plot statRes
 #' @examples
 #' \dontrun{
-#' library(pmartR)
 #' library(pmartRdata)
-#' #Transform the data
-#'
 #' #Group the data by condition
-#' myproData <- group_designation(omicsData = pro_object,
-#'                                main_effects = c("Condition"))
+#' mypro <- group_designation(omicsData = pro_object,
+#'                            main_effects = c("Phenotype"))
 #'
 #' #Apply the IMD ANOVA filter
-#' imdanova_Filt <- imdanova_filter(omicsData = myproData)
-#' myproData <- applyFilt(filter_obj = imdanova_Filt,
-#'                        omicsData = myproData,
+#' imdanova_Filt <- imdanova_filter(omicsData = mypro)
+#' mypro <- applyFilt(filter_object = imdanova_Filt,
+#'                        omicsData = mypro,
 #'                        min_nonmiss_anova=2)
 #'
 #' #Implement the IMD ANOVA method and compuate all pairwise comparisons
 #' #(i.e. leave the `comparisons` argument NULL)
-#' anova_res <- imd_anova(omicsData = myproData, test_method = 'anova')
+#' anova_res <- imd_anova(omicsData = mypro, test_method = 'anova')
 #' plot(anova_res)
 #' plot(anova_res, plot_type = "volcano")
 #'
-#' imd_res <- imd_anova(omicsData = myproData, test_method = 'gtest')
+#' imd_res <- imd_anova(omicsData = mypro, test_method = 'gtest')
 #' plot(imd_res)
 #' plot(imd_res, plot_type = "gheatmap")
 #' # using arguments of internal functions:
@@ -5467,9 +5562,10 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
 #'      color_low = "red",
 #'      color_high = "green")
 #'
-#' imd_anova_res <- imd_anova(omicsData = myproData,
+#' imd_anova_res <- imd_anova(omicsData = mypro,
 #'                            test_method = 'comb',
-#'                            pval_adjust='bon')
+#'                            pval_adjust_a ='bon',
+#'                            pval_adjust_g = 'bon')
 #' plot(imd_anova_res, bw_theme = TRUE)
 #' plot(imd_anova_res, plot_type = "volcano", bw_theme = TRUE)
 #'
@@ -5823,8 +5919,7 @@ plot.statRes <- function (x,
 #' tamed!!
 #'
 #' @param x A statRes object.
-#'
-#' @param test A character string indicating the type of test run.
+#' @param test character string indicating the type of test run.
 #'
 prep_flags <- function (x, test) {
 
@@ -5944,7 +6039,7 @@ prep_flags <- function (x, test) {
 
 }
 
-#' Create a plotting dataframe for volcano plots and heatmaps.
+#' Create a plotting dataframe for volcano plots and heatmaps
 #'
 #' A function internal to \link{pmartR::plot.statRes} which creates the
 #' dataframe necessary to construct volcano plots and heatmaps.
@@ -6075,12 +6170,12 @@ make_volcano_plot_df <- function(x) {
 #'   \code{\link[pmartR:plot.statRes]{pmartR::plot.statRes()}}
 #' @param text_size An integer specifying the size of the text (number of
 #'   non-missing values) within the plot. The default is 3.
-#' @param display_count Logical. Indicates whether the non-missing counts will
+#' @param display_count logical value. Indicates whether the non-missing counts will
 #'   be displayed on the bar plot. The default is TRUE.
-#' @param x_lab A character string specifying the x-axis label.
-#' @param y_lab A character string specifying the y-axis label.
-#' @param title_lab A character string specifying the plot title.
-#' @param legend_lab A character string specifying the legend title.
+#' @param x_lab character string specifying the x-axis label.
+#' @param y_lab character string specifying the y-axis label.
+#' @param title_lab character string specifying the plot title.
+#' @param legend_lab character string specifying the legend title.
 #'
 #' @return `ggplot` object - barplot.
 #'
@@ -6199,20 +6294,20 @@ statres_barplot <- function(x,
 #' @param interactive passed from
 #'   \code{\link[pmartR:plot.statRes]{pmartR::plot.statRes()}}. If T, will build
 #'   a plotly version of the plot.  Defaults to FALSE.
-#' @param color_low A character string specifying the color of the gradient for
+#' @param color_low character string specifying the color of the gradient for
 #'   low count values.
-#' @param color_high A character string specifying the color of the gradient for
+#' @param color_high character string specifying the color of the gradient for
 #'   high count values.
 #' @param plotly_layout A list of arguments, not including the plot, to be
 #'   passed to plotly::layout if interactive = T.
 #' @param text_size An integer specifying the size of the text (number of
 #'   non-missing values) within the plot. The default is 3.
-#' @param display_count Logical. Indicates whether the non-missing counts will
-#'   be displayed on the bar plot. The default is TRUE.
-#' @param x_lab A character string specifying the x-axis label.
-#' @param y_lab A character string specifying the y-axis label.
-#' @param title_lab A character string specifying the plot title.
-#' @param legend_lab A character string specifying the legend title.
+#' @param display_count logical value. Indicates whether the non-missing counts
+#'   will be displayed on the bar plot. The default is TRUE.
+#' @param x_lab character string specifying the x-axis label.
+#' @param y_lab character string specifying the y-axis label.
+#' @param title_lab character string specifying the plot title.
+#' @param legend_lab character string specifying the legend title.
 #'
 #' @return `ggplot or plotly` object, depending on if \code{interactive} is set
 #' to TRUE or FALSE respectively. A g-test heatmap
@@ -6420,16 +6515,17 @@ gtest_heatmap <-
 #' change on the x axis. Each point is colored by fold change direction and
 #' whether or not it was significant by ANOVA.
 #'
-#' @param volcano `data.frame` produced by \link{pmartR::make_volcano_plot_df}
-#' @param pval_thresh alpha level to determine significance.  Any values that
-#'   are significant at this level will be colored based on fc_colors.
+#' @param volcano data frame produced by \link{pmartR::make_volcano_plot_df}
+#' @param pval_thresh numeric value between 0 and 1 for the alpha level to
+#'   determine significance. Any values that are significant at this level will
+#'   be colored based on fc_colors.
 #' @param data_scale One of c("log2","log","log10"), for labeling purposes.
 #' @param fc_colors,fc_threshold,interactive passed from
 #'   \code{\link[pmartR:plot.statRes]{pmartR::plot.statRes()}}
-#' @param x_lab A character string specifying the x-axis label.
-#' @param y_lab A character string specifying the y-axis label.
-#' @param title_lab A character string specifying the plot title.
-#' @param legend_lab A character string specifying the legend title.
+#' @param x_lab character string specifying the x-axis label.
+#' @param y_lab character string specifying the y-axis label.
+#' @param title_lab character string specifying the plot title.
+#' @param legend_lab character string specifying the legend title.
 #'
 #' @return `ggplot` object.  A volcano plot.
 #'

@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_fns.R
 \name{plot.nmrnormRes}
 \alias{plot.nmrnormRes}
-\title{Plots an object of class nmrnormRes}
+\title{Plot nmrnormRes Object}
 \usage{
 \method{plot}{nmrnormRes}(
   nmrnormRes_obj,
@@ -24,38 +24,40 @@
 \item{nmrnormRes_obj}{an object of type nmrnormRes, created by
 \code{\link{normalize_nmr}}}
 
-\item{interactive}{Logical. If TRUE produces an interactive plot.}
+\item{interactive}{logical value. If TRUE produces an interactive plot.}
 
-\item{x_lab}{A character string specifying the x-axis label.}
+\item{x_lab}{character string specifying the x-axis label}
 
-\item{y_lab}{A character string specifying the y-axis label.}
+\item{y_lab}{character string specifying the y-axis label}
 
-\item{x_lab_size}{An integer value indicating the font size for the x-axis.
-The default is 11.}
+\item{x_lab_size}{integer value indicating the font size for the x-axis. The
+default is 11.}
 
-\item{y_lab_size}{An integer value indicating the font size for the y-axis.
-The default is 11.}
+\item{y_lab_size}{integer value indicating the font size for the y-axis. The
+default is 11.}
 
-\item{x_lab_angle}{An integer value indicating the angle of x-axis labels.}
+\item{x_lab_angle}{integer value indicating the angle of x-axis labels.}
 
-\item{title_lab}{A character string specifying the plot title.}
+\item{title_lab}{character string specifying the plot title.}
 
-\item{title_lab_size}{An integer value indicating the font size of the plot
+\item{title_lab_size}{integer value indicating the font size of the plot
 title. The default is 14.}
 
-\item{legend_lab}{A character string specifying the legend title.}
+\item{legend_lab}{character string specifying the legend title.}
 
-\item{legend_position}{A character string specifying the position of the
+\item{legend_position}{character string specifying the position of the
 legend. Can be one of "right", "left", "top", "bottom", or "none". The
 default is "none".}
 
-\item{point_size}{An integer specifying the size of the points. The default
-is 2.}
+\item{point_size}{integer specifying the size of the points. The default is
+2.}
 
-\item{bw_theme}{Logical. If TRUE uses the ggplot2 black and white theme.}
+\item{bw_theme}{logical value. If TRUE uses the ggplot2 black and white
+theme.}
 }
 \value{
-plots ggplot2 object
+ggplot2 plot object if interactive is FALSE, or plotly plot object if
+  interactive is TRUE
 }
 \description{
 Creates a scatter plot for an S3 object of type 'nmrnormRes'
@@ -63,22 +65,11 @@ Creates a scatter plot for an S3 object of type 'nmrnormRes'
 \examples{
 \dontrun{
 library(pmartRdata)
-data(nmr_object_identified)
-
-nmr_object = edata_transform(nmr_object_identified, "log2")
-nmr_norm = normalize_nmr(nmr_object,
+mynmr <- edata_transform(omicsData = nmr_identified_object, data_scale = "log2")
+mynmr <- normalize_nmr(omicsData = mynmr,
                          apply_norm = FALSE,
                          metabolite_name = "unkm1.53")
-plot(nmr_norm)
-
-# alternate specification: #
-data(nmr_object_identified)
-
-nmr_object = edata_transform(nmr_object, "log2")
-nmr_norm = normalize_nmr(nmr_object,
-                         apply_norm = FALSE,
-                         sample_property_cname = "Concentration")
-plot(nmr_norm)
+plot(mynmr)
 }
 
 }

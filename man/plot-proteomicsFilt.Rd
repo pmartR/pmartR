@@ -2,10 +2,10 @@
 % Please edit documentation in R/plot_fns.R
 \name{plot.proteomicsFilt}
 \alias{plot.proteomicsFilt}
-\title{plot.proteomicsFilt}
+\title{Plot proteomicsFilt Object}
 \usage{
 \method{plot}{proteomicsFilt}(
-  filter_obj,
+  filter_object,
   plot_type = "num_peps",
   min_num_peps = NULL,
   interactive = FALSE,
@@ -29,12 +29,12 @@
 )
 }
 \arguments{
-\item{filter_obj}{Object of class proteomicsFilt which is a list containing
-two elements. The first element is a data frame with the counts of proteins
-mapping to each peptide. The second element is also a data frame with the
-counts of peptides mapping to each protein.}
+\item{filter_object}{object of class proteomicsFilt, which is a list with two
+elements. The first element is a data frame of counts for each unique
+peptide. The second element is a data frame with the counts for the number
+of peptides that map to each unique protein.}
 
-\item{plot_type}{A character string specifying the type of plot to be
+\item{plot_type}{character string specifying the type of plot to be
 displayed. The available options are "num_peps" or "redundancy". If
 "num_peps" the plot is displayed that shows the counts of proteins that
 have a specific number of peptides mapping to them. If "redundancy" the
@@ -47,45 +47,45 @@ the minimum number of peptides that must map to a protein. Any protein with
 less than \code{min_num_peps} mapping to it will be returned as a protein
 that should be filtered. Default value is NULL.}
 
-\item{interactive}{Logical. If TRUE produces an interactive plot.}
+\item{interactive}{logical value. If TRUE produces an interactive plot.}
 
-\item{x_lab_pep}{A character string used for the x-axis label for the
+\item{x_lab_pep}{character string used for the x-axis label for the
 num_peps plot. The default is NULL in which case the default x-axis label
 will be used.}
 
-\item{x_lab_pro}{A character string used for the x-axis label for the
+\item{x_lab_pro}{character string used for the x-axis label for the
 redundancy plot. The default is NULL in which case the default x-axis label
 will be used.}
 
-\item{y_lab_pep}{A character string used for the y-axis label for the
+\item{y_lab_pep}{character string used for the y-axis label for the
 num_peps plot. The default is NULL in which case the default y-axis label
 will be used.}
 
-\item{y_lab_pro}{A character string used for the y-axis label for the
+\item{y_lab_pro}{character string used for the y-axis label for the
 redundancy plot. The default is NULL in which case the default y-axis label
 will be used.}
 
-\item{x_lab_size}{An integer value indicating the font size for the x-axis.
+\item{x_lab_size}{integer value indicating the font size for the x-axis.
 The default is 11.}
 
-\item{y_lab_size}{An integer value indicating the font size for the y-axis.
+\item{y_lab_size}{integer value indicating the font size for the y-axis.
 The default is 11.}
 
-\item{x_lab_angle}{An integer value indicating the angle of x-axis labels.
+\item{x_lab_angle}{integer value indicating the angle of x-axis labels.
 The default is 0.}
 
-\item{title_lab_pep}{A character string specifying the num_peps plot title.
+\item{title_lab_pep}{character string specifying the num_peps plot title.
 The default is NULL in which case the default title will be used.}
 
-\item{title_lab_pro}{A character string specifying the redundancy plot title.
+\item{title_lab_pro}{character string specifying the redundancy plot title.
 The default is NULL in which case the default title will be used.}
 
-\item{title_lab_size}{An integer value indicating the font size of the plot
+\item{title_lab_size}{integer value indicating the font size of the plot
 title. The default is 14.}
 
-\item{legend_lab}{A character string specifying the legend title.}
+\item{legend_lab}{character string specifying the legend title}
 
-\item{legend_position}{A character string specifying the position of the
+\item{legend_position}{character string specifying the position of the
 legend. Can be one of "right", "left", "top", "bottom", or "none". The
 default is "none".}
 
@@ -96,23 +96,27 @@ default is 3.}
 \item{bar_width}{An integer indicating the width of the bars in the bar plot.
 The default is 0.8.}
 
-\item{bw_theme}{Logical. If TRUE uses the ggplot2 black and white theme.}
+\item{bw_theme}{logical value. If TRUE uses the ggplot2 black and white theme.}
 
-\item{palette}{A character string indicating the name of the RColorBrewer
+\item{palette}{character string indicating the name of the RColorBrewer
 palette to use. For a list of available options see the details section in
 \code{\link[RColorBrewer]{RColorBrewer}}.}
 
-\item{display_count}{Logical. Indicates whether the peptide or protein counts
+\item{display_count}{logical value. Indicates whether the peptide or protein counts
 will be displayed on the bar plot. The default is TRUE.}
+}
+\value{
+ggplot2 plot object if interactive is FALSE, or plotly plot object if
+  interactive is TRUE
 }
 \description{
 For plotting an S3 object of type 'proteomicsFilt':
 }
 \examples{
 \dontrun{
-data(pep_object)
-profilt <- proteomics_filter(pep_object)
-plot(profilt, min_num_peps = 5)
+library(pmartRdata)
+my_filter <- proteomics_filter(omicsData = pep_object)
+plot(my_filter, min_num_peps = 3)
 }
 
 }

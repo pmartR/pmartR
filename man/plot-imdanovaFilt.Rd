@@ -2,10 +2,10 @@
 % Please edit documentation in R/plot_fns.R
 \name{plot.imdanovaFilt}
 \alias{plot.imdanovaFilt}
-\title{plot.imdanovaFilt}
+\title{Plot imdanovaFilt Object}
 \usage{
 \method{plot}{imdanovaFilt}(
-  filter_obj,
+  filter_object,
   min_nonmiss_anova = NULL,
   min_nonmiss_gtest = NULL,
   interactive = FALSE,
@@ -27,9 +27,9 @@
 )
 }
 \arguments{
-\item{filter_obj}{Object of class imdanovaFilt (also a data frame) containing
+\item{filter_object}{Object of class imdanovaFilt (also a data frame) containing
 the molecule identifier and number of samples in each group with
-non-missing values for that molecule.}
+non-missing values for that molecule}
 
 \item{min_nonmiss_anova}{An integer indicating the minimum number of
 non-missing feature values allowed per group for \code{anova_filter}.
@@ -39,50 +39,63 @@ Suggested value is 2.}
 non-missing feature values allowed per group for \code{gtest_filter}.
 Suggested value is 3.}
 
-\item{interactive}{Logical. If TRUE produces an interactive plot.}
+\item{interactive}{logical value. If TRUE produces an interactive plot.}
 
-\item{x_lab}{A character string specifying the x-axis label.}
+\item{x_lab}{character string specifying the x-axis label}
 
-\item{y_lab}{A character string specifying the y-axis label.}
+\item{y_lab}{character string specifying the y-axis label}
 
-\item{x_lab_size}{An integer value indicating the font size for the x-axis.
+\item{x_lab_size}{integer value indicating the font size for the x-axis.
 The default is 11.}
 
-\item{y_lab_size}{An integer value indicating the font size for the y-axis.
+\item{y_lab_size}{integer value indicating the font size for the y-axis.
 The default is 11.}
 
-\item{x_lab_angle}{An integer value indicating the angle of x-axis labels.
+\item{x_lab_angle}{integer value indicating the angle of x-axis labels.
 The default is 0.}
 
-\item{title_lab}{A character string specifying the plot title.}
+\item{title_lab}{character string specifying the plot title.}
 
-\item{title_lab_size}{An integer value indicating the font size of the plot
+\item{title_lab_size}{integer value indicating the font size of the plot
 title. The default is 14.}
 
-\item{legend_lab}{A character string specifying the legend title.}
+\item{legend_lab}{character string specifying the legend title.}
 
-\item{legend_position}{A character string specifying the position of the
+\item{legend_position}{character string specifying the position of the
 legend. Can be one of "right", "left", "top", "bottom", or "none". The
 default is "none".}
 
-\item{point_size}{An integer specifying the size of the points. The default
+\item{point_size}{integer specifying the size of the points. The default
 is 3.}
 
-\item{line_size}{An integer specifying the thickness of the line. The default
+\item{line_size}{integer specifying the thickness of the line. The default
 is 0.75.}
 
-\item{text_size}{An integer specifying the size of the text (number of
+\item{text_size}{integer specifying the size of the text (number of
 biomolecules per group). The default is 3.}
 
-\item{bw_theme}{Logical. If TRUE uses the ggplot2 black and white theme.}
+\item{bw_theme}{logical value. If TRUE uses the ggplot2 black and white theme.}
 
-\item{palette}{A character string indicating the name of the RColorBrewer
+\item{palette}{character string indicating the name of the RColorBrewer
 palette to use. For a list of available options see the details section in
 \code{\link[RColorBrewer]{RColorBrewer}}.}
 
-\item{display_count}{Logical. Indicates whether the missing value counts by
+\item{display_count}{logical value. Indicates whether the missing value counts by
 sample will be displayed on the bar plot. The default is TRUE.}
+}
+\value{
+ggplot2 plot object if interactive is FALSE, or plotly plot object if
+  interactive is TRUE
 }
 \description{
 For plotting an S3 object of type 'imdanovaFilt'
+}
+\examples{
+\dontrun{
+library(pmartRdata)
+mypep <- group_designation(omicsData = pep_object, main_effects = "Phenotype")
+to_filter <- imdanova_filter(omicsData = mypep)
+plot(to_filter, min_nonmiss_anova = 2)  
+} 
+  
 }

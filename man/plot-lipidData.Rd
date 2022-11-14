@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_fns.R
 \name{plot.lipidData}
 \alias{plot.lipidData}
-\title{plot.lipidData}
+\title{Plot lipidData Object}
 \usage{
 \method{plot}{lipidData}(
   omicsData,
@@ -27,68 +27,77 @@
 )
 }
 \arguments{
-\item{omicsData}{A lipidData object.}
+\item{omicsData}{lipidData object}
 
-\item{order_by}{A character string specifying a main effect by which to order
-the boxplots. This main effect must be found in the column names of f_data
-in the omicsData object. If \code{order_by} is "Group", the boxplots
+\item{order_by}{character string specifying the column name of f_data by
+which to order the boxplots. If \code{order_by} is "Group", the boxplots
 will be ordered by the group variable from the group_designation function.
 If NULL (default), the boxplots will be displayed in the order they appear
 in the data.}
 
-\item{color_by}{A character string specifying a main effect by which to color
-the boxplots. This main effect must be found in the column names of f_data
-in the omicsData object. If \code{color_by} is "Group", the boxplots
+\item{color_by}{character string specifying the column name of f_data by
+which to color the boxplots. If \code{color_by} is "Group", the boxplots
 will be colored by the group variable from the group_designation function.
 If NULL (default), the boxplots will have one default color.}
 
-\item{facet_by}{A character string specifying a main effect with which to
-create a facet plot. This main effect must be found in the column names of
-f_data in the omicsData object. Default value is NULL.}
+\item{facet_by}{character string specifying the column name of f_data with
+which to create a facet plot. Default value is NULL.}
 
-\item{facet_cols}{An optional integer specifying the number of columns to
+\item{facet_cols}{optional integer specifying the number of columns to
 show in the facet plot.}
 
-\item{interactive}{Logical. If TRUE produces an interactive plot.}
+\item{interactive}{logical value. If TRUE produces an interactive plot.}
 
-\item{x_lab}{A character string specifying the x-axis label.}
+\item{x_lab}{character string specifying the x-axis label.}
 
-\item{y_lab}{A character string specifying the y-axis label. The default is
+\item{y_lab}{character string specifying the y-axis label. The default is
 NULL in which case the y-axis label will be the metric selected for the
 \code{metric} argument.}
 
-\item{x_lab_size}{An integer value indicating the font size for the x-axis.
+\item{x_lab_size}{integer value indicating the font size for the x-axis.
 The default is 11.}
 
-\item{y_lab_size}{An integer value indicating the font size for the y-axis.
+\item{y_lab_size}{integer value indicating the font size for the y-axis.
 The default is 11.}
 
-\item{x_lab_angle}{An integer value indicating the angle of x-axis labels.
+\item{x_lab_angle}{integer value indicating the angle of x-axis labels.
 The default is 0.}
 
-\item{title_lab}{A character string specifying the plot title.}
+\item{title_lab}{character string specifying the plot title.}
 
-\item{title_lab_size}{An integer value indicating the font size of the plot
+\item{title_lab_size}{integer value indicating the font size of the plot
 title. The default is 14.}
 
-\item{legend_lab}{A character string specifying the legend title.}
+\item{legend_lab}{character string specifying the legend title.}
 
-\item{legend_position}{A character string specifying the position of the
+\item{legend_position}{character string specifying the position of the
 legend. Can be one of "right", "left", "top", "bottom", or "none". The
 default is "none".}
 
-\item{ylimit}{A numeric vector of length 2 specifying y-axis lower and upper
+\item{ylimit}{numeric vector of length 2 specifying y-axis lower and upper
 limits.}
 
-\item{bw_theme}{Logical. If TRUE uses the ggplot2 black and white theme.}
+\item{bw_theme}{logical value. If TRUE uses the ggplot2 black and white theme.}
 
-\item{palette}{A character string indicating the name of the RColorBrewer
+\item{palette}{character string indicating the name of the RColorBrewer
 palette to use. For a list of available options see the details section in
 \code{\link[RColorBrewer]{RColorBrewer}}.}
 
-\item{use_VizSampNames}{Logical. Indicates whether to use custom sample
+\item{use_VizSampNames}{logical value. Indicates whether to use custom sample
 names. The default is FALSE.}
+}
+\value{
+ggplot2 plot object if interactive is FALSE, or plotly plot object if
+  interactive is TRUE
 }
 \description{
 For plotting lipidData S3 objects
+}
+\examples{
+\dontrun{
+library(pmartRdata)
+mylipid <- edata_transform(omicsData = lipid_pos_object, data_scale = "log2")
+plot(omicsData = mylipid, order_by = "Virus", color_by = "Virus")
+}      
+  
 }

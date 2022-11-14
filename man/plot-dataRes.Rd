@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_fns.R
 \name{plot.dataRes}
 \alias{plot.dataRes}
-\title{Plots an object of class dataRes}
+\title{Plot dataRes object}
 \usage{
 \method{plot}{dataRes}(
   dataRes_obj,
@@ -32,101 +32,98 @@
 )
 }
 \arguments{
-\item{dataRes_obj}{An object of class dataRes. A dataRes object is created by
-the \code{edata_summary} function.}
+\item{dataRes_obj}{object of class dataRes, created by the
+\code{\link{edata_summary}} function}
 
-\item{metric}{A character string indicating which metric to use in plot, one
-of 'mean', 'median', 'sd, 'pct_obs', 'min', or 'max'}
+\item{metric}{character string indicating which metric to use in plot:
+'mean', 'median', 'sd, 'pct_obs', 'min', or 'max'}
 
-\item{density}{logical default to FALSE, if set to true a density plot of the
-specified metric is returned}
+\item{density}{logical value, defaults to FALSE. If TRUE, a density plot of
+the specified metric is returned.}
 
-\item{ncols}{An integer specifying the number columns for the histogram
+\item{ncols}{integer value specifying the number columns for the histogram
 facet_wrap. This argument is used when \code{metric} is not null. The
 default is NULL.}
 
-\item{interactive}{Logical. If TRUE produces an interactive plot.}
+\item{interactive}{logical value. If TRUE, produces an interactive plot.}
 
-\item{x_lab}{A character string specifying the x-axis label when the metric
+\item{x_lab}{character string specifying the x-axis label when the metric
 argument is NULL. The default is NULL in which case the x-axis label will
 be "count".}
 
-\item{x_lab_sd}{A character string used for the x-axis label for the
+\item{x_lab_sd}{character string used for the x-axis label for the
 mean/standard deviation plot when the \code{metric} argument is not NULL.}
 
-\item{x_lab_median}{A character string used for the x-axis label for the
+\item{x_lab_median}{character string used for the x-axis label for the
 mean/median plot when the \code{metric} argument is not NULL.}
 
-\item{y_lab}{A character string specifying the y-axis label. The default is
+\item{y_lab}{character string specifying the y-axis label. The default is
 NULL in which case the y-axis label will be the metric selected for the
 \code{metric} argument.}
 
-\item{y_lab_sd}{A character string used for the y-axis label for the
+\item{y_lab_sd}{character string used for the y-axis label for the
 mean/standard deviation plot when the \code{metric} argument is not NULL.}
 
-\item{y_lab_median}{A character string used for the y-axis label for the
+\item{y_lab_median}{character string used for the y-axis label for the
 mean/median plot when the \code{metric} argument is not NULL.}
 
-\item{x_lab_size}{An integer value indicating the font size for the x-axis.
-The default is 11.}
+\item{x_lab_size}{integer value indicating the font size for the x-axis. The
+default is 11.}
 
-\item{y_lab_size}{An integer value indicating the font size for the y-axis.
-The default is 11.}
+\item{y_lab_size}{integer value indicating the font size for the y-axis. The
+default is 11.}
 
-\item{x_lab_angle}{An integer value indicating the angle of x-axis labels.}
+\item{x_lab_angle}{integer value indicating the angle of x-axis labels}
 
-\item{title_lab}{A character string specifying the plot title when the
+\item{title_lab}{character string specifying the plot title when the
 \code{metric} argument is NULL.}
 
-\item{title_lab_sd}{A character string used for the plot title for the
+\item{title_lab_sd}{character string used for the plot title for the
 mean/standard deviation plot when the \code{metric} argument is not NULL.}
 
-\item{title_lab_median}{A character string used for the plot title for the
+\item{title_lab_median}{character string used for the plot title for the
 mean/median plot when the \code{metric} argument is not NULL.}
 
-\item{title_lab_size}{An integer value indicating the font size of the plot
+\item{title_lab_size}{integer value indicating the font size of the plot
 title. The default is 14.}
 
-\item{legend_lab}{A character string specifying the legend title.}
+\item{legend_lab}{character string specifying the legend title.}
 
-\item{legend_position}{A character string specifying the position of the
+\item{legend_position}{character string specifying the position of the
 legend. Can be one of "right", "left", "top", or "bottom". The default is
 "right".}
 
-\item{point_size}{An integer specifying the size of the points. The default
-is 2.}
+\item{point_size}{integer specifying the size of the points. The default is
+2.}
 
-\item{bin_width}{An integer indicating the bin width in a histogram. The
-default is 0.5.}
+\item{bin_width}{integer indicating the bin width in a histogram. The default
+is 0.5.}
 
-\item{bw_theme}{Logical. If TRUE uses the ggplot2 black and white theme.}
+\item{bw_theme}{logical value. If TRUE, uses the ggplot2 black and white
+theme.}
 
-\item{palette}{A character string indicating the name of the RColorBrewer
+\item{palette}{character string indicating the name of the RColorBrewer
 palette to use. For a list of available options see the details section in
 \code{\link[RColorBrewer]{RColorBrewer}}.}
 }
 \value{
-plots ggplot2 object
+ggplot2 plot object if interactive is FALSE, or plotly plot object if
+  interactive is TRUE
 }
 \description{
 For plotting an S3 object of type dataRes
 }
 \details{
-This function can only create plots of dataRes objects whose 'by' ==
+This function can only create plots for dataRes objects whose 'by' =
   'molecule' and 'groupvar' attribute is non NULL
 }
 \examples{
 \dontrun{
 library (pmartRdata)
-
-data(lipid_object)
-
-lipid_object = edata_transform(lipid_object, "log2")
-
-result = edata_summary(omicsData = lipid_object,
+mylipid <- edata_transform(omicsData = lipid_pos_object, data_scale = "log2")
+result <- edata_summary(omicsData = mylipid,
                        by = "molecule",
-                       groupvar = "Condition")
-
+                       groupvar = "Virus")
 plot(result)
 }
 

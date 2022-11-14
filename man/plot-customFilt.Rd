@@ -2,12 +2,12 @@
 % Please edit documentation in R/plot_fns.R
 \name{plot.customFilt}
 \alias{plot.customFilt}
-\title{plot.customFilt}
+\title{Plot customFilt Object}
 \usage{
-\method{plot}{customFilt}(filter_obj)
+\method{plot}{customFilt}(filter_object)
 }
 \arguments{
-\item{filter_obj}{An object of class customFilt.}
+\item{filter_object}{An object of class customFilt.}
 }
 \description{
 Currently plotting a customFilt object is not supported

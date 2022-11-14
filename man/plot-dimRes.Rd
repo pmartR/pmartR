@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_fns.R
 \name{plot.dimRes}
 \alias{plot.dimRes}
-\title{plot.dimRes}
+\title{Plot dimRes Object}
 \usage{
 \method{plot}{dimRes}(
   dimRes_obj,
@@ -22,46 +22,65 @@
 )
 }
 \arguments{
-\item{dimRes_obj}{An object of class dimRes. A dimRes object is created by
-the \code{dim_reduction} function.}
+\item{dimRes_obj}{object of class dimRes created by the \code{dim_reduction}
+function}
 
-\item{interactive}{Logical. If TRUE produces an interactive plot.}
+\item{interactive}{logical value. If TRUE produces an interactive plot.}
 
-\item{x_lab}{A character string specifying the x-axis label.}
+\item{x_lab}{character string specifying the x-axis label}
 
-\item{y_lab}{A character string specifying the y-axis label. The default is
+\item{y_lab}{character string specifying the y-axis label. The default is
 NULL in which case the y-axis label will be the metric selected for the
 \code{metric} argument.}
 
-\item{x_lab_size}{An integer value indicating the font size for the x-axis.
+\item{x_lab_size}{integer value indicating the font size for the x-axis.
 The default is 11.}
 
-\item{y_lab_size}{An integer value indicating the font size for the y-axis.
+\item{y_lab_size}{integer value indicating the font size for the y-axis.
 The default is 11.}
 
-\item{x_lab_angle}{An integer value indicating the angle of x-axis labels.
+\item{x_lab_angle}{integer value indicating the angle of x-axis labels.
 The default is 0.}
 
-\item{title_lab}{A character string specifying the plot title.}
+\item{title_lab}{character string specifying the plot title}
 
-\item{title_lab_size}{An integer value indicating the font size of the plot
+\item{title_lab_size}{integer value indicating the font size of the plot
 title. The default is 14.}
 
-\item{legend_lab}{A character string specifying the legend title.}
+\item{legend_lab}{character string specifying the legend title}
 
-\item{legend_position}{A character string specifying the position of the
+\item{legend_position}{character string specifying the position of the
 legend. Can be one of "right", "left", "top", "bottom", or "none". The
 default is "none".}
 
 \item{point_size}{An integer specifying the size of the points. The default
 is 4.}
 
-\item{bw_theme}{Logical. If TRUE uses the ggplot2 black and white theme.}
+\item{bw_theme}{logical value. If TRUE uses the ggplot2 black and white theme.}
 
-\item{palette}{A character string indicating the name of the RColorBrewer
+\item{palette}{character string indicating the name of the RColorBrewer
 palette to use. For a list of available options see the details section in
 \code{\link[RColorBrewer]{RColorBrewer}}.}
 }
+\value{
+ggplot2 plot object if interactive is FALSE, or plotly plot object if
+  interactive is TRUE
+}
 \description{
 For plotting an S3 object of type 'dimRes'
+}
+\examples{
+\dontrun{
+library(pmartRdata)
+
+mylipid <- edata_transform(omicsData = lipid_neg_object, data_scale="log2")
+mylipid <- group_designation(omicsData = mylipid, main_effects = "Virus")
+pca_lipids <- dim_reduction(omicsData = mylipid)
+plot(pca_lipids)
+
+myseq <- group_designation(omicsData = rnaseq_object, main_effects = "Virus")
+pca_seq <- dim_reduction(omicsData = myseq)
+plot(pca_seq)
+}
+  
 }

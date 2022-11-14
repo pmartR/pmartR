@@ -2,10 +2,10 @@
 % Please edit documentation in R/plot_fns.R
 \name{plot.moleculeFilt}
 \alias{plot.moleculeFilt}
-\title{plot.moleculeFilt}
+\title{Plot moleculeFilt Object}
 \usage{
 \method{plot}{moleculeFilt}(
-  filter_obj,
+  filter_object,
   min_num = NULL,
   cumulative = TRUE,
   interactive = FALSE,
@@ -26,61 +26,65 @@
 )
 }
 \arguments{
-\item{filter_obj}{An object of class moleculeFilt that contains the molecule
+\item{filter_object}{object of class moleculeFilt that contains the molecule
 identifier and the number of samples for which the molecule was measured
-(not NA).}
+(not NA)}
 
 \item{min_num}{An integer specifying the minimum number of samples in which a
 biomolecule must appear. If a value is specified, a horizontal line will be
 drawn when \code{cumulative=TRUE}, and bars will be colored appropriately
-if \code{cumulative=FALSE}.  Defaults to NULL.}
+if \code{cumulative=FALSE}. Defaults to NULL.}
 
 \item{cumulative}{logical indicating whether the number of biomolecules
 observed in \emph{at least} (TRUE) x number of samples or \emph{exactly}
 (FALSE) x number of samples should be plotted.  Defaults to TRUE.}
 
-\item{interactive}{Logical. If TRUE produces an interactive plot.}
+\item{interactive}{logical value. If TRUE produces an interactive plot.}
 
-\item{x_lab}{A character string specifying the x-axis label.}
+\item{x_lab}{character string specifying the x-axis label}
 
-\item{y_lab}{A character string specifying the y-axis label. The default is
+\item{y_lab}{character string specifying the y-axis label. The default is
 NULL in which case the y-axis label will be the metric selected for the
 \code{metric} argument.}
 
-\item{x_lab_size}{An integer value indicating the font size for the x-axis.
+\item{x_lab_size}{integer value indicating the font size for the x-axis.
 The default is 11.}
 
-\item{y_lab_size}{An integer value indicating the font size for the y-axis.
+\item{y_lab_size}{integer value indicating the font size for the y-axis.
 The default is 11.}
 
-\item{x_lab_angle}{An integer value indicating the angle of x-axis labels.
+\item{x_lab_angle}{integer value indicating the angle of x-axis labels.
 The default is 0.}
 
-\item{title_lab}{A character string specifying the plot title.}
+\item{title_lab}{character string specifying the plot title}
 
-\item{title_lab_size}{An integer value indicating the font size of the plot
+\item{title_lab_size}{integer value indicating the font size of the plot
 title. The default is 14.}
 
-\item{legend_lab}{A character string specifying the legend title.}
+\item{legend_lab}{character string specifying the legend title.}
 
-\item{legend_position}{A character string specifying the position of the
+\item{legend_position}{character string specifying the position of the
 legend. Can be one of "right", "left", "top", "bottom", or "none". The
 default is "none".}
 
-\item{text_size}{An integer specifying the size of the text (number of
+\item{text_size}{integer specifying the size of the text (number of
 biomolecules by sample) within the bar plot. The default is 3.}
 
-\item{bar_width}{An integer indicating the width of the bars in the bar plot.
+\item{bar_width}{integer indicating the width of the bars in the bar plot.
 The default is 0.8.}
 
-\item{bw_theme}{Logical. If TRUE uses the ggplot2 black and white theme.}
+\item{bw_theme}{logical value. If TRUE uses the ggplot2 black and white theme.}
 
-\item{palette}{A character string indicating the name of the RColorBrewer
+\item{palette}{character string indicating the name of the RColorBrewer
 palette to use. For a list of available options see the details section in
 \code{\link[RColorBrewer]{RColorBrewer}}.}
 
-\item{display_count}{Logical. Indicates whether the missing value counts by
+\item{display_count}{logical value. Indicates whether the missing value counts by
 sample will be displayed on the bar plot. The default is TRUE.}
+}
+\value{
+ggplot2 plot object if interactive is FALSE, or plotly plot object if
+  interactive is TRUE
 }
 \description{
 For plotting an S3 object of type 'moleculeFilt':
@@ -88,7 +92,7 @@ For plotting an S3 object of type 'moleculeFilt':
 \examples{
 \dontrun{
 data(pep_object)
-molfilt <- molecule_filter(pep_object)
+molfilt <- molecule_filter(omicsData = pep_object)
 plot(molfilt, min_num = 5)
 plot(molfilt, min_num = 3, cumulative = FALSE)
 }
