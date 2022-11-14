@@ -7,9 +7,23 @@
 edata_transform(omicsData, data_scale)
 }
 \arguments{
-\item{omicsData}{an object of the class 'pepData', 'proData', 'metabData', 'lipidData', 'nmrData', or 'seqData', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, \code{\link{as.lipidData}}, \code{\link{as.nmrData}}, \code{\link{as.seqData}}, respectively.}
+\item{omicsData}{an object of the class 'pepData', 'proData', 'metabData',
+'lipidData', or 'nmrData', created by
+\code{\link{as.pepData}}, \code{\link{as.proData}},
+\code{\link{as.metabData}}, \code{\link{as.lipidData}}, or
+\code{\link{as.nmrData}}, respectively.}
 
-\item{data_scale}{a character string indicating the type of transformation to be applied to the data. Valid values for 'pepData', 'proData', 'metabData', 'lipidData', or 'nmrData': 'log2', 'log', 'log10', or 'abundance'. Valid values for 'seqData': 'upper', 'median', 'lcpm'. A value of 'abundance' indicates the data has previously undergone one of the log transformations and should be transformed back to raw values with no transformation applied. For 'seqData', 'lcpm' transforms by log2 counts per million, 'upper' transforms by the upper quartile of non-zero counts, and 'median' transforms by the median of non-zero counts.}
+\item{data_scale}{a character string indicating the type of transformation to
+be applied to the data. Valid values for 'pepData', 'proData', 'metabData',
+'lipidData', or 'nmrData': 'log2', 'log', 'log10', or 'abundance'. A value
+of 'abundance' indicates the data has previously undergone one of the log
+transformations and should be transformed back to raw values with no
+transformation applied. 
+
+Valid values for 'seqData': 'upper', 'median',
+'lcpm'. For 'seqData', 'lcpm' transforms by log2 counts per million,
+'upper' transforms by the upper quartile of non-zero counts, and 'median'
+transforms by the median of non-zero counts.}
 }
 \value{
 data object of the same class as omicsData
@@ -18,15 +32,17 @@ data object of the same class as omicsData
 This function applies a transformation to the e_data element of omicsData
 }
 \details{
-This function is intended to be used before analysis of the data begins. Data are typically analyzed on a log scale.
+For all but seqData, this function is intended to be used before
+  analysis of the data begins, and data are typically analyzed on a log
+  scale. This function is not applicable to seqData objects, as any
+  transformations needed e.g. to allow more meaningful visualization of
+  seqData objects are performed within the pertinent functions.
 }
 \examples{
-dontrun{
 library(pmartRdata)
-data(metab_object)
-metab_object2 <- edata_transform(omicsData = metab_object, data_scale="log2")
-attr(metab_object2, "data_info")$data_scale
-}
+mymetab <- edata_transform(omicsData = metab_object, data_scale="log2")
+attr(mymetab, "data_info")$data_scale
+
 }
 \author{
 Kelly Stratton, Natalie Heller
