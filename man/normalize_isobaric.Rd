@@ -2,7 +2,7 @@
 % Please edit documentation in R/normalize_isobaric.R
 \name{normalize_isobaric}
 \alias{normalize_isobaric}
-\title{Normalize an object of class isobaricpepData}
+\title{Examine and Apply Isobaric Normalization}
 \usage{
 normalize_isobaric(
   omicsData,
@@ -18,41 +18,42 @@ normalize_isobaric(
 \item{omicsData}{an object of the class 'isobaricpepData'}
 
 \item{exp_cname}{character string specifying the name of the column
-containing the experiment/plate information in \code{f_data}.}
+containing the experiment/plate information in \code{f_data}}
 
 \item{apply_norm}{logical, indicates whether normalization should be applied
 to omicsData$e_data}
 
 \item{channel_cname}{optional character string specifying the name of the
 column containing the instrument channel a sample was run on in
-\code{f_data}. This argument is optional, see Details for how to specify
+\code{f_data}. This argument is optional. See Details for how to specify
 information regarding reference pool samples. If using this argument, the
 'refpool_channel' argument must also be specified; in this case,
 'refpool_cname' and 'refpool_notation' should not be specified.}
 
 \item{refpool_channel}{optional character string specifying which channel
-contained the reference pool sample, only used when this remains the same
-from experiment to experiment. This argument is optional, see Details for
+contains the reference pool sample. Only used when this is the same
+from experiment to experiment. This argument is optional. See Details for
 how to specify information regarding reference pool samples. If using this
 argument, the 'channel_cname' argument must also be specified; in this
 case, 'refpool_cname' and 'refpool_notation' should not be specified.}
 
 \item{refpool_cname}{optional character string specifying the name of the
 column containing information about which samples are reference samples in
-\code{f_data}. This argument is optional, see Details for how to specify
+\code{f_data}. This argument is optional. see Details for how to specify
 information regarding reference pool samples. If using this argument, the
 'refpool_notation' argument must also be specified; in this case,
 'channel_cname' and 'refpool_channel' should not be specified.}
 
 \item{refpool_notation}{optional character string specifying the value in the
 refpool_channel column which denotes that a sample is a reference sample.
-This argument is optional, see Details for how to specify information
+This argument is optional. See Details for how to specify information
 regarding reference pool samples. If using this argument, the
 'refpool_cname' argument must also be specified; in this case,
 'channel_cname' and 'refpool_channel' should not be specified.}
 }
 \description{
-The samples are normalized to their corresponding reference pool sample
+Examine reference pool samples and apply normalization of study samples to
+their corresponding reference pool sample
 }
 \details{
 There are two ways to specify the information needed for identifying
@@ -75,25 +76,22 @@ There are two ways to specify the information needed for identifying
   was run on.
 }
 \examples{
-\dontrun{
 library(pmartRdata)
-data(isobaric_object)
 
-isobaric_object = edata_transform(isobaric_object, "log2")
-isobaric_norm = normalize_isobaric(isobaric_object, exp_cname = "Set",
+myiso <- edata_transform(isobaric_object, "log2")
+
+# Don't apply the normalization quite yet; can use summary() and plot() to view reference pool samples
+myiso_refpools <- normalize_isobaric(omicsData = myiso, exp_cname = "Plex",
+                                   apply_norm = FALSE,
+                                   refpool_cname = "Virus",
+                                   refpool_notation = "Pool")
+summary(myiso_refpools)                     
+  
+# Now apply the normalization; can use plot() to view the study samples after reference pool normalization                                 
+myiso_norm <- normalize_isobaric(omicsData = myiso, exp_cname = "Plex",
                                    apply_norm = TRUE,
-                                   channel_cname = "iTRAQ.Channel",
-                                   refpool_channel = "116")
+                                   refpool_cname = "Virus",
+                                   refpool_notation = "Pool")
 
-# alternate specification: #
-data(isobaric_object)
-
-isobaric_object = edata_transform(isobaric_object, "log2")
-isobaric_norm = normalize_isobaric(isobaric_object, exp_cname = "Set",
-                                   apply_norm = TRUE,
-                                   refpool_cname = "Reference",
-                                   refpool_notation = "Yes")
-
-}
 
 }

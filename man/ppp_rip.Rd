@@ -2,40 +2,49 @@
 % Please edit documentation in R/subset_funcs.R
 \name{ppp_rip}
 \alias{ppp_rip}
-\title{Identify Proportion of Peptides Present (PPP) and Rank Invariant Peptides (RIP)}
+\title{Identify Proportion of Peptides Present (PPP) and Rank Invariant Peptides
+(RIP) for Use in Normalization}
 \usage{
 ppp_rip(e_data, edata_id, fdata_id, groupDF, alpha = 0.2, proportion = 0.5)
 }
 \arguments{
-\item{e_data}{a \eqn{p \times n + 1} data.frame, where \eqn{p} is the number of peptides, proteins, lipids, or metabolites and \eqn{n} is the number of samples. Each row corresponds to data for a peptide, protein, lipid, or metabolite, with a column giving the identifer name.}
+\item{e_data}{a \eqn{p \times n + 1} data.frame, where \eqn{p} is the number
+of peptides, proteins, lipids, or metabolites and \eqn{n} is the number of
+samples. Each row corresponds to data for a peptide, protein, lipid, or
+metabolite, with one column giving the biomolecule identifier name.}
 
-\item{edata_id}{character string indicating the name of the peptide, protein, lipid, or metabolite identifier. Usually obtained by calling \code{attr(omicsData, "cnames")$edata_cname}.}
+\item{edata_id}{character string indicating the name of the peptide, protein,
+lipid, or metabolite identifier. Usually obtained by calling
+\code{attr(omicsData, "cnames")$edata_cname}.}
 
-\item{fdata_id}{character string indicating the name of the sample column name in f_data.}
+\item{fdata_id}{character string indicating the name of the sample column
+name in f_data.}
 
-\item{groupDF}{data.frame created by \code{group_designation} with columns for sample.id and group. If two main effects are provided the original main effect levels for each sample are returned as the third and fourth columns of the data.frame.}
+\item{groupDF}{data.frame created by \code{group_designation} with columns
+for sample.id and group. If two main effects are provided the original main
+effect levels for each sample are returned as the third and fourth columns
+of the data.frame.}
 
-\item{alpha}{numeric p-value threshold, above which the features are retained as rank invariant (default value 0.25)}
+\item{alpha}{numeric p-value threshold, above which the biomolecules are retained
+as rank invariant (default value 0.25)}
 
-\item{proportion}{numeric value between 0 and 1, indicating the percentage at or above which a feature must be present across all samples in order to be retained (default value 0.5)}
+\item{proportion}{numeric value between 0 and 1, indicating the percentage at
+or above which a biomolecule must be present across all samples in order to be
+retained (default value 0.5)}
 }
 \value{
-Character vector containing the features belonging to the ppp_rip subset.
+Character vector containing the biomolecules belonging to the ppp_rip subset.
 }
 \description{
-Selects features for normalization via the method of proportion of peptides present and rank invariant peptides (ppp_rip)
+Selects biomolecules for normalization via the method of proportion of
+biomolecules present and rank invariant biomolecules (ppp_rip)
 }
 \details{
-Features present across \code{proportion} samples are subjected to a Kruskal-Wallis test (non-parametric one-way ANOVA, where NAs are ignored) on group membership, and those biomolecules with p-value greater than a defined threshold \code{alpha} (common values include 0.1 or 0.25) are retained as rank-invariant biomolecules.
-}
-\examples{
-\dontrun{
-library(pmartRdata)
-data(pep_pepData)
-pep_pepData2 <- group_designation(omicsData = pep_pepData, main_effects = "Condition")
-pep_subset <- ppp_rip(e_data = pep_pepData2$e_data, edata_id = attr(pep_pepData2, "cnames")$edata_cname, samp_id = attr(pep_pepData2, "cnames")$fdata_cname, pmartR_groupDF = attr(pep_pepData2, "group_DF"))
-}
-
+Biomolecules present across \code{proportion} samples are subjected to a
+  Kruskal-Wallis test (non-parametric one-way ANOVA, where NAs are ignored)
+  on group membership, and those biomolecules with p-value greater than a
+  defined threshold \code{alpha} (common values include 0.1 or 0.25) are
+  retained as rank-invariant biomolecules.
 }
 \author{
 Kelly Stratton

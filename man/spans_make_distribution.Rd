@@ -15,10 +15,8 @@ spans_make_distribution(
 )
 }
 \arguments{
-\item{omicsData}{an object of the class 'pepData', 'proData', 'lipidData', or
-'metabData' usually created by \code{\link{as.pepData}},
-\code{\link{as.proData}}, \code{\link{as.lipidData}}, or
-\code{\link{as.metabData}}, respectively.}
+\item{omicsData}{an object of the class 'pepData' or 'proData' created by
+\code{\link{as.pepData}} or \code{\link{as.proData}}, respectively.}
 
 \item{group_vector}{A character vector from the group_DF attribute specifying
 the order of the samples. This order is the same as the order of the

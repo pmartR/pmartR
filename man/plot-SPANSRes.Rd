@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_fns.R
 \name{plot.SPANSRes}
 \alias{plot.SPANSRes}
-\title{Plots an object of class SPANSRes}
+\title{Plot SPANSRes Object}
 \usage{
 \method{plot}{SPANSRes}(
   SPANSRes_obj,
@@ -22,46 +22,57 @@
 )
 }
 \arguments{
-\item{SPANSRes_obj}{an object of the class 'SPANSRes', usually created by
-\code{\link{spans_procedure()}}.}
+\item{SPANSRes_obj}{an object of the class 'SPANSRes', created by
+\code{\link{spans_procedure()}}}
 
-\item{interactive}{Logical. If TRUE produces an interactive plot.}
+\item{interactive}{logical value. If TRUE produces an interactive plot.}
 
-\item{x_lab}{A character string specifying the x-axis label.}
+\item{x_lab}{character string specifying the x-axis label.}
 
-\item{y_lab}{A character string specifying the y-axis label.}
+\item{y_lab}{character string specifying the y-axis label.}
 
-\item{x_lab_size}{An integer value indicating the font size for the x-axis.
+\item{x_lab_size}{integer value indicating the font size for the x-axis.
 The default is 11.}
 
-\item{y_lab_size}{An integer value indicating the font size for the y-axis.
+\item{y_lab_size}{integer value indicating the font size for the y-axis.
 The default is 11.}
 
-\item{x_lab_angle}{An integer value indicating the angle of x-axis labels.
+\item{x_lab_angle}{integer value indicating the angle of x-axis labels.
 The default is NULL.}
 
-\item{title_lab}{A character string specifying the plot title.}
+\item{title_lab}{character string specifying the plot title}
 
-\item{title_lab_size}{An integer value indicating the font size of the plot
+\item{title_lab_size}{integer value indicating the font size of the plot
 title. The default is 14.}
 
-\item{legend_lab}{A character string specifying the legend title.}
+\item{legend_lab}{character string specifying the legend title}
 
-\item{legend_position}{A character string specifying the position of the
+\item{legend_position}{character string specifying the position of the
 legend. Can be one of "right", "left", "top", "bottom", or "none". The
 default is "none".}
 
-\item{color_low}{A character string specifying the color of the gradient for
+\item{color_low}{character string specifying the color of the gradient for
 low values.}
 
-\item{color_high}{A character string specifying the color of the gradient for
-high values.}
+\item{color_high}{character string specifying the color of the gradient for
+high values}
 
-\item{bw_theme}{Logical. If TRUE uses the ggplot2 black and white theme.}
+\item{bw_theme}{logical value. If TRUE uses the ggplot2 black and white theme.}
 }
 \value{
-plots a plotly object
+ggplot2 plot object if interactive is FALSE, or plotly plot object if
+  interactive is TRUE
 }
 \description{
 For plotting an S3 object of type 'SPANSRes'
+}
+\examples{
+\dontrun{
+library(pmartRdata)
+mypep <- edata_transform(omicsData = pep_object, data_scale = "log2")
+mypep <- group_designation(omicsData = mypep, main_effects = "Phenotype")
+myspans <- spans_procedure(omicsData = mypep)
+plot(myspans)
+}
+
 }
