@@ -18,34 +18,40 @@ trelli_abundance_histogram(
 )
 }
 \arguments{
-\item{trelliData}{A trelliscope data object made by as.trelliData or as.trelliData.edata,
-and grouped by edata_cname in trelli_panel_by. Required.}
+\item{trelliData}{A trelliscope data object made by as.trelliData or
+as.trelliData.edata, and grouped by edata_cname in trelli_panel_by.
+Required.}
 
-\item{cognostics}{A vector of cognostic options for each plot. Valid entries are
-n, mean, median, sd, and skew. p_value and fold_change can be added if statRes
-is included.}
+\item{cognostics}{A vector of cognostic options for each plot. Valid entries
+are n, mean, median, sd, and skew. p_value and fold_change can be added if
+statRes is included.}
 
-\item{ggplot_params}{An optional vector of strings of ggplot parameters to the backend ggplot
-function. For example, c("ylab('')", "ylim(c(1,2))"). Default is NULL.}
+\item{ggplot_params}{An optional vector of strings of ggplot parameters to
+the backend ggplot function. For example, c("ylab('')", "ylim(c(1,2))").
+Default is NULL.}
 
-\item{interactive}{A logical argument indicating whether the plots should be interactive
-or not. Interactive plots are ggplots piped to ggplotly (for now). Default is FALSE.}
+\item{interactive}{A logical argument indicating whether the plots should be
+interactive or not. Interactive plots are ggplots piped to ggplotly (for
+now). Default is FALSE.}
 
-\item{path}{The base directory of the trelliscope application. Default is Downloads.}
+\item{path}{The base directory of the trelliscope application. Default is
+Downloads.}
 
 \item{name}{The name of the display. Default is Trelliscope.}
 
-\item{test_mode}{A logical to return a smaller trelliscope to confirm plot and design.
-Default is FALSE.}
+\item{test_mode}{A logical to return a smaller trelliscope to confirm plot
+and design. Default is FALSE.}
 
-\item{test_example}{A vector of plot indices to return for test_mode. Default is 1.}
+\item{test_example}{A vector of plot indices to return for test_mode. Default
+is 1.}
 
-\item{single_plot}{A TRUE/FALSE to indicate whether 1 plot (not a trelliscope) should be returned. 
-Default is FALSE.}
+\item{single_plot}{A TRUE/FALSE to indicate whether 1 plot (not a
+trelliscope) should be returned. Default is FALSE.}
 }
 \description{
-Specify a plot design and cognostics for the abundance histogram trelliscope.
-   Main_effects grouping are ignored. Data must be grouped by edata_cname.
+Specify a plot design and cognostics for the abundance histogram
+  trelliscope. Main_effects grouping are ignored. Data must be grouped by
+  edata_cname.
 }
 \examples{
 \dontrun{
@@ -70,7 +76,6 @@ trelli_panel_by(trelliData = trelliData, panel = "LipidCommonName") \%>\%
      cognostics = c("mean", "median"))  
    
 }
-
 
 }
 \author{

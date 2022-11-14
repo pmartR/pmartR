@@ -45,50 +45,51 @@
 
 #' @name as.trelliData.edata
 #' 
-#' @title Generate an object from edata to pass to trelliscope building functions 
-#' 
-#' @description The only acceptable input file type is a single edata file. Transformation
-#'    and normalization must be specified. Isobaric protein or NMR data does not
-#'    need to be normalized. 
+#' @title Generate an object from edata to pass to trelliscope building
+#'   functions
+#'
+#' @description The only acceptable input file type is a single edata file.
+#'   Transformation and normalization must be specified. Isobaric protein or NMR
+#'   data does not need to be normalized.
 #'  
 #' @param e_data a \eqn{p * (n + 1)} data.frame of expression data, where
 #'   \eqn{p} is the number of biomolecules observed and \eqn{n} is the number of
 #'   samples (an additional biomolecule identifier/name column should also be
-#'   present anywhere in the data.frame). Each row corresponds to data for each
-#'   biomolecule. One column specifying a unique identifier for each biomolecule (row)
-#'   must be present. We do not recommend passing data that requires reference 
-#'   normalization (isobaric, nmr, etc.)
+#'   present anywhere in the data.frame). Each row corresponds to data for one
+#'   biomolecule. One column specifying a unique identifier for each biomolecule
+#'   (row) must be present. We do not recommend passing data that requires
+#'   reference normalization (isobaric, nmr, etc.)
 #' @param edata_cname character string specifying the name of the column
-#'   containing the biomolecule identifiers. It should be the only non-numeric colummn
-#'   in edata.
-#' @param omics_type A string of the data type. Acceptable options are "pepData",
-#'   "isobaricpepData", "proData", "metabData", "lipidData", or "nmrData".
+#'   containing the biomolecule identifiers. It should be the only non-numeric
+#'   colummn in edata.
+#' @param omics_type A string specifying the data type. Acceptable options are
+#'   "pepData", "isobaricpepData", "proData", "metabData", "lipidData", or
+#'   "nmrData".
 #' @param data_scale_original A character string indicating original scale 
 #'   of the data. Valid values are: 'log2', 'log', 'log10', or 'abundance'.
 #'   Default is abundance. 
-#' @param data_scale A character string indicating the scale to transform 
-#'   the data to. Valid values are: 'log2', 'log', 'log10', or 'abundance'. If 
-#'   the value is the same as data_scale_original, then transformation is not applied. 
-#'   Default is log2.
-#' @param normalization_fun A character string indicating the pmartR normalization
-#'   function to use on the data, if is_normalized is FALSE. Acceptable choices are 
-#'   'global', 'loess', and 'quantile'.
-#' @param normalization_params A vector or list where the normalization parameters
-#'   are the names, and the parameter values are the list values. For example, an 
-#'   acceptable entry for 'normalize_global' would be list("subset_fn" = "all", "norm_fn" = "median", 
-#'   "apply_norm" = TRUE, "backtransform" = TRUE).
+#' @param data_scale A character string indicating the scale to transform the
+#'   data to. Valid values are: 'log2', 'log', 'log10', or 'abundance'. If the
+#'   value is the same as data_scale_original, then transformation is not
+#'   applied. Default is log2.
+#' @param normalization_fun A character string indicating the pmartR
+#'   normalization function to use on the data, if is_normalized is FALSE.
+#'   Acceptable choices are 'global', 'loess', and 'quantile'.
+#' @param normalization_params A vector or list where the normalization
+#'   parameters are the names, and the parameter values are the list values. For
+#'   example, an acceptable entry for 'normalize_global' would be
+#'   list("subset_fn" = "all", "norm_fn" = "median", "apply_norm" = TRUE,
+#'   "backtransform" = TRUE).
 #'  
 #' @examples
-#' \dontrun{
 #' library(pmartRdata)
 #' data("lipid_edata_pos")
 #' 
 #' # Simple example 
-#' trelliData <- as.trelliData.edata(e_data = lipid_edata_pos,
-#'                                   edata_cname = "LipidCommonName",
+#' trelliData <- as.trelliData.edata(e_data = lipid_pos_edata,
+#'                                   edata_cname = "Lipid",
 #'                                   omics_type = "lipidData")
 #'                                   
-#' }   
 #'           
 #' @author David Degnan, Daniel Claborne, Lisa Bramer
 #' 
@@ -213,19 +214,24 @@ as.trelliData.edata <- function(e_data,
 
 #' @name as.trelliData
 #' 
-#' @title Generate an object from omicsData and/or statRes objects to pass to trelliscope building functions
+#' @title Generate an object from omicsData and/or statRes objects to pass to
+#'   trelliscope building functions
 #' 
-#' @description Either an omicsData and/or a statRes object is accepted. omicsData must
-#'    be transformed and normalized, unless the data is isobaric protein or NMR data.
-#'    Adding a "main_effects" group_desgination() will result in plots with groups. 
-#'    The main effects group_designation and e_meta columns are merged to the e_data in long format to
-#'    create the trelliData.omics dataframe, and e_meta is merged to statRes in long
-#'    format to create trelliData.stat dataframe. 
+#' @description Either an omicData and/or a statRes object are accepted.
+#'   omicData must be transformed and normalized, unless the data is isobaric
+#'   protein or NMR data. If group_designation() has been run on the omicData
+#'   object to add "main_effects", the resulting plots will include groups. The
+#'   main effects group_designation and e_meta columns are merged to the e_data
+#'   in long format to create the trelliData.omics dataframe, and e_meta is
+#'   merged to statRes in long format to create trelliData.stat dataframe.
 #'    
-#' @param omicsData an object of the class 'pepData', 'isobaricpepData', proData', 
-#'    'metabData', 'lipidData', 'nmrData', created by as.pepData, as.isobaricpepData.
-#'    as.proData, as.metabData, as.lipidData, as.nmrData, respectively. 
-#' @param statRes statRes an object of the class 'statRes', created by \code{\link{summarize}}
+#' @param omicsData an object of the class 'pepData', 'isobaricpepData',
+#'   proData', 'metabData', 'lipidData', or 'nmrData', created by
+#'   \code{\link{as.pepData}}, \code{\link{as.isobaricpepData}},
+#'   \code{\link{as.proData}}, \code{\link{as.metabData}},
+#'   \code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, respectively.
+#' @param statRes statRes an object of the class 'statRes', created by
+#'   \code{\link{imd_anova}}
 #' 
 #' @examples
 #' \dontrun{
@@ -233,25 +239,18 @@ as.trelliData.edata <- function(e_data,
 #' library(pmartRdata)
 #' 
 #' # Generate an example e_meta file for lipid data 
-#' lipid_emeta <- data.frame("LipidCommonName" = lipid_edata_pos$LipidCommonName, 
-#'   "LipidFamily" = lipid_edata_pos$LipidCommonName %>% as.character() %>% 
+#' lipid_emeta <- data.frame("Lipid" = lipid_pos_edata$Lipid, 
+#'   "LipidFamily" = lipid_pos_edata$Lipid %>% as.character() %>% 
 #'     strsplit("(", fixed = T) %>% lapply(function(el) {el[1]}) %>% unlist())
 #'     
-#' # Extend fdata to have two infection groups 
-#' lipid_fdata_pos2 <- data.frame("Sample_Name" = lipid_fdata_pos$Sample_Name, 
-#'   "Condition" = c(rep("Mock", 3), rep("Infection_A", 4), rep("Infection_B", 4)),
-#'   "Weight" = runif(11))
-#' 
-#' # Build lipid data object
-#' lipids <- as.lipidData(e_data = lipid_edata_pos, f_data = lipid_fdata_pos2, e_meta = lipid_emeta,
-#'   edata_cname = "LipidCommonName", fdata_cname = "Sample_Name", 
-#'   emeta_cname = "LipidCommonName")
 #' 
 #' # Transform the data
-#' omicsData <- edata_transform(omicsData = lipids, data_scale = "log2")
+#' omicsData <- edata_transform(omicsData = lipid_neg_object, data_scale = "log2")
+#' omicsData$e_meta$LipidFamily <- omicsData$e_meta$Lipid %>% as.character() %>% 
+#'     strsplit("(", fixed = T) %>% lapply(function(el) {el[1]}) %>% unlist()
 #' 
 #' # Group the data by condition
-#' omicsData <- group_designation(omicsData = omicsData, main_effects = c("Condition"))
+#' omicsData <- group_designation(omicsData = omicsData, main_effects = c("Virus"))
 #' 
 #' # Apply the IMD ANOVA filter
 #' imdanova_Filt <- imdanova_filter(omicsData = omicsData)
@@ -479,21 +478,25 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL, ...) {
 #' library(pmartRdata)
 #' library(pmartR)
 #' 
-#' ## "panel_by" with an edata file. Generate with example code in as.trelliData.edata
-#' trelli_panel_by(trelliData = trelliData, panel = "LipidCommonName")
+#' ## "panel_by" with an edata file. 
+#' ## Generate with example code in as.trelliData.edata
+#' trelli_panel_by(trelliData = trelliData, panel = "Lipid")
 #' trelli_panel_by(trelliData = trelliData, panel = "Sample")
 #' 
-#' ## "panel_by" with trelliData containing omicsData. Generate with example code in as.trelliData
-#' trelli_panel_by(trelliData = trelliData2, panel = "LipidCommonName")
+#' ## "panel_by" with trelliData containing omicsData. 
+#' ## Generate with example code in as.trelliData
+#' trelli_panel_by(trelliData = trelliData2, panel = "Lipid")
 #' trelli_panel_by(trelliData = trelliData2, panel = "LipidFamily")
 #' 
-#' ## "panel_by" with trelliData containing statRes. Generate with example code in as.trelliData
-#' trelli_panel_by(trelliData = trelliData3, panel = "LipidCommonName")
+#' ## "panel_by" with trelliData containing statRes. 
+#' ## Generate with example code in as.trelliData
+#' trelli_panel_by(trelliData = trelliData3, panel = "Lipid")
 #' 
-#' ## "panel_by" with trelliData containing both omicsData and statRes. Generate with example code in as.trelliData
+#' ## "panel_by" with trelliData containing both omicsData and statRes. 
+#' ## Generate with example code in as.trelliData
 #' trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily")
-#' trelli_panel_by(trelliData = trelliData4, panel = "LipidCommonName")
-#' trelli_panel_by(trelliData = trelliData4, panel = "Sample_Name")
+#' trelli_panel_by(trelliData = trelliData4, panel = "Lipid")
+#' trelli_panel_by(trelliData = trelliData4, panel = "SampleID")
 #' 
 #' }  
 #' 
@@ -528,16 +531,19 @@ trelli_panel_by <- function(trelliData, panel) {
   # Determine which dataframes this grouping variable applies to----------------
   
   # Test if grouping applies to omicsData 
-  if (!is.null(trelliData$trelliData.omics) && panel %in% colnames(trelliData$trelliData.omics)) {
+  if (!is.null(trelliData$trelliData.omics) && 
+      panel %in% colnames(trelliData$trelliData.omics)) {
     apply_to_omics <- TRUE} else {apply_to_omics <- FALSE}
   
   # Test if grouping applies to statRes 
-  if (!is.null(trelliData$trelliData.stat) && panel %in% colnames(trelliData$trelliData.stat)) {
+  if (!is.null(trelliData$trelliData.stat) && 
+      panel %in% colnames(trelliData$trelliData.stat)) {
     apply_to_stat <- TRUE} else {apply_to_stat <- FALSE}
   
   # Test panel_by option--------------------------------------------------------
   
-  # If there are instances of groups with less than 3 data points, it is not a good grouping option. 
+  # If there are instances of groups with less than 3 data points, it is not a
+  # good grouping option.
   .test_grouping <- function(trelliData_subclass, trelliData_subclass_name) {
     
     # Get the smallest group size
@@ -549,14 +555,16 @@ trelli_panel_by <- function(trelliData, panel) {
     
     # If the smallest group size is less than 3, then give warning
     if (smallest_group_size < 3) {
-      warning(paste0("Grouping by ", panel, " results in panels with less than 3 ",
+      warning(paste0("Grouping by ", panel, 
+                     " results in panels with less than 3 ",
                      "data points in ", trelliData_subclass_name, "."))
     }
     
   }
   
   # Onlt test grouping if it applies to omics
-  if (apply_to_omics) {.test_grouping(trelliData$trelliData.omics, "trelliData.omics")}
+  if (apply_to_omics) {.test_grouping(trelliData$trelliData.omics, 
+                                      "trelliData.omics")}
   
   # Group and nest samples------------------------------------------------------
   

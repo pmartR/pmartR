@@ -19,37 +19,42 @@ trelli_abundance_boxplot(
 )
 }
 \arguments{
-\item{trelliData}{A trelliscope data object made by as.trelliData or as.trelliData.edata,
-and grouped by trelli_panel_by. Required.}
+\item{trelliData}{A trelliscope data object made by as.trelliData or
+as.trelliData.edata, and grouped by trelli_panel_by. Required.}
 
-\item{cognostics}{A vector of cognostic options for each plot. Valid entries are
-n, mean, median, sd, and skew for abundance. If statRes data is included, 
-p_value and fold_change cognostics can be added. If no cognostics are desired,
-set to NULL.}
+\item{cognostics}{A vector of cognostic options for each plot. Valid entries
+are n, mean, median, sd, and skew for abundance. If statRes data is
+included, p_value and fold_change cognostics can be added. If no cognostics
+are desired, set to NULL.}
 
-\item{ggplot_params}{An optional vector of strings of ggplot parameters to the backend ggplot
-function. For example, c("ylab('')", "ylim(c(2,20))"). Default is NULL.}
+\item{ggplot_params}{An optional vector of strings of ggplot parameters to
+the backend ggplot function. For example, c("ylab('')", "ylim(c(2,20))").
+Default is NULL.}
 
-\item{interactive}{A logical argument indicating whether the plots should be interactive
-or not. Interactive plots are ggplots piped to ggplotly (for now). Default is FALSE.}
+\item{interactive}{A logical argument indicating whether the plots should be
+interactive or not. Interactive plots are ggplots piped to ggplotly (for
+now). Default is FALSE.}
 
 \item{include_points}{Add points as a geom_jitter. Default is TRUE.}
 
-\item{path}{The base directory of the trelliscope application. Default is Downloads.}
+\item{path}{The base directory of the trelliscope application. Default is
+Downloads.}
 
 \item{name}{The name of the display. Default is Trelliscope.}
 
-\item{test_mode}{A logical to return a smaller trelliscope to confirm plot and design.
-Default is FALSE.}
+\item{test_mode}{A logical to return a smaller trelliscope to confirm plot
+and design. Default is FALSE.}
 
-\item{test_example}{A vector of plot indices to return for test_mode. Default is 1.}
+\item{test_example}{A vector of plot indices to return for test_mode. Default
+is 1.}
 
-\item{single_plot}{A TRUE/FALSE to indicate whether 1 plot (not a trelliscope) should be returned. 
-Default is FALSE.}
+\item{single_plot}{A TRUE/FALSE to indicate whether 1 plot (not a
+trelliscope) should be returned. Default is FALSE.}
 }
 \description{
-Specify a boxplot design and cognostics for the abundance boxplot trelliscope.
-   Each boxplot will have its own groups as specified by the first main effect in group_designation.
+Specify a boxplot design and cognostics for the abundance
+  boxplot trelliscope. Each boxplot will have its own groups as specified by
+  the first main effect in group_designation.
 }
 \examples{
 \dontrun{

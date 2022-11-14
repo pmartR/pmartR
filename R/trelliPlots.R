@@ -1,17 +1,29 @@
-# This function runs necessary checks for pmartR trelliscope plotting functions. 
-# It cleans any parameters (rounding numerics to integers, etc.), and returns them.
-#' @param trelliData The trelliData object the user passed to a plotting function.
-#' @param trelliCheck Check if the object type is supposed to be "omics", "statRes" or put a vector of both.
-#' @param cognostics A vector of the user provided cognstics. 
-#' @param acceptable_cognostics The acceptable cognostics for this plot. 
-#' @param ggplot_params The vector of user provided ggplots. 
-#' @param interactive The user provided logical for whether the plot should be interactive.
-#' @param test_mode The user provided logical for whether a smaller trelliscope should be returned
+#' Performs initial checks for trelliData objects
+#'
+#' This function runs necessary checks for pmartR trelliscope plotting
+#' functions. It cleans any parameters (rounding numerics to integers, etc.),
+#' and returns them.
+#'
+#' @param trelliData trelliData object the user passed to a plotting
+#'   function
+#' @param trelliCheck Check if the object type is supposed to be "omics",
+#'   "statRes" or put a vector of both
+#' @param cognostics A vector of the user provided cognstics
+#' @param acceptable_cognostics The acceptable cognostics for this plot
+#' @param ggplot_params The vector of user provided ggplots
+#' @param interactive The user provided logical for whether the plot should be
+#'   interactive
+#' @param test_mode The user provided logical for whether a smaller trelliscope
+#'   should be returned
 #' @param test_example The user provided vector of plot indices
-#' @param single_plot The user provided logical for whether a single plot should be returned
-#' @param p_value_skip Whether to skip specific p_value checks. Placeholder for potential future functions. 
-#' @param p_value_thresh The user provided threshold for plotting significant p-values.
-#' @param p_value_test The user provided provided logical for whether p-value testing should occur. 
+#' @param single_plot The user provided logical for whether a single plot should
+#'   be returned
+#' @param p_value_skip Whether to skip specific p_value checks. Placeholder for
+#'   potential future functions.
+#' @param p_value_thresh The user provided threshold for plotting significant
+#'   p-values.
+#' @param p_value_test The user provided provided logical for whether p-value
+#'   testing should occur.
 trelli_precheck <- function(trelliData, 
                             trelliCheck,
                             cognostics, 
@@ -233,30 +245,35 @@ trelli_builder <- function(toBuild, cognostics, plotFUN, cogFUN, path, name, ...
 }
 
 #' @name trelli_abundance_boxplot
-#' 
-#' @title Boxplot trelliscope building function for abundance data   
-#' 
-#' @description Specify a boxplot design and cognostics for the abundance boxplot trelliscope.
-#'    Each boxplot will have its own groups as specified by the first main effect in group_designation.
-#' 
-#' @param trelliData A trelliscope data object made by as.trelliData or as.trelliData.edata,
-#'    and grouped by trelli_panel_by. Required. 
-#' @param cognostics A vector of cognostic options for each plot. Valid entries are
-#'    n, mean, median, sd, and skew for abundance. If statRes data is included, 
-#'    p_value and fold_change cognostics can be added. If no cognostics are desired,
-#'    set to NULL. 
-#' @param ggplot_params An optional vector of strings of ggplot parameters to the backend ggplot
-#'    function. For example, c("ylab('')", "ylim(c(2,20))"). Default is NULL. 
-#' @param interactive A logical argument indicating whether the plots should be interactive
-#'    or not. Interactive plots are ggplots piped to ggplotly (for now). Default is FALSE.  
-#' @param include_points Add points as a geom_jitter. Default is TRUE. 
-#' @param path The base directory of the trelliscope application. Default is Downloads. 
+#'
+#' @title Boxplot trelliscope building function for abundance data
+#'
+#' @description Specify a boxplot design and cognostics for the abundance
+#'   boxplot trelliscope. Each boxplot will have its own groups as specified by
+#'   the first main effect in group_designation.
+#'
+#' @param trelliData A trelliscope data object made by as.trelliData or
+#'   as.trelliData.edata, and grouped by trelli_panel_by. Required.
+#' @param cognostics A vector of cognostic options for each plot. Valid entries
+#'   are n, mean, median, sd, and skew for abundance. If statRes data is
+#'   included, p_value and fold_change cognostics can be added. If no cognostics
+#'   are desired, set to NULL.
+#' @param ggplot_params An optional vector of strings of ggplot parameters to
+#'   the backend ggplot function. For example, c("ylab('')", "ylim(c(2,20))").
+#'   Default is NULL.
+#' @param interactive A logical argument indicating whether the plots should be
+#'   interactive or not. Interactive plots are ggplots piped to ggplotly (for
+#'   now). Default is FALSE.
+#' @param include_points Add points as a geom_jitter. Default is TRUE.
+#' @param path The base directory of the trelliscope application. Default is
+#'   Downloads.
 #' @param name The name of the display. Default is Trelliscope.
-#' @param test_mode A logical to return a smaller trelliscope to confirm plot and design.
-#'    Default is FALSE.
-#' @param test_example A vector of plot indices to return for test_mode. Default is 1.  
-#' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a trelliscope) should be returned. 
-#'    Default is FALSE. 
+#' @param test_mode A logical to return a smaller trelliscope to confirm plot
+#'   and design. Default is FALSE.
+#' @param test_example A vector of plot indices to return for test_mode. Default
+#'   is 1.
+#' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a
+#'   trelliscope) should be returned. Default is FALSE.
 #' 
 #' @examples
 #' \dontrun{
@@ -513,27 +530,33 @@ trelli_abundance_boxplot <- function(trelliData,
 
 #' @name trelli_abundance_histogram
 #' 
-#' @title Histogram trelliscope building function for abundance data   
-#' 
-#' @description Specify a plot design and cognostics for the abundance histogram trelliscope.
-#'    Main_effects grouping are ignored. Data must be grouped by edata_cname. 
-#' 
-#' @param trelliData A trelliscope data object made by as.trelliData or as.trelliData.edata,
-#'    and grouped by edata_cname in trelli_panel_by. Required. 
-#' @param cognostics A vector of cognostic options for each plot. Valid entries are
-#'    n, mean, median, sd, and skew. p_value and fold_change can be added if statRes
-#'    is included.
-#' @param ggplot_params An optional vector of strings of ggplot parameters to the backend ggplot
-#'    function. For example, c("ylab('')", "ylim(c(1,2))"). Default is NULL. 
-#' @param interactive A logical argument indicating whether the plots should be interactive
-#'    or not. Interactive plots are ggplots piped to ggplotly (for now). Default is FALSE.  
-#' @param path The base directory of the trelliscope application. Default is Downloads. 
+#' @title Histogram trelliscope building function for abundance data
+#'
+#' @description Specify a plot design and cognostics for the abundance histogram
+#'   trelliscope. Main_effects grouping are ignored. Data must be grouped by
+#'   edata_cname.
+#'
+#' @param trelliData A trelliscope data object made by as.trelliData or
+#'   as.trelliData.edata, and grouped by edata_cname in trelli_panel_by.
+#'   Required.
+#' @param cognostics A vector of cognostic options for each plot. Valid entries
+#'   are n, mean, median, sd, and skew. p_value and fold_change can be added if
+#'   statRes is included.
+#' @param ggplot_params An optional vector of strings of ggplot parameters to
+#'   the backend ggplot function. For example, c("ylab('')", "ylim(c(1,2))").
+#'   Default is NULL.
+#' @param interactive A logical argument indicating whether the plots should be
+#'   interactive or not. Interactive plots are ggplots piped to ggplotly (for
+#'   now). Default is FALSE.
+#' @param path The base directory of the trelliscope application. Default is
+#'   Downloads.
 #' @param name The name of the display. Default is Trelliscope.
-#' @param test_mode A logical to return a smaller trelliscope to confirm plot and design.
-#'    Default is FALSE.
-#' @param test_example A vector of plot indices to return for test_mode. Default is 1.  
-#' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a trelliscope) should be returned. 
-#'    Default is FALSE. 
+#' @param test_mode A logical to return a smaller trelliscope to confirm plot
+#'   and design. Default is FALSE.
+#' @param test_example A vector of plot indices to return for test_mode. Default
+#'   is 1.
+#' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a
+#'   trelliscope) should be returned. Default is FALSE.
 #' 
 #' @examples
 #' \dontrun{
@@ -558,7 +581,6 @@ trelli_abundance_boxplot <- function(trelliData,
 #'      cognostics = c("mean", "median"))  
 #'    
 #' }
-#' 
 #' 
 #' @author David Degnan, Lisa Bramer
 #' 
@@ -735,28 +757,32 @@ trelli_abundance_histogram <- function(trelliData,
 
 #' @name trelli_abundance_heatmap
 #' 
-#' @title Heatmap trelliscope building function for abundance data   
-#' 
-#' @description Specify a plot design and cognostics for the abundance heatmap trelliscope.
-#'    Data must be grouped by an emeta column. Main_effects order the y-variables. All 
-#'    statRes data is ignored. 
-#' 
-#' @param trelliData A trelliscope data object made by as.trelliData,
-#'    and grouped by an emeta variable. Required. 
-#' @param cognostics A vector of cognostic options for each plot. Valid entries are
-#'    n, mean, median, sd, and skew per "main_effects" group designation. Otherwise, 
-#'    no cognostics are returned. 
-#' @param ggplot_params An optional vector of strings of ggplot parameters to the backend ggplot
-#'    function. For example, c("ylab('')", "xlab('')"). Default is NULL. 
-#' @param interactive A logical argument indicating whether the plots should be interactive
-#'    or not. Interactive plots are ggplots piped to ggplotly (for now). Default is FALSE.  
-#' @param path The base directory of the trelliscope application. Default is Downloads. 
-#' @param name The name of the display. Default is Trelliscope.
-#' @param test_mode A logical to return a smaller trelliscope to confirm plot and design.
-#'    Default is FALSE.
-#' @param test_example A vector of plot indices to return for test_mode. Default is 1.  
-#' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a trelliscope) should be returned. 
-#'    Default is FALSE.
+#' @title Heatmap trelliscope building function for abundance data
+#'
+#' @description Specify a plot design and cognostics for the abundance heatmap
+#'   trelliscope. Data must be grouped by an emeta column. Main_effects order
+#'   the y-variables. All statRes data is ignored.
+#'
+#' @param trelliData A trelliscope data object made by as.trelliData, and
+#'   grouped by an emeta variable. Required.
+#' @param cognostics A vector of cognostic options for each plot. Valid entries
+#'   are n, mean, median, sd, and skew per "main_effects" group designation.
+#'   Otherwise, no cognostics are returned.
+#' @param ggplot_params An optional vector of strings of ggplot parameters to
+#'   the backend ggplot function. For example, c("ylab('')", "xlab('')").
+#'   Default is NULL.
+#' @param interactive A logical argument indicating whether the plots should be
+#'   interactive or not. Interactive plots are ggplots piped to ggplotly (for
+#'   now). Default is FALSE.
+#' @param path The base directory of the trelliscope application. Default is
+#'   Downloads.
+#' @param name The name of the display. Default is Trelliscope
+#' @param test_mode A logical to return a smaller trelliscope to confirm plot
+#'   and design. Default is FALSE.
+#' @param test_example A vector of plot indices to return for test_mode. Default
+#'   is 1.
+#' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a
+#'   trelliscope) should be returned. Default is FALSE.
 #' 
 #' @examples
 #' \dontrun{
@@ -926,27 +952,32 @@ trelli_abundance_heatmap <- function(trelliData,
 #' 
 #' @title Bar chart trelliscope building function for missing data   
 #' 
-#' @description Specify a plot design and cognostics for the missing barchart trelliscope.
-#'    Missingness is displayed per panel_by variable. Main_effects data is used to
-#'    split samples when applicable. 
-#' 
-#' @param trelliData A trelliscope data object made by as.trelliData.edata or as.trelliData. Required. 
-#' @param cognostics A vector of cognostic options for each plot. Valid entries are
-#'    is n and proportion.
-#' @param proportion A logical to determine whether plots should display counts or proportions.
-#'    Default is TRUE.     
-#' @param ggplot_params An optional vector of strings of ggplot parameters to the backend ggplot
-#'    function. For example, c("ylab('')", "xlab('')"). Default is NULL. 
-#' @param interactive A logical argument indicating whether the plots should be interactive
-#'    or not. Interactive plots are ggplots piped to ggplotly (for now). Default is FALSE.  
-#' @param path The base directory of the trelliscope application. Default is Downloads. 
+#' @description Specify a plot design and cognostics for the missing barchart
+#'   trelliscope. Missingness is displayed per panel_by variable. Main_effects
+#'   data is used to split samples when applicable.
+#'
+#' @param trelliData A trelliscope data object made by as.trelliData.edata or
+#'   as.trelliData. Required.
+#' @param cognostics A vector of cognostic options for each plot. Valid entries
+#'   are is n and proportion.
+#' @param proportion A logical to determine whether plots should display counts
+#'   or proportions. Default is TRUE.
+#' @param ggplot_params An optional vector of strings of ggplot parameters to
+#'   the backend ggplot function. For example, c("ylab('')", "xlab('')").
+#'   Default is NULL.
+#' @param interactive A logical argument indicating whether the plots should be
+#'   interactive or not. Interactive plots are ggplots piped to ggplotly (for
+#'   now). Default is FALSE.
+#' @param path The base directory of the trelliscope application. Default is
+#'   Downloads.
 #' @param name The name of the display. Default is Trelliscope.
-#' @param test_mode A logical to return a smaller trelliscope to confirm plot and design.
-#'    Default is FALSE.
-#' @param test_example A vector of plot indices to return for test_mode. Default is 1.  
-#' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a trelliscope) should be returned. 
-#'    Default is FALSE.
-#' 
+#' @param test_mode A logical to return a smaller trelliscope to confirm plot
+#'   and design. Default is FALSE.
+#' @param test_example A vector of plot indices to return for test_mode. Default
+#'   is 1.
+#' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a
+#'   trelliscope) should be returned. Default is FALSE.
+#'   
 #' @examples
 #' \dontrun{
 #' 
@@ -1231,30 +1262,35 @@ determine_significance <- function(DF, p_value_thresh) {
 
 #' @name trelli_foldchange_bar
 #' 
-#' @title Bar chart trelliscope building function for fold_change   
-#' 
-#' @description Specify a plot design and cognostics for the fold_change barchart trelliscope.
-#'    Fold change must be grouped by edata_cname. 
-#' 
-#' @param trelliData A trelliscope data object with statRes results. Required. 
-#' @param cognostics A vector of cognostic options for each plot. Valid entries are
-#'    are fold_change and p_value.
-#' @param p_value_test A logical to indicate whether specific significant biomolecules are
-#'    to be incidated with a black outline, if an imd-anova was run. Default is FALSE. 
-#' @param p_value_thresh A value between 0 and 1 to indicate significant biomolecules
-#'    for p_value_test. Default is 0.05. 
-#' @param ggplot_params An optional vector of strings of ggplot parameters to the backend ggplot
-#'    function. For example, c("ylab('')", "xlab('')"). Default is NULL. 
-#' @param interactive A logical argument indicating whether the plots should be interactive
-#'    or not. Interactive plots are ggplots piped to ggplotly (for now). Default is FALSE.  
-#' @param path The base directory of the trelliscope application. Default is Downloads. 
+#' @title Bar chart trelliscope building function for fold_change
+#'
+#' @description Specify a plot design and cognostics for the fold_change
+#'   barchart trelliscope. Fold change must be grouped by edata_cname.
+#'
+#' @param trelliData A trelliscope data object with statRes results. Required.
+#' @param cognostics A vector of cognostic options for each plot. Valid entries
+#'   are are fold_change and p_value.
+#' @param p_value_test A logical to indicate whether specific significant
+#'   biomolecules are to be incidated with a black outline, if an imd-anova was
+#'   run. Default is FALSE.
+#' @param p_value_thresh A value between 0 and 1 to indicate significant
+#'   biomolecules for p_value_test. Default is 0.05.
+#' @param ggplot_params An optional vector of strings of ggplot parameters to
+#'   the backend ggplot function. For example, c("ylab('')", "xlab('')").
+#'   Default is NULL.
+#' @param interactive A logical argument indicating whether the plots should be
+#'   interactive or not. Interactive plots are ggplots piped to ggplotly (for
+#'   now). Default is FALSE.
+#' @param path The base directory of the trelliscope application. Default is
+#'   Downloads.
 #' @param name The name of the display. Default is Trelliscope.
-#' @param test_mode A logical to return a smaller trelliscope to confirm plot and design.
-#'    Default is FALSE.
-#' @param test_example A vector of plot indices to return for test_mode. Default is 1.  
-#' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a trelliscope) should be returned. 
-#'    Default is FALSE.
-#' 
+#' @param test_mode A logical to return a smaller trelliscope to confirm plot
+#'   and design. Default is FALSE.
+#' @param test_example A vector of plot indices to return for test_mode. Default
+#'   is 1.
+#' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a
+#'   trelliscope) should be returned. Default is FALSE.
+#'   
 #' @examples
 #' \dontrun{
 #' 
@@ -1413,30 +1449,36 @@ trelli_foldchange_bar <- function(trelliData,
 #' 
 #' @title Boxplot trelliscope building function for fold_change   
 #' 
-#' @description Specify a plot design and cognostics for the fold_change boxplot trelliscope.
-#'    Fold change must be grouped by an emeta column, which means both an omicsData
-#'    object and statRes are required to make this plot. 
-#' 
-#' @param trelliData A trelliscope data object with omicsData and statRes results. Required. 
-#' @param cognostics A vector of cognostic options for each plot. Valid entries are
-#'    are n, mean, median, and sd. 
-#' @param p_value_test A logical to indicate whether specific significant biomolecules are
-#'    to be indicated with a changed symbol if an imd-anova was run. Default is FALSE. 
-#' @param p_value_thresh A value between 0 and 1 to indicate significant biomolecules
-#'    for p_value_test. Default is 0.05. 
-#' @param include_points Add points. Default is TRUE. 
-#' @param ggplot_params An optional vector of strings of ggplot parameters to the backend ggplot
-#'    function. For example, c("ylab('')", "xlab('')"). Default is NULL. 
-#' @param interactive A logical argument indicating whether the plots should be interactive
-#'    or not. Interactive plots are ggplots piped to ggplotly (for now). Default is FALSE.  
-#' @param path The base directory of the trelliscope application. Default is Downloads. 
+#' @description Specify a plot design and cognostics for the fold_change boxplot
+#'   trelliscope. Fold change must be grouped by an emeta column, which means
+#'   both an omicsData object and statRes are required to make this plot.
+#'
+#' @param trelliData A trelliscope data object with omicsData and statRes
+#'   results. Required.
+#' @param cognostics A vector of cognostic options for each plot. Valid entries
+#'   are are n, mean, median, and sd.
+#' @param p_value_test A logical to indicate whether specific significant
+#'   biomolecules are to be indicated with a changed symbol if an imd-anova was
+#'   run. Default is FALSE.
+#' @param p_value_thresh A value between 0 and 1 to indicate significant
+#'   biomolecules for p_value_test. Default is 0.05.
+#' @param include_points Add points. Default is TRUE.
+#' @param ggplot_params An optional vector of strings of ggplot parameters to
+#'   the backend ggplot function. For example, c("ylab('')", "xlab('')").
+#'   Default is NULL.
+#' @param interactive A logical argument indicating whether the plots should be
+#'   interactive or not. Interactive plots are ggplots piped to ggplotly (for
+#'   now). Default is FALSE.
+#' @param path The base directory of the trelliscope application. Default is
+#'   Downloads.
 #' @param name The name of the display. Default is Trelliscope.
-#' @param test_mode A logical to return a smaller trelliscope to confirm plot and design.
-#'    Default is FALSE.
-#' @param test_example A vector of plot indices to return for test_mode. Default is 1.  
-#' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a trelliscope) should be returned. 
-#'    Default is FALSE.
-#' 
+#' @param test_mode A logical to return a smaller trelliscope to confirm plot
+#'   and design. Default is FALSE.
+#' @param test_example A vector of plot indices to return for test_mode. Default
+#'   is 1.
+#' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a
+#'   trelliscope) should be returned. Default is FALSE.
+#'   
 #' @examples
 #' \dontrun{ 
 #' 
@@ -1596,30 +1638,38 @@ trelli_foldchange_boxplot <- function(trelliData,
 #' 
 #' @title Volcano trelliscope building function for fold_change   
 #' 
-#' @description Specify a plot design and cognostics for the fold_change volcano trelliscope.
-#'    Fold change must be grouped by an emeta column, which means both an omicsData
-#'    object and statRes are required to make this plot. 
-#' 
-#' @param trelliData A trelliscope data object with omicsData and statRes results. Required. 
-#' @param comparison The specific comparison to visualize in the fold_change volcano. 
-#'    See attr(statRes, "comparisons") for the available options. Required. 
-#' @param cognostics A vector of cognostic options for each plot. Valid entry is n. 
-#' @param p_value_test A logical to indicate whether specific significant biomolecules are
-#'    to be indicated with a changed color if an imd-anova was run. Default is FALSE. 
-#' @param p_value_thresh A value between 0 and 1 to indicate significant biomolecules
-#'    for p_value_test. Default is 0.05. 
-#' @param ggplot_params An optional vector of strings of ggplot parameters to the backend ggplot
-#'    function. For example, c("ylab('')", "xlab('')"). Default is NULL. 
-#' @param interactive A logical argument indicating whether the plots should be interactive
-#'    or not. Interactive plots are ggplots piped to ggplotly (for now). Default is FALSE.  
-#' @param path The base directory of the trelliscope application. Default is Downloads. 
+#' @description Specify a plot design and cognostics for the fold_change volcano
+#'   trelliscope. Fold change must be grouped by an emeta column, which means
+#'   both an omicsData object and statRes are required to make this plot.
+#'
+#' @param trelliData A trelliscope data object with omicsData and statRes
+#'   results. Required.
+#' @param comparison The specific comparison to visualize in the fold_change
+#'   volcano. See attr(statRes, "comparisons") for the available options.
+#'   Required.
+#' @param cognostics A vector of cognostic options for each plot. Valid entry is
+#'   n.
+#' @param p_value_test A logical to indicate whether specific significant
+#'   biomolecules are to be indicated with a changed color if an imd-anova was
+#'   run. Default is FALSE.
+#' @param p_value_thresh A value between 0 and 1 to indicate significant
+#'   biomolecules for p_value_test. Default is 0.05.
+#' @param ggplot_params An optional vector of strings of ggplot parameters to
+#'   the backend ggplot function. For example, c("ylab('')", "xlab('')").
+#'   Default is NULL.
+#' @param interactive A logical argument indicating whether the plots should be
+#'   interactive or not. Interactive plots are ggplots piped to ggplotly (for
+#'   now). Default is FALSE.
+#' @param path The base directory of the trelliscope application. Default is
+#'   Downloads.
 #' @param name The name of the display. Default is Trelliscope.
-#' @param test_mode A logical to return a smaller trelliscope to confirm plot and design.
-#'    Default is FALSE.
-#' @param test_example A vector of plot indices to return for test_mode. Default is 1.  
-#' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a trelliscope) should be returned. 
-#'    Default is FALSE.
-#' 
+#' @param test_mode A logical to return a smaller trelliscope to confirm plot
+#'   and design. Default is FALSE.
+#' @param test_example A vector of plot indices to return for test_mode. Default
+#'   is 1.
+#' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a
+#'   trelliscope) should be returned. Default is FALSE.
+#'   
 #' @examples
 #' \dontrun{ 
 #' 
@@ -1815,30 +1865,36 @@ trelli_foldchange_volcano <- function(trelliData,
 
 #' @name trelli_foldchange_heatmap
 #' 
-#' @title Heatmap trelliscope building function for fold_change   
-#' 
-#' @description Specify a plot design and cognostics for the fold_change heatmap trelliscope.
-#'    Fold change must be grouped by an emeta column, which means both an omicsData
-#'    object and statRes are required to make this plot. 
-#' 
-#' @param trelliData A trelliscope data object with omicsData and statRes results. Required. 
-#' @param cognostics A vector of cognostic options for each plot. Valid entries are
-#'    are n, mean, median, and sd. 
-#' @param p_value_test A logical to indicate whether specific significant biomolecules are
-#'    to be indicated with a dot if an imd-anova was run. Default is FALSE. 
-#' @param p_value_thresh A value between 0 and 1 to indicate significant biomolecules
-#'    for p_value_test. Default is 0.05. 
-#' @param ggplot_params An optional vector of strings of ggplot parameters to the backend ggplot
-#'    function. For example, c("ylab('')", "xlab('')"). Default is NULL. 
-#' @param interactive A logical argument indicating whether the plots should be interactive
-#'    or not. Interactive plots are ggplots piped to ggplotly (for now). Default is FALSE.  
-#' @param path The base directory of the trelliscope application. Default is Downloads. 
+#' @title Heatmap trelliscope building function for fold_change
+#'
+#' @description Specify a plot design and cognostics for the fold_change heatmap
+#'   trelliscope. Fold change must be grouped by an emeta column, which means
+#'   both an omicsData object and statRes are required to make this plot.
+#'
+#' @param trelliData A trelliscope data object with omicsData and statRes
+#'   results. Required.
+#' @param cognostics A vector of cognostic options for each plot. Valid entries
+#'   are are n, mean, median, and sd.
+#' @param p_value_test A logical to indicate whether specific significant
+#'   biomolecules are to be indicated with a dot if an imd-anova was run.
+#'   Default is FALSE.
+#' @param p_value_thresh A value between 0 and 1 to indicate significant
+#'   biomolecules for p_value_test. Default is 0.05.
+#' @param ggplot_params An optional vector of strings of ggplot parameters to
+#'   the backend ggplot function. For example, c("ylab('')", "xlab('')").
+#'   Default is NULL.
+#' @param interactive A logical argument indicating whether the plots should be
+#'   interactive or not. Interactive plots are ggplots piped to ggplotly (for
+#'   now). Default is FALSE.
+#' @param path The base directory of the trelliscope application. Default is
+#'   Downloads.
 #' @param name The name of the display. Default is Trelliscope.
-#' @param test_mode A logical to return a smaller trelliscope to confirm plot and design.
-#'    Default is FALSE.
-#' @param test_example A vector of plot indices to return for test_mode. Default is 1.  
-#' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a trelliscope) should be returned. 
-#'    Default is FALSE.
+#' @param test_mode A logical to return a smaller trelliscope to confirm plot
+#'   and design. Default is FALSE.
+#' @param test_example A vector of plot indices to return for test_mode. Default
+#'   is 1.
+#' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a
+#'   trelliscope) should be returned. Default is FALSE.
 #' 
 #' @examples
 #' \dontrun{ 

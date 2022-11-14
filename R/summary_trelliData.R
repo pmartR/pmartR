@@ -1,6 +1,7 @@
 #' Summarizes potential plotting options for a trelliData object 
 #' 
-#' @param trelliData An object of the as.trelliData.edata or as.trelliData functions. 
+#' @param trelliData An object from the as.trelliData.edata or as.trelliData
+#'   functions
 #' 
 #' @examples 
 #' \dontrun{
