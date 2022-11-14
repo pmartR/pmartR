@@ -1,10 +1,10 @@
 #' Calculate SPANS Score for a Number of Normalization Methods
 #'
-#' Ranks different combinations of subsetting and normalization methods based on
+#' Ranks different combinations of subset and normalization methods based on
 #' a score that captures how much bias a particular normalization procedure
-#' introduces into the data.  Higher score implies less bias.
+#' introduces into the data. Higher score implies less bias.
 #'
-#' @param omicsData an object of the class 'pepData' or 'proData' created by
+#' @param omicsData aobject of the class 'pepData' or 'proData' created by
 #'   \code{\link{as.pepData}} or \code{\link{as.proData}} respectively. The data
 #'   must be log transformed (using edata_transform()) and have a grouping
 #'   structure, usually set by calling group_designation() on the object.
@@ -15,16 +15,16 @@
 #' @param params list of additional arguments passed to the chosen subset
 #'   functions. See details for parameter specification and default values.
 #' @param group character specifying a column name in f_data that gives the
-#'   group assignment of the samples.  Defaults to NULL, in which case the
+#'   group assignment of the samples. Defaults to NULL, in which case the
 #'   grouping structure given in \code{attr(omicsData, 'group_DF')} is used.
 #' @param n_iter number of iterations used in calculating the background
-#'   distribution in step 0 of SPANS.  Defaults to 1000.
+#'   distribution in step 0 of SPANS. Defaults to 1000.
 #' @param sig_thresh numeric value that specifies the maximum p-value for which
 #'   a biomolecule can be considered highly significant based on a
-#'   Kruskal-Wallis test.  Defaults to 0.0001.
+#'   Kruskal-Wallis test. Defaults to 0.0001.
 #' @param nonsig_thresh numeric value that specifies the minimum p-value for
 #'   which a biomolecule can be considered non-significant based on a
-#'   Kruskal-Wallis test.  Defaults to 0.5.
+#'   Kruskal-Wallis test. Defaults to 0.5.
 #' @param min_sig integer value specifying the minimum number of highly
 #'   significant biomolecules identified in step 0 of SPANS in order to proceed.
 #'   sig_thresh will be adjusted to the minimum value that gives this many
@@ -43,7 +43,7 @@
 #'   the location and scale parameters resulting from a normalization method in
 #'   order for that method to be considered a candidate for scoring.\cr
 #'   \code{verbose} Logical specifying whether to print the completion of SPANS
-#'   procedure steps to console.  Defaults to TRUE.\cr \code{parallel} Logical
+#'   procedure steps to console. Defaults to TRUE.\cr \code{parallel} Logical
 #'   specifying whether to use a parallel backend.  Depending on the size of
 #'   your data, setting this to FALSE can cause the algorithm to be very slow.
 #'   Defaults to TRUE. }
@@ -89,7 +89,7 @@
 #'   The list elements should have names corresponding to the subset function
 #'   inputs and contain a \emph{list} of numeric values.  The elements of
 #'   ppp_rip will be length 2 numeric vectors, corresponding to the parameters
-#'   for ppp and rip.  See examples.
+#'   for ppp and rip. See examples.
 #'
 #'   The following subset functions have parameters that can be specified:
 #'   \tabular{ll}{ los \tab list of values between 0 and 1 indicating the top
@@ -122,22 +122,20 @@
 #'
 #'
 #' @examples
-#' library(pmartR)
 #' library(pmartRdata)
 #'
-#' pep_object
-#' pep_object <- edata_transform(pep_object, data_scale = "log2")
-#' pep_object <- group_designation(pep_object, main_effects = "Condition")
+#' pep_object <- edata_transform(omicsData = pep_object, data_scale = "log2")
+#' pep_object <- group_designation(omicsData = pep_object, main_effects = "Phenotype")
 #'
 #' ## default parameters
-#' # spans_res <- spans_procedure(pep_object)
+#' spans_res <- spans_procedure(omicsData = pep_object)
 #'
 #' ## specify only certain subset and normalization functions
-#' # spans_res <- spans_procedure(pep_object, norm_fn = c("median", "zscore"), subset_fn = c("all", "los", "ppp"))
+#' # spans_res <- spans_procedure(omicsData = pep_object, norm_fn = c("median", "zscore"), subset_fn = c("all", "los", "ppp"))
 #'
 #' ## specify parameters for supplied subset functions, notice ppp_rip takes a vector of two numeric arguments.
-#' # spans_res <- spans_procedure(pep_object, subset_fn = c("all", "los", "ppp"), params = list(los = list(0.25, 0.5), ppp = list(0.15, 0.25)))
-#' # spans_res <- spans_procedure(pep_object, subset_fn = c("all", "rip", "ppp_rip"), params = list(rip = list(0.3, 0.4), ppp_rip = list(c(0.15, 0.5), c(0.25, 0.5))))
+#' spans_res <- spans_procedure(omicsData = pep_object, subset_fn = c("all", "los", "ppp"), params = list(los = list(0.25, 0.5), ppp = list(0.15, 0.25)))
+#' spans_res <- spans_procedure(omicsData = pep_object, subset_fn = c("all", "rip", "ppp_rip"), params = list(rip = list(0.3, 0.4), ppp_rip = list(c(0.15, 0.5), c(0.25, 0.5))))
 #'
 #' @author Daniel Claborne
 #'
@@ -487,10 +485,8 @@ spans_procedure <- function(omicsData,
 #' Creates the list of median p-values used to make the background distribution
 #' used to compute the SPANS score in step 2.
 #'
-#' @param omicsData an object of the class 'pepData', 'proData', 'lipidData', or
-#'   'metabData' usually created by \code{\link{as.pepData}},
-#'   \code{\link{as.proData}}, \code{\link{as.lipidData}}, or
-#'   \code{\link{as.metabData}}, respectively.
+#' @param omicsData an object of the class 'pepData' or 'proData' created by
+#'   \code{\link{as.pepData}} or \code{\link{as.proData}}, respectively.
 #' @param group_vector A character vector from the group_DF attribute specifying
 #'   the order of the samples. This order is the same as the order of the
 #'   samples (columns) in e_data.

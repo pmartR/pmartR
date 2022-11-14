@@ -1,7 +1,7 @@
-#' Normalize an object of class nmrData
+#' Normalize an Object of Class nmrData
 #'
-#' The data is normalied either to a spiked in metabolite or to a property
-#' taking sample-specific values
+#' The data is normalized either to a spiked-in metabolite or to a 
+#' sample-specific property
 #'
 #' @param omicsData an object of the class 'nmrData'
 #'
@@ -38,7 +38,7 @@
 #'   on the same scale it was provided). If using this argument, the
 #'   'metabolite_name' argument should not be specified.
 #'
-#' @details #' There are two ways to specify the information needed for
+#' @details There are two ways to specify the information needed for
 #' performing instrument normalization on an nmrData object: \enumerate{ \item
 #' specify \code{metabolite_name}. This should be used when normalization to a
 #' spiked in standard is desired. Here \code{metabolite_name} gives the name of
@@ -48,34 +48,33 @@
 #' used when normalizing to a sample property, such as concentration, is
 #' desired. Here, \code{sample_property_cname} gives the name of the column in
 #' \code{f_data} which contains the property to use for normalization. If any
-#' samples have a missing value for this column, and error is returned. }
+#' samples have a missing value for this column, and error is returned.}
+#' 
 #' @section Backtransform: The purpose of back transforming data is to ensure
-#'   values are on a scale similar to their raw values before normalization. The
-#'   following values are calculated and/or applied for backtransformation
-#'   purposes: \tabular{ll}{ If normalization using a metabolite in
-#'   \code{e_data} is specified \tab location parameter is the median of the
-#'   values for  \code{metabolite_name} \cr \tab \cr If normalization using a
-#'   sample property in \code{f_data} is specified \tab location parameter is
-#'   the median of the values in \code{sample_property} \cr } See examples
-#'   below.
+#' values are on a scale similar to their raw values before normalization. The
+#' following values are calculated and/or applied for backtransformation
+#' purposes: \tabular{ll}{ If normalization using a metabolite in
+#' \code{e_data} is specified \tab location parameter is the median of the
+#' values for \code{metabolite_name} \cr \tab \cr If normalization using a
+#' sample property in \code{f_data} is specified \tab location parameter is
+#' the median of the values in \code{sample_property} \cr } See examples below.
 #' 
 #' @examples
-#' \dontrun{
 #' library(pmartRdata)
-#' data(nmr_object_identified)
 #'
-#' nmr_object = edata_transform(nmr_object_identified, "log2")
-#' nmr_norm = normalize_nmr(nmr_object, apply_norm = TRUE,
-#'                          metabolite_name = "unkm1.53")
+#' # Normalize using a metabolite (this is merely an example of how to use this specification; the metabolite used was not actually spiked-in for the purpose of normalization)
+#' mynmr <- edata_transform(omicsData = nmr_identified_object, 
+#'                          data_scale = "log2")
+#' nmr_norm <- normalize_nmr(omicsData = mynmr, apply_norm = TRUE,
+#'                           metabolite_name = "unkm1.53", 
+#'                           backtransform = TRUE)
 #'
-#' # alternate specification: #
-#' data(nmr_object_identified)
-#'
-#' nmr_object = edata_transform(nmr_object, "log2")
-#' nmr_norm = normalize_nmr(nmr_object, apply_norm = TRUE,
-#'                          sample_property_cname = "Concentration")
-#'
-#' }
+#' # Normalization using a sample property
+#' mynmr <- edata_transform(omicsData = nmr_identified_object, 
+#'                          data_scale = "log2")
+#' nmr_norm <- normalize_nmr(omicsData = mynmr, apply_norm = TRUE,
+#'                          sample_property_cname = "Concentration",
+#'                          backtransform = TRUE)
 #'
 #' @export
 #' 
