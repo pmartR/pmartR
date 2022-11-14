@@ -1,24 +1,28 @@
 #' Runs BP-Quant
 #'
-#' Applies BP-Quant to a pepData object
+#' Applies BP-Quant to a pepData object 
 #'
 #' @param statRes an object of the class 'statRes'
-#' @param pepData is an omicsData object of the class 'pepData'
-#' @param pi_not is a numeric value between 0 and 1 indicating the background
-#'   probability/frequency of a zero signature.
-#' @param max_proteoforms a numeric value, a maximum threshold for the number of
-#'   possible proteoforms.
+#' @param pepData an omicsData object of the class 'pepData' that includes the
+#'   e_meta component
+#' @param pi_not numeric value between 0 and 1 indicating the background
+#'   probability/frequency of a zero signature
+#' @param max_proteoforms a numeric value corresponding to the maximum threshold
+#'   for the number of possible proteoforms
 #'
 #' @return a list of data frames, one for each unique protein. The data frames
-#'   have three columns, "Protein", "Mass_Tag_ID" (which is molecule ID), and
+#'   have three columns, a protein identifier, a peptide identifier, and a
 #'   "ProteoformID". The class of this list is 'isoformRes'.
 #'
-#' @details The statRes object contains the signatures data frame, the pepData
-#'   object is used for its e_meta data frame. Next the signatures data frame
-#'   and e_meta are merged by their edata_cname (“Peptide”) columns, this new
-#'   data frame called protein_sig_data will be input to bpquant_mod in a
-#'   “foreach” statement. “Foreach” will subset protein_sig_data for each unique
-#'   protein and apply bpquant_mod to each subset and store the results.
+#' @details The result of this function can be used as one the \code{isoformRes}
+#'   input argument to \code{\link{protein_quant}}. The \code{bpquant} function
+#'   itself operates as follows: The statRes object contains the signatures data
+#'   frame, the pepData object is used for its e_meta data frame. Next the
+#'   signatures data frame and e_meta are merged by their edata_cname (e.g.
+#'   peptide identifier) columns, this new data frame called protein_sig_data
+#'   will be input to bpquant_mod in a “foreach” statement. “Foreach” will
+#'   subset protein_sig_data for each unique protein and apply bpquant_mod to
+#'   each subset and store the results.
 #'
 #' @examples
 #' \dontrun{
@@ -26,8 +30,8 @@
 #' library(pmartRdata)
 #'
 #' mypepData <- group_designation(omicsData = pep_object,
-#'                                main_effects = c("Condition"))
-#' mypepData = edata_transform(mypepData, "log2")
+#'                                main_effects = c("Phenotype"))
+#' mypepData = edata_transform(omicsData = mypepData, data_scale = "log2")
 #'
 #' imdanova_Filt <- imdanova_filter(omicsData = mypepData)
 #' mypepData <- applyFilt(filter_object = imdanova_Filt,
@@ -35,46 +39,48 @@
 #'                        min_nonmiss_anova=2)
 #'
 #' imd_anova_res <- imd_anova(omicsData = mypepData,
-#'                            test_method = 'comb',
-#'                            pval_adjust='bon')
+#'                            test_method = 'combined',
+#'                            pval_adjust_a ='bon',
+#'                            pval_adjust_g = 'bon')
 #'
 #' result = bpquant(statRes = imd_anova_res, pepData = mypepData)
 #'
 #' }
 #'
-#' @name bpquant
-#' @rdname bpquant
 #' @export
 #'
 bpquant<- function (statRes, pepData, pi_not = .9,
                     max_proteoforms = 5, parallel = TRUE) {
 
-  #some checks
+  # some checks
+  
+  if(is.null(pepData$e_meta)) {
+    stop("pepData object must contain e_meta element")
+  }
 
   if (!is.numeric(pi_not)) {
-
     # Again! When will you look at the examples and follow them?
     stop ("pi_not must be numeric.")
-
   }
+  
   if(pi_not < 0 || pi_not > 1) stop("pi_not must be between 0 and 1")
 
   if (!is.numeric(max_proteoforms)) {
-
     # Hmmmmm. I can totally see that a number should be input as a character.
     stop ("max_proteoforms must be numeric.")
-
   }
+  
   if(max_proteoforms <= 0) stop("max_proteoforms must be 1 or greater")
 
-  if(!inherits(statRes, "statRes")) stop("statRes must be an object of class statRes")
-  if(!inherits(pepData, "pepData")) stop("pepData must be an object of class pepData")
+  if(!inherits(statRes, "statRes"))
+    stop("statRes must be an object of class statRes")
+  if (!inherits(pepData, "pepData"))
+    stop("pepData must be an object of class pepData")
 
-
-  #pulling e_meta from pepData, aswell as cnames
-  e_meta<- pepData$e_meta
-  edata_cname<- attr(pepData, "cnames")$edata_cname
-  emeta_cname<- attr(pepData, "cnames")$emeta_cname
+  # pulling e_meta from pepData, aswell as cnames
+  e_meta <- pepData$e_meta
+  edata_cname <- attr(pepData, "cnames")$edata_cname
+  emeta_cname <- attr(pepData, "cnames")$emeta_cname
 
   # Check if the bpFlags attribute is NULL. If it is then only the G-test was
   # run and the bpquant function should not be run with just G-test flags.
@@ -162,7 +168,7 @@ bpquant<- function (statRes, pepData, pi_not = .9,
 #' bpquant_mod function
 #'
 #' The function is written to take input from one protein at a time and requires
-#' three inputs: protein_sig, pi_not and max_proteforms.
+#' three inputs: protein_sig, pi_not and max_proteforms
 #'
 #' @param protein_sig  is a matrix or data.frame with p rows and n columns,
 #'   where p is the number of peptides mapped to the protein of interest and n
@@ -191,10 +197,14 @@ bpquant_mod <- function (protein_sig, pi_not, max_proteoforms) {
   ## implement some checks ##
 
   ## signatures can only contain values equal to -1, 1, or 0
-  if(sum(apply(protein_sig, 1, function(x) sum(!(x %in% c(1,-1,0)))))> 0 ) stop("Entries in the signatures matrix may only take values of -1, 1, or 0")
+  if(sum(apply(protein_sig, 1, function(x)
+    sum(!(x %in% c(
+      1, -1, 0
+    )))))> 0)
+    stop("Entries in the signatures matrix may only take values of -1, 1, or 0")
+  
 
-
-  ############# generate parameters associated with signature counts and probabilities #############
+  ### generate parameters associated with signature counts and probabilities ###
 
   ## generate a list of unique signatures ##
   sigs = unique(protein_sig)
@@ -270,7 +280,8 @@ bpquant_mod <- function (protein_sig, pi_not, max_proteoforms) {
 
   ## order configurations for readability ##
   ## rows are first ordered by sum (ascending)
-  ## then first column value (descending), second column value (descending), etc. ##
+  ## then first column value (descending), 
+  ## second column value (descending), etc. ##
 
   if(nu == 1){p_configs = mat}else{
     mat.list = list()

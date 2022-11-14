@@ -9,29 +9,33 @@ bpquant(statRes, pepData, pi_not = 0.9, max_proteoforms = 5, parallel = TRUE)
 \arguments{
 \item{statRes}{an object of the class 'statRes'}
 
-\item{pepData}{is an omicsData object of the class 'pepData'}
+\item{pepData}{an omicsData object of the class 'pepData' that includes the
+e_meta component}
 
-\item{pi_not}{is a numeric value between 0 and 1 indicating the background
-probability/frequency of a zero signature.}
+\item{pi_not}{numeric value between 0 and 1 indicating the background
+probability/frequency of a zero signature}
 
-\item{max_proteoforms}{a numeric value, a maximum threshold for the number of
-possible proteoforms.}
+\item{max_proteoforms}{a numeric value corresponding to the maximum threshold
+for the number of possible proteoforms}
 }
 \value{
 a list of data frames, one for each unique protein. The data frames
-  have three columns, "Protein", "Mass_Tag_ID" (which is molecule ID), and
+  have three columns, a protein identifier, a peptide identifier, and a
   "ProteoformID". The class of this list is 'isoformRes'.
 }
 \description{
 Applies BP-Quant to a pepData object
 }
 \details{
-The statRes object contains the signatures data frame, the pepData
-  object is used for its e_meta data frame. Next the signatures data frame
-  and e_meta are merged by their edata_cname (“Peptide”) columns, this new
-  data frame called protein_sig_data will be input to bpquant_mod in a
-  “foreach” statement. “Foreach” will subset protein_sig_data for each unique
-  protein and apply bpquant_mod to each subset and store the results.
+The result of this function can be used as one the \code{isoformRes}
+  input argument to \code{\link{protein_quant}}. The \code{bpquant} function
+  itself operates as follows: The statRes object contains the signatures data
+  frame, the pepData object is used for its e_meta data frame. Next the
+  signatures data frame and e_meta are merged by their edata_cname (e.g.
+  peptide identifier) columns, this new data frame called protein_sig_data
+  will be input to bpquant_mod in a “foreach” statement. “Foreach” will
+  subset protein_sig_data for each unique protein and apply bpquant_mod to
+  each subset and store the results.
 }
 \examples{
 \dontrun{
@@ -39,8 +43,8 @@ library(pmartR)
 library(pmartRdata)
 
 mypepData <- group_designation(omicsData = pep_object,
-                               main_effects = c("Condition"))
-mypepData = edata_transform(mypepData, "log2")
+                               main_effects = c("Phenotype"))
+mypepData = edata_transform(omicsData = mypepData, data_scale = "log2")
 
 imdanova_Filt <- imdanova_filter(omicsData = mypepData)
 mypepData <- applyFilt(filter_object = imdanova_Filt,
@@ -48,8 +52,9 @@ mypepData <- applyFilt(filter_object = imdanova_Filt,
                        min_nonmiss_anova=2)
 
 imd_anova_res <- imd_anova(omicsData = mypepData,
-                           test_method = 'comb',
-                           pval_adjust='bon')
+                           test_method = 'combined',
+                           pval_adjust_a ='bon',
+                           pval_adjust_g = 'bon')
 
 result = bpquant(statRes = imd_anova_res, pepData = mypepData)
 
