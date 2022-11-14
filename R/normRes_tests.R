@@ -4,7 +4,7 @@
 #' and group assignment of a normalized omicsData or normRes object
 #'
 #' @param norm_obj object of class 'pepData', 'proData', 'lipidData',
-#'   'metabData', 'isobaricpepData' that has had \code{normalize_global()} run
+#'   'metabData', 'isobaricpepData', or 'nmrData' that has had \code{normalize_global()} run
 #'   on it, or a 'normRes' object
 #' @param test_fn character string indicating the statistical test to use.
 #'   Current options are "anova" and "kw" for a Kruskal-Wallis test.
@@ -24,13 +24,22 @@
 #' # provide normalized omicsData object
 #' mymetab<- normalize_global(omicsData = mymetab, subset_fn = "all", norm_fn = "median", apply_norm = TRUE)
 #' norm_pvals <- normRes_tests(norm_obj = mymetab)
-#'
+#' 
+#' # NMR data object
+#' mynmr <- edata_transform(omicsData = nmr_identified_object, data_scale = "log2")
+#' mynmr <- group_designation(mynmr, main_effects = "Condition")
+#' mynmrnorm <- normalize_nmr(omicsData = mynmr,
+#'                             apply_norm = TRUE,
+#'                             sample_property_cname = "Concentration")
+#' mynmrnorm <- normalize_global(omicsData = mynmrnorm, subset_fn = "all", norm_fn = "median", apply_norm = TRUE, backtransform = TRUE)                
+#' norm_pvals <- normRes_tests(norm_obj = mynmrnorm)
+#'                     
 #' @export
 #'
 normRes_tests <- function (norm_obj, test_fn = "kw") {
 
   obj_classes <-  c("pepData", "proData", "lipidData", "metabData",
-                    "isobaricpepData")
+                    "isobaricpepData", 'nmrData')
 
   # object is of correct class and groupie is a character vector
   if(!inherits(norm_obj, c(obj_classes, "normRes")))

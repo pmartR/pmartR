@@ -8,7 +8,7 @@ normRes_tests(norm_obj, test_fn = "kw")
 }
 \arguments{
 \item{norm_obj}{object of class 'pepData', 'proData', 'lipidData',
-'metabData', 'isobaricpepData' that has had \code{normalize_global()} run
+'metabData', 'isobaricpepData', or 'nmrData' that has had \code{normalize_global()} run
 on it, or a 'normRes' object}
 
 \item{test_fn}{character string indicating the statistical test to use.
@@ -35,4 +35,11 @@ norm_pvals <- normRes_tests(norm_obj = mynorm)
 mymetab<- normalize_global(omicsData = mymetab, subset_fn = "all", norm_fn = "median", apply_norm = TRUE)
 norm_pvals <- normRes_tests(norm_obj = mymetab)
 
+# NMR data object
+mynmr <- edata_transform(omicsData = nmr_identified_object, data_scale = "log2")
+mynmrnorm <- normalize_nmr(omicsData = mynmr,
+                            apply_norm = TRUE,
+                            sample_property_cname = "Concentration")
+mynmrnorm <- normalize_global(omicsData = mynmrnorm, subset_fn = "all", norm_fn = "median", apply_norm = TRUE)                
+                   
 }

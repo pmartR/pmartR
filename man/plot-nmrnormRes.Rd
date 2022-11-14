@@ -65,9 +65,14 @@ Creates a scatter plot for an S3 object of type 'nmrnormRes'
 \examples{
 library(pmartRdata)
 mynmr <- edata_transform(omicsData = nmr_identified_object, data_scale = "log2")
-mynmr <- normalize_nmr(omicsData = mynmr,
+mynmrnorm <- normalize_nmr(omicsData = mynmr,
                          apply_norm = FALSE,
                          metabolite_name = "unkm1.53")
-plot(mynmr)
+plot(mynmrnorm)
+
+mynmrnorm2 <- normalize_nmr(omicsData = mynmr,
+                         apply_norm = FALSE,
+                         sample_property_cname = "Concentration")
+plot(mynmrnorm2)
 
 }
