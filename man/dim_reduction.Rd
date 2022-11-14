@@ -8,8 +8,7 @@ dim_reduction(omicsData, k = 2)
 }
 \arguments{
 \item{omicsData}{an object of the class 'pepdata', 'prodata', 'metabData',
-'lipidData', 'nmrData', or 'seqData', 
-usually created by \code{\link{as.pepData}},
+'lipidData', 'nmrData', or 'seqData', created by \code{\link{as.pepData}},
 \code{\link{as.proData}}, \code{\link{as.metabData}},
 \code{\link{as.lipidData}}, \code{\link{as.nmrData}}, or
 \code{\link{as.seqData}}, respectively.}
@@ -19,33 +18,32 @@ usually created by \code{\link{as.pepData}},
 \value{
 a data.frame with first \code{k} principal component scores, sample
   identifiers, and group membership for each sample (if group designation was
-  previously run on the data).
+  previously run on the data). The object is of class dimRes (dimension
+  reduction Result).
 }
 \description{
-Calculate principal components using projection pursuit estimation, which
-implements an expectation-maximization (EM) estimation algorithm when data is
-missing. For seqData counts, a generalized version of principal components 
-analysis for non-normally distributed data is calculated under the assumption 
-of a negative binomial distribution with global dispersion.
+For data types other than seqData, this function calculates principal
+components using projection pursuit estimation, which implements an
+expectation-maximization (EM) estimation algorithm when data is missing. For
+seqData counts, a generalized version of principal components analysis for
+non-normally distributed data is calculated under the assumption of a
+negative binomial distribution with global dispersion.
 }
 \details{
-Any biomolecules seen in only one sample or with a variance less than
-  1E-6 across all samples are not included in the PCA calculations. This
-  function leverages code from \code{\link[pcaMethods]{pca}} and 
+Any biomolecules seen in only one sample or with a variance less
+  than 1E-6 across all samples are not included in the PCA calculations. This
+  function leverages code from \code{\link[pcaMethods]{pca}} and
   \code{\link[glmpca]{glmpca}} .
 }
 \examples{
-\dontrun{
 library(pmartRdata)
-data(lipid_object)
-lipid_object <- edata_transform(omicsData = lipid_object,
-                                data_scale="log2")
-lipid_object <- group_designation(omicsData = lipid_object,
-                                  main_effects = "Condition")
-pca_lipids <- dim_reduction(omicsData = lipid_object)
-plot(pca_lipids)
-summary(pca_lipids)
-}
+
+mylipid <- edata_transform(omicsData = lipid_neg_object, data_scale="log2")
+mylipid <- group_designation(omicsData = mylipid, main_effects = "Virus")
+pca_lipids <- dim_reduction(omicsData = mylipid)
+
+myseq <- group_designation(omicsData = rnaseq_object, main_effects = "Virus")
+pca_seq <- dim_reduction(omicsData = myseq)
 
 }
 \references{
@@ -53,8 +51,9 @@ Redestig, H., Stacklies, W., Scholz, M., Selbig, J., & Walther,
   D. (2007). \emph{pcaMethods - a bioconductor package providing PCA methods
   for incomplete data}. Bioinformatics. 23(9): 1164-7.
   
-  Implements a generalized version of principal components analysis (GLM-PCA) 
-  for dimension reduction of non-normally distributed data such as counts or 
-  binary matrices. Townes FW, Hicks SC, Aryee MJ, Irizarry RA (2019) 
-  <doi:10.1186/s13059-019-1861-6>. Townes FW (2019) <arXiv:1907.02647>.
+ @references Implements a generalized version of principal components
+   analysis (GLM-PCA) for dimension reduction of non-normally distributed
+   data such as counts or binary matrices. Townes FW, Hicks SC, Aryee MJ,
+   Irizarry RA (2019) <doi:10.1186/s13059-019-1861-6>. Townes FW (2019)
+   <arXiv:1907.02647>.
 }
