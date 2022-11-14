@@ -1,24 +1,24 @@
-#' Convert Data to Appropriate pmartR Class
+#' Create pmartR Object of Class isobaricpepData
 #'
-#' Converts a list object or several data.frames of isobaric peptide-level data
+#' Converts several data frames of isobaric peptide data
 #' to an object of the class 'isobaricpepData'. Objects of the class
-#' 'isobaricpepData' are lists with two obligatory components \code{e_data} and
-#' \code{f_data}. An optional list component \code{e_meta} is used if analysis
+#' 'isobaricpepData' are lists with two obligatory components, \code{e_data} and
+#' \code{f_data}. An optional list component, \code{e_meta}, is used if analysis
 #' or visualization at other levels (e.g. protein) is also desired.
 #'
-#' @param e_data a \eqn{p \times n + 1} data.frame of expression data, where
+#' @param e_data a \eqn{p \times n + 1} data frame of expression data, where
 #'   \eqn{p} is the number of peptides observed and \eqn{n} is the number of
 #'   samples (an additional peptide identifier/name column should also be
-#'   present anywhere in the data.frame). Each row corresponds to data for each
+#'   present in the data frame). Each row corresponds to data for one
 #'   peptide. One column specifying a unique identifier for each peptide (row)
 #'   must be present.
-#' @param f_data a data.frame with \eqn{n} rows. Each row corresponds to a
+#' @param f_data a data frame with \eqn{n} rows. Each row corresponds to a
 #'   sample with one column giving the unique sample identifiers found in e_data
 #'   column names and other columns providing qualitative and/or quantitative
 #'   traits of each sample.
-#' @param e_meta an optional data.frame with at least \eqn{p} rows. Each row
+#' @param e_meta an optional data frame with at least \eqn{p} rows. Each row
 #'   corresponds to a peptide with one column giving peptide names (must be
-#'   named the same as the column in \code{e_data}) and other columns giving
+#'   named the same as the column in \code{e_data}) and other columns giving biomolecule
 #'   meta information (e.g. mappings of peptides to proteins).
 #' @param edata_cname character string specifying the name of the column
 #'   containing the peptide identifiers in \code{e_data} and \code{e_meta} (if
@@ -26,8 +26,7 @@
 #' @param emeta_cname character string specifying the name of the column
 #'   containing the protein identifiers (or other mapping variable) in
 #'   \code{e_meta} (if applicable). Defaults to NULL. If \code{e_meta} is NULL,
-#'   then either do not specify \code{emeta_cname} or specify it as NULL. If
-#'   \code{e_meta} is NULL, then specify \code{emeta_cname} as NULL.
+#'   then either do not specify \code{emeta_cname} or specify it as NULL. 
 #' @param fdata_cname character string specifying the name of the column
 #'   containing the sample identifiers in \code{f_data}.
 #' @param techrep_cname character string specifying the name of the column in
@@ -37,13 +36,14 @@
 #'   Defaults to NULL (no technical replicates).
 #'
 #' @param ... further arguments
+#' 
+#' @return Object of class isobaricpepData and pepData.
 #'
-#' @details The class 'isobaricpepData' is meant to deal with peptide data
-#'   generated on instruments where a reference pool for normalization is
-#'   available (e.g. TMT, iTRAQ).
+#' @details The class 'isobaricpepData' is meant to deal with labeled peptide data
+#'   generated on instruments (e.g. TMT, iTRAQ) where a reference pool sample will be utilized for normalization.
 #'
 #'  If your data has already undergone normalization to the reference pool, you
-#'  should speficy \code{isobaric_norm = T}.
+#'  should specify \code{isobaric_norm = T}.
 #'
 #'  Objects of class 'isobaricpepData' contain some attributes that are
 #'  referenced by downstream functions. These attributes can be changed from
@@ -53,9 +53,9 @@
 #'  'log10', 'log', and 'abundance', which indicate data is log base 2, base 10,
 #'  natural log transformed, and raw abundance, respectively. Default is
 #'  'abundance'. \cr \tab \cr is_normalized \tab A logical argument, specifying
-#'  whether the data has been normalized or not. Default value is FALSE. \cr
+#'  whether the data has been normalized or not (this normalization refers to a statistical normalization, such as median centering or other methods). Default value is FALSE. \cr
 #'  \tab \cr isobaric_norm \tab A logical argument, specifying whether the data
-#'  has been normalized to the approporiate reference pool sample or not.
+#'  has been normalized to the appropriate reference pool sample or not.
 #'  Default value is FALSE \cr \tab \cr norm_info \tab Default value is an empty
 #'  list, which will be populated with a single named element
 #'  \code{is_normalized = is_normalized}. When a normalization is applied to the
@@ -63,7 +63,7 @@
 #'  function, normalization subset and subset parameters, the location and scale
 #'  parameters used to normalize the data, and the location and scale parameters
 #'  used to backtransform the data (if applicable). \cr \tab \cr data_types \tab
-#'  Character string describing the type of data (e.g.'Positive ion'). Default
+#'  Character string describing the type of data, most commonly used for lipidomic data (lipidData objects) or NMR data (nmrData objects) but available for other data classes as well. Default
 #'  value is NULL. \cr \tab \cr check.names \tab Logical defaults to TRUE.
 #'  Indicates whether 'check.names' attribute of returned omicsData object is
 #'  TRUE or FALSE. \cr } Computed values included in the \code{data_info}
@@ -79,18 +79,13 @@
 #'  whether \code{e_meta} is provided.\cr \tab \cr }
 #'
 #' @examples
-#' \dontrun{
 #' library(pmartRdata)
-#' data("isobaric_edata")
-#' data("isobaric_fdata")
-#' data("isobaric_emeta")
-#' mypepData <- as.isobaricpepData(e_data = isobaric_edata,
-#'                                 e_meta = isobaric_emeta,
-#'                                 f_data = isobaric_fdata,
-#'                                 edata_cname = "Peptide",
-#'                                 fdata_cname = "Sample",
-#'                                 emeta_cname = "Protein")
-#' }
+#' mypep <- as.isobaricpepData(e_data = isobaric_edata,
+#'                             e_meta = isobaric_emeta,
+#'                             f_data = isobaric_fdata,
+#'                             edata_cname = "Peptide",
+#'                             fdata_cname = "SampleID",
+#'                             emeta_cname = "Protein")
 #'
 #' @author Lisa Bramer
 #' @seealso \code{\link{as.pepData}}
@@ -198,42 +193,42 @@ as.isobaricpepData <- function (e_data, f_data, e_meta = NULL, edata_cname,
   
 }
 
-#' Convert Data to Appropriate pmartR Class
+#' Create pmartR Object of Class lipidData
 #'
-#' Converts a list object or several data.frames of lipid-level data to an
+#' Converts several data frames of lipid data to an
 #' object of the class 'lipidData'. Objects of the class 'lipidData' are lists
-#' with two obligatory components \code{e_data} and \code{f_data}. An optional
-#' list component \code{e_meta} is used if analysis or visualization at other
-#' levels (e.g. lipid identification) is also desired.
+#' with two obligatory components, \code{e_data} and \code{f_data}. An optional
+#' list component, \code{e_meta}, is used if analysis or visualization at other
+#' levels (e.g. lipid class) is also desired.
 #'
-#' @param e_data a \eqn{p \times n + 1} data.frame of expression data, where
+#' @param e_data a \eqn{p \times n + 1} data frame of expression data, where
 #'   \eqn{p} is the number of lipids observed and \eqn{n} is the number of
-#'   samples. Each row corresponds to data for each lipid. One column specifying
+#'   samples. Each row corresponds to data for one lipid. One column specifying
 #'   a unique identifier for each lipid (row) must be present.
-#' @param f_data a data.frame with \eqn{n} rows. Each row corresponds to a
+#' @param f_data a data frame with \eqn{n} rows. Each row corresponds to a
 #'   sample with one column giving the unique sample identifiers found in e_data
 #'   column names and other columns providing qualitative and/or quantitative
 #'   traits of each sample.
-#' @param e_meta an optional data.frame with \eqn{p} rows. Each row corresponds
+#' @param e_meta an optional data frame with \eqn{p} rows. Each row corresponds
 #'   to a lipid with one column giving lipid names (must be named the same as
-#'   the column in \code{e_data}) and other columns giving meta information.
+#'   the column in \code{e_data}) and other columns giving biomolecule meta information.
 #' @param edata_cname character string specifying the name of the column
 #'   containing the lipid identifiers in \code{e_data} and \code{e_meta} (if
 #'   applicable).
 #' @param emeta_cname character string specifying the name of the column
-#'   containing the mapped identifiers in \code{e_meta} (if applicable).
+#'   containing the mapped identifiers in \code{e_meta} (if applicable). Can be the same as edata_cname, if desired.
 #'   Defaults to NULL. If \code{e_meta} is NULL, then either do not specify
-#'   \code{emeta_cname} or specify it as NULL. If \code{e_meta} is NULL, then
-#'   specify \code{emeta_cname} as NULL.
+#'   \code{emeta_cname} or specify it as NULL. 
 #' @param fdata_cname character string specifying the name of the column
 #'   containing the sample identifiers in \code{f_data}.
 #' @param techrep_cname character string specifying the name of the column in
-#'   \code{f_data} containing the identifiers for the biological samples if the
-#'   observations represent technical replicates.  This column is used to
+#'   \code{f_data} that specifies which samples are technical replicates. This column is used to
 #'   collapse the data when \code{combine_techreps} is called on this object.
 #'   Defaults to NULL (no technical replicates).
 #'
 #' @param ... further arguments
+#' 
+#' @return Object of class lipidData
 #'
 #' @details Objects of class 'lipidData' contain some attributes that are
 #'   referenced by downstream functions. These attributes can be changed from
@@ -241,7 +236,7 @@ as.isobaricpepData <- function (e_data, f_data, e_meta = NULL, edata_cname,
 #'   well as their default values are as follows: \tabular{ll}{ data_scale \tab
 #'   Scale of the data provided in \code{e_data}. Acceptable values are 'log2',
 #'   'log10', 'log', and 'abundance', which indicate data is log base 2, base
-#'   10, natural log transformed, and raw abundance, respectively. Default
+#'   10, natural log, or raw abundance, respectively. Default
 #'   values is 'abundance'. \cr \tab \cr is_normalized \tab A logical argument,
 #'   specifying whether the data has been normalized or not. Default value is
 #'   FALSE. \cr \tab \cr norm_info \tab Default value is an empty list, which
@@ -251,7 +246,7 @@ as.isobaricpepData <- function (e_data, f_data, e_meta = NULL, edata_cname,
 #'   subset and subset parameters, the location and scale parameters used to
 #'   normalize the data, and the location and scale parameters used to
 #'   backtransform the data (if applicable). \cr \tab \cr data_types \tab
-#'   Character string describing the type of data (e.g. 'Positive ion'). Default
+#'   Character string describing the type of data (e.g. 'Positive ion' or ‘Negative ion’ for lipid data). Default
 #'   value is NULL. \cr \tab \cr check.names \tab Logical defaults to TRUE.
 #'   Indicates whether 'check.names' attribute of returned omicsData object is
 #'   TRUE or FALSE. \cr } Computed values included in the \code{data_info}
@@ -265,20 +260,14 @@ as.isobaricpepData <- function (e_data, f_data, e_meta = NULL, edata_cname,
 #'   argument, specifying where the \code{e_meta} is provided.\cr \tab \cr }
 #'
 #' @examples
-#' \dontrun{
 #' library(pmartRdata)
-#' data("lipid_edata")
-#' data("lipid_fdata")
-#' mylipidData <- as.lipidData(e_data = lipid_edata,
-#'                             f_data = lipid_fdata,
-#'                             edata_cname = "LipidCommonName",
-#'                             fdata_cname = "Sample_Name")
-#' }
+#' mylipid <- as.lipidData(e_data = lipid_neg_edata,
+#'                         f_data = lipid_neg_fdata,
+#'                         edata_cname = "Lipid",
+#'                         fdata_cname = "SampleID")
 #'
 #' @author Lisa Bramer, Kelly Stratton
 #' @seealso \code{\link{as.metabData}}
-#' @seealso \code{\link{as.pepData}}
-#' @seealso \code{\link{as.proData}}
 #'
 #' @export
 #'
@@ -372,23 +361,23 @@ as.lipidData <- function (e_data, f_data, e_meta = NULL,
   
 }
 
-#' Convert Data to Appropriate pmartR Class
+#' Create pmartR Object of Class metabData
 #'
-#' Converts a list object or several data.frames of metabolomic-level data to an
+#' Converts several data frames of metabolomic data to an
 #' object of the class 'metabData'. Objects of the class 'metabData' are lists
-#' with two obligatory components \code{e_data} and \code{f_data}. An optional
-#' list component \code{e_meta} is used if analysis or visualization at other
+#' with two obligatory components, \code{e_data} and \code{f_data}. An optional
+#' list component, \code{e_meta}, is used if analysis or visualization at other
 #' levels (e.g. metabolite identification) is also desired.
 #'
-#' @param e_data a \eqn{p \times n + 1} data.frame of expression data, where
+#' @param e_data a \eqn{p \times n + 1} data frame of expression data, where
 #'   \eqn{p} is the number of metabolites observed and \eqn{n} is the number of
-#'   samples. Each row corresponds to data for each metabolite. One column
+#'   samples. Each row corresponds to data for one metabolite. One column
 #'   specifying a unique identifier for each metabolite (row) must be present.
-#' @param f_data a data.frame with \eqn{n} rows. Each row corresponds to a
+#' @param f_data a data frame with \eqn{n} rows. Each row corresponds to a
 #'   sample with one column giving the unique sample identifiers found in e_data
 #'   column names and other columns providing qualitative and/or quantitative
 #'   traits of each sample.
-#' @param e_meta an optional data.frame with \eqn{p} rows. Each row corresponds
+#' @param e_meta an optional data frame with \eqn{p} rows. Each row corresponds
 #'   to a metabolite with one column giving metabolite names (must be named the
 #'   same as the column in \code{e_data}) and other columns giving meta
 #'   information.
@@ -396,19 +385,19 @@ as.lipidData <- function (e_data, f_data, e_meta = NULL,
 #'   containing the metabolite identifiers in \code{e_data} and \code{e_meta}
 #'   (if applicable).
 #' @param emeta_cname character string specifying the name of the column
-#'   containing the mapped identifiers in \code{e_meta} (if applicable).
-#'   Defaults to NULL. If \code{e_meta} is NULL, then either do not specify
-#'   \code{emeta_cname} or specify it as NULL. If \code{e_meta} is NULL, then
-#'   specify \code{emeta_cname} as NULL.
+#'   containing the mapped identifiers in \code{e_meta} (if applicable). 
+#'   Defaults to NULL. Can be the same as edata_cname, if desired. If \code{e_meta} is NULL, then either do not specify
+#'   \code{emeta_cname} or specify it as NULL.
 #' @param fdata_cname character string specifying the name of the column
 #'   containing the sample identifiers in \code{f_data}.
 #' @param techrep_cname character string specifying the name of the column in
-#'   \code{f_data} containing the identifiers for the biological samples if the
-#'   observations represent technical replicates.  This column is used to
+#'   \code{f_data} that specifies which samples are technical replicates. This column is used to
 #'   collapse the data when \code{combine_techreps} is called on this object.
 #'   Defaults to NULL (no technical replicates).
 #'
 #' @param ... further arguments
+#' 
+#' @return Object of class metabData
 #'
 #' @details Objects of class 'metabData' contain some attributes that are
 #'   referenced by downstream functions. These attributes can be changed from
@@ -416,7 +405,7 @@ as.lipidData <- function (e_data, f_data, e_meta = NULL,
 #'   well as their default values are as follows: \tabular{ll}{ data_scale \tab
 #'   Scale of the data provided in \code{e_data}. Acceptable values are 'log2',
 #'   'log10', 'log', and 'abundance', which indicate data is log base 2, base
-#'   10, natural log transformed, and raw abundance, respectively. Default is
+#'   10, natural log, or raw abundance, respectively. Default is
 #'   'abundance'. \cr \tab \cr is_normalized \tab A logical argument, specifying
 #'   whether the data has been normalized or not. Default value is FALSE. \cr
 #'   \tab \cr norm_info \tab Default value is an empty list, which will be
@@ -425,8 +414,7 @@ as.lipidData <- function (e_data, f_data, e_meta = NULL,
 #'   list containing the normalization function, normalization subset and subset
 #'   parameters, the location and scale parameters used to normalize the data,
 #'   and the location and scale parameters used to backtransform the data (if
-#'   applicable). \cr \tab \cr data_types \tab Character string describing the
-#'   type of data (e.g.'Positive ion'). Default value is NULL. \cr \tab \cr
+#'   applicable). \cr \tab \cr data_types \tab Character string describing the type of data, most commonly used for lipidomic data (lipidData objects) or NMR data (nmrData objects) but available for other data classes as well. Default value is NULL. \cr \tab \cr
 #'   check.names \tab Logical defaults to TRUE. Indicates whether 'check.names'
 #'   attribute of returned omicsData object is TRUE or FALSE. \cr } Computed
 #'   values included in the \code{data_info} attribute are as follows:
@@ -438,22 +426,17 @@ as.lipidData <- function (e_data, f_data, e_meta = NULL,
 #'   of samples that make up the columns of \code{e_data}.\cr \tab \cr meta_info
 #'   \tab A logical argument, specifying where the \code{e_meta} is provided.\cr
 #'   \tab \cr }
-#'
+#'   
 #' @examples
-#' \dontrun{
 #' library(pmartRdata)
-#' data("metab_edata")
-#' data("metab_fdata")
 #' mymetabData <- as.metabData(e_data = metab_edata,
 #'                             f_data = metab_fdata,
 #'                             edata_cname = "Metabolite",
 #'                             fdata_cname = "SampleID")
-#' }
 #'
 #' @author Lisa Bramer, Kelly Stratton
 #' @seealso \code{\link{as.lipidData}}
-#' @seealso \code{\link{as.pepData}}
-#' @seealso \code{\link{as.proData}}
+#' @seealso \code{\link{as.nmrData}}
 #'
 #' @export
 #'
@@ -548,24 +531,24 @@ as.metabData <- function (e_data, f_data, e_meta = NULL,
   
 }
 
-#' Convert Data to Appropriate pmartR Class
+#' Create pmartR Object of Class nmrData
 #'
-#' Converts a list object or several data.frames of NMR-generated
-#' metabolomic-level data to an object of the class 'nmrData'. Objects of the
-#' class 'nmrData' are lists with two obligatory components \code{e_data} and
-#' \code{f_data}. An optional list component \code{e_meta} is used if analysis
+#' Converts several data frames of NMR-generated
+#' metabolomic data to an object of the class 'nmrData'. Objects of the
+#' class 'nmrData' are lists with two obligatory components, \code{e_data} and
+#' \code{f_data}. An optional list component, \code{e_meta}, is used if analysis
 #' or visualization at other levels (e.g. metabolite identification) is also
 #' desired.
 #'
-#' @param e_data a \eqn{p \times n + 1} data.frame of expression data, where
+#' @param e_data a \eqn{p \times n + 1} data frame of expression data, where
 #'   \eqn{p} is the number of metabolites observed and \eqn{n} is the number of
-#'   samples. Each row corresponds to data for each metabolite. One column
+#'   samples. Each row corresponds to data for one metabolite. One column
 #'   specifying a unique identifier for each metabolite (row) must be present.
-#' @param f_data a data.frame with \eqn{n} rows. Each row corresponds to a
+#' @param f_data a data frame with \eqn{n} rows. Each row corresponds to a
 #'   sample with one column giving the unique sample identifiers found in e_data
 #'   column names and other columns providing qualitative and/or quantitative
 #'   traits of each sample.
-#' @param e_meta an optional data.frame with \eqn{p} rows. Each row corresponds
+#' @param e_meta an optional data frame with \eqn{p} rows. Each row corresponds
 #'   to a metabolite with one column giving metabolite names (must be named the
 #'   same as the column in \code{e_data}) and other columns giving meta
 #'   information.
@@ -574,18 +557,18 @@ as.metabData <- function (e_data, f_data, e_meta = NULL,
 #'   (if applicable).
 #' @param emeta_cname character string specifying the name of the column
 #'   containing the mapped identifiers in \code{e_meta} (if applicable).
-#'   Defaults to NULL. If \code{e_meta} is NULL, then either do not specify
-#'   \code{emeta_cname} or specify it as NULL. If \code{e_meta} is NULL, then
-#'   specify \code{emeta_cname} as NULL.
+#'   Defaults to NULL. Can be the same as edata_cname, if desired. If \code{e_meta} is NULL, then either do not specify
+#'   \code{emeta_cname} or specify it as NULL. 
 #' @param fdata_cname character string specifying the name of the column
 #'   containing the sample identifiers in \code{f_data}.
 #' @param techrep_cname character string specifying the name of the column in
-#'   \code{f_data} containing the identifiers for the biological samples if the
-#'   observations represent technical replicates.  This column is used to
+#'   \code{f_data} that specifies which samples are technical replicates. This column is used to
 #'   collapse the data when \code{combine_techreps} is called on this object.
 #'   Defaults to NULL (no technical replicates).
 #'
 #' @param ... further arguments
+#'
+#' @return Object of class nmrData
 #'
 #' @details Objects of class 'nmrData' contain some attributes that are
 #'   referenced by downstream functions. These attributes can be changed from
@@ -593,7 +576,7 @@ as.metabData <- function (e_data, f_data, e_meta = NULL,
 #'   well as their default values are as follows: \tabular{ll}{ data_scale \tab
 #'   Scale of the data provided in \code{e_data}. Acceptable values are 'log2',
 #'   'log10', 'log', and 'abundance', which indicate data is log base 2, base
-#'   10, natural log transformed, and raw abundance, respectively. Default is
+#'   10, natural log, or raw abundance, respectively. Default is
 #'   'abundance'. \cr \tab \cr is_normalized \tab A logical argument, specifying
 #'   whether the data has been normalized or not. Default value is FALSE. \cr
 #'   \tab \cr nmr_norm \tab A logical argument, specifying whether the data has
@@ -620,23 +603,16 @@ as.metabData <- function (e_data, f_data, e_meta = NULL,
 #'   \tab \cr }
 #'
 #' @examples
-#' \dontrun{
 #' library(pmartRdata)
-#' data("nmr_edata_identified")
-#' data("nmr_fdata_identified")
-#' mynmrData <- as.nmrData(e_data = nmr_edata_identified,
-#'                         f_data = nmr_fdata_identified,
+#' mynmrData <- as.nmrData(e_data = nmr_identified_edata,
+#'                         f_data = nmr_identified_fdata,
 #'                         edata_cname = "Metabolite",
 #'                         fdata_cname = "SampleID",
 #'                         data_type = "identified")
-#' }
 #'
 #' @author Lisa Bramer, Kelly Stratton
 #' @seealso \code{\link{as.metabData}}
-#' @seealso \code{\link{as.isobaricpepData}}
-#' @seealso \code{\link{as.lipidData}}
-#' @seealso \code{\link{as.pepData}}
-#' @seealso \code{\link{as.proData}}
+#' @seealso \code{\link{normalize_nmr}}
 #'
 #' @export
 #'
@@ -738,45 +714,45 @@ as.nmrData <- function (e_data, f_data, e_meta = NULL,
   
 }
 
-#' Convert Data to Appropriate pmartR Class
+#' Create pmartR Object of Class pepData
 #'
-#' Converts a list object or several data.frames of peptide-level data to an
+#' Converts several data frames of (unlabeled or global, as opposed to labeled) peptide data to an
 #' object of the class 'pepData'. Objects of the class 'pepData' are lists with
-#' two obligatory components \code{e_data} and \code{f_data}. An optional list
-#' component \code{e_meta} is used if analysis or visualization at other levels
+#' two obligatory components, \code{e_data} and \code{f_data}. An optional list
+#' component, \code{e_meta}, is used if analysis or visualization at other levels
 #' (e.g. protein) is also desired.
 #'
-#' @param e_data a \eqn{p \times n + 1} data.frame of expression data, where
+#' @param e_data a \eqn{p \times n + 1} data frame of expression data, where
 #'   \eqn{p} is the number of peptides observed and \eqn{n} is the number of
 #'   samples (an additional peptide identifier/name column should also be
-#'   present anywhere in the data.frame). Each row corresponds to data for each
+#'   present somewhere in the data frame). Each row corresponds to data for one
 #'   peptide. One column specifying a unique identifier for each peptide (row)
 #'   must be present.
-#' @param f_data a data.frame with \eqn{n} rows. Each row corresponds to a
+#' @param f_data a data frame with \eqn{n} rows. Each row corresponds to a
 #'   sample with one column giving the unique sample identifiers found in e_data
 #'   column names and other columns providing qualitative and/or quantitative
 #'   traits of each sample.
-#' @param e_meta an optional data.frame with at least \eqn{p} rows. Each row
+#' @param e_meta an optional data frame with at least \eqn{p} rows. Each row
 #'   corresponds to a peptide with one column giving peptide names (must be
-#'   named the same as the column in \code{e_data}) and other columns giving
+#'   named the same as the column in \code{e_data}) and other columns giving biomolecule
 #'   meta information (e.g. mappings of peptides to proteins).
 #' @param edata_cname character string specifying the name of the column
 #'   containing the peptide identifiers in \code{e_data} and \code{e_meta} (if
 #'   applicable).
 #' @param emeta_cname character string specifying the name of the column
 #'   containing the protein identifiers (or other mapping variable) in
-#'   \code{e_meta} (if applicable). Defaults to NULL. If \code{e_meta} is NULL,
-#'   then either do not specify \code{emeta_cname} or specify it as NULL. If
-#'   \code{e_meta} is NULL, then specify \code{emeta_cname} as NULL.
+#'   \code{e_meta} (if applicable). Defaults to NULL. Can be the same as edata_cname, if desired. If \code{e_meta} is NULL,
+#'   then either do not specify \code{emeta_cname} or specify it as NULL. 
 #' @param fdata_cname character string specifying the name of the column
 #'   containing the sample identifiers in \code{f_data}.
 #' @param techrep_cname character string specifying the name of the column in
-#'   \code{f_data} containing the identifiers for the biological samples if the
-#'   observations represent technical replicates.  This column is used to
+#'   \code{f_data} that specifies which samples are technical replicates. This column is used to
 #'   collapse the data when \code{combine_techreps} is called on this object.
 #'   Defaults to NULL (no technical replicates).
 #'
 #' @param ... further arguments
+#' 
+#' @return Object of class pepData
 #'
 #' @details Objects of class 'pepData' contain some attributes that are
 #'   referenced by downstream functions. These attributes can be changed from
@@ -784,7 +760,7 @@ as.nmrData <- function (e_data, f_data, e_meta = NULL,
 #'   well as their default values are as follows: \tabular{ll}{ data_scale \tab
 #'   Scale of the data provided in \code{e_data}. Acceptable values are 'log2',
 #'   'log10', 'log', and 'abundance', which indicate data is log base 2, base
-#'   10, natural log transformed, and raw abundance, respectively. Default is
+#'   10, natural log, or raw abundance, respectively. Default is
 #'   'abundance'. \cr \tab \cr is_normalized \tab A logical argument, specifying
 #'   whether the data has been normalized or not. Default value is FALSE. \cr
 #'   \tab \cr norm_info \tab Default value is an empty list, which will be
@@ -793,8 +769,7 @@ as.nmrData <- function (e_data, f_data, e_meta = NULL,
 #'   list containing the normalization function, normalization subset and subset
 #'   parameters, the location and scale parameters used to normalize the data,
 #'   and the location and scale parameters used to backtransform the data (if
-#'   applicable). \cr \tab \cr data_types \tab Character string describing the
-#'   type of data (e.g.'Positive ion'). Default value is NULL. \cr \tab \cr
+#'   applicable). \cr \tab \cr data_types \tab Character string describing the type of data, most commonly used for lipidomic data (lipidData objects) or NMR data (nmrData objects) but available for other data classes as well. Default value is NULL. \cr \tab \cr
 #'   check.names \tab Logical defaults to TRUE. Indicates whether 'check.names'
 #'   attribute of returned omicsData object is TRUE or FALSE. \cr } Computed
 #'   values included in the \code{data_info} attribute are as follows:
@@ -808,23 +783,17 @@ as.nmrData <- function (e_data, f_data, e_meta = NULL,
 #'   \tab \cr }
 #'
 #' @examples
-#' \dontrun{
 #' library(pmartRdata)
-#' data("pep_edata")
-#' data("pep_fdata")
-#' data("pep_emeta")
 #' mypepData <- as.pepData(e_data = pep_edata,
 #'                         e_meta = pep_emeta,
 #'                         f_data = pep_fdata,
-#'                         edata_cname = "Mass_Tag_ID",
+#'                         edata_cname = "Peptide",
 #'                         fdata_cname = "SampleID",
-#'                         emeta_cname = "Mass_Tag_ID")
-#' }
+#'                         emeta_cname = "RazorProtein")
 #'
 #' @author Kelly Stratton, Lisa Bramer
 #' @seealso \code{\link{as.proData}}
-#' @seealso \code{\link{as.lipidData}}
-#' @seealso \code{\link{as.metabData}}
+#' @seealso \code{\link{as.isobaricpepData}}
 #'
 #' @export
 #'
@@ -918,42 +887,43 @@ as.pepData <- function (e_data, f_data, e_meta = NULL,
   
 }
 
-#' Convert Data to Appropriate pmartR Class
+#' Create pmartR Object of Class proData
 #'
-#' Converts a list object or several data.frames of protein-level data to an
+#' Converts several data frames of protein data to an
 #' object of the class 'proData'. Objects of the class 'proData' are lists with
-#' two obligatory components \code{e_data} and \code{f_data}. An optional list
-#' component \code{e_meta} is used if analysis or visualization at other levels
+#' two obligatory components, \code{e_data} and \code{f_data}. An optional list
+#' component, \code{e_meta}, is used if analysis or visualization at other levels
 #' (e.g. gene) is also desired.
 #'
-#' @param e_data a \eqn{p \times n + 1} data.frame of expression data, where
+#' @param e_data a \eqn{p \times n + 1} data frame of expression data, where
 #'   \eqn{p} is the number of proteins observed and \eqn{n} is the number of
-#'   samples. Each row corresponds to data for each protein. One column
+#'   samples. Each row corresponds to data for one protein. One column
 #'   specifying a unique identifier for each protein (row) must be present.
-#' @param f_data a data.frame with \eqn{n} rows. Each row corresponds to a
+#' @param f_data a data frame with \eqn{n} rows. Each row corresponds to a
 #'   sample with one column giving the unique sample identifiers found in e_data
 #'   column names and other columns providing qualitative and/or quantitative
 #'   traits of each sample.
-#' @param e_meta an optional data.frame with \eqn{p} rows. Each row corresponds
+#' @param e_meta an optional data frame with \eqn{p} rows. Each row corresponds
 #'   to a protein with one column giving protein names (must be named the same
-#'   as the column in \code{e_data}) and other columns giving meta information
+#'   as the column in \code{e_data}) and other columns giving biomolecule meta information
 #'   (e.g. mappings of proteins to genes).
 #' @param edata_cname character string specifying the name of the column
 #'   containing the protein identifiers in \code{e_data} and \code{e_meta} (if
 #'   applicable).
 #' @param emeta_cname character string specifying the name of the column
 #'   containing the gene identifiers (or other mapping variable) in
-#'   \code{e_meta} (if applicable). Defaults to NULL. If \code{e_meta} is NULL,
+#'   \code{e_meta} (if applicable). Defaults to NULL. Can be the same as edata_cname, if desired. If \code{e_meta} is NULL,
 #'   then either do not specify \code{emeta_cname} or specify it as NULL.
 #' @param fdata_cname character string specifying the name of the column
 #'   containing the sample identifiers in \code{f_data}.
 #' @param techrep_cname character string specifying the name of the column in
-#'   \code{f_data} containing the identifiers for the biological samples if the
-#'   observations represent technical replicates.  This column is used to
+#'   \code{f_data} that specifies which samples are technical replicates. This column is used to
 #'   collapse the data when \code{combine_techreps} is called on this object.
 #'   Defaults to NULL (no technical replicates).
 #'
 #' @param ... further arguments
+#' 
+#' @return Object of class proData
 #'
 #' @details Objects of class 'proData' contain some attributes that are
 #'   referenced by downstream functions. These attributes can be changed from
@@ -961,7 +931,7 @@ as.pepData <- function (e_data, f_data, e_meta = NULL,
 #'   well as their default values are as follows: \tabular{ll}{ data_scale \tab
 #'   Scale of the data provided in \code{e_data}. Acceptable values are 'log2',
 #'   'log10', 'log', and 'abundance', which indicate data is log base 2, base
-#'   10, natural log transformed, and raw abundance, respectively. Default
+#'   10, natural log, or raw abundance, respectively. Default
 #'   values is 'abundance'. \cr \tab \cr is_normalized \tab A logical argument,
 #'   specifying whether the data has been normalized or not. Default value is
 #'   FALSE. \cr \tab \cr norm_info \tab Default value is an empty list, which
@@ -971,7 +941,7 @@ as.pepData <- function (e_data, f_data, e_meta = NULL,
 #'   subset and subset parameters, the location and scale parameters used to
 #'   normalize the data, and the location and scale parameters used to
 #'   backtransform the data (if applicable). \cr \tab \cr data_types \tab
-#'   Character string describing the type of data (e.g.'Positive ion'). Default
+#'   Character string describing the type of data, most commonly used for lipidomic data (lipidData objects) or NMR data (nmrData objects) but available for other data classes as well. Default
 #'   value is NULL. \cr \tab\cr check.names \tab Logical defaults to TRUE.
 #'   Indicates whether 'check.names' attribute of returned omicsData object is
 #'   TRUE or FALSE. \cr } Computed values included in the \code{data_info}
@@ -985,21 +955,16 @@ as.pepData <- function (e_data, f_data, e_meta = NULL,
 #'   \tab \cr }
 #'
 #' @examples
-#' \dontrun{
 #' library(pmartRdata)
-#' data("pro_edata")
-#' data("pro_fdata")
 #' myproData <- as.proData(e_data = pro_edata,
 #'                         f_data = pro_fdata,
-#'                         edata_cname = "Reference",
+#'                         edata_cname = "RazorProtein",
 #'                         fdata_cname = "SampleID",
 #'                         is_normalized = TRUE)
-#' }
 #'
 #' @author Kelly Stratton, Lisa Bramer
 #' @seealso \code{\link{as.pepData}}
-#' @seealso \code{\link{as.lipidData}}
-#' @seealso \code{\link{as.metabData}}
+#' @seealso \code{\link{as.isobaricpepData}}
 #'
 #' @export
 #'
@@ -1098,46 +1063,46 @@ as.proData <- function (e_data, f_data, e_meta = NULL,
   
 }
 
-#' Convert Data to Appropriate pmartR Class
+#' Create pmartR Object of Class seqData
 #'
-#' Converts a list object or several data.frames of RNA-seq transcript data to
+#' Converts several data frames of RNA-seq transcript data to
 #' an object of the class 'seqData'. Objects of the class 'seqData' are lists
-#' with two obligatory components \code{e_data} and \code{f_data}. An optional
-#' list component \code{e_meta} is used if analysis or visualization at other
+#' with two obligatory components, \code{e_data} and \code{f_data}. An optional
+#' list component, \code{e_meta}, is used if analysis or visualization at other
 #' levels (e.g. gene, protein, pathway) is also desired.
 #'
-#' @param e_data a \eqn{p \times n + 1} data.frame of expression data, where
+#' @param e_data a \eqn{p \times n + 1} data frame of expression data, where
 #'   \eqn{p} is the number of RNA transcripts observed and \eqn{n} is the number
 #'   of samples (an additional transcript identifier/name column should also be
-#'   present anywhere in the data.frame). Each row corresponds to data for each
-#'   transcript One column specifying a unique identifier for each transcript
+#'   present somewhere in the data frame). Each row corresponds to data for one
+#'   transcript. One column specifying a unique identifier for each transcript
 #'   (row) must be present. All counts are required to be raw for processing.
-#' @param f_data a data.frame with \eqn{n} rows. Each row corresponds to a
+#' @param f_data a data frame with \eqn{n} rows. Each row corresponds to a
 #'   sample with one column giving the unique sample identifiers found in e_data
 #'   column names and other columns providing qualitative and/or quantitative
-#'   traits of each sample. For library size normalization, this can be provided
-#'   here or calculated from columns in e_data.
-#' @param e_meta an optional data.frame with at least \eqn{p} rows. Each row
+#'   traits of each sample. For library size normalization, this can be provided as part of f_data
+#'   or calculated from columns in e_data.
+#' @param e_meta an optional data frame with at least \eqn{p} rows. Each row
 #'   corresponds to a transcript with one column giving transcript names (must be
-#'   named the same as the column in \code{e_data}) and other columns giving
-#'   meta information (e.g. mappings of transcripts to genes or proteins).
+#'   named the same as the column in \code{e_data}) and other columns giving biomolecule
+#'   meta information (e.g. mappings of transcripts to genes or proteins). Can be the same as edata_cname, if desired.
 #' @param edata_cname character string specifying the name of the column
 #'   containing the transcript identifiers in \code{e_data} and \code{e_meta} 
 #'   (if applicable).
 #' @param emeta_cname character string specifying the name of the column
 #'   containing the gene identifiers (or other mapping variable) in
 #'   \code{e_meta} (if applicable). Defaults to NULL. If \code{e_meta} is NULL,
-#'   then either do not specify \code{emeta_cname} or specify it as NULL. If
-#'   \code{e_meta} is NULL, then specify \code{emeta_cname} as NULL.
+#'   then either do not specify \code{emeta_cname} or specify it as NULL. 
 #' @param fdata_cname character string specifying the name of the column
 #'   containing the sample identifiers in \code{f_data}.
 #' @param techrep_cname character string specifying the name of the column in
-#'   \code{f_data} containing the identifiers for the biological samples if the
-#'   observations represent technical replicates.  This column is used to
+#'   \code{f_data} that specifies which samples are technical replicates. This column is used to
 #'   collapse the data when \code{combine_techreps} is called on this object.
 #'   Defaults to NULL (no technical replicates).
 #'
 #' @param ... further arguments
+#' 
+#' @return Object of class seqData
 #'
 #' @details Objects of class 'seqData' contain some attributes that are
 #'   referenced by downstream functions. These attributes can be changed from
@@ -1148,12 +1113,7 @@ as.proData <- function (e_data, f_data, e_meta = NULL,
 #'   whether the data has been normalized or not. Default value is FALSE. \cr
 #'   \tab \cr norm_info \tab Default value is an empty list, which will be
 #'   populated with a single named element \code{is_normalized = is_normalized}.
-#'   When a normalization is applied to the data, this becomes populated with a
-#'   list containing the normalization function, normalization subset and subset
-#'   parameters, the location and scale parameters used to normalize the data,
-#'   and the location and scale parameters used to backtransform the data (if
-#'   applicable). \cr \tab \cr data_types \tab Character string describing the
-#'   type of data (e.g.'Positive ion'). Default value is NULL. \cr \tab \cr
+#'   \cr \tab \cr data_types \tab Character string describing the type of data, most commonly used for lipidomic data (lipidData objects) or NMR data (nmrData objects) but available for other data classes as well. Default value is NULL. \cr \tab \cr
 #'   check.names \tab Logical defaults to TRUE. Indicates whether 'check.names'
 #'   attribute of returned omicsData object is TRUE or FALSE. \cr } Computed
 #'   values included in the \code{data_info} attribute are as follows:
@@ -1167,18 +1127,13 @@ as.proData <- function (e_data, f_data, e_meta = NULL,
 #'   \tab \cr }
 #'
 #' @examples
-#' \dontrun{
 #' library(pmartRdata)
-#' data("seq_edata")
-#' data("seq_fdata")
-#' data("seq_emeta")
-#' mypepData <- as.seqData(e_data = seq_edata,
-#'                         e_meta = seq_emeta,
-#'                         f_data = seq_fdata,
-#'                         edata_cname = "Seq_Tag_ID",
-#'                         fdata_cname = "SampleID",
-#'                         emeta_cname = "Seq_Tag_ID")
-#' }
+#' mypepData <- as.seqData(e_data = rnaseq_edata,
+#'                         e_meta = rnaseq_emeta,
+#'                         f_data = rnaseq_fdata,
+#'                         edata_cname = "Transcript",
+#'                         fdata_cname = "SampleName",
+#'                         emeta_cname = "Transcript")
 #'
 #' @author Rachel Richardson, Kelly Stratton, Lisa Bramer
 #' @seealso \code{\link{as.proData}}
