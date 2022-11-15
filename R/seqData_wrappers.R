@@ -5,23 +5,56 @@
 #' @param omicsData an object of type 'seqData', created by \code{\link{as.seqData}}
 #' @param method a character string of length one specifying which wrapper to use. 
 #' Can be 'edgeR', 'DESeq2', or 'limma-voom' 
-#' @param p_adjust an object of type 'seqData', created by \code{\link{as.seqData}}
+#' @param p_adjust Character string for p-value correction method, refer to 
+#' ?p.adjust() for valid options. Defaults to "BH" (Benjamini & Hochberg)
 #' @param comparisons `data.frame` with columns for "Control" and "Test"
 #'   containing the different comparisons of interest. Comparisons will be made
 #'   between the Test and the corresponding Control  If left NULL, then all
 #'   pairwise comparisons are executed.
-#' @param p_cutoff an object of type 'seqData', created by \code{\link{as.seqData}}  
+#' @param p_cutoff Numeric value between 0 and 1 for setting p-value significance threshold
 #' @param ... additional arguments passed to methods functions. Note, formatting 
 #' option changes will interfere with wrapping functionality.
 #' 
 #'
-#' @return data.frame object
+#' @return a statRes object (data.frame)
 #'
-#' @details Runs default differential expression workflows. Refer to ?Deseq2_wrapper,
-#' ?Voom_wrapper, and ?EdgeR_wrapper for additional details.
+#' @details Runs default differential expression workflows.
+#' 
+#' Flags (signatures) -	Indicator of statistical significance for computed test. 
+#' Zeros indicate no significance, while +/- 1 indicates direction of significance.
+#'
+#' Method "edgeR" - Runs default edgeR workflow with empirical Bayes quasi-likelihood F-tests.
+#' Additional arguments can be passed for use in the function, 
+#' refer to calcNormFactors() and glmQLFit() in edgeR package.
+#'
+#' Method "DESeq2" - Runs default DESeq workflow. Defaults to Wald test, no independent filtering, and 
+#' running in parallel. Additional arguments can be passed for use in the function, 
+#' refer to DESeq() and results() in DESeq2 package. Requires 'survival' package to run.
+#' 
+#' Method "voom" - Runs default limma-voom workflow using empirical Bayes moderated t-statistics.
+#' Additional arguments can be passed for use in the function, 
+#' refer to calcNormFactors() in edgeR package.
+#' 
+#' @references 
+#'  Robinson MD, McCarthy DJ, Smyth GK (2010). “edgeR: a Bioconductor package 
+#'  for differential expression analysis of digital gene expression data.” 
+#'  Bioinformatics, 26(1), 139-140. doi: 10.1093/bioinformatics/btp616.
+#'  
+#'  Love, M.I., Huber, W., Anders, S. Moderated estimation of fold change and 
+#'  dispersion for RNA-seq data with DESeq2 Genome Biology 15(12):550 (2014)
+#'  
+#'  Ritchie, M.E., Phipson, B., Wu, D., Hu, Y., Law, C.W., Shi, W., and Smyth, 
+#'  G.K. (2015). limma powers differential expression analyses for 
+#'  RNA-sequencing and microarray studies. Nucleic Acids Research 43(7), e47.
 #' 
 #' @examples
 #' \dontrun{
+#' 
+#' library(pmartRdata)
+#' myseqData <- rnaseq_object
+#' myseqData <- group_designation(omicsData = myseqData, main_effects = "Virus")
+#' statsresults <- diffexp_seq(omicsData = myseqData, method = "edgeR")
+#' 
 #' }
 #' 
 #' @export
@@ -91,35 +124,45 @@ diffexp_seq <- function(omicsData, method = "edgeR", p_adjust = "BH",
 #' 
 #' @param omicsData an object of type 'seqData', created by \code{\link{as.seqData}}
 #' @param test an object of type 'seqData', created by \code{\link{as.seqData}}  
-#' @param p_adjust an object of type 'seqData', created by \code{\link{as.seqData}}
-#' @param comparisons an object of type 'seqData', created by \code{\link{as.seqData}}  
-# @param fitType an object of type 'seqData', created by \code{\link{as.seqData}}
-# @param sfType an object of type 'seqData', created by \code{\link{as.seqData}}  
-# @param full an object of type 'seqData', created by \code{\link{as.seqData}}
-# @param reduced an object of type 'seqData', created by \code{\link{as.seqData}} 
-# @param quiet an object of type 'seqData', created by \code{\link{as.seqData}}
-# @param minReplicatesForReplace an object of type 'seqData', created by \code{\link{as.seqData}}  
-# @param modelMatrixType an object of type 'seqData', created by \code{\link{as.seqData}}
-# @param useT an object of type 'seqData', created by \code{\link{as.seqData}} 
-# @param parallel an object of type 'seqData', created by \code{\link{as.seqData}}
-# @param BPPARAM an object of type 'seqData', created by \code{\link{as.seqData}} 
-# @param lfcThreshold an object of type 'seqData', created by \code{\link{as.seqData}}
-# @param altHypothesis an object of type 'seqData', created by \code{\link{as.seqData}}  
-# @param independentFiltering an object of type 'seqData', created by \code{\link{as.seqData}}
-# @param alpha an object of type 'seqData', created by \code{\link{as.seqData}} 
-# @param format an object of type 'seqData', created by \code{\link{as.seqData}}
-# @param addMLE an object of type 'seqData', created by \code{\link{as.seqData}}  
+#' @param method a character string of length one specifying which wrapper to use. 
+#' Can be 'edgeR', 'DESeq2', or 'limma-voom' 
+#' @param p_adjust Character string for p-value correction method, refer to 
+#' ?p.adjust() for valid options. Defaults to "BH" (Benjamini & Hochberg)
+#' @param comparisons `data.frame` with columns for "Control" and "Test"
+#'   containing the different comparisons of interest. Comparisons will be made
+#'   between the Test and the corresponding Control  If left NULL, then all
+#'   pairwise comparisons are executed.
+#' @param p_cutoff Numeric value between 0 and 1 for setting p-value significance threshold
+#' @param ... additional arguments passed to methods functions. Note, formatting 
+#' option changes will interfere with wrapping functionality.
 #' @param ... additional arguments passed to function
 #' 
 #' @details Runs default DESeq workflow. Defaults to Wald test, no independent filtering, and 
 #' running in parallel. Additional arguments can be passed for use in the function, 
-#' refer to DESeq() and results() in DESeq2 package. Requires package "survival" to be available.
+
+#' refer to DESeq() and results() in DESeq2 package. Requires 'survival' package to run.
 #'
-#' @return statres data.frame object
+#' Flags (signatures) -	Indicator of statistical significance for computed test. 
+#' Zeros indicate no significance, while +/- 1 indicates direction of significance.
+
+#'
+#' @references 
+#'  
+#'  Love, M.I., Huber, W., Anders, S. Moderated estimation of fold change and 
+#'  dispersion for RNA-seq data with DESeq2 Genome Biology 15(12):550 (2014)
+#'  
+#'
+#' @return a statRes object (data.frame)
 #' 
 #' 
 #' @examples
 #' \dontrun{
+#' 
+#' library(pmartRdata)
+#' myseqData <- rnaseq_object
+#' myseqData <- group_designation(omicsData = myseqData, main_effects = "Virus")
+#' statsresults <- pmartR:::DESeq2_wrapper(omicsData = myseqData)
+#' 
 #' }
 #' 
 #' 
@@ -225,7 +268,7 @@ DESeq2_wrapper <- function(
     run_deseq <- run_deseq[!duplicated(names(run_deseq))]
     
   run_stats_deseq <- do.call(DESeq2::DESeq, args = run_deseq)
-  
+ 
   ## Args
   
   if(stringr::str_detect(grouping_formula, "Group")){
@@ -259,6 +302,8 @@ DESeq2_wrapper <- function(
     run_results <- c(run_results, add_list)
     run_results <- run_results[!duplicated(names(run_results))]
     
+
+    ## Run tests
     res <- do.call(DESeq2::results, args = run_results)
     
     res[["row"]] <- NULL
@@ -305,7 +350,6 @@ DESeq2_wrapper <- function(
                        group_means)
 
   lfc_cols <- grep("^log2FoldChange", colnames(all_cont))
-  # pval_cols <- grep(colnames(all_cont), "_pvalue")
   padj_cols <- grep("^padj", colnames(all_cont))
   flag_cols <- grep("^Flag", colnames(all_cont))
   
@@ -356,19 +400,42 @@ DESeq2_wrapper <- function(
 #' For generating statistics for 'seqData' objects
 #' 
 #' @param omicsData an object of type 'seqData', created by \code{\link{as.seqData}}
-#' @param p_adjust an object of type 'seqData', created by \code{\link{as.seqData}}
-#' @param comparisons an object of type 'seqData', created by \code{\link{as.seqData}}  
-#' @param p_cutoff an object of type 'seqData', created by \code{\link{as.seqData}}  
-#' @param ... additional arguments passed to functions 
+#' @param method a character string of length one specifying which wrapper to use. 
+#' Can be 'edgeR', 'DESeq2', or 'limma-voom' 
+#' @param p_adjust Character string for p-value correction method, refer to 
+#' ?p.adjust() for valid options. Defaults to "BH" (Benjamini & Hochberg).
+#' @param comparisons `data.frame` with columns for "Control" and "Test"
+#'   containing the different comparisons of interest. Comparisons will be made
+#'   between the Test and the corresponding Control  If left NULL, then all
+#'   pairwise comparisons are executed.
+#' @param p_cutoff Numeric value between 0 and 1 for setting p-value significance threshold
+#' @param ... additional arguments passed to methods functions. Note, formatting 
+#' option changes will interfere with wrapping functionality.
+#'
+#'
+#' @return a statRes object (data.frame)
 #' 
-#' @details Runs default edgeR workflow. Defaults to Wald test, no independent filtering, and 
-#' running in parallel. Additional arguments can be passed for use in the function, 
-#' refer to calcNormFactors() and glmQLFit() in edgeR package
-#' @return data.frame object
+#' @details Runs default edgeR workflow with empirical Bayes quasi-likelihood F-tests.
+#' Additional arguments can be passed for use in the function, 
+#' refer to calcNormFactors() and glmQLFit() in edgeR package.
+#' 
+#' Flags (signatures) -	Indicator of statistical significance for computed test. 
+#' Zeros indicate no significance, while +/- 1 indicates direction of significance.
 #' 
 #' 
+#' @references 
+#'  Robinson MD, McCarthy DJ, Smyth GK (2010). “edgeR: a Bioconductor package 
+#'  for differential expression analysis of digital gene expression data.” 
+#'  Bioinformatics, 26(1), 139-140. doi: 10.1093/bioinformatics/btp616.
+#'  
 #' @examples
 #' \dontrun{
+#' 
+#' library(pmartRdata)
+#' myseqData <- rnaseq_object
+#' myseqData <- group_designation(omicsData = myseqData, main_effects = "Virus")
+#' statsresults <- pmartR:::edgeR_wrapper(omicsData = myseqData)
+#' 
 #' }
 #' 
 edgeR_wrapper <- function(
@@ -467,10 +534,6 @@ edgeR_wrapper <- function(
     if(length(interesting_comparisons) == 0) stop("Invalid comparisons given")
   }
   
-  # cob_list <- combn(comparisons, 2)
-  # all_contrasts <- apply(cob_list, 2, paste, collapse = "-")
-  # 
-  
   ## Slice frames
   edata_egdeR <- edgeR::DGEList(omicsData$e_data[-1]) 
   
@@ -483,6 +546,7 @@ edgeR_wrapper <- function(
   run_NF <- run_NF[!duplicated(names(run_NF))]
   
   norm_factors_edgeR <- do.call(edgeR::calcNormFactors, run_NF)
+
   D_edgeR <- edgeR::estimateDisp(norm_factors_edgeR,
                       design_matrix_edgeR)
   
@@ -515,7 +579,8 @@ edgeR_wrapper <- function(
       checker <- sub(el, "", checker)
     }
     
-    checkin <- purrr::map_lgl(purrr:::map(combo, stringr::str_detect, string = checker), any)
+    checkin <- purrr::map_lgl(purrr::map(combo, stringr::str_detect, string = checker), any)
+
     
     if(all(checkin)){
       
@@ -620,20 +685,36 @@ edgeR_wrapper <- function(
 #' For generating statistics for 'seqData' objects
 #' 
 #' @param omicsData an object of type 'seqData', created by \code{\link{as.seqData}}
-#' @param p_adjust an object of type 'seqData', created by \code{\link{as.seqData}}
-#' @param comparisons an object of type 'seqData', created by \code{\link{as.seqData}}  
-#' @param p_cutoff an object of type 'seqData', created by \code{\link{as.seqData}}
-#' @param ... additional arguments passed to functions   
-# @param plotVoom an object of type 'seqData', created by \code{\link{as.seqData}}
+#' @param method a character string of length one specifying which wrapper to use. 
+#' Can be 'edgeR', 'DESeq2', or 'limma-voom' 
+#' @param p_adjust Character string for p-value correction method, refer to ?p.adjust() for valid options
+#' @param comparisons `data.frame` with columns for "Control" and "Test"
+#'   containing the different comparisons of interest. Comparisons will be made
+#'   between the Test and the corresponding Control  If left NULL, then all
+#'   pairwise comparisons are executed.
+#' @param p_cutoff Numeric value between 0 and 1 for setting p-value significance threshold
+#' @param ... additional arguments passed to methods functions. Note, formatting 
+#' option changes will interfere with wrapping functionality.
 #' 
-#' @details Runs default edgeR workflow. Defaults to Wald test, no independent filtering, and 
-#' running in parallel. Additional arguments can be passed for use in the function, 
-#' refer to calcNormFactors() in edgeR package
+#' @details Runs default limma-voom workflow using empirical Bayes moderated t-statistics.
+#' Additional arguments can be passed for use in the function, 
+#' refer to calcNormFactors() in edgeR package.
 #' @return data.frame object
 #' 
+#' @references 
+#'  
+#'  Ritchie, M.E., Phipson, B., Wu, D., Hu, Y., Law, C.W., Shi, W., and Smyth, 
+#'  G.K. (2015). limma powers differential expression analyses for 
+#'  RNA-sequencing and microarray studies. Nucleic Acids Research 43(7), e47.
 #' 
 #' @examples
 #' \dontrun{
+#' 
+#' library(pmartRdata)
+#' myseqData <- rnaseq_object
+#' myseqData <- group_designation(omicsData = myseqData, main_effects = "Virus")
+#' statsresults <- pmartR:::edgeR_wrapper(omicsData = myseqData)
+#' 
 #' }
 #' 
 voom_wrapper <- function(
@@ -673,6 +754,8 @@ voom_wrapper <- function(
   }
   
   design_matrix_limma <- model.matrix(as.formula(grouping_formula), grouping_info)
+  
+  # ## Get comparisons
 
   all_cols <- stringr::str_trim(
     stringr::str_split(
@@ -750,6 +833,7 @@ voom_wrapper <- function(
     }
     
     checkin <- purrr::map_lgl(purrr:::map(combo, stringr::str_detect, string = checker), any)
+
     
     if(all(checkin)){
       
@@ -848,17 +932,23 @@ voom_wrapper <- function(
 
 #' Get formula for group design
 #' 
-#' For generating group design formula
+#' For generating group design formulas and correctly ordered group data for 
+#' seqData statistical functions
 #' 
 #' @param omicsData an object of type 'seqData', created by \code{\link{as.seqData}}
 #' 
 #' @examples
 #' \dontrun{
+#' 
+#' library(pmartRdata)
+#' myseqData <- rnaseq_object
+#' myseqData <- group_designation(omicsData = myseqData, main_effects = "Virus")
+#' grouping_info <- pmartR:::get_group_formula(omicsData = myseqData)
+#' 
 #' }
 #' 
 #' @rdname get_group_formula
 #' @name get_group_formula
-#' @export
 #' 
 get_group_formula <- function(omicsData){
   
@@ -1002,14 +1092,32 @@ get_group_formula <- function(omicsData){
 #'
 #' @examples
 #' \dontrun{
+#' 
+#' library(pmartRdata)
+#' myseqData <- rnaseq_object
+#' myseqData <- group_designation(omicsData = myseqData, main_effects = "Virus")
+#' disp_est <- dispersion_est(omicsData = myseqData, method = "edgeR")
+#' 
+#' 
 #' }
+#'
+#' @references 
+#'  Robinson MD, McCarthy DJ, Smyth GK (2010). “edgeR: a Bioconductor package 
+#'  for differential expression analysis of digital gene expression data.” 
+#'  Bioinformatics, 26(1), 139-140. doi: 10.1093/bioinformatics/btp616.
+#'  
+#'  Love, M.I., Huber, W., Anders, S. Moderated estimation of fold change and 
+#'  dispersion for RNA-seq data with DESeq2 Genome Biology 15(12):550 (2014)
+#'  
+#'  Ritchie, M.E., Phipson, B., Wu, D., Hu, Y., Law, C.W., Shi, W., and Smyth, 
+#'  G.K. (2015). limma powers differential expression analyses for 
+#'  RNA-sequencing and microarray studies. Nucleic Acids Research 43(7), e47.
 #'
 #' @export
 #' @rdname dispersion_est
 #' @name dispersion_est
 #'
 dispersion_est <- function(omicsData, method,
-                           # comparisons = NULL,
                            interactive = FALSE,
                            x_lab = NULL,
                            x_lab_size = 11,
@@ -1035,7 +1143,9 @@ dispersion_est <- function(omicsData, method,
   if(length(method) != 1 || !(method %in% c('edgeR', 'DESeq2','voom'))){
     stop("method must a single character string of length 1 in 'edgeR', 'DESeq2', or 'voom'")
   }
-  
+
+  ## Set theme ##
+
   if(!is.null(custom_theme)){
     if(bw_theme)
       warning(paste("Setting both bw_theme to TRUE and specifying a custom",
@@ -1104,7 +1214,7 @@ dispersion_est <- function(omicsData, method,
     ## only plots for those above 0
     df1 <- as.data.frame(S4Vectors::mcols(dds))
     
-    
+    ## Plot
     p <- ggplot2::ggplot(data = df1, 
                          ggplot2::aes(x = baseMean, y = dispGeneEst)) +
       ggplot2::geom_point(color = "black", size = point_size) +

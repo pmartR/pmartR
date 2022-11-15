@@ -93,80 +93,6 @@ print.moleculeFilterSummary <- function(object){
 
 }
 
-
-#' Produce a basic summary of a totalCountFilt object
-#'
-#' This function will provide basic summary statistics for the totalCountFilt object.
-#'
-#' @param filter_object S3 object of class 'totalCountFilt' created by \code{\link{total_count_filter}}.
-#' @param min_count numeric value greater than 1 and less than the value given by filter_object$Total_Count.  Values below min_count are filtered out. Default value is NULL.
-#' @return a summary of the Total Count values, number of zero values, and non-zero values. If a min_count is provided the biomolecules that would be filtered, at this threshold, are reported.
-#'
-#'
-#' @author Lisa Bramer
-#'
-#' @export
-#' @rdname summary.totalCountFilt
-#' @name summary.totalCountFilt
-summary.totalCountFilt <- function(filter_object, min_count = NULL){
-  
-  # checks for cv_threshold if not null #
-  if(!is.null(min_count)) {
-    # check that cv_threshold is numeric
-    if(!is.numeric(min_count)) stop("cv_threshold must be numeric of length 1")
-    # chack that cv_threshold is of length 1
-    if(length(min_count)>1) stop("cv_threshold must be numeric of length 1")
-    # check that cv_threshold is more than 1 and less than max CV value
-    if(min_count <= 1 | min_count >= max(filter_object$Total_Counts, na.rm = TRUE)) stop("cv_threshold must be greater than 1 and less than the maximum CV value")
-  }
-  
-  # get summary of Total_Counts #
-  count_sum <- summary(filter_object$Total_Counts)
-  
-  # get biomolecules to filter if min_count is not NULL #
-  if(!is.null(min_count)) {
-    filt <- as.character(filter_object[filter_object$Total_Counts < min_count, 1])
-    if(length(filt)==0) filt <- NULL
-  } else filt <- NULL
-  
-  res <- list(Summary_all = count_sum,
-              filtered_biomolecules = length(filt))
-  
-  class(res) = c("totalCountFiltSummary","list")
-  
-  return(res)
-}
-
-#' Print method for summary of Total Count filter
-#' 
-#' Print method for summary of Total Count filter
-#' 
-#' @export
-#'
-print.totalCountFiltSummary <- function(object){
-  # create output #
-  cat(c("\nSummary of Total Count Filter\n----------------------\nCountss:\n", 
-        capture.output(object$Summary_all)), sep = "\n")
-  cat(c("\nNumber Filtered Biomolecules:", paste(object$filtered_biomolecules, collapse = ", "), "\n\n"))
-  
-}
-
-#' Print method for summary of molecule filter
-#' 
-#' Print method for summary of molecule filter
-#' 
-#' @export
-#' @name print.moleculeFilterSummary
-print.moleculeFilterSummary <- function(object){
-  # create output #
-  cat("\nSummary of Molecule Filter \n----------------------------------\n")
-  if(!is.null(object$min_num)){
-    cat(sprintf("Minimum Number:%d\nFiltered:%d\nNot Filtered:%d\n\n", object$min_num, object$num_filtered, object$num_not_filtered))
-  }
-  print(object$pep_observation_counts, row.names = FALSE)
-  
-}
-
 #' Produce a basic summary of a RNAFilt object
 #'
 #' This function will provide basic summary statistics for the molecule_filter object.
@@ -192,7 +118,7 @@ print.moleculeFilterSummary <- function(object){
 #' summary(myfilter, min_num = 2)
 #'}
 #'
-#' @author Lisa Bramer, Kelly Stratton
+#' @author Rachel Richardson
 #'
 #' @export
 #'@rdname summary.RNAFilt
@@ -328,12 +254,17 @@ print.RNAFiltSummary <- function(object){
 #'
 #' This function will provide basic summary statistics for the totalCountFilt object.
 #'
-#' @param filter_object S3 object of class 'totalCountFilt' created by \code{\link{total_count_filter}}.
-#' @param min_count numeric value greater than 1 and less than the value given by filter_object$Total_Count.  Values below min_count are filtered out. Default value is NULL.
-#' @return a summary of the Total Count values, number of zero values, and non-zero values. If a min_count is provided the biomolecules that would be filtered, at this threshold, are reported.
+#' @param filter_object S3 object of class 'totalCountFilt' created by 
+#' \code{\link{total_count_filter}}.
+#' @param min_count numeric value greater than 1 and less than the value 
+#' given by filter_object$Total_Count.  Values below min_count are filtered out. 
+#' Default value is NULL.
+#' @return a summary of the Total Count values, number of zero values, and 
+#' non-zero values. If a min_count is provided the biomolecules that would be 
+#' filtered, at this threshold, are reported.
 #'
 #'
-#' @author Lisa Bramer
+#' @author Rachel Richardson
 #'
 #' @export
 #' @rdname summary.totalCountFilt
@@ -378,22 +309,6 @@ print.totalCountFiltSummary <- function(object){
   cat(c("\nSummary of Total Count Filter\n----------------------\nCounts:\n", 
         capture.output(object$Summary_all)), sep = "\n")
   cat(c("\nNumber Filtered Biomolecules:", paste(object$filtered_biomolecules, collapse = ", "), "\n\n"))
-  
-}
-
-#' Print method for summary of molecule filter
-#' 
-#' Print method for summary of molecule filter
-#' 
-#' @export
-#' @name print.moleculeFilterSummary
-print.moleculeFilterSummary <- function(object){
-  # create output #
-  cat("\nSummary of Molecule Filter \n----------------------------------\n")
-  if(!is.null(object$min_num)){
-    cat(sprintf("Minimum Number:%d\nFiltered:%d\nNot Filtered:%d\n\n", object$min_num, object$num_filtered, object$num_not_filtered))
-  }
-  print(object$pep_observation_counts, row.names = FALSE)
   
 }
 
@@ -1058,11 +973,17 @@ summary.customFilt <- function(filter_object){
   # apply the filter #
   filtered_data <- applyFilt(filter_object, omicsData)
   summary_filt <- summary(filtered_data)
-
+  
+  mode_rmv <- !is.null(filter_object$e_data_remove)|
+    !is.null(filter_object$f_data_remove)|
+    !is.null(filter_object$e_meta_remove)
+  
+  mode_kp <- !is.null(filter_object$e_data_keep)|
+    !is.null(filter_object$f_data_keep)|
+    !is.null(filter_object$e_meta_keep)
+  
   #if filter_object contains removes
-  if(!is.null(filter_object$e_data_remove)|
-     !is.null(filter_object$f_data_remove)|
-     !is.null(filter_object$e_meta_remove))
+  if(mode_rmv)
   {
     # samples #
     if(!is.null(filter_object$f_data_remove)) {
@@ -1098,40 +1019,39 @@ summary.customFilt <- function(filter_object){
   }
 
   #if filter_object contains keeps
-  if(!is.null(filter_object$e_data_keep)|
-     !is.null(filter_object$f_data_keep)|
-     !is.null(filter_object$e_meta_keep))
+  # tags of `_left` and `_filt` correspond to items kept and items not kept
+  if(mode_kp)
   {
     # samples #
     if(!is.null(filter_object$f_data_keep)) {
-      samps_keep <- length(filter_object$f_data_keep)
-      samps_discard <- num_samples - samps_keep
+      samps_left <- length(filter_object$f_data_keep)
+      samps_filt <- num_samples - samps_left
     } else {
-      samps_keep <- num_samples
-      samps_discard <- 0
+      samps_left <- num_samples
+      samps_filt <- 0
     }
 
     # e_data #
     if(!is.null(filter_object$e_data_keep)) {
-      edata_keep <- length(filter_object$e_data_keep)
-      edata_discard <- num_edata - edata_keep
+      edata_left <- length(filter_object$e_data_keep)
+      edata_filt <- num_edata - edata_left
     } else {
-      edata_keep <- nrow(filtered_data$e_data)
-      edata_discard <- num_edata - nrow(filtered_data$e_data)
+      edata_left <- nrow(filtered_data$e_data)
+      edata_filt <- num_edata - nrow(filtered_data$e_data)
     }
 
     # e_meta #
     if(!is.null(num_emeta)){
       if(!is.null(filter_object$e_meta_keep)) {
-        emeta_keep <- length(filter_object$e_meta_keep)
-        emeta_discard <- num_emeta - emeta_keep
+        emeta_left <- length(filter_object$e_meta_keep)
+        emeta_filt <- num_emeta - emeta_left
       } else {
-        emeta_keep <- length(unique(filtered_data$e_meta[, emeta_id] ))
-        emeta_discard <- num_emeta - length(unique(filtered_data$e_meta[, emeta_id] ))
+        emeta_left <- length(unique(filtered_data$e_meta[, emeta_id] ))
+        emeta_filt <- num_emeta - length(unique(filtered_data$e_meta[, emeta_id] ))
       }
     }
 
-    disp_colnames <- c("Kept", "Discarded", "Total")
+    disp_colnames <- c("Discarded", "Kept", "Total")
 
   }
   

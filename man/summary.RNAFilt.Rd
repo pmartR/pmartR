@@ -36,5 +36,5 @@ summary(myfilter, min_num = 2)
 
 }
 \author{
-Lisa Bramer, Kelly Stratton
+Rachel Richardson
 }
