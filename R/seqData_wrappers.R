@@ -172,8 +172,13 @@ DESeq2_wrapper <- function(
     
   } else {
     
-    all_contrasts <- unique(c(all_contrasts,
-                              apply(cob_list[nrow(cob_list):1,], 2, paste, collapse = "-")))
+    if(ncol(cob_list) == 1){
+      all_contrasts <- unique(c(all_contrasts, paste(cob_list[nrow(cob_list):1,], collapse = "-")))
+      
+    } else {
+      all_contrasts <- unique(c(all_contrasts,
+                                apply(cob_list[nrow(cob_list):1,], 2, paste, collapse = "-")))
+    }
     
     cob_list <- cbind(cob_list, cob_list[nrow(cob_list):1,])
     all_contrasts_comp <- paste(comparisons$Control, comparisons$Test, sep = "-")
@@ -277,7 +282,7 @@ DESeq2_wrapper <- function(
   
   
   #merge all data frames in list
-  all_cont <- all_res %>% purrr::reduce(dplyr::full_join)
+  all_cont <- purrr::reduce(all_res, dplyr::full_join)
   
   count_cols <- grep("^NonZero_Count_", colnames(all_cont))
   
@@ -290,7 +295,8 @@ DESeq2_wrapper <- function(
     colnames(df) <- paste0("Mean_", grp)
     df
   })
-  group_means <- cbind(omicsData$e_data[get_edata_cname(omicsData)], group_means)
+  group_means <- cbind(as.character(omicsData$e_data[get_edata_cname(omicsData)]), 
+                       group_means)
 
   lfc_cols <- grep("^log2FoldChange", colnames(all_cont))
   # pval_cols <- grep(colnames(all_cont), "_pvalue")
@@ -300,6 +306,8 @@ DESeq2_wrapper <- function(
   # colnames(all_cont)[-1] <- gsub("^baseMean", "Mean", colnames(all_cont)[-1])
   colnames(all_cont)[-1] <- gsub("^log2FoldChange", "Fold_change", colnames(all_cont)[-1])
   colnames(all_cont)[-1] <- gsub("^padj", paste0("P_value_", test), colnames(all_cont)[-1])
+  
+  all_cont[[1]] <- as.character(all_cont[[1]])
   
   results <- cbind(dplyr::left_join(all_cont[c(1, count_cols)], group_means), 
                    all_cont[c(lfc_cols, padj_cols, flag_cols)])
@@ -439,8 +447,13 @@ edgeR_wrapper <- function(
     
   } else {
     
-    all_contrasts <- unique(c(all_contrasts,
-                       apply(cob_list[nrow(cob_list):1,], 2, paste, collapse = "-")))
+    if(ncol(cob_list) == 1){
+      all_contrasts <- unique(c(all_contrasts, paste(cob_list[nrow(cob_list):1,], collapse = "-")))
+      
+    } else {
+      all_contrasts <- unique(c(all_contrasts,
+                                apply(cob_list[nrow(cob_list):1,], 2, paste, collapse = "-")))
+    }
 
     cob_list <- cbind(cob_list, cob_list[nrow(cob_list):1,])
     all_contrasts_comp <- paste(comparisons$Control, comparisons$Test, sep = "-")
@@ -547,8 +560,8 @@ edgeR_wrapper <- function(
     res[c(ncol(res), 1:(ncol(res) - 1))]
   })
   
-  all_cont <- res_contrasts[purrr::map_int(res_contrasts, nrow) != 0] %>% 
-    purrr::reduce(dplyr:::full_join)
+  all_cont <- res_contrasts[purrr::map_int(res_contrasts, nrow) != 0]
+  all_cont <-  purrr::reduce(all_cont, dplyr::full_join)
   
   count_cols <- grep("^NonZero_Count_", colnames(all_cont))
   mean_cols <- grep("^Mean", colnames(all_cont))
@@ -685,8 +698,13 @@ voom_wrapper <- function(
     
   } else {
     
-    all_contrasts <- unique(c(all_contrasts,
-                              apply(cob_list[nrow(cob_list):1,], 2, paste, collapse = "-")))
+    if(ncol(cob_list) == 1){
+      all_contrasts <- unique(c(all_contrasts, paste(cob_list[nrow(cob_list):1,], collapse = "-")))
+                              
+    } else {
+      all_contrasts <- unique(c(all_contrasts,
+                                apply(cob_list[nrow(cob_list):1,], 2, paste, collapse = "-")))
+    }
     
     cob_list <- cbind(cob_list, cob_list[nrow(cob_list):1,])
     all_contrasts_comp <- paste(comparisons$Control, comparisons$Test, sep = "-")
@@ -774,8 +792,8 @@ voom_wrapper <- function(
     } else return()
   })
   
-  all_cont <- res_contrasts[purrr::map_int(res_contrasts, nrow) != 0] %>% 
-    purrr::reduce(dplyr::full_join)
+  all_cont <- res_contrasts[purrr::map_int(res_contrasts, nrow) != 0]
+  all_cont <-  purrr::reduce(all_cont, dplyr::full_join)
   
   results <- list(Full_results = all_cont)
   
