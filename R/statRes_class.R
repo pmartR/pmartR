@@ -98,66 +98,120 @@ setOldClass("statRes")
 
 #' @export
 #' @method summary statRes
-summary.statRes <- function(x,...){
-  cat("Type of test:",attr(x,"statistical_test"),"\n\n")
-  cat("Multiple comparison adjustment ANOVA:",attr(x,"adjustment_method_a"),"\n\n")
-  cat("Multiple comparison adjustment G-test:",attr(x,"adjustment_method_g"),"\n\n")
-  cat("p-value threshold:",attr(x,"pval_thresh"),"\n\n")
-  cat("Number of significant biomolecules by comparison.  Columns specify fold change direction and type of test:\n\n")
-
-  table <- attr(x,"number_significant")
-  names(table) <- lapply(names(table), function(name){switch(name,
-                                                     Up_total = "Total:Positive",
-                                                     Down_total = "Total:Negative",
-                                                     Up_anova = "Positive:ANOVA",
-                                                     Down_anova = "Negative:ANOVA",
-                                                     Up_gtest = "Positive:G-test",
-                                                     Down_gtest = "Negative:G-test",
-                                                     name)
+summary.statRes <- function(x, ...) {
+  
+  # add if-statement for seqData class since the ANOVA and g-test language is 
+  # not applicable for seqData
+  if (attributes(x)$data_class == "seqData") {
+    cat("Type of test:", attr(x, "statistical_test"), "\n\n")
+    cat("Multiple comparison adjustment:",
+        attr(x, "adjustment_method"),
+        "\n\n")
+    cat("p-value threshold:", attr(x, "pval_thresh"), "\n\n")
+    cat(
+      "Number of significant biomolecules by comparison. Columns specify fold change direction and type of test:\n\n"
+    )
+    
+    table <- attr(x, "number_significant")
+    names(table) <- lapply(names(table), function(name) {
+      switch(name,
+             Up_total = "Total:Positive",
+             Down_total = "Total:Negative",
+             name)
+    })
+    
+    rownames(table) <- NULL
+    
+    print(table)
+    
+    return(invisible(
+      list(
+        test_type = attr(x, "statistical_test"),
+        adjustment = attr(x, "adjustment_method"),
+        pval_thresh = attr(x, "pval_thresh"),
+        sig_table = table,
+        comparisons = attr(x, "comparisons"),
+        group_DF = attr(x, "group_DF")
+      )
+    ))
+    
+    
+  }else{
+  # not statRes object from seqData
+  cat("Type of test:", attr(x, "statistical_test"), "\n\n")
+  cat("Multiple comparison adjustment ANOVA:",
+      attr(x, "adjustment_method_a"),
+      "\n\n")
+  cat("Multiple comparison adjustment G-test:",
+      attr(x, "adjustment_method_g"),
+      "\n\n")
+  cat("p-value threshold:", attr(x, "pval_thresh"), "\n\n")
+  cat(
+    "Number of significant biomolecules by comparison. Columns specify fold change direction and type of test:\n\n"
+  )
+  
+  table <- attr(x, "number_significant")
+  names(table) <- lapply(names(table), function(name) {
+    switch(
+      name,
+      Up_total = "Total:Positive",
+      Down_total = "Total:Negative",
+      Up_anova = "Positive:ANOVA",
+      Down_anova = "Negative:ANOVA",
+      Up_gtest = "Positive:G-test",
+      Down_gtest = "Negative:G-test",
+      name
+    )
   })
-
+  
   rownames(table) <- NULL
-
+  
   print(table)
+  
+  return(invisible(
+    list(
+      test_type = attr(x, "statistical_test"),
+      adjustment_a = attr(x, "adjustment_method_a"),
+      adjustment_g = attr(x, "adjustment_method_g"),
+      pval_thresh = attr(x, "pval_thresh"),
+      sig_table = table,
+      comparisons = attr(x, "comparisons"),
+      group_DF = attr(x, "group_DF")
+    )
+  ))
+  
+  
+}
 
-  return(invisible(list(test_type = attr(x,"statistical_test"),
-                        adjustment_a = attr(x,"adjustment_method_a"),
-                        adjustment_g = attr(x,"adjustment_method_g"),
-                        pval_thresh = attr(x,"pval_thresh"),
-                        sig_table = table,
-                        comparisons = attr(x, "comparisons"),
-                        group_DF = attr(x,"group_DF"))))
 }
 
 #' @export
 #' @method print statRes
 print.statRes <- function (x) {
-
   x <- format.data.frame(x)
-
+  
   blank_row = rep("----", 5)
-
+  
   if (nrow(x) >= 9) {
-
     # Nab the first and last four rows of the statRes data frame.
     statman_head <- head(x, 4)[, 1:min(ncol(x), 5)]
     statman_tail <- tail(x, 4)[, 1:min(ncol(x), 5)]
-
+    
     # Combine the first and last four rows of the statRes data frame with some
     # pretty dashes for a pleasing look when the statRes object is printed in
     # the console.
     statman <- rbind(statman_head, blank_row, statman_tail)
-
+    
   } else {
-
     # Just print the entire data frame because it is only a little guy.
     statman <- x
-
+    
   }
-
-  if (ncol(x) > 5) message("only first 5 columns are shown")
+  
+  if (ncol(x) > 5)
+    message("only first 5 columns are shown")
   cat("statRes\n")
   cat(capture.output(statman), sep = "\n")
   cat("\n")
-
+  
 }
