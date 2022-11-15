@@ -58,6 +58,12 @@ diffexp_seq <- function(omicsData, method = "edgeR", p_adjust = "BH",
     
   }
   
+  # must have group_desig #
+  if(is.null(get_group_DF(omicsData))){
+    stop("Running group_designation is required before statistical analysis")
+    
+  }
+  
   
   if(method == 'edgeR'){
     

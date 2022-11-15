@@ -2315,7 +2315,8 @@ plot.totalCountFilt <- function (filter_obj, min_count = NULL,
   
   # Plot
   p <- ggplot2::ggplot(plot_data, ggplot2::aes(x=lcpm)) + 
-    ggplot2::geom_density(ggplot2::aes(group = Sample, color = "Samples")) + 
+    ggplot2::geom_density(ggplot2::aes(group = !!rlang::sym(colnames(plot_data)[2]), 
+                                       color = !!rlang::sym(colnames(plot_data)[2]))) + 
     ggplot2::geom_density(ggplot2::aes(color = "Average Density")) + 
     ggplot2::scale_color_manual(
       name = legend_lab,
@@ -2552,7 +2553,7 @@ plot.RNAFilt <- function (filter_obj, plot_type = "library",
   # Plot
   if(plot_type == "library"){
     p <- ggplot2::ggplot(
-      temp_obj, ggplot2::aes(x=SampleID, y = LibrarySize, fill = color)) + 
+      temp_obj, ggplot2::aes(x=!!rlang::sym(colnames(temp_obj)[1]), y = LibrarySize, fill = color)) + 
       ggplot2::geom_col(show.legend = F) +
       ggplot2::scale_fill_manual(
         name = legend_lab,
@@ -2564,7 +2565,7 @@ plot.RNAFilt <- function (filter_obj, plot_type = "library",
     
     if(!is.null(size_library)){
       p <- p + ggplot2::geom_segment(y = size_library, yend = size_library, 
-                                     xend = length(unique(temp_obj$SampleID))+.5, 
+                                     xend = length(unique(temp_obj[[colnames(temp_obj)[1]]]))+.5, 
                                      x = 0, linetype = "dashed")
     }
       
@@ -2573,7 +2574,7 @@ plot.RNAFilt <- function (filter_obj, plot_type = "library",
     mt <- round(filter_obj$NonZero[[1]]/filter_obj$ProportionNonZero[[1]])
     
     p <- ggplot2::ggplot(
-      temp_obj, ggplot2::aes(x=SampleID, y = NonZero, fill = color)) + 
+      temp_obj, ggplot2::aes(x=!!rlang::sym(colnames(temp_obj)[1]), y = NonZero, fill = color)) + 
       ggplot2::scale_y_continuous(
         sec.axis = ggplot2::sec_axis(trans=~./mt, 
                           name="Proportion of all biomolecules")
@@ -2589,7 +2590,7 @@ plot.RNAFilt <- function (filter_obj, plot_type = "library",
     
     if(!is.null(min_nonzero)){
       p <- p + ggplot2::geom_segment(y = min_nonzero, yend = min_nonzero,
-                                     xend = length(unique(temp_obj$SampleID))+.5,
+                                     xend = length(unique(temp_obj[[colnames(temp_obj)[1]]]))+.5,
                                      x = 0, linetype = "dashed")
     }
     

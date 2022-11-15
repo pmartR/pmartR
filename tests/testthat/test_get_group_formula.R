@@ -76,7 +76,7 @@ test_that('get_group_formula returns the correct data frame and results',{
   )
   
   expect_warning(get_group_formula(seqdata_grp4), 
-                 "At least 1 detected covariate is confounded with Group will not be used in final model.")
+                 "At least 1 detected covariate is confounded with Group")
   
   res_get_group_formula <- suppressWarnings(purrr::map(group_list, get_group_formula))
   
