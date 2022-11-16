@@ -21,7 +21,7 @@ library(dplyr)
 
 # Use an edata example. Build with as.trelliData.edata.
 summary(trelliData)
-summary(trelliData \%>\% trelli_panel_by("LipidCommonName"))
+summary(trelliData \%>\% trelli_panel_by("Lipid"))
 summary(trelliData \%>\% trelli_panel_by("Sample"))
 
 # Use an omicsData example. Build with as.trelliData.
