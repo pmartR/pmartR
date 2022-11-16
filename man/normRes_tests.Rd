@@ -37,9 +37,11 @@ norm_pvals <- normRes_tests(norm_obj = mymetab)
 
 # NMR data object
 mynmr <- edata_transform(omicsData = nmr_identified_object, data_scale = "log2")
+mynmr <- group_designation(mynmr, main_effects = "Condition")
 mynmrnorm <- normalize_nmr(omicsData = mynmr,
                             apply_norm = TRUE,
                             sample_property_cname = "Concentration")
-mynmrnorm <- normalize_global(omicsData = mynmrnorm, subset_fn = "all", norm_fn = "median", apply_norm = TRUE)                
-                   
+mynmrnorm <- normalize_global(omicsData = mynmrnorm, subset_fn = "all", norm_fn = "median", apply_norm = TRUE, backtransform = TRUE)                
+norm_pvals <- normRes_tests(norm_obj = mynmrnorm)
+                    
 }

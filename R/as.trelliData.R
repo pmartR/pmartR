@@ -241,10 +241,9 @@ as.trelliData.edata <- function(e_data,
 #' lipid_emeta <- data.frame("Lipid" = lipid_pos_edata$Lipid, 
 #'   "LipidFamily" = lipid_pos_edata$Lipid %>% as.character() %>% 
 #'     strsplit("(", fixed = T) %>% lapply(function(el) {el[1]}) %>% unlist())
-#'     
 #' 
 #' # Transform the data
-#' omicsData <- edata_transform(omicsData = lipid_neg_object, data_scale = "log2")
+#' omicsData <- edata_transform(omicsData = lipid_pos_object, data_scale = "log2")
 #' omicsData$e_meta$LipidFamily <- omicsData$e_meta$Lipid %>% as.character() %>% 
 #'     strsplit("(", fixed = T) %>% lapply(function(el) {el[1]}) %>% unlist()
 #' 

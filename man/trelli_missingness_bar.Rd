@@ -59,28 +59,28 @@ Specify a plot design and cognostics for the missing barchart
 \dontrun{
 
 ## Build the missingness bar plot with an edata file. Generate trelliData in as.trelliData.edata
-trelli_panel_by(trelliData = trelliData, panel = "LipidCommonName") \%>\% 
+trelli_panel_by(trelliData = trelliData, panel = "Lipid") \%>\% 
   trelli_missingness_bar(test_mode = T, test_example = 1:10)
 trelli_panel_by(trelliData = trelliData, panel = "Sample") \%>\% trelli_missingness_bar()
 
 ## Build the missingness bar plot with an omicsData object. Generate trelliData in as.trelliData
-trelli_panel_by(trelliData = trelliData2, panel = "LipidCommonName") \%>\% 
+trelli_panel_by(trelliData = trelliData2, panel = "Lipid") \%>\% 
   trelli_missingness_bar(test_mode = T, test_example = 1:10)
 
 ## Build the missingness bar plot with a statRes object. Generate trelliData in as.trelliData
-trelli_panel_by(trelliData = trelliData3, panel = "LipidCommonName") \%>\%
+trelli_panel_by(trelliData = trelliData3, panel = "Lipid") \%>\%
   trelli_missingness_bar(test_mode = T, test_example = 1:10)
 
 ## Build the missingness bar plot with an omicsData and statRes object. Generate trelliData in as.trelliData.
-trelli_panel_by(trelliData = trelliData4, panel = "LipidCommonName") \%>\%
+trelli_panel_by(trelliData = trelliData4, panel = "Lipid") \%>\%
   trelli_missingness_bar(test_mode = T, test_example = 1:10) 
 
 ## Or making the plot interactive 
-trelli_panel_by(trelliData = trelliData2, panel = "LipidCommonName") \%>\% 
-   trelli_missingness_bar(test_mode = T, test_example = 1:5)
+trelli_panel_by(trelliData = trelliData2, panel = "Lipid") \%>\% 
+   trelli_missingness_bar(test_mode = T, test_example = 1:5, interactive = T)
    
 ## Or visualize only count data 
-trelli_panel_by(trelliData = trelliData2, panel = "LipidCommonName") \%>\% 
+trelli_panel_by(trelliData = trelliData2, panel = "Lipid") \%>\% 
    trelli_missingness_bar(test_mode = T, test_example = 1:5, cognostics = "n", proportion = FALSE)
    
 }
