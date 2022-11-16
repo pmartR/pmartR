@@ -5,11 +5,7 @@
 \title{Print method for summary of Total Count filter}
 \usage{
 \method{print}{totalCountFiltSummary}(object)
-
-\method{print}{totalCountFiltSummary}(object)
 }
 \description{
-Print method for summary of Total Count filter
-
 Print method for summary of Total Count filter
 }

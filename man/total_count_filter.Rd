@@ -10,7 +10,7 @@ total_count_filter(omicsData)
 \item{omicsData}{an object of the class 'seqData', usually created by \code{\link{as.seqData}}}
 }
 \value{
-Object of class totalcountFilt (also a data.frame) that contains the
+Object of class totalcountFilt (data.frame) that contains the
   molecule identifier and the total count of observed reads.
 }
 \description{
@@ -18,20 +18,26 @@ This function returns a totalcountFilt object for use with
 \code{\link{applyFilt}}
 }
 \details{
-Filter is based off of recommendations in edgeR processing:
-Chen Y, Lun ATL, and Smyth, GK (2016). From reads to genes to pathways: 
-differential expression analysis of RNA-Seq experiments using Rsubread and 
-the edgeR quasi-likelihood pipeline. F1000Research 5, 1438. 
-http://f1000research.com/articles/5-1438
+Filter is based off of recommendations in edgeR processing, where 
+the low-observed biomolecules are removed from processing. Default 
+recommendation in edgeR is at least 10 total counts observed across samples 
+(i.e., if the sum of counts in a row of e_data is < 10, default edgeR 
+filtering would remove this biomolecule).
 }
 \examples{
 \dontrun{
 library(pmartRdata)
-data("seq_object")
-to_filter <- total_count_filter(omicsData = seq_object)
-summary(to_filter, min_num = 2)
+data("rnaseq_object")
+to_filter <- total_count_filter(omicsData = rnaseq_object)
+summary(to_filter, min_count = 10)
 }
 
+}
+\references{
+Chen Y, Lun ATL, and Smyth, GK (2016). From reads to genes to pathways: 
+differential expression analysis of RNA-Seq experiments using Rsubread and 
+the edgeR quasi-likelihood pipeline. F1000Research 5, 1438. 
+http://f1000research.com/articles/5-1438
 }
 \author{
 Rachel Richardson
