@@ -346,8 +346,9 @@ DESeq2_wrapper <- function(
     colnames(df) <- paste0("Mean_", grp)
     df
   })
-  group_means <- cbind(as.character(omicsData$e_data[get_edata_cname(omicsData)]), 
+  group_means <- cbind(as.character(omicsData$e_data[[get_edata_cname(omicsData)]]), 
                        group_means)
+  colnames(group_means) <- c(get_edata_cname(omicsData), colnames(group_means)[-1])
 
   lfc_cols <- grep("^log2FoldChange", colnames(all_cont))
   padj_cols <- grep("^padj", colnames(all_cont))
@@ -358,7 +359,7 @@ DESeq2_wrapper <- function(
   colnames(all_cont)[-1] <- gsub("^padj", paste0("P_value_", test), colnames(all_cont)[-1])
   
   all_cont[[1]] <- as.character(all_cont[[1]])
-  
+
   results <- cbind(dplyr::left_join(all_cont[c(1, count_cols)], group_means), 
                    all_cont[c(lfc_cols, padj_cols, flag_cols)])
   
