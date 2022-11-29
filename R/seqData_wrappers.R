@@ -123,7 +123,9 @@ diffexp_seq <- function(omicsData, method = "edgeR", p_adjust = "BH",
 #' For generating statistics for 'seqData' objects
 #' 
 #' @param omicsData an object of type 'seqData', created by \code{\link{as.seqData}}
-#' @param test an object of type 'seqData', created by \code{\link{as.seqData}}  
+#' @param test either "Wald" or "LRT", which will then use either Wald 
+#' significance tests, or the likelihood ratio test on the difference in 
+#' deviance between a full and reduced model formula 
 #' @param method a character string of length one specifying which wrapper to use. 
 #' Can be 'edgeR', 'DESeq2', or 'limma-voom' 
 #' @param p_adjust Character string for p-value correction method, refer to 
@@ -364,7 +366,7 @@ DESeq2_wrapper <- function(
                    all_cont[c(lfc_cols, padj_cols, flag_cols)])
   
   attr_list <- c("cnames", "data_info", "filters", "group_DF")
-  keep_attr <- attributes(results)[names(attributes(results)) %in% attr_list]
+  keep_attr <- attributes(omicsData)[names(attributes(results)) %in% attr_list]
   attributes(results) <- c(attributes(results), keep_attr)
   
   ## sig totes
@@ -650,7 +652,7 @@ edgeR_wrapper <- function(
                         lfc_cols, padj_cols, flag_cols)]
   
   attr_list <- c("cnames", "data_info", "filters", "group_DF")
-  keep_attr <- attributes(results)[names(attributes(results)) %in% attr_list]
+  keep_attr <- attributes(omicsData)[names(attributes(results)) %in% attr_list]
   attributes(results) <- c(attributes(results), keep_attr)
   
   ## sig totes
@@ -901,7 +903,7 @@ voom_wrapper <- function(
                         lfc_cols, padj_cols, flag_cols)]
   
   attr_list <- c("cnames", "data_info", "filters", "group_DF")
-  keep_attr <- attributes(results)[names(attributes(results)) %in% attr_list]
+  keep_attr <- attributes(omicsData)[names(attributes(results)) %in% attr_list]
   attributes(results) <- c(attributes(results), keep_attr)
   
   flag_df <- reshape2::melt(all_cont[flag_cols], 
