@@ -37,12 +37,8 @@
 \code{\link{as.metabData}}, \code{\link{as.nmrData}}, or
 \code{\link{as.seqData}}, respectively.}
 
-\item{order_by}{character string specifying a main effect by which to order
-the correlation heat map. This main effect must be found in the column
-names of f_data in the omicsData object. If \code{order_by} is "Group", the
-correlation heat map will be ordered by the group variable from the
-group_designation function. If NULL (default), the correlation heat map
-will be displayed in the order the samples appear in the data.}
+\item{order_by}{A character string specifying a column in f_data by which to
+order the samples.}
 
 \item{colorbar_lim}{A pair of numeric values specifying the minimum and
 maximum values to use in the heat map color bar. Defaults to 'c(NA, NA)',

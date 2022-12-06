@@ -1440,12 +1440,8 @@ na_scatter <- function (edata, group_df, na.by.sample, num_missing_vals,
 #'   \code{\link{as.proData}}, \code{\link{as.lipidData}},
 #'   \code{\link{as.metabData}}, \code{\link{as.nmrData}}, or
 #'   \code{\link{as.seqData}}, respectively.
-#' @param order_by character string specifying a main effect by which to order
-#'   the correlation heat map. This main effect must be found in the column
-#'   names of f_data in the omicsData object. If \code{order_by} is "Group", the
-#'   correlation heat map will be ordered by the group variable from the
-#'   group_designation function. If NULL (default), the correlation heat map
-#'   will be displayed in the order the samples appear in the data.
+#' @param order_by A character string specifying a column in f_data by which to
+#'   order the samples.
 #' @param x_text logical value. Indicates whether the x-axis will be labeled
 #'   with the sample names. The default is TRUE.
 #' @param y_text logical value. Indicates whether the y-axis will be labeled
@@ -1540,28 +1536,11 @@ plot.corRes <- function (corRes_obj, omicsData = NULL, order_by = NULL,
 
   if (!is.null(order_by)) {
 
-    # If order_by is not NULL omicsData must also not be NULL.
-    if (is.null(omicsData)) {
+    # Farm boy, make sure order_by exists in f_data. As you wish.
+    if (!order_by %in% names(omicsData$f_data)) {
 
-      # Get used to disappointment.
-      stop ("If order_by is not NULL omicsData must also not be NULL.")
-
-    }
-
-    if (!is.character(order_by) || length(order_by) > 1) {
-
-      # Your plot is now mostly dead. Good luck trying to revive it.
-      stop ("order_by must be a character vector of length 1")
-
-    }
-
-    # Make sure the group designation function has been run.
-    if (is.null(attr(omicsData, "group_DF"))) {
-
-      # Do you hear that? Those are the shrieking eels!
-      stop (paste("group_DF must not be NULL. Run the group_designation",
-                  "function prior to plotting with the order_by argument.",
-                  sep = " "))
+      # I do not think that input means what you think it means.
+      stop ("order_by must be a column in f_data.")
 
     }
 
@@ -1646,8 +1625,8 @@ plot.corRes <- function (corRes_obj, omicsData = NULL, order_by = NULL,
 
     # include correlation method in title
     plotTitle <- paste0("Correlations Among Samples (",
-                         stringr::str_to_title(attr(corRes_obj, "cor_method")),
-                         ")")
+                        stringr::str_to_title(attr(corRes_obj, "cor_method")),
+                        ")")
 
     # Runs when title_lab is not NULL (the user specified title).
   } else {
