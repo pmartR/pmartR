@@ -47,18 +47,11 @@ molecule}
 \item{plot_type}{character string specifying which type of plot to produce.
 The two options are 'bar' or 'scatter'.}
 
-\item{order_by}{character string specifying a main effect by which to order
-the bar plot. This main effect must be found in the column names of f_data
-in the omicsData object. If \code{order_by} is "Group", the bar plot
-will be ordered by the group variable from the group_designation function.
-If NULL (default), the bar plot will be displayed in the order they appear
-in the data.}
+\item{order_by}{A character string specifying a column in f_data by which to
+order the samples.}
 
-\item{color_by}{character string specifying a main effect by which to color
-the bar plot. This main effect must be found in the column names of f_data
-in the omicsData object. If \code{color_by} is "Group", the bar plot will
-be colored by the group variable from the group_designation function. If
-NULL (default), the bar plot will have one default color.}
+\item{color_by}{A character string specifying a column in f_data by which to
+color the bars or the points depending on the \code{plot_type}.}
 
 \item{interactive}{logical value. If TRUE produces an interactive plot.}
 

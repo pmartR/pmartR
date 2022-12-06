@@ -952,17 +952,10 @@ plot.SPANSRes <- function (SPANSRes_obj, interactive = FALSE,
 #'   \code{\link{as.lipidData}}, \code{\link{as.nmrData}}, or \code{\link{as.seqData}}, respectively.
 #' @param plot_type character string specifying which type of plot to produce.
 #'   The two options are 'bar' or 'scatter'.
-#' @param order_by character string specifying a main effect by which to order
-#'   the bar plot. This main effect must be found in the column names of f_data
-#'   in the omicsData object. If \code{order_by} is "Group", the bar plot
-#'   will be ordered by the group variable from the group_designation function.
-#'   If NULL (default), the bar plot will be displayed in the order they appear
-#'   in the data.
-#' @param color_by character string specifying a main effect by which to color
-#'   the bar plot. This main effect must be found in the column names of f_data
-#'   in the omicsData object. If \code{color_by} is "Group", the bar plot will
-#'   be colored by the group variable from the group_designation function. If
-#'   NULL (default), the bar plot will have one default color.
+#' @param order_by A character string specifying a column in f_data by which to
+#'   order the samples.
+#' @param color_by A character string specifying a column in f_data by which to
+#'   color the bars or the points depending on the \code{plot_type}.
 #' @param interactive logical value. If TRUE produces an interactive plot.
 #' @param x_lab_bar character string used for the x-axis label for the bar
 #'   plot
@@ -1084,51 +1077,25 @@ plot.naRes <- function (naRes_obj, omicsData, plot_type = "bar",
 
   }
 
-  # Check if order_by is present. If it is additional checks need to be
-  # performed to make sure it is a valid input.
+  # Farm boy, make sure order_by exists in f_data. As you wish.
   if (!is.null(order_by)) {
 
-    # Make sure order_by is either "Group" or is in f_data.
-    if (order_by != "Group" && !(order_by %in% names(omicsData$f_data))) {
+    if (!order_by %in% names(omicsData$f_data)) {
 
-      stop (paste("order_by must either be 'Group' or the name of a column",
-                  "from f_data.",
-                  sep = " "))
-
-    }
-
-    # If order_by is "Group" the group_DF attribute must not be NULL.
-    if (order_by == "Group" && is.null(attr(omicsData, "group_DF"))) {
-
-      # Welcome to the pit of despair!! You will never escape!!!
-      stop (paste("group_DF must not be NULL. Run the group_designation",
-                  "function prior to running the missingval_result function.",
-                  sep = " "))
+      # I'm a pmartR developer. You killed my plot. Prepare to receive an error.
+      stop ("order_by must be a column in f_data.")
 
     }
 
   }
 
-  # Check if color_by is present. If it is additional checks need to be
-  # performed to make sure it is a valid input.
+  # Farm boy, make sure color_by exists in f_data. As you wish.
   if (!is.null(color_by)) {
 
-    # Make sure color_by is either "Group" or is in f_data.
-    if (color_by != "Group" && !(color_by %in% names(omicsData$f_data))) {
+    if (!color_by %in% names(omicsData$f_data)) {
 
-      stop (paste("color_by must either be 'Group' or the name of a column",
-                  "from f_data.",
-                  sep = " "))
-
-    }
-
-    # If color_by is "Group" the group_DF attribute must not be NULL.
-    if (color_by == "Group" && is.null(attr(omicsData, "group_DF"))) {
-
-      # Welcome to the pit of despair!! You will never escape!!!
-      stop (paste("group_DF must not be NULL. Run the group_designation",
-                  "function prior to running the missingval_result function.",
-                  sep = " "))
+      # Clearly you cannot choose a column name in f_data!
+      stop ("color_by must be a column in f_data.")
 
     }
 
@@ -1154,7 +1121,6 @@ plot.naRes <- function (naRes_obj, omicsData, plot_type = "bar",
   # Extract info from omicsData
   edata <- omicsData$e_data
   edata_cname_id <- which(names(edata) == edata_cname)
-  group_df <- attr(omicsData, "group_DF")
   group_df <- get_group_DF(omicsData)
 
   # Bar plot order_by and group_by crap ---------------
