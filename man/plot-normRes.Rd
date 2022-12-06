@@ -103,5 +103,5 @@ norm_object <- normalize_global(omicsData = mymetab,
                                 subset_fn = "all",
                                 norm_fn = "median")
 plot(norm_object, order_by = "Phenotype", color_by = "Phenotype")
-  
+
 }

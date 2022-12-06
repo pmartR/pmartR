@@ -97,5 +97,5 @@ For plotting isobaricpepData S3 objects
 library(pmartRdata)
 myiso <- edata_transform(omicsData = isobaric_object, data_scale = "log2")
 plot(myiso)
-  
+
 }

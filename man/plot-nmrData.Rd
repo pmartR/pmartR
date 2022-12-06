@@ -97,5 +97,5 @@ For plotting nmrData S3 objects
 library(pmartRdata)
 mynmr <- edata_transform(omicsData = nmr_identified_object, data_scale = "log2")
 plot(omicsData = mynmr)
-  
+
 }

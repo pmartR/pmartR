@@ -27,18 +27,18 @@
 }
 \arguments{
 \item{filter_object}{object of class RNAFilt that contains the sample
-identifier, library size, number of non-zero biomolecules, and proportion 
+identifier, library size, number of non-zero biomolecules, and proportion
 of non-zero biomolecules}
 
 \item{plot_type}{character string, specified as "library" or "biomolecule".
-"library" displays library size for each sample, "biomolecule" displays the 
+"library" displays library size for each sample, "biomolecule" displays the
 number of unique biomolecules with non-zero counts per sample.}
 
-\item{size_library}{integer cut-off for sample library size (i.e. number 
+\item{size_library}{integer cut-off for sample library size (i.e. number
 of reads). Defaults to NULL.}
 
-\item{min_nonzero}{integer or float between 0 and 1. Cut-off for number of 
-unique biomolecules with non-zero counts or as a proportion of total 
+\item{min_nonzero}{integer or float between 0 and 1. Cut-off for number of
+unique biomolecules with non-zero counts or as a proportion of total
 biomolecules. Defaults to NULL.}
 
 \item{interactive}{logical value. If TRUE produces an interactive plot.}

@@ -94,6 +94,6 @@ For plotting an S3 object of type 'imdanovaFilt'
 library(pmartRdata)
 mypep <- group_designation(omicsData = pep_object, main_effects = "Phenotype")
 to_filter <- imdanova_filter(omicsData = mypep)
-plot(to_filter, min_nonmiss_anova = 2, min_nonmiss_gtest = 3)  
+plot(to_filter, min_nonmiss_anova = 2, min_nonmiss_gtest = 3)
 
 }

@@ -80,5 +80,5 @@ plot(pca_lipids)
 myseq <- group_designation(omicsData = rnaseq_object, main_effects = "Virus")
 pca_seq <- dim_reduction(omicsData = myseq)
 plot(pca_seq)
-  
+
 }

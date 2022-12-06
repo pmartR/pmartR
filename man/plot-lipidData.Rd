@@ -97,5 +97,5 @@ For plotting lipidData S3 objects
 library(pmartRdata)
 mylipid <- edata_transform(omicsData = lipid_pos_object, data_scale = "log2")
 plot(omicsData = mylipid, order_by = "Virus", color_by = "Virus")
-  
+
 }

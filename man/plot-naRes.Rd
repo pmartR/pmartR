@@ -56,9 +56,9 @@ in the data.}
 
 \item{color_by}{character string specifying a main effect by which to color
 the bar plot. This main effect must be found in the column names of f_data
-in the omicsData object. If \code{color_by} is "Group", the bar plot
-will be colored by the group variable from the group_designation function.
-If NULL (default), the bar plot will have one default color.}
+in the omicsData object. If \code{color_by} is "Group", the bar plot will
+be colored by the group variable from the group_designation function. If
+NULL (default), the bar plot will have one default color.}
 
 \item{interactive}{logical value. If TRUE produces an interactive plot.}
 

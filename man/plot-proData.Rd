@@ -97,5 +97,5 @@ For plotting proData S3 objects
 library(pmartRdata)
 mypro <- edata_transform(omicsData = pro_object, data_scale = "log2")
 plot(omicsData = mypro, order_by = "Phenotype", color_by = "Phenotype")
-  
+
 }

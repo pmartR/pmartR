@@ -6,6 +6,9 @@
 \usage{
 \method{plot}{nmrnormRes}(
   nmrnormRes_obj,
+  nmrData,
+  order_by = NULL,
+  color_by = NULL,
   interactive = FALSE,
   x_lab = NULL,
   y_lab = NULL,
@@ -17,12 +20,21 @@
   legend_lab = NULL,
   legend_position = "none",
   point_size = 2,
-  bw_theme = TRUE
+  bw_theme = TRUE,
+  palette = NULL
 )
 }
 \arguments{
 \item{nmrnormRes_obj}{an object of type nmrnormRes, created by
 \code{\link{normalize_nmr}}}
+
+\item{nmrData}{An nmrData object.}
+
+\item{order_by}{A character string specifying a column in f_data by which to
+order the samples.}
+
+\item{color_by}{A character string specifying a column in f_data by which to
+color the points.}
 
 \item{interactive}{logical value. If TRUE produces an interactive plot.}
 
@@ -54,6 +66,10 @@ default is "none".}
 
 \item{bw_theme}{logical value. If TRUE uses the ggplot2 black and white
 theme.}
+
+\item{palette}{character string indicating the name of the RColorBrewer
+palette to use. For a list of available options see the details section in
+\code{\link[RColorBrewer]{RColorBrewer}}.}
 }
 \value{
 ggplot2 plot object if interactive is FALSE, or plotly plot object if

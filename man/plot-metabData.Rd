@@ -97,5 +97,5 @@ For plotting metabData S3 objects
 library(pmartRdata)
 mymetab <- edata_transform(omicsData = metab_object, data_scale = "log2")
 plot(omicsData = mymetab, order_by = "Phenotype", color_by = "Phenotype")
-  
+
 }
