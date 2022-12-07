@@ -1932,8 +1932,14 @@ plot.dimRes <- function (dimRes_obj, interactive = FALSE, x_lab = NULL,
   # Construct impressive plots -------------------------------------------------
 
   # Create the bare bones plot.
-  p <- ggplot2::ggplot(plotdata,
-                       ggplot2::aes(x = PC1, y = PC2)) +
+  p <- ggplot2::ggplot(
+    plotdata,
+    ggplot2::aes(
+      x = PC1,
+      y = PC2,
+      text = paste("Sample name: ", SampleID)
+    )
+  ) +
     ggplot2::geom_point(ggplot2::aes_string(col = color_var,
                                             pch = pch_var),
                         size = point_size)
