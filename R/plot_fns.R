@@ -583,7 +583,7 @@ prime_iso <- function (isonormRes, exp_cname,
 #' @rdname plot-nmrnormRes
 #' @export
 #'
-plot.nmrnormRes <- function (nmrnormRes_obj, nmrData, order_by = NULL,
+plot.nmrnormRes <- function (nmrnormRes_obj, nmrData = NULL, order_by = NULL,
                              color_by = NULL, interactive = FALSE,
                              x_lab = NULL, y_lab = NULL, x_lab_size = 11,
                              y_lab_size = 11, x_lab_angle = 90,
@@ -602,6 +602,14 @@ plot.nmrnormRes <- function (nmrnormRes_obj, nmrData, order_by = NULL,
 
   if (!is.null(order_by)) {
 
+    # Farm boy, make sure an nmrData object is provided. As you wish.
+    if (is.null(nmrData)) {
+
+      # To the pain!
+      stop ("An nmrData object must be provided if order_by is not NULL.")
+
+    }
+
     # Farm boy, make sure order_by exists in f_data. As you wish.
     if (!order_by %in% names(nmrData$f_data)) {
 
@@ -613,6 +621,14 @@ plot.nmrnormRes <- function (nmrnormRes_obj, nmrData, order_by = NULL,
   }
 
   if (!is.null(color_by)) {
+
+    # Farm boy, make sure an nmrData object is provided. As you wish.
+    if (is.null(nmrData)) {
+
+      # To the pain!
+      stop ("An nmrData object must be provided if color_by is not NULL.")
+
+    }
 
     # Farm boy, make sure color_by exists in f_data. As you wish.
     if (!color_by %in% names(nmrData$f_data)) {

@@ -6,7 +6,7 @@
 \usage{
 \method{plot}{nmrnormRes}(
   nmrnormRes_obj,
-  nmrData,
+  nmrData = NULL,
   order_by = NULL,
   color_by = NULL,
   interactive = FALSE,
