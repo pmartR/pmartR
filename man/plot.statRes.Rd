@@ -28,7 +28,8 @@
   bw_theme = TRUE,
   display_count = TRUE,
   custom_theme = NULL,
-  cluster = F
+  cluster = F,
+  free_y_axis = FALSE
 )
 }
 \arguments{
@@ -72,15 +73,15 @@ plotly. Not valid for all plots.}
 
 \item{x_lab}{character string specifying the x-axis label.}
 
-\item{x_lab_size}{integer value indicating the font size for the x-axis.
-The default is 11.}
+\item{x_lab_size}{integer value indicating the font size for the x-axis. The
+default is 11.}
 
 \item{x_lab_angle}{integer value indicating the angle of x-axis labels.}
 
 \item{y_lab}{character string specifying the y-axis label.}
 
-\item{y_lab_size}{integer value indicating the font size for the y-axis.
-The default is 11.}
+\item{y_lab_size}{integer value indicating the font size for the y-axis. The
+default is 11.}
 
 \item{title_lab}{character string specifying the plot title.}
 
@@ -96,16 +97,20 @@ default is "none".}
 \item{text_size}{integer specifying the size of the text (number of
 non-missing values) within the plot. The default is 3.}
 
-\item{bw_theme}{logical value. If TRUE uses the ggplot2 black and white theme.}
+\item{bw_theme}{logical value. If TRUE uses the ggplot2 black and white
+theme.}
 
-\item{display_count}{logical value. Indicates whether the non-missing counts will
-be displayed on the bar plot. The default is TRUE.}
+\item{display_count}{logical value. Indicates whether the non-missing counts
+will be displayed on the bar plot. The default is TRUE.}
 
 \item{custom_theme}{a ggplot `theme` object to be applied to non-interactive
 plots, or those converted by plotly::ggplotly().}
 
-\item{cluster}{logical for heatmaps; TRUE will cluster biomolecules on X axis.
-defaults to TRUE for seqData statistics and FALSE for all others.}
+\item{cluster}{logical for heatmaps; TRUE will cluster biomolecules on X
+axis. defaults to TRUE for seqData statistics and FALSE for all others.}
+
+\item{free_y_axis}{Logical. If TRUE the y axis for each bar plot can have its
+own range. The default is FALSE.}
 
 \item{top_n}{numeric for heatmaps; defaults to NULL.}
 }

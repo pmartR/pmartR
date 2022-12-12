@@ -5547,12 +5547,12 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
 #' @param interactive TRUE/FALSE for whether to create an interactive plot using
 #'   plotly. Not valid for all plots.
 #' @param x_lab character string specifying the x-axis label.
-#' @param x_lab_size integer value indicating the font size for the x-axis.
-#'   The default is 11.
+#' @param x_lab_size integer value indicating the font size for the x-axis. The
+#'   default is 11.
 #' @param x_lab_angle integer value indicating the angle of x-axis labels.
 #' @param y_lab character string specifying the y-axis label.
-#' @param y_lab_size integer value indicating the font size for the y-axis.
-#'   The default is 11.
+#' @param y_lab_size integer value indicating the font size for the y-axis. The
+#'   default is 11.
 #' @param title_lab character string specifying the plot title.
 #' @param title_lab_size integer value indicating the font size of the plot
 #'   title. The default is 14.
@@ -5562,14 +5562,17 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
 #'   default is "none".
 #' @param text_size integer specifying the size of the text (number of
 #'   non-missing values) within the plot. The default is 3.
-#' @param bw_theme logical value. If TRUE uses the ggplot2 black and white theme.
-#' @param display_count logical value. Indicates whether the non-missing counts will
-#'   be displayed on the bar plot. The default is TRUE.
+#' @param bw_theme logical value. If TRUE uses the ggplot2 black and white
+#'   theme.
+#' @param display_count logical value. Indicates whether the non-missing counts
+#'   will be displayed on the bar plot. The default is TRUE.
 #' @param custom_theme a ggplot `theme` object to be applied to non-interactive
 #'   plots, or those converted by plotly::ggplotly().
 #' @param top_n numeric for heatmaps; defaults to NULL.
-#' @param cluster logical for heatmaps; TRUE will cluster biomolecules on X axis.
-#' defaults to TRUE for seqData statistics and FALSE for all others.
+#' @param cluster logical for heatmaps; TRUE will cluster biomolecules on X
+#'   axis. defaults to TRUE for seqData statistics and FALSE for all others.
+#' @param free_y_axis Logical. If TRUE the y axis for each bar plot can have its
+#'   own range. The default is FALSE.
 #'
 #' @details Plot types:
 #' \itemize{
@@ -5649,7 +5652,8 @@ plot.statRes <- function (x,
                           bw_theme = TRUE,
                           display_count = TRUE,
                           custom_theme = NULL,
-                          cluster = F) {
+                          cluster = F,
+                          free_y_axis = FALSE) {
 
   # Farm boy, fix all the problems. As you wish.
 
@@ -5722,7 +5726,8 @@ plot.statRes <- function (x,
       x_lab = x_lab,
       y_lab = y_lab,
       title_lab = title_lab,
-      legend_lab = legend_lab
+      legend_lab = legend_lab,
+      free_y_axis = free_y_axis
     )
 
     if(bw_theme) p <- p +
@@ -6244,7 +6249,19 @@ statres_barplot <- function(x,
                             x_lab,
                             y_lab,
                             title_lab,
-                            legend_lab) {
+                            legend_lab,
+                            free_y_axis) {
+
+  # If free_y_axis is true then each bar plot can have its own y axis range.
+  if (free_y_axis) {
+
+    da_scales <- "free"
+
+  } else {
+
+    da_scales <- NULL
+
+  }
 
   # Farm boy, do all the tedious label crap. As you wish.
   the_x_label <- if (is.null(x_lab))
@@ -6305,7 +6322,7 @@ statres_barplot <- function(x,
                                    fill = posneg,
                                    group = whichtest),
                       stat = 'identity'#,
-                      #position = "dodge"
+                      # position = "dodge"
                       ) +
     ggplot2::geom_hline(ggplot2::aes(yintercept = 0), colour = 'gray50') +
     ggplot2::scale_fill_manual(
@@ -6313,7 +6330,7 @@ statres_barplot <- function(x,
       labels = c("Negative", "Positive"),
       name = the_legend_label
     ) +
-    ggplot2::facet_wrap( ~ Comparison) +
+    ggplot2::facet_wrap( ~ Comparison, scales = da_scales) +
     ggplot2::xlab(the_x_label) +
     ggplot2::ylab(the_y_label) +
     ggplot2::ggtitle(the_title_label)

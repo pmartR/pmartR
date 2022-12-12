@@ -13,7 +13,8 @@ statres_barplot(
   x_lab,
   y_lab,
   title_lab,
-  legend_lab
+  legend_lab,
+  free_y_axis
 )
 }
 \arguments{
