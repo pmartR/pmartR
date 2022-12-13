@@ -8,7 +8,7 @@
 #' 
 #' 
 #' @examples
-#' dontrun{
+#' \dontrun{
 #' library(pmartRdata)
 #' data(nmr_object_identified)
 #' 

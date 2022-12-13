@@ -7,7 +7,7 @@
 #' @return a summary table giving the number of biomolecules by number of observed values across all samples. If min_num is specified, the number of biomolecules to be filtered with the specified threshold are reported.
 #'
 #' @examples
-#' dontrun{
+#' \dontrun{
 #' library(pmartRdata)
 #' data("pep_object")
 #' myfilter <- molecule_filter(pep_object)
@@ -110,7 +110,7 @@ print.moleculeFilterSummary <- function(object){
 #' over the total number of biomolecules.
 #'
 #' @examples
-#' dontrun{
+#' \dontrun{
 #' library(pmartRdata)
 #' data("pep_object")
 #' myfilter <- molecule_filter(pep_object)

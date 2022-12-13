@@ -19,7 +19,7 @@ Implements overall survival analysis or progression-free survival analysis, depe
 surv_designation, and gives a summary of the results.
 }
 \examples{
-dontrun{
+\dontrun{
 library(OvarianPepdataBP)
 attr(tcga_ovarian_pepdata_bp,"survDF") <- list(t_death = "survival_time",ind_death = "vital_status")
 #No percent is provided so the entire object is returned

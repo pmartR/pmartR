@@ -17,7 +17,7 @@ Implements overall survival analysis or progression-free survival analysis, depe
 surv_designation, and return the "survfit" object
 }
 \examples{
-dontrun{
+\dontrun{
 library(MSomicsSTAT)
 library(OvarianPepdataBP)
 

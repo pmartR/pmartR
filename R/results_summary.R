@@ -6,7 +6,7 @@
 #' @return a summary table or list for the pmartR results object.
 #'
 #' @examples
-#' dontrun{
+#' \dontrun{
 #' library(pmartRdata)
 #' data("pep_object")
 #' 

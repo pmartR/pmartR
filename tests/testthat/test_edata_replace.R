@@ -8,6 +8,11 @@ test_that('edata_replace correctly replaces one value with another',{
                    'little_isodata.RData',
                    package = 'pmartR'))
   
+  # Test: incorrect class ------------------------------------------------------
+  
+  err_1 <- "omicsData must be of class 'pepData', 'proData', 'metabData', 'lipidData', or 'nmrData'. "
+  testthat::expect_error(edata_replace(60, 0, NA), err_1) ## error
+  
   # Test: isobaricpepData ------------------------------------------------------
   
   # Fabricate an isobaricpepData object.
@@ -18,11 +23,17 @@ test_that('edata_replace correctly replaces one value with another',{
                                 fdata_cname = 'Sample',
                                 emeta_cname = 'Protein')
   
+  
   # Replace NAs with 0s in isodata.
   expect_message(isodata2 <- edata_replace(omicsData = isodata,
                                            x = NA,
                                            y = 0),
                  "400 instances of NA have been replaced with 0")
+  
+  expect_message(edata_replace(omicsData = isodata,
+                            x = 589.917555116065,
+                            y = 0), 
+                 "1 instances of 589.917555116065 have been replaced with 0")
   
   # Check that the elements of the data_info attribute are all correct.
   expect_equal(
@@ -366,5 +377,22 @@ test_that('edata_replace correctly replaces one value with another',{
   # Examine the class of the new prdata object.
   expect_s3_class(prdata,
                   'proData')
+
+  # Test: seqData ------------------------------------------------------
+  load(system.file('testdata',
+                   'little_seqdata.RData',
+                   package = 'pmartR'))
   
+  # Construct a seqData object with the edata, fdata, and emeta data frames.
+  seqdata <- as.seqData(e_data = edata,
+                        f_data = fdata,
+                        edata_cname = 'ID_REF',
+                        fdata_cname = 'Samples'
+  )
+  
+  err_1 <- "omicsData must be of class 'pepData', 'proData', 'metabData', 'lipidData', or 'nmrData'. "
+  
+  # Not allowed
+  testthat::expect_error(edata_replace(seqdata, 0, NA), err_1) ## error
+    
 })

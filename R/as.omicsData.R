@@ -1689,8 +1689,9 @@ pre_flight <- function (e_data,
                               edata_cname = edata_cname)
     }
 
-    # Auto remove all NA data
-    # e_data <- e_data[apply(is.na(e_data), 1, sum) < 2,]
+    # # Auto remove all NA data
+    # select <- which(colnames(e_data) != edata_cname)
+    # e_data <- e_data[apply(!is.na(e_data[select]), 1, any),]
 
   } else if (data_scale == 'counts'){
 
@@ -1700,7 +1701,7 @@ pre_flight <- function (e_data,
                             edata_cname = edata_cname)
     }
 
-    # Auto-remove all 0 data
+    # # Auto-remove all 0 data
     # select <- which(colnames(e_data) != edata_cname)
     # e_data <- e_data[apply(e_data[select] != 0, 1, any),]
 

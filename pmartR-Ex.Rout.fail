@@ -1,0 +1,114 @@
+
+R version 4.0.2 (2020-06-22) -- "Taking Off Again"
+Copyright (C) 2020 The R Foundation for Statistical Computing
+Platform: x86_64-apple-darwin17.0 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> pkgname <- "pmartR"
+> source(file.path(R.home("share"), "R", "examples-header.R"))
+> options(warn = 1)
+> library('pmartR')
+> 
+> base::assign(".oldSearch", base::search(), pos = 'CheckExEnv')
+> base::assign(".old_wd", base::getwd(), pos = 'CheckExEnv')
+> cleanEx()
+> nameEx("MSnSet2pepData")
+> ### * MSnSet2pepData
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: MSnSet2pepData
+> ### Title: Convert Data of class MSnSet to pmartR pepData Class
+> ### Aliases: MSnSet2pepData
+> 
+> ### ** Examples
+> 
+> ## Not run: 
+> ##D library(pmartR)
+> ##D library(MSnbase)
+> ##D data("msnset")
+> ##D result = MSnSet2pepData(msnset,
+> ##D                         data_scale = "log2",
+> ##D                         edata_cname = "UniqueID",
+> ##D                         fdata_cname = "SampleID",
+> ##D                         emeta_cname = "UniqueID",
+> ##D                         check.names = TRUE)
+> ## End(Not run)
+> 
+> 
+> 
+> 
+> cleanEx()
+> nameEx("RNA_filter")
+> ### * RNA_filter
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: RNA_filter
+> ### Title: RNA filter object
+> ### Aliases: RNA_filter
+> 
+> ### ** Examples
+> 
+> ## Not run: 
+> ##D library(pmartRdata)
+> ##D data("seq_object")
+> ##D to_filter <- RNA_filter(omicsData = seq_object)
+> ##D plot(to_filter)
+> ##D summary(to_filter, size_library = 10000)
+> ##D summary(to_filter, min_nonzero = 5000)
+> ##D summary(to_filter, min_nonzero = .2)
+> ## End(Not run)
+> 
+> 
+> 
+> 
+> cleanEx()
+> nameEx("all_subset")
+> ### * all_subset
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: all_subset
+> ### Title: Identifies the 'subset' of All Features
+> ### Aliases: all_subset
+> 
+> ### ** Examples
+> 
+> ## Not run: 
+> ##D library(pmartRdata)
+> ##D data(pep_edata)
+> ##D keep <- none_subset(e_data = pep_edata, edata_id = "Mass_Tag_ID")
+> ## End(Not run)
+> 
+> 
+> 
+> 
+> cleanEx()
+> nameEx("analysis_log")
+> ### * analysis_log
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: analysis_log
+> ### Title: Creates R markdown document report
+> ### Aliases: analysis_log
+> 
+> ### ** Examples
+> 
+> dontrun{
+Error: unexpected '{' in "dontrun{"
+Execution halted

@@ -3,7 +3,7 @@
 #' @param omicsData an object of the class 'pepData', 'proData', 'metabData', 'lipidData', or 'nmrData', usually created by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.
 #' 
 #' @examples 
-#' dontrun{
+#' \dontrun{
 #' library(pmartRdata)
 #' data(metab_object)
 #' result = analysis_log(metab_object)

@@ -34,11 +34,48 @@ test_that("trelliPlots check the correct inputs", {
   # Now run statistics
   metabStat <- imd_anova(metabData, test_method = "combined")
   
+  metabStat_gtest <- imd_anova(metabData, test_method = "gtest")
+  
   # Create the four trelliData object testers 
   mtrelliData1 <- as.trelliData.edata(e_data = edata, edata_cname = "Metabolite", omics_type = "metabData")
   mtrelliData2 <- as.trelliData(omicsData = metabData)
   mtrelliData3 <- as.trelliData(statRes = metabStat)
   mtrelliData4 <- as.trelliData(omicsData = metabData, statRes = metabStat)
+  
+  mtrelliData5 <- as.trelliData(omicsData = metabData, statRes = metabStat_gtest)
+  
+  ## Where p_value_test is NA, set and return FALSE
+  expect_false(pmartR:::trelli_precheck(trelliData = mtrelliData5 %>% trelli_panel_by("MClass"),
+                  trelliCheck = c("omics", "stat"),
+                  cognostics = NULL,
+                  ggplot_params = NULL,
+                  interactive = F,
+                  test_mode = T, 
+                  test_example = 10.2345,
+                  single_plot = T,
+                  p_value_thresh = 0.05,
+                  p_value_test = NA))
+  
+  ## Warning where no ANOVA results are present
+  expect_message(pmartR:::trelli_precheck(trelliData = mtrelliData5 %>% trelli_panel_by("MClass"),
+                           trelliCheck = c("omics", "stat"),
+                           cognostics = NULL,
+                           ggplot_params = NULL,
+                           interactive = F,
+                           test_mode = T, 
+                           test_example = 10.2345,
+                           single_plot = T,
+                           p_value_thresh = 0.05,
+                           p_value_test = T),
+                 "No imd-anova stats were detected in the statRes object which is"
+                 )
+ 
+  
+  ds_test <- data.frame(
+    p_value_anova = 0.7,
+    fold_change = NaN
+  )
+  expect_null(pmartR:::determine_significance(ds_test, 0.05))
   
   # Test: trelli plotting functions---------------------------------------------
   
@@ -395,6 +432,18 @@ test_that("trelliPlots check the correct inputs", {
   
   ## trelli_foldchange_volcano
   
+  # Data must have only 1 comparison
+  expect_error(
+    mtrelliData4 %>% trelli_panel_by("Metabolite") %>% trelli_foldchange_volcano(comparison = c("Mock_vs_InfectionA", "Mock_vs_InfectionA")),
+    "comparison must be a string of length 1."
+  )
+  
+  # Data must be grouped by an e_meta column
+  expect_error(
+    mtrelliData4 %>% trelli_panel_by("Metabolite") %>% trelli_foldchange_volcano(comparison = "Tigers"),
+    "is not an acceptable comparison"
+  )
+  
   # Data must be grouped by an e_meta column
   expect_error(
     mtrelliData4 %>% trelli_panel_by("Metabolite") %>% trelli_foldchange_volcano(comparison = "Mock_vs_InfectionA"),
@@ -452,5 +501,70 @@ test_that("trelliPlots check the correct inputs", {
   # Generate a single plot
   fc_heatmap <- singleEmetaPlot %>% trelli_foldchange_heatmap(single_plot = T)
   expect_true(inherits(fc_heatmap, "ggplot"))
+  
+  ## NaN significance results  ######################## might need a second look
+  mtrelliData6 <- mtrelliData4
+  mtrelliData6$trelliData.stat$p_value_anova <- NaN
+  mtrelliData6$trelliData.stat$p_value_gtest <- NaN
+  
+  ## Generate heatmap w/ significance stuff
+  suppressWarnings(mtrelliData6 %>% trelli_panel_by("MClass") %>%
+                trelli_foldchange_heatmap(p_value_thresh = 0.05,
+                                          path = file.path(testFolder, "hmFoldChangeTest2"),
+                                          test_mode = TRUE, 
+                                          p_value_test = TRUE,
+                                          test_example = 2,
+                                          interactive = TRUE))
+  
+  mtrelliData6$trelliData.stat$fold_change <- NaN
+  
+  ### Completion attempts
+  
+  # res <- mtrelliData6 %>% trelli_panel_by("MClass") %>%
+  #   trelli_foldchange_heatmap(
+  #     p_value_thresh = 0.05,
+  #     path = file.path("./"),
+  #     test_mode = TRUE, 
+  #     p_value_test = TRUE,
+  #     test_example = 2,
+      # interactive = TRUE)
+  
+  # expect_null(mtrelliData6 %>% trelli_panel_by("MClass") %>%
+  #   trelli_foldchange_heatmap(
+  #     p_value_thresh = 0.05,
+  #                             test_mode = TRUE, 
+  #                             p_value_test = TRUE,
+  #                             test_example = 2,
+  #                             interactive = TRUE))
+  
+  ########## may need fix, determin sig <- NULL
+ #  expect_error(mtrelliData6 %>% trelli_panel_by("MClass") %>%
+ #                trelli_foldchange_volcano(
+ #                  comparison = "Mock_vs_InfectionA",
+ #                  p_value_thresh = 0.05,
+ #                  test_mode = TRUE, 
+ #                  p_value_test = TRUE,
+ #                  test_example = 2,
+ #                  interactive = TRUE), "missing value where TRUE/FALSE needed")
+ #  
+ #  ## Check output when Nan values
+ # mtrelliData6 %>% trelli_panel_by("MClass") %>%
+ #                 trelli_foldchange_boxplot(
+ #                   path = file.path(testFolder, "hmbpTest2"),
+ #                   p_value_thresh = 0.05,
+ #                   test_mode = TRUE, 
+ #                   p_value_test = TRUE,
+ #                   test_example = 2,
+ #                   interactive = TRUE)
+ # 
+ # mtrelliData6 %>% trelli_panel_by("Metabolite") %>%
+ #   trelli_foldchange_bar(
+ #     # path = file.path(testFolder, "hmbpTest2"),
+ #     p_value_thresh = 0.05,
+ #     test_mode = TRUE, 
+ #     p_value_test = TRUE,
+ #     test_example = 2,
+ #     interactive = TRUE)
+  
   
 })  

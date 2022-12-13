@@ -21,7 +21,7 @@ This function applies a transformation to the e_data element of omicsData
 This function is intended to be used before analysis of the data begins. Data are typically analyzed on a log scale.
 }
 \examples{
-dontrun{
+\dontrun{
 library(pmartRdata)
 data(metab_object)
 metab_object2 <- edata_transform(omicsData = metab_object, data_scale="log2")
