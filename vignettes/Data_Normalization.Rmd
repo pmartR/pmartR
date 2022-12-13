@@ -114,11 +114,11 @@ The option to backtransform the data after either of these NMR normalizations is
 We'll use the example NMR dataset from the `pmartRdata` package.
 
 ```{r}
-data(nmr_object_identified)
-summary(nmr_object_identified)
+mynmr <- data(nmr_object_identified)
+summary(mynmr)
 
 # log2 transform the values
-nmr_object <- edata_transform(nmr_object_identified, "log2")
+nmr_object <- edata_transform(omicsData = mynmr, data_scale = "log2")
 ```
 
 
@@ -176,7 +176,7 @@ plot(nmr_norm_reference)
 
 ### Global Normalization
 
-There are two specifications needed in order to compute normalization factors, the normalization function (how the normalization factors are computed) and the subset function (the subset of biomolecules with which the normalization factors are computed). Global normalizations in `pmartR` normalize within each sample, so each sample has its own normalization factor(s), a location and (sometimes) a scale parameter.  There are several options available for normalization and subset functions.
+There are two specifications needed in order to compute normalization factors: the normalization function (how the normalization factors are computed) and the subset function (the subset of biomolecules with which the normalization factors are computed) [@aastrand2003contrast],[@gautier2004affy]. Global normalizations in `pmartR` normalize within each sample, so each sample has its own normalization factor(s), a location and (sometimes) a scale parameter.  There are several options available for normalization and subset functions.
 
 **Normalization Functions**
 
@@ -214,97 +214,160 @@ When, in preparation for normalizing the data, we use the `normalize_global()` f
 
 ```{r}
 # global median centering - don't apply the norm, show info in the normRes object
+mypep <- edata_transform(omicsData = pep_object, data_scale = "log2")
 
-
+mynorm <- normalize_global(omicsData = mypep, 
+                           subset_fn = "all", 
+                           norm_fn = "median", 
+                           apply_norm = FALSE)
+class(mynorm)
+plot(mynorm)
 ```
 
 
-When we apply the normalization to the data, we get back an omicsData object of the same class that we started with.
+When we apply the normalization to the data, we get back an omicsData object of the same class that we started with. The `backtransform` argument can be set to `TRUE` to return the normalized data such that the normalized values are similar in magnitude to the pre-normalized values. With global median centering, this is done by adding back the median of the entire dataset to each individual value; this results in boxplots that are no longer centered at zero, but rather at the median of the entire dataset. 
 
 ```{r}
 # global median centering - apply the norm
-
-
+mypep_norm <- normalize_global(omicsData = mypep, 
+                               subset_fn = "all", 
+                               norm_fn = "median", 
+                               apply_norm = TRUE, 
+                               backtransform = TRUE)
+class(mypep_norm)
+plot(mypep_norm)
 ```
 
-
+When using a subset function other than "all", additional parameters are needed; they have default values or can be set by the user. Here we use rank invariant biomolecules (RIP) with a parameter of 0.2. For details, see `?normalize_global`. Note that some of the subset functions, such as "rip", require `group_designation` to have been run on the omicsData object.
 
 ```{r}
-# RIP mean centering - don't apply the norm (so we can look at the number of molecules in the subset)
+# run group_designation
+mypep <- group_designation(omicsData = mypep, main_effects = "Phenotype")
 
+# RIP mean centering - don't apply the norm (so we can look at the number of molecules in the subset)
+mynorm <- normalize_global(omicsData = mypep, 
+                           subset_fn = "rip", 
+                           params = list(rip = (0.2)),
+                           norm_fn = "median", 
+                           apply_norm = FALSE)
+
+# we can see how many biomolecules are included in this subset
+mynorm$n_features_calc
+mynorm$prop_features_calc
 
 ```
 
+If the subset of biomolecules used does not contain a sufficient number or proportion, we have less confidence in the normalization and may want to choose a different subset function. As a rule of thumb, we like to see at least 10% of the biomolecules from the normalization-ready dataset utilized in the subset for calculating the normalization parameter(s). If the normalization-ready dataset has fewer than ~200 biomolecules, as is common with LC-MS lipidomics and GC-MS metabolomics, 10% of the biomolecules may still not be enough to have confidence in the normalization, as this is only ~20 biomolecules.
+
+We can use the `min_prop` argument to the `normalize_global` function to enforce a minimum proportion of biomolecules required to apply a normalization. In the following code using the LOS (0.1) subset, we would get an error if we included `min_prop = 0.2` because the proportion of biomolecules in the specified subset is below that threshold.
 
 ```{r}
 # LOS MAD
-
-
+mynorm <- normalize_global(omicsData = mypep, 
+                           subset_fn = "los", 
+                           params = list(los = (0.1)),
+                           norm_fn = "mad", 
+                           apply_norm = FALSE)
+mynorm$prop_features_calc
 ```
 
+Here we demonstrate how to use the PPP subset and z-score normalization function.
 
 ```{r}
 # PPP z-score
-
-
+mynorm <- normalize_global(omicsData = mypep, 
+                           subset_fn = "ppp", 
+                           params = list(ppp = (0.5)),
+                           norm_fn = "zscore", 
+                           apply_norm = FALSE,
+                           min_prop = 0.2)
+mynorm$prop_features_calc
 ```
 
+Here we demonstrate how to use the PPP-RIP subset and specify parameter values, along with the median normalization function.
 
 ```{r}
 # PPP-RIP median
-
-
+mynorm <- normalize_global(omicsData = mypep, 
+                           subset_fn = "ppp_rip", 
+                           params = list(ppp = (0.5), rip = (0.2)),
+                           norm_fn = "median", 
+                           apply_norm = FALSE)
+mynorm$prop_features_calc
 ```
 
+Finally, we demonstrate how to use the set of complete biomolecules with the mean function.
 
 ```{r}
 # Complete mean
+mynorm <- normalize_global(omicsData = mypep, 
+                           subset_fn = "complete", 
+                           norm_fn = "mean", 
+                           apply_norm = FALSE)
+mynorm$prop_features_calc
+```
 
 
+For proteomics data, or large lipidomics or metabolomics datasets (>200ish biomolecules??), the Statistical Procedure for the Analyses of peptide abundance Normalization Strategies (SPANS) [@webb2011statistical] algorithm can help determine an appropriate normalization approach. This algorithm ranks different combinations of subset and normalization functions based on a score that captures how much bias a particular normalization procedure introduces into the data. Higher scores imply less bias.
+
+```{r spans, eval = FALSE}
+# returns a data frame arranged by descending SPANS score
+# not run due to long runtime; SPANS plot generated and saved to include in vignette
+spans_result <- spans_procedure(mypep)
+
+plot(spans_result)
+```
+
+
+```{r spans plot, out.width = "600px", echo=FALSE}
+knitr::include_graphics("SPANS_pep.png")
 ```
 
 
 ```{r}
-# 
-
-
+head(spans_result)
 ```
 
+To apply a normalization method after using SPANS, simply use the `normalize_global` function.
 
 ```{r}
-# 
-
-
+mypep_norm <- normalize_global(omicsData = mypep, 
+                               subset_fn = "all", 
+                               norm_fn = "median", 
+                               apply_norm = TRUE, 
+                               backtransform = TRUE)
 ```
-
-
-For proteomics data, or large lipidomics or metabolomics datasets (>200ish biomolecules??), there is a method to help select an appropriate normalization approach, Statistical Procedure for the Analyses of peptide abundance Normalization Strategies (SPANS) [@webb2011statistical]. This algorithm ranks different combinations of subset and normalization functions based on a score that captures how much bias a particular normalization procedure introduces into the data.  Higher scores imply less bias.
-
-
-```{r}
-
-```
-
 
 
 ### LOESS Normalization
 
-As an alternative to a global normalization, `pmartR` includes a wrapper for the normalizeCyclicLoess [@bolstad2003comparison] function from the limma package [@smyth2005limma]. 
+As an alternative to a global normalization, `pmartR` includes a wrapper for the `normalizeCyclicLoess` [@bolstad2003comparison] function from the limma package [@smyth2005limma]. 
 
 ```{r}
-
+plot(mypep, order_by = "Phenotype", color_by = "Phenotype")
+mypep_loess <- normalize_loess(omicsData = mypep)
+plot(mypep_loess, order_by = "Phenotype", color_by = "Phenotype")
 ```
 
 
 ### Quantile Normalization
 
-Quantile normalization is an algorithm for normalizing a set of data vectors by giving them the same distribution [@bolstad2003comparison]. It is applied to data on the abundance scale (e.g. not a log scale). It is often used for microarray data.
+Quantile normalization is an algorithm for normalizing a set of data vectors by giving them the same distribution [@bolstad2003comparison]. It is applied to data on the abundance scale (e.g. not a log scale). It is often used for microarray data. Note that quantile normalization requires complete data. In the example below we use the `molecule_filter` to restrict our data to complete samples.
 
 ```{r}
+mymetab <- edata_transform(omicsData = metab_object, data_scale = "log2")
 
+# restrict to complete samples using the molecule filter
+myfilter <- molecule_filter(omicsData = mymetab)
+nsamps <- get_data_info(mymetab)$num_samps
+mymetab <- applyFilt(filter_object = myfilter, omicsData = mymetab, min_num = nsamps)
+
+plot(mymetab, order_by = "Phenotype", color_by = "Phenotype")
+mymetab_quantile <- normalize_quantile(omicsData = mymetab)
+plot(mymetab_quantile, order_by = "Phenotype", color_by = "Phenotype")
 ```
 
-
+It is up to the user to determine whether the normalization ultimately applied to the data is appropriate. In the case of the quantile normalization performed above, based on the resulting boxplots we would not recommend proceeding with this dataset for further analyses; a different normalization approach should be tried.
 
 ### RNAseq Data Normalization
 
@@ -316,29 +379,7 @@ The statistical normalization approaches for RNAseq data are combined with the s
 
 - limma voom [@law2014voom]
 
-
-#### DESeq2
-
-
-```{r}
-
-```
-
-
-#### edgeR
-
-
-```{r}
-
-```
-
-
-#### limma voom
-
-
-```{r}
-
-```
+See `?diffexp_seq` and the "RNAseq Processing Workflow" for more information.
 
 
 ## References
