@@ -43,7 +43,9 @@ This vignette describes the filter functionality of the `pmartR` package. Filter
 
 In a typical `pmartR` processing pipeline, these filters are applied in a certain order during the quality control process.
 
-To utilize a filter, the first step is to create the filter object, an S3 object whose class is directly tied to the filter. Once a filter object is created, the `plot()` and `summary()` functions can be used to see the effects of applying the filter with certain parameters, and then the filter can be applied to the omicsData object using the `applyFilt()` function.
+To utilize a filter, the first step is to create the filter object, an S3 object whose class is directly tied to the filter. Once a filter object is created, the `plot` and `summary` functions can be used to see the effects of applying the filter with certain parameters, and then the filter can be applied to the omicsData object using the `applyFilt` function.
+
+If data are paired, the pairing structure can be defined in the `group_designation` function, and the pairs will be accounted for in relevant filters. For biomolecule filters, this means filtering based on paired differences rather than on individual values. For sample filters, removal of a sample will be accompanied by the removal of all members of the corresponding pair.
 
 
 ## Biomolecule Filters
