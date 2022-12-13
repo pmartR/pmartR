@@ -34,7 +34,7 @@ test_that('diffexp_seq returns the correct data frame and attributes',{
   seqdata$f_data$covar4 <- as.numeric(as.factor(seqdata$f_data$Treatment))  ## factor, redundant with group
   
   expect_error(diffexp_seq(seqdata), 
-               "group_designation has not been run")
+               "Running group_designation is required")
   
   ## Factor main effect
   seqdata_grp <- group_designation(seqdata, main_effects = c("Tissue", "Treatment"))
