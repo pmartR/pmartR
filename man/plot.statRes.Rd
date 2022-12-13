@@ -9,7 +9,7 @@
   plot_type = "bar",
   fc_threshold = NULL,
   fc_colors = c("red", "black", "green"),
-  stacked = FALSE,
+  stacked = TRUE,
   show_sig = TRUE,
   color_low = NULL,
   color_high = NULL,
@@ -51,7 +51,7 @@ being used to color negative, non-significant, and positive fold changes
 respectively}
 
 \item{stacked}{TRUE/FALSE for whether to stack positive and negative fold
-change sections in the barplot, defaults to FALSE}
+change sections in the barplot, defaults to TRUE}
 
 \item{show_sig}{This input is used when \code{plot_type = "gheatmap"}. A
 logical value. If TRUE a visual indicator that a certain bin combination is

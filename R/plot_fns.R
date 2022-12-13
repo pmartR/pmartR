@@ -5532,7 +5532,7 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
 #'   being used to color negative, non-significant, and positive fold changes
 #'   respectively
 #' @param stacked TRUE/FALSE for whether to stack positive and negative fold
-#'   change sections in the barplot, defaults to FALSE
+#'   change sections in the barplot, defaults to TRUE
 #' @param show_sig This input is used when \code{plot_type = "gheatmap"}. A
 #'   logical value. If TRUE a visual indicator that a certain bin combination is
 #'   significant by the g-test is shown.
@@ -5633,7 +5633,7 @@ plot.statRes <- function (x,
                           plot_type = "bar",
                           fc_threshold = NULL,
                           fc_colors = c("red", "black", "green"),
-                          stacked = FALSE,
+                          stacked = TRUE,
                           show_sig = TRUE,
                           color_low = NULL,
                           color_high = NULL,
@@ -6292,7 +6292,7 @@ statres_barplot <- function(x,
   #   geom_bar(stat='identity',position='dodge')
 
   ##Up direction is positive, down direction is negative
-  if(!stacked)
+  if(stacked)
     comp_df_melt[grep("Down", comp_df_melt$Direction),]$Count <- (
       -comp_df_melt[grep("Down", comp_df_melt$Direction),]$Count
     )
@@ -6319,18 +6319,20 @@ statres_barplot <- function(x,
 
   p <- ggplot2::ggplot(data = comp_df_melt, ggplot2::aes(Comparison, Count)) +
     ggplot2::geom_bar(ggplot2::aes(x = whichtest,
-                                   fill = posneg,
-                                   group = whichtest),
-                      stat = 'identity'#,
-                      # position = "dodge"
-                      ) +
+                                   fill = posneg),
+                      stat = 'identity',
+                      position = if (stacked) {
+                        ggplot2::position_identity()
+                      } else {
+                        ggplot2::position_dodge(0.9)
+                      }) +
     ggplot2::geom_hline(ggplot2::aes(yintercept = 0), colour = 'gray50') +
     ggplot2::scale_fill_manual(
       values = c(fc_colors[1], fc_colors[3]),
       labels = c("Negative", "Positive"),
       name = the_legend_label
     ) +
-    ggplot2::facet_wrap( ~ Comparison, scales = da_scales) +
+    ggplot2::facet_wrap(~ Comparison, scales = da_scales) +
     ggplot2::xlab(the_x_label) +
     ggplot2::ylab(the_y_label) +
     ggplot2::ggtitle(the_title_label)
@@ -6340,11 +6342,14 @@ statres_barplot <- function(x,
 
     p <- p +
       ggplot2::geom_text(ggplot2::aes(x = whichtest,
-                                      label = ifelse(abs(Count) > 0,
-                                                     abs(Count),
-                                                     "")),
-                         # position = "dodge",#ggplot2::position_stack(vjust = 0.5),
-                         size = text_size)
+                                      group = posneg,
+                                      label = abs(Count)),
+                         size = text_size,
+                         position = if (stacked) {
+                           ggplot2::position_identity()
+                         } else {
+                           ggplot2::position_dodge(0.9)
+                         })
 
   }
 
