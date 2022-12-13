@@ -57,7 +57,7 @@ independent filtering, and running in parallel. Additional arguments can be
 passed for use in the function. Refer to DESeq() and results() in DESeq2
 package. Requires 'survival' package to run.
 
-Method "voom" - Runs default limma-voom workflow using empirical Bayes
+Method "limma-voom" - Runs default limma-voom workflow using empirical Bayes
 moderated t-statistics. Additional arguments can be passed for use in the
 function. Refer to calcNormFactors() in edgeR package.
 }
