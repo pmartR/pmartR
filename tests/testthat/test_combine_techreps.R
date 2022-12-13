@@ -111,4 +111,126 @@ test_that("combine_techreps properly aggregates technical replicates", {
                      "f_data or was the same as fdata_cname",
                      sep = " "))
   
+  # Test: seqData ------------------------------------------------------
+  load(system.file('testdata',
+                   'little_seqdata.RData',
+                   package = 'pmartR'))
+  
+  # Construct a seqData object with the edata, fdata, and emeta data frames.
+  seqdata <- as.seqData(e_data = edata,
+                        f_data = fdata,
+                        edata_cname = 'ID_REF',
+                        fdata_cname = 'Samples'
+  )
+  
+  f_data_temp <- fdata
+  f_data_temp$techrep <- paste(sapply(c("A", "B", "C", "D"), rep, 10),  rep(1:5, 8))
+  f_data_temp$bio_samp_names <- paste(sapply(c("crock", "o", "dile", "rock"), rep, 10),  rep(1:5, 8))
+  f_data_temp$Label <- NULL
+  
+  temp_omics <- as.seqData(e_data = edata, edata_cname = 'ID_REF',
+                           f_data = f_data_temp, fdata_cname = "Samples",
+                           techrep_cname = "techrep", check.names = F)
+  
+  vector_biosamp <- f_data_temp$bio_samp_names
+  
+  ## check equal function
+  check_equal <- function(og_obj, ct_obj, cmbn_fn, tr_col = NULL){
+    
+    tr_col <- ifelse(is.null(tr_col), attr(og_obj, "cname")$techrep_cname, tr_col)
+    
+    reps <- split(og_obj$f_data[[get_fdata_cname(og_obj)]], 
+                  og_obj$f_data[[tr_col]])
+    purrr::map(1:length(reps), function(n){
+      cols <- reps[[n]]
+      x <- expect_identical(
+        as.numeric(apply(og_obj$e_data[cols], 1, cmbn_fn)),
+        ct_obj$e_data[[names(reps)[n]]])
+      return()
+    })
+    return(invisible(NULL))
+  }
+  
+  ## Trigger class errors
+  expect_error(combine_techreps(fdata), 
+               "omicsData must be of class 'pepData', 'proData'")
+  
+  expect_error(combine_techreps(temp_omics, bio_sample_names = 5),
+               "bio_sample_names must be a character string specifying a column in f_data")
+  
+  expect_error(combine_techreps(temp_omics, bio_sample_names = c("tiger",vector_biosamp[-1])),
+  "character vector of sample names does not have the same number of names as the number of biological samples")
+  
+  temp_omics_grp_bad <- temp_omics %>% group_designation("Treatment")
+  temp_omics_grp_bad$f_data$Treatment[[5]] <- "Tiger"
+  
+  expect_warning(combine_techreps(temp_omics_grp_bad), 
+                                  "The following columns in f_data have multiple values across technical replicates")
+  
+  temp_comb1 <- combine_techreps(temp_omics)
+  expect_identical(unique(temp_omics$f_data$techrep), temp_comb1$f_data$techrep)
+  expect_identical(unique(temp_omics$f_data$techrep), colnames(temp_comb1$e_data)[-1])
+  check_equal(og_obj = temp_omics, ct_obj = temp_comb1, sum) ## Check equal sums
+  
+  temp_comb2 <- combine_techreps(temp_omics, combine_fn = "mean")
+  expect_identical(unique(temp_omics$f_data$techrep), temp_comb2$f_data$techrep)
+  expect_identical(unique(temp_omics$f_data$techrep), colnames(temp_comb2$e_data)[-1])
+  check_equal(og_obj = temp_omics, ct_obj = temp_comb2, mean)
+  
+  temp_comb3 <- combine_techreps(temp_omics, bio_sample_names = "bio_samp_names")
+  expect_identical(unique(temp_omics$f_data$bio_samp_names), temp_comb3$f_data$bio_samp_names)
+  expect_identical(unique(temp_omics$f_data$bio_samp_names), colnames(temp_comb3$e_data)[-1])
+  check_equal(og_obj = temp_omics, ct_obj = temp_comb3, sum, tr_col = "bio_samp_names")
+  
+  temp_comb4 <- combine_techreps(temp_omics, bio_sample_names = vector_biosamp)
+  expect_identical(unique(temp_omics$f_data$bio_samp_names), temp_comb4$f_data$bio_samp_names)
+  expect_identical(unique(temp_omics$f_data$bio_samp_names), colnames(temp_comb4$e_data)[-1])
+  check_equal(og_obj = temp_omics, ct_obj = temp_comb4, sum, tr_col = "bio_samp_names")
+  
+  temp_omics <- group_designation(temp_omics, main_effects = c("Tissue", "Treatment"))
+  
+  temp_comb5 <- combine_techreps(temp_omics)
+  expect_identical(unique(temp_omics$f_data$techrep), temp_comb5$f_data$techrep)
+  expect_identical(unique(temp_omics$f_data$techrep), colnames(temp_comb5$e_data)[-1])
+  check_equal(og_obj = temp_omics, ct_obj = temp_comb5, sum) ## Check equal sums
+  
+  temp_comb6 <- combine_techreps(temp_omics, combine_fn = "mean")
+  expect_identical(unique(temp_omics$f_data$techrep), temp_comb6$f_data$techrep)
+  expect_identical(unique(temp_omics$f_data$techrep), colnames(temp_comb6$e_data)[-1])
+  check_equal(og_obj = temp_omics, ct_obj = temp_comb6, mean)
+  
+  temp_comb7 <- combine_techreps(temp_omics, bio_sample_names = "bio_samp_names")
+  expect_identical(unique(temp_omics$f_data$bio_samp_names), temp_comb7$f_data$bio_samp_names)
+  expect_identical(unique(temp_omics$f_data$bio_samp_names), colnames(temp_comb7$e_data)[-1])
+  check_equal(og_obj = temp_omics, ct_obj = temp_comb7, sum, tr_col = "bio_samp_names")
+  
+  temp_comb8 <- combine_techreps(temp_omics, bio_sample_names = vector_biosamp)
+  expect_identical(unique(temp_omics$f_data$bio_samp_names), temp_comb8$f_data$bio_samp_names)
+  expect_identical(unique(temp_omics$f_data$bio_samp_names), colnames(temp_comb8$e_data)[-1])
+  check_equal(og_obj = temp_omics, ct_obj = temp_comb8, sum, tr_col = "bio_samp_names")
+  
+  
+  ## No tech reps, differing #
+  err_1 <- "This object did not have technical replicates specified."
+  err_2 <- "Differing number of technical replicates per sample"
+  
+  ## Errors expected in techrep designation
+  testthat::expect_error(combine_techreps(seqdata), err_1) ## no tech reps
+  
+  f_data_temp <- fdata
+  f_data_temp$techrep <- paste(sapply(c("A", "B", "C", "D"), rep, 10),  rep(1:5, 8))
+  f_data_temp$bio_samp_names <- paste(sapply(c("crock", "o", "dile", "rock"), rep, 10),  rep(1:5, 8))
+  f_data_temp$Label <- NULL
+  
+  
+  f_data_temp2 <- f_data_temp
+  f_data_temp2$techrep[5] <- NA
+  
+  temp_omics <- as.seqData(e_data = edata, edata_cname = 'ID_REF',
+                           f_data = f_data_temp2, fdata_cname = "Samples",
+                           techrep_cname = "techrep")
+  
+  testthat::expect_error(combine_techreps(temp_omics), err_2) ## unequal tech reps
+  
+  
 })

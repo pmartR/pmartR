@@ -18,6 +18,10 @@ data frame object
 For creating a summary of an S3 object of type 'nmrnormRes'
 }
 \examples{
+<<<<<<< HEAD
+=======
+\dontrun{
+>>>>>>> develop
 library(pmartRdata)
 mynmr <- edata_transform(omicsData = nmr_identified_object, 
                          data_scale = "log2")

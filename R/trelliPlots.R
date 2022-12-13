@@ -220,7 +220,7 @@ trelli_builder <- function(toBuild, cognostics, plotFUN, cogFUN, path, name, ...
     
   } else {
     
-    toBuild %>%
+    toBuild <- toBuild %>%
       dplyr::ungroup() %>%
       dplyr::mutate(
         panel = trelliscopejs::map2_plot(Nested_DF, as.character(unlist(toBuild[,1])), plotFUN),

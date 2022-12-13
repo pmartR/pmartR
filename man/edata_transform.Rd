@@ -39,6 +39,10 @@ For all but seqData, this function is intended to be used before
   seqData objects are performed within the pertinent functions.
 }
 \examples{
+<<<<<<< HEAD
+=======
+\dontrun{
+>>>>>>> develop
 library(pmartRdata)
 mymetab <- edata_transform(omicsData = metab_object, data_scale="log2")
 attr(mymetab, "data_info")$data_scale

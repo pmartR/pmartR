@@ -25,6 +25,10 @@ a summary table giving the number of biomolecules by number of
 Provide summary of a moleculeFilt S3 object
 }
 \examples{
+<<<<<<< HEAD
+=======
+\dontrun{
+>>>>>>> develop
 library(pmartRdata)
 myfilter <- molecule_filter(omicsData = pep_object)
 summary(filter_object = myfilter)

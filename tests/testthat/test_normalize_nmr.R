@@ -16,6 +16,8 @@ test_that('normalize_nmr produces the correct output',{
                         fdata_cname = "SampleID",
                         emeta_cname = "Bin")
   
+  
+  
   # Natural logate the data.
   lognmrdata <- edata_transform(omicsData = nmrdata,
                                 data_scale = "log")
@@ -773,5 +775,19 @@ test_that('normalize_nmr produces the correct output',{
                             is_log_orig = TRUE,
                             sample_property = log10(fdata$Concentration)),
                log2(fdata$Concentration))
+  
+  
+  load(system.file('testdata',
+                   'little_seqdata.RData',
+                   package = 'pmartR'))
+  
+  myseqData <- as.seqData(e_data = edata,
+                          f_data = fdata,
+                          edata_cname = 'ID_REF',
+                          fdata_cname = 'Samples'
+  )
+  
+  err_2 <- "omicsData must be of the class 'nmrData'"
+  testthat::expect_error(normalize_nmr(myseqData), err_2)
   
 })

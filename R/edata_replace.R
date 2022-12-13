@@ -45,16 +45,6 @@ edata_replace <- function(omicsData, x, y) {
     
   }
   
-  # check that omicsData is of appropriate class #
-  if (inherits(omicsData, "seqData") && is.na(y)) {
-    
-    # Bestow an error on the user because the input does not have the correct
-    # class.
-    stop ("NAs values are not valid for seqData processing.")
-    
-  }
-  
-  
   # Acquire the index of the edata_cname column.
   id_col <- which(names(omicsData$e_data) == attr(omicsData,
                                                   "cnames")$edata_cname)

@@ -155,5 +155,43 @@ test_that("sample names are properly abridged",{
                paste("none of the indices specified in 'components' match",
                      "indices of the split sample name",
                      sep = " "))
+  
+  
+  load(system.file('testdata',
+                   'little_seqdata.RData',
+                   package = 'pmartR'))
+  
+  myseqData <- as.seqData(e_data = edata,
+                          f_data = fdata,
+                          edata_cname = 'ID_REF',
+                          fdata_cname = 'Samples'
+  )
+  
+  err_1 <- "Please specify both 'from' and 'to' if either argument is used."
+  err_2 <- "Please specify both 'delim' and 'components' if either argument is used."
+  
+  expect_identical(
+    strtrim(myseqData$f_data$Samples, 13),
+    suppressWarnings(custom_sampnames(myseqData, firstn = 13)$f_data$VizSampNames) 
+    ## Might wanna think about a lastn as well
+  )
+  
+  testthat::expect_error(custom_sampnames(myseqData, from = 1), err_1)
+  testthat::expect_error(custom_sampnames(myseqData, to = 13), err_1)
+  
+  expect_identical(
+    substring(myseqData$f_data$Samples, first = 3, last = 13),
+    custom_sampnames(myseqData, from = 3, to = 13)$f_data$VizSampNames
+  )
+  
+  testthat::expect_error(custom_sampnames(myseqData, delim = "_"), err_2)
+  testthat::expect_error(custom_sampnames(myseqData, components = c(1,2,3)), err_2)
+  
+  ## No changes actually happening here, demo of arg use
+  expect_identical(
+    myseqData$f_data$Samples,
+    custom_sampnames(myseqData, delim = "_", components = c(1,2,3))$f_data$VizSampNames,
+    custom_sampnames(myseqData, pattern = ".+")$f_data$VizSampNames
+  )
 
 })

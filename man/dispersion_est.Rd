@@ -76,6 +76,24 @@ plot result
 \description{
 For generating statistics for 'seqData' objects
 }
+<<<<<<< HEAD
+=======
+\details{
+DESeq2 option requires package "survival" to be available.
+}
+\examples{
+\dontrun{
+
+library(pmartRdata)
+myseqData <- rnaseq_object
+myseqData <- group_designation(omicsData = myseqData, main_effects = "Virus")
+disp_est <- dispersion_est(omicsData = myseqData, method = "edgeR")
+
+
+}
+
+}
+>>>>>>> develop
 \references{
 Robinson MD, McCarthy DJ, Smyth GK (2010). “edgeR: a Bioconductor package 
  for differential expression analysis of digital gene expression data.” 
