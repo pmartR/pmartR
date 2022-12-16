@@ -2417,16 +2417,10 @@ plot.totalCountFilt <- function (filter_object, min_count = NULL,
   }
 
   # Plot
-<<<<<<< HEAD
-  p <- ggplot2::ggplot(plot_data, ggplot2::aes(x=lcpm)) +
-    ggplot2::geom_density(ggplot2::aes(group = Sample, color = "Samples")) +
-    ggplot2::geom_density(ggplot2::aes(color = "Average Density")) +
-=======
   p <- ggplot2::ggplot(plot_data, ggplot2::aes(x=lcpm)) + 
     ggplot2::geom_density(ggplot2::aes(group = !!rlang::sym(colnames(plot_data)[2]), 
                                        color = !!rlang::sym(colnames(plot_data)[2]))) + 
     ggplot2::geom_density(ggplot2::aes(color = "Average Density")) + 
->>>>>>> develop
     ggplot2::scale_color_manual(
       name = legend_lab,
       values = values,
@@ -2663,11 +2657,7 @@ plot.RNAFilt <- function (filter_object, plot_type = "library",
   # Plot
   if(plot_type == "library"){
     p <- ggplot2::ggplot(
-<<<<<<< HEAD
-      temp_obj, ggplot2::aes(x=SampleID, y = LibrarySize, fill = color)) +
-=======
       temp_obj, ggplot2::aes(x=!!rlang::sym(colnames(temp_obj)[1]), y = LibrarySize, fill = color)) + 
->>>>>>> develop
       ggplot2::geom_col(show.legend = F) +
       ggplot2::scale_fill_manual(
         name = legend_lab,
@@ -2678,13 +2668,8 @@ plot.RNAFilt <- function (filter_object, plot_type = "library",
                     x = xlabel, y = ylabel)
 
     if(!is.null(size_library)){
-<<<<<<< HEAD
-      p <- p + ggplot2::geom_segment(y = size_library, yend = size_library,
-                                     xend = length(unique(temp_obj$SampleID))+.5,
-=======
       p <- p + ggplot2::geom_segment(y = size_library, yend = size_library, 
                                      xend = length(unique(temp_obj[[colnames(temp_obj)[1]]]))+.5, 
->>>>>>> develop
                                      x = 0, linetype = "dashed")
     }
 
@@ -2693,11 +2678,7 @@ plot.RNAFilt <- function (filter_object, plot_type = "library",
     mt <- round(filter_object$NonZero[[1]]/filter_object$ProportionNonZero[[1]])
 
     p <- ggplot2::ggplot(
-<<<<<<< HEAD
-      temp_obj, ggplot2::aes(x=SampleID, y = NonZero, fill = color)) +
-=======
       temp_obj, ggplot2::aes(x=!!rlang::sym(colnames(temp_obj)[1]), y = NonZero, fill = color)) + 
->>>>>>> develop
       ggplot2::scale_y_continuous(
         sec.axis = ggplot2::sec_axis(trans=~./mt,
                           name="Proportion of all biomolecules")
@@ -5844,13 +5825,8 @@ plot.statRes <- function (x,
         legend_lab
 
     #For now just consider biomolecules significant with respect to ANOVA
-<<<<<<< HEAD
-    volcano <- dplyr::filter(volcano, Type %in% c("ANOVA", "EdgeR_LRT",
-                                                 "Voom_T", "DESeq_Wald",
-=======
     volcano <- dplyr::filter(volcano, Type %in% c("ANOVA", "EdgeR_F", 
                                                  "Voom_T", "DESeq_Wald", 
->>>>>>> develop
                                                  "DESeq_LRT"))
 
     volcano_sigs <- dplyr::filter(volcano,P_value<attr(x,"pval_thresh"))
@@ -5904,13 +5880,8 @@ plot.statRes <- function (x,
 
     ## Color by significance
     comps <- strsplit(attr(x, "comparisons"), "_vs_")
-<<<<<<< HEAD
-
-    plotter <- map_dfr(1:length(comps), function(n_comp){
-=======
     
     plotter <- purrr::map_dfr(1:length(comps), function(n_comp){
->>>>>>> develop
       label <- attr(x, "comparisons")[n_comp]
       comp <- paste("Mean", comps[[n_comp]], sep = "_")
       pval <-  grep(paste0("^P_value_.+", label), colnames(x), value = T)
@@ -5927,59 +5898,14 @@ plot.statRes <- function (x,
 
       data.frame(var1 = v1,var2 = v2, pval = v3, comp = label)
     })
-<<<<<<< HEAD
 
-    if(all(is.na(plotter$var1))){
-
-      plotter <- map_dfr(1:length(comps), function(n_comp){
-        label <- attr(x, "comparisons")[n_comp]
-        comp <- paste("Mean", label, sep = "_")
-        comp2 <- paste("Fold_change", label, sep = "_")
-        pval <-  grep(paste0("^P_value_.+", label), colnames(x), value = T)
-
-        v1 <- x[[comp]]
-        v2 <- x[[comp2]]
-        v3 <-  x[[pval]]
-
-        data.frame(var1 = v1,var2 = v2, pval = v3, comp = label)
-      })
-
-      p <- ggplot2::ggplot(
-        plotter,
-        ggplot2::aes(
-          x = log2(var1),
-          y = var2,
-          color = pval < attr(x, "pval_thresh")
-        )) +
-        ggplot2::geom_point() +
-        ggplot2::facet_wrap(~comp) +
-        ggplot2::geom_segment(
-          y = 0, yend = 0, linetype = "dashed", color = "red",
-          x = min(log2(plotter$var1), na.rm = T),
-          xend = max(log2(plotter$var1), na.rm = T)
-        ) + ggplot2::labs(
-          x = "A (Log2 Average Expression)",
-          y = "M (Log2 Fold Change)",
-          color = paste("Significance < ", attr(x, "pval_thresh"))
-        )
-
-    } else {
-
-=======
-    
->>>>>>> develop
       p <- ggplot2::ggplot(
         plotter,
         ggplot2::aes(
           x = log2((var1 + var2)/2),
           y = log2(var1/var2), ## where mean is 0 or na in a group, goes to Inf
           color = pval < attr(x, "pval_thresh")
-<<<<<<< HEAD
-        )) +
-        # ggplot2::geom_hex(ggplot2::aes(fill = stat(log2(count)))) +
-=======
         )) + 
->>>>>>> develop
         ggplot2::geom_point() +
         ggplot2::facet_wrap(~comp) +
         ggplot2::geom_segment(
@@ -5991,13 +5917,7 @@ plot.statRes <- function (x,
           y = "M (Log2 Fold change)",
           color = paste("Significance < ", attr(x, "pval_thresh"))
         )
-<<<<<<< HEAD
 
-    }
-
-=======
-    
->>>>>>> develop
     if(bw_theme) p <- p +
       ggplot2::theme_bw() +
       ggplot2::theme(strip.background = ggplot2::element_rect(fill = "white"))
@@ -6056,26 +5976,16 @@ prep_flags <- function (x, test) {
                                   "",
                                   colnames(x)[grep("^Flag_G_", colnames(x))])
 
-<<<<<<< HEAD
-  } else if(test %in% c("EdgeR_LRT", "Voom_T", "DESeq_Wald", "DESeq_LRT")){
-
-=======
   } else if(test %in% c("EdgeR_F", "Voom_T", "DESeq_Wald", "DESeq_LRT")){
     
->>>>>>> develop
     # Assemble a data frame with the sample IDs and flags.
     flag_cols <- grep("^Flag_(Wald|LRT|T|F)_", colnames(x))
     da_flag <- x[c(1, flag_cols)]
 
     # Remove "Flag_A_" from column names. The first column name is removed
     # because it corresponds to the biomolecule ID column.
-<<<<<<< HEAD
-    colnames(da_flag)[-1] <- gsub("^Flag_(Wald|LRT|T)_", "", colnames(da_flag)[-1])
-
-=======
     colnames(da_flag)[-1] <- gsub("^Flag_(Wald|LRT|T|F)_", "", colnames(da_flag)[-1])
     
->>>>>>> develop
   } else {
 
     # Criteria for reporting p-values when combined test is selected:

@@ -34,7 +34,6 @@
 #'   plotting, specify the optional argument 'use_VizSampNames = TRUE'.
 #'
 #' @examples
-#' library(pmartR)
 #' library(pmartRdata)
 #' 
 #' mypep <- edata_transform(omicsData = pep_object, data_scale = "log2")

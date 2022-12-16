@@ -8,10 +8,6 @@
 #' @return data frame object
 #' 
 #' @examples
-<<<<<<< HEAD
-=======
-#' \dontrun{
->>>>>>> develop
 #' library(pmartRdata)
 #' mynmr <- edata_transform(omicsData = nmr_identified_object, 
 #'                          data_scale = "log2")

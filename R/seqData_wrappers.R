@@ -6,7 +6,7 @@
 #' @param omicsData object of type 'seqData' created by
 #'   \code{\link{as.seqData}}
 #' @param method character string of length one specifying which wrapper to
-#'   use. Can be 'edgeR', 'DESeq2', or 'limma-voom'
+#'   use. Can be 'edgeR', 'DESeq2', or 'voom'
 #' @param p_adjust character string for p-value correction method, refer to
 #'   ?p.adjust() for valid options. Defaults to "BH" (Benjamini & Hochberg).
 #' @param comparisons data frame with columns for "Control" and "Test"
@@ -36,7 +36,7 @@
 #' passed for use in the function. Refer to DESeq() and results() in DESeq2
 #' package. Requires 'survival' package to run.
 #'
-#' Method "limma-voom" - Runs default limma-voom workflow using empirical Bayes
+#' Method "voom" - Runs default limma-voom workflow using empirical Bayes
 #' moderated t-statistics. Additional arguments can be passed for use in the
 #' function. Refer to calcNormFactors() in edgeR package.
 #' 
@@ -57,7 +57,7 @@
 #' myseqData <- group_designation(omicsData = rnaseq_object, main_effects = "Virus")
 #' edger_results <- diffexp_seq(omicsData = myseqData, method = "edgeR")
 #' deseq_results <- diffexp_seq(omicsData = myseqData, method = "DESeq2")
-#' voom_results <- diffexp_seq(omicsData = myseqData, method = "limma-voom")
+#' voom_results <- diffexp_seq(omicsData = myseqData, method = "voom")
 #' 
 #' @export
 #' 
@@ -122,24 +122,14 @@ diffexp_seq <- function(omicsData, method = "edgeR", p_adjust = "BH",
 #' 
 #' For generating statistics for 'seqData' objects
 #' 
-<<<<<<< HEAD
-#' @param omicsData an object of type 'seqData', created by
-#'   \code{\link{as.seqData}}
-#' @param test an object of type 'seqData', created by \code{\link{as.seqData}}
-#' @param method a character string of length one specifying which wrapper to
-#'   use. Can be 'edgeR', 'DESeq2', or 'limma-voom'
-#' @param p_adjust Character string for p-value correction method, refer to
-#'   ?p.adjust() for valid options. Defaults to "BH" (Benjamini & Hochberg)
-=======
 #' @param omicsData an object of type 'seqData', created by \code{\link{as.seqData}}
 #' @param test either "Wald" or "LRT", which will then use either Wald 
 #' significance tests, or the likelihood ratio test on the difference in 
 #' deviance between a full and reduced model formula 
 #' @param method a character string of length one specifying which wrapper to use. 
-#' Can be 'edgeR', 'DESeq2', or 'limma-voom' 
+#' Can be 'edgeR', 'DESeq2', or 'voom' 
 #' @param p_adjust Character string for p-value correction method, refer to 
 #' ?p.adjust() for valid options. Defaults to "BH" (Benjamini & Hochberg)
->>>>>>> develop
 #' @param comparisons `data.frame` with columns for "Control" and "Test"
 #'   containing the different comparisons of interest. Comparisons will be made
 #'   between the Test and the corresponding Control  If left NULL, then all
@@ -149,7 +139,6 @@ diffexp_seq <- function(omicsData, method = "edgeR", p_adjust = "BH",
 #' @param ... additional arguments passed to methods functions. Note, formatting
 #'   option changes will interfere with wrapping functionality.
 #' @param ... additional arguments passed to function
-<<<<<<< HEAD
 #'
 #' @details Runs default DESeq workflow. Defaults to Wald test, no independent
 #'   filtering, and running in parallel. Additional arguments can be passed for
@@ -159,17 +148,6 @@ diffexp_seq <- function(omicsData, method = "edgeR", p_adjust = "BH",
 #'   Flags (signatures) -	Indicator of statistical significance for computed
 #'   test. Zeros indicate no significance, while +/- 1 indicates direction of
 #'   significance.
-=======
-#' 
-#' @details Runs default DESeq workflow. Defaults to Wald test, no independent filtering, and 
-#' running in parallel. Additional arguments can be passed for use in the function, 
-
-#' refer to DESeq() and results() in DESeq2 package. Requires 'survival' package to run.
-#'
-#' Flags (signatures) -	Indicator of statistical significance for computed test. 
-#' Zeros indicate no significance, while +/- 1 indicates direction of significance.
-
->>>>>>> develop
 #'
 #' @references 
 #'  
@@ -1087,10 +1065,16 @@ get_group_formula <- function(omicsData){
 #' @param custom_theme a ggplot `theme` object to be applied to non-interactive
 #'   plots, or those converted by plotly::ggplotly().
 #'
-#' @details  DESeq2 option requires package "survival" to be available.
+#' @details DESeq2 option requires package "survival" to be available.
 #'
 #' @return plot result
-#'
+#' 
+#' @examples 
+#' library(pmartRdata)
+#' myseqData <- group_designation(omicsData = rnaseq_object, main_effects = "Virus")
+#' dispersion_est(omicsData = myseqData, method = "edgeR")
+#' dispersion_est(omicsData = myseqData, method = "DESeq2")
+#' dispersion_est(omicsData = myseqData, method = "voom")
 #'
 #' @references 
 #'  Robinson MD, McCarthy DJ, Smyth GK (2010). “edgeR: a Bioconductor package 

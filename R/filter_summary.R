@@ -14,10 +14,6 @@
 #'   numbers reported by the summary are based on groups and/or batches.
 #'   
 #' @examples
-<<<<<<< HEAD
-=======
-#' \dontrun{
->>>>>>> develop
 #' library(pmartRdata)
 #' myfilter <- molecule_filter(omicsData = pep_object)
 #' summary(filter_object = myfilter)
@@ -121,10 +117,6 @@ print.moleculeFilterSummary <- function(object){
 #'   non-zero observations over the total number of biomolecules.
 #'
 #' @examples
-<<<<<<< HEAD
-=======
-#' \dontrun{
->>>>>>> develop
 #' library(pmartRdata)
 #' myfilter <- RNA_filter(omicsData = rnaseq_object)
 #' summary(filter_object = myfilter)
