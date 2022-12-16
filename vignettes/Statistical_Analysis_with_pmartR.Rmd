@@ -141,7 +141,7 @@ In practice, the covariate adjustment is applied then the one-factor ANOVA model
 
 ### Paired Data
 
-The comparison of samples at two points from the same individual (e.g., a before and after state) is common in omics experiments and referred to as “paired data.” Functions in `pmartR` impacted by the use of paired data have been updated to properly handle paired data throughout the package.
+The comparison of samples at two points in time from the same individual (e.g., a before and after state) is common in omics experiments and referred to as “paired data.” To enable analysis of paired data in `pmartR`, we have implemented a method for specifying pair information and added appropriate code to any `pmartR` functions impacted by the use of paired data.
 
 If data are paired, this should be specified using the `group_designation` function. Users can also designate which member of a pair is the “control” or “reference.”
 

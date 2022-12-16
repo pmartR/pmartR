@@ -172,6 +172,7 @@ After filtering out any transcripts and/or samples above, we may wish to do some
 #### Correlation Heatmap
 
 A Spearman correlation heatmap shows a couple of samples with lower correlation than the rest, but neither of these are 
+
 - Strain B 3 D
 
 - Strain C 1 E
@@ -204,19 +205,15 @@ For RNAseq data there are three methods available via `pmartR` for making statis
 
 - limma-voom [@limmavoom]
 
-GIVE GUIDANCE/TABLE WITH PROS AND CONS OF EACH METHOD? 
-
-Here we utilize all three for demonstration purposes, but in practice a single method should be utilized, the selection of which can be guided by visual inspection of dispersion plots for each method. After using the `diffexp_seq` function to perform statistical comparisons with the selected method, `plot` and `summary` methods are available to help display the results, and the data frame returned by the `diffexp_seq` function can be saved as an Excel file or another useful format if helpful.
+Here we utilize all three for demonstration purposes, but in practice a single method should be utilized, the selection of which can be guided by visual inspection of dispersion plots for each method via `dispersion_est`. After using the `diffexp_seq` function to perform statistical comparisons with the selected method, `plot` and `summary` methods are available to help display the results, and the data frame returned by the `diffexp_seq` function can be saved as an Excel file or another useful format if helpful.
 
 
 ### edgeR Method
 
 We examine the dispersion plot for use of the edgeR method. 
 
-- HOW DO YOU SHOW THIS??
-
 ```{r}
-
+dispersion_est(omicsData = myseq, method = "edgeR")
 ```
 
 
@@ -229,11 +226,10 @@ Various plot types are available to display the results of the statistical compa
 
 - WHAT ARE THE plot_method SYNTAX options here? Not seeing those in the documentation, but maybe it's on Rachel's latest round of updates? In her notes, she said "Plot of stat results - option for either volcano or MA plot, heat maps with option to subset to most significant molecules (based on p-value)"
 
-```{r}
+```{r warning=FALSE}
 plot(stats_edger, plot_type = "volcano")
-
-# plot(stats_edger, plot_type = "MA") # errors out
-
+plot(stats_edger, plot_type = "bar")
+plot(stats_edger, plot_type = "ma") 
 ```
 
 ### DESeq2 Method
@@ -241,49 +237,44 @@ plot(stats_edger, plot_type = "volcano")
 We examine the dispersion plot for use of the DESeq2 method.
 
 ```{r}
-
+dispersion_est(omicsData = myseq, method = "DESeq2")
 ```
 
 If we are satisfied with using this method for our statistical comparisons between virus strains, we can do so as follows.
 
 ```{r}
-stats_deseq <- diffexp_seq(omicsData = myseq, method = "deseq2")
-
-
+stats_deseq <- diffexp_seq(omicsData = myseq, method = "DESeq2")
 ```
 
 Various plot types are available to display the results of the statistical comparisons.
 
-```{r}
+```{r warning=FALSE}
 plot(stats_deseq, plot_type = "volcano")
+plot(stats_deseq, plot_type = "bar")
+plot(stats_deseq, plot_type = "ma") 
 ```
 
 ### limma-voom Method
 
-We examine the dispersion plot for use of the DESeq2 method.
+We examine the dispersion plot for use of the voom method.
 
 ```{r}
-
+dispersion_est(omicsData = myseq, method = "voom")
 ```
 
 If we are satisfied with using this method for our statistical comparisons between virus strains, we can do so as follows.
 
 ```{r}
-stats_voom <- diffexp_seq(omicsData = myseq, method = "limma-voom")
-
-
+stats_voom <- diffexp_seq(omicsData = myseq, method = "voom")
 ```
 
 Various plot types are available to display the results of the statistical comparisons.
 
-```{r}
+```{r warning=FALSE}
 plot(stats_voom, plot_type = "volcano")
-
-
+plot(stats_voom, plot_type = "bar")
+plot(stats_voom, plot_type = "ma") 
 ```
-
-
-
 
 
 
