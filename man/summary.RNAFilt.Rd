@@ -27,10 +27,6 @@ a summary table giving the minimum, maximum, 1st and 3rd quartiles,
 Provide summary of a RNAFilt S3 object
 }
 \examples{
-<<<<<<< HEAD
-=======
-\dontrun{
->>>>>>> develop
 library(pmartRdata)
 myfilter <- RNA_filter(omicsData = rnaseq_object)
 summary(filter_object = myfilter)

@@ -14,12 +14,13 @@ DESeq2_wrapper(
 )
 }
 \arguments{
-\item{omicsData}{an object of type 'seqData', created by
-\code{\link{as.seqData}}}
+\item{omicsData}{an object of type 'seqData', created by \code{\link{as.seqData}}}
 
-\item{test}{an object of type 'seqData', created by \code{\link{as.seqData}}}
+\item{test}{either "Wald" or "LRT", which will then use either Wald 
+significance tests, or the likelihood ratio test on the difference in 
+deviance between a full and reduced model formula}
 
-\item{p_adjust}{Character string for p-value correction method, refer to
+\item{p_adjust}{Character string for p-value correction method, refer to 
 ?p.adjust() for valid options. Defaults to "BH" (Benjamini & Hochberg)}
 
 \item{comparisons}{`data.frame` with columns for "Control" and "Test"
@@ -32,8 +33,8 @@ significance threshold}
 
 \item{...}{additional arguments passed to function}
 
-\item{method}{a character string of length one specifying which wrapper to
-use. Can be 'edgeR', 'DESeq2', or 'limma-voom'}
+\item{method}{a character string of length one specifying which wrapper to use. 
+Can be 'edgeR', 'DESeq2', or 'voom'}
 }
 \value{
 statRes object

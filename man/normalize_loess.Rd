@@ -34,11 +34,6 @@ A wrapper for the normalizeCyclicLoess function from the limma
 package.
 }
 \examples{
-<<<<<<< HEAD
-=======
-\dontrun{
-library(pmartR)
->>>>>>> develop
 library(pmartRdata)
 mypep <- edata_transform(pep_object, "log2")
 result <- normalize_loess(mypep)

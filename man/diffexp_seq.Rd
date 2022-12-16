@@ -18,7 +18,7 @@ diffexp_seq(
 \code{\link{as.seqData}}}
 
 \item{method}{character string of length one specifying which wrapper to
-use. Can be 'edgeR', 'DESeq2', or 'limma-voom'}
+use. Can be 'edgeR', 'DESeq2', or 'voom'}
 
 \item{p_adjust}{character string for p-value correction method, refer to
 ?p.adjust() for valid options. Defaults to "BH" (Benjamini & Hochberg).}
@@ -57,7 +57,7 @@ independent filtering, and running in parallel. Additional arguments can be
 passed for use in the function. Refer to DESeq() and results() in DESeq2
 package. Requires 'survival' package to run.
 
-Method "limma-voom" - Runs default limma-voom workflow using empirical Bayes
+Method "voom" - Runs default limma-voom workflow using empirical Bayes
 moderated t-statistics. Additional arguments can be passed for use in the
 function. Refer to calcNormFactors() in edgeR package.
 }
@@ -66,7 +66,7 @@ library(pmartRdata)
 myseqData <- group_designation(omicsData = rnaseq_object, main_effects = "Virus")
 edger_results <- diffexp_seq(omicsData = myseqData, method = "edgeR")
 deseq_results <- diffexp_seq(omicsData = myseqData, method = "DESeq2")
-voom_results <- diffexp_seq(omicsData = myseqData, method = "limma-voom")
+voom_results <- diffexp_seq(omicsData = myseqData, method = "voom")
 
 }
 \references{
