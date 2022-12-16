@@ -34,7 +34,9 @@ Imports:
     RColorBrewer,
     magrittr,
     patchwork,
-    glmpca
+    glmpca,
+    edgeR,
+    DESeq2
 Suggests:
     knitr,
     rmarkdown,
