@@ -11,7 +11,7 @@
 #' @return The normalized data is returned in an object of the appropriate S3 class (e.g. pepData), on the same scale as omicsData (e.g. if omicsData contains log2 transformed data, the normalization will be performed on the non-log2 scale and then re-scaled after normalization to be returned on the log2 scale).
 #' 
 #' @examples
-#' dontrun{
+#' \dontrun{
 #' library(pmartR)
 #' library(pmartRdata)
 #' pep_object = edata_transform(pep_object, "log2")

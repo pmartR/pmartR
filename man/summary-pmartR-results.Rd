@@ -32,7 +32,7 @@ a summary table or list for the pmartR results object.
 This function will provide basic summary statistics for results objects from the pmartR package.
 }
 \examples{
-dontrun{
+\dontrun{
 library(pmartRdata)
 data("pep_object")
 

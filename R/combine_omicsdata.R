@@ -70,21 +70,21 @@ combine_lipidData <- function(obj_1, obj_2, retain_groups = FALSE, retain_filter
   if(attr(obj_1, "data_info")$data_scale != 
      attr(obj_2, "data_info")$data_scale) {
     stop(sprintf(
-      "Objects must be on the same scale, found %s and %s"),
+      "Objects must be on the same scale, found %s and %s",
       attr(obj_1, "data_info")$data_scale,
       attr(obj_2, "data_info")$data_scale
-    ) 
+    ))
   }
   
   same_nsamps = attr(obj_1, "data_info")$num_samps == attr(obj_2, "data_info")$num_samps
   samps_diff = setdiff(
     union(
       obj_1$f_data[, get_fdata_cname(obj_1)],
-      obj_1$f_data[, get_fdata_cname(obj_2)]
+      obj_2$f_data[, get_fdata_cname(obj_2)]
     ),
     intersect(
       obj_1$f_data[, get_fdata_cname(obj_1)],
-      obj_1$f_data[, get_fdata_cname(obj_2)]
+      obj_2$f_data[, get_fdata_cname(obj_2)]
     )
   )
   

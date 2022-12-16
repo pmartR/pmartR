@@ -10,7 +10,7 @@
 #' @return data object of the same class as omicsData
 #'
 #' @examples
-#' dontrun{
+#' \dontrun{
 #' library(pmartRdata)
 #' data(metab_object)
 #' metab_object2 <- edata_transform(omicsData = metab_object, data_scale="log2")

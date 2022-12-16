@@ -22,7 +22,7 @@ a list of three data frames Normalized_Data, DA_Test_Results, and DA_"data type"
 Creates a list of three sheets, Normalized Data, DA Test Results, and Only DA biomolecules - for OMICS project
 }
 \examples{
-dontrun{
+\dontrun{
 library(pmartR)
 library(pmartRdata)
 

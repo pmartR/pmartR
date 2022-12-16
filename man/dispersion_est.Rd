@@ -76,6 +76,9 @@ plot result
 \description{
 For generating statistics for 'seqData' objects
 }
+\details{
+DESeq2 option requires package "survival" to be available.
+}
 \examples{
 \dontrun{
 

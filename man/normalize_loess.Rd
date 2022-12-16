@@ -23,7 +23,7 @@ Perform Loess normalization
 A wrapper for the normalizeCyclicLoess function from the limma package.
 }
 \examples{
-dontrun{
+\dontrun{
 library(pmartR)
 library(pmartRdata)
 pep_object = edata_transform(pep_object, "log2")
