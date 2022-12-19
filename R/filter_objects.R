@@ -273,18 +273,29 @@ total_count_filter <- function (omicsData) {
   samp_sum <- apply(temp_data, 2, sum, na.rm = TRUE) + 1
   div_sum <- sweep((temp_data + .5), 2, samp_sum, `/`)
   lcpm <- log2(div_sum * 10^6)
-  lcpm[[get_edata_cname(omicsData)]] <- omicsData$e_data[[id_col]]
+  
+  ## prevent arrange issue where fdata_cname == edata_cname
+  idvar <- ifelse(get_edata_cname(omicsData) == get_fdata_cname(omicsData), 
+                  paste0(get_edata_cname(omicsData), " (biomolecules)"), 
+                  get_edata_cname(omicsData))
+  
+  lcpm[[idvar]] <- omicsData$e_data[[id_col]]
+  
+  varname <- ifelse(get_edata_cname(omicsData) == get_fdata_cname(omicsData), 
+                  paste0(get_fdata_cname(omicsData), " (samples)"),
+                  get_fdata_cname(omicsData))
+  
   density_data <- reshape2::melt(lcpm, 
-                                 id.var = get_edata_cname(omicsData),
-                                 variable.name = get_fdata_cname(omicsData),
+                                 id.var = idvar,
+                                 variable.name = varname,
                                  value.name = "lcpm")
   
-  density_data[[get_edata_cname(omicsData)]] <- as.character(density_data[[get_edata_cname(omicsData)]])
-  density_data[[get_fdata_cname(omicsData)]] <- as.character(density_data[[get_fdata_cname(omicsData)]])
+  density_data[[idvar]] <- as.character(density_data[[idvar]])
+  density_data[[varname]] <- as.character(density_data[[varname]])
   
   density_data <- dplyr::arrange(density_data, 
-                          !!rlang::sym(get_edata_cname(omicsData)),
-                          !!rlang::sym(get_fdata_cname(omicsData)), 
+                          !!rlang::sym(idvar),
+                          !!rlang::sym(varname), 
                           lcpm)
   row.names(output) <- NULL
   
@@ -359,7 +370,7 @@ RNA_filter <- function (omicsData) {
   
   output <- dplyr::arrange(output, SampleID, LibrarySize, NonZero, ProportionNonZero)
   row.names(output) <- NULL
-  colnames(output) <- c(get_edata_cname(omicsData), "LibrarySize", 
+  colnames(output) <- c(get_fdata_cname(omicsData), "LibrarySize", 
                         "NonZero", "ProportionNonZero")
   
   # Extract the 'data.frame' class from the the output data frame.

@@ -196,11 +196,11 @@ summary.RNAFilt <- function(filter_object,
   df <- as.data.frame(apply(temp_obj[-1], 2, summary))
   df["SD",] <- apply(temp_obj[-1], 2, sd)
   
-  rmved <- !(filter_object$SampleID %in% temp_obj$SampleID)
+  rmved <- !(filter_object[[get_fdata_cname(omicsData)]] %in% temp_obj[[get_fdata_cname(omicsData)]])
   
   res <- list(
     Summary = df,
-    samples_filtered = filter_object$SampleID[rmved],
+    samples_filtered = filter_object[[get_fdata_cname(omicsData)]][rmved],
     num_filtered = sum(rmved),
     num_not_filtered = sum(!rmved),
     nonzero_thresh = min_nonzero,

@@ -5727,11 +5727,12 @@ plot.statRes <- function (x,
     
     plotter <- purrr::map_dfr(1:length(comps), function(n_comp){
       label <- attr(x, "comparisons")[n_comp]
-      comp <- paste("Mean", comps[[n_comp]], sep = "_")
+      comp <- comps[[n_comp]]
+      mean_df <- attr(x, "MA_means")
       pval <-  grep(paste0("^P_value_.+", label), colnames(x), value = T)
       
-      v1 <- x[[comp[1]]]
-      v2 <- x[[comp[2]]]
+      v1 <- mean_df[[comp[1]]]
+      v2 <- mean_df[[comp[2]]]
       v3 <- x[[pval]]
       
       if(length(v1) == 0){
