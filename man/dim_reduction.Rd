@@ -47,13 +47,15 @@ pca_seq <- dim_reduction(omicsData = myseq)
 
 }
 \references{
-Redestig, H., Stacklies, W., Scholz, M., Selbig, J., & Walther,
-  D. (2007). \emph{pcaMethods - a bioconductor package providing PCA methods
+Redestig H, Stacklies W, Scholz M, Selbig J, & Walther
+  D (2007). \emph{pcaMethods - a bioconductor package providing PCA methods
   for incomplete data}. Bioinformatics. 23(9): 1164-7.
   
- @references Implements a generalized version of principal components
-   analysis (GLM-PCA) for dimension reduction of non-normally distributed
-   data such as counts or binary matrices. Townes FW, Hicks SC, Aryee MJ,
-   Irizarry RA (2019) <doi:10.1186/s13059-019-1861-6>. Townes FW (2019)
-   <arXiv:1907.02647>.
+  Townes FW, Hicks SC, Aryee MJ, Irizarry RA (2019). \emph{Feature selection
+  and dimension reduction for single-cell RNA-seq based on a multinomial
+  model.} Genome Biol. 20, 1–16.
+  
+  Huang H, Wang Y, Rudin C, Browne EP (2022). \emph{Towards a comprehensive
+  evaluation of dimension reduction methods for transcriptomic data
+  visualization.} Communications Biology 5, 719.
 }
