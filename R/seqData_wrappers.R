@@ -242,12 +242,12 @@ DESeq2_wrapper <- function(
   e_data_counts <- omicsData$e_data[colnames(omicsData$e_data) != edata_cname]
   grouping_info <- grouping_info[colnames(grouping_info) != fdata_cname]
   
-    edata_deseq <- DESeq2::DESeqDataSetFromMatrix(
+    edata_deseq <- suppressWarnings(DESeq2::DESeqDataSetFromMatrix(
       e_data_counts, 
       colData = grouping_info,
       design = as.formula(stringr::str_remove(
         grouping_formula, "0 \\+")) ## The zero does wonky things with covariates
-    )
+    ))
     
     dds <- DESeq2::estimateSizeFactors(edata_deseq) # run this or DESeq() first
     norm_factors_apply <- DESeq2::counts(dds, normalized=TRUE)
@@ -879,12 +879,14 @@ voom_wrapper <- function(
         contrasts = all_contrasts[n], 
         levels = checker)
       
-      tmp <- limma::contrasts.fit(limma_vfit, CONTRASTS)
+      ## Suppress name difference warnings
+      tmp <- suppressWarnings(limma::contrasts.fit(limma_vfit, CONTRASTS))
       
     } else {
       
       get_coef <- which(checker %in% combo[checkin])
-      tmp <- limma::contrasts.fit(limma_vfit, coefficients = get_coef)
+      ## Suppress name difference warnings
+      tmp <- suppressWarnings(limma::contrasts.fit(limma_vfit, coefficients = get_coef))
       
     }
 
@@ -1240,11 +1242,11 @@ dispersion_est <- function(omicsData, method,
     cols <- if (is.null(palette)) c("black","blue", "red") else RColorBrewer::brewer.pal(3, palette)
     
     ## DESeq workflow
-    edata_deseq <- DESeq2::DESeqDataSetFromMatrix(
+    edata_deseq <- suppressWarnings(DESeq2::DESeqDataSetFromMatrix(
       e_data_counts, 
       colData = grouping_info,
       design = as.formula(grouping_formula)
-    )
+    ))
     
     dds <- DESeq2::estimateSizeFactors(edata_deseq)
     dds <- DESeq2::estimateDispersions(dds)
