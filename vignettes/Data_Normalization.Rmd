@@ -114,11 +114,10 @@ The option to backtransform the data after either of these NMR normalizations is
 We'll use the example NMR dataset from the `pmartRdata` package.
 
 ```{r}
-mynmr <- data(nmr_object_identified)
-summary(mynmr)
+summary(nmr_identified_object)
 
 # log2 transform the values
-nmr_object <- edata_transform(omicsData = mynmr, data_scale = "log2")
+nmr_object <- edata_transform(omicsData = nmr_identified_object, data_scale = "log2")
 ```
 
 

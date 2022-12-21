@@ -220,18 +220,18 @@ If we would rather see count information in the bar plot instead of proportions,
 we can easily set proportion to FALSE. 
 
 ```{r}
-# Pull from the smoking dataset
-smoke_trelliData <- as.trelliData.edata(
-  e_data = pmartRdata::smoke_edata,
-  edata_cname = "Mass_Tag_ID",
+# Pull from the peptide dataset
+pep_trelliData <- as.trelliData.edata(
+  e_data = pmartRdata::pep_edata,
+  edata_cname = "Peptide",
   omics_type = "pepData"
 )
 # Create an example bar plot 
-Miss_Bar_Edata <- trelli_missingness_bar(trelli_panel_by(smoke_trelliData, "Mass_Tag_ID"), 
+Miss_Bar_Edata <- trelli_missingness_bar(trelli_panel_by(pep_trelliData, "Peptide"), 
                                          single_plot = TRUE, test_example = 3,
                                          ggplot_params = "ggtitle('Biomolecule')")
 # Make a missingness barplot 
-Miss_Bar_Sample <- trelli_missingness_bar(trelli_panel_by(smoke_trelliData, "Sample"), 
+Miss_Bar_Sample <- trelli_missingness_bar(trelli_panel_by(pep_trelliData, "Sample"), 
                                           include_points = F, 
                                           proportion = FALSE, single_plot = T,
                                           ggplot_params = "ggtitle('Sample')")
