@@ -907,12 +907,10 @@ set_check_names <- function (omicsData, set_to = TRUE) {
 #'   objects in \code{\link{format_data}}
 #' @return returns a data frame with comparisons and their indices
 #' @examples
-#' \dontrun{
-#' library(pmartR)
 #' library(pmartRdata)
 #'
 #' my_prodata = group_designation(omicsData = pro_object,
-#'                                main_effects = c("Condition"))
+#'                                main_effects = c("Phenotype"))
 #'
 #' imdanova_Filt = imdanova_filter(omicsData = my_prodata)
 #' 
@@ -922,10 +920,10 @@ set_check_names <- function (omicsData, set_to = TRUE) {
 #'                        
 #' imd_anova_res = imd_anova(omicsData = my_prodata,
 #'                           test_method = 'comb',
-#'                           pval_adjust='bon')
+#'                           pval_adjust_a ='bon',
+#'                           pval_adjust_g = 'bon')
 #'
 #' result = get_comparisons(imd_anova_res)
-#' }
 #'
 #' @export
 #' @name get_comparisons
@@ -968,11 +966,10 @@ get_comparisons<- function(compObj){
 #'   object
 #'
 #' @examples
-#' \dontrun{
 #' library(pmartRdata)
 #'
 #' my_prodata = group_designation(omicsData = pro_object,
-#'                                main_effects = c("Condition"))
+#'                                main_effects = c("Phenotype"))
 #'
 #' imdanova_Filt = imdanova_filter(omicsData = my_prodata)
 #'
@@ -982,10 +979,10 @@ get_comparisons<- function(compObj){
 #'
 #' imd_anova_res = imd_anova(omicsData = my_prodata,
 #'                           test_method = 'comb',
-#'                           pval_adjust='bon')
+#'                           pval_adjust_a ='bon',
+#'                           pval_adjust_g = 'bon')
 #'
 #' result = get_data_class(imd_anova_res)
-#' }
 #'
 #' @export
 #' @name get_data_class
