@@ -43,13 +43,13 @@ p-value adjustment.}
 
 \item{pval_adjust_a_fdr}{A character string specifying the type of FDR
 adjustment to implement for ANOVA tests. Valid options include:
-"bonferroni", "holm", "tukey", and "dunnett". The default is "none" which
-corresponds to no p-value adjustment.}
+"bonferroni" and "holm". The default is "none" which corresponds to no
+p-value adjustment.}
 
 \item{pval_adjust_g_fdr}{A character string specifying the type of FDR
 adjustment to implement for G-test tests. Valid options include:
-"bonferroni" and "holm". The default is "none" which
-corresponds to no p-value adjustment.}
+"bonferroni" and "holm". The default is "none" which corresponds to no
+p-value adjustment.}
 
 \item{pval_thresh}{numeric p-value threshold, below or equal to which
 peptides are considered differentially expressed. Defaults to 0.05}

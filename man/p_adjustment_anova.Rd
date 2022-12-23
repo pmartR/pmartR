@@ -24,7 +24,7 @@ p_adjustment_anova(
 
 \item{pval_adjust_multcomp}{character vector specifying the type of multiple comparisons adjustment to implement. A NULL value corresponds to no adjustment. Valid options include: holm, bonferroni, dunnett, tukey or none.}
 
-\item{pval_adjust_fdr}{character vector specifying the type of FDR adjustment to implement. A NULL value corresponds to no adjustment. Valid options include: holm, bonferroni, dunnett, tukey or none.}
+\item{pval_adjust_fdr}{character vector specifying the type of FDR adjustment to implement. A NULL value corresponds to no adjustment. Valid options include: holm, bonferroni, or none.}
 }
 \value{
 a data frame with the following columns: group means, global G-test statistic and corresponding p-value
