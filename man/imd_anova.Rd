@@ -9,8 +9,10 @@ imd_anova(
   omicsData,
   comparisons = NULL,
   test_method,
-  pval_adjust_a = "none",
-  pval_adjust_g = "none",
+  pval_adjust_a_multcomp = "none",
+  pval_adjust_g_multcomp = "none",
+  pval_adjust_a_fdr = "none",
+  pval_adjust_g_fdr = "none",
   pval_thresh = 0.05,
   equal_var = TRUE,
   use_parallel = TRUE
@@ -29,15 +31,25 @@ pairwise comparisons are executed.}
 "combined", "gtest", or "anova". "combined" implements both the gtest and
 anova filters.}
 
-\item{pval_adjust_a}{A character string specifying the type of multiple
+\item{pval_adjust_a_multcomp}{A character string specifying the type of multiple
 comparison adjustment to implement for ANOVA tests. Valid options include:
 "bonferroni", "holm", "tukey", and "dunnett". The default is "none" which
 corresponds to no p-value adjustment.}
 
-\item{pval_adjust_g}{A character string specifying the type of multiple
+\item{pval_adjust_g_multcomp}{A character string specifying the type of multiple
 comparison adjustment to implement for G-test tests. Valid options include:
 "bonferroni" and "holm". The default is "none" which corresponds to no
 p-value adjustment.}
+
+\item{pval_adjust_a_fdr}{A character string specifying the type of FDR
+adjustment to implement for ANOVA tests. Valid options include:
+"bonferroni", "holm", "tukey", and "dunnett". The default is "none" which
+corresponds to no p-value adjustment.}
+
+\item{pval_adjust_g_fdr}{A character string specifying the type of FDR
+adjustment to implement for G-test tests. Valid options include:
+"bonferroni" and "holm". The default is "none" which
+corresponds to no p-value adjustment.}
 
 \item{pval_thresh}{numeric p-value threshold, below or equal to which
 peptides are considered differentially expressed. Defaults to 0.05}
@@ -84,9 +96,9 @@ tcga_ovarian_pepdata_bp <- as.pepData(e_data = tcga_ovarian_pepdata_bp$e_data, f
 tcga_ovarian_pepdata_bp <- group_designation(omicsData = tcga_ovarian_pepdata_bp, main_effects = c("race"))
 ovarian_res <- imd_anova(omicsData = tcga_ovarian_pepdata_bp, test_method = 'anova')
 #Tukey adjustment is super slow right now because "ptukey" is super slow, not sure how to fix that
-ovarian_res_holm <- imd_anova(omicsData = tcga_ovarian_pepdata_bp, pval_adjust = 'holm', test_method='gtest')
+ovarian_res_holm <- imd_anova(omicsData = tcga_ovarian_pepdata_bp, pval_adjust_g_multcomp = 'holm', test_method='gtest')
 #Dunnett adjustment, should give an error because dunnett correction shouldn't be applied for all pairwise comparisons
-ovarian_res_dunnett <- imd_anova(omicsData = tcga_ovarian_pepdata_bp, pval_adjust = 'dunnett', test_method='combined')
+ovarian_res_dunnett <- imd_anova(omicsData = tcga_ovarian_pepdata_bp, pval_adjust_a_multcomp = 'dunnett', pval_adjust_g_multcomp = 'dunnett', test_method='combined')
 
 #Test really big dataset, two factors
 tcga_ovarian_pepdata_bp <- group_designation(omicsData = tcga_ovarian_pepdata_bp, main_effects = c("vital_status","neoplasm_histologic_grade"))

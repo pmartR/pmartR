@@ -12,14 +12,22 @@
 #' @param test_method character string specifying the filter method to use:
 #'   "combined", "gtest", or "anova". "combined" implements both the gtest and
 #'   anova filters.
-#' @param pval_adjust_a A character string specifying the type of multiple
+#' @param pval_adjust_a_multcomp A character string specifying the type of multiple
 #'   comparison adjustment to implement for ANOVA tests. Valid options include:
 #'   "bonferroni", "holm", "tukey", and "dunnett". The default is "none" which
 #'   corresponds to no p-value adjustment.
-#' @param pval_adjust_g A character string specifying the type of multiple
+#' @param pval_adjust_g_multcomp A character string specifying the type of multiple
 #'   comparison adjustment to implement for G-test tests. Valid options include:
 #'   "bonferroni" and "holm". The default is "none" which corresponds to no
 #'   p-value adjustment.
+#' @param pval_adjust_a_fdr A character string specifying the type of FDR
+#'   adjustment to implement for ANOVA tests. Valid options include:
+#'   "bonferroni", "holm", "tukey", and "dunnett". The default is "none" which
+#'   corresponds to no p-value adjustment.
+#' @param pval_adjust_g_fdr A character string specifying the type of FDR
+#'   adjustment to implement for G-test tests. Valid options include:
+#'   "bonferroni" and "holm". The default is "none" which
+#'   corresponds to no p-value adjustment.
 #' @param pval_thresh numeric p-value threshold, below or equal to which
 #'   peptides are considered differentially expressed. Defaults to 0.05
 #' @param use_parallel A logical value indicating whether or not to use a
@@ -67,9 +75,9 @@
 #' tcga_ovarian_pepdata_bp <- group_designation(omicsData = tcga_ovarian_pepdata_bp, main_effects = c("race"))
 #' ovarian_res <- imd_anova(omicsData = tcga_ovarian_pepdata_bp, test_method = 'anova')
 #' #Tukey adjustment is super slow right now because "ptukey" is super slow, not sure how to fix that
-#' ovarian_res_holm <- imd_anova(omicsData = tcga_ovarian_pepdata_bp, pval_adjust = 'holm', test_method='gtest')
+#' ovarian_res_holm <- imd_anova(omicsData = tcga_ovarian_pepdata_bp, pval_adjust_g_multcomp = 'holm', test_method='gtest')
 #' #Dunnett adjustment, should give an error because dunnett correction shouldn't be applied for all pairwise comparisons
-#' ovarian_res_dunnett <- imd_anova(omicsData = tcga_ovarian_pepdata_bp, pval_adjust = 'dunnett', test_method='combined')
+#' ovarian_res_dunnett <- imd_anova(omicsData = tcga_ovarian_pepdata_bp, pval_adjust_a_multcomp = 'dunnett', pval_adjust_g_multcomp = 'dunnett', test_method='combined')
 #'
 #' #Test really big dataset, two factors
 #' tcga_ovarian_pepdata_bp <- group_designation(omicsData = tcga_ovarian_pepdata_bp, main_effects = c("vital_status","neoplasm_histologic_grade"))
@@ -85,8 +93,10 @@
 imd_anova <- function (omicsData,
                        comparisons = NULL,
                        test_method,
-                       pval_adjust_a = 'none',
-                       pval_adjust_g = 'none',
+                       pval_adjust_a_multcomp = 'none',
+                       pval_adjust_g_multcomp = 'none',
+                       pval_adjust_a_fdr = 'none',
+                       pval_adjust_g_fdr = 'none',
                        pval_thresh = 0.05,
                        equal_var = TRUE,
                        use_parallel = TRUE) {
@@ -220,7 +230,7 @@ imd_anova <- function (omicsData,
   # }
 
   # Check if combined results was selected.
-  if (test_method == "combined" && pval_adjust_a != pval_adjust_g) {
+  if (test_method == "combined" && pval_adjust_a_multcomp != pval_adjust_g_multcomp) {
 
     # Dear pmartR user,
     #
@@ -232,8 +242,8 @@ imd_anova <- function (omicsData,
     #                                                 Sincerely,
     #                                                 pmartR programmer
     message(paste("The p-value adjustment method selected for ANOVA and G-test",
-                  "are different. Check the input to pval_adjust_a and",
-                  "pval_adjust_g.",
+                  "are different. Check the input to pval_adjust_a_multcomp and",
+                  "pval_adjust_g_multcomp.",
                   sep = " "))
 
   }
@@ -241,33 +251,33 @@ imd_anova <- function (omicsData,
   # Farm boy, check the inputs. Farm boy, fix all the problems. Farm boy, hurry
   # up. Farm boy, why is the user an idiot? Farm boy, make everything uniform.
   # Farm boy, do all the tedious crap. AS YOU WISH!
-  pval_adjust_a <- try(
-    match.arg(tolower(pval_adjust_a),
+  pval_adjust_a_multcomp <- try(
+    match.arg(tolower(pval_adjust_a_multcomp),
               c("bonferroni", "tukey", "dunnett", "holm", "none")),
     silent = TRUE
   )
-  if (class(pval_adjust_a) == 'try-error') {
+  if (class(pval_adjust_a_multcomp) == 'try-error') {
 
     # I clearly told you what you could choose from in the documentation.
     # Obviously it is too much to ask for you to read the instructions!
     stop (
-      paste("The available options for pval_adjust_a are: 'bonferroni',",
+      paste("The available options for pval_adjust_a_multcomp are: 'bonferroni',",
             "'holm', 'tukey', 'dunnett', and 'none'.",
             sep = " ")
     )
 
   }
-  pval_adjust_g <- try(
-    match.arg(tolower(pval_adjust_g),
+  pval_adjust_g_multcomp <- try(
+    match.arg(tolower(pval_adjust_g_multcomp),
               c("bonferroni", "holm", "none")),
     silent = TRUE
   )
-  if (class(pval_adjust_g) == 'try-error') {
+  if (class(pval_adjust_g_multcomp) == 'try-error') {
 
     # I cannot make this any easier for you. Please seek the help you
     # desperately need.
     stop (
-      paste("The available options for pval_adjust_g are: 'bonferroni',",
+      paste("The available options for pval_adjust_g_multcomp are: 'bonferroni',",
             "'holm', and 'none'.",
             sep = " ")
     )
@@ -364,7 +374,8 @@ imd_anova <- function (omicsData,
       imd_results_full <- imd_test(omicsData,
                                    groupData = groupData,
                                    comparisons = NULL, # This actually performs all pairwise comparisons.
-                                   pval_adjust = 'none',
+                                   pval_adjust_multcomp = 'none',
+                                   pval_adjust_fdr = 'none',
                                    pval_thresh = pval_thresh,
                                    covariates = NULL,
                                    paired = paired,
@@ -380,7 +391,8 @@ imd_anova <- function (omicsData,
     imd_results_full <- imd_test(omicsData,
                                  groupData = groupData,
                                  comparisons = comparisons,
-                                 pval_adjust = pval_adjust_g,
+                                 pval_adjust_multcomp = pval_adjust_g_multcomp,
+                                 pval_adjust_fdr = pval_adjust_g_fdr,
                                  pval_thresh = pval_thresh,
                                  covariates = covariates,
                                  paired = paired,
@@ -402,7 +414,8 @@ imd_anova <- function (omicsData,
     anova_results_full <- anova_test(omicsData,
                                      groupData = groupData,
                                      comparisons = comparisons,
-                                     pval_adjust = 'none',
+                                     pval_adjust_multcomp = 'none',
+                                     pval_adjust_fdr = 'none',
                                      pval_thresh = pval_thresh,
                                      covariates = NULL,
                                      paired = paired,
@@ -412,7 +425,8 @@ imd_anova <- function (omicsData,
     anova_results_full <- anova_test(omicsData,
                                      groupData = groupData,
                                      comparisons = comparisons,
-                                     pval_adjust = pval_adjust_a,
+                                     pval_adjust_multcomp = pval_adjust_a_multcomp,
+                                     pval_adjust_fdr = pval_adjust_a_fdr,
                                      pval_thresh = pval_thresh,
                                      covariates = covariates,
                                      paired = paired,
@@ -588,8 +602,8 @@ imd_anova <- function (omicsData,
                               omicsData,
                               actual_comparisons,
                               test_method,
-                              pval_adjust_a,
-                              pval_adjust_g,
+                              pval_adjust_a_multcomp,
+                              pval_adjust_g_multcomp,
                               pval_thresh)
 
   attr(final_out, "bpFlags") <- the_flag
@@ -655,10 +669,13 @@ imd_anova <- function (omicsData,
 #'   containing the different comparisons of interest. Comparisons will be made
 #'   between the Test and the corresponding Control  If left NULL, then all
 #'   pairwise comparisons are executed.
-#' @param pval_adjust A character string specifying the type of multiple
+#' @param pval_adjust_multcomp A character string specifying the type of multiple
 #'   comparisons adjustment to implement. The default, "none", corresponds to no
 #'   adjustment. Valid options include: "bonferroni", "holm", "tukey", and
 #'   "dunnett".
+#' @param pval_adjust_fdr A character string specifying the type of FDR adjustment
+#'   to implement. The default, "none", corresponds to no adjustment. Valid
+#'   options include: "bonferroni", "holm", "tukey", and "dunnett".
 #' @param pval_thresh numeric p-value threshold, below or equal to which
 #'   peptides are considered differentially expressed. Defaults to 0.05
 #' @param covariates A character vector with no more than two variable names
@@ -689,8 +706,8 @@ imd_anova <- function (omicsData,
 #'   identification of significant peptides from MS-based proteomics data."
 #'   Journal of proteome research 9.11 (2010): 5748-5756.
 #'
-anova_test <- function (omicsData, groupData, comparisons, pval_adjust,
-                        pval_thresh, covariates, paired, equal_var,
+anova_test <- function (omicsData, groupData, comparisons, pval_adjust_multcomp,
+                        pval_adjust_fdr, pval_thresh, covariates, paired, equal_var,
                         use_parallel) {
 
   #Catch if number of groups is too small
@@ -717,7 +734,7 @@ anova_test <- function (omicsData, groupData, comparisons, pval_adjust,
   #----Check to see if appropriate p-value adjustment technique is chosen----#
   #all pairwise -> Tukey
   #Case versus control -> Dunnett
-  if(length(unique(comparisons$Control))==1 & tolower(pval_adjust)=="tukey" & length(comparisons$Control)>1){
+  if(length(unique(comparisons$Control))==1 & tolower(pval_adjust_multcomp)=="tukey" & length(comparisons$Control)>1){
     stop("Tukey adjustment for multiple comparisions should only be used when all pairwise comparisons are being made; try a 'Dunnett' adjustment.")
   }
 
@@ -1013,7 +1030,8 @@ anova_test <- function (omicsData, groupData, comparisons, pval_adjust,
                                         diff_mean = group_comp$diff_mat,
                                         t_stats = group_comp$t_tests,
                                         sizes = raw_results$group_sizes,
-                                        pval_adjust = pval_adjust)
+                                        pval_adjust_multcomp = pval_adjust_multcomp,
+                                        pval_adjust_fdr = pval_adjust_fdr)
   colnames(p_values_adjust) <- colnames(fold_change)
 
 
@@ -1190,8 +1208,11 @@ paired_test <- function (data, bio_ids, cutoff, use_parallel) {
 #'   containing the different comparisons of interest. Comparisons will be made
 #'   between the Test and the corresponding Control  If left NULL, then all
 #'   pairwise comparisons are executed.
-#' @param pval_adjust A character string specifying the type of multiple
+#' @param pval_adjust_multcomp A character string specifying the type of multiple
 #'   comparisons adjustment to implement. The default setting, "none", is to not
+#'   apply an adjustment. Valid options include: "bonferroni" and "holm".
+#' @param pval_adjust_fdr A character string specifying the type of FDR
+#'   adjustment to implement. The default setting, "none", is to not
 #'   apply an adjustment. Valid options include: "bonferroni" and "holm".
 #' @param pval_thresh numeric p-value threshold, below or equal to which
 #'   peptides are considered differentially expressed. Defaults to 0.05
@@ -1221,7 +1242,7 @@ paired_test <- function (data, bio_ids, cutoff, use_parallel) {
 #' identification of significant peptides from MS-based proteomics data."
 #' Journal of proteome research 9.11 (2010): 5748-5756.
 #'
-imd_test <- function (omicsData, groupData, comparisons, pval_adjust,
+imd_test <- function (omicsData, groupData, comparisons, pval_adjust_multcomp, pval_adjust_fdr,
                       pval_thresh, covariates, paired, use_parallel) {
 
   #Catch if number of groups is too small
@@ -1392,16 +1413,22 @@ imd_test <- function (omicsData, groupData, comparisons, pval_adjust,
   #Implement Bonferonni correction by multiplying by number of tests if requested, otherwise do nothing
 
   if(ncol(pairwise_pvals)==1)
-    pval_adjust <- 'none'
+    pval_adjust_multcomp <- 'none'
 
-  if(pval_adjust=="bonferroni"){
+  if(pval_adjust_multcomp=="bonferroni"){
     adjusted_pvals <- pmin(data.matrix(pairwise_pvals*(ncol(pairwise_pvals))),1)
-  }else if(pval_adjust=="holm"){
+  }else if(pval_adjust_multcomp=="holm"){
     adjusted_pvals <- t(apply(pairwise_pvals,1,ranked_holm_cpp))
     colnames(adjusted_pvals) <- colnames(pairwise_pvals)
   }else{
     adjusted_pvals <- pairwise_pvals
   }
+  
+  # Apply FDR adjustment
+  if (is.null(pval_adjust_fdr))
+    pval_adjust_fdr <- "none"
+  
+  adjusted_pvals <- apply(adjusted_pvals, 2, p.adjust, method = pval_adjust_fdr)
 
   #----- Create significance flag matrix -----#
   sig_indicators <- data.matrix(adjusted_pvals)
@@ -1776,16 +1803,18 @@ create_c_matrix <- function(group_df,to_compare_df=NULL){
 #' @param diff_mean A matrix (or \code{data.frame}) of groups means that are to be compared
 #' @param t_stats A matrix (or \code{data.frame}) of t-test statistics resulting from from standard procedures
 #' @param sizes A matrix (or \code{data.frame}) of group sizes
-#' @param pval_adjust character vector specifying the type of multiple comparisons adjustment to implement. A NULL value corresponds to no adjustment. Valid options include: holm, bonferroni, dunnett, tukey or none.
+#' @param pval_adjust_multcomp character vector specifying the type of multiple comparisons adjustment to implement. A NULL value corresponds to no adjustment. Valid options include: holm, bonferroni, dunnett, tukey or none.
+#' @param pval_adjust_fdr character vector specifying the type of FDR adjustment to implement. A NULL value corresponds to no adjustment. Valid options include: holm, bonferroni, dunnett, tukey or none.
 #'
 #' @return a data frame with the following columns: group means, global G-test statistic and corresponding p-value
 #'
 #' @author Bryan Stanfill
 #'
 p_adjustment_anova <- function (p_values, diff_mean, t_stats,
-                                sizes, pval_adjust) {
+                                sizes, pval_adjust_multcomp,
+                                pval_adjust_fdr) {
 
-  if(pval_adjust=="tukey" | pval_adjust=="dunnett"){
+  if(pval_adjust_multcomp=="tukey" | pval_adjust_multcomp=="dunnett"){
 
     #Tukey-Kramer statistics are t-statistic/sqrt(2)
     if(is.null(t_stats) | is.null(sizes)){
@@ -1796,10 +1825,10 @@ p_adjustment_anova <- function (p_values, diff_mean, t_stats,
 
     if(n_compares==1){
       #Tukey adjustment is not done if only one comparison is provided
-      pval_adjust <- 'none'
+      pval_adjust_multcomp <- 'none'
     }else{
 
-      if(pval_adjust=="tukey"){
+      if(pval_adjust_multcomp=="tukey"){
         tukey_stats <- data.matrix(t_stats*sqrt(2))
         #Tukey only needs sizes for the rows, not individual group sizes
         if(is.data.frame(sizes)){
@@ -1856,21 +1885,21 @@ p_adjustment_anova <- function (p_values, diff_mean, t_stats,
     }
   }
 
-  #Don't make this an "else if" because pval_adjust can be changed to 'none' if n_compares==1
-  if(pval_adjust%in%c('none',"bonferroni","holm")){
+  #Don't make this an "else if" because pval_adjust_multcomp can be changed to 'none' if n_compares==1
+  if(pval_adjust_multcomp%in%c('none',"bonferroni","holm")){
 
     #p_values needs to be supplied to apply bonferroni adjustment, if it's NULL tell them that's a problem
     if(is.null(p_values)){
-      stop("The `p_values` argument must be supplied to perform the selected `pval_adjust` method")
+      stop("The `p_values` argument must be supplied to perform the selected `pval_adjust_multcomp` method")
     }
 
     if(is.null(dim(p_values)) || ncol(p_values)==1){ # leaving this as "||" because only evaluating the 1st argument is fine in this case, as it returns TRUE when p_values is a vector (and thus ncol(p_values) does not compute and using a "|" gives an error)
-      pval_adjust='none'
+      pval_adjust_multcomp='none'
     }
 
-    if(pval_adjust !='holm'){
+    if(pval_adjust_multcomp !='holm'){
       #For bonferroni adjustment, multiply p_values by number of comparisons (columns in p_values) else do no adjustment
-      multiplier <- ifelse(pval_adjust=="bonferroni",ncol(p_values),1)
+      multiplier <- ifelse(pval_adjust_multcomp=="bonferroni",ncol(p_values),1)
       adjusted_pvals <- pmin(data.matrix(multiplier*p_values), 1)
     }else{
       #Rcpp::sourceCpp('src/holm_adjustment.cpp') #For debugging
@@ -1885,6 +1914,12 @@ p_adjustment_anova <- function (p_values, diff_mean, t_stats,
     }
 
   }
+  
+  # FDR adjustment
+  if (is.null(pval_adjust_fdr))
+    pval_adjust_fdr <- "none"
+  
+  adjusted_pvals <- apply(adjusted_pvals, 2, p.adjust, method = pval_adjust_fdr)
 
   #Return the adjusted p-values
 

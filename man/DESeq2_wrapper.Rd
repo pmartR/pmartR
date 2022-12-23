@@ -16,7 +16,9 @@ DESeq2_wrapper(
 \arguments{
 \item{omicsData}{an object of type 'seqData', created by \code{\link{as.seqData}}}
 
-\item{test}{an object of type 'seqData', created by \code{\link{as.seqData}}}
+\item{test}{either "Wald" or "LRT", which will then use either Wald 
+significance tests, or the likelihood ratio test on the difference in 
+deviance between a full and reduced model formula}
 
 \item{p_adjust}{Character string for p-value correction method, refer to 
 ?p.adjust() for valid options. Defaults to "BH" (Benjamini & Hochberg)}
