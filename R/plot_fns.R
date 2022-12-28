@@ -241,7 +241,7 @@ plot.dataRes <- function (dataRes_obj, metric = NULL, density = FALSE,
 
       # Combine the plots into one plot when interactive is FALSE.
 
-      q + p
+      patchwork::wrap_plot(q, p)
 
     }
 
