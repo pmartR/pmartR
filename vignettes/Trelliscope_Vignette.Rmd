@@ -84,7 +84,7 @@ Let's start with the simplest input data to run these trelliscope functions,
 e_data. For context, a typical e_data file looks like this: 
 
 ```{r, echo = F}
-datatable(head(pmartRdata::lipid_pos_edata), options = list(`scrollX` = T))
+knitr::kable(head(pmartRdata::lipid_pos_edata), options = list(`scrollX` = T))
 ```
 
 where each of the rows are biomolecules and each of the columns are samples. Within

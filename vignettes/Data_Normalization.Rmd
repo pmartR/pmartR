@@ -220,7 +220,7 @@ mynorm <- normalize_global(omicsData = mypep,
                            norm_fn = "median", 
                            apply_norm = FALSE)
 class(mynorm)
-plot(mynorm)
+# plot(mynorm)
 ```
 
 
