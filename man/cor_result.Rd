@@ -27,7 +27,6 @@ The pairwise correlations between samples are calculated based on
   is used and data must be log transformed. See \code{\link{cor}} for further details.
 }
 \examples{
-library(pmartR)
 library(pmartRdata)
 
 mymetab <- edata_transform(omicsData = metab_object, data_scale = "log2")

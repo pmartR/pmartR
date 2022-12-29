@@ -28,7 +28,6 @@ Either an omicData and/or a statRes object are accepted.
 }
 \examples{
 \dontrun{
-library(pmartR)
 library(pmartRdata)
 
 # Generate an example e_meta file for lipid data 

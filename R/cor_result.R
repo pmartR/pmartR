@@ -17,7 +17,6 @@
 #'   between samples.
 #'
 #' @examples
-#' library(pmartR)
 #' library(pmartRdata)
 #' 
 #' mymetab <- edata_transform(omicsData = metab_object, data_scale = "log2")

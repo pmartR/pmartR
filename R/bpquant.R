@@ -26,7 +26,6 @@
 #'
 #' @examples
 #' \dontrun{
-#' library(pmartR)
 #' library(pmartRdata)
 #'
 #' mypepData <- group_designation(omicsData = pep_object,

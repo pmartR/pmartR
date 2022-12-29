@@ -83,7 +83,7 @@ plot.dataRes <- function (dataRes_obj, metric = NULL, density = FALSE,
 
   # Preliminaries --------------------------------------------------------------
 
-  #check that attr(dataRes_obj, "by") == "molecule"
+  # check that attr(dataRes_obj, "by") == "molecule"
   if(attr(dataRes_obj, "by") != "molecule") {
 
     # My name is Evan Martin. You killed my plot. Prepare to die.
@@ -93,7 +93,7 @@ plot.dataRes <- function (dataRes_obj, metric = NULL, density = FALSE,
 
   }
 
-  #check that attr(dataRes_obj, "groupvar") is not NULL
+  # check that attr(dataRes_obj, "groupvar") is not NULL
   if(is.null(attr(dataRes_obj, "groupvar"))) {
 
     # My name is Evan Martin. You killed my plot. Prepare to die.
@@ -150,13 +150,13 @@ plot.dataRes <- function (dataRes_obj, metric = NULL, density = FALSE,
 
   if (is.null(metric)) {
 
-    #scatterplots
-    #subseting dataRes_obj object
+    # scatterplots
+    # subseting dataRes_obj object
     mean <- dataRes_obj$mean
     median <- dataRes_obj$median
     sd <- dataRes_obj$sd
 
-    #melting data frames from dataRes object
+    # melting data frames from dataRes object
     mean_melt <- reshape2::melt(mean, id.vars = edata_cname)
     names(mean_melt)[3] <- "mean"
     sd_melt <- reshape2::melt(sd, id.vars = edata_cname)
@@ -241,7 +241,7 @@ plot.dataRes <- function (dataRes_obj, metric = NULL, density = FALSE,
 
       # Combine the plots into one plot when interactive is FALSE.
 
-      patchwork::wrap_plot(q, p)
+      patchwork:::wrap_plots(q, p)
 
     }
 
@@ -268,7 +268,7 @@ plot.dataRes <- function (dataRes_obj, metric = NULL, density = FALSE,
         paste("Histograms for ", metric, sep = "") else
           title_lab
 
-      #subsetting dataRes object
+      # subsetting dataRes object
       data = dataRes_obj[[metric]]
       data_melt = reshape2::melt(data, id.vars = edata_cname)
 
@@ -288,7 +288,7 @@ plot.dataRes <- function (dataRes_obj, metric = NULL, density = FALSE,
         paste("Density plots for ", metric, sep = "") else
           title_lab
 
-      #if density == T, will plot geom_density
+      # if density == T, will plot geom_density
       data = dataRes_obj[[metric]]
       data_melt = reshape2::melt(data, id.vars = edata_cname)
 
@@ -640,7 +640,7 @@ plot.nmrnormRes <- function (nmrnormRes_obj, nmrData = NULL, order_by = NULL,
 
   }
 
-  #extracting attributes from nmrnormRes_obj
+  # extracting attributes from nmrnormRes_obj
   sample_property_cname <- attr(nmrnormRes_obj,
                                 "nmr_info")$sample_property_cname
   metabolite_name <- attr(nmrnormRes_obj, "nmr_info")$metabolite_name
@@ -5018,8 +5018,7 @@ plot.pepData <- function (omicsData, order_by = NULL, color_by = NULL,
 #'
 #' @examples
 #' library(pmartRdata)
-#' mypro <- edata_transform(omicsData = pro_object, data_scale = "log2")
-#' plot(omicsData = mypro, order_by = "Phenotype", color_by = "Phenotype")
+#' plot(omicsData = pro_object, order_by = "Phenotype", color_by = "Phenotype")
 #'
 #' @rdname plot-proData
 #'
@@ -5597,30 +5596,24 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
 #' @method plot statRes
 #' @examples
 #' library(pmartRdata)
-#' #Group the data by condition
+#' # Group the data by condition
 #' mypro <- group_designation(omicsData = pro_object,
 #'                            main_effects = c("Phenotype"))
 #'
-#' #Apply the IMD ANOVA filter
+#' # Apply the IMD ANOVA filter
 #' imdanova_Filt <- imdanova_filter(omicsData = mypro)
 #' mypro <- applyFilt(filter_object = imdanova_Filt,
 #'                        omicsData = mypro,
 #'                        min_nonmiss_anova=2)
 #'
-#' #Implement the IMD ANOVA method and compuate all pairwise comparisons
-#' #(i.e. leave the `comparisons` argument NULL)
+#' # Implement the IMD ANOVA method and compuate all pairwise comparisons
+#' # (i.e. leave the `comparisons` argument NULL)
 #' anova_res <- imd_anova(omicsData = mypro, test_method = 'anova')
 #' plot(anova_res)
 #' plot(anova_res, plot_type = "volcano")
 #'
 #' imd_res <- imd_anova(omicsData = mypro, test_method = 'gtest')
 #' plot(imd_res)
-#' plot(imd_res, plot_type = "gheatmap")
-#' # using arguments of internal functions:
-#' plot(imd_res,
-#'      plot_type = "gheatmap",
-#'      color_low = "red",
-#'      color_high = "green")
 #'
 #' imd_anova_res <- imd_anova(omicsData = mypro,
 #'                            test_method = 'comb',
@@ -5628,7 +5621,6 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
 #'                            pval_adjust_g = 'bon')
 #' plot(imd_anova_res, bw_theme = TRUE)
 #' plot(imd_anova_res, plot_type = "volcano", bw_theme = TRUE)
-#'
 #'
 plot.statRes <- function (x,
                           plot_type = "bar",
@@ -5944,121 +5936,62 @@ plot.statRes <- function (x,
 #' @param test character string indicating the type of test run.
 #'
 prep_flags <- function (x, test) {
-
+  
   if (test == "anova") {
-
+    
     # Assemble a data frame with the sample IDs and anova flags.
     da_flag <- data.frame(
       x[, 1, drop = FALSE],
       x[, grep("^Flag_A_", colnames(x))]
     )
-
+    
     # Remove "Flag_A_" from column names. The first column name is removed
     # because it corresponds to the biomolecule ID column.
     colnames(da_flag)[-1] <- gsub("^Flag_A_",
                                   "",
                                   colnames(x)[grep("^Flag_A_", colnames(x))])
-
+    
   } else if (test == "gtest") {
-
-    # Assemble a data frame with the sample IDs and gtest flags.
-    da_flag <- data.frame(
-      x[, 1, drop = FALSE],
-      x[, grep("^Flag_G_", colnames(x))]
-    )
-
-    # Change -1 and 1 to -2 and 2 respectively.
-    da_flag[, -1] <- da_flag[, -1] * 2
-
-    # Remove "Flag_G_" from column names. The first column name is removed
-    # because it corresponds to the biomolecule ID column.
-    colnames(da_flag)[-1] <- gsub("^Flag_G_",
-                                  "",
-                                  colnames(x)[grep("^Flag_G_", colnames(x))])
-
-  } else if(test %in% c("EdgeR_F", "Voom_T", "DESeq_Wald", "DESeq_LRT")){
+    
+    # Throw an error at the user like Fezzik throwing rocks at the Dread Pirate
+    # Roberts. It doesn't make sense to create a volcano plot with Gtest flags.
+    # Coding would take so much less time if we didn't have to think of all the
+    # ways a user can mess things up.
+    stop ("A volcano plot cannot be created with Gtest flags.")
+    
+  } else if (test %in% c("EdgeR_LRT", "Voom_T", "DESeq_Wald", "DESeq_LRT")) {
     
     # Assemble a data frame with the sample IDs and flags.
-    flag_cols <- grep("^Flag_(Wald|LRT|T|F)_", colnames(x))
+    flag_cols <- grep("^Flag_(Wald|LRT|T)_", colnames(x))
     da_flag <- x[c(1, flag_cols)]
-
+    
     # Remove "Flag_A_" from column names. The first column name is removed
     # because it corresponds to the biomolecule ID column.
-    colnames(da_flag)[-1] <- gsub("^Flag_(Wald|LRT|T|F)_", "", colnames(da_flag)[-1])
+    colnames(da_flag)[-1] <- gsub("^Flag_(Wald|LRT|T)_", "", colnames(da_flag)[-1])
     
+    # Runs when the "combined" option was used.
   } else {
-
-    # Criteria for reporting p-values when combined test is selected:
-    # (1)   If ANOVA flag but no G-test flag, report ANOVA flag
-    # (2)   If G-test flag but no ANOVA flag, report G-test flag
-    # (3)   If neither are present, report NA
-    # (4)   If both are present but corresponding p-values are not significant,
-    #       report ANOVA flag
-    # (5)   If both are present but ANOVA is p-value is significant, report
-    #       ANOVA flag
-    # (6)   If both are present but G-test p-value is significant, report G-test
-    #       flag
-
-    # Start with the anova p-values (extracted from combined results) and
-    # replace if missing [see (2)] or G-test is significant [see (6)]
-    imd_pvals <- data.matrix(x[, grep("^P_value_A_", colnames(x))])
-    imd_flags <- data.matrix(x[, grep("^Flag_A_", colnames(x))])
-
-    # Extract G-test p-values and flags.
-    g_pvals <- data.matrix(x[, grep("^P_value_G_", colnames(x))])
-    g_flags <- data.matrix(x[, grep("^Flag_G_", colnames(x))])
-
-    # Change G-test flags to -2, 0, 2. This is necessary because the plot
-    # functions depend on this distinction between ANOVA and G-test.
-    g_flags <- g_flags * 2
-
-    # Replace missing ANOVA p-values with g-test p-values
-    if (any(is.na(imd_pvals))) {
-
-      anova_NAs <- which(is.na(imd_pvals))
-      imd_pvals[anova_NAs] <- g_pvals[anova_NAs]
-      imd_flags[anova_NAs] <- g_flags[anova_NAs]
-
-    }
-
-    # Replace insignificant ANOVA p-values with significant g-test:
-    # Insignificant ANOVA p-value indices.
-    insig_anova <- which(imd_pvals > attr(x, "pval_thresh"))
-
-    if (any(insig_anova)) {
-
-      # Nab significant G-test p-value indices.
-      sig_gtest <- which(g_pvals <= attr(x, "pval_thresh"))
-
-      # Find overlap between the significant G-test p-values and the
-      # insignificant ANOVA p-values.
-      overlap <- sig_gtest[sig_gtest %in% insig_anova]
-
-      if (any(overlap)) {
-
-        # Replace ANOVA flags (with insignificant p-values) with G-test flags
-        # (that have significant p-values).
-        imd_flags[overlap] <- g_flags[overlap]
-
-      }
-
-    }
-
-    # Remove "Flag_A_" from column names.
-    colnames(imd_flags) <- gsub("^Flag_A_",
-                                "",
-                                colnames(x)[grep("^Flag_A_", colnames(x))])
-
-    # Assemble the flags data frame with the first column containing the
-    # biomolecule IDs and the remaining columns containing the flags.
-    da_flag <- data.frame(x[, 1, drop = FALSE],
-                          imd_flags,
-                          check.names = FALSE)
-
+    
+    # NOTE: It does not make sense to have Gtest flags present when creating a
+    # volcano plot. For this reason we will only use the ANOVA flags when the
+    # test is "combined".
+    
+    # Assemble a data frame with the sample IDs and anova flags.
+    da_flag <- data.frame(
+      x[, 1, drop = FALSE],
+      x[, grep("^Flag_A_", colnames(x))]
+    )
+    
+    # Remove "Flag_A_" from column names. The first column name is removed
+    # because it corresponds to the biomolecule ID column.
+    colnames(da_flag)[-1] <- gsub("^Flag_A_",
+                                  "",
+                                  colnames(x)[grep("^Flag_A_", colnames(x))])
+    
   }
-
+  
   return (da_flag)
-
+  
 }
 
 #' Create a plotting dataframe for volcano plots and heatmaps

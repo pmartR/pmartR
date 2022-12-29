@@ -39,7 +39,6 @@ The result of this function can be used as one the \code{isoformRes}
 }
 \examples{
 \dontrun{
-library(pmartR)
 library(pmartRdata)
 
 mypepData <- group_designation(omicsData = pep_object,

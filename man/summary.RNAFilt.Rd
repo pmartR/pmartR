@@ -30,7 +30,7 @@ Provide summary of a RNAFilt S3 object
 library(pmartRdata)
 myfilter <- RNA_filter(omicsData = rnaseq_object)
 summary(filter_object = myfilter)
-summary(filter_object = myfilter, min_num = 2)
+summary(filter_object = myfilter, min_nonzero = 2)
 
 }
 \seealso{
