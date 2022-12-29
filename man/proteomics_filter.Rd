@@ -2,32 +2,29 @@
 % Please edit documentation in R/filter_objects.R
 \name{proteomics_filter}
 \alias{proteomics_filter}
-\title{Proteomics filter object}
+\title{Proteomics Filter Object}
 \usage{
 proteomics_filter(omicsData)
 }
 \arguments{
 \item{omicsData}{an object of class "pepData", the a result of
-\code{\link{as.pepData}}. The e_meta component of omicsData must be
-nonempty.}
+\code{\link{as.pepData}} or \code{\link{as.isobaricpepData}}. The e_meta
+component of omicsData must be nonempty.}
 }
 \value{
-A list with two elements. The first element is a data frame of counts
-  for each unique peptide. The second element is also a data frame. This data
-  frame contains the counts for the number of peptides that map to each
-  unique protein.
+An S3 object of class proteomicsFilt, which is a list with two
+  elements. The first element is a data frame of counts for each unique
+  peptide. The second element is a data frame with the counts for the number
+  of peptides that map to each unique protein.
 }
 \description{
 This function counts the number of peptides that map to each protein and/or
 the number of proteins to which each individual peptide maps.
 }
 \examples{
-\dontrun{
-library(pmartR)
-data("pep_object")
+library(pmartRdata)
 my_filter <- proteomics_filter(omicsData = pep_object)
-summary(my_filter, min_num_peps = 3)
-}
+summary(filter_object = my_filter, min_num_peps = 3)
 
 }
 \author{

@@ -2,7 +2,7 @@
 % Please edit documentation in R/filter_summary.R
 \name{print.customFilterSummary}
 \alias{print.customFilterSummary}
-\title{Print method for summary of custom filter}
+\title{Custom Filter Print Method}
 \usage{
 \method{print}{customFilterSummary}(object)
 }

@@ -2,10 +2,10 @@
 % Please edit documentation in R/plot_fns.R
 \name{plot.cvFilt}
 \alias{plot.cvFilt}
-\title{plot.cvFilt}
+\title{Plot cvFilt Object}
 \usage{
 \method{plot}{cvFilt}(
-  filter_obj,
+  filter_object,
   cv_threshold = NULL,
   interactive = FALSE,
   x_lab = NULL,
@@ -25,72 +25,71 @@
 )
 }
 \arguments{
-\item{filter_obj}{An object of class cvFilt which is a data frame containing
-a column of biomolecule IDs and a column with the coefficient of variation
-(CV) for each biomolecule. If the group_designation function was run
-previously the CV column will contain pooled CV values.}
+\item{filter_object}{object of class cvFilt generated via
+\code{\link{cv_filter}}}
 
-\item{cv_threshold}{draws a vertical line at the pooled cv cutoff, values to
-the left of this cutoff are dropped if the filter is applied.}
+\item{cv_threshold}{numeric value for cv threshold above which to remove the
+corresponding biomolecules}
 
-\item{interactive}{Logical. If TRUE produces an interactive plot.}
+\item{interactive}{logical value. If TRUE produces an interactive plot.}
 
-\item{x_lab}{A character string specifying the x-axis label.}
+\item{x_lab}{character string specifying the x-axis label.}
 
-\item{y_lab}{A character string specifying the y-axis label. The default is
+\item{y_lab}{character string specifying the y-axis label. The default is
 NULL in which case the y-axis label will be the metric selected for the
 \code{metric} argument.}
 
-\item{x_lab_size}{An integer value indicating the font size for the x-axis.
+\item{x_lab_size}{integer value indicating the font size for the x-axis.
 The default is 11.}
 
-\item{y_lab_size}{An integer value indicating the font size for the y-axis.
+\item{y_lab_size}{integer value indicating the font size for the y-axis.
 The default is 11.}
 
-\item{x_lab_angle}{An integer value indicating the angle of x-axis labels.
+\item{x_lab_angle}{integer value indicating the angle of x-axis labels.
 The default is 0.}
 
-\item{title_lab}{A character string specifying the plot title.}
+\item{title_lab}{character string specifying the plot title}
 
-\item{title_lab_size}{An integer value indicating the font size of the plot
+\item{title_lab_size}{integer value indicating the font size of the plot
 title. The default is 14.}
 
-\item{legend_lab}{A character string specifying the legend title.}
+\item{legend_lab}{character string specifying the legend title}
 
-\item{legend_position}{A character string specifying the position of the
+\item{legend_position}{character string specifying the position of the
 legend. Can be one of "right", "left", "top", "bottom", or "none". The
 default is "none".}
 
-\item{log_scale}{Logical. Indicates whether to use a log2 transformed x-axis.
+\item{log_scale}{logical value. Indicates whether to use a log2 transformed x-axis.
 The default is TRUE.}
 
-\item{n_breaks}{An integer value specifying the number of breaks to use. You
+\item{n_breaks}{integer value specifying the number of breaks to use. You
 may get less breaks if rounding causes certain values to become non-unique.
 The default is 15.}
 
-\item{n_bins}{An integer value specifying the number of bins to draw in the
+\item{n_bins}{integer value specifying the number of bins to draw in the
 histogram.  The default is 30.}
 
-\item{bw_theme}{Logical. If TRUE uses the ggplot2 black and white theme.}
+\item{bw_theme}{logical value. If TRUE uses the ggplot2 black and white theme.}
 
-\item{palette}{A character string indicating the name of the RColorBrewer
+\item{palette}{character string indicating the name of the RColorBrewer
 palette to use. For a list of available options see the details section in
 \code{\link[RColorBrewer]{RColorBrewer}}.}
+}
+\value{
+ggplot2 plot object if interactive is FALSE, or plotly plot object if
+  interactive is TRUE
 }
 \description{
 For plotting an S3 object of type 'cvFilt'
 }
 \examples{
-\dontrun{
-data(pep_object)
+library(pmartRdata)
+mypep <- group_designation(omicsData = pep_object,
+                                main_effects = "Phenotype")
 
-pep_object <- group_designation(omicsData = pep_object,
-                                main_effects = "Condition")
-
-cvfilt <- cv_filter(pep_object)
+cvfilt <- cv_filter(omicsData = mypep)
 
 plot(cvfilt, cv_threshold = 20)
 plot(cvfilt, cv_threshold = 10, log_scale = FALSE)
-}
 
 }

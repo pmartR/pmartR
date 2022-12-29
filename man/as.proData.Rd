@@ -2,7 +2,7 @@
 % Please edit documentation in R/as.omicsData.R
 \name{as.proData}
 \alias{as.proData}
-\title{Convert Data to Appropriate pmartR Class}
+\title{Create pmartR Object of Class proData}
 \usage{
 as.proData(
   e_data,
@@ -16,19 +16,19 @@ as.proData(
 )
 }
 \arguments{
-\item{e_data}{a \eqn{p \times n + 1} data.frame of expression data, where
+\item{e_data}{a \eqn{p \times n + 1} data frame of expression data, where
 \eqn{p} is the number of proteins observed and \eqn{n} is the number of
-samples. Each row corresponds to data for each protein. One column
+samples. Each row corresponds to data for one protein. One column
 specifying a unique identifier for each protein (row) must be present.}
 
-\item{f_data}{a data.frame with \eqn{n} rows. Each row corresponds to a
+\item{f_data}{a data frame with \eqn{n} rows. Each row corresponds to a
 sample with one column giving the unique sample identifiers found in e_data
 column names and other columns providing qualitative and/or quantitative
 traits of each sample.}
 
-\item{e_meta}{an optional data.frame with \eqn{p} rows. Each row corresponds
+\item{e_meta}{an optional data frame with \eqn{p} rows. Each row corresponds
 to a protein with one column giving protein names (must be named the same
-as the column in \code{e_data}) and other columns giving meta information
+as the column in \code{e_data}) and other columns giving biomolecule meta information
 (e.g. mappings of proteins to genes).}
 
 \item{edata_cname}{character string specifying the name of the column
@@ -40,22 +40,24 @@ containing the sample identifiers in \code{f_data}.}
 
 \item{emeta_cname}{character string specifying the name of the column
 containing the gene identifiers (or other mapping variable) in
-\code{e_meta} (if applicable). Defaults to NULL. If \code{e_meta} is NULL,
+\code{e_meta} (if applicable). Defaults to NULL. Can be the same as edata_cname, if desired. If \code{e_meta} is NULL,
 then either do not specify \code{emeta_cname} or specify it as NULL.}
 
 \item{techrep_cname}{character string specifying the name of the column in
-\code{f_data} containing the identifiers for the biological samples if the
-observations represent technical replicates.  This column is used to
+\code{f_data} that specifies which samples are technical replicates. This column is used to
 collapse the data when \code{combine_techreps} is called on this object.
 Defaults to NULL (no technical replicates).}
 
 \item{...}{further arguments}
 }
+\value{
+Object of class proData
+}
 \description{
-Converts a list object or several data.frames of protein-level data to an
+Converts several data frames of protein data to an
 object of the class 'proData'. Objects of the class 'proData' are lists with
-two obligatory components \code{e_data} and \code{f_data}. An optional list
-component \code{e_meta} is used if analysis or visualization at other levels
+two obligatory components, \code{e_data} and \code{f_data}. An optional list
+component, \code{e_meta}, is used if analysis or visualization at other levels
 (e.g. gene) is also desired.
 }
 \details{
@@ -65,7 +67,7 @@ Objects of class 'proData' contain some attributes that are
   well as their default values are as follows: \tabular{ll}{ data_scale \tab
   Scale of the data provided in \code{e_data}. Acceptable values are 'log2',
   'log10', 'log', and 'abundance', which indicate data is log base 2, base
-  10, natural log transformed, and raw abundance, respectively. Default
+  10, natural log, or raw abundance, respectively. Default
   values is 'abundance'. \cr \tab \cr is_normalized \tab A logical argument,
   specifying whether the data has been normalized or not. Default value is
   FALSE. \cr \tab \cr norm_info \tab Default value is an empty list, which
@@ -75,7 +77,7 @@ Objects of class 'proData' contain some attributes that are
   subset and subset parameters, the location and scale parameters used to
   normalize the data, and the location and scale parameters used to
   backtransform the data (if applicable). \cr \tab \cr data_types \tab
-  Character string describing the type of data (e.g.'Positive ion'). Default
+  Character string describing the type of data, most commonly used for lipidomic data (lipidData objects) or NMR data (nmrData objects) but available for other data classes as well. Default
   value is NULL. \cr \tab\cr check.names \tab Logical defaults to TRUE.
   Indicates whether 'check.names' attribute of returned omicsData object is
   TRUE or FALSE. \cr } Computed values included in the \code{data_info}
@@ -89,24 +91,18 @@ Objects of class 'proData' contain some attributes that are
   \tab \cr }
 }
 \examples{
-\dontrun{
 library(pmartRdata)
-data("pro_edata")
-data("pro_fdata")
 myproData <- as.proData(e_data = pro_edata,
                         f_data = pro_fdata,
-                        edata_cname = "Reference",
+                        edata_cname = "RazorProtein",
                         fdata_cname = "SampleID",
                         is_normalized = TRUE)
-}
 
 }
 \seealso{
 \code{\link{as.pepData}}
 
-\code{\link{as.lipidData}}
-
-\code{\link{as.metabData}}
+\code{\link{as.isobaricpepData}}
 }
 \author{
 Kelly Stratton, Lisa Bramer

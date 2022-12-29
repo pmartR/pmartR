@@ -2,7 +2,7 @@
 % Please edit documentation in R/custom_sampnames.R
 \name{custom_sampnames}
 \alias{custom_sampnames}
-\title{Creates custom sample names for plots}
+\title{Creates custom sample names to be used in plots}
 \usage{
 custom_sampnames(
   omicsData,
@@ -16,43 +16,79 @@ custom_sampnames(
 )
 }
 \arguments{
-\item{omicsData}{omicsData an object of the class 'pepData', 'proData',
-'metabData', 'lipidData', 'nmrData', or 'seqData', usually created by \code{as.pepData},
+\item{omicsData}{an object of the class 'pepData', 'proData',
+'metabData', 'lipidData', 'nmrData', or 'seqData', created by \code{as.pepData},
 \code{as.proData}, \code{as.metabData}, \code{as.lipidData}, \code{as.nmrData},
 or \code{as.seqData}, respectively.}
 
-\item{firstn}{is an integer specifying the first n characters to keep as the
-sample name}
+\item{firstn}{an integer specifying the first n characters to keep as the
+sample name. This argument is optional.}
 
-\item{from}{is an integer specifying the start of the range of characters to
-keep as the sample name}
+\item{from}{an integer specifying the start of the range of characters to
+keep as the sample name. This argument is optional. If this argument is
+specified, 'to' must also be specified.}
 
-\item{to}{is an integer specifying the end of the range of characters to keep
-as the sample name}
+\item{to}{an integer specifying the end of the range of characters to keep as
+the sample name. This argument is optional. If this argument is specified,
+'from' must also be specified.}
 
-\item{delim}{is a delimiter to separate sample name components by}
+\item{delim}{character delimiter by which to separate sample name components.
+This argument is optional. If this argument is specified, 'components' must
+also be specified.}
 
-\item{components}{an integer vector specifying which components separated by
-delim to keep as sample name}
+\item{components}{integer vector specifying which components separated by the
+delimiter should be kept as the custom sample name. This argument is
+optional. If this argument is specified, 'delim' must also be specified.}
 
-\item{pattern}{string, regex pattern to use to extract substrings from the
-sample names.}
+\item{pattern}{character string specifying the regex pattern to use to
+extract substrings from the sample names}
 
 \item{...}{extra arguments passed to regexpr if pattern is specified}
 }
+\value{
+Object of same class as omicsData, with added column in f_data named
+  'VizSampNames'.
+}
 \description{
 This helper function creates custom sample names for plot data object
-function
+functions
 }
 \details{
 This function can be used to create custom (and shorter) sample
   names to be used when plotting so that axis labels are not so long that
-  they interfere with the graph itself.
+  they interfere with the graph itself. To use the custom sample names when
+  plotting, specify the optional argument 'use_VizSampNames = TRUE'.
 }
 \examples{
-\dontrun{
-data(pep_object)
-results = custom_sampnames(pep_object, firstn = 5)
-}
+library(pmartRdata)
+
+mypep <- edata_transform(omicsData = pep_object, data_scale = "log2")
+plot(mypep)
+
+# specify new names using firstn argument
+results <- custom_sampnames(omicsData = mypep, firstn = 9)
+plot(results, use_VizSampNames = TRUE)
+
+# specify new names using from and to arguments
+results <- custom_sampnames(omicsData = mypep, from = 1, to = 9)
+plot(results, use_VizSampNames = TRUE)
+
+# specify new names using delim and components arguments
+results <- custom_sampnames(omicsData = mypep, delim = "_", components = c(1, 2))
+plot(results, use_VizSampNames = TRUE)
+
+## specify new names using pattern arguments (regex)
+
+# match everything after "Sample_"
+pattern1 <- "[0-9]+_[0-9A-Za-z]+_[A-Z]"
+
+results <- custom_sampnames(omicsData = mypep, pattern=pattern1)
+plot(results, use_VizSampNames = TRUE) 
+
+# match "Sample_" and the number after it
+pattern2 <- "^Sample_[0-9]+"
+ 
+results <- custom_sampnames(omicsData = mypep, pattern=pattern2)
+plot(results, use_VizSampNames = TRUE)
 
 }

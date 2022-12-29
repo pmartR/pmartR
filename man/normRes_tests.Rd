@@ -7,12 +7,12 @@
 normRes_tests(norm_obj, test_fn = "kw")
 }
 \arguments{
-\item{norm_obj}{An object of class 'pepData', 'proData', 'lipidData',
-'metabData', 'isobaricpepData' that has had \code{normalize_global()} run
+\item{norm_obj}{object of class 'pepData', 'proData', 'lipidData',
+'metabData', 'isobaricpepData', or 'nmrData' that has had \code{normalize_global()} run
 on it, or a 'normRes' object}
 
-\item{test_fn}{The statistical test to use, current tests are "anova" and
-"kw" for a Kruskal-Wallis test.}
+\item{test_fn}{character string indicating the statistical test to use.
+Current options are "anova" and "kw" for a Kruskal-Wallis test.}
 }
 \value{
 A list with 2 entries containing the p_value of the test performed on
@@ -20,5 +20,28 @@ A list with 2 entries containing the p_value of the test performed on
 }
 \description{
 Computes p-values from a test of dependence between normalization parameters
-and group assignment of a normalized omicsData or normRes object.
+and group assignment of a normalized omicsData or normRes object
+}
+\examples{
+library(pmartRdata)
+mymetab <- edata_transform(omicsData = metab_object, data_scale = "log2")
+mymetab <- group_designation(omicsData = mymetab, main_effects = "Phenotype")
+
+# provide the normRes object
+mynorm <- normalize_global(omicsData = mymetab, subset_fn = "all", norm_fn = "median", apply_norm = FALSE)
+norm_pvals <- normRes_tests(norm_obj = mynorm)
+
+# provide normalized omicsData object
+mymetab<- normalize_global(omicsData = mymetab, subset_fn = "all", norm_fn = "median", apply_norm = TRUE)
+norm_pvals <- normRes_tests(norm_obj = mymetab)
+
+# NMR data object
+mynmr <- edata_transform(omicsData = nmr_identified_object, data_scale = "log2")
+mynmr <- group_designation(mynmr, main_effects = "Condition")
+mynmrnorm <- normalize_nmr(omicsData = mynmr,
+                            apply_norm = TRUE,
+                            sample_property_cname = "Concentration")
+mynmrnorm <- normalize_global(omicsData = mynmrnorm, subset_fn = "all", norm_fn = "median", apply_norm = TRUE, backtransform = TRUE)                
+norm_pvals <- normRes_tests(norm_obj = mynmrnorm)
+                    
 }

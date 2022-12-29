@@ -2,7 +2,7 @@
 % Please edit documentation in R/filter_objects.R
 \name{custom_filter}
 \alias{custom_filter}
-\title{Custom Filter}
+\title{Custom Filter Object}
 \usage{
 custom_filter(
   omicsData,
@@ -46,23 +46,21 @@ identifiers to keep from the data. This argument can only be specified with
 other 'keep' arguments.}
 }
 \value{
-An S3 object of class 'customFilt', which is a list with 3 elements:
-  e_data_remove, f_data_remove, and e_meta_remove.
+An S3 object of class 'customFilt', which is a list with 3 elements
+  for e_data, f_data, and e_meta, specifying which entries should be either
+  kept or removed
 }
 \description{
 This function creates a customFilt S3 object based on user-specified items to
 filter out of the dataset
 }
 \examples{
-\dontrun{
 library(pmartRdata)
-data("metab_object")
-to_filter <- custom_filter(metab_object, e_data_remove = "fumaric acid",
-                           f_data_remove = "Infection1")
-summary(to_filter)
-to_filter2 <- custom_filter(metab_object, e_data_remove = "fumaric acid")
-summary(to_filter2)
-}
+to_filter <- custom_filter(omicsData = metab_object, e_data_remove = "fumaric acid", f_data_remove = "Sample_1_Phenotype2_B")
+summary(filter_object = to_filter)
+
+to_filter2 <- custom_filter(omicsData = metab_object, f_data_keep = metab_object$f_data$SampleID[1:10])
+summary(filter_object = to_filter2)
 
 }
 \author{

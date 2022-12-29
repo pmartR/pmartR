@@ -3,4 +3,4 @@
 \docType{package}
 \name{pmartR}
 \alias{pmartR}
-\title{My package}
+\title{Panomics Marketplace - Quality Control and Statistical Analysis for Panomics Data}

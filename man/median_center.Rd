@@ -15,20 +15,31 @@ median_center(
 )
 }
 \arguments{
-\item{e_data}{a \eqn{p \times n + 1} data.frame, where \eqn{p} is the number of peptides, lipids, or metabolites and \eqn{n} is the number of samples. Each row corresponds to data for a peptide, protein, lipid, or metabolite, with a column giving the identifer name.}
+\item{e_data}{a \eqn{p \times n + 1} data.frame, where \eqn{p} is the number
+of peptides, lipids, or metabolites and \eqn{n} is the number of samples.
+Each row corresponds to data for a peptide, protein, lipid, or metabolite,
+with one column giving the biomolecule identifier name.}
 
-\item{edata_id}{character string indicating the name of the peptide, protein, lipid, or metabolite identifier. Usually obtained by calling \code{attr(omicsData, "cnames")$edata_cname}.}
+\item{edata_id}{character string indicating the name of the peptide, protein,
+lipid, or metabolite identifier. Usually obtained by calling
+\code{attr(omicsData, "cnames")$edata_cname}.}
 
-\item{subset_fn}{character string indicating the subset function to use for normalization.}
+\item{subset_fn}{character string indicating the subset function to use for
+normalization.}
 
-\item{feature_subset}{character vector containing the feature names in the subset to be used for normalization}
+\item{feature_subset}{character vector containing the feature names in the
+subset to be used for normalization}
 
-\item{backtransform}{logical argument. If TRUE, the data will be back transformed after normalization so that the values are on a scale similar to their raw values. See details for more information. Defaults to FALSE.}
+\item{backtransform}{logical argument. If TRUE, the data will be back
+transformed after normalization so that the values are on a scale similar
+to their raw values. See details for more information. Defaults to FALSE.}
 
-\item{apply_norm}{logical argument. If TRUE, the normalization will be applied to the data. Defaults to FALSE.}
+\item{apply_norm}{logical argument. If TRUE, the normalization will be
+applied to the data. Defaults to FALSE.}
 }
 \value{
-List containing two elements: \code{norm_params} is list with two elements:
+List containing two elements: \code{norm_params} is list with two
+  elements:
 \tabular{ll}{
 scale \tab NULL \cr
 \tab \cr
@@ -43,25 +54,24 @@ scale \tab NULL \cr
 location \tab numeric value giving global median across all samples
 \cr
 }
-If \code{backtransform} is set to TRUE then each list item under \code{backtransform_params} will be NULL.
+If \code{backtransform} is set to TRUE then each list item under
+\code{backtransform_params} will be NULL.
 
-If \code{apply_norm} is TRUE, the transformed data is returned as a third list item.
+If \code{apply_norm} is TRUE, the transformed data is returned as a third
+list item.
 }
 \description{
-Normalizes the data via median centering with median of the feature subset specified for normalization
+Calculate normalization parameters for the data via median centering.
 }
 \details{
-The sample-wise median of the feature subset specified for normalization is subtracted from each feature in e_data to get the normalized data. The location estimates are the sample-wise medians of the subset data. There are no scale estimates for median centering, though the function returns a NULL list element as a placeholder for a scale estimate. If backtransform is TRUE, the global median of the subset data (across all samples) is added back to the normalized values. Medians are taken ignoring any NA values.
-}
-\examples{
-\dontrun{
-library(pmartRdata)
-data(lipid_object)
-lipid_object2 <- group_designation(omicsData = lipid_object, main_effects = "Condition")
-lipid_subset <- los(e_data = lipid_object2$e_data, edata_id = attr(lipid_object2, "cnames")$edata_cname, pmartR_groupDF = attr(lipid_object2, "group_DF"))
-lipids_median <- median_center(e_data = lipid_object2$e_data, edata_id = attr(lipid_object, "cnames")$edata_cname, feature_subset = lipid_subset, backtransform = TRUE)
-}
-
+The sample-wise median of the feature subset specified for
+  normalization is subtracted from each feature in e_data to get the
+  normalized data. The location estimates are the sample-wise medians of the
+  subset data. There are no scale estimates for median centering, though the
+  function returns a NULL list element as a placeholder for a scale estimate.
+  If backtransform is TRUE, the global median of the subset data (across all
+  samples) is added back to the normalized values. Medians are taken ignoring
+  any NA values.
 }
 \author{
 Lisa Bramer, Kelly Stratton

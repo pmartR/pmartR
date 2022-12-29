@@ -2,10 +2,10 @@
 % Please edit documentation in R/plot_fns.R
 \name{plot.RNAFilt}
 \alias{plot.RNAFilt}
-\title{plot.RNAFilt}
+\title{Plot RNAFilt Object}
 \usage{
 \method{plot}{RNAFilt}(
-  filter_obj,
+  filter_object,
   plot_type = "library",
   size_library = NULL,
   min_nonzero = NULL,
@@ -26,46 +26,46 @@
 )
 }
 \arguments{
-\item{filter_obj}{An object of class RNAFilt that contains the sample
-identifier, library size, number of non-zero biomolecules, and proportion 
-of non-zero biomolecules.}
+\item{filter_object}{object of class RNAFilt that contains the sample
+identifier, library size, number of non-zero biomolecules, and proportion
+of non-zero biomolecules}
 
-\item{plot_type}{Character string, specified as "library" or "biomolecule".
-"library" displays library size for each sample, "biomolecule" displays the 
+\item{plot_type}{character string, specified as "library" or "biomolecule".
+"library" displays library size for each sample, "biomolecule" displays the
 number of unique biomolecules with non-zero counts per sample.}
 
-\item{size_library}{Integer. Cut-off for sample library size (i.e. number 
+\item{size_library}{integer cut-off for sample library size (i.e. number
 of reads). Defaults to NULL.}
 
-\item{min_nonzero}{Integer or float between 0 and 1. Cut-off for number of 
-unique biomolecules with non-zero counts or as a proportion of total 
+\item{min_nonzero}{integer or float between 0 and 1. Cut-off for number of
+unique biomolecules with non-zero counts or as a proportion of total
 biomolecules. Defaults to NULL.}
 
-\item{interactive}{Logical. If TRUE produces an interactive plot.}
+\item{interactive}{logical value. If TRUE produces an interactive plot.}
 
-\item{x_lab}{A character string specifying the x-axis label.}
+\item{x_lab}{character string specifying the x-axis label}
 
-\item{y_lab}{A character string specifying the y-axis label. The default is
+\item{y_lab}{character string specifying the y-axis label. The default is
 NULL in which case the y-axis label will be the metric selected for the
 \code{metric} argument.}
 
-\item{x_lab_size}{An integer value indicating the font size for the x-axis.
+\item{x_lab_size}{integer value indicating the font size for the x-axis.
 The default is 11.}
 
-\item{y_lab_size}{An integer value indicating the font size for the y-axis.
+\item{y_lab_size}{integer value indicating the font size for the y-axis.
 The default is 11.}
 
-\item{x_lab_angle}{An integer value indicating the angle of x-axis labels.
+\item{x_lab_angle}{integer value indicating the angle of x-axis labels.
 The default is 0.}
 
-\item{title_lab}{A character string specifying the plot title.}
+\item{title_lab}{character string specifying the plot title}
 
-\item{title_lab_size}{An integer value indicating the font size of the plot
+\item{title_lab_size}{integer value indicating the font size of the plot
 title. The default is 14.}
 
-\item{legend_lab}{A character string specifying the legend title.}
+\item{legend_lab}{character string specifying the legend title}
 
-\item{legend_position}{A character string specifying the position of the
+\item{legend_position}{character string specifying the position of the
 legend. Can be one of "right", "left", "top", "bottom", or "none". The
 default is "none".}
 
@@ -75,20 +75,22 @@ biomolecules by sample) within the bar plot. The default is 3.}
 \item{bar_width}{An integer indicating the width of the bars in the bar plot.
 The default is 0.8.}
 
-\item{bw_theme}{Logical. If TRUE uses the ggplot2 black and white theme.}
+\item{bw_theme}{logical value. If TRUE uses the ggplot2 black and white theme.}
 
-\item{palette}{A character string indicating the name of the RColorBrewer
+\item{palette}{character string indicating the name of the RColorBrewer
 palette to use. For a list of available options see the details section in
 \code{\link[RColorBrewer]{RColorBrewer}}.}
 }
+\value{
+ggplot2 plot object if interactive is FALSE, or plotly plot object if
+  interactive is TRUE
+}
 \description{
-For plotting an S3 object of type 'RNAFilt':
+For plotting an S3 object of type 'RNAFilt'
 }
 \examples{
-\dontrun{
-data(seq_object)
-seqfilt <- total_count_filter(pep_object)
-plot(seqfilt, min_count = 5)
-}
+library(pmartRdata)
+seqfilt <- RNA_filter(omicsData = rnaseq_object)
+plot(seqfilt)
 
 }

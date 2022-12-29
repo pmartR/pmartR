@@ -1,6 +1,6 @@
 #' print.pepData
 #' 
-#' For printing an S3 object of type 'pepData':
+#' For printing an S3 object of type 'pepData'
 #' 
 #'@rdname print-pepData
 #'@export
@@ -88,7 +88,7 @@ print.pepData<- function(pepData){
 
 #' print.metabData
 #' 
-#' For printing an S3 object of type 'metabData':
+#' For printing an S3 object of type 'metabData'
 #' 
 #'@rdname print-metabData
 #'@export
@@ -176,7 +176,7 @@ print.metabData<- function(metabData){
 
 #' print.proData
 #' 
-#' For printing an S3 object of type 'proData':
+#' For printing an S3 object of type 'proData'
 #' 
 #'@rdname print-proData
 #'@export
@@ -264,7 +264,7 @@ print.proData<- function(proData){
 
 #' print.lipidData
 #' 
-#' For printing an S3 object of type 'lipidData':
+#' For printing an S3 object of type 'lipidData'
 #' 
 #'@rdname print-lipidData
 #'@export
@@ -352,7 +352,7 @@ print.lipidData<- function(lipidData){
 
 #' print.seqData
 #' 
-#' For printing an S3 object of type 'seqData':
+#' For printing an S3 object of type 'seqData'
 #' 
 #'@rdname print-seqData
 #'@export
@@ -441,7 +441,7 @@ print.seqData<- function(seqData){
 
 #' print.dataRes
 #' 
-#' For printing an S3 object of class 'dataRes':
+#' For printing an S3 object of class 'dataRes'
 #' 
 #'@rdname print-dataRes
 #'@export
@@ -704,7 +704,7 @@ print.dataRes<- function(dataRes){
 
 #' print.normRes
 #' 
-#' For printing an S3 object of type 'normRes':
+#' For printing an S3 object of type 'normRes'
 #' 
 #'@rdname print-normRes
 #'@export

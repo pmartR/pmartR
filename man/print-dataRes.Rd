@@ -7,5 +7,5 @@
 \method{print}{dataRes}(dataRes)
 }
 \description{
-For printing an S3 object of class 'dataRes':
+For printing an S3 object of class 'dataRes'
 }

@@ -2,9 +2,9 @@
 % Please edit documentation in R/statRes_class.R
 \name{statRes-class}
 \alias{statRes-class}
-\title{statRes class.}
+\title{Summary of statRes Object}
 \description{
-Class for statistical results returned by fucntions in this package.
+Provide summary information about statRes objects
 }
 \seealso{
 See \code{\link{imd_anova}}

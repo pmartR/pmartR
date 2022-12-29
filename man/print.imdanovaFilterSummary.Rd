@@ -2,7 +2,7 @@
 % Please edit documentation in R/filter_summary.R
 \name{print.imdanovaFilterSummary}
 \alias{print.imdanovaFilterSummary}
-\title{Print method for summary of imdanova filter}
+\title{IMD-ANOVA Filter Print Method}
 \usage{
 \method{print}{imdanovaFilterSummary}(object)
 }

@@ -19,11 +19,10 @@ inherited from the omicsData used in \code{\link{imd_anova}} or
 \code{\link{format_data}}
 }
 \examples{
-\dontrun{
 library(pmartRdata)
 
 my_prodata = group_designation(omicsData = pro_object,
-                               main_effects = c("Condition"))
+                               main_effects = c("Phenotype"))
 
 imdanova_Filt = imdanova_filter(omicsData = my_prodata)
 
@@ -33,9 +32,9 @@ my_prodata = applyFilt(filter_object = imdanova_Filt,
 
 imd_anova_res = imd_anova(omicsData = my_prodata,
                           test_method = 'comb',
-                          pval_adjust='bon')
+                          pval_adjust_a ='bon',
+                          pval_adjust_g = 'bon')
 
 result = get_data_class(imd_anova_res)
-}
 
 }

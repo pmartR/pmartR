@@ -2,50 +2,46 @@
 % Please edit documentation in R/as.trelliData.R
 \name{as.trelliData}
 \alias{as.trelliData}
-\title{Generate an object from omicsData and/or statRes objects to pass to trelliscope building functions}
+\title{Generate an object from omicsData and/or statRes objects to pass to
+  trelliscope building functions}
 \usage{
 as.trelliData(omicsData = NULL, statRes = NULL, ...)
 }
 \arguments{
-\item{omicsData}{an object of the class 'pepData', 'isobaricpepData', proData', 
-'metabData', 'lipidData', 'nmrData', created by as.pepData, as.isobaricpepData.
-as.proData, as.metabData, as.lipidData, as.nmrData, respectively.}
+\item{omicsData}{an object of the class 'pepData', 'isobaricpepData',
+proData', 'metabData', 'lipidData', or 'nmrData', created by
+\code{\link{as.pepData}}, \code{\link{as.isobaricpepData}},
+\code{\link{as.proData}}, \code{\link{as.metabData}},
+\code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, respectively.}
 
-\item{statRes}{statRes an object of the class 'statRes', created by \code{\link{summarize}}}
+\item{statRes}{statRes an object of the class 'statRes', created by
+\code{\link{imd_anova}}}
 }
 \description{
-Either an omicsData and/or a statRes object is accepted. omicsData must
-   be transformed and normalized, unless the data is isobaric protein or NMR data.
-   Adding a "main_effects" group_desgination() will result in plots with groups. 
-   The main effects group_designation and e_meta columns are merged to the e_data in long format to
-   create the trelliData.omics dataframe, and e_meta is merged to statRes in long
-   format to create trelliData.stat dataframe.
+Either an omicData and/or a statRes object are accepted.
+  omicData must be transformed and normalized, unless the data is isobaric
+  protein or NMR data. If group_designation() has been run on the omicData
+  object to add "main_effects", the resulting plots will include groups. The
+  main effects group_designation and e_meta columns are merged to the e_data
+  in long format to create the trelliData.omics dataframe, and e_meta is
+  merged to statRes in long format to create trelliData.stat dataframe.
 }
 \examples{
 \dontrun{
-library(pmartR)
 library(pmartRdata)
 
 # Generate an example e_meta file for lipid data 
-lipid_emeta <- data.frame("LipidCommonName" = lipid_edata_pos$LipidCommonName, 
-  "LipidFamily" = lipid_edata_pos$LipidCommonName \%>\% as.character() \%>\% 
+lipid_emeta <- data.frame("Lipid" = lipid_pos_edata$Lipid, 
+  "LipidFamily" = lipid_pos_edata$Lipid \%>\% as.character() \%>\% 
     strsplit("(", fixed = T) \%>\% lapply(function(el) {el[1]}) \%>\% unlist())
-    
-# Extend fdata to have two infection groups 
-lipid_fdata_pos2 <- data.frame("Sample_Name" = lipid_fdata_pos$Sample_Name, 
-  "Condition" = c(rep("Mock", 3), rep("Infection_A", 4), rep("Infection_B", 4)),
-  "Weight" = runif(11))
-
-# Build lipid data object
-lipids <- as.lipidData(e_data = lipid_edata_pos, f_data = lipid_fdata_pos2, e_meta = lipid_emeta,
-  edata_cname = "LipidCommonName", fdata_cname = "Sample_Name", 
-  emeta_cname = "LipidCommonName")
 
 # Transform the data
-omicsData <- edata_transform(omicsData = lipids, data_scale = "log2")
+omicsData <- edata_transform(omicsData = lipid_pos_object, data_scale = "log2")
+omicsData$e_meta$LipidFamily <- omicsData$e_meta$Lipid \%>\% as.character() \%>\% 
+    strsplit("(", fixed = T) \%>\% lapply(function(el) {el[1]}) \%>\% unlist()
 
 # Group the data by condition
-omicsData <- group_designation(omicsData = omicsData, main_effects = c("Condition"))
+omicsData <- group_designation(omicsData = omicsData, main_effects = c("Virus"))
 
 # Apply the IMD ANOVA filter
 imdanova_Filt <- imdanova_filter(omicsData = omicsData)

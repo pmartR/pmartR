@@ -2,7 +2,7 @@
 % Please edit documentation in R/filter_summary.R
 \name{summary.customFilt}
 \alias{summary.customFilt}
-\title{Produce a basic summary of a custom_filter object}
+\title{Custom Filter Summary}
 \usage{
 \method{summary}{customFilt}(filter_object)
 }
@@ -15,8 +15,19 @@ a summary of the items in e_data, f_data, and e_meta that will be
   removed as a result of applying the custom filter.
 }
 \description{
-This function will provide basic summary statistics for the custom_filter
-object.
+Provide summary of a customFilt S3 object
+}
+\examples{
+library(pmartRdata)
+to_filter <- custom_filter(omicsData = metab_object, e_data_remove = "fumaric acid", f_data_remove = "Sample_1_Phenotype2_B")
+summary(filter_object = to_filter)
+
+to_filter2 <- custom_filter(omicsData = metab_object, f_data_keep = metab_object$f_data$SampleID[1:10])
+summary(filter_object = to_filter2)
+
+}
+\seealso{
+\code{\link{custom_filter}}
 }
 \author{
 Lisa Bramer

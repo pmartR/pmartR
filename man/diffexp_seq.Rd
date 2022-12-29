@@ -2,7 +2,7 @@
 % Please edit documentation in R/seqData_wrappers.R
 \name{diffexp_seq}
 \alias{diffexp_seq}
-\title{Wrapper for Differential Expression workflows}
+\title{Differential Expression for seqData}
 \usage{
 diffexp_seq(
   omicsData,
@@ -14,57 +14,59 @@ diffexp_seq(
 )
 }
 \arguments{
-\item{omicsData}{an object of type 'seqData', created by \code{\link{as.seqData}}}
+\item{omicsData}{object of type 'seqData' created by
+\code{\link{as.seqData}}}
 
-\item{method}{a character string of length one specifying which wrapper to use. 
-Can be 'edgeR', 'DESeq2', or 'limma-voom'}
+\item{method}{character string of length one specifying which wrapper to
+use. Can be 'edgeR', 'DESeq2', or 'voom'}
 
-\item{p_adjust}{Character string for p-value correction method, refer to 
-?p.adjust() for valid options. Defaults to "BH" (Benjamini & Hochberg)}
+\item{p_adjust}{character string for p-value correction method, refer to
+?p.adjust() for valid options. Defaults to "BH" (Benjamini & Hochberg).}
 
-\item{comparisons}{`data.frame` with columns for "Control" and "Test"
+\item{comparisons}{data frame with columns for "Control" and "Test"
 containing the different comparisons of interest. Comparisons will be made
 between the Test and the corresponding Control  If left NULL, then all
 pairwise comparisons are executed.}
 
-\item{p_cutoff}{Numeric value between 0 and 1 for setting p-value significance threshold}
+\item{p_cutoff}{numeric value between 0 and 1 for setting p-value
+significance threshold}
 
-\item{...}{additional arguments passed to methods functions. Note, formatting 
+\item{...}{additional arguments passed to methods functions. Note, formatting
 option changes will interfere with wrapping functionality.}
 }
 \value{
-a statRes object (data.frame)
+object of class statRes
 }
 \description{
-For generating statistics for 'seqData' objects
+Performs statistical analysis for differential expression of seqData objects,
+using methods from one of: edgeR, DESeq2, or limma-voom
 }
 \details{
 Runs default differential expression workflows.
 
-Flags (signatures) -	Indicator of statistical significance for computed test. 
-Zeros indicate no significance, while +/- 1 indicates direction of significance.
+Flags (signatures) -	Indicator of statistical significance.
+Zeroes indicate no significance, while +/- 1 indicates direction of
+significance.
 
-Method "edgeR" - Runs default edgeR workflow with empirical Bayes quasi-likelihood F-tests.
-Additional arguments can be passed for use in the function, 
-refer to calcNormFactors() and glmQLFit() in edgeR package.
+Method "edgeR" - Runs default edgeR workflow with empirical Bayes
+quasi-likelihood F-tests. Additional arguments can be passed for use in the
+function. Refer to calcNormFactors() and glmQLFit() in edgeR package.
 
-Method "DESeq2" - Runs default DESeq workflow. Defaults to Wald test, no independent filtering, and 
-running in parallel. Additional arguments can be passed for use in the function, 
-refer to DESeq() and results() in DESeq2 package. Requires 'survival' package to run.
+Method "DESeq2" - Runs default DESeq workflow. Defaults to Wald test, no
+independent filtering, and running in parallel. Additional arguments can be
+passed for use in the function. Refer to DESeq() and results() in DESeq2
+package. Requires 'survival' package to run.
 
-Method "voom" - Runs default limma-voom workflow using empirical Bayes moderated t-statistics.
-Additional arguments can be passed for use in the function, 
-refer to calcNormFactors() in edgeR package.
+Method "voom" - Runs default limma-voom workflow using empirical Bayes
+moderated t-statistics. Additional arguments can be passed for use in the
+function. Refer to calcNormFactors() in edgeR package.
 }
 \examples{
-\dontrun{
-
 library(pmartRdata)
-myseqData <- rnaseq_object
-myseqData <- group_designation(omicsData = myseqData, main_effects = "Virus")
-statsresults <- diffexp_seq(omicsData = myseqData, method = "edgeR")
-
-}
+myseqData <- group_designation(omicsData = rnaseq_object, main_effects = "Virus")
+edger_results <- diffexp_seq(omicsData = myseqData, method = "edgeR")
+deseq_results <- diffexp_seq(omicsData = myseqData, method = "DESeq2")
+voom_results <- diffexp_seq(omicsData = myseqData, method = "voom")
 
 }
 \references{

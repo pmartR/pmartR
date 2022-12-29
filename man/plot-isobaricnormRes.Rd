@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_fns.R
 \name{plot.isobaricnormRes}
 \alias{plot.isobaricnormRes}
-\title{Plots an object of class isobaricnormRes}
+\title{Plot isobaricnormRes object}
 \usage{
 \method{plot}{isobaricnormRes}(
   isobaricnormRes_obj,
@@ -23,62 +23,57 @@
 }
 \arguments{
 \item{isobaricnormRes_obj}{an object of type isobaricnormRes, created by
-\code{\link{normalize_isobaric}}}
+\code{\link{normalize_isobaric}} with apply_norm = FALSE}
 
-\item{order}{Logical. If TRUE the samples will be ordered by the column of
-f_data containing the experiment/plate information.}
+\item{order}{logical value. If TRUE the samples will be ordered by the column
+of f_data containing the experiment/plate information.}
 
-\item{interactive}{Logical. If TRUE produces an interactive plot.}
+\item{interactive}{logical value. If TRUE produces an interactive plot.}
 
-\item{x_lab}{A character string specifying the x-axis label.}
+\item{x_lab}{character string specifying the x-axis label}
 
-\item{y_lab}{A character string specifying the y-axis label.}
+\item{y_lab}{character string specifying the y-axis label}
 
-\item{x_lab_size}{An integer value indicating the font size for the x-axis.
-The default is 11.}
+\item{x_lab_size}{integer value indicating the font size for the x-axis. The
+default is 11.}
 
-\item{y_lab_size}{An integer value indicating the font size for the y-axis.
-The default is 11.}
+\item{y_lab_size}{integer value indicating the font size for the y-axis. The
+default is 11.}
 
-\item{x_lab_angle}{An integer value indicating the angle of x-axis labels.}
+\item{x_lab_angle}{integer value indicating the angle of x-axis labels.}
 
-\item{title_lab}{A character string specifying the plot title.}
+\item{title_lab}{character string specifying the plot title.}
 
-\item{title_lab_size}{An integer value indicating the font size of the plot
+\item{title_lab_size}{integer value indicating the font size of the plot
 title. The default is 14.}
 
-\item{legend_lab}{A character string specifying the legend title.}
+\item{legend_lab}{character string specifying the legend title.}
 
-\item{legend_position}{A character string specifying the position of the
+\item{legend_position}{character string specifying the position of the
 legend. Can be one of "right", "left", "top", "bottom", or "none". The
 default is "none".}
 
-\item{bw_theme}{Logical. If TRUE uses the ggplot2 black and white theme.}
+\item{bw_theme}{logical value. If TRUE uses the ggplot2 black and white
+theme.}
 
-\item{palette}{A character string indicating the name of the RColorBrewer
+\item{palette}{character string indicating the name of the RColorBrewer
 palette to use. For a list of available options see the details section in
 \code{\link[RColorBrewer]{RColorBrewer}}.}
 }
 \value{
-plots ggplot2 object
+ggplot2 plot object if interactive is FALSE, or plotly plot object if
+  interactive is TRUE
 }
 \description{
 Creates box plots for an S3 object of type 'isobaricnormRes'
 }
 \examples{
-\dontrun{
 library(pmartRdata)
-
-data(isobaric_object)
-
-isobaric_object = edata_transform(isobaric_object, "log2")
-
-result = normalize_isobaric(isobaric_object, exp_cname = "Set",
-                            apply_norm = FALSE,
-                            channel_cname = "iTRAQ.Channel",
-                            refpool_channel = "116")
-
+myiso <- edata_transform(omicsData = isobaric_object, data_scale = "log2")
+myiso_norm <- normalize_isobaric(myiso, exp_cname = "Plex",
+                                   apply_norm = FALSE,
+                                   refpool_cname = "Virus",
+                                   refpool_notation = "Pool")
 plot(result)
-}
 
 }

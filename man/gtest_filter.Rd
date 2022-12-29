@@ -40,21 +40,6 @@ Two methods are available for determining the peptides to be
   hypothesis of independence between the number of missing values across
   groups.
 }
-\examples{
-\dontrun{
-library(pmartR)
-data(pep_object)
-
-pep_object2 <- group_designation(omicsData = pep_object,
-                                 main_effects = "Condition")
-
-nonmissing_result <- nonmissing_per_group(omicsData = pep_object2)
-
-to_filter <- gtest_filter(nonmiss_per_group = nonmissing_result,
-                          min_nonmiss_gtest = 3)
-}
-
-}
 \author{
 Kelly Stratton
 }

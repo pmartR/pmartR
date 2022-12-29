@@ -2,7 +2,7 @@
 % Please edit documentation in R/as.omicsData.R
 \name{as.nmrData}
 \alias{as.nmrData}
-\title{Convert Data to Appropriate pmartR Class}
+\title{Create pmartR Object of Class nmrData}
 \usage{
 as.nmrData(
   e_data,
@@ -16,17 +16,17 @@ as.nmrData(
 )
 }
 \arguments{
-\item{e_data}{a \eqn{p \times n + 1} data.frame of expression data, where
+\item{e_data}{a \eqn{p \times n + 1} data frame of expression data, where
 \eqn{p} is the number of metabolites observed and \eqn{n} is the number of
-samples. Each row corresponds to data for each metabolite. One column
+samples. Each row corresponds to data for one metabolite. One column
 specifying a unique identifier for each metabolite (row) must be present.}
 
-\item{f_data}{a data.frame with \eqn{n} rows. Each row corresponds to a
+\item{f_data}{a data frame with \eqn{n} rows. Each row corresponds to a
 sample with one column giving the unique sample identifiers found in e_data
 column names and other columns providing qualitative and/or quantitative
 traits of each sample.}
 
-\item{e_meta}{an optional data.frame with \eqn{p} rows. Each row corresponds
+\item{e_meta}{an optional data frame with \eqn{p} rows. Each row corresponds
 to a metabolite with one column giving metabolite names (must be named the
 same as the column in \code{e_data}) and other columns giving meta
 information.}
@@ -40,23 +40,24 @@ containing the sample identifiers in \code{f_data}.}
 
 \item{emeta_cname}{character string specifying the name of the column
 containing the mapped identifiers in \code{e_meta} (if applicable).
-Defaults to NULL. If \code{e_meta} is NULL, then either do not specify
-\code{emeta_cname} or specify it as NULL. If \code{e_meta} is NULL, then
-specify \code{emeta_cname} as NULL.}
+Defaults to NULL. Can be the same as edata_cname, if desired. If \code{e_meta} is NULL, then either do not specify
+\code{emeta_cname} or specify it as NULL.}
 
 \item{techrep_cname}{character string specifying the name of the column in
-\code{f_data} containing the identifiers for the biological samples if the
-observations represent technical replicates.  This column is used to
+\code{f_data} that specifies which samples are technical replicates. This column is used to
 collapse the data when \code{combine_techreps} is called on this object.
 Defaults to NULL (no technical replicates).}
 
 \item{...}{further arguments}
 }
+\value{
+Object of class nmrData
+}
 \description{
-Converts a list object or several data.frames of NMR-generated
-metabolomic-level data to an object of the class 'nmrData'. Objects of the
-class 'nmrData' are lists with two obligatory components \code{e_data} and
-\code{f_data}. An optional list component \code{e_meta} is used if analysis
+Converts several data frames of NMR-generated
+metabolomic data to an object of the class 'nmrData'. Objects of the
+class 'nmrData' are lists with two obligatory components, \code{e_data} and
+\code{f_data}. An optional list component, \code{e_meta}, is used if analysis
 or visualization at other levels (e.g. metabolite identification) is also
 desired.
 }
@@ -67,7 +68,7 @@ Objects of class 'nmrData' contain some attributes that are
   well as their default values are as follows: \tabular{ll}{ data_scale \tab
   Scale of the data provided in \code{e_data}. Acceptable values are 'log2',
   'log10', 'log', and 'abundance', which indicate data is log base 2, base
-  10, natural log transformed, and raw abundance, respectively. Default is
+  10, natural log, or raw abundance, respectively. Default is
   'abundance'. \cr \tab \cr is_normalized \tab A logical argument, specifying
   whether the data has been normalized or not. Default value is FALSE. \cr
   \tab \cr nmr_norm \tab A logical argument, specifying whether the data has
@@ -94,28 +95,18 @@ Objects of class 'nmrData' contain some attributes that are
   \tab \cr }
 }
 \examples{
-\dontrun{
 library(pmartRdata)
-data("nmr_edata_identified")
-data("nmr_fdata_identified")
-mynmrData <- as.nmrData(e_data = nmr_edata_identified,
-                        f_data = nmr_fdata_identified,
+mynmrData <- as.nmrData(e_data = nmr_identified_edata,
+                        f_data = nmr_identified_fdata,
                         edata_cname = "Metabolite",
                         fdata_cname = "SampleID",
                         data_type = "identified")
-}
 
 }
 \seealso{
 \code{\link{as.metabData}}
 
-\code{\link{as.isobaricpepData}}
-
-\code{\link{as.lipidData}}
-
-\code{\link{as.pepData}}
-
-\code{\link{as.proData}}
+\code{\link{normalize_nmr}}
 }
 \author{
 Lisa Bramer, Kelly Stratton

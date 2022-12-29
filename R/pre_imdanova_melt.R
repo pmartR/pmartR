@@ -1,13 +1,18 @@
 #' Create a Melted and Grouped Version of e_data for IMD_ANOVA filter
 #'
-#' This function creates a melted version of e_data, grouped by edata_id and group designation, for future use of implementing a IMD_ANOVA filter
+#' This function creates a melted version of e_data, grouped by edata_id and
+#' group designation, for future use of implementing a IMD_ANOVA filter
 #'
-#' @param e_data \eqn{p \times n} data.frame, where \eqn{p} is the number of peptides, proteins, lipids, metabolites, or accessions and \eqn{n} is the number of samples. e_data contains
-#' @param groupDF data.frame created by \code{group_designation} with columns for the sample identifier and the designated group.
-#' @param samp_id character string specifying the name of the column containing the sample identifiers in \code{groupDF}.
+#' @param e_data \eqn{p \times n} data.frame, where \eqn{p} is the number of
+#'   peptides, proteins, lipids, metabolites, or accessions and \eqn{n} is the
+#'   number of samples
+#' @param groupDF data frame created by \code{group_designation} with columns
+#'   for the sample identifier and the designated group.
+#' @param samp_id character string specifying the name of the column containing
+#'   the sample identifiers in \code{groupDF}.
 #'
-#' @return a data.frame of class "grouped_dt" which is compatible with functions in the dplyr package
-#'
+#' @return a data frame of class "grouped_dt" which is compatible with functions
+#'   in the dplyr package
 #'
 #' @author Lisa Bramer, Kelly Stratton
 

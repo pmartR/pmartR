@@ -2,26 +2,45 @@
 % Please edit documentation in R/get_comparisons.R
 \name{create_comparisonDF}
 \alias{create_comparisonDF}
-\title{Returns data.frame with comparisons to be made}
+\title{Returns data frame with comparisons to be made}
 \usage{
 create_comparisonDF(comp_type, omicsData, control_group = NULL)
 }
 \arguments{
-\item{comp_type}{string taking one of the following values: control, pairwise, custom. Specifying "control" indicates that all other groups are to be compared to this single control group. Specifying "pairwise" indicates that all pairwise comparisons are to be made.}
+\item{comp_type}{string specifying either "control" or 
+"pairwise". Specifying "control" indicates that all other groups are
+to be compared to a single control group. Specifying "pairwise"
+indicates that all pairwise comparisons are to be made.}
 
-\item{omicsData}{A pmartR data object of any class, which has a `group_df` attribute that is usually created by the `group_designation()` function}
+\item{omicsData}{A pmartR data object of any class, which has a `group_df`
+attribute created by the `group_designation()` function}
 
-\item{control_group}{string indicating the group to use for the control group. Only required when comp_type="control".}
+\item{control_group}{string indicating the group to use for the control
+group. Only required when comp_type="control".}
 }
 \value{
-data.frame with columns for Test and Control. Each row corresponds to a comparison of interest. 
-#'
+data frame with columns for Test and Control. Each row corresponds to
+  a comparison of interest.
 }
 \description{
-The method creates a data.frame containing the comparisons to be made using differential statistics.
+The method creates a data frame containing the comparisons to be made when
+performing differential statistics.
 }
 \details{
-This function takes in the omicsData and type of comparison, and returns a data.frame where each row corresponds to a comparison of interest.
+This function takes in the omicsData and type of comparison, and
+  returns a data frame where each row corresponds to a comparison of
+  interest.
+}
+\examples{
+library(pmartRdata)
+mymetab <- group_designation(omicsData = metab_object, main_effects = "Phenotype")
+create_comparisonDF(comp_type = "pairwise", omicsData = mymetab)
+
+create_comparisonDF(comp_type = "control", omicsData = mymetab, control_group = "Phenotype1")
+
+}
+\seealso{
+\code{\link{group_designation}}
 }
 \author{
 Kelly Stratton

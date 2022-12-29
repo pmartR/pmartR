@@ -1,6 +1,6 @@
 #' print.moleculeFilt
 #' 
-#' For printing an S3 object of type 'moleculeFilt':
+#' For printing an S3 object of type 'moleculeFilt'
 #' 
 #' @rdname print-moleculeFilt
 #' @export
@@ -22,7 +22,7 @@ print.moleculeFilt<- function(filter_object){
 
 #' print.totalCountFilt
 #' 
-#' For printing an S3 object of type 'totalCountFilt':
+#' For printing an S3 object of type 'totalCountFilt'
 #' 
 #' @rdname print-totalCountFilt
 #' @export
@@ -44,7 +44,7 @@ print.totalCountFilt <- function(filter_object){
 
 #' print.RNAFilt
 #' 
-#' For printing an S3 object of type 'RNAFilt':
+#' For printing an S3 object of type 'RNAFilt'
 #' 
 #' @rdname print-RNAFilt
 #' @export
@@ -66,10 +66,10 @@ print.RNAFilt <- function(filter_object){
 
 #' print.proteomicsFilt
 #' 
-#' For printing an S3 object of type 'proteomicsFilt':
+#' For printing an S3 object of type 'proteomicsFilt'
 #' 
-#'@rdname print-proteomicsFilt
-#'@export
+#' @rdname print-proteomicsFilt
+#' @export
 #'
 print.proteomicsFilt<- function(filter_object){
   if(!inherits(filter_object, "proteomicsFilt")) stop("filter object must be of the class 'proteomicsFilt'")
@@ -101,10 +101,10 @@ print.proteomicsFilt<- function(filter_object){
 
 #' print.imdanovaFilt
 #' 
-#' For printing an S3 object of type 'imdanovaFilt':
+#' For printing an S3 object of type 'imdanovaFilt'
 #' 
-#'@rdname print-imdanovaFilt
-#'@export
+#' @rdname print-imdanovaFilt
+#' @export
 #'
 print.imdanovaFilt<- function(filter_object){
   if(!inherits(filter_object, "imdanovaFilt")) stop("filter object must be of the class 'imdanovaFilt'")
@@ -123,10 +123,10 @@ print.imdanovaFilt<- function(filter_object){
 
 #' print.rmdFilt
 #' 
-#' For printing an S3 object of type 'rmdFilt':
+#' For printing an S3 object of type 'rmdFilt'
 #' 
-#'@rdname print-rmdFilt
-#'@export
+#' @rdname print-rmdFilt
+#' @export
 #'
 print.rmdFilt<- function(filter_object){
   if(!inherits(filter_object, "rmdFilt")) stop("filter object must be of the class 'rmdFilt'")
@@ -147,10 +147,10 @@ print.rmdFilt<- function(filter_object){
 
 #' print.cvFilt
 #' 
-#' For printing an S3 object of type 'cvFilt':
+#' For printing an S3 object of type 'cvFilt'
 #' 
-#'@rdname print-cvFilt
-#'@export
+#' @rdname print-cvFilt
+#' @export
 #'
 print.cvFilt<- function(filter_object){
   if(!inherits(filter_object, "cvFilt")) stop("filter object must be of the class 'cvFilt'")
@@ -169,10 +169,10 @@ print.cvFilt<- function(filter_object){
 
 #' print.customFilt
 #' 
-#' For printing an S3 object of type 'customFilt':
+#' For printing an S3 object of type 'customFilt'
 #' 
-#'@rdname print-customFilt
-#'@export
+#' @rdname print-customFilt
+#' @export
 #'
 print.customFilt<- function(filter_object){
   if(!inherits(filter_object, "customFilt")) stop("filter object must be of the class 'customFilt'")

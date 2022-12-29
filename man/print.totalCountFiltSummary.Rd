@@ -2,7 +2,7 @@
 % Please edit documentation in R/filter_summary.R
 \name{print.totalCountFiltSummary}
 \alias{print.totalCountFiltSummary}
-\title{Print method for summary of Total Count filter}
+\title{Total Count Filter Print Method}
 \usage{
 \method{print}{totalCountFiltSummary}(object)
 }

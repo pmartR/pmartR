@@ -27,14 +27,6 @@ In the zrollup method, peptides are scaled as, pep_scaled = (pep -
   median)/sd, and protein abundance is set as the mean of these scaled
   peptides.
 }
-\examples{
-\dontrun{
-library(pmartRdata)
-data(pep_object)
-result = zrollup(pepData = pep_object)
-}
-
-}
 \references{
 Polpitiya, A. D., Qian, W.-J., Jaitly, N., Petyuk, V. A., Adkins,
   J. N., Camp, D. G., ... Smith, R. D. (2008). \emph{DAnTE: a statistical

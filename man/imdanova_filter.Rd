@@ -2,22 +2,22 @@
 % Please edit documentation in R/filter_objects.R
 \name{imdanova_filter}
 \alias{imdanova_filter}
-\title{IMD-ANOVA filter object}
+\title{IMD-ANOVA Filter Object}
 \usage{
 imdanova_filter(omicsData)
 }
 \arguments{
 \item{omicsData}{object of one of the classes "pepData", "isobaricpepData",
-"proData", "lipidData", "metabData", or "nmrData", usually created by
+"proData", "lipidData", "metabData", or "nmrData", created by
 \code{\link{as.pepData}}, \code{\link{as.isobaricpepData}},
 \code{\link{as.proData}}, \code{\link{as.lipidData}},
 \code{\link{as.metabData}}, or \code{\link{as.nmrData}}, respectively.
-Groups (more than one group) must have been specified using the
+Groups (more than one) must have been specified using the
 \code{\link{group_designation}} function prior to using the imdanova_filter
 function.}
 }
 \value{
-Object of class imdanovaFilt (also a data.frame) containing the
+An S3 object of class imdanovaFilt (also a data.frame) containing the
   molecule identifier and number of samples in each group with non-missing
   values for that molecule.
 }
@@ -33,14 +33,10 @@ The output from this function can be used in conjunction with
   object that is returned.
 }
 \examples{
-\dontrun{
 library(pmartRdata)
-data("pep_object")
-pep_pepData2 <- group_designation(omicsData = pep_object,
-                                  main_effects = "Condition")
-to_filter <- imdanova_filter(omicsData = pep_pepData2)
-summary(to_filter, min_nonmiss_anova = 2)
-}
+mypep <- group_designation(omicsData = pep_object, main_effects = "Phenotype")
+to_filter <- imdanova_filter(omicsData = mypep)
+summary(filter_object = to_filter, min_nonmiss_anova = 2)
 
 }
 \author{

@@ -1,25 +1,27 @@
 #' Creates a data frame displaying multiple metrics
 #'
-#' This function takes in an object of class 'dataRes' and returns a data frame displaying a combination of metrics. The six summarizing metrics include, mean, standard deviation, median, percent observed, minimum and maximum.
+#' This function takes in an object of class 'dataRes' and returns a data frame
+#' displaying a combination of metrics. The six summarizing metrics include,
+#' mean, standard deviation, median, percent observed, minimum, and maximum.
 #'
-#' @param statRes an object of the class 'statRes', created by \code{\link{summarize}}.
-#' @param minmax logical, for specifying whether or not to include minimum and maximum data in the returned data frame. Defaults to FALSE.
+#' @param statRes an object of the class 'dataRes', created by
+#'   \code{\link{edata_summary}}.
+#' @param minmax logical specifying whether or not to include minimum and
+#'   maximum data in the returned data frame. Defaults to FALSE.
 #' @param digits integer indicating the number of decimal places to round
 #'
-#' @details If the 'by' attribute of the input 'statRes' object is set to 'sample', then its groupvar attribute must be set to NULL
+#' @details When creating the 'dataRes' object via \code{\link{edata_summary}},
+#'   if the 'by' argument is set to 'sample', then the 'groupvar' argument must
+#'   be NULL
 #'
 #' @return prints a data frame
 #'
 #' @examples
-#' dontrun{
 #' library(pmartRdata)
-#' data(lipid_object)
-#' lipid_object2 <- edata_transform(omicsData = lipid_object, data_scale = "log2")
+#' mylipid <- edata_transform(omicsData = lipid_neg_object, data_scale = "log2")
 #'
-#' dataRes_sample = edata_summary(omicsData = lipid_object2, groupvar = NULL, by = "sample")
-#' report_dataRes(dataRes_sample)
-#'}
-#'
+#' dataRes_sample <- edata_summary(omicsData = mylipid, groupvar = NULL, by = "sample")
+#' my_output <- report_dataRes(dataRes_sample)
 #'
 #' @export
 
