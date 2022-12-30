@@ -2,7 +2,7 @@
 % Please edit documentation in R/imd_anova.R
 \name{imd_anova}
 \alias{imd_anova}
-\title{Tests for a qualitative and quantitative difference between groups using IMD
+\title{Test for a qualitative and quantitative difference between groups using IMD
 and ANOVA, respectively}
 \usage{
 imd_anova(
@@ -19,24 +19,24 @@ imd_anova(
 )
 }
 \arguments{
-\item{omicsData}{A pmartR data object of any class, which has a `group_df`
-attribute that is usually created by the `group_designation()` function}
+\item{omicsData}{pmartR data object of any class, which has a `group_df`
+attribute created by the `group_designation()` function}
 
-\item{comparisons}{data.frame with columns for "Control" and "Test"
+\item{comparisons}{data frame with columns for "Control" and "Test"
 containing the different comparisons of interest. Comparisons will be made
 between the Test and the corresponding Control. If left NULL, then all
 pairwise comparisons are executed.}
 
 \item{test_method}{character string specifying the filter method to use:
-"combined", "gtest", or "anova". "combined" implements both the gtest and
+"combined", "gtest", or "anova". Specifying "combined" implements both the gtest and
 anova filters.}
 
-\item{pval_adjust_a_multcomp}{A character string specifying the type of multiple
+\item{pval_adjust_a_multcomp}{character string specifying the type of multiple
 comparison adjustment to implement for ANOVA tests. Valid options include:
 "bonferroni", "holm", "tukey", and "dunnett". The default is "none" which
 corresponds to no p-value adjustment.}
 
-\item{pval_adjust_g_multcomp}{A character string specifying the type of multiple
+\item{pval_adjust_g_multcomp}{character string specifying the type of multiple
 comparison adjustment to implement for G-test tests. Valid options include:
 "bonferroni" and "holm". The default is "none" which corresponds to no
 p-value adjustment.}
@@ -52,62 +52,50 @@ adjustment to implement for G-test tests. Valid options include:
 p-value adjustment.}
 
 \item{pval_thresh}{numeric p-value threshold, below or equal to which
-peptides are considered differentially expressed. Defaults to 0.05}
+biomolecules are considered differentially expressed. Defaults to 0.05}
 
-\item{use_parallel}{A logical value indicating whether or not to use a
-"doParallel" loop when running the G-Test with covariates. The default is
+\item{use_parallel}{logical value indicating whether or not to use a
+"doParallel" loop when running the G-Test with covariates. Defaults to 
 TRUE.}
 }
 \value{
-a list of \code{data.frame} objects \tabular{ll}{ Full_Results \tab
-  Columns: e_data cname, group counts, group means, ANOVA p-values, IMD
-  p-values, fold change estimates, fold change significance flags\cr \tab \cr
-  Flags (signatures)  \tab Indicator of statistical significance for one
-  (+/-1 for ANOVA, +/-2 for g-test) or neither (0) test \cr \tab \cr p-values
-  \tab p-values for pairwise comparisons adjusted for within, e.g., peptide
-  multiple comparisons only (not across peptides yet) \cr \tab \cr groupData
-  \tab Mapping between sample ID and group \cr }
+An object of class 'statRes', which is a data frame containing
+  columns (when relevant based on the test(s) performed) for: e_data cname,
+  group counts, group means, ANOVA p-values, IMD p-values, fold change
+  estimates on the same scale as the data (e.g. log2, log10, etc.), and fold
+  change significance flags (0 = not significant; +1 = significant and
+  positive fold change (ANOVA) or more observations in test group relative to
+  reference group (IMD); -1 = significant and negative fold change (ANOVA) or
+  fewer observations in test group relative to reference group (IMD))
 }
 \description{
-This is IMD-ANOVA test proposed in Webb-Robertson et al. (2010).
+This is the IMD-ANOVA test defined in Webb-Robertson et al. (2010).
 }
 \examples{
-\dontrun{
-library(pmartR)
 library(pmartRdata)
-#Transform the data
-mypepData <- edata_transform(omicsData = pep_object, data_scale = "log2")
+# Transform the data
+mymetab <- edata_transform(omicsData = metab_object, data_scale = "log2")
 
-#Group the data by condition
-mypepData <- group_designation(omicsData = mypepData, main_effects = c("Condition"))
+# Group the data by condition
+mymetab <- group_designation(omicsData = mymetab, main_effects = c("Phenotype"))
 
-#Apply the IMD ANOVA filter
-imdanova_Filt <- imdanova_filter(omicsData = mypepData)
-mypepData <- applyFilt(filter_object = imdanova_Filt, omicsData = mypepData, min_nonmiss_anova=2)
+# Apply the IMD ANOVA filter
+imdanova_Filt <- imdanova_filter(omicsData = mymetab)
+mymetab <- applyFilt(filter_object = imdanova_Filt, omicsData = mymetab, min_nonmiss_anova = 2)
 
-#Implement the IMD ANOVA method and compute all pairwise comparisons (i.e. leave the `comparisons` argument NULL)
-anova_res <- imd_anova(omicsData = mypepData, test_method = 'anova')
-imd_res <- imd_anova(omicsData = mypepData, test_method = 'gtest')
-imd_anova_res <- imd_anova(omicsData = mypepData, test_method = 'comb', pval_adjust='bon')
+# Implement IMD ANOVA and compute all pairwise comparisons (i.e. leave the `comparisons` argument NULL)
+anova_res <- imd_anova(omicsData = mymetab, test_method = "anova")
+imd_res <- imd_anova(omicsData = mymetab, test_method = "gtest")
+imd_anova_res <- imd_anova(omicsData = mymetab, test_method = 'combined', pval_adjust_a_multcomp ="bon", pval_adjust_g_multcomp ="bon")
 
-#Test with really big dataset
-library(OvarianPepdataBP)
-tcga_ovarian_pepdata_bp <- as.pepData(e_data = tcga_ovarian_pepdata_bp$e_data, f_data = tcga_ovarian_pepdata_bp$f_data, e_meta = tcga_ovarian_pepdata_bp$e_meta)
-tcga_ovarian_pepdata_bp <- group_designation(omicsData = tcga_ovarian_pepdata_bp, main_effects = c("race"))
-ovarian_res <- imd_anova(omicsData = tcga_ovarian_pepdata_bp, test_method = 'anova')
-#Tukey adjustment is super slow right now because "ptukey" is super slow, not sure how to fix that
-ovarian_res_holm <- imd_anova(omicsData = tcga_ovarian_pepdata_bp, pval_adjust_g_multcomp = 'holm', test_method='gtest')
-#Dunnett adjustment, should give an error because dunnett correction shouldn't be applied for all pairwise comparisons
-ovarian_res_dunnett <- imd_anova(omicsData = tcga_ovarian_pepdata_bp, pval_adjust_a_multcomp = 'dunnett', pval_adjust_g_multcomp = 'dunnett', test_method='combined')
+# Two main effects and a covariate
+mymetab <- group_designation(omicsData = mymetab, main_effects = c("Phenotype", "SecondPhenotype"), covariates = "Characteristic")
+imd_anova_res <- imd_anova(omicsData = mymetab, test_method='comb')
 
-#Test really big dataset, two factors
-tcga_ovarian_pepdata_bp <- group_designation(omicsData = tcga_ovarian_pepdata_bp, main_effects = c("vital_status","neoplasm_histologic_grade"))
-ovarian_res_twofac <- imd_anova(omicsData = tcga_ovarian_pepdata_bp, test_method='comb')
+# Same but with custom comparisons
+comp_df <- data.frame(Control = c("Phenotype1","A"), Test = c("Phenotype2","B"))
+custom_comps_res <- imd_anova(omicsData = mymetab, comparisons = comp_df, test_method = "combined")
 
-#Same but only test main effects (Dead vs Alive, G2 vs G3)
-comp_df <- data.frame(Control=c("Alive","G2"), Test=c("Dead","G3"))
-ovarian_res_twofac_main_effects <- imd_anova(omicsData = tcga_ovarian_pepdata_bp, comparisons = comp_df, test_method='comb')
-}
 
 }
 \references{
