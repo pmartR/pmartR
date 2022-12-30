@@ -353,6 +353,42 @@ test_that('all tests conform to the decrees of the God of Stats',{
     ) < 0.0001132809
   )
 
+  # ANOVA: FDR adjust ---------------------------
+  afruit_fdr_bon_1_0_2 <- imd_anova(afilta_1_0_2, test_method = "anova", pval_adjust_a_fdr = "bonferroni")
+  afruit_fdr_holm_1_0_2 <- imd_anova(afilta_1_0_2, test_method = "anova", pval_adjust_a_fdr = "holm")
+  expect_equal(afruit_fdr_bon_1_0_2$P_value_A_Infection_vs_Mock,
+               c(apply(data.frame(afruit_1_0_2$P_value_A_Infection_vs_Mock), 2, p.adjust, method = "bonferroni")))
+  expect_equal(afruit_fdr_holm_1_0_2$P_value_A_Infection_vs_Mock,
+               c(apply(data.frame(afruit_1_0_2$P_value_A_Infection_vs_Mock), 2, p.adjust, method = "holm")))
+  
+  afruit_fdr_bon_1_1_3 <- imd_anova(afilta_1_1_3, test_method = "anova", pval_adjust_a_fdr = "bonferroni")
+  afruit_fdr_holm_1_1_3 <- imd_anova(afilta_1_1_3, test_method = "anova", pval_adjust_a_fdr = "holm")
+  expect_equal(afruit_fdr_bon_1_1_3$P_value_A_zombie_vs_human,
+               c(apply(data.frame(afruit_1_1_3$P_value_A_zombie_vs_human), 2, p.adjust, method = "bonferroni")))
+  expect_equal(afruit_fdr_holm_1_1_3$P_value_A_zombie_vs_human,
+               c(apply(data.frame(afruit_1_1_3$P_value_A_zombie_vs_human), 2, p.adjust, method = "holm")))
+  
+  afruit_fdr_bon_1_2_3 <- imd_anova(afilta_1_2_3, test_method = "anova", pval_adjust_a_fdr = "bonferroni")
+  afruit_fdr_holm_1_2_3 <- imd_anova(afilta_1_2_3, test_method = "anova", pval_adjust_a_fdr = "holm")
+  expect_equal(afruit_fdr_bon_1_2_3$P_value_A_zombie_vs_human,
+               c(apply(data.frame(afruit_1_2_3$P_value_A_zombie_vs_human), 2, p.adjust, method = "bonferroni")))
+  expect_equal(afruit_fdr_holm_1_2_3$P_value_A_zombie_vs_human,
+               c(apply(data.frame(afruit_1_2_3$P_value_A_zombie_vs_human), 2, p.adjust, method = "holm")))
+
+  afruit_fdr_bon_2_0_3 <- imd_anova(afilta_2_0_3, test_method = "anova", pval_adjust_a_fdr = "bonferroni")
+  afruit_fdr_holm_2_0_3 <- imd_anova(afilta_2_0_3, test_method = "anova", pval_adjust_a_fdr = "holm")
+  expect_equal(afruit_fdr_bon_2_0_3$P_value_A_Infection_high_vs_Mock_none,
+               c(apply(data.frame(afruit_2_0_3$P_value_A_Infection_high_vs_Mock_none), 2, p.adjust, method = "bonferroni")))
+  expect_equal(afruit_fdr_holm_2_0_3$P_value_A_Infection_high_vs_Mock_none,
+               c(apply(data.frame(afruit_2_0_3$P_value_A_Infection_high_vs_Mock_none), 2, p.adjust, method = "holm")))
+
+  afruit_fdr_bon_2_1_4 <- imd_anova(afilta_2_1_4, test_method = "anova", pval_adjust_a_fdr = "bonferroni")
+  afruit_fdr_holm_2_1_4 <- imd_anova(afilta_2_1_4, test_method = "anova", pval_adjust_a_fdr = "holm")  
+  expect_equal(afruit_fdr_bon_2_1_4$P_value_A_Infection_high_vs_Infection_low,
+               c(apply(data.frame(afruit_2_1_4$P_value_A_Infection_high_vs_Infection_low), 2, p.adjust, method = "bonferroni")))
+  expect_equal(afruit_fdr_holm_2_1_4$P_value_A_Infection_high_vs_Infection_low,
+               c(apply(data.frame(afruit_2_1_4$P_value_A_Infection_high_vs_Infection_low), 2, p.adjust, method = "holm")))
+
   # G-Test: Unadjusted p-values ---------------
 
   expect_equal(gfruit_1_0_2, gstan_1_0_2)
@@ -398,7 +434,43 @@ test_that('all tests conform to the decrees of the God of Stats',{
                        p.adjust,
                        method = "holm")))
   )
-
+  
+  # G-Test: FDR adjust --------------------------
+  gfruit_fdr_bon_1_0_2 <- imd_anova(gfilta_1_0_2, test_method = "gtest", pval_adjust_g_fdr = "bonferroni")
+  gfruit_fdr_holm_1_0_2 <- imd_anova(gfilta_1_0_2, test_method = "gtest", pval_adjust_g_fdr = "holm")
+  expect_equal(gfruit_fdr_bon_1_0_2$P_value_G_Infection_vs_Mock,
+               c(apply(data.frame(gfruit_1_0_2$P_value_G_Infection_vs_Mock), 2, p.adjust, method = "bonferroni")))
+  expect_equal(gfruit_fdr_holm_1_0_2$P_value_G_Infection_vs_Mock,
+               c(apply(data.frame(gfruit_1_0_2$P_value_G_Infection_vs_Mock), 2, p.adjust, method = "holm")))
+  
+  gfruit_fdr_bon_1_1_3 <- imd_anova(gfilta_1_1_3, test_method = "gtest", pval_adjust_g_fdr = "bonferroni")
+  gfruit_fdr_holm_1_1_3 <- imd_anova(gfilta_1_1_3, test_method = "gtest", pval_adjust_g_fdr = "holm")
+  expect_equal(gfruit_fdr_bon_1_1_3$P_value_G_zombie_vs_human,
+               c(apply(data.frame(gfruit_1_1_3$P_value_G_zombie_vs_human), 2, p.adjust, method = "bonferroni")))
+  expect_equal(gfruit_fdr_holm_1_1_3$P_value_G_zombie_vs_human,
+               c(apply(data.frame(gfruit_1_1_3$P_value_G_zombie_vs_human), 2, p.adjust, method = "holm")))
+  
+  gfruit_fdr_bon_1_2_3 <- imd_anova(gfilta_1_2_3, test_method = "gtest", pval_adjust_g_fdr = "bonferroni")
+  gfruit_fdr_holm_1_2_3 <- imd_anova(gfilta_1_2_3, test_method = "gtest", pval_adjust_g_fdr = "holm")
+  expect_equal(gfruit_fdr_bon_1_2_3$P_value_G_zombie_vs_human,
+               c(apply(data.frame(gfruit_1_2_3$P_value_G_zombie_vs_human), 2, p.adjust, method = "bonferroni")))
+  expect_equal(gfruit_fdr_holm_1_2_3$P_value_G_zombie_vs_human,
+               c(apply(data.frame(gfruit_1_2_3$P_value_G_zombie_vs_human), 2, p.adjust, method = "holm")))
+  
+  gfruit_fdr_bon_2_0_3 <- imd_anova(gfilta_2_0_3, test_method = "gtest", pval_adjust_g_fdr = "bonferroni")
+  gfruit_fdr_holm_2_0_3 <- imd_anova(gfilta_2_0_3, test_method = "gtest", pval_adjust_g_fdr = "holm")
+  expect_equal(gfruit_fdr_bon_2_0_3$P_value_G_Infection_high_vs_Mock_none,
+               c(apply(data.frame(gfruit_2_0_3$P_value_G_Infection_high_vs_Mock_none), 2, p.adjust, method = "bonferroni")))
+  expect_equal(gfruit_fdr_holm_2_0_3$P_value_G_Infection_high_vs_Mock_none,
+               c(apply(data.frame(gfruit_2_0_3$P_value_G_Infection_high_vs_Mock_none), 2, p.adjust, method = "holm")))
+  
+  gfruit_fdr_bon_2_1_4 <- imd_anova(gfilta_2_1_4, test_method = "gtest", pval_adjust_g_fdr = "bonferroni")
+  gfruit_fdr_holm_2_1_4 <- imd_anova(gfilta_2_1_4, test_method = "gtest", pval_adjust_g_fdr = "holm")  
+  expect_equal(gfruit_fdr_bon_2_1_4$P_value_G_Infection_high_vs_Infection_low,
+               c(apply(data.frame(gfruit_2_1_4$P_value_G_Infection_high_vs_Infection_low), 2, p.adjust, method = "bonferroni")))
+  expect_equal(gfruit_fdr_holm_2_1_4$P_value_G_Infection_high_vs_Infection_low,
+               c(apply(data.frame(gfruit_2_1_4$P_value_G_Infection_high_vs_Infection_low), 2, p.adjust, method = "holm")))
+  
   # Combined: Unadjusted p-values ---------------
 
   expect_equal(cfruit_1_0_2, cstan_1_0_2)
@@ -407,7 +479,7 @@ test_that('all tests conform to the decrees of the God of Stats',{
   expect_equal(cfruit_2_0_3, cstan_2_0_3)
   expect_equal(cfruit_2_1_4, cstan_2_1_4)
   expect_equal(cfruit_2_2_4, cstan_2_2_4)
-
+  
   # Test argument checks -------------------------------------------------------
 
   # Maybe add later (depending on the position of the planets and stars).
