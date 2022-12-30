@@ -657,11 +657,11 @@ imd_anova <- function (omicsData,
 #'   containing the different comparisons of interest. Comparisons will be made
 #'   between the Test and the corresponding Control  If left NULL, then all
 #'   pairwise comparisons are executed.
-#' @param pval_adjust_multcomp A character string specifying the type of multiple
+#' @param pval_adjust_multcomp character string specifying the type of multiple
 #'   comparisons adjustment to implement. The default, "none", corresponds to no
 #'   adjustment. Valid options include: "bonferroni", "holm", "tukey", and
 #'   "dunnett".
-#' @param pval_adjust_fdr A character string specifying the type of FDR adjustment
+#' @param pval_adjust_fdr character string specifying the type of FDR adjustment
 #'   to implement. The default, "none", corresponds to no adjustment. Valid
 #'   options include: "bonferroni" and "holm".
 #' @param pval_thresh numeric p-value threshold, below or equal to which
