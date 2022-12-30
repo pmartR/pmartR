@@ -20,11 +20,11 @@
 #'   comparison adjustment to implement for G-test tests. Valid options include:
 #'   "bonferroni" and "holm". The default is "none" which corresponds to no
 #'   p-value adjustment.
-#' @param pval_adjust_a_fdr A character string specifying the type of FDR
+#' @param pval_adjust_a_fdr character string specifying the type of FDR
 #'   adjustment to implement for ANOVA tests. Valid options include:
 #'   "bonferroni" and "holm". The default is "none" which corresponds to no
 #'   p-value adjustment.
-#' @param pval_adjust_g_fdr A character string specifying the type of FDR
+#' @param pval_adjust_g_fdr character string specifying the type of FDR
 #'   adjustment to implement for G-test tests. Valid options include:
 #'   "bonferroni" and "holm". The default is "none" which corresponds to no
 #'   p-value adjustment.
