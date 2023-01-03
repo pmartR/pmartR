@@ -1,29 +1,19 @@
-#' Summarizes an object of class nmrnormRes
+#' Summary of nmrnormRes Object
 #' 
-#' For creating a summary of an S3 object of type 'nmrnormRes':
+#' For creating a summary of an S3 object of type 'nmrnormRes'
 #' 
-#' @param nmrnormRes_object an object of type nmrnormRes, created by \code{\link{normalize_nmr}}  
+#' @param nmrnormRes_object object of type nmrnormRes, created by
+#'   \code{\link{normalize_nmr}}
 #'
-#' @return data.frame object
-#' 
+#' @return data frame object
 #' 
 #' @examples
-#' \dontrun{
 #' library(pmartRdata)
-#' data(nmr_object_identified)
-#' 
-#' nmr_object = edata_transform(nmr_object_identified, "log2")
-#' nmr_norm = normalize_nmr(nmr_object, apply_norm = FALSE, metabolite_name = "unkm1.53")
-#' summary(nmr_norm)
-#' 
-#' # alternate specification: #
-#' data(nmr_object_identified)
-#' 
-#' nmr_object = edata_transform(nmr_object, "log2")
-#' nmr_norm = normalize_nmr(nmr_object, apply_norm = FALSE, sample_property_cname = "Concentration")
-#' summary(nmr_norm)
-#' 
-#'}
+#' mynmr <- edata_transform(omicsData = nmr_identified_object, 
+#'                          data_scale = "log2")
+#' nmr_norm <- normalize_nmr(omicsData = mynmr, apply_norm = FALSE,
+#'                          sample_property_cname = "Concentration")
+#' mysummary <- summary(nmr_norm)
 #' 
 #' @export
 #' @rdname summary-nmrnormRes

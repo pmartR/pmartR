@@ -1,6 +1,7 @@
 #' Summarizes potential plotting options for a trelliData object 
 #' 
-#' @param trelliData An object of the as.trelliData.edata or as.trelliData functions. 
+#' @param trelliData An object from the as.trelliData.edata or as.trelliData
+#'   functions
 #' 
 #' @examples 
 #' \dontrun{
@@ -9,7 +10,7 @@
 #' 
 #' # Use an edata example. Build with as.trelliData.edata.
 #' summary(trelliData)
-#' summary(trelliData %>% trelli_panel_by("LipidCommonName"))
+#' summary(trelliData %>% trelli_panel_by("Lipid"))
 #' summary(trelliData %>% trelli_panel_by("Sample"))
 #' 
 #' # Use an omicsData example. Build with as.trelliData.

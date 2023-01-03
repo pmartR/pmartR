@@ -1,51 +1,56 @@
 #' Combines two omicsData objects with identical sample information.
 #'
-#' @param obj_1,obj_2 Two omicsData objects of the same supported type, 
-#' currently "lipidData".  See details for more requirements.
-#' @param retain_groups Whether to attempt to apply existing group information 
-#' to the new object (defaults to FALSE).
+#' @param obj_1 omicsData object of the same supported type as obj_2, currently
+#'   "lipidData". See details for more requirements.
+#' @param obj_2 omicsData object of the same supported type as obj_1, currently
+#'   "lipidData". See details for more requirements.
+#' @param retain_groups logical indicator of whether to attempt to apply
+#'   existing group information to the new object. Defaults to FALSE.
 #' @param retain_filters Whether to retain filter information in the new object 
 #' (defaults to FALSE).
-#' @param ... Extra arguments, not one of 'omicsData', 'main_effects', or 'covariates' to be passed to `pmartR::group_designation`.
-#' 
+#' @param ... Extra arguments, not one of 'omicsData', 'main_effects', or
+#'   'covariates' to be passed to `pmartR::group_designation`.
+#'   
 #' @return An object of the same type as the two input objects, with their 
 #' combined data.
 #'
 #' @details
 #' General requirements:
-#' 
-#' * sample names:  These must be identical for both objects (column names of e_data, and sample identifiers in f_data).
-#' * data attributes:  Objects must be on the same scale and both be either normalized or unnormalized.  
-#' * group designation:  Objects must have the same grouping structure if retain_groups = T.
-#' 
-#' @md
+#'
+#' * sample names: These must be identical for both objects (column names of
+#' e_data, and sample identifiers in f_data)
+#' * data attributes: Objects must be on the same scale and both be either
+#' normalized or unnormalized
+#' * group designation: Objects must have the same grouping structure if
+#' retain_groups = T
 #'
 #' @examples
-#' library(pmartR)
 #' library(pmartRdata)
 #' 
-#' obj_1 <- pmartRdata::lipid_object_neg
-#' obj_2 <- pmartRdata::lipid_object_pos
+#' obj_1 <- lipid_neg_object
+#' obj_2 <- lipid_pos_object
 #' 
-#' # de-dupe any duplicate edata identifiers
+#' # de-duplicate any duplicate edata identifiers
+#' all(obj_2$e_data[,get_edata_cname(obj_2)] == obj_2$e_meta[,get_edata_cname(obj_2)])
 #' obj_2$e_data[,get_edata_cname(obj_2)] <- paste0("obj_2_", obj_2$e_data[,get_edata_cname(obj_2)])
+#' obj_2$e_meta[,get_edata_cname(obj_2)] <- obj_2$e_data[,get_edata_cname(obj_2)]
 #' 
-#' combine_object <- combine_lipidData(obj_1, obj_2)
+#' combine_object <- combine_lipidData(obj_1 = obj_1, obj_2 = obj_2)
 #' 
 #' # preprocess and group the data and keep filters/grouping structure
 #' 
-#' obj_1 <- edata_transform(obj_1, "log2")
-#' obj_1 <- normalize_global(obj_1, "all", "median", apply_norm = T)
-#' obj_2 <- edata_transform(obj_2, "log2")
-#' obj_2 <- normalize_global(obj_2, "all", "median", apply_norm = T)
+#' obj_1 <- edata_transform(omicsData = obj_1, data_scale = "log2")
+#' obj_1 <- normalize_global(omicsData = obj_1, subset_fn = "all", norm_fn = "median", apply_norm = TRUE)
+#' obj_2 <- edata_transform(omicsData = obj_2, data_scale = "log2")
+#' obj_2 <- normalize_global(omicsData = obj_2, subset_fn = "all", norm_fn = "median", apply_norm = TRUE)
 #' 
-#' obj_1 <- group_designation(obj_1, "Condition")
-#' obj_2 <- group_designation(obj_2, "Condition")
+#' obj_1 <- group_designation(omicsData = obj_1, main_effects = "Virus")
+#' obj_2 <- group_designation(omicsData = obj_2, main_effects = "Virus")
 #' 
-#' obj_1 <- applyFilt(molecule_filter(obj_1), obj_1, min_num = 2)
-#' obj_2 <- applyFilt(cv_filter(obj_2),obj_2, cv_thresh = 60)
+#' obj_1 <- applyFilt(filter_object = molecule_filter(omicsData = obj_1), omicsData = obj_1, min_num = 2)
+#' obj_2 <- applyFilt(filter_object = cv_filter(omicsData = obj_2),obj_2, cv_thresh = 60)
 #' 
-#' combine_lipidData(obj_1, obj_2, retain_groups = T, retain_filters = T)
+#' combine_object_later <- combine_lipidData(obj_1 = obj_1, obj_2 = obj_2, retain_groups = T, retain_filters = T)
 #' 
 #' @export
 #' 
@@ -61,7 +66,8 @@ combine_lipidData <- function(obj_1, obj_2, retain_groups = FALSE, retain_filter
   # Check that it is among supported objects
   if(!(class(obj_1) %in% c("lipidData"))) stop("Currently only support lipidData")
   
-  if(get_data_norm(obj_1) != get_data_norm(obj_2)) stop("Both objects must have the same normalization status (normalized/unnormalized)") 
+  if(get_data_norm(obj_1) != get_data_norm(obj_2))
+    stop("Both objects must have the same normalization status (normalized/unnormalized)")
   # if(attr(obj_1, "data_info")$norm_info$is_normalized != 
   #    attr(obj_2, "data_info")$norm_info$is_normalized) {
     # stop("Both objects must have the same normalization status (normalized/unnormalized)") 
@@ -155,10 +161,15 @@ combine_lipidData <- function(obj_1, obj_2, retain_groups = FALSE, retain_filter
         length(unique(emeta_ids_1)) + length(unique(emeta_ids_2))) {
       
       if(drop_duplicate_emeta) {
-        warning("There were non-unique molecule identifiers in e_meta, dropping these duplicates, some meta-data information may be lost.") 
-        new_emeta <- new_emeta %>% dplyr::distinct(!!rlang::sym(new_edata_cname), .keep_all = TRUE)
+        warning(
+          "There were non-unique molecule identifiers in e_meta, dropping these duplicates, some meta-data information may be lost."
+        )
+        new_emeta <-
+          new_emeta %>% dplyr::distinct(!!rlang::sym(new_edata_cname), .keep_all = TRUE)
       } else {
-        warning("There were non-unique molecule identifiers in e_meta, this may cause the object construction to fail if edata_cname and emeta_cname do not specify unique rows in the combined e_meta")
+        warning(
+          "There were non-unique molecule identifiers in e_meta, this may cause the object construction to fail if edata_cname and emeta_cname do not specify unique rows in the combined e_meta"
+        )
       }
     }
     

@@ -7,5 +7,5 @@
 \method{print}{proteomicsFilt}(filter_object)
 }
 \description{
-For printing an S3 object of type 'proteomicsFilt':
+For printing an S3 object of type 'proteomicsFilt'
 }

@@ -1,15 +1,33 @@
-#' Returns data.frame with comparisons to be made 
+#' Returns data frame with comparisons to be made 
 #' 
-#' The method creates a data.frame containing the comparisons to be made using differential statistics.  
+#' The method creates a data frame containing the comparisons to be made when
+#' performing differential statistics.
 #'  
-#' @param comp_type string taking one of the following values: control, pairwise, custom. Specifying "control" indicates that all other groups are to be compared to this single control group. Specifying "pairwise" indicates that all pairwise comparisons are to be made. 
-#' @param omicsData A pmartR data object of any class, which has a `group_df` attribute that is usually created by the `group_designation()` function
-#' @param control_group string indicating the group to use for the control group. Only required when comp_type="control".
+#' @param comp_type string specifying either "control" or 
+#'   "pairwise". Specifying "control" indicates that all other groups are
+#'   to be compared to a single control group. Specifying "pairwise"
+#'   indicates that all pairwise comparisons are to be made.
+#' @param omicsData A pmartR data object of any class, which has a `group_df`
+#'   attribute created by the `group_designation()` function
+#' @param control_group string indicating the group to use for the control
+#'   group. Only required when comp_type="control".
 #'
-#' @details This function takes in the omicsData and type of comparison, and returns a data.frame where each row corresponds to a comparison of interest.
+#' @details This function takes in the omicsData and type of comparison, and
+#'   returns a data frame where each row corresponds to a comparison of
+#'   interest.
 #'
-#' @return data.frame with columns for Test and Control. Each row corresponds to a comparison of interest. 
-#' #'  
+#' @return data frame with columns for Test and Control. Each row corresponds to
+#'   a comparison of interest.
+#'   
+#' @examples 
+#' library(pmartRdata)
+#' mymetab <- group_designation(omicsData = metab_object, main_effects = "Phenotype")
+#' create_comparisonDF(comp_type = "pairwise", omicsData = mymetab)
+#' 
+#' create_comparisonDF(comp_type = "control", omicsData = mymetab, control_group = "Phenotype1")
+#' 
+#' @seealso \code{\link{group_designation}}
+#' 
 #' @author Kelly Stratton
 #' 
 #' @export
@@ -30,8 +48,8 @@ create_comparisonDF <- function(comp_type, omicsData, control_group=NULL){
   
   
   ## initial checks ##
-  if(!(comp_type %in% c("control", "pairwise", "custom"))){
-    stop("Comparison type must be one of the following: control, pairwise, custom")
+  if(!(comp_type %in% c("control", "pairwise"))){
+    stop("Comparison type must be one of the following: control, pairwise")
   }
   
   if(comp_type=="control" & is.null(control_group)){

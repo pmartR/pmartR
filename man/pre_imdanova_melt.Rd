@@ -7,17 +7,23 @@
 pre_imdanova_melt(e_data, groupDF, samp_id)
 }
 \arguments{
-\item{e_data}{\eqn{p \times n} data.frame, where \eqn{p} is the number of peptides, proteins, lipids, metabolites, or accessions and \eqn{n} is the number of samples. e_data contains}
+\item{e_data}{\eqn{p \times n} data.frame, where \eqn{p} is the number of
+peptides, proteins, lipids, metabolites, or accessions and \eqn{n} is the
+number of samples}
 
-\item{groupDF}{data.frame created by \code{group_designation} with columns for the sample identifier and the designated group.}
+\item{groupDF}{data frame created by \code{group_designation} with columns
+for the sample identifier and the designated group.}
 
-\item{samp_id}{character string specifying the name of the column containing the sample identifiers in \code{groupDF}.}
+\item{samp_id}{character string specifying the name of the column containing
+the sample identifiers in \code{groupDF}.}
 }
 \value{
-a data.frame of class "grouped_dt" which is compatible with functions in the dplyr package
+a data frame of class "grouped_dt" which is compatible with functions
+  in the dplyr package
 }
 \description{
-This function creates a melted version of e_data, grouped by edata_id and group designation, for future use of implementing a IMD_ANOVA filter
+This function creates a melted version of e_data, grouped by edata_id and
+group designation, for future use of implementing a IMD_ANOVA filter
 }
 \author{
 Lisa Bramer, Kelly Stratton

@@ -7,5 +7,5 @@
 \method{print}{RNAFilt}(filter_object)
 }
 \description{
-For printing an S3 object of type 'RNAFilt':
+For printing an S3 object of type 'RNAFilt'
 }

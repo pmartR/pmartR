@@ -2,33 +2,39 @@
 % Please edit documentation in R/filter_objects.R
 \name{molecule_filter}
 \alias{molecule_filter}
-\title{Molecule filter object}
+\title{Molecule Filter Object}
 \usage{
 molecule_filter(omicsData, use_groups = FALSE, use_batch = FALSE)
 }
 \arguments{
-\item{omicsData}{an object of the class 'pepData', 'proData', 'metabData',
-'lipidData', 'nmrData', or 'seqData', usually created by \code{\link{as.pepData}},
+\item{omicsData}{object of the class 'pepData', 'proData', 'metabData',
+'lipidData', 'nmrData', or 'seqData', created by \code{\link{as.pepData}},
 \code{\link{as.proData}}, \code{\link{as.metabData}},
-\code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, 
-or \code{\link{as.nmrData}}, respectively.}
+\code{\link{as.lipidData}}, \code{\link{as.nmrData}}, or \code{\link{as.seqData}}, respectively.}
 
 \item{use_batch}{logical indicator for whether to utilize batch information
 from \code{\link{group_designation}} when calculating the molecule filter.
-Defaults to FALSE. Necessary to be set to TRUE if running ComBat batch
-correction.}
+Defaults to FALSE. When batch information is used to calculate the molecule
+filter, the minimum number of observations is required within each batch,
+as opposed to across all samples regardless of batch. If ComBat or similar
+method will be used for downstream batch effect correction, this argument
+should be set to TRUE.}
 
-\item{min_num}{an integer value specifying the minimum number of times each
-feature must be observed across all samples. Default value is 2.}
+\item{min_num}{integer value specifying the minimum number of times each
+biomolecule must be observed across all samples. Default value is 2 (i.e.
+biomolecules seen in just 1 sample or in no samples will be removed once
+the filter is applied).}
 
 \item{use_group}{logical indicator for whether to utilize group information
 from \code{\link{group_designation}} when calculating the molecule filter.
-Defaults to FALSE.}
+Defaults to FALSE. When group information is used to calculate the molecule
+filter, the minimum number of observations is required within each group,
+as opposed to across all samples regardless of group membership.}
 }
 \value{
-Object of class moleculeFilt (also a data.frame) that contains the
+An S3 object of class 'moleculeFilt' (also a data.frame) that contains the
   molecule identifier and the number of samples for which the molecule was
-  measured (not NA)
+  observed (i.e. not NA)
 }
 \description{
 This function returns a moleculeFilt object for use with
@@ -40,12 +46,9 @@ Attribute of molecule_filt object is "total_poss_obs", the number of
   samples)
 }
 \examples{
-\dontrun{
 library(pmartRdata)
-data("pep_object")
 to_filter <- molecule_filter(omicsData = pep_object)
-summary(to_filter, min_num = 2)
-}
+summary(filter_object = to_filter, min_num = 2)
 
 }
 \author{

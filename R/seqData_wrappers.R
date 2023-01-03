@@ -1,39 +1,44 @@
-#' Wrapper for Differential Expression workflows
+#' Differential Expression for seqData
 #' 
-#' For generating statistics for 'seqData' objects
-#' 
-#' @param omicsData an object of type 'seqData', created by \code{\link{as.seqData}}
-#' @param method a character string of length one specifying which wrapper to use. 
-#' Can be 'edgeR', 'DESeq2', or 'limma-voom' 
-#' @param p_adjust Character string for p-value correction method, refer to 
-#' ?p.adjust() for valid options. Defaults to "BH" (Benjamini & Hochberg)
-#' @param comparisons `data.frame` with columns for "Control" and "Test"
+#' Performs statistical analysis for differential expression of seqData objects,
+#' using methods from one of: edgeR, DESeq2, or limma-voom
+#'
+#' @param omicsData object of type 'seqData' created by
+#'   \code{\link{as.seqData}}
+#' @param method character string of length one specifying which wrapper to
+#'   use. Can be 'edgeR', 'DESeq2', or 'voom'
+#' @param p_adjust character string for p-value correction method, refer to
+#'   ?p.adjust() for valid options. Defaults to "BH" (Benjamini & Hochberg).
+#' @param comparisons data frame with columns for "Control" and "Test"
 #'   containing the different comparisons of interest. Comparisons will be made
 #'   between the Test and the corresponding Control  If left NULL, then all
 #'   pairwise comparisons are executed.
-#' @param p_cutoff Numeric value between 0 and 1 for setting p-value significance threshold
-#' @param ... additional arguments passed to methods functions. Note, formatting 
-#' option changes will interfere with wrapping functionality.
-#' 
+#' @param p_cutoff numeric value between 0 and 1 for setting p-value
+#'   significance threshold
+#' @param ... additional arguments passed to methods functions. Note, formatting
+#'   option changes will interfere with wrapping functionality.
+#'   
 #'
-#' @return a statRes object (data.frame)
+#' @return object of class statRes 
 #'
 #' @details Runs default differential expression workflows.
 #' 
-#' Flags (signatures) -	Indicator of statistical significance for computed test. 
-#' Zeros indicate no significance, while +/- 1 indicates direction of significance.
+#' Flags (signatures) -	Indicator of statistical significance.
+#' Zeroes indicate no significance, while +/- 1 indicates direction of
+#' significance.
 #'
-#' Method "edgeR" - Runs default edgeR workflow with empirical Bayes quasi-likelihood F-tests.
-#' Additional arguments can be passed for use in the function, 
-#' refer to calcNormFactors() and glmQLFit() in edgeR package.
+#' Method "edgeR" - Runs default edgeR workflow with empirical Bayes
+#' quasi-likelihood F-tests. Additional arguments can be passed for use in the
+#' function. Refer to calcNormFactors() and glmQLFit() in edgeR package.
 #'
-#' Method "DESeq2" - Runs default DESeq workflow. Defaults to Wald test, no independent filtering, and 
-#' running in parallel. Additional arguments can be passed for use in the function, 
-#' refer to DESeq() and results() in DESeq2 package. Requires 'survival' package to run.
-#' 
-#' Method "voom" - Runs default limma-voom workflow using empirical Bayes moderated t-statistics.
-#' Additional arguments can be passed for use in the function, 
-#' refer to calcNormFactors() in edgeR package.
+#' Method "DESeq2" - Runs default DESeq workflow. Defaults to Wald test, no
+#' independent filtering, and running in parallel. Additional arguments can be
+#' passed for use in the function. Refer to DESeq() and results() in DESeq2
+#' package. Requires 'survival' package to run.
+#'
+#' Method "voom" - Runs default limma-voom workflow using empirical Bayes
+#' moderated t-statistics. Additional arguments can be passed for use in the
+#' function. Refer to calcNormFactors() in edgeR package.
 #' 
 #' @references 
 #'  Robinson MD, McCarthy DJ, Smyth GK (2010). “edgeR: a Bioconductor package 
@@ -48,18 +53,13 @@
 #'  RNA-sequencing and microarray studies. Nucleic Acids Research 43(7), e47.
 #' 
 #' @examples
-#' \dontrun{
-#' 
 #' library(pmartRdata)
-#' myseqData <- rnaseq_object
-#' myseqData <- group_designation(omicsData = myseqData, main_effects = "Virus")
-#' statsresults <- diffexp_seq(omicsData = myseqData, method = "edgeR")
-#' 
-#' }
+#' myseqData <- group_designation(omicsData = rnaseq_object, main_effects = "Virus")
+#' edger_results <- diffexp_seq(omicsData = myseqData, method = "edgeR")
+#' deseq_results <- diffexp_seq(omicsData = myseqData, method = "DESeq2")
+#' voom_results <- diffexp_seq(omicsData = myseqData, method = "voom")
 #' 
 #' @export
-#' @rdname diffexp_seq
-#' @name diffexp_seq
 #' 
 diffexp_seq <- function(omicsData, method = "edgeR", p_adjust = "BH", 
                         comparisons = NULL, p_cutoff = 0.05, ...){
@@ -127,26 +127,27 @@ diffexp_seq <- function(omicsData, method = "edgeR", p_adjust = "BH",
 #' significance tests, or the likelihood ratio test on the difference in 
 #' deviance between a full and reduced model formula 
 #' @param method a character string of length one specifying which wrapper to use. 
-#' Can be 'edgeR', 'DESeq2', or 'limma-voom' 
+#' Can be 'edgeR', 'DESeq2', or 'voom' 
 #' @param p_adjust Character string for p-value correction method, refer to 
 #' ?p.adjust() for valid options. Defaults to "BH" (Benjamini & Hochberg)
 #' @param comparisons `data.frame` with columns for "Control" and "Test"
 #'   containing the different comparisons of interest. Comparisons will be made
 #'   between the Test and the corresponding Control  If left NULL, then all
 #'   pairwise comparisons are executed.
-#' @param p_cutoff Numeric value between 0 and 1 for setting p-value significance threshold
-#' @param ... additional arguments passed to methods functions. Note, formatting 
-#' option changes will interfere with wrapping functionality.
+#' @param p_cutoff Numeric value between 0 and 1 for setting p-value
+#'   significance threshold
+#' @param ... additional arguments passed to methods functions. Note, formatting
+#'   option changes will interfere with wrapping functionality.
 #' @param ... additional arguments passed to function
-#' 
-#' @details Runs default DESeq workflow. Defaults to Wald test, no independent filtering, and 
-#' running in parallel. Additional arguments can be passed for use in the function, 
-
-#' refer to DESeq() and results() in DESeq2 package. Requires 'survival' package to run.
 #'
-#' Flags (signatures) -	Indicator of statistical significance for computed test. 
-#' Zeros indicate no significance, while +/- 1 indicates direction of significance.
-
+#' @details Runs default DESeq workflow. Defaults to Wald test, no independent
+#'   filtering, and running in parallel. Additional arguments can be passed for
+#'   use in the function, refer to DESeq() and results() in DESeq2 package.
+#'   Requires 'survival' package to run.
+#'
+#'   Flags (signatures) -	Indicator of statistical significance for computed
+#'   test. Zeros indicate no significance, while +/- 1 indicates direction of
+#'   significance.
 #'
 #' @references 
 #'  
@@ -154,18 +155,7 @@ diffexp_seq <- function(omicsData, method = "edgeR", p_adjust = "BH",
 #'  dispersion for RNA-seq data with DESeq2 Genome Biology 15(12):550 (2014)
 #'  
 #'
-#' @return a statRes object (data.frame)
-#' 
-#' 
-#' @examples
-#' \dontrun{
-#' 
-#' library(pmartRdata)
-#' myseqData <- rnaseq_object
-#' myseqData <- group_designation(omicsData = myseqData, main_effects = "Virus")
-#' statsresults <- pmartR:::DESeq2_wrapper(omicsData = myseqData)
-#' 
-#' }
+#' @return statRes object
 #' 
 #' 
 DESeq2_wrapper <- function(
@@ -398,48 +388,38 @@ DESeq2_wrapper <- function(
   
 }
 
-#' Wrapper for EdgeR workflow
+#' Wrapper for edgeR workflow
 #' 
 #' For generating statistics for 'seqData' objects
 #' 
-#' @param omicsData an object of type 'seqData', created by \code{\link{as.seqData}}
-#' @param method a character string of length one specifying which wrapper to use. 
-#' Can be 'edgeR', 'DESeq2', or 'limma-voom' 
-#' @param p_adjust Character string for p-value correction method, refer to 
-#' ?p.adjust() for valid options. Defaults to "BH" (Benjamini & Hochberg).
+#' @param omicsData an object of type 'seqData', created by
+#'   \code{\link{as.seqData}}
+#' @param method a character string of length one specifying which wrapper to
+#'   use. Can be 'edgeR', 'DESeq2', or 'limma-voom'
+#' @param p_adjust Character string for p-value correction method, refer to
+#'   ?p.adjust() for valid options. Defaults to "BH" (Benjamini & Hochberg).
 #' @param comparisons `data.frame` with columns for "Control" and "Test"
 #'   containing the different comparisons of interest. Comparisons will be made
 #'   between the Test and the corresponding Control  If left NULL, then all
 #'   pairwise comparisons are executed.
-#' @param p_cutoff Numeric value between 0 and 1 for setting p-value significance threshold
-#' @param ... additional arguments passed to methods functions. Note, formatting 
-#' option changes will interfere with wrapping functionality.
+#' @param p_cutoff Numeric value between 0 and 1 for setting p-value
+#'   significance threshold
+#' @param ... additional arguments passed to methods functions. Note, formatting
+#'   option changes will interfere with wrapping functionality.
 #'
+#' @return statRes object
 #'
-#' @return a statRes object (data.frame)
-#' 
-#' @details Runs default edgeR workflow with empirical Bayes quasi-likelihood F-tests.
-#' Additional arguments can be passed for use in the function, 
-#' refer to calcNormFactors() and glmQLFit() in edgeR package.
+#' @details Runs default edgeR workflow with empirical Bayes quasi-likelihood
+#'   F-tests. Additional arguments can be passed for use in the function, refer
+#'   to calcNormFactors() and glmQLFit() in edgeR package.
 #' 
 #' Flags (signatures) -	Indicator of statistical significance for computed test. 
-#' Zeros indicate no significance, while +/- 1 indicates direction of significance.
-#' 
+#' Zeroes indicate no significance, while +/- 1 indicates direction of significance.
 #' 
 #' @references 
 #'  Robinson MD, McCarthy DJ, Smyth GK (2010). “edgeR: a Bioconductor package 
 #'  for differential expression analysis of digital gene expression data.” 
 #'  Bioinformatics, 26(1), 139-140. doi: 10.1093/bioinformatics/btp616.
-#'  
-#' @examples
-#' \dontrun{
-#' 
-#' library(pmartRdata)
-#' myseqData <- rnaseq_object
-#' myseqData <- group_designation(omicsData = myseqData, main_effects = "Virus")
-#' statsresults <- pmartR:::edgeR_wrapper(omicsData = myseqData)
-#' 
-#' }
 #' 
 edgeR_wrapper <- function(
     omicsData, p_adjust = "BH", comparisons = NULL, p_cutoff = 0.05,
@@ -687,38 +667,32 @@ edgeR_wrapper <- function(
 #' 
 #' For generating statistics for 'seqData' objects
 #' 
-#' @param omicsData an object of type 'seqData', created by \code{\link{as.seqData}}
-#' @param method a character string of length one specifying which wrapper to use. 
-#' Can be 'edgeR', 'DESeq2', or 'limma-voom' 
-#' @param p_adjust Character string for p-value correction method, refer to ?p.adjust() for valid options
+#' @param omicsData an object of type 'seqData', created by
+#'   \code{\link{as.seqData}}
+#' @param method a character string of length one specifying which wrapper to
+#'   use. Can be 'edgeR', 'DESeq2', or 'limma-voom'
+#' @param p_adjust Character string for p-value correction method, refer to
+#'   ?p.adjust() for valid options
 #' @param comparisons `data.frame` with columns for "Control" and "Test"
 #'   containing the different comparisons of interest. Comparisons will be made
 #'   between the Test and the corresponding Control  If left NULL, then all
 #'   pairwise comparisons are executed.
-#' @param p_cutoff Numeric value between 0 and 1 for setting p-value significance threshold
-#' @param ... additional arguments passed to methods functions. Note, formatting 
-#' option changes will interfere with wrapping functionality.
-#' 
-#' @details Runs default limma-voom workflow using empirical Bayes moderated t-statistics.
-#' Additional arguments can be passed for use in the function, 
-#' refer to calcNormFactors() in edgeR package.
-#' @return data.frame object
+#' @param p_cutoff Numeric value between 0 and 1 for setting p-value
+#'   significance threshold
+#' @param ... additional arguments passed to methods functions. Note, formatting
+#'   option changes will interfere with wrapping functionality.
+#'
+#' @details Runs default limma-voom workflow using empirical Bayes moderated
+#'   t-statistics. Additional arguments can be passed for use in the function,
+#'   refer to calcNormFactors() in edgeR package.
+#'   
+#' @return statRes object
 #' 
 #' @references 
-#'  
 #'  Ritchie, M.E., Phipson, B., Wu, D., Hu, Y., Law, C.W., Shi, W., and Smyth, 
 #'  G.K. (2015). limma powers differential expression analyses for 
 #'  RNA-sequencing and microarray studies. Nucleic Acids Research 43(7), e47.
 #' 
-#' @examples
-#' \dontrun{
-#' 
-#' library(pmartRdata)
-#' myseqData <- rnaseq_object
-#' myseqData <- group_designation(omicsData = myseqData, main_effects = "Virus")
-#' statsresults <- pmartR:::edgeR_wrapper(omicsData = myseqData)
-#' 
-#' }
 #' 
 voom_wrapper <- function(
     omicsData,  p_adjust = "BH", comparisons = NULL, p_cutoff = 0.05, ...
@@ -1091,20 +1065,16 @@ get_group_formula <- function(omicsData){
 #' @param custom_theme a ggplot `theme` object to be applied to non-interactive
 #'   plots, or those converted by plotly::ggplotly().
 #'
-#' @details  DESeq2 option requires package "survival" to be available.
+#' @details DESeq2 option requires package "survival" to be available.
 #'
 #' @return plot result
-#'
-#' @examples
-#' \dontrun{
 #' 
+#' @examples 
 #' library(pmartRdata)
-#' myseqData <- rnaseq_object
-#' myseqData <- group_designation(omicsData = myseqData, main_effects = "Virus")
-#' disp_est <- dispersion_est(omicsData = myseqData, method = "edgeR")
-#' 
-#' 
-#' }
+#' myseqData <- group_designation(omicsData = rnaseq_object, main_effects = "Virus")
+#' dispersion_est(omicsData = myseqData, method = "edgeR")
+#' dispersion_est(omicsData = myseqData, method = "DESeq2")
+#' dispersion_est(omicsData = myseqData, method = "voom")
 #'
 #' @references 
 #'  Robinson MD, McCarthy DJ, Smyth GK (2010). “edgeR: a Bioconductor package 

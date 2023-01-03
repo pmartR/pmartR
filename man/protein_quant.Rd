@@ -2,7 +2,7 @@
 % Please edit documentation in R/protein_quant.R
 \name{protein_quant}
 \alias{protein_quant}
-\title{protein_quant wrapper function}
+\title{Protein Quantification}
 \usage{
 protein_quant(
   pepData,
@@ -17,15 +17,15 @@ protein_quant(
 )
 }
 \arguments{
-\item{pepData}{an omicsData object of the class 'pepData'.}
+\item{pepData}{an omicsData object of the class 'pepData'}
 
-\item{method}{is one of four protein quantification methods, 'rollup',
-'rrollup', 'qrollup' and 'zrollup'.}
+\item{method}{character string specifying one of four protein quantification methods, 'rollup',
+'rrollup', 'qrollup' and 'zrollup'}
 
-\item{isoformRes}{is a list of data frames, the result of applying the
+\item{isoformRes}{list of data frames, the result of applying the
 'bpquant' function to original pepData object. Defaults to NULL.}
 
-\item{qrollup_thresh}{is a numeric value; is the peptide abundance cutoff
+\item{qrollup_thresh}{numeric value; is the peptide abundance cutoff
 value. Is an argument to qrollup function.}
 
 \item{single_pep}{logical indicating whether or not to remove proteins that
@@ -34,19 +34,19 @@ have just a single peptide mapping to them, defaults to FALSE.}
 \item{single_observation}{logical indicating whether or not to remove
 peptides that have just a single observation, defaults to FALSE.}
 
-\item{combine_fn}{can either be 'mean' or 'median'.}
+\item{combine_fn}{character string specifying either be 'mean' or 'median'}
 
 \item{use_parallel}{logical indicating whether or not to use "doParallel"
 loop in applying rollup functions. Defaults to TRUE. Is an argument of
 rrollup, qrollup and zrollup functions.}
 
-\item{emeta_cols}{A character vector indicating additional columns of e_meta
+\item{emeta_cols}{character vector indicating additional columns of e_meta
 that should be kept after rolling up to the protein level. The default,
 NULL, only keeps the column containing the mapping variable along with the
 new columns created (peps_per_pro and n_peps_used).}
 }
 \value{
-an omicsData object of the class 'proData'
+omicsData object of the class 'proData'
 }
 \description{
 This function takes in a pepData object, method (quantification method, mean,
@@ -65,17 +65,15 @@ If isoformRes is provided then, a temporary pepData object is formed
   and a proData object is returned.
 }
 \examples{
-\dontrun{
-library(pmartR)
 library(pmartRdata)
 
-mypepData <- group_designation(omicsData = pep_object, main_effects = c("Condition"))
-mypepData = edata_transform(mypepData, "log2")
+mypepData <- group_designation(omicsData = pep_object, main_effects = c("Phenotype"))
+mypepData = edata_transform(omicsData = mypepData, "log2")
 
 imdanova_Filt <- imdanova_filter(omicsData = mypepData)
 mypepData <- applyFilt(filter_object = imdanova_Filt, omicsData = mypepData, min_nonmiss_anova=2)
 
-imd_anova_res <- imd_anova(omicsData = mypepData, test_method = 'comb', pval_adjust='bon')
+imd_anova_res <- imd_anova(omicsData = mypepData, test_method = 'comb', pval_adjust_a ='bon', pval_adjust_g ='bon')
 
 isoformRes = bpquant(statRes = imd_anova_res, pepData = mypepData)
 
@@ -83,8 +81,7 @@ isoformRes = bpquant(statRes = imd_anova_res, pepData = mypepData)
 results<- protein_quant(pepData = mypepData, method = 'rollup', combine_fn = 'median', isoformRes = NULL)
 
 #case where isoformRes is provided:
-results2 = protein_quant(pepData = mypepData, method = 'rollup', combine_fn = 'mean', isoformRes = isoformRes)
-}
+# results2 = protein_quant(pepData = mypepData, method = 'rollup', combine_fn = 'mean', isoformRes = isoformRes)
 
 }
 \references{

@@ -2,20 +2,36 @@
 % Please edit documentation in R/filter_summary.R
 \name{summary.rmdFilt}
 \alias{summary.rmdFilt}
-\title{Produce a basic summary of a rmd_filter object}
+\title{RMD Filter Summary}
 \usage{
 \method{summary}{rmdFilt}(filter_object, pvalue_threshold = NULL)
 }
 \arguments{
-\item{filter_object}{S3 object of class 'rmdFilt' created by \code{\link{rmd_filter}}.}
+\item{filter_object}{S3 object of class 'rmdFilt' created by
+\code{\link{rmd_filter}}.}
 
-\item{pvalue_threshold}{A threshold for the Robust Mahalanobis Distance (RMD) p-value. All samples below the threshold will be filtered out. Default value is NULL. Suggested value is 0.0001}
+\item{pvalue_threshold}{A threshold for the Robust Mahalanobis Distance (RMD)
+p-value. All samples with p-values below the threshold will be filtered
+out. Default value is NULL. Suggested value is 0.0001}
 }
 \value{
-a summary of the p-values associated with running RMD-PAV across all samples. If a p-value threshold is provided the samples that would be filtered, at this threshold, are reported.
+a summary of the p-values associated with running RMD-PAV across all
+  samples. If a p-value threshold is provided the samples that would be
+  filtered at this threshold are reported.
 }
 \description{
-This function will provide basic summary statistics for the rmd_filter object.
+Provide summary of a rmdFilt S3 object
+}
+\examples{
+library(pmartRdata)
+mymetab <- group_designation(omicsData = metab_object, main_effects = "Phenotype")
+mymetab <- edata_transform(omicsData = mymetab, data_scale = "log2")
+myfilt <- rmd_filter(omicsData = mymetab) 
+summary(filter_object = myfilt, pvalue_threshold = 0.001)
+
+}
+\seealso{
+\code{\link{rmd_filter}}
 }
 \author{
 Lisa Bramer, Kelly Stratton

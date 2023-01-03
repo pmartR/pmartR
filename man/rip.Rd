@@ -2,38 +2,45 @@
 % Please edit documentation in R/subset_funcs.R
 \name{rip}
 \alias{rip}
-\title{Identify Rank-Invariant Peptides}
+\title{Identify Rank-Invariant Biomolcules for Use in Normalization}
 \usage{
 rip(e_data, edata_id, fdata_id, groupDF, alpha = 0.2)
 }
 \arguments{
-\item{e_data}{a \eqn{p \times n} data.frame, where \eqn{p} is the number of peptides, proteins, lipids, or metabolites and \eqn{n} is the number of samples. Each row corresponds to data for a peptide, protein, lipid, or metabolite, with the first column giving the identifer name.}
+\item{e_data}{a \eqn{p \times n} data.frame, where \eqn{p} is the number of
+peptides, proteins, lipids, or metabolites and \eqn{n} is the number of
+samples. Each row corresponds to data for a peptide, protein, lipid, or
+metabolite, with one column giving the biomolecule identifier name.}
 
-\item{edata_id}{character string indicating the name of the peptide, protein, lipid, or metabolite identifier. Usually obtained by calling \code{attr(omicsData, "cnames")$edata_cname}.}
+\item{edata_id}{character string indicating the name of the peptide, protein,
+lipid, or metabolite identifier. Usually obtained by calling
+\code{attr(omicsData, "cnames")$edata_cname}.}
 
-\item{fdata_id}{character string indicating the name of the sample column name in f_data.}
+\item{fdata_id}{character string indicating the name of the sample column
+name in f_data.}
 
-\item{groupDF}{data.frame created by \code{group_designation} with columns for sample.id and group. If two main effects are provided the original main effect levels for each sample are returned as the third and fourth columns of the data.frame.}
+\item{groupDF}{data.frame created by \code{group_designation} with columns
+for sample.id and group. If two main effects are provided the original main
+effect levels for each sample are returned as the third and fourth columns
+of the data.frame.}
 
-\item{alpha}{numeric p-value threshold, above which the features are retained as rank invariant (default value 0.25)}
+\item{alpha}{numeric p-value threshold, above which the biomolecules are
+retained as rank invariant (default value 0.25)}
 }
 \value{
-Character vector containing the features belonging to the RIP subset.
+Character vector containing the biomolecules belonging to the RIP
+  subset.
 }
 \description{
-Selects features for normalization via the method of rank-invariant peptides (RIP)
+Selects biomolecules for normalization via the method of rank-invariant
+biomolcules (RIP)
 }
 \details{
-Features with complete data are subjected to a Kruskal-Wallis test (non-parametric one-way ANOVA) on group membership, and those features with p-value greater than a defined threshold \code{alpha} (common values include 0.1 or 0.25) are retained as rank-invariant features.
-}
-\examples{
-\dontrun{
-library(pmartRdata)
-data(pep_pepData)
-pep_pepData2 <- group_designation(omicsData = pep_pepData, main_effects = "Condition")
-pep_subset <- rip(e_data = pep_pepData2$e_data, edata_id = attr(pep_pepData2, "cnames")$edata_cname, pmartR_groupDF = attr(pep_pepData2, "group_DF"))
-}
-
+Biomolecules with complete data are subjected to a Kruskal-Wallis
+  test (non-parametric one-way ANOVA) on group membership, and those
+  biomolecules with p-value greater than a defined threshold \code{alpha}
+  (common values include 0.1 or 0.25) are retained as rank-invariant
+  biomolecules.
 }
 \author{
 Kelly Stratton

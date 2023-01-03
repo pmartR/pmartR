@@ -7,5 +7,5 @@
 \method{print}{seqData}(seqData)
 }
 \description{
-For printing an S3 object of type 'seqData':
+For printing an S3 object of type 'seqData'
 }

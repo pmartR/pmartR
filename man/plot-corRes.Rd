@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_fns.R
 \name{plot.corRes}
 \alias{plot.corRes}
-\title{plot.corRes}
+\title{Plot corRes Object}
 \usage{
 \method{plot}{corRes}(
   corRes_obj,
@@ -28,70 +28,81 @@
 )
 }
 \arguments{
-\item{corRes_obj}{An object of class "corRes" created by calling
-\code{cor_result} on an omicsData object.}
+\item{corRes_obj}{An object of class "corRes" created via \code{cor_result}}
 
 \item{omicsData}{an object of the class 'pepData', 'isobaricpepData',
-'proData', 'lipidData', 'metabData', or 'nmrData' usually created by
+'proData', 'lipidData', 'metabData', 'nmrData' or 'seqData' created via
 \code{\link{as.pepData}}, \code{\link{as.isobaricpepData}},
 \code{\link{as.proData}}, \code{\link{as.lipidData}},
-\code{\link{as.metabData}}, or\code{\link{as.nmrData}}, respectively.}
+\code{\link{as.metabData}}, \code{\link{as.nmrData}}, or
+\code{\link{as.seqData}}, respectively.}
 
-\item{order_by}{A character string specifying a main effect by which to order
-the correlation heat map. This main effect must be found in the column
-names of f_data in the omicsData object. If \code{order_by} is "Group", the
-correlation heat map will be ordered by the group variable from the
-group_designation function. If NULL (default), the correlation heat map
-will be displayed in the order the samples appear in the data.}
+\item{order_by}{A character string specifying a column in f_data by which to
+order the samples.}
 
 \item{colorbar_lim}{A pair of numeric values specifying the minimum and
 maximum values to use in the heat map color bar. Defaults to 'c(NA, NA)',
 in which case ggplot2 automatically sets the minimum and maximum values
 based on the correlation values in the data.}
 
-\item{x_text}{Logical. Indicates whether the x-axis will be labeled with the
-sample names. The default is TRUE.}
+\item{x_text}{logical value. Indicates whether the x-axis will be labeled
+with the sample names. The default is TRUE.}
 
-\item{y_text}{Logical. Indicates whether the y-axis will be labeled with the
-sample names. The default is TRUE.}
+\item{y_text}{logical value. Indicates whether the y-axis will be labeled
+with the sample names. The default is TRUE.}
 
-\item{interactive}{Logical. If TRUE produces an interactive plot.}
+\item{interactive}{logical value. If TRUE produces an interactive plot.}
 
-\item{x_lab}{A character string specifying the x-axis label.}
+\item{x_lab}{character string specifying the x-axis label}
 
-\item{y_lab}{A character string specifying the y-axis label.}
+\item{y_lab}{character string specifying the y-axis label}
 
-\item{x_lab_size}{An integer value indicating the font size for the x-axis.
+\item{x_lab_size}{integer value indicating the font size for the x-axis.
 The default is 11.}
 
-\item{y_lab_size}{An integer value indicating the font size for the y-axis.
+\item{y_lab_size}{integer value indicating the font size for the y-axis.
 The default is 11.}
 
-\item{x_lab_angle}{An integer value indicating the angle of x-axis labels.
+\item{x_lab_angle}{integer value indicating the angle of x-axis labels.
 The default is 90.}
 
-\item{title_lab}{A character string specifying the plot title.}
+\item{title_lab}{character string specifying the plot title}
 
-\item{title_lab_size}{An integer value indicating the font size of the plot
+\item{title_lab_size}{integer value indicating the font size of the plot
 title. The default is 14.}
 
-\item{legend_lab}{A character string specifying the legend title.}
+\item{legend_lab}{character string specifying the legend title.}
 
-\item{legend_position}{A character string specifying the position of the
+\item{legend_position}{character string specifying the position of the
 legend. Can be one of "right", "left", "top", "bottom", or "none". The
 default is "none".}
 
-\item{color_low}{A character string specifying the color of the gradient for
-low values.}
+\item{color_low}{character string specifying the color of the gradient for
+low values}
 
-\item{color_high}{A character string specifying the color of the gradient for
-high values.}
+\item{color_high}{character string specifying the color of the gradient for
+high values}
 
-\item{bw_theme}{Logical. If TRUE uses the ggplot2 black and white theme.}
+\item{bw_theme}{logical value. If TRUE uses the ggplot2 black and white theme.}
 
-\item{use_VizSampNames}{Logical. Indicates whether to use custom sample
+\item{use_VizSampNames}{logical value. Indicates whether to use custom sample
 names. The default is FALSE.}
+}
+\value{
+ggplot2 plot object if interactive is FALSE, or plotly plot object if
+  interactive is TRUE
 }
 \description{
 For plotting an S3 object of type 'corRes'
+}
+\examples{
+library(pmartRdata)
+mymetab <- edata_transform(omicsData = metab_object, data_scale = "log2")
+mymetab <- group_designation(omicsData = mymetab, main_effects = "Phenotype")
+my_correlation <- cor_result(omicsData = mymetab)
+plot(my_correlation, omicsData = mymetab, order_by = "Phenotype")
+
+myseq_correlation <- cor_result(omicsData = rnaseq_object)
+plot(myseq_correlation)
+
 }

@@ -1,35 +1,37 @@
 #' Combine technical replicates of an omicsData object
 #'
-#' For each biomolecule, aggregates the technical replicates within biological
-#' samples using a specified aggregation method
+#' For each biomolecule, this function aggregates the technical replicates of
+#' the biological samples using a specified aggregation method
 #'
 #' @param omicsData an object of the class 'lipidData', 'metabData', 'pepData',
-#'   'proData', or 'nmrData', usually created by \code{\link{as.lipidData}},
-#'   \code{\link{as.metabData}}, \code{\link{as.pepData}},
-#'   \code{\link{as.proData}}, or \code{\link{as.nmrData}}, respectively.  The
+#'   'proData', 'nmrData', or 'seqData', created by
+#'   \code{\link{as.lipidData}}, \code{\link{as.metabData}},
+#'   \code{\link{as.pepData}}, \code{\link{as.proData}},
+#'   \code{\link{as.nmrData}}, or \code{\link{as.seqData}}, respectively. The
 #'   parameter techrep_cnames must have been specified when creating this
 #'   object.
 #' @param combine_fn a character string specifying the function used to
-#'   aggregate across technical replicates, currently only supports 'sum' and 
-#'   'mean'. Defaults to 'sum' for seqData and mean for all other omicsData.
-#' @param bio_sample_names a character string specifying a column in
+#'   aggregate across technical replicates. Currently supported functions are
+#'   'sum' and 'mean'. Defaults to 'sum' for seqData and 'mean' for all other
+#'   omicsData.
+#' @param bio_sample_names a character string specifying the column in
 #'   \code{f_data} which contains names by which to label aggregated samples in
 #'   \code{omicsData$e_data} and \code{omicsData$f_data} OR a character vector
-#'   with number of elements equal to the number of biological samples.  If a
+#'   with number of elements equal to the number of biological samples. If a
 #'   column name is specified, it should have a one-to-one correspondence with
-#'   the technical replicate ID column in \code{f_data}.  Defaults to NULL, in
+#'   the technical replicate ID column in \code{f_data}. Defaults to NULL, in
 #'   which case default names are used according to the technical replicate ID
-#'   column.
+#'   column, which was specified at data object creation.
 #'
 #' @details Loss of information after aggregation \tabular{ll}{ f_data: \tab
-#'   If there are columns of f_data that have more than 1 value per biological
+#'   If there are columns in f_data that have more than 1 value per biological
 #'   sample, then for each biological sample, only the first value in that
-#'   column will be retained.  Technical replicate specific information will be
-#'   lost.\cr group information:  \tab If a grouping structure has been set
+#'   column will be retained. Technical replicate specific information will be
+#'   lost.\cr group information: \tab If a grouping structure has been set
 #'   using a main effect from f_data that has more than 1 level within any given
-#'   biological sample, that grouping structure will be removed.  Call
+#'   biological sample, that grouping structure will be removed. Call
 #'   \code{group_designation} again on the aggregated data to assign a grouping
-#'   structure. \cr sample names:  \tab Identifiers for each biological sample
+#'   structure. \cr sample names: \tab Identifiers for each biological sample
 #'   will replace the identifiers for technical replicates as column names in
 #'   e_data as well as the identifier column \code{attr(omicsData,
 #'   'fdata_cname')} in f_data. \cr }
@@ -38,12 +40,9 @@
 #'   to the biological sample level
 #'
 #' @examples
-#' library(pmartR)
 #' library(pmartRdata)
 #'
-#' data(techrep_pep_object)
-#'
-#' pep_object_averaged = combine_techreps(techrep_pep_object)
+#' pep_object_averaged <- combine_techreps(omicsData = pep_techrep_object)
 #'
 #' @author Daniel Claborne
 #'
@@ -53,9 +52,16 @@ combine_techreps <- function (omicsData, combine_fn = NULL,
                               bio_sample_names = NULL) {
   
   # check that omicsData is of pmartR S3 class#
-  if(!inherits(omicsData, 
-               c("pepData", "proData", "lipidData", "metabData", "nmrData", "seqData"))
-     ) stop("omicsData must be of class 'pepData', 'proData', 'lipidData', 'metabData', 'nmrData', or 'seqData'")
+  if(!inherits(omicsData,
+               c("pepData",
+                 "proData",
+                 "lipidData",
+                 "metabData",
+                 "nmrData",
+                 "seqData")))
+    stop(
+      "omicsData must be of class 'pepData', 'proData', 'lipidData', 'metabData', 'nmrData', or 'seqData'"
+    )
   
   if(is.null(combine_fn)){
     combine_fn <- ifelse(inherits(omicsData, "seqData"), "sum", "mean")

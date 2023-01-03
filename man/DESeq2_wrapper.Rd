@@ -16,7 +16,9 @@ DESeq2_wrapper(
 \arguments{
 \item{omicsData}{an object of type 'seqData', created by \code{\link{as.seqData}}}
 
-\item{test}{an object of type 'seqData', created by \code{\link{as.seqData}}}
+\item{test}{either "Wald" or "LRT", which will then use either Wald 
+significance tests, or the likelihood ratio test on the difference in 
+deviance between a full and reduced model formula}
 
 \item{p_adjust}{Character string for p-value correction method, refer to 
 ?p.adjust() for valid options. Defaults to "BH" (Benjamini & Hochberg)}
@@ -26,38 +28,29 @@ containing the different comparisons of interest. Comparisons will be made
 between the Test and the corresponding Control  If left NULL, then all
 pairwise comparisons are executed.}
 
-\item{p_cutoff}{Numeric value between 0 and 1 for setting p-value significance threshold}
+\item{p_cutoff}{Numeric value between 0 and 1 for setting p-value
+significance threshold}
 
 \item{...}{additional arguments passed to function}
 
 \item{method}{a character string of length one specifying which wrapper to use. 
-Can be 'edgeR', 'DESeq2', or 'limma-voom'}
+Can be 'edgeR', 'DESeq2', or 'voom'}
 }
 \value{
-a statRes object (data.frame)
+statRes object
 }
 \description{
 For generating statistics for 'seqData' objects
 }
 \details{
-Runs default DESeq workflow. Defaults to Wald test, no independent filtering, and 
-running in parallel. Additional arguments can be passed for use in the function, 
-refer to DESeq() and results() in DESeq2 package. Requires 'survival' package to run.
+Runs default DESeq workflow. Defaults to Wald test, no independent
+  filtering, and running in parallel. Additional arguments can be passed for
+  use in the function, refer to DESeq() and results() in DESeq2 package.
+  Requires 'survival' package to run.
 
-Flags (signatures) -	Indicator of statistical significance for computed test. 
-Zeros indicate no significance, while +/- 1 indicates direction of significance.
-}
-\examples{
-\dontrun{
-
-library(pmartRdata)
-myseqData <- rnaseq_object
-myseqData <- group_designation(omicsData = myseqData, main_effects = "Virus")
-statsresults <- pmartR:::DESeq2_wrapper(omicsData = myseqData)
-
-}
-
-
+  Flags (signatures) -	Indicator of statistical significance for computed
+  test. Zeros indicate no significance, while +/- 1 indicates direction of
+  significance.
 }
 \references{
 Love, M.I., Huber, W., Anders, S. Moderated estimation of fold change and 

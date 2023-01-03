@@ -2,16 +2,18 @@
 % Please edit documentation in R/filter_objects.R
 \name{total_count_filter}
 \alias{total_count_filter}
-\title{Total Count filter object}
+\title{Total Count Filter Object}
 \usage{
 total_count_filter(omicsData)
 }
 \arguments{
-\item{omicsData}{an object of the class 'seqData', usually created by \code{\link{as.seqData}}}
+\item{omicsData}{an object of the class 'seqData', created by
+\code{\link{as.seqData}}}
 }
 \value{
-Object of class totalcountFilt (data.frame) that contains the
-  molecule identifier and the total count of observed reads.
+An S3 object of class 'totalcountFilt' (data.frame) that contains the
+  molecule identifier and the total count of observed reads for that molecule
+  across all samples.
 }
 \description{
 This function returns a totalcountFilt object for use with
@@ -25,12 +27,9 @@ recommendation in edgeR is at least 10 total counts observed across samples
 filtering would remove this biomolecule).
 }
 \examples{
-\dontrun{
 library(pmartRdata)
-data("rnaseq_object")
 to_filter <- total_count_filter(omicsData = rnaseq_object)
-summary(to_filter, min_count = 10)
-}
+summary(filter_object = to_filter, min_count = 10)
 
 }
 \references{

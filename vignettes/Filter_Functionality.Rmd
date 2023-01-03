@@ -1,0 +1,362 @@
+---
+title: "Filter Functions"
+author: "Kelly Stratton, Lisa Bramer"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    df_print: paged
+    rmarkdown::html_vignette:
+    fig_caption: yes
+    self_contained: yes
+    toc: true
+bibliography: bibliography.bib
+vignette: >
+  %\VignetteIndexEntry{pmartR-filters} 
+  %\VignetteEngine{knitr::rmarkdown} 
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r global_options, include = FALSE}
+knitr::opts_chunk$set(warning=FALSE, fig.width = 8, fig.height = 6, echo = TRUE, include = TRUE, eval = TRUE)
+options(rmarkdown.html_vignette.check_title = FALSE)
+```
+
+```{r logo, out.width = "100px", echo=FALSE}
+knitr::include_graphics("pmartR_logo_final.jpg")
+
+library(pmartR)
+library(pmartRdata)
+library(ggplot2)
+library(reshape2)
+```
+
+
+## Overview
+
+This vignette describes the filter functionality of the `pmartR` package. Filters fall into three categories and their use is a standard part of quality control processing.
+
+1. Biomolecule filters
+
+2. Sample filters
+
+3. Filters specific to seqData objects
+
+In a typical `pmartR` processing pipeline, these filters are applied in a certain order during the quality control process.
+
+To utilize a filter, the first step is to create the filter object, an S3 object whose class is directly tied to the filter. Once a filter object is created, the `plot` and `summary` functions can be used to see the effects of applying the filter with certain parameters, and then the filter can be applied to the omicsData object using the `applyFilt` function.
+
+If data are paired, the pairing structure can be defined in the `group_designation` function, and the pairs will be accounted for in relevant filters. For biomolecule filters, this means filtering based on paired differences rather than on individual values. For sample filters, removal of a sample will be accompanied by the removal of all members of the corresponding pair.
+
+
+## Biomolecule Filters
+
+The following filters remove entire biomolecules from omicsData objects. 
+
+### Molecule Filter
+
+The motivation for using the molecule filter is to remove any biomolecules not confidently observed. Typical use of the molecule filter removes any biomolecules that are not observed in at least two samples across the entire dataset, within each group, or within each batch. Depending on downstream analysis goals, a different threshold may be more appropriate.
+
+Below we demonstrate creation and application of the molecule filter on a pepData object. With a minimum number of 2 observations per molecule required across all samples, a summary of the molecule filter object tells us how many biomolecules would be filtered and not filtered out of the dataset.
+
+```{r molecule filter}
+mypep <- pep_object
+
+# create a molecule filter object
+mymolfilt <- molecule_filter(omicsData = mypep)
+class(mymolfilt)
+summary(mymolfilt)
+
+# summary of molecule filter with a specific threshold
+summary(mymolfilt, min_num = 2)
+
+mypep_molfilt <- applyFilt(mymolfilt, omicsData = mypep, min_num = 2)
+
+# now our data object contains the reduced number of biomolecules
+summary(mypep_molfilt)
+```
+
+To implement a molecule filter with the minimum required number of observations is within each group, we must first define groups.
+
+```{r molecule filter groups}
+# define groups based on a "main effect"
+mypep_groups <- group_designation(omicsData = mypep, main_effects = "Phenotype")
+
+# create a molecule filter object
+mymolfilt_groups <- molecule_filter(omicsData = mypep_groups, use_groups = TRUE)
+class(mymolfilt_groups)
+summary(mymolfilt_groups)
+
+# summary of molecule filter with a specific threshold
+summary(mymolfilt_groups, min_num = 2)
+
+mypep_molfilt_groups <- applyFilt(mymolfilt_groups, omicsData = mypep_groups, min_num = 2)
+
+# now our data object contains the reduced number of biomolecules
+summary(mypep_molfilt_groups)
+```
+
+If our samples were run on the instrument over the course of multiple batches, we may wish to implement the molecule filter within each batch.
+
+```{r molecule filter batches}
+# define groups based on a "main effect" and "batch id" -- here we pretend that "SecondPhenotype" is describing the batches of samples
+mypep_batches <- group_designation(omicsData = mypep, main_effects = "Phenotype", batch_id = "SecondPhenotype")
+
+# create a molecule filter object using the batch information -- we can use both groups and batch or just batch
+mymolfilt_batches <- molecule_filter(omicsData = mypep_batches, use_groups = TRUE, use_batch = TRUE)
+mymolfilt_batches <- molecule_filter(omicsData = mypep_batches, use_batch = TRUE)
+class(mymolfilt_batches)
+summary(mymolfilt_batches)
+
+# summary of molecule filter with a specific threshold
+summary(mymolfilt_batches, min_num = 2)
+
+mypep_molfilt_batches <- applyFilt(mymolfilt_batches, omicsData = mypep_batches, min_num = 2)
+
+# now our data object contains the reduced number of biomolecules
+summary(mypep_molfilt_batches)
+```
+
+
+### Coefficient of Variation (CV) Filter
+
+The coefficient of variation (CV) is the ratio of the standard deviation to the mean [@ahmed1995pooling]. We can use the CV calculated for each biomolecule as a quality control filter to remove highly variable biomolecules. Using the pooled CV, as `pmartR` does, enables the experimental groups to be accounted for. Note that the CV is calculated on the abundance scale (if already log transformed, the `cv_filter()` function accounts for this).
+
+```{r cv filter}
+# use the example peptide data with Phenotype as main effect
+mycvfilt <- cv_filter(omicsData = mypep_groups)
+plot(mycvfilt, cv_threshold = 97)
+
+# we get the same graph if we log2 transform our data
+mypep_groups_log2 <- edata_transform(mypep_groups, data_scale = "log2")
+mycvfilt_log2 <- cv_filter(omicsData = mypep_groups_log2)
+plot(mycvfilt_log2, cv_threshold = 97)
+
+summary(mycvfilt_log2, cv_threshold = 97)
+
+# apply the filter
+mypep_cvfilt <- applyFilt(filter_object = mycvfilt_log2, omicsData = mypep_groups_log2, cv_threshold = 97)
+summary(mypep_cvfilt)
+```
+
+
+### Proteomics Filter
+
+For proteomics data (pepData object where mapping of peptides-to-proteins is included in e_meta), two additional filters are available via the `proteomics_filter()` function.
+
+#### Redundant Peptide Filter
+
+In some instances, peptides can map to more than one protein; peptides such as this are called "redundant" or "degenerate". Redundant peptides can be removed using the `proteomics_filter()`.
+
+```{r}
+myproteomicsfilt <- proteomics_filter(omicsData = mypep_groups_log2)
+summary(myproteomicsfilt, degen_peps = TRUE)
+
+# This results in an error message since there are no redundant peptides
+# mypep_redundant <- applyFilt(filter_object = myredundantfilt, omicsData = mypep_groups_log2)
+```
+
+Here we have no redundant peptides, so a summary of the filter object indicates that no peptides or proteins are removed. Trying to apply the filter in this scenario results in an error.
+
+
+#### Minimum Number of Peptides per Protein Filter
+
+Sometimes it is of interest to remove any proteins that are not "confidently" observed, where "confidently" is defined by the number of peptides observed that map to a given protein. For instance, we could use the following filter to remove any proteins (and their associated peptides) that have fewer than 2 peptides mapping to them.
+
+```{r}
+# use the same filter object as above
+# setting min_num_peps = 2 removes any proteins with just a single observed peptide mapping to them; the associated peptides are also removed
+summary(myproteomicsfilt, min_num_peps = 2)
+
+mypep_proteomicsfilt <- applyFilt(filter_object = myproteomicsfilt, omicsData = mypep_groups_log2, min_num_peps = 2)
+```
+
+### IMD-ANOVA Filter
+
+If ANOVA and/or the IMD test will be used for downstream statistical comparisons, any biomolecules for which the desired test cannot be run can be removed using the following filter.
+
+In the case where both ANOVA and IMD will be performed:
+
+```{r combined test}
+myimdanovafilt <- imdanova_filter(omicsData = mypep_groups_log2)
+summary(myimdanovafilt, min_nonmiss_anova = 2, min_nonmiss_gtest = 3)
+
+mypep_imdanovafilt <- applyFilt(filter_object = myimdanovafilt, omicsData = mypep_groups_log2, min_nonmiss_anova = 2, min_nonmiss_gtest = 3)
+```
+
+If only ANOVA is of interest:
+
+```{r anova only}
+# start with the same filter object as above
+summary(myimdanovafilt, min_nonmiss_anova = 2)
+
+mypep_anovafilt <- applyFilt(filter_object = myimdanovafilt, omicsData = mypep_groups_log2, min_nonmiss_anova = 2)
+```
+
+If only the IMD test, also referred to as the g-test, is of interest:
+
+```{r gtest only}
+# start with the same filter object as above
+summary(myimdanovafilt, min_nonmiss_gtest = 3)
+
+mypep_imdfilt <- applyFilt(filter_object = myimdanovafilt, omicsData = mypep_groups_log2, min_nonmiss_gtest = 3)
+```
+
+
+### Custom Filter
+
+If certain biomolecules are known *a priori* to be unwanted in the analysis, those can be removed using a custom filter. For instance if contaminant proteins are identified, or a set of internal standards needs to be removed for a specific portion of the analysis, this filter can be of particular use. Multiple custom filters could be applied to a single dataset, depending on the analysis needs. Biomolecules for removal can be specified based on their presence in e_data or in e_meta.
+
+To remove biomolecules based on their presence in e_data, we implement the filter as follows. Note that this also removes them from e_meta, if applicable.
+
+```{r remove from e_data}
+remove_peps <- mypep$e_data$Peptide[1:10]
+
+mycustomfilt <- custom_filter(omicsData = mypep_groups_log2, e_data_remove = remove_peps)
+summary(mycustomfilt)
+
+mypep_custom <- applyFilt(filter_object = mycustomfilt, omicsData = mypep_groups_log2)
+```
+
+To remove biomolecules based on their presence in e_meta (such as specifying proteins to remove from a pepData object), we implement the filter as follows. This also removes the associated biomolecules from e_data, as applicable.
+
+```{r remove from e_meta}
+remove_prots <- mypep$e_meta$RazorProtein[1:10]
+
+mycustomfilt <- custom_filter(omicsData = mypep_groups_log2, e_meta_remove = remove_prots)
+summary(mycustomfilt)
+
+mypep_custom <- applyFilt(filter_object = mycustomfilt, omicsData = mypep_groups_log2)
+```
+
+We can also utilize the custom filter and specify only those biomolecules in either e_data or e_meta that we would like to keep. To do this, use the arguments `e_data_keep` and `e_meta_keep`.
+
+
+## Sample Filters
+
+The following filters remove entire samples from omicsData objects. 
+
+### rMd-PAV Filter
+
+The robust Mahalanobis distance squared values associated with the peptide abundances vector (rMd-PAV) is a method which computes a rMd and that can be mapped to a p-value and used to identify outlying samples [@matzke2011improved]. Any identified samples can be reviewed by the analyst to determine whether to remove them from the dataset.
+
+The metrics on which the log2 robust Mahalanobis distance is based can be specified using the `metrics` argument of the `rmd_filter()` function. Available metrics include:
+
+- Median absolute deviation (MAD): specified as "MAD"
+
+- Correlation: specified as "Correlation"
+
+- Skewness: specified as "Skewness"
+
+- Kurtosis: specified as "Kurtosis"
+
+- Proportion Missing: specified as "Proportion_Missing"
+
+For pepData and proData objects, the default is to use all five of the metrics. For metabData and lipidData objects, the default is to exclude the proportion missing (as these data typically do not have much missing data).
+
+When plotting the RMD filter, we can specify a p-value threshold
+
+
+```{r create rmd and plot}
+myrmdfilt <- rmd_filter(mypep_groups_log2)
+plot(myrmdfilt, pvalue_threshold = 0.0001)
+```
+
+If we want to look at individual samples, especially if there are samples falling above the threshold line, we can do so using the following. The colored points on each boxplot correspond to the sample that was specified, so we can see where it falls relative to all of the other samples.
+
+```{r rmd plot individ outliers}
+plot(myrmdfilt, sampleID = "Sample_35_Phenotype2_A")
+```
+
+
+
+### Custom Filter
+
+A custom filter can be used to remove entire samples. This is particularly useful if only a subset of potential outliers identified by the rMd filter are to be removed, or if quality control samples that were run within the experiment are no longer needed for a particular analysis step.
+
+```{r}
+mycustomfilt <- custom_filter(omicsData = mypep_groups_log2, f_data_remove = "Sample_35_Phenotype2_A")
+```
+
+Similar to the usage of the custom filter for filtering biomolecules, we could alternately use the `f_data_keep` argument to specify which samples to retain in the dataset.
+
+
+## Typical Order of Filter Application
+
+This section applies to all but seqData objects.
+
+A custom filter could be applied at any point, depending on the study and dataset. For instance, if proteomics data and there are contaminant proteins or reverse hits, a custom filter can be used first thing to remove these. If the RMD filter identifies potential outliers but not all are to be removed, a custom filter can be used to remove a subset of samples.
+
+1. Molecule filter
+
+2. CV filter (if using--we often do not)
+
+3. Proteomics filter (if proteomics data)
+
+4. RMD filter
+
+5. IMD-ANOVA filter
+
+
+## RNAseq Data Filters
+
+Due to RNAseq data being count data, the typical filters differ compared to the other data types supported by `pmartR`.
+
+```{r}
+myseq <- rnaseq_object
+summary(myseq)
+```
+
+The molecule filter and custom filter (either transcripts or samples) are available for seqData objects, if useful for a particular dataset. Not applicable for seqData objects are the CV filter, IMD-ANOVA filter, and RMD filter.
+
+### Total Count Filter 
+
+The total count filter is based on recommendations in edgeR processing [@edger], where the low-observed biomolecules are removed. The default recommendation in edgeR is to require at least 10 total counts observed across samples (i.e., if the sum of counts in a row of e_data is < 10, default edgeR filtering would remove this biomolecule).
+
+```{r}
+mytotcountfilt <- total_count_filter(omicsData = myseq)
+summary(mytotcountfilt, min_count = 10)
+
+myseq_totcount <- applyFilt(filter_object = mytotcountfilt, omicsData = myseq, min_count = 10)
+summary(myseq_totcount)
+```
+
+
+
+### RNA Filter: Total Library Size Filter
+
+The RNA filter removes samples based on either:
+
+- library size (number of reads) 
+
+- number/proportion of unique non-zero biomolecules per sample
+
+This filter is particularly useful for identifying any samples that contain lower than expected numbers of reads.
+
+
+```{r}
+# create RNA filter object
+myrnafilt <- RNA_filter(omicsData = myseq)
+
+# filter by library size
+plot(myrnafilt, plot_type = "library")
+plot(myrnafilt, plot_type = "library", size_library = 10000)
+summary(myrnafilt, size_library = 10000)
+
+myseq_librarysize <- applyFilt(filter_object = myrnafilt, omicsData = myseq, size_library = 10000)
+summary(myseq_librarysize)
+
+# filter based on number or proportion of non-zero counts
+plot(myrnafilt, plot_type = "biomolecule")
+summary(myrnafilt, min_nonzero = 5000)
+summary(myrnafilt, min_nonzero = 0.2)
+
+myseq_nonzero <- applyFilt(filter_object = myrnafilt, omicsData = myseq, min_nonzero = 0.2)
+summary(myseq_nonzero)
+```
+
+
+
+
+## References
+
+

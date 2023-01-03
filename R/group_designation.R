@@ -1,14 +1,13 @@
-#' Creates Attribute of omicsData object containing Group Membership Based on
-#' Specified Main Effects
+#' Creates Attribute of omicsData Object for Group Membership 
 #'
-#' The method assigns each sample to a group, for future analyses, based on the
+#' The method assigns each sample to a group, for use in future analyses, based on the
 #' variable(s) specified as main effects.
 #'
 #' @param omicsData an object of the class 'lipidData', 'metabData', 'pepData',
-#'   'proData', 'isobaricpepData', or 'nmrData', usually created by
+#'   'proData', 'isobaricpepData', 'nmrData', or 'seqData', usually created by
 #'   \code{\link{as.lipidData}}, \code{\link{as.metabData}},
 #'   \code{\link{as.pepData}}, \code{\link{as.proData}},
-#'   \code{\link{as.isobaricpepData}}, or \code{\link{as.nmrData}},
+#'   \code{\link{as.isobaricpepData}}, \code{\link{as.nmrData}}, or \code{\link{as.seqData}},
 #'   respectively.
 #' @param main_effects a character vector with no more than two variable names
 #'   that should be used as main effects to determine group membership of
@@ -42,9 +41,6 @@
 #'  should be used as batch information for downstream analyses. Batch ID is
 #'  similar to covariates but unlike covariates it is specific to that of specific
 #'  batch effects
-#' @param time_course an optional character string specifying the variable name
-#'   of a time course variable, if applicable to the experimental data.
-#'   CURRENTLY NOT SUPPORTED
 #'
 #' @details Groups are formed based on the levels of the main effect variables.
 #'   One or two main effect variables are allowed. In the case of two main
@@ -60,19 +56,13 @@
 #'   for sample id and group, is added to the object. If two main effects are
 #'   provided the original main effect levels for each sample are returned as
 #'   the third and fourth columns of the data.frame. Additionally, the
-#'   covariates provided will be listed as attributes of this data.frame. Use of
-#'   time_course is currently not supported, however the eventual functionality
-#'   is such that if time_course is included, a column for 'TimeCourse' will be
-#'   output as well.
+#'   covariates provided will be listed as attributes of this data.frame. 
 #'
 #' @examples
-#' \dontrun{
 #' library(pmartRdata)
-#' data(lipid_object)
-#' lipid_object2 <- group_designation(omicsData = lipid_object,
-#'                                    main_effects = "Condition")
-#' attr(lipid_object2, "group_DF")
-#' }
+#' mylipid <- group_designation(omicsData = lipid_pos_object,
+#'                                    main_effects = "Virus")
+#' attr(mylipid, "group_DF")
 #'
 #' @author Lisa Bramer, Kelly Stratton
 #'
