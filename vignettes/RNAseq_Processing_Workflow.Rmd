@@ -224,7 +224,6 @@ stats_edger <- diffexp_seq(omicsData = myseq, method = "edgeR")
 ```
 Various plot types are available to display the results of the statistical comparisons. 
 
-- WHAT ARE THE plot_method SYNTAX options here? Not seeing those in the documentation, but maybe it's on Rachel's latest round of updates? In her notes, she said "Plot of stat results - option for either volcano or MA plot, heat maps with option to subset to most significant molecules (based on p-value)"
 
 ```{r warning=FALSE}
 plot(stats_edger, plot_type = "volcano")
