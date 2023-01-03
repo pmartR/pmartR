@@ -5959,15 +5959,15 @@ prep_flags <- function (x, test) {
     # ways a user can mess things up.
     stop ("A volcano plot cannot be created with Gtest flags.")
     
-  } else if (test %in% c("EdgeR_LRT", "Voom_T", "DESeq_Wald", "DESeq_LRT")) {
+  } else if (test %in% c("EdgeR_LRT", "EdgeR_F", "Voom_T", "DESeq_Wald", "DESeq_LRT")) {
     
     # Assemble a data frame with the sample IDs and flags.
-    flag_cols <- grep("^Flag_(Wald|LRT|T)_", colnames(x))
+    flag_cols <- grep("^Flag_(Wald|LRT|T|F)_", colnames(x))
     da_flag <- x[c(1, flag_cols)]
     
     # Remove "Flag_A_" from column names. The first column name is removed
     # because it corresponds to the biomolecule ID column.
-    colnames(da_flag)[-1] <- gsub("^Flag_(Wald|LRT|T)_", "", colnames(da_flag)[-1])
+    colnames(da_flag)[-1] <- gsub("^Flag_(Wald|LRT|T|F)_", "", colnames(da_flag)[-1])
     
     # Runs when the "combined" option was used.
   } else {
