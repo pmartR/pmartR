@@ -325,9 +325,9 @@ DESeq2_wrapper <- function(
     res[["row"]] <- NULL
     # Flag stuffs ----------------------------------------------------------------
     sigs <- which(res[["padj"]] < p_cutoff)
-    res[[paste0("Flag_", test)]] <- 0
+    res[["Flag"]] <- 0
     if(length(sigs)>0){
-      res[[paste0("Flag_", test)]][sigs] <- sign(res$log2FoldChange[sigs])
+      res[["Flag"]][sigs] <- sign(res$log2FoldChange[sigs])
     }
     
     res[["row"]] <- NULL
@@ -359,16 +359,21 @@ DESeq2_wrapper <- function(
   
   # colnames(all_cont)[-1] <- gsub("^baseMean", "Mean", colnames(all_cont)[-1])
   colnames(all_cont)[-1] <- gsub("^log2FoldChange", "Fold_change", colnames(all_cont)[-1])
-  colnames(all_cont)[-1] <- gsub("^padj", paste0("P_value_", test), colnames(all_cont)[-1])
+  colnames(all_cont)[-1] <- gsub("^padj", "P_value", colnames(all_cont)[-1])
   
   all_cont[[1]] <- as.character(all_cont[[1]])
 
   results <- cbind(all_cont[c(1, count_cols)],
                    all_cont[c(lfc_cols, padj_cols, flag_cols)])
   
-  attr_list <- c("cnames", "data_info", "filters", "group_DF")
-  keep_attr <- attributes(omicsData)[names(attributes(results)) %in% attr_list]
-  attributes(results) <- c(attributes(results), keep_attr)
+  # attr_list <- c("cnames", "data_info", "filters", "group_DF")
+  # keep_attr <- attributes(omicsData)[names(attributes(results)) %in% attr_list]
+  # attributes(results) <- c(attributes(results), keep_attr)
+  
+  attr(results, "cnames") <- attr(omicsData, "cnames")
+  attr(results, "data_info") <- attr(omicsData, "data_info")
+  attr(results, "filters") <- attr(omicsData, "filters")
+  attr(results, "group_DF") <- attr(omicsData, "group_DF")
   
   ## sig totes
   flag_df <- reshape2::melt(
@@ -625,9 +630,9 @@ edgeR_wrapper <- function(
     
     # Flag stuffs ----------------------------------------------------------------
     sigs <- which(res[[sig_col]] < p_cutoff)
-    res[["Flag_F"]] <- 0
+    res[["Flag"]] <- 0
     if(length(sigs) > 0){
-      res[["Flag_F"]][sigs] <- sign(res[["logFC"]][sigs])
+      res[["Flag"]][sigs] <- sign(res[["logFC"]][sigs])
     }
     
     colnames(res) <- paste0(colnames(res), 
@@ -662,21 +667,26 @@ edgeR_wrapper <- function(
   flag_cols <- grep("^Flag", colnames(all_cont))
   
   colnames(all_cont)[-1] <- gsub("^logFC", "Fold_change", colnames(all_cont)[-1])
-  colnames(all_cont)[-1] <- gsub("^(FDR|FWER)", "P_value_F", colnames(all_cont)[-1])
+  colnames(all_cont)[-1] <- gsub("^(FDR|FWER)", "P_value", colnames(all_cont)[-1])
   
   ## Ordering
   results <- all_cont[c(1, count_cols, #mean_cols, 
                         lfc_cols, padj_cols, flag_cols)]
   
-  attr_list <- c("cnames", "data_info", "filters", "group_DF")
-  keep_attr <- attributes(omicsData)[names(attributes(results)) %in% attr_list]
-  attributes(results) <- c(attributes(results), keep_attr)
+  # attr_list <- c("cnames", "data_info", "filters", "group_DF")
+  # keep_attr <- attributes(omicsData)[names(attributes(results)) %in% attr_list]
+  # attributes(results) <- c(attributes(results), keep_attr)
+  
+  attr(results, "cnames") <- attr(omicsData, "cnames")
+  attr(results, "data_info") <- attr(omicsData, "data_info")
+  attr(results, "filters") <- attr(omicsData, "filters")
+  attr(results, "group_DF") <- attr(omicsData, "group_DF")
   
   ## sig totes
   flag_df <- reshape2::melt(all_cont[flag_cols], 
                             variable.name = "Comparison", 
                             value.name = "Flags")
-  flag_df$Comparison <- gsub("Flag_F_", "", flag_df$Comparison )
+  flag_df$Comparison <- gsub("Flag_", "", flag_df$Comparison )
   attr(results, "number_significant") <- flag_df %>%
     dplyr::group_by(Comparison) %>%
     dplyr::summarise(
@@ -897,9 +907,9 @@ voom_wrapper <- function(
     if(nrow(res) > 1){
       # Flag stuffs ----------------------------------------------------------------
       sigs <- which(res[["adj.P.Val"]] < p_cutoff)
-      res[["Flag_T"]] <- 0
+      res[["Flag"]] <- 0
       if(length(sigs) >0 ){
-        res[["Flag_T"]][sigs] <- sign(res[["logFC"]][sigs])
+        res[["Flag"]][sigs] <- sign(res[["logFC"]][sigs])
       }
       
       colnames(res) <- paste0(colnames(res), paste0("_", combo[1], "_vs_", combo[2]))
@@ -933,19 +943,24 @@ voom_wrapper <- function(
   padj_cols <- grep("^adj.P.Val", colnames(all_cont))
   flag_cols <- grep("^Flag", colnames(all_cont))
   colnames(all_cont)[-1] <- gsub("^logFC", "Fold_change", colnames(all_cont)[-1])
-  colnames(all_cont)[-1] <- gsub("^adj.P.Val", "P_value_T", colnames(all_cont)[-1])
+  colnames(all_cont)[-1] <- gsub("^adj.P.Val", "P_value", colnames(all_cont)[-1])
   
   results <- all_cont[c(1, count_cols, #mean_cols, 
                         lfc_cols, padj_cols, flag_cols)]
   
-  attr_list <- c("cnames", "data_info", "filters", "group_DF")
-  keep_attr <- attributes(omicsData)[names(attributes(results)) %in% attr_list]
-  attributes(results) <- c(attributes(results), keep_attr)
+  # attr_list <- c("cnames", "data_info", "filters", "group_DF")
+  # keep_attr <- attributes(omicsData)[names(attributes(results)) %in% attr_list]
+  # attributes(results) <- c(attributes(results), keep_attr)
+  
+  attr(results, "cnames") <- attr(omicsData, "cnames")
+  attr(results, "data_info") <- attr(omicsData, "data_info")
+  attr(results, "filters") <- attr(omicsData, "filters")
+  attr(results, "group_DF") <- attr(omicsData, "group_DF")
   
   flag_df <- reshape2::melt(all_cont[flag_cols], 
                             variable.name = "Comparison", 
                             value.name = "Flags")
-  flag_df$Comparison <- gsub("Flag_T_", "", flag_df$Comparison )
+  flag_df$Comparison <- gsub("Flag_", "", flag_df$Comparison )
   attr(results, "number_significant") <- flag_df %>%
     dplyr::group_by(Comparison) %>%
     dplyr::summarise(

@@ -5729,7 +5729,7 @@ plot.statRes <- function (x,
       label <- attr(x, "comparisons")[n_comp]
       comp <- comps[[n_comp]]
       mean_df <- attr(x, "MA_means")
-      pval <-  grep(paste0("^P_value_.+", label), colnames(x), value = T)
+      pval <-  grep(paste0("^P_value_", label), colnames(x), value = T)
       
       v1 <- mean_df[[comp[1]]]
       v2 <- mean_df[[comp[2]]]
@@ -5825,12 +5825,12 @@ prep_flags <- function (x, test) {
   } else if(test %in% c("EdgeR_F", "Voom_T", "DESeq_Wald", "DESeq_LRT")){
     
     # Assemble a data frame with the sample IDs and flags.
-    flag_cols <- grep("^Flag_(Wald|LRT|T|F)_", colnames(x))
+    flag_cols <- grep("^Flag_", colnames(x))
     da_flag <- x[c(1, flag_cols)]
 
     # Remove "Flag_A_" from column names. The first column name is removed
     # because it corresponds to the biomolecule ID column.
-    colnames(da_flag)[-1] <- gsub("^Flag_(Wald|LRT|T|F)_", "", colnames(da_flag)[-1])
+    colnames(da_flag)[-1] <- gsub("^Flag_", "", colnames(da_flag)[-1])
     
   } else {
 
@@ -5922,12 +5922,10 @@ prep_flags <- function (x, test) {
 make_volcano_plot_df <- function(x) {
   # fold change values for volcano plot
   
-  fc_data <-
-    x[, c(1, grep("^Fold_change", colnames(x)))]
-  colnames(fc_data) <-
-    gsub(pattern = "^Fold_change_",
-         replacement = "",
-         x = colnames(fc_data))
+  fc_data <- x[, c(1, grep("^Fold_change", colnames(x)))]
+  colnames(fc_data) <- gsub(pattern = "^Fold_change_",
+                            replacement = "",
+                            x = colnames(fc_data))
   fc_data <-
     reshape2::melt(
       fc_data,
@@ -5951,8 +5949,7 @@ make_volcano_plot_df <- function(x) {
     dplyr::mutate(Fold_change_flag = as.character(Fold_change_flag))
 
   # p values for labeling and y axis in anova volcano plot
-  p_data <-
-    x[, c(1, grep("^P_value", colnames(x)))]
+  p_data <- x[, c(1, grep("^P_value", colnames(x)))]
   pvals <-
     reshape2::melt(
       p_data,
@@ -5972,8 +5969,10 @@ make_volcano_plot_df <- function(x) {
     pvals$Type <- "ANOVA"
   } else pvals$Type <- attr(x, "statistical_test")
 
+  ## assumes silly people won't call a group A_vs or G_vs for seqdata
+  ## Negative lookahead permits groups called A or G tho
   levels(pvals$Comparison) <-
-    gsub(pattern = "^P_value_(Wald|LRT|T|F|G|A)_",
+    gsub(pattern = "^P_value_((G|A)_((!?=vs)))*",
          replacement = "",
          levels(pvals$Comparison))
 
