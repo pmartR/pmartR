@@ -2,7 +2,7 @@
 % Please edit documentation in R/filter_summary.R
 \name{summary.imdanovaFilt}
 \alias{summary.imdanovaFilt}
-\title{Produce a basic summary of a imdanova_filter object}
+\title{IMD-ANOVA Filter Summary}
 \usage{
 \method{summary}{imdanovaFilt}(
   filter_object,
@@ -15,25 +15,35 @@
 \item{filter_object}{S3 object of class 'imdanovaFilt' created by
 \code{\link{imdanova_filter}}.}
 
-\item{min_nonmiss_anova}{the minimum number of non-missing feature values
-allowed per group for \code{anova_filter}. Defaults to NULL. Suggested
-value is 2.}
+\item{min_nonmiss_anova}{integer value specifying the minimum number of
+non-missing feature values allowed per group for \code{anova_filter}.
+Defaults to NULL. Suggested value is 2.}
 
-\item{min_nonmiss_gtest}{the minimum number of non-missing feature values
-allowed per group for \code{gtest_filter}. Defaults to NULL. Suggested
-value is 3.}
+\item{min_nonmiss_gtest}{integer value specifying the minimum number of
+non-missing feature values allowed per group for \code{gtest_filter}.
+Defaults to NULL. Suggested value is 3.}
 
-\item{comparisons}{data.frame with columns for "Control" and "Test"
+\item{comparisons}{data frame with columns for "Control" and "Test"
 containing the different comparisons of interest. Comparisons will be made
-between the Test and the corresponding Control.}
+between the Test and the corresponding Control (e.g. Control is the
+reference group).}
 }
 \value{
 If min_nonmiss_gtest or min_nonmiss_anova is specified, the number of
   biomolecules to be filtered with the specified threshold are reported.
 }
 \description{
-This function will provide basic summary statistics for the imdanova_filter
-object.
+Provide summary of a imdanovaFilt S3 object
+}
+\examples{
+library(pmartRdata)
+mypep <- group_designation(omicsData = pep_object, main_effects = "Phenotype")
+myfilt <- imdanova_filter(omicsData = mypep)
+summary(filter_object = myfilt, min_nonmiss_anova = 2, min_nonmiss_gtest = 3)
+
+}
+\seealso{
+\code{\link{imdanova_filter}}
 }
 \author{
 Lisa Bramer

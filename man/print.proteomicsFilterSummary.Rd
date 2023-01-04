@@ -2,7 +2,7 @@
 % Please edit documentation in R/filter_summary.R
 \name{print.proteomicsFilterSummary}
 \alias{print.proteomicsFilterSummary}
-\title{Print method for summary of proteomics filter}
+\title{Proteomics Filter Print Method}
 \usage{
 \method{print}{proteomicsFilterSummary}(object)
 }

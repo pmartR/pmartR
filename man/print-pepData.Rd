@@ -7,5 +7,5 @@
 \method{print}{pepData}(pepData)
 }
 \description{
-For printing an S3 object of type 'pepData':
+For printing an S3 object of type 'pepData'
 }

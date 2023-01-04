@@ -5,9 +5,7 @@
 #' @param omicsData an object of the class 'pepData', 'proData', 'metabData',
 #'   'lipidData', 'nmrData', created by \code{\link{as.pepData}},
 #'   \code{\link{as.proData}}, \code{\link{as.metabData}},
-#'   \code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, respectively. The
-#'   function \code{\link{group_designation}} must have been run on omicsData to
-#'   use several of the subset functions (i.e. rip and ppp_rip).
+#'   \code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, respectively. 
 #'
 #' @details Quantile normalization is an algorithm for normalizing a set of data
 #'   vectors by giving them the same distribution. It is applied to data on the
@@ -19,13 +17,16 @@
 #'   contains log2 transformed data, the normalization will be performed on the
 #'   non-log2 scale and then re-scaled after normalization to be returned on the
 #'   log2 scale).
+#'   
+#' @details The method is implemented as described in Bolstad et al. (2003).
 #'
 #' @examples
-#' \dontrun{
 #' library(pmartRdata)
-#' data(lipid_object)
-#' norm_data <- normalize_quantile(omicsData = lipid_object)
-#' }
+#' myfilt <- molecule_filter(omicsData = metab_object)
+#' # quantile normalization requires complete data
+#' # summary(filter_object = myfilt, min_num = 50)
+#' mymetab <- applyFilt(filter_object = myfilt, omicsData = metab_object, min_num = 50)
+#' norm_data <- normalize_quantile(omicsData = mymetab)
 #'
 #' @author Kelly Stratton
 #'

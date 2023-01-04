@@ -21,41 +21,47 @@ trelli_foldchange_boxplot(
 )
 }
 \arguments{
-\item{trelliData}{A trelliscope data object with omicsData and statRes results. Required.}
+\item{trelliData}{A trelliscope data object with omicsData and statRes
+results. Required.}
 
-\item{cognostics}{A vector of cognostic options for each plot. Valid entries are
-are n, mean, median, and sd.}
+\item{cognostics}{A vector of cognostic options for each plot. Valid entries
+are are n, mean, median, and sd.}
 
-\item{p_value_test}{A logical to indicate whether specific significant biomolecules are
-to be indicated with a changed symbol if an imd-anova was run. Default is FALSE.}
+\item{p_value_test}{A logical to indicate whether specific significant
+biomolecules are to be indicated with a changed symbol if an imd-anova was
+run. Default is FALSE.}
 
-\item{p_value_thresh}{A value between 0 and 1 to indicate significant biomolecules
-for p_value_test. Default is 0.05.}
+\item{p_value_thresh}{A value between 0 and 1 to indicate significant
+biomolecules for p_value_test. Default is 0.05.}
 
 \item{include_points}{Add points. Default is TRUE.}
 
-\item{ggplot_params}{An optional vector of strings of ggplot parameters to the backend ggplot
-function. For example, c("ylab('')", "xlab('')"). Default is NULL.}
+\item{ggplot_params}{An optional vector of strings of ggplot parameters to
+the backend ggplot function. For example, c("ylab('')", "xlab('')").
+Default is NULL.}
 
-\item{interactive}{A logical argument indicating whether the plots should be interactive
-or not. Interactive plots are ggplots piped to ggplotly (for now). Default is FALSE.}
+\item{interactive}{A logical argument indicating whether the plots should be
+interactive or not. Interactive plots are ggplots piped to ggplotly (for
+now). Default is FALSE.}
 
-\item{path}{The base directory of the trelliscope application. Default is Downloads.}
+\item{path}{The base directory of the trelliscope application. Default is
+Downloads.}
 
 \item{name}{The name of the display. Default is Trelliscope.}
 
-\item{test_mode}{A logical to return a smaller trelliscope to confirm plot and design.
-Default is FALSE.}
+\item{test_mode}{A logical to return a smaller trelliscope to confirm plot
+and design. Default is FALSE.}
 
-\item{test_example}{A vector of plot indices to return for test_mode. Default is 1.}
+\item{test_example}{A vector of plot indices to return for test_mode. Default
+is 1.}
 
-\item{single_plot}{A TRUE/FALSE to indicate whether 1 plot (not a trelliscope) should be returned. 
-Default is FALSE.}
+\item{single_plot}{A TRUE/FALSE to indicate whether 1 plot (not a
+trelliscope) should be returned. Default is FALSE.}
 }
 \description{
-Specify a plot design and cognostics for the fold_change boxplot trelliscope.
-   Fold change must be grouped by an emeta column, which means both an omicsData
-   object and statRes are required to make this plot.
+Specify a plot design and cognostics for the fold_change boxplot
+  trelliscope. Fold change must be grouped by an emeta column, which means
+  both an omicsData object and statRes are required to make this plot.
 }
 \examples{
 \dontrun{ 

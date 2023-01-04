@@ -31,4 +31,5 @@ attr(tcga_ovarian_pepdata_bp,"survDF") <- list(t_death = "survival_time",ind_dea
 sfit <- fit_surv(tcga_ovarian_pepdata_bp)
 plot(sfit,col=c(1,2))
 }
+
 }

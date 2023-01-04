@@ -26,14 +26,6 @@ protein and returns a proData object.
 In the rrollup method, peptides are scaled based on a reference
   peptide and protein abundance is set as the mean of these scaled peptides.
 }
-\examples{
-\dontrun{
-library(pmartRdata)
-data(pep_object)
-result = rrollup(pepData = pep_object)
-}
-
-}
 \references{
 Matzke, M. M., Brown, J. N., Gritsenko, M. A., Metz, T. O.,
   Pounds, J. G., Rodland, K. D., ... Webb-Robertson, B.-J. (2013). \emph{A

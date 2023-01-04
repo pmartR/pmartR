@@ -7,5 +7,5 @@
 \method{print}{lipidData}(lipidData)
 }
 \description{
-For printing an S3 object of type 'lipidData':
+For printing an S3 object of type 'lipidData'
 }

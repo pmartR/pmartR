@@ -2,12 +2,12 @@
 % Please edit documentation in R/filter_objects.R
 \name{cv_filter}
 \alias{cv_filter}
-\title{Filter Based on Pooled Coefficient of Variation (CV) Values}
+\title{Pooled Coefficient of Variation (CV) Filter Object}
 \usage{
 cv_filter(omicsData, use_groups = TRUE)
 }
 \arguments{
-\item{omicsData}{an object of the class 'pepData', 'proData', 'metabData',
+\item{omicsData}{an object of class 'pepData', 'proData', 'metabData',
 'lipidData', or 'nmrData' created by \code{\link{as.pepData}},
 \code{\link{as.proData}}, \code{\link{as.metabData}},
 \code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, respectively. Note,
@@ -21,7 +21,7 @@ not been run on the omicsData object, use_groups will be treated as FALSE.}
 }
 \value{
 An S3 object of class 'cvFilt' giving the pooled CV for each
- biomolecule and additional attributes used for plotting a data.frame with a
+ biomolecule and additional information used for plotting a data.frame with a
  column giving the biomolecule name and a column giving the pooled CV value.
 }
 \description{
@@ -37,19 +37,15 @@ For each biomolecule, the CV of each group is calculated as the
  group.
 }
 \examples{
-\dontrun{
 library(pmartRdata)
-data("pep_object")
-pep_object2 <- group_designation(omicsData = pep_object,
-                                 main_effects = "Condition")
-to_filter <- cv_filter(omicsData = pep_object2, use_groups = TRUE)
-summary(to_filter, cv_threshold = 30)
-}
+mypep <- group_designation(omicsData = pep_object, main_effects = "Phenotype")
+to_filter <- cv_filter(omicsData = mypep, use_groups = TRUE)
+summary(filter_object = to_filter, cv_threshold = 30)
 
 }
 \references{
-Ahmed, S.E. (1995). \emph{A pooling methodology for coefficient of
- variation}. The Indian Journal of Statistics. 57: 57-75.
+Ahmed, S.E. (1995). \emph{A pooling methodology for coefficient
+  of variation}. The Indian Journal of Statistics. 57: 57-75.
 }
 \author{
 Lisa Bramer, Kelly Stratton

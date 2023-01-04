@@ -36,20 +36,6 @@ This function filters biomolecules that do not have at least
   \code{min.nonmiss.allowed} values per group, where groups are from
   \code{group_designation}.
 }
-\examples{
-\dontrun{
-library(pmartRdata)
-data("pep_object")
-
-pep_object2 <- group_designation(pep_object, main_effects = "Condition")
-
-nonmissing_result <- nonmissing_per_group(omicsData = pep_object2)
-
-to_filter <- anova_filter(nonmiss_per_group = nonmissing_result,
-                          min_nonmiss_anova = 2)
-}
-
-}
 \seealso{
 \code{\link{nonmissing_per_group}}
 }

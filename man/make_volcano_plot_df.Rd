@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_fns.R
 \name{make_volcano_plot_df}
 \alias{make_volcano_plot_df}
-\title{Create a plotting dataframe for volcano plots and heatmaps.}
+\title{Create a plotting dataframe for volcano plots and heatmaps}
 \usage{
 make_volcano_plot_df(x)
 }

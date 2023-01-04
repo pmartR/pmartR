@@ -7,5 +7,5 @@
 \method{print}{customFilt}(filter_object)
 }
 \description{
-For printing an S3 object of type 'customFilt':
+For printing an S3 object of type 'customFilt'
 }

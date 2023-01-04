@@ -2,10 +2,10 @@
 % Please edit documentation in R/plot_fns.R
 \name{plot.rmdFilt}
 \alias{plot.rmdFilt}
-\title{plot.rmdFilt}
+\title{Plot rmdFilt Object}
 \usage{
 \method{plot}{rmdFilt}(
-  filter_obj,
+  filter_object,
   pvalue_threshold = NULL,
   sampleID = NULL,
   order_by = NULL,
@@ -26,69 +26,79 @@
 )
 }
 \arguments{
-\item{filter_obj}{An object of class rmdFilt which is a data frame containing
-columns for the sample ID, group, log2 robust Mahalanobis distance,
-p-values, and metrics used to calcualte the robust Mahalanobis distance.}
+\item{filter_object}{object of class rmdFilt created via \code{\link{rmd_filter}}}
 
-\item{pvalue_threshold}{A threshold for the Robust Mahalanobis Distance (RMD)
+\item{pvalue_threshold}{numeric threshold for the Robust Mahalanobis Distance (RMD)
 p-value. If \code{sampleID} is NULL (see \code{sampleID} below), a
 horizontal line is plotted at the RMD value that corresponds with the
 threshold, and all samples above the line have a p-value below the
 threshold. If \code{sampleID} is not NULL, \code{pvalue_threshold} will do
 nothing. Default value is NULL.}
 
-\item{sampleID}{A character vector specifying the sample names to be plotted.
+\item{sampleID}{character vector specifying the sample names to be plotted.
 If specified, the plot function produces a boxplot instead of a
 scatterplot. A point, colored by sample, will be placed on each boxplot for
 that sample's value for the given metric. The default value is NULL.}
 
-\item{order_by}{A character string specifying a variable by which to order
+\item{order_by}{character string specifying a variable by which to order
 the samples in the plot. This variable must be found in the column names of
 fdata from the rmdFilt object. If \code{order_by} is "Group", the plot will
 be ordered by the group variable from the group_designation function. If
 NULL (default), the samples will be displayed in the order in which they
 first appear.}
 
-\item{interactive}{Logical. If TRUE produces an interactive plot.}
+\item{interactive}{logical value. If TRUE produces an interactive plot.}
 
-\item{x_lab}{A character string specifying the x-axis label.}
+\item{x_lab}{character string specifying the x-axis label}
 
-\item{y_lab}{A character string specifying the y-axis label. The default is
+\item{y_lab}{character string specifying the y-axis label. The default is
 NULL in which case the y-axis label will be the metric selected for the
 \code{metric} argument.}
 
-\item{x_lab_size}{An integer value indicating the font size for the x-axis.
+\item{x_lab_size}{integer value indicating the font size for the x-axis.
 The default is 11.}
 
-\item{y_lab_size}{An integer value indicating the font size for the y-axis.
+\item{y_lab_size}{integer value indicating the font size for the y-axis.
 The default is 11.}
 
-\item{x_lab_angle}{An integer value indicating the angle of x-axis labels.
+\item{x_lab_angle}{integer value indicating the angle of x-axis labels.
 The default is 90.}
 
-\item{title_lab}{A character string specifying the plot title.}
+\item{title_lab}{character string specifying the plot title.}
 
-\item{title_lab_size}{An integer value indicating the font size of the plot
+\item{title_lab_size}{integer value indicating the font size of the plot
 title. The default is 14.}
 
-\item{legend_lab}{A character string specifying the legend title.}
+\item{legend_lab}{character string specifying the legend title}
 
-\item{legend_position}{A character string specifying the position of the
+\item{legend_position}{character string specifying the position of the
 legend. Can be one of "right", "left", "top", "bottom", or "none". The
 default is "none".}
 
 \item{point_size}{An integer specifying the size of the points. The default
 is 3.}
 
-\item{bw_theme}{Logical. If TRUE uses the ggplot2 black and white theme.}
+\item{bw_theme}{logical value. If TRUE uses the ggplot2 black and white theme.}
 
-\item{palette}{A character string indicating the name of the RColorBrewer
+\item{palette}{character string indicating the name of the RColorBrewer
 palette to use. For a list of available options see the details section in
 \code{\link[RColorBrewer]{RColorBrewer}}.}
 
-\item{use_VizSampNames}{Logical. Indicates whether to use custom sample
+\item{use_VizSampNames}{logical value. Indicates whether to use custom sample
 names. The default is FALSE.}
+}
+\value{
+ggplot2 plot object if interactive is FALSE, or plotly plot object if
+  interactive is TRUE
 }
 \description{
 For plotting an S3 object of type 'rmdFilt'
+}
+\examples{
+library(pmartRdata)
+mymetab <- edata_transform(omicsData = metab_object, data_scale = "log2")
+mymetab <- group_designation(omicsData = mymetab, main_effects = "Phenotype")
+rmd_results <- rmd_filter(omicsData = mymetab, metrics=c("MAD", "Skewness", "Correlation"))
+plot(rmd_results, pvalue_threshold = 0.0001, order_by = "Phenotype")
+
 }

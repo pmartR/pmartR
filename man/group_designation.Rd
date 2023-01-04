@@ -2,8 +2,7 @@
 % Please edit documentation in R/group_designation.R
 \name{group_designation}
 \alias{group_designation}
-\title{Creates Attribute of omicsData object containing Group Membership Based on
-Specified Main Effects}
+\title{Creates Attribute of omicsData Object for Group Membership}
 \usage{
 group_designation(
   omicsData,
@@ -19,10 +18,10 @@ group_designation(
 }
 \arguments{
 \item{omicsData}{an object of the class 'lipidData', 'metabData', 'pepData',
-'proData', 'isobaricpepData', or 'nmrData', usually created by
+'proData', 'isobaricpepData', 'nmrData', or 'seqData', usually created by
 \code{\link{as.lipidData}}, \code{\link{as.metabData}},
 \code{\link{as.pepData}}, \code{\link{as.proData}},
-\code{\link{as.isobaricpepData}}, or \code{\link{as.nmrData}},
+\code{\link{as.isobaricpepData}}, \code{\link{as.nmrData}}, or \code{\link{as.seqData}},
 respectively.}
 
 \item{main_effects}{a character vector with no more than two variable names
@@ -63,10 +62,6 @@ be subtracted from the non-control group value.}
 should be used as batch information for downstream analyses. Batch ID is
 similar to covariates but unlike covariates it is specific to that of specific
 batch effects}
-
-\item{time_course}{an optional character string specifying the variable name
-of a time course variable, if applicable to the experimental data.
-CURRENTLY NOT SUPPORTED}
 }
 \value{
 An object of the same class as the input \code{omicsData} object -
@@ -75,13 +70,10 @@ An object of the same class as the input \code{omicsData} object -
   for sample id and group, is added to the object. If two main effects are
   provided the original main effect levels for each sample are returned as
   the third and fourth columns of the data.frame. Additionally, the
-  covariates provided will be listed as attributes of this data.frame. Use of
-  time_course is currently not supported, however the eventual functionality
-  is such that if time_course is included, a column for 'TimeCourse' will be
-  output as well.
+  covariates provided will be listed as attributes of this data.frame.
 }
 \description{
-The method assigns each sample to a group, for future analyses, based on the
+The method assigns each sample to a group, for use in future analyses, based on the
 variable(s) specified as main effects.
 }
 \details{
@@ -94,13 +86,10 @@ Groups are formed based on the levels of the main effect variables.
   allowed, as is a single group.
 }
 \examples{
-\dontrun{
 library(pmartRdata)
-data(lipid_object)
-lipid_object2 <- group_designation(omicsData = lipid_object,
-                                   main_effects = "Condition")
-attr(lipid_object2, "group_DF")
-}
+mylipid <- group_designation(omicsData = lipid_pos_object,
+                                   main_effects = "Virus")
+attr(mylipid, "group_DF")
 
 }
 \author{

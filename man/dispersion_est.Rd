@@ -80,15 +80,11 @@ For generating statistics for 'seqData' objects
 DESeq2 option requires package "survival" to be available.
 }
 \examples{
-\dontrun{
-
 library(pmartRdata)
-myseqData <- rnaseq_object
-myseqData <- group_designation(omicsData = myseqData, main_effects = "Virus")
-disp_est <- dispersion_est(omicsData = myseqData, method = "edgeR")
-
-
-}
+myseqData <- group_designation(omicsData = rnaseq_object, main_effects = "Virus")
+dispersion_est(omicsData = myseqData, method = "edgeR")
+dispersion_est(omicsData = myseqData, method = "DESeq2")
+dispersion_est(omicsData = myseqData, method = "voom")
 
 }
 \references{

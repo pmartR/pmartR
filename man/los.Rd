@@ -2,34 +2,36 @@
 % Please edit documentation in R/subset_funcs.R
 \name{los}
 \alias{los}
-\title{Identify Features from the Top L Order Statistics}
+\title{Identify Biomolecules from the Top L Order Statistics for Use in
+Normalization}
 \usage{
 los(e_data, edata_id, L = 0.05)
 }
 \arguments{
-\item{e_data}{a \eqn{p \times n + 1} data.frame, where \eqn{p} is the number of peptides, proteins, lipids, or metabolites and \eqn{n} is the number of samples. Each row corresponds to data for a peptide, protein, lipid, or metabolite, with a column giving the identifer name.}
+\item{e_data}{a \eqn{p \times n + 1} data.frame, where \eqn{p} is the number
+of peptides, proteins, lipids, or metabolites and \eqn{n} is the number of
+samples. Each row corresponds to data for a peptide, protein, lipid, or
+metabolite, with one column giving the biomolecule identifier name.}
 
-\item{edata_id}{character string indicating the name of the column giving the peptide, protein, lipid, or metabolite identifier. Usually obtained by calling \code{attr(omicsData, "cnames")$edata_cname}.}
+\item{edata_id}{character string indicating the name of the column giving the
+peptide, protein, lipid, or metabolite identifier. Usually obtained by
+calling \code{attr(omicsData, "cnames")$edata_cname}.}
 
-\item{L}{numeric value between 0 and 1, indicating the top proportion of features to be retained (default value 0.05)}
+\item{L}{numeric value between 0 and 1, indicating the top proportion of
+biomolecules to be retained (default value 0.05)}
 }
 \value{
-Character vector containing the features belonging to the subset.
+Character vector containing the biomolecules belonging to the subset.
 }
 \description{
-Select features for normalization via the method of the top L order statistics (LOS)
+Select biomolecules for normalization via the method of the top L order
+statistics (LOS)
 }
 \details{
-The feature abundances of the top \code{L} order statistics are identified and returned. Specifically, for each sample, the features with the top \code{L} proportion of highest absolute abundance are retained, and the union of these features is taken as the subset identified.
-}
-\examples{
-\dontrun{
-library(pmartRdata)
-data(pep_pepData)
-pep_pepData2 <- group_designation(omicsData = pep_pepData, main_effects = "Condition")
-pep_subset <- los(e_data = pep_pepData2$e_data, edata_id = attr(pep_pepData2, "cnames")$edata_cname, pmartR_groupDF = attr(pep_pepData2, "group_DF"))
-}
-
+The biomolecule abundances of the top \code{L} order statistics are
+  identified and returned. Specifically, for each sample, the biomolecules with
+  the top \code{L} proportion of highest absolute abundance are retained, and
+  the union of these biomolecules is taken as the subset identified.
 }
 \author{
 Kelly Stratton, Lisa Bramer

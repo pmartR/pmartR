@@ -30,10 +30,10 @@ bin combination is significant by the g-test}
 \code{\link[pmartR:plot.statRes]{pmartR::plot.statRes()}}. If T, will build
 a plotly version of the plot.  Defaults to FALSE.}
 
-\item{color_low}{A character string specifying the color of the gradient for
+\item{color_low}{character string specifying the color of the gradient for
 low count values.}
 
-\item{color_high}{A character string specifying the color of the gradient for
+\item{color_high}{character string specifying the color of the gradient for
 high count values.}
 
 \item{plotly_layout}{A list of arguments, not including the plot, to be
@@ -42,16 +42,16 @@ passed to plotly::layout if interactive = T.}
 \item{text_size}{An integer specifying the size of the text (number of
 non-missing values) within the plot. The default is 3.}
 
-\item{display_count}{Logical. Indicates whether the non-missing counts will
-be displayed on the bar plot. The default is TRUE.}
+\item{display_count}{logical value. Indicates whether the non-missing counts
+will be displayed on the bar plot. The default is TRUE.}
 
-\item{x_lab}{A character string specifying the x-axis label.}
+\item{x_lab}{character string specifying the x-axis label.}
 
-\item{y_lab}{A character string specifying the y-axis label.}
+\item{y_lab}{character string specifying the y-axis label.}
 
-\item{title_lab}{A character string specifying the plot title.}
+\item{title_lab}{character string specifying the plot title.}
 
-\item{legend_lab}{A character string specifying the legend title.}
+\item{legend_lab}{character string specifying the legend title.}
 
 \item{count_text_size}{In non-interactive mode, the size of the text
 indicating the number of biomolecules to be displayed inside the tile.

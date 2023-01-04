@@ -1,29 +1,26 @@
-#' Creates an object of class naRes
+#' Creates an object of class naRes (NA Result)
 #'
-#' This function takes in an omicsData object, outputs a list of two data
-#' frames, one contains NA by sample, the second contains NA by molecule
+#' This function takes in an omicsData object, and outputs a list of two data
+#' frames, one containing the number of missing values by sample, and the other
+#' containing the number of missing values by molecule
 #'
 #' @param omicsData an object of class "pepData", "proData", "metabData",
-#'   "lipidData", or "nmrData", created by \code{\link{as.pepData}},
+#'   "lipidData", "nmrData", or "seqData", created by \code{\link{as.pepData}},
 #'   \code{\link{as.proData}}, \code{\link{as.metabData}},
-#'   \code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, respectively.
+#'   \code{\link{as.lipidData}}, \code{\link{as.nmrData}}, or
+#'   \code{\link{as.seqData}}, respectively.
 #'
-#' @return outputs a list of two data frames, one contains NA by sample (missing
-#'   values per sample), the second contains NA by molecule (missing values per
-#'   molecule). The output is assigned class 'naRes'.
+#' @return S3 object of class naRes, which is a list of two data frames, one
+#'   containing the number of missing values per sample, and the other
+#'   containing the number of missing values per molecule. For count data,
+#'   zeroes represent missing values; for abundance data, NA's represent missing
+#'   values. This object can be used with 'plot' and 'summary' methods to
+#'   examine the missing values in the dataset.
 #'
 #' @examples
-#' \dontrun{
 #' library(pmartRdata)
-#' data("lipid_object")
-#' data("metab_object")
-#'
-#' result = missingval_result(lipid_object)
-#' result2 = missingval_result(metab_object)
-#'
-#' }
-#'
-#' @rdname missingval_result
+#' result1 = missingval_result(omicsData = lipid_neg_object)
+#' result2 = missingval_result(omicsData = metab_object)
 #'
 #' @export
 #' 

@@ -7,5 +7,5 @@
 \method{print}{imdanovaFilt}(filter_object)
 }
 \description{
-For printing an S3 object of type 'imdanovaFilt':
+For printing an S3 object of type 'imdanovaFilt'
 }

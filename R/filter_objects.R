@@ -1,39 +1,42 @@
-#' Molecule filter object
+#' Molecule Filter Object
 #'
 #' This function returns a moleculeFilt object for use with
 #' \code{\link{applyFilt}}
 #'
-#' @param omicsData an object of the class 'pepData', 'proData', 'metabData',
-#'   'lipidData', 'nmrData', or 'seqData', usually created by \code{\link{as.pepData}},
+#' @param omicsData object of the class 'pepData', 'proData', 'metabData',
+#'   'lipidData', 'nmrData', or 'seqData', created by \code{\link{as.pepData}},
 #'   \code{\link{as.proData}}, \code{\link{as.metabData}},
-#'   \code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, 
-#'   or \code{\link{as.nmrData}}, respectively.
-#' @param min_num an integer value specifying the minimum number of times each
-#'   feature must be observed across all samples. Default value is 2.
+#'   \code{\link{as.lipidData}}, \code{\link{as.nmrData}}, or \code{\link{as.seqData}}, respectively.
+#' @param min_num integer value specifying the minimum number of times each
+#'   biomolecule must be observed across all samples. Default value is 2 (i.e.
+#'   biomolecules seen in just 1 sample or in no samples will be removed once
+#'   the filter is applied).
 #' @param use_group logical indicator for whether to utilize group information
 #'   from \code{\link{group_designation}} when calculating the molecule filter.
-#'   Defaults to FALSE.
+#'   Defaults to FALSE. When group information is used to calculate the molecule
+#'   filter, the minimum number of observations is required within each group,
+#'   as opposed to across all samples regardless of group membership.
 #' @param use_batch logical indicator for whether to utilize batch information
 #'   from \code{\link{group_designation}} when calculating the molecule filter.
-#'   Defaults to FALSE. Necessary to be set to TRUE if running ComBat batch
-#'   correction.
-#'
+#'   Defaults to FALSE. When batch information is used to calculate the molecule
+#'   filter, the minimum number of observations is required within each batch,
+#'   as opposed to across all samples regardless of batch. If ComBat or similar
+#'   method will be used for downstream batch effect correction, this argument
+#'   should be set to TRUE.
+#'   
 #' @details Attribute of molecule_filt object is "total_poss_obs", the number of
 #'   total possible observations for each feature (same as the number of
 #'   samples)
 #'
-#' @return Object of class moleculeFilt (also a data.frame) that contains the
+#' @return An S3 object of class 'moleculeFilt' (also a data.frame) that contains the
 #'   molecule identifier and the number of samples for which the molecule was
-#'   measured (not NA)
+#'   observed (i.e. not NA)
 #'
 #' @examples
-#' \dontrun{
 #' library(pmartRdata)
-#' data("pep_object")
 #' to_filter <- molecule_filter(omicsData = pep_object)
-#' summary(to_filter, min_num = 2)
-#' }
-#'
+#' summary(filter_object = to_filter, min_num = 2)
+#' 
 #' @author Kelly Stratton
 #'
 #' @export
@@ -200,12 +203,13 @@ molecule_filter <- function (omicsData, use_groups = FALSE, use_batch = FALSE) {
   return(output)
 }
 
-#' Total Count filter object
+#' Total Count Filter Object
 #'
 #' This function returns a totalcountFilt object for use with
 #' \code{\link{applyFilt}}
 #'
-#' @param omicsData an object of the class 'seqData', usually created by \code{\link{as.seqData}}
+#' @param omicsData an object of the class 'seqData', created by
+#'   \code{\link{as.seqData}}
 #'
 #' @details Filter is based off of recommendations in edgeR processing, where 
 #' the low-observed biomolecules are removed from processing. Default 
@@ -219,17 +223,15 @@ molecule_filter <- function (omicsData, use_groups = FALSE, use_batch = FALSE) {
 #' the edgeR quasi-likelihood pipeline. F1000Research 5, 1438. 
 #' http://f1000research.com/articles/5-1438
 #'
-#' @return Object of class totalcountFilt (data.frame) that contains the
-#'   molecule identifier and the total count of observed reads.
+#' @return An S3 object of class 'totalcountFilt' (data.frame) that contains the
+#'   molecule identifier and the total count of observed reads for that molecule
+#'   across all samples.
 #'
 #' @examples
-#' \dontrun{
 #' library(pmartRdata)
-#' data("rnaseq_object")
 #' to_filter <- total_count_filter(omicsData = rnaseq_object)
-#' summary(to_filter, min_count = 10)
-#' }
-#'
+#' summary(filter_object = to_filter, min_count = 10)
+#' 
 #' @author Rachel Richardson
 #'
 #' @export
@@ -307,33 +309,30 @@ total_count_filter <- function (omicsData) {
 }
 
 
-#' RNA filter object
+#' RNA Filter Object
 #'
 #' This function returns a RNAFilt object for use with
 #' \code{\link{applyFilt}}
 #'
-#' @param omicsData an object of the class 'seqData', usually created by \code{\link{as.seqData}}
+#' @param omicsData an object of the class 'seqData', created by
+#'   \code{\link{as.seqData}}
 #'
 #' @details Filter omicsData samples by library size (number of reads) or number
-#' of unique non-zero biomolecules per sample. Useful for visualizing if a sample
-#' contains lower than expected number of reads.
+#'   of unique non-zero biomolecules per sample. Useful for visualizing if a
+#'   sample contains lower than expected number of reads.
 #'
-#' @return Object of class RNAFilt (data.frame) that contains the
+#' @return An S3 object of class 'RNAFilt' (data.frame) that contains the
 #'   sample identifiers, library size, the number of unique biomolecules with 
 #'   non-zero observations per sample, and the proportion of non-zero 
 #'   observations over the total number of biomolecules.
 #'
 #' @examples
-#' \dontrun{
 #' library(pmartRdata)
-#' data("rnaseq_object")
 #' to_filter <- RNA_filter(omicsData = rnaseq_object)
-#' plot(to_filter)
-#' summary(to_filter, size_library = 10000)
-#' summary(to_filter, min_nonzero = 5000)
-#' summary(to_filter, min_nonzero = .2)
-#' }
-#'
+#' summary(filter_object = to_filter, size_library = 10000)
+#' summary(filter_object = to_filter, min_nonzero = 5000)
+#' summary(filter_object = to_filter, min_nonzero = .2)
+#' 
 #' @author Rachel Richardson
 #'
 #' @export
@@ -385,48 +384,45 @@ RNA_filter <- function (omicsData) {
 }
 
 
-##'Filter Based on Pooled Coefficient of Variation (CV) Values
+#' Pooled Coefficient of Variation (CV) Filter Object
 #'
-#'A pooled CV is calculated for each biomolecule.
+#' A pooled CV is calculated for each biomolecule.
 #'
-#'@param omicsData an object of the class 'pepData', 'proData', 'metabData',
+#' @param omicsData an object of class 'pepData', 'proData', 'metabData',
 #'  'lipidData', or 'nmrData' created by \code{\link{as.pepData}},
 #'  \code{\link{as.proData}}, \code{\link{as.metabData}},
 #'  \code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, respectively. Note,
 #'  if \code{\link{group_designation}} has not been run, the CV is calculated
 #'  based on all samples for each biomolecule.
-#'@param use_groups logical indicator for whether to utilize group information
+#' @param use_groups logical indicator for whether to utilize group information
 #'  from \code{\link{group_designation}} when calculating the CV. Defaults to
 #'  TRUE. If use_groups is set to TRUE but \code{\link{group_designation}} has
 #'  not been run on the omicsData object, use_groups will be treated as FALSE.
 #'
-#'@return  An S3 object of class 'cvFilt' giving the pooled CV for each
-#'  biomolecule and additional attributes used for plotting a data.frame with a
+#' @return An S3 object of class 'cvFilt' giving the pooled CV for each
+#'  biomolecule and additional information used for plotting a data.frame with a
 #'  column giving the biomolecule name and a column giving the pooled CV value.
 #'
-#'@details For each biomolecule, the CV of each group is calculated as the
+#' @details For each biomolecule, the CV of each group is calculated as the
 #'  standard deviation divided by the mean, excluding missing values. A pooled
 #'  CV estimate is then calculated based on the methods of Ahmed (1995). Any
 #'  groups consisting of a single sample are excluded from the CV calculation,
 #'  and thus, from the cv_filter result. If group_designation has not been run
 #'  on the omicsData object, all samples are considered to belong to the same
 #'  group.
-#'@references Ahmed, S.E. (1995). \emph{A pooling methodology for coefficient of
-#'  variation}. The Indian Journal of Statistics. 57: 57-75.
+#'  
+#' @references Ahmed, S.E. (1995). \emph{A pooling methodology for coefficient
+#'   of variation}. The Indian Journal of Statistics. 57: 57-75.
 #'
 #' @examples
-#' \dontrun{
 #' library(pmartRdata)
-#' data("pep_object")
-#' pep_object2 <- group_designation(omicsData = pep_object,
-#'                                  main_effects = "Condition")
-#' to_filter <- cv_filter(omicsData = pep_object2, use_groups = TRUE)
-#' summary(to_filter, cv_threshold = 30)
-#'}
+#' mypep <- group_designation(omicsData = pep_object, main_effects = "Phenotype")
+#' to_filter <- cv_filter(omicsData = mypep, use_groups = TRUE)
+#' summary(filter_object = to_filter, cv_threshold = 30)
 #'
-#'@author Lisa Bramer, Kelly Stratton
+#' @author Lisa Bramer, Kelly Stratton
 #'
-#'@export
+#' @export
 #'
 cv_filter <- function(omicsData, use_groups = TRUE) {
   
@@ -440,7 +436,6 @@ cv_filter <- function(omicsData, use_groups = TRUE) {
     stop (paste("omicsData must be of class 'pepData', 'proData', 'metabData',",
                 "'lipidData', or 'nmrData'",
                 sep = ' '))
-    
   }
   
   # check that use_groups is valid #
@@ -597,59 +592,53 @@ cv_filter <- function(omicsData, use_groups = TRUE) {
 }
 
 
-#' RMD Runs
+#' Robust Mahalanobis Distance (RMD) Filter Object
 #'
 #' The method computes a robust Mahalanobis distance that can be mapped to a
-#'p-value and used to identify outlying samples
+#' p-value and used to identify outlying samples
 #'
 #' @param omicsData an object of the class 'pepData', 'proData', 'metabData',
-#'  'lipidData', or 'nmrData' usually created by \code{\link{as.pepData}},
+#'  'lipidData', or 'nmrData' created by \code{\link{as.pepData}},
 #'  \code{\link{as.proData}}, \code{\link{as.metabData}},
 #'  \code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, respectively.
 #'
 #' @param ignore_singleton_groups logical indicator of whether to remove
-#'  singleton groups or not; defaults to TRUE. If TRUE, rmd_filter results are
-#'  returned only for samples in groups of size greater than 1. This is used
-#'  when calculating the correlation.
+#'   singleton groups or not; defaults to TRUE. A singleton group is a group
+#'   consisting of just a single sample. If TRUE, rmd_filter results are
+#'   returned only for samples in groups of size greater than 1. This is used
+#'   when calculating the correlation.
 #'
-#' @param metrics A character vector indicating which metrics should be used when
-#'       calculating the robust Mahalanobis distance. This vector must contain
-#'       between two and five of the following options: "MAD" (Median Absolute
-#'       Deviation), "Kurtosis", "Skewness", "Correlation", and
-#'       "Proportion_Missing". The default is NULL. When NULL a combination of
-#'       metrics will be chosen depending on the class of omicsData.
+#' @param metrics A character vector indicating which metrics should be used
+#'   when calculating the robust Mahalanobis distance. This vector must contain
+#'   between two and five of the following options: "MAD" (Median Absolute
+#'   Deviation), "Kurtosis", "Skewness", "Correlation", and
+#'   "Proportion_Missing". The default is NULL. When NULL a combination of
+#'   metrics will be chosen depending on the class of omicsData.
 #'
-#' @return a data.frame containing columns for the Sample ID, log2 robust
-#'  Mahalanobis distance, p-values, and robust Mahalanobis distance
+#' @return An S3 object of class 'rmdFilt' containing columns for the sample
+#'   identifier, log2 robust Mahalanobis distance, p-values, and robust
+#'   Mahalanobis distance
 #'
 #' @details The metrics on which the log2 robust Mahalanobis distance is based
-#'  can be specified using the \code{metrics} argument. \tabular{ll}{ pepData
-#'  \tab For pepData objects, all five of the metrics "MAD", "Kurtosis",
+#'  can be specified using the \code{metrics} argument. \tabular{ll}{ pepData, proData
+#'  \tab For pepData and proData objects, all five of the metrics "MAD", "Kurtosis",
 #'  "Skewness", "Correlation", "Proportion_Missing" may be used (this is the
-#'  default). \cr proData \tab For proData objects, all five of the metrics
-#'  "MAD", "Kurtosis", "Skewness", "Correlation", "Proportion_Missing" may be
-#'  used (this is the default). \cr metabData \tab For metabData objects, the
+#'  default). \cr metabData, lipidData, nmrData \tab The
 #'  use of "Proportion_Missing" is discouraged due to the general lack of
-#'  missing data in metabolomics datasets (the default behavior omits
-#'  "Proportion_Missing" from the metrics). \cr lipidData \tab For lipidData
-#'  objects, , the use of "Proportion_Missing" is discouraged due to the general
-#'  lack of missing data in metabolomics datasets (the default behavior omits
+#'  missing data in these datasets (the default behavior omits
 #'  "Proportion_Missing" from the metrics). \cr }
 #'
 #' @examples
-#' \dontrun{
 #' library(pmartRdata)
-#' data(metab_object)
-#' metab_object2 <- edata_transform(omicsData = metab_object, data_scale = "log2")
-#' metab_object3 <- group_designation(omicsData = metab_object2, main_effects = "Condition")
-#' rmd_results <- rmd_filter(omicsData = metab_object3, metrics=c("MAD", "Skewness", "Correlation"))
-#' rmd_results <- rmd_filter(omicsData = metab_object2)
+#' mymetab <- edata_transform(omicsData = metab_object, data_scale = "log2")
+#' mymetab <- group_designation(omicsData = mymetab, main_effects = "Phenotype")
+#' rmd_results <- rmd_filter(omicsData = mymetab, metrics=c("MAD", "Skewness", "Correlation"))
+#' rmd_results <- rmd_filter(omicsData = mymetab)
 #'
-#' data(pep_pepData)
-#' pep_pepData2 <- edata_transform(omicsData = pep_object, data_scale = "log2")
-#' pep_pepData3 <- group_designation(omicsData = pep_pepData2, main_effects = "Condition")
-#' rmd_results <- rmd_filter(omicsData = pep_pepData3)
-#' }
+#' mypep <- edata_transform(omicsData = pep_object, data_scale = "log2")
+#' mypep <- group_designation(omicsData = mypep, main_effects = "Phenotype")
+#' rmd_results <- rmd_filter(omicsData = mypep)
+#' 
 #'
 #' @references Matzke, M., Waters, K., Metz, T., Jacobs, J., Sims, A., Baric, R.,
 #'  Pounds, J., and Webb-Robertson, B.J. (2011), \emph{Improved quality control
@@ -659,9 +648,6 @@ cv_filter <- function(omicsData, use_groups = TRUE) {
 #' @author Lisa Bramer, Kelly Stratton
 #'
 #' @export
-#'
-#' @rdname rmd_filter
-#' @name rmd_filter
 #'
 rmd_filter <- function (omicsData,
                         ignore_singleton_groups = TRUE,
@@ -1389,27 +1375,24 @@ run_group_meancor <- function(omicsData, mintR_groupDF, ignore_singleton_groups 
   return(res.cor)
 }
 
-#' Proteomics filter object
+#' Proteomics Filter Object
 #'
 #' This function counts the number of peptides that map to each protein and/or
 #' the number of proteins to which each individual peptide maps.
 #'
 #' @param omicsData an object of class "pepData", the a result of
-#'   \code{\link{as.pepData}}. The e_meta component of omicsData must be
-#'   nonempty.
+#'   \code{\link{as.pepData}} or \code{\link{as.isobaricpepData}}. The e_meta
+#'   component of omicsData must be nonempty.
 #'
-#' @return A list with two elements. The first element is a data frame of counts
-#'   for each unique peptide. The second element is also a data frame. This data
-#'   frame contains the counts for the number of peptides that map to each
-#'   unique protein.
+#' @return An S3 object of class proteomicsFilt, which is a list with two
+#'   elements. The first element is a data frame of counts for each unique
+#'   peptide. The second element is a data frame with the counts for the number
+#'   of peptides that map to each unique protein.
 #'
 #' @examples
-#' \dontrun{
-#' library(pmartR)
-#' data("pep_object")
+#' library(pmartRdata)
 #' my_filter <- proteomics_filter(omicsData = pep_object)
-#' summary(my_filter, min_num_peps = 3)
-#' }
+#' summary(filter_object = my_filter, min_num_peps = 3)
 #'
 #' @author Lisa Bramer, Kelly Stratton
 #'
@@ -1479,17 +1462,17 @@ proteomics_filter <- function (omicsData) {
 
 }
 
-#' IMD-ANOVA filter object
+#' IMD-ANOVA Filter Object
 #'
 #' This function returns an imdanovaFilt object for use with
-#'\code{\link{applyFilt}}
+#' \code{\link{applyFilt}}
 #'
 #' @param omicsData object of one of the classes "pepData", "isobaricpepData",
-#'   "proData", "lipidData", "metabData", or "nmrData", usually created by
+#'   "proData", "lipidData", "metabData", or "nmrData", created by
 #'   \code{\link{as.pepData}}, \code{\link{as.isobaricpepData}},
 #'   \code{\link{as.proData}}, \code{\link{as.lipidData}},
 #'   \code{\link{as.metabData}}, or \code{\link{as.nmrData}}, respectively.
-#'   Groups (more than one group) must have been specified using the
+#'   Groups (more than one) must have been specified using the
 #'   \code{\link{group_designation}} function prior to using the imdanova_filter
 #'   function.
 #'
@@ -1499,19 +1482,15 @@ proteomics_filter <- function (omicsData) {
 #'   present in the omicsData object, those groups are not part of the filter
 #'   object that is returned.
 #'
-#' @return Object of class imdanovaFilt (also a data.frame) containing the
+#' @return An S3 object of class imdanovaFilt (also a data.frame) containing the
 #'   molecule identifier and number of samples in each group with non-missing
 #'   values for that molecule.
 #'
 #' @examples
-#' \dontrun{
 #' library(pmartRdata)
-#' data("pep_object")
-#' pep_pepData2 <- group_designation(omicsData = pep_object,
-#'                                   main_effects = "Condition")
-#' to_filter <- imdanova_filter(omicsData = pep_pepData2)
-#' summary(to_filter, min_nonmiss_anova = 2)
-#' }
+#' mypep <- group_designation(omicsData = pep_object, main_effects = "Phenotype")
+#' to_filter <- imdanova_filter(omicsData = mypep)
+#' summary(filter_object = to_filter, min_nonmiss_anova = 2)
 #'
 #' @author Kelly Stratton
 #'
@@ -1653,7 +1632,7 @@ imdanova_filter <- function (omicsData) {
 
 }
 
-#' Custom Filter
+#' Custom Filter Object
 #'
 #' This function creates a customFilt S3 object based on user-specified items to
 #' filter out of the dataset
@@ -1688,19 +1667,17 @@ imdanova_filter <- function (omicsData) {
 #'   identifiers to keep from the data. This argument can only be specified with
 #'   other 'keep' arguments.
 #'
-#' @return An S3 object of class 'customFilt', which is a list with 3 elements:
-#'   e_data_remove, f_data_remove, and e_meta_remove.
+#' @return An S3 object of class 'customFilt', which is a list with 3 elements
+#'   for e_data, f_data, and e_meta, specifying which entries should be either
+#'   kept or removed
 #'
 #' @examples
-#' \dontrun{
 #' library(pmartRdata)
-#' data("metab_object")
-#' to_filter <- custom_filter(metab_object, e_data_remove = "fumaric acid",
-#'                            f_data_remove = "Infection1")
-#' summary(to_filter)
-#' to_filter2 <- custom_filter(metab_object, e_data_remove = "fumaric acid")
-#' summary(to_filter2)
-#' }
+#' to_filter <- custom_filter(omicsData = metab_object, e_data_remove = "fumaric acid", f_data_remove = "Sample_1_Phenotype2_B")
+#' summary(filter_object = to_filter)
+#' 
+#' to_filter2 <- custom_filter(omicsData = metab_object, f_data_keep = metab_object$f_data$SampleID[1:10])
+#' summary(filter_object = to_filter2)
 #'
 #' @author Kelly Stratton
 #'
@@ -1871,8 +1848,11 @@ custom_filter <- function (omicsData,
       # check that f_data_remove doesn't specify ALL the items in omicsData #
       if (all(omicsData$f_data[, samp_id] %in% f_data_keep)) {
 
-        # Stop the greedy user from keeping all of the samples. Why filter?!
-        stop ("f_data_keep specifies all the items in f_data.")
+        # Message the greedy user that they are keeping all of the samples. A
+        # silly filter by itself, yes, but if they are using the as.multiData
+        # function, this filter gets applied to keep only the intersecting
+        # samples, and we wouldn't want it erroring out. (Updated by KGS)
+        message ("f_data_keep specifies all the items in f_data.")
 
       }
 

@@ -4,7 +4,7 @@
 #' replaces them with y
 #'
 #' @param omicsData an object of the class 'pepData', 'proData', 'metabData',
-#'   'lipidData', or 'nmrData' usually created by \code{\link{pepData}},
+#'   'lipidData', or 'nmrData' created by \code{\link{pepData}},
 #'   \code{\link{proData}}, \code{\link{metabData}}, \code{\link{lipidData}}, or
 #'   \code{\link{as.nmrData}}, respectively.
 #'
@@ -13,16 +13,17 @@
 #' @param y replacement value, usually numeric or NA
 #'
 #' @details This function is often used to replace any 0 values in peptide,
-#'   protein, metabolite, or lipid data with NA's.
+#'   protein, metabolite, or lipid data with NA's. For omicsData on the
+#'   abundance scale, when the omicsData object is created, any 0's in e_data
+#'   are automatically converted to NA's. For omicsData on the count scale (e.g.
+#'   seqData objects), when the omicsData object is created, any NA's in e_data
+#'   are automatically converted to 0's.
 #'
 #' @return data object of the same class as omicsData
 #'
 #' @examples
-#' \dontrun{
 #' library(pmartRdata)
-#' data(metab_object)
-#' metab_object2 <- edata_replace(omicsData = metab_object, x=0, y=NA)
-#' }
+#' mymetab <- edata_replace(omicsData = metab_object, x = 0, y = NA)
 #' 
 #' @author Kelly Stratton
 #'
