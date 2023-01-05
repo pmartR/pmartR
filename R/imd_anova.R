@@ -22,12 +22,12 @@
 #'   p-value adjustment.
 #' @param pval_adjust_a_fdr character string specifying the type of FDR
 #'   adjustment to implement for ANOVA tests. Valid options include:
-#'   "bonferroni" and "holm". The default is "none" which corresponds to no
-#'   p-value adjustment.
+#'   "bonferroni", "BH", "BY", and "fdr". The default is "none" which corresponds
+#'   to no p-value adjustment.
 #' @param pval_adjust_g_fdr character string specifying the type of FDR
 #'   adjustment to implement for G-test tests. Valid options include:
-#'   "bonferroni" and "holm". The default is "none" which corresponds to no
-#'   p-value adjustment.
+#'   "bonferroni", "BH", "BY", and "fdr". The default is "none" which corresponds
+#'   to no p-value adjustment.
 #' @param pval_thresh numeric p-value threshold, below or equal to which
 #'   biomolecules are considered differentially expressed. Defaults to 0.05
 #' @param use_parallel logical value indicating whether or not to use a
@@ -663,7 +663,7 @@ imd_anova <- function (omicsData,
 #'   "dunnett".
 #' @param pval_adjust_fdr character string specifying the type of FDR adjustment
 #'   to implement. The default, "none", corresponds to no adjustment. Valid
-#'   options include: "bonferroni" and "holm".
+#'   options include: "bonferroni", "BH", "BY", and "fdr".
 #' @param pval_thresh numeric p-value threshold, below or equal to which
 #'   peptides are considered differentially expressed. Defaults to 0.05
 #' @param covariates A character vector with no more than two variable names
@@ -1201,7 +1201,8 @@ paired_test <- function (data, bio_ids, cutoff, use_parallel) {
 #'   apply an adjustment. Valid options include: "bonferroni" and "holm".
 #' @param pval_adjust_fdr A character string specifying the type of FDR
 #'   adjustment to implement. The default setting, "none", is to not
-#'   apply an adjustment. Valid options include: "bonferroni" and "holm".
+#'   apply an adjustment. Valid options include: "bonferroni", "BH", "BY", and
+#'   "fdr".
 #' @param pval_thresh numeric p-value threshold, below or equal to which
 #'   peptides are considered differentially expressed. Defaults to 0.05
 #' @param covariates A character vector with no more than two variable names
@@ -1792,7 +1793,7 @@ create_c_matrix <- function(group_df,to_compare_df=NULL){
 #' @param t_stats A matrix (or \code{data.frame}) of t-test statistics resulting from from standard procedures
 #' @param sizes A matrix (or \code{data.frame}) of group sizes
 #' @param pval_adjust_multcomp character vector specifying the type of multiple comparisons adjustment to implement. A NULL value corresponds to no adjustment. Valid options include: holm, bonferroni, dunnett, tukey or none.
-#' @param pval_adjust_fdr character vector specifying the type of FDR adjustment to implement. A NULL value corresponds to no adjustment. Valid options include: holm, bonferroni, or none.
+#' @param pval_adjust_fdr character vector specifying the type of FDR adjustment to implement. A NULL value corresponds to no adjustment. Valid options include: bonferroni, BH, BY, fdr, or none.
 #'
 #' @return a data frame with the following columns: group means, global G-test statistic and corresponding p-value
 #'

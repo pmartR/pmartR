@@ -33,7 +33,7 @@ adjustment. Valid options include: "bonferroni", "holm", "tukey", and
 
 \item{pval_adjust_fdr}{character string specifying the type of FDR adjustment
 to implement. The default, "none", corresponds to no adjustment. Valid
-options include: "bonferroni" and "holm".}
+options include: "bonferroni", "BH", "BY", and "fdr".}
 
 \item{pval_thresh}{numeric p-value threshold, below or equal to which
 peptides are considered differentially expressed. Defaults to 0.05}
