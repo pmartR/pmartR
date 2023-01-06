@@ -24,6 +24,7 @@ Imports:
     forcats,
     foreach,
     limma,
+    methods,
     pcaMethods,
     plotly,
     rlang,

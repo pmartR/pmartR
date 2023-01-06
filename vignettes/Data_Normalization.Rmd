@@ -19,7 +19,6 @@ vignette: >
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 options(rmarkdown.html_vignette.check_title = FALSE)
-
 library(pmartR)
 library(pmartRdata)
 ```
@@ -321,6 +320,7 @@ plot(spans_result)
 ```{r spans plot, out.width = "600px", echo=FALSE}
 knitr::include_graphics("SPANS_pep.png")
 ```
+
 
 
 
