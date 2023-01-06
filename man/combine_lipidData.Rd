@@ -72,6 +72,6 @@ obj_2 <- group_designation(omicsData = obj_2, main_effects = "Virus")
 obj_1 <- applyFilt(filter_object = molecule_filter(omicsData = obj_1), omicsData = obj_1, min_num = 2)
 obj_2 <- applyFilt(filter_object = cv_filter(omicsData = obj_2),obj_2, cv_thresh = 60)
 
-combine_object_later <- combine_lipidData(obj_1 = obj_1, obj_2 = obj_2, retain_groups = T, retain_filters = TRUE)
+combine_object_later <- combine_lipidData(obj_1 = obj_1, obj_2 = obj_2, retain_groups = TRUE, retain_filters = TRUE)
 
 }

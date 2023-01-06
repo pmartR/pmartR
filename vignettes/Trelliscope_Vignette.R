@@ -22,7 +22,7 @@ data.table(
 knitr::include_graphics("TrelliData_Plotting_Options.png")
 
 ## ---- echo = F----------------------------------------------------------------
-knitr::kable(head(pmartRdata::lipid_pos_edata), options = list(`scrollX` = T))
+knitr::kable(head(pmartRdata::lipid_pos_edata), options = list(`scrollX` = TRUE))
 
 ## -----------------------------------------------------------------------------
 trelliData1 <- as.trelliData.edata(
@@ -56,7 +56,7 @@ data.table(
                     "Output a single plot instead of a trelliscope display")
 ) %>% knitr::kable()
 
-## ---- echo = T, eval = F------------------------------------------------------
+## ---- echo = TRUE, eval = F------------------------------------------------------
 #  trelli_abundance_boxplot(
 #    trelli_panel_by(trelliData1, "Lipid"),
 #    cognostics = c("n", "mean", "median", "sd"),
@@ -75,7 +75,7 @@ SampleGroups <- trelliData1 %>% trelli_panel_by("Sample")
 # Create an example boxplot 
 Abun_Box_Edata <- trelli_abundance_boxplot(MassGroups, single_plot = TRUE, test_example = 3)
 # Make an abundance boxplot without the points 
-Abun_Box_Sample <- trelli_abundance_boxplot(SampleGroups, include_points = F, single_plot = T,
+Abun_Box_Sample <- trelli_abundance_boxplot(SampleGroups, include_points = F, single_plot = TRUE,
                                             ggplot_params = "scale_fill_manual(values = 'forestgreen')")
 # Use patchwork to put plots together
 Abun_Box_Edata + Abun_Box_Sample
@@ -97,7 +97,7 @@ Miss_Bar_Edata <- trelli_missingness_bar(trelli_panel_by(pep_trelliData, "Peptid
 # Make a missingness barplot 
 Miss_Bar_Sample <- trelli_missingness_bar(trelli_panel_by(pep_trelliData, "Sample"), 
                                           include_points = F, 
-                                          proportion = FALSE, single_plot = T,
+                                          proportion = FALSE, single_plot = TRUE,
                                           ggplot_params = "ggtitle('Sample')")
 # Put plots together with patchwork
 Miss_Bar_Edata + Miss_Bar_Sample
@@ -107,7 +107,7 @@ Miss_Bar_Edata + Miss_Bar_Sample
 lipids <- pmartRdata::lipid_pos_object
 # Extract and add lipid family information
 lipids$e_meta$Family <- lipids$e_meta$Lipid %>% 
-  strsplit("(", fixed = T) %>% 
+  strsplit("(", fixed = TRUE) %>% 
   lapply(function(x) {head(x, 1)}) %>% 
   unlist()
 # Log transform the edata file 
@@ -130,22 +130,22 @@ summary(trelliData2)
 ## -----------------------------------------------------------------------------
 trelliData2 %>% 
   trelli_panel_by("Lipid") %>% 
-  trelli_abundance_boxplot(test_example = 3, single_plot = T, ggplot_params = "xlab('Viral Strain')")
+  trelli_abundance_boxplot(test_example = 3, single_plot = TRUE, ggplot_params = "xlab('Viral Strain')")
 
 ## -----------------------------------------------------------------------------
 trelliData2 %>% 
   trelli_panel_by("Family") %>% 
-  trelli_abundance_boxplot(test_example = 6, single_plot = T)
+  trelli_abundance_boxplot(test_example = 6, single_plot = TRUE)
 
 ## -----------------------------------------------------------------------------
 trelliData2 %>% 
   trelli_panel_by("Family") %>% 
-  trelli_missingness_bar(test_example = 3, single_plot = T)
+  trelli_missingness_bar(test_example = 3, single_plot = TRUE)
 
 ## -----------------------------------------------------------------------------
 trelliData2 %>% 
   trelli_panel_by("Family") %>% 
-  trelli_abundance_heatmap(test_example = 2, single_plot = T, ggplot_params = "coord_flip()")
+  trelli_abundance_heatmap(test_example = 2, single_plot = TRUE, ggplot_params = "coord_flip()")
 
 ## -----------------------------------------------------------------------------
 # Since nothing is missing from this dataset, there is no need to run the G-test. 
@@ -195,7 +195,7 @@ trelliData4 %>%
 ## -----------------------------------------------------------------------------
 trelliData2 %>% 
   trelli_panel_by("Lipid") %>% 
-  trelli_abundance_boxplot(test_example = 3, single_plot = T,
+  trelli_abundance_boxplot(test_example = 3, single_plot = TRUE,
     ggplot_params = c("ggtitle('CYC Human')", 
                       "ylab('Log Adjusted Abundance')",
                       "xlab('')", "theme_classic()", 
@@ -230,7 +230,7 @@ data.table(
 ## -----------------------------------------------------------------------------
 trelliData2 %>% 
   trelli_panel_by("Lipid") %>% 
-  trelli_abundance_boxplot(test_example = 3, single_plot = T, interactive = T)
+  trelli_abundance_boxplot(test_example = 3, single_plot = TRUE, interactive = TRUE)
 
 ## ---- echo = FALSE------------------------------------------------------------
 data.table(

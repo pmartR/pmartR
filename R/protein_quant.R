@@ -653,7 +653,7 @@ rrollup <- function (pepData, combine_fn, parallel = TRUE) {
 
       ## If tied, select one with highest median abundance##
       if(length(least.na)>1){
-        mds = apply(current_subset,1,median,na.rm=T)[least.na]
+        mds = apply(current_subset,1,median,na.rm=TRUE)[least.na]
         least.na = least.na[which(mds==max(mds))]
       }
       prot_val = unlist(current_subset[least.na,])
@@ -664,7 +664,7 @@ rrollup <- function (pepData, combine_fn, parallel = TRUE) {
                                  each = nrow(current_subset)) - current_subset,
                              1,
                              median,
-                             na.rm=T)
+                             na.rm=TRUE)
 
       ## Step 3: Use the median of the ratio as a scaling factor for each
       ## peptide ##
@@ -815,8 +815,8 @@ qrollup <- function (pepData, qrollup_thresh,
       peps_used <- 1
     }else{
       ## Step 1: Subset peptides whose abundance is >= to qrollup_thresh ##
-      means = apply(current_subset,1,mean,na.rm=T)
-      quantil = quantile(means, probs = qrollup_thresh, na.rm = T)
+      means = apply(current_subset,1,mean,na.rm=TRUE)
+      quantil = quantile(means, probs = qrollup_thresh, na.rm = TRUE)
 
       new_subset = current_subset[which(means >= quantil), ]
       peps_used <- nrow(new_subset)
@@ -981,8 +981,8 @@ zrollup <- function (pepData, combine_fn, parallel = TRUE) {
 
     res = matrix(NA, nrow = 1, ncol =  ncol(current_subset))
     ## Step 1: Compute mean and sd of peptides ##
-    mds = apply(current_subset, 1, median, na.rm = T)
-    sds = apply(current_subset, 1, sd, na.rm = T)
+    mds = apply(current_subset, 1, median, na.rm = TRUE)
+    sds = apply(current_subset, 1, sd, na.rm = TRUE)
 
     ## Step 2: Scale peptide data as pep_scaled = (pep - median)/sd
     medians_mat = matrix(mds, nrow = num_peps, ncol = ncol(current_subset), byrow = F)
@@ -1044,8 +1044,8 @@ combine_fn_mean <- function (x) {
 
   if (all(is.na(x)))
     mean(x) else
-      mean(x, na.rm = T)
+      mean(x, na.rm = TRUE)
 
 }
 
-combine_fn_median <- function (x) median(x, na.rm = T)
+combine_fn_median <- function (x) median(x, na.rm = TRUE)

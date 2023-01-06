@@ -1,8 +1,8 @@
-source(system.file('testdata', 'load_data.R', package = 'pmartR'), local = T)
+source(system.file('testdata', 'load_data.R', package = 'pmartR'), local = TRUE)
 
 obj1 <- edata_transform(ldata, "log2")
 obj12 <- obj1
-obj1 <- normalize_global(obj1, "all", "median", apply_norm = T)
+obj1 <- normalize_global(obj1, "all", "median", apply_norm = TRUE)
 
 fake_cov <- c(rep("A", 5), rep("B", 6))
 fake_cov2 <- c(rep(LETTERS[1:4],2), rep(LETTERS[5], 3))
@@ -35,19 +35,19 @@ obj2 <- applyFilt(cv_filter(obj2),obj2, cv_thresh = 60)
 
 suppressWarnings({
   combn1 <- combine_lipidData(obj1, obj2)
-  combn2 <- combine_lipidData(obj1, obj2, retain_groups = T)
-  combn3 <- combine_lipidData(obj1, obj2, retain_groups = F, retain_filters = T)
-  combn4 <- combine_lipidData(obj1, obj2, retain_groups = T, retain_filters = T)
+  combn2 <- combine_lipidData(obj1, obj2, retain_groups = TRUE)
+  combn3 <- combine_lipidData(obj1, obj2, retain_groups = F, retain_filters = TRUE)
+  combn4 <- combine_lipidData(obj1, obj2, retain_groups = TRUE, retain_filters = TRUE)
   combn5 <- combine_lipidData(obj1, obj3)
-  combn6 <- combine_lipidData(obj1, obj3, retain_filters = T)
+  combn6 <- combine_lipidData(obj1, obj3, retain_filters = TRUE)
   combn7 <- combine_lipidData(obj1, obj5)
-  combn8 <- combine_lipidData(obj2, obj3, retain_filters = T)
+  combn8 <- combine_lipidData(obj2, obj3, retain_filters = TRUE)
 })
 
 test_that("bad class errors", {
   suppressWarnings({
-    expect_error(combine_lipidData(5, obj2, retain_groups = T), regexp = "Objects must be of the same class")
-    expect_error(combine_lipidData(5, 5, retain_groups = T), regexp = "Currently only support lipidData")
+    expect_error(combine_lipidData(5, obj2, retain_groups = TRUE), regexp = "Objects must be of the same class")
+    expect_error(combine_lipidData(5, 5, retain_groups = TRUE), regexp = "Currently only support lipidData")
   })
 })
 
@@ -57,7 +57,7 @@ test_that("pipeline errors", {
                                    obj2), regexp = "Objects must be on the same scale")
     expect_error(combine_lipidData(obj1, obj12), 
                  regexp = "Both objects must have the same normalization status")
-    expect_error(combine_lipidData(obj1, normalize_global(obj12, "all", "median", apply_norm = T), retain_groups = T), 
+    expect_error(combine_lipidData(obj1, normalize_global(obj12, "all", "median", apply_norm = TRUE), retain_groups = TRUE), 
                  regexp = "Both objects must be grouped.")
   })
 })
@@ -71,10 +71,10 @@ test_that("sample errors", {
 
 test_that("bad group/covariate structures throw an error", {
   suppressWarnings({
-    expect_error(combine_lipidData(obj3, obj2, retain_groups = T), regexp = "covariate structure")
-    expect_error(combine_lipidData(obj2, obj4, retain_groups = T), regexp = "covariate structure")
-    expect_error(combine_lipidData(obj1, obj5, retain_groups = T), regexp = "main effect")
-    expect_error(combine_lipidData(obj3, obj5, retain_groups = T), regexp = "main effect")
+    expect_error(combine_lipidData(obj3, obj2, retain_groups = TRUE), regexp = "covariate structure")
+    expect_error(combine_lipidData(obj2, obj4, retain_groups = TRUE), regexp = "covariate structure")
+    expect_error(combine_lipidData(obj1, obj5, retain_groups = TRUE), regexp = "main effect")
+    expect_error(combine_lipidData(obj3, obj5, retain_groups = TRUE), regexp = "main effect")
   })
 })
 

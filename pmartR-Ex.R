@@ -256,11 +256,11 @@ flush(stderr()); flush(stdout())
 ##D 
 ##D # Combine lipid and protein object into multidata, both must be log2 + normalized.
 ##D mylipid_object <- edata_transform(lipid_object, "log2")
-##D mylipid_object <- normalize_global(mylipid_object, "all", "median", apply_norm = T)
+##D mylipid_object <- normalize_global(mylipid_object, "all", "median", apply_norm = TRUE)
 ##D 
 ##D # Combine without specifically supplying f_meta, either directly, or as one
 ##D # of the f_datas in any object.
-##D mymultidata <- as.multiData(pro_object, mylipid_object, auto_fmeta = T)
+##D mymultidata <- as.multiData(pro_object, mylipid_object, auto_fmeta = TRUE)
 ##D 
 ##D # Manually supply an f_meta
 ##D f_meta <- data.frame(
@@ -271,11 +271,11 @@ flush(stderr()); flush(stdout())
 ##D )
 ##D 
 ##D mymetab_object <- edata_transform(metab_object, "log2")
-##D mymetab_object <- normalize_global(mymetab_object, "all", "median", apply_norm = T)
+##D mymetab_object <- normalize_global(mymetab_object, "all", "median", apply_norm = TRUE)
 ##D 
 ##D as.multiData(mylipid_object, pro_object, mymetab_object, f_meta = f_meta)
 ##D # remove samples that are not common across all data.
-##D as.multiData(mylipid_object, pro_object, mymetab_object, f_meta = f_meta, sample_intersect = T)
+##D as.multiData(mylipid_object, pro_object, mymetab_object, f_meta = f_meta, sample_intersect = TRUE)
 ## End(Not run)
 
 
@@ -409,7 +409,7 @@ flush(stderr()); flush(stdout())
 ##D # Generate an example e_meta file for lipid data 
 ##D lipid_emeta <- data.frame("LipidCommonName" = lipid_edata_pos$LipidCommonName, 
 ##D   "LipidFamily" = lipid_edata_pos$LipidCommonName %>% as.character() %>% 
-##D     strsplit("(", fixed = T) %>% lapply(function(el) {el[1]}) %>% unlist())
+##D     strsplit("(", fixed = TRUE) %>% lapply(function(el) {el[1]}) %>% unlist())
 ##D     
 ##D # Extend fdata to have two infection groups 
 ##D lipid_fdata_pos2 <- data.frame("Sample_Name" = lipid_fdata_pos$Sample_Name, 
@@ -536,9 +536,9 @@ combine_object <- combine_lipidData(obj_1, obj_2)
 # preprocess and group the data and keep filters/grouping structure
 
 obj_1 <- edata_transform(obj_1, "log2")
-obj_1 <- normalize_global(obj_1, "all", "median", apply_norm = T)
+obj_1 <- normalize_global(obj_1, "all", "median", apply_norm = TRUE)
 obj_2 <- edata_transform(obj_2, "log2")
-obj_2 <- normalize_global(obj_2, "all", "median", apply_norm = T)
+obj_2 <- normalize_global(obj_2, "all", "median", apply_norm = TRUE)
 
 obj_1 <- group_designation(obj_1, "Condition")
 obj_2 <- group_designation(obj_2, "Condition")
@@ -546,7 +546,7 @@ obj_2 <- group_designation(obj_2, "Condition")
 obj_1 <- applyFilt(molecule_filter(obj_1), obj_1, min_num = 2)
 obj_2 <- applyFilt(cv_filter(obj_2),obj_2, cv_thresh = 60)
 
-combine_lipidData(obj_1, obj_2, retain_groups = T, retain_filters = T)
+combine_lipidData(obj_1, obj_2, retain_groups = TRUE, retain_filters = TRUE)
 
 
 
@@ -2188,26 +2188,26 @@ flush(stderr()); flush(stdout())
 ##D 
 ##D ## Build the abundance boxplot with an edata file. Generate trelliData in as.trelliData.edata
 ##D trelli_panel_by(trelliData = trelliData, panel = "LipidCommonName") %>% 
-##D    trelli_abundance_boxplot(test_mode = T, test_example = 1:10)
+##D    trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10)
 ##D trelli_panel_by(trelliData = trelliData, panel = "Sample") %>% trelli_abundance_boxplot()
 ##D 
 ##D ## Build the abundance boxplot with an omicsData object. Generate trelliData in as.trelliData
 ##D trelli_panel_by(trelliData = trelliData2, panel = "LipidCommonName") %>% 
-##D    trelli_abundance_boxplot(test_mode = T, test_example = 1:10)
+##D    trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10)
 ##D trelli_panel_by(trelliData = trelliData2, panel = "LipidFamily") %>% trelli_abundance_boxplot()
 ##D     
 ##D ## Build the abundance boxplot with an omicsData and statRes object. Generate trelliData in as.trelliData.
 ##D trelli_panel_by(trelliData = trelliData4, panel = "LipidCommonName") %>%
-##D    trelli_abundance_boxplot(test_mode = T, test_example = 1:10)
+##D    trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10)
 ##D trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") %>% trelli_abundance_boxplot()
 ##D    
 ##D ## Other options include modifying the ggplot  
 ##D trelli_panel_by(trelliData = trelliData, panel = "LipidCommonName") %>% 
-##D    trelli_abundance_boxplot(test_mode = T, test_example = 1:10, 
+##D    trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10, 
 ##D      ggplot_params = c("ylab('')", "ylim(c(2,20))"))
 ##D 
 ##D ## Or making the plot interactive 
-##D trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") %>% trelli_abundance_boxplot(interactive = T)
+##D trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") %>% trelli_abundance_boxplot(interactive = TRUE)
 ##D 
 ## End(Not run)
 
@@ -2230,12 +2230,12 @@ flush(stderr()); flush(stdout())
 ##D 
 ##D ## Build the abundance heatmap with an omicsData object with emeta variables. Generate trelliData in as.trelliData.
 ##D trelli_panel_by(trelliData = trelliData2, panel = "LipidFamily") %>% 
-##D    trelli_abundance_heatmap(test_mode = T, test_example = 1:3)
+##D    trelli_abundance_heatmap(test_mode = TRUE, test_example = 1:3)
 ##D    
 ##D ## Users can modify the plotting function with ggplot parameters and interactivity, 
 ##D ## and can also select certain cognostics.     
 ##D trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") %>% 
-##D    trelli_abundance_heatmap(test_mode = T, test_example = 1:5, 
+##D    trelli_abundance_heatmap(test_mode = TRUE, test_example = 1:5, 
 ##D      ggplot_params = c("ylab('')", "xlab('')"), interactive = TRUE, cognostics = c("mean", "median"))  
 ##D    
 ## End(Not run)
@@ -2260,20 +2260,20 @@ flush(stderr()); flush(stdout())
 ##D 
 ##D ## Build the abundance histogram with an edata file. Generate trelliData in as.trelliData.edata
 ##D trelli_panel_by(trelliData = trelliData, panel = "LipidCommonName") %>% 
-##D    trelli_abundance_histogram(test_mode = T, test_example = 1:10)
+##D    trelli_abundance_histogram(test_mode = TRUE, test_example = 1:10)
 ##D 
 ##D ## Build the abundance histogram with an omicsData object. Generate trelliData in as.trelliData
 ##D trelli_panel_by(trelliData = trelliData2, panel = "LipidCommonName") %>% 
-##D    trelli_abundance_histogram(test_mode = T, test_example = 1:10)
+##D    trelli_abundance_histogram(test_mode = TRUE, test_example = 1:10)
 ##D     
 ##D ## Build the abundance histogram with an omicsData and statRes object. Generate trelliData in as.trelliData.
 ##D trelli_panel_by(trelliData = trelliData4, panel = "LipidCommonName") %>%
-##D    trelli_abundance_histogram(test_mode = T, test_example = 1:10)
+##D    trelli_abundance_histogram(test_mode = TRUE, test_example = 1:10)
 ##D    
 ##D ## Users can modify the plotting function with ggplot parameters and interactivity, 
 ##D ## and can also select certain cognostics.     
 ##D trelli_panel_by(trelliData = trelliData, panel = "LipidCommonName") %>% 
-##D    trelli_abundance_histogram(test_mode = T, test_example = 1:10, 
+##D    trelli_abundance_histogram(test_mode = TRUE, test_example = 1:10, 
 ##D      ggplot_params = c("ylab('')", "xlab('Abundance')"), interactive = TRUE,
 ##D      cognostics = c("mean", "median"))  
 ##D    
@@ -2299,11 +2299,11 @@ flush(stderr()); flush(stdout())
 ##D 
 ##D ## Build fold_change bar plot with statRes data grouped by edata_colname.
 ##D trelli_panel_by(trelliData = trelliData3, panel = "LipidCommonName") %>% 
-##D   trelli_foldchange_bar(test_mode = T, test_example = 1:10, p_value_test = TRUE)
+##D   trelli_foldchange_bar(test_mode = TRUE, test_example = 1:10, p_value_test = TRUE)
 ##D   
 ##D ## Or make the plot interactive  
 ##D trelli_panel_by(trelliData = trelliData4, panel = "LipidCommonName") %>% 
-##D   trelli_foldchange_bar(test_mode = T, test_example = 1:10, p_value_test = TRUE, interactive = T) 
+##D   trelli_foldchange_bar(test_mode = TRUE, test_example = 1:10, p_value_test = TRUE, interactive = TRUE) 
 ##D    
 ## End(Not run)
 
@@ -2398,28 +2398,28 @@ flush(stderr()); flush(stdout())
 ##D 
 ##D ## Build the missingness bar plot with an edata file. Generate trelliData in as.trelliData.edata
 ##D trelli_panel_by(trelliData = trelliData, panel = "LipidCommonName") %>% 
-##D   trelli_missingness_bar(test_mode = T, test_example = 1:10)
+##D   trelli_missingness_bar(test_mode = TRUE, test_example = 1:10)
 ##D trelli_panel_by(trelliData = trelliData, panel = "Sample") %>% trelli_missingness_bar()
 ##D 
 ##D ## Build the missingness bar plot with an omicsData object. Generate trelliData in as.trelliData
 ##D trelli_panel_by(trelliData = trelliData2, panel = "LipidCommonName") %>% 
-##D   trelli_missingness_bar(test_mode = T, test_example = 1:10)
+##D   trelli_missingness_bar(test_mode = TRUE, test_example = 1:10)
 ##D 
 ##D ## Build the missingness bar plot with a statRes object. Generate trelliData in as.trelliData
 ##D trelli_panel_by(trelliData = trelliData3, panel = "LipidCommonName") %>%
-##D   trelli_missingness_bar(test_mode = T, test_example = 1:10)
+##D   trelli_missingness_bar(test_mode = TRUE, test_example = 1:10)
 ##D 
 ##D ## Build the missingness bar plot with an omicsData and statRes object. Generate trelliData in as.trelliData.
 ##D trelli_panel_by(trelliData = trelliData4, panel = "LipidCommonName") %>%
-##D   trelli_missingness_bar(test_mode = T, test_example = 1:10) 
+##D   trelli_missingness_bar(test_mode = TRUE, test_example = 1:10) 
 ##D 
 ##D ## Or making the plot interactive 
 ##D trelli_panel_by(trelliData = trelliData2, panel = "LipidCommonName") %>% 
-##D    trelli_missingness_bar(test_mode = T, test_example = 1:5)
+##D    trelli_missingness_bar(test_mode = TRUE, test_example = 1:5)
 ##D    
 ##D ## Or visualize only count data 
 ##D trelli_panel_by(trelliData = trelliData2, panel = "LipidCommonName") %>% 
-##D    trelli_missingness_bar(test_mode = T, test_example = 1:5, cognostics = "n", proportion = FALSE)
+##D    trelli_missingness_bar(test_mode = TRUE, test_example = 1:5, cognostics = "n", proportion = FALSE)
 ##D    
 ## End(Not run)
 

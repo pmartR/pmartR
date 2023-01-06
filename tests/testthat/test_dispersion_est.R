@@ -38,14 +38,14 @@ test_that('dispersion_est returns the correct data frame and attributes',{
   
   ## Custom theme warning/error
   edgeR_res <- expect_error(expect_warning(
-    dispersion_est(seqdata_grp, method = "edgeR", bw_theme = T, custom_theme = 2),
+    dispersion_est(seqdata_grp, method = "edgeR", bw_theme = TRUE, custom_theme = 2),
     "Setting both bw_theme to TRUE and specifying a custom"),
     "custom_theme must be a valid 'theme' object as used in ggplot")
   
   ## plotly result
-  edgeR_res_py <- dispersion_est(seqdata_grp, method = "edgeR", interactive = T)
-  deseq2_res_py <- suppressWarnings(dispersion_est(seqdata_grp, method = "DESeq2", interactive = T))
-  voom_res_py <- dispersion_est(seqdata_grp, method = "voom", interactive = T)
+  edgeR_res_py <- dispersion_est(seqdata_grp, method = "edgeR", interactive = TRUE)
+  deseq2_res_py <- suppressWarnings(dispersion_est(seqdata_grp, method = "DESeq2", interactive = TRUE))
+  voom_res_py <- dispersion_est(seqdata_grp, method = "voom", interactive = TRUE)
   
   res <- purrr::map(list(edgeR_res_py, deseq2_res_py, voom_res_py), function(gg){
     expect_true(inherits(gg, "plotly"))

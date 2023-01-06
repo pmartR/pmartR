@@ -79,18 +79,18 @@ edata_summary <- function (omicsData, by = 'sample', groupvar = NULL) {
                               function(x){if(all(is.na(x))){
                                 mean(x)
                               }else{
-                                mean(x, na.rm = T)
+                                mean(x, na.rm = TRUE)
                               }}))
     avg = cbind(names(edata[, -edata_cname_id]), avg)
     names(avg)<- c("sample", "mean")
     rownames(avg)<- NULL
 
-    sd = as.data.frame(apply(edata[,-edata_cname_id], 2, sd, na.rm = T))
+    sd = as.data.frame(apply(edata[,-edata_cname_id], 2, sd, na.rm = TRUE))
     sd = cbind(names(edata[,-edata_cname_id]), sd)
     names(sd)<- c("sample", "sd")
     rownames(sd)<- NULL
 
-    mds = as.data.frame(apply(edata[,-edata_cname_id], 2, median, na.rm = T))
+    mds = as.data.frame(apply(edata[,-edata_cname_id], 2, median, na.rm = TRUE))
     mds = cbind(names(edata[,-edata_cname_id]), mds)
     names(mds)<- c("sample", "median")
     rownames(mds)<- NULL
@@ -111,12 +111,12 @@ edata_summary <- function (omicsData, by = 'sample', groupvar = NULL) {
       rownames(pct_obs)<- NULL
     }
 
-    min = as.data.frame(apply(edata[,-edata_cname_id], 2, min, na.rm = T))
+    min = as.data.frame(apply(edata[,-edata_cname_id], 2, min, na.rm = TRUE))
     min = cbind(names(edata[,-edata_cname_id]), min)
     names(min)<- c("sample", "min")
     rownames(min)<- NULL
 
-    max = as.data.frame(apply(edata[,-edata_cname_id], 2, max, na.rm = T))
+    max = as.data.frame(apply(edata[,-edata_cname_id], 2, max, na.rm = TRUE))
     max = cbind(names(edata[,-edata_cname_id]), max)
     names(max)<- c("sample", "max")
     rownames(max)<- NULL
@@ -144,18 +144,18 @@ edata_summary <- function (omicsData, by = 'sample', groupvar = NULL) {
                     function(x){if(all(is.na(x))){
                       mean(x)
                     }else{
-                      mean(x, na.rm = T)
+                      mean(x, na.rm = TRUE)
                     }})
         avg = data.frame(molecule = edata[, edata_cname_id],
                          mean = avg,
                          stringsAsFactors = F)
         names(avg)[1]<- edata_cname
-        sd = apply(edata[, -edata_cname_id], 1, sd, na.rm = T)
+        sd = apply(edata[, -edata_cname_id], 1, sd, na.rm = TRUE)
         sd = data.frame(molecule = edata[, edata_cname_id],
                         sd = sd,
                         stringsAsFactors = F)
         names(sd)[1]<- edata_cname
-        mds = apply(edata[, -edata_cname_id], 1, median, na.rm = T)
+        mds = apply(edata[, -edata_cname_id], 1, median, na.rm = TRUE)
         mds = data.frame(molecule = edata[, edata_cname_id],
                          median = mds,
                          stringsAsFactors = F)
@@ -166,12 +166,12 @@ edata_summary <- function (omicsData, by = 'sample', groupvar = NULL) {
                              pct_obs = pct_obs,
                              stringsAsFactors = F)
         names(pct_obs)[1]<- edata_cname
-        min = apply(edata[, -edata_cname_id], 1, min, na.rm = T)
+        min = apply(edata[, -edata_cname_id], 1, min, na.rm = TRUE)
         min = data.frame(molecule = edata[, edata_cname_id],
                          min = min,
                          stringsAsFactors = F)
         names(min)[1]<- edata_cname
-        max = apply(edata[, -edata_cname_id], 1, max, na.rm = T)
+        max = apply(edata[, -edata_cname_id], 1, max, na.rm = TRUE)
         max = data.frame(molecule = edata[, edata_cname_id],
                          max = max,
                          stringsAsFactors = F)
@@ -226,14 +226,14 @@ edata_summary <- function (omicsData, by = 'sample', groupvar = NULL) {
                               function(x){if(all(is.na(x))){
                                 mean(x)
                               }else{
-                                mean(x, na.rm = T)
+                                mean(x, na.rm = TRUE)
                               }})
         names(avg)[which(colnames(avg)== ".")]<- "value"
         avg = reshape2::dcast(avg, formula = formula2)
-        std_dev = reshape2::dcast(edata_melt, formula = formula1, sd, na.rm = T)
+        std_dev = reshape2::dcast(edata_melt, formula = formula1, sd, na.rm = TRUE)
         names(std_dev)[which(colnames(std_dev)== ".")]<- "value"
         std_dev = reshape2::dcast(std_dev, formula = formula2)
-        mds = reshape2::dcast(edata_melt, formula = formula1, median, na.rm = T)
+        mds = reshape2::dcast(edata_melt, formula = formula1, median, na.rm = TRUE)
         names(mds)[which(colnames(mds)== ".")]<- "value"
         mds = reshape2::dcast(mds, formula = formula2)
         pct_obs = reshape2::dcast(edata_melt, formula = formula1,
@@ -244,7 +244,7 @@ edata_summary <- function (omicsData, by = 'sample', groupvar = NULL) {
                                function(x){if(all(is.na(x))){
                                  min(x)
                                }else{
-                                 min(x, na.rm = T)
+                                 min(x, na.rm = TRUE)
                                }})
         names(mins)[which(colnames(mins)== ".")]<- "value"
         mins = reshape2::dcast(mins, formula = formula2)
@@ -252,7 +252,7 @@ edata_summary <- function (omicsData, by = 'sample', groupvar = NULL) {
                                function(x){if(all(is.na(x))){
                                  max(x)
                                }else{
-                                 max(x, na.rm = T)
+                                 max(x, na.rm = TRUE)
                                }})
         names(maxs)[which(colnames(maxs)== ".")]<- "value"
         maxs = reshape2::dcast(maxs, formula = formula2)
@@ -309,14 +309,14 @@ edata_summary <- function (omicsData, by = 'sample', groupvar = NULL) {
                             function(x){if(all(is.na(x))){
                               mean(x)
                             }else{
-                              mean(x, na.rm = T)
+                              mean(x, na.rm = TRUE)
                             }})
       names(avg)[which(colnames(avg)== ".")]<- "value"
       avg = reshape2::dcast(avg, formula = formula2)
-      std_dev = reshape2::dcast(edata_melt, formula = formula1, sd, na.rm = T)
+      std_dev = reshape2::dcast(edata_melt, formula = formula1, sd, na.rm = TRUE)
       names(std_dev)[which(colnames(std_dev)== ".")]<- "value"
       std_dev = reshape2::dcast(std_dev, formula = formula2)
-      mds = reshape2::dcast(edata_melt, formula = formula1, median, na.rm = T)
+      mds = reshape2::dcast(edata_melt, formula = formula1, median, na.rm = TRUE)
       names(mds)[which(colnames(mds)== ".")]<- "value"
       mds = reshape2::dcast(mds, formula = formula2)
       pct_obs = reshape2::dcast(edata_melt, formula = formula1,
@@ -327,7 +327,7 @@ edata_summary <- function (omicsData, by = 'sample', groupvar = NULL) {
                              function(x){if(all(is.na(x))){
                                min(x)
                              }else{
-                               min(x, na.rm = T)
+                               min(x, na.rm = TRUE)
                              }})
       names(mins)[which(colnames(mins)== ".")]<- "value"
       mins = reshape2::dcast(mins, formula = formula2)
@@ -335,7 +335,7 @@ edata_summary <- function (omicsData, by = 'sample', groupvar = NULL) {
                              function(x){if(all(is.na(x))){
                                max(x)
                              }else{
-                               max(x, na.rm = T)
+                               max(x, na.rm = TRUE)
                              }})
       names(maxs)[which(colnames(maxs)== ".")]<- "value"
       maxs = reshape2::dcast(maxs, formula = formula2)
@@ -407,14 +407,14 @@ edata_summary <- function (omicsData, by = 'sample', groupvar = NULL) {
                             function(x){if(all(is.na(x))){
                               mean(x)
                             }else{
-                              mean(x, na.rm = T)
+                              mean(x, na.rm = TRUE)
                             }})
       names(avg)[which(colnames(avg)== ".")]<- "value"
       avg = reshape2::dcast(avg, formula = formula2)
-      std_dev = reshape2::dcast(edata_melt, formula = formula1, sd, na.rm = T)
+      std_dev = reshape2::dcast(edata_melt, formula = formula1, sd, na.rm = TRUE)
       names(std_dev)[which(colnames(std_dev)== ".")]<- "value"
       std_dev = reshape2::dcast(std_dev, formula = formula2)
-      mds = reshape2::dcast(edata_melt, formula = formula1, median, na.rm = T)
+      mds = reshape2::dcast(edata_melt, formula = formula1, median, na.rm = TRUE)
       names(mds)[which(colnames(mds)== ".")]<- "value"
       mds = reshape2::dcast(mds, formula = formula2)
       pct_obs = reshape2::dcast(edata_melt, formula = formula1,
@@ -425,7 +425,7 @@ edata_summary <- function (omicsData, by = 'sample', groupvar = NULL) {
                              function(x){if(all(is.na(x))){
                                min(x)
                              }else{
-                               min(x, na.rm = T)
+                               min(x, na.rm = TRUE)
                              }})
       names(mins)[which(colnames(mins)== ".")]<- "value"
       mins = reshape2::dcast(mins, formula = formula2)
@@ -433,7 +433,7 @@ edata_summary <- function (omicsData, by = 'sample', groupvar = NULL) {
                              function(x){if(all(is.na(x))){
                                max(x)
                              }else{
-                               max(x, na.rm = T)
+                               max(x, na.rm = TRUE)
                              }})
       names(maxs)[which(colnames(maxs)== ".")]<- "value"
       maxs = reshape2::dcast(maxs, formula = formula2)
