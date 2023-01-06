@@ -25,6 +25,7 @@ jobs:
         with:
           extra-packages: |
             any::rcmdcheck
+            any::XML
             github::pmartR/pmartRdata@master
           needs: check
       
