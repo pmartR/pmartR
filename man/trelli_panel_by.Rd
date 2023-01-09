@@ -19,7 +19,6 @@ Allows for grouping omics or stats data for downstream plotting
 \dontrun{
 
 library(pmartRdata)
-library(pmartR)
 
 ## "panel_by" with an edata file. 
 ## Generate with example code in as.trelliData.edata

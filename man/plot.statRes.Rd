@@ -139,30 +139,24 @@ Plot types:
 }
 \examples{
 library(pmartRdata)
-#Group the data by condition
+# Group the data by condition
 mypro <- group_designation(omicsData = pro_object,
                            main_effects = c("Phenotype"))
 
-#Apply the IMD ANOVA filter
+# Apply the IMD ANOVA filter
 imdanova_Filt <- imdanova_filter(omicsData = mypro)
 mypro <- applyFilt(filter_object = imdanova_Filt,
                        omicsData = mypro,
                        min_nonmiss_anova=2)
 
-#Implement the IMD ANOVA method and compuate all pairwise comparisons
-#(i.e. leave the `comparisons` argument NULL)
+# Implement the IMD ANOVA method and compuate all pairwise comparisons
+# (i.e. leave the `comparisons` argument NULL)
 anova_res <- imd_anova(omicsData = mypro, test_method = 'anova')
 plot(anova_res)
 plot(anova_res, plot_type = "volcano")
 
 imd_res <- imd_anova(omicsData = mypro, test_method = 'gtest')
 plot(imd_res)
-plot(imd_res, plot_type = "gheatmap")
-# using arguments of internal functions:
-plot(imd_res,
-     plot_type = "gheatmap",
-     color_low = "red",
-     color_high = "green")
 
 imd_anova_res <- imd_anova(omicsData = mypro,
                            test_method = 'comb',
@@ -170,6 +164,5 @@ imd_anova_res <- imd_anova(omicsData = mypro,
                            pval_adjust_g = 'bon')
 plot(imd_anova_res, bw_theme = TRUE)
 plot(imd_anova_res, plot_type = "volcano", bw_theme = TRUE)
-
 
 }

@@ -219,7 +219,7 @@ mynorm <- normalize_global(omicsData = mypep,
                            norm_fn = "median", 
                            apply_norm = FALSE)
 class(mynorm)
-plot(mynorm)
+# plot(mynorm)
 ```
 
 
@@ -322,12 +322,7 @@ knitr::include_graphics("SPANS_pep.png")
 ```
 
 
-```{r spans table}
-# loaded version
-spans_result <- readRDS("spans_result.RDS")
 
-head(spans_result)
-```
 
 To apply a normalization method after using SPANS, simply use the `normalize_global` function.
 

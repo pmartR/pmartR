@@ -22,7 +22,7 @@ data.table(
 knitr::include_graphics("TrelliData_Plotting_Options.png")
 
 ## ---- echo = F----------------------------------------------------------------
-datatable(head(pmartRdata::lipid_pos_edata), options = list(`scrollX` = T))
+knitr::kable(head(pmartRdata::lipid_pos_edata), options = list(`scrollX` = T))
 
 ## -----------------------------------------------------------------------------
 trelliData1 <- as.trelliData.edata(

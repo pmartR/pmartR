@@ -32,7 +32,6 @@
 #'
 #' @examples
 #' \dontrun{
-#' library(pmartR)
 #' library(MSnbase)
 #' data("msnset")
 #' result = MSnSet2pepData(msnset,

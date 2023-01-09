@@ -234,7 +234,6 @@ as.trelliData.edata <- function(e_data,
 #' 
 #' @examples
 #' \dontrun{
-#' library(pmartR)
 #' library(pmartRdata)
 #' 
 #' # Generate an example e_meta file for lipid data 
@@ -474,7 +473,6 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL, ...) {
 #' \dontrun{
 #' 
 #' library(pmartRdata)
-#' library(pmartR)
 #' 
 #' ## "panel_by" with an edata file. 
 #' ## Generate with example code in as.trelliData.edata

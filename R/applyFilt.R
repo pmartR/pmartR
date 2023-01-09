@@ -2477,17 +2477,6 @@ anova_filter <- function (nonmiss_per_group,
 #' @return filter.peps a character vector of the peptides to be filtered out
 #'   prior to the G-test or IMD-ANOVA
 #'
-#' @examples
-#' library(pmartR)
-#'
-#' pep_object2 <- group_designation(omicsData = pep_object,
-#'                                  main_effects = "Phenotype")
-#'
-#' nonmissing_result <- nonmissing_per_group(omicsData = pep_object2)
-#'
-#' to_filter <- gtest_filter(nonmiss_per_group = nonmissing_result,
-#'                           min_nonmiss_gtest = 3)
-#'
 #' @author Kelly Stratton
 #'
 gtest_filter <- function (nonmiss_per_group,

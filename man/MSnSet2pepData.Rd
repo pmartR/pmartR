@@ -45,7 +45,6 @@ The MSnbase package is available via Bioconductor
 }
 \examples{
 \dontrun{
-library(pmartR)
 library(MSnbase)
 data("msnset")
 result = MSnSet2pepData(msnset,
