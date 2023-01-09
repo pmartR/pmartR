@@ -216,7 +216,7 @@ trelli_builder <- function(toBuild, cognostics, plotFUN, cogFUN, path, name, ...
       dplyr::mutate(
         panel = trelliscopejs::map2_plot(Nested_DF, as.character(unlist(toBuild[,1])), plotFUN)
       ) %>%
-      trelliscopejs::trelliscope(path = path, name = name, nrow = 1, ncol = 1, thumb = T, ...) 
+      trelliscopejs::trelliscope(path = path, name = name, nrow = 1, ncol = 1, thumb = TRUE, ...) 
     
   } else {
     
@@ -226,7 +226,7 @@ trelli_builder <- function(toBuild, cognostics, plotFUN, cogFUN, path, name, ...
         panel = trelliscopejs::map2_plot(Nested_DF, as.character(unlist(toBuild[,1])), plotFUN),
         cog = trelliscopejs::map2_cog(Nested_DF, as.character(unlist(toBuild[,1])), cogFUN)
       ) %>%
-      trelliscopejs::trelliscope(path = path, name = name, nrow = 1, ncol = 1, thumb = T, ...) 
+      trelliscopejs::trelliscope(path = path, name = name, nrow = 1, ncol = 1, thumb = TRUE, ...) 
     
   }
 }
@@ -280,26 +280,26 @@ trelli_builder <- function(toBuild, cognostics, plotFUN, cogFUN, path, name, ...
 #' 
 #' ## Build the abundance boxplot with an edata file. Generate trelliData in as.trelliData.edata
 #' trelli_panel_by(trelliData = trelliData, panel = "Lipid") %>% 
-#'    trelli_abundance_boxplot(test_mode = T, test_example = 1:10)
+#'    trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10)
 #' trelli_panel_by(trelliData = trelliData, panel = "Sample") %>% trelli_abundance_boxplot()
 #' 
 #' ## Build the abundance boxplot with an omicsData object. Generate trelliData in as.trelliData
 #' trelli_panel_by(trelliData = trelliData2, panel = "Lipid") %>% 
-#'    trelli_abundance_boxplot(test_mode = T, test_example = 1:10)
+#'    trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10)
 #' trelli_panel_by(trelliData = trelliData2, panel = "LipidFamily") %>% trelli_abundance_boxplot()
 #'     
 #' ## Build the abundance boxplot with an omicsData and statRes object. Generate trelliData in as.trelliData.
 #' trelli_panel_by(trelliData = trelliData4, panel = "Lipid") %>%
-#'    trelli_abundance_boxplot(test_mode = T, test_example = 1:10)
+#'    trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10)
 #' trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") %>% trelli_abundance_boxplot()
 #'    
 #' ## Other options include modifying the ggplot  
 #' trelli_panel_by(trelliData = trelliData, panel = "Lipid") %>% 
-#'    trelli_abundance_boxplot(test_mode = T, test_example = 1:10, 
+#'    trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10, 
 #'      ggplot_params = c("ylab('')", "ylim(c(2,20))"))
 #' 
 #' ## Or making the plot interactive 
-#' trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") %>% trelli_abundance_boxplot(interactive = T)
+#' trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") %>% trelli_abundance_boxplot(interactive = TRUE)
 #' 
 #' }
 #' 
@@ -399,10 +399,10 @@ trelli_abundance_boxplot <- function(trelliData,
     # Set basic cognostics for ungrouped data or in case when data is not split by fdata_cname
     cog <- list(
       "n" = dplyr::tibble(`Count` = trelliscopejs::cog(sum(!is.na(DF$Abundance)), desc = "Biomolecule Count")),
-      "mean" = dplyr::tibble(`Mean Abundance` = trelliscopejs::cog(round(mean(DF$Abundance, na.rm = T), 4), desc = "Mean Abundance")), 
-      "median" = dplyr::tibble(`Median Abundance` = trelliscopejs::cog(round(median(DF$Abundance, na.rm = T), 4), desc = "Median Abundance")), 
-      "sd" = dplyr::tibble(`Standard Deviation Abundance` = trelliscopejs::cog(round(sd(DF$Abundance, na.rm = T), 4), desc = "Abundance Standard Deviation")), 
-      "skew" = dplyr::tibble(`Skew Abundance` = trelliscopejs::cog(round(e1071::skewness(DF$Abundance, na.rm = T), 4), desc= "Abundance Skewness"))
+      "mean" = dplyr::tibble(`Mean Abundance` = trelliscopejs::cog(round(mean(DF$Abundance, na.rm = TRUE), 4), desc = "Mean Abundance")), 
+      "median" = dplyr::tibble(`Median Abundance` = trelliscopejs::cog(round(median(DF$Abundance, na.rm = TRUE), 4), desc = "Median Abundance")), 
+      "sd" = dplyr::tibble(`Standard Deviation Abundance` = trelliscopejs::cog(round(sd(DF$Abundance, na.rm = TRUE), 4), desc = "Abundance Standard Deviation")), 
+      "skew" = dplyr::tibble(`Skew Abundance` = trelliscopejs::cog(round(e1071::skewness(DF$Abundance, na.rm = TRUE), 4), desc= "Abundance Skewness"))
     )
     
     # If cognostics are any of the cog, then add them 
@@ -426,10 +426,10 @@ trelli_abundance_boxplot <- function(trelliData,
         dplyr::group_by(Group) %>%
         dplyr::summarise(
           "n" = sum(!is.na(Abundance)), 
-          "mean" = round(mean(Abundance, na.rm = T), 4),
-          "median" = round(median(Abundance, na.rm = T), 4),
-          "sd" = round(sd(Abundance, na.rm = T), 4),
-          "skew" = round(e1071::skewness(Abundance, na.rm = T), 4)
+          "mean" = round(mean(Abundance, na.rm = TRUE), 4),
+          "median" = round(median(Abundance, na.rm = TRUE), 4),
+          "sd" = round(sd(Abundance, na.rm = TRUE), 4),
+          "skew" = round(e1071::skewness(Abundance, na.rm = TRUE), 4)
         ) %>%
         tidyr::pivot_longer(c(n, mean, median, sd, skew)) %>%
         dplyr::filter(name %in% cognostics) %>%
@@ -563,20 +563,20 @@ trelli_abundance_boxplot <- function(trelliData,
 #' 
 #' ## Build the abundance histogram with an edata file. Generate trelliData in as.trelliData.edata
 #' trelli_panel_by(trelliData = trelliData, panel = "Lipid") %>% 
-#'    trelli_abundance_histogram(test_mode = T, test_example = 1:10)
+#'    trelli_abundance_histogram(test_mode = TRUE, test_example = 1:10)
 #' 
 #' ## Build the abundance histogram with an omicsData object. Generate trelliData in as.trelliData
 #' trelli_panel_by(trelliData = trelliData2, panel = "Lipid") %>% 
-#'    trelli_abundance_histogram(test_mode = T, test_example = 1:10)
+#'    trelli_abundance_histogram(test_mode = TRUE, test_example = 1:10)
 #'     
 #' ## Build the abundance histogram with an omicsData and statRes object. Generate trelliData in as.trelliData.
 #' trelli_panel_by(trelliData = trelliData4, panel = "Lipid") %>%
-#'    trelli_abundance_histogram(test_mode = T, test_example = 1:10)
+#'    trelli_abundance_histogram(test_mode = TRUE, test_example = 1:10)
 #'    
 #' ## Users can modify the plotting function with ggplot parameters and interactivity, 
 #' ## and can also select certain cognostics.     
 #' trelli_panel_by(trelliData = trelliData, panel = "Lipid") %>% 
-#'    trelli_abundance_histogram(test_mode = T, test_example = 1:10, 
+#'    trelli_abundance_histogram(test_mode = TRUE, test_example = 1:10, 
 #'      ggplot_params = c("ylab('')", "xlab('Abundance')"), interactive = TRUE,
 #'      cognostics = c("mean", "median"))  
 #'    
@@ -667,10 +667,10 @@ trelli_abundance_histogram <- function(trelliData,
     # Set basic cognostics for ungrouped data or in case when data is not split by fdata_cname
     cog <- list(
       "n" = dplyr::tibble(`Count` = trelliscopejs::cog(sum(!is.na(DF$Abundance)), desc = "Biomolecule Count")),
-      "mean" = dplyr::tibble(`Mean Abundance` = trelliscopejs::cog(round(mean(DF$Abundance, na.rm = T), 4), desc = "Mean Abundance")), 
-      "median" = dplyr::tibble(`Median Abundance` = trelliscopejs::cog(round(median(DF$Abundance, na.rm = T), 4), desc = "Median Abundance")), 
-      "sd" = dplyr::tibble(`Standard Deviation Abundance` = trelliscopejs::cog(round(sd(DF$Abundance, na.rm = T), 4), desc = "Abundance Standard Deviation")), 
-      "skew" = dplyr::tibble(`Skew Abundance` = trelliscopejs::cog(round(e1071::skewness(DF$Abundance, na.rm = T), 4), desc= "Abundance Skewness"))
+      "mean" = dplyr::tibble(`Mean Abundance` = trelliscopejs::cog(round(mean(DF$Abundance, na.rm = TRUE), 4), desc = "Mean Abundance")), 
+      "median" = dplyr::tibble(`Median Abundance` = trelliscopejs::cog(round(median(DF$Abundance, na.rm = TRUE), 4), desc = "Median Abundance")), 
+      "sd" = dplyr::tibble(`Standard Deviation Abundance` = trelliscopejs::cog(round(sd(DF$Abundance, na.rm = TRUE), 4), desc = "Abundance Standard Deviation")), 
+      "skew" = dplyr::tibble(`Skew Abundance` = trelliscopejs::cog(round(e1071::skewness(DF$Abundance, na.rm = TRUE), 4), desc= "Abundance Skewness"))
     )
     
     # If cognostics are any of the cog, then add them 
@@ -789,12 +789,12 @@ trelli_abundance_histogram <- function(trelliData,
 #' 
 #' ## Build the abundance heatmap with an omicsData object with emeta variables. Generate trelliData in as.trelliData.
 #' trelli_panel_by(trelliData = trelliData2, panel = "LipidFamily") %>% 
-#'    trelli_abundance_heatmap(test_mode = T, test_example = 1:3)
+#'    trelli_abundance_heatmap(test_mode = TRUE, test_example = 1:3)
 #'    
 #' ## Users can modify the plotting function with ggplot parameters and interactivity, 
 #' ## and can also select certain cognostics.     
 #' trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") %>% 
-#'    trelli_abundance_heatmap(test_mode = T, test_example = 1:5, 
+#'    trelli_abundance_heatmap(test_mode = TRUE, test_example = 1:5, 
 #'      ggplot_params = c("ylab('')", "xlab('')"), interactive = TRUE, cognostics = c("mean", "median"))  
 #'    
 #' }
@@ -896,10 +896,10 @@ trelli_abundance_heatmap <- function(trelliData,
       dplyr::group_by(Group) %>%
       dplyr::summarise(
         "n" = sum(!is.na(Abundance)), 
-        "mean" = round(mean(Abundance, na.rm = T), 4),
-        "median" = round(median(Abundance, na.rm = T), 4),
-        "sd" = round(sd(Abundance, na.rm = T), 4),
-        "skew" = round(e1071::skewness(Abundance, na.rm = T), 4)
+        "mean" = round(mean(Abundance, na.rm = TRUE), 4),
+        "median" = round(median(Abundance, na.rm = TRUE), 4),
+        "sd" = round(sd(Abundance, na.rm = TRUE), 4),
+        "skew" = round(e1071::skewness(Abundance, na.rm = TRUE), 4)
       ) %>%
       tidyr::pivot_longer(c(n, mean, median, sd, skew)) %>%
       dplyr::filter(name %in% cognostics) %>%
@@ -983,28 +983,28 @@ trelli_abundance_heatmap <- function(trelliData,
 #' 
 #' ## Build the missingness bar plot with an edata file. Generate trelliData in as.trelliData.edata
 #' trelli_panel_by(trelliData = trelliData, panel = "Lipid") %>% 
-#'   trelli_missingness_bar(test_mode = T, test_example = 1:10)
+#'   trelli_missingness_bar(test_mode = TRUE, test_example = 1:10)
 #' trelli_panel_by(trelliData = trelliData, panel = "Sample") %>% trelli_missingness_bar()
 #' 
 #' ## Build the missingness bar plot with an omicsData object. Generate trelliData in as.trelliData
 #' trelli_panel_by(trelliData = trelliData2, panel = "Lipid") %>% 
-#'   trelli_missingness_bar(test_mode = T, test_example = 1:10)
+#'   trelli_missingness_bar(test_mode = TRUE, test_example = 1:10)
 #' 
 #' ## Build the missingness bar plot with a statRes object. Generate trelliData in as.trelliData
 #' trelli_panel_by(trelliData = trelliData3, panel = "Lipid") %>%
-#'   trelli_missingness_bar(test_mode = T, test_example = 1:10)
+#'   trelli_missingness_bar(test_mode = TRUE, test_example = 1:10)
 #' 
 #' ## Build the missingness bar plot with an omicsData and statRes object. Generate trelliData in as.trelliData.
 #' trelli_panel_by(trelliData = trelliData4, panel = "Lipid") %>%
-#'   trelli_missingness_bar(test_mode = T, test_example = 1:10) 
+#'   trelli_missingness_bar(test_mode = TRUE, test_example = 1:10) 
 #' 
 #' ## Or making the plot interactive 
 #' trelli_panel_by(trelliData = trelliData2, panel = "Lipid") %>% 
-#'    trelli_missingness_bar(test_mode = T, test_example = 1:5, interactive = T)
+#'    trelli_missingness_bar(test_mode = TRUE, test_example = 1:5, interactive = TRUE)
 #'    
 #' ## Or visualize only count data 
 #' trelli_panel_by(trelliData = trelliData2, panel = "Lipid") %>% 
-#'    trelli_missingness_bar(test_mode = T, test_example = 1:5, cognostics = "n", proportion = FALSE)
+#'    trelli_missingness_bar(test_mode = TRUE, test_example = 1:5, cognostics = "n", proportion = FALSE)
 #'    
 #' }
 #' 
@@ -1296,11 +1296,11 @@ determine_significance <- function(DF, p_value_thresh) {
 #' 
 #' ## Build fold_change bar plot with statRes data grouped by edata_colname.
 #' trelli_panel_by(trelliData = trelliData3, panel = "Lipid") %>% 
-#'   trelli_foldchange_bar(test_mode = T, test_example = 1:10, p_value_test = TRUE)
+#'   trelli_foldchange_bar(test_mode = TRUE, test_example = 1:10, p_value_test = TRUE)
 #'   
 #' ## Or make the plot interactive  
 #' trelli_panel_by(trelliData = trelliData4, panel = "Lipid") %>% 
-#'   trelli_foldchange_bar(test_mode = T, test_example = 1:10, p_value_test = TRUE, interactive = T) 
+#'   trelli_foldchange_bar(test_mode = TRUE, test_example = 1:10, p_value_test = TRUE, interactive = TRUE) 
 #'    
 #' }
 #' 
@@ -1584,9 +1584,9 @@ trelli_foldchange_boxplot <- function(trelliData,
       dplyr::group_by(Comparison) %>%
       dplyr::summarise(
         "n" = sum(!is.nan(fold_change)), 
-        "mean" = round(mean(fold_change, na.rm = T), 4),
-        "median" = round(median(fold_change, na.rm = T), 4),
-        "sd" = round(sd(fold_change, na.rm = T), 4)
+        "mean" = round(mean(fold_change, na.rm = TRUE), 4),
+        "median" = round(median(fold_change, na.rm = TRUE), 4),
+        "sd" = round(sd(fold_change, na.rm = TRUE), 4)
       ) %>%
      tidyr::pivot_longer(c(n, mean, median, sd)) %>%
      dplyr::filter(name %in% cognostics) %>%
@@ -2004,9 +2004,9 @@ trelli_foldchange_heatmap <- function(trelliData,
       dplyr::group_by(Comparison) %>%
       dplyr::summarise(
         "n" = sum(!is.nan(fold_change)), 
-        "mean" = round(mean(fold_change, na.rm = T), 4),
-        "median" = round(median(fold_change, na.rm = T), 4),
-        "sd" = round(sd(fold_change, na.rm = T), 4)
+        "mean" = round(mean(fold_change, na.rm = TRUE), 4),
+        "median" = round(median(fold_change, na.rm = TRUE), 4),
+        "sd" = round(sd(fold_change, na.rm = TRUE), 4)
       ) %>%
       tidyr::pivot_longer(c(n, mean, median, sd)) %>%
       dplyr::filter(name %in% cognostics) %>%

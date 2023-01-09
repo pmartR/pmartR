@@ -288,7 +288,7 @@ plot.dataRes <- function (dataRes_obj, metric = NULL, density = FALSE,
         paste("Density plots for ", metric, sep = "") else
           title_lab
 
-      # if density == T, will plot geom_density
+      # if density == TRUE, will plot geom_density
       data = dataRes_obj[[metric]]
       data_melt = reshape2::melt(data, id.vars = edata_cname)
 
@@ -5876,7 +5876,7 @@ plot.statRes <- function (x,
     plotter <- purrr::map_dfr(1:length(comps), function(n_comp){
       label <- attr(x, "comparisons")[n_comp]
       comp <- paste("Mean", comps[[n_comp]], sep = "_")
-      pval <-  grep(paste0("^P_value_.+", label), colnames(x), value = T)
+      pval <-  grep(paste0("^P_value_.+", label), colnames(x), value = TRUE)
 
       v1 <- x[[comp[1]]]
       v2 <- x[[comp[2]]]
@@ -5902,8 +5902,8 @@ plot.statRes <- function (x,
         ggplot2::facet_wrap(~comp) +
         ggplot2::geom_segment(
           y = 0, yend = 0, linetype = "dashed", color = "red",
-          x = min(log2((plotter$var1 + plotter$var2)/2), na.rm = T),
-          xend = max(log2((plotter$var1 + plotter$var2)/2), na.rm = T)
+          x = min(log2((plotter$var1 + plotter$var2)/2), na.rm = TRUE),
+          xend = max(log2((plotter$var1 + plotter$var2)/2), na.rm = TRUE)
         ) + ggplot2::labs(
           x = "A (Log2 Average Expression)",
           y = "M (Log2 Fold change)",
@@ -6471,7 +6471,7 @@ gtest_heatmap <-
         subplot_list[[length(subplot_list) + 1]] <- p
       }
 
-      p <- plotly::subplot(subplot_list, shareY = T) %>%
+      p <- plotly::subplot(subplot_list, shareY = TRUE) %>%
         plotly::layout(
           xaxis = list(title = the_x_label),
           yaxis = list(title = the_y_label)

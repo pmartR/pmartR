@@ -61,26 +61,26 @@ Specify a boxplot design and cognostics for the abundance
 
 ## Build the abundance boxplot with an edata file. Generate trelliData in as.trelliData.edata
 trelli_panel_by(trelliData = trelliData, panel = "Lipid") \%>\% 
-   trelli_abundance_boxplot(test_mode = T, test_example = 1:10)
+   trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10)
 trelli_panel_by(trelliData = trelliData, panel = "Sample") \%>\% trelli_abundance_boxplot()
 
 ## Build the abundance boxplot with an omicsData object. Generate trelliData in as.trelliData
 trelli_panel_by(trelliData = trelliData2, panel = "Lipid") \%>\% 
-   trelli_abundance_boxplot(test_mode = T, test_example = 1:10)
+   trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10)
 trelli_panel_by(trelliData = trelliData2, panel = "LipidFamily") \%>\% trelli_abundance_boxplot()
     
 ## Build the abundance boxplot with an omicsData and statRes object. Generate trelliData in as.trelliData.
 trelli_panel_by(trelliData = trelliData4, panel = "Lipid") \%>\%
-   trelli_abundance_boxplot(test_mode = T, test_example = 1:10)
+   trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10)
 trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") \%>\% trelli_abundance_boxplot()
    
 ## Other options include modifying the ggplot  
 trelli_panel_by(trelliData = trelliData, panel = "Lipid") \%>\% 
-   trelli_abundance_boxplot(test_mode = T, test_example = 1:10, 
+   trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10, 
      ggplot_params = c("ylab('')", "ylim(c(2,20))"))
 
 ## Or making the plot interactive 
-trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") \%>\% trelli_abundance_boxplot(interactive = T)
+trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") \%>\% trelli_abundance_boxplot(interactive = TRUE)
 
 }
 

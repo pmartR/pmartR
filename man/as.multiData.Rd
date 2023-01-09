@@ -8,7 +8,7 @@ as.multiData(
   ...,
   f_meta = NULL,
   sample_intersect = F,
-  match_samples = T,
+  match_samples = TRUE,
   keep_sample_info = F,
   auto_fmeta = F
 )
@@ -24,7 +24,7 @@ omicsData objects supplied to the function.}
 are common across all datasets be kept in f_meta. See details for how
 samples will be dropped.}
 
-\item{match_samples}{logical indicator. If auto_fmeta = T, whether to attempt
+\item{match_samples}{logical indicator. If auto_fmeta = TRUE, whether to attempt
 to match the names in the sample columns in f_data across all objects in an
 attempt to align them in f_meta. Defaults to TRUE.}
 
@@ -59,7 +59,7 @@ library(pmartRdata)
 # Combine metabolomics and protein object into multidata, both must be log2 
 # and normalized.
 mymetab <- edata_transform(omicsData = metab_object, data_scale = "log2")
-mymetab <- normalize_global(omicsData = mymetab, subset_fn = "all", norm_fn = "median", apply_norm = T)
+mymetab <- normalize_global(omicsData = mymetab, subset_fn = "all", norm_fn = "median", apply_norm = TRUE)
 
 mypro <- pro_object
 

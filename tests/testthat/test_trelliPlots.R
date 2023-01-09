@@ -50,9 +50,9 @@ test_that("trelliPlots check the correct inputs", {
                   cognostics = NULL,
                   ggplot_params = NULL,
                   interactive = F,
-                  test_mode = T, 
+                  test_mode = TRUE, 
                   test_example = 10.2345,
-                  single_plot = T,
+                  single_plot = TRUE,
                   p_value_thresh = 0.05,
                   p_value_test = NA))
   
@@ -62,11 +62,11 @@ test_that("trelliPlots check the correct inputs", {
                            cognostics = NULL,
                            ggplot_params = NULL,
                            interactive = F,
-                           test_mode = T, 
+                           test_mode = TRUE, 
                            test_example = 10.2345,
-                           single_plot = T,
+                           single_plot = TRUE,
                            p_value_thresh = 0.05,
-                           p_value_test = T),
+                           p_value_test = TRUE),
                  "No imd-anova stats were detected in the statRes object which is"
                  )
  
@@ -427,7 +427,7 @@ test_that("trelliPlots check the correct inputs", {
   expect_true(file.exists(file.path(testFolder, "boxFoldChangeTest2")))
   
   # Generate a single plot
-  fc_boxplot <- singleEmetaPlot %>% trelli_foldchange_boxplot(single_plot = T)
+  fc_boxplot <- singleEmetaPlot %>% trelli_foldchange_boxplot(single_plot = TRUE)
   expect_true(inherits(fc_boxplot, "ggplot"))
   
   ## trelli_foldchange_volcano
@@ -499,7 +499,7 @@ test_that("trelliPlots check the correct inputs", {
   expect_true(file.exists(file.path(testFolder, "hmFoldChangeTest2")))
   
   # Generate a single plot
-  fc_heatmap <- singleEmetaPlot %>% trelli_foldchange_heatmap(single_plot = T)
+  fc_heatmap <- singleEmetaPlot %>% trelli_foldchange_heatmap(single_plot = TRUE)
   expect_true(inherits(fc_heatmap, "ggplot"))
   
   ## NaN significance results  ######################## might need a second look

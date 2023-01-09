@@ -89,7 +89,7 @@ dim_reduction <- function (omicsData, k = 2){
   }
 
   ## check for near zero variance features and remove ##
-  minvars = which(apply(temp_data, 1, var, na.rm = T) < 0.000001)
+  minvars = which(apply(temp_data, 1, var, na.rm = TRUE) < 0.000001)
   if(length(minvars) > 0){
     temp_data = temp_data[-minvars, ]
   }

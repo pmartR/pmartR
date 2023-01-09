@@ -548,7 +548,7 @@ cv_filter <- function(omicsData, use_groups = TRUE) {
   
   ## determine plotting window cutoff ##
   # calculate percentage of observations with CV <= 200 #
-  prct.less200 <- (sum(pool_cv$CV <= 200, na.rm = T) /
+  prct.less200 <- (sum(pool_cv$CV <= 200, na.rm = TRUE) /
                      length(pool_cv$CV[!is.na(pool_cv$CV)]))
   
   if (prct.less200 > 0.95) {
@@ -1121,14 +1121,14 @@ run_prop_missing <- function(data_only){
 run_mad <- function(data_only){
 
   # calculate MAD #
-  mad_val = apply(data_only, 2, function(x) median(abs(x - median(x, na.rm = T)), na.rm = T))
+  mad_val = apply(data_only, 2, function(x) median(abs(x - median(x, na.rm = TRUE)), na.rm = TRUE))
 
   # calculate the number of samples with MAD equal to NA #
   num.miss <- sum(is.na(mad_val))
 
   # if at least one sample has a MAD of NA, replace it with mean MAD value #
   if(num.miss > 0){
-    mad_val[is.na(mad_val)] <- mean(mad_val, na.rm = T)
+    mad_val[is.na(mad_val)] <- mean(mad_val, na.rm = TRUE)
   }
 
   # store data #
@@ -1165,7 +1165,7 @@ run_kurtosis <- function(data_only){
 
   # if at least one sample has a kurtosis of NA, replace it with mean kurtosis #
   if(num.miss > 0){
-    kurt_res[is.na(kurt_res)] <- mean(kurt_res, na.rm = T)
+    kurt_res[is.na(kurt_res)] <- mean(kurt_res, na.rm = TRUE)
   }
 
   # store data #
@@ -1202,7 +1202,7 @@ run_skewness <- function(data_only){
 
   # if at least one sample has a skewness of NA, replace it with mean skewness #
   if(num.miss > 0){
-    skew_res[is.na(skew_res)] <- mean(skew_res, na.rm = T)
+    skew_res[is.na(skew_res)] <- mean(skew_res, na.rm = TRUE)
   }
 
   # store data #
@@ -1333,7 +1333,7 @@ run_group_meancor <- function(omicsData, mintR_groupDF, ignore_singleton_groups 
   grp.cors = lapply(prwse.grp.cors, function(x) x*(matrix(1, nrow = nrow(x), ncol = ncol(x)) + diag(NA, nrow(x))))
 
   # compute mean correlation for each sample #
-  mean.cor = lapply(grp.cors, function(x) apply(x, 1, mean, na.rm = T))
+  mean.cor = lapply(grp.cors, function(x) apply(x, 1, mean, na.rm = TRUE))
 
   ## need to adjust the list elements of mean.cor for any singleton groups,
   ## to just contain the value for the sample in that group
