@@ -371,7 +371,7 @@ plot.dataRes <- function (dataRes_obj, metric = NULL, density = FALSE,
 #' @examples
 #' library(pmartRdata)
 #' myiso <- edata_transform(omicsData = isobaric_object, data_scale = "log2")
-#' myiso_norm <- normalize_isobaric(myiso, exp_cname = "Plex",
+#' result <- normalize_isobaric(myiso, exp_cname = "Plex",
 #'                                    apply_norm = FALSE,
 #'                                    refpool_cname = "Virus",
 #'                                    refpool_notation = "Pool")
