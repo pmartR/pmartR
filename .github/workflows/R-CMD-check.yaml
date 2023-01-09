@@ -27,6 +27,7 @@ jobs:
             any::rcmdcheck
             any::XML
             github::pmartR/pmartRdata@master
+            github::hafen/trelliscopejs
           needs: check
       
       - uses: r-lib/actions/setup-pandoc@v2

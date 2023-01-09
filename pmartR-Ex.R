@@ -1382,6 +1382,8 @@ flush(stderr()); flush(stdout())
 ### ** Examples
 
 ## Not run: 
+##D library(pmartRdata)
+##D
 ##D data(pep_object)
 ##D 
 ##D pep_object <- group_designation(omicsData = pep_object,
@@ -1468,6 +1470,7 @@ flush(stderr()); flush(stdout())
 ### ** Examples
 
 ## Not run: 
+##D library(pmartRdata)
 ##D data(pep_object)
 ##D molfilt <- molecule_filter(pep_object)
 ##D plot(molfilt, min_num = 5)
@@ -1550,6 +1553,7 @@ flush(stderr()); flush(stdout())
 ### ** Examples
 
 ## Not run: 
+##D library(pmartRdata)
 ##D data(pep_object)
 ##D profilt <- proteomics_filter(pep_object)
 ##D plot(profilt, min_num_peps = 5)
@@ -1571,6 +1575,7 @@ flush(stderr()); flush(stdout())
 ### ** Examples
 
 ## Not run: 
+##D library(pmartRdata)
 ##D data(seq_object)
 ##D seqfilt <- total_count_filter(pep_object)
 ##D plot(seqfilt, min_count = 5)

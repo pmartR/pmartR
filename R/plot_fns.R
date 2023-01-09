@@ -371,7 +371,7 @@ plot.dataRes <- function (dataRes_obj, metric = NULL, density = FALSE,
 #' @examples
 #' library(pmartRdata)
 #' myiso <- edata_transform(omicsData = isobaric_object, data_scale = "log2")
-#' myiso_norm <- normalize_isobaric(myiso, exp_cname = "Plex",
+#' result <- normalize_isobaric(myiso, exp_cname = "Plex",
 #'                                    apply_norm = FALSE,
 #'                                    refpool_cname = "Virus",
 #'                                    refpool_notation = "Pool")
@@ -818,6 +818,7 @@ plot.nmrnormRes <- function (nmrnormRes_obj, nmrData = NULL, order_by = NULL,
 #'
 #' @examples
 #' library(pmartRdata)
+#' data(pep_object)
 #' mypep <- edata_transform(omicsData = pep_object, data_scale = "log2")
 #' mypep <- group_designation(omicsData = mypep, main_effects = "Phenotype")
 #' myspans <- spans_procedure(omicsData = mypep)
@@ -2073,6 +2074,7 @@ plot.dimRes <- function (dimRes_obj, interactive = FALSE, x_lab = NULL,
 #'   interactive is TRUE
 #'
 #' @examples
+#' library(pmartRdata)
 #' data(pep_object)
 #' molfilt <- molecule_filter(omicsData = pep_object)
 #' plot(molfilt, min_num = 5)
@@ -2768,6 +2770,7 @@ plot.RNAFilt <- function (filter_object, plot_type = "library",
 #'
 #' @examples
 #' library(pmartRdata)
+#' data(pep_object)
 #' mypep <- group_designation(omicsData = pep_object, main_effects = "Phenotype")
 #' to_filter <- imdanova_filter(omicsData = mypep)
 #' plot(to_filter, min_nonmiss_anova = 2, min_nonmiss_gtest = 3)
@@ -3171,6 +3174,7 @@ plot.imdanovaFilt <- function (filter_object, min_nonmiss_anova = NULL,
 #'
 #' @examples
 #' library(pmartRdata)
+#' data(pep_object)
 #' my_filter <- proteomics_filter(omicsData = pep_object)
 #' plot(my_filter, min_num_peps = 3)
 #' plot(my_filter, plot_type = "redundancy")
@@ -4100,6 +4104,7 @@ plot.rmdFilt <- function (filter_object, pvalue_threshold = NULL, sampleID = NUL
 #'
 #' @examples
 #' library(pmartRdata)
+#' data(pep_object)
 #' mypep <- group_designation(omicsData = pep_object,
 #'                                 main_effects = "Phenotype")
 #'
@@ -4939,6 +4944,7 @@ plot.seqData <- function (omicsData, order_by = NULL, color_by = NULL,
 #'
 #' @examples
 #' library(pmartRdata)
+#' data(pep_object)
 #' mypep <- edata_transform(omicsData = pep_object, data_scale = "log2")
 #' plot(omicsData = mypep, order_by = "Phenotype", color_by = "Phenotype")
 #'
