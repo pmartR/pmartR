@@ -33,6 +33,7 @@ Imports:
     RcppArmadillo,
     RColorBrewer,
     magrittr,
+    parallelly,
     patchwork,
     glmpca,
     edgeR,

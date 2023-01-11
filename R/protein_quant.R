@@ -619,8 +619,8 @@ rrollup <- function (pepData, combine_fn, parallel = TRUE) {
 
   # set up parallel backend
   if(parallel == TRUE){
-    cores<- parallel::detectCores()
-    cl<- parallel::makeCluster(cores)
+    cores <- parallelly::availableCores()
+    cl <- parallelly::makeClusterPSOCK(cores)
     on.exit(parallel::stopCluster(cl))
     doParallel::registerDoParallel(cl)
   } else {
@@ -789,9 +789,9 @@ qrollup <- function (pepData, qrollup_thresh,
   unique_proteins<- unique(temp[[pro_id]])
 
   # set up parallel backend
-  if(parallel == TRUE){
-    cores<- parallel::detectCores()
-    cl<- parallel::makeCluster(cores)
+  if(parallel){
+    cores <- parallelly::availableCores()
+    cl <- parallelly::makeClusterPSOCK(cores)
     on.exit(parallel::stopCluster(cl))
     doParallel::registerDoParallel(cl)
   } else {
@@ -960,9 +960,9 @@ zrollup <- function (pepData, combine_fn, parallel = TRUE) {
   unique_proteins <- unique(temp[[pro_id]])
 
   # set up parallel backend
-  if(parallel == TRUE){
-    cores<- parallel::detectCores()
-    cl<- parallel::makeCluster(cores)
+  if (parallel == TRUE){
+    cores <- parallelly::availableCores()
+    cl <- parallelly::makeClusterPSOCK(cores)
     on.exit(parallel::stopCluster(cl))
     doParallel::registerDoParallel(cl)
   } else {

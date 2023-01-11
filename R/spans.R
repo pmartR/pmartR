@@ -330,8 +330,8 @@ spans_procedure <- function(omicsData,
 
   # set up parallel backend
   if(parallel){
-    cores<- parallel::detectCores()
-    cl<- parallel::makeCluster(cores)
+    cores <- parallelly::availableCores()
+    cl <- parallelly::makeClusterPSOCK(cores)
     on.exit(parallel::stopCluster(cl))
     doParallel::registerDoParallel(cl)
   } else {

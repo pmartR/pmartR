@@ -1136,9 +1136,9 @@ paired_test <- function (data, bio_ids, cutoff, use_parallel) {
   names(results)[2] <- "Mean_paired_diff"
   
   # Set up parallel backend.
-  if (use_parallel) {
-    cores <- parallel::detectCores()
-    cl <- parallel::makeCluster(cores - 1)
+  if(use_parallel){
+    cores <- parallelly::availableCores()
+    cl <- parallelly::makeClusterPSOCK(cores - 1)
     on.exit(parallel::stopCluster(cl))
     doParallel::registerDoParallel(cl)
   } else {
@@ -1546,9 +1546,9 @@ imd_cov <- function (data, groupData, fdata, cmat,
   
   
   # Set up parallel backend.
-  if (use_parallel) {
-    cores <- parallel::detectCores()
-    cl <- parallel::makeCluster(cores - 1)
+  if (use_parallel){
+    cores <- parallelly::availableCores()
+    cl <- parallelly::makeClusterPSOCK(cores - 1)
     on.exit(parallel::stopCluster(cl))
     doParallel::registerDoParallel(cl)
   } else {
