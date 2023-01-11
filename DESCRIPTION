@@ -42,9 +42,10 @@ Imports:
 Suggests:
     knitr,
     rmarkdown,
+    survival,
     testthat,
-    survival
+    trelliscopejs
 Remotes:
-    hafen/trelliscopejs
+    github::hafen/trelliscopejs
 RoxygenNote: 7.2.3
 Encoding: UTF-8
