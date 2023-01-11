@@ -38,6 +38,7 @@ jobs:
             local::.
             github::pmartR/pmartRdata@master
           needs: website
+          pak-version: devel # See https://github.com/r-lib/actions/issues/559
 
       - name: Build site
         run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
