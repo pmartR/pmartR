@@ -371,7 +371,7 @@ DESeq2_wrapper <- function(
     variable.name = "Comparison", 
     value.name = "Flags"
   )
-  flag_df$Comparison <- gsub("Flag_(Wald|LRT)_", "", flag_df$Comparison )
+  flag_df$Comparison <- gsub("Flag_", "", flag_df$Comparison )
   attr(results, "number_significant") <- flag_df %>%
     dplyr::group_by(Comparison) %>%
     dplyr::summarise(
