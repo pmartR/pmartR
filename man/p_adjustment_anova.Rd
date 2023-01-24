@@ -4,7 +4,14 @@
 \alias{p_adjustment_anova}
 \title{Adjust p-values for multiple comparisons}
 \usage{
-p_adjustment_anova(p_values, diff_mean, t_stats, sizes, pval_adjust)
+p_adjustment_anova(
+  p_values,
+  diff_mean,
+  t_stats,
+  sizes,
+  pval_adjust_multcomp,
+  pval_adjust_fdr
+)
 }
 \arguments{
 \item{p_values}{A matrix (or \code{data.frame}) of p-values to be adjusted.}
@@ -15,7 +22,9 @@ p_adjustment_anova(p_values, diff_mean, t_stats, sizes, pval_adjust)
 
 \item{sizes}{A matrix (or \code{data.frame}) of group sizes}
 
-\item{pval_adjust}{character vector specifying the type of multiple comparisons adjustment to implement. A NULL value corresponds to no adjustment. Valid options include: holm, bonferroni, dunnett, tukey or none.}
+\item{pval_adjust_multcomp}{character vector specifying the type of multiple comparisons adjustment to implement. A NULL value corresponds to no adjustment. Valid options include: holm, bonferroni, dunnett, tukey or none.}
+
+\item{pval_adjust_fdr}{character vector specifying the type of FDR adjustment to implement. A NULL value corresponds to no adjustment. Valid options include: bonferroni, BH, BY, fdr, or none.}
 }
 \value{
 a data frame with the following columns: group means, global G-test statistic and corresponding p-value

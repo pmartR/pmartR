@@ -9,8 +9,10 @@ imd_anova(
   omicsData,
   comparisons = NULL,
   test_method,
-  pval_adjust_a = "none",
-  pval_adjust_g = "none",
+  pval_adjust_a_multcomp = "none",
+  pval_adjust_g_multcomp = "none",
+  pval_adjust_a_fdr = "none",
+  pval_adjust_g_fdr = "none",
   pval_thresh = 0.05,
   equal_var = TRUE,
   use_parallel = TRUE
@@ -29,15 +31,25 @@ pairwise comparisons are executed.}
 "combined", "gtest", or "anova". Specifying "combined" implements both the gtest and
 anova filters.}
 
-\item{pval_adjust_a}{character string specifying the type of multiple
+\item{pval_adjust_a_multcomp}{character string specifying the type of multiple
 comparison adjustment to implement for ANOVA tests. Valid options include:
 "bonferroni", "holm", "tukey", and "dunnett". The default is "none" which
 corresponds to no p-value adjustment.}
 
-\item{pval_adjust_g}{character string specifying the type of multiple
+\item{pval_adjust_g_multcomp}{character string specifying the type of multiple
 comparison adjustment to implement for G-test tests. Valid options include:
 "bonferroni" and "holm". The default is "none" which corresponds to no
 p-value adjustment.}
+
+\item{pval_adjust_a_fdr}{character string specifying the type of FDR
+adjustment to implement for ANOVA tests. Valid options include:
+"bonferroni", "BH", "BY", and "fdr". The default is "none" which corresponds
+to no p-value adjustment.}
+
+\item{pval_adjust_g_fdr}{character string specifying the type of FDR
+adjustment to implement for G-test tests. Valid options include:
+"bonferroni", "BH", "BY", and "fdr". The default is "none" which corresponds
+to no p-value adjustment.}
 
 \item{pval_thresh}{numeric p-value threshold, below or equal to which
 biomolecules are considered differentially expressed. Defaults to 0.05}
@@ -71,10 +83,11 @@ mymetab <- group_designation(omicsData = mymetab, main_effects = c("Phenotype"))
 imdanova_Filt <- imdanova_filter(omicsData = mymetab)
 mymetab <- applyFilt(filter_object = imdanova_Filt, omicsData = mymetab, min_nonmiss_anova = 2)
 
-# Implement IMD ANOVA and compute all pairwise comparisons (i.e. leave the `comparisons` argument NULL)
-anova_res <- imd_anova(omicsData = mymetab, test_method = "anova")
-imd_res <- imd_anova(omicsData = mymetab, test_method = "gtest")
-imd_anova_res <- imd_anova(omicsData = mymetab, test_method = 'combined', pval_adjust_a ="bon", pval_adjust_g ="bon")
+# Implement IMD ANOVA and compute all pairwise comparisons (i.e. leave the comparisons argument NULL), with FDR adjustment
+anova_res <- imd_anova(omicsData = mymetab, test_method = "anova", pval_adjust_a_multcomp ="Holm", pval_adjust_a_fdr ="BY")
+imd_res <- imd_anova(omicsData = mymetab, test_method = "gtest", pval_adjust_g_multcomp ="bon", pval_adjust_g_fdr ="BY")
+imd_anova_res <- imd_anova(omicsData = mymetab, test_method = "combined", pval_adjust_a_fdr ="BY", pval_adjust_g_fdr ="BY")
+imd_anova_res <- imd_anova(omicsData = mymetab, test_method = "combined", pval_adjust_a_multcomp ="bon", pval_adjust_g_multcomp ="bon", pval_adjust_a_fdr ="BY", pval_adjust_g_fdr ="BY")
 
 # Two main effects and a covariate
 mymetab <- group_designation(omicsData = mymetab, main_effects = c("Phenotype", "SecondPhenotype"), covariates = "Characteristic")
