@@ -24,9 +24,9 @@
 }
 \arguments{
 \item{omicsData}{an object of the class 'lipidData', 'metabData', 'pepData',
-'proData', or 'nmrData' usually created by \code{\link{as.lipidData}},
+'proData', nmrData', or 'seqData' usually created by \code{\link{as.lipidData}},
 \code{\link{as.metabData}}, \code{\link{as.pepData}},
-\code{\link{as.proData}}, or \code{\link{as.nmrData}}, respectively.}
+\code{\link{as.proData}}, \code{\link{as.nmrData}}, or \code{\link{as.seqData}}, respectively.}
 }
 \value{
 a summary table for the pmartR omicsData object. If assigned to a
@@ -37,11 +37,14 @@ This function will provide basic summary statistics for omicsData objects
 from the pmartR package.
 }
 \examples{
-\dontrun{
 library(pmartRdata)
-data("pep_object")
-summary(pep_object)
-}
+pep_summary <- summary(pep_object)
+iso_summary <- summary(isobaric_object)
+pro_summary <- summary(pro_object)
+metab_summary <- summary(metab_object)
+lipid_summary <- summary(lipid_neg_object)
+nmr_summary <- summary(nmr_identified_object)
+rnaseq_summary <- summary(rnaseq_object)
 
 }
 \author{

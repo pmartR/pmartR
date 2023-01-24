@@ -7,5 +7,5 @@
 \method{print}{metabData}(metabData)
 }
 \description{
-For printing an S3 object of type 'metabData':
+For printing an S3 object of type 'metabData'
 }

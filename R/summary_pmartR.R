@@ -4,19 +4,22 @@
 #' from the pmartR package.
 #'
 #' @param omicsData an object of the class 'lipidData', 'metabData', 'pepData',
-#'   'proData', or 'nmrData' usually created by \code{\link{as.lipidData}},
+#'   'proData', nmrData', or 'seqData' usually created by \code{\link{as.lipidData}},
 #'   \code{\link{as.metabData}}, \code{\link{as.pepData}},
-#'   \code{\link{as.proData}}, or \code{\link{as.nmrData}}, respectively.
+#'   \code{\link{as.proData}}, \code{\link{as.nmrData}}, or \code{\link{as.seqData}}, respectively.
 #'
 #' @return a summary table for the pmartR omicsData object. If assigned to a
 #'   variable, the elements of the summary table are saved in a list format.
 #'
 #' @examples
-#' \dontrun{
 #' library(pmartRdata)
-#' data("pep_object")
-#' summary(pep_object)
-#' }
+#' pep_summary <- summary(pep_object)
+#' iso_summary <- summary(isobaric_object)
+#' pro_summary <- summary(pro_object)
+#' metab_summary <- summary(metab_object)
+#' lipid_summary <- summary(lipid_neg_object)
+#' nmr_summary <- summary(nmr_identified_object)
+#' rnaseq_summary <- summary(rnaseq_object)
 #'
 #' @author Lisa Bramer, Kelly Stratton, Thomas Johansen
 #'
@@ -80,6 +83,62 @@ summary.nmrData <- function(omicsData) {
   summarizer(omicsData)
 
 }
+
+
+#'@export
+#'@rdname summary-omicsData
+#'@name summary-omicsData
+summary.seqData <- function(omicsData) {
+  
+  # get values #
+  res <- list(class = class(omicsData), num_samps = attr(omicsData, "data_info")$num_samps,
+              num_edata = attr(omicsData, "data_info")$num_edata,
+              num_emeta = attr(omicsData, "meta_info")$num_emeta,
+              num_zero_obs = attr(omicsData, "data_info")$num_zero_obs,
+              prop_zeros = round(attr(omicsData, "data_info")$prop_zeros, 3))
+  
+  # construct output #
+  newres <- lapply(res, function(x) ifelse(is.null(x), "NA", as.character(x)))
+  catmat <- data.frame(unlist(newres, use.names = FALSE))
+  
+  # assemble text strings #
+  edata_name <- paste("Unique ", attributes(omicsData)$cnames$edata_cname, "s (e_data)", sep="")
+  fdata_name <- paste("Unique ", attributes(omicsData)$cnames$fdata_cname, "s (f_data)", sep="")
+  if(!is.null(attributes(omicsData)$cnames$emeta_cname)){
+    emeta_name <- paste("Unique ", attributes(omicsData)$cnames$emeta_cname, "s (e_meta)", sep="")
+  }else{
+    emeta_name <- "Rows (e_meta) "
+  }
+  
+  colnames(catmat) <- NULL
+  rownames(catmat) <- c("Class", fdata_name, edata_name, emeta_name, "Observed Zero-Counts ", "Proportion Zeros ")
+  
+  #if group_DF attr is present
+  if(!is.null(get_group_DF(omicsData))){
+    group_vec<- get_group_DF(omicsData)$Group
+    levels<- unique(get_group_DF(omicsData)$Group)
+    counts <- vector(mode="numeric", length=length(levels))
+    
+    for(i in 1:length(levels)){
+      counts[i]<- length(which(group_vec == levels[i]))
+    }
+    res2<- as.list(counts)
+    names(res2)<- levels
+    newres2 <- lapply(res2, function(x) ifelse(is.null(x), "NA", as.character(x)))
+    
+    newres2<- c(newres, newres2)
+    catmat2 <- data.frame(unlist(newres2, use.names = FALSE))
+    colnames(catmat2) <- NULL
+    rownames(catmat2) <- c("Class", fdata_name, edata_name, emeta_name, 
+                           "Observed Zero-Counts ", "Proportion Zeros ", 
+                           paste("Samples per group:", levels, sep = " "))
+    
+    catmat<- catmat2
+  }
+  
+  return(catmat)
+}
+
 
 # A Neat little function that summarizes an omicsData object. This function adds
 # covariate and pair counts to the original summary function.
@@ -200,60 +259,6 @@ summarizer <- function (omicsData) {
 
   return (catmat)
 
-}
-
-#'@export
-#'@rdname summary-omicsData
-#'@name summary-omicsData
-summary.seqData <- function(omicsData) {
-  
-  # get values #
-  res <- list(class = class(omicsData), num_samps = attr(omicsData, "data_info")$num_samps,
-              num_edata = attr(omicsData, "data_info")$num_edata,
-              num_emeta = attr(omicsData, "meta_info")$num_emeta,
-              num_zero_obs = attr(omicsData, "data_info")$num_zero_obs,
-              prop_zeros = round(attr(omicsData, "data_info")$prop_zeros, 3))
-  
-  # construct output #
-  newres <- lapply(res, function(x) ifelse(is.null(x), "NA", as.character(x)))
-  catmat <- data.frame(unlist(newres, use.names = FALSE))
-  
-  # assemble text strings #
-  edata_name <- paste("Unique ", attributes(omicsData)$cnames$edata_cname, "s (e_data)", sep="")
-  fdata_name <- paste("Unique ", attributes(omicsData)$cnames$fdata_cname, "s (f_data)", sep="")
-  if(!is.null(attributes(omicsData)$cnames$emeta_cname)){
-    emeta_name <- paste("Unique ", attributes(omicsData)$cnames$emeta_cname, "s (e_meta)", sep="")
-  }else{
-    emeta_name <- "Rows (e_meta) "
-  }
-  
-  colnames(catmat) <- NULL
-  rownames(catmat) <- c("Class", fdata_name, edata_name, emeta_name, "Observed Zero-Counts ", "Proportion Zeros ")
-  
-  #if group_DF attr is present
-  if(!is.null(get_group_DF(omicsData))){
-    group_vec<- get_group_DF(omicsData)$Group
-    levels<- unique(get_group_DF(omicsData)$Group)
-    counts <- vector(mode="numeric", length=length(levels))
-    
-    for(i in 1:length(levels)){
-      counts[i]<- length(which(group_vec == levels[i]))
-    }
-    res2<- as.list(counts)
-    names(res2)<- levels
-    newres2 <- lapply(res2, function(x) ifelse(is.null(x), "NA", as.character(x)))
-    
-    newres2<- c(newres, newres2)
-    catmat2 <- data.frame(unlist(newres2, use.names = FALSE))
-    colnames(catmat2) <- NULL
-    rownames(catmat2) <- c("Class", fdata_name, edata_name, emeta_name, 
-                           "Observed Zero-Counts ", "Proportion Zeros ", 
-                           paste("Samples per group:", levels, sep = " "))
-    
-    catmat<- catmat2
-  }
-  
-  return(catmat)
 }
 
 

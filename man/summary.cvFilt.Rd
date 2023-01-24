@@ -2,20 +2,35 @@
 % Please edit documentation in R/filter_summary.R
 \name{summary.cvFilt}
 \alias{summary.cvFilt}
-\title{Produce a basic summary of a cv_filter object}
+\title{Coefficient of Variation (CV) Filter Summary}
 \usage{
 \method{summary}{cvFilt}(filter_object, cv_threshold = NULL)
 }
 \arguments{
-\item{filter_object}{S3 object of class 'cvFilt' created by \code{\link{cv_filter}}.}
+\item{filter_object}{S3 object of class 'cvFilt' created by
+\code{\link{cv_filter}}.}
 
-\item{cv_threshold}{numeric value greater than 1 and less than the value given by filter_object$CV.  CV values above cv_threshold are filtered out. Default value is NULL.}
+\item{cv_threshold}{numeric value greater than 1 and less than the value
+given by filter_object$CV. CV values above cv_threshold are filtered out.
+Default value is NULL.}
 }
 \value{
-a summary of the CV values, number of NA values, and non-NA values. If a CV threshold is provided the biomolecules that would be filtered, at this threshold, are reported.
+a summary of the CV values, number of NA values, and non-NA values.
+  If a CV threshold is provided, the biomolecules that would be filtered
+  based on this threshold are reported.
 }
 \description{
-This function will provide basic summary statistics for the cv_filter object.
+Provide summary of a cvFilt S3 object
+}
+\examples{
+library(pmartRdata)
+mypep <- group_designation(omicsData = pep_object, main_effects = "Phenotype")
+to_filter <- cv_filter(omicsData = mypep, use_groups = TRUE)
+summary(filter_object = to_filter, cv_threshold = 30)
+
+}
+\seealso{
+\code{\link{cv_filter}}
 }
 \author{
 Lisa Bramer

@@ -2,7 +2,8 @@
 % Please edit documentation in R/as.trelliData.R
 \name{as.trelliData.edata}
 \alias{as.trelliData.edata}
-\title{Generate an object from edata to pass to trelliscope building functions}
+\title{Generate an object from edata to pass to trelliscope building
+  functions}
 \usage{
 as.trelliData.edata(
   e_data,
@@ -20,52 +21,51 @@ as.trelliData.edata(
 \item{e_data}{a \eqn{p * (n + 1)} data.frame of expression data, where
 \eqn{p} is the number of biomolecules observed and \eqn{n} is the number of
 samples (an additional biomolecule identifier/name column should also be
-present anywhere in the data.frame). Each row corresponds to data for each
-biomolecule. One column specifying a unique identifier for each biomolecule (row)
-must be present. We do not recommend passing data that requires reference 
-normalization (isobaric, nmr, etc.)}
+present anywhere in the data.frame). Each row corresponds to data for one
+biomolecule. One column specifying a unique identifier for each biomolecule
+(row) must be present. We do not recommend passing data that requires
+reference normalization (isobaric, nmr, etc.)}
 
 \item{edata_cname}{character string specifying the name of the column
-containing the biomolecule identifiers. It should be the only non-numeric colummn
-in edata.}
+containing the biomolecule identifiers. It should be the only non-numeric
+colummn in edata.}
 
-\item{omics_type}{A string of the data type. Acceptable options are "pepData",
-"isobaricpepData", "proData", "metabData", "lipidData", or "nmrData".}
+\item{omics_type}{A string specifying the data type. Acceptable options are
+"pepData", "isobaricpepData", "proData", "metabData", "lipidData", or
+"nmrData".}
 
 \item{data_scale_original}{A character string indicating original scale 
 of the data. Valid values are: 'log2', 'log', 'log10', or 'abundance'.
 Default is abundance.}
 
-\item{data_scale}{A character string indicating the scale to transform 
-the data to. Valid values are: 'log2', 'log', 'log10', or 'abundance'. If 
-the value is the same as data_scale_original, then transformation is not applied. 
-Default is log2.}
+\item{data_scale}{A character string indicating the scale to transform the
+data to. Valid values are: 'log2', 'log', 'log10', or 'abundance'. If the
+value is the same as data_scale_original, then transformation is not
+applied. Default is log2.}
 
-\item{normalization_fun}{A character string indicating the pmartR normalization
-function to use on the data, if is_normalized is FALSE. Acceptable choices are 
-'global', 'loess', and 'quantile'.}
+\item{normalization_fun}{A character string indicating the pmartR
+normalization function to use on the data, if is_normalized is FALSE.
+Acceptable choices are 'global', 'loess', and 'quantile'.}
 
-\item{normalization_params}{A vector or list where the normalization parameters
-are the names, and the parameter values are the list values. For example, an 
-acceptable entry for 'normalize_global' would be list("subset_fn" = "all", "norm_fn" = "median", 
-"apply_norm" = TRUE, "backtransform" = TRUE).}
+\item{normalization_params}{A vector or list where the normalization
+parameters are the names, and the parameter values are the list values. For
+example, an acceptable entry for 'normalize_global' would be
+list("subset_fn" = "all", "norm_fn" = "median", "apply_norm" = TRUE,
+"backtransform" = TRUE).}
 }
 \description{
-The only acceptable input file type is a single edata file. Transformation
-   and normalization must be specified. Isobaric protein or NMR data does not
-   need to be normalized.
+The only acceptable input file type is a single edata file.
+  Transformation and normalization must be specified. Isobaric protein or NMR
+  data does not need to be normalized.
 }
 \examples{
-\dontrun{
 library(pmartRdata)
-data("lipid_edata_pos")
 
 # Simple example 
-trelliData <- as.trelliData.edata(e_data = lipid_edata_pos,
-                                  edata_cname = "LipidCommonName",
+trelliData <- as.trelliData.edata(e_data = lipid_pos_edata,
+                                  edata_cname = "Lipid",
                                   omics_type = "lipidData")
                                   
-}   
           
 }
 \author{

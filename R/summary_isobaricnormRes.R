@@ -1,23 +1,21 @@
-#' Summarizes an object of class isobaricnormRes
+#' Summary for isobaricnormRes Object
 #' 
-#' For creating a summary of an S3 object of type 'isobaricnormRes':
+#' For creating a summary of an S3 object of type 'isobaricnormRes'
 #' 
-#' @param isobaricnormRes_object an object of type isobaricnormRes, created by \code{\link{normalize_isobaric}}  
+#' @param isobaricnormRes_object object of type isobaricnormRes, created by
+#'   \code{\link{normalize_isobaric}}
 #'
-#' @return data.frame object
-#' 
+#' @return data frame object
 #' 
 #' @examples
-#' \dontrun{
 #' library(pmartRdata)
-#' data(isobaric_object)
-#' 
-#' isobaric_object = edata_transform(isobaric_object, "log2")
-#' result = normalize_isobaric(isobaric_object, exp_cname = "Set", apply_norm = FALSE, channel_cname = "iTRAQ.Channel", refpool_channel = "116")
-#' 
-#' summary(result)
-#' }
-#' 
+#' myiso <- edata_transform(omicsData = isobaric_object, data_scale = "log2")
+#' myiso_norm <- normalize_isobaric(omicsData = myiso, exp_cname = "Plex",
+#'                                    apply_norm = FALSE,
+#'                                    refpool_cname = "Virus",
+#'                                    refpool_notation = "Pool")
+#' mysummary <- summary(myiso_norm)
+#'
 #' @export
 #' @rdname summary-isobaricnormRes
 #' @name summary-pmartR

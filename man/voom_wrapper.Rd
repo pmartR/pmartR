@@ -13,44 +13,36 @@ voom_wrapper(
 )
 }
 \arguments{
-\item{omicsData}{an object of type 'seqData', created by \code{\link{as.seqData}}}
+\item{omicsData}{an object of type 'seqData', created by
+\code{\link{as.seqData}}}
 
-\item{p_adjust}{Character string for p-value correction method, refer to ?p.adjust() for valid options}
+\item{p_adjust}{Character string for p-value correction method, refer to
+?p.adjust() for valid options}
 
 \item{comparisons}{`data.frame` with columns for "Control" and "Test"
 containing the different comparisons of interest. Comparisons will be made
 between the Test and the corresponding Control  If left NULL, then all
 pairwise comparisons are executed.}
 
-\item{p_cutoff}{Numeric value between 0 and 1 for setting p-value significance threshold}
+\item{p_cutoff}{Numeric value between 0 and 1 for setting p-value
+significance threshold}
 
-\item{...}{additional arguments passed to methods functions. Note, formatting 
+\item{...}{additional arguments passed to methods functions. Note, formatting
 option changes will interfere with wrapping functionality.}
 
-\item{method}{a character string of length one specifying which wrapper to use. 
-Can be 'edgeR', 'DESeq2', or 'limma-voom'}
+\item{method}{a character string of length one specifying which wrapper to
+use. Can be 'edgeR', 'DESeq2', or 'limma-voom'}
 }
 \value{
-data.frame object
+statRes object
 }
 \description{
 For generating statistics for 'seqData' objects
 }
 \details{
-Runs default limma-voom workflow using empirical Bayes moderated t-statistics.
-Additional arguments can be passed for use in the function, 
-refer to calcNormFactors() in edgeR package.
-}
-\examples{
-\dontrun{
-
-library(pmartRdata)
-myseqData <- rnaseq_object
-myseqData <- group_designation(omicsData = myseqData, main_effects = "Virus")
-statsresults <- pmartR:::edgeR_wrapper(omicsData = myseqData)
-
-}
-
+Runs default limma-voom workflow using empirical Bayes moderated
+  t-statistics. Additional arguments can be passed for use in the function,
+  refer to calcNormFactors() in edgeR package.
 }
 \references{
 Ritchie, M.E., Phipson, B., Wu, D., Hu, Y., Law, C.W., Shi, W., and Smyth, 

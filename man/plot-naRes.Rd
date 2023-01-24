@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_fns.R
 \name{plot.naRes}
 \alias{plot.naRes}
-\title{Plots an object of class naRes}
+\title{Plot naRes Object}
 \usage{
 \method{plot}{naRes}(
   naRes_obj,
@@ -35,68 +35,62 @@
 )
 }
 \arguments{
-\item{naRes_obj}{A list of two data frames, one contains NA values by sample,
-the second contains NA values by molecule}
+\item{naRes_obj}{list of two data frames, one containing the number of
+missing values by sample, and the other containing missing values by
+molecule}
 
-\item{omicsData}{an object of class 'pepData', 'proData', 'metabData',
-'lipidData', or 'nmrData', created by \code{\link{as.pepData}},
+\item{omicsData}{object of class 'pepData', 'proData', 'metabData',
+'lipidData', nmrData', or 'seqData', created by \code{\link{as.pepData}},
 \code{\link{as.proData}}, \code{\link{as.metabData}},
-\code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, respectively.}
+\code{\link{as.lipidData}}, \code{\link{as.nmrData}}, or \code{\link{as.seqData}}, respectively.}
 
-\item{plot_type}{A character string specifying which type of plot to produce.
+\item{plot_type}{character string specifying which type of plot to produce.
 The two options are 'bar' or 'scatter'.}
 
-\item{order_by}{A character string specifying a main effect by which to order
-the bar plot. This main effect must be found in the column names of f_data
-in the omicsData object. If \code{order_by} is "Group", the bar plot
-will be ordered by the group variable from the group_designation function.
-If NULL (default), the bar plot will be displayed in the order they appear
-in the data.}
+\item{order_by}{A character string specifying a column in f_data by which to
+order the samples.}
 
-\item{color_by}{A character string specifying a main effect by which to color
-the bar plot. This main effect must be found in the column names of f_data
-in the omicsData object. If \code{color_by} is "Group", the bar plot
-will be colored by the group variable from the group_designation function.
-If NULL (default), the bar plot will have one default color.}
+\item{color_by}{A character string specifying a column in f_data by which to
+color the bars or the points depending on the \code{plot_type}.}
 
-\item{interactive}{Logical. If TRUE produces an interactive plot.}
+\item{interactive}{logical value. If TRUE produces an interactive plot.}
 
-\item{x_lab_bar}{A character string used for the x-axis label for the bar
-plot.}
+\item{x_lab_bar}{character string used for the x-axis label for the bar
+plot}
 
-\item{x_lab_scatter}{A character string used for the x-axis label for the
-scatter plot.}
+\item{x_lab_scatter}{character string used for the x-axis label for the
+scatter plot}
 
-\item{y_lab_bar}{A character string used for the y-axis label for the bar
-plot.}
+\item{y_lab_bar}{character string used for the y-axis label for the bar
+plot}
 
-\item{y_lab_scatter}{A character string used for the y-axis label for the
-scatter plot.}
+\item{y_lab_scatter}{character string used for the y-axis label for the
+scatter plot}
 
-\item{x_lab_size}{An integer value indicating the font size for the x-axis.
+\item{x_lab_size}{integer value indicating the font size for the x-axis.
 The default is 11.}
 
-\item{y_lab_size}{An integer value indicating the font size for the y-axis.
+\item{y_lab_size}{integer value indicating the font size for the y-axis.
 The default is 11.}
 
-\item{x_lab_angle}{An integer value indicating the angle of x-axis labels.}
+\item{x_lab_angle}{integer value indicating the angle of x-axis labels.}
 
-\item{title_lab_bar}{A character string used for the plot title when
+\item{title_lab_bar}{character string used for the plot title when
 \code{plot_type} is 'bar'.}
 
-\item{title_lab_scatter}{A character string used for the plot title when
+\item{title_lab_scatter}{character string used for the plot title when
 \code{plot_type} is 'scatter'.}
 
-\item{title_lab_size}{An integer value indicating the font size of the plot
+\item{title_lab_size}{integer value indicating the font size of the plot
 title. The default is 14.}
 
-\item{legend_lab_bar}{A character string specifying the legend title when
+\item{legend_lab_bar}{character string specifying the legend title when
 creating a bar plot.}
 
-\item{legend_lab_scatter}{A character string specifying the legend title when
+\item{legend_lab_scatter}{character string specifying the legend title when
 creating a scatter plot.}
 
-\item{legend_position}{A character string specifying the position of the
+\item{legend_position}{character string specifying the position of the
 legend. Can be one of "right", "left", "top", or "bottom". The default is
 "right".}
 
@@ -109,23 +103,24 @@ missing values by sample) within the bar plot. The default is 3.}
 \item{bar_width}{An integer indicating the width of the bars in the bar plot.
 The default is 0.8.}
 
-\item{bw_theme}{Logical. If TRUE uses the ggplot2 black and white theme.}
+\item{bw_theme}{logical value. If TRUE uses the ggplot2 black and white theme.}
 
-\item{palette}{A character string indicating the name of the RColorBrewer
+\item{palette}{character string indicating the name of the RColorBrewer
 palette to use. For a list of available options see the details section in
 \code{\link[RColorBrewer]{RColorBrewer}}.}
 
-\item{display_count}{Logical. Indicates whether the missing value counts by
-sample will be displayed on the bar plot. The default is TRUE.}
+\item{display_count}{logical value. Indicates whether the missing value
+counts by sample will be displayed on the bar plot. The default is TRUE.}
 
-\item{coordinate_flip}{Logical. Indicates whether the x and y axes will be
-flipped. The default is FALSE.}
+\item{coordinate_flip}{logical value. Indicates whether the x and y axes will
+be flipped. The default is FALSE.}
 
-\item{use_VizSampNames}{Logical. Indicates whether to use custom sample
+\item{use_VizSampNames}{logical value. Indicates whether to use custom sample
 names. The default is FALSE.}
 }
 \value{
-plots ggplot2 object
+ggplot2 plot object if interactive is FALSE, or plotly plot object if
+  interactive is TRUE
 }
 \description{
 For plotting an S3 object of type 'naRes'
@@ -140,14 +135,13 @@ This function takes in an object of class naRes and creates either a
   be colored by group.
 }
 \examples{
-\dontrun{
 library(pmartRdata)
+mylipid <- group_designation(omicsData = lipid_neg_object, main_effects = "Virus")
+result <- missingval_result(omicsData = mylipid)
+plot(naRes_obj = result, omicsData = mylipid, plot_type = "bar", x_lab_angle = 50, order_by = "Virus", color_by = "Virus")
+plot(naRes_obj = result, omicsData = mylipid, plot_type = "scatter", x_lab_angle = 50, color_by = "Virus")
 
-data("lipid_object")
-
-result<- missingval_result(lipid_object)
-
-plot(result, plog_type = "bar", x_lab_angle = 50)
-}
+result <- missingval_result(omicsData = rnaseq_object)
+plot(naRes_obj = result, omicsData = rnaseq_object, plot_type = "bar")
 
 }

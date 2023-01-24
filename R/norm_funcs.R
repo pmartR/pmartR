@@ -1,17 +1,35 @@
 #' Median Center Transformation
 #'
-#' Normalizes the data via median centering with median of the feature subset specified for normalization
+#' Calculate normalization parameters for the data via median centering. 
 #'
-#' @param e_data a \eqn{p \times n + 1} data.frame, where \eqn{p} is the number of peptides, lipids, or metabolites and \eqn{n} is the number of samples. Each row corresponds to data for a peptide, protein, lipid, or metabolite, with a column giving the identifer name.
-#' @param edata_id character string indicating the name of the peptide, protein, lipid, or metabolite identifier. Usually obtained by calling \code{attr(omicsData, "cnames")$edata_cname}.
-#' @param subset_fn character string indicating the subset function to use for normalization.
-#' @param feature_subset character vector containing the feature names in the subset to be used for normalization
-#' @param backtransform logical argument. If TRUE, the data will be back transformed after normalization so that the values are on a scale similar to their raw values. See details for more information. Defaults to FALSE.
-#' @param apply_norm logical argument. If TRUE, the normalization will be applied to the data. Defaults to FALSE.
+#' @param e_data a \eqn{p \times n + 1} data.frame, where \eqn{p} is the number
+#'   of peptides, lipids, or metabolites and \eqn{n} is the number of samples.
+#'   Each row corresponds to data for a peptide, protein, lipid, or metabolite,
+#'   with one column giving the biomolecule identifier name.
+#' @param edata_id character string indicating the name of the peptide, protein,
+#'   lipid, or metabolite identifier. Usually obtained by calling
+#'   \code{attr(omicsData, "cnames")$edata_cname}.
+#' @param subset_fn character string indicating the subset function to use for
+#'   normalization.
+#' @param feature_subset character vector containing the feature names in the
+#'   subset to be used for normalization
+#' @param backtransform logical argument. If TRUE, the data will be back
+#'   transformed after normalization so that the values are on a scale similar
+#'   to their raw values. See details for more information. Defaults to FALSE.
+#' @param apply_norm logical argument. If TRUE, the normalization will be
+#'   applied to the data. Defaults to FALSE.
 #'
-#' @details The sample-wise median of the feature subset specified for normalization is subtracted from each feature in e_data to get the normalized data. The location estimates are the sample-wise medians of the subset data. There are no scale estimates for median centering, though the function returns a NULL list element as a placeholder for a scale estimate. If backtransform is TRUE, the global median of the subset data (across all samples) is added back to the normalized values. Medians are taken ignoring any NA values.
+#' @details The sample-wise median of the feature subset specified for
+#'   normalization is subtracted from each feature in e_data to get the
+#'   normalized data. The location estimates are the sample-wise medians of the
+#'   subset data. There are no scale estimates for median centering, though the
+#'   function returns a NULL list element as a placeholder for a scale estimate.
+#'   If backtransform is TRUE, the global median of the subset data (across all
+#'   samples) is added back to the normalized values. Medians are taken ignoring
+#'   any NA values.
 #'
-#' @return List containing two elements: \code{norm_params} is list with two elements:
+#' @return List containing two elements: \code{norm_params} is list with two
+#'   elements:
 #' \tabular{ll}{
 #' scale \tab NULL \cr
 #' \tab \cr
@@ -26,18 +44,11 @@
 #' location \tab numeric value giving global median across all samples
 #' \cr
 #' }
-#' If \code{backtransform} is set to TRUE then each list item under \code{backtransform_params} will be NULL.
+#' If \code{backtransform} is set to TRUE then each list item under
+#' \code{backtransform_params} will be NULL.
 #'
-#'If \code{apply_norm} is TRUE, the transformed data is returned as a third list item.
-#'
-#' @examples
-#' \dontrun{
-#' library(pmartRdata)
-#' data(lipid_object)
-#' lipid_object2 <- group_designation(omicsData = lipid_object, main_effects = "Condition")
-#' lipid_subset <- los(e_data = lipid_object2$e_data, edata_id = attr(lipid_object2, "cnames")$edata_cname, pmartR_groupDF = attr(lipid_object2, "group_DF"))
-#' lipids_median <- median_center(e_data = lipid_object2$e_data, edata_id = attr(lipid_object, "cnames")$edata_cname, feature_subset = lipid_subset, backtransform = TRUE)
-#' }
+#' If \code{apply_norm} is TRUE, the transformed data is returned as a third
+#' list item.
 #'
 #' @author Lisa Bramer, Kelly Stratton
 #'
@@ -167,19 +178,35 @@ median_center <- function (e_data,
 
 #' Mean Center Transformation
 #'
-#' Normalizes the data via mean centering with mean of the feature subset specified for normalization
+#' Calculate normalization parameters for the data via via mean centering. 
 #'
-#' @param e_data e_data a \eqn{p \times n + 1} data.frame, where \eqn{p} is the number of peptides, lipids, or metabolites and \eqn{n} is the number of samples. Each row corresponds to data for a peptide, protein, lipid, or metabolite, with a column giving the identifer name.
-#' @param edata_id character string indicating the name of the peptide, protein, lipid, or metabolite identifier. Usually obtained by calling \code{attr(omicsData, "cnames")$edata_cname}.
-#' @param subset_fn character string indicating the subset function to use for normalization.
-#' @param feature_subset character vector containing the feature names in the subset to be used for normalization
-#' @param backtransform logical argument. If TRUE, the data will be back transformed after normalization so that the values are on a scale similar to their raw values. See details for more information. Defaults to FALSE.
-#' @param apply_norm logical argument. If TRUE, the normalization will be applied to the data. Defaults to FALSE.
-#' @details The sample-wise mean of the feature subset specified for normalization is subtracted from each feature in e_data to get the normalized data. The location estimates are the sample-wise means of the subset data.
-#' There are no scale estimates for mean centering, though the function returns a NULL list element as a placeholdfer for a scale estimate.
-#' If backtransform is TRUE, the global median of the subset data (across all samples) is added back to the normalized values. Medians are taken ignoring any NA values.
+#' @param e_data e_data a \eqn{p \times n + 1} data.frame, where \eqn{p} is the
+#'   number of peptides, lipids, or metabolites and \eqn{n} is the number of
+#'   samples. Each row corresponds to data for a peptide, protein, lipid, or
+#'   metabolite, with one column giving the biomolecule identifier name.
+#' @param edata_id character string indicating the name of the peptide, protein,
+#'   lipid, or metabolite identifier. Usually obtained by calling
+#'   \code{attr(omicsData, "cnames")$edata_cname}.
+#' @param subset_fn character string indicating the subset function to use for
+#'   normalization.
+#' @param feature_subset character vector containing the feature names in the
+#'   subset to be used for normalization
+#' @param backtransform logical argument. If TRUE, the data will be back
+#'   transformed after normalization so that the values are on a scale similar
+#'   to their raw values. See details for more information. Defaults to FALSE.
+#' @param apply_norm logical argument. If TRUE, the normalization will be
+#'   applied to the data. Defaults to FALSE.
+#' @details The sample-wise mean of the feature subset specified for
+#'   normalization is subtracted from each feature in e_data to get the
+#'   normalized data. The location estimates are the sample-wise means of the
+#'   subset data. There are no scale estimates for mean centering, though the
+#'   function returns a NULL list element as a placeholdfer for a scale
+#'   estimate. If backtransform is TRUE, the global median of the subset data
+#'   (across all samples) is added back to the normalized values. Medians are
+#'   taken ignoring any NA values.
 #'
-#' @return List containing two elements: \code{norm_params} is list with two elements:
+#' @return List containing two elements: \code{norm_params} is list with two
+#'   elements:
 #' \tabular{ll}{
 #' scale \tab NULL \cr
 #' \tab \cr
@@ -194,9 +221,11 @@ median_center <- function (e_data,
 #' location \tab numeric value giving global median across all samples
 #' \cr
 #' }
-#' If \code{backtransform} is set to TRUE then each list item under \code{backtransform_params} will be NULL.
+#' If \code{backtransform} is set to TRUE then each list item under
+#' \code{backtransform_params} will be NULL.
 #'
-#' If \code{apply_norm} is TRUE, the transformed data is returned as a third list item.
+#' If \code{apply_norm} is TRUE, the transformed data is returned as a third
+#' list item.
 #'
 #' @author Lisa Bramer, Kelly Stratton
 #'
@@ -324,19 +353,38 @@ mean_center <- function (e_data,
 
 #' Z-Score Transformation
 #'
-#' Normalizes the data via z-score transformation using the feature subset specified for normalization
+#' Calculate normalization parameters for the data via via z-score
+#' transformation.
 #'
-#' @param e_data a \eqn{p \times n + 1} data.frame, where \eqn{p} is the number of peptides, lipids, or metabolites and \eqn{n} is the number of samples. Each row corresponds to data for a peptide, protein, lipid, or metabolite, with a column giving the identifer name.
-#' @param edata_id character string indicating the name of the peptide, protein, lipid, or metabolite identifier. Usually obtained by calling \code{attr(omicsData, "cnames")$edata_cname}.
-#' @param subset_fn character string indicating the subset function to use for normalization.
-#' @param feature_subset character vector containing the feature names in the subset to be used for normalization
-#' @param backtransform logical argument. If TRUE, the data will be back transformed after normalization so that the values are on a scale similar to their raw values. See details for more information. Defaults to FALSE.
-#' @param apply_norm logical argument. If TRUE, the normalization will be applied to the data. Defaults to FALSE.
+#' @param e_data a \eqn{p \times n + 1} data.frame, where \eqn{p} is the number
+#'   of peptides, lipids, or metabolites and \eqn{n} is the number of samples.
+#'   Each row corresponds to data for a peptide, protein, lipid, or metabolite,
+#'   with one column giving the biomolecule identifier name.
+#' @param edata_id character string indicating the name of the peptide, protein,
+#'   lipid, or metabolite identifier. Usually obtained by calling
+#'   \code{attr(omicsData, "cnames")$edata_cname}.
+#' @param subset_fn character string indicating the subset function to use for
+#'   normalization
+#' @param feature_subset character vector containing the feature names in the
+#'   subset to be used for normalization
+#' @param backtransform logical argument. If TRUE, the data will be back
+#'   transformed after normalization so that the values are on a scale similar
+#'   to their raw values. See details for more information. Defaults to FALSE.
+#' @param apply_norm logical argument. If TRUE, the normalization will be
+#'   applied to the data. Defaults to FALSE.
+#'   
+#' @details Each feature is scaled by subtracting the mean of the feature subset
+#'   specified for normalization and then dividing the result by the standard
+#'   deviation (SD) of the feature subset specified for normalization to get the
+#'   normalized data. The location estimates are the subset means for each
+#'   sample. The scale estimates are the subset SDs for each sample. If
+#'   backtransform is TRUE, the normalized feature values are multiplied by a
+#'   pooled standard deviation (estimated across all samples) and a global mean
+#'   of the subset data (across all samples) is added back to the normalized
+#'   values. Means are taken ignoring any NA values.
 #'
-#' @details Each feature is scaled by subtracting the mean of the feature subset specified for normalization and then dividing the result by the standard deviation (SD) of the feature subset specified for normalization to get the normalized data.
-#' The location estimates are the subset means for each sample. The scale estimates are the subset SDs for each sample. If backtransform is TRUE, the normalized feature values are multiplied by a pooled standard deviation (estimated across all samples) and a global mean of the subset data (across all samples) is added back to the normalized values. Means are taken ignoring any NA values.
-#'
-#' @return List containing two elements: \code{norm_params} is list with two elements:
+#' @return List containing two elements: \code{norm_params} is list with two
+#'   elements:
 #' \tabular{ll}{
 #' scale \tab numeric vector of length \code{n} standard deviations for each sample \cr
 #' \tab \cr
@@ -351,16 +399,11 @@ mean_center <- function (e_data,
 #' location \tab numeric value giving global mean across all samples
 #' \cr
 #' }
-#' If \code{backtransform} is set to TRUE then each list item under \code{backtransform_params} will be NULL.
+#' If \code{backtransform} is set to TRUE then each list item under
+#' \code{backtransform_params} will be NULL.
 #'
-#' If \code{apply_norm} is TRUE, the transformed data is returned as a third list item.
-#' @examples
-#' \dontrun{
-#' library(pmartRdata)
-#' data(pep_edata)
-#' peps_subset <- pep_edata$Mass_Tag_ID
-#' peps_zscore <- zscore_transform(e_data = pep_edata, edata_id = "Mass_Tag_ID", feature_subset = peps_subset)
-#' }
+#' If \code{apply_norm} is TRUE, the transformed data is returned as a third
+#' list item.
 #'
 #' @author Lisa Bramer, Kelly Stratton, Bryan Stanfill
 #'
@@ -513,18 +556,39 @@ zscore_transform <- function (e_data,
 
 #' Median Absolute Deviation Transformation
 #'
-#' Calculate normalization parameters for the data via median absolute deviation (MAD) transformation based on the feature subset specified for normalization
+#' Calculate normalization parameters for the data via median absolute deviation
+#' (MAD) transformation.
 #'
-#' @param e_data a \eqn{p \times n + 1} data.frame, where \eqn{p} is the number of peptides, lipids, or metabolites and \eqn{n} is the number of samples. Each row corresponds to data for a peptide, lipid, or metabolite, with a column giving the identifer name.
-#' @param edata_id character string indicating the name of the peptide, protein, lipid, or metabolite identifier. Usually obtained by calling \code{attr(omicsData, "cnames")$edata_cname}.
-#' @param subset_fn character string indicating the subset function to use for normalization.
-#' @param feature_subset character vector containing the feature names in the subset to be used for normalization
-#' @param backtransform logical argument. If TRUE, the parameters for backtransforming the data after normalization will be calculated so that the values are on a scale similar to their raw values. See details for more information. Defaults to FALSE.
-#' @param apply_norm logical argument. If TRUE, the normalization will be applied to the data. Defaults to FALSE.
+#' @param e_data a \eqn{p \times n + 1} data.frame, where \eqn{p} is the number
+#'   of peptides, lipids, or metabolites and \eqn{n} is the number of samples.
+#'   Each row corresponds to data for a peptide, lipid, or metabolite, with one
+#'   column giving the biomolecule identifier name.
+#' @param edata_id character string indicating the name of the peptide, protein,
+#'   lipid, or metabolite identifier. Usually obtained by calling
+#'   \code{attr(omicsData, "cnames")$edata_cname}.
+#' @param subset_fn character string indicating the subset function to use for
+#'   normalization.
+#' @param feature_subset character vector containing the feature names in the
+#'   subset to be used for normalization
+#' @param backtransform logical argument. If TRUE, the parameters for
+#'   backtransforming the data after normalization will be calculated so that
+#'   the values are on a scale similar to their raw values. See details for more
+#'   information. Defaults to FALSE.
+#' @param apply_norm logical argument. If TRUE, the normalization will be
+#'   applied to the data. Defaults to FALSE.
+#'   
+#' @details Each feature is scaled by subtracting the median of the feature
+#'   subset specified for normalization and then dividing the result by the
+#'   median absolute deviation (MAD) of the feature subset specified for
+#'   normalization to get the normalized data. The location estimates are the
+#'   subset medians for each sample. The scale estimates are the subset MADs for
+#'   each sample. Medians are taken ignoring any NA values. If backtransform is
+#'   TRUE, the normalized feature values are multiplied by a pooled MAD
+#'   (estimated from all samples) and a global median of the subset data (across
+#'   all samples) is added back to the normalized values.
 #'
-#' @details Each feature is scaled by subtracting the median of the feature subset specified for normalization and then dividing the result by the median absolute deviation (MAD) of the feature subset specified for normalization to get the normalized data. The location estimates are the subset medians for each sample. The scale estimates are the subset MADs for each sample. Medians are taken ignoring any NA values. If backtransform is TRUE, the normalized feature values are multiplied by a pooled MAD (estimated from all samples) and a global median of the subset data (across all samples) is added back to the normalized values.
-#'
-#' @return List containing two elements: \code{norm_params} is list with two elements:
+#' @return List containing two elements: \code{norm_params} is list with two
+#'   elements:
 #' \tabular{ll}{
 #' scale \tab numeric vector of length \code{n} median absolute deviations (MAD) for each sample \cr
 #' \tab \cr
@@ -539,18 +603,12 @@ zscore_transform <- function (e_data,
 #' location \tab numeric value giving global median across all samples
 #' \cr
 #' }
-#' If \code{backtransform} is set to TRUE then each list item under \code{backtransform_params} will be NULL.
+#' If \code{backtransform} is set to TRUE then each list item under
+#' \code{backtransform_params} will be NULL.
 #'
-#' If \code{apply_norm} is TRUE, the transformed data is returned as a third list item.
+#' If \code{apply_norm} is TRUE, the transformed data is returned as a third
+#' list item.
 #'
-#' @examples
-#' \dontrun{
-#' library(pmartRdata)
-#' data(lipid_object)
-#' lipid_object2 <- group_designation(omicsData = lipid_object, main_effects = "Condition")
-#' lipid_subset <- los(e_data = lipid_object2$e_data, edata_id = attr(lipid_object2, "cnames")$edata_cname, pmartR_groupDF = attr(lipid_object2, "group_DF"))
-#' lipids_mad <- mad_transform(e_data = lipid_object2$e_data, edata_id = attr(lipid_object, "cnames")$edata_cname, feature_subset = lipid_subset, backtransform = TRUE)
-#'}
 #' @author Lisa Bramer, Kelly Stratton
 #'
 mad_transform <- function (e_data,

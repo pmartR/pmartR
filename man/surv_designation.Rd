@@ -14,23 +14,32 @@ surv_designation(
 )
 }
 \arguments{
-\item{omicsData}{an object of the class 'lipidData', 'metabData', 'pepData', or 'proData' usually created by \code{\link{as.lipidData}}, \code{\link{as.metabData}}, \code{\link{as.pepData}}, or \code{\link{as.proData}}, respectively.}
+\item{omicsData}{an object of the class 'lipidData', 'metabData', 'pepData',
+or 'proData' usually created by \code{\link{as.lipidData}},
+\code{\link{as.metabData}}, \code{\link{as.pepData}}, or
+\code{\link{as.proData}}, respectively.}
 
-\item{t_death}{the column in 'f_data' that corresonds to the subjects' time of death}
+\item{t_death}{the column in 'f_data' that corresponds to the subjects' time
+of death}
 
-\item{t_progress}{the column in 'f_data' that corresonds to the subjects' time of progression}
+\item{t_progress}{the column in 'f_data' that corresponds to the subjects'
+time of progression}
 
-\item{ind_death}{the column in 'f_data' that corresonds to the subjects' status, e.g. alive/dead}
+\item{ind_death}{the column in 'f_data' that corresponds to the subjects'
+status, e.g. alive/dead}
 
-\item{ind_progress}{the column in 'f_data' that corresonds to the subjects' progression status}
+\item{ind_progress}{the column in 'f_data' that corresponds to the subjects'
+progression status}
 
-\item{covariates}{the column(s) in 'f_data' that correspond to covariates to be included in the survivial analysis}
+\item{covariates}{the column(s) in 'f_data' that correspond to covariates to
+be included in the survivial analysis}
 }
 \value{
 omicsData is returned with the additional attribute
 }
 \description{
-This function will add the necessary information to omicsData such that survival analysis can be applied to it.
+This function will add the necessary information to omicsData such that
+survival analysis can be applied to it.
 }
 \author{
 Bryan Stanfill

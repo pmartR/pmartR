@@ -7,5 +7,5 @@
 \method{print}{normRes}(normRes)
 }
 \description{
-For printing an S3 object of type 'normRes':
+For printing an S3 object of type 'normRes'
 }

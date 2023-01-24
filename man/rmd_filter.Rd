@@ -2,31 +2,33 @@
 % Please edit documentation in R/filter_objects.R
 \name{rmd_filter}
 \alias{rmd_filter}
-\title{RMD Runs}
+\title{Robust Mahalanobis Distance (RMD) Filter Object}
 \usage{
 rmd_filter(omicsData, ignore_singleton_groups = TRUE, metrics = NULL)
 }
 \arguments{
 \item{omicsData}{an object of the class 'pepData', 'proData', 'metabData',
-'lipidData', or 'nmrData' usually created by \code{\link{as.pepData}},
+'lipidData', or 'nmrData' created by \code{\link{as.pepData}},
 \code{\link{as.proData}}, \code{\link{as.metabData}},
 \code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, respectively.}
 
 \item{ignore_singleton_groups}{logical indicator of whether to remove
-singleton groups or not; defaults to TRUE. If TRUE, rmd_filter results are
+singleton groups or not; defaults to TRUE. A singleton group is a group
+consisting of just a single sample. If TRUE, rmd_filter results are
 returned only for samples in groups of size greater than 1. This is used
 when calculating the correlation.}
 
-\item{metrics}{A character vector indicating which metrics should be used when
-calculating the robust Mahalanobis distance. This vector must contain
+\item{metrics}{A character vector indicating which metrics should be used
+when calculating the robust Mahalanobis distance. This vector must contain
 between two and five of the following options: "MAD" (Median Absolute
 Deviation), "Kurtosis", "Skewness", "Correlation", and
 "Proportion_Missing". The default is NULL. When NULL a combination of
 metrics will be chosen depending on the class of omicsData.}
 }
 \value{
-a data.frame containing columns for the Sample ID, log2 robust
- Mahalanobis distance, p-values, and robust Mahalanobis distance
+An S3 object of class 'rmdFilt' containing columns for the sample
+  identifier, log2 robust Mahalanobis distance, p-values, and robust
+  Mahalanobis distance
 }
 \description{
 The method computes a robust Mahalanobis distance that can be mapped to a
@@ -34,33 +36,25 @@ p-value and used to identify outlying samples
 }
 \details{
 The metrics on which the log2 robust Mahalanobis distance is based
- can be specified using the \code{metrics} argument. \tabular{ll}{ pepData
- \tab For pepData objects, all five of the metrics "MAD", "Kurtosis",
+ can be specified using the \code{metrics} argument. \tabular{ll}{ pepData, proData
+ \tab For pepData and proData objects, all five of the metrics "MAD", "Kurtosis",
  "Skewness", "Correlation", "Proportion_Missing" may be used (this is the
- default). \cr proData \tab For proData objects, all five of the metrics
- "MAD", "Kurtosis", "Skewness", "Correlation", "Proportion_Missing" may be
- used (this is the default). \cr metabData \tab For metabData objects, the
+ default). \cr metabData, lipidData, nmrData \tab The
  use of "Proportion_Missing" is discouraged due to the general lack of
- missing data in metabolomics datasets (the default behavior omits
- "Proportion_Missing" from the metrics). \cr lipidData \tab For lipidData
- objects, , the use of "Proportion_Missing" is discouraged due to the general
- lack of missing data in metabolomics datasets (the default behavior omits
+ missing data in these datasets (the default behavior omits
  "Proportion_Missing" from the metrics). \cr }
 }
 \examples{
-\dontrun{
 library(pmartRdata)
-data(metab_object)
-metab_object2 <- edata_transform(omicsData = metab_object, data_scale = "log2")
-metab_object3 <- group_designation(omicsData = metab_object2, main_effects = "Condition")
-rmd_results <- rmd_filter(omicsData = metab_object3, metrics=c("MAD", "Skewness", "Correlation"))
-rmd_results <- rmd_filter(omicsData = metab_object2)
+mymetab <- edata_transform(omicsData = metab_object, data_scale = "log2")
+mymetab <- group_designation(omicsData = mymetab, main_effects = "Phenotype")
+rmd_results <- rmd_filter(omicsData = mymetab, metrics=c("MAD", "Skewness", "Correlation"))
+rmd_results <- rmd_filter(omicsData = mymetab)
 
-data(pep_pepData)
-pep_pepData2 <- edata_transform(omicsData = pep_object, data_scale = "log2")
-pep_pepData3 <- group_designation(omicsData = pep_pepData2, main_effects = "Condition")
-rmd_results <- rmd_filter(omicsData = pep_pepData3)
-}
+mypep <- edata_transform(omicsData = pep_object, data_scale = "log2")
+mypep <- group_designation(omicsData = mypep, main_effects = "Phenotype")
+rmd_results <- rmd_filter(omicsData = mypep)
+
 
 }
 \references{

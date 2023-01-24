@@ -7,5 +7,5 @@
 \method{print}{moleculeFilt}(filter_object)
 }
 \description{
-For printing an S3 object of type 'moleculeFilt':
+For printing an S3 object of type 'moleculeFilt'
 }

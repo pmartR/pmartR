@@ -71,7 +71,7 @@ nonmissing_per_group <- function (omicsData) {
   # biomolecules would be filtered. NOTE: The explanation above is outdated
   # because Evan A Martin on 10/05/2021 changed how the nonmiss_totals data
   # frame is created and how the column names are updated. However, I am leaving
-  # the explanation for future generations of pmartR coding slaves in hopes it
+  # the explanation for future generations of pmartR coding elves in hopes it
   # will help them through this trying time in their lives.
 
   # Rename the columns according to the edata_cname in omicsData and the names

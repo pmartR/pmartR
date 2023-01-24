@@ -1,31 +1,32 @@
-#' Correlation matrix of biomolecule data
+#' Compute Correlation matrix of biomolecule data
 #'
 #' This function returns an object of class corRes (correlation Result)
 #'
-#' @param omicsData an object of the class 'pepData', 'proData', 'metabData',
-#'   'lipidData', or 'nmrData' created by \code{\link{as.pepData}},
-#'   \code{\link{as.proData}}, \code{\link{as.metabData}},
-#'   \code{\link{as.lipidData}}, \code{\link{as.nmrData}}, respectively.
+#' @param omicsData an object of the class 'lipidData', 'metabData', 'pepData',
+#'   'proData', 'nmrData', or 'seqData', created by
+#'   \code{\link{as.lipidData}}, \code{\link{as.metabData}},
+#'   \code{\link{as.pepData}}, \code{\link{as.proData}},
+#'   \code{\link{as.nmrData}}, or \code{\link{as.seqData}}, respectively.
 #'
-#' @details The correlation between samples is calculated based on
-#'   biomolecules that are observed in both samples. For seqData objects, 
-#'   Spearman correlation is used. For all other data types, Pearson 
-#'   correlation is used.  the \eqn{n \times n}
-#'   correlation matrix of normalized data. See \code{\link{cor}} for further
-#'   details.
+#' @details The pairwise correlations between samples are calculated based on
+#'   biomolecules that are observed in both samples. For seqData objects,
+#'   Spearman correlation is used. For all other data types, Pearson correlation
+#'   is used and data must be log transformed. See \code{\link{cor}} for further details.
 #'
-#' @return An \eqn{n \times n} matrix giving the correlation between samples.
+#' @return An \eqn{n \times n} matrix of class corRes giving the correlation
+#'   between samples.
 #'
 #' @examples
-#' \dontrun{
-#' library(pmartR)
+#' library(pmartRdata)
 #' 
-#' data(pep_object)
+#' mymetab <- edata_transform(omicsData = metab_object, data_scale = "log2")
+#' my_correlation <- cor_result(omicsData = mymetab)
 #' 
-#' my_correlation <- cor_result(omicsData = pep_object)
-#' }
+#' myseq_correlation <- cor_result(omicsData = rnaseq_object)
 #' 
 #' @author Kelly Stratton, Lisa Bramer
+#' 
+#' @seealso \code{\link{edata_transform}}
 #'
 #' @export
 #' 

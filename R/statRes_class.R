@@ -1,14 +1,18 @@
 #' Function to take raw output of `imd_anova` and create output for `statRes` object
 #'
-#' @param imd_anova_out A \code{ata.frame} containing the results of the \code{imd_anova} call.
-#' @param omicsData A pmartR data object of any class, which has a `group_df` attribute that is usually created by the `group_designation()` function
-#' @param comparisons The comparisons made.
-#' @param test_method The test method used ("anova", "gtest", or "combined").
-#' @param pval_adjust_a The p-value adjustment method for ANOVA.
-#' @param pval_adjust_g The p-value adjustment method for G-test.
-#' @param pval_thresh The p-value threshold value.
+#' @param imd_anova_out data frame containing the results of the
+#'   \code{imd_anova} call.
+#' @param omicsData pmartR data object of any class, which has a `group_df`
+#'   attribute that is usually created by the `group_designation()` function
+#' @param comparisons Tcomparisons made
+#' @param test_method test method used ("anova", "gtest", or "combined")
+#' @param pval_adjust_a character string indicating the p-value adjustment
+#'   method for ANOVA
+#' @param pval_adjust_g character string indicating the p-value adjustment
+#'   method for G-test
+#' @param pval_thresh numeric p-value threshold value
 #'
-#' @return the final object of class statRes
+#' @return object of class statRes
 #'
 statRes_output <- function (imd_anova_out,
                             omicsData,
@@ -86,9 +90,9 @@ statRes_output <- function (imd_anova_out,
 
 }
 
-#' statRes class.
+#' Summary of statRes Object
 #'
-#' Class for statistical results returned by fucntions in this package.
+#' Provide summary information about statRes objects
 #'
 #' @name statRes-class
 #' @seealso See \code{\link{imd_anova}}

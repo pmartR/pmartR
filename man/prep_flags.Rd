@@ -9,7 +9,7 @@ prep_flags(x, test)
 \arguments{
 \item{x}{A statRes object.}
 
-\item{test}{A character string indicating the type of test run.}
+\item{test}{character string indicating the type of test run.}
 }
 \description{
 Changes the flags columns from a statRes object into a format that the

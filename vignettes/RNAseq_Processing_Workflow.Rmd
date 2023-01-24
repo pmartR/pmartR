@@ -1,0 +1,282 @@
+---
+title: "RNAseq Data Processing"
+author: "Kelly Stratton, Rachel Richardson, Lisa Bramer"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    df_print: paged
+    rmarkdown::html_vignette:
+    fig_caption: yes
+    self_contained: yes
+    toc: true
+bibliography: bibliography.bib
+vignette: >
+  %\VignetteIndexEntry{pmartR-RNAseq-processing} 
+  %\VignetteEngine{knitr::rmarkdown} 
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(rmarkdown.html_vignette.check_title = FALSE)
+```
+
+```{r}
+library(pmartR)
+library(pmartRdata)
+```
+
+## Overview
+
+RNAseq data in `pmartR` follows a different workflow compared to the other data types, with different filtering, plotting, and statistical options. This vignette walks through the RNAseq workflow using example data from the `pmartRdata` package, including the use of all three statistical analysis options, DEseq2 [@deseq2], edgeR [@edger], or limmaVOOM [@limmavoom].
+
+
+## Data Set-up
+
+Data upload, create object
+
+```{r data0, include=FALSE}
+# load example e_data, f_data, e_meta for the RNAseq dataset
+edata <- rnaseq_edata
+fdata <- rnaseq_fdata
+emeta <- rnaseq_emeta
+```
+
+
+For these data, the column named "Transcript" denotes the transcript identifier in e_data.
+
+```{r}
+head(edata)
+```
+
+
+The f_data data frame contains the sample identifier, "SampleName", mapping to the column names in e_data other than "Transcript". The column for "Virus" takes on 1 of 3 values, and will be used as our main effect, since comparisons of interest in this experiment are between virus strains. Finally, f_data contains information about the Donor and Replicate, which describe the provenance of the samples and biological replicate information.
+
+```{r}
+head(fdata)
+```
+
+The e_meta data frame contains just 2 columns, "Transcript" and "Gene". The "Transcript" column contains the same transcripts found in e_data, and "Gene" provides the mapping of the transcripts to the gene level. 
+
+```{r}
+head(emeta)
+```
+
+Since these are RNAseq data, we will create a `seqData` object in `pmartR`. Note that unlike the other data types supported in `pmartR`, seqData objects are not log2 transformed.
+
+```{r}
+myseq <- as.seqData(e_data = rnaseq_edata,
+                        e_meta = rnaseq_emeta,
+                        f_data = rnaseq_fdata,
+                        edata_cname = "Transcript",
+                        fdata_cname = "SampleName",
+                        emeta_cname = "Transcript")
+```
+
+We can use the `summary` function to get basic summary information for our `isbaricseqData` object.
+
+```{r data2}
+summary(myseq)
+```
+
+
+
+Using the `plot` function on our seqData object provides box plots of log counts per million (lcpm) for each sample.
+
+```{r}
+plot(myseq, transformation = "lcpm")
+```
+
+
+## Workflow
+
+
+### Main Effects
+
+We are preparing this data for statistical analysis where we will compare the samples belonging to one group to the samples belonging to another, and so we must specify the group membership of the samples. We do this using the `group_designation()` function, which modifies our seqData object and returns an updated version of it. Up to two main effects and up to two covariates may be specified (VERIFY THIS IS TRUE), with one main effect being required at minimum. For these example data, we specify the main effect to be "Virus" so that we can make comparisons between the different strains. Certain functions we will use below require that groups have been designated via the `group_designation()` function, and doing so makes the results of `plot` and `summary` more meaningful.
+
+```{r format3}
+myseq <- group_designation(omicsData = myseq, main_effects = "Virus")
+summary(myseq)
+plot(myseq, order_by = "Virus", color_by = "Virus", transformation = "lcpm")
+```
+
+The `group_designation()` function creates an attribute of the dataset as follows:
+
+```{r format4}
+attributes(myseq)$group_DF
+```
+
+
+### Filter Biomolecules
+
+Transcripts can be removed from `seqData` objects using the molecule filter or the custom filter, if desired. See the "Filter Functionality" vignette for more information. 
+
+#### Total Count Filter
+
+The total count filter is specifically applicable to `seqData` objects, and is implemented in `pmartR` based
+on recommendations in edgeR processing [@edger], where the low-observed biomolecules are removed. Here we use the default recommendation in edgeR and require at least 10 total counts observed across samples. We plot the filter first without a `min_count` threshold, and then with our threshold of 10, so we can see how the application of the filter changes the observation density.
+
+```{r}
+mytotcountfilt <- total_count_filter(omicsData = myseq)
+summary(mytotcountfilt, min_count = 10)
+plot(mytotcountfilt)
+plot(mytotcountfilt, min_count = 10)
+```
+
+Once we are satified with the filter results, we apply the filter to the `seqData` object.
+
+```{r}
+myseq <- applyFilt(filter_object = mytotcountfilt, omicsData = myseq, min_count = 10)
+```
+
+
+### Filter Samples
+
+#### RNA Filter: Total Library Size Filter
+
+The RNA filter removes samples based on either:
+
+- library size (number of reads) 
+
+- number/proportion of unique non-zero biomolecules per sample
+
+This filter is particularly useful for identifying any samples that contain lower than expected numbers of reads.
+
+First we utilize this filter to identify any samples with fewer than one million reads, of which there are none.
+
+```{r}
+# create RNA filter object
+myrnafilt <- RNA_filter(omicsData = myseq)
+
+# filter by library size
+plot(myrnafilt, plot_type = "library")
+plot(myrnafilt, plot_type = "library", size_library = 1000000)
+
+```
+
+Next, we utilize the filter to identify any samples with fewer than 5,000 non-zero counts, of which there are none.
+
+```{r}
+# filter based on number or proportion of non-zero counts
+plot(myrnafilt, plot_type = "biomolecule", min_nonzero = 5000)
+```
+
+
+
+
+### Summarize Data
+
+After filtering out any transcripts and/or samples above, we may wish to do some exploratory data analysis.
+
+#### Correlation Heatmap
+
+A Spearman correlation heatmap shows a couple of samples with lower correlation than the rest, but neither of these are 
+
+- Strain B 3 D
+
+- Strain C 1 E
+
+```{r}
+mycor <- cor_result(omicsData = myseq)
+plot(mycor, interactive = TRUE)
+```
+
+
+#### Principal Components Analysis
+
+A principal components analysis (PCA) plot of our data shows clustering of strains A and C with one another, separated from strain B. The two samples that are separated on PC1 one from the rest are the same two samples that stood out in the correlation heatmap.
+
+```{r}
+mypca <- dim_reduction(omicsData = myseq, k=2)
+plot(mypca, interactive = TRUE)
+
+mypca_df <- data.frame(SampleID = mypca$SampleID, PC1 = mypca$PC1, PC2 = mypca$PC2)
+```
+
+
+## Normalization & Statistical Comparisons
+
+For RNAseq data there are three methods available via `pmartR` for making statistical comparisons:
+
+- edgeR [@edger]
+
+- DESeq2 [@deseq2]
+
+- limma-voom [@limmavoom]
+
+Here we utilize all three for demonstration purposes, but in practice a single method should be utilized, the selection of which can be guided by visual inspection of dispersion plots for each method via `dispersion_est`. After using the `diffexp_seq` function to perform statistical comparisons with the selected method, `plot` and `summary` methods are available to help display the results, and the data frame returned by the `diffexp_seq` function can be saved as an Excel file or another useful format if helpful.
+
+
+### edgeR Method
+
+We examine the dispersion plot for use of the edgeR method. 
+
+```{r}
+dispersion_est(omicsData = myseq, method = "edgeR")
+```
+
+
+If we are satisfied with using this method for our statistical comparisons between virus strains, we can do so as follows.
+
+```{r}
+stats_edger <- diffexp_seq(omicsData = myseq, method = "edgeR")
+```
+Various plot types are available to display the results of the statistical comparisons. 
+
+
+```{r warning=FALSE}
+plot(stats_edger, plot_type = "volcano")
+plot(stats_edger, plot_type = "bar")
+plot(stats_edger, plot_type = "ma") 
+```
+
+### DESeq2 Method
+
+We examine the dispersion plot for use of the DESeq2 method.
+
+```{r}
+dispersion_est(omicsData = myseq, method = "DESeq2")
+```
+
+If we are satisfied with using this method for our statistical comparisons between virus strains, we can do so as follows.
+
+```{r}
+stats_deseq <- diffexp_seq(omicsData = myseq, method = "DESeq2")
+```
+
+Various plot types are available to display the results of the statistical comparisons.
+
+```{r warning=FALSE}
+plot(stats_deseq, plot_type = "volcano")
+plot(stats_deseq, plot_type = "bar")
+plot(stats_deseq, plot_type = "ma") 
+```
+
+### limma-voom Method
+
+We examine the dispersion plot for use of the voom method.
+
+```{r}
+dispersion_est(omicsData = myseq, method = "voom")
+```
+
+If we are satisfied with using this method for our statistical comparisons between virus strains, we can do so as follows.
+
+```{r}
+stats_voom <- diffexp_seq(omicsData = myseq, method = "voom")
+```
+
+Various plot types are available to display the results of the statistical comparisons.
+
+```{r warning=FALSE}
+plot(stats_voom, plot_type = "volcano")
+plot(stats_voom, plot_type = "bar")
+plot(stats_voom, plot_type = "ma") 
+```
+
+
+
+
+## References
+

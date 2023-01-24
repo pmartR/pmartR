@@ -7,5 +7,5 @@
 \method{print}{proData}(proData)
 }
 \description{
-For printing an S3 object of type 'proData':
+For printing an S3 object of type 'proData'
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/filter_summary.R
 \name{print.RNAFiltSummary}
 \alias{print.RNAFiltSummary}
-\title{Print method for summary of RNAFilt}
+\title{RNA Filter Print Method}
 \usage{
 \method{print}{RNAFiltSummary}(object)
 }

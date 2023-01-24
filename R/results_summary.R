@@ -1,32 +1,35 @@
-#' Produce summaries of various results objects from pmartR functions.
+#' Summary of pmartR Analysis Functions
 #'
-#' This function will provide basic summary statistics for results objects from the pmartR package.
+#' Provide basic summaries for results objects from the pmartR package.
 #'
-#'
-#' @return a summary table or list for the pmartR results object.
+#' @return a summary table or list for the pmartR results object
 #'
 #' @examples
-#' \dontrun{
 #' library(pmartRdata)
-#' data("pep_object")
+#' mypep <- group_designation(omicsData = pep_object, main_effects = "Phenotype")
+#' mypep <- edata_transform(omicsData = mypep, data_scale = "log2")
 #' 
-#' pep_object <- group_designation(pep_object, main_effects = 'Condition')
-#' 
-#' norm_result <- normalize_global(pep_object, norm_fn='median', subset_fn='all')
+#' norm_result <- normalize_global(omicsData = mypep, norm_fn = "median", subset_fn = "all")
 #' summary(norm_result)
 #' 
-#' spans_results <- spans_procedure(pep_object)
+#' spans_results <- spans_procedure(omicsData = mypep)
 #' summary(spans_results)
-#'}
+#' 
+#' dim_results <- dim_reduction(omicsData = mypep)
+#' summary(dim_results)
+#' 
+#' cor_results <- cor_result(omicsData = mypep)
+#' summary(cor_results) 
 #'
 #' @author Lisa Bramer, Kelly Stratton, Thomas Johansen
 #'
 #' @export
 
-#'@export
-#'@rdname summary-pmartR-results
-#'@name summary-pmartR-results
-#'@param omicsNorm An object of class normRes, produced by calling \code{\link{normalize_global} with option apply_norm=FALSE}
+#' @export
+#' @rdname summary-pmartR-results
+#' @name summary-pmartR-results
+#' @param omicsNorm object of class normRes, produced by calling
+#'   \code{\link{normalize_global} with option apply_norm=FALSE}
 summary.normRes <- function(omicsNorm) {
   # summary for the normalization object (if normalize=FALSE when calling normalization_calc)
   
@@ -52,10 +55,11 @@ summary.normRes <- function(omicsNorm) {
   return(invisible(res)) # should this be returning "catmat" instead?
 }
 
-#'@export
-#'@rdname summary-pmartR-results
-#'@name summary-pmartR-results
-#'@param SPANSres_obj an object of class SPANSRes created by calling \code{\link{spans_procedure}} on a grouped pepData or proData object.
+#' @export
+#' @rdname summary-pmartR-results
+#' @name summary-pmartR-results
+#' @param SPANSres_obj object of class SPANSRes created by calling
+#'   \code{\link{spans_procedure}} on a grouped pepData or proData object
 summary.SPANSRes <- function(SPANSRes_obj){
   
   spanscores <- sort(unique(SPANSRes_obj$SPANS_score), decreasing = TRUE)
@@ -73,10 +77,11 @@ summary.SPANSRes <- function(SPANSRes_obj){
   
 }
 
-#'@export
-#'@rdname summary-pmartR-results
-#'@name summary-pmartR-results
-#'@param dimRes_object an object of class dimRes. A list containing sample identifiers and the principle components scores.
+#' @export
+#' @rdname summary-pmartR-results
+#' @name summary-pmartR-results
+#' @param dimRes_object object of class dimRes, which is a list containing
+#'   sample identifiers and the principle components scores
 summary.dimRes <- function(dimRes_object){
   
   
@@ -95,10 +100,10 @@ summary.dimRes <- function(dimRes_object){
   return(invisible(dim_summary))
 }
 
-#'@export
-#'@rdname summary-pmartR-results
-#'@name summary-pmartR-results
-#'@param corRes_object an object of class corRes. A correlation matrix of all samples.
+#' @export
+#' @rdname summary-pmartR-results
+#' @name summary-pmartR-results
+#' @param corRes_object object of class corRes
 summary.corRes <- function(corRes_object){
   
   cor_summary <- summary(corRes_object[upper.tri(corRes_object)])

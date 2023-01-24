@@ -2,31 +2,30 @@
 % Please edit documentation in R/subset_funcs.R
 \name{all_subset}
 \alias{all_subset}
-\title{Identifies the 'subset' of All Features}
+\title{Identify All Biomolecules for Use in Normalization}
 \usage{
 all_subset(e_data, edata_id)
 }
 \arguments{
-\item{e_data}{a \eqn{p \times n + 1} data.frame, where \eqn{p} is the number of peptides, proteins, lipids, or metabolites and \eqn{n} is the number of samples. Each row corresponds to data for a peptide, protein, lipid, or metabolite, with a column giving the identifer name.}
+\item{e_data}{a \eqn{p \times n + 1} data.frame, where \eqn{p} is the number
+of peptides, proteins, lipids, or metabolites and \eqn{n} is the number of
+samples. Each row corresponds to data for a peptide, protein, lipid, or
+metabolite, with one column giving the biomolecule identifier name.}
 
-\item{edata_id}{character string indicating the name of the peptide, protein, lipid, or metabolite identifier. Usually obtained by calling \code{attr(omicsData, "cnames")$edata_cname}.}
+\item{edata_id}{character string indicating the name of the peptide, protein,
+lipid, or metabolite identifier. Usually obtained by calling
+\code{attr(omicsData, "cnames")$edata_cname}.}
 }
 \value{
-Character vector containing all features.
+Character vector containing all biomolecules.
 }
 \description{
-Selects features for normalization via choosing all features currently in the data
+Selects biomolecules for normalization via choosing all biomolecules
+currently in the data
 }
 \details{
-This function returns the subset of all features. These will be used for normalization.
-}
-\examples{
-\dontrun{
-library(pmartRdata)
-data(pep_edata)
-keep <- none_subset(e_data = pep_edata, edata_id = "Mass_Tag_ID")
-}
-
+This function returns the subset of all biomolecules. These will be
+  used for normalization.
 }
 \author{
 Kelly Stratton

@@ -7,5 +7,5 @@
 \method{print}{rmdFilt}(filter_object)
 }
 \description{
-For printing an S3 object of type 'rmdFilt':
+For printing an S3 object of type 'rmdFilt'
 }

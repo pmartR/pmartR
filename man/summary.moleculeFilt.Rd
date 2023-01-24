@@ -2,30 +2,37 @@
 % Please edit documentation in R/filter_summary.R
 \name{summary.moleculeFilt}
 \alias{summary.moleculeFilt}
-\title{Produce a basic summary of a molecule_filter object}
+\title{Molecule Filter Summary}
 \usage{
 \method{summary}{moleculeFilt}(filter_object, min_num = NULL)
 }
 \arguments{
-\item{filter_object}{S3 object of class 'moleculeFilt' created by \code{\link{molecule_filter}}.}
+\item{filter_object}{S3 object of class 'moleculeFilt' created by
+\code{\link{molecule_filter}}}
 
-\item{min_num}{an integer value specifying the minimum number of times each feature must be observed across all samples. Default value is NULL.}
+\item{min_num}{integer value specifying the minimum number of times each
+feature must be observed across all samples. Default value is NULL.}
 }
 \value{
-a summary table giving the number of biomolecules by number of observed values across all samples. If min_num is specified, the number of biomolecules to be filtered with the specified threshold are reported.
+a summary table giving the number of biomolecules by number of
+  observed values across all samples. If min_num is specified, the numbers of
+  biomolecules to be filtered and to be retained based on the specified
+  threshold are reported. If, upon creation of moleculeFilt object,
+  \code{use_groups = TRUE} or \code{use_batches = TRUE} were specified, the
+  numbers reported by the summary are based on groups and/or batches.
 }
 \description{
-This function will provide basic summary statistics for the molecule_filter object.
+Provide summary of a moleculeFilt S3 object
 }
 \examples{
-\dontrun{
 library(pmartRdata)
-data("pep_object")
-myfilter <- molecule_filter(pep_object)
-summary(myfilter)
-summary(myfilter, min_num = 2)
-}
+myfilter <- molecule_filter(omicsData = pep_object)
+summary(filter_object = myfilter)
+summary(filter_object = myfilter, min_num = 2)
 
+}
+\seealso{
+\code{\link{molecule_filter}}
 }
 \author{
 Lisa Bramer, Kelly Stratton

@@ -24,7 +24,7 @@ a list of five items: num_proteoforms, unique_sigs,
 }
 \description{
 The function is written to take input from one protein at a time and requires
-three inputs: protein_sig, pi_not and max_proteforms.
+three inputs: protein_sig, pi_not and max_proteforms
 }
 \details{
 \tabular{ll}{ num_proteoforms \tab the number of proteoforms as

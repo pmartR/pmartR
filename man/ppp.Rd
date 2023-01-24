@@ -2,35 +2,36 @@
 % Please edit documentation in R/subset_funcs.R
 \name{ppp}
 \alias{ppp}
-\title{Identify Proportion of the Peptides Present (PPP) Biomolecules}
+\title{Identify Biomolecules from the Proportion Present (PPP) for Use in
+Normalization}
 \usage{
 ppp(e_data, edata_id, proportion = 0.5)
 }
 \arguments{
-\item{e_data}{a \eqn{p \times n + 1} data.frame, where \eqn{p} is the number of peptides, proteins, lipids, or metabolites and \eqn{n} is the number of samples. Each row corresponds to data for a peptide, protein, lipid, or metabolite, with a column giving the identifer name.}
+\item{e_data}{a \eqn{p \times n + 1} data.frame, where \eqn{p} is the number
+of peptides, proteins, lipids, or metabolites and \eqn{n} is the number of
+samples. Each row corresponds to data for a peptide, protein, lipid, or
+metabolite, with one column giving the biomolecule identifier name.}
 
-\item{edata_id}{character string indicating the name of the peptide, protein, lipid, or metabolite identifier. Usually obtained by calling \code{attr(omicsData, "cnames")$edata_cname}.}
+\item{edata_id}{character string indicating the name of the peptide, protein,
+lipid, or metabolite identifier. Usually obtained by calling
+\code{attr(omicsData, "cnames")$edata_cname}.}
 
-\item{proportion}{numeric value between 0 and 1, indicating the proportion at or above which a feature must be present across all samples in order to be retained (default value 0.5)}
+\item{proportion}{numeric value between 0 and 1, indicating the proportion at
+or above which a biomolecule must be present across all samples in order to be
+retained (default value 0.5)}
 }
 \value{
-Character vector containing the features belonging to the PPP subset.
+Character vector containing the biomolecules belonging to the PPP
+  subset.
 }
 \description{
-Selects features for normalization via the method of percentage of the peptides (or proteins, metabolites, etc.) present (PPP)
+Selects biomolecules for normalization via the method of percentage of the
+peptides (or proteins, metabolites, etc.) present (PPP)
 }
 \details{
-Features present across \code{proportion} samples are designated as PPP.
-}
-\examples{
-\dontrun{
-library(pmartRdata)
-data(pep_pepData)
-pep_subset <- ppp(e_data = pep_pepData$e_data, edata_id = attr(pep_pepData, "cnames")$edata_cname)
-
-pep_subset <- ppp(e_data = pep_pepData$e_data, edata_id = attr(pep_pepData, "cnames")$edata_cname, percent = 0.6)
-}
-
+Biomolecules present across \code{proportion} samples are designated as
+  PPP.
 }
 \author{
 Kelly Stratton

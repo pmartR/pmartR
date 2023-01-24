@@ -38,6 +38,7 @@
 #'         }
 #' 
 #' @export
+#' @name get_data_info
 #' 
 get_data_info <- function (omicsData) {
   
@@ -75,9 +76,8 @@ get_data_info <- function (omicsData) {
 #'
 #' @return A logical value indicating whether the data have been normalized.
 #'
-#' @rdname get_data_norm
-#'
 #' @export
+#' @name get_data_norm
 #' 
 get_data_norm <- function (omicsObject) {
   
@@ -111,6 +111,7 @@ get_data_norm <- function (omicsObject) {
 #'         }
 #' 
 #' @export
+#' @name get_meta_info
 #' 
 get_meta_info <- function (omicsData) {
   
@@ -159,6 +160,7 @@ get_meta_info <- function (omicsData) {
 #'         }
 #' 
 #' @export
+#' @name get_filters
 #' 
 get_filters <- function (omicsData) {
   
@@ -255,6 +257,7 @@ get_filter_type <- function (omicsData) {
 #'         more details.
 #' 
 #' @export
+#' @name get_check_names
 #' 
 get_check_names <- function (omicsData) {
   
@@ -305,6 +308,7 @@ get_check_names <- function (omicsData) {
 #'         }
 #' 
 #' @export
+#' @name get_isobaric_info
 #' 
 get_isobaric_info <- function (omicsData) {
   
@@ -335,9 +339,8 @@ get_isobaric_info <- function (omicsData) {
 #' @return A logical value indicating whether the data have been isobaric
 #'   normalized.
 #'
-#' @rdname get_isobaric_norm
-#'
 #' @export
+#' @name get_isobaric_norm
 #' 
 get_isobaric_norm <- function (omicsData) {
   
@@ -372,6 +375,7 @@ get_isobaric_norm <- function (omicsData) {
 #'         }
 #' 
 #' @export
+#' @name get_nmr_info
 #' 
 get_nmr_info <- function (omicsData) {
   
@@ -407,9 +411,9 @@ get_nmr_info <- function (omicsData) {
 #'
 #' @return A logical value indicating whether the data have been NMR normalized.
 #'
-#' @rdname get_nmr_norm
 #'
 #' @export
+#' @name get_nmr_norm
 #' 
 get_nmr_norm <- function (omicsData) {
   
@@ -435,6 +439,7 @@ get_nmr_norm <- function (omicsData) {
 #'         this data frame.
 #' 
 #' @export
+#' @name get_group_DF
 #' 
 get_group_DF <- function (omicsData) {
   
@@ -469,6 +474,7 @@ get_group_DF <- function (omicsData) {
 #' @return A character string.
 #' 
 #' @export
+#' @name get_data_scale_orig
 #' 
 get_data_scale_orig <- function (omicsObject){
   
@@ -500,9 +506,8 @@ get_data_scale_orig <- function (omicsObject){
 #'
 #' @return a character string describing data scale
 #'
-#' @rdname get_data_scale
-#'
 #' @export
+#' @name get_data_scale
 #' 
 get_data_scale <- function (omicsObject) {
   
@@ -532,9 +537,8 @@ get_data_scale <- function (omicsObject) {
 #'
 #' @return a character string describing e_data cname
 #'
-#' @rdname get_edata_cname
-#'
 #' @export
+#' @name get_edata_cname
 #' 
 get_edata_cname <- function (omicsObject) {
   
@@ -563,9 +567,8 @@ get_edata_cname <- function (omicsObject) {
 #'
 #' @return a character string describing f_data cname
 #'
-#' @rdname get_fdata_cname
-#'
 #' @export
+#' @name get_fdata_cname
 #' 
 get_fdata_cname<- function (omicsObject) {
   
@@ -594,9 +597,8 @@ get_fdata_cname<- function (omicsObject) {
 #'
 #' @return a character string describing e_meta cname
 #'
-#' @rdname get_emeta_cname
-#'
 #' @export
+#' @name get_emeta_cname
 #' 
 get_emeta_cname <- function (omicsObject) {
   
@@ -873,9 +875,8 @@ set_filter <- function (type,
 #' 
 #' @return omicsData object with updated check.names attribute
 #'
-#' @rdname set_check_names
-#' 
 #' @export
+#' @name set_check_names
 #' 
 set_check_names <- function (omicsData, set_to = TRUE) {
   
@@ -906,12 +907,10 @@ set_check_names <- function (omicsData, set_to = TRUE) {
 #'   objects in \code{\link{format_data}}
 #' @return returns a data frame with comparisons and their indices
 #' @examples
-#' \dontrun{
-#' library(pmartR)
 #' library(pmartRdata)
 #'
 #' my_prodata = group_designation(omicsData = pro_object,
-#'                                main_effects = c("Condition"))
+#'                                main_effects = c("Phenotype"))
 #'
 #' imdanova_Filt = imdanova_filter(omicsData = my_prodata)
 #' 
@@ -921,14 +920,13 @@ set_check_names <- function (omicsData, set_to = TRUE) {
 #'                        
 #' imd_anova_res = imd_anova(omicsData = my_prodata,
 #'                           test_method = 'comb',
-#'                           pval_adjust='bon')
+#'                           pval_adjust_a ='bon',
+#'                           pval_adjust_g = 'bon')
 #'
 #' result = get_comparisons(imd_anova_res)
-#' }
-#'
-#' @rdname get_comparisons
 #'
 #' @export
+#' @name get_comparisons
 #' 
 get_comparisons<- function(compObj){
 
@@ -968,11 +966,10 @@ get_comparisons<- function(compObj){
 #'   object
 #'
 #' @examples
-#' \dontrun{
 #' library(pmartRdata)
 #'
 #' my_prodata = group_designation(omicsData = pro_object,
-#'                                main_effects = c("Condition"))
+#'                                main_effects = c("Phenotype"))
 #'
 #' imdanova_Filt = imdanova_filter(omicsData = my_prodata)
 #'
@@ -982,14 +979,13 @@ get_comparisons<- function(compObj){
 #'
 #' imd_anova_res = imd_anova(omicsData = my_prodata,
 #'                           test_method = 'comb',
-#'                           pval_adjust='bon')
+#'                           pval_adjust_a ='bon',
+#'                           pval_adjust_g = 'bon')
 #'
 #' result = get_data_class(imd_anova_res)
-#' }
-#'
-#' @rdname get_data_class
 #'
 #' @export
+#' @name get_data_class
 #' 
 get_data_class<- function (dcObj) {
   
@@ -1014,9 +1010,8 @@ get_data_class<- function (dcObj) {
 #'
 #' @return a table containing number of samples per group
 #'
-#' @rdname get_group_table
-#'
 #' @export
+#' @name get_group_table
 #' 
 get_group_table <- function (omicsObject) {
   
