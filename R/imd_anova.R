@@ -62,10 +62,11 @@
 #' imdanova_Filt <- imdanova_filter(omicsData = mymetab)
 #' mymetab <- applyFilt(filter_object = imdanova_Filt, omicsData = mymetab, min_nonmiss_anova = 2)
 #'
-#' # Implement IMD ANOVA and compute all pairwise comparisons (i.e. leave the `comparisons` argument NULL)
-#' anova_res <- imd_anova(omicsData = mymetab, test_method = "anova")
-#' imd_res <- imd_anova(omicsData = mymetab, test_method = "gtest")
-#' imd_anova_res <- imd_anova(omicsData = mymetab, test_method = 'combined', pval_adjust_a_multcomp ="bon", pval_adjust_g_multcomp ="bon")
+#' # Implement IMD ANOVA and compute all pairwise comparisons (i.e. leave the comparisons argument NULL), with FDR adjustment
+#' anova_res <- imd_anova(omicsData = mymetab, test_method = "anova", pval_adjust_a_multcomp ="Holm", pval_adjust_a_fdr ="BY")
+#' imd_res <- imd_anova(omicsData = mymetab, test_method = "gtest", pval_adjust_g_multcomp ="bon", pval_adjust_g_fdr ="BY")
+#' imd_anova_res <- imd_anova(omicsData = mymetab, test_method = "combined", pval_adjust_a_fdr ="BY", pval_adjust_g_fdr ="BY")
+#' imd_anova_res <- imd_anova(omicsData = mymetab, test_method = "combined", pval_adjust_a_multcomp ="bon", pval_adjust_g_multcomp ="bon", pval_adjust_a_fdr ="BY", pval_adjust_g_fdr ="BY")
 #'
 #' # Two main effects and a covariate
 #' mymetab <- group_designation(omicsData = mymetab, main_effects = c("Phenotype", "SecondPhenotype"), covariates = "Characteristic")
