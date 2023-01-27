@@ -110,9 +110,9 @@ bpquant<- function (statRes, pepData, pi_not = .9,
   unique_proteins<- unique(protein_sig_data[[emeta_cname]])
 
   # set up parallel backend
-  if(parallel == TRUE){
-    cores<- parallel::detectCores()
-    cl<- parallel::makeCluster(cores)
+  if (parallel == TRUE){
+    cores <- parallelly::availableCores()
+    cl <- parallelly::makeClusterPSOCK(cores)
     on.exit(parallel::stopCluster(cl))
     doParallel::registerDoParallel(cl)
   } else {

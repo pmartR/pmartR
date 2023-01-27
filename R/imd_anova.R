@@ -30,7 +30,7 @@
 #'   to no p-value adjustment.
 #' @param pval_thresh numeric p-value threshold, below or equal to which
 #'   biomolecules are considered differentially expressed. Defaults to 0.05
-#' @param use_parallel logical value indicating whether or not to use a
+#' @param parallel logical value indicating whether or not to use a
 #'   "doParallel" loop when running the G-Test with covariates. Defaults to 
 #'   TRUE.
 #'
@@ -88,8 +88,8 @@ imd_anova <- function (omicsData,
                        pval_adjust_g_fdr = 'none',
                        pval_thresh = 0.05,
                        equal_var = TRUE,
-                       use_parallel = TRUE) {
-  
+                       parallel = TRUE) {
+
   # Preliminaries --------------------------------------------------------------
   
   # check that omicsData is of the appropriate class
@@ -368,7 +368,7 @@ imd_anova <- function (omicsData,
                                    pval_thresh = pval_thresh,
                                    covariates = NULL,
                                    paired = paired,
-                                   use_parallel = use_parallel)
+                                   parallel = parallel)
       # NOTE: covariates = NULL in the above call to imd_test because the
       # covariate portion of the code is the slowest part of the imd_test
       # function. In addition, the covariates portion of the results are not
@@ -385,7 +385,7 @@ imd_anova <- function (omicsData,
                                  pval_thresh = pval_thresh,
                                  covariates = covariates,
                                  paired = paired,
-                                 use_parallel = use_parallel)
+                                 parallel = parallel)
     gtest_pvalues <- imd_results_full$Pvalues
     colnames(gtest_pvalues) <- paste0("P_value_G_",colnames(gtest_pvalues))
     gtest_flags <- imd_results_full$Flags
@@ -409,7 +409,7 @@ imd_anova <- function (omicsData,
                                      covariates = NULL,
                                      paired = paired,
                                      equal_var = equal_var,
-                                     use_parallel = use_parallel)
+                                     parallel = parallel)
   }else{
     anova_results_full <- anova_test(omicsData,
                                      groupData = groupData,
@@ -420,7 +420,7 @@ imd_anova <- function (omicsData,
                                      covariates = covariates,
                                      paired = paired,
                                      equal_var = equal_var,
-                                     use_parallel = use_parallel)
+                                     parallel = parallel)
     anova_fold_flags <- anova_results_full$Flags
     colnames(anova_fold_flags) <- paste0("Flag_A_",colnames(anova_fold_flags))
     anova_pvalues <- anova_results_full$Fold_change_pvalues
@@ -673,7 +673,7 @@ imd_anova <- function (omicsData,
 #'   `f_data` element of `omicsData` is checked for a "Pair" column, an error is
 #'   returned if none is found
 #' @param equal_var logical; should the variance across groups be assumed equal?
-#' @param use_parallel A logical value indicating if the t test should be run in
+#' @param parallel A logical value indicating if the t test should be run in
 #'   parallel.
 #'
 #'
@@ -697,7 +697,7 @@ imd_anova <- function (omicsData,
 #'
 anova_test <- function (omicsData, groupData, comparisons, pval_adjust_multcomp,
                         pval_adjust_fdr, pval_thresh, covariates, paired, equal_var,
-                        use_parallel) {
+                        parallel) {
   
   #Catch if number of groups is too small
   k <- length(unique(groupData$Group))
@@ -951,7 +951,7 @@ anova_test <- function (omicsData, groupData, comparisons, pval_adjust_multcomp,
       paired_test(data = data,
                   bio_ids = omicsData$e_data[get_edata_cname(omicsData)],
                   cutoff = pval_thresh,
-                  use_parallel = use_parallel)
+                  parallel = parallel)
     )
     
   }
@@ -1127,8 +1127,8 @@ group_comparison_anova <- function(groupData,comparisons,anova_results_full){
 # effects.
 
 # @author Evan A Martin
-paired_test <- function (data, bio_ids, cutoff, use_parallel) {
-  
+paired_test <- function (data, bio_ids, cutoff, parallel) {
+
   # Create the results data frame. With no main effects and paired data this
   # will consist of two columns. The first contains the biomolecule IDs and the
   # second is the mean of differences.
@@ -1136,9 +1136,9 @@ paired_test <- function (data, bio_ids, cutoff, use_parallel) {
   names(results)[2] <- "Mean_paired_diff"
   
   # Set up parallel backend.
-  if (use_parallel) {
-    cores <- parallel::detectCores()
-    cl <- parallel::makeCluster(cores - 1)
+  if(parallel){
+    cores <- parallelly::availableCores()
+    cl <- parallelly::makeClusterPSOCK(cores - 1)
     on.exit(parallel::stopCluster(cl))
     doParallel::registerDoParallel(cl)
   } else {
@@ -1208,7 +1208,7 @@ paired_test <- function (data, bio_ids, cutoff, use_parallel) {
 #'   peptides are considered differentially expressed. Defaults to 0.05
 #' @param covariates A character vector with no more than two variable names
 #'   that will be used as covariates in the IMD-ANOVA analysis.
-#' @param use_parallel A logical value indicating whether or not to use a
+#' @param parallel A logical value indicating whether or not to use a
 #'   "doParallel" loop when running the G-Test with covariates. The default is
 #'   TRUE.
 #'
@@ -1233,7 +1233,7 @@ paired_test <- function (data, bio_ids, cutoff, use_parallel) {
 #' Journal of proteome research 9.11 (2010): 5748-5756.
 #'
 imd_test <- function (omicsData, groupData, comparisons, pval_adjust_multcomp, pval_adjust_fdr,
-                      pval_thresh, covariates, paired, use_parallel) {
+                      pval_thresh, covariates, paired, parallel) {
   
   #Catch if number of groups is too small
   k <- length(unique(groupData$Group))
@@ -1343,7 +1343,7 @@ imd_test <- function (omicsData, groupData, comparisons, pval_adjust_multcomp, p
         cmat = cmat,
         covariates = covariates,
         paired = paired,
-        use_parallel = use_parallel
+        parallel = parallel
       )
       
       pairwise_stats <- interim$tstats
@@ -1383,7 +1383,7 @@ imd_test <- function (omicsData, groupData, comparisons, pval_adjust_multcomp, p
         cmat = cmat,
         covariates = covariates,
         paired = paired,
-        use_parallel = use_parallel
+        parallel = parallel
       )
       
       pairwise_stats <- interim$tstats
@@ -1507,7 +1507,7 @@ group_comparison_imd <- function(groupData,comparisons,observed,absent){
 #
 # @param paired A logical value indicating whether the data is paired.
 #
-# @param use_parallel A logical value indicating whether or not to use a
+# @param parallel A logical value indicating whether or not to use a
 #   "doParallel" loop when running the G-Test with covariates. The default is
 #   TRUE.
 #
@@ -1517,8 +1517,8 @@ group_comparison_imd <- function(groupData,comparisons,observed,absent){
 #
 # @Author Evan A Martin
 imd_cov <- function (data, groupData, fdata, cmat,
-                     covariates, paired, use_parallel) {
-  
+                     covariates, paired, parallel) {
+
   # Create an object that will correctly subset the anova(glm()) output given
   # the number of covariates present.
   if (paired && is.null(covariates)) {
@@ -1546,9 +1546,9 @@ imd_cov <- function (data, groupData, fdata, cmat,
   
   
   # Set up parallel backend.
-  if (use_parallel) {
-    cores <- parallel::detectCores()
-    cl <- parallel::makeCluster(cores - 1)
+  if (parallel){
+    cores <- parallelly::availableCores()
+    cl <- parallelly::makeClusterPSOCK(cores - 1)
     on.exit(parallel::stopCluster(cl))
     doParallel::registerDoParallel(cl)
   } else {

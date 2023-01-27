@@ -273,7 +273,7 @@ test_that('each rollup method correctly quantifies proteins',{
   rr_med <- protein_quant(pepData = pdata,
                           method = 'rrollup',
                           combine_fn = 'median',
-                          use_parallel = FALSE,
+                          parallel = FALSE,
                           isoformRes = NULL)
 
   # Compare the output to the standards.
@@ -366,7 +366,7 @@ test_that('each rollup method correctly quantifies proteins',{
                           method = 'qrollup',
                           combine_fn = 'median',
                           qrollup_thresh = 0.4,
-                          use_parallel = FALSE,
+                          parallel = FALSE,
                           isoformRes = NULL)
 
   # Compare the output to the standards.
@@ -469,7 +469,7 @@ test_that('each rollup method correctly quantifies proteins',{
                           combine_fn = 'median',
                           single_observation = TRUE,
                           single_pep = TRUE,
-                          use_parallel = FALSE,
+                          parallel = FALSE,
                           isoformRes = NULL)
 
   # Compare the output to the standards.
@@ -539,7 +539,7 @@ test_that('each rollup method correctly quantifies proteins',{
   pq_med_bayes <- protein_quant(pepData = pdata,
                                 method = 'rollup',
                                 combine_fn = 'median',
-                                use_parallel = FALSE,
+                                parallel = FALSE,
                                 isoformRes = bayes,
                                 emeta_cols = c("Peptide_Sequence"))
 
@@ -600,7 +600,7 @@ test_that('each rollup method correctly quantifies proteins',{
                                 method = 'qrollup',
                                 combine_fn = 'median',
                                 qrollup_thresh = 0.4,
-                                use_parallel = FALSE,
+                                parallel = FALSE,
                                 isoformRes = bayes)
 
   # Reorder the rows in the standard because the nest_by function creates a
