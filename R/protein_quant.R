@@ -16,7 +16,7 @@
 #' @param single_observation logical indicating whether or not to remove
 #'   peptides that have just a single observation, defaults to FALSE.
 #' @param combine_fn character string specifying either be 'mean' or 'median'
-#' @param use_parallel logical indicating whether or not to use "doParallel"
+#' @param parallel logical indicating whether or not to use "doParallel"
 #'   loop in applying rollup functions. Defaults to TRUE. Is an argument of
 #'   rrollup, qrollup and zrollup functions.
 #' @param emeta_cols character vector indicating additional columns of e_meta
@@ -66,7 +66,7 @@
 protein_quant <- function (pepData, method, isoformRes = NULL,
                            qrollup_thresh = NULL, single_pep = FALSE,
                            single_observation = FALSE, combine_fn = "median",
-                           use_parallel = TRUE, emeta_cols = NULL) {
+                           parallel = TRUE, emeta_cols = NULL) {
 
   # Preflight checks -----------------------------------------------------------
 
@@ -210,7 +210,7 @@ protein_quant <- function (pepData, method, isoformRes = NULL,
 
     results <- rrollup(pepData,
                        combine_fn = chosen_combine_fn,
-                       parallel = use_parallel)
+                       parallel = parallel)
 
   }
 
@@ -225,7 +225,7 @@ protein_quant <- function (pepData, method, isoformRes = NULL,
     results <- qrollup(pepData,
                        qrollup_thresh = qrollup_thresh,
                        combine_fn = chosen_combine_fn,
-                       parallel = use_parallel)
+                       parallel = parallel)
   }
 
   if (method == 'zrollup') {
@@ -277,7 +277,7 @@ protein_quant <- function (pepData, method, isoformRes = NULL,
 
     results <- zrollup(pepData,
                        combine_fn = chosen_combine_fn,
-                       parallel = use_parallel)
+                       parallel = parallel)
 
   }
 

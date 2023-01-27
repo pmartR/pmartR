@@ -26,7 +26,7 @@ test_that('all tests conform to the decrees of the God of Stats',{
                             test_method = "anova")
   gfruit_1_1_3 <- imd_anova(gfilta_1_1_3,
                             test_method = "gtest",
-                            use_parallel = FALSE)
+                            parallel = FALSE)
   cfruit_1_1_3 <- imd_anova(cfilta_1_1_3,
                             test_method = "combined")
 
@@ -34,7 +34,7 @@ test_that('all tests conform to the decrees of the God of Stats',{
                             test_method = "anova")
   gfruit_1_2_3 <- imd_anova(gfilta_1_2_3,
                             test_method = "gtest",
-                            use_parallel = FALSE)
+                            parallel = FALSE)
   cfruit_1_2_3 <- imd_anova(cfilta_1_2_3,
                             test_method = "combined")
 
@@ -46,7 +46,7 @@ test_that('all tests conform to the decrees of the God of Stats',{
                             test_method = "anova")
   gfruit_2_1_4 <- imd_anova(gfilta_2_1_4,
                             test_method = "gtest",
-                            use_parallel = FALSE)
+                            parallel = FALSE)
   cfruit_2_1_4 <- imd_anova(cfilta_2_1_4,
                             test_method = "combined")
 
@@ -54,7 +54,7 @@ test_that('all tests conform to the decrees of the God of Stats',{
                             test_method = "anova")
   gfruit_2_2_4 <- imd_anova(gfilta_2_2_4,
                             test_method = "gtest",
-                            use_parallel = FALSE)
+                            parallel = FALSE)
   cfruit_2_2_4 <- imd_anova(cfilta_2_2_4,
                             test_method = "combined")
 
