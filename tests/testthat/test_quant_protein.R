@@ -36,8 +36,8 @@ test_that('each rollup method correctly quantifies proteins',{
   # Run some statisiticalness on the filtered data.
   inova <- imd_anova(omicsData = pdata3,
                      test_method = 'comb',
-                     pval_adjust_a = 'bon',
-                     pval_adjust_g = 'bon')
+                     pval_adjust_a_multcomp = 'bon',
+                     pval_adjust_g_multcomp = 'bon')
 
   # Run bpquant pdata with the IMD-ANOVA output as the statRes object.
   bayes <- bpquant(statRes = inova, pepData = pdata3, parallel = FALSE)

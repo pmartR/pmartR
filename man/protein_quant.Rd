@@ -12,7 +12,7 @@ protein_quant(
   single_pep = FALSE,
   single_observation = FALSE,
   combine_fn = "median",
-  use_parallel = TRUE,
+  parallel = TRUE,
   emeta_cols = NULL
 )
 }
@@ -36,7 +36,7 @@ peptides that have just a single observation, defaults to FALSE.}
 
 \item{combine_fn}{character string specifying either be 'mean' or 'median'}
 
-\item{use_parallel}{logical indicating whether or not to use "doParallel"
+\item{parallel}{logical indicating whether or not to use "doParallel"
 loop in applying rollup functions. Defaults to TRUE. Is an argument of
 rrollup, qrollup and zrollup functions.}
 
@@ -73,7 +73,7 @@ mypepData = edata_transform(omicsData = mypepData, "log2")
 imdanova_Filt <- imdanova_filter(omicsData = mypepData)
 mypepData <- applyFilt(filter_object = imdanova_Filt, omicsData = mypepData, min_nonmiss_anova=2)
 
-imd_anova_res <- imd_anova(omicsData = mypepData, test_method = 'comb', pval_adjust_a ='bon', pval_adjust_g ='bon')
+imd_anova_res <- imd_anova(omicsData = mypepData, test_method = 'comb', pval_adjust_a_multcomp ='bon', pval_adjust_g_multcomp ='bon')
 
 isoformRes = bpquant(statRes = imd_anova_res, pepData = mypepData)
 

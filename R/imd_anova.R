@@ -593,6 +593,8 @@ imd_anova <- function (omicsData,
                               test_method,
                               pval_adjust_a_multcomp,
                               pval_adjust_g_multcomp,
+                              pval_adjust_a_fdr,
+                              pval_adjust_g_fdr,
                               pval_thresh)
   
   attr(final_out, "bpFlags") <- the_flag
