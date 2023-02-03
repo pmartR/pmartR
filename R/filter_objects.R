@@ -228,9 +228,11 @@ molecule_filter <- function (omicsData, use_groups = FALSE, use_batch = FALSE) {
 #'   across all samples.
 #'
 #' @examples
+#' \dontrun{
 #' library(pmartRdata)
 #' to_filter <- total_count_filter(omicsData = rnaseq_object)
 #' summary(filter_object = to_filter, min_count = 10)
+#' }
 #' 
 #' @author Rachel Richardson
 #'

@@ -27,9 +27,11 @@ recommendation in edgeR is at least 10 total counts observed across samples
 filtering would remove this biomolecule).
 }
 \examples{
+\dontrun{
 library(pmartRdata)
 to_filter <- total_count_filter(omicsData = rnaseq_object)
 summary(filter_object = to_filter, min_count = 10)
+}
 
 }
 \references{

@@ -817,13 +817,14 @@ plot.nmrnormRes <- function (nmrnormRes_obj, nmrData = NULL, order_by = NULL,
 #'   interactive is TRUE
 #'
 #' @examples
+#' \dontrun{
 #' library(pmartRdata)
 #' data(pep_object)
 #' mypep <- edata_transform(omicsData = pep_object, data_scale = "log2")
 #' mypep <- group_designation(omicsData = mypep, main_effects = "Phenotype")
 #' myspans <- spans_procedure(omicsData = mypep)
 #' plot(myspans)
-#'
+#' }
 #' @rdname plot-SPANSRes
 #'
 #' @export
@@ -1502,9 +1503,11 @@ na_scatter <- function (edata, group_df, na.by.sample, num_missing_vals,
 #' mymetab <- group_designation(omicsData = mymetab, main_effects = "Phenotype")
 #' my_correlation <- cor_result(omicsData = mymetab)
 #' plot(my_correlation, omicsData = mymetab, order_by = "Phenotype")
-#'
+#' 
+#' \dontrun{
 #' myseq_correlation <- cor_result(omicsData = rnaseq_object)
 #' plot(myseq_correlation)
+#' }
 #'
 #' @export
 #'
@@ -1788,10 +1791,12 @@ plot.corRes <- function (corRes_obj, omicsData = NULL, order_by = NULL,
 #' mylipid <- group_designation(omicsData = mylipid, main_effects = "Virus")
 #' pca_lipids <- dim_reduction(omicsData = mylipid)
 #' plot(pca_lipids)
-#'
+#' 
+#' \dontrun{
 #' myseq <- group_designation(omicsData = rnaseq_object, main_effects = "Virus")
 #' pca_seq <- dim_reduction(omicsData = myseq)
 #' plot(pca_seq)
+#' }
 #'
 #' @rdname plot-dimRes
 #'
@@ -2334,10 +2339,12 @@ plot.moleculeFilt <- function (filter_object, min_num = NULL, cumulative = TRUE,
 #'   interactive is TRUE
 #'
 #' @examples
+#' \dontrun{
 #' library(pmartRdata)
 #' seqfilt <- total_count_filter(omicsData = rnaseq_object)
 #' plot(seqfilt, min_count = 5)
-#'
+#' }
+#' 
 #' @rdname plot-totalCountFilt
 #'
 #' @export

@@ -156,7 +156,7 @@ combine_techreps <- function (omicsData, combine_fn = NULL,
   if(!is.null(bio_sample_names)){
     # if a column was specified, reassign that column as the id column
     if(length(bio_sample_names) == 1){
-      new_fdata <- dplyr::select(new_fdata, bio_sample_names, dplyr::everything())
+      new_fdata <- dplyr::select(new_fdata, dplyr::all_of(bio_sample_names), dplyr::everything())
       attr(omicsData, "cnames")$fdata_cname = bio_sample_names
       bio_sample_names <- new_fdata[,bio_sample_names] 
     }

@@ -852,7 +852,7 @@ trelli_abundance_heatmap <- function(trelliData,
     
     # If group designation was set, then convert Group to a factor variable 
     if (!is.null(attributes(trelliData$omicsData)$group_DF)) {
-      theLevels <- attr(trelliData$omicsData, "group_DF") %>% dplyr::arrange(Group) %>% dplyr::select(fdata_cname) %>% unlist()
+      theLevels <- attr(trelliData$omicsData, "group_DF") %>% dplyr::arrange(Group) %>% dplyr::select(dplyr::all_of(fdata_cname)) %>% unlist()
       DF[,fdata_cname] <- factor(unlist(DF[,fdata_cname]), levels = theLevels)
     } else {
       DF[,fdata_cname] <- as.factor(unlist(DF[,fdata_cname]))

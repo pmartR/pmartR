@@ -42,6 +42,7 @@
 #'   Measurements}. Molecular & Cellular Proteomics.: MCP, 13(12), 3639-3646.
 #'
 #' @examples
+#' \dontrun{
 #' library(pmartRdata)
 #'
 #' mypepData <- group_designation(omicsData = pep_object, main_effects = c("Phenotype"))
@@ -59,7 +60,8 @@
 #'
 #' #case where isoformRes is provided:
 #' # results2 = protein_quant(pepData = mypepData, method = 'rollup', combine_fn = 'mean', isoformRes = isoformRes)
-#'
+#' }
+#' 
 #' @rdname protein_quant
 #' @export
 #'
@@ -338,7 +340,6 @@ protein_quant <- function (pepData, method, isoformRes = NULL,
   # Check if isoformRes is NULL. results$e_meta will be updated differently
   # depending on whether isoformRes is present.
   if (is.null(isoformRes)) {
-
     # Update e_meta with peptide counts.
     results$e_meta <- results$e_meta %>%
       dplyr::group_by(!!rlang::sym(emeta_cname)) %>%
@@ -360,14 +361,13 @@ protein_quant <- function (pepData, method, isoformRes = NULL,
       dplyr::select(dplyr::any_of(c(emeta_cname, "peps_per_pro",
                                     "n_peps_used", emeta_cols))) %>%
       # Only keep distinct combinations of the columns that are kept.
-      dplyr::distinct(dplyr::all_of(.)) %>%
+      dplyr::distinct() %>%
       data.frame()
 
     # The following runs when isoformRes is present. In this case n_peps_used
     # will be calculated based on protein isoform instead of protein (which
     # includes all isoforms).
   } else {
-
     # Count the number of peptides per isoform. If qrollup was used this was
     # already done in the qrollup function otherwise the peptides per isoform
     # will be counted from the isoformRes_subset data frame.
@@ -377,7 +377,7 @@ protein_quant <- function (pepData, method, isoformRes = NULL,
       results$e_meta %>%
         dplyr::select(!!rlang::sym(emeta_cname), n_peps_used) %>%
         # Only keep unique combinations of emeta_cname and n_peps_used
-        dplyr::distinct(dplyr::all_of(.))
+        dplyr::distinct()
 
     } else {
 

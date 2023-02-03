@@ -394,7 +394,7 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL, ...) {
     # panel_by comparison, nest dataframes, and then extract the p_value and fold_change
     # for each group
     trelliData.stat <- statRes %>%
-      dplyr::select(c(edata_cname, pvalue_cols, fold_change_cols))  %>%
+      dplyr::select(dplyr::all_of(c(edata_cname, pvalue_cols, fold_change_cols)))  %>%
       tidyr::pivot_longer(c(pvalue_cols, fold_change_cols)) %>%
       dplyr::mutate(
         Comparison = gsub("P_value_A_|P_value_G_|Fold_change_", "", name), 

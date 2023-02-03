@@ -162,6 +162,7 @@ Below are details for specifying function and parameter options.
 }
 
 \examples{
+\dontrun{
 library(pmartRdata)
 
 pep_object <- edata_transform(omicsData = pep_object, data_scale = "log2")
@@ -171,11 +172,12 @@ pep_object <- group_designation(omicsData = pep_object, main_effects = "Phenotyp
 spans_res <- spans_procedure(omicsData = pep_object)
 
 ## specify only certain subset and normalization functions
-# spans_res <- spans_procedure(omicsData = pep_object, norm_fn = c("median", "zscore"), subset_fn = c("all", "los", "ppp"))
+spans_res <- spans_procedure(omicsData = pep_object, norm_fn = c("median", "zscore"), subset_fn = c("all", "los", "ppp"))
 
 ## specify parameters for supplied subset functions, notice ppp_rip takes a vector of two numeric arguments.
 spans_res <- spans_procedure(omicsData = pep_object, subset_fn = c("all", "los", "ppp"), params = list(los = list(0.25, 0.5), ppp = list(0.15, 0.25)))
 spans_res <- spans_procedure(omicsData = pep_object, subset_fn = c("all", "rip", "ppp_rip"), params = list(rip = list(0.3, 0.4), ppp_rip = list(c(0.15, 0.5), c(0.25, 0.5))))
+}
 
 }
 \references{

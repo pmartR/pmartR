@@ -53,12 +53,13 @@
 #'  RNA-sequencing and microarray studies. Nucleic Acids Research 43(7), e47.
 #' 
 #' @examples
+#' \dontrun{
 #' library(pmartRdata)
 #' myseqData <- group_designation(omicsData = rnaseq_object, main_effects = "Virus")
 #' edger_results <- diffexp_seq(omicsData = myseqData, method = "edgeR")
 #' deseq_results <- diffexp_seq(omicsData = myseqData, method = "DESeq2")
 #' voom_results <- diffexp_seq(omicsData = myseqData, method = "voom")
-#' 
+#' }
 #' @export
 #' 
 diffexp_seq <- function(omicsData, method = "edgeR", p_adjust = "BH", 
@@ -1120,12 +1121,14 @@ get_group_formula <- function(omicsData){
 #' @return plot result
 #' 
 #' @examples 
+#' \dontrun{
 #' library(pmartRdata)
 #' myseqData <- group_designation(omicsData = rnaseq_object, main_effects = "Virus")
 #' dispersion_est(omicsData = myseqData, method = "edgeR")
 #' dispersion_est(omicsData = myseqData, method = "DESeq2")
 #' dispersion_est(omicsData = myseqData, method = "voom")
-#'
+#' }
+#' 
 #' @references 
 #'  Robinson MD, McCarthy DJ, Smyth GK (2010). “edgeR: a Bioconductor package 
 #'  for differential expression analysis of digital gene expression data.” 

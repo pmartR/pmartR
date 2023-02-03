@@ -65,6 +65,7 @@ If isoformRes is provided then, a temporary pepData object is formed
   and a proData object is returned.
 }
 \examples{
+\dontrun{
 library(pmartRdata)
 
 mypepData <- group_designation(omicsData = pep_object, main_effects = c("Phenotype"))
@@ -82,6 +83,7 @@ results<- protein_quant(pepData = mypepData, method = 'rollup', combine_fn = 'me
 
 #case where isoformRes is provided:
 # results2 = protein_quant(pepData = mypepData, method = 'rollup', combine_fn = 'mean', isoformRes = isoformRes)
+}
 
 }
 \references{
