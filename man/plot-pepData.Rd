@@ -95,6 +95,7 @@ For plotting pepData S3 objects
 }
 \examples{
 library(pmartRdata)
+data(pep_object)
 mypep <- edata_transform(omicsData = pep_object, data_scale = "log2")
 plot(omicsData = mypep, order_by = "Phenotype", color_by = "Phenotype")
 

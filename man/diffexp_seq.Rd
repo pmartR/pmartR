@@ -62,12 +62,13 @@ moderated t-statistics. Additional arguments can be passed for use in the
 function. Refer to calcNormFactors() in edgeR package.
 }
 \examples{
+\dontrun{
 library(pmartRdata)
 myseqData <- group_designation(omicsData = rnaseq_object, main_effects = "Virus")
 edger_results <- diffexp_seq(omicsData = myseqData, method = "edgeR")
 deseq_results <- diffexp_seq(omicsData = myseqData, method = "DESeq2")
 voom_results <- diffexp_seq(omicsData = myseqData, method = "voom")
-
+}
 }
 \references{
 Robinson MD, McCarthy DJ, Smyth GK (2010). “edgeR: a Bioconductor package 

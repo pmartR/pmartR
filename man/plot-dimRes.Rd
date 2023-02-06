@@ -77,8 +77,10 @@ mylipid <- group_designation(omicsData = mylipid, main_effects = "Virus")
 pca_lipids <- dim_reduction(omicsData = mylipid)
 plot(pca_lipids)
 
+\dontrun{
 myseq <- group_designation(omicsData = rnaseq_object, main_effects = "Virus")
 pca_seq <- dim_reduction(omicsData = myseq)
 plot(pca_seq)
+}
 
 }

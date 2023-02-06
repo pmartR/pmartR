@@ -1,7 +1,0 @@
-pandoc: 1.19.2.1
-pkgdown: 1.2.0
-pkgdown_sha: ~
-articles:
-  Quality_Control_with_pmartR: Quality_Control_with_pmartR.html
-  Statistical_Analysis_with_pmartR: Statistical_Analysis_with_pmartR.html
-

@@ -122,21 +122,23 @@
 #'
 #'
 #' @examples
+#' \dontrun{
 #' library(pmartRdata)
-#'
+#' 
 #' pep_object <- edata_transform(omicsData = pep_object, data_scale = "log2")
 #' pep_object <- group_designation(omicsData = pep_object, main_effects = "Phenotype")
-#'
+#' 
 #' ## default parameters
 #' spans_res <- spans_procedure(omicsData = pep_object)
 #'
 #' ## specify only certain subset and normalization functions
-#' # spans_res <- spans_procedure(omicsData = pep_object, norm_fn = c("median", "zscore"), subset_fn = c("all", "los", "ppp"))
+#' spans_res <- spans_procedure(omicsData = pep_object, norm_fn = c("median", "zscore"), subset_fn = c("all", "los", "ppp"))
 #'
 #' ## specify parameters for supplied subset functions, notice ppp_rip takes a vector of two numeric arguments.
 #' spans_res <- spans_procedure(omicsData = pep_object, subset_fn = c("all", "los", "ppp"), params = list(los = list(0.25, 0.5), ppp = list(0.15, 0.25)))
 #' spans_res <- spans_procedure(omicsData = pep_object, subset_fn = c("all", "rip", "ppp_rip"), params = list(rip = list(0.3, 0.4), ppp_rip = list(c(0.15, 0.5), c(0.25, 0.5))))
-#'
+#' }
+#' 
 #' @author Daniel Claborne
 #'
 #' @references Webb-Robertson BJ, Matzke MM, Jacobs JM, Pounds JG, Waters KM. A
@@ -657,6 +659,7 @@ normalize_global_basic <- function (edata, norm_fn) {
 #'   method. \cr
 #'
 #' @examples
+#' \dontrun{
 #' library(pmartRdata)
 #'
 #' # data must be log transformed and grouped
@@ -676,7 +679,8 @@ normalize_global_basic <- function (edata, norm_fn) {
 #'
 #' # pass arguments to normalize global
 #' norm_object <- normalize_global(omicsData = myobject, subset_fn = subset_fn, norm_fn = norm_fn, params = params)
-#'
+#' }
+#' 
 #' @export
 #'
 get_spans_params <- function(SPANSRes_obj, sort_by_nmols = FALSE){
@@ -714,7 +718,7 @@ get_spans_params <- function(SPANSRes_obj, sort_by_nmols = FALSE){
       params[[i]][["params"]] = list(NULL)
     } else if(params[[i]][["subset_fn"]] %in% c("los", "rip", "ppp")){
       sublist = list()
-      sublist[[params[[i]]["subset_fn"]]] <- pars_from_df
+      sublist[[params[[i]][["subset_fn"]]]] <- pars_from_df
       params[[i]][["params"]] <- sublist
     }
   }

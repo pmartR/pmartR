@@ -15,7 +15,7 @@ anova_test(
   covariates,
   paired,
   equal_var,
-  use_parallel
+  parallel
 )
 }
 \arguments{
@@ -47,7 +47,7 @@ returned if none is found}
 
 \item{equal_var}{logical; should the variance across groups be assumed equal?}
 
-\item{use_parallel}{A logical value indicating if the t test should be run in
+\item{parallel}{A logical value indicating if the t test should be run in
 parallel.}
 }
 \value{

@@ -23,9 +23,11 @@ filtered at this threshold are reported.
 Provide summary of a totalCountFilt S3 object
 }
 \examples{
+\dontrun{
 library(pmartRdata)
 myfilt <- total_count_filter(omicsData = rnaseq_object)
 summary(filter_object = myfilt, min_count = 2)
+}
 
 }
 \seealso{

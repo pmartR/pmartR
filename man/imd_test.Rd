@@ -14,7 +14,7 @@ imd_test(
   pval_thresh,
   covariates,
   paired,
-  use_parallel
+  parallel
 )
 }
 \arguments{
@@ -40,7 +40,7 @@ peptides are considered differentially expressed. Defaults to 0.05}
 \item{covariates}{A character vector with no more than two variable names
 that will be used as covariates in the IMD-ANOVA analysis.}
 
-\item{use_parallel}{A logical value indicating whether or not to use a
+\item{parallel}{A logical value indicating whether or not to use a
 "doParallel" loop when running the G-Test with covariates. The default is
 TRUE.}
 }

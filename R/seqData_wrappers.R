@@ -53,12 +53,13 @@
 #'  RNA-sequencing and microarray studies. Nucleic Acids Research 43(7), e47.
 #' 
 #' @examples
+#' \dontrun{
 #' library(pmartRdata)
 #' myseqData <- group_designation(omicsData = rnaseq_object, main_effects = "Virus")
 #' edger_results <- diffexp_seq(omicsData = myseqData, method = "edgeR")
 #' deseq_results <- diffexp_seq(omicsData = myseqData, method = "DESeq2")
 #' voom_results <- diffexp_seq(omicsData = myseqData, method = "voom")
-#' 
+#' }
 #' @export
 #' 
 diffexp_seq <- function(omicsData, method = "edgeR", p_adjust = "BH", 
@@ -259,10 +260,10 @@ DESeq2_wrapper <- function(
       object = edata_deseq,
       test = test, ## reasonable to allow change in pmartR
       fitType = "parametric", #fitting of dispersions to the mean intensity
-      quiet = T,
+      quiet = TRUE,
       minReplicatesForReplace = Inf, ## cook's distance used to flag outliers, require at least n replicates to replace flagged outliers-- defined as .99 quantile of the F(p, m - p) distribution, where p is the number of parameters and m is the number of samples. Replacement is values predicted by the trimmed mean over all samples (and adjusted by size factor or normalization factor). Inf disables replacement
       modelMatrixType = "standard", ## If we need anything fancier than what is defined by "Group" we should consider this argument for the glm use case -- betapriors req for expanded
-      parallel = T,
+      parallel = TRUE,
       
       ## Waldy
       betaPrior = F, 
@@ -293,7 +294,7 @@ DESeq2_wrapper <- function(
     ## and m is the number of samples. Excludes groups w/ only 2 samples
     independentFiltering = FALSE,
     pAdjustMethod = p_adjust,
-    tidy = T,
+    tidy = TRUE,
     parallel = T
   )
   
@@ -375,8 +376,8 @@ DESeq2_wrapper <- function(
   attr(results, "number_significant") <- flag_df %>%
     dplyr::group_by(Comparison) %>%
     dplyr::summarise(
-      Up_total = sum(Flags > 0, na.rm = T),
-      Down_total = sum(Flags < 0, na.rm = T),
+      Up_total = sum(Flags > 0, na.rm = TRUE),
+      Down_total = sum(Flags < 0, na.rm = TRUE),
       row.names = NULL
     )
   
@@ -623,13 +624,13 @@ edgeR_wrapper <- function(
     if(length(cmb1) == 0) cmb1 <- e_data_counts[grouping_info[[attr(grouping_info, "pair_group")]] == combo[1]]
     
     res[[paste0("NonZero_Count_", combo[1])]] <- rowSums(cmb1 != 0)
-    # res[[paste0("Mean_", combo[1])]] <- apply(cmb1, 1, mean, na.rm = T)
+    # res[[paste0("Mean_", combo[1])]] <- apply(cmb1, 1, mean, na.rm = TRUE)
     
     cmb2 <- e_data_counts[grouping_info$Group == combo[2]]
     if(length(cmb2) == 0) cmb2 <- e_data_counts[grouping_info[[attr(grouping_info, "pair_group")]] == combo[2]]
     
     res[[paste0("NonZero_Count_", combo[2])]] <- rowSums(cmb2 != 0)
-    # res[[paste0("Mean_", combo[2])]] <- apply(cmb2, 1, mean, na.rm = T)
+    # res[[paste0("Mean_", combo[2])]] <- apply(cmb2, 1, mean, na.rm = TRUE)
     
     res[[get_edata_cname(omicsData)]] <- as.character(omicsData$e_data[[get_edata_cname(omicsData)]])
     row.names(res) <- NULL
@@ -670,8 +671,8 @@ edgeR_wrapper <- function(
   attr(results, "number_significant") <- flag_df %>%
     dplyr::group_by(Comparison) %>%
     dplyr::summarise(
-      Up_total = sum(Flags > 0, na.rm = T),
-      Down_total = sum(Flags < 0, na.rm = T),
+      Up_total = sum(Flags > 0, na.rm = TRUE),
+      Down_total = sum(Flags < 0, na.rm = TRUE),
       row.names = NULL
     )
   
@@ -892,12 +893,12 @@ voom_wrapper <- function(
       cmb1 <- e_data_counts[grouping_info$Group == combo[1]]
       if(length(cmb1) == 0) cmb1 <- e_data_counts[grouping_info[[attr(grouping_info, "pair_group")]] == combo[1]]
       res[[paste0("NonZero_Count_", combo[1])]] <- rowSums(cmb1 != 0)
-      # res[[paste0("Mean_", combo[1])]] <- apply(cmb1, 1, mean, na.rm = T)
+      # res[[paste0("Mean_", combo[1])]] <- apply(cmb1, 1, mean, na.rm = TRUE)
       
       cmb2 <- e_data_counts[grouping_info$Group == combo[2]]
       if(length(cmb2) == 0) cmb2 <- e_data_counts[grouping_info[[attr(grouping_info, "pair_group")]] == combo[2]]
       res[[paste0("NonZero_Count_", combo[2])]] <- rowSums(cmb2 != 0)
-      # res[[paste0("Mean_", combo[2])]] <- apply(cmb2, 1, mean, na.rm = T)
+      # res[[paste0("Mean_", combo[2])]] <- apply(cmb2, 1, mean, na.rm = TRUE)
 
       res[[get_edata_cname(omicsData)]] <- as.character(omicsData$e_data[[get_edata_cname(omicsData)]])
       row.names(res) <- NULL
@@ -938,8 +939,8 @@ voom_wrapper <- function(
   attr(results, "number_significant") <- flag_df %>%
     dplyr::group_by(Comparison) %>%
     dplyr::summarise(
-      Up_total = sum(Flags > 0, na.rm = T),
-      Down_total = sum(Flags < 0, na.rm = T),
+      Up_total = sum(Flags > 0, na.rm = TRUE),
+      Down_total = sum(Flags < 0, na.rm = TRUE),
       row.names = NULL
     )
   
@@ -1120,12 +1121,14 @@ get_group_formula <- function(omicsData){
 #' @return plot result
 #' 
 #' @examples 
+#' \dontrun{
 #' library(pmartRdata)
 #' myseqData <- group_designation(omicsData = rnaseq_object, main_effects = "Virus")
 #' dispersion_est(omicsData = myseqData, method = "edgeR")
 #' dispersion_est(omicsData = myseqData, method = "DESeq2")
 #' dispersion_est(omicsData = myseqData, method = "voom")
-#'
+#' }
+#' 
 #' @references 
 #'  Robinson MD, McCarthy DJ, Smyth GK (2010). “edgeR: a Bioconductor package 
 #'  for differential expression analysis of digital gene expression data.” 
@@ -1318,7 +1321,7 @@ dispersion_est <- function(omicsData, method,
     norm_factors_limma <- edgeR::calcNormFactors(edata_limma)
     mean_norm_counts <- norm_factors_limma
     
-    limma_voom <- limma::voom(norm_factors_limma, design_matrix, save.plot = T)
+    limma_voom <- limma::voom(norm_factors_limma, design_matrix, save.plot = TRUE)
     limma_vfit <- limma::lmFit(limma_voom, design_matrix)
     
     efit <- limma::eBayes(limma_vfit)

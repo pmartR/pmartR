@@ -270,10 +270,12 @@ print.RNAFiltSummary <- function(object){
 #' filtered at this threshold are reported.
 #'
 #' @examples 
+#' \dontrun{
 #' library(pmartRdata)
 #' myfilt <- total_count_filter(omicsData = rnaseq_object)
 #' summary(filter_object = myfilt, min_count = 2)
-#'
+#' }
+#' 
 #' @author Rachel Richardson
 #' 
 #' @seealso \code{\link{total_count_filter}}

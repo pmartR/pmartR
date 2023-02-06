@@ -32,8 +32,8 @@ my_prodata = applyFilt(filter_object = imdanova_Filt,
 
 imd_anova_res = imd_anova(omicsData = my_prodata,
                           test_method = 'comb',
-                          pval_adjust_a ='bon',
-                          pval_adjust_g = 'bon')
+                          pval_adjust_a_multcomp ='bon',
+                          pval_adjust_g_multcomp = 'bon')
 
 result = get_data_class(imd_anova_res)
 

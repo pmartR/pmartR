@@ -33,8 +33,8 @@ test_that('bpquant produces correct isoforms',{
   # Run some statisiticalness on the filtered data.
   inova <- imd_anova(omicsData = pdata,
                      test_method = 'comb',
-                     pval_adjust_a = 'bon',
-                     pval_adjust_g = 'bon')
+                     pval_adjust_a_multcomp = 'bon',
+                     pval_adjust_g_multcomp = 'bon')
 
   # Quantitate with Reverend Bayes ---------------------------------------------
 

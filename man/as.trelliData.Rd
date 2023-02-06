@@ -33,12 +33,12 @@ library(pmartRdata)
 # Generate an example e_meta file for lipid data 
 lipid_emeta <- data.frame("Lipid" = lipid_pos_edata$Lipid, 
   "LipidFamily" = lipid_pos_edata$Lipid \%>\% as.character() \%>\% 
-    strsplit("(", fixed = T) \%>\% lapply(function(el) {el[1]}) \%>\% unlist())
+    strsplit("(", fixed = TRUE) \%>\% lapply(function(el) {el[1]}) \%>\% unlist())
 
 # Transform the data
 omicsData <- edata_transform(omicsData = lipid_pos_object, data_scale = "log2")
 omicsData$e_meta$LipidFamily <- omicsData$e_meta$Lipid \%>\% as.character() \%>\% 
-    strsplit("(", fixed = T) \%>\% lapply(function(el) {el[1]}) \%>\% unlist()
+    strsplit("(", fixed = TRUE) \%>\% lapply(function(el) {el[1]}) \%>\% unlist()
 
 # Group the data by condition
 omicsData <- group_designation(omicsData = omicsData, main_effects = c("Virus"))

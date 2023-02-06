@@ -12,8 +12,10 @@
 #' norm_result <- normalize_global(omicsData = mypep, norm_fn = "median", subset_fn = "all")
 #' summary(norm_result)
 #' 
+#' \dontrun{
 #' spans_results <- spans_procedure(omicsData = mypep)
 #' summary(spans_results)
+#' }
 #' 
 #' dim_results <- dim_reduction(omicsData = mypep)
 #' summary(dim_results)

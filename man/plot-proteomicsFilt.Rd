@@ -114,6 +114,7 @@ For plotting an S3 object of type 'proteomicsFilt':
 }
 \examples{
 library(pmartRdata)
+data(pep_object)
 my_filter <- proteomics_filter(omicsData = pep_object)
 plot(my_filter, min_num_peps = 3)
 plot(my_filter, plot_type = "redundancy")
