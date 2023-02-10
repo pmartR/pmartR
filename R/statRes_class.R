@@ -4,19 +4,19 @@
 #'   \code{imd_anova} call.
 #' @param omicsData pmartR data object of any class, which has a `group_df`
 #'   attribute that is usually created by the `group_designation()` function
-#' @param comparisons Tcomparisons made
+#' @param comparisons character vector of comparison names, e.g. c("A_vs_B", "B_vs_C", ...)
 #' @param test_method test method used ("anova", "gtest", or "combined")
-#' @param pval_adjust_a_multcomp character string specifying the type of multiple
+#' @param pval_adjust_a_multcomp character string specifying which type of multiple
 #'   comparison adjustment was implemented for ANOVA tests. Valid options include:
 #'   "bonferroni", "holm", "tukey", and "dunnett".
-#' @param pval_adjust_g_multcomp character string specifying the type of multiple
-#'   comparison adjustment to was implemented for G-test tests. Valid options include:
+#' @param pval_adjust_g_multcomp character string specifying which type of multiple
+#'   comparison adjustment was implemented for G-tests. Valid options include:
 #'   "bonferroni" and "holm".
-#' @param pval_adjust_a_fdr character string specifying the type of FDR
+#' @param pval_adjust_a_fdr character string specifying which type of FDR
 #'   adjustment was implemented for ANOVA tests. Valid options include:
 #'   "bonferroni", "BH", "BY", and "fdr".
-#' @param pval_adjust_g_fdr character string specifying the type of FDR
-#'   adjustment was implemented for G-test tests. Valid options include:
+#' @param pval_adjust_g_fdr character string specifying which type of FDR
+#'   adjustment was implemented for G-tests. Valid options include:
 #'   "bonferroni", "BH", "BY", and "fdr".
 #' @param pval_thresh numeric p-value threshold value
 #'
