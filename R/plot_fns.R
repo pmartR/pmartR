@@ -6113,10 +6113,8 @@ make_volcano_plot_df <- function(x) {
       temp_df$Comparison <- comp
 
       # rename the columns to something static so they can be rbind-ed
-      rnms <- colnames(temp_df)[which(colnames(temp_df) %in% groups)]
-      
-      colnames(temp_df) <- gsub(rnms[2], "Count_Second_Group", 
-                                gsub(rnms[1], "Count_First_Group", colnames(temp_df)))
+      colnames(temp_df)[which(colnames(temp_df) == groups[1])] <- "Count_First_Group"
+      colnames(temp_df)[which(colnames(temp_df) == groups[2])] <- "Count_Second_Group"
 
       # store proportion of nonmissing to color g-test values in volcano plot
       temp_df$Prop_First_Group <- temp_df$Count_First_Group / gsize_1
