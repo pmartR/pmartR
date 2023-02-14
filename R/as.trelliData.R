@@ -589,3 +589,81 @@ trelli_panel_by <- function(trelliData, panel) {
   return(trelliData)
   
 }
+
+#' @name trelli_pvalue_filter
+#' 
+#' @title Filter a paneled trelliData object by a p-value 
+#' 
+#' @description This custom function allows users to filter down their plots to a 
+#'    specified p-value IF statistics data has been included. This function is mostly
+#'    relevant to the MODE application. 
+#'    
+#' @param trelliData A trelliData object with statistics results (statRes). Required.
+#' @param comparison The specific comparison to visualize in the fold_change volcano. 
+#'    See attr(statRes, "comparisons") for the available options. Required. 
+#' @param p_value_test A string to indicate which p_values to plot. Acceptable
+#'    entries are "anova", "gtest", or "combined". Default is "anova". Unlike the
+#'    plotting functions, here p_value_test cannot be null. Required.
+#' @param p_value_thresh A value between 0 and 1 to indicate the p-value threshold 
+#'    at which to keep plots. Default is 0.05. Required.
+#'    
+#' @examples
+#' \dontrun{
+#' 
+#' # Filter just a statRes object
+#' 
+#' 
+#' # Filter both a omicsData and statRes object
+#' 
+#' 
+#' 
+#' }
+#'
+#' @author David Degnan, Lisa Bramer
+#' 
+#' @export
+trelli_pvalue_filter <- function(trelliData, 
+                                 comparison,
+                                 p_value_test = "anova", 
+                                 p_value_thresh = 0.05) {
+  
+  # Run initial checks----------------------------------------------------------
+  
+  # trelliData object must be of the trelliData class
+  if (any(class(trelliData) %in% c("trelliData")) == FALSE) {
+    stop("trelliData must be of the class trelliData.")
+  }
+  
+  # trelliData must contain statistics 
+  if (is.null(trelliData$statRes)) {
+    stop("trelliData must contain a statRes object.")
+  }
+  
+  # Ensure the comparison is an acceptable input
+  if (!is.character(comparison) | length(comparison) > 1) {
+    stop("comparison must be a string of length 1.")
+  }
+  
+  # Ensure the comparison is from the comparisons lists
+  Comparisons <- attr(trelliData$statRes, "comparisons")
+  if (comparison %in% Comparisons == FALSE) {
+    stop(paste0(comparison, "is not an acceptable comparison"))
+  }
+  
+  # Ensure the p_value_test is anova, gtest, or combined
+  if (p_value_test %in% c("anova", "gtest", "combined") == FALSE) {
+    stop("p_value_test must be anova, gtest, or combined.")
+  }
+  
+  # Ensure that p_value threshold is a single numeric
+  if (!is.numeric(p_value_thresh)) {
+    stop("p_value_threshold must be a number.")
+  }
+  p_value_thresh <- abs(p_value_thresh)
+  
+  # Filter by p_value-----------------------------------------------------------
+  
+  
+  
+  
+}
