@@ -5942,7 +5942,8 @@ prep_flags <- function (x, test) {
     # Assemble a data frame with the sample IDs and anova flags.
     da_flag <- data.frame(
       x[, 1, drop = FALSE],
-      x[, grep("^Flag_A_", colnames(x))]
+      x[, grep("^Flag_A_", colnames(x))],
+      check.names = F
     )
     
     # Remove "Flag_A_" from column names. The first column name is removed
@@ -5979,7 +5980,8 @@ prep_flags <- function (x, test) {
     # Assemble a data frame with the sample IDs and anova flags.
     da_flag <- data.frame(
       x[, 1, drop = FALSE],
-      x[, grep("^Flag_A_", colnames(x))]
+      x[, grep("^Flag_A_", colnames(x))],
+      check.names = F
     )
     
     # Remove "Flag_A_" from column names. The first column name is removed
