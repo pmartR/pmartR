@@ -35,12 +35,14 @@ This use-case-specific function allows users to filter down their plots to a
 # Filter a trelliData object with only statistics results, while not caring about a comparison
 trelli_pvalue_filter(trelliData3, p_value_test = "anova", p_value_thresh = 0.1)
 
-# Filter a trelliData object with only statistics results, while caring about specific comparison
+# Filter a trelliData object with only statistics results, while caring about a specific comparison
 trelli_pvalue_filter(trelliData3, p_value_test = "anova", p_value_thresh = 0.1, comparison = "StrainC_vs_StrainA")
 
+# Filter both a omicsData and statRes object, while not caring about a specific comparison
+trelli_pvalue_filter(trelliData4, p_value_test = "anova", p_value_thresh = 0.001)
 
-# Filter both a omicsData and statRes object
-
+# Filter both a omicsData and statRes object, while caring about a specific comparison
+trelli_pvalue_filter(trelliData4, p_value_test = "gtest", p_value_thresh = 0.25, comparison = "StrainA_vs_StrainB")
 
 
 }
