@@ -1693,7 +1693,7 @@ trelli_foldchange_boxplot <- function(trelliData,
 #' 
 #' ## Build fold_change bar plot with statRes data grouped by edata_colname.
 #' trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") %>% 
-#'   trelli_foldchange_volcano(comparison = "Mock_vs_Infection_A")
+#'   trelli_foldchange_volcano(comparison = "StrainA_vs_StrainB")
 #'
 #' }
 #' 
@@ -1815,37 +1815,40 @@ trelli_foldchange_volcano <- function(trelliData,
     # Subset comparison
     DF <- DF[DF$Comparison == comparison,]
     
-    # Get significant values
-    DF <- determine_significance(DF, p_value_thresh)
-    if (is.null(DF)) {return(NULL)}
+    if (!is.null(p_value_test) && p_value_thresh != 0) {
+      
+      # Get significant values
+      DF <- determine_significance(DF, p_value_test, p_value_thresh)
     
-    # Indicate which comparisons should be highlighted
-    DF$SigCounts <- lapply(1:nrow(DF), function(row) {
-      if (DF$Significance[row] == attr(DF, "LessThan")) {
-        ifelse(DF$fold_change[row] > 0, "High", "Low")
-      } else {return("Not Significant")}
-    }) %>% unlist()
+      # Indicate which comparisons should be highlighted
+      DF$SigCounts <- lapply(1:nrow(DF), function(row) {
+        if (DF$Significance[row] == attr(DF, "LessThan")) {
+          ifelse(DF$fold_change[row] > 0, "High", "Low")
+        } else {return("Not Significant")}
+      }) %>% unlist()
+      
+      # Get count 
+      counts <- DF$SigCounts%>%
+        table(dnn = "Cog") %>%
+        data.table::data.table()
+      
+      # Add 0's if necessary
+      if (nrow(counts) != 3) {
+        all_options <- c("High", "Low", "Not Significant")
+        missing <- all_options[all_options %in% counts$Cog == FALSE]
+        counts <- rbind(counts, data.frame(Cog = missing, N = 0))
+      }
+      
+      # Set order
+      counts <- counts[order(counts$Cog),]
+      counts$N <- as.numeric(counts$N)
+      
+      # Convert to trelliscope cogs
+      cog_to_trelli <- do.call(cbind, lapply(1:nrow(counts), function(row) {
+        quick_cog(paste(counts$Cog[row], "Count"), counts$N[row])
+      })) %>% tibble::tibble()
     
-    # Get count 
-    counts <- DF$SigCounts%>%
-      table(dnn = "Cog") %>%
-      data.table::data.table()
-    
-    # Add 0's if necessary
-    if (nrow(counts) != 3) {
-      all_options <- c("High", "Low", "Not Significant")
-      missing <- all_options[all_options %in% counts$Cog == FALSE]
-      counts <- rbind(counts, data.frame(Cog = missing, N = 0))
-    }
-    
-    # Set order
-    counts <- counts[order(counts$Cog),]
-    counts$N <- as.numeric(counts$N)
-    
-    # Convert to trelliscope cogs
-    cog_to_trelli <- do.call(cbind, lapply(1:nrow(counts), function(row) {
-      quick_cog(paste(counts$Cog[row], "Count"), counts$N[row])
-    })) %>% tibble::tibble()
+    } else {return(NULL)}
     
     return(cog_to_trelli)
     

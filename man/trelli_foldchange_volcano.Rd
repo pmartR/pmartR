@@ -69,7 +69,7 @@ Specify a plot design and cognostics for the fold_change volcano
 
 ## Build fold_change bar plot with statRes data grouped by edata_colname.
 trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") \%>\% 
-  trelli_foldchange_volcano(comparison = "Mock_vs_Infection_A")
+  trelli_foldchange_volcano(comparison = "StrainA_vs_StrainB")
 
 }
 
