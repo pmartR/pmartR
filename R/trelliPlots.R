@@ -22,8 +22,8 @@
 #'   potential future functions.
 #' @param p_value_thresh The user provided threshold for plotting significant
 #'   p-values.
-#' @param p_value_test The user provided provided logical for whether p-value
-#'   testing should occur.
+#' @param p_value_test The user provided test to indicate in plots. Valid options 
+#'   are anova, gtest, or NULL.
 trelli_precheck <- function(trelliData, 
                             trelliCheck,
                             cognostics, 
@@ -153,21 +153,22 @@ trelli_precheck <- function(trelliData,
   # Check p_value test
   if ("stat" %in% trelliCheck & p_value_skip != TRUE) {
     
-    # Check p-value test method 
-    if (length(p_value_test) > 1 | !is.logical(p_value_test)) {
-      stop("p_value_test must be a single TRUE or FALSE.")
+    if (!is.null(p_value_test)) {
+      
+      if (!is.character(p_value_test) || p_value_test %in% c("anova", "gtest") == FALSE || length(p_value_test) > 1) {
+        stop("p_value_test must be anova, gtest, or NULL.")
+        }
+  
+    
+      # Check that the data has the requested p_value 
+      if (p_value_test == "anova" & any(grepl("P_value_A", colnames(trelliData$statRes))) == FALSE) {
+        stop("No imd-anova stats were detected in the statRes object. Change p_value_test to gtest.")
+      } else if (p_value_test == "gtest" & any(grepl("P_value_G", colnames(trelliData$statRes))) == FALSE) {
+        stop("No gtest stats were detected in the statRes object. Change p_value_test to anova.")
+      } 
+    
     }
-    if (is.na(p_value_test)) {p_value_test <- FALSE}
-    
-    # Check that the data has the requested p_value 
-    if (p_value_test & any(grepl("P_value_A", colnames(trelliData$statRes))) == FALSE) {
-      message(paste(
-        "No imd-anova stats were detected in the statRes object which is",
-        "required for p_value_test to be TRUE. Seting P_value_test to FALSE."
-      ))
-      p_value_test <- FALSE
-    } 
-    
+      
     # Check p_value threshold
     if (!is.numeric(p_value_thresh)) {
       stop("p_value_thresh must be a numeric.")
@@ -220,7 +221,7 @@ trelli_builder <- function(toBuild, cognostics, plotFUN, cogFUN, path, name, ...
     
   } else {
     
-    toBuild <- toBuild %>%
+    toBuild %>%
       dplyr::ungroup() %>%
       dplyr::mutate(
         panel = trelliscopejs::map2_plot(Nested_DF, as.character(unlist(toBuild[,1])), plotFUN),
@@ -1236,10 +1237,11 @@ trelli_missingness_bar <- function(trelliData,
   
 }
 
-determine_significance <- function(DF, p_value_thresh) {
+determine_significance <- function(DF, p_value_test, p_value_thresh) {
   
   # Indicate significant values 
-  DF$Significance <- DF$p_value_anova <= p_value_thresh
+  if (p_value_test == "anova") {DF$Significance <- DF$p_value_anova <= p_value_thresh} else 
+  if (p_value_test == "gtest") {DF$Significance <- DF$p_value_gtest <= p_value_thresh} 
   
   # Filter out NA values 
   DF <- DF[!(is.nan(DF$Significance) | is.nan(DF$fold_change)),]
@@ -1270,9 +1272,8 @@ determine_significance <- function(DF, p_value_thresh) {
 #' @param trelliData A trelliscope data object with statRes results. Required.
 #' @param cognostics A vector of cognostic options for each plot. Valid entries
 #'   are are fold_change and p_value.
-#' @param p_value_test A logical to indicate whether specific significant
-#'   biomolecules are to be incidated with a black outline, if an imd-anova was
-#'   run. Default is FALSE.
+#' @param p_value_test A string to indicate which p_values to plot. Acceptable
+#'    entries are "anova", "gtest", or NULL. Default is "anova". 
 #' @param p_value_thresh A value between 0 and 1 to indicate significant
 #'   biomolecules for p_value_test. Default is 0.05.
 #' @param ggplot_params An optional vector of strings of ggplot parameters to
@@ -1296,11 +1297,11 @@ determine_significance <- function(DF, p_value_thresh) {
 #' 
 #' ## Build fold_change bar plot with statRes data grouped by edata_colname.
 #' trelli_panel_by(trelliData = trelliData3, panel = "Lipid") %>% 
-#'   trelli_foldchange_bar(test_mode = TRUE, test_example = 1:10, p_value_test = TRUE)
+#'   trelli_foldchange_bar(test_mode = TRUE, test_example = 1:10, p_value_test = "anova")
 #'   
 #' ## Or make the plot interactive  
 #' trelli_panel_by(trelliData = trelliData4, panel = "Lipid") %>% 
-#'   trelli_foldchange_bar(test_mode = TRUE, test_example = 1:10, p_value_test = TRUE, interactive = TRUE) 
+#'   trelli_foldchange_bar(test_mode = TRUE, test_example = 1:10, p_value_test = "gtest", interactive = TRUE) 
 #'    
 #' }
 #' 
@@ -1309,7 +1310,7 @@ determine_significance <- function(DF, p_value_thresh) {
 #' @export
 trelli_foldchange_bar <- function(trelliData,
                                   cognostics = c("fold_change", "p_value"),
-                                  p_value_test = FALSE,
+                                  p_value_test = "anova",
                                   p_value_thresh = 0.05,
                                   ggplot_params = NULL,
                                   interactive = FALSE,
@@ -1348,10 +1349,10 @@ trelli_foldchange_bar <- function(trelliData,
   
   fc_bar_plot_fun <- function(DF, title) {
     
-    if (p_value_test && p_value_thresh != 0) {
+    if (!is.null(p_value_test) && p_value_thresh != 0) {
       
       # Get significant values
-      DF <- determine_significance(DF, p_value_thresh)
+      DF <- determine_significance(DF, p_value_test, p_value_thresh)
       if (is.null(DF)) {return(NULL)}
       
       # Make bar plot 
@@ -1457,9 +1458,8 @@ trelli_foldchange_bar <- function(trelliData,
 #'   results. Required.
 #' @param cognostics A vector of cognostic options for each plot. Valid entries
 #'   are are n, mean, median, and sd.
-#' @param p_value_test A logical to indicate whether specific significant
-#'   biomolecules are to be indicated with a changed symbol if an imd-anova was
-#'   run. Default is FALSE.
+#' @param p_value_test A string to indicate which p_values to plot. Acceptable
+#'    entries are "anova", "gtest", or NULL. Default is "anova". 
 #' @param p_value_thresh A value between 0 and 1 to indicate significant
 #'   biomolecules for p_value_test. Default is 0.05.
 #' @param include_points Add points. Default is TRUE.
@@ -1484,7 +1484,7 @@ trelli_foldchange_bar <- function(trelliData,
 #' 
 #' ## Build fold_change box plot with statRes data grouped by edata_colname.
 #' trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") %>% 
-#'   trelli_foldchange_boxplot(p_value_test = TRUE)
+#'   trelli_foldchange_boxplot(p_value_test = "anova")
 #'
 #' }
 #' 
@@ -1493,7 +1493,7 @@ trelli_foldchange_bar <- function(trelliData,
 #' @export
 trelli_foldchange_boxplot <- function(trelliData,
                                       cognostics = c("n", "median", "mean", "sd"),
-                                      p_value_test = FALSE,
+                                      p_value_test = "anova",
                                       p_value_thresh = 0.05,
                                       include_points = TRUE,
                                       ggplot_params = NULL,
@@ -1537,26 +1537,45 @@ trelli_foldchange_boxplot <- function(trelliData,
   
   fc_box_plot_fun <- function(DF, title) {
     
-    # Get significant values
-    DF <- determine_significance(DF, p_value_thresh)
-    if (is.null(DF)) {return(NULL)}
-  
-    # Make boxplot
-    boxplot <- ggplot2::ggplot(DF, ggplot2::aes(x = Comparison, y = fold_change, fill = Comparison)) +
-      ggplot2::geom_boxplot(outlier.shape = NA) + ggplot2::theme_bw() +
-      ggplot2::theme(
-        plot.title = ggplot2::element_text(hjust = 0.5), 
-        axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1),
-      ) + ggplot2::ylab("Fold Change") + ggplot2::ggtitle(title) +
-      ggplot2::guides(fill = "none")
+    if (!is.null(p_value_test) && p_value_thresh != 0) {
     
-    # Add include_points
-    if (include_points) {
-      if (p_value_test && p_value_thresh != 0) {
-        boxplot <- boxplot + ggplot2::geom_jitter(ggplot2::aes(shape = Significance), height = 0, width = 0.25) +
-          ggplot2::scale_shape_manual(values = structure(c(17, 16), .Names = c(attr(DF, "LessThan"), attr(DF, "GreaterThan"))))
-      } else {
-        boxplot <- boxplot + ggplot2::geom_jitter(height = 0, width = 0.25)
+      # Get significant values
+      DF <- determine_significance(DF, p_value_test, p_value_thresh)
+      if (is.null(DF)) {return(NULL)}
+    
+      # Make boxplot
+      boxplot <- ggplot2::ggplot(DF, ggplot2::aes(x = Comparison, y = fold_change, fill = Comparison)) +
+        ggplot2::geom_boxplot(outlier.shape = NA) + ggplot2::theme_bw() +
+        ggplot2::theme(
+          plot.title = ggplot2::element_text(hjust = 0.5), 
+          axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1),
+        ) + ggplot2::ylab("Fold Change") + ggplot2::ggtitle(title) +
+        ggplot2::guides(fill = "none")
+      
+      # Add include_points
+      if (include_points) {
+        if (!is.null(p_value_test) && p_value_thresh != 0) {
+          boxplot <- boxplot + ggplot2::geom_jitter(ggplot2::aes(shape = Significance), height = 0, width = 0.25) +
+            ggplot2::scale_shape_manual(values = structure(c(17, 16), .Names = c(attr(DF, "LessThan"), attr(DF, "GreaterThan"))))
+        } else {
+          boxplot <- boxplot + ggplot2::geom_jitter(height = 0, width = 0.25)
+        }
+      }
+      
+    } else {
+      
+      # Make boxplot
+      boxplot <- ggplot2::ggplot(DF, ggplot2::aes(x = Comparison, y = fold_change, fill = Comparison)) +
+        ggplot2::geom_boxplot(outlier.shape = NA) + ggplot2::theme_bw() +
+        ggplot2::theme(
+          plot.title = ggplot2::element_text(hjust = 0.5), 
+          axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1),
+        ) + ggplot2::ylab("Fold Change") + ggplot2::ggtitle(title) +
+        ggplot2::guides(fill = "none")
+      
+      # Add include_points
+      if (include_points) {
+          boxplot <- boxplot + ggplot2::geom_jitter(height = 0, width = 0.25)
       }
     }
     
@@ -1649,9 +1668,8 @@ trelli_foldchange_boxplot <- function(trelliData,
 #'   Required.
 #' @param cognostics A vector of cognostic options for each plot. Valid entry is
 #'   n.
-#' @param p_value_test A logical to indicate whether specific significant
-#'   biomolecules are to be indicated with a changed color if an imd-anova was
-#'   run. Default is FALSE.
+#' @param p_value_test A string to indicate which p_values to plot. Acceptable
+#'    entries are "anova", "gtest", or NULL. Default is "anova". 
 #' @param p_value_thresh A value between 0 and 1 to indicate significant
 #'   biomolecules for p_value_test. Default is 0.05.
 #' @param ggplot_params An optional vector of strings of ggplot parameters to
@@ -1685,7 +1703,7 @@ trelli_foldchange_boxplot <- function(trelliData,
 trelli_foldchange_volcano <- function(trelliData,
                                       comparison, 
                                       cognostics = c("n"),
-                                      p_value_test = TRUE,
+                                      p_value_test = "anova",
                                       p_value_thresh = 0.05,
                                       ggplot_params = NULL,
                                       interactive = FALSE,
@@ -1737,10 +1755,10 @@ trelli_foldchange_volcano <- function(trelliData,
     # Subset comparison
     DF <- DF[DF$Comparison == comparison,]
     
-    if (p_value_test && p_value_thresh != 0) {
+    if (!is.null(p_value_test) && p_value_thresh != 0) {
 
       # Get significant values
-      DF <- determine_significance(DF, p_value_thresh)
+      DF <- determine_significance(DF, p_value_test, p_value_thresh)
       if (is.null(DF)) {return(NULL)}
       
       # Indicate which comparisons should be highlighted
@@ -1875,9 +1893,8 @@ trelli_foldchange_volcano <- function(trelliData,
 #'   results. Required.
 #' @param cognostics A vector of cognostic options for each plot. Valid entries
 #'   are are n, mean, median, and sd.
-#' @param p_value_test A logical to indicate whether specific significant
-#'   biomolecules are to be indicated with a dot if an imd-anova was run.
-#'   Default is FALSE.
+#' @param p_value_test A string to indicate which p_values to plot. Acceptable
+#'    entries are "anova", "gtest", or NULL. Default is "anova". 
 #' @param p_value_thresh A value between 0 and 1 to indicate significant
 #'   biomolecules for p_value_test. Default is 0.05.
 #' @param ggplot_params An optional vector of strings of ggplot parameters to
@@ -1910,7 +1927,7 @@ trelli_foldchange_volcano <- function(trelliData,
 #' @export
 trelli_foldchange_heatmap <- function(trelliData,
                                       cognostics = c("n", "median", "mean", "sd"),
-                                      p_value_test = FALSE,
+                                      p_value_test = "anova",
                                       p_value_thresh = 0.05,
                                       ggplot_params = NULL,
                                       interactive = FALSE,
@@ -1951,10 +1968,10 @@ trelli_foldchange_heatmap <- function(trelliData,
     # Get edata cname
     edata_cname <- get_edata_cname(trelliData$statRes)
     
-    if (p_value_test && p_value_thresh != 0) {
+    if (!is.null(p_value_test) && p_value_thresh != 0) {
       
       # Get significant values
-      DF <- determine_significance(DF, p_value_thresh)
+      DF <- determine_significance(DF, p_value_test, p_value_thresh)
       if (is.null(DF)) {return(NULL)}
       
       # Make heatmap with significance
