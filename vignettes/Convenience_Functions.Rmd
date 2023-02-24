@@ -37,22 +37,6 @@ mynmr <- nmr_identified_object
 
 ## Related to Data Structure or Setup
 
-- `get_check_names()` - Retrieves the value in the check.names attribute from an omicsData object
-
-```{r}
-get_check_names(omicsData = mypro)
-get_check_names(omicsData = mymetab)
-get_check_names(omicsData = mynmr)
-```
-
-- `set_check_names()` - Sets the check.names attribute of an omicsData object
-
-```{r}
-mynmr <- set_check_names(omicsData = mynmr, set_to = TRUE)
-get_check_names(omicsData = mynmr)
-```
-
-
 - `get_data_class()` - Returns data_class attribute from statRes or trellData object, inherited from the omicsData used in `imd_anova()` or `format_data()`
 
 ```{r}

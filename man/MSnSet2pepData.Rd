@@ -9,8 +9,7 @@ MSnSet2pepData(
   data_scale,
   edata_cname = "UniqueID",
   fdata_cname = "SampleID",
-  emeta_cname = "UniqueID",
-  check.names = TRUE
+  emeta_cname = "UniqueID"
 )
 }
 \arguments{
@@ -51,8 +50,7 @@ result = MSnSet2pepData(msnset,
                         data_scale = "log2",
                         edata_cname = "UniqueID",
                         fdata_cname = "SampleID",
-                        emeta_cname = "UniqueID",
-                        check.names = TRUE)
+                        emeta_cname = "UniqueID")
 }
 
 }

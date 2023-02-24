@@ -28,7 +28,7 @@ test_that('as.proData returns the correct data frame and attributes',{
   
   # Confirm the correct attributes are present in the proData object.
   expect_equal(names(attributes(prdata)),
-               c("names", "cnames", "data_info", "check.names", "meta_info",
+               c("names", "cnames", "data_info", "meta_info",
                  "filters", "pro_quant_info", "class"))
   
   # Scrutinize the column names attribute.
@@ -86,7 +86,7 @@ test_that('as.proData returns the correct data frame and attributes',{
   
   # Confirm the correct attributes are present in the proData object.
   expect_equal(names(attributes(prdata)),
-               c("names", "cnames", "data_info", "check.names", "meta_info",
+               c("names", "cnames", "data_info", "meta_info",
                  "filters", "pro_quant_info", "class"))
   
   # Scrutinize the column names attribute.
@@ -170,7 +170,7 @@ test_that('as.proData returns the correct data frame and attributes',{
   
   # Confirm the correct attributes are present in the proData object.
   expect_equal(names(attributes(prdata)),
-               c("names", "cnames", "data_info", "check.names", "meta_info",
+               c("names", "cnames", "data_info", "meta_info",
                  "filters", "pro_quant_info", "class"))
   
   # Scrutinize the column names attribute.
@@ -233,7 +233,7 @@ test_that('as.proData returns the correct data frame and attributes',{
   
   # Confirm the correct attributes are present in the proData object.
   expect_equal(names(attributes(prdata)),
-               c("names", "cnames", "data_info", "check.names", "meta_info",
+               c("names", "cnames", "data_info", "meta_info",
                  "filters", "pro_quant_info", "class"))
   
   # Scrutinize the column names attribute.
@@ -307,7 +307,7 @@ test_that('as.proData returns the correct data frame and attributes',{
   
   # Confirm the correct attributes are present in the proData object.
   expect_equal(names(attributes(prdata)),
-               c("names", "cnames", "data_info", "check.names", "meta_info",
+               c("names", "cnames", "data_info", "meta_info",
                  "filters", "pro_quant_info", "class"))
   
   # Scrutinize the column names attribute.

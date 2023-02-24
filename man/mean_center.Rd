@@ -10,8 +10,7 @@ mean_center(
   subset_fn,
   feature_subset,
   backtransform = FALSE,
-  apply_norm = FALSE,
-  check.names = TRUE
+  apply_norm = FALSE
 )
 }
 \arguments{

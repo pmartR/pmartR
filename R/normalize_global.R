@@ -184,7 +184,6 @@ normalize_global <- function (omicsData, subset_fn, norm_fn, params = NULL,
 
   }
 
-  check_names = get_check_names(omicsData)
   edata_id <- get_edata_cname(omicsData)
   samp_id <- get_fdata_cname(omicsData)
   
@@ -506,8 +505,7 @@ normalize_global <- function (omicsData, subset_fn, norm_fn, params = NULL,
                             subset_fn = subset_fn,
                             feature_subset = peps,
                             backtransform = backtransform,
-                            apply_norm = apply_norm,
-                            check.names = check_names)
+                            apply_norm = apply_norm)
 
   # Calculate the proportion of features used to calculate the normalization
   # parameters.

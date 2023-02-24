@@ -57,8 +57,7 @@ median_center <- function (e_data,
                            subset_fn,
                            feature_subset,
                            backtransform = FALSE,
-                           apply_norm = FALSE,
-                           check.names = TRUE) {
+                           apply_norm = FALSE) {
   
   # Determine which column of e_data contains the biomolecule IDs.
   id_col <- which(colnames(e_data) == edata_id)
@@ -234,8 +233,7 @@ mean_center <- function (e_data,
                          subset_fn,
                          feature_subset,
                          backtransform = FALSE,
-                         apply_norm = FALSE,
-                         check.names = TRUE) {
+                         apply_norm = FALSE) {
   
   # Determine which column of e_data contains the biomolecule IDs.
   id_col <- which(colnames(e_data) == edata_id)
@@ -412,8 +410,7 @@ zscore_transform <- function (e_data,
                               subset_fn,
                               feature_subset,
                               backtransform = FALSE,
-                              apply_norm = FALSE,
-                              check.names = TRUE) {
+                              apply_norm = FALSE) {
   
   # Determine which column of e_data contains the biomolecule IDs.
   id_col <- which(colnames(e_data) == edata_id)
@@ -616,8 +613,7 @@ mad_transform <- function (e_data,
                            subset_fn,
                            feature_subset,
                            backtransform = FALSE,
-                           apply_norm = FALSE,
-                           check.names = TRUE) {
+                           apply_norm = FALSE) {
   
   # Determine which column of e_data contains the biomolecule IDs.
   id_col <- which(colnames(e_data) == edata_id)

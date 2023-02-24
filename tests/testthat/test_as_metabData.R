@@ -28,7 +28,7 @@ test_that('as.metabData returns the correct data frame and attributes',{
   
   # Confirm the correct attributes are present in the metabData object.
   expect_equal(names(attributes(mdata)),
-               c("names", "cnames", "data_info", "check.names", "meta_info",
+               c("names", "cnames", "data_info", "meta_info",
                  "filters", "class"))
   
   # Scrutinize the column names attribute.
@@ -83,7 +83,7 @@ test_that('as.metabData returns the correct data frame and attributes',{
   
   # Confirm the correct attributes are present in the metabData object.
   expect_equal(names(attributes(mdata)),
-               c("names", "cnames", "data_info", "check.names", "meta_info",
+               c("names", "cnames", "data_info", "meta_info",
                  "filters", "class"))
   
   # Scrutinize the column names attribute.
@@ -164,7 +164,7 @@ test_that('as.metabData returns the correct data frame and attributes',{
   
   # Confirm the correct attributes are present in the metabData object.
   expect_equal(names(attributes(mdata)),
-               c("names", "cnames", "data_info", "check.names", "meta_info",
+               c("names", "cnames", "data_info", "meta_info",
                  "filters", "class"))
   
   # Scrutinize the column names attribute.
@@ -224,7 +224,7 @@ test_that('as.metabData returns the correct data frame and attributes',{
   
   # Confirm the correct attributes are present in the metabData object.
   expect_equal(names(attributes(mdata)),
-               c("names", "cnames", "data_info", "check.names", "meta_info",
+               c("names", "cnames", "data_info", "meta_info",
                  "filters", "class"))
   
   # Scrutinize the column names attribute.
@@ -295,7 +295,7 @@ test_that('as.metabData returns the correct data frame and attributes',{
   
   # Confirm the correct attributes are present in the metabData object.
   expect_equal(names(attributes(mdata)),
-               c("names", "cnames", "data_info", "check.names", "meta_info",
+               c("names", "cnames", "data_info", "meta_info",
                  "filters", "class"))
   
   # Scrutinize the column names attribute.

@@ -70,8 +70,6 @@ test_that('molecule_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata, 'cnames'),
                    attr(filtered, 'cnames'))
-  expect_identical(attr(pdata, 'check.names'),
-                   attr(filtered, 'check.names'))
   expect_identical(class(pdata),
                    class(filtered))
 
@@ -271,8 +269,6 @@ test_that('molecule_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata, 'cnames'),
                    attr(filtered_b, 'cnames'))
-  expect_identical(attr(pdata, 'check.names'),
-                   attr(filtered_b, 'check.names'))
   expect_identical(class(pdata),
                    class(filtered_b))
   
@@ -358,8 +354,6 @@ test_that('molecule_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata, 'cnames'),
                    attr(filtered_g, 'cnames'))
-  expect_identical(attr(pdata, 'check.names'),
-                   attr(filtered_g, 'check.names'))
   expect_identical(class(pdata),
                    class(filtered_g))
   
@@ -447,8 +441,6 @@ test_that('molecule_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata, 'cnames'),
                    attr(filtered_bg, 'cnames'))
-  expect_identical(attr(pdata, 'check.names'),
-                   attr(filtered_bg, 'check.names'))
   expect_identical(class(pdata),
                    class(filtered_bg))
   

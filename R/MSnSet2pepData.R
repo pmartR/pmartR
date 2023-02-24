@@ -38,15 +38,13 @@
 #'                         data_scale = "log2",
 #'                         edata_cname = "UniqueID",
 #'                         fdata_cname = "SampleID",
-#'                         emeta_cname = "UniqueID",
-#'                         check.names = TRUE)
+#'                         emeta_cname = "UniqueID")
 #' }
 #'
 #' @export
 #' 
 MSnSet2pepData <- function (msnset_object, data_scale, edata_cname = "UniqueID",
-                            fdata_cname = "SampleID", emeta_cname = "UniqueID",
-                            check.names = TRUE) {
+                            fdata_cname = "SampleID", emeta_cname = "UniqueID") {
   
   #check that msnset_object is of correct class
   if(!inherits(msnset_object, "MSnSet"))

@@ -120,8 +120,6 @@ test_that('total_count_filter and applyFilt produce the correct output',{
     # Ensure the class and attributes that shouldn't have changed didn't change.
     expect_identical(attr(tester, 'cnames'),
                      attr(filtered, 'cnames'))
-    expect_identical(attr(tester, 'check.names'),
-                     attr(filtered, 'check.names'))
     expect_identical(class(tester),
                      class(filtered))
     

@@ -28,7 +28,7 @@ test_that('as.nmrData returns the correct data frame and attributes',{
   
   # Confirm the correct attributes are present in the nmrData object.
   expect_equal(names(attributes(nmrdata)),
-               c("names", "cnames", "data_info", "nmr_info", "check.names",
+               c("names", "cnames", "data_info", "nmr_info",
                  "meta_info", "filters", "class"))
   
   # Scrutinize the column names attribute.
@@ -90,7 +90,7 @@ test_that('as.nmrData returns the correct data frame and attributes',{
   
   # Confirm the correct attributes are present in the nmrData object.
   expect_equal(names(attributes(nmrdata)),
-               c("names", "cnames", "data_info", "nmr_info", "check.names",
+               c("names", "cnames", "data_info", "nmr_info",
                  "meta_info", "filters", "class"))
   
   # Scrutinize the column names attribute.
@@ -139,8 +139,7 @@ test_that('as.nmrData returns the correct data frame and attributes',{
   
   # Check for an error when e_data has more columns than f_data has rows.
   expect_error(as.nmrData(e_data = data.frame(edata,
-                                              `F5-007` = edata[, 10],
-                                              check.names = FALSE),
+                                              `F5-007` = edata[, 10], check.names = FALSE),
                           f_data = fdata,
                           edata_cname = 'Metabolite',
                           fdata_cname = 'SampleID'),
@@ -177,7 +176,7 @@ test_that('as.nmrData returns the correct data frame and attributes',{
   
   # Confirm the correct attributes are present in the nmrData object.
   expect_equal(names(attributes(nmrdata)),
-               c("names", "cnames", "data_info", "nmr_info", "check.names",
+               c("names", "cnames", "data_info", "nmr_info",
                  "meta_info", "filters", "class"))
   
   # Scrutinize the column names attribute.
@@ -244,7 +243,7 @@ test_that('as.nmrData returns the correct data frame and attributes',{
   
   # Confirm the correct attributes are present in the nmrData object.
   expect_equal(names(attributes(nmrdata)),
-               c("names", "cnames", "data_info", "nmr_info", "check.names",
+               c("names", "cnames", "data_info", "nmr_info",
                  "meta_info", "filters", "class"))
   
   # Scrutinize the column names attribute.
@@ -322,7 +321,7 @@ test_that('as.nmrData returns the correct data frame and attributes',{
   
   # Confirm the correct attributes are present in the nmrData object.
   expect_equal(names(attributes(nmrdata)),
-               c("names", "cnames", "data_info", "nmr_info", "check.names",
+               c("names", "cnames", "data_info", "nmr_info",
                  "meta_info", "filters", "class"))
   
   # Scrutinize the column names attribute.

@@ -64,9 +64,7 @@
 #'  parameters used to normalize the data, and the location and scale parameters
 #'  used to backtransform the data (if applicable). \cr \tab \cr data_types \tab
 #'  Character string describing the type of data, most commonly used for lipidomic data (lipidData objects) or NMR data (nmrData objects) but available for other data classes as well. Default
-#'  value is NULL. \cr \tab \cr check.names \tab Logical defaults to TRUE.
-#'  Indicates whether 'check.names' attribute of returned omicsData object is
-#'  TRUE or FALSE. \cr } Computed values included in the \code{data_info}
+#'  value is NULL. \cr } Computed values included in the \code{data_info}
 #'  attribute are as follows: \tabular{ll}{ num_edata \tab The number of unique
 #'  \code{edata_cname} entries.\cr \tab \cr num_miss_obs \tab The number of
 #'  missing observations.\cr \tab \cr num_zero_obs \tab For seqData only: The 
@@ -109,8 +107,6 @@ as.isobaricpepData <- function (e_data, f_data, e_meta = NULL, edata_cname,
                                  norm_info = list(),  data_types = NULL,
                                  is_bc = FALSE, batch_info = list()) {
   
-  check.names = FALSE
-  
   # Set the original data scale to the input data scale.
   data_scale_orig <- data_scale
   
@@ -131,7 +127,6 @@ as.isobaricpepData <- function (e_data, f_data, e_meta = NULL, edata_cname,
                     is_normalized = is_normalized,
                     norm_info = norm_info,
                     data_types = data_types,
-                    check.names = check.names,
                     dType = dType,
                     is_bc = is_bc,
                     batch_info = batch_info)
@@ -170,9 +165,6 @@ as.isobaricpepData <- function (e_data, f_data, e_meta = NULL, edata_cname,
                                                   refpool_notation = NA,
                                                   norm_info = norm_info,
                                                   isobaric_norm = isobaric_norm)
-  
-  # set check.names attribute #
-  attr(res, "check.names") = check.names
   
   # set meta data attributes #
   attr(res, "meta_info") <- set_meta_info(e_meta = res$e_meta,
@@ -248,9 +240,7 @@ as.isobaricpepData <- function (e_data, f_data, e_meta = NULL, edata_cname,
 #'   normalize the data, and the location and scale parameters used to
 #'   backtransform the data (if applicable). \cr \tab \cr data_types \tab
 #'   Character string describing the type of data (e.g. 'Positive ion' or ‘Negative ion’ for lipid data). Default
-#'   value is NULL. \cr \tab \cr check.names \tab Logical defaults to TRUE.
-#'   Indicates whether 'check.names' attribute of returned omicsData object is
-#'   TRUE or FALSE. \cr } Computed values included in the \code{data_info}
+#'   value is NULL. \cr } Computed values included in the \code{data_info}
 #'   attribute are as follows: \tabular{ll}{ \code{num_edata} \tab The number of
 #'   unique \code{edata_cname} entries.\cr \tab \cr \code{num_miss_obs} \tab The
 #'   number of missing observations.\cr \tab \cr \code{num_emeta} \tab The
@@ -288,8 +278,6 @@ as.lipidData <- function (e_data, f_data, e_meta = NULL,
                            is_bc = FALSE, batch_info = list(),
                            data_types = NULL) {
   
-  check.names = FALSE
-  
   # Set the original data scale to the input data scale.
   data_scale_orig <- data_scale
   
@@ -310,7 +298,6 @@ as.lipidData <- function (e_data, f_data, e_meta = NULL,
                     is_normalized = is_normalized,
                     norm_info = norm_info,
                     data_types = data_types,
-                    check.names = check.names,
                     dType = dType,
                     is_bc = is_bc,
                     batch_info = batch_info)
@@ -340,9 +327,6 @@ as.lipidData <- function (e_data, f_data, e_meta = NULL,
                                           is_normalized = is_normalized,
                                           batch_info = batch_info,
                                           is_bc = is_bc)
-
-  #set check.names attribute #
-  attr(res, "check.names") = check.names
   
   # set meta data attributes #
   attr(res, "meta_info") <- set_meta_info(e_meta = res$e_meta,
@@ -417,9 +401,7 @@ as.lipidData <- function (e_data, f_data, e_meta = NULL,
 #'   list containing the normalization function, normalization subset and subset
 #'   parameters, the location and scale parameters used to normalize the data,
 #'   and the location and scale parameters used to backtransform the data (if
-#'   applicable). \cr \tab \cr data_types \tab Character string describing the type of data, most commonly used for lipidomic data (lipidData objects) or NMR data (nmrData objects) but available for other data classes as well. Default value is NULL. \cr \tab \cr
-#'   check.names \tab Logical defaults to TRUE. Indicates whether 'check.names'
-#'   attribute of returned omicsData object is TRUE or FALSE. \cr } Computed
+#'   applicable). \cr \tab \cr data_types \tab Character string describing the type of data, most commonly used for lipidomic data (lipidData objects) or NMR data (nmrData objects) but available for other data classes as well. Default value is NULL. \cr } Computed
 #'   values included in the \code{data_info} attribute are as follows:
 #'   \tabular{ll}{ num_edata \tab The number of unique \code{edata_cname}
 #'   entries.\cr \tab \cr num_miss_obs \tab The number of missing
@@ -457,7 +439,7 @@ as.metabData <- function (e_data, f_data, e_meta = NULL,
                            data_scale = "abundance",
                            is_normalized = FALSE, norm_info = list(),
                            is_bc = FALSE, batch_info = list(),
-                           data_types = NULL, check.names = TRUE
+                           data_types = NULL
                            ) {
 
   # Set the original data scale to the input data scale.
@@ -480,7 +462,6 @@ as.metabData <- function (e_data, f_data, e_meta = NULL,
                     is_normalized = is_normalized,
                     norm_info = norm_info,
                     data_types = data_types,
-                    check.names = check.names,
                     dType = dType,
                     is_bc = is_bc,
                     batch_info = batch_info)
@@ -510,9 +491,6 @@ as.metabData <- function (e_data, f_data, e_meta = NULL,
                                           is_normalized = is_normalized,
                                           batch_info = batch_info,
                                           is_bc = is_bc)
-
-  #set check.names attribute #
-  attr(res, "check.names") = check.names
   
   # set meta data attributes #
   attr(res, "meta_info") <- set_meta_info(e_meta = res$e_meta,
@@ -592,9 +570,7 @@ as.metabData <- function (e_data, f_data, e_meta = NULL,
 #'   scale parameters used to normalize the data, and the location and scale
 #'   parameters used to backtransform the data (if applicable). \cr \tab \cr
 #'   data_types \tab Character string describing the type of data (e.g.'binned'
-#'   or 'identified', for NMR data). Default value is NULL. \cr \tab \cr
-#'   check.names \tab Logical defaults to TRUE. Indicates whether 'check.names'
-#'   attribute of returned omicsData object is TRUE or FALSE. \cr } Computed
+#'   or 'identified', for NMR data). Default value is NULL. \cr } Computed
 #'   values included in the \code{data_info} attribute are as follows:
 #'   \tabular{ll}{ num_edata \tab The number of unique \code{edata_cname}
 #'   entries.\cr \tab \cr num_miss_obs \tab The number of missing
@@ -635,8 +611,6 @@ as.nmrData <- function (e_data, f_data, e_meta = NULL,
                          norm_info = list(), data_types = NULL,
                          is_bc = FALSE, batch_info = list()) {
   
-  check.names = FALSE
-  
   # Set the original data scale to the input data scale.
   data_scale_orig <- data_scale
   
@@ -657,7 +631,6 @@ as.nmrData <- function (e_data, f_data, e_meta = NULL,
                     is_normalized = is_normalized,
                     norm_info = norm_info,
                     data_types = data_types,
-                    check.names = check.names,
                     dType = dType,
                     is_bc = is_bc,
                     batch_info = batch_info)
@@ -694,9 +667,6 @@ as.nmrData <- function (e_data, f_data, e_meta = NULL,
                                         norm_info = norm_info,
                                         nmr_norm = nmr_norm,
                                         backtransform = NA)
-  
-  #set check.names attribute #
-  attr(res, "check.names") = check.names
   
   # set meta data attributes #
   attr(res, "meta_info") <- set_meta_info(e_meta = res$e_meta,
@@ -773,9 +743,7 @@ as.nmrData <- function (e_data, f_data, e_meta = NULL,
 #'   list containing the normalization function, normalization subset and subset
 #'   parameters, the location and scale parameters used to normalize the data,
 #'   and the location and scale parameters used to backtransform the data (if
-#'   applicable). \cr \tab \cr data_types \tab Character string describing the type of data, most commonly used for lipidomic data (lipidData objects) or NMR data (nmrData objects) but available for other data classes as well. Default value is NULL. \cr \tab \cr
-#'   check.names \tab Logical defaults to TRUE. Indicates whether 'check.names'
-#'   attribute of returned omicsData object is TRUE or FALSE. \cr } Computed
+#'   applicable). \cr \tab \cr data_types \tab Character string describing the type of data, most commonly used for lipidomic data (lipidData objects) or NMR data (nmrData objects) but available for other data classes as well. Default value is NULL. \cr } Computed
 #'   values included in the \code{data_info} attribute are as follows:
 #'   \tabular{ll}{ num_edata \tab The number of unique \code{edata_cname}
 #'   entries.\cr \tab \cr num_miss_obs \tab The number of missing
@@ -817,8 +785,6 @@ as.pepData <- function (e_data, f_data, e_meta = NULL,
                          is_bc = FALSE, batch_info = list(),
                          data_types = NULL) {
   
-  check.names = FALSE
-  
   # Set the original data scale to the input data scale.
   data_scale_orig <- data_scale
   
@@ -839,7 +805,6 @@ as.pepData <- function (e_data, f_data, e_meta = NULL,
                     is_normalized = is_normalized,
                     norm_info = norm_info,
                     data_types = data_types,
-                    check.names = check.names,
                     dType = dType,
                     is_bc = is_bc,
                     batch_info = batch_info)
@@ -869,9 +834,6 @@ as.pepData <- function (e_data, f_data, e_meta = NULL,
                                           is_normalized = is_normalized,
                                           batch_info = batch_info,
                                           is_bc = is_bc)
-
-  # set check.names attribute #
-  attr(res, "check.names") = check.names
   
   # set meta data attributes #
   attr(res, "meta_info") <- set_meta_info(e_meta = res$e_meta,
@@ -948,9 +910,7 @@ as.pepData <- function (e_data, f_data, e_meta = NULL,
 #'   normalize the data, and the location and scale parameters used to
 #'   backtransform the data (if applicable). \cr \tab \cr data_types \tab
 #'   Character string describing the type of data, most commonly used for lipidomic data (lipidData objects) or NMR data (nmrData objects) but available for other data classes as well. Default
-#'   value is NULL. \cr \tab\cr check.names \tab Logical defaults to TRUE.
-#'   Indicates whether 'check.names' attribute of returned omicsData object is
-#'   TRUE or FALSE. \cr } Computed values included in the \code{data_info}
+#'   value is NULL. \cr } Computed values included in the \code{data_info}
 #'   attribute are as follows: \tabular{ll}{ num_edata \tab The number of unique
 #'   \code{edata_cname} entries.\cr \tab \cr num_miss_obs \tab The number of
 #'   missing observations.\cr \tab \cr num_emeta \tab The number of unique
@@ -990,8 +950,6 @@ as.proData <- function (e_data, f_data, e_meta = NULL,
                          is_bc = FALSE, batch_info = list(),
                          data_types = NULL) {
   
-  check.names = FALSE
-  
   # Set the original data scale to the input data scale.
   data_scale_orig <- data_scale
   
@@ -1012,7 +970,6 @@ as.proData <- function (e_data, f_data, e_meta = NULL,
                     is_normalized = is_normalized,
                     norm_info = norm_info,
                     data_types = data_types,
-                    check.names = check.names,
                     dType = dType,
                     is_bc = is_bc,
                     batch_info = batch_info)
@@ -1042,9 +999,6 @@ as.proData <- function (e_data, f_data, e_meta = NULL,
                                           is_normalized = is_normalized,
                                           batch_info = batch_info,
                                           is_bc = is_bc)
-
-  #set check.names attribute #
-  attr(res, "check.names") = check.names
   
   # set meta data attributes #
   attr(res, "meta_info") <- set_meta_info(e_meta = res$e_meta,
@@ -1121,9 +1075,7 @@ as.proData <- function (e_data, f_data, e_meta = NULL,
 #'   whether the data has been normalized or not. Default value is FALSE. \cr
 #'   \tab \cr norm_info \tab Default value is an empty list, which will be
 #'   populated with a single named element \code{is_normalized = is_normalized}.
-#'   \cr \tab \cr data_types \tab Character string describing the type of data, most commonly used for lipidomic data (lipidData objects) or NMR data (nmrData objects) but available for other data classes as well. Default value is NULL. \cr \tab \cr
-#'   check.names \tab Logical defaults to TRUE. Indicates whether 'check.names'
-#'   attribute of returned omicsData object is TRUE or FALSE. \cr } Computed
+#'   \cr \tab \cr data_types \tab Character string describing the type of data, most commonly used for lipidomic data (lipidData objects) or NMR data (nmrData objects) but available for other data classes as well. Default value is NULL. \cr } Computed
 #'   values included in the \code{data_info} attribute are as follows:
 #'   \tabular{ll}{ num_edata \tab The number of unique \code{edata_cname}
 #'   entries.\cr \tab \cr num_zero_obs \tab The number of zero-value
@@ -1168,8 +1120,6 @@ as.seqData <- function (e_data, f_data, e_meta = NULL,
                          data_types = NULL,
                          is_bc = FALSE, batch_info = list()) {
   
-  check.names = FALSE
-  
   # Set the original data scale to the input data scale.
   data_scale_orig <- data_scale
   
@@ -1190,7 +1140,6 @@ as.seqData <- function (e_data, f_data, e_meta = NULL,
                     is_normalized = is_normalized,
                     norm_info = norm_info,
                     data_types = data_types,
-                    check.names = check.names,
                     dType = dType,
                     is_bc = is_bc,
                     batch_info = batch_info)
@@ -1229,9 +1178,6 @@ as.seqData <- function (e_data, f_data, e_meta = NULL,
                                           is_normalized = is_normalized,
                                           batch_info = batch_info,
                                           is_bc = is_bc)
-  
-  # set check.names attribute #
-  attr(res, "check.names") = check.names
   
   # set meta data attributes #
   attr(res, "meta_info") <- set_meta_info(e_meta = res$e_meta,
@@ -1272,7 +1218,6 @@ pre_flight <- function (e_data,
                         is_normalized,
                         norm_info,
                         data_types,
-                        check.names,
                         dType,
                         is_bc,
                         batch_info) {
@@ -1283,7 +1228,7 @@ pre_flight <- function (e_data,
       inherits(e_data, "tbl") ||
       inherits(e_data, "data.table")) {
 
-    e_data <- data.frame(e_data, check.names = check.names)
+    e_data <- data.frame(e_data, check.names = FALSE)
 
   }
   
@@ -1299,7 +1244,7 @@ pre_flight <- function (e_data,
       inherits(f_data, "tbl") ||
       inherits(f_data, "data.table")) {
 
-    f_data <- data.frame(f_data, check.names = check.names)
+    f_data <- data.frame(f_data, check.names = FALSE)
 
   }
   
@@ -1319,7 +1264,7 @@ pre_flight <- function (e_data,
         inherits(e_meta, "tbl") ||
         inherits(e_meta, "data.table")) {
 
-      e_meta <- data.frame(e_meta, check.names = check.names)
+      e_meta <- data.frame(e_meta, check.names = FALSE)
 
     }
     
@@ -1405,20 +1350,6 @@ pre_flight <- function (e_data,
     }
     
   }
-  
-  # Investigate the check.names argument.
-  if (!is.null(check.names)) {
-    
-    # Establish its class.
-    if (!inherits(check.names, "logical")) {
-      
-      # Shell out an error that check.names must be logical.
-      stop ("check.names must be of the class 'logical'")
-      
-    }
-    
-  }
-  
   
   # Make sure data_scale is one of the acceptable strings
   if(dType[[2]] == "as.seqData"){
