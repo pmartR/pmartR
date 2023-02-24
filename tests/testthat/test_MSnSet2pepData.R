@@ -51,9 +51,6 @@ test_that('MSnSet objects are correctly converted to pepData objects',{
          batch_info = list(is_bc = FALSE))
   )
   
-  # Check the checkers.
-  expect_true(attr(msn_pepe, "check.names"))
-  
   # Inspect the elements of the meta_info attribute.
   expect_equal(
     attr(msn_pepe, "meta_info"),

@@ -218,8 +218,7 @@ test_that('edata_replace correctly replaces one value with another',{
                         e_meta = emeta,
                         edata_cname = 'Metabolite',
                         fdata_cname = 'SampleID',
-                        emeta_cname = 'nmrClass',
-                        check.names = FALSE)
+                        emeta_cname = 'nmrClass')
   
   # Replace NAs with 0s in nmrdata.
   expect_message(nmrdata2 <- edata_replace(omicsData = nmrdata,

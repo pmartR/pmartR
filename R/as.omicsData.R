@@ -107,8 +107,9 @@ as.isobaricpepData <- function (e_data, f_data, e_meta = NULL, edata_cname,
                                  data_scale = "abundance",
                                  is_normalized = FALSE, isobaric_norm = FALSE,
                                  norm_info = list(),  data_types = NULL,
-                                 is_bc = FALSE, batch_info = list(),
-                                 check.names = TRUE) {
+                                 is_bc = FALSE, batch_info = list()) {
+  
+  check.names = FALSE
   
   # Set the original data scale to the input data scale.
   data_scale_orig <- data_scale
@@ -285,7 +286,9 @@ as.lipidData <- function (e_data, f_data, e_meta = NULL,
                            data_scale = "abundance",
                            is_normalized = FALSE, norm_info = list(),
                            is_bc = FALSE, batch_info = list(),
-                           data_types = NULL, check.names = TRUE) {
+                           data_types = NULL) {
+  
+  check.names = FALSE
   
   # Set the original data scale to the input data scale.
   data_scale_orig <- data_scale
@@ -630,8 +633,9 @@ as.nmrData <- function (e_data, f_data, e_meta = NULL,
                          data_scale = "abundance",
                          is_normalized = FALSE, nmr_norm = FALSE,
                          norm_info = list(), data_types = NULL,
-                         is_bc = FALSE, batch_info = list(),
-                         check.names = TRUE) {
+                         is_bc = FALSE, batch_info = list()) {
+  
+  check.names = FALSE
   
   # Set the original data scale to the input data scale.
   data_scale_orig <- data_scale
@@ -811,7 +815,9 @@ as.pepData <- function (e_data, f_data, e_meta = NULL,
                          data_scale = "abundance",
                          is_normalized = FALSE, norm_info = list(),
                          is_bc = FALSE, batch_info = list(),
-                         data_types = NULL, check.names = TRUE) {
+                         data_types = NULL) {
+  
+  check.names = FALSE
   
   # Set the original data scale to the input data scale.
   data_scale_orig <- data_scale
@@ -982,7 +988,9 @@ as.proData <- function (e_data, f_data, e_meta = NULL,
                          data_scale = "abundance",
                          is_normalized = FALSE, norm_info = list(),
                          is_bc = FALSE, batch_info = list(),
-                         data_types = NULL, check.names = TRUE) {
+                         data_types = NULL) {
+  
+  check.names = FALSE
   
   # Set the original data scale to the input data scale.
   data_scale_orig <- data_scale
@@ -1157,8 +1165,10 @@ as.seqData <- function (e_data, f_data, e_meta = NULL,
                          techrep_cname = NULL,
                          data_scale = "counts",
                          is_normalized = FALSE, norm_info = list(),
-                         data_types = NULL, check.names = TRUE,
+                         data_types = NULL,
                          is_bc = FALSE, batch_info = list()) {
+  
+  check.names = FALSE
   
   # Set the original data scale to the input data scale.
   data_scale_orig <- data_scale
@@ -1189,7 +1199,7 @@ as.seqData <- function (e_data, f_data, e_meta = NULL,
   # Analyses must have raw counts
   
   nums <- e_data[which(colnames(e_data) != edata_cname)]
-  notint <- any(apply(nums, 2, function(col) (sum(col%%1, na.rm = TRUE) != 0)))
+  notint <- any(apply(nums, 2, function(col) (sum(col%%1, na.rm = T) != 0)))
   if(notint){
     warning("Non-integers detected. Analyses supported by pmartR for RNA-seq data require raw counts.")
   }

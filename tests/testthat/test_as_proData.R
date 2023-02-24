@@ -53,9 +53,6 @@ test_that('as.proData returns the correct data frame and attributes',{
          batch_info = list(is_bc = FALSE))
   )
   
-  # Check the checkers.
-  expect_true(attr(prdata, "check.names"))
-  
   # Inspect the elements of the meta_info attribute.
   expect_equal(
     attr(prdata, "meta_info"),
@@ -113,9 +110,6 @@ test_that('as.proData returns the correct data frame and attributes',{
          data_types = NULL,
          batch_info = list(is_bc = FALSE))
   )
-  
-  # Check the checkers.
-  expect_true(attr(prdata, "check.names"))
   
   # Inspect the elements of the meta_info attribute.
   expect_equal(
@@ -201,9 +195,6 @@ test_that('as.proData returns the correct data frame and attributes',{
          batch_info = list(is_bc = FALSE))
   )
   
-  # Check the checkers.
-  expect_true(attr(prdata, "check.names"))
-  
   # Inspect the elements of the meta_info attribute.
   expect_equal(
     attr(prdata, "meta_info"),
@@ -266,9 +257,6 @@ test_that('as.proData returns the correct data frame and attributes',{
          data_types = NULL,
          batch_info = list(is_bc = FALSE))
   )
-  
-  # Check the checkers.
-  expect_true(attr(prdata, "check.names"))
   
   # Inspect the elements of the meta_info attribute.
   expect_equal(
@@ -343,9 +331,6 @@ test_that('as.proData returns the correct data frame and attributes',{
          data_types = NULL,
          batch_info = list(is_bc = FALSE))
   )
-  
-  # Check the checkers.
-  expect_true(attr(prdata, "check.names"))
   
   # Inspect the elements of the meta_info attribute.
   expect_equal(

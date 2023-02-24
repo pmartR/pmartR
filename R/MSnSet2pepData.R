@@ -83,7 +83,7 @@ MSnSet2pepData <- function (msnset_object, data_scale, edata_cname = "UniqueID",
   res<- as.pepData(e_data = msnset_edata, f_data = msnset_fdata,
                    e_meta = msnset_emeta, edata_cname = edata_cname,
                    fdata_cname = fdata_cname, emeta_cname = emeta_cname,
-                   data_scale = data_scale, check.names = check.names)
+                   data_scale = data_scale)
   
   return(res)
   

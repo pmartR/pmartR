@@ -63,9 +63,6 @@ test_that('as.isobaricpepData returns the correct data frame and attributes',{
                     refpool_notation = NA,
                     norm_info = list(is_normalized = FALSE)))
   
-  # Check the checkers.
-  expect_true(attr(isodata, "check.names"))
-  
   # Inspect the elements of the meta_info attribute.
   expect_equal(
     attr(isodata, "meta_info"),
@@ -130,9 +127,6 @@ test_that('as.isobaricpepData returns the correct data frame and attributes',{
                     refpool_cname = NA,
                     refpool_notation = NA,
                     norm_info = list(is_normalized = FALSE)))
-  
-  # Check the checkers.
-  expect_true(attr(isodata, "check.names"))
   
   # Inspect the elements of the meta_info attribute.
   expect_equal(
@@ -228,9 +222,6 @@ test_that('as.isobaricpepData returns the correct data frame and attributes',{
                     refpool_notation = NA,
                     norm_info = list(is_normalized = FALSE)))
   
-  # Check the checkers.
-  expect_true(attr(isodata, "check.names"))
-  
   # Inspect the elements of the meta_info attribute.
   expect_equal(
     attr(isodata, "meta_info"),
@@ -299,9 +290,6 @@ test_that('as.isobaricpepData returns the correct data frame and attributes',{
                     refpool_cname = NA,
                     refpool_notation = NA,
                     norm_info = list(is_normalized = FALSE)))
-  
-  # Check the checkers.
-  expect_true(attr(isodata, "check.names"))
   
   # Inspect the elements of the meta_info attribute.
   expect_equal(
@@ -387,9 +375,6 @@ test_that('as.isobaricpepData returns the correct data frame and attributes',{
                     refpool_cname = NA,
                     refpool_notation = NA,
                     norm_info = list(is_normalized = FALSE)))
-  
-  # Check the checkers.
-  expect_true(attr(isodata, "check.names"))
   
   # Inspect the elements of the meta_info attribute.
   expect_equal(

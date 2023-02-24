@@ -60,9 +60,6 @@ test_that('as.nmrData returns the correct data frame and attributes',{
                     norm_info = list(is_normalized = FALSE,
                                      backtransform = NA)))
   
-  # Check the checkers.
-  expect_true(attr(nmrdata, "check.names"))
-  
   # Inspect the elements of the meta_info attribute.
   expect_equal(
     attr(nmrdata, "meta_info"),
@@ -124,9 +121,6 @@ test_that('as.nmrData returns the correct data frame and attributes',{
                     sample_property_cname = NA,
                     norm_info = list(is_normalized = FALSE,
                                      backtransform = NA)))
-  
-  # Check the checkers.
-  expect_true(attr(nmrdata, "check.names"))
   
   # Inspect the elements of the meta_info attribute.
   expect_equal(
@@ -215,9 +209,6 @@ test_that('as.nmrData returns the correct data frame and attributes',{
                     norm_info = list(is_normalized = FALSE,
                                      backtransform = NA)))
   
-  # Check the checkers.
-  expect_true(attr(nmrdata, "check.names"))
-  
   # Inspect the elements of the meta_info attribute.
   expect_equal(
     attr(nmrdata, "meta_info"),
@@ -284,9 +275,6 @@ test_that('as.nmrData returns the correct data frame and attributes',{
                     sample_property_cname = NA,
                     norm_info = list(is_normalized = FALSE,
                                      backtransform = NA)))
-  
-  # Check the checkers.
-  expect_true(attr(nmrdata, "check.names"))
   
   # Inspect the elements of the meta_info attribute.
   expect_equal(
@@ -365,9 +353,6 @@ test_that('as.nmrData returns the correct data frame and attributes',{
                     sample_property_cname = NA,
                     norm_info = list(is_normalized = FALSE,
                                      backtransform = NA)))
-  
-  # Check the checkers.
-  expect_true(attr(nmrdata, "check.names"))
   
   # Inspect the elements of the meta_info attribute.
   expect_equal(

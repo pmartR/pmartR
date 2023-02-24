@@ -134,11 +134,6 @@ protein_quant <- function (pepData, method, isoformRes = NULL,
   # Extricate e_data column name index.
   edata_cname_id<- which(names(pepData$e_data) == edata_cname)
 
-  # Nab the check.names attribute. This needs to be used anytime another
-  # omicsData object is created. There are cases where the names will not match
-  # between the old and new omicsData objects which leads to errors.
-  fijate <- get_check_names(pepData)
-
   # Grab more attributes that will be used at some point somewhere.
   data_scale <- get_data_scale(pepData)
   is_normalized <- attr(pepData, "data_info")$norm_info$is_normalized
@@ -176,8 +171,7 @@ protein_quant <- function (pepData, method, isoformRes = NULL,
                           fdata_cname = fdata_cname,
                           emeta_cname = "Protein_Isoform",
                           data_scale = data_scale,
-                          is_normalized = is_normalized,
-                          check.names = fijate)
+                          is_normalized = is_normalized)
 
     # Update the attributes that are reset in as.pepData.
     attr(pepData, "filters") <- filtas
@@ -442,8 +436,7 @@ protein_quant <- function (pepData, method, isoformRes = NULL,
                         fdata_cname = fdata_cname,
                         emeta_cname = emeta_cname,
                         data_scale = get_data_scale(pepData),
-                        is_normalized = is_normalized,
-                        check.names = fijate)
+                        is_normalized = is_normalized)
 
   # Update proData attributes --------------------------------------------------
 
