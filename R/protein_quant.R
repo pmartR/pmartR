@@ -362,7 +362,7 @@ protein_quant <- function (pepData, method, isoformRes = NULL,
                                     "n_peps_used", emeta_cols))) %>%
       # Only keep distinct combinations of the columns that are kept.
       dplyr::distinct() %>%
-      data.frame()
+      data.frame(check.names = FALSE)
 
     # The following runs when isoformRes is present. In this case n_peps_used
     # will be calculated based on protein isoform instead of protein (which
@@ -419,7 +419,7 @@ protein_quant <- function (pepData, method, isoformRes = NULL,
       dplyr::relocate(dplyr::any_of(emeta_cols), .after = n_peps_used) %>%
       # Only keep distinct combinations of the columns that are kept.
       dplyr::distinct(dplyr::all_of(.)) %>%
-      data.frame()
+      data.frame(check.names = FALSE)
 
   }
 
