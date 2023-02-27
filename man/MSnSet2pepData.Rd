@@ -9,7 +9,8 @@ MSnSet2pepData(
   data_scale,
   edata_cname = "UniqueID",
   fdata_cname = "SampleID",
-  emeta_cname = "UniqueID"
+  emeta_cname = "UniqueID",
+  check.names = "deprecated"
 )
 }
 \arguments{
@@ -32,6 +33,8 @@ containing the sample identifiers in \code{f_data}.}
 \item{emeta_cname}{character string specifying the name of the column
 containing the protein identifiers (or other mapping variable) in
 \code{e_meta} (if applicable).}
+
+\item{check.names}{deprecated}
 }
 \value{
 pepData object

@@ -245,6 +245,43 @@ get_filter_type <- function (omicsData) {
   
 }
 
+#' \bold{DEPRECATED}: Fetch the check.names attribute
+#' 
+#' \emph{Retrieves the value in check.names attribute from an omicsData object.}
+#' \bold{This function has been deprecated in favor of handling checking names
+#' externally, and will always return FALSE.}
+#' 
+#' @param omicsData An object of class pepData, proData, metabData, lipidData,
+#'                  or nmrData.
+#'                  
+#' @return A logical value indicating if the syntax of the column names in a
+#'         data frame should be checked. See \code{\link[base]{data.frame}} for
+#'         more details.
+#'         
+#' @export
+#' @name get_check_names
+#' 
+get_check_names <- function(omicsData) {
+  warning("get_check_names: function is deprecated")
+  
+  # Check class of omicsData.
+  if (!inherits(omicsData, c("pepData",
+                             "proData",
+                             "metabData",
+                             "lipidData",
+                             "nmrData",
+                             "seqData"))) {
+    
+    # Lay down an error in the console.
+    stop (paste("omicsData must be of class 'pepData', 'proData',",
+                "'metabData', 'lipidData', 'nmrData', or 'seqData'",
+                sep = " "))
+    
+  }
+  
+  return(FALSE)
+}
+
 #' Fetch the isobaric_info attribute
 #' 
 #' Retrieves the values in the isobaric_info attribute from an omicsData object.
@@ -823,6 +860,38 @@ set_filter <- function (type,
   class(filta) = "filter"
   
   return (filta)
+  
+}
+
+#' \bold{DEPRECATED}: Set check.names attribute of omicsData object
+#'
+#' \emph{This function sets the check.names attribute of an omicsData object.}
+#' \bold{This function has been deprecated in favor of handling checking names 
+#' externally and will return an unmodified omicsData.}
+#'
+#' @param omicsData an object of the class 'pepData', 'proData', 'metabData',
+#'   'lipidData', or 'nmrData', usually created by \code{\link{as.pepData}},
+#'   \code{\link{as.proData}}, \code{\link{as.metabData}},
+#'   \code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, respectively.
+#' @param set_to logical indicating what to set check.names attribute to.
+#'   Defaults to TRUE.
+#' 
+#' @return omicsData object with updated check.names attribute
+#'
+#' @export
+#' @name set_check_names
+#'
+set_check_names <- function (omicsData, set_to = TRUE) {
+  warning("set_check_names: function is deprecated")
+  
+  # check that omicsData is of appropriate class #
+  if(!inherits(omicsData, c("pepData", "proData", "metabData",
+                            "lipidData", "nmrData", "seqData")))
+    stop (paste("omicsData must be of class 'pepData', 'proData',",
+                "'metabData', 'lipidData', 'nmrData', or 'seqData'",
+                sep = " "))
+  
+  return (omicsData)
   
 }
 

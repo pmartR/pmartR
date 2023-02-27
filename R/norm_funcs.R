@@ -18,6 +18,7 @@
 #'   to their raw values. See details for more information. Defaults to FALSE.
 #' @param apply_norm logical argument. If TRUE, the normalization will be
 #'   applied to the data. Defaults to FALSE.
+#' @param check.names deprecated
 #'
 #' @details The sample-wise median of the feature subset specified for
 #'   normalization is subtracted from each feature in e_data to get the
@@ -57,7 +58,11 @@ median_center <- function (e_data,
                            subset_fn,
                            feature_subset,
                            backtransform = FALSE,
-                           apply_norm = FALSE) {
+                           apply_norm = FALSE,
+                           check.names = "deprecated") {
+  
+  if (!missing(check.names))
+    warning("check.names parameter is deprecated")
   
   # Determine which column of e_data contains the biomolecule IDs.
   id_col <- which(colnames(e_data) == edata_id)
@@ -195,6 +200,8 @@ median_center <- function (e_data,
 #'   to their raw values. See details for more information. Defaults to FALSE.
 #' @param apply_norm logical argument. If TRUE, the normalization will be
 #'   applied to the data. Defaults to FALSE.
+#' @param check.names deprecated
+#'
 #' @details The sample-wise mean of the feature subset specified for
 #'   normalization is subtracted from each feature in e_data to get the
 #'   normalized data. The location estimates are the sample-wise means of the
@@ -233,7 +240,11 @@ mean_center <- function (e_data,
                          subset_fn,
                          feature_subset,
                          backtransform = FALSE,
-                         apply_norm = FALSE) {
+                         apply_norm = FALSE,
+                         check.names = "deprecated") {
+  
+  if (!missing(check.names))
+    warning("check.names parameter is deprecated")
   
   # Determine which column of e_data contains the biomolecule IDs.
   id_col <- which(colnames(e_data) == edata_id)
@@ -370,6 +381,7 @@ mean_center <- function (e_data,
 #'   to their raw values. See details for more information. Defaults to FALSE.
 #' @param apply_norm logical argument. If TRUE, the normalization will be
 #'   applied to the data. Defaults to FALSE.
+#' @param check.names deprecated
 #'   
 #' @details Each feature is scaled by subtracting the mean of the feature subset
 #'   specified for normalization and then dividing the result by the standard
@@ -410,7 +422,11 @@ zscore_transform <- function (e_data,
                               subset_fn,
                               feature_subset,
                               backtransform = FALSE,
-                              apply_norm = FALSE) {
+                              apply_norm = FALSE,
+                              check.names = "deprecated") {
+  
+  if (!missing(check.names))
+    warning("check.names parameter is deprecated")
   
   # Determine which column of e_data contains the biomolecule IDs.
   id_col <- which(colnames(e_data) == edata_id)
@@ -573,6 +589,7 @@ zscore_transform <- function (e_data,
 #'   information. Defaults to FALSE.
 #' @param apply_norm logical argument. If TRUE, the normalization will be
 #'   applied to the data. Defaults to FALSE.
+#' @param check.names deprecated
 #'   
 #' @details Each feature is scaled by subtracting the median of the feature
 #'   subset specified for normalization and then dividing the result by the
@@ -613,7 +630,11 @@ mad_transform <- function (e_data,
                            subset_fn,
                            feature_subset,
                            backtransform = FALSE,
-                           apply_norm = FALSE) {
+                           apply_norm = FALSE,
+                           check.names = "deprecated") {
+  
+  if (!missing(check.names))
+    warning("check.names parameter is deprecated")
   
   # Determine which column of e_data contains the biomolecule IDs.
   id_col <- which(colnames(e_data) == edata_id)
