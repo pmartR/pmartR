@@ -2044,11 +2044,14 @@ pmartR_filter_worker <- function (filter_object, omicsData) {
       # the e_data object.
       inds <- which(names(omicsData$e_data) %in% filter_object$f_data_remove)
 
-      # Remove the columns in e_data that correspond to the samples that should
-      # be removed.
-      omicsData$e_data <- omicsData$e_data[, -inds]
+      # Check if there is at least one sample name that will be removed
+      if (length(inds) > 0) {
+      
+        # Remove the columns in e_data that correspond to the samples that should
+        # be removed.
+        omicsData$e_data <- omicsData$e_data[, -inds]
 
-
+      }
     }
 
     # remove any edata molecules from e_data and e_meta #
