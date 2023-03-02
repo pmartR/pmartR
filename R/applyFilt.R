@@ -2083,7 +2083,7 @@ pmartR_filter_worker <- function (filter_object, omicsData) {
     # remove any edata molecules from e_data and e_meta #
     if (!is.null(filter_object$e_data_remove)) {
 
-      valid_names <- which(names(omicsData$e_data) == edata_cname)
+      valid_names <- omicsData$e_data[, which(names(omicsData$e_data) == edata_cname)]
       
       # Warn if trying to remove biomolecules which are no longer in the data
       missing_biomolecules <- unlist(
@@ -2099,7 +2099,7 @@ pmartR_filter_worker <- function (filter_object, omicsData) {
       # Find the row indices of the biomolecule names that will be removed from
       # the e_data object.
       inds <- which(
-        omicsData$e_data[, which(names(omicsData$e_data) == edata_cname)]
+        valid_names
         %in% filter_object$e_data_remove
       )
 
@@ -2115,7 +2115,7 @@ pmartR_filter_worker <- function (filter_object, omicsData) {
       # Check if e_meta is present.
       if (!is.null(omicsData$e_meta)) {
 
-        valid_names <- which(names(omicsData$e_meta) == edata_cname)
+        valid_names <- omicsData$e_meta[, which(names(omicsData$e_meta) == edata_cname)]
         
         # Warn if trying to remove biomolecules which are no longer in the data
         # missing_biomolecules <- unlist(
@@ -2131,7 +2131,7 @@ pmartR_filter_worker <- function (filter_object, omicsData) {
         # Find the row indices of the biomolecule names that will be removed
         # from the e_meta object.
         inds <- which(
-          omicsData$e_meta[, which(names(omicsData$e_meta) == edata_cname)]
+          valid_names
           %in% filter_object$e_data_remove
         )
 
@@ -2151,7 +2151,7 @@ pmartR_filter_worker <- function (filter_object, omicsData) {
     # remove any emeta molecules from e_meta and e_data #
     if (!is.null(filter_object$e_meta_remove)) {
 
-      valid_names <- which(names(omicsData$e_meta) == emeta_cname)
+      valid_names <- omicsData$e_meta[, which(names(omicsData$e_meta) == emeta_cname)]
       
       # Warn if trying to remove biomolecules which are no longer in the data
       # missing_variables <- unlist(
@@ -2167,7 +2167,7 @@ pmartR_filter_worker <- function (filter_object, omicsData) {
       # Find the row indices of the mapping variable names that will be removed
       # from the e_meta object.
       inds <- which(
-        omicsData$e_meta[, which(names(omicsData$e_meta) == emeta_cname)]
+        valid_names
         %in% filter_object$e_meta_remove
       )
 
