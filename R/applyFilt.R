@@ -2090,7 +2090,7 @@ pmartR_filter_worker <- function (filter_object, omicsData) {
         lapply(filter_object$e_data_remove, function(x) if (!(x %in% valid_names)) x)
       )
       
-      if (length(missing_samples > 0)) {
+      if (length(missing_biomolecules > 0)) {
         warning("Specified biomolecules ",
                 paste0(missing_biomolecules, collapse = ", "),
                 " were not found in the e_data.")
