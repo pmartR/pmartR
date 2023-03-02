@@ -20,6 +20,9 @@ test_that('as.seqData returns the correct data frame and attributes',{
                       fdata_cname = 'Samples'
                       )
   
+  # Check high level structure
+  expect_equal(names(seqdata), c("e_data", "f_data", "e_meta"))
+  
   # Ensure the returned data frames are the correct dimension.
   expect_equal(dim(seqdata$e_data), c(1200, 41))
   expect_equal(dim(seqdata$f_data), c(40, 4))
@@ -137,6 +140,9 @@ test_that('as.seqData returns the correct data frame and attributes',{
                        'e_data. These have been removed from f_data.',
                        sep = ' '))
   
+  # Check high level structure
+  expect_equal(names(seqdata), c("e_data", "f_data", "e_meta"))
+  
   # Ensure the returned data frames are the correct dimension.
   expect_equal(dim(seqdata$e_data), c(1200, 41))
   expect_equal(dim(seqdata$f_data), c(40, 4))
@@ -249,6 +255,9 @@ test_that('as.seqData returns the correct data frame and attributes',{
                       edata_cname = 'ID_REF',
                       fdata_cname = 'Samples'
                       )
+  
+  # Check high level structure
+  expect_equal(names(seqdata), c("e_data", "f_data", "e_meta"))
   
   # Verify that the returned data frames are the correct dimension.
   expect_equal(dim(seqdata$e_data), c(1200, 41))
