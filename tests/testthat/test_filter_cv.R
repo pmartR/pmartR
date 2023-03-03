@@ -533,4 +533,11 @@ test_that('cv_filter and applyFilt produce the correct output',{
   # attribute should remain how it was before running applyFilt.
   expect_identical(noFilta, pdata)
 
+  # Expect warning if data has already been filtered ------------------
+  
+  filter1 <- cv_filter(omicsData = pdata)
+  filter2 <- cv_filter(omicsData = pdata)
+  filtered1 <- applyFilt(filter1, pdata, cv_threshold = 90)
+  expect_warning(filtered2 <- applyFilt(filter2, filtered1, cv_threshold = 90),
+                 "A CV filter has already been applied to this data set.")
 })

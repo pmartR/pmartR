@@ -186,5 +186,54 @@ test_that('total_count_filter and applyFilt produce the correct output',{
   # Sleuth around the scrambled data
   expect_equal(filter_gdf,  filter_eggs)
 
-
+  # Expect warning if data has already been filtered ---------------------------
+  
+  filter1 <- total_count_filter(omicsData = pdata)
+  filter2 <- total_count_filter(omicsData = pdata)
+  filtered1 <- applyFilt(filter1,
+                         pdata,
+                         min_count = 2)
+  warnings <- capture_warnings(
+    filtered2 <- applyFilt(filter2,
+                           filtered1,
+                           min_count = 2)
+  )
+  expect_match(
+    warnings,
+    "A total count filter has already been applied to this data set.",
+    all = FALSE
+  )
+  expect_match(
+    warnings,
+    paste0(
+      "Specified biomolecules Name_100040016, Name_100041811, Name_10031",
+      "6710, Name_100316712, Name_100504323, Name_100526527, Name_100529075, ",
+      "Name_114600, Name_114640, Name_116911, Name_11922, Name_12951, Name_12",
+      "958, Name_140489, Name_14237, Name_14380, Name_15228, Name_16637, Name",
+      "_16814, Name_171206, Name_171245, Name_171253, Name_171262, Name_18328",
+      ", Name_207151, Name_210155, Name_210876, Name_215854, Name_216783, Nam",
+      "e_21907, Name_22040, Name_22109, Name_228731, Name_229550, Name_230025",
+      ", Name_235256, Name_23793, Name_238568, Name_245492, Name_245509, Name",
+      "_257872, Name_258086, Name_258166, Name_258181, Name_258201, Name_2582",
+      "25, Name_258249, Name_258276, Name_258330, Name_258355, Name_258361, N",
+      "ame_258431, Name_258444, Name_258461, Name_258488, Name_258497, Name_2",
+      "58536, Name_258570, Name_258621, Name_258624, Name_258628, Name_258652",
+      ", Name_258684, Name_258716, Name_258747, Name_258752, Name_258767, Nam",
+      "e_258818, Name_258853, Name_258865, Name_258893, Name_258899, Name_258",
+      "904, Name_258917, Name_258944, Name_259005, Name_259008, Name_259019, ",
+      "Name_259024, Name_259045, Name_259072, Name_27140, Name_27423, Name_31",
+      "9579, Name_329404, Name_381816, Name_382244, Name_384696, Name_385328,",
+      " Name_387170, Name_387230, Name_387344, Name_387349, Name_387354, Name",
+      "_404288, Name_433449, Name_435207, Name_435951, Name_50774, Name_50929",
+      ", Name_546648, Name_546912, Name_60505, Name_624765, Name_627537, Name",
+      "_637898, Name_667240, Name_667262, Name_669149, Name_670464, Name_6740",
+      "2, Name_70993, Name_71057, Name_73353, Name_73360, Name_73470, Name_73",
+      "5267, Name_735283, Name_735285, Name_73887, Name_73972, Name_74441, Na",
+      "me_74529, Name_74987, Name_75470, Name_75718, Name_75861, Name_76405, ",
+      "Name_78471, Name_93968 were not found in the e_data\\."
+    ),
+    all = FALSE
+  )
+  
+  expect_identical(filtered1$e_data, filtered2$e_data)
 })
