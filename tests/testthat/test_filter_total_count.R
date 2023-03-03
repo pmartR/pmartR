@@ -201,7 +201,7 @@ test_that('total_count_filter and applyFilt produce the correct output',{
   )
   expect_match(
     warnings,
-    "A total count filter has already been applied to this data set.",
+    "A total count filter has already been applied to this data set\\.",
     all = FALSE
   )
   expect_match(
@@ -245,7 +245,7 @@ test_that('total_count_filter and applyFilt produce the correct output',{
   )
   expect_match(
     warnings,
-    "A total count filter has already been applied to this data set.",
+    "A total count filter has already been applied to this data set\\.",
     all = FALSE
   )
   expect_match(

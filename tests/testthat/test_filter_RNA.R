@@ -313,4 +313,36 @@ test_that('RNA_filter and applyFilt produce the correct output',{
                                       size_library = max(na.omit(filter$LibrarySize))),
                                       "size_library must be integer of length 1 less than max")
   
+  # Expect warning if data has already been filtered ---------------------------
+  
+  filter1 <- RNA_filter(omicsData = pdata)
+  filter2 <- RNA_filter(omicsData = pdata)
+  filter3 <- RNA_filter(omicsData = pdata)
+  
+  filtered1 <- applyFilt(filter_object = filter1,
+                        omicsData = pdata,
+                        size_library = 10000,
+                        min_nonzero = 885)
+  warnings <- capture_warnings(
+    filtered2 <- applyFilt(filter_object = filter2,
+                      omicsData = filtered1,
+                      size_library = 10000,
+                      min_nonzero = 885)
+  )
+  
+  expect_match(
+    warnings,
+    "An RNA filter has already been applied to this data set.",
+    all = FALSE
+  )
+  expect_match(
+    warnings,
+    paste0(
+      "Specified samples cervix_PBS_8, cervix_hCG_10, uterus_PBS_8, uterus_PBS",
+      "_R3, uterus_hCG_1 were not found in the e_data\\."
+    ),
+    all = FALSE
+  )
+  
+  expect_identical(filtered1$e_data, filtered2$e_data)
 })
