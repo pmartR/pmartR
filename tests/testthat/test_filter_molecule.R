@@ -496,5 +496,68 @@ test_that('molecule_filter and applyFilt produce the correct output',{
   expect_equal(dim(filtered_bg$e_meta),
                c(109, 4))
 
-
+  # Expect warning if data has already been filtered ---------------------------
+  
+  load(system.file('testdata',
+                   'little_pdata.RData',
+                   package = 'pmartR'))
+  
+  # Create a pepData object with the reduced data set.
+  pdata <- as.pepData(e_data = edata,
+                      f_data = fdata,
+                      e_meta = emeta,
+                      edata_cname = "Mass_Tag_ID",
+                      fdata_cname = "SampleID",
+                      emeta_cname = "Protein")
+  
+  filter1 <- molecule_filter(omicsData = pdata)
+  filter2 <- molecule_filter(omicsData = pdata)
+  filter3 <- molecule_filter(omicsData = pdata)
+  
+  filtered1 <- applyFilt(filter_object = filter1,
+                         omicsData = pdata,
+                         min_num = 8)
+  warnings <- capture_warnings(
+    filtered2 <- applyFilt(filter_object = filter2,
+                           omicsData = filtered1,
+                           min_num = 8)
+  )
+  
+  expect_match(
+    warnings,
+    "A molecule filter has already been applied to this data set.",
+    all = FALSE
+  )
+  expect_match(
+    warnings,
+    paste0("Specified biomolecules 1024, 1687, 10900, 11083, 11939, 15714, ",
+    "16636, 21149, 21168, 66123, 976139, 6637724, 6654733, 6701524, 6702477, ",
+    "6769231, 6769844, 6793445, 6809644, 6831118, 6832528, 6850636, 6901575, ",
+    "6907124, 6908501, 6909787, 6934326, 6948820, 6948846, 6948848, 6948875, ",
+    "6948912 were not found in the e_data\\."),
+    all = FALSE
+  )
+  
+  warnings <- capture_warnings(
+    filtered3 <- applyFilt(filter_object = filter3,
+                           omicsData = filtered1,
+                           min_num = 12)
+  )
+  
+  expect_match(
+    warnings,
+    "A molecule filter has already been applied to this data set.",
+    all = FALSE
+  )
+  expect_match(
+    warnings,
+    paste0("Specified biomolecules 1024, 1687, 10900, 11083, 11939, 15714, ",
+    "16636, 21149, 21168, 66123, 976139, 6637724, 6654733, 6701524, 6702477, ",
+    "6769231, 6769844, 6793445, 6809644, 6831118, 6832528, 6850636, 6901575, ",
+    "6907124, 6908501, 6909787, 6934326, 6948820, 6948846, 6948848, 6948875, ",
+    "6948912 were not found in the e_data\\."),
+    all = FALSE
+  )
+  
+  expect_true(dim(filtered3$e_data)[1] < dim(filtered2$e_data)[1])
 })

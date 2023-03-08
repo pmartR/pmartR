@@ -237,7 +237,7 @@ applyFilt.moleculeFilt <- function(filter_object, omicsData, min_num=2){
   } else {
 
     # Fish out the identifiers that will be filtered.
-    filter.edata <- omicsData$e_data[, id_col][inds]
+    filter.edata <- filter_object[, id_col][inds]
 
   }
 
