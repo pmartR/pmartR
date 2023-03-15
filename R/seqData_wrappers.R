@@ -53,12 +53,13 @@
 #'  RNA-sequencing and microarray studies. Nucleic Acids Research 43(7), e47.
 #' 
 #' @examples
+#' \dontrun{
 #' library(pmartRdata)
 #' myseqData <- group_designation(omicsData = rnaseq_object, main_effects = "Virus")
 #' edger_results <- diffexp_seq(omicsData = myseqData, method = "edgeR")
 #' deseq_results <- diffexp_seq(omicsData = myseqData, method = "DESeq2")
 #' voom_results <- diffexp_seq(omicsData = myseqData, method = "voom")
-#' 
+#' }
 #' @export
 #' 
 diffexp_seq <- function(omicsData, method = "edgeR", p_adjust = "BH", 
@@ -239,16 +240,30 @@ DESeq2_wrapper <- function(
         grouping_formula, "0 \\+")) ## The zero does wonky things with covariates
     ))
     
+    dds <- DESeq2::estimateSizeFactors(edata_deseq) # run this or DESeq() first
+    norm_factors_apply <- DESeq2::counts(dds, normalized=TRUE)
+    
+    group_means <- purrr::map_dfc(1:length(unique(grouping_info$Group)), function(group_n){
+      group <- unique(grouping_info$Group)[group_n]
+      group_cols <- as.data.frame(norm_factors_apply)[grouping_info$Group == group]
+      means_group <- apply(group_cols, 1, mean, na.rm = T)
+      df <- data.frame(means_group)
+      colnames(df) <- group
+      df
+    })
+    
+    group_means <- cbind(omicsData$e_data[edata_cname], group_means)
+    
   ## All possible arguments ugh
     
     list_defaults <- list(
       object = edata_deseq,
       test = test, ## reasonable to allow change in pmartR
       fitType = "parametric", #fitting of dispersions to the mean intensity
-      quiet = T,
+      quiet = TRUE,
       minReplicatesForReplace = Inf, ## cook's distance used to flag outliers, require at least n replicates to replace flagged outliers-- defined as .99 quantile of the F(p, m - p) distribution, where p is the number of parameters and m is the number of samples. Replacement is values predicted by the trimmed mean over all samples (and adjusted by size factor or normalization factor). Inf disables replacement
       modelMatrixType = "standard", ## If we need anything fancier than what is defined by "Group" we should consider this argument for the glm use case -- betapriors req for expanded
-      parallel = T,
+      parallel = TRUE,
       
       ## Waldy
       betaPrior = F, 
@@ -279,7 +294,7 @@ DESeq2_wrapper <- function(
     ## and m is the number of samples. Excludes groups w/ only 2 samples
     independentFiltering = FALSE,
     pAdjustMethod = p_adjust,
-    tidy = T,
+    tidy = TRUE,
     parallel = T
   )
   
@@ -301,9 +316,9 @@ DESeq2_wrapper <- function(
     res[["row"]] <- NULL
     # Flag stuffs ----------------------------------------------------------------
     sigs <- which(res[["padj"]] < p_cutoff)
-    res[[paste0("Flag_", test)]] <- 0
+    res[["Flag"]] <- 0
     if(length(sigs)>0){
-      res[[paste0("Flag_", test)]][sigs] <- sign(res$log2FoldChange[sigs])
+      res[["Flag"]][sigs] <- sign(res$log2FoldChange[sigs])
     }
     
     res[["row"]] <- NULL
@@ -328,19 +343,6 @@ DESeq2_wrapper <- function(
   all_cont <- purrr::reduce(all_res, dplyr::full_join)
   
   count_cols <- grep("^NonZero_Count_", colnames(all_cont))
-  
-  ## Re-calc the means cause DESeq2 is silly
-  groups_used <- unique(as.vector(cob_list[,interesting_comparisons]))
-  group_means <- purrr::map_dfc(groups_used, function(grp){
-    rows_use <- apply(group_res[[1]] == grp, 1, any)
-    samples <- group_res[[1]][rows_use,][[get_fdata_cname(omicsData)]]
-    df <- data.frame(apply(omicsData$e_data[samples], 1, mean, na.rm = T))
-    colnames(df) <- paste0("Mean_", grp)
-    df
-  })
-  group_means <- cbind(as.character(omicsData$e_data[[get_edata_cname(omicsData)]]), 
-                       group_means)
-  colnames(group_means) <- c(get_edata_cname(omicsData), colnames(group_means)[-1])
 
   lfc_cols <- grep("^log2FoldChange", colnames(all_cont))
   padj_cols <- grep("^padj", colnames(all_cont))
@@ -348,16 +350,21 @@ DESeq2_wrapper <- function(
   
   # colnames(all_cont)[-1] <- gsub("^baseMean", "Mean", colnames(all_cont)[-1])
   colnames(all_cont)[-1] <- gsub("^log2FoldChange", "Fold_change", colnames(all_cont)[-1])
-  colnames(all_cont)[-1] <- gsub("^padj", paste0("P_value_", test), colnames(all_cont)[-1])
+  colnames(all_cont)[-1] <- gsub("^padj", "P_value", colnames(all_cont)[-1])
   
   all_cont[[1]] <- as.character(all_cont[[1]])
 
-  results <- cbind(dplyr::left_join(all_cont[c(1, count_cols)], group_means), 
+  results <- cbind(all_cont[c(1, count_cols)],
                    all_cont[c(lfc_cols, padj_cols, flag_cols)])
   
-  attr_list <- c("cnames", "data_info", "filters", "group_DF")
-  keep_attr <- attributes(omicsData)[names(attributes(results)) %in% attr_list]
-  attributes(results) <- c(attributes(results), keep_attr)
+  # attr_list <- c("cnames", "data_info", "filters", "group_DF")
+  # keep_attr <- attributes(omicsData)[names(attributes(results)) %in% attr_list]
+  # attributes(results) <- c(attributes(results), keep_attr)
+  
+  attr(results, "cnames") <- attr(omicsData, "cnames")
+  attr(results, "data_info") <- attr(omicsData, "data_info")
+  attr(results, "filters") <- attr(omicsData, "filters")
+  attr(results, "group_DF") <- attr(omicsData, "group_DF")
   
   ## sig totes
   flag_df <- reshape2::melt(
@@ -365,12 +372,12 @@ DESeq2_wrapper <- function(
     variable.name = "Comparison", 
     value.name = "Flags"
   )
-  flag_df$Comparison <- gsub("Flag_(Wald|LRT)_", "", flag_df$Comparison )
+  flag_df$Comparison <- gsub("Flag_", "", flag_df$Comparison )
   attr(results, "number_significant") <- flag_df %>%
     dplyr::group_by(Comparison) %>%
     dplyr::summarise(
-      Up_total = sum(Flags > 0, na.rm = T),
-      Down_total = sum(Flags < 0, na.rm = T),
+      Up_total = sum(Flags > 0, na.rm = TRUE),
+      Down_total = sum(Flags < 0, na.rm = TRUE),
       row.names = NULL
     )
   
@@ -378,6 +385,7 @@ DESeq2_wrapper <- function(
     combo <- cob_list[,n]
     paste0(combo[1], "_vs_", combo[2])
   })
+  attr(results, "MA_means") <- group_means
   attr(results, "statistical_test") <- paste0("DESeq_", test)
   attr(results, "adjustment_method") <- p_adjust
   attr(results, "pval_thresh") <- p_cutoff
@@ -529,6 +537,21 @@ edgeR_wrapper <- function(
   run_NF <- run_NF[!duplicated(names(run_NF))]
   
   norm_factors_edgeR <- do.call(edgeR::calcNormFactors, run_NF)
+  
+  ## Stick in attributes for MA plots
+  norm_factors_find <- norm_factors_edgeR
+  norm_factors_apply <- as.data.frame(sweep(as.data.frame(norm_factors_find$counts), MARGIN=2,
+        FUN="/",STATS= norm_factors_find$samples$norm.factors))
+  group_means <- suppressMessages(purrr::map_dfc(1:ncol(design_matrix_edgeR), function(col){
+    group_cols <- norm_factors_apply[as.logical(design_matrix_edgeR[,col])]
+    means_group <- apply(group_cols, 1, mean, na.rm = T)
+    data.frame(means_group)
+  }))
+  
+  colnames(group_means) <- unique(grouping_info$Group)
+  
+  group_means <- cbind(omicsData$e_data[get_edata_cname(omicsData)], group_means)
+  
 
   D_edgeR <- edgeR::estimateDisp(norm_factors_edgeR,
                       design_matrix_edgeR)
@@ -588,9 +611,9 @@ edgeR_wrapper <- function(
     
     # Flag stuffs ----------------------------------------------------------------
     sigs <- which(res[[sig_col]] < p_cutoff)
-    res[["Flag_F"]] <- 0
+    res[["Flag"]] <- 0
     if(length(sigs) > 0){
-      res[["Flag_F"]][sigs] <- sign(res[["logFC"]][sigs])
+      res[["Flag"]][sigs] <- sign(res[["logFC"]][sigs])
     }
     
     colnames(res) <- paste0(colnames(res), 
@@ -601,13 +624,13 @@ edgeR_wrapper <- function(
     if(length(cmb1) == 0) cmb1 <- e_data_counts[grouping_info[[attr(grouping_info, "pair_group")]] == combo[1]]
     
     res[[paste0("NonZero_Count_", combo[1])]] <- rowSums(cmb1 != 0)
-    res[[paste0("Mean_", combo[1])]] <- apply(cmb1, 1, mean, na.rm = T)
+    # res[[paste0("Mean_", combo[1])]] <- apply(cmb1, 1, mean, na.rm = TRUE)
     
     cmb2 <- e_data_counts[grouping_info$Group == combo[2]]
     if(length(cmb2) == 0) cmb2 <- e_data_counts[grouping_info[[attr(grouping_info, "pair_group")]] == combo[2]]
     
     res[[paste0("NonZero_Count_", combo[2])]] <- rowSums(cmb2 != 0)
-    res[[paste0("Mean_", combo[2])]] <- apply(cmb2, 1, mean, na.rm = T)
+    # res[[paste0("Mean_", combo[2])]] <- apply(cmb2, 1, mean, na.rm = TRUE)
     
     res[[get_edata_cname(omicsData)]] <- as.character(omicsData$e_data[[get_edata_cname(omicsData)]])
     row.names(res) <- NULL
@@ -618,33 +641,38 @@ edgeR_wrapper <- function(
   all_cont <-  purrr::reduce(all_cont, dplyr::full_join)
   
   count_cols <- grep("^NonZero_Count_", colnames(all_cont))
-  mean_cols <- grep("^Mean", colnames(all_cont))
+  # mean_cols <- grep("^Mean", colnames(all_cont))
   lfc_cols <- grep("^logFC", colnames(all_cont))
   # pval_cols <- grep(colnames(all_cont), "_pvalue")
   padj_cols <- grep("^(FDR|FWER)", colnames(all_cont))
   flag_cols <- grep("^Flag", colnames(all_cont))
   
   colnames(all_cont)[-1] <- gsub("^logFC", "Fold_change", colnames(all_cont)[-1])
-  colnames(all_cont)[-1] <- gsub("^(FDR|FWER)", "P_value_F", colnames(all_cont)[-1])
+  colnames(all_cont)[-1] <- gsub("^(FDR|FWER)", "P_value", colnames(all_cont)[-1])
   
   ## Ordering
-  results <- all_cont[c(1, count_cols, mean_cols, 
+  results <- all_cont[c(1, count_cols, #mean_cols, 
                         lfc_cols, padj_cols, flag_cols)]
   
-  attr_list <- c("cnames", "data_info", "filters", "group_DF")
-  keep_attr <- attributes(omicsData)[names(attributes(results)) %in% attr_list]
-  attributes(results) <- c(attributes(results), keep_attr)
+  # attr_list <- c("cnames", "data_info", "filters", "group_DF")
+  # keep_attr <- attributes(omicsData)[names(attributes(results)) %in% attr_list]
+  # attributes(results) <- c(attributes(results), keep_attr)
+  
+  attr(results, "cnames") <- attr(omicsData, "cnames")
+  attr(results, "data_info") <- attr(omicsData, "data_info")
+  attr(results, "filters") <- attr(omicsData, "filters")
+  attr(results, "group_DF") <- attr(omicsData, "group_DF")
   
   ## sig totes
   flag_df <- reshape2::melt(all_cont[flag_cols], 
                             variable.name = "Comparison", 
                             value.name = "Flags")
-  flag_df$Comparison <- gsub("Flag_F_", "", flag_df$Comparison )
+  flag_df$Comparison <- gsub("Flag_", "", flag_df$Comparison )
   attr(results, "number_significant") <- flag_df %>%
     dplyr::group_by(Comparison) %>%
     dplyr::summarise(
-      Up_total = sum(Flags > 0, na.rm = T),
-      Down_total = sum(Flags < 0, na.rm = T),
+      Up_total = sum(Flags > 0, na.rm = TRUE),
+      Down_total = sum(Flags < 0, na.rm = TRUE),
       row.names = NULL
     )
   
@@ -652,6 +680,7 @@ edgeR_wrapper <- function(
     combo <- cob_list[,n]
     paste0(combo[1], "_vs_", combo[2])
   })
+  attr(results, "MA_means") <- group_means
   attr(results, "statistical_test") <- "EdgeR_F"
   attr(results, "adjustment_method") <- p_adjust
   attr(results, "pval_thresh") <- p_cutoff
@@ -791,6 +820,22 @@ voom_wrapper <- function(
   run_NF <- run_NF[!duplicated(names(run_NF))]
   
   norm_factors_limma <- do.call(edgeR::calcNormFactors, run_NF)
+  
+  norm_factors_find <- norm_factors_limma
+  norm_factors_apply <- as.data.frame(sweep(as.data.frame(norm_factors_find$counts), MARGIN=2,
+                                            FUN="/",STATS= norm_factors_find$samples$norm.factors))
+  norm_factors_apply <- as.data.frame(sweep(as.data.frame(norm_factors_find$counts), MARGIN=2,
+                                            FUN="/",STATS= norm_factors_find$samples$norm.factors))
+  group_means <- suppressMessages(purrr::map_dfc(1:ncol(design_matrix_limma), function(col){
+    group_cols <- norm_factors_apply[as.logical(design_matrix_limma[,col])]
+    means_group <- apply(group_cols, 1, mean, na.rm = T)
+    data.frame(means_group)
+  }))
+  
+  colnames(group_means) <- unique(grouping_info$Group)
+  
+  group_means <- cbind(omicsData$e_data[get_edata_cname(omicsData)], group_means)
+  
   limma_voom <- limma::voom(norm_factors_limma, design_matrix_limma)
   limma_vfit <- limma::lmFit(limma_voom, design_matrix_limma)
   
@@ -837,9 +882,9 @@ voom_wrapper <- function(
     if(nrow(res) > 1){
       # Flag stuffs ----------------------------------------------------------------
       sigs <- which(res[["adj.P.Val"]] < p_cutoff)
-      res[["Flag_T"]] <- 0
+      res[["Flag"]] <- 0
       if(length(sigs) >0 ){
-        res[["Flag_T"]][sigs] <- sign(res[["logFC"]][sigs])
+        res[["Flag"]][sigs] <- sign(res[["logFC"]][sigs])
       }
       
       colnames(res) <- paste0(colnames(res), paste0("_", combo[1], "_vs_", combo[2]))
@@ -848,12 +893,12 @@ voom_wrapper <- function(
       cmb1 <- e_data_counts[grouping_info$Group == combo[1]]
       if(length(cmb1) == 0) cmb1 <- e_data_counts[grouping_info[[attr(grouping_info, "pair_group")]] == combo[1]]
       res[[paste0("NonZero_Count_", combo[1])]] <- rowSums(cmb1 != 0)
-      res[[paste0("Mean_", combo[1])]] <- apply(cmb1, 1, mean, na.rm = T)
+      # res[[paste0("Mean_", combo[1])]] <- apply(cmb1, 1, mean, na.rm = TRUE)
       
       cmb2 <- e_data_counts[grouping_info$Group == combo[2]]
       if(length(cmb2) == 0) cmb2 <- e_data_counts[grouping_info[[attr(grouping_info, "pair_group")]] == combo[2]]
       res[[paste0("NonZero_Count_", combo[2])]] <- rowSums(cmb2 != 0)
-      res[[paste0("Mean_", combo[2])]] <- apply(cmb2, 1, mean, na.rm = T)
+      # res[[paste0("Mean_", combo[2])]] <- apply(cmb2, 1, mean, na.rm = TRUE)
 
       res[[get_edata_cname(omicsData)]] <- as.character(omicsData$e_data[[get_edata_cname(omicsData)]])
       row.names(res) <- NULL
@@ -867,30 +912,35 @@ voom_wrapper <- function(
   results <- list(Full_results = all_cont)
   
   count_cols <- grep("^NonZero", colnames(all_cont))
-  mean_cols <- grep("^Mean", colnames(all_cont))
+  # mean_cols <- grep("^Mean", colnames(all_cont))
   lfc_cols <- grep("^logFC", colnames(all_cont))
   # pval_cols <- grep(colnames(all_cont), "_pvalue")
   padj_cols <- grep("^adj.P.Val", colnames(all_cont))
   flag_cols <- grep("^Flag", colnames(all_cont))
   colnames(all_cont)[-1] <- gsub("^logFC", "Fold_change", colnames(all_cont)[-1])
-  colnames(all_cont)[-1] <- gsub("^adj.P.Val", "P_value_T", colnames(all_cont)[-1])
+  colnames(all_cont)[-1] <- gsub("^adj.P.Val", "P_value", colnames(all_cont)[-1])
   
-  results <- all_cont[c(1, count_cols, mean_cols, 
+  results <- all_cont[c(1, count_cols, #mean_cols, 
                         lfc_cols, padj_cols, flag_cols)]
   
-  attr_list <- c("cnames", "data_info", "filters", "group_DF")
-  keep_attr <- attributes(omicsData)[names(attributes(results)) %in% attr_list]
-  attributes(results) <- c(attributes(results), keep_attr)
+  # attr_list <- c("cnames", "data_info", "filters", "group_DF")
+  # keep_attr <- attributes(omicsData)[names(attributes(results)) %in% attr_list]
+  # attributes(results) <- c(attributes(results), keep_attr)
+  
+  attr(results, "cnames") <- attr(omicsData, "cnames")
+  attr(results, "data_info") <- attr(omicsData, "data_info")
+  attr(results, "filters") <- attr(omicsData, "filters")
+  attr(results, "group_DF") <- attr(omicsData, "group_DF")
   
   flag_df <- reshape2::melt(all_cont[flag_cols], 
                             variable.name = "Comparison", 
                             value.name = "Flags")
-  flag_df$Comparison <- gsub("Flag_T_", "", flag_df$Comparison )
+  flag_df$Comparison <- gsub("Flag_", "", flag_df$Comparison )
   attr(results, "number_significant") <- flag_df %>%
     dplyr::group_by(Comparison) %>%
     dplyr::summarise(
-      Up_total = sum(Flags > 0, na.rm = T),
-      Down_total = sum(Flags < 0, na.rm = T),
+      Up_total = sum(Flags > 0, na.rm = TRUE),
+      Down_total = sum(Flags < 0, na.rm = TRUE),
       row.names = NULL
     )
   
@@ -898,6 +948,7 @@ voom_wrapper <- function(
     combo <- cob_list[,n]
     paste0(combo[1], "_vs_", combo[2])
   })
+  attr(results, "MA_means") <- group_means
   attr(results, "statistical_test") <- "Voom_T"
   attr(results, "adjustment_method") <- p_adjust
   attr(results, "pval_thresh") <- p_cutoff
@@ -1070,12 +1121,14 @@ get_group_formula <- function(omicsData){
 #' @return plot result
 #' 
 #' @examples 
+#' \dontrun{
 #' library(pmartRdata)
 #' myseqData <- group_designation(omicsData = rnaseq_object, main_effects = "Virus")
 #' dispersion_est(omicsData = myseqData, method = "edgeR")
 #' dispersion_est(omicsData = myseqData, method = "DESeq2")
 #' dispersion_est(omicsData = myseqData, method = "voom")
-#'
+#' }
+#' 
 #' @references 
 #'  Robinson MD, McCarthy DJ, Smyth GK (2010). “edgeR: a Bioconductor package 
 #'  for differential expression analysis of digital gene expression data.” 
@@ -1215,46 +1268,16 @@ dispersion_est <- function(omicsData, method,
     ## EdgeR workflow
     edata_egdeR <- edgeR::DGEList(e_data_counts) 
     norm_factors_edgeR <- edgeR::calcNormFactors(edata_egdeR)
-    GCD_edgeR <- edgeR::estimateGLMCommonDisp(norm_factors_edgeR,
-                                              design_matrix)
-    GTD_edgeR <- edgeR::estimateGLMTrendedDisp(GCD_edgeR,
-                                               design_matrix)
-    GTagD_edgeR <- edgeR::estimateGLMTagwiseDisp(GTD_edgeR, design_matrix)
     
-    fit_edgeR <- edgeR::glmQLFit(GTagD_edgeR, design_matrix)
+    D_edgeR <- edgeR::estimateDisp(norm_factors_edgeR,
+                                   design_matrix)
     
-    
-    ## squeezed points, closest to plotQLDisp
-    # plot(y = (fit_edgeR$var.post)^(1/4), 
-    #      x = fit_edgeR$AveLogCPM, pch = 20, cex = 0.2)
-    # points(y = (fit_edgeR$var.prior)^(1/4), 
-    #      x = fit_edgeR$AveLogCPM, pch = 20, cex = 0.2, col = "blue")
-    
-    ## Blue points with horizontal line
-    ## Common line can be removed
-    ## new RMD with plot(s) for each method + diagnostic guidance
-    ## NMDC studff :)
-    ## Touch base with Emily? -- intro from Kelly + Lisa
-    ## To do: write some tests :) test set to be processed, take part as exemplar dataset (include reminder in email)
-    
-    # plotQLDisp(fit_edgeR)
-    # plotBCV(GTagD_edgeR, log = "y")
-    
-    ## Other attempts
-    # plot(y = (GTagD_edgeR$tagwise.dispersion)^(1/4), 
-    #      x = fit_edgeR$AveLogCPM, pch = 20, cex = 0.2, log = "y")
-    # plot(y = sqrt(fit_edgeR$deviance) ^(1/4), 
-    #      x = fit_edgeR$AveLogCPM, pch = 20, cex = 0.2, log = "y")
-    
-    ## Checking which points fit
-    # plotQLDisp(fit_edgeR)
-    # points(y = (fit_edgeR$var.post)^(1/4), 
-    #        x = fit_edgeR$AveLogCPM, pch = 20, cex = 0.1, col = "purple")
-    
+    fit_edgeR <- edgeR::glmQLFit(D_edgeR, design_matrix)
+
     df2 <- data.frame(
-      CD = GTagD_edgeR$common.dispersion,
-      TD = GTagD_edgeR$trended.dispersion,
-      TagD = GTagD_edgeR$tagwise.dispersion,
+      CD = D_edgeR$common.dispersion,
+      TD = D_edgeR$trended.dispersion,
+      TagD = D_edgeR$tagwise.dispersion,
       fitD1 = fit_edgeR$var.prior,
       fitD2 = fit_edgeR$var.post,
       AveLogCPM = fit_edgeR$AveLogCPM
@@ -1296,7 +1319,9 @@ dispersion_est <- function(omicsData, method,
     
     edata_limma <- edgeR::DGEList(e_data_counts) 
     norm_factors_limma <- edgeR::calcNormFactors(edata_limma)
-    limma_voom <- limma::voom(norm_factors_limma, design_matrix, save.plot = T)
+    mean_norm_counts <- norm_factors_limma
+    
+    limma_voom <- limma::voom(norm_factors_limma, design_matrix, save.plot = TRUE)
     limma_vfit <- limma::lmFit(limma_voom, design_matrix)
     
     efit <- limma::eBayes(limma_vfit)

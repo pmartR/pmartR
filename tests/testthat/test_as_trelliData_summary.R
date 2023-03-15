@@ -5,7 +5,7 @@ test_that("trelliData object summaries return the correct data frames",{
   # Load: peptide expression data-----------------------------------------------
   
   load(system.file('testdata',
-                   'little_pdata.Rdata',
+                   'little_pdata.RData',
                    package = 'pmartR'))
   
   # Generate omicsData and statRes: peptide expression data---------------------

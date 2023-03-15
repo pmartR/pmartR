@@ -16,7 +16,7 @@
 #' @param single_observation logical indicating whether or not to remove
 #'   peptides that have just a single observation, defaults to FALSE.
 #' @param combine_fn character string specifying either be 'mean' or 'median'
-#' @param use_parallel logical indicating whether or not to use "doParallel"
+#' @param parallel logical indicating whether or not to use "doParallel"
 #'   loop in applying rollup functions. Defaults to TRUE. Is an argument of
 #'   rrollup, qrollup and zrollup functions.
 #' @param emeta_cols character vector indicating additional columns of e_meta
@@ -42,6 +42,7 @@
 #'   Measurements}. Molecular & Cellular Proteomics.: MCP, 13(12), 3639-3646.
 #'
 #' @examples
+#' \dontrun{
 #' library(pmartRdata)
 #'
 #' mypepData <- group_designation(omicsData = pep_object, main_effects = c("Phenotype"))
@@ -50,7 +51,7 @@
 #' imdanova_Filt <- imdanova_filter(omicsData = mypepData)
 #' mypepData <- applyFilt(filter_object = imdanova_Filt, omicsData = mypepData, min_nonmiss_anova=2)
 #'
-#' imd_anova_res <- imd_anova(omicsData = mypepData, test_method = 'comb', pval_adjust_a ='bon', pval_adjust_g ='bon')
+#' imd_anova_res <- imd_anova(omicsData = mypepData, test_method = 'comb', pval_adjust_a_multcomp ='bon', pval_adjust_g_multcomp ='bon')
 #'
 #' isoformRes = bpquant(statRes = imd_anova_res, pepData = mypepData)
 #'
@@ -59,14 +60,15 @@
 #'
 #' #case where isoformRes is provided:
 #' # results2 = protein_quant(pepData = mypepData, method = 'rollup', combine_fn = 'mean', isoformRes = isoformRes)
-#'
+#' }
+#' 
 #' @rdname protein_quant
 #' @export
 #'
 protein_quant <- function (pepData, method, isoformRes = NULL,
                            qrollup_thresh = NULL, single_pep = FALSE,
                            single_observation = FALSE, combine_fn = "median",
-                           use_parallel = TRUE, emeta_cols = NULL) {
+                           parallel = TRUE, emeta_cols = NULL) {
 
   # Preflight checks -----------------------------------------------------------
 
@@ -210,7 +212,7 @@ protein_quant <- function (pepData, method, isoformRes = NULL,
 
     results <- rrollup(pepData,
                        combine_fn = chosen_combine_fn,
-                       parallel = use_parallel)
+                       parallel = parallel)
 
   }
 
@@ -225,7 +227,7 @@ protein_quant <- function (pepData, method, isoformRes = NULL,
     results <- qrollup(pepData,
                        qrollup_thresh = qrollup_thresh,
                        combine_fn = chosen_combine_fn,
-                       parallel = use_parallel)
+                       parallel = parallel)
   }
 
   if (method == 'zrollup') {
@@ -277,7 +279,7 @@ protein_quant <- function (pepData, method, isoformRes = NULL,
 
     results <- zrollup(pepData,
                        combine_fn = chosen_combine_fn,
-                       parallel = use_parallel)
+                       parallel = parallel)
 
   }
 
@@ -338,7 +340,6 @@ protein_quant <- function (pepData, method, isoformRes = NULL,
   # Check if isoformRes is NULL. results$e_meta will be updated differently
   # depending on whether isoformRes is present.
   if (is.null(isoformRes)) {
-
     # Update e_meta with peptide counts.
     results$e_meta <- results$e_meta %>%
       dplyr::group_by(!!rlang::sym(emeta_cname)) %>%
@@ -360,14 +361,13 @@ protein_quant <- function (pepData, method, isoformRes = NULL,
       dplyr::select(dplyr::any_of(c(emeta_cname, "peps_per_pro",
                                     "n_peps_used", emeta_cols))) %>%
       # Only keep distinct combinations of the columns that are kept.
-      dplyr::distinct(dplyr::all_of(.)) %>%
-      data.frame()
+      dplyr::distinct() %>%
+      data.frame(check.names = FALSE)
 
     # The following runs when isoformRes is present. In this case n_peps_used
     # will be calculated based on protein isoform instead of protein (which
     # includes all isoforms).
   } else {
-
     # Count the number of peptides per isoform. If qrollup was used this was
     # already done in the qrollup function otherwise the peptides per isoform
     # will be counted from the isoformRes_subset data frame.
@@ -377,7 +377,7 @@ protein_quant <- function (pepData, method, isoformRes = NULL,
       results$e_meta %>%
         dplyr::select(!!rlang::sym(emeta_cname), n_peps_used) %>%
         # Only keep unique combinations of emeta_cname and n_peps_used
-        dplyr::distinct(dplyr::all_of(.))
+        dplyr::distinct()
 
     } else {
 
@@ -419,7 +419,7 @@ protein_quant <- function (pepData, method, isoformRes = NULL,
       dplyr::relocate(dplyr::any_of(emeta_cols), .after = n_peps_used) %>%
       # Only keep distinct combinations of the columns that are kept.
       dplyr::distinct(dplyr::all_of(.)) %>%
-      data.frame()
+      data.frame(check.names = FALSE)
 
   }
 
@@ -619,8 +619,8 @@ rrollup <- function (pepData, combine_fn, parallel = TRUE) {
 
   # set up parallel backend
   if(parallel == TRUE){
-    cores<- parallel::detectCores()
-    cl<- parallel::makeCluster(cores)
+    cores <- parallelly::availableCores()
+    cl <- parallelly::makeClusterPSOCK(cores)
     on.exit(parallel::stopCluster(cl))
     doParallel::registerDoParallel(cl)
   } else {
@@ -653,7 +653,7 @@ rrollup <- function (pepData, combine_fn, parallel = TRUE) {
 
       ## If tied, select one with highest median abundance##
       if(length(least.na)>1){
-        mds = apply(current_subset,1,median,na.rm=T)[least.na]
+        mds = apply(current_subset,1,median,na.rm=TRUE)[least.na]
         least.na = least.na[which(mds==max(mds))]
       }
       prot_val = unlist(current_subset[least.na,])
@@ -664,7 +664,7 @@ rrollup <- function (pepData, combine_fn, parallel = TRUE) {
                                  each = nrow(current_subset)) - current_subset,
                              1,
                              median,
-                             na.rm=T)
+                             na.rm=TRUE)
 
       ## Step 3: Use the median of the ratio as a scaling factor for each
       ## peptide ##
@@ -789,9 +789,9 @@ qrollup <- function (pepData, qrollup_thresh,
   unique_proteins<- unique(temp[[pro_id]])
 
   # set up parallel backend
-  if(parallel == TRUE){
-    cores<- parallel::detectCores()
-    cl<- parallel::makeCluster(cores)
+  if(parallel){
+    cores <- parallelly::availableCores()
+    cl <- parallelly::makeClusterPSOCK(cores)
     on.exit(parallel::stopCluster(cl))
     doParallel::registerDoParallel(cl)
   } else {
@@ -815,8 +815,8 @@ qrollup <- function (pepData, qrollup_thresh,
       peps_used <- 1
     }else{
       ## Step 1: Subset peptides whose abundance is >= to qrollup_thresh ##
-      means = apply(current_subset,1,mean,na.rm=T)
-      quantil = quantile(means, probs = qrollup_thresh, na.rm = T)
+      means = apply(current_subset,1,mean,na.rm=TRUE)
+      quantil = quantile(means, probs = qrollup_thresh, na.rm = TRUE)
 
       new_subset = current_subset[which(means >= quantil), ]
       peps_used <- nrow(new_subset)
@@ -960,9 +960,9 @@ zrollup <- function (pepData, combine_fn, parallel = TRUE) {
   unique_proteins <- unique(temp[[pro_id]])
 
   # set up parallel backend
-  if(parallel == TRUE){
-    cores<- parallel::detectCores()
-    cl<- parallel::makeCluster(cores)
+  if (parallel == TRUE){
+    cores <- parallelly::availableCores()
+    cl <- parallelly::makeClusterPSOCK(cores)
     on.exit(parallel::stopCluster(cl))
     doParallel::registerDoParallel(cl)
   } else {
@@ -981,8 +981,8 @@ zrollup <- function (pepData, combine_fn, parallel = TRUE) {
 
     res = matrix(NA, nrow = 1, ncol =  ncol(current_subset))
     ## Step 1: Compute mean and sd of peptides ##
-    mds = apply(current_subset, 1, median, na.rm = T)
-    sds = apply(current_subset, 1, sd, na.rm = T)
+    mds = apply(current_subset, 1, median, na.rm = TRUE)
+    sds = apply(current_subset, 1, sd, na.rm = TRUE)
 
     ## Step 2: Scale peptide data as pep_scaled = (pep - median)/sd
     medians_mat = matrix(mds, nrow = num_peps, ncol = ncol(current_subset), byrow = F)
@@ -1044,8 +1044,8 @@ combine_fn_mean <- function (x) {
 
   if (all(is.na(x)))
     mean(x) else
-      mean(x, na.rm = T)
+      mean(x, na.rm = TRUE)
 
 }
 
-combine_fn_median <- function (x) median(x, na.rm = T)
+combine_fn_median <- function (x) median(x, na.rm = TRUE)

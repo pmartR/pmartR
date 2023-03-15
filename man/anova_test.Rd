@@ -9,12 +9,13 @@ anova_test(
   omicsData,
   groupData,
   comparisons,
-  pval_adjust,
+  pval_adjust_multcomp,
+  pval_adjust_fdr,
   pval_thresh,
   covariates,
   paired,
   equal_var,
-  use_parallel
+  parallel
 )
 }
 \arguments{
@@ -25,10 +26,14 @@ containing the different comparisons of interest. Comparisons will be made
 between the Test and the corresponding Control  If left NULL, then all
 pairwise comparisons are executed.}
 
-\item{pval_adjust}{A character string specifying the type of multiple
+\item{pval_adjust_multcomp}{character string specifying the type of multiple
 comparisons adjustment to implement. The default, "none", corresponds to no
 adjustment. Valid options include: "bonferroni", "holm", "tukey", and
 "dunnett".}
+
+\item{pval_adjust_fdr}{character string specifying the type of FDR adjustment
+to implement. The default, "none", corresponds to no adjustment. Valid
+options include: "bonferroni", "BH", "BY", and "fdr".}
 
 \item{pval_thresh}{numeric p-value threshold, below or equal to which
 peptides are considered differentially expressed. Defaults to 0.05}
@@ -42,7 +47,7 @@ returned if none is found}
 
 \item{equal_var}{logical; should the variance across groups be assumed equal?}
 
-\item{use_parallel}{A logical value indicating if the t test should be run in
+\item{parallel}{A logical value indicating if the t test should be run in
 parallel.}
 }
 \value{

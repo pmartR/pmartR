@@ -228,9 +228,11 @@ molecule_filter <- function (omicsData, use_groups = FALSE, use_batch = FALSE) {
 #'   across all samples.
 #'
 #' @examples
+#' \dontrun{
 #' library(pmartRdata)
 #' to_filter <- total_count_filter(omicsData = rnaseq_object)
 #' summary(filter_object = to_filter, min_count = 10)
+#' }
 #' 
 #' @author Rachel Richardson
 #'
@@ -275,18 +277,29 @@ total_count_filter <- function (omicsData) {
   samp_sum <- apply(temp_data, 2, sum, na.rm = TRUE) + 1
   div_sum <- sweep((temp_data + .5), 2, samp_sum, `/`)
   lcpm <- log2(div_sum * 10^6)
-  lcpm[[get_edata_cname(omicsData)]] <- omicsData$e_data[[id_col]]
+  
+  ## prevent arrange issue where fdata_cname == edata_cname
+  idvar <- ifelse(get_edata_cname(omicsData) == get_fdata_cname(omicsData), 
+                  paste0(get_edata_cname(omicsData), " (biomolecules)"), 
+                  get_edata_cname(omicsData))
+  
+  lcpm[[idvar]] <- omicsData$e_data[[id_col]]
+  
+  varname <- ifelse(get_edata_cname(omicsData) == get_fdata_cname(omicsData), 
+                  paste0(get_fdata_cname(omicsData), " (samples)"),
+                  get_fdata_cname(omicsData))
+  
   density_data <- reshape2::melt(lcpm, 
-                                 id.var = get_edata_cname(omicsData),
-                                 variable.name = get_fdata_cname(omicsData),
+                                 id.var = idvar,
+                                 variable.name = varname,
                                  value.name = "lcpm")
   
-  density_data[[get_edata_cname(omicsData)]] <- as.character(density_data[[get_edata_cname(omicsData)]])
-  density_data[[get_fdata_cname(omicsData)]] <- as.character(density_data[[get_fdata_cname(omicsData)]])
+  density_data[[idvar]] <- as.character(density_data[[idvar]])
+  density_data[[varname]] <- as.character(density_data[[varname]])
   
   density_data <- dplyr::arrange(density_data, 
-                          !!rlang::sym(get_edata_cname(omicsData)),
-                          !!rlang::sym(get_fdata_cname(omicsData)), 
+                          !!rlang::sym(idvar),
+                          !!rlang::sym(varname), 
                           lcpm)
   row.names(output) <- NULL
   
@@ -358,7 +371,7 @@ RNA_filter <- function (omicsData) {
   
   output <- dplyr::arrange(output, SampleID, LibrarySize, NonZero, ProportionNonZero)
   row.names(output) <- NULL
-  colnames(output) <- c(get_edata_cname(omicsData), "LibrarySize", 
+  colnames(output) <- c(get_fdata_cname(omicsData), "LibrarySize", 
                         "NonZero", "ProportionNonZero")
   
   # Extract the 'data.frame' class from the the output data frame.
@@ -548,7 +561,7 @@ cv_filter <- function(omicsData, use_groups = TRUE) {
   
   ## determine plotting window cutoff ##
   # calculate percentage of observations with CV <= 200 #
-  prct.less200 <- (sum(pool_cv$CV <= 200, na.rm = T) /
+  prct.less200 <- (sum(pool_cv$CV <= 200, na.rm = TRUE) /
                      length(pool_cv$CV[!is.na(pool_cv$CV)]))
   
   if (prct.less200 > 0.95) {
@@ -1121,14 +1134,14 @@ run_prop_missing <- function(data_only){
 run_mad <- function(data_only){
 
   # calculate MAD #
-  mad_val = apply(data_only, 2, function(x) median(abs(x - median(x, na.rm = T)), na.rm = T))
+  mad_val = apply(data_only, 2, function(x) median(abs(x - median(x, na.rm = TRUE)), na.rm = TRUE))
 
   # calculate the number of samples with MAD equal to NA #
   num.miss <- sum(is.na(mad_val))
 
   # if at least one sample has a MAD of NA, replace it with mean MAD value #
   if(num.miss > 0){
-    mad_val[is.na(mad_val)] <- mean(mad_val, na.rm = T)
+    mad_val[is.na(mad_val)] <- mean(mad_val, na.rm = TRUE)
   }
 
   # store data #
@@ -1165,7 +1178,7 @@ run_kurtosis <- function(data_only){
 
   # if at least one sample has a kurtosis of NA, replace it with mean kurtosis #
   if(num.miss > 0){
-    kurt_res[is.na(kurt_res)] <- mean(kurt_res, na.rm = T)
+    kurt_res[is.na(kurt_res)] <- mean(kurt_res, na.rm = TRUE)
   }
 
   # store data #
@@ -1202,7 +1215,7 @@ run_skewness <- function(data_only){
 
   # if at least one sample has a skewness of NA, replace it with mean skewness #
   if(num.miss > 0){
-    skew_res[is.na(skew_res)] <- mean(skew_res, na.rm = T)
+    skew_res[is.na(skew_res)] <- mean(skew_res, na.rm = TRUE)
   }
 
   # store data #
@@ -1333,7 +1346,7 @@ run_group_meancor <- function(omicsData, mintR_groupDF, ignore_singleton_groups 
   grp.cors = lapply(prwse.grp.cors, function(x) x*(matrix(1, nrow = nrow(x), ncol = ncol(x)) + diag(NA, nrow(x))))
 
   # compute mean correlation for each sample #
-  mean.cor = lapply(grp.cors, function(x) apply(x, 1, mean, na.rm = T))
+  mean.cor = lapply(grp.cors, function(x) apply(x, 1, mean, na.rm = TRUE))
 
   ## need to adjust the list elements of mean.cor for any singleton groups,
   ## to just contain the value for the sample in that group

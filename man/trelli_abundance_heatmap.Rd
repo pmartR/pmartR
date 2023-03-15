@@ -57,12 +57,12 @@ Specify a plot design and cognostics for the abundance heatmap
 
 ## Build the abundance heatmap with an omicsData object with emeta variables. Generate trelliData in as.trelliData.
 trelli_panel_by(trelliData = trelliData2, panel = "LipidFamily") \%>\% 
-   trelli_abundance_heatmap(test_mode = T, test_example = 1:3)
+   trelli_abundance_heatmap(test_mode = TRUE, test_example = 1:3)
    
 ## Users can modify the plotting function with ggplot parameters and interactivity, 
 ## and can also select certain cognostics.     
 trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") \%>\% 
-   trelli_abundance_heatmap(test_mode = T, test_example = 1:5, 
+   trelli_abundance_heatmap(test_mode = TRUE, test_example = 1:5, 
      ggplot_params = c("ylab('')", "xlab('')"), interactive = TRUE, cognostics = c("mean", "median"))  
    
 }

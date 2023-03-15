@@ -39,8 +39,8 @@
 #'
 #' imd_anova_res <- imd_anova(omicsData = mypepData,
 #'                            test_method = 'combined',
-#'                            pval_adjust_a ='bon',
-#'                            pval_adjust_g = 'bon')
+#'                            pval_adjust_a_multcomp ='bon',
+#'                            pval_adjust_g_multcomp = 'bon')
 #'
 #' result = bpquant(statRes = imd_anova_res, pepData = mypepData)
 #'
@@ -110,9 +110,9 @@ bpquant<- function (statRes, pepData, pi_not = .9,
   unique_proteins<- unique(protein_sig_data[[emeta_cname]])
 
   # set up parallel backend
-  if(parallel == TRUE){
-    cores<- parallel::detectCores()
-    cl<- parallel::makeCluster(cores)
+  if (parallel == TRUE){
+    cores <- parallelly::availableCores()
+    cl <- parallelly::makeClusterPSOCK(cores)
     on.exit(parallel::stopCluster(cl))
     doParallel::registerDoParallel(cl)
   } else {
@@ -222,9 +222,9 @@ bpquant_mod <- function (protein_sig, pi_not, max_proteoforms) {
   }
 
   ## order signatures by count##
-  cnt.ord = counts[order(counts, decreasing=T)]
+  cnt.ord = counts[order(counts, decreasing=TRUE)]
   if(nrow(sigs) > 1){
-    sig.ord = as.data.frame(sigs[order(counts, decreasing=T),])
+    sig.ord = as.data.frame(sigs[order(counts, decreasing=TRUE),])
   }else{
     sig.ord = sigs
   }
@@ -289,7 +289,7 @@ bpquant_mod <- function (protein_sig, pi_not, max_proteoforms) {
     for(j in 1:(nu-1)){
       tmp.rws = mat[apply(mat,1,sum)==j,]
       ord.var = apply(tmp.rws,1,function(x) as.numeric(paste(x,collapse="")))
-      mat.list[[j+1]] = tmp.rws[order(ord.var, decreasing=T),]
+      mat.list[[j+1]] = tmp.rws[order(ord.var, decreasing=TRUE),]
     }
     p_configs = do.call(rbind,mat.list)
   }

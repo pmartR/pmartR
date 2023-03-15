@@ -160,8 +160,8 @@ plot(imd_res)
 
 imd_anova_res <- imd_anova(omicsData = mypro,
                            test_method = 'comb',
-                           pval_adjust_a ='bon',
-                           pval_adjust_g = 'bon')
+                           pval_adjust_a_multcomp ='bon',
+                           pval_adjust_g_multcomp = 'bon')
 plot(imd_anova_res, bw_theme = TRUE)
 plot(imd_anova_res, plot_type = "volcano", bw_theme = TRUE)
 

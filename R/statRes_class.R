@@ -4,12 +4,20 @@
 #'   \code{imd_anova} call.
 #' @param omicsData pmartR data object of any class, which has a `group_df`
 #'   attribute that is usually created by the `group_designation()` function
-#' @param comparisons Tcomparisons made
+#' @param comparisons character vector of comparison names, e.g. c("A_vs_B", "B_vs_C", ...)
 #' @param test_method test method used ("anova", "gtest", or "combined")
-#' @param pval_adjust_a character string indicating the p-value adjustment
-#'   method for ANOVA
-#' @param pval_adjust_g character string indicating the p-value adjustment
-#'   method for G-test
+#' @param pval_adjust_a_multcomp character string specifying which type of multiple
+#'   comparison adjustment was implemented for ANOVA tests. Valid options include:
+#'   "bonferroni", "holm", "tukey", and "dunnett".
+#' @param pval_adjust_g_multcomp character string specifying which type of multiple
+#'   comparison adjustment was implemented for G-tests. Valid options include:
+#'   "bonferroni" and "holm".
+#' @param pval_adjust_a_fdr character string specifying which type of FDR
+#'   adjustment was implemented for ANOVA tests. Valid options include:
+#'   "bonferroni", "BH", "BY", and "fdr".
+#' @param pval_adjust_g_fdr character string specifying which type of FDR
+#'   adjustment was implemented for G-tests. Valid options include:
+#'   "bonferroni", "BH", "BY", and "fdr".
 #' @param pval_thresh numeric p-value threshold value
 #'
 #' @return object of class statRes
@@ -18,8 +26,10 @@ statRes_output <- function (imd_anova_out,
                             omicsData,
                             comparisons,
                             test_method,
-                            pval_adjust_a,
-                            pval_adjust_g,
+                            pval_adjust_a_multcomp,
+                            pval_adjust_g_multcomp,
+                            pval_adjust_a_fdr,
+                            pval_adjust_g_fdr,
                             pval_thresh) {
 
   # check that omicsData is of the appropriate class
@@ -79,8 +89,10 @@ statRes_output <- function (imd_anova_out,
     row.names = NULL
   )
   attr(imd_anova_out,"statistical_test") <- test_method
-  attr(imd_anova_out, "adjustment_method_a") <- pval_adjust_a
-  attr(imd_anova_out, "adjustment_method_g") <- pval_adjust_g
+  attr(imd_anova_out, "adjustment_method_a_multcomp") <- pval_adjust_a_multcomp
+  attr(imd_anova_out, "adjustment_method_g_multcomp") <- pval_adjust_g_multcomp
+  attr(imd_anova_out, "adjustment_method_a_fdr") <- pval_adjust_a_fdr
+  attr(imd_anova_out, "adjustment_method_g_fdr") <- pval_adjust_g_fdr
   attr(imd_anova_out, "pval_thresh") <- pval_thresh
   attr(imd_anova_out, "data_info") <- attr(omicsData, "data_info")
 

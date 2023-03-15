@@ -9,11 +9,12 @@ imd_test(
   omicsData,
   groupData,
   comparisons,
-  pval_adjust,
+  pval_adjust_multcomp,
+  pval_adjust_fdr,
   pval_thresh,
   covariates,
   paired,
-  use_parallel
+  parallel
 )
 }
 \arguments{
@@ -24,9 +25,14 @@ containing the different comparisons of interest. Comparisons will be made
 between the Test and the corresponding Control  If left NULL, then all
 pairwise comparisons are executed.}
 
-\item{pval_adjust}{A character string specifying the type of multiple
+\item{pval_adjust_multcomp}{A character string specifying the type of multiple
 comparisons adjustment to implement. The default setting, "none", is to not
 apply an adjustment. Valid options include: "bonferroni" and "holm".}
+
+\item{pval_adjust_fdr}{A character string specifying the type of FDR
+adjustment to implement. The default setting, "none", is to not
+apply an adjustment. Valid options include: "bonferroni", "BH", "BY", and
+"fdr".}
 
 \item{pval_thresh}{numeric p-value threshold, below or equal to which
 peptides are considered differentially expressed. Defaults to 0.05}
@@ -34,7 +40,7 @@ peptides are considered differentially expressed. Defaults to 0.05}
 \item{covariates}{A character vector with no more than two variable names
 that will be used as covariates in the IMD-ANOVA analysis.}
 
-\item{use_parallel}{A logical value indicating whether or not to use a
+\item{parallel}{A logical value indicating whether or not to use a
 "doParallel" loop when running the G-Test with covariates. The default is
 TRUE.}
 }

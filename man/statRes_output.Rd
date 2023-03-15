@@ -9,8 +9,10 @@ statRes_output(
   omicsData,
   comparisons,
   test_method,
-  pval_adjust_a,
-  pval_adjust_g,
+  pval_adjust_a_multcomp,
+  pval_adjust_g_multcomp,
+  pval_adjust_a_fdr,
+  pval_adjust_g_fdr,
   pval_thresh
 )
 }
@@ -21,15 +23,25 @@ statRes_output(
 \item{omicsData}{pmartR data object of any class, which has a `group_df`
 attribute that is usually created by the `group_designation()` function}
 
-\item{comparisons}{Tcomparisons made}
+\item{comparisons}{character vector of comparison names, e.g. c("A_vs_B", "B_vs_C", ...)}
 
 \item{test_method}{test method used ("anova", "gtest", or "combined")}
 
-\item{pval_adjust_a}{character string indicating the p-value adjustment
-method for ANOVA}
+\item{pval_adjust_a_multcomp}{character string specifying which type of multiple
+comparison adjustment was implemented for ANOVA tests. Valid options include:
+"bonferroni", "holm", "tukey", and "dunnett".}
 
-\item{pval_adjust_g}{character string indicating the p-value adjustment
-method for G-test}
+\item{pval_adjust_g_multcomp}{character string specifying which type of multiple
+comparison adjustment was implemented for G-tests. Valid options include:
+"bonferroni" and "holm".}
+
+\item{pval_adjust_a_fdr}{character string specifying which type of FDR
+adjustment was implemented for ANOVA tests. Valid options include:
+"bonferroni", "BH", "BY", and "fdr".}
+
+\item{pval_adjust_g_fdr}{character string specifying which type of FDR
+adjustment was implemented for G-tests. Valid options include:
+"bonferroni", "BH", "BY", and "fdr".}
 
 \item{pval_thresh}{numeric p-value threshold value}
 }

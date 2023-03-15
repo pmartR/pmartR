@@ -43,7 +43,7 @@ Below, descriptions of ANOVA and IMD are provided, followed by a description of 
 
 ## Analysis of Variance 
 
-Quantitative tests for differential abundance of pan-omic data are accomplished using the function `test_method = "anova"` or `test_method = "combined"` arguments, which implement an analysis of variance (ANOVA) for each biomolecule. [`Rcpp`](https://cran.r-project.org/web/packages/Rcpp/index.html) is used to speed up computation (@rcpp_book) by default, and can be turned off with the `use_parallel = FALSE` argument. Different ANOVA implementations are applied depending on the complexity of the supplied data. For example, if only two groups are supplied then ANOVA reduces to a two sample $t$-test that assumes equal variance for the two groups. Alternatively, if two groups are present and a covariate correction is required, then the effect of the covariates is removed using a reduced maximum likelihood approach. After the covariate correction is applied, a two-factor ANOVA is used to detect difference between all combinations of groups or between main effects as appropriate. Details on generalizations to these two approaches are given in the next two subsections.
+Quantitative tests for differential abundance of pan-omic data are accomplished using the function `test_method = "anova"` or `test_method = "combined"` arguments, which implement an analysis of variance (ANOVA) for each biomolecule. [`Rcpp`](https://cran.r-project.org/web/packages/Rcpp/index.html) is used to speed up computation (@rcpp_book) by default, and can be turned off with the `parallel = FALSE` argument. Different ANOVA implementations are applied depending on the complexity of the supplied data. For example, if only two groups are supplied then ANOVA reduces to a two sample $t$-test that assumes equal variance for the two groups. Alternatively, if two groups are present and a covariate correction is required, then the effect of the covariates is removed using a reduced maximum likelihood approach. After the covariate correction is applied, a two-factor ANOVA is used to detect difference between all combinations of groups or between main effects as appropriate. Details on generalizations to these two approaches are given in the next two subsections.
 
 ### One Group
 
@@ -80,12 +80,12 @@ The function `imd_anova` function returns a data frame containing:
 
 5. An indicator for significance for each comparison in the columns called `Flag_A_` ("A" for ANOVA) that is a $\pm1$ or 0  depending on whether that fold change was or was not statistically significant from zero, respectively, according to the $p$-values and the specified $p$-value threshold set by the `pval_thresh` argument to `imd_anova`. A value of $-1$ implies the "control" or "reference" group is significantly under expressed compared to the test group, and the converse is true for $+1$. 
 
-The $p$-values associated with each group comparison can be adjusted for multiple comparisons using the `pval_adjust_a` argument to `imd_anova`. A detailed look at the available $p$-value adjustment methods and when they should be applied are discussed later in this vignette, but the use of the Tukey multiple comparison method is illustrated in the following.
+The $p$-values associated with each group comparison can be adjusted for multiple comparisons using the `pval_adjust_a_multcomp` argument to `imd_anova`. A detailed look at the available $p$-value adjustment methods and when they should be applied are discussed later in this vignette, but the use of the Tukey multiple comparison method is illustrated in the following.
 
 ```{r, warning=FALSE}
 all_pairwise_results_adjusted <- imd_anova(omicsData = pep_object, 
                                            test_method = "anova", 
-                                           pval_adjust_a = "Tukey")
+                                           pval_adjust_a_multcomp = "Tukey")
 ```
 
 By default, all pairwise comparisons are made. Custom comparisons can by defined by passing a `data.frame` to the `comparisons` argument with column names "Test" and "Control". Now, group "Phenotype1" is treated as the control group and the remaining groups are compared to it.
@@ -195,7 +195,7 @@ The function `test_method = "gtest"` or `test_method = "combined"` argument spec
 
 5. An indicator for significance for each comparison in the columns called `Flag_G_` ("G" g-test) that is a $\pm1$ or 0 depending on whether the $p$-values were significant or not. In this case, a value of $-1$ implies the "control" or "reference" group had fewer observations than the test group, and the converse is true for $+1$. 
 
-The $p$-values associated with each group comparison can be adjusted for multiple comparisons using the `pval_adjust_g` argument to `imd_anova`. 
+The $p$-values associated with each group comparison can be adjusted for multiple comparisons using the `pval_adjust_g_multcomp` argument to `imd_anova`. 
 
 ### Covariate Adjustment
 

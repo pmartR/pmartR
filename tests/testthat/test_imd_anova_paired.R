@@ -18,7 +18,7 @@ test_that('all paired tests conform to the decrees of the God of Stats',{
 
   afruit_0_0_3 <- imd_anova(afilta_0_0_3,
                             test_method = "anova",
-                            use_parallel = FALSE)
+                            parallel = FALSE)
 
   afruit_1_0_3 <- imd_anova(afilta_1_0_3,
                             test_method = "anova")
@@ -31,7 +31,7 @@ test_that('all paired tests conform to the decrees of the God of Stats',{
                             test_method = "anova")
   gfruit_1_1_3 <- imd_anova(gfilta_1_1_3,
                             test_method = "gtest",
-                            use_parallel = FALSE)
+                            parallel = FALSE)
   cfruit_1_1_3 <- imd_anova(cfilta_1_1_3,
                             test_method = "combined")
 

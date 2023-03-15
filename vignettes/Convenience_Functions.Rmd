@@ -219,8 +219,8 @@ get_nmr_norm(omicsData = nmr_norm)
 ```{r}
 imd_anova_res <- imd_anova(omicsData = mypro,
                           test_method = "comb",
-                          pval_adjust_a = "bon",
-                          pval_adjust_g = "bon")
+                          pval_adjust_a_multcomp = "bon",
+                          pval_adjust_g_multcomp = "bon")
 
 get_comparisons(compObj = imd_anova_res)
 ```

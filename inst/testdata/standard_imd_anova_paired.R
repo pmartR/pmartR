@@ -245,8 +245,10 @@ attr(astan_0_0_3, "number_significant") <- data.frame(
   row.names = NULL
 )
 attr(astan_0_0_3, "statistical_test") <- "anova"
-attr(astan_0_0_3, "adjustment_method_a") <- "none"
-attr(astan_0_0_3, "adjustment_method_g") <- "none"
+attr(astan_0_0_3, "adjustment_method_a_multcomp") <- "none"
+attr(astan_0_0_3, "adjustment_method_g_multcomp") <- "none"
+attr(astan_0_0_3, "adjustment_method_a_fdr") <- "none"
+attr(astan_0_0_3, "adjustment_method_g_fdr") <- "none"
 attr(astan_0_0_3, "pval_thresh") <- 0.05
 attr(astan_0_0_3, "data_info") <- list(
   data_scale_orig = "abundance",
@@ -418,8 +420,10 @@ attr(astan_1_0_3, "number_significant") <- data.frame(
   row.names = NULL
 )
 attr(astan_1_0_3, "statistical_test") <- "anova"
-attr(astan_1_0_3, "adjustment_method_a") <- "none"
-attr(astan_1_0_3, "adjustment_method_g") <- "none"
+attr(astan_1_0_3, "adjustment_method_a_multcomp") <- "none"
+attr(astan_1_0_3, "adjustment_method_g_multcomp") <- "none"
+attr(astan_1_0_3, "adjustment_method_a_fdr") <- "none"
+attr(astan_1_0_3, "adjustment_method_g_fdr") <- "none"
 attr(astan_1_0_3, "pval_thresh") <- 0.05
 attr(astan_1_0_3, "data_info") <- list(
   data_scale_orig = "abundance",
@@ -623,8 +627,10 @@ attr(astan_1_1_3, "number_significant") <- data.frame(
   row.names = NULL
 )
 attr(astan_1_1_3, "statistical_test") <- "anova"
-attr(astan_1_1_3, "adjustment_method_a") <- "none"
-attr(astan_1_1_3, "adjustment_method_g") <- "none"
+attr(astan_1_1_3, "adjustment_method_a_multcomp") <- "none"
+attr(astan_1_1_3, "adjustment_method_g_multcomp") <- "none"
+attr(astan_1_1_3, "adjustment_method_a_fdr") <- "none"
+attr(astan_1_1_3, "adjustment_method_g_fdr") <- "none"
 attr(astan_1_1_3, "pval_thresh") <- 0.05
 attr(astan_1_1_3, "data_info") <- list(
   data_scale_orig = "abundance",
@@ -786,8 +792,10 @@ attr(gstan_1_0_3, "number_significant") <- data.frame(
   row.names = NULL
 )
 attr(gstan_1_0_3, "statistical_test") <- "gtest"
-attr(gstan_1_0_3, "adjustment_method_a") <- "none"
-attr(gstan_1_0_3, "adjustment_method_g") <- "none"
+attr(gstan_1_0_3, "adjustment_method_a_multcomp") <- "none"
+attr(gstan_1_0_3, "adjustment_method_g_multcomp") <- "none"
+attr(gstan_1_0_3, "adjustment_method_a_fdr") <- "none"
+attr(gstan_1_0_3, "adjustment_method_g_fdr") <- "none"
 attr(gstan_1_0_3, "pval_thresh") <- 0.05
 attr(gstan_1_0_3, "data_info") <- list(
   data_scale_orig = "abundance",
@@ -936,8 +944,10 @@ attr(gstan_1_1_3, "number_significant") <- data.frame(
   row.names = NULL
 )
 attr(gstan_1_1_3, "statistical_test") <- "gtest"
-attr(gstan_1_1_3, "adjustment_method_a") <- "none"
-attr(gstan_1_1_3, "adjustment_method_g") <- "none"
+attr(gstan_1_1_3, "adjustment_method_a_multcomp") <- "none"
+attr(gstan_1_1_3, "adjustment_method_g_multcomp") <- "none"
+attr(gstan_1_1_3, "adjustment_method_a_fdr") <- "none"
+attr(gstan_1_1_3, "adjustment_method_g_fdr") <- "none"
 attr(gstan_1_1_3, "pval_thresh") <- 0.05
 attr(gstan_1_1_3, "data_info") <- list(
   data_scale_orig = "abundance",
@@ -1031,8 +1041,10 @@ attr(cstan_1_0_3, "number_significant") <- data.frame(
   row.names = NULL
 )
 attr(cstan_1_0_3, "statistical_test") <- "combined"
-attr(cstan_1_0_3, "adjustment_method_a") <- "none"
-attr(cstan_1_0_3, "adjustment_method_g") <- "none"
+attr(cstan_1_0_3, "adjustment_method_a_multcomp") <- "none"
+attr(cstan_1_0_3, "adjustment_method_g_multcomp") <- "none"
+attr(cstan_1_0_3, "adjustment_method_a_fdr") <- "none"
+attr(cstan_1_0_3, "adjustment_method_g_fdr") <- "none"
 attr(cstan_1_0_3, "pval_thresh") <- 0.05
 attr(cstan_1_0_3, "data_info") <- list(
   data_scale_orig = "abundance",
@@ -1154,8 +1166,10 @@ attr(cstan_1_1_3, "number_significant") <- data.frame(
   row.names = NULL
 )
 attr(cstan_1_1_3, "statistical_test") <- "combined"
-attr(cstan_1_1_3, "adjustment_method_a") <- "none"
-attr(cstan_1_1_3, "adjustment_method_g") <- "none"
+attr(cstan_1_1_3, "adjustment_method_a_multcomp") <- "none"
+attr(cstan_1_1_3, "adjustment_method_g_multcomp") <- "none"
+attr(cstan_1_1_3, "adjustment_method_a_fdr") <- "none"
+attr(cstan_1_1_3, "adjustment_method_g_fdr") <- "none"
 attr(cstan_1_1_3, "pval_thresh") <- 0.05
 attr(cstan_1_1_3, "data_info") <- list(
   data_scale_orig = "abundance",
@@ -1209,19 +1223,18 @@ attr(cstan_1_1_3, "data_class") <- "pepData"
 
 # Save standards for paired IMD-ANOVA tests ------------------------------------
 
-# save(
-#
-#   astan_0_0_3,
-#
-#   astan_1_0_3,
-#   gstan_1_0_3,
-#   cstan_1_0_3,
-#
-#   astan_1_1_3,
-#   gstan_1_1_3,
-#   cstan_1_1_3,
-#
-#   file = file.path("/Users/mart077/Documents/r_packages/pmartR",
-#                    "inst/testdata/standards_imd_anova_paired.RData")
-#
-# )
+save(
+
+  astan_0_0_3,
+
+  astan_1_0_3,
+  gstan_1_0_3,
+  cstan_1_0_3,
+
+  astan_1_1_3,
+  gstan_1_1_3,
+  cstan_1_1_3,
+
+  file = file.path("inst/testdata/standards_imd_anova_paired.RData")
+
+)

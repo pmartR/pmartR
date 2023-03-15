@@ -79,8 +79,10 @@ ggplot2 plot object if interactive is FALSE, or plotly plot object if
 For plotting an S3 object of type 'totalCountFilt':
 }
 \examples{
+\dontrun{
 library(pmartRdata)
 seqfilt <- total_count_filter(omicsData = rnaseq_object)
 plot(seqfilt, min_count = 5)
+}
 
 }

@@ -202,11 +202,11 @@ summary.RNAFilt <- function(filter_object,
   df <- as.data.frame(apply(temp_obj[-1], 2, summary))
   df["SD",] <- apply(temp_obj[-1], 2, sd)
   
-  rmved <- !(filter_object$SampleID %in% temp_obj$SampleID)
+  rmved <- !(filter_object[[colnames(filter_object)[[1]]]] %in% temp_obj[[colnames(filter_object)[[1]]]])
   
   res <- list(
     Summary = df,
-    samples_filtered = filter_object$SampleID[rmved],
+    samples_filtered = filter_object[[colnames(filter_object)[[1]]]][rmved],
     num_filtered = sum(rmved),
     num_not_filtered = sum(!rmved),
     nonzero_thresh = min_nonzero,
@@ -270,10 +270,12 @@ print.RNAFiltSummary <- function(object){
 #' filtered at this threshold are reported.
 #'
 #' @examples 
+#' \dontrun{
 #' library(pmartRdata)
 #' myfilt <- total_count_filter(omicsData = rnaseq_object)
 #' summary(filter_object = myfilt, min_count = 2)
-#'
+#' }
+#' 
 #' @author Rachel Richardson
 #' 
 #' @seealso \code{\link{total_count_filter}}

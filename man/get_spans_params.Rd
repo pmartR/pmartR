@@ -20,6 +20,7 @@ A list of lists, where there are multiple sublists only if there were
 Gets the parameters for the highest ranked methods from spans.
 }
 \examples{
+\dontrun{
 library(pmartRdata)
 
 # data must be log transformed and grouped
@@ -39,5 +40,6 @@ if(is.null(params[[1]])){params = NULL}
 
 # pass arguments to normalize global
 norm_object <- normalize_global(omicsData = myobject, subset_fn = subset_fn, norm_fn = norm_fn, params = params)
+}
 
 }

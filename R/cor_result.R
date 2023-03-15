@@ -22,7 +22,9 @@
 #' mymetab <- edata_transform(omicsData = metab_object, data_scale = "log2")
 #' my_correlation <- cor_result(omicsData = mymetab)
 #' 
+#' \dontrun{
 #' myseq_correlation <- cor_result(omicsData = rnaseq_object)
+#' }
 #' 
 #' @author Kelly Stratton, Lisa Bramer
 #' 

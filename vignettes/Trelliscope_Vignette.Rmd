@@ -10,7 +10,7 @@ output:
     self_contained: yes
 bibliography: bibliography.bib
 vignette: >
-  %\VignetteIndexEntry{pmartR-peptide} 
+  %\VignetteIndexEntry{pmartR-trelliscope} 
   %\VignetteEngine{knitr::rmarkdown} 
   %\VignetteEncoding{UTF-8}
 ---
@@ -19,8 +19,6 @@ vignette: >
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 library(pmartRdata)
 library(pmartR)
-library(data.table)
-library(DT)
 library(dplyr)
 library(patchwork)
 ```
@@ -51,7 +49,7 @@ Currently, abundance, missingness, and fold change plots are supported, and
 can be summarized as follows: 
 
 ```{r, echo = FALSE}
-data.table(
+data.frame(
   `Input Data` = c(rep("Abundance", 3), "Missingness", rep("Fold Change", 4)),
   `Plot Type` = c("Boxplot", "Histogram", "Heatmap", "Barplot", "Barplot", "Boxplot", "Volcano", "Heatmap"),
   `Uses e_data` = c("X", "X", "", "X", rep("", 4)),
@@ -143,7 +141,7 @@ which is the above table subsetted down to the only options available to plot
 right now. The typical trelliscope parameters look like this: 
 
 ```{r, echo = FALSE}
-data.table(
+data.frame(
   "Parameter Name" = c("cognostics", "ggplot_params", "interactive", "path", 
                        "name", "test_mode", "test_example", "single_plot"),
   "Description" = c("Set the specific cognostics of the trelliscope. Varies per plotting function.", 
@@ -448,7 +446,7 @@ trelliData2 %>%
 Below is the a list of common functions and what they do. 
 
 ```{r, echo = FALSE}
-data.table(
+data.frame(
   Function = c("xlab('Name')", "ylab('Name')", "ggtitle('Name')", 
                "xlim(c(0,1))", "ylim(c(0,1))",
                "coord_flip()",
@@ -492,7 +490,7 @@ using the "trelli_abundance_boxplot" and only wanted a mean and median cognostic
 you could set cognostics to c("mean", "median").
 
 ```{r, echo = FALSE}
-data.table(
+data.frame(
  Functions = c("trelli_abundance_boxplot", "trelli_abundance_histogram", 
                "trelli_abundance_heatmap", "trelli_missingness_bar",
                "trelli_foldchange_bar", "trelli_foldchange_boxplot",

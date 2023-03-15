@@ -141,13 +141,13 @@ test_that('edata_summary correctly summarizes the data',{
                                        function(x){if(all(is.na(x))){
                                          min(x)
                                        }else{
-                                         min(x, na.rm = T)
+                                         min(x, na.rm = TRUE)
                                        }}),
                      Mock = apply(pdata$e_data[, 11:13], 1,
                                   function(x){if(all(is.na(x))){
                                     min(x)
                                   }else{
-                                    min(x, na.rm = T)
+                                    min(x, na.rm = TRUE)
                                   }}),
                      row.names = 1:150),
     max = data.frame(Mass_Tag_ID = pdata$e_data$Mass_Tag_ID,
@@ -155,13 +155,13 @@ test_that('edata_summary correctly summarizes the data',{
                                        function(x){if(all(is.na(x))){
                                          max(x)
                                        }else{
-                                         max(x, na.rm = T)
+                                         max(x, na.rm = TRUE)
                                        }}),
                      Mock = apply(pdata$e_data[, 11:13], 1,
                                   function(x){if(all(is.na(x))){
                                     max(x)
                                   }else{
-                                    max(x, na.rm = T)
+                                    max(x, na.rm = TRUE)
                                   }}),
                      row.names = 1:150)
   )
@@ -233,19 +233,19 @@ test_that('edata_summary correctly summarizes the data',{
                                             function(x){if(all(is.na(x))){
                                               min(x)
                                             }else{
-                                              min(x, na.rm = T)
+                                              min(x, na.rm = TRUE)
                                             }}),
                      Infection_low = apply(pdata$e_data[, c(2, 3, 5, 10)], 1,
                                            function(x){if(all(is.na(x))){
                                              min(x)
                                            }else{
-                                             min(x, na.rm = T)
+                                             min(x, na.rm = TRUE)
                                            }}),
                      Mock_none = apply(pdata$e_data[, 11:13], 1,
                                        function(x){if(all(is.na(x))){
                                          min(x)
                                        }else{
-                                         min(x, na.rm = T)
+                                         min(x, na.rm = TRUE)
                                        }}),
                      row.names = 1:150),
     max = data.frame(Mass_Tag_ID = pdata$e_data$Mass_Tag_ID,
@@ -253,19 +253,19 @@ test_that('edata_summary correctly summarizes the data',{
                                             function(x){if(all(is.na(x))){
                                               max(x)
                                             }else{
-                                              max(x, na.rm = T)
+                                              max(x, na.rm = TRUE)
                                             }}),
                      Infection_low = apply(pdata$e_data[, c(2, 3, 5, 10)], 1,
                                            function(x){if(all(is.na(x))){
                                              max(x)
                                            }else{
-                                             max(x, na.rm = T)
+                                             max(x, na.rm = TRUE)
                                            }}),
                      Mock_none = apply(pdata$e_data[, 11:13], 1,
                                        function(x){if(all(is.na(x))){
                                          max(x)
                                        }else{
-                                         max(x, na.rm = T)
+                                         max(x, na.rm = TRUE)
                                        }}),
                      row.names = 1:150)
   )
