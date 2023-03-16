@@ -281,8 +281,6 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata_gdf, 'cnames'),
                    attr(aFiltered, 'cnames'))
-  expect_identical(attr(pdata_gdf, 'check.names'),
-                   attr(aFiltered, 'check.names'))
   expect_identical(class(pdata_gdf),
                    class(aFiltered))
 
@@ -537,8 +535,6 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata_sg, 'cnames'),
                    attr(aFiltered_sg, 'cnames'))
-  expect_identical(attr(pdata_sg, 'check.names'),
-                   attr(aFiltered_sg, 'check.names'))
   expect_identical(class(pdata_sg),
                    class(aFiltered_sg))
 
@@ -744,8 +740,6 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata_sg, 'cnames'),
                    attr(aFiltered_sg_f, 'cnames'))
-  expect_identical(attr(pdata_sg, 'check.names'),
-                   attr(aFiltered_sg_f, 'check.names'))
   expect_identical(class(pdata_sg),
                    class(aFiltered_sg_f))
 
@@ -822,8 +816,6 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata_sg, 'cnames'),
                    attr(gFiltered_sg_f, 'cnames'))
-  expect_identical(attr(pdata_sg, 'check.names'),
-                   attr(gFiltered_sg_f, 'check.names'))
   expect_identical(class(pdata_sg),
                    class(gFiltered_sg_f))
 
@@ -901,8 +893,6 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata_sg, 'cnames'),
                    attr(bFiltered_sg_f, 'cnames'))
-  expect_identical(attr(pdata_sg, 'check.names'),
-                   attr(bFiltered_sg_f, 'check.names'))
   expect_identical(class(pdata_sg),
                    class(bFiltered_sg_f))
 

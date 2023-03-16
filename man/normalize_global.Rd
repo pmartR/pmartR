@@ -11,7 +11,8 @@ normalize_global(
   params = NULL,
   apply_norm = FALSE,
   backtransform = FALSE,
-  min_prop = NULL
+  min_prop = NULL,
+  check.names = NULL
 )
 }
 \arguments{
@@ -48,6 +49,8 @@ factors are calculated.}
 
 \item{min_prop}{numeric threshold between 0 and 1 giving the minimum value
 for the proportion of biomolecules subset (rows of \code{e_data})}
+
+\item{check.names}{deprecated}
 }
 \value{
 If apply_norm is FALSE, an S3 object of type 'normRes' is returned.

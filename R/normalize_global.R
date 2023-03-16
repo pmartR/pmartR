@@ -31,6 +31,7 @@
 #'   factors are calculated.
 #' @param min_prop numeric threshold between 0 and 1 giving the minimum value
 #'   for the proportion of biomolecules subset (rows of \code{e_data})
+#' @param check.names deprecated
 #'
 #' @details Below are details for specifying function and parameter options.
 #' @section Subset Functions: Specifying a subset function indicates the subset
@@ -134,8 +135,11 @@
 #'
 normalize_global <- function (omicsData, subset_fn, norm_fn, params = NULL,
                               apply_norm = FALSE, backtransform = FALSE,
-                              min_prop = NULL) {
+                              min_prop = NULL, check.names = NULL) {
 
+  if (!missing(check.names))
+    warning("check.names parameter is deprecated")
+  
   ## initial checks ##
 
   # Ensure omicsData is an appropriate class
@@ -184,7 +188,6 @@ normalize_global <- function (omicsData, subset_fn, norm_fn, params = NULL,
 
   }
 
-  check_names = get_check_names(omicsData)
   edata_id <- get_edata_cname(omicsData)
   samp_id <- get_fdata_cname(omicsData)
   
@@ -506,8 +509,7 @@ normalize_global <- function (omicsData, subset_fn, norm_fn, params = NULL,
                             subset_fn = subset_fn,
                             feature_subset = peps,
                             backtransform = backtransform,
-                            apply_norm = apply_norm,
-                            check.names = check_names)
+                            apply_norm = apply_norm)
 
   # Calculate the proportion of features used to calculate the normalization
   # parameters.

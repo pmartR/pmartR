@@ -149,8 +149,6 @@ To create the lipidData object with our example data, we need the 3 data frames 
 
 - data_types: optional argument for additional information about the data type; often used if there are datasets for both negative and positive ionization modes on an instrument
 
-- check.names: optional argument that behaves as in base R, defaults to TRUE. If we read in a .csv or .xlsx file for  e_data file without specifying \code{check.names = FALSE}, any column names beginning with a number are automatically prepended with "X" or containing a dash are replaced with a period. This causes the sample names in e_data to not match the sample names in f_data, and will prevent the creation of the omicsData object.
-
 ```{r}
 mylipid <- as.lipidData(e_data = edata,
                         f_data = fdata,
@@ -159,8 +157,7 @@ mylipid <- as.lipidData(e_data = edata,
                         fdata_cname = "SampleID",
                         emeta_cname = "Lipid", 
                         data_scale = "abundance",
-                        data_types = "Negative Ion",
-                        check.names = FALSE)
+                        data_types = "Negative Ion")
 ```
 
 Now we have an object of class lipidData. Built-in summary and plot methods now operate on this object and provide additional information.

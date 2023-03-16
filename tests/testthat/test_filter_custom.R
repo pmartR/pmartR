@@ -301,8 +301,6 @@ test_that('custom_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata, "cnames"),
                    attr(filtered_edr, "cnames"))
-  expect_identical(attr(pdata, "check.names"),
-                   attr(filtered_edr, "check.names"))
   expect_identical(class(pdata),
                    class(filtered_edr))
 
@@ -357,8 +355,6 @@ test_that('custom_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata, "cnames"),
                    attr(filtered_fdr, "cnames"))
-  expect_identical(attr(pdata, "check.names"),
-                   attr(filtered_fdr, "check.names"))
   expect_identical(class(pdata),
                    class(filtered_fdr))
 
@@ -412,8 +408,6 @@ test_that('custom_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata, "cnames"),
                    attr(filtered_emr, "cnames"))
-  expect_identical(attr(pdata, "check.names"),
-                   attr(filtered_emr, "check.names"))
   expect_identical(class(pdata),
                    class(filtered_emr))
 
@@ -467,8 +461,6 @@ test_that('custom_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata, "cnames"),
                    attr(filtered_efdr, "cnames"))
-  expect_identical(attr(pdata, "check.names"),
-                   attr(filtered_efdr, "check.names"))
   expect_identical(class(pdata),
                    class(filtered_efdr))
 
@@ -525,8 +517,6 @@ test_that('custom_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata, "cnames"),
                    attr(filtered_edemr, "cnames"))
-  expect_identical(attr(pdata, "check.names"),
-                   attr(filtered_edemr, "check.names"))
   expect_identical(class(pdata),
                    class(filtered_edemr))
 
@@ -583,8 +573,6 @@ test_that('custom_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata, "cnames"),
                    attr(filtered_efer, "cnames"))
-  expect_identical(attr(pdata, "check.names"),
-                   attr(filtered_efer, "check.names"))
   expect_identical(class(pdata),
                    class(filtered_efer))
 
@@ -643,8 +631,6 @@ test_that('custom_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata_grp, "cnames"),
                    attr(filtered_fdr_grp, "cnames"))
-  expect_identical(attr(pdata_grp, "check.names"),
-                   attr(filtered_fdr_grp, "check.names"))
   expect_identical(class(pdata_grp),
                    class(filtered_fdr_grp))
 
@@ -706,8 +692,6 @@ test_that('custom_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata, "cnames"),
                    attr(filtered_edk, "cnames"))
-  expect_identical(attr(pdata, "check.names"),
-                   attr(filtered_edk, "check.names"))
   expect_identical(class(pdata),
                    class(filtered_edk))
 
@@ -762,8 +746,6 @@ test_that('custom_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata, "cnames"),
                    attr(filtered_fdk, "cnames"))
-  expect_identical(attr(pdata, "check.names"),
-                   attr(filtered_fdk, "check.names"))
   expect_identical(class(pdata),
                    class(filtered_fdk))
 
@@ -817,8 +799,6 @@ test_that('custom_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata, "cnames"),
                    attr(filtered_emk, "cnames"))
-  expect_identical(attr(pdata, "check.names"),
-                   attr(filtered_emk, "check.names"))
   expect_identical(class(pdata),
                    class(filtered_emk))
 
@@ -872,8 +852,6 @@ test_that('custom_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata, "cnames"),
                    attr(filtered_efdk, "cnames"))
-  expect_identical(attr(pdata, "check.names"),
-                   attr(filtered_efdk, "check.names"))
   expect_identical(class(pdata),
                    class(filtered_efdk))
 
@@ -930,8 +908,6 @@ test_that('custom_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata, "cnames"),
                    attr(filtered_edemk, "cnames"))
-  expect_identical(attr(pdata, "check.names"),
-                   attr(filtered_edemk, "check.names"))
   expect_identical(class(pdata),
                    class(filtered_edemk))
 
@@ -988,8 +964,6 @@ test_that('custom_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata, "cnames"),
                    attr(filtered_efek, "cnames"))
-  expect_identical(attr(pdata, "check.names"),
-                   attr(filtered_efek, "check.names"))
   expect_identical(class(pdata),
                    class(filtered_efek))
 
@@ -1048,8 +1022,6 @@ test_that('custom_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata_grp, "cnames"),
                    attr(filtered_fdk_grp, "cnames"))
-  expect_identical(attr(pdata_grp, "check.names"),
-                   attr(filtered_fdk_grp, "check.names"))
   expect_identical(class(pdata_grp),
                    class(filtered_fdk_grp))
 

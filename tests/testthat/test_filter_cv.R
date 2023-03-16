@@ -365,8 +365,6 @@ test_that('cv_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata, 'cnames'),
                    attr(filtered, 'cnames'))
-  expect_identical(attr(pdata, 'check.names'),
-                   attr(filtered, 'check.names'))
   expect_identical(class(pdata),
                    class(filtered))
 
@@ -419,8 +417,6 @@ test_that('cv_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata, 'cnames'),
                    attr(filtered_gdf, 'cnames'))
-  expect_identical(attr(pdata, 'check.names'),
-                   attr(filtered_gdf, 'check.names'))
   expect_identical(class(pdata),
                    class(filtered_gdf))
 
@@ -473,8 +469,6 @@ test_that('cv_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata, 'cnames'),
                    attr(filtered_sg_gdf, 'cnames'))
-  expect_identical(attr(pdata, 'check.names'),
-                   attr(filtered_sg_gdf, 'check.names'))
   expect_identical(class(pdata),
                    class(filtered_sg_gdf))
 

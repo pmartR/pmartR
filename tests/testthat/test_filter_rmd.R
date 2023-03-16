@@ -321,8 +321,6 @@ test_that("rmd_filter and applyFilt produce the correct output",{
   # Ensurify the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata, "cnames"),
                    attr(pfiltered, "cnames"))
-  expect_identical(attr(pdata, "check.names"),
-                   attr(pfiltered, "check.names"))
   expect_identical(class(pdata),
                    class(pfiltered))
 
@@ -394,8 +392,6 @@ test_that("rmd_filter and applyFilt produce the correct output",{
   # Ensurify the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(nmrdata, "cnames"),
                    attr(nmrfiltered, "cnames"))
-  expect_identical(attr(nmrdata, "check.names"),
-                   attr(nmrfiltered, "check.names"))
   expect_identical(class(nmrdata),
                    class(nmrfiltered))
 
@@ -461,8 +457,6 @@ test_that("rmd_filter and applyFilt produce the correct output",{
   # Ensurify the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata_sg, "cnames"),
                    attr(pfiltered_sg, "cnames"))
-  expect_identical(attr(pdata_sg, "check.names"),
-                   attr(pfiltered_sg, "check.names"))
   expect_identical(class(pdata_sg),
                    class(pfiltered_sg))
 
@@ -521,8 +515,6 @@ test_that("rmd_filter and applyFilt produce the correct output",{
   # Ensurify the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata_sg, "cnames"),
                    attr(pfiltered_sg_f, "cnames"))
-  expect_identical(attr(pdata_sg, "check.names"),
-                   attr(pfiltered_sg_f, "check.names"))
   expect_identical(class(pdata_sg),
                    class(pfiltered_sg_f))
 

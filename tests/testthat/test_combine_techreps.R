@@ -130,7 +130,7 @@ test_that("combine_techreps properly aggregates technical replicates", {
   
   temp_omics <- as.seqData(e_data = edata, edata_cname = 'ID_REF',
                            f_data = f_data_temp, fdata_cname = "Samples",
-                           techrep_cname = "techrep", check.names = F)
+                           techrep_cname = "techrep")
   
   vector_biosamp <- f_data_temp$bio_samp_names
   

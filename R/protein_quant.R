@@ -134,11 +134,6 @@ protein_quant <- function (pepData, method, isoformRes = NULL,
   # Extricate e_data column name index.
   edata_cname_id<- which(names(pepData$e_data) == edata_cname)
 
-  # Nab the check.names attribute. This needs to be used anytime another
-  # omicsData object is created. There are cases where the names will not match
-  # between the old and new omicsData objects which leads to errors.
-  fijate <- get_check_names(pepData)
-
   # Grab more attributes that will be used at some point somewhere.
   data_scale <- get_data_scale(pepData)
   is_normalized <- attr(pepData, "data_info")$norm_info$is_normalized
@@ -176,8 +171,7 @@ protein_quant <- function (pepData, method, isoformRes = NULL,
                           fdata_cname = fdata_cname,
                           emeta_cname = "Protein_Isoform",
                           data_scale = data_scale,
-                          is_normalized = is_normalized,
-                          check.names = fijate)
+                          is_normalized = is_normalized)
 
     # Update the attributes that are reset in as.pepData.
     attr(pepData, "filters") <- filtas
@@ -442,8 +436,7 @@ protein_quant <- function (pepData, method, isoformRes = NULL,
                         fdata_cname = fdata_cname,
                         emeta_cname = emeta_cname,
                         data_scale = get_data_scale(pepData),
-                        is_normalized = is_normalized,
-                        check.names = fijate)
+                        is_normalized = is_normalized)
 
   # Update proData attributes --------------------------------------------------
 
@@ -478,13 +471,7 @@ protein_quant <- function (pepData, method, isoformRes = NULL,
 #'
 #' @return An omicsData object of class 'proData'
 #'
-pquant <- function (pepData,
-                    combine_fn) {
-
-  # Nab the check names attribute because data.frame conventions are making my
-  # life miserable. In fact, if it weren't for check.names and COVID my life
-  # would be pretty awesome right now.
-  check_names <- get_check_names(pepData)
+pquant <- function (pepData, combine_fn) {
 
   # check that pepData is of appropraite class #
   if (!inherits(pepData, "pepData")) {
@@ -519,7 +506,7 @@ pquant <- function (pepData,
     dplyr::mutate(dplyr::across(.cols = -dplyr::any_of(pro_id),
                                 .fns = combine_fn)) %>%
     dplyr::distinct() %>%
-    data.frame(check.names = check_names)
+    data.frame(check.names = FALSE)
 
 
   # Extricate attribute info for creating the proData object.
@@ -537,8 +524,7 @@ pquant <- function (pepData,
   #                       fdata_cname = samp_id,
   #                       emeta_cname = pro_id,
   #                       data_scale = data_scale,
-  #                       is_normalized = is_normalized,
-  #                       check.names = check_names)
+  #                       is_normalized = is_normalized)
 
   return (
     list(e_data = res,
@@ -580,11 +566,6 @@ pquant <- function (pepData,
 #'
 rrollup <- function (pepData, combine_fn, parallel = TRUE) {
 
-  # Nab the check names attribute because data.frame conventions are making my
-  # life miserable. In fact, if it weren't for check.names and COVID my life
-  # would be pretty awesome right now.
-  check_names <- get_check_names(pepData)
-
   # check that pepData is of appropraite class #
   if(!inherits(pepData, "pepData")) {
 
@@ -612,7 +593,7 @@ rrollup <- function (pepData, combine_fn, parallel = TRUE) {
                 all.x = FALSE,
                 all.y = TRUE) %>%
     dplyr::select(-rlang::sym(pep_id)) %>%
-    data.frame(check.names = check_names)
+    data.frame(check.names = FALSE)
 
   #pull protein column from temp and apply unique function
   unique_proteins <- unique(temp[[pro_id]])
@@ -694,7 +675,7 @@ rrollup <- function (pepData, combine_fn, parallel = TRUE) {
   # Combine the protein abundances (or is it abundanci?).
   final_result <- data.frame(unique_proteins,
                              data.table::rbindlist(r),
-                             check.names = check_names)
+                             check.names = FALSE)
   names(final_result)[1] <- pro_id
 
   # Extricate attribute info for creating the proData object.
@@ -712,8 +693,7 @@ rrollup <- function (pepData, combine_fn, parallel = TRUE) {
   #                       fdata_cname = samp_id,
   #                       emeta_cname = pro_id,
   #                       data_scale = data_scale,
-  #                       is_normalized = is_normalized,
-  #                       check.names = check_names)
+  #                       is_normalized = is_normalized)
 
   return (
     list(e_data = final_result,
@@ -748,13 +728,7 @@ rrollup <- function (pepData, combine_fn, parallel = TRUE) {
 #'
 #' @rdname qrollup
 #'
-qrollup <- function (pepData, qrollup_thresh,
-                     combine_fn, parallel = TRUE) {
-
-  # Nab the check names attribute because data.frame conventions are making my
-  # life miserable. In fact, if it weren't for check.names and COVID my life
-  # would be pretty awesome right now.
-  check_names <- get_check_names(pepData)
+qrollup <- function (pepData, qrollup_thresh, combine_fn, parallel = TRUE) {
 
   # check that pepData is of appropraite class #
   if(!inherits(pepData, "pepData")) stop("pepData is not an object of the appropriate class")
@@ -783,7 +757,7 @@ qrollup <- function (pepData, qrollup_thresh,
                 all.x = FALSE,
                 all.y = TRUE) %>%
     dplyr::select(-rlang::sym(pep_id)) %>%
-    data.frame(check.names = check_names)
+    data.frame(check.names = FALSE)
 
   #pull protein column from temp and apply unique function
   unique_proteins<- unique(temp[[pro_id]])
@@ -852,13 +826,13 @@ qrollup <- function (pepData, qrollup_thresh,
                              data.table::rbindlist(
                                lapply(r, function(x) x[[1]])
                              ),
-                             check.names = check_names)
+                             check.names = FALSE)
   names(final_result)[1] <- pro_id
 
   # Combine the peptide counts with their corresponding proteins.
   temp_pepes <- data.frame(final_result[, 1],
                            n_peps_used = sapply(r, function(x) x[[2]]),
-                           check.names = check_names)
+                           check.names = FALSE)
   names(temp_pepes)[1] <- pro_id
 
   # Combine the peptide counts with pepData$e_meta by protein. This is done to
@@ -886,8 +860,7 @@ qrollup <- function (pepData, qrollup_thresh,
   #                       fdata_cname = samp_id,
   #                       emeta_cname = pro_id,
   #                       data_scale = data_scale,
-  #                       is_normalized = is_normalized,
-  #                       check.names = check_names)
+  #                       is_normalized = is_normalized)
 
   return (
     list(e_data = final_result,
@@ -924,11 +897,6 @@ zrollup <- function (pepData, combine_fn, parallel = TRUE) {
 
   # Preliminary checks ---------------------------------------------------------
 
-  # Nab the check names attribute because data.frame conventions are making my
-  # life miserable. In fact, if it weren't for check.names and COVID my life
-  # would be pretty awesome right now.
-  check_names <- get_check_names(pepData)
-
   # check that pepData is of appropraite class #
   if(!inherits(pepData, "pepData")) stop("pepData is not an object of the appropriate class")
 
@@ -954,7 +922,7 @@ zrollup <- function (pepData, combine_fn, parallel = TRUE) {
                 all.x = FALSE,
                 all.y = TRUE) %>%
     dplyr::select(-rlang::sym(pep_id)) %>%
-    data.frame(check.names = check_names)
+    data.frame(check.names = FALSE)
 
   #pull protein column from temp and apply unique function
   unique_proteins <- unique(temp[[pro_id]])
@@ -997,7 +965,7 @@ zrollup <- function (pepData, combine_fn, parallel = TRUE) {
 
     # Convert the single row matrix to a single row data frame and rename the
     # columns to the original column names.
-    res <- data.frame(res, check.names = check_names)
+    res <- data.frame(res, check.names = FALSE)
     names(res) <- names(current_subset)
 
     # Using the foreach function with %dopar% will assign the last element
@@ -1010,7 +978,7 @@ zrollup <- function (pepData, combine_fn, parallel = TRUE) {
   # Combine the protein abundances (or is it abundanci?).
   final_result <- data.frame(unique_proteins,
                              data.table::rbindlist(r),
-                             check.names = check_names)
+                             check.names = FALSE)
   names(final_result)[1] <- pro_id
 
   # Extricate attribute info for creating the proData object.
@@ -1028,8 +996,7 @@ zrollup <- function (pepData, combine_fn, parallel = TRUE) {
   #                       fdata_cname = samp_id,
   #                       emeta_cname = pro_id,
   #                       data_scale = data_scale,
-  #                       is_normalized = is_normalized,
-  #                       check.names = check_names)
+  #                       is_normalized = is_normalized)
 
   return (
     list(e_data = final_result,
