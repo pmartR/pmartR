@@ -141,8 +141,7 @@ as.isobaricpepData <- function (e_data, f_data, e_meta = NULL, edata_cname,
   # Remove the emeta_cname element from the res list. That way only the e_data,
   # f_data, and e_meta (when applicable) data frames will be part of the output.
   # emeta_cname will no longer be an element of and omicsData object.
-  res <- res %>%
-    purrr::list_modify("emeta_cname" = NULL)
+  res <- res[-which(names(res) == "emeta_cname")]
   
   # set column name attributes #
   attr(res, "cnames") = list(edata_cname = edata_cname,
@@ -318,8 +317,7 @@ as.lipidData <- function (e_data, f_data, e_meta = NULL,
   # Remove the emeta_cname element from the res list. That way only the e_data,
   # f_data, and e_meta (when applicable) data frames will be part of the output.
   # emeta_cname will no longer be an element of and omicsData object.
-  res <- res %>%
-    purrr::list_modify("emeta_cname" = NULL)
+  res <- res[-which(names(res) == "emeta_cname")]
   
   # set column name attributes #
   attr(res, "cnames") = list(edata_cname = edata_cname,
@@ -488,8 +486,7 @@ as.metabData <- function (e_data, f_data, e_meta = NULL,
   # Remove the emeta_cname element from the res list. That way only the e_data,
   # f_data, and e_meta (when applicable) data frames will be part of the output.
   # emeta_cname will no longer be an element of and omicsData object.
-  res <- res %>%
-    purrr::list_modify("emeta_cname" = NULL)
+  res <- res[-which(names(res) == "emeta_cname")]
   
   # set column name attributes #
   attr(res, "cnames") = list(edata_cname = edata_cname,
@@ -664,8 +661,7 @@ as.nmrData <- function (e_data, f_data, e_meta = NULL,
   # Remove the emeta_cname element from the res list. That way only the e_data,
   # f_data, and e_meta (when applicable) data frames will be part of the output.
   # emeta_cname will no longer be an element of and omicsData object.
-  res <- res %>%
-    purrr::list_modify("emeta_cname" = NULL)
+  res <- res[-which(names(res) == "emeta_cname")]
   
   # set column name attributes #
   attr(res, "cnames") = list(edata_cname = edata_cname,
@@ -844,8 +840,7 @@ as.pepData <- function (e_data, f_data, e_meta = NULL,
   # Remove the emeta_cname element from the res list. That way only the e_data,
   # f_data, and e_meta (when applicable) data frames will be part of the output.
   # emeta_cname will no longer be an element of and omicsData object.
-  res <- res %>%
-    purrr::list_modify("emeta_cname" = NULL)
+  res <- res[-which(names(res) == "emeta_cname")]
   
   # set column name attributes #
   attr(res, "cnames") = list(edata_cname = edata_cname,
@@ -1015,8 +1010,7 @@ as.proData <- function (e_data, f_data, e_meta = NULL,
   # Remove the emeta_cname element from the res list. That way only the e_data,
   # f_data, and e_meta (when applicable) data frames will be part of the output.
   # emeta_cname will no longer be an element of and omicsData object.
-  res <- res %>%
-    purrr::list_modify("emeta_cname" = NULL)
+  res <- res[-which(names(res) == "emeta_cname")]
   
   # set column name attributes #
   attr(res, "cnames") = list(edata_cname = edata_cname,
@@ -1200,8 +1194,7 @@ as.seqData <- function (e_data, f_data, e_meta = NULL,
   # Remove the emeta_cname element from the res list. That way only the e_data,
   # f_data, and e_meta (when applicable) data frames will be part of the output.
   # emeta_cname will no longer be an element of and omicsData object.
-  res <- res %>%
-    purrr::list_modify("emeta_cname" = NULL)
+  res <- res[-which(names(res) == "emeta_cname")]
   
   # set column name attributes #
   attr(res, "cnames") = list(edata_cname = edata_cname,

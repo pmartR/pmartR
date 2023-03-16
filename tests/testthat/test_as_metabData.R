@@ -18,6 +18,9 @@ test_that('as.metabData returns the correct data frame and attributes',{
                         fdata_cname = 'SampleID',
                         emeta_cname = 'MClass')
   
+  # Check high level structure
+  expect_equal(names(mdata), c("e_data", "f_data", "e_meta"))
+  
   # Ensure the returned data frames are the correct dimension.
   expect_equal(dim(mdata$e_data),
                c(80, 13))
@@ -76,6 +79,9 @@ test_that('as.metabData returns the correct data frame and attributes',{
                                        fdata_cname = 'SampleID',
                                        emeta_cname = 'Test'),
                  "emeta_cname set to NULL, no e_meta object was provided.")
+  
+  # Check high level structure
+  expect_equal(names(mdata), c("e_data", "f_data", "e_meta"))
   
   # Ensure the returned data frames are the correct dimension.
   expect_equal(dim(mdata$e_data),
@@ -161,6 +167,9 @@ test_that('as.metabData returns the correct data frame and attributes',{
                        "e_data. These have been removed from f_data.",
                        sep = ' '))
   
+  # Check high level structure
+  expect_equal(names(mdata), c("e_data", "f_data", "e_meta"))
+  
   # Confirm the dimensions of the e_data and f_data data frames.
   expect_equal(dim(mdata$e_data),
                c(80, 13))
@@ -222,6 +231,9 @@ test_that('as.metabData returns the correct data frame and attributes',{
                  paste('Extra metabolites were found in e_meta that were not in',
                        'e_data. These have been removed from e_meta.',
                        sep = ' '))
+  
+  # Check high level structure
+  expect_equal(names(mdata), c("e_data", "f_data", "e_meta"))
   
   # Confirm the dimensions of the e_data and e_meta data frames.
   expect_equal(dim(mdata$e_data),
@@ -297,6 +309,9 @@ test_that('as.metabData returns the correct data frame and attributes',{
                         f_data = fdata,
                         edata_cname = 'Metabolite',
                         fdata_cname = 'SampleID')
+  
+  # Check high level structure
+  expect_equal(names(mdata), c("e_data", "f_data", "e_meta"))
   
   # Verify that the returned data frames are the correct dimension.
   expect_equal(dim(mdata$e_data),
