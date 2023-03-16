@@ -1631,7 +1631,7 @@ pre_flight <- function (e_data,
   # Depending on scale, check if there are zeros in edata and auto-remove all 0/na rows
   if (data_scale == 'abundance') {
 
-    if(any(na.omit(e_data == 0))){
+    if(any(e_data == 0, na.rm = TRUE)){
       # Exchange 0 for NA in edata.
       e_data <- replace_zeros(edata = e_data,
                               edata_cname = edata_cname)
