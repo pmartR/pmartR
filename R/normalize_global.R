@@ -135,7 +135,7 @@
 #'
 normalize_global <- function (omicsData, subset_fn, norm_fn, params = NULL,
                               apply_norm = FALSE, backtransform = FALSE,
-                              min_prop = NULL, check.names = "deprecated") {
+                              min_prop = NULL, check.names = NULL) {
 
   if (!missing(check.names))
     warning("check.names parameter is deprecated")

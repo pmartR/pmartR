@@ -59,7 +59,7 @@ median_center <- function (e_data,
                            feature_subset,
                            backtransform = FALSE,
                            apply_norm = FALSE,
-                           check.names = "deprecated") {
+                           check.names = NULL) {
   
   if (!missing(check.names))
     warning("check.names parameter is deprecated")
@@ -241,7 +241,7 @@ mean_center <- function (e_data,
                          feature_subset,
                          backtransform = FALSE,
                          apply_norm = FALSE,
-                         check.names = "deprecated") {
+                         check.names = NULL) {
   
   if (!missing(check.names))
     warning("check.names parameter is deprecated")
@@ -423,7 +423,7 @@ zscore_transform <- function (e_data,
                               feature_subset,
                               backtransform = FALSE,
                               apply_norm = FALSE,
-                              check.names = "deprecated") {
+                              check.names = NULL) {
   
   if (!missing(check.names))
     warning("check.names parameter is deprecated")
@@ -631,7 +631,7 @@ mad_transform <- function (e_data,
                            feature_subset,
                            backtransform = FALSE,
                            apply_norm = FALSE,
-                           check.names = "deprecated") {
+                           check.names = NULL) {
   
   if (!missing(check.names))
     warning("check.names parameter is deprecated")

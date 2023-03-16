@@ -12,7 +12,7 @@ normalize_global(
   apply_norm = FALSE,
   backtransform = FALSE,
   min_prop = NULL,
-  check.names = "deprecated"
+  check.names = NULL
 )
 }
 \arguments{

@@ -46,7 +46,7 @@
 #' 
 MSnSet2pepData <- function (msnset_object, data_scale, edata_cname = "UniqueID",
                             fdata_cname = "SampleID", emeta_cname = "UniqueID",
-                            check.names = "deprecated") {
+                            check.names = NULL) {
   
   if (!missing(check.names))
     warning("check.names parameter is deprecated")

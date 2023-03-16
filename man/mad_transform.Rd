@@ -11,7 +11,7 @@ mad_transform(
   feature_subset,
   backtransform = FALSE,
   apply_norm = FALSE,
-  check.names = "deprecated"
+  check.names = NULL
 )
 }
 \arguments{

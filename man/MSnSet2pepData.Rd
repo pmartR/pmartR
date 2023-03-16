@@ -10,7 +10,7 @@ MSnSet2pepData(
   edata_cname = "UniqueID",
   fdata_cname = "SampleID",
   emeta_cname = "UniqueID",
-  check.names = "deprecated"
+  check.names = NULL
 )
 }
 \arguments{
