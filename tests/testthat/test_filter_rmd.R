@@ -810,7 +810,7 @@ test_that("rmd_filter and applyFilt produce the correct output",{
   )
   expect_match(
     warnings,
-    "Specified samples Infection7 were not found in the e_data\\.",
+    "Specified samples Infection7 were not found in the data\\.",
     all = FALSE
   )
   
@@ -830,7 +830,7 @@ test_that("rmd_filter and applyFilt produce the correct output",{
   )
   expect_match(
     warnings,
-    "Specified samples Infection7 were not found in the e_data\\.",
+    "Specified samples Infection7 were not found in the data\\.",
     all = FALSE
   )
   

@@ -1434,7 +1434,7 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
     paste0(
       "Specified biomolecules 1024, 1687, 11083, 15714, 16636, 976139, ",
       "6769231, 6769844, 6809644, 6831118, 6832528, 6901575, 6934326 were not ",
-      "found in the e_data\\."
+      "found in e_data\\."
     ),
     all = FALSE
   )
@@ -1461,7 +1461,7 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
     paste0(
       "Specified biomolecules 1024, 1687, 11083, 15714, 16636, 976139, ",
       "6769231, 6769844, 6809644, 6831118, 6832528, 6901575, 6934326 were not ",
-      "found in the e_data\\."
+      "found in e_data\\."
     ),
     all = FALSE
   )

@@ -231,7 +231,7 @@ test_that('total_count_filter and applyFilt produce the correct output',{
       "2, Name_70993, Name_71057, Name_73353, Name_73360, Name_73470, Name_73",
       "5267, Name_735283, Name_735285, Name_73887, Name_73972, Name_74441, Na",
       "me_74529, Name_74987, Name_75470, Name_75718, Name_75861, Name_76405, ",
-      "Name_78471, Name_93968 were not found in the e_data\\."
+      "Name_78471, Name_93968 were not found in e_data\\."
     ),
     all = FALSE
   )
@@ -275,7 +275,7 @@ test_that('total_count_filter and applyFilt produce the correct output',{
       "2, Name_70993, Name_71057, Name_73353, Name_73360, Name_73470, Name_73",
       "5267, Name_735283, Name_735285, Name_73887, Name_73972, Name_74441, Na",
       "me_74529, Name_74987, Name_75470, Name_75718, Name_75861, Name_76405, ",
-      "Name_78471, Name_93968 were not found in the e_data\\."
+      "Name_78471, Name_93968 were not found in e_data\\."
     ),
     all = FALSE
   )

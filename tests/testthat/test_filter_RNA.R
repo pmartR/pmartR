@@ -25,8 +25,12 @@ test_that('RNA_filter and applyFilt produce the correct output',{
   pdata_sg <- pdata
   
   # Remove nine of the samples.
-  pdata_sg$e_data <- pdata_sg$e_data[, -c(11:19)]
-  pdata_sg$f_data <- pdata_sg$f_data[-c(11:19), ]
+  rm_inds = c(11:19)
+  rm_samps = pdata_sg$f_data[rm_inds, get_fdata_cname(pdata_sg)]
+  rm_inds_edata = which(colnames(pdata_sg$e_data) %in% rm_samps)
+  
+  pdata_sg$e_data <- pdata_sg$e_data[, -rm_inds_edata]
+  pdata_sg$f_data <- pdata_sg$f_data[-rm_inds, ]
   
   # Run the group_designation function on the singleton group seqData object.
   pdata_sg_gdf <- group_designation(omicsData = pdata_sg,
@@ -271,8 +275,7 @@ test_that('RNA_filter and applyFilt produce the correct output',{
   expect_identical(attr(filtered_sg_gdf, 'filters')[[1]]$threshold$min_nonzero,
                    885)
   expect_equal(sort(attr(filtered_sg_gdf, 'filters')[[1]]$filtered),
-               sort(c("cervix_hCG_10", "cervix_PBS_8",  "uterus_hCG_1",  
-                 "uterus_PBS_8",  "uterus_PBS_R3")))
+               sort(c("cervix_hCG_10", "cervix_PBS_8",  "uterus_hCG_1")))
   
   expect_true(is.na(attr(filtered_sg_gdf, 'filters')[[1]]$method))
   
@@ -300,17 +303,17 @@ test_that('RNA_filter and applyFilt produce the correct output',{
   
   # Inspect the filtered_sg_gdf e_data, f_data, and e_meta data frames.
   expect_equal(dim(filtered_sg_gdf$e_data),
-               c(1200, 27))
+               c(1200, 29))
   expect_equal(dim(filtered_sg_gdf$f_data),
                c(28, 4))
   
   # Test scenario when nothing is filtered -------------------------------------
-  
+
   # Apply the filter with a value for RNA_threshold that will not filter any
   # rows.
   expect_error(noFilta <- applyFilt(filter_object = filter_sg_gdf,
                                       omicsData = pdata_sg_gdf,
-                                      size_library = max(na.omit(filter$LibrarySize))),
+                                      size_library = max(na.omit(filter_sg_gdf$LibrarySize)) + 1),
                                       "size_library must be integer of length 1 less than max")
   
   # Expect warning if data has already been filtered ---------------------------
@@ -339,7 +342,7 @@ test_that('RNA_filter and applyFilt produce the correct output',{
     warnings,
     paste0(
       "Specified samples cervix_PBS_8, cervix_hCG_10, uterus_PBS_8, uterus_PBS",
-      "_R3, uterus_hCG_1 were not found in the e_data\\."
+      "_R3, uterus_hCG_1 were not found in the data\\."
     ),
     all = FALSE
   )
