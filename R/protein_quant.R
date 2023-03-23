@@ -267,7 +267,10 @@ protein_quant <- function (pepData, method, isoformRes = NULL,
     if (single_pep == TRUE && single_observation == TRUE) {
 
       pepData0 = applyFilt(moleculefilt, pepData, min_num = 2)
-      pepData = applyFilt(proteomicsfilt, pepData0, min_num_peps = 2)
+      
+      # remake proteomics filter to take into account different object.
+      tmp_filt = proteomics_filter(pepData0)
+      pepData = applyFilt(tmp_filt, pepData0, min_num_peps = 2)
 
     }
 
