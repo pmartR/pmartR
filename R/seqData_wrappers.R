@@ -165,11 +165,9 @@ DESeq2_wrapper <- function(
 ){
   
   
-  df_test <- installed.packages()
-  if(!("survival" %in% df_test)){
+  if (!requireNamespace("survival", quietly = TRUE)) {
     stop("package 'survival' required for DESeq2 processing")
   }
-  require("survival")
   
   l <- list(...)
   
