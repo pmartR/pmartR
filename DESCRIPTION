@@ -46,8 +46,10 @@ Suggests:
     testthat,
     trelliscopejs,
     survival,
-    vdiffr
+    vdiffr,
+    pmartRdata
 Remotes:
-    github::hafen/trelliscopejs
+    github::hafen/trelliscopejs,
+    github::pmartR/pmartRdata
 RoxygenNote: 7.2.3
 Encoding: UTF-8
