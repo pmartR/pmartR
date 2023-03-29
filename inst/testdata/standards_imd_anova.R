@@ -582,7 +582,7 @@ set.seed(4)
 dunnett_1_1_3 <- pval_a_1_1_3 %>%
   dplyr::rowwise() %>%
   dplyr::mutate(
-    no_nas = sum(!is.na(dplyr::c_across(tidyselect::everything())))
+    no_nas = sum(!is.na(dplyr::c_across(dplyr::everything())))
   ) %>%
   dplyr::ungroup() %>%
   dplyr::mutate(dFree = nona_counts_1_1_3 - no_nas) %>%
@@ -889,7 +889,7 @@ suppressWarnings(
   dunnett_1_2_3 <- pval_a_1_2_3 %>%
     dplyr::rowwise() %>%
     dplyr::mutate(
-      no_nas = sum(!is.na(dplyr::c_across(tidyselect::everything())))
+      no_nas = sum(!is.na(dplyr::c_across(dplyr::everything())))
     ) %>%
     dplyr::ungroup() %>%
     dplyr::mutate(dFree = nona_counts_1_2_3 - no_nas) %>%
@@ -1160,7 +1160,7 @@ set.seed(5)
 dunnett_2_0_3 <- pval_a_2_0_3 %>%
   dplyr::rowwise() %>%
   dplyr::mutate(
-    no_nas = sum(!is.na(dplyr::c_across(tidyselect::everything())))
+    no_nas = sum(!is.na(dplyr::c_across(dplyr::everything())))
   ) %>%
   dplyr::ungroup() %>%
   dplyr::mutate(dFree = nona_counts_2_0_3 - no_nas) %>%
@@ -1550,7 +1550,7 @@ set.seed(4)
 dunnett_2_1_4 <- pval_a_2_1_4 %>%
   dplyr::rowwise() %>%
   dplyr::mutate(
-    no_nas = sum(!is.na(dplyr::c_across(tidyselect::everything())))
+    no_nas = sum(!is.na(dplyr::c_across(dplyr::everything())))
   ) %>%
   dplyr::ungroup() %>%
   dplyr::mutate(dFree = nona_counts_2_1_4 - no_nas) %>%
@@ -1975,7 +1975,7 @@ suppressWarnings(
   dunnett_2_2_4 <- pval_a_2_2_4 %>%
     dplyr::rowwise() %>%
     dplyr::mutate(
-      no_nas = sum(!is.na(dplyr::c_across(tidyselect::everything())))
+      no_nas = sum(!is.na(dplyr::c_across(dplyr::everything())))
     ) %>%
     dplyr::ungroup() %>%
     dplyr::mutate(dFree = nona_counts_2_2_4 - no_nas) %>%
