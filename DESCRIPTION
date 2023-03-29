@@ -31,7 +31,6 @@ Imports:
     rrcov,
     scales,
     reshape2,
-    RcppArmadillo,
     RColorBrewer,
     magrittr,
     parallelly,
