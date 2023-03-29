@@ -1214,11 +1214,9 @@ dispersion_est <- function(omicsData, method,
   
   if(method == "DESeq2"){
     
-    df_test <- installed.packages()
-    if(!("survival" %in% df_test)){
+    if(!requireNamespace("survival", quietly = TRUE)){
       stop("package 'survival' required for DESeq2 processing")
     }
-    require("survival")
     
     # Farm boy, do all the tedious label crap. As you wish.
     the_x_label <- if (is.null(x_lab)) "Mean of Normalized Counts" else x_lab
