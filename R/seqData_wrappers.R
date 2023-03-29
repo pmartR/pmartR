@@ -852,7 +852,7 @@ voom_wrapper <- function(
       checker <- sub(el, "", checker)
     }
     
-    checkin <- purrr::map_lgl(purrr:::map(combo, stringr::str_detect, string = checker), any)
+    checkin <- purrr::map_lgl(purrr::map(combo, stringr::str_detect, string = checker), any)
 
     
     if(all(checkin)){

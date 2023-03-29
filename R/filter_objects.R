@@ -906,7 +906,7 @@ rmd_filter <- function (omicsData,
       ## proceed, to check the rank of cov.mat ##
 
       ## Conduct Robust PCA ##
-      robpca.res = rrcov:::PcaHubert(x = rmd.vals[,-1],
+      robpca.res = rrcov::PcaHubert(x = rmd.vals[,-1],
                                      k = (ncol(rmd.vals)-1),
                                      mcd = FALSE,
                                      scale = FALSE)
@@ -995,7 +995,7 @@ rmd_filter <- function (omicsData,
   if (!exists("robpca.res")) {
 
     ## Conduct Robust PCA ##
-    robpca.res = rrcov:::PcaHubert(x = rmd.vals[,-1],
+    robpca.res = rrcov::PcaHubert(x = rmd.vals[,-1],
                                    k = (ncol(rmd.vals)-1),
                                    mcd = FALSE,
                                    scale = FALSE)

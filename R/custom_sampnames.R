@@ -109,7 +109,7 @@ custom_sampnames <- function (omicsData, firstn = NULL, from = NULL,
   fdata_cname = attr(omicsData, "cnames")$fdata_cname
   names = as.list(as.character(omicsData$f_data[[fdata_cname]]))
 
-  output = pmartR:::subset_names(names, firstn = firstn, from = from, to = to,
+  output = subset_names(names, firstn = firstn, from = from, to = to,
                         delim = delim, components = components,
                         pattern = pattern, ...)
 
