@@ -2094,7 +2094,7 @@ take_diff <- function (omicsData) {
   # Extract the first occurrence of each pair variable in f_data. These will be
   # used later to rename the columns of diff_data.
   moniker <- omicsData$f_data %>%
-    dplyr::group_by(dplyr::across(pair_idx)) %>%
+    dplyr::group_by(dplyr::across(dplyr::all_of(pair_idx))) %>%
     dplyr::slice(1) %>%
     dplyr::pull(pair_idx)
   

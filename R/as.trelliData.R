@@ -398,7 +398,7 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL, ...) {
     # for each group
     trelliData.stat <- statRes %>%
       dplyr::select(dplyr::all_of(c(edata_cname, pvalue_cols, fold_change_cols)))  %>%
-      tidyr::pivot_longer(c(pvalue_cols, fold_change_cols)) %>%
+      tidyr::pivot_longer(dplyr::all_of(c(pvalue_cols, fold_change_cols))) %>%
       dplyr::mutate(
         Comparison = gsub("P_value_A_|P_value_G_|Fold_change_", "", name), 
         Metric = lapply(name, function(x) {

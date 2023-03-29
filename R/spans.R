@@ -518,7 +518,7 @@ spans_make_distribution <- function (omicsData, group_vector, norm_fn, sig_inds,
 
   # need a matrix to pass to kw_rcpp
   abundance_matrix <- omicsData$e_data %>%
-    dplyr::select(-edata_cname) %>%
+    dplyr::select(-dplyr::all_of(edata_cname)) %>%
     as.matrix()
 
   # indices vector that will be used for subsetting
@@ -571,7 +571,7 @@ spans_make_distribution <- function (omicsData, group_vector, norm_fn, sig_inds,
   # is not intended to be used outside this function, it returns the location
   # and (if applicable) scale parameters for normalization.
   norm_params <- normalize_global_basic(
-    edata = cbind(omicsData$e_data %>% dplyr::select(edata_cname),
+    edata = cbind(omicsData$e_data %>% dplyr::select(dplyr::all_of(edata_cname)),
                   replace(abundance_matrix, -inds, NA)),
     norm_fn = rand_norm
   )
