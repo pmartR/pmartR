@@ -84,7 +84,7 @@ List anova_cpp(NumericMatrix data, NumericVector gp, int unequal_var, NumericVec
     overall_mean = std::accumulate(rowi.begin(),rowi.end(),0.0);
     overall_mean = overall_mean/rowi_size;
 
-    if(m==2 & unequal_var==1){ //If there are only two groups, allow the variances to be different, i.e., Welch's t-test
+    if(m==2 && unequal_var==1){ //If there are only two groups, allow the variances to be different, i.e., Welch's t-test
       diff_vars[0] = 0;
       diff_vars[1] = 0;
 
