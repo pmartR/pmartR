@@ -408,7 +408,7 @@ trelli_abundance_boxplot <- function(trelliData,
     
     # If cognostics are any of the cog, then add them 
     if (any(cognostics %in% c("n", "mean", "median", "sd", "skew"))) {
-      cog_to_trelli <- do.call(dplyr::bind_cols, lapply(cognostics, function(x) {cog[[x]]})) %>% tibble::tibble()
+      cog_to_trelli <- do.call(dplyr::bind_cols, lapply(cognostics, function(x) {cog[[x]]})) %>% dplyr::tibble()
     } else {cog_to_trelli <- NULL}
     
     # Get fdata cname and panel_by selection
@@ -443,7 +443,7 @@ trelli_abundance_boxplot <- function(trelliData,
       # Add new cognostics 
       cog_to_trelli <- cbind(cog_to_trelli, do.call(cbind, lapply(1:nrow(cogs_to_add), function(row) {
         quick_cog(cogs_to_add$name[row], cogs_to_add$value[row])
-      })) %>% tibble::tibble()) %>% tibble::tibble()
+      })) %>% dplyr::tibble()) %>% dplyr::tibble()
       
     }
     
@@ -485,11 +485,11 @@ trelli_abundance_boxplot <- function(trelliData,
         # Generate new cognostics 
         new_cogs <- do.call(cbind, lapply(1:nrow(cogs_to_add), function(row) {
           quick_cog(cogs_to_add$name[row], cogs_to_add$value[row])
-        })) %>% tibble::tibble()
+        })) %>% dplyr::tibble()
 
         
         # Add new cognostics, removing when it is NULL 
-        cog_to_trelli <- cbind(cog_to_trelli, new_cogs) %>% tibble::tibble()
+        cog_to_trelli <- cbind(cog_to_trelli, new_cogs) %>% dplyr::tibble()
         
       }
       
@@ -675,7 +675,7 @@ trelli_abundance_histogram <- function(trelliData,
     )
     
     # If cognostics are any of the cog, then add them 
-    cog_to_trelli <- do.call(dplyr::bind_cols, lapply(cognostics, function(x) {cog[[x]]})) %>% tibble::tibble()
+    cog_to_trelli <- do.call(dplyr::bind_cols, lapply(cognostics, function(x) {cog[[x]]})) %>% dplyr::tibble()
     
     # Add statistics if applicable 
     if (!is.null(trelliData$trelliData.stat)) {
@@ -712,10 +712,10 @@ trelli_abundance_histogram <- function(trelliData,
         # Generate new cognostics 
         new_cogs <- do.call(cbind, lapply(1:nrow(cogs_to_add), function(row) {
           quick_cog(cogs_to_add$name[row], cogs_to_add$value[row])
-        })) %>% tibble::tibble()
+        })) %>% dplyr::tibble()
         
         # Add new cognostics 
-        cog_to_trelli <- cbind(cog_to_trelli, new_cogs) %>% tibble::tibble()
+        cog_to_trelli <- cbind(cog_to_trelli, new_cogs) %>% dplyr::tibble()
       
         
       }
@@ -913,7 +913,7 @@ trelli_abundance_heatmap <- function(trelliData,
     # Add new cognostics 
     cog_to_trelli <- do.call(cbind, lapply(1:nrow(cogs_to_add), function(row) {
       quick_cog(cogs_to_add$name[row], cogs_to_add$value[row])
-    })) %>% tibble::tibble() 
+    })) %>% dplyr::tibble() 
     
     return(cog_to_trelli)
     
@@ -1172,7 +1172,7 @@ trelli_missingness_bar <- function(trelliData,
     # Generate cognostics 
     cog_to_trelli <- do.call(cbind, lapply(1:nrow(Miss_Cog), function(row) {
       quick_cog(name = Miss_Cog$name[row], value = Miss_Cog$value[row])
-    })) %>% tibble::tibble()
+    })) %>% dplyr::tibble()
     
     return(cog_to_trelli)
     
@@ -1412,7 +1412,7 @@ trelli_foldchange_bar <- function(trelliData,
     # Make quick cognostics
     cog_to_trelli <- do.call(cbind, lapply(1:nrow(PreCog), function(row) {
       quick_cog(gsub("_", " ", PreCog$Comparison[row]), round(PreCog$value[row], 4))
-    })) %>% tibble::tibble()
+    })) %>% dplyr::tibble()
     
     return(cog_to_trelli)
     
@@ -1614,7 +1614,7 @@ trelli_foldchange_boxplot <- function(trelliData,
     # Add new cognostics 
     cog_to_trelli <- do.call(cbind, lapply(1:nrow(cog_to_trelli), function(row) {
       quick_cog(gsub("_", " ", cog_to_trelli$name[row]), cog_to_trelli$value[row])
-    })) %>% tibble::tibble()
+    })) %>% dplyr::tibble()
     
     return(cog_to_trelli)
     
@@ -1816,35 +1816,35 @@ trelli_foldchange_volcano <- function(trelliData,
       # Get significant values
       DF <- determine_significance(DF, p_value_test, p_value_thresh)
     
-      # Indicate which comparisons should be highlighted
-      DF$SigCounts <- lapply(1:nrow(DF), function(row) {
-        if (DF$Significance[row] == attr(DF, "LessThan")) {
-          ifelse(DF$fold_change[row] > 0, "High", "Low")
-        } else {return("Not Significant")}
-      }) %>% unlist()
-      
-      # Get count 
-      counts <- DF$SigCounts%>%
-        table(dnn = "Cog") %>%
-        data.table::data.table()
-      
-      # Add 0's if necessary
-      if (nrow(counts) != 3) {
-        all_options <- c("High", "Low", "Not Significant")
-        missing <- all_options[all_options %in% counts$Cog == FALSE]
-        counts <- rbind(counts, data.frame(Cog = missing, N = 0))
-      }
-      
-      # Set order
-      counts <- counts[order(counts$Cog),]
-      counts$N <- as.numeric(counts$N)
-      
-      # Convert to trelliscope cogs
-      cog_to_trelli <- do.call(cbind, lapply(1:nrow(counts), function(row) {
-        quick_cog(paste(counts$Cog[row], "Count"), counts$N[row])
-      })) %>% tibble::tibble()
+    # Indicate which comparisons should be highlighted
+    DF$SigCounts <- lapply(1:nrow(DF), function(row) {
+      if (DF$Significance[row] == attr(DF, "LessThan")) {
+        ifelse(DF$fold_change[row] > 0, "High", "Low")
+      } else {return("Not Significant")}
+    }) %>% unlist()
     
-    } else {return(NULL)}
+    # Get count 
+    counts <- DF$SigCounts%>%
+      table(dnn = "Cog") %>%
+      data.table::data.table()
+    
+    # Add 0's if necessary
+    if (nrow(counts) != 3) {
+      all_options <- c("High", "Low", "Not Significant")
+      missing <- all_options[all_options %in% counts$Cog == FALSE]
+      counts <- rbind(counts, data.frame(Cog = missing, N = 0))
+    }
+    
+    # Set order
+    counts <- counts[order(counts$Cog),]
+    counts$N <- as.numeric(counts$N)
+    
+    # Convert to trelliscope cogs
+    cog_to_trelli <- do.call(cbind, lapply(1:nrow(counts), function(row) {
+      quick_cog(paste(counts$Cog[row], "Count"), counts$N[row])
+    })) %>% dplyr::tibble()
+    
+    } else { return(NULL) }
     
     return(cog_to_trelli)
     
@@ -2035,7 +2035,7 @@ trelli_foldchange_heatmap <- function(trelliData,
     # Add new cognostics 
     cog_to_trelli <- do.call(cbind, lapply(1:nrow(cog_to_trelli), function(row) {
       quick_cog(gsub("_", " ", cog_to_trelli$name[row]), cog_to_trelli$value[row])
-    })) %>% tibble::tibble()
+    })) %>% dplyr::tibble()
     
     return(cog_to_trelli)
     
