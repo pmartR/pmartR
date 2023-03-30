@@ -13,7 +13,10 @@
 #' 
 
 analysis_log<- function(omicsData){
-  library(rmarkdown)
+  
+  if (!("rmarkdown" %in% installed.packages())) {
+    stop("Please install the 'rmarkdown' package.")
+  }
   
   # check that omicsData is of correct class #
   if(
@@ -28,6 +31,6 @@ analysis_log<- function(omicsData){
   
   params <- list(data=data, classes=classes)
   
-  render("vignettes/analysis_log.Rmd", params = params)
+  rmarkdown::render("vignettes/analysis_log.Rmd", params = params)
   
 }  

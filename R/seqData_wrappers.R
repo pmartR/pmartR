@@ -1218,6 +1218,10 @@ dispersion_est <- function(omicsData, method,
       stop("package 'survival' required for DESeq2 processing")
     }
     
+    if (!requireNamespace("S4Vectors", quietly = TRUE)) {
+      stop("package 'S4Vectors' required for DESeq2 processing")
+    }
+    
     # Farm boy, do all the tedious label crap. As you wish.
     the_x_label <- if (is.null(x_lab)) "Mean of Normalized Counts" else x_lab
     the_y_label <- if (is.null(y_lab)) "Dispersion" else y_lab
