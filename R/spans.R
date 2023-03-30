@@ -257,7 +257,7 @@ spans_procedure <- function(omicsData,
   # Calculate p-values on e_data by group --------------------------------------
 
   # get indices of significant and nonsignificant p-values
-  kw_pvals <- kw_rcpp(omicsData$e_data %>% dplyr::select(-edata_cname) %>% as.matrix(), as.character(group))
+  kw_pvals <- kw_rcpp(omicsData$e_data %>% dplyr::select(-dplyr::all_of(edata_cname)) %>% as.matrix(), as.character(group))
 
   # initial storage of both vectors
   sig_inds <- (kw_pvals <= sig_thresh & !is.na(kw_pvals))
@@ -299,7 +299,7 @@ spans_procedure <- function(omicsData,
   }
 
   # get a vector of n_iter sample sizes for randomly selecting peptides to determine normalization factors
-  scaling_factor <- sum(!is.na(omicsData$e_data %>% dplyr::select(-edata_cname)))/100
+  scaling_factor <- sum(!is.na(omicsData$e_data %>% dplyr::select(-dplyr::all_of(edata_cname))))/100
   select_n <- ceiling(runif(n_iter, nsamps/scaling_factor, 100)*scaling_factor) - nsamps
 
   ### produce a list with all combinations of subset functions, normalization functions, and parameters ###
@@ -392,7 +392,7 @@ spans_procedure <- function(omicsData,
   scores <- foreach::foreach(el = which_spans, .packages = "pmartR", .export = c("kw_rcpp")) %dopar% {
     if(el$passfail){
       norm_data <- normalize_global(omicsData, el$subset_fn, el$norm_fn, params = el$params, apply_norm = TRUE)
-      abundance_matrix <- norm_data$e_data %>% dplyr::select(-edata_cname) %>% as.matrix()
+      abundance_matrix <- norm_data$e_data %>% dplyr::select(-dplyr::all_of(edata_cname)) %>% as.matrix()
 
       sig_score <- -log10(median(kw_rcpp(abundance_matrix[sig_inds,], group = as.character(group)), na.rm = TRUE))
       non_sig_score <- log10(median(kw_rcpp(abundance_matrix[nonsig_inds,], group = as.character(group)), na.rm = TRUE))

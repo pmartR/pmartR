@@ -76,7 +76,7 @@ test_that('each rollup method correctly quantifies proteins',{
     e_data = merged %>%
       dplyr::select(-Mass_Tag_ID) %>%
       dplyr::group_by(Protein) %>%
-      dplyr::mutate(dplyr::across(.fns = median, na.rm = TRUE)) %>%
+      dplyr::mutate(dplyr::across(.cols = dplyr::everything(), .fns = \(x) median(x, na.rm = TRUE))) %>%
       dplyr::distinct() %>%
       data.frame(),
     f_data = pdata$f_data,
@@ -104,7 +104,8 @@ test_that('each rollup method correctly quantifies proteins',{
     e_data = merged %>%
       dplyr::select(-Mass_Tag_ID) %>%
       dplyr::group_by(Protein) %>%
-      dplyr::mutate(dplyr::across(.fns = pmartR:::combine_fn_mean)) %>%
+      dplyr::mutate(dplyr::across(.cols = dplyr::everything(), 
+                                  .fns = pmartR:::combine_fn_mean)) %>%
       dplyr::distinct() %>%
       data.frame(),
     f_data = pdata$f_data,
@@ -135,7 +136,8 @@ test_that('each rollup method correctly quantifies proteins',{
     e_data = merged2 %>%
       dplyr::select(-Mass_Tag_ID) %>%
       dplyr::group_by(Protein) %>%
-      dplyr::mutate(dplyr::across(.fns = median, na.rm = TRUE)) %>%
+      dplyr::mutate(dplyr::across(.cols = dplyr::everything(),
+                                  .fns = \(x) median(x, na.rm = TRUE))) %>%
       dplyr::distinct() %>%
       data.frame(),
     f_data = pdata2$f_data,
@@ -218,7 +220,7 @@ test_that('each rollup method correctly quantifies proteins',{
 
       # Take the mean/median of the scaled data.
       protein <- scaled %>%
-        dplyr::summarize(dplyr::across(.fns = fn))
+        dplyr::summarize(dplyr::across(.cols = dplyr::everything(), .fns = fn))
 
     } else {
 
@@ -235,7 +237,7 @@ test_that('each rollup method correctly quantifies proteins',{
     dplyr::select(-Mass_Tag_ID) %>%
     dplyr::nest_by(Protein) %>%
     dplyr::mutate(ratio = list(ratio(cData = data,
-                                     fn = pmartR:::combine_fn_median)))
+                                     fn = \(x) median(x, na.rm = TRUE))))
 
   # Produce an e_data object to create the rrollup standard.
   edata_med <- data.frame(temp_med$Protein,
@@ -298,7 +300,7 @@ test_that('each rollup method correctly quantifies proteins',{
         # Count the number of pepes (rows).
         dplyr::mutate(n_pepes = nrow(.)) %>%
         # Take the mean/median of the data.
-        dplyr::summarize(dplyr::across(.fns = fn))
+        dplyr::summarize(dplyr::across(.cols = dplyr::everything(), .fns = fn))
 
 
     } else {
@@ -318,7 +320,7 @@ test_that('each rollup method correctly quantifies proteins',{
     dplyr::select(-Mass_Tag_ID) %>%
     dplyr::nest_by(Protein) %>%
     dplyr::mutate(qtile = list(qtile(cData = data,
-                                     fn = pmartR:::combine_fn_median,
+                                     fn = \(x) median(x, na.rm = TRUE),
                                      qthold = 0.4)))
 
   # Produce an e_data object to create the qrollup standard.
@@ -508,7 +510,7 @@ test_that('each rollup method correctly quantifies proteins',{
     e_data = merged_bayes %>%
       dplyr::select(-Mass_Tag_ID, -Protein) %>%
       dplyr::group_by(Protein_Isoform) %>%
-      dplyr::mutate(dplyr::across(.fns = median, na.rm = TRUE)) %>%
+      dplyr::mutate(dplyr::across(.cols = dplyr::everything(), .fns = \(x) median(x, na.rm = TRUE))) %>%
       dplyr::distinct() %>%
       data.frame(),
     f_data = pdata3$f_data,
@@ -516,7 +518,7 @@ test_that('each rollup method correctly quantifies proteins',{
       dplyr::select(-Mass_Tag_ID) %>%
       dplyr::group_by(Protein_Isoform) %>%
       dplyr::mutate(n_peps_used = dplyr::n()) %>%
-      dplyr::left_join(pepes_per_pro2, by = "Protein") %>%
+      dplyr::left_join(pepes_per_pro2, by = "Protein", multiple = "all") %>%
       dplyr::relocate(n_peps_used, .after = peps_per_pro) %>%
       dplyr::distinct(Protein, Protein_Isoform, peps_per_pro,
                       n_peps_used) %>%
@@ -572,7 +574,7 @@ test_that('each rollup method correctly quantifies proteins',{
       dplyr::select(-Mass_Tag_ID) %>%
       dplyr::group_by(Protein_Isoform) %>%
       dplyr::mutate(n_peps_used = dplyr::n()) %>%
-      dplyr::left_join(pepes_per_pro, by = "Protein") %>%
+      dplyr::left_join(pepes_per_pro, by = "Protein", multiple = "all") %>%
       dplyr::relocate(n_peps_used, .after = peps_per_pro) %>%
       dplyr::distinct(Protein, Protein_Isoform, peps_per_pro, n_peps_used) %>%
       data.frame(),
