@@ -4,15 +4,15 @@
 \alias{summary.cvFilt}
 \title{Coefficient of Variation (CV) Filter Summary}
 \usage{
-\method{summary}{cvFilt}(filter_object, cv_threshold = NULL)
+\method{summary}{cvFilt}(object, cv_threshold = NULL, ...)
 }
 \arguments{
-\item{filter_object}{S3 object of class 'cvFilt' created by
-\code{\link{cv_filter}}.}
-
 \item{cv_threshold}{numeric value greater than 1 and less than the value
 given by filter_object$CV. CV values above cv_threshold are filtered out.
 Default value is NULL.}
+
+\item{filter_object}{S3 object of class 'cvFilt' created by
+\code{\link{cv_filter}}.}
 }
 \value{
 a summary of the CV values, number of NA values, and non-NA values.
@@ -26,7 +26,7 @@ Provide summary of a cvFilt S3 object
 library(pmartRdata)
 mypep <- group_designation(omicsData = pep_object, main_effects = "Phenotype")
 to_filter <- cv_filter(omicsData = mypep, use_groups = TRUE)
-summary(filter_object = to_filter, cv_threshold = 30)
+summary(to_filter, cv_threshold = 30)
 
 }
 \seealso{

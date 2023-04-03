@@ -4,7 +4,7 @@
 \alias{print.seqData}
 \title{print.seqData}
 \usage{
-\method{print}{seqData}(seqData)
+\method{print}{seqData}(x, ...)
 }
 \description{
 For printing an S3 object of type 'seqData'

@@ -48,7 +48,7 @@ Attribute of molecule_filt object is "total_poss_obs", the number of
 \examples{
 library(pmartRdata)
 to_filter <- molecule_filter(omicsData = pep_object)
-summary(filter_object = to_filter, min_num = 2)
+summary(to_filter, min_num = 2)
 
 }
 \author{

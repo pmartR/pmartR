@@ -4,7 +4,7 @@
 \alias{print.customFilt}
 \title{print.customFilt}
 \usage{
-\method{print}{customFilt}(filter_object)
+\method{print}{customFilt}(x, ...)
 }
 \description{
 For printing an S3 object of type 'customFilt'

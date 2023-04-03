@@ -14,22 +14,35 @@
 \usage{
 applyFilt(filter_object, omicsData, ...)
 
-\method{applyFilt}{moleculeFilt}(filter_object, omicsData, min_num = 2)
+\method{applyFilt}{moleculeFilt}(filter_object, omicsData, min_num = 2, ...)
 
-\method{applyFilt}{totalCountFilt}(filter_object, omicsData, min_count)
+\method{applyFilt}{totalCountFilt}(filter_object, omicsData, min_count, ...)
 
-\method{applyFilt}{RNAFilt}(filter_object, omicsData, min_nonzero = NULL, size_library = NULL)
+\method{applyFilt}{RNAFilt}(
+  filter_object,
+  omicsData,
+  min_nonzero = NULL,
+  size_library = NULL,
+  ...
+)
 
-\method{applyFilt}{cvFilt}(filter_object, omicsData, cv_threshold = 150)
+\method{applyFilt}{cvFilt}(filter_object, omicsData, cv_threshold = 150, ...)
 
 \method{applyFilt}{rmdFilt}(
   filter_object,
   omicsData,
   pvalue_threshold = 1e-04,
-  min_num_biomolecules = 50
+  min_num_biomolecules = 50,
+  ...
 )
 
-\method{applyFilt}{proteomicsFilt}(filter_object, omicsData, min_num_peps = NULL, redundancy = FALSE)
+\method{applyFilt}{proteomicsFilt}(
+  filter_object,
+  omicsData,
+  min_num_peps = NULL,
+  redundancy = FALSE,
+  ...
+)
 
 \method{applyFilt}{imdanovaFilt}(
   filter_object,
@@ -37,10 +50,11 @@ applyFilt(filter_object, omicsData, ...)
   comparisons = NULL,
   min_nonmiss_anova = NULL,
   min_nonmiss_gtest = NULL,
-  remove_singleton_groups = TRUE
+  remove_singleton_groups = TRUE,
+  ...
 )
 
-\method{applyFilt}{customFilt}(filter_object, omicsData)
+\method{applyFilt}{customFilt}(filter_object, omicsData, ...)
 }
 \arguments{
 \item{filter_object}{an object of the class 'cvFilt', 'proteomicsFilt',

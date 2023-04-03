@@ -4,10 +4,10 @@
 \alias{summary.totalCountFilt}
 \title{Total Count Filter Summary}
 \usage{
-\method{summary}{totalCountFilt}(filter_object, min_count = NULL)
+\method{summary}{totalCountFilt}(object, min_count = NULL, ...)
 }
 \arguments{
-\item{filter_object}{S3 object of class 'totalCountFilt' created by 
+\item{object}{S3 object of class 'totalCountFilt' created by 
 \code{\link{total_count_filter}}.}
 
 \item{min_count}{numeric value greater than 1 and less than the value 
@@ -26,7 +26,7 @@ Provide summary of a totalCountFilt S3 object
 \dontrun{
 library(pmartRdata)
 myfilt <- total_count_filter(omicsData = rnaseq_object)
-summary(filter_object = myfilt, min_count = 15)
+summary(myfilt, min_count = 15)
 }
 
 }

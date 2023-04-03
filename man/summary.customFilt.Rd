@@ -4,10 +4,10 @@
 \alias{summary.customFilt}
 \title{Custom Filter Summary}
 \usage{
-\method{summary}{customFilt}(filter_object)
+\method{summary}{customFilt}(object, ...)
 }
 \arguments{
-\item{filter_object}{S3 object of class 'customFilt' created by
+\item{object}{S3 object of class 'customFilt' created by
 \code{\link{custom_filter}}.}
 }
 \value{
@@ -20,10 +20,10 @@ Provide summary of a customFilt S3 object
 \examples{
 library(pmartRdata)
 to_filter <- custom_filter(omicsData = metab_object, e_data_remove = "fumaric acid", f_data_remove = "Sample_1_Phenotype2_B")
-summary(filter_object = to_filter)
+summary(to_filter)
 
 to_filter2 <- custom_filter(omicsData = metab_object, f_data_keep = metab_object$f_data$SampleID[1:10])
-summary(filter_object = to_filter2)
+summary(to_filter2)
 
 }
 \seealso{

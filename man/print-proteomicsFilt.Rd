@@ -4,7 +4,7 @@
 \alias{print.proteomicsFilt}
 \title{print.proteomicsFilt}
 \usage{
-\method{print}{proteomicsFilt}(filter_object)
+\method{print}{proteomicsFilt}(x, ...)
 }
 \description{
 For printing an S3 object of type 'proteomicsFilt'

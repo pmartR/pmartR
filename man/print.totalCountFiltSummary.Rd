@@ -4,7 +4,7 @@
 \alias{print.totalCountFiltSummary}
 \title{Total Count Filter Print Method}
 \usage{
-\method{print}{totalCountFiltSummary}(object)
+\method{print}{totalCountFiltSummary}(x, ...)
 }
 \description{
 Print method for summary of Total Count filter

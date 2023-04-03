@@ -175,7 +175,7 @@ applyFilt <- function (filter_object, omicsData, ...) {
 #' @export
 #' @name applyFilt
 #' @rdname applyFilt
-applyFilt.moleculeFilt <- function(filter_object, omicsData, min_num=2){
+applyFilt.moleculeFilt <- function(filter_object, omicsData, min_num=2, ...) {
 
   # Perform some initial checks on the input arguments -------------------------
 
@@ -333,7 +333,7 @@ applyFilt.moleculeFilt <- function(filter_object, omicsData, min_num=2){
 #' @export
 #' @name applyFilt
 #' @rdname applyFilt
-applyFilt.totalCountFilt <- function(filter_object, omicsData, min_count){
+applyFilt.totalCountFilt <- function(filter_object, omicsData, min_count, ...) {
   
   # Perform some initial checks on the input arguments -------------------------
   
@@ -461,8 +461,11 @@ applyFilt.totalCountFilt <- function(filter_object, omicsData, min_count){
 #' @export
 #' @name applyFilt
 #' @rdname applyFilt
-applyFilt.RNAFilt <- function(filter_object, omicsData, 
-                              min_nonzero = NULL, size_library = NULL){
+applyFilt.RNAFilt <- function(filter_object,
+                              omicsData, 
+                              min_nonzero = NULL,
+                              size_library = NULL,
+                              ...) {
   
   # Perform some initial checks on the input arguments -------------------------
   
@@ -633,7 +636,7 @@ applyFilt.RNAFilt <- function(filter_object, omicsData,
 #' @export
 #' @name applyFilt
 #' @rdname applyFilt
-applyFilt.cvFilt <- function (filter_object, omicsData, cv_threshold = 150) {
+applyFilt.cvFilt <- function (filter_object, omicsData, cv_threshold = 150, ...) {
 
   # Perform some initial checks on the input arguments -------------------------
 
@@ -791,9 +794,11 @@ applyFilt.cvFilt <- function (filter_object, omicsData, cv_threshold = 150) {
 #' @export
 #' @name applyFilt
 #' @rdname applyFilt
-applyFilt.rmdFilt <- function (filter_object, omicsData,
+applyFilt.rmdFilt <- function (filter_object,
+                               omicsData,
                                pvalue_threshold = 0.0001,
-                               min_num_biomolecules = 50) {
+                               min_num_biomolecules = 50,
+                               ...) {
 
   # Perform some initial checks on the input arguments -------------------------
 
@@ -1003,7 +1008,8 @@ applyFilt.rmdFilt <- function (filter_object, omicsData,
 applyFilt.proteomicsFilt <- function (filter_object,
                                       omicsData,
                                       min_num_peps = NULL,
-                                      redundancy = FALSE) {
+                                      redundancy = FALSE,
+                                      ...) {
 
   # Perform initial checks on the input arguments ------------------------------
 
@@ -1274,7 +1280,8 @@ applyFilt.imdanovaFilt <- function (filter_object,
                                     comparisons = NULL,
                                     min_nonmiss_anova = NULL,
                                     min_nonmiss_gtest = NULL,
-                                    remove_singleton_groups = TRUE) {
+                                    remove_singleton_groups = TRUE,
+                                    ...) {
 
   # #' @details If filter_method="combined" is specified, then both the
   # \code{anova_filter} and \code{gtest_filter} are applied to the data, and the
@@ -1804,7 +1811,7 @@ applyFilt.imdanovaFilt <- function (filter_object,
 #' @export
 #' @name applyFilt
 #' @rdname applyFilt
-applyFilt.customFilt <- function (filter_object, omicsData) {
+applyFilt.customFilt <- function (filter_object, omicsData, ...) {
 
   # Perform initial checks on the input arguments ------------------------------
 

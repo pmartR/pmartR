@@ -5,7 +5,7 @@
 \title{Plot naRes Object}
 \usage{
 \method{plot}{naRes}(
-  naRes_obj,
+  x,
   omicsData,
   plot_type = "bar",
   nonmissing = FALSE,
@@ -33,11 +33,12 @@
   palette = NULL,
   display_count = TRUE,
   coordinate_flip = FALSE,
-  use_VizSampNames = FALSE
+  use_VizSampNames = FALSE,
+  ...
 )
 }
 \arguments{
-\item{naRes_obj}{list of two data frames, one containing the number of
+\item{x}{list of two data frames, one containing the number of
 missing values by sample, and the other containing missing values by
 molecule}
 
@@ -151,10 +152,10 @@ This function takes in an object of class naRes and creates either a
 library(pmartRdata)
 mylipid <- group_designation(omicsData = lipid_neg_object, main_effects = "Virus")
 result <- missingval_result(omicsData = mylipid)
-plot(naRes_obj = result, omicsData = mylipid, plot_type = "bar", x_lab_angle = 50, order_by = "Virus", color_by = "Virus")
-plot(naRes_obj = result, omicsData = mylipid, plot_type = "scatter", x_lab_angle = 50, color_by = "Virus")
+plot(result, omicsData = mylipid, plot_type = "bar", x_lab_angle = 50, order_by = "Virus", color_by = "Virus")
+plot(result, omicsData = mylipid, plot_type = "scatter", x_lab_angle = 50, color_by = "Virus")
 
 result <- missingval_result(omicsData = rnaseq_object)
-plot(naRes_obj = result, omicsData = rnaseq_object, plot_type = "bar")
+plot(result, omicsData = rnaseq_object, plot_type = "bar")
 
 }

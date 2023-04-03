@@ -4,7 +4,7 @@
 \alias{print.RNAFiltSummary}
 \title{RNA Filter Print Method}
 \usage{
-\method{print}{RNAFiltSummary}(object)
+\method{print}{RNAFiltSummary}(x, ...)
 }
 \description{
 Print method for summary of RNAFilt

@@ -5,7 +5,7 @@
 \alias{summary.nmrnormRes}
 \title{Summary of nmrnormRes Object}
 \usage{
-\method{summary}{nmrnormRes}(nmrnormRes_object)
+\method{summary}{nmrnormRes}(object)
 }
 \arguments{
 \item{nmrnormRes_object}{object of type nmrnormRes, created by

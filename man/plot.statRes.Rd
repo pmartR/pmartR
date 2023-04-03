@@ -29,7 +29,8 @@
   display_count = TRUE,
   custom_theme = NULL,
   cluster = F,
-  free_y_axis = FALSE
+  free_y_axis = FALSE,
+  ...
 )
 }
 \arguments{

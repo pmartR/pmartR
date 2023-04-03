@@ -2,7 +2,7 @@
 #'
 #' For plotting an S3 object of type dataRes
 #'
-#' @param dataRes_obj object of class dataRes, created by the
+#' @param x object of class dataRes, created by the
 #'   \code{\link{edata_summary}} function
 #' @param metric character string indicating which metric to use in plot:
 #'   'mean', 'median', 'sd, 'pct_obs', 'min', or 'max'
@@ -71,7 +71,7 @@
 #'
 #' @export
 #'
-plot.dataRes <- function (dataRes_obj, metric = NULL, density = FALSE,
+plot.dataRes <- function (x, metric = NULL, density = FALSE,
                           ncols = NULL, interactive = FALSE, x_lab = NULL,
                           x_lab_sd = NULL, x_lab_median = NULL, y_lab = NULL,
                           y_lab_sd = NULL, y_lab_median = NULL, x_lab_size = 11,
@@ -79,10 +79,17 @@ plot.dataRes <- function (dataRes_obj, metric = NULL, density = FALSE,
                           title_lab_sd = NULL, title_lab_median = NULL,
                           title_lab_size = 14, legend_lab = NULL,
                           legend_position = "right", point_size = 2,
-                          bin_width = 1, bw_theme = TRUE, palette = NULL) {
+                          bin_width = 1, bw_theme = TRUE, palette = NULL, ...) {
 
+  dataRes_obj <- x
+  
   # Preliminaries --------------------------------------------------------------
 
+  # Make sure we only have valid arguments
+  if (length(list(...) > 0)) {
+    stop ("unused argument")
+  }
+  
   # check that attr(dataRes_obj, "by") == "molecule"
   if(attr(dataRes_obj, "by") != "molecule") {
 
@@ -340,7 +347,7 @@ plot.dataRes <- function (dataRes_obj, metric = NULL, density = FALSE,
 #'
 #' Creates box plots for an S3 object of type 'isobaricnormRes'
 #'
-#' @param isobaricnormRes_obj an object of type isobaricnormRes, created by
+#' @param x an object of type isobaricnormRes, created by
 #'   \code{\link{normalize_isobaric}} with apply_norm = FALSE
 #' @param order logical value. If TRUE the samples will be ordered by the column
 #'   of f_data containing the experiment/plate information.
@@ -383,16 +390,23 @@ plot.dataRes <- function (dataRes_obj, metric = NULL, density = FALSE,
 #'
 #' @export
 #'
-plot.isobaricnormRes <- function (isobaricnormRes_obj, order = FALSE,
+plot.isobaricnormRes <- function (x, order = FALSE,
                                   interactive = FALSE, x_lab = NULL,
                                   y_lab = NULL, x_lab_size = 11,
                                   y_lab_size = 11, x_lab_angle = NULL,
                                   title_lab = NULL, title_lab_size = 14,
                                   legend_lab = NULL, legend_position = "none",
-                                  bw_theme = TRUE, palette = NULL) {
+                                  bw_theme = TRUE, palette = NULL, ...) {
 
+  isobaricnormRes_obj <- x
+  
   # Preliminaries --------------------------------------------------------------
 
+  # Make sure we only have valid arguments
+  if (length(list(...) > 0)) {
+    stop ("unused argument")
+  }
+  
   # Check if input is an isobaricnormRes class object.
   if (!inherits(isobaricnormRes_obj, "isobaricnormRes")) {
 
@@ -534,7 +548,7 @@ prime_iso <- function (isonormRes, exp_cname,
 #'
 #' Creates a scatter plot for an S3 object of type 'nmrnormRes'
 #'
-#' @param nmrnormRes_obj an object of type nmrnormRes, created by
+#' @param x an object of type nmrnormRes, created by
 #'   \code{\link{normalize_nmr}}
 #' @param nmrData An nmrData object.
 #' @param order_by A character string specifying a column in f_data by which to
@@ -583,16 +597,24 @@ prime_iso <- function (isonormRes, exp_cname,
 #' @rdname plot-nmrnormRes
 #' @export
 #'
-plot.nmrnormRes <- function (nmrnormRes_obj, nmrData = NULL, order_by = NULL,
+plot.nmrnormRes <- function (x, nmrData = NULL, order_by = NULL,
                              color_by = NULL, interactive = FALSE,
                              x_lab = NULL, y_lab = NULL, x_lab_size = 11,
                              y_lab_size = 11, x_lab_angle = 90,
                              title_lab = NULL, title_lab_size = 14,
                              legend_lab = NULL, legend_position = "none",
-                             point_size = 2, bw_theme = TRUE, palette = NULL) {
+                             point_size = 2, bw_theme = TRUE, palette = NULL,
+                             ...) {
 
+  nmrnormRes_obj <- x
+  
   # Preliminaries --------------------------------------------------------------
 
+  # Make sure we only have valid arguments
+  if (length(list(...) > 0)) {
+    stop ("unused argument")
+  }
+  
   if (!inherits(nmrnormRes_obj, "nmrnormRes")) {
 
     # My name is Evan Martin. You defiled pmart. Prepare to die.
@@ -789,7 +811,7 @@ plot.nmrnormRes <- function (nmrnormRes_obj, nmrData = NULL, order_by = NULL,
 #'
 #' For plotting an S3 object of type 'SPANSRes'
 #'
-#' @param SPANSRes_obj an object of the class 'SPANSRes', created by
+#' @param x an object of the class 'SPANSRes', created by
 #'   \code{\link{spans_procedure()}}
 #' @param interactive logical value. If TRUE produces an interactive plot.
 #' @param x_lab character string specifying the x-axis label.
@@ -829,16 +851,23 @@ plot.nmrnormRes <- function (nmrnormRes_obj, nmrData = NULL, order_by = NULL,
 #'
 #' @export
 #'
-plot.SPANSRes <- function (SPANSRes_obj, interactive = FALSE,
+plot.SPANSRes <- function (x, interactive = FALSE,
                            x_lab = NULL, y_lab = NULL, x_lab_size = 11,
                            y_lab_size = 11, x_lab_angle = NULL,
                            title_lab = NULL, title_lab_size = 14,
                            legend_lab = NULL, legend_position = "right",
                            color_low = NULL, color_high = NULL,
-                           bw_theme = TRUE) {
+                           bw_theme = TRUE, ...) {
 
+  SPANSRes_obj <- x
+  
   # Preliminaries --------------------------------------------------------------
 
+  # Make sure we only have valid arguments
+  if (length(list(...) > 0)) {
+    stop ("unused argument")
+  }
+  
   if (!inherits(SPANSRes_obj, "SPANSRes")) {
 
     # Suffer the wrath of Dread Pirate Roberts!!!!!
@@ -961,7 +990,7 @@ plot.SPANSRes <- function (SPANSRes_obj, interactive = FALSE,
 #'
 #' For plotting an S3 object of type 'naRes'
 #'
-#' @param naRes_obj list of two data frames, one containing the number of
+#' @param x list of two data frames, one containing the number of
 #'   missing values by sample, and the other containing missing values by
 #'   molecule
 #' @param omicsData object of class 'pepData', 'proData', 'metabData',
@@ -1042,17 +1071,17 @@ plot.SPANSRes <- function (SPANSRes_obj, interactive = FALSE,
 #' library(pmartRdata)
 #' mylipid <- group_designation(omicsData = lipid_neg_object, main_effects = "Virus")
 #' result <- missingval_result(omicsData = mylipid)
-#' plot(naRes_obj = result, omicsData = mylipid, plot_type = "bar", x_lab_angle = 50, order_by = "Virus", color_by = "Virus")
-#' plot(naRes_obj = result, omicsData = mylipid, plot_type = "scatter", x_lab_angle = 50, color_by = "Virus")
+#' plot(result, omicsData = mylipid, plot_type = "bar", x_lab_angle = 50, order_by = "Virus", color_by = "Virus")
+#' plot(result, omicsData = mylipid, plot_type = "scatter", x_lab_angle = 50, color_by = "Virus")
 #'
 #' result <- missingval_result(omicsData = rnaseq_object)
-#' plot(naRes_obj = result, omicsData = rnaseq_object, plot_type = "bar")
+#' plot(result, omicsData = rnaseq_object, plot_type = "bar")
 #'
 #' @rdname plot-naRes
 #'
 #' @export
 #'
-plot.naRes <- function (naRes_obj, omicsData, plot_type = "bar", 
+plot.naRes <- function (x, omicsData, plot_type = "bar", 
                         nonmissing = FALSE, proportion = FALSE,
                         order_by = NULL, color_by = NULL, 
                         interactive = FALSE, x_lab_bar = NULL,
@@ -1064,10 +1093,18 @@ plot.naRes <- function (naRes_obj, omicsData, plot_type = "bar",
                         legend_position = "right", point_size = 2,
                         text_size = 3, bar_width = 0.8, bw_theme = TRUE,
                         palette = NULL, display_count = TRUE,
-                        coordinate_flip = FALSE, use_VizSampNames = FALSE) {
+                        coordinate_flip = FALSE, use_VizSampNames = FALSE,
+                        ...) {
 
+  naRes_obj <- x
+  
   # Preliminaries --------------------------------------------------------------
 
+  # Make sure we only have valid arguments
+  if (length(list(...) > 0)) {
+    stop ("unused argument")
+  }
+  
   # check for a naRes object #
   if(!inherits(naRes_obj, "naRes")) stop("object must be of class 'naRes'")
 
@@ -1512,7 +1549,7 @@ na_scatter <- function (edata, group_df, na.by.molecule, edata_cname,
 #'
 #' For plotting an S3 object of type 'corRes'
 #'
-#' @param corRes_obj An object of class "corRes" created via \code{cor_result}
+#' @param x An object of class "corRes" created via \code{cor_result}
 #' @param omicsData an object of the class 'pepData', 'isobaricpepData',
 #'   'proData', 'lipidData', 'metabData', 'nmrData' or 'seqData' created via
 #'   \code{\link{as.pepData}}, \code{\link{as.isobaricpepData}},
@@ -1572,7 +1609,7 @@ na_scatter <- function (edata, group_df, na.by.molecule, edata_cname,
 #'
 #' @export
 #'
-plot.corRes <- function (corRes_obj, omicsData = NULL, order_by = NULL,
+plot.corRes <- function (x, omicsData = NULL, order_by = NULL,
                          colorbar_lim = c(NA, NA), x_text = TRUE,
                          y_text = TRUE, interactive = FALSE, x_lab = NULL,
                          y_lab = NULL, x_lab_size = 11, y_lab_size = 11,
@@ -1580,10 +1617,17 @@ plot.corRes <- function (corRes_obj, omicsData = NULL, order_by = NULL,
                          title_lab_size = 14, legend_lab = NULL,
                          legend_position = "right", color_low = NULL,
                          color_high = NULL, bw_theme = TRUE,
-                         use_VizSampNames = FALSE) {
+                         use_VizSampNames = FALSE, ...) {
 
+  corRes_obj <- x
+  
   # Preliminaries --------------------------------------------------------------
 
+  # Make sure we only have valid arguments
+  if (length(list(...) > 0)) {
+    stop ("unused argument")
+  }
+  
   # check for a corRes object #
   if (!inherits(corRes_obj, "corRes")) {
 
@@ -1814,7 +1858,7 @@ plot.corRes <- function (corRes_obj, omicsData = NULL, order_by = NULL,
 #'
 #' For plotting an S3 object of type 'dimRes'
 #'
-#' @param dimRes_obj object of class dimRes created by the \code{dim_reduction}
+#' @param x object of class dimRes created by the \code{dim_reduction}
 #'   function
 #' @param omicsData optional omicsData for use in specifying a column name in
 #'   fdata when using \code{color_by} or \code{shape_by}.
@@ -1876,16 +1920,23 @@ plot.corRes <- function (corRes_obj, omicsData = NULL, order_by = NULL,
 #'
 #' @export
 #'
-plot.dimRes <- function (dimRes_obj, omicsData = NULL,
+plot.dimRes <- function (x, omicsData = NULL,
                          color_by = NULL, shape_by = NULL,
                          interactive = FALSE, x_lab = NULL, y_lab = NULL, 
                          x_lab_size = 11, y_lab_size = 11, x_lab_angle = 0, 
                          title_lab = NULL, title_lab_size = 14,
                          legend_lab = NULL, legend_position = "right",
-                         point_size = 4, bw_theme = TRUE, palette = NULL) {
+                         point_size = 4, bw_theme = TRUE, palette = NULL, ...) {
 
+  dimRes_obj <- x
+  
   # Preliminaries --------------------------------------------------------------
 
+  # Make sure we only have valid arguments
+  if (length(list(...) > 0)) {
+    stop ("unused argument")
+  }
+  
   # Evan, make sure the input is the correct class. As you wish.
   if (!inherits(dimRes_obj, "dimRes")) {
 
@@ -2181,7 +2232,7 @@ plot.dimRes <- function (dimRes_obj, omicsData = NULL,
 #'
 #' For plotting an S3 object of type 'moleculeFilt':
 #'
-#' @param filter_object object of class moleculeFilt that contains the molecule
+#' @param x object of class moleculeFilt that contains the molecule
 #'   identifier and the number of samples for which the molecule was measured
 #'   (not NA)
 #' @param min_num An integer specifying the minimum number of samples in which a
@@ -2234,17 +2285,24 @@ plot.dimRes <- function (dimRes_obj, omicsData = NULL,
 #'
 #' @export
 #'
-plot.moleculeFilt <- function (filter_object, min_num = NULL, cumulative = TRUE,
+plot.moleculeFilt <- function (x, min_num = NULL, cumulative = TRUE,
                                interactive = FALSE, x_lab = NULL, y_lab = NULL,
                                x_lab_size = 11, y_lab_size = 11,
                                x_lab_angle = 0, title_lab = NULL,
                                title_lab_size = 14, legend_lab = NULL,
                                legend_position = "right", text_size = 3,
                                bar_width = 0.8, bw_theme = TRUE,
-                               palette = NULL, display_count = TRUE) {
+                               palette = NULL, display_count = TRUE, ...) {
 
+  filter_object <- x
+  
   # Preliminaries --------------------------------------------------------------
 
+  # Make sure we only have valid arguments
+  if (length(list(...) > 0)) {
+    stop ("unused argument")
+  }
+  
   # Have a looksie at the class of the filter object.
   if (!inherits(filter_object, "moleculeFilt")) {
 
@@ -2448,7 +2506,7 @@ plot.moleculeFilt <- function (filter_object, min_num = NULL, cumulative = TRUE,
 #'
 #' For plotting an S3 object of type 'totalCountFilt':
 #'
-#' @param filter_object object of class totalCountFilt that contains the molecule
+#' @param x object of class totalCountFilt that contains the molecule
 #'   identifier and the number of total counts for which the molecule was measured
 #'   (not NA).
 #' @param min_count integer specifying the minimum number of samples in which a
@@ -2494,20 +2552,24 @@ plot.moleculeFilt <- function (filter_object, min_num = NULL, cumulative = TRUE,
 #'
 #' @export
 #'
-plot.totalCountFilt <- function (filter_object, min_count = NULL,
+plot.totalCountFilt <- function (x, min_count = NULL,
                                interactive = FALSE, x_lab = NULL, y_lab = NULL,
                                x_lab_size = 11, y_lab_size = 11,
                                x_lab_angle = 0, title_lab = NULL,
                                title_lab_size = 14, legend_lab = "",
                                legend_position = "right", text_size = 3,
                                bar_width = 0.8, bw_theme = TRUE,
-                               palette = NULL) {
+                               palette = NULL, ...) {
 
-  # @param log_total_counts logical value. Indicates if the X-axis should be on
-  #   the log scale. The default is TRUE.
+  filter_object <- x
 
   # Preliminaries --------------------------------------------------------------
 
+  # Make sure we only have valid arguments
+  if (length(list(...) > 0)) {
+    stop ("unused argument")
+  }
+  
   # Have a looksie at the class of the filter object.
   if (!inherits(filter_object, "totalCountFilt")) {
 
@@ -2607,7 +2669,7 @@ plot.totalCountFilt <- function (filter_object, min_count = NULL,
 #'
 #' For plotting an S3 object of type 'RNAFilt'
 #'
-#' @param filter_object object of class RNAFilt that contains the sample
+#' @param x object of class RNAFilt that contains the sample
 #'   identifier, library size, number of non-zero biomolecules, and proportion
 #'   of non-zero biomolecules
 #' @param plot_type character string, specified as "library" or "biomolecule".
@@ -2657,7 +2719,7 @@ plot.totalCountFilt <- function (filter_object, min_count = NULL,
 #'
 #' @export
 #'
-plot.RNAFilt <- function (filter_object, plot_type = "library",
+plot.RNAFilt <- function (x, plot_type = "library",
                           size_library = NULL, min_nonzero = NULL,
                           interactive = FALSE,
                           x_lab = NULL, y_lab = NULL,
@@ -2666,13 +2728,17 @@ plot.RNAFilt <- function (filter_object, plot_type = "library",
                           title_lab_size = 14, legend_lab = "",
                           legend_position = "right", text_size = 3,
                           bar_width = 0.8, bw_theme = TRUE,
-                          palette = NULL) {
+                          palette = NULL, ...) {
 
-  # @param log_total_counts logical value. Indicates if the X-axis should be on
-  #   the log scale. The default is TRUE.
+  filter_object <- x
 
   # Preliminaries --------------------------------------------------------------
 
+  # Make sure we only have valid arguments
+  if (length(list(...) > 0)) {
+    stop ("unused argument")
+  }
+  
   # Have a looksie at the class of the filter object.
   if (!inherits(filter_object, "RNAFilt")) {
 
@@ -2879,7 +2945,7 @@ plot.RNAFilt <- function (filter_object, plot_type = "library",
 #'
 #' For plotting an S3 object of type 'imdanovaFilt'
 #'
-#' @param filter_object Object of class imdanovaFilt (also a data frame) containing
+#' @param x Object of class imdanovaFilt (also a data frame) containing
 #'   the molecule identifier and number of samples in each group with
 #'   non-missing values for that molecule
 #' @param min_nonmiss_gtest An integer indicating the minimum number of
@@ -2931,7 +2997,7 @@ plot.RNAFilt <- function (filter_object, plot_type = "library",
 #'
 #' @export
 #'
-plot.imdanovaFilt <- function (filter_object, min_nonmiss_anova = NULL,
+plot.imdanovaFilt <- function (x, min_nonmiss_anova = NULL,
                                min_nonmiss_gtest = NULL, interactive = FALSE,
                                x_lab = NULL, y_lab = NULL, x_lab_size = 11,
                                y_lab_size = 11, x_lab_angle = 0,
@@ -2939,10 +3005,17 @@ plot.imdanovaFilt <- function (filter_object, min_nonmiss_anova = NULL,
                                legend_lab = NULL, legend_position = "right",
                                point_size = 3, line_size = 0.75, text_size = 3,
                                bw_theme = TRUE, palette = NULL,
-                               display_count = TRUE) {
+                               display_count = TRUE, ...) {
 
+  filter_object <- x
+  
   # Preliminaries --------------------------------------------------------------
 
+  # Make sure we only have valid arguments
+  if (length(list(...) > 0)) {
+    stop ("unused argument")
+  }
+  
   # Have a looksie at the class of the filter object.
   if (!inherits(filter_object, "imdanovaFilt")) {
 
@@ -3265,7 +3338,7 @@ plot.imdanovaFilt <- function (filter_object, min_nonmiss_anova = NULL,
 #'
 #' For plotting an S3 object of type 'proteomicsFilt':
 #'
-#' @param filter_object object of class proteomicsFilt, which is a list with two
+#' @param x object of class proteomicsFilt, which is a list with two
 #'   elements. The first element is a data frame of counts for each unique
 #'   peptide. The second element is a data frame with the counts for the number
 #'   of peptides that map to each unique protein.
@@ -3335,7 +3408,7 @@ plot.imdanovaFilt <- function (filter_object, min_nonmiss_anova = NULL,
 #'
 #' @export
 #'
-plot.proteomicsFilt <- function (filter_object,
+plot.proteomicsFilt <- function (x,
                                  plot_type = "num_peps",
                                  min_num_peps = NULL,
                                  interactive = FALSE, x_lab_pep = NULL,
@@ -3346,10 +3419,18 @@ plot.proteomicsFilt <- function (filter_object,
                                  title_lab_size = 14, legend_lab = NULL,
                                  legend_position = "right", text_size = 3,
                                  bar_width = 0.8, bw_theme = TRUE,
-                                 palette = NULL, display_count = TRUE) {
+                                 palette = NULL, display_count = TRUE,
+                                 ...) {
 
+  filter_object <- x
+  
   # Preliminaries --------------------------------------------------------------
 
+  # Make sure we only have valid arguments
+  if (length(list(...) > 0)) {
+    stop ("unused argument")
+  }
+  
   # Have a looksie at the class of the filter object.
   if (!inherits(filter_object, "proteomicsFilt")) {
 
@@ -3620,7 +3701,7 @@ plot.proteomicsFilt <- function (filter_object,
 #'
 #' For plotting an S3 object of type 'rmdFilt'
 #'
-#' @param filter_object object of class rmdFilt created via \code{\link{rmd_filter}}
+#' @param x object of class rmdFilt created via \code{\link{rmd_filter}}
 #' @param pvalue_threshold numeric threshold for the Robust Mahalanobis Distance (RMD)
 #'   p-value. If \code{sampleID} is NULL (see \code{sampleID} below), a
 #'   horizontal line is plotted at the RMD value that corresponds with the
@@ -3678,17 +3759,24 @@ plot.proteomicsFilt <- function (filter_object,
 #'
 #' @export
 #'
-plot.rmdFilt <- function (filter_object, pvalue_threshold = NULL, sampleID = NULL,
+plot.rmdFilt <- function (x, pvalue_threshold = NULL, sampleID = NULL,
                           order_by = NULL, interactive = FALSE, x_lab = NULL,
                           y_lab = NULL, x_lab_size = 11, y_lab_size = 11,
                           x_lab_angle = 90, title_lab = NULL,
                           title_lab_size = 14, legend_lab = NULL,
                           legend_position = "right", point_size = 3,
                           bw_theme = TRUE, palette = NULL,
-                          use_VizSampNames = FALSE) {
+                          use_VizSampNames = FALSE, ...) {
 
+  filter_object <- x
+  
   # Preliminaries --------------------------------------------------------------
 
+  # Make sure we only have valid arguments
+  if (length(list(...) > 0)) {
+    stop ("unused argument")
+  }
+  
   # Have a looksie at the class of the filter object.
   if (!inherits(filter_object, "rmdFilt")) {
 
@@ -4217,7 +4305,7 @@ plot.rmdFilt <- function (filter_object, pvalue_threshold = NULL, sampleID = NUL
 #'
 #' For plotting an S3 object of type 'cvFilt'
 #'
-#' @param filter_object object of class cvFilt generated via
+#' @param x object of class cvFilt generated via
 #'   \code{\link{cv_filter}}
 #' @param cv_threshold numeric value for cv threshold above which to remove the
 #'   corresponding biomolecules
@@ -4269,16 +4357,23 @@ plot.rmdFilt <- function (filter_object, pvalue_threshold = NULL, sampleID = NUL
 #'
 #' @export
 #'
-plot.cvFilt <- function (filter_object, cv_threshold = NULL,
+plot.cvFilt <- function (x, cv_threshold = NULL,
                          interactive = FALSE, x_lab = NULL, y_lab = NULL,
                          x_lab_size = 11, y_lab_size = 11, x_lab_angle = 0,
                          title_lab = NULL, title_lab_size = 14,
                          legend_lab = NULL, legend_position = "right",
                          log_scale = TRUE, n_breaks = 15, n_bins = 30,
-                         bw_theme = TRUE, palette = NULL) {
+                         bw_theme = TRUE, palette = NULL, ...) {
 
+  filter_object <- x
+  
   # Preliminaries --------------------------------------------------------------
 
+  # Make sure we only have valid arguments
+  if (length(list(...) > 0)) {
+    stop ("unused argument")
+  }
+  
   # checks for cv_threshold if not null
   if(!is.null(cv_threshold)) {
     # check that cv_threshold is numeric
@@ -4444,13 +4539,13 @@ plot.cvFilt <- function (filter_object, cv_threshold = NULL,
 #'
 #' Currently plotting a customFilt object is not supported
 #'
-#' @param filter_object An object of class customFilt.
+#' @param x An object of class customFilt.
 #'
 #' @rdname plot-customFilt
 #'
 #' @export
 #'
-plot.customFilt <- function (filter_object) {
+plot.customFilt <- function (x, ...) {
 
   message (paste("There is no plot method for objects of class 'customFilt'.",
                  "See summary.customFilt instead.",
@@ -4462,7 +4557,7 @@ plot.customFilt <- function (filter_object) {
 #'
 #' For plotting an S3 object of type 'normRes'
 #'
-#' @param normRes normRes object created by the normalize_global function
+#' @param x normRes object created by the normalize_global function
 #' @param order_by character string specifying the column name of f_data by
 #'   which to order the boxplots. If \code{order_by} is "Group", the boxplots
 #'   will be ordered by the group variable from the group_designation function.
@@ -4521,17 +4616,24 @@ plot.customFilt <- function (filter_object) {
 #'
 #' @export
 #'
-plot.normRes <- function (normRes_obj, order_by = NULL, color_by = NULL,
+plot.normRes <- function (x, order_by = NULL, color_by = NULL,
                           facet_by = NULL, facet_cols = NULL,
                           interactive = FALSE, x_lab = NULL, y_lab = NULL,
                           x_lab_size = 11, y_lab_size = 11, x_lab_angle = 90,
                           title_lab = NULL, title_lab_size = 14,
                           legend_lab = NULL, legend_position = "right",
                           ylimit = NULL, bw_theme = TRUE, palette = NULL,
-                          use_VizSampNames = FALSE) {
+                          use_VizSampNames = FALSE, ...) {
 
+  normRes_obj <- x
+  
   # Preliminaries --------------------------------------------------------------
 
+  # Make sure we only have valid arguments
+  if (length(list(...) > 0)) {
+    stop ("unused argument")
+  }
+  
   # Create the raw and normalized omicsData objects.
   omicsRaw <- attr(normRes_obj, "omicsData")
 
@@ -4645,7 +4747,7 @@ plot.normRes <- function (normRes_obj, order_by = NULL, color_by = NULL,
 #'
 #' For plotting isobaricpepData S3 objects
 #'
-#' @param omicsData An isobaricpepData object
+#' @param x An isobaricpepData object
 #' @param order_by character string specifying the column name of f_data by
 #'   which to order the boxplots. If \code{order_by} is "Group", the boxplots
 #'   will be ordered by the group variable from the group_designation function.
@@ -4698,7 +4800,7 @@ plot.normRes <- function (normRes_obj, order_by = NULL, color_by = NULL,
 #'
 #' @export
 #'
-plot.isobaricpepData <- function (omicsData, order_by = NULL, color_by = NULL,
+plot.isobaricpepData <- function (x, order_by = NULL, color_by = NULL,
                                   facet_by = NULL, facet_cols = NULL,
                                   interactive = FALSE, x_lab = NULL,
                                   y_lab = NULL, x_lab_size = 11,
@@ -4706,10 +4808,16 @@ plot.isobaricpepData <- function (omicsData, order_by = NULL, color_by = NULL,
                                   title_lab = NULL, title_lab_size = 14,
                                   legend_lab = NULL, legend_position = "right",
                                   ylimit = NULL, bw_theme = TRUE,
-                                  palette = NULL, use_VizSampNames = FALSE) {
-
+                                  palette = NULL, use_VizSampNames = FALSE,
+                                  ...) {
+  
+  # Make sure we only have valid arguments
+  if (length(list(...) > 0)) {
+    stop ("unused argument")
+  }
+  
   # Farm boy, make me a plot with an isobaricpepData object. As you wish.
-  plot_omicsData(omicsData = omicsData, order_by = order_by,
+  plot_omicsData(omicsData = x, order_by = order_by,
                  color_by = color_by, facet_by = facet_by,
                  facet_cols = facet_cols, interactive = interactive,
                  x_lab = x_lab, y_lab = y_lab, x_lab_size = x_lab_size,
@@ -4725,7 +4833,7 @@ plot.isobaricpepData <- function (omicsData, order_by = NULL, color_by = NULL,
 #'
 #' For plotting lipidData S3 objects
 #'
-#' @param omicsData lipidData object
+#' @param x lipidData object
 #' @param order_by character string specifying the column name of f_data by
 #'   which to order the boxplots. If \code{order_by} is "Group", the boxplots
 #'   will be ordered by the group variable from the group_designation function.
@@ -4772,23 +4880,28 @@ plot.isobaricpepData <- function (omicsData, order_by = NULL, color_by = NULL,
 #' @examples
 #' library(pmartRdata)
 #' mylipid <- edata_transform(omicsData = lipid_pos_object, data_scale = "log2")
-#' plot(omicsData = mylipid, order_by = "Virus", color_by = "Virus")
+#' plot(mylipid, order_by = "Virus", color_by = "Virus")
 #'
 #' @rdname plot-lipidData
 #'
 #' @export
 #'
-plot.lipidData <- function (omicsData, order_by = NULL, color_by = NULL,
+plot.lipidData <- function (x, order_by = NULL, color_by = NULL,
                             facet_by = NULL, facet_cols = NULL,
                             interactive = FALSE, x_lab = NULL, y_lab = NULL,
                             x_lab_size = 11, y_lab_size = 11, x_lab_angle = 90,
                             title_lab = NULL, title_lab_size = 14,
                             legend_lab = NULL, legend_position = "right",
                             ylimit = NULL, bw_theme = TRUE, palette = NULL,
-                            use_VizSampNames = FALSE) {
+                            use_VizSampNames = FALSE, ...) {
 
+  # Make sure we only have valid arguments
+  if (length(list(...) > 0)) {
+    stop ("unused argument")
+  }
+  
   # Farm boy, make me a plot with a lipidData object. As you wish.
-  plot_omicsData(omicsData = omicsData, order_by = order_by,
+  plot_omicsData(omicsData = x, order_by = order_by,
                  color_by = color_by, facet_by = facet_by,
                  facet_cols = facet_cols, interactive = interactive,
                  x_lab = x_lab, y_lab = y_lab, x_lab_size = x_lab_size,
@@ -4804,7 +4917,7 @@ plot.lipidData <- function (omicsData, order_by = NULL, color_by = NULL,
 #'
 #' For plotting metabData S3 objects
 #'
-#' @param omicsData metabData object
+#' @param x metabData object
 #' @param order_by character string specifying the column name of f_data by
 #'   which to order the boxplots. If \code{order_by} is "Group", the boxplots
 #'   will be ordered by the group variable from the group_designation function.
@@ -4851,23 +4964,28 @@ plot.lipidData <- function (omicsData, order_by = NULL, color_by = NULL,
 #' @examples
 #' library(pmartRdata)
 #' mymetab <- edata_transform(omicsData = metab_object, data_scale = "log2")
-#' plot(omicsData = mymetab, order_by = "Phenotype", color_by = "Phenotype")
+#' plot(mymetab, order_by = "Phenotype", color_by = "Phenotype")
 #'
 #' @rdname plot-metabData
 #'
 #' @export
 #'
-plot.metabData <- function (omicsData, order_by = NULL, color_by = NULL,
+plot.metabData <- function (x, order_by = NULL, color_by = NULL,
                             facet_by = NULL, facet_cols = NULL,
                             interactive = FALSE, x_lab = NULL, y_lab = NULL,
                             x_lab_size = 11, y_lab_size = 11, x_lab_angle = 90,
                             title_lab = NULL, title_lab_size = 14,
                             legend_lab = NULL, legend_position = "right",
                             ylimit = NULL, bw_theme = TRUE, palette = NULL,
-                            use_VizSampNames = FALSE) {
+                            use_VizSampNames = FALSE, ...) {
 
+  # Make sure we only have valid arguments
+  if (length(list(...) > 0)) {
+    stop ("unused argument")
+  }
+  
   # Farm boy, make me a plot with a metabData object. As you wish.
-  plot_omicsData(omicsData = omicsData, order_by = order_by,
+  plot_omicsData(omicsData = x, order_by = order_by,
                  color_by = color_by, facet_by = facet_by,
                  facet_cols = facet_cols, interactive = interactive,
                  x_lab = x_lab, y_lab = y_lab, x_lab_size = x_lab_size,
@@ -4883,7 +5001,7 @@ plot.metabData <- function (omicsData, order_by = NULL, color_by = NULL,
 #'
 #' For plotting nmrData S3 objects
 #'
-#' @param omicsData nmrData object
+#' @param x nmrData object
 #' @param order_by character string specifying the column name of f_data by
 #'   which to order the boxplots. If \code{order_by} is "Group", the boxplots
 #'   will be ordered by the group variable from the group_designation function.
@@ -4930,23 +5048,28 @@ plot.metabData <- function (omicsData, order_by = NULL, color_by = NULL,
 #' @examples
 #' library(pmartRdata)
 #' mynmr <- edata_transform(omicsData = nmr_identified_object, data_scale = "log2")
-#' plot(omicsData = mynmr)
+#' plot(mynmr)
 #'
 #' @rdname plot-nmrData
 #'
 #' @export
 #'
-plot.nmrData <- function (omicsData, order_by = NULL, color_by = NULL,
+plot.nmrData <- function (x, order_by = NULL, color_by = NULL,
                           facet_by = NULL, facet_cols = NULL,
                           interactive = FALSE, x_lab = NULL, y_lab = NULL,
                           x_lab_size = 11, y_lab_size = 11, x_lab_angle = 90,
                           title_lab = NULL, title_lab_size = 14,
                           legend_lab = NULL, legend_position = "right",
                           ylimit = NULL, bw_theme = TRUE, palette = NULL,
-                          use_VizSampNames = FALSE) {
+                          use_VizSampNames = FALSE, ...) {
 
+  # Make sure we only have valid arguments
+  if (length(list(...) > 0)) {
+    stop ("unused argument")
+  }
+  
   # Farm boy, make me a plot with a nmrData object. As you wish.
-  plot_omicsData(omicsData = omicsData, order_by = order_by,
+  plot_omicsData(omicsData = x, order_by = order_by,
                  color_by = color_by, facet_by = facet_by,
                  facet_cols = facet_cols, interactive = interactive,
                  x_lab = x_lab, y_lab = y_lab, x_lab_size = x_lab_size,
@@ -4962,7 +5085,7 @@ plot.nmrData <- function (omicsData, order_by = NULL, color_by = NULL,
 #'
 #' For plotting seqData S3 objects
 #'
-#' @param omicsData seqData object
+#' @param x seqData object
 #' @param order_by character string specifying the column name of f_data by
 #'   which to order the boxplots. If \code{order_by} is "Group", the boxplots
 #'   will be ordered by the group variable from the group_designation function.
@@ -5017,23 +5140,29 @@ plot.nmrData <- function (omicsData, order_by = NULL, color_by = NULL,
 #'
 #' @examples
 #' library(pmartRdata)
-#' plot(omicsData = rnaseq_object, transformation = "lcpm")
+#' plot(rnaseq_object, transformation = "lcpm")
 #'
 #' @rdname plot-seqData
 #'
 #' @export
 #'
-plot.seqData <- function (omicsData, order_by = NULL, color_by = NULL,
+plot.seqData <- function (x, order_by = NULL, color_by = NULL,
                           facet_by = NULL, facet_cols = NULL,
                           interactive = FALSE, x_lab = NULL, y_lab = NULL,
                           x_lab_size = 11, y_lab_size = 11, x_lab_angle = 90,
                           title_lab = NULL, title_lab_size = 14,
                           legend_lab = NULL, legend_position = "right",
                           ylimit = NULL, bw_theme = TRUE, palette = NULL,
-                          use_VizSampNames = FALSE, transformation = NULL) {
+                          use_VizSampNames = FALSE, transformation = NULL,
+                          ...) {
 
+  # Make sure we only have valid arguments
+  if (length(list(...) > 0)) {
+    stop ("unused argument")
+  }
+  
   # Farm boy, make me a plot with a seqData object. As you wish.
-  plot_omicsData(omicsData = omicsData, order_by = order_by,
+  plot_omicsData(omicsData = x, order_by = order_by,
                  color_by = color_by, facet_by = facet_by,
                  facet_cols = facet_cols, interactive = interactive,
                  x_lab = x_lab, y_lab = y_lab, x_lab_size = x_lab_size,
@@ -5050,7 +5179,7 @@ plot.seqData <- function (omicsData, order_by = NULL, color_by = NULL,
 #'
 #' For plotting pepData S3 objects
 #'
-#' @param omicsData pepData object
+#' @param x pepData object
 #' @param order_by character string specifying the column name of f_data by
 #'   which to order the boxplots. If \code{order_by} is "Group", the boxplots
 #'   will be ordered by the group variable from the group_designation function.
@@ -5098,23 +5227,28 @@ plot.seqData <- function (omicsData, order_by = NULL, color_by = NULL,
 #' library(pmartRdata)
 #' data(pep_object)
 #' mypep <- edata_transform(omicsData = pep_object, data_scale = "log2")
-#' plot(omicsData = mypep, order_by = "Phenotype", color_by = "Phenotype")
+#' plot(mypep, order_by = "Phenotype", color_by = "Phenotype")
 #'
 #' @rdname plot-pepData
 #'
 #' @export
 #'
-plot.pepData <- function (omicsData, order_by = NULL, color_by = NULL,
+plot.pepData <- function (x, order_by = NULL, color_by = NULL,
                           facet_by = NULL, facet_cols = NULL,
                           interactive = FALSE, x_lab = NULL, y_lab = NULL,
                           x_lab_size = 11, y_lab_size = 11, x_lab_angle = 90,
                           title_lab = NULL, title_lab_size = 14,
                           legend_lab = NULL, legend_position = "right",
                           ylimit = NULL, bw_theme = TRUE, palette = NULL,
-                          use_VizSampNames = FALSE) {
+                          use_VizSampNames = FALSE, ...) {
 
+  # Make sure we only have valid arguments
+  if (length(list(...) > 0)) {
+    stop ("unused argument")
+  }
+  
   # Farm boy, make me a plot with a pepData object. As you wish.
-  plot_omicsData(omicsData = omicsData, order_by = order_by,
+  plot_omicsData(omicsData = x, order_by = order_by,
                  color_by = color_by, facet_by = facet_by,
                  facet_cols = facet_cols, interactive = interactive,
                  x_lab = x_lab, y_lab = y_lab, x_lab_size = x_lab_size,
@@ -5130,7 +5264,7 @@ plot.pepData <- function (omicsData, order_by = NULL, color_by = NULL,
 #'
 #' For plotting proData S3 objects
 #'
-#' @param omicsData proData object
+#' @param x proData object
 #' @param order_by character string specifying the column name of f_data by
 #'   which to order the boxplots. If \code{order_by} is "Group", the boxplots
 #'   will be ordered by the group variable from the group_designation function.
@@ -5176,23 +5310,28 @@ plot.pepData <- function (omicsData, order_by = NULL, color_by = NULL,
 #'
 #' @examples
 #' library(pmartRdata)
-#' plot(omicsData = pro_object, order_by = "Phenotype", color_by = "Phenotype")
+#' plot(pro_object, order_by = "Phenotype", color_by = "Phenotype")
 #'
 #' @rdname plot-proData
 #'
 #' @export
 #'
-plot.proData <- function (omicsData, order_by = NULL, color_by = NULL,
+plot.proData <- function (x, order_by = NULL, color_by = NULL,
                           facet_by = NULL, facet_cols = NULL,
                           interactive = FALSE, x_lab = NULL, y_lab = NULL,
                           x_lab_size = 11, y_lab_size = 11, x_lab_angle = 90,
                           title_lab = NULL, title_lab_size = 14,
                           legend_lab = NULL, legend_position = "right",
                           ylimit = NULL, bw_theme = TRUE, palette = NULL,
-                          use_VizSampNames = FALSE) {
+                          use_VizSampNames = FALSE, ...) {
 
+  # Make sure we only have valid arguments
+  if (length(list(...) > 0)) {
+    stop ("unused argument")
+  }
+  
   # Farm boy, make me a plot with a proData object. As you wish.
-  plot_omicsData(omicsData = omicsData, order_by = order_by,
+  plot_omicsData(omicsData = x, order_by = order_by,
                  color_by = color_by, facet_by = facet_by,
                  facet_cols = facet_cols, interactive = interactive,
                  x_lab = x_lab, y_lab = y_lab, x_lab_size = x_lab_size,
@@ -5211,7 +5350,7 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
                             x_lab_angle, title_lab, title_lab_size, legend_lab,
                             legend_position, ylimit, bw_theme, palette,
                             use_VizSampNames, transformation = NULL) {
-
+  
   # Preliminaries --------------------------------------------------------------
 
   # Keeping the user honest ---------------
@@ -5804,8 +5943,14 @@ plot.statRes <- function (x,
                           display_count = TRUE,
                           custom_theme = NULL,
                           cluster = F,
-                          free_y_axis = FALSE) {
+                          free_y_axis = FALSE,
+                          ...) {
 
+  # Make sure we only have valid arguments
+  if (length(list(...) > 0)) {
+    stop ("unused argument")
+  }
+  
   # Farm boy, fix all the problems. As you wish.
 
   #Most plots are based on "number_significant" data frame so pull it out

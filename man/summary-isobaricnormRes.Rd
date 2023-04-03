@@ -5,7 +5,7 @@
 \alias{summary.isobaricnormRes}
 \title{Summary for isobaricnormRes Object}
 \usage{
-\method{summary}{isobaricnormRes}(isobaricnormRes_object)
+\method{summary}{isobaricnormRes}(object, ...)
 }
 \arguments{
 \item{isobaricnormRes_object}{object of type isobaricnormRes, created by

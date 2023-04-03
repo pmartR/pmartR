@@ -5,7 +5,7 @@
 \title{Plot cvFilt Object}
 \usage{
 \method{plot}{cvFilt}(
-  filter_object,
+  x,
   cv_threshold = NULL,
   interactive = FALSE,
   x_lab = NULL,
@@ -21,11 +21,12 @@
   n_breaks = 15,
   n_bins = 30,
   bw_theme = TRUE,
-  palette = NULL
+  palette = NULL,
+  ...
 )
 }
 \arguments{
-\item{filter_object}{object of class cvFilt generated via
+\item{x}{object of class cvFilt generated via
 \code{\link{cv_filter}}}
 
 \item{cv_threshold}{numeric value for cv threshold above which to remove the

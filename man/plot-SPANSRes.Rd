@@ -5,7 +5,7 @@
 \title{Plot SPANSRes Object}
 \usage{
 \method{plot}{SPANSRes}(
-  SPANSRes_obj,
+  x,
   interactive = FALSE,
   x_lab = NULL,
   y_lab = NULL,
@@ -18,11 +18,12 @@
   legend_position = "right",
   color_low = NULL,
   color_high = NULL,
-  bw_theme = TRUE
+  bw_theme = TRUE,
+  ...
 )
 }
 \arguments{
-\item{SPANSRes_obj}{an object of the class 'SPANSRes', created by
+\item{x}{an object of the class 'SPANSRes', created by
 \code{\link{spans_procedure()}}}
 
 \item{interactive}{logical value. If TRUE produces an interactive plot.}

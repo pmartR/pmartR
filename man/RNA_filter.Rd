@@ -28,9 +28,9 @@ Filter omicsData samples by library size (number of reads) or number
 \examples{
 library(pmartRdata)
 to_filter <- RNA_filter(omicsData = rnaseq_object)
-summary(filter_object = to_filter, size_library = 10000)
-summary(filter_object = to_filter, min_nonzero = 5000)
-summary(filter_object = to_filter, min_nonzero = .2)
+summary(to_filter, size_library = 10000)
+summary(to_filter, min_nonzero = 5000)
+summary(to_filter, min_nonzero = .2)
 
 }
 \author{

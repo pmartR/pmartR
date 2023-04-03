@@ -4,7 +4,7 @@
 \alias{print.rmdFilt}
 \title{print.rmdFilt}
 \usage{
-\method{print}{rmdFilt}(filter_object)
+\method{print}{rmdFilt}(x, ...)
 }
 \description{
 For printing an S3 object of type 'rmdFilt'

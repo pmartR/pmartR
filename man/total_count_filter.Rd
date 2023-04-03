@@ -30,7 +30,7 @@ filtering would remove this biomolecule).
 \dontrun{
 library(pmartRdata)
 to_filter <- total_count_filter(omicsData = rnaseq_object)
-summary(filter_object = to_filter, min_count = 15)
+summary(to_filter, min_count = 15)
 }
 
 }

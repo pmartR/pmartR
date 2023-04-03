@@ -5,7 +5,7 @@
 \title{Plot dimRes Object}
 \usage{
 \method{plot}{dimRes}(
-  dimRes_obj,
+  x,
   omicsData = NULL,
   color_by = NULL,
   shape_by = NULL,
@@ -21,11 +21,12 @@
   legend_position = "right",
   point_size = 4,
   bw_theme = TRUE,
-  palette = NULL
+  palette = NULL,
+  ...
 )
 }
 \arguments{
-\item{dimRes_obj}{object of class dimRes created by the \code{dim_reduction}
+\item{x}{object of class dimRes created by the \code{dim_reduction}
 function}
 
 \item{omicsData}{optional omicsData for use in specifying a column name in

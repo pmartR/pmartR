@@ -4,7 +4,7 @@
 \alias{print.totalCountFilt}
 \title{print.totalCountFilt}
 \usage{
-\method{print}{totalCountFilt}(filter_object)
+\method{print}{totalCountFilt}(x, ...)
 }
 \description{
 For printing an S3 object of type 'totalCountFilt'

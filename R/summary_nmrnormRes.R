@@ -19,7 +19,8 @@
 #' @rdname summary-nmrnormRes
 #' @name summary-pmartR
 #'
-summary.nmrnormRes<-function(nmrnormRes_object){
+summary.nmrnormRes <- function(object, ...) {
+  nmrnormRes_object <- object
   
   #check for an nmrnormRes object #
   if(!inherits(nmrnormRes_object, "nmrnormRes")) stop("object must be of class 'nmrnormRes'")

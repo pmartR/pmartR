@@ -5,7 +5,7 @@
 \title{Plot moleculeFilt Object}
 \usage{
 \method{plot}{moleculeFilt}(
-  filter_object,
+  x,
   min_num = NULL,
   cumulative = TRUE,
   interactive = FALSE,
@@ -22,11 +22,12 @@
   bar_width = 0.8,
   bw_theme = TRUE,
   palette = NULL,
-  display_count = TRUE
+  display_count = TRUE,
+  ...
 )
 }
 \arguments{
-\item{filter_object}{object of class moleculeFilt that contains the molecule
+\item{x}{object of class moleculeFilt that contains the molecule
 identifier and the number of samples for which the molecule was measured
 (not NA)}
 

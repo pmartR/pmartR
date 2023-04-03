@@ -4,7 +4,7 @@
 \alias{print.imdanovaFilterSummary}
 \title{IMD-ANOVA Filter Print Method}
 \usage{
-\method{print}{imdanovaFilterSummary}(object)
+\method{print}{imdanovaFilterSummary}(x, ...)
 }
 \description{
 Print method for summary of imdanova filter

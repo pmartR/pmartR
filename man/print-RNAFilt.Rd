@@ -4,7 +4,7 @@
 \alias{print.RNAFilt}
 \title{print.RNAFilt}
 \usage{
-\method{print}{RNAFilt}(filter_object)
+\method{print}{RNAFilt}(x, ...)
 }
 \description{
 For printing an S3 object of type 'RNAFilt'

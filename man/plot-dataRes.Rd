@@ -5,7 +5,7 @@
 \title{Plot dataRes object}
 \usage{
 \method{plot}{dataRes}(
-  dataRes_obj,
+  x,
   metric = NULL,
   density = FALSE,
   ncols = NULL,
@@ -28,11 +28,12 @@
   point_size = 2,
   bin_width = 1,
   bw_theme = TRUE,
-  palette = NULL
+  palette = NULL,
+  ...
 )
 }
 \arguments{
-\item{dataRes_obj}{object of class dataRes, created by the
+\item{x}{object of class dataRes, created by the
 \code{\link{edata_summary}} function}
 
 \item{metric}{character string indicating which metric to use in plot:

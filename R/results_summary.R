@@ -32,7 +32,9 @@
 #' @name summary-pmartR-results
 #' @param omicsNorm object of class normRes, produced by calling
 #'   \code{\link{normalize_global} with option apply_norm=FALSE}
-summary.normRes <- function(omicsNorm) {
+summary.normRes <- function(object, ...) {
+  omicsNorm <- object
+  
   # summary for the normalization object (if normalize=FALSE when calling normalization_calc)
   
   # get values #
@@ -62,7 +64,8 @@ summary.normRes <- function(omicsNorm) {
 #' @name summary-pmartR-results
 #' @param SPANSres_obj object of class SPANSRes created by calling
 #'   \code{\link{spans_procedure}} on a grouped pepData or proData object
-summary.SPANSRes <- function(SPANSRes_obj){
+summary.SPANSRes <- function(object, ...) {
+  SPANSRes_obj <- object
   
   spanscores <- sort(unique(SPANSRes_obj$SPANS_score), decreasing = TRUE)
   SPANSRes_obj <- SPANSRes_obj %>% 
@@ -84,8 +87,8 @@ summary.SPANSRes <- function(SPANSRes_obj){
 #' @name summary-pmartR-results
 #' @param dimRes_object object of class dimRes, which is a list containing
 #'   sample identifiers and the principle components scores
-summary.dimRes <- function(dimRes_object){
-  
+summary.dimRes <- function(object, ...){
+  dimRes_object <- object
   
   # get R^2 values #
   r2 <- rep(NA, length(dimRes_object) -1)
@@ -106,7 +109,8 @@ summary.dimRes <- function(dimRes_object){
 #' @rdname summary-pmartR-results
 #' @name summary-pmartR-results
 #' @param corRes_object object of class corRes
-summary.corRes <- function(corRes_object){
+summary.corRes <- function(object, ...) {
+  corRes_object <- object
   
   cor_summary <- summary(corRes_object[upper.tri(corRes_object)])
   

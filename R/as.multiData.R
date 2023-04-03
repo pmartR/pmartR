@@ -347,7 +347,8 @@ find_fmeta_cnames <- function(res) {
 
 #' 
 #'@export
-print.multiData <- function(multiData, ...) {
+print.multiData <- function(x, ...) {
+  multiData <- x
   classes <- sapply(multiData$omicsData, class)
   
   cat(sprintf("multiData object containing %s omicsData objects\n", length(multiData$omicsData)))
@@ -359,7 +360,9 @@ print.multiData <- function(multiData, ...) {
 
 #'
 #' @export
-summary.multiData <- function(multiData, ...) {
+summary.multiData <- function(object, ...) {
+  multiData <- object
+  
   # Assume data scale and norm status will be consistent across all objects.
   # data_scale = unique(sapply(multiData$omicsData, function(x) attr(x, "data_info")$data_scale))
   # is_normed <- all(sapply(multiData$omicsData, function(x) attr(x, "data_info")$norm_info$is_normalized))

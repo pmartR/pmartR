@@ -35,7 +35,7 @@
 #' @examples
 #' library(pmartRdata)
 #' to_filter <- molecule_filter(omicsData = pep_object)
-#' summary(filter_object = to_filter, min_num = 2)
+#' summary(to_filter, min_num = 2)
 #' 
 #' @author Kelly Stratton
 #'
@@ -231,7 +231,7 @@ molecule_filter <- function (omicsData, use_groups = FALSE, use_batch = FALSE) {
 #' \dontrun{
 #' library(pmartRdata)
 #' to_filter <- total_count_filter(omicsData = rnaseq_object)
-#' summary(filter_object = to_filter, min_count = 15)
+#' summary(to_filter, min_count = 15)
 #' }
 #' 
 #' @author Rachel Richardson
@@ -331,9 +331,9 @@ total_count_filter <- function (omicsData) {
 #' @examples
 #' library(pmartRdata)
 #' to_filter <- RNA_filter(omicsData = rnaseq_object)
-#' summary(filter_object = to_filter, size_library = 10000)
-#' summary(filter_object = to_filter, min_nonzero = 5000)
-#' summary(filter_object = to_filter, min_nonzero = .2)
+#' summary(to_filter, size_library = 10000)
+#' summary(to_filter, min_nonzero = 5000)
+#' summary(to_filter, min_nonzero = .2)
 #' 
 #' @author Rachel Richardson
 #'
@@ -420,7 +420,7 @@ RNA_filter <- function (omicsData) {
 #' library(pmartRdata)
 #' mypep <- group_designation(omicsData = pep_object, main_effects = "Phenotype")
 #' to_filter <- cv_filter(omicsData = mypep, use_groups = TRUE)
-#' summary(filter_object = to_filter, cv_threshold = 30)
+#' summary(to_filter, cv_threshold = 30)
 #'
 #' @author Lisa Bramer, Kelly Stratton
 #'
@@ -1394,7 +1394,7 @@ run_group_meancor <- function(omicsData, mintR_groupDF, ignore_singleton_groups 
 #' @examples
 #' library(pmartRdata)
 #' my_filter <- proteomics_filter(omicsData = pep_object)
-#' summary(filter_object = my_filter, min_num_peps = 3)
+#' summary(my_filter, min_num_peps = 3)
 #'
 #' @author Lisa Bramer, Kelly Stratton
 #'
@@ -1492,7 +1492,7 @@ proteomics_filter <- function (omicsData) {
 #' library(pmartRdata)
 #' mypep <- group_designation(omicsData = pep_object, main_effects = "Phenotype")
 #' to_filter <- imdanova_filter(omicsData = mypep)
-#' summary(filter_object = to_filter, min_nonmiss_anova = 2)
+#' summary(to_filter, min_nonmiss_anova = 2)
 #'
 #' @author Kelly Stratton
 #'
@@ -1676,10 +1676,10 @@ imdanova_filter <- function (omicsData) {
 #' @examples
 #' library(pmartRdata)
 #' to_filter <- custom_filter(omicsData = metab_object, e_data_remove = "fumaric acid", f_data_remove = "Sample_1_Phenotype2_B")
-#' summary(filter_object = to_filter)
+#' summary(to_filter)
 #' 
 #' to_filter2 <- custom_filter(omicsData = metab_object, f_data_keep = metab_object$f_data$SampleID[1:10])
-#' summary(filter_object = to_filter2)
+#' summary(to_filter2)
 #'
 #' @author Kelly Stratton
 #'

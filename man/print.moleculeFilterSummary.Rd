@@ -4,7 +4,7 @@
 \alias{print.moleculeFilterSummary}
 \title{Molecule Filter Print Method}
 \usage{
-\method{print}{moleculeFilterSummary}(object)
+\method{print}{moleculeFilterSummary}(x, ...)
 }
 \description{
 Print method for moleculeFilt S3 object

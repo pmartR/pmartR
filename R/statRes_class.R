@@ -114,7 +114,8 @@ setOldClass("statRes")
 
 #' @export
 #' @method summary statRes
-summary.statRes <- function(x, ...) {
+summary.statRes <- function(object, ...) {
+  x <- object
   
   # add if-statement for seqData class since the ANOVA and g-test language is 
   # not applicable for seqData
@@ -203,7 +204,7 @@ summary.statRes <- function(x, ...) {
 
 #' @export
 #' @method print statRes
-print.statRes <- function (x) {
+print.statRes <- function (x, ...) {
   x <- format.data.frame(x)
   
   blank_row = rep("----", 5)

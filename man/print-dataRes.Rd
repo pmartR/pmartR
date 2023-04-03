@@ -4,7 +4,7 @@
 \alias{print.dataRes}
 \title{print.dataRes}
 \usage{
-\method{print}{dataRes}(dataRes)
+\method{print}{dataRes}(x, ...)
 }
 \description{
 For printing an S3 object of class 'dataRes'

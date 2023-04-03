@@ -5,7 +5,7 @@
 \title{Plot rmdFilt Object}
 \usage{
 \method{plot}{rmdFilt}(
-  filter_object,
+  x,
   pvalue_threshold = NULL,
   sampleID = NULL,
   order_by = NULL,
@@ -22,11 +22,12 @@
   point_size = 3,
   bw_theme = TRUE,
   palette = NULL,
-  use_VizSampNames = FALSE
+  use_VizSampNames = FALSE,
+  ...
 )
 }
 \arguments{
-\item{filter_object}{object of class rmdFilt created via \code{\link{rmd_filter}}}
+\item{x}{object of class rmdFilt created via \code{\link{rmd_filter}}}
 
 \item{pvalue_threshold}{numeric threshold for the Robust Mahalanobis Distance (RMD)
 p-value. If \code{sampleID} is NULL (see \code{sampleID} below), a

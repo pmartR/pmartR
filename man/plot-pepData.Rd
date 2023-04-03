@@ -5,7 +5,7 @@
 \title{Plot pepData Object}
 \usage{
 \method{plot}{pepData}(
-  omicsData,
+  x,
   order_by = NULL,
   color_by = NULL,
   facet_by = NULL,
@@ -23,11 +23,12 @@
   ylimit = NULL,
   bw_theme = TRUE,
   palette = NULL,
-  use_VizSampNames = FALSE
+  use_VizSampNames = FALSE,
+  ...
 )
 }
 \arguments{
-\item{omicsData}{pepData object}
+\item{x}{pepData object}
 
 \item{order_by}{character string specifying the column name of f_data by
 which to order the boxplots. If \code{order_by} is "Group", the boxplots
@@ -97,6 +98,6 @@ For plotting pepData S3 objects
 library(pmartRdata)
 data(pep_object)
 mypep <- edata_transform(omicsData = pep_object, data_scale = "log2")
-plot(omicsData = mypep, order_by = "Phenotype", color_by = "Phenotype")
+plot(mypep, order_by = "Phenotype", color_by = "Phenotype")
 
 }

@@ -5,7 +5,7 @@
 \alias{summary.trelliData}
 \title{Summarizes potential plotting options for a trelliData object}
 \usage{
-\method{summary}{trelliData}(trelliData)
+\method{summary}{trelliData}(object, ...)
 }
 \arguments{
 \item{trelliData}{An object from the as.trelliData.edata or as.trelliData

@@ -4,7 +4,7 @@
 \alias{print.normRes}
 \title{print.normRes}
 \usage{
-\method{print}{normRes}(normRes)
+\method{print}{normRes}(x, ...)
 }
 \description{
 For printing an S3 object of type 'normRes'

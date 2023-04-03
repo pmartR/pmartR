@@ -5,7 +5,7 @@
 \title{Plot nmrnormRes Object}
 \usage{
 \method{plot}{nmrnormRes}(
-  nmrnormRes_obj,
+  x,
   nmrData = NULL,
   order_by = NULL,
   color_by = NULL,
@@ -21,11 +21,12 @@
   legend_position = "none",
   point_size = 2,
   bw_theme = TRUE,
-  palette = NULL
+  palette = NULL,
+  ...
 )
 }
 \arguments{
-\item{nmrnormRes_obj}{an object of type nmrnormRes, created by
+\item{x}{an object of type nmrnormRes, created by
 \code{\link{normalize_nmr}}}
 
 \item{nmrData}{An nmrData object.}

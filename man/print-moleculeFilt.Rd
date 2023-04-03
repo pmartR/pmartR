@@ -4,7 +4,7 @@
 \alias{print.moleculeFilt}
 \title{print.moleculeFilt}
 \usage{
-\method{print}{moleculeFilt}(filter_object)
+\method{print}{moleculeFilt}(x, ...)
 }
 \description{
 For printing an S3 object of type 'moleculeFilt'

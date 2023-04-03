@@ -3,7 +3,7 @@
 #' This function will provide basic summary statistics for omicsData objects
 #' from the pmartR package.
 #'
-#' @param omicsData an object of the class 'lipidData', 'metabData', 'pepData',
+#' @param object an object of the class 'lipidData', 'metabData', 'pepData',
 #'   'proData', nmrData', or 'seqData' usually created by \code{\link{as.lipidData}},
 #'   \code{\link{as.metabData}}, \code{\link{as.pepData}},
 #'   \code{\link{as.proData}}, \code{\link{as.nmrData}}, or \code{\link{as.seqData}}, respectively.
@@ -28,22 +28,22 @@
 #' @rdname summary-omicsData
 #' @name summary-omicsData
 #'
-summary.pepData <- function(omicsData) {
+summary.pepData <- function(object, ...) {
 
   # Army captain, "Nooooo! ... General, the enemy is about to overtake us!"
   # Army general, "CALL IN THE SUMMARIZER!!!"
-  summarizer(omicsData)
+  summarizer(object)
 
 }
 
 #' @export
 #' @rdname summary-omicsData
 #' @name summary-omicsData
-summary.proData <- function(omicsData) {
+summary.proData <- function(object, ...) {
 
   # Army captain, "Nooooo! ... General, the enemy is about to overtake us!"
   # Army general, "CALL IN THE SUMMARIZER!!!"
-  summarizer(omicsData)
+  summarizer(object)
 
 }
 
@@ -51,11 +51,11 @@ summary.proData <- function(omicsData) {
 #'@export
 #'@rdname summary-omicsData
 #'@name summary-omicsData
-summary.lipidData <- function(omicsData) {
+summary.lipidData <- function(object, ...) {
 
   # Army captain, "Nooooo! ... General, the enemy is about to overtake us!"
   # Army general, "CALL IN THE SUMMARIZER!!!"
-  summarizer(omicsData)
+  summarizer(object)
 
 }
 
@@ -64,11 +64,11 @@ summary.lipidData <- function(omicsData) {
 #'@export
 #'@rdname summary-omicsData
 #'@name summary-omicsData
-summary.metabData <- function(omicsData) {
+summary.metabData <- function(object, ...) {
 
   # Army captain, "Nooooo! ... General, the enemy is about to overtake us!"
   # Army general, "CALL IN THE SUMMARIZER!!!"
-  summarizer(omicsData)
+  summarizer(object)
 
 }
 
@@ -76,11 +76,11 @@ summary.metabData <- function(omicsData) {
 #'@export
 #'@rdname summary-omicsData
 #'@name summary-omicsData
-summary.nmrData <- function(omicsData) {
+summary.nmrData <- function(object, ...) {
 
   # Army captain, "Nooooo! ... General, the enemy is about to overtake us!"
   # Army general, "CALL IN THE SUMMARIZER!!!"
-  summarizer(omicsData)
+  summarizer(object)
 
 }
 
@@ -88,7 +88,9 @@ summary.nmrData <- function(omicsData) {
 #'@export
 #'@rdname summary-omicsData
 #'@name summary-omicsData
-summary.seqData <- function(omicsData) {
+summary.seqData <- function(object, ...) {
+  
+  omicsData <- object
   
   # get values #
   res <- list(class = class(omicsData), num_samps = attr(omicsData, "data_info")$num_samps,

@@ -5,7 +5,9 @@
 #'@rdname print-pepData
 #'@export
 #'
-print.pepData<- function(pepData){
+print.pepData <- function(x, ...){
+  pepData <- x
+  
   if(!inherits(pepData, "pepData")) stop("pep_object must be of the class 'pepData'")
   
   e_data<- as.data.frame(lapply(pepData$e_data, as.character), stringsAsFactors = FALSE, check.names = FALSE)
@@ -93,7 +95,9 @@ print.pepData<- function(pepData){
 #'@rdname print-metabData
 #'@export
 #'
-print.metabData<- function(metabData){
+print.metabData <- function(x, ...){
+  metabData <- x
+  
   if(!inherits(metabData, "metabData")) stop("metab_object must be of the class 'metabData'")
   
   e_data<- as.data.frame(lapply(metabData$e_data, as.character), stringsAsFactors = FALSE, check.names = FALSE)
@@ -181,7 +185,9 @@ print.metabData<- function(metabData){
 #'@rdname print-proData
 #'@export
 #'
-print.proData<- function(proData){
+print.proData <- function(x, ...){
+  proData <- x
+  
   if(!inherits(proData, "proData")) stop("pro_object must be of the class 'proData'")
   
   e_data<- as.data.frame(lapply(proData$e_data, as.character), stringsAsFactors = FALSE, check.names = FALSE)
@@ -269,7 +275,9 @@ print.proData<- function(proData){
 #'@rdname print-lipidData
 #'@export
 #'
-print.lipidData<- function(lipidData){
+print.lipidData <- function(x, ...){
+  lipidData <- x
+  
   if(!inherits(lipidData, "lipidData")) stop("lipid_object must be of the class 'lipidData'")
   
   e_data<- as.data.frame(lapply(lipidData$e_data, as.character), stringsAsFactors = FALSE, check.names = FALSE)
@@ -357,7 +365,9 @@ print.lipidData<- function(lipidData){
 #'@rdname print-seqData
 #'@export
 #'
-print.seqData<- function(seqData){
+print.seqData <- function(x, ...){
+  seqData <- x
+  
   if(!inherits(seqData, "seqData")) stop("lipid_object must be of the class 'seqData'")
   
   e_data<- as.data.frame(lapply(seqData$e_data, as.character), stringsAsFactors = FALSE, check.names = FALSE)
@@ -446,8 +456,10 @@ print.seqData<- function(seqData){
 #'@rdname print-dataRes
 #'@export
 #'
-print.dataRes<- function(dataRes){
+print.dataRes <- function(x, ...){
 
+  dataRes <- x
+  
   if((!is.null(attr(dataRes, "groupvar")) & attr(dataRes, "by") == "molecule") | (is.null(attr(dataRes, "groupvar")) & !is.null(attr(dataRes, "group_DF")) & (attr(dataRes, "by") == "molecule"))){
       
       #extract item from dataRes, n_per_grp
@@ -709,7 +721,8 @@ print.dataRes<- function(dataRes){
 #'@rdname print-normRes
 #'@export
 #'
-print.normRes<- function(normRes){
+print.normRes <- function(x, ...){
+  normRes <- x
   
   attr(normRes, "class")<- NULL
   attr(normRes, "omicsData")<- NULL

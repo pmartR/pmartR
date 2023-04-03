@@ -5,7 +5,7 @@
 \title{Plot isobaricnormRes object}
 \usage{
 \method{plot}{isobaricnormRes}(
-  isobaricnormRes_obj,
+  x,
   order = FALSE,
   interactive = FALSE,
   x_lab = NULL,
@@ -18,11 +18,12 @@
   legend_lab = NULL,
   legend_position = "none",
   bw_theme = TRUE,
-  palette = NULL
+  palette = NULL,
+  ...
 )
 }
 \arguments{
-\item{isobaricnormRes_obj}{an object of type isobaricnormRes, created by
+\item{x}{an object of type isobaricnormRes, created by
 \code{\link{normalize_isobaric}} with apply_norm = FALSE}
 
 \item{order}{logical value. If TRUE the samples will be ordered by the column

@@ -20,7 +20,8 @@
 #' @rdname summary-isobaricnormRes
 #' @name summary-pmartR
 #' 
-summary.isobaricnormRes <- function (isobaricnormRes_object) {
+summary.isobaricnormRes <- function (object, ...) {
+  isobaricnormRes_object <- object
   
   #check for an isobaricnormRes object #
   if(!inherits(isobaricnormRes_object, "isobaricnormRes")) {

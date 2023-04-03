@@ -4,7 +4,7 @@
 \alias{print.cvFilt}
 \title{print.cvFilt}
 \usage{
-\method{print}{cvFilt}(filter_object)
+\method{print}{cvFilt}(x, ...)
 }
 \description{
 For printing an S3 object of type 'cvFilt'

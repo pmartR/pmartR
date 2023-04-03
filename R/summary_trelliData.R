@@ -24,7 +24,8 @@
 #' @export
 #' @rdname summary-trelliData
 #' @name summary-trelliData
-summary.trelliData <- function(trelliData) {
+summary.trelliData <- function(object, ...) {
+  trelliData <- object
   
   #######################################
   ## EXTRACT ATTRIBUTES AND PROPERTIES ##

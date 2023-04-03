@@ -4,7 +4,7 @@
 \alias{print.customFilterSummary}
 \title{Custom Filter Print Method}
 \usage{
-\method{print}{customFilterSummary}(object)
+\method{print}{customFilterSummary}(x, ...)
 }
 \description{
 Print method for summary of custom filter

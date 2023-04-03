@@ -4,7 +4,7 @@
 \alias{print.pepData}
 \title{print.pepData}
 \usage{
-\method{print}{pepData}(pepData)
+\method{print}{pepData}(x, ...)
 }
 \description{
 For printing an S3 object of type 'pepData'

@@ -349,10 +349,10 @@ In addition to the correlation heatmap and PCA plot that we utilized above, the 
 We can generate numeric summaries of our data by either sample or molecule. The `edata_summary` function computes the mean, standard deviation, median, percent of observations for which a value was observed, the minimum value, and the maximum value.
 
 ```{r edata_summary}
-edata_summary(omicsData = mypep, by = "sample", groupvar = NULL)
+edata_summary(mypep, by = "sample", groupvar = NULL)
 
-#edata_summary(omicsData = norm_data, by = "molecule", groupvar = "Condition")
-#edata_summary(omicsData = norm_data, by = "molecule", groupvar = NULL)
+#edata_summary(norm_data, by = "molecule", groupvar = "Condition")
+#edata_summary(norm_data, by = "molecule", groupvar = NULL)
 
 ```
 
@@ -364,8 +364,8 @@ Patterns of missing data can be explored using the `missingval_result` and `plot
 ```{r missingval}
 results <- missingval_result(omicsData = mypep)
 
-plot(naRes_obj = results, omicsData = mypep, plot_type = "bar")
-plot(naRes_obj = results, omicsData = mypep, plot_type = "scatter")
+plot(results, omicsData = mypep, plot_type = "bar")
+plot(results, omicsData = mypep, plot_type = "scatter")
 ```
 
 

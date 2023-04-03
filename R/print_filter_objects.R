@@ -5,7 +5,9 @@
 #' @rdname print-moleculeFilt
 #' @export
 #'
-print.moleculeFilt<- function(filter_object){
+print.moleculeFilt<- function(x, ...) {
+  filter_object <- x
+  
   if(!inherits(filter_object, "moleculeFilt")) stop("filter object must be of the class 'moleculeFilt'")
   filter_object<- as.data.frame(lapply(filter_object, as.character), stringsAsFactors = FALSE)
   
@@ -27,7 +29,9 @@ print.moleculeFilt<- function(filter_object){
 #' @rdname print-totalCountFilt
 #' @export
 #'
-print.totalCountFilt <- function(filter_object){
+print.totalCountFilt <- function(x, ...) {
+  filter_object <- x
+  
   if(!inherits(filter_object, "totalCountFilt")) stop("filter object must be of the class 'totalCountFilt'")
   filter_object<- as.data.frame(lapply(filter_object, as.character), stringsAsFactors = FALSE)
   
@@ -49,7 +53,9 @@ print.totalCountFilt <- function(filter_object){
 #' @rdname print-RNAFilt
 #' @export
 #'
-print.RNAFilt <- function(filter_object){
+print.RNAFilt <- function(x, ...) {
+  filter_object <- x
+  
   if(!inherits(filter_object, "RNAFilt")) stop("filter object must be of the class 'RNAFilt'")
   filter_object<- as.data.frame(lapply(filter_object, as.character), stringsAsFactors = FALSE)
   
@@ -71,7 +77,9 @@ print.RNAFilt <- function(filter_object){
 #' @rdname print-proteomicsFilt
 #' @export
 #'
-print.proteomicsFilt<- function(filter_object){
+print.proteomicsFilt<- function(x, ...) {
+  filter_object <- x
+  
   if(!inherits(filter_object, "proteomicsFilt")) stop("filter object must be of the class 'proteomicsFilt'")
   
   counts_by_pep<- as.data.frame(lapply(filter_object$counts_by_pep, as.character), stringsAsFactors = FALSE)
@@ -106,7 +114,9 @@ print.proteomicsFilt<- function(filter_object){
 #' @rdname print-imdanovaFilt
 #' @export
 #'
-print.imdanovaFilt<- function(filter_object){
+print.imdanovaFilt<- function(x, ...) {
+  filter_object <- x
+  
   if(!inherits(filter_object, "imdanovaFilt")) stop("filter object must be of the class 'imdanovaFilt'")
   filter_object<- as.data.frame(lapply(filter_object, as.character), stringsAsFactors = FALSE)
   
@@ -128,7 +138,9 @@ print.imdanovaFilt<- function(filter_object){
 #' @rdname print-rmdFilt
 #' @export
 #'
-print.rmdFilt<- function(filter_object){
+print.rmdFilt<- function(x, ...) {
+  filter_object <- x
+  
   if(!inherits(filter_object, "rmdFilt")) stop("filter object must be of the class 'rmdFilt'")
   filter_object<- as.data.frame(lapply(filter_object, as.character), stringsAsFactors = FALSE)
   num_cols<- ncol(filter_object)
@@ -152,7 +164,9 @@ print.rmdFilt<- function(filter_object){
 #' @rdname print-cvFilt
 #' @export
 #'
-print.cvFilt<- function(filter_object){
+print.cvFilt<- function(x, ...) {
+  filter_object <- x
+  
   if(!inherits(filter_object, "cvFilt")) stop("filter object must be of the class 'cvFilt'")
   filter_object<- as.data.frame(lapply(filter_object, as.character), stringsAsFactors = FALSE)
   
@@ -174,7 +188,9 @@ print.cvFilt<- function(filter_object){
 #' @rdname print-customFilt
 #' @export
 #'
-print.customFilt<- function(filter_object){
+print.customFilt<- function(x, ...) {
+  filter_object <- x
+  
   if(!inherits(filter_object, "customFilt")) stop("filter object must be of the class 'customFilt'")
   
   if(!is.null(filter_object$e_data_remove) | !is.null(filter_object$f_data_remove) | !is.null(filter_object$e_meta_remove)){

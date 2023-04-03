@@ -154,19 +154,19 @@ imd_anova <- function (omicsData,
     # Change input to applyFilt depending on test_method.
     if (test_method == "anova") {
       suppressMessages(
-        filtad <- applyFilt.imdanovaFilt(filter_object = filta,
+        filtad <- applyFilt.imdanovaFilt(filta,
                                          omicsData = omicsData,
                                          min_nonmiss_anova = 2)
       )
     } else if (test_method == "gtest") {
       suppressMessages(
-        filtad <- applyFilt.imdanovaFilt(filter_object = filta,
+        filtad <- applyFilt.imdanovaFilt(filta,
                                          omicsData = omicsData,
                                          min_nonmiss_gtest = 3)
       )
     } else {
       suppressMessages(
-        filtad <- applyFilt.imdanovaFilt(filter_object = filta,
+        filtad <- applyFilt.imdanovaFilt(filta,
                                          omicsData = omicsData,
                                          min_nonmiss_anova = 2,
                                          min_nonmiss_gtest = 3)

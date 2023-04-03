@@ -36,7 +36,7 @@ The output from this function can be used in conjunction with
 library(pmartRdata)
 mypep <- group_designation(omicsData = pep_object, main_effects = "Phenotype")
 to_filter <- imdanova_filter(omicsData = mypep)
-summary(filter_object = to_filter, min_nonmiss_anova = 2)
+summary(to_filter, min_nonmiss_anova = 2)
 
 }
 \author{

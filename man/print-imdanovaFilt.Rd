@@ -4,7 +4,7 @@
 \alias{print.imdanovaFilt}
 \title{print.imdanovaFilt}
 \usage{
-\method{print}{imdanovaFilt}(filter_object)
+\method{print}{imdanovaFilt}(x, ...)
 }
 \description{
 For printing an S3 object of type 'imdanovaFilt'
