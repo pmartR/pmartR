@@ -8,7 +8,7 @@ trelli_foldchange_volcano(
   trelliData,
   comparison,
   cognostics = c("n"),
-  p_value_test = TRUE,
+  p_value_test = "anova",
   p_value_thresh = 0.05,
   ggplot_params = NULL,
   interactive = FALSE,
@@ -31,9 +31,8 @@ Required.}
 \item{cognostics}{A vector of cognostic options for each plot. Valid entry is
 n.}
 
-\item{p_value_test}{A logical to indicate whether specific significant
-biomolecules are to be indicated with a changed color if an imd-anova was
-run. Default is FALSE.}
+\item{p_value_test}{A string to indicate which p_values to plot. Acceptable
+entries are "anova", "gtest", or NULL. Default is "anova".}
 
 \item{p_value_thresh}{A value between 0 and 1 to indicate significant
 biomolecules for p_value_test. Default is 0.05.}
@@ -70,7 +69,7 @@ Specify a plot design and cognostics for the fold_change volcano
 
 ## Build fold_change bar plot with statRes data grouped by edata_colname.
 trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") \%>\% 
-  trelli_foldchange_volcano(comparison = "Mock_vs_Infection_A")
+  trelli_foldchange_volcano(comparison = "StrainA_vs_StrainB")
 
 }
 

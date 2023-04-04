@@ -589,3 +589,110 @@ trelli_panel_by <- function(trelliData, panel) {
   return(trelliData)
   
 }
+
+#' @name trelli_pvalue_filter
+#' 
+#' @title Filter a paneled trelliData object by a p-value 
+#' 
+#' @description This use-case-specific function allows users to filter down their plots to a 
+#'    specified p-value IF statistics data has been included. This function is mostly
+#'    relevant to the MODE application. 
+#'    
+#' @param trelliData A trelliData object with statistics results (statRes). Required.
+#' @param p_value_test A string to indicate which p_values to plot. Acceptable
+#'    entries are "anova" or "gtest". Default is "anova". Unlike the
+#'    plotting functions, here p_value_test cannot be null. Required.
+#' @param p_value_thresh A value between 0 and 1 to indicate the p-value threshold 
+#'    at which to keep plots. Default is 0.05. Required.
+#' @param comparison The specific comparison to filter significant values to. Can
+#'    be null. See attr(statRes, "comparisons") for the available options. Optional.
+#'    
+#' @examples
+#' \dontrun{
+#' 
+#' # Filter a trelliData object with only statistics results, while not caring about a comparison
+#' trelli_pvalue_filter(trelliData3, p_value_test = "anova", p_value_thresh = 0.1)
+#' 
+#' # Filter a trelliData object with only statistics results, while caring about a specific comparison
+#' trelli_pvalue_filter(trelliData3, p_value_test = "anova", p_value_thresh = 0.1, comparison = "StrainC_vs_StrainA")
+#' 
+#' # Filter both a omicsData and statRes object, while not caring about a specific comparison
+#' trelli_pvalue_filter(trelliData4, p_value_test = "anova", p_value_thresh = 0.001)
+#' 
+#' # Filter both a omicsData and statRes object, while caring about a specific comparison
+#' trelli_pvalue_filter(trelliData4, p_value_test = "gtest", p_value_thresh = 0.25, comparison = "StrainA_vs_StrainB")
+#' 
+#' 
+#' }
+#'
+#' @author David Degnan, Lisa Bramer
+#' 
+#' @export
+trelli_pvalue_filter <- function(trelliData, 
+                                 p_value_test = "anova", 
+                                 p_value_thresh = 0.05,
+                                 comparison = NULL) {
+  
+  # Run initial checks----------------------------------------------------------
+  
+  # trelliData object must be of the trelliData class
+  if (any(class(trelliData) %in% c("trelliData")) == FALSE) {
+    stop("trelliData must be of the class trelliData.")
+  }
+  
+  # trelliData must contain statistics 
+  if (is.null(trelliData$statRes)) {
+    stop("trelliData must contain a statRes object.")
+  }
+  
+  # Ensure the p_value_test is anova, gtest, or combined
+  if (p_value_test %in% c("anova", "gtest", "combined") == FALSE) {
+    stop("p_value_test must be anova, gtest, or combined.")
+  }
+  
+  # Ensure that p_value threshold is a single numeric
+  if (!is.numeric(p_value_thresh)) {
+    stop("p_value_threshold must be a number.")
+  }
+  p_value_thresh <- abs(p_value_thresh)
+  
+  # If comparison is not NULL...
+  if (!is.null(comparison)) {
+    # Ensure that comparison is an acceptable input
+    if (!is.character(comparison) | length(comparison) > 1) {
+      stop("comparison must be a string of length 1.")
+    }
+    
+    # Ensure that comparison is from the comparisons lists
+    Comparisons <- attr(trelliData$statRes, "comparisons")
+    if (comparison %in% Comparisons == FALSE) {
+      stop(paste0(comparison, "is not an acceptable comparison"))
+    }
+  }
+  
+  # Filter by p_value-----------------------------------------------------------
+  
+  # Pull the biomolecule name 
+  biomolecule <- attr(trelliData$statRes, "cnames")$edata_cname
+  
+  # Filter down to only a comparison if the user specifies one
+  if (!is.null(comparison)) {
+    trelliData$trelliData.stat <- trelliData$trelliData.stat[trelliData$trelliData.stat$Comparison == comparison,]
+  }
+  
+  # Filter statRes
+  if (p_value_test == "anova") {
+    trelliData$trelliData.stat <- trelliData$trelliData.stat[trelliData$trelliData.stat$p_value_anova <= p_value_thresh,]
+  } else if (p_value_test == "gtest") {
+    trelliData$trelliData.stat <- trelliData$trelliData.stat[trelliData$trelliData.stat$p_value_gtest <= p_value_thresh,] 
+  } 
+  
+  # Filter omics down 
+  if (!is.null(trelliData$trelliData.omics)) {
+    biomolecule_subset <-  trelliData$trelliData.stat[,biomolecule] %>% unlist()
+    trelliData$trelliData.omics <- trelliData$trelliData.omics[trelliData$trelliData.omics[[biomolecule]] %in% biomolecule_subset,]
+  }
+  
+  return(trelliData)
+  
+}

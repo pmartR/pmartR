@@ -49,8 +49,8 @@ potential future functions.}
 \item{p_value_thresh}{The user provided threshold for plotting significant
 p-values.}
 
-\item{p_value_test}{The user provided provided logical for whether p-value
-testing should occur.}
+\item{p_value_test}{The user provided test to indicate in plots. Valid options 
+are anova, gtest, or NULL.}
 }
 \description{
 This function runs necessary checks for pmartR trelliscope plotting
