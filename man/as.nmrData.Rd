@@ -81,9 +81,7 @@ Objects of class 'nmrData' contain some attributes that are
   scale parameters used to normalize the data, and the location and scale
   parameters used to backtransform the data (if applicable). \cr \tab \cr
   data_types \tab Character string describing the type of data (e.g.'binned'
-  or 'identified', for NMR data). Default value is NULL. \cr \tab \cr
-  check.names \tab Logical defaults to TRUE. Indicates whether 'check.names'
-  attribute of returned omicsData object is TRUE or FALSE. \cr } Computed
+  or 'identified', for NMR data). Default value is NULL. \cr } Computed
   values included in the \code{data_info} attribute are as follows:
   \tabular{ll}{ num_edata \tab The number of unique \code{edata_cname}
   entries.\cr \tab \cr num_miss_obs \tab The number of missing

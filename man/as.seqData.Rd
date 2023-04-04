@@ -73,9 +73,7 @@ Objects of class 'seqData' contain some attributes that are
   whether the data has been normalized or not. Default value is FALSE. \cr
   \tab \cr norm_info \tab Default value is an empty list, which will be
   populated with a single named element \code{is_normalized = is_normalized}.
-  \cr \tab \cr data_types \tab Character string describing the type of data, most commonly used for lipidomic data (lipidData objects) or NMR data (nmrData objects) but available for other data classes as well. Default value is NULL. \cr \tab \cr
-  check.names \tab Logical defaults to TRUE. Indicates whether 'check.names'
-  attribute of returned omicsData object is TRUE or FALSE. \cr } Computed
+  \cr \tab \cr data_types \tab Character string describing the type of data, most commonly used for lipidomic data (lipidData objects) or NMR data (nmrData objects) but available for other data classes as well. Default value is NULL. \cr } Computed
   values included in the \code{data_info} attribute are as follows:
   \tabular{ll}{ num_edata \tab The number of unique \code{edata_cname}
   entries.\cr \tab \cr num_zero_obs \tab The number of zero-value

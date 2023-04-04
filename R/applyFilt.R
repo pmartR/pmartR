@@ -237,7 +237,7 @@ applyFilt.moleculeFilt <- function(filter_object, omicsData, min_num=2){
   } else {
 
     # Fish out the identifiers that will be filtered.
-    filter.edata <- omicsData$e_data[, id_col][inds]
+    filter.edata <- filter_object[, id_col][inds]
 
   }
 
@@ -2020,59 +2020,123 @@ pmartR_filter_worker <- function (filter_object, omicsData) {
   if (!is.null(c(filter_object$e_data_remove,
                  filter_object$e_meta_remove,
                  filter_object$f_data_remove))) {
+    
+    ##  Warnings for filtering non-existent values ##
+    
+    # e_data
+    valid_edata <- omicsData$e_data[, get_edata_cname(omicsData)]
+    
+    missing_biomolecules <- unlist(
+      lapply(filter_object$e_data_remove, function(x) if (!(x %in% valid_edata)) x)
+    )
+    
+    if (length(missing_biomolecules > 0)) {
+      warning("Specified biomolecules ",
+              paste0(missing_biomolecules, collapse = ", "),
+              " were not found in e_data.")
+    }
+    
+    # f_data
+    valid_fdata <- valid_names <- omicsData$f_data[,get_fdata_cname(omicsData)]
+    
+    missing_samples <- unlist(
+      lapply(filter_object$f_data_remove, function(x) if (!(x %in% valid_fdata)) x)
+    )
+    
+    if (length(missing_samples > 0)) {
+      warning("Specified samples ",
+              paste0(missing_samples, collapse = ", "),
+              " were not found in the data.")
+    }
+    
+    
+    # e_meta
+    valid_emeta <- omicsData$e_meta[, get_emeta_cname(omicsData)]
+    
+    missing_emeta <- unlist(
+      lapply(filter_object$e_meta_remove, function(x) if (!(x %in% valid_emeta)) x)
+    )
 
+    if (length(missing_emeta > 0)) {
+      warning("Specified e_meta values ",
+              paste0(missing_emeta, collapse = ", "),
+              " were not found in e_meta.")
+    }
+    
+    ##
+    
     # remove any samples from f_data and e_data #
     if (!is.null(filter_object$f_data_remove)) {
-
       # Find the row indices of the sample names that will be removed from the
       # f_data object.
       inds <- which(
-        omicsData$f_data[, which(names(omicsData$f_data) == samp_cname)]
+        valid_fdata
         %in% filter_object$f_data_remove
       )
 
-      # Remove the rows in f_data that correspond to the samples that should be
-      # removed.
-      omicsData$f_data <- omicsData$f_data[-inds, ]
-
+      # Check if there is at least one sample name that will be removed
+      if (length(inds) > 0) {
+        
+        # Remove the rows in f_data that correspond to the samples that should
+        # be removed.
+        omicsData$f_data <- omicsData$f_data[-inds, ]
+        
+      }
+      
+      valid_names <- names(omicsData$e_data)
+      
       # Find the column indices of the sample names that will be removed from
       # the e_data object.
-      inds <- which(names(omicsData$e_data) %in% filter_object$f_data_remove)
+      inds <- which(valid_names %in% filter_object$f_data_remove)
+    
+      # Check if there is at least one sample name that will be removed
+      if (length(inds) > 0) {
+      
+        # Remove the columns in e_data that correspond to the samples that should
+        # be removed.
+        omicsData$e_data <- omicsData$e_data[, -inds]
 
-      # Remove the columns in e_data that correspond to the samples that should
-      # be removed.
-      omicsData$e_data <- omicsData$e_data[, -inds]
-
-
+      }
     }
 
     # remove any edata molecules from e_data and e_meta #
     if (!is.null(filter_object$e_data_remove)) {
-
       # Find the row indices of the biomolecule names that will be removed from
       # the e_data object.
       inds <- which(
-        omicsData$e_data[, which(names(omicsData$e_data) == edata_cname)]
+        valid_edata
         %in% filter_object$e_data_remove
       )
 
-      # Remove the rows in e_data that correspond to the biomolecules that
-      # should be removed.
-      omicsData$e_data <- omicsData$e_data[-inds, ]
+      # Check if there is at least one row that will be removed.
+      if (length(inds) > 0) {
+        
+        # Remove the rows in e_data that correspond to the biomolecules that
+        # should be removed.
+        omicsData$e_data <- omicsData$e_data[-inds, ]
+        
+      }
 
       # Check if e_meta is present.
       if (!is.null(omicsData$e_meta)) {
-
+        
+        valid_names <- omicsData$e_meta[, which(names(omicsData$e_meta) == edata_cname)]
+        
         # Find the row indices of the biomolecule names that will be removed
         # from the e_meta object.
         inds <- which(
-          omicsData$e_meta[, which(names(omicsData$e_meta) == edata_cname)]
+          valid_names
           %in% filter_object$e_data_remove
         )
 
-        # Remove the rows in e_meta corresponding to the biomolecules that
-        # should be removed.
-        omicsData$e_meta <- omicsData$e_meta[-inds, ]
+        # Check if there is at least one row that will be removed
+        if (length(inds) > 0) {
+          
+          # Remove the rows in e_meta corresponding to the biomolecules that
+          # should be removed.
+          omicsData$e_meta <- omicsData$e_meta[-inds, ]
+          
+        }
 
       }
 
@@ -2080,11 +2144,12 @@ pmartR_filter_worker <- function (filter_object, omicsData) {
 
     # remove any emeta molecules from e_meta and e_data #
     if (!is.null(filter_object$e_meta_remove)) {
-
+      valid_emeta <- omicsData$e_meta[, get_emeta_cname(omicsData)]
+      
       # Find the row indices of the mapping variable names that will be removed
       # from the e_meta object.
       inds <- which(
-        omicsData$e_meta[, which(names(omicsData$e_meta) == emeta_cname)]
+        valid_emeta
         %in% filter_object$e_meta_remove
       )
 

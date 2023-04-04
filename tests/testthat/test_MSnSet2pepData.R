@@ -11,8 +11,7 @@ test_that('MSnSet objects are correctly converted to pepData objects',{
                              data_scale = "log2",
                              edata_cname = "UniqueID",
                              fdata_cname = "SampleID",
-                             emeta_cname = "UniqueID",
-                             check.names = TRUE)
+                             emeta_cname = "UniqueID")
   
   # Holy MSnSet unit tests, Batman! --------------------------------------------
   
@@ -26,7 +25,7 @@ test_that('MSnSet objects are correctly converted to pepData objects',{
   
   # Confirm the correct attributes are present in the pepData object.
   expect_equal(names(attributes(msn_pepe)),
-               c("names", "cnames", "data_info", "check.names", "meta_info",
+               c("names", "cnames", "data_info", "meta_info",
                  "filters", "class"))
   
   # Scrutinize the column names attribute.
@@ -50,9 +49,6 @@ test_that('MSnSet objects are correctly converted to pepData objects',{
          data_types = NULL,
          batch_info = list(is_bc = FALSE))
   )
-  
-  # Check the checkers.
-  expect_true(attr(msn_pepe, "check.names"))
   
   # Inspect the elements of the meta_info attribute.
   expect_equal(

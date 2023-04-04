@@ -281,8 +281,6 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata_gdf, 'cnames'),
                    attr(aFiltered, 'cnames'))
-  expect_identical(attr(pdata_gdf, 'check.names'),
-                   attr(aFiltered, 'check.names'))
   expect_identical(class(pdata_gdf),
                    class(aFiltered))
 
@@ -537,8 +535,6 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata_sg, 'cnames'),
                    attr(aFiltered_sg, 'cnames'))
-  expect_identical(attr(pdata_sg, 'check.names'),
-                   attr(aFiltered_sg, 'check.names'))
   expect_identical(class(pdata_sg),
                    class(aFiltered_sg))
 
@@ -744,8 +740,6 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata_sg, 'cnames'),
                    attr(aFiltered_sg_f, 'cnames'))
-  expect_identical(attr(pdata_sg, 'check.names'),
-                   attr(aFiltered_sg_f, 'check.names'))
   expect_identical(class(pdata_sg),
                    class(aFiltered_sg_f))
 
@@ -822,8 +816,6 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata_sg, 'cnames'),
                    attr(gFiltered_sg_f, 'cnames'))
-  expect_identical(attr(pdata_sg, 'check.names'),
-                   attr(gFiltered_sg_f, 'check.names'))
   expect_identical(class(pdata_sg),
                    class(gFiltered_sg_f))
 
@@ -901,8 +893,6 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata_sg, 'cnames'),
                    attr(bFiltered_sg_f, 'cnames'))
-  expect_identical(attr(pdata_sg, 'check.names'),
-                   attr(bFiltered_sg_f, 'check.names'))
   expect_identical(class(pdata_sg),
                    class(bFiltered_sg_f))
 
@@ -1405,4 +1395,66 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
       as.character()
   )
 
+  # Expect warning if data has already been filtered ---------------------------
+  
+  filter1 <- imdanova_filter(omicsData = pdata_gdf)
+  filter2 <- imdanova_filter(omicsData = pdata_gdf)
+  filter3 <- imdanova_filter(omicsData = pdata_gdf)
+  filtered1 <- applyFilt(filter_object = filter1,
+                         omicsData = pdata_gdf,
+                         min_nonmiss_anova = 2,
+                         min_nonmiss_gtest = 3,
+                         remove_singleton_groups = FALSE)
+  warnings <- capture_warnings(
+    filtered2 <- applyFilt(filter_object = filter2,
+                           omicsData = filtered1,
+                           min_nonmiss_anova = 2,
+                           min_nonmiss_gtest = 3,
+                           remove_singleton_groups = FALSE) 
+  )
+  
+  # The second applyFilt should generate warnings
+  expect_match(
+    warnings,
+    "An imdanova filter has already been applied to this data set.",
+    all = FALSE
+  )
+  expect_match(
+    warnings,
+    paste0(
+      "Specified biomolecules 1024, 1687, 11083, 15714, 16636, 976139, ",
+      "6769231, 6769844, 6809644, 6831118, 6832528, 6901575, 6934326 were not ",
+      "found in e_data\\."
+    ),
+    all = FALSE
+  )
+  
+  # Samples that do exist should be filtered even if there are samples that
+  # don't exist
+  expect_true(any(filtered2$e_data$Mass_Tag_ID == 6793445))
+  
+  warnings <- capture_warnings(
+    filtered3 <- applyFilt(filter_object = filter3,
+                           omicsData = filtered2,
+                           min_nonmiss_anova = 3,
+                           min_nonmiss_gtest = 3,
+                           remove_singleton_groups = FALSE) 
+  )
+  
+  expect_match(
+    warnings,
+    "An imdanova filter has already been applied to this data set.",
+    all = FALSE
+  )
+  expect_match(
+    warnings,
+    paste0(
+      "Specified biomolecules 1024, 1687, 11083, 15714, 16636, 976139, ",
+      "6769231, 6769844, 6809644, 6831118, 6832528, 6901575, 6934326 were not ",
+      "found in e_data\\."
+    ),
+    all = FALSE
+  )
+  
+  expect_false(any(filtered3$e_data$Mass_Tag_ID == 6793445))
 })

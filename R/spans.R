@@ -640,8 +640,7 @@ normalize_global_basic <- function (edata, norm_fn) {
                             subset_fn = "all",
                             feature_subset = edata[, 1],
                             backtransform = FALSE,
-                            apply_norm = FALSE,
-                            check.names = FALSE)
+                            apply_norm = FALSE)
 
   # Just return the normalizing parameters.
   return (norm_results$norm_params)

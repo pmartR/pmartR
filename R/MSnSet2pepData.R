@@ -17,6 +17,7 @@
 #'   values are 'log2', 'log10', 'log', and 'abundance', which indicate data is
 #'   log base 2, base 10, natural log transformed, and raw abundance,
 #'   respectively.
+#' @param check.names deprecated
 #'
 #' @return pepData object
 #' 
@@ -38,15 +39,17 @@
 #'                         data_scale = "log2",
 #'                         edata_cname = "UniqueID",
 #'                         fdata_cname = "SampleID",
-#'                         emeta_cname = "UniqueID",
-#'                         check.names = TRUE)
+#'                         emeta_cname = "UniqueID")
 #' }
 #'
 #' @export
 #' 
 MSnSet2pepData <- function (msnset_object, data_scale, edata_cname = "UniqueID",
                             fdata_cname = "SampleID", emeta_cname = "UniqueID",
-                            check.names = TRUE) {
+                            check.names = NULL) {
+  
+  if (!missing(check.names))
+    warning("check.names parameter is deprecated")
   
   #check that msnset_object is of correct class
   if(!inherits(msnset_object, "MSnSet"))
@@ -83,7 +86,7 @@ MSnSet2pepData <- function (msnset_object, data_scale, edata_cname = "UniqueID",
   res<- as.pepData(e_data = msnset_edata, f_data = msnset_fdata,
                    e_meta = msnset_emeta, edata_cname = edata_cname,
                    fdata_cname = fdata_cname, emeta_cname = emeta_cname,
-                   data_scale = data_scale, check.names = check.names)
+                   data_scale = data_scale)
   
   return(res)
   

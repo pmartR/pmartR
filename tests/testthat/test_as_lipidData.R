@@ -18,6 +18,9 @@ test_that('as.lipidData returns the correct data frame and attributes',{
                         fdata_cname = 'Sample_Name',
                         emeta_cname = 'LipidClass')
   
+  # Check high level structure
+  expect_equal(names(ldata), c("e_data", "f_data", "e_meta"))
+  
   # Ensure the returned data frames are the correct dimension.
   expect_equal(dim(ldata$e_data),
                c(146, 12))
@@ -28,7 +31,7 @@ test_that('as.lipidData returns the correct data frame and attributes',{
   
   # Confirm the correct attributes are present in the lipidData object.
   expect_equal(names(attributes(ldata)),
-               c("names", "cnames", "data_info", "check.names", "meta_info",
+               c("names", "cnames", "data_info", "meta_info",
                  "filters", "class"))
   
   # Scrutinize the column names attribute.
@@ -53,9 +56,6 @@ test_that('as.lipidData returns the correct data frame and attributes',{
          batch_info = list(is_bc = FALSE))
   )
   
-  # Check the checkers.
-  expect_true(attr(ldata, "check.names"))
-  
   # Inspect the elements of the meta_info attribute.
   expect_equal(
     attr(ldata, "meta_info"),
@@ -77,6 +77,9 @@ test_that('as.lipidData returns the correct data frame and attributes',{
                                        emeta_cname = 'Test'),
                  "emeta_cname set to NULL, no e_meta object was provided.")
   
+  # Check high level structure
+  expect_equal(names(ldata), c("e_data", "f_data", "e_meta"))
+  
   # Ensure the returned data frames are the correct dimension.
   expect_equal(dim(ldata$e_data),
                c(146, 12))
@@ -86,7 +89,7 @@ test_that('as.lipidData returns the correct data frame and attributes',{
   
   # Confirm the correct attributes are present in the lipidData object.
   expect_equal(names(attributes(ldata)),
-               c("names", "cnames", "data_info", "check.names", "meta_info",
+               c("names", "cnames", "data_info", "meta_info",
                  "filters", "class"))
   
   # Scrutinize the column names attribute.
@@ -110,9 +113,6 @@ test_that('as.lipidData returns the correct data frame and attributes',{
          data_types = NULL,
          batch_info = list(is_bc = FALSE))
   )
-  
-  # Check the checkers.
-  expect_true(attr(ldata, "check.names"))
   
   # Inspect the elements of the meta_info attribute.
   expect_equal(
@@ -161,6 +161,9 @@ test_that('as.lipidData returns the correct data frame and attributes',{
                        "e_data. These have been removed from f_data.",
                        sep = ' '))
   
+  # Check high level structure
+  expect_equal(names(ldata), c("e_data", "f_data", "e_meta"))
+  
   # Confirm the dimensions of the e_data and f_data data frames.
   expect_equal(dim(ldata$e_data),
                c(146, 12))
@@ -170,7 +173,7 @@ test_that('as.lipidData returns the correct data frame and attributes',{
   
   # Confirm the correct attributes are present in the lipidData object.
   expect_equal(names(attributes(ldata)),
-               c("names", "cnames", "data_info", "check.names", "meta_info",
+               c("names", "cnames", "data_info", "meta_info",
                  "filters", "class"))
   
   # Scrutinize the column names attribute.
@@ -194,9 +197,6 @@ test_that('as.lipidData returns the correct data frame and attributes',{
          data_types = NULL,
          batch_info = list(is_bc = FALSE))
   )
-  
-  # Check the checkers.
-  expect_true(attr(ldata, "check.names"))
   
   # Inspect the elements of the meta_info attribute.
   expect_equal(
@@ -223,6 +223,9 @@ test_that('as.lipidData returns the correct data frame and attributes',{
                        'e_data. These have been removed from e_meta.',
                        sep = ' '))
   
+  # Check high level structure
+  expect_equal(names(ldata), c("e_data", "f_data", "e_meta"))
+  
   # Confirm the dimensions of the e_data and e_meta data frames.
   expect_equal(dim(ldata$e_data),
                c(117, 12))
@@ -233,7 +236,7 @@ test_that('as.lipidData returns the correct data frame and attributes',{
   
   # Confirm the correct attributes are present in the lipidData object.
   expect_equal(names(attributes(ldata)),
-               c("names", "cnames", "data_info", "check.names", "meta_info",
+               c("names", "cnames", "data_info", "meta_info",
                  "filters", "class"))
   
   # Scrutinize the column names attribute.
@@ -257,9 +260,6 @@ test_that('as.lipidData returns the correct data frame and attributes',{
          data_types = NULL,
          batch_info = list(is_bc = FALSE))
   )
-  
-  # Check the checkers.
-  expect_true(attr(ldata, "check.names"))
   
   # Inspect the elements of the meta_info attribute.
   expect_equal(
@@ -298,6 +298,9 @@ test_that('as.lipidData returns the correct data frame and attributes',{
                       edata_cname = 'LipidCommonName',
                       fdata_cname = 'Sample_Name')
   
+  # Check high level structure
+  expect_equal(names(ldata), c("e_data", "f_data", "e_meta"))
+  
   # Verify that the returned data frames are the correct dimension.
   expect_equal(dim(ldata$e_data),
                c(146, 12))
@@ -307,7 +310,7 @@ test_that('as.lipidData returns the correct data frame and attributes',{
   
   # Confirm the correct attributes are present in the lipidData object.
   expect_equal(names(attributes(ldata)),
-               c("names", "cnames", "data_info", "check.names", "meta_info",
+               c("names", "cnames", "data_info", "meta_info",
                  "filters", "class"))
   
   # Scrutinize the column names attribute.
@@ -331,9 +334,6 @@ test_that('as.lipidData returns the correct data frame and attributes',{
          data_types = NULL,
          batch_info = list(is_bc = FALSE))
   )
-  
-  # Check the checkers.
-  expect_true(attr(ldata, "check.names"))
   
   # Inspect the elements of the meta_info attribute.
   expect_equal(

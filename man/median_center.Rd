@@ -11,7 +11,7 @@ median_center(
   feature_subset,
   backtransform = FALSE,
   apply_norm = FALSE,
-  check.names = TRUE
+  check.names = NULL
 )
 }
 \arguments{
@@ -36,6 +36,8 @@ to their raw values. See details for more information. Defaults to FALSE.}
 
 \item{apply_norm}{logical argument. If TRUE, the normalization will be
 applied to the data. Defaults to FALSE.}
+
+\item{check.names}{deprecated}
 }
 \value{
 List containing two elements: \code{norm_params} is list with two

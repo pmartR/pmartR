@@ -148,8 +148,6 @@ test_that('proteomics_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata, 'cnames'),
                    attr(filtered, 'cnames'))
-  expect_identical(attr(pdata, 'check.names'),
-                   attr(filtered, 'check.names'))
   expect_identical(class(pdata),
                    class(filtered))
 
@@ -206,8 +204,6 @@ test_that('proteomics_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(sordata, 'cnames'),
                    attr(sorfiltered, 'cnames'))
-  expect_identical(attr(sordata, 'check.names'),
-                   attr(sorfiltered, 'check.names'))
   expect_identical(class(sordata),
                    class(sorfiltered))
 
@@ -261,8 +257,6 @@ test_that('proteomics_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(sordata, 'cnames'),
                    attr(sorfiltered2, 'cnames'))
-  expect_identical(attr(sordata, 'check.names'),
-                   attr(sorfiltered2, 'check.names'))
   expect_identical(class(sordata),
                    class(sorfiltered2))
 
@@ -316,8 +310,6 @@ test_that('proteomics_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(sordata, 'cnames'),
                    attr(sorfiltered3, 'cnames'))
-  expect_identical(attr(sordata, 'check.names'),
-                   attr(sorfiltered3, 'check.names'))
   expect_identical(class(sordata),
                    class(sorfiltered3))
 

@@ -365,8 +365,6 @@ test_that('cv_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata, 'cnames'),
                    attr(filtered, 'cnames'))
-  expect_identical(attr(pdata, 'check.names'),
-                   attr(filtered, 'check.names'))
   expect_identical(class(pdata),
                    class(filtered))
 
@@ -419,8 +417,6 @@ test_that('cv_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata, 'cnames'),
                    attr(filtered_gdf, 'cnames'))
-  expect_identical(attr(pdata, 'check.names'),
-                   attr(filtered_gdf, 'check.names'))
   expect_identical(class(pdata),
                    class(filtered_gdf))
 
@@ -473,8 +469,6 @@ test_that('cv_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata, 'cnames'),
                    attr(filtered_sg_gdf, 'cnames'))
-  expect_identical(attr(pdata, 'check.names'),
-                   attr(filtered_sg_gdf, 'check.names'))
   expect_identical(class(pdata),
                    class(filtered_sg_gdf))
 
@@ -533,4 +527,11 @@ test_that('cv_filter and applyFilt produce the correct output',{
   # attribute should remain how it was before running applyFilt.
   expect_identical(noFilta, pdata)
 
+  # Expect warning if data has already been filtered ------------------
+  
+  filter1 <- cv_filter(omicsData = pdata)
+  filter2 <- cv_filter(omicsData = pdata)
+  filtered1 <- applyFilt(filter1, pdata, cv_threshold = 90)
+  expect_warning(filtered2 <- applyFilt(filter2, filtered1, cv_threshold = 90),
+                 "A CV filter has already been applied to this data set.")
 })
