@@ -21,6 +21,8 @@ anova_test(
 \arguments{
 \item{omicsData}{A pmartR data object of any class}
 
+\item{groupData}{Group data attribute of the data object}
+
 \item{comparisons}{data.frame with columns for "Control" and "Test"
 containing the different comparisons of interest. Comparisons will be made
 between the Test and the corresponding Control  If left NULL, then all

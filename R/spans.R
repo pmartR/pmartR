@@ -609,7 +609,7 @@ spans_make_distribution <- function (omicsData, group_vector, norm_fn, sig_inds,
 #' need the norm_params element from the output of the normalize_global
 #' function. All of the other options and output can be ignored.
 #'
-#' @param e_data a \eqn{p \times n + 1} data.frame, where \eqn{p} is the number
+#' @param edata a \eqn{p \times n + 1} data.frame, where \eqn{p} is the number
 #'   of peptides, lipids, or metabolites and \eqn{n} is the number of samples.
 #'   Each row corresponds to data for a peptide, protein, lipid, or metabolite,
 #'   with a column giving the identifer name.
@@ -651,6 +651,9 @@ normalize_global_basic <- function (edata, norm_fn) {
 #'
 #' @param SPANSRes_obj an object of the class SPANSRes obtained by calling
 #'   \code{spans_procedure()}
+#' @param sort_by_nmols a logical indicator of whether to sort by number of 
+#'   molecules used in the normalization (see \code{\link{spans_procedure}} for
+#'   info about the 'mols_used_in_norm' column)
 #'
 #' @return A list of lists, where there are multiple sublists only if there were
 #'   ties for the top SPANS score.  Each sublist contains named elements for the

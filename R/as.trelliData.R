@@ -80,6 +80,10 @@
 #'   example, an acceptable entry for 'normalize_global' would be
 #'   list("subset_fn" = "all", "norm_fn" = "median", "apply_norm" = TRUE,
 #'   "backtransform" = TRUE).
+#' @param is_normalized A logical indicator of whether the data is already
+#'   normalized (and will therefore skip the normalization step)
+#' @param force_normalization A logical indicator to force normalization that is  
+#'   not required for both isobaric protein and NMR data
 #'  
 #' @examples
 #' library(pmartRdata)
@@ -93,25 +97,19 @@
 #' @author David Degnan, Daniel Claborne, Lisa Bramer
 #' 
 #' @export
+
 as.trelliData.edata <- function(e_data, 
                                 edata_cname,
                                 omics_type,
                                 data_scale_original = "abundance",
                                 data_scale = "log2", 
                                 normalization_fun = "global", 
-                                normalization_params = list("subset_fn" = "all", "norm_fn" = "median", 
-                                                            "apply_norm" = TRUE, "backtransform" = TRUE),
-                                ...
-) {
-  
-  .as.trelliData.edata(e_data, edata_cname, omics_type, data_scale_original, 
-                       data_scale, normalization_fun, normalization_params, ...)
-  
-}
-
-.as.trelliData.edata <- function(edata, edata_cname, omics_type, data_scale_original,
-                                 data_scale, normalization_fun, normalization_params,
-                                 is_normalized = FALSE, force_normalization = FALSE) {
+                                normalization_params = list(
+                                  "subset_fn" = "all", "norm_fn" = "median", 
+                                  "apply_norm" = TRUE, "backtransform" = TRUE
+                                ),
+                                is_normalized = FALSE,
+                                force_normalization = FALSE) {
   
   # Initial checks -------------------------------------------------------------
   
@@ -268,13 +266,8 @@ as.trelliData.edata <- function(e_data,
 #' @author David Degnan, Lisa Bramer
 #' 
 #' @export
-as.trelliData <- function(omicsData = NULL, statRes = NULL, ...) {
-  
-  .as.trelliData(omicsData, statRes, require_normalization = TRUE)
-  
-}
-
-.as.trelliData <- function(omicsData, statRes, require_normalization) {
+as.trelliData <- function(omicsData, statRes) {
+  require_normalization <- TRUE
   
   # Initial checks--------------------------------------------------------------
   

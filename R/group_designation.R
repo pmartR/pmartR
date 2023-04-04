@@ -75,8 +75,7 @@ group_designation <- function (omicsData,
                                pair_id = NULL,
                                pair_group = NULL,
                                pair_denom = NULL,
-                               batch_id = NULL,
-                               time_course = NULL) {
+                               batch_id = NULL) {
 
   # Initial checks on input arguments ------------------------------------------
 
@@ -507,41 +506,41 @@ group_designation <- function (omicsData,
   # Check time_course ---------------
 
   # See if time_course is present.
-  if (!is.null(time_course)) {
-
-    # added Aug 2020, since use of this argument is currently not actively
-    # supported #
-    if (is.na(time_course)) {time_course = NULL}
-
-    # Give an error and don't run the rest of the function because time_course
-    # is not currently supported.
-    stop (paste("Use of the time_course argument is currently not supported.",
-                "In group_designation set time_course = NULL.",
-                sep = " "))
-
-    if (!is.character(time_course)) {
-      # check that time_course is a character #
-      stop (paste("time_course must be a character specifying the name of the",
-                  "variable denoting time",
-                  sep = " "))
-    }
-
-    # check that time_course is found in the data #
-    if(!(time_course %in% names(omicsData$f_data))) {
-
-      stop ("time_course is not found in f_data of omicsData")
-
-    }
-
-    # check that no more than 1 main_effect is specified when time_course is non
-    # NULL #
-    if(length(main_effects) > 1) {
-
-      stop ("Only 1 main effect may be specified when time_course is provided")
-
-    }
-
-  }
+  # if (!is.null(time_course)) {
+  #   
+  #   # added Aug 2020, since use of this argument is currently not actively
+  #   # supported #
+  #   if (is.na(time_course)) {time_course = NULL}
+  #   
+  #   # Give an error and don't run the rest of the function because time_course
+  #   # is not currently supported.
+  #   stop (paste("Use of the time_course argument is currently not supported.",
+  #               "In group_designation set time_course = NULL.",
+  #               sep = " "))
+  #   
+  #   if (!is.character(time_course)) {
+  #     # check that time_course is a character #
+  #     stop (paste("time_course must be a character specifying the name of the",
+  #                 "variable denoting time",
+  #                 sep = " "))
+  #   }
+  #   
+  #   # check that time_course is found in the data #
+  #   if(!(time_course %in% names(omicsData$f_data))) {
+  #     
+  #     stop ("time_course is not found in f_data of omicsData")
+  #     
+  #   }
+  #   
+  #   # check that no more than 1 main_effect is specified when time_course is non
+  #   # NULL #
+  #   if(length(main_effects) > 1) {
+  #     
+  #     stop ("Only 1 main effect may be specified when time_course is provided")
+  #     
+  #   }
+  #   
+  # }
 
   # Create the group data frame and attributes ---------------------------------
 

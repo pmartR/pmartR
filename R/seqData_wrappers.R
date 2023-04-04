@@ -127,8 +127,6 @@ diffexp_seq <- function(omicsData, method = "edgeR", p_adjust = "BH",
 #' @param test either "Wald" or "LRT", which will then use either Wald 
 #' significance tests, or the likelihood ratio test on the difference in 
 #' deviance between a full and reduced model formula 
-#' @param method a character string of length one specifying which wrapper to use. 
-#' Can be 'edgeR', 'DESeq2', or 'voom' 
 #' @param p_adjust Character string for p-value correction method, refer to 
 #' ?p.adjust() for valid options. Defaults to "BH" (Benjamini & Hochberg)
 #' @param comparisons `data.frame` with columns for "Control" and "Test"
@@ -400,8 +398,6 @@ DESeq2_wrapper <- function(
 #' 
 #' @param omicsData an object of type 'seqData', created by
 #'   \code{\link{as.seqData}}
-#' @param method a character string of length one specifying which wrapper to
-#'   use. Can be 'edgeR', 'DESeq2', or 'limma-voom'
 #' @param p_adjust Character string for p-value correction method, refer to
 #'   ?p.adjust() for valid options. Defaults to "BH" (Benjamini & Hochberg).
 #' @param comparisons `data.frame` with columns for "Control" and "Test"

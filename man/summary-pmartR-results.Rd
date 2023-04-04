@@ -8,7 +8,7 @@
 \alias{summary.corRes}
 \title{Summary of pmartR Analysis Functions}
 \usage{
-\method{summary}{normRes}(object)
+\method{summary}{normRes}(object, ...)
 
 \method{summary}{SPANSRes}(object, ...)
 

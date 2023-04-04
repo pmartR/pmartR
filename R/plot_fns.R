@@ -52,6 +52,7 @@
 #' @param palette character string indicating the name of the RColorBrewer
 #'   palette to use. For a list of available options see the details section in
 #'   \code{\link[RColorBrewer]{RColorBrewer}}.
+#' @param ... further arguments passed to or from other methods.
 #'
 #' @details This function can only create plots for dataRes objects whose 'by' =
 #'   'molecule' and 'groupvar' attribute is non NULL
@@ -371,6 +372,7 @@ plot.dataRes <- function (x, metric = NULL, density = FALSE,
 #' @param palette character string indicating the name of the RColorBrewer
 #'   palette to use. For a list of available options see the details section in
 #'   \code{\link[RColorBrewer]{RColorBrewer}}.
+#' @param ... further arguments passed to or from other methods.
 #'
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
 #'   interactive is TRUE
@@ -577,6 +579,7 @@ prime_iso <- function (isonormRes, exp_cname,
 #' @param palette character string indicating the name of the RColorBrewer
 #'   palette to use. For a list of available options see the details section in
 #'   \code{\link[RColorBrewer]{RColorBrewer}}.
+#' @param ... further arguments passed to or from other methods.
 #'
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
 #'   interactive is TRUE
@@ -834,6 +837,7 @@ plot.nmrnormRes <- function (x, nmrData = NULL, order_by = NULL,
 #' @param color_high character string specifying the color of the gradient for
 #'   high values
 #' @param bw_theme logical value. If TRUE uses the ggplot2 black and white theme.
+#' @param ... further arguments passed to or from other methods.
 #'
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
 #'   interactive is TRUE
@@ -1055,6 +1059,7 @@ plot.SPANSRes <- function (x, interactive = FALSE,
 #'   be flipped. The default is FALSE.
 #' @param use_VizSampNames logical value. Indicates whether to use custom sample
 #'   names. The default is FALSE.
+#' @param ... further arguments passed to or from other methods.
 #'
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
 #'   interactive is TRUE
@@ -1589,6 +1594,7 @@ na_scatter <- function (edata, group_df, na.by.molecule, edata_cname,
 #' @param bw_theme logical value. If TRUE uses the ggplot2 black and white theme.
 #' @param use_VizSampNames logical value. Indicates whether to use custom sample
 #'   names. The default is FALSE.
+#' @param ... further arguments passed to or from other methods.
 #'
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
 #'   interactive is TRUE
@@ -1898,6 +1904,7 @@ plot.corRes <- function (x, omicsData = NULL, order_by = NULL,
 #' @param palette character string indicating the name of the RColorBrewer
 #'   palette to use. For a list of available options see the details section in
 #'   \code{\link[RColorBrewer]{RColorBrewer}}.
+#' @param ... further arguments passed to or from other methods.
 #'
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
 #'   interactive is TRUE
@@ -2270,6 +2277,7 @@ plot.dimRes <- function (x, omicsData = NULL,
 #'   \code{\link[RColorBrewer]{RColorBrewer}}.
 #' @param display_count logical value. Indicates whether the missing value counts by
 #'   sample will be displayed on the bar plot. The default is TRUE.
+#' @param ... further arguments passed to or from other methods.
 #'
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
 #'   interactive is TRUE
@@ -2537,6 +2545,7 @@ plot.moleculeFilt <- function (x, min_num = NULL, cumulative = TRUE,
 #' @param palette character string indicating the name of the RColorBrewer
 #'   palette to use. For a list of available options see the details section in
 #'   \code{\link[RColorBrewer]{RColorBrewer}}.
+#' @param ... further arguments passed to or from other methods.
 #'
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
 #'   interactive is TRUE
@@ -2706,6 +2715,7 @@ plot.totalCountFilt <- function (x, min_count = NULL,
 #' @param palette character string indicating the name of the RColorBrewer
 #'   palette to use. For a list of available options see the details section in
 #'   \code{\link[RColorBrewer]{RColorBrewer}}.
+#' @param ... further arguments passed to or from other methods.
 #'
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
 #'   interactive is TRUE
@@ -2982,6 +2992,7 @@ plot.RNAFilt <- function (x, plot_type = "library",
 #'   \code{\link[RColorBrewer]{RColorBrewer}}.
 #' @param display_count logical value. Indicates whether the missing value counts by
 #'   sample will be displayed on the bar plot. The default is TRUE.
+#' @param ... further arguments passed to or from other methods.
 #'
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
 #'   interactive is TRUE
@@ -3393,6 +3404,7 @@ plot.imdanovaFilt <- function (x, min_nonmiss_anova = NULL,
 #'   \code{\link[RColorBrewer]{RColorBrewer}}.
 #' @param display_count logical value. Indicates whether the peptide or protein counts
 #'   will be displayed on the bar plot. The default is TRUE.
+#' @param ... further arguments passed to or from other methods.
 #'
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
 #'   interactive is TRUE
@@ -3744,6 +3756,7 @@ plot.proteomicsFilt <- function (x,
 #'   \code{\link[RColorBrewer]{RColorBrewer}}.
 #' @param use_VizSampNames logical value. Indicates whether to use custom sample
 #'   names. The default is FALSE.
+#' @param ... further arguments passed to or from other methods.
 #'
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
 #'   interactive is TRUE
@@ -4338,6 +4351,7 @@ plot.rmdFilt <- function (x, pvalue_threshold = NULL, sampleID = NULL,
 #' @param palette character string indicating the name of the RColorBrewer
 #'   palette to use. For a list of available options see the details section in
 #'   \code{\link[RColorBrewer]{RColorBrewer}}.
+#' @param ... further arguments passed to or from other methods.
 #'
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
 #'   interactive is TRUE
@@ -4597,6 +4611,7 @@ plot.customFilt <- function (x, ...) {
 #'   \code{\link[RColorBrewer]{RColorBrewer}}.
 #' @param use_VizSampNames logical value. Indicates whether to use custom sample
 #'   names. The default is FALSE.
+#' @param ... further arguments passed to or from other methods.
 #'
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
 #'   interactive is TRUE
@@ -4787,6 +4802,7 @@ plot.normRes <- function (x, order_by = NULL, color_by = NULL,
 #'   \code{\link[RColorBrewer]{RColorBrewer}}.
 #' @param use_VizSampNames logical value. Indicates whether to use custom sample
 #'   names. The default is FALSE.
+#' @param ... further arguments passed to or from other methods.
 #'
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
 #'   interactive is TRUE
@@ -4873,6 +4889,7 @@ plot.isobaricpepData <- function (x, order_by = NULL, color_by = NULL,
 #'   \code{\link[RColorBrewer]{RColorBrewer}}.
 #' @param use_VizSampNames logical value. Indicates whether to use custom sample
 #'   names. The default is FALSE.
+#' @param ... further arguments passed to or from other methods.
 #'
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
 #'   interactive is TRUE
@@ -4957,6 +4974,7 @@ plot.lipidData <- function (x, order_by = NULL, color_by = NULL,
 #'   \code{\link[RColorBrewer]{RColorBrewer}}.
 #' @param use_VizSampNames logical value. Indicates whether to use custom sample
 #'   names. The default is FALSE.
+#' @param ... further arguments passed to or from other methods.
 #'
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
 #'   interactive is TRUE
@@ -5041,6 +5059,7 @@ plot.metabData <- function (x, order_by = NULL, color_by = NULL,
 #'   \code{\link[RColorBrewer]{RColorBrewer}}.
 #' @param use_VizSampNames logical value. Indicates whether to use custom sample
 #'   names. The default is FALSE.
+#' @param ... further arguments passed to or from other methods.
 #'
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
 #'   interactive is TRUE
@@ -5134,6 +5153,7 @@ plot.nmrData <- function (x, order_by = NULL, color_by = NULL,
 #'   intensities by 75th quantile column intensities, then back-transform to
 #'   original scale. For 'median' and 'upper' options, all zeros are converted
 #'   to NAs.
+#' @param ... further arguments passed to or from other methods.
 #'
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
 #'   interactive is TRUE
@@ -5219,6 +5239,7 @@ plot.seqData <- function (x, order_by = NULL, color_by = NULL,
 #'   \code{\link[RColorBrewer]{RColorBrewer}}.
 #' @param use_VizSampNames logical value. Indicates whether to use custom sample
 #'   names. The default is FALSE.
+#' @param ... further arguments passed to or from other methods.
 #'
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
 #'   interactive is TRUE
@@ -5304,6 +5325,7 @@ plot.pepData <- function (x, order_by = NULL, color_by = NULL,
 #'   \code{\link[RColorBrewer]{RColorBrewer}}.
 #' @param use_VizSampNames logical value. Indicates whether to use custom sample
 #'   names. The default is FALSE.
+#' @param ... further arguments passed to or from other methods.
 #'
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
 #'   interactive is TRUE
@@ -5865,11 +5887,11 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
 #'   will be displayed on the bar plot. The default is TRUE.
 #' @param custom_theme a ggplot `theme` object to be applied to non-interactive
 #'   plots, or those converted by plotly::ggplotly().
-#' @param top_n numeric for heatmaps; defaults to NULL.
 #' @param cluster logical for heatmaps; TRUE will cluster biomolecules on X
 #'   axis. defaults to TRUE for seqData statistics and FALSE for all others.
 #' @param free_y_axis Logical. If TRUE the y axis for each bar plot can have its
 #'   own range. The default is FALSE.
+#' @param ... further arguments passed to or from other methods.
 #'
 #' @details Plot types:
 #' \itemize{

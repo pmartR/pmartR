@@ -656,7 +656,8 @@ imd_anova <- function (omicsData,
 #' estimates in ANOVA step }
 #'
 #' @param omicsData A pmartR data object of any class
-#' @param comparisons data.frame with columns for "Control" and "Test"
+#' @param groupData `data.frame` that assigns sample names to groups
+#' @param comparisons `data.frame` with columns for "Control" and "Test"
 #'   containing the different comparisons of interest. Comparisons will be made
 #'   between the Test and the corresponding Control  If left NULL, then all
 #'   pairwise comparisons are executed.
@@ -1091,13 +1092,13 @@ run_twofactor_cpp <- function(data,gpData,red_df){
 #'
 #' @param groupData data frame that assigns sample names to groups
 #' @param comparisons dataframe that defiens the comparsions of interest
-#' @param anova_results results of the pmartR::anova_test() function
+#' @param anova_results_full results of the \code{pmartR::anova_test()} function
 #'
 #' @return A data.frame containing the p-values from the group comparisons.
 #'
 #' @author Bryan Stanfill
 #'
-group_comparison_anova <- function(groupData,comparisons,anova_results_full){
+group_comparison_anova <- function(groupData, comparisons, anova_results_full){
   
   #The group means include the word "Group" in them so that is what will be passed
   #to the group_comparison(...) and fold_change(...) functions along with estimated variance
@@ -1195,6 +1196,7 @@ paired_test <- function (data, bio_ids, cutoff, parallel) {
 #' even do this test.  See Webb-Robertson et al. (2010) for more.
 #'
 #' @param omicsData A pmartR data object of any class
+#' @param groupData `data.frame` that assigns sample names to groups 
 #' @param comparisons `data.frame` with columns for "Control" and "Test"
 #'   containing the different comparisons of interest. Comparisons will be made
 #'   between the Test and the corresponding Control  If left NULL, then all
@@ -1210,6 +1212,8 @@ paired_test <- function (data, bio_ids, cutoff, parallel) {
 #'   peptides are considered differentially expressed. Defaults to 0.05
 #' @param covariates A character vector with no more than two variable names
 #'   that will be used as covariates in the IMD-ANOVA analysis.
+#' @param paired A logical value that determines whether paired data should be
+#'   accounted for
 #' @param parallel A logical value indicating whether or not to use a
 #'   "doParallel" loop when running the G-Test with covariates. The default is
 #'   TRUE.
@@ -1234,8 +1238,9 @@ paired_test <- function (data, bio_ids, cutoff, parallel) {
 #' identification of significant peptides from MS-based proteomics data."
 #' Journal of proteome research 9.11 (2010): 5748-5756.
 #'
-imd_test <- function (omicsData, groupData, comparisons, pval_adjust_multcomp, pval_adjust_fdr,
-                      pval_thresh, covariates, paired, parallel) {
+imd_test <- function (omicsData, groupData, comparisons, pval_adjust_multcomp, 
+                      pval_adjust_fdr, pval_thresh, covariates, paired,
+                      parallel = TRUE) {
   
   #Catch if number of groups is too small
   k <- length(unique(groupData$Group))
@@ -1519,7 +1524,7 @@ group_comparison_imd <- function(groupData,comparisons,observed,absent){
 #
 # @Author Evan A Martin
 imd_cov <- function (data, groupData, fdata, cmat,
-                     covariates, paired, parallel) {
+                     covariates, paired, parallel = TRUE) {
 
   # Create an object that will correctly subset the anova(glm()) output given
   # the number of covariates present.

@@ -50,7 +50,7 @@
 #' }
 #' 
 #Function to fit the survival model
-fit_surv <- function(omicsData,...){
+fit_surv <- function(omicsData){
   
   if(!requireNamespace("survival", quietly = TRUE)){
     stop("Please install the 'survival' package.")  

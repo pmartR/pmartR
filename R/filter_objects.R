@@ -7,11 +7,7 @@
 #'   'lipidData', 'nmrData', or 'seqData', created by \code{\link{as.pepData}},
 #'   \code{\link{as.proData}}, \code{\link{as.metabData}},
 #'   \code{\link{as.lipidData}}, \code{\link{as.nmrData}}, or \code{\link{as.seqData}}, respectively.
-#' @param min_num integer value specifying the minimum number of times each
-#'   biomolecule must be observed across all samples. Default value is 2 (i.e.
-#'   biomolecules seen in just 1 sample or in no samples will be removed once
-#'   the filter is applied).
-#' @param use_group logical indicator for whether to utilize group information
+#' @param use_groups logical indicator for whether to utilize group information
 #'   from \code{\link{group_designation}} when calculating the molecule filter.
 #'   Defaults to FALSE. When group information is used to calculate the molecule
 #'   filter, the minimum number of observations is required within each group,
