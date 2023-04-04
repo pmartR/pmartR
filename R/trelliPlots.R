@@ -1554,12 +1554,8 @@ trelli_foldchange_boxplot <- function(trelliData,
       
       # Add include_points
       if (include_points) {
-        if (!is.null(p_value_test) && p_value_thresh != 0) {
-          boxplot <- boxplot + ggplot2::geom_jitter(ggplot2::aes(shape = Significance), height = 0, width = 0.25) +
-            ggplot2::scale_shape_manual(values = structure(c(17, 16), .Names = c(attr(DF, "LessThan"), attr(DF, "GreaterThan"))))
-        } else {
-          boxplot <- boxplot + ggplot2::geom_jitter(height = 0, width = 0.25)
-        }
+        boxplot <- boxplot + ggplot2::geom_jitter(ggplot2::aes(shape = Significance), height = 0, width = 0.25) +
+          ggplot2::scale_shape_manual(values = structure(c(17, 16), .Names = c(attr(DF, "LessThan"), attr(DF, "GreaterThan"))))
       }
       
     } else {
