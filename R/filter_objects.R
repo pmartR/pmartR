@@ -1231,10 +1231,11 @@ run_skewness <- function(data_only){
 #'   or \code{\link{as.lipidData}}, respectively.
 #' @param mintR_groupDF data.frame created by \code{\link{group_designation}}
 #'   with columns for sample.id and group.
-#' @param use_singletons logical indicator of whether to include singleton
-#'   groups or not; defaults to FALSE. If FALSE, rmd_filter results are returned
-#'   only for samples in groups of size greater than 1. This is a pass-through
-#'   argument from \code{\link{rmd_filter}}.
+#' @param ignore_singleton_groups logical indicator of whether to remove
+#'   singleton groups or not; defaults to TRUE. A singleton group is a group
+#'   consisting of just a single sample. If TRUE, rmd_filter results are
+#'   returned only for samples in groups of size greater than 1. This is used
+#'   when calculating the correlation.
 #'
 #' @details Correlation calculations use only complete pairwise observations.
 #'

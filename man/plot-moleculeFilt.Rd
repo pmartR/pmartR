@@ -82,6 +82,8 @@ palette to use. For a list of available options see the details section in
 
 \item{display_count}{logical value. Indicates whether the missing value counts by
 sample will be displayed on the bar plot. The default is TRUE.}
+
+\item{...}{further arguments passed to or from other methods.}
 }
 \value{
 ggplot2 plot object if interactive is FALSE, or plotly plot object if

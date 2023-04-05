@@ -7,13 +7,13 @@
 report_dataRes(dataRes, minmax = FALSE, digits = 2)
 }
 \arguments{
+\item{dataRes}{an object of the class 'dataRes', created by
+\code{\link{edata_summary}}.}
+
 \item{minmax}{logical specifying whether or not to include minimum and
 maximum data in the returned data frame. Defaults to FALSE.}
 
 \item{digits}{integer indicating the number of decimal places to round}
-
-\item{statRes}{an object of the class 'dataRes', created by
-\code{\link{edata_summary}}.}
 }
 \value{
 prints a data frame

@@ -1,6 +1,8 @@
 #' print.pepData
 #' 
 #' For printing an S3 object of type 'pepData'
+#' @param x An object of type 'pepData'
+#' @param ...  further arguments passed to or from other methods
 #' 
 #'@rdname print-pepData
 #'@export
@@ -91,6 +93,8 @@ print.pepData <- function(x, ...){
 #' print.metabData
 #' 
 #' For printing an S3 object of type 'metabData'
+#' @param x An object of type 'metabData'
+#' @param ...  further arguments passed to or from other methods
 #' 
 #'@rdname print-metabData
 #'@export
@@ -181,6 +185,8 @@ print.metabData <- function(x, ...){
 #' print.proData
 #' 
 #' For printing an S3 object of type 'proData'
+#' @param x An object of type 'proData'
+#' @param ...  further arguments passed to or from other methods
 #' 
 #'@rdname print-proData
 #'@export
@@ -271,6 +277,8 @@ print.proData <- function(x, ...){
 #' print.lipidData
 #' 
 #' For printing an S3 object of type 'lipidData'
+#' @param x An object of type 'lipidData'
+#' @param ...  further arguments passed to or from other methods
 #' 
 #'@rdname print-lipidData
 #'@export
@@ -361,6 +369,8 @@ print.lipidData <- function(x, ...){
 #' print.seqData
 #' 
 #' For printing an S3 object of type 'seqData'
+#' @param x An object of type 'seqData'
+#' @param ...  further arguments passed to or from other methods
 #' 
 #'@rdname print-seqData
 #'@export
@@ -452,9 +462,11 @@ print.seqData <- function(x, ...){
 #' print.dataRes
 #' 
 #' For printing an S3 object of class 'dataRes'
-#' 
-#'@rdname print-dataRes
-#'@export
+#' @param x An object of class 'dataRes'
+#' @param ...  further arguments passed to or from other methods
+#'
+#' @rdname print-dataRes
+#' @export
 #'
 print.dataRes <- function(x, ...){
 
@@ -717,6 +729,8 @@ print.dataRes <- function(x, ...){
 #' print.normRes
 #' 
 #' For printing an S3 object of type 'normRes'
+#' @param x An object of type 'normRes'
+#' @param ...  further arguments passed to or from other methods
 #' 
 #'@rdname print-normRes
 #'@export

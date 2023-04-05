@@ -17,6 +17,9 @@ probability/frequency of a zero signature}
 
 \item{max_proteoforms}{a numeric value corresponding to the maximum threshold
 for the number of possible proteoforms}
+
+\item{parallel}{a logical indicator of whether the calculation will be
+parallelized}
 }
 \value{
 a list of data frames, one for each unique protein. The data frames

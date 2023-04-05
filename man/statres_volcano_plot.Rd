@@ -18,7 +18,7 @@ statres_volcano_plot(
 )
 }
 \arguments{
-\item{volcano}{data frame produced by \link{pmartR::make_volcano_plot_df}}
+\item{volcano}{data frame produced by \link{pmartR:::make_volcano_plot_df}}
 
 \item{data_scale}{One of c("log2","log","log10"), for labeling purposes.}
 

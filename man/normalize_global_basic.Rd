@@ -7,13 +7,13 @@
 normalize_global_basic(edata, norm_fn)
 }
 \arguments{
-\item{norm_fn}{character string indicating the normalization function to use
-for normalization. See details for the current offerings.}
-
-\item{e_data}{a \eqn{p \times n + 1} data.frame, where \eqn{p} is the number
+\item{edata}{a \eqn{p \times n + 1} data.frame, where \eqn{p} is the number
 of peptides, lipids, or metabolites and \eqn{n} is the number of samples.
 Each row corresponds to data for a peptide, protein, lipid, or metabolite,
 with a column giving the identifer name.}
+
+\item{norm_fn}{character string indicating the normalization function to use
+for normalization. See details for the current offerings.}
 }
 \value{
 A list containing the location and scale parameters for normalizing

@@ -15,6 +15,8 @@ spans_procedure(
   nonsig_thresh = 0.5,
   min_nonsig = 20,
   min_sig = 20,
+  max_nonsig = NULL,
+  max_sig = NULL,
   ...
 )
 }
@@ -58,6 +60,16 @@ significant biomolecules identified in step 0 of SPANS in order to proceed.
 sig_thresh will be adjusted to the minimum value that gives this many
 biomolecules.}
 
+\item{max_nonsig}{integer value specifying the maximum number of
+non-significant biomolecules identified in step 0 if SPANS in order to 
+proceed.  Excesses of non-significant biomolecules will be randomly sampled
+down to these values.}
+
+\item{max_sig}{integer value specifying the maximum number of
+highly significant biomolecules identified in step 0 if SPANS in order to
+proceed.  Excesses of highly significant biomolecules will be randomly 
+sampled down to these values.}
+
 \item{...}{Additional arguments \tabular{ll}{ \code{location_thresh,
 scale_thresh} The minimum p-value resulting from a Kruskal-Wallis test on
 the location and scale parameters resulting from a normalization method in
@@ -67,11 +79,6 @@ procedure steps to console. Defaults to TRUE.\cr \code{parallel} Logical
 specifying whether to use a parallel backend.  Depending on the size of
 your data, setting this to FALSE can cause the algorithm to be very slow.
 Defaults to TRUE. }}
-
-\item{max_sig/max_nonsig}{integer value specifying the maximum number of
-highly significant/non-significant biomolecules identified in step 0 if
-SPANS in order to proceed.  Excesses of highly significant/non-significant
-biomolecules will be randomly sampled down to these values.}
 }
 \value{
 An object of class 'SPANSRes', which is a dataframe containing

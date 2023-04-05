@@ -1237,6 +1237,8 @@ paired_test <- function (data, bio_ids, cutoff, parallel) {
 #' analyses of peptide intensities and peptide occurrences improves
 #' identification of significant peptides from MS-based proteomics data."
 #' Journal of proteome research 9.11 (2010): 5748-5756.
+#' 
+#' @importFrom stats p.adjust
 #'
 imd_test <- function (omicsData, groupData, comparisons, pval_adjust_multcomp, 
                       pval_adjust_fdr, pval_thresh, covariates, paired,

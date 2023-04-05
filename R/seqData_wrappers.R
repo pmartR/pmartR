@@ -60,6 +60,7 @@
 #' deseq_results <- diffexp_seq(omicsData = myseqData, method = "DESeq2")
 #' voom_results <- diffexp_seq(omicsData = myseqData, method = "voom")
 #' }
+#' @importFrom stats p.adjust.methods
 #' @export
 #' 
 diffexp_seq <- function(omicsData, method = "edgeR", p_adjust = "BH", 
@@ -692,8 +693,6 @@ edgeR_wrapper <- function(
 #' 
 #' @param omicsData an object of type 'seqData', created by
 #'   \code{\link{as.seqData}}
-#' @param method a character string of length one specifying which wrapper to
-#'   use. Can be 'edgeR', 'DESeq2', or 'limma-voom'
 #' @param p_adjust Character string for p-value correction method, refer to
 #'   ?p.adjust() for valid options
 #' @param comparisons `data.frame` with columns for "Control" and "Test"

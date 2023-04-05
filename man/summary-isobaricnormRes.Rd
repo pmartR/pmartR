@@ -8,7 +8,7 @@
 \method{summary}{isobaricnormRes}(object, ...)
 }
 \arguments{
-\item{isobaricnormRes_object}{object of type isobaricnormRes, created by
+\item{object}{object of type isobaricnormRes, created by
 \code{\link{normalize_isobaric}}}
 }
 \value{

@@ -6,6 +6,11 @@
 \usage{
 \method{print}{customFilterSummary}(x, ...)
 }
+\arguments{
+\item{x}{the custom filter summary to print}
+
+\item{...}{further arguments passed to or from other methods}
+}
 \description{
 Print method for summary of custom filter
 }

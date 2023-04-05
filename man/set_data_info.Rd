@@ -30,6 +30,10 @@ set_data_info(
 \item{norm_info}{}
 
 \item{is_normalized}{}
+
+\item{batch_info}{}
+
+\item{is_bc}{}
 }
 \value{
 A list containing all the elements in the data_info attribute:

@@ -275,6 +275,7 @@ trelli_builder <- function(toBuild, cognostics, plotFUN, cogFUN, path, name, ...
 #'   is 1.
 #' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a
 #'   trelliscope) should be returned. Default is FALSE.
+#' @param ... Additional arguments to be passed on to the trelli builder
 #' 
 #' @examples
 #' \dontrun{
@@ -558,6 +559,7 @@ trelli_abundance_boxplot <- function(trelliData,
 #'   is 1.
 #' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a
 #'   trelliscope) should be returned. Default is FALSE.
+#' @param ... Additional arguments to be passed on to the trelli builder
 #' 
 #' @examples
 #' \dontrun{
@@ -784,6 +786,7 @@ trelli_abundance_histogram <- function(trelliData,
 #'   is 1.
 #' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a
 #'   trelliscope) should be returned. Default is FALSE.
+#' @param ... Additional arguments to be passed on to the trelli builder
 #' 
 #' @examples
 #' \dontrun{
@@ -978,6 +981,7 @@ trelli_abundance_heatmap <- function(trelliData,
 #'   is 1.
 #' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a
 #'   trelliscope) should be returned. Default is FALSE.
+#' @param ... Additional arguments to be passed on to the trelli builder
 #'   
 #' @examples
 #' \dontrun{
@@ -1291,6 +1295,7 @@ determine_significance <- function(DF, p_value_test, p_value_thresh) {
 #'   is 1.
 #' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a
 #'   trelliscope) should be returned. Default is FALSE.
+#' @param ... Additional arguments to be passed on to the trelli builder
 #'   
 #' @examples
 #' \dontrun{
@@ -1478,6 +1483,7 @@ trelli_foldchange_bar <- function(trelliData,
 #'   is 1.
 #' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a
 #'   trelliscope) should be returned. Default is FALSE.
+#' @param ... Additional arguments to be passed on to the trelli builder
 #'   
 #' @examples
 #' \dontrun{ 
@@ -1683,6 +1689,7 @@ trelli_foldchange_boxplot <- function(trelliData,
 #'   is 1.
 #' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a
 #'   trelliscope) should be returned. Default is FALSE.
+#' @param ... Additional arguments to be passed on to the trelli builder
 #'   
 #' @examples
 #' \dontrun{ 
@@ -1911,6 +1918,7 @@ trelli_foldchange_volcano <- function(trelliData,
 #'   is 1.
 #' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a
 #'   trelliscope) should be returned. Default is FALSE.
+#' @param ... Additional arguments to be passed on to the trelli builder
 #' 
 #' @examples
 #' \dontrun{ 

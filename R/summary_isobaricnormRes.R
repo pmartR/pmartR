@@ -2,7 +2,7 @@
 #' 
 #' For creating a summary of an S3 object of type 'isobaricnormRes'
 #' 
-#' @param isobaricnormRes_object object of type isobaricnormRes, created by
+#' @param object object of type isobaricnormRes, created by
 #'   \code{\link{normalize_isobaric}}
 #'
 #' @return data frame object

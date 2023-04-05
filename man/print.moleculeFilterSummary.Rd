@@ -6,6 +6,11 @@
 \usage{
 \method{print}{moleculeFilterSummary}(x, ...)
 }
+\arguments{
+\item{x}{the moleculeFilt summary to print}
+
+\item{...}{further arguments passed to or from other methods}
+}
 \description{
 Print method for moleculeFilt S3 object
 }

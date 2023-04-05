@@ -8,14 +8,14 @@ get_comparisons(compObj)
 }
 \arguments{
 \item{compObj}{is an object with the comparison attribute; specifically
-objects of class 'statRes' and 'trellData' objects derived from 'statRes'
-objects in \code{\link{format_data}}}
+objects of class 'statRes' and 'trelliData' objects derived from 'statRes'
+objects in \code{\link{as.trelliData}}}
 }
 \value{
 returns a data frame with comparisons and their indices
 }
 \description{
-This function returns comparisons from statRes or trellData object
+This function returns comparisons from statRes or trelliData object
 }
 \examples{
 library(pmartRdata)

@@ -4,7 +4,7 @@
 \alias{fit_surv}
 \title{Basic survival analysis function}
 \usage{
-fit_surv(omicsData, ...)
+fit_surv(omicsData)
 }
 \arguments{
 \item{omicsData}{A pmartR data object of any class, which has a `group_df` attribute that is usually created by the `group_designation()` function}

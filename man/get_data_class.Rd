@@ -2,21 +2,21 @@
 % Please edit documentation in R/helper_fn.R
 \name{get_data_class}
 \alias{get_data_class}
-\title{Return data_class of statRes or trellData object}
+\title{Return data_class of statRes or trelliData object}
 \usage{
 get_data_class(dcObj)
 }
 \arguments{
-\item{dcObj}{an object of class 'statRes' or 'trellData'}
+\item{dcObj}{an object of class 'statRes' or 'trelliData'}
 }
 \value{
-returns the data_class attribute from a 'statRes' or 'trellData'
+returns the data_class attribute from a 'statRes' or 'trelliData'
   object
 }
 \description{
-This function returns data_class attribute from statRes or trellData object,
+This function returns data_class attribute from statRes or trelliData object,
 inherited from the omicsData used in \code{\link{imd_anova}} or
-\code{\link{format_data}}
+\code{\link{as.trelliData}}
 }
 \examples{
 library(pmartRdata)

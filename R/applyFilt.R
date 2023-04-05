@@ -270,8 +270,8 @@ applyFilt.moleculeFilt <- function(filter_object, omicsData, min_num=2, ...) {
       covariates = names(attr(get_group_DF(omicsData),
                               "covariates"))[-1],
       batch_id = names(attr(get_group_DF(omicsData),"batch_id"))[-1],
-      time_course = attr(get_group_DF(omicsData),
-                         "time_course"),
+      # time_course = attr(get_group_DF(omicsData),
+      #                    "time_course"),
       pair_id = attr(get_group_DF(omicsData), "pair_id"),
       pair_group = attr(get_group_DF(omicsData), "pair_group"),
       pair_denom = attr(get_group_DF(omicsData), "pair_denom")
@@ -407,8 +407,8 @@ applyFilt.totalCountFilt <- function(filter_object, omicsData, min_count, ...) {
                           "main_effects"),
       covariates = names(attr(get_group_DF(omicsData),
                               "covariates"))[-1],
-      time_course = attr(get_group_DF(omicsData),
-                         "time_course")
+      # time_course = attr(get_group_DF(omicsData),
+      #                   "time_course")
     )
     
   } else {
@@ -581,8 +581,8 @@ applyFilt.RNAFilt <- function(filter_object,
                           "main_effects"),
       covariates = names(attr(get_group_DF(omicsData),
                               "covariates"))[-1],
-      time_course = attr(get_group_DF(omicsData),
-                         "time_course")
+      # time_course = attr(get_group_DF(omicsData),
+      #                   "time_course")
     )
     
   } else {
@@ -734,8 +734,8 @@ applyFilt.cvFilt <- function (filter_object, omicsData, cv_threshold = 150, ...)
       covariates = names(attr(get_group_DF(omicsData),
                               "covariates"))[-1],
       batch_id = names(attr(get_group_DF(omicsData),"batch_id"))[-1],
-      time_course = attr(get_group_DF(omicsData),
-                         "time_course"),
+      # time_course = attr(get_group_DF(omicsData),
+      #                    "time_course"),
       pair_id = attr(get_group_DF(omicsData), "pair_id"),
       pair_group = attr(get_group_DF(omicsData), "pair_group"),
       pair_denom = attr(get_group_DF(omicsData), "pair_denom")
@@ -946,8 +946,8 @@ applyFilt.rmdFilt <- function (filter_object,
       covariates = names(attr(get_group_DF(omicsData),
                               "covariates"))[-1],
       batch_id = names(attr(get_group_DF(omicsData),"batch_id"))[-1],
-      time_course = attr(get_group_DF(omicsData),
-                         "time_course"),
+      # time_course = attr(get_group_DF(omicsData),
+      #                    "time_course"),
       pair_id = attr(get_group_DF(omicsData), "pair_id"),
       pair_group = attr(get_group_DF(omicsData), "pair_group"),
       pair_denom = attr(get_group_DF(omicsData), "pair_denom")
@@ -1215,8 +1215,8 @@ applyFilt.proteomicsFilt <- function (filter_object,
       covariates = names(attr(get_group_DF(omicsData),
                               "covariates"))[-1],
       batch_id = names(attr(get_group_DF(omicsData),"batch_id"))[-1],
-      time_course = attr(get_group_DF(omicsData),
-                         "time_course"),
+      # time_course = attr(get_group_DF(omicsData),
+      #                    "time_course"),
       pair_id = attr(get_group_DF(omicsData), "pair_id"),
       pair_group = attr(get_group_DF(omicsData), "pair_group"),
       pair_denom = attr(get_group_DF(omicsData), "pair_denom")
@@ -1686,8 +1686,8 @@ applyFilt.imdanovaFilt <- function (filter_object,
       covariates = names(attr(get_group_DF(omicsData),
                               "covariates"))[-1],
       batch_id = names(attr(get_group_DF(omicsData),"batch_id"))[-1],
-      time_course = attr(get_group_DF(omicsData),
-                         "time_course"),
+      # time_course = attr(get_group_DF(omicsData),
+      #                    "time_course"),
       pair_id = attr(get_group_DF(omicsData), "pair_id"),
       pair_group = attr(get_group_DF(omicsData), "pair_group"),
       pair_denom = attr(get_group_DF(omicsData), "pair_denom")
@@ -1941,8 +1941,8 @@ applyFilt.customFilt <- function (filter_object, omicsData, ...) {
       covariates = names(attr(get_group_DF(omicsData),
                               "covariates"))[-1],
       batch_id = names(attr(get_group_DF(omicsData),"batch_id"))[-1],
-      time_course = attr(get_group_DF(omicsData),
-                         "time_course"),
+      # time_course = attr(get_group_DF(omicsData),
+      #                    "time_course"),
       pair_id = attr(get_group_DF(omicsData), "pair_id"),
       pair_group = attr(get_group_DF(omicsData), "pair_group"),
       pair_denom = attr(get_group_DF(omicsData), "pair_denom")

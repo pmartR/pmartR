@@ -50,6 +50,8 @@ is 1.}
 
 \item{single_plot}{A TRUE/FALSE to indicate whether 1 plot (not a
 trelliscope) should be returned. Default is FALSE.}
+
+\item{...}{Additional arguments to be passed on to the trelli builder}
 }
 \description{
 Specify a boxplot design and cognostics for the abundance

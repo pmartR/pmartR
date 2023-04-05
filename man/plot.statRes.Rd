@@ -113,7 +113,7 @@ axis. defaults to TRUE for seqData statistics and FALSE for all others.}
 \item{free_y_axis}{Logical. If TRUE the y axis for each bar plot can have its
 own range. The default is FALSE.}
 
-\item{top_n}{numeric for heatmaps; defaults to NULL.}
+\item{...}{further arguments passed to or from other methods.}
 }
 \value{
 ggplot2 plot object if interactive is FALSE, or plotly plot object if

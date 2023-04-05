@@ -8,6 +8,8 @@
 }
 \arguments{
 \item{x}{An object of class customFilt.}
+
+\item{...}{further arguments passed to or from other methods.}
 }
 \description{
 Currently plotting a customFilt object is not supported

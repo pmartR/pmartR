@@ -131,6 +131,8 @@ be flipped. The default is FALSE.}
 
 \item{use_VizSampNames}{logical value. Indicates whether to use custom sample
 names. The default is FALSE.}
+
+\item{...}{further arguments passed to or from other methods.}
 }
 \value{
 ggplot2 plot object if interactive is FALSE, or plotly plot object if

@@ -7,9 +7,9 @@
 set_meta_info(e_meta, emeta_cname)
 }
 \arguments{
-\item{emeta_cname}{}
+\item{e_meta}{}
 
-\item{e_data}{}
+\item{emeta_cname}{}
 }
 \value{
 A list containing all the elements in the meta_info attribute:

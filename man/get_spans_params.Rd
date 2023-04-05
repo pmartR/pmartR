@@ -9,6 +9,10 @@ get_spans_params(SPANSRes_obj, sort_by_nmols = FALSE)
 \arguments{
 \item{SPANSRes_obj}{an object of the class SPANSRes obtained by calling
 \code{spans_procedure()}}
+
+\item{sort_by_nmols}{a logical indicator of whether to sort by number of 
+molecules used in the normalization (see \code{\link{spans_procedure}} for
+info about the 'mols_used_in_norm' column)}
 }
 \value{
 A list of lists, where there are multiple sublists only if there were

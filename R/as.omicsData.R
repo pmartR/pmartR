@@ -1816,7 +1816,7 @@ str_col <- function (edata,
 #'
 #' This function finds all instances of 0 in e_data and replaces them with NA.
 #'
-#' @param e_data A \eqn{p \times n + 1} data frame of expression data, where
+#' @param edata A \eqn{p \times n + 1} data frame of expression data, where
 #'        \eqn{p} is the number of xxx observed and \eqn{n} is the
 #'        number of samples.
 #'
@@ -1891,7 +1891,7 @@ replace_zeros <- function(edata,
 #'
 #' This function finds all instances of NA in e_data and replaces them with 0.
 #'
-#' @param e_data A \eqn{p \times n + 1} data frame of expression data, where
+#' @param edata A \eqn{p \times n + 1} data frame of expression data, where
 #'        \eqn{p} is the number of xxx observed and \eqn{n} is the
 #'        number of samples.
 #'

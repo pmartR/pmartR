@@ -77,6 +77,8 @@ summary.moleculeFilt <- function(object, min_num = NULL, ...){
 #' Molecule Filter Print Method
 #'
 #' Print method for moleculeFilt S3 object
+#' @param x the moleculeFilt summary to print
+#' @param ... further arguments passed to or from other methods
 #' 
 #' @export
 #' @name print.moleculeFilterSummary
@@ -230,6 +232,8 @@ summary.RNAFilt <- function(object,
 #' RNA Filter Print Method
 #' 
 #' Print method for summary of RNAFilt
+#' @param x the RNAFilt summary to print
+#' @param ... further arguments passed to or from other methods
 #' 
 #' @export
 #' @name print.RNAFiltSummary
@@ -327,6 +331,8 @@ summary.totalCountFilt <- function(object, min_count = NULL, ...){
 #' Total Count Filter Print Method
 #' 
 #' Print method for summary of Total Count filter
+#' @param x the Total Count filter summary to print
+#' @param ... further arguments passed to or from other methods
 #' 
 #' @export
 #' @name print.totalCountFiltSummary
@@ -463,6 +469,8 @@ summary.proteomicsFilt <- function(object, min_num_peps=NULL, degen_peps=FALSE,
 #' Proteomics Filter Print Method
 #'
 #' Print method for summary of proteomics filter
+#' @param x the proteomics filter summary to print
+#' @param ... further arguments passed to or from other methods
 #' 
 #' @export
 #' @name print.proteomicsFilterSummary
@@ -804,6 +812,8 @@ summary.imdanovaFilt <- function(object, min_nonmiss_anova = NULL,
 #' IMD-ANOVA Filter Print Method
 #' 
 #' Print method for summary of imdanova filter
+#' @param x the imdanova filter summary to print
+#' @param ... further arguments passed to or from other methods
 #' 
 #' @export
 #' @name print.imdanovaFilterSummary
@@ -926,6 +936,8 @@ summary.rmdFilt <- function(object, pvalue_threshold = NULL, ...){
 #' RMD Filter Print Method
 #' 
 #' Print method for summary of RMD filter
+#' @param x the RMD filter summary to print
+#' @param ... further arguments passed to or from other methods
 #' 
 #' @export
 #' @name print.rmdFilterSummary
@@ -1024,6 +1036,8 @@ summary.cvFilt <- function(object, cv_threshold = NULL, ...){
 #' CV Filter Print Method
 #'
 #' Print method for summary of CV filter
+#' @param x the CV filter summary to print
+#' @param ... further arguments passed to or from other methods
 #' 
 #' @export
 #' @name print.cvSummary
@@ -1208,6 +1222,8 @@ summary.customFilt <- function(object, ...) {
 #' Custom Filter Print Method
 #' 
 #' Print method for summary of custom filter
+#' @param x the custom filter summary to print
+#' @param ... further arguments passed to or from other methods
 #'
 #' @export
 #' @name print.customFilterSummary

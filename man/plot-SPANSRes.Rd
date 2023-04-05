@@ -24,7 +24,7 @@
 }
 \arguments{
 \item{x}{an object of the class 'SPANSRes', created by
-\code{\link{spans_procedure()}}}
+\code{\link{spans_procedure}}}
 
 \item{interactive}{logical value. If TRUE produces an interactive plot.}
 
@@ -59,6 +59,8 @@ low values.}
 high values}
 
 \item{bw_theme}{logical value. If TRUE uses the ggplot2 black and white theme.}
+
+\item{...}{further arguments passed to or from other methods.}
 }
 \value{
 ggplot2 plot object if interactive is FALSE, or plotly plot object if

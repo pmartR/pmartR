@@ -4,7 +4,7 @@
 \alias{plot_km}
 \title{Basic survival analysis plot}
 \usage{
-plot_km(omicsData, ...)
+plot_km(omicsData)
 }
 \arguments{
 \item{omicsData}{A pmartR data object of any class, which has a `group_df` attribute that is usually created by the `group_designation()` function}

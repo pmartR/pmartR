@@ -1,6 +1,8 @@
 #' print.moleculeFilt
 #' 
 #' For printing an S3 object of type 'moleculeFilt'
+#' @param x An object of type 'moleculeFilt'
+#' @param ...  further arguments passed to or from other methods
 #' 
 #' @rdname print-moleculeFilt
 #' @export
@@ -25,6 +27,8 @@ print.moleculeFilt<- function(x, ...) {
 #' print.totalCountFilt
 #' 
 #' For printing an S3 object of type 'totalCountFilt'
+#' @param x An object of type 'totalCountFilt'
+#' @param ...  further arguments passed to or from other methods
 #' 
 #' @rdname print-totalCountFilt
 #' @export
@@ -49,6 +53,8 @@ print.totalCountFilt <- function(x, ...) {
 #' print.RNAFilt
 #' 
 #' For printing an S3 object of type 'RNAFilt'
+#' @param x An object of type 'RNAFilt'
+#' @param ...  further arguments passed to or from other methods
 #' 
 #' @rdname print-RNAFilt
 #' @export
@@ -73,6 +79,8 @@ print.RNAFilt <- function(x, ...) {
 #' print.proteomicsFilt
 #' 
 #' For printing an S3 object of type 'proteomicsFilt'
+#' @param x An object of type 'proteomicsFilt'
+#' @param ...  further arguments passed to or from other methods
 #' 
 #' @rdname print-proteomicsFilt
 #' @export
@@ -110,6 +118,8 @@ print.proteomicsFilt<- function(x, ...) {
 #' print.imdanovaFilt
 #' 
 #' For printing an S3 object of type 'imdanovaFilt'
+#' @param x An object of type 'imdanovaFilt'
+#' @param ...  further arguments passed to or from other methods
 #' 
 #' @rdname print-imdanovaFilt
 #' @export
@@ -134,6 +144,8 @@ print.imdanovaFilt<- function(x, ...) {
 #' print.rmdFilt
 #' 
 #' For printing an S3 object of type 'rmdFilt'
+#' @param x An object of type 'rmdFilt'
+#' @param ...  further arguments passed to or from other methods
 #' 
 #' @rdname print-rmdFilt
 #' @export
@@ -160,6 +172,8 @@ print.rmdFilt<- function(x, ...) {
 #' print.cvFilt
 #' 
 #' For printing an S3 object of type 'cvFilt'
+#' @param x An object of type 'cvFilt'
+#' @param ...  further arguments passed to or from other methods
 #' 
 #' @rdname print-cvFilt
 #' @export
@@ -184,6 +198,8 @@ print.cvFilt<- function(x, ...) {
 #' print.customFilt
 #' 
 #' For printing an S3 object of type 'customFilt'
+#' @param x An object of type 'customFilt'
+#' @param ...  further arguments passed to or from other methods
 #' 
 #' @rdname print-customFilt
 #' @export

@@ -6,6 +6,11 @@
 \usage{
 \method{print}{pepData}(x, ...)
 }
+\arguments{
+\item{x}{An object of type 'pepData'}
+
+\item{...}{further arguments passed to or from other methods}
+}
 \description{
 For printing an S3 object of type 'pepData'
 }

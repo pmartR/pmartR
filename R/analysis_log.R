@@ -9,6 +9,7 @@
 #' result = analysis_log(metab_object)
 #'}
 #'
+#' @importFrom utils installed.packages
 #' @export
 #' 
 

@@ -26,6 +26,9 @@ existing group information to the new object. Defaults to FALSE.}
 \item{retain_filters}{Whether to retain filter information in the new object 
 (defaults to FALSE).}
 
+\item{drop_duplicate_emeta}{a logical indicator of whether duplicate molecule
+identifiers in e_meta should be dropped}
+
 \item{...}{Extra arguments, not one of 'omicsData', 'main_effects', or
 'covariates' to be passed to `pmartR::group_designation`.}
 }

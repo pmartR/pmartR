@@ -33,10 +33,14 @@
 #'   non-significant biomolecules identified in step 0 of SPANS in order to
 #'   proceed.  nonsig_thresh will be adjusted to the maximum value that gives
 #'   this many biomolecules.
-#' @param max_sig/max_nonsig integer value specifying the maximum number of
-#'   highly significant/non-significant biomolecules identified in step 0 if
-#'   SPANS in order to proceed.  Excesses of highly significant/non-significant
-#'   biomolecules will be randomly sampled down to these values.
+#' @param max_sig integer value specifying the maximum number of
+#'   highly significant biomolecules identified in step 0 if SPANS in order to
+#'   proceed.  Excesses of highly significant biomolecules will be randomly 
+#'   sampled down to these values.
+#' @param max_nonsig integer value specifying the maximum number of
+#'   non-significant biomolecules identified in step 0 if SPANS in order to 
+#'   proceed.  Excesses of non-significant biomolecules will be randomly sampled
+#'   down to these values.
 #'
 #' @param ... Additional arguments \tabular{ll}{ \code{location_thresh,
 #'   scale_thresh} The minimum p-value resulting from a Kruskal-Wallis test on
@@ -153,11 +157,13 @@ spans_procedure <- function(omicsData,
                             subset_fn = c("all", "los", "ppp", "rip", "ppp_rip"),
                             params = NULL, group = NULL, n_iter = 1000,
                             sig_thresh = 0.0001, nonsig_thresh = 0.5,
-                            min_nonsig = 20, min_sig = 20, ...){
+                            min_nonsig = 20, min_sig = 20, max_nonsig = NULL,
+                            max_sig = NULL, ...){
   .spans_procedure(omicsData, norm_fn = norm_fn, subset_fn = subset_fn,
                    params = params, group = group, n_iter = n_iter,
                    sig_thresh = sig_thresh, nonsig_thresh = nonsig_thresh,
-                   min_nonsig = min_nonsig, min_sig = min_sig, ...)
+                   min_nonsig = min_nonsig, min_sig = min_sig,
+                   max_sig = max_sig, max_nonsig = max_nonsig, ...)
 }
 
 .spans_procedure <- function(omicsData,

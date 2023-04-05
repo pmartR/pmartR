@@ -7,13 +7,13 @@
 set_filter(type, threshold, filtered, method)
 }
 \arguments{
+\item{type}{}
+
 \item{threshold}{}
 
 \item{filtered}{}
 
-\item{filter_type}{}
-
-\item{filter_method}{}
+\item{method}{}
 }
 \value{
 A list containing all the elements in the filters attribute:

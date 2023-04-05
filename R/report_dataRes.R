@@ -4,7 +4,7 @@
 #' displaying a combination of metrics. The six summarizing metrics include,
 #' mean, standard deviation, median, percent observed, minimum, and maximum.
 #'
-#' @param statRes an object of the class 'dataRes', created by
+#' @param dataRes an object of the class 'dataRes', created by
 #'   \code{\link{edata_summary}}.
 #' @param minmax logical specifying whether or not to include minimum and
 #'   maximum data in the returned data frame. Defaults to FALSE.

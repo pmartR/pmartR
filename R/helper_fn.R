@@ -68,11 +68,11 @@ get_data_info <- function (omicsData) {
 #' indicating whether the data have been normalized.
 #'
 #' @param omicsObject an object of the class 'pepData', 'proData', 'metabData',
-#'   'lipidData', 'nmrData', 'statRes', or 'trellData', usually created by
+#'   'lipidData', 'nmrData', 'statRes', or 'trelliData', usually created by
 #'   \code{\link{as.pepData}}, \code{\link{as.proData}},
 #'   \code{\link{as.metabData}}, \code{\link{as.lipidData}},
 #'   \code{\link{as.nmrData}}, \code{\link{imd_anova}}, or
-#'   \code{\link{format_data}} respectively.
+#'   \code{\link{as.trelliData}} respectively.
 #'
 #' @return A logical value indicating whether the data have been normalized.
 #'
@@ -83,9 +83,9 @@ get_data_norm <- function (omicsObject) {
   
   # check that omicsObject is of appropriate class #
   if(!inherits(omicsObject, c("pepData", "proData", "metabData", "lipidData",
-                              "nmrData", "statRes", "trellData", "seqData")))
+                              "nmrData", "statRes", "trelliData", "seqData")))
     stop (paste("omicsData must be of class 'pepData', 'proData', 'metabData',",
-                "'lipidData', 'nmrData', 'seqData', 'statRes', or 'trellData'",
+                "'lipidData', 'nmrData', 'seqData', 'statRes', or 'trelliData'",
                 sep = " "))
   
   return (attr(omicsObject, "data_info")$norm_info$is_normalized)
@@ -499,11 +499,11 @@ get_data_scale_orig <- function (omicsObject){
 #' original data scale (if \code{edata_transform} was used).
 #'
 #' @param omicsObject an object of the class 'pepData', 'proData', 'metabData',
-#'   'lipidData', 'nmrData', 'statRes', or 'trellData', usually created by
+#'   'lipidData', 'nmrData', 'statRes', or 'trelliData', usually created by
 #'   \code{\link{as.pepData}}, \code{\link{as.proData}},
 #'   \code{\link{as.metabData}}, \code{\link{as.lipidData}},
 #'   \code{\link{as.nmrData}}, \code{\link{imd_anova}}, or
-#'   \code{\link{format_data}} respectively.
+#'   \code{\link{as.trelliData}} respectively.
 #'
 #' @return a character string describing data scale
 #'
@@ -514,10 +514,10 @@ get_data_scale <- function (omicsObject) {
   
   # check that omicsObject is of appropriate class #
   if(!inherits(omicsObject, c("pepData", "proData", "metabData", "lipidData",
-                              "nmrData", "statRes", "trellData", 'seqData')))
+                              "nmrData", "statRes", "trelliData", 'seqData')))
     
     stop (paste("omicsData must be of class 'pepData', 'proData', 'metabData',",
-                "'lipidData', 'nmrData', 'seqData', 'statRes', or 'trellData'",
+                "'lipidData', 'nmrData', 'seqData', 'statRes', or 'trelliData'",
                 sep = " "))
   
   return(attr(omicsObject, "data_info")$data_scale)
@@ -530,11 +530,11 @@ get_data_scale <- function (omicsObject) {
 #' biomolecule IDs.
 #'
 #' @param omicsObject an object of the class 'pepData', 'proData', 'metabData',
-#'   'lipidData', 'nmrData', 'statRes', or 'trellData', usually created by
+#'   'lipidData', 'nmrData', 'statRes', or 'trelliData', usually created by
 #'   \code{\link{as.pepData}}, \code{\link{as.proData}},
 #'   \code{\link{as.metabData}}, \code{\link{as.lipidData}},
 #'   \code{\link{as.nmrData}}, \code{\link{imd_anova}}, or
-#'   \code{\link{format_data}} respectively.
+#'   \code{\link{as.trelliData}} respectively.
 #'
 #' @return a character string describing e_data cname
 #'
@@ -545,9 +545,9 @@ get_edata_cname <- function (omicsObject) {
   
   # check that omicsObject is of appropriate class #
   if(!inherits(omicsObject, c("pepData", "proData", "metabData", "lipidData",
-                              "nmrData", 'seqData', "statRes", "trellData")))
+                              "nmrData", 'seqData', "statRes", "trelliData")))
     stop (paste("omicsData must be of class 'pepData', 'proData', 'metabData',",
-                "'lipidData', 'nmrData', 'seqData', 'statRes', or 'trellData'",
+                "'lipidData', 'nmrData', 'seqData', 'statRes', or 'trelliData'",
                 sep = " "))
   
   return (attr(omicsObject, "cnames")$edata_cname)
@@ -560,11 +560,11 @@ get_edata_cname <- function (omicsObject) {
 #' names of the samples.
 #'
 #' @param omicsObject an object of the class 'pepData', 'proData', 'metabData',
-#'   'lipidData', 'nmrData', 'statRes', or 'trellData', usually created by
+#'   'lipidData', 'nmrData', 'statRes', or 'trelliData', usually created by
 #'   \code{\link{as.pepData}}, \code{\link{as.proData}},
 #'   \code{\link{as.metabData}}, \code{\link{as.lipidData}},
 #'   \code{\link{as.nmrData}}, \code{\link{imd_anova}}, or
-#'   \code{\link{format_data}} respectively.
+#'   \code{\link{as.trelliData}} respectively.
 #'
 #' @return a character string describing f_data cname
 #'
@@ -575,9 +575,9 @@ get_fdata_cname<- function (omicsObject) {
   
   # check that omicsObject is of appropriate class #
   if(!inherits(omicsObject, c("pepData", "proData", "metabData", "lipidData",
-                              "nmrData", 'seqData', "statRes", "trellData")))
+                              "nmrData", 'seqData', "statRes", "trelliData")))
     stop (paste("omicsData must be of class 'pepData', 'proData', 'metabData',",
-                "'lipidData', 'nmrData', 'seqData', 'statRes', or 'trellData'",
+                "'lipidData', 'nmrData', 'seqData', 'statRes', or 'trelliData'",
                 sep = " "))
   
   return (attr(omicsObject, "cnames")$fdata_cname)
@@ -590,11 +590,11 @@ get_fdata_cname<- function (omicsObject) {
 #' mapping variable IDs.
 #'
 #' @param omicsObject an object of the class 'pepData', 'proData', 'metabData',
-#'   'lipidData', 'nmrData', 'statRes', or 'trellData', usually created by
+#'   'lipidData', 'nmrData', 'statRes', or 'trelliData', usually created by
 #'   \code{\link{as.pepData}}, \code{\link{as.proData}},
 #'   \code{\link{as.metabData}}, \code{\link{as.lipidData}},
 #'   \code{\link{as.nmrData}}, \code{\link{imd_anova}}, or
-#'   \code{\link{format_data}} respectively.
+#'   \code{\link{as.trelliData}} respectively.
 #'
 #' @return a character string describing e_meta cname
 #'
@@ -605,9 +605,9 @@ get_emeta_cname <- function (omicsObject) {
   
   # check that omicsObject is of appropriate class #
   if(!inherits(omicsObject, c("pepData", "proData", "metabData", "lipidData",
-                              "nmrData", 'seqData', "statRes", "trellData")))
+                              "nmrData", 'seqData', "statRes", "trelliData")))
     stop (paste("omicsData must be of class 'pepData', 'proData', 'metabData',",
-                "'lipidData', 'nmrData', 'seqData', 'statRes', or 'trellData'",
+                "'lipidData', 'nmrData', 'seqData', 'statRes', or 'trelliData'",
                 sep = " "))
   
   if(is.null(omicsObject$e_meta) &&  inherits(omicsObject, "statRes"))
@@ -642,6 +642,10 @@ get_emeta_cname <- function (omicsObject) {
 #' @param norm_info
 #' 
 #' @param is_normalized
+#' 
+#' @param batch_info
+#' 
+#' @param is_bc
 #' 
 #' @return A list containing all the elements in the data_info attribute:
 #'        (list all attributes)
@@ -711,7 +715,7 @@ set_data_info <- function (e_data,
 
 #' Sets/updates the values in the meta_info attribute
 #' 
-#' @param e_data 
+#' @param e_meta 
 #' 
 #' @param emeta_cname
 #' 
@@ -824,13 +828,13 @@ set_nmr_info <- function (metabolite_name,
 #' object will be appended to the list in the filters attribute for an omicsData
 #' object.
 #' 
-#' @param filter_type
+#' @param type
 #' 
 #' @param threshold
 #' 
 #' @param filtered
 #' 
-#' @param filter_method
+#' @param method
 #' 
 #' @return A list containing all the elements in the filters attribute:
 #'         (list all attributes)
@@ -899,11 +903,11 @@ set_check_names <- function (omicsData, set_to = TRUE) {
 
 #' Return comparisons of statRes object
 #'
-#' This function returns comparisons from statRes or trellData object
+#' This function returns comparisons from statRes or trelliData object
 #'
 #' @param compObj is an object with the comparison attribute; specifically
-#'   objects of class 'statRes' and 'trellData' objects derived from 'statRes'
-#'   objects in \code{\link{format_data}}
+#'   objects of class 'statRes' and 'trelliData' objects derived from 'statRes'
+#'   objects in \code{\link{as.trelliData}}
 #' @return returns a data frame with comparisons and their indices
 #' @examples
 #' library(pmartRdata)
@@ -929,12 +933,12 @@ set_check_names <- function (omicsData, set_to = TRUE) {
 #' 
 get_comparisons<- function(compObj){
 
-  #check that compObj object is of 'statRes' or 'trellData' class
-  if(!inherits(compObj, c("statRes", "trellData")))
-    stop("object must be of class 'statRes' or 'trellData'")
+  #check that compObj object is of 'statRes' or 'trelliData' class
+  if(!inherits(compObj, c("statRes", "trelliData")))
+    stop("object must be of class 'statRes' or 'trelliData'")
   
-  #check that compObj object is of 'statRes' or 'trellData' class
-  if(inherits(compObj, "trellData") && is.null(attr(compObj, "comparisons"))) {
+  #check that compObj object is of 'statRes' or 'trelliData' class
+  if(inherits(compObj, "trelliData") && is.null(attr(compObj, "comparisons"))) {
 
     return (NULL)
 
@@ -953,15 +957,15 @@ get_comparisons<- function(compObj){
 
 }
 
-#' Return data_class of statRes or trellData object
+#' Return data_class of statRes or trelliData object
 #'
-#' This function returns data_class attribute from statRes or trellData object,
+#' This function returns data_class attribute from statRes or trelliData object,
 #' inherited from the omicsData used in \code{\link{imd_anova}} or
-#' \code{\link{format_data}}
+#' \code{\link{as.trelliData}}
 #'
-#' @param dcObj an object of class 'statRes' or 'trellData'
+#' @param dcObj an object of class 'statRes' or 'trelliData'
 #'
-#' @return returns the data_class attribute from a 'statRes' or 'trellData'
+#' @return returns the data_class attribute from a 'statRes' or 'trelliData'
 #'   object
 #'
 #' @examples
@@ -989,8 +993,8 @@ get_comparisons<- function(compObj){
 get_data_class<- function (dcObj) {
   
   #check that compObj object is of 'statRes' class
-  if(!inherits(dcObj, c("statRes", "trellData")))
-    stop("dcObj object must be of class 'statRes' or 'trellData'")
+  if(!inherits(dcObj, c("statRes", "trelliData")))
+    stop("dcObj object must be of class 'statRes' or 'trelliData'")
   
   return(attr(dcObj, "data_class"))
   
@@ -1001,11 +1005,11 @@ get_data_class<- function (dcObj) {
 #' This function returns a table with number of samples per group
 #'
 #' @param omicsObject an object of the class 'pepData', 'proData', 'metabData',
-#'   'lipidData', 'nmrData', 'statRes', or 'trellData', usually created by
+#'   'lipidData', 'nmrData', 'statRes', or 'trelliData', usually created by
 #'   \code{\link{as.pepData}}, \code{\link{as.proData}},
 #'   \code{\link{as.metabData}}, \code{\link{as.lipidData}},
 #'   \code{\link{as.nmrData}}, \code{\link{imd_anova}}, or
-#'   \code{\link{format_data}} respectively.
+#'   \code{\link{as.trelliData}} respectively.
 #'
 #' @return a table containing number of samples per group
 #'
@@ -1016,9 +1020,9 @@ get_group_table <- function (omicsObject) {
   
   # check that omicsObject is of appropriate class #
   if(!inherits(omicsObject, c("pepData", "proData", "metabData", "lipidData",
-                              "nmrData", "seqData", "statRes", "trellData")))
+                              "nmrData", "seqData", "statRes", "trelliData")))
     stop (paste("omicsData must be of class 'pepData', 'proData', 'metabData',",
-                "'lipidData', 'nmrData', 'seqData', 'statRes', or 'trellData'",
+                "'lipidData', 'nmrData', 'seqData', 'statRes', or 'trelliData'",
                 sep = " "))
 
   if(is.null(attr(omicsObject, "group_DF"))) {

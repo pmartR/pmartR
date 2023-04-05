@@ -6,6 +6,11 @@
 \usage{
 \method{print}{totalCountFiltSummary}(x, ...)
 }
+\arguments{
+\item{x}{the Total Count filter summary to print}
+
+\item{...}{further arguments passed to or from other methods}
+}
 \description{
 Print method for summary of Total Count filter
 }

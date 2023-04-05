@@ -6,6 +6,11 @@
 \usage{
 \method{print}{imdanovaFilt}(x, ...)
 }
+\arguments{
+\item{x}{An object of type 'imdanovaFilt'}
+
+\item{...}{further arguments passed to or from other methods}
+}
 \description{
 For printing an S3 object of type 'imdanovaFilt'
 }

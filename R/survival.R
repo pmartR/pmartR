@@ -94,6 +94,7 @@ fit_surv <- function(omicsData){
 #' surv_designation, and plot the resulting Kaplan-Meier curve.
 #' 
 #' @param omicsData A pmartR data object of any class, which has a `group_df` attribute that is usually created by the `group_designation()` function
+#' 
 #' @return a Kaplan-Meier curve
 #' 
 #' @examples 
@@ -107,10 +108,10 @@ fit_surv <- function(omicsData){
 #' attr(tcga_ovarian_pepdata_bp,"survDF") <- list(t_death = "survival_time",ind_death = "vital_status", covariates = "age_at_initial_pathologic_diagnosis")
 #' plot_km(omicsData = tcga_ovarian_pepdata_bp)
 #' }
-plot_km <- function(omicsData,...){
+plot_km <- function(omicsData){
   
 
-  sfit <- fit_surv(omicsData,...)
+  sfit <- fit_surv(omicsData)
   
   
   plot(sfit)

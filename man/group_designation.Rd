@@ -12,8 +12,7 @@ group_designation(
   pair_id = NULL,
   pair_group = NULL,
   pair_denom = NULL,
-  batch_id = NULL,
-  time_course = NULL
+  batch_id = NULL
 )
 }
 \arguments{

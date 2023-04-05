@@ -97,6 +97,8 @@ back-transform to original scale. 'upper' - For each column: scale column
 intensities by 75th quantile column intensities, then back-transform to
 original scale. For 'median' and 'upper' options, all zeros are converted
 to NAs.}
+
+\item{...}{further arguments passed to or from other methods.}
 }
 \value{
 ggplot2 plot object if interactive is FALSE, or plotly plot object if

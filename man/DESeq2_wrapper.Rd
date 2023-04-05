@@ -32,9 +32,6 @@ pairwise comparisons are executed.}
 significance threshold}
 
 \item{...}{additional arguments passed to function}
-
-\item{method}{a character string of length one specifying which wrapper to use. 
-Can be 'edgeR', 'DESeq2', or 'voom'}
 }
 \value{
 statRes object

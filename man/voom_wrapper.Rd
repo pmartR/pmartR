@@ -29,9 +29,6 @@ significance threshold}
 
 \item{...}{additional arguments passed to methods functions. Note, formatting
 option changes will interfere with wrapping functionality.}
-
-\item{method}{a character string of length one specifying which wrapper to
-use. Can be 'edgeR', 'DESeq2', or 'limma-voom'}
 }
 \value{
 statRes object
