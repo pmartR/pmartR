@@ -111,6 +111,8 @@ as.trelliData.edata <- function(e_data,
                                 is_normalized = FALSE,
                                 force_normalization = FALSE) {
   
+  edata <- e_data
+  
   # Initial checks -------------------------------------------------------------
   
   # Run the .is_edata check to confirm the file is an acceptable edata file
@@ -266,7 +268,7 @@ as.trelliData.edata <- function(e_data,
 #' @author David Degnan, Lisa Bramer
 #' 
 #' @export
-as.trelliData <- function(omicsData, statRes) {
+as.trelliData <- function(omicsData = NULL, statRes = NULL) {
   require_normalization <- TRUE
   
   # Initial checks--------------------------------------------------------------

@@ -54,11 +54,11 @@ example, an acceptable entry for 'normalize_global' would be
 list("subset_fn" = "all", "norm_fn" = "median", "apply_norm" = TRUE,
 "backtransform" = TRUE).}
 
-\item{is_normalized}{A boolean indicating whether the data is already
+\item{is_normalized}{A logical indicator of whether the data is already
 normalized (and will therefore skip the normalization step)}
 
-\item{force_normalization}{A boolean to force normalization that is not 
-required for both isobaric protein and NMR data}
+\item{force_normalization}{A logical indicator to force normalization that is
+not required for both isobaric protein and NMR data}
 }
 \description{
 The only acceptable input file type is a single edata file.

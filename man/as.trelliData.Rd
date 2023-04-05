@@ -5,7 +5,7 @@
 \title{Generate an object from omicsData and/or statRes objects to pass to
   trelliscope building functions}
 \usage{
-as.trelliData(omicsData, statRes)
+as.trelliData(omicsData = NULL, statRes = NULL)
 }
 \arguments{
 \item{omicsData}{an object of the class 'pepData', 'isobaricpepData',
