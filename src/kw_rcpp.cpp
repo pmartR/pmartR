@@ -8,13 +8,6 @@ are stored in another vector called rankvec. The ranks are used in the
 calculation of the Kruskall Wallis h statistic to then calculate the p-value of 
 that specific row.*/
 
-/*The fuction group_size takes one input, a vector of strings called group. This
-vector is an ordered character vector indicating what "group" factor level a 
-specific data element belongs to. This function makes a copy of group, called temp.
-Next a unique function is applied to temp, exposing the levels of the factor. 
-Next we iterate through temp and count how many elements belong to each level, 
-these counts are stored in gsize.*/
-
 /*The function calculate_kwh takes two inputs, a vector of ranks and a vector 
 of the number of non-NA values per group.This function implements the 
 mathematical formula for Kruskal Wallis test statistic. It returns a numeric 
@@ -24,8 +17,7 @@ value(p-value).*/
 and computes a p-value.*/
 
 /*The main function is the kwh function, it takes two inputs, an armadillo 
-matrix and a vector of strings called "group". The vector "group" is fed to
-the group_size function which will return a vector of group sizes. One row 
+matrix and a vector of strings called "group".  One row 
 of the armadillo matrix is stored in a vector named "cp". We iterate over
 "cp" and collect all non-NA values and store them in a vector of vectors
 called "groups". We iterate over "groups" and take the size of each group 
@@ -47,32 +39,6 @@ matrix is reached, all the p-values are stored in order in a list named
 // [[Rcpp::depends(RcppArmadillo)]]
 // [[Rcpp::depends(BH)]]
 using namespace Rcpp;
-
-std::vector<int> gp_size(std::vector<std::string> group)
-{
-  std::vector<std::string> temp;
-  temp = group;
-  
-  //std::sort(temp.begin(),temp.end());
-  
-  temp.erase( std::unique( temp.begin(), temp.end() ), temp.end() );
-  int tempsize = 0;
-  
-  tempsize = temp.size();
-  
-  std::vector<int> gsize(tempsize);
-  
-  for(unsigned int i = 0;i<group.size();i++)
-  {
-    for(unsigned int k=0;k<temp.size();k++)
-    {
-      if(group[i]==temp[k])
-        gsize[k]++;
-    }
-  }
-  
-  return gsize;
-}
 
 double calculate_kwh(std::vector <std::vector <double> > ranks, std::vector <double> nonmiss_sizes)
 {
