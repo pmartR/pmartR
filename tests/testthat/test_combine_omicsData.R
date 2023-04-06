@@ -5,7 +5,7 @@ obj12 <- obj1
 obj1 <- normalize_global(obj1, "all", "median", apply_norm = TRUE)
 
 fake_cov <- c(rep("A", 5), rep("B", 6))
-fake_cov2 <- c(rep(LETTERS[1:4],2), rep(LETTERS[5], 3))
+fake_cov2 <- c(rep(LETTERS[1:4], 2), rep(LETTERS[5], 3))
 obj1$f_data["cov"] <- fake_cov
 obj1$f_data['cov_2'] <- fake_cov2
 
@@ -24,14 +24,14 @@ obj4 <- obj3
 obj5 <- group_designation(obj5, c("Condition", "cov"), covariates = "cov_2")
 
 # Some fake edata ID's to make it unique
-obj2$e_data[,get_edata_cname(obj2)] <- paste0("obj2_", obj2$e_data[,get_edata_cname(obj2)])
-obj2$e_meta[,get_edata_cname(obj2)] <- paste0("obj2_", obj2$e_meta[,get_edata_cname(obj2)])
+obj2$e_data[, get_edata_cname(obj2)] <- paste0("obj2_", obj2$e_data[, get_edata_cname(obj2)])
+obj2$e_meta[, get_edata_cname(obj2)] <- paste0("obj2_", obj2$e_meta[, get_edata_cname(obj2)])
 
-obj4$e_data[,get_edata_cname(obj4)] <- paste0("obj4_", obj4$e_data[,get_edata_cname(obj4)])
-obj4$e_meta[,get_edata_cname(obj4)] <- paste0("obj4_", obj4$e_meta[,get_edata_cname(obj4)])
+obj4$e_data[, get_edata_cname(obj4)] <- paste0("obj4_", obj4$e_data[, get_edata_cname(obj4)])
+obj4$e_meta[, get_edata_cname(obj4)] <- paste0("obj4_", obj4$e_meta[, get_edata_cname(obj4)])
 
-obj1 <- applyFilt(molecule_filter(obj1),obj1, min_num = 2)
-obj2 <- applyFilt(cv_filter(obj2),obj2, cv_thresh = 60)
+obj1 <- applyFilt(molecule_filter(obj1), obj1, min_num = 2)
+obj2 <- applyFilt(cv_filter(obj2), obj2, cv_thresh = 60)
 
 suppressWarnings({
   combn1 <- combine_lipidData(obj1, obj2)
@@ -53,19 +53,25 @@ test_that("bad class errors", {
 
 test_that("pipeline errors", {
   suppressWarnings({
-    expect_error(combine_lipidData(edata_transform(obj1, "log10"), 
-                                   obj2), regexp = "Objects must be on the same scale")
-    expect_error(combine_lipidData(obj1, obj12), 
-                 regexp = "Both objects must have the same normalization status")
-    expect_error(combine_lipidData(obj1, normalize_global(obj12, "all", "median", apply_norm = TRUE), retain_groups = TRUE), 
-                 regexp = "Both objects must be grouped.")
+    expect_error(combine_lipidData(
+      edata_transform(obj1, "log10"),
+      obj2
+    ), regexp = "Objects must be on the same scale")
+    expect_error(combine_lipidData(obj1, obj12),
+      regexp = "Both objects must have the same normalization status"
+    )
+    expect_error(combine_lipidData(obj1, normalize_global(obj12, "all", "median", apply_norm = TRUE), retain_groups = TRUE),
+      regexp = "Both objects must be grouped."
+    )
   })
 })
 
 test_that("sample errors", {
   suppressWarnings({
-    expect_error(combine_lipidData(applyFilt(custom_filter(obj1, f_data_remove = "Mock2"), obj1), 
-                                   obj2), regexp = "Number of samples must be the same in both objects")
+    expect_error(combine_lipidData(
+      applyFilt(custom_filter(obj1, f_data_remove = "Mock2"), obj1),
+      obj2
+    ), regexp = "Number of samples must be the same in both objects")
   })
 })
 
@@ -89,23 +95,23 @@ test_that("attributes correctly stored", {
     is.null(attr(combn1, "group_DF")),
     length(attr(combn1, "filters")) == 0
   ))
-  
+
   expect_true(all(
     is.null(attr(combn7, "group_DF")),
     length(attr(combn7, "filters")) == 0
   ))
-  
+
   expect_true(all(
     is.null(attr(combn5, "group_DF")),
     length(attr(combn5, "filters")) == 0
   ))
-  
+
   # no filters, keep groups
   expect_true(all(
     !is.null(attr(combn2, "group_DF")),
     length(attr(combn2, "filters")) == 0
   ))
-  
+
   expect_true(all(
     !is.null(attr(combn2, "group_DF")),
     length(attr(combn2, "filters")) == 0
@@ -120,33 +126,32 @@ test_that("attributes correctly stored", {
     length(ftypes) == 2,
     all(ftypes == c("moleculeFilt", "cvFilt"))
   ))
-  
-  ftypes <- attr(combn6, "filters") %>% 
+
+  ftypes <- attr(combn6, "filters") %>%
     lapply(function(x) x$type)
-  
+
   expect_true(all(
     is.null(attr(combn6, "group_DF")),
     length(ftypes) == 1,
     all(ftypes == c("moleculeFilt"))
   ))
-  
-  ftypes <- attr(combn8, "filters") %>% 
+
+  ftypes <- attr(combn8, "filters") %>%
     lapply(function(x) x$type)
-  
+
   expect_true(all(
     is.null(attr(combn6, "group_DF")),
     length(ftypes) == 1,
     all(ftypes == c("cvFilt"))
   ))
-  
+
   # keep both filters and groups
-  ftypes <- attr(combn4, "filters") %>% 
+  ftypes <- attr(combn4, "filters") %>%
     lapply(function(x) x$type)
-  
+
   expect_true(all(
     !is.null(attr(combn4, "group_DF")),
     length(ftypes) == 2,
     all(ftypes == c("moleculeFilt", "cvFilt"))
   ))
 })
-

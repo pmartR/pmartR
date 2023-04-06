@@ -16,15 +16,15 @@ vignette: >
 ---
 
 ```{r global_options, include = FALSE}
-knitr::opts_chunk$set(warning=FALSE, fig.width = 8, fig.height = 6)
+knitr::opts_chunk$set(warning = FALSE, fig.width = 8, fig.height = 6)
 options(rmarkdown.html_vignette.check_title = FALSE)
 ```
 
 ```{r logo, out.width = "100px", echo=FALSE}
 knitr::include_graphics("pmartR_logo_final.jpg")
 
-knitr::opts_chunk$set(fig.width=8)
-knitr::opts_chunk$set(fig.height=6)
+knitr::opts_chunk$set(fig.width = 8)
+knitr::opts_chunk$set(fig.height = 6)
 
 library(pmartR)
 library(pmartRdata)
@@ -69,17 +69,18 @@ Since these are isobaric labeled (TMT) peptide data, we will create an `isobaric
 Log transforming the data prior to analysis is highly recommended, and `pmartR` supports log2, log10, and natural logarithm transformations. The `edata_transform()` function provides this capability. We can also use `edata_transform()` to transform the data back to the abundance scale if needed. Note that the scale of the data is stored and automatically updated in the `data_info$data_scale` attribute of the omicsData object.
 
 ```{r data1}
-mypep <- as.isobaricpepData(e_data = edata,
-                            f_data = fdata,
-                            e_meta = emeta,
-                            edata_cname = "Peptide",
-                            fdata_cname = "SampleID",
-                            emeta_cname = "Protein",
-                            data_scale = "abundance")
+mypep <- as.isobaricpepData(
+  e_data = edata,
+  f_data = fdata,
+  e_meta = emeta,
+  edata_cname = "Peptide",
+  fdata_cname = "SampleID",
+  emeta_cname = "Protein",
+  data_scale = "abundance"
+)
 
 # log2 transform the data
 mypep <- edata_transform(omicsData = mypep, data_scale = "log2")
-
 ```
 
 We can use the `summary` function to get basic summary information for our `isbaricpepData` object.
@@ -94,18 +95,20 @@ One of the first steps when analyzing labeled proteomics data is to normalize to
 
 ```{r data4}
 # Don't apply the normalization quite yet; can use summary() and plot() to view reference pool samples
-mypep_refpools <- normalize_isobaric(omicsData = mypep, 
-                                     exp_cname = "Plex",
-                                     apply_norm = FALSE,
-                                     refpool_cname = "Virus",
-                                     refpool_notation = "Pool")
+mypep_refpools <- normalize_isobaric(
+  omicsData = mypep,
+  exp_cname = "Plex",
+  apply_norm = FALSE,
+  refpool_cname = "Virus",
+  refpool_notation = "Pool"
+)
 ```
 
 We can use the `summary` and `plot` functions on our `isobaricnormRes` object, to make sure that there isn't anything concerning about these samples.
 
 ```{r}
-summary(mypep_refpools)                     
-  
+summary(mypep_refpools)
+
 plot(mypep_refpools)
 ```
 
@@ -113,11 +116,13 @@ When we're ready to actually perform the reference pool normalization, we can do
 
 ```{r}
 # Now apply the normalization; can use plot() to view the study samples after reference pool normalization
-mypep <- normalize_isobaric(omicsData = mypep, 
-                            exp_cname = "Plex",
-                            apply_norm = TRUE,
-                            refpool_cname = "Virus",
-                            refpool_notation = "Pool")
+mypep <- normalize_isobaric(
+  omicsData = mypep,
+  exp_cname = "Plex",
+  apply_norm = TRUE,
+  refpool_cname = "Virus",
+  refpool_notation = "Pool"
+)
 ```
 
 
@@ -167,7 +172,7 @@ Using the argument `degen_peps = TRUE`, we see from the `summary` that each pept
 ```{r proteomics_filter}
 myfilter <- proteomics_filter(mypep)
 summary(myfilter, degen_peps = TRUE)
-plot(myfilter, bw_theme=TRUE)
+plot(myfilter, bw_theme = TRUE)
 ```
 
 Using the argument `min_num_peps`, we can restrict our dataset to just those proteins with a minimum number of peptides mapping to them. A common threshold to use is 2, as this ensures that only proteins with at least 2 peptides mapping to them are retained. We can apply the proteomics filter using the `applyFilt` function.
@@ -290,7 +295,7 @@ myfilter <- rmd_filter(omicsData = mypep, metrics = c("Correlation", "Proportion
 plot(myfilter)
 
 summary(myfilter, pvalue_threshold = 0.0001)
-plot(myfilter, pvalue_threshold = 0.0001, bw_theme=TRUE)
+plot(myfilter, pvalue_threshold = 0.0001, bw_theme = TRUE)
 ```
 
 Using the output from the `summary()` function, we can explore the potential outliers identified to see which metrics are driving their "outlier-ness". Box plots for each metric are graphed, with the specified sample marked with an X.
@@ -301,13 +306,11 @@ Using the output from the `summary()` function, we can explore the potential out
 potential_outliers <- summary(myfilter, pvalue_threshold = 0.0001)$filtered_samples
 
 # loop over potential outliers to generate plots
-if(length(potential_outliers) > 0){
-  for(i in 1:length(potential_outliers)){
+if (length(potential_outliers) > 0) {
+  for (i in 1:length(potential_outliers)) {
     print(plot(myfilter, sampleID = potential_outliers[i]))
   }
 }
-
-
 ```
 
 StrainB_D3_R4 appears to have been flagged as a potential outlier primarily on the basis of its MAD relative to the other samples. StrainA_D3_R2 and StrainB_D3_R2 have similar profiles across the four metrics, with high amounts of missing data,  low correlations, and high MAD and skew.
@@ -351,9 +354,8 @@ We can generate numeric summaries of our data by either sample or molecule. The 
 ```{r edata_summary}
 edata_summary(mypep, by = "sample", groupvar = NULL)
 
-#edata_summary(norm_data, by = "molecule", groupvar = "Condition")
-#edata_summary(norm_data, by = "molecule", groupvar = NULL)
-
+# edata_summary(norm_data, by = "molecule", groupvar = "Condition")
+# edata_summary(norm_data, by = "molecule", groupvar = NULL)
 ```
 
 
@@ -395,12 +397,14 @@ Particularly when there are ties in the SPANS scores, it can be useful to see ho
 Similar to normalizing to the reference pool, we will first create a normRes object so we can see the effect of applying the specified normalization ahead of actually applying it to our data.
 
 ```{r}
-#readRDS("/vignettes/spans_result.RDS") 
+# readRDS("/vignettes/spans_result.RDS")
 
-mynorm <- normalize_global(omicsData = mypep, 
-                           subset_fn = "rip", params = list(rip = 0.25), 
-                           norm_fn = "median", 
-                           apply_norm = FALSE)
+mynorm <- normalize_global(
+  omicsData = mypep,
+  subset_fn = "rip", params = list(rip = 0.25),
+  norm_fn = "median",
+  apply_norm = FALSE
+)
 
 # plot(mynorm) # currently errors out
 ```
@@ -438,9 +442,11 @@ In the zrollup method, scaling is done similarly to the  z-score formula (except
 Here we utilize rrollup.
 
 ```{r protein_quant}
-mypro <- protein_quant(pepData = mypep, 
-                       method = "rrollup", 
-                       combine_fn = "median")
+mypro <- protein_quant(
+  pepData = mypep,
+  method = "rrollup",
+  combine_fn = "median"
+)
 
 plot(mypro, order_by = "Virus", color_by = "Virus")
 ```

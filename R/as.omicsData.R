@@ -26,7 +26,7 @@
 #' @param emeta_cname character string specifying the name of the column
 #'   containing the protein identifiers (or other mapping variable) in
 #'   \code{e_meta} (if applicable). Defaults to NULL. If \code{e_meta} is NULL,
-#'   then either do not specify \code{emeta_cname} or specify it as NULL. 
+#'   then either do not specify \code{emeta_cname} or specify it as NULL.
 #' @param fdata_cname character string specifying the name of the column
 #'   containing the sample identifiers in \code{f_data}.
 #' @param techrep_cname character string specifying the name of the column in
@@ -36,7 +36,7 @@
 #'   Defaults to NULL (no technical replicates).
 #'
 #' @param ... further arguments
-#' 
+#'
 #' @return Object of class isobaricpepData and pepData.
 #'
 #' @details The class 'isobaricpepData' is meant to deal with labeled peptide data
@@ -67,126 +67,138 @@
 #'  value is NULL. \cr } Computed values included in the \code{data_info}
 #'  attribute are as follows: \tabular{ll}{ num_edata \tab The number of unique
 #'  \code{edata_cname} entries.\cr \tab \cr num_miss_obs \tab The number of
-#'  missing observations.\cr \tab \cr num_zero_obs \tab For seqData only: The 
+#'  missing observations.\cr \tab \cr num_zero_obs \tab For seqData only: The
 #'  number of zero observations.\cr \tab \cr num_emeta \tab The number of unique
 #'  \code{emeta_cname} entries. \cr \tab \cr prop_missing \tab The proportion of
 #'  \code{e_data} values that are NA. \cr \tab \cr prop_zeros \tab For seqData
-#'  only: the proportion of zero counts observed in \code{e_data} values. \cr 
-#'  \tab \cr num_samps \tab The number of samples that make up the columns of 
-#'  \code{e_data}.\cr \tab \cr meta_info \tab A logical argument, specifying 
+#'  only: the proportion of zero counts observed in \code{e_data} values. \cr
+#'  \tab \cr num_samps \tab The number of samples that make up the columns of
+#'  \code{e_data}.\cr \tab \cr meta_info \tab A logical argument, specifying
 #'  whether \code{e_meta} is provided.\cr \tab \cr }
 #'
 #' @examples
 #' library(pmartRdata)
-#' mypep <- as.isobaricpepData(e_data = isobaric_edata,
-#'                             e_meta = isobaric_emeta,
-#'                             f_data = isobaric_fdata,
-#'                             edata_cname = "Peptide",
-#'                             fdata_cname = "SampleID",
-#'                             emeta_cname = "Protein")
+#' mypep <- as.isobaricpepData(
+#'   e_data = isobaric_edata,
+#'   e_meta = isobaric_emeta,
+#'   f_data = isobaric_fdata,
+#'   edata_cname = "Peptide",
+#'   fdata_cname = "SampleID",
+#'   emeta_cname = "Protein"
+#' )
 #'
 #' @author Lisa Bramer
 #' @seealso \code{\link{as.pepData}}
 #' @seealso \code{\link{normalize_isobaric}}
 #'
-#'@export
+#' @export
 #'
-as.isobaricpepData <- function (e_data, f_data, e_meta = NULL, edata_cname,
-                                fdata_cname, emeta_cname = NULL,
-                                techrep_cname = NULL, ...) {
-   .as.isobaricpepData(e_data, f_data, e_meta, edata_cname, fdata_cname,
-                      emeta_cname, techrep_cname, ...)
+as.isobaricpepData <- function(e_data, f_data, e_meta = NULL, edata_cname,
+                               fdata_cname, emeta_cname = NULL,
+                               techrep_cname = NULL, ...) {
+  .as.isobaricpepData(
+    e_data, f_data, e_meta, edata_cname, fdata_cname,
+    emeta_cname, techrep_cname, ...
+  )
 }
 
 ## peptide data ##
-.as.isobaricpepData <- function (e_data, f_data, e_meta = NULL, edata_cname,
-                                 fdata_cname, emeta_cname = NULL,
-                                 techrep_cname = NULL,
-                                 data_scale = "abundance",
-                                 is_normalized = FALSE, isobaric_norm = FALSE,
-                                 norm_info = list(),  data_types = NULL,
-                                 is_bc = FALSE, batch_info = list(),
-                                 check.names = NULL) {
-  
+.as.isobaricpepData <- function(e_data, f_data, e_meta = NULL, edata_cname,
+                                fdata_cname, emeta_cname = NULL,
+                                techrep_cname = NULL,
+                                data_scale = "abundance",
+                                is_normalized = FALSE, isobaric_norm = FALSE,
+                                norm_info = list(), data_types = NULL,
+                                is_bc = FALSE, batch_info = list(),
+                                check.names = NULL) {
   if (!missing(check.names))
     warning("check.names parameter is deprecated")
-  
+
   # Set the original data scale to the input data scale.
   data_scale_orig <- data_scale
-  
+
   # Define the dType variable. This is used for customizing the warnings and
   # errors according to the data type (peptide, protein, lipid, ...).
   dType <- c('peptides', 'as.isobaricpepData')
-  
+
   # Perform pre analysis checks. Return updated data frames if they all receive
   # a gold star.
-  res <- pre_flight(e_data = e_data,
-                    f_data = f_data,
-                    e_meta = e_meta,
-                    edata_cname = edata_cname,
-                    fdata_cname = fdata_cname,
-                    emeta_cname = emeta_cname,
-                    techrep_cname = techrep_cname,
-                    data_scale = data_scale,
-                    is_normalized = is_normalized,
-                    norm_info = norm_info,
-                    data_types = data_types,
-                    dType = dType,
-                    is_bc = is_bc,
-                    batch_info = batch_info)
+  res <- pre_flight(
+    e_data = e_data,
+    f_data = f_data,
+    e_meta = e_meta,
+    edata_cname = edata_cname,
+    fdata_cname = fdata_cname,
+    emeta_cname = emeta_cname,
+    techrep_cname = techrep_cname,
+    data_scale = data_scale,
+    is_normalized = is_normalized,
+    norm_info = norm_info,
+    data_types = data_types,
+    dType = dType,
+    is_bc = is_bc,
+    batch_info = batch_info
+  )
 
   # Set the (possibly new) emeta_cname.
   emeta_cname <- res$emeta_cname
-  
+
   # Remove the emeta_cname element from the res list. That way only the e_data,
   # f_data, and e_meta (when applicable) data frames will be part of the output.
   # emeta_cname will no longer be an element of and omicsData object.
   res <- res[-which(names(res) == "emeta_cname")]
-  
+
   # set column name attributes #
-  attr(res, "cnames") = list(edata_cname = edata_cname,
-                             emeta_cname = emeta_cname,
-                             fdata_cname = fdata_cname,
-                             techrep_cname = techrep_cname)
-  
+  attr(res, "cnames") = list(
+    edata_cname = edata_cname,
+    emeta_cname = emeta_cname,
+    fdata_cname = fdata_cname,
+    techrep_cname = techrep_cname
+  )
+
   # Compute the data_info attributes.
-  attr(res, "data_info") <- set_data_info(e_data = res$e_data,
-                                          edata_cname = edata_cname,
-                                          data_scale_orig = data_scale_orig,
-                                          data_scale = data_scale,
-                                          data_types = data_types,
-                                          norm_info = norm_info,
-                                          is_normalized = is_normalized,
-                                          batch_info = batch_info,
-                                          is_bc = is_bc)
+  attr(res, "data_info") <- set_data_info(
+    e_data = res$e_data,
+    edata_cname = edata_cname,
+    data_scale_orig = data_scale_orig,
+    data_scale = data_scale,
+    data_types = data_types,
+    norm_info = norm_info,
+    is_normalized = is_normalized,
+    batch_info = batch_info,
+    is_bc = is_bc
+  )
 
   # Set isobaric specific attribute.
-  attr(res, "isobaric_info") <- set_isobaric_info(exp_cname = NA,
-                                                  channel_cname = NA,
-                                                  refpool_channel = NA,
-                                                  refpool_cname = NA,
-                                                  refpool_notation = NA,
-                                                  norm_info = norm_info,
-                                                  isobaric_norm = isobaric_norm)
-  
+  attr(res, "isobaric_info") <- set_isobaric_info(
+    exp_cname = NA,
+    channel_cname = NA,
+    refpool_channel = NA,
+    refpool_cname = NA,
+    refpool_notation = NA,
+    norm_info = norm_info,
+    isobaric_norm = isobaric_norm
+  )
+
   # set meta data attributes #
-  attr(res, "meta_info") <- set_meta_info(e_meta = res$e_meta,
-                                          emeta_cname = emeta_cname)
-  
+  attr(res, "meta_info") <- set_meta_info(
+    e_meta = res$e_meta,
+    emeta_cname = emeta_cname
+  )
+
   # set group dataframe attribute to NULL, will be filled in after running
   # group_designation function #
   attr(res, "group_DF") = NULL
-  
+
   # Initialize the filters attribute with a list. This list will be populated
   # with filter class objects as filters are applied. Multiple filters can be
   # implemented on one data set.
   attr(res, "filters") <- list()
-  
+
   # set class of list #
   class(res) = c("isobaricpepData", "pepData")
-  
+
   return(res)
-  
 }
 
 #' Create pmartR Object of Class lipidData
@@ -214,7 +226,7 @@ as.isobaricpepData <- function (e_data, f_data, e_meta = NULL, edata_cname,
 #' @param emeta_cname character string specifying the name of the column
 #'   containing the mapped identifiers in \code{e_meta} (if applicable). Can be the same as edata_cname, if desired.
 #'   Defaults to NULL. If \code{e_meta} is NULL, then either do not specify
-#'   \code{emeta_cname} or specify it as NULL. 
+#'   \code{emeta_cname} or specify it as NULL.
 #' @param fdata_cname character string specifying the name of the column
 #'   containing the sample identifiers in \code{f_data}.
 #' @param techrep_cname character string specifying the name of the column in
@@ -223,7 +235,7 @@ as.isobaricpepData <- function (e_data, f_data, e_meta = NULL, edata_cname,
 #'   Defaults to NULL (no technical replicates).
 #'
 #' @param ... further arguments
-#' 
+#'
 #' @return Object of class lipidData
 #'
 #' @details Objects of class 'lipidData' contain some attributes that are
@@ -255,102 +267,112 @@ as.isobaricpepData <- function (e_data, f_data, e_meta = NULL, edata_cname,
 #'
 #' @examples
 #' library(pmartRdata)
-#' mylipid <- as.lipidData(e_data = lipid_neg_edata,
-#'                         f_data = lipid_neg_fdata,
-#'                         edata_cname = "Lipid",
-#'                         fdata_cname = "SampleID")
+#' mylipid <- as.lipidData(
+#'   e_data = lipid_neg_edata,
+#'   f_data = lipid_neg_fdata,
+#'   edata_cname = "Lipid",
+#'   fdata_cname = "SampleID"
+#' )
 #'
 #' @author Lisa Bramer, Kelly Stratton
 #' @seealso \code{\link{as.metabData}}
 #'
 #' @export
 #'
-as.lipidData <- function (e_data, f_data, e_meta = NULL,
-                          edata_cname, fdata_cname, emeta_cname = NULL,
-                          techrep_cname = NULL, ...) {
-  .as.lipidData(e_data, f_data, e_meta, edata_cname, fdata_cname, emeta_cname,
-                techrep_cname, ...)
+as.lipidData <- function(e_data, f_data, e_meta = NULL,
+                         edata_cname, fdata_cname, emeta_cname = NULL,
+                         techrep_cname = NULL, ...) {
+  .as.lipidData(
+    e_data, f_data, e_meta, edata_cname, fdata_cname, emeta_cname,
+    techrep_cname, ...
+  )
 }
 
 ## lipid data ##
-.as.lipidData <- function (e_data, f_data, e_meta = NULL, edata_cname,
-                           fdata_cname, emeta_cname = NULL,
-                           techrep_cname = NULL,
-                           data_scale = "abundance",
-                           is_normalized = FALSE, norm_info = list(),
-                           is_bc = FALSE, batch_info = list(),
-                           data_types = NULL, check.names = NULL) {
-  
+.as.lipidData <- function(e_data, f_data, e_meta = NULL, edata_cname,
+                          fdata_cname, emeta_cname = NULL,
+                          techrep_cname = NULL,
+                          data_scale = "abundance",
+                          is_normalized = FALSE, norm_info = list(),
+                          is_bc = FALSE, batch_info = list(),
+                          data_types = NULL, check.names = NULL) {
   if (!missing(check.names))
     warning("check.names parameter is deprecated")
-  
+
   # Set the original data scale to the input data scale.
   data_scale_orig <- data_scale
-  
+
   # Define the dType variable. This is used for customizing the warnings and
   # errors according to the data type (peptide, protein, lipid, ...).
   dType <- c('lipids', 'as.lipidData')
-  
+
   # Perform pre analysis checks. Return updated data frames if they all receive
   # a gold star.
-  res <- pre_flight(e_data = e_data,
-                    f_data = f_data,
-                    e_meta = e_meta,
-                    edata_cname = edata_cname,
-                    fdata_cname = fdata_cname,
-                    emeta_cname = emeta_cname,
-                    techrep_cname = techrep_cname,
-                    data_scale = data_scale,
-                    is_normalized = is_normalized,
-                    norm_info = norm_info,
-                    data_types = data_types,
-                    dType = dType,
-                    is_bc = is_bc,
-                    batch_info = batch_info)
+  res <- pre_flight(
+    e_data = e_data,
+    f_data = f_data,
+    e_meta = e_meta,
+    edata_cname = edata_cname,
+    fdata_cname = fdata_cname,
+    emeta_cname = emeta_cname,
+    techrep_cname = techrep_cname,
+    data_scale = data_scale,
+    is_normalized = is_normalized,
+    norm_info = norm_info,
+    data_types = data_types,
+    dType = dType,
+    is_bc = is_bc,
+    batch_info = batch_info
+  )
 
   # Set the (possibly new) emeta_cname.
   emeta_cname <- res$emeta_cname
-  
+
   # Remove the emeta_cname element from the res list. That way only the e_data,
   # f_data, and e_meta (when applicable) data frames will be part of the output.
   # emeta_cname will no longer be an element of and omicsData object.
   res <- res[-which(names(res) == "emeta_cname")]
-  
+
   # set column name attributes #
-  attr(res, "cnames") = list(edata_cname = edata_cname,
-                             emeta_cname = emeta_cname,
-                             fdata_cname = fdata_cname,
-                             techrep_cname = techrep_cname)
-  
+  attr(res, "cnames") = list(
+    edata_cname = edata_cname,
+    emeta_cname = emeta_cname,
+    fdata_cname = fdata_cname,
+    techrep_cname = techrep_cname
+  )
+
   # Compute the data_info attributes.
-  attr(res, "data_info") <- set_data_info(e_data = res$e_data,
-                                          edata_cname = edata_cname,
-                                          data_scale_orig = data_scale_orig,
-                                          data_scale = data_scale,
-                                          data_types = data_types,
-                                          norm_info = norm_info,
-                                          is_normalized = is_normalized,
-                                          batch_info = batch_info,
-                                          is_bc = is_bc)
-  
+  attr(res, "data_info") <- set_data_info(
+    e_data = res$e_data,
+    edata_cname = edata_cname,
+    data_scale_orig = data_scale_orig,
+    data_scale = data_scale,
+    data_types = data_types,
+    norm_info = norm_info,
+    is_normalized = is_normalized,
+    batch_info = batch_info,
+    is_bc = is_bc
+  )
+
   # set meta data attributes #
-  attr(res, "meta_info") <- set_meta_info(e_meta = res$e_meta,
-                                          emeta_cname = emeta_cname)
-  
+  attr(res, "meta_info") <- set_meta_info(
+    e_meta = res$e_meta,
+    emeta_cname = emeta_cname
+  )
+
   # set group dataframe attribute to NULL, will be filled in after running
   # group_designation function #
   attr(res, "group_DF") = NULL
-  
+
   # Initialize the filters attribute with a list. This list will be populated
   # with filter class objects as filters are applied. Multiple filters can be
   # implemented on one data set.
   attr(res, "filters") <- list()
-  
+
   # set class of list #
   class(res) = "lipidData"
-  
+
   return(res)
-  
 }
 
 #' Create pmartR Object of Class metabData
@@ -377,7 +399,7 @@ as.lipidData <- function (e_data, f_data, e_meta = NULL,
 #'   containing the metabolite identifiers in \code{e_data} and \code{e_meta}
 #'   (if applicable).
 #' @param emeta_cname character string specifying the name of the column
-#'   containing the mapped identifiers in \code{e_meta} (if applicable). 
+#'   containing the mapped identifiers in \code{e_meta} (if applicable).
 #'   Defaults to NULL. Can be the same as edata_cname, if desired. If \code{e_meta} is NULL, then either do not specify
 #'   \code{emeta_cname} or specify it as NULL.
 #' @param fdata_cname character string specifying the name of the column
@@ -388,7 +410,7 @@ as.lipidData <- function (e_data, f_data, e_meta = NULL,
 #'   Defaults to NULL (no technical replicates).
 #'
 #' @param ... further arguments
-#' 
+#'
 #' @return Object of class metabData
 #'
 #' @details Objects of class 'metabData' contain some attributes that are
@@ -416,13 +438,15 @@ as.lipidData <- function (e_data, f_data, e_meta = NULL,
 #'   of samples that make up the columns of \code{e_data}.\cr \tab \cr meta_info
 #'   \tab A logical argument, specifying where the \code{e_meta} is provided.\cr
 #'   \tab \cr }
-#'   
+#'
 #' @examples
 #' library(pmartRdata)
-#' mymetabData <- as.metabData(e_data = metab_edata,
-#'                             f_data = metab_fdata,
-#'                             edata_cname = "Metabolite",
-#'                             fdata_cname = "SampleID")
+#' mymetabData <- as.metabData(
+#'   e_data = metab_edata,
+#'   f_data = metab_fdata,
+#'   edata_cname = "Metabolite",
+#'   fdata_cname = "SampleID"
+#' )
 #'
 #' @author Lisa Bramer, Kelly Stratton
 #' @seealso \code{\link{as.lipidData}}
@@ -430,93 +454,100 @@ as.lipidData <- function (e_data, f_data, e_meta = NULL,
 #'
 #' @export
 #'
-as.metabData <- function (e_data, f_data, e_meta = NULL,
-                          edata_cname, fdata_cname, emeta_cname = NULL,
-                          techrep_cname = NULL, ...) {
-  .as.metabData(e_data, f_data, e_meta, edata_cname, fdata_cname, emeta_cname,
-                techrep_cname, ...)
+as.metabData <- function(e_data, f_data, e_meta = NULL,
+                         edata_cname, fdata_cname, emeta_cname = NULL,
+                         techrep_cname = NULL, ...) {
+  .as.metabData(
+    e_data, f_data, e_meta, edata_cname, fdata_cname, emeta_cname,
+    techrep_cname, ...
+  )
 }
 
 ## metabolite data ##
-.as.metabData <- function (e_data, f_data, e_meta = NULL, edata_cname,
-                           fdata_cname, emeta_cname = NULL,
-                           techrep_cname = NULL,
-                           data_scale = "abundance",
-                           is_normalized = FALSE, norm_info = list(),
-                           is_bc = FALSE, batch_info = list(),
-                           data_types = NULL, check.names = NULL
-                           ) {
-  
+.as.metabData <- function(e_data, f_data, e_meta = NULL, edata_cname,
+                          fdata_cname, emeta_cname = NULL,
+                          techrep_cname = NULL,
+                          data_scale = "abundance",
+                          is_normalized = FALSE, norm_info = list(),
+                          is_bc = FALSE, batch_info = list(),
+                          data_types = NULL, check.names = NULL) {
   if (!missing(check.names))
     warning("check.names parameter is deprecated")
 
   # Set the original data scale to the input data scale.
   data_scale_orig <- data_scale
-  
+
   # Define the dType variable. This is used for customizing the warnings and
   # errors according to the data type (peptide, protein, lipid, ...).
   dType <- c('metabolites', 'as.metabData')
-  
+
   # Perform pre analysis checks. Return updated data frames if they all receive
   # a gold star.
-  res <- pre_flight(e_data = e_data,
-                    f_data = f_data,
-                    e_meta = e_meta,
-                    edata_cname = edata_cname,
-                    fdata_cname = fdata_cname,
-                    emeta_cname = emeta_cname,
-                    techrep_cname = techrep_cname,
-                    data_scale = data_scale,
-                    is_normalized = is_normalized,
-                    norm_info = norm_info,
-                    data_types = data_types,
-                    dType = dType,
-                    is_bc = is_bc,
-                    batch_info = batch_info)
+  res <- pre_flight(
+    e_data = e_data,
+    f_data = f_data,
+    e_meta = e_meta,
+    edata_cname = edata_cname,
+    fdata_cname = fdata_cname,
+    emeta_cname = emeta_cname,
+    techrep_cname = techrep_cname,
+    data_scale = data_scale,
+    is_normalized = is_normalized,
+    norm_info = norm_info,
+    data_types = data_types,
+    dType = dType,
+    is_bc = is_bc,
+    batch_info = batch_info
+  )
 
   # Set the (possibly new) emeta_cname.
   emeta_cname <- res$emeta_cname
-  
+
   # Remove the emeta_cname element from the res list. That way only the e_data,
   # f_data, and e_meta (when applicable) data frames will be part of the output.
   # emeta_cname will no longer be an element of and omicsData object.
   res <- res[-which(names(res) == "emeta_cname")]
-  
+
   # set column name attributes #
-  attr(res, "cnames") = list(edata_cname = edata_cname,
-                             emeta_cname = emeta_cname,
-                             fdata_cname = fdata_cname,
-                             techrep_cname = techrep_cname)
-  
+  attr(res, "cnames") = list(
+    edata_cname = edata_cname,
+    emeta_cname = emeta_cname,
+    fdata_cname = fdata_cname,
+    techrep_cname = techrep_cname
+  )
+
   # Compute the data_info attributes.
-  attr(res, "data_info") <- set_data_info(e_data = res$e_data,
-                                          edata_cname = edata_cname,
-                                          data_scale_orig = data_scale_orig,
-                                          data_scale = data_scale,
-                                          data_types = data_types,
-                                          norm_info = norm_info,
-                                          is_normalized = is_normalized,
-                                          batch_info = batch_info,
-                                          is_bc = is_bc)
-  
+  attr(res, "data_info") <- set_data_info(
+    e_data = res$e_data,
+    edata_cname = edata_cname,
+    data_scale_orig = data_scale_orig,
+    data_scale = data_scale,
+    data_types = data_types,
+    norm_info = norm_info,
+    is_normalized = is_normalized,
+    batch_info = batch_info,
+    is_bc = is_bc
+  )
+
   # set meta data attributes #
-  attr(res, "meta_info") <- set_meta_info(e_meta = res$e_meta,
-                                          emeta_cname = emeta_cname)
-  
+  attr(res, "meta_info") <- set_meta_info(
+    e_meta = res$e_meta,
+    emeta_cname = emeta_cname
+  )
+
   # set group dataframe attribute to NULL, will be filled in after running
   # group_designation function #
   attr(res, "group_DF") = NULL
-  
+
   # Initialize the filters attribute with a list. This list will be populated
   # with filter class objects as filters are applied. Multiple filters can be
   # implemented on one data set.
   attr(res, "filters") <- list()
-  
+
   # set class of list #
   class(res) = "metabData"
-  
+
   return(res)
-  
 }
 
 #' Create pmartR Object of Class nmrData
@@ -546,7 +577,7 @@ as.metabData <- function (e_data, f_data, e_meta = NULL,
 #' @param emeta_cname character string specifying the name of the column
 #'   containing the mapped identifiers in \code{e_meta} (if applicable).
 #'   Defaults to NULL. Can be the same as edata_cname, if desired. If \code{e_meta} is NULL, then either do not specify
-#'   \code{emeta_cname} or specify it as NULL. 
+#'   \code{emeta_cname} or specify it as NULL.
 #' @param fdata_cname character string specifying the name of the column
 #'   containing the sample identifiers in \code{f_data}.
 #' @param techrep_cname character string specifying the name of the column in
@@ -590,11 +621,13 @@ as.metabData <- function (e_data, f_data, e_meta = NULL,
 #'
 #' @examples
 #' library(pmartRdata)
-#' mynmrData <- as.nmrData(e_data = nmr_identified_edata,
-#'                         f_data = nmr_identified_fdata,
-#'                         edata_cname = "Metabolite",
-#'                         fdata_cname = "SampleID",
-#'                         data_type = "identified")
+#' mynmrData <- as.nmrData(
+#'   e_data = nmr_identified_edata,
+#'   f_data = nmr_identified_fdata,
+#'   edata_cname = "Metabolite",
+#'   fdata_cname = "SampleID",
+#'   data_type = "identified"
+#' )
 #'
 #' @author Lisa Bramer, Kelly Stratton
 #' @seealso \code{\link{as.metabData}}
@@ -602,100 +635,110 @@ as.metabData <- function (e_data, f_data, e_meta = NULL,
 #'
 #' @export
 #'
-as.nmrData <- function (e_data, f_data, e_meta = NULL,
-                        edata_cname, fdata_cname, emeta_cname = NULL,
-                        techrep_cname = NULL, ...) {
-  .as.nmrData(e_data, f_data, e_meta, edata_cname, fdata_cname, emeta_cname,
-              techrep_cname, ...)
+as.nmrData <- function(e_data, f_data, e_meta = NULL,
+                       edata_cname, fdata_cname, emeta_cname = NULL,
+                       techrep_cname = NULL, ...) {
+  .as.nmrData(
+    e_data, f_data, e_meta, edata_cname, fdata_cname, emeta_cname,
+    techrep_cname, ...
+  )
 }
 
 ## metabolite data ##
-.as.nmrData <- function (e_data, f_data, e_meta = NULL, edata_cname,
-                         fdata_cname, emeta_cname = NULL,
-                         techrep_cname = NULL,
-                         data_scale = "abundance",
-                         is_normalized = FALSE, nmr_norm = FALSE,
-                         norm_info = list(), data_types = NULL,
-                         is_bc = FALSE, batch_info = list(),
-                         check.names = NULL) {
-  
+.as.nmrData <- function(e_data, f_data, e_meta = NULL, edata_cname,
+                        fdata_cname, emeta_cname = NULL,
+                        techrep_cname = NULL,
+                        data_scale = "abundance",
+                        is_normalized = FALSE, nmr_norm = FALSE,
+                        norm_info = list(), data_types = NULL,
+                        is_bc = FALSE, batch_info = list(),
+                        check.names = NULL) {
   if (!missing(check.names))
     warning("check.names parameter is deprecated")
-  
+
   # Set the original data scale to the input data scale.
   data_scale_orig <- data_scale
-  
+
   # Define the dType variable. This is used for customizing the warnings and
   # errors according to the data type (peptide, protein, lipid, ...).
   dType <- c('metabolites', 'as.nmrData')
-  
+
   # Perform pre analysis checks. Return updated data frames if they all receive
   # a gold star.
-  res <- pre_flight(e_data = e_data,
-                    f_data = f_data,
-                    e_meta = e_meta,
-                    edata_cname = edata_cname,
-                    fdata_cname = fdata_cname,
-                    emeta_cname = emeta_cname,
-                    techrep_cname = techrep_cname,
-                    data_scale = data_scale,
-                    is_normalized = is_normalized,
-                    norm_info = norm_info,
-                    data_types = data_types,
-                    dType = dType,
-                    is_bc = is_bc,
-                    batch_info = batch_info)
+  res <- pre_flight(
+    e_data = e_data,
+    f_data = f_data,
+    e_meta = e_meta,
+    edata_cname = edata_cname,
+    fdata_cname = fdata_cname,
+    emeta_cname = emeta_cname,
+    techrep_cname = techrep_cname,
+    data_scale = data_scale,
+    is_normalized = is_normalized,
+    norm_info = norm_info,
+    data_types = data_types,
+    dType = dType,
+    is_bc = is_bc,
+    batch_info = batch_info
+  )
 
   # Set the (possibly new) emeta_cname.
   emeta_cname <- res$emeta_cname
-  
+
   # Remove the emeta_cname element from the res list. That way only the e_data,
   # f_data, and e_meta (when applicable) data frames will be part of the output.
   # emeta_cname will no longer be an element of and omicsData object.
   res <- res[-which(names(res) == "emeta_cname")]
-  
+
   # set column name attributes #
-  attr(res, "cnames") = list(edata_cname = edata_cname,
-                             emeta_cname = emeta_cname,
-                             fdata_cname = fdata_cname,
-                             techrep_cname = techrep_cname)
-  
+  attr(res, "cnames") = list(
+    edata_cname = edata_cname,
+    emeta_cname = emeta_cname,
+    fdata_cname = fdata_cname,
+    techrep_cname = techrep_cname
+  )
+
   # Compute the data_info attributes.
-  attr(res, "data_info") <- set_data_info(e_data = res$e_data,
-                                          edata_cname = edata_cname,
-                                          data_scale_orig = data_scale_orig,
-                                          data_scale = data_scale,
-                                          data_types = data_types,
-                                          norm_info = norm_info,
-                                          is_normalized = is_normalized,
-                                          batch_info = batch_info,
-                                          is_bc = is_bc)
+  attr(res, "data_info") <- set_data_info(
+    e_data = res$e_data,
+    edata_cname = edata_cname,
+    data_scale_orig = data_scale_orig,
+    data_scale = data_scale,
+    data_types = data_types,
+    norm_info = norm_info,
+    is_normalized = is_normalized,
+    batch_info = batch_info,
+    is_bc = is_bc
+  )
 
   # Set nmr specific attribute.
-  attr(res, "nmr_info") <- set_nmr_info(metabolite_name = NA,
-                                        sample_property_cname = NA,
-                                        norm_info = norm_info,
-                                        nmr_norm = nmr_norm,
-                                        backtransform = NA)
-  
+  attr(res, "nmr_info") <- set_nmr_info(
+    metabolite_name = NA,
+    sample_property_cname = NA,
+    norm_info = norm_info,
+    nmr_norm = nmr_norm,
+    backtransform = NA
+  )
+
   # set meta data attributes #
-  attr(res, "meta_info") <- set_meta_info(e_meta = res$e_meta,
-                                          emeta_cname = emeta_cname)
-  
+  attr(res, "meta_info") <- set_meta_info(
+    e_meta = res$e_meta,
+    emeta_cname = emeta_cname
+  )
+
   # set group dataframe attribute to NULL, will be filled in after running
   # group_designation function #
   attr(res, "group_DF") = NULL
-  
+
   # Initialize the filters attribute with a list. This list will be populated
   # with filter class objects as filters are applied. Multiple filters can be
   # implemented on one data set.
   attr(res, "filters") <- list()
-  
+
   # set class of list #
   class(res) = c("nmrData")
-  
+
   return(res)
-  
 }
 
 #' Create pmartR Object of Class pepData
@@ -726,7 +769,7 @@ as.nmrData <- function (e_data, f_data, e_meta = NULL,
 #' @param emeta_cname character string specifying the name of the column
 #'   containing the protein identifiers (or other mapping variable) in
 #'   \code{e_meta} (if applicable). Defaults to NULL. Can be the same as edata_cname, if desired. If \code{e_meta} is NULL,
-#'   then either do not specify \code{emeta_cname} or specify it as NULL. 
+#'   then either do not specify \code{emeta_cname} or specify it as NULL.
 #' @param fdata_cname character string specifying the name of the column
 #'   containing the sample identifiers in \code{f_data}.
 #' @param techrep_cname character string specifying the name of the column in
@@ -735,7 +778,7 @@ as.nmrData <- function (e_data, f_data, e_meta = NULL,
 #'   Defaults to NULL (no technical replicates).
 #'
 #' @param ... further arguments
-#' 
+#'
 #' @return Object of class pepData
 #'
 #' @details Objects of class 'pepData' contain some attributes that are
@@ -766,12 +809,14 @@ as.nmrData <- function (e_data, f_data, e_meta = NULL,
 #'
 #' @examples
 #' library(pmartRdata)
-#' mypepData <- as.pepData(e_data = pep_edata,
-#'                         e_meta = pep_emeta,
-#'                         f_data = pep_fdata,
-#'                         edata_cname = "Peptide",
-#'                         fdata_cname = "SampleID",
-#'                         emeta_cname = "RazorProtein")
+#' mypepData <- as.pepData(
+#'   e_data = pep_edata,
+#'   e_meta = pep_emeta,
+#'   f_data = pep_fdata,
+#'   edata_cname = "Peptide",
+#'   fdata_cname = "SampleID",
+#'   emeta_cname = "RazorProtein"
+#' )
 #'
 #' @author Kelly Stratton, Lisa Bramer
 #' @seealso \code{\link{as.proData}}
@@ -779,92 +824,100 @@ as.nmrData <- function (e_data, f_data, e_meta = NULL,
 #'
 #' @export
 #'
-as.pepData <- function (e_data, f_data, e_meta = NULL,
-                        edata_cname, fdata_cname, emeta_cname = NULL,
-                        techrep_cname = NULL, ...) {
-  .as.pepData(e_data, f_data, e_meta, edata_cname, fdata_cname, emeta_cname,
-              techrep_cname, ...)
+as.pepData <- function(e_data, f_data, e_meta = NULL,
+                       edata_cname, fdata_cname, emeta_cname = NULL,
+                       techrep_cname = NULL, ...) {
+  .as.pepData(
+    e_data, f_data, e_meta, edata_cname, fdata_cname, emeta_cname,
+    techrep_cname, ...
+  )
 }
 
 ## peptide data ##
-.as.pepData <- function (e_data, f_data, e_meta = NULL, edata_cname,
-                         fdata_cname, emeta_cname = NULL,
-                         techrep_cname = NULL,
-                         data_scale = "abundance",
-                         is_normalized = FALSE, norm_info = list(),
-                         is_bc = FALSE, batch_info = list(),
-                         data_types = NULL, check.names = NULL) {
-  
+.as.pepData <- function(e_data, f_data, e_meta = NULL, edata_cname,
+                        fdata_cname, emeta_cname = NULL,
+                        techrep_cname = NULL,
+                        data_scale = "abundance",
+                        is_normalized = FALSE, norm_info = list(),
+                        is_bc = FALSE, batch_info = list(),
+                        data_types = NULL, check.names = NULL) {
   if (!missing(check.names))
     warning("check.names parameter is deprecated")
-  
+
   # Set the original data scale to the input data scale.
   data_scale_orig <- data_scale
-  
+
   # Define the dType variable. This is used for customizing the warnings and
   # errors according to the data type (peptide, protein, lipid, ...).
   dType <- c('peptides', 'as.pepData')
-  
+
   # Perform pre analysis checks. Return updated data frames if they all receive
   # a gold star.
-  res <- pre_flight(e_data = e_data,
-                    f_data = f_data,
-                    e_meta = e_meta,
-                    edata_cname = edata_cname,
-                    fdata_cname = fdata_cname,
-                    emeta_cname = emeta_cname,
-                    techrep_cname = techrep_cname,
-                    data_scale = data_scale,
-                    is_normalized = is_normalized,
-                    norm_info = norm_info,
-                    data_types = data_types,
-                    dType = dType,
-                    is_bc = is_bc,
-                    batch_info = batch_info)
+  res <- pre_flight(
+    e_data = e_data,
+    f_data = f_data,
+    e_meta = e_meta,
+    edata_cname = edata_cname,
+    fdata_cname = fdata_cname,
+    emeta_cname = emeta_cname,
+    techrep_cname = techrep_cname,
+    data_scale = data_scale,
+    is_normalized = is_normalized,
+    norm_info = norm_info,
+    data_types = data_types,
+    dType = dType,
+    is_bc = is_bc,
+    batch_info = batch_info
+  )
 
   # Set the (possibly new) emeta_cname.
   emeta_cname <- res$emeta_cname
-  
+
   # Remove the emeta_cname element from the res list. That way only the e_data,
   # f_data, and e_meta (when applicable) data frames will be part of the output.
   # emeta_cname will no longer be an element of and omicsData object.
   res <- res[-which(names(res) == "emeta_cname")]
-  
+
   # set column name attributes #
-  attr(res, "cnames") = list(edata_cname = edata_cname,
-                             emeta_cname = emeta_cname,
-                             fdata_cname = fdata_cname,
-                             techrep_cname = techrep_cname)
-  
+  attr(res, "cnames") = list(
+    edata_cname = edata_cname,
+    emeta_cname = emeta_cname,
+    fdata_cname = fdata_cname,
+    techrep_cname = techrep_cname
+  )
+
   # Compute the data_info attributes.
-  attr(res, "data_info") <- set_data_info(e_data = res$e_data,
-                                          edata_cname = edata_cname,
-                                          data_scale_orig = data_scale_orig,
-                                          data_scale = data_scale,
-                                          data_types = data_types,
-                                          norm_info = norm_info,
-                                          is_normalized = is_normalized,
-                                          batch_info = batch_info,
-                                          is_bc = is_bc)
-  
+  attr(res, "data_info") <- set_data_info(
+    e_data = res$e_data,
+    edata_cname = edata_cname,
+    data_scale_orig = data_scale_orig,
+    data_scale = data_scale,
+    data_types = data_types,
+    norm_info = norm_info,
+    is_normalized = is_normalized,
+    batch_info = batch_info,
+    is_bc = is_bc
+  )
+
   # set meta data attributes #
-  attr(res, "meta_info") <- set_meta_info(e_meta = res$e_meta,
-                                          emeta_cname = emeta_cname)
-  
+  attr(res, "meta_info") <- set_meta_info(
+    e_meta = res$e_meta,
+    emeta_cname = emeta_cname
+  )
+
   # set group dataframe attribute to NULL, will be filled in after running
   # group_designation function #
   attr(res, "group_DF") = NULL
-  
+
   # Initialize the filters attribute with a list. This list will be populated
   # with filter class objects as filters are applied. Multiple filters can be
   # implemented on one data set.
   attr(res, "filters") <- list()
-  
+
   # set class of list #
   class(res) = "pepData"
-  
+
   return(res)
-  
 }
 
 #' Create pmartR Object of Class proData
@@ -902,7 +955,7 @@ as.pepData <- function (e_data, f_data, e_meta = NULL,
 #'   Defaults to NULL (no technical replicates).
 #'
 #' @param ... further arguments
-#' 
+#'
 #' @return Object of class proData
 #'
 #' @details Objects of class 'proData' contain some attributes that are
@@ -934,11 +987,13 @@ as.pepData <- function (e_data, f_data, e_meta = NULL,
 #'
 #' @examples
 #' library(pmartRdata)
-#' myproData <- as.proData(e_data = pro_edata,
-#'                         f_data = pro_fdata,
-#'                         edata_cname = "RazorProtein",
-#'                         fdata_cname = "SampleID",
-#'                         is_normalized = TRUE)
+#' myproData <- as.proData(
+#'   e_data = pro_edata,
+#'   f_data = pro_fdata,
+#'   edata_cname = "RazorProtein",
+#'   fdata_cname = "SampleID",
+#'   is_normalized = TRUE
+#' )
 #'
 #' @author Kelly Stratton, Lisa Bramer
 #' @seealso \code{\link{as.pepData}}
@@ -946,97 +1001,105 @@ as.pepData <- function (e_data, f_data, e_meta = NULL,
 #'
 #' @export
 #'
-as.proData <- function (e_data, f_data, e_meta = NULL,
-                        edata_cname, fdata_cname, emeta_cname = NULL,
-                        techrep_cname = NULL, ...) {
-  .as.proData(e_data, f_data, e_meta, edata_cname, fdata_cname, emeta_cname,
-              techrep_cname, ...)
+as.proData <- function(e_data, f_data, e_meta = NULL,
+                       edata_cname, fdata_cname, emeta_cname = NULL,
+                       techrep_cname = NULL, ...) {
+  .as.proData(
+    e_data, f_data, e_meta, edata_cname, fdata_cname, emeta_cname,
+    techrep_cname, ...
+  )
 }
 
 ## protein data ##
-.as.proData <- function (e_data, f_data, e_meta = NULL, edata_cname,
-                         fdata_cname, emeta_cname = NULL,
-                         techrep_cname = NULL,
-                         data_scale = "abundance",
-                         is_normalized = FALSE, norm_info = list(),
-                         is_bc = FALSE, batch_info = list(),
-                         data_types = NULL, check.names = NULL) {
-  
+.as.proData <- function(e_data, f_data, e_meta = NULL, edata_cname,
+                        fdata_cname, emeta_cname = NULL,
+                        techrep_cname = NULL,
+                        data_scale = "abundance",
+                        is_normalized = FALSE, norm_info = list(),
+                        is_bc = FALSE, batch_info = list(),
+                        data_types = NULL, check.names = NULL) {
   if (!missing(check.names))
     warning("check.names parameter is deprecated")
-  
+
   # Set the original data scale to the input data scale.
   data_scale_orig <- data_scale
-  
+
   # Define the dType variable. This is used for customizing the warnings and
   # errors according to the data type (peptide, protein, lipid, ...).
   dType <- c('proteins', 'as.proData')
-  
+
   # Perform pre analysis checks. Return updated data frames if they all receive
   # a gold star.
-  res <- pre_flight(e_data = e_data,
-                    f_data = f_data,
-                    e_meta = e_meta,
-                    edata_cname = edata_cname,
-                    fdata_cname = fdata_cname,
-                    emeta_cname = emeta_cname,
-                    techrep_cname = techrep_cname,
-                    data_scale = data_scale,
-                    is_normalized = is_normalized,
-                    norm_info = norm_info,
-                    data_types = data_types,
-                    dType = dType,
-                    is_bc = is_bc,
-                    batch_info = batch_info)
+  res <- pre_flight(
+    e_data = e_data,
+    f_data = f_data,
+    e_meta = e_meta,
+    edata_cname = edata_cname,
+    fdata_cname = fdata_cname,
+    emeta_cname = emeta_cname,
+    techrep_cname = techrep_cname,
+    data_scale = data_scale,
+    is_normalized = is_normalized,
+    norm_info = norm_info,
+    data_types = data_types,
+    dType = dType,
+    is_bc = is_bc,
+    batch_info = batch_info
+  )
 
   # Set the (possibly new) emeta_cname.
   emeta_cname <- res$emeta_cname
-  
+
   # Remove the emeta_cname element from the res list. That way only the e_data,
   # f_data, and e_meta (when applicable) data frames will be part of the output.
   # emeta_cname will no longer be an element of and omicsData object.
   res <- res[-which(names(res) == "emeta_cname")]
-  
+
   # set column name attributes #
-  attr(res, "cnames") = list(edata_cname = edata_cname,
-                             emeta_cname = emeta_cname,
-                             fdata_cname = fdata_cname,
-                             techrep_cname = techrep_cname)
-  
+  attr(res, "cnames") = list(
+    edata_cname = edata_cname,
+    emeta_cname = emeta_cname,
+    fdata_cname = fdata_cname,
+    techrep_cname = techrep_cname
+  )
+
   # Compute the data_info attributes.
-  attr(res, "data_info") <- set_data_info(e_data = res$e_data,
-                                          edata_cname = edata_cname,
-                                          data_scale_orig = data_scale_orig,
-                                          data_scale = data_scale,
-                                          data_types = data_types,
-                                          norm_info = norm_info,
-                                          is_normalized = is_normalized,
-                                          batch_info = batch_info,
-                                          is_bc = is_bc)
-  
+  attr(res, "data_info") <- set_data_info(
+    e_data = res$e_data,
+    edata_cname = edata_cname,
+    data_scale_orig = data_scale_orig,
+    data_scale = data_scale,
+    data_types = data_types,
+    norm_info = norm_info,
+    is_normalized = is_normalized,
+    batch_info = batch_info,
+    is_bc = is_bc
+  )
+
   # set meta data attributes #
-  attr(res, "meta_info") <- set_meta_info(e_meta = res$e_meta,
-                                          emeta_cname = emeta_cname)
-  
+  attr(res, "meta_info") <- set_meta_info(
+    e_meta = res$e_meta,
+    emeta_cname = emeta_cname
+  )
+
   # set group dataframe attribute to NULL, will be filled in after running
   # group_designation function #
   attr(res, "group_DF") = NULL
-  
+
   # Initialize the filters attribute with a list. This list will be populated
   # with filter class objects as filters are applied. Multiple filters can be
   # implemented on one data set.
   attr(res, "filters") <- list()
-  
+
   # Set the protein quantitation attribute to NA. This will be updated to one of
   # rollup, qrollup, rrollup, or zrollup if/when a pepData object is rolled up
   # to a proData object.
   attr(res, "pro_quant_info") <- list(method = NA)
-  
+
   # set class of list #
   class(res) = "proData"
-  
+
   return(res)
-  
 }
 
 #' Create pmartR Object of Class seqData
@@ -1063,12 +1126,12 @@ as.proData <- function (e_data, f_data, e_meta = NULL,
 #'   named the same as the column in \code{e_data}) and other columns giving biomolecule
 #'   meta information (e.g. mappings of transcripts to genes or proteins). Can be the same as edata_cname, if desired.
 #' @param edata_cname character string specifying the name of the column
-#'   containing the transcript identifiers in \code{e_data} and \code{e_meta} 
+#'   containing the transcript identifiers in \code{e_data} and \code{e_meta}
 #'   (if applicable).
 #' @param emeta_cname character string specifying the name of the column
 #'   containing the gene identifiers (or other mapping variable) in
 #'   \code{e_meta} (if applicable). Defaults to NULL. If \code{e_meta} is NULL,
-#'   then either do not specify \code{emeta_cname} or specify it as NULL. 
+#'   then either do not specify \code{emeta_cname} or specify it as NULL.
 #' @param fdata_cname character string specifying the name of the column
 #'   containing the sample identifiers in \code{f_data}.
 #' @param techrep_cname character string specifying the name of the column in
@@ -1077,14 +1140,14 @@ as.proData <- function (e_data, f_data, e_meta = NULL,
 #'   Defaults to NULL (no technical replicates).
 #'
 #' @param ... further arguments
-#' 
+#'
 #' @return Object of class seqData
 #'
 #' @details Objects of class 'seqData' contain some attributes that are
 #'   referenced by downstream functions. These attributes can be changed from
 #'   their default value by manual specification. A list of these attributes as
 #'   well as their default values are as follows: \tabular{ll}{ data_scale \tab
-#'   Scale of the data provided in \code{e_data}. Only 'counts' is valid for 
+#'   Scale of the data provided in \code{e_data}. Only 'counts' is valid for
 #'   'seqData'. \cr \tab \cr is_normalized \tab A logical argument, specifying
 #'   whether the data has been normalized or not. Default value is FALSE. \cr
 #'   \tab \cr norm_info \tab Default value is an empty list, which will be
@@ -1102,12 +1165,14 @@ as.proData <- function (e_data, f_data, e_meta = NULL,
 #'
 #' @examples
 #' library(pmartRdata)
-#' myseq <- as.seqData(e_data = rnaseq_edata,
-#'                         e_meta = rnaseq_emeta,
-#'                         f_data = rnaseq_fdata,
-#'                         edata_cname = "Transcript",
-#'                         fdata_cname = "SampleName",
-#'                         emeta_cname = "Transcript")
+#' myseq <- as.seqData(
+#'   e_data = rnaseq_edata,
+#'   e_meta = rnaseq_emeta,
+#'   f_data = rnaseq_fdata,
+#'   edata_cname = "Transcript",
+#'   fdata_cname = "SampleName",
+#'   emeta_cname = "Transcript"
+#' )
 #'
 #' @author Rachel Richardson, Kelly Stratton, Lisa Bramer
 #' @seealso \code{\link{as.proData}}
@@ -1118,102 +1183,110 @@ as.proData <- function (e_data, f_data, e_meta = NULL,
 #'
 #' @export
 #'
-as.seqData <- function (e_data, f_data, e_meta = NULL,
-                        edata_cname, fdata_cname, emeta_cname = NULL,
-                        techrep_cname = NULL, ...) {
-  .as.seqData(e_data, f_data, e_meta, edata_cname, fdata_cname, emeta_cname,
-              techrep_cname, ...)
+as.seqData <- function(e_data, f_data, e_meta = NULL,
+                       edata_cname, fdata_cname, emeta_cname = NULL,
+                       techrep_cname = NULL, ...) {
+  .as.seqData(
+    e_data, f_data, e_meta, edata_cname, fdata_cname, emeta_cname,
+    techrep_cname, ...
+  )
 }
 
 ## RNA-seq data ##
-.as.seqData <- function (e_data, f_data, e_meta = NULL, edata_cname,
-                         fdata_cname, emeta_cname = NULL,
-                         techrep_cname = NULL,
-                         data_scale = "counts",
-                         is_normalized = FALSE, norm_info = list(),
-                         data_types = NULL,
-                         is_bc = FALSE, batch_info = list(),
-                         check.names = NULL) {
-  
+.as.seqData <- function(e_data, f_data, e_meta = NULL, edata_cname,
+                        fdata_cname, emeta_cname = NULL,
+                        techrep_cname = NULL,
+                        data_scale = "counts",
+                        is_normalized = FALSE, norm_info = list(),
+                        data_types = NULL,
+                        is_bc = FALSE, batch_info = list(),
+                        check.names = NULL) {
   if (!missing(check.names))
     warning("check.names parameter is deprecated")
-  
+
   # Set the original data scale to the input data scale.
   data_scale_orig <- data_scale
-  
+
   # Define the dType variable. This is used for customizing the warnings and
   # errors according to the data type (peptide, protein, lipid, ...).
   dType <- c('RNA transcripts', 'as.seqData')
-  
+
   # Perform pre analysis checks. Return updated data frames if they all receive
   # a gold star.
-  res <- pre_flight(e_data = e_data,
-                    f_data = f_data,
-                    e_meta = e_meta,
-                    edata_cname = edata_cname,
-                    fdata_cname = fdata_cname,
-                    emeta_cname = emeta_cname,
-                    techrep_cname = techrep_cname,
-                    data_scale = data_scale,
-                    is_normalized = is_normalized,
-                    norm_info = norm_info,
-                    data_types = data_types,
-                    dType = dType,
-                    is_bc = is_bc,
-                    batch_info = batch_info)
-  
-  ### Should we add these to pre_flight? 
+  res <- pre_flight(
+    e_data = e_data,
+    f_data = f_data,
+    e_meta = e_meta,
+    edata_cname = edata_cname,
+    fdata_cname = fdata_cname,
+    emeta_cname = emeta_cname,
+    techrep_cname = techrep_cname,
+    data_scale = data_scale,
+    is_normalized = is_normalized,
+    norm_info = norm_info,
+    data_types = data_types,
+    dType = dType,
+    is_bc = is_bc,
+    batch_info = batch_info
+  )
+
+  ### Should we add these to pre_flight?
   # Analyses must have raw counts
-  
+
   nums <- e_data[which(colnames(e_data) != edata_cname)]
-  notint <- any(apply(nums, 2, function(col) (sum(col%%1, na.rm = TRUE) != 0)))
-  if(notint){
+  notint <- any(apply(nums, 2, function(col) (sum(col %% 1, na.rm = TRUE) != 0)))
+  if (notint) {
     warning("Non-integers detected. Analyses supported by pmartR for RNA-seq data require raw counts.")
   }
-  
+
   # Set the (possibly new) emeta_cname.
   emeta_cname <- res$emeta_cname
-  
+
   # Remove the emeta_cname element from the res list. That way only the e_data,
   # f_data, and e_meta (when applicable) data frames will be part of the output.
   # emeta_cname will no longer be an element of and omicsData object.
   res <- res[-which(names(res) == "emeta_cname")]
-  
+
   # set column name attributes #
-  attr(res, "cnames") = list(edata_cname = edata_cname,
-                             emeta_cname = emeta_cname,
-                             fdata_cname = fdata_cname,
-                             techrep_cname = techrep_cname)
-  
+  attr(res, "cnames") = list(
+    edata_cname = edata_cname,
+    emeta_cname = emeta_cname,
+    fdata_cname = fdata_cname,
+    techrep_cname = techrep_cname
+  )
+
   # Compute the data_info attributes.
-  attr(res, "data_info") <- set_data_info(e_data = res$e_data,
-                                          edata_cname = edata_cname,
-                                          data_scale_orig = data_scale_orig,
-                                          data_scale = data_scale,
-                                          data_types = data_types,
-                                          norm_info = norm_info,
-                                          is_normalized = is_normalized,
-                                          batch_info = batch_info,
-                                          is_bc = is_bc)
-  
+  attr(res, "data_info") <- set_data_info(
+    e_data = res$e_data,
+    edata_cname = edata_cname,
+    data_scale_orig = data_scale_orig,
+    data_scale = data_scale,
+    data_types = data_types,
+    norm_info = norm_info,
+    is_normalized = is_normalized,
+    batch_info = batch_info,
+    is_bc = is_bc
+  )
+
   # set meta data attributes #
-  attr(res, "meta_info") <- set_meta_info(e_meta = res$e_meta,
-                                          emeta_cname = emeta_cname)
-  
+  attr(res, "meta_info") <- set_meta_info(
+    e_meta = res$e_meta,
+    emeta_cname = emeta_cname
+  )
+
   # set group dataframe attribute to NULL, will be filled in after running
   # group_designation function #
   attr(res, "group_DF") = NULL
-  
+
   # Initialize the filters attribute with a list. This list will be populated
   # with filter class objects as filters are applied. Multiple filters can be
   # implemented on one data set.
   attr(res, "filters") <- list()
-  
+
   # set class of list #
   class(res) = "seqData"
-  
+
   return(res)
-  
 }
 
 
@@ -1224,462 +1297,405 @@ as.seqData <- function (e_data, f_data, e_meta = NULL,
 # pre_flight returns e_data, f_data, e_meta, and emeta_cname. Each of these
 # objects could have been modified in this function.
 #
-pre_flight <- function (e_data,
-                        f_data,
-                        e_meta,
-                        edata_cname,
-                        fdata_cname,
-                        emeta_cname,
-                        techrep_cname,
-                        data_scale,
-                        is_normalized,
-                        norm_info,
-                        data_types,
-                        dType,
-                        is_bc,
-                        batch_info) {
+pre_flight <- function(e_data,
+                       f_data,
+                       e_meta,
+                       edata_cname,
+                       fdata_cname,
+                       emeta_cname,
+                       techrep_cname,
+                       data_scale,
+                       is_normalized,
+                       norm_info,
+                       data_types,
+                       dType,
+                       is_bc,
+                       batch_info) {
   # Verify classes/values of arguments -----------------------------------------
-  
+
   # Check if e_data is a tibble or data.table. If it is convert to a data frame.
   if (inherits(e_data, "tbl_df") ||
-      inherits(e_data, "tbl") ||
-      inherits(e_data, "data.table")) {
-
+    inherits(e_data, "tbl") ||
+    inherits(e_data, "data.table")) {
     e_data <- data.frame(e_data, check.names = FALSE)
-
   }
-  
+
   # Make sure e_data is a data.frame.
   if (!inherits(e_data, "data.frame")) {
-    
-    stop ("e_data must be of class 'data.frame'")
-    
+    stop("e_data must be of class 'data.frame'")
   }
-  
+
   # Check if f_data is a tibble or data.table. If it is convert to a data frame.
   if (inherits(f_data, "tbl_df") ||
-      inherits(f_data, "tbl") ||
-      inherits(f_data, "data.table")) {
-
+    inherits(f_data, "tbl") ||
+    inherits(f_data, "data.table")) {
     f_data <- data.frame(f_data, check.names = FALSE)
-
   }
-  
+
   # Make sure f_data is a data.frame.
   if (!inherits(f_data, "data.frame")) {
-    
-    stop ("f_data must be of class 'data.frame'")
-    
+    stop("f_data must be of class 'data.frame'")
   }
-  
+
   # Determine if e_meta is present.
   if (!is.null(e_meta)) {
-    
     # Check if e_meta is a tibble or data.table. If it is convert to a data
     # frame.
     if (inherits(e_meta, "tbl_df") ||
-        inherits(e_meta, "tbl") ||
-        inherits(e_meta, "data.table")) {
-
+      inherits(e_meta, "tbl") ||
+      inherits(e_meta, "data.table")) {
       e_meta <- data.frame(e_meta, check.names = FALSE)
-
     }
-    
+
     # Test that e_meta is a data frame.
     if (!inherits(e_meta, "data.frame")) {
-      
       # Lay down an error because e_meta is not a data frame.
-      stop ("e_meta must be of class 'data.frame'")
-      
+      stop("e_meta must be of class 'data.frame'")
     }
-    
   }
-  
+
   # Investigate the columns of edata and ensure they are the correct class and
   # do not contain any erroneous values.
-  str_col(edata = e_data,
-          edata_cname = edata_cname)
-  
+  str_col(
+    edata = e_data,
+    edata_cname = edata_cname
+  )
+
   # check remaining input params are of correct class # added by KGS 5/1/2020
   ## cnames are character strings
   if (!is.null(edata_cname)) {
     if (!inherits(edata_cname, "character")) {
-      stop ("edata_cname must be of the class 'character'")}
+      stop("edata_cname must be of the class 'character'")
+    }
   }
-  if (!is.null(fdata_cname)){
+  if (!is.null(fdata_cname)) {
     if (!inherits(fdata_cname, "character")) {
-      stop ("fdata_cname must be of the class 'character'")}
+      stop("fdata_cname must be of the class 'character'")
+    }
   }
-  if (!is.null(emeta_cname)){
+  if (!is.null(emeta_cname)) {
     if (!inherits(emeta_cname, "character")) {
-      stop ("emeta_cname must be of the class 'character'")}
+      stop("emeta_cname must be of the class 'character'")
+    }
   }
-  
+
   # Inspect the is_normalized argument.
   if (!is.null(is_normalized)) {
-    
     # Make sure it is logical (not irrational:)).
-    if(!inherits(is_normalized, "logical")) {
-      
+    if (!inherits(is_normalized, "logical")) {
       # BAM!! pmart 1 user 0.
-      stop ("is_normalized must be of the class 'logical'")
-      
+      stop("is_normalized must be of the class 'logical'")
     }
-    
   }
 
   # Inspect the is_bc argument
   if (!is.null(is_bc)) {
-
     # Make sure it is logical
     if (!inherits(is_bc, "logical")) {
-
-      stop ("is_bc must be of the class 'logical'")
-
+      stop("is_bc must be of the class 'logical'")
     }
-
   }
 
   # Examine the norm_info argument. Ensure it is a list.
   if (!inherits(norm_info, "list")) {
-    
     # Throw an error at the user.
-    stop ("norm_info must be of the class 'list'")
-    
+    stop("norm_info must be of the class 'list'")
   }
 
   # Examine the batch_info argument. Ensure it is a list.
   if (!inherits(batch_info, "list")) {
-
     # Throw an error at the user
-    stop ("batch_info must be of the class 'list'")
+    stop("batch_info must be of the class 'list'")
   }
 
   # Check the data_types argument.
   if (!is.null(data_types)) {
-    
     # Confirm it is a character string.
     if (!inherits(data_types, "character")) {
-      
       # Deliver a devastating blow to the users morale.
-      stop ("data_types must be of the class 'character'")
-      
+      stop("data_types must be of the class 'character'")
     }
-    
   }
-  
+
   # Make sure data_scale is one of the acceptable strings
-  if(dType[[2]] == "as.seqData"){
-    
+  if (dType[[2]] == "as.seqData") {
     if (data_scale != c("counts")) {
-      
       # Throw an error because data_scale is not an acceptable form.
-      stop ("data_scale must be 'counts' for as.seqData")
-      
+      stop("data_scale must be 'counts' for as.seqData")
     }
-    
   } else {
     if (!(data_scale %in% c("abundance", "log", "log2", "log10"))) {
-      
       # Throw an error because data_scale is not an acceptable form.
-      stop (paste0("data_scale must be one of the following for ",
-                   dType[[2]], ":",
-                   " 'abundance', 'log', 'log2', or 'log10'."))
-      
+      stop(paste0(
+        "data_scale must be one of the following for ",
+        dType[[2]], ":",
+        " 'abundance', 'log', 'log2', or 'log10'."
+      ))
     }
   }
-  
+
   # Check if techrep_cname is null or not.
   if (!is.null(techrep_cname)) {
-    
     # Check that techrep_cname is a character string.
     if (!inherits(techrep_cname, "character") || length(techrep_cname) == 0) {
-      
       # Use an error to let the user know there is little hope.
-      stop (paste("techrep_cname must be a character string specifying a",
-                  "column in f_data",
-                  sep = ' '))
-      
+      stop(paste("techrep_cname must be a character string specifying a",
+        "column in f_data",
+        sep = ' '
+      ))
     }
-    
   }
-  
+
   # Check column names in e_data, f_data, and e_meta ---------------------------
-  
+
   # Ensure the ID column exists in e_data.
   if (!(edata_cname %in% names(e_data))) {
-    
     # Return an error if the ID column doesn't exist.
-    stop (paste("The",
-                dType[[1]],
-                "ID column",
-                edata_cname,
-                "is not found in e_data. See details of",
-                dType[[2]],
-                "for specifying column names.",
-                sep = " "))
-    
+    stop(paste("The",
+      dType[[1]],
+      "ID column",
+      edata_cname,
+      "is not found in e_data. See details of",
+      dType[[2]],
+      "for specifying column names.",
+      sep = " "
+    ))
   }
-  
+
   # Check if techrep_cname is null or not.
   if (!is.null(techrep_cname)) {
-    
     # Check that techrep_cname is in f_data and is not the same as fdata_cname.
     if (!(techrep_cname %in%
-          colnames(f_data[, -which(names(f_data) == fdata_cname)]))) {
-      
+      colnames(f_data[, -which(names(f_data) == fdata_cname)]))) {
       stop(paste("Specified technical replicate column was not found in",
-                 "f_data or was the same as fdata_cname",
-                 sep = ' '))
-      
+        "f_data or was the same as fdata_cname",
+        sep = ' '
+      ))
     }
-    
+
     # Check that the tech rep column does not have a unique value in each row.
-    if (length(unique(f_data[,techrep_cname])) == nrow(f_data)) {
-      
-      stop (paste("Specified technical replicate column had a unique value for",
-                  "each row.  Values should specify groups of technical",
-                  "replicates belonging to a biological sample.",
-                  sep = ' '))
-      
+    if (length(unique(f_data[, techrep_cname])) == nrow(f_data)) {
+      stop(paste("Specified technical replicate column had a unique value for",
+        "each row.  Values should specify groups of technical",
+        "replicates belonging to a biological sample.",
+        sep = ' '
+      ))
     }
-    
   }
-  
+
   # Check if e_meta is NULL and emeta_cname is non-NULL #
   if (is.null(e_meta) && !is.null(emeta_cname)) {
-    
     # Set emeta_cname to null and state that it will not be used.
     emeta_cname <- NULL
     message("emeta_cname set to NULL, no e_meta object was provided.")
-    
   }
-  
+
   # Verify e_meta is not null.
   if (!is.null(e_meta)) {
-    
     # Confirm the peptide ID column exists in e_meta.
     if (!(edata_cname %in% names(e_meta))) {
-      
       # Return an error if the ID column does not exist in e_meta.
-      stop (paste("The",
-                  dType[[1]],
-                  "ID column",
-                  edata_cname,
-                  "is not found in e_meta. The column name containing the",
-                  dType[[1]],
-                  "IDs must match for e_data and e_meta. See details of",
-                  dType[[2]],
-                  "for specifying column names.",
-                  sep = " "))
-      
+      stop(paste("The",
+        dType[[1]],
+        "ID column",
+        edata_cname,
+        "is not found in e_meta. The column name containing the",
+        dType[[1]],
+        "IDs must match for e_data and e_meta. See details of",
+        dType[[2]],
+        "for specifying column names.",
+        sep = " "
+      ))
     }
-    
+
     # Check if the emeta_cnames argument is null.
     if (is.null(emeta_cname)) {
-      
-      stop ("Since e_meta is non-NULL, emeta_cname must also be non-NULL.")
-      
+      stop("Since e_meta is non-NULL, emeta_cname must also be non-NULL.")
     } else {
-      
       # If emeta_cname is not null ensure this column is present in e_meta.
       if (!(emeta_cname %in% names(e_meta))) {
-        
-        stop (paste("Mapping variable column",
-                    emeta_cname,
-                    "not found in e_meta. See details of",
-                    dType[[2]],
-                    "for specifying column names.",
-                    sep = " "))
-        
+        stop(paste("Mapping variable column",
+          emeta_cname,
+          "not found in e_meta. See details of",
+          dType[[2]],
+          "for specifying column names.",
+          sep = " "
+        ))
       }
-      
     }
-    
   }
-  
+
   # Verify that the Sample column name is in the f_data column names #
   if (!(fdata_cname %in% names(f_data))) {
-    
     # If this sample column name is not present return an error.
-    stop (paste("Sample column",
-                fdata_cname,
-                "not found in f_data. See details of",
-                dType[[2]],
-                "for specifying column names.",
-                sep = " "))
-    
+    stop(paste("Sample column",
+      fdata_cname,
+      "not found in f_data. See details of",
+      dType[[2]],
+      "for specifying column names.",
+      sep = " "
+    ))
   }
-  
+
   # Make sure the word 'Group' does not appear in f_data column names.
   if ("Group" %in% names(f_data)) {
-    
     # Find the column number where the name "Group" occurs. This index will be
     # used to change the name to "group" because the group_designation function
     # creates a column named "Group". Some functions merge data frames with
     # f_data and having two columns named "Group" causes issues.
     group_idx <- which(names(f_data) == "Group")
-    
+
     # Change the name to "group" so the merge function doesn't get confused.
     names(f_data)[group_idx] <- "group"
-    
+
     # Let the user know they have overstepped their bounds and must be put in
     # their appropriate place.
     message(paste("A column in f_data is named 'Group'. This name is reserved",
-                  "for use in the group_designation funtion. The column name",
-                  "has been changed to 'group'.",
-                  sep = " "))
-    
+      "for use in the group_designation funtion. The column name",
+      "has been changed to 'group'.",
+      sep = " "
+    ))
   }
-  
+
   # Ensure the data frames agree with each other -------------------------------
-  
+
   # check that all samples in e_data (column names of e_data) are present in
   # f_data (rows of f_data in the fdata_cname column) #
   edat_sampid = which(names(e_data) == edata_cname) # fixed by KS 10/13/2016
-  samps.miss = sum(!(names(e_data[,-edat_sampid]) %in% f_data[,fdata_cname]))
-  if( samps.miss > 0) stop (paste( samps.miss,
-                                   " samples from e_data not found in f_data",
-                                   sep = ""))
-  
+  samps.miss = sum(!(names(e_data[, -edat_sampid]) %in% f_data[, fdata_cname]))
+  if (samps.miss > 0) stop(paste(samps.miss,
+    " samples from e_data not found in f_data",
+    sep = ""
+  ))
+
   # check for any extra samples in f_data than in e_data - necessary to remove
   # before group_designation function #
-  if (any(!(f_data[, fdata_cname] %in% names(e_data)))){
-    
+  if (any(!(f_data[, fdata_cname] %in% names(e_data)))) {
     # Remove rows found in f_data that are not also in e_data.
     f_data <- f_data[-which(!(f_data[, fdata_cname] %in% names(e_data))), ]
-    
+
     # Throw down a warning that the extra rows in f_data were removed.
-    warning (paste("Extra samples were found in f_data that were not in",
-                   "e_data. These have been removed from f_data.",
-                   sep = ' '))
-    
+    warning(paste("Extra samples were found in f_data that were not in",
+      "e_data. These have been removed from f_data.",
+      sep = ' '
+    ))
   }
-  
+
   # if e_meta is provided, remove any extra features that are not also found in
   # e_data.
-  if(!is.null(e_meta)){
-    if(any(!(e_meta[,edata_cname] %in% e_data[,edata_cname]))){
-      
+  if (!is.null(e_meta)) {
+    if (any(!(e_meta[, edata_cname] %in% e_data[, edata_cname]))) {
       # Remove any rows in e_meta corresponding to IDs that are not also found
       # in e_data.
       e_meta <- e_meta[-which(!(e_meta[, edata_cname] %in%
-                                  e_data[, edata_cname])),]
-      
+        e_data[, edata_cname])), ]
+
       # Slam the user with a warning that the e_meta data frame was modified.
-      warning (paste("Extra",
-                     dType[[1]],
-                     "were found in e_meta that were not in e_data.",
-                     "These have been removed from e_meta.",
-                     sep = " "))
+      warning(paste("Extra",
+        dType[[1]],
+        "were found in e_meta that were not in e_data.",
+        "These have been removed from e_meta.",
+        sep = " "
+      ))
     }
   }
-  
+
   # Execute checks on e_data ---------------------------------------------------
-  
+
   # Ensure the rows in e_data are unique.
   if (nrow(e_data) != length(unique(e_data[, edata_cname]))) {
-    
     # Rewrite e_data with only the unique rows of the data frame.
     e_data <- unique(e_data)
-    
+
     # Check if the unique data frame has non unique IDs.
     if (nrow(e_data) != length(unique(e_data[, edata_cname]))) {
-      
       # Return an error if some IDs are repeated in e_data.
-      stop ("The 'edata_cname' identifier is non-unique.")
-      
+      stop("The 'edata_cname' identifier is non-unique.")
     }
-    
   }
-  
+
   # Depending on scale, check if there are zeros in edata and auto-remove all 0/na rows
   if (data_scale == 'abundance') {
-
-    if(any(e_data == 0, na.rm = TRUE)){
+    if (any(e_data == 0, na.rm = TRUE)) {
       # Exchange 0 for NA in edata.
-      e_data <- replace_zeros(edata = e_data,
-                              edata_cname = edata_cname)
+      e_data <- replace_zeros(
+        edata = e_data,
+        edata_cname = edata_cname
+      )
     }
 
     # # Auto remove all NA data
     # select <- which(colnames(e_data) != edata_cname)
     # e_data <- e_data[apply(!is.na(e_data[select]), 1, any),]
-
-  } else if (data_scale == 'counts'){
-
-    if(any(is.na(e_data))){
+  } else if (data_scale == 'counts') {
+    if (any(is.na(e_data))) {
       # Exchange NA for 0 in edata.
-      e_data <- replace_nas(edata = e_data,
-                            edata_cname = edata_cname)
+      e_data <- replace_nas(
+        edata = e_data,
+        edata_cname = edata_cname
+      )
     }
 
     # # Auto-remove all 0 data
     # select <- which(colnames(e_data) != edata_cname)
     # e_data <- e_data[apply(e_data[select] != 0, 1, any),]
-
   }
-  
+
   # Perform checks on f_data ---------------------------------------------------
-  
+
   # check that f_data has at least 2 columns #
-  if (ncol(f_data) < 2) stop ("f_data must contain at least 2 columns")
-  
+  if (ncol(f_data) < 2) stop("f_data must contain at least 2 columns")
+
   # Check if techrep_cname is null or not.
   if (!is.null(techrep_cname)) {
-    
     # Check that the tech rep column does not have a unique value in each row.
-    if (length(unique(f_data[,techrep_cname])) == nrow(f_data)) {
-      
-      stop (paste("Specified technical replicate column had a unique value for",
-                  "each row.  Values should specify groups of technical",
-                  "replicates belonging to a biological sample.",
-                  sep = ' '))
-      
+    if (length(unique(f_data[, techrep_cname])) == nrow(f_data)) {
+      stop(paste("Specified technical replicate column had a unique value for",
+        "each row.  Values should specify groups of technical",
+        "replicates belonging to a biological sample.",
+        sep = ' '
+      ))
     }
-    
   }
-  
+
   # Conduct checks on e_meta ---------------------------------------------------
-  
+
   # If e_meta is provided, check that all peptides, proteins, ... in e_data also
   # occur in e_meta.
-  if (!is.null(e_meta)){
-    
+  if (!is.null(e_meta)) {
     # If e_data has more rows than e_meta return an error.
-    if (sum(!(e_data[,edata_cname] %in% e_meta[,edata_cname])) > 0) {
-      
-      stop (paste("Not all",
-                  dType[[1]],
-                  "in e_data are present in e_meta.",
-                  sep = " "))
-      
+    if (sum(!(e_data[, edata_cname] %in% e_meta[, edata_cname])) > 0) {
+      stop(paste("Not all",
+        dType[[1]],
+        "in e_data are present in e_meta.",
+        sep = " "
+      ))
     }
-    
   }
-  
-  # if e_meta is provided check that there are no duplicates of edata_cname and 
+
+  # if e_meta is provided check that there are no duplicates of edata_cname and
   # emeta_cname combinations in the e_meta
-  if(!is.null(e_meta)){
+  if (!is.null(e_meta)) {
     # identify which columns are edata and emeta cnames in the emeta dataset
     id_edat_cname = which(colnames(e_meta) == edata_cname)
     id_emet_cname = which(colnames(e_meta) == emeta_cname)
-    
+
     # find the subset of just those 2 columns
-    sub_emeta <- unique(data.frame(e_meta[,id_edat_cname],e_meta[,id_emet_cname]))
-    
+    sub_emeta <- unique(data.frame(e_meta[, id_edat_cname], e_meta[, id_emet_cname]))
+
     # are the two number of rows equal to each other?
-    if(nrow(sub_emeta) != nrow(e_meta)){
-      stop (paste("Not all e_data cname and e_meta cname combinations are unique"))
+    if (nrow(sub_emeta) != nrow(e_meta)) {
+      stop(paste("Not all e_data cname and e_meta cname combinations are unique"))
     }
   }
 
   # Return the (possibly updated) data frames and cnames.
-  return (list(e_data = e_data,
-               f_data = f_data,
-               e_meta = e_meta,
-               emeta_cname = emeta_cname))
-  
+  return(list(
+    e_data = e_data,
+    f_data = f_data,
+    e_meta = e_meta,
+    emeta_cname = emeta_cname
+  ))
 }
 
 # Check to see if Excel or MATLAB is ruining our lives with their silly number
@@ -1698,9 +1714,8 @@ pre_flight <- function (e_data,
 # str_col only returns an error if one occurs. Otherwise it does not return
 # anything.
 #
-str_col <- function (edata,
-                     edata_cname) {
-
+str_col <- function(edata,
+                    edata_cname) {
   # Determine the index of the id column
   id_col <- which(names(edata) == edata_cname)
 
@@ -1727,11 +1742,11 @@ str_col <- function (edata,
   # that contains the IDs. For example, if the first column contains the IDs
   # the for loop will start at 2.
   for (e in seq_len(n_col)[-id_col]) {
-
     # Check if the current column is not numeric.
-    if (!inherits(edata[, e],
-                  c('integer', 'double', 'numeric'))) {
-
+    if (!inherits(
+      edata[, e],
+      c('integer', 'double', 'numeric')
+    )) {
       # Update the counter used to fill in the non_numeric vector.
       v <- v + 1
 
@@ -1740,76 +1755,60 @@ str_col <- function (edata,
 
       # If the column is numeric the following code will run.
     } else {
-
       # Check if the column contains infinite values.
       if (any(is.infinite(edata[, e]))) {
-
         # Update the counter used to fill in the too_vast vector.
         a <- a + 1
 
         # Include the column number in the too_vast vector.
         too_vast[[a]] <- e
-
       }
-
     }
-
   }
 
   # Confirm whether or not there are any non-numeric columns
   if (length(non_numeric) > 0) {
-
     # Check the length of non_numeric.
     if (length(non_numeric) == 1) {
-
       # Use proper English grammar when there is one naughty column.
       grammar <- c('Column', 'contains')
-
     } else {
-
       # Use proper English grammar when there are multiple naughty columns.
       grammar <- c('Columns', 'contain')
-
     }
 
     # Forcefully tell the user their data is not acceptable. In other words, we
     # don't want their crap data because our life is crazy enough already.
-    stop (paste(grammar[[1]],
-                knitr::combine_words(non_numeric),
-                'of e_data',
-                grammar[[2]],
-                'non-numeric values.',
-                sep = ' '))
-
+    stop(paste(grammar[[1]],
+      knitr::combine_words(non_numeric),
+      'of e_data',
+      grammar[[2]],
+      'non-numeric values.',
+      sep = ' '
+    ))
   }
 
   # Confirm whether or not there are any columns containing infinity.
   if (length(too_vast) > 0) {
-
     # Check the length of too_vast.
     if (length(too_vast) == 1) {
-
       # Use proper English grammar when there is one boundless column.
       grammar <- c('Column', 'contains')
-
     } else {
-
       # Use proper English grammar when there are multiple boundless columns.
       grammar <- c('Columns', 'contain')
-
     }
 
     # Throw down an error letting the user know it is impossible to have an
     # infinite number of something in their sample. (How would it all fit?)
-    stop (paste(grammar[[1]],
-                knitr::combine_words(too_vast),
-                'of e_data',
-                grammar[[2]],
-                'infinite values.',
-                sep = ' '))
-
+    stop(paste(grammar[[1]],
+      knitr::combine_words(too_vast),
+      'of e_data',
+      grammar[[2]],
+      'infinite values.',
+      sep = ' '
+    ))
   }
-
 }
 
 #' Replace 0 with NA
@@ -1832,59 +1831,51 @@ str_col <- function (edata,
 #'
 replace_zeros <- function(edata,
                           edata_cname) {
-
   # Acquire the index of the edata_cname column.
   id_col <- which(names(edata) == edata_cname)
 
   # Enumerate the number of zeros to be replaced with NA
   n_zeros <- sum(edata[, -id_col] == 0,
-                 na.rm = TRUE)
+    na.rm = TRUE
+  )
 
   # Loop through each column in e_data.
   for (e in 1:ncol(edata)) {
-
     # Check if the current column is NOT the ID column.
     if (e != id_col) {
-
       # Find indices where the value is 0.
       inds <- which(edata[, e] == 0)
 
       # Check if any values in the eth column of edata match 0. If there are no
       # matches then which() will return integer(0) -- which has length 0.
       if (length(inds) == 0) {
-
         # Move to the next column in the data frame.
         next
 
         # If the length of inds is greater than 0 enter the else statement.
       } else {
-
         # Replace 0 with NA.
         edata[inds, e] <- NA
-
       }
 
       # If e is equal to the index of the ID column enter the else statement.
     } else {
-
       # Move to the next column in the data frame.
       next
-
     }
-
   }
 
   # Report the number of replaced elements in e_data
   message(paste(n_zeros,
-                "instances of",
-                0,
-                "have been replaced with",
-                NA,
-                sep = " "))
+    "instances of",
+    0,
+    "have been replaced with",
+    NA,
+    sep = " "
+  ))
 
   # Return the updated edata object.
-  return (edata)
-
+  return(edata)
 }
 
 #' Replace NA with 0
@@ -1905,28 +1896,26 @@ replace_zeros <- function(edata,
 #'         replaced with 0.
 #'
 replace_nas <- function(edata,
-                          edata_cname) {
-  
+                        edata_cname) {
   # Acquire the index of the edata_cname column.
   id_col <- which(names(edata) == edata_cname)
   num_cols <- edata[, -id_col]
-  
+
   # Enumerate the number of zeros to be replaced with NA
   n_nas <- sum(is.na(num_cols))
-  
+
   num_cols[is.na(num_cols)] <- 0
   edata[, -id_col] <- num_cols
-  
+
   # Report the number of replaced elements in e_data
   message(paste(n_nas,
-                "instances of",
-                NA,
-                "have been replaced with",
-                0,
-                sep = " "))
-  
-  # Return the updated edata object.
-  return (edata)
-  
-}
+    "instances of",
+    NA,
+    "have been replaced with",
+    0,
+    sep = " "
+  ))
 
+  # Return the updated edata object.
+  return(edata)
+}

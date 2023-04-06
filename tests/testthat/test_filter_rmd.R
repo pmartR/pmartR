@@ -1,77 +1,100 @@
 context("filter by robust Mahalanobis distance")
 
-test_that("rmd_filter and applyFilt produce the correct output",{
-
+test_that("rmd_filter and applyFilt produce the correct output", {
   # Load and prepare omicsData objects -----------------------------------------
 
   # Load peptide data.
   load(system.file("testdata",
-                   "little_pdata.RData",
-                   package = "pmartR"))
+    "little_pdata.RData",
+    package = "pmartR"
+  ))
 
   # Fabricate a pepData object with the edata, fdata, and emeta data frames.
-  pdata <- as.pepData(e_data = edata,
-                      f_data = fdata,
-                      e_meta = emeta,
-                      edata_cname = "Mass_Tag_ID",
-                      fdata_cname = "SampleID",
-                      emeta_cname = "Protein")
+  pdata <- as.pepData(
+    e_data = edata,
+    f_data = fdata,
+    e_meta = emeta,
+    edata_cname = "Mass_Tag_ID",
+    fdata_cname = "SampleID",
+    emeta_cname = "Protein"
+  )
 
   # Log transfigure the peptide data.
-  pdata <- edata_transform(omicsData = pdata,
-                           data_scale = "log")
+  pdata <- edata_transform(
+    omicsData = pdata,
+    data_scale = "log"
+  )
 
   # Group designate the peptide data.
-  pdata <- group_designation(omicsData = pdata,
-                             main_effects = "Condition")
+  pdata <- group_designation(
+    omicsData = pdata,
+    main_effects = "Condition"
+  )
 
   # Forge a pepData object with only one sample from Mock. This will create a
   # singleton group when group designating the data. sg: singleton group.
-  pdata_sg <- as.pepData(e_data = edata[, 1:11],
-                         f_data = fdata[1:10, ],
-                         e_meta = emeta,
-                         edata_cname = "Mass_Tag_ID",
-                         fdata_cname = "SampleID",
-                         emeta_cname = "Protein")
+  pdata_sg <- as.pepData(
+    e_data = edata[, 1:11],
+    f_data = fdata[1:10, ],
+    e_meta = emeta,
+    edata_cname = "Mass_Tag_ID",
+    fdata_cname = "SampleID",
+    emeta_cname = "Protein"
+  )
 
   # Log transmogrify the peptide data with a singleton group.
-  pdata_sg <- edata_transform(omicsData = pdata_sg,
-                              data_scale = "log")
+  pdata_sg <- edata_transform(
+    omicsData = pdata_sg,
+    data_scale = "log"
+  )
 
   # Group designate the peptide data with a singleton group.
-  pdata_sg <- group_designation(omicsData = pdata_sg,
-                                main_effects = "Condition")
+  pdata_sg <- group_designation(
+    omicsData = pdata_sg,
+    main_effects = "Condition"
+  )
 
   # Load nmr data.
   load(system.file('testdata',
-                   'nmrData.RData',
-                   package = 'pmartR'))
+    'nmrData.RData',
+    package = 'pmartR'
+  ))
 
   # Produce a nmrData object with the edata, fdata, and emeta data frames.
-  nmrdata <- as.nmrData(e_data = edata,
-                        f_data = fdata,
-                        e_meta = emeta,
-                        edata_cname = 'Metabolite',
-                        fdata_cname = 'SampleID',
-                        emeta_cname = 'nmrClass')
+  nmrdata <- as.nmrData(
+    e_data = edata,
+    f_data = fdata,
+    e_meta = emeta,
+    edata_cname = 'Metabolite',
+    fdata_cname = 'SampleID',
+    emeta_cname = 'nmrClass'
+  )
 
   # Log transmute the nmr data.
-  nmrdata <- edata_transform(omicsData = nmrdata,
-                             data_scale = "log")
+  nmrdata <- edata_transform(
+    omicsData = nmrdata,
+    data_scale = "log"
+  )
 
   # Group designate the nmr data.
-  nmrdata <- group_designation(omicsData = nmrdata,
-                               main_effects = "Condition")
+  nmrdata <- group_designation(
+    omicsData = nmrdata,
+    main_effects = "Condition"
+  )
 
   # Test rmd_filter no singleton groups ----------------------------------------
 
   # Forge a filter object for the peptide data.
-  pfilter_rmd <- rmd_filter(omicsData = pdata,
-                            ignore_singleton_groups = FALSE)
+  pfilter_rmd <- rmd_filter(
+    omicsData = pdata,
+    ignore_singleton_groups = FALSE
+  )
 
   # Check the class of the filter object.
-  expect_s3_class(pfilter_rmd,
-                  c("rmdFilt", "data.frame"))
+  expect_s3_class(
+    pfilter_rmd,
+    c("rmdFilt", "data.frame")
+  )
 
   # Checkify the peptide filter object data frame.
   expect_equal(dim(pfilter_rmd),
@@ -99,55 +122,92 @@ test_that("rmd_filter and applyFilt produce the correct output",{
                  0.153, 0.260, 0.220, 0.167, 0.160, 0.167))
 
   # Inspectify the filter object attributes.
-  expect_equal(attr(pfilter_rmd, "sample_names"),
-               c("Infection1", "Infection2", "Infection3", "Infection4",
-                 "Infection5", "Infection6", "Infection7", "Infection8",
-                 "Infection9", "Mock1", "Mock2", "Mock3"))
-  expect_equal(attr(pfilter_rmd, "group_DF"),
-               attr(pdata, "group_DF"))
-  expect_equal(attr(pfilter_rmd, "df"),
-               5)
-  expect_equal(attr(pfilter_rmd, "metrics"),
-               c("MAD", "Kurtosis", "Skewness", "Corr", "Proportion_Missing"))
+  expect_equal(
+    attr(pfilter_rmd, "sample_names"),
+    c(
+      "Infection1", "Infection2", "Infection3", "Infection4",
+      "Infection5", "Infection6", "Infection7", "Infection8",
+      "Infection9", "Mock1", "Mock2", "Mock3"
+    )
+  )
+  expect_equal(
+    attr(pfilter_rmd, "group_DF"),
+    attr(pdata, "group_DF")
+  )
+  expect_equal(
+    attr(pfilter_rmd, "df"),
+    5
+  )
+  expect_equal(
+    attr(pfilter_rmd, "metrics"),
+    c("MAD", "Kurtosis", "Skewness", "Corr", "Proportion_Missing")
+  )
 
   # Test for an error with too few arguments in metrics (because there is no
   # missing data).
-  expect_error(suppressWarnings(rmd_filter(omicsData = nmrdata,
-                                           metrics = c("MAD",
-                                                       "Proportion_Missing"))),
-               paste("Vector of metrics must contain at least two valid",
-                     "entries. Try including a metric other than",
-                     "Proportion_Missing.",
-                     sep = " "))
+  expect_error(
+    suppressWarnings(rmd_filter(
+      omicsData = nmrdata,
+      metrics = c(
+        "MAD",
+        "Proportion_Missing"
+      )
+    )),
+    paste("Vector of metrics must contain at least two valid",
+      "entries. Try including a metric other than",
+      "Proportion_Missing.",
+      sep = " "
+    )
+  )
 
   # Test for a warning because there are few observations.
-  expect_warning(rmd_filter(omicsData = nmrdata,
-                            metrics = c("MAD",
-                                        "Kurtosis",
-                                        "Proportion_Missing")),
-                 paste("Use the results of the RMD filter with caution due",
-                       "to a small number of biomolecules \\(<50\\).",
-                       sep = " "))
+  expect_warning(
+    rmd_filter(
+      omicsData = nmrdata,
+      metrics = c(
+        "MAD",
+        "Kurtosis",
+        "Proportion_Missing"
+      )
+    ),
+    paste("Use the results of the RMD filter with caution due",
+      "to a small number of biomolecules \\(<50\\).",
+      sep = " "
+    )
+  )
 
   # Test for a warning because there is no missing data.
-  expect_warning(rmd_filter(omicsData = nmrdata,
-                            metrics = c("MAD",
-                                        "Kurtosis",
-                                        "Proportion_Missing")),
-                 paste("There are no missing values in e_data, therefore",
-                       "Proportion_Missing will not be used as one of the",
-                       "metrics for RMD-Runs.",
-                       sep = " "))
+  expect_warning(
+    rmd_filter(
+      omicsData = nmrdata,
+      metrics = c(
+        "MAD",
+        "Kurtosis",
+        "Proportion_Missing"
+      )
+    ),
+    paste("There are no missing values in e_data, therefore",
+      "Proportion_Missing will not be used as one of the",
+      "metrics for RMD-Runs.",
+      sep = " "
+    )
+  )
 
   # Generate a filter object for the nmr data.
-  nmrfilter_rmd <- suppressWarnings(rmd_filter(omicsData = nmrdata,
-                                               metrics = c("MAD", "Kurtosis",
-                                                           "Skewness",
-                                                           "Correlation")))
+  nmrfilter_rmd <- suppressWarnings(rmd_filter(
+    omicsData = nmrdata,
+    metrics = c(
+      "MAD", "Kurtosis",
+      "Skewness",
+      "Correlation"
+    )
+  ))
 
   # Check the class of the filter object.
-  expect_s3_class(nmrfilter_rmd,
-                  c("rmdFilt", "data.frame"))
+  expect_s3_class(
+    nmrfilter_rmd,
+    c("rmdFilt", "data.frame")
+  )
 
   # Checkify the nmr filter object data frame.
   expect_equal(dim(nmrfilter_rmd),
@@ -191,35 +251,52 @@ test_that("rmd_filter and applyFilt produce the correct output",{
                  0.925, 0.93, 0.926, 0.926, 0.922))
 
   # Run standard diagnostics on the filter object attributes.
-  expect_equal(attr(nmrfilter_rmd, "sample_names"),
-               c("F3-049", "F3-097", "F3-002", "F3-050", "F3-098", "F3-013",
-                 "F3-061", "F3-109", "F3-062", "F3-110", "F3-025", "F3-073",
-                 "F3-121", "F3-026", "F3-074", "F3-122", "F3-085", "F3-133",
-                 "F3-038", "F3-086", "F3-134", "F4-001", "F4-009", "F4-065",
-                 "F4-005", "F4-069", "F4-037", "F4-017", "F4-045", "F4-021",
-                 "F4-049", "F4-081", "F4-025", "F4-053", "F4-085", "F4-029",
-                 "F4-057", "F4-089", "F4-033", "F4-061", "F4-093"))
-  expect_equal(attr(nmrfilter_rmd, "group_DF"),
-               attr(nmrdata, "group_DF"))
-  expect_equal(attr(nmrfilter_rmd, "df"),
-               4)
-  expect_equal(attr(nmrfilter_rmd, "metrics"),
-               c("MAD", "Kurtosis", "Skewness", "Corr"))
+  expect_equal(
+    attr(nmrfilter_rmd, "sample_names"),
+    c(
+      "F3-049", "F3-097", "F3-002", "F3-050", "F3-098", "F3-013",
+      "F3-061", "F3-109", "F3-062", "F3-110", "F3-025", "F3-073",
+      "F3-121", "F3-026", "F3-074", "F3-122", "F3-085", "F3-133",
+      "F3-038", "F3-086", "F3-134", "F4-001", "F4-009", "F4-065",
+      "F4-005", "F4-069", "F4-037", "F4-017", "F4-045", "F4-021",
+      "F4-049", "F4-081", "F4-025", "F4-053", "F4-085", "F4-029",
+      "F4-057", "F4-089", "F4-033", "F4-061", "F4-093"
+    )
+  )
+  expect_equal(
+    attr(nmrfilter_rmd, "group_DF"),
+    attr(nmrdata, "group_DF")
+  )
+  expect_equal(
+    attr(nmrfilter_rmd, "df"),
+    4
+  )
+  expect_equal(
+    attr(nmrfilter_rmd, "metrics"),
+    c("MAD", "Kurtosis", "Skewness", "Corr")
+  )
 
   # Test rmd_filter with singleton groups --------------------------------------
 
   # Forge a filter object for the peptide data.
-  expect_warning(pfilter_rmd_sg <- rmd_filter(omicsData = pdata_sg,
-                                              ignore_singleton_groups = TRUE),
-                 paste("Use the results of the RMD filter with caution due to",
-                       "a small number of samples relative to the number of",
-                       "metrics being used. Consider reducing the number of",
-                       "metrics being used.",
-                       sep = " "))
+  expect_warning(
+    pfilter_rmd_sg <- rmd_filter(
+      omicsData = pdata_sg,
+      ignore_singleton_groups = TRUE
+    ),
+    paste("Use the results of the RMD filter with caution due to",
+      "a small number of samples relative to the number of",
+      "metrics being used. Consider reducing the number of",
+      "metrics being used.",
+      sep = " "
+    )
+  )
 
   # Check the class of the filter object.
-  expect_s3_class(pfilter_rmd_sg,
-                  c("rmdFilt", "data.frame"))
+  expect_s3_class(
+    pfilter_rmd_sg,
+    c("rmdFilt", "data.frame")
+  )
 
   # Checkify the peptide filter object data frame.
   expect_equal(dim(pfilter_rmd_sg),
@@ -247,26 +324,40 @@ test_that("rmd_filter and applyFilt produce the correct output",{
                  0.220, 0.153, 0.260, 0.220))
 
   # Inspectify the filter object attributes.
-  expect_equal(attr(pfilter_rmd_sg, "sample_names"),
-               c("Infection1", "Infection2", "Infection3", "Infection4",
-                 "Infection5", "Infection6", "Infection7", "Infection8",
-                 "Infection9"))
+  expect_equal(
+    attr(pfilter_rmd_sg, "sample_names"),
+    c(
+      "Infection1", "Infection2", "Infection3", "Infection4",
+      "Infection5", "Infection6", "Infection7", "Infection8",
+      "Infection9"
+    )
+  )
   temp_grp_df <- attr(pdata_sg, "group_DF")[-10, ]
-  expect_equal(attr(pfilter_rmd_sg, "group_DF"),
-               temp_grp_df)
-  expect_equal(attr(pfilter_rmd_sg, "df"),
-               5)
-  expect_equal(attr(pfilter_rmd_sg, "metrics"),
-               c("MAD", "Kurtosis", "Skewness", "Corr", "Proportion_Missing"))
+  expect_equal(
+    attr(pfilter_rmd_sg, "group_DF"),
+    temp_grp_df
+  )
+  expect_equal(
+    attr(pfilter_rmd_sg, "df"),
+    5
+  )
+  expect_equal(
+    attr(pfilter_rmd_sg, "metrics"),
+    c("MAD", "Kurtosis", "Skewness", "Corr", "Proportion_Missing")
+  )
 
   # Forge a filter object for the peptide data. There is one singleton group but
   # it is not ignored for the following tests. _f: ignore singletons is FALSE
-  pfilter_rmd_sg_f <- rmd_filter(omicsData = pdata_sg,
-                               ignore_singleton_groups = FALSE)
+  pfilter_rmd_sg_f <- rmd_filter(
+    omicsData = pdata_sg,
+    ignore_singleton_groups = FALSE
+  )
 
   # Check the class of the filter object.
-  expect_s3_class(pfilter_rmd_sg_f,
-                  c("rmdFilt", "data.frame"))
+  expect_s3_class(
+    pfilter_rmd_sg_f,
+    c("rmdFilt", "data.frame")
+  )
 
   # Checkify the peptide filter object data frame.
   expect_equal(dim(pfilter_rmd_sg_f),
@@ -295,103 +386,152 @@ test_that("rmd_filter and applyFilt produce the correct output",{
                  0.220, 0.153, 0.260, 0.220, 0.167))
 
   # Inspectify the filter object attributes.
-  expect_equal(attr(pfilter_rmd_sg_f, "sample_names"),
-               c("Infection1", "Infection2", "Infection3", "Infection4",
-                 "Infection5", "Infection6", "Infection7", "Infection8",
-                 "Infection9", "Mock1"))
-  expect_equal(attr(pfilter_rmd_sg_f, "group_DF"),
-               attr(pdata_sg, "group_DF"))
-  expect_equal(attr(pfilter_rmd_sg_f, "df"),
-               5)
-  expect_equal(attr(pfilter_rmd_sg_f, "metrics"),
-               c("MAD", "Kurtosis", "Skewness", "Corr", "Proportion_Missing"))
+  expect_equal(
+    attr(pfilter_rmd_sg_f, "sample_names"),
+    c(
+      "Infection1", "Infection2", "Infection3", "Infection4",
+      "Infection5", "Infection6", "Infection7", "Infection8",
+      "Infection9", "Mock1"
+    )
+  )
+  expect_equal(
+    attr(pfilter_rmd_sg_f, "group_DF"),
+    attr(pdata_sg, "group_DF")
+  )
+  expect_equal(
+    attr(pfilter_rmd_sg_f, "df"),
+    5
+  )
+  expect_equal(
+    attr(pfilter_rmd_sg_f, "metrics"),
+    c("MAD", "Kurtosis", "Skewness", "Corr", "Proportion_Missing")
+  )
 
   # Test applyFilt no singletons -----------------------------------------------
 
   # Peptide data ---------------
 
   # Apply the filter to the peptide data without singleton groups.
-  pfiltered <- applyFilt(filter_object = pfilter_rmd,
-                         omicsData = pdata,
-                         pvalue_threshold = 0.0001,
-                         min_num_biomolecules = 50)
+  pfiltered <- applyFilt(
+    filter_object = pfilter_rmd,
+    omicsData = pdata,
+    pvalue_threshold = 0.0001,
+    min_num_biomolecules = 50
+  )
 
   # Ensurify the class and attributes that shouldn't have changed didn't change.
-  expect_identical(attr(pdata, "cnames"),
-                   attr(pfiltered, "cnames"))
-  expect_identical(class(pdata),
-                   class(pfiltered))
+  expect_identical(
+    attr(pdata, "cnames"),
+    attr(pfiltered, "cnames")
+  )
+  expect_identical(
+    class(pdata),
+    class(pfiltered)
+  )
 
   # Examine the filters attribute.
-  expect_equal(attr(pfiltered, "filters")[[1]]$type,
-               "rmdFilt")
-  expect_identical(attr(pfiltered, "filters")[[1]]$threshold,
-                   0.0001)
-  expect_equal(attr(pfiltered, "filters")[[1]]$filtered,
-               "Infection7")
+  expect_equal(
+    attr(pfiltered, "filters")[[1]]$type,
+    "rmdFilt"
+  )
+  expect_identical(
+    attr(pfiltered, "filters")[[1]]$threshold,
+    0.0001
+  )
+  expect_equal(
+    attr(pfiltered, "filters")[[1]]$filtered,
+    "Infection7"
+  )
   expect_true(is.na(attr(pfiltered, "filters")[[1]]$method))
 
   # Investigate the data_info attribute.
   expect_equal(
     attr(pfiltered, "data_info"),
-    list(data_scale_orig = "abundance",
-         data_scale = "log",
-         norm_info = list(is_normalized = FALSE),
-         num_edata = length(unique(pfiltered$e_data[, 1])),
-         num_miss_obs = sum(is.na(pfiltered$e_data)),
-         prop_missing = (sum(is.na(pfiltered$e_data)) /
-                           prod(dim(pfiltered$e_data[, -1]))),
-         num_samps = ncol(pfiltered$e_data[, -1]),
-         data_types = NULL,
-         batch_info = list(is_bc = FALSE))
+    list(
+      data_scale_orig = "abundance",
+      data_scale = "log",
+      norm_info = list(is_normalized = FALSE),
+      num_edata = length(unique(pfiltered$e_data[, 1])),
+      num_miss_obs = sum(is.na(pfiltered$e_data)),
+      prop_missing = (sum(is.na(pfiltered$e_data)) /
+        prod(dim(pfiltered$e_data[, -1]))),
+      num_samps = ncol(pfiltered$e_data[, -1]),
+      data_types = NULL,
+      batch_info = list(is_bc = FALSE)
+    )
   )
 
   # Explore the meta_info attribute.
   expect_equal(
     attr(pfiltered, "meta_info"),
-    list(meta_data = TRUE,
-         num_emeta = length(unique(pfiltered$e_meta$Protein)))
+    list(
+      meta_data = TRUE,
+      num_emeta = length(unique(pfiltered$e_meta$Protein))
+    )
   )
 
   # Dissect the group_DF attribute.
-  expect_equal(dim(attr(pfiltered, "group_DF")),
-               c(11, 2))
-  expect_equal(attr(pfiltered, "group_DF")$SampleID,
-               c("Infection1", "Infection2", "Infection3", "Infection4",
-                 "Infection5", "Infection6", "Infection8", "Infection9",
-                 "Mock1", "Mock2", "Mock3"))
+  expect_equal(
+    dim(attr(pfiltered, "group_DF")),
+    c(11, 2)
+  )
+  expect_equal(
+    attr(pfiltered, "group_DF")$SampleID,
+    c(
+      "Infection1", "Infection2", "Infection3", "Infection4",
+      "Infection5", "Infection6", "Infection8", "Infection9",
+      "Mock1", "Mock2", "Mock3"
+    )
+  )
 
   # Inspect the filtered e_data, f_data, and e_meta data frames.
-  expect_equal(dim(pfiltered$e_data),
-               c(150, 12))
-  expect_equal(dim(pfiltered$f_data),
-               c(11, 2))
-  expect_equal(dim(pfiltered$e_meta),
-               c(150, 4))
+  expect_equal(
+    dim(pfiltered$e_data),
+    c(150, 12)
+  )
+  expect_equal(
+    dim(pfiltered$f_data),
+    c(11, 2)
+  )
+  expect_equal(
+    dim(pfiltered$e_meta),
+    c(150, 4)
+  )
 
   # nmr data ---------------
 
   # Apply the filter to the nmr data with default min_num_biomolecules.
-  expect_error(applyFilt(filter_object = nmrfilter_rmd,
-                         omicsData = nmrdata,
-                         pvalue_threshold = 0.0001,
-                         min_num_biomolecules = 50),
-               paste("There are fewer biomolecules in omicsData than",
-                     "min_num_biomolecules \\(50\\).",
-                     "See applyFilt for details.",
-                     sep = " "))
+  expect_error(
+    applyFilt(
+      filter_object = nmrfilter_rmd,
+      omicsData = nmrdata,
+      pvalue_threshold = 0.0001,
+      min_num_biomolecules = 50
+    ),
+    paste("There are fewer biomolecules in omicsData than",
+      "min_num_biomolecules \\(50\\).",
+      "See applyFilt for details.",
+      sep = " "
+    )
+  )
 
   # Apply the filter to the nmr data with a lower biomolecule threshold.
-  nmrfiltered <- applyFilt(filter_object = nmrfilter_rmd,
-                           omicsData = nmrdata,
-                           pvalue_threshold = 0.0001,
-                           min_num_biomolecules = 30)
+  nmrfiltered <- applyFilt(
+    filter_object = nmrfilter_rmd,
+    omicsData = nmrdata,
+    pvalue_threshold = 0.0001,
+    min_num_biomolecules = 30
+  )
 
   # Ensurify the class and attributes that shouldn't have changed didn't change.
-  expect_identical(attr(nmrdata, "cnames"),
-                   attr(nmrfiltered, "cnames"))
-  expect_identical(class(nmrdata),
-                   class(nmrfiltered))
+  expect_identical(
+    attr(nmrdata, "cnames"),
+    attr(nmrfiltered, "cnames")
+  )
+  expect_identical(
+    class(nmrdata),
+    class(nmrfiltered)
+  )
 
   # Examine the filters attribute.
   expect_equal(attr(nmrfiltered, "filters")[[1]]$type,
@@ -405,23 +545,27 @@ test_that("rmd_filter and applyFilt produce the correct output",{
   # Investigate the data_info attribute.
   expect_equal(
     attr(nmrfiltered, "data_info"),
-    list(data_scale_orig = "abundance",
-         data_scale = "log",
-         norm_info = list(is_normalized = FALSE),
-         num_edata = length(unique(nmrfiltered$e_data[, 1])),
-         num_miss_obs = sum(is.na(nmrfiltered$e_data)),
-         prop_missing = (sum(is.na(nmrfiltered$e_data)) /
-                           prod(dim(nmrfiltered$e_data[, -1]))),
-         num_samps = ncol(nmrfiltered$e_data[, -1]),
-         data_types = NULL,
-         batch_info = list(is_bc = FALSE))
+    list(
+      data_scale_orig = "abundance",
+      data_scale = "log",
+      norm_info = list(is_normalized = FALSE),
+      num_edata = length(unique(nmrfiltered$e_data[, 1])),
+      num_miss_obs = sum(is.na(nmrfiltered$e_data)),
+      prop_missing = (sum(is.na(nmrfiltered$e_data)) /
+        prod(dim(nmrfiltered$e_data[, -1]))),
+      num_samps = ncol(nmrfiltered$e_data[, -1]),
+      data_types = NULL,
+      batch_info = list(is_bc = FALSE)
+    )
   )
 
   # Explore the meta_info attribute.
   expect_equal(
     attr(nmrfiltered, "meta_info"),
-    list(meta_data = TRUE,
-         num_emeta = length(unique(nmrfiltered$e_meta$nmrClass)))
+    list(
+      meta_data = TRUE,
+      num_emeta = length(unique(nmrfiltered$e_meta$nmrClass))
+    )
   )
 
   # Dissect the group_DF attribute.
@@ -446,16 +590,22 @@ test_that("rmd_filter and applyFilt produce the correct output",{
   # Test applyFilt with singletons ---------------------------------------------
 
   # Apply the filter to the peptide data without singleton groups.
-  pfiltered_sg <- applyFilt(filter_object = pfilter_rmd_sg,
-                         omicsData = pdata_sg,
-                         pvalue_threshold = 0.0000000000000008,
-                         min_num_biomolecules = 50)
+  pfiltered_sg <- applyFilt(
+    filter_object = pfilter_rmd_sg,
+    omicsData = pdata_sg,
+    pvalue_threshold = 0.0000000000000008,
+    min_num_biomolecules = 50
+  )
 
   # Ensurify the class and attributes that shouldn't have changed didn't change.
-  expect_identical(attr(pdata_sg, "cnames"),
-                   attr(pfiltered_sg, "cnames"))
-  expect_identical(class(pdata_sg),
-                   class(pfiltered_sg))
+  expect_identical(
+    attr(pdata_sg, "cnames"),
+    attr(pfiltered_sg, "cnames")
+  )
+  expect_identical(
+    class(pdata_sg),
+    class(pfiltered_sg)
+  )
 
   # Examine the filters attribute.
   expect_equal(attr(pfiltered_sg, "filters")[[1]]$type,
@@ -470,23 +620,27 @@ test_that("rmd_filter and applyFilt produce the correct output",{
   # Investigate the data_info attribute.
   expect_equal(
     attr(pfiltered_sg, "data_info"),
-    list(data_scale_orig = "abundance",
-         data_scale = "log",
-         norm_info = list(is_normalized = FALSE),
-         num_edata = length(unique(pfiltered_sg$e_data[, 1])),
-         num_miss_obs = sum(is.na(pfiltered_sg$e_data)),
-         prop_missing = (sum(is.na(pfiltered_sg$e_data)) /
-                           prod(dim(pfiltered_sg$e_data[, -1]))),
-         num_samps = ncol(pfiltered_sg$e_data[, -1]),
-         data_types = NULL,
-         batch_info = list(is_bc = FALSE))
+    list(
+      data_scale_orig = "abundance",
+      data_scale = "log",
+      norm_info = list(is_normalized = FALSE),
+      num_edata = length(unique(pfiltered_sg$e_data[, 1])),
+      num_miss_obs = sum(is.na(pfiltered_sg$e_data)),
+      prop_missing = (sum(is.na(pfiltered_sg$e_data)) /
+        prod(dim(pfiltered_sg$e_data[, -1]))),
+      num_samps = ncol(pfiltered_sg$e_data[, -1]),
+      data_types = NULL,
+      batch_info = list(is_bc = FALSE)
+    )
   )
 
   # Explore the meta_info attribute.
   expect_equal(
     attr(pfiltered_sg, "meta_info"),
-    list(meta_data = TRUE,
-         num_emeta = length(unique(pfiltered_sg$e_meta$Protein)))
+    list(
+      meta_data = TRUE,
+      num_emeta = length(unique(pfiltered_sg$e_meta$Protein))
+    )
   )
 
   # Dissect the group_DF attribute.
@@ -505,120 +659,164 @@ test_that("rmd_filter and applyFilt produce the correct output",{
                c(150, 4))
 
   # Apply the filter to the peptide data without singleton groups.
-  pfiltered_sg_f <- applyFilt(filter_object = pfilter_rmd_sg_f,
-                              omicsData = pdata_sg,
-                              pvalue_threshold = 0.0001,
-                              min_num_biomolecules = 50)
+  pfiltered_sg_f <- applyFilt(
+    filter_object = pfilter_rmd_sg_f,
+    omicsData = pdata_sg,
+    pvalue_threshold = 0.0001,
+    min_num_biomolecules = 50
+  )
 
   # Ensurify the class and attributes that shouldn't have changed didn't change.
-  expect_identical(attr(pdata_sg, "cnames"),
-                   attr(pfiltered_sg_f, "cnames"))
-  expect_identical(class(pdata_sg),
-                   class(pfiltered_sg_f))
+  expect_identical(
+    attr(pdata_sg, "cnames"),
+    attr(pfiltered_sg_f, "cnames")
+  )
+  expect_identical(
+    class(pdata_sg),
+    class(pfiltered_sg_f)
+  )
 
   # Examine the filters attribute.
-  expect_equal(attr(pfiltered_sg_f, "filters")[[1]]$type,
-               "rmdFilt")
-  expect_identical(attr(pfiltered_sg_f, "filters")[[1]]$threshold,
-                   0.0001)
-  expect_equal(attr(pfiltered_sg_f, "filters")[[1]]$filtered,
-               "Mock1")
+  expect_equal(
+    attr(pfiltered_sg_f, "filters")[[1]]$type,
+    "rmdFilt"
+  )
+  expect_identical(
+    attr(pfiltered_sg_f, "filters")[[1]]$threshold,
+    0.0001
+  )
+  expect_equal(
+    attr(pfiltered_sg_f, "filters")[[1]]$filtered,
+    "Mock1"
+  )
   expect_true(is.na(attr(pfiltered_sg_f, "filters")[[1]]$method))
 
   # Investigate the data_info attribute.
   expect_equal(
     attr(pfiltered_sg_f, "data_info"),
-    list(data_scale_orig = "abundance",
-         data_scale = "log",
-         norm_info = list(is_normalized = FALSE),
-         num_edata = length(unique(pfiltered_sg_f$e_data[, 1])),
-         num_miss_obs = sum(is.na(pfiltered_sg_f$e_data)),
-         prop_missing = (sum(is.na(pfiltered_sg_f$e_data)) /
-                           prod(dim(pfiltered_sg_f$e_data[, -1]))),
-         num_samps = ncol(pfiltered_sg_f$e_data[, -1]),
-         data_types = NULL,
-         batch_info = list(is_bc = FALSE))
+    list(
+      data_scale_orig = "abundance",
+      data_scale = "log",
+      norm_info = list(is_normalized = FALSE),
+      num_edata = length(unique(pfiltered_sg_f$e_data[, 1])),
+      num_miss_obs = sum(is.na(pfiltered_sg_f$e_data)),
+      prop_missing = (sum(is.na(pfiltered_sg_f$e_data)) /
+        prod(dim(pfiltered_sg_f$e_data[, -1]))),
+      num_samps = ncol(pfiltered_sg_f$e_data[, -1]),
+      data_types = NULL,
+      batch_info = list(is_bc = FALSE)
+    )
   )
 
   # Explore the meta_info attribute.
   expect_equal(
     attr(pfiltered_sg_f, "meta_info"),
-    list(meta_data = TRUE,
-         num_emeta = length(unique(pfiltered_sg_f$e_meta$Protein)))
+    list(
+      meta_data = TRUE,
+      num_emeta = length(unique(pfiltered_sg_f$e_meta$Protein))
+    )
   )
 
   # Dissect the group_DF attribute.
-  expect_equal(dim(attr(pfiltered_sg_f, "group_DF")),
-               c(9, 2))
-  expect_equal(attr(pfiltered_sg_f, "group_DF")$SampleID,
-               c("Infection1", "Infection2", "Infection3", "Infection4",
-                 "Infection5", "Infection6", "Infection7", "Infection8",
-                 "Infection9"))
+  expect_equal(
+    dim(attr(pfiltered_sg_f, "group_DF")),
+    c(9, 2)
+  )
+  expect_equal(
+    attr(pfiltered_sg_f, "group_DF")$SampleID,
+    c(
+      "Infection1", "Infection2", "Infection3", "Infection4",
+      "Infection5", "Infection6", "Infection7", "Infection8",
+      "Infection9"
+    )
+  )
 
   # Inspect the filtered e_data, f_data, and e_meta data frames.
-  expect_equal(dim(pfiltered_sg_f$e_data),
-               c(150, 10))
-  expect_equal(dim(pfiltered_sg_f$f_data),
-               c(9, 2))
-  expect_equal(dim(pfiltered_sg_f$e_meta),
-               c(150, 4))
+  expect_equal(
+    dim(pfiltered_sg_f$e_data),
+    c(150, 10)
+  )
+  expect_equal(
+    dim(pfiltered_sg_f$f_data),
+    c(9, 2)
+  )
+  expect_equal(
+    dim(pfiltered_sg_f$e_meta),
+    c(150, 4)
+  )
 
 
   # Test VizSampNames attribute ------------------------------------------------
 
   # Assemble long sample names to make sure the VizSampNames attribute is
   # created correctly.
-  names(pdata$e_data) <- c("Mass_Tag_ID",
-                           "qwerty_one_infection1_asdf",
-                           "qwerty_two_infection2_asdf",
-                           "qwerty_three_infection3_asdf",
-                           "qwerty_four_infection4_asdf",
-                           "qwerty_five_infection5_asdf",
-                           "qwerty_six_infection6_asdf",
-                           "qwerty_seven_infection7_asdf",
-                           "qwerty_eight_infection8_asdf",
-                           "qwerty_nine_infection9_asdf",
-                           "qwerty_one_mock1_asdf",
-                           "qwerty_two_mock2_asdf",
-                           "qwerty_three_mock3_asdf")
+  names(pdata$e_data) <- c(
+    "Mass_Tag_ID",
+    "qwerty_one_infection1_asdf",
+    "qwerty_two_infection2_asdf",
+    "qwerty_three_infection3_asdf",
+    "qwerty_four_infection4_asdf",
+    "qwerty_five_infection5_asdf",
+    "qwerty_six_infection6_asdf",
+    "qwerty_seven_infection7_asdf",
+    "qwerty_eight_infection8_asdf",
+    "qwerty_nine_infection9_asdf",
+    "qwerty_one_mock1_asdf",
+    "qwerty_two_mock2_asdf",
+    "qwerty_three_mock3_asdf"
+  )
 
   # Change to the new long names in f_data
-  pdata$f_data$SampleID <- c("qwerty_one_infection1_asdf",
-                             "qwerty_two_infection2_asdf",
-                             "qwerty_three_infection3_asdf",
-                             "qwerty_four_infection4_asdf",
-                             "qwerty_five_infection5_asdf",
-                             "qwerty_six_infection6_asdf",
-                             "qwerty_seven_infection7_asdf",
-                             "qwerty_eight_infection8_asdf",
-                             "qwerty_nine_infection9_asdf",
-                             "qwerty_one_mock1_asdf",
-                             "qwerty_two_mock2_asdf",
-                             "qwerty_three_mock3_asdf")
+  pdata$f_data$SampleID <- c(
+    "qwerty_one_infection1_asdf",
+    "qwerty_two_infection2_asdf",
+    "qwerty_three_infection3_asdf",
+    "qwerty_four_infection4_asdf",
+    "qwerty_five_infection5_asdf",
+    "qwerty_six_infection6_asdf",
+    "qwerty_seven_infection7_asdf",
+    "qwerty_eight_infection8_asdf",
+    "qwerty_nine_infection9_asdf",
+    "qwerty_one_mock1_asdf",
+    "qwerty_two_mock2_asdf",
+    "qwerty_three_mock3_asdf"
+  )
 
   # Use delim and components to make tiny sample names.
   delim_u <- custom_sampnames(pdata, delim = "_", components = 3)
 
   # Don't forget to rerun the group_designation function!!
-  delim_u <- group_designation(omicsData = delim_u,
-                               main_effects = "Condition")
+  delim_u <- group_designation(
+    omicsData = delim_u,
+    main_effects = "Condition"
+  )
 
   # Forge a filter object for the peptide data with tiny sample names.
-  delim_rmd <- rmd_filter(omicsData = delim_u,
-                          ignore_singleton_groups = FALSE)
+  delim_rmd <- rmd_filter(
+    omicsData = delim_u,
+    ignore_singleton_groups = FALSE
+  )
 
   # Sleuth around the sample names attributes.
-  expect_equal(attr(delim_rmd, "sample_names"),
-               c("qwerty_one_infection1_asdf", "qwerty_two_infection2_asdf",
-                 "qwerty_three_infection3_asdf", "qwerty_four_infection4_asdf",
-                 "qwerty_five_infection5_asdf", "qwerty_six_infection6_asdf",
-                 "qwerty_seven_infection7_asdf", "qwerty_eight_infection8_asdf",
-                 "qwerty_nine_infection9_asdf", "qwerty_one_mock1_asdf",
-                 "qwerty_two_mock2_asdf", "qwerty_three_mock3_asdf"))
-  expect_equal(attr(delim_rmd, "VizSampNames"),
-               c("infection1", "infection2", "infection3", "infection4",
-                 "infection5", "infection6", "infection7", "infection8",
-                 "infection9", "mock1", "mock2", "mock3"))
+  expect_equal(
+    attr(delim_rmd, "sample_names"),
+    c(
+      "qwerty_one_infection1_asdf", "qwerty_two_infection2_asdf",
+      "qwerty_three_infection3_asdf", "qwerty_four_infection4_asdf",
+      "qwerty_five_infection5_asdf", "qwerty_six_infection6_asdf",
+      "qwerty_seven_infection7_asdf", "qwerty_eight_infection8_asdf",
+      "qwerty_nine_infection9_asdf", "qwerty_one_mock1_asdf",
+      "qwerty_two_mock2_asdf", "qwerty_three_mock3_asdf"
+    )
+  )
+  expect_equal(
+    attr(delim_rmd, "VizSampNames"),
+    c(
+      "infection1", "infection2", "infection3", "infection4",
+      "infection5", "infection6", "infection7", "infection8",
+      "infection9", "mock1", "mock2", "mock3"
+    )
+  )
 
   # Make sure the output is in the same order even though the names changed.
   expect_identical(delim_rmd$Group, pfilter_rmd$Group)
@@ -634,13 +832,18 @@ test_that("rmd_filter and applyFilt produce the correct output",{
 
   # Apply the filter with a value for pvalue_threshold that will not filter any
   # samples.
-  expect_message(noFilta <- applyFilt(filter_object = pfilter_rmd,
-                                      omicsData = pdata,
-                                      pvalue_threshold = 0.0000000000000000001,
-                                      min_num_biomolecules = 50),
-                 paste("No samples were filtered with the value specified",
-                       "for the pvalue_threshold argument.",
-                       sep = " "))
+  expect_message(
+    noFilta <- applyFilt(
+      filter_object = pfilter_rmd,
+      omicsData = pdata,
+      pvalue_threshold = 0.0000000000000000001,
+      min_num_biomolecules = 50
+    ),
+    paste("No samples were filtered with the value specified",
+      "for the pvalue_threshold argument.",
+      sep = " "
+    )
+  )
 
   # The output of applyFilt should be the same as the omicsData object used as
   # the input because the filter was not applied. Therefore, the filters
@@ -650,29 +853,36 @@ test_that("rmd_filter and applyFilt produce the correct output",{
   # Create paired objects ------------------------------------------------------
 
   load(system.file('testdata',
-                   'little_pairdata.RData',
-                   package = 'pmartR'))
+    'little_pairdata.RData',
+    package = 'pmartR'
+  ))
 
   # Create a pepData object with the original main effect and pairing variable.
-  pairdata <- as.pepData(e_data = edata,
-                         f_data = fdata,
-                         e_meta = emeta,
-                         edata_cname = 'Mass_Tag_ID',
-                         fdata_cname = 'Name',
-                         emeta_cname = 'Protein')
+  pairdata <- as.pepData(
+    e_data = edata,
+    f_data = fdata,
+    e_meta = emeta,
+    edata_cname = 'Mass_Tag_ID',
+    fdata_cname = 'Name',
+    emeta_cname = 'Protein'
+  )
   pairdata <- edata_transform(pairdata,
-                              data_scale = "log")
+    data_scale = "log"
+  )
   pairdata <- group_designation(pairdata,
-                                pair_id = "PairID",
-                                pair_group = "Time",
-                                pair_denom = "18")
+    pair_id = "PairID",
+    pair_group = "Time",
+    pair_denom = "18"
+  )
 
   pair_filter <- rmd_filter(omicsData = pairdata)
 
-  pair_filtered <- applyFilt(filter_object = pair_filter,
-                             omicsData = pairdata,
-                             pvalue_threshold = 0.001,
-                             min_num_biomolecules = 50)
+  pair_filtered <- applyFilt(
+    filter_object = pair_filter,
+    omicsData = pairdata,
+    pvalue_threshold = 0.001,
+    min_num_biomolecules = 50
+  )
 
   # Holy paired rmd filter tests with no main effects, Batman! -----------------
 
@@ -726,21 +936,49 @@ test_that("rmd_filter and applyFilt produce the correct output",{
   expect_true(is.na(attr(pair_filtered, "filters")[[1]]$method))
   expect_equal(
     attr(pair_filtered, "data_info"),
-    list(data_scale_orig = "abundance",
-         data_scale = "log",
-         norm_info = list(is_normalized = FALSE),
-         num_edata = length(unique(pair_filtered$e_data[, 1])),
-         num_miss_obs = sum(is.na(pair_filtered$e_data)),
-         prop_missing = (sum(is.na(pair_filtered$e_data)) /
-                           prod(dim(pair_filtered$e_data[, -1]))),
-         num_samps = ncol(pair_filtered$e_data[, -1]),
-         data_types = NULL,
-         batch_info = list(is_bc = FALSE))
+    list(
+      data_scale_orig = "abundance",
+      data_scale = "log",
+      norm_info = list(is_normalized = FALSE),
+      num_edata = length(unique(pair_filtered$e_data[, 1])),
+      num_miss_obs = sum(is.na(pair_filtered$e_data)),
+      prop_missing = (sum(is.na(pair_filtered$e_data)) /
+        prod(dim(pair_filtered$e_data[, -1]))),
+      num_samps = ncol(pair_filtered$e_data[, -1]),
+      data_types = NULL,
+      batch_info = list(is_bc = FALSE)
+    )
   )
   expect_equal(
     attr(pair_filtered, "meta_info"),
-    list(meta_data = TRUE,
-         num_emeta = length(unique(pair_filtered$e_meta$Protein)))
+    list(
+      meta_data = TRUE,
+      num_emeta = length(unique(pair_filtered$e_meta$Protein))
+    )
+  )
+  expect_equal(
+    dim(attr(pair_filtered, "group_DF")),
+    c(26, 2)
+  )
+  expect_equal(
+    attr(attr(pair_filtered, "group_DF"), "main_effects"),
+    "no_main_effect"
+  )
+  expect_equal(
+    attr(attr(pair_filtered, "group_DF"), "nonsingleton_groups"),
+    "paired_diff"
+  )
+  expect_equal(
+    dim(pair_filtered$e_data),
+    c(150, 27)
+  )
+  expect_equal(
+    dim(pair_filtered$f_data),
+    c(26, 6)
+  )
+  expect_equal(
+    dim(pair_filtered$e_meta),
+    c(175, 6)
   )
   expect_equal(dim(attr(pair_filtered, "group_DF")),
                c(26, 2))
@@ -756,42 +994,59 @@ test_that("rmd_filter and applyFilt produce the correct output",{
                c(175, 6))
 
   # Expect warning if data has already been filtered ---------------------------
-  
+
   # The original peptide data gets overwritten at some point. Load it as before.
   load(system.file("testdata",
-                   "little_pdata.RData",
-                   package = "pmartR"))
-  pdata <- as.pepData(e_data = edata,
-                      f_data = fdata,
-                      e_meta = emeta,
-                      edata_cname = "Mass_Tag_ID",
-                      fdata_cname = "SampleID",
-                      emeta_cname = "Protein")
-  pdata <- edata_transform(omicsData = pdata,
-                           data_scale = "log")
-  pdata <- group_designation(omicsData = pdata,
-                             main_effects = "Condition")
-  
-  # Create three identical filters using the same omicsData
-  pfilter1 <- rmd_filter(omicsData = pdata,
-                         ignore_singleton_groups = FALSE)
-  pfilter2 <- rmd_filter(omicsData = pdata,
-                         ignore_singleton_groups = FALSE)
-  pfilter3 <- rmd_filter(omicsData = pdata,
-                         ignore_singleton_groups = FALSE)
-  
-  # Apply two filters
-  pfiltered1 <- applyFilt(filter_object = pfilter1,
-                          omicsData = pdata,
-                          pvalue_threshold = 0.0001,
-                          min_num_biomolecules = 50)
-  warnings <- capture_warnings(
-    pfiltered2 <- applyFilt(filter_object = pfilter2,
-                            omicsData = pfiltered1,
-                            pvalue_threshold = 0.0001,
-                            min_num_biomolecules = 50)
+    "little_pdata.RData",
+    package = "pmartR"
+  ))
+  pdata <- as.pepData(
+    e_data = edata,
+    f_data = fdata,
+    e_meta = emeta,
+    edata_cname = "Mass_Tag_ID",
+    fdata_cname = "SampleID",
+    emeta_cname = "Protein"
   )
-  
+  pdata <- edata_transform(
+    omicsData = pdata,
+    data_scale = "log"
+  )
+  pdata <- group_designation(
+    omicsData = pdata,
+    main_effects = "Condition"
+  )
+
+  # Create three identical filters using the same omicsData
+  pfilter1 <- rmd_filter(
+    omicsData = pdata,
+    ignore_singleton_groups = FALSE
+  )
+  pfilter2 <- rmd_filter(
+    omicsData = pdata,
+    ignore_singleton_groups = FALSE
+  )
+  pfilter3 <- rmd_filter(
+    omicsData = pdata,
+    ignore_singleton_groups = FALSE
+  )
+
+  # Apply two filters
+  pfiltered1 <- applyFilt(
+    filter_object = pfilter1,
+    omicsData = pdata,
+    pvalue_threshold = 0.0001,
+    min_num_biomolecules = 50
+  )
+  warnings <- capture_warnings(
+    pfiltered2 <- applyFilt(
+      filter_object = pfilter2,
+      omicsData = pfiltered1,
+      pvalue_threshold = 0.0001,
+      min_num_biomolecules = 50
+    )
+  )
+
   # The second applyFilt should generate warnings
   expect_match(
     warnings,
@@ -803,16 +1058,18 @@ test_that("rmd_filter and applyFilt produce the correct output",{
     "Specified samples Infection7 were not found in the data\\.",
     all = FALSE
   )
-  
+
   # Samples that do exist should be filtered even if there are samples that
   # don't exist
   warnings <- capture_warnings(
-    pfiltered3 <- applyFilt(filter_object = pfilter3,
-                            omicsData = pfiltered1,
-                            pvalue_threshold = 0.48,
-                            min_num_biomolecules = 50)
+    pfiltered3 <- applyFilt(
+      filter_object = pfilter3,
+      omicsData = pfiltered1,
+      pvalue_threshold = 0.48,
+      min_num_biomolecules = 50
+    )
   )
-  
+
   expect_match(
     warnings,
     "An RMD filter has already been applied to this data set.",
@@ -823,6 +1080,6 @@ test_that("rmd_filter and applyFilt produce the correct output",{
     "Specified samples Infection7 were not found in the data\\.",
     all = FALSE
   )
-  
+
   expect_null(pfiltered3$e_data$Infection8)
 })

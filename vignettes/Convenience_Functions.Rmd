@@ -121,11 +121,13 @@ get_group_table(omicsObject = mypro)
 
 ```{r}
 myiso <- edata_transform(omicsData = isobaric_object, data_scale = "log2")
-myiso_normalized <- normalize_isobaric(omicsData = myiso, 
-                                      exp_cname = "Plex",
-                                      apply_norm = TRUE,
-                                      refpool_cname = "Virus",
-                                      refpool_notation = "Pool")
+myiso_normalized <- normalize_isobaric(
+  omicsData = myiso,
+  exp_cname = "Plex",
+  apply_norm = TRUE,
+  refpool_cname = "Virus",
+  refpool_notation = "Pool"
+)
 get_isobaric_info(omicsData = myiso_normalized)
 ```
 
@@ -141,24 +143,30 @@ get_meta_info(omicsData = mynmr)
 ```{r}
 get_nmr_info(omicsData = mynmr)
 
-mynmr <- edata_transform(omicsData = nmr_identified_object, 
-                         data_scale = "log2")
+mynmr <- edata_transform(
+  omicsData = nmr_identified_object,
+  data_scale = "log2"
+)
 ```
 
 ```{r}
 # Normalization using a "spiked in" metabolite
-nmr_norm <- normalize_nmr(omicsData = mynmr, apply_norm = TRUE,
-                           metabolite_name = "unkm1.53", 
-                           backtransform = TRUE)
+nmr_norm <- normalize_nmr(
+  omicsData = mynmr, apply_norm = TRUE,
+  metabolite_name = "unkm1.53",
+  backtransform = TRUE
+)
 get_nmr_info(omicsData = nmr_norm)
 ```
 
 ```{r}
 # Normalization using a sample property
-nmr_norm <- normalize_nmr(omicsData = mynmr, apply_norm = TRUE,
-                          sample_property_cname = "Concentration",
-                          backtransform = TRUE)
-get_nmr_info(omicsData = nmr_norm)                          
+nmr_norm <- normalize_nmr(
+  omicsData = mynmr, apply_norm = TRUE,
+  sample_property_cname = "Concentration",
+  backtransform = TRUE
+)
+get_nmr_info(omicsData = nmr_norm)
 ```
 
 
@@ -201,10 +209,12 @@ get_nmr_norm(omicsData = nmr_norm)
 - `get_comparisons()` - Returns a data frame with comparisons and their indices
 
 ```{r}
-imd_anova_res <- imd_anova(omicsData = mypro,
-                          test_method = "comb",
-                          pval_adjust_a_multcomp = "bon",
-                          pval_adjust_g_multcomp = "bon")
+imd_anova_res <- imd_anova(
+  omicsData = mypro,
+  test_method = "comb",
+  pval_adjust_a_multcomp = "bon",
+  pval_adjust_g_multcomp = "bon"
+)
 
 get_comparisons(compObj = imd_anova_res)
 ```

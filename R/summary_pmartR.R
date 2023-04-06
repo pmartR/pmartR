@@ -29,115 +29,108 @@
 #' @name summary-omicsData
 #'
 summary.pepData <- function(object, ...) {
-
   # Army captain, "Nooooo! ... General, the enemy is about to overtake us!"
   # Army general, "CALL IN THE SUMMARIZER!!!"
   summarizer(object)
-
 }
 
 #' @export
 #' @rdname summary-omicsData
 #' @name summary-omicsData
 summary.proData <- function(object, ...) {
-
   # Army captain, "Nooooo! ... General, the enemy is about to overtake us!"
   # Army general, "CALL IN THE SUMMARIZER!!!"
   summarizer(object)
-
 }
 
 
-#'@export
-#'@rdname summary-omicsData
-#'@name summary-omicsData
+#' @export
+#' @rdname summary-omicsData
+#' @name summary-omicsData
 summary.lipidData <- function(object, ...) {
-
   # Army captain, "Nooooo! ... General, the enemy is about to overtake us!"
   # Army general, "CALL IN THE SUMMARIZER!!!"
   summarizer(object)
-
 }
 
 
 
-#'@export
-#'@rdname summary-omicsData
-#'@name summary-omicsData
+#' @export
+#' @rdname summary-omicsData
+#' @name summary-omicsData
 summary.metabData <- function(object, ...) {
-
   # Army captain, "Nooooo! ... General, the enemy is about to overtake us!"
   # Army general, "CALL IN THE SUMMARIZER!!!"
   summarizer(object)
-
 }
 
 
-#'@export
-#'@rdname summary-omicsData
-#'@name summary-omicsData
+#' @export
+#' @rdname summary-omicsData
+#' @name summary-omicsData
 summary.nmrData <- function(object, ...) {
-
   # Army captain, "Nooooo! ... General, the enemy is about to overtake us!"
   # Army general, "CALL IN THE SUMMARIZER!!!"
   summarizer(object)
-
 }
 
 
-#'@export
-#'@rdname summary-omicsData
-#'@name summary-omicsData
+#' @export
+#' @rdname summary-omicsData
+#' @name summary-omicsData
 summary.seqData <- function(object, ...) {
-  
   omicsData <- object
-  
+
   # get values #
-  res <- list(class = class(omicsData), num_samps = attr(omicsData, "data_info")$num_samps,
-              num_edata = attr(omicsData, "data_info")$num_edata,
-              num_emeta = attr(omicsData, "meta_info")$num_emeta,
-              num_zero_obs = attr(omicsData, "data_info")$num_zero_obs,
-              prop_zeros = round(attr(omicsData, "data_info")$prop_zeros, 3))
-  
+  res <- list(
+    class = class(omicsData), num_samps = attr(omicsData, "data_info")$num_samps,
+    num_edata = attr(omicsData, "data_info")$num_edata,
+    num_emeta = attr(omicsData, "meta_info")$num_emeta,
+    num_zero_obs = attr(omicsData, "data_info")$num_zero_obs,
+    prop_zeros = round(attr(omicsData, "data_info")$prop_zeros, 3)
+  )
+
   # construct output #
   newres <- lapply(res, function(x) ifelse(is.null(x), "NA", as.character(x)))
   catmat <- data.frame(unlist(newres, use.names = FALSE))
-  
+
   # assemble text strings #
-  edata_name <- paste("Unique ", attributes(omicsData)$cnames$edata_cname, "s (e_data)", sep="")
-  fdata_name <- paste("Unique ", attributes(omicsData)$cnames$fdata_cname, "s (f_data)", sep="")
-  if(!is.null(attributes(omicsData)$cnames$emeta_cname)){
-    emeta_name <- paste("Unique ", attributes(omicsData)$cnames$emeta_cname, "s (e_meta)", sep="")
-  }else{
+  edata_name <- paste("Unique ", attributes(omicsData)$cnames$edata_cname, "s (e_data)", sep = "")
+  fdata_name <- paste("Unique ", attributes(omicsData)$cnames$fdata_cname, "s (f_data)", sep = "")
+  if (!is.null(attributes(omicsData)$cnames$emeta_cname)) {
+    emeta_name <- paste("Unique ", attributes(omicsData)$cnames$emeta_cname, "s (e_meta)", sep = "")
+  } else {
     emeta_name <- "Rows (e_meta) "
   }
-  
+
   colnames(catmat) <- NULL
   rownames(catmat) <- c("Class", fdata_name, edata_name, emeta_name, "Observed Zero-Counts ", "Proportion Zeros ")
-  
-  #if group_DF attr is present
-  if(!is.null(get_group_DF(omicsData))){
-    group_vec<- get_group_DF(omicsData)$Group
-    levels<- unique(get_group_DF(omicsData)$Group)
-    counts <- vector(mode="numeric", length=length(levels))
-    
-    for(i in 1:length(levels)){
-      counts[i]<- length(which(group_vec == levels[i]))
+
+  # if group_DF attr is present
+  if (!is.null(get_group_DF(omicsData))) {
+    group_vec <- get_group_DF(omicsData)$Group
+    levels <- unique(get_group_DF(omicsData)$Group)
+    counts <- vector(mode = "numeric", length = length(levels))
+
+    for (i in 1:length(levels)) {
+      counts[i] <- length(which(group_vec == levels[i]))
     }
-    res2<- as.list(counts)
-    names(res2)<- levels
+    res2 <- as.list(counts)
+    names(res2) <- levels
     newres2 <- lapply(res2, function(x) ifelse(is.null(x), "NA", as.character(x)))
-    
-    newres2<- c(newres, newres2)
+
+    newres2 <- c(newres, newres2)
     catmat2 <- data.frame(unlist(newres2, use.names = FALSE))
     colnames(catmat2) <- NULL
-    rownames(catmat2) <- c("Class", fdata_name, edata_name, emeta_name, 
-                           "Observed Zero-Counts ", "Proportion Zeros ", 
-                           paste("Samples per group:", levels, sep = " "))
-    
-    catmat<- catmat2
+    rownames(catmat2) <- c(
+      "Class", fdata_name, edata_name, emeta_name,
+      "Observed Zero-Counts ", "Proportion Zeros ",
+      paste("Samples per group:", levels, sep = " ")
+    )
+
+    catmat <- catmat2
   }
-  
+
   return(catmat)
 }
 
@@ -146,8 +139,7 @@ summary.seqData <- function(object, ...) {
 # covariate and pair counts to the original summary function.
 #
 # @author Evan A Martin
-summarizer <- function (omicsData) {
-
+summarizer <- function(omicsData) {
   # The following values will always be present no matter what. They wont change
   # depending on the main effects, covariates, and whether the data are paired.
   # For the remainder of the script we will append values to this list.
@@ -171,14 +163,13 @@ summarizer <- function (omicsData) {
     paste("Unique ", get_edata_cname(omicsData), "s (e_data)", sep = ""),
     if (is.null(get_emeta_cname(omicsData)))
       "Rows (e_meta)" else
-        paste("Unique ", get_emeta_cname(omicsData), "s (e_meta)", sep = ""),
+      paste("Unique ", get_emeta_cname(omicsData), "s (e_meta)", sep = ""),
     "Missing Observations",
     "Proportion Missing"
   )
 
   # Check if the data are grouped.
   if (!is.null(attr(omicsData, "group_DF"))) {
-
     # Add group counts ---------------
 
     group_vec <- attr(omicsData, "group_DF")$Group
@@ -186,10 +177,8 @@ summarizer <- function (omicsData) {
     counts <- vector(mode = "list", length = length(levels))
 
     for (i in 1:length(levels)) {
-
       # Determine the number of samples in the current group.
       counts[[i]] <- length(which(group_vec == levels[[i]]))
-
     }
 
     # Name the counts with their corresponding group names.
@@ -203,21 +192,16 @@ summarizer <- function (omicsData) {
     # want to print the number of samples in the paired_diff group. (We want to
     # keep this group a secret from the user. Shhhhhhh!)
     if ("paired_diff" %in% levels) {
-
       res_names <- c(res_names, "Total Samples")
-
     } else {
-
       # Add each group name to the res_names vector.
       res_names <- c(res_names, paste("Samples per group:", levels, sep = " "))
-
     }
 
     # Add covariate counts ---------------
 
     # Check for covariates. If they exist we will tell the user what they are.
     if (!is.null(attr(get_group_DF(omicsData), "covariates"))) {
-
       # Nab the covariates data frame. This will be used later for sundry
       # purposes.
       covies <- attr(get_group_DF(omicsData), "covariates")
@@ -227,7 +211,6 @@ summarizer <- function (omicsData) {
 
       # Add the name of the covariate levels to res_names.
       res_names <- c(res_names, "Covariates")
-
     }
 
     # Add pair counts ------------
@@ -235,19 +218,18 @@ summarizer <- function (omicsData) {
     # Check if the data are paired. If they are the number of pairs will be
     # added to the beautiful summary we are creating!
     if (!is.null(attr(get_group_DF(omicsData), "pair_id"))) {
-
       # Nab the name of the pair variable. This will be used to subset f_data.
       pair_name <- attr(get_group_DF(omicsData), "pair_id")
 
       # Add the number of pairs to res.
-      res <- c(res,
-               list(pairs = dplyr::n_distinct(omicsData$f_data[, pair_name])))
+      res <- c(
+        res,
+        list(pairs = dplyr::n_distinct(omicsData$f_data[, pair_name]))
+      )
 
       # Update the names vector with the row name for the number of pairs.
       res_names <- c(res_names, "Pairs")
-
     }
-
   }
 
   # Convert all elements in res to a character.
@@ -259,8 +241,5 @@ summarizer <- function (omicsData) {
   colnames(catmat) <- NULL
   rownames(catmat) <- res_names
 
-  return (catmat)
-
+  return(catmat)
 }
-
-

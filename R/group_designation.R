@@ -1,4 +1,4 @@
-#' Creates Attribute of omicsData Object for Group Membership 
+#' Creates Attribute of omicsData Object for Group Membership
 #'
 #' The method assigns each sample to a group, for use in future analyses, based on the
 #' variable(s) specified as main effects.
@@ -56,51 +56,52 @@
 #'   for sample id and group, is added to the object. If two main effects are
 #'   provided the original main effect levels for each sample are returned as
 #'   the third and fourth columns of the data.frame. Additionally, the
-#'   covariates provided will be listed as attributes of this data.frame. 
+#'   covariates provided will be listed as attributes of this data.frame.
 #'
 #' @examples
 #' library(pmartRdata)
-#' mylipid <- group_designation(omicsData = lipid_pos_object,
-#'                                    main_effects = "Virus")
+#' mylipid <- group_designation(
+#'   omicsData = lipid_pos_object,
+#'   main_effects = "Virus"
+#' )
 #' attr(mylipid, "group_DF")
 #'
 #' @author Lisa Bramer, Kelly Stratton
 #'
 #' @export
 #'
-group_designation <- function (omicsData,
-                               main_effects = NULL,
-                               covariates = NULL,
-                               cov_type = NULL,
-                               pair_id = NULL,
-                               pair_group = NULL,
-                               pair_denom = NULL,
-                               batch_id = NULL) {
-
+group_designation <- function(omicsData,
+                              main_effects = NULL,
+                              covariates = NULL,
+                              cov_type = NULL,
+                              pair_id = NULL,
+                              pair_group = NULL,
+                              pair_denom = NULL,
+                              batch_id = NULL) {
   # Initial checks on input arguments ------------------------------------------
 
   # check that omicsData is of appropriate class #
-  if (!inherits(omicsData, c("pepData", "proData", "metabData",
-                             "isobaricpepData", "lipidData", "nmrData", 
-                             "seqData"))) {
-    
+  if (!inherits(omicsData, c(
+    "pepData", "proData", "metabData",
+    "isobaricpepData", "lipidData", "nmrData",
+    "seqData"
+  ))) {
     # Throw an error that the input for omicsData is not the appropriate class.
     stop(paste("omicsData must be of class 'pepData', 'proData', 'metabData',",
-               "'isobaricpepData', 'lipidData', 'nmrData', or 'seqData'",
-               sep = ' '))
-
+      "'isobaricpepData', 'lipidData', 'nmrData', or 'seqData'",
+      sep = ' '
+    ))
   }
 
   # check that isobaric data has been normalized #
   if (inherits(omicsData, "isobaricpepData") &&
-      (attr(omicsData, "isobaric_info")$norm_info$is_normalized != TRUE)) {
-
+    (attr(omicsData, "isobaric_info")$norm_info$is_normalized != TRUE)) {
     # Lay down an isobaric error for the user to trip over.
-    stop (paste("omicsData with class 'isobaricpepData' must be normalized",
-                "using normalize_isobaric(omicsData, apply_norm = TRUE) prior",
-                "to calling group_designation()",
-                sep = " "))
-
+    stop(paste("omicsData with class 'isobaricpepData' must be normalized",
+      "using normalize_isobaric(omicsData, apply_norm = TRUE) prior",
+      "to calling group_designation()",
+      sep = " "
+    ))
   }
   # no need for an analogous check for nmrData objects because there are not
   # entire samples that are used for normalization of NMR data
@@ -108,117 +109,91 @@ group_designation <- function (omicsData,
   # Don't allow the airhead running the computer to specify a covariate if they
   # didn't also specify a main effect.
   if (is.null(main_effects) && !is.null(covariates)) {
-
     # I will be a merciful coding lord and stop the user from continuing through
     # the entire pmartR pipeline with this abominable error.
-    stop (
+    stop(
       "A covariate cannot be specified unless a main effect is also specified."
     )
-
   }
 
   # Check main_effects ---------------
 
   # A main effect does not need to be supplied if a pairing variable is.
   if (is.null(main_effects) && is.null(pair_id)) {
-
     # A main effect must be specified unless a pair_id variable is specified.
-    stop (
+    stop(
       paste("A main effect must be specified unless the data are paired.",
-            "In the case of paired data 'pair_id' must be specified if",
-            "there are no main effects.",
-            sep = " ")
+        "In the case of paired data 'pair_id' must be specified if",
+        "there are no main effects.",
+        sep = " "
+      )
     )
-
   }
 
   # Check if any main effects have been provided.
   if (!is.null(main_effects)) {
-
     # Make sure the user does not use the forbidden main effect name. We must
     # defend the secrets of pmartR!
     if ("no_main_effects" %in% main_effects) {
-
       # Stop! You shall not pass!
-      stop ("The name 'no_main_effects' cannot be used as a main effect name.")
-
+      stop("The name 'no_main_effects' cannot be used as a main effect name.")
     }
 
     # Check that main_effects is a character vector #
     if (!is.character(main_effects)) {
-
       # Stop production with a character vector error.
-      stop ("main_effects must be a character vector.")
-
+      stop("main_effects must be a character vector.")
     }
 
     # Check that main_effects is of an appropriate length. The point is to be
     # like Goldilocks.
     if (length(main_effects) < 1) {
-
       # Error out with too few main effects.
       stop("No main effects were provided")
-
     }
     if (length(main_effects) > 2) {
-
       # Error out with too many main effects.
-      stop ("No more than two main effects can be provided")
-
+      stop("No more than two main effects can be provided")
     }
 
     # Check that main_effects given are in f_data #
     if (sum(main_effects %in% names(omicsData$f_data)) != length(main_effects)) {
-
       stop("One or more of the main_effects is not found in f_data of omicsData")
-
     }
-
   }
 
   # Check covariates ---------------
 
   # See if covariates are present.
   if (!is.null(covariates)) {
-
     # Check that covariates is a character vector #
     if (!is.character(covariates)) {
-
       # Stop production with a character vector error.
-      stop ("covariates must be a character vector.")
-
+      stop("covariates must be a character vector.")
     }
 
     # Check that covariates is an appropriate length. Think Goldilocks! #
     if (length(covariates) > 2) {
-
       # Error out with too many covariates.
-      stop ("No more than two covariates can be provided.")
-
+      stop("No more than two covariates can be provided.")
     }
 
     # Check that covariates given are in f_data #
     if (sum(covariates %in% names(omicsData$f_data)) != length(covariates)) {
-
       stop("One or more of the covariates is not found in f_data of omicsData")
-
     }
 
     # Check if the covariate types are specified.
     if (!is.null(cov_type)) {
-
       # Make sure the length of covariates and cov_type are the same.
       if (length(covariates) != length(cov_type)) {
-
-        stop ("The length of covariates and cov_type must be the same.")
-
+        stop("The length of covariates and cov_type must be the same.")
       }
 
       # Loop through all covariates and compare their class to the cov_type
       # input. If the classes do not match the covariate will be converted to a
       # character vector.
       for (e in 1:length(covariates)) {
-
         # Nab the class of the eth covariate.
         da_class <- class(omicsData$f_data[[covariates[[e]]]])
 
@@ -229,55 +204,42 @@ group_designation <- function (omicsData,
         # "double" but the cov_type is "numeric". In this case the covariate
         # would incorrectly be converted to a character vector.
         if (da_class %in% c("numeric", "integer", "double") &&
-            !(cov_type[[e]] %in% c("numeric", "integer", "double"))) {
-
+          !(cov_type[[e]] %in% c("numeric", "integer", "double"))) {
           # Convert the covariate to a character vector.
           omicsData$f_data[[covariates[[e]]]] <- as.character(
             omicsData$f_data[[covariates[[e]]]]
           )
-
         } else if (!(da_class %in% c("numeric", "integer", "double")) &&
-                   da_class != cov_type[[e]]) {
-
+          da_class != cov_type[[e]]) {
           # Convert the covariate to a character vector.
           omicsData$f_data[[covariates[[e]]]] <- as.character(
             omicsData$f_data[[covariates[[e]]]]
           )
-
         }
-
       }
-
     }
-
   }
 
   # Check batch_id ---------------
 
   # See if batch_id is present
   if (!is.null(batch_id)) {
-
     # Check that batch_id is a character vector #
     if (!is.character(batch_id)) {
-
       # Stop production with a character vector error
-      stop ("batch_id must be a character vector.")
+      stop("batch_id must be a character vector.")
     }
 
     # Check that batch_id is an appropriate length
-    if (length(batch_id) > 1){
-
+    if (length(batch_id) > 1) {
       # Error out with too many batch_ids
-      stop ("No more than one batch_id can be provided.")
+      stop("No more than one batch_id can be provided.")
     }
 
     # Check that batch_id is given in f_data #
     if (!(batch_id %in% names(omicsData$f_data))) {
-
-      stop ("batch_id is not found in f_data of omicsData")
+      stop("batch_id is not found in f_data of omicsData")
     }
-
-
   }
 
   # Check pairs ---------------
@@ -285,84 +247,61 @@ group_designation <- function (omicsData,
   # Have a looksie at the pair_id argument. If it is present put it through the
   # usual methods of information extraction and verification.
   if (!is.null(pair_id)) {
-
     # If data are paired pair_group and pair_denom must also be specified.
     if (is.null(pair_group) || is.null(pair_denom)) {
-
       # Holy missing information, Batman.
-      stop ("pair_group and pair_denom must be specified if data are paired.")
-
+      stop("pair_group and pair_denom must be specified if data are paired.")
     }
 
     # Check that pair_id, pair_group, and pair_denom are a character vectors.
     if (!is.character(pair_id)) {
-
       # Holy inappropriate ID input type, Batman.
-      stop ("pair_id must be a character vector.")
-
+      stop("pair_id must be a character vector.")
     }
     if (!is.character(pair_group)) {
-
       # Holy inappropriate group input type, Batman.
-      stop ("pair_group must be a character vector.")
-
+      stop("pair_group must be a character vector.")
     }
     if (!is.character(pair_denom)) {
-
       # Holy inappropriate input type, Batman.
-      stop ("pair_denom must be a character vector.")
-
+      stop("pair_denom must be a character vector.")
     }
 
     # Make sure there is only one character string specified.
     if (length(pair_id) > 1) {
-
       # Holy too many pair IDs, Batman!
-      stop ("Only one pair ID variable can be specified.")
-
+      stop("Only one pair ID variable can be specified.")
     }
     if (length(pair_group) > 1) {
-
       # Holy too many pair groups, Batman!
-      stop ("Only one pair group variable can be specified.")
-
+      stop("Only one pair group variable can be specified.")
     }
     if (length(pair_denom) > 1) {
-
       # Holy too many control groups, Batman!
-      stop ("Only one control group can be specified.")
-
+      stop("Only one control group can be specified.")
     }
 
     # Make sure the paired variables exists in f_data. How can we subset by
     # something that doesn't exist?!
     if (!(pair_id %in% names(omicsData$f_data))) {
-
       # Holy missing pair ID variable, Batman!
-      stop ("The variable specified for pair_id does not exist in f_data.")
-
+      stop("The variable specified for pair_id does not exist in f_data.")
     }
     if (!(pair_group %in% names(omicsData$f_data))) {
-
       # Holy missing pair group variable, Batman!
-      stop ("The variable specified for pair_group does not exist in f_data.")
-
+      stop("The variable specified for pair_group does not exist in f_data.")
     }
 
     # Ensure there are only two levels or values in pair_group.
     if (dplyr::n_distinct(omicsData$f_data[, pair_group]) != 2) {
-
       # Holy too many pairing groups, Batman.
-      stop ("Only two levels or values are allowed in pair_group.")
-
+      stop("Only two levels or values are allowed in pair_group.")
     }
 
     # Make sure the control is in the pair_group variable.
     if (!pair_denom %in% unique(as.character(omicsData$f_data[, pair_group]))) {
-
       # Holy missing control group, Batman!
-      stop ("The control group is not present in the pair_group variable.")
-
+      stop("The control group is not present in the pair_group variable.")
     }
 
     # Count the number of pair IDs that do not have two entries in f_data.
@@ -370,15 +309,14 @@ group_designation <- function (omicsData,
 
     # Ensure each pair has at least two observations in f_data.
     if (length(not_two) > 0) {
-
       pair_id <- names(table(omicsData$f_data[, pair_id]))[not_two]
 
-      stop (paste("The following pair IDs do not have at least two samples to ",
-                  "form a pair: ",
-                  knitr::combine_words(pair_id),
-                  ".",
-                  sep = ""))
-
+      stop(paste("The following pair IDs do not have at least two samples to ",
+        "form a pair: ",
+        knitr::combine_words(pair_id),
+        ".",
+        sep = ""
+      ))
     }
 
     # Check that each pair has exactly one corresponding entry in pair_group
@@ -390,30 +328,28 @@ group_designation <- function (omicsData,
         sum(pair_levels == pair_denom)
       })
 
-    if(!all(denom_in_pair == 1)) {
+    if (!all(denom_in_pair == 1)) {
       stop(paste(
         "Each pair must have exactly 1 entry in the pair_group column that ",
         "is equal to pair_denom.",
         sep = ""
-      )
-      )
+      ))
     }
 
     # Check that the main effect(s) are the same for each pair.
     if (!is.null(main_effects)) {
-
       # If there are two main effects create a new variable where the main
       # effects are combined with a "_" between them.
       if (length(main_effects) == 2) {
-
         # Count the number of unique combined main effect values for each pair.
         # The format for combined main effects is me1_me2.
         reprobates <- omicsData$f_data %>%
           dplyr::rowwise() %>%
           dplyr::mutate(
             both_me = paste(!!rlang::sym(main_effects[[1]]),
-                            !!rlang::sym(main_effects[[2]]),
-                            sep = "_")
+              !!rlang::sym(main_effects[[2]]),
+              sep = "_"
+            )
           ) %>%
           dplyr::ungroup() %>%
           dplyr::group_by(!!rlang::sym(pair_id)) %>%
@@ -424,7 +360,6 @@ group_designation <- function (omicsData,
 
         # Use the main effect variable directly (only one main effect exists).
       } else {
-
         # Count the number of unique main effect values for each pair.
         reprobates <- omicsData$f_data %>%
           dplyr::group_by(!!rlang::sym(pair_id)) %>%
@@ -434,37 +369,33 @@ group_designation <- function (omicsData,
           dplyr::ungroup() %>%
           dplyr::filter(n_me > 1) %>%
           dplyr::pull(get_fdata_cname(omicsData))
-
       }
 
       # Check if some main effects differ between pair_id.
       if (length(reprobates) > 0) {
-
         # Let them have it for making my life miserable.
-        stop (paste("The following samples have main effects that differ",
-                    "between pairs:",
-                    knitr::combine_words(reprobates),
-                    sep = " "))
-
+        stop(paste("The following samples have main effects that differ",
+          "between pairs:",
+          knitr::combine_words(reprobates),
+          sep = " "
+        ))
       }
-
     }
 
     # Check that the covariate(s) are the same for each pair.
     if (!is.null(covariates)) {
-
       # If there are two covariates create a new variable where the covariates
       # are combined with a "_" between them.
       if (length(covariates) == 2) {
-
         # Count the number of unique combined covariate values for each pair.
         # The format for combined covariates is cov1_cov2.
         reprobates <- omicsData$f_data %>%
           dplyr::rowwise() %>%
           dplyr::mutate(
             both_cov = paste(!!rlang::sym(covariates[[1]]),
-                             !!rlang::sym(covariates[[2]]),
-                             sep = "_")
+              !!rlang::sym(covariates[[2]]),
+              sep = "_"
+            )
           ) %>%
           dplyr::ungroup() %>%
           dplyr::group_by(!!rlang::sym(pair_id)) %>%
@@ -475,7 +406,6 @@ group_designation <- function (omicsData,
 
         # Use the covariate variable directly (only one covariate exists).
       } else {
-
         # Count the number of unique covariate values for each pair.
         reprobates <- omicsData$f_data %>%
           dplyr::group_by(!!rlang::sym(pair_id)) %>%
@@ -485,61 +415,57 @@ group_designation <- function (omicsData,
           dplyr::ungroup() %>%
           dplyr::filter(n_cov > 1) %>%
           dplyr::pull(get_fdata_cname(omicsData))
-
       }
 
       # Check if some covariates differ between pairs.
       if (length(reprobates) > 0) {
-
         # Let them have it for making my life miserable.
-        stop (paste("The following samples have covariates that differ",
-                    "between pairs:",
-                    knitr::combine_words(reprobates),
-                    sep = " "))
-
+        stop(paste("The following samples have covariates that differ",
+          "between pairs:",
+          knitr::combine_words(reprobates),
+          sep = " "
+        ))
       }
-
     }
-
   }
 
   # Check time_course ---------------
 
   # See if time_course is present.
   # if (!is.null(time_course)) {
-  #   
+  #
   #   # added Aug 2020, since use of this argument is currently not actively
   #   # supported #
   #   if (is.na(time_course)) {time_course = NULL}
-  #   
+  #
   #   # Give an error and don't run the rest of the function because time_course
   #   # is not currently supported.
   #   stop (paste("Use of the time_course argument is currently not supported.",
   #               "In group_designation set time_course = NULL.",
   #               sep = " "))
-  #   
+  #
   #   if (!is.character(time_course)) {
   #     # check that time_course is a character #
   #     stop (paste("time_course must be a character specifying the name of the",
   #                 "variable denoting time",
   #                 sep = " "))
   #   }
-  #   
+  #
   #   # check that time_course is found in the data #
   #   if(!(time_course %in% names(omicsData$f_data))) {
-  #     
+  #
   #     stop ("time_course is not found in f_data of omicsData")
-  #     
+  #
   #   }
-  #   
+  #
   #   # check that no more than 1 main_effect is specified when time_course is non
   #   # NULL #
   #   if(length(main_effects) > 1) {
-  #     
+  #
   #     stop ("Only 1 main effect may be specified when time_course is provided")
-  #     
+  #
   #   }
-  #   
+  #
   # }
 
   # Create the group data frame and attributes ---------------------------------
@@ -547,7 +473,6 @@ group_designation <- function (omicsData,
   # If no main effect was provided but the data are paired create a substitute
   # main effects variable with just one level.
   if (is.null(main_effects) && !is.null(pair_id)) {
-
     # Add a main effect name. This will be used as a place holder because later
     # in this function and downstream functions expect a main effect variable to
     # be present.
@@ -558,7 +483,6 @@ group_designation <- function (omicsData,
     # this rarely goes well and someone at some point will come crying to us
     # because pmartR is giving them crazy output and/or errors.
     omicsData$f_data$no_main_effect <- "paired_diff"
-
   }
 
   # pull sample id column name #
@@ -569,12 +493,13 @@ group_designation <- function (omicsData,
 
   # Case 1: 1 main effect variable #
   if (n.maineffects == 1) {
-
     # create output formatted with first column being sample id and second
     # column group id #
-    output <- data.frame(Sample.ID = as.character(omicsData$f_data[, samp_id]),
-                         Group = as.character(omicsData$f_data[, main_effects]),
-                         stringsAsFactors = FALSE)
+    output <- data.frame(
+      Sample.ID = as.character(omicsData$f_data[, samp_id]),
+      Group = as.character(omicsData$f_data[, main_effects]),
+      stringsAsFactors = FALSE
+    )
     names(output)[1] = samp_id
 
     # Case 2: 2 main effect variables #
@@ -589,7 +514,7 @@ group_designation <- function (omicsData,
 
     # identify samples that will have a Group membership that is not missing #
     nonna.group <- (!is.na(omicsData$f_data[, main_effects[[1]]]) &
-                      !is.na(omicsData$f_data[, main_effects[[2]]]))
+      !is.na(omicsData$f_data[, main_effects[[2]]]))
 
     # Combine names of the first and second main effects to create a group
     # variable.
@@ -634,21 +559,19 @@ group_designation <- function (omicsData,
     na.group <- as.character(output[is.na(output$Group), samp_id])
     n.samps = length(na.group)
     mystr <- paste("The following ",
-                   n.samps,
-                   " sample(s) has/have been removed from the dataset due to",
-                   " missing group information: ",
-                   sep = "")
-    mystr2 <- paste(as.character(na.group), sep="' '", collapse=", ")
+      n.samps,
+      " sample(s) has/have been removed from the dataset due to",
+      " missing group information: ",
+      sep = ""
+    )
+    mystr2 <- paste(as.character(na.group), sep = "' '", collapse = ", ")
     warning(paste0(mystr, mystr2))
     # note: this doesn't actually remove them from the dataset, that is done
     # further below
-
   } else {
-
     # If no group samples have NA values set na.group to null. This will allow
     # all rows in the group data frame (output) to be selected.
     na.group <- NULL
-
   }
 
   # Set na.time to null because time course data is not supported.
@@ -690,9 +613,8 @@ group_designation <- function (omicsData,
 
   # remove samples with group or time NA from output and data
   if (length(all.na) > 0) {
-
     # remove from output #
-    output <- output[-which(output[, samp_id] %in% all.na),]
+    output <- output[-which(output[, samp_id] %in% all.na), ]
 
     # Find rows or columns that need to be removed from e_data and f_data.
     edat_ids = which(names(omicsData$e_data) %in% all.na)
@@ -703,7 +625,6 @@ group_designation <- function (omicsData,
 
     # Remove rows from f_data that have groups with NAs.
     omicsData$f_data = omicsData$f_data[-fdat_ids, ]
-
   }
 
   # Add attributes to the group data frame for the main effects, covariates,
@@ -712,14 +633,12 @@ group_designation <- function (omicsData,
 
   # Set the covariates attribute according to the input (very complicated).
   if (is.null(covariates)) {
-
     holy_covariates_batman <- NULL
 
     # Change the covariates attribute to a data frame. Later this will be
     # updated to make sure the covaraite columns are in the correct format, but
     # for now they will just be added to the covariates data frame.
   } else if (length(covariates) == 1) {
-
     # Make the data frame with the sample ID as the first column and the one and
     # only covariate as the second column.
     holy_covariates_batman <- data.frame(
@@ -733,7 +652,6 @@ group_designation <- function (omicsData,
 
     # Runs when there are just two covariates.
   } else {
-
     # Make the data frame with the sample ID as the first column and the second
     # and third columns as the covariates.
     holy_covariates_batman <- data.frame(
@@ -744,10 +662,11 @@ group_designation <- function (omicsData,
     )
 
     # Rename the columns to match the names in f_data.
-    names(holy_covariates_batman) <- c(samp_id,
-                                       covariates[[1]],
-                                       covariates[[2]])
-
+    names(holy_covariates_batman) <- c(
+      samp_id,
+      covariates[[1]],
+      covariates[[2]]
+    )
   }
 
   attr(output, "covariates") <- holy_covariates_batman
@@ -761,10 +680,8 @@ group_designation <- function (omicsData,
 
   # Set the batch_id attribute according to the input
   if (is.null(batch_id)) {
-
     holy_batch_robin <- NULL
   } else {
-
     # make the data frame with the Sample ID as the first column and the batch id
     # as the second column
     holy_batch_robin <- data.frame(
@@ -779,19 +696,19 @@ group_designation <- function (omicsData,
   attr(output, "batch_id") <- holy_batch_robin
 
   ### changed to NA Aug 2020 ###
-  attr(output, "time_course") = NULL #time_course
+  attr(output, "time_course") = NULL # time_course
   ## added attribute that lists groups with 2 or more samples Nov 2020 ##
   # Find groups with more than one sample in them.
   nonsingleton_groups <- names(which(table(output$Group) > 1))
   attr(output, "nonsingleton_groups") <- nonsingleton_groups
 
   ## Warning for levels that are not "correct" in R
-  if(!is.numeric(output$Group) && 
-     !identical(output$Group, make.names(output$Group)) &&
-     inherits(omicsData, "seqData")){
+  if (!is.numeric(output$Group) &&
+    !identical(output$Group, make.names(output$Group)) &&
+    inherits(omicsData, "seqData")) {
     warning("Main effects levels are not in R-acceptable format (A syntactically valid name consists of letters, numbers and the dot or underline characters and starts with a letter or the dot not followed by a number). Limma-voom processing will not be available unless all main effects meet this condition.")
   }
-  
+
   # Add the group information to the group_DF attribute in the omicsData object.
   attr(omicsData, "group_DF") = output
 
@@ -815,6 +732,5 @@ group_designation <- function (omicsData,
   )
 
   # Return the updated and polished omicsData object!!!
-  return (omicsData)
-
+  return(omicsData)
 }

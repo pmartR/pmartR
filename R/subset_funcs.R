@@ -18,15 +18,14 @@
 #'
 #' @author Kelly Stratton
 #'
-all_subset <- function(e_data, edata_id){
-
+all_subset <- function(e_data, edata_id) {
   # pull off the column for edata_id
-  edata_id_ind <- which(colnames(e_data)==edata_id)
+  edata_id_ind <- which(colnames(e_data) == edata_id)
 
   # subset to all cases
   peps <- as.character(e_data[, edata_id_ind])
 
-  if(length(peps)<2) stop("There are <2 biomolecules in the subset; cannot proceed.")
+  if (length(peps) < 2) stop("There are <2 biomolecules in the subset; cannot proceed.")
 
   return(peps)
 }
@@ -53,13 +52,12 @@ all_subset <- function(e_data, edata_id){
 #'   the union of these biomolecules is taken as the subset identified.
 #'
 #' @return Character vector containing the biomolecules belonging to the subset.
-#'   
+#'
 #' @author Kelly Stratton, Lisa Bramer
 #'
-los <- function(e_data, edata_id, L =.05){
-
+los <- function(e_data, edata_id, L = .05) {
   # pull off the column for edata_id
-  edata_id_ind <- which(colnames(e_data)==edata_id)
+  edata_id_ind <- which(colnames(e_data) == edata_id)
 
   n_samps <- ncol(e_data[, -edata_id_ind])
   n_peps <- nrow(e_data[, -edata_id_ind])
@@ -73,7 +71,7 @@ los <- function(e_data, edata_id, L =.05){
 
   kp <- c()
   # for each sample, ... #
-  for(i in 1:n_samps){
+  for (i in 1:n_samps) {
     # rank the features from highest to lowest (NAs are low) #
     cur_data <- mydata[, i]
     names(cur_data) <- peps
@@ -83,12 +81,11 @@ los <- function(e_data, edata_id, L =.05){
 
     # take the union of those features - that is the subset to return #
     kp <- c(kp, names(ordered_data)[1:num_kp])
-
   }
 
   kp <- unique(kp)
 
-  if(length(kp)<2) stop("There are <2 biomolecules in the subset; cannot proceed.")
+  if (length(kp) < 2) stop("There are <2 biomolecules in the subset; cannot proceed.")
 
   return(kp)
 }
@@ -115,13 +112,12 @@ los <- function(e_data, edata_id, L =.05){
 #'
 #' @return Character vector containing the biomolecules belonging to the PPP
 #'   subset.
-#'   
+#'
 #' @author Kelly Stratton
 #'
-ppp <- function(e_data, edata_id, proportion=0.5){
-
+ppp <- function(e_data, edata_id, proportion = 0.5) {
   # pull off the column for edata_id
-  edata_id_ind <- which(colnames(e_data)==edata_id)
+  edata_id_ind <- which(colnames(e_data) == edata_id)
 
   # get column of proportion present #
   mydata_pct_present <- rowSums(!is.na(e_data[, -edata_id_ind])) /
@@ -132,7 +128,7 @@ ppp <- function(e_data, edata_id, proportion=0.5){
 
   subset_peps <- as.character(e_data[inds, edata_id_ind])
 
-  if(length(subset_peps)<2) stop("There are <2 biomolecules in the subset; cannot proceed.")
+  if (length(subset_peps) < 2) stop("There are <2 biomolecules in the subset; cannot proceed.")
 
   return(subset_peps)
 }
@@ -172,20 +168,19 @@ ppp <- function(e_data, edata_id, proportion=0.5){
 #'
 #' @author Kelly Stratton
 #'
-ppp_rip <- function(e_data, edata_id, fdata_id, groupDF, alpha=0.2, proportion=0.5){
-
+ppp_rip <- function(e_data, edata_id, fdata_id, groupDF, alpha = 0.2, proportion = 0.5) {
   samp_id = fdata_id
-  
+
   # pull off the column for edata_id
-  edata_id_ind <- which(colnames(e_data)==edata_id)
-  
+  edata_id_ind <- which(colnames(e_data) == edata_id)
+
   # subset to features present in at least proportion samples
   peps <- e_data[, edata_id_ind]
-  
+
   # get column of proportion present #
   mydata_pct_present <- rowSums(!is.na(e_data[, -edata_id_ind])) /
     ncol(e_data[, -edata_id_ind])
-  
+
   # which features have proportion present above the value of "proportion" #
   inds <- which(mydata_pct_present >= proportion)
   mydata <- e_data[inds, -edata_id_ind]
@@ -198,15 +193,14 @@ ppp_rip <- function(e_data, edata_id, fdata_id, groupDF, alpha=0.2, proportion=0
   # conduct K-W test using kw_rcpp function 
   pvals = kw_rcpp(as.matrix(mydata), group_dat)
   pvals = data.frame(pvals)
-  
-  RIPeps <- as.character(peps[as.numeric(pvals[, 1]) > alpha &
-                                !is.na(as.numeric(pvals[, 1]))])
 
-  if(length(RIPeps)<2) stop("There are <2 biomolecules in the subset; cannot proceed.")
+  RIPeps <- as.character(peps[as.numeric(pvals[, 1]) > alpha &
+    !is.na(as.numeric(pvals[, 1]))])
+
+  if (length(RIPeps) < 2) stop("There are <2 biomolecules in the subset; cannot proceed.")
 
 
   return(RIPeps)
-  
 }
 
 #' Identify Rank-Invariant Biomolcules for Use in Normalization
@@ -241,29 +235,28 @@ ppp_rip <- function(e_data, edata_id, fdata_id, groupDF, alpha=0.2, proportion=0
 #'
 #' @author Kelly Stratton
 #'
-rip <- function(e_data, edata_id, fdata_id, groupDF, alpha=.2){
-
+rip <- function(e_data, edata_id, fdata_id, groupDF, alpha = .2) {
   # pull off the column for edata_id
-  edata_id_ind <- which(colnames(e_data)==edata_id)
+  edata_id_ind <- which(colnames(e_data) == edata_id)
 
   # subset to complete cases (features with complete data)
   peps <- e_data[, edata_id_ind]
   inds <- which(complete.cases(e_data[, -edata_id_ind]) == TRUE)
   mydata <- e_data[inds, -edata_id_ind]
   peps <- peps[inds]
-  
-  #added 2/6/17 iobani
+
+  # added 2/6/17 iobani
   group_dat = as.character(groupDF$Group[order(groupDF$Group)])
   mydata <- mydata[, order(groupDF$Group)]
-    
-  # conduct K-W test on un-normalized data, used kw_rcpp function 
+
+  # conduct K-W test on un-normalized data, used kw_rcpp function
   pvals = kw_rcpp(as.matrix(mydata), group_dat)
   pvals = data.frame(pvals)
 
   RIPeps <- as.character(peps[as.numeric(pvals[, 1]) > alpha &
-                                !is.na(as.numeric(pvals[, 1]))])
+    !is.na(as.numeric(pvals[, 1]))])
 
-  if(length(RIPeps)<2) stop("There are <2 biomolecules in the subset; cannot proceed.")
+  if (length(RIPeps) < 2) stop("There are <2 biomolecules in the subset; cannot proceed.")
 
   return(RIPeps)
 }
@@ -283,19 +276,18 @@ rip <- function(e_data, edata_id, fdata_id, groupDF, alpha=.2){
 #'
 #' @return Character vector containing the biomolecules with no missing values
 #'   across all samples.
-#'   
-complete_mols <- function(e_data, edata_id){
-  
+#'
+complete_mols <- function(e_data, edata_id) {
   # pull off the column for edata_id
-  edata_id_ind <- which(colnames(e_data)==edata_id)
-  
+  edata_id_ind <- which(colnames(e_data) == edata_id)
+
   # rows with no missing values
   complete_inds <- which(complete.cases(e_data[, -edata_id_ind]) == TRUE)
-  
+
   # retain only character peptide names for complete rows
   peps <- as.character(e_data[complete_inds, edata_id_ind])
-  
-  if(length(peps)<2) stop("There are <2 biomolecules in the subset; cannot proceed.")
-  
+
+  if (length(peps) < 2) stop("There are <2 biomolecules in the subset; cannot proceed.")
+
   return(peps)
 }

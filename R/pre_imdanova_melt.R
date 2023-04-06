@@ -16,26 +16,26 @@
 #'
 #' @author Lisa Bramer, Kelly Stratton
 
-pre_imdanova_melt <- function(e_data, groupDF, samp_id){
-
-
+pre_imdanova_melt <- function(e_data, groupDF, samp_id) {
   # convert peptide data to class "data.table" #
   DT <- data.table::data.table(e_data)
-  setnames(DT,names(DT)[1], "Peptide") # Don't change this from "Peptide"! When I tried to use cname_id, it messed up use of the "summarise" function in nonmissing_per_group.R
+  setnames(DT, names(DT)[1], "Peptide") # Don't change this from "Peptide"! When I tried to use cname_id, it messed up use of the "summarise" function in nonmissing_per_group.R
 
   # melt this data based on the first column giving the peptide names #
   melt.pep = melt(DT, id.var = 1)
 
   # set second column to have name sampleID #
-  #setnames(melt.pep,names(melt.pep)[2], samp_id)
-  setnames(melt.pep,names(melt.pep)[2], "samp_id")
+  # setnames(melt.pep,names(melt.pep)[2], samp_id)
+  setnames(melt.pep, names(melt.pep)[2], "samp_id")
 
   orig_name <- names(groupDF)[1] # save the orig name
   names(groupDF)[1] <- "samp_id"
 
   # merge melted e_data and groupDF #
-  new.dat = merge(x = melt.pep, y = data.table::data.table(groupDF),
-                                          by = "samp_id", all.x = TRUE)
+  new.dat = merge(
+    x = melt.pep, y = data.table::data.table(groupDF),
+    by = "samp_id", all.x = TRUE
+  )
 
   # group data by Peptide and Group #
   grpd.data = dplyr::group_by(new.dat, Peptide, Group) # Don't change this from Peptide! When I tried to use cname_id, it messed up use of the "summarise" function in nonmissing_per_group.R  ... after the "summarise" is done, it is reset to cname_id
@@ -43,5 +43,4 @@ pre_imdanova_melt <- function(e_data, groupDF, samp_id){
   names(grpd.data)[1] <- orig_name # re-set the sample ID column name back to the original value
   # return grouped data #
   return(grpd.data)
-
 }
