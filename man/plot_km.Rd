@@ -20,7 +20,8 @@ surv_designation, and plot the resulting Kaplan-Meier curve.
 \dontrun{
 library(MSomicsSTAT)
 library(OvarianPepdataBP)
-attr(tcga_ovarian_pepdata_bp, "survDF") <- list(t_death = "survival_time", ind_death = "vital_status")
+attr(tcga_ovarian_pepdata_bp, "survDF") <- list(t_death = "survival_time",
+                                                ind_death = "vital_status")
 plot_km(omicsData = tcga_ovarian_pepdata_bp)
 
 # Add covariates to "survDF" attribute

@@ -183,7 +183,8 @@ spans_res <- spans_procedure(omicsData = pep_object,
                              norm_fn = c("median", "zscore"), 
                              subset_fn = c("all", "los", "ppp"))
 
-## specify parameters for supplied subset functions, notice ppp_rip takes a vector of two numeric arguments.
+## specify parameters for supplied subset functions, 
+## notice ppp_rip takes a vector of two numeric arguments.
 spans_res <- spans_procedure(omicsData = pep_object, 
                              subset_fn = c("all", "los", "ppp"), 
                              params = list(los = list(0.25, 0.5), 

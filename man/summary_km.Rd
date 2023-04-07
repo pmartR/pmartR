@@ -23,7 +23,8 @@ surv_designation, and gives a summary of the results.
 \examples{
 \dontrun{
 library(OvarianPepdataBP)
-attr(tcga_ovarian_pepdata_bp, "survDF") <- list(t_death = "survival_time", ind_death = "vital_status")
+attr(tcga_ovarian_pepdata_bp, "survDF") <- list(t_death = "survival_time",
+                                                ind_death = "vital_status")
 # No percent is provided so the entire object is returned
 summary_km(tcga_ovarian_pepdata_bp)
 

@@ -38,7 +38,8 @@
 #' library(OvarianPepdataBP)
 #'
 #' # Basic analysis without covariates
-#' attr(tcga_ovarian_pepdata_bp, "survDF") <- list(t_death = "survival_time", ind_death = "vital_status")
+#' attr(tcga_ovarian_pepdata_bp, "survDF") <- list(t_death = "survival_time",
+#'                                                 ind_death = "vital_status")
 #' sfit <- fit_surv(tcga_ovarian_pepdata_bp)
 #' plot(sfit)
 #'
@@ -102,7 +103,8 @@ fit_surv <- function(omicsData) {
 #' \dontrun{
 #' library(MSomicsSTAT)
 #' library(OvarianPepdataBP)
-#' attr(tcga_ovarian_pepdata_bp, "survDF") <- list(t_death = "survival_time", ind_death = "vital_status")
+#' attr(tcga_ovarian_pepdata_bp, "survDF") <- list(t_death = "survival_time",
+#'                                                 ind_death = "vital_status")
 #' plot_km(omicsData = tcga_ovarian_pepdata_bp)
 #'
 #' # Add covariates to "survDF" attribute
@@ -133,7 +135,8 @@ plot_km <- function(omicsData) {
 #' @examples
 #' \dontrun{
 #' library(OvarianPepdataBP)
-#' attr(tcga_ovarian_pepdata_bp, "survDF") <- list(t_death = "survival_time", ind_death = "vital_status")
+#' attr(tcga_ovarian_pepdata_bp, "survDF") <- list(t_death = "survival_time",
+#'                                                 ind_death = "vital_status")
 #' # No percent is provided so the entire object is returned
 #' summary_km(tcga_ovarian_pepdata_bp)
 #'

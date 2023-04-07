@@ -22,7 +22,8 @@ library(MSomicsSTAT)
 library(OvarianPepdataBP)
 
 # Basic analysis without covariates
-attr(tcga_ovarian_pepdata_bp, "survDF") <- list(t_death = "survival_time", ind_death = "vital_status")
+attr(tcga_ovarian_pepdata_bp, "survDF") <- list(t_death = "survival_time",
+                                                ind_death = "vital_status")
 sfit <- fit_surv(tcga_ovarian_pepdata_bp)
 plot(sfit)
 

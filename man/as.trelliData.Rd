@@ -58,7 +58,8 @@ omicsData <- applyFilt(filter_object = imdanova_Filt, omicsData = omicsData,
                        min_nonmiss_anova = 2)
 
 # Normalize my pepData
-omicsData <- normalize_global(omicsData, "subset_fn" = "all", "norm_fn" = "median", "apply_norm" = TRUE, "backtransform" = TRUE)
+omicsData <- normalize_global(omicsData, "subset_fn" = "all", "norm_fn" = "median",
+                             "apply_norm" = TRUE, "backtransform" = TRUE)
 
 # Implement the IMD ANOVA method and compute all pairwise comparisons 
 # (i.e. leave the `comparisons` argument NULL)
