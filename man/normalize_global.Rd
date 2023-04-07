@@ -44,7 +44,7 @@ transforming the data, after normalization, should be calculated. Defaults
 to FALSE. If TRUE, the parameters for back transforming the data after
 normalization will be calculated, and subsequently included in the data
 normalization if \code{apply_norm} is TRUE or \code{\link{apply.normRes}}
-is used downstream. See \link{details} for an explanation of how these
+is used downstream. See the details section for an explanation of how these
 factors are calculated.}
 
 \item{min_prop}{numeric threshold between 0 and 1 giving the minimum value

@@ -7,14 +7,14 @@
 \method{summary}{cvFilt}(object, cv_threshold = NULL, ...)
 }
 \arguments{
+\item{object}{S3 object of class 'cvFilt' created by
+\code{\link{cv_filter}}.}
+
 \item{cv_threshold}{numeric value greater than 1 and less than the value
 given by filter_object$CV. CV values above cv_threshold are filtered out.
 Default value is NULL.}
 
 \item{...}{further arguments passed to or from other methods}
-
-\item{filter_object}{S3 object of class 'cvFilt' created by
-\code{\link{cv_filter}}.}
 }
 \value{
 a summary of the CV values, number of NA values, and non-NA values.

@@ -4,6 +4,7 @@
 #'
 #' @param object object of type isobaricnormRes, created by
 #'   \code{\link{normalize_isobaric}}
+#' @param ... further arguments passed to or from other methods.
 #'
 #' @return data frame object
 #'

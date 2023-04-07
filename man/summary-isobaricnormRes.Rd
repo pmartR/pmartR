@@ -10,6 +10,8 @@
 \arguments{
 \item{object}{object of type isobaricnormRes, created by
 \code{\link{normalize_isobaric}}}
+
+\item{...}{further arguments passed to or from other methods.}
 }
 \value{
 data frame object

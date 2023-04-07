@@ -2,6 +2,7 @@
 #'
 #' @param trelliData An object from the as.trelliData.edata or as.trelliData
 #'   functions
+#' @param ... further arguments passed to or from other methods.
 #'
 #' @examples
 #' \dontrun{

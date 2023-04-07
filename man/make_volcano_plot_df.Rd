@@ -14,7 +14,7 @@ make_volcano_plot_df(x)
 such as missing counts per group, and p-values for t and g-tests.
 }
 \description{
-A function internal to \link{pmartR:::plot.statRes} which creates the
+A function internal to pmartR:::\link{plot.statRes} which creates the
 dataframe necessary to construct volcano plots and heatmaps.
 }
 \keyword{internal}

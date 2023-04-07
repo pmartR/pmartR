@@ -8,6 +8,8 @@
 \method{summary}{nmrnormRes}(object, ...)
 }
 \arguments{
+\item{...}{further arguments passed to or from other methods.}
+
 \item{nmrnormRes_object}{object of type nmrnormRes, created by
 \code{\link{normalize_nmr}}}
 }

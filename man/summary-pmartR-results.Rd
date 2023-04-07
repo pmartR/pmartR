@@ -17,16 +17,9 @@
 \method{summary}{corRes}(object, ...)
 }
 \arguments{
-\item{omicsNorm}{object of class normRes, produced by calling
-\code{\link{normalize_global} with option apply_norm=FALSE}}
+\item{object}{object of class corRes}
 
-\item{SPANSres_obj}{object of class SPANSRes created by calling
-\code{\link{spans_procedure}} on a grouped pepData or proData object}
-
-\item{dimRes_object}{object of class dimRes, which is a list containing
-sample identifiers and the principle components scores}
-
-\item{corRes_object}{object of class corRes}
+\item{...}{further arguments passed to or from other methods.}
 }
 \value{
 a summary table or list for the pmartR results object

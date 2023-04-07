@@ -7,6 +7,7 @@
 #'   'proData', nmrData', or 'seqData' usually created by \code{\link{as.lipidData}},
 #'   \code{\link{as.metabData}}, \code{\link{as.pepData}},
 #'   \code{\link{as.proData}}, \code{\link{as.nmrData}}, or \code{\link{as.seqData}}, respectively.
+#' @param ... further arguments passed to or from other methods.
 #'
 #' @return a summary table for the pmartR omicsData object. If assigned to a
 #'   variable, the elements of the summary table are saved in a list format.

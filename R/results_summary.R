@@ -2,6 +2,9 @@
 #'
 #' Provide basic summaries for results objects from the pmartR package.
 #'
+#' @param object the pmartR results object to summarize
+#' @param ... further arguments passed to or from other methods.
+#'
 #' @return a summary table or list for the pmartR results object
 #'
 #' @examples
@@ -30,7 +33,7 @@
 #' @export
 #' @rdname summary-pmartR-results
 #' @name summary-pmartR-results
-#' @param omicsNorm object of class normRes, produced by calling
+#' @param object object of class normRes, produced by calling
 #'   \code{\link{normalize_global} with option apply_norm=FALSE}
 summary.normRes <- function(object, ...) {
   omicsNorm <- object
@@ -64,7 +67,7 @@ summary.normRes <- function(object, ...) {
 #' @export
 #' @rdname summary-pmartR-results
 #' @name summary-pmartR-results
-#' @param SPANSres_obj object of class SPANSRes created by calling
+#' @param object object of class SPANSRes created by calling
 #'   \code{\link{spans_procedure}} on a grouped pepData or proData object
 summary.SPANSRes <- function(object, ...) {
   SPANSRes_obj <- object
@@ -86,7 +89,7 @@ summary.SPANSRes <- function(object, ...) {
 #' @export
 #' @rdname summary-pmartR-results
 #' @name summary-pmartR-results
-#' @param dimRes_object object of class dimRes, which is a list containing
+#' @param object object of class dimRes, which is a list containing
 #'   sample identifiers and the principle components scores
 summary.dimRes <- function(object, ...) {
   dimRes_object <- object
@@ -109,7 +112,7 @@ summary.dimRes <- function(object, ...) {
 #' @export
 #' @rdname summary-pmartR-results
 #' @name summary-pmartR-results
-#' @param corRes_object object of class corRes
+#' @param object object of class corRes
 summary.corRes <- function(object, ...) {
   corRes_object <- object
 

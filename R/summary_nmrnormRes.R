@@ -4,6 +4,7 @@
 #'
 #' @param nmrnormRes_object object of type nmrnormRes, created by
 #'   \code{\link{normalize_nmr}}
+#' @param ... further arguments passed to or from other methods.
 #'
 #' @return data frame object
 #'

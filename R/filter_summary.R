@@ -934,7 +934,7 @@ print.rmdFilterSummary <- function(x, ...) {
 #'
 #' Provide summary of a cvFilt S3 object
 #'
-#' @param filter_object S3 object of class 'cvFilt' created by
+#' @param object S3 object of class 'cvFilt' created by
 #'   \code{\link{cv_filter}}.
 #' @param cv_threshold numeric value greater than 1 and less than the value
 #'   given by filter_object$CV. CV values above cv_threshold are filtered out.

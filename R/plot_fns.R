@@ -6276,7 +6276,7 @@ prep_flags <- function(x, test) {
 
 #' Create a plotting dataframe for volcano plots and heatmaps
 #'
-#' A function internal to \link{pmartR:::plot.statRes} which creates the
+#' A function internal to pmartR:::\link{plot.statRes} which creates the
 #' dataframe necessary to construct volcano plots and heatmaps.
 #'
 #' @param x `statRes` object to be plotted, usually the result of `imd_anova`
@@ -6557,7 +6557,7 @@ statres_barplot <- function(x,
 #' across groups.  Bins are colored by the number of biomolecules falling into
 #' each bin, and have indicators for significance by g-test.
 #'
-#' @param volcano `data.frame` produced by \link{pmartR:::make_volcano_plot_df}
+#' @param volcano `data.frame` produced by pmartR:::\link{make_volcano_plot_df}
 #' @param show_sig Boolean whether to show the visual indicator that a certain
 #'   bin combination is significant by the g-test
 #' @param count_text_size In non-interactive mode, the size of the text
@@ -6796,7 +6796,7 @@ gtest_heatmap <-
 #' change on the x axis. Each point is colored by fold change direction and
 #' whether or not it was significant by ANOVA.
 #'
-#' @param volcano data frame produced by \link{pmartR:::make_volcano_plot_df}
+#' @param volcano data frame produced by pmartR:::\link{make_volcano_plot_df}
 #' @param pval_thresh numeric value between 0 and 1 for the alpha level to
 #'   determine significance. Any values that are significant at this level will
 #'   be colored based on fc_colors.
