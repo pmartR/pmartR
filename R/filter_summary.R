@@ -1044,10 +1044,12 @@ print.cvFilterSummary <- function(x, ...) {
 #'
 #' @examples
 #' library(pmartRdata)
-#' to_filter <- custom_filter(omicsData = metab_object, e_data_remove = "fumaric acid", f_data_remove = "Sample_1_Phenotype2_B")
+#' to_filter <- custom_filter(omicsData = metab_object, e_data_remove = "fumaric acid",
+#'                            f_data_remove = "Sample_1_Phenotype2_B")
 #' summary(to_filter)
 #'
-#' to_filter2 <- custom_filter(omicsData = metab_object, f_data_keep = metab_object$f_data$SampleID[1:10])
+#' to_filter2 <- custom_filter(omicsData = metab_object, 
+#'                             f_data_keep = metab_object$f_data$SampleID[1:10])
 #' summary(to_filter2)
 #'
 #' @author Lisa Bramer

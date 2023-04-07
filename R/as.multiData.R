@@ -38,7 +38,8 @@
 #' # Combine metabolomics and protein object into multidata, both must be log2
 #' # and normalized.
 #' mymetab <- edata_transform(omicsData = metab_object, data_scale = "log2")
-#' mymetab <- normalize_global(omicsData = mymetab, subset_fn = "all", norm_fn = "median", apply_norm = TRUE)
+#' mymetab <- normalize_global(omicsData = mymetab, subset_fn = "all",
+#'                             norm_fn = "median", apply_norm = TRUE)
 #'
 #' mypro <- pro_object
 #'

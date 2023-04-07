@@ -271,20 +271,26 @@ trelli_builder <- function(toBuild, cognostics, plotFUN, cogFUN, path, name, ...
 #' @examples
 #' \dontrun{
 #'
-#' ## Build the abundance boxplot with an edata file. Generate trelliData in as.trelliData.edata
+#' ## Build the abundance boxplot with an edata file. 
+#' ## Generate trelliData in as.trelliData.edata
 #' trelli_panel_by(trelliData = trelliData, panel = "Lipid") %>%
 #'   trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10)
-#' trelli_panel_by(trelliData = trelliData, panel = "Sample") %>% trelli_abundance_boxplot()
+#' trelli_panel_by(trelliData = trelliData, panel = "Sample") %>% 
+#'   trelli_abundance_boxplot()
 #'
-#' ## Build the abundance boxplot with an omicsData object. Generate trelliData in as.trelliData
+#' ## Build the abundance boxplot with an omicsData object. 
+#' ## Generate trelliData in as.trelliData
 #' trelli_panel_by(trelliData = trelliData2, panel = "Lipid") %>%
 #'   trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10)
-#' trelli_panel_by(trelliData = trelliData2, panel = "LipidFamily") %>% trelli_abundance_boxplot()
+#' trelli_panel_by(trelliData = trelliData2, panel = "LipidFamily") %>%
+#'   trelli_abundance_boxplot()
 #'
-#' ## Build the abundance boxplot with an omicsData and statRes object. Generate trelliData in as.trelliData.
+#' ## Build the abundance boxplot with an omicsData and statRes object. 
+#' ## Generate trelliData in as.trelliData.
 #' trelli_panel_by(trelliData = trelliData4, panel = "Lipid") %>%
 #'   trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10)
-#' trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") %>% trelli_abundance_boxplot()
+#' trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") %>%
+#'   trelli_abundance_boxplot()
 #'
 #' ## Other options include modifying the ggplot
 #' trelli_panel_by(trelliData = trelliData, panel = "Lipid") %>%
@@ -294,7 +300,8 @@ trelli_builder <- function(toBuild, cognostics, plotFUN, cogFUN, path, name, ...
 #'   )
 #'
 #' ## Or making the plot interactive
-#' trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") %>% trelli_abundance_boxplot(interactive = TRUE)
+#' trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") %>%
+#'   trelli_abundance_boxplot(interactive = TRUE)
 #' }
 #'
 #' @author David Degnan, Lisa Bramer
@@ -560,15 +567,18 @@ trelli_abundance_boxplot <- function(trelliData,
 #' @examples
 #' \dontrun{
 #'
-#' ## Build the abundance histogram with an edata file. Generate trelliData in as.trelliData.edata
+#' ## Build the abundance histogram with an edata file. 
+#' ## Generate trelliData in as.trelliData.edata
 #' trelli_panel_by(trelliData = trelliData, panel = "Lipid") %>%
 #'   trelli_abundance_histogram(test_mode = TRUE, test_example = 1:10)
 #'
-#' ## Build the abundance histogram with an omicsData object. Generate trelliData in as.trelliData
+#' ## Build the abundance histogram with an omicsData object. 
+#' ## Generate trelliData in as.trelliData
 #' trelli_panel_by(trelliData = trelliData2, panel = "Lipid") %>%
 #'   trelli_abundance_histogram(test_mode = TRUE, test_example = 1:10)
 #'
-#' ## Build the abundance histogram with an omicsData and statRes object. Generate trelliData in as.trelliData.
+#' ## Build the abundance histogram with an omicsData and statRes object. 
+#' ## Generate trelliData in as.trelliData.
 #' trelli_panel_by(trelliData = trelliData4, panel = "Lipid") %>%
 #'   trelli_abundance_histogram(test_mode = TRUE, test_example = 1:10)
 #'
@@ -785,7 +795,8 @@ trelli_abundance_histogram <- function(trelliData,
 #' @examples
 #' \dontrun{
 #'
-#' ## Build the abundance heatmap with an omicsData object with emeta variables. Generate trelliData in as.trelliData.
+#' ## Build the abundance heatmap with an omicsData object with emeta variables. 
+#' ## Generate trelliData in as.trelliData.
 #' trelli_panel_by(trelliData = trelliData2, panel = "LipidFamily") %>%
 #'   trelli_abundance_heatmap(test_mode = TRUE, test_example = 1:3)
 #'
@@ -986,20 +997,25 @@ trelli_abundance_heatmap <- function(trelliData,
 #' @examples
 #' \dontrun{
 #'
-#' ## Build the missingness bar plot with an edata file. Generate trelliData in as.trelliData.edata
+#' ## Build the missingness bar plot with an edata file. 
+#' ## Generate trelliData in as.trelliData.edata
 #' trelli_panel_by(trelliData = trelliData, panel = "Lipid") %>%
 #'   trelli_missingness_bar(test_mode = TRUE, test_example = 1:10)
-#' trelli_panel_by(trelliData = trelliData, panel = "Sample") %>% trelli_missingness_bar()
+#' trelli_panel_by(trelliData = trelliData, panel = "Sample") %>% 
+#'   trelli_missingness_bar()
 #'
-#' ## Build the missingness bar plot with an omicsData object. Generate trelliData in as.trelliData
+#' ## Build the missingness bar plot with an omicsData object. 
+#' ## Generate trelliData in as.trelliData
 #' trelli_panel_by(trelliData = trelliData2, panel = "Lipid") %>%
 #'   trelli_missingness_bar(test_mode = TRUE, test_example = 1:10)
 #'
-#' ## Build the missingness bar plot with a statRes object. Generate trelliData in as.trelliData
+#' ## Build the missingness bar plot with a statRes object. 
+#' ## Generate trelliData in as.trelliData
 #' trelli_panel_by(trelliData = trelliData3, panel = "Lipid") %>%
 #'   trelli_missingness_bar(test_mode = TRUE, test_example = 1:10)
 #'
-#' ## Build the missingness bar plot with an omicsData and statRes object. Generate trelliData in as.trelliData.
+#' ## Build the missingness bar plot with an omicsData and statRes object. 
+#' ## Generate trelliData in as.trelliData.
 #' trelli_panel_by(trelliData = trelliData4, panel = "Lipid") %>%
 #'   trelli_missingness_bar(test_mode = TRUE, test_example = 1:10)
 #'
@@ -1302,12 +1318,12 @@ determine_significance <- function(DF, p_value_test, p_value_thresh) {
 #' \dontrun{
 #'
 #' ## Build fold_change bar plot with statRes data grouped by edata_colname.
-#' trelli_panel_by(trelliData = trelliData3, panel = "Lipid") %>% 
+#' trelli_panel_by(trelliData = trelliData3, panel = "Lipid") %>%
 #'   trelli_foldchange_bar(test_mode = TRUE, test_example = 1:10, p_value_test = "anova")
-#'   
-#' ## Or make the plot interactive  
-#' trelli_panel_by(trelliData = trelliData4, panel = "Lipid") %>% 
-#'   trelli_foldchange_bar(test_mode = TRUE, test_example = 1:10, p_value_test = "gtest", interactive = TRUE) 
+#'
+#' ## Or make the plot interactive
+#' trelli_panel_by(trelliData = trelliData4, panel = "Lipid") %>%
+#'   trelli_foldchange_bar(test_mode = TRUE, test_example = 1:10, p_value_test = "gtest", interactive = TRUE)
 #'    
 #' }
 #'

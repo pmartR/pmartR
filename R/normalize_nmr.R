@@ -62,7 +62,8 @@
 #' @examples
 #' library(pmartRdata)
 #'
-#' # Normalize using a metabolite (this is merely an example of how to use this specification; the metabolite used was not actually spiked-in for the purpose of normalization)
+#' # Normalize using a metabolite (this is merely an example of how to use this specification;
+#' # the metabolite used was not actually spiked-in for the purpose of normalization)
 #' mynmr <- edata_transform(
 #'   omicsData = nmr_identified_object,
 #'   data_scale = "log2"

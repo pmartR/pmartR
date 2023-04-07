@@ -57,7 +57,8 @@
 #'
 #' myiso <- edata_transform(isobaric_object, "log2")
 #'
-#' # Don't apply the normalization quite yet; can use summary() and plot() to view reference pool samples
+#' # Don't apply the normalization quite yet;
+#' # can use summary() and plot() to view reference pool samples
 #' myiso_refpools <- normalize_isobaric(
 #'   omicsData = myiso, exp_cname = "Plex",
 #'   apply_norm = FALSE,
@@ -66,7 +67,8 @@
 #' )
 #' summary(myiso_refpools)
 #'
-#' # Now apply the normalization; can use plot() to view the study samples after reference pool normalization
+#' # Now apply the normalization;
+#' # can use plot() to view the study samples after reference pool normalization
 #' myiso_norm <- normalize_isobaric(
 #'   omicsData = myiso, exp_cname = "Plex",
 #'   apply_norm = TRUE,

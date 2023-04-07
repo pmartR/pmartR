@@ -43,7 +43,11 @@
 #' plot(sfit)
 #'
 #' # Add some covariate information
-#' attr(tcga_ovarian_pepdata_bp, "survDF") <- list(t_death = "survival_time", ind_death = "vital_status", covariates = "g__initial_pathologic_diagnosis_method_g1")
+#' attr(tcga_ovarian_pepdata_bp, "survDF") <- list(
+#'   t_death = "survival_time",
+#'   ind_death = "vital_status",
+#'   covariates = "g__initial_pathologic_diagnosis_method_g1"
+#' )
 #' sfit <- fit_surv(tcga_ovarian_pepdata_bp)
 #' plot(sfit, col = c(1, 2))
 #' }
@@ -102,7 +106,11 @@ fit_surv <- function(omicsData) {
 #' plot_km(omicsData = tcga_ovarian_pepdata_bp)
 #'
 #' # Add covariates to "survDF" attribute
-#' attr(tcga_ovarian_pepdata_bp, "survDF") <- list(t_death = "survival_time", ind_death = "vital_status", covariates = "age_at_initial_pathologic_diagnosis")
+#' attr(tcga_ovarian_pepdata_bp, "survDF") <- list(
+#'   t_death = "survival_time",
+#'   ind_death = "vital_status",
+#'   covariates = "age_at_initial_pathologic_diagnosis"
+#' )
 #' plot_km(omicsData = tcga_ovarian_pepdata_bp)
 #' }
 plot_km <- function(omicsData) {
@@ -119,6 +127,7 @@ plot_km <- function(omicsData) {
 #'
 #' @param omicsData A pmartR data object of any class, which has a `group_df` attribute that is usually created by the `group_designation()` function
 #' @param percent The percentile
+#' @param ... extra arguments passed to regexpr if pattern is specified
 #' @return if `percent` is provided then the time at which that probability of death is returned; else, the summary of the `survival` object is returned
 #'
 #' @examples

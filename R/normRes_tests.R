@@ -18,11 +18,13 @@
 #' mymetab <- group_designation(omicsData = mymetab, main_effects = "Phenotype")
 #'
 #' # provide the normRes object
-#' mynorm <- normalize_global(omicsData = mymetab, subset_fn = "all", norm_fn = "median", apply_norm = FALSE)
+#' mynorm <- normalize_global(omicsData = mymetab, subset_fn = "all",
+#'                            norm_fn = "median", apply_norm = FALSE)
 #' norm_pvals <- normRes_tests(norm_obj = mynorm)
 #'
 #' # provide normalized omicsData object
-#' mymetab <- normalize_global(omicsData = mymetab, subset_fn = "all", norm_fn = "median", apply_norm = TRUE)
+#' mymetab <- normalize_global(omicsData = mymetab, subset_fn = "all",
+#'                             norm_fn = "median", apply_norm = TRUE)
 #' norm_pvals <- normRes_tests(norm_obj = mymetab)
 #'
 #' # NMR data object
@@ -33,7 +35,8 @@
 #'   apply_norm = TRUE,
 #'   sample_property_cname = "Concentration"
 #' )
-#' mynmrnorm <- normalize_global(omicsData = mynmrnorm, subset_fn = "all", norm_fn = "median", apply_norm = TRUE, backtransform = TRUE)
+#' mynmrnorm <- normalize_global(omicsData = mynmrnorm, subset_fn = "all",
+#'                               norm_fn = "median", apply_norm = TRUE, backtransform = TRUE)
 #' norm_pvals <- normRes_tests(norm_obj = mynmrnorm)
 #'
 #' @export
