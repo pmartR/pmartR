@@ -12,7 +12,7 @@ trelli_panel_by(trelliData, panel)
 \item{panel}{The name of a column in trelliData to panel the data by. Required.}
 }
 \description{
-Allows for grouping omics or stats data for downstream plotting 
+Allows for grouping omics or stats data for downstream plotting
     and cognostic functions
 }
 \examples{
@@ -20,27 +20,26 @@ Allows for grouping omics or stats data for downstream plotting
 
 library(pmartRdata)
 
-## "panel_by" with an edata file. 
+## "panel_by" with an edata file.
 ## Generate with example code in as.trelliData.edata
 trelli_panel_by(trelliData = trelliData, panel = "Lipid")
 trelli_panel_by(trelliData = trelliData, panel = "Sample")
 
-## "panel_by" with trelliData containing omicsData. 
+## "panel_by" with trelliData containing omicsData.
 ## Generate with example code in as.trelliData
 trelli_panel_by(trelliData = trelliData2, panel = "Lipid")
 trelli_panel_by(trelliData = trelliData2, panel = "LipidFamily")
 
-## "panel_by" with trelliData containing statRes. 
+## "panel_by" with trelliData containing statRes.
 ## Generate with example code in as.trelliData
 trelli_panel_by(trelliData = trelliData3, panel = "Lipid")
 
-## "panel_by" with trelliData containing both omicsData and statRes. 
+## "panel_by" with trelliData containing both omicsData and statRes.
 ## Generate with example code in as.trelliData
 trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily")
 trelli_panel_by(trelliData = trelliData4, panel = "Lipid")
 trelli_panel_by(trelliData = trelliData4, panel = "SampleID")
-
-}  
+}
 
 }
 \author{

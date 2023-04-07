@@ -50,10 +50,11 @@ The MSnbase package is available via Bioconductor
 library(MSnbase)
 data("msnset")
 result = MSnSet2pepData(msnset,
-                        data_scale = "log2",
-                        edata_cname = "UniqueID",
-                        fdata_cname = "SampleID",
-                        emeta_cname = "UniqueID")
+  data_scale = "log2",
+  edata_cname = "UniqueID",
+  fdata_cname = "SampleID",
+  emeta_cname = "UniqueID"
+)
 }
 
 }

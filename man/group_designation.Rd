@@ -86,8 +86,10 @@ Groups are formed based on the levels of the main effect variables.
 }
 \examples{
 library(pmartRdata)
-mylipid <- group_designation(omicsData = lipid_pos_object,
-                                   main_effects = "Virus")
+mylipid <- group_designation(
+  omicsData = lipid_pos_object,
+  main_effects = "Virus"
+)
 attr(mylipid, "group_DF")
 
 }

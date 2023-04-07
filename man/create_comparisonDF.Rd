@@ -7,7 +7,7 @@
 create_comparisonDF(comp_type, omicsData, control_group = NULL)
 }
 \arguments{
-\item{comp_type}{string specifying either "control" or 
+\item{comp_type}{string specifying either "control" or
 "pairwise". Specifying "control" indicates that all other groups are
 to be compared to a single control group. Specifying "pairwise"
 indicates that all pairwise comparisons are to be made.}

@@ -146,18 +146,26 @@ Below are details for specifying function and parameter options.
 \examples{
 library(pmartRdata)
 
-mymetab <- edata_transform(omicsData = metab_object,
-                                data_scale = "log2")
-mymetab <- group_designation(omicsData = mymetab,
-                                  main_effects = "Phenotype")
-norm_object <- normalize_global(omicsData = mymetab,
-                                subset_fn = "all",
-                                norm_fn = "median")
-norm_data <- normalize_global(omicsData = mymetab,
-                              subset_fn = "all",
-                              norm_fn = "median",
-                              apply_norm = TRUE,
-                              backtransform = TRUE)
+mymetab <- edata_transform(
+  omicsData = metab_object,
+  data_scale = "log2"
+)
+mymetab <- group_designation(
+  omicsData = mymetab,
+  main_effects = "Phenotype"
+)
+norm_object <- normalize_global(
+  omicsData = mymetab,
+  subset_fn = "all",
+  norm_fn = "median"
+)
+norm_data <- normalize_global(
+  omicsData = mymetab,
+  subset_fn = "all",
+  norm_fn = "median",
+  apply_norm = TRUE,
+  backtransform = TRUE
+)
 
 }
 \references{

@@ -39,7 +39,7 @@ containing the metabolite identifiers in \code{e_data} and \code{e_meta}
 containing the sample identifiers in \code{f_data}.}
 
 \item{emeta_cname}{character string specifying the name of the column
-containing the mapped identifiers in \code{e_meta} (if applicable). 
+containing the mapped identifiers in \code{e_meta} (if applicable).
 Defaults to NULL. Can be the same as edata_cname, if desired. If \code{e_meta} is NULL, then either do not specify
 \code{emeta_cname} or specify it as NULL.}
 
@@ -89,10 +89,12 @@ Objects of class 'metabData' contain some attributes that are
 }
 \examples{
 library(pmartRdata)
-mymetabData <- as.metabData(e_data = metab_edata,
-                            f_data = metab_fdata,
-                            edata_cname = "Metabolite",
-                            fdata_cname = "SampleID")
+mymetabData <- as.metabData(
+  e_data = metab_edata,
+  f_data = metab_fdata,
+  edata_cname = "Metabolite",
+  fdata_cname = "SampleID"
+)
 
 }
 \seealso{

@@ -20,10 +20,10 @@ This function returns a totalcountFilt object for use with
 \code{\link{applyFilt}}
 }
 \details{
-Filter is based off of recommendations in edgeR processing, where 
-the low-observed biomolecules are removed from processing. Default 
-recommendation in edgeR is at least 15 total counts observed across samples 
-(i.e., if the sum of counts in a row of e_data is < 15, default edgeR 
+Filter is based off of recommendations in edgeR processing, where
+the low-observed biomolecules are removed from processing. Default
+recommendation in edgeR is at least 15 total counts observed across samples
+(i.e., if the sum of counts in a row of e_data is < 15, default edgeR
 filtering would remove this biomolecule).
 }
 \examples{
@@ -35,9 +35,9 @@ summary(to_filter, min_count = 15)
 
 }
 \references{
-Chen Y, Lun ATL, and Smyth, GK (2016). From reads to genes to pathways: 
-differential expression analysis of RNA-Seq experiments using Rsubread and 
-the edgeR quasi-likelihood pipeline. F1000Research 5, 1438. 
+Chen Y, Lun ATL, and Smyth, GK (2016). From reads to genes to pathways:
+differential expression analysis of RNA-Seq experiments using Rsubread and
+the edgeR quasi-likelihood pipeline. F1000Research 5, 1438.
 http://f1000research.com/articles/5-1438
 }
 \author{

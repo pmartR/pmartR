@@ -12,6 +12,8 @@
 
 \item{min_num}{integer value specifying the minimum number of times each
 feature must be observed across all samples. Default value is NULL.}
+
+\item{...}{further arguments passed to or from other methods}
 }
 \value{
 a summary table giving the number of biomolecules by number of

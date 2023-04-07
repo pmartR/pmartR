@@ -27,9 +27,8 @@ summary(trelliData \%>\% trelli_panel_by("Sample"))
 # Use an omicsData example. Build with as.trelliData.
 summary(trelliData2)
 
-# Use a statRes example. Build with as.trelliData. 
+# Use a statRes example. Build with as.trelliData.
 summary(trelliData3)
-
 }
 
 }

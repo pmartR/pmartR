@@ -48,13 +48,12 @@ The metrics on which the log2 robust Mahalanobis distance is based
 library(pmartRdata)
 mymetab <- edata_transform(omicsData = metab_object, data_scale = "log2")
 mymetab <- group_designation(omicsData = mymetab, main_effects = "Phenotype")
-rmd_results <- rmd_filter(omicsData = mymetab, metrics=c("MAD", "Skewness", "Correlation"))
+rmd_results <- rmd_filter(omicsData = mymetab, metrics = c("MAD", "Skewness", "Correlation"))
 rmd_results <- rmd_filter(omicsData = mymetab)
 
 mypep <- edata_transform(omicsData = pep_object, data_scale = "log2")
 mypep <- group_designation(omicsData = mypep, main_effects = "Phenotype")
 rmd_results <- rmd_filter(omicsData = mypep)
-
 
 }
 \references{

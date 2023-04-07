@@ -95,7 +95,7 @@ For plotting an S3 object of type 'dimRes'
 \examples{
 library(pmartRdata)
 
-mylipid <- edata_transform(omicsData = lipid_neg_object, data_scale="log2")
+mylipid <- edata_transform(omicsData = lipid_neg_object, data_scale = "log2")
 mylipid <- group_designation(omicsData = mylipid, main_effects = "Virus")
 pca_lipids <- dim_reduction(omicsData = mylipid)
 plot(pca_lipids)

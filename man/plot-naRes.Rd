@@ -154,8 +154,10 @@ This function takes in an object of class naRes and creates either a
 library(pmartRdata)
 mylipid <- group_designation(omicsData = lipid_neg_object, main_effects = "Virus")
 result <- missingval_result(omicsData = mylipid)
-plot(result, omicsData = mylipid, plot_type = "bar", x_lab_angle = 50, order_by = "Virus", color_by = "Virus")
-plot(result, omicsData = mylipid, plot_type = "scatter", x_lab_angle = 50, color_by = "Virus")
+plot(result, omicsData = mylipid, plot_type = "bar",
+     x_lab_angle = 50, order_by = "Virus", color_by = "Virus")
+plot(result, omicsData = mylipid, plot_type = "scatter",
+     x_lab_angle = 50, color_by = "Virus")
 
 result <- missingval_result(omicsData = rnaseq_object)
 plot(result, omicsData = rnaseq_object, plot_type = "bar")

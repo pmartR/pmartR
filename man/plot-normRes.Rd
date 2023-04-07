@@ -98,13 +98,19 @@ For plotting an S3 object of type 'normRes'
 }
 \examples{
 library(pmartRdata)
-mymetab <- edata_transform(omicsData = metab_object,
-                                data_scale = "log2")
-mymetab <- group_designation(omicsData = mymetab,
-                                  main_effects = "Phenotype")
-norm_object <- normalize_global(omicsData = mymetab,
-                                subset_fn = "all",
-                                norm_fn = "median")
+mymetab <- edata_transform(
+  omicsData = metab_object,
+  data_scale = "log2"
+)
+mymetab <- group_designation(
+  omicsData = mymetab,
+  main_effects = "Phenotype"
+)
+norm_object <- normalize_global(
+  omicsData = mymetab,
+  subset_fn = "all",
+  norm_fn = "median"
+)
 plot(norm_object, order_by = "Phenotype", color_by = "Phenotype")
 
 }

@@ -19,10 +19,14 @@ For creating a summary of an S3 object of type 'nmrnormRes'
 }
 \examples{
 library(pmartRdata)
-mynmr <- edata_transform(omicsData = nmr_identified_object, 
-                         data_scale = "log2")
-nmr_norm <- normalize_nmr(omicsData = mynmr, apply_norm = FALSE,
-                         sample_property_cname = "Concentration")
+mynmr <- edata_transform(
+  omicsData = nmr_identified_object,
+  data_scale = "log2"
+)
+nmr_norm <- normalize_nmr(
+  omicsData = mynmr, apply_norm = FALSE,
+  sample_property_cname = "Concentration"
+)
 mysummary <- summary(nmr_norm)
 
 }

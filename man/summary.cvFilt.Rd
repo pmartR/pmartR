@@ -11,6 +11,8 @@
 given by filter_object$CV. CV values above cv_threshold are filtered out.
 Default value is NULL.}
 
+\item{...}{further arguments passed to or from other methods}
+
 \item{filter_object}{S3 object of class 'cvFilt' created by
 \code{\link{cv_filter}}.}
 }

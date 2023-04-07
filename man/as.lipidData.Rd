@@ -89,10 +89,12 @@ Objects of class 'lipidData' contain some attributes that are
 }
 \examples{
 library(pmartRdata)
-mylipid <- as.lipidData(e_data = lipid_neg_edata,
-                        f_data = lipid_neg_fdata,
-                        edata_cname = "Lipid",
-                        fdata_cname = "SampleID")
+mylipid <- as.lipidData(
+  e_data = lipid_neg_edata,
+  f_data = lipid_neg_fdata,
+  edata_cname = "Lipid",
+  fdata_cname = "SampleID"
+)
 
 }
 \seealso{

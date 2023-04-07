@@ -13,6 +13,8 @@
 \item{pvalue_threshold}{A threshold for the Robust Mahalanobis Distance (RMD)
 p-value. All samples with p-values below the threshold will be filtered
 out. Default value is NULL. Suggested value is 0.0001}
+
+\item{...}{further arguments passed to or from other methods}
 }
 \value{
 a summary of the p-values associated with running RMD-PAV across all
@@ -26,7 +28,7 @@ Provide summary of a rmdFilt S3 object
 library(pmartRdata)
 mymetab <- group_designation(omicsData = metab_object, main_effects = "Phenotype")
 mymetab <- edata_transform(omicsData = mymetab, data_scale = "log2")
-myfilt <- rmd_filter(omicsData = mymetab) 
+myfilt <- rmd_filter(omicsData = mymetab)
 summary(myfilt, pvalue_threshold = 0.001)
 
 }

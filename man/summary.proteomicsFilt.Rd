@@ -19,6 +19,8 @@ that should be filtered. Default value is NULL.}
 \item{degen_peps}{logical indicator of whether to filter out 'degenerate' or 'redundant'
 peptides (i.e. peptides mapping to multiple proteins) (TRUE) or not
 (FALSE). Default value is FALSE.}
+
+\item{...}{further arguments passed to or from other methods}
 }
 \value{
 a summary table giving the number of Observed Proteins per Peptide

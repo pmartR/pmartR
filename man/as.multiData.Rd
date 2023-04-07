@@ -24,9 +24,9 @@ omicsData objects supplied to the function.}
 are common across all datasets be kept in f_meta. See details for how
 samples will be dropped.}
 
-\item{match_samples}{logical indicator. If auto_fmeta = TRUE, whether to attempt
-to match the names in the sample columns in f_data across all objects in an
-attempt to align them in f_meta. Defaults to TRUE.}
+\item{match_samples}{logical indicator. If auto_fmeta = TRUE, whether to 
+attempt to match the names in the sample columns in f_data across all
+objects in an attempt to align them in f_meta. Defaults to TRUE.}
 
 \item{keep_sample_info}{logical indicator for whether to attempt to append
 sample information contained in the objects' f_data to the final f_meta via
@@ -56,10 +56,11 @@ and column-binding them.
 
 library(pmartRdata)
 
-# Combine metabolomics and protein object into multidata, both must be log2 
+# Combine metabolomics and protein object into multidata, both must be log2
 # and normalized.
 mymetab <- edata_transform(omicsData = metab_object, data_scale = "log2")
-mymetab <- normalize_global(omicsData = mymetab, subset_fn = "all", norm_fn = "median", apply_norm = TRUE)
+mymetab <- normalize_global(omicsData = mymetab, subset_fn = "all",
+                            norm_fn = "median", apply_norm = TRUE)
 
 mypro <- pro_object
 
@@ -69,9 +70,10 @@ mymultidata <- as.multiData(mymetab, mypro, auto_fmeta = TRUE, sample_intersect 
 
 # Manually supply an f_meta
 f_meta <- data.frame(
-   "Proteins" = mypro$f_data$SampleID[match(mymetab$f_data$SampleID, mypro$f_data$SampleID)],
-   "Metabolites" = mymetab$f_data$SampleID,
-   "Condition" = mymetab$f_data$Phenotype[match(mymetab$f_data$SampleID, mypro$f_data$SampleID)])
+  "Proteins" = mypro$f_data$SampleID[match(mymetab$f_data$SampleID, mypro$f_data$SampleID)],
+  "Metabolites" = mymetab$f_data$SampleID,
+  "Condition" = mymetab$f_data$Phenotype[match(mymetab$f_data$SampleID, mypro$f_data$SampleID)]
+)
 
 mymultidata <- as.multiData(mymetab, mypro, f_meta = f_meta)
 # remove samples that are not common across all data.

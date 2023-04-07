@@ -23,7 +23,7 @@ combine_lipidData(
 \item{retain_groups}{logical indicator of whether to attempt to apply
 existing group information to the new object. Defaults to FALSE.}
 
-\item{retain_filters}{Whether to retain filter information in the new object 
+\item{retain_filters}{Whether to retain filter information in the new object
 (defaults to FALSE).}
 
 \item{drop_duplicate_emeta}{a logical indicator of whether duplicate molecule
@@ -33,7 +33,7 @@ identifiers in e_meta should be dropped}
 'covariates' to be passed to `pmartR::group_designation`.}
 }
 \value{
-An object of the same type as the two input objects, with their 
+An object of the same type as the two input objects, with their
 combined data.
 }
 \description{
@@ -56,25 +56,32 @@ obj_1 <- lipid_neg_object
 obj_2 <- lipid_pos_object
 
 # de-duplicate any duplicate edata identifiers
-all(obj_2$e_data[,get_edata_cname(obj_2)] == obj_2$e_meta[,get_edata_cname(obj_2)])
-obj_2$e_data[,get_edata_cname(obj_2)] <- paste0("obj_2_", obj_2$e_data[,get_edata_cname(obj_2)])
-obj_2$e_meta[,get_edata_cname(obj_2)] <- obj_2$e_data[,get_edata_cname(obj_2)]
+all(obj_2$e_data[, get_edata_cname(obj_2)] == obj_2$e_meta[, get_edata_cname(obj_2)])
+obj_2$e_data[, get_edata_cname(obj_2)] <- paste0("obj_2_", obj_2$e_data[, get_edata_cname(obj_2)])
+obj_2$e_meta[, get_edata_cname(obj_2)] <- obj_2$e_data[, get_edata_cname(obj_2)]
 
 combine_object <- combine_lipidData(obj_1 = obj_1, obj_2 = obj_2)
 
 # preprocess and group the data and keep filters/grouping structure
 
 obj_1 <- edata_transform(omicsData = obj_1, data_scale = "log2")
-obj_1 <- normalize_global(omicsData = obj_1, subset_fn = "all", norm_fn = "median", apply_norm = TRUE)
+obj_1 <- normalize_global(omicsData = obj_1, subset_fn = "all",
+                          norm_fn = "median", apply_norm = TRUE)
 obj_2 <- edata_transform(omicsData = obj_2, data_scale = "log2")
-obj_2 <- normalize_global(omicsData = obj_2, subset_fn = "all", norm_fn = "median", apply_norm = TRUE)
+obj_2 <- normalize_global(omicsData = obj_2, subset_fn = "all",
+                          norm_fn = "median", apply_norm = TRUE)
 
 obj_1 <- group_designation(omicsData = obj_1, main_effects = "Virus")
 obj_2 <- group_designation(omicsData = obj_2, main_effects = "Virus")
 
 obj_1 <- applyFilt(filter_object = molecule_filter(omicsData = obj_1), omicsData = obj_1, min_num = 2)
-obj_2 <- applyFilt(filter_object = cv_filter(omicsData = obj_2),obj_2, cv_thresh = 60)
+obj_2 <- applyFilt(filter_object = cv_filter(omicsData = obj_2), obj_2, cv_thresh = 60)
 
-combine_object_later <- combine_lipidData(obj_1 = obj_1, obj_2 = obj_2, retain_groups = TRUE, retain_filters = TRUE)
+combine_object_later <- combine_lipidData(
+                          obj_1 = obj_1,
+                          obj_2 = obj_2,
+                          retain_groups = TRUE,
+                          retain_filters = TRUE
+                        )
 
 }

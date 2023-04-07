@@ -10,7 +10,7 @@ get_spans_params(SPANSRes_obj, sort_by_nmols = FALSE)
 \item{SPANSRes_obj}{an object of the class SPANSRes obtained by calling
 \code{spans_procedure()}}
 
-\item{sort_by_nmols}{a logical indicator of whether to sort by number of 
+\item{sort_by_nmols}{a logical indicator of whether to sort by number of
 molecules used in the normalization (see \code{\link{spans_procedure}} for
 info about the 'mols_used_in_norm' column)}
 }
@@ -40,10 +40,13 @@ best_params <- get_spans_params(spans_result)
 subset_fn = best_params[[1]]$subset_fn
 norm_fn = best_params[[1]]$norm_fn
 params = best_params[[1]]$params
-if(is.null(params[[1]])){params = NULL}
+if (is.null(params[[1]])) {
+  params = NULL
+}
 
 # pass arguments to normalize global
-norm_object <- normalize_global(omicsData = myobject, subset_fn = subset_fn, norm_fn = norm_fn, params = params)
+norm_object <- normalize_global(omicsData = myobject, subset_fn = subset_fn,
+                                norm_fn = norm_fn, params = params)
 }
 
 }

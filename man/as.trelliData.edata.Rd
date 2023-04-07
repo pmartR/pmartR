@@ -35,7 +35,7 @@ colummn in edata.}
 "pepData", "isobaricpepData", "proData", "metabData", "lipidData", or
 "nmrData".}
 
-\item{data_scale_original}{A character string indicating original scale 
+\item{data_scale_original}{A character string indicating original scale
 of the data. Valid values are: 'log2', 'log', 'log10', or 'abundance'.
 Default is abundance.}
 
@@ -68,12 +68,13 @@ The only acceptable input file type is a single edata file.
 \examples{
 library(pmartRdata)
 
-# Simple example 
-trelliData <- as.trelliData.edata(e_data = lipid_pos_edata,
-                                  edata_cname = "Lipid",
-                                  omics_type = "lipidData")
-                                  
-          
+# Simple example
+trelliData <- as.trelliData.edata(
+  e_data = lipid_pos_edata,
+  edata_cname = "Lipid",
+  omics_type = "lipidData"
+)
+
 }
 \author{
 David Degnan, Daniel Claborne, Lisa Bramer

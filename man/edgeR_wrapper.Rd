@@ -41,11 +41,11 @@ Runs default edgeR workflow with empirical Bayes quasi-likelihood
   F-tests. Additional arguments can be passed for use in the function, refer
   to calcNormFactors() and glmQLFit() in edgeR package.
 
-Flags (signatures) -	Indicator of statistical significance for computed test. 
+Flags (signatures) -	Indicator of statistical significance for computed test.
 Zeroes indicate no significance, while +/- 1 indicates direction of significance.
 }
 \references{
-Robinson MD, McCarthy DJ, Smyth GK (2010). “edgeR: a Bioconductor package 
- for differential expression analysis of digital gene expression data.” 
+Robinson MD, McCarthy DJ, Smyth GK (2010). “edgeR: a Bioconductor package
+ for differential expression analysis of digital gene expression data.”
  Bioinformatics, 26(1), 139-140. doi: 10.1093/bioinformatics/btp616.
 }

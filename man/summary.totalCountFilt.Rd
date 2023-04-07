@@ -7,16 +7,18 @@
 \method{summary}{totalCountFilt}(object, min_count = NULL, ...)
 }
 \arguments{
-\item{object}{S3 object of class 'totalCountFilt' created by 
+\item{object}{S3 object of class 'totalCountFilt' created by
 \code{\link{total_count_filter}}.}
 
-\item{min_count}{numeric value greater than 1 and less than the value 
-given by filter_object$Total_Count. Values below min_count are filtered out. 
+\item{min_count}{numeric value greater than 1 and less than the value
+given by filter_object$Total_Count. Values below min_count are filtered out.
 Default value is NULL.}
+
+\item{...}{further arguments passed to or from other methods}
 }
 \value{
-a summary of the Total Count values, number of zero values, and 
-non-zero values. If a min_count is provided the biomolecules that would be 
+a summary of the Total Count values, number of zero values, and
+non-zero values. If a min_count is provided the biomolecules that would be
 filtered at this threshold are reported.
 }
 \description{

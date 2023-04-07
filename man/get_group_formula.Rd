@@ -10,7 +10,7 @@ get_group_formula(omicsData)
 \item{omicsData}{an object of type 'seqData', created by \code{\link{as.seqData}}}
 }
 \description{
-For generating group design formulas and correctly ordered group data for 
+For generating group design formulas and correctly ordered group data for
 seqData statistical functions
 }
 \examples{
@@ -20,7 +20,6 @@ library(pmartRdata)
 myseqData <- rnaseq_object
 myseqData <- group_designation(omicsData = myseqData, main_effects = "Virus")
 grouping_info <- pmartR:::get_group_formula(omicsData = myseqData)
-
 }
 
 }

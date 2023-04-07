@@ -101,7 +101,7 @@ For plotting an S3 object of type 'rmdFilt'
 library(pmartRdata)
 mymetab <- edata_transform(omicsData = metab_object, data_scale = "log2")
 mymetab <- group_designation(omicsData = mymetab, main_effects = "Phenotype")
-rmd_results <- rmd_filter(omicsData = mymetab, metrics=c("MAD", "Skewness", "Correlation"))
+rmd_results <- rmd_filter(omicsData = mymetab, metrics = c("MAD", "Skewness", "Correlation"))
 plot(rmd_results, pvalue_threshold = 0.0001, order_by = "Phenotype")
 
 }

@@ -28,6 +28,8 @@ Defaults to NULL. Suggested value is 3.}
 containing the different comparisons of interest. Comparisons will be made
 between the Test and the corresponding Control (e.g. Control is the
 reference group).}
+
+\item{...}{further arguments passed to or from other methods}
 }
 \value{
 If min_nonmiss_gtest or min_nonmiss_anova is specified, the number of

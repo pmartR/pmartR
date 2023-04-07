@@ -12,8 +12,8 @@ RNA_filter(omicsData)
 }
 \value{
 An S3 object of class 'RNAFilt' (data.frame) that contains the
-  sample identifiers, library size, the number of unique biomolecules with 
-  non-zero observations per sample, and the proportion of non-zero 
+  sample identifiers, library size, the number of unique biomolecules with
+  non-zero observations per sample, and the proportion of non-zero
   observations over the total number of biomolecules.
 }
 \description{

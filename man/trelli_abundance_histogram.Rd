@@ -58,25 +58,29 @@ Specify a plot design and cognostics for the abundance histogram
 \examples{
 \dontrun{
 
-## Build the abundance histogram with an edata file. Generate trelliData in as.trelliData.edata
-trelli_panel_by(trelliData = trelliData, panel = "Lipid") \%>\% 
-   trelli_abundance_histogram(test_mode = TRUE, test_example = 1:10)
+## Build the abundance histogram with an edata file. 
+## Generate trelliData in as.trelliData.edata
+trelli_panel_by(trelliData = trelliData, panel = "Lipid") \%>\%
+  trelli_abundance_histogram(test_mode = TRUE, test_example = 1:10)
 
-## Build the abundance histogram with an omicsData object. Generate trelliData in as.trelliData
-trelli_panel_by(trelliData = trelliData2, panel = "Lipid") \%>\% 
-   trelli_abundance_histogram(test_mode = TRUE, test_example = 1:10)
-    
-## Build the abundance histogram with an omicsData and statRes object. Generate trelliData in as.trelliData.
+## Build the abundance histogram with an omicsData object. 
+## Generate trelliData in as.trelliData
+trelli_panel_by(trelliData = trelliData2, panel = "Lipid") \%>\%
+  trelli_abundance_histogram(test_mode = TRUE, test_example = 1:10)
+
+## Build the abundance histogram with an omicsData and statRes object. 
+## Generate trelliData in as.trelliData.
 trelli_panel_by(trelliData = trelliData4, panel = "Lipid") \%>\%
-   trelli_abundance_histogram(test_mode = TRUE, test_example = 1:10)
-   
-## Users can modify the plotting function with ggplot parameters and interactivity, 
-## and can also select certain cognostics.     
-trelli_panel_by(trelliData = trelliData, panel = "Lipid") \%>\% 
-   trelli_abundance_histogram(test_mode = TRUE, test_example = 1:10, 
-     ggplot_params = c("ylab('')", "xlab('Abundance')"), interactive = TRUE,
-     cognostics = c("mean", "median"))  
-   
+  trelli_abundance_histogram(test_mode = TRUE, test_example = 1:10)
+
+## Users can modify the plotting function with ggplot parameters and interactivity,
+## and can also select certain cognostics.
+trelli_panel_by(trelliData = trelliData, panel = "Lipid") \%>\%
+  trelli_abundance_histogram(
+    test_mode = TRUE, test_example = 1:10,
+    ggplot_params = c("ylab('')", "xlab('Abundance')"), interactive = TRUE,
+    cognostics = c("mean", "median")
+  )
 }
 
 }

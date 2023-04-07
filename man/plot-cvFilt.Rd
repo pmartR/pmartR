@@ -88,8 +88,10 @@ For plotting an S3 object of type 'cvFilt'
 \examples{
 library(pmartRdata)
 data(pep_object)
-mypep <- group_designation(omicsData = pep_object,
-                                main_effects = "Phenotype")
+mypep <- group_designation(
+  omicsData = pep_object,
+  main_effects = "Phenotype"
+)
 
 cvfilt <- cv_filter(omicsData = mypep)
 

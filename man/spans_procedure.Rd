@@ -61,13 +61,13 @@ sig_thresh will be adjusted to the minimum value that gives this many
 biomolecules.}
 
 \item{max_nonsig}{integer value specifying the maximum number of
-non-significant biomolecules identified in step 0 if SPANS in order to 
+non-significant biomolecules identified in step 0 if SPANS in order to
 proceed.  Excesses of non-significant biomolecules will be randomly sampled
 down to these values.}
 
 \item{max_sig}{integer value specifying the maximum number of
 highly significant biomolecules identified in step 0 if SPANS in order to
-proceed.  Excesses of highly significant biomolecules will be randomly 
+proceed.  Excesses of highly significant biomolecules will be randomly
 sampled down to these values.}
 
 \item{...}{Additional arguments \tabular{ll}{ \code{location_thresh,
@@ -179,11 +179,19 @@ pep_object <- group_designation(omicsData = pep_object, main_effects = "Phenotyp
 spans_res <- spans_procedure(omicsData = pep_object)
 
 ## specify only certain subset and normalization functions
-spans_res <- spans_procedure(omicsData = pep_object, norm_fn = c("median", "zscore"), subset_fn = c("all", "los", "ppp"))
+spans_res <- spans_procedure(omicsData = pep_object, 
+                             norm_fn = c("median", "zscore"), 
+                             subset_fn = c("all", "los", "ppp"))
 
 ## specify parameters for supplied subset functions, notice ppp_rip takes a vector of two numeric arguments.
-spans_res <- spans_procedure(omicsData = pep_object, subset_fn = c("all", "los", "ppp"), params = list(los = list(0.25, 0.5), ppp = list(0.15, 0.25)))
-spans_res <- spans_procedure(omicsData = pep_object, subset_fn = c("all", "rip", "ppp_rip"), params = list(rip = list(0.3, 0.4), ppp_rip = list(c(0.15, 0.5), c(0.25, 0.5))))
+spans_res <- spans_procedure(omicsData = pep_object, 
+                             subset_fn = c("all", "los", "ppp"), 
+                             params = list(los = list(0.25, 0.5), 
+                             ppp = list(0.15, 0.25)))
+spans_res <- spans_procedure(omicsData = pep_object, 
+                             subset_fn = c("all", "rip", "ppp_rip"), 
+                             params = list(rip = list(0.3, 0.4), 
+                             ppp_rip = list(c(0.15, 0.5), c(0.25, 0.5))))
 }
 
 }

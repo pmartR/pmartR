@@ -6,6 +6,7 @@
 #'   \code{\link{molecule_filter}}
 #' @param min_num integer value specifying the minimum number of times each
 #'   feature must be observed across all samples. Default value is NULL.
+#' @param ... further arguments passed to or from other methods
 #' @return a summary table giving the number of biomolecules by number of
 #'   observed values across all samples. If min_num is specified, the numbers of
 #'   biomolecules to be filtered and to be retained based on the specified
@@ -113,6 +114,7 @@ print.moleculeFilterSummary <- function(x, ...) {
 #'   biomolecules. Defaults to NULL.
 #' @param size_library integer cut-off for sample library size (i.e. number of
 #'   reads). Defaults to NULL.
+#' @param ... further arguments passed to or from other methods
 #'
 #' @return a summary table giving the minimum, maximum, 1st and 3rd quartiles,
 #'   mean and standard deviation for library size (the number of unique
@@ -278,6 +280,7 @@ print.RNAFiltSummary <- function(x, ...) {
 #' @param min_count numeric value greater than 1 and less than the value
 #' given by filter_object$Total_Count. Values below min_count are filtered out.
 #' Default value is NULL.
+#' @param ... further arguments passed to or from other methods
 #' @return a summary of the Total Count values, number of zero values, and
 #' non-zero values. If a min_count is provided the biomolecules that would be
 #' filtered at this threshold are reported.
@@ -363,6 +366,7 @@ print.totalCountFiltSummary <- function(x, ...) {
 #' @param degen_peps logical indicator of whether to filter out 'degenerate' or 'redundant'
 #'   peptides (i.e. peptides mapping to multiple proteins) (TRUE) or not
 #'   (FALSE). Default value is FALSE.
+#' @param ... further arguments passed to or from other methods
 #' @return a summary table giving the number of Observed Proteins per Peptide
 #'   and number of Observed Peptides per Protein. If min_num_peps is specified
 #'   and/or degen_peps is TRUE, the number of biomolecules to be filtered with
@@ -514,6 +518,7 @@ print.proteomicsFilterSummary <- function(x, ...) {
 #'   containing the different comparisons of interest. Comparisons will be made
 #'   between the Test and the corresponding Control (e.g. Control is the
 #'   reference group).
+#' @param ... further arguments passed to or from other methods
 #'
 #' @return If min_nonmiss_gtest or min_nonmiss_anova is specified, the number of
 #'   biomolecules to be filtered with the specified threshold are reported.
@@ -823,6 +828,7 @@ print.imdanovaFilterSummary <- function(x, ...) {
 #' @param pvalue_threshold A threshold for the Robust Mahalanobis Distance (RMD)
 #'   p-value. All samples with p-values below the threshold will be filtered
 #'   out. Default value is NULL. Suggested value is 0.0001
+#' @param ... further arguments passed to or from other methods
 #' @return a summary of the p-values associated with running RMD-PAV across all
 #'   samples. If a p-value threshold is provided the samples that would be
 #'   filtered at this threshold are reported.
@@ -933,6 +939,7 @@ print.rmdFilterSummary <- function(x, ...) {
 #' @param cv_threshold numeric value greater than 1 and less than the value
 #'   given by filter_object$CV. CV values above cv_threshold are filtered out.
 #'   Default value is NULL.
+#' @param ... further arguments passed to or from other methods
 #' @return a summary of the CV values, number of NA values, and non-NA values.
 #'   If a CV threshold is provided, the biomolecules that would be filtered
 #'   based on this threshold are reported.
@@ -1038,6 +1045,7 @@ print.cvFilterSummary <- function(x, ...) {
 #'
 #' @param object S3 object of class 'customFilt' created by
 #'   \code{\link{custom_filter}}.
+#' @param ... further arguments passed to or from other methods
 #'
 #' @return a summary of the items in e_data, f_data, and e_meta that will be
 #'   removed as a result of applying the custom filter.

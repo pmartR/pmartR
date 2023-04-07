@@ -72,17 +72,20 @@ mypepData <- group_designation(omicsData = pep_object, main_effects = c("Phenoty
 mypepData = edata_transform(omicsData = mypepData, "log2")
 
 imdanova_Filt <- imdanova_filter(omicsData = mypepData)
-mypepData <- applyFilt(filter_object = imdanova_Filt, omicsData = mypepData, min_nonmiss_anova=2)
+mypepData <- applyFilt(filter_object = imdanova_Filt, omicsData = mypepData, min_nonmiss_anova = 2)
 
-imd_anova_res <- imd_anova(omicsData = mypepData, test_method = 'comb', pval_adjust_a_multcomp ='bon', pval_adjust_g_multcomp ='bon')
+imd_anova_res <- imd_anova(omicsData = mypepData, test_method = 'comb',
+                           pval_adjust_a_multcomp = 'bon', pval_adjust_g_multcomp = 'bon')
 
 isoformRes = bpquant(statRes = imd_anova_res, pepData = mypepData)
 
-#case where isoformRes is NULL:
-results<- protein_quant(pepData = mypepData, method = 'rollup', combine_fn = 'median', isoformRes = NULL)
+# case where isoformRes is NULL:
+results <- protein_quant(pepData = mypepData, method = 'rollup',
+                         combine_fn = 'median', isoformRes = NULL)
 
-#case where isoformRes is provided:
-# results2 = protein_quant(pepData = mypepData, method = 'rollup', combine_fn = 'mean', isoformRes = isoformRes)
+# case where isoformRes is provided:
+# results2 = protein_quant(pepData = mypepData, method = 'rollup',
+                           combine_fn = 'mean', isoformRes = isoformRes)
 }
 
 }

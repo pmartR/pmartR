@@ -51,7 +51,7 @@ dim_results <- dim_reduction(omicsData = mypep)
 summary(dim_results)
 
 cor_results <- cor_result(omicsData = mypep)
-summary(cor_results) 
+summary(cor_results)
 
 }
 \author{

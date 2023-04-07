@@ -20,10 +20,12 @@ For creating a summary of an S3 object of type 'isobaricnormRes'
 \examples{
 library(pmartRdata)
 myiso <- edata_transform(omicsData = isobaric_object, data_scale = "log2")
-myiso_norm <- normalize_isobaric(omicsData = myiso, exp_cname = "Plex",
-                                   apply_norm = FALSE,
-                                   refpool_cname = "Virus",
-                                   refpool_notation = "Pool")
+myiso_norm <- normalize_isobaric(
+  omicsData = myiso, exp_cname = "Plex",
+  apply_norm = FALSE,
+  refpool_cname = "Virus",
+  refpool_notation = "Pool"
+)
 mysummary <- summary(myiso_norm)
 
 }

@@ -40,7 +40,7 @@ A list containing all the elements in the data_info attribute:
        (list all attributes)
 }
 \description{
-Create a set function that will return the value for each attribute. For 
+Create a set function that will return the value for each attribute. For
 example, set_data_info will perform all of the calculations to fill in the
 data_info attribute. These functions will be called in the as.xxx functions
 to create an xxxData object but can be used individually to update any one of

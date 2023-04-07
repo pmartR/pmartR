@@ -73,10 +73,12 @@ Creates box plots for an S3 object of type 'isobaricnormRes'
 \examples{
 library(pmartRdata)
 myiso <- edata_transform(omicsData = isobaric_object, data_scale = "log2")
-result <- normalize_isobaric(myiso, exp_cname = "Plex",
-                                   apply_norm = FALSE,
-                                   refpool_cname = "Virus",
-                                   refpool_notation = "Pool")
+result <- normalize_isobaric(myiso,
+  exp_cname = "Plex",
+  apply_norm = FALSE,
+  refpool_cname = "Virus",
+  refpool_notation = "Pool"
+)
 plot(result)
 
 }

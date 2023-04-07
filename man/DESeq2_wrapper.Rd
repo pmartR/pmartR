@@ -16,11 +16,11 @@ DESeq2_wrapper(
 \arguments{
 \item{omicsData}{an object of type 'seqData', created by \code{\link{as.seqData}}}
 
-\item{test}{either "Wald" or "LRT", which will then use either Wald 
-significance tests, or the likelihood ratio test on the difference in 
+\item{test}{either "Wald" or "LRT", which will then use either Wald
+significance tests, or the likelihood ratio test on the difference in
 deviance between a full and reduced model formula}
 
-\item{p_adjust}{Character string for p-value correction method, refer to 
+\item{p_adjust}{Character string for p-value correction method, refer to
 ?p.adjust() for valid options. Defaults to "BH" (Benjamini & Hochberg)}
 
 \item{comparisons}{`data.frame` with columns for "Control" and "Test"
@@ -50,6 +50,6 @@ Runs default DESeq workflow. Defaults to Wald test, no independent
   significance.
 }
 \references{
-Love, M.I., Huber, W., Anders, S. Moderated estimation of fold change and 
+Love, M.I., Huber, W., Anders, S. Moderated estimation of fold change and
  dispersion for RNA-seq data with DESeq2 Genome Biology 15(12):550 (2014)
 }

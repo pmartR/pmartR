@@ -8,12 +8,12 @@ sharing the same column name.}
 find_fmeta_cnames(res)
 }
 \arguments{
-\item{res}{The output of \code{fmeta_matches}, A list, the i-th element of 
-which contains a character vector of column name matches in f_meta for the 
+\item{res}{The output of \code{fmeta_matches}, A list, the i-th element of
+which contains a character vector of column name matches in f_meta for the
 i-th omicsData object.}
 }
 \value{
-Character vector containing a column name in f_meta that the i-th 
+Character vector containing a column name in f_meta that the i-th
 object matches to
 }
 \description{
