@@ -1766,8 +1766,8 @@ create_c_matrix <- function(group_df,to_compare_df=NULL){
     }
     
     for(i in 1:n_comparisons){
-      control_i <- grep(to_compare_df$Control[i],groups)
-      test_i <- grep(to_compare_df$Test[i],groups)
+      control_i <- which(to_compare_df$Control[i] == groups)
+      test_i <- which(to_compare_df$Test[i] == groups)
       Cmat[i,control_i] <- (-1/length(control_i))
       Cmat[i,test_i] <- 1/length(test_i)
       compi <- c(compi,paste0(to_compare_df$Test[i],"_vs_",to_compare_df$Control[i]))
