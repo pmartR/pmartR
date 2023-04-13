@@ -1128,7 +1128,7 @@ test_that('imdanova_filter and applyFilt produce the correct output',{
   expect_equal(
     attributes(pair_filter),
     list(
-     names = c("Mass_Tag_ID", "AM", "FM", "Mock"),
+     names = c("Mass_Tag_ID", "Mock", "FM", "AM"),
      class = c("imdanovaFilt", "data.frame"),
      row.names = 1:150,
      omicsData = pairdata,

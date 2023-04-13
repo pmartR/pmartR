@@ -9,7 +9,7 @@ std::vector<int> grp_siz(std::vector<std::string> group)
   std::vector<std::string> temp;
   temp = group;
   
-  //std::sort(temp.begin(),temp.end());
+  std::sort(temp.begin(),temp.end());
   
   temp.erase( std::unique( temp.begin(), temp.end() ), temp.end() );
   int tempsize = 0;
