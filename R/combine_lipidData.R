@@ -140,15 +140,21 @@ combine_lipidData <- function(obj_1, obj_2, retain_groups = FALSE, retain_filter
   
   # Combine e_meta in the same way as e_data if it exists in both datasets.
   if(!is.null(obj_1$e_meta) & !is.null(obj_2$e_meta)) {
-    new_emeta_cname = get_emeta_cname(obj_1)
+    new_emeta_cname <- paste0(
+      get_emeta_cname(obj_1), "_", get_emeta_cname(obj_2)
+    )
     
     new_emeta <- dplyr::bind_rows(
-      obj_1$e_meta, 
+      obj_1$e_meta %>%
+        dplyr::rename(setNames(
+          get_emeta_cname(obj_1),
+          new_emeta_cname
+        )), 
       obj_2$e_meta %>% 
         dplyr::rename(setNames(
-          get_emeta_cname(obj_2), 
-          get_emeta_cname(obj_1)
-        ))
+          get_emeta_cname(obj_2),
+          new_emeta_cname
+        )), 
     )
     
     # Check and warn about non-unique e_meta identifiers, this is pre-empting a
