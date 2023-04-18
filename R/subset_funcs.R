@@ -191,9 +191,9 @@ ppp_rip <- function(e_data, edata_id, fdata_id, groupDF, alpha=0.2, proportion=0
   mydata <- e_data[inds, -edata_id_ind]
   peps <- peps[inds]
   
-  #added 2/6/17 lines 223-231 iobani
-  group_dat = as.character(groupDF$Group[order(groupDF$Group)])
-  mydata = mydata[, order(groupDF$Group)]
+  # make sure groups are aligned with the columns of e_data
+  reorder = match(colnames(mydata), as.character(groupDF[,fdata_id]))
+  group_dat = as.character(groupDF[reorder,]$Group)
   
   # conduct K-W test using kw_rcpp function 
   pvals = kw_rcpp(as.matrix(mydata), group_dat)

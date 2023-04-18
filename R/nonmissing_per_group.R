@@ -42,12 +42,16 @@ nonmissing_per_group <- function (omicsData) {
   # Reorder the samples. This is done because the C++ function for counting
   # group sizes assumes the samples are ordered by group in the omicsData data
   # frames.
-  group_dat <- as.character(groupDF$Group[order(groupDF$Group)])
+
+  # match the order of the groupDF$SampleID to the order of the columns in edata
+  samp_ord = match(groupDF[,get_fdata_cname(omicsData)], colnames(edata))
+  group_ord = order(groupDF$Group)
+  group_dat <- as.character(groupDF$Group[group_ord])
 
   # Reorder the columns of e_data. This needs to be done so the e_data columns
   # will match the order of the group_data vector. These are ordered because the
   # following C++ function assumes the samples are in order.
-  edata <- edata[, order(groupDF$Group)]
+  edata <- edata[, samp_ord[group_ord]]
 
   # Count the number of nonmissing values per group. The output is a matrix with
   # the number of observations down the rows and the number of unique groups
