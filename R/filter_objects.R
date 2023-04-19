@@ -1264,7 +1264,7 @@ run_group_meancor <- function(omicsData, mintR_groupDF, ignore_singleton_groups 
     # average that value to get the correlation for that particular sample/group
     omicsData_singletons <- omicsData
     omicsData_singletons$f_data$Dummy <- "dummy" # create a dummy grouping variable so that all samples belong to same group
-    omicsData_singletons <- group_designation(omicsData_singletons, main_effect = "Dummy")
+    omicsData_singletons <- group_designation(omicsData_singletons, main_effects = "Dummy")
 
     prwse.grp.cors.all <- cor(omicsData_singletons$e_data[, -which(names(omicsData_singletons$e_data) == get_edata_cname(omicsData_singletons))], use = "pairwise.complete.obs")
 

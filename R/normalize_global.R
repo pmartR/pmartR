@@ -26,9 +26,8 @@
 #'   transforming the data, after normalization, should be calculated. Defaults
 #'   to FALSE. If TRUE, the parameters for back transforming the data after
 #'   normalization will be calculated, and subsequently included in the data
-#'   normalization if \code{apply_norm} is TRUE or \code{\link{apply.normRes}}
-#'   is used downstream. See the details section for an explanation of how these
-#'   factors are calculated.
+#'   normalization if \code{apply_norm} is TRUE. See the details section for an 
+#'   explanation of how these factors are calculated.
 #' @param min_prop numeric threshold between 0 and 1 giving the minimum value
 #'   for the proportion of biomolecules subset (rows of \code{e_data})
 #' @param check.names deprecated
@@ -38,9 +37,9 @@
 #'   of biomolecules (rows of \code{e_data}) that should be used for computing
 #'   normalization factors. The following are valid options: "all", "los",
 #'   "ppp", "complete", "rip", and "ppp_rip". The option "all" is the subset
-#'   that includes all biomolecules (i.e. no subsetting is done). The option "los"
-#'   identifies the subset of the biomolecules associated with the top \code{L} order statistics,
-#'   where \code{L} is a proportion between 0 and 1.
+#'   that includes all biomolecules (i.e. no subsetting is done). The option 
+#'   "los" identifies the subset of the biomolecules associated with the top 
+#'   \code{L} order statistics, where \code{L} is a proportion between 0 and 1.
 #'   Specifically, the biomolecules falling within the top \code{L} proportion of highest
 #'   absolute abundance are retained for each sample, and the union of these
 #'   biomolecules is taken as the subset identified (Wang et al., 2006). The option

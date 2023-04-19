@@ -151,9 +151,9 @@ diffexp_seq <- function(omicsData, method = "edgeR", p_adjust = "BH",
 #' @return statRes object
 #'
 #'
-DESeq2_wrapper <- function(
-    omicsData, test = "Wald", p_adjust = "BH", comparisons = NULL,
-    p_cutoff = 0.05, ...) {
+DESeq2_wrapper <- function(omicsData, test = "Wald", p_adjust = "BH",
+  comparisons = NULL, p_cutoff = 0.05, ...) {
+  
   if (!requireNamespace("survival", quietly = TRUE)) {
     stop("package 'survival' required for DESeq2 processing")
   }

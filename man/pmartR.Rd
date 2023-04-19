@@ -4,3 +4,15 @@
 \name{pmartR}
 \alias{pmartR}
 \title{Panomics Marketplace - Quality Control and Statistical Analysis for Panomics Data}
+\description{
+This R package provides functionality for quality 
+ processing, statistical analysis and visualization of mass spectrometry (MS)
+ omics data, in particular proteomic (either at the peptide or the protein
+ level; isobaric labeled or unlabled), lipidomic, and metabolomic data. This
+ includes data transformation, specification of groups that are to be
+ compared against each other, filtering of feature and/or samples, data
+ normalization, data summarization (correlation, PCA), and statistical
+ comparisons of groups of interest (ANOVA and/or independence of missing
+ data tests). Example data to be used with this packages can be found in
+ \link[pmartRdata]{pmartRdata}.
+}

@@ -1,5 +1,13 @@
 #' Panomics Marketplace - Quality Control and Statistical Analysis for Panomics Data
 #'
+#' @description Provides functionality for quality control processing and
+#'  statistical analysis of mass spectrometry (MS) omics data, in particular 
+#'  proteomic (either at the peptide or the protein level), lipidomic, and 
+#'  metabolomic data. This includes data transformation, specification of 
+#'  groups that are to be compared against each other, filtering of features 
+#'  and/or samples, data normalization, data summarization (correlation, PCA), 
+#'  and statistical comparisons between defined groups.
+#'
 #' @docType package
 #' @importFrom Rcpp evalCpp
 #'
