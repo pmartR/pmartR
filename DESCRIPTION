@@ -24,7 +24,6 @@ Imports:
     forcats,
     foreach,
     limma,
-    methods,
     mvtnorm,
     pcaMethods,
     plotly,
