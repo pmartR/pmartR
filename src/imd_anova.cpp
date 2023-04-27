@@ -148,8 +148,8 @@ List two_factor_anova_cpp(arma::mat y,
   arma::rowvec yrowi_nona;
   int num_to_remove;
   int df_red, df_full;
-  double sigma2_red, sigma2_full;
-  NumericVector sig_est(n), pval(n), Fstat(n),  atl_one(n);
+  double sigma2_red, sigma2_full = 0;
+  NumericVector sig_est(n), pval(n), Fstat(n);
   arma::mat diag_mat;
   arma::colvec par_ests(p_full), par_ests_temp,group_ids_nona(y.n_cols), group_ids_nona_unq;
   arma::mat parmat(n,p_full), group_sizes(n,p_full);
@@ -224,7 +224,7 @@ List two_factor_anova_cpp(arma::mat y,
     group_ids_nona_unq=arma::unique(group_ids_nona);
 
     //Fill in the par_ests vector, put NaN if group was missing or the average effect in groups with no missing data
-    if(group_ids_nona_unq.n_elem<p_full){
+    if(static_cast<int>(group_ids_nona_unq.n_elem)<p_full){
       par_ests.zeros();
       //cntr = 0;
 
@@ -298,7 +298,7 @@ arma::mat fold_change_diff_copy(arma::mat data, arma::mat C)  {
 
       temp_fc_diff.fill(arma::datum::nan); //Fill the vector with NAs
 
-      if(bad_C.n_cols<=(p-2)){ //Only proceed if there are at least two non-NaN means, otherwise return all NaNs
+      if(static_cast<int>(bad_C.n_cols)<=(p-2)){ //Only proceed if there are at least two non-NaN means, otherwise return all NaNs
         //Absolute row sum of bad_C to see where the differences we can compute are
         rsums = arma::sum(abs(bad_C),1);
 
@@ -535,7 +535,7 @@ arma::mat fold_change_diff(arma::mat data, arma::mat C)  {
 
       temp_fc_diff.fill(arma::datum::nan); //Fill the vector with NAs
 
-      if(bad_C.n_cols<=(p-2)){ //Only proceed if there are at least two non-NaN means, otherwise return all NaNs
+      if(static_cast<int>(bad_C.n_cols)<=(p-2)){ //Only proceed if there are at least two non-NaN means, otherwise return all NaNs
         //Absolute row sum of bad_C to see where the differences we can compute are
         rsums = arma::sum(abs(bad_C),1);
 
@@ -596,12 +596,12 @@ arma::mat fold_change_diff_na_okay(arma::mat data, arma::mat C)  {
   arma::uvec of_int;
   fc_diff.zeros();
 
-  for(i=0;i<n;i++){
+  for(int i=0;i<n;i++){
     rowi_means = arma::conv_to<arma::colvec>::from(data.row(i));
     if(rowi_means.has_nan()){
-      for(j=0;j<num_comparisons;j++){
+      for(int j=0;j<num_comparisons;j++){
         of_int = find(C.row(j));
-        for(k=0;k<of_int.size();k++){
+        for(int k=0;k<static_cast<int>(of_int.size());k++){
           fc_diff(i,j) += C(j,of_int[k])*rowi_means(of_int[k]);
         }
       }
