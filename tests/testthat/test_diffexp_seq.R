@@ -5,7 +5,6 @@ context('class: seqData')
 
 test_that('diffexp_seq returns the correct data frame and attributes',{
   
-  skip("")
   # Load the reduced peptide data frames ---------------------------------------
   
   load(system.file('testdata',
