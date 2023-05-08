@@ -201,6 +201,17 @@ summary(myimdanovafilt, min_nonmiss_gtest = 3)
 mypep_imdfilt <- applyFilt(filter_object = myimdanovafilt, omicsData = mypep_groups_log2, min_nonmiss_gtest = 3)
 ```
 
+By default, the IMD-ANOVA filter assumes that all pairwise comparisons will be performed in downstream use of the imd_anova() function. A user can specify custom comparisons using the "comparisons" argument when they apply the IMD-ANOVA filter. For instance if the comparisons of interest are Phenotype2 versus Phenotype1 and Phenotype3 versus Phenotype1, the following code can be used.
+
+```{r combined with comparisons}
+mypep_imdanovafilt <- applyFilt(filter_object = myimdanovafilt,
+                                omicsData = mypep_groups_log2,
+                                min_nonmiss_anova = 2,
+                                min_nonmiss_gtest = 3,
+                                comparisons = data.frame(
+                                  Control = c("Phenotype1", "Phenotype1"),
+                                  Test = c("Phenotype2", "Phenotype3")))
+```
 
 ### Custom Filter
 
