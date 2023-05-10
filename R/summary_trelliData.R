@@ -1,6 +1,6 @@
 #' Summarizes potential plotting options for a trelliData object
 #'
-#' @param trelliData An object from the as.trelliData.edata or as.trelliData
+#' @param object An object from the as.trelliData.edata or as.trelliData
 #'   functions
 #' @param ... further arguments passed to or from other methods.
 #'
