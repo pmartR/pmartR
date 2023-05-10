@@ -21,7 +21,7 @@
 #'
 #' @export
 #' @rdname summary-isobaricnormRes
-#' @name summary-pmartR
+#' @name summary-isobaricnormRes
 #'
 summary.isobaricnormRes <- function(object, ...) {
   isobaricnormRes_object <- object

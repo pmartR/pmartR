@@ -22,7 +22,7 @@
 #'
 #' @export
 #' @rdname summary-nmrnormRes
-#' @name summary-pmartR
+#' @name summary-nmrnormRes
 #'
 summary.nmrnormRes <- function(object, ...) {
   nmrnormRes_object <- object
