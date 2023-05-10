@@ -36,8 +36,8 @@ utils::globalVariables(
     "p_value_anova", "paired_diff", "Panel By Choice", "parameters", "PC1",
     "PC2", "peps_per_pro", "Peptide", "posneg", "Present", "Present Count", 
     "Present Proportion", "ProportionNonZero", "Protein_Isoform", 
-    "pval", "res", "Sample", "SampleID", "sig", "Significance", "skew", 
-    "SPANS_score", "ss_par", "Statistic", "subset_method", "survfit", 
+    "pval", "res", "Sample", "SampleID", "setnames", "sig", "Significance",
+    "skew", "SPANS_score", "ss_par", "Statistic", "subset_method", "survfit", 
     "Total", "Total_Counts", "Type", "v", "value", "values", "var1", 
     "var2", "variable", "whichtest", "x_disp", "x_fit", "y", "y_disp", 
     "y_fit"

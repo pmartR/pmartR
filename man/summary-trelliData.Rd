@@ -8,10 +8,10 @@
 \method{summary}{trelliData}(object, ...)
 }
 \arguments{
-\item{...}{further arguments passed to or from other methods.}
-
-\item{trelliData}{An object from the as.trelliData.edata or as.trelliData
+\item{object}{An object from the as.trelliData.edata or as.trelliData
 functions}
+
+\item{...}{further arguments passed to or from other methods.}
 }
 \description{
 Summarizes potential plotting options for a trelliData object
