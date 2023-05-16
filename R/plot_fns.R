@@ -2342,7 +2342,7 @@ plot.moleculeFilt <- function (filter_object, min_num = NULL, cumulative = TRUE,
 #' \dontrun{
 #' library(pmartRdata)
 #' seqfilt <- total_count_filter(omicsData = rnaseq_object)
-#' plot(seqfilt, min_count = 5)
+#' plot(seqfilt, min_count = 15)
 #' }
 #' 
 #' @rdname plot-totalCountFilt
