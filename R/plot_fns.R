@@ -1043,8 +1043,8 @@ plot.SPANSRes <- function (SPANSRes_obj, interactive = FALSE,
 #'
 #' @export
 #'
-plot.naRes <- function (naRes_obj, omicsData, plot_type = "bar",
-                        order_by = NULL, color_by = NULL,
+plot.naRes <- function (naRes_obj, omicsData, plot_type = "bar", 
+                        plot_mode = "missing", order_by = NULL, color_by = NULL, 
                         interactive = FALSE, x_lab_bar = NULL,
                         x_lab_scatter = NULL, y_lab_bar = NULL,
                         y_lab_scatter = NULL, x_lab_size = 11, y_lab_size = 11,
@@ -1076,6 +1076,13 @@ plot.naRes <- function (naRes_obj, omicsData, plot_type = "bar",
     # My name is Evan Martin. You killed my plot. Prepare to die.
     stop ("plot_type must be either 'bar' or 'scatter'")
 
+  }
+  
+  # Check that the mode is either missing, nonmissing, or proportion
+  if (!(plot_mode %in% c("missing", "nonmissing", "proportion"))) {
+    
+    stop("plot_mode must be 'missing', 'nonmissing', or 'proportion'")
+    
   }
 
   # Make sure palette is one of the RColorBrewer options if it is not NULL.
@@ -1124,12 +1131,20 @@ plot.naRes <- function (naRes_obj, omicsData, plot_type = "bar",
     na.by.sample <- naRes_obj$zeros.by.sample
     na.by.molecule <- naRes_obj$zeros.by.molecule
     num_missing_vals <- na.by.molecule$num_zeros
+    num_nonmissing_vals <- na.by.molecule$num_nonzeros
+    missing_proportion <- na.by.molecule$zeros_proportion
     names(na.by.sample)[which(names(na.by.sample) == "num_zeros")] <- "num_NA"
     names(na.by.molecule)[which(names(na.by.molecule) == "num_zeros")] <- "num_NA"
+    names(na.by.sample)[which(names(na.by.sample) == "num_nonzeros")] <- "num_non_NA"
+    names(na.by.molecule)[which(names(na.by.molecule) == "num_nonzeros")] <- "num_non_NA"
+    names(na.by.sample)[which(names(na.by.sample) == "zeros_proportion")] <- "NA_proportion"
+    names(na.by.molecule)[which(names(na.by.molecule) == "zeros_proportion")] <- "NA_proportion"
   }else{
     na.by.sample <- naRes_obj$na.by.sample
     na.by.molecule <- naRes_obj$na.by.molecule
     num_missing_vals <- na.by.molecule$num_NA
+    num_nonmissing_vals <- na.by.molecule$num_non_NA
+    missing_proportion <- na.by.molecule$NA_proportion
   }
 
 
@@ -1184,7 +1199,8 @@ plot.naRes <- function (naRes_obj, omicsData, plot_type = "bar",
                 display_count = display_count,
                 coordinate_flip = coordinate_flip,
                 use_VizSampNames = use_VizSampNames, interactive = interactive,
-                fdata_cname = fdata_cname, color_by = color_by)
+                fdata_cname = fdata_cname, color_by = color_by,
+                plot_mode = plot_mode)
 
   }
 
@@ -1217,18 +1233,26 @@ na_bar <- function (na.by.sample, x_lab_bar, y_lab_bar, x_lab_size, y_lab_size,
                     x_lab_angle, title_lab_bar, title_lab_size, legend_lab_bar,
                     legend_position, text_size, bar_width, bw_theme, palette,
                     display_count, coordinate_flip, use_VizSampNames,
-                    interactive, fdata_cname, color_by) {
+                    interactive, fdata_cname, color_by, plot_mode) {
 
 
 
   # Farm boy, color the plots based on the input. As you wish.
   if (!is.null(color_by)) {
 
+    if (plot_mode == "missing") {
+      y_axis = "num_NA"
+    } else if (plot_mode == "nonmissing") {
+      y_axis = "num_non_NA"
+    } else if (plot_mode == "proportion") {
+      y_axis = "NA_proportion"
+    }
+    
     # Forge the basic sample bar plot with group info. More details will be
     # added according to the users input later.
     samp <- ggplot2::ggplot(data = na.by.sample,
                             ggplot2::aes(x = .data[[fdata_cname]],
-                                         y = num_NA,
+                                         y = .data[[y_axis]],
                                          fill = !!rlang::sym(color_by))) +
       ggplot2::geom_bar(stat = "identity", width = bar_width)
 
@@ -1248,11 +1272,19 @@ na_bar <- function (na.by.sample, x_lab_bar, y_lab_bar, x_lab_size, y_lab_size,
                               c = 100,
                               l = 65)
 
+    if (plot_mode == "missing") {
+      y_axis = "num_NA"
+    } else if (plot_mode == "nonmissing") {
+      y_axis = "num_non_NA"
+    } else if (plot_mode == "proportion") {
+      y_axis = "NA_proportion"
+    }
+    
     # Forge the basic sample bar plot without group info. More details will be
     # added according to the users input later.
     samp <- ggplot2::ggplot(data = na.by.sample,
                             ggplot2::aes(x = .data[[fdata_cname]],
-                                         y = num_NA)) +
+                                         y = .data[[y_axis]])) +
       ggplot2::geom_bar(stat = "identity",
                         width = bar_width,
                         fill = if (is.null(palette))
@@ -1265,7 +1297,7 @@ na_bar <- function (na.by.sample, x_lab_bar, y_lab_bar, x_lab_size, y_lab_size,
   if (display_count) {
 
     samp <- samp +
-      ggplot2::geom_text(ggplot2::aes(label = num_NA),
+      ggplot2::geom_text(ggplot2::aes(label = round(.data[[y_axis]], digits=4)),
                          vjust = 2,
                          color = "black",
                          size = text_size)
