@@ -979,9 +979,12 @@ plot.SPANSRes <- function (SPANSRes_obj, interactive = FALSE,
 #'   \bold{NOTE:} The 'nonmissing' and 'proportion' options are only valid when the
 #'   \code{plot_type} is 'bar'.
 #' @param order_by A character string specifying a column in f_data by which to
-#'   order the samples.
+#'   order the samples. The special value 'ORDER_BY_GROUP' will use the 
+#'   \code{group_DF} attribute to order the samples.
 #' @param color_by A character string specifying a column in f_data by which to
-#'   color the bars or the points depending on the \code{plot_type}.
+#'   color the bars or the points depending on the \code{plot_type}. The special
+#'   value 'COLOR_BY_GROUP' will use the \code{group_DF} attribute to order the
+#'   samples.
 #' @param interactive logical value. If TRUE produces an interactive plot.
 #' @param x_lab_bar character string used for the x-axis label for the bar
 #'   plot
@@ -1115,7 +1118,7 @@ plot.naRes <- function (naRes_obj, omicsData, plot_type = "bar",
   }
 
   # Farm boy, make sure order_by exists in f_data. As you wish.
-  if (!is.null(order_by)) {
+  if (!is.null(order_by) && order_by != "ORDER_BY_GROUP") {
 
     if (!order_by %in% names(omicsData$f_data)) {
 
@@ -1127,8 +1130,8 @@ plot.naRes <- function (naRes_obj, omicsData, plot_type = "bar",
   }
 
   # Farm boy, make sure color_by exists in f_data. As you wish.
-  if (!is.null(color_by)) {
-
+  if (!is.null(color_by) && color_by != "COLOR_BY_GROUP") {
+    
     if (!color_by %in% names(omicsData$f_data)) {
 
       # Clearly you cannot choose a column name in f_data!
@@ -1173,26 +1176,50 @@ plot.naRes <- function (naRes_obj, omicsData, plot_type = "bar",
   # Check if order_by is NULL and update the plot_data object accordingly.
   if (!is.null(order_by)) {
 
-    # Reorder the rows of na.by.sample so the bar plot will be displayed in the
-    # correct order.
-    na.by.sample <- na.by.sample[order(na.by.sample[, order_by]), ]
-    na.by.sample[[fdata_cname]] <- factor(
-      na.by.sample[[fdata_cname]],
-      levels = na.by.sample[[fdata_cname]],
-      ordered = TRUE
-    )
+    if (order_by == "ORDER_BY_GROUP") {
+      
+      na.by.sample <- na.by.sample[order(attr(omicsData, 'group_DF')$Group), ]
+      na.by.sample[[fdata_cname]] <- factor(
+        na.by.sample[[fdata_cname]],
+        levels = na.by.sample[[fdata_cname]],
+        ordered = TRUE
+      )
+      
+    } else {
+    
+      # Reorder the rows of na.by.sample so the bar plot will be displayed in the
+      # correct order.
+      na.by.sample <- na.by.sample[order(na.by.sample[, order_by]), ]
+      na.by.sample[[fdata_cname]] <- factor(
+        na.by.sample[[fdata_cname]],
+        levels = na.by.sample[[fdata_cname]],
+        ordered = TRUE
+      )
+      
+    }
 
   }
 
   # Check if color_by is NULL and update na.by.sample accordingly.
   if (!is.null(color_by)) {
 
-    # Create factors to color by according to the input of color_by.
-    color_levels <- if (color_by != "Group")
-      unique(factor(omicsData$f_data[[color_by]])) else
-        unique(factor(attr(omicsData, "group_DF")[["Group"]]))
-    na.by.sample[[color_by]] <- factor(na.by.sample[[color_by]],
-                                       levels = color_levels)
+    if (color_by == "COLOR_BY_GROUP") {
+      
+      na.by.sample[["COLOR_BY_GROUP"]] = factor(
+        attr(omicsData, 'group_DF')$Group,
+        levels = unique(attr(omicsData, 'group_DF')$Group)
+      )
+      
+    } else {
+      
+      # Create factors to color by according to the input of color_by.
+      color_levels <- if (color_by != "Group")
+        unique(factor(omicsData$f_data[[color_by]])) else
+          unique(factor(attr(omicsData, "group_DF")[["Group"]]))
+      na.by.sample[[color_by]] <- factor(na.by.sample[[color_by]],
+                                         levels = color_levels)
+    
+    }
 
   }
 

@@ -58,10 +58,13 @@ nonmissing values.
 \code{plot_type} is 'bar'.}
 
 \item{order_by}{A character string specifying a column in f_data by which to
-order the samples.}
+order the samples. The special value 'ORDER_BY_GROUP' will use the 
+\code{group_DF} attribute to order the samples.}
 
 \item{color_by}{A character string specifying a column in f_data by which to
-color the bars or the points depending on the \code{plot_type}.}
+color the bars or the points depending on the \code{plot_type}. The special
+value 'COLOR_BY_GROUP' will use the \code{group_DF} attribute to order the
+samples.}
 
 \item{interactive}{logical value. If TRUE produces an interactive plot.}
 
