@@ -8,6 +8,7 @@
   naRes_obj,
   omicsData,
   plot_type = "bar",
+  plot_mode = "missing",
   order_by = NULL,
   color_by = NULL,
   interactive = FALSE,
@@ -46,6 +47,15 @@ molecule}
 
 \item{plot_type}{character string specifying which type of plot to produce.
 The two options are 'bar' or 'scatter'.}
+
+\item{plot_mode}{character string specifying what will be plotted. The 
+default option of 'missing' plots the number of missing (NA) values. 
+The 'nonmissing' option plots the number of values which are \emph{not}
+missing. The 'proportion' option plots the proportion of missing values to
+nonmissing values.
+
+\bold{NOTE:} The 'nonmissing' and 'proportion' options are only valid when the
+\code{plot_type} is 'bar'.}
 
 \item{order_by}{A character string specifying a column in f_data by which to
 order the samples.}
