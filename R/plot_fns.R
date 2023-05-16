@@ -1317,8 +1317,12 @@ na_bar <- function (na.by.sample, x_lab_bar, y_lab_bar, x_lab_size, y_lab_size,
   yLabelBar <- if (is.null(y_lab_bar))
     "Number of missing values" else
       y_lab_bar
-  plotTitleBar <- if (is.null(title_lab_bar))
-    "Missing values by sample" else
+  plotTitleBar <- if (is.null(title_lab_bar)) {
+    if (plot_mode == "nonmissing")
+      "Non-missing values by sample"
+    else
+      "Missing values by sample"
+  } else
       title_lab_bar
   legendLabelBar <- if (is.null(legend_lab_bar))
     "Group" else
