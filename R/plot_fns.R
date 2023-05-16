@@ -1091,6 +1091,10 @@ plot.naRes <- function (naRes_obj, omicsData, plot_type = "bar",
     
     stop("plot_mode must be 'missing', 'nonmissing', or 'proportion'")
     
+    if (plot_type != "bar" && plot_mode != "missing") {
+      stop("plot_mode must be 'missing' unless used with a plot_type of 'bar'")
+    }
+    
   }
 
   # Make sure palette is one of the RColorBrewer options if it is not NULL.
@@ -1243,18 +1247,17 @@ na_bar <- function (na.by.sample, x_lab_bar, y_lab_bar, x_lab_size, y_lab_size,
                     display_count, coordinate_flip, use_VizSampNames,
                     interactive, fdata_cname, color_by, plot_mode) {
 
-
+  # Select which column of na.by.sample will be used
+  if (plot_mode == "missing") {
+    y_axis = "num_NA"
+  } else if (plot_mode == "nonmissing") {
+    y_axis = "num_non_NA"
+  } else if (plot_mode == "proportion") {
+    y_axis = "NA_proportion"
+  }
 
   # Farm boy, color the plots based on the input. As you wish.
   if (!is.null(color_by)) {
-
-    if (plot_mode == "missing") {
-      y_axis = "num_NA"
-    } else if (plot_mode == "nonmissing") {
-      y_axis = "num_non_NA"
-    } else if (plot_mode == "proportion") {
-      y_axis = "NA_proportion"
-    }
     
     # Forge the basic sample bar plot with group info. More details will be
     # added according to the users input later.
@@ -1279,14 +1282,6 @@ na_bar <- function (na.by.sample, x_lab_bar, y_lab_bar, x_lab_size, y_lab_size,
     hideous <- grDevices::hcl(h = 15,
                               c = 100,
                               l = 65)
-
-    if (plot_mode == "missing") {
-      y_axis = "num_NA"
-    } else if (plot_mode == "nonmissing") {
-      y_axis = "num_non_NA"
-    } else if (plot_mode == "proportion") {
-      y_axis = "NA_proportion"
-    }
     
     # Forge the basic sample bar plot without group info. More details will be
     # added according to the users input later.
