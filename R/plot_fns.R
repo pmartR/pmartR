@@ -1822,6 +1822,16 @@ plot.corRes <- function (corRes_obj, omicsData = NULL, order_by = NULL,
 #' @param dimRes_obj object of class dimRes created by the \code{dim_reduction}
 #'   function
 #'
+#' @param color_by character string specifying which column to use to control 
+#'   the color for plotting. NULL indicates the default value of the main effect 
+#'   (if present). COLOR_BY_GROUP indicates the combination of both main 
+#'   effects. COLOR_BY_NONE indicates no column will be used, and will use the 
+#'   default theme color.
+#' @param shape_by character string specifying which column to use to control
+#'   the shape for plotting. NULL indicates the default value of the second main
+#'   effect (if present). SHAPE_BY_GROUP indicates the combination of both main 
+#'   effects. SHAPE_BY_NONE indicates no column will be used, and will use the 
+#'   default theme shape.
 #' @param interactive logical value. If TRUE produces an interactive plot.
 #' @param x_lab character string specifying the x-axis label
 #' @param y_lab character string specifying the y-axis label. The default is
@@ -1868,9 +1878,10 @@ plot.corRes <- function (corRes_obj, omicsData = NULL, order_by = NULL,
 #'
 #' @export
 #'
-plot.dimRes <- function (dimRes_obj, interactive = FALSE, x_lab = NULL,
-                         y_lab = NULL, x_lab_size = 11, y_lab_size = 11,
-                         x_lab_angle = 0, title_lab = NULL, title_lab_size = 14,
+plot.dimRes <- function (dimRes_obj, color_by = NULL, shape_by = NULL,
+                         interactive = FALSE, x_lab = NULL, y_lab = NULL, 
+                         x_lab_size = 11, y_lab_size = 11, x_lab_angle = 0, 
+                         title_lab = NULL, title_lab_size = 14,
                          legend_lab = NULL, legend_position = "right",
                          point_size = 4, bw_theme = TRUE, palette = NULL) {
 
@@ -2001,6 +2012,38 @@ plot.dimRes <- function (dimRes_obj, interactive = FALSE, x_lab = NULL,
 
     }
 
+  }
+  
+  if (!is.null(color_by)) {
+    if (color_by == "COLOR_BY_GROUP") {
+      if (is.null(attr(dimRes_obj,"group_DF"))) {
+        stop("COLOR_BY_GROUP is only valid if there is a group designation")
+      }
+      
+      color_var <- "Group"
+      display_names[1] <- "Group"
+    } else if (color_by == "COLOR_BY_NONE") {
+      color_var <- NULL
+    } else {
+      color_var <- color_by
+      display_names[1] <- color_by
+    }
+  }
+  
+  if (!is.null(shape_by)) {
+    if (shape_by == "SHAPE_BY_GROUP") {
+      if (is.null(attr(dimRes_obj,"group_DF"))) {
+        stop("SHAPE_BY_GROUP is only valid if there is a group designation")
+      }
+      
+      pch_var <- "Group"
+      display_names[2] <- "Group"
+    } else if (shape_by == "SHAPE_BY_NONE") {
+      pch_var <- NULL
+    } else {
+      pch_var <- shape_by
+      display_names[2] <- shape_by
+    }
   }
 
   # custom legend names #
