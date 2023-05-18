@@ -26,7 +26,7 @@
 #' mypep <- edata_transform(pep_object, "log2")
 #' result <- normalize_loess(mypep)
 #'
-#' @seealso \code{\link{normalizeCyclicLoess}} in the \code{limma} package
+#' @seealso \code{\link[limma]{normalizeCyclicLoess}} in the \code{limma} package
 #'
 #' @references Bolstad, B. M., Irizarry R. A., Astrand, M., and Speed, T. P.
 #' (2003). \emph{A comparison of normalization methods for high density

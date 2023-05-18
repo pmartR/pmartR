@@ -34,12 +34,13 @@ option changes will interfere with wrapping functionality.}
 statRes object
 }
 \description{
-For generating statistics for 'seqData' objects
+For generating statistics for 'seqData' objects.
 }
 \details{
-Runs default edgeR workflow with empirical Bayes quasi-likelihood
-  F-tests. Additional arguments can be passed for use in the function, refer
-  to calcNormFactors() and glmQLFit() in edgeR package.
+Requires the 'edgeR' and 'limma' packages. Runs default edgeR workflow with 
+  empirical Bayes quasi-likelihood F-tests. Additional arguments can be
+  passed for use in the function, refer to calcNormFactors() and glmQLFit()
+  in edgeR package.
 
 Flags (signatures) -	Indicator of statistical significance for computed test.
 Zeroes indicate no significance, while +/- 1 indicates direction of significance.

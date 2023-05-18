@@ -556,7 +556,7 @@ imd_anova <- function(omicsData,
   Full_results <- Full_results %>%
     dplyr::relocate(
       dplyr::starts_with("Count_", vars = colnames(Full_results)),
-      .after = !!rlang::sym(get_edata_cname(omicsData))
+      .after = !!dplyr::sym(get_edata_cname(omicsData))
     ) %>%
     dplyr::relocate(
       dplyr::starts_with("Mean_", vars = colnames(.data)),
@@ -801,7 +801,7 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
       omicsData$f_data[, c(samp_cname, da_pair_name)],
       sort = FALSE
     ) %>%
-      dplyr::group_by(!!rlang::sym(da_pair_name)) %>%
+      dplyr::group_by(!!dplyr::sym(da_pair_name)) %>%
       dplyr::slice(1) %>%
       data.frame()
 
@@ -857,7 +857,7 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
       # each difference. Here we will select the first row in cov_data while
       # grouping by the column with the pairing information.
       cov_data <- cov_data %>%
-        dplyr::group_by(!!rlang::sym(da_pair_name)) %>%
+        dplyr::group_by(!!dplyr::sym(da_pair_name)) %>%
         dplyr::slice(1) %>%
         # Remove the grouping structure. If we don't then the pair ID variable
         # will be added to the beginning of the data frame after removing it

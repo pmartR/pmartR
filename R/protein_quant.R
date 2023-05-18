@@ -318,7 +318,7 @@ protein_quant <- function(pepData, method, isoformRes = NULL,
   if (is.null(isoformRes)) {
     # Update e_meta with peptide counts.
     results$e_meta <- results$e_meta %>%
-      dplyr::group_by(!!rlang::sym(emeta_cname)) %>%
+      dplyr::group_by(!!dplyr::sym(emeta_cname)) %>%
       dplyr::mutate(peps_per_pro = dplyr::n()) %>%
       # Only qrollup will cause n_peps_used != peps_per_protein when isoformRes
       # is NULL.
@@ -352,7 +352,7 @@ protein_quant <- function(pepData, method, isoformRes = NULL,
     peps_used <- if ("n_peps_used" %in% colnames(results$e_meta)) {
       # Extract counts from e_meta because peptides were counted in qrollup.
       results$e_meta %>%
-        dplyr::select(!!rlang::sym(emeta_cname), n_peps_used) %>%
+        dplyr::select(!!dplyr::sym(emeta_cname), n_peps_used) %>%
         # Only keep unique combinations of emeta_cname and n_peps_used
         dplyr::distinct()
     } else {
@@ -363,13 +363,13 @@ protein_quant <- function(pepData, method, isoformRes = NULL,
         # Only keep the first row of each group.
         dplyr::slice(1) %>%
         dplyr::ungroup() %>%
-        dplyr::select(!!rlang::sym(emeta_cname), n_peps_used)
+        dplyr::select(!!dplyr::sym(emeta_cname), n_peps_used)
     }
 
     # store total number of peptides mapping to each protein (different from
     # above)
     peps_per_protein = e_meta %>%
-      dplyr::group_by(!!rlang::sym(emeta_cname)) %>%
+      dplyr::group_by(!!dplyr::sym(emeta_cname)) %>%
       dplyr::mutate(peps_per_pro = dplyr::n()) %>%
       # Keep the mapping variable, pep_per_pro, and any columns specified by the
       # user.
@@ -475,8 +475,8 @@ pquant <- function(pepData, combine_fn) {
     all.x = FALSE,
     all.y = TRUE
   ) %>%
-    dplyr::select(-rlang::sym(pep_id)) %>%
-    dplyr::group_by(!!rlang::sym(pro_id)) %>%
+    dplyr::select(-dplyr::sym(pep_id)) %>%
+    dplyr::group_by(!!dplyr::sym(pro_id)) %>%
     dplyr::mutate(dplyr::across(
       .cols = -dplyr::any_of(pro_id),
       .fns = combine_fn
@@ -495,7 +495,7 @@ pquant <- function(pepData, combine_fn) {
   # prodata <- as.proData(e_data = res,
   #                       f_data = pepData$f_data,
   #                       e_meta = dplyr::select(pepData$e_meta,
-  #                                              -rlang::sym(pep_id)),
+  #                                              -dplyr::sym(pep_id)),
   #                       edata_cname = pro_id,
   #                       fdata_cname = samp_id,
   #                       emeta_cname = pro_id,
@@ -568,7 +568,7 @@ rrollup <- function(pepData, combine_fn, parallel = TRUE) {
     all.x = FALSE,
     all.y = TRUE
   ) %>%
-    dplyr::select(-rlang::sym(pep_id)) %>%
+    dplyr::select(-dplyr::sym(pep_id)) %>%
     data.frame(check.names = FALSE)
 
   # pull protein column from temp and apply unique function
@@ -665,7 +665,7 @@ rrollup <- function(pepData, combine_fn, parallel = TRUE) {
   # prodata <- as.proData(e_data = final_result,
   #                       f_data = pepData$f_data,
   #                       e_meta = dplyr::select(pepData$e_meta,
-  #                                              -rlang::sym(pep_id)),
+  #                                              -dplyr::sym(pep_id)),
   #                       edata_cname = pro_id,
   #                       fdata_cname = samp_id,
   #                       emeta_cname = pro_id,
@@ -735,7 +735,7 @@ qrollup <- function(pepData, qrollup_thresh, combine_fn, parallel = TRUE) {
     all.x = FALSE,
     all.y = TRUE
   ) %>%
-    dplyr::select(-rlang::sym(pep_id)) %>%
+    dplyr::select(-dplyr::sym(pep_id)) %>%
     data.frame(check.names = FALSE)
 
   # pull protein column from temp and apply unique function
@@ -825,7 +825,7 @@ qrollup <- function(pepData, qrollup_thresh, combine_fn, parallel = TRUE) {
     by = pro_id
   ) %>%
     # Remove peptide id column.
-    dplyr::select(-rlang::sym(pep_id))
+    dplyr::select(-dplyr::sym(pep_id))
 
   # Extricate attribute info for creating the proData object.
   # data_scale <- attr(pepData, "data_info")$data_scale
@@ -904,7 +904,7 @@ zrollup <- function(pepData, combine_fn, parallel = TRUE) {
     all.x = FALSE,
     all.y = TRUE
   ) %>%
-    dplyr::select(-rlang::sym(pep_id)) %>%
+    dplyr::select(-dplyr::sym(pep_id)) %>%
     data.frame(check.names = FALSE)
 
   # pull protein column from temp and apply unique function
@@ -975,7 +975,7 @@ zrollup <- function(pepData, combine_fn, parallel = TRUE) {
   # prodata <- as.proData(e_data = final_result,
   #                       f_data = pepData$f_data,
   #                       e_meta = dplyr::select(pepData$e_meta,
-  #                                              -rlang::sym(pep_id)),
+  #                                              -dplyr::sym(pep_id)),
   #                       edata_cname = pro_id,
   #                       fdata_cname = samp_id,
   #                       emeta_cname = pro_id,

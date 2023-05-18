@@ -861,8 +861,8 @@ applyFilt.rmdFilt <- function(filter_object,
 
       # Snag the associated pair IDs for the samples that will be filtered.
       filtered_pairs <- omicsData$f_data %>%
-        dplyr::filter(!!rlang::sym(sample_name) %in% filter.samp) %>%
-        dplyr::pull(!!rlang::sym(pair_name))
+        dplyr::filter(!!dplyr::sym(sample_name) %in% filter.samp) %>%
+        dplyr::pull(!!dplyr::sym(pair_name))
 
       # Go back to f_data and nab all the sample names corresponding to the pair
       # IDs associated with the original samples that were selected for removal.
@@ -870,8 +870,8 @@ applyFilt.rmdFilt <- function(filter_object,
       # be the same as the original vector if any pairs were split. If there
       # were no pairs split the two vectors will be the same.
       filter.samp <- omicsData$f_data %>%
-        dplyr::filter(!!rlang::sym(pair_name) %in% filtered_pairs) %>%
-        dplyr::pull(!!rlang::sym(sample_name)) %>%
+        dplyr::filter(!!dplyr::sym(pair_name) %in% filtered_pairs) %>%
+        dplyr::pull(!!dplyr::sym(sample_name)) %>%
         as.character()
     }
   }
@@ -1733,17 +1733,17 @@ applyFilt.customFilt <- function(filter_object, omicsData, ...) {
     # Snag the associated pair IDs for the samples that will be filtered.
     filtered_pairs <- omicsData$f_data %>%
       dplyr::filter(
-        !!rlang::sym(sample_name) %in% filter_object$f_data_remove
+        !!dplyr::sym(sample_name) %in% filter_object$f_data_remove
       ) %>%
-      dplyr::pull(!!rlang::sym(pair_name))
+      dplyr::pull(!!dplyr::sym(pair_name))
 
     # Go back to f_data and nab all the sample names corresponding to the pair
     # IDs associated with the original samples that were selected for removal.
     # If this vector is not the same as the input we will throw an error because
     # one or more pairs are being split.
     filter_samp <- omicsData$f_data %>%
-      dplyr::filter(!!rlang::sym(pair_name) %in% filtered_pairs) %>%
-      dplyr::pull(!!rlang::sym(sample_name)) %>%
+      dplyr::filter(!!dplyr::sym(pair_name) %in% filtered_pairs) %>%
+      dplyr::pull(!!dplyr::sym(sample_name)) %>%
       as.character()
 
     # If samples are split throw an error.
@@ -1764,17 +1764,17 @@ applyFilt.customFilt <- function(filter_object, omicsData, ...) {
     # Snag the associated pair IDs for the samples that will be kept.
     filtered_pairs <- omicsData$f_data %>%
       dplyr::filter(
-        !!rlang::sym(sample_name) %in% filter_object$f_data_keep
+        !!dplyr::sym(sample_name) %in% filter_object$f_data_keep
       ) %>%
-      dplyr::pull(!!rlang::sym(pair_name))
+      dplyr::pull(!!dplyr::sym(pair_name))
 
     # Go back to f_data and nab all the sample names corresponding to the pair
     # IDs associated with the original samples that were chosen to be kept.
     # If this vector is not the same as the input we will throw an error because
     # one or more pairs are being split.
     filter_samp <- omicsData$f_data %>%
-      dplyr::filter(!!rlang::sym(pair_name) %in% filtered_pairs) %>%
-      dplyr::pull(!!rlang::sym(sample_name)) %>%
+      dplyr::filter(!!dplyr::sym(pair_name) %in% filtered_pairs) %>%
+      dplyr::pull(!!dplyr::sym(sample_name)) %>%
       as.character()
 
     # If samples are split throw an error.
@@ -2483,7 +2483,7 @@ as.diffData <- function(omicsData) {
   # in f_data to match the number of columns in e_data.
   diff_fdata <- omicsData$f_data %>%
     dplyr::group_by(
-      !!rlang::sym(attr(attr(omicsData, "group_DF"), "pair_id"))
+      !!dplyr::sym(attr(attr(omicsData, "group_DF"), "pair_id"))
     ) %>%
     dplyr::slice(1)
 

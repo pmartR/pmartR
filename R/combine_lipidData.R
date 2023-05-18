@@ -178,7 +178,7 @@ combine_lipidData <- function(obj_1, obj_2, retain_groups = FALSE, retain_filter
           "There were non-unique molecule identifiers in e_meta, dropping these duplicates, some meta-data information may be lost."
         )
         new_emeta <-
-          new_emeta %>% dplyr::distinct(!!rlang::sym(new_edata_cname), .keep_all = TRUE)
+          new_emeta %>% dplyr::distinct(!!dplyr::sym(new_edata_cname), .keep_all = TRUE)
       } else {
         warning(
           "There were non-unique molecule identifiers in e_meta, this may cause the object construction to fail if edata_cname and emeta_cname do not specify unique rows in the combined e_meta"

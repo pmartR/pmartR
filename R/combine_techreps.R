@@ -106,7 +106,7 @@ combine_techreps <- function(omicsData, combine_fn = NULL,
   for (el in as.character(unique(f_data[, which(names(f_data) == techrep_cname)]))) {
     bio_sample_list[[el]] = unique(
       f_data %>%
-        dplyr::filter(!!rlang::sym(techrep_cname) == el) %>%
+        dplyr::filter(!!dplyr::sym(techrep_cname) == el) %>%
         {
           .[, fdata_cname]
         }
@@ -123,7 +123,7 @@ combine_techreps <- function(omicsData, combine_fn = NULL,
 
   # get number of distinct levels for each column per biological sample.
   distinct <- f_data %>%
-    dplyr::group_by(!!rlang::sym(techrep_cname)) %>%
+    dplyr::group_by(!!dplyr::sym(techrep_cname)) %>%
     dplyr::summarise_all(dplyr::n_distinct) %>%
     dplyr::select(-dplyr::one_of(c(techrep_cname, fdata_cname))) %>%
     as.data.frame()
@@ -142,9 +142,9 @@ combine_techreps <- function(omicsData, combine_fn = NULL,
 
   # create new, collapsed f_data object
   new_fdata <- f_data %>%
-    dplyr::group_by(!!rlang::sym(techrep_cname)) %>%
+    dplyr::group_by(!!dplyr::sym(techrep_cname)) %>%
     dplyr::slice(1) %>%
-    dplyr::select(!!rlang::sym(techrep_cname), dplyr::everything(), -dplyr::one_of(fdata_cname)) %>%
+    dplyr::select(!!dplyr::sym(techrep_cname), dplyr::everything(), -dplyr::one_of(fdata_cname)) %>%
     as.data.frame()
 
   # create new, collapsed e_data object, averaged over technical replicates
@@ -188,7 +188,7 @@ combine_techreps <- function(omicsData, combine_fn = NULL,
     # gives number of unique main effect levels in group_DF for a given group of technical replictes...
     multiple_groups <- get_group_DF(omicsData) %>%
       dplyr::left_join(f_data[c(fdata_cname, techrep_cname)], by = fdata_cname) %>%
-      dplyr::group_by(!!rlang::sym(techrep_cname)) %>%
+      dplyr::group_by(!!dplyr::sym(techrep_cname)) %>%
       dplyr::summarise_all(dplyr::n_distinct) %>%
       dplyr::select("Group")
 
@@ -201,9 +201,9 @@ combine_techreps <- function(omicsData, combine_fn = NULL,
     else {
       new_group_DF <- get_group_DF(omicsData) %>%
         dplyr::left_join(f_data[c(fdata_cname, techrep_cname)], by = fdata_cname) %>%
-        dplyr::group_by(!!rlang::sym(techrep_cname)) %>%
+        dplyr::group_by(!!dplyr::sym(techrep_cname)) %>%
         dplyr::slice(1) %>%
-        dplyr::select(!!rlang::sym(techrep_cname), dplyr::everything(), -dplyr::one_of(fdata_cname)) %>%
+        dplyr::select(!!dplyr::sym(techrep_cname), dplyr::everything(), -dplyr::one_of(fdata_cname)) %>%
         as.data.frame()
 
       colnames(new_group_DF)[which(colnames(new_group_DF) == techrep_cname)] <- get_fdata_cname(omicsData) # this attribute will always have been reset at this point

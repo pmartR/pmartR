@@ -346,13 +346,13 @@ group_designation <- function(omicsData,
         reprobates <- omicsData$f_data %>%
           dplyr::rowwise() %>%
           dplyr::mutate(
-            both_me = paste(!!rlang::sym(main_effects[[1]]),
-              !!rlang::sym(main_effects[[2]]),
+            both_me = paste(!!dplyr::sym(main_effects[[1]]),
+              !!dplyr::sym(main_effects[[2]]),
               sep = "_"
             )
           ) %>%
           dplyr::ungroup() %>%
-          dplyr::group_by(!!rlang::sym(pair_id)) %>%
+          dplyr::group_by(!!dplyr::sym(pair_id)) %>%
           dplyr::mutate(n_me = dplyr::n_distinct(both_me)) %>%
           dplyr::ungroup() %>%
           dplyr::filter(n_me > 1) %>%
@@ -362,9 +362,9 @@ group_designation <- function(omicsData,
       } else {
         # Count the number of unique main effect values for each pair.
         reprobates <- omicsData$f_data %>%
-          dplyr::group_by(!!rlang::sym(pair_id)) %>%
+          dplyr::group_by(!!dplyr::sym(pair_id)) %>%
           dplyr::mutate(
-            n_me = dplyr::n_distinct(!!rlang::sym(main_effects))
+            n_me = dplyr::n_distinct(!!dplyr::sym(main_effects))
           ) %>%
           dplyr::ungroup() %>%
           dplyr::filter(n_me > 1) %>%
@@ -392,13 +392,13 @@ group_designation <- function(omicsData,
         reprobates <- omicsData$f_data %>%
           dplyr::rowwise() %>%
           dplyr::mutate(
-            both_cov = paste(!!rlang::sym(covariates[[1]]),
-              !!rlang::sym(covariates[[2]]),
+            both_cov = paste(!!dplyr::sym(covariates[[1]]),
+              !!dplyr::sym(covariates[[2]]),
               sep = "_"
             )
           ) %>%
           dplyr::ungroup() %>%
-          dplyr::group_by(!!rlang::sym(pair_id)) %>%
+          dplyr::group_by(!!dplyr::sym(pair_id)) %>%
           dplyr::mutate(n_cov = dplyr::n_distinct(both_cov)) %>%
           dplyr::ungroup() %>%
           dplyr::filter(n_cov > 1) %>%
@@ -408,9 +408,9 @@ group_designation <- function(omicsData,
       } else {
         # Count the number of unique covariate values for each pair.
         reprobates <- omicsData$f_data %>%
-          dplyr::group_by(!!rlang::sym(pair_id)) %>%
+          dplyr::group_by(!!dplyr::sym(pair_id)) %>%
           dplyr::mutate(
-            n_cov = dplyr::n_distinct(!!rlang::sym(covariates))
+            n_cov = dplyr::n_distinct(!!dplyr::sym(covariates))
           ) %>%
           dplyr::ungroup() %>%
           dplyr::filter(n_cov > 1) %>%

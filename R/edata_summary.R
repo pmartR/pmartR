@@ -245,10 +245,14 @@ edata_summary <- function(omicsData, by = 'sample', groupvar = NULL) {
         }
 
         # rearranging edata
-        edata_melt = reshape2::melt(edata, id.vars = edata_cname)
-        names(edata_melt)[2] <- fdata_cname
-        edata_melt = merge.data.frame(edata_melt, groupDF, by = fdata_cname)
-        edata_melt = edata_melt[, -which(names(edata_melt) == fdata_cname)]
+        edata_melt <- tidyr::pivot_longer(
+          edata, -!!edata_cname,
+          cols_vary = "slowest",
+          names_to = fdata_cname,
+          values_to = "value"
+        )
+        edata_melt <- merge.data.frame(edata_melt, groupDF, by = fdata_cname)
+        edata_melt <- edata_melt[, -which(names(edata_melt) == fdata_cname)]
 
         # checking that n_per_grp group order matches that of edata_melt
         n_per_grp = n_per_grp[match(
@@ -256,61 +260,30 @@ edata_summary <- function(omicsData, by = 'sample', groupvar = NULL) {
           n_per_grp$Group
         ), ]
 
-        # here we are creating a string to input for dcast function argument
-        # "formula"
-        formula1 = paste(edata_cname, "+Group~...", sep = "")
-        formula2 = paste(edata_cname, "~...", sep = "")
-
-        avg = reshape2::dcast(edata_melt,
-          formula = formula1,
-          function(x) {
-            if (all(is.na(x))) {
-              mean(x)
-            } else {
-              mean(x, na.rm = TRUE)
-            }
-          }
-        )
-        names(avg)[which(colnames(avg) == ".")] <- "value"
-        avg = reshape2::dcast(avg, formula = formula2)
-        std_dev = reshape2::dcast(edata_melt, formula = formula1, sd, na.rm = TRUE)
-        names(std_dev)[which(colnames(std_dev) == ".")] <- "value"
-        std_dev = reshape2::dcast(std_dev, formula = formula2)
-        mds = reshape2::dcast(edata_melt, formula = formula1, median, na.rm = TRUE)
-        names(mds)[which(colnames(mds) == ".")] <- "value"
-        mds = reshape2::dcast(mds, formula = formula2)
-        pct_obs = reshape2::dcast(edata_melt,
-          formula = formula1,
-          function(x) {
-            sum(!is.na(x)) / length(x)
-          }
-        )
-        names(pct_obs)[which(colnames(pct_obs) == ".")] <- "value"
-        pct_obs = reshape2::dcast(pct_obs, formula = formula2)
-        mins = reshape2::dcast(edata_melt,
-          formula = formula1,
-          function(x) {
-            if (all(is.na(x))) {
-              min(x)
-            } else {
-              min(x, na.rm = TRUE)
-            }
-          }
-        )
-        names(mins)[which(colnames(mins) == ".")] <- "value"
-        mins = reshape2::dcast(mins, formula = formula2)
-        maxs = reshape2::dcast(edata_melt,
-          formula = formula1,
-          function(x) {
-            if (all(is.na(x))) {
-              max(x)
-            } else {
-              max(x, na.rm = TRUE)
-            }
-          }
-        )
-        names(maxs)[which(colnames(maxs) == ".")] <- "value"
-        maxs = reshape2::dcast(maxs, formula = formula2)
+        dcast_fn <- function(fun) {
+          edata_melt %>%
+            dplyr::group_by(
+              !!dplyr::sym(edata_cname), Group
+            ) %>%
+            dplyr::summarise(
+              value = fun(value),
+              .groups = "drop"
+            ) %>%
+            tidyr::pivot_wider(
+              id_cols = !!edata_cname,
+              names_from = Group,
+              names_vary = "slowest",
+              values_from = value
+            ) %>%
+            data.frame
+        }
+        
+        avg <- dcast_fn(\(x) mean(x, na.rm = !all(is.na(x))))
+        std_dev <- dcast_fn(\(x) sd(x, na.rm = TRUE))
+        mds <- dcast_fn(\(x) median(x, na.rm = !all(is.na(x))))
+        pct_obs <- dcast_fn(\(x) sum(!is.na(x)) / length(x))
+        mins <- dcast_fn(\(x) min(x, na.rm = !all(is.na(x))))
+        maxs <- dcast_fn(\(x) max(x, na.rm = !all(is.na(x))))
 
         res_list = list(
           n_per_grp = n_per_grp,
@@ -351,69 +324,42 @@ edata_summary <- function(omicsData, by = 'sample', groupvar = NULL) {
       if (nrow(temp_fdata) == 0) stop("The grouping variable must assign more than 1 sample to at least one group level")
 
       # rearranging edata
-      edata_melt = reshape2::melt(omicsData$e_data, id.vars = edata_cname)
-      names(edata_melt)[2] <- fdata_cname
+      edata_melt <- tidyr::pivot_longer(
+        omicsData$e_data, -!!edata_cname,
+        cols_vary = "slowest",
+        names_to = fdata_cname,
+        values_to = "value"
+      )
       edata_melt = merge.data.frame(edata_melt, temp_fdata, by = fdata_cname)
       edata_melt = edata_melt[, -which(names(edata_melt) == fdata_cname)]
 
       # checking that n_per_grp group order matches that of edata_melt
       n_per_grp = n_per_grp[match(unique(edata_melt$Group), n_per_grp$Group), ]
 
-      # here we are creating a string to input for dcast function argument
-      # "formula"
-      formula1 = paste(edata_cname, "+Group~...", sep = "")
-      formula2 = paste(edata_cname, "~...", sep = "")
-
-      avg = reshape2::dcast(edata_melt,
-        formula = formula1,
-        function(x) {
-          if (all(is.na(x))) {
-            mean(x)
-          } else {
-            mean(x, na.rm = TRUE)
-          }
-        }
-      )
-      names(avg)[which(colnames(avg) == ".")] <- "value"
-      avg = reshape2::dcast(avg, formula = formula2)
-      std_dev = reshape2::dcast(edata_melt, formula = formula1, sd, na.rm = TRUE)
-      names(std_dev)[which(colnames(std_dev) == ".")] <- "value"
-      std_dev = reshape2::dcast(std_dev, formula = formula2)
-      mds = reshape2::dcast(edata_melt, formula = formula1, median, na.rm = TRUE)
-      names(mds)[which(colnames(mds) == ".")] <- "value"
-      mds = reshape2::dcast(mds, formula = formula2)
-      pct_obs = reshape2::dcast(edata_melt,
-        formula = formula1,
-        function(x) {
-          sum(!is.na(x)) / length(x)
-        }
-      )
-      names(pct_obs)[which(colnames(pct_obs) == ".")] <- "value"
-      pct_obs = reshape2::dcast(pct_obs, formula = formula2)
-      mins = reshape2::dcast(edata_melt,
-        formula = formula1,
-        function(x) {
-          if (all(is.na(x))) {
-            min(x)
-          } else {
-            min(x, na.rm = TRUE)
-          }
-        }
-      )
-      names(mins)[which(colnames(mins) == ".")] <- "value"
-      mins = reshape2::dcast(mins, formula = formula2)
-      maxs = reshape2::dcast(edata_melt,
-        formula = formula1,
-        function(x) {
-          if (all(is.na(x))) {
-            max(x)
-          } else {
-            max(x, na.rm = TRUE)
-          }
-        }
-      )
-      names(maxs)[which(colnames(maxs) == ".")] <- "value"
-      maxs = reshape2::dcast(maxs, formula = formula2)
+      dcast_fn <- function(fun) {
+        edata_melt %>%
+          dplyr::group_by(
+            !!dplyr::sym(edata_cname), Group
+          ) %>%
+          dplyr::summarise(
+            value = fun(value),
+            .groups = "drop"
+          ) %>%
+          tidyr::pivot_wider(
+            id_cols = !!edata_cname,
+            names_from = Group,
+            names_vary = "slowest",
+            values_from = value
+          ) %>%
+          data.frame
+      }
+      
+      avg <- dcast_fn(\(x) mean(x, na.rm = !all(is.na(x))))
+      std_dev <- dcast_fn(\(x) sd(x, na.rm = TRUE))
+      mds <- dcast_fn(\(x) median(x, na.rm = !all(is.na(x))))
+      pct_obs <- dcast_fn(\(x) sum(!is.na(x)) / length(x))
+      mins <- dcast_fn(\(x) min(x, na.rm = !all(is.na(x))))
+      maxs <- dcast_fn(\(x) max(x, na.rm = !all(is.na(x))))
 
       res_list = list(
         n_per_grp = n_per_grp,
@@ -469,69 +415,42 @@ edata_summary <- function(omicsData, by = 'sample', groupvar = NULL) {
       if (nrow(output) == 0) stop("The grouping structure must assign more than 1 sample to at least one group level")
 
       # groupvar was provided, rearranging edata
-      edata_melt = reshape2::melt(omicsData$e_data, id.vars = edata_cname)
-      names(edata_melt)[2] <- fdata_cname
+      edata_melt <- tidyr::pivot_longer(
+        omicsData$e_data, -!!edata_cname,
+        cols_vary = "slowest",
+        names_to = fdata_cname,
+        values_to = "value"
+      )
       edata_melt = merge.data.frame(edata_melt, output, by = fdata_cname)
       edata_melt = edata_melt[, -which(names(edata_melt) == fdata_cname)]
 
       # checking that n_per_grp group order matches that of edata_melt
       n_per_grp = n_per_grp[match(unique(edata_melt$Group), n_per_grp$Group), ]
 
-      # here we are creating a string to input for dcast function argument
-      # "formula"
-      formula1 = paste(edata_cname, "+Group~...", sep = "")
-      formula2 = paste(edata_cname, "~...", sep = "")
-
-      avg = reshape2::dcast(edata_melt,
-        formula = formula1,
-        function(x) {
-          if (all(is.na(x))) {
-            mean(x)
-          } else {
-            mean(x, na.rm = TRUE)
-          }
-        }
-      )
-      names(avg)[which(colnames(avg) == ".")] <- "value"
-      avg = reshape2::dcast(avg, formula = formula2)
-      std_dev = reshape2::dcast(edata_melt, formula = formula1, sd, na.rm = TRUE)
-      names(std_dev)[which(colnames(std_dev) == ".")] <- "value"
-      std_dev = reshape2::dcast(std_dev, formula = formula2)
-      mds = reshape2::dcast(edata_melt, formula = formula1, median, na.rm = TRUE)
-      names(mds)[which(colnames(mds) == ".")] <- "value"
-      mds = reshape2::dcast(mds, formula = formula2)
-      pct_obs = reshape2::dcast(edata_melt,
-        formula = formula1,
-        function(x) {
-          sum(!is.na(x)) / length(x)
-        }
-      )
-      names(pct_obs)[which(colnames(pct_obs) == ".")] <- "value"
-      pct_obs = reshape2::dcast(pct_obs, formula = formula2)
-      mins = reshape2::dcast(edata_melt,
-        formula = formula1,
-        function(x) {
-          if (all(is.na(x))) {
-            min(x)
-          } else {
-            min(x, na.rm = TRUE)
-          }
-        }
-      )
-      names(mins)[which(colnames(mins) == ".")] <- "value"
-      mins = reshape2::dcast(mins, formula = formula2)
-      maxs = reshape2::dcast(edata_melt,
-        formula = formula1,
-        function(x) {
-          if (all(is.na(x))) {
-            max(x)
-          } else {
-            max(x, na.rm = TRUE)
-          }
-        }
-      )
-      names(maxs)[which(colnames(maxs) == ".")] <- "value"
-      maxs = reshape2::dcast(maxs, formula = formula2)
+      dcast_fn <- function(fun) {
+        edata_melt %>%
+          dplyr::group_by(
+            !!dplyr::sym(edata_cname), Group
+          ) %>%
+          dplyr::summarise(
+            value = fun(value),
+            .groups = "drop"
+          ) %>%
+          tidyr::pivot_wider(
+            id_cols = !!edata_cname,
+            names_from = Group,
+            names_vary = "slowest",
+            values_from = value
+          ) %>%
+          data.frame
+      }
+      
+      avg <- dcast_fn(\(x) mean(x, na.rm = !all(is.na(x))))
+      std_dev <- dcast_fn(\(x) sd(x, na.rm = TRUE))
+      mds <- dcast_fn(\(x) median(x, na.rm = !all(is.na(x))))
+      pct_obs <- dcast_fn(\(x) sum(!is.na(x)) / length(x))
+      mins <- dcast_fn(\(x) min(x, na.rm = !all(is.na(x))))
+      maxs <- dcast_fn(\(x) max(x, na.rm = !all(is.na(x))))
 
       res_list = list(
         n_per_grp = n_per_grp,

@@ -29,7 +29,6 @@ knitr::opts_chunk$set(fig.height = 6)
 library(pmartR)
 library(pmartRdata)
 library(ggplot2)
-library(reshape2)
 ```
 
 This vignette describes a standard processing pipeline for labeled proteomics data with the `pmartR` package, including normalization to the reference pool, quality control, global normalization, and protein rollup. After normalization to the reference pool, the pipeline is identical to a typical processing pipeline for unlabeled or global proteomics data, and very similar to processing for metabolomics and lipidomics data. A separate vignette, "RNAseq Data Processing", describes the typical processing steps for seqData objects. For more details about the statistical analyses available within `pmartR` see the "Statistical Analysis with pmartR" vignette.

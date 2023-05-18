@@ -51,6 +51,7 @@ significance.
 Method "edgeR" - Runs default edgeR workflow with empirical Bayes
 quasi-likelihood F-tests. Additional arguments can be passed for use in the
 function. Refer to calcNormFactors() and glmQLFit() in edgeR package.
+Requires the 'edgeR' and 'limma' packages to run.
 
 Method "DESeq2" - Runs default DESeq workflow. Defaults to Wald test, no
 independent filtering, and running in parallel. Additional arguments can be
@@ -60,6 +61,7 @@ package. Requires 'survival' package to run.
 Method "voom" - Runs default limma-voom workflow using empirical Bayes
 moderated t-statistics. Additional arguments can be passed for use in the
 function. Refer to calcNormFactors() in edgeR package.
+Requires the 'edgeR' and 'limma' packages to run.
 }
 \examples{
 \dontrun{

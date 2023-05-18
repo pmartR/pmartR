@@ -465,19 +465,19 @@ test_that('edata_summary correctly summarizes the data', {
   mole <- edata_summary(pdata, by = "molecule", groupvar = NULL)
 
   # Summarize by molecule, one groupvar.
-  expect_warning(mole_1 <- edata_summary(pdata,
+  mole_1 <- edata_summary(pdata,
     by = "molecule",
     groupvar = "Condition"
-  ))
+  )
 
   # Summarize by molecule, two groupvars.
-  expect_warning(mole_2 <- edata_summary(pdata,
+  mole_2 <- edata_summary(pdata,
     by = "molecule",
     groupvar = c(
       "Condition",
       "Intensity"
     )
-  ))
+  )
 
   # Sleuth around each object.
   expect_identical(samp, stan_samp)

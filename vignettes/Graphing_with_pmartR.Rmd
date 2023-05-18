@@ -27,7 +27,6 @@ knitr::include_graphics("pmartR_logo_final.jpg")
 library(pmartR)
 library(pmartRdata)
 library(ggplot2)
-library(reshape2)
 ```
 
 ## Overview

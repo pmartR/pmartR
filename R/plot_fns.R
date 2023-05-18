@@ -159,12 +159,24 @@ plot.dataRes <- function(x, metric = NULL, density = FALSE,
     sd <- dataRes_obj$sd
 
     # melting data frames from dataRes object
-    mean_melt <- reshape2::melt(mean, id.vars = edata_cname)
-    names(mean_melt)[3] <- "mean"
-    sd_melt <- reshape2::melt(sd, id.vars = edata_cname)
-    names(sd_melt)[3] <- "sd"
-    median_melt <- reshape2::melt(median, id.vars = edata_cname)
-    names(median_melt)[3] <- "median"
+    mean_melt <- tidyr::pivot_longer(
+      mean, -!!edata_cname,
+      cols_vary = "slowest",
+      names_to = "variable",
+      values_to = "mean"
+    )
+    sd_melt <- tidyr::pivot_longer(
+      sd, -!!edata_cname,
+      cols_vary = "slowest",
+      names_to = "variable",
+      values_to = "sd"
+    )
+    median_melt <- tidyr::pivot_longer(
+      median, -!!edata_cname,
+      cols_vary = "slowest",
+      names_to = "variable",
+      values_to = "median"
+    )
 
     data_mean_sd <- merge(mean_melt,
       sd_melt,
@@ -272,7 +284,12 @@ plot.dataRes <- function(x, metric = NULL, density = FALSE,
 
       # subsetting dataRes object
       data = dataRes_obj[[metric]]
-      data_melt = reshape2::melt(data, id.vars = edata_cname)
+      data_melt = tidyr::pivot_longer(
+        data, -!!edata_cname,
+        cols_vary = "slowest",
+        names_to = "variable",
+        values_to = "value"
+      )
 
       r <- ggplot2::ggplot(
         data_melt,
@@ -295,7 +312,12 @@ plot.dataRes <- function(x, metric = NULL, density = FALSE,
 
       # if density == TRUE, will plot geom_density
       data = dataRes_obj[[metric]]
-      data_melt = reshape2::melt(data, id.vars = edata_cname)
+      data_melt = tidyr::pivot_longer(
+        data, -!!edata_cname,
+        cols_vary = "slowest",
+        names_to = "variable",
+        values_to = "value"
+      )
 
       r <- ggplot2::ggplot(
         data_melt,
@@ -386,7 +408,7 @@ plot.dataRes <- function(x, metric = NULL, density = FALSE,
 #' )
 #' plot(result)
 #'
-#' @importFrom rlang .data
+#' @importFrom dplyr .data
 #'
 #' @rdname plot-isobaricnormRes
 #'
@@ -1320,7 +1342,7 @@ na_bar <- function (na.by.sample, x_lab_bar, y_lab_bar, x_lab_size, y_lab_size,
     samp <- ggplot2::ggplot(data = na.by.sample,
                             ggplot2::aes(x = .data[[fdata_cname]],
                                          y = .data[[y_axis]],
-                                         fill = !!rlang::sym(color_by))) +
+                                         fill = !!dplyr::sym(color_by))) +
       ggplot2::geom_bar(stat = "identity", width = bar_width)
   } else {
     # Check if palette is NULL or not. Hopefully it isn't so the plot will be
@@ -1496,7 +1518,13 @@ na_scatter <- function (edata, group_df, na.by.molecule, edata_cname,
 
     plot_data <- cbind(num_missing_vals, mean_intensity)
     plot_data <- as.data.frame(plot_data)
-    plot_data <- reshape2::melt(plot_data, id.vars = "num_missing_vals")
+    plot_data <- plot_data %>%
+      tidyr::pivot_longer(
+        -num_missing_vals,
+        cols_vary = "slowest",
+        names_to = "variable",
+        values_to = "value"
+      ) %>% data.frame
 
     # Start the scatter plot when the group_DF attribute is present.
     p <- ggplot2::ggplot(
@@ -1717,17 +1745,26 @@ plot.corRes <- function(x, omicsData = NULL, order_by = NULL,
   }
 
   # Create the data frame that will be used to produce the correlation heat map.
-  corRes_melt <- reshape2::melt(corRes_obj)
-  # The y-axis will be Var1 in the plot.
-  corRes_melt$Var1 <- factor(
-    abbreviate(corRes_melt$Var1, minlength = 20),
-    levels = abbreviate(rownames(corRes_obj), minlength = 20)
-  )
-  # The x-axis will be Var2 in the plot.
-  corRes_melt$Var2 <- factor(
-    abbreviate(corRes_melt$Var2, minlength = 20),
-    levels = abbreviate(rownames(corRes_obj), minlength = 20)
-  )
+  corRes_obj_df <- data.frame(corRes_obj)
+  corRes_obj_df <- cbind(Var1 = rownames(corRes_obj_df), corRes_obj_df)
+  rownames(corRes_obj_df) <- 1:nrow(corRes_obj_df)
+  corRes_melt <- corRes_obj_df %>%
+    tidyr::pivot_longer(
+      -Var1,
+      names_to = "Var2",
+      cols_vary = "slowest"
+    ) %>%
+    dplyr::mutate(
+      Var1 = factor(
+        abbreviate(Var1, minlength = 20),
+        levels = abbreviate(rownames(corRes_obj), minlength = 20)
+      ),
+      Var2 = factor(
+        abbreviate(Var2, minlength = 20),
+        levels = abbreviate(rownames(corRes_obj), minlength = 20)
+      )
+    ) %>%
+    data.frame
 
   # Create all the plot labels. Life is pain!!!
   xlabel <- if (is.null(x_lab)) "" else x_lab
@@ -2623,8 +2660,8 @@ plot.totalCountFilt <- function(x, min_count = NULL,
   # Plot
   p <- ggplot2::ggplot(plot_data, ggplot2::aes(x = lcpm)) +
     ggplot2::geom_density(ggplot2::aes(
-      group = !!rlang::sym(colnames(plot_data)[2]),
-      color = !!rlang::sym(colnames(plot_data)[2])
+      group = !!dplyr::sym(colnames(plot_data)[2]),
+      color = !!dplyr::sym(colnames(plot_data)[2])
     )) +
     ggplot2::geom_density(ggplot2::aes(color = "Average Density")) +
     ggplot2::scale_color_manual(
@@ -2865,7 +2902,7 @@ plot.RNAFilt <- function(x, plot_type = "library",
   # Plot
   if (plot_type == "library") {
     p <- ggplot2::ggplot(
-      temp_obj, ggplot2::aes(x = !!rlang::sym(colnames(temp_obj)[1]), y = LibrarySize, fill = color)
+      temp_obj, ggplot2::aes(x = !!dplyr::sym(colnames(temp_obj)[1]), y = LibrarySize, fill = color)
     ) +
       ggplot2::geom_col(show.legend = F) +
       ggplot2::scale_fill_manual(
@@ -2890,7 +2927,7 @@ plot.RNAFilt <- function(x, plot_type = "library",
     mt <- round(filter_object$NonZero[[1]] / filter_object$ProportionNonZero[[1]])
 
     p <- ggplot2::ggplot(
-      temp_obj, ggplot2::aes(x = !!rlang::sym(colnames(temp_obj)[1]), y = NonZero, fill = color)
+      temp_obj, ggplot2::aes(x = !!dplyr::sym(colnames(temp_obj)[1]), y = NonZero, fill = color)
     ) +
       ggplot2::scale_y_continuous(
         sec.axis = ggplot2::sec_axis(
@@ -3820,13 +3857,23 @@ plot.rmdFilt <- function(x, pvalue_threshold = NULL, sampleID = NULL,
   # determine the main effects, then melt the df #
   if (ncol(group_df) == 2) {
     main_eff_names <- "Group"
-    dfmelt <- reshape2::melt(filter_object, id = c(samp_id, main_eff_names))
+    dfmelt <- filter_object %>%
+      tidyr::pivot_longer(
+        -dplyr::all_of(c(!!samp_id, !!main_eff_names)),
+        names_to = "variable",
+        cols_vary = "slowest"
+      ) %>% data.frame
   } else if (ncol(group_df) > 2) {
     ## put main effect with more levels first, for plotting aesthetics ##
     temp <- droplevels(group_df[, -(1:2)])
     numlevels <- sapply(1:2, function(j) length(levels(as.factor(temp[, j]))))
     main_eff_names <- names(temp)[order(numlevels, decreasing = TRUE)]
-    dfmelt <- reshape2::melt(filter_object[, -2], id = c(samp_id, main_eff_names))
+    dfmelt <- tidyr::pivot_longer(
+      filter_object[, -2],
+      -dplyr::all_of(c(!!samp_id, !!main_eff_names)),
+      names_to = "variable",
+      cols_vary = "slowest"
+    ) %>% data.frame
   }
 
   # Data frame that has information to create rmd box plots.
@@ -3928,7 +3975,7 @@ plot.rmdFilt <- function(x, pvalue_threshold = NULL, sampleID = NULL,
         ggplot2::aes(
           x = rep(1, length(value)),
           y = value,
-          color = !!rlang::sym(samp_id)
+          color = !!dplyr::sym(samp_id)
         ),
         size = point_size
       ) +
@@ -3946,9 +3993,9 @@ plot.rmdFilt <- function(x, pvalue_threshold = NULL, sampleID = NULL,
       p <- p +
         ggplot2::geom_point(
           ggplot2::aes(
-            x = !!rlang::sym(samp_id),
+            x = !!dplyr::sym(samp_id),
             y = Log2.md,
-            color = !!rlang::sym(main_eff_names[1])
+            color = !!dplyr::sym(main_eff_names[1])
           ),
           size = point_size
         )
@@ -3959,10 +4006,10 @@ plot.rmdFilt <- function(x, pvalue_threshold = NULL, sampleID = NULL,
       p <- p +
         ggplot2::geom_point(
           ggplot2::aes(
-            x = !!rlang::sym(samp_id),
+            x = !!dplyr::sym(samp_id),
             y = Log2.md,
-            color = !!rlang::sym(main_eff_names[1]),
-            shape = !!rlang::sym(main_eff_names[2])
+            color = !!dplyr::sym(main_eff_names[1]),
+            shape = !!dplyr::sym(main_eff_names[2])
           ),
           size = point_size
         )
@@ -4015,8 +4062,8 @@ plot.rmdFilt <- function(x, pvalue_threshold = NULL, sampleID = NULL,
 
         # Snag the associated pair IDs for the samples that will be filtered.
         filtad_pairs <- attr(filter_object, "fdata") %>%
-          dplyr::filter(!!rlang::sym(sample_name) %in% filtad) %>%
-          dplyr::pull(!!rlang::sym(pair_name))
+          dplyr::filter(!!dplyr::sym(sample_name) %in% filtad) %>%
+          dplyr::pull(!!dplyr::sym(pair_name))
 
         # Go back to f_data and nab all the sample names corresponding to the
         # pair IDs associated with the original samples that were selected for
@@ -4025,8 +4072,8 @@ plot.rmdFilt <- function(x, pvalue_threshold = NULL, sampleID = NULL,
         # samples that belong to pair where only one sample falls below the
         # threshold.
         filtad_too <- attr(filter_object, "fdata") %>%
-          dplyr::filter(!!rlang::sym(pair_name) %in% filtad_pairs) %>%
-          dplyr::pull(!!rlang::sym(sample_name)) %>%
+          dplyr::filter(!!dplyr::sym(pair_name) %in% filtad_pairs) %>%
+          dplyr::pull(!!dplyr::sym(sample_name)) %>%
           as.character()
 
         # Update the goodies_alpha vector to reflect the additional samples that
@@ -4074,9 +4121,9 @@ plot.rmdFilt <- function(x, pvalue_threshold = NULL, sampleID = NULL,
         p <- p +
           ggplot2::geom_point(
             ggplot2::aes(
-              x = !!rlang::sym(samp_id),
+              x = !!dplyr::sym(samp_id),
               y = Log2.md,
-              col = !!rlang::sym(main_eff_names),
+              col = !!dplyr::sym(main_eff_names),
               # Add a fill layer that will not affect how the plot looks. This
               # layer is used to create a legend when one sample from a pair is
               # an outlier but the other sample belonging to the pair is not.
@@ -4091,9 +4138,9 @@ plot.rmdFilt <- function(x, pvalue_threshold = NULL, sampleID = NULL,
         p <- p +
           ggplot2::geom_point(
             ggplot2::aes(
-              x = !!rlang::sym(samp_id),
+              x = !!dplyr::sym(samp_id),
               y = Log2.md,
-              col = !!rlang::sym(main_eff_names)
+              col = !!dplyr::sym(main_eff_names)
             ),
             alpha = ifelse(goodies_alpha, 1, 0.5),
             size = point_size,
@@ -4106,10 +4153,10 @@ plot.rmdFilt <- function(x, pvalue_threshold = NULL, sampleID = NULL,
         p <- p +
           ggplot2::geom_point(
             ggplot2::aes(
-              x = !!rlang::sym(samp_id),
+              x = !!dplyr::sym(samp_id),
               y = Log2.md,
-              col = !!rlang::sym(main_eff_names[1]),
-              shape = !!rlang::sym(main_eff_names[2]),
+              col = !!dplyr::sym(main_eff_names[1]),
+              shape = !!dplyr::sym(main_eff_names[2]),
               # Add a fill layer that will not affect how the plot looks. This
               # layer is used to create a legend when one sample from a pair is
               # an outlier but the other sample belonging to the pair is not.
@@ -4127,9 +4174,9 @@ plot.rmdFilt <- function(x, pvalue_threshold = NULL, sampleID = NULL,
           # plotted as a square.
           ggplot2::geom_point(
             ggplot2::aes(
-              x = !!rlang::sym(samp_id),
+              x = !!dplyr::sym(samp_id),
               y = Log2.md,
-              col = !!rlang::sym(main_eff_names[1])
+              col = !!dplyr::sym(main_eff_names[1])
             ),
             size = ifelse(goodies_pch, point_size, 0),
             shape = ifelse(goodies_pch, 15, 16)
@@ -4139,10 +4186,10 @@ plot.rmdFilt <- function(x, pvalue_threshold = NULL, sampleID = NULL,
         p <- p +
           ggplot2::geom_point(
             ggplot2::aes(
-              x = !!rlang::sym(samp_id),
+              x = !!dplyr::sym(samp_id),
               y = Log2.md,
-              col = !!rlang::sym(main_eff_names[1]),
-              shape = !!rlang::sym(main_eff_names[2])
+              col = !!dplyr::sym(main_eff_names[1]),
+              shape = !!dplyr::sym(main_eff_names[2])
             ),
             alpha = ifelse(goodies_alpha, 1, 0.5),
             # Make guilty-by-association points really small because we will
@@ -4156,9 +4203,9 @@ plot.rmdFilt <- function(x, pvalue_threshold = NULL, sampleID = NULL,
           # plotted as a square.
           ggplot2::geom_point(
             ggplot2::aes(
-              x = !!rlang::sym(samp_id),
+              x = !!dplyr::sym(samp_id),
               y = Log2.md,
-              col = !!rlang::sym(main_eff_names[1])
+              col = !!dplyr::sym(main_eff_names[1])
             ),
             size = ifelse(goodies_pch, point_size, 0),
             shape = ifelse(goodies_pch, 15, 16)
@@ -5574,10 +5621,13 @@ plot_omicsData <- function(omicsData, order_by, color_by, facet_by, facet_cols,
     }
   }
 
-  plot_data <- reshape2::melt(temp_data,
-    id = e_data_cname,
-    na.rm = TRUE
-  )
+  plot_data <- temp_data %>%
+    tidyr::pivot_longer(
+      -!!e_data_cname,
+      names_to = "variable",
+      values_drop_na = TRUE,
+      cols_vary = "slowest"
+    ) %>% data.frame
 
   # Farm boy, extract the group_DF attribute. As you wish.
   # groupDF <- attr(omicsData, "group_DF")
@@ -5613,8 +5663,8 @@ plot_omicsData <- function(omicsData, order_by, color_by, facet_by, facet_cols,
       # column corresponding to the order_by input.
       orderDF <- dplyr::select(
         omicsData$f_data,
-        !!rlang::sym(get_fdata_cname(omicsData)),
-        !!rlang::sym(order_by)
+        !!dplyr::sym(get_fdata_cname(omicsData)),
+        !!dplyr::sym(order_by)
       )
     } else {
       # Use the original group_DF attribute for ordering the samples. This
@@ -5702,7 +5752,7 @@ plot_omicsData <- function(omicsData, order_by, color_by, facet_by, facet_cols,
       ggplot2::geom_boxplot(ggplot2::aes(
         x = variable,
         y = value,
-        fill = !!rlang::sym(color_by)
+        fill = !!dplyr::sym(color_by)
       ))
   }
 
@@ -6107,11 +6157,12 @@ plot.statRes <- function(x,
     colnames(volcano_sigs)[1] <- "Biomolecule"
 
     if (cluster) {
-      wide <- reshape2::dcast(volcano_sigs,
-        Biomolecule ~ Comparison,
-        value.var = "Fold_change",
-        fun.aggregate = mean, na.rm = T
-      )
+      wide <- volcano_sigs %>% 
+        tidyr::pivot_wider(
+          id_cols = Biomolecule,
+          names_from = Comparison,
+          values_from = Fold_change
+        ) %>% data.frame
       wide <- wide[!is.na(wide$Biomolecule), ]
       row.names(wide) <- wide$Biomolecule
       dist_mat <- dist(wide[-1])
@@ -6298,13 +6349,13 @@ make_volcano_plot_df <- function(x) {
       x = colnames(fc_data)
     )
 
-  fc_data <-
-    reshape2::melt(
-      fc_data,
-      id.vars = 1,
-      variable.name = "Comparison",
-      value.name = "Fold_change"
-    )
+  fc_data <- fc_data %>%
+    tidyr::pivot_longer(
+      -1,
+      names_to = "Comparison",
+      values_to = "Fold_change",
+      cols_vary = "slowest"
+    ) %>% data.frame
 
   # Run the cmbn_flags function here.
 
@@ -6313,24 +6364,27 @@ make_volcano_plot_df <- function(x) {
     x = x,
     test = attr(x, "statistical_test")
   )
-  fc_flags <-
-    reshape2::melt(
-      fc_flags,
-      id.vars = 1,
-      variable.name = "Comparison",
-      value.name = "Fold_change_flag"
+  fc_flags <- fc_flags %>%
+    tidyr::pivot_longer(
+      -1,
+      names_to = "Comparison",
+      values_to = "Fold_change_flag",
+      cols_vary = "slowest"
     ) %>%
-    dplyr::mutate(Fold_change_flag = as.character(Fold_change_flag))
+    dplyr::mutate(
+      Fold_change_flag = as.character(Fold_change_flag)
+    ) %>%
+    data.frame
 
   # p values for labeling and y axis in anova volcano plot
   p_data <- x[, c(1, grep("^P_value", colnames(x)))]
-  pvals <-
-    reshape2::melt(
-      p_data,
-      id.vars = 1,
-      variable.name = "Comparison",
-      value.name = "P_value"
-    )
+  pvals <- p_data %>%
+    tidyr::pivot_longer(
+      -1,
+      names_to = "Comparison",
+      values_to = "P_value",
+      cols_vary = "slowest"
+    ) %>% data.frame
 
   # grouping column based on test type
   if (attr(x, "statistical_test") == "combined") {
@@ -6345,22 +6399,23 @@ make_volcano_plot_df <- function(x) {
 
   ## assumes silly people won't call a group A_vs or G_vs for seqdata
   ## Negative lookahead permits groups called A or G tho
-  levels(pvals$Comparison) <-
+  pvals$Comparison <-
     gsub(
       pattern = "^P_value_((G|A)_(?!vs))*",
       replacement = "",
-      levels(pvals$Comparison), perl = T
+      pvals$Comparison,
+      perl = T
     )
 
   volcano <-
     merge(merge(fc_data, pvals, all = TRUE), fc_flags, all = TRUE)
 
   # levels of comparison now of the form 'GROUPNAME_X vs GROUPNAME_Y'
-  levels(volcano$Comparison) <-
+  volcano$Comparison <-
     gsub(
       pattern = "_vs_",
       replacement = " vs ",
-      levels(volcano$Comparison)
+      volcano$Comparison
     )
 
   # create counts for gtest plot (number present in each group)
@@ -6460,11 +6515,14 @@ statres_barplot <- function(x,
 
   comp_df <- attr(x, "number_significant")
 
-  comp_df_melt <- reshape2::melt(comp_df,
-    id.vars = "Comparison",
-    value.name = "Count",
-    variable.name = "Direction"
-  )
+  comp_df_melt <- comp_df %>%
+    tidyr::pivot_longer(
+      -Comparison,
+      values_to = "Count",
+      names_to = "Direction",
+      cols_vary = "slowest"
+    ) %>% data.frame
+    
   levels(comp_df_melt$Comparison) <- gsub(
     pattern = "_",
     replacement = " ",
@@ -6855,7 +6913,7 @@ statres_volcano_plot <-
       dplyr::mutate(
         Fold_change_flag = dplyr::case_when(
           is.na(Fold_change) |
-            abs(Fold_change) < ifelse(rlang::is_empty(fc_threshold),
+            abs(Fold_change) < ifelse(length(fc_threshold) == 0,
               0,
               abs(fc_threshold)
             ) ~ "0",
@@ -6876,7 +6934,7 @@ statres_volcano_plot <-
           -log(P_value, base = 10),
           text = paste(
             "ID:",
-            !!rlang::sym(colnames(volcano)[1]),
+            !!dplyr::sym(colnames(volcano)[1]),
             "<br>",
             "Pval:",
             round(P_value, 4)
@@ -6894,7 +6952,7 @@ statres_volcano_plot <-
     }
 
     # draw vertical lines at +- fc threshold
-    if (!rlang::is_empty(fc_threshold)) {
+    if (length(fc_threshold) > 0) {
       p <- p +
         ggplot2::geom_vline(ggplot2::aes(xintercept = abs(fc_threshold)),
           lty = 2

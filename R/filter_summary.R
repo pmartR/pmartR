@@ -885,8 +885,8 @@ summary.rmdFilt <- function(object, pvalue_threshold = NULL, ...) {
 
     # Snag the associated pair IDs for the samples that will be filtered.
     filtered_pairs <- attr(filter_object, "fdata") %>%
-      dplyr::filter(!!rlang::sym(sample_name) %in% filt) %>%
-      dplyr::pull(!!rlang::sym(pair_name))
+      dplyr::filter(!!dplyr::sym(sample_name) %in% filt) %>%
+      dplyr::pull(!!dplyr::sym(pair_name))
 
     # Go back to f_data and nab all the sample names corresponding to the pair
     # IDs associated with the original samples that were selected for removal.
@@ -894,8 +894,8 @@ summary.rmdFilt <- function(object, pvalue_threshold = NULL, ...) {
     # be the same as the original vector if any pairs were split. If there
     # were no pairs split the two vectors will be the same.
     filt <- attr(filter_object, "fdata") %>%
-      dplyr::filter(!!rlang::sym(pair_name) %in% filtered_pairs) %>%
-      dplyr::pull(!!rlang::sym(sample_name)) %>%
+      dplyr::filter(!!dplyr::sym(pair_name) %in% filtered_pairs) %>%
+      dplyr::pull(!!dplyr::sym(sample_name)) %>%
       as.character()
   }
 

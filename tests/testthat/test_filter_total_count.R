@@ -108,19 +108,23 @@ test_that('total_count_filter and applyFilt produce the correct output', {
 
     temp_data <- cbind(tester$e_data[1], temp_data)
 
-    use_r_lcpm <- reshape2::melt(temp_data,
-      id.var = "ID_REF",
-      value.name = "lcpm", variable.name = "Samples"
-    )
-    use_r_lcpm$ID_REF <- as.character(use_r_lcpm$ID_REF)
-    use_r_lcpm$Samples <- as.character(use_r_lcpm$Samples)
-
-    use_r_lcpm <- dplyr::arrange(
-      use_r_lcpm,
-      !!rlang::sym(get_edata_cname(tester)),
-      !!rlang::sym(get_fdata_cname(tester)),
-      lcpm
-    )
+    use_r_lcpm <- tidyr::pivot_longer(
+        temp_data,
+        -ID_REF,
+        values_to = "lcpm",
+        names_to = "Samples",
+        cols_vary = "slowest"
+      ) %>%
+      dplyr::mutate(
+        ID_REF = as.character(ID_REF),
+        Samples = as.character(Samples)
+      ) %>% 
+      dplyr::arrange(
+        !!dplyr::sym(get_edata_cname(tester)),
+        !!dplyr::sym(get_fdata_cname(tester)),
+        lcpm
+      ) %>% 
+      data.frame
 
     # Ensure the total_count values are correct.
     expect_equal(

@@ -30,6 +30,7 @@
 #' Method "edgeR" - Runs default edgeR workflow with empirical Bayes
 #' quasi-likelihood F-tests. Additional arguments can be passed for use in the
 #' function. Refer to calcNormFactors() and glmQLFit() in edgeR package.
+#' Requires the 'edgeR' and 'limma' packages to run.
 #'
 #' Method "DESeq2" - Runs default DESeq workflow. Defaults to Wald test, no
 #' independent filtering, and running in parallel. Additional arguments can be
@@ -39,6 +40,7 @@
 #' Method "voom" - Runs default limma-voom workflow using empirical Bayes
 #' moderated t-statistics. Additional arguments can be passed for use in the
 #' function. Refer to calcNormFactors() in edgeR package.
+#' Requires the 'edgeR' and 'limma' packages to run.
 #'
 #' @references
 #'  Robinson MD, McCarthy DJ, Smyth GK (2010). “edgeR: a Bioconductor package
@@ -156,6 +158,10 @@ DESeq2_wrapper <- function(omicsData, test = "Wald", p_adjust = "BH",
   
   if (!requireNamespace("survival", quietly = TRUE)) {
     stop("package 'survival' required for DESeq2 processing")
+  }
+  
+  if (!requireNamespace("DESeq2", quietly = TRUE)) {
+    stop("package 'DESeq2' required for DESeq2 processing")
   }
 
   l <- list(...)
@@ -354,11 +360,13 @@ DESeq2_wrapper <- function(omicsData, test = "Wald", p_adjust = "BH",
   attr(results, "group_DF") <- attr(omicsData, "group_DF")
 
   ## sig totes
-  flag_df <- reshape2::melt(
+  flag_df <- tidyr::pivot_longer(
     all_cont[flag_cols],
-    variable.name = "Comparison",
-    value.name = "Flags"
-  )
+    -0,
+    names_to = "Comparison",
+    values_to = "Flags",
+    cols_vary = "slowest"
+  ) %>% data.frame
   flag_df$Comparison <- gsub("Flag_", "", flag_df$Comparison)
   attr(results, "number_significant") <- flag_df %>%
     dplyr::group_by(Comparison) %>%
@@ -384,7 +392,7 @@ DESeq2_wrapper <- function(omicsData, test = "Wald", p_adjust = "BH",
 
 #' Wrapper for edgeR workflow
 #'
-#' For generating statistics for 'seqData' objects
+#' For generating statistics for 'seqData' objects.
 #'
 #' @param omicsData an object of type 'seqData', created by
 #'   \code{\link{as.seqData}}
@@ -401,9 +409,10 @@ DESeq2_wrapper <- function(omicsData, test = "Wald", p_adjust = "BH",
 #'
 #' @return statRes object
 #'
-#' @details Runs default edgeR workflow with empirical Bayes quasi-likelihood
-#'   F-tests. Additional arguments can be passed for use in the function, refer
-#'   to calcNormFactors() and glmQLFit() in edgeR package.
+#' @details Requires the 'edgeR' and 'limma' packages. Runs default edgeR workflow with 
+#'   empirical Bayes quasi-likelihood F-tests. Additional arguments can be
+#'   passed for use in the function, refer to calcNormFactors() and glmQLFit()
+#'   in edgeR package.
 #'
 #' Flags (signatures) -	Indicator of statistical significance for computed test.
 #' Zeroes indicate no significance, while +/- 1 indicates direction of significance.
@@ -416,6 +425,15 @@ DESeq2_wrapper <- function(omicsData, test = "Wald", p_adjust = "BH",
 edgeR_wrapper <- function(
     omicsData, p_adjust = "BH", comparisons = NULL, p_cutoff = 0.05,
     ...) {
+  
+  if (!requireNamespace("edgeR", quietly = TRUE)) {
+    stop("package 'edgeR' required for edgeR processing")
+  }
+  
+  if (!requireNamespace("limma", quietly = TRUE)) {
+    stop("package 'limma' required for edgeR processing")
+  }
+  
   l <- list(...)
 
   NF_args <- l[names(l) %in% names(formals(edgeR::calcNormFactors.DGEList))]
@@ -654,10 +672,13 @@ edgeR_wrapper <- function(
   attr(results, "group_DF") <- attr(omicsData, "group_DF")
 
   ## sig totes
-  flag_df <- reshape2::melt(all_cont[flag_cols],
-    variable.name = "Comparison",
-    value.name = "Flags"
-  )
+  flag_df <- tidyr::pivot_longer(
+    all_cont[flag_cols],
+    -0,
+    names_to = "Comparison",
+    values_to = "Flags",
+    cols_vary = "slowest"
+  ) %>% data.frame
   flag_df$Comparison <- gsub("Flag_", "", flag_df$Comparison)
   attr(results, "number_significant") <- flag_df %>%
     dplyr::group_by(Comparison) %>%
@@ -713,6 +734,15 @@ edgeR_wrapper <- function(
 #'
 voom_wrapper <- function(
     omicsData, p_adjust = "BH", comparisons = NULL, p_cutoff = 0.05, ...) {
+  
+  if (!requireNamespace("edgeR", quietly = TRUE)) {
+    stop("package 'edgeR' required for voom processing")
+  }
+  
+  if (!requireNamespace("limma", quietly = TRUE)) {
+    stop("package 'limma' required for voom processing")
+  }
+  
   l <- list(...)
 
   NF_args <- l[names(l) %in% names(formals(edgeR::calcNormFactors.DGEList))]
@@ -922,10 +952,13 @@ voom_wrapper <- function(
   attr(results, "filters") <- attr(omicsData, "filters")
   attr(results, "group_DF") <- attr(omicsData, "group_DF")
 
-  flag_df <- reshape2::melt(all_cont[flag_cols],
-    variable.name = "Comparison",
-    value.name = "Flags"
-  )
+  flag_df <- tidyr::pivot_longer(
+    all_cont[flag_cols],
+    -0,
+    names_to = "Comparison",
+    values_to = "Flags",
+    cols_vary = "slowest"
+  ) %>% data.frame
   flag_df$Comparison <- gsub("Flag_", "", flag_df$Comparison)
   attr(results, "number_significant") <- flag_df %>%
     dplyr::group_by(Comparison) %>%
@@ -1004,7 +1037,7 @@ get_group_formula <- function(omicsData) {
       grouping_info <- dplyr::arrange(
         grouping_info,
         Group,
-        !!rlang::sym(pair_group), !!rlang::sym(pairs)
+        !!dplyr::sym(pair_group), !!dplyr::sym(pairs)
       )
 
       all_mult_levels <- table(apply(grouping_info[c("Group", pair_group)],
@@ -1215,6 +1248,10 @@ dispersion_est <- function(omicsData, method,
     if (!requireNamespace("S4Vectors", quietly = TRUE)) {
       stop("package 'S4Vectors' required for DESeq2 processing")
     }
+    
+    if (!requireNamespace("DESeq2", quietly = TRUE)) {
+      stop("package 'DESeq2' required for DESeq2 processing")
+    }
 
     # Farm boy, do all the tedious label crap. As you wish.
     the_x_label <- if (is.null(x_lab)) "Mean of Normalized Counts" else x_lab
@@ -1256,6 +1293,14 @@ dispersion_est <- function(omicsData, method,
         title = the_title_label, color = the_legend_label
       )
   } else if (method == "edgeR") {
+    if (!requireNamespace("edgeR", quietly = TRUE)) {
+      stop("package 'edgeR' required for edgeR processing")
+    }
+    
+    if (!requireNamespace("limma", quietly = TRUE)) {
+      stop("package 'limma' required for edgeR processing")
+    }
+    
     # Farm boy, do all the tedious label crap. As you wish.
     the_x_label <- if (is.null(x_lab)) "Average Log2 CPM" else x_lab
     the_y_label <- if (is.null(y_lab)) "Quarter-Root Mean Deviance" else y_lab
@@ -1284,7 +1329,13 @@ dispersion_est <- function(omicsData, method,
     )
 
     ## Remake of plotBCV(GTagD_edgeR, log = "y")
-    df2_melt <- reshape2::melt(df2[c("AveLogCPM", "TagD", "TD", "CD")], id.var = "AveLogCPM")
+    df2_melt <- tidyr::pivot_longer(
+        df2[c("AveLogCPM", "TagD", "TD", "CD")],
+        -AveLogCPM,
+        names_to = "variable",
+        cols_vary = "slowest"
+      ) %>% data.frame
+
     p <- ggplot2::ggplot(
       data = df2_melt,
       ggplot2::aes(x = AveLogCPM, y = sqrt(value), color = variable)
@@ -1315,6 +1366,14 @@ dispersion_est <- function(omicsData, method,
     #   ggplot2::labs(x = the_x_label, y = the_y_label,
     #                 title = the_title_label, color = the_legend_label)
   } else if (method == "voom") {
+    if (!requireNamespace("edgeR", quietly = TRUE)) {
+      stop("package 'edgeR' required for voom processing")
+    }
+    
+    if (!requireNamespace("limma", quietly = TRUE)) {
+      stop("package 'limma' required for voom processing")
+    }
+    
     # Farm boy, do all the tedious label crap. As you wish.
     the_x_label <- if (is.null(x_lab)) "Sqrt (Standard Deviation)" else x_lab
     the_y_label <- if (is.null(y_lab)) "Log (count size + 0.5)" else y_lab

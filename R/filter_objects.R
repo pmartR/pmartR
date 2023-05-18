@@ -259,7 +259,7 @@ total_count_filter <- function(omicsData) {
 
   output[[get_edata_cname(omicsData)]] <- as.character(output[[get_edata_cname(omicsData)]])
   output <- dplyr::arrange(
-    output, !!rlang::sym(get_edata_cname(omicsData)),
+    output, !!dplyr::sym(get_edata_cname(omicsData)),
     Total_Counts
   )
   row.names(output) <- NULL
@@ -289,21 +289,19 @@ total_count_filter <- function(omicsData) {
     get_fdata_cname(omicsData)
   )
 
-  density_data <- reshape2::melt(lcpm,
-    id.var = idvar,
-    variable.name = varname,
-    value.name = "lcpm"
-  )
-
-  density_data[[idvar]] <- as.character(density_data[[idvar]])
-  density_data[[varname]] <- as.character(density_data[[varname]])
-
-  density_data <- dplyr::arrange(
-    density_data,
-    !!rlang::sym(idvar),
-    !!rlang::sym(varname),
-    lcpm
-  )
+  density_data <- lcpm %>%
+    tidyr::pivot_longer(
+      -dplyr::all_of(idvar),
+      cols_vary = "slowest",
+      names_to = varname,
+      values_to = "lcpm"
+    ) %>%
+    dplyr::arrange(
+      !!dplyr::sym(idvar),
+      !!dplyr::sym(varname),
+      lcpm
+    ) %>% 
+    data.frame()
   row.names(output) <- NULL
 
   attr(output, "e_data_lcpm") <- density_data

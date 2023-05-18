@@ -176,7 +176,7 @@ trelli_precheck <- function(trelliData,
 
 # A quick cognostic function
 quick_cog <- function(name, value) {
-  dplyr::tibble(!!rlang::sym(name) := trelliscopejs::cog(value, desc = name))
+  dplyr::tibble(!!dplyr::sym(name) := trelliscopejs::cog(value, desc = name))
 }
 
 # Create a list to convert from short name to long
@@ -1223,7 +1223,7 @@ trelli_missingness_bar <- function(trelliData,
     # Build toBuild dataframe
     toBuild <- trelliData$statRes %>%
       dplyr::select(c(edata_cname, count_cols)) %>%
-      dplyr::group_by(!!rlang::sym(edata_cname)) %>%
+      dplyr::group_by(!!dplyr::sym(edata_cname)) %>%
       tidyr::nest() %>%
       dplyr::ungroup() %>%
       dplyr::rename(Nested_DF = data)

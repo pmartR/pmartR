@@ -50,5 +50,5 @@ Ballman, KV Grill, DE, Oberg, AL and Therneau, TM (2004).
 Bioinformatics 20, 2778-2786.
 }
 \seealso{
-\code{\link{normalizeCyclicLoess}} in the \code{limma} package
+\code{\link[limma]{normalizeCyclicLoess}} in the \code{limma} package
 }

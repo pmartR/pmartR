@@ -417,13 +417,13 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL) {
         }) %>% unlist()
       ) %>%
       dplyr::select(-name) %>%
-      dplyr::group_by(dplyr::across(c(Comparison, !!rlang::sym(edata_cname)))) %>%
+      dplyr::group_by(dplyr::across(c(Comparison, !!dplyr::sym(edata_cname)))) %>%
       dplyr::summarise(
         "p_value_anova" = ifelse(length(value[which(Metric == "p_value_anova")]) == 0, NA, value[which(Metric == "p_value_anova")]),
         "p_value_gtest" = ifelse(length(value[which(Metric == "p_value_gtest")]) == 0, NA, value[which(Metric == "p_value_gtest")]),
         "fold_change" = value[which(Metric == "fold_change")]
       ) %>%
-      dplyr::relocate(!!rlang::sym(edata_cname))
+      dplyr::relocate(!!dplyr::sym(edata_cname))
 
     # Add emeta columns if emeta exists
     if (!is.null(omicsData$e_meta)) {
