@@ -970,14 +970,11 @@ plot.SPANSRes <- function (SPANSRes_obj, interactive = FALSE,
 #'   \code{\link{as.lipidData}}, \code{\link{as.nmrData}}, or \code{\link{as.seqData}}, respectively.
 #' @param plot_type character string specifying which type of plot to produce.
 #'   The two options are 'bar' or 'scatter'.
-#' @param plot_mode character string specifying what will be plotted. The 
-#'   default option of 'missing' plots the number of missing (NA) values. 
-#'   The 'nonmissing' option plots the number of values which are \emph{not}
-#'   missing. The 'proportion' option plots the proportion of missing values to
-#'   nonmissing values.
-#'   
-#'   \bold{NOTE:} The 'nonmissing' and 'proportion' options are only valid when the
-#'   \code{plot_type} is 'bar'.
+#' @param nonmissing logical value. When FALSE, plots missing values. When TRUE,
+#'   plots non-missing values.
+#' @param proportion logical value. When TRUE, plots the proportion of missing 
+#'   (or non-missing if \code{nonmissing} is TRUE) to the total number of 
+#'   values. Only works with a plot type of 'bar'.
 #' @param order_by A character string specifying a column in f_data by which to
 #'   order the samples. The special value 'ORDER_BY_GROUP' will use the 
 #'   \code{group_DF} attribute to order the samples.
@@ -1055,7 +1052,8 @@ plot.SPANSRes <- function (SPANSRes_obj, interactive = FALSE,
 #' @export
 #'
 plot.naRes <- function (naRes_obj, omicsData, plot_type = "bar", 
-                        plot_mode = "missing", order_by = NULL, color_by = NULL, 
+                        nonmissing = FALSE, proportion = FALSE,
+                        order_by = NULL, color_by = NULL, 
                         interactive = FALSE, x_lab_bar = NULL,
                         x_lab_scatter = NULL, y_lab_bar = NULL,
                         y_lab_scatter = NULL, x_lab_size = 11, y_lab_size = 11,
@@ -1089,14 +1087,10 @@ plot.naRes <- function (naRes_obj, omicsData, plot_type = "bar",
 
   }
   
-  # Check that the mode is either missing, nonmissing, or proportion
-  if (!(plot_mode %in% c("missing", "nonmissing", "proportion"))) {
+  # Check to make sure proportion is only used with bar plot
+  if (proportion && plot_type != "bar") {
     
-    stop("plot_mode must be 'missing', 'nonmissing', or 'proportion'")
-    
-    if (plot_type != "bar" && plot_mode != "missing") {
-      stop("plot_mode must be 'missing' unless used with a plot_type of 'bar'")
-    }
+    stop("plot_type must be 'bar' if proportion is TRUE")
     
   }
 
@@ -1152,16 +1146,19 @@ plot.naRes <- function (naRes_obj, omicsData, plot_type = "bar",
     names(na.by.molecule)[which(names(na.by.molecule) == "num_zeros")] <- "num_NA"
     names(na.by.sample)[which(names(na.by.sample) == "num_nonzeros")] <- "num_non_NA"
     names(na.by.molecule)[which(names(na.by.molecule) == "num_nonzeros")] <- "num_non_NA"
-    names(na.by.sample)[which(names(na.by.sample) == "zeros_proportion")] <- "NA_proportion"
-    names(na.by.molecule)[which(names(na.by.molecule) == "zeros_proportion")] <- "NA_proportion"
   }else{
     na.by.sample <- naRes_obj$na.by.sample
     na.by.molecule <- naRes_obj$na.by.molecule
     num_missing_vals <- na.by.molecule$num_NA
     num_nonmissing_vals <- na.by.molecule$num_non_NA
-    missing_proportion <- na.by.molecule$NA_proportion
   }
-
+  
+  # Get the proportion of missing/nonmissing to total (missing + nonmissing)
+  target_NA_column <- ifelse(nonmissing, "num_non_NA", "num_NA")
+  na.by.molecule$NA_proportion <- na.by.molecule[[target_NA_column]] / 
+    (na.by.molecule$num_NA + na.by.molecule$num_non_NA)
+  na.by.sample$NA_proportion <- na.by.sample[[target_NA_column]] / 
+    (na.by.sample$num_NA + na.by.sample$num_non_NA)
 
   edata_cname <- attr(naRes_obj, "cnames")$edata_cname
   fdata_cname <- attr(naRes_obj, "cnames")$fdata_cname
@@ -1239,7 +1236,7 @@ plot.naRes <- function (naRes_obj, omicsData, plot_type = "bar",
                 coordinate_flip = coordinate_flip,
                 use_VizSampNames = use_VizSampNames, interactive = interactive,
                 fdata_cname = fdata_cname, color_by = color_by,
-                plot_mode = plot_mode)
+                nonmissing = nonmissing, proportion = proportion)
 
   }
 
@@ -1248,7 +1245,6 @@ plot.naRes <- function (naRes_obj, omicsData, plot_type = "bar",
 
     p <- na_scatter(edata = edata, group_df = group_df,
                     na.by.sample = na.by.sample,
-                    num_missing_vals = num_missing_vals,
                     edata_cname = edata_cname, edata_cname_id = edata_cname_id,
                     fdata_cname = fdata_cname, x_lab_scatter = x_lab_scatter,
                     y_lab_scatter = y_lab_scatter,
@@ -1260,7 +1256,8 @@ plot.naRes <- function (naRes_obj, omicsData, plot_type = "bar",
                     bw_theme = bw_theme, palette = palette,
                     x_lab_angle = x_lab_angle,
                     coordinate_flip = coordinate_flip,
-                    interactive = interactive, point_size = point_size)
+                    interactive = interactive, point_size = point_size,
+                    nonmissing = nonmissing)
 
   }
 
@@ -1272,15 +1269,16 @@ na_bar <- function (na.by.sample, x_lab_bar, y_lab_bar, x_lab_size, y_lab_size,
                     x_lab_angle, title_lab_bar, title_lab_size, legend_lab_bar,
                     legend_position, text_size, bar_width, bw_theme, palette,
                     display_count, coordinate_flip, use_VizSampNames,
-                    interactive, fdata_cname, color_by, plot_mode) {
+                    interactive, fdata_cname, color_by, nonmissing,
+                    proportion) {
 
   # Select which column of na.by.sample will be used
-  if (plot_mode == "missing") {
-    y_axis = "num_NA"
-  } else if (plot_mode == "nonmissing") {
-    y_axis = "num_non_NA"
-  } else if (plot_mode == "proportion") {
+  if (proportion) {
     y_axis = "NA_proportion"
+  } else if (nonmissing) {
+    y_axis = "num_non_NA"
+  } else {
+    y_axis = "num_NA"
   }
 
   # Farm boy, color the plots based on the input. As you wish.
@@ -1342,14 +1340,17 @@ na_bar <- function (na.by.sample, x_lab_bar, y_lab_bar, x_lab_size, y_lab_size,
     "Sample Name" else
       x_lab_bar
   yLabelBar <- if (is.null(y_lab_bar))
-    "Number of missing values" else
+    sprintf(
+      "%s of %s values",
+      ifelse(proportion, "Proportion", "Number"),
+      ifelse(nonmissing, "non-missing", "missing")
+    ) else
       y_lab_bar
-  plotTitleBar <- if (is.null(title_lab_bar)) {
-    if (plot_mode == "nonmissing")
-      "Non-missing values by sample"
-    else
-      "Missing values by sample"
-  } else
+  plotTitleBar <- if (is.null(title_lab_bar))
+    sprintf(
+      "%s values by sample",
+      ifelse(nonmissing, "Non-missing", "Missing")
+    ) else
       title_lab_bar
   legendLabelBar <- if (is.null(legend_lab_bar))
     "Group" else
@@ -1397,13 +1398,20 @@ na_bar <- function (na.by.sample, x_lab_bar, y_lab_bar, x_lab_size, y_lab_size,
 
 }
 
-na_scatter <- function (edata, group_df, na.by.sample, num_missing_vals,
-                        edata_cname, edata_cname_id, fdata_cname, x_lab_scatter,
+na_scatter <- function (edata, group_df, na.by.sample, edata_cname,
+                        edata_cname_id, fdata_cname, x_lab_scatter,
                         y_lab_scatter, title_lab_scatter, legend_lab_scatter,
                         legend_position, title_lab_size, x_lab_size, y_lab_size,
                         text_size, bw_theme, palette, x_lab_angle,
-                        coordinate_flip, interactive, point_size) {
+                        coordinate_flip, interactive, point_size,
+                        nonmissing) {
 
+  # Select missing/nonmissing
+  if (nonmissing)
+    num_missing_vals <- na.by.sample$num_non_NA
+  else
+    num_missing_vals <- na.by.sample$num_NA
+  
   # More tedious label making.
   xLabelScatter <- if (is.null(x_lab_scatter))
     "Mean Intensity" else
