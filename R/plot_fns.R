@@ -1829,7 +1829,8 @@ plot.corRes <- function (corRes_obj, omicsData = NULL, order_by = NULL,
 #'
 #' @param dimRes_obj object of class dimRes created by the \code{dim_reduction}
 #'   function
-#'
+#' @param omicsData optional omicsData for use in specifying a column name in
+#'   fdata when using \code{color_by} or \code{shape_by}.
 #' @param color_by character string specifying which column to use to control 
 #'   the color for plotting. NULL indicates the default value of the main effect 
 #'   (if present). COLOR_BY_GROUP indicates the combination of both main 
@@ -1886,7 +1887,8 @@ plot.corRes <- function (corRes_obj, omicsData = NULL, order_by = NULL,
 #'
 #' @export
 #'
-plot.dimRes <- function (dimRes_obj, color_by = NULL, shape_by = NULL,
+plot.dimRes <- function (dimRes_obj, omicsData = NULL,
+                         color_by = NULL, shape_by = NULL,
                          interactive = FALSE, x_lab = NULL, y_lab = NULL, 
                          x_lab_size = 11, y_lab_size = 11, x_lab_angle = 0, 
                          title_lab = NULL, title_lab_size = 14,
@@ -1919,7 +1921,6 @@ plot.dimRes <- function (dimRes_obj, color_by = NULL, shape_by = NULL,
     }
 
   }
-
   plotdata <- data.frame(SampleID = dimRes_obj$SampleID,
                          PC1 = dimRes_obj$PC1,
                          PC2 = dimRes_obj$PC2)
@@ -2005,6 +2006,28 @@ plot.dimRes <- function (dimRes_obj, color_by = NULL, shape_by = NULL,
 
       }
 
+    }
+    
+    # Add any columns from f_data to the plotdata if present (for color_by
+    # and shape_by)
+    if (!is.null(omicsData)) {
+      if (is.null(omicsData$f_data)) {
+        stop("omicsData does not have f_data")
+      }
+      
+      fdata_concat <- omicsData$f_data[
+        c(
+          which(colnames(omicsData$f_data) == fdata_cname),
+          which(!colnames(omicsData$f_data) %in% colnames(plotdata))
+        )
+      ]
+      
+      plotdata <- merge.data.frame(plotdata,
+                                   fdata_concat,
+                                   by.x = plotdata_name,
+                                   by.y = fdata_cname,
+                                   sort = FALSE)
+      
     }
 
     # Runs when there is no group information.
