@@ -6,6 +6,9 @@
 \usage{
 \method{plot}{dimRes}(
   dimRes_obj,
+  omicsData = NULL,
+  color_by = NULL,
+  shape_by = NULL,
   interactive = FALSE,
   x_lab = NULL,
   y_lab = NULL,
@@ -24,6 +27,21 @@
 \arguments{
 \item{dimRes_obj}{object of class dimRes created by the \code{dim_reduction}
 function}
+
+\item{omicsData}{optional omicsData for use in specifying a column name in
+fdata when using \code{color_by} or \code{shape_by}.}
+
+\item{color_by}{character string specifying which column to use to control 
+the color for plotting. NULL indicates the default value of the main effect 
+(if present). COLOR_BY_GROUP indicates the combination of both main 
+effects. COLOR_BY_NONE indicates no column will be used, and will use the 
+default theme color.}
+
+\item{shape_by}{character string specifying which column to use to control
+the shape for plotting. NULL indicates the default value of the second main
+effect (if present). SHAPE_BY_GROUP indicates the combination of both main 
+effects. SHAPE_BY_NONE indicates no column will be used, and will use the 
+default theme shape.}
 
 \item{interactive}{logical value. If TRUE produces an interactive plot.}
 
