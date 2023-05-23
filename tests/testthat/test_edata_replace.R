@@ -55,8 +55,6 @@ test_that('edata_replace correctly replaces one value with another',{
                attr(isodata2, 'cnames'))
   expect_equal(attr(isodata, 'isobaric_info'),
                attr(isodata2, 'isobaric_info'))
-  expect_equal(attr(isodata, 'check.names'),
-               attr(isodata2, 'check.names'))
   expect_equal(attr(isodata, 'meta_info'),
                attr(isodata2, 'meta_info'))
   expect_equal(attr(isodata, 'group_DF'),
@@ -112,8 +110,6 @@ test_that('edata_replace correctly replaces one value with another',{
   # Make sure all other attributes have not changed.
   expect_equal(attr(ldata, 'cnames'),
                attr(ldata2, 'cnames'))
-  expect_equal(attr(ldata, 'check.names'),
-               attr(ldata2, 'check.names'))
   expect_equal(attr(ldata, 'meta_info'),
                attr(ldata2, 'meta_info'))
   expect_equal(attr(ldata, 'group_DF'),
@@ -169,8 +165,6 @@ test_that('edata_replace correctly replaces one value with another',{
   # Make sure all other attributes have not changed.
   expect_equal(attr(mdata, 'cnames'),
                attr(mdata2, 'cnames'))
-  expect_equal(attr(mdata, 'check.names'),
-               attr(mdata2, 'check.names'))
   expect_equal(attr(mdata, 'meta_info'),
                attr(mdata2, 'meta_info'))
   expect_equal(attr(mdata, 'group_DF'),
@@ -218,8 +212,7 @@ test_that('edata_replace correctly replaces one value with another',{
                         e_meta = emeta,
                         edata_cname = 'Metabolite',
                         fdata_cname = 'SampleID',
-                        emeta_cname = 'nmrClass',
-                        check.names = FALSE)
+                        emeta_cname = 'nmrClass')
   
   # Replace NAs with 0s in nmrdata.
   expect_message(nmrdata2 <- edata_replace(omicsData = nmrdata,
@@ -247,8 +240,6 @@ test_that('edata_replace correctly replaces one value with another',{
                attr(nmrdata2, 'cnames'))
   expect_equal(attr(nmrdata, 'nmr_info'),
                attr(nmrdata2, 'nmr_info'))
-  expect_equal(attr(nmrdata, 'check.names'),
-               attr(nmrdata2, 'check.names'))
   expect_equal(attr(nmrdata, 'meta_info'),
                attr(nmrdata2, 'meta_info'))
   expect_equal(attr(nmrdata, 'group_DF'),
@@ -304,8 +295,6 @@ test_that('edata_replace correctly replaces one value with another',{
   # Make sure all other attributes have not changed.
   expect_equal(attr(pdata, 'cnames'),
                attr(pdata2, 'cnames'))
-  expect_equal(attr(pdata, 'check.names'),
-               attr(pdata2, 'check.names'))
   expect_equal(attr(pdata, 'meta_info'),
                attr(pdata2, 'meta_info'))
   expect_equal(attr(pdata, 'group_DF'),
@@ -361,8 +350,6 @@ test_that('edata_replace correctly replaces one value with another',{
   # Make sure all other attributes have not changed.
   expect_equal(attr(prdata, 'cnames'),
                attr(prdata2, 'cnames'))
-  expect_equal(attr(prdata, 'check.names'),
-               attr(prdata2, 'check.names'))
   expect_equal(attr(prdata, 'meta_info'),
                attr(prdata2, 'meta_info'))
   expect_equal(attr(prdata, 'group_DF'),

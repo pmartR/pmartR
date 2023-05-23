@@ -245,9 +245,11 @@ get_filter_type <- function (omicsData) {
   
 }
 
-#' Fetch the check.names attribute
+#' \bold{DEPRECATED}: Fetch the check.names attribute
 #' 
-#' Retrieves the value in the check.names attribute from an omicsData object.
+#' \emph{Retrieves the value in check.names attribute from an omicsData object.}
+#' \bold{This function has been deprecated in favor of handling checking names
+#' externally, and will always return FALSE.}
 #' 
 #' @param omicsData An object of class pepData, proData, metabData, lipidData,
 #'                  or nmrData.
@@ -255,11 +257,12 @@ get_filter_type <- function (omicsData) {
 #' @return A logical value indicating if the syntax of the column names in a
 #'         data frame should be checked. See \code{\link[base]{data.frame}} for
 #'         more details.
-#' 
+#'         
 #' @export
 #' @name get_check_names
 #' 
-get_check_names <- function (omicsData) {
+get_check_names <- function(omicsData) {
+  warning("get_check_names: function is deprecated")
   
   # Check class of omicsData.
   if (!inherits(omicsData, c("pepData",
@@ -276,9 +279,7 @@ get_check_names <- function (omicsData) {
     
   }
   
-  # Extract and return the check.names attribute.
-  return (attr(omicsData, 'check.names'))
-  
+  return(FALSE)
 }
 
 #' Fetch the isobaric_info attribute
@@ -862,9 +863,11 @@ set_filter <- function (type,
   
 }
 
-#' Set check.names attribute of omicsData object
+#' \bold{DEPRECATED}: Set check.names attribute of omicsData object
 #'
-#' This function sets the check.names attribute of an omicsData object
+#' \emph{This function sets the check.names attribute of an omicsData object.}
+#' \bold{This function has been deprecated in favor of handling checking names 
+#' externally and will return an unmodified omicsData.}
 #'
 #' @param omicsData an object of the class 'pepData', 'proData', 'metabData',
 #'   'lipidData', or 'nmrData', usually created by \code{\link{as.pepData}},
@@ -877,8 +880,9 @@ set_filter <- function (type,
 #'
 #' @export
 #' @name set_check_names
-#' 
+#'
 set_check_names <- function (omicsData, set_to = TRUE) {
+  warning("set_check_names: function is deprecated")
   
   # check that omicsData is of appropriate class #
   if(!inherits(omicsData, c("pepData", "proData", "metabData",
@@ -886,11 +890,6 @@ set_check_names <- function (omicsData, set_to = TRUE) {
     stop (paste("omicsData must be of class 'pepData', 'proData',",
                 "'metabData', 'lipidData', 'nmrData', or 'seqData'",
                 sep = " "))
-  
-  #check that set_to is logical
-  if(!is.logical(set_to)) stop ("set_to must be of class 'logical' ")
-  
-  attr(omicsData, "check.names") <- set_to
   
   return (omicsData)
   

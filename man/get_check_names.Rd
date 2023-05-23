@@ -2,7 +2,7 @@
 % Please edit documentation in R/helper_fn.R
 \name{get_check_names}
 \alias{get_check_names}
-\title{Fetch the check.names attribute}
+\title{\bold{DEPRECATED}: Fetch the check.names attribute}
 \usage{
 get_check_names(omicsData)
 }
@@ -16,5 +16,7 @@ A logical value indicating if the syntax of the column names in a
         more details.
 }
 \description{
-Retrieves the value in the check.names attribute from an omicsData object.
+\emph{Retrieves the value in check.names attribute from an omicsData object.}
+\bold{This function has been deprecated in favor of handling checking names
+externally, and will always return FALSE.}
 }

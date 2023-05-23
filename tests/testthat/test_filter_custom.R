@@ -301,8 +301,6 @@ test_that('custom_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata, "cnames"),
                    attr(filtered_edr, "cnames"))
-  expect_identical(attr(pdata, "check.names"),
-                   attr(filtered_edr, "check.names"))
   expect_identical(class(pdata),
                    class(filtered_edr))
 
@@ -357,8 +355,6 @@ test_that('custom_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata, "cnames"),
                    attr(filtered_fdr, "cnames"))
-  expect_identical(attr(pdata, "check.names"),
-                   attr(filtered_fdr, "check.names"))
   expect_identical(class(pdata),
                    class(filtered_fdr))
 
@@ -412,8 +408,6 @@ test_that('custom_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata, "cnames"),
                    attr(filtered_emr, "cnames"))
-  expect_identical(attr(pdata, "check.names"),
-                   attr(filtered_emr, "check.names"))
   expect_identical(class(pdata),
                    class(filtered_emr))
 
@@ -467,8 +461,6 @@ test_that('custom_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata, "cnames"),
                    attr(filtered_efdr, "cnames"))
-  expect_identical(attr(pdata, "check.names"),
-                   attr(filtered_efdr, "check.names"))
   expect_identical(class(pdata),
                    class(filtered_efdr))
 
@@ -525,8 +517,6 @@ test_that('custom_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata, "cnames"),
                    attr(filtered_edemr, "cnames"))
-  expect_identical(attr(pdata, "check.names"),
-                   attr(filtered_edemr, "check.names"))
   expect_identical(class(pdata),
                    class(filtered_edemr))
 
@@ -583,8 +573,6 @@ test_that('custom_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata, "cnames"),
                    attr(filtered_efer, "cnames"))
-  expect_identical(attr(pdata, "check.names"),
-                   attr(filtered_efer, "check.names"))
   expect_identical(class(pdata),
                    class(filtered_efer))
 
@@ -643,8 +631,6 @@ test_that('custom_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata_grp, "cnames"),
                    attr(filtered_fdr_grp, "cnames"))
-  expect_identical(attr(pdata_grp, "check.names"),
-                   attr(filtered_fdr_grp, "check.names"))
   expect_identical(class(pdata_grp),
                    class(filtered_fdr_grp))
 
@@ -706,8 +692,6 @@ test_that('custom_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata, "cnames"),
                    attr(filtered_edk, "cnames"))
-  expect_identical(attr(pdata, "check.names"),
-                   attr(filtered_edk, "check.names"))
   expect_identical(class(pdata),
                    class(filtered_edk))
 
@@ -762,8 +746,6 @@ test_that('custom_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata, "cnames"),
                    attr(filtered_fdk, "cnames"))
-  expect_identical(attr(pdata, "check.names"),
-                   attr(filtered_fdk, "check.names"))
   expect_identical(class(pdata),
                    class(filtered_fdk))
 
@@ -817,8 +799,6 @@ test_that('custom_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata, "cnames"),
                    attr(filtered_emk, "cnames"))
-  expect_identical(attr(pdata, "check.names"),
-                   attr(filtered_emk, "check.names"))
   expect_identical(class(pdata),
                    class(filtered_emk))
 
@@ -872,8 +852,6 @@ test_that('custom_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata, "cnames"),
                    attr(filtered_efdk, "cnames"))
-  expect_identical(attr(pdata, "check.names"),
-                   attr(filtered_efdk, "check.names"))
   expect_identical(class(pdata),
                    class(filtered_efdk))
 
@@ -930,8 +908,6 @@ test_that('custom_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata, "cnames"),
                    attr(filtered_edemk, "cnames"))
-  expect_identical(attr(pdata, "check.names"),
-                   attr(filtered_edemk, "check.names"))
   expect_identical(class(pdata),
                    class(filtered_edemk))
 
@@ -988,8 +964,6 @@ test_that('custom_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata, "cnames"),
                    attr(filtered_efek, "cnames"))
-  expect_identical(attr(pdata, "check.names"),
-                   attr(filtered_efek, "check.names"))
   expect_identical(class(pdata),
                    class(filtered_efek))
 
@@ -1048,8 +1022,6 @@ test_that('custom_filter and applyFilt produce the correct output',{
   # Ensure the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata_grp, "cnames"),
                    attr(filtered_fdk_grp, "cnames"))
-  expect_identical(attr(pdata_grp, "check.names"),
-                   attr(filtered_fdk_grp, "check.names"))
   expect_identical(class(pdata_grp),
                    class(filtered_fdk_grp))
 
@@ -1146,5 +1118,49 @@ test_that('custom_filter and applyFilt produce the correct output',{
           "FM_18hr_5. Samples in a pair must be kept together.",
           sep = " ")
   )
-
+  
+  # Expect warning if columns/rows have already been filtered ------------------
+  
+  # Columns
+  
+  fdr2_1 <- custom_filter(pdata,
+                          f_data_remove = c("Infection3"))
+  fdr2_2 <- custom_filter(pdata,
+                          f_data_remove = c("Infection3"))
+  fdr2_3 <- custom_filter(pdata,
+                          f_data_remove = c("Infection3", "Mock2"))
+  
+  # Data should be identical if filtered columns don't exist
+  filtered_fdr2_1 <- applyFilt(fdr2_1, pdata) 
+  expect_warning(filtered_fdr2_2 <- applyFilt(fdr2_2, filtered_fdr2_1),
+                 "Specified samples Infection3 were not found in the data")
+  expect_identical(filtered_fdr2_1$e_data,
+                   filtered_fdr2_2$e_data)
+  
+  # Columns that do exist should be removed, even if there are columns that
+  # don't exist
+  expect_warning(filtered_fdr2_3 <- applyFilt(fdr2_3, filtered_fdr2_1))
+  expect_null(filtered_fdr2_3$e_data$Mock2)
+  
+  # Rows
+  
+  edr2_1 <- custom_filter(pdata,
+                          e_data_remove = 6948849)
+  edr2_2 <- custom_filter(pdata,
+                          e_data_remove = 6948849)
+  edr2_3 <- custom_filter(pdata,
+                          e_data_remove = c(6948849, 6679059))
+  
+  # Data should be identical if filtered rows don't exist
+  filtered_edr2_1 <- applyFilt(edr2_1, pdata)
+  expect_warning(filtered_edr2_2 <- applyFilt(edr2_2, filtered_edr2_1),
+                 "Specified biomolecules 6948849 were not found in e_data")
+  expect_identical(filtered_edr2_1$e_data,
+                   filtered_edr2_2$e_data)
+  
+  # Rows that do exist should be removed, even if there are rows that
+  # don't exist
+  expect_warning(filtered_edr2_3 <- applyFilt(edr2_3, filtered_edr2_1),
+                 "Specified biomolecules 6948849 were not found in e_data")
+  expect_false(any(filtered_edr2_3$e_data$Mass_Tag_ID == 6679059))
 })

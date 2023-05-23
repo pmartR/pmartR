@@ -7,13 +7,15 @@ test_that('errors are thrown for bad data structures/values',{
   # Read csv created by Excel that contains values divided by zero and infinity.
   sour_grapes <- read.csv(system.file('testdata',
                                       'sour_grapes.csv',
-                                      package = 'pmartR'))
+                                      package = 'pmartR'),
+                          fileEncoding = 'UTF-8-BOM')
   
   # Read csv created by Excel that contains values divided by zero, infinity,
   # and NaN.
   sour_grapes_2 <- read.csv(system.file('testdata',
                                         'sour_grapes_2.csv',
-                                        package = 'pmartR'))
+                                        package = 'pmartR'),
+                            fileEncoding = 'UTF-8-BOM')
   
   set.seed(8346)
   

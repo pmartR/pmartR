@@ -7,7 +7,7 @@
 trelli_foldchange_bar(
   trelliData,
   cognostics = c("fold_change", "p_value"),
-  p_value_test = FALSE,
+  p_value_test = "anova",
   p_value_thresh = 0.05,
   ggplot_params = NULL,
   interactive = FALSE,
@@ -25,9 +25,8 @@ trelli_foldchange_bar(
 \item{cognostics}{A vector of cognostic options for each plot. Valid entries
 are are fold_change and p_value.}
 
-\item{p_value_test}{A logical to indicate whether specific significant
-biomolecules are to be incidated with a black outline, if an imd-anova was
-run. Default is FALSE.}
+\item{p_value_test}{A string to indicate which p_values to plot. Acceptable
+entries are "anova", "gtest", or NULL. Default is "anova".}
 
 \item{p_value_thresh}{A value between 0 and 1 to indicate significant
 biomolecules for p_value_test. Default is 0.05.}
@@ -63,11 +62,11 @@ Specify a plot design and cognostics for the fold_change
 
 ## Build fold_change bar plot with statRes data grouped by edata_colname.
 trelli_panel_by(trelliData = trelliData3, panel = "Lipid") \%>\% 
-  trelli_foldchange_bar(test_mode = TRUE, test_example = 1:10, p_value_test = TRUE)
+  trelli_foldchange_bar(test_mode = TRUE, test_example = 1:10, p_value_test = "anova")
   
 ## Or make the plot interactive  
 trelli_panel_by(trelliData = trelliData4, panel = "Lipid") \%>\% 
-  trelli_foldchange_bar(test_mode = TRUE, test_example = 1:10, p_value_test = TRUE, interactive = TRUE) 
+  trelli_foldchange_bar(test_mode = TRUE, test_example = 1:10, p_value_test = "gtest", interactive = TRUE) 
    
 }
 

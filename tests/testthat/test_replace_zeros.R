@@ -147,8 +147,7 @@ test_that('as.xxx correctly replaces missing values (0s) with NAs',{
                                        e_meta = emeta,
                                        edata_cname = 'Metabolite',
                                        fdata_cname = 'SampleID',
-                                       emeta_cname = 'nmrClass',
-                                       check.names = FALSE),
+                                       emeta_cname = 'nmrClass'),
                  '302 instances of 0 have been replaced with NA')
   
   # Check that the elements of the data_info attribute are all correct.

@@ -76,9 +76,7 @@ Objects of class 'metabData' contain some attributes that are
   list containing the normalization function, normalization subset and subset
   parameters, the location and scale parameters used to normalize the data,
   and the location and scale parameters used to backtransform the data (if
-  applicable). \cr \tab \cr data_types \tab Character string describing the type of data, most commonly used for lipidomic data (lipidData objects) or NMR data (nmrData objects) but available for other data classes as well. Default value is NULL. \cr \tab \cr
-  check.names \tab Logical defaults to TRUE. Indicates whether 'check.names'
-  attribute of returned omicsData object is TRUE or FALSE. \cr } Computed
+  applicable). \cr \tab \cr data_types \tab Character string describing the type of data, most commonly used for lipidomic data (lipidData objects) or NMR data (nmrData objects) but available for other data classes as well. Default value is NULL. \cr } Computed
   values included in the \code{data_info} attribute are as follows:
   \tabular{ll}{ num_edata \tab The number of unique \code{edata_cname}
   entries.\cr \tab \cr num_miss_obs \tab The number of missing

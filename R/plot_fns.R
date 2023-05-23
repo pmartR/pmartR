@@ -3830,7 +3830,7 @@ plot.rmdFilt <- function (filter_object, pvalue_threshold = NULL, sampleID = NUL
         # Create a logical vector that will determine the point shape.
         goodies_pch <- filter_object[, sample_name] %in% condemned
 
-      }
+      } else goodies_pch <- rep(FALSE, nrow(filter_object))
 
     } else {
 
