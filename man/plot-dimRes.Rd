@@ -33,15 +33,17 @@ fdata when using \code{color_by} or \code{shape_by}.}
 
 \item{color_by}{character string specifying which column to use to control 
 the color for plotting. NULL indicates the default value of the main effect 
-(if present). COLOR_BY_GROUP indicates the combination of both main 
-effects. COLOR_BY_NONE indicates no column will be used, and will use the 
-default theme color.}
+levels (if present). "Group" uses the "Group" column of group_DF. NA 
+indicates no column will be used, and will use the default theme color. If 
+an omicsData object is passed, any other value will use the specified 
+column of f_data.}
 
-\item{shape_by}{character string specifying which column to use to control
+\item{shape_by}{character string specifying which column to use to control 
 the shape for plotting. NULL indicates the default value of the second main
-effect (if present). SHAPE_BY_GROUP indicates the combination of both main 
-effects. SHAPE_BY_NONE indicates no column will be used, and will use the 
-default theme shape.}
+effect levels (if present). "Group" uses the "Group" column of group_DF. NA 
+indicates no column will be used, and will use the default theme shape. If 
+an omicsData object is passed, any other value will use the specified 
+column of f_data.}
 
 \item{interactive}{logical value. If TRUE produces an interactive plot.}
 

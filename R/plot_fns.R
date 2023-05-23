@@ -976,12 +976,13 @@ plot.SPANSRes <- function (SPANSRes_obj, interactive = FALSE,
 #'   (or non-missing if \code{nonmissing} is TRUE) to the total number of 
 #'   values. Only works with a plot type of 'bar'.
 #' @param order_by A character string specifying a column in f_data by which to
-#'   order the samples. The special value 'ORDER_BY_GROUP' will use the 
-#'   \code{group_DF} attribute to order the samples.
+#'   order the samples. Specifying "Group" will use the "Group" column of the
+#'   object's \code{group_DF} attribute to order the samples. Only works with a 
+#'   plot type of 'bar'.
 #' @param color_by A character string specifying a column in f_data by which to
-#'   color the bars or the points depending on the \code{plot_type}. The special
-#'   value 'COLOR_BY_GROUP' will use the \code{group_DF} attribute to order the
-#'   samples.
+#'   color the bars or the points depending on the \code{plot_type}. Specifying
+#'   "Group" will use the "Group" column of the object's \code{group_DF}
+#'   attribute to color the samples. Only works with a plot type of 'bar'.
 #' @param interactive logical value. If TRUE produces an interactive plot.
 #' @param x_lab_bar character string used for the x-axis label for the bar
 #'   plot
@@ -1112,24 +1113,24 @@ plot.naRes <- function (naRes_obj, omicsData, plot_type = "bar",
   }
 
   # Farm boy, make sure order_by exists in f_data. As you wish.
-  if (!is.null(order_by) && order_by != "ORDER_BY_GROUP") {
+  if (!is.null(order_by) && order_by != "Group") {
 
     if (!order_by %in% names(omicsData$f_data)) {
 
       # I'm a pmartR developer. You killed my plot. Prepare to receive an error.
-      stop ("order_by must be a column in f_data.")
+      stop ("order_by: column ", order_by, " not found in f_data.")
 
     }
 
   }
 
   # Farm boy, make sure color_by exists in f_data. As you wish.
-  if (!is.null(color_by) && color_by != "COLOR_BY_GROUP") {
+  if (!is.null(color_by) && color_by != "Group") {
     
     if (!color_by %in% names(omicsData$f_data)) {
 
       # Clearly you cannot choose a column name in f_data!
-      stop ("color_by must be a column in f_data.")
+      stop ("color_by: column ", color_by, "not found in f_data.")
 
     }
 
@@ -1173,7 +1174,7 @@ plot.naRes <- function (naRes_obj, omicsData, plot_type = "bar",
   # Check if order_by is NULL and update the plot_data object accordingly.
   if (!is.null(order_by)) {
 
-    if (order_by == "ORDER_BY_GROUP") {
+    if (order_by == "Group") {
       
       na.by.sample <- na.by.sample[order(attr(omicsData, 'group_DF')$Group), ]
       na.by.sample[[fdata_cname]] <- factor(
@@ -1200,9 +1201,9 @@ plot.naRes <- function (naRes_obj, omicsData, plot_type = "bar",
   # Check if color_by is NULL and update na.by.sample accordingly.
   if (!is.null(color_by)) {
 
-    if (color_by == "COLOR_BY_GROUP") {
+    if (color_by == "Group") {
       
-      na.by.sample[["COLOR_BY_GROUP"]] = factor(
+      na.by.sample[["Group"]] = factor(
         attr(omicsData, 'group_DF')$Group,
         levels = unique(attr(omicsData, 'group_DF')$Group)
       )
@@ -1353,7 +1354,7 @@ na_bar <- function (na.by.sample, x_lab_bar, y_lab_bar, x_lab_size, y_lab_size,
     ) else
       title_lab_bar
   legendLabelBar <- if (is.null(legend_lab_bar))
-    "Group" else
+    color_by else
       legend_lab_bar
 
   # Add labels to the plots. Even more tedious work to do. Will it ever end!?!
@@ -1833,14 +1834,16 @@ plot.corRes <- function (corRes_obj, omicsData = NULL, order_by = NULL,
 #'   fdata when using \code{color_by} or \code{shape_by}.
 #' @param color_by character string specifying which column to use to control 
 #'   the color for plotting. NULL indicates the default value of the main effect 
-#'   (if present). COLOR_BY_GROUP indicates the combination of both main 
-#'   effects. COLOR_BY_NONE indicates no column will be used, and will use the 
-#'   default theme color.
-#' @param shape_by character string specifying which column to use to control
+#'   levels (if present). "Group" uses the "Group" column of group_DF. NA 
+#'   indicates no column will be used, and will use the default theme color. If 
+#'   an omicsData object is passed, any other value will use the specified 
+#'   column of f_data.
+#' @param shape_by character string specifying which column to use to control 
 #'   the shape for plotting. NULL indicates the default value of the second main
-#'   effect (if present). SHAPE_BY_GROUP indicates the combination of both main 
-#'   effects. SHAPE_BY_NONE indicates no column will be used, and will use the 
-#'   default theme shape.
+#'   effect levels (if present). "Group" uses the "Group" column of group_DF. NA 
+#'   indicates no column will be used, and will use the default theme shape. If 
+#'   an omicsData object is passed, any other value will use the specified 
+#'   column of f_data.
 #' @param interactive logical value. If TRUE produces an interactive plot.
 #' @param x_lab character string specifying the x-axis label
 #' @param y_lab character string specifying the y-axis label. The default is
@@ -2046,32 +2049,46 @@ plot.dimRes <- function (dimRes_obj, omicsData = NULL,
   }
   
   if (!is.null(color_by)) {
-    if (color_by == "COLOR_BY_GROUP") {
-      if (is.null(attr(dimRes_obj,"group_DF"))) {
-        stop("COLOR_BY_GROUP is only valid if there is a group designation")
-      }
-      
+    if (is.na(color_by)) {
+      color_var <- NULL
+    } else if (color_by == "Group") {
       color_var <- "Group"
       display_names[1] <- "Group"
-    } else if (color_by == "COLOR_BY_NONE") {
-      color_var <- NULL
     } else {
+      if(is.null(omicsData)) {
+          stop("color_by value is invalid. Did you mean to add an omicsData?")
+      }
+      
+      if (!color_by %in% colnames(omicsData$f_data)) {
+        if (is.null(omicsData)) {
+        } else {
+          stop("color_by: column '", color_by, "' not found in f_data.")
+        }
+      }
+      
       color_var <- color_by
       display_names[1] <- color_by
     }
   }
   
   if (!is.null(shape_by)) {
-    if (shape_by == "SHAPE_BY_GROUP") {
-      if (is.null(attr(dimRes_obj,"group_DF"))) {
-        stop("SHAPE_BY_GROUP is only valid if there is a group designation")
-      }
-      
+    if (is.na(shape_by)) {
+      pch_var <- NULL
+    } else if (shape_by == "Group") {
       pch_var <- "Group"
       display_names[2] <- "Group"
-    } else if (shape_by == "SHAPE_BY_NONE") {
-      pch_var <- NULL
     } else {
+      if(is.null(omicsData)) {
+        stop("shape_by value is invalid. Did you mean to add an omicsData?")
+      }
+      
+      if (!shape_by %in% colnames(omicsData$f_data)) {
+        if (is.null(omicsData)) {
+        } else {
+          stop("shape_by: column '", shape_by, "' not found in f_data.")
+        }
+      }
+      
       pch_var <- shape_by
       display_names[2] <- shape_by
     }
