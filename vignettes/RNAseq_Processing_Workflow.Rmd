@@ -115,19 +115,19 @@ Transcripts can be removed from `seqData` objects using the molecule filter or t
 #### Total Count Filter
 
 The total count filter is specifically applicable to `seqData` objects, and is implemented in `pmartR` based
-on recommendations in edgeR processing [@edger], where the low-observed biomolecules are removed. Here we use the default recommendation in edgeR and require at least 10 total counts observed across samples. We plot the filter first without a `min_count` threshold, and then with our threshold of 10, so we can see how the application of the filter changes the observation density.
+on recommendations in edgeR processing [@edger], where the low-observed biomolecules are removed. Here we use the default recommendation in edgeR and require at least 15 total counts observed across samples. We plot the filter first without a `min_count` threshold, and then with our threshold of 15, so we can see how the application of the filter changes the observation density.
 
 ```{r}
 mytotcountfilt <- total_count_filter(omicsData = myseq)
-summary(mytotcountfilt, min_count = 10)
+summary(mytotcountfilt, min_count = 15)
 plot(mytotcountfilt)
-plot(mytotcountfilt, min_count = 10)
+plot(mytotcountfilt, min_count = 15)
 ```
 
 Once we are satified with the filter results, we apply the filter to the `seqData` object.
 
 ```{r}
-myseq <- applyFilt(filter_object = mytotcountfilt, omicsData = myseq, min_count = 10)
+myseq <- applyFilt(filter_object = mytotcountfilt, omicsData = myseq, min_count = 15)
 ```
 
 
