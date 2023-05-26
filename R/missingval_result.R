@@ -49,15 +49,19 @@ missingval_result<- function(omicsData){
   # Count the number of NA or zeros values per column.
   if(inherits(omicsData, "seqData")){
     res_per_col<- colSums((omicsData$e_data[, -edata_cname_id]) == 0)
+    res_per_col_non <- colSums((omicsData$e_data[, -edata_cname_id]) != 0)
     res_by_sample<- data.frame(
       "sample_names" = names(omicsData$e_data[, -edata_cname_id]),
-      "num_zeros" = as.numeric(res_per_col)
+      "num_zeros" = as.numeric(res_per_col),
+      "num_nonzeros" = as.numeric(res_per_col_non),
     )
   } else {
     res_per_col<- colSums(is.na(omicsData$e_data[, -edata_cname_id]))
+    res_per_col_non <- colSums(!is.na(omicsData$e_data[, -edata_cname_id]))
     res_by_sample<- data.frame(
       "sample_names" = names(omicsData$e_data[, -edata_cname_id]),
-      "num_NA" = as.numeric(res_per_col)
+      "num_NA" = as.numeric(res_per_col),
+      "num_non_NA" = as.numeric(res_per_col_non)
     )
   }
   
@@ -83,9 +87,11 @@ missingval_result<- function(omicsData){
   if(inherits(omicsData, "seqData")){
     
     res_per_row <- rowSums(omicsData$e_data[, -edata_cname_id] == 0)
+    res_per_row_non <- rowSums(omicsData$e_data[, -edata_cname_id] != 0)
     
     res_by_molecule <- data.frame("molecule"= omicsData$e_data[, edata_cname_id],
-                                 "num_zeros"= as.numeric(res_per_row))
+                                 "num_zeros"= as.numeric(res_per_row),
+                                 "num_nonzeros" = as.numeric(res_per_row_non))
     names(res_by_molecule)[1] <- edata_cname
     
     result<- list("zeros.by.sample" = res_by_sample,
@@ -98,8 +104,10 @@ missingval_result<- function(omicsData){
   } else {
     
     res_per_row <- rowSums(is.na(omicsData$e_data[, -edata_cname_id]))
+    res_per_row_non <- rowSums(!is.na(omicsData$e_data[, -edata_cname_id]))
     res_by_molecule <- data.frame("molecule"= omicsData$e_data[, edata_cname_id],
-                                 "num_NA"= as.numeric(res_per_row))
+                                 "num_NA"= as.numeric(res_per_row),
+                                 "num_non_NA" = as.numeric(res_per_row_non))
     names(res_by_molecule)[1] <- edata_cname
     
     result<- list("na.by.sample" = res_by_sample,
