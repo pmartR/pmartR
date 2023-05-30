@@ -82,7 +82,7 @@ For plotting an S3 object of type 'totalCountFilt':
 \dontrun{
 library(pmartRdata)
 seqfilt <- total_count_filter(omicsData = rnaseq_object)
-plot(seqfilt, min_count = 5)
+plot(seqfilt, min_count = 15)
 }
 
 }

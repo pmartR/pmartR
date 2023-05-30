@@ -213,8 +213,8 @@ molecule_filter <- function (omicsData, use_groups = FALSE, use_batch = FALSE) {
 #'
 #' @details Filter is based off of recommendations in edgeR processing, where 
 #' the low-observed biomolecules are removed from processing. Default 
-#' recommendation in edgeR is at least 10 total counts observed across samples 
-#' (i.e., if the sum of counts in a row of e_data is < 10, default edgeR 
+#' recommendation in edgeR is at least 15 total counts observed across samples 
+#' (i.e., if the sum of counts in a row of e_data is < 15, default edgeR 
 #' filtering would remove this biomolecule).
 #' 
 #' @references 
@@ -231,7 +231,7 @@ molecule_filter <- function (omicsData, use_groups = FALSE, use_batch = FALSE) {
 #' \dontrun{
 #' library(pmartRdata)
 #' to_filter <- total_count_filter(omicsData = rnaseq_object)
-#' summary(filter_object = to_filter, min_count = 10)
+#' summary(filter_object = to_filter, min_count = 15)
 #' }
 #' 
 #' @author Rachel Richardson

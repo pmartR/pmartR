@@ -273,7 +273,7 @@ print.RNAFiltSummary <- function(object){
 #' \dontrun{
 #' library(pmartRdata)
 #' myfilt <- total_count_filter(omicsData = rnaseq_object)
-#' summary(filter_object = myfilt, min_count = 2)
+#' summary(filter_object = myfilt, min_count = 15)
 #' }
 #' 
 #' @author Rachel Richardson
