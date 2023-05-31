@@ -2068,6 +2068,7 @@ plot.dimRes <- function (dimRes_obj, omicsData = NULL,
       
       color_var <- color_by
       display_names[1] <- color_by
+      plotdata[[color_by]] <- as.factor(plotdata[[color_by]])
     }
   }
   
@@ -2091,6 +2092,7 @@ plot.dimRes <- function (dimRes_obj, omicsData = NULL,
       
       pch_var <- shape_by
       display_names[2] <- shape_by
+      plotdata[[shape_by]] <- as.factor(plotdata[[shape_by]])
     }
   }
 
