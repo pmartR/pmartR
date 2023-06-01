@@ -1245,7 +1245,7 @@ plot.naRes <- function (naRes_obj, omicsData, plot_type = "bar",
   if (plot_type == "scatter") {
 
     p <- na_scatter(edata = edata, group_df = group_df,
-                    na.by.sample = na.by.sample,
+                    na.by.molecule = na.by.molecule,
                     edata_cname = edata_cname, edata_cname_id = edata_cname_id,
                     fdata_cname = fdata_cname, x_lab_scatter = x_lab_scatter,
                     y_lab_scatter = y_lab_scatter,
@@ -1399,7 +1399,7 @@ na_bar <- function (na.by.sample, x_lab_bar, y_lab_bar, x_lab_size, y_lab_size,
 
 }
 
-na_scatter <- function (edata, group_df, na.by.sample, edata_cname,
+na_scatter <- function (edata, group_df, na.by.molecule, edata_cname,
                         edata_cname_id, fdata_cname, x_lab_scatter,
                         y_lab_scatter, title_lab_scatter, legend_lab_scatter,
                         legend_position, title_lab_size, x_lab_size, y_lab_size,
@@ -1409,9 +1409,9 @@ na_scatter <- function (edata, group_df, na.by.sample, edata_cname,
 
   # Select missing/nonmissing
   if (nonmissing)
-    num_missing_vals <- na.by.sample$num_non_NA
+    num_missing_vals <- na.by.molecule$num_non_NA
   else
-    num_missing_vals <- na.by.sample$num_NA
+    num_missing_vals <- na.by.molecule$num_NA
   
   # More tedious label making.
   xLabelScatter <- if (is.null(x_lab_scatter))
