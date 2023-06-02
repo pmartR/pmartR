@@ -6531,14 +6531,18 @@ gtest_heatmap <-
                            color = "black")
 
       if(show_sig) {
-        p <- p + ggplot2::geom_point(
-          data = gtest_counts %>% dplyr::filter(sig),
-          ggplot2::aes(Count_First_Group, Count_Second_Group, shape = "1"),
-          fill = "white"
-        ) +
+        sig_data <- gtest_counts %>% dplyr::filter(sig)
+        
+        if(nrow(sig_data) > 0) {
+          p <- p + ggplot2::geom_point(
+            data = sig_data,
+            ggplot2::aes(Count_First_Group, Count_Second_Group, shape = "1"),
+            fill = "white"
+          ) +
           ggplot2::scale_shape_manual(name = "Statistically significant",
                                       labels = "",
                                       values = 21)
+        }
       }
 
       if(display_count) {
