@@ -53,7 +53,7 @@ missingval_result<- function(omicsData){
     res_by_sample<- data.frame(
       "sample_names" = names(omicsData$e_data[, -edata_cname_id]),
       "num_zeros" = as.numeric(res_per_col),
-      "num_nonzeros" = as.numeric(res_per_col_non),
+      "num_nonzeros" = as.numeric(res_per_col_non)
     )
   } else {
     res_per_col<- colSums(is.na(omicsData$e_data[, -edata_cname_id]))

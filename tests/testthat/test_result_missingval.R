@@ -28,9 +28,12 @@ test_that('missingval_result correctly counts missing values',{
   standard <- list(
     "na.by.sample" = data.frame("SampleID" = names(pdata$e_data)[-1],
                                 "num_NA" = as.numeric(count_col),
+                                "num_non_NA" = nrow(pdata$e_data) - as.numeric(count_col),
                                 "Condition" = pdata$f_data[, 2]),
     "na.by.molecule" = data.frame("Mass_Tag_ID" = pdata$e_data[, 1],
-                                  "num_NA" = as.numeric(count_row))
+                                  "num_NA" = as.numeric(count_row),
+                                  "num_non_NA" = nrow(pdata$f_data) - as.numeric(count_row)
+                                  )
   )
   
   # Add class and attribute crap to the standard.

@@ -1118,7 +1118,7 @@ plot.naRes <- function (naRes_obj, omicsData, plot_type = "bar",
     if (!order_by %in% names(omicsData$f_data)) {
 
       # I'm a pmartR developer. You killed my plot. Prepare to receive an error.
-      stop ("order_by: column ", order_by, " not found in f_data.")
+      stop ("order_by: column '", order_by, "' not found in f_data.")
 
     }
 
@@ -1130,7 +1130,7 @@ plot.naRes <- function (naRes_obj, omicsData, plot_type = "bar",
     if (!color_by %in% names(omicsData$f_data)) {
 
       # Clearly you cannot choose a column name in f_data!
-      stop ("color_by: column ", color_by, "not found in f_data.")
+      stop ("color_by: column '", color_by, "' not found in f_data.")
 
     }
 
@@ -1245,7 +1245,7 @@ plot.naRes <- function (naRes_obj, omicsData, plot_type = "bar",
   if (plot_type == "scatter") {
 
     p <- na_scatter(edata = edata, group_df = group_df,
-                    na.by.sample = na.by.sample,
+                    na.by.molecule = na.by.molecule,
                     edata_cname = edata_cname, edata_cname_id = edata_cname_id,
                     fdata_cname = fdata_cname, x_lab_scatter = x_lab_scatter,
                     y_lab_scatter = y_lab_scatter,
@@ -1399,7 +1399,7 @@ na_bar <- function (na.by.sample, x_lab_bar, y_lab_bar, x_lab_size, y_lab_size,
 
 }
 
-na_scatter <- function (edata, group_df, na.by.sample, edata_cname,
+na_scatter <- function (edata, group_df, na.by.molecule, edata_cname,
                         edata_cname_id, fdata_cname, x_lab_scatter,
                         y_lab_scatter, title_lab_scatter, legend_lab_scatter,
                         legend_position, title_lab_size, x_lab_size, y_lab_size,
@@ -1409,9 +1409,9 @@ na_scatter <- function (edata, group_df, na.by.sample, edata_cname,
 
   # Select missing/nonmissing
   if (nonmissing)
-    num_missing_vals <- na.by.sample$num_non_NA
+    num_missing_vals <- na.by.molecule$num_non_NA
   else
-    num_missing_vals <- na.by.sample$num_NA
+    num_missing_vals <- na.by.molecule$num_NA
   
   # More tedious label making.
   xLabelScatter <- if (is.null(x_lab_scatter))
@@ -2068,6 +2068,7 @@ plot.dimRes <- function (dimRes_obj, omicsData = NULL,
       
       color_var <- color_by
       display_names[1] <- color_by
+      plotdata[[color_by]] <- as.factor(plotdata[[color_by]])
     }
   }
   
@@ -2091,6 +2092,7 @@ plot.dimRes <- function (dimRes_obj, omicsData = NULL,
       
       pch_var <- shape_by
       display_names[2] <- shape_by
+      plotdata[[shape_by]] <- as.factor(plotdata[[shape_by]])
     }
   }
 
@@ -6529,14 +6531,18 @@ gtest_heatmap <-
                            color = "black")
 
       if(show_sig) {
-        p <- p + ggplot2::geom_point(
-          data = gtest_counts %>% dplyr::filter(sig),
-          ggplot2::aes(Count_First_Group, Count_Second_Group, shape = "1"),
-          fill = "white"
-        ) +
+        sig_data <- gtest_counts %>% dplyr::filter(sig)
+        
+        if(nrow(sig_data) > 0) {
+          p <- p + ggplot2::geom_point(
+            data = sig_data,
+            ggplot2::aes(Count_First_Group, Count_Second_Group, shape = "1"),
+            fill = "white"
+          ) +
           ggplot2::scale_shape_manual(name = "Statistically significant",
                                       labels = "",
                                       values = 21)
+        }
       }
 
       if(display_count) {
