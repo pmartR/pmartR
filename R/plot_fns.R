@@ -1118,7 +1118,7 @@ plot.naRes <- function (naRes_obj, omicsData, plot_type = "bar",
     if (!order_by %in% names(omicsData$f_data)) {
 
       # I'm a pmartR developer. You killed my plot. Prepare to receive an error.
-      stop ("order_by: column ", order_by, " not found in f_data.")
+      stop ("order_by: column '", order_by, "' not found in f_data.")
 
     }
 
@@ -1130,7 +1130,7 @@ plot.naRes <- function (naRes_obj, omicsData, plot_type = "bar",
     if (!color_by %in% names(omicsData$f_data)) {
 
       # Clearly you cannot choose a column name in f_data!
-      stop ("color_by: column ", color_by, "not found in f_data.")
+      stop ("color_by: column '", color_by, "' not found in f_data.")
 
     }
 
