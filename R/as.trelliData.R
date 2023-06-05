@@ -390,6 +390,9 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL, ...) {
     pvalue_cols <- colnames(statRes)[grepl("P_value", colnames(statRes))]
     fold_change_cols <- colnames(statRes)[grepl("Fold_change", colnames(statRes))]
     
+    # Change class to prevent dplyr issues
+    class(statRes) <- "data.frame"
+    
     # Pivot longer so that the first column is the edata_cname, extract comparison,
     # panel_by comparison, nest dataframes, and then extract the p_value and fold_change
     # for each group
@@ -419,6 +422,9 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL, ...) {
       trelliData.stat <- dplyr::left_join(trelliData.stat, emeta, by = emeta_cname)
       
     }
+    
+    # Fix statRes
+    class(statRes) <- c("data.frame", "statRes")
     
   } else {statRes <- NULL}
   
