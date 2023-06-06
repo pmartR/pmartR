@@ -678,7 +678,7 @@ plot.nmrnormRes <- function (nmrnormRes_obj, nmrData = NULL, order_by = NULL,
 
     # Farm boy, add a variable specifying the color for each point.
     data$Color <- factor(nmrData$f_data[[color_by]],
-                         levels = color_levels)
+                         levels = sort(color_levels))
 
   }
 
@@ -1215,7 +1215,7 @@ plot.naRes <- function (naRes_obj, omicsData, plot_type = "bar",
         unique(factor(omicsData$f_data[[color_by]])) else
           unique(factor(attr(omicsData, "group_DF")[["Group"]]))
       na.by.sample[[color_by]] <- factor(na.by.sample[[color_by]],
-                                         levels = color_levels)
+                                         levels = sort(color_levels))
     
     }
 
@@ -5599,7 +5599,7 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
       unique(factor(omicsData$f_data[[color_by]])) else
         unique(factor(attr(omicsData, "group_DF")[["Group"]]))
     plot_data[[color_by]] <- factor(plot_data[[color_by]],
-                                    levels = color_levels)
+                                    levels = sort(color_levels))
 
   }
 

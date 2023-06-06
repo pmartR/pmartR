@@ -424,7 +424,7 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL, ...) {
     }
     
     # Fix statRes
-    class(statRes) <- c("data.frame", "statRes")
+    class(statRes) <- c("statRes", "data.frame")
     
   } else {statRes <- NULL}
   
