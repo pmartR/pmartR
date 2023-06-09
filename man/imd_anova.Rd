@@ -54,6 +54,8 @@ to no p-value adjustment.}
 \item{pval_thresh}{numeric p-value threshold, below or equal to which
 biomolecules are considered differentially expressed. Defaults to 0.05}
 
+\item{equal_var}{logical; should the variance across groups be assumed equal?}
+
 \item{parallel}{logical value indicating whether or not to use a
 "doParallel" loop when running the G-Test with covariates. Defaults to
 TRUE.}

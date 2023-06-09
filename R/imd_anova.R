@@ -30,6 +30,7 @@
 #'   to no p-value adjustment.
 #' @param pval_thresh numeric p-value threshold, below or equal to which
 #'   biomolecules are considered differentially expressed. Defaults to 0.05
+#' @param equal_var logical; should the variance across groups be assumed equal?
 #' @param parallel logical value indicating whether or not to use a
 #'   "doParallel" loop when running the G-Test with covariates. Defaults to
 #'   TRUE.
@@ -249,7 +250,7 @@ imd_anova <- function(omicsData,
     ),
     silent = TRUE
   )
-  if (class(pval_adjust_a_multcomp) == 'try-error') {
+  if (inherits(pval_adjust_a_multcomp, 'try-error')) {
     # I clearly told you what you could choose from in the documentation.
     # Obviously it is too much to ask for you to read the instructions!
     stop(
@@ -266,7 +267,7 @@ imd_anova <- function(omicsData,
     ),
     silent = TRUE
   )
-  if (class(pval_adjust_g_multcomp) == 'try-error') {
+  if (inherits(pval_adjust_a_multcomp, 'try-error')) {
     # I cannot make this any easier for you. Please seek the help you
     # desperately need.
     stop(

@@ -5984,7 +5984,7 @@ plot.statRes <- function(x,
     ),
     silent = TRUE
   )
-  if (class(plt_tyj) == 'try-error') {
+  if (inherits(plt_tyj, 'try-error')) {
     warning(paste0(
       "Plot type '",
       plot_type,

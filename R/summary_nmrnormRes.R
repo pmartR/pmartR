@@ -2,7 +2,7 @@
 #'
 #' For creating a summary of an S3 object of type 'nmrnormRes'
 #'
-#' @param nmrnormRes_object object of type nmrnormRes, created by
+#' @param object object of type nmrnormRes, created by
 #'   \code{\link{normalize_nmr}}
 #' @param ... further arguments passed to or from other methods.
 #'

@@ -71,6 +71,8 @@ usually created by \code{\link{as.pepData}}, \code{\link{as.proData}},
 \code{\link{as.nmrData}}, or \code{\link{as.seqData}}, respectively.}
 
 \item{...}{further arguments}
+
+\item{min_num, min_count, min_nonzero, size_library, cv_threshold, pvalue_threshold, min_num_biomolecules, min_num_peps, redundancy, comparisons, min_nonmiss_anova, min_nonmiss_gtest, remove_singleton_groups}{Arguments that depend on the class of \code{filter_object}, see details.}
 }
 \value{
 An object of the class \code{pepData}, \code{proData},

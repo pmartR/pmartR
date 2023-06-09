@@ -103,7 +103,7 @@ protein_quant <- function(pepData, method, isoformRes = NULL,
     message("qrollup_thresh argument will be ignored, as it is only applicable if method is qrollup")
 
   # Check if isoformRes is actually and isoformRes.
-  if (!is.null(isoformRes) && class(isoformRes) != "isoformRes") {
+  if (!is.null(isoformRes) && !inherits(isoformRes, "isoformRes")) {
     stop("The input for isoformRes must be of class 'isoformRes'.")
   }
 

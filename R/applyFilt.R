@@ -18,7 +18,9 @@
 #'   \code{\link{as.lipidData}}, \code{\link{as.metabData}},
 #'   \code{\link{as.nmrData}}, or \code{\link{as.seqData}}, respectively.
 #' @param ... further arguments
-#'
+#' @param min_num,min_count,min_nonzero,size_library,cv_threshold,pvalue_threshold,min_num_biomolecules,min_num_peps,redundancy,comparisons,min_nonmiss_anova,min_nonmiss_gtest,remove_singleton_groups 
+#'   Arguments that depend on the class of \code{filter_object}, see details.
+#' 
 #' @return An object of the class \code{pepData}, \code{proData},
 #'   \code{lipidData}, \code{metabData}, \code{nmrData}, or \code{seqData} with
 #'   specified cname_ids, edata_cnames, and emeta_cnames filtered out of the
@@ -1262,7 +1264,7 @@ applyFilt.imdanovaFilt <- function(filter_object,
   }
 
   # verify remove_singleton_groups is logical T/F #
-  if (class(remove_singleton_groups) != "logical") {
+  if (!inherits(remove_singleton_groups, "logical")) {
     # Stop the illogical user in their tracks for using illogical inputs.
     stop("remove_singleton_groups must be TRUE or FALSE")
   }
@@ -1297,7 +1299,7 @@ applyFilt.imdanovaFilt <- function(filter_object,
   # Check that comparisons is a data frame with appropriate group names.
   if (!is.null(comparisons)) {
     # Check that comparisons is a data frame.
-    if (class(comparisons) != "data.frame") {
+    if (!inherits(comparisons, "data.frame")) {
       # I am at a loss for words. That doesn't happen very often when I am
       # writing comments in my code.
       stop("comparisons must be a data frame.")

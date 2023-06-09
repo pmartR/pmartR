@@ -609,27 +609,13 @@ get_emeta_cname <- function(omicsObject) {
 
 #' Sets/updates the values in the data_info attribute
 #'
-#' @param e_data
+#' @param e_data,edata_cname,data_scale_orig,data_scale,data_types,norm_info,is_normalized,batch_info,is_bc 
+#'  See the \code{as.omicsData} functions, e.g. \code{\link{as.lipidData}}
 #'
-#' @param edata_cname
+#' @return A list of edited data_info to replace the attribute in the
+#'  omicsData object.
 #'
-#' @param data_scale_orig
-#'
-#' @param data_scale
-#'
-#' @param data_types
-#'
-#' @param norm_info
-#'
-#' @param is_normalized
-#'
-#' @param batch_info
-#'
-#' @param is_bc
-#'
-#' @return A list containing all the elements in the data_info attribute:
-#'        (list all attributes)
-#'
+#' @keywords internal 
 set_data_info <- function(e_data,
                           edata_cname,
                           data_scale_orig,
@@ -697,12 +683,13 @@ set_data_info <- function(e_data,
 
 #' Sets/updates the values in the meta_info attribute
 #'
-#' @param e_meta
-#'
-#' @param emeta_cname
+#' @param e_meta,emeta_cname See the \code{as.omicsData} functions, e.g. 
+#'  \code{\link{as.lipidData}} 
 #'
 #' @return A list containing all the elements in the meta_info attribute:
 #'        (list all attributes)
+#' 
+#' @keywords internal
 #'
 set_meta_info <- function(e_meta,
                           emeta_cname) {
@@ -729,23 +716,12 @@ set_meta_info <- function(e_meta,
 
 #' Sets/updates the values in the isobaric_info attribute.
 #'
-#' @param exp_cname
-#'
-#' @param channel_cname
-#'
-#' @param refpool_channel
-#'
-#' @param refpool_cname
-#'
-#' @param refpool_notation
-#'
-#' @param norm_info
-#'
-#' @param isobaric_norm
+#' @param exp_cname,channel_cname,refpool_channel,refpool_cname,refpool_notation,norm_info,isobaric_norm See \code{\link{normalize_isobaric}}
 #'
 #' @return A list containing all the elements in the isobaric_info attribute:
 #'         (list all attributes)
 #'
+#' @keywords internal
 set_isobaric_info <- function(exp_cname,
                               channel_cname,
                               refpool_channel,
@@ -781,6 +757,8 @@ set_isobaric_info <- function(exp_cname,
 #'
 #' @return A list containing all the elements in the nmr_info attribute:
 #'         (list all attributes)
+#' 
+#' @keywords internal
 #'
 set_nmr_info <- function(metabolite_name,
                          sample_property_cname,
@@ -806,17 +784,19 @@ set_nmr_info <- function(metabolite_name,
 #' object will be appended to the list in the filters attribute for an omicsData
 #' object.
 #'
-#' @param type
+#' @param type The type of filter, see \code{filter_objects.R}
 #'
-#' @param threshold
+#' @param threshold The threshold for filtering applied, if applicable.
 #'
-#' @param filtered
+#' @param filtered The samples/biomolecules that are filtered.
 #'
-#' @param method
+#' @param method A list of metadata about what method was used in applying the 
+#'  filter.
 #'
 #' @return A list containing all the elements in the filters attribute:
 #'         (list all attributes)
-#'
+#' 
+#' @keywords internal
 set_filter <- function(type,
                        threshold,
                        filtered,

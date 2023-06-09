@@ -7,9 +7,8 @@
 set_meta_info(e_meta, emeta_cname)
 }
 \arguments{
-\item{e_meta}{}
-
-\item{emeta_cname}{}
+\item{e_meta, emeta_cname}{See the \code{as.omicsData} functions, e.g. 
+\code{\link{as.lipidData}}}
 }
 \value{
 A list containing all the elements in the meta_info attribute:
@@ -18,3 +17,4 @@ A list containing all the elements in the meta_info attribute:
 \description{
 Sets/updates the values in the meta_info attribute
 }
+\keyword{internal}

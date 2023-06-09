@@ -30,3 +30,4 @@ A list containing all the elements in the nmr_info attribute:
 \description{
 Sets/updates the values in the nmr_info attribute.
 }
+\keyword{internal}
