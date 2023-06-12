@@ -97,15 +97,22 @@ test_that('plot functions are producing desired output',{
   expect_doppelganger("plot.dataRes (bw_theme)", plot(result, bw_theme = TRUE))
   
   ## Test plot.naRes -----------------------------------------------------------
-  
   mylipid <- group_designation(omicsData = lipid_pos_object, main_effects = "Condition")
   result <- missingval_result(omicsData = mylipid)
-  expect_doppelganger("plot.naRes (bar)", 
+  expect_doppelganger("plot.naRes (bar, group color)", 
                       plot(naRes_obj = result, 
                            omicsData = mylipid,
                            plot_type = "bar", 
                            x_lab_angle = 50, 
                            order_by = "Condition", 
+                           color_by = "Group")
+  )
+  expect_doppelganger("plot.naRes (bar, group order)", 
+                      plot(naRes_obj = result, 
+                           omicsData = mylipid,
+                           plot_type = "bar", 
+                           x_lab_angle = 50, 
+                           order_by = "Group", 
                            color_by = "Condition")
   )
   expect_doppelganger("plot.naRes (scatter)", 

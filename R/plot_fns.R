@@ -678,7 +678,7 @@ plot.nmrnormRes <- function (nmrnormRes_obj, nmrData = NULL, order_by = NULL,
 
     # Farm boy, add a variable specifying the color for each point.
     data$Color <- factor(nmrData$f_data[[color_by]],
-                         levels = color_levels)
+                         levels = sort(color_levels))
 
   }
 
@@ -1175,8 +1175,7 @@ plot.naRes <- function (naRes_obj, omicsData, plot_type = "bar",
   if (!is.null(order_by)) {
 
     if (order_by == "Group") {
-      
-      na.by.sample <- na.by.sample[order(attr(omicsData, 'group_DF')$Group), ]
+      na.by.sample <- na.by.sample[order(na.by.sample$Group), ]
       na.by.sample[[fdata_cname]] <- factor(
         na.by.sample[[fdata_cname]],
         levels = na.by.sample[[fdata_cname]],
@@ -1200,25 +1199,12 @@ plot.naRes <- function (naRes_obj, omicsData, plot_type = "bar",
 
   # Check if color_by is NULL and update na.by.sample accordingly.
   if (!is.null(color_by)) {
-
-    if (color_by == "Group") {
-      
-      na.by.sample[["Group"]] = factor(
-        attr(omicsData, 'group_DF')$Group,
-        levels = unique(attr(omicsData, 'group_DF')$Group)
-      )
-      
-    } else {
-      
-      # Create factors to color by according to the input of color_by.
-      color_levels <- if (color_by != "Group")
-        unique(factor(omicsData$f_data[[color_by]])) else
-          unique(factor(attr(omicsData, "group_DF")[["Group"]]))
-      na.by.sample[[color_by]] <- factor(na.by.sample[[color_by]],
-                                         levels = color_levels)
-    
-    }
-
+    # Create factors to color by according to the input of color_by.
+    color_levels <- if (color_by != "Group")
+      unique(factor(omicsData$f_data[[color_by]])) else
+        unique(factor(attr(omicsData, "group_DF")[["Group"]]))
+    na.by.sample[[color_by]] <- factor(na.by.sample[[color_by]],
+                                       levels = sort(color_levels))
   }
 
   # Fashion astonishing plots --------------------------------------------------
@@ -5599,7 +5585,7 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
       unique(factor(omicsData$f_data[[color_by]])) else
         unique(factor(attr(omicsData, "group_DF")[["Group"]]))
     plot_data[[color_by]] <- factor(plot_data[[color_by]],
-                                    levels = color_levels)
+                                    levels = sort(color_levels))
 
   }
 
