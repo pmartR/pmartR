@@ -139,7 +139,6 @@ as.multiData <-
         prefix = " ", initial = ""
       ))
     }
-    ##
 
     obj_types <- sapply(omicsData_objects, class)
 
@@ -258,7 +257,6 @@ as.multiData <-
         dplyr::select(fmeta_cnames)
     }
 
-    #
     if (sample_intersect) {
       allsamps <- unique(unlist(f_meta[, fmeta_cnames]))
       allsamps <- allsamps[!is.na(allsamps)]

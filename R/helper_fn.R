@@ -361,8 +361,9 @@ get_isobaric_norm <- function(omicsData) {
 #' @name get_nmr_info
 #'
 get_nmr_info <- function(omicsData) {
-  ###################################### should we add "nmrnormRes" objects? ###########
-  #### should this be restricted to nmr class?  should we open up other calls to all classes? ########
+  ############################## should we add "nmrnormRes" objects? ###########
+  #### should this be restricted to nmr class?  
+  #### should we open up other calls to all classes? ########
 
   # Check class of omicsData.
   if (!inherits(omicsData, c(
@@ -901,7 +902,8 @@ get_comparisons <- function(compObj) {
     stop("object must be of class 'statRes' or 'trelliData'")
 
   # check that compObj object is of 'statRes' or 'trelliData' class
-  if (inherits(compObj, "trelliData") && is.null(attr(compObj, "comparisons"))) {
+  if (inherits(compObj, "trelliData") && 
+      is.null(attr(compObj, "comparisons"))) {
     return(NULL)
   } else {
     # pull comparisons attribute

@@ -253,14 +253,26 @@ DESeq2_wrapper <- function(omicsData, test = "Wald", p_adjust = "BH",
     test = test, ## reasonable to allow change in pmartR
     fitType = "parametric", # fitting of dispersions to the mean intensity
     quiet = TRUE,
-    minReplicatesForReplace = Inf, ## cook's distance used to flag outliers, require at least n replicates to replace flagged outliers-- defined as .99 quantile of the F(p, m - p) distribution, where p is the number of parameters and m is the number of samples. Replacement is values predicted by the trimmed mean over all samples (and adjusted by size factor or normalization factor). Inf disables replacement
-    modelMatrixType = "standard", ## If we need anything fancier than what is defined by "Group" we should consider this argument for the glm use case -- betapriors req for expanded
+    minReplicatesForReplace = Inf, ## cook's distance used to flag outliers, 
+                                   ## require at least n replicates to replace
+                                   ## flagged outliers-- defined as .99 quantile
+                                   ## of the F(p, m - p) distribution, where p 
+                                   ## is the number of parameters and m is the 
+                                   ## number of samples. Replacement is values 
+                                   ## predicted by the trimmed mean over all 
+                                   ## samples (and adjusted by size factor or 
+                                   ## normalization factor). Inf disables 
+                                   ## replacement
+    modelMatrixType = "standard", ## If we need anything fancier than what is 
+                                  ## defined by "Group" we should consider this 
+                                  ## argument for the glm use case -- betapriors
+                                  ## req for expanded
     parallel = TRUE,
 
     ## Waldy
-    betaPrior = F,
+    betaPrior = FALSE,
     # whether or not to put a zero-mean normal prior on the non-intercept coefficients See nbinomWaldTest for description of the calculation of the beta prior.In versions >=1.16, the default is set to FALSE, and shrunken LFCs are obtained afterwards using lfcShrink.
-    useT = F ## only for waldtest, uses a t-distribution instead of a normal distribution)
+    useT = FALSE ## only for waldtest, uses a t-distribution instead of a normal distribution)
   )
 
   run_deseq <- c(DESeq_args, list_defaults)
@@ -287,7 +299,7 @@ DESeq2_wrapper <- function(omicsData, test = "Wald", p_adjust = "BH",
     independentFiltering = FALSE,
     pAdjustMethod = p_adjust,
     tidy = TRUE,
-    parallel = T
+    parallel = TRUE
   )
 
   run_results <- c(results_args, list_defaults)

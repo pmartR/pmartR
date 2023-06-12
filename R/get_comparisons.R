@@ -33,18 +33,24 @@
 #' @export
 create_comparisonDF <- function(comp_type, omicsData, control_group = NULL) {
   # check that omicsData is of the appropriate class
-  if (!inherits(omicsData, c("proData", "pepData", "lipidData", "metabData", "nmrData", "seqData"))) stop("omicsData is not an object of appropriate class")
+  if (!inherits(omicsData, 
+                c("proData", "pepData", "lipidData", "metabData", 
+                  "nmrData", "seqData"))) {
+    stop("omicsData is not an object of appropriate class")
+  }
 
   # Check for group_DF attribute #
   if (is.null(attr(omicsData, "group_DF"))) {
-    stop("group_designation must be called in order to create a 'group_DF' attribute for omicsData.")
+    stop("group_designation must be called in order to create a 'group_DF' ",
+         "attribute for omicsData.")
   } else {
     # group_data <- attr(omicsData, "group_DF")
     group_data <- get_group_DF(omicsData)
   }
 
   # do we even run this if they want custom groups?
-  # need to address the order of the factor levels somewhere...maybe not in this function, but somewhere...
+  # need to address the order of the factor levels somewhere...
+  #   maybe not in this function, but somewhere...
 
 
   ## initial checks ##
@@ -53,11 +59,13 @@ create_comparisonDF <- function(comp_type, omicsData, control_group = NULL) {
   }
 
   if (comp_type == "control" & is.null(control_group)) {
-    stop("A control_group must be specified when comp_type is set to 'control'.")
+    stop("A control_group must be specified when comp_type is set to ",
+         "'control'.")
   }
 
   # if(comp_type=="control" & (table(group_data$Group)[control_group]<2)){
-  #  stop("The control_group selected has fewer than two subjects and cannot be used.")
+  #  stop("The control_group selected has fewer than two subjects and cannot ",
+  #       "be used.")
   # }
 
   ## end of initial checks ##

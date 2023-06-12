@@ -398,7 +398,7 @@ applyFilt.totalCountFilt <- function(filter_object, omicsData, min_count, ...) {
       covariates = names(attr(
         get_group_DF(omicsData),
         "covariates"
-      ))[-1],
+      ))[-1]
       # time_course = attr(get_group_DF(omicsData),
       #                   "time_course")
     )
@@ -568,7 +568,7 @@ applyFilt.RNAFilt <- function(filter_object,
       covariates = names(attr(
         get_group_DF(omicsData),
         "covariates"
-      ))[-1],
+      ))[-1]
       # time_course = attr(get_group_DF(omicsData),
       #                   "time_course")
     )

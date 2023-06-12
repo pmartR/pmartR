@@ -1027,7 +1027,10 @@ print.cvFilterSummary <- function(x, ...) {
   object <- x
 
   # create output #
-  cat(c("\nSummary of Coefficient of Variation (CV) Filter\n----------------------\nCVs:\n", capture.output(object$CVs)), sep = "\n")
+  cat(c("\nSummary of Coefficient of Variation (CV) ",
+        "Filter\n----------------------\nCVs:\n",
+        capture.output(object$CVs)),
+      sep = "\n")
   if (!is.null(object$tot_NAs)) {
     cat(c("\nTotal NAs:", object$tot_NAs))
     cat(c("\nTotal Non-NAs:", object$tot_non_NAs, "\n"))
@@ -1035,7 +1038,8 @@ print.cvFilterSummary <- function(x, ...) {
     cat(c("\nTotal zeros:", object$tot_zeros))
     cat(c("\nTotal Non-zeros:", object$tot_non_zeros, "\n"))
   }
-  cat(c("\nNumber Filtered Biomolecules:", paste(object$filtered_biomolecules, collapse = ", "), "\n\n"))
+  cat(c("\nNumber Filtered Biomolecules:", 
+        paste(object$filtered_biomolecules, collapse = ", "), "\n\n"))
 }
 
 
@@ -1122,7 +1126,9 @@ summary.customFilt <- function(object, ...) {
         emeta_filt <- length(filter_object$e_meta_remove)
         emeta_left <- num_emeta - emeta_filt
       } else {
-        emeta_filt <- num_emeta - length(unique(filtered_data$e_meta[, emeta_id]))
+        emeta_filt <- num_emeta - length(
+          unique(filtered_data$e_meta[, emeta_id])
+        )
         emeta_left <- length(unique(filtered_data$e_meta[, emeta_id]))
       }
     }
@@ -1158,7 +1164,9 @@ summary.customFilt <- function(object, ...) {
         emeta_filt <- num_emeta - emeta_left
       } else {
         emeta_left <- length(unique(filtered_data$e_meta[, emeta_id]))
-        emeta_filt <- num_emeta - length(unique(filtered_data$e_meta[, emeta_id]))
+        emeta_filt <- num_emeta - length(
+          unique(filtered_data$e_meta[, emeta_id])
+        )
       }
     }
 
