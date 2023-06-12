@@ -16,9 +16,10 @@ test_that('plotting errors are triggered correctly', {
 
   err_1 <- "lkpm is not a valid option for 'transformation'"
   err_2 <- "log is not a valid option for 'transformation'. "
-  err_3 <- "unused argument" ## maybe change to be more specific?
 
   testthat::expect_error(plot(myseqData, transformation = "lkpm"), err_1)
   testthat::expect_error(plot(myseqData, transformation = "log"), err_2)
-  testthat::expect_error(plot(pmartRdata::isobaric_object, transformation = "lcpm"), err_3)
+  
+  # "unused argument(s): lcpm"
+  testthat::expect_warning(plot(pmartRdata::isobaric_object, transformation = "lcpm")) 
 })
