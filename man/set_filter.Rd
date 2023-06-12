@@ -7,7 +7,7 @@
 set_filter(type, threshold, filtered, method)
 }
 \arguments{
-\item{type}{The type of filter, see \link{filter_objects}}
+\item{type}{The type of filter, see \code{filter_objects.R}}
 
 \item{threshold}{The threshold for filtering applied, if applicable.}
 
