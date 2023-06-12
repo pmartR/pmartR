@@ -450,7 +450,7 @@ protein_quant <- function(pepData, method, isoformRes = NULL,
 pquant <- function(pepData, combine_fn) {
   # check that pepData is of appropraite class #
   if (!inherits(pepData, "pepData")) {
-    stop("pepData is not an object of the appropriate class")
+    stop("pepData must be an object of class 'pepData'")
   }
 
   # check that a protein mapping is provided #

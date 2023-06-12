@@ -103,7 +103,7 @@ as.multiData <-
           sprintf(
             "Object was expected to have one of type 'pepData', 'proData',
                 'metabData','lipidData', or 'nmrData', but was of type %s",
-            paste(class(obj), collapse = ", ")
+            toString(class(obj))
           ),
           prefix = " ", initial = ""
         ))
