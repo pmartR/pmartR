@@ -10,6 +10,12 @@
 print.pepData <- function(x, ...) {
   pepData <- x
 
+  # Make sure we only have valid arguments
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
+  }
+  
   if (!inherits(pepData, "pepData")) stop("pep_object must be of the class 'pepData'")
 
   e_data <- as.data.frame(lapply(pepData$e_data, as.character), stringsAsFactors = FALSE, check.names = FALSE)
@@ -101,6 +107,12 @@ print.pepData <- function(x, ...) {
 print.metabData <- function(x, ...) {
   metabData <- x
 
+  # Make sure we only have valid arguments
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
+  }
+  
   if (!inherits(metabData, "metabData")) stop("metab_object must be of the class 'metabData'")
 
   e_data <- as.data.frame(lapply(metabData$e_data, as.character), stringsAsFactors = FALSE, check.names = FALSE)
@@ -192,6 +204,12 @@ print.metabData <- function(x, ...) {
 print.proData <- function(x, ...) {
   proData <- x
 
+  # Make sure we only have valid arguments
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
+  }
+  
   if (!inherits(proData, "proData")) stop("pro_object must be of the class 'proData'")
 
   e_data <- as.data.frame(lapply(proData$e_data, as.character), stringsAsFactors = FALSE, check.names = FALSE)
@@ -283,6 +301,12 @@ print.proData <- function(x, ...) {
 print.lipidData <- function(x, ...) {
   lipidData <- x
 
+  # Make sure we only have valid arguments
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
+  }
+  
   if (!inherits(lipidData, "lipidData")) stop("lipid_object must be of the class 'lipidData'")
 
   e_data <- as.data.frame(lapply(lipidData$e_data, as.character), stringsAsFactors = FALSE, check.names = FALSE)
@@ -374,6 +398,12 @@ print.lipidData <- function(x, ...) {
 print.seqData <- function(x, ...) {
   seqData <- x
 
+  # Make sure we only have valid arguments
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
+  }
+  
   if (!inherits(seqData, "seqData")) stop("lipid_object must be of the class 'seqData'")
 
   e_data <- as.data.frame(lapply(seqData$e_data, as.character), stringsAsFactors = FALSE, check.names = FALSE)
@@ -466,6 +496,12 @@ print.seqData <- function(x, ...) {
 print.dataRes <- function(x, ...) {
   dataRes <- x
 
+  # Make sure we only have valid arguments
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
+  }
+  
   if ((!is.null(attr(dataRes, "groupvar")) & attr(dataRes, "by") == "molecule") | (is.null(attr(dataRes, "groupvar")) & !is.null(attr(dataRes, "group_DF")) & (attr(dataRes, "by") == "molecule"))) {
     # extract item from dataRes, n_per_grp
     n_per_grp <- as.data.frame(lapply(dataRes$n_per_grp, as.character), stringsAsFactors = FALSE)
@@ -731,6 +767,12 @@ print.dataRes <- function(x, ...) {
 print.normRes <- function(x, ...) {
   normRes <- x
 
+  # Make sure we only have valid arguments
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
+  }
+  
   attr(normRes, "class") <- NULL
   attr(normRes, "omicsData") <- NULL
 

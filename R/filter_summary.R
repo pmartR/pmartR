@@ -31,6 +31,12 @@
 summary.moleculeFilt <- function(object, min_num = NULL, ...) {
   filter_object <- object
 
+  # Make sure we only have valid arguments
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
+  }
+  
   if (!is.null(min_num)) {
     # check that min_num is not a vector #
     if (length(min_num) > 1) stop("min_num must be of length 1")
@@ -85,6 +91,12 @@ summary.moleculeFilt <- function(object, min_num = NULL, ...) {
 print.moleculeFilterSummary <- function(x, ...) {
   object <- x
 
+  # Make sure we only have valid arguments
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
+  }
+  
   # create output #
   cat("\nSummary of Molecule Filter \n----------------------------------\n")
   if (attr(object, "use_batch") & !attr(object, "use_groups")) {
@@ -141,6 +153,12 @@ summary.RNAFilt <- function(object,
                             ...) {
   filter_object <- object
 
+  # Make sure we only have valid arguments
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
+  }
+  
   # Have a looksie at the class of the filter object.
   if (!inherits(filter_object, "RNAFilt")) {
     # Fezzik, tear his arms off.
@@ -235,6 +253,12 @@ summary.RNAFilt <- function(object,
 print.RNAFiltSummary <- function(x, ...) {
   object <- x
 
+  # Make sure we only have valid arguments
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
+  }
+  
   # create output #
   cat("\nSummary of RNA Filter \n----------------------------------\n")
 
@@ -302,6 +326,12 @@ print.RNAFiltSummary <- function(x, ...) {
 summary.totalCountFilt <- function(object, min_count = NULL, ...) {
   filter_object <- object
 
+  # Make sure we only have valid arguments
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
+  }
+  
   # checks for cv_threshold if not null #
   if (!is.null(min_count)) {
     # check that cv_threshold is numeric
@@ -389,6 +419,12 @@ summary.proteomicsFilt <- function(object, min_num_peps = NULL, degen_peps = FAL
                                    ...) {
   filter_object <- object
 
+  # Make sure we only have valid arguments
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
+  }
+  
   # error checks for min_num_peps, if not NULL #
   if (!is.null(min_num_peps)) {
     # check that min_num_peps is not a vector #
@@ -489,6 +525,12 @@ summary.proteomicsFilt <- function(object, min_num_peps = NULL, degen_peps = FAL
 print.proteomicsFilterSummary <- function(x, ...) {
   object <- x
 
+  # Make sure we only have valid arguments
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
+  }
+  
   # create output #
   catmat <- data.frame(
     c(object$num_per_pep, " ", object$num_pep_filtered, object$num_pep_notfiltered),
@@ -540,6 +582,12 @@ summary.imdanovaFilt <- function(object, min_nonmiss_anova = NULL,
                                  min_nonmiss_gtest = NULL, comparisons = NULL, ...) {
   filter_object <- object
 
+  # Make sure we only have valid arguments
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
+  }
+  
   ## initial checks ##
 
   # it is fine if both min_nonmiss_anova and min_nonmiss_gtest are NULL in the summary function #
@@ -800,6 +848,12 @@ summary.imdanovaFilt <- function(object, min_nonmiss_anova = NULL,
 print.imdanovaFilterSummary <- function(x, ...) {
   object <- x
 
+  # Make sure we only have valid arguments
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
+  }
+  
   # create output #
   if (is.null(object$num_filtered)) {
     object$num_filtered <- NA
@@ -850,6 +904,12 @@ print.imdanovaFilterSummary <- function(x, ...) {
 summary.rmdFilt <- function(object, pvalue_threshold = NULL, ...) {
   filter_object <- object
 
+  # Make sure we only have valid arguments
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
+  }
+  
   # check that pvalue_threshold is numeric [0,1] #
   if (!is.null(pvalue_threshold)) {
     if (!is.numeric(pvalue_threshold)) stop("pvalue_threshold must be numeric between 0 and 1")
@@ -923,6 +983,12 @@ summary.rmdFilt <- function(object, pvalue_threshold = NULL, ...) {
 print.rmdFilterSummary <- function(x, ...) {
   object <- x
 
+  # Make sure we only have valid arguments
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
+  }
+  
   # create output #
   cat(c("\nSummary of RMD Filter\n----------------------\nP-values:\n", capture.output(object$pvalue)), sep = "\n")
   cat(c("\nMetrics Used:", paste(object$metrics, collapse = ", "), "\n"))
@@ -960,6 +1026,12 @@ print.rmdFilterSummary <- function(x, ...) {
 summary.cvFilt <- function(object, cv_threshold = NULL, ...) {
   filter_object <- object
 
+  # Make sure we only have valid arguments
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
+  }
+  
   # checks for cv_threshold if not null #
   if (!is.null(cv_threshold)) {
     # check that cv_threshold is numeric
@@ -1026,6 +1098,12 @@ summary.cvFilt <- function(object, cv_threshold = NULL, ...) {
 print.cvFilterSummary <- function(x, ...) {
   object <- x
 
+  # Make sure we only have valid arguments
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
+  }
+  
   # create output #
   cat(c("\nSummary of Coefficient of Variation (CV) ",
         "Filter\n----------------------\nCVs:\n",
@@ -1074,6 +1152,12 @@ print.cvFilterSummary <- function(x, ...) {
 summary.customFilt <- function(object, ...) {
   filter_object <- object
 
+  # Make sure we only have valid arguments
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
+  }
+  
   # get omicsData object #
   omicsData <- attr(filter_object, "omicsData")
   summary_orig <- summary(omicsData)
@@ -1220,6 +1304,12 @@ summary.customFilt <- function(object, ...) {
 print.customFilterSummary <- function(x, ...) {
   object <- x
 
+  # Make sure we only have valid arguments
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
+  }
+  
   ## Display output ##
   cat("\nSummary of Custom Filter\n\n")
   print.data.frame(object)

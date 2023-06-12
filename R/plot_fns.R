@@ -88,8 +88,9 @@ plot.dataRes <- function(x, metric = NULL, density = FALSE,
   # Preliminaries --------------------------------------------------------------
 
   # Make sure we only have valid arguments
-  if (length(list(...) > 0)) {
-    stop("unused argument")
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
   }
 
   # check that attr(dataRes_obj, "by") == "molecule"
@@ -426,8 +427,9 @@ plot.isobaricnormRes <- function(x, order = FALSE,
   # Preliminaries --------------------------------------------------------------
 
   # Make sure we only have valid arguments
-  if (length(list(...) > 0)) {
-    stop("unused argument")
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
   }
 
   # Check if input is an isobaricnormRes class object.
@@ -639,8 +641,9 @@ plot.nmrnormRes <- function(x, nmrData = NULL, order_by = NULL,
   # Preliminaries --------------------------------------------------------------
 
   # Make sure we only have valid arguments
-  if (length(list(...) > 0)) {
-    stop("unused argument")
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
   }
 
   if (!inherits(nmrnormRes_obj, "nmrnormRes")) {
@@ -875,8 +878,9 @@ plot.SPANSRes <- function(x, interactive = FALSE,
   # Preliminaries --------------------------------------------------------------
 
   # Make sure we only have valid arguments
-  if (length(list(...) > 0)) {
-    stop("unused argument")
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
   }
 
   if (!inherits(SPANSRes_obj, "SPANSRes")) {
@@ -1139,8 +1143,9 @@ plot.naRes <- function (x, omicsData, plot_type = "bar",
   # Preliminaries --------------------------------------------------------------
 
   # Make sure we only have valid arguments
-  if (length(list(...) > 0)) {
-    stop("unused argument")
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
   }
 
   # check for a naRes object #
@@ -1657,8 +1662,9 @@ plot.corRes <- function(x, omicsData = NULL, order_by = NULL,
   # Preliminaries --------------------------------------------------------------
 
   # Make sure we only have valid arguments
-  if (length(list(...) > 0)) {
-    stop("unused argument")
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
   }
 
   # check for a corRes object #
@@ -1954,8 +1960,9 @@ plot.dimRes <- function (x, omicsData = NULL,
   # Preliminaries --------------------------------------------------------------
 
   # Make sure we only have valid arguments
-  if (length(list(...) > 0)) {
-    stop("unused argument")
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
   }
 
   # Evan, make sure the input is the correct class. As you wish.
@@ -2322,8 +2329,9 @@ plot.moleculeFilt <- function(x, min_num = NULL, cumulative = TRUE,
   # Preliminaries --------------------------------------------------------------
 
   # Make sure we only have valid arguments
-  if (length(list(...) > 0)) {
-    stop("unused argument")
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
   }
 
   # Have a looksie at the class of the filter object.
@@ -2593,8 +2601,9 @@ plot.totalCountFilt <- function(x, min_count = NULL,
   # Preliminaries --------------------------------------------------------------
 
   # Make sure we only have valid arguments
-  if (length(list(...) > 0)) {
-    stop("unused argument")
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
   }
 
   # Have a looksie at the class of the filter object.
@@ -2764,8 +2773,9 @@ plot.RNAFilt <- function(x, plot_type = "library",
   # Preliminaries --------------------------------------------------------------
 
   # Make sure we only have valid arguments
-  if (length(list(...) > 0)) {
-    stop("unused argument")
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
   }
 
   # Have a looksie at the class of the filter object.
@@ -3047,8 +3057,9 @@ plot.imdanovaFilt <- function(x, min_nonmiss_anova = NULL,
   # Preliminaries --------------------------------------------------------------
 
   # Make sure we only have valid arguments
-  if (length(list(...) > 0)) {
-    stop("unused argument")
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
   }
 
   # Have a looksie at the class of the filter object.
@@ -3455,8 +3466,9 @@ plot.proteomicsFilt <- function(x,
   # Preliminaries --------------------------------------------------------------
 
   # Make sure we only have valid arguments
-  if (length(list(...) > 0)) {
-    stop("unused argument")
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
   }
 
   # Have a looksie at the class of the filter object.
@@ -3801,8 +3813,9 @@ plot.rmdFilt <- function(x, pvalue_threshold = NULL, sampleID = NULL,
   # Preliminaries --------------------------------------------------------------
 
   # Make sure we only have valid arguments
-  if (length(list(...) > 0)) {
-    stop("unused argument")
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
   }
 
   # Have a looksie at the class of the filter object.
@@ -4388,8 +4401,9 @@ plot.cvFilt <- function(x, cv_threshold = NULL,
   # Preliminaries --------------------------------------------------------------
 
   # Make sure we only have valid arguments
-  if (length(list(...) > 0)) {
-    stop("unused argument")
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
   }
 
   # checks for cv_threshold if not null
@@ -4654,8 +4668,9 @@ plot.normRes <- function(x, order_by = NULL, color_by = NULL,
   # Preliminaries --------------------------------------------------------------
 
   # Make sure we only have valid arguments
-  if (length(list(...) > 0)) {
-    stop("unused argument")
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
   }
 
   # Create the raw and normalized omicsData objects.
@@ -4830,8 +4845,9 @@ plot.isobaricpepData <- function(x, order_by = NULL, color_by = NULL,
                                  palette = NULL, use_VizSampNames = FALSE,
                                  ...) {
   # Make sure we only have valid arguments
-  if (length(list(...) > 0)) {
-    stop("unused argument")
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
   }
 
   # Farm boy, make me a plot with an isobaricpepData object. As you wish.
@@ -4915,8 +4931,9 @@ plot.lipidData <- function(x, order_by = NULL, color_by = NULL,
                            ylimit = NULL, bw_theme = TRUE, palette = NULL,
                            use_VizSampNames = FALSE, ...) {
   # Make sure we only have valid arguments
-  if (length(list(...) > 0)) {
-    stop("unused argument")
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
   }
 
   # Farm boy, make me a plot with a lipidData object. As you wish.
@@ -5000,8 +5017,9 @@ plot.metabData <- function(x, order_by = NULL, color_by = NULL,
                            ylimit = NULL, bw_theme = TRUE, palette = NULL,
                            use_VizSampNames = FALSE, ...) {
   # Make sure we only have valid arguments
-  if (length(list(...) > 0)) {
-    stop("unused argument")
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
   }
 
   # Farm boy, make me a plot with a metabData object. As you wish.
@@ -5085,8 +5103,9 @@ plot.nmrData <- function(x, order_by = NULL, color_by = NULL,
                          ylimit = NULL, bw_theme = TRUE, palette = NULL,
                          use_VizSampNames = FALSE, ...) {
   # Make sure we only have valid arguments
-  if (length(list(...) > 0)) {
-    stop("unused argument")
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
   }
 
   # Farm boy, make me a plot with a nmrData object. As you wish.
@@ -5179,8 +5198,9 @@ plot.seqData <- function(x, order_by = NULL, color_by = NULL,
                          use_VizSampNames = FALSE, transformation = NULL,
                          ...) {
   # Make sure we only have valid arguments
-  if (length(list(...) > 0)) {
-    stop("unused argument")
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
   }
 
   # Farm boy, make me a plot with a seqData object. As you wish.
@@ -5266,8 +5286,9 @@ plot.pepData <- function(x, order_by = NULL, color_by = NULL,
                          ylimit = NULL, bw_theme = TRUE, palette = NULL,
                          use_VizSampNames = FALSE, ...) {
   # Make sure we only have valid arguments
-  if (length(list(...) > 0)) {
-    stop("unused argument")
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
   }
 
   # Farm boy, make me a plot with a pepData object. As you wish.
@@ -5350,8 +5371,9 @@ plot.proData <- function(x, order_by = NULL, color_by = NULL,
                          ylimit = NULL, bw_theme = TRUE, palette = NULL,
                          use_VizSampNames = FALSE, ...) {
   # Make sure we only have valid arguments
-  if (length(list(...) > 0)) {
-    stop("unused argument")
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
   }
 
   # Farm boy, make me a plot with a proData object. As you wish.
@@ -5960,8 +5982,9 @@ plot.statRes <- function(x,
                          free_y_axis = FALSE,
                          ...) {
   # Make sure we only have valid arguments
-  if (length(list(...) > 0)) {
-    stop("unused argument")
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
   }
 
   # Farm boy, fix all the problems. As you wish.

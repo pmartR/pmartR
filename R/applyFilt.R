@@ -183,6 +183,12 @@ applyFilt <- function(filter_object, omicsData, ...) {
 applyFilt.moleculeFilt <- function(filter_object, omicsData, min_num = 2, ...) {
   # Perform some initial checks on the input arguments -------------------------
 
+  # Warn the user if they passed extra arguments
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+            toString(as.list(tail(match.call(), length(list(...))))))
+  }
+  
   # Check if a molecule filter has already been applied.
   if ('moleculeFilt' %in% get_filter_type(omicsData)) {
     # Gently tell the user they have already applied a molecule filter.
@@ -332,6 +338,12 @@ applyFilt.moleculeFilt <- function(filter_object, omicsData, min_num = 2, ...) {
 applyFilt.totalCountFilt <- function(filter_object, omicsData, min_count, ...) {
   # Perform some initial checks on the input arguments -------------------------
 
+  # Warn the user if they passed extra arguments
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
+  }
+  
   # Check if a molecule filter has already been applied.
   if ('totalCountFilt' %in% get_filter_type(omicsData)) {
     # Gently tell the user they have already applied a molecule filter.
@@ -456,6 +468,12 @@ applyFilt.RNAFilt <- function(filter_object,
                               ...) {
   # Perform some initial checks on the input arguments -------------------------
 
+  # Warn the user if they passed extra arguments
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
+  }
+  
   # Check if a molecule filter has already been applied.
   if ('RNAFilt' %in% suppressMessages(get_filter_type(omicsData))) {
     # Gently tell the user they have already applied a molecule filter.
@@ -623,6 +641,12 @@ applyFilt.RNAFilt <- function(filter_object,
 applyFilt.cvFilt <- function(filter_object, omicsData, cv_threshold = 150, ...) {
   # Perform some initial checks on the input arguments -------------------------
 
+  # Warn the user if they passed extra arguments
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
+  }
+  
   # Check if a CV filter has already been applied.
   if ('cvFilt' %in% get_filter_type(omicsData)) {
     # Slap the users wrist with a warning.
@@ -776,6 +800,12 @@ applyFilt.rmdFilt <- function(filter_object,
                               ...) {
   # Perform some initial checks on the input arguments -------------------------
 
+  # Warn the user if they passed extra arguments
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
+  }
+  
   # Check if an RMD filter has already been applied.
   if ('rmdFilt' %in% get_filter_type(omicsData)) {
     # Slap the users wrist with a warning.
@@ -975,6 +1005,12 @@ applyFilt.proteomicsFilt <- function(filter_object,
                                      ...) {
   # Perform initial checks on the input arguments ------------------------------
 
+  # Warn the user if they passed extra arguments
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
+  }
+  
   # Check if a proteomics filter has already been applied.
   if ('proteomicsFilt' %in% get_filter_type(omicsData)) {
     # Slap the users wrist with a warning.
@@ -1245,6 +1281,12 @@ applyFilt.imdanovaFilt <- function(filter_object,
 
   # Perform initial checks on the input arguments ------------------------------
 
+  # Warn the user if they passed extra arguments
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
+  }
+  
   # Check if an imdanova filter has already been applied.
   if ('imdanovaFilt' %in% get_filter_type(omicsData)) {
     # Slap the users wrist with a warning.
@@ -1717,6 +1759,12 @@ applyFilt.imdanovaFilt <- function(filter_object,
 applyFilt.customFilt <- function(filter_object, omicsData, ...) {
   # Perform initial checks on the input arguments ------------------------------
 
+  # Warn the user if they passed extra arguments
+  if (length(list(...)) > 0) {
+    warning("unused argument(s): ",
+             toString(as.list(tail(match.call(), length(list(...))))))
+  }
+  
   # Grab some names to save typing later on.
   sample_name <- get_fdata_cname(omicsData)
   pair_name <- attr(attr(omicsData, "group_DF"), "pair_id")
