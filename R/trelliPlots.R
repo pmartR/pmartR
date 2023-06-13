@@ -188,14 +188,6 @@ quick_cog <- function(name, value) {
   dplyr::tibble(!!rlang::sym(name) := trelliscopejs::cog(value, desc = name))
 }
 
-# Create a list to convert from short name to long
-name_converter_abundance <- list("n" = "Count", "mean" = "Mean Abundance", 
-                       "median" = "Median Abundance", "sd" = "Standard Deviation Abundance", 
-                       "skew" = "Skew Abundance", "p_value_anova" = "Anova P Value",
-                       "p_value_gtest" = "G-Test P Value", "fold_change" = "Fold Change")
-name_converter_foldchange <- list("n" = "Count", "mean" = "Mean Fold Change", 
-                                  "median" = "Median Fold Change", "sd" = "Standard Deviation Fold Change")
-
 # This function builds all trelliscopes.
 trelli_builder <- function(toBuild, cognostics, plotFUN, cogFUN, path, name, ...) {
   
@@ -258,8 +250,10 @@ trelli_builder <- function(toBuild, cognostics, plotFUN, cogFUN, path, name, ...
 #' @param cognostics A vector of cognostic options for each plot. Valid entries
 #'   are "sample count", "mean abundance", "median abundance", and "cv abundance". 
 #'   If statRes data is included, "anova p-value" and "fold change" data per comparisons
-#'   may be added. Summary cognostics per group will be calculated if group information
-#'   is included. Default is "sample count" and "mean abundance".
+#'   may be added. If grouping information is included, only "sample count" and 
+#'   "mean abundance" will be calclulated, along with "anova p-value" and "fold change"
+#'   if specified. "anova p-value" will not be included if paneling a trelliscope
+#'   display by a biomolecule class. Default is "sample count" and "mean abundance".
 #' @param ggplot_params An optional vector of strings of ggplot parameters to
 #'   the backend ggplot function. For example, c("ylab('')", "ylim(c(2,20))").
 #'   Default is NULL.
@@ -309,7 +303,7 @@ trelli_builder <- function(toBuild, cognostics, plotFUN, cogFUN, path, name, ...
 #' 
 #' @export
 trelli_abundance_boxplot <- function(trelliData,
-                                     cognostics = c("sample count", "median abundance"),
+                                     cognostics = c("sample count", "mean abundance"),
                                      ggplot_params = NULL,
                                      interactive = FALSE,
                                      include_points = TRUE,
@@ -344,6 +338,14 @@ trelli_abundance_boxplot <- function(trelliData,
                     "Did you forget to include a statRes object?")
              )
     }    
+  }
+  
+  # Remove median and cv as cognostics if data is grouped
+  if (!inherits(trelliData, "trelliData.edata")) {
+    if (any(c("median abundance", "cv abundance") %in% cognostics)) {
+      cognostics <- cognostics[-match(c("median abundance", "cv abundance"), cognostics, nomatch = 0)]
+      message("'median abundance' and 'cv abundance' are not permitted when groups have been specified.")
+    }
   }
   
   # Round test example to integer 
@@ -436,16 +438,14 @@ trelli_abundance_boxplot <- function(trelliData,
         ) %>%
         tidyr::pivot_longer(c(`sample count`, `mean abundance`, `median abundance`, `cv abundance`)) %>%
         dplyr::filter(name %in% cognostics) %>%
-        dplyr::mutate(
-          name = paste(Group, lapply(name, function(x) {name_converter_abundance[[x]]}) %>% unlist())
-        ) %>%
+        dplyr::mutate(name = paste(Group, name)) %>%
         dplyr::ungroup() %>%
         dplyr::select(-Group) 
       
       # Add new cognostics 
-      cog_to_trelli <- cbind(cog_to_trelli, do.call(cbind, lapply(1:nrow(cogs_to_add), function(row) {
+      cog_to_trelli <- do.call(cbind, lapply(1:nrow(cogs_to_add), function(row) {
         quick_cog(cogs_to_add$name[row], cogs_to_add$value[row])
-      })) %>% tibble::tibble()) %>% tibble::tibble()
+      })) %>% tibble::tibble() 
       
     }
     
