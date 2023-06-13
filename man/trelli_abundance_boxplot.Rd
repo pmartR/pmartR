@@ -6,7 +6,7 @@
 \usage{
 trelli_abundance_boxplot(
   trelliData,
-  cognostics = c("n", "mean", "median", "sd", "skew", "p_value", "fold_change"),
+  cognostics = c("n", "mean", "median", "cv"),
   ggplot_params = NULL,
   interactive = FALSE,
   include_points = TRUE,
@@ -23,9 +23,11 @@ trelli_abundance_boxplot(
 as.trelliData.edata, and grouped by trelli_panel_by. Required.}
 
 \item{cognostics}{A vector of cognostic options for each plot. Valid entries
-are n, mean, median, sd, and skew for abundance. If statRes data is
-included, p_value and fold_change cognostics can be added. If no cognostics
-are desired, set to NULL.}
+are "sample count", "mean abundance", "median abundance", and "cv abundance". 
+If statRes data is included, "anova p-value" and "fold change" data per comparisons
+may be added. Summary cognostics per group will be calculated if group information
+is included. Default is "sample count", "mean abundance", "median abundance", 
+and "cv abundance".}
 
 \item{ggplot_params}{An optional vector of strings of ggplot parameters to
 the backend ggplot function. For example, c("ylab('')", "ylim(c(2,20))").

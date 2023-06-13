@@ -256,9 +256,11 @@ trelli_builder <- function(toBuild, cognostics, plotFUN, cogFUN, path, name, ...
 #' @param trelliData A trelliscope data object made by as.trelliData or
 #'   as.trelliData.edata, and grouped by trelli_panel_by. Required.
 #' @param cognostics A vector of cognostic options for each plot. Valid entries
-#'   are n, mean, median, sd, and skew for abundance. If statRes data is
-#'   included, p_value and fold_change cognostics can be added. If no cognostics
-#'   are desired, set to NULL.
+#'   are "sample count", "mean abundance", "median abundance", and "cv abundance". 
+#'   If statRes data is included, "anova p-value" and "fold change" data per comparisons
+#'   may be added. Summary cognostics per group will be calculated if group information
+#'   is included. Default is "sample count", "mean abundance", "median abundance", 
+#'   and "cv abundance". 
 #' @param ggplot_params An optional vector of strings of ggplot parameters to
 #'   the backend ggplot function. For example, c("ylab('')", "ylim(c(2,20))").
 #'   Default is NULL.
@@ -308,7 +310,7 @@ trelli_builder <- function(toBuild, cognostics, plotFUN, cogFUN, path, name, ...
 #' 
 #' @export
 trelli_abundance_boxplot <- function(trelliData,
-                                     cognostics = c("n", "mean", "median", "sd", "skew", "p_value", "fold_change"),
+                                     cognostics = c("n", "mean", "median", "cv"),
                                      ggplot_params = NULL,
                                      interactive = FALSE,
                                      include_points = TRUE,
@@ -325,7 +327,7 @@ trelli_abundance_boxplot <- function(trelliData,
   trelli_precheck(trelliData = trelliData, 
                   trelliCheck = "omics",
                   cognostics = cognostics,
-                  acceptable_cognostics = c("n", "mean", "median", "sd", "skew", "p_value", "fold_change"),
+                  acceptable_cognostics = c("n", "mean", "median", "cv", "p_value", "fold_change"),
                   ggplot_params = ggplot_params,
                   interactive = interactive,
                   test_mode = test_mode, 
@@ -339,6 +341,7 @@ trelli_abundance_boxplot <- function(trelliData,
   if (is.null(trelliData$trelliData.stat)) {
     if (any(c("p_value", "fold_change") %in% cognostics) & is.null(trelliData$trelliData.stat)) {
       cognostics <- cognostics[-match(c("p_value", "fold_change"), cognostics, nomatch = 0)]
+      message("p_value and/or fold_change were listed as cognostics, but not provided in the trelliData object.")
     }    
   }
   
@@ -402,12 +405,11 @@ trelli_abundance_boxplot <- function(trelliData,
       "n" = dplyr::tibble(`Count` = trelliscopejs::cog(sum(!is.na(DF$Abundance)), desc = "Biomolecule Count")),
       "mean" = dplyr::tibble(`Mean Abundance` = trelliscopejs::cog(round(mean(DF$Abundance, na.rm = TRUE), 4), desc = "Mean Abundance")), 
       "median" = dplyr::tibble(`Median Abundance` = trelliscopejs::cog(round(median(DF$Abundance, na.rm = TRUE), 4), desc = "Median Abundance")), 
-      "sd" = dplyr::tibble(`Standard Deviation Abundance` = trelliscopejs::cog(round(sd(DF$Abundance, na.rm = TRUE), 4), desc = "Abundance Standard Deviation")), 
-      "skew" = dplyr::tibble(`Skew Abundance` = trelliscopejs::cog(round(e1071::skewness(DF$Abundance, na.rm = TRUE), 4), desc= "Abundance Skewness"))
+      "cv" = dplyr::tibble(`CV Abundance` = trelliscopejs::cog(round((sd(DF$Abundance, na.rm = TRUE) / mean(DF$Abundance, na.rm = T)) * 100, 4), desc = "CV Abundance"))
     )
     
     # If cognostics are any of the cog, then add them 
-    if (any(cognostics %in% c("n", "mean", "median", "sd", "skew"))) {
+    if (any(cognostics %in% c("n", "mean", "median", "cv"))) {
       cog_to_trelli <- do.call(dplyr::bind_cols, lapply(cognostics, function(x) {cog[[x]]})) %>% tibble::tibble()
     } else {cog_to_trelli <- NULL}
     
@@ -429,8 +431,7 @@ trelli_abundance_boxplot <- function(trelliData,
           "n" = sum(!is.na(Abundance)), 
           "mean" = round(mean(Abundance, na.rm = TRUE), 4),
           "median" = round(median(Abundance, na.rm = TRUE), 4),
-          "sd" = round(sd(Abundance, na.rm = TRUE), 4),
-          "skew" = round(e1071::skewness(Abundance, na.rm = TRUE), 4)
+          "cv" = round((sd(Abundance, na.rm = T) / mean(Abundance, na.rm =T)) * 100, 4),
         ) %>%
         tidyr::pivot_longer(c(n, mean, median, sd, skew)) %>%
         dplyr::filter(name %in% cognostics) %>%
@@ -456,6 +457,8 @@ trelli_abundance_boxplot <- function(trelliData,
       stat_cogs <- cognostics[cognostics %in% c("fold_change", "p_value")]
       
       if (length(stat_cogs) != 0) {
+        
+        browser()
         
         # Subset down the dataframe down to group, unnest the dataframe, 
         # pivot_longer to comparison, subset columns to requested statistics, 

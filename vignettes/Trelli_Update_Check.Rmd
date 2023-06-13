@@ -1,0 +1,11 @@
+```{r}
+library(devtools)
+document("~/Git_Repos/pmartR/")
+load_all("~/Git_Repos/pmartR")
+```
+
+## Abundance Boxplots
+
+#### Expression Matrix Only
+
+Cognostics must be: N, Mean, Median, CV 
