@@ -146,9 +146,27 @@ test_that('plot functions are producing desired output',{
     refpool_cname = "Reference", 
     refpool_notation = "Yes"
   )
+  
+  result_obj <- normalize_isobaric(
+    myiso, 
+    exp_cname = "Set", 
+    apply_norm = TRUE,
+    refpool_cname = "Reference", 
+    refpool_notation = "Yes"
+  )
+  
+  result_obj_norm <- normalize_global(
+    result_obj,
+    norm_fn = "mean",
+    subset_fn = "all",
+    apply_norm = TRUE
+  )
+  
   expect_doppelganger("plot.isobaricnormRes", plot(result))
   expect_doppelganger("plot.isobaricnormRes (palette)", plot(result, palette = "YlOrRd"))
   expect_doppelganger("plot.isobaricnormRes (bw_theme)", plot(result, bw_theme = FALSE))
+  
+  expect_doppelganger("plot.isobaricnormRes (global normalized)", plot(result_obj_norm, bw_theme = FALSE))
   
   ## Test plot.corRes ----------------------------------------------------------
   
