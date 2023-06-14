@@ -104,8 +104,8 @@ trelli_panel_by(trelliData = trelliData2, panel = "LipidFamily") %>%
 
 ```{r}
 # Stats only should error out 
-trelli_panel_by(trelliData = trelliData3, panel = "Lipid") %>% 
-  trelli_abundance_boxplot()
+#trelli_panel_by(trelliData = trelliData3, panel = "Lipid") %>% 
+#  trelli_abundance_boxplot()
 
 # Should return sample count and mean abundance per group
 trelli_panel_by(trelliData = trelliData4, panel = "Lipid") %>% 

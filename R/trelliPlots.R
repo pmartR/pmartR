@@ -477,23 +477,18 @@ trelli_abundance_boxplot <- function(trelliData,
         # Subset down the dataframe down to group, unnest the dataframe, 
         # pivot_longer to comparison, subset columns to requested statistics, 
         # switch name to a more specific name
-        
-        # Update stat cogs to accept the new p-value groups
-        if ("p_value_A" %in% stat_cogs) {
-          theNames <- trelliData$trelliData.stat$Nested_DF[[1]] %>% colnames()
-          p_value_cols <- theNames[grepl("p_value_A", theNames)]
-          stat_cogs <- stat_cogs[stat_cogs != "p_value_A"]
-          stat_cogs <- c(stat_cogs, p_value_cols)
-        }
-        
         cogs_to_add <- trelliData$trelliData.stat %>%
           dplyr::filter(trelliData$trelliData.stat[[edata_cname]] == biomolecule) %>%
           dplyr::select(Nested_DF) %>%
           tidyr::unnest(cols = c(Nested_DF)) %>%
+          dplyr::rename(
+            `anova p-value` = p_value_anova,
+            `fold change` = fold_change
+          ) %>%
           dplyr::select(c(Comparison, stat_cogs)) %>%
           tidyr::pivot_longer(stat_cogs) %>%
           dplyr::mutate(
-            name = paste(Comparison, lapply(name, function(x) {name_converter_abundance[[x]]}) %>% unlist()),
+            name = paste(Comparison, name),
             value = round(value, 4)
           ) %>%
           dplyr::ungroup() %>%
@@ -504,7 +499,6 @@ trelli_abundance_boxplot <- function(trelliData,
           quick_cog(cogs_to_add$name[row], cogs_to_add$value[row])
         })) %>% tibble::tibble()
 
-        
         # Add new cognostics, removing when it is NULL 
         cog_to_trelli <- cbind(cog_to_trelli, new_cogs) %>% tibble::tibble()
         
@@ -717,10 +711,14 @@ trelli_abundance_histogram <- function(trelliData,
           dplyr::filter(trelliData$trelliData.stat[[edata_cname]] == biomolecule) %>%
           dplyr::select(Nested_DF) %>%
           tidyr::unnest(cols = c(Nested_DF)) %>%
+          dplyr::rename(
+            `anova p-value` = p_value_anova,
+            `fold change` = fold_change,
+          ) %>%
           dplyr::select(c(Comparison, stat_cogs)) %>%
           tidyr::pivot_longer(stat_cogs) %>%
           dplyr::mutate(
-            name = paste(Comparison, lapply(name, function(x) {name_converter_abundance[[x]]}) %>% unlist()),
+            name = paste(Comparison, name),
             value = round(value, 4)
           ) %>%
           dplyr::ungroup() %>%
