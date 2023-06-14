@@ -101,7 +101,7 @@ get_fdata_cname(omicsObject = mymetab)
 get_fdata_cname(omicsObject = mynmr)
 ```
 
-- `get_group_DF()` - A data.frame with columns for sample ID and group. If two main effects are provided the original main effect levels for each sample are returned as the third and fourth columns of the data frame. Additionally, the covariates provided will be listed as attributes of this data frame. For both `mymetab` and `mynmr`, we have not designated groups yet so the results are NULL.
+- `get_group_DF()` - A data.frame with columns for sample ID and group. If two main effects are provided, the original main effect levels for each sample are returned as the third and fourth columns of the data frame. Additionally, the covariates provided will be listed as attributes of this data frame. For both `mymetab` and `mynmr`, we have not designated groups yet so the results are NULL.
 
 
 ```{r}
