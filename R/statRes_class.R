@@ -69,10 +69,10 @@ statRes_output <- function(imd_anova_out,
   attr(imd_anova_out, "comparisons") <- comparisons
 
   # All this flag crap is really more trouble than it is worth!!
-  up_a <- apply(anova_flags == 1, 2, sum)
-  down_a <- apply(anova_flags == -1, 2, sum)
-  up_g <- apply(imd_flags == 1, 2, sum)
-  down_g <- apply(imd_flags == -1, 2, sum)
+  up_a <- apply(anova_flags, 2, \(x) length(which(x == 1)))
+  down_a <- apply(anova_flags, 2, \(x) length(which(x == -1)))
+  up_g <- apply(imd_flags, 2, \(x) length(which(x == 1)))
+  down_g <- apply(imd_flags, 2, \(x) length(which(x == -1)))
   attr(imd_anova_out, "number_significant") <- data.frame(
     Comparison = comparisons,
     Up_total = up_a + up_g,
