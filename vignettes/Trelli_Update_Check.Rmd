@@ -150,5 +150,21 @@ trelli_panel_by(trelliData = trelliData4, panel = "Lipid") %>%
                                 cognostics = c("cv abundance"))
 ```
 
+## Abundance Heatmaps
+
+```{r}
+# Should return sample count, mean abundance, and biomolecule count
+trelli_panel_by(trelliData = trelliData2, panel = "LipidFamily") %>%
+  trelli_abundance_heatmap()
+
+# Should return only biomolecule count
+trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") %>%
+  trelli_abundance_heatmap(cognostics = "biomolecule count")
+
+# Should return only mean abundance
+trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") %>%
+  trelli_abundance_heatmap(cognostics = "mean abundance")
+```
+
 
 

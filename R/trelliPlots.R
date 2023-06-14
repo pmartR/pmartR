@@ -724,14 +724,15 @@ trelli_abundance_histogram <- function(trelliData,
 #' @title Heatmap trelliscope building function for abundance data
 #'
 #' @description Specify a plot design and cognostics for the abundance heatmap
-#'   trelliscope. Data must be grouped by an emeta column. Main_effects order
+#'   trelliscope. Data must be grouped by an e_meta column. Main_effects order
 #'   the y-variables. All statRes data is ignored.
 #'
 #' @param trelliData A trelliscope data object made by as.trelliData, and
 #'   grouped by an emeta variable. Required.
-#' @param cognostics A vector of cognostic options for each plot. Valid entries
-#'   are n, mean, median, sd, and skew per "main_effects" group designation.
-#'   Otherwise, no cognostics are returned.
+#' @param cognostics A vector of cognostic options. Defaults are "sample count", 
+#'   "mean abundance" and "biomolecule count". "sample count" and "mean abundance"
+#'   are reported per group, and "biomolecule count" is the total number of biomolecules
+#'   in the biomolecule class (e_meta column).
 #' @param ggplot_params An optional vector of strings of ggplot parameters to
 #'   the backend ggplot function. For example, c("ylab('')", "xlab('')").
 #'   Default is NULL.
@@ -768,7 +769,7 @@ trelli_abundance_histogram <- function(trelliData,
 #' 
 #' @export
 trelli_abundance_heatmap <- function(trelliData,
-                                     cognostics = c("n", "mean", "median", "sd", "skew"),
+                                     cognostics = c("sample count", "mean abundance", "biomolecule count"),
                                      ggplot_params = NULL,
                                      interactive = FALSE,
                                      path = .getDownloadsFolder(),
@@ -784,7 +785,7 @@ trelli_abundance_heatmap <- function(trelliData,
   trelli_precheck(trelliData = trelliData, 
                   trelliCheck = "omics",
                   cognostics = cognostics,
-                  acceptable_cognostics = c("n", "mean", "median", "sd", "skew", "p_value", "fold_change"),
+                  acceptable_cognostics = c("sample count", "mean abundance", "biomolecule count"),
                   ggplot_params = ggplot_params,
                   interactive = interactive,
                   test_mode = test_mode, 
@@ -803,8 +804,11 @@ trelli_abundance_heatmap <- function(trelliData,
   
   # If no group designation, set cognostics to NULL. 
   if (is.null(attributes(trelliData$omicsData)$group_DF)) {
-    congnostics <- NULL
+    cognostics <- NULL
   }
+  
+  # Get the edata variable name
+  edata_cname <- get_edata_cname(trelliData$omicsData)
   
   # Make heatmap function-------------------------------------------------------
   
@@ -821,9 +825,6 @@ trelli_abundance_heatmap <- function(trelliData,
     } else {
       DF[,fdata_cname] <- as.factor(unlist(DF[,fdata_cname]))
     }
-    
-    # Get edata and fdata cname
-    edata_cname <- get_edata_cname(trelliData$omicsData)
     
     # Build plot: this should be edata_cname
     hm <- ggplot2::ggplot(DF, ggplot2::aes(x = as.factor(.data[[edata_cname]]), y = .data[[fdata_cname]], fill = Abundance)) +
@@ -859,19 +860,24 @@ trelli_abundance_heatmap <- function(trelliData,
     cogs_to_add <- DF %>%
       dplyr::group_by(Group) %>%
       dplyr::summarise(
-        "n" = sum(!is.na(Abundance)), 
-        "mean" = round(mean(Abundance, na.rm = TRUE), 4),
-        "median" = round(median(Abundance, na.rm = TRUE), 4),
-        "sd" = round(sd(Abundance, na.rm = TRUE), 4),
-        "skew" = round(e1071::skewness(Abundance, na.rm = TRUE), 4)
+        "sample count" = sum(!is.na(Abundance)), 
+        "mean abundance" = round(mean(Abundance, na.rm = TRUE), 4),
       ) %>%
-      tidyr::pivot_longer(c(n, mean, median, sd, skew)) %>%
+      tidyr::pivot_longer(c(`sample count`, `mean abundance`)) %>%
       dplyr::filter(name %in% cognostics) %>%
-      dplyr::mutate(
-        name = paste(Group, lapply(name, function(x) {name_converter_abundance[[x]]}) %>% unlist())
-      ) %>%
+      dplyr::mutate(name = paste(Group, name)) %>%
       dplyr::ungroup() %>%
       dplyr::select(-Group) 
+    
+    if ("biomolecule count" %in% cognostics) {
+      cogs_to_add <- rbind(cogs_to_add, 
+         data.frame(
+           name = "Biomolecule Count",
+           value = DF[[edata_cname]] %>% unique() %>% length()
+         )
+      )
+      
+    }
     
     # Add new cognostics 
     cog_to_trelli <- do.call(cbind, lapply(1:nrow(cogs_to_add), function(row) {
@@ -917,30 +923,30 @@ trelli_abundance_heatmap <- function(trelliData,
 #' @title Bar chart trelliscope building function for missing data   
 #' 
 #' @description Specify a plot design and cognostics for the missing barchart
-#'   trelliscope. Missingness is displayed per panel_by variable. Main_effects
-#'   data is used to split samples when applicable.
+#'    trelliscope. Missingness is displayed per panel_by variable. Main_effects
+#'    data is used to split samples when applicable.
 #'
 #' @param trelliData A trelliscope data object made by as.trelliData.edata or
-#'   as.trelliData. Required.
-#' @param cognostics A vector of cognostic options for each plot. Valid entries
-#'   are is n and proportion.
+#'    as.trelliData. Required.
+#' @param cognostics A vector of cognostic options for each plot. Defaults are "sample count",
+#'   
 #' @param proportion A logical to determine whether plots should display counts
-#'   or proportions. Default is TRUE.
+#'    or proportions. Default is TRUE.
 #' @param ggplot_params An optional vector of strings of ggplot parameters to
-#'   the backend ggplot function. For example, c("ylab('')", "xlab('')").
-#'   Default is NULL.
+#'    the backend ggplot function. For example, c("ylab('')", "xlab('')").
+#'    Default is NULL.
 #' @param interactive A logical argument indicating whether the plots should be
-#'   interactive or not. Interactive plots are ggplots piped to ggplotly (for
-#'   now). Default is FALSE.
+#'    interactive or not. Interactive plots are ggplots piped to ggplotly (for
+#'    now). Default is FALSE.
 #' @param path The base directory of the trelliscope application. Default is
-#'   Downloads.
+#'    Downloads.
 #' @param name The name of the display. Default is Trelliscope.
 #' @param test_mode A logical to return a smaller trelliscope to confirm plot
-#'   and design. Default is FALSE.
+#'    and design. Default is FALSE.
 #' @param test_example A vector of plot indices to return for test_mode. Default
-#'   is 1.
+#'    is 1.
 #' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a
-#'   trelliscope) should be returned. Default is FALSE.
+#'    trelliscope) should be returned. Default is FALSE.
 #'   
 #' @examples
 #' \dontrun{
