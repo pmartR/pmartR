@@ -6,7 +6,7 @@
 \usage{
 trelli_abundance_boxplot(
   trelliData,
-  cognostics = c("sample count", "mean abundance"),
+  cognostics = c("count", "mean abundance"),
   ggplot_params = NULL,
   interactive = FALSE,
   include_points = TRUE,
@@ -23,10 +23,14 @@ trelli_abundance_boxplot(
 as.trelliData.edata, and grouped by trelli_panel_by. Required.}
 
 \item{cognostics}{A vector of cognostic options for each plot. Valid entries
-are "sample count", "mean abundance", "median abundance", and "cv abundance". 
+are "count", "mean abundance", "median abundance", and "cv abundance". 
+If data are paneled by a biomolecule, the count will be "sample count".
+If data are paneled by a sample or a biomolecule class, the count will be "biomolecule count". 
 If statRes data is included, "anova p-value" and "fold change" data per comparisons
 may be added. If grouping information is included, only "sample count" and 
-"mean abundance" can be calculated. Default is "sample count" and "mean abundance".}
+"mean abundance" will be calclulated, along with "anova p-value" and "fold change"
+if specified. "anova p-value" will not be included if paneling a trelliscope
+display by a biomolecule class. Default is "sample count" and "mean abundance".}
 
 \item{ggplot_params}{An optional vector of strings of ggplot parameters to
 the backend ggplot function. For example, c("ylab('')", "ylim(c(2,20))").

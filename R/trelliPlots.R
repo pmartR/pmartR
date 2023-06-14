@@ -248,7 +248,9 @@ trelli_builder <- function(toBuild, cognostics, plotFUN, cogFUN, path, name, ...
 #' @param trelliData A trelliscope data object made by as.trelliData or
 #'   as.trelliData.edata, and grouped by trelli_panel_by. Required.
 #' @param cognostics A vector of cognostic options for each plot. Valid entries
-#'   are "sample count", "mean abundance", "median abundance", and "cv abundance". 
+#'   are "count", "mean abundance", "median abundance", and "cv abundance". 
+#'   If data are paneled by a biomolecule, the count will be "sample count".
+#'   If data are paneled by a sample or a biomolecule class, the count will be "biomolecule count". 
 #'   If statRes data is included, "anova p-value" and "fold change" data per comparisons
 #'   may be added. If grouping information is included, only "sample count" and 
 #'   "mean abundance" will be calclulated, along with "anova p-value" and "fold change"
@@ -303,7 +305,7 @@ trelli_builder <- function(toBuild, cognostics, plotFUN, cogFUN, path, name, ...
 #' 
 #' @export
 trelli_abundance_boxplot <- function(trelliData,
-                                     cognostics = c("sample count", "mean abundance"),
+                                     cognostics = c("count", "mean abundance"),
                                      ggplot_params = NULL,
                                      interactive = FALSE,
                                      include_points = TRUE,
@@ -320,7 +322,7 @@ trelli_abundance_boxplot <- function(trelliData,
   trelli_precheck(trelliData = trelliData, 
                   trelliCheck = "omics",
                   cognostics = cognostics,
-                  acceptable_cognostics = c("sample count", "mean abundance", "median abundance", "cv abundance", "anova p-value", "fold change"),
+                  acceptable_cognostics = c("count", "mean abundance", "median abundance", "cv abundance", "anova p-value", "fold change"),
                   ggplot_params = ggplot_params,
                   interactive = interactive,
                   test_mode = test_mode, 
@@ -354,6 +356,17 @@ trelli_abundance_boxplot <- function(trelliData,
   # Make sure include_points is a true or false
   if (!is.logical(include_points) & !is.na(include_points)) {
     stop("include_points must be a TRUE or FALSE.")
+  }
+  
+  # Determine if count is biomolecule count or sample count 
+  if ("count" %in% cognostics) {
+    
+    if (attr(trelliData, "panel_by_omics") == get_edata_cname(trelliData$omicsData)) {
+      cognostics[which(cognostics == "count")] <- "sample count"
+    } else {
+      cognostics[which(cognostics == "count")] <- "biomolecule count"
+    }
+    
   }
 
   # Make boxplot function-------------------------------------------------------
@@ -406,13 +419,14 @@ trelli_abundance_boxplot <- function(trelliData,
     # Set basic cognostics for ungrouped data or in case when data is not split by fdata_cname
     cog <- list(
       "sample count" = dplyr::tibble(`Sample Count` = trelliscopejs::cog(sum(!is.na(DF$Abundance)), desc = "Sample Count")),
+      "biomolecule count" = dplyr::tibble(`Biomolecule Count` = trelliscopejs::cog(sum(!is.na(DF$Abundance)), desc = "Biomolecule Count")),
       "mean abundance" = dplyr::tibble(`Mean Abundance` = trelliscopejs::cog(round(mean(DF$Abundance, na.rm = TRUE), 4), desc = "Mean Abundance")), 
       "median abundance" = dplyr::tibble(`Median Abundance` = trelliscopejs::cog(round(median(DF$Abundance, na.rm = TRUE), 4), desc = "Median Abundance")), 
       "cv abundance" = dplyr::tibble(`CV Abundance` = trelliscopejs::cog(round((sd(DF$Abundance, na.rm = TRUE) / mean(DF$Abundance, na.rm = T)) * 100, 4), desc = "CV Abundance"))
     )
     
     # If cognostics are any of the cog, then add them 
-    if (any(cognostics %in% c("sample count", "mean abundance", "median abundance", "cv abundance"))) {
+    if (any(cognostics %in% c("sample count", "biomolecule count", "mean abundance", "median abundance", "cv abundance"))) {
       cog_to_trelli <- do.call(dplyr::bind_cols, lapply(cognostics, function(x) {cog[[x]]})) %>% tibble::tibble()
     } else {cog_to_trelli <- NULL}
     
@@ -432,11 +446,12 @@ trelli_abundance_boxplot <- function(trelliData,
         dplyr::group_by(Group) %>%
         dplyr::summarise(
           "sample count" = sum(!is.na(Abundance)), 
+          "biomolecule count" = sum(!is.na(Abundance)), 
           "mean abundance" = round(mean(Abundance, na.rm = TRUE), 4),
           "median abundance" = round(median(Abundance, na.rm = TRUE), 4),
           "cv abundance" = round((sd(Abundance, na.rm = T) / mean(Abundance, na.rm =T)) * 100, 4),
         ) %>%
-        tidyr::pivot_longer(c(`sample count`, `mean abundance`, `median abundance`, `cv abundance`)) %>%
+        tidyr::pivot_longer(c(`sample count`, `biomolecule count`, `mean abundance`, `median abundance`, `cv abundance`)) %>%
         dplyr::filter(name %in% cognostics) %>%
         dplyr::mutate(name = paste(Group, name)) %>%
         dplyr::ungroup() %>%
