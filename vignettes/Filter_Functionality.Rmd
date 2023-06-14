@@ -321,13 +321,13 @@ The molecule filter and custom filter (either transcripts or samples) are availa
 
 ### Total Count Filter 
 
-The total count filter is based on recommendations in edgeR processing [@edger], where the low-observed biomolecules are removed. The default recommendation in edgeR is to require at least 10 total counts observed across samples (i.e., if the sum of counts in a row of e_data is < 10, default edgeR filtering would remove this biomolecule).
+The total count filter is based on recommendations in edgeR processing [@edger], where the low-observed biomolecules are removed. The default recommendation in edgeR is to require at least 15 total counts observed across samples (i.e., if the sum of counts in a row of e_data is < 15, default edgeR filtering would remove this biomolecule).
 
 ```{r}
 mytotcountfilt <- total_count_filter(omicsData = myseq)
-summary(mytotcountfilt, min_count = 10)
+summary(mytotcountfilt, min_count = 15)
 
-myseq_totcount <- applyFilt(filter_object = mytotcountfilt, omicsData = myseq, min_count = 10)
+myseq_totcount <- applyFilt(filter_object = mytotcountfilt, omicsData = myseq, min_count = 15)
 summary(myseq_totcount)
 ```
 
