@@ -928,8 +928,12 @@ trelli_abundance_heatmap <- function(trelliData,
 #'
 #' @param trelliData A trelliscope data object made by as.trelliData.edata or
 #'    as.trelliData. Required.
-#' @param cognostics A vector of cognostic options for each plot. Defaults are "sample count",
-#'   
+#' @param cognostics A vector of cognostic options for each plot. Defaults are "total count",
+#'    "observed count", and "observed proportion". If grouping
+#'    data is included, all cognostics will be reported per group. If the 
+#'    trelliData is paneled by a biomolecule, the counts and proportion we be 
+#'    samples. If paneled by a sample or biomolecule class, the counts and proportions
+#'    will be biomolecules.
 #' @param proportion A logical to determine whether plots should display counts
 #'    or proportions. Default is TRUE.
 #' @param ggplot_params An optional vector of strings of ggplot parameters to
@@ -982,7 +986,7 @@ trelli_abundance_heatmap <- function(trelliData,
 #' 
 #' @export
 trelli_missingness_bar <- function(trelliData,
-                                   cognostics = c("n", "proportion"),
+                                   cognostics = c("total count", "observed count", "observed proportion"),
                                    proportion = TRUE,
                                    ggplot_params = NULL,
                                    interactive = FALSE,
@@ -998,7 +1002,7 @@ trelli_missingness_bar <- function(trelliData,
   trelli_precheck(trelliData = trelliData, 
                   trelliCheck = c("either"),
                   cognostics = cognostics,
-                  acceptable_cognostics = c("n", "proportion"),
+                  acceptable_cognostics = c("total count", "observed count", "observed proportion"),
                   ggplot_params = ggplot_params,
                   interactive = interactive,
                   test_mode = test_mode, 
@@ -1014,6 +1018,13 @@ trelli_missingness_bar <- function(trelliData,
   
   # Round test example to integer 
   if (test_mode) {test_example <- unique(abs(round(test_example)))}
+  
+  # Determine if the trelliData is paneled by the edata column
+  if (is.null(attr(trelliData, "panel_by_omics"))) {
+    paneled_by_edata <- attr(trelliData, "panel_by_stat") == get_edata_cname(trelliData$statRes)
+  } else {
+    paneled_by_edata <- attr(trelliData, "panel_by_omics") == get_edata_cname(trelliData$omicsData)
+  }
   
   # Generate a function to make missingness dataframes--------------------------
   get_missing_DF <- function(DF) {
@@ -1119,10 +1130,19 @@ trelli_missingness_bar <- function(trelliData,
     
     # Build cognostics 
     Miss_Cog <- Missingness %>%
-      tidyr::pivot_longer(c(`Absent Count`, `Present Count`, `Absent Proportion`, `Present Proportion`))
+      dplyr::mutate(`total count` = `Present Count` + `Absent Count`) %>%
+      dplyr::select(-c(`Absent Count`, `Absent Proportion`)) %>%
+      dplyr::rename(`observed count` = `Present Count`, 
+                    `observed proportion` = `Present Proportion`) %>%
+      tidyr::pivot_longer(c(`observed count`, `observed proportion`, `total count`)) %>%
+      dplyr::filter(name %in% cognostics)
+    
+    # Expand the name depending on whether the counts are samples or biomolecules
+    browser()
     
     # Add grouping data if there's more than one group 
     if (length(unique(Miss_Cog$Group)) > 1) {
+      browser()
       Miss_Cog <- Miss_Cog %>% dplyr::mutate(name = paste(Group, name))
     }
       

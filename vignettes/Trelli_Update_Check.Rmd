@@ -166,5 +166,21 @@ trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") %>%
   trelli_abundance_heatmap(cognostics = "mean abundance")
 ```
 
+## Missingness Barplots
 
+#### Expression data only
+
+```{r}
+# Should return total sample count, observed sample count, and observed sample proportion
+trelli_panel_by(trelliData = trelliData1, panel = "Lipid") %>%
+  trelli_missingness_bar(test_mode = TRUE, test_example = 1:10)
+
+# Should return observed sample proportion
+trelli_panel_by(trelliData = trelliData1, panel = "Lipid") %>%
+  trelli_missingness_bar(test_mode = TRUE, test_example = 1:10, cognostics = "observed sample proportion")
+
+trelli_panel_by(trelliData = trelliData1, panel = "Sample") %>%
+  trelli_missingness_bar(test_mode = TRUE, test_example = 1:10)
+
+```
 

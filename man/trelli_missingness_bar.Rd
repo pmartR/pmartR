@@ -6,7 +6,7 @@
 \usage{
 trelli_missingness_bar(
   trelliData,
-  cognostics = c("n", "proportion"),
+  cognostics = c("total count", "observed count", "observed proportion"),
   proportion = TRUE,
   ggplot_params = NULL,
   interactive = FALSE,
@@ -22,8 +22,12 @@ trelli_missingness_bar(
 \item{trelliData}{A trelliscope data object made by as.trelliData.edata or
 as.trelliData. Required.}
 
-\item{cognostics}{A vector of cognostic options for each plot. Valid entries
-are is n and proportion.}
+\item{cognostics}{A vector of cognostic options for each plot. Defaults are "total count",
+"observed count", and "observed proportion". If grouping
+data is included, all cognostics will be reported per group. If the 
+trelliData is paneled by a biomolecule, the counts and proportion we be 
+samples. If paneled by a sample or biomolecule class, the counts and proportions
+will be biomolecules.}
 
 \item{proportion}{A logical to determine whether plots should display counts
 or proportions. Default is TRUE.}
@@ -52,8 +56,8 @@ trelliscope) should be returned. Default is FALSE.}
 }
 \description{
 Specify a plot design and cognostics for the missing barchart
-  trelliscope. Missingness is displayed per panel_by variable. Main_effects
-  data is used to split samples when applicable.
+   trelliscope. Missingness is displayed per panel_by variable. Main_effects
+   data is used to split samples when applicable.
 }
 \examples{
 \dontrun{
