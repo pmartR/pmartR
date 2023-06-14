@@ -6,7 +6,8 @@
 \usage{
 trelli_abundance_histogram(
   trelliData,
-  cognostics = c("n", "mean", "median", "sd", "skew", "p_value", "fold_change"),
+  cognostics = c("sample count", "mean abundance", "median abundance", "cv abundance",
+    "skew abundance"),
   ggplot_params = NULL,
   interactive = FALSE,
   path = .getDownloadsFolder(),
@@ -23,8 +24,8 @@ as.trelliData.edata, and grouped by edata_cname in trelli_panel_by.
 Required.}
 
 \item{cognostics}{A vector of cognostic options for each plot. Valid entries
-are n, mean, median, sd, and skew. p_value and fold_change can be added if
-statRes is included.}
+are "sample count", "mean abundance", "median abundance", "cv abundance", 
+and "skew abundance". All are included by default.}
 
 \item{ggplot_params}{An optional vector of strings of ggplot parameters to
 the backend ggplot function. For example, c("ylab('')", "ylim(c(1,2))").

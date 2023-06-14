@@ -127,5 +127,28 @@ trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") %>%
   trelli_abundance_boxplot(cognostics = c("count", "mean abundance", "median abundance", "cv abundance", "anova p-value", "fold change"))
 ```
 
+## Abundance Histograms
+
+```{r}
+# Should return biomolecule count, and mean, median, cv, and skew abundance
+trelli_panel_by(trelliData = trelliData1, panel = "Lipid") %>% 
+     trelli_abundance_histogram(test_mode = TRUE, test_example = 1:10)
+
+# Should return median and skew abundance
+trelli_panel_by(trelliData = trelliData2, panel = "Lipid") %>% 
+     trelli_abundance_histogram(test_mode = TRUE, test_example = 1:10,
+                                cognostics = c("median abundance", "skew abundance"))
+
+# Should error out 
+#trelli_panel_by(trelliData = trelliData4, panel = "Lipid") %>% 
+#     trelli_abundance_histogram(test_mode = TRUE, test_example = 1:10,
+#                                cognostics = c("sample count", "anova p-value"))
+
+# Should return cv abundance
+trelli_panel_by(trelliData = trelliData4, panel = "Lipid") %>% 
+     trelli_abundance_histogram(test_mode = TRUE, test_example = 1:10,
+                                cognostics = c("cv abundance"))
+```
+
 
 

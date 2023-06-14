@@ -370,7 +370,7 @@ trelli_abundance_boxplot <- function(trelliData,
   }
   
   if (any(c("anova p-value", "fold change") %in% cognostics) & attr(trelliData, "panel_by_omics") != get_edata_cname(trelliData$omicsData)) {
-    message(paste("Please panel by", get_edata_cname(trelliData$omicsData), "to get anova p-values and fold changes in the trelliscope display."))
+    message(paste("Please panel by", get_edata_cname(trelliData$omicsData), "to get 'anova p-values' and 'fold changes' as cognostics in the trelliscope display."))
   }
   
   # Make boxplot function-------------------------------------------------------
@@ -556,8 +556,8 @@ trelli_abundance_boxplot <- function(trelliData,
 #'   as.trelliData.edata, and grouped by edata_cname in trelli_panel_by.
 #'   Required.
 #' @param cognostics A vector of cognostic options for each plot. Valid entries
-#'   are n, mean, median, sd, and skew. p_value and fold_change can be added if
-#'   statRes is included.
+#'   are "sample count", "mean abundance", "median abundance", "cv abundance", 
+#'   and "skew abundance". All are included by default. 
 #' @param ggplot_params An optional vector of strings of ggplot parameters to
 #'   the backend ggplot function. For example, c("ylab('')", "ylim(c(1,2))").
 #'   Default is NULL.
@@ -602,7 +602,7 @@ trelli_abundance_boxplot <- function(trelliData,
 #' 
 #' @export
 trelli_abundance_histogram <- function(trelliData,
-                                       cognostics = c("n", "mean", "median", "sd", "skew", "p_value", "fold_change"),
+                                       cognostics = c("sample count", "mean abundance", "median abundance", "cv abundance", "skew abundance"),
                                        ggplot_params = NULL,
                                        interactive = FALSE,
                                        path = .getDownloadsFolder(),
@@ -618,7 +618,7 @@ trelli_abundance_histogram <- function(trelliData,
   trelli_precheck(trelliData = trelliData, 
                   trelliCheck = "omics",
                   cognostics = cognostics,
-                  acceptable_cognostics = c("n", "mean", "median", "sd", "skew", "p_value", "fold_change"),
+                  acceptable_cognostics = c("sample count", "mean abundance", "median abundance", "cv abundance", "skew abundance"),
                   ggplot_params = ggplot_params,
                   interactive = interactive,
                   test_mode = test_mode, 
@@ -627,12 +627,6 @@ trelli_abundance_histogram <- function(trelliData,
                   p_value_thresh = NULL,
                   p_value_test = NULL)
 
-  # Remove stat specific options if no stats data was provided 
-  if (is.null(trelliData$trelliData.stat)) {
-    if (any(c("p_value", "fold_change") %in% cognostics) & is.null(trelliData$trelliData.stat)) {
-      cognostics <- cognostics[-match(c("p_value", "fold_change"), cognostics, nomatch = 0)]
-    }    
-  }
   
   # Round test example to integer 
   if (test_mode) {test_example <- unique(abs(round(test_example)))}
@@ -674,7 +668,6 @@ trelli_abundance_histogram <- function(trelliData,
      
   }
   
-  
   # Create cognostic function---------------------------------------------------
   
   # Second, create function to return cognostics
@@ -682,64 +675,15 @@ trelli_abundance_histogram <- function(trelliData,
     
     # Set basic cognostics for ungrouped data or in case when data is not split by fdata_cname
     cog <- list(
-      "n" = dplyr::tibble(`Count` = trelliscopejs::cog(sum(!is.na(DF$Abundance)), desc = "Biomolecule Count")),
-      "mean" = dplyr::tibble(`Mean Abundance` = trelliscopejs::cog(round(mean(DF$Abundance, na.rm = TRUE), 4), desc = "Mean Abundance")), 
-      "median" = dplyr::tibble(`Median Abundance` = trelliscopejs::cog(round(median(DF$Abundance, na.rm = TRUE), 4), desc = "Median Abundance")), 
-      "sd" = dplyr::tibble(`Standard Deviation Abundance` = trelliscopejs::cog(round(sd(DF$Abundance, na.rm = TRUE), 4), desc = "Abundance Standard Deviation")), 
-      "skew" = dplyr::tibble(`Skew Abundance` = trelliscopejs::cog(round(e1071::skewness(DF$Abundance, na.rm = TRUE), 4), desc= "Abundance Skewness"))
+      "sample count" = dplyr::tibble(`Sample Count` = trelliscopejs::cog(sum(!is.na(DF$Abundance)), desc = "Sample Count")),
+      "mean abundance" = dplyr::tibble(`Mean Abundance` = trelliscopejs::cog(round(mean(DF$Abundance, na.rm = TRUE), 4), desc = "Mean Abundance")), 
+      "median abundance" = dplyr::tibble(`Median Abundance` = trelliscopejs::cog(round(median(DF$Abundance, na.rm = TRUE), 4), desc = "Median Abundance")), 
+      "cv abundance" = dplyr::tibble(`CV Abundance` = trelliscopejs::cog(round((sd(DF$Abundance, na.rm = TRUE) / mean(DF$Abundance, na.rm = T)) * 100, 4), desc = "CV Abundance")), 
+      "skew abundance" = dplyr::tibble(`Skew Abundance` = trelliscopejs::cog(round(e1071::skewness(DF$Abundance, na.rm = TRUE), 4), desc= "Skew Abundance"))
     )
     
     # If cognostics are any of the cog, then add them 
     cog_to_trelli <- do.call(dplyr::bind_cols, lapply(cognostics, function(x) {cog[[x]]})) %>% tibble::tibble()
-    
-    # Add statistics if applicable 
-    if (!is.null(trelliData$trelliData.stat)) {
-      
-      # Downselect to only stats 
-      stat_cogs <- cognostics[cognostics %in% c("fold_change", "p_value")]
-      
-      if (length(stat_cogs) != 0) {
-        
-        # Update stat cogs to accept the new p-value groups
-        if ("p_value" %in% stat_cogs) {
-          theNames <- trelliData$trelliData.stat$Nested_DF[[1]] %>% colnames()
-          p_value_cols <- theNames[grepl("p_value", theNames)]
-          stat_cogs <- stat_cogs[stat_cogs != "p_value"]
-          stat_cogs <- c(stat_cogs, p_value_cols)
-        }
-        
-        # Subset down the dataframe down to group, unnest the dataframe, 
-        # pivot_longer to comparison, subset columns to requested statistics, 
-        # switch name to a more specific name
-        cogs_to_add <- trelliData$trelliData.stat %>%
-          dplyr::filter(trelliData$trelliData.stat[[edata_cname]] == biomolecule) %>%
-          dplyr::select(Nested_DF) %>%
-          tidyr::unnest(cols = c(Nested_DF)) %>%
-          dplyr::rename(
-            `anova p-value` = p_value_anova,
-            `fold change` = fold_change,
-          ) %>%
-          dplyr::select(c(Comparison, stat_cogs)) %>%
-          tidyr::pivot_longer(stat_cogs) %>%
-          dplyr::mutate(
-            name = paste(Comparison, name),
-            value = round(value, 4)
-          ) %>%
-          dplyr::ungroup() %>%
-          dplyr::select(-Comparison)
-        
-        # Generate new cognostics 
-        new_cogs <- do.call(cbind, lapply(1:nrow(cogs_to_add), function(row) {
-          quick_cog(cogs_to_add$name[row], cogs_to_add$value[row])
-        })) %>% tibble::tibble()
-        
-        # Add new cognostics 
-        cog_to_trelli <- cbind(cog_to_trelli, new_cogs) %>% tibble::tibble()
-      
-        
-      }
-      
-    }
     
     return(cog_to_trelli)
     
