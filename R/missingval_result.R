@@ -47,8 +47,8 @@ missingval_result <- function(omicsData) {
   fdata_cname <- get_fdata_cname(omicsData)
 
   # Count the number of NA or zeros values per column.
-  if(inherits(omicsData, "seqData")){
-    res_per_col<- colSums((omicsData$e_data[, -edata_cname_id]) == 0)
+  if (inherits(omicsData, "seqData")) {
+    res_per_col <- colSums((omicsData$e_data[, -edata_cname_id]) == 0)
     res_per_col_non <- colSums((omicsData$e_data[, -edata_cname_id]) != 0)
     res_by_sample<- data.frame(
       "sample_names" = names(omicsData$e_data[, -edata_cname_id]),

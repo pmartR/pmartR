@@ -1732,7 +1732,7 @@ create_c_matrix <- function(group_df, to_compare_df = NULL) {
       stop("Some groups listed in the 'comparisons' argument do not appear in the 'groupData' argument.")
     }
     
-    for(i in 1:n_comparisons){
+    for (i in 1:n_comparisons) {
       control_i <- which(to_compare_df$Control[i] == groups)
       test_i <- which(to_compare_df$Test[i] == groups)
       Cmat[i,control_i] <- (-1/length(control_i))

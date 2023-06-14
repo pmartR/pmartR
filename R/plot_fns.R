@@ -1344,10 +1344,14 @@ na_bar <- function (na.by.sample, x_lab_bar, y_lab_bar, x_lab_size, y_lab_size,
     
     # Forge the basic sample bar plot with group info. More details will be
     # added according to the users input later.
-    samp <- ggplot2::ggplot(data = na.by.sample,
-                            ggplot2::aes(x = .data[[fdata_cname]],
-                                         y = .data[[y_axis]],
-                                         fill = !!dplyr::sym(color_by))) +
+    samp <- ggplot2::ggplot(
+      data = na.by.sample,
+      ggplot2::aes(
+        x = .data[[fdata_cname]],
+        y = .data[[y_axis]],
+        fill = !!dplyr::sym(color_by)
+      )
+    ) +
       ggplot2::geom_bar(stat = "identity", width = bar_width)
   } else {
     # Check if palette is NULL or not. Hopefully it isn't so the plot will be
