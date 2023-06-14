@@ -4,7 +4,7 @@
 #'  statistical analysis of mass spectrometry (MS) omics data, in particular 
 #'  proteomic (either at the peptide or the protein level), lipidomic, and 
 #'  metabolomic data, as well as RNA-seq based count data and nuclear magnetic
-#'  resonance (NMR) data This includes data transformation, specification of 
+#'  resonance (NMR) data. This includes data transformation, specification of 
 #'  groups that are to be compared against each other, filtering of features 
 #'  and/or samples, data normalization, data summarization (correlation, PCA), 
 #'  and statistical comparisons between defined groups.
