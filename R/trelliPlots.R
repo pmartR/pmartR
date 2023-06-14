@@ -368,7 +368,11 @@ trelli_abundance_boxplot <- function(trelliData,
     }
     
   }
-
+  
+  if (any(c("anova p-value", "fold change") %in% cognostics) & attr(trelliData, "panel_by_omics") != get_edata_cname(trelliData$omicsData)) {
+    message(paste("Please panel by", get_edata_cname(trelliData$omicsData), "to get anova p-values and fold changes in the trelliscope display."))
+  }
+  
   # Make boxplot function-------------------------------------------------------
   
   # First, generate the boxplot function
