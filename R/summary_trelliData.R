@@ -34,7 +34,8 @@ summary.trelliData <- function(object, ...) {
   # First, we must know if this data has been grouped at all
   panel_by <- attr(trelliData, "panel_by")
 
-  # Second, let's determine if there's omicsData or statRes or both in this object
+  # Second, let's determine if there's omicsData or statRes or both in this
+  # object
   omics <- !is.null(trelliData$trelliData.omics)
   stat <- !is.null(trelliData$trelliData.stat)
 
@@ -62,7 +63,11 @@ summary.trelliData <- function(object, ...) {
 
   # Create a base data.frame which can be filtered
   All_Options <- data.table::data.table(
-    `Panel By Choice` = c(rep("e_data cname", 4), rep("f_data cname", 2), rep("e_meta column", 6)),
+    `Panel By Choice` = c(
+      rep("e_data cname", 4),
+      rep("f_data cname", 2),
+      rep("e_meta column", 6)
+    ),
     Plot = c(
       "abundance boxplot", "abundance histogram", "missingness bar",
       "fold change bar", "abundance boxplot", "missingness bar",
@@ -81,20 +86,24 @@ summary.trelliData <- function(object, ...) {
 
   # Filter by "Data Type"
   if (omics == FALSE) {
-    All_Options <- All_Options %>% dplyr::filter(`Data Type` != "omics" | is.na(`Data Type`))
+    All_Options <- All_Options %>% 
+      dplyr::filter(`Data Type` != "omics" | is.na(`Data Type`))
   }
   if (stat == FALSE) {
-    All_Options <- All_Options %>% dplyr::filter(`Data Type` != "stat" | is.na(`Data Type`))
+    All_Options <- All_Options %>% 
+      dplyr::filter(`Data Type` != "stat" | is.na(`Data Type`))
   }
 
   # If there is no grouping information, we should suggest potential plots.
   if (panel_by == FALSE) {
     # Filter by "Panel By" choices
     if (fdata_cname_missing) {
-      All_Options <- All_Options %>% dplyr::filter(`Panel By Choice` != "f_data cname")
+      All_Options <- All_Options %>% 
+        dplyr::filter(`Panel By Choice` != "f_data cname")
     }
     if (emeta_cols_missing) {
-      All_Options <- All_Options %>% dplyr::filter(`Panel By Choice` != "e_meta column")
+      All_Options <- All_Options %>% 
+        dplyr::filter(`Panel By Choice` != "e_meta column")
     }
 
     # Remove data type and add a holder for count
@@ -102,7 +111,7 @@ summary.trelliData <- function(object, ...) {
       dplyr::select(-`Data Type`) %>%
       dplyr::mutate(`Number of Plots` = 0)
 
-    # Replace names and get counts
+    # Replace names and get counts TODO: apply styler
     if ("e_data cname" %in% All_Options$`Panel By Choice`) {
       bio_var <- ifelse(omics, attr(trelliData$omicsData, "cnames")$edata_cname, attr(trelliData$statRes, "cnames")$edata_cname)
       bio_count <- ifelse(omics, trelliData$trelliData.omics[[bio_var]] %>% unique() %>% length(), trelliData$trelliData.stat[[bio_var]] %>% unique() %>% length())
@@ -126,21 +135,38 @@ summary.trelliData <- function(object, ...) {
         paste(collapse = ", ")
 
       # Add counts
-      All_Options[All_Options$`Panel By Choice` == "e_meta column", "Number of Plots"] <- emeta_counts
-      All_Options[All_Options$`Panel By Choice` == "e_meta column", "Panel By Choice"] <- paste(emeta_cols, collapse = ", ")
+      All_Options[
+        All_Options$`Panel By Choice` == "e_meta column", "Number of Plots"
+      ] <- emeta_counts
+      All_Options[
+        All_Options$`Panel By Choice` == "e_meta column", "Panel By Choice"
+      ] <- paste(emeta_cols, collapse = ", ")
     }
   } else {
     # Determine what the data has been grouped by
-    Grouped <- ifelse(omics, attr(trelliData, "panel_by_omics"), attr(trelliData, "panel_by_stat"))
+    Grouped <- ifelse(
+      omics,
+      attr(trelliData, "panel_by_omics"),
+      attr(trelliData, "panel_by_stat")
+    )
 
-    # Determine if group variable is edata_cname, fdata_cname, or an emeta column, and get a count
+    # Determine if group variable is edata_cname, fdata_cname, or an emeta
+    # column, and get a count
     theMatch <- match(Grouped, c(edata_cname, fdata_cname, emeta_cols))
     if (theMatch == 1) {
       panel_by_choice <- "e_data cname"
-      count <- ifelse(omics, nrow(trelliData$trelliData.omics), nrow(trelliData$trelliData.stat))
+      count <- ifelse(
+        omics, 
+        nrow(trelliData$trelliData.omics), 
+        nrow(trelliData$trelliData.stat)
+      )
     } else if (theMatch == 2) {
       panel_by_choice <- "f_data cname"
-      count <- ifelse(omics, nrow(trelliData$omicsData$f_data), attr(trelliData$statRes, "group_DF") %>% nrow())
+      count <- ifelse(
+        omics,
+        nrow(trelliData$omicsData$f_data),
+        attr(trelliData$statRes, "group_DF") %>% nrow()
+      )
     } else {
       panel_by_choice <- "e_meta column"
       count <- trelliData$omicsData$e_meta[[Grouped]] %>%
