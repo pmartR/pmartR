@@ -27,7 +27,8 @@ as.trelliData. Required.}
 data is included, all cognostics will be reported per group. If the 
 trelliData is paneled by a biomolecule, the counts and proportion we be 
 samples. If paneled by a sample or biomolecule class, the counts and proportions
-will be biomolecules.}
+will be biomolecules. If statRes data is included, "anova g-test" may 
+be included.}
 
 \item{proportion}{A logical to determine whether plots should display counts
 or proportions. Default is TRUE.}

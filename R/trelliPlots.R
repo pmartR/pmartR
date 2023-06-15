@@ -933,7 +933,8 @@ trelli_abundance_heatmap <- function(trelliData,
 #'    data is included, all cognostics will be reported per group. If the 
 #'    trelliData is paneled by a biomolecule, the counts and proportion we be 
 #'    samples. If paneled by a sample or biomolecule class, the counts and proportions
-#'    will be biomolecules.
+#'    will be biomolecules. If statRes data is included, "anova g-test" may 
+#'    be included. 
 #' @param proportion A logical to determine whether plots should display counts
 #'    or proportions. Default is TRUE.
 #' @param ggplot_params An optional vector of strings of ggplot parameters to
@@ -1002,7 +1003,7 @@ trelli_missingness_bar <- function(trelliData,
   trelli_precheck(trelliData = trelliData, 
                   trelliCheck = c("either"),
                   cognostics = cognostics,
-                  acceptable_cognostics = c("total count", "observed count", "observed proportion"),
+                  acceptable_cognostics = c("total count", "observed count", "observed proportion", "anova g-test"),
                   ggplot_params = ggplot_params,
                   interactive = interactive,
                   test_mode = test_mode, 
@@ -1014,6 +1015,14 @@ trelli_missingness_bar <- function(trelliData,
   # Check that proportion is a non NA logical
   if (!is.logical(proportion) | is.na(proportion)) {
     stop("proportion must be a TRUE or FALSE.")
+  }
+  
+  # Test whether statRes data is included to use anova g-test
+  if ("anova g-test" %in% cognostics) {
+    if (is.null(trelliData$trelliData.stat)) {
+      cognostics <- cognostics[cognostics != "anova g-test"]
+      message("'anova g-test' can only be included if stats data is included ")
+    }
   }
   
   # Round test example to integer 
@@ -1138,25 +1147,34 @@ trelli_missingness_bar <- function(trelliData,
       dplyr::filter(name %in% cognostics)
     
     # Expand the name depending on whether the counts are samples or biomolecules
-    browser()
+    if (paneled_by_edata & nrow(Miss_Cog) > 0) {
+      Miss_Cog <- Miss_Cog %>% 
+        dplyr::mutate(
+          name = lapply(name, function(x) {
+            splitNames <- strsplit(x, " ") %>% unlist()
+            return(paste(splitNames[1], "sample", splitNames[2]))
+          }) %>% unlist()
+        )
+    } else if (nrow(Miss_Cog) > 0) {
+      Miss_Cog <- Miss_Cog %>% 
+        dplyr::mutate(
+          name = lapply(name, function(x) {
+            splitNames <- strsplit(x, " ") %>% unlist()
+            return(paste(splitNames[1], "biomolecule", splitNames[2]))
+          }) %>% unlist()
+        )
+    }
     
     # Add grouping data if there's more than one group 
     if (length(unique(Miss_Cog$Group)) > 1) {
-      browser()
       Miss_Cog <- Miss_Cog %>% dplyr::mutate(name = paste(Group, name))
     }
       
     # Remove group column
     Miss_Cog <- Miss_Cog %>% dplyr::select(c(name, value))
     
-    # Subset down to selected cognostics
-    if (length(cognostics) == 1) {
-      if (cognostics == "n") {
-        Miss_Cog <- Miss_Cog %>% dplyr::filter(grepl("Count", name))
-      } else if (cognostics == "proportion") {
-        Miss_Cog <- Miss_Cog %>% dplyr::filter(grepl("Proportion", name))
-      }
-    }
+    # Return NULL if there's no cognostics 
+    if (nrow(Miss_Cog) == 0) {return(NULL)}
     
     # Generate cognostics 
     cog_to_trelli <- do.call(cbind, lapply(1:nrow(Miss_Cog), function(row) {

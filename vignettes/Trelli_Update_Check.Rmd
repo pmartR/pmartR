@@ -12,29 +12,29 @@ load_all("~/Git_Repos/pmartR")
 Cognostics must be: N, Mean, Median, CV 
 
 ```{r}
-trelliData1 <- as.trelliData.edata(e_data = lipid_pos_edata,
-                                  edata_cname = "Lipid",
-                                  omics_type = "lipidData")
+trelliData1 <- as.trelliData.edata(e_data = pep_edata,
+                                  edata_cname = "Peptide",
+                                  omics_type = "pepData")
 
 # Should return sample count, and mean, median, and cv abundance
-trelli_panel_by(trelliData = trelliData1, panel = "Lipid") %>% 
+trelli_panel_by(trelliData = trelliData1, panel = "Peptide") %>% 
    trelli_abundance_boxplot(test_mode = TRUE, 
                             test_example = 1:10, 
                             cognostics = c("count", "mean abundance", "median abundance", "cv abundance"))
 
 # Should return sample count, mean abundance, and median abundance
-trelli_panel_by(trelliData = trelliData1, panel = "Lipid") %>% 
+trelli_panel_by(trelliData = trelliData1, panel = "Peptide") %>% 
    trelli_abundance_boxplot(test_mode = TRUE, 
                             test_example = 1:10, 
                             cognostics = c("count", "mean abundance", "median abundance"))
 
 # Should return sample count and mean abundance
-trelli_panel_by(trelliData = trelliData1, panel = "Lipid") %>% 
+trelli_panel_by(trelliData = trelliData1, panel = "Peptide") %>% 
    trelli_abundance_boxplot(test_mode = TRUE, 
                             test_example = 1:10)
 
 # Should return sample count, and mean, median, and cv abundance
-trelli_panel_by(trelliData = trelliData1, panel = "Lipid") %>% 
+trelli_panel_by(trelliData = trelliData1, panel = "Peptide") %>% 
    trelli_abundance_boxplot(test_mode = TRUE, 
                             test_example = 1:10, 
                             cognostics = c("count", "mean abundance", "median abundance", "cv abundance", "anova p-value"))
@@ -43,23 +43,18 @@ trelli_panel_by(trelliData = trelliData1, panel = "Lipid") %>%
 trelli_panel_by(trelliData = trelliData1, panel = "Sample") %>% 
    trelli_abundance_boxplot(test_mode = TRUE, 
                             test_example = 1:10, 
+                            include_points = FALSE,
                             cognostics = c("count", "mean abundance", "median abundance", "cv abundance", "anova p-value"))
 ```
 
 #### Grouping Information Included
 
 ```{r}
-lipid_emeta <- data.frame("Lipid" = lipid_pos_edata$Lipid, 
-  "LipidFamily" = lipid_pos_edata$Lipid %>% as.character() %>% 
-    strsplit("(", fixed = TRUE) %>% lapply(function(el) {el[1]}) %>% unlist())
-
 # Transform the data
-omicsData <- edata_transform(omicsData = lipid_pos_object, data_scale = "log2")
-omicsData$e_meta$LipidFamily <- omicsData$e_meta$Lipid %>% as.character() %>% 
-    strsplit("(", fixed = TRUE) %>% lapply(function(el) {el[1]}) %>% unlist()
+omicsData <- edata_transform(omicsData = pep_object, data_scale = "log2")
 
 # Group the data by condition
-omicsData <- group_designation(omicsData = omicsData, main_effects = c("Virus"))
+omicsData <- group_designation(omicsData = omicsData, main_effects = c("Phenotype"))
 
 # Apply the IMD ANOVA filter
 imdanova_Filt <- imdanova_filter(omicsData = omicsData)
@@ -79,73 +74,74 @@ trelliData4 <- as.trelliData(omicsData = omicsData, statRes = statRes)
 
 ```{r}
 # Should return sample count and mean abundance per group
-trelli_panel_by(trelliData = trelliData2, panel = "Lipid") %>% 
+trelli_panel_by(trelliData = trelliData2, panel = "Peptide") %>% 
    trelli_abundance_boxplot(test_mode = TRUE, 
                             test_example = 1:10)
 
 # Should return mean abundance per group
-trelli_panel_by(trelliData = trelliData2, panel = "Lipid") %>%
+trelli_panel_by(trelliData = trelliData2, panel = "Peptide") %>%
   trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10, cognostics = c("mean abundance", "median abundance", "anova p-value"))
 
 # Should return no cognostics 
-trelli_panel_by(trelliData = trelliData2, panel = "Lipid") %>%
+trelli_panel_by(trelliData = trelliData2, panel = "Peptide") %>%
   trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10, cognostics = c("median abundance", "anova p-value"))
 
 # Should return biomolecule count and mean abundance 
 trelli_panel_by(trelliData = trelliData2, panel = "SampleID") %>%
-  trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10)
+  trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10, include_points = F)
 
 # Should return biomolecule count and mean abundance per biomolecule class
-trelli_panel_by(trelliData = trelliData2, panel = "LipidFamily") %>%
-     trelli_abundance_boxplot()
+trelli_panel_by(trelliData = trelliData2, panel = "RazorProtein") %>%
+     trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10)
 ```
 
 #### Statistics Included 
 
 ```{r}
 # Stats only should error out 
-#trelli_panel_by(trelliData = trelliData3, panel = "Lipid") %>% 
+#trelli_panel_by(trelliData = trelliData3, panel = "Peptide") %>% 
 #  trelli_abundance_boxplot()
 
 # Should return sample count and mean abundance per group
-trelli_panel_by(trelliData = trelliData4, panel = "Lipid") %>% 
+trelli_panel_by(trelliData = trelliData4, panel = "Peptide") %>% 
   trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10)
 
 # Should return sample count and mean abundance per group, and anova p value and fold change
 # per comparison
-trelli_panel_by(trelliData = trelliData4, panel = "Lipid") %>% 
+trelli_panel_by(trelliData = trelliData4, panel = "Peptide") %>% 
   trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10,
                            cognostics = c("count", "mean abundance", "median abundance", "cv abundance", "anova p-value", "fold change"))
 
 # Should return biomolecule count and mean abundance 
 trelli_panel_by(trelliData = trelliData4, panel = "SampleID") %>% 
-  trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10,
+  trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10, include_points = FALSE,
                            cognostics = c("count", "mean abundance", "median abundance", "cv abundance", "anova p-value", "fold change"))
 
 # Should return biomolecule count and mean abundance 
-trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") %>% 
-  trelli_abundance_boxplot(cognostics = c("count", "mean abundance", "median abundance", "cv abundance", "anova p-value", "fold change"))
+trelli_panel_by(trelliData = trelliData4, panel = "RazorProtein") %>% 
+  trelli_abundance_boxplot(cognostics = c("count", "mean abundance", "median abundance", "cv abundance", "anova p-value", "fold change"),
+                           test_mode = TRUE, test_example = 1:10)
 ```
 
 ## Abundance Histograms
 
 ```{r}
-# Should return biomolecule count, and mean, median, cv, and skew abundance
-trelli_panel_by(trelliData = trelliData1, panel = "Lipid") %>% 
+# Should return sample count, and mean, median, cv, and skew abundance
+trelli_panel_by(trelliData = trelliData1, panel = "Peptide") %>% 
      trelli_abundance_histogram(test_mode = TRUE, test_example = 1:10)
 
 # Should return median and skew abundance
-trelli_panel_by(trelliData = trelliData2, panel = "Lipid") %>% 
+trelli_panel_by(trelliData = trelliData2, panel = "Peptide") %>% 
      trelli_abundance_histogram(test_mode = TRUE, test_example = 1:10,
                                 cognostics = c("median abundance", "skew abundance"))
 
 # Should error out 
-#trelli_panel_by(trelliData = trelliData4, panel = "Lipid") %>% 
+#trelli_panel_by(trelliData = trelliData4, panel = "Peptide") %>% 
 #     trelli_abundance_histogram(test_mode = TRUE, test_example = 1:10,
 #                                cognostics = c("sample count", "anova p-value"))
 
 # Should return cv abundance
-trelli_panel_by(trelliData = trelliData4, panel = "Lipid") %>% 
+trelli_panel_by(trelliData = trelliData4, panel = "Peptide") %>% 
      trelli_abundance_histogram(test_mode = TRUE, test_example = 1:10,
                                 cognostics = c("cv abundance"))
 ```
@@ -154,16 +150,16 @@ trelli_panel_by(trelliData = trelliData4, panel = "Lipid") %>%
 
 ```{r}
 # Should return sample count, mean abundance, and biomolecule count
-trelli_panel_by(trelliData = trelliData2, panel = "LipidFamily") %>%
-  trelli_abundance_heatmap()
+trelli_panel_by(trelliData = trelliData2, panel = "RazorProtein") %>%
+  trelli_abundance_heatmap(test_mode = TRUE, test_example = 1:10)
 
 # Should return only biomolecule count
-trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") %>%
-  trelli_abundance_heatmap(cognostics = "biomolecule count")
+trelli_panel_by(trelliData = trelliData4, panel = "RazorProtein") %>%
+  trelli_abundance_heatmap(cognostics = "biomolecule count", test_mode = TRUE, test_example = 1:10)
 
 # Should return only mean abundance
-trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") %>%
-  trelli_abundance_heatmap(cognostics = "mean abundance")
+trelli_panel_by(trelliData = trelliData4, panel = "RazorProtein") %>%
+  trelli_abundance_heatmap(cognostics = "mean abundance", test_mode = TRUE, test_example = 1:10)
 ```
 
 ## Missingness Barplots
@@ -172,15 +168,39 @@ trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") %>%
 
 ```{r}
 # Should return total sample count, observed sample count, and observed sample proportion
-trelli_panel_by(trelliData = trelliData1, panel = "Lipid") %>%
+trelli_panel_by(trelliData = trelliData1, panel = "Peptide") %>%
   trelli_missingness_bar(test_mode = TRUE, test_example = 1:10)
 
 # Should return observed sample proportion
-trelli_panel_by(trelliData = trelliData1, panel = "Lipid") %>%
-  trelli_missingness_bar(test_mode = TRUE, test_example = 1:10, cognostics = "observed sample proportion")
+trelli_panel_by(trelliData = trelliData1, panel = "Peptide") %>%
+  trelli_missingness_bar(test_mode = TRUE, test_example = 1:10, cognostics = "observed proportion")
 
+# Should return total biomolecule count, observed biomolecule count, and observed biomolecule proportion
 trelli_panel_by(trelliData = trelliData1, panel = "Sample") %>%
   trelli_missingness_bar(test_mode = TRUE, test_example = 1:10)
 
+# Should return total biomolecule count
+trelli_panel_by(trelliData = trelliData1, panel = "Sample") %>%
+  trelli_missingness_bar(test_mode = TRUE, test_example = 1:10, cognostics = "total count")
 ```
+
+#### Add grouping data
+
+```{r}
+# Should return total sample count, observed sample count, and observed sample proportion per group
+trelli_panel_by(trelliData = trelliData2, panel = "Peptide") %>%
+  trelli_missingness_bar(test_mode = TRUE, test_example = 1:10, cognostics = "observed proportion")
+
+# Should return total biomolecule count, observed biomolecule count, and observed biomolecule proportion
+trelli_panel_by(trelliData = trelliData2, panel = "SampleID") %>%
+  trelli_missingness_bar(test_mode = TRUE, test_example = 1:10)
+
+# Should return no cognostics, as no stats data was supplied
+trelli_panel_by(trelliData = trelliData2, panel = "SampleID") %>%
+  trelli_missingness_bar(test_mode = TRUE, test_example = 1:10, cognostics = "anova g-test")
+```
+
+##### Add statistics data 
+
+
 
