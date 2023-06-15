@@ -1533,6 +1533,13 @@ na_scatter <- function (edata, group_df, na.by.molecule, edata_cname,
         cols_vary = "slowest",
         names_to = "variable",
         values_to = "value"
+      ) %>% dplyr::mutate(
+        variable = factor(
+          variable,
+          levels = names(plot_data)[
+            -which(names(plot_data) == "num_missing_vals")
+          ]
+        )
       ) %>% data.frame
 
     # Start the scatter plot when the group_DF attribute is present.
@@ -5653,6 +5660,13 @@ plot_omicsData <- function(omicsData, order_by, color_by, facet_by, facet_cols,
       names_to = "variable",
       values_drop_na = TRUE,
       cols_vary = "slowest"
+    ) %>% dplyr::mutate(
+      variable = factor(
+        variable,
+        levels = names(temp_data)[
+          -which(names(temp_data) == e_data_cname)
+        ]
+      )
     ) %>% data.frame
 
   # Farm boy, extract the group_DF attribute. As you wish.
