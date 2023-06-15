@@ -100,7 +100,7 @@ test_that('plot functions are producing desired output',{
   mylipid <- group_designation(omicsData = lipid_pos_object, main_effects = "Condition")
   result <- missingval_result(omicsData = mylipid)
   expect_doppelganger("plot.naRes (bar, group color)", 
-                      plot(naRes_obj = result, 
+                      plot(result, 
                            omicsData = mylipid,
                            plot_type = "bar", 
                            x_lab_angle = 50, 
@@ -108,7 +108,7 @@ test_that('plot functions are producing desired output',{
                            color_by = "Group")
   )
   expect_doppelganger("plot.naRes (bar, group order)", 
-                      plot(naRes_obj = result, 
+                      plot(result, 
                            omicsData = mylipid,
                            plot_type = "bar", 
                            x_lab_angle = 50, 
@@ -116,7 +116,7 @@ test_that('plot functions are producing desired output',{
                            color_by = "Condition")
   )
   expect_doppelganger("plot.naRes (scatter)", 
-                      plot(naRes_obj = result,
+                      plot(result,
                            omicsData = mylipid,
                            plot_type = "scatter",
                            x_lab_angle = 50,
@@ -279,21 +279,21 @@ test_that('plot functions are producing desired output',{
   expect_doppelganger("plot.isobaricpepData", plot(myiso))
   
   mylipid <- edata_transform(omicsData = lipid_pos_object, data_scale = "log2")
-  expect_doppelganger("plot.lipidData", plot(omicsData = mylipid, order_by = "Condition", color_by = "Condition"))
+  expect_doppelganger("plot.lipidData", plot(mylipid, order_by = "Condition", color_by = "Condition"))
   
   mymetab <- edata_transform(omicsData = metab_object, data_scale = "log2")
-  expect_doppelganger("plot.metabData", plot(omicsData = mymetab, order_by = "Condition", color_by = "Condition"))
+  expect_doppelganger("plot.metabData", plot(mymetab, order_by = "Condition", color_by = "Condition"))
   
   mynmr <- edata_transform(omicsData = nmr_identified_object, data_scale = "log2")
-  expect_doppelganger("plot.nmrData", plot(omicsData = mynmr, order_by = "Condition", color_by = "Condition"))
+  expect_doppelganger("plot.nmrData", plot(mynmr, order_by = "Condition", color_by = "Condition"))
   
   mypep <- edata_transform(omicsData = pep_object, data_scale = "log2")
-  expect_doppelganger("plot.pepData", plot(omicsData = mypep, order_by = "Condition", color_by = "Condition"))
+  expect_doppelganger("plot.pepData", plot(mypep, order_by = "Condition", color_by = "Condition"))
   
   mypro <- edata_transform(omicsData = pro_object, data_scale = "log2")
-  expect_doppelganger("plot.proData", plot(omicsData = pro_object, order_by = "Condition", color_by = "Condition"))
+  expect_doppelganger("plot.proData", plot(pro_object, order_by = "Condition", color_by = "Condition"))
   
   myseq <- group_designation(omicsData = rnaseq_object, main_effects = "Tissue")
-  expect_doppelganger("plot.seqData", plot(omicsData = rnaseq_object, transformation = "lcpm"))
+  expect_doppelganger("plot.seqData", plot(rnaseq_object, transformation = "lcpm"))
   
 })
