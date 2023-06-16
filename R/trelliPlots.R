@@ -940,7 +940,7 @@ trelli_abundance_heatmap <- function(trelliData,
 #'    data is included, all cognostics will be reported per group. If the 
 #'    trelliData is paneled by a biomolecule, the counts and proportion we be 
 #'    samples. If paneled by a sample or biomolecule class, the counts and proportions
-#'    will be biomolecules. If statRes data is included, "anova g-test" may 
+#'    will be biomolecules. If statRes data is included, "g-test p-value" may 
 #'    be included. 
 #' @param proportion A logical to determine whether plots should display counts
 #'    or proportions. Default is TRUE.
@@ -1010,7 +1010,7 @@ trelli_missingness_bar <- function(trelliData,
   trelli_precheck(trelliData = trelliData, 
                   trelliCheck = c("either"),
                   cognostics = cognostics,
-                  acceptable_cognostics = c("total count", "observed count", "observed proportion", "anova g-test"),
+                  acceptable_cognostics = c("total count", "observed count", "observed proportion", "g-test p-value"),
                   ggplot_params = ggplot_params,
                   interactive = interactive,
                   test_mode = test_mode, 
@@ -1024,11 +1024,14 @@ trelli_missingness_bar <- function(trelliData,
     stop("proportion must be a TRUE or FALSE.")
   }
   
-  # Test whether statRes data is included to use anova g-test
-  if ("anova g-test" %in% cognostics) {
+  # Test whether statRes data is included to use g-test p-value
+  if ("g-test p-value" %in% cognostics) {
     if (is.null(trelliData$trelliData.stat)) {
-      cognostics <- cognostics[cognostics != "anova g-test"]
-      message("'anova g-test' can only be included if stats data is included ")
+      cognostics <- cognostics[cognostics != "g-test p-value"]
+      message("'g-test p-value' can only be included if stats data (statRes) is included")
+    } else if (is.na(attr(trelliData, "panel_by_stat")) || get_edata_cname(trelliData$statRes) != attr(trelliData, "panel_by_stat")) {
+      cognostics <- cognostics[cognostics != "g-test p-value"]
+      message("'g-test p-value' can only be included if the data has been paneled by the biomolecule column 'edata_cname'")
     }
   }
   
@@ -1179,6 +1182,27 @@ trelli_missingness_bar <- function(trelliData,
       
     # Remove group column
     Miss_Cog <- Miss_Cog %>% dplyr::select(c(name, value))
+    
+    # Add statistics if applicable
+    if ("g-test p-value" %in% cognostics) {
+      
+      edata_cname <- get_edata_cname(trelliData$statRes)
+      
+      if (!is.na(attr(trelliData, "panel_by_stat")) && edata_cname == attr(trelliData, "panel_by_stat")) {
+        
+        Miss_Cog <- rbind(Miss_Cog, 
+                          trelliData$trelliData.stat %>%
+                            dplyr::filter(trelliData$trelliData.stat[[edata_cname]] == GroupingVar) %>%
+                            dplyr::select(Nested_DF) %>%
+                            tidyr::unnest(cols = c(Nested_DF)) %>%
+                            dplyr::mutate(Comparison = paste(Comparison, "g-test p-value")) %>%
+                            dplyr::select(Comparison, p_value_gtest) %>%
+                            dplyr::rename(name = Comparison, value = p_value_gtest)
+        )
+        
+      }
+      
+    }
     
     # Return NULL if there's no cognostics 
     if (nrow(Miss_Cog) == 0) {return(NULL)}
