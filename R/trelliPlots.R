@@ -189,7 +189,7 @@ quick_cog <- function(name, value) {
 }
 
 # This function builds all trelliscopes.
-trelli_builder <- function(toBuild, cognostics, plotFUN, cogFUN, path, name, ...) {
+trelli_builder <- function(toBuild, cognostics, plotFUN, cogFUN, path, name, remove_nestedDF, ...) {
   
   # Remove any blank names 
   if ("" %in% unlist(toBuild[,1])) {
@@ -201,27 +201,31 @@ trelli_builder <- function(toBuild, cognostics, plotFUN, cogFUN, path, name, ...
     stop("No data to build trelliscope with.")
   }
   
-  # Build trelliscope without cognostics if none are provided. Otherwise, build with cognostics.
-  if (is.null(cognostics)) {
+  # Plots will always be included 
+  preLaunch <- toBuild %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(
+      panel = trelliscopejs::map2_plot(Nested_DF, as.character(unlist(toBuild[,1])), plotFUN)
+    ) 
+  
+  # Cognostics are optional
+  if (!is.null(cognostics)) {
     
-    toBuild %>%
-      dplyr::ungroup() %>%
+    preLaunch <- preLaunch %>%
       dplyr::mutate(
-        panel = trelliscopejs::map2_plot(Nested_DF, as.character(unlist(toBuild[,1])), plotFUN)
-      ) %>%
-      trelliscopejs::trelliscope(path = path, name = name, nrow = 1, ncol = 1, thumb = TRUE, ...) 
-    
-  } else {
-    
-    toBuild %>%
-      dplyr::ungroup() %>%
-      dplyr::mutate(
-        panel = trelliscopejs::map2_plot(Nested_DF, as.character(unlist(toBuild[,1])), plotFUN),
         cog = trelliscopejs::map2_cog(Nested_DF, as.character(unlist(toBuild[,1])), cogFUN)
-      ) %>%
-      trelliscopejs::trelliscope(path = path, name = name, nrow = 1, ncol = 1, thumb = TRUE, ...) 
+      )
     
   }
+  
+  # Some dataframes are only one row, which ends up as cognostics. Removing the nestedDF
+  # is recommended
+  if (remove_nestedDF) {preLaunch <- preLaunch %>% dplyr::select(-Nested_DF)}
+  
+  # Finally, build the diplay  
+  preLaunch %>%
+      trelliscopejs::trelliscope(path = path, name = name, nrow = 1, ncol = 1, thumb = TRUE, ...) 
+    
 }
 
 # Get downloads folder
@@ -538,6 +542,7 @@ trelli_abundance_boxplot <- function(trelliData,
                    cogFUN = box_cog_fun,
                    path = path,
                    name = name,
+                   remove_nestedDF = FALSE,
                    ...)
     
   }
@@ -713,6 +718,7 @@ trelli_abundance_histogram <- function(trelliData,
                    cogFUN = hist_cog_fun,
                    path = path,
                    name = name,
+                   remove_nestedDF = FALSE,
                    ...)
     
   }
@@ -912,6 +918,7 @@ trelli_abundance_heatmap <- function(trelliData,
                    cogFUN = hm_cog_fun,
                    path = path,
                    name = name,
+                   remove_nestedDF = FALSE,
                    ...) 
     
   }
@@ -1029,7 +1036,7 @@ trelli_missingness_bar <- function(trelliData,
   if (test_mode) {test_example <- unique(abs(round(test_example)))}
   
   # Determine if the trelliData is paneled by the edata column
-  if (is.null(attr(trelliData, "panel_by_omics"))) {
+  if (is.na(attr(trelliData, "panel_by_omics"))) {
     paneled_by_edata <- attr(trelliData, "panel_by_stat") == get_edata_cname(trelliData$statRes)
   } else {
     paneled_by_edata <- attr(trelliData, "panel_by_omics") == get_edata_cname(trelliData$omicsData)
@@ -1212,7 +1219,7 @@ trelli_missingness_bar <- function(trelliData,
       dplyr::group_by(!!rlang::sym(edata_cname)) %>%
       tidyr::nest() %>%
       dplyr::ungroup() %>%
-      dplyr::rename(Nested_DF = data)
+      dplyr::rename(Nested_DF = data) 
     
     # Save total counts 
     totalCounts <- attr(trelliData$statRes, "group_DF")$Group %>% 
@@ -1232,13 +1239,31 @@ trelli_missingness_bar <- function(trelliData,
   } else {
     
     # Pass parameters to trelli_builder function
-    trelli_builder(toBuild = toBuild,
-                   cognostics = cognostics, 
-                   plotFUN = missing_bar_plot_fun,
-                   cogFUN = missing_bar_cog_fun,
-                   path = path,
-                   name = name,
-                   ...)
+    if (!is.null(trelliData$omicsData)) {
+      
+      trelli_builder(toBuild = toBuild,
+                     cognostics = cognostics, 
+                     plotFUN = missing_bar_plot_fun,
+                     cogFUN = missing_bar_cog_fun,
+                     path = path,
+                     name = name,
+                     remove_nestedDF = FALSE,
+                     ...)
+      
+      
+    } else {
+      
+      trelli_builder(toBuild = toBuild,
+                     cognostics = cognostics, 
+                     plotFUN = missing_bar_plot_fun,
+                     cogFUN = missing_bar_cog_fun,
+                     path = path,
+                     name = name,
+                     remove_nestedDF = TRUE,
+                     ...)
+      
+    }
+
     
   }
   
@@ -1449,6 +1474,7 @@ trelli_foldchange_bar <- function(trelliData,
                  cogFUN = fc_bar_cog_fun,
                  path = path,
                  name = name,
+                 remove_nestedDF = FALSE,
                  ...)
   
 }
@@ -1651,6 +1677,7 @@ trelli_foldchange_boxplot <- function(trelliData,
                    cogFUN = fc_box_cog_fun,
                    path = path,
                    name = name,
+                   remove_nestedDF = FALSE,
                    ...)
   }
     
@@ -1881,6 +1908,7 @@ trelli_foldchange_volcano <- function(trelliData,
                    cogFUN = fc_volcano_cog_fun,
                    path = path,
                    name = name,
+                   remove_nestedDF = FALSE,
                    ...)
     
   }
@@ -2072,6 +2100,7 @@ trelli_foldchange_heatmap <- function(trelliData,
                    cogFUN = fc_hm_cog_fun,
                    path = path,
                    name = name,
+                   remove_nestedDF = FALSE,
                    ...)
     
   }

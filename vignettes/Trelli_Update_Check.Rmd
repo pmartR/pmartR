@@ -202,5 +202,14 @@ trelli_panel_by(trelliData = trelliData2, panel = "SampleID") %>%
 
 ##### Add statistics data 
 
+```{r}
+# Statistics data only. Should return total sample count, observed sample count, 
+# and observed sample proportion per group
+trelli_panel_by(trelliData = trelliData3, panel = "Peptide") %>%
+  trelli_missingness_bar(test_mode = TRUE, test_example = 1:10)
 
+# Statistics data only. Should return total sample proportion, and anova g-test.
+trelli_panel_by(trelliData = trelliData3, panel = "Peptide") %>%
+  trelli_missingness_bar(test_mode = TRUE, test_example = 1:10, cognostics = c("observed proportion", "anova g-test"))
+```
 
