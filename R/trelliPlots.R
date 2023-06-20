@@ -22,8 +22,6 @@
 #'   potential future functions.
 #' @param p_value_thresh The user provided threshold for plotting significant
 #'   p-values.
-#' @param p_value_test The user provided test to indicate in plots. Valid options 
-#'   are anova, gtest, or NULL.
 trelli_precheck <- function(trelliData, 
                             trelliCheck,
                             cognostics, 
@@ -34,8 +32,7 @@ trelli_precheck <- function(trelliData,
                             test_example,
                             single_plot,
                             p_value_skip = FALSE,
-                            p_value_thresh = NULL,
-                            p_value_test = NULL) {
+                            p_value_thresh = NULL) {
   
   #########################
   ## TEST EXAMPLE CHECKS ##
@@ -152,22 +149,6 @@ trelli_precheck <- function(trelliData,
   
   # Check p_value test
   if ("stat" %in% trelliCheck & p_value_skip != TRUE) {
-    
-    if (!is.null(p_value_test)) {
-      
-      if (!is.character(p_value_test) || p_value_test %in% c("anova", "gtest") == FALSE || length(p_value_test) > 1) {
-        stop("p_value_test must be anova, gtest, or NULL.")
-        }
-  
-    
-      # Check that the data has the requested p_value 
-      if (p_value_test == "anova" & any(grepl("P_value_A", colnames(trelliData$statRes))) == FALSE) {
-        stop("No imd-anova stats were detected in the statRes object. Change p_value_test to gtest.")
-      } else if (p_value_test == "gtest" & any(grepl("P_value_G", colnames(trelliData$statRes))) == FALSE) {
-        stop("No gtest stats were detected in the statRes object. Change p_value_test to anova.")
-      } 
-    
-    }
       
     # Check p_value threshold
     if (!is.numeric(p_value_thresh)) {
@@ -178,8 +159,6 @@ trelli_precheck <- function(trelliData,
     }
     
   }
-  
-  return(p_value_test)
   
 }
 
@@ -332,8 +311,7 @@ trelli_abundance_boxplot <- function(trelliData,
                   test_mode = test_mode, 
                   test_example = test_example,
                   single_plot = single_plot,
-                  p_value_thresh = NULL,
-                  p_value_test = NULL)
+                  p_value_thresh = NULL)
   
   
   # Remove stat specific options if no stats data was provided 
@@ -629,8 +607,7 @@ trelli_abundance_histogram <- function(trelliData,
                   test_mode = test_mode, 
                   test_example = test_example,
                   single_plot = single_plot,
-                  p_value_thresh = NULL,
-                  p_value_test = NULL)
+                  p_value_thresh = NULL)
 
   
   # Round test example to integer 
@@ -797,8 +774,7 @@ trelli_abundance_heatmap <- function(trelliData,
                   test_mode = test_mode, 
                   test_example = test_example,
                   single_plot = single_plot,
-                  p_value_thresh = NULL,
-                  p_value_test = NULL)
+                  p_value_thresh = NULL)
   
   # Round test example to integer 
   if (test_mode) {test_example <- unique(abs(round(test_example)))}
@@ -1016,8 +992,7 @@ trelli_missingness_bar <- function(trelliData,
                   test_mode = test_mode, 
                   test_example = test_example,
                   single_plot = single_plot,
-                  p_value_thresh = NULL,
-                  p_value_test = NULL)
+                  p_value_thresh = NULL)
   
   # Check that proportion is a non NA logical
   if (!is.logical(proportion) | is.na(proportion)) {
@@ -1293,11 +1268,10 @@ trelli_missingness_bar <- function(trelliData,
   
 }
 
-determine_significance <- function(DF, p_value_test, p_value_thresh) {
+determine_significance <- function(DF, p_value_thresh) {
   
-  # Indicate significant values 
-  if (p_value_test == "anova") {DF$Significance <- DF$p_value_anova <= p_value_thresh} else 
-  if (p_value_test == "gtest") {DF$Significance <- DF$p_value_gtest <= p_value_thresh} 
+  # Subset by significance
+  DF$Significance <- DF$p_value_anova <= p_value_thresh
   
   # Filter out NA values 
   DF <- DF[!(is.nan(DF$Significance) | is.nan(DF$fold_change)),]
@@ -1327,9 +1301,7 @@ determine_significance <- function(DF, p_value_test, p_value_thresh) {
 #'
 #' @param trelliData A trelliscope data object with statRes results. Required.
 #' @param cognostics A vector of cognostic options for each plot. Valid entries
-#'   are are fold_change and p_value.
-#' @param p_value_test A string to indicate which p_values to plot. Acceptable
-#'    entries are "anova", "gtest", or NULL. Default is "anova". 
+#'   are "fold change" 
 #' @param p_value_thresh A value between 0 and 1 to indicate significant
 #'   biomolecules for p_value_test. Default is 0.05.
 #' @param ggplot_params An optional vector of strings of ggplot parameters to
@@ -1353,11 +1325,11 @@ determine_significance <- function(DF, p_value_test, p_value_thresh) {
 #' 
 #' ## Build fold_change bar plot with statRes data grouped by edata_colname.
 #' trelli_panel_by(trelliData = trelliData3, panel = "Lipid") %>% 
-#'   trelli_foldchange_bar(test_mode = TRUE, test_example = 1:10, p_value_test = "anova")
+#'   trelli_foldchange_bar(test_mode = TRUE, test_example = 1:10)
 #'   
 #' ## Or make the plot interactive  
 #' trelli_panel_by(trelliData = trelliData4, panel = "Lipid") %>% 
-#'   trelli_foldchange_bar(test_mode = TRUE, test_example = 1:10, p_value_test = "gtest", interactive = TRUE) 
+#'   trelli_foldchange_bar(test_mode = TRUE, test_example = 1:10, interactive = TRUE) 
 #'    
 #' }
 #' 
@@ -1365,8 +1337,7 @@ determine_significance <- function(DF, p_value_test, p_value_thresh) {
 #' 
 #' @export
 trelli_foldchange_bar <- function(trelliData,
-                                  cognostics = c("fold_change", "p_value"),
-                                  p_value_test = "anova",
+                                  cognostics = c("fold change", "anova p-value"),
                                   p_value_thresh = 0.05,
                                   ggplot_params = NULL,
                                   interactive = FALSE,
@@ -1380,17 +1351,16 @@ trelli_foldchange_bar <- function(trelliData,
   # Run initial checks----------------------------------------------------------
   
   # Run generic checks 
-  p_value_test <- trelli_precheck(trelliData = trelliData, 
+  trelli_precheck(trelliData = trelliData, 
                   trelliCheck = "stat",
                   cognostics = cognostics,
-                  acceptable_cognostics = c("p_value", "fold_change"),
+                  acceptable_cognostics = c("fold change", "anova p-value"),
                   ggplot_params = ggplot_params,
                   interactive = interactive,
                   test_mode = test_mode, 
                   test_example = test_example,
                   single_plot = single_plot,
-                  p_value_thresh = p_value_thresh,
-                  p_value_test = p_value_test)
+                  p_value_thresh = p_value_thresh)
   
   # Round test example to integer 
   if (test_mode) {test_example <- unique(abs(round(test_example)))}
@@ -1405,10 +1375,10 @@ trelli_foldchange_bar <- function(trelliData,
   
   fc_bar_plot_fun <- function(DF, title) {
     
-    if (!is.null(p_value_test) && p_value_thresh != 0) {
+    if (p_value_thresh != 0) {
       
       # Get significant values
-      DF <- determine_significance(DF, p_value_test, p_value_thresh)
+      DF <- determine_significance(DF, p_value_thresh)
       if (is.null(DF)) {return(NULL)}
       
       # Make bar plot 
@@ -1452,22 +1422,19 @@ trelli_foldchange_bar <- function(trelliData,
   fc_bar_cog_fun <- function(DF, Biomolecule) {
     
     # Extend cognostics if p_value is in it
-    if ("p_value" %in% cognostics) {
-      theNames <- trelliData$trelliData.stat$Nested_DF[[1]] %>% colnames()
-      p_value_cols <- theNames[grepl("p_value", theNames)]
-      cognostics <- cognostics[cognostics != "p_value"]
-      cognostics <- c(cognostics, p_value_cols)
-    }
+    if ("fold change" %in% cognostics) {DF <- DF %>% dplyr::rename(`fold change` = fold_change)}
+    if ("anova p-value" %in% cognostics) {DF <- DF %>% dplyr::rename(`anova p-value` = p_value_anova)}
     
     # Prepare DF for quick_cog function
     PreCog <- DF %>%
+      dplyr::select(c(cognostics, Comparison)) %>%
       tidyr::pivot_longer(cognostics) %>%
       dplyr::mutate(Comparison = paste(Comparison, name)) %>%
       dplyr::select(-name)
     
     # Make quick cognostics
     cog_to_trelli <- do.call(cbind, lapply(1:nrow(PreCog), function(row) {
-      quick_cog(gsub("_", " ", PreCog$Comparison[row]), round(PreCog$value[row], 4))
+      quick_cog(PreCog$Comparison[row], round(PreCog$value[row], 4))
     })) %>% tibble::tibble()
     
     return(cog_to_trelli)
