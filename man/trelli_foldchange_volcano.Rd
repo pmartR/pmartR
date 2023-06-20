@@ -6,7 +6,7 @@
 \usage{
 trelli_foldchange_volcano(
   trelliData,
-  comparison,
+  comparison = "all",
   cognostics = "biomolecule count",
   p_value_thresh = 0.05,
   ggplot_params = NULL,
@@ -25,7 +25,8 @@ results. Required.}
 
 \item{comparison}{The specific comparison to visualize in the fold_change
 volcano. See attr(statRes, "comparisons") for the available options.
-Required.}
+If all comparisons are desired, the word "all" can be used, which is the
+default. Required.}
 
 \item{cognostics}{A vector of cognostic options for each plot. Valid entries are 
 "biomolecule count", "proportion significant", "proportion significant up",

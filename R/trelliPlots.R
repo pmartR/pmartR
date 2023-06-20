@@ -1878,7 +1878,8 @@ trelli_foldchange_heatmap <- function(trelliData,
 #'   results. Required.
 #' @param comparison The specific comparison to visualize in the fold_change
 #'   volcano. See attr(statRes, "comparisons") for the available options.
-#'   Required.
+#'   If all comparisons are desired, the word "all" can be used, which is the
+#'   default. Required.
 #' @param cognostics A vector of cognostic options for each plot. Valid entries are 
 #'   "biomolecule count", "proportion significant", "proportion significant up",
 #'   and "proportion significant down". Default is "biomolecule count" 
@@ -1913,7 +1914,7 @@ trelli_foldchange_heatmap <- function(trelliData,
 #' 
 #' @export
 trelli_foldchange_volcano <- function(trelliData,
-                                      comparison, 
+                                      comparison = "all", 
                                       cognostics = "biomolecule count",
                                       p_value_thresh = 0.05,
                                       ggplot_params = NULL,
@@ -1949,6 +1950,8 @@ trelli_foldchange_volcano <- function(trelliData,
   
   # Ensure that comparison is from the comparisons lists
   Comparisons <- attr(trelliData$statRes, "comparisons")
+  if ("all" %in% comparison) {comparison <- Comparisons}
+  
   if (any(comparison %in% Comparisons) == FALSE) {
     stop(paste0(comparison, "is not an acceptable comparison"))
   }

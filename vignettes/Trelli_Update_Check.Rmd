@@ -316,6 +316,12 @@ trelli_panel_by(trelliData = trelliData4, panel = "RazorProtein") %>%
                             comparison = c("Phenotype3_vs_Phenotype1",
                                            "Phenotype3_vs_Phenotype2"),
                             cognostics = "proportion significant")
+
+# If no comparisons are specified, then all of them should be generated
+trelli_panel_by(trelliData = trelliData4, panel = "RazorProtein") %>%
+  trelli_foldchange_volcano(test_mode = TRUE, test_example = 1:10, 
+                            comparison = "all",
+                            cognostics = "biomolecule count")
 ```
 
 
