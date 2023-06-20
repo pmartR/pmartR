@@ -7,8 +7,7 @@
 trelli_foldchange_volcano(
   trelliData,
   comparison,
-  cognostics = c("n"),
-  p_value_test = "anova",
+  cognostics = "biomolecule count",
   p_value_thresh = 0.05,
   ggplot_params = NULL,
   interactive = FALSE,
@@ -28,11 +27,9 @@ results. Required.}
 volcano. See attr(statRes, "comparisons") for the available options.
 Required.}
 
-\item{cognostics}{A vector of cognostic options for each plot. Valid entry is
-n.}
-
-\item{p_value_test}{A string to indicate which p_values to plot. Acceptable
-entries are "anova", "gtest", or NULL. Default is "anova".}
+\item{cognostics}{A vector of cognostic options for each plot. Valid entries are 
+"biomolecule count", "proportion significant", "proportion significant up",
+and "proportion significant down". Default is "biomolecule count"}
 
 \item{p_value_thresh}{A value between 0 and 1 to indicate significant
 biomolecules for p_value_test. Default is 0.05.}

@@ -6,8 +6,7 @@
 \usage{
 trelli_foldchange_boxplot(
   trelliData,
-  cognostics = c("biomolecule count", "proportion significant", "mean fold change",
-    "sd fold change"),
+  cognostics = "biomolecule count",
   p_value_thresh = 0.05,
   include_points = TRUE,
   ggplot_params = NULL,
@@ -24,12 +23,12 @@ trelli_foldchange_boxplot(
 \item{trelliData}{A trelliscope data object with omicsData and statRes
 results. Required.}
 
-\item{cognostics}{A vector of cognostic options for each plot. Valid entries and
-defaults are "biomolecule count", "proportion significant", "mean fold change",
-and "sd fold change".}
+\item{cognostics}{A vector of cognostic options for each plot. Valid entries are 
+"biomolecule count", "proportion significant", "mean fold change",
+and "sd fold change". Default is "biomolecule count"}
 
 \item{p_value_thresh}{A value between 0 and 1 to indicate significant
-biomolecules for p_value_test. Default is 0.05.}
+biomolecules for the anova test. Default is 0.05.}
 
 \item{include_points}{Add points. Default is TRUE.}
 
