@@ -62,9 +62,15 @@ Specify a plot design and cognostics for the fold_change boxplot
 \examples{
 \dontrun{ 
 
-## Build fold_change box plot with statRes data grouped by edata_colname.
-trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") \%>\% 
-  trelli_foldchange_boxplot(p_value_test = "anova")
+# Build fold_change box plot with statRes data grouped by edata_colname.
+trelli_panel_by(trelliData = trelliData4, panel = "RazorProtein") \%>\% 
+  trelli_foldchange_boxplot(test_mode = TRUE, 
+                            test_example = 1:10,
+                            cognostics = c("biomolecule count", 
+                                           "proportion significant", 
+                                           "mean fold change",
+                                           "sd fold change")
+                           )
 
 }
 
