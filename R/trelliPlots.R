@@ -1301,7 +1301,7 @@ determine_significance <- function(DF, p_value_thresh) {
 #'
 #' @param trelliData A trelliscope data object with statRes results. Required.
 #' @param cognostics A vector of cognostic options for each plot. Valid entries
-#'   are "fold change" 
+#'   and the defaults are "fold change" and "anova p-value". 
 #' @param p_value_thresh A value between 0 and 1 to indicate significant
 #'   biomolecules for p_value_test. Default is 0.05.
 #' @param ggplot_params An optional vector of strings of ggplot parameters to
@@ -1480,10 +1480,9 @@ trelli_foldchange_bar <- function(trelliData,
 #'
 #' @param trelliData A trelliscope data object with omicsData and statRes
 #'   results. Required.
-#' @param cognostics A vector of cognostic options for each plot. Valid entries
-#'   are are n, mean, median, and sd.
-#' @param p_value_test A string to indicate which p_values to plot. Acceptable
-#'    entries are "anova", "gtest", or NULL. Default is "anova". 
+#' @param cognostics A vector of cognostic options for each plot. Valid entries and
+#'   defaults are "biomolecule count", "proportion significant", "mean fold change",
+#'   and "sd fold change".
 #' @param p_value_thresh A value between 0 and 1 to indicate significant
 #'   biomolecules for p_value_test. Default is 0.05.
 #' @param include_points Add points. Default is TRUE.
@@ -1516,8 +1515,10 @@ trelli_foldchange_bar <- function(trelliData,
 #' 
 #' @export
 trelli_foldchange_boxplot <- function(trelliData,
-                                      cognostics = c("n", "median", "mean", "sd"),
-                                      p_value_test = "anova",
+                                      cognostics = c("biomolecule count", 
+                                                     "proportion significant", 
+                                                     "mean fold change",
+                                                     "sd fold change"),
                                       p_value_thresh = 0.05,
                                       include_points = TRUE,
                                       ggplot_params = NULL,
@@ -1535,14 +1536,16 @@ trelli_foldchange_boxplot <- function(trelliData,
   p_value_test <- trelli_precheck(trelliData = trelliData, 
                   trelliCheck = c("omics", "stat"),
                   cognostics = cognostics,
-                  acceptable_cognostics = c("n", "median", "mean", "sd"),
+                  acceptable_cognostics = c("biomolecule count", 
+                                            "proportion significant", 
+                                            "mean fold change",
+                                            "sd fold change"),
                   ggplot_params = ggplot_params,
                   interactive = interactive,
                   test_mode = test_mode, 
                   test_example = test_example,
                   single_plot = single_plot,
-                  p_value_thresh = p_value_thresh,
-                  p_value_test = p_value_test)
+                  p_value_thresh = p_value_thresh)
   
   # Round test example to integer 
   if (test_mode) {test_example <- unique(abs(round(test_example)))}
@@ -1561,10 +1564,10 @@ trelli_foldchange_boxplot <- function(trelliData,
   
   fc_box_plot_fun <- function(DF, title) {
     
-    if (!is.null(p_value_test) && p_value_thresh != 0) {
+    if (p_value_thresh != 0) {
     
       # Get significant values
-      DF <- determine_significance(DF, p_value_test, p_value_thresh)
+      DF <- determine_significance(DF, p_value_thresh)
       if (is.null(DF)) {return(NULL)}
     
       # Make boxplot
@@ -1622,22 +1625,22 @@ trelli_foldchange_boxplot <- function(trelliData,
     cog_to_trelli <- DF %>%
       dplyr::group_by(Comparison) %>%
       dplyr::summarise(
-        "n" = sum(!is.nan(fold_change)), 
-        "mean" = round(mean(fold_change, na.rm = TRUE), 4),
-        "median" = round(median(fold_change, na.rm = TRUE), 4),
-        "sd" = round(sd(fold_change, na.rm = TRUE), 4)
+        "biomolecule count" = sum(!is.nan(fold_change)), 
+        "proportion significant" = round(sum(p_value_anova[!is.na(p_value_anova)] <= p_value_thresh) / `biomolecule count`, 4),
+        "mean fold change" = round(mean(fold_change, na.rm = TRUE), 4),
+        "sd fold change" = round(sd(fold_change, na.rm = TRUE), 4)
       ) %>%
-     tidyr::pivot_longer(c(n, mean, median, sd)) %>%
+     tidyr::pivot_longer(c(`biomolecule count`, `proportion significant`, `mean fold change`, `sd fold change`)) %>%
      dplyr::filter(name %in% cognostics) %>%
      dplyr::mutate(
-      name = paste(Comparison, lapply(name, function(x) {name_converter_foldchange[[x]]}) %>% unlist())
+      name = paste(Comparison, name)
      ) %>%
     dplyr::ungroup() %>%
     dplyr::select(-Comparison) 
     
     # Add new cognostics 
     cog_to_trelli <- do.call(cbind, lapply(1:nrow(cog_to_trelli), function(row) {
-      quick_cog(gsub("_", " ", cog_to_trelli$name[row]), cog_to_trelli$value[row])
+      quick_cog(cog_to_trelli$name[row], cog_to_trelli$value[row])
     })) %>% tibble::tibble()
     
     return(cog_to_trelli)

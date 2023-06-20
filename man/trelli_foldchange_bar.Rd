@@ -22,7 +22,7 @@ trelli_foldchange_bar(
 \item{trelliData}{A trelliscope data object with statRes results. Required.}
 
 \item{cognostics}{A vector of cognostic options for each plot. Valid entries
-are "fold change"}
+and the defaults are "fold change" and "anova p-value".}
 
 \item{p_value_thresh}{A value between 0 and 1 to indicate significant
 biomolecules for p_value_test. Default is 0.05.}
