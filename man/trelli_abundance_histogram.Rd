@@ -58,16 +58,16 @@ Specify a plot design and cognostics for the abundance histogram
 \dontrun{
 
 ## Build the abundance histogram with an edata file. Generate trelliData in as.trelliData.edata
-trelli_panel_by(trelliData = trelliData, panel = "Lipid") \%>\% 
+trelli_panel_by(trelliData = trelliData, panel = "Peptide") \%>\% 
    trelli_abundance_histogram(test_mode = TRUE, test_example = 1:10)
 
 ## Build the abundance histogram with an omicsData object. Generate trelliData in as.trelliData
-trelli_panel_by(trelliData = trelliData2, panel = "Lipid") \%>\% 
+trelli_panel_by(trelliData = trelliData2, panel = "Peptide") \%>\% 
    trelli_abundance_histogram(test_mode = TRUE, test_example = 1:10)
     
 ## Build the abundance histogram with an omicsData and statRes object. Generate trelliData in as.trelliData.
-trelli_panel_by(trelliData = trelliData4, panel = "Lipid") \%>\%
-   trelli_abundance_histogram(test_mode = TRUE, test_example = 1:10)
+trelli_panel_by(trelliData = trelliData4, panel = "Peptide") \%>\%
+   trelli_abundance_histogram(test_mode = TRUE, test_example = 1:10, cognostics = "sample count")
    
 ## Users can modify the plotting function with ggplot parameters and interactivity, 
 ## and can also select certain cognostics.     
