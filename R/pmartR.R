@@ -10,8 +10,9 @@
 #'  and statistical comparisons between defined groups.
 #'
 #' @docType package
-#' @importFrom Rcpp evalCpp
 #'
+#' @import methods
+#' @importFrom Rcpp evalCpp
 #' @importFrom stats anova aov as.formula binomial complete.cases cor dist ecdf formula glm hclust lm mad median model.matrix na.omit p.adjust.methods pbinom pchisq qchisq quantile runif sd setNames t.test var
 #' @importFrom utils capture.output combn data head stack tail
 #'

@@ -23,6 +23,7 @@ Imports:
     e1071,
     forcats,
     foreach,
+    methods,
     mvtnorm,
     pcaMethods,
     plotly,
