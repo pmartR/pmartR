@@ -18,7 +18,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pmartR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.2</span>
       </span>
     </div>
 
@@ -89,7 +89,7 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">trelli_foldchange_bar</span><span class="op">(</span></span>
 <span>  <span class="va">trelliData</span>,</span>
 <span>  cognostics <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fold_change"</span>, <span class="st">"p_value"</span><span class="op">)</span>,</span>
-<span>  p_value_test <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  p_value_test <span class="op">=</span> <span class="st">"anova"</span>,</span>
 <span>  p_value_thresh <span class="op">=</span> <span class="fl">0.05</span>,</span>
 <span>  ggplot_params <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  interactive <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -114,9 +114,8 @@ are are fold_change and p_value.</p></dd>
 
 
 <dt>p_value_test</dt>
-<dd><p>A logical to indicate whether specific significant
-biomolecules are to be incidated with a black outline, if an imd-anova was
-run. Default is FALSE.</p></dd>
+<dd><p>A string to indicate which p_values to plot. Acceptable
+entries are "anova", "gtest", or NULL. Default is "anova".</p></dd>
 
 
 <dt>p_value_thresh</dt>
@@ -171,11 +170,11 @@ trelliscope) should be returned. Default is FALSE.</p></dd>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Build fold_change bar plot with statRes data grouped by edata_colname.</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span>trelliData <span class="op">=</span> <span class="va">trelliData3</span>, panel <span class="op">=</span> <span class="st">"Lipid"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span></span>
-<span class="r-in"><span>  <span class="fu">trelli_foldchange_bar</span><span class="op">(</span>test_mode <span class="op">=</span> <span class="cn">TRUE</span>, test_example <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, p_value_test <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu">trelli_foldchange_bar</span><span class="op">(</span>test_mode <span class="op">=</span> <span class="cn">TRUE</span>, test_example <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, p_value_test <span class="op">=</span> <span class="st">"anova"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  </span></span>
 <span class="r-in"><span><span class="co">## Or make the plot interactive  </span></span></span>
 <span class="r-in"><span><span class="fu"><a href="trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span>trelliData <span class="op">=</span> <span class="va">trelliData4</span>, panel <span class="op">=</span> <span class="st">"Lipid"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span></span>
-<span class="r-in"><span>  <span class="fu">trelli_foldchange_bar</span><span class="op">(</span>test_mode <span class="op">=</span> <span class="cn">TRUE</span>, test_example <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, p_value_test <span class="op">=</span> <span class="cn">TRUE</span>, interactive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> </span></span>
+<span class="r-in"><span>  <span class="fu">trelli_foldchange_bar</span><span class="op">(</span>test_mode <span class="op">=</span> <span class="cn">TRUE</span>, test_example <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, p_value_test <span class="op">=</span> <span class="st">"gtest"</span>, interactive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> </span></span>
 <span class="r-in"><span>   </span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>

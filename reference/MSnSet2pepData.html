@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pmartR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.2</span>
       </span>
     </div>
 
@@ -90,7 +90,7 @@
 <span>  edata_cname <span class="op">=</span> <span class="st">"UniqueID"</span>,</span>
 <span>  fdata_cname <span class="op">=</span> <span class="st">"SampleID"</span>,</span>
 <span>  emeta_cname <span class="op">=</span> <span class="st">"UniqueID"</span>,</span>
-<span>  check.names <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  check.names <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -125,6 +125,10 @@ containing the sample identifiers in <code>f_data</code>.</p></dd>
 containing the protein identifiers (or other mapping variable) in
 <code>e_meta</code> (if applicable).</p></dd>
 
+
+<dt>check.names</dt>
+<dd><p>deprecated</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
@@ -155,8 +159,7 @@ containing the protein identifiers (or other mapping variable) in
 <span class="r-in"><span>                        data_scale <span class="op">=</span> <span class="st">"log2"</span>,</span></span>
 <span class="r-in"><span>                        edata_cname <span class="op">=</span> <span class="st">"UniqueID"</span>,</span></span>
 <span class="r-in"><span>                        fdata_cname <span class="op">=</span> <span class="st">"SampleID"</span>,</span></span>
-<span class="r-in"><span>                        emeta_cname <span class="op">=</span> <span class="st">"UniqueID"</span>,</span></span>
-<span class="r-in"><span>                        check.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span>                        emeta_cname <span class="op">=</span> <span class="st">"UniqueID"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

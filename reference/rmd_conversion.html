@@ -18,7 +18,7 @@ distance value and p-value for output from the rmd_runs function"><!-- mathjax -
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pmartR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.2</span>
       </span>
     </div>
 
@@ -132,16 +132,16 @@ test, which should be equal to the number of metrics used in rmd_runs</p></dd>
 <span class="r-in"><span><span class="va">rmd_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="rmd_filter.html">rmd_filter</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mymetab</span>,</span></span>
 <span class="r-in"><span>                          metrics<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MAD"</span>, <span class="st">"Skewness"</span>, <span class="st">"Correlation"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">rmd_conversion</span><span class="op">(</span>log2rmd <span class="op">=</span> <span class="va">rmd_results</span><span class="op">$</span><span class="va">Log2.md</span>, df<span class="op">=</span><span class="fl">3</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 0.4761719728 0.8327727352 0.6524468230 0.3684728308 0.3447597669</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6] 0.6542898830 0.7053563713 0.3670270437 0.9290380717 0.2319286931</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11] 0.5859192541 0.0078074182 0.7362309687 0.3340434018 0.7538969887</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [16] 0.5749425887 0.4913124128 0.3828684400 0.8074729047 0.5414365444</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [21] 0.9365013307 0.1293229210 0.4943922567 0.2271372145 0.8089657282</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [26] 0.5712803690 0.4458557481 0.4033381460 0.2809841458 0.8116200284</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [31] 0.4324914363 0.9537593307 0.9357149562 0.0026342607 0.7233469152</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [36] 0.8920473745 0.1421668904 0.0008203476 0.8847919235 0.3528210414</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [41] 0.3934678511 0.1393498878 0.5211920752 0.0829481186 0.5294102410</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [46] 0.7824967607 0.1380201046 0.6776441257 0.7818525470 0.2564190527</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 0.4416156882 0.8162279804 0.6238377042 0.3335961117 0.3102070212</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [6] 0.6257746922 0.6796891165 0.3321657107 0.9213079472 0.2012527082</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [11] 0.5543444578 0.0050516657 0.7125120107 0.2996883234 0.7313685486</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [16] 0.5429596898 0.4570173644 0.3478686448 0.7888898372 0.5083552780</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [21] 0.9295285625 0.1065075039 0.4601564585 0.1967231377 0.7904998020</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [26] 0.5391665582 0.4109299650 0.3682553848 0.2481115288 0.7933633516</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [31] 0.3974697822 0.9485827499 0.9286618483 0.0015560126 0.6987943918</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [36] 0.8807261109 0.1180720155 0.0004397454 0.8727968724 0.3181408731</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [41] 0.3584118198 0.1155271411 0.4875573024 0.0656988293 0.4959899847</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [46] 0.7620118274 0.1143274449 0.6503728868 0.7613200052 0.2245395266</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">rmd_conversion</span><span class="op">(</span>pval <span class="op">=</span> <span class="fl">.0001</span>, df <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 4.399685</span>

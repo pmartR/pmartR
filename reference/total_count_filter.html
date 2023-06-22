@@ -18,7 +18,7 @@ applyFilt"><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/m
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pmartR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.2</span>
       </span>
     </div>
 
@@ -108,8 +108,8 @@ applyFilt"><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/m
     <h2>Details</h2>
     <p>Filter is based off of recommendations in edgeR processing, where 
 the low-observed biomolecules are removed from processing. Default 
-recommendation in edgeR is at least 10 total counts observed across samples 
-(i.e., if the sum of counts in a row of e_data is &lt; 10, default edgeR 
+recommendation in edgeR is at least 15 total counts observed across samples 
+(i.e., if the sum of counts in a row of e_data is &lt; 15, default edgeR 
 filtering would remove this biomolecule).</p>
     </div>
     <div id="references">
@@ -129,7 +129,7 @@ http://f1000research.com/articles/5-1438</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/pmartR/pmartRdata" class="external-link">pmartRdata</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">to_filter</span> <span class="op">&lt;-</span> <span class="fu">total_count_filter</span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">rnaseq_object</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span>filter_object <span class="op">=</span> <span class="va">to_filter</span>, min_count <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span>filter_object <span class="op">=</span> <span class="va">to_filter</span>, min_count <span class="op">=</span> <span class="fl">15</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

@@ -19,7 +19,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pmartR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.2</span>
       </span>
     </div>
 
@@ -91,7 +91,7 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">trelli_foldchange_boxplot</span><span class="op">(</span></span>
 <span>  <span class="va">trelliData</span>,</span>
 <span>  cognostics <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"n"</span>, <span class="st">"median"</span>, <span class="st">"mean"</span>, <span class="st">"sd"</span><span class="op">)</span>,</span>
-<span>  p_value_test <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  p_value_test <span class="op">=</span> <span class="st">"anova"</span>,</span>
 <span>  p_value_thresh <span class="op">=</span> <span class="fl">0.05</span>,</span>
 <span>  include_points <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  ggplot_params <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -118,9 +118,8 @@ are are n, mean, median, and sd.</p></dd>
 
 
 <dt>p_value_test</dt>
-<dd><p>A logical to indicate whether specific significant
-biomolecules are to be indicated with a changed symbol if an imd-anova was
-run. Default is FALSE.</p></dd>
+<dd><p>A string to indicate which p_values to plot. Acceptable
+entries are "anova", "gtest", or NULL. Default is "anova".</p></dd>
 
 
 <dt>p_value_thresh</dt>
@@ -179,7 +178,7 @@ trelliscope) should be returned. Default is FALSE.</p></dd>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Build fold_change box plot with statRes data grouped by edata_colname.</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span>trelliData <span class="op">=</span> <span class="va">trelliData4</span>, panel <span class="op">=</span> <span class="st">"LipidFamily"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span></span>
-<span class="r-in"><span>  <span class="fu">trelli_foldchange_boxplot</span><span class="op">(</span>p_value_test <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu">trelli_foldchange_boxplot</span><span class="op">(</span>p_value_test <span class="op">=</span> <span class="st">"anova"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>

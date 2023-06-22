@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pmartR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.2</span>
       </span>
     </div>
 
@@ -103,7 +103,7 @@
                         <h4 data-toc-skip class="author">Kelly Stratton,
 Lisa Bramer</h4>
             
-            <h4 data-toc-skip class="date">2023-03-15</h4>
+            <h4 data-toc-skip class="date">2023-06-22</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/pmartR/pmartR/blob/HEAD/vignettes/Data_Object_Creation.Rmd" class="external-link"><code>vignettes/Data_Object_Creation.Rmd</code></a></small>
       <div class="hidden name"><code>Data_Object_Creation.Rmd</code></div>
@@ -356,13 +356,6 @@ been log2 or log10 or log transformed, or for seqData objects this is
 <li><p>data_types: optional argument for additional information about
 the data type; often used if there are datasets for both negative and
 positive ionization modes on an instrument</p></li>
-<li><p>check.names: optional argument that behaves as in base R,
-defaults to TRUE. If we read in a .csv or .xlsx file for e_data file
-without specifying , any column names beginning with a number are
-automatically prepended with “X” or containing a dash are replaced with
-a period. This causes the sample names in e_data to not match the sample
-names in f_data, and will prevent the creation of the omicsData
-object.</p></li>
 </ul>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mylipid</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as.lipidData.html">as.lipidData</a></span><span class="op">(</span>e_data <span class="op">=</span> <span class="va">edata</span>,</span>
@@ -372,8 +365,7 @@ object.</p></li>
 <span>                        fdata_cname <span class="op">=</span> <span class="st">"SampleID"</span>,</span>
 <span>                        emeta_cname <span class="op">=</span> <span class="st">"Lipid"</span>, </span>
 <span>                        data_scale <span class="op">=</span> <span class="st">"abundance"</span>,</span>
-<span>                        data_types <span class="op">=</span> <span class="st">"Negative Ion"</span>,</span>
-<span>                        check.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<span>                        data_types <span class="op">=</span> <span class="st">"Negative Ion"</span><span class="op">)</span></span></code></pre></div>
 <p>Now we have an object of class lipidData. Built-in summary and plot
 methods now operate on this object and provide additional
 information.</p>

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pmartR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.2</span>
       </span>
     </div>
 
@@ -87,6 +87,9 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for dimRes</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
 <span>  <span class="va">dimRes_obj</span>,</span>
+<span>  omicsData <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  color_by <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  shape_by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  interactive <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  x_lab <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  y_lab <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -108,6 +111,29 @@
     <dl><dt>dimRes_obj</dt>
 <dd><p>object of class dimRes created by the <code>dim_reduction</code>
 function</p></dd>
+
+
+<dt>omicsData</dt>
+<dd><p>optional omicsData for use in specifying a column name in
+fdata when using <code>color_by</code> or <code>shape_by</code>.</p></dd>
+
+
+<dt>color_by</dt>
+<dd><p>character string specifying which column to use to control 
+the color for plotting. NULL indicates the default value of the main effect 
+levels (if present). "Group" uses the "Group" column of group_DF. NA 
+indicates no column will be used, and will use the default theme color. If 
+an omicsData object is passed, any other value will use the specified 
+column of f_data.</p></dd>
+
+
+<dt>shape_by</dt>
+<dd><p>character string specifying which column to use to control 
+the shape for plotting. NULL indicates the default value of the second main
+effect levels (if present). "Group" uses the "Group" column of group_DF. NA 
+indicates no column will be used, and will use the default theme shape. If 
+an omicsData object is passed, any other value will use the specified 
+column of f_data.</p></dd>
 
 
 <dt>interactive</dt>

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pmartR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.2</span>
       </span>
     </div>
 
@@ -89,6 +89,8 @@
 <span>  <span class="va">naRes_obj</span>,</span>
 <span>  <span class="va">omicsData</span>,</span>
 <span>  plot_type <span class="op">=</span> <span class="st">"bar"</span>,</span>
+<span>  nonmissing <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  proportion <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  order_by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  color_by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  interactive <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -136,14 +138,29 @@ molecule</p></dd>
 The two options are 'bar' or 'scatter'.</p></dd>
 
 
+<dt>nonmissing</dt>
+<dd><p>logical value. When FALSE, plots missing values. When TRUE,
+plots non-missing values.</p></dd>
+
+
+<dt>proportion</dt>
+<dd><p>logical value. When TRUE, plots the proportion of missing 
+(or non-missing if <code>nonmissing</code> is TRUE) to the total number of 
+values. Only works with a plot type of 'bar'.</p></dd>
+
+
 <dt>order_by</dt>
 <dd><p>A character string specifying a column in f_data by which to
-order the samples.</p></dd>
+order the samples. Specifying "Group" will use the "Group" column of the
+object's <code>group_DF</code> attribute to order the samples. Only works with a 
+plot type of 'bar'.</p></dd>
 
 
 <dt>color_by</dt>
 <dd><p>A character string specifying a column in f_data by which to
-color the bars or the points depending on the <code>plot_type</code>.</p></dd>
+color the bars or the points depending on the <code>plot_type</code>. Specifying
+"Group" will use the "Group" column of the object's <code>group_DF</code>
+attribute to color the samples. Only works with a plot type of 'bar'.</p></dd>
 
 
 <dt>interactive</dt>

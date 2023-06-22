@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pmartR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.2</span>
       </span>
     </div>
 
@@ -103,7 +103,7 @@
                         <h4 data-toc-skip class="author">Kelly Stratton,
 Lisa Bramer</h4>
             
-            <h4 data-toc-skip class="date">2023-03-15</h4>
+            <h4 data-toc-skip class="date">2023-06-22</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/pmartR/pmartR/blob/HEAD/vignettes/Filter_Functionality.Rmd" class="external-link"><code>vignettes/Filter_Functionality.Rmd</code></a></small>
       <div class="hidden name"><code>Filter_Functionality.Rmd</code></div>
@@ -542,6 +542,21 @@ interest:</p>
 <div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mypep_imdfilt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/applyFilt.html">applyFilt</a></span><span class="op">(</span>filter_object <span class="op">=</span> <span class="va">myimdanovafilt</span>, omicsData <span class="op">=</span> <span class="va">mypep_groups_log2</span>, min_nonmiss_gtest <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## You have specified remove_singleton_groups = TRUE, but there are no singleton groups to remove. Proceeding with application of the IMD-ANOVA filter.</span></span></code></pre>
+<p>By default, the IMD-ANOVA filter assumes that all pairwise
+comparisons will be performed in downstream use of the imd_anova()
+function. A user can specify custom comparisons using the “comparisons”
+argument when they apply the IMD-ANOVA filter. For instance if the
+comparisons of interest are Phenotype2 versus Phenotype1 and Phenotype3
+versus Phenotype1, the following code can be used.</p>
+<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mypep_imdanovafilt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/applyFilt.html">applyFilt</a></span><span class="op">(</span>filter_object <span class="op">=</span> <span class="va">myimdanovafilt</span>,</span>
+<span>                                omicsData <span class="op">=</span> <span class="va">mypep_groups_log2</span>,</span>
+<span>                                min_nonmiss_anova <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>                                min_nonmiss_gtest <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>                                comparisons <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>                                  Control <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Phenotype1"</span>, <span class="st">"Phenotype1"</span><span class="op">)</span>,</span>
+<span>                                  Test <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Phenotype2"</span>, <span class="st">"Phenotype3"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## You have specified remove_singleton_groups = TRUE, but there are no singleton groups to remove. Proceeding with application of the IMD-ANOVA filter.</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="custom-filter">Custom Filter<a class="anchor" aria-label="anchor" href="#custom-filter"></a>
@@ -557,7 +572,7 @@ e_meta.</p>
 <p>To remove biomolecules based on their presence in e_data, we
 implement the filter as follows. Note that this also removes them from
 e_meta, if applicable.</p>
-<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">remove_peps</span> <span class="op">&lt;-</span> <span class="va">mypep</span><span class="op">$</span><span class="va">e_data</span><span class="op">$</span><span class="va">Peptide</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span></span>
 <span></span>
 <span><span class="va">mycustomfilt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/custom_filter.html">custom_filter</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mypep_groups_log2</span>, e_data_remove <span class="op">=</span> <span class="va">remove_peps</span><span class="op">)</span></span>
@@ -569,13 +584,13 @@ e_meta, if applicable.</p>
 <span><span class="co">## SampleIDs (f_data)            0        24    24</span></span>
 <span><span class="co">## Peptides (e_data)            10     21319 21329</span></span>
 <span><span class="co">## RazorProteins (e_meta)        2      2980  2982</span></span></code></pre>
-<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mypep_custom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/applyFilt.html">applyFilt</a></span><span class="op">(</span>filter_object <span class="op">=</span> <span class="va">mycustomfilt</span>, omicsData <span class="op">=</span> <span class="va">mypep_groups_log2</span><span class="op">)</span></span></code></pre></div>
 <p>To remove biomolecules based on their presence in e_meta (such as
 specifying proteins to remove from a pepData object), we implement the
 filter as follows. This also removes the associated biomolecules from
 e_data, as applicable.</p>
-<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">remove_prots</span> <span class="op">&lt;-</span> <span class="va">mypep</span><span class="op">$</span><span class="va">e_meta</span><span class="op">$</span><span class="va">RazorProtein</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span></span>
 <span></span>
 <span><span class="va">mycustomfilt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/custom_filter.html">custom_filter</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mypep_groups_log2</span>, e_meta_remove <span class="op">=</span> <span class="va">remove_prots</span><span class="op">)</span></span>
@@ -587,7 +602,7 @@ e_data, as applicable.</p>
 <span><span class="co">## SampleIDs (f_data)            0        24    24</span></span>
 <span><span class="co">## Peptides (e_data)            59     21270 21329</span></span>
 <span><span class="co">## RazorProteins (e_meta)       10      2972  2982</span></span></code></pre>
-<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mypep_custom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/applyFilt.html">applyFilt</a></span><span class="op">(</span>filter_object <span class="op">=</span> <span class="va">mycustomfilt</span>, omicsData <span class="op">=</span> <span class="va">mypep_groups_log2</span><span class="op">)</span></span></code></pre></div>
 <p>We can also utilize the custom filter and specify only those
 biomolecules in either e_data or e_meta that we would like to keep. To
@@ -624,7 +639,7 @@ the metrics. For metabData and lipidData objects, the default is to
 exclude the proportion missing (as these data typically do not have much
 missing data).</p>
 <p>When plotting the RMD filter, we can specify a p-value threshold</p>
-<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">myrmdfilt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rmd_filter.html">rmd_filter</a></span><span class="op">(</span><span class="va">mypep_groups_log2</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">myrmdfilt</span>, pvalue_threshold <span class="op">=</span> <span class="fl">0.0001</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Filter_Functionality_files/figure-html/create%20rmd%20and%20plot-1.png" width="768"></p>
@@ -633,7 +648,7 @@ samples falling above the threshold line, we can do so using the
 following. The colored points on each boxplot correspond to the sample
 that was specified, so we can see where it falls relative to all of the
 other samples.</p>
-<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">myrmdfilt</span>, sampleID <span class="op">=</span> <span class="st">"Sample_35_Phenotype2_A"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Filter_Functionality_files/figure-html/rmd%20plot%20individ%20outliers-1.png" width="768"></p>
 </div>
@@ -645,7 +660,7 @@ particularly useful if only a subset of potential outliers identified by
 the rMd filter are to be removed, or if quality control samples that
 were run within the experiment are no longer needed for a particular
 analysis step.</p>
-<div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb59"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mycustomfilt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/custom_filter.html">custom_filter</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mypep_groups_log2</span>, f_data_remove <span class="op">=</span> <span class="st">"Sample_35_Phenotype2_A"</span><span class="op">)</span></span></code></pre></div>
 <p>Similar to the usage of the custom filter for filtering biomolecules,
 we could alternately use the <code>f_data_keep</code> argument to
@@ -675,7 +690,7 @@ samples.</p>
 </h2>
 <p>Due to RNAseq data being count data, the typical filters differ
 compared to the other data types supported by <code>pmartR</code>.</p>
-<div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb60"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">myseq</span> <span class="op">&lt;-</span> <span class="va">rnaseq_object</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">myseq</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##                                    </span></span>
@@ -695,12 +710,12 @@ and RMD filter.</p>
 <p>The total count filter is based on recommendations in edgeR
 processing <span class="citation">(Robinson, McCarthy, and Smyth
 2010)</span>, where the low-observed biomolecules are removed. The
-default recommendation in edgeR is to require at least 10 total counts
+default recommendation in edgeR is to require at least 15 total counts
 observed across samples (i.e., if the sum of counts in a row of e_data
-is &lt; 10, default edgeR filtering would remove this biomolecule).</p>
-<div class="sourceCode" id="cb60"><pre class="downlit sourceCode r">
+is &lt; 15, default edgeR filtering would remove this biomolecule).</p>
+<div class="sourceCode" id="cb62"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mytotcountfilt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/total_count_filter.html">total_count_filter</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">myseq</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">mytotcountfilt</span>, min_count <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">mytotcountfilt</span>, min_count <span class="op">=</span> <span class="fl">15</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## </span></span>
 <span><span class="co">## Summary of Total Count Filter</span></span>
 <span><span class="co">## ----------------------</span></span>
@@ -709,17 +724,17 @@ is &lt; 10, default edgeR filtering would remove this biomolecule).</p>
 <span><span class="co">##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. </span></span>
 <span><span class="co">##        1       14       79    15477     3194 15803184 </span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## Number Filtered Biomolecules: 10299</span></span></code></pre>
-<div class="sourceCode" id="cb62"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">myseq_totcount</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/applyFilt.html">applyFilt</a></span><span class="op">(</span>filter_object <span class="op">=</span> <span class="va">mytotcountfilt</span>, omicsData <span class="op">=</span> <span class="va">myseq</span>, min_count <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
+<span><span class="co">## Number Filtered Biomolecules: 12765</span></span></code></pre>
+<div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">myseq_totcount</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/applyFilt.html">applyFilt</a></span><span class="op">(</span>filter_object <span class="op">=</span> <span class="va">mytotcountfilt</span>, omicsData <span class="op">=</span> <span class="va">myseq</span>, min_count <span class="op">=</span> <span class="fl">15</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">myseq_totcount</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##                                    </span></span>
 <span><span class="co">## Class                       seqData</span></span>
 <span><span class="co">## Unique SampleNames (f_data)      45</span></span>
-<span><span class="co">## Unique Transcripts (e_data)   39269</span></span>
-<span><span class="co">## Unique Genes (e_meta)         42532</span></span>
-<span><span class="co">## Observed Zero-Counts         440373</span></span>
-<span><span class="co">## Proportion Zeros              0.249</span></span></code></pre>
+<span><span class="co">## Unique Transcripts (e_data)   36803</span></span>
+<span><span class="co">## Unique Genes (e_meta)         40211</span></span>
+<span><span class="co">## Observed Zero-Counts         350295</span></span>
+<span><span class="co">## Proportion Zeros              0.212</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="rna-filter-total-library-size-filter">RNA Filter: Total Library Size Filter<a class="anchor" aria-label="anchor" href="#rna-filter-total-library-size-filter"></a>
@@ -732,17 +747,17 @@ sample</p></li>
 </ul>
 <p>This filter is particularly useful for identifying any samples that
 contain lower than expected numbers of reads.</p>
-<div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># create RNA filter object</span></span>
 <span><span class="va">myrnafilt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/RNA_filter.html">RNA_filter</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">myseq</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># filter by library size</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">myrnafilt</span>, plot_type <span class="op">=</span> <span class="st">"library"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Filter_Functionality_files/figure-html/unnamed-chunk-6-1.png" width="768"></p>
-<div class="sourceCode" id="cb65"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb67"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">myrnafilt</span>, plot_type <span class="op">=</span> <span class="st">"library"</span>, size_library <span class="op">=</span> <span class="fl">10000</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Filter_Functionality_files/figure-html/unnamed-chunk-6-2.png" width="768"></p>
-<div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb68"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">myrnafilt</span>, size_library <span class="op">=</span> <span class="fl">10000</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## </span></span>
 <span><span class="co">## Summary of RNA Filter </span></span>
@@ -757,7 +772,7 @@ contain lower than expected numbers of reads.</p>
 <span><span class="co">## 3rd Qu.    18517261 31299.000        0.63143560</span></span>
 <span><span class="co">## Max.       24990997 35713.000        0.72048499</span></span>
 <span><span class="co">## SD          3078177  1978.452        0.03991389</span></span></code></pre>
-<div class="sourceCode" id="cb68"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb70"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">myseq_librarysize</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/applyFilt.html">applyFilt</a></span><span class="op">(</span>filter_object <span class="op">=</span> <span class="va">myrnafilt</span>, omicsData <span class="op">=</span> <span class="va">myseq</span>, size_library <span class="op">=</span> <span class="fl">10000</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">myseq_librarysize</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##                                    </span></span>
@@ -767,11 +782,11 @@ contain lower than expected numbers of reads.</p>
 <span><span class="co">## Unique Genes (e_meta)         52222</span></span>
 <span><span class="co">## Observed Zero-Counts         872181</span></span>
 <span><span class="co">## Proportion Zeros              0.391</span></span></code></pre>
-<div class="sourceCode" id="cb70"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb72"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># filter based on number or proportion of non-zero counts</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">myrnafilt</span>, plot_type <span class="op">=</span> <span class="st">"biomolecule"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Filter_Functionality_files/figure-html/unnamed-chunk-6-3.png" width="768"></p>
-<div class="sourceCode" id="cb71"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb73"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">myrnafilt</span>, min_nonzero <span class="op">=</span> <span class="fl">5000</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## </span></span>
 <span><span class="co">## Summary of RNA Filter </span></span>
@@ -786,7 +801,7 @@ contain lower than expected numbers of reads.</p>
 <span><span class="co">## 3rd Qu.    18517261 31299.000        0.63143560</span></span>
 <span><span class="co">## Max.       24990997 35713.000        0.72048499</span></span>
 <span><span class="co">## SD          3078177  1978.452        0.03991389</span></span></code></pre>
-<div class="sourceCode" id="cb73"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb75"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">myrnafilt</span>, min_nonzero <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## </span></span>
 <span><span class="co">## Summary of RNA Filter </span></span>
@@ -801,7 +816,7 @@ contain lower than expected numbers of reads.</p>
 <span><span class="co">## 3rd Qu.    18517261 31299.000        0.63143560</span></span>
 <span><span class="co">## Max.       24990997 35713.000        0.72048499</span></span>
 <span><span class="co">## SD          3078177  1978.452        0.03991389</span></span></code></pre>
-<div class="sourceCode" id="cb75"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb77"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">myseq_nonzero</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/applyFilt.html">applyFilt</a></span><span class="op">(</span>filter_object <span class="op">=</span> <span class="va">myrnafilt</span>, omicsData <span class="op">=</span> <span class="va">myseq</span>, min_nonzero <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">myseq_nonzero</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##                                    </span></span>
