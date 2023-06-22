@@ -12,7 +12,6 @@ test_that('helper functions pull from correct attributes',{
                       fdata_cname = 'Samples'
   )
   
-  expect_identical(get_check_names(myseqData), attr(myseqData, "check.names"))
   expect_identical(get_data_info(myseqData), attr(myseqData, "data_info"))
   expect_identical(get_data_norm(myseqData), attr(myseqData, "data_info")$norm_info$is_normalized)
   expect_identical(get_data_scale(myseqData), attr(myseqData, "data_info")$data_scale)
@@ -20,8 +19,6 @@ test_that('helper functions pull from correct attributes',{
   expect_identical(get_emeta_cname(myseqData), attr(myseqData, "cnames")$emeta_cname)
   expect_identical(get_fdata_cname(myseqData), attr(myseqData, "cnames")$fdata_cname)
   expect_identical(get_meta_info(myseqData), attr(myseqData, "meta_info"))
-  expect_true(get_check_names(set_check_names(myseqData)))
-  expect_false(get_check_names(set_check_names(myseqData, FALSE)))
   
   mes_1 <- "No filters have been applied"
   ## check after processing as well ##

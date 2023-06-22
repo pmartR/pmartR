@@ -20,13 +20,16 @@ test_that('as.seqData returns the correct data frame and attributes',{
                       fdata_cname = 'Samples'
                       )
   
+  # Check high level structure
+  expect_equal(names(seqdata), c("e_data", "f_data", "e_meta"))
+  
   # Ensure the returned data frames are the correct dimension.
   expect_equal(dim(seqdata$e_data), c(1200, 41))
   expect_equal(dim(seqdata$f_data), c(40, 4))
   
   # Confirm the correct attributes are present in the seqData object.
   expect_equal(names(attributes(seqdata)),
-               c('names', 'cnames', 'data_info', 'check.names', 'meta_info',
+               c('names', 'cnames', 'data_info', 'meta_info',
                  'filters', 'class'))
   
   # Scrutinize the column names attribute.
@@ -51,9 +54,6 @@ test_that('as.seqData returns the correct data frame and attributes',{
          batch_info = list(is_bc = FALSE))
   )
   
-  # Check the checkers.
-  expect_true(attr(seqdata, 'check.names'))
-  
   # Take a looksie at the filters attribute.
   expect_identical(attr(seqdata, 'filters'), list())
   
@@ -66,7 +66,7 @@ test_that('as.seqData returns the correct data frame and attributes',{
   
   # Confirm the correct attributes are present in the seqData object.
   expect_equal(names(attributes(seqdata)),
-               c('names', 'cnames', 'data_info', 'check.names', 'meta_info',
+               c('names', 'cnames', 'data_info', 'meta_info',
                  'filters', 'class'))
   
   # Scrutinize the column names attribute.
@@ -90,9 +90,6 @@ test_that('as.seqData returns the correct data frame and attributes',{
          data_types = NULL,
          batch_info = list(is_bc = FALSE))
   )
-  
-  # Check the checkers.
-  expect_true(attr(seqdata, 'check.names'))
   
   # Inspect the elements of the meta_info attribute.
   expect_equal(
@@ -137,13 +134,16 @@ test_that('as.seqData returns the correct data frame and attributes',{
                        'e_data. These have been removed from f_data.',
                        sep = ' '))
   
+  # Check high level structure
+  expect_equal(names(seqdata), c("e_data", "f_data", "e_meta"))
+  
   # Ensure the returned data frames are the correct dimension.
   expect_equal(dim(seqdata$e_data), c(1200, 41))
   expect_equal(dim(seqdata$f_data), c(40, 4))
   
   # Confirm the correct attributes are present in the seqData object.
   expect_equal(names(attributes(seqdata)),
-               c('names', 'cnames', 'data_info', 'check.names', 'meta_info',
+               c('names', 'cnames', 'data_info', 'meta_info',
                  'filters', 'class'))
   
   # Scrutinize the column names attribute.
@@ -167,9 +167,6 @@ test_that('as.seqData returns the correct data frame and attributes',{
          data_types = NULL,
          batch_info = list(is_bc = FALSE))
   )
-  
-  # Check the checkers.
-  expect_true(attr(seqdata, 'check.names'))
   
   # Inspect the elements of the meta_info attribute.
   expect_equal(
@@ -191,7 +188,7 @@ test_that('as.seqData returns the correct data frame and attributes',{
   
   # Confirm the correct attributes are present in the seqData object.
   expect_equal(names(attributes(seqdata)),
-               c('names', 'cnames', 'data_info', 'check.names', 'meta_info',
+               c('names', 'cnames', 'data_info', 'meta_info',
                  'filters', 'class'))
   
   # Scrutinize the column names attribute.
@@ -215,9 +212,6 @@ test_that('as.seqData returns the correct data frame and attributes',{
          data_types = NULL,
          batch_info = list(is_bc = FALSE))
   )
-  
-  # Check the checkers.
-  expect_true(attr(seqdata, 'check.names'))
   
   # Take a looksie at the filters attribute.
   expect_identical(attr(seqdata, 'filters'), list())
@@ -250,13 +244,16 @@ test_that('as.seqData returns the correct data frame and attributes',{
                       fdata_cname = 'Samples'
                       )
   
+  # Check high level structure
+  expect_equal(names(seqdata), c("e_data", "f_data", "e_meta"))
+  
   # Verify that the returned data frames are the correct dimension.
   expect_equal(dim(seqdata$e_data), c(1200, 41))
   expect_equal(dim(seqdata$f_data), c(40, 4))
   
   # Confirm the correct attributes are present in the seqData object.
   expect_equal(names(attributes(seqdata)),
-               c('names', 'cnames', 'data_info', 'check.names', 'meta_info',
+               c('names', 'cnames', 'data_info', 'meta_info',
                  'filters', 'class'))
   
   # Scrutinize the column names attribute.
@@ -280,9 +277,6 @@ test_that('as.seqData returns the correct data frame and attributes',{
          data_types = NULL,
          batch_info = list(is_bc = FALSE))
   )
-  
-  # Check the checkers.
-  expect_true(attr(seqdata, 'check.names'))
   
   # Take a looksie at the filters attribute.
   expect_identical(attr(seqdata, 'filters'), list())
@@ -438,17 +432,6 @@ test_that('as.seqData returns the correct data frame and attributes',{
                           emeta_cname = "class",
                           data_types = 5),
                "must be of the class 'character'")
-  
-  
-  expect_error(as.seqData(e_data = data.table::as.data.table(edata),
-                          f_data = data.table::as.data.table(fdata),
-                          e_meta = data.table::as.data.table(emeta),
-                          edata_cname = 'ID_REF',
-                          fdata_cname = 'Samples',
-                          emeta_cname = "class",
-                          check.names = 5),
-               "must be of the class 'logical'")
-  
   
   ## Valid data_scale
   

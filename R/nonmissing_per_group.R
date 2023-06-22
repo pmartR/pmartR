@@ -42,12 +42,16 @@ nonmissing_per_group <- function (omicsData) {
   # Reorder the samples. This is done because the C++ function for counting
   # group sizes assumes the samples are ordered by group in the omicsData data
   # frames.
-  group_dat <- as.character(groupDF$Group[order(groupDF$Group)])
+
+  # match the order of the groupDF$SampleID to the order of the columns in edata
+  samp_ord = match(groupDF[,get_fdata_cname(omicsData)], colnames(edata))
+  group_ord = order(groupDF$Group)
+  group_dat <- as.character(groupDF$Group[group_ord])
 
   # Reorder the columns of e_data. This needs to be done so the e_data columns
   # will match the order of the group_data vector. These are ordered because the
   # following C++ function assumes the samples are in order.
-  edata <- edata[, order(groupDF$Group)]
+  edata <- edata[, samp_ord[group_ord]]
 
   # Count the number of nonmissing values per group. The output is a matrix with
   # the number of observations down the rows and the number of unique groups
@@ -59,20 +63,6 @@ nonmissing_per_group <- function (omicsData) {
   nonmiss_totals <- data.frame(as.character(omicsData$e_data[, id_col]),
                                nonmissing,
                                stringsAsFactors = FALSE)
-                               # check.names = check_names)
-  # BEWARE! DON'T UNCOMMENT!! Or uncomment and see what happens ;)
-  # The check.names argument was commented out because it placed an "X" in front
-  # of the column name if the column name was a number (even if the number was a
-  # character string e.g., "1"). This lead to problems when running a summary on
-  # the filtered data because the group names in the group_DF attribute did not
-  # match the column names of the filter object. For example, if the group names
-  # were "1", "2", and "3" the column names would be "X1", "X2", and "X3".
-  # Because of this discrepancy the summary would incorrectly print that all
-  # biomolecules would be filtered. NOTE: The explanation above is outdated
-  # because Evan A Martin on 10/05/2021 changed how the nonmiss_totals data
-  # frame is created and how the column names are updated. However, I am leaving
-  # the explanation for future generations of pmartR coding elves in hopes it
-  # will help them through this trying time in their lives.
 
   # Rename the columns according to the edata_cname in omicsData and the names
   # in the group_DF attribute. The order of the names in group_dat will always

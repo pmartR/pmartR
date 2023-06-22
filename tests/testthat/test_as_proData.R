@@ -18,6 +18,9 @@ test_that('as.proData returns the correct data frame and attributes',{
                        fdata_cname = 'SampleID',
                        emeta_cname = 'PClass')
   
+  # Check high level structure
+  expect_equal(names(prdata), c("e_data", "f_data", "e_meta"))
+  
   # Ensure the returned data frames are the correct dimension.
   expect_equal(dim(prdata$e_data),
                c(150, 12))
@@ -28,7 +31,7 @@ test_that('as.proData returns the correct data frame and attributes',{
   
   # Confirm the correct attributes are present in the proData object.
   expect_equal(names(attributes(prdata)),
-               c("names", "cnames", "data_info", "check.names", "meta_info",
+               c("names", "cnames", "data_info", "meta_info",
                  "filters", "pro_quant_info", "class"))
   
   # Scrutinize the column names attribute.
@@ -52,9 +55,6 @@ test_that('as.proData returns the correct data frame and attributes',{
          data_types = NULL,
          batch_info = list(is_bc = FALSE))
   )
-  
-  # Check the checkers.
-  expect_true(attr(prdata, "check.names"))
   
   # Inspect the elements of the meta_info attribute.
   expect_equal(
@@ -80,6 +80,9 @@ test_that('as.proData returns the correct data frame and attributes',{
                                       emeta_cname = 'Test'),
                  "emeta_cname set to NULL, no e_meta object was provided.")
   
+  # Check high level structure
+  expect_equal(names(prdata), c("e_data", "f_data", "e_meta"))
+  
   # Ensure the returned data frames are the correct dimension.
   expect_equal(dim(prdata$e_data),
                c(150, 12))
@@ -89,7 +92,7 @@ test_that('as.proData returns the correct data frame and attributes',{
   
   # Confirm the correct attributes are present in the proData object.
   expect_equal(names(attributes(prdata)),
-               c("names", "cnames", "data_info", "check.names", "meta_info",
+               c("names", "cnames", "data_info", "meta_info",
                  "filters", "pro_quant_info", "class"))
   
   # Scrutinize the column names attribute.
@@ -113,9 +116,6 @@ test_that('as.proData returns the correct data frame and attributes',{
          data_types = NULL,
          batch_info = list(is_bc = FALSE))
   )
-  
-  # Check the checkers.
-  expect_true(attr(prdata, "check.names"))
   
   # Inspect the elements of the meta_info attribute.
   expect_equal(
@@ -167,6 +167,9 @@ test_that('as.proData returns the correct data frame and attributes',{
                        "e_data. These have been removed from f_data.",
                        sep = ' '))
   
+  # Check high level structure
+  expect_equal(names(prdata), c("e_data", "f_data", "e_meta"))
+  
   # Confirm the dimensions of the e_data and f_data data frames.
   expect_equal(dim(prdata$e_data),
                c(150, 12))
@@ -176,7 +179,7 @@ test_that('as.proData returns the correct data frame and attributes',{
   
   # Confirm the correct attributes are present in the proData object.
   expect_equal(names(attributes(prdata)),
-               c("names", "cnames", "data_info", "check.names", "meta_info",
+               c("names", "cnames", "data_info", "meta_info",
                  "filters", "pro_quant_info", "class"))
   
   # Scrutinize the column names attribute.
@@ -200,9 +203,6 @@ test_that('as.proData returns the correct data frame and attributes',{
          data_types = NULL,
          batch_info = list(is_bc = FALSE))
   )
-  
-  # Check the checkers.
-  expect_true(attr(prdata, "check.names"))
   
   # Inspect the elements of the meta_info attribute.
   expect_equal(
@@ -232,6 +232,9 @@ test_that('as.proData returns the correct data frame and attributes',{
                        'e_data. These have been removed from e_meta.',
                        sep = ' '))
   
+  # Check high level structure
+  expect_equal(names(prdata), c("e_data", "f_data", "e_meta"))
+  
   # Confirm the dimensions of the e_data and e_meta data frames.
   expect_equal(dim(prdata$e_data),
                c(131, 12))
@@ -242,7 +245,7 @@ test_that('as.proData returns the correct data frame and attributes',{
   
   # Confirm the correct attributes are present in the proData object.
   expect_equal(names(attributes(prdata)),
-               c("names", "cnames", "data_info", "check.names", "meta_info",
+               c("names", "cnames", "data_info", "meta_info",
                  "filters", "pro_quant_info", "class"))
   
   # Scrutinize the column names attribute.
@@ -266,9 +269,6 @@ test_that('as.proData returns the correct data frame and attributes',{
          data_types = NULL,
          batch_info = list(is_bc = FALSE))
   )
-  
-  # Check the checkers.
-  expect_true(attr(prdata, "check.names"))
   
   # Inspect the elements of the meta_info attribute.
   expect_equal(
@@ -310,6 +310,9 @@ test_that('as.proData returns the correct data frame and attributes',{
                        edata_cname = 'Reference',
                        fdata_cname = 'SampleID')
   
+  # Check high level structure
+  expect_equal(names(prdata), c("e_data", "f_data", "e_meta"))
+  
   # Verify that the returned data frames are the correct dimension.
   expect_equal(dim(prdata$e_data),
                c(150, 12))
@@ -319,7 +322,7 @@ test_that('as.proData returns the correct data frame and attributes',{
   
   # Confirm the correct attributes are present in the proData object.
   expect_equal(names(attributes(prdata)),
-               c("names", "cnames", "data_info", "check.names", "meta_info",
+               c("names", "cnames", "data_info", "meta_info",
                  "filters", "pro_quant_info", "class"))
   
   # Scrutinize the column names attribute.
@@ -343,9 +346,6 @@ test_that('as.proData returns the correct data frame and attributes',{
          data_types = NULL,
          batch_info = list(is_bc = FALSE))
   )
-  
-  # Check the checkers.
-  expect_true(attr(prdata, "check.names"))
   
   # Inspect the elements of the meta_info attribute.
   expect_equal(

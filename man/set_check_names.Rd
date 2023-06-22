@@ -2,7 +2,7 @@
 % Please edit documentation in R/helper_fn.R
 \name{set_check_names}
 \alias{set_check_names}
-\title{Set check.names attribute of omicsData object}
+\title{\bold{DEPRECATED}: Set check.names attribute of omicsData object}
 \usage{
 set_check_names(omicsData, set_to = TRUE)
 }
@@ -19,5 +19,7 @@ Defaults to TRUE.}
 omicsData object with updated check.names attribute
 }
 \description{
-This function sets the check.names attribute of an omicsData object
+\emph{This function sets the check.names attribute of an omicsData object.}
+\bold{This function has been deprecated in favor of handling checking names 
+externally and will return an unmodified omicsData.}
 }

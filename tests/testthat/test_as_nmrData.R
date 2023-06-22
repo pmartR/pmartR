@@ -18,6 +18,9 @@ test_that('as.nmrData returns the correct data frame and attributes',{
                         fdata_cname = 'SampleID',
                         emeta_cname = 'nmrClass')
   
+  # Check high level structure
+  expect_equal(names(nmrdata), c("e_data", "f_data", "e_meta"))
+  
   # Ensure the returned data frames are the correct dimension.
   expect_equal(dim(nmrdata$e_data),
                c(38, 42))
@@ -28,7 +31,7 @@ test_that('as.nmrData returns the correct data frame and attributes',{
   
   # Confirm the correct attributes are present in the nmrData object.
   expect_equal(names(attributes(nmrdata)),
-               c("names", "cnames", "data_info", "nmr_info", "check.names",
+               c("names", "cnames", "data_info", "nmr_info",
                  "meta_info", "filters", "class"))
   
   # Scrutinize the column names attribute.
@@ -60,9 +63,6 @@ test_that('as.nmrData returns the correct data frame and attributes',{
                     norm_info = list(is_normalized = FALSE,
                                      backtransform = NA)))
   
-  # Check the checkers.
-  expect_true(attr(nmrdata, "check.names"))
-  
   # Inspect the elements of the meta_info attribute.
   expect_equal(
     attr(nmrdata, "meta_info"),
@@ -84,6 +84,9 @@ test_that('as.nmrData returns the correct data frame and attributes',{
                                        emeta_cname = 'Test'),
                  "emeta_cname set to NULL, no e_meta object was provided.")
   
+  # Check high level structure
+  expect_equal(names(nmrdata), c("e_data", "f_data", "e_meta"))
+  
   # Ensure the returned data frames are the correct dimension.
   expect_equal(dim(nmrdata$e_data),
                c(38, 42))
@@ -93,7 +96,7 @@ test_that('as.nmrData returns the correct data frame and attributes',{
   
   # Confirm the correct attributes are present in the nmrData object.
   expect_equal(names(attributes(nmrdata)),
-               c("names", "cnames", "data_info", "nmr_info", "check.names",
+               c("names", "cnames", "data_info", "nmr_info",
                  "meta_info", "filters", "class"))
   
   # Scrutinize the column names attribute.
@@ -125,9 +128,6 @@ test_that('as.nmrData returns the correct data frame and attributes',{
                     norm_info = list(is_normalized = FALSE,
                                      backtransform = NA)))
   
-  # Check the checkers.
-  expect_true(attr(nmrdata, "check.names"))
-  
   # Inspect the elements of the meta_info attribute.
   expect_equal(
     attr(nmrdata, "meta_info"),
@@ -145,8 +145,7 @@ test_that('as.nmrData returns the correct data frame and attributes',{
   
   # Check for an error when e_data has more columns than f_data has rows.
   expect_error(as.nmrData(e_data = data.frame(edata,
-                                              `F5-007` = edata[, 10],
-                                              check.names = FALSE),
+                                              `F5-007` = edata[, 10], check.names = FALSE),
                           f_data = fdata,
                           edata_cname = 'Metabolite',
                           fdata_cname = 'SampleID'),
@@ -174,6 +173,9 @@ test_that('as.nmrData returns the correct data frame and attributes',{
                        "e_data. These have been removed from f_data.",
                        sep = ' '))
   
+  # Check high level structure
+  expect_equal(names(nmrdata), c("e_data", "f_data", "e_meta"))
+  
   # Confirm the dimensions of the e_data and f_data data frames.
   expect_equal(dim(nmrdata$e_data),
                c(38, 42))
@@ -183,7 +185,7 @@ test_that('as.nmrData returns the correct data frame and attributes',{
   
   # Confirm the correct attributes are present in the nmrData object.
   expect_equal(names(attributes(nmrdata)),
-               c("names", "cnames", "data_info", "nmr_info", "check.names",
+               c("names", "cnames", "data_info", "nmr_info",
                  "meta_info", "filters", "class"))
   
   # Scrutinize the column names attribute.
@@ -215,9 +217,6 @@ test_that('as.nmrData returns the correct data frame and attributes',{
                     norm_info = list(is_normalized = FALSE,
                                      backtransform = NA)))
   
-  # Check the checkers.
-  expect_true(attr(nmrdata, "check.names"))
-  
   # Inspect the elements of the meta_info attribute.
   expect_equal(
     attr(nmrdata, "meta_info"),
@@ -243,6 +242,9 @@ test_that('as.nmrData returns the correct data frame and attributes',{
                        'in e_data. These have been removed from e_meta.',
                        sep = ' '))
   
+  # Check high level structure
+  expect_equal(names(nmrdata), c("e_data", "f_data", "e_meta"))
+  
   # Confirm the dimensions of the e_data and e_meta data frames.
   expect_equal(dim(nmrdata$e_data),
                c(26, 42))
@@ -253,7 +255,7 @@ test_that('as.nmrData returns the correct data frame and attributes',{
   
   # Confirm the correct attributes are present in the nmrData object.
   expect_equal(names(attributes(nmrdata)),
-               c("names", "cnames", "data_info", "nmr_info", "check.names",
+               c("names", "cnames", "data_info", "nmr_info",
                  "meta_info", "filters", "class"))
   
   # Scrutinize the column names attribute.
@@ -284,9 +286,6 @@ test_that('as.nmrData returns the correct data frame and attributes',{
                     sample_property_cname = NA,
                     norm_info = list(is_normalized = FALSE,
                                      backtransform = NA)))
-  
-  # Check the checkers.
-  expect_true(attr(nmrdata, "check.names"))
   
   # Inspect the elements of the meta_info attribute.
   expect_equal(
@@ -325,6 +324,9 @@ test_that('as.nmrData returns the correct data frame and attributes',{
                         edata_cname = 'Metabolite',
                         fdata_cname = 'SampleID')
   
+  # Check high level structure
+  expect_equal(names(nmrdata), c("e_data", "f_data", "e_meta"))
+  
   # Verify that the returned data frames are the correct dimension.
   expect_equal(dim(nmrdata$e_data),
                c(38, 42))
@@ -334,7 +336,7 @@ test_that('as.nmrData returns the correct data frame and attributes',{
   
   # Confirm the correct attributes are present in the nmrData object.
   expect_equal(names(attributes(nmrdata)),
-               c("names", "cnames", "data_info", "nmr_info", "check.names",
+               c("names", "cnames", "data_info", "nmr_info",
                  "meta_info", "filters", "class"))
   
   # Scrutinize the column names attribute.
@@ -365,9 +367,6 @@ test_that('as.nmrData returns the correct data frame and attributes',{
                     sample_property_cname = NA,
                     norm_info = list(is_normalized = FALSE,
                                      backtransform = NA)))
-  
-  # Check the checkers.
-  expect_true(attr(nmrdata, "check.names"))
   
   # Inspect the elements of the meta_info attribute.
   expect_equal(

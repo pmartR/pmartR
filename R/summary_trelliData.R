@@ -90,13 +90,15 @@ summary.trelliData <- function(trelliData) {
     
     # Replace names and get counts 
     if ("e_data cname" %in% All_Options$`Panel By Choice`) {
-      bio_count <- ifelse(omics, nrow(trelliData$omicsData$e_data), nrow(trelliData$statRes))
+      bio_var <- ifelse(omics, attr(trelliData$omicsData, "cnames")$edata_cname, attr(trelliData$statRes, "cnames")$edata_cname)
+      bio_count <- ifelse(omics, trelliData$trelliData.omics[[bio_var]] %>% unique() %>% length(), trelliData$trelliData.stat[[bio_var]] %>% unique() %>% length())
       All_Options[All_Options$`Panel By Choice` == "e_data cname", "Number of Plots"] <- bio_count %>% as.character()
       All_Options[All_Options$`Panel By Choice` == "e_data cname", "Panel By Choice"] <- edata_cname
     }
     
     if ("f_data cname" %in% All_Options$`Panel By Choice`) {
-      sample_count <- ifelse(omics, nrow(trelliData$omicsData$f_data), attr(trelliData$statRes, "group_DF") %>% nrow())
+      sample_var <- ifelse(omics, attr(trelliData$omicsData, "cnames")$fdata_cname, attr(trelliData$statRes, "cnames")$fdata_cname)
+      sample_count <- ifelse(omics, trelliData$trelliData.omics[[sample_var]] %>% unique() %>% length(), trelliData$trelliData.stat[[sample_var]] %>% unique() %>% length())
       All_Options[All_Options$`Panel By Choice` == "f_data cname", "Number of Plots"] <- sample_count %>% as.character()
       All_Options[All_Options$`Panel By Choice` == "f_data cname", "Panel By Choice"] <- fdata_cname
     }
@@ -105,7 +107,7 @@ summary.trelliData <- function(trelliData) {
       
       # Get counts per e_meta variable
       emeta_counts <- lapply(emeta_cols, function(name) {
-        trelliData$omicsData$e_meta[[name]] %>% unique() %>% length()
+        trelliData$trelliData.omics[[name]] %>% unique() %>% length()
       }) %>% 
         unlist() %>% 
         paste(collapse = ", ")

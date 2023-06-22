@@ -580,6 +580,8 @@ group_designation <- function (omicsData,
 
     # Case 2: 2 main effect variables #
   } else if (n.maineffects == 2) {
+    message("See the `group_DF` attribute of your omicsData object or call ",
+    "summary() on your omicsData object to see the combined group levels.")
 
     # create a group variable and paste main effect levels together for samples
     # # samples with a value of NA for either main effect will have a Group

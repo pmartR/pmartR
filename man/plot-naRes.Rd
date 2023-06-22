@@ -8,6 +8,8 @@
   naRes_obj,
   omicsData,
   plot_type = "bar",
+  nonmissing = FALSE,
+  proportion = FALSE,
   order_by = NULL,
   color_by = NULL,
   interactive = FALSE,
@@ -47,11 +49,22 @@ molecule}
 \item{plot_type}{character string specifying which type of plot to produce.
 The two options are 'bar' or 'scatter'.}
 
+\item{nonmissing}{logical value. When FALSE, plots missing values. When TRUE,
+plots non-missing values.}
+
+\item{proportion}{logical value. When TRUE, plots the proportion of missing 
+(or non-missing if \code{nonmissing} is TRUE) to the total number of 
+values. Only works with a plot type of 'bar'.}
+
 \item{order_by}{A character string specifying a column in f_data by which to
-order the samples.}
+order the samples. Specifying "Group" will use the "Group" column of the
+object's \code{group_DF} attribute to order the samples. Only works with a 
+plot type of 'bar'.}
 
 \item{color_by}{A character string specifying a column in f_data by which to
-color the bars or the points depending on the \code{plot_type}.}
+color the bars or the points depending on the \code{plot_type}. Specifying
+"Group" will use the "Group" column of the object's \code{group_DF}
+attribute to color the samples. Only works with a plot type of 'bar'.}
 
 \item{interactive}{logical value. If TRUE produces an interactive plot.}
 

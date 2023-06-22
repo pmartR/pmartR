@@ -23,16 +23,12 @@ List anova_cpp(NumericMatrix data, NumericVector gp, int unequal_var, NumericVec
   //unequal_var is a 0/1 depending on if variances are allowed to be unequal
   //df_red number of degrees of freedom spent elsewhere
 
-  int i,j,k,groupi,rowi_size;
   int n = data.nrow();  //number of rows in data matrix, i.e., peptides/proteins/...
   int p = data.ncol();  //number of samples
   int m = max(gp);      //number of groups
-  int nonmissing_m; //number of groups with at least one observation
   double overall_mean = 0; //mean across groups
-  NumericVector diff_vars; //Allow for unequal variances in two group situation
-  double dfi; //Satterthwaite df approximation if unequal variances
+  NumericVector diff_vars(n); //Allow for unequal variances in two group situation
 
-  double SSE,SST, SSB; //SSEs, SSTs and SSBs computed by row
   NumericVector Fstats(n), p_value(n), sigma2(n); //F-statistic & p-value for each row
   NumericMatrix group_sums(n,m); //matrix to save the group sums in
   NumericMatrix group_means(n,m); //matrix to save the group means in
@@ -43,21 +39,21 @@ List anova_cpp(NumericMatrix data, NumericVector gp, int unequal_var, NumericVec
 
   //Iterate over the matrix rows (peptides, proteins,...) to get group means
   //and SSEs
-  for(i=0; i<n; i++){
+  for(int i=0; i<n; i++){
 
     //Be sure each SS starts out at zero
-    SSE = 0;
-    SSB = 0;
-    SST = 0;
+    double SSE = 0;
+    double SSB = 0;
+    double SST = 0;
 
     //Reset the number of non-missing groups
-    nonmissing_m = m;
+    int nonmissing_m = m;
 
     //Iterate over the matrix columns (samples) to get groups means for each row
-    for(j=0; j<p; j++){
+    for(int j=0; j<p; j++){
 
       //Get the groupi
-      groupi = gp[j]-1;
+      int groupi = gp[j]-1;
 
       //Compute group sums by adding each observations that's not an NA
       if(!NumericMatrix::is_na(data(i,j))){
@@ -69,10 +65,10 @@ List anova_cpp(NumericMatrix data, NumericVector gp, int unequal_var, NumericVec
 
     //Store total number of non-na obs per row
     rowi_gsize = group_sizes(i,_);
-    rowi_size = std::accumulate(rowi_gsize.begin(),rowi_gsize.end(),0.0);
+    int rowi_size = std::accumulate(rowi_gsize.begin(),rowi_gsize.end(),0.0);
 
     //Translate the group sums into group means for each row
-    for(k=0; k<m; k++){
+    for(int k=0; k<m; k++){
       group_means(i,k) = group_sums(i,k)/group_sizes(i,k);
 
       //If an entire group is missing (which shouldn't happen), the number of groups needs to be decreased
@@ -92,8 +88,8 @@ List anova_cpp(NumericMatrix data, NumericVector gp, int unequal_var, NumericVec
       diff_vars[0] = 0;
       diff_vars[1] = 0;
 
-      for(j=0; j<p; j++){
-        groupi = gp[j] - 1;
+      for(int j=0; j<p; j++){
+        int groupi = gp[j] - 1;
         if(!NumericMatrix::is_na(data(i,j))){
           diff_vars[groupi] += pow(data(i,j)-group_means(i,groupi),2);
         }
@@ -103,14 +99,14 @@ List anova_cpp(NumericMatrix data, NumericVector gp, int unequal_var, NumericVec
       sigma2(i) = diff_vars[0]/rowi_gsize[0]+diff_vars[1]/rowi_gsize[1]; //Welch's estimate of variance
       Fstats(i) = pow(group_means(i,0)-group_means(i,1),2)/sigma2(i);
       //Satterthwaite approximation to degrees of freedom
-      dfi = pow(sigma2(i),2)/(pow(diff_vars[0]/rowi_gsize[0],2)/(rowi_gsize[0]-1)+pow(diff_vars[1]/rowi_gsize[1],2)/(rowi_gsize[1]-1));
+      double dfi = pow(sigma2(i),2)/(pow(diff_vars[0]/rowi_gsize[0],2)/(rowi_gsize[0]-1)+pow(diff_vars[1]/rowi_gsize[1],2)/(rowi_gsize[1]-1));
       p_value(i) = R::pf(Fstats(i),1,dfi,false,false);
       sigma2(i) *= dfi; //scale by estimated df to get sample variance not mean standard error
 
     }else{ //If there are more than two groups, compute pooled variance assuming equal variance across groups
       //Iterate over columns (again) to get a SSE for each row
-      for(j=0; j<p; j++){
-        groupi = gp[j] - 1;
+      for(int j=0; j<p; j++){
+        int groupi = gp[j] - 1;
         if(!NumericMatrix::is_na(data(i,j))){
           SSE += pow(data(i,j)-group_means(i,groupi),2);
           SST += pow(data(i,j)-overall_mean,2);
@@ -153,7 +149,7 @@ List two_factor_anova_cpp(arma::mat y,
   int num_to_remove;
   int df_red, df_full;
   double sigma2_red, sigma2_full;
-  NumericVector sig_est(n), pval(n), Fstat(n),  atl_one;
+  NumericVector sig_est(n), pval(n), Fstat(n),  atl_one(n);
   arma::mat diag_mat;
   arma::colvec par_ests(p_full), par_ests_temp,group_ids_nona(y.n_cols), group_ids_nona_unq;
   arma::mat parmat(n,p_full), group_sizes(n,p_full);

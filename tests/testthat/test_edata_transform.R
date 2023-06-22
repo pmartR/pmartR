@@ -160,8 +160,6 @@ test_that('edata_transform correctly transforms the data',{
   # Ensure the remaining attributes have not changed.
   expect_equal(attr(transmuted, 'cnames'),
                attr(pdata, 'cnames'))
-  expect_equal(attr(transmuted, 'check.names'),
-               attr(pdata, 'check.names'))
   expect_equal(attr(transmuted, 'meta_info'),
                attr(pdata, 'meta_info'))
   expect_equal(attr(transmuted, 'group_DF'),

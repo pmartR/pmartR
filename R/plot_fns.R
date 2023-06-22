@@ -678,7 +678,7 @@ plot.nmrnormRes <- function (nmrnormRes_obj, nmrData = NULL, order_by = NULL,
 
     # Farm boy, add a variable specifying the color for each point.
     data$Color <- factor(nmrData$f_data[[color_by]],
-                         levels = color_levels)
+                         levels = sort(color_levels))
 
   }
 
@@ -970,10 +970,19 @@ plot.SPANSRes <- function (SPANSRes_obj, interactive = FALSE,
 #'   \code{\link{as.lipidData}}, \code{\link{as.nmrData}}, or \code{\link{as.seqData}}, respectively.
 #' @param plot_type character string specifying which type of plot to produce.
 #'   The two options are 'bar' or 'scatter'.
+#' @param nonmissing logical value. When FALSE, plots missing values. When TRUE,
+#'   plots non-missing values.
+#' @param proportion logical value. When TRUE, plots the proportion of missing 
+#'   (or non-missing if \code{nonmissing} is TRUE) to the total number of 
+#'   values. Only works with a plot type of 'bar'.
 #' @param order_by A character string specifying a column in f_data by which to
-#'   order the samples.
+#'   order the samples. Specifying "Group" will use the "Group" column of the
+#'   object's \code{group_DF} attribute to order the samples. Only works with a 
+#'   plot type of 'bar'.
 #' @param color_by A character string specifying a column in f_data by which to
-#'   color the bars or the points depending on the \code{plot_type}.
+#'   color the bars or the points depending on the \code{plot_type}. Specifying
+#'   "Group" will use the "Group" column of the object's \code{group_DF}
+#'   attribute to color the samples. Only works with a plot type of 'bar'.
 #' @param interactive logical value. If TRUE produces an interactive plot.
 #' @param x_lab_bar character string used for the x-axis label for the bar
 #'   plot
@@ -1043,8 +1052,9 @@ plot.SPANSRes <- function (SPANSRes_obj, interactive = FALSE,
 #'
 #' @export
 #'
-plot.naRes <- function (naRes_obj, omicsData, plot_type = "bar",
-                        order_by = NULL, color_by = NULL,
+plot.naRes <- function (naRes_obj, omicsData, plot_type = "bar", 
+                        nonmissing = FALSE, proportion = FALSE,
+                        order_by = NULL, color_by = NULL, 
                         interactive = FALSE, x_lab_bar = NULL,
                         x_lab_scatter = NULL, y_lab_bar = NULL,
                         y_lab_scatter = NULL, x_lab_size = 11, y_lab_size = 11,
@@ -1077,6 +1087,13 @@ plot.naRes <- function (naRes_obj, omicsData, plot_type = "bar",
     stop ("plot_type must be either 'bar' or 'scatter'")
 
   }
+  
+  # Check to make sure proportion is only used with bar plot
+  if (proportion && plot_type != "bar") {
+    
+    stop("plot_type must be 'bar' if proportion is TRUE")
+    
+  }
 
   # Make sure palette is one of the RColorBrewer options if it is not NULL.
   if (!is.null(palette)) {
@@ -1096,24 +1113,24 @@ plot.naRes <- function (naRes_obj, omicsData, plot_type = "bar",
   }
 
   # Farm boy, make sure order_by exists in f_data. As you wish.
-  if (!is.null(order_by)) {
+  if (!is.null(order_by) && order_by != "Group") {
 
     if (!order_by %in% names(omicsData$f_data)) {
 
       # I'm a pmartR developer. You killed my plot. Prepare to receive an error.
-      stop ("order_by must be a column in f_data.")
+      stop ("order_by: column '", order_by, "' not found in f_data.")
 
     }
 
   }
 
   # Farm boy, make sure color_by exists in f_data. As you wish.
-  if (!is.null(color_by)) {
-
+  if (!is.null(color_by) && color_by != "Group") {
+    
     if (!color_by %in% names(omicsData$f_data)) {
 
       # Clearly you cannot choose a column name in f_data!
-      stop ("color_by must be a column in f_data.")
+      stop ("color_by: column '", color_by, "' not found in f_data.")
 
     }
 
@@ -1124,14 +1141,25 @@ plot.naRes <- function (naRes_obj, omicsData, plot_type = "bar",
     na.by.sample <- naRes_obj$zeros.by.sample
     na.by.molecule <- naRes_obj$zeros.by.molecule
     num_missing_vals <- na.by.molecule$num_zeros
+    num_nonmissing_vals <- na.by.molecule$num_nonzeros
+    missing_proportion <- na.by.molecule$zeros_proportion
     names(na.by.sample)[which(names(na.by.sample) == "num_zeros")] <- "num_NA"
     names(na.by.molecule)[which(names(na.by.molecule) == "num_zeros")] <- "num_NA"
+    names(na.by.sample)[which(names(na.by.sample) == "num_nonzeros")] <- "num_non_NA"
+    names(na.by.molecule)[which(names(na.by.molecule) == "num_nonzeros")] <- "num_non_NA"
   }else{
     na.by.sample <- naRes_obj$na.by.sample
     na.by.molecule <- naRes_obj$na.by.molecule
     num_missing_vals <- na.by.molecule$num_NA
+    num_nonmissing_vals <- na.by.molecule$num_non_NA
   }
-
+  
+  # Get the proportion of missing/nonmissing to total (missing + nonmissing)
+  target_NA_column <- ifelse(nonmissing, "num_non_NA", "num_NA")
+  na.by.molecule$NA_proportion <- na.by.molecule[[target_NA_column]] / 
+    (na.by.molecule$num_NA + na.by.molecule$num_non_NA)
+  na.by.sample$NA_proportion <- na.by.sample[[target_NA_column]] / 
+    (na.by.sample$num_NA + na.by.sample$num_non_NA)
 
   edata_cname <- attr(naRes_obj, "cnames")$edata_cname
   fdata_cname <- attr(naRes_obj, "cnames")$fdata_cname
@@ -1146,27 +1174,37 @@ plot.naRes <- function (naRes_obj, omicsData, plot_type = "bar",
   # Check if order_by is NULL and update the plot_data object accordingly.
   if (!is.null(order_by)) {
 
-    # Reorder the rows of na.by.sample so the bar plot will be displayed in the
-    # correct order.
-    na.by.sample <- na.by.sample[order(na.by.sample[, order_by]), ]
-    na.by.sample[[fdata_cname]] <- factor(
-      na.by.sample[[fdata_cname]],
-      levels = na.by.sample[[fdata_cname]],
-      ordered = TRUE
-    )
+    if (order_by == "Group") {
+      na.by.sample <- na.by.sample[order(na.by.sample$Group), ]
+      na.by.sample[[fdata_cname]] <- factor(
+        na.by.sample[[fdata_cname]],
+        levels = na.by.sample[[fdata_cname]],
+        ordered = TRUE
+      )
+      
+    } else {
+    
+      # Reorder the rows of na.by.sample so the bar plot will be displayed in the
+      # correct order.
+      na.by.sample <- na.by.sample[order(na.by.sample[, order_by]), ]
+      na.by.sample[[fdata_cname]] <- factor(
+        na.by.sample[[fdata_cname]],
+        levels = na.by.sample[[fdata_cname]],
+        ordered = TRUE
+      )
+      
+    }
 
   }
 
   # Check if color_by is NULL and update na.by.sample accordingly.
   if (!is.null(color_by)) {
-
     # Create factors to color by according to the input of color_by.
     color_levels <- if (color_by != "Group")
       unique(factor(omicsData$f_data[[color_by]])) else
         unique(factor(attr(omicsData, "group_DF")[["Group"]]))
     na.by.sample[[color_by]] <- factor(na.by.sample[[color_by]],
-                                       levels = color_levels)
-
+                                       levels = sort(color_levels))
   }
 
   # Fashion astonishing plots --------------------------------------------------
@@ -1184,7 +1222,8 @@ plot.naRes <- function (naRes_obj, omicsData, plot_type = "bar",
                 display_count = display_count,
                 coordinate_flip = coordinate_flip,
                 use_VizSampNames = use_VizSampNames, interactive = interactive,
-                fdata_cname = fdata_cname, color_by = color_by)
+                fdata_cname = fdata_cname, color_by = color_by,
+                nonmissing = nonmissing, proportion = proportion)
 
   }
 
@@ -1192,8 +1231,7 @@ plot.naRes <- function (naRes_obj, omicsData, plot_type = "bar",
   if (plot_type == "scatter") {
 
     p <- na_scatter(edata = edata, group_df = group_df,
-                    na.by.sample = na.by.sample,
-                    num_missing_vals = num_missing_vals,
+                    na.by.molecule = na.by.molecule,
                     edata_cname = edata_cname, edata_cname_id = edata_cname_id,
                     fdata_cname = fdata_cname, x_lab_scatter = x_lab_scatter,
                     y_lab_scatter = y_lab_scatter,
@@ -1205,7 +1243,8 @@ plot.naRes <- function (naRes_obj, omicsData, plot_type = "bar",
                     bw_theme = bw_theme, palette = palette,
                     x_lab_angle = x_lab_angle,
                     coordinate_flip = coordinate_flip,
-                    interactive = interactive, point_size = point_size)
+                    interactive = interactive, point_size = point_size,
+                    nonmissing = nonmissing)
 
   }
 
@@ -1217,18 +1256,26 @@ na_bar <- function (na.by.sample, x_lab_bar, y_lab_bar, x_lab_size, y_lab_size,
                     x_lab_angle, title_lab_bar, title_lab_size, legend_lab_bar,
                     legend_position, text_size, bar_width, bw_theme, palette,
                     display_count, coordinate_flip, use_VizSampNames,
-                    interactive, fdata_cname, color_by) {
+                    interactive, fdata_cname, color_by, nonmissing,
+                    proportion) {
 
-
+  # Select which column of na.by.sample will be used
+  if (proportion) {
+    y_axis = "NA_proportion"
+  } else if (nonmissing) {
+    y_axis = "num_non_NA"
+  } else {
+    y_axis = "num_NA"
+  }
 
   # Farm boy, color the plots based on the input. As you wish.
   if (!is.null(color_by)) {
-
+    
     # Forge the basic sample bar plot with group info. More details will be
     # added according to the users input later.
     samp <- ggplot2::ggplot(data = na.by.sample,
                             ggplot2::aes(x = .data[[fdata_cname]],
-                                         y = num_NA,
+                                         y = .data[[y_axis]],
                                          fill = !!rlang::sym(color_by))) +
       ggplot2::geom_bar(stat = "identity", width = bar_width)
 
@@ -1247,12 +1294,12 @@ na_bar <- function (na.by.sample, x_lab_bar, y_lab_bar, x_lab_size, y_lab_size,
     hideous <- grDevices::hcl(h = 15,
                               c = 100,
                               l = 65)
-
+    
     # Forge the basic sample bar plot without group info. More details will be
     # added according to the users input later.
     samp <- ggplot2::ggplot(data = na.by.sample,
                             ggplot2::aes(x = .data[[fdata_cname]],
-                                         y = num_NA)) +
+                                         y = .data[[y_axis]])) +
       ggplot2::geom_bar(stat = "identity",
                         width = bar_width,
                         fill = if (is.null(palette))
@@ -1265,7 +1312,7 @@ na_bar <- function (na.by.sample, x_lab_bar, y_lab_bar, x_lab_size, y_lab_size,
   if (display_count) {
 
     samp <- samp +
-      ggplot2::geom_text(ggplot2::aes(label = num_NA),
+      ggplot2::geom_text(ggplot2::aes(label = round(.data[[y_axis]], digits=4)),
                          vjust = 2,
                          color = "black",
                          size = text_size)
@@ -1280,13 +1327,20 @@ na_bar <- function (na.by.sample, x_lab_bar, y_lab_bar, x_lab_size, y_lab_size,
     "Sample Name" else
       x_lab_bar
   yLabelBar <- if (is.null(y_lab_bar))
-    "Number of missing values" else
+    sprintf(
+      "%s of %s values",
+      ifelse(proportion, "Proportion", "Number"),
+      ifelse(nonmissing, "non-missing", "missing")
+    ) else
       y_lab_bar
   plotTitleBar <- if (is.null(title_lab_bar))
-    "Missing values by sample" else
+    sprintf(
+      "%s values by sample",
+      ifelse(nonmissing, "Non-missing", "Missing")
+    ) else
       title_lab_bar
   legendLabelBar <- if (is.null(legend_lab_bar))
-    "Group" else
+    color_by else
       legend_lab_bar
 
   # Add labels to the plots. Even more tedious work to do. Will it ever end!?!
@@ -1331,13 +1385,20 @@ na_bar <- function (na.by.sample, x_lab_bar, y_lab_bar, x_lab_size, y_lab_size,
 
 }
 
-na_scatter <- function (edata, group_df, na.by.sample, num_missing_vals,
-                        edata_cname, edata_cname_id, fdata_cname, x_lab_scatter,
+na_scatter <- function (edata, group_df, na.by.molecule, edata_cname,
+                        edata_cname_id, fdata_cname, x_lab_scatter,
                         y_lab_scatter, title_lab_scatter, legend_lab_scatter,
                         legend_position, title_lab_size, x_lab_size, y_lab_size,
                         text_size, bw_theme, palette, x_lab_angle,
-                        coordinate_flip, interactive, point_size) {
+                        coordinate_flip, interactive, point_size,
+                        nonmissing) {
 
+  # Select missing/nonmissing
+  if (nonmissing)
+    num_missing_vals <- na.by.molecule$num_non_NA
+  else
+    num_missing_vals <- na.by.molecule$num_NA
+  
   # More tedious label making.
   xLabelScatter <- if (is.null(x_lab_scatter))
     "Mean Intensity" else
@@ -1755,7 +1816,20 @@ plot.corRes <- function (corRes_obj, omicsData = NULL, order_by = NULL,
 #'
 #' @param dimRes_obj object of class dimRes created by the \code{dim_reduction}
 #'   function
-#'
+#' @param omicsData optional omicsData for use in specifying a column name in
+#'   fdata when using \code{color_by} or \code{shape_by}.
+#' @param color_by character string specifying which column to use to control 
+#'   the color for plotting. NULL indicates the default value of the main effect 
+#'   levels (if present). "Group" uses the "Group" column of group_DF. NA 
+#'   indicates no column will be used, and will use the default theme color. If 
+#'   an omicsData object is passed, any other value will use the specified 
+#'   column of f_data.
+#' @param shape_by character string specifying which column to use to control 
+#'   the shape for plotting. NULL indicates the default value of the second main
+#'   effect levels (if present). "Group" uses the "Group" column of group_DF. NA 
+#'   indicates no column will be used, and will use the default theme shape. If 
+#'   an omicsData object is passed, any other value will use the specified 
+#'   column of f_data.
 #' @param interactive logical value. If TRUE produces an interactive plot.
 #' @param x_lab character string specifying the x-axis label
 #' @param y_lab character string specifying the y-axis label. The default is
@@ -1802,9 +1876,11 @@ plot.corRes <- function (corRes_obj, omicsData = NULL, order_by = NULL,
 #'
 #' @export
 #'
-plot.dimRes <- function (dimRes_obj, interactive = FALSE, x_lab = NULL,
-                         y_lab = NULL, x_lab_size = 11, y_lab_size = 11,
-                         x_lab_angle = 0, title_lab = NULL, title_lab_size = 14,
+plot.dimRes <- function (dimRes_obj, omicsData = NULL,
+                         color_by = NULL, shape_by = NULL,
+                         interactive = FALSE, x_lab = NULL, y_lab = NULL, 
+                         x_lab_size = 11, y_lab_size = 11, x_lab_angle = 0, 
+                         title_lab = NULL, title_lab_size = 14,
                          legend_lab = NULL, legend_position = "right",
                          point_size = 4, bw_theme = TRUE, palette = NULL) {
 
@@ -1834,7 +1910,6 @@ plot.dimRes <- function (dimRes_obj, interactive = FALSE, x_lab = NULL,
     }
 
   }
-
   plotdata <- data.frame(SampleID = dimRes_obj$SampleID,
                          PC1 = dimRes_obj$PC1,
                          PC2 = dimRes_obj$PC2)
@@ -1921,6 +1996,28 @@ plot.dimRes <- function (dimRes_obj, interactive = FALSE, x_lab = NULL,
       }
 
     }
+    
+    # Add any columns from f_data to the plotdata if present (for color_by
+    # and shape_by)
+    if (!is.null(omicsData)) {
+      if (is.null(omicsData$f_data)) {
+        stop("omicsData does not have f_data")
+      }
+      
+      fdata_concat <- omicsData$f_data[
+        c(
+          which(colnames(omicsData$f_data) == fdata_cname),
+          which(!colnames(omicsData$f_data) %in% colnames(plotdata))
+        )
+      ]
+      
+      plotdata <- merge.data.frame(plotdata,
+                                   fdata_concat,
+                                   by.x = plotdata_name,
+                                   by.y = fdata_cname,
+                                   sort = FALSE)
+      
+    }
 
     # Runs when there is no group information.
   } else {
@@ -1935,6 +2032,54 @@ plot.dimRes <- function (dimRes_obj, interactive = FALSE, x_lab = NULL,
 
     }
 
+  }
+  
+  if (!is.null(color_by)) {
+    if (is.na(color_by)) {
+      color_var <- NULL
+    } else if (color_by == "Group") {
+      color_var <- "Group"
+      display_names[1] <- "Group"
+    } else {
+      if(is.null(omicsData)) {
+          stop("color_by value is invalid. Did you mean to add an omicsData?")
+      }
+      
+      if (!color_by %in% colnames(omicsData$f_data)) {
+        if (is.null(omicsData)) {
+        } else {
+          stop("color_by: column '", color_by, "' not found in f_data.")
+        }
+      }
+      
+      color_var <- color_by
+      display_names[1] <- color_by
+      plotdata[[color_by]] <- as.factor(plotdata[[color_by]])
+    }
+  }
+  
+  if (!is.null(shape_by)) {
+    if (is.na(shape_by)) {
+      pch_var <- NULL
+    } else if (shape_by == "Group") {
+      pch_var <- "Group"
+      display_names[2] <- "Group"
+    } else {
+      if(is.null(omicsData)) {
+        stop("shape_by value is invalid. Did you mean to add an omicsData?")
+      }
+      
+      if (!shape_by %in% colnames(omicsData$f_data)) {
+        if (is.null(omicsData)) {
+        } else {
+          stop("shape_by: column '", shape_by, "' not found in f_data.")
+        }
+      }
+      
+      pch_var <- shape_by
+      display_names[2] <- shape_by
+      plotdata[[shape_by]] <- as.factor(plotdata[[shape_by]])
+    }
   }
 
   # custom legend names #
@@ -2342,7 +2487,7 @@ plot.moleculeFilt <- function (filter_object, min_num = NULL, cumulative = TRUE,
 #' \dontrun{
 #' library(pmartRdata)
 #' seqfilt <- total_count_filter(omicsData = rnaseq_object)
-#' plot(seqfilt, min_count = 5)
+#' plot(seqfilt, min_count = 15)
 #' }
 #' 
 #' @rdname plot-totalCountFilt
@@ -3830,7 +3975,7 @@ plot.rmdFilt <- function (filter_object, pvalue_threshold = NULL, sampleID = NUL
         # Create a logical vector that will determine the point shape.
         goodies_pch <- filter_object[, sample_name] %in% condemned
 
-      }
+      } else goodies_pch <- rep(FALSE, nrow(filter_object))
 
     } else {
 
@@ -5176,7 +5321,7 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
     })
     any(res)
   } else FALSE
-  ref_text <- if(norm_info) "Reference Standardized " else NULL
+  ref_text <- if(ref_info) "Reference Standardized " else NULL
 
   maintitle <- paste0(
     "Boxplots of ", ref_text, norm_text, datatype_text, "Data"
@@ -5440,7 +5585,7 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
       unique(factor(omicsData$f_data[[color_by]])) else
         unique(factor(attr(omicsData, "group_DF")[["Group"]]))
     plot_data[[color_by]] <- factor(plot_data[[color_by]],
-                                    levels = color_levels)
+                                    levels = sort(color_levels))
 
   }
 
@@ -6372,14 +6517,18 @@ gtest_heatmap <-
                            color = "black")
 
       if(show_sig) {
-        p <- p + ggplot2::geom_point(
-          data = gtest_counts %>% dplyr::filter(sig),
-          ggplot2::aes(Count_First_Group, Count_Second_Group, shape = "1"),
-          fill = "white"
-        ) +
+        sig_data <- gtest_counts %>% dplyr::filter(sig)
+        
+        if(nrow(sig_data) > 0) {
+          p <- p + ggplot2::geom_point(
+            data = sig_data,
+            ggplot2::aes(Count_First_Group, Count_Second_Group, shape = "1"),
+            fill = "white"
+          ) +
           ggplot2::scale_shape_manual(name = "Statistically significant",
                                       labels = "",
                                       values = 21)
+        }
       }
 
       if(display_count) {

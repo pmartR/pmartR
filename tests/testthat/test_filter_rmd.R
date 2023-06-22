@@ -321,8 +321,6 @@ test_that("rmd_filter and applyFilt produce the correct output",{
   # Ensurify the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata, "cnames"),
                    attr(pfiltered, "cnames"))
-  expect_identical(attr(pdata, "check.names"),
-                   attr(pfiltered, "check.names"))
   expect_identical(class(pdata),
                    class(pfiltered))
 
@@ -394,8 +392,6 @@ test_that("rmd_filter and applyFilt produce the correct output",{
   # Ensurify the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(nmrdata, "cnames"),
                    attr(nmrfiltered, "cnames"))
-  expect_identical(attr(nmrdata, "check.names"),
-                   attr(nmrfiltered, "check.names"))
   expect_identical(class(nmrdata),
                    class(nmrfiltered))
 
@@ -461,8 +457,6 @@ test_that("rmd_filter and applyFilt produce the correct output",{
   # Ensurify the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata_sg, "cnames"),
                    attr(pfiltered_sg, "cnames"))
-  expect_identical(attr(pdata_sg, "check.names"),
-                   attr(pfiltered_sg, "check.names"))
   expect_identical(class(pdata_sg),
                    class(pfiltered_sg))
 
@@ -521,8 +515,6 @@ test_that("rmd_filter and applyFilt produce the correct output",{
   # Ensurify the class and attributes that shouldn't have changed didn't change.
   expect_identical(attr(pdata_sg, "cnames"),
                    attr(pfiltered_sg_f, "cnames"))
-  expect_identical(attr(pdata_sg, "check.names"),
-                   attr(pfiltered_sg_f, "check.names"))
   expect_identical(class(pdata_sg),
                    class(pfiltered_sg_f))
 
@@ -765,4 +757,74 @@ test_that("rmd_filter and applyFilt produce the correct output",{
   expect_equal(dim(pair_filtered$e_meta),
                c(175, 6))
 
+  # Expect warning if data has already been filtered ---------------------------
+  
+  # The original peptide data gets overwritten at some point. Load it as before.
+  load(system.file("testdata",
+                   "little_pdata.RData",
+                   package = "pmartR"))
+  pdata <- as.pepData(e_data = edata,
+                      f_data = fdata,
+                      e_meta = emeta,
+                      edata_cname = "Mass_Tag_ID",
+                      fdata_cname = "SampleID",
+                      emeta_cname = "Protein")
+  pdata <- edata_transform(omicsData = pdata,
+                           data_scale = "log")
+  pdata <- group_designation(omicsData = pdata,
+                             main_effects = "Condition")
+  
+  # Create three identical filters using the same omicsData
+  pfilter1 <- rmd_filter(omicsData = pdata,
+                         ignore_singleton_groups = FALSE)
+  pfilter2 <- rmd_filter(omicsData = pdata,
+                         ignore_singleton_groups = FALSE)
+  pfilter3 <- rmd_filter(omicsData = pdata,
+                         ignore_singleton_groups = FALSE)
+  
+  # Apply two filters
+  pfiltered1 <- applyFilt(filter_object = pfilter1,
+                          omicsData = pdata,
+                          pvalue_threshold = 0.0001,
+                          min_num_biomolecules = 50)
+  warnings <- capture_warnings(
+    pfiltered2 <- applyFilt(filter_object = pfilter2,
+                            omicsData = pfiltered1,
+                            pvalue_threshold = 0.0001,
+                            min_num_biomolecules = 50)
+  )
+  
+  # The second applyFilt should generate warnings
+  expect_match(
+    warnings,
+    "An RMD filter has already been applied to this data set.",
+    all = FALSE
+  )
+  expect_match(
+    warnings,
+    "Specified samples Infection7 were not found in the data\\.",
+    all = FALSE
+  )
+  
+  # Samples that do exist should be filtered even if there are samples that
+  # don't exist
+  warnings <- capture_warnings(
+    pfiltered3 <- applyFilt(filter_object = pfilter3,
+                            omicsData = pfiltered1,
+                            pvalue_threshold = 0.48,
+                            min_num_biomolecules = 50)
+  )
+  
+  expect_match(
+    warnings,
+    "An RMD filter has already been applied to this data set.",
+    all = FALSE
+  )
+  expect_match(
+    warnings,
+    "Specified samples Infection7 were not found in the data\\.",
+    all = FALSE
+  )
+  
+  expect_null(pfiltered3$e_data$Infection8)
 })
