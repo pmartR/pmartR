@@ -57,7 +57,8 @@ molecule_filter <- function(omicsData, use_groups = FALSE, use_batch = FALSE) {
   if (!is.logical(use_batch)) stop("use_batch must be logical.")
 
   # check that omicsData has batch_id data if specified
-  if (is.null(attributes(attr(omicsData, "group_DF"))$batch_id) && use_batch == TRUE) {
+  if (is.null(attributes(attr(omicsData, "group_DF"))$batch_id) && 
+      use_batch == TRUE) {
     stop(paste("omicsData must have batch_id specified if use_batch = TRUE"))
   }
 
@@ -79,7 +80,9 @@ molecule_filter <- function(omicsData, use_groups = FALSE, use_batch = FALSE) {
 
   # SCENARIO 1: use_groups = FALSE, use_batch = FALSE
   # we run the scenario as before
-  if ((use_batch == FALSE | is.null(attributes(attr(omicsData, "group_DF"))$batch_id)) & (use_groups == FALSE | is.null(attr(omicsData, "group_DF")))) {
+  if ((use_batch == FALSE | 
+       is.null(attributes(attr(omicsData, "group_DF"))$batch_id)) & 
+      (use_groups == FALSE | is.null(attr(omicsData, "group_DF")))) {
     # Extricate the column number of the ID column.
 
     # Compute the number of non-missing values
@@ -89,19 +92,28 @@ molecule_filter <- function(omicsData, use_groups = FALSE, use_batch = FALSE) {
       num_obs <- rowSums(!is.na(omicsData$e_data[, -id_col]))
     }
 
-    # Create a data frame with the ID column and the number of non-missing values.
+    # Create a data frame with the ID column and the number of non-missing 
+    # values.
     output <- data.frame(omicsData$e_data[, id_col], num_obs)
   }
 
   # SCENARIO 2: use_groups = FALSE, use_batch = TRUE
-  else if ((use_batch == TRUE & !is.null(attributes(attr(omicsData, "group_DF"))$batch_id)) & (use_groups == FALSE | is.null(attr(omicsData, "group_DF")))) {
-    # create a data frame with ID columns and the number of non-missing values per group
+  else if ((use_batch == TRUE & 
+            !is.null(attributes(attr(omicsData, "group_DF"))$batch_id)) & 
+           (use_groups == FALSE | is.null(attr(omicsData, "group_DF")))) {
+    # create a data frame with ID columns and the number of non-missing values 
+    # per group
     # save the group data frame
     batchDat <- attributes(attr(omicsData, "group_DF"))$batch_id
     colnames(batchDat)[2] <- "Batch"
-    # Create a data frame with the ID columns and the minimum number of non-missing values per grouping
+    # Create a data frame with the ID columns and the minimum number of 
+    # non-missing values per grouping
     output <- omicsData$e_data %>%
-      tidyr::pivot_longer(cols = -dplyr::all_of(id_col), names_to = names(batchDat)[1], values_to = "value") %>%
+      tidyr::pivot_longer(
+        cols = -dplyr::all_of(id_col),
+        names_to = names(batchDat)[1],
+        values_to = "value"
+      ) %>%
       dplyr::left_join(batchDat, by = pmartR::get_fdata_cname(omicsData)) %>%
       dplyr::group_by(dplyr::across(dplyr::all_of(id_col)), Batch) %>%
       {
@@ -112,7 +124,9 @@ molecule_filter <- function(omicsData, use_groups = FALSE, use_batch = FALSE) {
         }
       } %>%
       dplyr::group_by(dplyr::across(dplyr::all_of(id_col))) %>%
-      dplyr::summarise(min_num_obs = as.numeric(min(num_obs)), .groups = "keep") %>%
+      dplyr::summarise(
+        min_num_obs = as.numeric(min(num_obs)), .groups = "keep"
+      ) %>%
       dplyr::ungroup() %>%
       dplyr::rename(molecule = dplyr::all_of(id_col)) %>%
       dplyr::arrange(match(molecule, ordering)) %>%
@@ -122,13 +136,21 @@ molecule_filter <- function(omicsData, use_groups = FALSE, use_batch = FALSE) {
   }
 
   # SCENARIO 3: use_groups = TRUE, use_batch = FALSE
-  else if ((use_batch == FALSE | is.null(attributes(attr(omicsData, "group_DF"))$batch_id)) & (use_groups == TRUE & !is.null(attr(omicsData, "group_DF")))) {
-    # create a data frame with ID columns and the number of non-missing values per group
+  else if ((use_batch == FALSE | 
+            is.null(attributes(attr(omicsData, "group_DF"))$batch_id)) &
+           (use_groups == TRUE & !is.null(attr(omicsData, "group_DF")))) {
+    # create a data frame with ID columns and the number of non-missing values 
+    # per group
     # save the group data frame
     groupDat <- attr(omicsData, "group_DF")
-    # Create a data frame with the ID columns and the minimum number of non-missing values per grouping
+    # Create a data frame with the ID columns and the minimum number of 
+    # non-missing values per grouping
     output <- omicsData$e_data %>%
-      tidyr::pivot_longer(cols = -dplyr::all_of(id_col), names_to = names(groupDat)[1], values_to = "value") %>%
+      tidyr::pivot_longer(
+        cols = -dplyr::all_of(id_col),
+        names_to = names(groupDat)[1],
+        values_to = "value"
+      ) %>%
       dplyr::left_join(groupDat, by = pmartR::get_fdata_cname(omicsData)) %>%
       dplyr::group_by(dplyr::across(dplyr::all_of(id_col)), Group) %>%
       {
@@ -139,7 +161,9 @@ molecule_filter <- function(omicsData, use_groups = FALSE, use_batch = FALSE) {
         }
       } %>%
       dplyr::group_by(dplyr::across(dplyr::all_of(id_col))) %>%
-      dplyr::summarise(min_num_obs = as.numeric(min(num_obs)), .groups = "keep") %>%
+      dplyr::summarise(
+        min_num_obs = as.numeric(min(num_obs)), .groups = "keep"
+      ) %>%
       dplyr::ungroup() %>%
       dplyr::rename(molecule = dplyr::all_of(id_col)) %>%
       dplyr::arrange(match(molecule, ordering)) %>%
@@ -155,7 +179,11 @@ molecule_filter <- function(omicsData, use_groups = FALSE, use_batch = FALSE) {
     colnames(batchDat)[2] <- "Batch"
 
     output <- omicsData$e_data %>%
-      tidyr::pivot_longer(cols = -dplyr::all_of(id_col), names_to = names(groupDat)[1], values_to = "value") %>%
+      tidyr::pivot_longer(
+        cols = -dplyr::all_of(id_col),
+        names_to = names(groupDat)[1],
+        values_to = "value"
+      ) %>%
       dplyr::left_join(groupDat, by = pmartR::get_fdata_cname(omicsData)) %>%
       dplyr::left_join(batchDat, by = pmartR::get_fdata_cname(omicsData)) %>%
       dplyr::group_by(dplyr::across(dplyr::all_of(id_col)), Group, Batch) %>%
@@ -167,7 +195,9 @@ molecule_filter <- function(omicsData, use_groups = FALSE, use_batch = FALSE) {
         }
       } %>%
       dplyr::group_by(dplyr::across(dplyr::all_of(id_col))) %>%
-      dplyr::summarise(min_num_obs = as.numeric(min(num_obs)), .groups = "keep") %>%
+      dplyr::summarise(
+        min_num_obs = as.numeric(min(num_obs)), .groups = "keep"
+      ) %>%
       dplyr::ungroup() %>%
       dplyr::rename(molecule = dplyr::all_of(id_col)) %>%
       dplyr::arrange(match(molecule, ordering)) %>%
@@ -257,17 +287,21 @@ total_count_filter <- function(omicsData) {
   output <- data.frame(omicsData$e_data[, id_col], count_data)
   names(output) <- c(get_edata_cname(omicsData), "Total_Counts")
 
-  output[[get_edata_cname(omicsData)]] <- as.character(output[[get_edata_cname(omicsData)]])
-  output <- dplyr::arrange(
-    output, !!dplyr::sym(get_edata_cname(omicsData)),
-    Total_Counts
+  output[[get_edata_cname(omicsData)]] <- as.character(
+    output[[get_edata_cname(omicsData)]]
   )
+  output <- output %>%
+    dplyr::arrange(
+      !!dplyr::sym(get_edata_cname(omicsData)),
+      Total_Counts
+    )
   row.names(output) <- NULL
 
   # Extract the 'data.frame' class from the the output data frame.
   orig_class <- class(output)
 
-  # Create the totalCountFilt class and attach the data.frame class to it as well.
+  # Create the totalCountFilt class and attach the data.frame class to it as 
+  # well.
   class(output) <- c("totalCountFilt", orig_class)
 
   ## Store density info ##
@@ -367,7 +401,8 @@ RNA_filter <- function(omicsData) {
     ProportionNonZero = as.numeric(non_zeros / nrow(temp_data))
   )
 
-  output <- dplyr::arrange(output, SampleID, LibrarySize, NonZero, ProportionNonZero)
+  output <- output %>%
+    dplyr::arrange(output, SampleID, LibrarySize, NonZero, ProportionNonZero)
   row.names(output) <- NULL
   colnames(output) <- c(
     get_fdata_cname(omicsData), "LibrarySize",
@@ -377,7 +412,8 @@ RNA_filter <- function(omicsData) {
   # Extract the 'data.frame' class from the the output data frame.
   orig_class <- class(output)
 
-  # Create the totalCountFilt class and attach the data.frame class to it as well.
+  # Create the totalCountFilt class and attach the data.frame class to it as 
+  # well.
   class(output) <- c("RNAFilt", orig_class)
 
   # Return the completed object!!!
@@ -417,7 +453,8 @@ RNA_filter <- function(omicsData) {
 #'
 #' @examples
 #' library(pmartRdata)
-#' mypep <- group_designation(omicsData = pep_object, main_effects = "Phenotype")
+#' mypep <- group_designation(omicsData = pep_object, 
+#'                            main_effects = "Phenotype")
 #' to_filter <- cv_filter(omicsData = mypep, use_groups = TRUE)
 #' summary(to_filter, cv_threshold = 30)
 #'
@@ -613,29 +650,30 @@ cv_filter <- function(omicsData, use_groups = TRUE) {
 #'   Mahalanobis distance
 #'
 #' @details The metrics on which the log2 robust Mahalanobis distance is based
-#'  can be specified using the \code{metrics} argument. \tabular{ll}{ pepData, proData
-#'  \tab For pepData and proData objects, all five of the metrics "MAD", "Kurtosis",
-#'  "Skewness", "Correlation", "Proportion_Missing" may be used (this is the
-#'  default). \cr metabData, lipidData, nmrData \tab The
-#'  use of "Proportion_Missing" is discouraged due to the general lack of
-#'  missing data in these datasets (the default behavior omits
-#'  "Proportion_Missing" from the metrics). \cr }
+#'  can be specified using the \code{metrics} argument. 
+#'  \tabular{ll}{ pepData, proData \tab For pepData and proData objects, all 
+#'  five of the metrics "MAD", "Kurtosis", "Skewness", "Correlation", 
+#'  "Proportion_Missing" may be used (this is the default). \cr metabData, 
+#'  lipidData, nmrData \tab The use of "Proportion_Missing" is discouraged due 
+#'  to the general lack of missing data in these datasets (the default behavior 
+#'  omits "Proportion_Missing" from the metrics). \cr }
 #'
 #' @examples
 #' library(pmartRdata)
 #' mymetab <- edata_transform(omicsData = metab_object, data_scale = "log2")
 #' mymetab <- group_designation(omicsData = mymetab, main_effects = "Phenotype")
-#' rmd_results <- rmd_filter(omicsData = mymetab, metrics = c("MAD", "Skewness", "Correlation"))
+#' rmd_results <- rmd_filter(omicsData = mymetab, 
+#'                           metrics = c("MAD", "Skewness", "Correlation"))
 #' rmd_results <- rmd_filter(omicsData = mymetab)
 #'
 #' mypep <- edata_transform(omicsData = pep_object, data_scale = "log2")
 #' mypep <- group_designation(omicsData = mypep, main_effects = "Phenotype")
 #' rmd_results <- rmd_filter(omicsData = mypep)
 #'
-#' @references Matzke, M., Waters, K., Metz, T., Jacobs, J., Sims, A., Baric, R.,
-#'  Pounds, J., and Webb-Robertson, B.J. (2011), \emph{Improved quality control
-#'  processing of peptide-centric LC-MS proteomics data}. Bioinformatics.
-#'  27(20): 2866-2872.
+#' @references Matzke, M., Waters, K., Metz, T., Jacobs, J., Sims, A., Baric, 
+#'  R., Pounds, J., and Webb-Robertson, B.J. (2011), \emph{Improved quality 
+#'  control processing of peptide-centric LC-MS proteomics data}. 
+#'  Bioinformatics. 27(20): 2866-2872.
 #'
 #' @author Lisa Bramer, Kelly Stratton
 #'
@@ -884,12 +922,15 @@ rmd_filter <- function(omicsData,
       ))
 
       if (length(ind) > 1) {
-        stop("More than one of the entries in metrics matches 'Proportion_Missing'.")
+        stop("More than one of the entries in metrics matches, ",
+             "'Proportion_Missing'.")
       }
 
       metrics = metrics[-ind]
       metrics_final[5] = 1
-      rmd.vals$Proportion_Missing = run_prop_missing(omicsData$e_data[, -id_col])[, 2]
+      rmd.vals$Proportion_Missing = run_prop_missing(
+        omicsData$e_data[, -id_col]
+      )[, 2]
 
       ## proceed, to check the rank of cov.mat ##
 
@@ -967,12 +1008,12 @@ rmd_filter <- function(omicsData,
     ))
   }
 
-  # Extract the names of the metrics that have been used. We cannot simply report
-  # the metrics vector used as the input because it is possible that the input
-  # metrics vector has had elements removed. For example, if the input data does
-  # not have any missing values, and Proportion_Missing was an input metric, then
-  # Proportion_Missing will not be calculated. Therefore, this metric will be
-  # removed from the metrics_final_txt vector.
+  # Extract the names of the metrics that have been used. We cannot simply 
+  # report the metrics vector used as the input because it is possible that the 
+  # input metrics vector has had elements removed. For example, if the input 
+  # data does not have any missing values, and Proportion_Missing was an input 
+  # metric, then Proportion_Missing will not be calculated. Therefore, this 
+  # metric will be removed from the metrics_final_txt vector.
   metrics_final_txt <- names(rmd.vals[, -1])
 
   # RMD the heck out of the data -----------------------------------------------
@@ -1098,7 +1139,8 @@ run_prop_missing <- function(data_only) {
   fracmiss <- nummiss / nrow(data_only)
 
   # store data #
-  res.final <- data.frame(Sample = names(data_only), Prop_missing = fracmiss, row.names = NULL)
+  res.final <- data.frame(Sample = names(data_only), Prop_missing = fracmiss, 
+                          row.names = NULL)
 
   return(res.final)
 }
@@ -1122,7 +1164,8 @@ run_prop_missing <- function(data_only) {
 #'
 run_mad <- function(data_only) {
   # calculate MAD #
-  mad_val = apply(data_only, 2, function(x) median(abs(x - median(x, na.rm = TRUE)), na.rm = TRUE))
+  mad_val = apply(data_only, 2, 
+                  \(x) median(abs(x - median(x, na.rm = TRUE)), na.rm = TRUE))
 
   # calculate the number of samples with MAD equal to NA #
   num.miss <- sum(is.na(mad_val))
@@ -1133,7 +1176,8 @@ run_mad <- function(data_only) {
   }
 
   # store data #
-  res.final <- data.frame(Sample = names(data_only), MAD = mad_val, row.names = NULL)
+  res.final <- data.frame(Sample = names(data_only), MAD = mad_val, 
+                          row.names = NULL)
 
   return(res.final)
 }
@@ -1169,7 +1213,8 @@ run_kurtosis <- function(data_only) {
   }
 
   # store data #
-  res.final <- data.frame(Sample = names(data_only), Kurtosis = kurt_res, row.names = NULL)
+  res.final <- data.frame(Sample = names(data_only), Kurtosis = kurt_res, 
+                          row.names = NULL)
 
   return(res.final)
 }
@@ -1205,7 +1250,8 @@ run_skewness <- function(data_only) {
   }
 
   # store data #
-  res.final <- data.frame(Sample = names(data_only), Skewness = skew_res, row.names = NULL)
+  res.final <- data.frame(Sample = names(data_only), Skewness = skew_res, 
+                          row.names = NULL)
 
   return(res.final)
 }
@@ -1217,8 +1263,8 @@ run_skewness <- function(data_only) {
 #'
 #' @param omicsData an object of the class 'pepData', 'proData', 'metabData', or
 #'   'lipidData' usually created
-#'   by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}},
-#'   or \code{\link{as.lipidData}}, respectively.
+#'   by \code{\link{as.pepData}}, \code{\link{as.proData}}, 
+#'   \code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.
 #' @param mintR_groupDF data.frame created by \code{\link{group_designation}}
 #'   with columns for sample.id and group.
 #' @param ignore_singleton_groups logical indicator of whether to remove
@@ -1235,12 +1281,17 @@ run_skewness <- function(data_only) {
 #'
 #' @author Lisa Bramer
 #'
-run_group_meancor <- function(omicsData, mintR_groupDF, ignore_singleton_groups = TRUE) {
-  # if group.data has column for TimeCourse, re-compute group.data including TimeCourse as main effect
-  # if mintR_groupDF has TimeCourse variable, re-compute group_data including TimeCourse as main effect
+run_group_meancor <- function(omicsData, mintR_groupDF, 
+                              ignore_singleton_groups = TRUE) {
+  # if group.data has column for TimeCourse, re-compute group.data including 
+  # TimeCourse as main effect
+  
+  # if mintR_groupDF has TimeCourse variable, re-compute group_data including 
+  # TimeCourse as main effect
   if (!is.null(attr(mintR_groupDF, "time_course"))) {
     if (!is.null(attr(mintR_groupDF, "main_effects"))) {
-      temp_maineff = c(attr(mintR_groupDF, "main_effects"), attr(mintR_groupDF, "time_course"))
+      temp_maineff = c(attr(mintR_groupDF, "main_effects"), 
+                       attr(mintR_groupDF, "time_course"))
     } else {
       temp_maineff = attr(mintR_groupDF, "time_course")
     }
@@ -1256,15 +1307,25 @@ run_group_meancor <- function(omicsData, mintR_groupDF, ignore_singleton_groups 
   nonsingleton_groups <- attributes(mintR_groupDF)$nonsingleton_groups
   singleton_groups <- setdiff(grps, nonsingleton_groups)
   if (length(singleton_groups) > 0 & ignore_singleton_groups == FALSE) {
-    ## there are singelton groups and we don't want to ignore them in creating the rmd filter ##
+    ## there are singleton groups and we don't want to ignore them in creating 
+    ## the rmd filter
 
     # calculate the correlation of the singleton sample to all other samples and
     # average that value to get the correlation for that particular sample/group
     omicsData_singletons <- omicsData
-    omicsData_singletons$f_data$Dummy <- "dummy" # create a dummy grouping variable so that all samples belong to same group
-    omicsData_singletons <- group_designation(omicsData_singletons, main_effects = "Dummy")
+    omicsData_singletons$f_data$Dummy <- "dummy" # create a dummy grouping 
+                                                 # variable so that all samples 
+                                                 # belong to same group
+    omicsData_singletons <- group_designation(omicsData_singletons, 
+                                              main_effects = "Dummy")
 
-    prwse.grp.cors.all <- cor(omicsData_singletons$e_data[, -which(names(omicsData_singletons$e_data) == get_edata_cname(omicsData_singletons))], use = "pairwise.complete.obs")
+    s_id_col <- which(names(
+      omicsData_singletons$e_data) == get_edata_cname(omicsData_singletons)
+    )
+    
+    prwse.grp.cors.all <- cor(
+      omicsData_singletons$e_data[, -s_id_col], use = "pairwise.complete.obs"
+    )
 
     prwse.grp.cors.singletons <- list()
     for (i in 1:length(singleton_groups)) {
@@ -1272,15 +1333,25 @@ run_group_meancor <- function(omicsData, mintR_groupDF, ignore_singleton_groups 
     }
 
     # do the "usual" thing for the nonsingleton groups:
-    # calculate the mean correlation of a sample with all other samples that have the same group membership
-    myfilt <- custom_filter(omicsData, f_data_keep = as.character(mintR_groupDF[which(mintR_groupDF$Group %in% nonsingleton_groups), samp_id]))
+    # calculate the mean correlation of a sample with all other samples that
+    # have the same group membership
+    myfilt <- custom_filter(omicsData, f_data_keep = as.character(
+        mintR_groupDF[
+          which(mintR_groupDF$Group %in% nonsingleton_groups), samp_id
+        ]
+      )
+    )
     omicsData_nonsingletons <- applyFilt(myfilt, omicsData)
 
     # make a list of which columns belong to which groups #
     grp.col.ids = list()
     for (i in 1:length(nonsingleton_groups)) {
       # pull sample names from group.data in current group #
-      nms = as.character(mintR_groupDF[which(mintR_groupDF$Group == nonsingleton_groups[i]), samp_id])
+      nms = as.character(
+        mintR_groupDF[
+          which(mintR_groupDF$Group == nonsingleton_groups[i]), samp_id
+        ]
+      )
 
       # pull column numbers corresponding to above names #
       grp.col.ids[[i]] = which(names(omicsData_nonsingletons$e_data) %in% nms)
@@ -1291,7 +1362,8 @@ run_group_meancor <- function(omicsData, mintR_groupDF, ignore_singleton_groups 
     })
 
 
-    ## combine the singleton and nonsingleton results...make sure the order is correct
+    ## combine the singleton and nonsingleton results...make sure the order is 
+    ## correct
     prwse.grp.cors <- c(prwse.grp.cors.nonsingletons, prwse.grp.cors.singletons)
     prws.grp.cors.grpnames <- c(nonsingleton_groups, singleton_groups)
   } else {
@@ -1299,7 +1371,11 @@ run_group_meancor <- function(omicsData, mintR_groupDF, ignore_singleton_groups 
     grp.col.ids = list()
     for (i in 1:length(grps)) {
       # pull sample names from group.data in current group #
-      nms = as.character(mintR_groupDF[which(mintR_groupDF$Group == grps[i]), samp_id])
+      nms = as.character(
+        mintR_groupDF[
+          which(mintR_groupDF$Group == grps[i]), samp_id
+        ]
+      )
 
       # pull column numbers corresponding to above names #
       grp.col.ids[[i]] = which(names(omicsData$e_data) %in% nms)
@@ -1325,8 +1401,12 @@ run_group_meancor <- function(omicsData, mintR_groupDF, ignore_singleton_groups 
     # Infection5  0.9732911  0.9824165  0.9801930  0.9784125  1.0000000
   }
 
-  # turn diagonal into NAs, so we don't include a sample's correlation with itself #
-  grp.cors = lapply(prwse.grp.cors, function(x) x * (matrix(1, nrow = nrow(x), ncol = ncol(x)) + diag(NA, nrow(x))))
+  # turn diagonal into NAs, so we don't include a sample's correlation with 
+  # itself
+  grp.cors = lapply(prwse.grp.cors, 
+                    \(x) x * (matrix(1, nrow = nrow(x), ncol = ncol(x)) + 
+                                diag(NA, nrow(x)))
+                    )
 
   # compute mean correlation for each sample #
   mean.cor = lapply(grp.cors, function(x) apply(x, 1, mean, na.rm = TRUE))
@@ -1335,17 +1415,28 @@ run_group_meancor <- function(omicsData, mintR_groupDF, ignore_singleton_groups 
   ## to just contain the value for the sample in that group
   if (length(singleton_groups) > 0 & ignore_singleton_groups == FALSE) {
     mean.cor2 <- mean.cor
-    # when I concatenated the pairwise group correlations, I put the singleton groups last #
+    # when I concatenated the pairwise group correlations, I put the singleton 
+    # groups last
     for (i in 1:length(singleton_groups)) {
-      # get the sample name in the current singleton group, and pull that value out of mean.cor #
+      # get the sample name in the current singleton group, and pull that value 
+      # out of mean.cor
       cur_singleton <- singleton_groups[i]
-      cur_sample <- as.character(omicsData_singletons$f_data[which(mintR_groupDF$Group == cur_singleton), samp_id])
+      cur_sample <- as.character(
+        omicsData_singletons$f_data[
+          which(mintR_groupDF$Group == cur_singleton), samp_id
+        ]
+      )
 
-      # get the element in mean.cor list that corresponds to this singleton group #
+      # get the element in mean.cor list that corresponds to this singleton
+      # group
       j <- which(prws.grp.cors.grpnames == cur_singleton)
       mean.cor2[[j]] <- mean.cor[[j]][cur_sample]
       # pull sample names from group.data in current group #
-      # nms = as.character(mintR_groupDF[which(mintR_groupDF$Group == nonsingleton_groups[i]), samp_id])
+      # nms = as.character(
+      #   mintR_groupDF[
+      #     which(mintR_groupDF$Group == nonsingleton_groups[i]), samp_id
+      #   ]
+      # )
     }
   } else {
     mean.cor2 <- mean.cor
@@ -1353,8 +1444,13 @@ run_group_meancor <- function(omicsData, mintR_groupDF, ignore_singleton_groups 
 
   # format results #
   # get order to put results in original sample order based on peptide.data #
-  temp = match(names(omicsData$e_data)[-1], names(unlist(mean.cor2)))
-  res.cor = data.frame(Sample.ID = names(omicsData$e_data)[-1], Mean_Correlation = unlist(mean.cor2)[temp], row.names = NULL)
+  id_col <- which(names(omicsData$e_data) == get_edata_cname(omicsData))
+  temp = match(names(omicsData$e_data)[-id_col], names(unlist(mean.cor2)))
+  res.cor = data.frame(
+    Sample.ID = names(omicsData$e_data)[-id_col],
+    Mean_Correlation = unlist(mean.cor2)[temp],
+    row.names = NULL
+  )
 
   return(res.cor)
 }
@@ -1532,38 +1628,38 @@ imdanova_filter <- function(omicsData) {
       "supported.",
       sep = " "
     ))
-    #     filt.edata <- vector(mode = "list", length =
-    #     length(unique(groupDF$TimeCourse))) names(filt.edata) <-
-    #     unique(groupDF$TimeCourse)
+    # filt.edata <- vector(mode = "list", length =
+    # length(unique(groupDF$TimeCourse))) names(filt.edata) <-
+    # unique(groupDF$TimeCourse)
     #
-    #     for(tind in 1:length(unique(groupDF$TimeCourse))){
+    # for(tind in 1:length(unique(groupDF$TimeCourse))){
     #
-    #     t = unique(groupDF$TimeCourse)[tind] t.e_data <- cbind(e_data[,1],
-    #     e_data[, names(e_data) %in%
-    #     as.character(groupDF[,samp_id][groupDF$TimeCourse==t])])
-    #     names(t.e_data)[1] <- names(e_data)[1]
+    # t = unique(groupDF$TimeCourse)[tind] t.e_data <- cbind(e_data[,1],
+    # e_data[, names(e_data) %in%
+    # as.character(groupDF[,samp_id][groupDF$TimeCourse==t])])
+    # names(t.e_data)[1] <- names(e_data)[1]
     #
-    #     t.groupDF <- groupDF[groupDF$TimeCourse==t, ] #all(names(t.e_data)[-1] ==
-    #     t.groupDF$sampleID) # just checking, should be TRUE
+    # t.groupDF <- groupDF[groupDF$TimeCourse==t, ] #all(names(t.e_data)[-1] ==
+    # t.groupDF$sampleID) # just checking, should be TRUE
     #
-    #     nonmiss_per_group <- nonmissing_per_group(omicsData=NULL, e_data=t.e_data,
-    #     groupDF=t.groupDF, cname_id=edata_id, samp_id=samp_id)
-    #     if(filter_method=="anova"){ filt.edata[[tind]] <-
-    #     anova_filter(nonmiss_per_group=nonmiss_per_group,
-    #     min_nonmiss_anova=min_nonmiss_anova, cname_id = edata_id) }else{
-    #     if(filter_method=="gtest"){ filt.edata[[tind]] <-
-    #     gtest_filter(nonmiss_per_group=nonmiss_per_group, groupDF=t.groupDF,
-    #     e_data=t.e_data, alpha=alpha, min_nonmiss_gtest=min_nonmiss_gtest,
-    #     cname_id = edata_id, samp_id = samp_id) }else{
-    #     if(filter_method=="combined"){ filt.edata.gtest <-
-    #     gtest_filter(nonmiss_per_group, groupDF=t.groupDF, e_data=t.e_data,
-    #     alpha=alpha, min_nonmiss_gtest=min_nonmiss_gtest, cname_id = edata_id) #
-    #     min.nonmiss.allowed <- 2 filt.edata.anova <-
-    #     anova_filter(nonmiss_per_group, min_nonmiss_anova, cname_id = edata_id)
-    #     filt.edata[[tind]] <- intersect(filt.edata.anova, filt.edata.gtest) } } }
-    #     }
+    # nonmiss_per_group <- nonmissing_per_group(omicsData=NULL, e_data=t.e_data,
+    # groupDF=t.groupDF, cname_id=edata_id, samp_id=samp_id)
+    # if(filter_method=="anova"){ filt.edata[[tind]] <-
+    # anova_filter(nonmiss_per_group=nonmiss_per_group,
+    # min_nonmiss_anova=min_nonmiss_anova, cname_id = edata_id) }else{
+    # if(filter_method=="gtest"){ filt.edata[[tind]] <-
+    # gtest_filter(nonmiss_per_group=nonmiss_per_group, groupDF=t.groupDF,
+    # e_data=t.e_data, alpha=alpha, min_nonmiss_gtest=min_nonmiss_gtest,
+    # cname_id = edata_id, samp_id = samp_id) }else{
+    # if(filter_method=="combined"){ filt.edata.gtest <-
+    # gtest_filter(nonmiss_per_group, groupDF=t.groupDF, e_data=t.e_data,
+    # alpha=alpha, min_nonmiss_gtest=min_nonmiss_gtest, cname_id = edata_id) #
+    # min.nonmiss.allowed <- 2 filt.edata.anova <-
+    # anova_filter(nonmiss_per_group, min_nonmiss_anova, cname_id = edata_id)
+    # filt.edata[[tind]] <- intersect(filt.edata.anova, filt.edata.gtest) } } }
+    # }
     #
-    #     filter.edata <- Reduce(base::intersect, filt.edata)
+    # filter.edata <- Reduce(base::intersect, filt.edata)
   } else { # end of if-statement for the presence of TimeCourse variable
 
     # Count the number of nonmissing elements per group per biomolecule. For
@@ -1649,7 +1745,8 @@ imdanova_filter <- function(omicsData) {
 #'
 #' @examples
 #' library(pmartRdata)
-#' to_filter <- custom_filter(omicsData = metab_object, e_data_remove = "fumaric acid",
+#' to_filter <- custom_filter(omicsData = metab_object, 
+#'                            e_data_remove = "fumaric acid",
 #'                            f_data_remove = "Sample_1_Phenotype2_B")
 #' summary(to_filter)
 #'
