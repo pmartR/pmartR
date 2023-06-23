@@ -77,11 +77,11 @@ test_that("rmd_filter and applyFilt produce the correct output",{
   expect_equal(dim(pfilter_rmd),
                c(12, 9))
   expect_equal(round(pfilter_rmd$Log2.md, 3),
-               c(1.754, 1.983, 1.340, 2.158, 0.635, 1.697,
-                 4.748, 2.210, 2.131, 0.787, 0.374, 1.477))
+               c(1.881, 2.11, 1.467, 2.284, 0.762, 1.823, 4.874, 2.337, 2.258, 
+                 0.914, 0.501, 1.604))
   expect_equal(round(pfilter_rmd$pvalue, 3),
-               c(0.643, 0.556, 0.772, 0.485, 0.907, 0.663,
-                 0.000, 0.463, 0.496, 0.886, 0.935, 0.733))
+               c(0.596, 0.505, 0.736, 0.432, 0.889, 0.618, 0, 0.41, 0.443, 
+                 0.865, 0.923, 0.694))
   expect_equal(round(pfilter_rmd$MAD, 3),
                c(1.331, 1.185, 1.241, 1.228, 1.228, 1.324,
                  1.203, 1.081, 1.169, 1.142, 1.274, 1.245))
@@ -153,18 +153,17 @@ test_that("rmd_filter and applyFilt produce the correct output",{
   expect_equal(dim(nmrfilter_rmd),
                c(41, 8))
   expect_equal(round(nmrfilter_rmd$Log2.md, 3),
-
-               c(3.913, 2.919, 0.785, 3.937, 5.23, 0.897, 1.553, 1.644, 1.447,
-                 2.126, 1.36, 1.995, 1.256, 0.095, 1.066, 0.999, 2.728, 1.966,
-                 1.471, 3.022, 2.122, -1.172, 4.629, 2.262, 5.708, 3.163, 4.236,
-                 1.666, 2.165, 1.107, 2.833, 2.18, 0.1, 0.131, 1.718, 1.712,
-                 1.757, 3.113, 1.832, 2.577, 2.01))
+               c(4.288, 3.294, 1.161, 4.312, 5.605, 1.273, 1.928, 2.019, 1.822, 
+                 2.501, 1.736, 2.371, 1.632, 0.47, 1.441, 1.375, 3.104, 2.342, 
+                 1.846, 3.397, 2.498, -0.797, 5.005, 2.638, 6.083, 3.539, 4.611, 
+                 2.041, 2.541, 1.482, 3.208, 2.555, 0.476, 0.507, 2.093, 2.087, 
+                 2.132, 3.489, 2.207, 2.953, 2.385))
   expect_equal(round(nmrfilter_rmd$pvalue, 3),
-               c(0.005, 0.109, 0.786, 0.004, 0, 0.761, 0.569, 0.537, 0.605,
-                 0.359, 0.633, 0.408, 0.665, 0.899, 0.719, 0.736, 0.157, 0.419,
-                 0.597, 0.087, 0.36, 0.979, 0, 0.309, 0, 0.062, 0.001, 0.529,
-                 0.344, 0.708, 0.13, 0.339, 0.899, 0.895, 0.511, 0.513, 0.496,
-                 0.07, 0.469, 0.202, 0.402))
+               c(0.001, 0.044, 0.692, 0.001, 0, 0.66, 0.433, 0.399, 0.472, 0.226, 
+                 0.504, 0.27, 0.541, 0.847, 0.606, 0.628, 0.072, 0.28, 0.464, 
+                 0.032, 0.227, 0.966, 0, 0.183, 0, 0.02, 0, 0.39, 0.213, 0.593, 
+                 0.055, 0.208, 0.846, 0.841, 0.371, 0.373, 0.357, 0.024, 0.329, 
+                 0.102, 0.265))
   expect_equal(round(nmrfilter_rmd$MAD, 3),
                c(0.922, 0.978, 1.411, 0.951, 1.047, 1.173, 1.245, 1.271, 1.176,
                  1.365, 1.234, 1.26, 1.27, 1.463, 1.461, 1.39, 1.328, 1.435,
@@ -226,8 +225,7 @@ test_that("rmd_filter and applyFilt produce the correct output",{
   expect_equal(dim(pfilter_rmd_sg),
                c(9, 9))
   expect_equal(round(pfilter_rmd_sg$Log2.md, 3),
-               c(6.321, 6.015, 6.225, 6.321, 5.608,
-                 5.976, 8.923, 6.132, 6.380))
+               c(6.5, 6.195, 6.404, 6.5, 5.788, 6.156, 9.102, 6.311, 6.56))
   expect_equal(round(pfilter_rmd_sg$pvalue, 16),
                c(9.000000e-16, 1.299400e-12, 1.030000e-14, 9.000000e-16,
                  2.459952e-09, 2.959300e-12, 0.000000e+00, 9.600000e-14,
@@ -274,12 +272,12 @@ test_that("rmd_filter and applyFilt produce the correct output",{
   expect_equal(dim(pfilter_rmd_sg_f),
                c(10, 9))
   expect_equal(round(pfilter_rmd_sg_f$Log2.md, 3),
-               c(2.292, 0.680, 1.661, 0.385, 1.255,
-                 2.047, 1.655, 2.474, 2.772, 5.614))
+               c(2.451, 0.838, 1.819, 0.544, 1.414, 2.205, 1.813, 2.632, 2.931, 
+                 5.773))
   expect_equal(round(pfilter_rmd_sg_f$pvalue, 10),
-               c(0.4285077890, 0.9010201653, 0.6750442797, 0.9343177198,
-                 0.7934655431, 0.5305775013, 0.6770948538, 0.3520673347,
-                 0.2333855866, 0.0000000022))
+               c(0.3616019649, 0.877622914, 0.6189490715, 0.9178949096, 0.7516195837, 
+                 0.4650147929, 0.6211961737, 0.2872941484, 0.1780398691, 2e-10
+               ))
   expect_equal(round(pfilter_rmd_sg_f$MAD, 3),
                c(1.331, 1.185, 1.241, 1.228, 1.228,
                  1.324, 1.203, 1.081, 1.169, 1.142))
@@ -401,7 +399,7 @@ test_that("rmd_filter and applyFilt produce the correct output",{
   expect_identical(attr(nmrfiltered, "filters")[[1]]$threshold,
                    0.0001)
   expect_equal(attr(nmrfiltered, "filters")[[1]]$filtered,
-               c("F3-098", "F4-009", "F4-005"))
+               c("F3-098", "F4-009", "F4-005", "F4-037"))
   expect_true(is.na(attr(nmrfiltered, "filters")[[1]]$method))
 
   # Investigate the data_info attribute.
@@ -428,21 +426,20 @@ test_that("rmd_filter and applyFilt produce the correct output",{
 
   # Dissect the group_DF attribute.
   expect_equal(dim(attr(nmrfiltered, "group_DF")),
-               c(38, 2))
+               c(37, 2))
   expect_equal(attr(nmrfiltered, "group_DF")$SampleID,
-               c("F3-049", "F3-097", "F3-002", "F3-050", "F3-013", "F3-061",
-                 "F3-109", "F3-062", "F3-110", "F3-025", "F3-073", "F3-121",
-                 "F3-026", "F3-074", "F3-122", "F3-085", "F3-133", "F3-038",
-                 "F3-086", "F3-134", "F4-001", "F4-065", "F4-069", "F4-037",
-                 "F4-017", "F4-045", "F4-021", "F4-049", "F4-081", "F4-025",
-                 "F4-053", "F4-085", "F4-029", "F4-057", "F4-089", "F4-033",
-                 "F4-061", "F4-093"))
+               c("F3-049", "F3-097", "F3-002", "F3-050", "F3-013", "F3-061", 
+                 "F3-109", "F3-062", "F3-110", "F3-025", "F3-073", "F3-121", "F3-026", 
+                 "F3-074", "F3-122", "F3-085", "F3-133", "F3-038", "F3-086", "F3-134", 
+                 "F4-001", "F4-065", "F4-069", "F4-017", "F4-045", "F4-021", "F4-049", 
+                 "F4-081", "F4-025", "F4-053", "F4-085", "F4-029", "F4-057", "F4-089", 
+                 "F4-033", "F4-061", "F4-093"))
 
   # Inspect the filtered e_data, f_data, and e_meta data frames.
   expect_equal(dim(nmrfiltered$e_data),
-               c(38, 39))
+               c(38, 38))
   expect_equal(dim(nmrfiltered$f_data),
-               c(38, 5))
+               c(37, 5))
   expect_equal(dim(nmrfiltered$e_meta),
                c(38, 3))
 
@@ -466,7 +463,8 @@ test_that("rmd_filter and applyFilt produce the correct output",{
   expect_identical(attr(pfiltered_sg, "filters")[[1]]$threshold,
                    0.0000000000000008)
   expect_equal(attr(pfiltered_sg, "filters")[[1]]$filtered,
-               c("Infection7", "Infection9"))
+               c("Infection1", "Infection3", "Infection4", "Infection7", 
+                 "Infection9"))
   expect_true(is.na(attr(pfiltered_sg, "filters")[[1]]$method))
 
   # Investigate the data_info attribute.
@@ -493,16 +491,16 @@ test_that("rmd_filter and applyFilt produce the correct output",{
 
   # Dissect the group_DF attribute.
   expect_equal(dim(attr(pfiltered_sg, "group_DF")),
-               c(8, 2))
+               c(5, 2))
   expect_equal(attr(pfiltered_sg, "group_DF")$SampleID,
-               c("Infection1", "Infection2", "Infection3", "Infection4",
-                 "Infection5", "Infection6", "Infection8", "Mock1"))
+               c("Infection2", "Infection5", "Infection6", "Infection8", "Mock1"
+               ))
 
   # Inspect the filtered e_data, f_data, and e_meta data frames.
   expect_equal(dim(pfiltered_sg$e_data),
-               c(150, 9))
+               c(150, 6))
   expect_equal(dim(pfiltered_sg$f_data),
-               c(8, 2))
+               c(5, 2))
   expect_equal(dim(pfiltered_sg$e_meta),
                c(150, 4))
 
@@ -683,15 +681,15 @@ test_that("rmd_filter and applyFilt produce the correct output",{
   expect_equal(pair_filter$Name, fdata$Name)
   expect_equal(pair_filter$Group, rep("paired_diff", 30))
   expect_equal(round(pair_filter$Log2.md, 3),
-               c(1.201, 0.455, 4.439, 2.086, 1.153, 0.794, 1.472, 0.316, 2.123,
-                 1.651, 2.345, 3.44, 2.028, 1.374, 3.235, 2.474, 2.488, 2.533,
-                 2.363, 2.58, 1.186, 1.056, 1.451, 1.504, -0.005, 2.21, 4.319,
-                 1.654, 2.1, 2.47))
+               c(1.42, 0.675, 4.659, 2.305, 1.372, 1.014, 1.692, 0.536, 2.343, 
+                 1.871, 2.564, 3.66, 2.248, 1.594, 3.455, 2.694, 2.707, 2.753, 
+                 2.583, 2.8, 1.405, 1.276, 1.671, 1.724, 0.215, 2.43, 4.539, 1.874, 
+                 2.32, 2.689))
   expect_equal(round(pair_filter$pvalue, 3),
-               c(0.807, 0.927, 0.001, 0.515, 0.817, 0.885, 0.735, 0.941, 0.499,
-                 0.678, 0.406, 0.054, 0.538, 0.763, 0.094, 0.352, 0.346, 0.327,
-                 0.399, 0.308, 0.81, 0.838, 0.741, 0.725, 0.963, 0.463, 0.001,
-                 0.677, 0.509, 0.354))
+               c(0.75, 0.902, 0, 0.423, 0.763, 0.847, 0.665, 0.919, 0.407, 0.6, 
+                 0.315, 0.027, 0.447, 0.697, 0.052, 0.263, 0.258, 0.241, 0.307, 
+                 0.223, 0.754, 0.788, 0.672, 0.653, 0.949, 0.37, 0, 0.599, 0.417, 
+                 0.265))
   expect_equal(round(pair_filter$MAD, 3),
                c(0.1, 0.087, 0.09, 0.076, 0.094, 0.076, 0.095, 0.091, 0.091,
                  0.081, 0.075, 0.077, 0.07, 0.075, 0.091, 0.097, 0.089, 0.089,
@@ -724,7 +722,7 @@ test_that("rmd_filter and applyFilt produce the correct output",{
   expect_identical(attr(pair_filtered, "filters")[[1]]$threshold,
                    0.001)
   expect_equal(attr(pair_filtered, "filters")[[1]]$filtered,
-               c("Mock_0hr_3", "Mock_18hr_3"))
+               c("Mock_0hr_3", "Mock_18hr_3", "AM_0hr_2", "AM_18hr_2"))
   expect_true(is.na(attr(pair_filtered, "filters")[[1]]$method))
   expect_equal(
     attr(pair_filtered, "data_info"),
@@ -745,15 +743,15 @@ test_that("rmd_filter and applyFilt produce the correct output",{
          num_emeta = length(unique(pair_filtered$e_meta$Protein)))
   )
   expect_equal(dim(attr(pair_filtered, "group_DF")),
-               c(28, 2))
+               c(26, 2))
   expect_equal(attr(attr(pair_filtered, "group_DF"), "main_effects"),
                "no_main_effect")
   expect_equal(attr(attr(pair_filtered, "group_DF"), "nonsingleton_groups"),
                "paired_diff")
   expect_equal(dim(pair_filtered$e_data),
-               c(150, 29))
+               c(150, 27))
   expect_equal(dim(pair_filtered$f_data),
-               c(28, 6))
+               c(26, 6))
   expect_equal(dim(pair_filtered$e_meta),
                c(175, 6))
 
