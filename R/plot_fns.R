@@ -2231,12 +2231,12 @@ plot.dimRes <- function (x, omicsData = NULL,
     )
   ) +
     ggplot2::geom_point(
-      ggplot2::aes_string(
-        col = color_var,
-        pch = pch_var
+      ggplot2::aes(
+        col = if(!is.null(color_var)) .data[[color_var]] else NULL,
+        pch = if(!is.null(pch_var)) .data[[pch_var]] else NULL
       ),
       size = point_size
-    )
+    ) + ggplot2::labs(col = color_var, pch = pch_var)
 
   # Evan, make me a plot with the black and white theme. As you wish.
   if (bw_theme) p <- p + ggplot2::theme_bw()
