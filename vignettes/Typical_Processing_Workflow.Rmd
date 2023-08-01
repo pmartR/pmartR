@@ -412,7 +412,7 @@ Now that we are satisfied with our selections, we can apply the normalization
 mynorm <- normalize_global(omicsData = mypep, 
                            subset_fn = "rip", params = list(rip = 0.25), 
                            norm_fn = "median", 
-                           apply_norm = FALSE)
+                           apply_norm = TRUE)
 
 ```
 

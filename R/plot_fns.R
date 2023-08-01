@@ -5321,7 +5321,7 @@ plot_omicsData <- function (omicsData, order_by, color_by, facet_by, facet_cols,
     })
     any(res)
   } else FALSE
-  ref_text <- if(norm_info) "Reference Standardized " else NULL
+  ref_text <- if(ref_info) "Reference Standardized " else NULL
 
   maintitle <- paste0(
     "Boxplots of ", ref_text, norm_text, datatype_text, "Data"
