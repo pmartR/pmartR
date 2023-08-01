@@ -75,7 +75,7 @@ test_that("trelliPlots check the correct inputs", {
   # Only acceptable cognostics are allowed
   expect_error(
     mtrelliData1 %>% trelli_panel_by("Metabolite") %>% trelli_abundance_boxplot(cognostics = "test"),
-    "Unacceptable cognostic option included. Acceptable options are:  n, mean, median, sd, skew, p_value, fold_change"
+    "Unacceptable cognostic option included. Acceptable options are:  count, mean abundance, median abundance, cv abundance, anova p-value, fold change"
   )
   
   # ggplot params should be strings
@@ -162,7 +162,7 @@ test_that("trelliPlots check the correct inputs", {
   singlePlot$trelliData.omics <- singlePlot$trelliData.omics[1,]
   suppressWarnings(singlePlot %>% 
    trelli_abundance_boxplot(path = file.path(testFolder, "BoxAbundanceTest2"), 
-                            cognostics = "p_value")
+                            cognostics = "anova p-value")
   )
   expect_true(file.exists(file.path(testFolder, "BoxAbundanceTest2")))
   
@@ -194,7 +194,7 @@ test_that("trelliPlots check the correct inputs", {
                                test_mode = TRUE, 
                                test_example = 2,
                                ggplot_params = "xlab('')",
-                               cognostics = c("n", "p_value"),
+                               cognostics = c("sample count", "cv abundance"),
                                interactive = TRUE)
   )
   expect_true(file.exists(file.path(testFolder, "HistAbundanceTest1")))
@@ -258,7 +258,7 @@ test_that("trelliPlots check the correct inputs", {
                            ggplot_params = "ylab('')",
                            test_mode = TRUE, 
                            test_example = 2,
-                           cognostics = "proportion",
+                           cognostics = "observed proportion",
                            interactive = TRUE)
   )
   expect_true(file.exists(file.path(testFolder, "MissingTest1")))
@@ -269,10 +269,11 @@ test_that("trelliPlots check the correct inputs", {
                                             test_mode = TRUE, 
                                             test_example = 2,
                                             proportion = FALSE,
-                                            cognostics = "n")
+                                            cognostics = "total count")
   )
   expect_true(file.exists(file.path(testFolder, "MissingTest2")))
   
+  ## Stopped here
   # Build a single plot
   miss_plot <- singlePlot %>% trelli_missingness_bar(single_plot = TRUE)
   expect_true(inherits(miss_plot, "ggplot"))
