@@ -1941,6 +1941,7 @@ plot.dimRes <- function (dimRes_obj, omicsData = NULL,
                                     by.x = plotdata_name,
                                     by.y = fdata_cname,
                                     sort = FALSE)
+        plotdata[[fdata_cname]] <- plotdata[[plotdata_name]]
       } else {
 
         plotdata<- merge.data.frame(plotdata,
@@ -1948,6 +1949,7 @@ plot.dimRes <- function (dimRes_obj, omicsData = NULL,
                                     by.x = plotdata_name,
                                     by.y = fdata_cname,
                                     sort = FALSE)
+        plotdata[[fdata_cname]] <- plotdata[[plotdata_name]]
 
       }
 
