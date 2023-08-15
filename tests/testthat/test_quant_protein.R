@@ -557,7 +557,7 @@ test_that('each rollup method correctly quantifies proteins', {
       dplyr::select(-Mass_Tag_ID) %>%
       dplyr::group_by(Protein_Isoform) %>%
       dplyr::mutate(n_peps_used = dplyr::n()) %>%
-      dplyr::left_join(pepes_per_pro2, by = "Protein", multiple = "all") %>%
+      dplyr::left_join(pepes_per_pro2, by = "Protein", multiple = "all", relationship = "many-to-many") %>%
       dplyr::relocate(n_peps_used, .after = peps_per_pro) %>%
       dplyr::distinct(
         Protein, Protein_Isoform, peps_per_pro,
@@ -621,7 +621,12 @@ test_that('each rollup method correctly quantifies proteins', {
       dplyr::select(-Mass_Tag_ID) %>%
       dplyr::group_by(Protein_Isoform) %>%
       dplyr::mutate(n_peps_used = dplyr::n()) %>%
-      dplyr::left_join(pepes_per_pro, by = "Protein", multiple = "all") %>%
+      dplyr::left_join(
+        pepes_per_pro,
+        by = "Protein",
+        multiple = "all",
+        relationship = 'many-to-many'
+      ) %>% 
       dplyr::relocate(n_peps_used, .after = peps_per_pro) %>%
       dplyr::distinct(Protein, Protein_Isoform, peps_per_pro, n_peps_used) %>%
       data.frame(),

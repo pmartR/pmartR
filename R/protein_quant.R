@@ -385,8 +385,16 @@ protein_quant <- function(pepData, method, isoformRes = NULL,
 
     # join the two count columns to the output e_meta
     results$e_meta <- results$e_meta %>%
-      dplyr::left_join(peps_per_protein, by = emeta_cname, multiple = "all") %>%
-      dplyr::left_join(peps_used, by = emeta_cname, multiple = "all") %>%
+      dplyr::left_join(
+        peps_per_protein,
+        by = emeta_cname,
+        multiple = "all",
+        relationship = "many-to-many"
+      ) %>%
+      dplyr::left_join(peps_used,
+                       by = emeta_cname,
+                       multiple = "all",
+                       relationship = "many-to-many") %>%
       # Move any columns specified by the user after n_peps_used.
       dplyr::relocate(dplyr::any_of(emeta_cols), .after = n_peps_used) %>%
       # Only keep distinct combinations of the columns that are kept.
