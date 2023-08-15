@@ -6,11 +6,14 @@ proj_mat <- function(X, ngroups){
   #into the null space corresponding to X
   if(!is.null(nrow(X))){
     Imat <- diag(1,nrow(X))
-    Px <- MASS::ginv(t(X)%*%X)%*%t(X)
-    # Zero out the first ngroups rows of Px because we only want to remove the
+    
+    # Zero out the first ngroups rows of X because we only want to remove the
     # effect of the covariates (which appear in the last n_covariates rows of
-    # Px).
-    Px[1:ngroups, ] <- 0
+    # X).
+    X[1:ngroups, ] <- 0
+    
+    Px <- MASS::ginv(t(X)%*%X)%*%t(X)
+    
     Px <- X%*%Px
     return(Imat-Px)
   }
