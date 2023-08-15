@@ -38,7 +38,8 @@ For each biomolecule, the CV of each group is calculated as the
 }
 \examples{
 library(pmartRdata)
-mypep <- group_designation(omicsData = pep_object, main_effects = "Phenotype")
+mypep <- group_designation(omicsData = pep_object, 
+                           main_effects = "Phenotype")
 to_filter <- cv_filter(omicsData = mypep, use_groups = TRUE)
 summary(to_filter, cv_threshold = 30)
 

@@ -36,19 +36,20 @@ p-value and used to identify outlying samples
 }
 \details{
 The metrics on which the log2 robust Mahalanobis distance is based
- can be specified using the \code{metrics} argument. \tabular{ll}{ pepData, proData
- \tab For pepData and proData objects, all five of the metrics "MAD", "Kurtosis",
- "Skewness", "Correlation", "Proportion_Missing" may be used (this is the
- default). \cr metabData, lipidData, nmrData \tab The
- use of "Proportion_Missing" is discouraged due to the general lack of
- missing data in these datasets (the default behavior omits
- "Proportion_Missing" from the metrics). \cr }
+ can be specified using the \code{metrics} argument. 
+ \tabular{ll}{ pepData, proData \tab For pepData and proData objects, all 
+ five of the metrics "MAD", "Kurtosis", "Skewness", "Correlation", 
+ "Proportion_Missing" may be used (this is the default). \cr metabData, 
+ lipidData, nmrData \tab The use of "Proportion_Missing" is discouraged due 
+ to the general lack of missing data in these datasets (the default behavior 
+ omits "Proportion_Missing" from the metrics). \cr }
 }
 \examples{
 library(pmartRdata)
 mymetab <- edata_transform(omicsData = metab_object, data_scale = "log2")
 mymetab <- group_designation(omicsData = mymetab, main_effects = "Phenotype")
-rmd_results <- rmd_filter(omicsData = mymetab, metrics = c("MAD", "Skewness", "Correlation"))
+rmd_results <- rmd_filter(omicsData = mymetab, 
+                          metrics = c("MAD", "Skewness", "Correlation"))
 rmd_results <- rmd_filter(omicsData = mymetab)
 
 mypep <- edata_transform(omicsData = pep_object, data_scale = "log2")
@@ -57,10 +58,10 @@ rmd_results <- rmd_filter(omicsData = mypep)
 
 }
 \references{
-Matzke, M., Waters, K., Metz, T., Jacobs, J., Sims, A., Baric, R.,
- Pounds, J., and Webb-Robertson, B.J. (2011), \emph{Improved quality control
- processing of peptide-centric LC-MS proteomics data}. Bioinformatics.
- 27(20): 2866-2872.
+Matzke, M., Waters, K., Metz, T., Jacobs, J., Sims, A., Baric, 
+ R., Pounds, J., and Webb-Robertson, B.J. (2011), \emph{Improved quality 
+ control processing of peptide-centric LC-MS proteomics data}. 
+ Bioinformatics. 27(20): 2866-2872.
 }
 \author{
 Lisa Bramer, Kelly Stratton

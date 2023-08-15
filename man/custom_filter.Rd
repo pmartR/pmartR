@@ -56,7 +56,8 @@ filter out of the dataset
 }
 \examples{
 library(pmartRdata)
-to_filter <- custom_filter(omicsData = metab_object, e_data_remove = "fumaric acid",
+to_filter <- custom_filter(omicsData = metab_object, 
+                           e_data_remove = "fumaric acid",
                            f_data_remove = "Sample_1_Phenotype2_B")
 summary(to_filter)
 

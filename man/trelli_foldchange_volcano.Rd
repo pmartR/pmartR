@@ -67,7 +67,7 @@ Specify a plot design and cognostics for the fold_change volcano
   both an omicsData object and statRes are required to make this plot.
 }
 \examples{
-\dontrun{
+\dontrun{ 
 
 ## Build fold_change bar plot with statRes data grouped by edata_colname.
 trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") \%>\% 

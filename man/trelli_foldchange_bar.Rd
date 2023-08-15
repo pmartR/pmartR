@@ -63,14 +63,12 @@ Specify a plot design and cognostics for the fold_change
 \dontrun{
 
 ## Build fold_change bar plot with statRes data grouped by edata_colname.
-trelli_panel_by(trelliData = trelliData3, panel = "Lipid") \%>\% 
-  trelli_foldchange_bar(test_mode = TRUE, test_example = 1:10, 
-                        p_value_test = "anova")
-  
-## Or make the plot interactive  
-trelli_panel_by(trelliData = trelliData4, panel = "Lipid") \%>\% 
-  trelli_foldchange_bar(test_mode = TRUE, test_example = 1:10,
-                        p_value_test = "gtest", interactive = TRUE) 
+trelli_panel_by(trelliData = trelliData3, panel = "Lipid") \%>\%
+  trelli_foldchange_bar(test_mode = TRUE, test_example = 1:10, p_value_test = "anova")
+
+## Or make the plot interactive
+trelli_panel_by(trelliData = trelliData4, panel = "Lipid") \%>\%
+  trelli_foldchange_bar(test_mode = TRUE, test_example = 1:10, p_value_test = "gtest", interactive = TRUE)
    
 }
 
