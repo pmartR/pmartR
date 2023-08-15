@@ -189,7 +189,10 @@ plot.dataRes <- function(x, metric = NULL, density = FALSE,
     )
 
     q <- ggplot2::ggplot(
-      data_mean_sd,
+      dplyr::filter(
+        data_mean_sd,
+        dplyr::if_all(dplyr::one_of(c("mean", "sd")), ~!is.na(.x))
+      ),
       ggplot2::aes(
         x = mean,
         y = sd,
@@ -202,7 +205,10 @@ plot.dataRes <- function(x, metric = NULL, density = FALSE,
       ggplot2::ggtitle(plotTitleSd)
 
     p <- ggplot2::ggplot(
-      data_mean_median,
+      dplyr::filter(
+        data_mean_median,
+        dplyr::if_all(dplyr::one_of(c("mean", "median")), ~!is.na(.x))
+      ),
       ggplot2::aes(
         x = mean,
         y = median,
@@ -480,7 +486,7 @@ plot.isobaricnormRes <- function(x, order = FALSE,
     xlabel <- if (is.null(x_lab)) exp_cname else x_lab
 
     p <- ggplot2::ggplot(
-      data = tall_data,
+      data = dplyr::filter(tall_data, !is.na(values)),
       ggplot2::aes(
         x = .data[[exp_cname]],
         y = values,
@@ -491,7 +497,7 @@ plot.isobaricnormRes <- function(x, order = FALSE,
     # Otherwise separate the box plots by sample name.
   } else {
     p <- ggplot2::ggplot(
-      data = tall_data,
+      data = dplyr::filter(tall_data, !is.na(values)),
       ggplot2::aes(
         x = .data[[fdata_cname]],
         y = values,
@@ -1544,7 +1550,7 @@ na_scatter <- function (edata, group_df, na.by.molecule, edata_cname,
 
     # Start the scatter plot when the group_DF attribute is present.
     p <- ggplot2::ggplot(
-      plot_data,
+      dplyr::filter(plot_data, !is.na(value)),
       ggplot2::aes(
         value,
         num_missing_vals
@@ -2399,7 +2405,6 @@ plot.moleculeFilt <- function(x, min_num = NULL, cumulative = TRUE,
 
     # draw a horizontal line if min_num is specified
     hline <- if (!is.null(min_num)) ggplot2::geom_hline(
-      ggplot2::aes(color = "black"),
       yintercept = counts[min_num],
       linetype = "dashed"
     ) else NULL

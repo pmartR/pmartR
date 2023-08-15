@@ -3,7 +3,7 @@ context('MSnSet conversion')
 test_that('MSnSet objects are correctly converted to pepData objects', {
   # Load data from the MSnbase package -----------------------------------------
 
-  the_set <- MSnbase::msnset
+  suppressWarnings({the_set <- MSnbase::msnset})
 
   # Convert an MSnSet object to a pepData object.
   msn_pepe <- MSnSet2pepData(the_set,

@@ -221,7 +221,7 @@ test_that('as.nmrData returns the correct data frame and attributes', {
   # Forge an f_data object with an extra row.
   fdata_1 <- rbind(
     fdata,
-    c('F5-007', 'Shadow', 'J55', 53)
+    c('F5-007', 'Shadow', 'J55', 53, 30.1)
   )
 
   # Create a nmrData object and check for a warning when the f_data object has
