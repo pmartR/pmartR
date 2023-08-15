@@ -631,12 +631,12 @@ List proj_mat_cpp(arma::mat X, int ngroups){
   arma::uword PxRank;
   Imat.eye();
   
-  // 8/14/23 correction: Set the first ngroups rows of the design matrix
+  // 8/14/23 correction: Set the first ngroups cols of the design matrix
   // to be 0 so that projection is into the null space of the covariates-
   // only version of X. This is equivalent to fitting a regression based on
   // the covariates alone, and then obtaining the residuals (i.e. the residuals
   // are the null projection)
-  X.head_rows(ngroups).zeros();
+  X.head_cols(ngroups).zeros();
 
   // Moore-Penrose pseudo-inverse, can always (?) be found but takes longer
   Px = pinv(X.t()*X)*X.t();
