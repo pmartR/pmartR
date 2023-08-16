@@ -1619,7 +1619,7 @@ pre_flight <- function(e_data,
     if (any(e_data == 0, na.rm = TRUE)) {
       # Exchange 0 for NA in edata.
       e_data <- replace_zeros(
-        edata = e_data,
+        e_data = e_data,
         edata_cname = edata_cname
       )
     }
@@ -1815,7 +1815,7 @@ str_col <- function(edata,
 #'
 #' This function finds all instances of 0 in e_data and replaces them with NA.
 #'
-#' @param edata A \eqn{p \times n + 1} data frame of expression data, where
+#' @param e_data A \eqn{p \times n + 1} data frame of expression data, where
 #'        \eqn{p} is the number of xxx observed and \eqn{n} is the
 #'        number of samples.
 #'
@@ -1829,7 +1829,7 @@ str_col <- function(edata,
 #' @return An updated e_data data frame where all instances of 0 have been
 #'         replaced with NA.
 #'
-replace_zeros <- function(edata,
+replace_zeros <- function(e_data,
                           edata_cname) {
   # Acquire the index of the edata_cname column.
   id_col <- which(names(edata) == edata_cname)
