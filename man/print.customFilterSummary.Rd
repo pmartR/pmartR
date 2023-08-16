@@ -4,7 +4,12 @@
 \alias{print.customFilterSummary}
 \title{Custom Filter Print Method}
 \usage{
-\method{print}{customFilterSummary}(object)
+\method{print}{customFilterSummary}(x, ...)
+}
+\arguments{
+\item{x}{the custom filter summary to print}
+
+\item{...}{further arguments passed to or from other methods}
 }
 \description{
 Print method for summary of custom filter

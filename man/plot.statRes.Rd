@@ -29,7 +29,8 @@
   display_count = TRUE,
   custom_theme = NULL,
   cluster = F,
-  free_y_axis = FALSE
+  free_y_axis = FALSE,
+  ...
 )
 }
 \arguments{
@@ -112,7 +113,7 @@ axis. defaults to TRUE for seqData statistics and FALSE for all others.}
 \item{free_y_axis}{Logical. If TRUE the y axis for each bar plot can have its
 own range. The default is FALSE.}
 
-\item{top_n}{numeric for heatmaps; defaults to NULL.}
+\item{...}{further arguments passed to or from other methods.}
 }
 \value{
 ggplot2 plot object if interactive is FALSE, or plotly plot object if
@@ -140,14 +141,18 @@ Plot types:
 \examples{
 library(pmartRdata)
 # Group the data by condition
-mypro <- group_designation(omicsData = pro_object,
-                           main_effects = c("Phenotype"))
+mypro <- group_designation(
+  omicsData = pro_object,
+  main_effects = c("Phenotype")
+)
 
 # Apply the IMD ANOVA filter
 imdanova_Filt <- imdanova_filter(omicsData = mypro)
-mypro <- applyFilt(filter_object = imdanova_Filt,
-                       omicsData = mypro,
-                       min_nonmiss_anova=2)
+mypro <- applyFilt(
+  filter_object = imdanova_Filt,
+  omicsData = mypro,
+  min_nonmiss_anova = 2
+)
 
 # Implement the IMD ANOVA method and compuate all pairwise comparisons
 # (i.e. leave the `comparisons` argument NULL)
@@ -158,10 +163,12 @@ plot(anova_res, plot_type = "volcano")
 imd_res <- imd_anova(omicsData = mypro, test_method = 'gtest')
 plot(imd_res)
 
-imd_anova_res <- imd_anova(omicsData = mypro,
-                           test_method = 'comb',
-                           pval_adjust_a_multcomp ='bon',
-                           pval_adjust_g_multcomp = 'bon')
+imd_anova_res <- imd_anova(
+  omicsData = mypro,
+  test_method = 'comb',
+  pval_adjust_a_multcomp = 'bon',
+  pval_adjust_g_multcomp = 'bon'
+)
 plot(imd_anova_res, bw_theme = TRUE)
 plot(imd_anova_res, plot_type = "volcano", bw_theme = TRUE)
 

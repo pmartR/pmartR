@@ -4,7 +4,12 @@
 \alias{print.proteomicsFilterSummary}
 \title{Proteomics Filter Print Method}
 \usage{
-\method{print}{proteomicsFilterSummary}(object)
+\method{print}{proteomicsFilterSummary}(x, ...)
+}
+\arguments{
+\item{x}{the proteomics filter summary to print}
+
+\item{...}{further arguments passed to or from other methods}
 }
 \description{
 Print method for summary of proteomics filter

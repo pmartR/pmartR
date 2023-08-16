@@ -4,7 +4,12 @@
 \alias{print.metabData}
 \title{print.metabData}
 \usage{
-\method{print}{metabData}(metabData)
+\method{print}{metabData}(x, ...)
+}
+\arguments{
+\item{x}{An object of type 'metabData'}
+
+\item{...}{further arguments passed to or from other methods}
 }
 \description{
 For printing an S3 object of type 'metabData'

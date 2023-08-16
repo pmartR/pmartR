@@ -4,7 +4,12 @@
 \alias{print.totalCountFilt}
 \title{print.totalCountFilt}
 \usage{
-\method{print}{totalCountFilt}(filter_object)
+\method{print}{totalCountFilt}(x, ...)
+}
+\arguments{
+\item{x}{An object of type 'totalCountFilt'}
+
+\item{...}{further arguments passed to or from other methods}
 }
 \description{
 For printing an S3 object of type 'totalCountFilt'

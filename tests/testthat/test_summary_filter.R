@@ -1,24 +1,28 @@
 context('summary: filters')
 
-test_that('the filter object summaries are all square',{
-
+test_that('the filter object summaries are all square', {
   # Create pepData objects to test with and without group info -----------------
 
   load(system.file('testdata',
-                   'little_pdata.RData',
-                   package = 'pmartR'))
+    'little_pdata.RData',
+    package = 'pmartR'
+  ))
 
-  pdata <- as.pepData(e_data = edata,
-                      f_data = fdata,
-                      e_meta = emeta,
-                      edata_cname = 'Mass_Tag_ID',
-                      fdata_cname = 'SampleID',
-                      emeta_cname = 'Protein')
+  pdata <- as.pepData(
+    e_data = edata,
+    f_data = fdata,
+    e_meta = emeta,
+    edata_cname = 'Mass_Tag_ID',
+    fdata_cname = 'SampleID',
+    emeta_cname = 'Protein'
+  )
 
   pdata <- edata_transform(pdata, "log")
 
-  pdata_gdf <- group_designation(omicsData = pdata,
-                                 main_effects = 'Condition')
+  pdata_gdf <- group_designation(
+    omicsData = pdata,
+    main_effects = 'Condition'
+  )
 
   # Create pepData objects to test multiple main effects and covariates --------
 
@@ -26,54 +30,72 @@ test_that('the filter object summaries are all square',{
   edata_2 <- edata
 
   # Change some of the Infection samples to Mock samples.
-  names(edata_2) <- c("Mass_Tag_ID",
-                      paste0("Infection", 1:6),
-                      paste0("Mock", 1:6))
+  names(edata_2) <- c(
+    "Mass_Tag_ID",
+    paste0("Infection", 1:6),
+    paste0("Mock", 1:6)
+  )
 
   # Create additional f_data objects with different main effects and covariates.
   fdata_2 <- fdata
 
   # Update the sample names in f_data.
-  fdata_2$SampleID <- c(paste0("Infection", 1:6),
-                        paste0("Mock", 1:6))
+  fdata_2$SampleID <- c(
+    paste0("Infection", 1:6),
+    paste0("Mock", 1:6)
+  )
 
   # Update the first main effect to account for changing some infection samples to
   # mock samples.
-  fdata_2$Condition <- c(rep("Infection", 6),
-                         rep("Mock", 6))
+  fdata_2$Condition <- c(
+    rep("Infection", 6),
+    rep("Mock", 6)
+  )
 
-  fdata_2$Level <- c("high", "low", "high", "low", "high", "low", "high",
-                     "high", "low", "low", "low", "high")
-  fdata_2$Gender <- c("M", "F", "M", "F", "M", "F",
-                      "F", "M", "F", "F", "M", "F")
+  fdata_2$Level <- c(
+    "high", "low", "high", "low", "high", "low", "high",
+    "high", "low", "low", "low", "high"
+  )
+  fdata_2$Gender <- c(
+    "M", "F", "M", "F", "M", "F",
+    "F", "M", "F", "F", "M", "F"
+  )
   fdata_2$Age <- round(runif(12, min = 19, max = 89), 2)
 
-  pdata_2 <- as.pepData(e_data = edata_2,
-                        f_data = fdata_2,
-                        edata_cname = "Mass_Tag_ID",
-                        fdata_cname = "SampleID")
+  pdata_2 <- as.pepData(
+    e_data = edata_2,
+    f_data = fdata_2,
+    edata_cname = "Mass_Tag_ID",
+    fdata_cname = "SampleID"
+  )
   pdata_2 <- edata_transform(pdata_2, "log")
-  pdata_2 <- group_designation(omicsData = pdata_2,
-                               main_effects = c("Condition", "Level"),
-                               covariates = c("Gender", "Age"))
+  pdata_2 <- group_designation(
+    omicsData = pdata_2,
+    main_effects = c("Condition", "Level"),
+    covariates = c("Gender", "Age")
+  )
 
   # Create pepData objects to test paired data ---------------------------------
 
   load(system.file('testdata',
-                   'little_pairdata.RData',
-                   package = 'pmartR'))
+    'little_pairdata.RData',
+    package = 'pmartR'
+  ))
 
-  pairdata <- as.pepData(e_data = edata,
-                         f_data = fdata,
-                         e_meta = emeta,
-                         edata_cname = 'Mass_Tag_ID',
-                         fdata_cname = 'Name',
-                         emeta_cname = 'Protein')
+  pairdata <- as.pepData(
+    e_data = edata,
+    f_data = fdata,
+    e_meta = emeta,
+    edata_cname = 'Mass_Tag_ID',
+    fdata_cname = 'Name',
+    emeta_cname = 'Protein'
+  )
   pairdata <- edata_transform(pairdata, "log")
   pairdata <- group_designation(pairdata,
-                                pair_id = "PairID",
-                                pair_group = "Time",
-                                pair_denom = "0")
+    pair_id = "PairID",
+    pair_group = "Time",
+    pair_denom = "0"
+  )
 
   # Carpe unitae testum --------------------------------------------------------
 
@@ -87,17 +109,22 @@ test_that('the filter object summaries are all square',{
           list(
             num_observations = 1:12,
             frequency_counts = c(9, 13, 20, 24, 26, 27, 32, 37, 43, 49, 61, 150)
-          ), row.names = c("(0,1]", "(1,2]", "(2,3]", "(3,4]",
-                           "(4,5]", "(5,6]", "(6,7]", "(7,8]",
-                           "(8,9]", "(9,10]", "(10,11]", "(11,12]"),
+          ),
+          row.names = c(
+            "(0,1]", "(1,2]", "(2,3]", "(3,4]",
+            "(4,5]", "(5,6]", "(6,7]", "(7,8]",
+            "(8,9]", "(9,10]", "(10,11]", "(11,12]"
+          ),
           class = "data.frame"
         ),
         min_num = 2,
         num_not_filtered = 141,
         num_filtered = 9
       ),
-      names = c("pep_observation_counts", "min_num",
-                "num_not_filtered", "num_filtered"),
+      names = c(
+        "pep_observation_counts", "min_num",
+        "num_not_filtered", "num_filtered"
+      ),
       class = c("moleculeFilterSummary", "list"),
       use_batch = FALSE,
       use_groups = FALSE
@@ -126,8 +153,10 @@ test_that('the filter object summaries are all square',{
     structure(
       list(
         pvalue = summary(rmd_filter(pdata_2)$pvalue),
-        metrics = c("MAD", "Kurtosis", "Skewness",
-                    "Corr", "Proportion_Missing"),
+        metrics = c(
+          "MAD", "Kurtosis", "Skewness",
+          "Corr", "Proportion_Missing"
+        ),
         filtered_samples = "Mock2"
       ),
       names = c("pvalue", "metrics", "filtered_samples"),
@@ -140,10 +169,14 @@ test_that('the filter object summaries are all square',{
     structure(
       list(
         pvalue = summary(rmd_filter(pairdata)$pvalue),
-        metrics = c("MAD", "Kurtosis", "Skewness",
-                    "Corr", "Proportion_Missing"),
-        filtered_samples = c("Mock_0hr_3", "Mock_18hr_3",
-                             "AM_0hr_2", "AM_18hr_2")
+        metrics = c(
+          "MAD", "Kurtosis", "Skewness",
+          "Corr", "Proportion_Missing"
+        ),
+        filtered_samples = c(
+          "Mock_0hr_3", "Mock_18hr_3",
+          "AM_0hr_2", "AM_18hr_2"
+        )
       ),
       names = c("pvalue", "metrics", "filtered_samples"),
       class = c("rmdFilterSummary", "list")
@@ -197,8 +230,9 @@ test_that('the filter object summaries are all square',{
 
   expect_equal(
     summary(imdanova_filter(pdata_2),
-            min_nonmiss_anova = 2,
-            min_nonmiss_gtest = 3),
+      min_nonmiss_anova = 2,
+      min_nonmiss_gtest = 3
+    ),
     structure(
       list(
         pep_observation_counts = 150,
@@ -238,8 +272,9 @@ test_that('the filter object summaries are all square',{
 
   expect_equal(
     summary(imdanova_filter(pairdata),
-            min_nonmiss_anova = 2,
-            min_nonmiss_gtest = 3),
+      min_nonmiss_anova = 2,
+      min_nonmiss_gtest = 3
+    ),
     structure(
       list(
         pep_observation_counts = 150,
@@ -312,9 +347,9 @@ test_that('the filter object summaries are all square',{
   )
 
   # Custom filter ---------------
-  
+
   ## Test with remove arguments
-  
+
   # remove e_data
   expect_equal(
     summary(custom_filter(pdata, e_data_remove = "1406")),
@@ -326,11 +361,13 @@ test_that('the filter object summaries are all square',{
       ),
       names = c("Filtered", "Remaining", "Total"),
       class = c("customFilterSummary", "data.frame"),
-      row.names = c("SampleIDs (f_data)", "Mass_Tag_IDs (e_data)",
-                    "Proteins (e_meta)")
+      row.names = c(
+        "SampleIDs (f_data)", "Mass_Tag_IDs (e_data)",
+        "Proteins (e_meta)"
+      )
     )
   )
-  
+
   # remove f_data
   expect_equal(
     summary(custom_filter(pdata, f_data_remove = "Infection4")),
@@ -342,8 +379,10 @@ test_that('the filter object summaries are all square',{
       ),
       names = c("Filtered", "Remaining", "Total"),
       class = c("customFilterSummary", "data.frame"),
-      row.names = c("SampleIDs (f_data)", "Mass_Tag_IDs (e_data)",
-                    "Proteins (e_meta)")
+      row.names = c(
+        "SampleIDs (f_data)", "Mass_Tag_IDs (e_data)",
+        "Proteins (e_meta)"
+      )
     )
   )
 
@@ -358,16 +397,18 @@ test_that('the filter object summaries are all square',{
       ),
       names = c("Filtered", "Remaining", "Total"),
       class = c("customFilterSummary", "data.frame"),
-      row.names = c("SampleIDs (f_data)", "Mass_Tag_IDs (e_data)",
-                    "Proteins (e_meta)")
+      row.names = c(
+        "SampleIDs (f_data)", "Mass_Tag_IDs (e_data)",
+        "Proteins (e_meta)"
+      )
     )
   )
-  
+
   # combination
   expect_equal(
     summary(
       custom_filter(
-        pdata, 
+        pdata,
         e_data_remove = "6948840",
         f_data_remove = "Mock2",
         e_meta_remove = "COR1C_HUMAN"
@@ -381,18 +422,21 @@ test_that('the filter object summaries are all square',{
       ),
       names = c("Filtered", "Remaining", "Total"),
       class = c("customFilterSummary", "data.frame"),
-      row.names = c("SampleIDs (f_data)", "Mass_Tag_IDs (e_data)",
-                    "Proteins (e_meta)")
+      row.names = c(
+        "SampleIDs (f_data)", "Mass_Tag_IDs (e_data)",
+        "Proteins (e_meta)"
+      )
     )
   )
-  
+
   ## Test with keep arguments
-  
+
   # e_meta keep
   expect_equal(
     summary(
       custom_filter(
-        pdata, e_meta_keep = c("ALBU_HUMAN",  "RL40_HUMAN",  "ALBU_HUMAN")
+        pdata,
+        e_meta_keep = c("ALBU_HUMAN", "RL40_HUMAN", "ALBU_HUMAN")
       )
     ),
     structure(
@@ -403,16 +447,19 @@ test_that('the filter object summaries are all square',{
       ),
       names = c("Discarded", "Kept", "Total"),
       class = c("customFilterSummary", "data.frame"),
-      row.names = c("SampleIDs (f_data)", "Mass_Tag_IDs (e_data)",
-                    "Proteins (e_meta)")
+      row.names = c(
+        "SampleIDs (f_data)", "Mass_Tag_IDs (e_data)",
+        "Proteins (e_meta)"
+      )
     )
   )
-  
+
   # f_data keep
   expect_equal(
     summary(
       custom_filter(
-        pdata, f_data_keep = c("Infection1", "Infection2", "Mock1", "Mock2", "Mock3")
+        pdata,
+        f_data_keep = c("Infection1", "Infection2", "Mock1", "Mock2", "Mock3")
       )
     ),
     structure(
@@ -423,19 +470,21 @@ test_that('the filter object summaries are all square',{
       ),
       names = c("Discarded", "Kept", "Total"),
       class = c("customFilterSummary", "data.frame"),
-      row.names = c("SampleIDs (f_data)", "Mass_Tag_IDs (e_data)",
-                    "Proteins (e_meta)")
+      row.names = c(
+        "SampleIDs (f_data)", "Mass_Tag_IDs (e_data)",
+        "Proteins (e_meta)"
+      )
     )
   )
-  
+
   # e_data keep
   expect_equal(
     summary(
       custom_filter(
-        pdata, 
-        e_data_keep = c("1024",  "4198254",  "6637724", "216191"),
+        pdata,
+        e_data_keep = c("1024", "4198254", "6637724", "216191"),
         f_data_keep = c("Infection1", "Infection2", "Mock1", "Mock2", "Mock3"),
-        e_meta_keep = c("ALBU_HUMAN",  "RL40_HUMAN",  "ALBU_HUMAN")
+        e_meta_keep = c("ALBU_HUMAN", "RL40_HUMAN", "ALBU_HUMAN")
       )
     ),
     structure(
@@ -446,16 +495,19 @@ test_that('the filter object summaries are all square',{
       ),
       names = c("Discarded", "Kept", "Total"),
       class = c("customFilterSummary", "data.frame"),
-      row.names = c("SampleIDs (f_data)", "Mass_Tag_IDs (e_data)",
-                    "Proteins (e_meta)")
+      row.names = c(
+        "SampleIDs (f_data)", "Mass_Tag_IDs (e_data)",
+        "Proteins (e_meta)"
+      )
     )
   )
-  
+
   # combination
   expect_equal(
     summary(
       custom_filter(
-        pdata, e_data_keep = c("1024",  "4198254",  "6637724", "216191")
+        pdata,
+        e_data_keep = c("1024", "4198254", "6637724", "216191")
       )
     ),
     structure(
@@ -466,9 +518,10 @@ test_that('the filter object summaries are all square',{
       ),
       names = c("Discarded", "Kept", "Total"),
       class = c("customFilterSummary", "data.frame"),
-      row.names = c("SampleIDs (f_data)", "Mass_Tag_IDs (e_data)",
-                    "Proteins (e_meta)")
+      row.names = c(
+        "SampleIDs (f_data)", "Mass_Tag_IDs (e_data)",
+        "Proteins (e_meta)"
+      )
     )
   )
-  
 })

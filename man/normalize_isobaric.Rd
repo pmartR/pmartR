@@ -80,18 +80,23 @@ library(pmartRdata)
 
 myiso <- edata_transform(isobaric_object, "log2")
 
-# Don't apply the normalization quite yet; can use summary() and plot() to view reference pool samples
-myiso_refpools <- normalize_isobaric(omicsData = myiso, exp_cname = "Plex",
-                                   apply_norm = FALSE,
-                                   refpool_cname = "Virus",
-                                   refpool_notation = "Pool")
-summary(myiso_refpools)                     
-  
-# Now apply the normalization; can use plot() to view the study samples after reference pool normalization                                 
-myiso_norm <- normalize_isobaric(omicsData = myiso, exp_cname = "Plex",
-                                   apply_norm = TRUE,
-                                   refpool_cname = "Virus",
-                                   refpool_notation = "Pool")
+# Don't apply the normalization quite yet;
+# can use summary() and plot() to view reference pool samples
+myiso_refpools <- normalize_isobaric(
+  omicsData = myiso, exp_cname = "Plex",
+  apply_norm = FALSE,
+  refpool_cname = "Virus",
+  refpool_notation = "Pool"
+)
+summary(myiso_refpools)
 
+# Now apply the normalization;
+# can use plot() to view the study samples after reference pool normalization
+myiso_norm <- normalize_isobaric(
+  omicsData = myiso, exp_cname = "Plex",
+  apply_norm = TRUE,
+  refpool_cname = "Virus",
+  refpool_notation = "Pool"
+)
 
 }

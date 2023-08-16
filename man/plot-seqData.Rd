@@ -5,7 +5,7 @@
 \title{Plot seqData Object}
 \usage{
 \method{plot}{seqData}(
-  omicsData,
+  x,
   order_by = NULL,
   color_by = NULL,
   facet_by = NULL,
@@ -24,11 +24,12 @@
   bw_theme = TRUE,
   palette = NULL,
   use_VizSampNames = FALSE,
-  transformation = NULL
+  transformation = NULL,
+  ...
 )
 }
 \arguments{
-\item{omicsData}{seqData object}
+\item{x}{seqData object}
 
 \item{order_by}{character string specifying the column name of f_data by
 which to order the boxplots. If \code{order_by} is "Group", the boxplots
@@ -96,6 +97,8 @@ back-transform to original scale. 'upper' - For each column: scale column
 intensities by 75th quantile column intensities, then back-transform to
 original scale. For 'median' and 'upper' options, all zeros are converted
 to NAs.}
+
+\item{...}{further arguments passed to or from other methods.}
 }
 \value{
 ggplot2 plot object if interactive is FALSE, or plotly plot object if
@@ -106,6 +109,6 @@ For plotting seqData S3 objects
 }
 \examples{
 library(pmartRdata)
-plot(omicsData = rnaseq_object, transformation = "lcpm")
+plot(rnaseq_object, transformation = "lcpm")
 
 }

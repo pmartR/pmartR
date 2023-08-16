@@ -5,7 +5,7 @@
 \title{Plot imdanovaFilt Object}
 \usage{
 \method{plot}{imdanovaFilt}(
-  filter_object,
+  x,
   min_nonmiss_anova = NULL,
   min_nonmiss_gtest = NULL,
   interactive = FALSE,
@@ -23,11 +23,12 @@
   text_size = 3,
   bw_theme = TRUE,
   palette = NULL,
-  display_count = TRUE
+  display_count = TRUE,
+  ...
 )
 }
 \arguments{
-\item{filter_object}{Object of class imdanovaFilt (also a data frame) containing
+\item{x}{Object of class imdanovaFilt (also a data frame) containing
 the molecule identifier and number of samples in each group with
 non-missing values for that molecule}
 
@@ -82,6 +83,8 @@ palette to use. For a list of available options see the details section in
 
 \item{display_count}{logical value. Indicates whether the missing value counts by
 sample will be displayed on the bar plot. The default is TRUE.}
+
+\item{...}{further arguments passed to or from other methods.}
 }
 \value{
 ggplot2 plot object if interactive is FALSE, or plotly plot object if

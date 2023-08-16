@@ -12,8 +12,7 @@ group_designation(
   pair_id = NULL,
   pair_group = NULL,
   pair_denom = NULL,
-  batch_id = NULL,
-  time_course = NULL
+  batch_id = NULL
 )
 }
 \arguments{
@@ -87,8 +86,10 @@ Groups are formed based on the levels of the main effect variables.
 }
 \examples{
 library(pmartRdata)
-mylipid <- group_designation(omicsData = lipid_pos_object,
-                                   main_effects = "Virus")
+mylipid <- group_designation(
+  omicsData = lipid_pos_object,
+  main_effects = "Virus"
+)
 attr(mylipid, "group_DF")
 
 }

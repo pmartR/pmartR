@@ -12,8 +12,8 @@ RNA_filter(omicsData)
 }
 \value{
 An S3 object of class 'RNAFilt' (data.frame) that contains the
-  sample identifiers, library size, the number of unique biomolecules with 
-  non-zero observations per sample, and the proportion of non-zero 
+  sample identifiers, library size, the number of unique biomolecules with
+  non-zero observations per sample, and the proportion of non-zero
   observations over the total number of biomolecules.
 }
 \description{
@@ -28,9 +28,9 @@ Filter omicsData samples by library size (number of reads) or number
 \examples{
 library(pmartRdata)
 to_filter <- RNA_filter(omicsData = rnaseq_object)
-summary(filter_object = to_filter, size_library = 10000)
-summary(filter_object = to_filter, min_nonzero = 5000)
-summary(filter_object = to_filter, min_nonzero = .2)
+summary(to_filter, size_library = 10000)
+summary(to_filter, min_nonzero = 5000)
+summary(to_filter, min_nonzero = .2)
 
 }
 \author{

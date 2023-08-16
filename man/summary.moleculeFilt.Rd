@@ -4,14 +4,16 @@
 \alias{summary.moleculeFilt}
 \title{Molecule Filter Summary}
 \usage{
-\method{summary}{moleculeFilt}(filter_object, min_num = NULL)
+\method{summary}{moleculeFilt}(object, min_num = NULL, ...)
 }
 \arguments{
-\item{filter_object}{S3 object of class 'moleculeFilt' created by
+\item{object}{S3 object of class 'moleculeFilt' created by
 \code{\link{molecule_filter}}}
 
 \item{min_num}{integer value specifying the minimum number of times each
 feature must be observed across all samples. Default value is NULL.}
+
+\item{...}{further arguments passed to or from other methods}
 }
 \value{
 a summary table giving the number of biomolecules by number of
@@ -27,8 +29,8 @@ Provide summary of a moleculeFilt S3 object
 \examples{
 library(pmartRdata)
 myfilter <- molecule_filter(omicsData = pep_object)
-summary(filter_object = myfilter)
-summary(filter_object = myfilter, min_num = 2)
+summary(myfilter)
+summary(myfilter, min_num = 2)
 
 }
 \seealso{

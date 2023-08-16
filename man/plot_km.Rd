@@ -4,7 +4,7 @@
 \alias{plot_km}
 \title{Basic survival analysis plot}
 \usage{
-plot_km(omicsData, ...)
+plot_km(omicsData)
 }
 \arguments{
 \item{omicsData}{A pmartR data object of any class, which has a `group_df` attribute that is usually created by the `group_designation()` function}
@@ -20,11 +20,16 @@ surv_designation, and plot the resulting Kaplan-Meier curve.
 \dontrun{
 library(MSomicsSTAT)
 library(OvarianPepdataBP)
-attr(tcga_ovarian_pepdata_bp,"survDF") <- list(t_death = "survival_time",ind_death = "vital_status")
+attr(tcga_ovarian_pepdata_bp, "survDF") <- list(t_death = "survival_time",
+                                                ind_death = "vital_status")
 plot_km(omicsData = tcga_ovarian_pepdata_bp)
 
-#Add covariates to "survDF" attribute
-attr(tcga_ovarian_pepdata_bp,"survDF") <- list(t_death = "survival_time",ind_death = "vital_status", covariates = "age_at_initial_pathologic_diagnosis")
+# Add covariates to "survDF" attribute
+attr(tcga_ovarian_pepdata_bp, "survDF") <- list(
+  t_death = "survival_time",
+  ind_death = "vital_status",
+  covariates = "age_at_initial_pathologic_diagnosis"
+)
 plot_km(omicsData = tcga_ovarian_pepdata_bp)
 }
 }

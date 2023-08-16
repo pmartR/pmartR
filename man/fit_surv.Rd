@@ -4,7 +4,7 @@
 \alias{fit_surv}
 \title{Basic survival analysis function}
 \usage{
-fit_surv(omicsData, ...)
+fit_surv(omicsData)
 }
 \arguments{
 \item{omicsData}{A pmartR data object of any class, which has a `group_df` attribute that is usually created by the `group_designation()` function}
@@ -21,15 +21,20 @@ surv_designation, and return the "survfit" object
 library(MSomicsSTAT)
 library(OvarianPepdataBP)
 
-#Basic analysis without covariates
-attr(tcga_ovarian_pepdata_bp,"survDF") <- list(t_death = "survival_time",ind_death = "vital_status")
+# Basic analysis without covariates
+attr(tcga_ovarian_pepdata_bp, "survDF") <- list(t_death = "survival_time",
+                                                ind_death = "vital_status")
 sfit <- fit_surv(tcga_ovarian_pepdata_bp)
 plot(sfit)
 
-#Add some covariate information
-attr(tcga_ovarian_pepdata_bp,"survDF") <- list(t_death = "survival_time",ind_death = "vital_status", covariates = "g__initial_pathologic_diagnosis_method_g1")
+# Add some covariate information
+attr(tcga_ovarian_pepdata_bp, "survDF") <- list(
+  t_death = "survival_time",
+  ind_death = "vital_status",
+  covariates = "g__initial_pathologic_diagnosis_method_g1"
+)
 sfit <- fit_surv(tcga_ovarian_pepdata_bp)
-plot(sfit,col=c(1,2))
+plot(sfit, col = c(1, 2))
 }
 
 }

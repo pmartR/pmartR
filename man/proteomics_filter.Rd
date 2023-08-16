@@ -24,7 +24,7 @@ the number of proteins to which each individual peptide maps.
 \examples{
 library(pmartRdata)
 my_filter <- proteomics_filter(omicsData = pep_object)
-summary(filter_object = my_filter, min_num_peps = 3)
+summary(my_filter, min_num_peps = 3)
 
 }
 \author{

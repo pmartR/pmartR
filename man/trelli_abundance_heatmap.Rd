@@ -46,6 +46,8 @@ is 1.}
 
 \item{single_plot}{A TRUE/FALSE to indicate whether 1 plot (not a
 trelliscope) should be returned. Default is FALSE.}
+
+\item{...}{Additional arguments to be passed on to the trelli builder}
 }
 \description{
 Specify a plot design and cognostics for the abundance heatmap
@@ -55,18 +57,19 @@ Specify a plot design and cognostics for the abundance heatmap
 \examples{
 \dontrun{
 
-## Build the abundance heatmap with an omicsData object with emeta variables. Generate trelliData in as.trelliData.
-trelli_panel_by(trelliData = trelliData2, panel = "LipidFamily") \%>\% 
-   trelli_abundance_heatmap(test_mode = TRUE, test_example = 1:3)
-   
-## Users can modify the plotting function with ggplot parameters and interactivity, 
-## and can also select certain cognostics.     
-trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") \%>\% 
-   trelli_abundance_heatmap(test_mode = TRUE, test_example = 1:5, 
-     ggplot_params = c("ylab('')", "xlab('')"), interactive = TRUE, cognostics = c("mean", "median"))  
-   
-}
+## Build the abundance heatmap with an omicsData object with emeta variables. 
+## Generate trelliData in as.trelliData.
+trelli_panel_by(trelliData = trelliData2, panel = "LipidFamily") \%>\%
+  trelli_abundance_heatmap(test_mode = TRUE, test_example = 1:3)
 
+## Users can modify the plotting function with ggplot parameters and interactivity,
+## and can also select certain cognostics.
+trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") \%>\%
+  trelli_abundance_heatmap(
+    test_mode = TRUE, test_example = 1:5,
+    ggplot_params = c("ylab('')", "xlab('')"), interactive = TRUE, cognostics = c("mean", "median")
+  )
+}
 
 }
 \author{

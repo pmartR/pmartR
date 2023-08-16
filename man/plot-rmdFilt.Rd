@@ -5,7 +5,7 @@
 \title{Plot rmdFilt Object}
 \usage{
 \method{plot}{rmdFilt}(
-  filter_object,
+  x,
   pvalue_threshold = NULL,
   sampleID = NULL,
   order_by = NULL,
@@ -22,11 +22,12 @@
   point_size = 3,
   bw_theme = TRUE,
   palette = NULL,
-  use_VizSampNames = FALSE
+  use_VizSampNames = FALSE,
+  ...
 )
 }
 \arguments{
-\item{filter_object}{object of class rmdFilt created via \code{\link{rmd_filter}}}
+\item{x}{object of class rmdFilt created via \code{\link{rmd_filter}}}
 
 \item{pvalue_threshold}{numeric threshold for the Robust Mahalanobis Distance (RMD)
 p-value. If \code{sampleID} is NULL (see \code{sampleID} below), a
@@ -86,6 +87,8 @@ palette to use. For a list of available options see the details section in
 
 \item{use_VizSampNames}{logical value. Indicates whether to use custom sample
 names. The default is FALSE.}
+
+\item{...}{further arguments passed to or from other methods.}
 }
 \value{
 ggplot2 plot object if interactive is FALSE, or plotly plot object if
@@ -98,7 +101,7 @@ For plotting an S3 object of type 'rmdFilt'
 library(pmartRdata)
 mymetab <- edata_transform(omicsData = metab_object, data_scale = "log2")
 mymetab <- group_designation(omicsData = mymetab, main_effects = "Phenotype")
-rmd_results <- rmd_filter(omicsData = mymetab, metrics=c("MAD", "Skewness", "Correlation"))
+rmd_results <- rmd_filter(omicsData = mymetab, metrics = c("MAD", "Skewness", "Correlation"))
 plot(rmd_results, pvalue_threshold = 0.0001, order_by = "Phenotype")
 
 }

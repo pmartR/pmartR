@@ -5,11 +5,13 @@
 \alias{summary.trelliData}
 \title{Summarizes potential plotting options for a trelliData object}
 \usage{
-\method{summary}{trelliData}(trelliData)
+\method{summary}{trelliData}(object, ...)
 }
 \arguments{
-\item{trelliData}{An object from the as.trelliData.edata or as.trelliData
+\item{object}{An object from the as.trelliData.edata or as.trelliData
 functions}
+
+\item{...}{further arguments passed to or from other methods.}
 }
 \description{
 Summarizes potential plotting options for a trelliData object
@@ -27,9 +29,8 @@ summary(trelliData \%>\% trelli_panel_by("Sample"))
 # Use an omicsData example. Build with as.trelliData.
 summary(trelliData2)
 
-# Use a statRes example. Build with as.trelliData. 
+# Use a statRes example. Build with as.trelliData.
 summary(trelliData3)
-
 }
 
 }

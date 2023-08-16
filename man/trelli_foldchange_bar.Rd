@@ -52,6 +52,8 @@ is 1.}
 
 \item{single_plot}{A TRUE/FALSE to indicate whether 1 plot (not a
 trelliscope) should be returned. Default is FALSE.}
+
+\item{...}{Additional arguments to be passed on to the trelli builder}
 }
 \description{
 Specify a plot design and cognostics for the fold_change
@@ -61,12 +63,12 @@ Specify a plot design and cognostics for the fold_change
 \dontrun{
 
 ## Build fold_change bar plot with statRes data grouped by edata_colname.
-trelli_panel_by(trelliData = trelliData3, panel = "Lipid") \%>\% 
+trelli_panel_by(trelliData = trelliData3, panel = "Lipid") \%>\%
   trelli_foldchange_bar(test_mode = TRUE, test_example = 1:10, p_value_test = "anova")
-  
-## Or make the plot interactive  
-trelli_panel_by(trelliData = trelliData4, panel = "Lipid") \%>\% 
-  trelli_foldchange_bar(test_mode = TRUE, test_example = 1:10, p_value_test = "gtest", interactive = TRUE) 
+
+## Or make the plot interactive
+trelli_panel_by(trelliData = trelliData4, panel = "Lipid") \%>\%
+  trelli_foldchange_bar(test_mode = TRUE, test_example = 1:10, p_value_test = "gtest", interactive = TRUE)
    
 }
 

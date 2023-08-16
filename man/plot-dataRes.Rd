@@ -5,7 +5,7 @@
 \title{Plot dataRes object}
 \usage{
 \method{plot}{dataRes}(
-  dataRes_obj,
+  x,
   metric = NULL,
   density = FALSE,
   ncols = NULL,
@@ -28,11 +28,12 @@
   point_size = 2,
   bin_width = 1,
   bw_theme = TRUE,
-  palette = NULL
+  palette = NULL,
+  ...
 )
 }
 \arguments{
-\item{dataRes_obj}{object of class dataRes, created by the
+\item{x}{object of class dataRes, created by the
 \code{\link{edata_summary}} function}
 
 \item{metric}{character string indicating which metric to use in plot:
@@ -105,6 +106,8 @@ theme.}
 \item{palette}{character string indicating the name of the RColorBrewer
 palette to use. For a list of available options see the details section in
 \code{\link[RColorBrewer]{RColorBrewer}}.}
+
+\item{...}{further arguments passed to or from other methods.}
 }
 \value{
 ggplot2 plot object if interactive is FALSE, or plotly plot object if
@@ -118,11 +121,13 @@ This function can only create plots for dataRes objects whose 'by' =
   'molecule' and 'groupvar' attribute is non NULL
 }
 \examples{
-library (pmartRdata)
+library(pmartRdata)
 mylipid <- edata_transform(omicsData = lipid_pos_object, data_scale = "log2")
-result <- edata_summary(omicsData = mylipid,
-                       by = "molecule",
-                       groupvar = "Virus")
+result <- edata_summary(
+  omicsData = mylipid,
+  by = "molecule",
+  groupvar = "Virus"
+)
 plot(result)
 
 }

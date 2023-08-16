@@ -5,7 +5,7 @@
 \title{Plot totalCountFilt Object}
 \usage{
 \method{plot}{totalCountFilt}(
-  filter_object,
+  x,
   min_count = NULL,
   interactive = FALSE,
   x_lab = NULL,
@@ -20,11 +20,12 @@
   text_size = 3,
   bar_width = 0.8,
   bw_theme = TRUE,
-  palette = NULL
+  palette = NULL,
+  ...
 )
 }
 \arguments{
-\item{filter_object}{object of class totalCountFilt that contains the molecule
+\item{x}{object of class totalCountFilt that contains the molecule
 identifier and the number of total counts for which the molecule was measured
 (not NA).}
 
@@ -70,6 +71,8 @@ The default is 0.8.}
 \item{palette}{character string indicating the name of the RColorBrewer
 palette to use. For a list of available options see the details section in
 \code{\link[RColorBrewer]{RColorBrewer}}.}
+
+\item{...}{further arguments passed to or from other methods.}
 }
 \value{
 ggplot2 plot object if interactive is FALSE, or plotly plot object if

@@ -5,7 +5,7 @@
 \title{Plot corRes Object}
 \usage{
 \method{plot}{corRes}(
-  corRes_obj,
+  x,
   omicsData = NULL,
   order_by = NULL,
   colorbar_lim = c(NA, NA),
@@ -24,11 +24,12 @@
   color_low = NULL,
   color_high = NULL,
   bw_theme = TRUE,
-  use_VizSampNames = FALSE
+  use_VizSampNames = FALSE,
+  ...
 )
 }
 \arguments{
-\item{corRes_obj}{An object of class "corRes" created via \code{cor_result}}
+\item{x}{An object of class "corRes" created via \code{cor_result}}
 
 \item{omicsData}{an object of the class 'pepData', 'isobaricpepData',
 'proData', 'lipidData', 'metabData', 'nmrData' or 'seqData' created via
@@ -87,6 +88,8 @@ high values}
 
 \item{use_VizSampNames}{logical value. Indicates whether to use custom sample
 names. The default is FALSE.}
+
+\item{...}{further arguments passed to or from other methods.}
 }
 \value{
 ggplot2 plot object if interactive is FALSE, or plotly plot object if

@@ -17,29 +17,18 @@ set_data_info(
 )
 }
 \arguments{
-\item{e_data}{}
-
-\item{edata_cname}{}
-
-\item{data_scale_orig}{}
-
-\item{data_scale}{}
-
-\item{data_types}{}
-
-\item{norm_info}{}
-
-\item{is_normalized}{}
+\item{e_data, edata_cname, data_scale_orig, data_scale, data_types, norm_info, is_normalized, batch_info, is_bc}{See the \code{as.omicsData} functions, e.g. \code{\link{as.lipidData}}}
 }
 \value{
-A list containing all the elements in the data_info attribute:
-       (list all attributes)
+A list of edited data_info to replace the attribute in the
+ omicsData object.
 }
 \description{
-Create a set function that will return the value for each attribute. For 
+Create a set function that will return the value for each attribute. For
 example, set_data_info will perform all of the calculations to fill in the
 data_info attribute. These functions will be called in the as.xxx functions
 to create an xxxData object but can be used individually to update any one of
 the attributes at a later time.
 Sets/updates the values in the data_info attribute
 }
+\keyword{internal}

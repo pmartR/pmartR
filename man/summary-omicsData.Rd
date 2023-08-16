@@ -10,23 +10,25 @@
 \alias{summary.seqData}
 \title{Produce a basic summary of a pmartR omicsData S3 Object}
 \usage{
-\method{summary}{pepData}(omicsData)
+\method{summary}{pepData}(object, ...)
 
-\method{summary}{proData}(omicsData)
+\method{summary}{proData}(object, ...)
 
-\method{summary}{lipidData}(omicsData)
+\method{summary}{lipidData}(object, ...)
 
-\method{summary}{metabData}(omicsData)
+\method{summary}{metabData}(object, ...)
 
-\method{summary}{nmrData}(omicsData)
+\method{summary}{nmrData}(object, ...)
 
-\method{summary}{seqData}(omicsData)
+\method{summary}{seqData}(object, ...)
 }
 \arguments{
-\item{omicsData}{an object of the class 'lipidData', 'metabData', 'pepData',
+\item{object}{an object of the class 'lipidData', 'metabData', 'pepData',
 'proData', nmrData', or 'seqData' usually created by \code{\link{as.lipidData}},
 \code{\link{as.metabData}}, \code{\link{as.pepData}},
 \code{\link{as.proData}}, \code{\link{as.nmrData}}, or \code{\link{as.seqData}}, respectively.}
+
+\item{...}{further arguments passed to or from other methods.}
 }
 \value{
 a summary table for the pmartR omicsData object. If assigned to a

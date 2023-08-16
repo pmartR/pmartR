@@ -13,13 +13,13 @@ or nmrData.}
 \value{
 A list containing two elements:
         \itemize{
-        
+
           \item meta_data -- Logical. Indicates if the \code{e_meta} data
-          frame was provided. 
-        
+          frame was provided.
+
           \item num_emeta -- The number of unique entries present in the
           \code{emeta_cname} column in \code{e_meta}.
-        
+
         }
 }
 \description{

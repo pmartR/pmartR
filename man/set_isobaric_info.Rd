@@ -15,19 +15,7 @@ set_isobaric_info(
 )
 }
 \arguments{
-\item{exp_cname}{}
-
-\item{channel_cname}{}
-
-\item{refpool_channel}{}
-
-\item{refpool_cname}{}
-
-\item{refpool_notation}{}
-
-\item{norm_info}{}
-
-\item{isobaric_norm}{}
+\item{exp_cname, channel_cname, refpool_channel, refpool_cname, refpool_notation, norm_info, isobaric_norm}{See \code{\link{normalize_isobaric}}}
 }
 \value{
 A list containing all the elements in the isobaric_info attribute:
@@ -36,3 +24,4 @@ A list containing all the elements in the isobaric_info attribute:
 \description{
 Sets/updates the values in the isobaric_info attribute.
 }
+\keyword{internal}

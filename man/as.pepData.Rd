@@ -91,12 +91,14 @@ Objects of class 'pepData' contain some attributes that are
 }
 \examples{
 library(pmartRdata)
-mypepData <- as.pepData(e_data = pep_edata,
-                        e_meta = pep_emeta,
-                        f_data = pep_fdata,
-                        edata_cname = "Peptide",
-                        fdata_cname = "SampleID",
-                        emeta_cname = "RazorProtein")
+mypepData <- as.pepData(
+  e_data = pep_edata,
+  e_meta = pep_emeta,
+  f_data = pep_fdata,
+  edata_cname = "Peptide",
+  fdata_cname = "SampleID",
+  emeta_cname = "RazorProtein"
+)
 
 }
 \seealso{

@@ -4,10 +4,10 @@
 \alias{summary.proteomicsFilt}
 \title{Proteomics Filter Summary}
 \usage{
-\method{summary}{proteomicsFilt}(filter_object, min_num_peps = NULL, degen_peps = FALSE)
+\method{summary}{proteomicsFilt}(object, min_num_peps = NULL, degen_peps = FALSE, ...)
 }
 \arguments{
-\item{filter_object}{S3 object of class 'proteomicsFilt' created by
+\item{object}{S3 object of class 'proteomicsFilt' created by
 \code{\link{proteomics_filter}}.}
 
 \item{min_num_peps}{optional integer value between 1 and the maximum
@@ -19,6 +19,8 @@ that should be filtered. Default value is NULL.}
 \item{degen_peps}{logical indicator of whether to filter out 'degenerate' or 'redundant'
 peptides (i.e. peptides mapping to multiple proteins) (TRUE) or not
 (FALSE). Default value is FALSE.}
+
+\item{...}{further arguments passed to or from other methods}
 }
 \value{
 a summary table giving the number of Observed Proteins per Peptide
@@ -32,8 +34,8 @@ Provide summary of a proteomicsFilt S3 object
 \examples{
 library(pmartRdata)
 myfilt <- proteomics_filter(omicsData = pep_object)
-summary(filter_object = myfilt, degen_peps = TRUE) # there are no degenerate peptides to filter out
-summary(filter_object = myfilt, min_num_peps = 2)
+summary(myfilt, degen_peps = TRUE) # there are no degenerate peptides to filter out
+summary(myfilt, min_num_peps = 2)
 
 }
 \seealso{
