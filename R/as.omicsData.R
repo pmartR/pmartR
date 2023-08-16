@@ -1832,21 +1832,21 @@ str_col <- function(edata,
 replace_zeros <- function(e_data,
                           edata_cname) {
   # Acquire the index of the edata_cname column.
-  id_col <- which(names(edata) == edata_cname)
+  id_col <- which(names(e_data) == edata_cname)
 
   # Enumerate the number of zeros to be replaced with NA
-  n_zeros <- sum(edata[, -id_col] == 0,
+  n_zeros <- sum(e_data[, -id_col] == 0,
     na.rm = TRUE
   )
 
   # Loop through each column in e_data.
-  for (e in 1:ncol(edata)) {
+  for (e in 1:ncol(e_data)) {
     # Check if the current column is NOT the ID column.
     if (e != id_col) {
       # Find indices where the value is 0.
-      inds <- which(edata[, e] == 0)
+      inds <- which(e_data[, e] == 0)
 
-      # Check if any values in the eth column of edata match 0. If there are no
+      # Check if any values in the eth column of e_data match 0. If there are no
       # matches then which() will return integer(0) -- which has length 0.
       if (length(inds) == 0) {
         # Move to the next column in the data frame.
@@ -1855,7 +1855,7 @@ replace_zeros <- function(e_data,
         # If the length of inds is greater than 0 enter the else statement.
       } else {
         # Replace 0 with NA.
-        edata[inds, e] <- NA
+        e_data[inds, e] <- NA
       }
 
       # If e is equal to the index of the ID column enter the else statement.
@@ -1874,8 +1874,8 @@ replace_zeros <- function(e_data,
     sep = " "
   ))
 
-  # Return the updated edata object.
-  return(edata)
+  # Return the updated e_data object.
+  return(e_data)
 }
 
 #' Replace NA with 0
