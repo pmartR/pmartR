@@ -154,9 +154,13 @@ to no p-value adjustment.</p></dd>
 biomolecules are considered differentially expressed. Defaults to 0.05</p></dd>
 
 
+<dt>equal_var</dt>
+<dd><p>logical; should the variance across groups be assumed equal?</p></dd>
+
+
 <dt>parallel</dt>
 <dd><p>logical value indicating whether or not to use a
-"doParallel" loop when running the G-Test with covariates. Defaults to 
+"doParallel" loop when running the G-Test with covariates. Defaults to
 TRUE.</p></dd>
 
 </dl></div>
@@ -200,27 +204,33 @@ Journal of proteome research 9.11 (2010): 5748-5756.</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> You have specified remove_singleton_groups = TRUE, but there are no singleton groups to remove. Proceeding with application of the IMD-ANOVA filter.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> No biomolecules were filtered with the values specified for the min_nonmiss_anova and/or min_nonmiss_gtest arguments.</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Implement IMD ANOVA and compute all pairwise comparisons (i.e. leave the comparisons argument NULL), with FDR adjustment</span></span></span>
-<span class="r-in"><span><span class="va">anova_res</span> <span class="op">&lt;-</span> <span class="fu">imd_anova</span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mymetab</span>, test_method <span class="op">=</span> <span class="st">"anova"</span>, pval_adjust_a_multcomp <span class="op">=</span> <span class="st">"Holm"</span>, pval_adjust_a_fdr <span class="op">=</span> <span class="st">"BY"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># Implement IMD ANOVA and compute all pairwise comparisons </span></span></span>
+<span class="r-in"><span><span class="co"># (i.e. leave the comparisons argument NULL), with FDR adjustment</span></span></span>
+<span class="r-in"><span><span class="va">anova_res</span> <span class="op">&lt;-</span> <span class="fu">imd_anova</span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mymetab</span>, test_method <span class="op">=</span> <span class="st">"anova"</span>,</span></span>
+<span class="r-in"><span>                       pval_adjust_a_multcomp <span class="op">=</span> <span class="st">"Holm"</span>, pval_adjust_a_fdr <span class="op">=</span> <span class="st">"BY"</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Joining with `by = join_by(Metabolite)`</span>
-<span class="r-in"><span><span class="va">imd_res</span> <span class="op">&lt;-</span> <span class="fu">imd_anova</span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mymetab</span>, test_method <span class="op">=</span> <span class="st">"gtest"</span>, pval_adjust_g_multcomp <span class="op">=</span> <span class="st">"bon"</span>, pval_adjust_g_fdr <span class="op">=</span> <span class="st">"BY"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">imd_res</span> <span class="op">&lt;-</span> <span class="fu">imd_anova</span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mymetab</span>, test_method <span class="op">=</span> <span class="st">"gtest"</span>,</span></span>
+<span class="r-in"><span>                     pval_adjust_g_multcomp <span class="op">=</span> <span class="st">"bon"</span>, pval_adjust_g_fdr <span class="op">=</span> <span class="st">"BY"</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Joining with `by = join_by(Metabolite)`</span>
-<span class="r-in"><span><span class="va">imd_anova_res</span> <span class="op">&lt;-</span> <span class="fu">imd_anova</span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mymetab</span>, test_method <span class="op">=</span> <span class="st">"combined"</span>, pval_adjust_a_fdr <span class="op">=</span> <span class="st">"BY"</span>, pval_adjust_g_fdr <span class="op">=</span> <span class="st">"BY"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">imd_anova_res</span> <span class="op">&lt;-</span> <span class="fu">imd_anova</span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mymetab</span>, test_method <span class="op">=</span> <span class="st">"combined"</span>,</span></span>
+<span class="r-in"><span>                           pval_adjust_a_fdr <span class="op">=</span> <span class="st">"BY"</span>, pval_adjust_g_fdr <span class="op">=</span> <span class="st">"BY"</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Joining with `by = join_by(Metabolite)`</span>
-<span class="r-in"><span><span class="va">imd_anova_res</span> <span class="op">&lt;-</span> <span class="fu">imd_anova</span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mymetab</span>, test_method <span class="op">=</span> <span class="st">"combined"</span>, pval_adjust_a_multcomp <span class="op">=</span> <span class="st">"bon"</span>, pval_adjust_g_multcomp <span class="op">=</span> <span class="st">"bon"</span>, pval_adjust_a_fdr <span class="op">=</span> <span class="st">"BY"</span>, pval_adjust_g_fdr <span class="op">=</span> <span class="st">"BY"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">imd_anova_res</span> <span class="op">&lt;-</span> <span class="fu">imd_anova</span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mymetab</span>, test_method <span class="op">=</span> <span class="st">"combined"</span>,</span></span>
+<span class="r-in"><span>                           pval_adjust_a_multcomp <span class="op">=</span> <span class="st">"bon"</span>, pval_adjust_g_multcomp <span class="op">=</span> <span class="st">"bon"</span>,</span></span>
+<span class="r-in"><span>                           pval_adjust_a_fdr <span class="op">=</span> <span class="st">"BY"</span>, pval_adjust_g_fdr <span class="op">=</span> <span class="st">"BY"</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Joining with `by = join_by(Metabolite)`</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Two main effects and a covariate</span></span></span>
-<span class="r-in"><span><span class="va">mymetab</span> <span class="op">&lt;-</span> <span class="fu"><a href="group_designation.html">group_designation</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mymetab</span>, main_effects <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Phenotype"</span>, <span class="st">"SecondPhenotype"</span><span class="op">)</span>, covariates <span class="op">=</span> <span class="st">"Characteristic"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">mymetab</span> <span class="op">&lt;-</span> <span class="fu"><a href="group_designation.html">group_designation</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mymetab</span>, main_effects <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Phenotype"</span>, <span class="st">"SecondPhenotype"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                             covariates <span class="op">=</span> <span class="st">"Characteristic"</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> See the `group_DF` attribute of your omicsData object or call summary() on your omicsData object to see the combined group levels.</span>
-<span class="r-in"><span><span class="va">imd_anova_res</span> <span class="op">&lt;-</span> <span class="fu">imd_anova</span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mymetab</span>, test_method<span class="op">=</span><span class="st">'comb'</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">imd_anova_res</span> <span class="op">&lt;-</span> <span class="fu">imd_anova</span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mymetab</span>, test_method <span class="op">=</span> <span class="st">'comb'</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Joining with `by = join_by(Metabolite)`</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Same but with custom comparisons</span></span></span>
-<span class="r-in"><span><span class="va">comp_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>Control <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Phenotype1"</span>,<span class="st">"A"</span><span class="op">)</span>, Test <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Phenotype2"</span>,<span class="st">"B"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">comp_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>Control <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Phenotype1"</span>, <span class="st">"A"</span><span class="op">)</span>, Test <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Phenotype2"</span>, <span class="st">"B"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">custom_comps_res</span> <span class="op">&lt;-</span> <span class="fu">imd_anova</span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mymetab</span>, comparisons <span class="op">=</span> <span class="va">comp_df</span>, test_method <span class="op">=</span> <span class="st">"combined"</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Joining with `by = join_by(Metabolite)`</span>
-<span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

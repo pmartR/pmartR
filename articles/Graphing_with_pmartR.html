@@ -103,7 +103,7 @@
                         <h4 data-toc-skip class="author">Kelly Stratton,
 Lisa Bramer</h4>
             
-            <h4 data-toc-skip class="date">2023-07-05</h4>
+            <h4 data-toc-skip class="date">2023-08-17</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/pmartR/pmartR/blob/HEAD/vignettes/Graphing_with_pmartR.Rmd" class="external-link"><code>vignettes/Graphing_with_pmartR.Rmd</code></a></small>
       <div class="hidden name"><code>Graphing_with_pmartR.Rmd</code></div>
@@ -145,7 +145,7 @@ and the corresponding column in f_data remain unchanged).</p>
 the default sample names:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mymetab</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/edata_transform.html">edata_transform</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">metab_object</span>, data_scale <span class="op">=</span> <span class="st">"log2"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mymetab</span>, color_by <span class="op">=</span> <span class="st">"Phenotype"</span>, order_by <span class="op">=</span> <span class="st">"Phenotype"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mymetab</span>, color_by <span class="op">=</span> <span class="st">"Phenotype"</span>, order_by <span class="op">=</span> <span class="st">"Phenotype"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Graphing_with_pmartR_files/figure-html/unnamed-chunk-1-1.png" width="768"></p>
 <p>If we would like shorter samples names so they don’t take so much
 space on the graph, we can utilize the <code>custom_sampnames</code>
@@ -171,16 +171,16 @@ for each sample.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># specify new names using delim and components arguments</span></span>
 <span><span class="va">mymetab_shorter_names</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/custom_sampnames.html">custom_sampnames</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mymetab</span>, delim <span class="op">=</span> <span class="st">"_"</span>, components <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mymetab</span>, use_VizSampNames <span class="op">=</span> <span class="cn">TRUE</span>, color_by <span class="op">=</span> <span class="st">"Phenotype"</span>, order_by <span class="op">=</span> <span class="st">"Phenotype"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mymetab</span>, use_VizSampNames <span class="op">=</span> <span class="cn">TRUE</span>, color_by <span class="op">=</span> <span class="st">"Phenotype"</span>, order_by <span class="op">=</span> <span class="st">"Phenotype"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Graphing_with_pmartR_files/figure-html/unnamed-chunk-2-1.png" width="768"></p>
 <p>If we wish to obtain the plot using the original sample names, simply
 omit the <code>use_VizSampNames</code> argument to the plot function or
 set it to <code>FALSE</code>.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mymetab</span>, color_by <span class="op">=</span> <span class="st">"Phenotype"</span>, order_by <span class="op">=</span> <span class="st">"Phenotype"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mymetab</span>, color_by <span class="op">=</span> <span class="st">"Phenotype"</span>, order_by <span class="op">=</span> <span class="st">"Phenotype"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Graphing_with_pmartR_files/figure-html/unnamed-chunk-3-1.png" width="768"></p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mymetab</span>, use_VizSampNames <span class="op">=</span> <span class="cn">FALSE</span>, color_by <span class="op">=</span> <span class="st">"Phenotype"</span>, order_by <span class="op">=</span> <span class="st">"Phenotype"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mymetab</span>, use_VizSampNames <span class="op">=</span> <span class="cn">FALSE</span>, color_by <span class="op">=</span> <span class="st">"Phenotype"</span>, order_by <span class="op">=</span> <span class="st">"Phenotype"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Graphing_with_pmartR_files/figure-html/unnamed-chunk-3-2.png" width="768"></p>
 </div>
 <div class="section level3">
@@ -248,7 +248,7 @@ plots. Note that adding plot layers may override some of the built-in
 that adding <code>theme_dark()</code> changes the background color but
 also changes the orientation of the x-axis labels.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mymetab</span>, order_by <span class="op">=</span> <span class="st">"Phenotype"</span>, color_by <span class="op">=</span> <span class="st">"Phenotype"</span><span class="op">)</span> <span class="op">+</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mymetab</span>, order_by <span class="op">=</span> <span class="st">"Phenotype"</span>, color_by <span class="op">=</span> <span class="st">"Phenotype"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">theme_dark</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Graphing_with_pmartR_files/figure-html/unnamed-chunk-4-1.png" width="768"></p>
 </div>

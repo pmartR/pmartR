@@ -85,8 +85,8 @@
 
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for normRes</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
-<span>  <span class="va">normRes_obj</span>,</span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
 <span>  order_by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  color_by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  facet_by <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -104,13 +104,18 @@
 <span>  ylimit <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  bw_theme <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  palette <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  use_VizSampNames <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  use_VizSampNames <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>order_by</dt>
+    <dl><dt>x</dt>
+<dd><p>normRes object created by the normalize_global function</p></dd>
+
+
+<dt>order_by</dt>
 <dd><p>character string specifying the column name of f_data by
 which to order the boxplots. If <code>order_by</code> is "Group", the boxplots
 will be ordered by the group variable from the group_designation function.
@@ -203,8 +208,8 @@ palette to use. For a list of available options see the details section in
 names. The default is FALSE.</p></dd>
 
 
-<dt>normRes</dt>
-<dd><p>normRes object created by the normalize_global function</p></dd>
+<dt>...</dt>
+<dd><p>further arguments passed to or from other methods.</p></dd>
 
 </dl></div>
     <div id="value">
@@ -218,14 +223,20 @@ names. The default is FALSE.</p></dd>
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/pmartR/pmartRdata" class="external-link">pmartRdata</a></span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">mymetab</span> <span class="op">&lt;-</span> <span class="fu"><a href="edata_transform.html">edata_transform</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">metab_object</span>,</span></span>
-<span class="r-in"><span>                                data_scale <span class="op">=</span> <span class="st">"log2"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">mymetab</span> <span class="op">&lt;-</span> <span class="fu"><a href="group_designation.html">group_designation</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mymetab</span>,</span></span>
-<span class="r-in"><span>                                  main_effects <span class="op">=</span> <span class="st">"Phenotype"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">norm_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="normalize_global.html">normalize_global</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mymetab</span>,</span></span>
-<span class="r-in"><span>                                subset_fn <span class="op">=</span> <span class="st">"all"</span>,</span></span>
-<span class="r-in"><span>                                norm_fn <span class="op">=</span> <span class="st">"median"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">norm_object</span>, order_by <span class="op">=</span> <span class="st">"Phenotype"</span>, color_by <span class="op">=</span> <span class="st">"Phenotype"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">mymetab</span> <span class="op">&lt;-</span> <span class="fu"><a href="edata_transform.html">edata_transform</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  omicsData <span class="op">=</span> <span class="va">metab_object</span>,</span></span>
+<span class="r-in"><span>  data_scale <span class="op">=</span> <span class="st">"log2"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">mymetab</span> <span class="op">&lt;-</span> <span class="fu"><a href="group_designation.html">group_designation</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  omicsData <span class="op">=</span> <span class="va">mymetab</span>,</span></span>
+<span class="r-in"><span>  main_effects <span class="op">=</span> <span class="st">"Phenotype"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">norm_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="normalize_global.html">normalize_global</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  omicsData <span class="op">=</span> <span class="va">mymetab</span>,</span></span>
+<span class="r-in"><span>  subset_fn <span class="op">=</span> <span class="st">"all"</span>,</span></span>
+<span class="r-in"><span>  norm_fn <span class="op">=</span> <span class="st">"median"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">norm_object</span>, order_by <span class="op">=</span> <span class="st">"Phenotype"</span>, color_by <span class="op">=</span> <span class="st">"Phenotype"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot-normRes-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

@@ -140,9 +140,8 @@ class 'normRes' is returned.</p></dd>
 transforming the data, after normalization, should be calculated. Defaults
 to FALSE. If TRUE, the parameters for back transforming the data after
 normalization will be calculated, and subsequently included in the data
-normalization if <code>apply_norm</code> is TRUE or <code>apply.normRes</code>
-is used downstream. See details for an explanation of how these
-factors are calculated.</p></dd>
+normalization if <code>apply_norm</code> is TRUE. See the details section for an 
+explanation of how these factors are calculated.</p></dd>
 
 
 <dt>min_prop</dt>
@@ -175,9 +174,9 @@ for the proportion of biomolecules subset (rows of <code>e_data</code>)</p></dd>
   of biomolecules (rows of <code>e_data</code>) that should be used for computing
   normalization factors. The following are valid options: "all", "los",
   "ppp", "complete", "rip", and "ppp_rip". The option "all" is the subset
-  that includes all biomolecules (i.e. no subsetting is done). The option "los"
-  identifies the subset of the biomolecules associated with the top <code>L</code> order statistics,
-  where <code>L</code> is a proportion between 0 and 1.
+  that includes all biomolecules (i.e. no subsetting is done). The option 
+  "los" identifies the subset of the biomolecules associated with the top 
+  <code>L</code> order statistics, where <code>L</code> is a proportion between 0 and 1.
   Specifically, the biomolecules falling within the top <code>L</code> proportion of highest
   absolute abundance are retained for each sample, and the union of these
   biomolecules is taken as the subset identified (Wang et al., 2006). The option
@@ -253,18 +252,26 @@ for the proportion of biomolecules subset (rows of <code>e_data</code>)</p></dd>
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/pmartR/pmartRdata" class="external-link">pmartRdata</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">mymetab</span> <span class="op">&lt;-</span> <span class="fu"><a href="edata_transform.html">edata_transform</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">metab_object</span>,</span></span>
-<span class="r-in"><span>                                data_scale <span class="op">=</span> <span class="st">"log2"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">mymetab</span> <span class="op">&lt;-</span> <span class="fu"><a href="group_designation.html">group_designation</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mymetab</span>,</span></span>
-<span class="r-in"><span>                                  main_effects <span class="op">=</span> <span class="st">"Phenotype"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">norm_object</span> <span class="op">&lt;-</span> <span class="fu">normalize_global</span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mymetab</span>,</span></span>
-<span class="r-in"><span>                                subset_fn <span class="op">=</span> <span class="st">"all"</span>,</span></span>
-<span class="r-in"><span>                                norm_fn <span class="op">=</span> <span class="st">"median"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">norm_data</span> <span class="op">&lt;-</span> <span class="fu">normalize_global</span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mymetab</span>,</span></span>
-<span class="r-in"><span>                              subset_fn <span class="op">=</span> <span class="st">"all"</span>,</span></span>
-<span class="r-in"><span>                              norm_fn <span class="op">=</span> <span class="st">"median"</span>,</span></span>
-<span class="r-in"><span>                              apply_norm <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>                              backtransform <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">mymetab</span> <span class="op">&lt;-</span> <span class="fu"><a href="edata_transform.html">edata_transform</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  omicsData <span class="op">=</span> <span class="va">metab_object</span>,</span></span>
+<span class="r-in"><span>  data_scale <span class="op">=</span> <span class="st">"log2"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">mymetab</span> <span class="op">&lt;-</span> <span class="fu"><a href="group_designation.html">group_designation</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  omicsData <span class="op">=</span> <span class="va">mymetab</span>,</span></span>
+<span class="r-in"><span>  main_effects <span class="op">=</span> <span class="st">"Phenotype"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">norm_object</span> <span class="op">&lt;-</span> <span class="fu">normalize_global</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  omicsData <span class="op">=</span> <span class="va">mymetab</span>,</span></span>
+<span class="r-in"><span>  subset_fn <span class="op">=</span> <span class="st">"all"</span>,</span></span>
+<span class="r-in"><span>  norm_fn <span class="op">=</span> <span class="st">"median"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">norm_data</span> <span class="op">&lt;-</span> <span class="fu">normalize_global</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  omicsData <span class="op">=</span> <span class="va">mymetab</span>,</span></span>
+<span class="r-in"><span>  subset_fn <span class="op">=</span> <span class="st">"all"</span>,</span></span>
+<span class="r-in"><span>  norm_fn <span class="op">=</span> <span class="st">"median"</span>,</span></span>
+<span class="r-in"><span>  apply_norm <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>  backtransform <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

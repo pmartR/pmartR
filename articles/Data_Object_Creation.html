@@ -103,7 +103,7 @@
                         <h4 data-toc-skip class="author">Kelly Stratton,
 Lisa Bramer</h4>
             
-            <h4 data-toc-skip class="date">2023-07-05</h4>
+            <h4 data-toc-skip class="date">2023-08-17</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/pmartR/pmartR/blob/HEAD/vignettes/Data_Object_Creation.Rmd" class="external-link"><code>vignettes/Data_Object_Creation.Rmd</code></a></small>
       <div class="hidden name"><code>Data_Object_Creation.Rmd</code></div>
@@ -299,10 +299,10 @@ donor.</p>
 to the column names of e_data (excluding the biomolecule identifier
 column). The entries do not have to be in the same order.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="va">fdata</span><span class="op">$</span><span class="va">SampleID</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">edata</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">edata</span><span class="op">)</span> <span class="op">==</span> <span class="st">"Lipid"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="va">fdata</span><span class="op">$</span><span class="va">SampleID</span> <span class="op"><a href="https://rdrr.io/pkg/BiocGenerics/man/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">edata</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/which.html" class="external-link">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">edata</span><span class="op">)</span> <span class="op">==</span> <span class="st">"Lipid"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] TRUE</span></span></code></pre>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">edata</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">edata</span><span class="op">)</span> <span class="op">==</span> <span class="st">"Lipid"</span><span class="op">)</span><span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">fdata</span><span class="op">$</span><span class="va">SampleID</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">edata</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/which.html" class="external-link">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">edata</span><span class="op">)</span> <span class="op">==</span> <span class="st">"Lipid"</span><span class="op">)</span><span class="op">]</span> <span class="op"><a href="https://rdrr.io/pkg/BiocGenerics/man/match.html" class="external-link">%in%</a></span> <span class="va">fdata</span><span class="op">$</span><span class="va">SampleID</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] TRUE</span></span></code></pre>
 </div>
 <div class="section level3">
@@ -332,7 +332,7 @@ found in the e_meta biomolecule column. Here were are not mapping to
 lipid classes, but are recording the Row and Retention Time values for
 each lipid.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="va">edata</span><span class="op">$</span><span class="va">Lipid</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">emeta</span><span class="op">$</span><span class="va">Lipid</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="va">edata</span><span class="op">$</span><span class="va">Lipid</span> <span class="op"><a href="https://rdrr.io/pkg/BiocGenerics/man/match.html" class="external-link">%in%</a></span> <span class="va">emeta</span><span class="op">$</span><span class="va">Lipid</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] TRUE</span></span></code></pre>
 </div>
 </div>
@@ -358,14 +358,16 @@ the data type; often used if there are datasets for both negative and
 positive ionization modes on an instrument</p></li>
 </ul>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">mylipid</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as.lipidData.html">as.lipidData</a></span><span class="op">(</span>e_data <span class="op">=</span> <span class="va">edata</span>,</span>
-<span>                        f_data <span class="op">=</span> <span class="va">fdata</span>,</span>
-<span>                        e_meta <span class="op">=</span> <span class="va">emeta</span>,</span>
-<span>                        edata_cname <span class="op">=</span> <span class="st">"Lipid"</span>, </span>
-<span>                        fdata_cname <span class="op">=</span> <span class="st">"SampleID"</span>,</span>
-<span>                        emeta_cname <span class="op">=</span> <span class="st">"Lipid"</span>, </span>
-<span>                        data_scale <span class="op">=</span> <span class="st">"abundance"</span>,</span>
-<span>                        data_types <span class="op">=</span> <span class="st">"Negative Ion"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">mylipid</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as.lipidData.html">as.lipidData</a></span><span class="op">(</span></span>
+<span>  e_data <span class="op">=</span> <span class="va">edata</span>,</span>
+<span>  f_data <span class="op">=</span> <span class="va">fdata</span>,</span>
+<span>  e_meta <span class="op">=</span> <span class="va">emeta</span>,</span>
+<span>  edata_cname <span class="op">=</span> <span class="st">"Lipid"</span>,</span>
+<span>  fdata_cname <span class="op">=</span> <span class="st">"SampleID"</span>,</span>
+<span>  emeta_cname <span class="op">=</span> <span class="st">"Lipid"</span>,</span>
+<span>  data_scale <span class="op">=</span> <span class="st">"abundance"</span>,</span>
+<span>  data_types <span class="op">=</span> <span class="st">"Negative Ion"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p>Now we have an object of class lipidData. Built-in summary and plot
 methods now operate on this object and provide additional
 information.</p>
@@ -382,7 +384,7 @@ information.</p>
 <span><span class="co">## Missing Observations             50</span></span>
 <span><span class="co">## Proportion Missing            0.003</span></span></code></pre>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="../reference/edata_transform.html">edata_transform</a></span><span class="op">(</span><span class="va">mylipid</span>, data_scale <span class="op">=</span> <span class="st">"log2"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="../reference/edata_transform.html">edata_transform</a></span><span class="op">(</span><span class="va">mylipid</span>, data_scale <span class="op">=</span> <span class="st">"log2"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Data_Object_Creation_files/figure-html/unnamed-chunk-9-1.png" width="768"></p>
 <p>See “Quality_Control_with_pmartR” vignette for next steps.</p>
 </div>

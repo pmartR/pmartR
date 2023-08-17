@@ -85,8 +85,8 @@
 
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for imdanovaFilt</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
-<span>  <span class="va">filter_object</span>,</span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
 <span>  min_nonmiss_anova <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  min_nonmiss_gtest <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  interactive <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -104,13 +104,14 @@
 <span>  text_size <span class="op">=</span> <span class="fl">3</span>,</span>
 <span>  bw_theme <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  palette <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  display_count <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  display_count <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>filter_object</dt>
+    <dl><dt>x</dt>
 <dd><p>Object of class imdanovaFilt (also a data frame) containing
 the molecule identifier and number of samples in each group with
 non-missing values for that molecule</p></dd>
@@ -203,6 +204,10 @@ palette to use. For a list of available options see the details section in
 <dd><p>logical value. Indicates whether the missing value counts by
 sample will be displayed on the bar plot. The default is TRUE.</p></dd>
 
+
+<dt>...</dt>
+<dd><p>further arguments passed to or from other methods.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
@@ -218,7 +223,7 @@ sample will be displayed on the bar plot. The default is TRUE.</p></dd>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">pep_object</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">mypep</span> <span class="op">&lt;-</span> <span class="fu"><a href="group_designation.html">group_designation</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">pep_object</span>, main_effects <span class="op">=</span> <span class="st">"Phenotype"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">to_filter</span> <span class="op">&lt;-</span> <span class="fu"><a href="imdanova_filter.html">imdanova_filter</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mypep</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">to_filter</span>, min_nonmiss_anova <span class="op">=</span> <span class="fl">2</span>, min_nonmiss_gtest <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">to_filter</span>, min_nonmiss_anova <span class="op">=</span> <span class="fl">2</span>, min_nonmiss_gtest <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot-imdanovaFilt-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

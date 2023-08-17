@@ -125,13 +125,19 @@ test, which should be equal to the number of metrics used in rmd_runs</p></dd>
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/pmartR/pmartRdata" class="external-link">pmartRdata</a></span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">mymetab</span> <span class="op">&lt;-</span> <span class="fu"><a href="edata_transform.html">edata_transform</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">metab_object</span>,</span></span>
-<span class="r-in"><span>                           data_scale <span class="op">=</span> <span class="st">"log2"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">mymetab</span> <span class="op">&lt;-</span> <span class="fu"><a href="group_designation.html">group_designation</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mymetab</span>,</span></span>
-<span class="r-in"><span>                             main_effects <span class="op">=</span> <span class="st">"Phenotype"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">rmd_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="rmd_filter.html">rmd_filter</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mymetab</span>,</span></span>
-<span class="r-in"><span>                          metrics<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MAD"</span>, <span class="st">"Skewness"</span>, <span class="st">"Correlation"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">rmd_conversion</span><span class="op">(</span>log2rmd <span class="op">=</span> <span class="va">rmd_results</span><span class="op">$</span><span class="va">Log2.md</span>, df<span class="op">=</span><span class="fl">3</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">mymetab</span> <span class="op">&lt;-</span> <span class="fu"><a href="edata_transform.html">edata_transform</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  omicsData <span class="op">=</span> <span class="va">metab_object</span>,</span></span>
+<span class="r-in"><span>  data_scale <span class="op">=</span> <span class="st">"log2"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">mymetab</span> <span class="op">&lt;-</span> <span class="fu"><a href="group_designation.html">group_designation</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  omicsData <span class="op">=</span> <span class="va">mymetab</span>,</span></span>
+<span class="r-in"><span>  main_effects <span class="op">=</span> <span class="st">"Phenotype"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">rmd_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="rmd_filter.html">rmd_filter</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  omicsData <span class="op">=</span> <span class="va">mymetab</span>,</span></span>
+<span class="r-in"><span>  metrics <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MAD"</span>, <span class="st">"Skewness"</span>, <span class="st">"Correlation"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">rmd_conversion</span><span class="op">(</span>log2rmd <span class="op">=</span> <span class="va">rmd_results</span><span class="op">$</span><span class="va">Log2.md</span>, df <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 0.4416156882 0.8162279804 0.6238377042 0.3335961117 0.3102070212</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [6] 0.6257746922 0.6796891165 0.3321657107 0.9213079472 0.2012527082</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [11] 0.5543444578 0.0050516657 0.7125120107 0.2996883234 0.7313685486</span>

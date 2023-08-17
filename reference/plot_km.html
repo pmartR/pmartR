@@ -86,7 +86,7 @@ surv_designation, and plot the resulting Kaplan-Meier curve.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plot_km</span><span class="op">(</span><span class="va">omicsData</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plot_km</span><span class="op">(</span><span class="va">omicsData</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -107,11 +107,16 @@ surv_designation, and plot the resulting Kaplan-Meier curve.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">MSomicsSTAT</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">OvarianPepdataBP</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">tcga_ovarian_pepdata_bp</span>,<span class="st">"survDF"</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>t_death <span class="op">=</span> <span class="st">"survival_time"</span>,ind_death <span class="op">=</span> <span class="st">"vital_status"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">tcga_ovarian_pepdata_bp</span>, <span class="st">"survDF"</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>t_death <span class="op">=</span> <span class="st">"survival_time"</span>,</span></span>
+<span class="r-in"><span>                                                ind_death <span class="op">=</span> <span class="st">"vital_status"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">plot_km</span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">tcga_ovarian_pepdata_bp</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co">#Add covariates to "survDF" attribute</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">tcga_ovarian_pepdata_bp</span>,<span class="st">"survDF"</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>t_death <span class="op">=</span> <span class="st">"survival_time"</span>,ind_death <span class="op">=</span> <span class="st">"vital_status"</span>, covariates <span class="op">=</span> <span class="st">"age_at_initial_pathologic_diagnosis"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># Add covariates to "survDF" attribute</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">tcga_ovarian_pepdata_bp</span>, <span class="st">"survDF"</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  t_death <span class="op">=</span> <span class="st">"survival_time"</span>,</span></span>
+<span class="r-in"><span>  ind_death <span class="op">=</span> <span class="st">"vital_status"</span>,</span></span>
+<span class="r-in"><span>  covariates <span class="op">=</span> <span class="st">"age_at_initial_pathologic_diagnosis"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">plot_km</span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">tcga_ovarian_pepdata_bp</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>

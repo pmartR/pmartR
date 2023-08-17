@@ -86,16 +86,17 @@
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for imdanovaFilt</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span></span>
-<span>  <span class="va">filter_object</span>,</span>
+<span>  <span class="va">object</span>,</span>
 <span>  min_nonmiss_anova <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  min_nonmiss_gtest <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  comparisons <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  comparisons <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>filter_object</dt>
+    <dl><dt>object</dt>
 <dd><p>S3 object of class 'imdanovaFilt' created by
 <code><a href="imdanova_filter.html">imdanova_filter</a></code>.</p></dd>
 
@@ -117,6 +118,10 @@ Defaults to NULL. Suggested value is 3.</p></dd>
 containing the different comparisons of interest. Comparisons will be made
 between the Test and the corresponding Control (e.g. Control is the
 reference group).</p></dd>
+
+
+<dt>...</dt>
+<dd><p>further arguments passed to or from other methods</p></dd>
 
 </dl></div>
     <div id="value">
@@ -140,7 +145,7 @@ reference group).</p></dd>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/pmartR/pmartRdata" class="external-link">pmartRdata</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">mypep</span> <span class="op">&lt;-</span> <span class="fu"><a href="group_designation.html">group_designation</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">pep_object</span>, main_effects <span class="op">=</span> <span class="st">"Phenotype"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">myfilt</span> <span class="op">&lt;-</span> <span class="fu"><a href="imdanova_filter.html">imdanova_filter</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mypep</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span>filter_object <span class="op">=</span> <span class="va">myfilt</span>, min_nonmiss_anova <span class="op">=</span> <span class="fl">2</span>, min_nonmiss_gtest <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">myfilt</span>, min_nonmiss_anova <span class="op">=</span> <span class="fl">2</span>, min_nonmiss_gtest <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Summary of IMD-ANOVA Filter</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                           </span>

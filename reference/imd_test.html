@@ -110,7 +110,7 @@ even do this test.  See Webb-Robertson et al. (2010) for more.</p>
 <span>  <span class="va">pval_thresh</span>,</span>
 <span>  <span class="va">covariates</span>,</span>
 <span>  <span class="va">paired</span>,</span>
-<span>  <span class="va">parallel</span></span>
+<span>  parallel <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -118,6 +118,10 @@ even do this test.  See Webb-Robertson et al. (2010) for more.</p>
     <h2>Arguments</h2>
     <dl><dt>omicsData</dt>
 <dd><p>A pmartR data object of any class</p></dd>
+
+
+<dt>groupData</dt>
+<dd><p>`data.frame` that assigns sample names to groups</p></dd>
 
 
 <dt>comparisons</dt>
@@ -148,6 +152,11 @@ peptides are considered differentially expressed. Defaults to 0.05</p></dd>
 <dt>covariates</dt>
 <dd><p>A character vector with no more than two variable names
 that will be used as covariates in the IMD-ANOVA analysis.</p></dd>
+
+
+<dt>paired</dt>
+<dd><p>A logical value that determines whether paired data should be
+accounted for</p></dd>
 
 
 <dt>parallel</dt>

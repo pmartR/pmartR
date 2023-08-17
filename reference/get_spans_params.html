@@ -93,6 +93,12 @@
 <dd><p>an object of the class SPANSRes obtained by calling
 <code><a href="spans_procedure.html">spans_procedure()</a></code></p></dd>
 
+
+<dt>sort_by_nmols</dt>
+<dd><p>a logical indicator of whether to sort by number of
+molecules used in the normalization (see <code><a href="spans_procedure.html">spans_procedure</a></code> for
+info about the 'mols_used_in_norm' column)</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
@@ -124,10 +130,13 @@
 <span class="r-in"><span><span class="va">subset_fn</span> <span class="op">=</span> <span class="va">best_params</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">subset_fn</span></span></span>
 <span class="r-in"><span><span class="va">norm_fn</span> <span class="op">=</span> <span class="va">best_params</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">norm_fn</span></span></span>
 <span class="r-in"><span><span class="va">params</span> <span class="op">=</span> <span class="va">best_params</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">params</span></span></span>
-<span class="r-in"><span><span class="kw">if</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">params</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">{</span><span class="va">params</span> <span class="op">=</span> <span class="cn">NULL</span><span class="op">}</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">params</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="va">params</span> <span class="op">=</span> <span class="cn">NULL</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># pass arguments to normalize global</span></span></span>
-<span class="r-in"><span><span class="va">norm_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="normalize_global.html">normalize_global</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">myobject</span>, subset_fn <span class="op">=</span> <span class="va">subset_fn</span>, norm_fn <span class="op">=</span> <span class="va">norm_fn</span>, params <span class="op">=</span> <span class="va">params</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">norm_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="normalize_global.html">normalize_global</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">myobject</span>, subset_fn <span class="op">=</span> <span class="va">subset_fn</span>,</span></span>
+<span class="r-in"><span>                                norm_fn <span class="op">=</span> <span class="va">norm_fn</span>, params <span class="op">=</span> <span class="va">params</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

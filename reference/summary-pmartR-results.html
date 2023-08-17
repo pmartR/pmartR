@@ -85,37 +85,26 @@
 
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for normRes</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">omicsNorm</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for SPANSRes</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">SPANSRes_obj</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for dimRes</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">dimRes_object</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for corRes</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">corRes_object</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>omicsNorm</dt>
-<dd><p>object of class normRes, produced by calling
-<code><a href="normalize_global.html">normalize_global</a> with option apply_norm=FALSE</code></p></dd>
-
-
-<dt>dimRes_object</dt>
-<dd><p>object of class dimRes, which is a list containing
-sample identifiers and the principle components scores</p></dd>
-
-
-<dt>corRes_object</dt>
+    <dl><dt>object</dt>
 <dd><p>object of class corRes</p></dd>
 
 
-<dt>SPANSres_obj</dt>
-<dd><p>object of class SPANSRes created by calling
-<code><a href="spans_procedure.html">spans_procedure</a></code> on a grouped pepData or proData object</p></dd>
+<dt>...</dt>
+<dd><p>further arguments passed to or from other methods.</p></dd>
 
 </dl></div>
     <div id="value">
@@ -156,10 +145,10 @@ sample identifiers and the principle components scores</p></dd>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">dim_results</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Summary of 'dimRes' Object</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     R_squaredPC1     0.500PC2     0.387</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     R_squaredPC1     0.456PC2     0.407</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">cor_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="cor_result.html">cor_result</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mypep</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">cor_results</span><span class="op">)</span> </span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">cor_results</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Summary of Correlation Matrix (Upper Triangle)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span>

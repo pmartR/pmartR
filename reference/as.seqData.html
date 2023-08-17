@@ -132,7 +132,7 @@ meta information (e.g. mappings of transcripts to genes or proteins). Can be the
 
 <dt>edata_cname</dt>
 <dd><p>character string specifying the name of the column
-containing the transcript identifiers in <code>e_data</code> and <code>e_meta</code> 
+containing the transcript identifiers in <code>e_data</code> and <code>e_meta</code>
 (if applicable).</p></dd>
 
 
@@ -170,7 +170,7 @@ Defaults to NULL (no technical replicates).</p></dd>
     <p>Objects of class 'seqData' contain some attributes that are
   referenced by downstream functions. These attributes can be changed from
   their default value by manual specification. A list of these attributes as
-  well as their default values are as follows:</p><table class="table table"><tr><td>data_scale</td><td>Scale of the data provided in <code>e_data</code>. Only 'counts' is valid for 
+  well as their default values are as follows:</p><table class="table table"><tr><td>data_scale</td><td>Scale of the data provided in <code>e_data</code>. Only 'counts' is valid for
   'seqData'.</td></tr><tr><td></td><td></td></tr><tr><td>is_normalized</td><td>A logical argument, specifying
   whether the data has been normalized or not. Default value is FALSE.</td></tr><tr><td></td><td></td></tr><tr><td>norm_info</td><td>Default value is an empty list, which will be
   populated with a single named element <code>is_normalized = is_normalized</code>.</td></tr><tr><td></td><td></td></tr><tr><td>data_types</td><td>Character string describing the type of data, most commonly used for lipidomic data (lipidData objects) or NMR data (nmrData objects) but available for other data classes as well. Default value is NULL.</td></tr></table><p>Computed
@@ -196,12 +196,14 @@ Defaults to NULL (no technical replicates).</p></dd>
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/pmartR/pmartRdata" class="external-link">pmartRdata</a></span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">myseq</span> <span class="op">&lt;-</span> <span class="fu">as.seqData</span><span class="op">(</span>e_data <span class="op">=</span> <span class="va">rnaseq_edata</span>,</span></span>
-<span class="r-in"><span>                        e_meta <span class="op">=</span> <span class="va">rnaseq_emeta</span>,</span></span>
-<span class="r-in"><span>                        f_data <span class="op">=</span> <span class="va">rnaseq_fdata</span>,</span></span>
-<span class="r-in"><span>                        edata_cname <span class="op">=</span> <span class="st">"Transcript"</span>,</span></span>
-<span class="r-in"><span>                        fdata_cname <span class="op">=</span> <span class="st">"SampleName"</span>,</span></span>
-<span class="r-in"><span>                        emeta_cname <span class="op">=</span> <span class="st">"Transcript"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">myseq</span> <span class="op">&lt;-</span> <span class="fu">as.seqData</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  e_data <span class="op">=</span> <span class="va">rnaseq_edata</span>,</span></span>
+<span class="r-in"><span>  e_meta <span class="op">=</span> <span class="va">rnaseq_emeta</span>,</span></span>
+<span class="r-in"><span>  f_data <span class="op">=</span> <span class="va">rnaseq_fdata</span>,</span></span>
+<span class="r-in"><span>  edata_cname <span class="op">=</span> <span class="st">"Transcript"</span>,</span></span>
+<span class="r-in"><span>  fdata_cname <span class="op">=</span> <span class="st">"SampleName"</span>,</span></span>
+<span class="r-in"><span>  emeta_cname <span class="op">=</span> <span class="st">"Transcript"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Extra RNA transcripts were found in e_meta that were not in e_data. These have been removed from e_meta.</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

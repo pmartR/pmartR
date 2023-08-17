@@ -155,6 +155,10 @@ is 1.</p></dd>
 <dd><p>A TRUE/FALSE to indicate whether 1 plot (not a
 trelliscope) should be returned. Default is FALSE.</p></dd>
 
+
+<dt>...</dt>
+<dd><p>Additional arguments to be passed on to the trelli builder</p></dd>
+
 </dl></div>
     <div id="author">
     <h2>Author</h2>
@@ -165,31 +169,35 @@ trelliscope) should be returned. Default is FALSE.</p></dd>
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co">## Build the missingness bar plot with an edata file. Generate trelliData in as.trelliData.edata</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span>trelliData <span class="op">=</span> <span class="va">trelliData</span>, panel <span class="op">=</span> <span class="st">"Lipid"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span></span>
+<span class="r-in"><span><span class="co">## Build the missingness bar plot with an edata file. </span></span></span>
+<span class="r-in"><span><span class="co">## Generate trelliData in as.trelliData.edata</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span>trelliData <span class="op">=</span> <span class="va">trelliData</span>, panel <span class="op">=</span> <span class="st">"Lipid"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">trelli_missingness_bar</span><span class="op">(</span>test_mode <span class="op">=</span> <span class="cn">TRUE</span>, test_example <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span>trelliData <span class="op">=</span> <span class="va">trelliData</span>, panel <span class="op">=</span> <span class="st">"Sample"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">trelli_missingness_bar</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span>trelliData <span class="op">=</span> <span class="va">trelliData</span>, panel <span class="op">=</span> <span class="st">"Sample"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span></span>
+<span class="r-in"><span>  <span class="fu">trelli_missingness_bar</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co">## Build the missingness bar plot with an omicsData object. Generate trelliData in as.trelliData</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span>trelliData <span class="op">=</span> <span class="va">trelliData2</span>, panel <span class="op">=</span> <span class="st">"Lipid"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span></span>
+<span class="r-in"><span><span class="co">## Build the missingness bar plot with an omicsData object. </span></span></span>
+<span class="r-in"><span><span class="co">## Generate trelliData in as.trelliData</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span>trelliData <span class="op">=</span> <span class="va">trelliData2</span>, panel <span class="op">=</span> <span class="st">"Lipid"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">trelli_missingness_bar</span><span class="op">(</span>test_mode <span class="op">=</span> <span class="cn">TRUE</span>, test_example <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co">## Build the missingness bar plot with a statRes object. Generate trelliData in as.trelliData</span></span></span>
+<span class="r-in"><span><span class="co">## Build the missingness bar plot with a statRes object. </span></span></span>
+<span class="r-in"><span><span class="co">## Generate trelliData in as.trelliData</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span>trelliData <span class="op">=</span> <span class="va">trelliData3</span>, panel <span class="op">=</span> <span class="st">"Lipid"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">trelli_missingness_bar</span><span class="op">(</span>test_mode <span class="op">=</span> <span class="cn">TRUE</span>, test_example <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co">## Build the missingness bar plot with an omicsData and statRes object. Generate trelliData in as.trelliData.</span></span></span>
+<span class="r-in"><span><span class="co">## Build the missingness bar plot with an omicsData and statRes object. </span></span></span>
+<span class="r-in"><span><span class="co">## Generate trelliData in as.trelliData.</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span>trelliData <span class="op">=</span> <span class="va">trelliData4</span>, panel <span class="op">=</span> <span class="st">"Lipid"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">trelli_missingness_bar</span><span class="op">(</span>test_mode <span class="op">=</span> <span class="cn">TRUE</span>, test_example <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span> </span></span>
+<span class="r-in"><span>  <span class="fu">trelli_missingness_bar</span><span class="op">(</span>test_mode <span class="op">=</span> <span class="cn">TRUE</span>, test_example <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co">## Or making the plot interactive </span></span></span>
-<span class="r-in"><span><span class="fu"><a href="trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span>trelliData <span class="op">=</span> <span class="va">trelliData2</span>, panel <span class="op">=</span> <span class="st">"Lipid"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span></span>
-<span class="r-in"><span>   <span class="fu">trelli_missingness_bar</span><span class="op">(</span>test_mode <span class="op">=</span> <span class="cn">TRUE</span>, test_example <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, interactive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-in"><span>   </span></span>
-<span class="r-in"><span><span class="co">## Or visualize only count data </span></span></span>
-<span class="r-in"><span><span class="fu"><a href="trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span>trelliData <span class="op">=</span> <span class="va">trelliData2</span>, panel <span class="op">=</span> <span class="st">"Lipid"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span></span>
-<span class="r-in"><span>   <span class="fu">trelli_missingness_bar</span><span class="op">(</span>test_mode <span class="op">=</span> <span class="cn">TRUE</span>, test_example <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, cognostics <span class="op">=</span> <span class="st">"n"</span>, proportion <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-in"><span>   </span></span>
+<span class="r-in"><span><span class="co">## Or making the plot interactive</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span>trelliData <span class="op">=</span> <span class="va">trelliData2</span>, panel <span class="op">=</span> <span class="st">"Lipid"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
+<span class="r-in"><span>  <span class="fu">trelli_missingness_bar</span><span class="op">(</span>test_mode <span class="op">=</span> <span class="cn">TRUE</span>, test_example <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, interactive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Or visualize only count data</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span>trelliData <span class="op">=</span> <span class="va">trelliData2</span>, panel <span class="op">=</span> <span class="st">"Lipid"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
+<span class="r-in"><span>  <span class="fu">trelli_missingness_bar</span><span class="op">(</span>test_mode <span class="op">=</span> <span class="cn">TRUE</span>, test_example <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, cognostics <span class="op">=</span> <span class="st">"n"</span>, proportion <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

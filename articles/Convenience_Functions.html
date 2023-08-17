@@ -103,7 +103,7 @@
                         <h4 data-toc-skip class="author">Kelly Stratton,
 Lisa Bramer</h4>
             
-            <h4 data-toc-skip class="date">2023-07-05</h4>
+            <h4 data-toc-skip class="date">2023-08-17</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/pmartR/pmartR/blob/HEAD/vignettes/Convenience_Functions.Rmd" class="external-link"><code>vignettes/Convenience_Functions.Rmd</code></a></small>
       <div class="hidden name"><code>Convenience_Functions.Rmd</code></div>
@@ -262,7 +262,7 @@ f_data that contains the names of the samples</li>
 <ul>
 <li>
 <code><a href="../reference/get_group_DF.html">get_group_DF()</a></code> - A data.frame with columns for sample
-ID and group. If two main effects are provided the original main effect
+ID and group. If two main effects are provided, the original main effect
 levels for each sample are returned as the third and fourth columns of
 the data frame. Additionally, the covariates provided will be listed as
 attributes of this data frame. For both <code>mymetab</code> and
@@ -322,11 +322,13 @@ reference pool</li>
 </ul>
 <div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">myiso</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/edata_transform.html">edata_transform</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">isobaric_object</span>, data_scale <span class="op">=</span> <span class="st">"log2"</span><span class="op">)</span></span>
-<span><span class="va">myiso_normalized</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/normalize_isobaric.html">normalize_isobaric</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">myiso</span>, </span>
-<span>                                      exp_cname <span class="op">=</span> <span class="st">"Plex"</span>,</span>
-<span>                                      apply_norm <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>                                      refpool_cname <span class="op">=</span> <span class="st">"Virus"</span>,</span>
-<span>                                      refpool_notation <span class="op">=</span> <span class="st">"Pool"</span><span class="op">)</span></span>
+<span><span class="va">myiso_normalized</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/normalize_isobaric.html">normalize_isobaric</a></span><span class="op">(</span></span>
+<span>  omicsData <span class="op">=</span> <span class="va">myiso</span>,</span>
+<span>  exp_cname <span class="op">=</span> <span class="st">"Plex"</span>,</span>
+<span>  apply_norm <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  refpool_cname <span class="op">=</span> <span class="st">"Virus"</span>,</span>
+<span>  refpool_notation <span class="op">=</span> <span class="st">"Pool"</span></span>
+<span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/get_isobaric_info.html">get_isobaric_info</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">myiso_normalized</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## $exp_cname</span></span>
 <span><span class="co">## [1] "Plex"</span></span>
@@ -383,13 +385,17 @@ before normalization.</li>
 <span><span class="co">## $norm_info$backtransform</span></span>
 <span><span class="co">## [1] NA</span></span></code></pre>
 <div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">mynmr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/edata_transform.html">edata_transform</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">nmr_identified_object</span>, </span>
-<span>                         data_scale <span class="op">=</span> <span class="st">"log2"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">mynmr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/edata_transform.html">edata_transform</a></span><span class="op">(</span></span>
+<span>  omicsData <span class="op">=</span> <span class="va">nmr_identified_object</span>,</span>
+<span>  data_scale <span class="op">=</span> <span class="st">"log2"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Normalization using a "spiked in" metabolite</span></span>
-<span><span class="va">nmr_norm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/normalize_nmr.html">normalize_nmr</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mynmr</span>, apply_norm <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>                           metabolite_name <span class="op">=</span> <span class="st">"unkm1.53"</span>, </span>
-<span>                           backtransform <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">nmr_norm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/normalize_nmr.html">normalize_nmr</a></span><span class="op">(</span></span>
+<span>  omicsData <span class="op">=</span> <span class="va">mynmr</span>, apply_norm <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  metabolite_name <span class="op">=</span> <span class="st">"unkm1.53"</span>,</span>
+<span>  backtransform <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/get_nmr_info.html">get_nmr_info</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">nmr_norm</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## $metabolite_name</span></span>
 <span><span class="co">## [1] "unkm1.53"</span></span>
@@ -416,10 +422,12 @@ before normalization.</li>
 <span><span class="co">## [41] 5.005238</span></span></code></pre>
 <div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Normalization using a sample property</span></span>
-<span><span class="va">nmr_norm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/normalize_nmr.html">normalize_nmr</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mynmr</span>, apply_norm <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>                          sample_property_cname <span class="op">=</span> <span class="st">"Concentration"</span>,</span>
-<span>                          backtransform <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/get_nmr_info.html">get_nmr_info</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">nmr_norm</span><span class="op">)</span>                          </span></code></pre></div>
+<span><span class="va">nmr_norm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/normalize_nmr.html">normalize_nmr</a></span><span class="op">(</span></span>
+<span>  omicsData <span class="op">=</span> <span class="va">mynmr</span>, apply_norm <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  sample_property_cname <span class="op">=</span> <span class="st">"Concentration"</span>,</span>
+<span>  backtransform <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/get_nmr_info.html">get_nmr_info</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">nmr_norm</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## $metabolite_name</span></span>
 <span><span class="co">## NULL</span></span>
 <span><span class="co">## </span></span>
@@ -644,10 +652,12 @@ data have been NMR normalized</li>
 comparisons and their indices</li>
 </ul>
 <div class="sourceCode" id="cb75"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">imd_anova_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/imd_anova.html">imd_anova</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mypro</span>,</span>
-<span>                          test_method <span class="op">=</span> <span class="st">"comb"</span>,</span>
-<span>                          pval_adjust_a_multcomp <span class="op">=</span> <span class="st">"bon"</span>,</span>
-<span>                          pval_adjust_g_multcomp <span class="op">=</span> <span class="st">"bon"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">imd_anova_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/imd_anova.html">imd_anova</a></span><span class="op">(</span></span>
+<span>  omicsData <span class="op">=</span> <span class="va">mypro</span>,</span>
+<span>  test_method <span class="op">=</span> <span class="st">"comb"</span>,</span>
+<span>  pval_adjust_a_multcomp <span class="op">=</span> <span class="st">"bon"</span>,</span>
+<span>  pval_adjust_g_multcomp <span class="op">=</span> <span class="st">"bon"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Joining with `by = join_by(RazorProtein)`</span></span></code></pre>
 <div class="sourceCode" id="cb77"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_comparisons.html">get_comparisons</a></span><span class="op">(</span>compObj <span class="op">=</span> <span class="va">imd_anova_res</span><span class="op">)</span></span></code></pre></div>

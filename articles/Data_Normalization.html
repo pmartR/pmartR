@@ -103,7 +103,7 @@
                         <h4 data-toc-skip class="author">Kelly Stratton,
 Lisa Bramer</h4>
             
-            <h4 data-toc-skip class="date">2023-07-05</h4>
+            <h4 data-toc-skip class="date">2023-08-17</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/pmartR/pmartR/blob/HEAD/vignettes/Data_Normalization.Rmd" class="external-link"><code>vignettes/Data_Normalization.Rmd</code></a></small>
       <div class="hidden name"><code>Data_Normalization.Rmd</code></div>
@@ -155,8 +155,9 @@ function on data that has already been log transformed.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">isobaric_object</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "isobaricpepData" "pepData"</span></span></code></pre>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">isobaric_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/edata_transform.html">edata_transform</a></span><span class="op">(</span><span class="va">isobaric_object</span>, </span>
-<span>                                   data_scale <span class="op">=</span> <span class="st">"log2"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">isobaric_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/edata_transform.html">edata_transform</a></span><span class="op">(</span><span class="va">isobaric_object</span>,</span>
+<span>  data_scale <span class="op">=</span> <span class="st">"log2"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p>There are two ways to specify the information needed for identifying
 reference samples which should be used for normalization:</p>
 <ol style="list-style-type: decimal">
@@ -173,27 +174,27 @@ plex/plate/experiment a sample was run on.</li>
 </ol>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># do not apply the normalization until we have looked at the distribution of peptides within the reference pool samples</span></span>
-<span><span class="va">iso_norm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/normalize_isobaric.html">normalize_isobaric</a></span><span class="op">(</span><span class="va">isobaric_object</span>, </span>
-<span>                               exp_cname <span class="op">=</span> <span class="st">"Plex"</span>,</span>
-<span>                               apply_norm <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>                               refpool_cname <span class="op">=</span> <span class="st">"Virus"</span>,</span>
-<span>                               refpool_notation <span class="op">=</span> <span class="st">"Pool"</span><span class="op">)</span></span>
+<span><span class="va">iso_norm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/normalize_isobaric.html">normalize_isobaric</a></span><span class="op">(</span><span class="va">isobaric_object</span>,</span>
+<span>  exp_cname <span class="op">=</span> <span class="st">"Plex"</span>,</span>
+<span>  apply_norm <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  refpool_cname <span class="op">=</span> <span class="st">"Virus"</span>,</span>
+<span>  refpool_notation <span class="op">=</span> <span class="st">"Pool"</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># look at the distribution of peptides within the reference pool samples</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">iso_norm</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Warning: Removed 625060 rows containing non-finite values</span></span>
-<span><span class="co">## (`stat_boxplot()`).</span></span></code></pre>
+<span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">iso_norm</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Data_Normalization_files/figure-html/specify_refpool-1.png" width="700"></p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># now apply the normalization</span></span>
-<span><span class="va">isobaric_object_normalized</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/normalize_isobaric.html">normalize_isobaric</a></span><span class="op">(</span><span class="va">isobaric_object</span>, </span>
-<span>                               exp_cname <span class="op">=</span> <span class="st">"Plex"</span>,</span>
-<span>                               apply_norm <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>                               refpool_cname <span class="op">=</span> <span class="st">"Virus"</span>,</span>
-<span>                               refpool_notation <span class="op">=</span> <span class="st">"Pool"</span><span class="op">)</span></span>
+<span><span class="va">isobaric_object_normalized</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/normalize_isobaric.html">normalize_isobaric</a></span><span class="op">(</span><span class="va">isobaric_object</span>,</span>
+<span>  exp_cname <span class="op">=</span> <span class="st">"Plex"</span>,</span>
+<span>  apply_norm <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  refpool_cname <span class="op">=</span> <span class="st">"Virus"</span>,</span>
+<span>  refpool_notation <span class="op">=</span> <span class="st">"Pool"</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># look at boxplots of the data after normalization to the reference pool samples</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">isobaric_object_normalized</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">isobaric_object_normalized</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Data_Normalization_files/figure-html/specify_refpool-2.png" width="700"></p>
 <ol start="2" style="list-style-type: decimal">
 <li>Specify the <code>channel_cname</code> and
@@ -205,13 +206,14 @@ channel each sample was run on, and <code>refpool_channel</code> is a
 character string specifying the value in <code>channel_colname</code>
 that corresponds to the reference sample channel.</li>
 </ol>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># not run because this data does not actually contain channel_cname or refpool_channel information</span></span>
-<span><span class="va">iso_norm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/normalize_isobaric.html">normalize_isobaric</a></span><span class="op">(</span><span class="va">isobaric_object</span>, </span>
-<span>                               exp_cname <span class="op">=</span> <span class="st">"Plex"</span>,</span>
-<span>                               apply_norm <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>                               channel_cname <span class="op">=</span> <span class="st">"SampleChannel"</span>, <span class="co"># this column in f_data would specify a number corresponding to the channel for each sample</span></span>
-<span>                               refpool_channel <span class="op">=</span> <span class="fl">4</span><span class="op">)</span> <span class="co"># this value in the SampleChannel column would always correspond to a reference pool sample</span></span></code></pre></div>
+<span><span class="va">iso_norm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/normalize_isobaric.html">normalize_isobaric</a></span><span class="op">(</span><span class="va">isobaric_object</span>,</span>
+<span>  exp_cname <span class="op">=</span> <span class="st">"Plex"</span>,</span>
+<span>  apply_norm <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  channel_cname <span class="op">=</span> <span class="st">"SampleChannel"</span>, <span class="co"># this column in f_data would specify a number corresponding to the channel for each sample</span></span>
+<span>  refpool_channel <span class="op">=</span> <span class="fl">4</span></span>
+<span><span class="op">)</span> <span class="co"># this value in the SampleChannel column would always correspond to a reference pool sample</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level3">
@@ -254,7 +256,7 @@ is specified, the location parameter is the median of the values in
 </ul>
 <p>We’ll use the example NMR dataset from the <code>pmartRdata</code>
 package.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">nmr_identified_object</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##                                    </span></span>
 <span><span class="co">## Class                       nmrData</span></span>
@@ -263,57 +265,61 @@ package.</p>
 <span><span class="co">## Unique Metabolites (e_meta)      38</span></span>
 <span><span class="co">## Missing Observations              0</span></span>
 <span><span class="co">## Proportion Missing                0</span></span></code></pre>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># log2 transform the values</span></span>
 <span><span class="va">nmr_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/edata_transform.html">edata_transform</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">nmr_identified_object</span>, data_scale <span class="op">=</span> <span class="st">"log2"</span><span class="op">)</span></span></code></pre></div>
 <p><strong>Normalize using property of each sample</strong></p>
 <p>We can first create a normRes object and explore the values of the
 sample property to be used for instrument normalization. The figure
 below shows the Concentration values for each sample.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># don't apply the normalization yet</span></span>
 <span><span class="va">normRes_property</span> <span class="op">&lt;-</span></span>
 <span>  <span class="fu"><a href="../reference/normalize_nmr.html">normalize_nmr</a></span><span class="op">(</span><span class="va">nmr_object</span>,</span>
-<span>                apply_norm <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>                sample_property_cname <span class="op">=</span> <span class="st">"Concentration"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">normRes_property</span><span class="op">)</span></span></code></pre></div>
+<span>    apply_norm <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>    sample_property_cname <span class="op">=</span> <span class="st">"Concentration"</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">normRes_property</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Data_Normalization_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
 <p>If we are satisified with using these Concentration values for
 normalization, we can apply the instrument normalization and plot the
 resulting omicsData object.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># now apply the normalization</span></span>
 <span><span class="va">nmr_norm_property</span> <span class="op">&lt;-</span></span>
 <span>  <span class="fu"><a href="../reference/normalize_nmr.html">normalize_nmr</a></span><span class="op">(</span><span class="va">nmr_object</span>,</span>
-<span>                apply_norm <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>                sample_property_cname <span class="op">=</span> <span class="st">"Concentration"</span>,</span>
-<span>                backtransform <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">nmr_norm_property</span><span class="op">)</span></span></code></pre></div>
+<span>    apply_norm <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>    sample_property_cname <span class="op">=</span> <span class="st">"Concentration"</span>,</span>
+<span>    backtransform <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">nmr_norm_property</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Data_Normalization_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
 <p><strong>Normalize using reference metabolite</strong></p>
 <p>We can first create a normRes object and explore the values of the
 reference metabolite to be used for instrument normalization. The figure
 below shows the log2 values of the reference metabolite for each
 sample.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># don't apply the normalization yet</span></span>
 <span><span class="va">normRes_reference</span> <span class="op">&lt;-</span></span>
 <span>  <span class="fu"><a href="../reference/normalize_nmr.html">normalize_nmr</a></span><span class="op">(</span><span class="va">nmr_object</span>,</span>
-<span>                apply_norm <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>                metabolite_name <span class="op">=</span> <span class="st">"unkm1.53"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">normRes_reference</span><span class="op">)</span></span></code></pre></div>
+<span>    apply_norm <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>    metabolite_name <span class="op">=</span> <span class="st">"unkm1.53"</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">normRes_reference</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Data_Normalization_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
 <p>If we are satisified with using these values for normalization, we
 can apply the instrument normalization and plot the resulting omicsData
 object.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># now apply the normalization</span></span>
 <span><span class="va">nmr_norm_reference</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/normalize_nmr.html">normalize_nmr</a></span><span class="op">(</span><span class="va">nmr_object</span>,</span>
-<span>                                    apply_norm <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>                                    metabolite_name <span class="op">=</span> <span class="st">"unkm1.53"</span><span class="op">)</span></span></code></pre></div>
+<span>  apply_norm <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  metabolite_name <span class="op">=</span> <span class="st">"unkm1.53"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## backtransform is set to FALSE. Examine the distribution of your data to ensure this is reasonable.</span></span></code></pre>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">nmr_norm_reference</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">nmr_norm_reference</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Data_Normalization_files/figure-html/unnamed-chunk-5-1.png" width="700"></p>
 </div>
 </div>
@@ -399,17 +405,19 @@ different parameter values.</p>
 <p>When, in preparation for normalizing the data, we use the
 <code><a href="../reference/normalize_global.html">normalize_global()</a></code> function but do not apply the
 normalization, we get back an object of class normRes.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># global median centering - don't apply the norm, show info in the normRes object</span></span>
 <span><span class="va">mypep</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/edata_transform.html">edata_transform</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">pep_object</span>, data_scale <span class="op">=</span> <span class="st">"log2"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">mynorm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/normalize_global.html">normalize_global</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mypep</span>, </span>
-<span>                           subset_fn <span class="op">=</span> <span class="st">"all"</span>, </span>
-<span>                           norm_fn <span class="op">=</span> <span class="st">"median"</span>, </span>
-<span>                           apply_norm <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="va">mynorm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/normalize_global.html">normalize_global</a></span><span class="op">(</span></span>
+<span>  omicsData <span class="op">=</span> <span class="va">mypep</span>,</span>
+<span>  subset_fn <span class="op">=</span> <span class="st">"all"</span>,</span>
+<span>  norm_fn <span class="op">=</span> <span class="st">"median"</span>,</span>
+<span>  apply_norm <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">mynorm</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "normRes"</span></span></code></pre>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># plot(mynorm)</span></span></code></pre></div>
 <p>When we apply the normalization to the data, we get back an omicsData
 object of the same class that we started with. The
@@ -419,17 +427,19 @@ in magnitude to the pre-normalized values. With global median centering,
 this is done by adding back the median of the entire dataset to each
 individual value; this results in boxplots that are no longer centered
 at zero, but rather at the median of the entire dataset.</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># global median centering - apply the norm</span></span>
-<span><span class="va">mypep_norm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/normalize_global.html">normalize_global</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mypep</span>, </span>
-<span>                               subset_fn <span class="op">=</span> <span class="st">"all"</span>, </span>
-<span>                               norm_fn <span class="op">=</span> <span class="st">"median"</span>, </span>
-<span>                               apply_norm <span class="op">=</span> <span class="cn">TRUE</span>, </span>
-<span>                               backtransform <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">mypep_norm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/normalize_global.html">normalize_global</a></span><span class="op">(</span></span>
+<span>  omicsData <span class="op">=</span> <span class="va">mypep</span>,</span>
+<span>  subset_fn <span class="op">=</span> <span class="st">"all"</span>,</span>
+<span>  norm_fn <span class="op">=</span> <span class="st">"median"</span>,</span>
+<span>  apply_norm <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  backtransform <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">mypep_norm</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "pepData"</span></span></code></pre>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mypep_norm</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mypep_norm</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Data_Normalization_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
 <p>When using a subset function other than “all”, additional parameters
 are needed; they have default values or can be set by the user. Here we
@@ -437,21 +447,23 @@ use rank invariant biomolecules (RIP) with a parameter of 0.2. For
 details, see <code><a href="../reference/normalize_global.html">?normalize_global</a></code>. Note that some of the
 subset functions, such as “rip”, require <code>group_designation</code>
 to have been run on the omicsData object.</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># run group_designation</span></span>
 <span><span class="va">mypep</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/group_designation.html">group_designation</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mypep</span>, main_effects <span class="op">=</span> <span class="st">"Phenotype"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># RIP mean centering - don't apply the norm (so we can look at the number of molecules in the subset)</span></span>
-<span><span class="va">mynorm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/normalize_global.html">normalize_global</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mypep</span>, </span>
-<span>                           subset_fn <span class="op">=</span> <span class="st">"rip"</span>, </span>
-<span>                           params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>rip <span class="op">=</span> <span class="op">(</span><span class="fl">0.2</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>                           norm_fn <span class="op">=</span> <span class="st">"median"</span>, </span>
-<span>                           apply_norm <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="va">mynorm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/normalize_global.html">normalize_global</a></span><span class="op">(</span></span>
+<span>  omicsData <span class="op">=</span> <span class="va">mypep</span>,</span>
+<span>  subset_fn <span class="op">=</span> <span class="st">"rip"</span>,</span>
+<span>  params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>rip <span class="op">=</span> <span class="op">(</span><span class="fl">0.2</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  norm_fn <span class="op">=</span> <span class="st">"median"</span>,</span>
+<span>  apply_norm <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># we can see how many biomolecules are included in this subset</span></span>
 <span><span class="va">mynorm</span><span class="op">$</span><span class="va">n_features_calc</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 2746</span></span></code></pre>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mynorm</span><span class="op">$</span><span class="va">prop_features_calc</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 0.1287449</span></span></code></pre>
 <p>If the subset of biomolecules used does not contain a sufficient
@@ -469,46 +481,54 @@ of biomolecules required to apply a normalization. In the following code
 using the LOS (0.1) subset, we would get an error if we included
 <code>min_prop = 0.2</code> because the proportion of biomolecules in
 the specified subset is below that threshold.</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># LOS MAD</span></span>
-<span><span class="va">mynorm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/normalize_global.html">normalize_global</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mypep</span>, </span>
-<span>                           subset_fn <span class="op">=</span> <span class="st">"los"</span>, </span>
-<span>                           params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>los <span class="op">=</span> <span class="op">(</span><span class="fl">0.1</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>                           norm_fn <span class="op">=</span> <span class="st">"mad"</span>, </span>
-<span>                           apply_norm <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="va">mynorm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/normalize_global.html">normalize_global</a></span><span class="op">(</span></span>
+<span>  omicsData <span class="op">=</span> <span class="va">mypep</span>,</span>
+<span>  subset_fn <span class="op">=</span> <span class="st">"los"</span>,</span>
+<span>  params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>los <span class="op">=</span> <span class="op">(</span><span class="fl">0.1</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  norm_fn <span class="op">=</span> <span class="st">"mad"</span>,</span>
+<span>  apply_norm <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
 <span><span class="va">mynorm</span><span class="op">$</span><span class="va">prop_features_calc</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 0.1821933</span></span></code></pre>
 <p>Here we demonstrate how to use the PPP subset and z-score
 normalization function.</p>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># PPP z-score</span></span>
-<span><span class="va">mynorm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/normalize_global.html">normalize_global</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mypep</span>, </span>
-<span>                           subset_fn <span class="op">=</span> <span class="st">"ppp"</span>, </span>
-<span>                           params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>ppp <span class="op">=</span> <span class="op">(</span><span class="fl">0.5</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>                           norm_fn <span class="op">=</span> <span class="st">"zscore"</span>, </span>
-<span>                           apply_norm <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>                           min_prop <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span></span>
+<span><span class="va">mynorm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/normalize_global.html">normalize_global</a></span><span class="op">(</span></span>
+<span>  omicsData <span class="op">=</span> <span class="va">mypep</span>,</span>
+<span>  subset_fn <span class="op">=</span> <span class="st">"ppp"</span>,</span>
+<span>  params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>ppp <span class="op">=</span> <span class="op">(</span><span class="fl">0.5</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  norm_fn <span class="op">=</span> <span class="st">"zscore"</span>,</span>
+<span>  apply_norm <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  min_prop <span class="op">=</span> <span class="fl">0.2</span></span>
+<span><span class="op">)</span></span>
 <span><span class="va">mynorm</span><span class="op">$</span><span class="va">prop_features_calc</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 0.5600825</span></span></code></pre>
 <p>Here we demonstrate how to use the PPP-RIP subset and specify
 parameter values, along with the median normalization function.</p>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># PPP-RIP median</span></span>
-<span><span class="va">mynorm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/normalize_global.html">normalize_global</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mypep</span>, </span>
-<span>                           subset_fn <span class="op">=</span> <span class="st">"ppp_rip"</span>, </span>
-<span>                           params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>ppp <span class="op">=</span> <span class="op">(</span><span class="fl">0.5</span><span class="op">)</span>, rip <span class="op">=</span> <span class="op">(</span><span class="fl">0.2</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>                           norm_fn <span class="op">=</span> <span class="st">"median"</span>, </span>
-<span>                           apply_norm <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="va">mynorm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/normalize_global.html">normalize_global</a></span><span class="op">(</span></span>
+<span>  omicsData <span class="op">=</span> <span class="va">mypep</span>,</span>
+<span>  subset_fn <span class="op">=</span> <span class="st">"ppp_rip"</span>,</span>
+<span>  params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>ppp <span class="op">=</span> <span class="op">(</span><span class="fl">0.5</span><span class="op">)</span>, rip <span class="op">=</span> <span class="op">(</span><span class="fl">0.2</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  norm_fn <span class="op">=</span> <span class="st">"median"</span>,</span>
+<span>  apply_norm <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
 <span><span class="va">mynorm</span><span class="op">$</span><span class="va">prop_features_calc</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 0.4433869</span></span></code></pre>
 <p>Finally, we demonstrate how to use the set of complete biomolecules
 with the mean function.</p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Complete mean</span></span>
-<span><span class="va">mynorm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/normalize_global.html">normalize_global</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mypep</span>, </span>
-<span>                           subset_fn <span class="op">=</span> <span class="st">"complete"</span>, </span>
-<span>                           norm_fn <span class="op">=</span> <span class="st">"mean"</span>, </span>
-<span>                           apply_norm <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="va">mynorm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/normalize_global.html">normalize_global</a></span><span class="op">(</span></span>
+<span>  omicsData <span class="op">=</span> <span class="va">mypep</span>,</span>
+<span>  subset_fn <span class="op">=</span> <span class="st">"complete"</span>,</span>
+<span>  norm_fn <span class="op">=</span> <span class="st">"mean"</span>,</span>
+<span>  apply_norm <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
 <span><span class="va">mynorm</span><span class="op">$</span><span class="va">prop_features_calc</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 0.1581415</span></span></code></pre>
 <p>For proteomics data, or large lipidomics or metabolomics datasets
@@ -518,21 +538,23 @@ determine an appropriate normalization approach. This algorithm ranks
 different combinations of subset and normalization functions based on a
 score that captures how much bias a particular normalization procedure
 introduces into the data. Higher scores imply less bias.</p>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># returns a data frame arranged by descending SPANS score</span></span>
 <span><span class="co"># not run due to long runtime; SPANS plot generated and saved to include in vignette</span></span>
 <span><span class="va">spans_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/spans_procedure.html">spans_procedure</a></span><span class="op">(</span><span class="va">mypep</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">spans_result</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">spans_result</span><span class="op">)</span></span></code></pre></div>
 <p><img src="SPANS_pep.png" width="600px"></p>
 <p>To apply a normalization method after using SPANS, simply use the
 <code>normalize_global</code> function.</p>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">mypep_norm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/normalize_global.html">normalize_global</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mypep</span>, </span>
-<span>                               subset_fn <span class="op">=</span> <span class="st">"all"</span>, </span>
-<span>                               norm_fn <span class="op">=</span> <span class="st">"median"</span>, </span>
-<span>                               apply_norm <span class="op">=</span> <span class="cn">TRUE</span>, </span>
-<span>                               backtransform <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mypep_norm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/normalize_global.html">normalize_global</a></span><span class="op">(</span></span>
+<span>  omicsData <span class="op">=</span> <span class="va">mypep</span>,</span>
+<span>  subset_fn <span class="op">=</span> <span class="st">"all"</span>,</span>
+<span>  norm_fn <span class="op">=</span> <span class="st">"median"</span>,</span>
+<span>  apply_norm <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  backtransform <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level3">
@@ -541,12 +563,12 @@ introduces into the data. Higher scores imply less bias.</p>
 <p>As an alternative to a global normalization, <code>pmartR</code>
 includes a wrapper for the <code>normalizeCyclicLoess</code> <span class="citation">(Bolstad et al. 2003)</span> function from the limma
 package <span class="citation">(Smyth 2005)</span>.</p>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mypep</span>, order_by <span class="op">=</span> <span class="st">"Phenotype"</span>, color_by <span class="op">=</span> <span class="st">"Phenotype"</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mypep</span>, order_by <span class="op">=</span> <span class="st">"Phenotype"</span>, color_by <span class="op">=</span> <span class="st">"Phenotype"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Data_Normalization_files/figure-html/unnamed-chunk-14-1.png" width="700"></p>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mypep_loess</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/normalize_loess.html">normalize_loess</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mypep</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mypep_loess</span>, order_by <span class="op">=</span> <span class="st">"Phenotype"</span>, color_by <span class="op">=</span> <span class="st">"Phenotype"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mypep_loess</span>, order_by <span class="op">=</span> <span class="st">"Phenotype"</span>, color_by <span class="op">=</span> <span class="st">"Phenotype"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Data_Normalization_files/figure-html/unnamed-chunk-14-2.png" width="700"></p>
 </div>
 <div class="section level3">
@@ -558,7 +580,7 @@ the abundance scale (e.g. not a log scale). It is often used for
 microarray data. Note that quantile normalization requires complete
 data. In the example below we use the <code>molecule_filter</code> to
 restrict our data to complete samples.</p>
-<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mymetab</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/edata_transform.html">edata_transform</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">metab_object</span>, data_scale <span class="op">=</span> <span class="st">"log2"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># restrict to complete samples using the molecule filter</span></span>
@@ -566,11 +588,11 @@ restrict our data to complete samples.</p>
 <span><span class="va">nsamps</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_data_info.html">get_data_info</a></span><span class="op">(</span><span class="va">mymetab</span><span class="op">)</span><span class="op">$</span><span class="va">num_samps</span></span>
 <span><span class="va">mymetab</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/applyFilt.html">applyFilt</a></span><span class="op">(</span>filter_object <span class="op">=</span> <span class="va">myfilter</span>, omicsData <span class="op">=</span> <span class="va">mymetab</span>, min_num <span class="op">=</span> <span class="va">nsamps</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mymetab</span>, order_by <span class="op">=</span> <span class="st">"Phenotype"</span>, color_by <span class="op">=</span> <span class="st">"Phenotype"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mymetab</span>, order_by <span class="op">=</span> <span class="st">"Phenotype"</span>, color_by <span class="op">=</span> <span class="st">"Phenotype"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Data_Normalization_files/figure-html/unnamed-chunk-15-1.png" width="700"></p>
-<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mymetab_quantile</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/normalize_quantile.html">normalize_quantile</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mymetab</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mymetab_quantile</span>, order_by <span class="op">=</span> <span class="st">"Phenotype"</span>, color_by <span class="op">=</span> <span class="st">"Phenotype"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mymetab_quantile</span>, order_by <span class="op">=</span> <span class="st">"Phenotype"</span>, color_by <span class="op">=</span> <span class="st">"Phenotype"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Data_Normalization_files/figure-html/unnamed-chunk-15-2.png" width="700"></p>
 <p>It is up to the user to determine whether the normalization
 ultimately applied to the data is appropriate. In the case of the

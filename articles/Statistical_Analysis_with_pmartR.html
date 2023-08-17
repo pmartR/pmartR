@@ -104,7 +104,7 @@
                         <h4 data-toc-skip class="author">Bryan Stanfill,
 Kelly Stratton, Lisa Bramer</h4>
             
-            <h4 data-toc-skip class="date">2023-07-05</h4>
+            <h4 data-toc-skip class="date">2023-08-17</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/pmartR/pmartR/blob/HEAD/vignettes/Statistical_Analysis_with_pmartR.Rmd" class="external-link"><code>vignettes/Statistical_Analysis_with_pmartR.Rmd</code></a></small>
       <div class="hidden name"><code>Statistical_Analysis_with_pmartR.Rmd</code></div>
@@ -117,8 +117,10 @@ Kelly Stratton, Lisa Bramer</h4>
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/pmartR/pmartR" class="external-link">pmartR</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/pmartR/pmartRdata" class="external-link">pmartRdata</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">pep_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/edata_transform.html">edata_transform</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">pep_object</span>, </span>
-<span>                              data_scale <span class="op">=</span> <span class="st">"log2"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">pep_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/edata_transform.html">edata_transform</a></span><span class="op">(</span></span>
+<span>  omicsData <span class="op">=</span> <span class="va">pep_object</span>,</span>
+<span>  data_scale <span class="op">=</span> <span class="st">"log2"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
@@ -160,8 +162,8 @@ function.</p>
 <p>Quantitative tests for differential abundance of pan-omic data are
 accomplished using the function <code>test_method = "anova"</code> or
 <code>test_method = "combined"</code> arguments, which implement an
-analysis of variance (ANOVA) for each biomolecule. <a href="https://cran.r-project.org/web/packages/Rcpp/index.html" class="external-link"><code>Rcpp</code></a>
-is used to speed up computation (<span class="citation">Eddelbuettel
+analysis of variance (ANOVA) for each biomolecule. <a href="https://CRAN.R-project.org/package=Rcpp" class="external-link"><code>Rcpp</code></a> is
+used to speed up computation (<span class="citation">Eddelbuettel
 (2013)</span>) by default, and can be turned off with the
 <code>parallel = FALSE</code> argument. Different ANOVA implementations
 are applied depending on the complexity of the supplied data. For
@@ -195,15 +197,21 @@ categorical variable with three levels: “Phenotype1”, “Phenotype2”, and
 described above and tests for differential abundance between each pair
 of phenotypes for every peptide.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">pep_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/group_designation.html">group_designation</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">pep_object</span>, </span>
-<span>                                main_effects <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Phenotype"</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">pep_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/group_designation.html">group_designation</a></span><span class="op">(</span></span>
+<span>  omicsData <span class="op">=</span> <span class="va">pep_object</span>,</span>
+<span>  main_effects <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Phenotype"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span><span class="va">myfilt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/imdanova_filter.html">imdanova_filter</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">pep_object</span><span class="op">)</span></span>
-<span><span class="va">pep_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/applyFilt.html">applyFilt</a></span><span class="op">(</span>filter_object <span class="op">=</span> <span class="va">myfilt</span>, </span>
-<span>                        omicsData <span class="op">=</span> <span class="va">pep_object</span>, </span>
-<span>                        min_nonmiss_anova <span class="op">=</span> <span class="fl">2</span>, </span>
-<span>                        min_nonmiss_gtest <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
-<span><span class="va">all_pairwise_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/imd_anova.html">imd_anova</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">pep_object</span>, </span>
-<span>                                  test_method <span class="op">=</span> <span class="st">"anova"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">pep_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/applyFilt.html">applyFilt</a></span><span class="op">(</span></span>
+<span>  filter_object <span class="op">=</span> <span class="va">myfilt</span>,</span>
+<span>  omicsData <span class="op">=</span> <span class="va">pep_object</span>,</span>
+<span>  min_nonmiss_anova <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  min_nonmiss_gtest <span class="op">=</span> <span class="fl">3</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">all_pairwise_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/imd_anova.html">imd_anova</a></span><span class="op">(</span></span>
+<span>  omicsData <span class="op">=</span> <span class="va">pep_object</span>,</span>
+<span>  test_method <span class="op">=</span> <span class="st">"anova"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p>The function <code>imd_anova</code> function returns a data frame
 containing:</p>
 <ol style="list-style-type: decimal">
@@ -237,20 +245,26 @@ should be applied are discussed later in this vignette, but the use of
 the Tukey multiple comparison method is illustrated in the
 following.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">all_pairwise_results_adjusted</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/imd_anova.html">imd_anova</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">pep_object</span>, </span>
-<span>                                           test_method <span class="op">=</span> <span class="st">"anova"</span>, </span>
-<span>                                           pval_adjust_a_multcomp <span class="op">=</span> <span class="st">"Tukey"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">all_pairwise_results_adjusted</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/imd_anova.html">imd_anova</a></span><span class="op">(</span></span>
+<span>  omicsData <span class="op">=</span> <span class="va">pep_object</span>,</span>
+<span>  test_method <span class="op">=</span> <span class="st">"anova"</span>,</span>
+<span>  pval_adjust_a_multcomp <span class="op">=</span> <span class="st">"Tukey"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p>By default, all pairwise comparisons are made. Custom comparisons can
 by defined by passing a <code>data.frame</code> to the
 <code>comparisons</code> argument with column names “Test” and
 “Control”. Now, group “Phenotype1” is treated as the control group and
 the remaining groups are compared to it.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">one_vs_all</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>Control<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"Phenotype1"</span>,<span class="fl">2</span><span class="op">)</span>, </span>
-<span>                         Test<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Phenotype2"</span>,<span class="st">"Phenotype3"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">one_vs_all_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/imd_anova.html">imd_anova</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">pep_object</span>, </span>
-<span>                                test_method <span class="op">=</span> <span class="st">"anova"</span>, </span>
-<span>                                comparisons <span class="op">=</span> <span class="va">one_vs_all</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">one_vs_all</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  Control <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"Phenotype1"</span>, <span class="fl">2</span><span class="op">)</span>,</span>
+<span>  Test <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Phenotype2"</span>, <span class="st">"Phenotype3"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">one_vs_all_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/imd_anova.html">imd_anova</a></span><span class="op">(</span></span>
+<span>  omicsData <span class="op">=</span> <span class="va">pep_object</span>,</span>
+<span>  test_method <span class="op">=</span> <span class="st">"anova"</span>,</span>
+<span>  comparisons <span class="op">=</span> <span class="va">one_vs_all</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p>If the grouping variable has only two levels, <span class="math inline">\(m=2\)</span>, then a Welch’s <span class="math inline">\(t\)</span>-test is performed instead of an ANOVA.
 That is, the model defined in Equation (\ref{eq:one_group}) is still
 fit, but the two groups of the grouping factor are allowed to have
@@ -263,10 +277,14 @@ by the Satterthwaite approximate degrees of freedom. To illustrate this
 the data are grouped by “SecondPhenotype”, which has two values, then
 fit with ANOVA.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">pep_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/group_designation.html">group_designation</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">pep_object</span>, </span>
-<span>                                main_effects <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"SecondPhenotype"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">all_pairwise_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/imd_anova.html">imd_anova</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">pep_object</span>, </span>
-<span>                                  test_method <span class="op">=</span> <span class="st">"anova"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">pep_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/group_designation.html">group_designation</a></span><span class="op">(</span></span>
+<span>  omicsData <span class="op">=</span> <span class="va">pep_object</span>,</span>
+<span>  main_effects <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"SecondPhenotype"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">all_pairwise_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/imd_anova.html">imd_anova</a></span><span class="op">(</span></span>
+<span>  omicsData <span class="op">=</span> <span class="va">pep_object</span>,</span>
+<span>  test_method <span class="op">=</span> <span class="st">"anova"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p>When this model is fit, it is imperative the researcher check the
 assumptions of the model. In particular for the <span class="math inline">\(m&gt;2\)</span> case, the residuals <span class="math inline">\(\hat e_{ik}=y_{ik}-\hat \mu_i\)</span> are assumed
 to be independent, normally distributed and have a common variance
@@ -358,20 +376,26 @@ the pair as opposed to each individual member of the pair.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># add fake pair info to f_data using SecondPhenotype</span></span>
 <span><span class="va">pep_object</span><span class="op">$</span><span class="va">f_data</span><span class="op">$</span><span class="va">Pairing</span> <span class="op">&lt;-</span> <span class="va">pep_object</span><span class="op">$</span><span class="va">f_data</span><span class="op">$</span><span class="va">SecondPhenotype</span></span>
-<span><span class="va">pep_object</span><span class="op">$</span><span class="va">f_data</span><span class="op">$</span><span class="va">Pair_ID</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span>, <span class="fl">2</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">5</span><span class="op">:</span><span class="fl">8</span>, <span class="fl">2</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">9</span><span class="op">:</span><span class="fl">12</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">mypaired</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/group_designation.html">group_designation</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">pep_object</span>,</span>
-<span>                              pair_group <span class="op">=</span> <span class="st">"Pairing"</span>,</span>
-<span>                              pair_id <span class="op">=</span> <span class="st">"Pair_ID"</span>,</span>
-<span>                              pair_denom <span class="op">=</span> <span class="st">"B"</span><span class="op">)</span></span>
+<span><span class="va">pep_object</span><span class="op">$</span><span class="va">f_data</span><span class="op">$</span><span class="va">Pair_ID</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span>, <span class="fl">2</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">5</span><span class="op">:</span><span class="fl">8</span>, <span class="fl">2</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">9</span><span class="op">:</span><span class="fl">12</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">mypaired</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/group_designation.html">group_designation</a></span><span class="op">(</span></span>
+<span>  omicsData <span class="op">=</span> <span class="va">pep_object</span>,</span>
+<span>  pair_group <span class="op">=</span> <span class="st">"Pairing"</span>,</span>
+<span>  pair_id <span class="op">=</span> <span class="st">"Pair_ID"</span>,</span>
+<span>  pair_denom <span class="op">=</span> <span class="st">"B"</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">myfilt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/imdanova_filter.html">imdanova_filter</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mypaired</span><span class="op">)</span></span>
-<span><span class="va">mypaired</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/applyFilt.html">applyFilt</a></span><span class="op">(</span>filter_object <span class="op">=</span> <span class="va">myfilt</span>, </span>
-<span>                      omicsData <span class="op">=</span> <span class="va">mypaired</span>, </span>
-<span>                      min_nonmiss_anova <span class="op">=</span> <span class="fl">2</span>,</span>
-<span>                      min_nonmiss_gtest <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
+<span><span class="va">mypaired</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/applyFilt.html">applyFilt</a></span><span class="op">(</span></span>
+<span>  filter_object <span class="op">=</span> <span class="va">myfilt</span>,</span>
+<span>  omicsData <span class="op">=</span> <span class="va">mypaired</span>,</span>
+<span>  min_nonmiss_anova <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  min_nonmiss_gtest <span class="op">=</span> <span class="fl">3</span></span>
+<span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">paired_stats</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/imd_anova.html">imd_anova</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mypaired</span>,</span>
-<span>                          test_method <span class="op">=</span> <span class="st">"anova"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">paired_stats</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/imd_anova.html">imd_anova</a></span><span class="op">(</span></span>
+<span>  omicsData <span class="op">=</span> <span class="va">mypaired</span>,</span>
+<span>  test_method <span class="op">=</span> <span class="st">"anova"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -433,8 +457,10 @@ each group comparison can be adjusted for multiple comparisons using the
 <p>Covariates can also be accounted for in the g-test.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mypep_covariates</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/group_designation.html">group_designation</a></span><span class="op">(</span><span class="va">pep_object</span>, main_effects <span class="op">=</span> <span class="st">"Phenotype"</span>, covariates <span class="op">=</span> <span class="st">"Characteristic"</span><span class="op">)</span></span>
-<span><span class="va">imd_covariates</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/imd_anova.html">imd_anova</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mypep_covariates</span>,</span>
-<span>                            test_method <span class="op">=</span> <span class="st">"gtest"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">imd_covariates</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/imd_anova.html">imd_anova</a></span><span class="op">(</span></span>
+<span>  omicsData <span class="op">=</span> <span class="va">mypep_covariates</span>,</span>
+<span>  test_method <span class="op">=</span> <span class="st">"gtest"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="paired-data-1">Paired Data<a class="anchor" aria-label="anchor" href="#paired-data-1"></a>
@@ -444,20 +470,26 @@ requires a “main effects” designation, unlike the quantitative test
 (ANOVA).</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># add fake pair info to f_data using SecondPhenotype</span></span>
-<span><span class="va">mypaired</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/group_designation.html">group_designation</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">pep_object</span>,</span>
-<span>                              main_effects <span class="op">=</span> <span class="st">"Phenotype"</span>,</span>
-<span>                              pair_group <span class="op">=</span> <span class="st">"Pairing"</span>,</span>
-<span>                              pair_id <span class="op">=</span> <span class="st">"Pair_ID"</span>,</span>
-<span>                              pair_denom <span class="op">=</span> <span class="st">"B"</span><span class="op">)</span></span>
+<span><span class="va">mypaired</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/group_designation.html">group_designation</a></span><span class="op">(</span></span>
+<span>  omicsData <span class="op">=</span> <span class="va">pep_object</span>,</span>
+<span>  main_effects <span class="op">=</span> <span class="st">"Phenotype"</span>,</span>
+<span>  pair_group <span class="op">=</span> <span class="st">"Pairing"</span>,</span>
+<span>  pair_id <span class="op">=</span> <span class="st">"Pair_ID"</span>,</span>
+<span>  pair_denom <span class="op">=</span> <span class="st">"B"</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">myfilt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/imdanova_filter.html">imdanova_filter</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mypaired</span><span class="op">)</span></span>
-<span><span class="va">mypaired</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/applyFilt.html">applyFilt</a></span><span class="op">(</span>filter_object <span class="op">=</span> <span class="va">myfilt</span>, </span>
-<span>                      omicsData <span class="op">=</span> <span class="va">mypaired</span>, </span>
-<span>                      min_nonmiss_anova <span class="op">=</span> <span class="fl">2</span>,</span>
-<span>                      min_nonmiss_gtest <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
+<span><span class="va">mypaired</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/applyFilt.html">applyFilt</a></span><span class="op">(</span></span>
+<span>  filter_object <span class="op">=</span> <span class="va">myfilt</span>,</span>
+<span>  omicsData <span class="op">=</span> <span class="va">mypaired</span>,</span>
+<span>  min_nonmiss_anova <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  min_nonmiss_gtest <span class="op">=</span> <span class="fl">3</span></span>
+<span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">paired_stats</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/imd_anova.html">imd_anova</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mypaired</span>,</span>
-<span>                          test_method <span class="op">=</span> <span class="st">"gtest"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">paired_stats</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/imd_anova.html">imd_anova</a></span><span class="op">(</span></span>
+<span>  omicsData <span class="op">=</span> <span class="va">mypaired</span>,</span>
+<span>  test_method <span class="op">=</span> <span class="st">"gtest"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -538,8 +570,10 @@ statistically significant biomolecules (only available if more than one
 comparison is done)</li>
 </ul>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">stat_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/imd_anova.html">imd_anova</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">pep_object</span>, </span>
-<span>                          test_method <span class="op">=</span> <span class="st">"combined"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">stat_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/imd_anova.html">imd_anova</a></span><span class="op">(</span></span>
+<span>  omicsData <span class="op">=</span> <span class="va">pep_object</span>,</span>
+<span>  test_method <span class="op">=</span> <span class="st">"combined"</span></span>
+<span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">stat_results</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Type of test: combined </span></span>
 <span><span class="co">## </span></span>
@@ -569,10 +603,10 @@ comparison is done)</li>
 <span><span class="co">## 18105             YTYSEWHSFTQPR       2       2 25.21807 25.38213</span></span>
 <span><span class="co">## 18106            YVYDSAFHPDTGEK       3       2 25.07202 24.09574</span></span></code></pre>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">stat_results</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">stat_results</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Statistical_Analysis_with_pmartR_files/figure-html/statres-1.png" width="576"></p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">stat_results</span>, plot_type <span class="op">=</span> <span class="st">"volcano"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">stat_results</span>, plot_type <span class="op">=</span> <span class="st">"volcano"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Statistical_Analysis_with_pmartR_files/figure-html/statres-2.png" width="576"></p>
 </div>
 <div class="section level2">

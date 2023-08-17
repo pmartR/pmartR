@@ -103,7 +103,7 @@
                         <h4 data-toc-skip class="author">Kelly Stratton,
 Lisa Bramer</h4>
             
-            <h4 data-toc-skip class="date">2023-07-05</h4>
+            <h4 data-toc-skip class="date">2023-08-17</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/pmartR/pmartR/blob/HEAD/vignettes/Filter_Functionality.Rmd" class="external-link"><code>vignettes/Filter_Functionality.Rmd</code></a></small>
       <div class="hidden name"><code>Filter_Functionality.Rmd</code></div>
@@ -395,18 +395,19 @@ for this).</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># use the example peptide data with Phenotype as main effect</span></span>
 <span><span class="va">mycvfilt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv_filter.html">cv_filter</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mypep_groups</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mycvfilt</span>, cv_threshold <span class="op">=</span> <span class="fl">97</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mycvfilt</span>, cv_threshold <span class="op">=</span> <span class="fl">97</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Filter_Functionality_files/figure-html/cv%20filter-1.png" width="768"></p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># we get the same graph if we log2 transform our data</span></span>
 <span><span class="va">mypep_groups_log2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/edata_transform.html">edata_transform</a></span><span class="op">(</span><span class="va">mypep_groups</span>, data_scale <span class="op">=</span> <span class="st">"log2"</span><span class="op">)</span></span>
 <span><span class="va">mycvfilt_log2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv_filter.html">cv_filter</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mypep_groups_log2</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mycvfilt_log2</span>, cv_threshold <span class="op">=</span> <span class="fl">97</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mycvfilt_log2</span>, cv_threshold <span class="op">=</span> <span class="fl">97</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Filter_Functionality_files/figure-html/cv%20filter-2.png" width="768"></p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">mycvfilt_log2</span>, cv_threshold <span class="op">=</span> <span class="fl">97</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## </span></span>
-<span><span class="co">## Summary of Coefficient of Variation (CV) Filter</span></span>
+<span><span class="co">## Summary of Coefficient of Variation (CV) </span></span>
+<span><span class="co">## Filter</span></span>
 <span><span class="co">## ----------------------</span></span>
 <span><span class="co">## CVs:</span></span>
 <span><span class="co">## </span></span>
@@ -641,7 +642,7 @@ missing data).</p>
 <p>When plotting the RMD filter, we can specify a p-value threshold</p>
 <div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">myrmdfilt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rmd_filter.html">rmd_filter</a></span><span class="op">(</span><span class="va">mypep_groups_log2</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">myrmdfilt</span>, pvalue_threshold <span class="op">=</span> <span class="fl">0.0001</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">myrmdfilt</span>, pvalue_threshold <span class="op">=</span> <span class="fl">0.0001</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Filter_Functionality_files/figure-html/create%20rmd%20and%20plot-1.png" width="768"></p>
 <p>If we want to look at individual samples, especially if there are
 samples falling above the threshold line, we can do so using the
@@ -649,7 +650,7 @@ following. The colored points on each boxplot correspond to the sample
 that was specified, so we can see where it falls relative to all of the
 other samples.</p>
 <div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">myrmdfilt</span>, sampleID <span class="op">=</span> <span class="st">"Sample_35_Phenotype2_A"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">myrmdfilt</span>, sampleID <span class="op">=</span> <span class="st">"Sample_35_Phenotype2_A"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Filter_Functionality_files/figure-html/rmd%20plot%20individ%20outliers-1.png" width="768"></p>
 </div>
 <div class="section level3">
@@ -752,10 +753,10 @@ contain lower than expected numbers of reads.</p>
 <span><span class="va">myrnafilt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/RNA_filter.html">RNA_filter</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">myseq</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># filter by library size</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">myrnafilt</span>, plot_type <span class="op">=</span> <span class="st">"library"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">myrnafilt</span>, plot_type <span class="op">=</span> <span class="st">"library"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Filter_Functionality_files/figure-html/unnamed-chunk-6-1.png" width="768"></p>
 <div class="sourceCode" id="cb67"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">myrnafilt</span>, plot_type <span class="op">=</span> <span class="st">"library"</span>, size_library <span class="op">=</span> <span class="fl">10000</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">myrnafilt</span>, plot_type <span class="op">=</span> <span class="st">"library"</span>, size_library <span class="op">=</span> <span class="fl">10000</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Filter_Functionality_files/figure-html/unnamed-chunk-6-2.png" width="768"></p>
 <div class="sourceCode" id="cb68"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">myrnafilt</span>, size_library <span class="op">=</span> <span class="fl">10000</span><span class="op">)</span></span></code></pre></div>
@@ -784,7 +785,7 @@ contain lower than expected numbers of reads.</p>
 <span><span class="co">## Proportion Zeros              0.391</span></span></code></pre>
 <div class="sourceCode" id="cb72"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># filter based on number or proportion of non-zero counts</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">myrnafilt</span>, plot_type <span class="op">=</span> <span class="st">"biomolecule"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">myrnafilt</span>, plot_type <span class="op">=</span> <span class="st">"biomolecule"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Filter_Functionality_files/figure-html/unnamed-chunk-6-3.png" width="768"></p>
 <div class="sourceCode" id="cb73"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">myrnafilt</span>, min_nonzero <span class="op">=</span> <span class="fl">5000</span><span class="op">)</span></span></code></pre></div>

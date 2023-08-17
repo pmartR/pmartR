@@ -93,9 +93,9 @@ samples that have the same group membership</p>
     <h2>Arguments</h2>
     <dl><dt>omicsData</dt>
 <dd><p>an object of the class 'pepData', 'proData', 'metabData', or
-'lipidData' usually created 
-by <code><a href="as.pepData.html">as.pepData</a></code>, <code><a href="as.proData.html">as.proData</a></code>, <code><a href="as.metabData.html">as.metabData</a></code>, 
-or <code><a href="as.lipidData.html">as.lipidData</a></code>, respectively.</p></dd>
+'lipidData' usually created
+by <code><a href="as.pepData.html">as.pepData</a></code>, <code><a href="as.proData.html">as.proData</a></code>, 
+<code><a href="as.metabData.html">as.metabData</a></code>, or <code><a href="as.lipidData.html">as.lipidData</a></code>, respectively.</p></dd>
 
 
 <dt>mintR_groupDF</dt>
@@ -103,11 +103,12 @@ or <code><a href="as.lipidData.html">as.lipidData</a></code>, respectively.</p><
 with columns for sample.id and group.</p></dd>
 
 
-<dt>use_singletons</dt>
-<dd><p>logical indicator of whether to include singleton
-groups or not; defaults to FALSE. If FALSE, rmd_filter results are returned
-only for samples in groups of size greater than 1. This is a pass-through
-argument from <code><a href="rmd_filter.html">rmd_filter</a></code>.</p></dd>
+<dt>ignore_singleton_groups</dt>
+<dd><p>logical indicator of whether to remove
+singleton groups or not; defaults to TRUE. A singleton group is a group
+consisting of just a single sample. If TRUE, rmd_filter results are
+returned only for samples in groups of size greater than 1. This is used
+when calculating the correlation.</p></dd>
 
 </dl></div>
     <div id="value">

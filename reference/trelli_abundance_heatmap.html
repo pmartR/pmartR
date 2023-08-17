@@ -150,6 +150,10 @@ is 1.</p></dd>
 <dd><p>A TRUE/FALSE to indicate whether 1 plot (not a
 trelliscope) should be returned. Default is FALSE.</p></dd>
 
+
+<dt>...</dt>
+<dd><p>Additional arguments to be passed on to the trelli builder</p></dd>
+
 </dl></div>
     <div id="author">
     <h2>Author</h2>
@@ -160,18 +164,19 @@ trelliscope) should be returned. Default is FALSE.</p></dd>
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co">## Build the abundance heatmap with an omicsData object with emeta variables. Generate trelliData in as.trelliData.</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span>trelliData <span class="op">=</span> <span class="va">trelliData2</span>, panel <span class="op">=</span> <span class="st">"LipidFamily"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span></span>
-<span class="r-in"><span>   <span class="fu">trelli_abundance_heatmap</span><span class="op">(</span>test_mode <span class="op">=</span> <span class="cn">TRUE</span>, test_example <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span></span></span>
-<span class="r-in"><span>   </span></span>
-<span class="r-in"><span><span class="co">## Users can modify the plotting function with ggplot parameters and interactivity, </span></span></span>
-<span class="r-in"><span><span class="co">## and can also select certain cognostics.     </span></span></span>
-<span class="r-in"><span><span class="fu"><a href="trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span>trelliData <span class="op">=</span> <span class="va">trelliData4</span>, panel <span class="op">=</span> <span class="st">"LipidFamily"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span></span>
-<span class="r-in"><span>   <span class="fu">trelli_abundance_heatmap</span><span class="op">(</span>test_mode <span class="op">=</span> <span class="cn">TRUE</span>, test_example <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, </span></span>
-<span class="r-in"><span>     ggplot_params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ylab('')"</span>, <span class="st">"xlab('')"</span><span class="op">)</span>, interactive <span class="op">=</span> <span class="cn">TRUE</span>, cognostics <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mean"</span>, <span class="st">"median"</span><span class="op">)</span><span class="op">)</span>  </span></span>
-<span class="r-in"><span>   </span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span><span class="co">## Build the abundance heatmap with an omicsData object with emeta variables. </span></span></span>
+<span class="r-in"><span><span class="co">## Generate trelliData in as.trelliData.</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span>trelliData <span class="op">=</span> <span class="va">trelliData2</span>, panel <span class="op">=</span> <span class="st">"LipidFamily"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
+<span class="r-in"><span>  <span class="fu">trelli_abundance_heatmap</span><span class="op">(</span>test_mode <span class="op">=</span> <span class="cn">TRUE</span>, test_example <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Users can modify the plotting function with ggplot parameters and interactivity,</span></span></span>
+<span class="r-in"><span><span class="co">## and can also select certain cognostics.</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span>trelliData <span class="op">=</span> <span class="va">trelliData4</span>, panel <span class="op">=</span> <span class="st">"LipidFamily"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
+<span class="r-in"><span>  <span class="fu">trelli_abundance_heatmap</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    test_mode <span class="op">=</span> <span class="cn">TRUE</span>, test_example <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>,</span></span>
+<span class="r-in"><span>    ggplot_params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ylab('')"</span>, <span class="st">"xlab('')"</span><span class="op">)</span>, interactive <span class="op">=</span> <span class="cn">TRUE</span>, cognostics <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mean"</span>, <span class="st">"median"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
