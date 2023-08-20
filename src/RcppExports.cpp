@@ -88,8 +88,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // group_comparison_anova_cpp
-List group_comparison_anova_cpp(arma::mat means, arma::mat sizes, arma::vec sigma2, arma::mat C);
-RcppExport SEXP _pmartR_group_comparison_anova_cpp(SEXP meansSEXP, SEXP sizesSEXP, SEXP sigma2SEXP, SEXP CSEXP) {
+List group_comparison_anova_cpp(arma::mat means, arma::mat sizes, arma::vec sigma2, arma::mat C, arma::mat red_df);
+RcppExport SEXP _pmartR_group_comparison_anova_cpp(SEXP meansSEXP, SEXP sizesSEXP, SEXP sigma2SEXP, SEXP CSEXP, SEXP red_dfSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -97,7 +97,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::mat >::type sizes(sizesSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type sigma2(sigma2SEXP);
     Rcpp::traits::input_parameter< arma::mat >::type C(CSEXP);
-    rcpp_result_gen = Rcpp::wrap(group_comparison_anova_cpp(means, sizes, sigma2, C));
+    Rcpp::traits::input_parameter< arma::mat >::type red_df(red_dfSEXP);
+    rcpp_result_gen = Rcpp::wrap(group_comparison_anova_cpp(means, sizes, sigma2, C, red_df));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -172,16 +173,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// project_to_null_cpp
-List project_to_null_cpp(arma::mat data_mat, arma::mat Xmatrix, int ngroups);
-RcppExport SEXP _pmartR_project_to_null_cpp(SEXP data_matSEXP, SEXP XmatrixSEXP, SEXP ngroupsSEXP) {
+// remove_covariates_cpp
+arma::mat remove_covariates_cpp(arma::mat data_mat, arma::mat Xmatrix, int ngroups);
+RcppExport SEXP _pmartR_remove_covariates_cpp(SEXP data_matSEXP, SEXP XmatrixSEXP, SEXP ngroupsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< arma::mat >::type data_mat(data_matSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type Xmatrix(XmatrixSEXP);
     Rcpp::traits::input_parameter< int >::type ngroups(ngroupsSEXP);
-    rcpp_result_gen = Rcpp::wrap(project_to_null_cpp(data_mat, Xmatrix, ngroups));
+    rcpp_result_gen = Rcpp::wrap(remove_covariates_cpp(data_mat, Xmatrix, ngroups));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -217,14 +218,14 @@ static const R_CallMethodDef CallEntries[] = {
     {"_pmartR_anova_cpp", (DL_FUNC) &_pmartR_anova_cpp, 4},
     {"_pmartR_two_factor_anova_cpp", (DL_FUNC) &_pmartR_two_factor_anova_cpp, 5},
     {"_pmartR_fold_change_diff_copy", (DL_FUNC) &_pmartR_fold_change_diff_copy, 2},
-    {"_pmartR_group_comparison_anova_cpp", (DL_FUNC) &_pmartR_group_comparison_anova_cpp, 4},
+    {"_pmartR_group_comparison_anova_cpp", (DL_FUNC) &_pmartR_group_comparison_anova_cpp, 5},
     {"_pmartR_holm_cpp", (DL_FUNC) &_pmartR_holm_cpp, 1},
     {"_pmartR_ptukey_speed", (DL_FUNC) &_pmartR_ptukey_speed, 2},
     {"_pmartR_fold_change_diff", (DL_FUNC) &_pmartR_fold_change_diff, 2},
     {"_pmartR_fold_change_ratio", (DL_FUNC) &_pmartR_fold_change_ratio, 2},
     {"_pmartR_fold_change_diff_na_okay", (DL_FUNC) &_pmartR_fold_change_diff_na_okay, 2},
     {"_pmartR_proj_mat_cpp", (DL_FUNC) &_pmartR_proj_mat_cpp, 2},
-    {"_pmartR_project_to_null_cpp", (DL_FUNC) &_pmartR_project_to_null_cpp, 3},
+    {"_pmartR_remove_covariates_cpp", (DL_FUNC) &_pmartR_remove_covariates_cpp, 3},
     {"_pmartR_kw_rcpp", (DL_FUNC) &_pmartR_kw_rcpp, 2},
     {"_pmartR_nonmissing_per_grp", (DL_FUNC) &_pmartR_nonmissing_per_grp, 2},
     {NULL, NULL, 0}

@@ -324,7 +324,7 @@ arma::mat fold_change_diff_copy(arma::mat data, arma::mat C)  {
 }
 
 // [[Rcpp::export]]
-List group_comparison_anova_cpp(arma::mat means, arma::mat sizes, arma::vec sigma2, arma::mat C) {
+List group_comparison_anova_cpp(arma::mat means, arma::mat sizes, arma::vec sigma2, arma::mat C, arma::mat red_df) {
   //Given the group means, group sizes and esimtaes of sigma^2, do all the
   //group comparisons requested.  Returns estimated difference, standard error, t-statistic
   //and p-value
@@ -395,7 +395,7 @@ List group_comparison_anova_cpp(arma::mat means, arma::mat sizes, arma::vec sigm
       //Only compute p-values if the degrees of freedom are atleast 3
       if (arma::is_finite(t_tests(i,k)) && (N - (n_groups - n_na_grps)) > 0) {
         p_values(i,k) = 2*R::pt(fabs(t_tests(i,k)),
-                 (N - (n_groups - n_na_grps)),
+                 (N - (n_groups - n_na_grps) - red_df(i)),
                  false,
                  false);
       }else{
@@ -636,39 +636,45 @@ List proj_mat_cpp(arma::mat X, int ngroups){
   // only version of X. This is equivalent to fitting a regression based on
   // the covariates alone, and then obtaining the residuals (i.e. the residuals
   // are the null projection)
-  X.head_cols(ngroups).zeros();
+  // X.head_cols(ngroups).zeros();
+  
+  arma::mat X_red = X.head_cols(ngroups);
+  arma::mat rPx;
 
+  // Rcout << X_red.size() << " | " << X.size();
+  
   // Moore-Penrose pseudo-inverse, can always (?) be found but takes longer
   Px = pinv(X.t()*X)*X.t();
-
+  rPx = X_red*pinv(X_red.t()*X_red)*X_red.t();
   // Px (below) is the projection matrix that projects onto the columnspace of X
-  Px = X*Px;
+  // Px.head_rows(ngroups).zeros();
+  //Px = X*Px;
   PxRank = rank(Px);
+  
+  //Rcout << accu(Px) << " " << accu(rPx) << "\n";
+  //Rcout << accum(Px - rPx);
   
   // Imax - Px is the projection matrix that projects onto the nullspace of X
   
-  return List::create(Named("Ipx") = Imat-Px,
+  return List::create(Named("Ipx") = Px,
+                      Named("Rpx") = rPx,
                       Named("PxRank") = PxRank);
 }
 
 //-----Project each row of the data.matrix into X's null space-----//
 // [[Rcpp::export]]
-List project_to_null_cpp(arma::mat data_mat, arma::mat Xmatrix, int ngroups){
-
+arma::mat remove_covariates_cpp(arma::mat data_mat, arma::mat Xmatrix, int ngroups){
+  
   arma::mat data_no_x;
   data_no_x = data_mat;
   int i;
   int n = data_mat.n_rows;
   List proj_res;
-  arma::rowvec rowi, rowi_no_x;
-  arma::colvec red_rowi;
-  arma::mat ImPx, Xtemp, ImpxTemp;
+  arma::rowvec rowi, rowi_sub_covars;
+  arma::colvec red_rowi, betas;
+  arma::mat ImPx, Xtemp, ImpxTemp, RpxTemp, effects;
   arma::uvec elems_to_keep;
   arma::uvec row_ind;
-  // vector of integers that represent how many degrees of freedom lost by
-  // correcting for covariates
-  arma::uvec lost_df(n);
-  lost_df.fill(0);
 
   for(i=0;i<n;i++){
 
@@ -680,20 +686,19 @@ List project_to_null_cpp(arma::mat data_mat, arma::mat Xmatrix, int ngroups){
 
     //Compute the projection matrix after removing the rows with missing data
     Xtemp = Xmatrix.rows(elems_to_keep);
-    proj_res = proj_mat_cpp(Xtemp, ngroups);
-    ImpxTemp = as<arma::mat>(proj_res["Ipx"]);;
-    lost_df(i) = as<arma::uword>(proj_res["PxRank"]);
-
-    //Project the data into the null space of Xtemp
-    rowi_no_x = arma::conv_to<arma::rowvec>::from(ImpxTemp*red_rowi);
-
-    //Replace the ith row, finite elements with the projected data
+    arma::mat P = pinv(Xtemp.t()*Xtemp)*Xtemp.t();
+    betas = P*red_rowi;
+    
+    // Find the effect on the response for the covariates
+    effects = Xtemp;
+    effects = effects.cols(ngroups, effects.n_cols - 1);    
+    effects = effects * betas.rows(ngroups, betas.n_rows - 1);
+    
+    rowi_sub_covars = arma::conv_to<arma::rowvec>::from(red_rowi - effects); 
     row_ind = i;
-    data_no_x.submat(row_ind,elems_to_keep) = rowi_no_x;
-
+    data_no_x.submat(row_ind,elems_to_keep) = rowi_sub_covars;
   }
 
-  return List::create(Named("data_no_x") = data_no_x,
-                      Named("lost_df") = lost_df);
+  return data_no_x;
 
 }
