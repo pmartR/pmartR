@@ -936,7 +936,6 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
     # no-op values for things related to covariates if we dont use them
     red_df <- matrix(rep(0, nrow(data)), ncol=1)
     covar_effects <- matrix(0,nrow = nrow(data), ncol=ncol(data))
-    covar_SSE <- matrix(0,nrow = nrow(data), ncol=1)
     covariates <- attr(myobj_covariates, "group_DF")$Group
     xmatrix <- build_x_mat(covariates, intercept = TRUE)
     xmatrix <- reduce_xmatrix(xmatrix,k)
@@ -972,8 +971,20 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
     #source('~/pmartR/R/anova_helper_fun.R') #Run if debugging
     #source('~/pmartR/R/covariate_supp_funs.R')
     #Rcpp::sourceCpp('~/pmartR/src/two_factor_anova.cpp')
-    raw_results <- run_twofactor_cpp(data=data.matrix(data),gpData=groupData,red_df)
-    group_names <- paste("Mean",colnames(raw_results$group_means),sep="_")
+    # add covariates to the group data
+    
+    groupData_aug = groupData 
+    covar_df = attr(attr(omicsData, "group_DF"), "covariates")
+    if (!is.null(covar_df)) {
+      groupData_aug <- groupData_aug %>%
+        dplyr::left_join(covar_df)
+      covar_names = setdiff(colnames(groupData_aug), colnames(groupData))
+    } else {
+      covar_names = NULL
+    }
+    
+    raw_results <- run_twofactor_cpp(data=data.matrix(data),gpData=groupData_aug,red_df, covar_names = covar_names)
+    group_names <- paste("Mean",colnames(raw_results$adj_group_means),sep="_")
   }
   
   #The C++ function returns a list so we need to make it into a data.frame
@@ -1054,26 +1065,35 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
   ))
 }
 
-# Wrapper function for the two factor ANOVA function
-run_twofactor_cpp <- function(data, gpData, red_df) {
-  # Create design matrix for reduced model, i.e., no interaction effect
-  colnames(gpData)[-c(1, 2)] <- c("Factor1", "Factor2")
-  gpData <- cbind(gpData, y = 1:nrow(gpData))
-
-  # Create design matrix for the full model, i.e., all first order and
-  # interaction effects
-  Xred <- unname(model.matrix(lm(y ~ Factor1 + Factor2 - 1, data = gpData)))
-  Xfull <- unname(model.matrix(lm(y ~ Factor1 * Factor2 - 1, data = gpData)))
-
-  # Run the two factor ANOVA model
-  # Edit 2/16: add "group_ids" so C++ knows which groups belong to which columns,
-  # helps with handling NaNs
+#Wrapper function for the two factor ANOVA function
+run_twofactor_cpp <- function(data,gpData,red_df,covar_names){
+  #Create design matrix for reduced model, i.e., no interaction effect
+  group_names = setdiff(colnames(gpData)[-c(1,2)], covar_names) 
+  
+  gpData <- cbind(gpData,y=1:nrow(gpData))  
+  
+  # design matrix for the reduced model (no interactions between main effects)
+  Xred <- model.matrix(lm(y~.-1,data=gpData[,-c(1,2)]))
+  
+  # design matrix for the full model (interaction terms between main effects)
+  rhs =sprintf("%s %s - 1", 
+               paste(group_names, collapse="*"),
+               paste(c("", covar_names), collapse = " + "))
+  full_formula = sprintf("y ~ %s", rhs)
+  Xfull <- model.matrix(lm(full_formula,data=gpData[,-c(1,2)]))
+  
+  covar_inds = which(!(attr(Xred, "assign") %in% c(1,2)))
+  
+  #Run the two factor ANOVA model
+  #Edit 2/16: add "group_ids" so C++ knows which groups belong to which columns,
+  #helps with handling NaNs
   res <- two_factor_anova_cpp(
     data,
     Xfull,
     Xred,
     red_df,
-    group_ids = as.numeric(factor(gpData$Group, levels = unique(gpData$Group)))
+    group_ids=as.numeric(factor(gpData$Group,levels=unique(gpData$Group))),
+    covar_inds
   )
 
   # Get the unique group levels to translate ANOVA parameters into group means
@@ -1082,8 +1102,8 @@ run_twofactor_cpp <- function(data, gpData, red_df) {
 
   means <- res$par_estimates[, 1:length(red_gpData$Group)]
   colnames(means) <- red_gpData$Group
-
-  res$group_means <- means
+  
+  res$adj_group_means <- means
   return(res)
 }
 

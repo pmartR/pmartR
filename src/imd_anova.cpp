@@ -151,7 +151,8 @@ List two_factor_anova_cpp(arma::mat y,
                           arma::mat X_full,
                           arma::mat X_red,
                           NumericVector red_df,
-                          arma::colvec group_ids){
+                          arma::colvec group_ids,
+                          arma::uvec covar_inds){
 
   int i,j;
   int n = y.n_rows;
@@ -198,14 +199,15 @@ List two_factor_anova_cpp(arma::mat y,
     zero_cols = arma::find(csums==0);
     non_zero_cols = arma::find(csums);
 
-    df_red = X_red_nona.n_rows-rank(X_red_nona)-red_df(i); //Subtract off df spent elsewhere, e.g., on covariates
-    df_full = X_full_nona.n_rows-rank(X_full_nona)-red_df(i);
+    df_red = X_red_nona.n_rows-rank(X_red_nona);
+    df_full = X_full_nona.n_rows-rank(X_full_nona);
 
-    PxRed = X_red_nona*pinv(X_red_nona.t()*X_red_nona)*X_red_nona.t();
-    diag_mat.resize(size(PxRed));
-    diag_mat.eye();
+    PxRed = pinv(X_red_nona.t()*X_red_nona)*X_red_nona.t()*yrowi_nona.t();
+    
+    arma::colvec residual_vec = yrowi_nona.t();
+    residual_vec = residual_vec - X_red_nona*PxRed;
 
-    sigma2_red = arma::conv_to<double>::from(yrowi_nona*(diag_mat-PxRed)*yrowi_nona.t()/(df_red));
+    sigma2_red = arma::conv_to<double>::from(residual_vec.t()*residual_vec/df_red);
 
     if((df_red-df_full)<=0){
 
@@ -217,6 +219,21 @@ List two_factor_anova_cpp(arma::mat y,
       diag_mat.resize(size(PxFull));
       diag_mat.eye();
       sigma2_full = arma::conv_to<double>::from(yrowi_nona*(diag_mat-PxFull)*yrowi_nona.t()/(df_full));
+
+      if (i == 1){
+        Rcout << sigma2_full << std::endl;
+      }
+
+      PxFull = pinv(X_full_nona.t()*X_full_nona)*X_full_nona.t()*yrowi_nona.t();
+    
+      arma::colvec residual_vec = yrowi_nona.t();
+      residual_vec = residual_vec - X_full_nona*PxFull;
+
+      sigma2_full = arma::conv_to<double>::from(residual_vec.t()*residual_vec/df_full);
+
+      if (i == 1){
+        Rcout << sigma2_full << std::endl;
+      }
 
       Fstat(i) = (sigma2_red*df_red-sigma2_full*df_full)/sigma2_full;
       pval(i) = R::pf(Fstat(i),df_red-df_full,df_full,0,0);
@@ -234,7 +251,22 @@ List two_factor_anova_cpp(arma::mat y,
     }
 
     //"Parameter estiamtes" are the group means: Xbeta_hat=X(XpX)^{-1}XpY
-    par_ests_temp = XFinal*pinv(XFinal.t()*XFinal)*XFinal.t()*yrowi_nona.t();
+    par_ests_temp = pinv(XFinal.t()*XFinal)*XFinal.t()*yrowi_nona.t();
+
+    if (i == 1) {
+      Rcout << par_ests_temp << std::endl;
+    }
+
+    // Remove covariate effects
+    if(covar_inds.size() > 0) {
+      XFinal.cols(covar_inds-1).zeros();
+    }
+
+    if (i == 1) {
+      Rcout << XFinal << std::endl;
+    }
+
+    par_ests_temp = XFinal * par_ests_temp;
 
     //Find groups that had at least one non-missing value
     group_ids_nona_unq=arma::unique(group_ids_nona);

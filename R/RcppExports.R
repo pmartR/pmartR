@@ -17,8 +17,8 @@ anova_cpp <- function(data, gp, unequal_var, df_red, covar_effects, X, Beta) {
     .Call('_pmartR_anova_cpp', PACKAGE = 'pmartR', data, gp, unequal_var, df_red, covar_effects, X, Beta)
 }
 
-two_factor_anova_cpp <- function(y, X_full, X_red, red_df, group_ids) {
-    .Call('_pmartR_two_factor_anova_cpp', PACKAGE = 'pmartR', y, X_full, X_red, red_df, group_ids)
+two_factor_anova_cpp <- function(y, X_full, X_red, red_df, group_ids, covar_inds) {
+    .Call('_pmartR_two_factor_anova_cpp', PACKAGE = 'pmartR', y, X_full, X_red, red_df, group_ids, covar_inds)
 }
 
 fold_change_diff_copy <- function(data, C) {

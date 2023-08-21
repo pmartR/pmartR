@@ -64,8 +64,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // two_factor_anova_cpp
-List two_factor_anova_cpp(arma::mat y, arma::mat X_full, arma::mat X_red, NumericVector red_df, arma::colvec group_ids);
-RcppExport SEXP _pmartR_two_factor_anova_cpp(SEXP ySEXP, SEXP X_fullSEXP, SEXP X_redSEXP, SEXP red_dfSEXP, SEXP group_idsSEXP) {
+List two_factor_anova_cpp(arma::mat y, arma::mat X_full, arma::mat X_red, NumericVector red_df, arma::colvec group_ids, arma::uvec covar_inds);
+RcppExport SEXP _pmartR_two_factor_anova_cpp(SEXP ySEXP, SEXP X_fullSEXP, SEXP X_redSEXP, SEXP red_dfSEXP, SEXP group_idsSEXP, SEXP covar_indsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -74,7 +74,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::mat >::type X_red(X_redSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type red_df(red_dfSEXP);
     Rcpp::traits::input_parameter< arma::colvec >::type group_ids(group_idsSEXP);
-    rcpp_result_gen = Rcpp::wrap(two_factor_anova_cpp(y, X_full, X_red, red_df, group_ids));
+    Rcpp::traits::input_parameter< arma::uvec >::type covar_inds(covar_indsSEXP);
+    rcpp_result_gen = Rcpp::wrap(two_factor_anova_cpp(y, X_full, X_red, red_df, group_ids, covar_inds));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -210,7 +211,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_pmartR_unpooled_cv_rcpp", (DL_FUNC) &_pmartR_unpooled_cv_rcpp, 1},
     {"_pmartR_count_missing_cpp", (DL_FUNC) &_pmartR_count_missing_cpp, 2},
     {"_pmartR_anova_cpp", (DL_FUNC) &_pmartR_anova_cpp, 7},
-    {"_pmartR_two_factor_anova_cpp", (DL_FUNC) &_pmartR_two_factor_anova_cpp, 5},
+    {"_pmartR_two_factor_anova_cpp", (DL_FUNC) &_pmartR_two_factor_anova_cpp, 6},
     {"_pmartR_fold_change_diff_copy", (DL_FUNC) &_pmartR_fold_change_diff_copy, 2},
     {"_pmartR_group_comparison_anova_cpp", (DL_FUNC) &_pmartR_group_comparison_anova_cpp, 7},
     {"_pmartR_holm_cpp", (DL_FUNC) &_pmartR_holm_cpp, 1},
