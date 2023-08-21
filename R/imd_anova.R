@@ -895,7 +895,10 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
     # in the covariates data frame.
     if (any(is.na(cov_data[, -1]))) {
       warning("Missing values were detected in the provided covariates thus covariates will be ignored")
-      red_df <- matrix(rep(0, nrow(data)), ncol = 1)
+      red_df <- matrix(rep(0, nrow(data)), ncol=1)
+      covar_effects <- matrix(0,nrow = nrow(data), ncol=ncol(data))
+      covar_SSE <- matrix(0,nrow = nrow(data), ncol=1)
+      xmatrix <- build_x_mat(attr(myobj_covariates, "group_DF")$Group, intercept = FALSE)
     } else {
       # Combine main effect and covariate data. We only want two columns from
       # the main effect data frame (groupData). These columns are the sample ID
@@ -909,29 +912,33 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
       cov_samp_col <- which(colnames(covariates)==samp_cname)
       #source('~/pmartR/R/covariate_supp_funs.R') #Run to debug
       xmatrix <- build_x_mat(covariates[,-cov_samp_col], intercept = TRUE) #Build the appropriate X matrix based on the covariates data frame
-      Ng = length(unique(groupData$Group))
+
+      xmatrix <- reduce_xmatrix(xmatrix,k)
       
-      xmatrix <- reduce_xmatrix(xmatrix,Ng)
-      
-      # make xmatrix into intercept model for reduction purposes
-      # xmatrix[,1] <- 1
-      # xmatrix <- xmatrix[,-(Ng+1)]
+      ##Translate the groups into numeric labels for anova_cpp() function
+      gp <- factor(groupData$Group,labels=1:k,levels=unique(groupData$Group))
       
       # Remove effect of covariates
-      data <- remove_covariates_cpp(data.matrix(data),xmatrix,Ng)
-      
+      covar_res <- covariate_adjustment_cpp(data.matrix(data),xmatrix,k, gp)
+      covar_effects <- covar_res[['covar_effects']]
+      covar_SSE <- covar_res[['covar_SSE']]
+
       # use 1 degree of freedom per continuous covariate or K - 1 per categorical covariate with K levels.
-      red_df <- matrix(rep(ncol(xmatrix) - Ng,nrow(data)),ncol=1)
+      red_df <- matrix(rep(ncol(xmatrix) - k,nrow(covar_effects)),ncol=1)
       
+      # rebuild the xmatrix without the intercept for contrasts in downstream functions
+      xmatrix <- build_x_mat(covariates[,-cov_samp_col], intercept = FALSE)
     }
 
     # If covariates are adjusted for, then force equal variance assumption even
     # if there are only two levels to main effect
     equal_var <- TRUE
   } else {
-    # Set the value of reduced degrees of freedom (the degrees of freedom used
-    # up for covariates) to zero because covariates were not used.
-    red_df <- matrix(rep(0, nrow(data)), ncol = 1)
+    # no-op values for things related to covariates if we dont use them
+    red_df <- matrix(rep(0, nrow(data)), ncol=1)
+    covar_effects <- matrix(0,nrow = nrow(data), ncol=ncol(data))
+    covar_SSE <- matrix(0,nrow = nrow(data), ncol=1)
+    xmatrix <- build_x_mat(attr(myobj_covariates, "group_DF")$Group, intercept = FALSE)
   }
 
   # paired t test stuffs -------------------------------------------------------
@@ -950,40 +957,42 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
   # ANOVA stuffs ---------------------------------------------------------------
 
   if (length(attr(get_group_DF(omicsData), "main_effects")) == 1) {
-    ## ---- One factor ANOVA ----##
-
-    ## Translate the groups into numeric labels for anova_cpp() function
-    gp <- factor(groupData$Group, labels = 1:k, levels = unique(groupData$Group))
-
-    # Rcpp::sourceCpp('~/pmartR/src/anova_helper_funs.cpp') #Run if debugging code
-    raw_results <- anova_cpp(data.matrix(data), gp, 1 - equal_var, red_df)
-    group_names <- paste("Mean", as.character(unique(groupData$Group)), sep = "_")
-  } else {
-    ## ---- Two factor ANOVA ----##
-    # source('~/pmartR/R/anova_helper_fun.R') #Run if debugging
-    # source('~/pmartR/R/covariate_supp_funs.R')
-    # Rcpp::sourceCpp('~/pmartR/src/two_factor_anova.cpp')
-    raw_results <- run_twofactor_cpp(data = data.matrix(data), gpData = groupData, red_df)
-    group_names <- paste("Mean", colnames(raw_results$group_means), sep = "_")
+    ##---- One factor ANOVA ----##
+    
+    ##Translate the groups into numeric labels for anova_cpp() function
+    gp <- factor(groupData$Group,labels=1:k,levels=unique(groupData$Group))
+    
+    #Rcpp::sourceCpp('~/pmartR/src/anova_helper_funs.cpp') #Run if debugging code
+    raw_results <- anova_cpp(data.matrix(data),gp,1-equal_var,red_df, covar_effects, covar_SSE)
+    group_names <- paste("Mean",as.character(unique(groupData$Group)),sep="_")
+    
+  }else{
+    ##---- Two factor ANOVA ----##
+    #source('~/pmartR/R/anova_helper_fun.R') #Run if debugging
+    #source('~/pmartR/R/covariate_supp_funs.R')
+    #Rcpp::sourceCpp('~/pmartR/src/two_factor_anova.cpp')
+    raw_results <- run_twofactor_cpp(data=data.matrix(data),gpData=groupData,red_df)
+    group_names <- paste("Mean",colnames(raw_results$group_means),sep="_")
   }
-
-  # The C++ function returns a list so we need to make it into a data.frame
-  results <- data.frame(raw_results$Sigma2, raw_results$group_means, raw_results$Fstats, raw_results$pvalue)
-
-  # Rename the columns to match group names
-  colnames(results) <- c("Variance", group_names, "F_Statistic", "p_value")
-
-  # Pull off edata_cname and add to results df
-  edatacname <- attr(omicsData, "cnames")$edata_cname
-  results <- cbind(omicsData$e_data[edatacname], results)
-
-  ### -------Use group_comparison_anova() to compare the groups that were requested--------------##
-  # source('~/pmartR/R/group_comparison.R') # Run if debugging
-  # Rcpp::sourceCpp('~/pmartR/src/group_comparisons.cpp') #Run if debugging
-  group_comp <- group_comparison_anova(groupData = groupData, comparisons = comparisons, anova_results_full = list(Results = results, Sizes = raw_results$group_sizes))
-
-  # If there are only two levels, replace group_comp p-values with those taken from ANOVA function
-  if (k == 2) {
+  
+  #The C++ function returns a list so we need to make it into a data.frame
+  results <- data.frame(raw_results$Sigma2, raw_results$adj_group_means, raw_results$Fstats, raw_results$pvalue)
+  
+  #Rename the columns to match group names
+  colnames(results) <- c("Variance",group_names,"F_Statistic","p_value")
+  
+  #Pull off edata_cname and add to results df
+  edatacname <- attr(omicsData,"cnames")$edata_cname
+  results <- cbind(omicsData$e_data[edatacname],results)
+  
+  ###-------Use group_comparison_anova() to compare the groups that were requested--------------##
+  #source('~/pmartR/R/group_comparison.R') # Run if debugging
+  #Rcpp::sourceCpp('~/pmartR/src/group_comparisons.cpp') #Run if debugging
+  xmatrix <- reduce_xmatrix(xmatrix,k)
+  group_comp <- group_comparison_anova(groupData=groupData,comparisons=comparisons, xmatrix = xmatrix, anova_results_full=list(Results=results,Sizes=raw_results$group_sizes), red_df = red_df)
+  
+  #If there are only two levels, replace group_comp p-values with those taken from ANOVA function
+  if(k==2){
     group_comp$p_values <- raw_results$pvalue
   }
 
@@ -1104,8 +1113,15 @@ group_comparison_anova <- function(groupData, comparisons, anova_results_full) {
   Cmat_res <- create_c_matrix(group_df = groupData, to_compare_df = comparisons)
 
   Cmat <- Cmat_res$cmat
-  group_comp <- group_comparison_anova_cpp(means, sizes, sigma2, Cmat)
-
+  
+  # pad comparisons with zeros for covariates
+  cdiff <- ncol(xmatrix) - ncol(Cmat)
+  if (cdiff > 0) {
+    Cmat <- cbind(Cmat, matrix(nrow = nrow(Cmat), ncol = cdiff, 0))
+  }
+  
+  group_comp <- group_comparison_anova_cpp(means, sizes, sigma2, xmatrix, Cmat, red_df)
+  
   group_comp$diff_mat <- data.frame(group_comp$diff_mat)
   colnames(group_comp$diff_mat) <- Cmat_res$names
   colnames(group_comp$diff_ses) <- Cmat_res$names
@@ -1929,7 +1945,7 @@ build_x_mat <- function(cov_df, intercept = TRUE){
         
         for(j in 1:(n_levels - intercept)){
           # j + 1 so that we drop the first level
-          Xcoli[cov_df[,i]==coli_levels[j + 1],j] <- 1
+          Xcoli[cov_df[,i]==coli_levels[j + intercept],j] <- 1
         }
         Xmatrix <- cbind(Xmatrix, Xcoli)
       }

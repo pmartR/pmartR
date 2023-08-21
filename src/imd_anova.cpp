@@ -16,7 +16,7 @@ using namespace Rcpp;
 //group sizes and sigma^2 value to do whatever group comparisons the user asks for
 
 // [[Rcpp::export]]
-List anova_cpp(NumericMatrix data, NumericVector gp, int unequal_var, NumericVector df_red) {
+List anova_cpp(NumericMatrix data, NumericVector gp, int unequal_var, NumericVector df_red, NumericMatrix covar_effects, NumericVector covar_sse) {
   //data is the n-by-p matrix of data
   //gp is a vector that identifies what group each column belongs to,
   //  assumed to be numeric 1-m where m is the total number of groups
@@ -32,6 +32,7 @@ List anova_cpp(NumericMatrix data, NumericVector gp, int unequal_var, NumericVec
   NumericVector Fstats(n), p_value(n), sigma2(n); //F-statistic & p-value for each row
   NumericMatrix group_sums(n,m); //matrix to save the group sums in
   NumericMatrix group_means(n,m); //matrix to save the group means in
+  NumericMatrix adj_group_means(n,m); // matrix of means adjusted for covariates
   NumericMatrix group_sizes(n,m);
   NumericVector rowi(m);
   NumericVector rowi_gsize(m); //vector to contain the number of non-na observations
@@ -58,6 +59,7 @@ List anova_cpp(NumericMatrix data, NumericVector gp, int unequal_var, NumericVec
       //Compute group sums by adding each observations that's not an NA
       if(!NumericMatrix::is_na(data(i,j))){
         group_sums(i,groupi) += data(i,j);
+        adj_group_means(i,groupi) += data(i,j) - covar_effects(i,j);
         group_sizes(i,groupi) += 1;
       }
 
@@ -70,6 +72,7 @@ List anova_cpp(NumericMatrix data, NumericVector gp, int unequal_var, NumericVec
     //Translate the group sums into group means for each row
     for(int k=0; k<m; k++){
       group_means(i,k) = group_sums(i,k)/group_sizes(i,k);
+      adj_group_means(i,k) = adj_group_means(i,k)/group_sizes(i,k);
 
       //If an entire group is missing (which shouldn't happen), the number of groups needs to be decreased
       if(group_sizes(i,k)<1){
@@ -108,10 +111,14 @@ List anova_cpp(NumericMatrix data, NumericVector gp, int unequal_var, NumericVec
       for(int j=0; j<p; j++){
         int groupi = gp[j] - 1;
         if(!NumericMatrix::is_na(data(i,j))){
+          // These are now the adjusted group means, so this is no longer the correct SSE
           SSE += pow(data(i,j)-group_means(i,groupi),2);
           SST += pow(data(i,j)-overall_mean,2);
         }
       }
+
+      // SSE -= covar_sse[i]; //Subtract the SSE from the covariates
+
       //Compute F-statistic
       SSB = SST-SSE;
       sigma2(i) = (SSE/(rowi_size-nonmissing_m-df_red(i)));
@@ -124,6 +131,7 @@ List anova_cpp(NumericMatrix data, NumericVector gp, int unequal_var, NumericVec
   }//end iteration over rows
 
   return List::create(Named("group_means") = group_means,
+                      Named("adj_group_means") = adj_group_means,
                       Named("group_sizes") = group_sizes,
                       Named("Sigma2") = sigma2,
                       Named("Fstats") = Fstats,
@@ -324,7 +332,7 @@ arma::mat fold_change_diff_copy(arma::mat data, arma::mat C)  {
 }
 
 // [[Rcpp::export]]
-List group_comparison_anova_cpp(arma::mat means, arma::mat sizes, arma::vec sigma2, arma::mat C, arma::mat red_df) {
+List group_comparison_anova_cpp(arma::mat means, arma::mat sizes, arma::vec sigma2, arma::mat X, arma::mat C, arma::mat red_df) {
   //Given the group means, group sizes and esimtaes of sigma^2, do all the
   //group comparisons requested.  Returns estimated difference, standard error, t-statistic
   //and p-value
@@ -338,7 +346,6 @@ List group_comparison_anova_cpp(arma::mat means, arma::mat sizes, arma::vec sigm
   int n_groups = means.n_cols; //Number of groups
   int n = means.n_rows; //Number of rows (peptides)
   int N = 0; //Total number of observations for rowi;
-  arma::mat XpXInv(n_groups, n_groups); //Matrix used to compute SEs: (X'X)^{-1}
   arma::colvec rowi_means(n_groups), rowi_sizes(n_groups); //Storage for each row of means and sample sizes
 
   //arma::mat diff_mat(n,num_comparisons); //Matrix of comparison means
@@ -354,11 +361,11 @@ List group_comparison_anova_cpp(arma::mat means, arma::mat sizes, arma::vec sigm
   p_values.zeros();
 
   //Compute the differences between means using the fold_change_diff function
-  diff_mat = fold_change_diff_copy(means, C);
+  diff_mat = fold_change_diff_copy(means, C.cols(0,n_groups-1));
+
+  arma::mat XpXInv = pinv(X.t() * X);
 
   for(i=0;i<n;i++){
-    XpXInv.zeros(); //Fill with zeros
-
     // Create a counter that keeps track of the number of groups with all
     // missing data. This value will be used in calculating the degrees of
     // freedom in the R::pt function. For example, if there are three groups but
@@ -366,17 +373,14 @@ List group_comparison_anova_cpp(arma::mat means, arma::mat sizes, arma::vec sigm
     // of groups should be 3 - 1 = 2.
     int n_na_grps = 0;
 
-    //Create (X'X)^{-1} for each row
+    // keep track of the number of missing groups
     for(j=0; j<n_groups; j++){
       if(sizes(i,j)>0){
-        XpXInv(j,j) = 1/sizes(i,j);
         N += sizes(i,j);
       } else {
-
         // Add one to n_na_grps because group j had a count of 0. Which means
         // all samples in the group had missing values.
         n_na_grps++;
-
       }
 
     }
@@ -389,7 +393,7 @@ List group_comparison_anova_cpp(arma::mat means, arma::mat sizes, arma::vec sigm
 
     //Peel off sizes for row i and compute DFs
     rowi_sizes = arma::conv_to<arma::colvec>::from(sizes.row(i));
-    //Rcpp::Rcout << "df_vec = " << df_vec << std::endl;
+
     for(k=0; k<num_comparisons; k++){
 
       //Only compute p-values if the degrees of freedom are atleast 3
@@ -618,63 +622,27 @@ arma::mat fold_change_diff_na_okay(arma::mat data, arma::mat C)  {
 // COVARIATE FUNCTIONS
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-//------Function to construct the null space projection matrix------//
+//-----Get the adjustments to the group means and SSE due to covariates-----//
 // [[Rcpp::export]]
-List proj_mat_cpp(arma::mat X, int ngroups){
-  //If the X matrix has atleast two rows, find projection matrix
-  //into the null space corresponding to X
-
-  int n = X.n_rows;
-  arma::mat Px;
-  arma::mat Imat(n,n);
-  arma::uword PxRank;
-  Imat.eye();
-  
-  // 8/14/23 correction: Set the first ngroups cols of the design matrix
-  // to be 0 so that projection is into the null space of the covariates-
-  // only version of X. This is equivalent to fitting a regression based on
-  // the covariates alone, and then obtaining the residuals (i.e. the residuals
-  // are the null projection)
-  // X.head_cols(ngroups).zeros();
-  
-  arma::mat X_red = X.head_cols(ngroups);
-  arma::mat rPx;
-
-  // Rcout << X_red.size() << " | " << X.size();
-  
-  // Moore-Penrose pseudo-inverse, can always (?) be found but takes longer
-  Px = pinv(X.t()*X)*X.t();
-  rPx = X_red*pinv(X_red.t()*X_red)*X_red.t();
-  // Px (below) is the projection matrix that projects onto the columnspace of X
-  // Px.head_rows(ngroups).zeros();
-  //Px = X*Px;
-  PxRank = rank(Px);
-  
-  //Rcout << accu(Px) << " " << accu(rPx) << "\n";
-  //Rcout << accum(Px - rPx);
-  
-  // Imax - Px is the projection matrix that projects onto the nullspace of X
-  
-  return List::create(Named("Ipx") = Px,
-                      Named("Rpx") = rPx,
-                      Named("PxRank") = PxRank);
-}
-
-//-----Project each row of the data.matrix into X's null space-----//
-// [[Rcpp::export]]
-arma::mat remove_covariates_cpp(arma::mat data_mat, arma::mat Xmatrix, int ngroups){
-  
-  arma::mat data_no_x;
-  data_no_x = data_mat;
+List covariate_adjustment_cpp(arma::mat data_mat, arma::mat Xmatrix, int ngroups, NumericVector gp){
   int i;
   int n = data_mat.n_rows;
-  List proj_res;
-  arma::rowvec rowi, rowi_sub_covars;
+  int p = data_mat.n_cols;  //number of samples
+  int m = max(gp);      //number of groups
+  arma::rowvec rowi;
   arma::colvec red_rowi, betas;
-  arma::mat ImPx, Xtemp, ImpxTemp, RpxTemp, effects;
+  arma::mat effects, Xtemp;
+  arma::mat covar_effects = arma::zeros(n, p);
   arma::uvec elems_to_keep;
   arma::uvec row_ind;
+  
+  arma::uvec lost_df(n);
+  lost_df.fill(0);
+
+  arma::mat covar_vals = Xmatrix.cols(ngroups, Xmatrix.n_cols - 1);
+
+  NumericVector covar_SSE(n); //vector to contain the number of non-na observations
+  NumericMatrix group_sizes(n,m);
 
   for(i=0;i<n;i++){
 
@@ -689,16 +657,55 @@ arma::mat remove_covariates_cpp(arma::mat data_mat, arma::mat Xmatrix, int ngrou
     arma::mat P = pinv(Xtemp.t()*Xtemp)*Xtemp.t();
     betas = P*red_rowi;
     
-    // Find the effect on the response for the covariates
-    effects = Xtemp;
-    effects = effects.cols(ngroups, effects.n_cols - 1);    
-    effects = effects * betas.rows(ngroups, betas.n_rows - 1);
+    // Find the effect on the response for the covariates    
+    effects = covar_vals.rows(elems_to_keep) * betas.rows(ngroups, betas.n_rows - 1);
     
-    rowi_sub_covars = arma::conv_to<arma::rowvec>::from(red_rowi - effects); 
+    // Remove the effect of covariates
     row_ind = i;
-    data_no_x.submat(row_ind,elems_to_keep) = rowi_sub_covars;
-  }
+    covar_effects.submat(row_ind,elems_to_keep) = arma::conv_to<arma::rowvec>::from(effects);
+    
+    // compute group sizes outside the covariates column loop since it doesn't depend on the covariate values
+    for(int j=0; j<p; j++){
+      int groupi = gp[j]-1;
+    
+      if(!NumericMatrix::is_na(data_mat(i,j))){
+        group_sizes(i,groupi) += 1;
+      }
+    }
 
-  return data_no_x;
+    // Store covariate means and counts
+    for(int c=0; c<betas.n_rows - ngroups; c++){
+      // matrix to save the value of covariates in
+      NumericMatrix group_sums(n,m); //matrix to save the group sums in
+      NumericMatrix group_means(n,m); //matrix to save the group means in
+      double SSE_temp = 0;
+
+      for(int j=0; j<p; j++){
+        int groupi = gp[j]-1;
+      
+        if(!NumericMatrix::is_na(data_mat(i,j))){
+          group_sums(i,groupi) += covar_vals(j,c);
+        }
+      }
+
+      //Translate the group sums into group means for each row
+      for(int k=0; k<m; k++){
+        group_means(i,k) = group_sums(i,k)/group_sizes(i,k);
+      }
+      
+      // Compute the squared difference between each observation and the group mean
+      for(int j=0; j<p; j++){
+        int groupi = gp[j]-1;
+        if(!NumericMatrix::is_na(data_mat(i,j))){
+          SSE_temp += pow(covar_vals(j,c)-group_means(i,groupi),2);
+        }
+      }
+      
+      covar_SSE(i) += pow(betas(ngroups + c), 2) * SSE_temp;
+    }
+  }
+    
+  return List::create(Named("covar_effects") = covar_effects,
+                      Named("covar_SSE") = covar_SSE);
 
 }

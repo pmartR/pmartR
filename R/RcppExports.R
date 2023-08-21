@@ -13,8 +13,8 @@ count_missing_cpp <- function(data, gp) {
     .Call('_pmartR_count_missing_cpp', PACKAGE = 'pmartR', data, gp)
 }
 
-anova_cpp <- function(data, gp, unequal_var, df_red) {
-    .Call('_pmartR_anova_cpp', PACKAGE = 'pmartR', data, gp, unequal_var, df_red)
+anova_cpp <- function(data, gp, unequal_var, df_red, covar_effects, covar_sse) {
+    .Call('_pmartR_anova_cpp', PACKAGE = 'pmartR', data, gp, unequal_var, df_red, covar_effects, covar_sse)
 }
 
 two_factor_anova_cpp <- function(y, X_full, X_red, red_df, group_ids) {
@@ -25,8 +25,8 @@ fold_change_diff_copy <- function(data, C) {
     .Call('_pmartR_fold_change_diff_copy', PACKAGE = 'pmartR', data, C)
 }
 
-group_comparison_anova_cpp <- function(means, sizes, sigma2, C, red_df) {
-    .Call('_pmartR_group_comparison_anova_cpp', PACKAGE = 'pmartR', means, sizes, sigma2, C, red_df)
+group_comparison_anova_cpp <- function(means, sizes, sigma2, X, C, red_df) {
+    .Call('_pmartR_group_comparison_anova_cpp', PACKAGE = 'pmartR', means, sizes, sigma2, X, C, red_df)
 }
 
 holm_cpp <- function(ps) {
@@ -49,12 +49,8 @@ fold_change_diff_na_okay <- function(data, C) {
     .Call('_pmartR_fold_change_diff_na_okay', PACKAGE = 'pmartR', data, C)
 }
 
-proj_mat_cpp <- function(X, ngroups) {
-    .Call('_pmartR_proj_mat_cpp', PACKAGE = 'pmartR', X, ngroups)
-}
-
-remove_covariates_cpp <- function(data_mat, Xmatrix, ngroups) {
-    .Call('_pmartR_remove_covariates_cpp', PACKAGE = 'pmartR', data_mat, Xmatrix, ngroups)
+covariate_adjustment_cpp <- function(data_mat, Xmatrix, ngroups, gp) {
+    .Call('_pmartR_covariate_adjustment_cpp', PACKAGE = 'pmartR', data_mat, Xmatrix, ngroups, gp)
 }
 
 kw_rcpp <- function(mtr, group) {
