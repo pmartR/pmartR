@@ -4,7 +4,12 @@
 \alias{print.cvFilt}
 \title{print.cvFilt}
 \usage{
-\method{print}{cvFilt}(filter_object)
+\method{print}{cvFilt}(x, ...)
+}
+\arguments{
+\item{x}{An object of type 'cvFilt'}
+
+\item{...}{further arguments passed to or from other methods}
 }
 \description{
 For printing an S3 object of type 'cvFilt'

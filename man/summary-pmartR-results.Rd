@@ -8,25 +8,18 @@
 \alias{summary.corRes}
 \title{Summary of pmartR Analysis Functions}
 \usage{
-\method{summary}{normRes}(omicsNorm)
+\method{summary}{normRes}(object, ...)
 
-\method{summary}{SPANSRes}(SPANSRes_obj)
+\method{summary}{SPANSRes}(object, ...)
 
-\method{summary}{dimRes}(dimRes_object)
+\method{summary}{dimRes}(object, ...)
 
-\method{summary}{corRes}(corRes_object)
+\method{summary}{corRes}(object, ...)
 }
 \arguments{
-\item{omicsNorm}{object of class normRes, produced by calling
-\code{\link{normalize_global} with option apply_norm=FALSE}}
+\item{object}{object of class corRes}
 
-\item{dimRes_object}{object of class dimRes, which is a list containing
-sample identifiers and the principle components scores}
-
-\item{corRes_object}{object of class corRes}
-
-\item{SPANSres_obj}{object of class SPANSRes created by calling
-\code{\link{spans_procedure}} on a grouped pepData or proData object}
+\item{...}{further arguments passed to or from other methods.}
 }
 \value{
 a summary table or list for the pmartR results object
@@ -51,7 +44,7 @@ dim_results <- dim_reduction(omicsData = mypep)
 summary(dim_results)
 
 cor_results <- cor_result(omicsData = mypep)
-summary(cor_results) 
+summary(cor_results)
 
 }
 \author{

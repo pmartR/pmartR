@@ -14,11 +14,13 @@ imd_test(
   pval_thresh,
   covariates,
   paired,
-  parallel
+  parallel = TRUE
 )
 }
 \arguments{
 \item{omicsData}{A pmartR data object of any class}
+
+\item{groupData}{`data.frame` that assigns sample names to groups}
 
 \item{comparisons}{`data.frame` with columns for "Control" and "Test"
 containing the different comparisons of interest. Comparisons will be made
@@ -39,6 +41,9 @@ peptides are considered differentially expressed. Defaults to 0.05}
 
 \item{covariates}{A character vector with no more than two variable names
 that will be used as covariates in the IMD-ANOVA analysis.}
+
+\item{paired}{A logical value that determines whether paired data should be
+accounted for}
 
 \item{parallel}{A logical value indicating whether or not to use a
 "doParallel" loop when running the G-Test with covariates. The default is

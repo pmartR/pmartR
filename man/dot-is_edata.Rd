@@ -19,6 +19,5 @@ Test if a file is an edata file
 \dontrun{
 
 .is_edata(pmartRdata::lipid_edata)
-
 }
 }

@@ -5,7 +5,7 @@
 \title{Plot isobaricnormRes object}
 \usage{
 \method{plot}{isobaricnormRes}(
-  isobaricnormRes_obj,
+  x,
   order = FALSE,
   interactive = FALSE,
   x_lab = NULL,
@@ -18,11 +18,12 @@
   legend_lab = NULL,
   legend_position = "none",
   bw_theme = TRUE,
-  palette = NULL
+  palette = NULL,
+  ...
 )
 }
 \arguments{
-\item{isobaricnormRes_obj}{an object of type isobaricnormRes, created by
+\item{x}{an object of type isobaricnormRes, created by
 \code{\link{normalize_isobaric}} with apply_norm = FALSE}
 
 \item{order}{logical value. If TRUE the samples will be ordered by the column
@@ -59,6 +60,8 @@ theme.}
 \item{palette}{character string indicating the name of the RColorBrewer
 palette to use. For a list of available options see the details section in
 \code{\link[RColorBrewer]{RColorBrewer}}.}
+
+\item{...}{further arguments passed to or from other methods.}
 }
 \value{
 ggplot2 plot object if interactive is FALSE, or plotly plot object if
@@ -70,10 +73,12 @@ Creates box plots for an S3 object of type 'isobaricnormRes'
 \examples{
 library(pmartRdata)
 myiso <- edata_transform(omicsData = isobaric_object, data_scale = "log2")
-result <- normalize_isobaric(myiso, exp_cname = "Plex",
-                                   apply_norm = FALSE,
-                                   refpool_cname = "Virus",
-                                   refpool_notation = "Pool")
+result <- normalize_isobaric(myiso,
+  exp_cname = "Plex",
+  apply_norm = FALSE,
+  refpool_cname = "Virus",
+  refpool_notation = "Pool"
+)
 plot(result)
 
 }

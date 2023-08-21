@@ -48,8 +48,9 @@ When working with labeled proteomics data, an `isobaricpepData` object should be
 data(isobaric_object)
 class(isobaric_object)
 
-isobaric_object <- edata_transform(isobaric_object, 
-                                   data_scale = "log2")
+isobaric_object <- edata_transform(isobaric_object,
+  data_scale = "log2"
+)
 ```
 
 
@@ -60,21 +61,23 @@ There are two ways to specify the information needed for identifying reference s
 
 ```{r specify_refpool}
 # do not apply the normalization until we have looked at the distribution of peptides within the reference pool samples
-iso_norm <- normalize_isobaric(isobaric_object, 
-                               exp_cname = "Plex",
-                               apply_norm = FALSE,
-                               refpool_cname = "Virus",
-                               refpool_notation = "Pool")
+iso_norm <- normalize_isobaric(isobaric_object,
+  exp_cname = "Plex",
+  apply_norm = FALSE,
+  refpool_cname = "Virus",
+  refpool_notation = "Pool"
+)
 
 # look at the distribution of peptides within the reference pool samples
 plot(iso_norm)
 
 # now apply the normalization
-isobaric_object_normalized <- normalize_isobaric(isobaric_object, 
-                               exp_cname = "Plex",
-                               apply_norm = TRUE,
-                               refpool_cname = "Virus",
-                               refpool_notation = "Pool")
+isobaric_object_normalized <- normalize_isobaric(isobaric_object,
+  exp_cname = "Plex",
+  apply_norm = TRUE,
+  refpool_cname = "Virus",
+  refpool_notation = "Pool"
+)
 
 # look at boxplots of the data after normalization to the reference pool samples
 plot(isobaric_object_normalized)
@@ -84,11 +87,12 @@ plot(isobaric_object_normalized)
 
 ```{r specify_channels, eval = FALSE}
 # not run because this data does not actually contain channel_cname or refpool_channel information
-iso_norm <- normalize_isobaric(isobaric_object, 
-                               exp_cname = "Plex",
-                               apply_norm = FALSE,
-                               channel_cname = "SampleChannel", # this column in f_data would specify a number corresponding to the channel for each sample
-                               refpool_channel = 4) # this value in the SampleChannel column would always correspond to a reference pool sample
+iso_norm <- normalize_isobaric(isobaric_object,
+  exp_cname = "Plex",
+  apply_norm = FALSE,
+  channel_cname = "SampleChannel", # this column in f_data would specify a number corresponding to the channel for each sample
+  refpool_channel = 4
+) # this value in the SampleChannel column would always correspond to a reference pool sample
 ```
 
 
@@ -128,8 +132,9 @@ We can first create a normRes object and explore the values of the sample proper
 # don't apply the normalization yet
 normRes_property <-
   normalize_nmr(nmr_object,
-                apply_norm = FALSE,
-                sample_property_cname = "Concentration")
+    apply_norm = FALSE,
+    sample_property_cname = "Concentration"
+  )
 plot(normRes_property)
 ```
 
@@ -139,9 +144,10 @@ If we are satisified with using these Concentration values for normalization, we
 # now apply the normalization
 nmr_norm_property <-
   normalize_nmr(nmr_object,
-                apply_norm = TRUE,
-                sample_property_cname = "Concentration",
-                backtransform = TRUE)
+    apply_norm = TRUE,
+    sample_property_cname = "Concentration",
+    backtransform = TRUE
+  )
 plot(nmr_norm_property)
 ```
 
@@ -153,8 +159,9 @@ We can first create a normRes object and explore the values of the reference met
 # don't apply the normalization yet
 normRes_reference <-
   normalize_nmr(nmr_object,
-                apply_norm = FALSE,
-                metabolite_name = "unkm1.53")
+    apply_norm = FALSE,
+    metabolite_name = "unkm1.53"
+  )
 plot(normRes_reference)
 ```
 
@@ -163,8 +170,9 @@ If we are satisified with using these values for normalization, we can apply the
 ```{r}
 # now apply the normalization
 nmr_norm_reference <- normalize_nmr(nmr_object,
-                                    apply_norm = TRUE,
-                                    metabolite_name = "unkm1.53")
+  apply_norm = TRUE,
+  metabolite_name = "unkm1.53"
+)
 plot(nmr_norm_reference)
 ```
 
@@ -214,10 +222,12 @@ When, in preparation for normalizing the data, we use the `normalize_global()` f
 # global median centering - don't apply the norm, show info in the normRes object
 mypep <- edata_transform(omicsData = pep_object, data_scale = "log2")
 
-mynorm <- normalize_global(omicsData = mypep, 
-                           subset_fn = "all", 
-                           norm_fn = "median", 
-                           apply_norm = FALSE)
+mynorm <- normalize_global(
+  omicsData = mypep,
+  subset_fn = "all",
+  norm_fn = "median",
+  apply_norm = FALSE
+)
 class(mynorm)
 # plot(mynorm)
 ```
@@ -227,11 +237,13 @@ When we apply the normalization to the data, we get back an omicsData object of 
 
 ```{r}
 # global median centering - apply the norm
-mypep_norm <- normalize_global(omicsData = mypep, 
-                               subset_fn = "all", 
-                               norm_fn = "median", 
-                               apply_norm = TRUE, 
-                               backtransform = TRUE)
+mypep_norm <- normalize_global(
+  omicsData = mypep,
+  subset_fn = "all",
+  norm_fn = "median",
+  apply_norm = TRUE,
+  backtransform = TRUE
+)
 class(mypep_norm)
 plot(mypep_norm)
 ```
@@ -243,16 +255,17 @@ When using a subset function other than "all", additional parameters are needed;
 mypep <- group_designation(omicsData = mypep, main_effects = "Phenotype")
 
 # RIP mean centering - don't apply the norm (so we can look at the number of molecules in the subset)
-mynorm <- normalize_global(omicsData = mypep, 
-                           subset_fn = "rip", 
-                           params = list(rip = (0.2)),
-                           norm_fn = "median", 
-                           apply_norm = FALSE)
+mynorm <- normalize_global(
+  omicsData = mypep,
+  subset_fn = "rip",
+  params = list(rip = (0.2)),
+  norm_fn = "median",
+  apply_norm = FALSE
+)
 
 # we can see how many biomolecules are included in this subset
 mynorm$n_features_calc
 mynorm$prop_features_calc
-
 ```
 
 If the subset of biomolecules used does not contain a sufficient number or proportion, we have less confidence in the normalization and may want to choose a different subset function. As a rule of thumb, we like to see at least 10% of the biomolecules from the normalization-ready dataset utilized in the subset for calculating the normalization parameter(s). If the normalization-ready dataset has fewer than ~200 biomolecules, as is common with LC-MS lipidomics and GC-MS metabolomics, 10% of the biomolecules may still not be enough to have confidence in the normalization, as this is only ~20 biomolecules.
@@ -261,11 +274,13 @@ We can use the `min_prop` argument to the `normalize_global` function to enforce
 
 ```{r}
 # LOS MAD
-mynorm <- normalize_global(omicsData = mypep, 
-                           subset_fn = "los", 
-                           params = list(los = (0.1)),
-                           norm_fn = "mad", 
-                           apply_norm = FALSE)
+mynorm <- normalize_global(
+  omicsData = mypep,
+  subset_fn = "los",
+  params = list(los = (0.1)),
+  norm_fn = "mad",
+  apply_norm = FALSE
+)
 mynorm$prop_features_calc
 ```
 
@@ -273,12 +288,14 @@ Here we demonstrate how to use the PPP subset and z-score normalization function
 
 ```{r}
 # PPP z-score
-mynorm <- normalize_global(omicsData = mypep, 
-                           subset_fn = "ppp", 
-                           params = list(ppp = (0.5)),
-                           norm_fn = "zscore", 
-                           apply_norm = FALSE,
-                           min_prop = 0.2)
+mynorm <- normalize_global(
+  omicsData = mypep,
+  subset_fn = "ppp",
+  params = list(ppp = (0.5)),
+  norm_fn = "zscore",
+  apply_norm = FALSE,
+  min_prop = 0.2
+)
 mynorm$prop_features_calc
 ```
 
@@ -286,11 +303,13 @@ Here we demonstrate how to use the PPP-RIP subset and specify parameter values, 
 
 ```{r}
 # PPP-RIP median
-mynorm <- normalize_global(omicsData = mypep, 
-                           subset_fn = "ppp_rip", 
-                           params = list(ppp = (0.5), rip = (0.2)),
-                           norm_fn = "median", 
-                           apply_norm = FALSE)
+mynorm <- normalize_global(
+  omicsData = mypep,
+  subset_fn = "ppp_rip",
+  params = list(ppp = (0.5), rip = (0.2)),
+  norm_fn = "median",
+  apply_norm = FALSE
+)
 mynorm$prop_features_calc
 ```
 
@@ -298,10 +317,12 @@ Finally, we demonstrate how to use the set of complete biomolecules with the mea
 
 ```{r}
 # Complete mean
-mynorm <- normalize_global(omicsData = mypep, 
-                           subset_fn = "complete", 
-                           norm_fn = "mean", 
-                           apply_norm = FALSE)
+mynorm <- normalize_global(
+  omicsData = mypep,
+  subset_fn = "complete",
+  norm_fn = "mean",
+  apply_norm = FALSE
+)
 mynorm$prop_features_calc
 ```
 
@@ -326,11 +347,13 @@ knitr::include_graphics("SPANS_pep.png")
 To apply a normalization method after using SPANS, simply use the `normalize_global` function.
 
 ```{r}
-mypep_norm <- normalize_global(omicsData = mypep, 
-                               subset_fn = "all", 
-                               norm_fn = "median", 
-                               apply_norm = TRUE, 
-                               backtransform = TRUE)
+mypep_norm <- normalize_global(
+  omicsData = mypep,
+  subset_fn = "all",
+  norm_fn = "median",
+  apply_norm = TRUE,
+  backtransform = TRUE
+)
 ```
 
 

@@ -82,13 +82,13 @@ plot(results, use_VizSampNames = TRUE)
 # match everything after "Sample_"
 pattern1 <- "[0-9]+_[0-9A-Za-z]+_[A-Z]"
 
-results <- custom_sampnames(omicsData = mypep, pattern=pattern1)
-plot(results, use_VizSampNames = TRUE) 
+results <- custom_sampnames(omicsData = mypep, pattern = pattern1)
+plot(results, use_VizSampNames = TRUE)
 
 # match "Sample_" and the number after it
 pattern2 <- "^Sample_[0-9]+"
- 
-results <- custom_sampnames(omicsData = mypep, pattern=pattern2)
+
+results <- custom_sampnames(omicsData = mypep, pattern = pattern2)
 plot(results, use_VizSampNames = TRUE)
 
 }

@@ -8,17 +8,18 @@ run_group_meancor(omicsData, mintR_groupDF, ignore_singleton_groups = TRUE)
 }
 \arguments{
 \item{omicsData}{an object of the class 'pepData', 'proData', 'metabData', or
-'lipidData' usually created 
-by \code{\link{as.pepData}}, \code{\link{as.proData}}, \code{\link{as.metabData}}, 
-or \code{\link{as.lipidData}}, respectively.}
+'lipidData' usually created
+by \code{\link{as.pepData}}, \code{\link{as.proData}}, 
+\code{\link{as.metabData}}, or \code{\link{as.lipidData}}, respectively.}
 
 \item{mintR_groupDF}{data.frame created by \code{\link{group_designation}}
 with columns for sample.id and group.}
 
-\item{use_singletons}{logical indicator of whether to include singleton
-groups or not; defaults to FALSE. If FALSE, rmd_filter results are returned
-only for samples in groups of size greater than 1. This is a pass-through
-argument from \code{\link{rmd_filter}}.}
+\item{ignore_singleton_groups}{logical indicator of whether to remove
+singleton groups or not; defaults to TRUE. A singleton group is a group
+consisting of just a single sample. If TRUE, rmd_filter results are
+returned only for samples in groups of size greater than 1. This is used
+when calculating the correlation.}
 }
 \value{
 data.frame with two elements: Sample.ID, a character vector giving

@@ -14,22 +14,35 @@
 \usage{
 applyFilt(filter_object, omicsData, ...)
 
-\method{applyFilt}{moleculeFilt}(filter_object, omicsData, min_num = 2)
+\method{applyFilt}{moleculeFilt}(filter_object, omicsData, min_num = 2, ...)
 
-\method{applyFilt}{totalCountFilt}(filter_object, omicsData, min_count)
+\method{applyFilt}{totalCountFilt}(filter_object, omicsData, min_count, ...)
 
-\method{applyFilt}{RNAFilt}(filter_object, omicsData, min_nonzero = NULL, size_library = NULL)
+\method{applyFilt}{RNAFilt}(
+  filter_object,
+  omicsData,
+  min_nonzero = NULL,
+  size_library = NULL,
+  ...
+)
 
-\method{applyFilt}{cvFilt}(filter_object, omicsData, cv_threshold = 150)
+\method{applyFilt}{cvFilt}(filter_object, omicsData, cv_threshold = 150, ...)
 
 \method{applyFilt}{rmdFilt}(
   filter_object,
   omicsData,
   pvalue_threshold = 1e-04,
-  min_num_biomolecules = 50
+  min_num_biomolecules = 50,
+  ...
 )
 
-\method{applyFilt}{proteomicsFilt}(filter_object, omicsData, min_num_peps = NULL, redundancy = FALSE)
+\method{applyFilt}{proteomicsFilt}(
+  filter_object,
+  omicsData,
+  min_num_peps = NULL,
+  redundancy = FALSE,
+  ...
+)
 
 \method{applyFilt}{imdanovaFilt}(
   filter_object,
@@ -37,10 +50,11 @@ applyFilt(filter_object, omicsData, ...)
   comparisons = NULL,
   min_nonmiss_anova = NULL,
   min_nonmiss_gtest = NULL,
-  remove_singleton_groups = TRUE
+  remove_singleton_groups = TRUE,
+  ...
 )
 
-\method{applyFilt}{customFilt}(filter_object, omicsData)
+\method{applyFilt}{customFilt}(filter_object, omicsData, ...)
 }
 \arguments{
 \item{filter_object}{an object of the class 'cvFilt', 'proteomicsFilt',
@@ -57,6 +71,8 @@ usually created by \code{\link{as.pepData}}, \code{\link{as.proData}},
 \code{\link{as.nmrData}}, or \code{\link{as.seqData}}, respectively.}
 
 \item{...}{further arguments}
+
+\item{min_num, min_count, min_nonzero, size_library, cv_threshold, pvalue_threshold, min_num_biomolecules, min_num_peps, redundancy, comparisons, min_nonmiss_anova, min_nonmiss_gtest, remove_singleton_groups}{Arguments that depend on the class of \code{filter_object}, see details.}
 }
 \value{
 An object of the class \code{pepData}, \code{proData},
@@ -66,9 +82,9 @@ An object of the class \code{pepData}, \code{proData},
 }
 \description{
 This function takes a filter object of class 'cvFilt', 'rmdFilt',
-  'moleculeFilt', 'proteomicsFilt', 'imdanovaFilt', 'RNAFilt', 'totalCountFilt', 
-  or 'customFilt' and  applies the filter to a dataset of \code{pepData}, 
-  \code{proData}, \code{lipidData}, \code{metabData}, \code{nmrData} or 
+  'moleculeFilt', 'proteomicsFilt', 'imdanovaFilt', 'RNAFilt', 'totalCountFilt',
+  or 'customFilt' and  applies the filter to a dataset of \code{pepData},
+  \code{proData}, \code{lipidData}, \code{metabData}, \code{nmrData} or
   \code{seqData}.
 }
 \details{
@@ -85,7 +101,7 @@ Further arguments can be specified depending on the class of the
   coefficient of variation (CV) threshold for the biomolecules. Biomolecules
   with CV greater than this threshold will be filtered. Default threshold is
   150. \cr }
-  
+
   For a \code{filter_object} of type 'rmdFilt': \tabular{ll}{
   \code{pvalue_threshold} \tab numeric value between 0 and 1, specifying the
   p-value below which samples will be removed from the dataset. Default is
@@ -93,7 +109,7 @@ Further arguments can be specified depending on the class of the
   (preferably greater than 50) that specifies the minimum number of
   biomolecules that must be present in order to create an rmdFilt object.
   Using values less than 50 is not advised. \cr }
-  
+
   For a \code{filter_object} of type 'proteomicsFilt' either or both of the
   following can be applied: \tabular{ll}{ \code{min_num_peps} \tab an
   optional integer value between 1 and the maximum number of peptides that
@@ -104,7 +120,7 @@ Further arguments can be specified depending on the class of the
   \code{redundancy} \tab logical indicator of whether to filter out
   degenerate/redundant peptides (peptides that map to more than one protein).
   Default value is FALSE. \cr }
-  
+
   For a \code{filter_object} of type 'imdanovaFilt': \tabular{ll}{
   \code{min_nonmiss_anova} \tab integer value specifying the minimum number
   of non-missing feature values allowed per group for \code{anova_filter}.
@@ -132,14 +148,20 @@ Further arguments can be specified depending on the class of the
 library(pmartRdata)
 to_filter <- molecule_filter(omicsData = pep_object)
 summary(to_filter, min_num = 2)
-pep_object2 <- applyFilt(filter_object = to_filter,
-                         omicsData = pep_object, min_num = 2)
-summary(pep_object2) # number of Peptides is as expected based on summary of the filter object that was applied
-pep_object2 <- group_designation(omicsData = pep_object2, main_effects = "Phenotype")
+pep_object2 <- applyFilt(
+  filter_object = to_filter,
+  omicsData = pep_object, min_num = 2
+)
+summary(pep_object2) # number of Peptides is as expected based on summary of 
+                     # the filter object that was applied
+pep_object2 <- group_designation(omicsData = pep_object2,
+                                 main_effects = "Phenotype")
 to_filter2 <- imdanova_filter(omicsData = pep_object2)
-pep_object3 <- applyFilt(filter_object = to_filter2,
-                         omicsData = pep_object2,
-                         min_nonmiss_anova = 3)
+pep_object3 <- applyFilt(
+  filter_object = to_filter2,
+  omicsData = pep_object2,
+  min_nonmiss_anova = 3
+)
 
 }
 \seealso{

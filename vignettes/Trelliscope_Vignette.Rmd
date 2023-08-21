@@ -107,8 +107,10 @@ trelliData1 <- as.trelliData.edata(
   data_scale_original = "abundance",
   data_scale = "log2",
   normalization_fun = "global",
-  normalization_params = list(subset_fn = "all", norm_fn = "median", apply_norm = TRUE,
-    backtransform = TRUE)
+  normalization_params = list(
+    subset_fn = "all", norm_fn = "median", apply_norm = TRUE,
+    backtransform = TRUE
+  )
 )
 ```
 
@@ -117,7 +119,7 @@ to panel the data by. The `?summary` function provides a quick overview of
 potential plots that can be made.
 
 ```{r}
-summary(trelliData1) 
+summary(trelliData1)
 ```
 
 With only an e_data file, there are only two potential options for panel by variables, 
@@ -134,7 +136,7 @@ have two options in this case, so a summary for plots where each panel is the
 biomolecule (edata_cname = "Lipid") looks like this:
 
 ```{r}
-summary(trelliData1 %>% trelli_panel_by("Lipid")) 
+summary(trelliData1 %>% trelli_panel_by("Lipid"))
 ```
 
 which is the above table subsetted down to the only options available to plot
@@ -142,16 +144,20 @@ right now. The typical trelliscope parameters look like this:
 
 ```{r, echo = FALSE}
 data.frame(
-  "Parameter Name" = c("cognostics", "ggplot_params", "interactive", "path", 
-                       "name", "test_mode", "test_example", "single_plot"),
-  "Description" = c("Set the specific cognostics of the trelliscope. Varies per plotting function.", 
-                    "Pass parameters to the ggplot functions as a list of strings",
-                    "Indicate whether plots should be interactive or not", 
-                    "The path where the trelliscope will be outputted to",
-                    "Name of the trelliscope display",
-                    "Indicate whether the trelliscope should be subsetted to a few panels or not",
-                    "The panels to subset the trelliscope to if test_mode is true",
-                    "Output a single plot instead of a trelliscope display")
+  "Parameter Name" = c(
+    "cognostics", "ggplot_params", "interactive", "path",
+    "name", "test_mode", "test_example", "single_plot"
+  ),
+  "Description" = c(
+    "Set the specific cognostics of the trelliscope. Varies per plotting function.",
+    "Pass parameters to the ggplot functions as a list of strings",
+    "Indicate whether plots should be interactive or not",
+    "The path where the trelliscope will be outputted to",
+    "Name of the trelliscope display",
+    "Indicate whether the trelliscope should be subsetted to a few panels or not",
+    "The panels to subset the trelliscope to if test_mode is true",
+    "Output a single plot instead of a trelliscope display"
+  )
 ) %>% knitr::kable()
 ```
 
@@ -188,15 +194,17 @@ a "Lipid" example and on the right, a "Sample" example, with the color changed
 to avoid confusion. 
 
 ```{r}
-# Panel by Mass Tag ID  
+# Panel by Mass Tag ID
 MassGroups <- trelli_panel_by(trelliData1, "Lipid")
 # Panel by Sample
-SampleGroups <- trelliData1 %>% trelli_panel_by("Sample") 
-# Create an example boxplot 
+SampleGroups <- trelliData1 %>% trelli_panel_by("Sample")
+# Create an example boxplot
 Abun_Box_Edata <- trelli_abundance_boxplot(MassGroups, single_plot = TRUE, test_example = 3)
-# Make an abundance boxplot without the points 
-Abun_Box_Sample <- trelli_abundance_boxplot(SampleGroups, include_points = F, single_plot = T,
-                                            ggplot_params = "scale_fill_manual(values = 'forestgreen')")
+# Make an abundance boxplot without the points
+Abun_Box_Sample <- trelli_abundance_boxplot(SampleGroups,
+  include_points = F, single_plot = T,
+  ggplot_params = "scale_fill_manual(values = 'forestgreen')"
+)
 # Use patchwork to put plots together
 Abun_Box_Edata + Abun_Box_Sample
 ```
@@ -224,15 +232,17 @@ pep_trelliData <- as.trelliData.edata(
   edata_cname = "Peptide",
   omics_type = "pepData"
 )
-# Create an example bar plot 
-Miss_Bar_Edata <- trelli_missingness_bar(trelli_panel_by(pep_trelliData, "Peptide"), 
-                                         single_plot = TRUE, test_example = 3,
-                                         ggplot_params = "ggtitle('Biomolecule')")
-# Make a missingness barplot 
-Miss_Bar_Sample <- trelli_missingness_bar(trelli_panel_by(pep_trelliData, "Sample"), 
-                                          include_points = F, 
-                                          proportion = FALSE, single_plot = T,
-                                          ggplot_params = "ggtitle('Sample')")
+# Create an example bar plot
+Miss_Bar_Edata <- trelli_missingness_bar(trelli_panel_by(pep_trelliData, "Peptide"),
+  single_plot = TRUE, test_example = 3,
+  ggplot_params = "ggtitle('Biomolecule')"
+)
+# Make a missingness barplot
+Miss_Bar_Sample <- trelli_missingness_bar(trelli_panel_by(pep_trelliData, "Sample"),
+  include_points = F,
+  proportion = FALSE, single_plot = T,
+  ggplot_params = "ggtitle('Sample')"
+)
 # Put plots together with patchwork
 Miss_Bar_Edata + Miss_Bar_Sample
 ```
@@ -247,24 +257,28 @@ isobaric and nmr data) can be passed to the `as.trelliData` function which requi
 either an omicsData or statRes object. 
 
 ```{r}
-# Pull the lipids data frame 
+# Pull the lipids data frame
 lipids <- pmartRdata::lipid_pos_object
 # Extract and add lipid family information
-lipids$e_meta$Family <- lipids$e_meta$Lipid %>% 
-  strsplit("(", fixed = T) %>% 
-  lapply(function(x) {head(x, 1)}) %>% 
+lipids$e_meta$Family <- lipids$e_meta$Lipid %>%
+  strsplit("(", fixed = T) %>%
+  lapply(function(x) {
+    head(x, 1)
+  }) %>%
   unlist()
-# Log transform the edata file 
+# Log transform the edata file
 lipids <- edata_transform(omicsData = lipids, data_scale = "log2")
-# Set the group designation main effects 
+# Set the group designation main effects
 lipids <- group_designation(omicsData = lipids, main_effects = c("Virus"))
 # Filter the data to run the imd_anova
 imdanova_Filt <- imdanova_filter(omicsData = lipids)
-lipids <- applyFilt(filter_object = imdanova_Filt, omicsData = lipids, min_nonmiss_anova=2)
-# Normalize the data. You may use the Kruskal-Wallis test from normRes_tests to 
-# confirm that your normalization choice does not induce nor remove significance. 
-lipids <- normalize_global(lipids, subset_fn = "rip", norm_fn = "median", 
-                             apply_norm = TRUE, backtransform = TRUE)
+lipids <- applyFilt(filter_object = imdanova_Filt, omicsData = lipids, min_nonmiss_anova = 2)
+# Normalize the data. You may use the Kruskal-Wallis test from normRes_tests to
+# confirm that your normalization choice does not induce nor remove significance.
+lipids <- normalize_global(lipids,
+  subset_fn = "rip", norm_fn = "median",
+  apply_norm = TRUE, backtransform = TRUE
+)
 # Create trelliData object
 trelliData2 <- as.trelliData(omicsData = lipids)
 ```
@@ -288,8 +302,8 @@ The group_designation variables are utilized in the abundance boxplot when panel
 by edata_cname ("Lipid")...
 
 ```{r}
-trelliData2 %>% 
-  trelli_panel_by("Lipid") %>% 
+trelliData2 %>%
+  trelli_panel_by("Lipid") %>%
   trelli_abundance_boxplot(test_example = 3, single_plot = T, ggplot_params = "xlab('Viral Strain')")
 ```
 
@@ -297,8 +311,8 @@ trelliData2 %>%
 Note that group_designation is used if included: 
 
 ```{r}
-trelliData2 %>% 
-  trelli_panel_by("Family") %>% 
+trelliData2 %>%
+  trelli_panel_by("Family") %>%
   trelli_abundance_boxplot(test_example = 6, single_plot = T)
 ```
 
@@ -315,8 +329,8 @@ Once again, group_designation data is used if included, even if the panel_by
 variable is an e_meta variable. 
 
 ```{r}
-trelliData2 %>% 
-  trelli_panel_by("Family") %>% 
+trelliData2 %>%
+  trelli_panel_by("Family") %>%
   trelli_missingness_bar(test_example = 3, single_plot = T)
 ```
 
@@ -328,8 +342,8 @@ biomolecule class, and the other axis is the samples in order by the "group_by"
 designation.
 
 ```{r}
-trelliData2 %>% 
-  trelli_panel_by("Family") %>% 
+trelliData2 %>%
+  trelli_panel_by("Family") %>%
   trelli_abundance_heatmap(test_example = 2, single_plot = T, ggplot_params = "coord_flip()")
 ```
 
@@ -340,7 +354,7 @@ To get a statRes object, pass your transformed, filtered, and normalized data to
 the `?imd_anova` function. 
 
 ```{r}
-# Since nothing is missing from this dataset, there is no need to run the G-test. 
+# Since nothing is missing from this dataset, there is no need to run the G-test.
 lipidStats <- imd_anova(lipids, test_method = "anova")
 # Pass that dataframe to the trelliData object builder
 trelliData3 <- as.trelliData(statRes = lipidStats)
@@ -432,14 +446,17 @@ To make tweaks to the ggplot objects, pass the commands as strings in a list.
 For example: 
 
 ```{r}
-trelliData2 %>% 
-  trelli_panel_by("Lipid") %>% 
-  trelli_abundance_boxplot(test_example = 3, single_plot = T,
-    ggplot_params = c("ggtitle('CYC Human')", 
-                      "ylab('Log Adjusted Abundance')",
-                      "xlab('')", "theme_classic()", 
-                      "theme(plot.title = ggplot2::element_text(hjust = 0.5))",
-                      "theme(legend.position = 'none')")                       
+trelliData2 %>%
+  trelli_panel_by("Lipid") %>%
+  trelli_abundance_boxplot(
+    test_example = 3, single_plot = T,
+    ggplot_params = c(
+      "ggtitle('CYC Human')",
+      "ylab('Log Adjusted Abundance')",
+      "xlab('')", "theme_classic()",
+      "theme(plot.title = ggplot2::element_text(hjust = 0.5))",
+      "theme(legend.position = 'none')"
+    )
   )
 ```
 
@@ -447,26 +464,27 @@ Below is the a list of common functions and what they do.
 
 ```{r, echo = FALSE}
 data.frame(
-  Function = c("xlab('Name')", "ylab('Name')", "ggtitle('Name')", 
-               "xlim(c(0,1))", "ylim(c(0,1))",
-               "coord_flip()",
-               "theme(axis.title.x = ggplot2::element_text(size=16))",
-               "theme(axis.title.y = ggplot2::element_text(size=16))",
-               "theme(axis.text.x = element_text(size=12))",
-               "theme(axis.text.y = element_text(size=12))",
-               "theme(axis.text.x = element_text(angle=90))",
-               "theme(axis.text.y = element_text(angle=90))",
-               "theme(plot.title = element_text(size=30))"
-               ),
-  Purpose = c("Rename x-axis label", "Rename y-axis label", "Rename plot",
-              "Set the x-axis limits", "Set the y-axis limits",
-              "Flip x- and y-axis",
-              "Resize x-axis title", "Resize y-axis title",
-              "Resize x-axis ticks", "Resize y-axis ticks",
-              "Rotate x-axis ticks", "Rotate y-axis ticks",
-              "Change plot title size"
-              )
-  
+  Function = c(
+    "xlab('Name')", "ylab('Name')", "ggtitle('Name')",
+    "xlim(c(0,1))", "ylim(c(0,1))",
+    "coord_flip()",
+    "theme(axis.title.x = ggplot2::element_text(size=16))",
+    "theme(axis.title.y = ggplot2::element_text(size=16))",
+    "theme(axis.text.x = element_text(size=12))",
+    "theme(axis.text.y = element_text(size=12))",
+    "theme(axis.text.x = element_text(angle=90))",
+    "theme(axis.text.y = element_text(angle=90))",
+    "theme(plot.title = element_text(size=30))"
+  ),
+  Purpose = c(
+    "Rename x-axis label", "Rename y-axis label", "Rename plot",
+    "Set the x-axis limits", "Set the y-axis limits",
+    "Flip x- and y-axis",
+    "Resize x-axis title", "Resize y-axis title",
+    "Resize x-axis ticks", "Resize y-axis ticks",
+    "Rotate x-axis ticks", "Rotate y-axis ticks",
+    "Change plot title size"
+  )
 ) %>% knitr::kable()
 ```
 
@@ -477,8 +495,8 @@ For a list of other ggplot functions, [click here](https://ggplot2.tidyverse.org
 Every plot has an interactive option by making interactive=TRUE. 
 
 ```{r}
-trelliData2 %>% 
-  trelli_panel_by("Lipid") %>% 
+trelliData2 %>%
+  trelli_panel_by("Lipid") %>%
   trelli_abundance_boxplot(test_example = 3, single_plot = T, interactive = T)
 ```
 
@@ -491,18 +509,22 @@ you could set cognostics to c("mean", "median").
 
 ```{r, echo = FALSE}
 data.frame(
- Functions = c("trelli_abundance_boxplot", "trelli_abundance_histogram", 
-               "trelli_abundance_heatmap", "trelli_missingness_bar",
-               "trelli_foldchange_bar", "trelli_foldchange_boxplot",
-               "trelli_foldchange_heatmap", "trelli_foldchange_volcano"),
- Cognostics = c("n, mean, median, sd, skew, p_value, fold_change", 
-                "n, mean, median, sd, skew, p_value, fold_change",
-                "n, mean, median, sd, skew",
-                "n, proportion",
-                "fold_change, p_value",
-                "n, median, mean, sd",
-                "n, median, mean, sd",
-                "n")
+  Functions = c(
+    "trelli_abundance_boxplot", "trelli_abundance_histogram",
+    "trelli_abundance_heatmap", "trelli_missingness_bar",
+    "trelli_foldchange_bar", "trelli_foldchange_boxplot",
+    "trelli_foldchange_heatmap", "trelli_foldchange_volcano"
+  ),
+  Cognostics = c(
+    "n, mean, median, sd, skew, p_value, fold_change",
+    "n, mean, median, sd, skew, p_value, fold_change",
+    "n, mean, median, sd, skew",
+    "n, proportion",
+    "fold_change, p_value",
+    "n, median, mean, sd",
+    "n, median, mean, sd",
+    "n"
+  )
 ) %>% knitr::kable()
 ```
 

@@ -4,10 +4,12 @@
 \alias{plot.customFilt}
 \title{Plot customFilt Object}
 \usage{
-\method{plot}{customFilt}(filter_object)
+\method{plot}{customFilt}(x, ...)
 }
 \arguments{
-\item{filter_object}{An object of class customFilt.}
+\item{x}{An object of class customFilt.}
+
+\item{...}{further arguments passed to or from other methods.}
 }
 \description{
 Currently plotting a customFilt object is not supported

@@ -21,7 +21,9 @@ anova_test(
 \arguments{
 \item{omicsData}{A pmartR data object of any class}
 
-\item{comparisons}{data.frame with columns for "Control" and "Test"
+\item{groupData}{`data.frame` that assigns sample names to groups}
+
+\item{comparisons}{`data.frame` with columns for "Control" and "Test"
 containing the different comparisons of interest. Comparisons will be made
 between the Test and the corresponding Control  If left NULL, then all
 pairwise comparisons are executed.}

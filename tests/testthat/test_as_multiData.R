@@ -1,7 +1,7 @@
 source(system.file('testdata', 'load_data.R', package = 'pmartR'), local = TRUE)
 
 f_meta <- data.frame(
-  "Proteins" = c(paste0("Mock", 1:3), paste0("Infection", c(1:7)), NA,  "Infection9"),
+  "Proteins" = c(paste0("Mock", 1:3), paste0("Infection", c(1:7)), NA, "Infection9"),
   "Lipids" = c(paste0("Mock", 1:3), paste0("Infection", c(1:4)), NA, paste0("Infection", c(6:9))),
   "Metabolites" = c(paste0("Mock", 1:3), paste0("Infection", c(1:9))),
   "Condition" = c(rep("A", 3), rep("B", 9))
@@ -9,7 +9,7 @@ f_meta <- data.frame(
 
 # fmeta where the Lipids column is bad
 bad_fmeta1 <- data.frame(
-  "Proteins" = c(paste0("Mock", 1:3), paste0("Infection", c(1:7)), NA,  "Infection9"),
+  "Proteins" = c(paste0("Mock", 1:3), paste0("Infection", c(1:7)), NA, "Infection9"),
   "Lipids" = c(paste0("Mock", 1:3), paste0("Infection", c(1:3)), NA, NA, paste0("Infection", c(6:9))),
   "Metabolites" = c(paste0("Mock", 1:3), paste0("Infection", c(1:9))),
   "Condition" = c(rep("A", 3), rep("B", 9))
@@ -36,7 +36,7 @@ mdata_auto_fmeta_noarr = as.multiData(metab_object_proc, lipid_object_proc, pro_
 mdata_noarr_sint = as.multiData(metab_object_proc, lipid_object_proc, pro_object_proc, auto_fmeta = TRUE, match_samples = F, sample_intersect = TRUE)
 mdata_grouped = as.multiData(metab_grouped, lipid_grouped, pro_grouped, auto_fmeta = TRUE, sample_intersect = TRUE, keep_sample_info = TRUE)
 
-obj_list = list(mdata_man_fmeta1 , mdata_man_fmeta2, mdata_auto_fmeta, mdata_auto_fmeta_sinter, mdata_grouped)
+obj_list = list(mdata_man_fmeta1, mdata_man_fmeta2, mdata_auto_fmeta, mdata_auto_fmeta_sinter, mdata_grouped)
 
 test_that("Bad input throws error", {
   # objects with different log2/normalization
@@ -56,9 +56,9 @@ test_that("Bad input throws error", {
 })
 
 test_that("multiData attributes are aligned with <object>$omicsData", {
-  for(obj in obj_list) {
+  for (obj in obj_list) {
     matches = pmartR:::fmeta_matches(obj$omicsData, obj$f_meta)
-    for(i in 1:length(matches)) {
+    for (i in 1:length(matches)) {
       fdata_cname = get_fdata_cname(obj$omicsData[[i]])
       # The i-th fmeta_samp_cname should be a match for the i-th object's sample ID's
       expect_true(attributes(obj)$fmeta_samp_cname[i] %in% matches[[i]])
@@ -68,9 +68,9 @@ test_that("multiData attributes are aligned with <object>$omicsData", {
 
 test_that("multiData options produce expected output", {
   na_inds_counts <- function(x) {
-    na_rows = which(rowSums(is.na(x$f_meta[,attr(x, "fmeta_samp_cname")])) > 0)
+    na_rows = which(rowSums(is.na(x$f_meta[, attr(x, "fmeta_samp_cname")])) > 0)
     row_unique_counts = sapply(1:(nrow(x$f_meta) - length(na_rows)), function(i) {
-      length(unique(unlist(x$f_meta[i,]))) == 1
+      length(unique(unlist(x$f_meta[i, ]))) == 1
     })
     return(list("nas" = na_rows, "runq" = row_unique_counts))
   }

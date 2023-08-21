@@ -4,7 +4,12 @@
 \alias{print.RNAFilt}
 \title{print.RNAFilt}
 \usage{
-\method{print}{RNAFilt}(filter_object)
+\method{print}{RNAFilt}(x, ...)
+}
+\arguments{
+\item{x}{An object of type 'RNAFilt'}
+
+\item{...}{further arguments passed to or from other methods}
 }
 \description{
 For printing an S3 object of type 'RNAFilt'

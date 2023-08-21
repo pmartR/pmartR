@@ -22,10 +22,8 @@
 #'
 #' @author Bryan Stanfill
 #'
-surv_designation <- function(omicsData, t_death, t_progress=NULL, ind_death, ind_progress=NULL, covariates = NULL){
-  
-  attr(omicsData,"surv_DF") <- list(t_death = t_death, t_progress = t_progress, ind_death = ind_death, ind_progress = ind_progress, covariates = covariates)
-  
+surv_designation <- function(omicsData, t_death, t_progress = NULL, ind_death, ind_progress = NULL, covariates = NULL) {
+  attr(omicsData, "surv_DF") <- list(t_death = t_death, t_progress = t_progress, ind_death = ind_death, ind_progress = ind_progress, covariates = covariates)
+
   return(omicsData)
-  
-} 
+}

@@ -4,7 +4,12 @@
 \alias{print.normRes}
 \title{print.normRes}
 \usage{
-\method{print}{normRes}(normRes)
+\method{print}{normRes}(x, ...)
+}
+\arguments{
+\item{x}{An object of type 'normRes'}
+
+\item{...}{further arguments passed to or from other methods}
 }
 \description{
 For printing an S3 object of type 'normRes'

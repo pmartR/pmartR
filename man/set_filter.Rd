@@ -7,13 +7,14 @@
 set_filter(type, threshold, filtered, method)
 }
 \arguments{
-\item{threshold}{}
+\item{type}{The type of filter, see \code{filter_objects.R}}
 
-\item{filtered}{}
+\item{threshold}{The threshold for filtering applied, if applicable.}
 
-\item{filter_type}{}
+\item{filtered}{The samples/biomolecules that are filtered.}
 
-\item{filter_method}{}
+\item{method}{A list of metadata about what method was used in applying the 
+filter.}
 }
 \value{
 A list containing all the elements in the filters attribute:
@@ -25,3 +26,4 @@ the same elements but not all of them will be used for every filter type. This
 object will be appended to the list in the filters attribute for an omicsData
 object.
 }
+\keyword{internal}

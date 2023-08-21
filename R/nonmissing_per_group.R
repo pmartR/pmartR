@@ -18,8 +18,7 @@
 #'
 #' @author Lisa Bramer, Kelly Stratton
 #'
-nonmissing_per_group <- function (omicsData) {
-
+nonmissing_per_group <- function(omicsData) {
   # Extract the ID column.
   id_col <- which(names(omicsData$e_data) == get_edata_cname(omicsData))
 
@@ -56,13 +55,16 @@ nonmissing_per_group <- function (omicsData) {
   # Count the number of nonmissing values per group. The output is a matrix with
   # the number of observations down the rows and the number of unique groups
   # across the columns.
-  nonmissing <- nonmissing_per_grp(as.matrix(edata),
-                                   group_dat)
+  nonmissing <- nonmissing_per_grp(
+    as.matrix(edata),
+    group_dat
+  )
 
   # Add the biomolecule IDs to the group counts.
   nonmiss_totals <- data.frame(as.character(omicsData$e_data[, id_col]),
-                               nonmissing,
-                               stringsAsFactors = FALSE)
+    nonmissing,
+    stringsAsFactors = FALSE
+  )
 
   # Rename the columns according to the edata_cname in omicsData and the names
   # in the group_DF attribute. The order of the names in group_dat will always
@@ -71,7 +73,8 @@ nonmissing_per_group <- function (omicsData) {
   names(nonmiss_totals) <- c(get_edata_cname(omicsData), unique(group_dat))
 
 
-  return (list(group_sizes = tot_samps,
-               nonmiss_totals = nonmiss_totals))
-
+  return(list(
+    group_sizes = tot_samps,
+    nonmiss_totals = nonmiss_totals
+  ))
 }

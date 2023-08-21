@@ -17,6 +17,9 @@ probability/frequency of a zero signature}
 
 \item{max_proteoforms}{a numeric value corresponding to the maximum threshold
 for the number of possible proteoforms}
+
+\item{parallel}{a logical indicator of whether the calculation will be
+parallelized}
 }
 \value{
 a list of data frames, one for each unique protein. The data frames
@@ -41,22 +44,27 @@ The result of this function can be used as one the \code{isoformRes}
 \dontrun{
 library(pmartRdata)
 
-mypepData <- group_designation(omicsData = pep_object,
-                               main_effects = c("Phenotype"))
+mypepData <- group_designation(
+  omicsData = pep_object,
+  main_effects = c("Phenotype")
+)
 mypepData = edata_transform(omicsData = mypepData, data_scale = "log2")
 
 imdanova_Filt <- imdanova_filter(omicsData = mypepData)
-mypepData <- applyFilt(filter_object = imdanova_Filt,
-                       omicsData = mypepData,
-                       min_nonmiss_anova=2)
+mypepData <- applyFilt(
+  filter_object = imdanova_Filt,
+  omicsData = mypepData,
+  min_nonmiss_anova = 2
+)
 
-imd_anova_res <- imd_anova(omicsData = mypepData,
-                           test_method = 'combined',
-                           pval_adjust_a_multcomp ='bon',
-                           pval_adjust_g_multcomp = 'bon')
+imd_anova_res <- imd_anova(
+  omicsData = mypepData,
+  test_method = 'combined',
+  pval_adjust_a_multcomp = 'bon',
+  pval_adjust_g_multcomp = 'bon'
+)
 
 result = bpquant(statRes = imd_anova_res, pepData = mypepData)
-
 }
 
 }

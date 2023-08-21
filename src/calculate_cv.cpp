@@ -205,10 +205,10 @@ std::list<double> unpooled_cv_rcpp(NumericMatrix mtr)
   double tempcv = 0;
   
   // Loop through each row of the input matrix to calculate the CV.
-  for (unsigned int i = 0; i < mtr.nrow(); i++) {
+  for (int i = 0; i < mtr.nrow(); i++) {
     
     // Loop through each column of the ith row in the input matrix.
-    for (unsigned int j = 0; j < mtr.ncol(); j++) {
+    for (int j = 0; j < mtr.ncol(); j++) {
       
       // Remove any NaNs from the vector.
       if (ISNAN(mtr(i, j))) {

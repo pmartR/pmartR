@@ -11,7 +11,7 @@ group_comparison_anova(groupData, comparisons, anova_results_full)
 
 \item{comparisons}{dataframe that defiens the comparsions of interest}
 
-\item{anova_results}{results of the pmartR::anova_test() function}
+\item{anova_results_full}{results of the \code{pmartR::anova_test()} function}
 }
 \value{
 A data.frame containing the p-values from the group comparisons.

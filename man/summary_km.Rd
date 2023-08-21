@@ -10,6 +10,8 @@ summary_km(omicsData, percent = NULL, ...)
 \item{omicsData}{A pmartR data object of any class, which has a `group_df` attribute that is usually created by the `group_designation()` function}
 
 \item{percent}{The percentile}
+
+\item{...}{extra arguments passed to regexpr if pattern is specified}
 }
 \value{
 if `percent` is provided then the time at which that probability of death is returned; else, the summary of the `survival` object is returned
@@ -21,11 +23,12 @@ surv_designation, and gives a summary of the results.
 \examples{
 \dontrun{
 library(OvarianPepdataBP)
-attr(tcga_ovarian_pepdata_bp,"survDF") <- list(t_death = "survival_time",ind_death = "vital_status")
-#No percent is provided so the entire object is returned
+attr(tcga_ovarian_pepdata_bp, "survDF") <- list(t_death = "survival_time",
+                                                ind_death = "vital_status")
+# No percent is provided so the entire object is returned
 summary_km(tcga_ovarian_pepdata_bp)
 
-#Percent is provided so corresponding time point is returned
+# Percent is provided so corresponding time point is returned
 summary_km(tcga_ovarian_pepdata_bp, .4)
 }
 

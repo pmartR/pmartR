@@ -58,6 +58,8 @@ is 1.}
 
 \item{single_plot}{A TRUE/FALSE to indicate whether 1 plot (not a
 trelliscope) should be returned. Default is FALSE.}
+
+\item{...}{Additional arguments to be passed on to the trelli builder}
 }
 \description{
 Specify a plot design and cognostics for the fold_change volcano
@@ -70,7 +72,6 @@ Specify a plot design and cognostics for the fold_change volcano
 ## Build fold_change bar plot with statRes data grouped by edata_colname.
 trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") \%>\% 
   trelli_foldchange_volcano(comparison = "StrainA_vs_StrainB")
-
 }
 
 }

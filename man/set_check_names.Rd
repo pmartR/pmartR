@@ -20,6 +20,6 @@ omicsData object with updated check.names attribute
 }
 \description{
 \emph{This function sets the check.names attribute of an omicsData object.}
-\bold{This function has been deprecated in favor of handling checking names 
+\bold{This function has been deprecated in favor of handling checking names
 externally and will return an unmodified omicsData.}
 }

@@ -5,14 +5,15 @@
 \title{IMD-ANOVA Filter Summary}
 \usage{
 \method{summary}{imdanovaFilt}(
-  filter_object,
+  object,
   min_nonmiss_anova = NULL,
   min_nonmiss_gtest = NULL,
-  comparisons = NULL
+  comparisons = NULL,
+  ...
 )
 }
 \arguments{
-\item{filter_object}{S3 object of class 'imdanovaFilt' created by
+\item{object}{S3 object of class 'imdanovaFilt' created by
 \code{\link{imdanova_filter}}.}
 
 \item{min_nonmiss_anova}{integer value specifying the minimum number of
@@ -27,6 +28,8 @@ Defaults to NULL. Suggested value is 3.}
 containing the different comparisons of interest. Comparisons will be made
 between the Test and the corresponding Control (e.g. Control is the
 reference group).}
+
+\item{...}{further arguments passed to or from other methods}
 }
 \value{
 If min_nonmiss_gtest or min_nonmiss_anova is specified, the number of
@@ -39,7 +42,7 @@ Provide summary of a imdanovaFilt S3 object
 library(pmartRdata)
 mypep <- group_designation(omicsData = pep_object, main_effects = "Phenotype")
 myfilt <- imdanova_filter(omicsData = mypep)
-summary(filter_object = myfilt, min_nonmiss_anova = 2, min_nonmiss_gtest = 3)
+summary(myfilt, min_nonmiss_anova = 2, min_nonmiss_gtest = 3)
 
 }
 \seealso{

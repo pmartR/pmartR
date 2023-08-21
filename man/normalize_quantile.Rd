@@ -34,7 +34,7 @@ The method is implemented as described in Bolstad et al. (2003).
 library(pmartRdata)
 myfilt <- molecule_filter(omicsData = metab_object)
 # quantile normalization requires complete data
-# summary(filter_object = myfilt, min_num = 50)
+# summary(myfilt, min_num = 50)
 mymetab <- applyFilt(filter_object = myfilt, omicsData = metab_object, min_num = 50)
 norm_data <- normalize_quantile(omicsData = mymetab)
 

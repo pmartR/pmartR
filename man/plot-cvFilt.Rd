@@ -5,7 +5,7 @@
 \title{Plot cvFilt Object}
 \usage{
 \method{plot}{cvFilt}(
-  filter_object,
+  x,
   cv_threshold = NULL,
   interactive = FALSE,
   x_lab = NULL,
@@ -21,11 +21,12 @@
   n_breaks = 15,
   n_bins = 30,
   bw_theme = TRUE,
-  palette = NULL
+  palette = NULL,
+  ...
 )
 }
 \arguments{
-\item{filter_object}{object of class cvFilt generated via
+\item{x}{object of class cvFilt generated via
 \code{\link{cv_filter}}}
 
 \item{cv_threshold}{numeric value for cv threshold above which to remove the
@@ -74,6 +75,8 @@ histogram.  The default is 30.}
 \item{palette}{character string indicating the name of the RColorBrewer
 palette to use. For a list of available options see the details section in
 \code{\link[RColorBrewer]{RColorBrewer}}.}
+
+\item{...}{further arguments passed to or from other methods.}
 }
 \value{
 ggplot2 plot object if interactive is FALSE, or plotly plot object if
@@ -85,8 +88,10 @@ For plotting an S3 object of type 'cvFilt'
 \examples{
 library(pmartRdata)
 data(pep_object)
-mypep <- group_designation(omicsData = pep_object,
-                                main_effects = "Phenotype")
+mypep <- group_designation(
+  omicsData = pep_object,
+  main_effects = "Phenotype"
+)
 
 cvfilt <- cv_filter(omicsData = mypep)
 

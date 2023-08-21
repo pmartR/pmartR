@@ -5,7 +5,7 @@
 \title{Plot RNAFilt Object}
 \usage{
 \method{plot}{RNAFilt}(
-  filter_object,
+  x,
   plot_type = "library",
   size_library = NULL,
   min_nonzero = NULL,
@@ -22,11 +22,12 @@
   text_size = 3,
   bar_width = 0.8,
   bw_theme = TRUE,
-  palette = NULL
+  palette = NULL,
+  ...
 )
 }
 \arguments{
-\item{filter_object}{object of class RNAFilt that contains the sample
+\item{x}{object of class RNAFilt that contains the sample
 identifier, library size, number of non-zero biomolecules, and proportion
 of non-zero biomolecules}
 
@@ -80,6 +81,8 @@ The default is 0.8.}
 \item{palette}{character string indicating the name of the RColorBrewer
 palette to use. For a list of available options see the details section in
 \code{\link[RColorBrewer]{RColorBrewer}}.}
+
+\item{...}{further arguments passed to or from other methods.}
 }
 \value{
 ggplot2 plot object if interactive is FALSE, or plotly plot object if

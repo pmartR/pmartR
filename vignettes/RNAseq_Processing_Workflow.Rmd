@@ -65,12 +65,14 @@ head(emeta)
 Since these are RNAseq data, we will create a `seqData` object in `pmartR`. Note that unlike the other data types supported in `pmartR`, seqData objects are not log2 transformed.
 
 ```{r}
-myseq <- as.seqData(e_data = rnaseq_edata,
-                        e_meta = rnaseq_emeta,
-                        f_data = rnaseq_fdata,
-                        edata_cname = "Transcript",
-                        fdata_cname = "SampleName",
-                        emeta_cname = "Transcript")
+myseq <- as.seqData(
+  e_data = rnaseq_edata,
+  e_meta = rnaseq_emeta,
+  f_data = rnaseq_fdata,
+  edata_cname = "Transcript",
+  fdata_cname = "SampleName",
+  emeta_cname = "Transcript"
+)
 ```
 
 We can use the `summary` function to get basic summary information for our `isbaricseqData` object.
@@ -152,7 +154,6 @@ myrnafilt <- RNA_filter(omicsData = myseq)
 # filter by library size
 plot(myrnafilt, plot_type = "library")
 plot(myrnafilt, plot_type = "library", size_library = 1000000)
-
 ```
 
 Next, we utilize the filter to identify any samples with fewer than 5,000 non-zero counts, of which there are none.
@@ -188,7 +189,7 @@ plot(mycor, interactive = TRUE)
 A principal components analysis (PCA) plot of our data shows clustering of strains A and C with one another, separated from strain B. The two samples that are separated on PC1 one from the rest are the same two samples that stood out in the correlation heatmap.
 
 ```{r}
-mypca <- dim_reduction(omicsData = myseq, k=2)
+mypca <- dim_reduction(omicsData = myseq, k = 2)
 plot(mypca, interactive = TRUE)
 
 mypca_df <- data.frame(SampleID = mypca$SampleID, PC1 = mypca$PC1, PC2 = mypca$PC2)
@@ -228,7 +229,7 @@ Various plot types are available to display the results of the statistical compa
 ```{r warning=FALSE}
 plot(stats_edger, plot_type = "volcano")
 plot(stats_edger, plot_type = "bar")
-plot(stats_edger, plot_type = "ma") 
+plot(stats_edger, plot_type = "ma")
 ```
 
 ### DESeq2 Method
@@ -250,7 +251,7 @@ Various plot types are available to display the results of the statistical compa
 ```{r warning=FALSE}
 plot(stats_deseq, plot_type = "volcano")
 plot(stats_deseq, plot_type = "bar")
-plot(stats_deseq, plot_type = "ma") 
+plot(stats_deseq, plot_type = "ma")
 ```
 
 ### limma-voom Method
@@ -272,7 +273,7 @@ Various plot types are available to display the results of the statistical compa
 ```{r warning=FALSE}
 plot(stats_voom, plot_type = "volcano")
 plot(stats_voom, plot_type = "bar")
-plot(stats_voom, plot_type = "ma") 
+plot(stats_voom, plot_type = "ma")
 ```
 
 

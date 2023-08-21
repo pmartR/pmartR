@@ -4,7 +4,12 @@
 \alias{print.RNAFiltSummary}
 \title{RNA Filter Print Method}
 \usage{
-\method{print}{RNAFiltSummary}(object)
+\method{print}{RNAFiltSummary}(x, ...)
+}
+\arguments{
+\item{x}{the RNAFilt summary to print}
+
+\item{...}{further arguments passed to or from other methods}
 }
 \description{
 Print method for summary of RNAFilt
