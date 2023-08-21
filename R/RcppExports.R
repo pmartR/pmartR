@@ -13,8 +13,8 @@ count_missing_cpp <- function(data, gp) {
     .Call('_pmartR_count_missing_cpp', PACKAGE = 'pmartR', data, gp)
 }
 
-anova_cpp <- function(data, gp, unequal_var, df_red, covar_effects, covar_sse) {
-    .Call('_pmartR_anova_cpp', PACKAGE = 'pmartR', data, gp, unequal_var, df_red, covar_effects, covar_sse)
+anova_cpp <- function(data, gp, unequal_var, df_red, covar_effects, X, Beta) {
+    .Call('_pmartR_anova_cpp', PACKAGE = 'pmartR', data, gp, unequal_var, df_red, covar_effects, X, Beta)
 }
 
 two_factor_anova_cpp <- function(y, X_full, X_red, red_df, group_ids) {

@@ -897,8 +897,9 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
       warning("Missing values were detected in the provided covariates thus covariates will be ignored")
       red_df <- matrix(rep(0, nrow(data)), ncol=1)
       covar_effects <- matrix(0,nrow = nrow(data), ncol=ncol(data))
-      covar_SSE <- matrix(0,nrow = nrow(data), ncol=1)
-      xmatrix <- build_x_mat(attr(myobj_covariates, "group_DF")$Group, intercept = FALSE)
+      covariates <- attr(myobj_covariates, "group_DF")$Group
+      xmatrix <- build_x_mat(covariates, intercept = TRUE)
+      xmatrix <- reduce_xmatrix(xmatrix,k)
     } else {
       # Combine main effect and covariate data. We only want two columns from
       # the main effect data frame (groupData). These columns are the sample ID
@@ -910,9 +911,10 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
                           cov_data,
                           sort = FALSE)
       cov_samp_col <- which(colnames(covariates)==samp_cname)
-      #source('~/pmartR/R/covariate_supp_funs.R') #Run to debug
-      xmatrix <- build_x_mat(covariates[,-cov_samp_col], intercept = TRUE) #Build the appropriate X matrix based on the covariates data frame
+      covariates <- covariates[,-cov_samp_col]
 
+      #source('~/pmartR/R/covariate_supp_funs.R') #Run to debug
+      xmatrix <- build_x_mat(covariates, intercept = TRUE) #Build the appropriate X matrix based on the covariates data frame
       xmatrix <- reduce_xmatrix(xmatrix,k)
       
       ##Translate the groups into numeric labels for anova_cpp() function
@@ -921,13 +923,10 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
       # Remove effect of covariates
       covar_res <- covariate_adjustment_cpp(data.matrix(data),xmatrix,k, gp)
       covar_effects <- covar_res[['covar_effects']]
-      covar_SSE <- covar_res[['covar_SSE']]
+      Beta <- covar_res[['Beta']]
 
       # use 1 degree of freedom per continuous covariate or K - 1 per categorical covariate with K levels.
       red_df <- matrix(rep(ncol(xmatrix) - k,nrow(covar_effects)),ncol=1)
-      
-      # rebuild the xmatrix without the intercept for contrasts in downstream functions
-      xmatrix <- build_x_mat(covariates[,-cov_samp_col], intercept = FALSE)
     }
 
     # If covariates are adjusted for, then force equal variance assumption even
@@ -938,7 +937,9 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
     red_df <- matrix(rep(0, nrow(data)), ncol=1)
     covar_effects <- matrix(0,nrow = nrow(data), ncol=ncol(data))
     covar_SSE <- matrix(0,nrow = nrow(data), ncol=1)
-    xmatrix <- build_x_mat(attr(myobj_covariates, "group_DF")$Group, intercept = FALSE)
+    covariates <- attr(myobj_covariates, "group_DF")$Group
+    xmatrix <- build_x_mat(covariates, intercept = TRUE)
+    xmatrix <- reduce_xmatrix(xmatrix,k)
   }
 
   # paired t test stuffs -------------------------------------------------------
@@ -963,7 +964,7 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
     gp <- factor(groupData$Group,labels=1:k,levels=unique(groupData$Group))
     
     #Rcpp::sourceCpp('~/pmartR/src/anova_helper_funs.cpp') #Run if debugging code
-    raw_results <- anova_cpp(data.matrix(data),gp,1-equal_var,red_df, covar_effects, covar_SSE)
+    raw_results <- anova_cpp(data.matrix(data),gp,1-equal_var,red_df, covar_effects, xmatrix, Beta)
     group_names <- paste("Mean",as.character(unique(groupData$Group)),sep="_")
     
   }else{
@@ -988,6 +989,7 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
   ###-------Use group_comparison_anova() to compare the groups that were requested--------------##
   #source('~/pmartR/R/group_comparison.R') # Run if debugging
   #Rcpp::sourceCpp('~/pmartR/src/group_comparisons.cpp') #Run if debugging
+  xmatrix <- build_x_mat(covariates, intercept = FALSE)
   xmatrix <- reduce_xmatrix(xmatrix,k)
   group_comp <- group_comparison_anova(groupData=groupData,comparisons=comparisons, xmatrix = xmatrix, anova_results_full=list(Results=results,Sizes=raw_results$group_sizes), red_df = red_df)
   

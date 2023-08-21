@@ -47,18 +47,19 @@ BEGIN_RCPP
 END_RCPP
 }
 // anova_cpp
-List anova_cpp(NumericMatrix data, NumericVector gp, int unequal_var, NumericVector df_red, NumericMatrix covar_effects, NumericVector covar_sse);
-RcppExport SEXP _pmartR_anova_cpp(SEXP dataSEXP, SEXP gpSEXP, SEXP unequal_varSEXP, SEXP df_redSEXP, SEXP covar_effectsSEXP, SEXP covar_sseSEXP) {
+List anova_cpp(arma::mat data, NumericVector gp, int unequal_var, NumericVector df_red, NumericMatrix covar_effects, arma::mat X, arma::mat Beta);
+RcppExport SEXP _pmartR_anova_cpp(SEXP dataSEXP, SEXP gpSEXP, SEXP unequal_varSEXP, SEXP df_redSEXP, SEXP covar_effectsSEXP, SEXP XSEXP, SEXP BetaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericMatrix >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type data(dataSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type gp(gpSEXP);
     Rcpp::traits::input_parameter< int >::type unequal_var(unequal_varSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type df_red(df_redSEXP);
     Rcpp::traits::input_parameter< NumericMatrix >::type covar_effects(covar_effectsSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type covar_sse(covar_sseSEXP);
-    rcpp_result_gen = Rcpp::wrap(anova_cpp(data, gp, unequal_var, df_red, covar_effects, covar_sse));
+    Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type Beta(BetaSEXP);
+    rcpp_result_gen = Rcpp::wrap(anova_cpp(data, gp, unequal_var, df_red, covar_effects, X, Beta));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -207,7 +208,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_pmartR_pooled_cv_rcpp", (DL_FUNC) &_pmartR_pooled_cv_rcpp, 2},
     {"_pmartR_unpooled_cv_rcpp", (DL_FUNC) &_pmartR_unpooled_cv_rcpp, 1},
     {"_pmartR_count_missing_cpp", (DL_FUNC) &_pmartR_count_missing_cpp, 2},
-    {"_pmartR_anova_cpp", (DL_FUNC) &_pmartR_anova_cpp, 6},
+    {"_pmartR_anova_cpp", (DL_FUNC) &_pmartR_anova_cpp, 7},
     {"_pmartR_two_factor_anova_cpp", (DL_FUNC) &_pmartR_two_factor_anova_cpp, 5},
     {"_pmartR_fold_change_diff_copy", (DL_FUNC) &_pmartR_fold_change_diff_copy, 2},
     {"_pmartR_group_comparison_anova_cpp", (DL_FUNC) &_pmartR_group_comparison_anova_cpp, 6},
