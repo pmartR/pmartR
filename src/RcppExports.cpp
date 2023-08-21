@@ -91,18 +91,19 @@ BEGIN_RCPP
 END_RCPP
 }
 // group_comparison_anova_cpp
-List group_comparison_anova_cpp(arma::mat means, arma::mat sizes, arma::vec sigma2, arma::mat X, arma::mat C, arma::mat red_df);
-RcppExport SEXP _pmartR_group_comparison_anova_cpp(SEXP meansSEXP, SEXP sizesSEXP, SEXP sigma2SEXP, SEXP XSEXP, SEXP CSEXP, SEXP red_dfSEXP) {
+List group_comparison_anova_cpp(arma::mat data, arma::mat means, arma::mat sizes, arma::vec sigma2, arma::mat X, arma::mat C, arma::mat red_df);
+RcppExport SEXP _pmartR_group_comparison_anova_cpp(SEXP dataSEXP, SEXP meansSEXP, SEXP sizesSEXP, SEXP sigma2SEXP, SEXP XSEXP, SEXP CSEXP, SEXP red_dfSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type data(dataSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type means(meansSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type sizes(sizesSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type sigma2(sigma2SEXP);
     Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type C(CSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type red_df(red_dfSEXP);
-    rcpp_result_gen = Rcpp::wrap(group_comparison_anova_cpp(means, sizes, sigma2, X, C, red_df));
+    rcpp_result_gen = Rcpp::wrap(group_comparison_anova_cpp(data, means, sizes, sigma2, X, C, red_df));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -211,7 +212,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_pmartR_anova_cpp", (DL_FUNC) &_pmartR_anova_cpp, 7},
     {"_pmartR_two_factor_anova_cpp", (DL_FUNC) &_pmartR_two_factor_anova_cpp, 5},
     {"_pmartR_fold_change_diff_copy", (DL_FUNC) &_pmartR_fold_change_diff_copy, 2},
-    {"_pmartR_group_comparison_anova_cpp", (DL_FUNC) &_pmartR_group_comparison_anova_cpp, 6},
+    {"_pmartR_group_comparison_anova_cpp", (DL_FUNC) &_pmartR_group_comparison_anova_cpp, 7},
     {"_pmartR_holm_cpp", (DL_FUNC) &_pmartR_holm_cpp, 1},
     {"_pmartR_ptukey_speed", (DL_FUNC) &_pmartR_ptukey_speed, 2},
     {"_pmartR_fold_change_diff", (DL_FUNC) &_pmartR_fold_change_diff, 2},

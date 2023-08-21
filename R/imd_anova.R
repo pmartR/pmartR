@@ -991,7 +991,7 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
   #Rcpp::sourceCpp('~/pmartR/src/group_comparisons.cpp') #Run if debugging
   xmatrix <- build_x_mat(covariates, intercept = FALSE)
   xmatrix <- reduce_xmatrix(xmatrix,k)
-  group_comp <- group_comparison_anova(groupData=groupData,comparisons=comparisons, xmatrix = xmatrix, anova_results_full=list(Results=results,Sizes=raw_results$group_sizes), red_df = red_df)
+  group_comp <- group_comparison_anova(data=data.matrix(data), groupData=groupData,comparisons=comparisons, xmatrix = xmatrix, anova_results_full=list(Results=results,Sizes=raw_results$group_sizes), red_df = red_df)
   
   #If there are only two levels, replace group_comp p-values with those taken from ANOVA function
   if(k==2){
@@ -1099,9 +1099,10 @@ run_twofactor_cpp <- function(data, gpData, red_df) {
 #'
 #' @author Bryan Stanfill
 #'
-group_comparison_anova <- function(groupData, comparisons, anova_results_full) {
-  # The group means include the word "Group" in them so that is what will be passed
-  # to the group_comparison(...) and fold_change(...) functions along with estimated variance
+group_comparison_anova <- function(data,groupData,comparisons,xmatrix,anova_results_full, red_df){
+  
+  #The group means include the word "Group" in them so that is what will be passed
+  #to the group_comparison(...) and fold_change(...) functions along with estimated variance
   anova_results <- anova_results_full$Results
   means <- data.matrix(anova_results[, grep("Mean", colnames(anova_results))])
   sigma2 <- data.matrix(anova_results$Variance)
@@ -1122,7 +1123,7 @@ group_comparison_anova <- function(groupData, comparisons, anova_results_full) {
     Cmat <- cbind(Cmat, matrix(nrow = nrow(Cmat), ncol = cdiff, 0))
   }
   
-  group_comp <- group_comparison_anova_cpp(means, sizes, sigma2, xmatrix, Cmat, red_df)
+  group_comp <- group_comparison_anova_cpp(data,means, sizes, sigma2, xmatrix, Cmat, red_df)
   
   group_comp$diff_mat <- data.frame(group_comp$diff_mat)
   colnames(group_comp$diff_mat) <- Cmat_res$names

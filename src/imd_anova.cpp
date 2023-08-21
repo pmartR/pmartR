@@ -340,7 +340,7 @@ arma::mat fold_change_diff_copy(arma::mat data, arma::mat C)  {
 }
 
 // [[Rcpp::export]]
-List group_comparison_anova_cpp(arma::mat means, arma::mat sizes, arma::vec sigma2, arma::mat X, arma::mat C, arma::mat red_df) {
+List group_comparison_anova_cpp(arma::mat data, arma::mat means, arma::mat sizes, arma::vec sigma2, arma::mat X, arma::mat C, arma::mat red_df) {
   //Given the group means, group sizes and esimtaes of sigma^2, do all the
   //group comparisons requested.  Returns estimated difference, standard error, t-statistic
   //and p-value
@@ -365,15 +365,20 @@ List group_comparison_anova_cpp(arma::mat means, arma::mat sizes, arma::vec sigm
   p_values.fill(1.0);
   arma::mat ses_mat(num_comparisons, num_comparisons); //Storage for the sqrt of the comparison var-cov matrix
 
+  arma::rowvec rowi;
+  arma::uvec elems_to_keep;
+
   diff_mat.zeros();
   p_values.zeros();
 
   //Compute the differences between means using the fold_change_diff function
   diff_mat = fold_change_diff_copy(means, C.cols(0,n_groups-1));
 
-  arma::mat XpXInv = pinv(X.t() * X);
-
   for(i=0;i<n;i++){
+    rowi = data.row(i);
+    elems_to_keep = find_finite(rowi);
+    arma::mat XpXInv = pinv(X.rows(elems_to_keep).t() * X.rows(elems_to_keep));
+
     // Create a counter that keeps track of the number of groups with all
     // missing data. This value will be used in calculating the degrees of
     // freedom in the R::pt function. For example, if there are three groups but

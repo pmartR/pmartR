@@ -25,8 +25,8 @@ fold_change_diff_copy <- function(data, C) {
     .Call('_pmartR_fold_change_diff_copy', PACKAGE = 'pmartR', data, C)
 }
 
-group_comparison_anova_cpp <- function(means, sizes, sigma2, X, C, red_df) {
-    .Call('_pmartR_group_comparison_anova_cpp', PACKAGE = 'pmartR', means, sizes, sigma2, X, C, red_df)
+group_comparison_anova_cpp <- function(data, means, sizes, sigma2, X, C, red_df) {
+    .Call('_pmartR_group_comparison_anova_cpp', PACKAGE = 'pmartR', data, means, sizes, sigma2, X, C, red_df)
 }
 
 holm_cpp <- function(ps) {
