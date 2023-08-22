@@ -2045,6 +2045,7 @@ plot.dimRes <- function (x, omicsData = NULL,
           by.y = fdata_cname,
           sort = FALSE
         )
+        plotdata[[fdata_cname]] <- plotdata[[plotdata_name]]
       }
 
       color_var <- main_eff_names[1]
@@ -2078,6 +2079,7 @@ plot.dimRes <- function (x, omicsData = NULL,
           by.y = fdata_cname,
           sort = FALSE
         )
+        plotdata[[fdata_cname]] <- plotdata[[plotdata_name]]
       }
 
       color_var <- "Group"
@@ -2111,6 +2113,7 @@ plot.dimRes <- function (x, omicsData = NULL,
                                    by.x = plotdata_name,
                                    by.y = fdata_cname,
                                    sort = FALSE)
+      plotdata[[fdata_cname]] <- plotdata[[plotdata_name]]
       
     }
 
@@ -2123,6 +2126,32 @@ plot.dimRes <- function (x, omicsData = NULL,
     if (!is.null(legend_lab)) {
       warning("There is no group designation, so legend_lab will go unused.")
     }
+    
+    # Add any columns from f_data to the plotdata if present (for color_by
+    # and shape_by)
+    if (!is.null(omicsData)) {
+      if (is.null(omicsData$f_data)) {
+        stop("omicsData does not have f_data")
+      }
+      
+      fdata_cname <- get_fdata_cname(omicsData)
+      
+      fdata_concat <- omicsData$f_data[
+        c(
+          which(colnames(omicsData$f_data) == fdata_cname),
+          which(!colnames(omicsData$f_data) %in% colnames(plotdata))
+        )
+      ]
+      
+      plotdata <- merge.data.frame(plotdata,
+                                   fdata_concat,
+                                   by.x = plotdata_name,
+                                   by.y = fdata_cname,
+                                   sort = FALSE)
+      plotdata[[fdata_cname]] <- plotdata[[plotdata_name]]
+      
+    }
+
   }
   
   if (!is.null(color_by)) {
