@@ -13,20 +13,20 @@ count_missing_cpp <- function(data, gp) {
     .Call('_pmartR_count_missing_cpp', PACKAGE = 'pmartR', data, gp)
 }
 
-anova_cpp <- function(data, gp, unequal_var, df_red, covar_effects, X, Beta) {
-    .Call('_pmartR_anova_cpp', PACKAGE = 'pmartR', data, gp, unequal_var, df_red, covar_effects, X, Beta)
+anova_cpp <- function(data, gp, unequal_var, X, Beta) {
+    .Call('_pmartR_anova_cpp', PACKAGE = 'pmartR', data, gp, unequal_var, X, Beta)
 }
 
-two_factor_anova_cpp <- function(y, X_full, X_red, red_df, group_ids, covar_inds) {
-    .Call('_pmartR_two_factor_anova_cpp', PACKAGE = 'pmartR', y, X_full, X_red, red_df, group_ids, covar_inds)
+two_factor_anova_cpp <- function(y, X_full, X_red, group_ids, covar_inds) {
+    .Call('_pmartR_two_factor_anova_cpp', PACKAGE = 'pmartR', y, X_full, X_red, group_ids, covar_inds)
 }
 
 fold_change_diff_copy <- function(data, C) {
     .Call('_pmartR_fold_change_diff_copy', PACKAGE = 'pmartR', data, C)
 }
 
-group_comparison_anova_cpp <- function(data, means, sizes, sigma2, X, C, red_df) {
-    .Call('_pmartR_group_comparison_anova_cpp', PACKAGE = 'pmartR', data, means, sizes, sigma2, X, C, red_df)
+group_comparison_anova_cpp <- function(data, means, sizes, sigma2, X, C, df_used) {
+    .Call('_pmartR_group_comparison_anova_cpp', PACKAGE = 'pmartR', data, means, sizes, sigma2, X, C, df_used)
 }
 
 holm_cpp <- function(ps) {
@@ -49,8 +49,8 @@ fold_change_diff_na_okay <- function(data, C) {
     .Call('_pmartR_fold_change_diff_na_okay', PACKAGE = 'pmartR', data, C)
 }
 
-covariate_adjustment_cpp <- function(data_mat, Xmatrix, ngroups, gp) {
-    .Call('_pmartR_covariate_adjustment_cpp', PACKAGE = 'pmartR', data_mat, Xmatrix, ngroups, gp)
+compute_betas <- function(data_mat, Xmatrix, gp) {
+    .Call('_pmartR_compute_betas', PACKAGE = 'pmartR', data_mat, Xmatrix, gp)
 }
 
 kw_rcpp <- function(mtr, group) {

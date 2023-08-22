@@ -47,35 +47,32 @@ BEGIN_RCPP
 END_RCPP
 }
 // anova_cpp
-List anova_cpp(arma::mat data, NumericVector gp, int unequal_var, NumericVector df_red, NumericMatrix covar_effects, arma::mat X, arma::mat Beta);
-RcppExport SEXP _pmartR_anova_cpp(SEXP dataSEXP, SEXP gpSEXP, SEXP unequal_varSEXP, SEXP df_redSEXP, SEXP covar_effectsSEXP, SEXP XSEXP, SEXP BetaSEXP) {
+List anova_cpp(arma::mat data, NumericVector gp, int unequal_var, arma::mat X, arma::mat Beta);
+RcppExport SEXP _pmartR_anova_cpp(SEXP dataSEXP, SEXP gpSEXP, SEXP unequal_varSEXP, SEXP XSEXP, SEXP BetaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< arma::mat >::type data(dataSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type gp(gpSEXP);
     Rcpp::traits::input_parameter< int >::type unequal_var(unequal_varSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type df_red(df_redSEXP);
-    Rcpp::traits::input_parameter< NumericMatrix >::type covar_effects(covar_effectsSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type Beta(BetaSEXP);
-    rcpp_result_gen = Rcpp::wrap(anova_cpp(data, gp, unequal_var, df_red, covar_effects, X, Beta));
+    rcpp_result_gen = Rcpp::wrap(anova_cpp(data, gp, unequal_var, X, Beta));
     return rcpp_result_gen;
 END_RCPP
 }
 // two_factor_anova_cpp
-List two_factor_anova_cpp(arma::mat y, arma::mat X_full, arma::mat X_red, NumericVector red_df, arma::colvec group_ids, arma::uvec covar_inds);
-RcppExport SEXP _pmartR_two_factor_anova_cpp(SEXP ySEXP, SEXP X_fullSEXP, SEXP X_redSEXP, SEXP red_dfSEXP, SEXP group_idsSEXP, SEXP covar_indsSEXP) {
+List two_factor_anova_cpp(arma::mat y, arma::mat X_full, arma::mat X_red, arma::colvec group_ids, arma::uvec covar_inds);
+RcppExport SEXP _pmartR_two_factor_anova_cpp(SEXP ySEXP, SEXP X_fullSEXP, SEXP X_redSEXP, SEXP group_idsSEXP, SEXP covar_indsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< arma::mat >::type y(ySEXP);
     Rcpp::traits::input_parameter< arma::mat >::type X_full(X_fullSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type X_red(X_redSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type red_df(red_dfSEXP);
     Rcpp::traits::input_parameter< arma::colvec >::type group_ids(group_idsSEXP);
     Rcpp::traits::input_parameter< arma::uvec >::type covar_inds(covar_indsSEXP);
-    rcpp_result_gen = Rcpp::wrap(two_factor_anova_cpp(y, X_full, X_red, red_df, group_ids, covar_inds));
+    rcpp_result_gen = Rcpp::wrap(two_factor_anova_cpp(y, X_full, X_red, group_ids, covar_inds));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -92,8 +89,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // group_comparison_anova_cpp
-List group_comparison_anova_cpp(arma::mat data, arma::mat means, arma::mat sizes, arma::vec sigma2, arma::mat X, arma::mat C, arma::mat red_df);
-RcppExport SEXP _pmartR_group_comparison_anova_cpp(SEXP dataSEXP, SEXP meansSEXP, SEXP sizesSEXP, SEXP sigma2SEXP, SEXP XSEXP, SEXP CSEXP, SEXP red_dfSEXP) {
+List group_comparison_anova_cpp(arma::mat data, arma::mat means, arma::mat sizes, arma::vec sigma2, arma::mat X, arma::mat C, arma::vec df_used);
+RcppExport SEXP _pmartR_group_comparison_anova_cpp(SEXP dataSEXP, SEXP meansSEXP, SEXP sizesSEXP, SEXP sigma2SEXP, SEXP XSEXP, SEXP CSEXP, SEXP df_usedSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -103,8 +100,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::vec >::type sigma2(sigma2SEXP);
     Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type C(CSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type red_df(red_dfSEXP);
-    rcpp_result_gen = Rcpp::wrap(group_comparison_anova_cpp(data, means, sizes, sigma2, X, C, red_df));
+    Rcpp::traits::input_parameter< arma::vec >::type df_used(df_usedSEXP);
+    rcpp_result_gen = Rcpp::wrap(group_comparison_anova_cpp(data, means, sizes, sigma2, X, C, df_used));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -167,17 +164,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// covariate_adjustment_cpp
-List covariate_adjustment_cpp(arma::mat data_mat, arma::mat Xmatrix, int ngroups, NumericVector gp);
-RcppExport SEXP _pmartR_covariate_adjustment_cpp(SEXP data_matSEXP, SEXP XmatrixSEXP, SEXP ngroupsSEXP, SEXP gpSEXP) {
+// compute_betas
+arma::mat compute_betas(arma::mat data_mat, arma::mat Xmatrix, NumericVector gp);
+RcppExport SEXP _pmartR_compute_betas(SEXP data_matSEXP, SEXP XmatrixSEXP, SEXP gpSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< arma::mat >::type data_mat(data_matSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type Xmatrix(XmatrixSEXP);
-    Rcpp::traits::input_parameter< int >::type ngroups(ngroupsSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type gp(gpSEXP);
-    rcpp_result_gen = Rcpp::wrap(covariate_adjustment_cpp(data_mat, Xmatrix, ngroups, gp));
+    rcpp_result_gen = Rcpp::wrap(compute_betas(data_mat, Xmatrix, gp));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -210,8 +206,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_pmartR_pooled_cv_rcpp", (DL_FUNC) &_pmartR_pooled_cv_rcpp, 2},
     {"_pmartR_unpooled_cv_rcpp", (DL_FUNC) &_pmartR_unpooled_cv_rcpp, 1},
     {"_pmartR_count_missing_cpp", (DL_FUNC) &_pmartR_count_missing_cpp, 2},
-    {"_pmartR_anova_cpp", (DL_FUNC) &_pmartR_anova_cpp, 7},
-    {"_pmartR_two_factor_anova_cpp", (DL_FUNC) &_pmartR_two_factor_anova_cpp, 6},
+    {"_pmartR_anova_cpp", (DL_FUNC) &_pmartR_anova_cpp, 5},
+    {"_pmartR_two_factor_anova_cpp", (DL_FUNC) &_pmartR_two_factor_anova_cpp, 5},
     {"_pmartR_fold_change_diff_copy", (DL_FUNC) &_pmartR_fold_change_diff_copy, 2},
     {"_pmartR_group_comparison_anova_cpp", (DL_FUNC) &_pmartR_group_comparison_anova_cpp, 7},
     {"_pmartR_holm_cpp", (DL_FUNC) &_pmartR_holm_cpp, 1},
@@ -219,7 +215,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_pmartR_fold_change_diff", (DL_FUNC) &_pmartR_fold_change_diff, 2},
     {"_pmartR_fold_change_ratio", (DL_FUNC) &_pmartR_fold_change_ratio, 2},
     {"_pmartR_fold_change_diff_na_okay", (DL_FUNC) &_pmartR_fold_change_diff_na_okay, 2},
-    {"_pmartR_covariate_adjustment_cpp", (DL_FUNC) &_pmartR_covariate_adjustment_cpp, 4},
+    {"_pmartR_compute_betas", (DL_FUNC) &_pmartR_compute_betas, 3},
     {"_pmartR_kw_rcpp", (DL_FUNC) &_pmartR_kw_rcpp, 2},
     {"_pmartR_nonmissing_per_grp", (DL_FUNC) &_pmartR_nonmissing_per_grp, 2},
     {NULL, NULL, 0}
