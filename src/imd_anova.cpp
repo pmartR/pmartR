@@ -298,9 +298,10 @@ List anova_cpp(arma::mat data, NumericVector gp, int unequal_var, arma::mat X, a
       //Compute F-statistic
       SSB = SST-SSE;
       sigma2(i) = (SSE/(rowi_size-rank(X)+missing_m));
-      Fstats(i) = (SSB/(m - missing_m - 1))/(sigma2(i));
+
+      Fstats(i) = (SSB/(rank(X) - missing_m - 1))/(sigma2(i));
       //Arguments passed to pf are: value, df1, df2, lower tail?, log scale?
-      p_value(i) = R::pf(Fstats(i),m - missing_m - 1,rowi_size-rank(X)+missing_m,false,false);
+      p_value(i) = R::pf(Fstats(i),rank(X) - missing_m - 1,rowi_size-rank(X)+missing_m,false,false);
       dof(i) = rowi_size-rank(X)+missing_m;
     }
 
