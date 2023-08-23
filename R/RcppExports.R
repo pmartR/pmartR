@@ -13,32 +13,12 @@ count_missing_cpp <- function(data, gp) {
     .Call('_pmartR_count_missing_cpp', PACKAGE = 'pmartR', data, gp)
 }
 
-anova_cpp <- function(data, gp, unequal_var, X, Beta) {
-    .Call('_pmartR_anova_cpp', PACKAGE = 'pmartR', data, gp, unequal_var, X, Beta)
-}
-
-two_factor_anova_cpp <- function(y, X_full, X_red, group_ids, covar_inds) {
-    .Call('_pmartR_two_factor_anova_cpp', PACKAGE = 'pmartR', y, X_full, X_red, group_ids, covar_inds)
-}
-
-fold_change_diff_copy <- function(data, C) {
-    .Call('_pmartR_fold_change_diff_copy', PACKAGE = 'pmartR', data, C)
-}
-
-group_comparison_anova_cpp <- function(data, means, sizes, sigma2, X, C, df_used) {
-    .Call('_pmartR_group_comparison_anova_cpp', PACKAGE = 'pmartR', data, means, sizes, sigma2, X, C, df_used)
-}
-
-holm_cpp <- function(ps) {
-    .Call('_pmartR_holm_cpp', PACKAGE = 'pmartR', ps)
-}
-
-ptukey_speed <- function(qstats, sizes) {
-    .Call('_pmartR_ptukey_speed', PACKAGE = 'pmartR', qstats, sizes)
-}
-
 fold_change_diff <- function(data, C) {
     .Call('_pmartR_fold_change_diff', PACKAGE = 'pmartR', data, C)
+}
+
+fold_change_diff_row <- function(means, C) {
+    .Call('_pmartR_fold_change_diff_row', PACKAGE = 'pmartR', means, C)
 }
 
 fold_change_ratio <- function(data, C) {
@@ -47,6 +27,26 @@ fold_change_ratio <- function(data, C) {
 
 fold_change_diff_na_okay <- function(data, C) {
     .Call('_pmartR_fold_change_diff_na_okay', PACKAGE = 'pmartR', data, C)
+}
+
+anova_cpp <- function(data, gp, unequal_var, X, Beta) {
+    .Call('_pmartR_anova_cpp', PACKAGE = 'pmartR', data, gp, unequal_var, X, Beta)
+}
+
+two_factor_anova_cpp <- function(y, X_full, X_red, group_ids, covar_inds) {
+    .Call('_pmartR_two_factor_anova_cpp', PACKAGE = 'pmartR', y, X_full, X_red, group_ids, covar_inds)
+}
+
+group_comparison_anova_cpp <- function(data, sizes, X, C) {
+    .Call('_pmartR_group_comparison_anova_cpp', PACKAGE = 'pmartR', data, sizes, X, C)
+}
+
+holm_cpp <- function(ps) {
+    .Call('_pmartR_holm_cpp', PACKAGE = 'pmartR', ps)
+}
+
+ptukey_speed <- function(qstats, sizes) {
+    .Call('_pmartR_ptukey_speed', PACKAGE = 'pmartR', qstats, sizes)
 }
 
 compute_betas <- function(data_mat, Xmatrix, gp) {

@@ -46,6 +46,54 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// fold_change_diff
+arma::mat fold_change_diff(arma::mat data, arma::mat C);
+RcppExport SEXP _pmartR_fold_change_diff(SEXP dataSEXP, SEXP CSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type C(CSEXP);
+    rcpp_result_gen = Rcpp::wrap(fold_change_diff(data, C));
+    return rcpp_result_gen;
+END_RCPP
+}
+// fold_change_diff_row
+arma::rowvec fold_change_diff_row(arma::rowvec means, arma::mat C);
+RcppExport SEXP _pmartR_fold_change_diff_row(SEXP meansSEXP, SEXP CSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::rowvec >::type means(meansSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type C(CSEXP);
+    rcpp_result_gen = Rcpp::wrap(fold_change_diff_row(means, C));
+    return rcpp_result_gen;
+END_RCPP
+}
+// fold_change_ratio
+arma::mat fold_change_ratio(arma::mat data, arma::mat C);
+RcppExport SEXP _pmartR_fold_change_ratio(SEXP dataSEXP, SEXP CSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type C(CSEXP);
+    rcpp_result_gen = Rcpp::wrap(fold_change_ratio(data, C));
+    return rcpp_result_gen;
+END_RCPP
+}
+// fold_change_diff_na_okay
+arma::mat fold_change_diff_na_okay(arma::mat data, arma::mat C);
+RcppExport SEXP _pmartR_fold_change_diff_na_okay(SEXP dataSEXP, SEXP CSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type C(CSEXP);
+    rcpp_result_gen = Rcpp::wrap(fold_change_diff_na_okay(data, C));
+    return rcpp_result_gen;
+END_RCPP
+}
 // anova_cpp
 List anova_cpp(arma::mat data, NumericVector gp, int unequal_var, arma::mat X, arma::mat Beta);
 RcppExport SEXP _pmartR_anova_cpp(SEXP dataSEXP, SEXP gpSEXP, SEXP unequal_varSEXP, SEXP XSEXP, SEXP BetaSEXP) {
@@ -76,32 +124,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// fold_change_diff_copy
-arma::mat fold_change_diff_copy(arma::mat data, arma::mat C);
-RcppExport SEXP _pmartR_fold_change_diff_copy(SEXP dataSEXP, SEXP CSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::mat >::type data(dataSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type C(CSEXP);
-    rcpp_result_gen = Rcpp::wrap(fold_change_diff_copy(data, C));
-    return rcpp_result_gen;
-END_RCPP
-}
 // group_comparison_anova_cpp
-List group_comparison_anova_cpp(arma::mat data, arma::mat means, arma::mat sizes, arma::vec sigma2, arma::mat X, arma::mat C, arma::vec df_used);
-RcppExport SEXP _pmartR_group_comparison_anova_cpp(SEXP dataSEXP, SEXP meansSEXP, SEXP sizesSEXP, SEXP sigma2SEXP, SEXP XSEXP, SEXP CSEXP, SEXP df_usedSEXP) {
+List group_comparison_anova_cpp(arma::mat data, arma::mat sizes, arma::mat X, arma::mat C);
+RcppExport SEXP _pmartR_group_comparison_anova_cpp(SEXP dataSEXP, SEXP sizesSEXP, SEXP XSEXP, SEXP CSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< arma::mat >::type data(dataSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type means(meansSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type sizes(sizesSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type sigma2(sigma2SEXP);
     Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type C(CSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type df_used(df_usedSEXP);
-    rcpp_result_gen = Rcpp::wrap(group_comparison_anova_cpp(data, means, sizes, sigma2, X, C, df_used));
+    rcpp_result_gen = Rcpp::wrap(group_comparison_anova_cpp(data, sizes, X, C));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -125,42 +158,6 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericMatrix >::type qstats(qstatsSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type sizes(sizesSEXP);
     rcpp_result_gen = Rcpp::wrap(ptukey_speed(qstats, sizes));
-    return rcpp_result_gen;
-END_RCPP
-}
-// fold_change_diff
-arma::mat fold_change_diff(arma::mat data, arma::mat C);
-RcppExport SEXP _pmartR_fold_change_diff(SEXP dataSEXP, SEXP CSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::mat >::type data(dataSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type C(CSEXP);
-    rcpp_result_gen = Rcpp::wrap(fold_change_diff(data, C));
-    return rcpp_result_gen;
-END_RCPP
-}
-// fold_change_ratio
-arma::mat fold_change_ratio(arma::mat data, arma::mat C);
-RcppExport SEXP _pmartR_fold_change_ratio(SEXP dataSEXP, SEXP CSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::mat >::type data(dataSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type C(CSEXP);
-    rcpp_result_gen = Rcpp::wrap(fold_change_ratio(data, C));
-    return rcpp_result_gen;
-END_RCPP
-}
-// fold_change_diff_na_okay
-arma::mat fold_change_diff_na_okay(arma::mat data, arma::mat C);
-RcppExport SEXP _pmartR_fold_change_diff_na_okay(SEXP dataSEXP, SEXP CSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::mat >::type data(dataSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type C(CSEXP);
-    rcpp_result_gen = Rcpp::wrap(fold_change_diff_na_okay(data, C));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -206,15 +203,15 @@ static const R_CallMethodDef CallEntries[] = {
     {"_pmartR_pooled_cv_rcpp", (DL_FUNC) &_pmartR_pooled_cv_rcpp, 2},
     {"_pmartR_unpooled_cv_rcpp", (DL_FUNC) &_pmartR_unpooled_cv_rcpp, 1},
     {"_pmartR_count_missing_cpp", (DL_FUNC) &_pmartR_count_missing_cpp, 2},
-    {"_pmartR_anova_cpp", (DL_FUNC) &_pmartR_anova_cpp, 5},
-    {"_pmartR_two_factor_anova_cpp", (DL_FUNC) &_pmartR_two_factor_anova_cpp, 5},
-    {"_pmartR_fold_change_diff_copy", (DL_FUNC) &_pmartR_fold_change_diff_copy, 2},
-    {"_pmartR_group_comparison_anova_cpp", (DL_FUNC) &_pmartR_group_comparison_anova_cpp, 7},
-    {"_pmartR_holm_cpp", (DL_FUNC) &_pmartR_holm_cpp, 1},
-    {"_pmartR_ptukey_speed", (DL_FUNC) &_pmartR_ptukey_speed, 2},
     {"_pmartR_fold_change_diff", (DL_FUNC) &_pmartR_fold_change_diff, 2},
+    {"_pmartR_fold_change_diff_row", (DL_FUNC) &_pmartR_fold_change_diff_row, 2},
     {"_pmartR_fold_change_ratio", (DL_FUNC) &_pmartR_fold_change_ratio, 2},
     {"_pmartR_fold_change_diff_na_okay", (DL_FUNC) &_pmartR_fold_change_diff_na_okay, 2},
+    {"_pmartR_anova_cpp", (DL_FUNC) &_pmartR_anova_cpp, 5},
+    {"_pmartR_two_factor_anova_cpp", (DL_FUNC) &_pmartR_two_factor_anova_cpp, 5},
+    {"_pmartR_group_comparison_anova_cpp", (DL_FUNC) &_pmartR_group_comparison_anova_cpp, 4},
+    {"_pmartR_holm_cpp", (DL_FUNC) &_pmartR_holm_cpp, 1},
+    {"_pmartR_ptukey_speed", (DL_FUNC) &_pmartR_ptukey_speed, 2},
     {"_pmartR_compute_betas", (DL_FUNC) &_pmartR_compute_betas, 3},
     {"_pmartR_kw_rcpp", (DL_FUNC) &_pmartR_kw_rcpp, 2},
     {"_pmartR_nonmissing_per_grp", (DL_FUNC) &_pmartR_nonmissing_per_grp, 2},

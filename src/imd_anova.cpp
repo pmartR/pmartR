@@ -5,337 +5,12 @@ using namespace Rcpp;
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// ANOVA FUNCTIONS
+// FOLD CHANGE FUNCTIONS
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-//For each row (peptide), this function computes the group means, counts the number of non-NA
-//observations, estimates sigma^2, then computes the ANOVA F-statistic and associated p-value
-//
-//The results of this function are fed into group_comparison() which takes the group means,
-//group sizes and sigma^2 value to do whatever group comparisons the user asks for
-
 // [[Rcpp::export]]
-List anova_cpp(arma::mat data, NumericVector gp, int unequal_var, arma::mat X, arma::mat Beta) {
-  //data is the n-by-p matrix of data
-  //gp is a vector that identifies what group each column belongs to,
-  //  assumed to be numeric 1-m where m is the total number of groups
-  //unequal_var is a 0/1 depending on if variances are allowed to be unequal
-  //df_red number of degrees of freedom spent elsewhere
-
-  int n = data.n_rows;  //number of rows in data matrix, i.e., peptides/proteins/...
-  int p = data.n_cols;  //number of samples
-  int m = max(gp);      //number of groups
-  double overall_mean = 0; //mean across groups
-  NumericVector diff_vars(n); //Allow for unequal variances in two group situation
-
-  NumericVector Fstats(n), p_value(n), sigma2(n); //F-statistic & p-value for each row
-  NumericMatrix group_sums(n,m); //matrix to save the group sums in
-  NumericMatrix group_means(n,m); //matrix to save the group means in
-  NumericMatrix adj_group_means(n,m); // matrix of means adjusted for covariates
-  NumericMatrix group_sizes(n,m);
-  NumericVector rowi(m);
-  NumericVector rowi_gsize(m); //vector to contain the number of non-na observations
-  //per group
-
-  arma::mat covar_vals = X.cols(m, X.n_cols - 1);
-  arma::rowvec Xrowi(p);
-  arma::uvec elems_to_keep;
-  arma::uvec df_used(n);
-  
-  //Iterate over the matrix rows (peptides, proteins,...) to get group means
-  //and SSEs
-  for(int i=0; i<n; i++){
-
-    //Be sure each SS starts out at zero
-    double SSE = 0;
-    double SSB = 0;
-    double SST = 0;
-
-    //Reset the number of non-missing groups
-    int missing_m = 0;
-
-    Xrowi = data.row(i);
-    //Find the finite values in row i and put them in a column vector called "red_rowi"
-    elems_to_keep = find_finite(Xrowi);
-
-    arma::rowvec beta = Beta.row(i);
-    arma::colvec effects = arma::zeros(p);
-    effects.rows(elems_to_keep) = covar_vals.rows(elems_to_keep) * beta.cols(m, beta.n_cols - 1).t();
-    
-    Rcout << "We here" << i << std::endl;
-
-    //Iterate over the matrix columns (samples) to get groups means for each row
-    for(int j=0; j<p; j++){
-
-      //Get the groupi
-      int groupi = gp[j]-1;
-
-      //Compute group sums by adding each observations that's not an NA
-      if(!NumericMatrix::is_na(data(i,j))){
-        group_sums(i,groupi) += data(i,j);
-        adj_group_means(i,groupi) += data(i,j) - effects(j);
-        group_sizes(i,groupi) += 1;
-      }
-
-    }
-
-    Rcout << "Computed sums" << i << std::endl;
-
-    //Store total number of non-na obs per row
-    rowi_gsize = group_sizes(i,_);
-    int rowi_size = std::accumulate(rowi_gsize.begin(),rowi_gsize.end(),0.0);
-
-    //Translate the group sums into group means for each row
-    for(int k=0; k<m; k++){
-      group_means(i,k) = group_sums(i,k)/group_sizes(i,k);
-      adj_group_means(i,k) = adj_group_means(i,k)/group_sizes(i,k);
-
-      //If an entire group is missing (which shouldn't happen), the number of groups needs to be decreased
-      if(group_sizes(i,k)<1){
-        missing_m = missing_m + 1;
-      }
-
-      //group_sizes(k) = 0;
-    }
-
-     Rcout << "Computed means" << i << std::endl;
-
-    //compute overall mean for row i
-    rowi = group_sums(i,_);
-    overall_mean = std::accumulate(rowi.begin(),rowi.end(),0.0);
-    overall_mean = overall_mean/rowi_size;
-
-    if(m==2 && unequal_var==1){ //If there are only two groups, allow the variances to be different, i.e., Welch's t-test
-      diff_vars[0] = 0;
-      diff_vars[1] = 0;
-
-      for(int j=0; j<p; j++){
-        int groupi = gp[j] - 1;
-        if(!NumericMatrix::is_na(data(i,j))){
-          diff_vars[groupi] += pow(data(i,j)-group_means(i,groupi),2);
-        }
-      }
-      diff_vars[0] /= (rowi_gsize[0]-1);
-      diff_vars[1] /= (rowi_gsize[1]-1);
-      sigma2(i) = diff_vars[0]/rowi_gsize[0]+diff_vars[1]/rowi_gsize[1]; //Welch's estimate of variance
-      Fstats(i) = pow(group_means(i,0)-group_means(i,1),2)/sigma2(i);
-      //Satterthwaite approximation to degrees of freedom
-      double dfi = pow(sigma2(i),2)/(pow(diff_vars[0]/rowi_gsize[0],2)/(rowi_gsize[0]-1)+pow(diff_vars[1]/rowi_gsize[1],2)/(rowi_gsize[1]-1));
-      p_value(i) = R::pf(Fstats(i),1,dfi,false,false);
-      sigma2(i) *= dfi; //scale by estimated df to get sample variance not mean standard error
-      df_used(i) = dfi;
-    }else{ //If there are more than two groups, compute pooled variance assuming equal variance across groups
-      //Iterate over columns (again) to get a SSE for each row
-      for(int j=0; j<p; j++){
-        if(!NumericMatrix::is_na(data(i,j))){
-          // These are now the adjusted group means, so this is no longer the correct SSE
-          SST += pow(data(i,j)-overall_mean,2);
-        }
-      }
-    
-      arma::colvec residual_vec(p);
-      residual_vec = arma::conv_to<arma::colvec>::from(data.row(i)).rows(elems_to_keep);
-      residual_vec = residual_vec - X.rows(elems_to_keep)*Beta.row(i).t();
-      SSE = arma::as_scalar(residual_vec.t()*residual_vec);
-
-      //Compute F-statistic
-      SSB = SST-SSE;
-      sigma2(i) = (SSE/(rowi_size-rank(X)+missing_m));
-      Fstats(i) = (SSB/(m - missing_m - 1))/(sigma2(i));
-      //Arguments passed to pf are: value, df1, df2, lower tail?, log scale?
-      p_value(i) = R::pf(Fstats(i),m - missing_m - 1,rowi_size-rank(X)+missing_m,false,false);
-      df_used(i) = rowi_size-rank(X)+missing_m;
-    }
-
-  }//end iteration over rows
-
-  return List::create(Named("group_means") = group_means,
-                      Named("adj_group_means") = adj_group_means,
-                      Named("group_sizes") = group_sizes,
-                      Named("Sigma2") = sigma2,
-                      Named("Fstats") = Fstats,
-                      Named("pvalue") = p_value,
-                      Named("df_used") = df_used);
-}
-
-// [[Rcpp::export]]
-List two_factor_anova_cpp(arma::mat y,
-                          arma::mat X_full,
-                          arma::mat X_red,
-                          arma::colvec group_ids,
-                          arma::uvec covar_inds){
-
-  int i,j;
-  int n = y.n_rows;
-  int p_red = X_red.n_cols;
-  int p_full = X_full.n_cols;
-  arma::rowvec yrowi(y.n_cols);
-  arma::uvec to_remove;
-  arma::mat X_red_nona, X_full_nona, invXtX_red, invXtX_full, XFinal;
-  arma::mat PxRed, PxFull;
-  arma::rowvec yrowi_nona;
-  int num_to_remove;
-
-  int df_red, df_full;
-  arma::uvec df_used(n);
-  
-  double sigma2_red, sigma2_full = 0;
-  NumericVector sig_est(n), pval(n), Fstat(n),  atl_one(n);
-  arma::mat diag_mat;
-  arma::colvec par_ests(p_full), par_ests_temp,group_ids_nona(y.n_cols), group_ids_nona_unq;
-  arma::mat parmat(n,p_full), group_sizes(n,p_full);
-  arma::rowvec gsizes(p_full), csums(p_full);
-  arma::uvec zero_cols, non_zero_cols;
-  arma::uvec missing_gp,size_j;
-
-
-  //Loop over rows in y
-  for(i=0; i<n; i++){
-    yrowi = y.row(i);
-    to_remove = arma::find_nonfinite(yrowi);
-    //Rcout << "Indices to remove " << to_remove << std::endl;
-
-    yrowi_nona = yrowi;
-    X_red_nona = X_red;
-    X_full_nona = X_full;
-    num_to_remove = to_remove.size();
-    group_ids_nona = group_ids-1; //Make group_ids zero indexed
-
-    //Remove NAs if applicable
-    for(j=(num_to_remove-1);j>=0;j--){
-      yrowi_nona.shed_col(to_remove[j]);
-      X_red_nona.shed_row(to_remove[j]);
-      X_full_nona.shed_row(to_remove[j]);
-      group_ids_nona.shed_row(to_remove[j]);
-    }
-
-    //Remove completely empty columns
-    csums = sum(X_full_nona,0);
-    zero_cols = arma::find(csums==0);
-    non_zero_cols = arma::find(csums);
-
-    df_red = X_red_nona.n_rows-rank(X_red_nona);
-    df_full = X_full_nona.n_rows-rank(X_full_nona);
-
-    PxRed = pinv(X_red_nona.t()*X_red_nona)*X_red_nona.t()*yrowi_nona.t();
-    
-    arma::colvec residual_vec = yrowi_nona.t();
-    residual_vec = residual_vec - X_red_nona*PxRed;
-
-    sigma2_red = arma::conv_to<double>::from(residual_vec.t()*residual_vec/df_red);
-
-    if((df_red-df_full)<=0){
-
-      //If interaction can't be estimated, automatically select smaller model
-      pval(i) = 1;
-      Fstat(i) = 0;
-      df_used(i) = df_red;
-    }else{
-      PxFull = X_full_nona*pinv(X_full_nona.t()*X_full_nona)*X_full_nona.t();
-      diag_mat.resize(size(PxFull));
-      diag_mat.eye();
-      sigma2_full = arma::conv_to<double>::from(yrowi_nona*(diag_mat-PxFull)*yrowi_nona.t()/(df_full));
-
-      if (i == 1){
-        Rcout << sigma2_full << std::endl;
-      }
-
-      PxFull = pinv(X_full_nona.t()*X_full_nona)*X_full_nona.t()*yrowi_nona.t();
-    
-      arma::colvec residual_vec = yrowi_nona.t();
-      residual_vec = residual_vec - X_full_nona*PxFull;
-
-      sigma2_full = arma::conv_to<double>::from(residual_vec.t()*residual_vec/df_full);
-
-      if (i == 1){
-        Rcout << sigma2_full << std::endl;
-      }
-
-      Fstat(i) = (sigma2_red*df_red-sigma2_full*df_full)/sigma2_full;
-      pval(i) = R::pf(Fstat(i),df_red-df_full,df_full,0,0);
-    }
-
-    if(pval(i)<0.05){
-      //Reject null hypothesis that reduced model is good enough, use full model
-      XFinal = X_full_nona;
-      sig_est(i) = sigma2_full;
-      df_used(i) = df_full;
-    }else{
-      XFinal = X_full_nona;
-      XFinal.cols(p_red,p_full-1).fill(0.0); //Zero out the interaction terms if they're insignificant
-      sig_est(i) = sigma2_red;
-      df_used(i) = df_red;
-    }
-
-    //"Parameter estiamtes" are the group means: Xbeta_hat=X(XpX)^{-1}XpY
-    par_ests_temp = pinv(XFinal.t()*XFinal)*XFinal.t()*yrowi_nona.t();
-
-    if (i == 1) {
-      Rcout << par_ests_temp << std::endl;
-    }
-
-    // Remove covariate effects
-    if(covar_inds.size() > 0) {
-      XFinal.cols(covar_inds-1).zeros();
-    }
-
-    if (i == 1) {
-      Rcout << XFinal << std::endl;
-    }
-
-    par_ests_temp = XFinal * par_ests_temp;
-
-    //Find groups that had at least one non-missing value
-    group_ids_nona_unq=arma::unique(group_ids_nona);
-
-    //Fill in the par_ests vector, put NaN if group was missing or the average effect in groups with no missing data
-    if(static_cast<int>(group_ids_nona_unq.n_elem)<p_full){
-      par_ests.zeros();
-      //cntr = 0;
-
-      for(j=0;j<p_full;j++){
-        missing_gp = find(group_ids_nona_unq==j);
-        if(missing_gp.n_elem>0){
-          //Rcpp::Rcout <<"group_ids_nona \n"<< find(group_ids_nona==j)<<"\n";
-          par_ests(j) = mean(par_ests_temp(find(group_ids_nona==j)));
-          //cntr++;
-        }else{
-          par_ests(j) = arma::datum::nan;
-        }
-      }
-
-    }else{
-      for(j=0;j<p_full;j++){
-        par_ests(j) = mean(par_ests_temp(find(group_ids_nona==j)));
-      }
-    }
-
-
-
-    parmat.row(i) = par_ests.t();
-
-    //Compute group sizes after accounting for NaNs
-    for(j=0;j<p_full;j++){
-      size_j = find(group_ids_nona==j);
-      gsizes(j) = size_j.n_elem;
-      //Rcpp::Rcout <<"size_j \n"<<size_j;
-    }
-
-    group_sizes.row(i) = gsizes; //For now don't return the interaction groups
-
-  }
-  return List::create(Named("par_estimates") = parmat,
-                      Named("group_sizes") = group_sizes,
-                      Named("Sigma2") = sig_est,
-                      Named("Fstats") = Fstat,
-                      Named("pvalue") = pval,
-                      Named("df_used") = df_used);
-}
-
-//This is a copy of `fold_change_diff` that will be called by `group_comparison`
-// [[Rcpp::export]]
-arma::mat fold_change_diff_copy(arma::mat data, arma::mat C)  {
+arma::mat fold_change_diff(arma::mat data, arma::mat C)  {
   //Given the group means, and wanted group comparisons, compute the fold change using differencing
   //means - matrix of group means
   // C - matrix that defines the group comparisons you want to make
@@ -391,25 +66,429 @@ arma::mat fold_change_diff_copy(arma::mat data, arma::mat C)  {
 }
 
 // [[Rcpp::export]]
-List group_comparison_anova_cpp(arma::mat data, arma::mat means, arma::mat sizes, arma::vec sigma2, arma::mat X, arma::mat C, arma::vec df_used) {
-  //Given the group means, group sizes and esimtaes of sigma^2, do all the
-  //group comparisons requested.  Returns estimated difference, standard error, t-statistic
-  //and p-value
-  //means - matrix of group means
-  //sizes- matrix of group sizes
-  //sigma2 - vector of sigma^2 estimates
+arma::rowvec fold_change_diff_row(arma::rowvec means, arma::mat C) {
+  // Given the vector of means, and wanted group comparisons, compute the fold change using differencing
+  // means - row vector of group means
   // C - matrix that defines the group comparisons you want to make
-  // degrees of freedom used in the estimation of the means
+  int p = means.n_cols;
+  int num_comparisons = C.n_rows;
+  arma::rowvec fc_diff(num_comparisons);
+  arma::uvec found_finite;
+  arma::uvec zero_C;
+  arma::colvec not_nan;
+  arma::mat good_C;
+  arma::mat bad_C;
+  arma::colvec rsums;
+  
+  //Treat rows with NaN as special cases
+  if(means.has_nan()){
+    
+    //Which rows of C do not involve the NaN element(s)?
+    bad_C = C.cols(find_nonfinite(means)); //Submatrix of C involving the NaN element
+    
+    fc_diff.fill(arma::datum::nan); //Fill the vector with NAs
+    
+    if(bad_C.n_cols<=(p-2)){ //Only proceed if there are at least two non-NaN means, otherwise return all NaNs
+      //Absolute row sum of bad_C to see where the differences we can compute are
+      rsums = arma::sum(abs(bad_C),1);
+      
+      zero_C = arma::find(rsums<0.01);    //Which rows of bad_C have zero elements? i.e., should compute differences of
+      
+      //non-nan elements of rowi_means
+      found_finite = find_finite(means);
+      not_nan = means.rows(found_finite); //rowi_means is a column vector so take it's rows
+      good_C = C.cols(found_finite);          //C is a matrix so take the columns I need
+      good_C = good_C.rows(zero_C);
+      
+      
+      fc_diff.cols(zero_C) = arma::conv_to<arma::rowvec>::from(good_C*not_nan);
+      
+    }
 
-  int i, j, k;
+  }else{
+    fc_diff = arma::conv_to<arma::rowvec>::from(C*means.t());
+  }
+  
+  return fc_diff;
+}
+
+// [[Rcpp::export]]
+arma::mat fold_change_ratio(arma::mat data, arma::mat C)  {
+  //Given the group means, and wanted group comparisons, compute the fold change ratios
+  //means - matrix of group means
+  // C - matrix that defines the group comparisons you want to make
+
+  arma::mat fc_mat;
+  arma::mat log_data;
+  arma::mat fc_diff;
+  //ratio is same as difference on log scale, so take log, then difference, then exponentiate
+
+  log_data = log(data);
+  fc_diff = fold_change_diff(log_data, C);
+  fc_mat = exp(fc_diff);
+
+  return fc_mat;
+}
+
+// [[Rcpp::export]]
+arma::mat fold_change_diff_na_okay(arma::mat data, arma::mat C)  {
+  //Given the group means, and wanted group comparisons, compute the fold change using differencing
+  //To avoid returning NAs even if all groups of interest are not NA, it will do elementwise
+  //multiplication instead of matrix multiplication
+
+  //means - matrix of group means
+  // C - matrix that defines the group comparisons you want to make
+
+  int n = data.n_rows;
+  int p = data.n_cols;
+  int num_comparisons = C.n_rows;
+  arma::mat fc_diff(n,num_comparisons);
+  arma::colvec rowi_means(p);
+  int i,j,k;
+  arma::uvec of_int;
+  fc_diff.zeros();
+
+  for(i=0;i<n;i++){
+    rowi_means = arma::conv_to<arma::colvec>::from(data.row(i));
+    if(rowi_means.has_nan()){
+      for(j=0;j<num_comparisons;j++){
+        of_int = find(C.row(j));
+        for(k=0;k<of_int.size();k++){
+          fc_diff(i,j) += C(j,of_int[k])*rowi_means(of_int[k]);
+        }
+      }
+    }else{
+      fc_diff.row(i) = arma::conv_to<arma::rowvec>::from(C*rowi_means);
+    }
+  }
+
+  return fc_diff;
+}
+
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// ANOVA FUNCTIONS
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+//For each row (peptide), this function computes the group means, counts the number of non-NA
+//observations, estimates sigma^2, then computes the ANOVA F-statistic and associated p-value
+//
+//The results of this function are fed into group_comparison() which takes the group means,
+//group sizes and sigma^2 value to do whatever group comparisons the user asks for
+
+// [[Rcpp::export]]
+List anova_cpp(arma::mat data, NumericVector gp, int unequal_var, arma::mat X, arma::mat Beta) {
+  //data is the n-by-p matrix of data
+  //gp is a vector that identifies what group each column belongs to,
+  //  assumed to be numeric 1-m where m is the total number of groups
+  //unequal_var is a 0/1 depending on if variances are allowed to be unequal
+  //df_red number of degrees of freedom spent elsewhere
+
+  int n = data.n_rows;  //number of rows in data matrix, i.e., peptides/proteins/...
+  int p = data.n_cols;  //number of samples
+  int m = max(gp);      //number of groups
+  double overall_mean = 0; //mean across groups
+  NumericVector diff_vars(n); //Allow for unequal variances in two group situation
+
+  NumericVector Fstats(n), p_value(n), sigma2(n); //F-statistic & p-value for each row
+  NumericMatrix group_sums(n,m); //matrix to save the group sums in
+  NumericMatrix group_means(n,m); //matrix to save the group means in
+  NumericMatrix adj_group_means(n,m); // matrix of means adjusted for covariates
+  NumericMatrix group_sizes(n,m);
+  NumericVector rowi(m);
+  NumericVector rowi_gsize(m); //vector to contain the number of non-na observations
+  //per group
+
+  arma::mat covar_vals = X.cols(m, X.n_cols - 1);
+  arma::rowvec Xrowi(p);
+  arma::uvec elems_to_keep;
+  arma::uvec dof(n);
+  
+  //Iterate over the matrix rows (peptides, proteins,...) to get group means
+  //and SSEs
+  for(int i=0; i<n; i++){
+
+    //Be sure each SS starts out at zero
+    double SSE = 0;
+    double SSB = 0;
+    double SST = 0;
+
+    //Reset the number of non-missing groups
+    int missing_m = 0;
+
+    Xrowi = data.row(i);
+    //Find the finite values in row i and put them in a column vector called "red_rowi"
+    elems_to_keep = find_finite(Xrowi);
+
+    arma::rowvec beta = Beta.row(i);
+    arma::colvec effects = arma::zeros(p);
+    effects.rows(elems_to_keep) = covar_vals.rows(elems_to_keep) * beta.cols(m, beta.n_cols - 1).t();
+
+    //Iterate over the matrix columns (samples) to get groups means for each row
+    for(int j=0; j<p; j++){
+
+      //Get the groupi
+      int groupi = gp[j]-1;
+
+      //Compute group sums by adding each observations that's not an NA
+      if(!NumericMatrix::is_na(data(i,j))){
+        group_sums(i,groupi) += data(i,j);
+        adj_group_means(i,groupi) += data(i,j) - effects(j);
+        group_sizes(i,groupi) += 1;
+      }
+
+    }
+
+    //Store total number of non-na obs per row
+    rowi_gsize = group_sizes(i,_);
+    int rowi_size = std::accumulate(rowi_gsize.begin(),rowi_gsize.end(),0.0);
+
+    //Translate the group sums into group means for each row
+    for(int k=0; k<m; k++){
+      group_means(i,k) = group_sums(i,k)/group_sizes(i,k);
+      adj_group_means(i,k) = adj_group_means(i,k)/group_sizes(i,k);
+
+      //If an entire group is missing (which shouldn't happen), the number of groups needs to be decreased
+      if(group_sizes(i,k)<1){
+        missing_m = missing_m + 1;
+      }
+
+      //group_sizes(k) = 0;
+    }
+
+    //compute overall mean for row i
+    rowi = group_sums(i,_);
+    overall_mean = std::accumulate(rowi.begin(),rowi.end(),0.0);
+    overall_mean = overall_mean/rowi_size;
+
+    if(m==2 & unequal_var==1){ //If there are only two groups, allow the variances to be different, i.e., Welch's t-test
+      diff_vars[0] = 0;
+      diff_vars[1] = 0;
+
+      for(int j=0; j<p; j++){
+        int groupi = gp[j] - 1;
+        if(!NumericMatrix::is_na(data(i,j))){
+          diff_vars[groupi] += pow(data(i,j)-group_means(i,groupi),2);
+        }
+      }
+      diff_vars[0] /= (rowi_gsize[0]-1);
+      diff_vars[1] /= (rowi_gsize[1]-1);
+      sigma2(i) = diff_vars[0]/rowi_gsize[0]+diff_vars[1]/rowi_gsize[1]; //Welch's estimate of variance
+      Fstats(i) = pow(group_means(i,0)-group_means(i,1),2)/sigma2(i);
+      //Satterthwaite approximation to degrees of freedom
+      double dfi = pow(sigma2(i),2)/(pow(diff_vars[0]/rowi_gsize[0],2)/(rowi_gsize[0]-1)+pow(diff_vars[1]/rowi_gsize[1],2)/(rowi_gsize[1]-1));
+      p_value(i) = R::pf(Fstats(i),1,dfi,false,false);
+      sigma2(i) *= dfi; //scale by estimated df to get sample variance not mean standard error
+      dof(i) = dfi;
+    }else{ //If there are more than two groups, compute pooled variance assuming equal variance across groups
+      //Iterate over columns (again) to get a SSE for each row
+      for(int j=0; j<p; j++){
+        if(!NumericMatrix::is_na(data(i,j))){
+          // These are now the adjusted group means, so this is no longer the correct SSE
+          SST += pow(data(i,j)-overall_mean,2);
+        }
+      }
+    
+      arma::colvec residual_vec(p);
+      residual_vec = arma::conv_to<arma::colvec>::from(data.row(i)).rows(elems_to_keep);
+      residual_vec = residual_vec - X.rows(elems_to_keep)*Beta.row(i).t();
+      SSE = arma::as_scalar(residual_vec.t()*residual_vec);
+
+      //Compute F-statistic
+      SSB = SST-SSE;
+      sigma2(i) = (SSE/(rowi_size-rank(X)+missing_m));
+      Fstats(i) = (SSB/(m - missing_m - 1))/(sigma2(i));
+      //Arguments passed to pf are: value, df1, df2, lower tail?, log scale?
+      p_value(i) = R::pf(Fstats(i),m - missing_m - 1,rowi_size-rank(X)+missing_m,false,false);
+      dof(i) = rowi_size-rank(X)+missing_m;
+    }
+
+  }//end iteration over rows
+
+  return List::create(Named("group_means") = group_means,
+                      Named("adj_group_means") = adj_group_means,
+                      Named("group_sizes") = group_sizes,
+                      Named("Sigma2") = sigma2,
+                      Named("Fstats") = Fstats,
+                      Named("pvalue") = p_value,
+                      Named("dof") = dof);
+}
+
+// [[Rcpp::export]]
+List two_factor_anova_cpp(arma::mat y,
+                          arma::mat X_full,
+                          arma::mat X_red,
+                          arma::colvec group_ids,
+                          arma::uvec covar_inds){
+
+  int i,j;
+  int n = y.n_rows;
+  int p_red = X_red.n_cols;
+  int p_full = X_full.n_cols;
+  arma::rowvec yrowi(y.n_cols);
+  arma::uvec to_remove;
+  arma::mat X_red_nona, X_full_nona, invXtX_red, invXtX_full, XFinal;
+  arma::mat PxRed, PxFull;
+  arma::rowvec yrowi_nona;
+  int num_to_remove;
+
+  int df_red, df_full;
+  arma::uvec dof(n);
+  
+  double sigma2_red, sigma2_full;
+  NumericVector sig_est(n), pval(n), Fstat(n),  atl_one(n);
+  arma::mat diag_mat;
+  arma::colvec par_ests(p_full), par_ests_temp,group_ids_nona(y.n_cols), group_ids_nona_unq;
+  arma::mat parmat(n,p_full), group_sizes(n,p_full);
+  arma::rowvec gsizes(p_full), csums(p_full);
+  arma::uvec zero_cols, non_zero_cols;
+  arma::uvec missing_gp,size_j;
+
+
+  //Loop over rows in y
+  for(i=0; i<n; i++){
+    yrowi = y.row(i);
+    to_remove = arma::find_nonfinite(yrowi);
+    //Rcout << "Indices to remove " << to_remove << std::endl;
+
+    yrowi_nona = yrowi;
+    X_red_nona = X_red;
+    X_full_nona = X_full;
+    num_to_remove = to_remove.size();
+    group_ids_nona = group_ids-1; //Make group_ids zero indexed
+
+    //Remove NAs if applicable
+    for(j=(num_to_remove-1);j>=0;j--){
+      yrowi_nona.shed_col(to_remove[j]);
+      X_red_nona.shed_row(to_remove[j]);
+      X_full_nona.shed_row(to_remove[j]);
+      group_ids_nona.shed_row(to_remove[j]);
+    }
+
+    //Remove completely empty columns
+    csums = sum(X_full_nona,0);
+    zero_cols = arma::find(csums==0);
+    non_zero_cols = arma::find(csums);
+
+    df_red = X_red_nona.n_rows-rank(X_red_nona);
+    df_full = X_full_nona.n_rows-rank(X_full_nona);
+
+    PxRed = pinv(X_red_nona.t()*X_red_nona)*X_red_nona.t()*yrowi_nona.t();
+    
+    arma::colvec residual_vec = yrowi_nona.t();
+    residual_vec = residual_vec - X_red_nona*PxRed;
+
+    sigma2_red = arma::conv_to<double>::from(residual_vec.t()*residual_vec/df_red);
+
+    if((df_red-df_full)<=0){
+
+      //If interaction can't be estimated, automatically select smaller model
+      pval(i) = 1;
+      Fstat(i) = 0;
+      dof(i) = df_red;
+    }else{
+      PxFull = X_full_nona*pinv(X_full_nona.t()*X_full_nona)*X_full_nona.t();
+      diag_mat.resize(size(PxFull));
+      diag_mat.eye();
+      sigma2_full = arma::conv_to<double>::from(yrowi_nona*(diag_mat-PxFull)*yrowi_nona.t()/(df_full));
+
+      PxFull = pinv(X_full_nona.t()*X_full_nona)*X_full_nona.t()*yrowi_nona.t();
+    
+      arma::colvec residual_vec = yrowi_nona.t();
+      residual_vec = residual_vec - X_full_nona*PxFull;
+
+      sigma2_full = arma::conv_to<double>::from(residual_vec.t()*residual_vec/df_full);
+
+      Fstat(i) = (sigma2_red*df_red-sigma2_full*df_full)/sigma2_full;
+      pval(i) = R::pf(Fstat(i),df_red-df_full,df_full,0,0);
+    }
+
+    if(pval(i)<0.05){
+      //Reject null hypothesis that reduced model is good enough, use full model
+      XFinal = X_full_nona;
+      sig_est(i) = sigma2_full;
+      dof(i) = df_full;
+    }else{
+      XFinal = X_full_nona;
+      XFinal.cols(p_red,p_full-1).fill(0.0); //Zero out the interaction terms if they're insignificant
+      sig_est(i) = sigma2_red;
+      dof(i) = df_red;
+    }
+
+    //"Parameter estiamtes" are the group means: Xbeta_hat=X(XpX)^{-1}XpY
+    par_ests_temp = pinv(XFinal.t()*XFinal)*XFinal.t()*yrowi_nona.t();
+
+    // Remove covariate effects
+    if(covar_inds.size() > 0) {
+      XFinal.cols(covar_inds-1).zeros();
+    }
+
+    par_ests_temp = XFinal * par_ests_temp;
+
+    //Find groups that had at least one non-missing value
+    group_ids_nona_unq=arma::unique(group_ids_nona);
+
+    //Fill in the par_ests vector, put NaN if group was missing or the average effect in groups with no missing data
+    if(group_ids_nona_unq.n_elem<p_full){
+      par_ests.zeros();
+      //cntr = 0;
+
+      for(j=0;j<p_full;j++){
+        missing_gp = find(group_ids_nona_unq==j);
+        if(missing_gp.n_elem>0){
+          //Rcpp::Rcout <<"group_ids_nona \n"<< find(group_ids_nona==j)<<"\n";
+          par_ests(j) = mean(par_ests_temp(find(group_ids_nona==j)));
+          //cntr++;
+        }else{
+          par_ests(j) = arma::datum::nan;
+        }
+      }
+
+    }else{
+      for(j=0;j<p_full;j++){
+        par_ests(j) = mean(par_ests_temp(find(group_ids_nona==j)));
+      }
+    }
+
+
+
+    parmat.row(i) = par_ests.t();
+
+    //Compute group sizes after accounting for NaNs
+    for(j=0;j<p_full;j++){
+      size_j = find(group_ids_nona==j);
+      gsizes(j) = size_j.n_elem;
+      //Rcpp::Rcout <<"size_j \n"<<size_j;
+    }
+
+    group_sizes.row(i) = gsizes; //For now don't return the interaction groups
+
+  }
+  return List::create(Named("par_estimates") = parmat,
+                      Named("group_sizes") = group_sizes,
+                      Named("Sigma2") = sig_est,
+                      Named("Fstats") = Fstat,
+                      Named("pvalue") = pval,
+                      Named("dof") = dof);
+}
+
+// [[Rcpp::export]]
+List group_comparison_anova_cpp(arma::mat data, arma::mat sizes, arma::mat X, arma::mat C) {
+  //Given the raw data, group sizes, design matrix consisting of group levels, and comparison matrix return the group comparisons requested.  Returns the estimated difference, standard errors, t-statistics, and p-values.
+  //Returns estimated difference, standard error, t-statistic, p-values
+  //data - raw data matrix of n_biomolecules by n_samples
+  //sizes - matrix of group sizes n_biomolecules x n_groups
+  // C - matrix that defines the group comparisons you want to make
+
   int num_comparisons = C.n_rows; //Number of comparisons to be made
-  int n_groups = means.n_cols; //Number of groups
-  int n = means.n_rows; //Number of rows (peptides)
+  int n_groups = sizes.n_cols; //Number of groups
+  int n = sizes.n_rows; //Number of rows (peptides)
   int N = 0; //Total number of observations for rowi;
   arma::colvec rowi_means(n_groups), rowi_sizes(n_groups); //Storage for each row of means and sample sizes
 
   //arma::mat diff_mat(n,num_comparisons); //Matrix of comparison means
-  arma::mat diff_mat;
+  arma::mat diff_mat(n, num_comparisons);
 
   arma::mat diff_ses(n,num_comparisons); //Matrix of comparison ses
   arma::mat t_tests(n,num_comparisons); //Matrix of t-test statistics
@@ -423,43 +502,47 @@ List group_comparison_anova_cpp(arma::mat data, arma::mat means, arma::mat sizes
   diff_mat.zeros();
   p_values.zeros();
 
-  //Compute the differences between means using the fold_change_diff function
-  diff_mat = fold_change_diff_copy(means, C.cols(0,n_groups-1));
-
-  for(i=0;i<n;i++){
+  for(int i=0;i<n;i++){
     rowi = data.row(i);
     elems_to_keep = find_finite(rowi);
     arma::mat XpXInv = pinv(X.rows(elems_to_keep).t() * X.rows(elems_to_keep));
 
-    // Create a counter that keeps track of the number of groups with all
-    // missing data. This value will be used in calculating the degrees of
-    // freedom in the R::pt function. For example, if there are three groups but
-    // one of them has all missing values the degrees of freedom for the number
-    // of groups should be 3 - 1 = 2.
-    int n_na_grps = 0;
-
     // keep track of the number of missing groups
-    for(j=0; j<n_groups; j++){
+    for(int j=0; j<n_groups; j++){
       if(sizes(i,j)>0){
         N += sizes(i,j);
       } 
     }
 
+    int dof = N - rank(X.rows(elems_to_keep));
+
+    arma::colvec residual_vec(X.n_rows);
+    residual_vec = arma::conv_to<arma::colvec>::from(data.row(i)).rows(elems_to_keep);
+
+    // Betas are the estimated group means in this model specification
+    arma::colvec Beta = XpXInv*X.rows(elems_to_keep).t()*residual_vec;
+    arma::colvec Beta_finite = Beta;
+    Beta_finite.rows(sizes.row(i).cols(0, n_groups - 1) == 0).fill(arma::datum::nan);
+
+    arma::rowvec mean_diffs = fold_change_diff_row(Beta.rows(0, n_groups - 1).t(), C.cols(0, n_groups - 1));
+    diff_mat.row(i) = mean_diffs;
+
+    residual_vec = residual_vec - X.rows(elems_to_keep)*Beta;
+    double SSE = arma::as_scalar(residual_vec.t()*residual_vec);
+    double sigma_hat = SSE/dof;
+
     // Compute the square root of the variance-covariance matrix
-    ses_mat = sqrt(C*XpXInv*C.t()*sigma2(i));
+    ses_mat = sqrt(C*XpXInv*C.t()*sigma_hat);
     // Take the diagonal elements as Vars for each comparison
     diff_ses.row(i) = arma::conv_to<arma::rowvec>::from(ses_mat.diag());
-    t_tests.row(i) = diff_mat.row(i)/diff_ses.row(i);
+    t_tests.row(i) = mean_diffs/diff_ses.row(i);
 
-    //Peel off sizes for row i and compute DFs
-    rowi_sizes = arma::conv_to<arma::colvec>::from(sizes.row(i));
-
-    for(k=0; k<num_comparisons; k++){
+    for(int k=0; k<num_comparisons; k++){
 
       //Only compute p-values if the degrees of freedom are atleast 3
-      if (arma::is_finite(t_tests(i,k)) && (N - (n_groups - n_na_grps)) > 0) {
+      if (arma::is_finite(t_tests(i,k)) && dof > 0) {
         p_values(i,k) = 2*R::pt(fabs(t_tests(i,k)),
-                 (df_used(i)),
+                 dof,
                  false,
                  false);
       }else{
@@ -562,126 +645,10 @@ NumericMatrix ptukey_speed(NumericMatrix qstats, NumericVector sizes) {
 
 }
 
-// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// FOLD CHANGE FUNCTIONS
-// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-// [[Rcpp::export]]
-arma::mat fold_change_diff(arma::mat data, arma::mat C)  {
-  //Given the group means, and wanted group comparisons, compute the fold change using differencing
-  //means - matrix of group means
-  // C - matrix that defines the group comparisons you want to make
-
-  int n = data.n_rows;
-  int p = data.n_cols;
-  int num_comparisons = C.n_rows;
-  arma::mat fc_diff(n,num_comparisons);
-  arma::colvec rowi_means(p);
-  arma::uvec found_finite;
-  arma::uvec zero_C;
-  arma::colvec not_nan;
-  arma::mat good_C;
-  arma::mat bad_C;
-  arma::rowvec temp_fc_diff(num_comparisons);
-  arma::colvec rsums;
-
-  for(int i=0;i<n;i++){
-    rowi_means = arma::conv_to<arma::colvec>::from(data.row(i));
-
-    //Treat rows with NaN as special cases
-    if(rowi_means.has_nan()){
-
-      //Which rows of C do not involve the NaN element(s)?
-      bad_C = C.cols(find_nonfinite(rowi_means)); //Submatrix of C involving the NaN element
-
-
-      temp_fc_diff.fill(arma::datum::nan); //Fill the vector with NAs
-
-      if(static_cast<int>(bad_C.n_cols)<=(p-2)){ //Only proceed if there are at least two non-NaN means, otherwise return all NaNs
-        //Absolute row sum of bad_C to see where the differences we can compute are
-        rsums = arma::sum(abs(bad_C),1);
-
-        zero_C = arma::find(rsums<0.01);    //Which rows of bad_C have zero elements? i.e., should compute differences of
-
-        //non-nan elements of rowi_means
-        found_finite = find_finite(rowi_means);
-        not_nan = rowi_means.rows(found_finite); //rowi_means is a column vector so take it's rows
-        good_C = C.cols(found_finite);          //C is a matrix so take the columns I need
-        good_C = good_C.rows(zero_C);
-
-
-        temp_fc_diff.cols(zero_C) = arma::conv_to<arma::rowvec>::from(good_C*not_nan);
-
-      }
-
-      fc_diff.row(i) = temp_fc_diff;
-    }else{
-      fc_diff.row(i) = arma::conv_to<arma::rowvec>::from(C*rowi_means);
-    }
-  }
-  return fc_diff;
-}
-
-// [[Rcpp::export]]
-arma::mat fold_change_ratio(arma::mat data, arma::mat C)  {
-  //Given the group means, and wanted group comparisons, compute the fold change ratios
-  //means - matrix of group means
-  // C - matrix that defines the group comparisons you want to make
-
-  arma::mat fc_mat;
-  arma::mat log_data;
-  arma::mat fc_diff;
-  //ratio is same as difference on log scale, so take log, then difference, then exponentiate
-
-  log_data = log(data);
-  fc_diff = fold_change_diff(log_data, C);
-  fc_mat = exp(fc_diff);
-
-  return fc_mat;
-}
-
-// [[Rcpp::export]]
-arma::mat fold_change_diff_na_okay(arma::mat data, arma::mat C)  {
-  //Given the group means, and wanted group comparisons, compute the fold change using differencing
-  //To avoid returning NAs even if all groups of interest are not NA, it will do elementwise
-  //multiplication instead of matrix multiplication
-
-  //means - matrix of group means
-  // C - matrix that defines the group comparisons you want to make
-
-  int n = data.n_rows;
-  int p = data.n_cols;
-  int num_comparisons = C.n_rows;
-  arma::mat fc_diff(n,num_comparisons);
-  arma::colvec rowi_means(p);
-  int i,j,k;
-  arma::uvec of_int;
-  fc_diff.zeros();
-
-  for(int i=0;i<n;i++){
-    rowi_means = arma::conv_to<arma::colvec>::from(data.row(i));
-    if(rowi_means.has_nan()){
-      for(int j=0;j<num_comparisons;j++){
-        of_int = find(C.row(j));
-        for(int k=0;k<static_cast<int>(of_int.size());k++){
-          fc_diff(i,j) += C(j,of_int[k])*rowi_means(of_int[k]);
-        }
-      }
-    }else{
-      fc_diff.row(i) = arma::conv_to<arma::rowvec>::from(C*rowi_means);
-    }
-  }
-
-  return fc_diff;
-}
-
 //-----Compute the matrix of coefficients for the simple additive model-----//
 // [[Rcpp::export]]
 arma::mat compute_betas(arma::mat data_mat, arma::mat Xmatrix, NumericVector gp){
   int n = data_mat.n_rows;  //number of biomolecules
-  int p = data_mat.n_cols;  //number of samples
   arma::rowvec rowi;
   arma::colvec red_rowi, beta;
   arma::mat effects, Xtemp;

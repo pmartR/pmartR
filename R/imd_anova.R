@@ -803,7 +803,6 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
     # select the first row in groupData while grouping by the column with the
     # pairing information.
     groupData <- merge(
-      groupData,
       omicsData$f_data[, c(samp_cname, da_pair_name)],
       sort = FALSE
     ) %>%
@@ -921,17 +920,16 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
   }
 
   # ANOVA stuffs ---------------------------------------------------------------
-  # pre-compute coefficients of the non-interaction model
-  xmatrix <- build_x_mat(groupData[,c(main_effect_names, covariate_names)], intercept = TRUE)
-  xmatrix <- reduce_xmatrix(xmatrix,k)
-  gp <- factor(groupData$Group,labels=1:k,levels=unique(groupData$Group))
-  Betas <- compute_betas(data.matrix(data),xmatrix, gp)
-  
   if (length(attr(get_group_DF(omicsData), "main_effects")) == 1) {
     ##---- One factor ANOVA ----##
     
     ##Translate the groups into numeric labels for anova_cpp() function
     gp <- factor(groupData$Group,labels=1:k,levels=unique(groupData$Group))
+    
+    # pre-compute coefficients of the non-interaction model
+    xmatrix <- build_x_mat(groupData[,c(main_effect_names, covariate_names)], intercept = TRUE)
+    xmatrix <- reduce_xmatrix(xmatrix,k)
+    Betas <- compute_betas(data.matrix(data),xmatrix, gp)
     
     #Rcpp::sourceCpp('~/pmartR/src/anova_helper_funs.cpp') #Run if debugging code
     raw_results <- anova_cpp(data.matrix(data),gp,1-equal_var, xmatrix, Betas)
@@ -949,10 +947,10 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
   }
   
   #The C++ function returns a list so we need to make it into a data.frame
-  results <- data.frame(raw_results$Sigma2, raw_results$adj_group_means, raw_results$Fstats, raw_results$pvalue, raw_results$df_used)
+  results <- data.frame(raw_results$Sigma2, raw_results$adj_group_means, raw_results$Fstats, raw_results$pvalue, raw_results$dof)
   
   #Rename the columns to match group names
-  colnames(results) <- c("Variance",group_names,"F_Statistic","p_value", "df_used")
+  colnames(results) <- c("Variance",group_names,"F_Statistic","p_value", "degrees_of_freedom")
   
   #Pull off edata_cname and add to results df
   edatacname <- attr(omicsData,"cnames")$edata_cname
@@ -961,8 +959,6 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
   ###-------Use group_comparison_anova() to compare the groups that were requested--------------##
   #source('~/pmartR/R/group_comparison.R') # Run if debugging
   #Rcpp::sourceCpp('~/pmartR/src/group_comparisons.cpp') #Run if debugging
-  # xmatrix <- build_x_mat(groupData[,c(main_effect_names, covariate_names)], intercept = FALSE)
-  # actual_rank = Matrix::rankMatrix(xmatrix)
   xmatrix_g = build_x_mat(groupData[,c("Group", covariate_names)], intercept = FALSE)
   
   group_comp <- group_comparison_anova(data=data.matrix(data), groupData=groupData[,c("Group", main_effect_names, covariate_names)],comparisons=comparisons, xmatrix = xmatrix_g, anova_results_full=list(Results=results,Sizes=raw_results$group_sizes))
@@ -1084,11 +1080,8 @@ group_comparison_anova <- function(data,groupData,comparisons,xmatrix,anova_resu
   #The group means include the word "Group" in them so that is what will be passed
   #to the group_comparison(...) and fold_change(...) functions along with estimated variance
   anova_results <- anova_results_full$Results
-  means <- data.matrix(anova_results[, grep("Mean", colnames(anova_results))])
-  sigma2 <- data.matrix(anova_results$Variance)
+  means <- data.matrix(anova_results[,grep("Mean",colnames(anova_results))])
   sizes <- data.matrix(anova_results_full$Sizes)
-  df_used <- data.matrix(anova_results$df_used)
-  #rm(anova_results_full)
   
   #If "comparisons" is null, then do all pairwise comparisons, else use the "comparisons" df to
   #create the appropriate C matrix
@@ -1104,7 +1097,7 @@ group_comparison_anova <- function(data,groupData,comparisons,xmatrix,anova_resu
     Cmat <- cbind(Cmat, matrix(nrow = nrow(Cmat), ncol = cdiff, 0))
   }
   
-  group_comp <- group_comparison_anova_cpp(data,means, sizes, sigma2, xmatrix, Cmat, df_used)
+  group_comp <- group_comparison_anova_cpp(data, sizes, xmatrix, Cmat)
   
   group_comp$diff_mat <- data.frame(group_comp$diff_mat)
   colnames(group_comp$diff_mat) <- Cmat_res$names
