@@ -3261,7 +3261,7 @@ plot.imdanovaFilt <- function(x, min_nonmiss_anova = NULL,
           color = "G-test applied filter"
         ),
         linetype = "dashed",
-        size = if (is.null(line_size)) 1 else line_size
+        linewidth = if (is.null(line_size)) 1 else line_size
       )
   }
 
