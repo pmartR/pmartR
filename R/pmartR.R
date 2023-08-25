@@ -42,6 +42,10 @@ utils::globalVariables(
     "skew", "SPANS_score", "ss_par", "Statistic", "subset_method", "survfit", 
     "Total", "Total_Counts", "Type", "v", "value", "values", "var1", 
     "var2", "variable", "whichtest", "x_disp", "x_fit", "y", "y_disp", 
-    "y_fit"
+    "y_fit", "biomolecule count", "cv abundance", "mean abundance",
+    "mean fold change", "median abundance", "observed count",
+    "observed proportion", "p_value_gtest", "proportion significant",
+    "proportionsignificant down", "proportion significant up",
+    "sample count", "sd fold change", "total count"
   )
 )
