@@ -66,13 +66,14 @@ Specify a boxplot design and cognostics for the abundance
 \examples{
 \dontrun{
 
+## Generate trelliData objects using the as.trelliData.edata example code.
+
 # Build the abundance boxplot with an edata file where each panel is a biomolecule. 
-# Generate trelliData in as.trelliData.edata
 trelli_panel_by(trelliData = trelliData1, panel = "Peptide") \%>\% 
    trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10)
    
-# Build the abundance boxplot wher each panel is a sample. Generate the trelliData
-# is as.trelliData.edata. Include all applicable cognostics. Remove points. 
+# Build the abundance boxplot wher each panel is a sample.
+# Include all applicable cognostics. Remove points. 
 trelli_panel_by(trelliData = trelliData1, panel = "Sample") \%>\% 
    trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10, 
                             include_points = FALSE,
@@ -82,7 +83,7 @@ trelli_panel_by(trelliData = trelliData1, panel = "Sample") \%>\%
                                            "cv abundance")
                            )
 
-# Build the abundance boxplot with an omicsData object. Generate trelliData in as.trelliData.
+# Build the abundance boxplot with an omicsData object.
 # Let the panels be biomolecules. Here, grouping information is included.
 trelli_panel_by(trelliData = trelliData2, panel = "Peptide") \%>\% 
    trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10)
@@ -92,7 +93,7 @@ trelli_panel_by(trelliData = trelliData2, panel = "Peptide") \%>\%
 trelli_panel_by(trelliData = trelliData2, panel = "RazorProtein") \%>\% 
    trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10)
     
-# Build the abundance boxplot with an omicsData and statRes object. Generate trelliData in as.trelliData.
+# Build the abundance boxplot with an omicsData and statRes object.
 # Panel by a biomolecule, and add statistics data to the cognostics
 trelli_panel_by(trelliData = trelliData4, panel = "Peptide") \%>\%
    trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10,
@@ -107,9 +108,6 @@ trelli_panel_by(trelliData = trelliData1, panel = "Peptide") \%>\%
 trelli_panel_by(trelliData = trelliData4, panel = "RazorProtein") \%>\% 
     trelli_abundance_boxplot(interactive = TRUE, test_mode = TRUE, test_example = 1:10)
 
-## Or making the plot interactive
-trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") \%>\%
-  trelli_abundance_boxplot(interactive = TRUE)
 }
 
 }

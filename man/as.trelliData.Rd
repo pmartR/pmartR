@@ -29,6 +29,7 @@ Either an omicData and/or a statRes object are accepted.
 \examples{
 \dontrun{
 library(pmartRdata)
+
 # Transform the data
 omicsData <- edata_transform(omicsData = pep_object, data_scale = "log2")
 
