@@ -472,22 +472,20 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL, ...) {
 #' 
 #' library(pmartRdata)
 #' 
+#' ## Generate trelliData objects using the example code in as.trelliData.edata
+#' 
 #' ## "panel_by" with an edata file. 
-#' ## Generate with example code in as.trelliData.edata
 #' trelli_panel_by(trelliData = trelliData1, panel = "Peptide")
 #' trelli_panel_by(trelliData = trelliData1, panel = "Sample")
 #' 
 #' ## "panel_by" with trelliData containing omicsData. 
-#' ## Generate with example code in as.trelliData
 #' trelli_panel_by(trelliData = trelliData2, panel = "Peptide")
 #' trelli_panel_by(trelliData = trelliData2, panel = "RazorProtein")
 #' 
 #' ## "panel_by" with trelliData containing statRes. 
-#' ## Generate with example code in as.trelliData
 #' trelli_panel_by(trelliData = trelliData3, panel = "Peptide")
 #' 
 #' ## "panel_by" with trelliData containing both omicsData and statRes. 
-#' ## Generate with example code in as.trelliData
 #' trelli_panel_by(trelliData = trelliData4, panel = "Peptide")
 #' trelli_panel_by(trelliData = trelliData4, panel = "RazorProtein")
 #' trelli_panel_by(trelliData = trelliData4, panel = "SampleID")

@@ -56,7 +56,8 @@ data.frame(
   `Uses omicsData` = c(rep("X", 4), rep("", 4)),
   `Uses statRes` = c(rep("", 3), rep("X", 5)),
   `Requires Biomolecule Class (e_meta)` = c("", "", "X", "", "", "X", "X", "X"),
-  `Main Effects Used` = c("X", "", rep("X", 4), "", "")
+  `Main Effects Used` = c("X", "", rep("X", 4), "", ""),
+  check.names = FALSE
 ) 
 ```
 
@@ -151,7 +152,8 @@ data.frame(
                     "Name of the trelliscope display",
                     "Indicate whether the trelliscope should be subsetted to a few panels or not",
                     "The panels to subset the trelliscope to if test_mode is true",
-                    "Output a single plot instead of a trelliscope display")
+                    "Output a single plot instead of a trelliscope display"),
+  check.names = FALSE
 ) 
 ```
 
@@ -287,7 +289,7 @@ trelliData2 %>%
   trelli_abundance_boxplot(test_example = 3, single_plot = T, ggplot_params = "xlab('Phenotype')")
 ```
 
-...or by am e_meta variable. In this case, our options include RazorProtein and ProteinList.
+...or by an e_meta variable. In this case, our options include RazorProtein and ProteinList.
 Note that group_designation is used if included: 
 
 ```{r}
@@ -317,7 +319,7 @@ trelliData2 %>%
 **Abundance Heatmap**
 
 An advantage to including e_meta variables is the ability to use heatmaps, where 
-each panel is an "e_meta" variable, one axis is the biomolecules within that 
+each panel is an e_meta variable, one axis is the biomolecules within that 
 biomolecule class, and the other axis is the samples in order by the "group_by"
 designation.
 
@@ -458,7 +460,8 @@ data.frame(
               "Resize x-axis ticks", "Resize y-axis ticks",
               "Rotate x-axis ticks", "Rotate y-axis ticks",
               "Change plot title size"
-              )
+              ),
+  check.names = FALSE
   
 ) 
 ```
@@ -480,7 +483,7 @@ trelliData2 %>%
 Every trelliscope plotting function has default diagnostics that can be changed 
 or removed completely by setting cognostics to "NULL". For example, if you were 
 using the "trelli_abundance_boxplot" and only wanted a mean and median cognostic,
-you could set cognostics to c("mean", "median").
+you could set cognostics to `c("mean abundance", "median abundance")`.
 
 ```{r, echo = FALSE}
 data.frame(
@@ -488,14 +491,15 @@ data.frame(
                "trelli_abundance_heatmap", "trelli_missingness_bar",
                "trelli_foldchange_bar", "trelli_foldchange_boxplot",
                "trelli_foldchange_heatmap", "trelli_foldchange_volcano"),
- Cognostics = c("n, mean, median, sd, skew, p_value, fold_change", 
-                "n, mean, median, sd, skew, p_value, fold_change",
-                "n, mean, median, sd, skew",
-                "n, proportion",
-                "fold_change, p_value",
-                "n, median, mean, sd",
-                "n, median, mean, sd",
-                "n")
+ Cognostics = c("count, mean abundance, median abundance, cv abundance, anova p-value, fold change",
+                "sample count, mean abundance, median abundance, cv abundance, skew abundance",
+                "sample count, mean abundance, biomolecule count",
+                "total count, observed count, observed proportion, g-test p-value",
+                "fold change, anova p-value",
+                "biomolecule count, proportion significant, mean fold change, sd fold change",
+                "biomolecule count, proportion significant, mean fold change, sd fold change",
+                "biomolecule count, proportion significant, proportion significant up, proportion significant down"),
+  check.names = FALSE
 ) 
 ```
 

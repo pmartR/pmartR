@@ -138,7 +138,7 @@ test_that("trelliPlots check the correct inputs", {
   # Test mode for windows should pass 
   expect_equal(
     .getDownloadsFolder(.test_mode = TRUE),
-    dirname("~")
+    file.path(dirname("~"), "Downloads")
   )
   
   # Expect a single plot object to be made 
