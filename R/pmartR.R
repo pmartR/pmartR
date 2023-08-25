@@ -45,7 +45,7 @@ utils::globalVariables(
     "y_fit", "biomolecule count", "cv abundance", "mean abundance",
     "mean fold change", "median abundance", "observed count",
     "observed proportion", "p_value_gtest", "proportion significant",
-    "proportionsignificant down", "proportion significant up",
+    "proportion significant down", "proportion significant up",
     "sample count", "sd fold change", "total count"
   )
 )
