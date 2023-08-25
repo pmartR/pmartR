@@ -14,7 +14,8 @@ as.trelliData.edata(
   normalization_fun = "global",
   normalization_params = list(subset_fn = "all", norm_fn = "median", apply_norm = TRUE,
     backtransform = TRUE),
-  ...
+  is_normalized = FALSE,
+  force_normalization = FALSE
 )
 }
 \arguments{
@@ -34,7 +35,7 @@ colummn in edata.}
 "pepData", "isobaricpepData", "proData", "metabData", "lipidData", or
 "nmrData".}
 
-\item{data_scale_original}{A character string indicating original scale 
+\item{data_scale_original}{A character string indicating original scale
 of the data. Valid values are: 'log2', 'log', 'log10', or 'abundance'.
 Default is abundance.}
 
@@ -52,6 +53,12 @@ parameters are the names, and the parameter values are the list values. For
 example, an acceptable entry for 'normalize_global' would be
 list("subset_fn" = "all", "norm_fn" = "median", "apply_norm" = TRUE,
 "backtransform" = TRUE).}
+
+\item{is_normalized}{A logical indicator of whether the data is already
+normalized (and will therefore skip the normalization step)}
+
+\item{force_normalization}{A logical indicator to force normalization that is
+not required for both isobaric protein and NMR data}
 }
 \description{
 The only acceptable input file type is a single edata file.

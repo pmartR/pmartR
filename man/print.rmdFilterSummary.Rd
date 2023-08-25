@@ -4,7 +4,12 @@
 \alias{print.rmdFilterSummary}
 \title{RMD Filter Print Method}
 \usage{
-\method{print}{rmdFilterSummary}(object)
+\method{print}{rmdFilterSummary}(x, ...)
+}
+\arguments{
+\item{x}{the RMD filter summary to print}
+
+\item{...}{further arguments passed to or from other methods}
 }
 \description{
 Print method for summary of RMD filter

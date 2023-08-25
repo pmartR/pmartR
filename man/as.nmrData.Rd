@@ -94,11 +94,13 @@ Objects of class 'nmrData' contain some attributes that are
 }
 \examples{
 library(pmartRdata)
-mynmrData <- as.nmrData(e_data = nmr_identified_edata,
-                        f_data = nmr_identified_fdata,
-                        edata_cname = "Metabolite",
-                        fdata_cname = "SampleID",
-                        data_type = "identified")
+mynmrData <- as.nmrData(
+  e_data = nmr_identified_edata,
+  f_data = nmr_identified_fdata,
+  edata_cname = "Metabolite",
+  fdata_cname = "SampleID",
+  data_type = "identified"
+)
 
 }
 \seealso{

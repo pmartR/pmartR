@@ -29,9 +29,6 @@ significance threshold}
 
 \item{...}{additional arguments passed to methods functions. Note, formatting
 option changes will interfere with wrapping functionality.}
-
-\item{method}{a character string of length one specifying which wrapper to
-use. Can be 'edgeR', 'DESeq2', or 'limma-voom'}
 }
 \value{
 statRes object
@@ -45,7 +42,7 @@ Runs default limma-voom workflow using empirical Bayes moderated
   refer to calcNormFactors() in edgeR package.
 }
 \references{
-Ritchie, M.E., Phipson, B., Wu, D., Hu, Y., Law, C.W., Shi, W., and Smyth, 
- G.K. (2015). limma powers differential expression analyses for 
+Ritchie, M.E., Phipson, B., Wu, D., Hu, Y., Law, C.W., Shi, W., and Smyth,
+ G.K. (2015). limma powers differential expression analyses for
  RNA-sequencing and microarray studies. Nucleic Acids Research 43(7), e47.
 }

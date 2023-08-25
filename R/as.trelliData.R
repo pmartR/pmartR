@@ -1,57 +1,56 @@
 #' @name .is_edata
-#' 
+#'
 #' @title Test if a file is an edata file
-#' 
-#' @param edata Must be a dataframe. Required. 
-#' 
-#' @return A boolean where TRUE means the file is an acceptable edata file. 
-#' @examples 
+#'
+#' @param edata Must be a dataframe. Required.
+#'
+#' @return A boolean where TRUE means the file is an acceptable edata file.
+#' @examples
 #' \dontrun{
-#' 
+#'
 #' .is_edata(pmartRdata::lipid_edata)
-#' 
 #' }
 .is_edata <- function(edata) {
-  
   # If edata is NULL, return FALSE
   if (is.null(edata) || is.data.frame(edata) == FALSE) {
     message("edata must be a data.frame.")
     return(FALSE)
   }
-  
-  # edata must have at least 2 samples 
+
+  # edata must have at least 2 samples
   if (ncol(edata) < 3) {
     message("edata must have at least 3 columns, a 'descriptor' column and at least 2 samples.")
     return(FALSE)
   }
-  
+
   ## All columns with the exception of one column MUST be numeric
-  
+
   # Get counts of the number of numeric columns
-  LogicCounts <- lapply(1:ncol(edata), function(col) {is.numeric(edata[,col])}) %>% 
+  LogicCounts <- lapply(1:ncol(edata), function(col) {
+    is.numeric(edata[, col])
+  }) %>%
     unlist() %>%
-    table() 
-  
-  # If more than one column is not numeric, return error 
+    table()
+
+  # If more than one column is not numeric, return error
   if ("FALSE" %in% names(LogicCounts) && LogicCounts[["FALSE"]] > 1) {
     message("All columns in edata must be numeric, with exception of a 'descriptor' column.")
-    return(FALSE)  
+    return(FALSE)
   }
-  
+
   # Otherwise, return True
   return(TRUE)
-  
-} 
+}
 
 #' @name as.trelliData.edata
-#' 
+#'
 #' @title Generate an object from edata to pass to trelliscope building
 #'   functions
 #'
 #' @description The only acceptable input file type is a single edata file.
 #'   Transformation and normalization must be specified. Isobaric protein or NMR
 #'   data does not need to be normalized.
-#'  
+#'
 #' @param e_data a \eqn{p * (n + 1)} data.frame of expression data, where
 #'   \eqn{p} is the number of biomolecules observed and \eqn{n} is the number of
 #'   samples (an additional biomolecule identifier/name column should also be
@@ -65,9 +64,9 @@
 #' @param omics_type A string specifying the data type. Acceptable options are
 #'   "pepData", "isobaricpepData", "proData", "metabData", "lipidData", or
 #'   "nmrData".
-#' @param data_scale_original A character string indicating original scale 
+#' @param data_scale_original A character string indicating original scale
 #'   of the data. Valid values are: 'log2', 'log', 'log10', or 'abundance'.
-#'   Default is abundance. 
+#'   Default is abundance.
 #' @param data_scale A character string indicating the scale to transform the
 #'   data to. Valid values are: 'log2', 'log', 'log10', or 'abundance'. If the
 #'   value is the same as data_scale_original, then transformation is not
@@ -80,7 +79,11 @@
 #'   example, an acceptable entry for 'normalize_global' would be
 #'   list("subset_fn" = "all", "norm_fn" = "median", "apply_norm" = TRUE,
 #'   "backtransform" = TRUE).
-#'  
+#' @param is_normalized A logical indicator of whether the data is already
+#'   normalized (and will therefore skip the normalization step)
+#' @param force_normalization A logical indicator to force normalization that is
+#'   not required for both isobaric protein and NMR data
+#'
 #' @examples
 #' library(pmartRdata)
 #' 
@@ -91,114 +94,114 @@
 #'                                   
 #'           
 #' @author David Degnan, Daniel Claborne, Lisa Bramer
-#' 
+#'
 #' @export
-as.trelliData.edata <- function(e_data, 
+
+as.trelliData.edata <- function(e_data,
                                 edata_cname,
                                 omics_type,
                                 data_scale_original = "abundance",
-                                data_scale = "log2", 
-                                normalization_fun = "global", 
-                                normalization_params = list("subset_fn" = "all", "norm_fn" = "median", 
-                                                            "apply_norm" = TRUE, "backtransform" = TRUE),
-                                ...
-) {
-  
-  .as.trelliData.edata(e_data, edata_cname, omics_type, data_scale_original, 
-                       data_scale, normalization_fun, normalization_params, ...)
-  
-}
+                                data_scale = "log2",
+                                normalization_fun = "global",
+                                normalization_params = list(
+                                  "subset_fn" = "all", "norm_fn" = "median",
+                                  "apply_norm" = TRUE, "backtransform" = TRUE
+                                ),
+                                is_normalized = FALSE,
+                                force_normalization = FALSE) {
+  edata <- e_data
 
-.as.trelliData.edata <- function(edata, edata_cname, omics_type, data_scale_original,
-                                 data_scale, normalization_fun, normalization_params,
-                                 is_normalized = FALSE, force_normalization = FALSE) {
-  
   # Initial checks -------------------------------------------------------------
-  
+
   # Run the .is_edata check to confirm the file is an acceptable edata file
   if (!.is_edata(edata)) {
     stop("")
   }
-  
+
   # Check that the object type is in the acceptable class
   if (omics_type %in% c("pepData", "isobaricpepData", "proData", "metabData", "lipidData", "nmrData") == FALSE) {
     stop(paste(omics_type, "is not an acceptable omics_type."))
   }
-  
+
   # Check that both data_scale_original and data scale are an acceptable option.
   log_transforms <- c("abundance", "log2", "log", "log10")
-  if (data_scale_original %in% log_transforms == FALSE) {stop(paste(data_scale_original, "is not an acceptable data scale."))}
-  if (data_scale %in% log_transforms == FALSE) {stop(paste(data_scale, "is not an acceptable data scale."))}
-  
+  if (data_scale_original %in% log_transforms == FALSE) {
+    stop(paste(data_scale_original, "is not an acceptable data scale."))
+  }
+  if (data_scale %in% log_transforms == FALSE) {
+    stop(paste(data_scale, "is not an acceptable data scale."))
+  }
+
   # Check the normalization function. Isobaric is not included since it requires f_data.
   if (normalization_fun %in% c("global", "loess", "quantile") == FALSE) {
     stop(paste(normalization_fun, "is not an acceptable normalization function type."))
   }
-  
+
   # Normalization parameters should have apply_norm in it
   if (!is.null(normalization_params) && normalization_fun == "global") {
     if ("apply_norm" %in% names(normalization_params) == FALSE || (normalization_params$apply_norm == FALSE)) {
       stop("apply_norm must be TRUE to apply normalization parameters.")
     }
-  } 
-  
+  }
+
   # Build an omics data object--------------------------------------------------
-  
-  # Generate a f data frame 
+
+  # Generate a f data frame
   fdata <- data.frame("Sample" = colnames(edata)[colnames(edata) != edata_cname], "Condition" = NA)
   fdata_cname <- "Sample"
-  
-  # Build the omics object 
-  omicsData <- eval(parse(text = paste0("as.", omics_type, 
-                                        "(e_data = edata, edata_cname = edata_cname, f_data = fdata, fdata_cname = fdata_cname,
-      data_scale = data_scale_original)")))
-  
+
+  # Build the omics object
+  omicsData <- eval(parse(text = paste0(
+    "as.", omics_type,
+    "(e_data = edata, edata_cname = edata_cname, f_data = fdata, fdata_cname = fdata_cname,
+      data_scale = data_scale_original)"
+  )))
+
   # Transform if appropriate
   if (data_scale_original != data_scale) {
     omicsData <- edata_transform(omicsData, data_scale)
   }
-  
-  # If the data is already normalized, skip this step 
-  if (is_normalized == FALSE ) {
-    
+
+  # If the data is already normalized, skip this step
+  if (is_normalized == FALSE) {
     # Normalization is not required for both isobaric protein and NMR data, but can
     # be forced with .force_normalization
     if (omics_type %in% c("isobaricpepData", "nmrData") == FALSE | force_normalization) {
-      
       # Get the normalization function
-      norm_fun <- switch(normalization_fun, "global" = normalize_global, 
-                         "global_basic" = normalize_global_basic, "loess" = normalize_loess,
-                         "quantile" = normalize_quantile)
-      
+      norm_fun <- switch(normalization_fun,
+        "global" = normalize_global,
+        "global_basic" = normalize_global_basic,
+        "loess" = normalize_loess,
+        "quantile" = normalize_quantile
+      )
+
       # Add omics data to normalization parameters
       normalization_params[["omicsData"]] <- omicsData
-      
+
       # Apply normalization with its parameters
       omicsData <- do.call(norm_fun, normalization_params)
-      
     }
-    
   } else {
     attr(omicsData, "data_info")$norm_info$is_normalized <- TRUE
   }
-  
+
   # Finally, generate the trelliData object-------------------------------------
-  
-  # Put the edata into the trelliData omics slot 
+
+  # Put the edata into the trelliData omics slot
   trelliData <- list(
-    trelliData.omics = omicsData$e_data %>% 
+    trelliData.omics = omicsData$e_data %>%
       tidyr::pivot_longer(colnames(edata)[colnames(edata) != edata_cname]) %>%
       dplyr::rename(Sample = name, Abundance = value),
     trelliData.stat = NULL,
     omicsData = omicsData,
     statRes = NULL
   )
-  
+
   # Save Panel By information and set class."panel_by_options" list the potential
-  # inputs for the panel_by function. "panel_by_omics"/"panel_by_stat" will hold 
-  # the column name of the trelliData.omics/trelliData.stat that the data has 
+  # inputs for the panel_by function. "panel_by_omics"/"panel_by_stat" will hold
+  # the column name of the trelliData.omics/trelliData.stat that the data has
   # been grouped by. And "panel_by" tracks whether the panel_by function has been
-  # applied or not. 
+  # applied or not.
   attr(trelliData, "fdata_col") <- "Sample"
   attr(trelliData, "emeta_col") <- NULL
   attr(trelliData, "panel_by_options") <- c(edata_cname, fdata_cname)
@@ -206,16 +209,15 @@ as.trelliData.edata <- function(e_data,
   attr(trelliData, "panel_by_stat") <- NA
   attr(trelliData, "panel_by") <- FALSE
   class(trelliData) <- c("trelliData", "trelliData.edata")
-  
+
   return(trelliData)
-  
 }
 
 #' @name as.trelliData
-#' 
+#'
 #' @title Generate an object from omicsData and/or statRes objects to pass to
 #'   trelliscope building functions
-#' 
+#'
 #' @description Either an omicData and/or a statRes object are accepted.
 #'   omicData must be transformed and normalized, unless the data is isobaric
 #'   protein or NMR data. If group_designation() has been run on the omicData
@@ -223,7 +225,7 @@ as.trelliData.edata <- function(e_data,
 #'   main effects group_designation and e_meta columns are merged to the e_data
 #'   in long format to create the trelliData.omics dataframe, and e_meta is
 #'   merged to statRes in long format to create trelliData.stat dataframe.
-#'    
+#'
 #' @param omicsData an object of the class 'pepData', 'isobaricpepData',
 #'   proData', 'metabData', 'lipidData', or 'nmrData', created by
 #'   \code{\link{as.pepData}}, \code{\link{as.isobaricpepData}},
@@ -231,10 +233,11 @@ as.trelliData.edata <- function(e_data,
 #'   \code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, respectively.
 #' @param statRes statRes an object of the class 'statRes', created by
 #'   \code{\link{imd_anova}}
-#' 
+#'
 #' @examples
 #' \dontrun{
 #' library(pmartRdata)
+#' 
 #' # Transform the data
 #' omicsData <- edata_transform(omicsData = pep_object, data_scale = "log2")
 #' 
@@ -243,97 +246,93 @@ as.trelliData.edata <- function(e_data,
 #' 
 #' # Apply the IMD ANOVA filter
 #' imdanova_Filt <- imdanova_filter(omicsData = omicsData)
-#' omicsData <- applyFilt(filter_object = imdanova_Filt, omicsData = omicsData, min_nonmiss_anova=2)
-#' 
+#' omicsData <- applyFilt(filter_object = imdanova_Filt, omicsData = omicsData,
+#'                        min_nonmiss_anova = 2)
+#'
 #' # Normalize my pepData
-#' omicsData <- normalize_global(omicsData, "subset_fn" = "all", "norm_fn" = "median", "apply_norm" = TRUE, "backtransform" = TRUE)
-#' 
-#' # Implement the IMD ANOVA method and compute all pairwise comparisons (i.e. leave the `comparisons` argument NULL)
+#' omicsData <- normalize_global(omicsData, "subset_fn" = "all", "norm_fn" = "median",
+#'                              "apply_norm" = TRUE, "backtransform" = TRUE)
+#'
+#' # Implement the IMD ANOVA method and compute all pairwise comparisons 
+#' # (i.e. leave the `comparisons` argument NULL)
 #' statRes <- imd_anova(omicsData = omicsData, test_method = 'combined')
-#' 
-#' # Generate the trelliData object 
+#'
+#' # Generate the trelliData object
 #' trelliData2 <- as.trelliData(omicsData = omicsData)
-#' trelliData3 <- as.trelliData(statRes = statRes)   
+#' trelliData3 <- as.trelliData(statRes = statRes)
 #' trelliData4 <- as.trelliData(omicsData = omicsData, statRes = statRes)
 #' }
-#' 
+#'
 #' @author David Degnan, Lisa Bramer
-#' 
+#'
 #' @export
-as.trelliData <- function(omicsData = NULL, statRes = NULL, ...) {
-  
-  .as.trelliData(omicsData, statRes, require_normalization = TRUE)
-  
-}
+as.trelliData <- function(omicsData = NULL, statRes = NULL) {
+  require_normalization <- TRUE
 
-.as.trelliData <- function(omicsData, statRes, require_normalization) {
-  
   # Initial checks--------------------------------------------------------------
-  
+
   # Either omicsData or statRes must be included
   if (is.null(omicsData) & is.null(statRes)) {
     stop("At least 1 omicsData or 1 statRes object must be provided.")
   }
-  
+
   # If omicsData is provided...
   if (!is.null(omicsData)) {
-    
     # ...it must be an omics data object
     if (any(class(omicsData) %in% c("pepData", "isobaricpepData", "proData", "metabData", "lipidData", "nmrData")) == FALSE) {
       stop(paste(class(omicsData), "is not a supported omicsData class."))
     }
-    
+
     # ...it must be log transformed if it's not NMR or isobaric
-    if (any(class(omicsData) %in% c("nmrData", "isobaricpepData")) == FALSE & 
-        get_data_scale(omicsData) %in% c("log2", "log", "log10") == FALSE) {
+    if (any(class(omicsData) %in% c("nmrData", "isobaricpepData")) == FALSE &
+      get_data_scale(omicsData) %in% c("log2", "log", "log10") == FALSE) {
       stop("omicsData must be log transformed.")
     }
-    
-    # ...it must be normalized if it's not NMR nor isobaric 
+
+    # ...it must be normalized if it's not NMR nor isobaric
     if (require_normalization & any(class(omicsData) %in% c("isobaricpepData", "nmrData")) == FALSE) {
       if (!get_data_norm(omicsData)) {
         stop("omicsData must be normalized.")
       }
     }
-    
+
     # ...and if group_designation is set, the first main effect must not have any singletons
     if (!is.null(attributes(omicsData)$group_DF)) {
-      group_counts <- attributes(omicsData)$group_DF$Group %>% table(dnn = "Group") %>% data.frame()
+      group_counts <- attributes(omicsData)$group_DF$Group %>%
+        table(dnn = "Group") %>%
+        data.frame()
       if (1 %in% group_counts$Freq) {
-        warning(paste("singleton groups found in group_designation:", 
-                      paste0(group_counts[group_counts$Freq == 1, "Group"], collapse = ", ")))
+        warning(paste(
+          "singleton groups found in group_designation:",
+          paste0(group_counts[group_counts$Freq == 1, "Group"], collapse = ", ")
+        ))
       }
     }
-    
   }
-  
+
   # If statRes is provided
   if (!is.null(statRes)) {
-    
     # ...it must be a statRes object
     if ("statRes" %in% class(statRes) == FALSE) {
       stop("statRes must be an object of the statRes class. See ?imd_anova.")
     }
-    
   }
-  
+
   # If both omicsData and staRes are provided...
   if (!is.null(omicsData) & !is.null(statRes)) {
-    
-    # ...they should be from the same dataset. 
-    
+    # ...they should be from the same dataset.
+
     # Get edata cname
     edata_cname <- pmartR::get_edata_cname(omicsData)
-    
+
     # Confirm that all statRes biomolecules are in omicsData.
     if (is.null(statRes[[edata_cname]])) {
       stop("omicsData and statRes are from different datasets.")
     }
-    
   }
-  
+
   # Generate the trelliData object----------------------------------------------
-  
+
   # Create placeholders for trelliData objects
   trelliData.omics <- NULL
   trelliData.stat <- NULL
@@ -342,42 +341,39 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL, ...) {
 
   # Format omicsData if applicable
   if (!is.null(omicsData)) {
-    
     # Get edata_cname, edata, and fdata_cname
-    edata_cname <- pmartR::get_edata_cname(omicsData)    
+    edata_cname <- pmartR::get_edata_cname(omicsData)
     edata <- omicsData$e_data
     fdata_cname <- pmartR::get_fdata_cname(omicsData)
     fdata <- omicsData$f_data
-    
-    # Generate telliData.omics object 
-    trelliData.omics <- edata %>% 
+
+    # Generate telliData.omics object
+    trelliData.omics <- edata %>%
       tidyr::pivot_longer(colnames(edata)[colnames(edata) != edata_cname]) %>%
       dplyr::rename(Abundance = value, !!fdata_cname := name)
-    
+
     # Add group_designation if it exists
     if (!is.null(attributes(omicsData)$group_DF)) {
       trelliData.omics <- dplyr::left_join(trelliData.omics, attributes(omicsData)$group_DF, by = fdata_cname)
     }
-    
+
     # Add emeta columns if emeta exists
     if (!is.null(omicsData$e_meta)) {
-      
       # Pull emeta
       emeta <- omicsData$e_meta
-      
+
       # Add emeta columns
       trelliData.omics <- dplyr::left_join(trelliData.omics, emeta, by = edata_cname)
-      
     }
-    
-  } else {omicsData <- NULL}
-  
+  } else {
+    omicsData <- NULL
+  }
+
   # Format statRes if applicable
   if (!is.null(statRes)) {
-    
     # Get edata cname
     edata_cname <- pmartR::get_edata_cname(statRes)
-    
+
     # Get column names of all fold changes, as well as p-values
     pvalue_cols <- colnames(statRes)[grepl("P_value", colnames(statRes))]
     fold_change_cols <- colnames(statRes)[grepl("Fold_change", colnames(statRes))]
@@ -389,36 +385,41 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL, ...) {
     # panel_by comparison, nest dataframes, and then extract the p_value and fold_change
     # for each group
     trelliData.stat <- statRes %>%
-      dplyr::select(dplyr::all_of(c(edata_cname, pvalue_cols, fold_change_cols)))  %>%
-      tidyr::pivot_longer(c(pvalue_cols, fold_change_cols)) %>%
+      dplyr::select(dplyr::all_of(c(edata_cname, pvalue_cols, fold_change_cols))) %>%
+      tidyr::pivot_longer(dplyr::all_of(c(pvalue_cols, fold_change_cols))) %>%
       dplyr::mutate(
-        Comparison = gsub("P_value_A_|P_value_G_|Fold_change_", "", name), 
+        Comparison = gsub("P_value_A_|P_value_G_|Fold_change_", "", name),
         Metric = lapply(name, function(x) {
-          if (grepl("P_value_A", x)) {return("p_value_anova")} else
-          if (grepl("P_value_G", x)) {return("p_value_gtest")} else {return("fold_change")}
+          if (grepl("P_value_A", x)) {
+            return("p_value_anova")
+          } else if (grepl("P_value_G", x)) {
+            return("p_value_gtest")
+          } else {
+            return("fold_change")
+          }
         }) %>% unlist()
       ) %>%
       dplyr::select(-name) %>%
-      dplyr::group_by(dplyr::across(c(Comparison, !!rlang::sym(edata_cname)))) %>%
+      dplyr::group_by(dplyr::across(c(Comparison, !!dplyr::sym(edata_cname)))) %>%
       dplyr::summarise(
-        "p_value_anova" = ifelse(length(value[which(Metric == "p_value_anova")]) == 0, NA, value[which(Metric == "p_value_anova")]), 
+        "p_value_anova" = ifelse(length(value[which(Metric == "p_value_anova")]) == 0, NA, value[which(Metric == "p_value_anova")]),
         "p_value_gtest" = ifelse(length(value[which(Metric == "p_value_gtest")]) == 0, NA, value[which(Metric == "p_value_gtest")]),
         "fold_change" = value[which(Metric == "fold_change")]
       ) %>%
-      dplyr::relocate(!!rlang::sym(edata_cname))
-    
+      dplyr::relocate(!!dplyr::sym(edata_cname))
+
     # Add emeta columns if emeta exists
     if (!is.null(omicsData$e_meta)) {
-      
       # Add emeta columns
       trelliData.stat <- dplyr::left_join(trelliData.stat, emeta, by = emeta_cname)
-      
     }
     
     # Fix statRes
     class(statRes) <- c("statRes", "data.frame")
     
-  } else {statRes <- NULL}
+  } else {
+    statRes <- NULL
+  }
   
   # Generate a trelliData object
   trelliData <- list(
@@ -427,23 +428,23 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL, ...) {
     omicsData = omicsData,
     statRes = statRes
   )
-  
+
   # Add fdata_cname and emeta column names as attributes
   if (!is.null(fdata_cname)) {
     attr(trelliData, "fdata_col") <- fdata_cname
   }
-  
+
   if (!is.null(omicsData$e_meta)) {
     attr(trelliData, "emeta_col") <- colnames(omicsData$e_meta)[colnames(omicsData$e_meta) != edata_cname]
   } else {
     attr(trelliData, "emeta_col") <- NULL
   }
-  
+
   # Save Panel By information and set class."panel_by_options" list the potential
-  # inputs for the panel_by function. "panel_by_omics"/"panel_by_stat" will hold 
-  # the column name of the trelliData.omics/trelliData.stat that the data has 
+  # inputs for the panel_by function. "panel_by_omics"/"panel_by_stat" will hold
+  # the column name of the trelliData.omics/trelliData.stat that the data has
   # been grouped by. And "panel_by" tracks whether the panel_by function has been
-  # applied or not. 
+  # applied or not.
   group_options <- c(colnames(trelliData.omics), colnames(trelliData.stat)) %>% unique()
   group_nonoptions <- c("Abundance", "Comparison", "p_value_anova", "p_value_gtest", "fold_change", "Group")
   group_options <- group_options[group_options %in% group_nonoptions == FALSE]
@@ -452,25 +453,22 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL, ...) {
   attr(trelliData, "panel_by_stat") <- NA
   attr(trelliData, "panel_by") <- FALSE
   class(trelliData) <- c("trelliData")
-  
+
   return(trelliData)
-  
 }
 
 #' @name trelli_panel_by
-#' 
-#' @title Set the "panel_by" variable for a trelliData object 
-#'    
-#' @description Allows for grouping omics or stats data for downstream plotting 
+#'
+#' @title Set the "panel_by" variable for a trelliData object
+#'
+#' @description Allows for grouping omics or stats data for downstream plotting
 #'     and cognostic functions
-#'     
+#'
 #' @param trelliData A trelliscope data object made by as.trelliData or as.trelliData.edata. Required.
-#' @param panel The name of a column in trelliData to panel the data by. Required. 
-#' 
+#' @param panel The name of a column in trelliData to panel the data by. Required.
+#'
 #' @examples
 #' \dontrun{
-#' 
-#' library(pmartRdata)
 #' 
 #' ## Generate trelliData objects using the example code in as.trelliData.edata
 #' 
@@ -489,77 +487,87 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL, ...) {
 #' trelli_panel_by(trelliData = trelliData4, panel = "Peptide")
 #' trelli_panel_by(trelliData = trelliData4, panel = "RazorProtein")
 #' trelli_panel_by(trelliData = trelliData4, panel = "SampleID")
-#' 
-#' }  
-#' 
+#' }
+#'
 #' @author David Degnan, Lisa Bramer
-#' 
+#'
 #' @export
 trelli_panel_by <- function(trelliData, panel) {
-  
   # Run initial checks----------------------------------------------------------
-  
+
   # Confirm that trelliData is a trelliData object
   if (any(class(trelliData) %in% c("trelliData")) == FALSE) {
     stop("trelliData must be of the class trelliData from as.trelliData or as.trelliData.edata.")
   }
-  
+
   # Confirm that panel is an acceptable option
   if (panel %in% attr(trelliData, "panel_by_options") == FALSE) {
-    stop(paste("panel is not an acceptable option. The following can be selected:", 
-               paste(attr(trelliData, "panel_by_options"), collapse = ", ")))
+    stop(paste(
+      "panel is not an acceptable option. The following can be selected:",
+      paste(attr(trelliData, "panel_by_options"), collapse = ", ")
+    ))
   }
-  
+
   # Confirm that panel_by is false
   if (attr(trelliData, "panel_by")) {
-    
     if (is.na(attr(trelliData, "panel_by_omics"))) {
       paneled_by <- attr(trelliData, "panel_by_stat")
-    } else {paneled_by <- attr(trelliData, "panel_by_omics")}
+    } else {
+      paneled_by <- attr(trelliData, "panel_by_omics")
+    }
     stop(paste("trelliData has already been paneled by", paneled_by))
-    
   }
-  
+
   # Determine which dataframes this grouping variable applies to----------------
-  
-  # Test if grouping applies to omicsData 
-  if (!is.null(trelliData$trelliData.omics) && 
-      panel %in% colnames(trelliData$trelliData.omics)) {
-    apply_to_omics <- TRUE} else {apply_to_omics <- FALSE}
-  
-  # Test if grouping applies to statRes 
-  if (!is.null(trelliData$trelliData.stat) && 
-      panel %in% colnames(trelliData$trelliData.stat)) {
-    apply_to_stat <- TRUE} else {apply_to_stat <- FALSE}
-  
+
+  # Test if grouping applies to omicsData
+  if (!is.null(trelliData$trelliData.omics) &&
+    panel %in% colnames(trelliData$trelliData.omics)) {
+    apply_to_omics <- TRUE
+  } else {
+    apply_to_omics <- FALSE
+  }
+
+  # Test if grouping applies to statRes
+  if (!is.null(trelliData$trelliData.stat) &&
+    panel %in% colnames(trelliData$trelliData.stat)) {
+    apply_to_stat <- TRUE
+  } else {
+    apply_to_stat <- FALSE
+  }
+
   # Test panel_by option--------------------------------------------------------
-  
+
   # If there are instances of groups with less than 3 data points, it is not a
   # good grouping option.
   .test_grouping <- function(trelliData_subclass, trelliData_subclass_name) {
-    
     # Get the smallest group size
-    smallest_group_size <- trelliData_subclass %>% 
-      dplyr::group_by_at(panel) %>% 
+    smallest_group_size <- trelliData_subclass %>%
+      dplyr::group_by_at(panel) %>%
       dplyr::summarize(N = dplyr::n()) %>%
       dplyr::select(N) %>%
       min()
-    
+
     # If the smallest group size is less than 3, then give warning
     if (smallest_group_size < 3) {
-      warning(paste0("Grouping by ", panel, 
-                     " results in panels with less than 3 ",
-                     "data points in ", trelliData_subclass_name, "."))
+      warning(paste0(
+        "Grouping by ", panel,
+        " results in panels with less than 3 ",
+        "data points in ", trelliData_subclass_name, "."
+      ))
     }
-    
   }
-  
+
   # Onlt test grouping if it applies to omics
-  if (apply_to_omics) {.test_grouping(trelliData$trelliData.omics, 
-                                      "trelliData.omics")}
-  
+  if (apply_to_omics) {
+    .test_grouping(
+      trelliData$trelliData.omics,
+      "trelliData.omics"
+    )
+  }
+
   # Group and nest samples------------------------------------------------------
-  
+
   .group_samples <- function(trelliData_subclass) {
     trelliData_subclass %>%
       dplyr::group_by_at(panel) %>%
@@ -567,23 +575,22 @@ trelli_panel_by <- function(trelliData, panel) {
       dplyr::ungroup() %>%
       dplyr::rename(Nested_DF = data)
   }
-  
+
   # Group omicsData
   if (apply_to_omics) {
     trelliData$trelliData.omics <- .group_samples(trelliData$trelliData.omics)
     attr(trelliData, "panel_by_omics") <- panel
   }
-  
+
   # Group statRes
   if (apply_to_stat) {
     trelliData$trelliData.stat <- .group_samples(trelliData$trelliData.stat)
     attr(trelliData, "panel_by_stat") <- panel
   }
-  
+
   # Export results--------------------------------------------------------------
   attr(trelliData, "panel_by") <- TRUE
   return(trelliData)
-  
 }
 
 #' @name trelli_pvalue_filter

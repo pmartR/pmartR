@@ -5,7 +5,7 @@
 \title{Plot normRes Object}
 \usage{
 \method{plot}{normRes}(
-  normRes_obj,
+  x,
   order_by = NULL,
   color_by = NULL,
   facet_by = NULL,
@@ -23,10 +23,13 @@
   ylimit = NULL,
   bw_theme = TRUE,
   palette = NULL,
-  use_VizSampNames = FALSE
+  use_VizSampNames = FALSE,
+  ...
 )
 }
 \arguments{
+\item{x}{normRes object created by the normalize_global function}
+
 \item{order_by}{character string specifying the column name of f_data by
 which to order the boxplots. If \code{order_by} is "Group", the boxplots
 will be ordered by the group variable from the group_designation function.
@@ -84,7 +87,7 @@ palette to use. For a list of available options see the details section in
 \item{use_VizSampNames}{logical value. Indicates whether to use custom sample
 names. The default is FALSE.}
 
-\item{normRes}{normRes object created by the normalize_global function}
+\item{...}{further arguments passed to or from other methods.}
 }
 \value{
 ggplot2 plot object if interactive is FALSE, or plotly plot object if
@@ -95,13 +98,19 @@ For plotting an S3 object of type 'normRes'
 }
 \examples{
 library(pmartRdata)
-mymetab <- edata_transform(omicsData = metab_object,
-                                data_scale = "log2")
-mymetab <- group_designation(omicsData = mymetab,
-                                  main_effects = "Phenotype")
-norm_object <- normalize_global(omicsData = mymetab,
-                                subset_fn = "all",
-                                norm_fn = "median")
+mymetab <- edata_transform(
+  omicsData = metab_object,
+  data_scale = "log2"
+)
+mymetab <- group_designation(
+  omicsData = mymetab,
+  main_effects = "Phenotype"
+)
+norm_object <- normalize_global(
+  omicsData = mymetab,
+  subset_fn = "all",
+  norm_fn = "median"
+)
 plot(norm_object, order_by = "Phenotype", color_by = "Phenotype")
 
 }

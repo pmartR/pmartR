@@ -44,5 +44,4 @@ mylipid <- edata_transform(omicsData = lipid_pos_object, data_scale = "log2")
 mylipid <- group_designation(omicsData = mylipid, main_effects = "Virus")
 result <- edata_summary(omicsData = mylipid, by = "sample", groupvar = NULL)
 
-
 }

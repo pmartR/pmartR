@@ -5,7 +5,7 @@
 \title{Plot metabData Object}
 \usage{
 \method{plot}{metabData}(
-  omicsData,
+  x,
   order_by = NULL,
   color_by = NULL,
   facet_by = NULL,
@@ -23,11 +23,12 @@
   ylimit = NULL,
   bw_theme = TRUE,
   palette = NULL,
-  use_VizSampNames = FALSE
+  use_VizSampNames = FALSE,
+  ...
 )
 }
 \arguments{
-\item{omicsData}{metabData object}
+\item{x}{metabData object}
 
 \item{order_by}{character string specifying the column name of f_data by
 which to order the boxplots. If \code{order_by} is "Group", the boxplots
@@ -85,6 +86,8 @@ palette to use. For a list of available options see the details section in
 
 \item{use_VizSampNames}{logical value. Indicates whether to use custom sample
 names. The default is FALSE.}
+
+\item{...}{further arguments passed to or from other methods.}
 }
 \value{
 ggplot2 plot object if interactive is FALSE, or plotly plot object if
@@ -96,6 +99,6 @@ For plotting metabData S3 objects
 \examples{
 library(pmartRdata)
 mymetab <- edata_transform(omicsData = metab_object, data_scale = "log2")
-plot(omicsData = mymetab, order_by = "Phenotype", color_by = "Phenotype")
+plot(mymetab, order_by = "Phenotype", color_by = "Phenotype")
 
 }

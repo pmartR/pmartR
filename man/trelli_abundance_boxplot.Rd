@@ -55,6 +55,8 @@ is 1.}
 
 \item{single_plot}{A TRUE/FALSE to indicate whether 1 plot (not a
 trelliscope) should be returned. Default is FALSE.}
+
+\item{...}{Additional arguments to be passed on to the trelli builder}
 }
 \description{
 Specify a boxplot design and cognostics for the abundance
@@ -105,6 +107,9 @@ trelli_panel_by(trelliData = trelliData1, panel = "Peptide") \%>\%
 trelli_panel_by(trelliData = trelliData4, panel = "RazorProtein") \%>\% 
     trelli_abundance_boxplot(interactive = TRUE, test_mode = TRUE, test_example = 1:10)
 
+## Or making the plot interactive
+trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") \%>\%
+  trelli_abundance_boxplot(interactive = TRUE)
 }
 
 }

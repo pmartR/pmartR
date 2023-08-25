@@ -8,9 +8,9 @@ edata_replace(omicsData, x, y)
 }
 \arguments{
 \item{omicsData}{an object of the class 'pepData', 'proData', 'metabData',
-'lipidData', or 'nmrData' created by \code{\link{pepData}},
-\code{\link{proData}}, \code{\link{metabData}}, \code{\link{lipidData}}, or
-\code{\link{as.nmrData}}, respectively.}
+'lipidData', or 'nmrData' created by \code{\link{as.pepData}},
+\code{\link{as.proData}}, \code{\link{as.metabData}},
+\code{\link{as.lipidData}}, or \code{\link{as.nmrData}}, respectively.}
 
 \item{x}{value to be replaced, usually numeric or NA}
 

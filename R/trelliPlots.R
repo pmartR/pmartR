@@ -24,10 +24,10 @@
 #'   p-values.
 trelli_precheck <- function(trelliData, 
                             trelliCheck,
-                            cognostics, 
+                            cognostics,
                             acceptable_cognostics,
                             ggplot_params,
-                            interactive, 
+                            interactive,
                             test_mode,
                             test_example,
                             single_plot,
@@ -37,12 +37,12 @@ trelli_precheck <- function(trelliData,
   #########################
   ## TEST EXAMPLE CHECKS ##
   #########################
-  
+
   # Assert that test mode is a true or false
   if (!is.logical(test_mode) & !is.na(test_mode)) {
     stop("test_mode must be a TRUE or FALSE")
   }
-  
+
   # Ensure that test_example is an integer
   if (test_mode) {
     if (!is.numeric(test_example) | 0 %in% test_example) {
@@ -51,102 +51,96 @@ trelli_precheck <- function(trelliData,
     test_example <- unique(abs(round(test_example)))
   }
 
-  
+
   #######################
   ## trelliData checks ##
   #######################
-  
+
   # trelliData object must be of the trelliData class
   if (any(class(trelliData) %in% c("trelliData")) == FALSE) {
     stop("trelliData must be of the class trelliData.")
   }
-  
+
   # Check that trelliData has been passed to the "trelli_panel_by" function.
   if (!attr(trelliData, "panel_by")) {
     stop("trelliData must be paneled with trelli_panel_by.")
   }
-  
+
   # Check that omics data exists
   if ("omics" %in% trelliCheck) {
-    
     # Assert that trelliData has omicsData
     if (is.null(trelliData$trelliData.omics)) {
       stop("trelliData must have omicsData for this plotting function.")
     }
-    
-    # Ensure that test_example is in the range of possibilities 
+
+    # Ensure that test_example is in the range of possibilities
     if (test_mode) {
       if (max(test_example) > nrow(trelliData$trelliData.omics)) {
         stop(paste("test_example must be in the range of possibilities, of 1 to", nrow(trelliData$trelliData.omics)))
       }
     }
-
   }
-  
-  # Check that statRes data exists 
+
+  # Check that statRes data exists
   if ("stat" %in% trelliCheck) {
-    
     # Assert that trelliData has statRes
     if (is.null(trelliData$trelliData.stat)) {
       stop("trelliData must have statRes for this plotting function.")
     }
-    
-    # Ensure that test_example is in the range of possibilities 
+
+    # Ensure that test_example is in the range of possibilities
     if (test_mode) {
       if (max(test_example) > nrow(trelliData$trelliData.stat)) {
         stop(paste("test_example must be in the range of possibilities, of 1 to", nrow(trelliData$trelliData.stat)))
       }
     }
-    
   }
-  
+
   ######################
   ## COGNOSTIC CHECKS ##
   ######################
-  
+
   # If cognostics are not NULL...
   if (!is.null(cognostics)) {
-    
-    # ...assert that cognostics are acceptable options 
+    # ...assert that cognostics are acceptable options
     if (all(cognostics %in% acceptable_cognostics) == FALSE) {
-      stop(paste("Unacceptable cognostic option included. Acceptable options are: ", 
-                 paste(acceptable_cognostics, collapse = ", ")))
+      stop(paste(
+        "Unacceptable cognostic option included. Acceptable options are: ",
+        paste(acceptable_cognostics, collapse = ", ")
+      ))
     }
-    
   }
-  
+
   #########################
   ## GGPLOT PARAMS CHECK ##
   #########################
-  
+
   # If ggplot_params is not null...
   if (!is.null(ggplot_params)) {
-    
-    # ...and ggplot_params is not a character or is a vector of greater than 1, 
+    # ...and ggplot_params is not a character or is a vector of greater than 1,
     if (!is.character(ggplot_params)) {
       stop("ggplot_params must be a string, vector of strings, or NULL.")
     }
-    
   }
-  
+
   ####################
   ## LOGICAL CHECKS ##
   ####################
-  
+
   # If interactive is not TRUE/FALSE, inform the user
   if (!is.logical(interactive) & !is.na(interactive)) {
     stop("interactive must be a TRUE or FALSE.")
   }
-  
+
   # single_plot must be a TRUE/FALSE
   if (!is.logical(single_plot) & !is.na(single_plot)) {
     stop("single_plot must be a TRUE or FALSE.")
   }
-  
+
   #############################
   ## P-VALUE SPECIFIC CHECKS ##
   #############################
-  
+
   # Check p_value test
   if ("stat" %in% trelliCheck & p_value_skip != TRUE) {
       
@@ -157,14 +151,13 @@ trelli_precheck <- function(trelliData,
     if (p_value_thresh < 0 | p_value_thresh > 1) {
       stop("p_value_thresh must be between 0 and 1.")
     }
-    
   }
   
 }
 
-# A quick cognostic function 
+# A quick cognostic function
 quick_cog <- function(name, value) {
-  dplyr::tibble(!!rlang::sym(name) := trelliscopejs::cog(value, desc = name))
+  dplyr::tibble(!!dplyr::sym(name) := trelliscopejs::cog(value, desc = name))
 }
 
 # This function builds all trelliscopes.
@@ -172,10 +165,10 @@ trelli_builder <- function(toBuild, cognostics, plotFUN, cogFUN, path, name, rem
   
   # Remove any blank names 
   if ("" %in% unlist(toBuild[,1])) {
-    message(paste("Removing", length(sum("" %in% toBuild[,1])), "blank biomolecule names."))
-    toBuild <- toBuild[toBuild[,1] != "",]
+    message(paste("Removing", length(sum("" %in% toBuild[, 1])), "blank biomolecule names."))
+    toBuild <- toBuild[toBuild[, 1] != "", ]
   }
-  
+
   if (nrow(toBuild) == 0) {
     stop("No data to build trelliscope with.")
   }
@@ -184,7 +177,7 @@ trelli_builder <- function(toBuild, cognostics, plotFUN, cogFUN, path, name, rem
   preLaunch <- toBuild %>%
     dplyr::ungroup() %>%
     dplyr::mutate(
-      panel = trelliscopejs::map2_plot(Nested_DF, as.character(unlist(toBuild[,1])), plotFUN)
+      panel = trelliscopejs::map2_plot(Nested_DF, as.character(unlist(toBuild[, 1])), plotFUN)
     ) 
   
   # Cognostics are optional
@@ -192,7 +185,7 @@ trelli_builder <- function(toBuild, cognostics, plotFUN, cogFUN, path, name, rem
     
     preLaunch <- preLaunch %>%
       dplyr::mutate(
-        cog = trelliscopejs::map2_cog(Nested_DF, as.character(unlist(toBuild[,1])), cogFUN)
+        cog = trelliscopejs::map2_cog(Nested_DF, as.character(unlist(toBuild[, 1])), cogFUN)
       )
     
   }
@@ -256,7 +249,8 @@ trelli_builder <- function(toBuild, cognostics, plotFUN, cogFUN, path, name, rem
 #'   is 1.
 #' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a
 #'   trelliscope) should be returned. Default is FALSE.
-#' 
+#' @param ... Additional arguments to be passed on to the trelli builder
+#'
 #' @examples
 #' \dontrun{
 #' 
@@ -303,9 +297,9 @@ trelli_builder <- function(toBuild, cognostics, plotFUN, cogFUN, path, name, rem
 #'     trelli_abundance_boxplot(interactive = TRUE, test_mode = TRUE, test_example = 1:10)
 #' 
 #' }
-#' 
+#'
 #' @author David Degnan, Lisa Bramer
-#' 
+#'
 #' @export
 trelli_abundance_boxplot <- function(trelliData,
                                      cognostics = c("count", "mean abundance"),
@@ -318,7 +312,6 @@ trelli_abundance_boxplot <- function(trelliData,
                                      test_example = 1,
                                      single_plot = FALSE,
                                      ...) {
-  
   # Run initial checks----------------------------------------------------------
   
   # Run generic checks 
@@ -353,7 +346,9 @@ trelli_abundance_boxplot <- function(trelliData,
   }
   
   # Round test example to integer 
-  if (test_mode) {test_example <- unique(abs(round(test_example)))}
+  if (test_mode) {
+    test_example <- unique(abs(round(test_example)))
+  }
   
   # Make sure include_points is a true or false
   if (!is.logical(include_points) & !is.na(include_points)) {
@@ -376,52 +371,55 @@ trelli_abundance_boxplot <- function(trelliData,
   }
   
   # Make boxplot function-------------------------------------------------------
-  
+
   # First, generate the boxplot function
   box_plot_fun <- function(DF, title) {
-    
     # Add a blank group if no group designation was given
-    if (is.null(attributes(trelliData$omicsData)$group_DF)) {DF$Group <- "x"} 
-    
-    # Build plot 
-    boxplot <- ggplot2::ggplot(DF, ggplot2::aes(x = Group, fill = Group, y = Abundance)) + 
-      ggplot2::geom_boxplot(outlier.shape = NA) + ggplot2::theme_bw() + 
+    if (is.null(attributes(trelliData$omicsData)$group_DF)) {
+      DF$Group <- "x"
+    }
+
+    # Build plot
+    boxplot <- ggplot2::ggplot(DF, ggplot2::aes(x = Group, fill = Group, y = Abundance)) +
+      ggplot2::geom_boxplot(outlier.shape = NA) +
+      ggplot2::theme_bw() +
       ggplot2::ggtitle(title) +
-      ggplot2::theme(legend.position = "none", plot.title = ggplot2::element_text(hjust = 0.5)) + 
-      ggplot2::ylab(paste(attr(trelliData$omicsData, "data_info")$data_scale, "Abundance")) 
-    
-    # Add include_points 
+      ggplot2::theme(legend.position = "none", plot.title = ggplot2::element_text(hjust = 0.5)) +
+      ggplot2::ylab(paste(attr(trelliData$omicsData, "data_info")$data_scale, "Abundance"))
+
+    # Add include_points
     if (include_points) {
       boxplot <- boxplot + ggplot2::geom_jitter(height = 0, width = 0.25)
-    } 
-    
+    }
+
     # Remove x axis if no groups
     if (is.null(attributes(trelliData$omicsData)$group_DF)) {
-      boxplot <- boxplot + ggplot2::theme(axis.title.x = ggplot2::element_blank(),
-                                          axis.ticks.x = ggplot2::element_blank(), 
-                                          axis.text.x = ggplot2::element_blank())
+      boxplot <- boxplot + ggplot2::theme(
+        axis.title.x = ggplot2::element_blank(),
+        axis.ticks.x = ggplot2::element_blank(),
+        axis.text.x = ggplot2::element_blank()
+      )
     }
-    
+
     # Add additional parameters
     if (!is.null(ggplot_params)) {
       for (param in ggplot_params) {
         boxplot <- boxplot + eval(parse(text = paste0("ggplot2::", param)))
       }
     }
-    
+
     # If interactive, pipe to ggplotly
     if (interactive) {
       boxplot <- boxplot %>% plotly::ggplotly()
     }
-    
+
     return(boxplot)
   }
-  
+
   # Create cognostic function---------------------------------------------------
-  
+
   # Second, create function to return cognostics
   box_cog_fun <- function(DF, biomolecule) {
-    
     # Set basic cognostics for ungrouped data or in case when data is not split by fdata_cname
     cog <- list(
       "sample count" = dplyr::tibble(`Sample Count` = trelliscopejs::cog(sum(!is.na(DF$Abundance)), desc = "Sample Count")),
@@ -433,20 +431,21 @@ trelli_abundance_boxplot <- function(trelliData,
     
     # If cognostics are any of the cog, then add them 
     if (any(cognostics %in% c("sample count", "biomolecule count", "mean abundance", "median abundance", "cv abundance"))) {
-      cog_to_trelli <- do.call(dplyr::bind_cols, lapply(cognostics, function(x) {cog[[x]]})) %>% tibble::tibble()
-    } else {cog_to_trelli <- NULL}
+      cog_to_trelli <- do.call(dplyr::bind_cols, lapply(cognostics, function(x) {cog[[x]]})) %>% dplyr::tibble()
+    } else {
+      cog_to_trelli <- NULL
+    }
     
     # Get fdata cname and panel_by selection
     fdata_cname <- pmartR::get_fdata_cname(trelliData$omicsData)
     panel_by_choice <- attr(trelliData, "panel_by_omics")
-    
+
     # Additional group cognostics can be added only if group_designation was set and
     # trelli_panel_by is not the fdata_cname
     if (!is.null(attributes(trelliData$omicsData)$group_DF) & fdata_cname != panel_by_choice & !is.null(cog_to_trelli)) {
-      
       # Since the number of groups is unknown, first panel_by the Groups,
       # then calculate all summary statistics, pivot to long format,
-      # subset down to requested statistics, switch name to a more specific name, 
+      # subset down to requested statistics, switch name to a more specific name,
       # combine group and name, and generate the cognostic tibble
       cogs_to_add <- DF %>%
         dplyr::group_by(Group) %>%
@@ -466,22 +465,21 @@ trelli_abundance_boxplot <- function(trelliData,
       # Add new cognostics 
       cog_to_trelli <- do.call(cbind, lapply(1:nrow(cogs_to_add), function(row) {
         quick_cog(cogs_to_add$name[row], cogs_to_add$value[row])
-      })) %>% tibble::tibble() 
+      })) %>% dplyr::tibble() 
       
     }
-    
+
     # Add cognostics that only apply when stats data is grouped by edata_cname
     edata_cname <- pmartR::get_edata_cname(trelliData$omicsData)
-    
+
     if (!is.null(trelliData$trelliData.stat) && !is.na(attr(trelliData, "panel_by_stat")) && edata_cname == attr(trelliData, "panel_by_stat")) {
       
       # Downselect to only stats 
       stat_cogs <- cognostics[cognostics %in% c("fold change", "anova p-value")]
       
       if (length(stat_cogs) != 0) {
-        
-        # Subset down the dataframe down to group, unnest the dataframe, 
-        # pivot_longer to comparison, subset columns to requested statistics, 
+        # Subset down the dataframe down to group, unnest the dataframe,
+        # pivot_longer to comparison, subset columns to requested statistics,
         # switch name to a more specific name
         cogs_to_add <- trelliData$trelliData.stat %>%
           dplyr::filter(trelliData$trelliData.stat[[edata_cname]] == biomolecule) %>%
@@ -499,40 +497,36 @@ trelli_abundance_boxplot <- function(trelliData,
           ) %>%
           dplyr::ungroup() %>%
           dplyr::select(-Comparison)
-        
-        # Generate new cognostics 
+
+        # Generate new cognostics
         new_cogs <- do.call(cbind, lapply(1:nrow(cogs_to_add), function(row) {
           quick_cog(cogs_to_add$name[row], cogs_to_add$value[row])
-        })) %>% tibble::tibble()
+        })) %>% dplyr::tibble()
+
 
         # Add new cognostics, removing when it is NULL 
-        cog_to_trelli <- cbind(cog_to_trelli, new_cogs) %>% tibble::tibble()
+        cog_to_trelli <- cbind(cog_to_trelli, new_cogs) %>% dplyr::tibble()
         
       }
-      
     }
-    
+
     return(cog_to_trelli)
-    
   }
-  
+
   # Build trelliscope display---------------------------------------------------
-  
+
   # Return a single plot if single_plot is TRUE
   if (single_plot) {
-    
-    singleData <- trelliData$trelliData.omics[test_example[1],]
+    singleData <- trelliData$trelliData.omics[test_example[1], ]
     return(box_plot_fun(singleData$Nested_DF[[1]], unlist(singleData[1, 1])))
-    
   } else {
-  
     # If test_mode is on, then just build the required panels
     if (test_mode) {
-      toBuild <- trelliData$trelliData.omics[test_example,]
+      toBuild <- trelliData$trelliData.omics[test_example, ]
     } else {
       toBuild <- trelliData$trelliData.omics
     }
-    
+
     # Pass parameters to trelli_builder function
     trelli_builder(toBuild = toBuild,
                    cognostics = cognostics, 
@@ -544,11 +538,10 @@ trelli_abundance_boxplot <- function(trelliData,
                    ...)
     
   }
-  
 }
 
 #' @name trelli_abundance_histogram
-#' 
+#'
 #' @title Histogram trelliscope building function for abundance data
 #'
 #' @description Specify a plot design and cognostics for the abundance histogram
@@ -576,7 +569,8 @@ trelli_abundance_boxplot <- function(trelliData,
 #'   is 1.
 #' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a
 #'   trelliscope) should be returned. Default is FALSE.
-#' 
+#' @param ... Additional arguments to be passed on to the trelli builder
+#'
 #' @examples
 #' \dontrun{
 #' 
@@ -600,9 +594,9 @@ trelli_abundance_boxplot <- function(trelliData,
 #'      cognostics = c("mean abundance", "median abundance"))  
 #'    
 #' }
-#' 
+#'
 #' @author David Degnan, Lisa Bramer
-#' 
+#'
 #' @export
 trelli_abundance_histogram <- function(trelliData,
                                        cognostics = c("sample count", "mean abundance", "median abundance", "cv abundance", "skew abundance"),
@@ -612,9 +606,8 @@ trelli_abundance_histogram <- function(trelliData,
                                        name = "Trelliscope",
                                        test_mode = FALSE,
                                        test_example = 1,
-                                       single_plot = FALSE, 
+                                       single_plot = FALSE,
                                        ...) {
-  
   # Run initial checks----------------------------------------------------------
   
   # Run generic checks 
@@ -631,50 +624,51 @@ trelli_abundance_histogram <- function(trelliData,
 
   
   # Round test example to integer 
-  if (test_mode) {test_example <- unique(abs(round(test_example)))}
+  if (test_mode) {
+    test_example <- unique(abs(round(test_example)))
+  }
   
   # Check that group data is edata_cname
   edata_cname <- pmartR::get_edata_cname(trelliData$omicsData)
   if (edata_cname != attr(trelliData, "panel_by_omics")) {
     stop("trelliData must be grouped by edata_cname.")
   }
-  
+
   # Make histogram function-----------------------------------------------------
-  
+
   # First, generate the histogram function
   hist_plot_fun <- function(DF, title) {
-    
     # Remove NAs
-    DF <- DF[!is.na(DF$Abundance),]
-    
-    # Build plot 
-    histogram <- ggplot2::ggplot(DF, ggplot2::aes(x = Abundance)) + 
-      ggplot2::geom_histogram(bins = 10, fill = "steelblue", color = "black") + ggplot2::ggtitle(title) +
-      ggplot2::theme_bw() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) + 
+    DF <- DF[!is.na(DF$Abundance), ]
+
+    # Build plot
+    histogram <- ggplot2::ggplot(DF, ggplot2::aes(x = Abundance)) +
+      ggplot2::geom_histogram(bins = 10, fill = "steelblue", color = "black") +
+      ggplot2::ggtitle(title) +
+      ggplot2::theme_bw() +
+      ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) +
       ggplot2::xlab(paste(attr(trelliData$omicsData, "data_info")$data_scale, "Abundance")) +
       ggplot2::ylab("Frequency")
-    
+
     # Add additional parameters
     if (!is.null(ggplot_params)) {
       for (param in ggplot_params) {
         histogram <- histogram + eval(parse(text = paste0("ggplot2::", param)))
       }
     }
-    
+
     # If interactive, pipe to ggplotly
     if (interactive) {
       histogram <- histogram %>% plotly::ggplotly()
     }
-   
+
     return(histogram)
-     
   }
   
   # Create cognostic function---------------------------------------------------
-  
+
   # Second, create function to return cognostics
   hist_cog_fun <- function(DF, biomolecule) {
-    
     # Set basic cognostics for ungrouped data or in case when data is not split by fdata_cname
     cog <- list(
       "sample count" = dplyr::tibble(`Sample Count` = trelliscopejs::cog(sum(!is.na(DF$Abundance)), desc = "Sample Count")),
@@ -685,29 +679,25 @@ trelli_abundance_histogram <- function(trelliData,
     )
     
     # If cognostics are any of the cog, then add them 
-    cog_to_trelli <- do.call(dplyr::bind_cols, lapply(cognostics, function(x) {cog[[x]]})) %>% tibble::tibble()
+    cog_to_trelli <- do.call(dplyr::bind_cols, lapply(cognostics, function(x) {cog[[x]]})) %>% dplyr::tibble()
     
     return(cog_to_trelli)
-    
   }
-  
+
   # Build trelliscope display---------------------------------------------------
-  
+
   # Return a single plot if single_plot is TRUE
   if (single_plot) {
-    
-    singleData <- trelliData$trelliData.omics[test_example[1],]
+    singleData <- trelliData$trelliData.omics[test_example[1], ]
     return(hist_plot_fun(singleData$Nested_DF[[1]], unlist(singleData[1, 1])))
-    
   } else {
-  
     # If test_mode is on, then just build the required panels
     if (test_mode) {
-      toBuild <- trelliData$trelliData.omics[test_example,]
+      toBuild <- trelliData$trelliData.omics[test_example, ]
     } else {
       toBuild <- trelliData$trelliData.omics
     }
-    
+
     # Pass parameters to trelli_builder function
     trelli_builder(toBuild = toBuild,
                    cognostics = cognostics, 
@@ -719,11 +709,10 @@ trelli_abundance_histogram <- function(trelliData,
                    ...)
     
   }
-  
 }
 
 #' @name trelli_abundance_heatmap
-#' 
+#'
 #' @title Heatmap trelliscope building function for abundance data
 #'
 #' @description Specify a plot design and cognostics for the abundance heatmap
@@ -751,7 +740,8 @@ trelli_abundance_histogram <- function(trelliData,
 #'   is 1.
 #' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a
 #'   trelliscope) should be returned. Default is FALSE.
-#' 
+#' @param ... Additional arguments to be passed on to the trelli builder
+#'
 #' @examples
 #' \dontrun{
 #' 
@@ -767,7 +757,7 @@ trelli_abundance_histogram <- function(trelliData,
 #'    
 #' }
 #' @author David Degnan, Lisa Bramer
-#' 
+#'
 #' @export
 trelli_abundance_heatmap <- function(trelliData,
                                      cognostics = c("sample count", "mean abundance", "biomolecule count"),
@@ -779,7 +769,6 @@ trelli_abundance_heatmap <- function(trelliData,
                                      test_example = 1,
                                      single_plot = FALSE,
                                      ...) {
-  
   # Run initial checks----------------------------------------------------------
   
   # Run generic checks 
@@ -795,14 +784,16 @@ trelli_abundance_heatmap <- function(trelliData,
                   p_value_thresh = NULL)
   
   # Round test example to integer 
-  if (test_mode) {test_example <- unique(abs(round(test_example)))}
+  if (test_mode) {
+    test_example <- unique(abs(round(test_example)))
+  }
   
   # Check that group data is grouped by an e_meta variable
   if (attr(trelliData, "panel_by_omics") %in% attr(trelliData, "emeta_col") == FALSE) {
     stop("trelliData must be paneled_by an e_meta column.")
   }
-  
-  # If no group designation, set cognostics to NULL. 
+
+  # If no group designation, set cognostics to NULL.
   if (is.null(attributes(trelliData$omicsData)$group_DF)) {
     cognostics <- NULL
   }
@@ -811,26 +802,33 @@ trelli_abundance_heatmap <- function(trelliData,
   edata_cname <- get_edata_cname(trelliData$omicsData)
   
   # Make heatmap function-------------------------------------------------------
-  
+
   # First, generate the heatmap function
   hm_plot_fun <- function(DF, title) {
-    
     # Get fdata_cname
     fdata_cname <- get_fdata_cname(trelliData$omicsData)
-    
-    # If group designation was set, then convert Group to a factor variable 
+
+    # If group designation was set, then convert Group to a factor variable
     if (!is.null(attributes(trelliData$omicsData)$group_DF)) {
-      theLevels <- attr(trelliData$omicsData, "group_DF") %>% dplyr::arrange(Group) %>% dplyr::select(dplyr::all_of(fdata_cname)) %>% unlist()
-      DF[,fdata_cname] <- factor(unlist(DF[,fdata_cname]), levels = theLevels)
+      theLevels <- attr(trelliData$omicsData, "group_DF") %>%
+        dplyr::arrange(Group) %>%
+        dplyr::select(dplyr::all_of(fdata_cname)) %>%
+        unlist()
+      DF[, fdata_cname] <- factor(unlist(DF[, fdata_cname]), levels = theLevels)
     } else {
-      DF[,fdata_cname] <- as.factor(unlist(DF[,fdata_cname]))
+      DF[, fdata_cname] <- as.factor(unlist(DF[, fdata_cname]))
     }
     
     # Build plot: this should be edata_cname
     hm <- ggplot2::ggplot(DF, ggplot2::aes(x = as.factor(.data[[edata_cname]]), y = .data[[fdata_cname]], fill = Abundance)) +
-      ggplot2::geom_tile() + ggplot2::theme_bw() + ggplot2::ylab("Sample") + ggplot2::xlab("Biomolecule") +
-      ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5), 
-                     axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+      ggplot2::geom_tile() +
+      ggplot2::theme_bw() +
+      ggplot2::ylab("Sample") +
+      ggplot2::xlab("Biomolecule") +
+      ggplot2::theme(
+        plot.title = ggplot2::element_text(hjust = 0.5),
+        axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust = 1)
+      ) +
       ggplot2::scale_fill_gradient(low = "blue", high = "red", na.value = "white") +
       ggplot2::ggtitle(title)
 
@@ -840,22 +838,20 @@ trelli_abundance_heatmap <- function(trelliData,
         hm <- hm + eval(parse(text = paste0("ggplot2::", param)))
       }
     }
-    
+
     # If interactive, pipe to ggplotly
     if (interactive) {
       hm <- hm %>% plotly::ggplotly()
     }
-    
+
     return(hm)
-    
   }
-  
+
   # Create cognostic function---------------------------------------------------
-  
+
   hm_cog_fun <- function(DF, emeta_var) {
-    
-    # Subset down the dataframe down to group, unnest the dataframe, 
-    # pivot_longer to comparison, subset columns to requested statistics, 
+    # Subset down the dataframe down to group, unnest the dataframe,
+    # pivot_longer to comparison, subset columns to requested statistics,
     # switch name to a more specific name
     cogs_to_add <- DF %>%
       dplyr::group_by(Group) %>%
@@ -870,11 +866,12 @@ trelli_abundance_heatmap <- function(trelliData,
       dplyr::select(-Group) 
     
     if ("biomolecule count" %in% cognostics) {
-      cogs_to_add <- rbind(cogs_to_add, 
-         data.frame(
-           name = "Biomolecule Count",
-           value = DF[[edata_cname]] %>% unique() %>% length()
-         )
+      cogs_to_add <- rbind(
+        cogs_to_add, 
+        data.frame(
+          name = "Biomolecule Count",
+          value = DF[[edata_cname]] %>% unique() %>% length()
+        )
       )
       
     }
@@ -882,29 +879,25 @@ trelli_abundance_heatmap <- function(trelliData,
     # Add new cognostics 
     cog_to_trelli <- do.call(cbind, lapply(1:nrow(cogs_to_add), function(row) {
       quick_cog(cogs_to_add$name[row], cogs_to_add$value[row])
-    })) %>% tibble::tibble() 
-    
+    })) %>% dplyr::tibble()
+
     return(cog_to_trelli)
-    
-  } 
-  
+  }
+
   # Build trelliscope display---------------------------------------------------
-  
+
   # Return a single plot if single_plot is TRUE
   if (single_plot) {
-    
-    singleData <- trelliData$trelliData.omics[test_example[1],]
+    singleData <- trelliData$trelliData.omics[test_example[1], ]
     return(hm_plot_fun(singleData$Nested_DF[[1]], unlist(singleData[1, 1])))
-    
   } else {
-    
     # If test_mode is on, then just build the required panels
     if (test_mode) {
-      toBuild <- trelliData$trelliData.omics[test_example,]
+      toBuild <- trelliData$trelliData.omics[test_example, ]
     } else {
       toBuild <- trelliData$trelliData.omics
     }
-    
+
     # Pass parameters to trelli_builder function
     trelli_builder(toBuild = toBuild,
                    cognostics = cognostics, 
@@ -916,13 +909,12 @@ trelli_abundance_heatmap <- function(trelliData,
                    ...) 
     
   }
-  
 }
 
 #' @name trelli_missingness_bar
-#' 
-#' @title Bar chart trelliscope building function for missing data   
-#' 
+#'
+#' @title Bar chart trelliscope building function for missing data
+#'
 #' @description Specify a plot design and cognostics for the missing barchart
 #'    trelliscope. Missingness is displayed per panel_by variable. Main_effects
 #'    data is used to split samples when applicable.
@@ -985,9 +977,9 @@ trelli_abundance_heatmap <- function(trelliData,
 #'    trelli_missingness_bar(test_mode = TRUE, test_example = 1:5, cognostics = "observed count", proportion = FALSE)
 #'    
 #' }
-#' 
+#'
 #' @author David Degnan, Lisa Bramer
-#' 
+#'
 #' @export
 trelli_missingness_bar <- function(trelliData,
                                    cognostics = c("total count", "observed count", "observed proportion"),
@@ -1031,7 +1023,9 @@ trelli_missingness_bar <- function(trelliData,
   }
   
   # Round test example to integer 
-  if (test_mode) {test_example <- unique(abs(round(test_example)))}
+  if (test_mode) {
+    test_example <- unique(abs(round(test_example)))
+  }
   
   # Determine if the trelliData is paneled by the edata column
   if (is.na(attr(trelliData, "panel_by_omics"))) {
@@ -1042,29 +1036,27 @@ trelli_missingness_bar <- function(trelliData,
   
   # Generate a function to make missingness dataframes--------------------------
   get_missing_DF <- function(DF) {
-    
-    # If there is no omics data, use statRes 
+    # If there is no omics data, use statRes
     if (is.null(trelliData$omicsData)) {
-      
-      # Add to total counts 
+      # Add to total counts
       Missingness <- data.table::data.table(
         Group = gsub("Count_", "", colnames(DF)),
         `Present Count` = unlist(DF)
       ) %>%
         merge(totalCounts, by = "Group") %>%
         dplyr::mutate(
-          `Absent Count` = Total - `Present Count`, 
+          `Absent Count` = Total - `Present Count`,
           `Absent Proportion` = `Absent Count` / Total,
           `Present Proportion` = `Present Count` / Total
         ) %>%
         dplyr::select(-Total) %>%
         dplyr::mutate(Group, `Absent Count`, `Present Count`, `Absent Proportion`, `Present Proportion`)
-      
     } else {
-      
       # Add a blank group if no group designation was given
-      if (is.null(attributes(trelliData$omicsData)$group_DF)) {DF$Group <- "x"} 
-      
+      if (is.null(attributes(trelliData$omicsData)$group_DF)) {
+        DF$Group <- "x"
+      }
+
       # Create missingness data.frame
       Missingness <- DF %>%
         dplyr::group_by(Group) %>%
@@ -1073,23 +1065,20 @@ trelli_missingness_bar <- function(trelliData,
           `Present Count` = sum(!is.na(Abundance)),
           `Absent Proportion` = round(`Absent Count` / sum(c(`Absent Count`, `Present Count`)), 4),
           `Present Proportion` = round(`Present Count` / sum(c(`Absent Count`, `Present Count`)), 4)
-        ) 
-      
+        )
     }
-    
+
     return(Missingness)
-    
   }
-  
+
   # Make missingness bar function-----------------------------------------------
-  
+
   # First, generate the boxplot function
   missing_bar_plot_fun <- function(DF, title) {
-    
     # Get missingness dataframe
     Missingness <- get_missing_DF(DF)
-    
-    # Subset based on count or proportion 
+
+    # Subset based on count or proportion
     if (proportion) {
       MissPlotDF <- Missingness %>%
         dplyr::select(c(Group, `Absent Proportion`, `Present Proportion`)) %>%
@@ -1103,46 +1092,51 @@ trelli_missingness_bar <- function(trelliData,
         tidyr::pivot_longer(c(Absent, Present))
       ylab <- "Count"
     }
-    
-    # Build plot 
-    missing_bar <- ggplot2::ggplot(MissPlotDF, ggplot2::aes(x = Group, y = value, fill = name)) + 
-      ggplot2::geom_bar(stat = "identity", position = "stack", color = "black") + ggplot2::theme_bw() + 
-      ggplot2::ggtitle(title) + ggplot2::ylab(ylab) +
+
+    # Build plot
+    missing_bar <- ggplot2::ggplot(MissPlotDF, ggplot2::aes(x = Group, y = value, fill = name)) +
+      ggplot2::geom_bar(stat = "identity", position = "stack", color = "black") +
+      ggplot2::theme_bw() +
+      ggplot2::ggtitle(title) +
+      ggplot2::ylab(ylab) +
       ggplot2::scale_fill_manual(values = c("black", "steelblue")) +
-      ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5),
-                     legend.title = ggplot2::element_blank()) 
-    
+      ggplot2::theme(
+        plot.title = ggplot2::element_text(hjust = 0.5),
+        legend.title = ggplot2::element_blank()
+      )
+
     # Remove x axis if no groups
     if (is.null(attributes(trelliData$omicsData)$group_DF) & stats_mode == FALSE) {
-      missing_bar <- missing_bar + ggplot2::theme(axis.title.x = ggplot2::element_blank(),
-                                                  axis.ticks.x = ggplot2::element_blank(), 
-                                                  axis.text.x = ggplot2::element_blank())
+      missing_bar <- missing_bar + ggplot2::theme(
+        axis.title.x = ggplot2::element_blank(),
+        axis.ticks.x = ggplot2::element_blank(),
+        axis.text.x = ggplot2::element_blank()
+      )
     }
-    
+
     # Add additional parameters
     if (!is.null(ggplot_params)) {
       for (param in ggplot_params) {
         missing_bar <- missing_bar + eval(parse(text = paste0("ggplot2::", param)))
       }
     }
-    
+
     # If interactive, pipe to ggplotly
     if (interactive) {
       missing_bar <- missing_bar %>% plotly::ggplotly()
     }
-    
+
     return(missing_bar)
   }
-  
+
   # Create the cognostic function-----------------------------------------------
-  
+
   # Next, generate the cognostic function
   missing_bar_cog_fun <- function(DF, GroupingVar) {
-    
     # Get missingness dataframe
     Missingness <- get_missing_DF(DF)
-    
-    # Build cognostics 
+
+    # Build cognostics
     Miss_Cog <- Missingness %>%
       dplyr::mutate(`total count` = `Present Count` + `Absent Count`) %>%
       dplyr::select(-c(`Absent Count`, `Absent Proportion`)) %>%
@@ -1174,7 +1168,7 @@ trelli_missingness_bar <- function(trelliData,
     if (length(unique(Miss_Cog$Group)) > 1) {
       Miss_Cog <- Miss_Cog %>% dplyr::mutate(name = paste(Group, name))
     }
-      
+
     # Remove group column
     Miss_Cog <- Miss_Cog %>% dplyr::select(c(name, value))
     
@@ -1201,42 +1195,42 @@ trelli_missingness_bar <- function(trelliData,
     }
     
     # Return NULL if there's no cognostics 
-    if (nrow(Miss_Cog) == 0) {return(NULL)}
+    if (nrow(Miss_Cog) == 0) {
+      return(NULL)
+    }
     
     # Generate cognostics 
     cog_to_trelli <- do.call(cbind, lapply(1:nrow(Miss_Cog), function(row) {
       quick_cog(name = Miss_Cog$name[row], value = Miss_Cog$value[row])
-    })) %>% tibble::tibble()
-    
+    })) %>% dplyr::tibble()
+
     return(cog_to_trelli)
-    
   }
-  
+
   # Build trelliscope display---------------------------------------------------
-  
-  # If test_mode is on, then just build the required panels. If the data is statRes, we 
-  # will need to restructure the data a bit. 
+
+  # If test_mode is on, then just build the required panels. If the data is statRes, we
+  # will need to restructure the data a bit.
   if (!is.null(trelliData$trelliData.omics)) {
     stats_mode <- FALSE
     if (test_mode) {
-      toBuild <- trelliData$trelliData.omics[test_example,]
+      toBuild <- trelliData$trelliData.omics[test_example, ]
     } else {
       toBuild <- trelliData$trelliData.omics
     }
   } else {
-    
     stats_mode <- TRUE
-    
-    # Get the edata column name 
+
+    # Get the edata column name
     edata_cname <- get_edata_cname(trelliData$statRes)
-    
-    # Get the columns with counts 
+
+    # Get the columns with counts
     count_cols <- colnames(trelliData$statRes)[grepl("Count", colnames(trelliData$statRes))]
-    
+
     # Build toBuild dataframe
     toBuild <- trelliData$statRes %>%
       dplyr::select(c(edata_cname, count_cols)) %>%
-      dplyr::group_by(!!rlang::sym(edata_cname)) %>%
+      dplyr::group_by(!!dplyr::sym(edata_cname)) %>%
       tidyr::nest() %>%
       dplyr::ungroup() %>%
       dplyr::rename(Nested_DF = data) 
@@ -1246,18 +1240,17 @@ trelli_missingness_bar <- function(trelliData,
       table(dnn = "Group") %>% 
       data.frame() %>% 
       dplyr::rename(Total = Freq)
-    
-    if (test_mode) {toBuild <- toBuild[test_example,]} 
+
+    if (test_mode) {
+      toBuild <- toBuild[test_example, ]
+    }
   }
-  
+
   # Return a single plot if single_plot is TRUE
   if (single_plot) {
-    
-    singleData <- toBuild[test_example[1],]
+    singleData <- toBuild[test_example[1], ]
     return(missing_bar_plot_fun(singleData$Nested_DF[[1]], unlist(singleData[1, 1])))
-    
   } else {
-    
     # Pass parameters to trelli_builder function
     if (!is.null(trelliData$omicsData)) {
       
@@ -1286,7 +1279,6 @@ trelli_missingness_bar <- function(trelliData,
 
     
   }
-  
 }
 
 determine_significance <- function(DF, p_value_thresh) {
@@ -1295,26 +1287,27 @@ determine_significance <- function(DF, p_value_thresh) {
   DF$Significance <- DF$p_value_anova <= p_value_thresh
   
   # Filter out NA values 
-  DF <- DF[!(is.nan(DF$Significance) | is.nan(DF$fold_change)),]
+  DF <- DF[!(is.nan(DF$Significance) | is.nan(DF$fold_change)), ]
   
   # Return NULL if no rows left
-  if (nrow(DF) == 0) {return(NULL)}
-  
-  # Add variables 
+  if (nrow(DF) == 0) {
+    return(NULL)
+  }
+
+  # Add variables
   GreaterThan <- paste0(">", p_value_thresh)
   LessThan <- paste0("<", p_value_thresh)
   DF$Significance <- ifelse(DF$Significance, LessThan, GreaterThan)
-  
+
   # Add attributes for plotting functions
   attr(DF, "GreaterThan") <- GreaterThan
   attr(DF, "LessThan") <- LessThan
-  
+
   return(DF)
-  
 }
 
 #' @name trelli_foldchange_bar
-#' 
+#'
 #' @title Bar chart trelliscope building function for fold_change
 #'
 #' @description Specify a plot design and cognostics for the fold_change
@@ -1340,7 +1333,8 @@ determine_significance <- function(DF, p_value_thresh) {
 #'   is 1.
 #' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a
 #'   trelliscope) should be returned. Default is FALSE.
-#'   
+#' @param ... Additional arguments to be passed on to the trelli builder
+#'
 #' @examples
 #' \dontrun{
 #' 
@@ -1353,9 +1347,9 @@ determine_significance <- function(DF, p_value_thresh) {
 #'   trelli_foldchange_bar(test_mode = TRUE, test_example = 1:10, interactive = TRUE) 
 #'    
 #' }
-#' 
+#'
 #' @author David Degnan, Lisa Bramer
-#' 
+#'
 #' @export
 trelli_foldchange_bar <- function(trelliData,
                                   cognostics = c("fold change", "anova p-value"),
@@ -1368,7 +1362,6 @@ trelli_foldchange_bar <- function(trelliData,
                                   test_example = 1,
                                   single_plot = FALSE,
                                   ...) {
-  
   # Run initial checks----------------------------------------------------------
   
   # Run generic checks 
@@ -1384,67 +1377,71 @@ trelli_foldchange_bar <- function(trelliData,
                   p_value_thresh = p_value_thresh)
   
   # Round test example to integer 
-  if (test_mode) {test_example <- unique(abs(round(test_example)))}
+  if (test_mode) {
+    test_example <- unique(abs(round(test_example)))
+  }
   
   # Check that group data is edata_cname
   edata_cname <- pmartR::get_edata_cname(trelliData$statRes)
   if (is.na(attr(trelliData, "panel_by_stat")) || edata_cname != attr(trelliData, "panel_by_stat")) {
     stop("trelliData must be grouped by edata_cname.")
   }
-  
+
   # Make foldchange bar function------------------------------------------------
-  
+
   fc_bar_plot_fun <- function(DF, title) {
     
     if (p_value_thresh != 0) {
       
       # Get significant values
       DF <- determine_significance(DF, p_value_thresh)
-      if (is.null(DF)) {return(NULL)}
+      if (is.null(DF)) {
+        return(NULL)
+      }
       
       # Make bar plot 
       bar <- ggplot2::ggplot(DF, ggplot2::aes(x = Comparison, y = fold_change, fill = Comparison, color = Significance)) +
-        ggplot2::geom_bar(stat = "identity") + 
+        ggplot2::geom_bar(stat = "identity") +
         ggplot2::scale_color_manual(values = structure(c("black", NA), .Names = c(attr(DF, "LessThan"), attr(DF, "GreaterThan"))), na.value = NA)
-      
     } else {
-      
       # Make bar plot
       bar <- ggplot2::ggplot(DF, ggplot2::aes(x = Comparison, y = fold_change, fill = Comparison)) +
-        ggplot2::geom_bar(stat = "identity") 
-      
+        ggplot2::geom_bar(stat = "identity")
     }
-    
+
     # Extend bar plot
     bar <- bar + ggplot2::theme_bw() + ggplot2::ggtitle(title) +
       ggplot2::theme(
-        plot.title = ggplot2::element_text(hjust = 0.5), 
-        axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1),
+        plot.title = ggplot2::element_text(hjust = 0.5),
+        axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust = 1),
       ) + ggplot2::ylab("Fold Change") + ggplot2::guides(fill = "none")
-    
+
     # Add additional parameters
     if (!is.null(ggplot_params)) {
       for (param in ggplot_params) {
         bar <- bar + eval(parse(text = paste0("ggplot2::", param)))
       }
     }
-    
+
     # If interactive, pipe to ggplotly
     if (interactive) {
       bar <- bar %>% plotly::ggplotly()
     }
-     
+
     return(bar)
-    
   }
-  
+
   # Create the cognostic function-----------------------------------------------
-  
+
   fc_bar_cog_fun <- function(DF, Biomolecule) {
-    
     # Extend cognostics if p_value is in it
-    if ("fold change" %in% cognostics) {DF <- DF %>% dplyr::rename(`fold change` = fold_change)}
-    if ("anova p-value" %in% cognostics) {DF <- DF %>% dplyr::rename(`anova p-value` = p_value_anova)}
+    if ("fold change" %in% cognostics) {
+      DF <- DF %>% dplyr::rename(`fold change` = fold_change)
+    }
+    
+    if ("anova p-value" %in% cognostics) {
+      DF <- DF %>% dplyr::rename(`anova p-value` = p_value_anova)
+    }
     
     # Prepare DF for quick_cog function
     PreCog <- DF %>%
@@ -1452,33 +1449,30 @@ trelli_foldchange_bar <- function(trelliData,
       tidyr::pivot_longer(cognostics) %>%
       dplyr::mutate(Comparison = paste(Comparison, name)) %>%
       dplyr::select(-name)
-    
+
     # Make quick cognostics
     cog_to_trelli <- do.call(cbind, lapply(1:nrow(PreCog), function(row) {
       quick_cog(PreCog$Comparison[row], round(PreCog$value[row], 4))
-    })) %>% tibble::tibble()
+    })) %>% dplyr::tibble()
     
     return(cog_to_trelli)
-    
   }
-  
+
   # Build trelliscope function--------------------------------------------------
-  
+
   # Return a single plot if single_plot is TRUE
   if (single_plot) {
-    
-    singleData <- trelliData$trelliData.stat[test_example[1],]
+    singleData <- trelliData$trelliData.stat[test_example[1], ]
     return(fc_bar_plot_fun(singleData$Nested_DF[[1]], unlist(singleData[1, 1])))
-    
   }
-  
+
   # Subset down to test example if applicable
   if (test_mode) {
-    toBuild <- trelliData$trelliData.stat[test_example,]
+    toBuild <- trelliData$trelliData.stat[test_example, ]
   } else {
     toBuild <- trelliData$trelliData.stat
   }
-  
+
   # Pass parameters to trelli_builder function
   trelli_builder(toBuild = toBuild,
                  cognostics = cognostics, 
@@ -1492,9 +1486,9 @@ trelli_foldchange_bar <- function(trelliData,
 }
 
 #' @name trelli_foldchange_boxplot
-#' 
-#' @title Boxplot trelliscope building function for fold_change   
-#' 
+#'
+#' @title Boxplot trelliscope building function for fold_change
+#'
 #' @description Specify a plot design and cognostics for the fold_change boxplot
 #'   trelliscope. Fold change must be grouped by an emeta column, which means
 #'   both an omicsData object and statRes are required to make this plot.
@@ -1522,6 +1516,7 @@ trelli_foldchange_bar <- function(trelliData,
 #'   is 1.
 #' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a
 #'   trelliscope) should be returned. Default is FALSE.
+#' @param ... Additional arguments to be passed on to the trelli builder
 #'   
 #' @examples
 #' \dontrun{ 
@@ -1537,9 +1532,9 @@ trelli_foldchange_bar <- function(trelliData,
 #'                            )
 #'
 #' }
-#' 
+#'
 #' @author David Degnan, Lisa Bramer
-#' 
+#'
 #' @export
 trelli_foldchange_boxplot <- function(trelliData,
                                       cognostics = "biomolecule count",
@@ -1553,7 +1548,6 @@ trelli_foldchange_boxplot <- function(trelliData,
                                       test_example = 1,
                                       single_plot = FALSE,
                                       ...) {
-  
   # Run initial checks----------------------------------------------------------
   
   # Run generic checks 
@@ -1572,27 +1566,31 @@ trelli_foldchange_boxplot <- function(trelliData,
                   p_value_thresh = p_value_thresh)
   
   # Round test example to integer 
-  if (test_mode) {test_example <- unique(abs(round(test_example)))}
+  if (test_mode) {
+    test_example <- unique(abs(round(test_example)))
+  }
   
   # Check that group data is an emeta column
   if (attr(trelliData, "panel_by_omics") %in% attr(trelliData, "emeta_col") == FALSE) {
     stop("trelliData must be paneled_by an e_meta column.")
   }
-  
+
   # Make sure include_points is a true or false
   if (!is.logical(include_points) & !is.na(include_points)) {
     stop("include_points must be a TRUE or FALSE.")
   }
-  
+
   # Make foldchange boxplot function--------------------------------------------
-  
+
   fc_box_plot_fun <- function(DF, title) {
     
     if (p_value_thresh != 0) {
     
       # Get significant values
       DF <- determine_significance(DF, p_value_thresh)
-      if (is.null(DF)) {return(NULL)}
+      if (is.null(DF)) {
+        return(NULL)
+      }
     
       # Make boxplot
       boxplot <- ggplot2::ggplot(DF, ggplot2::aes(x = Comparison, y = fold_change, fill = Comparison)) +
@@ -1625,27 +1623,26 @@ trelli_foldchange_boxplot <- function(trelliData,
           boxplot <- boxplot + ggplot2::geom_jitter(height = 0, width = 0.25)
       }
     }
-    
+
     # Add additional parameters
     if (!is.null(ggplot_params)) {
       for (param in ggplot_params) {
         boxplot <- boxplot + eval(parse(text = paste0("ggplot2::", param)))
       }
     }
-    
+
     # If interactive, pipe to ggplotly
     if (interactive) {
       boxplot <- boxplot %>% plotly::ggplotly()
     }
-    
+
     return(boxplot)
   }
-  
+
   # Make cognostic function-----------------------------------------------------
-  
+
   fc_box_cog_fun <- function(DF, Group) {
-    
-    # Calculate stats and subset to selected choices 
+    # Calculate stats and subset to selected choices
     cog_to_trelli <- DF %>%
       dplyr::group_by(Comparison) %>%
       dplyr::summarise(
@@ -1665,29 +1662,25 @@ trelli_foldchange_boxplot <- function(trelliData,
     # Add new cognostics 
     cog_to_trelli <- do.call(cbind, lapply(1:nrow(cog_to_trelli), function(row) {
       quick_cog(cog_to_trelli$name[row], cog_to_trelli$value[row])
-    })) %>% tibble::tibble()
+    })) %>% dplyr::tibble()
     
     return(cog_to_trelli)
-    
   }
-  
+
   # Build the trelliscope-------------------------------------------------------
-  
+
   # Return a single plot if single_plot is TRUE
   if (single_plot) {
-    
-    singleData <- trelliData$trelliData.stat[test_example[1],]
+    singleData <- trelliData$trelliData.stat[test_example[1], ]
     return(fc_box_plot_fun(singleData$Nested_DF[[1]], unlist(singleData[1, 1])))
-    
   } else {
-  
     # Subset down to test example if applicable
     if (test_mode) {
-      toBuild <- trelliData$trelliData.stat[test_example,]
+      toBuild <- trelliData$trelliData.stat[test_example, ]
     } else {
       toBuild <- trelliData$trelliData.stat
     }
-    
+
     # Pass parameters to trelli_builder function
     trelli_builder(toBuild = toBuild,
                    cognostics = cognostics, 
@@ -1698,7 +1691,6 @@ trelli_foldchange_boxplot <- function(trelliData,
                    remove_nestedDF = FALSE,
                    ...)
   }
-    
 }
 
 #' @name trelli_foldchange_heatmap
@@ -1741,9 +1733,9 @@ trelli_foldchange_boxplot <- function(trelliData,
 #'                             test_example = 1:10)
 #'
 #' }
-#' 
+#'
 #' @author David Degnan, Lisa Bramer
-#' 
+#'
 #' @export
 trelli_foldchange_heatmap <- function(trelliData,
                                       cognostics = "biomolecule count",
@@ -1756,7 +1748,6 @@ trelli_foldchange_heatmap <- function(trelliData,
                                       test_example = 1,
                                       single_plot = FALSE,
                                       ...) {
-  
   # Run initial checks----------------------------------------------------------
   
   # Run generic checks 
@@ -1775,7 +1766,9 @@ trelli_foldchange_heatmap <- function(trelliData,
                   p_value_thresh = p_value_thresh)
   
   # Round test example to integer 
-  if (test_mode) {test_example <- unique(abs(round(test_example)))}
+  if (test_mode) {
+    test_example <- unique(abs(round(test_example)))
+  }
   
   # Check that group data is an emeta column
   if (attr(trelliData, "panel_by_omics") %in% attr(trelliData, "emeta_col") == FALSE) {
@@ -1793,7 +1786,9 @@ trelli_foldchange_heatmap <- function(trelliData,
       
       # Get significant values
       DF <- determine_significance(DF, p_value_thresh)
-      if (is.null(DF)) {return(NULL)}
+      if (is.null(DF)) {
+        return(NULL)
+      }
       
       # Make heatmap with significance
       hm <- ggplot2::ggplot(DF, ggplot2::aes(x = Comparison, y = as.factor(.data[[edata_cname]]), fill = fold_change)) +
@@ -1817,14 +1812,14 @@ trelli_foldchange_heatmap <- function(trelliData,
         ggplot2::ggtitle(title)
       
     }
-    
+
     # Add additional parameters
     if (!is.null(ggplot_params)) {
       for (param in ggplot_params) {
         hm <- hm + eval(parse(text = paste0("ggplot2::", param)))
       }
     }
-    
+
     # If interactive, pipe to ggplotly
     if (interactive) {
       hm <- hm %>% plotly::ggplotly()
@@ -1832,7 +1827,7 @@ trelli_foldchange_heatmap <- function(trelliData,
     
     return(hm)
   }
-  
+
   # Make cognostic function-----------------------------------------------------
   
   fc_hm_cog_fun <- function(DF, Group) {
@@ -1857,29 +1852,28 @@ trelli_foldchange_heatmap <- function(trelliData,
     # Add new cognostics 
     cog_to_trelli <- do.call(cbind, lapply(1:nrow(cog_to_trelli), function(row) {
       quick_cog(cog_to_trelli$name[row], cog_to_trelli$value[row])
-    })) %>% tibble::tibble()
+    })) %>% dplyr::tibble()
     
     return(cog_to_trelli)
-    
   }
-  
+
   # Build the trelliscope-------------------------------------------------------
-  
+
   # Return a single plot if single_plot is TRUE
   if (single_plot) {
     
-    singleData <- trelliData$trelliData.stat[test_example[1],]
+    singleData <- trelliData$trelliData.stat[test_example[1], ]
     return(fc_hm_plot_fun(singleData$Nested_DF[[1]], unlist(singleData[1, 1])))
     
   } else {
     
     # Subset down to test example if applicable
     if (test_mode) {
-      toBuild <- trelliData$trelliData.stat[test_example,]
+      toBuild <- trelliData$trelliData.stat[test_example, ]
     } else {
       toBuild <- trelliData$trelliData.stat
     }
-    
+
     # Pass parameters to trelli_builder function
     trelli_builder(toBuild = toBuild,
                    cognostics = cognostics, 
@@ -1930,17 +1924,17 @@ trelli_foldchange_heatmap <- function(trelliData,
 #'   trelliscope) should be returned. Default is FALSE.
 #'   
 #' @examples
-#' \dontrun{ 
-#' 
+#' \dontrun{
+#'
 #' ## Build fold_change bar plot with statRes data grouped by edata_colname.
 #' trelli_panel_by(trelliData = trelliData4, panel = "RazorProtein") %>% 
 #'   trelli_foldchange_volcano(comparison = "all", test_mode = TRUE, test_example = 1:10,
 #'                             cognostics = c("biomolecule count", "proportion significant"))
 #'
 #' }
-#' 
+#'
 #' @author David Degnan, Lisa Bramer
-#' 
+#'
 #' @export
 trelli_foldchange_volcano <- function(trelliData,
                                       comparison = "all", 
@@ -1954,7 +1948,6 @@ trelli_foldchange_volcano <- function(trelliData,
                                       test_example = 1,
                                       single_plot = FALSE,
                                       ...) {
-  
   # Run initial checks----------------------------------------------------------
   
   # Run generic checks 
@@ -1986,7 +1979,9 @@ trelli_foldchange_volcano <- function(trelliData,
   }
   
   # Round test example to integer 
-  if (test_mode) {test_example <- unique(abs(round(test_example)))}
+  if (test_mode) {
+    test_example <- unique(abs(round(test_example)))
+  }
   
   # Check that group data is an emeta column
   if (attr(trelliData, "panel_by_omics") %in% attr(trelliData, "emeta_col") == FALSE) {
@@ -2001,7 +1996,9 @@ trelli_foldchange_volcano <- function(trelliData,
       
       # Get significant values
       DF <- determine_significance(DF, p_value_thresh)
-      if (is.null(DF)) {return(NULL)}
+      if (is.null(DF)) {
+        return(NULL)
+      }
       
       # Indicate which comparisons should be highlighted
       DF$Significance <- lapply(1:nrow(DF), function(row) {
@@ -2034,14 +2031,14 @@ trelli_foldchange_volcano <- function(trelliData,
         ggplot2::xlab("Fold Change") + ggplot2::ylab("-Log10 P Value")
       
     }
-    
+
     # Add additional parameters
     if (!is.null(ggplot_params)) {
       for (param in ggplot_params) {
         volcano <- volcano + eval(parse(text = paste0("ggplot2::", param)))
       }
     }
-    
+
     # If interactive, pipe to ggplotly
     if (interactive) {
       volcano <- volcano %>% plotly::ggplotly()
@@ -2049,7 +2046,7 @@ trelli_foldchange_volcano <- function(trelliData,
     
     return(volcano)
   }
-  
+
   # Make cognostic function-----------------------------------------------------
   
   fc_volcano_cog_fun <- function(DF, Group) {
@@ -2070,22 +2067,23 @@ trelli_foldchange_volcano <- function(trelliData,
       # Convert to trelliscope cogs
       cog_to_trelli <- do.call(cbind, lapply(1:nrow(cog_to_trelli), function(row) {
         quick_cog(cog_to_trelli$name[row], cog_to_trelli$value[row])
-      })) %>% tibble::tibble()
+      })) %>% dplyr::tibble()
       
-    } else {return(NULL)}
+    } else {
+      return(NULL)
+    }
     
     return(cog_to_trelli)
-    
   }
-  
+
   # Build the trelliscope-------------------------------------------------------
-  
+
   # Return a single plot if single_plot is TRUE
   if (single_plot) {
     
     if (length(comparison) > 1) {stop("single_plot will only work if 1 comparison has been selected.")}
     
-    singleData <- trelliData$trelliData.stat[test_example[1],]
+    singleData <- trelliData$trelliData.stat[test_example[1], ]
     return(fc_volcano_plot_fun(singleData$Nested_DF[[1]], unlist(singleData[1, 1])))
     
   } else {
@@ -2105,7 +2103,7 @@ trelli_foldchange_volcano <- function(trelliData,
     
     # Subset down to test example if applicable
     if (test_mode) {
-      toBuild <- toBuild[test_example,]
+      toBuild <- toBuild[test_example, ]
     } 
     
     # Pass parameters to trelli_builder function

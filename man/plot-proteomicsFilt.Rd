@@ -5,7 +5,7 @@
 \title{Plot proteomicsFilt Object}
 \usage{
 \method{plot}{proteomicsFilt}(
-  filter_object,
+  x,
   plot_type = "num_peps",
   min_num_peps = NULL,
   interactive = FALSE,
@@ -25,11 +25,12 @@
   bar_width = 0.8,
   bw_theme = TRUE,
   palette = NULL,
-  display_count = TRUE
+  display_count = TRUE,
+  ...
 )
 }
 \arguments{
-\item{filter_object}{object of class proteomicsFilt, which is a list with two
+\item{x}{object of class proteomicsFilt, which is a list with two
 elements. The first element is a data frame of counts for each unique
 peptide. The second element is a data frame with the counts for the number
 of peptides that map to each unique protein.}
@@ -104,6 +105,8 @@ palette to use. For a list of available options see the details section in
 
 \item{display_count}{logical value. Indicates whether the peptide or protein counts
 will be displayed on the bar plot. The default is TRUE.}
+
+\item{...}{further arguments passed to or from other methods.}
 }
 \value{
 ggplot2 plot object if interactive is FALSE, or plotly plot object if

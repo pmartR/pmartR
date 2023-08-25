@@ -14,16 +14,16 @@ edata_transform(omicsData, data_scale)
 \code{\link{as.nmrData}}, respectively.}
 
 \item{data_scale}{a character string indicating the type of transformation to
-be applied to the data. Valid values for 'pepData', 'proData', 'metabData',
-'lipidData', or 'nmrData': 'log2', 'log', 'log10', or 'abundance'. A value
-of 'abundance' indicates the data has previously undergone one of the log
-transformations and should be transformed back to raw values with no
-transformation applied. 
+  be applied to the data. Valid values for 'pepData', 'proData', 'metabData',
+  'lipidData', or 'nmrData': 'log2', 'log', 'log10', or 'abundance'. A value
+  of 'abundance' indicates the data has previously undergone one of the log
+  transformations and should be transformed back to raw values with no
+  transformation applied.
 
-Valid values for 'seqData': 'upper', 'median',
-'lcpm'. For 'seqData', 'lcpm' transforms by log2 counts per million,
-'upper' transforms by the upper quartile of non-zero counts, and 'median'
-transforms by the median of non-zero counts.}
+  Valid values for 'seqData': 'upper', 'median',
+  'lcpm'. For 'seqData', 'lcpm' transforms by log2 counts per million,
+  'upper' transforms by the upper quartile of non-zero counts, and 'median'
+  transforms by the median of non-zero counts.}
 }
 \value{
 data object of the same class as omicsData
@@ -40,7 +40,7 @@ For all but seqData, this function is intended to be used before
 }
 \examples{
 library(pmartRdata)
-mymetab <- edata_transform(omicsData = metab_object, data_scale="log2")
+mymetab <- edata_transform(omicsData = metab_object, data_scale = "log2")
 attr(mymetab, "data_info")$data_scale
 
 }

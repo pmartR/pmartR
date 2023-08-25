@@ -38,7 +38,7 @@ Any biomolecules seen in only one sample or with a variance less
 \examples{
 library(pmartRdata)
 
-mylipid <- edata_transform(omicsData = lipid_neg_object, data_scale="log2")
+mylipid <- edata_transform(omicsData = lipid_neg_object, data_scale = "log2")
 mylipid <- group_designation(omicsData = mylipid, main_effects = "Virus")
 pca_lipids <- dim_reduction(omicsData = mylipid)
 
@@ -52,11 +52,11 @@ pca_seq <- dim_reduction(omicsData = myseq)
 Redestig H, Stacklies W, Scholz M, Selbig J, & Walther
   D (2007). \emph{pcaMethods - a bioconductor package providing PCA methods
   for incomplete data}. Bioinformatics. 23(9): 1164-7.
-  
+
   Townes FW, Hicks SC, Aryee MJ, Irizarry RA (2019). \emph{Feature selection
   and dimension reduction for single-cell RNA-seq based on a multinomial
   model.} Genome Biol. 20, 1–16.
-  
+
   Huang H, Wang Y, Rudin C, Browne EP (2022). \emph{Towards a comprehensive
   evaluation of dimension reduction methods for transcriptomic data
   visualization.} Communications Biology 5, 719.

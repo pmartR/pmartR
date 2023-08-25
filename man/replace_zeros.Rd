@@ -4,15 +4,15 @@
 \alias{replace_zeros}
 \title{Replace 0 with NA}
 \usage{
-replace_zeros(edata, edata_cname)
+replace_zeros(e_data, edata_cname)
 }
 \arguments{
-\item{edata_cname}{A character string specifying the name of the ID column in
-the e_data data frame.}
-
 \item{e_data}{A \eqn{p \times n + 1} data frame of expression data, where
 \eqn{p} is the number of xxx observed and \eqn{n} is the
 number of samples.}
+
+\item{edata_cname}{A character string specifying the name of the ID column in
+the e_data data frame.}
 }
 \value{
 An updated e_data data frame where all instances of 0 have been

@@ -5,7 +5,7 @@
 \title{Generate an object from omicsData and/or statRes objects to pass to
   trelliscope building functions}
 \usage{
-as.trelliData(omicsData = NULL, statRes = NULL, ...)
+as.trelliData(omicsData = NULL, statRes = NULL)
 }
 \arguments{
 \item{omicsData}{an object of the class 'pepData', 'isobaricpepData',
@@ -37,17 +37,20 @@ omicsData <- group_designation(omicsData = omicsData, main_effects = c("Phenotyp
 
 # Apply the IMD ANOVA filter
 imdanova_Filt <- imdanova_filter(omicsData = omicsData)
-omicsData <- applyFilt(filter_object = imdanova_Filt, omicsData = omicsData, min_nonmiss_anova=2)
+omicsData <- applyFilt(filter_object = imdanova_Filt, omicsData = omicsData,
+                       min_nonmiss_anova = 2)
 
 # Normalize my pepData
-omicsData <- normalize_global(omicsData, "subset_fn" = "all", "norm_fn" = "median", "apply_norm" = TRUE, "backtransform" = TRUE)
+omicsData <- normalize_global(omicsData, "subset_fn" = "all", "norm_fn" = "median",
+                             "apply_norm" = TRUE, "backtransform" = TRUE)
 
-# Implement the IMD ANOVA method and compute all pairwise comparisons (i.e. leave the `comparisons` argument NULL)
+# Implement the IMD ANOVA method and compute all pairwise comparisons 
+# (i.e. leave the `comparisons` argument NULL)
 statRes <- imd_anova(omicsData = omicsData, test_method = 'combined')
 
-# Generate the trelliData object 
+# Generate the trelliData object
 trelliData2 <- as.trelliData(omicsData = omicsData)
-trelliData3 <- as.trelliData(statRes = statRes)   
+trelliData3 <- as.trelliData(statRes = statRes)
 trelliData4 <- as.trelliData(omicsData = omicsData, statRes = statRes)
 }
 

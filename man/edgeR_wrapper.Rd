@@ -29,26 +29,24 @@ significance threshold}
 
 \item{...}{additional arguments passed to methods functions. Note, formatting
 option changes will interfere with wrapping functionality.}
-
-\item{method}{a character string of length one specifying which wrapper to
-use. Can be 'edgeR', 'DESeq2', or 'limma-voom'}
 }
 \value{
 statRes object
 }
 \description{
-For generating statistics for 'seqData' objects
+For generating statistics for 'seqData' objects.
 }
 \details{
-Runs default edgeR workflow with empirical Bayes quasi-likelihood
-  F-tests. Additional arguments can be passed for use in the function, refer
-  to calcNormFactors() and glmQLFit() in edgeR package.
+Requires the 'edgeR' and 'limma' packages. Runs default edgeR workflow with 
+  empirical Bayes quasi-likelihood F-tests. Additional arguments can be
+  passed for use in the function, refer to calcNormFactors() and glmQLFit()
+  in edgeR package.
 
-Flags (signatures) -	Indicator of statistical significance for computed test. 
+Flags (signatures) -	Indicator of statistical significance for computed test.
 Zeroes indicate no significance, while +/- 1 indicates direction of significance.
 }
 \references{
-Robinson MD, McCarthy DJ, Smyth GK (2010). “edgeR: a Bioconductor package 
- for differential expression analysis of digital gene expression data.” 
+Robinson MD, McCarthy DJ, Smyth GK (2010). “edgeR: a Bioconductor package
+ for differential expression analysis of digital gene expression data.”
  Bioinformatics, 26(1), 139-140. doi: 10.1093/bioinformatics/btp616.
 }

@@ -21,7 +21,7 @@ gtest_heatmap(
 )
 }
 \arguments{
-\item{volcano}{`data.frame` produced by \link{pmartR::make_volcano_plot_df}}
+\item{volcano}{`data.frame` produced by pmartR:::\link{make_volcano_plot_df}}
 
 \item{show_sig}{Boolean whether to show the visual indicator that a certain
 bin combination is significant by the g-test}

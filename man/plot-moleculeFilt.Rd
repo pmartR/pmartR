@@ -5,7 +5,7 @@
 \title{Plot moleculeFilt Object}
 \usage{
 \method{plot}{moleculeFilt}(
-  filter_object,
+  x,
   min_num = NULL,
   cumulative = TRUE,
   interactive = FALSE,
@@ -22,11 +22,12 @@
   bar_width = 0.8,
   bw_theme = TRUE,
   palette = NULL,
-  display_count = TRUE
+  display_count = TRUE,
+  ...
 )
 }
 \arguments{
-\item{filter_object}{object of class moleculeFilt that contains the molecule
+\item{x}{object of class moleculeFilt that contains the molecule
 identifier and the number of samples for which the molecule was measured
 (not NA)}
 
@@ -81,6 +82,8 @@ palette to use. For a list of available options see the details section in
 
 \item{display_count}{logical value. Indicates whether the missing value counts by
 sample will be displayed on the bar plot. The default is TRUE.}
+
+\item{...}{further arguments passed to or from other methods.}
 }
 \value{
 ggplot2 plot object if interactive is FALSE, or plotly plot object if

@@ -35,7 +35,7 @@ named the same as the column in \code{e_data}) and other columns giving biomolec
 meta information (e.g. mappings of transcripts to genes or proteins). Can be the same as edata_cname, if desired.}
 
 \item{edata_cname}{character string specifying the name of the column
-containing the transcript identifiers in \code{e_data} and \code{e_meta} 
+containing the transcript identifiers in \code{e_data} and \code{e_meta}
 (if applicable).}
 
 \item{fdata_cname}{character string specifying the name of the column
@@ -68,7 +68,7 @@ Objects of class 'seqData' contain some attributes that are
   referenced by downstream functions. These attributes can be changed from
   their default value by manual specification. A list of these attributes as
   well as their default values are as follows: \tabular{ll}{ data_scale \tab
-  Scale of the data provided in \code{e_data}. Only 'counts' is valid for 
+  Scale of the data provided in \code{e_data}. Only 'counts' is valid for
   'seqData'. \cr \tab \cr is_normalized \tab A logical argument, specifying
   whether the data has been normalized or not. Default value is FALSE. \cr
   \tab \cr norm_info \tab Default value is an empty list, which will be
@@ -86,12 +86,14 @@ Objects of class 'seqData' contain some attributes that are
 }
 \examples{
 library(pmartRdata)
-myseq <- as.seqData(e_data = rnaseq_edata,
-                        e_meta = rnaseq_emeta,
-                        f_data = rnaseq_fdata,
-                        edata_cname = "Transcript",
-                        fdata_cname = "SampleName",
-                        emeta_cname = "Transcript")
+myseq <- as.seqData(
+  e_data = rnaseq_edata,
+  e_meta = rnaseq_emeta,
+  f_data = rnaseq_fdata,
+  edata_cname = "Transcript",
+  fdata_cname = "SampleName",
+  emeta_cname = "Transcript"
+)
 
 }
 \seealso{

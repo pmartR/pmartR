@@ -5,7 +5,7 @@
 \title{Plot SPANSRes Object}
 \usage{
 \method{plot}{SPANSRes}(
-  SPANSRes_obj,
+  x,
   interactive = FALSE,
   x_lab = NULL,
   y_lab = NULL,
@@ -18,12 +18,13 @@
   legend_position = "right",
   color_low = NULL,
   color_high = NULL,
-  bw_theme = TRUE
+  bw_theme = TRUE,
+  ...
 )
 }
 \arguments{
-\item{SPANSRes_obj}{an object of the class 'SPANSRes', created by
-\code{\link{spans_procedure()}}}
+\item{x}{an object of the class 'SPANSRes', created by
+\code{\link{spans_procedure}}}
 
 \item{interactive}{logical value. If TRUE produces an interactive plot.}
 
@@ -58,6 +59,8 @@ low values.}
 high values}
 
 \item{bw_theme}{logical value. If TRUE uses the ggplot2 black and white theme.}
+
+\item{...}{further arguments passed to or from other methods.}
 }
 \value{
 ggplot2 plot object if interactive is FALSE, or plotly plot object if

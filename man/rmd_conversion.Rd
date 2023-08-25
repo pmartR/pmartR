@@ -29,13 +29,19 @@ Only one of \code{log2rmd} and \code{pval} should be provided. The
 }
 \examples{
 library(pmartRdata)
-mymetab <- edata_transform(omicsData = metab_object,
-                           data_scale = "log2")
-mymetab <- group_designation(omicsData = mymetab,
-                             main_effects = "Phenotype")
-rmd_results <- rmd_filter(omicsData = mymetab,
-                          metrics=c("MAD", "Skewness", "Correlation"))
-rmd_conversion(log2rmd = rmd_results$Log2.md, df=3)
+mymetab <- edata_transform(
+  omicsData = metab_object,
+  data_scale = "log2"
+)
+mymetab <- group_designation(
+  omicsData = mymetab,
+  main_effects = "Phenotype"
+)
+rmd_results <- rmd_filter(
+  omicsData = mymetab,
+  metrics = c("MAD", "Skewness", "Correlation")
+)
+rmd_conversion(log2rmd = rmd_results$Log2.md, df = 3)
 
 rmd_conversion(pval = .0001, df = 3)
 rmd_conversion(log2rmd = 4.5, df = 3)

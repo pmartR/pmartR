@@ -5,7 +5,7 @@
 \title{Plot nmrnormRes Object}
 \usage{
 \method{plot}{nmrnormRes}(
-  nmrnormRes_obj,
+  x,
   nmrData = NULL,
   order_by = NULL,
   color_by = NULL,
@@ -21,11 +21,12 @@
   legend_position = "none",
   point_size = 2,
   bw_theme = TRUE,
-  palette = NULL
+  palette = NULL,
+  ...
 )
 }
 \arguments{
-\item{nmrnormRes_obj}{an object of type nmrnormRes, created by
+\item{x}{an object of type nmrnormRes, created by
 \code{\link{normalize_nmr}}}
 
 \item{nmrData}{An nmrData object.}
@@ -70,6 +71,8 @@ theme.}
 \item{palette}{character string indicating the name of the RColorBrewer
 palette to use. For a list of available options see the details section in
 \code{\link[RColorBrewer]{RColorBrewer}}.}
+
+\item{...}{further arguments passed to or from other methods.}
 }
 \value{
 ggplot2 plot object if interactive is FALSE, or plotly plot object if
@@ -81,14 +84,18 @@ Creates a scatter plot for an S3 object of type 'nmrnormRes'
 \examples{
 library(pmartRdata)
 mynmr <- edata_transform(omicsData = nmr_identified_object, data_scale = "log2")
-mynmrnorm <- normalize_nmr(omicsData = mynmr,
-                         apply_norm = FALSE,
-                         metabolite_name = "unkm1.53")
+mynmrnorm <- normalize_nmr(
+  omicsData = mynmr,
+  apply_norm = FALSE,
+  metabolite_name = "unkm1.53"
+)
 plot(mynmrnorm)
 
-mynmrnorm2 <- normalize_nmr(omicsData = mynmr,
-                         apply_norm = FALSE,
-                         sample_property_cname = "Concentration")
+mynmrnorm2 <- normalize_nmr(
+  omicsData = mynmr,
+  apply_norm = FALSE,
+  sample_property_cname = "Concentration"
+)
 plot(mynmrnorm2)
 
 }

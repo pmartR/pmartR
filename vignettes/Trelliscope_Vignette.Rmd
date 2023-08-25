@@ -108,8 +108,10 @@ trelliData1 <- as.trelliData.edata(
   data_scale_original = "abundance",
   data_scale = "log2",
   normalization_fun = "global",
-  normalization_params = list(subset_fn = "all", norm_fn = "median", apply_norm = TRUE,
-    backtransform = TRUE)
+  normalization_params = list(
+    subset_fn = "all", norm_fn = "median", apply_norm = TRUE,
+    backtransform = TRUE
+  )
 )
 ```
 
@@ -118,7 +120,7 @@ to panel the data by. The `?summary` function provides a quick overview of
 potential plots that can be made.
 
 ```{r}
-summary(trelliData1) 
+summary(trelliData1)
 ```
 
 With only an e_data file, there are only two potential options for panel by variables, 

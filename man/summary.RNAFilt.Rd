@@ -4,10 +4,10 @@
 \alias{summary.RNAFilt}
 \title{RNA Filter Summary}
 \usage{
-\method{summary}{RNAFilt}(filter_object, size_library = NULL, min_nonzero = NULL)
+\method{summary}{RNAFilt}(object, size_library = NULL, min_nonzero = NULL, ...)
 }
 \arguments{
-\item{filter_object}{S3 object of class 'RNAFilt' created by
+\item{object}{S3 object of class 'RNAFilt' created by
 \code{\link{RNA_filter}}.}
 
 \item{size_library}{integer cut-off for sample library size (i.e. number of
@@ -16,6 +16,8 @@ reads). Defaults to NULL.}
 \item{min_nonzero}{integer or float between 0 and 1. Cut-off for number of
 unique biomolecules with non-zero counts or as a proportion of total
 biomolecules. Defaults to NULL.}
+
+\item{...}{further arguments passed to or from other methods}
 }
 \value{
 a summary table giving the minimum, maximum, 1st and 3rd quartiles,
@@ -29,8 +31,8 @@ Provide summary of a RNAFilt S3 object
 \examples{
 library(pmartRdata)
 myfilter <- RNA_filter(omicsData = rnaseq_object)
-summary(filter_object = myfilter)
-summary(filter_object = myfilter, min_nonzero = 2)
+summary(myfilter)
+summary(myfilter, min_nonzero = 2)
 
 }
 \seealso{

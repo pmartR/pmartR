@@ -90,11 +90,13 @@ Objects of class 'proData' contain some attributes that are
 }
 \examples{
 library(pmartRdata)
-myproData <- as.proData(e_data = pro_edata,
-                        f_data = pro_fdata,
-                        edata_cname = "RazorProtein",
-                        fdata_cname = "SampleID",
-                        is_normalized = TRUE)
+myproData <- as.proData(
+  e_data = pro_edata,
+  f_data = pro_fdata,
+  edata_cname = "RazorProtein",
+  fdata_cname = "SampleID",
+  is_normalized = TRUE
+)
 
 }
 \seealso{

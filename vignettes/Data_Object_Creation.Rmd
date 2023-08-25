@@ -21,8 +21,8 @@ vignette: >
 knitr::opts_chunk$set(echo = TRUE)
 options(rmarkdown.html_vignette.check_title = FALSE)
 
-knitr::opts_chunk$set(fig.width=8)
-knitr::opts_chunk$set(fig.height=6)
+knitr::opts_chunk$set(fig.width = 8)
+knitr::opts_chunk$set(fig.height = 6)
 ```
 
 
@@ -150,14 +150,16 @@ To create the lipidData object with our example data, we need the 3 data frames 
 - data_types: optional argument for additional information about the data type; often used if there are datasets for both negative and positive ionization modes on an instrument
 
 ```{r}
-mylipid <- as.lipidData(e_data = edata,
-                        f_data = fdata,
-                        e_meta = emeta,
-                        edata_cname = "Lipid", 
-                        fdata_cname = "SampleID",
-                        emeta_cname = "Lipid", 
-                        data_scale = "abundance",
-                        data_types = "Negative Ion")
+mylipid <- as.lipidData(
+  e_data = edata,
+  f_data = fdata,
+  e_meta = emeta,
+  edata_cname = "Lipid",
+  fdata_cname = "SampleID",
+  emeta_cname = "Lipid",
+  data_scale = "abundance",
+  data_types = "Negative Ion"
+)
 ```
 
 Now we have an object of class lipidData. Built-in summary and plot methods now operate on this object and provide additional information.
@@ -168,7 +170,6 @@ class(mylipid)
 summary(mylipid)
 
 plot(edata_transform(mylipid, data_scale = "log2"))
-
 ```
 
 See "Quality_Control_with_pmartR" vignette for next steps.
