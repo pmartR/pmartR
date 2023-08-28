@@ -90,7 +90,7 @@
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">trelli_abundance_boxplot</span><span class="op">(</span></span>
 <span>  <span class="va">trelliData</span>,</span>
-<span>  cognostics <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"n"</span>, <span class="st">"mean"</span>, <span class="st">"median"</span>, <span class="st">"sd"</span>, <span class="st">"skew"</span>, <span class="st">"p_value"</span>, <span class="st">"fold_change"</span><span class="op">)</span>,</span>
+<span>  cognostics <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"count"</span>, <span class="st">"mean abundance"</span><span class="op">)</span>,</span>
 <span>  ggplot_params <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  interactive <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  include_points <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -112,9 +112,14 @@ as.trelliData.edata, and grouped by trelli_panel_by. Required.</p></dd>
 
 <dt>cognostics</dt>
 <dd><p>A vector of cognostic options for each plot. Valid entries
-are n, mean, median, sd, and skew for abundance. If statRes data is
-included, p_value and fold_change cognostics can be added. If no cognostics
-are desired, set to NULL.</p></dd>
+are "count", "mean abundance", "median abundance", and "cv abundance". 
+If data are paneled by a biomolecule, the count will be "sample count".
+If data are paneled by a sample or a biomolecule class, the count will be "biomolecule count". 
+If statRes data is included, "anova p-value" and "fold change" data per comparisons
+may be added. If grouping information is included, only "sample count" and 
+"mean abundance" will be calclulated, along with "anova p-value" and "fold change"
+if specified. "anova p-value" will not be included if paneling a trelliscope
+display by a biomolecule class. Default is "sample count" and "mean abundance".</p></dd>
 
 
 <dt>ggplot_params</dt>
@@ -170,37 +175,48 @@ trelliscope) should be returned. Default is FALSE.</p></dd>
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co">## Build the abundance boxplot with an edata file. </span></span></span>
-<span class="r-in"><span><span class="co">## Generate trelliData in as.trelliData.edata</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span>trelliData <span class="op">=</span> <span class="va">trelliData</span>, panel <span class="op">=</span> <span class="st">"Lipid"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">trelli_abundance_boxplot</span><span class="op">(</span>test_mode <span class="op">=</span> <span class="cn">TRUE</span>, test_example <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span>trelliData <span class="op">=</span> <span class="va">trelliData</span>, panel <span class="op">=</span> <span class="st">"Sample"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span></span>
-<span class="r-in"><span>  <span class="fu">trelli_abundance_boxplot</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co">## Generate trelliData objects using the as.trelliData.edata example code.</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co">## Build the abundance boxplot with an omicsData object. </span></span></span>
-<span class="r-in"><span><span class="co">## Generate trelliData in as.trelliData</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span>trelliData <span class="op">=</span> <span class="va">trelliData2</span>, panel <span class="op">=</span> <span class="st">"Lipid"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">trelli_abundance_boxplot</span><span class="op">(</span>test_mode <span class="op">=</span> <span class="cn">TRUE</span>, test_example <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span>trelliData <span class="op">=</span> <span class="va">trelliData2</span>, panel <span class="op">=</span> <span class="st">"LipidFamily"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">trelli_abundance_boxplot</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># Build the abundance boxplot with an edata file where each panel is a biomolecule. </span></span></span>
+<span class="r-in"><span><span class="fu"><a href="trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span>trelliData <span class="op">=</span> <span class="va">trelliData1</span>, panel <span class="op">=</span> <span class="st">"Peptide"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span></span>
+<span class="r-in"><span>   <span class="fu">trelli_abundance_boxplot</span><span class="op">(</span>test_mode <span class="op">=</span> <span class="cn">TRUE</span>, test_example <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span></span></span>
+<span class="r-in"><span>   </span></span>
+<span class="r-in"><span><span class="co"># Build the abundance boxplot wher each panel is a sample.</span></span></span>
+<span class="r-in"><span><span class="co"># Include all applicable cognostics. Remove points. </span></span></span>
+<span class="r-in"><span><span class="fu"><a href="trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span>trelliData <span class="op">=</span> <span class="va">trelliData1</span>, panel <span class="op">=</span> <span class="st">"Sample"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span></span>
+<span class="r-in"><span>   <span class="fu">trelli_abundance_boxplot</span><span class="op">(</span>test_mode <span class="op">=</span> <span class="cn">TRUE</span>, test_example <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, </span></span>
+<span class="r-in"><span>                            include_points <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
+<span class="r-in"><span>                            cognostics <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"count"</span>, </span></span>
+<span class="r-in"><span>                                           <span class="st">"mean abundance"</span>, </span></span>
+<span class="r-in"><span>                                           <span class="st">"median abundance"</span>, </span></span>
+<span class="r-in"><span>                                           <span class="st">"cv abundance"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>                           <span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co">## Build the abundance boxplot with an omicsData and statRes object. </span></span></span>
-<span class="r-in"><span><span class="co">## Generate trelliData in as.trelliData.</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span>trelliData <span class="op">=</span> <span class="va">trelliData4</span>, panel <span class="op">=</span> <span class="st">"Lipid"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">trelli_abundance_boxplot</span><span class="op">(</span>test_mode <span class="op">=</span> <span class="cn">TRUE</span>, test_example <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span>trelliData <span class="op">=</span> <span class="va">trelliData4</span>, panel <span class="op">=</span> <span class="st">"LipidFamily"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">trelli_abundance_boxplot</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># Build the abundance boxplot with an omicsData object.</span></span></span>
+<span class="r-in"><span><span class="co"># Let the panels be biomolecules. Here, grouping information is included.</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span>trelliData <span class="op">=</span> <span class="va">trelliData2</span>, panel <span class="op">=</span> <span class="st">"Peptide"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span></span>
+<span class="r-in"><span>   <span class="fu">trelli_abundance_boxplot</span><span class="op">(</span>test_mode <span class="op">=</span> <span class="cn">TRUE</span>, test_example <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span></span></span>
+<span class="r-in"><span>   </span></span>
+<span class="r-in"><span><span class="co"># Build the abundance boxplot with an omicsData object. The panel is a biomolecule class,</span></span></span>
+<span class="r-in"><span><span class="co"># which is proteins in this case.</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span>trelliData <span class="op">=</span> <span class="va">trelliData2</span>, panel <span class="op">=</span> <span class="st">"RazorProtein"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span></span>
+<span class="r-in"><span>   <span class="fu">trelli_abundance_boxplot</span><span class="op">(</span>test_mode <span class="op">=</span> <span class="cn">TRUE</span>, test_example <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    </span></span>
+<span class="r-in"><span><span class="co"># Build the abundance boxplot with an omicsData and statRes object.</span></span></span>
+<span class="r-in"><span><span class="co"># Panel by a biomolecule, and add statistics data to the cognostics</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span>trelliData <span class="op">=</span> <span class="va">trelliData4</span>, panel <span class="op">=</span> <span class="st">"Peptide"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
+<span class="r-in"><span>   <span class="fu">trelli_abundance_boxplot</span><span class="op">(</span>test_mode <span class="op">=</span> <span class="cn">TRUE</span>, test_example <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span>,</span></span>
+<span class="r-in"><span>                            cognostics <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mean abundance"</span>, <span class="st">"anova p-value"</span>, <span class="st">"fold change"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span> </span></span>
+<span class="r-in"><span><span class="co"># Other options include modifying the ggplot  </span></span></span>
+<span class="r-in"><span><span class="fu"><a href="trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span>trelliData <span class="op">=</span> <span class="va">trelliData1</span>, panel <span class="op">=</span> <span class="st">"Peptide"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span></span>
+<span class="r-in"><span>   <span class="fu">trelli_abundance_boxplot</span><span class="op">(</span>test_mode <span class="op">=</span> <span class="cn">TRUE</span>, test_example <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, </span></span>
+<span class="r-in"><span>     ggplot_params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ylab('')"</span>, <span class="st">"ylim(c(20,30))"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co">## Other options include modifying the ggplot</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span>trelliData <span class="op">=</span> <span class="va">trelliData</span>, panel <span class="op">=</span> <span class="st">"Lipid"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">trelli_abundance_boxplot</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    test_mode <span class="op">=</span> <span class="cn">TRUE</span>, test_example <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span>,</span></span>
-<span class="r-in"><span>    ggplot_params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ylab('')"</span>, <span class="st">"ylim(c(2,20))"</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># Or making the plot interactive </span></span></span>
+<span class="r-in"><span><span class="fu"><a href="trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span>trelliData <span class="op">=</span> <span class="va">trelliData4</span>, panel <span class="op">=</span> <span class="st">"RazorProtein"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span></span>
+<span class="r-in"><span>    <span class="fu">trelli_abundance_boxplot</span><span class="op">(</span>interactive <span class="op">=</span> <span class="cn">TRUE</span>, test_mode <span class="op">=</span> <span class="cn">TRUE</span>, test_example <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co">## Or making the plot interactive</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span>trelliData <span class="op">=</span> <span class="va">trelliData4</span>, panel <span class="op">=</span> <span class="st">"LipidFamily"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">trelli_abundance_boxplot</span><span class="op">(</span>interactive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

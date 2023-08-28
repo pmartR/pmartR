@@ -105,7 +105,7 @@
                         <h4 data-toc-skip class="author">David Degnan,
 Kelly Stratton, Lisa Bramer</h4>
             
-            <h4 data-toc-skip class="date">2023-08-22</h4>
+            <h4 data-toc-skip class="date">2023-08-28</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/pmartR/pmartR/blob/HEAD/vignettes/Trelliscope_Vignette.Rmd" class="external-link"><code>vignettes/Trelliscope_Vignette.Rmd</code></a></small>
       <div class="hidden name"><code>Trelliscope_Vignette.Rmd</code></div>
@@ -128,7 +128,7 @@ etc.</p>
 are as follows:</p>
 <ol style="list-style-type: decimal">
 <li>build the trelliscope data object with an e_data file, omicsData
-object0, statRes object, or both an omicsData and statRes object.
+object, statRes object, or both an omicsData and statRes object.
 (<code>as.trelliData.edata</code> or <code>as.trelliData</code>)</li>
 </ol>
 <p>Note: The e_data file is an unprocessed expression matrix. The
@@ -143,100 +143,24 @@ functions</p></li>
 </ol>
 <p>Currently, abundance, missingness, and fold change plots are
 supported, and can be summarized as follows:</p>
-<table class="table">
-<colgroup>
-<col width="10%">
-<col width="8%">
-<col width="10%">
-<col width="12%">
-<col width="11%">
-<col width="31%">
-<col width="15%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">Input.Data</th>
-<th align="left">Plot.Type</th>
-<th align="left">Uses.e_data</th>
-<th align="left">Uses.omicsData</th>
-<th align="left">Uses.statRes</th>
-<th align="left">Requires.Biomolecule.Class..e_meta.</th>
-<th align="left">Main.Effects.Used</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">Abundance</td>
-<td align="left">Boxplot</td>
-<td align="left">X</td>
-<td align="left">X</td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left">X</td>
-</tr>
-<tr class="even">
-<td align="left">Abundance</td>
-<td align="left">Histogram</td>
-<td align="left">X</td>
-<td align="left">X</td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Abundance</td>
-<td align="left">Heatmap</td>
-<td align="left"></td>
-<td align="left">X</td>
-<td align="left"></td>
-<td align="left">X</td>
-<td align="left">X</td>
-</tr>
-<tr class="even">
-<td align="left">Missingness</td>
-<td align="left">Barplot</td>
-<td align="left">X</td>
-<td align="left">X</td>
-<td align="left">X</td>
-<td align="left"></td>
-<td align="left">X</td>
-</tr>
-<tr class="odd">
-<td align="left">Fold Change</td>
-<td align="left">Barplot</td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left">X</td>
-<td align="left"></td>
-<td align="left">X</td>
-</tr>
-<tr class="even">
-<td align="left">Fold Change</td>
-<td align="left">Boxplot</td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left">X</td>
-<td align="left">X</td>
-<td align="left">X</td>
-</tr>
-<tr class="odd">
-<td align="left">Fold Change</td>
-<td align="left">Volcano</td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left">X</td>
-<td align="left">X</td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">Fold Change</td>
-<td align="left">Heatmap</td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left">X</td>
-<td align="left">X</td>
-<td align="left"></td>
-</tr>
-</tbody>
-</table>
+<pre><code><span><span class="co">##    Input Data Plot Type Uses e_data Uses omicsData Uses statRes</span></span>
+<span><span class="co">## 1   Abundance   Boxplot           X              X             </span></span>
+<span><span class="co">## 2   Abundance Histogram           X              X             </span></span>
+<span><span class="co">## 3   Abundance   Heatmap                          X             </span></span>
+<span><span class="co">## 4 Missingness   Barplot           X              X            X</span></span>
+<span><span class="co">## 5 Fold Change   Barplot                                       X</span></span>
+<span><span class="co">## 6 Fold Change   Boxplot                                       X</span></span>
+<span><span class="co">## 7 Fold Change   Volcano                                       X</span></span>
+<span><span class="co">## 8 Fold Change   Heatmap                                       X</span></span>
+<span><span class="co">##   Requires Biomolecule Class (e_meta) Main Effects Used</span></span>
+<span><span class="co">## 1                                                     X</span></span>
+<span><span class="co">## 2                                                      </span></span>
+<span><span class="co">## 3                                   X                 X</span></span>
+<span><span class="co">## 4                                                     X</span></span>
+<span><span class="co">## 5                                                     X</span></span>
+<span><span class="co">## 6                                   X                 X</span></span>
+<span><span class="co">## 7                                   X                  </span></span>
+<span><span class="co">## 8                                   X</span></span></code></pre>
 <p>where “Input Data” is the type of data that will be plotted and “Plot
 Type” describes what kind of plot would be generated in the trelliscope.
 “Uses e_data” describes plots that can be made with just an e_data
@@ -261,394 +185,20 @@ describes any plot where the “main_effects” parameter in
 <p>Let’s start with the simplest input data to run these trelliscope
 functions, e_data. For context, a typical e_data file looks like
 this:</p>
-<table class="table">
-<colgroup>
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">Lipid</th>
-<th align="right">StrainC_D1_R1</th>
-<th align="right">StrainC_D1_R5</th>
-<th align="right">StrainC_D1_R2</th>
-<th align="right">StrainC_D1_R4</th>
-<th align="right">StrainC_D1_R3</th>
-<th align="right">StrainC_D2_R2</th>
-<th align="right">StrainC_D2_R1</th>
-<th align="right">StrainC_D2_R5</th>
-<th align="right">StrainC_D2_R3</th>
-<th align="right">StrainC_D2_R4</th>
-<th align="right">StrainC_D3_R2</th>
-<th align="right">StrainC_D3_R1</th>
-<th align="right">StrainC_D3_R3</th>
-<th align="right">StrainC_D3_R4</th>
-<th align="right">StrainC_D3_R5</th>
-<th align="right">StrainA_D1_R5</th>
-<th align="right">StrainA_D1_R1</th>
-<th align="right">StrainA_D1_R4</th>
-<th align="right">StrainA_D1_R2</th>
-<th align="right">StrainA_D1_R3</th>
-<th align="right">StrainA_D2_R2</th>
-<th align="right">StrainA_D2_R3</th>
-<th align="right">StrainA_D2_R4</th>
-<th align="right">StrainA_D2_R5</th>
-<th align="right">StrainA_D2_R1</th>
-<th align="right">StrainA_D3_R2</th>
-<th align="right">StrainA_D3_R3</th>
-<th align="right">StrainA_D3_R5</th>
-<th align="right">StrainA_D3_R4</th>
-<th align="right">StrainA_D3_R1</th>
-<th align="right">StrainB_D1_R1</th>
-<th align="right">StrainB_D1_R2</th>
-<th align="right">StrainB_D1_R4</th>
-<th align="right">StrainB_D1_R5</th>
-<th align="right">StrainB_D1_R3</th>
-<th align="right">StrainB_D2_R3</th>
-<th align="right">StrainB_D2_R1</th>
-<th align="right">StrainB_D2_R2</th>
-<th align="right">StrainB_D2_R4</th>
-<th align="right">StrainB_D2_R5</th>
-<th align="right">StrainB_D3_R3</th>
-<th align="right">StrainB_D3_R1</th>
-<th align="right">StrainB_D3_R2</th>
-<th align="right">StrainB_D3_R5</th>
-<th align="right">StrainB_D3_R4</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">carnitine(16:0)</td>
-<td align="right">262820.62</td>
-<td align="right">787945.9</td>
-<td align="right">361754.5</td>
-<td align="right">786515.3</td>
-<td align="right">372198.38</td>
-<td align="right">675440.44</td>
-<td align="right">723261.12</td>
-<td align="right">955778.44</td>
-<td align="right">1718047.4</td>
-<td align="right">855749.88</td>
-<td align="right">793363.8</td>
-<td align="right">644021.06</td>
-<td align="right">410247.22</td>
-<td align="right">891409.75</td>
-<td align="right">604701.2</td>
-<td align="right">255599.12</td>
-<td align="right">244321.4</td>
-<td align="right">483120.06</td>
-<td align="right">521146.78</td>
-<td align="right">243681.50</td>
-<td align="right">1638508.8</td>
-<td align="right">1188332.38</td>
-<td align="right">378445.9</td>
-<td align="right">1041888.62</td>
-<td align="right">1492173.6</td>
-<td align="right">355432.69</td>
-<td align="right">433696.09</td>
-<td align="right">500784.66</td>
-<td align="right">838907.5</td>
-<td align="right">400569.75</td>
-<td align="right">145989.5</td>
-<td align="right">217211.55</td>
-<td align="right">597480.6</td>
-<td align="right">516966.6</td>
-<td align="right">502270.3</td>
-<td align="right">403850.34</td>
-<td align="right">607844.94</td>
-<td align="right">477675.2</td>
-<td align="right">591884.4</td>
-<td align="right">766621.38</td>
-<td align="right">735437.9</td>
-<td align="right">510643.2</td>
-<td align="right">485189.8</td>
-<td align="right">615153.6</td>
-<td align="right">701410.7</td>
-</tr>
-<tr class="even">
-<td align="left">carnitine(18:1)</td>
-<td align="right">202906.48</td>
-<td align="right">455785.9</td>
-<td align="right">245975.2</td>
-<td align="right">368869.9</td>
-<td align="right">247122.16</td>
-<td align="right">299270.84</td>
-<td align="right">290375.50</td>
-<td align="right">518390.66</td>
-<td align="right">472815.9</td>
-<td align="right">383356.16</td>
-<td align="right">233570.6</td>
-<td align="right">372651.22</td>
-<td align="right">187580.20</td>
-<td align="right">419932.28</td>
-<td align="right">254219.5</td>
-<td align="right">117440.60</td>
-<td align="right">151256.7</td>
-<td align="right">242807.11</td>
-<td align="right">274567.91</td>
-<td align="right">159222.30</td>
-<td align="right">545411.1</td>
-<td align="right">443926.16</td>
-<td align="right">198750.1</td>
-<td align="right">499175.19</td>
-<td align="right">577437.5</td>
-<td align="right">175881.02</td>
-<td align="right">187686.41</td>
-<td align="right">251359.97</td>
-<td align="right">521368.6</td>
-<td align="right">245823.09</td>
-<td align="right">114102.2</td>
-<td align="right">165383.62</td>
-<td align="right">278946.9</td>
-<td align="right">199033.5</td>
-<td align="right">260755.2</td>
-<td align="right">195967.00</td>
-<td align="right">183019.00</td>
-<td align="right">153787.9</td>
-<td align="right">244087.8</td>
-<td align="right">330636.50</td>
-<td align="right">282266.6</td>
-<td align="right">184857.2</td>
-<td align="right">214877.7</td>
-<td align="right">275909.3</td>
-<td align="right">289513.4</td>
-</tr>
-<tr class="odd">
-<td align="left">CE(18:1)</td>
-<td align="right">574408.44</td>
-<td align="right">1535816.8</td>
-<td align="right">1137045.6</td>
-<td align="right">1592443.9</td>
-<td align="right">1570150.12</td>
-<td align="right">1458056.12</td>
-<td align="right">976073.25</td>
-<td align="right">1270426.75</td>
-<td align="right">1412847.8</td>
-<td align="right">1906531.75</td>
-<td align="right">1656387.8</td>
-<td align="right">1124151.75</td>
-<td align="right">1219534.62</td>
-<td align="right">1254728.88</td>
-<td align="right">1852715.1</td>
-<td align="right">1279676.50</td>
-<td align="right">1130057.0</td>
-<td align="right">1108035.50</td>
-<td align="right">1416096.38</td>
-<td align="right">682929.00</td>
-<td align="right">1583008.0</td>
-<td align="right">1206145.75</td>
-<td align="right">1282248.4</td>
-<td align="right">1548318.25</td>
-<td align="right">1624212.6</td>
-<td align="right">798576.88</td>
-<td align="right">948851.81</td>
-<td align="right">1055860.00</td>
-<td align="right">1803589.0</td>
-<td align="right">1192707.50</td>
-<td align="right">2189403.0</td>
-<td align="right">1482626.62</td>
-<td align="right">3418398.2</td>
-<td align="right">2913713.2</td>
-<td align="right">1862504.6</td>
-<td align="right">632856.81</td>
-<td align="right">1373255.50</td>
-<td align="right">2172740.2</td>
-<td align="right">2753302.5</td>
-<td align="right">868667.44</td>
-<td align="right">2116568.0</td>
-<td align="right">1818848.4</td>
-<td align="right">2143611.0</td>
-<td align="right">2187577.5</td>
-<td align="right">2999383.0</td>
-</tr>
-<tr class="even">
-<td align="left">CE(18:2)</td>
-<td align="right">61348.60</td>
-<td align="right">495397.2</td>
-<td align="right">345652.0</td>
-<td align="right">174411.6</td>
-<td align="right">177184.30</td>
-<td align="right">499767.12</td>
-<td align="right">405669.34</td>
-<td align="right">399318.97</td>
-<td align="right">677791.5</td>
-<td align="right">627947.56</td>
-<td align="right">751502.7</td>
-<td align="right">262884.00</td>
-<td align="right">531998.12</td>
-<td align="right">826207.25</td>
-<td align="right">880179.4</td>
-<td align="right">266668.69</td>
-<td align="right">233972.5</td>
-<td align="right">198089.97</td>
-<td align="right">258923.12</td>
-<td align="right">128621.91</td>
-<td align="right">1244912.8</td>
-<td align="right">579361.69</td>
-<td align="right">434279.0</td>
-<td align="right">374931.94</td>
-<td align="right">659934.9</td>
-<td align="right">260636.81</td>
-<td align="right">567985.56</td>
-<td align="right">632997.62</td>
-<td align="right">423202.5</td>
-<td align="right">406835.31</td>
-<td align="right">371184.1</td>
-<td align="right">267214.56</td>
-<td align="right">979224.6</td>
-<td align="right">616975.0</td>
-<td align="right">194345.2</td>
-<td align="right">107659.37</td>
-<td align="right">411349.56</td>
-<td align="right">844058.2</td>
-<td align="right">802793.4</td>
-<td align="right">174967.28</td>
-<td align="right">1449017.6</td>
-<td align="right">983571.6</td>
-<td align="right">831444.4</td>
-<td align="right">610416.0</td>
-<td align="right">1222457.1</td>
-</tr>
-<tr class="odd">
-<td align="left">CE(20:1)</td>
-<td align="right">19997.07</td>
-<td align="right">131929.3</td>
-<td align="right">138256.8</td>
-<td align="right">160749.7</td>
-<td align="right">49607.79</td>
-<td align="right">48878.99</td>
-<td align="right">32328.31</td>
-<td align="right">49854.62</td>
-<td align="right">122437.3</td>
-<td align="right">74425.67</td>
-<td align="right">101769.5</td>
-<td align="right">40532.98</td>
-<td align="right">86100.37</td>
-<td align="right">71767.95</td>
-<td align="right">107202.4</td>
-<td align="right">46442.32</td>
-<td align="right">101390.9</td>
-<td align="right">48981.93</td>
-<td align="right">76430.52</td>
-<td align="right">24403.29</td>
-<td align="right">140378.3</td>
-<td align="right">88905.95</td>
-<td align="right">46947.0</td>
-<td align="right">95265.61</td>
-<td align="right">106392.9</td>
-<td align="right">29452.86</td>
-<td align="right">52829.77</td>
-<td align="right">71246.99</td>
-<td align="right">133232.0</td>
-<td align="right">99232.75</td>
-<td align="right">145758.8</td>
-<td align="right">92520.69</td>
-<td align="right">449571.8</td>
-<td align="right">446339.7</td>
-<td align="right">117604.8</td>
-<td align="right">25936.11</td>
-<td align="right">87947.79</td>
-<td align="right">178746.1</td>
-<td align="right">134636.6</td>
-<td align="right">44765.63</td>
-<td align="right">359051.9</td>
-<td align="right">179164.8</td>
-<td align="right">172745.2</td>
-<td align="right">158662.7</td>
-<td align="right">291570.5</td>
-</tr>
-<tr class="even">
-<td align="left">CE(20:2)</td>
-<td align="right">302766.41</td>
-<td align="right">821983.9</td>
-<td align="right">834198.4</td>
-<td align="right">825602.4</td>
-<td align="right">696071.44</td>
-<td align="right">492116.41</td>
-<td align="right">437943.75</td>
-<td align="right">474454.88</td>
-<td align="right">503099.1</td>
-<td align="right">750810.50</td>
-<td align="right">538345.2</td>
-<td align="right">699276.75</td>
-<td align="right">578725.62</td>
-<td align="right">767793.44</td>
-<td align="right">872433.1</td>
-<td align="right">486695.97</td>
-<td align="right">664213.1</td>
-<td align="right">498794.50</td>
-<td align="right">564211.69</td>
-<td align="right">568117.31</td>
-<td align="right">744406.2</td>
-<td align="right">590691.00</td>
-<td align="right">490491.0</td>
-<td align="right">550672.50</td>
-<td align="right">817738.8</td>
-<td align="right">409146.75</td>
-<td align="right">620578.12</td>
-<td align="right">509542.59</td>
-<td align="right">859584.2</td>
-<td align="right">564628.50</td>
-<td align="right">705168.0</td>
-<td align="right">535042.62</td>
-<td align="right">761357.8</td>
-<td align="right">1196939.1</td>
-<td align="right">587026.0</td>
-<td align="right">291035.00</td>
-<td align="right">452840.94</td>
-<td align="right">700211.7</td>
-<td align="right">666464.8</td>
-<td align="right">264519.03</td>
-<td align="right">1125621.8</td>
-<td align="right">737741.8</td>
-<td align="right">736249.4</td>
-<td align="right">1020190.2</td>
-<td align="right">932810.3</td>
-</tr>
-</tbody>
-</table>
+<pre><code><span><span class="co">##                     Peptide Sample_20_Phenotype3_A Sample_33_Phenotype3_A</span></span>
+<span><span class="co">## 1          AAAAAAAAAAGAAGGR                     NA                     NA</span></span>
+<span><span class="co">## 2               AAAAAAALQAK                     NA                     NA</span></span>
+<span><span class="co">## 3 AAAAAEQQQFYLLLGNLLSPDNVVR                     NA               27154000</span></span>
+<span><span class="co">## 4              AAAAAGTATSQR               36119000               39205000</span></span>
+<span><span class="co">## 5               AAAAELSLLEK                     NA                     NA</span></span>
+<span><span class="co">## 6  AAAAVGAGHGAGGPGAASSSGGAR               12026000                6319800</span></span>
+<span><span class="co">##   Sample_49_Phenotype3_A Sample_47_Phenotype3_A Sample_50_Phenotype3_B</span></span>
+<span><span class="co">## 1                     NA                     NA                     NA</span></span>
+<span><span class="co">## 2                     NA                     NA                     NA</span></span>
+<span><span class="co">## 3               19001000                     NA                     NA</span></span>
+<span><span class="co">## 4               43322000               40862000               31594000</span></span>
+<span><span class="co">## 5                     NA                     NA                     NA</span></span>
+<span><span class="co">## 6               26133000               27810000                     NA</span></span></code></pre>
 <p>where each of the rows are biomolecules and each of the columns are
 samples. Within each e_data file, there must be one identifier column
 referred to as the “edata_cname.” The rest of the columns contain
@@ -665,11 +215,11 @@ supported.</p>
 see <code><a href="../reference/normalize_global.html">?normalize_global</a></code>, <code><a href="../reference/normalize_loess.html">?normalize_loess</a></code> and
 <code><a href="../reference/normalize_quantile.html">?normalize_quantile</a></code>. Below, we have an example of valid log
 transformation and normalization parameters.</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">trelliData1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as.trelliData.edata.html">as.trelliData.edata</a></span><span class="op">(</span></span>
-<span>  e_data <span class="op">=</span> <span class="fu">pmartRdata</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/pmartRdata/man/lipid_pos_edata.html" class="external-link">lipid_pos_edata</a></span>,</span>
-<span>  edata_cname <span class="op">=</span> <span class="st">"Lipid"</span>,</span>
-<span>  omics_type <span class="op">=</span> <span class="st">"lipidData"</span>,</span>
+<span>  e_data <span class="op">=</span> <span class="fu">pmartRdata</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/pmartRdata/man/pep_edata.html" class="external-link">pep_edata</a></span>,</span>
+<span>  edata_cname <span class="op">=</span> <span class="st">"Peptide"</span>,</span>
+<span>  omics_type <span class="op">=</span> <span class="st">"pepData"</span>,</span>
 <span>  data_scale_original <span class="op">=</span> <span class="st">"abundance"</span>,</span>
 <span>  data_scale <span class="op">=</span> <span class="st">"log2"</span>,</span>
 <span>  normalization_fun <span class="op">=</span> <span class="st">"global"</span>,</span>
@@ -681,95 +231,61 @@ transformation and normalization parameters.</p>
 <p>After creating a trelliData object, the next step is to determine
 which variable to panel the data by. The <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">?summary</a></code> function
 provides a quick overview of potential plots that can be made.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">trelliData1</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##    Panel By Choice                Plot Number of Plots</span></span>
-<span><span class="co">## 1:           Lipid   abundance boxplot             275</span></span>
-<span><span class="co">## 2:           Lipid abundance histogram             275</span></span>
-<span><span class="co">## 3:           Lipid     missingness bar             275</span></span>
-<span><span class="co">## 4:          Sample   abundance boxplot              45</span></span>
-<span><span class="co">## 5:          Sample     missingness bar              45</span></span></code></pre>
+<span><span class="co">## 1:         Peptide   abundance boxplot           21329</span></span>
+<span><span class="co">## 2:         Peptide abundance histogram           21329</span></span>
+<span><span class="co">## 3:         Peptide     missingness bar           21329</span></span>
+<span><span class="co">## 4:          Sample   abundance boxplot              24</span></span>
+<span><span class="co">## 5:          Sample     missingness bar              24</span></span></code></pre>
 <p>With only an e_data file, there are only two potential options for
-panel by variables, which include the edata_cname (in this case, Lipid),
-and a “Sample” category which is comprised of the name of every column
-besides edata_cname. The plot, which corresponds to the table in the
-introduction, can be further investigated with adding trelli and
-underscores to the name. For example, the “abundance boxplot” details be
-viewed with <code><a href="../reference/trelli_abundance_boxplot.html">?trelli_abundance_boxplot</a></code>. The last column
-tells you the number of plots that can be made with that trelliscope
-function. Note that trelliscopes of more than 1,000 plots can take
-several minutes to be made.</p>
+panel by variables, which include the edata_cname (in this case,
+Peptide), and a “Sample” category which is comprised of the name of
+every column besides edata_cname. The plot, which corresponds to the
+table in the introduction, can be further investigated with adding
+trelli and underscores to the name. For example, the “abundance boxplot”
+details be viewed with <code><a href="../reference/trelli_abundance_boxplot.html">?trelli_abundance_boxplot</a></code>. The last
+column tells you the number of plots that can be made with that
+trelliscope function. Note that trelliscopes of more than 1,000 plots
+can take several minutes to be made.</p>
 <p>To set the panels for the trelliscope, use the
 <code><a href="../reference/trelli_panel_by.html">?trelli_panel_by</a></code> function. We only have two options in this
 case, so a summary for plots where each panel is the biomolecule
-(edata_cname = “Lipid”) looks like this:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">trelliData1</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="../reference/trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span><span class="st">"Lipid"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+(edata_cname = “Peptide”) looks like this:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">trelliData1</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="../reference/trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span><span class="st">"Peptide"</span><span class="op">)</span><span class="op">)</span> </span></code></pre></div>
 <pre><code><span><span class="co">##    Panel By Choice                Plot Number of Plots</span></span>
-<span><span class="co">## 1:           Lipid   abundance boxplot             275</span></span>
-<span><span class="co">## 2:           Lipid abundance histogram             275</span></span>
-<span><span class="co">## 3:           Lipid     missingness bar             275</span></span></code></pre>
+<span><span class="co">## 1:         Peptide   abundance boxplot           21329</span></span>
+<span><span class="co">## 2:         Peptide abundance histogram           21329</span></span>
+<span><span class="co">## 3:         Peptide     missingness bar           21329</span></span></code></pre>
 <p>which is the above table subsetted down to the only options available
 to plot right now. The typical trelliscope parameters look like
 this:</p>
-<table class="table">
-<colgroup>
-<col width="16%">
-<col width="83%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">Parameter.Name</th>
-<th align="left">Description</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">cognostics</td>
-<td align="left">Set the specific cognostics of the trelliscope. Varies
-per plotting function.</td>
-</tr>
-<tr class="even">
-<td align="left">ggplot_params</td>
-<td align="left">Pass parameters to the ggplot functions as a list of
-strings</td>
-</tr>
-<tr class="odd">
-<td align="left">interactive</td>
-<td align="left">Indicate whether plots should be interactive or
-not</td>
-</tr>
-<tr class="even">
-<td align="left">path</td>
-<td align="left">The path where the trelliscope will be outputted
-to</td>
-</tr>
-<tr class="odd">
-<td align="left">name</td>
-<td align="left">Name of the trelliscope display</td>
-</tr>
-<tr class="even">
-<td align="left">test_mode</td>
-<td align="left">Indicate whether the trelliscope should be subsetted to
-a few panels or not</td>
-</tr>
-<tr class="odd">
-<td align="left">test_example</td>
-<td align="left">The panels to subset the trelliscope to if test_mode is
-true</td>
-</tr>
-<tr class="even">
-<td align="left">single_plot</td>
-<td align="left">Output a single plot instead of a trelliscope
-display</td>
-</tr>
-</tbody>
-</table>
+<pre><code><span><span class="co">##   Parameter Name</span></span>
+<span><span class="co">## 1     cognostics</span></span>
+<span><span class="co">## 2  ggplot_params</span></span>
+<span><span class="co">## 3    interactive</span></span>
+<span><span class="co">## 4           path</span></span>
+<span><span class="co">## 5           name</span></span>
+<span><span class="co">## 6      test_mode</span></span>
+<span><span class="co">## 7   test_example</span></span>
+<span><span class="co">## 8    single_plot</span></span>
+<span><span class="co">##                                                                     Description</span></span>
+<span><span class="co">## 1 Set the specific cognostics of the trelliscope. Varies per plotting function.</span></span>
+<span><span class="co">## 2                  Pass parameters to the ggplot functions as a list of strings</span></span>
+<span><span class="co">## 3                           Indicate whether plots should be interactive or not</span></span>
+<span><span class="co">## 4                           The path where the trelliscope will be outputted to</span></span>
+<span><span class="co">## 5                                               Name of the trelliscope display</span></span>
+<span><span class="co">## 6   Indicate whether the trelliscope should be subsetted to a few panels or not</span></span>
+<span><span class="co">## 7                  The panels to subset the trelliscope to if test_mode is true</span></span>
+<span><span class="co">## 8                         Output a single plot instead of a trelliscope display</span></span></code></pre>
 <p>See an example of how to use one of these functions below, with
 test_mode enabled.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/trelli_abundance_boxplot.html">trelli_abundance_boxplot</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="../reference/trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span><span class="va">trelliData1</span>, <span class="st">"Lipid"</span><span class="op">)</span>,</span>
-<span>  cognostics <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"n"</span>, <span class="st">"mean"</span>, <span class="st">"median"</span>, <span class="st">"sd"</span><span class="op">)</span>,</span>
-<span>  interactive <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  <span class="fu"><a href="../reference/trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span><span class="va">trelliData1</span>, <span class="st">"Peptide"</span><span class="op">)</span>,</span>
+<span>  cognostics <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"count"</span>, <span class="st">"mean abundance"</span>, <span class="st">"cv abundance"</span><span class="op">)</span>,</span>
 <span>  include_points <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  name <span class="op">=</span> <span class="st">"Trelliscope"</span>,</span>
 <span>  test_mode <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -788,54 +304,46 @@ abundance with include_points = TRUE, we would get too many points to
 view. Thus, set include_points to FALSE. Since we’ve set “single_plot”
 to TRUE, we get an example of one of the many plots that will be made
 and passed to trelliscope. We can change which plot we’re looking at
-with “test_example”. On the left, we have a “Lipid” example and on the
+with “test_example”. On the left, we have a “Peptide” example and on the
 right, a “Sample” example, with the color changed to avoid
 confusion.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Panel by Mass Tag ID</span></span>
-<span><span class="va">MassGroups</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span><span class="va">trelliData1</span>, <span class="st">"Lipid"</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Panel by Mass Tag ID  </span></span>
+<span><span class="va">PeptideGroups</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span><span class="va">trelliData1</span>, <span class="st">"Peptide"</span><span class="op">)</span></span>
+<span></span>
 <span><span class="co"># Panel by Sample</span></span>
-<span><span class="va">SampleGroups</span> <span class="op">&lt;-</span> <span class="va">trelliData1</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="../reference/trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span><span class="st">"Sample"</span><span class="op">)</span></span>
-<span><span class="co"># Create an example boxplot</span></span>
-<span><span class="va">Abun_Box_Edata</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/trelli_abundance_boxplot.html">trelli_abundance_boxplot</a></span><span class="op">(</span><span class="va">MassGroups</span>, single_plot <span class="op">=</span> <span class="cn">TRUE</span>, test_example <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
-<span><span class="co"># Make an abundance boxplot without the points</span></span>
-<span><span class="va">Abun_Box_Sample</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/trelli_abundance_boxplot.html">trelli_abundance_boxplot</a></span><span class="op">(</span><span class="va">SampleGroups</span>,</span>
-<span>  include_points <span class="op">=</span> <span class="cn">F</span>, single_plot <span class="op">=</span> <span class="cn">T</span>,</span>
-<span>  ggplot_params <span class="op">=</span> <span class="st">"scale_fill_manual(values = 'forestgreen')"</span></span>
-<span><span class="op">)</span></span>
+<span><span class="va">SampleGroups</span> <span class="op">&lt;-</span> <span class="va">trelliData1</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="../reference/trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span><span class="st">"Sample"</span><span class="op">)</span> </span>
+<span></span>
+<span><span class="co"># Create an example boxplot </span></span>
+<span><span class="va">Abun_Box_Edata</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/trelli_abundance_boxplot.html">trelli_abundance_boxplot</a></span><span class="op">(</span><span class="va">PeptideGroups</span>, single_plot <span class="op">=</span> <span class="cn">TRUE</span>, test_example <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Make an abundance boxplot without the points </span></span>
+<span><span class="va">Abun_Box_Sample</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/trelli_abundance_boxplot.html">trelli_abundance_boxplot</a></span><span class="op">(</span><span class="va">SampleGroups</span>, include_points <span class="op">=</span> <span class="cn">F</span>, single_plot <span class="op">=</span> <span class="cn">T</span>,</span>
+<span>                                            ggplot_params <span class="op">=</span> <span class="st">"scale_fill_manual(values = 'forestgreen')"</span><span class="op">)</span></span>
+<span></span>
 <span><span class="co"># Use patchwork to put plots together</span></span>
 <span><span class="va">Abun_Box_Edata</span> <span class="op">+</span> <span class="va">Abun_Box_Sample</span></span></code></pre></div>
 <p><img src="Trelliscope_Vignette_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
 <p><strong>Abundance Histogram</strong></p>
 <p>The abundance histogram is only supported for data that has been
 paneled by edata_cname.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/trelli_abundance_histogram.html">trelli_abundance_histogram</a></span><span class="op">(</span><span class="va">MassGroups</span>, single_plot <span class="op">=</span> <span class="cn">TRUE</span>, test_example <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/trelli_abundance_histogram.html">trelli_abundance_histogram</a></span><span class="op">(</span><span class="va">PeptideGroups</span>, single_plot <span class="op">=</span> <span class="cn">TRUE</span>, test_example <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Trelliscope_Vignette_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
 <p><strong>Missingness Barplot</strong></p>
-<p>We can also build a missingness bar plots. In this data, there is no
-missingness, so we will use a different dataset to better demonstrate
-how these plots look. If we would rather see count information in the
-bar plot instead of proportions, we can easily set proportion to
-FALSE.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Pull from the peptide dataset</span></span>
-<span><span class="va">pep_trelliData</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as.trelliData.edata.html">as.trelliData.edata</a></span><span class="op">(</span></span>
-<span>  e_data <span class="op">=</span> <span class="fu">pmartRdata</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/pmartRdata/man/pep_edata.html" class="external-link">pep_edata</a></span>,</span>
-<span>  edata_cname <span class="op">=</span> <span class="st">"Peptide"</span>,</span>
-<span>  omics_type <span class="op">=</span> <span class="st">"pepData"</span></span>
-<span><span class="op">)</span></span>
-<span><span class="co"># Create an example bar plot</span></span>
-<span><span class="va">Miss_Bar_Edata</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/trelli_missingness_bar.html">trelli_missingness_bar</a></span><span class="op">(</span><span class="fu"><a href="../reference/trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span><span class="va">pep_trelliData</span>, <span class="st">"Peptide"</span><span class="op">)</span>,</span>
-<span>  single_plot <span class="op">=</span> <span class="cn">TRUE</span>, test_example <span class="op">=</span> <span class="fl">3</span>,</span>
-<span>  ggplot_params <span class="op">=</span> <span class="st">"ggtitle('Biomolecule')"</span></span>
-<span><span class="op">)</span></span>
-<span><span class="co"># Make a missingness barplot</span></span>
-<span><span class="va">Miss_Bar_Sample</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/trelli_missingness_bar.html">trelli_missingness_bar</a></span><span class="op">(</span><span class="fu"><a href="../reference/trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span><span class="va">pep_trelliData</span>, <span class="st">"Sample"</span><span class="op">)</span>,</span>
-<span>  include_points <span class="op">=</span> <span class="cn">F</span>,</span>
-<span>  proportion <span class="op">=</span> <span class="cn">FALSE</span>, single_plot <span class="op">=</span> <span class="cn">T</span>,</span>
-<span>  ggplot_params <span class="op">=</span> <span class="st">"ggtitle('Sample')"</span></span>
-<span><span class="op">)</span></span>
+<p>We can also build a missingness bar plots. If we would rather see
+count information in the bar plot instead of proportions, we can easily
+set proportion to FALSE.</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Create an example bar plot </span></span>
+<span><span class="va">Miss_Bar_Edata</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/trelli_missingness_bar.html">trelli_missingness_bar</a></span><span class="op">(</span><span class="va">PeptideGroups</span>,</span>
+<span>                                         single_plot <span class="op">=</span> <span class="cn">TRUE</span>, test_example <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>                                         ggplot_params <span class="op">=</span> <span class="st">"ggtitle('Biomolecule')"</span><span class="op">)</span></span>
+<span><span class="co"># Make a missingness barplot </span></span>
+<span><span class="va">Miss_Bar_Sample</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/trelli_missingness_bar.html">trelli_missingness_bar</a></span><span class="op">(</span><span class="va">SampleGroups</span>,</span>
+<span>                                          include_points <span class="op">=</span> <span class="cn">F</span>, </span>
+<span>                                          proportion <span class="op">=</span> <span class="cn">FALSE</span>, single_plot <span class="op">=</span> <span class="cn">T</span>,</span>
+<span>                                          ggplot_params <span class="op">=</span> <span class="st">"ggtitle('Sample')"</span><span class="op">)</span></span>
 <span><span class="co"># Put plots together with patchwork</span></span>
 <span><span class="va">Miss_Bar_Edata</span> <span class="op">+</span> <span class="va">Miss_Bar_Sample</span></span></code></pre></div>
 <p><img src="Trelliscope_Vignette_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
@@ -849,44 +357,40 @@ There are more options for omicsData and statRes listed below.</p>
 exception of isobaric and nmr data) can be passed to the
 <code>as.trelliData</code> function which requires either an omicsData
 or statRes object.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Pull the lipids data frame</span></span>
-<span><span class="va">lipids</span> <span class="op">&lt;-</span> <span class="fu">pmartRdata</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/pmartRdata/man/lipid_pos_object.html" class="external-link">lipid_pos_object</a></span></span>
-<span><span class="co"># Extract and add lipid family information</span></span>
-<span><span class="va">lipids</span><span class="op">$</span><span class="va">e_meta</span><span class="op">$</span><span class="va">Family</span> <span class="op">&lt;-</span> <span class="va">lipids</span><span class="op">$</span><span class="va">e_meta</span><span class="op">$</span><span class="va">Lipid</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/strsplit.html" class="external-link">strsplit</a></span><span class="op">(</span><span class="st">"("</span>, fixed <span class="op">=</span> <span class="cn">T</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">x</span>, <span class="fl">1</span><span class="op">)</span></span>
-<span>  <span class="op">}</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co"># Log transform the edata file</span></span>
-<span><span class="va">lipids</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/edata_transform.html">edata_transform</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">lipids</span>, data_scale <span class="op">=</span> <span class="st">"log2"</span><span class="op">)</span></span>
-<span><span class="co"># Set the group designation main effects</span></span>
-<span><span class="va">lipids</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/group_designation.html">group_designation</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">lipids</span>, main_effects <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Virus"</span><span class="op">)</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Pull the example peptide object</span></span>
+<span><span class="va">peptide</span> <span class="op">&lt;-</span> <span class="fu">pmartRdata</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/pmartRdata/man/pep_object.html" class="external-link">pep_object</a></span></span>
+<span></span>
+<span><span class="co"># Log transform the edata file </span></span>
+<span><span class="va">peptide</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/edata_transform.html">edata_transform</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">peptide</span>, data_scale <span class="op">=</span> <span class="st">"log2"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Set the group designation main effects </span></span>
+<span><span class="va">peptide</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/group_designation.html">group_designation</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">peptide</span>, main_effects <span class="op">=</span> <span class="st">"Phenotype"</span><span class="op">)</span></span>
+<span></span>
 <span><span class="co"># Filter the data to run the imd_anova</span></span>
-<span><span class="va">imdanova_Filt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/imdanova_filter.html">imdanova_filter</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">lipids</span><span class="op">)</span></span>
-<span><span class="va">lipids</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/applyFilt.html">applyFilt</a></span><span class="op">(</span>filter_object <span class="op">=</span> <span class="va">imdanova_Filt</span>, omicsData <span class="op">=</span> <span class="va">lipids</span>, min_nonmiss_anova <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
-<span><span class="co"># Normalize the data. You may use the Kruskal-Wallis test from normRes_tests to</span></span>
-<span><span class="co"># confirm that your normalization choice does not induce nor remove significance.</span></span>
-<span><span class="va">lipids</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/normalize_global.html">normalize_global</a></span><span class="op">(</span><span class="va">lipids</span>,</span>
-<span>  subset_fn <span class="op">=</span> <span class="st">"rip"</span>, norm_fn <span class="op">=</span> <span class="st">"median"</span>,</span>
-<span>  apply_norm <span class="op">=</span> <span class="cn">TRUE</span>, backtransform <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span><span class="op">)</span></span>
+<span><span class="va">imdanova_Filt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/imdanova_filter.html">imdanova_filter</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">peptide</span><span class="op">)</span></span>
+<span><span class="va">peptide</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/applyFilt.html">applyFilt</a></span><span class="op">(</span>filter_object <span class="op">=</span> <span class="va">imdanova_Filt</span>, omicsData <span class="op">=</span> <span class="va">peptide</span>, min_nonmiss_anova<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Normalize the data. You may use the Kruskal-Wallis test from normRes_tests to </span></span>
+<span><span class="co"># confirm that your normalization choice does not induce nor remove significance. </span></span>
+<span><span class="va">peptide</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/normalize_global.html">normalize_global</a></span><span class="op">(</span><span class="va">peptide</span>, subset_fn <span class="op">=</span> <span class="st">"rip"</span>, norm_fn <span class="op">=</span> <span class="st">"median"</span>, </span>
+<span>                             apply_norm <span class="op">=</span> <span class="cn">TRUE</span>, backtransform <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
 <span><span class="co"># Create trelliData object</span></span>
-<span><span class="va">trelliData2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as.trelliData.html">as.trelliData</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">lipids</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">trelliData2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as.trelliData.html">as.trelliData</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">peptide</span><span class="op">)</span></span></code></pre></div>
 <p>If we summarize the plot options with <code>summary</code>, we
 get:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">trelliData2</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##                Panel By Choice                Plot Number of Plots</span></span>
-<span><span class="co">## 1:                       Lipid   abundance boxplot             275</span></span>
-<span><span class="co">## 2:                       Lipid abundance histogram             275</span></span>
-<span><span class="co">## 3:                       Lipid     missingness bar             275</span></span>
-<span><span class="co">## 4:                    SampleID   abundance boxplot              45</span></span>
-<span><span class="co">## 5:                    SampleID     missingness bar              45</span></span>
-<span><span class="co">## 6: Row, Retention_Time, Family   abundance boxplot     275, 274, 9</span></span>
-<span><span class="co">## 7: Row, Retention_Time, Family   abundance heatmap     275, 274, 9</span></span>
-<span><span class="co">## 8: Row, Retention_Time, Family     missingness bar     275, 274, 9</span></span></code></pre>
+<pre><code><span><span class="co">##              Panel By Choice                Plot Number of Plots</span></span>
+<span><span class="co">## 1:                   Peptide   abundance boxplot           17200</span></span>
+<span><span class="co">## 2:                   Peptide abundance histogram           17200</span></span>
+<span><span class="co">## 3:                   Peptide     missingness bar           17200</span></span>
+<span><span class="co">## 4:                  SampleID   abundance boxplot              24</span></span>
+<span><span class="co">## 5:                  SampleID     missingness bar              24</span></span>
+<span><span class="co">## 6: ProteinList, RazorProtein   abundance boxplot      3230, 2650</span></span>
+<span><span class="co">## 7: ProteinList, RazorProtein   abundance heatmap      3230, 2650</span></span>
+<span><span class="co">## 8: ProteinList, RazorProtein     missingness bar      3230, 2650</span></span></code></pre>
 <p>Since we included an e_meta object that has categorical data for
 e_data, there are a lot more plotting options available then what was
 provided for the e_data file. Additionally, we have provided grouping
@@ -896,19 +400,19 @@ covered the trelliscope building functions, we will focus these next few
 sections on how each e_meta and group_designation affect each plot.</p>
 <p><strong>Abundance Boxplot</strong></p>
 <p>The group_designation variables are utilized in the abundance boxplot
-when paneling by edata_cname (“Lipid”)…</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">trelliData2</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="../reference/trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span><span class="st">"Lipid"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="../reference/trelli_abundance_boxplot.html">trelli_abundance_boxplot</a></span><span class="op">(</span>test_example <span class="op">=</span> <span class="fl">3</span>, single_plot <span class="op">=</span> <span class="cn">T</span>, ggplot_params <span class="op">=</span> <span class="st">"xlab('Viral Strain')"</span><span class="op">)</span></span></code></pre></div>
+when paneling by edata_cname (“Peptide”)…</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">trelliData2</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="../reference/trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span><span class="st">"Peptide"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="../reference/trelli_abundance_boxplot.html">trelli_abundance_boxplot</a></span><span class="op">(</span>test_example <span class="op">=</span> <span class="fl">3</span>, single_plot <span class="op">=</span> <span class="cn">T</span>, ggplot_params <span class="op">=</span> <span class="st">"xlab('Phenotype')"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Trelliscope_Vignette_files/figure-html/unnamed-chunk-14-1.png" width="700"></p>
-<p>…or e_meta variable. In this case, our options include Row,
-Retention_Time, and Family. Note that group_designation is used if
+<p>…or by an e_meta variable. In this case, our options include
+RazorProtein and ProteinList. Note that group_designation is used if
 included:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">trelliData2</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="../reference/trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span><span class="st">"Family"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="../reference/trelli_abundance_boxplot.html">trelli_abundance_boxplot</a></span><span class="op">(</span>test_example <span class="op">=</span> <span class="fl">6</span>, single_plot <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">trelliData2</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="../reference/trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span><span class="st">"RazorProtein"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="../reference/trelli_abundance_boxplot.html">trelli_abundance_boxplot</a></span><span class="op">(</span>test_example <span class="op">=</span> <span class="fl">3</span>, single_plot <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Trelliscope_Vignette_files/figure-html/unnamed-chunk-15-1.png" width="700"></p>
 <p>If we panel by the sample, the plot remains the same as in example
 case 1.</p>
@@ -918,19 +422,19 @@ plotting function, it remains the same as in Example Case 1.</p>
 <p><strong>Missingness Bar</strong></p>
 <p>Once again, group_designation data is used if included, even if the
 panel_by variable is an e_meta variable.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">trelliData2</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="../reference/trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span><span class="st">"Family"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">trelliData2</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="../reference/trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span><span class="st">"Peptide"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="../reference/trelli_missingness_bar.html">trelli_missingness_bar</a></span><span class="op">(</span>test_example <span class="op">=</span> <span class="fl">3</span>, single_plot <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Trelliscope_Vignette_files/figure-html/unnamed-chunk-16-1.png" width="700"></p>
 <p><strong>Abundance Heatmap</strong></p>
 <p>An advantage to including e_meta variables is the ability to use
-heatmaps, where each panel is an “e_meta” variable, one axis is the
+heatmaps, where each panel is an e_meta variable, one axis is the
 biomolecules within that biomolecule class, and the other axis is the
 samples in order by the “group_by” designation.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">trelliData2</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="../reference/trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span><span class="st">"Family"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">trelliData2</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="../reference/trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span><span class="st">"RazorProtein"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="../reference/trelli_abundance_heatmap.html">trelli_abundance_heatmap</a></span><span class="op">(</span>test_example <span class="op">=</span> <span class="fl">2</span>, single_plot <span class="op">=</span> <span class="cn">T</span>, ggplot_params <span class="op">=</span> <span class="st">"coord_flip()"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Trelliscope_Vignette_files/figure-html/unnamed-chunk-17-1.png" width="700"></p>
 </div>
@@ -941,28 +445,28 @@ samples in order by the “group_by” designation.</p>
 fold_change values. To get a statRes object, pass your transformed,
 filtered, and normalized data to the <code><a href="../reference/imd_anova.html">?imd_anova</a></code>
 function.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Since nothing is missing from this dataset, there is no need to run the G-test.</span></span>
-<span><span class="va">lipidStats</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/imd_anova.html">imd_anova</a></span><span class="op">(</span><span class="va">lipids</span>, test_method <span class="op">=</span> <span class="st">"anova"</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Run an imd-anova</span></span>
+<span><span class="va">pepStats</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/imd_anova.html">imd_anova</a></span><span class="op">(</span><span class="va">peptide</span>, test_method <span class="op">=</span> <span class="st">"anova"</span><span class="op">)</span></span>
+<span></span>
 <span><span class="co"># Pass that dataframe to the trelliData object builder</span></span>
-<span><span class="va">trelliData3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as.trelliData.html">as.trelliData</a></span><span class="op">(</span>statRes <span class="op">=</span> <span class="va">lipidStats</span><span class="op">)</span></span>
+<span><span class="va">trelliData3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as.trelliData.html">as.trelliData</a></span><span class="op">(</span>statRes <span class="op">=</span> <span class="va">pepStats</span><span class="op">)</span></span>
+<span></span>
 <span><span class="co"># Run the summary function</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">trelliData3</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##    Panel By Choice            Plot Number of Plots</span></span>
-<span><span class="co">## 1:           Lipid missingness bar             275</span></span>
-<span><span class="co">## 2:           Lipid fold change bar             275</span></span></code></pre>
+<span><span class="co">## 1:         Peptide missingness bar           17200</span></span>
+<span><span class="co">## 2:         Peptide fold change bar           17200</span></span></code></pre>
 <p>There are only two trelliscope plotting options for statRes objects
 by themselves. The missingness plot, which we have seen above, and a
-fold change bar plot. Fold change plots have two additional parameters:
-p_value_test, which allows users to choose TRUE/FALSE for determining
-which significance tests should be highlighted at a specific p value
-threshold (p_value_thresh).</p>
+fold change bar plot. Fold change plots have an additional parameters:
+p_value_thresh, which allows users to set a significance threshold.</p>
 <p><strong>Foldchange Bar</strong></p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">trelliData3</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="../reference/trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span><span class="st">"Lipid"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span><span class="st">"Peptide"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/trelli_foldchange_bar.html">trelli_foldchange_bar</a></span><span class="op">(</span>p_value_thresh <span class="op">=</span> <span class="fl">0.05</span>, </span>
-<span>                        test_example <span class="op">=</span> <span class="fl">3</span>, single_plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<span>                        test_example <span class="op">=</span> <span class="fl">10</span>, single_plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Trelliscope_Vignette_files/figure-html/unnamed-chunk-19-1.png" width="700"></p>
 <p>To see more fold change plot options, include an e_meta dataframe in
 the trelliData object.</p>
@@ -973,44 +477,43 @@ the trelliData object.</p>
 <p>Including both omicsData and statRes objects allows users the ability
 to run all available plotting functions. Below, we will focus on the
 last fold change plots that we have yet to see.</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Build a trelliData object with both omicsData and statRes</span></span>
-<span><span class="va">trelliData4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as.trelliData.html">as.trelliData</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">lipids</span>, statRes <span class="op">=</span> <span class="va">lipidStats</span><span class="op">)</span></span>
+<span><span class="va">trelliData4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as.trelliData.html">as.trelliData</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">peptide</span>, statRes <span class="op">=</span> <span class="va">pepStats</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">trelliData4</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##                 Panel By Choice                Plot Number of Plots</span></span>
-<span><span class="co">##  1:                       Lipid   abundance boxplot             275</span></span>
-<span><span class="co">##  2:                       Lipid abundance histogram             275</span></span>
-<span><span class="co">##  3:                       Lipid     missingness bar             275</span></span>
-<span><span class="co">##  4:                       Lipid     fold change bar             275</span></span>
-<span><span class="co">##  5:                    SampleID   abundance boxplot              45</span></span>
-<span><span class="co">##  6:                    SampleID     missingness bar              45</span></span>
-<span><span class="co">##  7: Row, Retention_Time, Family   abundance boxplot     275, 274, 9</span></span>
-<span><span class="co">##  8: Row, Retention_Time, Family   abundance heatmap     275, 274, 9</span></span>
-<span><span class="co">##  9: Row, Retention_Time, Family     missingness bar     275, 274, 9</span></span>
-<span><span class="co">## 10: Row, Retention_Time, Family fold change boxplot     275, 274, 9</span></span>
-<span><span class="co">## 11: Row, Retention_Time, Family fold change heatmap     275, 274, 9</span></span>
-<span><span class="co">## 12: Row, Retention_Time, Family fold change volcano     275, 274, 9</span></span></code></pre>
+<pre><code><span><span class="co">##               Panel By Choice                Plot Number of Plots</span></span>
+<span><span class="co">##  1:                   Peptide   abundance boxplot           17200</span></span>
+<span><span class="co">##  2:                   Peptide abundance histogram           17200</span></span>
+<span><span class="co">##  3:                   Peptide     missingness bar           17200</span></span>
+<span><span class="co">##  4:                   Peptide     fold change bar           17200</span></span>
+<span><span class="co">##  5:                  SampleID   abundance boxplot              24</span></span>
+<span><span class="co">##  6:                  SampleID     missingness bar              24</span></span>
+<span><span class="co">##  7: ProteinList, RazorProtein   abundance boxplot      3230, 2650</span></span>
+<span><span class="co">##  8: ProteinList, RazorProtein   abundance heatmap      3230, 2650</span></span>
+<span><span class="co">##  9: ProteinList, RazorProtein     missingness bar      3230, 2650</span></span>
+<span><span class="co">## 10: ProteinList, RazorProtein fold change boxplot      3230, 2650</span></span>
+<span><span class="co">## 11: ProteinList, RazorProtein fold change heatmap      3230, 2650</span></span>
+<span><span class="co">## 12: ProteinList, RazorProtein fold change volcano      3230, 2650</span></span></code></pre>
 <p><strong>Fold Change Boxplot</strong></p>
 <p>To create a fold change boxplot, the input data must be paneled by an
-e_meta variable. If p_value_test is enabled, any points with a
-significant value are shaped as squares.</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+e_meta variable.</p>
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">trelliData4</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="../reference/trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span><span class="st">"Family"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span><span class="st">"RazorProtein"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/trelli_foldchange_boxplot.html">trelli_foldchange_boxplot</a></span><span class="op">(</span></span>
 <span>    single_plot <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>    p_value_test <span class="op">=</span> <span class="st">"anova"</span>,</span>
-<span>    test_example <span class="op">=</span> <span class="fl">3</span></span>
+<span>    test_example <span class="op">=</span> <span class="fl">2</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
 <p><img src="Trelliscope_Vignette_files/figure-html/unnamed-chunk-21-1.png" width="700"></p>
 <p><strong>Fold Change Heatmap</strong></p>
 <p>These heatmaps shows fold change values per biomolecule (y-axis) and
 statistical comparison (x-axis).</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">trelliData4</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="../reference/trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span><span class="st">"Family"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span><span class="st">"RazorProtein"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/trelli_foldchange_heatmap.html">trelli_foldchange_heatmap</a></span><span class="op">(</span></span>
-<span>    single_plot <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>    single_plot <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>    test_example <span class="op">=</span> <span class="fl">2</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
 <p><img src="Trelliscope_Vignette_files/figure-html/unnamed-chunk-22-1.png" width="700"></p>
 <p><strong>Fold Change Volcano</strong></p>
@@ -1018,13 +521,12 @@ statistical comparison (x-axis).</p>
 values. Significant values with a low fold change are colored blue, and
 high ones are colored red. These plots require that a specific
 comparison is selected.</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">trelliData4</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="../reference/trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span><span class="st">"Family"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span><span class="st">"RazorProtein"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/trelli_foldchange_volcano.html">trelli_foldchange_volcano</a></span><span class="op">(</span></span>
-<span>    comparison <span class="op">=</span> <span class="st">"StrainA_vs_StrainB"</span>,</span>
-<span>    test_example <span class="op">=</span> <span class="fl">3</span>,</span>
-<span>    p_value_test <span class="op">=</span> <span class="st">"anova"</span>,</span>
+<span>    comparison <span class="op">=</span> <span class="st">"Phenotype3_vs_Phenotype2"</span>,</span>
+<span>    test_example <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>    single_plot <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
 <p><img src="Trelliscope_Vignette_files/figure-html/unnamed-chunk-23-1.png" width="700"></p>
@@ -1037,99 +539,44 @@ comparison is selected.</p>
 </h4>
 <p>To make tweaks to the ggplot objects, pass the commands as strings in
 a list. For example:</p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">trelliData2</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="../reference/trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span><span class="st">"Lipid"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="../reference/trelli_abundance_boxplot.html">trelli_abundance_boxplot</a></span><span class="op">(</span></span>
-<span>    test_example <span class="op">=</span> <span class="fl">3</span>, single_plot <span class="op">=</span> <span class="cn">T</span>,</span>
-<span>    ggplot_params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>      <span class="st">"ggtitle('CYC Human')"</span>,</span>
-<span>      <span class="st">"ylab('Log Adjusted Abundance')"</span>,</span>
-<span>      <span class="st">"xlab('')"</span>, <span class="st">"theme_classic()"</span>,</span>
-<span>      <span class="st">"theme(plot.title = ggplot2::element_text(hjust = 0.5))"</span>,</span>
-<span>      <span class="st">"theme(legend.position = 'none')"</span></span>
-<span>    <span class="op">)</span></span>
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">trelliData2</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="../reference/trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span><span class="st">"Peptide"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="../reference/trelli_abundance_boxplot.html">trelli_abundance_boxplot</a></span><span class="op">(</span>test_example <span class="op">=</span> <span class="fl">3</span>, single_plot <span class="op">=</span> <span class="cn">T</span>,</span>
+<span>    ggplot_params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ggtitle('CYC Human')"</span>, </span>
+<span>                      <span class="st">"ylab('Log Adjusted Abundance')"</span>,</span>
+<span>                      <span class="st">"xlab('')"</span>, <span class="st">"theme_classic()"</span>, </span>
+<span>                      <span class="st">"theme(plot.title = ggplot2::element_text(hjust = 0.5))"</span>,</span>
+<span>                      <span class="st">"theme(legend.position = 'none')"</span><span class="op">)</span>                       </span>
 <span>  <span class="op">)</span></span></code></pre></div>
 <p><img src="Trelliscope_Vignette_files/figure-html/unnamed-chunk-24-1.png" width="700"></p>
 <p>Below is the a list of common functions and what they do.</p>
-<table class="table">
-<colgroup>
-<col width="69%">
-<col width="30%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">Function</th>
-<th align="left">Purpose</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">xlab(‘Name’)</td>
-<td align="left">Rename x-axis label</td>
-</tr>
-<tr class="even">
-<td align="left">ylab(‘Name’)</td>
-<td align="left">Rename y-axis label</td>
-</tr>
-<tr class="odd">
-<td align="left">ggtitle(‘Name’)</td>
-<td align="left">Rename plot</td>
-</tr>
-<tr class="even">
-<td align="left">xlim(c(0,1))</td>
-<td align="left">Set the x-axis limits</td>
-</tr>
-<tr class="odd">
-<td align="left">ylim(c(0,1))</td>
-<td align="left">Set the y-axis limits</td>
-</tr>
-<tr class="even">
-<td align="left">coord_flip()</td>
-<td align="left">Flip x- and y-axis</td>
-</tr>
-<tr class="odd">
-<td align="left">theme(axis.title.x =
-ggplot2::element_text(size=16))</td>
-<td align="left">Resize x-axis title</td>
-</tr>
-<tr class="even">
-<td align="left">theme(axis.title.y =
-ggplot2::element_text(size=16))</td>
-<td align="left">Resize y-axis title</td>
-</tr>
-<tr class="odd">
-<td align="left">theme(axis.text.x = element_text(size=12))</td>
-<td align="left">Resize x-axis ticks</td>
-</tr>
-<tr class="even">
-<td align="left">theme(axis.text.y = element_text(size=12))</td>
-<td align="left">Resize y-axis ticks</td>
-</tr>
-<tr class="odd">
-<td align="left">theme(axis.text.x = element_text(angle=90))</td>
-<td align="left">Rotate x-axis ticks</td>
-</tr>
-<tr class="even">
-<td align="left">theme(axis.text.y = element_text(angle=90))</td>
-<td align="left">Rotate y-axis ticks</td>
-</tr>
-<tr class="odd">
-<td align="left">theme(plot.title = element_text(size=30))</td>
-<td align="left">Change plot title size</td>
-</tr>
-</tbody>
-</table>
+<pre><code><span><span class="co">##                                                Function                Purpose</span></span>
+<span><span class="co">## 1                                          xlab('Name')    Rename x-axis label</span></span>
+<span><span class="co">## 2                                          ylab('Name')    Rename y-axis label</span></span>
+<span><span class="co">## 3                                       ggtitle('Name')            Rename plot</span></span>
+<span><span class="co">## 4                                          xlim(c(0,1))  Set the x-axis limits</span></span>
+<span><span class="co">## 5                                          ylim(c(0,1))  Set the y-axis limits</span></span>
+<span><span class="co">## 6                                          coord_flip()     Flip x- and y-axis</span></span>
+<span><span class="co">## 7  theme(axis.title.x = ggplot2::element_text(size=16))    Resize x-axis title</span></span>
+<span><span class="co">## 8  theme(axis.title.y = ggplot2::element_text(size=16))    Resize y-axis title</span></span>
+<span><span class="co">## 9            theme(axis.text.x = element_text(size=12))    Resize x-axis ticks</span></span>
+<span><span class="co">## 10           theme(axis.text.y = element_text(size=12))    Resize y-axis ticks</span></span>
+<span><span class="co">## 11          theme(axis.text.x = element_text(angle=90))    Rotate x-axis ticks</span></span>
+<span><span class="co">## 12          theme(axis.text.y = element_text(angle=90))    Rotate y-axis ticks</span></span>
+<span><span class="co">## 13            theme(plot.title = element_text(size=30)) Change plot title size</span></span></code></pre>
 <p>For a list of other ggplot functions, <a href="https://ggplot2.tidyverse.org/reference/" class="external-link">click here</a></p>
 </div>
 <div class="section level4">
 <h4 id="make-the-plot-interactive">Make the plot interactive<a class="anchor" aria-label="anchor" href="#make-the-plot-interactive"></a>
 </h4>
 <p>Every plot has an interactive option by making interactive=TRUE.</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">trelliData2</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="../reference/trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span><span class="st">"Lipid"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">trelliData2</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="../reference/trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span><span class="st">"Peptide"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="../reference/trelli_abundance_boxplot.html">trelli_abundance_boxplot</a></span><span class="op">(</span>test_example <span class="op">=</span> <span class="fl">3</span>, single_plot <span class="op">=</span> <span class="cn">T</span>, interactive <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span></code></pre></div>
-<div class="plotly html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-de3dc959d381e932995a" style="width:700px;height:432.632880098888px;"></div>
-<script type="application/json" data-for="htmlwidget-de3dc959d381e932995a">{"x":{"data":[{"x":[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],"y":[20.777236647000109,20.178781612070022,20.145684447087973,20.238339289696874,19.160881169839481,20.567764024255514,20.279989380375582,20.522728824549429,20.407303946956187,20.351972582009502,19.560174318050041,20.139823882963992,20.141842888295173,20.413940913422117,20.270008419639325],"hoverinfo":"y","type":"box","fillcolor":"rgba(248,118,109,1)","marker":{"opacity":null,"outliercolor":"rgba(0,0,0,1)","line":{"width":1.8897637795275593,"color":"rgba(0,0,0,1)"},"size":5.6692913385826778},"line":{"color":"rgba(51,51,51,1)","width":1.8897637795275593},"name":"StrainA","legendgroup":"StrainA","showlegend":true,"xaxis":"x","yaxis":"y","frame":null},{"x":[2,2,2,2,2,2,2,2,2,2,2,2,2,2,2],"y":[21.300657125217828,20.469165565555848,21.326767213884274,21.343898105118384,20.729756481402219,19.903082863836204,20.436846399731092,21.271807154552082,21.325353296379468,20.235428230642611,21.104375607101076,20.574358765033434,20.778842917297382,20.902735349841475,21.298523747171259],"hoverinfo":"y","type":"box","fillcolor":"rgba(0,186,56,1)","marker":{"opacity":null,"outliercolor":"rgba(0,0,0,1)","line":{"width":1.8897637795275593,"color":"rgba(0,0,0,1)"},"size":5.6692913385826778},"line":{"color":"rgba(51,51,51,1)","width":1.8897637795275593},"name":"StrainB","legendgroup":"StrainB","showlegend":true,"xaxis":"x","yaxis":"y","frame":null},{"x":[3,3,3,3,3,3,3,3,3,3,3,3,3,3,3],"y":[18.864344060429165,20.246669936165684,19.78419664668537,20.291460379187988,20.263164792883352,20.685353926349261,19.957046324649909,20.053558788595939,20.709920317524556,21.2853143783144,20.741014082936626,20.203429340125329,20.344136228244199,20.512670842396812,20.632673920461123],"hoverinfo":"y","type":"box","fillcolor":"rgba(97,156,255,1)","marker":{"opacity":null,"outliercolor":"rgba(0,0,0,1)","line":{"width":1.8897637795275593,"color":"rgba(0,0,0,1)"},"size":5.6692913385826778},"line":{"color":"rgba(51,51,51,1)","width":1.8897637795275593},"name":"StrainC","legendgroup":"StrainC","showlegend":true,"xaxis":"x","yaxis":"y","frame":null},{"x":[0.76054275233764201,1.1006604875437915,1.2015650272369385,1.0399143862305209,0.78715328709222376,0.97934093803633004,1.2353614919120446,0.88728068128693849,0.9562580882338807,0.83639821503311396,1.1526735057123005,1.0152024583658203,1.1060104044154286,0.87032827676739544,1.0653236059006304],"y":[20.777236647000109,20.178781612070022,20.145684447087973,20.238339289696874,19.160881169839481,20.567764024255514,20.279989380375582,20.522728824549429,20.407303946956187,20.351972582009502,19.560174318050041,20.139823882963992,20.141842888295173,20.413940913422117,20.270008419639325],"text":["Group: StrainA<br />Abundance: 20.77724<br />Group: StrainA","Group: StrainA<br />Abundance: 20.17878<br />Group: StrainA","Group: StrainA<br />Abundance: 20.14568<br />Group: StrainA","Group: StrainA<br />Abundance: 20.23834<br />Group: StrainA","Group: StrainA<br />Abundance: 19.16088<br />Group: StrainA","Group: StrainA<br />Abundance: 20.56776<br />Group: StrainA","Group: StrainA<br />Abundance: 20.27999<br />Group: StrainA","Group: StrainA<br />Abundance: 20.52273<br />Group: StrainA","Group: StrainA<br />Abundance: 20.40730<br />Group: StrainA","Group: StrainA<br />Abundance: 20.35197<br />Group: StrainA","Group: StrainA<br />Abundance: 19.56017<br />Group: StrainA","Group: StrainA<br />Abundance: 20.13982<br />Group: StrainA","Group: StrainA<br />Abundance: 20.14184<br />Group: StrainA","Group: StrainA<br />Abundance: 20.41394<br />Group: StrainA","Group: StrainA<br />Abundance: 20.27001<br />Group: StrainA"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(248,118,109,1)","opacity":1,"size":5.6692913385826778,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(0,0,0,1)"}},"hoveron":"points","name":"StrainA","legendgroup":"StrainA","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1.8975370262051001,1.7584133483469486,1.7910662392387167,2.1433930142084137,2.1897718352265656,1.8271481231786311,2.0023902824614197,2.1497859682422131,2.0273467221995816,1.8630037562688813,1.9337411661399528,2.1514350493671373,1.8587680363561958,1.9858170383377001,2.0129677486838773],"y":[21.300657125217828,20.469165565555848,21.326767213884274,21.343898105118384,20.729756481402219,19.903082863836204,20.436846399731092,21.271807154552082,21.325353296379468,20.235428230642611,21.104375607101076,20.574358765033434,20.778842917297382,20.902735349841475,21.298523747171259],"text":["Group: StrainB<br />Abundance: 21.30066<br />Group: StrainB","Group: StrainB<br />Abundance: 20.46917<br />Group: StrainB","Group: StrainB<br />Abundance: 21.32677<br />Group: StrainB","Group: StrainB<br />Abundance: 21.34390<br />Group: StrainB","Group: StrainB<br />Abundance: 20.72976<br />Group: StrainB","Group: StrainB<br />Abundance: 19.90308<br />Group: StrainB","Group: StrainB<br />Abundance: 20.43685<br />Group: StrainB","Group: StrainB<br />Abundance: 21.27181<br />Group: StrainB","Group: StrainB<br />Abundance: 21.32535<br />Group: StrainB","Group: StrainB<br />Abundance: 20.23543<br />Group: StrainB","Group: StrainB<br />Abundance: 21.10438<br />Group: StrainB","Group: StrainB<br />Abundance: 20.57436<br />Group: StrainB","Group: StrainB<br />Abundance: 20.77884<br />Group: StrainB","Group: StrainB<br />Abundance: 20.90274<br />Group: StrainB","Group: StrainB<br />Abundance: 21.29852<br />Group: StrainB"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,186,56,1)","opacity":1,"size":5.6692913385826778,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(0,0,0,1)"}},"hoveron":"points","name":"StrainB","legendgroup":"StrainB","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[2.9005702144932002,3.1719780864659697,2.9152536760084331,3.1783550060354173,2.7972365501336753,3.1741705412277952,3.041704892530106,2.8094716296764091,3.0662206086562946,2.8379055230179802,2.8993217934621498,2.7924275372643024,2.941342112608254,3.2209126751404256,2.9991167995613068],"y":[18.864344060429165,20.246669936165684,19.78419664668537,20.291460379187988,20.263164792883352,20.685353926349261,19.957046324649909,20.053558788595939,20.709920317524556,21.2853143783144,20.741014082936626,20.203429340125329,20.344136228244199,20.512670842396812,20.632673920461123],"text":["Group: StrainC<br />Abundance: 18.86434<br />Group: StrainC","Group: StrainC<br />Abundance: 20.24667<br />Group: StrainC","Group: StrainC<br />Abundance: 19.78420<br />Group: StrainC","Group: StrainC<br />Abundance: 20.29146<br />Group: StrainC","Group: StrainC<br />Abundance: 20.26316<br />Group: StrainC","Group: StrainC<br />Abundance: 20.68535<br />Group: StrainC","Group: StrainC<br />Abundance: 19.95705<br />Group: StrainC","Group: StrainC<br />Abundance: 20.05356<br />Group: StrainC","Group: StrainC<br />Abundance: 20.70992<br />Group: StrainC","Group: StrainC<br />Abundance: 21.28531<br />Group: StrainC","Group: StrainC<br />Abundance: 20.74101<br />Group: StrainC","Group: StrainC<br />Abundance: 20.20343<br />Group: StrainC","Group: StrainC<br />Abundance: 20.34414<br />Group: StrainC","Group: StrainC<br />Abundance: 20.51267<br />Group: StrainC","Group: StrainC<br />Abundance: 20.63267<br />Group: StrainC"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(97,156,255,1)","opacity":1,"size":5.6692913385826778,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(0,0,0,1)"}},"hoveron":"points","name":"StrainC","legendgroup":"StrainC","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":45.358882994166862,"r":7.3059360730593621,"b":41.778974318367787,"l":48.949771689497723},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"title":{"text":"CE(18:1)","font":{"color":"rgba(0,0,0,1)","family":"","size":17.534246575342465},"x":0.5,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.40000000000000002,3.6000000000000001],"tickmode":"array","ticktext":["StrainA","StrainB","StrainC"],"tickvals":[1,2,3],"categoryorder":"array","categoryarray":["StrainA","StrainB","StrainC"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"y","title":{"text":"Group","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[18.740366358194702,21.467875807352847],"tickmode":"array","ticktext":["19.0","19.5","20.0","20.5","21.0"],"tickvals":[19,19.5,20,20.5,21],"categoryorder":"array","categoryarray":["19.0","19.5","20.0","20.5","21.0"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x","title":{"text":"log2 Abundance","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":"transparent","line":{"color":"rgba(51,51,51,1)","width":0.66417600664176002,"linetype":"solid"},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":false,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.8897637795275593,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"274e555b819f":{"x":{},"y":{},"fill":{},"type":"box"},"274e720fdf49":{"x":{},"y":{},"fill":{}}},"cur_data":"274e555b819f","visdat":{"274e555b819f":["function (y) ","x"],"274e720fdf49":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<div class="plotly html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-131aa9ef7b3c407354bd" style="width:700px;height:432.632880098888px;"></div>
+<script type="application/json" data-for="htmlwidget-131aa9ef7b3c407354bd">{"x":{"data":[{"x":[1,1,1,1,1,1,1,1],"y":[null,24.870012593591181,24.827663517242094,25.207455155549624,null,24.46058936058478,24.825179351228989,25.403273437763847],"hoverinfo":"y","type":"box","fillcolor":"rgba(248,118,109,1)","marker":{"opacity":null,"outliercolor":"rgba(0,0,0,1)","line":{"width":1.8897637795275593,"color":"rgba(0,0,0,1)"},"size":5.6692913385826778},"line":{"color":"rgba(51,51,51,1)","width":1.8897637795275593},"name":"Phenotype1","legendgroup":"Phenotype1","showlegend":true,"xaxis":"x","yaxis":"y","frame":null},{"x":[2,2,2,2,2,2,2,2],"y":[24.943633390278148,24.665423153079093,null,25.215116070685205,24.645256091051266,25.044196855856807,25.166764908811153,null],"hoverinfo":"y","type":"box","fillcolor":"rgba(0,186,56,1)","marker":{"opacity":null,"outliercolor":"rgba(0,0,0,1)","line":{"width":1.8897637795275593,"color":"rgba(0,0,0,1)"},"size":5.6692913385826778},"line":{"color":"rgba(51,51,51,1)","width":1.8897637795275593},"name":"Phenotype2","legendgroup":"Phenotype2","showlegend":true,"xaxis":"x","yaxis":"y","frame":null},{"x":[3,3,3,3,3,3,3,3],"y":[null,24.431707257348823,24.658510292913185,null,null,24.99314282715947,25.086956859464738,null],"hoverinfo":"y","type":"box","fillcolor":"rgba(97,156,255,1)","marker":{"opacity":null,"outliercolor":"rgba(0,0,0,1)","line":{"width":1.8897637795275593,"color":"rgba(0,0,0,1)"},"size":5.6692913385826778},"line":{"color":"rgba(51,51,51,1)","width":1.8897637795275593},"name":"Phenotype3","legendgroup":"Phenotype3","showlegend":true,"xaxis":"x","yaxis":"y","frame":null},{"x":[1.0249572668690234,1.0847757017472759,0.96398313727695495,1.2137718350859359,0.85850729409139603,1.1590187697438523,0.83847896149381995,0.76335743884555995],"y":[null,24.870012593591181,24.827663517242094,25.207455155549624,null,24.46058936058478,24.825179351228989,25.403273437763847],"text":["Group: Phenotype1<br />Abundance:       NA<br />Group: Phenotype1","Group: Phenotype1<br />Abundance: 24.87001<br />Group: Phenotype1","Group: Phenotype1<br />Abundance: 24.82766<br />Group: Phenotype1","Group: Phenotype1<br />Abundance: 25.20746<br />Group: Phenotype1","Group: Phenotype1<br />Abundance:       NA<br />Group: Phenotype1","Group: Phenotype1<br />Abundance: 24.46059<br />Group: Phenotype1","Group: Phenotype1<br />Abundance: 24.82518<br />Group: Phenotype1","Group: Phenotype1<br />Abundance: 25.40327<br />Group: Phenotype1"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(248,118,109,1)","opacity":1,"size":5.6692913385826778,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(0,0,0,1)"}},"hoveron":"points","name":"Phenotype1","legendgroup":"Phenotype1","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1.783765978179872,1.8004801461938769,2.0450035458197817,2.2486672728555277,2.0156626764219254,2.2026966119883582,2.1690412041498348,2.0121995531953871],"y":[24.943633390278148,24.665423153079093,null,25.215116070685205,24.645256091051266,25.044196855856807,25.166764908811153,null],"text":["Group: Phenotype2<br />Abundance: 24.94363<br />Group: Phenotype2","Group: Phenotype2<br />Abundance: 24.66542<br />Group: Phenotype2","Group: Phenotype2<br />Abundance:       NA<br />Group: Phenotype2","Group: Phenotype2<br />Abundance: 25.21512<br />Group: Phenotype2","Group: Phenotype2<br />Abundance: 24.64526<br />Group: Phenotype2","Group: Phenotype2<br />Abundance: 25.04420<br />Group: Phenotype2","Group: Phenotype2<br />Abundance: 25.16676<br />Group: Phenotype2","Group: Phenotype2<br />Abundance:       NA<br />Group: Phenotype2"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,186,56,1)","opacity":1,"size":5.6692913385826778,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(0,0,0,1)"}},"hoveron":"points","name":"Phenotype2","legendgroup":"Phenotype2","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[3.0770362947368994,2.7584936985513195,3.0037961109774187,3.0549570745788515,2.9445998282171786,2.9491444464074448,3.1345896441489458,2.8808261197991669],"y":[null,24.431707257348823,24.658510292913185,null,null,24.99314282715947,25.086956859464738,null],"text":["Group: Phenotype3<br />Abundance:       NA<br />Group: Phenotype3","Group: Phenotype3<br />Abundance: 24.43171<br />Group: Phenotype3","Group: Phenotype3<br />Abundance: 24.65851<br />Group: Phenotype3","Group: Phenotype3<br />Abundance:       NA<br />Group: Phenotype3","Group: Phenotype3<br />Abundance:       NA<br />Group: Phenotype3","Group: Phenotype3<br />Abundance: 24.99314<br />Group: Phenotype3","Group: Phenotype3<br />Abundance: 25.08696<br />Group: Phenotype3","Group: Phenotype3<br />Abundance:       NA<br />Group: Phenotype3"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(97,156,255,1)","opacity":1,"size":5.6692913385826778,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(0,0,0,1)"}},"hoveron":"points","name":"Phenotype3","legendgroup":"Phenotype3","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":45.358882994166862,"r":7.3059360730593621,"b":41.778974318367787,"l":48.949771689497723},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"title":{"text":"AAAAAEQQQFYLLLGNLLSPDNVVR","font":{"color":"rgba(0,0,0,1)","family":"","size":17.534246575342465},"x":0.5,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.40000000000000002,3.6000000000000001],"tickmode":"array","ticktext":["Phenotype1","Phenotype2","Phenotype3"],"tickvals":[1,2,3],"categoryorder":"array","categoryarray":["Phenotype1","Phenotype2","Phenotype3"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"y","title":{"text":"Group","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[24.383128948328071,25.451851746784598],"tickmode":"array","ticktext":["24.4","24.6","24.8","25.0","25.2","25.4"],"tickvals":[24.400000000000002,24.600000000000001,24.800000000000001,25.000000000000004,25.200000000000003,25.400000000000002],"categoryorder":"array","categoryarray":["24.4","24.6","24.8","25.0","25.2","25.4"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x","title":{"text":"log2 Abundance","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":"transparent","line":{"color":"rgba(51,51,51,1)","width":0.66417600664176002,"linetype":"solid"},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":false,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.8897637795275593,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"27c51847ea6a":{"x":{},"y":{},"fill":{},"type":"box"},"27c519dca363":{"x":{},"y":{},"fill":{}}},"cur_data":"27c51847ea6a","visdat":{"27c51847ea6a":["function (y) ","x"],"27c519dca363":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
 </div>
 <div class="section level4">
 <h4 id="change-cognostics">Change cognostics<a class="anchor" aria-label="anchor" href="#change-cognostics"></a>
@@ -1138,51 +585,25 @@ ggplot2::element_text(size=16))</td>
 be changed or removed completely by setting cognostics to “NULL”. For
 example, if you were using the “trelli_abundance_boxplot” and only
 wanted a mean and median cognostic, you could set cognostics to
-c(“mean”, “median”).</p>
-<table class="table">
-<colgroup>
-<col width="36%">
-<col width="64%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">Functions</th>
-<th align="left">Cognostics</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">trelli_abundance_boxplot</td>
-<td align="left">n, mean, median, sd, skew, p_value, fold_change</td>
-</tr>
-<tr class="even">
-<td align="left">trelli_abundance_histogram</td>
-<td align="left">n, mean, median, sd, skew, p_value, fold_change</td>
-</tr>
-<tr class="odd">
-<td align="left">trelli_abundance_heatmap</td>
-<td align="left">n, mean, median, sd, skew</td>
-</tr>
-<tr class="even">
-<td align="left">trelli_missingness_bar</td>
-<td align="left">n, proportion</td>
-</tr>
-<tr class="odd">
-<td align="left">trelli_foldchange_bar</td>
-<td align="left">fold_change, p_value</td>
-</tr>
-<tr class="even">
-<td align="left">trelli_foldchange_boxplot</td>
-<td align="left">n, median, mean, sd</td>
-</tr>
-<tr class="odd">
-<td align="left">trelli_foldchange_heatmap</td>
-<td align="left">n, median, mean, sd</td>
-</tr>
-<tr class="even">
-<td align="left">trelli_foldchange_volcano</td>
-<td align="left">n</td>
-</tr>
-</tbody>
-</table>
+<code>c("mean abundance", "median abundance")</code>.</p>
+<pre><code><span><span class="co">##                    Functions</span></span>
+<span><span class="co">## 1   trelli_abundance_boxplot</span></span>
+<span><span class="co">## 2 trelli_abundance_histogram</span></span>
+<span><span class="co">## 3   trelli_abundance_heatmap</span></span>
+<span><span class="co">## 4     trelli_missingness_bar</span></span>
+<span><span class="co">## 5      trelli_foldchange_bar</span></span>
+<span><span class="co">## 6  trelli_foldchange_boxplot</span></span>
+<span><span class="co">## 7  trelli_foldchange_heatmap</span></span>
+<span><span class="co">## 8  trelli_foldchange_volcano</span></span>
+<span><span class="co">##                                                                                          Cognostics</span></span>
+<span><span class="co">## 1                 count, mean abundance, median abundance, cv abundance, anova p-value, fold change</span></span>
+<span><span class="co">## 2                      sample count, mean abundance, median abundance, cv abundance, skew abundance</span></span>
+<span><span class="co">## 3                                                   sample count, mean abundance, biomolecule count</span></span>
+<span><span class="co">## 4                                  total count, observed count, observed proportion, g-test p-value</span></span>
+<span><span class="co">## 5                                                                        fold change, anova p-value</span></span>
+<span><span class="co">## 6                       biomolecule count, proportion significant, mean fold change, sd fold change</span></span>
+<span><span class="co">## 7                       biomolecule count, proportion significant, mean fold change, sd fold change</span></span>
+<span><span class="co">## 8 biomolecule count, proportion significant, proportion significant up, proportion significant down</span></span></code></pre>
 </div>
 </div>
 <div class="section level2">
@@ -1199,10 +620,9 @@ or NMR data, log transformation and normalization is required.</p>
 </h4>
 <p>“panel_by_options” are stored attributes in all trelliData
 objects.</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">trelliData4</span>, <span class="st">"panel_by_options"</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] "Lipid"          "SampleID"       "Row"            "Retention_Time"</span></span>
-<span><span class="co">## [5] "Family"</span></span></code></pre>
+<pre><code><span><span class="co">## [1] "Peptide"      "SampleID"     "ProteinList"  "RazorProtein"</span></span></code></pre>
 </div>
 </div>
   </div>

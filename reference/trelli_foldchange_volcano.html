@@ -90,9 +90,8 @@
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">trelli_foldchange_volcano</span><span class="op">(</span></span>
 <span>  <span class="va">trelliData</span>,</span>
-<span>  <span class="va">comparison</span>,</span>
-<span>  cognostics <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"n"</span><span class="op">)</span>,</span>
-<span>  p_value_test <span class="op">=</span> <span class="st">"anova"</span>,</span>
+<span>  comparison <span class="op">=</span> <span class="st">"all"</span>,</span>
+<span>  cognostics <span class="op">=</span> <span class="st">"biomolecule count"</span>,</span>
 <span>  p_value_thresh <span class="op">=</span> <span class="fl">0.05</span>,</span>
 <span>  ggplot_params <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  interactive <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -115,17 +114,14 @@ results. Required.</p></dd>
 <dt>comparison</dt>
 <dd><p>The specific comparison to visualize in the fold_change
 volcano. See attr(statRes, "comparisons") for the available options.
-Required.</p></dd>
+If all comparisons are desired, the word "all" can be used, which is the
+default. Required.</p></dd>
 
 
 <dt>cognostics</dt>
-<dd><p>A vector of cognostic options for each plot. Valid entry is
-n.</p></dd>
-
-
-<dt>p_value_test</dt>
-<dd><p>A string to indicate which p_values to plot. Acceptable
-entries are "anova", "gtest", or NULL. Default is "anova".</p></dd>
+<dd><p>A vector of cognostic options for each plot. Valid entries are 
+"biomolecule count", "proportion significant", "proportion significant up",
+and "proportion significant down". Default is "biomolecule count"</p></dd>
 
 
 <dt>p_value_thresh</dt>
@@ -180,11 +176,13 @@ trelliscope) should be returned. Default is FALSE.</p></dd>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> </span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Build fold_change bar plot with statRes data grouped by edata_colname.</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span>trelliData <span class="op">=</span> <span class="va">trelliData4</span>, panel <span class="op">=</span> <span class="st">"LipidFamily"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span></span>
-<span class="r-in"><span>  <span class="fu">trelli_foldchange_volcano</span><span class="op">(</span>comparison <span class="op">=</span> <span class="st">"StrainA_vs_StrainB"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span>trelliData <span class="op">=</span> <span class="va">trelliData4</span>, panel <span class="op">=</span> <span class="st">"RazorProtein"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span></span>
+<span class="r-in"><span>  <span class="fu">trelli_foldchange_volcano</span><span class="op">(</span>comparison <span class="op">=</span> <span class="st">"all"</span>, test_mode <span class="op">=</span> <span class="cn">TRUE</span>, test_example <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span>,</span></span>
+<span class="r-in"><span>                            cognostics <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"biomolecule count"</span>, <span class="st">"proportion significant"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
