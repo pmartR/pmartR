@@ -803,6 +803,7 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
     # select the first row in groupData while grouping by the column with the
     # pairing information.
     groupData <- merge(
+      groupData,
       omicsData$f_data[, c(samp_cname, da_pair_name)],
       sort = FALSE
     ) %>%
@@ -927,7 +928,7 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
     gp <- factor(groupData$Group,labels=1:k,levels=unique(groupData$Group))
     
     # pre-compute coefficients of the non-interaction model
-    xmatrix <- build_x_mat(groupData[,c(main_effect_names, covariate_names)], intercept = TRUE)
+    xmatrix <- build_x_mat(groupData[,c(main_effect_names, covariate_names)], intercept = FALSE)
     xmatrix <- reduce_xmatrix(xmatrix,k)
     Betas <- compute_betas(data.matrix(data),xmatrix, gp)
     

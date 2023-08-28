@@ -22,31 +22,6 @@ proj_mat <- function(X, ngroups){
   return(1)
 }
 
-
-# Project each row of the data.matrix into X's null space.
-project_to_null <- function(data_mat, Xmatrix, ngroups){
-
-  data_no_x <- data_mat
-
-  for(i in 1:nrow(data_mat)){
-
-    to_rem <- which(is.na(data_mat[i,]))
-    if(length(to_rem)>0){
-      roi <-  data_mat[i,-to_rem]
-      IPxi <- proj_mat(Xmatrix[-to_rem,], ngroups)
-      data_no_x[i,-to_rem] <- IPxi%*%matrix(roi,ncol=1)
-    }else{
-      roi <- data_mat[i,]
-      IPxi <- proj_mat(Xmatrix, ngroups)
-      data_no_x[i,] <- IPxi%*%matrix(roi,ncol=1)
-    }
-
-  }
-
-  return(data.frame(data_no_x))
-
-}
-
 # This function and the following function, two_factor_anova_r, are used for two
 # main effects (with or without covariates) when there is a significant
 # interaction between the main effects for some of the biomolecules (rows of

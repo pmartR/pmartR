@@ -82,7 +82,6 @@ arma::rowvec fold_change_diff_row(arma::rowvec means, arma::mat C) {
   
   //Treat rows with NaN as special cases
   if(means.has_nan()){
-    
     //Which rows of C do not involve the NaN element(s)?
     bad_C = C.cols(find_nonfinite(means)); //Submatrix of C involving the NaN element
     
@@ -96,8 +95,8 @@ arma::rowvec fold_change_diff_row(arma::rowvec means, arma::mat C) {
       
       //non-nan elements of rowi_means
       found_finite = find_finite(means);
-      not_nan = means.rows(found_finite); //rowi_means is a column vector so take it's rows
-      good_C = C.cols(found_finite);          //C is a matrix so take the columns I need
+      not_nan = means.cols(found_finite).t(); 
+      good_C = C.cols(found_finite); //C is a matrix so take the columns I need
       good_C = good_C.rows(zero_C);
       
       
@@ -200,7 +199,11 @@ List anova_cpp(arma::mat data, NumericVector gp, int unequal_var, arma::mat X, a
   NumericVector rowi_gsize(m); //vector to contain the number of non-na observations
   //per group
 
-  arma::mat covar_vals = X.cols(m, X.n_cols - 1);
+  arma::mat covar_vals;
+  if (X.n_cols > m) {
+    covar_vals = X.cols(m, X.n_cols - 1);
+  }
+
   arma::rowvec Xrowi(p);
   arma::uvec elems_to_keep;
   arma::uvec dof(n);
@@ -221,9 +224,14 @@ List anova_cpp(arma::mat data, NumericVector gp, int unequal_var, arma::mat X, a
     //Find the finite values in row i and put them in a column vector called "red_rowi"
     elems_to_keep = find_finite(Xrowi);
 
+    int row_rank =  rank(X.rows(elems_to_keep)); // determines degrees of freedom, accounts for things like missing groups etc.
     arma::rowvec beta = Beta.row(i);
     arma::colvec effects = arma::zeros(p);
-    effects.rows(elems_to_keep) = covar_vals.rows(elems_to_keep) * beta.cols(m, beta.n_cols - 1).t();
+
+    if (beta.n_cols > m) {
+      beta = beta.cols(m, beta.n_cols - 1);
+      effects.rows(elems_to_keep) = covar_vals.rows(elems_to_keep) * beta.t();
+    }
 
     //Iterate over the matrix columns (samples) to get groups means for each row
     for(int j=0; j<p; j++){
@@ -234,7 +242,7 @@ List anova_cpp(arma::mat data, NumericVector gp, int unequal_var, arma::mat X, a
       //Compute group sums by adding each observations that's not an NA
       if(!NumericMatrix::is_na(data(i,j))){
         group_sums(i,groupi) += data(i,j);
-        adj_group_means(i,groupi) += data(i,j) - effects(j);
+        adj_group_means(i,groupi) += (data(i,j) - effects(j));
         group_sizes(i,groupi) += 1;
       }
 
@@ -297,12 +305,12 @@ List anova_cpp(arma::mat data, NumericVector gp, int unequal_var, arma::mat X, a
 
       //Compute F-statistic
       SSB = SST-SSE;
-      sigma2(i) = (SSE/(rowi_size-rank(X)+missing_m));
+      sigma2(i) = (SSE/(rowi_size-row_rank));
 
-      Fstats(i) = (SSB/(rank(X) - missing_m - 1))/(sigma2(i));
+      Fstats(i) = (SSB/(row_rank - 1))/(sigma2(i));
       //Arguments passed to pf are: value, df1, df2, lower tail?, log scale?
-      p_value(i) = R::pf(Fstats(i),rank(X) - missing_m - 1,rowi_size-rank(X)+missing_m,false,false);
-      dof(i) = rowi_size-rank(X)+missing_m;
+      p_value(i) = R::pf(Fstats(i),row_rank - 1,rowi_size-row_rank,false,false);
+      dof(i) = rowi_size-row_rank;
     }
 
   }//end iteration over rows
@@ -522,10 +530,15 @@ List group_comparison_anova_cpp(arma::mat data, arma::mat sizes, arma::mat X, ar
 
     // Betas are the estimated group means in this model specification
     arma::colvec Beta = XpXInv*X.rows(elems_to_keep).t()*residual_vec;
-    arma::colvec Beta_finite = Beta;
-    Beta_finite.rows(sizes.row(i).cols(0, n_groups - 1) == 0).fill(arma::datum::nan);
 
-    arma::rowvec mean_diffs = fold_change_diff_row(Beta.rows(0, n_groups - 1).t(), C.cols(0, n_groups - 1));
+    arma::colvec Beta_finite = Beta;
+    arma::uvec zerosize_idx = find(sizes.row(i).cols(0, n_groups - 1) == 0);
+
+    if (zerosize_idx.size() > 0) {
+      Beta_finite.rows(zerosize_idx).fill(arma::datum::nan);
+    }
+
+    arma::rowvec mean_diffs = fold_change_diff_row(Beta_finite.rows(0, n_groups - 1).t(), C.cols(0, n_groups - 1));
     diff_mat.row(i) = mean_diffs;
 
     residual_vec = residual_vec - X.rows(elems_to_keep)*Beta;
