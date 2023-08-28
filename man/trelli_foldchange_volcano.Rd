@@ -6,9 +6,8 @@
 \usage{
 trelli_foldchange_volcano(
   trelliData,
-  comparison,
-  cognostics = c("n"),
-  p_value_test = "anova",
+  comparison = "all",
+  cognostics = "biomolecule count",
   p_value_thresh = 0.05,
   ggplot_params = NULL,
   interactive = FALSE,
@@ -26,13 +25,12 @@ results. Required.}
 
 \item{comparison}{The specific comparison to visualize in the fold_change
 volcano. See attr(statRes, "comparisons") for the available options.
-Required.}
+If all comparisons are desired, the word "all" can be used, which is the
+default. Required.}
 
-\item{cognostics}{A vector of cognostic options for each plot. Valid entry is
-n.}
-
-\item{p_value_test}{A string to indicate which p_values to plot. Acceptable
-entries are "anova", "gtest", or NULL. Default is "anova".}
+\item{cognostics}{A vector of cognostic options for each plot. Valid entries are 
+"biomolecule count", "proportion significant", "proportion significant up",
+and "proportion significant down". Default is "biomolecule count"}
 
 \item{p_value_thresh}{A value between 0 and 1 to indicate significant
 biomolecules for p_value_test. Default is 0.05.}
@@ -67,11 +65,13 @@ Specify a plot design and cognostics for the fold_change volcano
   both an omicsData object and statRes are required to make this plot.
 }
 \examples{
-\dontrun{ 
+\dontrun{
 
 ## Build fold_change bar plot with statRes data grouped by edata_colname.
-trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") \%>\% 
-  trelli_foldchange_volcano(comparison = "StrainA_vs_StrainB")
+trelli_panel_by(trelliData = trelliData4, panel = "RazorProtein") \%>\% 
+  trelli_foldchange_volcano(comparison = "all", test_mode = TRUE, test_example = 1:10,
+                            cognostics = c("biomolecule count", "proportion significant"))
+
 }
 
 }

@@ -1,6 +1,12 @@
 context("trelliscope plotting functions")
 
 test_that("trelliPlots check the correct inputs", {
+  
+  # Quick trelliscope function check for future changes
+  # file_coverage(c("./R/as.trelliData.R", "./R/summary_trelliData.R", "./R/trelliPlots.R"), 
+  #               c("./tests/testthat/test_as_trelliData_edata.R", "./tests/testthat/test_as_trelliData.R", "./tests/testthat/test_as_trelliData_summary.R", "./tests/testthat/test_trelliPlots.R")) %>% 
+  #     report()
+  
   # Load: lipid expression data-------------------------------------------------
 
   load(system.file('testdata',
@@ -75,7 +81,7 @@ test_that("trelliPlots check the correct inputs", {
   # Only acceptable cognostics are allowed
   expect_error(
     mtrelliData1 %>% trelli_panel_by("Metabolite") %>% trelli_abundance_boxplot(cognostics = "test"),
-    "Unacceptable cognostic option included. Acceptable options are:  n, mean, median, sd, skew, p_value, fold_change"
+    "Unacceptable cognostic option included. Acceptable options are:  count, mean abundance, median abundance, cv abundance, anova p-value, fold change"
   )
 
   # ggplot params should be strings
@@ -133,7 +139,7 @@ test_that("trelliPlots check the correct inputs", {
   # Test mode for windows should pass
   expect_equal(
     .getDownloadsFolder(.test_mode = TRUE),
-    dirname("~")
+    file.path(dirname("~"), "Downloads")
   )
 
   # Expect a single plot object to be made
@@ -163,13 +169,12 @@ test_that("trelliPlots check the correct inputs", {
 
   # Build a trelliscope that tries to call stats cognostics without stats data and
   # has one plot
-  singlePlot <- mtrelliData1 %>% trelli_panel_by("Metabolite")
+  singlePlot <- mtrelliData1 %>% trelli_panel_by("Metabolite") 
   singlePlot$trelliData.omics <- singlePlot$trelliData.omics[1, ]
-  suppressWarnings(singlePlot %>%
-    trelli_abundance_boxplot(
-      path = file.path(testFolder, "BoxAbundanceTest2"),
-      cognostics = "p_value"
-    ))
+  suppressWarnings(singlePlot %>% 
+   trelli_abundance_boxplot(path = file.path(testFolder, "BoxAbundanceTest2"), 
+                            cognostics = "anova p-value")
+  )
   expect_true(file.exists(file.path(testFolder, "BoxAbundanceTest2")))
 
   # Build a trelliscope that tries to call stats cognostics without cognostics data
@@ -195,18 +200,17 @@ test_that("trelliPlots check the correct inputs", {
     trelli_panel_by("Metabolite") %>%
     trelli_abundance_histogram(single_plot = TRUE)
   expect_true(inherits(abun_histplot, "ggplot"))
-
-
-  # Test that trelliscope builds when passed cognostic doesn't exist
-  suppressWarnings(mtrelliData1 %>% trelli_panel_by("Metabolite") %>%
-    trelli_abundance_histogram(
-      path = file.path(testFolder, "HistAbundanceTest1"),
-      test_mode = TRUE,
-      test_example = 2,
-      ggplot_params = "xlab('')",
-      cognostics = c("n", "p_value"),
-      interactive = TRUE
-    ))
+  
+  
+  # Test that trelliscope builds when passed cognostic doesn't exist  
+  suppressWarnings(mtrelliData1 %>% trelli_panel_by("Metabolite") %>% 
+    trelli_abundance_histogram(path = file.path(testFolder, "HistAbundanceTest1"),
+                               test_mode = TRUE, 
+                               test_example = 2,
+                               ggplot_params = "xlab('')",
+                               cognostics = c("sample count", "cv abundance"),
+                               interactive = TRUE)
+  )
   expect_true(file.exists(file.path(testFolder, "HistAbundanceTest1")))
 
   # Test that trelliscope builds even with missing cognostics and a single omic
@@ -266,26 +270,24 @@ test_that("trelliPlots check the correct inputs", {
   )
 
   # Test trelliscope builds with all cognostics
-  suppressWarnings(mtrelliData1 %>% trelli_panel_by("Metabolite") %>%
-    trelli_missingness_bar(
-      path = file.path(testFolder, "MissingTest1"),
-      ggplot_params = "ylab('')",
-      test_mode = TRUE,
-      test_example = 2,
-      cognostics = "proportion",
-      interactive = TRUE
-    ))
+  suppressWarnings(mtrelliData1 %>% trelli_panel_by("Metabolite") %>% 
+    trelli_missingness_bar(path = file.path(testFolder, "MissingTest1"),
+                           ggplot_params = "ylab('')",
+                           test_mode = TRUE, 
+                           test_example = 2,
+                           cognostics = "observed proportion",
+                           interactive = TRUE)
+  )
   expect_true(file.exists(file.path(testFolder, "MissingTest1")))
-
-  # Test trelliscope with just a statRes object
-  suppressWarnings(mtrelliData3 %>% trelli_panel_by("Metabolite") %>%
-    trelli_missingness_bar(
-      path = file.path(testFolder, "MissingTest2"),
-      test_mode = TRUE,
-      test_example = 2,
-      proportion = FALSE,
-      cognostics = "n"
-    ))
+  
+  # Test trelliscope with just a statRes object 
+  suppressWarnings(mtrelliData3 %>% trelli_panel_by("Metabolite") %>% 
+                     trelli_missingness_bar(path = file.path(testFolder, "MissingTest2"),
+                                            test_mode = TRUE, 
+                                            test_example = 2,
+                                            proportion = FALSE,
+                                            cognostics = "total count")
+  )
   expect_true(file.exists(file.path(testFolder, "MissingTest2")))
 
   # Build a single plot
@@ -327,13 +329,7 @@ test_that("trelliPlots check the correct inputs", {
     mtrelliData4 %>% trelli_panel_by("Metabolite") %>% trelli_foldchange_bar(p_value_test = "anova", p_value_thresh = 5),
     "p_value_thresh must be between 0 and 1."
   )
-
-  # Test that the p-value test is an acceptable entry of anova, gtest, both, or null
-  expect_error(
-    mtrelliData4 %>% trelli_panel_by("Metabolite") %>% trelli_foldchange_bar(p_value_test = "test"),
-    "p_value_test must be anova, gtest, or NULL."
-  )
-
+  
   # Generate a trelliscope without proportions and a single plot
   singleStatPlot <- mtrelliData4 %>% trelli_panel_by("Metabolite")
   singleStatPlot$trelliData.omics <- singleStatPlot$trelliData.omics[1, ]
@@ -341,8 +337,7 @@ test_that("trelliPlots check the correct inputs", {
   suppressWarnings(singleStatPlot %>%
      trelli_foldchange_bar(path = file.path(testFolder, "barFoldChangeTest1"),
                            ggplot_params = "ylab('')",
-                           cognostics = "p_value",
-                           p_value_test = "anova",
+                           cognostics = "anova p-value",
                            interactive = TRUE)
   )
   expect_true(file.exists(file.path(testFolder, "barFoldChangeTest1")))
@@ -353,18 +348,17 @@ test_that("trelliPlots check the correct inputs", {
                                            ggplot_params = "ylab('')",
                                            test_mode = TRUE, 
                                            test_example = 2,
-                                           cognostics = "p_value",
-                                           p_value_test = "anova",
+                                           cognostics = "fold change",
+                                           p_value_thresh = 0,
                                            interactive = TRUE)
   )
   expect_true(file.exists(file.path(testFolder, "barFoldChangeTest2")))
-
-  # Generate a trelliscope with proportions and combined p-values
+  
+  # Generate a trelliscope with proportions 
   suppressWarnings(mtrelliData3 %>% trelli_panel_by("Metabolite") %>% 
                      trelli_foldchange_bar(path = file.path(testFolder, "barFoldChangeTest3"),
                                            test_mode = TRUE, 
-                                           test_example = 2,
-                                           p_value_test = "anova")
+                                           test_example = 2)
   )
   expect_true(file.exists(file.path(testFolder, "barFoldChangeTest3")))
 
@@ -397,7 +391,6 @@ test_that("trelliPlots check the correct inputs", {
                              ggplot_params = "xlab('')",
                              test_mode = TRUE, 
                              test_example = 2,
-                             p_value_test = NULL,
                              interactive = TRUE)
   )
   expect_true(file.exists(file.path(testFolder, "boxFoldChangeTest1")))
@@ -409,7 +402,7 @@ test_that("trelliPlots check the correct inputs", {
 
   suppressWarnings(singleEmetaPlot %>%
                      trelli_foldchange_boxplot(path = file.path(testFolder, "boxFoldChangeTest2"),
-                                               p_value_test = "anova",
+                                               p_value_thresh = 0,
                                                include_points = TRUE)
   )
   expect_true(file.exists(file.path(testFolder, "boxFoldChangeTest2")))
@@ -419,16 +412,10 @@ test_that("trelliPlots check the correct inputs", {
   expect_true(inherits(fc_boxplot, "ggplot"))
 
   ## trelli_foldchange_volcano
-
-  # Data must have only 1 comparison
-  expect_error(
-    mtrelliData4 %>% trelli_panel_by("Metabolite") %>% trelli_foldchange_volcano(comparison = c("Mock_vs_InfectionA", "Mock_vs_InfectionA")),
-    "comparison must be a string of length 1."
-  )
-
+  
   # Data must be grouped by an e_meta column
   expect_error(
-    mtrelliData4 %>% trelli_panel_by("Metabolite") %>% trelli_foldchange_volcano(comparison = "Tigers"),
+    mtrelliData4 %>% trelli_panel_by("MClass") %>% trelli_foldchange_volcano(comparison = "Tigers"),
     "is not an acceptable comparison"
   )
 
@@ -445,7 +432,6 @@ test_that("trelliPlots check the correct inputs", {
                              ggplot_params = "xlab('')",
                              test_mode = TRUE, 
                              test_example = 2,
-                             p_value_test = "gtest",
                              interactive = TRUE)
   )
   expect_true(file.exists(file.path(testFolder, "volFoldChangeTest1")))
@@ -453,7 +439,7 @@ test_that("trelliPlots check the correct inputs", {
   # Generate a single plot volcano trelliscope with no p_value
   suppressWarnings(singleEmetaPlot %>%
                      trelli_foldchange_volcano(path = file.path(testFolder, "volFoldChangeTest2"), comparison = "Mock_vs_InfectionA",
-                                               p_value_test = NULL)
+                                               p_value_thresh = 0)
   )
   expect_true(file.exists(file.path(testFolder, "volFoldChangeTest2")))
 
@@ -488,21 +474,5 @@ test_that("trelliPlots check the correct inputs", {
   # Generate a single plot
   fc_heatmap <- singleEmetaPlot %>% trelli_foldchange_heatmap(single_plot = TRUE)
   expect_true(inherits(fc_heatmap, "ggplot"))
-
-  ## NaN significance results  ######################## might need a second look
-  mtrelliData6 <- mtrelliData4
-  mtrelliData6$trelliData.stat$p_value_anova <- NaN
-  mtrelliData6$trelliData.stat$p_value_gtest <- NaN
-
-  ## Generate heatmap w/ significance stuff
-  suppressWarnings(mtrelliData6 %>% trelli_panel_by("MClass") %>%
-                trelli_foldchange_heatmap(p_value_thresh = 0.05,
-                                          path = file.path(testFolder, "hmFoldChangeTest2"),
-                                          test_mode = TRUE, 
-                                          p_value_test = "anova",
-                                          test_example = 2,
-                                          interactive = TRUE))
-  
-  mtrelliData6$trelliData.stat$fold_change <- NaN
   
 })  

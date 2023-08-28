@@ -30,27 +30,11 @@ Either an omicData and/or a statRes object are accepted.
 \dontrun{
 library(pmartRdata)
 
-# Generate an example e_meta file for lipid data
-lipid_emeta <- data.frame(
-  "Lipid" = lipid_pos_edata$Lipid,
-  "LipidFamily" = lipid_pos_edata$Lipid \%>\% as.character() \%>\%
-    strsplit("(", fixed = TRUE) \%>\% lapply(function(el) {
-      el[1]
-    }) \%>\% unlist()
-)
-
 # Transform the data
-omicsData <- edata_transform(omicsData = lipid_pos_object, data_scale = "log2")
-omicsData$e_meta$LipidFamily <- omicsData$e_meta$Lipid \%>\%
-  as.character() \%>\%
-  strsplit("(", fixed = TRUE) \%>\%
-  lapply(function(el) {
-    el[1]
-  }) \%>\%
-  unlist()
+omicsData <- edata_transform(omicsData = pep_object, data_scale = "log2")
 
 # Group the data by condition
-omicsData <- group_designation(omicsData = omicsData, main_effects = c("Virus"))
+omicsData <- group_designation(omicsData = omicsData, main_effects = c("Phenotype"))
 
 # Apply the IMD ANOVA filter
 imdanova_Filt <- imdanova_filter(omicsData = omicsData)

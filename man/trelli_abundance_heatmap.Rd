@@ -6,7 +6,7 @@
 \usage{
 trelli_abundance_heatmap(
   trelliData,
-  cognostics = c("n", "mean", "median", "sd", "skew"),
+  cognostics = c("sample count", "mean abundance", "biomolecule count"),
   ggplot_params = NULL,
   interactive = FALSE,
   path = .getDownloadsFolder(),
@@ -21,9 +21,10 @@ trelli_abundance_heatmap(
 \item{trelliData}{A trelliscope data object made by as.trelliData, and
 grouped by an emeta variable. Required.}
 
-\item{cognostics}{A vector of cognostic options for each plot. Valid entries
-are n, mean, median, sd, and skew per "main_effects" group designation.
-Otherwise, no cognostics are returned.}
+\item{cognostics}{A vector of cognostic options. Defaults are "sample count", 
+"mean abundance" and "biomolecule count". "sample count" and "mean abundance"
+are reported per group, and "biomolecule count" is the total number of biomolecules
+in the biomolecule class (e_meta column).}
 
 \item{ggplot_params}{An optional vector of strings of ggplot parameters to
 the backend ggplot function. For example, c("ylab('')", "xlab('')").
@@ -51,26 +52,23 @@ trelliscope) should be returned. Default is FALSE.}
 }
 \description{
 Specify a plot design and cognostics for the abundance heatmap
-  trelliscope. Data must be grouped by an emeta column. Main_effects order
+  trelliscope. Data must be grouped by an e_meta column. Main_effects order
   the y-variables. All statRes data is ignored.
 }
 \examples{
 \dontrun{
 
-## Build the abundance heatmap with an omicsData object with emeta variables. 
-## Generate trelliData in as.trelliData.
-trelli_panel_by(trelliData = trelliData2, panel = "LipidFamily") \%>\%
-  trelli_abundance_heatmap(test_mode = TRUE, test_example = 1:3)
-
-## Users can modify the plotting function with ggplot parameters and interactivity,
-## and can also select certain cognostics.
-trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") \%>\%
-  trelli_abundance_heatmap(
-    test_mode = TRUE, test_example = 1:5,
-    ggplot_params = c("ylab('')", "xlab('')"), interactive = TRUE, cognostics = c("mean", "median")
-  )
+# Build the abundance heatmap with an omicsData object with emeta variables. Generate trelliData in as.trelliData.
+trelli_panel_by(trelliData = trelliData2, panel = "RazorProtein") \%>\% 
+   trelli_abundance_heatmap(test_mode = TRUE, test_example = 1:3)
+   
+# Users can modify the plotting function with ggplot parameters and interactivity, 
+# and can also select certain cognostics.     
+trelli_panel_by(trelliData = trelliData4, panel = "RazorProtein") \%>\% 
+   trelli_abundance_heatmap(test_mode = TRUE, test_example = 1:5, 
+     ggplot_params = c("ylab('')", "xlab('')"), interactive = TRUE, cognostics = c("biomolecule count"))  
+   
 }
-
 }
 \author{
 David Degnan, Lisa Bramer

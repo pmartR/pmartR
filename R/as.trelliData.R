@@ -86,14 +86,13 @@
 #'
 #' @examples
 #' library(pmartRdata)
-#'
-#' # Simple example
-#' trelliData <- as.trelliData.edata(
-#'   e_data = lipid_pos_edata,
-#'   edata_cname = "Lipid",
-#'   omics_type = "lipidData"
-#' )
-#'
+#' 
+#' # Simple example 
+#' trelliData1 <- as.trelliData.edata(e_data = pep_edata,
+#'                                    edata_cname = "Peptide",
+#'                                    omics_type = "pepData")
+#'                                   
+#'           
 #' @author David Degnan, Daniel Claborne, Lisa Bramer
 #'
 #' @export
@@ -238,29 +237,13 @@ as.trelliData.edata <- function(e_data,
 #' @examples
 #' \dontrun{
 #' library(pmartRdata)
-#'
-#' # Generate an example e_meta file for lipid data
-#' lipid_emeta <- data.frame(
-#'   "Lipid" = lipid_pos_edata$Lipid,
-#'   "LipidFamily" = lipid_pos_edata$Lipid %>% as.character() %>%
-#'     strsplit("(", fixed = TRUE) %>% lapply(function(el) {
-#'       el[1]
-#'     }) %>% unlist()
-#' )
-#'
+#' 
 #' # Transform the data
-#' omicsData <- edata_transform(omicsData = lipid_pos_object, data_scale = "log2")
-#' omicsData$e_meta$LipidFamily <- omicsData$e_meta$Lipid %>%
-#'   as.character() %>%
-#'   strsplit("(", fixed = TRUE) %>%
-#'   lapply(function(el) {
-#'     el[1]
-#'   }) %>%
-#'   unlist()
-#'
+#' omicsData <- edata_transform(omicsData = pep_object, data_scale = "log2")
+#' 
 #' # Group the data by condition
-#' omicsData <- group_designation(omicsData = omicsData, main_effects = c("Virus"))
-#'
+#' omicsData <- group_designation(omicsData = omicsData, main_effects = c("Phenotype"))
+#' 
 #' # Apply the IMD ANOVA filter
 #' imdanova_Filt <- imdanova_filter(omicsData = omicsData)
 #' omicsData <- applyFilt(filter_object = imdanova_Filt, omicsData = omicsData,
@@ -486,27 +469,26 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL) {
 #'
 #' @examples
 #' \dontrun{
-#'
-#' library(pmartRdata)
-#'
-#' ## "panel_by" with an edata file.
-#' ## Generate with example code in as.trelliData.edata
-#' trelli_panel_by(trelliData = trelliData, panel = "Lipid")
-#' trelli_panel_by(trelliData = trelliData, panel = "Sample")
-#'
-#' ## "panel_by" with trelliData containing omicsData.
-#' ## Generate with example code in as.trelliData
-#' trelli_panel_by(trelliData = trelliData2, panel = "Lipid")
-#' trelli_panel_by(trelliData = trelliData2, panel = "LipidFamily")
-#'
-#' ## "panel_by" with trelliData containing statRes.
-#' ## Generate with example code in as.trelliData
-#' trelli_panel_by(trelliData = trelliData3, panel = "Lipid")
-#'
-#' ## "panel_by" with trelliData containing both omicsData and statRes.
-#' ## Generate with example code in as.trelliData
-#' trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily")
-#' trelli_panel_by(trelliData = trelliData4, panel = "Lipid")
+#' 
+#' 
+#' ## "panel_by" with an edata file. 
+#' ## Generate trelliData1 using the example code for as.trelliData.edata
+#' trelli_panel_by(trelliData = trelliData1, panel = "Peptide")
+#' trelli_panel_by(trelliData = trelliData1, panel = "Sample")
+#' 
+#' ## "panel_by" with trelliData containing omicsData. 
+#' ## Generate trelliData2 using the example code for as.trelliData
+#' trelli_panel_by(trelliData = trelliData2, panel = "Peptide")
+#' trelli_panel_by(trelliData = trelliData2, panel = "RazorProtein")
+#' 
+#' ## "panel_by" with trelliData containing statRes. 
+#' ## Generate trelliData3 using the example code for as.trelliData
+#' trelli_panel_by(trelliData = trelliData3, panel = "Peptide")
+#' 
+#' ## "panel_by" with trelliData containing both omicsData and statRes. 
+#' ## Generate trelliData4 using the example code for as.trelliData
+#' trelli_panel_by(trelliData = trelliData4, panel = "Peptide")
+#' trelli_panel_by(trelliData = trelliData4, panel = "RazorProtein")
 #' trelli_panel_by(trelliData = trelliData4, panel = "SampleID")
 #' }
 #'
@@ -638,13 +620,13 @@ trelli_panel_by <- function(trelliData, panel) {
 #' trelli_pvalue_filter(trelliData3, p_value_test = "anova", p_value_thresh = 0.1)
 #' 
 #' # Filter a trelliData object with only statistics results, while caring about a specific comparison
-#' trelli_pvalue_filter(trelliData3, p_value_test = "anova", p_value_thresh = 0.1, comparison = "StrainC_vs_StrainA")
+#' trelli_pvalue_filter(trelliData3, p_value_test = "anova", p_value_thresh = 0.1, comparison = "Phenotype3_vs_Phenotype2")
 #' 
 #' # Filter both a omicsData and statRes object, while not caring about a specific comparison
 #' trelli_pvalue_filter(trelliData4, p_value_test = "anova", p_value_thresh = 0.001)
 #' 
 #' # Filter both a omicsData and statRes object, while caring about a specific comparison
-#' trelli_pvalue_filter(trelliData4, p_value_test = "gtest", p_value_thresh = 0.25, comparison = "StrainA_vs_StrainB")
+#' trelli_pvalue_filter(trelliData4, p_value_test = "gtest", p_value_thresh = 0.25, comparison = "Phenotype3_vs_Phenotype2")
 #' 
 #' 
 #' }

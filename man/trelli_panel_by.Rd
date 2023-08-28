@@ -18,26 +18,25 @@ Allows for grouping omics or stats data for downstream plotting
 \examples{
 \dontrun{
 
-library(pmartRdata)
 
-## "panel_by" with an edata file.
-## Generate with example code in as.trelliData.edata
-trelli_panel_by(trelliData = trelliData, panel = "Lipid")
-trelli_panel_by(trelliData = trelliData, panel = "Sample")
+## "panel_by" with an edata file. 
+## Generate trelliData1 using the example code for as.trelliData.edata
+trelli_panel_by(trelliData = trelliData1, panel = "Peptide")
+trelli_panel_by(trelliData = trelliData1, panel = "Sample")
 
-## "panel_by" with trelliData containing omicsData.
-## Generate with example code in as.trelliData
-trelli_panel_by(trelliData = trelliData2, panel = "Lipid")
-trelli_panel_by(trelliData = trelliData2, panel = "LipidFamily")
+## "panel_by" with trelliData containing omicsData. 
+## Generate trelliData2 using the example code for as.trelliData
+trelli_panel_by(trelliData = trelliData2, panel = "Peptide")
+trelli_panel_by(trelliData = trelliData2, panel = "RazorProtein")
 
-## "panel_by" with trelliData containing statRes.
-## Generate with example code in as.trelliData
-trelli_panel_by(trelliData = trelliData3, panel = "Lipid")
+## "panel_by" with trelliData containing statRes. 
+## Generate trelliData3 using the example code for as.trelliData
+trelli_panel_by(trelliData = trelliData3, panel = "Peptide")
 
-## "panel_by" with trelliData containing both omicsData and statRes.
-## Generate with example code in as.trelliData
-trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily")
-trelli_panel_by(trelliData = trelliData4, panel = "Lipid")
+## "panel_by" with trelliData containing both omicsData and statRes. 
+## Generate trelliData4 using the example code for as.trelliData
+trelli_panel_by(trelliData = trelliData4, panel = "Peptide")
+trelli_panel_by(trelliData = trelliData4, panel = "RazorProtein")
 trelli_panel_by(trelliData = trelliData4, panel = "SampleID")
 }
 

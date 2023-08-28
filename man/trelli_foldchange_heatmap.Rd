@@ -6,8 +6,7 @@
 \usage{
 trelli_foldchange_heatmap(
   trelliData,
-  cognostics = c("n", "median", "mean", "sd"),
-  p_value_test = "anova",
+  cognostics = "biomolecule count",
   p_value_thresh = 0.05,
   ggplot_params = NULL,
   interactive = FALSE,
@@ -23,11 +22,9 @@ trelli_foldchange_heatmap(
 \item{trelliData}{A trelliscope data object with omicsData and statRes
 results. Required.}
 
-\item{cognostics}{A vector of cognostic options for each plot. Valid entries
-are are n, mean, median, and sd.}
-
-\item{p_value_test}{A string to indicate which p_values to plot. Acceptable
-entries are "anova", "gtest", or NULL. Default is "anova".}
+\item{cognostics}{A vector of cognostic options for each plot. Valid entries are 
+"biomolecule count", "proportion significant", "mean fold change",
+and "sd fold change". Default is "biomolecule count"}
 
 \item{p_value_thresh}{A value between 0 and 1 to indicate significant
 biomolecules for p_value_test. Default is 0.05.}
@@ -62,11 +59,13 @@ Specify a plot design and cognostics for the fold_change heatmap
   both an omicsData object and statRes are required to make this plot.
 }
 \examples{
-\dontrun{
+\dontrun{ 
 
-## Build fold_change bar plot with statRes data grouped by edata_colname.
-trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") \%>\%
-  trelli_foldchange_heatmap()
+# Build fold_change bar plot with statRes data grouped by edata_colname.
+trelli_panel_by(trelliData = trelliData4, panel = "RazorProtein") \%>\% 
+  trelli_foldchange_heatmap(test_mode = TRUE, 
+                            test_example = 1:10)
+
 }
 
 }

@@ -68,13 +68,12 @@ The only acceptable input file type is a single edata file.
 \examples{
 library(pmartRdata)
 
-# Simple example
-trelliData <- as.trelliData.edata(
-  e_data = lipid_pos_edata,
-  edata_cname = "Lipid",
-  omics_type = "lipidData"
-)
-
+# Simple example 
+trelliData1 <- as.trelliData.edata(e_data = pep_edata,
+                                   edata_cname = "Peptide",
+                                   omics_type = "pepData")
+                                  
+          
 }
 \author{
 David Degnan, Daniel Claborne, Lisa Bramer

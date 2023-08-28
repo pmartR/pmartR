@@ -6,7 +6,7 @@
 \usage{
 trelli_abundance_boxplot(
   trelliData,
-  cognostics = c("n", "mean", "median", "sd", "skew", "p_value", "fold_change"),
+  cognostics = c("count", "mean abundance"),
   ggplot_params = NULL,
   interactive = FALSE,
   include_points = TRUE,
@@ -23,9 +23,14 @@ trelli_abundance_boxplot(
 as.trelliData.edata, and grouped by trelli_panel_by. Required.}
 
 \item{cognostics}{A vector of cognostic options for each plot. Valid entries
-are n, mean, median, sd, and skew for abundance. If statRes data is
-included, p_value and fold_change cognostics can be added. If no cognostics
-are desired, set to NULL.}
+are "count", "mean abundance", "median abundance", and "cv abundance". 
+If data are paneled by a biomolecule, the count will be "sample count".
+If data are paneled by a sample or a biomolecule class, the count will be "biomolecule count". 
+If statRes data is included, "anova p-value" and "fold change" data per comparisons
+may be added. If grouping information is included, only "sample count" and 
+"mean abundance" will be calclulated, along with "anova p-value" and "fold change"
+if specified. "anova p-value" will not be included if paneling a trelliscope
+display by a biomolecule class. Default is "sample count" and "mean abundance".}
 
 \item{ggplot_params}{An optional vector of strings of ggplot parameters to
 the backend ggplot function. For example, c("ylab('')", "ylim(c(2,20))").
@@ -61,37 +66,48 @@ Specify a boxplot design and cognostics for the abundance
 \examples{
 \dontrun{
 
-## Build the abundance boxplot with an edata file. 
-## Generate trelliData in as.trelliData.edata
-trelli_panel_by(trelliData = trelliData, panel = "Lipid") \%>\%
-  trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10)
-trelli_panel_by(trelliData = trelliData, panel = "Sample") \%>\% 
-  trelli_abundance_boxplot()
+## Generate trelliData objects using the as.trelliData.edata example code.
 
-## Build the abundance boxplot with an omicsData object. 
-## Generate trelliData in as.trelliData
-trelli_panel_by(trelliData = trelliData2, panel = "Lipid") \%>\%
-  trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10)
-trelli_panel_by(trelliData = trelliData2, panel = "LipidFamily") \%>\%
-  trelli_abundance_boxplot()
+# Build the abundance boxplot with an edata file where each panel is a biomolecule. 
+trelli_panel_by(trelliData = trelliData1, panel = "Peptide") \%>\% 
+   trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10)
+   
+# Build the abundance boxplot wher each panel is a sample.
+# Include all applicable cognostics. Remove points. 
+trelli_panel_by(trelliData = trelliData1, panel = "Sample") \%>\% 
+   trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10, 
+                            include_points = FALSE,
+                            cognostics = c("count", 
+                                           "mean abundance", 
+                                           "median abundance", 
+                                           "cv abundance")
+                           )
 
-## Build the abundance boxplot with an omicsData and statRes object. 
-## Generate trelliData in as.trelliData.
-trelli_panel_by(trelliData = trelliData4, panel = "Lipid") \%>\%
-  trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10)
-trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") \%>\%
-  trelli_abundance_boxplot()
+# Build the abundance boxplot with an omicsData object.
+# Let the panels be biomolecules. Here, grouping information is included.
+trelli_panel_by(trelliData = trelliData2, panel = "Peptide") \%>\% 
+   trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10)
+   
+# Build the abundance boxplot with an omicsData object. The panel is a biomolecule class,
+# which is proteins in this case.
+trelli_panel_by(trelliData = trelliData2, panel = "RazorProtein") \%>\% 
+   trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10)
+    
+# Build the abundance boxplot with an omicsData and statRes object.
+# Panel by a biomolecule, and add statistics data to the cognostics
+trelli_panel_by(trelliData = trelliData4, panel = "Peptide") \%>\%
+   trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10,
+                            cognostics = c("mean abundance", "anova p-value", "fold change"))
+ 
+# Other options include modifying the ggplot  
+trelli_panel_by(trelliData = trelliData1, panel = "Peptide") \%>\% 
+   trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10, 
+     ggplot_params = c("ylab('')", "ylim(c(20,30))"))
 
-## Other options include modifying the ggplot
-trelli_panel_by(trelliData = trelliData, panel = "Lipid") \%>\%
-  trelli_abundance_boxplot(
-    test_mode = TRUE, test_example = 1:10,
-    ggplot_params = c("ylab('')", "ylim(c(2,20))")
-  )
+# Or making the plot interactive 
+trelli_panel_by(trelliData = trelliData4, panel = "RazorProtein") \%>\% 
+    trelli_abundance_boxplot(interactive = TRUE, test_mode = TRUE, test_example = 1:10)
 
-## Or making the plot interactive
-trelli_panel_by(trelliData = trelliData4, panel = "LipidFamily") \%>\%
-  trelli_abundance_boxplot(interactive = TRUE)
 }
 
 }

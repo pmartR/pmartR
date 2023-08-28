@@ -1,0 +1,41 @@
+bibentry(
+  bibtype  = "Article",
+  title    = "pmartR 2.0: A Quality Control, Visualization, and Statistics Pipeline for Multiple Omics Datatypes",
+  author   = c(person("David", "Degnan", email = "david.degnan@pnnl.gov"), 
+               person("Kelly", "Stratton", email = "kelly.stratton@pnnl.gov"),
+               person("Rachel", "Richardson", email = "rachel.richardson@pnnl.gov"),
+               person("Daniel", "Claborne", email = "daniel.claborne@pnnl.gov"),
+               person("Evan", "Martin"),
+               person("Nathan", "Johnson"),
+               person("Damon", "Leach", email = "damon.leach@pnnl.gov"),
+               person("Bobbie-Jo", "Webb-Robertson"),
+               person("Lisa", "Bramer", email = "lisa.bramer@pnnl.gov")),
+  journal  = "Journal of Proteome Research",
+  year     = "2023",
+  volume   = "22",
+  number   = "2",
+  pages    = "570-576",
+  doi      = "10.1021/acs.jproteome.2c00610"
+)
+bibentry(
+  bibtype  = "Article",
+  title    = "pmartR: Quality Control and Statistics for Mass Spectrometry-Based Biological Data",
+  author   = c(person("Kelly", "Stratton", email = "kelly.stratton@pnnl.gov"),
+               person("Bobbie-Jo", "Webb-Robertson"),
+               person("Lee Ann", "McCue"),
+               person("Bryan", "Stanfill"),
+               person("Daniel", "Claborne", email = "daniel.claborne@pnnl.gov"),
+               person("Iobani", "Gomez"),
+               person("Thomas", "Johansen"),
+               person("Allison", "Thompson"),
+               person("Kristin", "Burnum-Johnson"),
+               person("Katrina", "Waters"),
+               person("Lisa", "Bramer", email = "lisa.bramer@pnnl.gov")),
+  journal  = "Journal of Proteome Research",
+  year     = "2019",
+  volume   = "18",
+  number   = "3",
+  pages    = "1418-1425",
+  doi      = "10.1021/acs.jproteome.8b00760"
+)
+
