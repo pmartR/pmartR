@@ -349,11 +349,16 @@ List two_factor_anova_cpp(arma::mat y,
   NumericVector sig_est(n), pval(n), Fstat(n),  atl_one(n);
   arma::mat diag_mat;
   arma::colvec par_ests(p_full), par_ests_temp,group_ids_nona(y.n_cols), group_ids_nona_unq;
-  arma::mat parmat(n,p_full), group_sizes(n,p_full);
-  arma::rowvec gsizes(p_full), csums(p_full);
+  arma::mat parmat(n,p_full);
+  arma::rowvec csums(p_full);
   arma::uvec zero_cols, non_zero_cols;
   arma::uvec missing_gp,size_j;
 
+  // For a given biomolecule, the number of groups may be less
+  arma::colvec unq_group_ids = arma::unique(group_ids);
+  int n_groups = unq_group_ids.n_elem;
+  arma::rowvec gsizes(n_groups);
+  arma::mat group_sizes(n,n_groups);
 
   //Loop over rows in y
   for(i=0; i<n; i++){
@@ -465,7 +470,7 @@ List two_factor_anova_cpp(arma::mat y,
     parmat.row(i) = par_ests.t();
 
     //Compute group sizes after accounting for NaNs
-    for(j=0;j<p_full;j++){
+    for(j=0;j<n_groups;j++){
       size_j = find(group_ids_nona==j);
       gsizes(j) = size_j.n_elem;
       //Rcpp::Rcout <<"size_j \n"<<size_j;
@@ -491,7 +496,7 @@ List group_comparison_anova_cpp(arma::mat data, arma::mat sizes, arma::mat X, ar
   // C - matrix that defines the group comparisons you want to make
 
   int num_comparisons = C.n_rows; //Number of comparisons to be made
-  int n_groups = sizes.n_cols; //Number of groups
+  int n_groups = sizes.n_cols; //Number of groups 
   int n = sizes.n_rows; //Number of rows (peptides)
   int N = 0; //Total number of observations for rowi;
   arma::colvec rowi_means(n_groups), rowi_sizes(n_groups); //Storage for each row of means and sample sizes
@@ -530,7 +535,6 @@ List group_comparison_anova_cpp(arma::mat data, arma::mat sizes, arma::mat X, ar
 
     // Betas are the estimated group means in this model specification
     arma::colvec Beta = XpXInv*X.rows(elems_to_keep).t()*residual_vec;
-
     arma::colvec Beta_finite = Beta;
     arma::uvec zerosize_idx = find(sizes.row(i).cols(0, n_groups - 1) == 0);
 
@@ -540,7 +544,7 @@ List group_comparison_anova_cpp(arma::mat data, arma::mat sizes, arma::mat X, ar
 
     arma::rowvec mean_diffs = fold_change_diff_row(Beta_finite.rows(0, n_groups - 1).t(), C.cols(0, n_groups - 1));
     diff_mat.row(i) = mean_diffs;
-
+    
     residual_vec = residual_vec - X.rows(elems_to_keep)*Beta;
     double SSE = arma::as_scalar(residual_vec.t()*residual_vec);
     double sigma_hat = SSE/dof;
