@@ -6780,7 +6780,17 @@ gtest_heatmap <-
     ) %>%
       `colnames<-`(c("Count_First_Group", "Count_Second_Group", "Comparison"))
 
-    gtest_counts <- all_counts %>% dplyr::left_join(gtest_counts)
+    gtest_counts <- all_counts %>% dplyr::left_join(gtest_counts) %>%
+      dplyr::mutate(
+        Count_First_Group = factor(
+            Count_First_Group,
+            levels = sort(unique(as.numeric(Count_First_Group)))
+          ),
+        Count_Second_Group = factor(
+            Count_Second_Group,
+            levels = sort(unique(as.numeric(Count_Second_Group)))
+          )
+      )
 
     if (!interactive) {
       p <- ggplot2::ggplot(gtest_counts) +
