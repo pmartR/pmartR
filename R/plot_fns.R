@@ -6472,11 +6472,9 @@ make_volcano_plot_df <- function(x) {
     pvals$Type <- "ANOVA"
   } else pvals$Type <- attr(x, "statistical_test")
 
-  ## assumes silly people won't call a group A_vs or G_vs for seqdata
-  ## Negative lookahead permits groups called A or G tho
   pvals$Comparison <-
     gsub(
-      pattern = "^P_value_((G|A)_(?!vs))*",
+      pattern = "^P_value_(G|A)_",
       replacement = "",
       pvals$Comparison,
       perl = T
