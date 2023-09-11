@@ -665,7 +665,7 @@ NumericMatrix ptukey_speed(NumericMatrix qstats, NumericVector sizes) {
 
 //-----Compute the matrix of coefficients for the simple additive model-----//
 // [[Rcpp::export]]
-arma::mat compute_betas(arma::mat data_mat, arma::mat Xmatrix, NumericVector gp){
+arma::mat compute_betas(arma::mat data_mat, arma::mat Xmatrix){
   int n = data_mat.n_rows;  //number of biomolecules
   arma::rowvec rowi;
   arma::colvec red_rowi, beta;

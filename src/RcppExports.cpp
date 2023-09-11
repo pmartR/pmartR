@@ -162,15 +162,14 @@ BEGIN_RCPP
 END_RCPP
 }
 // compute_betas
-arma::mat compute_betas(arma::mat data_mat, arma::mat Xmatrix, NumericVector gp);
-RcppExport SEXP _pmartR_compute_betas(SEXP data_matSEXP, SEXP XmatrixSEXP, SEXP gpSEXP) {
+arma::mat compute_betas(arma::mat data_mat, arma::mat Xmatrix);
+RcppExport SEXP _pmartR_compute_betas(SEXP data_matSEXP, SEXP XmatrixSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< arma::mat >::type data_mat(data_matSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type Xmatrix(XmatrixSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type gp(gpSEXP);
-    rcpp_result_gen = Rcpp::wrap(compute_betas(data_mat, Xmatrix, gp));
+    rcpp_result_gen = Rcpp::wrap(compute_betas(data_mat, Xmatrix));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -212,7 +211,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_pmartR_group_comparison_anova_cpp", (DL_FUNC) &_pmartR_group_comparison_anova_cpp, 4},
     {"_pmartR_holm_cpp", (DL_FUNC) &_pmartR_holm_cpp, 1},
     {"_pmartR_ptukey_speed", (DL_FUNC) &_pmartR_ptukey_speed, 2},
-    {"_pmartR_compute_betas", (DL_FUNC) &_pmartR_compute_betas, 3},
+    {"_pmartR_compute_betas", (DL_FUNC) &_pmartR_compute_betas, 2},
     {"_pmartR_kw_rcpp", (DL_FUNC) &_pmartR_kw_rcpp, 2},
     {"_pmartR_nonmissing_per_grp", (DL_FUNC) &_pmartR_nonmissing_per_grp, 2},
     {NULL, NULL, 0}

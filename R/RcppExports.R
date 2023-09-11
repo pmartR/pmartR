@@ -49,8 +49,8 @@ ptukey_speed <- function(qstats, sizes) {
     .Call('_pmartR_ptukey_speed', PACKAGE = 'pmartR', qstats, sizes)
 }
 
-compute_betas <- function(data_mat, Xmatrix, gp) {
-    .Call('_pmartR_compute_betas', PACKAGE = 'pmartR', data_mat, Xmatrix, gp)
+compute_betas <- function(data_mat, Xmatrix) {
+    .Call('_pmartR_compute_betas', PACKAGE = 'pmartR', data_mat, Xmatrix)
 }
 
 kw_rcpp <- function(mtr, group) {

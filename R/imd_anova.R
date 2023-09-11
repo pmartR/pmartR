@@ -919,7 +919,10 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
       )
     )
   }
-
+  
+  # Everything assumes the group levels are in the order they appear
+  groupData$Group <- factor(groupData$Group, levels=unique(groupData$Group))
+  
   # ANOVA stuffs ---------------------------------------------------------------
   if (length(attr(get_group_DF(omicsData), "main_effects")) == 1) {
     ##---- One factor ANOVA ----##
@@ -928,9 +931,8 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
     gp <- factor(groupData$Group,labels=1:k,levels=unique(groupData$Group))
     
     # pre-compute coefficients of the non-interaction model
-    xmatrix <- build_x_mat(groupData[,c(main_effect_names, covariate_names)], intercept = FALSE)
-    xmatrix <- reduce_xmatrix(xmatrix,k)
-    Betas <- compute_betas(data.matrix(data),xmatrix, gp)
+    xmatrix <- model.matrix(~ 0 + ., groupData[c("Group", covariate_names)])
+    Betas <- compute_betas(data.matrix(data),xmatrix)
     
     #Rcpp::sourceCpp('~/pmartR/src/anova_helper_funs.cpp') #Run if debugging code
     raw_results <- anova_cpp(data.matrix(data),gp,1-equal_var, xmatrix, Betas)
@@ -961,6 +963,7 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
   #source('~/pmartR/R/group_comparison.R') # Run if debugging
   #Rcpp::sourceCpp('~/pmartR/src/group_comparisons.cpp') #Run if debugging
   xmatrix_g = build_x_mat(groupData[,c("Group", covariate_names)], intercept = FALSE)
+  # xmatrix_g = model.matrix(~0+., groupData[,c("Group", covariate_names)])
   
   group_comp <- group_comparison_anova(data=data.matrix(data), groupData=groupData[,c("Group", main_effect_names, covariate_names)],comparisons=comparisons, xmatrix = xmatrix_g, anova_results_full=list(Results=results,Sizes=raw_results$group_sizes))
   

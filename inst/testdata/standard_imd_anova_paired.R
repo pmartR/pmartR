@@ -458,12 +458,12 @@ attr(astan_1_0_3, "data_class") <- "pepData"
 
 # main effects: 1; covariates: 1; groups: 3 ---------------
 
-Xmatrix = Xmatrix_1_1_3
+Xmatrix = Xmatrix_1_1_3[,-5]
 
 gp <- factor(c(rep(1,5), rep(2,5), rep(3,5)),labels=1:3,levels=c(1,2,3))
-Betas = compute_betas(data_mat = data.matrix(diff_a_1_0_3[, -1]), Xmatrix = Xmatrix, gp = gp)
+Betas = compute_betas(data_mat = data.matrix(diff_a_1_0_3[, -1]), Xmatrix = Xmatrix)
 
-covariate_effects = Xmatrix[,4:5] %*% t(Betas[,4:5])
+covariate_effects = Xmatrix[,4] %*% t(Betas[,4])
 
 # Adjust the means to remove effect of covariates.
 adj_data_1_1_3 <- data.matrix(diff_a_1_0_3[, -1]) - t(covariate_effects)
@@ -510,7 +510,6 @@ SEs <- lapply(1:length(XTXs), function(i) {
   return(sqrt(SSE/denom))
 })
 
-
 nona_counts_1_1_3 <- rowSums(!is.na(adj_data_1_1_3))
 
 diffs_1_1_3 <- mean_a_1_1_3 %>%
@@ -521,7 +520,7 @@ diffs_1_1_3 <- mean_a_1_1_3 %>%
   ) %>%
   dplyr::select(diff_m_f, diff_m_a, diff_f_a)
 
-cmat = rbind(c(1, -1, 0, 0, 0), c(1, 0, -1, 0, 0), c(0, 1, -1, 0, 0))
+cmat = rbind(c(1, -1, 0, 0), c(1, 0, -1, 0), c(0, 1, -1, 0))
 diff_denoms <- lapply(1:length(XTXs), function(i) {
   sqrt(diag(cmat %*% XTXs[[i]] %*% t(cmat))) * SEs[[i]]
 })
@@ -896,11 +895,10 @@ flag_g_1_1_3 <- data.frame(
   )
 )
 
-Xmatrix = Xmatrix_1_1_3
-gp <- factor(c(rep(1,5), rep(2,5), rep(3,5)),labels=1:3,levels=c(1,2,3))
-Betas = compute_betas(data_mat = data.matrix(diff_g[, -1]), Xmatrix = Xmatrix, gp = gp)
+Xmatrix = Xmatrix_1_1_3[,-5]
+Betas = compute_betas(data_mat = data.matrix(diff_g[, -1]), Xmatrix = Xmatrix)
 
-covariate_effects = Xmatrix[,4:5] %*% t(Betas[,4:5])
+covariate_effects = Xmatrix[,4] %*% t(Betas[,4])
 
 # Adjust the means to remove effect of covariates.
 adj_data_g_1_1_3 <- data.matrix(diff_g[, -1]) - t(covariate_effects)
@@ -915,21 +913,21 @@ mean_g_1_1_3 <- data.frame(
                      na.rm = TRUE)
 )
 
+cmat = rbind(c(1, -1, 0, 0, 0), c(1, 0, -1, 0, 0), c(0, 1, -1, 0, 0))
+Betas = compute_betas(data_mat = data.matrix(diff_g[, -1]), Xmatrix = Xmatrix_1_1_3)
+Betas[,1:3][is.na(mean_g_1_1_3)] <- NA
+
+diffs_1_1_3 <- fold_change_diff(Betas, cmat)
+
 gstan_1_1_3 <- data.frame(
   Mass_Tag_ID = gfilta_1_1_3$e_data$Mass_Tag_ID,
   Count_Mock = unname(obs_mock),
   Count_FM = unname(obs_fm),
   Count_AM = unname(obs_am),
   mean_g_1_1_3,
-  Fold_change_Mock_vs_FM = (
-    mean_g_1_1_3[, 1] - mean_g_1_1_3[, 2]
-  ),
-  Fold_change_Mock_vs_AM = (
-    mean_g_1_1_3[, 1] - mean_g_1_1_3[, 3]
-  ),
-  Fold_change_FM_vs_AM = (
-    mean_g_1_1_3[, 2] - mean_g_1_1_3[, 3]
-  ),
+  Fold_change_Mock_vs_FM = diffs_1_1_3[,1],
+  Fold_change_Mock_vs_AM = diffs_1_1_3[,2],
+  Fold_change_FM_vs_AM = diffs_1_1_3[,3],
   P_value_G_Mock_vs_FM = pval_g_1_1_3[, 1],
   P_value_G_Mock_vs_AM = pval_g_1_1_3[, 2],
   P_value_G_FM_vs_AM = pval_g_1_1_3[, 3],

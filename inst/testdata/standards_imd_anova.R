@@ -241,6 +241,49 @@ cfilta_2_2_4 <- applyFilt(filta_2_2_4, pdata_2_2_4,
 
 # Assemble ANOVA standards -----------------------------------------------------
 
+Xmatrix_1_1_3 <- structure(c(1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 
+                             1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 
+                             1, 0, 1, 0, 1, 1, 0, 1, 1, 0), dim = c(12L, 4L))
+
+Xmatrix_1_1_3_full <-  structure(c(1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 
+                                 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 
+                                 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 
+                                 1), dim = c(12L, 5L))
+
+Xmatrix_1_2_3 <-  structure(c(1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 
+                            1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 
+                            1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 59.68, 37.16, 69.4, 73.12, 69.27, 
+                            47.68, 53.79, 19.45, 27.06, 30.07, 22.04, 31.57), dim = c(12L, 
+                                                                                      5L))
+Xmatrix_1_2_3_full <- structure(c(1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 
+                                  1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 
+                                  1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 
+                                  1, 59.68, 37.16, 69.4, 73.12, 69.27, 47.68, 53.79, 19.45, 27.06, 
+                                  30.07, 22.04, 31.57), dim = c(12L, 6L))
+
+Xmatrix_2_1_4 <-  structure(c(1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 
+                            1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 
+                            0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 
+                            1), dim = c(12L, 5L))
+
+Xmatrix_2_1_4_full <- structure(c(1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 
+                                  1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 
+                                  0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 1, 
+                                  0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1), dim = c(12L, 6L))
+
+Xmatrix_2_2_4 <- structure(c(1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 
+            1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 
+            0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 1, 
+            0, 59.68, 37.16, 69.4, 73.12, 69.27, 47.68, 53.79, 19.45, 27.06, 
+            30.07, 22.04, 31.57), dim = c(12L, 6L))
+
+Xmatrix_2_2_4_full <- structure(c(1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 
+                                  1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 
+                                  0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 1, 
+                                  0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 59.68, 37.16, 69.4, 73.12, 
+                                  69.27, 47.68, 53.79, 19.45, 27.06, 30.07, 22.04, 31.57), dim = c(12L, 
+                                                                                                   7L))
+
 # main effects: 1; covariates: 0; groups: 2 ---------------
 
 mean_a_1_0_2 <- data.frame(
@@ -323,18 +366,14 @@ attr(astan_1_0_2, "data_class") <- "pepData"
 # main effects: 1; covariates: 1; groups: 3 ---------------
 
 # Adjust the means to remove effect of covariates.
-adj_data_1_1_3 <- project_to_null(
-  data_mat = data.matrix(afilta_1_1_3$e_data[, -1]),
-  Xmatrix = structure(c(1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0,
-                        0, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0,
-                        0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1,
-                        1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0,
-                        0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1),
-                      .Dim = c(12L, 5L)),
-  ngroups = 3
-)
+Xmatrix = Xmatrix_1_1_3
+gp = factor(attr(afilta_1_1_3, "group_DF")$Group)
+Betas = compute_betas(data_mat = data.matrix(afilta_1_1_3$e_data[, -1]), Xmatrix = Xmatrix)
+covariate_effects = Xmatrix[,4] %*% t(Betas[,4])
 
-cov_df_1_2_3 <- 2
+# Adjust the means to remove effect of covariates, these should just actually be the parameter estimates.
+adj_data_1_1_3 <- data.matrix(afilta_1_1_3$e_data[, -1]) - t(covariate_effects)
+adj_data_1_1_3 <- as.data.frame(adj_data_1_1_3)
 
 mean_a_1_1_3 <- data.frame(
   Mean_mutant = rowMeans(adj_data_1_1_3[, c(1, 3:4, 9)],
@@ -344,6 +383,9 @@ mean_a_1_1_3 <- data.frame(
   Mean_human = rowMeans(adj_data_1_1_3[, 10:12],
                         na.rm = TRUE)
 )
+
+cmat = rbind(c(1, -1, 0, 0), c(1, 0, -1, 0), c(0, 1, -1, 0))
+test_values <- get_test_values(afilta_1_1_3$e_data[, -1], Xmatrix, cmat)
 
 group_counts_1_1_3 <- data.frame(
   nona_mutant = rowSums(!is.na(adj_data_1_1_3[, c(1, 3:4, 9)])),
@@ -355,29 +397,6 @@ group_counts_1_1_3 <- data.frame(
   dplyr::ungroup()
 
 nona_grps_1_1_3 <- rowSums(group_counts_1_1_3[, 1:3] != 0)
-
-sigma_1_1_3 <- adj_data_1_1_3 %>%
-  dplyr::mutate(mMutant = mean_a_1_1_3$Mean_mutant,
-                mZombie = mean_a_1_1_3$Mean_zombie,
-                mHuman = mean_a_1_1_3$Mean_human,
-                lg = group_counts_1_1_3$n_grp) %>%
-  dplyr::rowwise() %>%
-  dplyr::mutate(
-    sse = sum(
-      c((dplyr::c_across(c(Infection1, Infection3, Infection4, Infection9)) -
-           mMutant)^2,
-        (dplyr::c_across(c(Infection2, Infection5:Infection8)) - mZombie)^2,
-        (dplyr::c_across(Mock1:Mock3) - mHuman)^2),
-      na.rm = TRUE
-    ),
-    vari = sse / (sum(!is.na(dplyr::c_across(Infection1:Mock3))) -
-                    # first number: number groups
-                    # lg: number groups with all missing data
-                    # cov_df_1_2_3: degrees of freedom lost due to covariates
-                    (3 - lg) - cov_df_1_2_3)
-  ) %>%
-  dplyr::pull(vari)
-
 nona_counts_1_1_3 <- rowSums(!is.na(adj_data_1_1_3))
 
 diffs_1_1_3 <- mean_a_1_1_3 %>%
@@ -388,18 +407,16 @@ diffs_1_1_3 <- mean_a_1_1_3 %>%
   ) %>%
   dplyr::select(diff_m_z, diff_m_h, diff_z_h)
 
+diff_denoms <- test_values$diff_denoms
+colnames(diff_denoms) <- c("C1", "C2", "C3")
+
 test_stat_1_1_3 <- diffs_1_1_3 %>%
   cbind(group_counts_1_1_3) %>%
+  cbind(diff_denoms) %>%
   dplyr::mutate(
-    stat_m_z = (diff_m_z /
-                  sqrt((1/nona_mutant +
-                          1/nona_zombie) * sigma_1_1_3)),
-    stat_m_h = (diff_m_h /
-                  sqrt((1/nona_mutant +
-                          1/nona_human) * sigma_1_1_3)),
-    stat_z_h = (diff_z_h /
-                  sqrt((1/nona_zombie +
-                          1/nona_human) * sigma_1_1_3))
+    stat_m_z = (diff_m_z / C1),
+    stat_m_h = (diff_m_h / C2),
+    stat_z_h = (diff_z_h / C3)
   ) %>%
   dplyr::select(stat_m_z, stat_m_h, stat_z_h) %>%
   dplyr::ungroup() %>%
@@ -407,20 +424,19 @@ test_stat_1_1_3 <- diffs_1_1_3 %>%
 
 pval_a_1_1_3 <- test_stat_1_1_3 %>%
   dplyr::mutate(
-    lg = group_counts_1_1_3$n_grp,
     P_value_A_mutant_vs_zombie = pt(
       q = abs(stat_m_z),
-      df = nona_counts_1_1_3 - (3 - lg),
+      df = nona_counts_1_1_3 - test_values$ranks,
       lower.tail = FALSE
     ) * 2,
     P_value_A_mutant_vs_human = pt(
       q = abs(stat_m_h),
-      df = nona_counts_1_1_3 - (3 - lg),
+      df = nona_counts_1_1_3 - test_values$ranks,
       lower.tail = FALSE
     ) * 2,
     P_value_A_zombie_vs_human = pt(
       q = abs(stat_z_h),
-      df = nona_counts_1_1_3 - (3 - lg),
+      df = nona_counts_1_1_3 - test_values$ranks,
       lower.tail = FALSE
     ) * 2
   ) %>%
@@ -625,20 +641,14 @@ dunnett_1_1_3 <- pval_a_1_1_3 %>%
 # main effects: 1; covariates: 2; groups: 3 ---------------
 
 # Adjust the means to remove effect of covariates.
-adj_data_1_2_3 <- project_to_null(
-  data_mat = data.matrix(afilta_1_2_3$e_data[, -1]),
-  Xmatrix = structure(
-    c(1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1,
-      1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-      1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0,
-      1, 0, 1, 0, 0, 1, 0, 0, 1, 59.68, 37.16, 69.4, 73.12,
-      69.27, 47.68, 53.79, 19.45, 27.06, 30.07, 22.04, 31.57),
-    .Dim = c(12L, 6L)
-  ),
-  ngroups = 3
-)
+Xmatrix = Xmatrix_1_2_3
+gp = factor(attr(afilta_1_2_3, "group_DF")$Group)
+Betas = compute_betas(data_mat = data.matrix(afilta_1_2_3$e_data[, -1]), Xmatrix = Xmatrix)
+covariate_effects = Xmatrix[,4:5] %*% t(Betas[,4:5])
 
-cov_df_1_2_3 <- 3
+# Adjust the means to remove effect of covariates.
+adj_data_1_2_3 <- data.matrix(afilta_1_2_3$e_data[, -1]) - t(covariate_effects)
+adj_data_1_2_3 <- as.data.frame(adj_data_1_2_3)
 
 mean_a_1_2_3 <- data.frame(
   Mean_mutant = rowMeans(adj_data_1_2_3[, c(1, 3:4, 9)],
@@ -659,29 +669,6 @@ group_counts_1_2_3 <- data.frame(
   dplyr::ungroup()
 
 nona_grps_1_2_3 <- rowSums(group_counts_1_2_3[, 1:3] != 0)
-
-sigma_1_2_3 <- adj_data_1_2_3 %>%
-  dplyr::mutate(mMutant = mean_a_1_2_3$Mean_mutant,
-                mZombie = mean_a_1_2_3$Mean_zombie,
-                mHuman = mean_a_1_2_3$Mean_human,
-                lg = group_counts_1_2_3$n_grp) %>%
-  dplyr::rowwise() %>%
-  dplyr::mutate(
-    sse = sum(
-      c((dplyr::c_across(c(Infection1, Infection3, Infection4, Infection9)) -
-           mMutant)^2,
-        (dplyr::c_across(c(Infection2, Infection5:Infection8)) - mZombie)^2,
-        (dplyr::c_across(Mock1:Mock3) - mHuman)^2),
-      na.rm = TRUE
-    ),
-    vari = sse / (sum(!is.na(dplyr::c_across(Infection1:Mock3))) -
-                    # first number: number groups
-                    # lg: number groups with all missing data
-                    # cov_df_1_2_3: degrees of freedom lost due to covariates
-                    (3 - lg) - cov_df_1_2_3)
-  ) %>%
-  dplyr::pull(vari)
-
 nona_counts_1_2_3 <- rowSums(!is.na(adj_data_1_2_3))
 
 diffs_1_2_3 <- mean_a_1_2_3 %>%
@@ -692,19 +679,19 @@ diffs_1_2_3 <- mean_a_1_2_3 %>%
   ) %>%
   dplyr::select(diff_m_z, diff_m_h, diff_z_h)
 
+cmat = rbind(c(1, -1, 0, 0, 0), c(1, 0, -1, 0, 0), c(0, 1, -1, 0, 0))
+test_values <- get_test_values(afilta_1_2_3$e_data[, -1], Xmatrix, cmat)
+diff_denoms <- test_values$diff_denoms
+colnames(diff_denoms) <- c("C1", "C2", "C3")
+
 suppressWarnings(
   test_stat_1_2_3 <- diffs_1_2_3 %>%
+    cbind(diff_denoms) %>%
     cbind(group_counts_1_2_3) %>%
     dplyr::mutate(
-      stat_m_z = (diff_m_z /
-                    sqrt((1/nona_mutant +
-                            1/nona_zombie) * sigma_1_2_3)),
-      stat_m_h = (diff_m_h /
-                    sqrt((1/nona_mutant +
-                            1/nona_human) * sigma_1_2_3)),
-      stat_z_h = (diff_z_h /
-                    sqrt((1/nona_zombie +
-                            1/nona_human) * sigma_1_2_3))
+      stat_m_z = (diff_m_z / C1),
+      stat_m_h = (diff_m_h / C2),
+      stat_z_h = (diff_z_h / C3)
     ) %>%
     dplyr::select(stat_m_z, stat_m_h, stat_z_h) %>%
     dplyr::ungroup() %>%
@@ -716,17 +703,17 @@ pval_a_1_2_3 <- test_stat_1_2_3 %>%
     lg = group_counts_1_2_3$n_grp,
     P_value_A_mutant_vs_zombie = pt(
       q = abs(stat_m_z),
-      df = nona_counts_1_2_3 - (3 - lg),
+      df = nona_counts_1_2_3 - test_values$ranks,
       lower.tail = FALSE
     ) * 2,
     P_value_A_mutant_vs_human = pt(
       q = abs(stat_m_h),
-      df = nona_counts_1_2_3 - (3 - lg),
+      df = nona_counts_1_2_3 - test_values$ranks,
       lower.tail = FALSE
     ) * 2,
     P_value_A_zombie_vs_human = pt(
       q = abs(stat_z_h),
-      df = nona_counts_1_2_3 - (3 - lg),
+      df = nona_counts_1_2_3 - test_values$ranks,
       lower.tail = FALSE
     ) * 2
   ) %>%
@@ -1203,24 +1190,24 @@ dunnett_2_0_3 <- pval_a_2_0_3 %>%
 # main effects: 2; covariates: 1; groups: 4 ---------------
 
 # Adjust the means to remove effect of covariates.
-adj_data_2_1_4 <- project_to_null(
-  data_mat = data.matrix(afilta_2_1_4$e_data[, -1]),
-  Xmatrix = structure(c(1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0,
-                        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0,
-                        0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1,
-                        0, 1, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0,
-                        1, 0, 0, 1),
-                      .Dim = c(12L, 6L)),
-  ngroups = 4
-)
+Xmatrix = Xmatrix_2_1_4
+gp = factor(attr(afilta_2_1_4, "group_DF")$Group)
+Betas = compute_betas(data_mat = data.matrix(afilta_2_1_4$e_data[, -1]), Xmatrix = Xmatrix)
+covariate_effects = Xmatrix[,5] %*% t(Betas[,5])
 
-cov_df_2_1_4 <- 2
+# Adjust the means to remove effect of covariates.
+adj_data_2_1_4 <- data.matrix(afilta_2_1_4$e_data[, -1]) - t(covariate_effects)
+adj_data_2_1_4 <- as.data.frame(adj_data_2_1_4)
 
-cobra <- run_two_factor(data = data.matrix(adj_data_2_1_4),
-                        gpData = groupDF_2_1_4,
-                        red_df = matrix(cov_df_2_1_4,
-                                        nrow = nrow(adj_data_2_1_4),
-                                        ncol = 1))
+covariate_names = colnames(attr(attr(afilta_2_1_4, "group_DF"), "covariates"))[-1]
+main_effect_names = attr(attr(afilta_2_1_4, "group_DF"), "main_effects")
+group_sampnames <- groupDF_2_1_4[,get_fdata_cname(afilta_2_1_4)]
+groupData <- groupDF_2_1_4[group_sampnames %in% colnames(afilta_2_1_4$e_data),]
+groupData <- groupData %>% 
+  dplyr::left_join(afilta_2_1_4$f_data)
+
+cobra <- run_twofactor_cpp(data = data.matrix(afilta_2_1_4$e_data[, -1]),
+                        gpData = groupData[,c("Group", main_effect_names, covariate_names)], covar_names = c("Gender"))
 
 group_counts_2_1_4 <- data.frame(
   nona_Infection_high = rowSums(!is.na(adj_data_2_1_4[, c(1, 3, 5)])),
@@ -1231,51 +1218,51 @@ group_counts_2_1_4 <- data.frame(
   dplyr::ungroup()
 
 nona_grps_2_1_4 <- unname(rowSums(group_counts_2_1_4 != 0))
-
 nona_counts_2_1_4 <- unname(rowSums(!is.na(adj_data_2_1_4)))
 
-mean_a_2_1_4 <- data.frame(
-  Mean_Infection_high = cobra$par_estimates[, 1],
-  Mean_Infection_low = cobra$par_estimates[, 2],
-  Mean_Mock_high = cobra$par_estimates[, 3],
-  Mean_Mock_low = cobra$par_estimates[, 4]
-)
+mean_a_2_1_4 <- data.frame(cobra$adj_group_means) 
+colnames(mean_a_2_1_4) <- paste0("Mean_", colnames(mean_a_2_1_4))
 
-sigma_2_1_4 <- cobra$Sigma2
+cmat = rbind(c(1, -1, 0, 0, 0, 0), c(1, 0, -1, 0, 0, 0), c(1, 0, 0, -1, 0 ,0),
+             c(0, 1, -1, 0, 0, 0), c(0, 1, 0, -1, 0, 0), c(0, 0, 1, -1, 0, 0))
 
-diffs_2_1_4 <- mean_a_2_1_4 %>%
-  dplyr::mutate(
-    diff_ih_il = Mean_Infection_high - Mean_Infection_low,
-    diff_ih_mh = Mean_Infection_high - Mean_Mock_high,
-    diff_ih_ml = Mean_Infection_high - Mean_Mock_low,
-    diff_il_mh = Mean_Infection_low - Mean_Mock_high,
-    diff_il_ml = Mean_Infection_low - Mean_Mock_low,
-    diff_mh_ml = Mean_Mock_high - Mean_Mock_low
-  ) %>%
-  dplyr::select(diff_ih_il, diff_ih_mh, diff_ih_ml,
-                diff_il_mh, diff_il_ml, diff_mh_ml)
+
+Betas = compute_betas(data_mat = data.matrix(afilta_2_1_4$e_data[, -1]), Xmatrix = Xmatrix_2_1_4_full)
+Betas_na = Betas[,1:4]
+Betas_na[group_counts_2_1_4 == 0] <- NA
+Betas[,1:4] <- Betas_na
+
+diffs_2_1_4 <- fold_change_diff(Betas, cmat)
+diffs_2_1_4 <- as.data.frame(diffs_2_1_4) %>%
+  `colnames<-`(c("diff_ih_il", "diff_ih_mh", "diff_ih_ml", "diff_il_mh", "diff_il_ml", "diff_mh_ml"))
+
+# diffs_2_1_4 <- mean_a_2_1_4 %>%
+#   dplyr::mutate(
+#     diff_ih_il = Mean_Infection_high - Mean_Infection_low,
+#     diff_ih_mh = Mean_Infection_high - Mean_Mock_high,
+#     diff_ih_ml = Mean_Infection_high - Mean_Mock_low,
+#     diff_il_mh = Mean_Infection_low - Mean_Mock_high,
+#     diff_il_ml = Mean_Infection_low - Mean_Mock_low,
+#     diff_mh_ml = Mean_Mock_high - Mean_Mock_low
+#   ) %>%
+#   dplyr::select(diff_ih_il, diff_ih_mh, diff_ih_ml,
+#                 diff_il_mh, diff_il_ml, diff_mh_ml)
+
+test_values <- get_test_values(afilta_2_1_4$e_data[, -1], Xmatrix_2_1_4_full, cmat)
+
+diff_denoms <- test_values$diff_denoms
+colnames(diff_denoms) <- c("C1", "C2", "C3", "C4", "C5", "C6")
 
 test_stat_2_1_4 <- diffs_2_1_4 %>%
   cbind(group_counts_2_1_4) %>%
+  cbind(diff_denoms) %>%
   dplyr::mutate(
-    stat_ih_il = (diff_ih_il /
-                    sqrt((1/nona_Infection_high +
-                            1/nona_Infection_low) * sigma_2_1_4)),
-    stat_ih_mh = (diff_ih_mh /
-                    sqrt((1/nona_Infection_high +
-                            1/nona_Mock_high) * sigma_2_1_4)),
-    stat_ih_ml = (diff_ih_ml /
-                    sqrt((1/nona_Infection_high +
-                            1/nona_Mock_low) * sigma_2_1_4)),
-    stat_il_mh = (diff_il_mh /
-                    sqrt((1/nona_Infection_low +
-                            1/nona_Mock_high) * sigma_2_1_4)),
-    stat_il_ml = (diff_il_ml /
-                    sqrt((1/nona_Infection_low +
-                            1/nona_Mock_low) * sigma_2_1_4)),
-    stat_mh_ml = (diff_mh_ml /
-                    sqrt((1/nona_Mock_high +
-                            1/nona_Mock_low) * sigma_2_1_4))
+    stat_ih_il = (diff_ih_il / C1),
+    stat_ih_mh = (diff_ih_mh / C2),
+    stat_ih_ml = (diff_ih_ml / C3),
+    stat_il_mh = (diff_il_mh / C4),
+    stat_il_ml = (diff_il_ml / C5),
+    stat_mh_ml = (diff_mh_ml / C6)
   ) %>%
   dplyr::select(stat_ih_il, stat_ih_mh, stat_ih_ml,
                 stat_il_mh, stat_il_ml, stat_mh_ml) %>%
@@ -1287,32 +1274,32 @@ pval_a_2_1_4 <- test_stat_2_1_4 %>%
     lg = group_counts_2_1_4$n_grp,
     P_value_A_Infection_high_vs_Infection_low = pt(
       q = abs(stat_ih_il),
-      df = nona_counts_2_1_4 - nona_grps_2_1_4,
+      df = nona_counts_2_1_4 - test_values$ranks,
       lower.tail = FALSE
     ) * 2,
     P_value_A_Infection_high_vs_Mock_high = pt(
       q = abs(stat_ih_mh),
-      df = nona_counts_2_1_4 - nona_grps_2_1_4,
+      df = nona_counts_2_1_4 - test_values$ranks,
       lower.tail = FALSE
     ) * 2,
     P_value_A_Infection_high_vs_Mock_low = pt(
       q = abs(stat_ih_ml),
-      df = nona_counts_2_1_4 - nona_grps_2_1_4,
+      df = nona_counts_2_1_4 - test_values$ranks,
       lower.tail = FALSE
     ) * 2,
     P_value_A_Infection_low_vs_Mock_high = pt(
       q = abs(stat_il_mh),
-      df = nona_counts_2_1_4 - nona_grps_2_1_4,
+      df = nona_counts_2_1_4 - test_values$ranks,
       lower.tail = FALSE
     ) * 2,
     P_value_A_Infection_low_vs_Mock_low = pt(
       q = abs(stat_il_ml),
-      df = nona_counts_2_1_4 - nona_grps_2_1_4,
+      df = nona_counts_2_1_4 - test_values$ranks,
       lower.tail = FALSE
     ) * 2,
     P_value_A_Mock_high_vs_Mock_low = pt(
       q = abs(stat_mh_ml),
-      df = nona_counts_2_1_4 - nona_grps_2_1_4,
+      df = nona_counts_2_1_4 - test_values$ranks,
       lower.tail = FALSE
     ) * 2
   ) %>%
@@ -1326,38 +1313,38 @@ pval_a_2_1_4 <- test_stat_2_1_4 %>%
 
 flag_a_2_1_4 <- data.frame(
   Infection_high_vs_Infection_low = aflag(
-    grp1 = mean_a_2_1_4$Mean_Infection_high,
-    grp2 = mean_a_2_1_4$Mean_Infection_low,
+    grp1 = Betas[,1],
+    grp2 = Betas[,2],
     pvals = pval_a_2_1_4[, 1],
     cutoff = 0.05
   ),
   Infection_high_vs_Mock_high = aflag(
-    grp1 = mean_a_2_1_4$Mean_Infection_high,
-    grp2 = mean_a_2_1_4$Mean_Mock_high,
+    grp1 = Betas[,1],
+    grp2 = Betas[,3],
     pvals = pval_a_2_1_4[, 2],
     cutoff = 0.05
   ),
   Infection_high_vs_Mock_low = aflag(
-    grp1 = mean_a_2_1_4$Mean_Infection_high,
-    grp2 = mean_a_2_1_4$Mean_Mock_low,
+    grp1 = Betas[,1],
+    grp2 = Betas[,4],
     pvals = pval_a_2_1_4[, 3],
     cutoff = 0.05
   ),
   Infection_low_vs_Mock_high = aflag(
-    grp1 = mean_a_2_1_4$Mean_Infection_low,
-    grp2 = mean_a_2_1_4$Mean_Mock_high,
+    grp1 = Betas[,2],
+    grp2 = Betas[,3],
     pvals = pval_a_2_1_4[, 4],
     cutoff = 0.05
   ),
   Infection_low_vs_Mock_low = aflag(
-    grp1 = mean_a_2_1_4$Mean_Infection_low,
-    grp2 = mean_a_2_1_4$Mean_Mock_low,
+    grp1 = Betas[,2],
+    grp2 = Betas[,4],
     pvals = pval_a_2_1_4[, 5],
     cutoff = 0.05
   ),
   Mock_high_vs_Mock_low = aflag(
-    grp1 = mean_a_2_1_4$Mean_Mock_high,
-    grp2 = mean_a_2_1_4$Mean_Mock_low,
+    grp1 = Betas[,3],
+    grp2 = Betas[,4],
     pvals = pval_a_2_1_4[, 6],
     cutoff = 0.05
   )
@@ -1370,24 +1357,12 @@ astan_2_1_4 <- data.frame(
   Count_Mock_high = group_counts_2_1_4$nona_Mock_high,
   Count_Mock_low = group_counts_2_1_4$nona_Mock_low,
   mean_a_2_1_4,
-  Fold_change_Infection_high_vs_Infection_low = (
-    mean_a_2_1_4[, 1] - mean_a_2_1_4[, 2]
-  ),
-  Fold_change_Infection_high_vs_Mock_high = (
-    mean_a_2_1_4[, 1] - mean_a_2_1_4[, 3]
-  ),
-  Fold_change_Infection_high_vs_Mock_low = (
-    mean_a_2_1_4[, 1] - mean_a_2_1_4[, 4]
-  ),
-  Fold_change_Infection_low_vs_Mock_high = (
-    mean_a_2_1_4[, 2] - mean_a_2_1_4[, 3]
-  ),
-  Fold_change_Infection_low_vs_Mock_low = (
-    mean_a_2_1_4[, 2] - mean_a_2_1_4[, 4]
-  ),
-  Fold_change_Mock_high_vs_Mock_low = (
-    mean_a_2_1_4[, 3] - mean_a_2_1_4[, 4]
-  ),
+  Fold_change_Infection_high_vs_Infection_low = diffs_2_1_4$diff_ih_il,
+  Fold_change_Infection_high_vs_Mock_high = diffs_2_1_4$diff_ih_mh,
+  Fold_change_Infection_high_vs_Mock_low = diffs_2_1_4$diff_ih_ml,
+  Fold_change_Infection_low_vs_Mock_high = diffs_2_1_4$diff_il_mh,
+  Fold_change_Infection_low_vs_Mock_low = diffs_2_1_4$diff_il_ml,
+  Fold_change_Mock_high_vs_Mock_low = diffs_2_1_4$diff_mh_ml,
   pval_a_2_1_4,
   Flag_A_Infection_high_vs_Infection_low = flag_a_2_1_4[, 1],
   Flag_A_Infection_high_vs_Mock_high = flag_a_2_1_4[, 2],
@@ -1623,35 +1598,24 @@ dunnett_2_1_4 <- pval_a_2_1_4 %>%
 
 # main effects: 2; covariates: 2; groups: 4 ---------------
 
+Xmatrix = Xmatrix_2_2_4
+gp = factor(attr(afilta_2_2_4, "group_DF")$Group)
+Betas = compute_betas(data_mat = data.matrix(afilta_2_2_4$e_data[, -1]), Xmatrix = Xmatrix)
+covariate_effects = Xmatrix[,5:6] %*% t(Betas[,5:6])
+
 # Adjust the means to remove effect of covariates.
-adj_data_2_2_4 <- project_to_null(
-  data_mat = data.matrix(afilta_2_2_4$e_data[, -1]),
-  Xmatrix = structure(c(1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0,
-                        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0,
-                        0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1,
-                        0, 1, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0,
-                        1, 0, 0, 1, 59.68, 37.16, 69.4, 73.12, 69.27, 47.68,
-                        53.79, 19.45, 27.06, 30.07, 22.04, 31.57),
-                      .Dim = c(12L, 7L)),
-  ngroups = 4
-)
+adj_data_2_2_4 <- data.matrix(afilta_2_2_4$e_data[, -1]) - t(covariate_effects)
+adj_data_2_2_4 <- as.data.frame(adj_data_2_2_4)
 
-cov_df_2_2_4 <- 3
+covariate_names = colnames(attr(attr(afilta_2_2_4, "group_DF"), "covariates"))[-1]
+main_effect_names = attr(attr(afilta_2_2_4, "group_DF"), "main_effects")
+group_sampnames <- groupDF_2_2_4[,get_fdata_cname(afilta_2_2_4)]
+groupData <- groupDF_2_2_4[group_sampnames %in% colnames(afilta_2_2_4$e_data),]
+groupData <- groupData %>% 
+  dplyr::left_join(afilta_2_2_4$f_data)
 
-kungfu <- run_two_factor(data = data.matrix(adj_data_2_2_4),
-                         gpData = groupDF_2_2_4,
-                         red_df = matrix(cov_df_2_2_4,
-                                         nrow = nrow(adj_data_2_2_4),
-                                         ncol = 1))
-
-mean_a_2_2_4 <- data.frame(
-  Mean_Infection_high = kungfu$par_estimates[, 1],
-  Mean_Infection_low = kungfu$par_estimates[, 2],
-  Mean_Mock_high = kungfu$par_estimates[, 3],
-  Mean_Mock_low = kungfu$par_estimates[, 4]
-)
-
-sigma_2_2_4 <- kungfu$Sigma2
+cobra <- run_twofactor_cpp(data = data.matrix(afilta_2_2_4$e_data[, -1]),
+                           gpData = groupData[,c("Group", main_effect_names, covariate_names)], covar_names = c("Gender", "Age"))
 
 group_counts_2_2_4 <- data.frame(
   nona_Infection_high = rowSums(!is.na(adj_data_2_2_4[, c(1, 3, 5)])),
@@ -1661,82 +1625,77 @@ group_counts_2_2_4 <- data.frame(
 ) %>%
   dplyr::ungroup()
 
-nona_grps_2_2_4 <- rowSums(group_counts_2_2_4 != 0)
+nona_grps_2_2_4 <- unname(rowSums(group_counts_2_2_4 != 0))
+nona_counts_2_2_4 <- unname(rowSums(!is.na(adj_data_2_2_4)))
 
-nona_counts_2_2_4 <- rowSums(!is.na(adj_data_2_2_4))
+mean_a_2_2_4 <- data.frame(cobra$adj_group_means) 
+colnames(mean_a_2_2_4) <- paste0("Mean_", colnames(mean_a_2_2_4))
 
-diffs_2_2_4 <- mean_a_2_2_4 %>%
+cmat = rbind(c(1, -1, 0, 0, 0, 0, 0), c(1, 0, -1, 0, 0, 0, 0), c(1, 0, 0, -1, 0 ,0, 0),
+             c(0, 1, -1, 0, 0, 0, 0), c(0, 1, 0, -1, 0, 0, 0), c(0, 0, 1, -1, 0, 0, 0))
+
+
+Betas = compute_betas(data_mat = data.matrix(afilta_2_2_4$e_data[, -1]), Xmatrix = Xmatrix_2_2_4_full)
+Betas_na = Betas[,1:4]
+Betas_na[group_counts_2_2_4 == 0] <- NA
+Betas[,1:4] <- Betas_na
+
+diffs_2_2_4 <- fold_change_diff(Betas, cmat)
+diffs_2_2_4 <- as.data.frame(diffs_2_2_4) %>%
+  `colnames<-`(c("diff_ih_il", "diff_ih_mh", "diff_ih_ml", "diff_il_mh", "diff_il_ml", "diff_mh_ml"))
+
+test_values <- get_test_values(afilta_2_2_4$e_data[, -1], Xmatrix_2_2_4_full, cmat)
+
+diff_denoms <- test_values$diff_denoms
+colnames(diff_denoms) <- c("C1", "C2", "C3", "C4", "C5", "C6")
+
+test_stat_2_2_4 <- diffs_2_2_4 %>%
+  cbind(group_counts_2_2_4) %>%
+  cbind(diff_denoms) %>%
   dplyr::mutate(
-    diff_ih_il = Mean_Infection_high - Mean_Infection_low,
-    diff_ih_mh = Mean_Infection_high - Mean_Mock_high,
-    diff_ih_ml = Mean_Infection_high - Mean_Mock_low,
-    diff_il_mh = Mean_Infection_low - Mean_Mock_high,
-    diff_il_ml = Mean_Infection_low - Mean_Mock_low,
-    diff_mh_ml = Mean_Mock_high - Mean_Mock_low
+    stat_ih_il = (diff_ih_il / C1),
+    stat_ih_mh = (diff_ih_mh / C2),
+    stat_ih_ml = (diff_ih_ml / C3),
+    stat_il_mh = (diff_il_mh / C4),
+    stat_il_ml = (diff_il_ml / C5),
+    stat_mh_ml = (diff_mh_ml / C6)
   ) %>%
-  dplyr::select(diff_ih_il, diff_ih_mh, diff_ih_ml,
-                diff_il_mh, diff_il_ml, diff_mh_ml)
-
-suppressWarnings(
-  test_stat_2_2_4 <- diffs_2_2_4 %>%
-    cbind(group_counts_2_2_4) %>%
-    dplyr::mutate(
-      stat_ih_il = (diff_ih_il /
-                      sqrt((1/nona_Infection_high +
-                              1/nona_Infection_low) * sigma_2_2_4)),
-      stat_ih_mh = (diff_ih_mh /
-                      sqrt((1/nona_Infection_high +
-                              1/nona_Mock_high) * sigma_2_2_4)),
-      stat_ih_ml = (diff_ih_ml /
-                      sqrt((1/nona_Infection_high +
-                              1/nona_Mock_low) * sigma_2_2_4)),
-      stat_il_mh = (diff_il_mh /
-                      sqrt((1/nona_Infection_low +
-                              1/nona_Mock_high) * sigma_2_2_4)),
-      stat_il_ml = (diff_il_ml /
-                      sqrt((1/nona_Infection_low +
-                              1/nona_Mock_low) * sigma_2_2_4)),
-      stat_mh_ml = (diff_mh_ml /
-                      sqrt((1/nona_Mock_high +
-                              1/nona_Mock_low) * sigma_2_2_4))
-    ) %>%
-    dplyr::select(stat_ih_il, stat_ih_mh, stat_ih_ml,
-                  stat_il_mh, stat_il_ml, stat_mh_ml) %>%
-    dplyr::ungroup() %>%
-    `row.names<-`(NULL)
-)
+  dplyr::select(stat_ih_il, stat_ih_mh, stat_ih_ml,
+                stat_il_mh, stat_il_ml, stat_mh_ml) %>%
+  dplyr::ungroup() %>%
+  `row.names<-`(NULL)
 
 pval_a_2_2_4 <- test_stat_2_2_4 %>%
   dplyr::mutate(
     lg = group_counts_2_2_4$n_grp,
     P_value_A_Infection_high_vs_Infection_low = pt(
       q = abs(stat_ih_il),
-      df = nona_counts_2_2_4 - nona_grps_2_2_4,
+      df = nona_counts_2_2_4 - test_values$ranks,
       lower.tail = FALSE
     ) * 2,
     P_value_A_Infection_high_vs_Mock_high = pt(
       q = abs(stat_ih_mh),
-      df = nona_counts_2_2_4 - nona_grps_2_2_4,
+      df = nona_counts_2_2_4 - test_values$ranks,
       lower.tail = FALSE
     ) * 2,
     P_value_A_Infection_high_vs_Mock_low = pt(
       q = abs(stat_ih_ml),
-      df = nona_counts_2_2_4 - nona_grps_2_2_4,
+      df = nona_counts_2_2_4 - test_values$ranks,
       lower.tail = FALSE
     ) * 2,
     P_value_A_Infection_low_vs_Mock_high = pt(
       q = abs(stat_il_mh),
-      df = nona_counts_2_2_4 - nona_grps_2_2_4,
+      df = nona_counts_2_2_4 - test_values$ranks,
       lower.tail = FALSE
     ) * 2,
     P_value_A_Infection_low_vs_Mock_low = pt(
       q = abs(stat_il_ml),
-      df = nona_counts_2_2_4 - nona_grps_2_2_4,
+      df = nona_counts_2_2_4 - test_values$ranks,
       lower.tail = FALSE
     ) * 2,
     P_value_A_Mock_high_vs_Mock_low = pt(
       q = abs(stat_mh_ml),
-      df = nona_counts_2_2_4 - nona_grps_2_2_4,
+      df = nona_counts_2_2_4 - test_values$ranks,
       lower.tail = FALSE
     ) * 2
   ) %>%
@@ -1750,38 +1709,38 @@ pval_a_2_2_4 <- test_stat_2_2_4 %>%
 
 flag_a_2_2_4 <- data.frame(
   Infection_high_vs_Infection_low = aflag(
-    grp1 = mean_a_2_2_4$Mean_Infection_high,
-    grp2 = mean_a_2_2_4$Mean_Infection_low,
+    grp1 = Betas[,1],
+    grp2 = Betas[,2],
     pvals = pval_a_2_2_4[, 1],
     cutoff = 0.05
   ),
   Infection_high_vs_Mock_high = aflag(
-    grp1 = mean_a_2_2_4$Mean_Infection_high,
-    grp2 = mean_a_2_2_4$Mean_Mock_high,
+    grp1 = Betas[,1],
+    grp2 = Betas[,3],
     pvals = pval_a_2_2_4[, 2],
     cutoff = 0.05
   ),
   Infection_high_vs_Mock_low = aflag(
-    grp1 = mean_a_2_2_4$Mean_Infection_high,
-    grp2 = mean_a_2_2_4$Mean_Mock_low,
+    grp1 = Betas[,1],
+    grp2 = Betas[,4],
     pvals = pval_a_2_2_4[, 3],
     cutoff = 0.05
   ),
   Infection_low_vs_Mock_high = aflag(
-    grp1 = mean_a_2_2_4$Mean_Infection_low,
-    grp2 = mean_a_2_2_4$Mean_Mock_high,
+    grp1 = Betas[,2],
+    grp2 = Betas[,3],
     pvals = pval_a_2_2_4[, 4],
     cutoff = 0.05
   ),
   Infection_low_vs_Mock_low = aflag(
-    grp1 = mean_a_2_2_4$Mean_Infection_low,
-    grp2 = mean_a_2_2_4$Mean_Mock_low,
+    grp1 = Betas[,2],
+    grp2 = Betas[,4],
     pvals = pval_a_2_2_4[, 5],
     cutoff = 0.05
   ),
   Mock_high_vs_Mock_low = aflag(
-    grp1 = mean_a_2_2_4$Mean_Mock_high,
-    grp2 = mean_a_2_2_4$Mean_Mock_low,
+    grp1 = Betas[,3],
+    grp2 = Betas[,4],
     pvals = pval_a_2_2_4[, 6],
     cutoff = 0.05
   )
@@ -1794,24 +1753,12 @@ astan_2_2_4 <- data.frame(
   Count_Mock_high = group_counts_2_2_4$nona_Mock_high,
   Count_Mock_low = group_counts_2_2_4$nona_Mock_low,
   mean_a_2_2_4,
-  Fold_change_Infection_high_vs_Infection_low = (
-    mean_a_2_2_4[, 1] - mean_a_2_2_4[, 2]
-  ),
-  Fold_change_Infection_high_vs_Mock_high = (
-    mean_a_2_2_4[, 1] - mean_a_2_2_4[, 3]
-  ),
-  Fold_change_Infection_high_vs_Mock_low = (
-    mean_a_2_2_4[, 1] - mean_a_2_2_4[, 4]
-  ),
-  Fold_change_Infection_low_vs_Mock_high = (
-    mean_a_2_2_4[, 2] - mean_a_2_2_4[, 3]
-  ),
-  Fold_change_Infection_low_vs_Mock_low = (
-    mean_a_2_2_4[, 2] - mean_a_2_2_4[, 4]
-  ),
-  Fold_change_Mock_high_vs_Mock_low = (
-    mean_a_2_2_4[, 3] - mean_a_2_2_4[, 4]
-  ),
+  Fold_change_Infection_high_vs_Infection_low = diffs_2_2_4$diff_ih_il,
+  Fold_change_Infection_high_vs_Mock_high = diffs_2_2_4$diff_ih_mh,
+  Fold_change_Infection_high_vs_Mock_low = diffs_2_2_4$diff_ih_ml,
+  Fold_change_Infection_low_vs_Mock_high = diffs_2_2_4$diff_il_mh,
+  Fold_change_Infection_low_vs_Mock_low = diffs_2_2_4$diff_il_ml,
+  Fold_change_Mock_high_vs_Mock_low = diffs_2_2_4$diff_mh_ml,
   pval_a_2_2_4,
   Flag_A_Infection_high_vs_Infection_low = flag_a_2_2_4[, 1],
   Flag_A_Infection_high_vs_Mock_high = flag_a_2_2_4[, 2],
@@ -2250,14 +2197,26 @@ flag_g_1_1_3 <- data.frame(
   )
 )
 
+Betas = compute_betas(data_mat = data.matrix(gfilta_1_1_3$e_data[, -1]), Xmatrix = Xmatrix_1_1_3)
+covariate_effects = Xmatrix_1_1_3[,4] %*% t(Betas[,4])
+
+adj_data_g_1_1_3 <- data.matrix(gfilta_1_1_3$e_data[, -1]) - t(covariate_effects)
+adj_data_g_1_1_3 <- as.data.frame(adj_data_g_1_1_3)
+
 mean_1_1_3 <- data.frame(
-  Mean_mutant = rowMeans(gfilta_1_1_3$e_data[, c(2, 4, 5, 10)],
+  Mean_mutant = rowMeans(adj_data_g_1_1_3[, c(1, 3, 4, 9)],
                          na.rm = TRUE),
-  Mean_zombie = rowMeans(gfilta_1_1_3$e_data[, c(3, 6:9)],
+  Mean_zombie = rowMeans(adj_data_g_1_1_3[, c(2, 5:8)],
                          na.rm = TRUE),
-  Mean_human = rowMeans(gfilta_1_1_3$e_data[, c(11:13)],
+  Mean_human = rowMeans(adj_data_g_1_1_3[, c(10:12)],
                         na.rm = TRUE)
 )
+
+cmat = rbind(c(1, -1, 0, 0, 0), c(1, 0, -1, 0, 0), c(0, 1, -1, 0, 0))
+Betas = compute_betas(data_mat = data.matrix(gfilta_1_1_3$e_data[,-1]), Xmatrix = Xmatrix_1_1_3_full)
+Betas[,1:3][is.na(mean_1_1_3)] <- NA
+
+diffs_1_1_3 <- fold_change_diff(Betas, cmat)
 
 gstan_1_1_3 <- data.frame(
   Mass_Tag_ID = gfilta_1_1_3$e_data$Mass_Tag_ID,
@@ -2265,15 +2224,9 @@ gstan_1_1_3 <- data.frame(
   Count_zombie = unname(obs_zom_1_1_3),
   Count_human = unname(obs_hum_1_1_3),
   mean_1_1_3,
-  Fold_change_mutant_vs_zombie = (
-    mean_1_1_3[, 1] - mean_1_1_3[, 2]
-  ),
-  Fold_change_mutant_vs_human = (
-    mean_1_1_3[, 1] - mean_1_1_3[, 3]
-  ),
-  Fold_change_zombie_vs_human = (
-    mean_1_1_3[, 2] - mean_1_1_3[, 3]
-  ),
+  Fold_change_mutant_vs_zombie = diffs_1_1_3[,1],
+  Fold_change_mutant_vs_human = diffs_1_1_3[,2],
+  Fold_change_zombie_vs_human = diffs_1_1_3[,3],
   pval_g_1_1_3,
   flag_g_1_1_3,
   row.names = NULL
@@ -2400,14 +2353,27 @@ flag_g_1_2_3 <- data.frame(
   )
 )
 
+Betas = compute_betas(data_mat = data.matrix(gfilta_1_2_3$e_data[, -1]), Xmatrix = Xmatrix_1_2_3)
+covariate_effects = Xmatrix_1_2_3[,4:5] %*% t(Betas[,4:5])
+
+adj_data_g_1_2_3 <- data.matrix(gfilta_1_2_3$e_data[, -1]) - t(covariate_effects)
+adj_data_g_1_2_3 <- as.data.frame(adj_data_g_1_2_3)
+
+
 mean_1_2_3 <- data.frame(
-  Mean_mutant = rowMeans(gfilta_1_2_3$e_data[, c(2, 4, 5, 10)],
+  Mean_mutant = rowMeans(adj_data_g_1_2_3[, c(1, 3, 4, 9)],
                          na.rm = TRUE),
-  Mean_zombie = rowMeans(gfilta_1_2_3$e_data[, c(3, 6:9)],
+  Mean_zombie = rowMeans(adj_data_g_1_2_3[, c(2, 5:8)],
                          na.rm = TRUE),
-  Mean_human = rowMeans(gfilta_1_2_3$e_data[, c(11:13)],
+  Mean_human = rowMeans(adj_data_g_1_2_3[, c(10:12)],
                         na.rm = TRUE)
 )
+
+cmat = rbind(c(1, -1, 0, 0, 0 , 0), c(1, 0, -1, 0, 0, 0), c(0, 1, -1, 0, 0, 0))
+Betas = compute_betas(data_mat = data.matrix(gfilta_1_2_3$e_data[,-1]), Xmatrix = Xmatrix_1_2_3_full)
+Betas[,1:3][is.na(mean_1_2_3)] <- NA
+
+diffs_1_2_3 <- fold_change_diff(Betas, cmat)
 
 gstan_1_2_3 <- data.frame(
   Mass_Tag_ID = gfilta_1_2_3$e_data$Mass_Tag_ID,
@@ -2415,15 +2381,9 @@ gstan_1_2_3 <- data.frame(
   Count_zombie = unname(obs_zom_1_2_3),
   Count_human = unname(obs_hum_1_2_3),
   mean_1_2_3,
-  Fold_change_mutant_vs_zombie = (
-    mean_1_2_3[, 1] - mean_1_2_3[, 2]
-  ),
-  Fold_change_mutant_vs_human = (
-    mean_1_2_3[, 1] - mean_1_2_3[, 3]
-  ),
-  Fold_change_zombie_vs_human = (
-    mean_1_2_3[, 2] - mean_1_2_3[, 3]
-  ),
+  Fold_change_mutant_vs_zombie = diffs_1_2_3[,1],
+  Fold_change_mutant_vs_human = diffs_1_2_3[,2],
+  Fold_change_zombie_vs_human = diffs_1_2_3[,3],
   pval_g_1_2_3,
   flag_g_1_2_3,
   row.names = NULL
@@ -2756,18 +2716,28 @@ flag_g_2_1_4 <- data.frame(
   )
 )
 
-dragon <- run_two_factor(data = data.matrix(gfilta_2_1_4$e_data[, -1]),
-                         gpData = groupDF_2_1_4,
-                         red_df = matrix(0,
-                                         nrow = nrow(gfilta_2_1_4$e_data),
-                                         ncol = 1))
+gdf = dplyr::left_join(groupDF_2_1_4, attr(groupDF_2_1_4, "covariates")) %>%
+  dplyr::select(-SampleID)
+dragon <- run_twofactor_cpp(data = data.matrix(gfilta_2_1_4$e_data[, -1]),
+                         gpData = gdf, "Gender")
 
 mean_2_1_4 <- data.frame(
-  Mean_Infection_high = dragon$par_estimates[, 1],
-  Mean_Infection_low = dragon$par_estimates[, 2],
-  Mean_Mock_high = dragon$par_estimates[, 3],
-  Mean_Mock_low = dragon$par_estimates[, 4]
+  Mean_Infection_high = dragon$adj_group_means[, 1],
+  Mean_Infection_low = dragon$adj_group_means[, 2],
+  Mean_Mock_high = dragon$adj_group_means[, 3],
+  Mean_Mock_low = dragon$adj_group_means[, 4]
 )
+
+cmat = rbind(c(1, -1, 0, 0, 0, 0), c(1, 0, -1, 0, 0, 0), c(1, 0, 0, -1, 0 ,0),
+             c(0, 1, -1, 0, 0, 0), c(0, 1, 0, -1, 0, 0), c(0, 0, 1, -1, 0, 0))
+
+
+Betas = compute_betas(data_mat = data.matrix(gfilta_2_1_4$e_data[, -1]), Xmatrix = Xmatrix_2_1_4_full)
+Betas[,1:4][is.na(mean_2_1_4)] <- NA
+
+diffs_2_1_4 <- fold_change_diff(Betas, cmat)
+diffs_2_1_4 <- as.data.frame(diffs_2_1_4) %>%
+  `colnames<-`(c("Fold_change_Infection_high_vs_Infection_low", "Fold_change_Infection_high_vs_Mock_high", "Fold_change_Infection_high_vs_Mock_low", "Fold_change_Infection_low_vs_Mock_high", "Fold_change_Infection_low_vs_Mock_low", "Fold_change_Mock_high_vs_Mock_low"))
 
 gstan_2_1_4 <- data.frame(
   Mass_Tag_ID = gfilta_2_1_4$e_data$Mass_Tag_ID,
@@ -2776,24 +2746,7 @@ gstan_2_1_4 <- data.frame(
   Count_Mock_high = unname(obs_mh_2_1_4),
   Count_Mock_low = unname(obs_ml_2_1_4),
   mean_2_1_4,
-  Fold_change_Infection_high_vs_Infection_low = (
-    mean_2_1_4[, 1] - mean_2_1_4[, 2]
-  ),
-  Fold_change_Infection_high_vs_Mock_high = (
-    mean_2_1_4[, 1] - mean_2_1_4[, 3]
-  ),
-  Fold_change_Infection_high_vs_Mock_low = (
-    mean_2_1_4[, 1] - mean_2_1_4[, 4]
-  ),
-  Fold_change_Infection_low_vs_Mock_high = (
-    mean_2_1_4[, 2] - mean_2_1_4[, 3]
-  ),
-  Fold_change_Infection_low_vs_Mock_low = (
-    mean_2_1_4[, 2] - mean_2_1_4[, 4]
-  ),
-  Fold_change_Mock_high_vs_Mock_low = (
-    mean_2_1_4[, 3] - mean_2_1_4[, 4]
-  ),
+  diffs_2_1_4,
   pval_g_2_1_4,
   flag_g_2_1_4,
   row.names = NULL
@@ -3001,18 +2954,27 @@ flag_g_2_2_4 <- data.frame(
   )
 )
 
-mustang <- run_two_factor(data = data.matrix(gfilta_2_1_4$e_data[, -1]),
-                          gpData = groupDF_2_1_4,
-                          red_df = matrix(0,
-                                          nrow = nrow(gfilta_2_1_4$e_data),
-                                          ncol = 1))
+gdf = dplyr::left_join(groupDF_2_2_4, attr(groupDF_2_2_4, "covariates")) %>%
+  dplyr::select(-SampleID)
+mustang <- run_twofactor_cpp(data = data.matrix(gfilta_2_2_4$e_data[, -1]),
+                          gpData = gdf, c("Gender", "Age"))
 
 mean_2_2_4 <- data.frame(
-  Mean_Infection_high = mustang$par_estimates[, 1],
-  Mean_Infection_low = mustang$par_estimates[, 2],
-  Mean_Mock_high = mustang$par_estimates[, 3],
-  Mean_Mock_low = mustang$par_estimates[, 4]
+  Mean_Infection_high = mustang$adj_group_means[, 1],
+  Mean_Infection_low = mustang$adj_group_means[, 2],
+  Mean_Mock_high = mustang$adj_group_means[, 3],
+  Mean_Mock_low = mustang$adj_group_means[, 4]
 )
+
+cmat = rbind(c(1, -1, 0, 0, 0, 0, 0), c(1, 0, -1, 0, 0, 0, 0), c(1, 0, 0, -1, 0 ,0, 0),
+             c(0, 1, -1, 0, 0, 0, 0), c(0, 1, 0, -1, 0, 0, 0), c(0, 0, 1, -1, 0, 0, 0))
+
+Betas = compute_betas(data_mat = data.matrix(gfilta_2_2_4$e_data[, -1]), Xmatrix = Xmatrix_2_2_4_full)
+Betas[,1:4][is.na(mean_2_2_4)] <- NA
+
+diffs_2_2_4 <- fold_change_diff(Betas, cmat)
+diffs_2_2_4 <- as.data.frame(diffs_2_2_4) %>%
+  `colnames<-`(c("Fold_change_Infection_high_vs_Infection_low", "Fold_change_Infection_high_vs_Mock_high", "Fold_change_Infection_high_vs_Mock_low", "Fold_change_Infection_low_vs_Mock_high", "Fold_change_Infection_low_vs_Mock_low", "Fold_change_Mock_high_vs_Mock_low"))
 
 gstan_2_2_4 <- data.frame(
   Mass_Tag_ID = gfilta_2_2_4$e_data$Mass_Tag_ID,
@@ -3021,24 +2983,7 @@ gstan_2_2_4 <- data.frame(
   Count_Mock_high = unname(obs_mh_2_2_4),
   Count_Mock_low = unname(obs_ml_2_2_4),
   mean_2_2_4,
-  Fold_change_Infection_high_vs_Infection_low = (
-    mean_2_2_4[, 1] - mean_2_2_4[, 2]
-  ),
-  Fold_change_Infection_high_vs_Mock_high = (
-    mean_2_2_4[, 1] - mean_2_2_4[, 3]
-  ),
-  Fold_change_Infection_high_vs_Mock_low = (
-    mean_2_2_4[, 1] - mean_2_2_4[, 4]
-  ),
-  Fold_change_Infection_low_vs_Mock_high = (
-    mean_2_2_4[, 2] - mean_2_2_4[, 3]
-  ),
-  Fold_change_Infection_low_vs_Mock_low = (
-    mean_2_2_4[, 2] - mean_2_2_4[, 4]
-  ),
-  Fold_change_Mock_high_vs_Mock_low = (
-    mean_2_2_4[, 3] - mean_2_2_4[, 4]
-  ),
+  diffs_2_2_4,
   pval_g_2_2_4,
   flag_g_2_2_4,
   row.names = NULL

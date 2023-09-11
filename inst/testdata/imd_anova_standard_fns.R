@@ -1,5 +1,41 @@
 # ANOVA and G-test functions ---------------------------------------------------
 
+get_test_values <- function(data, Xmatrix, cmat) {
+  mymiss <- data %>% apply(1, function(x) !is.na(x))
+  ranks <- sapply(1:ncol(mymiss), function(i) {
+    col = mymiss[,i]
+    rank = Matrix::rankMatrix(Xmatrix[col,])
+  })
+  
+  XTXs <- lapply(1:ncol(mymiss), function(i) {
+    col = mymiss[,i]
+    return(MASS::ginv(t(Xmatrix[col,]) %*% Xmatrix[col,]))
+  })
+  
+  SEs <- lapply(1:length(XTXs), function(i) {
+    nona_idx = mymiss[,i]
+    y = unlist(data[i,][nona_idx])
+    H = Xmatrix[nona_idx,] %*% XTXs[[i]] %*% t(Xmatrix[nona_idx,])
+    resids = y - (H %*% y)
+    SSE = sum(resids^2)
+    denom = sum(nona_idx) - ranks[i]
+    return(sqrt(SSE/denom))
+  })
+  
+  diff_denoms <- lapply(1:length(XTXs), function(i) {
+    sqrt(diag(cmat %*% XTXs[[i]] %*% t(cmat))) * SEs[[i]]
+  })
+  
+  diff_denoms <- do.call(rbind, diff_denoms)
+  
+  return(list(
+    "XTXs" = XTXs,
+    "SEs" = SEs,
+    "diff_denoms" = diff_denoms,
+    "ranks" = ranks
+  ))
+}
+
 # Function to construct the null space projection matrix.
 proj_mat <- function(X, ngroups){
   #If the X matrix has atleast two rows, find projection matrix
@@ -28,7 +64,7 @@ proj_mat <- function(X, ngroups){
 # e_data). These functions are not used for examples when there is no
 # significant interaction between the main effects, for any of the biomolecules,
 # because the mean and variance computations are the same for every row.
-run_two_factor <- function (data, gpData, red_df) {
+run_two_factor <- function (data, gpData) {
 
   #Create design matrix for reduced model, i.e., no interaction effect
   colnames(gpData)[-c(1,2)] <- c("Factor1","Factor2")
@@ -38,14 +74,16 @@ run_two_factor <- function (data, gpData, red_df) {
   #interaction effects
   Xred <- unname(model.matrix(lm(y ~ Factor1 + Factor2 - 1, data = gpData)))
   Xfull <- unname(model.matrix(lm(y ~ Factor1*Factor2 - 1, data = gpData)))
-
+  
+  covar_inds = which(!(attr(Xred, "assign") %in% c(1,2)))
+  
   res <- two_factor_anova_r(
     y = data,
     X_full = Xfull,
     X_red = Xred,
-    red_df = red_df,
     group_ids = as.numeric(factor(gpData$Group,
-                                  levels = unique(gpData$Group)))
+                                  levels = unique(gpData$Group))),
+    covar_inds = covar_inds
   )
 
   #Get the unique group levels to translate ANOVA parameters into group means
@@ -62,8 +100,8 @@ run_two_factor <- function (data, gpData, red_df) {
 two_factor_anova_r <- function (y,
                                 X_full,
                                 X_red,
-                                red_df,
-                                group_ids) {
+                                group_ids, 
+                                covar_inds=NULL) {
 
   n <- nrow(y)
   p_red <- ncol(X_red)
@@ -109,11 +147,9 @@ two_factor_anova_r <- function (y,
 
     #Subtract off df spent elsewhere, e.g., on covariates
     df_red <- (nrow(X_red_nona) -
-                 Matrix::rankMatrix(X_red_nona)[[1]] -
-                 red_df[i, ])
+                 Matrix::rankMatrix(X_red_nona)[[1]])
     df_full <- (nrow(X_full_nona) -
-                  Matrix::rankMatrix(X_full_nona)[[1]] -
-                  red_df[i, ])
+                  Matrix::rankMatrix(X_full_nona)[[1]])
 
     PxRed <- X_red_nona %*% MASS::ginv(
       t(X_red_nona) %*% X_red_nona
@@ -174,9 +210,16 @@ two_factor_anova_r <- function (y,
     }
 
     #"Parameter estimates" are the group means: Xbeta_hat=X(XpX)^{-1}XpY
-    par_ests_temp <- (XFinal %*% MASS::ginv(t(XFinal) %*% XFinal) %*%
+    par_ests_temp <- (MASS::ginv(t(XFinal) %*% XFinal) %*%
                         t(XFinal) %*% yrowi_nona)
-
+    
+    # remove covariate effects
+    if (!is.null(covar_inds)) {
+      XFinal[,covar_inds] = 0
+    }
+    
+    par_ests_temp <- Xfinal %*% par_ests_temp
+    
     #Find groups that had at least one non-missing value
     group_ids_nona_unq <- unique(group_ids_nona)
 
