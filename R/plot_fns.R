@@ -6472,14 +6472,6 @@ make_volcano_plot_df <- function(x) {
     pvals$Type <- "ANOVA"
   } else pvals$Type <- attr(x, "statistical_test")
 
-  pvals$Comparison <-
-    gsub(
-      pattern = "^P_value_(G|A)_",
-      replacement = "",
-      pvals$Comparison,
-      perl = T
-    )
-
   volcano <-
     merge(merge(fc_data, pvals, all = TRUE), fc_flags, all = TRUE)
 
@@ -6488,7 +6480,7 @@ make_volcano_plot_df <- function(x) {
     gsub(
       pattern = "_vs_",
       replacement = " vs ",
-      volcano$Comparison
+      attributes(x)$comparisons
     )
 
   # create counts for gtest plot (number present in each group)
