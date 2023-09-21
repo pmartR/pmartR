@@ -6468,21 +6468,41 @@ make_volcano_plot_df <- function(x) {
     pvals$Type <- "G-test"
     pvals$Type[grep(pattern = "^P_value_A_", x = pvals$Comparison)] <-
       "ANOVA"
+    pvals$Comparison <-
+      gsub(
+        pattern = "^P_value_(G|A)_",
+        replacement = "",
+        pvals$Comparison,
+        perl = T
+      )
   } else if (attr(x, "statistical_test") == "gtest") {
     pvals$Type <- "G-test"
+    pvals$Comparison <-
+      gsub(
+        pattern = "^P_value_G_",
+        replacement = "",
+        pvals$Comparison,
+        perl = T
+      )
   } else if (attr(x, "statistical_test") == "anova") {
     pvals$Type <- "ANOVA"
-  } else pvals$Type <- attr(x, "statistical_test")
-
-  ## assumes silly people won't call a group A_vs or G_vs for seqdata
-  ## Negative lookahead permits groups called A or G tho
-  pvals$Comparison <-
-    gsub(
-      pattern = "^P_value_((G|A)_(?!vs))*",
-      replacement = "",
-      pvals$Comparison,
-      perl = T
-    )
+    pvals$Comparison <-
+      gsub(
+        pattern = "^P_value_A_",
+        replacement = "",
+        pvals$Comparison,
+        perl = T
+      )
+  } else {
+    pvals$Type <- attr(x, "statistical_test")
+    pvals$Comparison <-
+      gsub(
+        pattern = "^P_value_",
+        replacement = "",
+        pvals$Comparison,
+        perl = T
+      )
+  }
 
   volcano <-
     merge(merge(fc_data, pvals, all = TRUE), fc_flags, all = TRUE)
@@ -6492,7 +6512,7 @@ make_volcano_plot_df <- function(x) {
     gsub(
       pattern = "_vs_",
       replacement = " vs ",
-      volcano$Comparison
+      pvals$Comparison
     )
 
   # create counts for gtest plot (number present in each group)
@@ -6782,7 +6802,17 @@ gtest_heatmap <-
     ) %>%
       `colnames<-`(c("Count_First_Group", "Count_Second_Group", "Comparison"))
 
-    gtest_counts <- all_counts %>% dplyr::left_join(gtest_counts)
+    gtest_counts <- all_counts %>% dplyr::left_join(gtest_counts) %>%
+      dplyr::mutate(
+        Count_First_Group = factor(
+            Count_First_Group,
+            levels = sort(unique(as.numeric(Count_First_Group)))
+          ),
+        Count_Second_Group = factor(
+            Count_Second_Group,
+            levels = sort(unique(as.numeric(Count_Second_Group)))
+          )
+      )
 
     if (!interactive) {
       p <- ggplot2::ggplot(gtest_counts) +
