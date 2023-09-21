@@ -9,7 +9,20 @@ This R package provides functionality for quality control processing, statistica
 
 ## Installation:
 
-``` r
+(**Recommended**) To install the latest *release*:
+```r
+devtools::install_github("pmartR/pmartR@*release")
+```
+
+To install a specific release, say v2.4.0:
+
+```r
+devtools::install_github("pmartR/pmartR@v2.4.0")
+```
+
+**(Not recommended, since these changes are likely still being tested)** You can also install the latest changes to master:
+
+```r
 devtools::install_github("pmartR/pmartR")
 ```
 
@@ -22,6 +35,23 @@ There is a problem that causes pmartR to fail compiling cpp code, which has some
     - On Catalina 10.15.7 I downloaded and installed gfortran 8.2 from the link provided in [this blog post](https://thecoatlessprofessor.com/programming/cpp/r-compiler-tools-for-rcpp-on-macos/#google_vignette)  
 2.  When using the homebrew gfortran installation, add the line **FLIBS = -L\`gfortran -print-file-name=libgfortran.dylib | xargs dirname\`** to ~/.R/Makevars (a plain text file with no extention)
 
+### gfortran and Apple silicon (M1/M2 chips)
+
+There are similarly issues with compilation in newer Mac chips.  We recommend to install gcc-13 from homebrew `brew install gcc` or the universal version from https://mac.r-project.org/tools/.  
+
+Additionally, some users experience errors with `ld:  Assertion failed ...` as seen [here](https://developer.apple.com/forums/thread/737707).  One solution is to use the old linker by making sure gcc uses the flag `-ld64` [(Xcode docs)](https://developer.apple.com/documentation/xcode-release-notes/xcode-15-release-notes#Linking).  To do this, you can edit `~/.R/Makevars` to include this flag, for example by appending it to LDFLAGS with +=:
+
+```
+# in ~/.R/Makevars
+LDFLAGS+=-ld64
+```
+
+or specifying it in your compiler command:
+
+```
+# in ~/.R/Makevars
+CC=/usr/local/bin/gcc -ld64
+```
 
 ## Tutorial:
 
