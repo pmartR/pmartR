@@ -298,7 +298,7 @@ DESeq2_wrapper <- function(omicsData, test = "Wald", p_adjust = "BH",
     ## and m is the number of samples. Excludes groups w/ only 2 samples
     independentFiltering = FALSE,
     pAdjustMethod = p_adjust,
-    tidy = TRUE,
+    tidy = F,
     parallel = TRUE
   )
 
@@ -315,6 +315,7 @@ DESeq2_wrapper <- function(omicsData, test = "Wald", p_adjust = "BH",
 
     ## Run tests
     res <- do.call(DESeq2::results, args = run_results)
+    res <- as.data.frame(res)
 
     res[["row"]] <- NULL
     # Flag stuffs ----------------------------------------------------------------
