@@ -198,12 +198,10 @@ groupie <- data.frame(
   Group = c(rep("Mock", 5), rep("FM", 5), rep("AM", 5))
 )
 
-Xmatrix_1_1_3 = structure(c(1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                            0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                            0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1,
-                            0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0,
-                            0, 1, 0, 0, 1, 1, 0),
-                          .Dim = c(15L, 5L))
+Xmatrix_1_1_3 = structure(c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 
+0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0, 
+1), dim = c(15L, 4L))
 
 # Assemble ANOVA standards -----------------------------------------------------
 
@@ -457,13 +455,9 @@ attr(astan_1_0_3, "cnames") <- list(
 attr(astan_1_0_3, "data_class") <- "pepData"
 
 # main effects: 1; covariates: 1; groups: 3 ---------------
+Betas = compute_betas(data_mat = data.matrix(diff_a_1_0_3[, -1]), Xmatrix = Xmatrix_1_1_3)
 
-Xmatrix = Xmatrix_1_1_3[,-5]
-
-gp <- factor(c(rep(1,5), rep(2,5), rep(3,5)),labels=1:3,levels=c(1,2,3))
-Betas = compute_betas(data_mat = data.matrix(diff_a_1_0_3[, -1]), Xmatrix = Xmatrix)
-
-covariate_effects = Xmatrix[,4] %*% t(Betas[,4])
+covariate_effects = Xmatrix_1_1_3[,4] %*% t(Betas[,4])
 
 # Adjust the means to remove effect of covariates.
 adj_data_1_1_3 <- data.matrix(diff_a_1_0_3[, -1]) - t(covariate_effects)
@@ -492,18 +486,18 @@ nona_grps_1_1_3 <- rowSums(group_counts_1_1_3[, 1:3] != 0)
 mymiss <- diff_a_1_0_3[, -1] %>% apply(1, function(x) !is.na(x))
 ranks <- sapply(1:ncol(mymiss), function(i) {
   col = mymiss[,i]
-  rank = Matrix::rankMatrix(Xmatrix[col,])
+  rank = Matrix::rankMatrix(Xmatrix_1_1_3[col,])
 })
 
 XTXs <- lapply(1:ncol(mymiss), function(i) {
   col = mymiss[,i]
-  rank = MASS::ginv(t(Xmatrix[col,]) %*% Xmatrix[col,])
+  rank = MASS::ginv(t(Xmatrix_1_1_3[col,]) %*% Xmatrix_1_1_3[col,])
 })
 
 SEs <- lapply(1:length(XTXs), function(i) {
   nona_idx = mymiss[,i]
   y = unlist(diff_a_1_0_3[i,-1][nona_idx])
-  H = Xmatrix[nona_idx,] %*% XTXs[[i]] %*% t(Xmatrix[nona_idx,])
+  H = Xmatrix_1_1_3[nona_idx,] %*% XTXs[[i]] %*% t(Xmatrix_1_1_3[nona_idx,])
   resids = y - (H %*% y)
   SSE = sum(resids^2)
   denom = sum(nona_idx) - ranks[i] + group_counts_1_1_3$n_grp[1]
@@ -520,7 +514,12 @@ diffs_1_1_3 <- mean_a_1_1_3 %>%
   ) %>%
   dplyr::select(diff_m_f, diff_m_a, diff_f_a)
 
-cmat = rbind(c(1, -1, 0, 0), c(1, 0, -1, 0), c(0, 1, -1, 0))
+cmat = rbind(c(1, -1, 0), c(1, 0, -1), c(0, 1, -1))
+beta_to_mu = Xmatrix_1_1_3
+beta_to_mu[,4] = 0
+beta_to_mu = unique(beta_to_mu)
+cmat = cmat %*% beta_to_mu
+
 diff_denoms <- lapply(1:length(XTXs), function(i) {
   sqrt(diag(cmat %*% XTXs[[i]] %*% t(cmat))) * SEs[[i]]
 })
@@ -895,7 +894,7 @@ flag_g_1_1_3 <- data.frame(
   )
 )
 
-Xmatrix = Xmatrix_1_1_3[,-5]
+Xmatrix = Xmatrix_1_1_3
 Betas = compute_betas(data_mat = data.matrix(diff_g[, -1]), Xmatrix = Xmatrix)
 
 covariate_effects = Xmatrix[,4] %*% t(Betas[,4])
@@ -913,11 +912,17 @@ mean_g_1_1_3 <- data.frame(
                      na.rm = TRUE)
 )
 
-cmat = rbind(c(1, -1, 0, 0, 0), c(1, 0, -1, 0, 0), c(0, 1, -1, 0, 0))
+cmat = rbind(c(1, -1, 0, 0), c(1, 0, -1, 0), c(0, 1, -1, 0))
 Betas = compute_betas(data_mat = data.matrix(diff_g[, -1]), Xmatrix = Xmatrix_1_1_3)
 Betas[,1:3][is.na(mean_g_1_1_3)] <- NA
 
-diffs_1_1_3 <- fold_change_diff(Betas, cmat)
+diffs_1_1_3 <- mean_g_1_1_3 %>%
+  dplyr::mutate(
+    diff_m_f = Mean_Mock - Mean_FM,
+    diff_m_a = Mean_Mock - Mean_AM,
+    diff_f_a = Mean_FM - Mean_AM
+  ) %>%
+  dplyr::select(diff_m_f, diff_m_a, diff_f_a)
 
 gstan_1_1_3 <- data.frame(
   Mass_Tag_ID = gfilta_1_1_3$e_data$Mass_Tag_ID,

@@ -125,16 +125,21 @@ BEGIN_RCPP
 END_RCPP
 }
 // group_comparison_anova_cpp
-List group_comparison_anova_cpp(arma::mat data, arma::mat sizes, arma::mat X, arma::mat C);
-RcppExport SEXP _pmartR_group_comparison_anova_cpp(SEXP dataSEXP, SEXP sizesSEXP, SEXP XSEXP, SEXP CSEXP) {
+List group_comparison_anova_cpp(arma::mat means, arma::mat data, arma::mat sizes, arma::mat which_xmatrix, arma::mat Xfull, arma::mat Xred, arma::mat Cfull, arma::mat Cred, arma::mat Cmu);
+RcppExport SEXP _pmartR_group_comparison_anova_cpp(SEXP meansSEXP, SEXP dataSEXP, SEXP sizesSEXP, SEXP which_xmatrixSEXP, SEXP XfullSEXP, SEXP XredSEXP, SEXP CfullSEXP, SEXP CredSEXP, SEXP CmuSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type means(meansSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type data(dataSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type sizes(sizesSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type C(CSEXP);
-    rcpp_result_gen = Rcpp::wrap(group_comparison_anova_cpp(data, sizes, X, C));
+    Rcpp::traits::input_parameter< arma::mat >::type which_xmatrix(which_xmatrixSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type Xfull(XfullSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type Xred(XredSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type Cfull(CfullSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type Cred(CredSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type Cmu(CmuSEXP);
+    rcpp_result_gen = Rcpp::wrap(group_comparison_anova_cpp(means, data, sizes, which_xmatrix, Xfull, Xred, Cfull, Cred, Cmu));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -208,7 +213,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_pmartR_fold_change_diff_na_okay", (DL_FUNC) &_pmartR_fold_change_diff_na_okay, 2},
     {"_pmartR_anova_cpp", (DL_FUNC) &_pmartR_anova_cpp, 5},
     {"_pmartR_two_factor_anova_cpp", (DL_FUNC) &_pmartR_two_factor_anova_cpp, 5},
-    {"_pmartR_group_comparison_anova_cpp", (DL_FUNC) &_pmartR_group_comparison_anova_cpp, 4},
+    {"_pmartR_group_comparison_anova_cpp", (DL_FUNC) &_pmartR_group_comparison_anova_cpp, 9},
     {"_pmartR_holm_cpp", (DL_FUNC) &_pmartR_holm_cpp, 1},
     {"_pmartR_ptukey_speed", (DL_FUNC) &_pmartR_ptukey_speed, 2},
     {"_pmartR_compute_betas", (DL_FUNC) &_pmartR_compute_betas, 2},

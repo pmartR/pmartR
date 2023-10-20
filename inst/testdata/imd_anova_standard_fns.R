@@ -1,5 +1,4 @@
 # ANOVA and G-test functions ---------------------------------------------------
-
 get_test_values <- function(data, Xmatrix, cmat) {
   mymiss <- data %>% apply(1, function(x) !is.na(x))
   ranks <- sapply(1:ncol(mymiss), function(i) {
@@ -23,6 +22,47 @@ get_test_values <- function(data, Xmatrix, cmat) {
   })
   
   diff_denoms <- lapply(1:length(XTXs), function(i) {
+    sqrt(diag(cmat %*% XTXs[[i]] %*% t(cmat))) * SEs[[i]]
+  })
+  
+  diff_denoms <- do.call(rbind, diff_denoms)
+  
+  return(list(
+    "XTXs" = XTXs,
+    "SEs" = SEs,
+    "diff_denoms" = diff_denoms,
+    "ranks" = ranks
+  ))
+}
+
+get_test_values_twofactor <- function(data, Xred, Xfull, Cred, Cfull, which_X) {
+  mymiss <- data %>% apply(1, function(x) !is.na(x))
+  ranks <- sapply(1:ncol(mymiss), function(i) {
+    col = mymiss[,i]
+    Xmatrix = if (which_X[i] == 0) Xred else Xfull
+    rank = Matrix::rankMatrix(Xmatrix[col,])
+    return(rank)
+  })
+  
+  XTXs <- lapply(1:ncol(mymiss), function(i) {
+    col = mymiss[,i]
+    Xmatrix = if (which_X[i] == 0) Xred else Xfull
+    return(MASS::ginv(t(Xmatrix[col,]) %*% Xmatrix[col,]))
+  })
+  
+  SEs <- lapply(1:length(XTXs), function(i) {
+    Xmatrix = if (which_X[i] == 0) Xred else Xfull
+    nona_idx = mymiss[,i]
+    y = unlist(data[i,][nona_idx])
+    H = Xmatrix[nona_idx,] %*% XTXs[[i]] %*% t(Xmatrix[nona_idx,])
+    resids = y - (H %*% y)
+    SSE = sum(resids^2)
+    denom = sum(nona_idx) - ranks[i]
+    return(sqrt(SSE/denom))
+  })
+  
+  diff_denoms <- lapply(1:length(XTXs), function(i) {
+    cmat = if (which_X[i] == 0) Cred else Cfull
     sqrt(diag(cmat %*% XTXs[[i]] %*% t(cmat))) * SEs[[i]]
   })
   

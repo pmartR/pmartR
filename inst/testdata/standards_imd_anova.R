@@ -241,49 +241,38 @@ cfilta_2_2_4 <- applyFilt(filta_2_2_4, pdata_2_2_4,
 
 # Assemble ANOVA standards -----------------------------------------------------
 
-Xmatrix_1_1_3 <- structure(c(1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 
-                             1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 
-                             1, 0, 1, 0, 1, 1, 0, 1, 1, 0), dim = c(12L, 4L))
+Xmatrix_1_1_3 <- structure(c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 1, 
+1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 
+1, 0, 1, 0, 1, 1, 0, 1, 1, 0), dim = c(12L, 4L))
 
-Xmatrix_1_1_3_full <-  structure(c(1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 
-                                 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 
-                                 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 
-                                 1), dim = c(12L, 5L))
+Xmatrix_1_2_3 <-  structure(c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 1, 
+1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 
+1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 59.68, 37.16, 69.4, 73.12, 69.27, 
+47.68, 53.79, 19.45, 27.06, 30.07, 22.04, 31.57), dim = c(12L, 
+5L))
 
-Xmatrix_1_2_3 <-  structure(c(1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 
-                            1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 
-                            1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 59.68, 37.16, 69.4, 73.12, 69.27, 
-                            47.68, 53.79, 19.45, 27.06, 30.07, 22.04, 31.57), dim = c(12L, 
-                                                                                      5L))
-Xmatrix_1_2_3_full <- structure(c(1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 
-                                  1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 
-                                  1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 
-                                  1, 59.68, 37.16, 69.4, 73.12, 69.27, 47.68, 53.79, 19.45, 27.06, 
-                                  30.07, 22.04, 31.57), dim = c(12L, 6L))
+Xmatrix_2_1_4  <-  structure(c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 
+0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 0, 
+1, 0, 1, 0, 1, 1, 0, 1, 1, 0), dim = c(12L, 4L))
 
-Xmatrix_2_1_4 <-  structure(c(1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 
-                            1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 
-                            0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 
-                            1), dim = c(12L, 5L))
+# with interaction effect
+Xmatrix_2_1_4_full  <- structure(c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 
+0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 0, 
+1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 
+0), dim = c(12L, 5L))
 
-Xmatrix_2_1_4_full <- structure(c(1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 
-                                  1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 
-                                  0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 1, 
-                                  0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1), dim = c(12L, 6L))
+Xmatrix_2_2_4 <- structure(c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 
+0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 0, 
+1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 59.68, 37.16, 69.4, 73.12, 69.27, 
+47.68, 53.79, 19.45, 27.06, 30.07, 22.04, 31.57), dim = c(12L, 
+5L))
 
-Xmatrix_2_2_4 <- structure(c(1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 
-            1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 
-            0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 1, 
-            0, 59.68, 37.16, 69.4, 73.12, 69.27, 47.68, 53.79, 19.45, 27.06, 
-            30.07, 22.04, 31.57), dim = c(12L, 6L))
-
-Xmatrix_2_2_4_full <- structure(c(1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 
-                                  1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 
-                                  0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 1, 
-                                  0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 59.68, 37.16, 69.4, 73.12, 
-                                  69.27, 47.68, 53.79, 19.45, 27.06, 30.07, 22.04, 31.57), dim = c(12L, 
-                                                                                                   7L))
-
+# with interaction effect
+Xmatrix_2_2_4_full <- structure(c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 
+0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 0, 
+1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 59.68, 37.16, 69.4, 73.12, 69.27, 
+47.68, 53.79, 19.45, 27.06, 30.07, 22.04, 31.57, 0, 0, 0, 0, 
+0, 0, 0, 0, 1, 1, 1, 0), dim = c(12L, 6L))
 # main effects: 1; covariates: 0; groups: 2 ---------------
 
 mean_a_1_0_2 <- data.frame(
@@ -366,10 +355,8 @@ attr(astan_1_0_2, "data_class") <- "pepData"
 # main effects: 1; covariates: 1; groups: 3 ---------------
 
 # Adjust the means to remove effect of covariates.
-Xmatrix = Xmatrix_1_1_3
-gp = factor(attr(afilta_1_1_3, "group_DF")$Group)
-Betas = compute_betas(data_mat = data.matrix(afilta_1_1_3$e_data[, -1]), Xmatrix = Xmatrix)
-covariate_effects = Xmatrix[,4] %*% t(Betas[,4])
+Betas = compute_betas(data_mat = data.matrix(afilta_1_1_3$e_data[, -1]), Xmatrix = data.matrix(Xmatrix_1_1_3))
+covariate_effects = Xmatrix_1_1_3[,4] %*% t(Betas[,4])
 
 # Adjust the means to remove effect of covariates, these should just actually be the parameter estimates.
 adj_data_1_1_3 <- data.matrix(afilta_1_1_3$e_data[, -1]) - t(covariate_effects)
@@ -384,8 +371,13 @@ mean_a_1_1_3 <- data.frame(
                         na.rm = TRUE)
 )
 
-cmat = rbind(c(1, -1, 0, 0), c(1, 0, -1, 0), c(0, 1, -1, 0))
-test_values <- get_test_values(afilta_1_1_3$e_data[, -1], Xmatrix, cmat)
+cmat = rbind(c(1, -1, 0), c(1, 0, -1), c(0, 1, -1))
+beta_to_mu = Xmatrix_1_1_3
+beta_to_mu[, 4] = 0
+beta_to_mu = unique(beta_to_mu)
+cmat = cmat %*% beta_to_mu
+
+test_values <- get_test_values(afilta_1_1_3$e_data[, -1], Xmatrix_1_1_3, cmat)
 
 group_counts_1_1_3 <- data.frame(
   nona_mutant = rowSums(!is.na(adj_data_1_1_3[, c(1, 3:4, 9)])),
@@ -641,10 +633,8 @@ dunnett_1_1_3 <- pval_a_1_1_3 %>%
 # main effects: 1; covariates: 2; groups: 3 ---------------
 
 # Adjust the means to remove effect of covariates.
-Xmatrix = Xmatrix_1_2_3
-gp = factor(attr(afilta_1_2_3, "group_DF")$Group)
-Betas = compute_betas(data_mat = data.matrix(afilta_1_2_3$e_data[, -1]), Xmatrix = Xmatrix)
-covariate_effects = Xmatrix[,4:5] %*% t(Betas[,4:5])
+Betas = compute_betas(data_mat = data.matrix(afilta_1_2_3$e_data[, -1]), Xmatrix = data.matrix(Xmatrix_1_2_3))
+covariate_effects = Xmatrix_1_2_3[,4:5] %*% t(Betas[,4:5])
 
 # Adjust the means to remove effect of covariates.
 adj_data_1_2_3 <- data.matrix(afilta_1_2_3$e_data[, -1]) - t(covariate_effects)
@@ -679,8 +669,13 @@ diffs_1_2_3 <- mean_a_1_2_3 %>%
   ) %>%
   dplyr::select(diff_m_z, diff_m_h, diff_z_h)
 
-cmat = rbind(c(1, -1, 0, 0, 0), c(1, 0, -1, 0, 0), c(0, 1, -1, 0, 0))
-test_values <- get_test_values(afilta_1_2_3$e_data[, -1], Xmatrix, cmat)
+cmat = rbind(c(1, -1, 0), c(1, 0, -1), c(0, 1, -1))
+beta_to_mu = Xmatrix_1_2_3
+beta_to_mu[, 4:5] = 0
+beta_to_mu = unique(beta_to_mu)
+cmat = cmat %*% beta_to_mu
+
+test_values <- get_test_values(afilta_1_2_3$e_data[, -1], Xmatrix_1_2_3, cmat)
 diff_denoms <- test_values$diff_denoms
 colnames(diff_denoms) <- c("C1", "C2", "C3")
 
@@ -1189,15 +1184,7 @@ dunnett_2_0_3 <- pval_a_2_0_3 %>%
 
 # main effects: 2; covariates: 1; groups: 4 ---------------
 
-# Adjust the means to remove effect of covariates.
-Xmatrix = Xmatrix_2_1_4
-gp = factor(attr(afilta_2_1_4, "group_DF")$Group)
-Betas = compute_betas(data_mat = data.matrix(afilta_2_1_4$e_data[, -1]), Xmatrix = Xmatrix)
-covariate_effects = Xmatrix[,5] %*% t(Betas[,5])
-
-# Adjust the means to remove effect of covariates.
-adj_data_2_1_4 <- data.matrix(afilta_2_1_4$e_data[, -1]) - t(covariate_effects)
-adj_data_2_1_4 <- as.data.frame(adj_data_2_1_4)
+data = data.matrix(afilta_2_1_4$e_data[, -1])
 
 covariate_names = colnames(attr(attr(afilta_2_1_4, "group_DF"), "covariates"))[-1]
 main_effect_names = attr(attr(afilta_2_1_4, "group_DF"), "main_effects")
@@ -1210,45 +1197,46 @@ cobra <- run_twofactor_cpp(data = data.matrix(afilta_2_1_4$e_data[, -1]),
                         gpData = groupData[,c("Group", main_effect_names, covariate_names)], covar_names = c("Gender"))
 
 group_counts_2_1_4 <- data.frame(
-  nona_Infection_high = rowSums(!is.na(adj_data_2_1_4[, c(1, 3, 5)])),
-  nona_Infection_low = rowSums(!is.na(adj_data_2_1_4[, c(2, 4, 6)])),
-  nona_Mock_high = rowSums(!is.na(adj_data_2_1_4[, c(7, 8, 12)])),
-  nona_Mock_low = rowSums(!is.na(adj_data_2_1_4[, c(9, 10, 11)]))
+  nona_Infection_high = rowSums(!is.na(data[, c(1, 3, 5)])),
+  nona_Infection_low = rowSums(!is.na(data[, c(2, 4, 6)])),
+  nona_Mock_high = rowSums(!is.na(data[, c(7, 8, 12)])),
+  nona_Mock_low = rowSums(!is.na(data[, c(9, 10, 11)]))
 ) %>%
   dplyr::ungroup()
 
 nona_grps_2_1_4 <- unname(rowSums(group_counts_2_1_4 != 0))
-nona_counts_2_1_4 <- unname(rowSums(!is.na(adj_data_2_1_4)))
+nona_counts_2_1_4 <- unname(rowSums(!is.na(data)))
 
 mean_a_2_1_4 <- data.frame(cobra$adj_group_means) 
 colnames(mean_a_2_1_4) <- paste0("Mean_", colnames(mean_a_2_1_4))
 
-cmat = rbind(c(1, -1, 0, 0, 0, 0), c(1, 0, -1, 0, 0, 0), c(1, 0, 0, -1, 0 ,0),
-             c(0, 1, -1, 0, 0, 0), c(0, 1, 0, -1, 0, 0), c(0, 0, 1, -1, 0, 0))
+diffs_2_1_4 <- mean_a_2_1_4 %>%
+  dplyr::mutate(
+    diff_ih_il = Mean_Infection_high - Mean_Infection_low,
+    diff_ih_mh = Mean_Infection_high - Mean_Mock_high,
+    diff_ih_ml = Mean_Infection_high - Mean_Mock_low,
+    diff_il_mh = Mean_Infection_low - Mean_Mock_high,
+    diff_il_ml = Mean_Infection_low - Mean_Mock_low,
+    diff_mh_ml = Mean_Mock_high - Mean_Mock_low
+  ) %>%
+  dplyr::select(diff_ih_il, diff_ih_mh, diff_ih_ml,
+                diff_il_mh, diff_il_ml, diff_mh_ml)
 
 
-Betas = compute_betas(data_mat = data.matrix(afilta_2_1_4$e_data[, -1]), Xmatrix = Xmatrix_2_1_4_full)
-Betas_na = Betas[,1:4]
-Betas_na[group_counts_2_1_4 == 0] <- NA
-Betas[,1:4] <- Betas_na
+cmat = rbind(c(1, -1, 0, 0), c(1, 0, -1, 0), c(1, 0, 0, -1),
+             c(0, 1, -1, 0), c(0, 1, 0, -1), c(0, 0, 1, -1))
 
-diffs_2_1_4 <- fold_change_diff(Betas, cmat)
-diffs_2_1_4 <- as.data.frame(diffs_2_1_4) %>%
-  `colnames<-`(c("diff_ih_il", "diff_ih_mh", "diff_ih_ml", "diff_il_mh", "diff_il_ml", "diff_mh_ml"))
+beta_to_mu <- Xmatrix_2_1_4
+beta_to_mu[,4] <- 0
+beta_to_mu <- unique(beta_to_mu)
+cmat_red <- cmat %*% beta_to_mu
 
-# diffs_2_1_4 <- mean_a_2_1_4 %>%
-#   dplyr::mutate(
-#     diff_ih_il = Mean_Infection_high - Mean_Infection_low,
-#     diff_ih_mh = Mean_Infection_high - Mean_Mock_high,
-#     diff_ih_ml = Mean_Infection_high - Mean_Mock_low,
-#     diff_il_mh = Mean_Infection_low - Mean_Mock_high,
-#     diff_il_ml = Mean_Infection_low - Mean_Mock_low,
-#     diff_mh_ml = Mean_Mock_high - Mean_Mock_low
-#   ) %>%
-#   dplyr::select(diff_ih_il, diff_ih_mh, diff_ih_ml,
-#                 diff_il_mh, diff_il_ml, diff_mh_ml)
+beta_to_mu_full <- Xmatrix_2_1_4_full
+beta_to_mu_full[,4] <- 0
+beta_to_mu_full <- unique(beta_to_mu_full)
+cmat_full <- cmat %*% beta_to_mu_full
 
-test_values <- get_test_values(afilta_2_1_4$e_data[, -1], Xmatrix_2_1_4_full, cmat)
+test_values <- get_test_values_twofactor(afilta_2_1_4$e_data[, -1], Xmatrix_2_1_4, Xmatrix_2_1_4_full, cmat_red, cmat_full, cobra$which_X)
 
 diff_denoms <- test_values$diff_denoms
 colnames(diff_denoms) <- c("C1", "C2", "C3", "C4", "C5", "C6")
@@ -1313,38 +1301,38 @@ pval_a_2_1_4 <- test_stat_2_1_4 %>%
 
 flag_a_2_1_4 <- data.frame(
   Infection_high_vs_Infection_low = aflag(
-    grp1 = Betas[,1],
-    grp2 = Betas[,2],
+    grp1 = mean_a_2_1_4[,1],
+    grp2 = mean_a_2_1_4[,2],
     pvals = pval_a_2_1_4[, 1],
     cutoff = 0.05
   ),
   Infection_high_vs_Mock_high = aflag(
-    grp1 = Betas[,1],
-    grp2 = Betas[,3],
+    grp1 = mean_a_2_1_4[,1],
+    grp2 = mean_a_2_1_4[,3],
     pvals = pval_a_2_1_4[, 2],
     cutoff = 0.05
   ),
   Infection_high_vs_Mock_low = aflag(
-    grp1 = Betas[,1],
-    grp2 = Betas[,4],
+    grp1 = mean_a_2_1_4[,1],
+    grp2 = mean_a_2_1_4[,4],
     pvals = pval_a_2_1_4[, 3],
     cutoff = 0.05
   ),
   Infection_low_vs_Mock_high = aflag(
-    grp1 = Betas[,2],
-    grp2 = Betas[,3],
+    grp1 = mean_a_2_1_4[,2],
+    grp2 = mean_a_2_1_4[,3],
     pvals = pval_a_2_1_4[, 4],
     cutoff = 0.05
   ),
   Infection_low_vs_Mock_low = aflag(
-    grp1 = Betas[,2],
-    grp2 = Betas[,4],
+    grp1 = mean_a_2_1_4[,2],
+    grp2 = mean_a_2_1_4[,4],
     pvals = pval_a_2_1_4[, 5],
     cutoff = 0.05
   ),
   Mock_high_vs_Mock_low = aflag(
-    grp1 = Betas[,3],
-    grp2 = Betas[,4],
+    grp1 = mean_a_2_1_4[,3],
+    grp2 = mean_a_2_1_4[,4],
     pvals = pval_a_2_1_4[, 6],
     cutoff = 0.05
   )
@@ -1597,15 +1585,7 @@ dunnett_2_1_4 <- pval_a_2_1_4 %>%
                 pval_il_mh, pval_il_ml, pval_mh_ml)
 
 # main effects: 2; covariates: 2; groups: 4 ---------------
-
-Xmatrix = Xmatrix_2_2_4
-gp = factor(attr(afilta_2_2_4, "group_DF")$Group)
-Betas = compute_betas(data_mat = data.matrix(afilta_2_2_4$e_data[, -1]), Xmatrix = Xmatrix)
-covariate_effects = Xmatrix[,5:6] %*% t(Betas[,5:6])
-
-# Adjust the means to remove effect of covariates.
-adj_data_2_2_4 <- data.matrix(afilta_2_2_4$e_data[, -1]) - t(covariate_effects)
-adj_data_2_2_4 <- as.data.frame(adj_data_2_2_4)
+data = data.matrix(afilta_2_2_4$e_data[, -1])
 
 covariate_names = colnames(attr(attr(afilta_2_2_4, "group_DF"), "covariates"))[-1]
 main_effect_names = attr(attr(afilta_2_2_4, "group_DF"), "main_effects")
@@ -1618,33 +1598,45 @@ cobra <- run_twofactor_cpp(data = data.matrix(afilta_2_2_4$e_data[, -1]),
                            gpData = groupData[,c("Group", main_effect_names, covariate_names)], covar_names = c("Gender", "Age"))
 
 group_counts_2_2_4 <- data.frame(
-  nona_Infection_high = rowSums(!is.na(adj_data_2_2_4[, c(1, 3, 5)])),
-  nona_Infection_low = rowSums(!is.na(adj_data_2_2_4[, c(2, 4, 6)])),
-  nona_Mock_high = rowSums(!is.na(adj_data_2_2_4[, c(7, 8, 12)])),
-  nona_Mock_low = rowSums(!is.na(adj_data_2_2_4[, c(9, 10, 11)]))
+  nona_Infection_high = rowSums(!is.na(data[, c(1, 3, 5)])),
+  nona_Infection_low = rowSums(!is.na(data[, c(2, 4, 6)])),
+  nona_Mock_high = rowSums(!is.na(data[, c(7, 8, 12)])),
+  nona_Mock_low = rowSums(!is.na(data[, c(9, 10, 11)]))
 ) %>%
   dplyr::ungroup()
 
 nona_grps_2_2_4 <- unname(rowSums(group_counts_2_2_4 != 0))
-nona_counts_2_2_4 <- unname(rowSums(!is.na(adj_data_2_2_4)))
+nona_counts_2_2_4 <- unname(rowSums(!is.na(data)))
 
 mean_a_2_2_4 <- data.frame(cobra$adj_group_means) 
 colnames(mean_a_2_2_4) <- paste0("Mean_", colnames(mean_a_2_2_4))
 
-cmat = rbind(c(1, -1, 0, 0, 0, 0, 0), c(1, 0, -1, 0, 0, 0, 0), c(1, 0, 0, -1, 0 ,0, 0),
-             c(0, 1, -1, 0, 0, 0, 0), c(0, 1, 0, -1, 0, 0, 0), c(0, 0, 1, -1, 0, 0, 0))
+diffs_2_2_4 <- mean_a_2_2_4 %>%
+  dplyr::mutate(
+    diff_ih_il = Mean_Infection_high - Mean_Infection_low,
+    diff_ih_mh = Mean_Infection_high - Mean_Mock_high,
+    diff_ih_ml = Mean_Infection_high - Mean_Mock_low,
+    diff_il_mh = Mean_Infection_low - Mean_Mock_high,
+    diff_il_ml = Mean_Infection_low - Mean_Mock_low,
+    diff_mh_ml = Mean_Mock_high - Mean_Mock_low
+  ) %>%
+  dplyr::select(diff_ih_il, diff_ih_mh, diff_ih_ml,
+                diff_il_mh, diff_il_ml, diff_mh_ml)
 
+cmat = rbind(c(1, -1, 0, 0), c(1, 0, -1, 0), c(1, 0, 0, -1),
+             c(0, 1, -1, 0), c(0, 1, 0, -1), c(0, 0, 1, -1))
 
-Betas = compute_betas(data_mat = data.matrix(afilta_2_2_4$e_data[, -1]), Xmatrix = Xmatrix_2_2_4_full)
-Betas_na = Betas[,1:4]
-Betas_na[group_counts_2_2_4 == 0] <- NA
-Betas[,1:4] <- Betas_na
+beta_to_mu = Xmatrix_2_2_4
+beta_to_mu[,4:5] <- 0
+beta_to_mu <- unique(beta_to_mu)
+cmat_red <- cmat %*% beta_to_mu
 
-diffs_2_2_4 <- fold_change_diff(Betas, cmat)
-diffs_2_2_4 <- as.data.frame(diffs_2_2_4) %>%
-  `colnames<-`(c("diff_ih_il", "diff_ih_mh", "diff_ih_ml", "diff_il_mh", "diff_il_ml", "diff_mh_ml"))
+beta_to_mu_full = Xmatrix_2_2_4_full
+beta_to_mu_full[,4:5] <- 0
+beta_to_mu_full <- unique(beta_to_mu_full)
+cmat_full <- cmat %*% beta_to_mu_full
 
-test_values <- get_test_values(afilta_2_2_4$e_data[, -1], Xmatrix_2_2_4_full, cmat)
+test_values <- get_test_values_twofactor(data, Xmatrix_2_2_4, Xmatrix_2_2_4_full, cmat_red, cmat_full, cobra$which_X)
 
 diff_denoms <- test_values$diff_denoms
 colnames(diff_denoms) <- c("C1", "C2", "C3", "C4", "C5", "C6")
@@ -1709,38 +1701,38 @@ pval_a_2_2_4 <- test_stat_2_2_4 %>%
 
 flag_a_2_2_4 <- data.frame(
   Infection_high_vs_Infection_low = aflag(
-    grp1 = Betas[,1],
-    grp2 = Betas[,2],
+    grp1 = mean_a_2_2_4[,1],
+    grp2 = mean_a_2_2_4[,2],
     pvals = pval_a_2_2_4[, 1],
     cutoff = 0.05
   ),
   Infection_high_vs_Mock_high = aflag(
-    grp1 = Betas[,1],
-    grp2 = Betas[,3],
+    grp1 = mean_a_2_2_4[,1],
+    grp2 = mean_a_2_2_4[,3],
     pvals = pval_a_2_2_4[, 2],
     cutoff = 0.05
   ),
   Infection_high_vs_Mock_low = aflag(
-    grp1 = Betas[,1],
-    grp2 = Betas[,4],
+    grp1 = mean_a_2_2_4[,1],
+    grp2 = mean_a_2_2_4[,4],
     pvals = pval_a_2_2_4[, 3],
     cutoff = 0.05
   ),
   Infection_low_vs_Mock_high = aflag(
-    grp1 = Betas[,2],
-    grp2 = Betas[,3],
+    grp1 = mean_a_2_2_4[,2],
+    grp2 = mean_a_2_2_4[,3],
     pvals = pval_a_2_2_4[, 4],
     cutoff = 0.05
   ),
   Infection_low_vs_Mock_low = aflag(
-    grp1 = Betas[,2],
-    grp2 = Betas[,4],
+    grp1 = mean_a_2_2_4[,2],
+    grp2 = mean_a_2_2_4[,4],
     pvals = pval_a_2_2_4[, 5],
     cutoff = 0.05
   ),
   Mock_high_vs_Mock_low = aflag(
-    grp1 = Betas[,3],
-    grp2 = Betas[,4],
+    grp1 = mean_a_2_2_4[,3],
+    grp2 = mean_a_2_2_4[,4],
     pvals = pval_a_2_2_4[, 6],
     cutoff = 0.05
   )
@@ -2197,7 +2189,7 @@ flag_g_1_1_3 <- data.frame(
   )
 )
 
-Betas = compute_betas(data_mat = data.matrix(gfilta_1_1_3$e_data[, -1]), Xmatrix = Xmatrix_1_1_3)
+Betas = compute_betas(data_mat = data.matrix(gfilta_1_1_3$e_data[, -1]), Xmatrix = data.matrix(Xmatrix_1_1_3))
 covariate_effects = Xmatrix_1_1_3[,4] %*% t(Betas[,4])
 
 adj_data_g_1_1_3 <- data.matrix(gfilta_1_1_3$e_data[, -1]) - t(covariate_effects)
@@ -2212,11 +2204,8 @@ mean_1_1_3 <- data.frame(
                         na.rm = TRUE)
 )
 
-cmat = rbind(c(1, -1, 0, 0, 0), c(1, 0, -1, 0, 0), c(0, 1, -1, 0, 0))
-Betas = compute_betas(data_mat = data.matrix(gfilta_1_1_3$e_data[,-1]), Xmatrix = Xmatrix_1_1_3_full)
-Betas[,1:3][is.na(mean_1_1_3)] <- NA
-
-diffs_1_1_3 <- fold_change_diff(Betas, cmat)
+cmat = rbind(c(1, -1, 0), c(1, 0, -1), c(0, 1, -1))
+diffs_1_1_3 <- fold_change_diff(data.matrix(mean_1_1_3), cmat)
 
 gstan_1_1_3 <- data.frame(
   Mass_Tag_ID = gfilta_1_1_3$e_data$Mass_Tag_ID,
@@ -2353,7 +2342,7 @@ flag_g_1_2_3 <- data.frame(
   )
 )
 
-Betas = compute_betas(data_mat = data.matrix(gfilta_1_2_3$e_data[, -1]), Xmatrix = Xmatrix_1_2_3)
+Betas = compute_betas(data_mat = data.matrix(gfilta_1_2_3$e_data[, -1]), Xmatrix = data.matrix(Xmatrix_1_2_3))
 covariate_effects = Xmatrix_1_2_3[,4:5] %*% t(Betas[,4:5])
 
 adj_data_g_1_2_3 <- data.matrix(gfilta_1_2_3$e_data[, -1]) - t(covariate_effects)
@@ -2369,11 +2358,8 @@ mean_1_2_3 <- data.frame(
                         na.rm = TRUE)
 )
 
-cmat = rbind(c(1, -1, 0, 0, 0 , 0), c(1, 0, -1, 0, 0, 0), c(0, 1, -1, 0, 0, 0))
-Betas = compute_betas(data_mat = data.matrix(gfilta_1_2_3$e_data[,-1]), Xmatrix = Xmatrix_1_2_3_full)
-Betas[,1:3][is.na(mean_1_2_3)] <- NA
-
-diffs_1_2_3 <- fold_change_diff(Betas, cmat)
+cmat = rbind(c(1, -1, 0), c(1, 0, -1), c(0, 1, -1))
+diffs_1_2_3 <- fold_change_diff(data.matrix(mean_1_2_3), cmat)
 
 gstan_1_2_3 <- data.frame(
   Mass_Tag_ID = gfilta_1_2_3$e_data$Mass_Tag_ID,
@@ -2728,14 +2714,10 @@ mean_2_1_4 <- data.frame(
   Mean_Mock_low = dragon$adj_group_means[, 4]
 )
 
-cmat = rbind(c(1, -1, 0, 0, 0, 0), c(1, 0, -1, 0, 0, 0), c(1, 0, 0, -1, 0 ,0),
-             c(0, 1, -1, 0, 0, 0), c(0, 1, 0, -1, 0, 0), c(0, 0, 1, -1, 0, 0))
+cmat = rbind(c(1, -1, 0, 0), c(1, 0, -1, 0), c(1, 0, 0, -1),
+             c(0, 1, -1, 0), c(0, 1, 0, -1), c(0, 0, 1, -1))
 
-
-Betas = compute_betas(data_mat = data.matrix(gfilta_2_1_4$e_data[, -1]), Xmatrix = Xmatrix_2_1_4_full)
-Betas[,1:4][is.na(mean_2_1_4)] <- NA
-
-diffs_2_1_4 <- fold_change_diff(Betas, cmat)
+diffs_2_1_4 <- fold_change_diff(data.matrix(mean_2_1_4), cmat)
 diffs_2_1_4 <- as.data.frame(diffs_2_1_4) %>%
   `colnames<-`(c("Fold_change_Infection_high_vs_Infection_low", "Fold_change_Infection_high_vs_Mock_high", "Fold_change_Infection_high_vs_Mock_low", "Fold_change_Infection_low_vs_Mock_high", "Fold_change_Infection_low_vs_Mock_low", "Fold_change_Mock_high_vs_Mock_low"))
 
@@ -2966,13 +2948,10 @@ mean_2_2_4 <- data.frame(
   Mean_Mock_low = mustang$adj_group_means[, 4]
 )
 
-cmat = rbind(c(1, -1, 0, 0, 0, 0, 0), c(1, 0, -1, 0, 0, 0, 0), c(1, 0, 0, -1, 0 ,0, 0),
-             c(0, 1, -1, 0, 0, 0, 0), c(0, 1, 0, -1, 0, 0, 0), c(0, 0, 1, -1, 0, 0, 0))
+cmat = rbind(c(1, -1, 0, 0), c(1, 0, -1, 0), c(1, 0, 0, -1),
+             c(0, 1, -1, 0), c(0, 1, 0, -1), c(0, 0, 1, -1))
 
-Betas = compute_betas(data_mat = data.matrix(gfilta_2_2_4$e_data[, -1]), Xmatrix = Xmatrix_2_2_4_full)
-Betas[,1:4][is.na(mean_2_2_4)] <- NA
-
-diffs_2_2_4 <- fold_change_diff(Betas, cmat)
+diffs_2_2_4 <- fold_change_diff(data.matrix(mean_2_2_4), cmat)
 diffs_2_2_4 <- as.data.frame(diffs_2_2_4) %>%
   `colnames<-`(c("Fold_change_Infection_high_vs_Infection_low", "Fold_change_Infection_high_vs_Mock_high", "Fold_change_Infection_high_vs_Mock_low", "Fold_change_Infection_low_vs_Mock_high", "Fold_change_Infection_low_vs_Mock_low", "Fold_change_Mock_high_vs_Mock_low"))
 

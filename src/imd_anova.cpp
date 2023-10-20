@@ -336,13 +336,14 @@ List two_factor_anova_cpp(arma::mat y,
   int p_full = X_full.n_cols;
   arma::rowvec yrowi(y.n_cols);
   arma::uvec to_remove;
-  arma::mat X_red_nona, X_full_nona, invXtX_red, invXtX_full, XFinal;
+  arma::mat X_red_nona, X_full_nona, XFinal;
   arma::mat PxRed, PxFull;
   arma::rowvec yrowi_nona;
   int num_to_remove;
 
   int df_red, df_full;
   arma::uvec dof(n);
+  arma::uvec whichX(n);
   
   double sigma2_red, sigma2_full;
   NumericVector sig_est(n), pval(n), Fstat(n);
@@ -422,11 +423,13 @@ List two_factor_anova_cpp(arma::mat y,
       XFinal = X_full_nona;
       sig_est(i) = sigma2_full;
       dof(i) = df_full;
+      whichX(i) = 1; // 1 indicates full model
     }else{
       XFinal = X_full_nona;
       XFinal.cols(p_red,p_full-1).fill(0.0); //Zero out the interaction terms if they're insignificant
       sig_est(i) = sigma2_red;
       dof(i) = df_red;
+      whichX(i) = 0;
     }
 
     //"Parameter estiamtes" are the group means: Xbeta_hat=X(XpX)^{-1}XpY
@@ -483,18 +486,19 @@ List two_factor_anova_cpp(arma::mat y,
                       Named("Sigma2") = sig_est,
                       Named("Fstats") = Fstat,
                       Named("pvalue") = pval,
-                      Named("dof") = dof);
+                      Named("dof") = dof,
+                      Named("which_X") = whichX);
 }
 
 // [[Rcpp::export]]
-List group_comparison_anova_cpp(arma::mat data, arma::mat sizes, arma::mat X, arma::mat C) {
+List group_comparison_anova_cpp(arma::mat means, arma::mat data, arma::mat sizes, arma::mat which_xmatrix, arma::mat Xfull, arma::mat Xred, arma::mat Cfull, arma::mat Cred, arma::mat Cmu) {
   //Given the raw data, group sizes, design matrix consisting of group levels, and comparison matrix return the group comparisons requested.  Returns the estimated difference, standard errors, t-statistics, and p-values.
   //Returns estimated difference, standard error, t-statistic, p-values
   //data - raw data matrix of n_biomolecules by n_samples
   //sizes - matrix of group sizes n_biomolecules x n_groups
-  // C - matrix that defines the group comparisons you want to make
+  //C - matrix that defines the group comparisons you want to make
 
-  int num_comparisons = C.n_rows; //Number of comparisons to be made
+  int num_comparisons = Cred.n_rows; //Number of comparisons to be made
   int n_groups = sizes.n_cols; //Number of groups 
   int n = sizes.n_rows; //Number of rows (peptides)
   int N = 0; //Total number of observations for rowi;
@@ -516,6 +520,16 @@ List group_comparison_anova_cpp(arma::mat data, arma::mat sizes, arma::mat X, ar
   p_values.zeros();
 
   for(int i=0;i<n;i++){
+    arma::mat X;
+    arma::mat C;
+
+    if (which_xmatrix(i) == 0) {
+      X = Xred;
+      C = Cred;
+    } else {
+      X = Xfull;
+      C = Cfull;
+    }
     rowi = data.row(i);
     elems_to_keep = find_finite(rowi);
     arma::mat XpXInv = pinv(X.rows(elems_to_keep).t() * X.rows(elems_to_keep));
@@ -529,21 +543,21 @@ List group_comparison_anova_cpp(arma::mat data, arma::mat sizes, arma::mat X, ar
 
     int dof = N - rank(X.rows(elems_to_keep));
 
+    arma::uvec zerosize_idx = find(sizes.row(i).cols(0, n_groups - 1) == 0);
+    arma::rowvec row_mean = means.row(i); 
+    if (zerosize_idx.size() > 0) {
+      row_mean.cols(zerosize_idx).fill(arma::datum::nan);
+    }
+
+    // Take the group means using the group means contrast matrix Cmu.  This needs to be done since the Betas to not take into account missing groups.
+    arma::rowvec mean_diffs = fold_change_diff_row(row_mean, Cmu.cols(0, n_groups - 1));
+    diff_mat.row(i) = mean_diffs;
+    
     arma::colvec residual_vec(X.n_rows);
     residual_vec = arma::conv_to<arma::colvec>::from(data.row(i)).rows(elems_to_keep);
 
-    // Betas are the estimated group means in this model specification
     arma::colvec Beta = XpXInv*X.rows(elems_to_keep).t()*residual_vec;
-    arma::colvec Beta_finite = Beta;
-    arma::uvec zerosize_idx = find(sizes.row(i).cols(0, n_groups - 1) == 0);
 
-    if (zerosize_idx.size() > 0) {
-      Beta_finite.rows(zerosize_idx).fill(arma::datum::nan);
-    }
-
-    arma::rowvec mean_diffs = fold_change_diff_row(Beta_finite.rows(0, n_groups - 1).t(), C.cols(0, n_groups - 1));
-    diff_mat.row(i) = mean_diffs;
-    
     residual_vec = residual_vec - X.rows(elems_to_keep)*Beta;
     double SSE = arma::as_scalar(residual_vec.t()*residual_vec);
     double sigma_hat = SSE/dof;

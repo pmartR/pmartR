@@ -37,8 +37,8 @@ two_factor_anova_cpp <- function(y, X_full, X_red, group_ids, covar_inds) {
     .Call('_pmartR_two_factor_anova_cpp', PACKAGE = 'pmartR', y, X_full, X_red, group_ids, covar_inds)
 }
 
-group_comparison_anova_cpp <- function(data, sizes, X, C) {
-    .Call('_pmartR_group_comparison_anova_cpp', PACKAGE = 'pmartR', data, sizes, X, C)
+group_comparison_anova_cpp <- function(means, data, sizes, which_xmatrix, Xfull, Xred, Cfull, Cred, Cmu) {
+    .Call('_pmartR_group_comparison_anova_cpp', PACKAGE = 'pmartR', means, data, sizes, which_xmatrix, Xfull, Xred, Cfull, Cred, Cmu)
 }
 
 holm_cpp <- function(ps) {
