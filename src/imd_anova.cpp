@@ -292,7 +292,6 @@ List anova_cpp(arma::mat data, NumericVector gp, int unequal_var, arma::mat X, a
       //Iterate over columns (again) to get a SSE for each row
       for(int j=0; j<p; j++){
         if(!NumericMatrix::is_na(data(i,j))){
-          // These are now the adjusted group means, so this is no longer the correct SSE
           SST += pow(data(i,j)-overall_mean,2);
         }
       }
@@ -328,7 +327,10 @@ List two_factor_anova_cpp(arma::mat y,
                           arma::mat X_full,
                           arma::mat X_red,
                           arma::colvec group_ids,
-                          arma::uvec covar_inds){
+                          arma::mat beta_to_mu_full,
+                          arma::mat beta_to_mu_red,
+                          arma::uvec continuous_covar_inds
+                          ){
 
   int i,j;
   int n = y.n_rows;
@@ -348,7 +350,7 @@ List two_factor_anova_cpp(arma::mat y,
   double sigma2_red, sigma2_full;
   NumericVector sig_est(n), pval(n), Fstat(n);
   arma::mat diag_mat;
-  arma::colvec par_ests(p_full), par_ests_temp,group_ids_nona(y.n_cols), group_ids_nona_unq;
+  arma::colvec par_ests(p_full),group_ids_nona(y.n_cols), group_ids_nona_unq;
   arma::mat parmat(n,p_full);
   arma::rowvec csums(p_full);
   arma::uvec zero_cols, non_zero_cols;
@@ -357,6 +359,7 @@ List two_factor_anova_cpp(arma::mat y,
   // For a given biomolecule, the number of groups may be less
   arma::colvec unq_group_ids = arma::unique(group_ids);
   int n_groups = unq_group_ids.n_elem;
+  arma::mat lsmeans(n,n_groups);
   arma::rowvec gsizes(n_groups);
   arma::mat group_sizes(n,n_groups);
 
@@ -396,7 +399,6 @@ List two_factor_anova_cpp(arma::mat y,
     sigma2_red = arma::conv_to<double>::from(residual_vec.t()*residual_vec/df_red);
 
     if((df_red-df_full)<=0){
-
       //If interaction can't be estimated, automatically select smaller model
       pval(i) = 1;
       Fstat(i) = 0;
@@ -432,44 +434,33 @@ List two_factor_anova_cpp(arma::mat y,
       whichX(i) = 0;
     }
 
-    //"Parameter estiamtes" are the group means: Xbeta_hat=X(XpX)^{-1}XpY
-    par_ests_temp = pinv(XFinal.t()*XFinal)*XFinal.t()*yrowi_nona.t();
-
-    // Remove covariate effects
-    if(covar_inds.size() > 0) {
-      XFinal.cols(covar_inds-1).zeros();
-    }
-
-    par_ests_temp = XFinal * par_ests_temp;
+    // Parameter estimates using the full X
+    arma::colvec beta = pinv(XFinal.t()*XFinal)*XFinal.t()*yrowi_nona.t();
 
     //Find groups that had at least one non-missing value
     group_ids_nona_unq=arma::unique(group_ids_nona);
 
-    //Fill in the par_ests vector, put NaN if group was missing or the average effect in groups with no missing data
-    if(static_cast<int>(group_ids_nona_unq.n_elem)<p_full){
-      par_ests.zeros();
-      //cntr = 0;
-
-      for(j=0;j<p_full;j++){
-        missing_gp = find(group_ids_nona_unq==j);
-        if(missing_gp.n_elem>0){
-          //Rcpp::Rcout <<"group_ids_nona \n"<< find(group_ids_nona==j)<<"\n";
-          par_ests(j) = mean(par_ests_temp(find(group_ids_nona==j)));
-          //cntr++;
-        }else{
-          par_ests(j) = arma::datum::nan;
-        }
-      }
-
-    }else{
-      for(j=0;j<p_full;j++){
-        par_ests(j) = mean(par_ests_temp(find(group_ids_nona==j)));
+    arma::mat beta_to_mu;
+    if (whichX[i] == 0) {
+      beta_to_mu = beta_to_mu_red;
+    } else {
+      beta_to_mu = beta_to_mu_full;
+    }
+    
+    // Average numeric covariates to get the adjusted means
+    if(continuous_covar_inds.size() > 0) {
+      // Replace each column indexed by covar_inds with it's mean
+      for (int k = 0; k < continuous_covar_inds.size(); k++) {
+        double colmean = arma::mean(XFinal.col(continuous_covar_inds[k] - 1));
+        arma::colvec mean_vec = arma::ones(beta_to_mu.n_rows) * colmean;
+        beta_to_mu.col(continuous_covar_inds[k] - 1) = mean_vec;
       }
     }
 
-
-
-    parmat.row(i) = par_ests.t();
+    arma::colvec marginal_means = beta_to_mu * beta.head_rows(beta_to_mu.n_cols);
+    lsmeans.row(i) = marginal_means.t();
+    
+    parmat.row(i) = beta.t();
 
     //Compute group sizes after accounting for NaNs
     for(j=0;j<n_groups;j++){
@@ -478,10 +469,13 @@ List two_factor_anova_cpp(arma::mat y,
       //Rcpp::Rcout <<"size_j \n"<<size_j;
     }
 
+    Rcout << "gsizes " << gsizes << std::endl;
+
     group_sizes.row(i) = gsizes; //For now don't return the interaction groups
 
   }
-  return List::create(Named("par_estimates") = parmat,
+  return List::create(Named("lsmeans") = lsmeans,
+                      Named("par_estimates") = parmat,
                       Named("group_sizes") = group_sizes,
                       Named("Sigma2") = sig_est,
                       Named("Fstats") = Fstat,
