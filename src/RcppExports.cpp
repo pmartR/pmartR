@@ -95,8 +95,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // anova_cpp
-List anova_cpp(arma::mat data, NumericVector gp, int unequal_var, arma::mat X, arma::mat Beta);
-RcppExport SEXP _pmartR_anova_cpp(SEXP dataSEXP, SEXP gpSEXP, SEXP unequal_varSEXP, SEXP XSEXP, SEXP BetaSEXP) {
+List anova_cpp(arma::mat data, NumericVector gp, int unequal_var, arma::mat X, arma::mat Beta, arma::mat beta_to_mu, arma::uvec continuous_covar_inds, int n_covar_levels);
+RcppExport SEXP _pmartR_anova_cpp(SEXP dataSEXP, SEXP gpSEXP, SEXP unequal_varSEXP, SEXP XSEXP, SEXP BetaSEXP, SEXP beta_to_muSEXP, SEXP continuous_covar_indsSEXP, SEXP n_covar_levelsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -105,13 +105,16 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type unequal_var(unequal_varSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type Beta(BetaSEXP);
-    rcpp_result_gen = Rcpp::wrap(anova_cpp(data, gp, unequal_var, X, Beta));
+    Rcpp::traits::input_parameter< arma::mat >::type beta_to_mu(beta_to_muSEXP);
+    Rcpp::traits::input_parameter< arma::uvec >::type continuous_covar_inds(continuous_covar_indsSEXP);
+    Rcpp::traits::input_parameter< int >::type n_covar_levels(n_covar_levelsSEXP);
+    rcpp_result_gen = Rcpp::wrap(anova_cpp(data, gp, unequal_var, X, Beta, beta_to_mu, continuous_covar_inds, n_covar_levels));
     return rcpp_result_gen;
 END_RCPP
 }
 // two_factor_anova_cpp
-List two_factor_anova_cpp(arma::mat y, arma::mat X_full, arma::mat X_red, arma::colvec group_ids, arma::mat beta_to_mu_full, arma::mat beta_to_mu_red, arma::uvec continuous_covar_inds);
-RcppExport SEXP _pmartR_two_factor_anova_cpp(SEXP ySEXP, SEXP X_fullSEXP, SEXP X_redSEXP, SEXP group_idsSEXP, SEXP beta_to_mu_fullSEXP, SEXP beta_to_mu_redSEXP, SEXP continuous_covar_indsSEXP) {
+List two_factor_anova_cpp(arma::mat y, arma::mat X_full, arma::mat X_red, arma::colvec group_ids, arma::mat beta_to_mu_full, arma::mat beta_to_mu_red, arma::uvec continuous_covar_inds, int n_covar_levels);
+RcppExport SEXP _pmartR_two_factor_anova_cpp(SEXP ySEXP, SEXP X_fullSEXP, SEXP X_redSEXP, SEXP group_idsSEXP, SEXP beta_to_mu_fullSEXP, SEXP beta_to_mu_redSEXP, SEXP continuous_covar_indsSEXP, SEXP n_covar_levelsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -122,7 +125,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::mat >::type beta_to_mu_full(beta_to_mu_fullSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type beta_to_mu_red(beta_to_mu_redSEXP);
     Rcpp::traits::input_parameter< arma::uvec >::type continuous_covar_inds(continuous_covar_indsSEXP);
-    rcpp_result_gen = Rcpp::wrap(two_factor_anova_cpp(y, X_full, X_red, group_ids, beta_to_mu_full, beta_to_mu_red, continuous_covar_inds));
+    Rcpp::traits::input_parameter< int >::type n_covar_levels(n_covar_levelsSEXP);
+    rcpp_result_gen = Rcpp::wrap(two_factor_anova_cpp(y, X_full, X_red, group_ids, beta_to_mu_full, beta_to_mu_red, continuous_covar_inds, n_covar_levels));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -213,8 +217,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_pmartR_fold_change_diff_row", (DL_FUNC) &_pmartR_fold_change_diff_row, 2},
     {"_pmartR_fold_change_ratio", (DL_FUNC) &_pmartR_fold_change_ratio, 2},
     {"_pmartR_fold_change_diff_na_okay", (DL_FUNC) &_pmartR_fold_change_diff_na_okay, 2},
-    {"_pmartR_anova_cpp", (DL_FUNC) &_pmartR_anova_cpp, 5},
-    {"_pmartR_two_factor_anova_cpp", (DL_FUNC) &_pmartR_two_factor_anova_cpp, 7},
+    {"_pmartR_anova_cpp", (DL_FUNC) &_pmartR_anova_cpp, 8},
+    {"_pmartR_two_factor_anova_cpp", (DL_FUNC) &_pmartR_two_factor_anova_cpp, 8},
     {"_pmartR_group_comparison_anova_cpp", (DL_FUNC) &_pmartR_group_comparison_anova_cpp, 9},
     {"_pmartR_holm_cpp", (DL_FUNC) &_pmartR_holm_cpp, 1},
     {"_pmartR_ptukey_speed", (DL_FUNC) &_pmartR_ptukey_speed, 2},

@@ -176,7 +176,16 @@ arma::mat fold_change_diff_na_okay(arma::mat data, arma::mat C)  {
 //group sizes and sigma^2 value to do whatever group comparisons the user asks for
 
 // [[Rcpp::export]]
-List anova_cpp(arma::mat data, NumericVector gp, int unequal_var, arma::mat X, arma::mat Beta) {
+List anova_cpp(
+  arma::mat data, 
+  NumericVector gp, 
+  int unequal_var, 
+  arma::mat X, 
+  arma::mat Beta,
+  arma::mat beta_to_mu,
+  arma::uvec continuous_covar_inds,
+  int n_covar_levels
+  ) {
   //data is the n-by-p matrix of data
   //gp is a vector that identifies what group each column belongs to,
   //  assumed to be numeric 1-m where m is the total number of groups
@@ -192,7 +201,7 @@ List anova_cpp(arma::mat data, NumericVector gp, int unequal_var, arma::mat X, a
   NumericVector Fstats(n), p_value(n), sigma2(n); //F-statistic & p-value for each row
   NumericMatrix group_sums(n,m); //matrix to save the group sums in
   NumericMatrix group_means(n,m); //matrix to save the group means in
-  NumericMatrix adj_group_means(n,m); // matrix of means adjusted for covariates
+  arma::mat adj_group_means(n,m); // matrix of means adjusted for covariates
   NumericMatrix group_sizes(n,m);
   NumericVector rowi(m);
   NumericVector rowi_gsize(m); //vector to contain the number of non-na observations
@@ -225,11 +234,32 @@ List anova_cpp(arma::mat data, NumericVector gp, int unequal_var, arma::mat X, a
 
     int row_rank =  rank(X.rows(elems_to_keep)); // determines degrees of freedom, accounts for things like missing groups etc.
     arma::rowvec beta = Beta.row(i);
-    arma::colvec effects = arma::zeros(p);
 
-    if (beta.n_cols > m) {
-      beta = beta.cols(m, beta.n_cols - 1);
-      effects.rows(elems_to_keep) = covar_vals.rows(elems_to_keep) * beta.t();
+    // Average numeric covariates to get the adjusted means (lsmeans)
+    if(continuous_covar_inds.size() > 0) {
+      arma::mat X_nona = X.rows(elems_to_keep);
+      // Replace each column indexed by covar_inds with it's mean
+      for (int k = 0; k < continuous_covar_inds.size(); k++) {
+        double colmean = arma::mean(X_nona.col(continuous_covar_inds[k] - 1));
+        arma::colvec mean_vec = arma::ones(beta_to_mu.n_rows) * colmean;
+        beta_to_mu.col(continuous_covar_inds[k] - 1) = mean_vec;
+      }
+    }
+
+    // Compute the marginal means by average over covariates
+    arma::colvec grid_preds = beta_to_mu * beta.t();
+
+    if (n_covar_levels > 0) {
+      arma::rowvec marginal_means(m);
+      int n_per_covar_group = grid_preds.n_elem / n_covar_levels;
+
+      for (int k = 0; k < m; k++) {
+        marginal_means(k) = arma::mean(grid_preds.rows(k * n_per_covar_group, (k + 1) * n_per_covar_group - 1));
+      }
+
+      adj_group_means.row(i) = marginal_means;
+    } else {
+      adj_group_means.row(i) = grid_preds.t();
     }
 
     //Iterate over the matrix columns (samples) to get groups means for each row
@@ -241,7 +271,6 @@ List anova_cpp(arma::mat data, NumericVector gp, int unequal_var, arma::mat X, a
       //Compute group sums by adding each observations that's not an NA
       if(!NumericMatrix::is_na(data(i,j))){
         group_sums(i,groupi) += data(i,j);
-        adj_group_means(i,groupi) += (data(i,j) - effects(j));
         group_sizes(i,groupi) += 1;
       }
 
@@ -254,7 +283,6 @@ List anova_cpp(arma::mat data, NumericVector gp, int unequal_var, arma::mat X, a
     //Translate the group sums into group means for each row
     for(int k=0; k<m; k++){
       group_means(i,k) = group_sums(i,k)/group_sizes(i,k);
-      adj_group_means(i,k) = adj_group_means(i,k)/group_sizes(i,k);
 
       //If an entire group is missing (which shouldn't happen), the number of groups needs to be decreased
       if(group_sizes(i,k)<1){
@@ -329,7 +357,8 @@ List two_factor_anova_cpp(arma::mat y,
                           arma::colvec group_ids,
                           arma::mat beta_to_mu_full,
                           arma::mat beta_to_mu_red,
-                          arma::uvec continuous_covar_inds
+                          arma::uvec continuous_covar_inds,
+                          int n_covar_levels
                           ){
 
   int i,j;
@@ -367,7 +396,6 @@ List two_factor_anova_cpp(arma::mat y,
   for(i=0; i<n; i++){
     yrowi = y.row(i);
     to_remove = arma::find_nonfinite(yrowi);
-    //Rcout << "Indices to remove " << to_remove << std::endl;
 
     yrowi_nona = yrowi;
     X_red_nona = X_red;
@@ -447,7 +475,7 @@ List two_factor_anova_cpp(arma::mat y,
       beta_to_mu = beta_to_mu_full;
     }
     
-    // Average numeric covariates to get the adjusted means
+    // Average numeric covariates in preparation for model predictions.
     if(continuous_covar_inds.size() > 0) {
       // Replace each column indexed by covar_inds with it's mean
       for (int k = 0; k < continuous_covar_inds.size(); k++) {
@@ -457,8 +485,22 @@ List two_factor_anova_cpp(arma::mat y,
       }
     }
 
-    arma::colvec marginal_means = beta_to_mu * beta.head_rows(beta_to_mu.n_cols);
-    lsmeans.row(i) = marginal_means.t();
+    // Predicted values over all levels of the main effects and categorical covariates.  Continuous covariates are averaged.
+    arma::colvec grid_preds = beta_to_mu * beta.head_rows(beta_to_mu.n_cols);
+
+    // Compute the lsmeans by averaging over covariates
+    if (n_covar_levels > 1) {
+      arma::rowvec marginal_means(n_groups);
+      int n_per_covar_group = grid_preds.n_elem / n_covar_levels;
+
+      for (int k = 0; k < n_groups; k++) {
+        marginal_means(k) = arma::mean(grid_preds.rows(k * n_per_covar_group, (k + 1) * n_per_covar_group - 1));
+      }
+
+      lsmeans.row(i) = marginal_means;
+    } else {
+      lsmeans.row(i) = grid_preds.t();
+    }
     
     parmat.row(i) = beta.t();
 
@@ -466,11 +508,8 @@ List two_factor_anova_cpp(arma::mat y,
     for(j=0;j<n_groups;j++){
       size_j = find(group_ids_nona==j);
       gsizes(j) = size_j.n_elem;
-      //Rcpp::Rcout <<"size_j \n"<<size_j;
     }
-
-    Rcout << "gsizes " << gsizes << std::endl;
-
+    
     group_sizes.row(i) = gsizes; //For now don't return the interaction groups
 
   }

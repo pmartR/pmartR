@@ -912,6 +912,8 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
 
   # Everything assumes the group levels are in the order they appear
   groupData$Group <- factor(groupData$Group, levels=unique(groupData$Group))
+  # Keep all the relevant stuff
+  groupData_sub <- groupData[,c("Group", main_effect_names, covariate_names)]
 
   # ANOVA stuffs ---------------------------------------------------------------
   if (length(attr(get_group_DF(omicsData), "main_effects")) == 1) {
@@ -926,31 +928,35 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
     Xred = xmatrix
     Betas <- compute_betas(data.matrix(data), xmatrix)
 
+    # indices of covariates in design matrix as well as special indices for continuous covariates.
     if (length(covariate_names) > 0) {
       covar_inds = (length(main_effect_names) + 1):(length(main_effect_names) + 1 + length(covariate_names))
       covar_inds = which(attr(Xred, "assign") %in% covar_inds)
+      continuous_covars = covariate_names[sapply(groupData_sub[covariate_names], is.numeric)]
+      continuous_covar_inds = which(colnames(Xred) == continuous_covars)
     } else {
       covar_inds <- NULL
     }
-
-    # Construct the matrix D which maps parameter estimates to group means
+  
+    # Construct the matrix which predicts over all group + categorical covariates combinations.  Continuous covariates will be set to the mean of their values for non-missing data points.
     beta_to_mu = Xred
-    beta_to_mu[,covar_inds] = mean(xmatrix[,covar_inds])
+    beta_to_mu[,continuous_covar_inds] = 0
     beta_to_mu = unique(beta_to_mu)
     beta_to_mu_full = beta_to_mu_red = beta_to_mu
+    n_covar_levels <- beta_to_mu[,covar_inds,drop=FALSE] %>% unique() %>% nrow()
     
     #Rcpp::sourceCpp('~/pmartR/src/anova_helper_funs.cpp') #Run if debugging code
-    raw_results <- anova_cpp(data.matrix(data),gp,1-equal_var, xmatrix, Betas, beta_to_mu)
+    raw_results <- anova_cpp(data.matrix(data),gp,1-equal_var, xmatrix, Betas, beta_to_mu, continuous_covar_inds, n_covar_levels)
     group_names <- paste("Mean",as.character(unique(groupData$Group)),sep="_")
-    which_xmatrix <- rep(0, nrow(data)) # dummy argument to group_comparison_anova, makes us always select the reduced model.
+    which_xmatrix <- rep(0, nrow(data)) # dummy argument to group_comparison_anova, makes us always select the reduced model since we only have one main effect.
 
   }else{
     ##---- Two factor ANOVA ----##
     #source('~/pmartR/R/anova_helper_fun.R') #Run if debugging
     #source('~/pmartR/R/covariate_supp_funs.R')
     #Rcpp::sourceCpp('~/pmartR/src/two_factor_anova.cpp')    
+
     # design matrix for the reduced model (no interactions between main effects)
-    groupData_sub <- groupData[,c("Group", main_effect_names, covariate_names)]
     Xred <- model.matrix(~.,data=dplyr::select(groupData_sub, -one_of("Group")))
     group_names = setdiff(colnames(groupData_sub), c("Group", covariate_names))
 
@@ -964,14 +970,12 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
     if (length(covariate_names) > 0) {
       covar_inds = (length(main_effect_names) + 1):(length(main_effect_names) + 1 + length(covariate_names))
       covar_inds = which(attr(Xred, "assign") %in% covar_inds)
-      # we get the indices of continuous covariates to average them when computing least squares means.
       continuous_covars = covariate_names[sapply(groupData_sub[covariate_names], is.numeric)]
       continuous_covar_inds = which(colnames(Xred) == continuous_covars)
     } else {
       covar_inds <- continuous_covar_inds <- NULL
     }
 
-    # Construct the matrix D which maps parameter estimates to group means for both the interaction and reduced model
     beta_to_mu_full = Xfull
     beta_to_mu_full[,continuous_covar_inds] = 0
     beta_to_mu_full = unique(beta_to_mu_full)
@@ -980,13 +984,16 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
     beta_to_mu_red[,continuous_covar_inds] = 0
     beta_to_mu_red = unique(beta_to_mu_red)
 
+    n_covar_levels <- beta_to_mu_red[,covar_inds,drop=FALSE] %>% unique() %>% nrow()
+
     raw_results <- run_twofactor_cpp(
       data=data.matrix(data),
-      gpData=groupData_sub, 
-      Xfull=Xfull, Xred=Xred, 
-      beta_to_mu_full=beta_to_mu_full, 
-      beta_to_mu_red=beta_to_mu_red, 
-      continuous_covar_inds = continuous_covar_inds
+      gpData=groupData_sub,
+      Xfull=Xfull, Xred=Xred,
+      beta_to_mu_full=beta_to_mu_full,
+      beta_to_mu_red=beta_to_mu_red,
+      continuous_covar_inds = continuous_covar_inds,
+      n_covar_levels = n_covar_levels
     )
 
     group_names <- paste("Mean",colnames(raw_results$adj_group_means),sep="_")
@@ -1009,6 +1016,12 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
   #source('~/pmartR/R/group_comparison.R') # Run if debugging
   #Rcpp::sourceCpp('~/pmartR/src/group_comparisons.cpp') #Run if debugging
   
+  # Construct matrices that map the beta coefficients to the group means
+  beta_to_mu_full[,covar_inds] <- 0
+  beta_to_mu_red[,covar_inds] <- 0
+  beta_to_mu_full <- unique(beta_to_mu_full)
+  beta_to_mu_red <- unique(beta_to_mu_red)
+
   group_comp <- group_comparison_anova(
     data=data.matrix(data),
     groupData=groupData[,c("Group", main_effect_names, covariate_names)],
@@ -1088,14 +1101,7 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
 }
 
 #Wrapper function for the two factor ANOVA function
-run_twofactor_cpp <- function(data,gpData,covar_names, Xfull, Xred, beta_to_mu_full, beta_to_mu_red, continuous_covar_inds){
-  # # which of group_names columns in gpDat are numeric?
-  # continuous_covars = covar_names[sapply(gpData[covar_names], is.numeric)]
-  # # covar_inds = which(!(attr(Xred, "assign") %in% c(0,1,2))) # intercept (0) and first two main effects (1,2) are not covariates
-  # covar_inds = which(colnames(Xred) == continuous_covars)
-  # beta_to_mu_full[,covar_inds] <- mean(Xfull[,covar_inds])
-  # beta_to_mu_red[,covar_inds] <- mean(Xred[,covar_inds])
-
+run_twofactor_cpp <- function(data,gpData,covar_names, Xfull, Xred, beta_to_mu_full, beta_to_mu_red, continuous_covar_inds, n_covar_levels){
   #Run the two factor ANOVA model
   res <- two_factor_anova_cpp(
     data,
@@ -1104,7 +1110,8 @@ run_twofactor_cpp <- function(data,gpData,covar_names, Xfull, Xred, beta_to_mu_f
     group_ids=as.numeric(factor(gpData$Group,levels=unique(gpData$Group))),
     beta_to_mu_full,
     beta_to_mu_red,
-    continuous_covar_inds
+    continuous_covar_inds,
+    n_covar_levels
   )
 
   # Get the unique group levels to translate ANOVA parameters into group means
@@ -1151,6 +1158,7 @@ group_comparison_anova <- function(data,groupData,comparisons, Xfull, Xred, anov
   Cmat_res <- create_c_matrix(group_df = groupData, to_compare_df = comparisons)
   Cmat <- Cmat_res$cmat
   
+  # C %*% D appropriate contrast matrices for group comparisons
   Cnew_full = Cmat %*% beta_to_mu_full
   Cnew_red = Cmat %*% beta_to_mu_red
   
