@@ -915,13 +915,13 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
   # Keep all the relevant stuff
   groupData_sub <- groupData[,c("Group", main_effect_names, covariate_names)]
 
+  ## Translate the groups into numeric labels for anova_cpp() function.  Also needed to order rows of the prediction grid
+  gp <- factor(groupData$Group,labels=1:k,levels=unique(groupData$Group))
+
   # ANOVA stuffs ---------------------------------------------------------------
   if (length(attr(get_group_DF(omicsData), "main_effects")) == 1) {
     ##---- One factor ANOVA ----##
-    
-    ##Translate the groups into numeric labels for anova_cpp() function
-    gp <- factor(groupData$Group,labels=1:k,levels=unique(groupData$Group))
-    
+        
     # pre-compute coefficients of the non-interaction model
     xmatrix <- model.matrix(~ ., groupData[c("Group", covariate_names)])
     Xfull = xmatrix # not used in one factor case, but needed as an argument
@@ -936,17 +936,15 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
       continuous_covar_inds = which(colnames(Xred) == continuous_covars)
     } else {
       covar_inds <- NULL
+      continuous_covar_inds <- numeric(0) # right type for Rcpp
     }
   
     # Construct the matrix which predicts over all group + categorical covariates combinations.  Continuous covariates will be set to the mean of their values for non-missing data points.
-    beta_to_mu = Xred
-    beta_to_mu[,continuous_covar_inds] = 0
-    beta_to_mu = unique(beta_to_mu)
-    beta_to_mu_full = beta_to_mu_red = beta_to_mu
-    n_covar_levels <- beta_to_mu[,covar_inds,drop=FALSE] %>% unique() %>% nrow()
+    pred_grid_red <- pred_grid_full <- get_pred_grid(Xred, gp)
+    n_covar_levels <- pred_grid_red[,covar_inds,drop=FALSE] %>% unique() %>% nrow()
     
     #Rcpp::sourceCpp('~/pmartR/src/anova_helper_funs.cpp') #Run if debugging code
-    raw_results <- anova_cpp(data.matrix(data),gp,1-equal_var, xmatrix, Betas, beta_to_mu, continuous_covar_inds, n_covar_levels)
+    raw_results <- anova_cpp(data.matrix(data),gp,1-equal_var, xmatrix, Betas, pred_grid_red, continuous_covar_inds, n_covar_levels)
     group_names <- paste("Mean",as.character(unique(groupData$Group)),sep="_")
     which_xmatrix <- rep(0, nrow(data)) # dummy argument to group_comparison_anova, makes us always select the reduced model since we only have one main effect.
 
@@ -973,16 +971,12 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
       continuous_covars = covariate_names[sapply(groupData_sub[covariate_names], is.numeric)]
       continuous_covar_inds = which(colnames(Xred) == continuous_covars)
     } else {
-      covar_inds <- continuous_covar_inds <- NULL
+      covar_inds <- NULL
+      continuous_covar_inds <- numeric(0)
     }
 
-    beta_to_mu_full = Xfull
-    beta_to_mu_full[,continuous_covar_inds] = 0
-    beta_to_mu_full = unique(beta_to_mu_full)
-
-    beta_to_mu_red = Xred
-    beta_to_mu_red[,continuous_covar_inds] = 0
-    beta_to_mu_red = unique(beta_to_mu_red)
+    pred_grid_red <- get_pred_grid(Xred, gp)
+    pred_grid_full <- get_pred_grid(Xfull, gp)
 
     n_covar_levels <- beta_to_mu_red[,covar_inds,drop=FALSE] %>% unique() %>% nrow()
 
@@ -990,8 +984,8 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
       data=data.matrix(data),
       gpData=groupData_sub,
       Xfull=Xfull, Xred=Xred,
-      beta_to_mu_full=beta_to_mu_full,
-      beta_to_mu_red=beta_to_mu_red,
+      beta_to_mu_full=pred_grid_full,
+      beta_to_mu_red=pred_grid_red,
       continuous_covar_inds = continuous_covar_inds,
       n_covar_levels = n_covar_levels
     )
@@ -1017,8 +1011,12 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
   #Rcpp::sourceCpp('~/pmartR/src/group_comparisons.cpp') #Run if debugging
   
   # Construct matrices that map the beta coefficients to the group means
+  beta_to_mu_full <- pred_grid_full
+  beta_to_mu_red <- pred_grid_red
+
   beta_to_mu_full[,covar_inds] <- 0
   beta_to_mu_red[,covar_inds] <- 0
+
   beta_to_mu_full <- unique(beta_to_mu_full)
   beta_to_mu_red <- unique(beta_to_mu_red)
 
@@ -2018,6 +2016,84 @@ reduce_xmatrix <- function(x, ngroups) {
     }
   }
   return(x)
+}
+
+#' Build the prediction grid to compute least squares means.
+#' 
+#' @param xmatrix The design matrix from which to construct the prediction grid
+#' @param groups The group assignments corresponding to rows in the design matrix
+#' @param continuous_covar_inds The column indices of xmatrix corresponding to continuous covariates.
+#' 
+#' @return A matrix of the prediction grid
+#' 
+#' @author Daniel Claborne
+#'  
+get_pred_grid <- function(xmatrix, groups, continuous_covar_inds = NULL) {
+  pred_grid <- xmatrix
+  pred_grid <- data.frame(pred_grid)
+
+  ordered_levels = factor(groups, levels = unique(groups))
+  pred_grid$Group <- ordered_levels
+  pred_grid <- pred_grid[order(pred_grid$Group),]
+  # set this temporarily, will replace with the mean of observed data during computation of lsmeans
+  pred_grid[,continuous_covar_inds] <- 0
+  pred_grid <- unique(pred_grid)
+  ordered_levels_unique <- pred_grid$Group
+  pred_grid <- pred_grid[, -ncol(pred_grid)] # drop group column
+  pred_grid <- as.matrix(pred_grid)
+
+  attr(pred_grid, "groups") = ordered_levels_unique
+
+  return(pred_grid)
+}
+
+#' Compute the least squares means from a prediction grid and estimated coefficients
+#' 
+#' @param data The raw data from which the estimates were computed
+#' @param xmatrix The design matrix from which the prediction grid was constructed
+#' @param pred_grid The prediction grid, obtained from \code{\link{get_pred_grid}}
+#' @param Betas The estimated coefficients
+#' @param continuous_covar_inds The column indices of xmatrix corresponding to continuous covariates.
+#' 
+#' @return A data frame of the least squares means
+#' 
+#' @author Daniel Claborne
+#' 
+get_lsmeans <- function(data, xmatrix, pred_grid, Betas, continuous_covar_inds=NULL) {
+  lsmeans <- list()
+
+  for (i in 1:nrow(Betas)) {
+    beta = Betas[i,]
+    y = data[i,]
+    nona = which(!is.na(y))
+    xnona = xmatrix[nona,]
+
+    # we predict at the average level of the continuous covariates
+    if (!is.null(continuous_covar_inds)) {
+      for (j in continuous_covar_inds) {
+        mean_ = mean(xnona[,j])
+        pred_grid[,j] = mean_
+      }
+    }
+
+    lsmeans_i <- pred_grid %*% beta
+    lsmeans[[i]] <- lsmeans_i
+  }
+
+  names(lsmeans) <- paste0("X", 1:nrow(Betas))
+  lsmeans = do.call(cbind.data.frame, lsmeans)
+
+  # average the predictions within group
+  lsmeans = lsmeans %>% 
+    dplyr::mutate(Group = attr(pred_grid, "groups")) %>%
+    dplyr::group_by(Group) %>%
+    dplyr::summarise(dplyr::across(dplyr::where(is.numeric), mean)) %>%
+    dplyr::select(-dplyr::one_of("Group")) %>%
+    t() %>%
+    as.data.frame() %>%
+    `colnames<-`(paste0("Mean_", levels(attr(pred_grid, "groups"))))
+
+  return(lsmeans)
 }
 
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -182,7 +182,7 @@ List anova_cpp(
   int unequal_var, 
   arma::mat X, 
   arma::mat Beta,
-  arma::mat beta_to_mu,
+  arma::mat pred_grid,
   arma::uvec continuous_covar_inds,
   int n_covar_levels
   ) {
@@ -241,20 +241,18 @@ List anova_cpp(
       // Replace each column indexed by covar_inds with it's mean
       for (int k = 0; k < continuous_covar_inds.size(); k++) {
         double colmean = arma::mean(X_nona.col(continuous_covar_inds[k] - 1));
-        arma::colvec mean_vec = arma::ones(beta_to_mu.n_rows) * colmean;
-        beta_to_mu.col(continuous_covar_inds[k] - 1) = mean_vec;
+        arma::colvec mean_vec = arma::ones(pred_grid.n_rows) * colmean;
+        pred_grid.col(continuous_covar_inds[k] - 1) = mean_vec;
       }
     }
 
     // Compute the marginal means by average over covariates
-    arma::colvec grid_preds = beta_to_mu * beta.t();
+    arma::colvec grid_preds = pred_grid * beta.t();
 
     if (n_covar_levels > 0) {
       arma::rowvec marginal_means(m);
-      int n_per_covar_group = grid_preds.n_elem / n_covar_levels;
-
       for (int k = 0; k < m; k++) {
-        marginal_means(k) = arma::mean(grid_preds.rows(k * n_per_covar_group, (k + 1) * n_per_covar_group - 1));
+        marginal_means(k) = arma::mean(grid_preds.rows(k * n_covar_levels, (k + 1) * n_covar_levels - 1));
       }
 
       adj_group_means.row(i) = marginal_means;
@@ -287,6 +285,7 @@ List anova_cpp(
       //If an entire group is missing (which shouldn't happen), the number of groups needs to be decreased
       if(group_sizes(i,k)<1){
         missing_m = missing_m + 1;
+        adj_group_means(i,k) = arma::datum::nan;
       }
 
       //group_sizes(k) = 0;

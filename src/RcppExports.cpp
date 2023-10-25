@@ -95,8 +95,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // anova_cpp
-List anova_cpp(arma::mat data, NumericVector gp, int unequal_var, arma::mat X, arma::mat Beta, arma::mat beta_to_mu, arma::uvec continuous_covar_inds, int n_covar_levels);
-RcppExport SEXP _pmartR_anova_cpp(SEXP dataSEXP, SEXP gpSEXP, SEXP unequal_varSEXP, SEXP XSEXP, SEXP BetaSEXP, SEXP beta_to_muSEXP, SEXP continuous_covar_indsSEXP, SEXP n_covar_levelsSEXP) {
+List anova_cpp(arma::mat data, NumericVector gp, int unequal_var, arma::mat X, arma::mat Beta, arma::mat pred_grid, arma::uvec continuous_covar_inds, int n_covar_levels);
+RcppExport SEXP _pmartR_anova_cpp(SEXP dataSEXP, SEXP gpSEXP, SEXP unequal_varSEXP, SEXP XSEXP, SEXP BetaSEXP, SEXP pred_gridSEXP, SEXP continuous_covar_indsSEXP, SEXP n_covar_levelsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -105,10 +105,10 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type unequal_var(unequal_varSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type Beta(BetaSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type beta_to_mu(beta_to_muSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type pred_grid(pred_gridSEXP);
     Rcpp::traits::input_parameter< arma::uvec >::type continuous_covar_inds(continuous_covar_indsSEXP);
     Rcpp::traits::input_parameter< int >::type n_covar_levels(n_covar_levelsSEXP);
-    rcpp_result_gen = Rcpp::wrap(anova_cpp(data, gp, unequal_var, X, Beta, beta_to_mu, continuous_covar_inds, n_covar_levels));
+    rcpp_result_gen = Rcpp::wrap(anova_cpp(data, gp, unequal_var, X, Beta, pred_grid, continuous_covar_inds, n_covar_levels));
     return rcpp_result_gen;
 END_RCPP
 }

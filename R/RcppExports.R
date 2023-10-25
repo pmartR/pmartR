@@ -29,8 +29,8 @@ fold_change_diff_na_okay <- function(data, C) {
     .Call('_pmartR_fold_change_diff_na_okay', PACKAGE = 'pmartR', data, C)
 }
 
-anova_cpp <- function(data, gp, unequal_var, X, Beta, beta_to_mu, continuous_covar_inds, n_covar_levels) {
-    .Call('_pmartR_anova_cpp', PACKAGE = 'pmartR', data, gp, unequal_var, X, Beta, beta_to_mu, continuous_covar_inds, n_covar_levels)
+anova_cpp <- function(data, gp, unequal_var, X, Beta, pred_grid, continuous_covar_inds, n_covar_levels) {
+    .Call('_pmartR_anova_cpp', PACKAGE = 'pmartR', data, gp, unequal_var, X, Beta, pred_grid, continuous_covar_inds, n_covar_levels)
 }
 
 two_factor_anova_cpp <- function(y, X_full, X_red, group_ids, beta_to_mu_full, beta_to_mu_red, continuous_covar_inds, n_covar_levels) {

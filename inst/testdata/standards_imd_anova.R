@@ -243,7 +243,11 @@ cfilta_2_2_4 <- applyFilt(filta_2_2_4, pdata_2_2_4,
 
 Xmatrix_1_1_3 <- structure(c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 1, 
 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 
-1, 0, 1, 0, 1, 1, 0, 1, 1, 0), dim = c(12L, 4L))
+1, 0, 1, 0, 1, 1, 0, 1, 1, 0), dim = c(12L, 4L), dimnames = list(
+    c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", 
+    "12"), c("(Intercept)", "Groupzombie", "Grouphuman", "GenderM"
+    )), assign = c(0L, 1L, 1L, 2L), contrasts = list(Group = "contr.treatment", 
+    Gender = "contr.treatment"))
 
 Xmatrix_1_2_3 <-  structure(c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 1, 
 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 
@@ -353,43 +357,35 @@ attr(astan_1_0_2, "cnames") <- list(
 attr(astan_1_0_2, "data_class") <- "pepData"
 
 # main effects: 1; covariates: 1; groups: 3 ---------------
+data_1_1_3 = afilta_1_1_3$e_data[, -1]
 
-# Adjust the means to remove effect of covariates.
-Betas = compute_betas(data_mat = data.matrix(afilta_1_1_3$e_data[, -1]), Xmatrix = data.matrix(Xmatrix_1_1_3))
-covariate_effects = Xmatrix_1_1_3[,4] %*% t(Betas[,4])
+Betas = compute_betas(data_mat = data.matrix(data_1_1_3), Xmatrix = data.matrix(Xmatrix_1_1_3))
+pred_grid <- get_pred_grid(xmatrix = Xmatrix_1_1_3, groups = attr(afilta_1_1_3, "group_DF")$Group)
 
-# Adjust the means to remove effect of covariates, these should just actually be the parameter estimates.
-adj_data_1_1_3 <- data.matrix(afilta_1_1_3$e_data[, -1]) - t(covariate_effects)
-adj_data_1_1_3 <- as.data.frame(adj_data_1_1_3)
+mean_a_1_1_3 <- get_lsmeans(data = data_1_1_3, xmatrix = Xmatrix_1_1_3, pred_grid = pred_grid, Betas = Betas)
 
-mean_a_1_1_3 <- data.frame(
-  Mean_mutant = rowMeans(adj_data_1_1_3[, c(1, 3:4, 9)],
-                         na.rm = TRUE),
-  Mean_zombie = rowMeans(adj_data_1_1_3[, c(2, 5:8)],
-                         na.rm = TRUE),
-  Mean_human = rowMeans(adj_data_1_1_3[, 10:12],
-                        na.rm = TRUE)
-)
-
-cmat = rbind(c(1, -1, 0), c(1, 0, -1), c(0, 1, -1))
-beta_to_mu = Xmatrix_1_1_3
-beta_to_mu[, 4] = 0
+beta_to_mu = pred_grid
+beta_to_mu[,4] = 0
 beta_to_mu = unique(beta_to_mu)
+cmat = rbind(c(1, -1, 0), c(1, 0, -1), c(0, 1, -1))
 cmat = cmat %*% beta_to_mu
 
 test_values <- get_test_values(afilta_1_1_3$e_data[, -1], Xmatrix_1_1_3, cmat)
 
 group_counts_1_1_3 <- data.frame(
-  nona_mutant = rowSums(!is.na(adj_data_1_1_3[, c(1, 3:4, 9)])),
-  nona_zombie = rowSums(!is.na(adj_data_1_1_3[, c(2, 5:8)])),
-  nona_human = rowSums(!is.na(adj_data_1_1_3[, 10:12]))
+  nona_mutant = rowSums(!is.na(data_1_1_3[, c(1, 3:4, 9)])),
+  nona_zombie = rowSums(!is.na(data_1_1_3[, c(2, 5:8)])),
+  nona_human = rowSums(!is.na(data_1_1_3[, 10:12]))
 ) %>%
   dplyr::rowwise() %>%
   dplyr::mutate(n_grp = sum(dplyr::c_across(nona_mutant:nona_human) == 0)) %>%
   dplyr::ungroup()
 
 nona_grps_1_1_3 <- rowSums(group_counts_1_1_3[, 1:3] != 0)
-nona_counts_1_1_3 <- rowSums(!is.na(adj_data_1_1_3))
+nona_counts_1_1_3 <- rowSums(!is.na(data_1_1_3))
+
+# set mean_a_1_1_3 to NA for groups with zero observations
+mean_a_1_1_3[group_counts_1_1_3[,-4] == 0] <- NA
 
 diffs_1_1_3 <- mean_a_1_1_3 %>%
   dplyr::mutate(
