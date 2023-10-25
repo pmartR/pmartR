@@ -113,8 +113,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // two_factor_anova_cpp
-List two_factor_anova_cpp(arma::mat y, arma::mat X_full, arma::mat X_red, arma::colvec group_ids, arma::mat beta_to_mu_full, arma::mat beta_to_mu_red, arma::uvec continuous_covar_inds, int n_covar_levels);
-RcppExport SEXP _pmartR_two_factor_anova_cpp(SEXP ySEXP, SEXP X_fullSEXP, SEXP X_redSEXP, SEXP group_idsSEXP, SEXP beta_to_mu_fullSEXP, SEXP beta_to_mu_redSEXP, SEXP continuous_covar_indsSEXP, SEXP n_covar_levelsSEXP) {
+List two_factor_anova_cpp(arma::mat y, arma::mat X_full, arma::mat X_red, arma::colvec group_ids, arma::mat pred_grid_full, arma::mat pred_grid_red, arma::uvec continuous_covar_inds, int n_covar_levels);
+RcppExport SEXP _pmartR_two_factor_anova_cpp(SEXP ySEXP, SEXP X_fullSEXP, SEXP X_redSEXP, SEXP group_idsSEXP, SEXP pred_grid_fullSEXP, SEXP pred_grid_redSEXP, SEXP continuous_covar_indsSEXP, SEXP n_covar_levelsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -122,11 +122,11 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::mat >::type X_full(X_fullSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type X_red(X_redSEXP);
     Rcpp::traits::input_parameter< arma::colvec >::type group_ids(group_idsSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type beta_to_mu_full(beta_to_mu_fullSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type beta_to_mu_red(beta_to_mu_redSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type pred_grid_full(pred_grid_fullSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type pred_grid_red(pred_grid_redSEXP);
     Rcpp::traits::input_parameter< arma::uvec >::type continuous_covar_inds(continuous_covar_indsSEXP);
     Rcpp::traits::input_parameter< int >::type n_covar_levels(n_covar_levelsSEXP);
-    rcpp_result_gen = Rcpp::wrap(two_factor_anova_cpp(y, X_full, X_red, group_ids, beta_to_mu_full, beta_to_mu_red, continuous_covar_inds, n_covar_levels));
+    rcpp_result_gen = Rcpp::wrap(two_factor_anova_cpp(y, X_full, X_red, group_ids, pred_grid_full, pred_grid_red, continuous_covar_inds, n_covar_levels));
     return rcpp_result_gen;
 END_RCPP
 }

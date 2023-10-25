@@ -940,7 +940,7 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
     }
   
     # Construct the matrix which predicts over all group + categorical covariates combinations.  Continuous covariates will be set to the mean of their values for non-missing data points.
-    pred_grid_red <- pred_grid_full <- get_pred_grid(Xred, gp)
+    pred_grid_red <- pred_grid_full <- get_pred_grid(Xred, gp, continuous_covar_inds)
     n_covar_levels <- pred_grid_red[,covar_inds,drop=FALSE] %>% unique() %>% nrow()
     
     #Rcpp::sourceCpp('~/pmartR/src/anova_helper_funs.cpp') #Run if debugging code
@@ -975,17 +975,17 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
       continuous_covar_inds <- numeric(0)
     }
 
-    pred_grid_red <- get_pred_grid(Xred, gp)
-    pred_grid_full <- get_pred_grid(Xfull, gp)
+    pred_grid_red <- get_pred_grid(Xred, gp, continuous_covar_inds)
+    pred_grid_full <- get_pred_grid(Xfull, gp, continuous_covar_inds)
 
-    n_covar_levels <- beta_to_mu_red[,covar_inds,drop=FALSE] %>% unique() %>% nrow()
+    n_covar_levels <- pred_grid_red[,covar_inds,drop=FALSE] %>% unique() %>% nrow()
 
     raw_results <- run_twofactor_cpp(
       data=data.matrix(data),
       gpData=groupData_sub,
       Xfull=Xfull, Xred=Xred,
-      beta_to_mu_full=pred_grid_full,
-      beta_to_mu_red=pred_grid_red,
+      pred_grid_full=pred_grid_full,
+      pred_grid_red=pred_grid_red,
       continuous_covar_inds = continuous_covar_inds,
       n_covar_levels = n_covar_levels
     )
@@ -1099,15 +1099,15 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
 }
 
 #Wrapper function for the two factor ANOVA function
-run_twofactor_cpp <- function(data,gpData,covar_names, Xfull, Xred, beta_to_mu_full, beta_to_mu_red, continuous_covar_inds, n_covar_levels){
+run_twofactor_cpp <- function(data,gpData,covar_names, Xfull, Xred, pred_grid_full, pred_grid_red, continuous_covar_inds, n_covar_levels){
   #Run the two factor ANOVA model
   res <- two_factor_anova_cpp(
     data,
     Xfull,
     Xred,
     group_ids=as.numeric(factor(gpData$Group,levels=unique(gpData$Group))),
-    beta_to_mu_full,
-    beta_to_mu_red,
+    pred_grid_full,
+    pred_grid_red,
     continuous_covar_inds,
     n_covar_levels
   )

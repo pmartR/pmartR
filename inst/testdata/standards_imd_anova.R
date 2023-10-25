@@ -1,6 +1,6 @@
 # Load functions for calculating IMD-ANOVA standards ---------------------------
 
-source (system.file("testdata",
+source(system.file("testdata",
                     "imd_anova_standard_fns.R",
                     package = "pmartR"))
 
@@ -277,6 +277,7 @@ Xmatrix_2_2_4_full <- structure(c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0
 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 59.68, 37.16, 69.4, 73.12, 69.27, 
 47.68, 53.79, 19.45, 27.06, 30.07, 22.04, 31.57, 0, 0, 0, 0, 
 0, 0, 0, 0, 1, 1, 1, 0), dim = c(12L, 6L))
+
 # main effects: 1; covariates: 0; groups: 2 ---------------
 
 mean_a_1_0_2 <- data.frame(
@@ -628,34 +629,32 @@ dunnett_1_1_3 <- pval_a_1_1_3 %>%
 
 # main effects: 1; covariates: 2; groups: 3 ---------------
 
-# Adjust the means to remove effect of covariates.
-Betas = compute_betas(data_mat = data.matrix(afilta_1_2_3$e_data[, -1]), Xmatrix = data.matrix(Xmatrix_1_2_3))
-covariate_effects = Xmatrix_1_2_3[,4:5] %*% t(Betas[,4:5])
+data_1_2_3 = afilta_1_2_3$e_data[, -1]
 
-# Adjust the means to remove effect of covariates.
-adj_data_1_2_3 <- data.matrix(afilta_1_2_3$e_data[, -1]) - t(covariate_effects)
-adj_data_1_2_3 <- as.data.frame(adj_data_1_2_3)
+Betas = compute_betas(data_mat = data.matrix(data_1_2_3), Xmatrix = data.matrix(Xmatrix_1_2_3))
+pred_grid <- get_pred_grid(xmatrix = Xmatrix_1_2_3, groups = attr(afilta_1_2_3, "group_DF")$Group, continuous_covar_inds = 5)
 
-mean_a_1_2_3 <- data.frame(
-  Mean_mutant = rowMeans(adj_data_1_2_3[, c(1, 3:4, 9)],
-                         na.rm = TRUE),
-  Mean_zombie = rowMeans(adj_data_1_2_3[, c(2, 5:8)],
-                         na.rm = TRUE),
-  Mean_human = rowMeans(adj_data_1_2_3[, 10:12],
-                        na.rm = TRUE)
-)
+mean_a_1_2_3 <- get_lsmeans(data = data_1_2_3, xmatrix = Xmatrix_1_2_3, pred_grid = pred_grid, Betas = Betas, continuous_covar_inds = 5)
+
+beta_to_mu = pred_grid
+beta_to_mu[,4] = 0
+beta_to_mu = unique(beta_to_mu)
+cmat = rbind(c(1, -1, 0), c(1, 0, -1), c(0, 1, -1))
+cmat = cmat %*% beta_to_mu
 
 group_counts_1_2_3 <- data.frame(
-  nona_mutant = rowSums(!is.na(adj_data_1_2_3[, c(1, 3:4, 9)])),
-  nona_zombie = rowSums(!is.na(adj_data_1_2_3[, c(2, 5:8)])),
-  nona_human = rowSums(!is.na(adj_data_1_2_3[, 10:12]))
+  nona_mutant = rowSums(!is.na(data_1_2_3[, c(1, 3:4, 9)])),
+  nona_zombie = rowSums(!is.na(data_1_2_3[, c(2, 5:8)])),
+  nona_human = rowSums(!is.na(data_1_2_3[, 10:12]))
 ) %>%
   dplyr::rowwise() %>%
   dplyr::mutate(n_grp = sum(dplyr::c_across(nona_mutant:nona_human) == 0)) %>%
   dplyr::ungroup()
 
 nona_grps_1_2_3 <- rowSums(group_counts_1_2_3[, 1:3] != 0)
-nona_counts_1_2_3 <- rowSums(!is.na(adj_data_1_2_3))
+nona_counts_1_2_3 <- rowSums(!is.na(data_1_2_3))
+
+mean_a_1_2_3[group_counts_1_2_3[,-4] == 0] <- NA
 
 diffs_1_2_3 <- mean_a_1_2_3 %>%
   dplyr::mutate(
@@ -664,12 +663,6 @@ diffs_1_2_3 <- mean_a_1_2_3 %>%
     diff_z_h = Mean_zombie - Mean_human
   ) %>%
   dplyr::select(diff_m_z, diff_m_h, diff_z_h)
-
-cmat = rbind(c(1, -1, 0), c(1, 0, -1), c(0, 1, -1))
-beta_to_mu = Xmatrix_1_2_3
-beta_to_mu[, 4:5] = 0
-beta_to_mu = unique(beta_to_mu)
-cmat = cmat %*% beta_to_mu
 
 test_values <- get_test_values(afilta_1_2_3$e_data[, -1], Xmatrix_1_2_3, cmat)
 diff_denoms <- test_values$diff_denoms
@@ -910,6 +903,7 @@ suppressWarnings(
 
 # main effects: 2; covariates: 0; groups: 3 ---------------
 
+# no covariates? should just be the observed means.
 mean_a_2_0_3 <- data.frame(
   Mean_Infection_high = rowMeans(afilta_2_0_3$e_data[, c(2:4, 7:8)],
                                  na.rm = TRUE),

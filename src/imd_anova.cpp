@@ -249,7 +249,7 @@ List anova_cpp(
     // Compute the marginal means by average over covariates
     arma::colvec grid_preds = pred_grid * beta.t();
 
-    if (n_covar_levels > 0) {
+    if (n_covar_levels > 1) {
       arma::rowvec marginal_means(m);
       for (int k = 0; k < m; k++) {
         marginal_means(k) = arma::mean(grid_preds.rows(k * n_covar_levels, (k + 1) * n_covar_levels - 1));
@@ -354,8 +354,8 @@ List two_factor_anova_cpp(arma::mat y,
                           arma::mat X_full,
                           arma::mat X_red,
                           arma::colvec group_ids,
-                          arma::mat beta_to_mu_full,
-                          arma::mat beta_to_mu_red,
+                          arma::mat pred_grid_full,
+                          arma::mat pred_grid_red,
                           arma::uvec continuous_covar_inds,
                           int n_covar_levels
                           ){
@@ -467,11 +467,11 @@ List two_factor_anova_cpp(arma::mat y,
     //Find groups that had at least one non-missing value
     group_ids_nona_unq=arma::unique(group_ids_nona);
 
-    arma::mat beta_to_mu;
+    arma::mat pred_grid;
     if (whichX[i] == 0) {
-      beta_to_mu = beta_to_mu_red;
+      pred_grid = pred_grid_red;
     } else {
-      beta_to_mu = beta_to_mu_full;
+      pred_grid = pred_grid_full;
     }
     
     // Average numeric covariates in preparation for model predictions.
@@ -479,21 +479,20 @@ List two_factor_anova_cpp(arma::mat y,
       // Replace each column indexed by covar_inds with it's mean
       for (int k = 0; k < continuous_covar_inds.size(); k++) {
         double colmean = arma::mean(XFinal.col(continuous_covar_inds[k] - 1));
-        arma::colvec mean_vec = arma::ones(beta_to_mu.n_rows) * colmean;
-        beta_to_mu.col(continuous_covar_inds[k] - 1) = mean_vec;
+        arma::colvec mean_vec = arma::ones(pred_grid.n_rows) * colmean;
+        pred_grid.col(continuous_covar_inds[k] - 1) = mean_vec;
       }
     }
 
     // Predicted values over all levels of the main effects and categorical covariates.  Continuous covariates are averaged.
-    arma::colvec grid_preds = beta_to_mu * beta.head_rows(beta_to_mu.n_cols);
+    arma::colvec grid_preds = pred_grid * beta.head_rows(pred_grid.n_cols);
 
     // Compute the lsmeans by averaging over covariates
     if (n_covar_levels > 1) {
       arma::rowvec marginal_means(n_groups);
-      int n_per_covar_group = grid_preds.n_elem / n_covar_levels;
 
       for (int k = 0; k < n_groups; k++) {
-        marginal_means(k) = arma::mean(grid_preds.rows(k * n_per_covar_group, (k + 1) * n_per_covar_group - 1));
+        marginal_means(k) = arma::mean(grid_preds.rows(k * n_covar_levels, (k + 1) * n_covar_levels - 1));
       }
 
       lsmeans.row(i) = marginal_means;
@@ -507,6 +506,10 @@ List two_factor_anova_cpp(arma::mat y,
     for(j=0;j<n_groups;j++){
       size_j = find(group_ids_nona==j);
       gsizes(j) = size_j.n_elem;
+
+      if (gsizes(j) == 0) {
+        lsmeans(i, j) = arma::datum::nan;
+      }
     }
     
     group_sizes.row(i) = gsizes; //For now don't return the interaction groups
