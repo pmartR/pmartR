@@ -455,56 +455,25 @@ attr(astan_1_0_3, "cnames") <- list(
 attr(astan_1_0_3, "data_class") <- "pepData"
 
 # main effects: 1; covariates: 1; groups: 3 ---------------
-Betas = compute_betas(data_mat = data.matrix(diff_a_1_0_3[, -1]), Xmatrix = Xmatrix_1_1_3)
+data_1_1_3 <- data.matrix(diff_a_1_0_3[, -1])
 
-covariate_effects = Xmatrix_1_1_3[,4] %*% t(Betas[,4])
-
-# Adjust the means to remove effect of covariates.
-adj_data_1_1_3 <- data.matrix(diff_a_1_0_3[, -1]) - t(covariate_effects)
-adj_data_1_1_3 <- as.data.frame(adj_data_1_1_3)
-
-mean_a_1_1_3 <- data.frame(
-  Mean_Mock = rowMeans(adj_data_1_1_3[, 1:5],
-                       na.rm = TRUE),
-  Mean_FM = rowMeans(adj_data_1_1_3[, 6:10],
-                     na.rm = TRUE),
-  Mean_AM = rowMeans(adj_data_1_1_3[, 11:15],
-                     na.rm = TRUE)
-)
+Betas = compute_betas(data_mat = data_1_1_3, Xmatrix = Xmatrix_1_1_3)
+pred_grid <- get_pred_grid(xmatrix = Xmatrix_1_1_3, groups = groupie$Group)
+mean_a_1_1_3 <- get_lsmeans(data = data_1_1_3, xmatrix = Xmatrix_1_1_3, pred_grid = pred_grid, Betas = Betas)
 
 group_counts_1_1_3 <- data.frame(
-  nona_Mock = rowSums(!is.na(adj_data_1_1_3[, 1:5])),
-  nona_FM = rowSums(!is.na(adj_data_1_1_3[, 6:10])),
-  nona_AM = rowSums(!is.na(adj_data_1_1_3[, 11:15]))
+  nona_Mock = rowSums(!is.na(data_1_1_3[, 1:5])),
+  nona_FM = rowSums(!is.na(data_1_1_3[, 6:10])),
+  nona_AM = rowSums(!is.na(data_1_1_3[, 11:15]))
 ) %>%
   dplyr::rowwise() %>%
   dplyr::mutate(n_grp = sum(dplyr::c_across(nona_Mock:nona_AM) == 0)) %>%
   dplyr::ungroup()
 
+mean_a_1_1_3[group_counts_1_1_3[,-4] == 0] <- NA
+
 nona_grps_1_1_3 <- rowSums(group_counts_1_1_3[, 1:3] != 0)
-
-mymiss <- diff_a_1_0_3[, -1] %>% apply(1, function(x) !is.na(x))
-ranks <- sapply(1:ncol(mymiss), function(i) {
-  col = mymiss[,i]
-  rank = Matrix::rankMatrix(Xmatrix_1_1_3[col,])
-})
-
-XTXs <- lapply(1:ncol(mymiss), function(i) {
-  col = mymiss[,i]
-  rank = MASS::ginv(t(Xmatrix_1_1_3[col,]) %*% Xmatrix_1_1_3[col,])
-})
-
-SEs <- lapply(1:length(XTXs), function(i) {
-  nona_idx = mymiss[,i]
-  y = unlist(diff_a_1_0_3[i,-1][nona_idx])
-  H = Xmatrix_1_1_3[nona_idx,] %*% XTXs[[i]] %*% t(Xmatrix_1_1_3[nona_idx,])
-  resids = y - (H %*% y)
-  SSE = sum(resids^2)
-  denom = sum(nona_idx) - ranks[i] + group_counts_1_1_3$n_grp[1]
-  return(sqrt(SSE/denom))
-})
-
-nona_counts_1_1_3 <- rowSums(!is.na(adj_data_1_1_3))
+nona_counts_1_1_3 <- rowSums(!is.na(data_1_1_3))
 
 diffs_1_1_3 <- mean_a_1_1_3 %>%
   dplyr::mutate(
@@ -514,17 +483,15 @@ diffs_1_1_3 <- mean_a_1_1_3 %>%
   ) %>%
   dplyr::select(diff_m_f, diff_m_a, diff_f_a)
 
-cmat = rbind(c(1, -1, 0), c(1, 0, -1), c(0, 1, -1))
-beta_to_mu = Xmatrix_1_1_3
+beta_to_mu = pred_grid
 beta_to_mu[,4] = 0
 beta_to_mu = unique(beta_to_mu)
+cmat = rbind(c(1, -1, 0), c(1, 0, -1), c(0, 1, -1))
 cmat = cmat %*% beta_to_mu
 
-diff_denoms <- lapply(1:length(XTXs), function(i) {
-  sqrt(diag(cmat %*% XTXs[[i]] %*% t(cmat))) * SEs[[i]]
-})
-
-diff_denoms <- do.call(rbind, diff_denoms) %>% `colnames<-`(c("C1", "C2", "C3"))
+test_values <- get_test_values(data_1_1_3, Xmatrix_1_1_3, cmat)
+diff_denoms <- test_values$diff_denoms
+colnames(diff_denoms) <- c("C1", "C2", "C3")
 
 test_stat_1_1_3 <- diffs_1_1_3 %>%
   cbind(group_counts_1_1_3) %>%
@@ -541,20 +508,20 @@ test_stat_1_1_3 <- diffs_1_1_3 %>%
 pval_a_1_1_3 <- test_stat_1_1_3 %>%
   dplyr::mutate(
     lg = group_counts_1_1_3$n_grp,
-    ranks = ranks,
+    ranks = test_values$ranks,
     P_value_A_Mock_vs_FM = pt(
       q = abs(stat_m_f),
-      df = nona_counts_1_1_3 - ranks,
+      df = nona_counts_1_1_3 - test_values$ranks,
       lower.tail = FALSE
     ) * 2,
     P_value_A_Mock_vs_AM = pt(
       q = abs(stat_m_a),
-      df = nona_counts_1_1_3 - ranks,
+      df = nona_counts_1_1_3 - test_values$ranks,
       lower.tail = FALSE
     ) * 2,
     P_value_A_FM_vs_AM = pt(
       q = abs(stat_f_a),
-      df = nona_counts_1_1_3 - ranks,
+      df = nona_counts_1_1_3 - test_values$ranks,
       lower.tail = FALSE
     ) * 2
   ) %>%
@@ -894,27 +861,22 @@ flag_g_1_1_3 <- data.frame(
   )
 )
 
-Xmatrix = Xmatrix_1_1_3
-Betas = compute_betas(data_mat = data.matrix(diff_g[, -1]), Xmatrix = Xmatrix)
+data_g_1_1_3 <- data.matrix(diff_g[, -1])
 
-covariate_effects = Xmatrix[,4] %*% t(Betas[,4])
+Betas = compute_betas(data_mat = data_g_1_1_3, Xmatrix = Xmatrix_1_1_3)
+pred_grid <- get_pred_grid(xmatrix = Xmatrix_1_1_3, groups = groupie$Group)
+mean_g_1_1_3 <- get_lsmeans(data = data_g_1_1_3, xmatrix = Xmatrix_1_1_3, pred_grid = pred_grid, Betas = Betas)
 
-# Adjust the means to remove effect of covariates.
-adj_data_g_1_1_3 <- data.matrix(diff_g[, -1]) - t(covariate_effects)
-adj_data_g_1_1_3 <- as.data.frame(adj_data_g_1_1_3)
+group_counts_g_1_1_3 <- data.frame(
+  nona_Mock = rowSums(!is.na(data_g_1_1_3[, 1:5])),
+  nona_FM = rowSums(!is.na(data_g_1_1_3[, 6:10])),
+  nona_AM = rowSums(!is.na(data_g_1_1_3[, 11:15]))
+) %>%
+  dplyr::rowwise() %>%
+  dplyr::mutate(n_grp = sum(dplyr::c_across(nona_Mock:nona_AM) == 0)) %>%
+  dplyr::ungroup()
 
-mean_g_1_1_3 <- data.frame(
-  Mean_Mock = rowMeans(adj_data_g_1_1_3[, 1:5],
-                       na.rm = TRUE),
-  Mean_FM = rowMeans(adj_data_g_1_1_3[, 6:10],
-                     na.rm = TRUE),
-  Mean_AM = rowMeans(adj_data_g_1_1_3[, 11:15],
-                     na.rm = TRUE)
-)
-
-cmat = rbind(c(1, -1, 0, 0), c(1, 0, -1, 0), c(0, 1, -1, 0))
-Betas = compute_betas(data_mat = data.matrix(diff_g[, -1]), Xmatrix = Xmatrix_1_1_3)
-Betas[,1:3][is.na(mean_g_1_1_3)] <- NA
+mean_g_1_1_3[group_counts_g_1_1_3[,-4] == 0] <- NA
 
 diffs_1_1_3 <- mean_g_1_1_3 %>%
   dplyr::mutate(
