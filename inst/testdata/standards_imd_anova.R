@@ -1174,7 +1174,7 @@ dunnett_2_0_3 <- pval_a_2_0_3 %>%
 
 # main effects: 2; covariates: 1; groups: 4 ---------------
 
-data = data.matrix(afilta_2_1_4$e_data[, -1])
+data_2_1_4 = data.matrix(afilta_2_1_4$e_data[, -1])
 
 covariate_names = colnames(attr(attr(afilta_2_1_4, "group_DF"), "covariates"))[-1]
 main_effect_names = attr(attr(afilta_2_1_4, "group_DF"), "main_effects")
@@ -1183,22 +1183,31 @@ groupData <- groupDF_2_1_4[group_sampnames %in% colnames(afilta_2_1_4$e_data),]
 groupData <- groupData %>% 
   dplyr::left_join(afilta_2_1_4$f_data)
 
-cobra <- run_twofactor_cpp(data = data.matrix(afilta_2_1_4$e_data[, -1]),
-                        gpData = groupData[,c("Group", main_effect_names, covariate_names)], covar_names = c("Gender"))
+# no continuous covariates
+pred_grid_full_2_1_4 = get_pred_grid(Xmatrix_2_1_4_full, groupData$Group)
+pred_grid_red_2_1_4 = get_pred_grid(Xmatrix_2_1_4, groupData$Group)
+
+cobra <- run_twofactor_cpp(
+  data = data.matrix(data_2_1_4),
+  gpData = groupData[,c("Group", main_effect_names, covariate_names)], 
+  Xfull=Xmatrix_2_1_4_full, Xred = Xmatrix_2_1_4,
+  pred_grid_full = pred_grid_full_2_1_4, pred_grid_red = pred_grid_red_2_1_4,
+  continuous_covar_inds = numeric(0)
+)
 
 group_counts_2_1_4 <- data.frame(
-  nona_Infection_high = rowSums(!is.na(data[, c(1, 3, 5)])),
-  nona_Infection_low = rowSums(!is.na(data[, c(2, 4, 6)])),
-  nona_Mock_high = rowSums(!is.na(data[, c(7, 8, 12)])),
-  nona_Mock_low = rowSums(!is.na(data[, c(9, 10, 11)]))
+  nona_Infection_high = rowSums(!is.na(data_2_1_4[, c(1, 3, 5)])),
+  nona_Infection_low = rowSums(!is.na(data_2_1_4[, c(2, 4, 6)])),
+  nona_Mock_high = rowSums(!is.na(data_2_1_4[, c(7, 8, 12)])),
+  nona_Mock_low = rowSums(!is.na(data_2_1_4[, c(9, 10, 11)]))
 ) %>%
   dplyr::ungroup()
 
 nona_grps_2_1_4 <- unname(rowSums(group_counts_2_1_4 != 0))
-nona_counts_2_1_4 <- unname(rowSums(!is.na(data)))
+nona_counts_2_1_4 <- unname(rowSums(!is.na(data_2_1_4)))
 
-mean_a_2_1_4 <- data.frame(cobra$adj_group_means) 
-colnames(mean_a_2_1_4) <- paste0("Mean_", colnames(mean_a_2_1_4))
+mean_a_2_1_4 <- data.frame(cobra$lsmeans) 
+colnames(mean_a_2_1_4) <- paste0("Mean_", unique(groupData$Group))
 
 diffs_2_1_4 <- mean_a_2_1_4 %>%
   dplyr::mutate(
@@ -1216,17 +1225,17 @@ diffs_2_1_4 <- mean_a_2_1_4 %>%
 cmat = rbind(c(1, -1, 0, 0), c(1, 0, -1, 0), c(1, 0, 0, -1),
              c(0, 1, -1, 0), c(0, 1, 0, -1), c(0, 0, 1, -1))
 
-beta_to_mu <- Xmatrix_2_1_4
+beta_to_mu <- pred_grid_red_2_1_4
 beta_to_mu[,4] <- 0
 beta_to_mu <- unique(beta_to_mu)
 cmat_red <- cmat %*% beta_to_mu
 
-beta_to_mu_full <- Xmatrix_2_1_4_full
+beta_to_mu_full <- pred_grid_full_2_1_4
 beta_to_mu_full[,4] <- 0
 beta_to_mu_full <- unique(beta_to_mu_full)
 cmat_full <- cmat %*% beta_to_mu_full
 
-test_values <- get_test_values_twofactor(afilta_2_1_4$e_data[, -1], Xmatrix_2_1_4, Xmatrix_2_1_4_full, cmat_red, cmat_full, cobra$which_X)
+test_values <- get_test_values_twofactor(data_2_1_4, Xmatrix_2_1_4, Xmatrix_2_1_4_full, cmat_red, cmat_full, cobra$which_X)
 
 diff_denoms <- test_values$diff_denoms
 colnames(diff_denoms) <- c("C1", "C2", "C3", "C4", "C5", "C6")
@@ -1575,7 +1584,7 @@ dunnett_2_1_4 <- pval_a_2_1_4 %>%
                 pval_il_mh, pval_il_ml, pval_mh_ml)
 
 # main effects: 2; covariates: 2; groups: 4 ---------------
-data = data.matrix(afilta_2_2_4$e_data[, -1])
+data_2_2_4 = data.matrix(afilta_2_2_4$e_data[, -1])
 
 covariate_names = colnames(attr(attr(afilta_2_2_4, "group_DF"), "covariates"))[-1]
 main_effect_names = attr(attr(afilta_2_2_4, "group_DF"), "main_effects")
@@ -1584,22 +1593,30 @@ groupData <- groupDF_2_2_4[group_sampnames %in% colnames(afilta_2_2_4$e_data),]
 groupData <- groupData %>% 
   dplyr::left_join(afilta_2_2_4$f_data)
 
-cobra <- run_twofactor_cpp(data = data.matrix(afilta_2_2_4$e_data[, -1]),
-                           gpData = groupData[,c("Group", main_effect_names, covariate_names)], covar_names = c("Gender", "Age"))
+pred_grid_full_2_2_4 = get_pred_grid(Xmatrix_2_2_4_full, groupData$Group, continuous_covar_inds = 5)
+pred_grid_red_2_2_4 = get_pred_grid(Xmatrix_2_2_4, groupData$Group, continuous_covar_inds = 5)
+
+cobra <- run_twofactor_cpp(
+  data = data.matrix(data_2_2_4),
+  gpData = groupData[,c("Group", main_effect_names, covariate_names)], 
+  Xfull=Xmatrix_2_2_4_full, Xred = Xmatrix_2_2_4,
+  pred_grid_full = pred_grid_full_2_2_4, pred_grid_red = pred_grid_red_2_2_4,
+  continuous_covar_inds = 5
+)
 
 group_counts_2_2_4 <- data.frame(
-  nona_Infection_high = rowSums(!is.na(data[, c(1, 3, 5)])),
-  nona_Infection_low = rowSums(!is.na(data[, c(2, 4, 6)])),
-  nona_Mock_high = rowSums(!is.na(data[, c(7, 8, 12)])),
-  nona_Mock_low = rowSums(!is.na(data[, c(9, 10, 11)]))
+  nona_Infection_high = rowSums(!is.na(data_2_2_4[, c(1, 3, 5)])),
+  nona_Infection_low = rowSums(!is.na(data_2_2_4[, c(2, 4, 6)])),
+  nona_Mock_high = rowSums(!is.na(data_2_2_4[, c(7, 8, 12)])),
+  nona_Mock_low = rowSums(!is.na(data_2_2_4[, c(9, 10, 11)]))
 ) %>%
   dplyr::ungroup()
 
 nona_grps_2_2_4 <- unname(rowSums(group_counts_2_2_4 != 0))
-nona_counts_2_2_4 <- unname(rowSums(!is.na(data)))
+nona_counts_2_2_4 <- unname(rowSums(!is.na(data_2_2_4)))
 
-mean_a_2_2_4 <- data.frame(cobra$adj_group_means) 
-colnames(mean_a_2_2_4) <- paste0("Mean_", colnames(mean_a_2_2_4))
+mean_a_2_2_4 <- data.frame(cobra$lsmeans)
+colnames(mean_a_2_2_4) <- paste0("Mean_", unique(groupData$Group))
 
 diffs_2_2_4 <- mean_a_2_2_4 %>%
   dplyr::mutate(
@@ -1616,17 +1633,17 @@ diffs_2_2_4 <- mean_a_2_2_4 %>%
 cmat = rbind(c(1, -1, 0, 0), c(1, 0, -1, 0), c(1, 0, 0, -1),
              c(0, 1, -1, 0), c(0, 1, 0, -1), c(0, 0, 1, -1))
 
-beta_to_mu = Xmatrix_2_2_4
+beta_to_mu = pred_grid_red_2_2_4
 beta_to_mu[,4:5] <- 0
 beta_to_mu <- unique(beta_to_mu)
 cmat_red <- cmat %*% beta_to_mu
 
-beta_to_mu_full = Xmatrix_2_2_4_full
+beta_to_mu_full = pred_grid_full_2_2_4
 beta_to_mu_full[,4:5] <- 0
 beta_to_mu_full <- unique(beta_to_mu_full)
 cmat_full <- cmat %*% beta_to_mu_full
 
-test_values <- get_test_values_twofactor(data, Xmatrix_2_2_4, Xmatrix_2_2_4_full, cmat_red, cmat_full, cobra$which_X)
+test_values <- get_test_values_twofactor(data_2_2_4, Xmatrix_2_2_4, Xmatrix_2_2_4_full, cmat_red, cmat_full, cobra$which_X)
 
 diff_denoms <- test_values$diff_denoms
 colnames(diff_denoms) <- c("C1", "C2", "C3", "C4", "C5", "C6")
@@ -2179,29 +2196,26 @@ flag_g_1_1_3 <- data.frame(
   )
 )
 
-Betas = compute_betas(data_mat = data.matrix(gfilta_1_1_3$e_data[, -1]), Xmatrix = data.matrix(Xmatrix_1_1_3))
-covariate_effects = Xmatrix_1_1_3[,4] %*% t(Betas[,4])
+data_1_1_3 <- gfilta_1_1_3$e_data[, -1]
 
-adj_data_g_1_1_3 <- data.matrix(gfilta_1_1_3$e_data[, -1]) - t(covariate_effects)
-adj_data_g_1_1_3 <- as.data.frame(adj_data_g_1_1_3)
+Betas = compute_betas(data_mat = data.matrix(data_1_1_3), Xmatrix = data.matrix(Xmatrix_1_1_3))
+pred_grid <- get_pred_grid(xmatrix = Xmatrix_1_1_3, groups = attr(gfilta_1_1_3, "group_DF")$Group)
+mean_1_1_3 <- get_lsmeans(data = data_1_1_3, xmatrix = Xmatrix_1_1_3, pred_grid = pred_grid, Betas = Betas)
 
-mean_1_1_3 <- data.frame(
-  Mean_mutant = rowMeans(adj_data_g_1_1_3[, c(1, 3, 4, 9)],
-                         na.rm = TRUE),
-  Mean_zombie = rowMeans(adj_data_g_1_1_3[, c(2, 5:8)],
-                         na.rm = TRUE),
-  Mean_human = rowMeans(adj_data_g_1_1_3[, c(10:12)],
-                        na.rm = TRUE)
+counts_1_1_3 <- data.frame(
+  "Count_mutant" = unname(obs_mut_1_1_3),
+  "Count_zombie" = unname(obs_zom_1_1_3),
+  "Count_human" = unname(obs_hum_1_1_3)
 )
+
+mean_1_1_3[counts_1_1_3 == 0] <- NA
 
 cmat = rbind(c(1, -1, 0), c(1, 0, -1), c(0, 1, -1))
 diffs_1_1_3 <- fold_change_diff(data.matrix(mean_1_1_3), cmat)
 
 gstan_1_1_3 <- data.frame(
   Mass_Tag_ID = gfilta_1_1_3$e_data$Mass_Tag_ID,
-  Count_mutant = unname(obs_mut_1_1_3),
-  Count_zombie = unname(obs_zom_1_1_3),
-  Count_human = unname(obs_hum_1_1_3),
+  counts_1_1_3,
   mean_1_1_3,
   Fold_change_mutant_vs_zombie = diffs_1_1_3[,1],
   Fold_change_mutant_vs_human = diffs_1_1_3[,2],
@@ -2332,30 +2346,25 @@ flag_g_1_2_3 <- data.frame(
   )
 )
 
-Betas = compute_betas(data_mat = data.matrix(gfilta_1_2_3$e_data[, -1]), Xmatrix = data.matrix(Xmatrix_1_2_3))
-covariate_effects = Xmatrix_1_2_3[,4:5] %*% t(Betas[,4:5])
+data_1_2_3 = data.matrix(gfilta_1_2_3$e_data[, -1])
+Betas = compute_betas(data_mat = data_1_2_3, Xmatrix = data.matrix(Xmatrix_1_2_3))
+pred_grid <- get_pred_grid(xmatrix = Xmatrix_1_2_3, groups = attr(gfilta_1_2_3, "group_DF")$Group, continuous_covar_inds = 5)
+mean_1_2_3 <- get_lsmeans(data = data_1_2_3, xmatrix = Xmatrix_1_2_3, pred_grid = pred_grid, Betas = Betas, continuous_covar_inds = 5)
 
-adj_data_g_1_2_3 <- data.matrix(gfilta_1_2_3$e_data[, -1]) - t(covariate_effects)
-adj_data_g_1_2_3 <- as.data.frame(adj_data_g_1_2_3)
-
-
-mean_1_2_3 <- data.frame(
-  Mean_mutant = rowMeans(adj_data_g_1_2_3[, c(1, 3, 4, 9)],
-                         na.rm = TRUE),
-  Mean_zombie = rowMeans(adj_data_g_1_2_3[, c(2, 5:8)],
-                         na.rm = TRUE),
-  Mean_human = rowMeans(adj_data_g_1_2_3[, c(10:12)],
-                        na.rm = TRUE)
+counts_1_2_3 <- data.frame(
+  "Count_mutant" = unname(obs_mut_1_2_3),
+  "Count_zombie" = unname(obs_zom_1_2_3),
+  "Count_human" = unname(obs_hum_1_2_3)
 )
+
+mean_1_2_3[counts_1_2_3 == 0] <- NA
 
 cmat = rbind(c(1, -1, 0), c(1, 0, -1), c(0, 1, -1))
 diffs_1_2_3 <- fold_change_diff(data.matrix(mean_1_2_3), cmat)
 
 gstan_1_2_3 <- data.frame(
   Mass_Tag_ID = gfilta_1_2_3$e_data$Mass_Tag_ID,
-  Count_mutant = unname(obs_mut_1_2_3),
-  Count_zombie = unname(obs_zom_1_2_3),
-  Count_human = unname(obs_hum_1_2_3),
+  counts_1_2_3,
   mean_1_2_3,
   Fold_change_mutant_vs_zombie = diffs_1_2_3[,1],
   Fold_change_mutant_vs_human = diffs_1_2_3[,2],
@@ -2694,8 +2703,16 @@ flag_g_2_1_4 <- data.frame(
 
 gdf = dplyr::left_join(groupDF_2_1_4, attr(groupDF_2_1_4, "covariates")) %>%
   dplyr::select(-SampleID)
-dragon <- run_twofactor_cpp(data = data.matrix(gfilta_2_1_4$e_data[, -1]),
-                         gpData = gdf, "Gender")
+
+dragon <- run_twofactor_cpp(
+  data = data.matrix(gfilta_2_1_4$e_data[, -1]),
+  gpData = gdf,
+  Xfull = Xmatrix_2_1_4_full,
+  Xred = Xmatrix_2_1_4,
+  pred_grid_full = pred_grid_full_2_1_4,
+  pred_grid_red = pred_grid_red_2_1_4,
+  continuous_covar_inds = numeric(0)
+)
 
 mean_2_1_4 <- data.frame(
   Mean_Infection_high = dragon$adj_group_means[, 1],
@@ -2928,8 +2945,14 @@ flag_g_2_2_4 <- data.frame(
 
 gdf = dplyr::left_join(groupDF_2_2_4, attr(groupDF_2_2_4, "covariates")) %>%
   dplyr::select(-SampleID)
-mustang <- run_twofactor_cpp(data = data.matrix(gfilta_2_2_4$e_data[, -1]),
-                          gpData = gdf, c("Gender", "Age"))
+
+mustang <- run_twofactor_cpp(
+  data = data.matrix(gfilta_2_2_4$e_data[, -1]),
+  gpData = gdf,
+  Xfull=Xmatrix_2_2_4_full, Xred = Xmatrix_2_2_4,
+  pred_grid_full = pred_grid_full_2_2_4, pred_grid_red = pred_grid_red_2_2_4,
+  continuous_covar_inds = 5
+)
 
 mean_2_2_4 <- data.frame(
   Mean_Infection_high = mustang$adj_group_means[, 1],

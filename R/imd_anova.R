@@ -944,7 +944,7 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
     n_covar_levels <- pred_grid_red[,covar_inds,drop=FALSE] %>% unique() %>% nrow()
     
     #Rcpp::sourceCpp('~/pmartR/src/anova_helper_funs.cpp') #Run if debugging code
-    raw_results <- anova_cpp(data.matrix(data),gp,1-equal_var, xmatrix, Betas, pred_grid_red, continuous_covar_inds, n_covar_levels)
+    raw_results <- anova_cpp(data.matrix(data),gp,1-equal_var, xmatrix, Betas, pred_grid_red, continuous_covar_inds, attr(pred_grid_red, "groups"))
     group_names <- paste("Mean",as.character(unique(groupData$Group)),sep="_")
     which_xmatrix <- rep(0, nrow(data)) # dummy argument to group_comparison_anova, makes us always select the reduced model since we only have one main effect.
 
@@ -986,8 +986,7 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
       Xfull=Xfull, Xred=Xred,
       pred_grid_full=pred_grid_full,
       pred_grid_red=pred_grid_red,
-      continuous_covar_inds = continuous_covar_inds,
-      n_covar_levels = n_covar_levels
+      continuous_covar_inds = continuous_covar_inds
     )
 
     group_names <- paste("Mean",colnames(raw_results$adj_group_means),sep="_")
@@ -1099,7 +1098,7 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
 }
 
 #Wrapper function for the two factor ANOVA function
-run_twofactor_cpp <- function(data,gpData,covar_names, Xfull, Xred, pred_grid_full, pred_grid_red, continuous_covar_inds, n_covar_levels){
+run_twofactor_cpp <- function(data,gpData, Xfull, Xred, pred_grid_full, pred_grid_red, continuous_covar_inds){
   #Run the two factor ANOVA model
   res <- two_factor_anova_cpp(
     data,
@@ -1109,7 +1108,7 @@ run_twofactor_cpp <- function(data,gpData,covar_names, Xfull, Xred, pred_grid_fu
     pred_grid_full,
     pred_grid_red,
     continuous_covar_inds,
-    n_covar_levels
+    attr(pred_grid_red, "groups")
   )
 
   # Get the unique group levels to translate ANOVA parameters into group means

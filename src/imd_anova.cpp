@@ -184,7 +184,7 @@ List anova_cpp(
   arma::mat Beta,
   arma::mat pred_grid,
   arma::uvec continuous_covar_inds,
-  int n_covar_levels
+  arma::uvec group_ids_pred
   ) {
   //data is the n-by-p matrix of data
   //gp is a vector that identifies what group each column belongs to,
@@ -249,10 +249,12 @@ List anova_cpp(
     // Compute the marginal means by average over covariates
     arma::colvec grid_preds = pred_grid * beta.t();
 
-    if (n_covar_levels > 1) {
+    if (group_ids_pred.n_elem > m) {
       arma::rowvec marginal_means(m);
+
       for (int k = 0; k < m; k++) {
-        marginal_means(k) = arma::mean(grid_preds.rows(k * n_covar_levels, (k + 1) * n_covar_levels - 1));
+        arma::uvec mean_inds = find(group_ids_pred == (k+1));
+        marginal_means(k) = arma::mean(grid_preds(mean_inds));
       }
 
       adj_group_means.row(i) = marginal_means;
@@ -357,7 +359,7 @@ List two_factor_anova_cpp(arma::mat y,
                           arma::mat pred_grid_full,
                           arma::mat pred_grid_red,
                           arma::uvec continuous_covar_inds,
-                          int n_covar_levels
+                          arma::uvec group_ids_pred
                           ){
 
   int i,j;
@@ -488,11 +490,14 @@ List two_factor_anova_cpp(arma::mat y,
     arma::colvec grid_preds = pred_grid * beta.head_rows(pred_grid.n_cols);
 
     // Compute the lsmeans by averaging over covariates
-    if (n_covar_levels > 1) {
+    // Do only if the numer of unique levels in group_ids_pred is less than the total number of elements in group_ids_pred
+
+    if (group_ids_pred.n_elem > n_groups) {
       arma::rowvec marginal_means(n_groups);
 
       for (int k = 0; k < n_groups; k++) {
-        marginal_means(k) = arma::mean(grid_preds.rows(k * n_covar_levels, (k + 1) * n_covar_levels - 1));
+        arma::uvec mean_inds = find(group_ids_pred == (k+1));
+        marginal_means(k) = arma::mean(grid_preds(mean_inds));
       }
 
       lsmeans.row(i) = marginal_means;
