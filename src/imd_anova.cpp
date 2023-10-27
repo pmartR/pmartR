@@ -169,11 +169,23 @@ arma::mat fold_change_diff_na_okay(arma::mat data, arma::mat C)  {
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-//For each row (peptide), this function computes the group means, counts the number of non-NA
-//observations, estimates sigma^2, then computes the ANOVA F-statistic and associated p-value
-//
-//The results of this function are fed into group_comparison() which takes the group means,
-//group sizes and sigma^2 value to do whatever group comparisons the user asks for
+/**
+ * @brief Computes the ANOVA F-statistic least squares means, and associated p-value for each row (peptide) in the data matrix.
+ * For each row (biomolecule), this function computes the observed and least squares means, counts the number of non-NA observations, estimates sigma^2, then computes the ANOVA F-statistic and associated p-value.
+ * 
+ * The results of this function are fed into group_comparison() which takes the group means, group sizes and sigma^2 value to do whatever group comparisons the user asks for.
+ * 
+ * @param data The p x n (biomolecules on rows, samples on columns) data matrix of expression values with no identifier column.  
+ * @param gp The group ids for each of the n samples, labeled 1 to m where m is the total number of groups.
+ * @param unequal_var 0/1 depending on if variances are allowed to be unequal.
+ * @param X The design matrix for the model.
+ * @param Beta p x k matrix of the parameter estimates for the model for each biomolecule.
+ * @param pred_grid l x k The grid of main effect/covariate levels to predict over when computing the least squares means.
+ * @param continuous_covar_inds The column indices of the continuous covariates in the design matrix.
+ * @param group_ids_pred The group ids for each of the l levels of the main effects/covariates.  Used to average over covariates when computing least squares means.
+ * 
+ * @return A list containing the group means, adjusted group means, group sizes, sigma^2, F-statistic, p-value, and degrees of freedom for each row.
+*/
 
 // [[Rcpp::export]]
 List anova_cpp(
@@ -186,12 +198,7 @@ List anova_cpp(
   arma::uvec continuous_covar_inds,
   arma::uvec group_ids_pred
   ) {
-  //data is the n-by-p matrix of data
-  //gp is a vector that identifies what group each column belongs to,
-  //  assumed to be numeric 1-m where m is the total number of groups
-  //unequal_var is a 0/1 depending on if variances are allowed to be unequal
-  //df_red number of degrees of freedom spent elsewhere
-
+  
   int n = data.n_rows;  //number of rows in data matrix, i.e., peptides/proteins/...
   int p = data.n_cols;  //number of samples
   int m = max(gp);      //number of groups
@@ -351,8 +358,27 @@ List anova_cpp(
                       Named("dof") = dof);
 }
 
+/**
+ * @brief Computes the ANOVA F-statistic least squares means, and associated p-value for each row (peptide) in the data matrix for two main effects.
+ * 
+ * For each row (biomolecule), this function computes the observed and least squares means, counts the number of non-NA observations, estimates sigma^2, then computes the ANOVA F-statistic and associated p-value.  The function is passed two design matrices, one with interaction terms and one without.  If the interaction terms are significant, the full model is used, otherwise the reduced model is used.
+ * 
+ * The results of this function are fed into group_comparison() which takes the group means, group sizes and sigma^2 value to do whatever group comparisons the user asks for.
+ * 
+ * @param data The p x n (biomolecules on rows, samples on columns) data matrix of expression values with no identifier column.
+ * @param X_full The n x k1 full design matrix for the model with interaction terms between main effects.
+ * @param X_red The n x k2 reduced design matrix for the model with no interaction terms between main effects.
+ * @param group_ids The group ids for each of the n samples, labeled 1 to m where m is the total number of groups.
+ * @param pred_grid_full l x k1 The grid of main effect/covariate levels to predict over when computing the least squares means for the full model.
+ * @param pred_grid_red l x k2 The grid of main effect/covariate levels to predict over when computing the least squares means for the reduced model.
+ * @param continuous_covar_inds The column indices of the continuous covariates in the design matrix.
+ * @param group_ids_pred The group ids for each of the l levels of the main effects/covariates.  Used to average over covariates when computing least squares means.
+ * 
+ * @return A list containing the least squares means, parameter estimates, group sizes, sigma^2, F-statistic, p-value, degrees of freedom, and which model was used for each row.
+*/
+
 // [[Rcpp::export]]
-List two_factor_anova_cpp(arma::mat y,
+List two_factor_anova_cpp(arma::mat data,
                           arma::mat X_full,
                           arma::mat X_red,
                           arma::colvec group_ids,
@@ -363,10 +389,10 @@ List two_factor_anova_cpp(arma::mat y,
                           ){
 
   int i,j;
-  int n = y.n_rows;
+  int n = data.n_rows;
   int p_red = X_red.n_cols;
   int p_full = X_full.n_cols;
-  arma::rowvec yrowi(y.n_cols);
+  arma::rowvec yrowi(data.n_cols);
   arma::uvec to_remove;
   arma::mat X_red_nona, X_full_nona, XFinal;
   arma::mat PxRed, PxFull;
@@ -380,7 +406,7 @@ List two_factor_anova_cpp(arma::mat y,
   double sigma2_red, sigma2_full;
   NumericVector sig_est(n), pval(n), Fstat(n);
   arma::mat diag_mat;
-  arma::colvec par_ests(p_full),group_ids_nona(y.n_cols), group_ids_nona_unq;
+  arma::colvec par_ests(p_full),group_ids_nona(data.n_cols), group_ids_nona_unq;
   arma::mat parmat(n,p_full);
   arma::rowvec csums(p_full);
   arma::uvec zero_cols, non_zero_cols;
@@ -395,7 +421,7 @@ List two_factor_anova_cpp(arma::mat y,
 
   //Loop over rows in y
   for(i=0; i<n; i++){
-    yrowi = y.row(i);
+    yrowi = data.row(i);
     to_remove = arma::find_nonfinite(yrowi);
 
     yrowi_nona = yrowi;
@@ -530,14 +556,24 @@ List two_factor_anova_cpp(arma::mat y,
                       Named("which_X") = whichX);
 }
 
+/**
+ * @brief computes the group comparisons for each row (biomolecule) in the data matrix.  The estimated means, design matrices, and comparison matrices are provided and used to compute estimates and standard errors for the group comparisons.
+ * 
+ * @param means The estimated group means (least squares means) for each row (biomolecule) in the data matrix.
+ * @param data The p x n (biomolecules on rows, samples on columns) data matrix of expression values with no identifier column.
+ * @param sizes The p x m matrix of group sizes for each row (biomolecule) in the data matrix.
+ * @param which_xmatrix The p x 1 vector indicating which design matrix to use for each row (biomolecule) in the data matrix.
+ * @param Xfull The n x k1 full design matrix for the model with interaction terms between main effects.
+ * @param Xred The n x k2 reduced design matrix for the model with no interaction terms between main effects.
+ * @param Cfull The m x k1 comparison matrix for the model with interaction terms between main effects.
+ * @param Cred The m x k2 comparison matrix for the model with no interaction terms between main effects.
+ * @param Cmu The m x m matrix of group means contrasts.  This is the simplest contrast matrix that simply picks out group means and takes their difference for each contrast.
+ * 
+ * @return A list containing the estimated differences, standard errors, t-statistics, and p-values for each row (biomolecule) in the data matrix.  
+*/
+
 // [[Rcpp::export]]
 List group_comparison_anova_cpp(arma::mat means, arma::mat data, arma::mat sizes, arma::mat which_xmatrix, arma::mat Xfull, arma::mat Xred, arma::mat Cfull, arma::mat Cred, arma::mat Cmu) {
-  //Given the raw data, group sizes, design matrix consisting of group levels, and comparison matrix return the group comparisons requested.  Returns the estimated difference, standard errors, t-statistics, and p-values.
-  //Returns estimated difference, standard error, t-statistic, p-values
-  //data - raw data matrix of n_biomolecules by n_samples
-  //sizes - matrix of group sizes n_biomolecules x n_groups
-  //C - matrix that defines the group comparisons you want to make
-
   int num_comparisons = Cred.n_rows; //Number of comparisons to be made
   int n_groups = sizes.n_cols; //Number of groups 
   int n = sizes.n_rows; //Number of rows (peptides)
@@ -589,7 +625,7 @@ List group_comparison_anova_cpp(arma::mat means, arma::mat data, arma::mat sizes
       row_mean.cols(zerosize_idx).fill(arma::datum::nan);
     }
 
-    // Take the group means using the group means contrast matrix Cmu.  This needs to be done since the Betas to not take into account missing groups.
+    // Take the group means using the group means contrast matrix Cmu.  This needs to be done since the Betas do not take into account missing groups.
     arma::rowvec mean_diffs = fold_change_diff_row(row_mean, Cmu.cols(0, n_groups - 1));
     diff_mat.row(i) = mean_diffs;
     
@@ -716,7 +752,15 @@ NumericMatrix ptukey_speed(NumericMatrix qstats, NumericVector sizes) {
 
 }
 
-//-----Compute the matrix of coefficients for the simple additive model-----//
+/**
+ * @brief Compute the p x k matrix of least squares coefficients for each of the p biomolecules.
+ * 
+ * @param data The p x n (biomolecules on rows, samples on columns) data matrix of expression values with no identifier column.
+ * @param Xmatrix The n x k design matrix.
+ * 
+ * @return A p x k matrix of least squares coefficients for each of the p biomolecules.
+*/
+
 // [[Rcpp::export]]
 arma::mat compute_betas(arma::mat data_mat, arma::mat Xmatrix){
   int n = data_mat.n_rows;  //number of biomolecules

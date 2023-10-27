@@ -683,7 +683,7 @@ imd_anova <- function(omicsData,
 #'   p-value<pval_thresh) \cr
 #'   }
 #'
-#' @author Bryan Stanfill
+#' @author Bryan Stanfill, Daniel Claborne
 #'
 #' @references Webb-Robertson, Bobbie-Jo M., et al. "Combined statistical
 #'   analyses of peptide intensities and peptide occurrences improves
@@ -955,7 +955,7 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
     #Rcpp::sourceCpp('~/pmartR/src/two_factor_anova.cpp')    
 
     # design matrix for the reduced model (no interactions between main effects)
-    Xred <- model.matrix(~.,data=dplyr::select(groupData_sub, -one_of("Group")))
+    Xred <- model.matrix(~.,data=dplyr::select(groupData_sub, -dplyr::one_of("Group")))
     group_names = setdiff(colnames(groupData_sub), c("Group", covariate_names))
 
     # design matrix for the full model (interaction terms between main effects)
@@ -963,7 +963,7 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
                 paste(group_names, collapse="*"),
                 paste(c("", covariate_names), collapse = " + "))
     full_formula = sprintf("~ %s", rhs)
-    Xfull <- model.matrix(as.formula(full_formula),data=dplyr::select(groupData_sub, -one_of("Group")))
+    Xfull <- model.matrix(as.formula(full_formula),data=dplyr::select(groupData_sub, -dplyr::one_of("Group")))
 
     if (length(covariate_names) > 0) {
       covar_inds = (length(main_effect_names) + 1):(length(main_effect_names) + 1 + length(covariate_names))
@@ -1045,7 +1045,7 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
     # ELSE INSTEAD OF RECREATING IT HERE
     Cmat_res <- create_c_matrix(groupData, comparisons)
     Cmat <- Cmat_res$cmat
-    fold_change <- fold_change_ratio(raw_results$group_means, Cmat)
+    fold_change <- fold_change_ratio(raw_results$adj_group_means, Cmat)
     fold_change <- data.frame(fold_change)
     colnames(fold_change) <- colnames(group_comp$diff_mat)
   }
@@ -1074,7 +1074,7 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
     sig_indicators[sigs] <- sign(data.matrix(group_comp$diff_mat)[sigs])
     sig_indicators[-sigs] <- 0
   } else {
-    sig_indicators[which(sig_indictors >= pval_thresh)] <- 0
+    sig_indicators[which(sig_indicators >= pval_thresh)] <- 0
   }
   sig_indicators <- data.frame(sig_indicators)
   colnames(sig_indicators) <- colnames(fold_change)
@@ -1129,13 +1129,18 @@ run_twofactor_cpp <- function(data,gpData, Xfull, Xred, pred_grid_full, pred_gri
 #'
 #' Takes the results of anova_test() and returns group comparison p-values
 #'
+#' @param data The expression values without the id column
 #' @param groupData data frame that assigns sample names to groups
-#' @param comparisons dataframe that defiens the comparsions of interest
+#' @param comparisons dataframe that defines the comparsions of interest
+#' @param Xfull design matrix for the full model with interaction terms between the main effects
+#' @param Xred design matrix for the reduced model with no interaction terms between the main effects 
 #' @param anova_results_full results of the \code{pmartR::anova_test()} function
+#' @param beta_to_mu_full matrix that maps the beta coefficients to the group means for the full model
+#' @param beta_to_mu_red matrix that maps the beta coefficients to the group means for the reduced model
 #'
 #' @return A data.frame containing the p-values from the group comparisons.
 #'
-#' @author Bryan Stanfill
+#' @author Bryan Stanfill, Daniel Claborne
 #'
 group_comparison_anova <- function(data,groupData,comparisons, Xfull, Xred, anova_results_full, beta_to_mu_full, beta_to_mu_red){
   
