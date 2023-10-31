@@ -912,6 +912,8 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
 
   # Everything assumes the group levels are in the order they appear
   groupData$Group <- factor(groupData$Group, levels=unique(groupData$Group))
+  groupData[,main_effect_names] <- lapply(groupData[main_effect_names], function(x) factor(x, levels=unique(x)))
+
   # Keep all the relevant stuff
   groupData_sub <- groupData[,c("Group", main_effect_names, covariate_names)]
 
@@ -940,8 +942,7 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
     }
   
     # Construct the matrix which predicts over all group + categorical covariates combinations.  Continuous covariates will be set to the mean of their values for non-missing data points.
-    pred_grid_red <- pred_grid_full <- get_pred_grid(Xred, gp, continuous_covar_inds)
-    n_covar_levels <- pred_grid_red[,covar_inds,drop=FALSE] %>% unique() %>% nrow()
+    pred_grid_red <- pred_grid_full <- get_pred_grid(group_df = groupData_sub, main_effect_names = main_effect_names, covariate_names, fspec = as.formula("~."))
     
     #Rcpp::sourceCpp('~/pmartR/src/anova_helper_funs.cpp') #Run if debugging code
     raw_results <- anova_cpp(data.matrix(data),gp,1-equal_var, xmatrix, Betas, pred_grid_red, continuous_covar_inds, attr(pred_grid_red, "groups"))
@@ -975,10 +976,8 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
       continuous_covar_inds <- numeric(0)
     }
 
-    pred_grid_red <- get_pred_grid(Xred, gp, continuous_covar_inds)
-    pred_grid_full <- get_pred_grid(Xfull, gp, continuous_covar_inds)
-
-    n_covar_levels <- pred_grid_red[,covar_inds,drop=FALSE] %>% unique() %>% nrow()
+    pred_grid_red <- get_pred_grid(group_df = groupData_sub, main_effect_names = main_effect_names, covariate_names, fspec = as.formula("~."))
+    pred_grid_full <- get_pred_grid(group_df = groupData_sub, main_effect_names = main_effect_names, covariate_names, fspec = as.formula(full_formula))
 
     raw_results <- run_twofactor_cpp(
       data=data.matrix(data),
@@ -2031,25 +2030,60 @@ reduce_xmatrix <- function(x, ngroups) {
 #' @return A matrix of the prediction grid
 #' 
 #' @author Daniel Claborne
-#'  
-get_pred_grid <- function(xmatrix, groups, continuous_covar_inds = NULL) {
-  pred_grid <- xmatrix
-  pred_grid <- data.frame(pred_grid)
+#'
+#' 
+get_pred_grid <- function(group_df, main_effect_names, covariate_names, fspec = as.formula("~.")) {
+  grid_list = list()
 
-  ordered_levels = factor(groups, levels = unique(groups))
-  pred_grid$Group <- ordered_levels
-  pred_grid <- pred_grid[order(pred_grid$Group),]
-  # set this temporarily, will replace with the mean of observed data during computation of lsmeans
-  pred_grid[,continuous_covar_inds] <- 0
-  pred_grid <- unique(pred_grid)
-  ordered_levels_unique <- pred_grid$Group
-  pred_grid <- pred_grid[, -ncol(pred_grid)] # drop group column
-  pred_grid <- as.matrix(pred_grid)
+  for (name in main_effect_names) {
+    grid_list[[name]] = unique(group_df[,name])
+  }
 
-  attr(pred_grid, "groups") = ordered_levels_unique
+  for (name in covariate_names) {
+    if (is.numeric(group_df[,name])) {
+      grid_list[[name]] = 0
+    } else {
+      grid_list[[name]] = unique(group_df[,name])
+    }
+  }
 
-  return(pred_grid)
-}
+  grid_df <- do.call(expand.grid, grid_list)
+
+  # this left join maintains the order of the original groups in the grid
+  grid_df <- dplyr::left_join(
+    group_df %>% dplyr::distinct(Group, dplyr::across(dplyr::one_of(main_effect_names))), 
+    grid_df,
+    by = main_effect_names, keep=FALSE
+  )
+
+  k = length(unique(group_df$Group))
+  gp_id = factor(grid_df$Group, labels = 1:k, levels = unique(grid_df$Group))
+
+  grid_df <- grid_df %>% dplyr::select(-dplyr::one_of("Group"))
+
+  modmatrix = as.matrix(model.matrix(fspec, data = grid_df))
+  attr(modmatrix, "groups") = gp_id
+
+  return(modmatrix)
+}  
+# get_pred_grid <- function(xmatrix, groups, continuous_covar_inds = NULL) {
+  # pred_grid <- xmatrix
+  # pred_grid <- data.frame(pred_grid)
+
+  # ordered_levels = factor(groups, levels = unique(groups))
+  # pred_grid$Group <- ordered_levels
+  # pred_grid <- pred_grid[order(pred_grid$Group),]
+  # # set this temporarily, will replace with the mean of observed data during computation of lsmeans
+  # pred_grid[,continuous_covar_inds] <- 0
+  # pred_grid <- unique(pred_grid)
+  # ordered_levels_unique <- pred_grid$Group
+  # pred_grid <- pred_grid[, -ncol(pred_grid)] # drop group column
+  # pred_grid <- as.matrix(pred_grid)
+
+  # attr(pred_grid, "groups") = ordered_levels_unique
+
+  # return(pred_grid)
+# }
 
 #' Compute the least squares means from a prediction grid and estimated coefficients
 #' 
