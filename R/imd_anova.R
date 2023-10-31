@@ -589,6 +589,7 @@ imd_anova <- function(omicsData,
   )
 
   attr(final_out, "bpFlags") <- the_flag
+  attr(final_out, "which_X") <- attr(anova_results_full, "which_X")
   attr(final_out, "cnames") = attr(omicsData, "cnames")
   attr(final_out, "data_class") = attr(omicsData, "class")
 
@@ -1091,6 +1092,7 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
 
   attr(out, "Xfull") <- Xfull
   attr(out, "Xred") <- Xred
+  attr(out, "which_X") <- which_xmatrix
 
   return(out)
 
@@ -2023,9 +2025,10 @@ reduce_xmatrix <- function(x, ngroups) {
 
 #' Build the prediction grid to compute least squares means.
 #' 
-#' @param xmatrix The design matrix from which to construct the prediction grid
-#' @param groups The group assignments corresponding to rows in the design matrix
-#' @param continuous_covar_inds The column indices of xmatrix corresponding to continuous covariates.
+#' @param group_df A dataframe with the reserved 'Group' column, and columns for main effects and covariates.
+#' @param main_effect_names Character vector with the column names of the main effects in group_df.
+#' @param covariate_names Character vector with the column names of the covariates in group_df.
+#' @param fspec A formula specification to be passed to \code{\link{model.matrix}} to construct the prediction grid in model matrix form.
 #' 
 #' @return A matrix of the prediction grid
 #' 
@@ -2066,24 +2069,6 @@ get_pred_grid <- function(group_df, main_effect_names, covariate_names, fspec = 
 
   return(modmatrix)
 }  
-# get_pred_grid <- function(xmatrix, groups, continuous_covar_inds = NULL) {
-  # pred_grid <- xmatrix
-  # pred_grid <- data.frame(pred_grid)
-
-  # ordered_levels = factor(groups, levels = unique(groups))
-  # pred_grid$Group <- ordered_levels
-  # pred_grid <- pred_grid[order(pred_grid$Group),]
-  # # set this temporarily, will replace with the mean of observed data during computation of lsmeans
-  # pred_grid[,continuous_covar_inds] <- 0
-  # pred_grid <- unique(pred_grid)
-  # ordered_levels_unique <- pred_grid$Group
-  # pred_grid <- pred_grid[, -ncol(pred_grid)] # drop group column
-  # pred_grid <- as.matrix(pred_grid)
-
-  # attr(pred_grid, "groups") = ordered_levels_unique
-
-  # return(pred_grid)
-# }
 
 #' Compute the least squares means from a prediction grid and estimated coefficients
 #' 
