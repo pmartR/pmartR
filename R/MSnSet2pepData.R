@@ -43,7 +43,7 @@
 #' )
 #' }
 #'
-#' @export
+#' @noRd
 #'
 MSnSet2pepData <- function(msnset_object, data_scale, edata_cname = "UniqueID",
                            fdata_cname = "SampleID", emeta_cname = "UniqueID",

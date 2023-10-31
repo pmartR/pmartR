@@ -4000,9 +4000,9 @@ plot.rmdFilt <- function(x, pvalue_threshold = NULL, sampleID = NULL,
   } else {
     # Order the data in the order the samples appear in the samp_id column.
     filter_object[[samp_id]] <- factor(
-      filter_object[[samp_id]]
-    ) %>%
-      forcats::fct_inorder()
+      filter_object[[samp_id]],
+      levels = unique(filter_object[[samp_id]]),
+    )
   }
 
   # Beautiful box plots ---------------

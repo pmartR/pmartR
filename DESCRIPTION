@@ -1,8 +1,8 @@
 Package: pmartR
 Type: Package
 Title: Panomics Marketplace - Quality Control and Statistical Analysis for Panomics Data
-Version: 2.5.0
-Date: 2023-10-27
+Version: 2.4.0
+Date: 2023-06-28
 Authors@R: c(person("Lisa", "Bramer", email = "lisa.bramer@pnnl.gov", role = c("aut", "cre")), person("Kelly", "Stratton", email = "kelly.stratton@pnnl.gov", role = c("aut")), person("Daniel", "Claborne", email = "daniel.claborne@pnnl.gov", role = c("aut")), person("Evan", "Glasscock", role = c("aut")), person("Rachel", "Richardson", role = "aut"), person("David", "Degnan", role="aut"))
 Description: Provides functionality for quality control processing and statistical analysis of mass spectrometry (MS) omics data, in particular proteomic (either at the peptide or the protein level), lipidomic, and metabolomic data, as well as RNA-seq based count data and nuclear magnetic resonance (NMR) data. This includes data transformation, specification of groups that are to be compared against each other, filtering of features and/or samples, data normalization, data summarization (correlation, PCA), and statistical comparisons between defined groups.
 License: BSD_2_clause + file LICENSE
@@ -21,7 +21,6 @@ Imports:
     dplyr,
     ggplot2,
     e1071,
-    forcats,
     foreach,
     methods,
     mvtnorm,
@@ -29,7 +28,6 @@ Imports:
     plotly,
     purrr,
     rrcov,
-    scales,
     stringr,
     tidyr (>= 1.3.0),
     RColorBrewer,
@@ -39,14 +37,13 @@ Imports:
     glmpca,
 Suggests:
     knitr,
-    rmarkdown,
     limma,
+    rmarkdown,
     edgeR,
     DESeq2,
     S4Vectors,
     survival,
     testthat,
-    MSnbase,
     trelliscopejs,
     pmartRdata,
     vdiffr
