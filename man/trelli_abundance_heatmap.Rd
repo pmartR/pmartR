@@ -58,15 +58,19 @@ Specify a plot design and cognostics for the abundance heatmap
 \examples{
 \dontrun{
 
-# Build the abundance heatmap with an omicsData object with emeta variables. Generate trelliData in as.trelliData.
-trelli_panel_by(trelliData = trelliData2, panel = "RazorProtein") \%>\% 
+# Build the abundance heatmap with an omicsData object with emeta variables. 
+# Generate trelliData in as.trelliData.
+trelli_panel_by(trelliData = trelliData2, panel = "RazorProtein") \%>\%
    trelli_abundance_heatmap(test_mode = TRUE, test_example = 1:3)
    
 # Users can modify the plotting function with ggplot parameters and interactivity, 
 # and can also select certain cognostics.     
 trelli_panel_by(trelliData = trelliData4, panel = "RazorProtein") \%>\% 
-   trelli_abundance_heatmap(test_mode = TRUE, test_example = 1:5, 
-     ggplot_params = c("ylab('')", "xlab('')"), interactive = TRUE, cognostics = c("biomolecule count"))  
+   trelli_abundance_heatmap(
+     test_mode = TRUE, test_example = 1:5, 
+     ggplot_params = c("ylab('')", "xlab('')"), 
+     interactive = TRUE, cognostics = c("biomolecule count")
+   )  
    
 }
 }
