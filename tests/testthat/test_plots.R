@@ -12,6 +12,7 @@ expect_doppelganger_ci <- function(...) {
 }
 
 test_that('plot functions are producing desired output',{
+  testthat::skip_on_cran()
   # some tests inexplicably fail on github actions, skip them if this is true
   IS_CI = Sys.getenv("CI") == "true"  
 
