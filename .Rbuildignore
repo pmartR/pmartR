@@ -8,3 +8,4 @@
 tests/testthat/test_MSnSet2pepData.R
 ^doc$
 ^Meta$
+^vignettes$
