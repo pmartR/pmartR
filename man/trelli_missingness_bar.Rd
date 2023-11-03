@@ -80,7 +80,8 @@ trelli_panel_by(trelliData = trelliData3, panel = "Peptide") \%>\%
   trelli_missingness_bar(test_mode = TRUE, test_example = 1:10,
                          cognostics = c("observed proportion", "g-test p-value"))
 
-# Build the missingness bar plot with an omicsData and statRes object. Generate trelliData in as.trelliData.
+# Build the missingness bar plot with an omicsData and statRes object. 
+# Generate trelliData in as.trelliData.
 trelli_panel_by(trelliData = trelliData4, panel = "Peptide") \%>\%
   trelli_missingness_bar(test_mode = TRUE, test_example = 1:10) 
 
@@ -90,7 +91,10 @@ trelli_panel_by(trelliData = trelliData2, panel = "Peptide") \%>\%
    
 # Or visualize only count data 
 trelli_panel_by(trelliData = trelliData2, panel = "Peptide") \%>\% 
-   trelli_missingness_bar(test_mode = TRUE, test_example = 1:5, cognostics = "observed count", proportion = FALSE)
+   trelli_missingness_bar(
+     test_mode = TRUE, test_example = 1:5, 
+     cognostics = "observed count", proportion = FALSE
+   )
    
 }
 

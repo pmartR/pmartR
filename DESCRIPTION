@@ -41,6 +41,7 @@ Suggests:
     rmarkdown,
     edgeR,
     DESeq2,
+    scales,
     S4Vectors,
     survival,
     testthat,

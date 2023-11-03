@@ -620,13 +620,17 @@ trelli_panel_by <- function(trelliData, panel) {
 #' trelli_pvalue_filter(trelliData3, p_value_test = "anova", p_value_thresh = 0.1)
 #' 
 #' # Filter a trelliData object with only statistics results, while caring about a specific comparison
-#' trelli_pvalue_filter(trelliData3, p_value_test = "anova", p_value_thresh = 0.1, comparison = "Phenotype3_vs_Phenotype2")
+#' trelli_pvalue_filter(
+#'  trelliData3, p_value_test = "anova", p_value_thresh = 0.1, comparison = "Phenotype3_vs_Phenotype2")
 #' 
 #' # Filter both a omicsData and statRes object, while not caring about a specific comparison
 #' trelli_pvalue_filter(trelliData4, p_value_test = "anova", p_value_thresh = 0.001)
 #' 
 #' # Filter both a omicsData and statRes object, while caring about a specific comparison
-#' trelli_pvalue_filter(trelliData4, p_value_test = "gtest", p_value_thresh = 0.25, comparison = "Phenotype3_vs_Phenotype2")
+#' trelli_pvalue_filter(
+#'  trelliData4, p_value_test = "gtest", p_value_thresh = 0.25, 
+#'  comparison = "Phenotype3_vs_Phenotype2"
+#' )
 #' 
 #' 
 #' }
