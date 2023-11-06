@@ -48,8 +48,7 @@ Suggests:
     trelliscopejs,
     pmartRdata,
     vdiffr
-Remotes:
-    github::hafen/trelliscopejs,
-    github::pmartR/pmartRdata
+Additional_repositories:
+    https://pmartR.github.io/drat
 RoxygenNote: 7.2.3
 Encoding: UTF-8
