@@ -149,7 +149,7 @@ test_that("trelliPlots check the correct inputs", {
   expect_true(inherits(abun_boxplot, "ggplot"))
 
   # Generate a tests folder
-  testFolder <- file.path(.getDownloadsFolder(), "/Trelli_Tests")
+  testFolder <- file.path(tempdir(), "/Trelli_Tests")
 
   # If the folder exists, remove it
   if (file.exists(testFolder)) {
