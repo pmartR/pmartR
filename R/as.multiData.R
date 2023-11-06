@@ -310,7 +310,7 @@ as.multiData <-
 
 #' Check that the f_meta file contains a column aligned to each omicsData objects
 #'
-#' @param omicsDataObjects A list of omicsdata objects containing sample
+#' @param omicsData_objects A list of omicsdata objects containing sample
 #' information matching that in f_meta
 #' @param f_meta passed from \code{as.multiData}
 #'

@@ -7,10 +7,10 @@
 fmeta_matches(omicsData_objects, f_meta)
 }
 \arguments{
-\item{f_meta}{passed from \code{as.multiData}}
-
-\item{omicsDataObjects}{A list of omicsdata objects containing sample
+\item{omicsData_objects}{A list of omicsdata objects containing sample
 information matching that in f_meta}
+
+\item{f_meta}{passed from \code{as.multiData}}
 }
 \value{
 A list, each element of which contains a character vector of column

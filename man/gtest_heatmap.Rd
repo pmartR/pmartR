@@ -23,6 +23,9 @@ gtest_heatmap(
 \arguments{
 \item{volcano}{`data.frame` produced by pmartR:::\link{make_volcano_plot_df}}
 
+\item{pval_thresh}{numeric value indicating the p-value threshold for
+significance.}
+
 \item{show_sig}{Boolean whether to show the visual indicator that a certain
 bin combination is significant by the g-test}
 
@@ -52,10 +55,6 @@ will be displayed on the bar plot. The default is TRUE.}
 \item{title_lab}{character string specifying the plot title.}
 
 \item{legend_lab}{character string specifying the legend title.}
-
-\item{count_text_size}{In non-interactive mode, the size of the text
-indicating the number of biomolecules to be displayed inside the tile.
-Defaults to 3.  Setting this to zero causes no text to be shown.}
 }
 \value{
 `ggplot or plotly` object, depending on if \code{interactive} is set

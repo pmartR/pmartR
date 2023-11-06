@@ -6713,11 +6713,10 @@ statres_barplot <- function(x,
 #' each bin, and have indicators for significance by g-test.
 #'
 #' @param volcano `data.frame` produced by pmartR:::\link{make_volcano_plot_df}
+#' @param pval_thresh numeric value indicating the p-value threshold for
+#'  significance.
 #' @param show_sig Boolean whether to show the visual indicator that a certain
 #'   bin combination is significant by the g-test
-#' @param count_text_size In non-interactive mode, the size of the text
-#'   indicating the number of biomolecules to be displayed inside the tile.
-#'   Defaults to 3.  Setting this to zero causes no text to be shown.
 #' @param interactive passed from
 #'   \code{\link[pmartR:plot.statRes]{pmartR::plot.statRes()}}. If T, will build
 #'   a plotly version of the plot.  Defaults to FALSE.
