@@ -98,6 +98,20 @@ proj_mat <- function(X, ngroups){
   return(1)
 }
 
+# build a group_df data frame that has ordered factor levels for all main effects
+build_factor_group_df <- function(omicsData) {
+  main_effect_names = attr(attr(omicsData, "group_DF"), "main_effects")
+  
+  group_df <- attr(omicsData, "group_DF")
+  group_sampnames <- group_df[,get_fdata_cname(omicsData)]
+  group_df <- group_df[group_sampnames %in% colnames(omicsData$e_data),]
+  group_df <- group_df %>% 
+    dplyr::left_join(omicsData$f_data)
+  group_df[,main_effect_names] <- lapply(group_df[main_effect_names], function(x) factor(x, levels=unique(x)))
+  
+  return(group_df)
+}
+
 # This function and the following function, two_factor_anova_r, are used for two
 # main effects (with or without covariates) when there is a significant
 # interaction between the main effects for some of the biomolecules (rows of

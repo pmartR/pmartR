@@ -452,13 +452,15 @@ attr(astan_1_0_3, "cnames") <- list(
   fdata_cname = "Name",
   techrep_cname = NULL
 )
+attr(astan_1_0_3, "which_X") <- rep(0, nrow(astan_1_0_3))
 attr(astan_1_0_3, "data_class") <- "pepData"
 
 # main effects: 1; covariates: 1; groups: 3 ---------------
 data_1_1_3 <- data.matrix(diff_a_1_0_3[, -1])
 
 Betas = compute_betas(data_mat = data_1_1_3, Xmatrix = Xmatrix_1_1_3)
-pred_grid <- get_pred_grid(xmatrix = Xmatrix_1_1_3, groups = groupie$Group)
+group_df <- build_factor_group_df(afilta_1_1_3)
+pred_grid <- get_pred_grid(group_df, main_effect_names = "Virus", covariate_names = "Gender")
 mean_a_1_1_3 <- get_lsmeans(data = data_1_1_3, xmatrix = Xmatrix_1_1_3, pred_grid = pred_grid, Betas = Betas)
 
 group_counts_1_1_3 <- data.frame(
@@ -627,6 +629,7 @@ attr(astan_1_1_3, "cnames") <- list(
   fdata_cname = "Name",
   techrep_cname = NULL
 )
+attr(astan_1_1_3, "which_X") <- rep(0, nrow(astan_1_1_3))
 attr(astan_1_1_3, "data_class") <- "pepData"
 
 # Generate G-Test standards ----------------------------------------------------
@@ -788,6 +791,7 @@ attr(gstan_1_0_3, "cnames") <- list(
   fdata_cname = "Name",
   techrep_cname = NULL
 )
+attr(gstan_1_0_3, "which_X") <- rep(0, nrow(gstan_1_0_3))
 attr(gstan_1_0_3, "data_class") <- "pepData"
 
 # main effects: 1; covariates: 1; groups: 3 ---------------
@@ -864,7 +868,8 @@ flag_g_1_1_3 <- data.frame(
 data_g_1_1_3 <- data.matrix(diff_g[, -1])
 
 Betas = compute_betas(data_mat = data_g_1_1_3, Xmatrix = Xmatrix_1_1_3)
-pred_grid <- get_pred_grid(xmatrix = Xmatrix_1_1_3, groups = groupie$Group)
+group_df <- build_factor_group_df(gfilta_1_1_3)
+pred_grid <- get_pred_grid(group_df, main_effect_names = "Virus", covariate_names = "Gender")
 mean_g_1_1_3 <- get_lsmeans(data = data_g_1_1_3, xmatrix = Xmatrix_1_1_3, pred_grid = pred_grid, Betas = Betas)
 
 group_counts_g_1_1_3 <- data.frame(
@@ -950,6 +955,7 @@ attr(gstan_1_1_3, "cnames") <- list(
   fdata_cname = "Name",
   techrep_cname = NULL
 )
+attr(gstan_1_1_3, "which_X") <- rep(0, nrow(gstan_1_1_3))
 attr(gstan_1_1_3, "data_class") <- "pepData"
 
 # Create combined standards ----------------------------------------------------
@@ -1077,6 +1083,15 @@ attr(cstan_1_0_3, "cnames") <- list(
   fdata_cname = "Name",
   techrep_cname = NULL
 )
+attr(cstan_1_0_3, "which_X") <- 
+c(0, 0, 0, 0, 0, 0, NA, NA, 0, 0, 0, NA, 0, 0, NA, NA, 0, 0, 
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+0, 0, 0, 0, 0, NA, 0, 0, 0, 0, 0, 0, NA, NA, NA, 0, 0, 0, 0, 
+0, 0, 0, 0, NA, 0, 0, 0, 0, 0, 0, 0, NA, NA, 0, 0, NA, 0, 0, 
+0, NA, 0, 0, 0, NA, 0, 0, 0, 0, NA, NA, 0, 0, NA, 0, 0, NA, NA, 
+0, 0, 0, 0, 0, 0, 0)
+
 attr(cstan_1_0_3, "data_class") <- "pepData"
 
 # main effects: 1; covariates: 1; groups: 3 ---------------
@@ -1202,6 +1217,14 @@ attr(cstan_1_1_3, "cnames") <- list(
   fdata_cname = "Name",
   techrep_cname = NULL
 )
+attr(cstan_1_1_3, "which_X") <- 
+  c(0, 0, 0, 0, 0, 0, NA, NA, 0, 0, 0, NA, 0, 0, NA, NA, 0, 0, 
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+  0, 0, 0, 0, 0, NA, 0, 0, 0, 0, 0, 0, NA, NA, NA, 0, 0, 0, 0, 
+  0, 0, 0, 0, NA, 0, 0, 0, 0, 0, 0, 0, NA, NA, 0, 0, NA, 0, 0, 
+  0, NA, 0, 0, 0, NA, 0, 0, 0, 0, NA, NA, 0, 0, NA, 0, 0, NA, NA, 
+  0, 0, 0, 0, 0, 0, 0)
 attr(cstan_1_1_3, "data_class") <- "pepData"
 
 # Save standards for paired IMD-ANOVA tests ------------------------------------

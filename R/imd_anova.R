@@ -589,7 +589,15 @@ imd_anova <- function(omicsData,
   )
 
   attr(final_out, "bpFlags") <- the_flag
-  attr(final_out, "which_X") <- attr(anova_results_full, "which_X")
+  
+  which_X <- attr(anova_results_full, "which_X") 
+  if (!is.null(attr(anova_results_full, "which_X"))) {
+    which_X <- rep(NA, nrow(final_out))
+    model_inds <- match(anova_results_full$Results[,get_edata_cname(omicsData)], final_out[,get_edata_cname(omicsData)])
+    which_X[model_inds] <- attr(anova_results_full, "which_X") 
+  }
+  
+  attr(final_out, "which_X") <- which_X
   attr(final_out, "cnames") = attr(omicsData, "cnames")
   attr(final_out, "data_class") = attr(omicsData, "class")
 
@@ -2035,18 +2043,18 @@ reduce_xmatrix <- function(x, ngroups) {
 #' @author Daniel Claborne
 #'
 #' 
-get_pred_grid <- function(group_df, main_effect_names, covariate_names, fspec = as.formula("~.")) {
+get_pred_grid <- function(group_df, main_effect_names, covariate_names=NULL, fspec = as.formula("~.")) {
   grid_list = list()
-
+  
   for (name in main_effect_names) {
-    grid_list[[name]] = unique(group_df[,name])
+    grid_list[[name]] = factor(unique(group_df[,name]), levels = unique(group_df[,name]))
   }
 
   for (name in covariate_names) {
     if (is.numeric(group_df[,name])) {
       grid_list[[name]] = 0
     } else {
-      grid_list[[name]] = unique(group_df[,name])
+      grid_list[[name]] = factor(unique(group_df[,name]), levels = unique(group_df[,name]))
     }
   }
 
@@ -2061,12 +2069,14 @@ get_pred_grid <- function(group_df, main_effect_names, covariate_names, fspec = 
 
   k = length(unique(group_df$Group))
   gp_id = factor(grid_df$Group, labels = 1:k, levels = unique(grid_df$Group))
-
+  gp_names = unique(grid_df$Group)
+  
   grid_df <- grid_df %>% dplyr::select(-dplyr::one_of("Group"))
 
   modmatrix = as.matrix(model.matrix(fspec, data = grid_df))
   attr(modmatrix, "groups") = gp_id
-
+  attr(modmatrix, 'ordered_group_names') = gp_names
+    
   return(modmatrix)
 }  
 
@@ -2114,7 +2124,7 @@ get_lsmeans <- function(data, xmatrix, pred_grid, Betas, continuous_covar_inds=N
     dplyr::select(-dplyr::one_of("Group")) %>%
     t() %>%
     as.data.frame() %>%
-    `colnames<-`(paste0("Mean_", levels(attr(pred_grid, "groups"))))
+    `colnames<-`(paste0("Mean_", attr(pred_grid, "ordered_group_names")))
 
   return(lsmeans)
 }

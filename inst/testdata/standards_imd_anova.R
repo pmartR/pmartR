@@ -278,6 +278,40 @@ Xmatrix_2_2_4_full <- structure(c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0
 47.68, 53.79, 19.45, 27.06, 30.07, 22.04, 31.57, 0, 0, 0, 0, 
 0, 0, 0, 0, 1, 1, 1, 0), dim = c(12L, 6L))
 
+# Selected Full/Reduced Model
+which_X_2_1_4_a <- structure(c(0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+0, 0, 0))
+
+which_X_2_2_4_a <- structure(c(0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+0, 0, 0))
+
+which_X_2_1_4_g <- structure(c(0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+
+which_X_2_2_4_g <- structure(c(0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+
+
 # main effects: 1; covariates: 0; groups: 2 ---------------
 
 mean_a_1_0_2 <- data.frame(
@@ -345,6 +379,7 @@ attr(astan_1_0_2, "data_info") <- list(
   num_samps = dim(afilta_1_0_2$f_data)[1],
   data_types = NULL
 )
+attr(astan_1_0_2, "which_X") <- rep(0, nrow(astan_1_0_2))
 attr(astan_1_0_2, "bpFlags") <- data.frame(
   Mass_Tag_ID = afilta_1_0_2$e_data$Mass_Tag_ID,
   flag_a_1_0_2
@@ -361,7 +396,13 @@ attr(astan_1_0_2, "data_class") <- "pepData"
 data_1_1_3 = afilta_1_1_3$e_data[, -1]
 
 Betas = compute_betas(data_mat = data.matrix(data_1_1_3), Xmatrix = data.matrix(Xmatrix_1_1_3))
-pred_grid <- get_pred_grid(xmatrix = Xmatrix_1_1_3, groups = attr(afilta_1_1_3, "group_DF")$Group)
+group_sampnames <- groupDF_1_1_3[,get_fdata_cname(afilta_1_1_3)]
+groupData <- groupDF_1_1_3[group_sampnames %in% colnames(afilta_1_1_3$e_data),]
+groupData <- groupData %>% 
+  dplyr::left_join(afilta_1_1_3$f_data)
+groupData[,"Condition"] <- lapply(groupData["Condition"], function(x) factor(x, levels=unique(x)))
+
+pred_grid <- get_pred_grid(groupData, "Condition", covariate_names = "Gender")
 
 mean_a_1_1_3 <- get_lsmeans(data = data_1_1_3, xmatrix = Xmatrix_1_1_3, pred_grid = pred_grid, Betas = Betas)
 
@@ -520,6 +561,7 @@ attr(astan_1_1_3, "data_info") <- list(
   num_samps = dim(afilta_1_1_3$f_data)[1],
   data_types = NULL
 )
+attr(astan_1_1_3, "which_X") <- rep(0, nrow(astan_1_1_3))
 attr(astan_1_1_3, "bpFlags") <- data.frame(
   Mass_Tag_ID = afilta_1_1_3$e_data$Mass_Tag_ID,
   flag_a_1_1_3
@@ -632,7 +674,12 @@ dunnett_1_1_3 <- pval_a_1_1_3 %>%
 data_1_2_3 = afilta_1_2_3$e_data[, -1]
 
 Betas = compute_betas(data_mat = data.matrix(data_1_2_3), Xmatrix = data.matrix(Xmatrix_1_2_3))
-pred_grid <- get_pred_grid(xmatrix = Xmatrix_1_2_3, groups = attr(afilta_1_2_3, "group_DF")$Group, continuous_covar_inds = 5)
+group_sampnames <- groupDF_1_2_3[,get_fdata_cname(afilta_1_2_3)]
+groupData <- groupDF_1_2_3[group_sampnames %in% colnames(afilta_1_2_3$e_data),]
+groupData <- groupData %>% 
+  dplyr::left_join(afilta_1_2_3$f_data)
+groupData[,"Condition"] <- lapply(groupData["Condition"], function(x) factor(x, levels=unique(x)))
+pred_grid <- get_pred_grid(groupData, "Condition", c("Gender", "Age"))
 
 mean_a_1_2_3 <- get_lsmeans(data = data_1_2_3, xmatrix = Xmatrix_1_2_3, pred_grid = pred_grid, Betas = Betas, continuous_covar_inds = 5)
 
@@ -792,6 +839,7 @@ attr(astan_1_2_3, "data_info") <- list(
   num_samps = dim(afilta_1_2_3$f_data)[1],
   data_types = NULL
 )
+attr(astan_1_2_3, "which_X") <- rep(0, nrow(astan_1_2_3))
 attr(astan_1_2_3, "bpFlags") <- data.frame(
   Mass_Tag_ID = afilta_1_2_3$e_data$Mass_Tag_ID,
   flag_a_1_2_3
@@ -1065,6 +1113,7 @@ attr(astan_2_0_3, "data_info") <- list(
   num_samps = dim(afilta_2_0_3$f_data)[1],
   data_types = NULL
 )
+attr(astan_2_0_3, "which_X") <- rep(0, nrow(astan_2_0_3))
 attr(astan_2_0_3, "bpFlags") <- data.frame(
   Mass_Tag_ID = afilta_2_0_3$e_data$Mass_Tag_ID,
   flag_a_2_0_3
@@ -1180,12 +1229,13 @@ covariate_names = colnames(attr(attr(afilta_2_1_4, "group_DF"), "covariates"))[-
 main_effect_names = attr(attr(afilta_2_1_4, "group_DF"), "main_effects")
 group_sampnames <- groupDF_2_1_4[,get_fdata_cname(afilta_2_1_4)]
 groupData <- groupDF_2_1_4[group_sampnames %in% colnames(afilta_2_1_4$e_data),]
+groupData[,main_effect_names] <- lapply(groupData[main_effect_names], function(x) factor(x, levels=unique(x)))
 groupData <- groupData %>% 
   dplyr::left_join(afilta_2_1_4$f_data)
 
 # no continuous covariates
-pred_grid_full_2_1_4 = get_pred_grid(Xmatrix_2_1_4_full, groupData$Group)
-pred_grid_red_2_1_4 = get_pred_grid(Xmatrix_2_1_4, groupData$Group)
+pred_grid_red_2_1_4 = get_pred_grid(groupData, c("Condition", "Level"), "Gender")
+pred_grid_full_2_1_4 = get_pred_grid(groupData, c("Condition", "Level"), "Gender", as.formula("~Condition*Level+Gender"))
 
 cobra <- run_twofactor_cpp(
   data = data.matrix(data_2_1_4),
@@ -1421,6 +1471,7 @@ attr(astan_2_1_4, "data_info") <- list(
   num_samps = dim(afilta_2_1_4$f_data)[1],
   data_types = NULL
 )
+attr(astan_2_1_4, "which_X") <- which_X_2_1_4_a
 attr(astan_2_1_4, "bpFlags") <- data.frame(
   Mass_Tag_ID = afilta_2_1_4$e_data$Mass_Tag_ID,
   flag_a_2_1_4
@@ -1592,9 +1643,10 @@ group_sampnames <- groupDF_2_2_4[,get_fdata_cname(afilta_2_2_4)]
 groupData <- groupDF_2_2_4[group_sampnames %in% colnames(afilta_2_2_4$e_data),]
 groupData <- groupData %>% 
   dplyr::left_join(afilta_2_2_4$f_data)
+groupData[,main_effect_names] <- lapply(groupData[main_effect_names], function(x) factor(x, levels=unique(x)))
 
-pred_grid_full_2_2_4 = get_pred_grid(Xmatrix_2_2_4_full, groupData$Group, continuous_covar_inds = 5)
-pred_grid_red_2_2_4 = get_pred_grid(Xmatrix_2_2_4, groupData$Group, continuous_covar_inds = 5)
+pred_grid_red_2_2_4 = get_pred_grid(groupData, main_effect_names, covariate_names)
+pred_grid_full_2_2_4 = get_pred_grid(groupData, main_effect_names, covariate_names, fspec = as.formula("~Condition*Level+Gender+Age"))
 
 cobra <- run_twofactor_cpp(
   data = data.matrix(data_2_2_4),
@@ -1829,6 +1881,7 @@ attr(astan_2_2_4, "data_info") <- list(
   num_samps = dim(afilta_2_2_4$f_data)[1],
   data_types = NULL
 )
+attr(astan_2_2_4, "which_X") <- which_X_2_2_4_a
 attr(astan_2_2_4, "bpFlags") <- data.frame(
   Mass_Tag_ID = afilta_2_2_4$e_data$Mass_Tag_ID,
   flag_a_2_2_4
@@ -2121,6 +2174,7 @@ attr(gstan_1_0_2, "data_info") <- list(
   num_samps = dim(gfilta_1_0_2$f_data)[1],
   data_types = NULL
 )
+attr(gstan_1_0_2, "which_X") <- rep(0, nrow(gstan_1_0_2))
 attr(gstan_1_0_2, "cnames") <- list(
   edata_cname = "Mass_Tag_ID",
   emeta_cname = "Protein",
@@ -2199,7 +2253,13 @@ flag_g_1_1_3 <- data.frame(
 data_1_1_3 <- gfilta_1_1_3$e_data[, -1]
 
 Betas = compute_betas(data_mat = data.matrix(data_1_1_3), Xmatrix = data.matrix(Xmatrix_1_1_3))
-pred_grid <- get_pred_grid(xmatrix = Xmatrix_1_1_3, groups = attr(gfilta_1_1_3, "group_DF")$Group)
+group_sampnames <- gfilta_1_1_3$f_data$SampleID
+groupData <- groupDF_1_1_3[group_sampnames %in% colnames(gfilta_1_1_3$e_data),]
+groupData <- groupData %>% 
+  dplyr::left_join(gfilta_1_1_3$f_data)
+groupData[,"Condition"] <- lapply(groupData["Condition"], function(x) factor(x, levels=unique(x)))
+
+pred_grid <- get_pred_grid(groupData, "Condition", "Gender")
 mean_1_1_3 <- get_lsmeans(data = data_1_1_3, xmatrix = Xmatrix_1_1_3, pred_grid = pred_grid, Betas = Betas)
 
 counts_1_1_3 <- data.frame(
@@ -2268,6 +2328,7 @@ attr(gstan_1_1_3, "data_info") <- list(
   num_samps = dim(gfilta_1_1_3$f_data)[1],
   data_types = NULL
 )
+attr(gstan_1_1_3, "which_X") <- rep(0, nrow(gstan_1_1_3))
 attr(gstan_1_1_3, "cnames") <- list(
   edata_cname = "Mass_Tag_ID",
   emeta_cname = "Protein",
@@ -2348,7 +2409,13 @@ flag_g_1_2_3 <- data.frame(
 
 data_1_2_3 = data.matrix(gfilta_1_2_3$e_data[, -1])
 Betas = compute_betas(data_mat = data_1_2_3, Xmatrix = data.matrix(Xmatrix_1_2_3))
-pred_grid <- get_pred_grid(xmatrix = Xmatrix_1_2_3, groups = attr(gfilta_1_2_3, "group_DF")$Group, continuous_covar_inds = 5)
+group_sampnames <- gfilta_1_2_3$f_data$SampleID
+groupData <- groupDF_1_2_3[group_sampnames %in% colnames(gfilta_1_2_3$e_data),]
+groupData <- groupData %>% 
+  dplyr::left_join(gfilta_1_2_3$f_data)
+groupData[,"Condition"] <- lapply(groupData["Condition"], function(x) factor(x, levels=unique(x)))
+
+pred_grid <- get_pred_grid(groupData, "Condition", c("Gender", "Age"))
 mean_1_2_3 <- get_lsmeans(data = data_1_2_3, xmatrix = Xmatrix_1_2_3, pred_grid = pred_grid, Betas = Betas, continuous_covar_inds = 5)
 
 counts_1_2_3 <- data.frame(
@@ -2417,6 +2484,7 @@ attr(gstan_1_2_3, "data_info") <- list(
   num_samps = dim(gfilta_1_2_3$f_data)[1],
   data_types = NULL
 )
+attr(gstan_1_2_3, "which_X") <- rep(0, nrow(gstan_1_2_3))
 attr(gstan_1_2_3, "cnames") <- list(
   edata_cname = "Mass_Tag_ID",
   emeta_cname = "Protein",
@@ -2566,6 +2634,7 @@ attr(gstan_2_0_3, "data_info") <- list(
   num_samps = dim(gfilta_2_0_3$f_data)[1],
   data_types = NULL
 )
+attr(gstan_2_0_3, "which_X") <- rep(0, nrow(gstan_2_0_3))
 attr(gstan_2_0_3, "cnames") <- list(
   edata_cname = "Mass_Tag_ID",
   emeta_cname = NULL,
@@ -2802,6 +2871,7 @@ attr(gstan_2_1_4, "data_info") <- list(
   num_samps = dim(gfilta_2_1_4$f_data)[1],
   data_types = NULL
 )
+attr(gstan_2_1_4, "which_X") <- which_X_2_1_4_g
 attr(gstan_2_1_4, "cnames") <- list(
   edata_cname = "Mass_Tag_ID",
   emeta_cname = NULL,
@@ -3042,6 +3112,7 @@ attr(gstan_2_2_4, "data_info") <- list(
   num_samps = dim(gfilta_2_2_4$f_data)[1],
   data_types = NULL
 )
+attr(gstan_2_2_4, "which_X") <- which_X_2_2_4_g
 attr(gstan_2_2_4, "cnames") <- list(
   edata_cname = "Mass_Tag_ID",
   emeta_cname = NULL,
@@ -3123,6 +3194,15 @@ attr(cstan_1_0_2, "data_info") <- list(
   num_samps = dim(gfilta_1_0_2$f_data)[1],
   data_types = NULL
 )
+attr(cstan_1_0_2, "which_X") <- 
+  c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NA, 0, 0, 0, NA, 0, 0, NA, NA, 
+    0, 0, 0, 0, 0, 0, 0, NA, 0, 0, 0, 0, 0, 0, 0, NA, 0, 0, NA, NA, 
+    0, 0, NA, 0, 0, 0, 0, NA, 0, 0, 0, 0, 0, NA, NA, 0, 0, 0, 0, 
+    0, 0, NA, NA, 0, 0, 0, NA, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, NA, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NA, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, NA, 0, 0, 0, 0, NA, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, NA, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NA, 
+    0, 0)
 attr(cstan_1_0_2, "bpFlags") <- data.frame(
   Mass_Tag_ID = gfilta_1_0_2$e_data$Mass_Tag_ID,
   Infection_vs_Mock = dplyr::case_when(
@@ -3233,6 +3313,14 @@ attr(cstan_1_1_3, "data_info") <- list(
   num_samps = dim(gfilta_1_1_3$f_data)[1],
   data_types = NULL
 )
+attr(cstan_1_1_3, "which_X") <- 
+  c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NA, 0, 0, 0, NA, 0, 0, NA, 0, 
+    0, 0, 0, 0, 0, 0, NA, 0, 0, 0, 0, 0, 0, 0, NA, 0, 0, NA, 0, 0, 
+    0, NA, 0, 0, 0, 0, 0, 0, 0, 0, 0, NA, 0, 0, 0, 0, 0, 0, NA, NA, 
+    NA, 0, 0, 0, NA, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 attr(cstan_1_1_3, "bpFlags") <- data.frame(
   Mass_Tag_ID = gfilta_1_1_3$e_data$Mass_Tag_ID,
   mutant_vs_zombie = dplyr::case_when(
@@ -3367,6 +3455,14 @@ attr(cstan_1_2_3, "data_info") <- list(
   num_samps = dim(gfilta_1_2_3$f_data)[1],
   data_types = NULL
 )
+attr(cstan_1_2_3, "which_X") <- 
+  c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NA, 0, 0, 0, NA, 0, 0, NA, 0, 
+    0, 0, 0, 0, 0, 0, NA, 0, 0, 0, 0, 0, 0, 0, NA, 0, 0, NA, 0, 0, 
+    0, NA, 0, 0, 0, 0, 0, 0, 0, 0, 0, NA, 0, 0, 0, 0, 0, 0, NA, NA, 
+    NA, 0, 0, 0, NA, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 attr(cstan_1_2_3, "bpFlags") <- data.frame(
   Mass_Tag_ID = gfilta_1_2_3$e_data$Mass_Tag_ID,
   mutant_vs_zombie = dplyr::case_when(
@@ -3503,6 +3599,14 @@ attr(cstan_2_0_3, "data_info") <- list(
   num_samps = dim(gfilta_2_0_3$f_data)[1],
   data_types = NULL
 )
+attr(cstan_2_0_3, "which_X") <- 
+  c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NA, 0, 0, 0, 0, 0, 0, NA, NA, 
+    0, 0, 0, 0, 0, 0, 0, NA, 0, 0, 0, 0, 0, 0, 0, NA, 0, 0, NA, 0, 
+    0, 0, NA, 0, 0, 0, 0, 0, 0, 0, 0, 0, NA, NA, NA, 0, 0, 0, 0, 
+    0, 0, NA, NA, 0, 0, 0, NA, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 attr(cstan_2_0_3, "bpFlags") <- data.frame(
   Mass_Tag_ID = gfilta_2_0_3$e_data$Mass_Tag_ID,
   Infection_high_vs_Infection_low = dplyr::case_when(
@@ -3667,6 +3771,14 @@ attr(cstan_2_1_4, "data_info") <- list(
   num_samps = dim(gfilta_2_1_4$f_data)[1],
   data_types = NULL
 )
+attr(cstan_2_1_4, "which_X") <- 
+  c(0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NA, 0, 0, NA, 0, 0, 
+    1, 0, 0, 0, 0, NA, 0, 0, 0, 0, 0, 0, 0, NA, 0, 0, NA, 0, 0, 1, 
+    NA, 0, 0, 0, 1, 0, 0, 0, 0, 0, NA, NA, 0, 0, 0, 0, 0, NA, NA, 
+    NA, 0, 0, 0, NA, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 attr(cstan_2_1_4, "bpFlags") <- data.frame(
   Mass_Tag_ID = gfilta_2_1_4$e_data$Mass_Tag_ID,
   Infection_high_vs_Infection_low = dplyr::case_when(
@@ -3864,6 +3976,14 @@ attr(cstan_2_2_4, "data_info") <- list(
   num_samps = dim(gfilta_2_2_4$f_data)[1],
   data_types = NULL
 )
+attr(cstan_2_2_4, "which_X") <- 
+  c(0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NA, 0, 0, NA, 0, 0, 
+  1, 0, 0, 0, 0, NA, 0, 0, 0, 0, 0, 0, 0, NA, 0, 0, NA, 0, 0, 1, 
+  NA, 0, 0, 0, 1, 0, 0, 0, 0, 0, NA, NA, 0, 0, 0, 0, 0, NA, NA, 
+  NA, 0, 0, 0, NA, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 attr(cstan_2_2_4, "bpFlags") <- data.frame(
   Mass_Tag_ID = gfilta_2_2_4$e_data$Mass_Tag_ID,
   Infection_high_vs_Infection_low = dplyr::case_when(
