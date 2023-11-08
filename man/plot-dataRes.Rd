@@ -121,6 +121,7 @@ This function can only create plots for dataRes objects whose 'by' =
   'molecule' and 'groupvar' attribute is non NULL
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 mylipid <- edata_transform(omicsData = lipid_pos_object, data_scale = "log2")
 result <- edata_summary(
@@ -129,5 +130,5 @@ result <- edata_summary(
   groupvar = "Virus"
 )
 plot(result)
-
+\dontshow{\}) # examplesIf}
 }

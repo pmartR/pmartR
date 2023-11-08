@@ -36,7 +36,7 @@
 #'   function leverages code from \code{\link[pcaMethods]{pca}} and
 #'   \code{\link[glmpca]{glmpca}} .
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #'
 #' mylipid <- edata_transform(omicsData = lipid_neg_object, data_scale = "log2")

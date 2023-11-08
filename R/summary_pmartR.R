@@ -12,7 +12,7 @@
 #' @return a summary table for the pmartR omicsData object. If assigned to a
 #'   variable, the elements of the summary table are saved in a list format.
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' pep_summary <- summary(pep_object)
 #' iso_summary <- summary(isobaric_object)

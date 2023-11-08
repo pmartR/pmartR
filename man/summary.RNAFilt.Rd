@@ -29,11 +29,12 @@ a summary table giving the minimum, maximum, 1st and 3rd quartiles,
 Provide summary of a RNAFilt S3 object
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 myfilter <- RNA_filter(omicsData = rnaseq_object)
 summary(myfilter)
 summary(myfilter, min_nonzero = 2)
-
+\dontshow{\}) # examplesIf}
 }
 \seealso{
 \code{\link{RNA_filter}}

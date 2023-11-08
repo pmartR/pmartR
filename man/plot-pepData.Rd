@@ -97,9 +97,10 @@ ggplot2 plot object if interactive is FALSE, or plotly plot object if
 For plotting pepData S3 objects
 }
 \examples{
+\dontshow{if (identical(tolower(Sys.getenv("NOT_CRAN")), "true") & requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 data(pep_object)
 mypep <- edata_transform(omicsData = pep_object, data_scale = "log2")
 plot(mypep, order_by = "Phenotype", color_by = "Phenotype")
-
+\dontshow{\}) # examplesIf}
 }

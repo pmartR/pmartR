@@ -17,6 +17,7 @@ functions}
 Summarizes potential plotting options for a trelliData object
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 \dontrun{
 
 library(dplyr)
@@ -32,5 +33,5 @@ summary(trelliData2)
 # Use a statRes example. Build with as.trelliData.
 summary(trelliData3)
 }
-
+\dontshow{\}) # examplesIf}
 }

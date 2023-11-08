@@ -19,7 +19,7 @@
 #' @return data frame with columns for Test and Control. Each row corresponds to
 #'   a comparison of interest.
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' mymetab <- group_designation(omicsData = metab_object, main_effects = "Phenotype")
 #' create_comparisonDF(comp_type = "pairwise", omicsData = mymetab)

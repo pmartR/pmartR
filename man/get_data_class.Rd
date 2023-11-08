@@ -19,6 +19,7 @@ inherited from the omicsData used in \code{\link{imd_anova}} or
 \code{\link{as.trelliData}}
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 
 my_prodata = group_designation(
@@ -42,5 +43,5 @@ imd_anova_res = imd_anova(
 )
 
 result = get_data_class(imd_anova_res)
-
+\dontshow{\}) # examplesIf}
 }

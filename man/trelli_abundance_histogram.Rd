@@ -57,6 +57,7 @@ Specify a plot design and cognostics for the abundance histogram
   edata_cname.
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 \dontrun{
 
 # Build the abundance histogram with an edata file. 
@@ -82,7 +83,7 @@ trelli_panel_by(trelliData = trelliData1, panel = "Peptide") \%>\%
      cognostics = c("mean abundance", "median abundance"))  
    
 }
-
+\dontshow{\}) # examplesIf}
 }
 \author{
 David Degnan, Lisa Bramer

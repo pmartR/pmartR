@@ -15,7 +15,7 @@
 #' @return The function returns the corresponding p-value or log base 2 robust
 #'   Mahalanobis when the other parameter is specified.
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' mymetab <- edata_transform(
 #'   omicsData = metab_object,

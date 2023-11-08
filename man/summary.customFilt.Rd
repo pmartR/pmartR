@@ -20,6 +20,7 @@ a summary of the items in e_data, f_data, and e_meta that will be
 Provide summary of a customFilt S3 object
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 to_filter <- custom_filter(omicsData = metab_object, e_data_remove = "fumaric acid",
                            f_data_remove = "Sample_1_Phenotype2_B")
@@ -28,7 +29,7 @@ summary(to_filter)
 to_filter2 <- custom_filter(omicsData = metab_object, 
                             f_data_keep = metab_object$f_data$SampleID[1:10])
 summary(to_filter2)
-
+\dontshow{\}) # examplesIf}
 }
 \seealso{
 \code{\link{custom_filter}}

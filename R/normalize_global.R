@@ -107,7 +107,7 @@
 #'   are available for this object. If apply_norm is TRUE, then the normalized
 #'   data is returned in an object of the appropriate S3 class (e.g. pepData).
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #'
 #' mymetab <- edata_transform(

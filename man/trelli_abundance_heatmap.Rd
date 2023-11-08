@@ -56,6 +56,7 @@ Specify a plot design and cognostics for the abundance heatmap
   the y-variables. All statRes data is ignored.
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 \dontrun{
 
 # Build the abundance heatmap with an omicsData object with emeta variables. 
@@ -73,6 +74,7 @@ trelli_panel_by(trelliData = trelliData4, panel = "RazorProtein") \%>\%
    )  
    
 }
+\dontshow{\}) # examplesIf}
 }
 \author{
 David Degnan, Lisa Bramer

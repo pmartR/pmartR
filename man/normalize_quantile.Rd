@@ -31,13 +31,14 @@ Quantile normalization is an algorithm for normalizing a set of data
 The method is implemented as described in Bolstad et al. (2003).
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 myfilt <- molecule_filter(omicsData = metab_object)
 # quantile normalization requires complete data
 # summary(myfilt, min_num = 50)
 mymetab <- applyFilt(filter_object = myfilt, omicsData = metab_object, min_num = 50)
 norm_data <- normalize_quantile(omicsData = mymetab)
-
+\dontshow{\}) # examplesIf}
 }
 \references{
 Bolstad, B. M., Irizarry, R. A., Åstrand, M., & Speed, T. P.

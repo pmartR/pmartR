@@ -21,6 +21,7 @@ Implements overall survival analysis or progression-free survival analysis, depe
 surv_designation, and gives a summary of the results.
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 \dontrun{
 library(OvarianPepdataBP)
 attr(tcga_ovarian_pepdata_bp, "survDF") <- list(t_death = "survival_time",
@@ -31,5 +32,5 @@ summary_km(tcga_ovarian_pepdata_bp)
 # Percent is provided so corresponding time point is returned
 summary_km(tcga_ovarian_pepdata_bp, .4)
 }
-
+\dontshow{\}) # examplesIf}
 }

@@ -2,7 +2,7 @@ context('IMD-ANOVA tests')
 
 test_that('all tests conform to the decrees of the God of Stats', {
   # Load IMD-ANOVA filter objects ----------------------------------------------
-
+  testthat::skip_on_cran()
   load(system.file('testdata',
     'standards_filter.RData',
     package = 'pmartR'

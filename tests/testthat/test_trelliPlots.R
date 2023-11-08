@@ -1,7 +1,7 @@
 context("trelliscope plotting functions")
 
 test_that("trelliPlots check the correct inputs", {
-  
+  testthat::skip_on_cran()
   # Quick trelliscope function check for future changes
   # file_coverage(c("./R/as.trelliData.R", "./R/summary_trelliData.R", "./R/trelliPlots.R"), 
   #               c("./tests/testthat/test_as_trelliData_edata.R", "./tests/testthat/test_as_trelliData.R", "./tests/testthat/test_as_trelliData_summary.R", "./tests/testthat/test_trelliPlots.R")) %>% 

@@ -1,4 +1,4 @@
-context('class: seqData')
+context('seqData constructors')
 
 
 ### TO do: add emeta

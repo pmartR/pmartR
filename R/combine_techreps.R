@@ -39,7 +39,7 @@
 #' @return An object with the same class as omicsData that has been aggregated
 #'   to the biological sample level
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #'
 #' pep_object_averaged <- combine_techreps(omicsData = pep_techrep_object)

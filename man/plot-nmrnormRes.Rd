@@ -82,6 +82,7 @@ ggplot2 plot object if interactive is FALSE, or plotly plot object if
 Creates a scatter plot for an S3 object of type 'nmrnormRes'
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 mynmr <- edata_transform(omicsData = nmr_identified_object, data_scale = "log2")
 mynmrnorm <- normalize_nmr(
@@ -97,5 +98,5 @@ mynmrnorm2 <- normalize_nmr(
   sample_property_cname = "Concentration"
 )
 plot(mynmrnorm2)
-
+\dontshow{\}) # examplesIf}
 }

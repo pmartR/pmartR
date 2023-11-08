@@ -1,4 +1,4 @@
-context('class: seqData')
+context('seqData dispersion_est')
 
 test_that('dispersion_est returns the correct data frame and attributes', {
   # Load the reduced peptide data frames ---------------------------------------

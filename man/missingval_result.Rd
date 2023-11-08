@@ -27,8 +27,9 @@ frames, one containing the number of missing values by sample, and the other
 containing the number of missing values by molecule
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 result1 = missingval_result(omicsData = lipid_neg_object)
 result2 = missingval_result(omicsData = metab_object)
-
+\dontshow{\}) # examplesIf}
 }

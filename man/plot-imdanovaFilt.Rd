@@ -94,10 +94,11 @@ ggplot2 plot object if interactive is FALSE, or plotly plot object if
 For plotting an S3 object of type 'imdanovaFilt'
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 data(pep_object)
 mypep <- group_designation(omicsData = pep_object, main_effects = "Phenotype")
 to_filter <- imdanova_filter(omicsData = mypep)
 plot(to_filter, min_nonmiss_anova = 2, min_nonmiss_gtest = 3)
-
+\dontshow{\}) # examplesIf}
 }

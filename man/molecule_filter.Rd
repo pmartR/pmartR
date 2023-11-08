@@ -41,10 +41,11 @@ Attribute of molecule_filt object is "total_poss_obs", the number of
   samples)
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 to_filter <- molecule_filter(omicsData = pep_object)
 summary(to_filter, min_num = 2)
-
+\dontshow{\}) # examplesIf}
 }
 \author{
 Kelly Stratton

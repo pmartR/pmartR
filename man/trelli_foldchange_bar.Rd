@@ -56,6 +56,7 @@ Specify a plot design and cognostics for the fold_change
   barchart trelliscope. Fold change must be grouped by edata_cname.
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 \dontrun{
 
 # Build fold_change bar plot with statRes data grouped by edata_colname.
@@ -67,7 +68,7 @@ trelli_panel_by(trelliData = trelliData4, panel = "Peptide") \%>\%
   trelli_foldchange_bar(test_mode = TRUE, test_example = 1:10, interactive = TRUE) 
    
 }
-
+\dontshow{\}) # examplesIf}
 }
 \author{
 David Degnan, Lisa Bramer

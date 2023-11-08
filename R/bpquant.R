@@ -26,7 +26,7 @@
 #'   subset protein_sig_data for each unique protein and apply bpquant_mod to
 #'   each subset and store the results.
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' \dontrun{
 #' library(pmartRdata)
 #'

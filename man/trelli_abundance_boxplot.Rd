@@ -64,6 +64,7 @@ Specify a boxplot design and cognostics for the abundance
   the first main effect in group_designation.
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 \dontrun{
 
 ## Generate trelliData objects using the as.trelliData.edata example code.
@@ -109,7 +110,7 @@ trelli_panel_by(trelliData = trelliData4, panel = "RazorProtein") \%>\%
     trelli_abundance_boxplot(interactive = TRUE, test_mode = TRUE, test_example = 1:10)
 
 }
-
+\dontshow{\}) # examplesIf}
 }
 \author{
 David Degnan, Lisa Bramer

@@ -18,6 +18,7 @@ returns a data frame with comparisons and their indices
 This function returns comparisons from statRes or trelliData object
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 
 my_prodata = group_designation(
@@ -41,5 +42,5 @@ imd_anova_res = imd_anova(
 )
 
 result = get_comparisons(imd_anova_res)
-
+\dontshow{\}) # examplesIf}
 }

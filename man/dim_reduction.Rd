@@ -36,6 +36,7 @@ Any biomolecules seen in only one sample or with a variance less
   \code{\link[glmpca]{glmpca}} .
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 
 mylipid <- edata_transform(omicsData = lipid_neg_object, data_scale = "log2")
@@ -46,7 +47,7 @@ pca_lipids <- dim_reduction(omicsData = mylipid)
 myseq <- group_designation(omicsData = rnaseq_object, main_effects = "Virus")
 pca_seq <- dim_reduction(omicsData = myseq)
 }
-
+\dontshow{\}) # examplesIf}
 }
 \references{
 Redestig H, Stacklies W, Scholz M, Selbig J, & Walther

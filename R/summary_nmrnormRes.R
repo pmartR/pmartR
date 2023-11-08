@@ -8,7 +8,7 @@
 #'
 #' @return data frame object
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' mynmr <- edata_transform(
 #'   omicsData = nmr_identified_object,

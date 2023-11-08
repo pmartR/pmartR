@@ -10,3 +10,4 @@ tests/testthat/test_MSnSet2pepData.R
 ^Meta$
 ^vignettes$
 ^cran-comments\.md$
+^CRAN-SUBMISSION$

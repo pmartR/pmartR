@@ -27,6 +27,7 @@ Either an omicData and/or a statRes object are accepted.
   merged to statRes in long format to create trelliData.stat dataframe.
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 \dontrun{
 library(pmartRdata)
 
@@ -54,7 +55,7 @@ trelliData2 <- as.trelliData(omicsData = omicsData)
 trelliData3 <- as.trelliData(statRes = statRes)
 trelliData4 <- as.trelliData(omicsData = omicsData, statRes = statRes)
 }
-
+\dontshow{\}) # examplesIf}
 }
 \author{
 David Degnan, Lisa Bramer

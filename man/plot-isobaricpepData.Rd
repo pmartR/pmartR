@@ -97,8 +97,9 @@ ggplot2 plot object if interactive is FALSE, or plotly plot object if
 For plotting isobaricpepData S3 objects
 }
 \examples{
+\dontshow{if (identical(tolower(Sys.getenv("NOT_CRAN")), "true") & requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 myiso <- edata_transform(omicsData = isobaric_object, data_scale = "log2")
 plot(myiso)
-
+\dontshow{\}) # examplesIf}
 }

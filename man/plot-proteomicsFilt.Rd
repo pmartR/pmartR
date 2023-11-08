@@ -116,10 +116,11 @@ ggplot2 plot object if interactive is FALSE, or plotly plot object if
 For plotting an S3 object of type 'proteomicsFilt':
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 data(pep_object)
 my_filter <- proteomics_filter(omicsData = pep_object)
 plot(my_filter, min_num_peps = 3)
 plot(my_filter, plot_type = "redundancy")
-
+\dontshow{\}) # examplesIf}
 }

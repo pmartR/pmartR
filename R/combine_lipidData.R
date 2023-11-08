@@ -26,7 +26,7 @@
 #' * group designation: Objects must have the same grouping structure if
 #' retain_groups = T
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #'
 #' obj_1 <- lipid_neg_object

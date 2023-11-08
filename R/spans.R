@@ -125,7 +125,7 @@
 #'   first step of SPANS.
 #'
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' \dontrun{
 #' library(pmartRdata)
 #'
@@ -694,7 +694,7 @@ normalize_global_basic <- function(edata, norm_fn) {
 #'   subset and normalization methods, and the parameters used for the subset
 #'   method. \cr
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' \dontrun{
 #' library(pmartRdata)
 #'

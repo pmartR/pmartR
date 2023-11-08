@@ -25,12 +25,13 @@ filtered at this threshold are reported.
 Provide summary of a totalCountFilt S3 object
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 \dontrun{
 library(pmartRdata)
 myfilt <- total_count_filter(omicsData = rnaseq_object)
 summary(myfilt, min_count = 15)
 }
-
+\dontshow{\}) # examplesIf}
 }
 \seealso{
 \code{\link{total_count_filter}}

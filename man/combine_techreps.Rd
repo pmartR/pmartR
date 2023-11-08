@@ -52,10 +52,11 @@ Loss of information after aggregation \tabular{ll}{ f_data: \tab
   'fdata_cname')} in f_data. \cr }
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 
 pep_object_averaged <- combine_techreps(omicsData = pep_techrep_object)
-
+\dontshow{\}) # examplesIf}
 }
 \author{
 Daniel Claborne

@@ -97,8 +97,9 @@ ggplot2 plot object if interactive is FALSE, or plotly plot object if
 For plotting nmrData S3 objects
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 mynmr <- edata_transform(omicsData = nmr_identified_object, data_scale = "log2")
 plot(mynmr)
-
+\dontshow{\}) # examplesIf}
 }

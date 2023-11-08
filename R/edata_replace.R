@@ -21,7 +21,7 @@
 #'
 #' @return data object of the same class as omicsData
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' mymetab <- edata_replace(omicsData = metab_object, x = 0, y = NA)
 #'

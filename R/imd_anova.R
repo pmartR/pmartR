@@ -51,7 +51,7 @@
 #' identification of significant peptides from MS-based proteomics data."
 #' Journal of proteome research 9.11 (2010): 5748-5756.
 #'
-#' @examples
+#' @examplesIf identical(tolower(Sys.getenv("NOT_CRAN")), "true") & requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' # Transform the data
 #' mymetab <- edata_transform(omicsData = metab_object, data_scale = "log2")

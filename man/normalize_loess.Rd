@@ -34,10 +34,11 @@ A wrapper for the normalizeCyclicLoess function from the limma
 package.
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 mypep <- edata_transform(pep_object, "log2")
 result <- normalize_loess(mypep)
-
+\dontshow{\}) # examplesIf}
 }
 \references{
 Bolstad, B. M., Irizarry R. A., Astrand, M., and Speed, T. P.

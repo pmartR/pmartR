@@ -38,10 +38,11 @@ If groupvar is NULL and group_designation has not been applied to
   column of f_data is used to group e_data in order to apply the metrics.
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 
 mylipid <- edata_transform(omicsData = lipid_pos_object, data_scale = "log2")
 mylipid <- group_designation(omicsData = mylipid, main_effects = "Virus")
 result <- edata_summary(omicsData = mylipid, by = "sample", groupvar = NULL)
-
+\dontshow{\}) # examplesIf}
 }

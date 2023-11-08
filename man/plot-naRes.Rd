@@ -151,6 +151,7 @@ This function takes in an object of class naRes and creates either a
   be colored by group.
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 mylipid <- group_designation(omicsData = lipid_neg_object, main_effects = "Virus")
 result <- missingval_result(omicsData = mylipid)
@@ -161,5 +162,5 @@ plot(result, omicsData = mylipid, plot_type = "scatter",
 
 result <- missingval_result(omicsData = rnaseq_object)
 plot(result, omicsData = rnaseq_object, plot_type = "bar")
-
+\dontshow{\}) # examplesIf}
 }

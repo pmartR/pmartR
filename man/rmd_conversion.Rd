@@ -28,6 +28,7 @@ Only one of \code{log2rmd} and \code{pval} should be provided. The
   input not provided will be solved for based on the provided input.
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 mymetab <- edata_transform(
   omicsData = metab_object,
@@ -45,7 +46,7 @@ rmd_conversion(log2rmd = rmd_results$Log2.md, df = 3)
 
 rmd_conversion(pval = .0001, df = 3)
 rmd_conversion(log2rmd = 4.5, df = 3)
-
+\dontshow{\}) # examplesIf}
 }
 \author{
 Lisa Bramer

@@ -4,7 +4,7 @@
 #'   functions
 #' @param ... further arguments passed to or from other methods.
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' \dontrun{
 #'
 #' library(dplyr)

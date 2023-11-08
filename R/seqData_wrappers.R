@@ -54,7 +54,7 @@
 #'  G.K. (2015). limma powers differential expression analyses for
 #'  RNA-sequencing and microarray studies. Nucleic Acids Research 43(7), e47.
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' \dontrun{
 #' library(pmartRdata)
 #' myseqData <- group_designation(omicsData = rnaseq_object, main_effects = "Virus")
@@ -1002,7 +1002,7 @@ voom_wrapper <- function(
 #'
 #' @param omicsData an object of type 'seqData', created by \code{\link{as.seqData}}
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' \dontrun{
 #'
 #' library(pmartRdata)
@@ -1158,7 +1158,7 @@ get_group_formula <- function(omicsData) {
 #'
 #' @return plot result
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' \dontrun{
 #' library(pmartRdata)
 #' myseqData <- group_designation(omicsData = rnaseq_object, main_effects = "Virus")

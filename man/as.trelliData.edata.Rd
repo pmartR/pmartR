@@ -66,6 +66,7 @@ The only acceptable input file type is a single edata file.
   data does not need to be normalized.
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 
 # Simple example 
@@ -74,6 +75,7 @@ trelliData1 <- as.trelliData.edata(e_data = pep_edata,
                                    omics_type = "pepData")
                                   
           
+\dontshow{\}) # examplesIf}
 }
 \author{
 David Degnan, Daniel Claborne, Lisa Bramer

@@ -97,7 +97,8 @@ ggplot2 plot object if interactive is FALSE, or plotly plot object if
 For plotting proData S3 objects
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 plot(pro_object, order_by = "Phenotype", color_by = "Phenotype")
-
+\dontshow{\}) # examplesIf}
 }

@@ -27,12 +27,13 @@ recommendation in edgeR is at least 15 total counts observed across samples
 filtering would remove this biomolecule).
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 \dontrun{
 library(pmartRdata)
 to_filter <- total_count_filter(omicsData = rnaseq_object)
 summary(to_filter, min_count = 15)
 }
-
+\dontshow{\}) # examplesIf}
 }
 \references{
 Chen Y, Lun ATL, and Smyth, GK (2016). From reads to genes to pathways:

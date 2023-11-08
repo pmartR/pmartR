@@ -31,7 +31,7 @@
 #' @seealso \code{\link{combine_lipidData}} if you want to combine lipidData
 #'  objects before providing them to as.multiData.
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #'
 #' library(pmartRdata)
 #'

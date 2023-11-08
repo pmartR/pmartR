@@ -32,11 +32,12 @@ a summary table giving the number of Observed Proteins per Peptide
 Provide summary of a proteomicsFilt S3 object
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 myfilt <- proteomics_filter(omicsData = pep_object)
 summary(myfilt, degen_peps = TRUE) # there are no degenerate peptides to filter out
 summary(myfilt, min_num_peps = 2)
-
+\dontshow{\}) # examplesIf}
 }
 \seealso{
 \code{\link{proteomics_filter}}

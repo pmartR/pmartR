@@ -53,6 +53,7 @@ datasets, and simply creates an f_meta by copying this vector for each dataset
 and column-binding them.
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 
 library(pmartRdata)
 
@@ -78,7 +79,7 @@ f_meta <- data.frame(
 mymultidata <- as.multiData(mymetab, mypro, f_meta = f_meta)
 # remove samples that are not common across all data.
 mymultidata <- as.multiData(mymetab, mypro, f_meta = f_meta, sample_intersect = TRUE)
-
+\dontshow{\}) # examplesIf}
 }
 \seealso{
 \code{\link{combine_lipidData}} if you want to combine lipidData

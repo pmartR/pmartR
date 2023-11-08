@@ -65,6 +65,7 @@ If isoformRes is provided then, a temporary pepData object is formed
   and a proData object is returned.
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 \dontrun{
 library(pmartRdata)
 
@@ -87,7 +88,7 @@ results <- protein_quant(pepData = mypepData, method = 'rollup',
 # results2 = protein_quant(pepData = mypepData, method = 'rollup',
                            combine_fn = 'mean', isoformRes = isoformRes)
 }
-
+\dontshow{\}) # examplesIf}
 }
 \references{
 Webb-Robertson, B.-J. M., Matzke, M. M., Datta, S., Payne, S. H.,

@@ -145,6 +145,7 @@ Further arguments can be specified depending on the class of the
   customFilt'.
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 to_filter <- molecule_filter(omicsData = pep_object)
 summary(to_filter, min_num = 2)
@@ -162,7 +163,7 @@ pep_object3 <- applyFilt(
   omicsData = pep_object2,
   min_nonmiss_anova = 3
 )
-
+\dontshow{\}) # examplesIf}
 }
 \seealso{
 \code{\link{molecule_filter}}

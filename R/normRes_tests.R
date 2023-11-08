@@ -12,7 +12,7 @@
 #' @return A list with 2 entries containing the p_value of the test performed on
 #'   the location and scale (if it exists) parameters.
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' mymetab <- edata_transform(omicsData = metab_object, data_scale = "log2")
 #' mymetab <- group_designation(omicsData = mymetab, main_effects = "Phenotype")

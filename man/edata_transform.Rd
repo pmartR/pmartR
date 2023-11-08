@@ -39,10 +39,11 @@ For all but seqData, this function is intended to be used before
   seqData objects are performed within the pertinent functions.
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 mymetab <- edata_transform(omicsData = metab_object, data_scale = "log2")
 attr(mymetab, "data_info")$data_scale
-
+\dontshow{\}) # examplesIf}
 }
 \author{
 Kelly Stratton, Natalie Heller

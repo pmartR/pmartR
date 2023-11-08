@@ -25,11 +25,12 @@ a summary of the CV values, number of NA values, and non-NA values.
 Provide summary of a cvFilt S3 object
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 mypep <- group_designation(omicsData = pep_object, main_effects = "Phenotype")
 to_filter <- cv_filter(omicsData = mypep, use_groups = TRUE)
 summary(to_filter, cv_threshold = 30)
-
+\dontshow{\}) # examplesIf}
 }
 \seealso{
 \code{\link{cv_filter}}

@@ -13,10 +13,11 @@ analysis_log(omicsData)
 Creates R markdown document report
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 \dontrun{
 library(pmartRdata)
 data(metab_object)
 result = analysis_log(metab_object)
 }
-
+\dontshow{\}) # examplesIf}
 }
