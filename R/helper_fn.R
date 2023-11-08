@@ -868,7 +868,7 @@ set_check_names <- function(omicsData, set_to = TRUE) {
 #'   objects of class 'statRes' and 'trelliData' objects derived from 'statRes'
 #'   objects in \code{\link{as.trelliData}}
 #' @return returns a data frame with comparisons and their indices
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #'
 #' my_prodata = group_designation(
@@ -930,7 +930,7 @@ get_comparisons <- function(compObj) {
 #' @return returns the data_class attribute from a 'statRes' or 'trelliData'
 #'   object
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #'
 #' my_prodata = group_designation(

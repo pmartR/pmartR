@@ -139,6 +139,7 @@ Plot types:
 }
 }
 \examples{
+\dontshow{if (identical(tolower(Sys.getenv("NOT_CRAN")), "true") & requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 # Group the data by condition
 mypro <- group_designation(
@@ -171,5 +172,5 @@ imd_anova_res <- imd_anova(
 )
 plot(imd_anova_res, bw_theme = TRUE)
 plot(imd_anova_res, plot_type = "volcano", bw_theme = TRUE)
-
+\dontshow{\}) # examplesIf}
 }

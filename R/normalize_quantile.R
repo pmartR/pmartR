@@ -20,7 +20,7 @@
 #'
 #' @details The method is implemented as described in Bolstad et al. (2003).
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' myfilt <- molecule_filter(omicsData = metab_object)
 #' # quantile normalization requires complete data

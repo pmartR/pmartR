@@ -88,6 +88,7 @@ Objects of class 'lipidData' contain some attributes that are
   argument, specifying where the \code{e_meta} is provided.\cr \tab \cr }
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 mylipid <- as.lipidData(
   e_data = lipid_neg_edata,
@@ -95,7 +96,7 @@ mylipid <- as.lipidData(
   edata_cname = "Lipid",
   fdata_cname = "SampleID"
 )
-
+\dontshow{\}) # examplesIf}
 }
 \seealso{
 \code{\link{as.metabData}}

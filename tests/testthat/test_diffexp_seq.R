@@ -1,12 +1,9 @@
-context('class: seqData')
-
-
-### TO do: add emeta
+context('seqData stats')
 
 test_that('diffexp_seq returns the correct data frame and attributes', {
-  
+  testthat::skip_on_cran()
+
   # Load the reduced peptide data frames ---------------------------------------
-  
   load(system.file('testdata',
                    'little_seqdata.RData',
                    package = 'pmartR'

@@ -76,7 +76,7 @@
 #'  \code{e_data}.\cr \tab \cr meta_info \tab A logical argument, specifying
 #'  whether \code{e_meta} is provided.\cr \tab \cr }
 #'
-#' @examples
+#' @examplesIf identical(tolower(Sys.getenv("NOT_CRAN")), "true") && requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' mypep <- as.isobaricpepData(
 #'   e_data = isobaric_edata,
@@ -265,7 +265,7 @@ as.isobaricpepData <- function(e_data, f_data, e_meta = NULL, edata_cname,
 #'   the columns of \code{e_data}.\cr \tab \cr \code{meta_info} \tab A logical
 #'   argument, specifying where the \code{e_meta} is provided.\cr \tab \cr }
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' mylipid <- as.lipidData(
 #'   e_data = lipid_neg_edata,
@@ -439,7 +439,7 @@ as.lipidData <- function(e_data, f_data, e_meta = NULL,
 #'   \tab A logical argument, specifying where the \code{e_meta} is provided.\cr
 #'   \tab \cr }
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' mymetabData <- as.metabData(
 #'   e_data = metab_edata,
@@ -619,7 +619,7 @@ as.metabData <- function(e_data, f_data, e_meta = NULL,
 #'   \tab A logical argument, specifying where the \code{e_meta} is provided.\cr
 #'   \tab \cr }
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' mynmrData <- as.nmrData(
 #'   e_data = nmr_identified_edata,
@@ -807,7 +807,7 @@ as.nmrData <- function(e_data, f_data, e_meta = NULL,
 #'   \tab A logical argument, specifying whether \code{e_meta} is provided.\cr
 #'   \tab \cr }
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' mypepData <- as.pepData(
 #'   e_data = pep_edata,
@@ -985,7 +985,7 @@ as.pepData <- function(e_data, f_data, e_meta = NULL,
 #'   \tab A logical argument, specifying whether \code{e_meta} is provided.\cr
 #'   \tab \cr }
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' myproData <- as.proData(
 #'   e_data = pro_edata,
@@ -1163,7 +1163,7 @@ as.proData <- function(e_data, f_data, e_meta = NULL,
 #'   \tab A logical argument, specifying whether \code{e_meta} is provided.\cr
 #'   \tab \cr }
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' myseq <- as.seqData(
 #'   e_data = rnaseq_edata,

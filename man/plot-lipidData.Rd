@@ -97,8 +97,9 @@ ggplot2 plot object if interactive is FALSE, or plotly plot object if
 For plotting lipidData S3 objects
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 mylipid <- edata_transform(omicsData = lipid_pos_object, data_scale = "log2")
 plot(mylipid, order_by = "Virus", color_by = "Virus")
-
+\dontshow{\}) # examplesIf}
 }

@@ -22,10 +22,11 @@ This function counts the number of peptides that map to each protein and/or
 the number of proteins to which each individual peptide maps.
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 my_filter <- proteomics_filter(omicsData = pep_object)
 summary(my_filter, min_num_peps = 3)
-
+\dontshow{\}) # examplesIf}
 }
 \author{
 Lisa Bramer, Kelly Stratton

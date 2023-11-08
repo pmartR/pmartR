@@ -80,6 +80,7 @@ For generating statistics for 'seqData' objects
 DESeq2 option requires package "survival" to be available.
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 \dontrun{
 library(pmartRdata)
 myseqData <- group_designation(omicsData = rnaseq_object, main_effects = "Virus")
@@ -87,7 +88,7 @@ dispersion_est(omicsData = myseqData, method = "edgeR")
 dispersion_est(omicsData = myseqData, method = "DESeq2")
 dispersion_est(omicsData = myseqData, method = "voom")
 }
-
+\dontshow{\}) # examplesIf}
 }
 \references{
 Robinson MD, McCarthy DJ, Smyth GK (2010). “edgeR: a Bioconductor package

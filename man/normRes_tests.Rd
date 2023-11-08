@@ -23,6 +23,7 @@ Computes p-values from a test of dependence between normalization parameters
 and group assignment of a normalized omicsData or normRes object
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 mymetab <- edata_transform(omicsData = metab_object, data_scale = "log2")
 mymetab <- group_designation(omicsData = mymetab, main_effects = "Phenotype")
@@ -48,5 +49,5 @@ mynmrnorm <- normalize_nmr(
 mynmrnorm <- normalize_global(omicsData = mynmrnorm, subset_fn = "all",
                               norm_fn = "median", apply_norm = TRUE, backtransform = TRUE)
 norm_pvals <- normRes_tests(norm_obj = mynmrnorm)
-
+\dontshow{\}) # examplesIf}
 }

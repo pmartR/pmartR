@@ -5,7 +5,7 @@
 #' @param edata Must be a dataframe. Required.
 #'
 #' @return A boolean where TRUE means the file is an acceptable edata file.
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' \dontrun{
 #'
 #' .is_edata(pmartRdata::lipid_edata)
@@ -84,7 +84,7 @@
 #' @param force_normalization A logical indicator to force normalization that is
 #'   not required for both isobaric protein and NMR data
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' 
 #' # Simple example 
@@ -234,7 +234,7 @@ as.trelliData.edata <- function(e_data,
 #' @param statRes statRes an object of the class 'statRes', created by
 #'   \code{\link{imd_anova}}
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' \dontrun{
 #' library(pmartRdata)
 #' 
@@ -467,7 +467,7 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL) {
 #' @param trelliData A trelliscope data object made by as.trelliData or as.trelliData.edata. Required.
 #' @param panel The name of a column in trelliData to panel the data by. Required.
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' \dontrun{
 #' 
 #' 
@@ -613,7 +613,7 @@ trelli_panel_by <- function(trelliData, panel) {
 #' @param comparison The specific comparison to filter significant values to. Can
 #'    be null. See attr(statRes, "comparisons") for the available options. Optional.
 #'    
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' \dontrun{
 #' 
 #' # Filter a trelliData object with only statistics results, while not caring about a comparison

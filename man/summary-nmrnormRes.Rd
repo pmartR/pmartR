@@ -20,6 +20,7 @@ data frame object
 For creating a summary of an S3 object of type 'nmrnormRes'
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 mynmr <- edata_transform(
   omicsData = nmr_identified_object,
@@ -30,5 +31,5 @@ nmr_norm <- normalize_nmr(
   sample_property_cname = "Concentration"
 )
 mysummary <- summary(nmr_norm)
-
+\dontshow{\}) # examplesIf}
 }

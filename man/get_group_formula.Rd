@@ -14,6 +14,7 @@ For generating group design formulas and correctly ordered group data for
 seqData statistical functions
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 \dontrun{
 
 library(pmartRdata)
@@ -21,5 +22,5 @@ myseqData <- rnaseq_object
 myseqData <- group_designation(omicsData = myseqData, main_effects = "Virus")
 grouping_info <- pmartR:::get_group_formula(omicsData = myseqData)
 }
-
+\dontshow{\}) # examplesIf}
 }

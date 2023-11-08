@@ -1,11 +1,10 @@
-context('class: seqData')
+context('seqData group_designation')
 
 
 ### TO do: add emeta
 
 test_that('get_group_formula returns the correct data frame and results', {
   # Load the reduced peptide data frames ---------------------------------------
-
   load(system.file('testdata',
     'little_seqdata.RData',
     package = 'pmartR'

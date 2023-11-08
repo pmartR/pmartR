@@ -29,10 +29,11 @@ When creating the 'dataRes' object via \code{\link{edata_summary}},
   be NULL
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 mylipid <- edata_transform(omicsData = lipid_neg_object, data_scale = "log2")
 
 dataRes_sample <- edata_summary(omicsData = mylipid, groupvar = NULL, by = "sample")
 my_output <- report_dataRes(dataRes_sample)
-
+\dontshow{\}) # examplesIf}
 }

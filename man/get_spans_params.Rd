@@ -24,6 +24,7 @@ A list of lists, where there are multiple sublists only if there were
 Gets the parameters for the highest ranked methods from spans.
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 \dontrun{
 library(pmartRdata)
 
@@ -48,5 +49,5 @@ if (is.null(params[[1]])) {
 norm_object <- normalize_global(omicsData = myobject, subset_fn = subset_fn,
                                 norm_fn = norm_fn, params = params)
 }
-
+\dontshow{\}) # examplesIf}
 }

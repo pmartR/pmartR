@@ -97,6 +97,7 @@ ggplot2 plot object if interactive is FALSE, or plotly plot object if
 For plotting an S3 object of type 'normRes'
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 mymetab <- edata_transform(
   omicsData = metab_object,
@@ -112,5 +113,5 @@ norm_object <- normalize_global(
   norm_fn = "median"
 )
 plot(norm_object, order_by = "Phenotype", color_by = "Phenotype")
-
+\dontshow{\}) # examplesIf}
 }

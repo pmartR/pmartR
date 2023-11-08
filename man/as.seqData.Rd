@@ -85,6 +85,7 @@ Objects of class 'seqData' contain some attributes that are
   \tab \cr }
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 myseq <- as.seqData(
   e_data = rnaseq_edata,
@@ -94,7 +95,7 @@ myseq <- as.seqData(
   fdata_cname = "SampleName",
   emeta_cname = "Transcript"
 )
-
+\dontshow{\}) # examplesIf}
 }
 \seealso{
 \code{\link{as.proData}}

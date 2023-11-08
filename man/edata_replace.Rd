@@ -32,9 +32,10 @@ This function is often used to replace any 0 values in peptide,
   are automatically converted to 0's.
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 mymetab <- edata_replace(omicsData = metab_object, x = 0, y = NA)
-
+\dontshow{\}) # examplesIf}
 }
 \author{
 Kelly Stratton

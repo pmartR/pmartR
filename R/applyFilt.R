@@ -82,7 +82,7 @@
 #'   There are no further arguments for a \code{filter_object} of type '
 #'   customFilt'.
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' to_filter <- molecule_filter(omicsData = pep_object)
 #' summary(to_filter, min_num = 2)

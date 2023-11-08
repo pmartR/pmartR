@@ -20,6 +20,7 @@ data frame object
 For creating a summary of an S3 object of type 'isobaricnormRes'
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 myiso <- edata_transform(omicsData = isobaric_object, data_scale = "log2")
 myiso_norm <- normalize_isobaric(
@@ -29,5 +30,5 @@ myiso_norm <- normalize_isobaric(
   refpool_notation = "Pool"
 )
 mysummary <- summary(myiso_norm)
-
+\dontshow{\}) # examplesIf}
 }

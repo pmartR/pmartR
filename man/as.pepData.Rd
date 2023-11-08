@@ -90,6 +90,7 @@ Objects of class 'pepData' contain some attributes that are
   \tab \cr }
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 mypepData <- as.pepData(
   e_data = pep_edata,
@@ -99,7 +100,7 @@ mypepData <- as.pepData(
   fdata_cname = "SampleID",
   emeta_cname = "RazorProtein"
 )
-
+\dontshow{\}) # examplesIf}
 }
 \seealso{
 \code{\link{as.proData}}

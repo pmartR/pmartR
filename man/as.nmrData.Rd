@@ -93,6 +93,7 @@ Objects of class 'nmrData' contain some attributes that are
   \tab \cr }
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 mynmrData <- as.nmrData(
   e_data = nmr_identified_edata,
@@ -101,7 +102,7 @@ mynmrData <- as.nmrData(
   fdata_cname = "SampleID",
   data_type = "identified"
 )
-
+\dontshow{\}) # examplesIf}
 }
 \seealso{
 \code{\link{as.metabData}}

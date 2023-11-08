@@ -33,11 +33,12 @@ The output from this function can be used in conjunction with
   object that is returned.
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 mypep <- group_designation(omicsData = pep_object, main_effects = "Phenotype")
 to_filter <- imdanova_filter(omicsData = mypep)
 summary(to_filter, min_nonmiss_anova = 2)
-
+\dontshow{\}) # examplesIf}
 }
 \author{
 Kelly Stratton

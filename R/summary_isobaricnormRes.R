@@ -8,7 +8,7 @@
 #'
 #' @return data frame object
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' myiso <- edata_transform(omicsData = isobaric_object, data_scale = "log2")
 #' myiso_norm <- normalize_isobaric(

@@ -17,6 +17,7 @@ Implements overall survival analysis or progression-free survival analysis, depe
 surv_designation, and return the "survfit" object
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 \dontrun{
 library(MSomicsSTAT)
 library(OvarianPepdataBP)
@@ -36,5 +37,5 @@ attr(tcga_ovarian_pepdata_bp, "survDF") <- list(
 sfit <- fit_surv(tcga_ovarian_pepdata_bp)
 plot(sfit, col = c(1, 2))
 }
-
+\dontshow{\}) # examplesIf}
 }

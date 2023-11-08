@@ -60,7 +60,7 @@
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
 #'   interactive is TRUE
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' mylipid <- edata_transform(omicsData = lipid_pos_object, data_scale = "log2")
 #' result <- edata_summary(
@@ -404,7 +404,7 @@ plot.dataRes <- function(x, metric = NULL, density = FALSE,
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
 #'   interactive is TRUE
 #'
-#' @examples
+#' @examplesIf identical(tolower(Sys.getenv("NOT_CRAN")), "true") & requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' myiso <- edata_transform(omicsData = isobaric_object, data_scale = "log2")
 #' result <- normalize_isobaric(myiso,
@@ -614,7 +614,7 @@ prime_iso <- function(isonormRes, exp_cname,
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
 #'   interactive is TRUE
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' mynmr <- edata_transform(omicsData = nmr_identified_object, data_scale = "log2")
 #' mynmrnorm <- normalize_nmr(
@@ -859,7 +859,7 @@ plot.nmrnormRes <- function(x, nmrData = NULL, order_by = NULL,
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
 #'   interactive is TRUE
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' \dontrun{
 #' library(pmartRdata)
 #' data(pep_object)
@@ -1113,7 +1113,7 @@ plot.SPANSRes <- function(x, interactive = FALSE,
 #'   \code{\link{group_designation}} applied to it, the points in the plot will
 #'   be colored by group.
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' mylipid <- group_designation(omicsData = lipid_neg_object, main_effects = "Virus")
 #' result <- missingval_result(omicsData = mylipid)
@@ -1651,7 +1651,7 @@ na_scatter <- function (edata, group_df, na.by.molecule, edata_cname,
 #'
 #' @rdname plot-corRes
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' mymetab <- edata_transform(omicsData = metab_object, data_scale = "log2")
 #' mymetab <- group_designation(omicsData = mymetab, main_effects = "Phenotype")
@@ -1946,7 +1946,7 @@ plot.corRes <- function(x, omicsData = NULL, order_by = NULL,
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
 #'   interactive is TRUE
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #'
 #' mylipid <- edata_transform(omicsData = lipid_neg_object, data_scale = "log2")
@@ -2351,7 +2351,7 @@ plot.dimRes <- function (x, omicsData = NULL,
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
 #'   interactive is TRUE
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' data(pep_object)
 #' molfilt <- molecule_filter(omicsData = pep_object)
@@ -2622,7 +2622,7 @@ plot.moleculeFilt <- function(x, min_num = NULL, cumulative = TRUE,
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
 #'   interactive is TRUE
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' \dontrun{
 #' library(pmartRdata)
 #' seqfilt <- total_count_filter(omicsData = rnaseq_object)
@@ -2794,7 +2794,7 @@ plot.totalCountFilt <- function(x, min_count = NULL,
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
 #'   interactive is TRUE
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' seqfilt <- RNA_filter(omicsData = rnaseq_object)
 #' plot(seqfilt)
@@ -3077,7 +3077,7 @@ plot.RNAFilt <- function(x, plot_type = "library",
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
 #'   interactive is TRUE
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' data(pep_object)
 #' mypep <- group_designation(omicsData = pep_object, main_effects = "Phenotype")
@@ -3482,7 +3482,7 @@ plot.imdanovaFilt <- function(x, min_nonmiss_anova = NULL,
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
 #'   interactive is TRUE
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' data(pep_object)
 #' my_filter <- proteomics_filter(omicsData = pep_object)
@@ -3834,7 +3834,7 @@ plot.proteomicsFilt <- function(x,
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
 #'   interactive is TRUE
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' mymetab <- edata_transform(omicsData = metab_object, data_scale = "log2")
 #' mymetab <- group_designation(omicsData = mymetab, main_effects = "Phenotype")
@@ -4417,7 +4417,7 @@ plot.rmdFilt <- function(x, pvalue_threshold = NULL, sampleID = NULL,
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
 #'   interactive is TRUE
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' data(pep_object)
 #' mypep <- group_designation(
@@ -4679,7 +4679,7 @@ plot.customFilt <- function(x, ...) {
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
 #'   interactive is TRUE
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' mymetab <- edata_transform(
 #'   omicsData = metab_object,
@@ -4870,7 +4870,7 @@ plot.normRes <- function(x, order_by = NULL, color_by = NULL,
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
 #'   interactive is TRUE
 #'
-#' @examples
+#' @examplesIf identical(tolower(Sys.getenv("NOT_CRAN")), "true") & requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' myiso <- edata_transform(omicsData = isobaric_object, data_scale = "log2")
 #' plot(myiso)
@@ -4958,7 +4958,7 @@ plot.isobaricpepData <- function(x, order_by = NULL, color_by = NULL,
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
 #'   interactive is TRUE
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' mylipid <- edata_transform(omicsData = lipid_pos_object, data_scale = "log2")
 #' plot(mylipid, order_by = "Virus", color_by = "Virus")
@@ -5044,7 +5044,7 @@ plot.lipidData <- function(x, order_by = NULL, color_by = NULL,
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
 #'   interactive is TRUE
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' mymetab <- edata_transform(omicsData = metab_object, data_scale = "log2")
 #' plot(mymetab, order_by = "Phenotype", color_by = "Phenotype")
@@ -5130,7 +5130,7 @@ plot.metabData <- function(x, order_by = NULL, color_by = NULL,
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
 #'   interactive is TRUE
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' mynmr <- edata_transform(omicsData = nmr_identified_object, data_scale = "log2")
 #' plot(mynmr)
@@ -5225,7 +5225,7 @@ plot.nmrData <- function(x, order_by = NULL, color_by = NULL,
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
 #'   interactive is TRUE
 #'
-#' @examples
+#' @examplesIf identical(tolower(Sys.getenv("NOT_CRAN")), "true") & requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' plot(rnaseq_object, transformation = "lcpm")
 #'
@@ -5312,7 +5312,7 @@ plot.seqData <- function(x, order_by = NULL, color_by = NULL,
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
 #'   interactive is TRUE
 #'
-#' @examples
+#' @examplesIf identical(tolower(Sys.getenv("NOT_CRAN")), "true") & requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' data(pep_object)
 #' mypep <- edata_transform(omicsData = pep_object, data_scale = "log2")
@@ -5399,7 +5399,7 @@ plot.pepData <- function(x, order_by = NULL, color_by = NULL,
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
 #'   interactive is TRUE
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' plot(pro_object, order_by = "Phenotype", color_by = "Phenotype")
 #'
@@ -5973,7 +5973,7 @@ plot_omicsData <- function(omicsData, order_by, color_by, facet_by, facet_cols,
 #'
 #' @export
 #' @method plot statRes
-#' @examples
+#' @examplesIf identical(tolower(Sys.getenv("NOT_CRAN")), "true") & requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' # Group the data by condition
 #' mypro <- group_designation(

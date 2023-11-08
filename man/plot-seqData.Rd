@@ -108,7 +108,8 @@ ggplot2 plot object if interactive is FALSE, or plotly plot object if
 For plotting seqData S3 objects
 }
 \examples{
+\dontshow{if (identical(tolower(Sys.getenv("NOT_CRAN")), "true") & requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 plot(rnaseq_object, transformation = "lcpm")
-
+\dontshow{\}) # examplesIf}
 }

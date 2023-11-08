@@ -32,7 +32,7 @@
 #' @param omicsData A pmartR data object of any class, which has a `group_df` attribute that is usually created by the `group_designation()` function
 #' @return if fitted survival analysis object is returned
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' \dontrun{
 #' library(MSomicsSTAT)
 #' library(OvarianPepdataBP)
@@ -99,7 +99,7 @@ fit_surv <- function(omicsData) {
 #'
 #' @return a Kaplan-Meier curve
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' \dontrun{
 #' library(MSomicsSTAT)
 #' library(OvarianPepdataBP)
@@ -132,7 +132,7 @@ plot_km <- function(omicsData) {
 #' @param ... extra arguments passed to regexpr if pattern is specified
 #' @return if `percent` is provided then the time at which that probability of death is returned; else, the summary of the `survival` object is returned
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' \dontrun{
 #' library(OvarianPepdataBP)
 #' attr(tcga_ovarian_pepdata_bp, "survDF") <- list(t_death = "survival_time",

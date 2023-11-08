@@ -251,7 +251,7 @@ trelli_builder <- function(toBuild, cognostics, plotFUN, cogFUN, path, name, rem
 #'   trelliscope) should be returned. Default is FALSE.
 #' @param ... Additional arguments to be passed on to the trelli builder
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' \dontrun{
 #' 
 #' ## Generate trelliData objects using the as.trelliData.edata example code.
@@ -571,7 +571,7 @@ trelli_abundance_boxplot <- function(trelliData,
 #'   trelliscope) should be returned. Default is FALSE.
 #' @param ... Additional arguments to be passed on to the trelli builder
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' \dontrun{
 #' 
 #' # Build the abundance histogram with an edata file. 
@@ -745,7 +745,7 @@ trelli_abundance_histogram <- function(trelliData,
 #'   trelliscope) should be returned. Default is FALSE.
 #' @param ... Additional arguments to be passed on to the trelli builder
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' \dontrun{
 #' 
 #' # Build the abundance heatmap with an omicsData object with emeta variables. 
@@ -954,7 +954,7 @@ trelli_abundance_heatmap <- function(trelliData,
 #'    trelliscope) should be returned. Default is FALSE.
 #' @param ... Additional arguments to be passed on to the trelli builder
 #'   
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' \dontrun{
 #' 
 #' # Build the missingness bar plot with an edata file. Generate trelliData in as.trelliData.edata
@@ -1347,7 +1347,7 @@ determine_significance <- function(DF, p_value_thresh) {
 #'   trelliscope) should be returned. Default is FALSE.
 #' @param ... Additional arguments to be passed on to the trelli builder
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' \dontrun{
 #' 
 #' # Build fold_change bar plot with statRes data grouped by edata_colname.
@@ -1530,7 +1530,7 @@ trelli_foldchange_bar <- function(trelliData,
 #'   trelliscope) should be returned. Default is FALSE.
 #' @param ... Additional arguments to be passed on to the trelli builder
 #'   
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' \dontrun{ 
 #' 
 #' # Build fold_change box plot with statRes data grouped by edata_colname.
@@ -1737,7 +1737,7 @@ trelli_foldchange_boxplot <- function(trelliData,
 #'   trelliscope) should be returned. Default is FALSE.
 #' @param ... Additional arguments to be passed on to the trelli builder
 #' 
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' \dontrun{ 
 #' 
 #' # Build fold_change bar plot with statRes data grouped by edata_colname.
@@ -1937,7 +1937,7 @@ trelli_foldchange_heatmap <- function(trelliData,
 #'   trelliscope) should be returned. Default is FALSE.
 #' @param ... Additional arguments to be passed on to the trelli builder
 #'   
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' \dontrun{
 #'
 #' ## Build fold_change bar plot with statRes data grouped by edata_colname.

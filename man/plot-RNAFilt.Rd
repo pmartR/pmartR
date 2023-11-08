@@ -92,8 +92,9 @@ ggplot2 plot object if interactive is FALSE, or plotly plot object if
 For plotting an S3 object of type 'RNAFilt'
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 seqfilt <- RNA_filter(omicsData = rnaseq_object)
 plot(seqfilt)
-
+\dontshow{\}) # examplesIf}
 }

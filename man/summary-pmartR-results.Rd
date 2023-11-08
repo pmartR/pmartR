@@ -28,6 +28,7 @@ a summary table or list for the pmartR results object
 Provide basic summaries for results objects from the pmartR package.
 }
 \examples{
+\dontshow{if (identical(tolower(Sys.getenv("NOT_CRAN")), "true") & requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 mypep <- group_designation(omicsData = pep_object, main_effects = "Phenotype")
 mypep <- edata_transform(omicsData = mypep, data_scale = "log2")
@@ -45,7 +46,7 @@ summary(dim_results)
 
 cor_results <- cor_result(omicsData = mypep)
 summary(cor_results)
-
+\dontshow{\}) # examplesIf}
 }
 \author{
 Lisa Bramer, Kelly Stratton, Thomas Johansen

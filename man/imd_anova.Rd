@@ -74,6 +74,7 @@ An object of class 'statRes', which is a data frame containing
 This is the IMD-ANOVA test defined in Webb-Robertson et al. (2010).
 }
 \examples{
+\dontshow{if (identical(tolower(Sys.getenv("NOT_CRAN")), "true") & requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 # Transform the data
 mymetab <- edata_transform(omicsData = metab_object, data_scale = "log2")
@@ -105,7 +106,7 @@ imd_anova_res <- imd_anova(omicsData = mymetab, test_method = 'comb')
 # Same but with custom comparisons
 comp_df <- data.frame(Control = c("Phenotype1", "A"), Test = c("Phenotype2", "B"))
 custom_comps_res <- imd_anova(omicsData = mymetab, comparisons = comp_df, test_method = "combined")
-
+\dontshow{\}) # examplesIf}
 }
 \references{
 Webb-Robertson, Bobbie-Jo M., et al. "Combined statistical

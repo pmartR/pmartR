@@ -39,11 +39,12 @@ If min_nonmiss_gtest or min_nonmiss_anova is specified, the number of
 Provide summary of a imdanovaFilt S3 object
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 mypep <- group_designation(omicsData = pep_object, main_effects = "Phenotype")
 myfilt <- imdanova_filter(omicsData = mypep)
 summary(myfilt, min_nonmiss_anova = 2, min_nonmiss_gtest = 3)
-
+\dontshow{\}) # examplesIf}
 }
 \seealso{
 \code{\link{imdanova_filter}}

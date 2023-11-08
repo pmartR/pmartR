@@ -60,6 +60,7 @@ This function can be used to create custom (and shorter) sample
   plotting, specify the optional argument 'use_VizSampNames = TRUE'.
 }
 \examples{
+\dontshow{if (identical(tolower(Sys.getenv("NOT_CRAN")), "true") && requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 
 mypep <- edata_transform(omicsData = pep_object, data_scale = "log2")
@@ -90,5 +91,5 @@ pattern2 <- "^Sample_[0-9]+"
 
 results <- custom_sampnames(omicsData = mypep, pattern = pattern2)
 plot(results, use_VizSampNames = TRUE)
-
+\dontshow{\}) # examplesIf}
 }

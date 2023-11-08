@@ -62,6 +62,7 @@ Specify a plot design and cognostics for the fold_change boxplot
   both an omicsData object and statRes are required to make this plot.
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 \dontrun{ 
 
 # Build fold_change box plot with statRes data grouped by edata_colname.
@@ -75,7 +76,7 @@ trelli_panel_by(trelliData = trelliData4, panel = "RazorProtein") \%>\%
                            )
 
 }
-
+\dontshow{\}) # examplesIf}
 }
 \author{
 David Degnan, Lisa Bramer

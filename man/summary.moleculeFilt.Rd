@@ -27,11 +27,12 @@ a summary table giving the number of biomolecules by number of
 Provide summary of a moleculeFilt S3 object
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 myfilter <- molecule_filter(omicsData = pep_object)
 summary(myfilter)
 summary(myfilter, min_num = 2)
-
+\dontshow{\}) # examplesIf}
 }
 \seealso{
 \code{\link{molecule_filter}}

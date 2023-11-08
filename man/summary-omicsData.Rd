@@ -39,6 +39,7 @@ This function will provide basic summary statistics for omicsData objects
 from the pmartR package.
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 pep_summary <- summary(pep_object)
 iso_summary <- summary(isobaric_object)
@@ -47,7 +48,7 @@ metab_summary <- summary(metab_object)
 lipid_summary <- summary(lipid_neg_object)
 nmr_summary <- summary(nmr_identified_object)
 rnaseq_summary <- summary(rnaseq_object)
-
+\dontshow{\}) # examplesIf}
 }
 \author{
 Lisa Bramer, Kelly Stratton, Thomas Johansen

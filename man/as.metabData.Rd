@@ -88,6 +88,7 @@ Objects of class 'metabData' contain some attributes that are
   \tab \cr }
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 mymetabData <- as.metabData(
   e_data = metab_edata,
@@ -95,7 +96,7 @@ mymetabData <- as.metabData(
   edata_cname = "Metabolite",
   fdata_cname = "SampleID"
 )
-
+\dontshow{\}) # examplesIf}
 }
 \seealso{
 \code{\link{as.lipidData}}

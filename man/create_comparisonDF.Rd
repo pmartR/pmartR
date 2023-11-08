@@ -32,12 +32,13 @@ This function takes in the omicsData and type of comparison, and
   interest.
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 mymetab <- group_designation(omicsData = metab_object, main_effects = "Phenotype")
 create_comparisonDF(comp_type = "pairwise", omicsData = mymetab)
 
 create_comparisonDF(comp_type = "control", omicsData = mymetab, control_group = "Phenotype1")
-
+\dontshow{\}) # examplesIf}
 }
 \seealso{
 \code{\link{group_designation}}

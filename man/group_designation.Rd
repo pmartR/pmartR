@@ -85,13 +85,14 @@ Groups are formed based on the levels of the main effect variables.
   allowed, as is a single group.
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 mylipid <- group_designation(
   omicsData = lipid_pos_object,
   main_effects = "Virus"
 )
 attr(mylipid, "group_DF")
-
+\dontshow{\}) # examplesIf}
 }
 \author{
 Lisa Bramer, Kelly Stratton

@@ -58,7 +58,7 @@
 #'   the third and fourth columns of the data.frame. Additionally, the
 #'   covariates provided will be listed as attributes of this data.frame.
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' mylipid <- group_designation(
 #'   omicsData = lipid_pos_object,

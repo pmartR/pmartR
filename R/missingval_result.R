@@ -17,7 +17,7 @@
 #'   values. This object can be used with 'plot' and 'summary' methods to
 #'   examine the missing values in the dataset.
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' result1 = missingval_result(omicsData = lipid_neg_object)
 #' result2 = missingval_result(omicsData = metab_object)

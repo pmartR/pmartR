@@ -30,6 +30,7 @@ This use-case-specific function allows users to filter down their plots to a
    relevant to the MODE application.
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 \dontrun{
 
 # Filter a trelliData object with only statistics results, while not caring about a comparison
@@ -50,7 +51,7 @@ trelli_pvalue_filter(
 
 
 }
-
+\dontshow{\}) # examplesIf}
 }
 \author{
 David Degnan, Lisa Bramer

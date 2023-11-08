@@ -93,6 +93,7 @@ ggplot2 plot object if interactive is FALSE, or plotly plot object if
 For plotting an S3 object of type 'dimRes'
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 
 mylipid <- edata_transform(omicsData = lipid_neg_object, data_scale = "log2")
@@ -105,5 +106,5 @@ myseq <- group_designation(omicsData = rnaseq_object, main_effects = "Virus")
 pca_seq <- dim_reduction(omicsData = myseq)
 plot(pca_seq)
 }
-
+\dontshow{\}) # examplesIf}
 }

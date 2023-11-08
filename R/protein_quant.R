@@ -41,7 +41,7 @@
 #'   Proteoform Modeling Improves Protein Quantification of Global Proteomic
 #'   Measurements}. Molecular & Cellular Proteomics.: MCP, 13(12), 3639-3646.
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' \dontrun{
 #' library(pmartRdata)
 #'

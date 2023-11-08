@@ -50,6 +50,7 @@ normalized or unnormalized
 retain_groups = T
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 
 obj_1 <- lipid_neg_object
@@ -84,5 +85,5 @@ combine_object_later <- combine_lipidData(
                           retain_groups = TRUE,
                           retain_filters = TRUE
                         )
-
+\dontshow{\}) # examplesIf}
 }

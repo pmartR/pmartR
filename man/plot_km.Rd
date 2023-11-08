@@ -17,6 +17,7 @@ Implements overall survival analysis or progression-free survival analysis, depe
 surv_designation, and plot the resulting Kaplan-Meier curve.
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 \dontrun{
 library(MSomicsSTAT)
 library(OvarianPepdataBP)
@@ -32,4 +33,5 @@ attr(tcga_ovarian_pepdata_bp, "survDF") <- list(
 )
 plot_km(omicsData = tcga_ovarian_pepdata_bp)
 }
+\dontshow{\}) # examplesIf}
 }

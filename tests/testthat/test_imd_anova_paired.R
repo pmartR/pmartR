@@ -2,7 +2,7 @@ context('IMD-ANOVA paired tests')
 
 test_that('all paired tests conform to the decrees of the God of Stats', {
   # Load IMD-ANOVA filter objects ----------------------------------------------
-
+  testthat::skip_on_cran()
   load(system.file('testdata',
     'standards_filter_paired.RData',
     package = 'pmartR'

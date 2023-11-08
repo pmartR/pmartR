@@ -97,8 +97,9 @@ ggplot2 plot object if interactive is FALSE, or plotly plot object if
 For plotting metabData S3 objects
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 mymetab <- edata_transform(omicsData = metab_object, data_scale = "log2")
 plot(mymetab, order_by = "Phenotype", color_by = "Phenotype")
-
+\dontshow{\}) # examplesIf}
 }

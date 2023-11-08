@@ -16,6 +16,7 @@ Allows for grouping omics or stats data for downstream plotting
     and cognostic functions
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 \dontrun{
 
 
@@ -39,7 +40,7 @@ trelli_panel_by(trelliData = trelliData4, panel = "Peptide")
 trelli_panel_by(trelliData = trelliData4, panel = "RazorProtein")
 trelli_panel_by(trelliData = trelliData4, panel = "SampleID")
 }
-
+\dontshow{\}) # examplesIf}
 }
 \author{
 David Degnan, Lisa Bramer

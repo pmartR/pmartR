@@ -76,6 +76,7 @@ the median of the values in \code{sample_property} \cr } See examples below.
 }
 
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 
 # Normalize using a metabolite (this is merely an example of how to use this specification;
@@ -100,5 +101,5 @@ nmr_norm <- normalize_nmr(
   sample_property_cname = "Concentration",
   backtransform = TRUE
 )
-
+\dontshow{\}) # examplesIf}
 }

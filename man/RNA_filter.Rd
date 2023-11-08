@@ -26,12 +26,13 @@ Filter omicsData samples by library size (number of reads) or number
   sample contains lower than expected number of reads.
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 to_filter <- RNA_filter(omicsData = rnaseq_object)
 summary(to_filter, size_library = 10000)
 summary(to_filter, min_nonzero = 5000)
 summary(to_filter, min_nonzero = .2)
-
+\dontshow{\}) # examplesIf}
 }
 \author{
 Rachel Richardson

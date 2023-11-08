@@ -93,10 +93,11 @@ ggplot2 plot object if interactive is FALSE, or plotly plot object if
 For plotting an S3 object of type 'moleculeFilt':
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 data(pep_object)
 molfilt <- molecule_filter(omicsData = pep_object)
 plot(molfilt, min_num = 5)
 plot(molfilt, min_num = 3, cumulative = FALSE)
-
+\dontshow{\}) # examplesIf}
 }

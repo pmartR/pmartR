@@ -31,7 +31,7 @@
 #'   R-based processing and visualisation of raw mass spectrometry data.”
 #'   bioRxiv.
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' \dontrun{
 #' library(MSnbase)
 #' data("msnset")

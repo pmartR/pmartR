@@ -76,6 +76,7 @@ There are two ways to specify the information needed for identifying
   was run on.
 }
 \examples{
+\dontshow{if (identical(tolower(Sys.getenv("NOT_CRAN")), "true") & requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 
 myiso <- edata_transform(isobaric_object, "log2")
@@ -98,5 +99,5 @@ myiso_norm <- normalize_isobaric(
   refpool_cname = "Virus",
   refpool_notation = "Pool"
 )
-
+\dontshow{\}) # examplesIf}
 }

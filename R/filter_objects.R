@@ -28,7 +28,7 @@
 #'   molecule identifier and the number of samples for which the molecule was
 #'   observed (i.e. not NA)
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' to_filter <- molecule_filter(omicsData = pep_object)
 #' summary(to_filter, min_num = 2)
@@ -255,7 +255,7 @@ molecule_filter <- function(omicsData, use_groups = FALSE, use_batch = FALSE) {
 #'   molecule identifier and the total count of observed reads for that molecule
 #'   across all samples.
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' \dontrun{
 #' library(pmartRdata)
 #' to_filter <- total_count_filter(omicsData = rnaseq_object)
@@ -362,7 +362,7 @@ total_count_filter <- function(omicsData) {
 #'   non-zero observations per sample, and the proportion of non-zero
 #'   observations over the total number of biomolecules.
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' to_filter <- RNA_filter(omicsData = rnaseq_object)
 #' summary(to_filter, size_library = 10000)
@@ -451,7 +451,7 @@ RNA_filter <- function(omicsData) {
 #' @references Ahmed, S.E. (1995). \emph{A pooling methodology for coefficient
 #'   of variation}. The Indian Journal of Statistics. 57: 57-75.
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' mypep <- group_designation(omicsData = pep_object, 
 #'                            main_effects = "Phenotype")
@@ -658,7 +658,7 @@ cv_filter <- function(omicsData, use_groups = TRUE) {
 #'  to the general lack of missing data in these datasets (the default behavior 
 #'  omits "Proportion_Missing" from the metrics). \cr }
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' mymetab <- edata_transform(omicsData = metab_object, data_scale = "log2")
 #' mymetab <- group_designation(omicsData = mymetab, main_effects = "Phenotype")
@@ -1469,7 +1469,7 @@ run_group_meancor <- function(omicsData, mintR_groupDF,
 #'   peptide. The second element is a data frame with the counts for the number
 #'   of peptides that map to each unique protein.
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' my_filter <- proteomics_filter(omicsData = pep_object)
 #' summary(my_filter, min_num_peps = 3)
@@ -1564,7 +1564,7 @@ proteomics_filter <- function(omicsData) {
 #'   molecule identifier and number of samples in each group with non-missing
 #'   values for that molecule.
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' mypep <- group_designation(omicsData = pep_object, main_effects = "Phenotype")
 #' to_filter <- imdanova_filter(omicsData = mypep)
@@ -1743,7 +1743,7 @@ imdanova_filter <- function(omicsData) {
 #'   for e_data, f_data, and e_meta, specifying which entries should be either
 #'   kept or removed
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' to_filter <- custom_filter(omicsData = metab_object, 
 #'                            e_data_remove = "fumaric acid",

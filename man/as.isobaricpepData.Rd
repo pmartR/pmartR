@@ -102,6 +102,7 @@ The class 'isobaricpepData' is meant to deal with labeled peptide data
  whether \code{e_meta} is provided.\cr \tab \cr }
 }
 \examples{
+\dontshow{if (identical(tolower(Sys.getenv("NOT_CRAN")), "true") && requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 mypep <- as.isobaricpepData(
   e_data = isobaric_edata,
@@ -111,7 +112,7 @@ mypep <- as.isobaricpepData(
   fdata_cname = "SampleID",
   emeta_cname = "Protein"
 )
-
+\dontshow{\}) # examplesIf}
 }
 \seealso{
 \code{\link{as.pepData}}

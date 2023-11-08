@@ -143,6 +143,7 @@ Below are details for specifying function and parameter options.
 }
 
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 
 mymetab <- edata_transform(
@@ -165,7 +166,7 @@ norm_data <- normalize_global(
   apply_norm = TRUE,
   backtransform = TRUE
 )
-
+\dontshow{\}) # examplesIf}
 }
 \references{
 Webb-Robertson BJ, Matzke MM, Jacobs JM, Pounds JG, Waters KM. A

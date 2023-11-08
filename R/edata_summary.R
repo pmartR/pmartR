@@ -27,7 +27,7 @@
 #'
 #' @export
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #'
 #' mylipid <- edata_transform(omicsData = lipid_pos_object, data_scale = "log2")

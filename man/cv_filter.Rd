@@ -37,12 +37,13 @@ For each biomolecule, the CV of each group is calculated as the
  group.
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 mypep <- group_designation(omicsData = pep_object, 
                            main_effects = "Phenotype")
 to_filter <- cv_filter(omicsData = mypep, use_groups = TRUE)
 summary(to_filter, cv_threshold = 30)
-
+\dontshow{\}) # examplesIf}
 }
 \references{
 Ahmed, S.E. (1995). \emph{A pooling methodology for coefficient

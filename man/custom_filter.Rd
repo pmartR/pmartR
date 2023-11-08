@@ -55,6 +55,7 @@ This function creates a customFilt S3 object based on user-specified items to
 filter out of the dataset
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 to_filter <- custom_filter(omicsData = metab_object, 
                            e_data_remove = "fumaric acid",
@@ -64,7 +65,7 @@ summary(to_filter)
 to_filter2 <- custom_filter(omicsData = metab_object, 
                             f_data_keep = metab_object$f_data$SampleID[1:10])
 summary(to_filter2)
-
+\dontshow{\}) # examplesIf}
 }
 \author{
 Kelly Stratton

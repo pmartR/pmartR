@@ -25,12 +25,13 @@ a summary of the p-values associated with running RMD-PAV across all
 Provide summary of a rmdFilt S3 object
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 mymetab <- group_designation(omicsData = metab_object, main_effects = "Phenotype")
 mymetab <- edata_transform(omicsData = mymetab, data_scale = "log2")
 myfilt <- rmd_filter(omicsData = mymetab)
 summary(myfilt, pvalue_threshold = 0.001)
-
+\dontshow{\}) # examplesIf}
 }
 \seealso{
 \code{\link{rmd_filter}}

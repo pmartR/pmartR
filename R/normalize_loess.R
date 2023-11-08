@@ -21,7 +21,7 @@
 #' non-log2 scale and then re-scaled after normalization to be returned on the
 #' log2 scale).
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' mypep <- edata_transform(pep_object, "log2")
 #' result <- normalize_loess(mypep)
