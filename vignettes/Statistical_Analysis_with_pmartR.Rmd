@@ -11,7 +11,7 @@ vignette: >
   %\VignetteIndexEntry{pmartR-stats}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-bibliography: pmartRstat_lit.bib
+bibliography: bibliography.bib
 ---
 
 ```{r global_options, include = FALSE}
@@ -24,7 +24,7 @@ library(pmartR)
 library(pmartRdata)
 
 pep_object <- edata_transform(
-  omicsData = pep_object,
+  omicsData = pmartRdata::pep_object,
   data_scale = "log2"
 )
 ```
@@ -45,16 +45,16 @@ Below, descriptions of ANOVA and IMD are provided, followed by a description of 
 
 ## Analysis of Variance 
 
-Quantitative tests for differential abundance of pan-omic data are accomplished using the function `test_method = "anova"` or `test_method = "combined"` arguments, which implement an analysis of variance (ANOVA) for each biomolecule. [`Rcpp`](https://CRAN.R-project.org/package=Rcpp) is used to speed up computation (@rcpp_book) by default, and can be turned off with the `parallel = FALSE` argument. Different ANOVA implementations are applied depending on the complexity of the supplied data. For example, if only two groups are supplied then ANOVA reduces to a two sample $t$-test that assumes equal variance for the two groups. Alternatively, if two groups are present and a covariate correction is required, then the effect of the covariates is removed using a reduced maximum likelihood approach. After the covariate correction is applied, a two-factor ANOVA is used to detect difference between all combinations of groups or between main effects as appropriate. Details on generalizations to these two approaches are given in the next two subsections.
+Quantitative tests for differential abundance of pan-omic data are accomplished using the function `test_method = "anova"` or `test_method = "combined"` arguments, which implement an analysis of variance (ANOVA) for each biomolecule. [`Rcpp`](https://CRAN.R-project.org/package=Rcpp) and parallel processing are used to speed up computation (@rcpp_book).  Different ANOVA implementations are applied depending on the complexity of the supplied data. For example, if only two groups are supplied then ANOVA reduces to a two sample $t$-test that assumes equal variance for the two groups. Alternatively, if two groups are present and a covariate correction is required, then a two-factor ANCOVA is used to detect differences between all combinations of groups or between main effects as appropriate controlling for covariates.  Details on generalizations to these two approaches are given in the next two subsections.
 
 ### One Group
 
 If there is only one grouping factor and that factor has more than two levels, then a one-way ANOVA tests for quantitative differences between the groups. Let $y_{ik}$ represent the biomolecule abundance for observation $k=1,\dots,n_i$ in group $i=1,\dots,m$ on the log base 2 scale then we assume
 \begin{equation}
-y_{ik}=\mu_i+e_{ik},
+y_{ik}=\mu_i+\epsilon_{ik}
 \label{eq:one_group}
 \end{equation}
-where $\mu_i$ represents the mean abundance of group $i$ (on the log-scale) and $e_{ik}$ are the error terms that are assumed to be independent and identically distributed (iid) according to the normal distribution with mean $0$ and variance $\sigma^2$. 
+where $\mu_i$ represents the mean abundance of group $i$ (on the log-scale) and $\epsilon_{ik}$ are the error terms that are assumed to be independent and identically distributed (iid) according to the normal distribution with mean $0$ and variance $\sigma^2$.  Group comparisons are performed according to *3.1 General linear models* in (@bretz_multcomp).  Under the hood, a linear model of the form $\mathbf{y} = \mathbf{X}\mathbf{\beta} + \epsilon$ is fit, and the design matrix is used to form the appropriate contrast matrix for comparing means.  This framework extends to the two factor case as well.   
 
 The code below will group the peptide data by Phenotype, which is a categorical variable with three levels: "Phenotype1", "Phenotype2", and "Phenotype3". Then the `anova_test` function fits the model described above and tests for differential abundance between each pair of phenotypes for every peptide. 
 
@@ -80,7 +80,7 @@ The function `imd_anova` function returns a data frame containing:
 
 1. The number of observed values in each group in the columns called `Count_i` where `i` is replaced by the group name supplied as an attribute of the `omicsData` argument,
 
-2. The best linear unbiased estimators of $\mu_i$ in the columns called `Mean_i` where `i` is replaced by the group name supplied as an attribute of the `omicsData` argument, 
+2. The least squares means for each group in the columns called `Mean_i` where `i` is replaced by the group name supplied as an attribute of the `omicsData` argument, 
 
 3. The $p$-values for each comparison in the columns called `P_value_A_` ("A" for ANOVA)
 
@@ -112,7 +112,7 @@ one_vs_all_results <- imd_anova(
 )
 ```
 
-If the grouping variable has only two levels, $m=2$, then a Welch's $t$-test is performed instead of an ANOVA. That is, the model defined in Equation (\\ref{eq:one_group}) is still fit, but the two groups of the grouping factor are allowed to have different variances. In particular, the error terms $e_{ik}$ are assumed to be independently distributed according to the normal distribution with mean $0$ and variance $\sigma^2_i$. To determine if the biomolecules are differentially expressed, $p$-values are derived from a $t$-distribution with degrees of freedom approximated by the Satterthwaite equation. The value for `Variance`, which is not a pooled variance estimate, scaled by the Satterthwaite approximate degrees of freedom. To illustrate this the data are grouped by "SecondPhenotype", which has two values, then fit with ANOVA.
+If the grouping variable has only two levels, $m=2$, then a Welch's $t$-test is performed instead of an ANOVA. That is, the model defined in equation (\ref{eq:one_group}) is still fit, but the two groups of the grouping factor are allowed to have different variances. In particular, the error terms $\epsilon_{ik}$ are assumed to be independently distributed according to the normal distribution with mean $0$ and variance $\sigma^2_i$. To determine if the biomolecules are differentially expressed, $p$-values are derived from a $t$-distribution with degrees of freedom approximated by the Satterthwaite equation. The value for `Variance`, which is not a pooled variance estimate, scaled by the Satterthwaite approximate degrees of freedom. To illustrate this the data are grouped by "SecondPhenotype", which has two values, then fit with ANOVA.
 
 ```{r, warning=FALSE}
 pep_object <- group_designation(
@@ -125,23 +125,23 @@ all_pairwise_results <- imd_anova(
 )
 ```
 
-When this model is fit, it is imperative the researcher check the assumptions of the model. In particular for the $m>2$ case, the residuals $\hat e_{ik}=y_{ik}-\hat \mu_i$ are assumed to be independent, normally distributed and have a common variance across groups. The appropriateness of this assumption can be assessed using quantile-quantile plots and comparisons of each group's variance.
+When this model is fit, it is imperative the researcher check the assumptions of the model. In particular for the $m>2$ case, the residuals $\hat \epsilon_{ik}=y_{ik}-\hat \mu_i$ are assumed to be independent, normally distributed and have a common variance across groups. The appropriateness of this assumption can be assessed using quantile-quantile plots and comparisons of each group's variance.
 
 ### Two Groups
 
 Next we consider the case where there are two grouping factors again in the context of biomolecule abundance. Let $y_{ijk}$ represent the biomolecule abundance for observation $k=1,\dots,n_{ij}$ in group $i=1,\dots,m$ and group $j=1,\dots,p$ on the log base 2 scale then we assume 
 \begin{equation}
-y_{ijk}=\mu_i+\alpha_j+\gamma_{ij}+e_{ijk},
+y_{ijk}=\mu_i+\alpha_j+\gamma_{ij}+\epsilon_{ijk}
 \label{eq:full_model}
 \end{equation}
-where $\mu_i+\alpha_j+\gamma_{ij}$ represents the mean abundance for an observation in $i$th first group and $j$th second group which have marginal means $\mu_i$ and $\alpha_j$, respectively. Finally, $\gamma_{ij}$ is the interaction effect of group $ij$,  and $e_{ijk}$ are the error terms that are assumed to be iid according to the normal distribution with mean $0$ and variance $\sigma^2$. 
+where $\mu_i+\alpha_j+\gamma_{ij}$ represents the mean abundance for an observation in $i$th first group and $j$th second group which have marginal means $\mu_i$ and $\alpha_j$, respectively. Finally, $\gamma_{ij}$ is the interaction effect of group $ij$,  and $\epsilon_{ijk}$ are the error terms that are assumed to be iid according to the normal distribution with mean $0$ and variance $\sigma^2$. 
 
 For each biomolecule, the `test_method = "anova"` argument automatically tests if the $\gamma_{ij}$ effect is statistically significant from zero using a full and reduced model $F$-test. That is, in addition to the model above, the reduced model 
 \begin{equation}
-y_{ijk}=\mu_i+\alpha_j+e_{ijk}
+y_{ijk}=\mu_i+\alpha_j+\epsilon_{ijk}
 \label{eq:red_model}
 \end{equation}
-is also fit and the test statistic $$F^*=\frac{MSE_F}{(SSE_R-SSE_F)/(df_R-df_F)}$$ is computed where $MSE_\cdot$ and $df_\cdot$ are the mean square error and degrees of freedom for the full (F; \\ref{eq:full_model}) or reduced (R; \\ref{eq:red_model}) model, respectively. A $p$-value is computed based on $F^*$ as $p=P(F^*>F_{a,b})$ where $F_{a,b}$ is compared to an $F$ distribution with degrees of freedom $a=df_F$ and $b=df_R-df_F$. If $p<0.05$ then there is significant evidence to reject the null hypothesis that the reduced model \\eqref{eq:red_model} is adequate and the full model \\eqref{eq:full_model} is used to test for group differences. Conversely, if $p\geq 0.05$ then there is not enough evidence to reject the null hypothesis and the reduced model \\eqref{eq:red_model} is used.
+is also fit and the test statistic $$F^*=\frac{MSE_F}{(SSE_R-SSE_F)/(df_R-df_F)}$$ is computed where $MSE_\cdot$ and $df_\cdot$ are the mean square error and degrees of freedom for the full (F; \ref{eq:full_model}) or reduced (R; \ref{eq:red_model}) model, respectively. A $p$-value is computed based on $F^*$ as $p=P(F^*>F_{a,b})$ where $F_{a,b}$ is compared to an $F$ distribution with degrees of freedom $a=df_F$ and $b=df_R-df_F$. If $p<0.05$ then there is significant evidence to reject the null hypothesis that the reduced model \ref{eq:red_model} is adequate and the full model \ref{eq:full_model} is used to test for group differences. Conversely, if $p\geq 0.05$ then there is not enough evidence to reject the null hypothesis and the reduced model \ref{eq:red_model} is used.  Group comparisons are computed in the same manner as the one-factor case, following *3.1 General linear models* in (@bretz_multcomp).
 
 Regardless of whether the full or reduced model is used, both assume that the residuals are independent and normally distributed with a common variance for all groups. These assumptions must be checked before the results of the model are used to assess differential abundance.
 
@@ -149,13 +149,10 @@ Regardless of whether the full or reduced model is used, both assume that the re
 
 If, in addition to a single grouping factor, there are covariates to account for when testing for differential abundance then a linear model of the form
 \begin{equation}
-y_{ik}=\mu_i+\mathbf{x}_{ik}^\top \beta +u_{ik}
+\mathbf{y}=\mathbf{X} \beta_1+\mathbf{V} \beta_2 + \epsilon
 \label{eq:covar_adj}
 \end{equation}
-is fit to the transformed abundance data $y_{ik}$ where $\mu_i$ is the marginal mean of group $i$, $\mathbf{x}_{ik}$ is a vector of covariates for observation $k$ in group $i$, $\mathbf{\beta}$ is the corresponding vector of parameters to be estimated and $u_{ik}$ are the error terms. An analogous model can be fit when there are two grouping factors of interest. If one of the covariates is colinear with a grouping variable then that covariate is removed from the model, that is, priority is given to the grouping variable over the covariate. 
-
-In practice, the covariate adjustment is applied then the one-factor ANOVA model is fit to the covariate adjusted data. That is, after the vector of parameters $\mathbf{\beta}$ in \eqref{eq:cover_adj} is estimated, the response $y_{ik}$ in \eqref{eq:one_group} is replaced with $y_{ik}^*=y_{ik}-\mathbf{x}_{ik}^\top\mathbf{\beta}$. Though this results in the marginal group means $\mu_i$ being estimated multiple times, it makes the workflow smoother.
-
+is fit to the transformed abundance data $\mathbf{y}$ where $\mathbf{X}$ is the dummy-encoded design matrix for the main effects, $\mathbf{V}$ is the design matrix for any covariates, $\beta_1$ and $\beta_2$ are the parameters to be estimated for the main effects and covariates, and $\epsilon$ is the error term.  Note that $\mathbf{X}$ allows for the one factor model, as well as the full and reduced forms of the two factor model.  We estimate the least squares means using the estimated coefficients $\beta_1$ and $\beta_2$.  Specifically, when computing the the least squares mean for a particular combination of main effect levels, we consider the predicted value of the fitted model at the main effect levels in question, the mean value of continuous covariates, and averaged over all levels of categorical covariates.  This is equivalent to the treatment in the `emmeans` package (@emmeans).
 
 ### Paired Data
 
@@ -167,7 +164,7 @@ ANOVA tests can be performed on paired data with or without any main effects or 
 
 The robust Mahalanobis distance (rMd) filter for sample outlier detection has been updated to remove all parts of a pair when at least one of the individuals in the pair does not pass the specified p-value threshold. Filters for biomolecules have also been updated to consider the pair as opposed to each individual member of the pair.  
 
-```{r}
+```{r paired_anova}
 # add fake pair info to f_data using SecondPhenotype
 pep_object$f_data$Pairing <- pep_object$f_data$SecondPhenotype
 pep_object$f_data$Pair_ID <- c(rep(1:4, 2), rep(5:8, 2), rep(9:12, 2))
@@ -223,9 +220,9 @@ The $p$-values associated with each group comparison can be adjusted for multipl
 
 ### Covariate Adjustment
 
-Covariates can also be accounted for in the g-test. 
+Covariates can also be accounted for in the g-test.  This is accomplished internally by passing their terms to the model specification in `glm`, which is used to compute the IMD test. 
 
-```{r}
+```{r covars_g}
 mypep_covariates <- group_designation(pep_object, main_effects = "Phenotype", covariates = "Characteristic")
 imd_covariates <- imd_anova(
   omicsData = mypep_covariates,
@@ -238,7 +235,7 @@ imd_covariates <- imd_anova(
 
 The g-test in the imd-ANOVA test can now be run on paired data and requires a “main effects” designation, unlike the quantitative test (ANOVA). 
 
-```{r}
+```{r paired_g}
 # add fake pair info to f_data using SecondPhenotype
 mypaired <- group_designation(
   omicsData = pep_object,
@@ -269,7 +266,7 @@ The `imd_anova()` function returns an object of class `statRes` that is a data f
 
 - Biomolecule name
 - Counts of observed values per main effect group
-- Means of observed values per main effect group
+- Least squares means of observed values per main effect group
 - log2 fold changes for each comparison
 - p-values for each comparison and test
 - Flags indicating significance
@@ -282,6 +279,7 @@ The `statRes` object also consists of several attributes which specify the metho
 -	`statistical_test` - character string giving the statistical test(s) run 
 -	`adjustment_method_a` and `adjustment_method_g` - character string giving the adjustment for multiple comparisons that was used; NA if none was used 
 -	`pval_thresh` - the numeric value that was an input to `anova_test`
+- `which_X` - For two factor models, a vector of zeros and ones indicating whether the corresponding biomolecule had the full model with interaction terms fit (ones) or the reduced model without interaction terms fit (zeros). For one factor models, this is a vector of zeros.
 
 Several methods are defined for objects of class `statRes` including `summary`, `print` and `plot`, which are discussed in more  depth in the next section.
 
@@ -303,7 +301,7 @@ stat_results <- imd_anova(
 )
 summary(stat_results)
 print(stat_results)
-plot(stat_results)
+plot(stat_results, stacked=FALSE)
 plot(stat_results, plot_type = "volcano")
 ```
 
@@ -322,7 +320,16 @@ Tukey       | All pairwise           | $\sqrt{}$ |
 
 ## False Discovery Rate Methods
 
-Coming soon!
+To perform false discovery rate (FDR) control, we can pass the argument `pval_adjust_a_fdr` or `pval_adjust_g_fdr` for the anova and IMD tests respectively.  Options are "bonferroni", "BH", "BY", and "fdr", see `?p.adjust`.
+
+```{r fdr_adjustment}
+stat_results <- imd_anova(
+  omicsData = pep_object,
+  test_method = "combined",
+  pval_adjust_a_fdr = "BH",
+  pval_adjust_g_fdr = "BH"
+)
+```
 
 
 ## References

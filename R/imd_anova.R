@@ -594,7 +594,9 @@ imd_anova <- function(omicsData,
   if (!is.null(attr(anova_results_full, "which_X"))) {
     which_X <- rep(NA, nrow(final_out))
     model_inds <- match(anova_results_full$Results[,get_edata_cname(omicsData)], final_out[,get_edata_cname(omicsData)])
-    which_X[model_inds] <- attr(anova_results_full, "which_X") 
+    nona <- which(!is.na(model_inds))
+    model_inds <- model_inds[nona]
+    which_X[model_inds] <- attr(anova_results_full, "which_X")[nona]
   }
   
   attr(final_out, "which_X") <- which_X
@@ -922,6 +924,7 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
   # Everything assumes the group levels are in the order they appear
   groupData$Group <- factor(groupData$Group, levels=unique(groupData$Group))
   groupData[,main_effect_names] <- lapply(groupData[main_effect_names], function(x) factor(x, levels=unique(x)))
+  group_names <- paste("Mean",as.character(unique(groupData$Group)),sep="_")
 
   # Keep all the relevant stuff
   groupData_sub <- groupData[,c("Group", main_effect_names, covariate_names)]
@@ -955,7 +958,6 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
     
     #Rcpp::sourceCpp('~/pmartR/src/anova_helper_funs.cpp') #Run if debugging code
     raw_results <- anova_cpp(data.matrix(data),gp,1-equal_var, xmatrix, Betas, pred_grid_red, continuous_covar_inds, attr(pred_grid_red, "groups"))
-    group_names <- paste("Mean",as.character(unique(groupData$Group)),sep="_")
     which_xmatrix <- rep(0, nrow(data)) # dummy argument to group_comparison_anova, makes us always select the reduced model since we only have one main effect.
 
   }else{
@@ -966,11 +968,10 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
 
     # design matrix for the reduced model (no interactions between main effects)
     Xred <- model.matrix(~.,data=dplyr::select(groupData_sub, -dplyr::one_of("Group")))
-    group_names = setdiff(colnames(groupData_sub), c("Group", covariate_names))
 
     # design matrix for the full model (interaction terms between main effects)
     rhs =sprintf("%s %s",
-                paste(group_names, collapse="*"),
+                paste(main_effect_names, collapse="*"),
                 paste(c("", covariate_names), collapse = " + "))
     full_formula = sprintf("~ %s", rhs)
     Xfull <- model.matrix(as.formula(full_formula),data=dplyr::select(groupData_sub, -dplyr::one_of("Group")))
@@ -997,14 +998,13 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
       continuous_covar_inds = continuous_covar_inds
     )
 
-    group_names <- paste("Mean",colnames(raw_results$adj_group_means),sep="_")
     which_xmatrix = raw_results$which_X
     Xfull <- raw_results$Xfull
     Xred <- raw_results$Xred
   }
   
   #The C++ function returns a list so we need to make it into a data.frame
-  results <- data.frame(raw_results$Sigma2, raw_results$adj_group_means, raw_results$Fstats, raw_results$pvalue, raw_results$dof, which_xmatrix)
+  results <- data.frame(raw_results$Sigma2, raw_results$lsmeans, raw_results$Fstats, raw_results$pvalue, raw_results$dof, which_xmatrix)
   
   #Rename the columns to match group names
   colnames(results) <- c("Variance",group_names,"F_Statistic","p_value", "degrees_of_freedom", "which_xmatrix")
@@ -1053,7 +1053,7 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
     # ELSE INSTEAD OF RECREATING IT HERE
     Cmat_res <- create_c_matrix(groupData, comparisons)
     Cmat <- Cmat_res$cmat
-    fold_change <- fold_change_ratio(raw_results$adj_group_means, Cmat)
+    fold_change <- fold_change_ratio(raw_results$lsmeans, Cmat)
     fold_change <- data.frame(fold_change)
     colnames(fold_change) <- colnames(group_comp$diff_mat)
   }
@@ -1120,15 +1120,6 @@ run_twofactor_cpp <- function(data,gpData, Xfull, Xred, pred_grid_full, pred_gri
     attr(pred_grid_red, "groups")
   )
 
-  # Get the unique group levels to translate ANOVA parameters into group means
-  gpData <- cbind(gpData,y=1:nrow(gpData))
-  red_gpData <- dplyr::distinct(gpData, Group, .keep_all = TRUE)
-  red_gpData <- dplyr::arrange(red_gpData, y)
-
-  means <- res$lsmeans
-  colnames(means) <- red_gpData$Group
-  
-  res$adj_group_means <- means
   res$Xfull <- Xfull
   res$Xred <- Xred
   return(res)

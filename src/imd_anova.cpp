@@ -350,7 +350,7 @@ List anova_cpp(
   }//end iteration over rows
 
   return List::create(Named("group_means") = group_means,
-                      Named("adj_group_means") = adj_group_means,
+                      Named("lsmeans") = adj_group_means,
                       Named("group_sizes") = group_sizes,
                       Named("Sigma2") = sigma2,
                       Named("Fstats") = Fstats,
