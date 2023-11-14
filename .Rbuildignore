@@ -11,3 +11,5 @@ tests/testthat/test_MSnSet2pepData.R
 ^vignettes$
 ^cran-comments\.md$
 ^CRAN-SUBMISSION$
+^LICENSE\.md$
+^DISCLAIMER\.md$

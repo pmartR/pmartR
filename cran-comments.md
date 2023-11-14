@@ -1,3 +1,6 @@
+### November 28, 2023
+- Removed VignetteBuilder from DESCRIPTION to remove note about missing vignette index.
+
 ### November 14, 2023
 - Skipping long-running tests to speed up checks.  These tests are still run with github actions.
 - Update LICENSE.
