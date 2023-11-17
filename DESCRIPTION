@@ -31,7 +31,7 @@ Imports:
     rrcov,
     scales,
     stringr,
-    tidyr,
+    tidyr (>= 1.3.0),
     RColorBrewer,
     magrittr,
     parallelly,

@@ -1118,8 +1118,23 @@ applyFilt.proteomicsFilt <- function(filter_object,
 
   # Check if min_num_peps is not NULL.
   if (!is.null(min_num_peps)) {
+    if (!is.null(pepe$e_data_remove)) {
+      # find the which proteins had peptides removed.
+      peps_rmv_by_pro <- omicsData$e_meta %>% 
+        dplyr::filter(!!rlang::sym(pep_id) %in% pepe$e_data_remove) %>%
+        dplyr::group_by(!!rlang::sym(pro_id)) %>%
+        dplyr::summarise(n = dplyr::n())
+
+      # decrement the counts of proteins that had redundant peptides removed.
+      temp_counts <- filter_object$counts_by_pro 
+      decr_idx = match(peps_rmv_by_pro[[pro_id]],temp_counts[[pro_id]])
+      temp_counts[decr_idx,]$n <- temp_counts[decr_idx,]$n - peps_rmv_by_pro$n 
+    } else {
+      temp_counts <- filter_object$counts_by_pro
+    }
+
     # Find all rows with proteins that map to fewer peptides than min_num_peps.
-    pro_idx <- which(filter_object$counts_by_pro$n < min_num_peps)
+    pro_idx <- which(temp_counts$n < min_num_peps)
 
     # pull proteins with less than min_num_peps.
     pro_filt <- as.character(filter_object$counts_by_pro[pro_idx, pro_id])
