@@ -85,7 +85,7 @@ trelliData1 <- as.trelliData.edata(e_data = pep_edata,
 ######################
                                     
 # RNA-seq Example
-trelliData_rna1 <- as.trelliData.edata(e_data = rnaseq_edata, 
+trelliData_seq1 <- as.trelliData.edata(e_data = rnaseq_edata, 
                                       edata_cname = "Transcript",
                                       omics_type = "seqData")
                                   

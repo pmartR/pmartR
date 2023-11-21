@@ -104,7 +104,7 @@
 #' ######################
 #'                                     
 #' # RNA-seq Example
-#' trelliData_rna1 <- as.trelliData.edata(e_data = rnaseq_edata, 
+#' trelliData_seq1 <- as.trelliData.edata(e_data = rnaseq_edata, 
 #'                                       edata_cname = "Transcript",
 #'                                       omics_type = "seqData")
 #'                                   
@@ -112,7 +112,6 @@
 #' @author David Degnan, Daniel Claborne, Lisa Bramer
 #'
 #' @export
-
 as.trelliData.edata <- function(e_data,
                                 edata_cname,
                                 omics_type,
@@ -314,6 +313,10 @@ as.trelliData.edata <- function(e_data,
 #' \dontrun{
 #' library(pmartRdata)
 #' 
+#' ###########################
+#' ## MS/NMR OMICS EXAMPLES ##
+#' ###########################
+#' 
 #' # Transform the data
 #' omicsData <- edata_transform(omicsData = pep_object, data_scale = "log2")
 #' 
@@ -337,12 +340,32 @@ as.trelliData.edata <- function(e_data,
 #' trelliData2 <- as.trelliData(omicsData = omicsData)
 #' trelliData3 <- as.trelliData(statRes = statRes)
 #' trelliData4 <- as.trelliData(omicsData = omicsData, statRes = statRes)
+#' 
+#' ######################
+#' ## RNA-SEQ EXAMPLES ##  
+#' ######################
+#' 
+#' # Group data by condition
+#' omicsData_seq <- group_designation(omicsData = rnaseq_object, main_effects = c("Virus"))
+#' 
+#' # Filter low transcript counts
+#' omicsData_seq <- applyFilt(filter_object = total_count_filter(omicsData = omicsData_seq), omicsData = omicsData_seq, min_count = 15)
+#' 
+#' # Select a normalization and statistics method (options are 'edgeR', 'DESeq2', and 'voom').
+#' # See ?difexp_seq for more details
+#' statRes_seq <- diffexp_seq(omicsData = omicsData_seq, method = "voom")
+#' 
+#' # Generate the trelliData object
+#' trelliData_seq2 <- as.trelliData(omicsData = omicsData_seq)
+#' trelliData_seq3 <- as.trelliData(statRes = statRes_seq)
+#' trelliData_seq4 <- as.trelliData(omicsData = omicsData_seq, statRes = statRes_seq)
 #' }
 #'
 #' @author David Degnan, Lisa Bramer
 #'
 #' @export
 as.trelliData <- function(omicsData = NULL, statRes = NULL) {
+  
   require_normalization <- TRUE
 
   # Initial checks--------------------------------------------------------------
@@ -354,19 +377,20 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL) {
 
   # If omicsData is provided...
   if (!is.null(omicsData)) {
+    
     # ...it must be an omics data object
-    if (any(class(omicsData) %in% c("pepData", "isobaricpepData", "proData", "metabData", "lipidData", "nmrData")) == FALSE) {
+    if (any(class(omicsData) %in% c("pepData", "isobaricpepData", "proData", "metabData", "lipidData", "nmrData", "seqData")) == FALSE) {
       stop(paste(class(omicsData), "is not a supported omicsData class."))
     }
 
-    # ...it must be log transformed if it's not NMR or isobaric
-    if (any(class(omicsData) %in% c("nmrData", "isobaricpepData")) == FALSE &
+    # ...it must be log transformed if it's not NMR, isobaric, or seqData
+    if (any(class(omicsData) %in% c("nmrData", "isobaricpepData", "seqData")) == FALSE &
       get_data_scale(omicsData) %in% c("log2", "log", "log10") == FALSE) {
       stop("omicsData must be log transformed.")
     }
 
-    # ...it must be normalized if it's not NMR nor isobaric
-    if (require_normalization & any(class(omicsData) %in% c("isobaricpepData", "nmrData")) == FALSE) {
+    # ...it must be normalized if it's not NMR, isobaric, or seqData
+    if (require_normalization & any(class(omicsData) %in% c("isobaricpepData", "nmrData", "seqData")) == FALSE) {
       if (!get_data_norm(omicsData)) {
         stop("omicsData must be normalized.")
       }
@@ -406,7 +430,7 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL) {
       stop("omicsData and statRes are from different datasets.")
     }
   }
-
+  
   # Generate the trelliData object----------------------------------------------
 
   # Create placeholders for trelliData objects
@@ -417,6 +441,7 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL) {
 
   # Format omicsData if applicable
   if (!is.null(omicsData)) {
+    
     # Get edata_cname, edata, and fdata_cname
     edata_cname <- pmartR::get_edata_cname(omicsData)
     edata <- omicsData$e_data
@@ -441,12 +466,41 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL) {
       # Add emeta columns
       trelliData.omics <- dplyr::left_join(trelliData.omics, emeta, by = edata_cname)
     }
+    
+    # Clean up if seqData
+    if (inherits(omicsData, "seqData")) {
+      
+      # Rename abundance as count
+      trelliData.omics <- trelliData.omics %>% dplyr::rename(Count = Abundance)
+      
+      # Generate log counts per million (lcpm)
+      biomolecules <- omicsData$e_data[[edata_cname]]
+      temp_data <- omicsData$e_data %>% dplyr::select(-edata_cname)
+      samp_sum <- apply(temp_data, 2, sum, na.rm = TRUE) + 1
+      div_sum <- sweep((temp_data + .5), 2, samp_sum, `/`)
+      lcpm <- log2(div_sum * 10^6)
+      lcpm <- lcpm %>% dplyr::mutate(!!edata_cname := biomolecules)
+      
+      # Pivot the lcpm data.frame longer
+      lcpm_pivoted <- lcpm %>%
+        tidyr::pivot_longer(colnames(edata)[colnames(edata) != edata_cname]) %>%
+        dplyr::rename(!!fdata_cname := name, LCPM = value)
+      
+      # Add LCPM to the dataframe 
+      trelliData.omics <- dplyr::left_join(trelliData.omics, lcpm_pivoted, by = c(edata_cname, fdata_cname))
+      
+    }
+    
+    
   } else {
     omicsData <- NULL
   }
 
   # Format statRes if applicable
   if (!is.null(statRes)) {
+    
+    browser()
+    
     # Get edata cname
     edata_cname <- pmartR::get_edata_cname(statRes)
 
@@ -529,6 +583,10 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL) {
   attr(trelliData, "panel_by_stat") <- NA
   attr(trelliData, "panel_by") <- FALSE
   class(trelliData) <- c("trelliData")
+  
+  if (class(omicsData) == "seqData") {
+    class(trelliData) <- c(class(trelliData), "trelliData.seqData")
+  }
 
   return(trelliData)
 }

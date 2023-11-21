@@ -30,6 +30,10 @@ Either an omicData and/or a statRes object are accepted.
 \dontrun{
 library(pmartRdata)
 
+###########################
+## MS/NMR OMICS EXAMPLES ##
+###########################
+
 # Transform the data
 omicsData <- edata_transform(omicsData = pep_object, data_scale = "log2")
 
@@ -53,6 +57,25 @@ statRes <- imd_anova(omicsData = omicsData, test_method = 'combined')
 trelliData2 <- as.trelliData(omicsData = omicsData)
 trelliData3 <- as.trelliData(statRes = statRes)
 trelliData4 <- as.trelliData(omicsData = omicsData, statRes = statRes)
+
+######################
+## RNA-SEQ EXAMPLES ##  
+######################
+
+# Group data by condition
+omicsData_seq <- group_designation(omicsData = rnaseq_object, main_effects = c("Virus"))
+
+# Filter low transcript counts
+omicsData_seq <- applyFilt(filter_object = total_count_filter(omicsData = omicsData_seq), omicsData = omicsData_seq, min_count = 15)
+
+# Select a normalization and statistics method (options are 'edgeR', 'DESeq2', and 'voom').
+# See ?difexp_seq for more details
+statRes_seq <- diffexp_seq(omicsData = omicsData_seq, method = "voom")
+
+# Generate the trelliData object
+trelliData_seq2 <- as.trelliData(omicsData = omicsData_seq)
+trelliData_seq3 <- as.trelliData(statRes = statRes_seq)
+trelliData_seq4 <- as.trelliData(omicsData = omicsData_seq, statRes = statRes_seq)
 }
 
 }
