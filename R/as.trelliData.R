@@ -58,27 +58,30 @@
 #'   containing the biomolecule identifiers. It should be the only non-numeric
 #'   colummn in edata.
 #' @param omics_type A string specifying the data type. Acceptable options are
-#'   "pepData", "isobaricpepData", "proData", "metabData", "lipidData", or
-#'   "nmrData".
+#'   "pepData", "isobaricpepData", "proData", "metabData", "lipidData", 
+#'   "nmrData", or "seqData". 
 #' @param data_scale_original A character string indicating original scale
 #'   of the data. Valid values are: 'log2', 'log', 'log10', or 'abundance'.
-#'   Default is abundance.
+#'   Default is abundance. This parameter is ignored if the data is "seqData". 
 #' @param data_scale A character string indicating the scale to transform the
 #'   data to. Valid values are: 'log2', 'log', 'log10', or 'abundance'. If the
 #'   value is the same as data_scale_original, then transformation is not
-#'   applied. Default is log2.
+#'   applied. Default is log2. This parameter is ignored if hte data is "seqData". 
 #' @param normalization_fun A character string indicating the pmartR
 #'   normalization function to use on the data, if is_normalized is FALSE.
-#'   Acceptable choices are 'global', 'loess', and 'quantile'.
+#'   Acceptable choices are 'global', 'loess', and 'quantile'. This parameter is
+#'   ignored if the data is "seqData". 
 #' @param normalization_params A vector or list where the normalization
 #'   parameters are the names, and the parameter values are the list values. For
 #'   example, an acceptable entry for 'normalize_global' would be
 #'   list("subset_fn" = "all", "norm_fn" = "median", "apply_norm" = TRUE,
-#'   "backtransform" = TRUE).
+#'   "backtransform" = TRUE). This parameter is ignored if the data is "seqData". 
 #' @param is_normalized A logical indicator of whether the data is already
-#'   normalized (and will therefore skip the normalization step)
+#'   normalized (and will therefore skip the normalization step). This parameter is
+#'   ignored if the data is "seqData". 
 #' @param force_normalization A logical indicator to force normalization that is
-#'   not required for both isobaric protein and NMR data
+#'   not required for both isobaric protein and NMR data. This parameter is ignored
+#'   if the data is "seqData." 
 #'
 #' @return An object of class 'trelliData' containing the raw data.
 #'  To be passed to trelliscope building functions.  
@@ -86,10 +89,23 @@
 #' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' 
-#' # Simple example 
+#' ###########################
+#' ## MS/NMR OMICS EXAMPLES ##
+#' ###########################
+#' 
+#' # Simple MS/NMR Example 
 #' trelliData1 <- as.trelliData.edata(e_data = pep_edata,
 #'                                    edata_cname = "Peptide",
 #'                                    omics_type = "pepData")
+#'  
+#' ######################
+#' ## RNA-SEQ EXAMPLES ##  
+#' ######################
+#'                                     
+#' # RNA-seq Example
+#' trelliData_rna1 <- as.trelliData.edata(e_data = rnaseq_edata, 
+#'                                       edata_cname = "Transcript",
+#'                                       omics_type = "seqData")
 #'                                   
 #'           
 #' @author David Degnan, Daniel Claborne, Lisa Bramer
@@ -116,31 +132,41 @@ as.trelliData.edata <- function(e_data,
   if (!.is_edata(edata)) {
     stop("")
   }
-
-  # Check that the object type is in the acceptable class
-  if (omics_type %in% c("pepData", "isobaricpepData", "proData", "metabData", "lipidData", "nmrData") == FALSE) {
-    stop(paste(omics_type, "is not an acceptable omics_type."))
-  }
-
-  # Check that both data_scale_original and data scale are an acceptable option.
-  log_transforms <- c("abundance", "log2", "log", "log10")
-  if (data_scale_original %in% log_transforms == FALSE) {
-    stop(paste(data_scale_original, "is not an acceptable data scale."))
-  }
-  if (data_scale %in% log_transforms == FALSE) {
-    stop(paste(data_scale, "is not an acceptable data scale."))
-  }
-
-  # Check the normalization function. Isobaric is not included since it requires f_data.
-  if (normalization_fun %in% c("global", "loess", "quantile") == FALSE) {
-    stop(paste(normalization_fun, "is not an acceptable normalization function type."))
-  }
-
-  # Normalization parameters should have apply_norm in it
-  if (!is.null(normalization_params) && normalization_fun == "global") {
-    if ("apply_norm" %in% names(normalization_params) == FALSE || (normalization_params$apply_norm == FALSE)) {
-      stop("apply_norm must be TRUE to apply normalization parameters.")
+  
+  # Skip most checks if the data is seqData
+  if (omics_type != "seqData") {
+    
+    # Check that the object type is in the acceptable class
+    if (omics_type %in% c("pepData", "isobaricpepData", "proData", "metabData", "lipidData", "nmrData") == FALSE) {
+      stop(paste(omics_type, "is not an acceptable omics_type."))
     }
+    
+    # Check that both data_scale_original and data scale are an acceptable option.
+    log_transforms <- c("abundance", "log2", "log", "log10")
+    if (data_scale_original %in% log_transforms == FALSE) {
+      stop(paste(data_scale_original, "is not an acceptable data scale."))
+    }
+    if (data_scale %in% log_transforms == FALSE) {
+      stop(paste(data_scale, "is not an acceptable data scale."))
+    }
+    
+    # Check the normalization function. Isobaric is not included since it requires f_data.
+    if (normalization_fun %in% c("global", "loess", "quantile") == FALSE) {
+      stop(paste(normalization_fun, "is not an acceptable normalization function type."))
+    }
+    
+    # Normalization parameters should have apply_norm in it
+    if (!is.null(normalization_params) && normalization_fun == "global") {
+      if ("apply_norm" %in% names(normalization_params) == FALSE || (normalization_params$apply_norm == FALSE)) {
+        stop("apply_norm must be TRUE to apply normalization parameters.")
+      }
+    } 
+    
+  } else {
+    message(paste("Notice: seqData will be log count per million (LCPM) transformed for visualization purposes.",
+                  "No other transformation method or normalization will be applied to the data.",
+                  "Therefore, the statistics results may not perfectly match visualized patterns of expressed data.",
+                  "We also suggest filtering out biomolecules before applying visualizations, as seqData tends to be quite large."))
   }
 
   # Build an omics data object--------------------------------------------------
@@ -149,52 +175,97 @@ as.trelliData.edata <- function(e_data,
   fdata <- data.frame("Sample" = colnames(edata)[colnames(edata) != edata_cname], "Condition" = NA)
   fdata_cname <- "Sample"
 
-  # Build the omics object
-  omicsData <- eval(parse(text = paste0(
-    "as.", omics_type,
-    "(e_data = edata, edata_cname = edata_cname, f_data = fdata, fdata_cname = fdata_cname,
+  # Diverge building paths depending on input data type 
+  if (omics_type != "seqData") {
+    
+    # Build omics object - this also checks that edata_cname is in edata 
+    omicsData <- eval(parse(text = paste0(
+      "as.", omics_type,
+      "(e_data = edata, edata_cname = edata_cname, f_data = fdata, fdata_cname = fdata_cname,
       data_scale = data_scale_original)"
-  )))
-
-  # Transform if appropriate
-  if (data_scale_original != data_scale) {
-    omicsData <- edata_transform(omicsData, data_scale)
-  }
-
-  # If the data is already normalized, skip this step
-  if (is_normalized == FALSE) {
-    # Normalization is not required for both isobaric protein and NMR data, but can
-    # be forced with .force_normalization
-    if (omics_type %in% c("isobaricpepData", "nmrData") == FALSE | force_normalization) {
-      # Get the normalization function
-      norm_fun <- switch(normalization_fun,
-        "global" = normalize_global,
-        "global_basic" = normalize_global_basic,
-        "loess" = normalize_loess,
-        "quantile" = normalize_quantile
-      )
-
-      # Add omics data to normalization parameters
-      normalization_params[["omicsData"]] <- omicsData
-
-      # Apply normalization with its parameters
-      omicsData <- do.call(norm_fun, normalization_params)
+    )))
+    
+    # Transform if appropriate
+    if (data_scale_original != data_scale) {
+      omicsData <- edata_transform(omicsData, data_scale)
     }
+    
+    # If the data is already normalized, skip this step
+    if (is_normalized == FALSE) {
+      # Normalization is not required for both isobaric protein and NMR data, but can
+      # be forced with .force_normalization
+      if (omics_type %in% c("isobaricpepData", "nmrData") == FALSE | force_normalization) {
+        # Get the normalization function
+        norm_fun <- switch(normalization_fun,
+                           "global" = normalize_global,
+                           "global_basic" = normalize_global_basic,
+                           "loess" = normalize_loess,
+                           "quantile" = normalize_quantile
+        )
+        
+        # Add omics data to normalization parameters
+        normalization_params[["omicsData"]] <- omicsData
+        
+        # Apply normalization with its parameters
+        omicsData <- do.call(norm_fun, normalization_params)
+      }
+    } else {
+      attr(omicsData, "data_info")$norm_info$is_normalized <- TRUE
+    }
+    
+    # Finally, generate the trelliData object-------------------------------------
+    
+    # Put the edata into the trelliData omics slot
+    trelliData <- list(
+      trelliData.omics = omicsData$e_data %>%
+        tidyr::pivot_longer(colnames(edata)[colnames(edata) != edata_cname]) %>%
+        dplyr::rename(Sample = name, Abundance = value),
+      trelliData.stat = NULL,
+      omicsData = omicsData,
+      statRes = NULL
+    )
+    
   } else {
-    attr(omicsData, "data_info")$norm_info$is_normalized <- TRUE
-  }
-
-  # Finally, generate the trelliData object-------------------------------------
-
-  # Put the edata into the trelliData omics slot
-  trelliData <- list(
-    trelliData.omics = omicsData$e_data %>%
+    
+    # Build omics object - this also checks that edata_cname is in edata 
+    omicsData <- eval(parse(text = paste0(
+      "as.", omics_type,
+      "(e_data = edata, edata_cname = edata_cname, f_data = fdata, fdata_cname = fdata_cname,
+      data_scale = 'counts')"
+    )))
+    
+    # Conduct the lcpm transformation
+    biomolecules <- omicsData$e_data[[edata_cname]]
+    temp_data <- omicsData$e_data %>% dplyr::select(-edata_cname)
+    samp_sum <- apply(temp_data, 2, sum, na.rm = TRUE) + 1
+    div_sum <- sweep((temp_data + .5), 2, samp_sum, `/`)
+    lcpm <- log2(div_sum * 10^6)
+    lcpm <- lcpm %>% dplyr::mutate(!!edata_cname := biomolecules)
+    
+    # Pivot the counts data.frame longer
+    counts_pivoted <- omicsData$e_data %>%
       tidyr::pivot_longer(colnames(edata)[colnames(edata) != edata_cname]) %>%
-      dplyr::rename(Sample = name, Abundance = value),
-    trelliData.stat = NULL,
-    omicsData = omicsData,
-    statRes = NULL
-  )
+      dplyr::rename(Sample = name, Count = value)
+    
+    # Pivot the lcpm data.frame longer
+    lcpm_pivoted <- lcpm %>%
+      tidyr::pivot_longer(colnames(edata)[colnames(edata) != edata_cname]) %>%
+      dplyr::rename(Sample = name, LCPM = value)
+    
+    # Join datasets
+    pivoted <- dplyr::left_join(counts_pivoted, lcpm_pivoted, by = c(edata_cname, "Sample"))
+    
+    # Finally, generate the trelliData object-------------------------------------
+    
+    # Put the edata into the trelliData omics slot
+    trelliData <- list(
+      trelliData.omics = pivoted,
+      trelliData.stat = NULL,
+      omicsData = omicsData,
+      statRes = NULL
+    )
+    
+  }
 
   # Save Panel By information and set class."panel_by_options" list the potential
   # inputs for the panel_by function. "panel_by_omics"/"panel_by_stat" will hold
@@ -208,6 +279,11 @@ as.trelliData.edata <- function(e_data,
   attr(trelliData, "panel_by_stat") <- NA
   attr(trelliData, "panel_by") <- FALSE
   class(trelliData) <- c("trelliData", "trelliData.edata")
+  
+  # Add a special label for seqData
+  if (omics_type == "seqData") {
+    class(trelliData) <- c(class(trelliData), "trelliData.seqData")
+  }
 
   return(trelliData)
 }
