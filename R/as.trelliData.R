@@ -499,8 +499,6 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL) {
   # Format statRes if applicable
   if (!is.null(statRes)) {
     
-    browser()
-    
     # Get edata cname
     edata_cname <- pmartR::get_edata_cname(statRes)
 
@@ -511,32 +509,51 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL) {
     # Change class to prevent dplyr issues
     class(statRes) <- "data.frame"
     
-    # Pivot longer so that the first column is the edata_cname, extract comparison,
-    # panel_by comparison, nest dataframes, and then extract the p_value and fold_change
-    # for each group
-    trelliData.stat <- statRes %>%
-      dplyr::select(dplyr::all_of(c(edata_cname, pvalue_cols, fold_change_cols))) %>%
-      tidyr::pivot_longer(dplyr::all_of(c(pvalue_cols, fold_change_cols))) %>%
-      dplyr::mutate(
-        Comparison = gsub("P_value_A_|P_value_G_|Fold_change_", "", name),
-        Metric = lapply(name, function(x) {
-          if (grepl("P_value_A", x)) {
-            return("p_value_anova")
-          } else if (grepl("P_value_G", x)) {
-            return("p_value_gtest")
-          } else {
-            return("fold_change")
-          }
-        }) %>% unlist()
-      ) %>%
-      dplyr::select(-name) %>%
-      dplyr::group_by(dplyr::across(c(Comparison, !!dplyr::sym(edata_cname)))) %>%
-      dplyr::summarise(
-        "p_value_anova" = ifelse(length(value[which(Metric == "p_value_anova")]) == 0, NA, value[which(Metric == "p_value_anova")]),
-        "p_value_gtest" = ifelse(length(value[which(Metric == "p_value_gtest")]) == 0, NA, value[which(Metric == "p_value_gtest")]),
-        "fold_change" = value[which(Metric == "fold_change")]
-      ) %>%
-      dplyr::relocate(!!dplyr::sym(edata_cname))
+    # Determine if this is MS/NMR omics or RNA seq 
+    ms_obj <- any(grepl("P_value_A|P_value_G", colnames(statRes)))
+    
+    if (ms_obj) {
+    
+      # Pivot longer so that the first column is the edata_cname, extract comparison,
+      # panel_by comparison, nest dataframes, and then extract the p_value and fold_change
+      # for each group. Split p-values by the ANOVA or the g-test. 
+      trelliData.stat <- statRes %>%
+        dplyr::select(dplyr::all_of(c(edata_cname, pvalue_cols, fold_change_cols))) %>%
+        tidyr::pivot_longer(dplyr::all_of(c(pvalue_cols, fold_change_cols))) %>%
+        dplyr::mutate(
+          Comparison = gsub("P_value_A_|P_value_G_|Fold_change_", "", name),
+          Metric = ifelse(grepl("P_value_A", name), "p_value_anova", 
+                   ifelse(grepl("P_value_A", name), "p_value_gtest", "fold_change"))
+        ) %>%
+        dplyr::select(-name) %>%
+        dplyr::group_by(dplyr::across(c(Comparison, !!dplyr::sym(edata_cname)))) %>%
+        dplyr::reframe(
+          "p_value_anova" = ifelse(length(value[which(Metric == "p_value_anova")]) == 0, NA, value[which(Metric == "p_value_anova")]),
+          "p_value_gtest" = ifelse(length(value[which(Metric == "p_value_gtest")]) == 0, NA, value[which(Metric == "p_value_gtest")]),
+          "fold_change" = value[which(Metric == "fold_change")]
+        ) %>%
+        dplyr::relocate(!!dplyr::sym(edata_cname))
+      
+    } else {
+      
+      # Pivot longer so that the first column is the edata_cname, extract comparison,
+      # panel_by comparison, nest dataframes, and then extract the p_value and fold_change
+      # for each group. Here, there is just one p-value. 
+      trelliData.stat <- statRes %>%
+        dplyr::select(dplyr::all_of(c(edata_cname, pvalue_cols, fold_change_cols))) %>%
+        tidyr::pivot_longer(dplyr::all_of(c(pvalue_cols, fold_change_cols))) %>%
+        dplyr::mutate(
+          Comparison = gsub("P_value_|Fold_change_", "", name),
+          Metric = ifelse(grepl("P_value", name), "p_value", "fold_change")
+        ) %>%
+        dplyr::select(-name) %>%
+        dplyr::group_by(dplyr::across(c(Comparison, !!dplyr::sym(edata_cname)))) %>%
+        dplyr::summarize(
+          "p_value" = ifelse(length(value[which(Metric == "p_value")]) == 0, NA, value[which(Metric == "p_value")]),
+          "fold_change" = value[which(Metric == "fold_change")]
+        ) %>%
+        dplyr::relocate(!!dplyr::sym(edata_cname))
+    }
 
     # Add emeta columns if emeta exists
     if (!is.null(omicsData$e_meta)) {
@@ -576,7 +593,7 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL) {
   # been grouped by. And "panel_by" tracks whether the panel_by function has been
   # applied or not.
   group_options <- c(colnames(trelliData.omics), colnames(trelliData.stat)) %>% unique()
-  group_nonoptions <- c("Abundance", "Comparison", "p_value_anova", "p_value_gtest", "fold_change", "Group")
+  group_nonoptions <- c("Abundance", "Comparison", "p_value_anova", "p_value_gtest", "p_value", "fold_change", "Group", "Count", "LCPM")
   group_options <- group_options[group_options %in% group_nonoptions == FALSE]
   attr(trelliData, "panel_by_options") <- group_options
   attr(trelliData, "panel_by_omics") <- NA
@@ -584,8 +601,19 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL) {
   attr(trelliData, "panel_by") <- FALSE
   class(trelliData) <- c("trelliData")
   
-  if (class(omicsData) == "seqData") {
+  if (class(omicsData) == "seqData" | (!is.null(statRes) && ms_obj == FALSE)) {
+    
     class(trelliData) <- c(class(trelliData), "trelliData.seqData")
+    
+    if (!is.null(omicsData)) {
+      message(paste("Notice: seqData will be log count per million (LCPM) transformed for visualization purposes.",
+                    "No other transformation method or normalization will be applied to the data.",
+                    "Therefore, the statistics results may not perfectly match visualized patterns of expressed data.",
+                    "We also suggest filtering out biomolecules before applying visualizations, as seqData tends to be quite large."))
+    } else {
+      message(paste("Notice: seqData tends to be quite large, so we suggest filtering out biomolecules before applying visualizations."))  
+    }
+    
   }
 
   return(trelliData)
