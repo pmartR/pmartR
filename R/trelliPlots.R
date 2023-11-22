@@ -44,7 +44,7 @@ trelli_precheck <- function(trelliData,
   
   seq_test <- inherits(trelliData, "trelliData.seqData")
   if (seqDataCheck == "no" & seq_test) {stop(paste("seqData is not permitted for this plotting function.", seqText))}
-  if (seqDataCheck == "required" & !seq_test) {stop("seqData is required for this plotting function.")}
+  if (seqDataCheck == "required" & !seq_test) {stop(paste("seqData is required for this plotting function.", seqText))}
   
   #########################
   ## TEST EXAMPLE CHECKS ##
@@ -242,7 +242,7 @@ trelli_builder <- function(toBuild, cognostics, plotFUN, cogFUN, path, name, rem
 #'   If data are paneled by a sample or a biomolecule class, the count will be "biomolecule count". 
 #'   If statRes data is included, "anova p-value" and "fold change" data per comparisons
 #'   may be added. If grouping information is included, only "sample count" and 
-#'   "mean abundance" will be calclulated, along with "anova p-value" and "fold change"
+#'   "mean abundance" will be calculated, along with "anova p-value" and "fold change"
 #'   if specified. "anova p-value" will not be included if paneling a trelliscope
 #'   display by a biomolecule class. Default is "sample count" and "mean abundance".
 #' @param ggplot_params An optional vector of strings of ggplot parameters to
@@ -272,7 +272,7 @@ trelli_builder <- function(toBuild, cognostics, plotFUN, cogFUN, path, name, rem
 #' trelli_panel_by(trelliData = trelliData1, panel = "Peptide") %>% 
 #'    trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10)
 #'    
-#' # Build the abundance boxplot wher each panel is a sample.
+#' # Build the abundance boxplot where each panel is a sample.
 #' # Include all applicable cognostics. Remove points. 
 #' trelli_panel_by(trelliData = trelliData1, panel = "Sample") %>% 
 #'    trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10, 
@@ -381,7 +381,7 @@ trelli_abundance_boxplot <- function(trelliData,
   }
   
   if (any(c("anova p-value", "fold change") %in% cognostics) & attr(trelliData, "panel_by_omics") != get_edata_cname(trelliData$omicsData)) {
-    message(paste("Please panel by", get_edata_cname(trelliData$omicsData), "to get 'anova p-values' and 'fold changes' as cognostics in the trelliscope display."))
+    message(paste("Please panel by", get_edata_cname(trelliData$omicsData), "to get 'anova p-value' and 'fold change' as cognostics in the trelliscope display."))
   }
   
   # Make boxplot function-------------------------------------------------------
