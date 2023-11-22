@@ -75,7 +75,7 @@
 #' # Other options include modifying the ggplot  
 #' trelli_panel_by(trelliData = trelliData_seq1, panel = "Transcript") %>% 
 #'    trelli_rnaseq_boxplot(test_mode = TRUE, test_example = 1:10, 
-#'      ggplot_params = c("ylab('')", "ylim(c(20,30))"))
+#'      ggplot_params = c("ylab('')", "xlab('')"))
 #' 
 #' # Or making the plot interactive 
 #' trelli_panel_by(trelliData = trelliData_seq4, panel = "Gene") %>% 
@@ -146,9 +146,9 @@ trelli_rnaseq_boxplot <- function(trelliData,
   if ("count" %in% cognostics) {
     
     if (attr(trelliData, "panel_by_omics") == get_edata_cname(trelliData$omicsData)) {
-      cognostics[which(cognostics == "count")] <- "sample count"
+      cognostics[which(cognostics == "count")] <- "sample nonzero count"
     } else {
-      cognostics[which(cognostics == "count")] <- "biomolecule count"
+      cognostics[which(cognostics == "count")] <- "biomolecule nonzero count"
     }
     
   }
@@ -209,15 +209,15 @@ trelli_rnaseq_boxplot <- function(trelliData,
   box_cog_fun <- function(DF, biomolecule) {
     # Set basic cognostics for ungrouped data or in case when data is not split by fdata_cname
     cog <- list(
-      "sample count" = dplyr::tibble(`Sample Count` = trelliscopejs::cog(sum(!is.na(DF$LCPM)), desc = "Sample Count")),
-      "biomolecule count" = dplyr::tibble(`Biomolecule Count` = trelliscopejs::cog(sum(!is.na(DF$LCPM)), desc = "Biomolecule Count")),
+      "sample nonzero count" = dplyr::tibble(`Sample Non-Zero Count` = trelliscopejs::cog(sum(DF$Count != 0), desc = "Sample Non-Zero Count")),
+      "biomolecule nonzero count" = dplyr::tibble(`Biomolecule Non-Zero Count` = trelliscopejs::cog(sum(DF$Count != 0), desc = "Biomolecule Non-Zero Count")),
       "mean lcpm" = dplyr::tibble(`Mean LCPM` = trelliscopejs::cog(round(mean(DF$LCPM, na.rm = TRUE), 4), desc = "Mean LCPM")), 
       "median lcpm" = dplyr::tibble(`Median LCPM` = trelliscopejs::cog(round(median(DF$LCPM, na.rm = TRUE), 4), desc = "Median LCPM")), 
       "cv lcpm" = dplyr::tibble(`CV LCPM` = trelliscopejs::cog(round((sd(DF$LCPM, na.rm = TRUE) / mean(DF$LCPM, na.rm = T)) * 100, 4), desc = "CV LCPM"))
     )
     
     # If cognostics are any of the cog, then add them 
-    if (any(cognostics %in% c("sample count", "biomolecule count", "mean lcpm", "median lcpm", "cv lcpm"))) {
+    if (any(cognostics %in% c("sample nonzero count", "biomolecule nonzero count", "mean lcpm", "median lcpm", "cv lcpm"))) {
       cog_to_trelli <- do.call(dplyr::bind_cols, lapply(cognostics, function(x) {cog[[x]]})) %>% dplyr::tibble()
     } else {
       cog_to_trelli <- NULL
@@ -237,13 +237,13 @@ trelli_rnaseq_boxplot <- function(trelliData,
       cogs_to_add <- DF %>%
         dplyr::group_by(Group) %>%
         dplyr::summarise(
-          "sample count" = sum(!is.na(LCPM)), 
-          "biomolecule count" = sum(!is.na(LCPM)), 
+          "sample nonzero count" = sum(Count != 0), 
+          "biomolecule nonzero count" = sum(Count != 0), 
           "mean lcpm" = round(mean(LCPM, na.rm = TRUE), 4),
           "median lcpm" = round(median(LCPM, na.rm = TRUE), 4),
           "cv lcpm" = round((sd(LCPM, na.rm = T) / mean(LCPM, na.rm =T)) * 100, 4),
         ) %>%
-        tidyr::pivot_longer(c(`sample count`, `biomolecule count`, `mean lcpm`, `median lcpm`, `cv lcpm`)) %>%
+        tidyr::pivot_longer(c(`sample nonzero count`, `biomolecule nonzero count`, `mean lcpm`, `median lcpm`, `cv lcpm`)) %>%
         dplyr::filter(name %in% cognostics) %>%
         dplyr::mutate(name = paste(Group, name)) %>%
         dplyr::ungroup() %>%
@@ -262,7 +262,7 @@ trelli_rnaseq_boxplot <- function(trelliData,
     if (!is.null(trelliData$trelliData.stat) && !is.na(attr(trelliData, "panel_by_stat")) && edata_cname == attr(trelliData, "panel_by_stat")) {
       
       # Downselect to only stats 
-      stat_cogs <- cognostics[cognostics %in% c("fold change", "anova p-value")]
+      stat_cogs <- cognostics[cognostics %in% c("fold change", "p-value")]
       
       if (length(stat_cogs) != 0) {
         # Subset down the dataframe down to group, unnest the dataframe,
