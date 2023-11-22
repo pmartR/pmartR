@@ -42,7 +42,7 @@ Default is abundance. This parameter is ignored if the data is "seqData".}
 \item{data_scale}{A character string indicating the scale to transform the
 data to. Valid values are: 'log2', 'log', 'log10', or 'abundance'. If the
 value is the same as data_scale_original, then transformation is not
-applied. Default is log2. This parameter is ignored if hte data is "seqData".}
+applied. Default is log2. This parameter is ignored if the data is "seqData".}
 
 \item{normalization_fun}{A character string indicating the pmartR
 normalization function to use on the data, if is_normalized is FALSE.

@@ -6,8 +6,12 @@
 #'
 #' @examples
 #' \dontrun{
-#'
+#' 
 #' library(dplyr)
+#' 
+#' ###########################
+#' ## MS/NMR OMICS EXAMPLES ##
+#' ###########################
 #'
 #' # Use an edata example. Build with as.trelliData.edata.
 #' summary(trelliData)
@@ -19,6 +23,10 @@
 #'
 #' # Use a statRes example. Build with as.trelliData.
 #' summary(trelliData3)
+#' 
+#' 
+#' 
+#' 
 #' }
 #'
 #' @export
