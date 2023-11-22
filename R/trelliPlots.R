@@ -18,8 +18,10 @@
 #' @param test_example The user provided vector of plot indices
 #' @param single_plot The user provided logical for whether a single plot should
 #'   be returned
-#' @param p_value_skip Whether to skip specific p_value checks. Placeholder for
-#'   potential future functions.
+#' @param seqDataCheck Whether seqData is permitted for this plot. "no" means that 
+#'   seqData cannot be used at all, "permissible" means that seqData can be used, 
+#'   and "required" means that seqData is required for the plotting function.
+#' @param p_value_skip Whether to skip specific p_value checks. 
 #' @param p_value_thresh The user provided threshold for plotting significant
 #'   p-values.
 #' 
@@ -34,8 +36,18 @@ trelli_precheck <- function(trelliData,
                             test_mode,
                             test_example,
                             single_plot,
+                            seqDataCheck,
+                            seqText = NULL,
                             p_value_skip = FALSE,
                             p_value_thresh = NULL) {
+  
+  ####################
+  ## SEQDATA CHECKS ##
+  ####################
+  
+  seq_test <- inherits(trelliData, "trelliData.seqData")
+  if (seqDataCheck == "no" & seq_test) {stop(paste("seqData is not permitted for this plotting function.", seqText))}
+  if (seqDataCheck == "required" & !seq_test) {stop("seqData is required for this plotting function.")}
   
   #########################
   ## TEST EXAMPLE CHECKS ##
@@ -53,7 +65,6 @@ trelli_precheck <- function(trelliData,
     }
     test_example <- unique(abs(round(test_example)))
   }
-
 
   #######################
   ## trelliData checks ##
@@ -219,11 +230,12 @@ trelli_builder <- function(toBuild, cognostics, plotFUN, cogFUN, path, name, rem
 
 #' @name trelli_abundance_boxplot
 #'
-#' @title Boxplot trelliscope building function for abundance data
+#' @title Boxplot trelliscope building function for abundance data 
 #'
 #' @description Specify a boxplot design and cognostics for the abundance
 #'   boxplot trelliscope. Each boxplot will have its own groups as specified by
-#'   the first main effect in group_designation.
+#'   the first main effect in group_designation. Use "trelli_rnaseq_boxplot"
+#'   for RNA-Seq data. 
 #'
 #' @param trelliData A trelliscope data object made by as.trelliData or
 #'   as.trelliData.edata, and grouped by trelli_panel_by. Required.
@@ -359,6 +371,8 @@ trelli_abundance_boxplot <- function(trelliData,
                   test_mode = test_mode, 
                   test_example = test_example,
                   single_plot = single_plot,
+                  seqDataCheck = "no",
+                  seqText = "Use trelli_rnaseq_boxplot instead.",
                   p_value_thresh = NULL)
   
   
@@ -581,7 +595,7 @@ trelli_abundance_boxplot <- function(trelliData,
 #'
 #' @description Specify a plot design and cognostics for the abundance histogram
 #'   trelliscope. Main_effects grouping are ignored. Data must be grouped by
-#'   edata_cname.
+#'   edata_cname. For RNA-Seq data, use "trelli_rnaseq_histogram". 
 #'
 #' @param trelliData A trelliscope data object made by as.trelliData or
 #'   as.trelliData.edata, and grouped by edata_cname in trelli_panel_by.
@@ -691,6 +705,8 @@ trelli_abundance_histogram <- function(trelliData,
                   test_mode = test_mode, 
                   test_example = test_example,
                   single_plot = single_plot,
+                  seqDataCheck = "no",
+                  seqText = "Use trelli_rnaseq_histogram instead.",
                   p_value_thresh = NULL)
 
   
@@ -788,7 +804,7 @@ trelli_abundance_histogram <- function(trelliData,
 #'
 #' @description Specify a plot design and cognostics for the abundance heatmap
 #'   trelliscope. Data must be grouped by an e_meta column. Main_effects order
-#'   the y-variables. All statRes data is ignored.
+#'   the y-variables. All statRes data is ignored. For RNA-Seq data, use "trelli_rnaseq_heatmap".
 #'
 #' @param trelliData A trelliscope data object made by as.trelliData, and
 #'   grouped by an emeta variable. Required.
@@ -886,6 +902,8 @@ trelli_abundance_heatmap <- function(trelliData,
                   test_mode = test_mode, 
                   test_example = test_example,
                   single_plot = single_plot,
+                  seqDataCheck = "no",
+                  seqText = "Use trelli_rnaseq_heatmap instead.",
                   p_value_thresh = NULL)
   
   # Round test example to integer 
@@ -1022,7 +1040,8 @@ trelli_abundance_heatmap <- function(trelliData,
 #'
 #' @description Specify a plot design and cognostics for the missing barchart
 #'    trelliscope. Missingness is displayed per panel_by variable. Main_effects
-#'    data is used to split samples when applicable.
+#'    data is used to split samples when applicable. For RNA-Seq data, use 
+#'    "trelli rnaseq nonzero bar". 
 #'
 #' @param trelliData A trelliscope data object made by as.trelliData.edata or
 #'    as.trelliData. Required.
@@ -1150,6 +1169,8 @@ trelli_missingness_bar <- function(trelliData,
                   test_mode = test_mode, 
                   test_example = test_example,
                   single_plot = single_plot,
+                  seqDataCheck = "no",
+                  seqText = "Use trelli_rnaseq_nonzero_bar instead.",
                   p_value_thresh = NULL)
   
   # Check that proportion is a non NA logical

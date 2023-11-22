@@ -56,7 +56,7 @@ No return value, builds a trelliscope display of heatmaps that is stored in `pat
 \description{
 Specify a plot design and cognostics for the abundance heatmap
   trelliscope. Data must be grouped by an e_meta column. Main_effects order
-  the y-variables. All statRes data is ignored.
+  the y-variables. All statRes data is ignored. For RNA-Seq data, use "trelli_rnaseq_heatmap".
 }
 \examples{
 \dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}

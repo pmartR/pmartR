@@ -57,7 +57,7 @@ No return value, builds a trelliscope display of histograms that is stored in `p
 \description{
 Specify a plot design and cognostics for the abundance histogram
   trelliscope. Main_effects grouping are ignored. Data must be grouped by
-  edata_cname.
+  edata_cname. For RNA-Seq data, use "trelli_rnaseq_histogram".
 }
 \examples{
 \dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}

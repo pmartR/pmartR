@@ -63,7 +63,8 @@ No return value, builds a trelliscope display of missingness bar charts that is 
 \description{
 Specify a plot design and cognostics for the missing barchart
    trelliscope. Missingness is displayed per panel_by variable. Main_effects
-   data is used to split samples when applicable.
+   data is used to split samples when applicable. For RNA-Seq data, use 
+   "trelli rnaseq nonzero bar".
 }
 \examples{
 \dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}

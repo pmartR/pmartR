@@ -64,7 +64,8 @@ No return value, builds a trelliscope display of boxplots that is stored in `pat
 \description{
 Specify a boxplot design and cognostics for the abundance
   boxplot trelliscope. Each boxplot will have its own groups as specified by
-  the first main effect in group_designation.
+  the first main effect in group_designation. Use "trelli_rnaseq_boxplot"
+  for RNA-Seq data.
 }
 \examples{
 \dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
