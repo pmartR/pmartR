@@ -16,7 +16,8 @@ trelli_pvalue_filter(
 
 \item{p_value_test}{A string to indicate which p_values to plot. Acceptable
 entries are "anova" or "gtest". Default is "anova". Unlike the
-plotting functions, here p_value_test cannot be null. Required.}
+plotting functions, here p_value_test cannot be null. Required unless
+the data is seqData, when this parameter will be ignored.}
 
 \item{p_value_thresh}{A value between 0 and 1 to indicate the p-value threshold 
 at which to keep plots. Default is 0.05. Required.}
@@ -61,6 +62,10 @@ statRes <- imd_anova(omicsData = omicsData, test_method = 'combined')
 trelliData3 <- as.trelliData(statRes = statRes)
 trelliData4 <- as.trelliData(omicsData = omicsData, statRes = statRes)
 
+###########################
+## MS/NMR OMICS EXAMPLES ##
+###########################
+
 # Filter a trelliData object with only statistics results, while not caring about a comparison
 trelli_pvalue_filter(trelliData3, p_value_test = "anova", p_value_thresh = 0.1)
 
@@ -76,6 +81,13 @@ trelli_pvalue_filter(
  trelliData4, p_value_test = "gtest", p_value_thresh = 0.25, 
  comparison = "Phenotype3_vs_Phenotype2"
 )
+
+######################
+## RNA-SEQ EXAMPLES ##  
+######################
+
+# Filter a trelliData seqData object with only statistics results, while not caring about a comparison
+trelli_pvalue_filter(trelliData_seq3, p_value_thresh = 0.05)
 
 
 }

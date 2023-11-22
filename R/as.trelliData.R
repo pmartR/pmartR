@@ -66,7 +66,7 @@
 #' @param data_scale A character string indicating the scale to transform the
 #'   data to. Valid values are: 'log2', 'log', 'log10', or 'abundance'. If the
 #'   value is the same as data_scale_original, then transformation is not
-#'   applied. Default is log2. This parameter is ignored if hte data is "seqData". 
+#'   applied. Default is log2. This parameter is ignored if the data is "seqData". 
 #' @param normalization_fun A character string indicating the pmartR
 #'   normalization function to use on the data, if is_normalized is FALSE.
 #'   Acceptable choices are 'global', 'loess', and 'quantile'. This parameter is
@@ -800,7 +800,8 @@ trelli_panel_by <- function(trelliData, panel) {
 #' @param trelliData A trelliData object with statistics results (statRes). Required.
 #' @param p_value_test A string to indicate which p_values to plot. Acceptable
 #'    entries are "anova" or "gtest". Default is "anova". Unlike the
-#'    plotting functions, here p_value_test cannot be null. Required.
+#'    plotting functions, here p_value_test cannot be null. Required unless
+#'    the data is seqData, when this parameter will be ignored.  
 #' @param p_value_thresh A value between 0 and 1 to indicate the p-value threshold 
 #'    at which to keep plots. Default is 0.05. Required.
 #' @param comparison The specific comparison to filter significant values to. Can
@@ -836,6 +837,10 @@ trelli_panel_by <- function(trelliData, panel) {
 #' trelliData3 <- as.trelliData(statRes = statRes)
 #' trelliData4 <- as.trelliData(omicsData = omicsData, statRes = statRes)
 #' 
+#' ###########################
+#' ## MS/NMR OMICS EXAMPLES ##
+#' ###########################
+#' 
 #' # Filter a trelliData object with only statistics results, while not caring about a comparison
 #' trelli_pvalue_filter(trelliData3, p_value_test = "anova", p_value_thresh = 0.1)
 #' 
@@ -852,6 +857,15 @@ trelli_panel_by <- function(trelliData, panel) {
 #'  comparison = "Phenotype3_vs_Phenotype2"
 #' )
 #' 
+#' ######################
+#' ## RNA-SEQ EXAMPLES ##  
+#' ######################
+#' 
+#' # Filter a trelliData seqData object with only statistics results, while not caring about a comparison
+#' trelli_pvalue_filter(trelliData_seq3, p_value_thresh = 0.05)
+#' 
+#' # Filter both a omicsData and statRes object, while caring about a specific comparison
+#' trelli_pvalue_filter(trelliData_seq4, p_value_thresh = 0.05, comparison = "StrainA_vs_StrainB")
 #' 
 #' }
 #'
@@ -875,10 +889,15 @@ trelli_pvalue_filter <- function(trelliData,
     stop("trelliData must contain a statRes object.")
   }
   
-  # Ensure the p_value_test is anova, gtest, or combined
-  if (p_value_test %in% c("anova", "gtest", "combined") == FALSE) {
-    stop("p_value_test must be anova, gtest, or combined.")
-  }
+  # If the data is seqData, then p_value_test is not used
+  if (!inherits(trelliData, "trelliData.seqData")) {
+  
+    # Ensure the p_value_test is anova, gtest, or combined
+    if (p_value_test %in% c("anova", "gtest") == FALSE) {
+      stop("p_value_test must be anova, or gtest.")
+    }
+    
+  } else {message("p_value_test is ignored with seqData.")}
   
   # Ensure that p_value threshold is a single numeric
   if (!is.numeric(p_value_thresh)) {
@@ -910,12 +929,16 @@ trelli_pvalue_filter <- function(trelliData,
     trelliData$trelliData.stat <- trelliData$trelliData.stat[trelliData$trelliData.stat$Comparison == comparison,]
   }
   
-  # Filter statRes
-  if (p_value_test == "anova") {
-    trelliData$trelliData.stat <- trelliData$trelliData.stat[trelliData$trelliData.stat$p_value_anova <= p_value_thresh,]
-  } else if (p_value_test == "gtest") {
-    trelliData$trelliData.stat <- trelliData$trelliData.stat[trelliData$trelliData.stat$p_value_gtest <= p_value_thresh,] 
-  } 
+  # Filter statRes, unless it's seqData
+  if (!inherits(trelliData, "trelliData.seqData")) {
+    if (p_value_test == "anova") {
+      trelliData$trelliData.stat <- trelliData$trelliData.stat[trelliData$trelliData.stat$p_value_anova <= p_value_thresh,]
+    } else if (p_value_test == "gtest") {
+      trelliData$trelliData.stat <- trelliData$trelliData.stat[trelliData$trelliData.stat$p_value_gtest <= p_value_thresh,] 
+    } 
+  } else {
+    trelliData$trelliData.stat <- trelliData$trelliData.stat[trelliData$trelliData.stat$p_value <= p_value_thresh,]
+  }
   
   # Filter omics down 
   if (!is.null(trelliData$trelliData.omics)) {
