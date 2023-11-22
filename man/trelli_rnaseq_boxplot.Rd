@@ -103,7 +103,7 @@ trelli_panel_by(trelliData = trelliData_seq4, panel = "Transcript") \%>\%
 # Other options include modifying the ggplot  
 trelli_panel_by(trelliData = trelliData_seq1, panel = "Transcript") \%>\% 
    trelli_rnaseq_boxplot(test_mode = TRUE, test_example = 1:10, 
-     ggplot_params = c("ylab('')", "ylim(c(20,30))"))
+     ggplot_params = c("ylab('')", "xlab('')"))
 
 # Or making the plot interactive 
 trelli_panel_by(trelliData = trelliData_seq4, panel = "Gene") \%>\% 
