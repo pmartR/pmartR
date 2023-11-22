@@ -325,3 +325,180 @@ trelli_rnaseq_boxplot <- function(trelliData,
     
   }
 }
+
+#' @name trelli_rnaseq_histogram
+#'
+#' @title Histogram trelliscope building function for RNA-Seq data
+#'
+#' @description Specify a plot design and cognostics for the abundance histogram
+#'   trelliscope. Main_effects grouping are ignored. Data must be grouped by
+#'   edata_cname. For MS/NMR data, use "trelli_abundance_histogram". 
+#' @param trelliData A trelliscope data object made by as.trelliData or
+#'   as.trelliData.edata, and grouped by edata_cname in trelli_panel_by.
+#'   Required.
+#' @param cognostics A vector of cognostic options for each plot. Valid entries
+#'   are "sample count", "mean lcpm", "median lcpm", "cv lcpm", 
+#'   and "skew lcpm". All are included by default. 
+#' @param ggplot_params An optional vector of strings of ggplot parameters to
+#'   the backend ggplot function. For example, c("ylab('')", "ylim(c(1,2))").
+#'   Default is NULL.
+#' @param interactive A logical argument indicating whether the plots should be
+#'   interactive or not. Interactive plots are ggplots piped to ggplotly (for
+#'   now). Default is FALSE.
+#' @param path The base directory of the trelliscope application. Default is
+#'   Downloads.
+#' @param name The name of the display. Default is Trelliscope.
+#' @param test_mode A logical to return a smaller trelliscope to confirm plot
+#'   and design. Default is FALSE.
+#' @param test_example A vector of plot indices to return for test_mode. Default
+#'   is 1.
+#' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a
+#'   trelliscope) should be returned. Default is FALSE.
+#' @param ... Additional arguments to be passed on to the trelli builder
+#'
+#' @examples
+#' \dontrun{
+#' 
+#' # Build the RNA-seq histogram with an edata file. Generate trelliData in as.trelliData.edata
+#' trelli_panel_by(trelliData = trelliData_seq1, panel = "Transcript") %>% 
+#'    trelli_rnaseq_histogram(test_mode = TRUE, test_example = 1:10)
+#' 
+#' # Build the RNA-seq histogram with an omicsData object. Generate trelliData in as.trelliData
+#' trelli_panel_by(trelliData = trelliData_seq2, panel = "Transcript") %>% 
+#'    trelli_rnaseq_histogram(test_mode = TRUE, test_example = 1:10)
+#'     
+#' # Build the RNA-seq histogram with an omicsData and statRes object. Generate trelliData in as.trelliData.
+#' trelli_panel_by(trelliData = trelliData_seq4, panel = "Transcript") %>%
+#'    trelli_rnaseq_histogram(test_mode = TRUE, test_example = 1:10, cognostics = "sample count")
+#'    
+#' # Users can modify the plotting function with ggplot parameters and interactivity, 
+#' # and can also select certain cognostics.     
+#' trelli_panel_by(trelliData = trelliData_seq1, panel = "Transcript") %>% 
+#'    trelli_rnaseq_histogram(test_mode = TRUE, test_example = 1:10, 
+#'      ggplot_params = c("ylab('')", "xlab('')"), interactive = TRUE,
+#'      cognostics = c("mean lcpm", "median lcpm"))  
+#'    
+#' }
+#'
+#' @author David Degnan, Lisa Bramer
+#'
+#' @export
+trelli_rnaseq_histogram <- function(trelliData,
+                                       cognostics = c("sample count", "mean lcpm", "median lcpm", "cv lcpm", "skew lcpm"),
+                                       ggplot_params = NULL,
+                                       interactive = FALSE,
+                                       path = .getDownloadsFolder(),
+                                       name = "Trelliscope",
+                                       test_mode = FALSE,
+                                       test_example = 1,
+                                       single_plot = FALSE,
+                                       ...) {
+  # Run initial checks----------------------------------------------------------
+  
+  # Run generic checks 
+  trelli_precheck(trelliData = trelliData, 
+                  trelliCheck = "omics",
+                  cognostics = cognostics,
+                  acceptable_cognostics = c("sample count", "mean lcpm", "median lcpm", "cv lcpm", "skew lcpm"),
+                  ggplot_params = ggplot_params,
+                  interactive = interactive,
+                  test_mode = test_mode, 
+                  test_example = test_example,
+                  single_plot = single_plot,
+                  seqDataCheck = "required",
+                  seqText = "Use trelli_abundance_histogram instead.",
+                  p_value_thresh = NULL)
+  
+  
+  # Round test example to integer 
+  if (test_mode) {
+    test_example <- unique(abs(round(test_example)))
+  }
+  
+  # Check that group data is edata_cname
+  edata_cname <- pmartR::get_edata_cname(trelliData$omicsData)
+  if (edata_cname != attr(trelliData, "panel_by_omics")) {
+    stop("trelliData must be grouped by edata_cname.")
+  }
+  
+  # Convert sample count to sample nonzero count
+  if ("sample count" %in% cognostics) {
+    cognostics[grepl("sample count", cognostics, fixed = T)] <- "sample nonzero count"
+  }
+  
+  # Make histogram function-----------------------------------------------------
+  
+  # First, generate the histogram function
+  hist_plot_fun <- function(DF, title) {
+    # Remove NAs
+    DF <- DF[!is.na(DF$LCPM), ]
+    
+    # Build plot
+    histogram <- ggplot2::ggplot(DF, ggplot2::aes(x = LCPM)) +
+      ggplot2::geom_histogram(bins = 10, fill = "steelblue", color = "black") +
+      ggplot2::ggtitle(title) +
+      ggplot2::theme_bw() +
+      ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) +
+      ggplot2::xlab("Log Counts per Million (LCPM)") +
+      ggplot2::ylab("Frequency")
+    
+    # Add additional parameters
+    if (!is.null(ggplot_params)) {
+      for (param in ggplot_params) {
+        histogram <- histogram + eval(parse(text = paste0("ggplot2::", param)))
+      }
+    }
+    
+    # If interactive, pipe to ggplotly
+    if (interactive) {
+      histogram <- histogram %>% plotly::ggplotly()
+    }
+    
+    return(histogram)
+  }
+  
+  # Create cognostic function---------------------------------------------------
+  
+  # Second, create function to return cognostics
+  hist_cog_fun <- function(DF, biomolecule) {
+    # Set basic cognostics for ungrouped data or in case when data is not split by fdata_cname
+    cog <- list(
+      "sample nonzero count" = dplyr::tibble(`Sample Non-Zero Count` = trelliscopejs::cog(sum(DF$Count != 0), desc = "Sample Non-Zero Count")),
+      "mean lcpm" = dplyr::tibble(`Mean LCPM` = trelliscopejs::cog(round(mean(DF$LCPM, na.rm = TRUE), 4), desc = "Mean LCPM")), 
+      "median lcpm" = dplyr::tibble(`Median LCPM` = trelliscopejs::cog(round(median(DF$LCPM, na.rm = TRUE), 4), desc = "Median LCPM")), 
+      "cv lcpm" = dplyr::tibble(`CV LCPM` = trelliscopejs::cog(round((sd(DF$LCPM, na.rm = TRUE) / mean(DF$LCPM, na.rm = T)) * 100, 4), desc = "CV LCPM")), 
+      "skew lcpm" = dplyr::tibble(`Skew LCPM` = trelliscopejs::cog(round(e1071::skewness(DF$LCPM, na.rm = TRUE), 4), desc= "Skew LCPM"))
+    )
+    
+    # If cognostics are any of the cog, then add them 
+    cog_to_trelli <- do.call(dplyr::bind_cols, lapply(cognostics, function(x) {cog[[x]]})) %>% dplyr::tibble()
+    
+    return(cog_to_trelli)
+  }
+  
+  # Build trelliscope display---------------------------------------------------
+  
+  # Return a single plot if single_plot is TRUE
+  if (single_plot) {
+    singleData <- trelliData$trelliData.omics[test_example[1], ]
+    return(hist_plot_fun(singleData$Nested_DF[[1]], unlist(singleData[1, 1])))
+  } else {
+    # If test_mode is on, then just build the required panels
+    if (test_mode) {
+      toBuild <- trelliData$trelliData.omics[test_example, ]
+    } else {
+      toBuild <- trelliData$trelliData.omics
+    }
+    
+    # Pass parameters to trelli_builder function
+    trelli_builder(toBuild = toBuild,
+                   cognostics = cognostics, 
+                   plotFUN = hist_plot_fun,
+                   cogFUN = hist_cog_fun,
+                   path = path,
+                   name = name,
+                   remove_nestedDF = FALSE,
+                   ...)
+    
+  }
+}
