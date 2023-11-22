@@ -61,7 +61,8 @@ trelliscope) should be returned. Default is FALSE.}
 \description{
 Specify a boxplot design and cognostics for the abundance
   boxplot trelliscope. Each boxplot will have its own groups as specified by
-  the first main effect in group_designation.
+  the first main effect in group_designation. Use "trelli_rnaseq_boxplot"
+  for RNA-Seq data.
 }
 \examples{
 \dontrun{

@@ -21,6 +21,10 @@ Summarizes potential plotting options for a trelliData object
 
 library(dplyr)
 
+###########################
+## MS/NMR OMICS EXAMPLES ##
+###########################
+
 # Use an edata example. Build with as.trelliData.edata.
 summary(trelliData)
 summary(trelliData \%>\% trelli_panel_by("Lipid"))
@@ -31,6 +35,27 @@ summary(trelliData2)
 
 # Use a statRes example. Build with as.trelliData.
 summary(trelliData3)
+
+# Use both a omicsData and statRes example
+summary(trelliData4)
+
+######################
+## RNA-SEQ EXAMPLES ##
+######################
+
+# Use only edata
+summary(trelliData_seq1)
+summary(trelliData_seq1 \%>\% trelli_panel_by("Transcript"))
+
+# Use an omicsData example
+summary(trelliData_seq2)
+
+# Use a statRes example
+summary(trelliData_seq3)
+
+# Use both an omicsData and statRes example
+summary(trelliData_seq4)
+
 }
 
 }

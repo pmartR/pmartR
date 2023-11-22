@@ -56,6 +56,8 @@ trelli_pvalue_filter(trelliData4, p_value_test = "gtest", p_value_thresh = 0.25,
 # Filter a trelliData seqData object with only statistics results, while not caring about a comparison
 trelli_pvalue_filter(trelliData_seq3, p_value_thresh = 0.05)
 
+# Filter both a omicsData and statRes object, while caring about a specific comparison
+trelli_pvalue_filter(trelliData_seq4, p_value_thresh = 0.05, comparison = "StrainA_vs_StrainB")
 
 }
 

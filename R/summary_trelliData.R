@@ -24,8 +24,25 @@
 #' # Use a statRes example. Build with as.trelliData.
 #' summary(trelliData3)
 #' 
+#' # Use both a omicsData and statRes example
+#' summary(trelliData4)
 #' 
+#' ######################
+#' ## RNA-SEQ EXAMPLES ##
+#' ######################
 #' 
+#' # Use only edata
+#' summary(trelliData_seq1)
+#' summary(trelliData_seq1 %>% trelli_panel_by("Transcript"))
+#' 
+#' # Use an omicsData example
+#' summary(trelliData_seq2)
+#' 
+#' # Use a statRes example
+#' summary(trelliData_seq3)
+#' 
+#' # Use both an omicsData and statRes example
+#' summary(trelliData_seq4)
 #' 
 #' }
 #'
@@ -68,7 +85,7 @@ summary.trelliData <- function(object, ...) {
   #####################
   ## BUILD DATAFRAME ##
   #####################
-
+  
   # Create a base data.frame which can be filtered
   All_Options <- data.table::data.table(
     `Panel By Choice` = c(
@@ -87,6 +104,17 @@ summary.trelliData <- function(object, ...) {
       NA, "stat", "stat", "stat"
     )
   )
+  
+  # Update plot names when data is seqData
+  if (inherits(trelliData, "trelliData.seqData")) {
+    
+    All_Options <- All_Options %>%
+      dplyr::mutate(
+        Plot = gsub("abundance", "rnaseq", Plot),
+        Plot = gsub("missingness", "rnaseq nonzero", Plot)
+      )
+    
+  }
 
   #################################
   ## SUBSET AND RETURN DATAFRAME ##

@@ -53,7 +53,7 @@ trelliscope) should be returned. Default is FALSE.}
 \description{
 Specify a plot design and cognostics for the abundance heatmap
   trelliscope. Data must be grouped by an e_meta column. Main_effects order
-  the y-variables. All statRes data is ignored.
+  the y-variables. All statRes data is ignored. For RNA-Seq data, use "trelli_rnaseq_heatmap".
 }
 \examples{
 \dontrun{

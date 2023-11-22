@@ -60,7 +60,8 @@ trelliscope) should be returned. Default is FALSE.}
 \description{
 Specify a plot design and cognostics for the missing barchart
    trelliscope. Missingness is displayed per panel_by variable. Main_effects
-   data is used to split samples when applicable.
+   data is used to split samples when applicable. For RNA-Seq data, use 
+   "trelli rnaseq nonzero bar".
 }
 \examples{
 \dontrun{

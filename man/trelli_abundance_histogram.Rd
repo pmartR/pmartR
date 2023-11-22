@@ -54,7 +54,7 @@ trelliscope) should be returned. Default is FALSE.}
 \description{
 Specify a plot design and cognostics for the abundance histogram
   trelliscope. Main_effects grouping are ignored. Data must be grouped by
-  edata_cname.
+  edata_cname. For RNA-Seq data, use "trelli_rnaseq_histogram".
 }
 \examples{
 \dontrun{
