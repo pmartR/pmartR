@@ -502,3 +502,210 @@ trelli_rnaseq_histogram <- function(trelliData,
     
   }
 }
+
+#' @name trelli_rnaseq_heatmap
+#'
+#' @title Heatmap trelliscope building function for RNA-seq data
+#'
+#' @description Specify a plot design and cognostics for the RNA-seq heatmap
+#'   trelliscope. Data must be grouped by an e_meta column. Main_effects order
+#'   the y-variables. All statRes data is ignored. 
+#'   For MS/NMR data, use "trelli_abundance_heatmap".
+#'
+#' @param trelliData A trelliscope data object made by as.trelliData, and
+#'   grouped by an emeta variable. Required.
+#' @param cognostics A vector of cognostic options. Defaults are "sample count", 
+#'   "mean LCPM" and "biomolecule count". "sample count" and "mean LCPM"
+#'   are reported per group, and "biomolecule count" is the total number of biomolecules
+#'   in the biomolecule class (e_meta column).
+#' @param ggplot_params An optional vector of strings of ggplot parameters to
+#'   the backend ggplot function. For example, c("ylab('')", "xlab('')").
+#'   Default is NULL.
+#' @param interactive A logical argument indicating whether the plots should be
+#'   interactive or not. Interactive plots are ggplots piped to ggplotly. Default is FALSE.
+#' @param path The base directory of the trelliscope application. Default is
+#'   Downloads.
+#' @param name The name of the display. Default is Trelliscope
+#' @param test_mode A logical to return a smaller trelliscope to confirm plot
+#'   and design. Default is FALSE.
+#' @param test_example A vector of plot indices to return for test_mode. Default
+#'   is 1.
+#' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a
+#'   trelliscope) should be returned. Default is FALSE.
+#' @param ... Additional arguments to be passed on to the trelli builder
+#'
+#' @examples
+#' \dontrun{
+#' 
+#' # Build the RNA-seq heatmap with an omicsData object with emeta variables. Generate trelliData in as.trelliData.
+#' trelli_panel_by(trelliData = trelliData_seq2, panel = "Gene") %>% 
+#'    trelli_rnaseq_heatmap(test_mode = TRUE, test_example = c(1532, 1905, 6134))
+#'    
+#' # Users can modify the plotting function with ggplot parameters and interactivity, 
+#' # and can also select certain cognostics.     
+#' trelli_panel_by(trelliData = trelliData_seq4, panel = "Gene") %>% 
+#'    trelli_rnaseq_heatmap(test_mode = TRUE, test_example = c(1532, 1905, 6134), 
+#'      ggplot_params = c("ylab('')", "xlab('')"), interactive = TRUE, cognostics = c("biomolecule count"))  
+#'    
+#' }
+#' @author David Degnan, Lisa Bramer
+#'
+#' @export
+trelli_rnaseq_heatmap <- function(trelliData,
+                                  cognostics = c("sample count", "mean LCPM", "biomolecule count"),
+                                  ggplot_params = NULL,
+                                  interactive = FALSE,
+                                  path = .getDownloadsFolder(),
+                                  name = "Trelliscope",
+                                  test_mode = FALSE,
+                                  test_example = 1,
+                                  single_plot = FALSE,
+                                  ...) {
+  # Run initial checks----------------------------------------------------------
+  
+  # Run generic checks 
+  trelli_precheck(trelliData = trelliData, 
+                  trelliCheck = "omics",
+                  cognostics = cognostics,
+                  acceptable_cognostics = c("sample count", "mean LCPM", "biomolecule count"),
+                  ggplot_params = ggplot_params,
+                  interactive = interactive,
+                  test_mode = test_mode, 
+                  test_example = test_example,
+                  single_plot = single_plot,
+                  seqDataCheck = "required",
+                  seqText = "Use trelli_abundance_heatmap instead.",
+                  p_value_thresh = NULL)
+  
+  # Round test example to integer 
+  if (test_mode) {
+    test_example <- unique(abs(round(test_example)))
+  }
+  
+  # Check that group data is grouped by an e_meta variable
+  if (attr(trelliData, "panel_by_omics") %in% attr(trelliData, "emeta_col") == FALSE) {
+    stop("trelliData must be paneled_by an e_meta column.")
+  }
+  
+  # If no group designation, set cognostics to NULL.
+  if (is.null(attributes(trelliData$omicsData)$group_DF)) {
+    cognostics <- NULL
+  }
+  
+  # Get the edata variable name
+  edata_cname <- get_edata_cname(trelliData$omicsData)
+  
+  # Make heatmap function-------------------------------------------------------
+  
+  # First, generate the heatmap function
+  hm_plot_fun <- function(DF, title) {
+    # Get fdata_cname
+    fdata_cname <- get_fdata_cname(trelliData$omicsData)
+    
+    # If group designation was set, then convert Group to a factor variable
+    if (!is.null(attributes(trelliData$omicsData)$group_DF)) {
+      theLevels <- attr(trelliData$omicsData, "group_DF") %>%
+        dplyr::arrange(Group) %>%
+        dplyr::select(dplyr::all_of(fdata_cname)) %>%
+        unlist()
+      DF[, fdata_cname] <- factor(unlist(DF[, fdata_cname]), levels = theLevels)
+    } else {
+      DF[, fdata_cname] <- as.factor(unlist(DF[, fdata_cname]))
+    }
+    
+    # Build plot: this should be edata_cname
+    hm <- ggplot2::ggplot(DF, ggplot2::aes(x = as.factor(.data[[edata_cname]]), y = .data[[fdata_cname]], fill = LCPM)) +
+      ggplot2::geom_tile() +
+      ggplot2::theme_bw() +
+      ggplot2::ylab("Sample") +
+      ggplot2::xlab("Biomolecule") +
+      ggplot2::theme(
+        plot.title = ggplot2::element_text(hjust = 0.5),
+        axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust = 1)
+      ) +
+      ggplot2::scale_fill_gradient(low = "blue", high = "red", na.value = "white") +
+      ggplot2::ggtitle(title)
+    
+    # Add additional parameters
+    if (!is.null(ggplot_params)) {
+      for (param in ggplot_params) {
+        hm <- hm + eval(parse(text = paste0("ggplot2::", param)))
+      }
+    }
+    
+    # If interactive, pipe to ggplotly
+    if (interactive) {
+      hm <- hm %>% plotly::ggplotly()
+    }
+    
+    return(hm)
+  }
+  
+  # Create cognostic function---------------------------------------------------
+  
+  hm_cog_fun <- function(DF, emeta_var) {
+    
+    
+    # Adjust names
+    if ("sample count" %in% cognostics) {cognostics[grepl("sample count", cognostics)] <- "Sample Non-Zero Count"}
+    if ("biomolecule count" %in% cognostics) {cognostics[grepl("biomolecule count", cognostics)] <- "Biomolecule Non-Zero Count"}
+    
+    # Subset down the dataframe down to group, unnest the dataframe,
+    # pivot_longer to comparison, subset columns to requested statistics,
+    # switch name to a more specific name
+    cogs_to_add <- DF %>%
+      dplyr::group_by(Group) %>%
+      dplyr::summarise(
+        "Sample Non-Zero Count" = sum(Count != 0), 
+        "mean LCPM" = round(mean(LCPM, na.rm = TRUE), 4),
+      ) %>%
+      tidyr::pivot_longer(c(`Sample Non-Zero Count`, `mean LCPM`)) %>%
+      dplyr::filter(name %in% cognostics) %>%
+      dplyr::mutate(name = paste(Group, name)) %>%
+      dplyr::ungroup() %>%
+      dplyr::select(-Group) 
+    
+    if ("Biomolecule Non-Zero Count" %in% cognostics) {
+      cogs_to_add <- rbind(
+        cogs_to_add, 
+        data.frame(
+          name = "Biomolecule Non-Zero Count",
+          value = DF[[edata_cname]] %>% unique() %>% length()
+        )
+      )
+    }
+    
+    # Add new cognostics 
+    cog_to_trelli <- do.call(cbind, lapply(1:nrow(cogs_to_add), function(row) {
+      quick_cog(cogs_to_add$name[row], cogs_to_add$value[row])
+    })) %>% dplyr::tibble()
+    
+    return(cog_to_trelli)
+  }
+  
+  # Build trelliscope display---------------------------------------------------
+  
+  # Return a single plot if single_plot is TRUE
+  if (single_plot) {
+    singleData <- trelliData$trelliData.omics[test_example[1], ]
+    return(hm_plot_fun(singleData$Nested_DF[[1]], unlist(singleData[1, 1])))
+  } else {
+    # If test_mode is on, then just build the required panels
+    if (test_mode) {
+      toBuild <- trelliData$trelliData.omics[test_example, ]
+    } else {
+      toBuild <- trelliData$trelliData.omics
+    }
+    
+    # Pass parameters to trelli_builder function
+    trelli_builder(toBuild = toBuild,
+                   cognostics = cognostics, 
+                   plotFUN = hm_plot_fun,
+                   cogFUN = hm_cog_fun,
+                   path = path,
+                   name = name,
+                   remove_nestedDF = FALSE,
+                   ...) 
+    
+  }
+}
