@@ -985,7 +985,7 @@ trelli_abundance_heatmap <- function(trelliData,
 #'                          cognostics = c("observed proportion", "g-test p-value"))
 #' 
 #' # Build the missingness bar plot with an omicsData and statRes object. Generate trelliData in as.trelliData.
-#' trelli_panel_by(trelliData = trelliData4, panel = "Peptide") %>%
+#' trelli_panel_by(trelliData = trelliData4, panel = "RazorProtein") %>%
 #'   trelli_missingness_bar(test_mode = TRUE, test_example = 1:10) 
 #' 
 #' # Or making the plot interactive 
@@ -1068,8 +1068,8 @@ trelli_missingness_bar <- function(trelliData,
         merge(totalCounts, by = "Group") %>%
         dplyr::mutate(
           `Absent Count` = Total - `Present Count`,
-          `Absent Proportion` = `Absent Count` / Total,
-          `Present Proportion` = `Present Count` / Total
+          `Absent Proportion` = round(`Absent Count` / Total, 4),
+          `Present Proportion` = round(`Present Count` / Total, 4)
         ) %>%
         dplyr::select(-Total) %>%
         dplyr::mutate(Group, `Absent Count`, `Present Count`, `Absent Proportion`, `Present Proportion`)

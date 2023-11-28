@@ -20,7 +20,8 @@ trelli_rnaseq_boxplot(
 }
 \arguments{
 \item{trelliData}{A trelliscope data object made by as.trelliData or
-as.trelliData.edata, and grouped by trelli_panel_by. Required.}
+as.trelliData.edata, and grouped by trelli_panel_by. Must be built using 
+seqData. Required.}
 
 \item{cognostics}{A vector of cognostic options for each plot. Valid entries
 are "count", "mean lcpm", "median lcpm", and "cv lcpm". 

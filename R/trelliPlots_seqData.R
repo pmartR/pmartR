@@ -8,7 +8,8 @@
 #'   for MS/NMR-based omics. 
 #'
 #' @param trelliData A trelliscope data object made by as.trelliData or
-#'   as.trelliData.edata, and grouped by trelli_panel_by. Required.
+#'   as.trelliData.edata, and grouped by trelli_panel_by. Must be built using 
+#'   seqData. Required.
 #' @param cognostics A vector of cognostic options for each plot. Valid entries
 #'   are "count", "mean lcpm", "median lcpm", and "cv lcpm". 
 #'   If data are paneled by a biomolecule, the count will be "sample count".
@@ -335,7 +336,7 @@ trelli_rnaseq_boxplot <- function(trelliData,
 #'   edata_cname. For MS/NMR data, use "trelli_abundance_histogram". 
 #' @param trelliData A trelliscope data object made by as.trelliData or
 #'   as.trelliData.edata, and grouped by edata_cname in trelli_panel_by.
-#'   Required.
+#'   Must be built using seqData. Required.
 #' @param cognostics A vector of cognostic options for each plot. Valid entries
 #'   are "sample count", "mean lcpm", "median lcpm", "cv lcpm", 
 #'   and "skew lcpm". All are included by default. 
@@ -513,7 +514,7 @@ trelli_rnaseq_histogram <- function(trelliData,
 #'   For MS/NMR data, use "trelli_abundance_heatmap".
 #'
 #' @param trelliData A trelliscope data object made by as.trelliData, and
-#'   grouped by an emeta variable. Required.
+#'   grouped by an emeta variable. Must be built using seqData. Required.
 #' @param cognostics A vector of cognostic options. Defaults are "sample count", 
 #'   "mean LCPM" and "biomolecule count". "sample count" and "mean LCPM"
 #'   are reported per group, and "biomolecule count" is the total number of biomolecules
@@ -706,6 +707,353 @@ trelli_rnaseq_heatmap <- function(trelliData,
                    name = name,
                    remove_nestedDF = FALSE,
                    ...) 
+    
+  }
+}
+
+#' @name trelli_rnaseq_nonzero_bar
+#'
+#' @title Bar chart trelliscope building function for Non-Zero counts in RNA-seq data
+#'
+#' @description Specify a plot design and cognostics for the Non-Zero barchart
+#'    trelliscope. Non-Zeroes are displayed per panel_by variable. Main_effects
+#'    data is used to split samples when applicable. For MS/NMR data, use 
+#'    "trelli missingness bar". 
+#'
+#' @param trelliData A trelliscope data object made by as.trelliData.edata or
+#'    as.trelliData. Must be built using seqData. Required.
+#' @param cognostics A vector of cognostic options for each plot. Defaults are "total count",
+#'    "non-zero count", and "non-zero proportion". If grouping
+#'    data is included, all cognostics will be reported per group. If the 
+#'    trelliData is paneled by a biomolecule, the counts and proportion we be 
+#'    samples. If paneled by a sample or biomolecule class, the counts and proportions
+#'    will be biomolecules.
+#' @param proportion A logical to determine whether plots should display counts
+#'    or proportions. Default is TRUE.
+#' @param ggplot_params An optional vector of strings of ggplot parameters to
+#'    the backend ggplot function. For example, c("ylab('')", "xlab('')").
+#'    Default is NULL.
+#' @param interactive A logical argument indicating whether the plots should be
+#'    interactive or not. Interactive plots are ggplots piped to ggplotly (for
+#'    now). Default is FALSE.
+#' @param path The base directory of the trelliscope application. Default is
+#'    Downloads.
+#' @param name The name of the display. Default is Trelliscope.
+#' @param test_mode A logical to return a smaller trelliscope to confirm plot
+#'    and design. Default is FALSE.
+#' @param test_example A vector of plot indices to return for test_mode. Default
+#'    is 1.
+#' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a
+#'    trelliscope) should be returned. Default is FALSE.
+#' @param ... Additional arguments to be passed on to the trelli builder
+#'   
+#' @examples
+#' \dontrun{
+#' 
+#' # Build the non-zero bar plot with an edata file. Generate trelliData in as.trelliData.edata
+#' trelli_panel_by(trelliData = trelliData_seq1, panel = "Transcript") %>% 
+#'   trelli_rnaseq_nonzero_bar(test_mode = TRUE, test_example = 1:10)
+#' trelli_panel_by(trelliData = trelliData_seq1, panel = "Sample") %>% 
+#'   trelli_rnaseq_nonzero_bar(test_mode = TRUE, test_example = 1:10, cognostics = "non-zero proportion")
+#' 
+#' # Build the non-zero bar plot with an omicsData object. Generate trelliData in as.trelliData
+#' trelli_panel_by(trelliData = trelliData_seq2, panel = "Transcript") %>% 
+#'   trelli_rnaseq_nonzero_bar(test_mode = TRUE, test_example = 1:10)
+#' 
+#' # Build the non-zero bar plot with a statRes object. Generate trelliData in as.trelliData
+#' trelli_panel_by(trelliData = trelliData_seq3, panel = "Transcript") %>%
+#'   trelli_rnaseq_nonzero_bar(test_mode = TRUE, test_example = 1:10,
+#'                          cognostics = c("non-zero proportion"))
+#' 
+#' # Build the non-zero bar plot with an omicsData and statRes object. Generate trelliData in as.trelliData.
+#' trelli_panel_by(trelliData = trelliData_seq4, panel = "Gene") %>%
+#'   trelli_rnaseq_nonzero_bar(test_mode = TRUE, test_example = 1:10) 
+#' 
+#' # Or making the plot interactive 
+#' trelli_panel_by(trelliData = trelliData_seq2, panel = "Transcript") %>% 
+#'    trelli_rnaseq_nonzero_bar(test_mode = TRUE, test_example = 1:5, interactive = TRUE)
+#'    
+#' # Or visualize only count data 
+#' trelli_panel_by(trelliData = trelliData_seq2, panel = "Transcript") %>% 
+#'    trelli_rnaseq_nonzero_bar(test_mode = TRUE, test_example = 1:5, cognostics = "non-zero count", proportion = FALSE)
+#'    
+#' }
+#'
+#' @author David Degnan, Lisa Bramer
+#'
+#' @export
+trelli_rnaseq_nonzero_bar <- function(trelliData,
+                                   cognostics = c("total count", "non-zero count", "non-zero proportion"),
+                                   proportion = TRUE,
+                                   ggplot_params = NULL,
+                                   interactive = FALSE,
+                                   path = .getDownloadsFolder(),
+                                   name = "Trelliscope",
+                                   test_mode = FALSE,
+                                   test_example = 1,
+                                   single_plot = FALSE,
+                                   ...) {
+  # Run initial checks----------------------------------------------------------
+  
+  # Run generic checks 
+  trelli_precheck(trelliData = trelliData, 
+                  trelliCheck = c("either"),
+                  cognostics = cognostics,
+                  acceptable_cognostics = c("total count", "non-zero count", "non-zero proportion"),
+                  ggplot_params = ggplot_params,
+                  interactive = interactive,
+                  test_mode = test_mode, 
+                  test_example = test_example,
+                  single_plot = single_plot,
+                  seqDataCheck = "required",
+                  seqText = "Use trelli_missingness_bar instead.",
+                  p_value_thresh = NULL)
+  
+  # Check that proportion is a non NA logical
+  if (!is.logical(proportion) | is.na(proportion)) {
+    stop("proportion must be a TRUE or FALSE.")
+  }
+  
+  # Round test example to integer 
+  if (test_mode) {
+    test_example <- unique(abs(round(test_example)))
+  }
+  
+  # Determine if the trelliData is paneled by the edata column
+  if (is.na(attr(trelliData, "panel_by_omics"))) {
+    paneled_by_edata <- attr(trelliData, "panel_by_stat") == get_edata_cname(trelliData$statRes)
+  } else {
+    paneled_by_edata <- attr(trelliData, "panel_by_omics") == get_edata_cname(trelliData$omicsData)
+  }
+  
+  # Generate a function to make nonzero dataframes------------------------------
+  get_nonzero_DF <- function(DF) {
+    
+    # If there is no omics data, use statRes
+    if (is.null(trelliData$omicsData)) {
+      
+      # Add to total counts
+      NonZero <- data.table::data.table(
+        Group = gsub("NonZero_Count_", "", colnames(DF)),
+        `Non-Zero Count` = unlist(DF)
+      ) %>%
+        merge(totalCounts, by = "Group") %>%
+        dplyr::mutate(
+          `Zero Count` = Total - `Non-Zero Count`,
+          `Zero Proportion` = round(`Zero Count` / Total, 4),
+          `Non-Zero Proportion` = round(`Non-Zero Count` / Total, 4)
+        ) %>%
+        dplyr::select(-Total) %>%
+        dplyr::mutate(Group, `Zero Count`, `Non-Zero Count`, `Zero Proportion`, `Non-Zero Proportion`)
+    
+      } else {
+      
+      # Add a blank group if no group designation was given
+      if (is.null(attributes(trelliData$omicsData)$group_DF)) {
+        DF$Group <- "x"
+      }
+      
+      # Create nonzero data.frame
+      NonZero <- DF %>%
+        dplyr::group_by(Group) %>%
+        dplyr::summarise(
+          `Zero Count` = sum(Count == 0),
+          `Non-Zero Count` = sum(Count != 0),
+          `Zero Proportion` = round(`Zero Count` / sum(c(`Zero Count`, `Non-Zero Count`)), 4),
+          `Non-Zero Proportion` = round(`Non-Zero Count` / sum(c(`Zero Count`, `Non-Zero Count`)), 4)
+        )
+    }
+    
+    return(NonZero)
+  }
+  
+  # Make nonzero bar function---------------------------------------------------
+  
+  # First, generate the boxplot function
+  nonzero_bar_plot_fun <- function(DF, title) {
+    
+    # Get non-zero dataframe
+    NonZero <- get_nonzero_DF(DF)
+    
+    # Subset based on count or proportion
+    if (proportion) {
+      NZPlotDF <- NonZero %>%
+        dplyr::select(c(Group, `Zero Proportion`, `Non-Zero Proportion`)) %>%
+        dplyr::rename(Zero = `Zero Proportion`, `Non-Zero` = `Non-Zero Proportion`) %>%
+        tidyr::pivot_longer(c(Zero, `Non-Zero`)) %>%
+        dplyr::mutate(name = factor(name, levels = c("Zero", "Non-Zero")))
+      ylab <- "Proportion"
+    } else {
+      NZPlotDF <- NonZero %>%
+        dplyr::select(c(Group, `Zero Count`, `Non-Zero Count`)) %>%
+        dplyr::rename(Zero = `Zero Count`, `Non-Zero` = `Non-Zero Count`) %>%
+        tidyr::pivot_longer(c(Zero, `Non-Zero`)) %>%
+        dplyr::mutate(name = factor(name, levels = c("Zero", "Non-Zero")))
+      ylab <- "Count"
+    }
+    
+    # Build plot
+    zero_bar <- ggplot2::ggplot(NZPlotDF, ggplot2::aes(x = Group, y = value, fill = name)) +
+      ggplot2::geom_bar(stat = "identity", position = "stack", color = "black") +
+      ggplot2::theme_bw() +
+      ggplot2::ggtitle(title) +
+      ggplot2::ylab(ylab) +
+      ggplot2::scale_fill_manual(values = c("Non-Zero" = "steelblue", "Zero" = "black")) +
+      ggplot2::theme(
+        plot.title = ggplot2::element_text(hjust = 0.5),
+        legend.title = ggplot2::element_blank()
+      )
+    
+    # Remove x axis if no groups
+    if (is.null(attributes(trelliData$omicsData)$group_DF) & stats_mode == FALSE) {
+      zero_bar <- zero_bar + ggplot2::theme(
+        axis.title.x = ggplot2::element_blank(),
+        axis.ticks.x = ggplot2::element_blank(),
+        axis.text.x = ggplot2::element_blank()
+      )
+    }
+    
+    # Add additional parameters
+    if (!is.null(ggplot_params)) {
+      for (param in ggplot_params) {
+        zero_bar <- zero_bar + eval(parse(text = paste0("ggplot2::", param)))
+      }
+    }
+    
+    # If interactive, pipe to ggplotly
+    if (interactive) {
+      zero_bar <- zero_bar %>% plotly::ggplotly()
+    }
+    
+    return(zero_bar)
+  }
+  
+  # Create the cognostic function-----------------------------------------------
+  
+  # Next, generate the cognostic function
+  nonzero_bar_cog_fun <- function(DF, GroupingVar) {
+    
+    # Get nonzero dataframe
+    NonZero <- get_nonzero_DF(DF)
+    
+    # Build cognostics
+    NZ_Cog <- NonZero %>%
+      dplyr::mutate(`total count` = `Non-Zero Count` + `Zero Count`) %>%
+      dplyr::select(-c(`Zero Count`, `Zero Proportion`)) %>%
+      dplyr::rename(`non-zero count` = `Non-Zero Count`, `non-zero proportion` = `Non-Zero Proportion`) %>%
+      tidyr::pivot_longer(c(`non-zero count`, `non-zero proportion`, `total count`)) %>%
+      dplyr::filter(name %in% cognostics)
+    
+    # Expand the name depending on whether the counts are samples or biomolecules
+    if (paneled_by_edata & nrow(NZ_Cog) > 0) {
+      NZ_Cog <- NZ_Cog %>% 
+        dplyr::mutate(
+          name = lapply(name, function(x) {
+            splitNames <- strsplit(x, " ") %>% unlist()
+            return(paste(splitNames[1], "sample", splitNames[2]))
+          }) %>% unlist()
+        )
+    } else if (nrow(NZ_Cog) > 0) {
+      NZ_Cog <- NZ_Cog %>% 
+        dplyr::mutate(
+          name = lapply(name, function(x) {
+            splitNames <- strsplit(x, " ") %>% unlist()
+            return(paste(splitNames[1], "biomolecule", splitNames[2]))
+          }) %>% unlist()
+        )
+    }
+    
+    # Add grouping data if there's more than one group 
+    if (length(unique(NZ_Cog$Group)) > 1) {
+      NZ_Cog <- NZ_Cog %>% dplyr::mutate(name = paste(Group, name))
+    }
+    
+    # Remove group column
+    NZ_Cog <- NZ_Cog %>% dplyr::select(c(name, value))
+    
+    # Return NULL if there's no cognostics 
+    if (nrow(NZ_Cog) == 0) {
+      return(NULL)
+    }
+    
+    # Generate cognostics 
+    cog_to_trelli <- do.call(cbind, lapply(1:nrow(NZ_Cog), function(row) {
+      quick_cog(name = NZ_Cog$name[row], value = NZ_Cog$value[row])
+    })) %>% dplyr::tibble()
+    
+    return(cog_to_trelli)
+  }
+  
+  # Build trelliscope display---------------------------------------------------
+  
+  # If test_mode is on, then just build the required panels. If the data is statRes, we
+  # will need to restructure the data a bit.
+  if (!is.null(trelliData$trelliData.omics)) {
+    stats_mode <- FALSE
+    if (test_mode) {
+      toBuild <- trelliData$trelliData.omics[test_example, ]
+    } else {
+      toBuild <- trelliData$trelliData.omics
+    }
+  } else {
+    stats_mode <- TRUE
+    
+    # Get the edata column name
+    edata_cname <- get_edata_cname(trelliData$statRes)
+    
+    # Get the columns with counts
+    count_cols <- colnames(trelliData$statRes)[grepl("Count", colnames(trelliData$statRes))]
+    
+    # Build toBuild dataframe
+    toBuild <- trelliData$statRes %>%
+      dplyr::select(c(edata_cname, count_cols)) %>%
+      dplyr::group_by(!!dplyr::sym(edata_cname)) %>%
+      tidyr::nest() %>%
+      dplyr::ungroup() %>%
+      dplyr::rename(Nested_DF = data) 
+    
+    # Save total counts 
+    totalCounts <- attr(trelliData$statRes, "group_DF")$Group %>% 
+      table(dnn = "Group") %>% 
+      data.frame() %>% 
+      dplyr::rename(Total = Freq)
+    
+    if (test_mode) {
+      toBuild <- toBuild[test_example, ]
+    }
+  }
+  
+  # Return a single plot if single_plot is TRUE
+  if (single_plot) {
+    singleData <- toBuild[test_example[1], ]
+    return(nonzero_bar_plot_fun(singleData$Nested_DF[[1]], unlist(singleData[1, 1])))
+  } else {
+    # Pass parameters to trelli_builder function
+    if (!is.null(trelliData$omicsData)) {
+      
+      trelli_builder(toBuild = toBuild,
+                     cognostics = cognostics, 
+                     plotFUN = nonzero_bar_plot_fun,
+                     cogFUN = nonzero_bar_cog_fun,
+                     path = path,
+                     name = name,
+                     remove_nestedDF = FALSE,
+                     ...)
+      
+      
+    } else {
+      
+      trelli_builder(toBuild = toBuild,
+                     cognostics = cognostics, 
+                     plotFUN = nonzero_bar_plot_fun,
+                     cogFUN = nonzero_bar_cog_fun,
+                     path = path,
+                     name = name,
+                     remove_nestedDF = TRUE,
+                     ...)
+      
+    }
+    
     
   }
 }
