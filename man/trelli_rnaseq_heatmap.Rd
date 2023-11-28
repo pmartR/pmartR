@@ -19,7 +19,7 @@ trelli_rnaseq_heatmap(
 }
 \arguments{
 \item{trelliData}{A trelliscope data object made by as.trelliData, and
-grouped by an emeta variable. Required.}
+grouped by an emeta variable. Must be built using seqData. Required.}
 
 \item{cognostics}{A vector of cognostic options. Defaults are "sample count", 
 "mean LCPM" and "biomolecule count". "sample count" and "mean LCPM"

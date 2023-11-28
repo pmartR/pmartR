@@ -30,10 +30,6 @@ trelliData <- as.trelliData.edata(e_data = pep_edata,
                                    edata_cname = "Peptide",
                                    omics_type = "pepData")
 
-###########################
-## MS/NMR OMICS EXAMPLES ##
-###########################
-
 # Use an edata example. Build with as.trelliData.edata.
 summary(trelliData)
 summary(trelliData \%>\% trelli_panel_by("Peptide"))
