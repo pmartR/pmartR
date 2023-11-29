@@ -48,6 +48,8 @@ be returned}
 seqData cannot be used at all, "permissible" means that seqData can be used, 
 and "required" means that seqData is required for the plotting function.}
 
+\item{seqText}{Text that should appear when seqDataCheck is violated.}
+
 \item{p_value_skip}{Whether to skip specific p_value checks.}
 
 \item{p_value_thresh}{The user provided threshold for plotting significant

@@ -6,7 +6,7 @@
 \usage{
 trelli_foldchange_bar(
   trelliData,
-  cognostics = c("fold change", "anova p-value"),
+  cognostics = c("fold change", "p-value"),
   p_value_thresh = 0.05,
   ggplot_params = NULL,
   interactive = FALSE,
@@ -22,7 +22,9 @@ trelli_foldchange_bar(
 \item{trelliData}{A trelliscope data object with statRes results. Required.}
 
 \item{cognostics}{A vector of cognostic options for each plot. Valid entries
-and the defaults are "fold change" and "anova p-value".}
+and the defaults are "fold change" and "p-value". If the omics data is MS/NMR,
+p-value will be the results from the ANOVA test. If the omics data is sedData,
+the p-value will be the results from the function "diffexp_seq".}
 
 \item{p_value_thresh}{A value between 0 and 1 to indicate significant
 biomolecules for p_value_test. Default is 0.05.}
@@ -58,16 +60,31 @@ Specify a plot design and cognostics for the fold_change
 \examples{
 \dontrun{
 
+###########################
+## MS/NMR OMICS EXAMPLES ##
+###########################
+
 # Build fold_change bar plot with statRes data grouped by edata_colname.
 trelli_panel_by(trelliData = trelliData3, panel = "Peptide") \%>\% 
   trelli_foldchange_bar(test_mode = TRUE, test_example = 1:10)
   
 # Or make the plot interactive  
 trelli_panel_by(trelliData = trelliData4, panel = "Peptide") \%>\% 
-  trelli_foldchange_bar(test_mode = TRUE, test_example = 1:10, interactive = TRUE) 
+  trelli_foldchange_bar(test_mode = TRUE, test_example = 1:10, interactive = TRUE, cognostics = "p-value") 
    
-}
+######################
+## RNA-SEQ EXAMPLES ##
+######################
 
+# Build fold_change bar plot with statRes data grouped by edata_colname.
+trelli_panel_by(trelliData = trelliData_seq3, panel = "Transcript") \%>\% 
+  trelli_foldchange_bar(test_mode = TRUE, test_example = 1:10)
+  
+# Or make the plot interactive  
+trelli_panel_by(trelliData = trelliData_seq4, panel = "Transcript") \%>\% 
+  trelli_foldchange_bar(test_mode = TRUE, test_example = 1:10, interactive = TRUE, cognostics = "fold change") 
+
+}
 }
 \author{
 David Degnan, Lisa Bramer

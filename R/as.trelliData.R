@@ -513,7 +513,7 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL) {
     ms_obj <- any(grepl("P_value_A|P_value_G", colnames(statRes)))
     
     if (ms_obj) {
-    
+      
       # Pivot longer so that the first column is the edata_cname, extract comparison,
       # panel_by comparison, nest dataframes, and then extract the p_value and fold_change
       # for each group. Split p-values by the ANOVA or the g-test. 
@@ -523,7 +523,7 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL) {
         dplyr::mutate(
           Comparison = gsub("P_value_A_|P_value_G_|Fold_change_", "", name),
           Metric = ifelse(grepl("P_value_A", name), "p_value_anova", 
-                   ifelse(grepl("P_value_A", name), "p_value_gtest", "fold_change"))
+                   ifelse(grepl("P_value_G", name), "p_value_gtest", "fold_change"))
         ) %>%
         dplyr::select(-name) %>%
         dplyr::group_by(dplyr::across(c(Comparison, !!dplyr::sym(edata_cname)))) %>%
