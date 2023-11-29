@@ -214,7 +214,7 @@ summary.trelliData <- function(object, ...) {
     All_Options <- All_Options %>%
       dplyr::filter(`Panel By Choice` == panel_by_choice) %>%
       dplyr::select(-`Data Type`) %>%
-      dplyr::mutate(`Number of Plots` = count %>% as.character()) %>%
+      dplyr::mutate(`Number of Plots` = count %>% as.numeric()) %>%
       dplyr::mutate(`Panel By Choice` = Grouped)
   }
 
