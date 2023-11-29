@@ -853,7 +853,7 @@ trelli_pvalue_filter <- function(trelliData,
     # Ensure that comparison is from the comparisons lists
     Comparisons <- attr(trelliData$statRes, "comparisons")
     if (comparison %in% Comparisons == FALSE) {
-      stop(paste0(comparison, "is not an acceptable comparison"))
+      stop(paste0(comparison, " is not an acceptable comparison"))
     }
   }
   
