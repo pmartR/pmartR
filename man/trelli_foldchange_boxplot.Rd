@@ -88,7 +88,6 @@ trelli_panel_by(trelliData = trelliData4, panel = "RazorProtein") \%>\%
 # Build fold_change box plot with statRes data grouped by edata_colname.
 trelli_panel_by(trelliData = trelliData_seq4, panel = "Gene") \%>\% 
   trelli_foldchange_boxplot(test_mode = TRUE, 
-                            p_value_thresh = 0.10, 
                             test_example = c(16823, 16890, 17680, 17976, 17981, 19281),
                             cognostics = c("biomolecule count", 
                                            "proportion significant", 

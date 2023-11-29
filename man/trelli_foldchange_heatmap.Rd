@@ -24,10 +24,12 @@ results. Required.}
 
 \item{cognostics}{A vector of cognostic options for each plot. Valid entries are 
 "biomolecule count", "proportion significant", "mean fold change",
-and "sd fold change". Default is "biomolecule count"}
+and "sd fold change". Default is "biomolecule count". If the omics data is MS/NMR, 
+the biomolecule count will count present biomolecules. If the omics data is sedData, 
+the biomolecule count will count Non-Zero transcripts.}
 
-\item{p_value_thresh}{A value between 0 and 1 to indicate significant
-biomolecules for p_value_test. Default is 0.05.}
+\item{p_value_thresh}{A value between 0 and 1 to indicate significant biomolecules 
+for the anova (MS/NMR) or diffexp_seq (RNA-seq) test. Default is 0.05.}
 
 \item{ggplot_params}{An optional vector of strings of ggplot parameters to
 the backend ggplot function. For example, c("ylab('')", "xlab('')").
@@ -61,10 +63,23 @@ Specify a plot design and cognostics for the fold_change heatmap
 \examples{
 \dontrun{ 
 
+##########################
+## MS/NMR OMICS EXAMPLE ##
+##########################
+
 # Build fold_change bar plot with statRes data grouped by edata_colname.
 trelli_panel_by(trelliData = trelliData4, panel = "RazorProtein") \%>\% 
   trelli_foldchange_heatmap(test_mode = TRUE, 
                             test_example = 1:10)
+                            
+#####################
+## RNA-SEQ EXAMPLE ##                             
+#####################
+
+# Build fold_change bar plot with statRes data grouped by edata_colname.
+trelli_panel_by(trelliData = trelliData_seq4, panel = "Gene") \%>\% 
+  trelli_foldchange_heatmap(test_mode = TRUE, 
+                            test_example = c(16823, 16890, 17680, 17976, 17981, 19281))
 
 }
 
