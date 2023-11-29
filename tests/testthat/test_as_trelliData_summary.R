@@ -1,6 +1,11 @@
 context("summary: trelliData edata and trelliData")
 
 test_that("trelliData object summaries return the correct data frames", {
+  
+  ##################
+  ## MS/NMR TESTS ##
+  ##################
+  
   # Load: peptide expression data-----------------------------------------------
 
   load(system.file('testdata',
@@ -77,4 +82,29 @@ test_that("trelliData object summaries return the correct data frames", {
   expect_equal(4, nrow(pepSumEdata))
   expect_equal(2, nrow(pepSumFdata))
   expect_equal(6, nrow(pepSumEmeta))
+  
+  ###################
+  ## RNA-SEQ TESTS ##
+  ###################
+  
+  # Load: seqData expression data-----------------------------------------------
+  
+  load(system.file('testdata',
+                   'little_seqdata.RData',
+                   package = 'pmartR'
+  ))
+  
+  seqData_omics <- as.seqData(e_data = edata, f_data = fdata, edata_cname = "ID_REF", fdata_cname = "Samples")
+  seqData_omics <- group_designation(seqData_omics, main_effects = "Tissue")
+  seqData_omics <- applyFilt(filter_object = total_count_filter(omicsData = seqData_omics), omicsData = seqData_omics, min_count = 15)
+  seqData_stat <- diffexp_seq(omicsData = seqData_omics, method = "voom")
+  
+  
+  # Test: seqData expression data-----------------------------------------------
+  
+  seqSummary <- as.trelliData(omicsData = seqData_omics, statRes = seqData_stat) %>% summary()
+  
+  # No abundance plots should be suggested in summary
+  expect_true(any(grepl("abundance", seqSummary$Plot)) == FALSE)
+  
 })
