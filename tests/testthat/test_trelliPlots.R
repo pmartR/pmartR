@@ -54,8 +54,25 @@ test_that("trelliPlots check the correct inputs", {
     p_value_anova = 0.7,
     fold_change = NaN
   )
-  expect_null(pmartR:::determine_significance(ds_test, 0.05))
-
+  expect_null(pmartR:::determine_significance(ds_test, 0.05, is_seq = FALSE))
+  
+  # Load RNA-seq data for testing-----------------------------------------------
+  
+  load(system.file('testdata',
+                   'little_seqdata.RData',
+                   package = 'pmartR'
+  ))
+  
+  emeta <- data.frame("ID_REF" = edata$ID_REF, "Classification" = paste("Class", rep(1:200, 6)))
+  seqData_omics <- as.seqData(e_data = edata, f_data = fdata, edata_cname = "ID_REF", fdata_cname = "Samples", e_meta = emeta, emeta_cname = "Classification")
+  seqData_omics <- group_designation(seqData_omics, main_effects = "Tissue")
+  seqData_omics <- applyFilt(filter_object = total_count_filter(omicsData = seqData_omics), omicsData = seqData_omics, min_count = 15)
+  seqData_stat <- diffexp_seq(omicsData = seqData_omics, method = "voom")
+  seqTrelli1 <- as.trelliData.edata(e_data = edata, edata_cname = "ID_REF", omics_type = "seqData")
+  seqTrelli2 <- as.trelliData(omicsData = seqData_omics)
+  seqTrelli3 <- as.trelliData(statRes = seqData_stat)
+  seqTrelli4 <- as.trelliData(omicsData = seqData_omics, statRes = seqData_stat)
+  
   # Test: trelli plotting functions---------------------------------------------
 
   ## trelli_abundance_boxplot
@@ -126,6 +143,18 @@ test_that("trelliPlots check the correct inputs", {
     "single_plot must be a TRUE or FALSE."
   )
 
+  # Expect a message that median and cv abundance have been removed
+  expect_message(
+    mtrelliData2 %>% trelli_panel_by("Metabolite") %>% trelli_abundance_boxplot(test_mode = TRUE, test_example = 1, cognostics = c("median abundance", "cv abundance")),
+    "'median abundance' and 'cv abundance' are not permitted when groups have been specified."
+  )
+  
+  # Expect a message that anova p-value and fold change have been removed 
+  expect_message(
+    mtrelliData4 %>% trelli_panel_by("MClass") %>% trelli_abundance_boxplot(test_mode = TRUE, test_example = 1, cognostics = c("anova p-value", "fold change")),
+    "Please panel by Metabolite to get 'anova p-value' and 'fold change' as cognostics in the trelliscope display."
+  )
+  
   # Blank biomolecules should be removed, and if no data, an error produced
   blankExample <- mtrelliData1 %>% trelli_panel_by("Metabolite")
   blankExample$trelliData.omics <- blankExample$trelliData.omics[1, ]
@@ -186,6 +215,42 @@ test_that("trelliPlots check the correct inputs", {
       cognostics = NULL
     ))
   expect_true(file.exists(file.path(testFolder, "BoxAbundanceTest3")))
+  
+  # Build a trelliscope that panels by MClass
+  suppressWarnings(mtrelliData5 %>% trelli_panel_by("MClass") %>%
+                     trelli_abundance_boxplot(
+                       path = file.path(testFolder, "BoxAbundanceTest4"),
+                       test_mode = TRUE,
+                       test_example = 1,
+                       cognostics = "count"
+                     ))
+  expect_true(file.exists(file.path(testFolder, "BoxAbundanceTest4")))
+  
+  # Build a trelliscope that returns anova p-value and fold change only
+  suppressWarnings(mtrelliData5 %>% trelli_panel_by("Metabolite") %>%
+                     trelli_abundance_boxplot(
+                       path = file.path(testFolder, "BoxAbundanceTest5"),
+                       test_mode = TRUE,
+                       test_example = 1,
+                       cognostics = c("anova p-value", "fold change")
+                     ))
+  expect_true(file.exists(file.path(testFolder, "BoxAbundanceTest5")))
+  
+  # Build a trelliscope that returns anova p-value, fold change, and count
+  suppressWarnings(mtrelliData5 %>% trelli_panel_by("Metabolite") %>%
+                     trelli_abundance_boxplot(
+                       path = file.path(testFolder, "BoxAbundanceTest6"),
+                       test_mode = TRUE,
+                       test_example = 1,
+                       cognostics = c("count", "anova p-value", "fold change")
+                     ))
+  expect_true(file.exists(file.path(testFolder, "BoxAbundanceTest6")))
+  
+  # Seq data is not allowed for this dataset
+  expect_error(
+    seqTrelli1 %>% trelli_panel_by("ID_REF") %>% trelli_abundance_boxplot(),
+    "seqData is not permitted for this plotting function. Use trelli_rnaseq_boxplot instead."
+  )
 
   ## trelli_abundance_histogram
 
@@ -201,11 +266,11 @@ test_that("trelliPlots check the correct inputs", {
     trelli_abundance_histogram(single_plot = TRUE)
   expect_true(inherits(abun_histplot, "ggplot"))
   
-  
+
   # Test that trelliscope builds when passed cognostic doesn't exist  
   suppressWarnings(mtrelliData1 %>% trelli_panel_by("Metabolite") %>% 
-    trelli_abundance_histogram(path = file.path(testFolder, "HistAbundanceTest1"),
-                               test_mode = TRUE, 
+     trelli_abundance_histogram(path = file.path(testFolder, "HistAbundanceTest1"),
+                                test_mode = TRUE, 
                                test_example = 2,
                                ggplot_params = "xlab('')",
                                cognostics = c("sample count", "cv abundance"),
@@ -229,7 +294,13 @@ test_that("trelliPlots check the correct inputs", {
       test_example = 3
     ))
   expect_true(file.exists(file.path(testFolder, "HistAbundanceTest3")))
-
+  
+  # Seq data is not allowed for this dataset
+  expect_error(
+    seqTrelli1 %>% trelli_panel_by("ID_REF") %>% trelli_abundance_histogram(),
+    "seqData is not permitted for this plotting function. Use trelli_rnaseq_histogram instead."
+  )
+  
   ## trelli_abundance_heatmap
 
   # Test that the data has been grouped by an emeta column
@@ -260,7 +331,13 @@ test_that("trelliPlots check the correct inputs", {
   suppressWarnings(nogroup %>%
     trelli_abundance_heatmap(path = file.path(testFolder, "HmAbundanceTest2")))
   expect_true(file.exists(file.path(testFolder, "HmAbundanceTest2")))
-
+  
+  # Seq data is not allowed for this dataset
+  expect_error(
+    seqTrelli4 %>% trelli_panel_by("Classification") %>% trelli_abundance_heatmap(),
+    "seqData is not permitted for this plotting function. Use trelli_rnaseq_heatmap instead."
+  )
+  
   ## trelli_missingness_bar
 
   # Trigger proportion check warning with something outrageous
@@ -293,6 +370,12 @@ test_that("trelliPlots check the correct inputs", {
   # Build a single plot
   miss_plot <- singlePlot %>% trelli_missingness_bar(single_plot = TRUE)
   expect_true(inherits(miss_plot, "ggplot"))
+  
+  # Seq data is not allowed for this dataset
+  expect_error(
+    seqTrelli1 %>% trelli_panel_by("ID_REF") %>% trelli_missingness_bar(),
+    "seqData is not permitted for this plotting function. Use trelli_rnaseq_nonzero_bar instead."
+  )
 
   ## trelli_foldchange_bar
 
@@ -337,7 +420,7 @@ test_that("trelliPlots check the correct inputs", {
   suppressWarnings(singleStatPlot %>%
      trelli_foldchange_bar(path = file.path(testFolder, "barFoldChangeTest1"),
                            ggplot_params = "ylab('')",
-                           cognostics = "anova p-value",
+                           cognostics = "p-value",
                            interactive = TRUE)
   )
   expect_true(file.exists(file.path(testFolder, "barFoldChangeTest1")))
@@ -463,7 +546,7 @@ test_that("trelliPlots check the correct inputs", {
       test_mode = TRUE,
       test_example = 2,
       interactive = TRUE
-    ))
+  ))
   expect_true(file.exists(file.path(testFolder, "hmFoldChangeTest1")))
 
   # Generate the fold change heatmap trelliscope with smaller dataset

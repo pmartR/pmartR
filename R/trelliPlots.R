@@ -528,6 +528,7 @@ trelli_abundance_boxplot <- function(trelliData,
       stat_cogs <- cognostics[cognostics %in% c("fold change", "anova p-value")]
       
       if (length(stat_cogs) != 0) {
+        
         # Subset down the dataframe down to group, unnest the dataframe,
         # pivot_longer to comparison, subset columns to requested statistics,
         # switch name to a more specific name
@@ -553,9 +554,12 @@ trelli_abundance_boxplot <- function(trelliData,
           quick_cog(cogs_to_add$name[row], cogs_to_add$value[row])
         })) %>% dplyr::tibble()
 
-
         # Add new cognostics, removing when it is NULL 
-        cog_to_trelli <- cbind(cog_to_trelli, new_cogs) %>% dplyr::tibble()
+        if (!is.null(cog_to_trelli)) {
+          cog_to_trelli <- cbind(cog_to_trelli, new_cogs) %>% dplyr::tibble()
+        } else {
+          cog_to_trelli <- new_cogs
+        }
         
       }
     }
