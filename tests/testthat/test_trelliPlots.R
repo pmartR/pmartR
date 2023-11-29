@@ -3,9 +3,18 @@ context("trelliscope plotting functions")
 test_that("trelliPlots check the correct inputs", {
   
   # Quick trelliscope function check for future changes
-  # file_coverage(c("./R/as.trelliData.R", "./R/summary_trelliData.R", "./R/trelliPlots.R"), 
-  #               c("./tests/testthat/test_as_trelliData_edata.R", "./tests/testthat/test_as_trelliData.R", "./tests/testthat/test_as_trelliData_summary.R", "./tests/testthat/test_trelliPlots.R")) %>% 
-  #     report()
+  #file_coverage(c("~/Git_Repos/pmartR/R/as.trelliData.R", 
+  #                "~/Git_Repos/pmartR/R/summary_trelliData.R",
+  #                "~/Git_Repos/pmartR/R/trelliPlots.R",
+  #                "~/Git_Repos/pmartR/R/trelliPlots_seqData.R",
+  #),
+  #c("~/Git_Repos/pmartR/tests/testthat/test_as_trelliData_edata.R", 
+  #  "~/Git_Repos/pmartR/tests/testthat/test_as_trelliData.R",
+  #  "~/Git_Repos/pmartR/tests/testthat/test_trelli_pvalue_filter.R",
+  #  "~/Git_Repos/pmartR/tests/testthat/test_as_trelliData_summary.R",
+  #  "~/Git_Repos/pmartR/tests/testthat/test_trelliPlots.R",
+  #  "~/Git_Repos/pmartR/tests/testthat/test_trelliPlots_seqData.R")
+  #) %>% report()
   
   # Load: lipid expression data-------------------------------------------------
 
@@ -533,6 +542,24 @@ test_that("trelliPlots check the correct inputs", {
                                                include_points = TRUE)
   )
   expect_true(file.exists(file.path(testFolder, "boxFoldChangeTest2")))
+  
+  # Add RNA-seq example
+  suppressWarnings(seqTrelli4 %>% trelli_panel_by("Classification") %>%
+                     trelli_foldchange_boxplot(path = file.path(testFolder, "boxFoldChangeTest3"),
+                                               test_mode = T,
+                                               test_example = 1)
+  )
+  expect_true(file.exists(file.path(testFolder, "boxFoldChangeTest3")))
+  
+  # Add RNA-seq example wit no p-value threshold
+  suppressWarnings(seqTrelli4 %>% trelli_panel_by("Classification") %>%
+                     trelli_foldchange_boxplot(path = file.path(testFolder, "boxFoldChangeTest4"),
+                                               test_mode = T,
+                                               test_example = 1,
+                                               p_value_thresh = 0)
+  )
+  expect_true(file.exists(file.path(testFolder, "boxFoldChangeTest4")))
+  
 
   # Generate a single plot
   fc_boxplot <- singleEmetaPlot %>% trelli_foldchange_boxplot(single_plot = TRUE)
@@ -569,10 +596,39 @@ test_that("trelliPlots check the correct inputs", {
                                                p_value_thresh = 0)
   )
   expect_true(file.exists(file.path(testFolder, "volFoldChangeTest2")))
+  
+  # Add RNA-seq example
+  suppressWarnings(seqTrelli4 %>% trelli_panel_by("Classification") %>%
+                     trelli_foldchange_volcano(path = file.path(testFolder, "volFoldChangeTest3"),
+                                               test_mode = T,
+                                               test_example = 1)
+  )
+  expect_true(file.exists(file.path(testFolder, "volFoldChangeTest3")))
+  
+  # Add RNA-seq example
+  suppressWarnings(seqTrelli4 %>% trelli_panel_by("Classification") %>%
+                     trelli_foldchange_volcano(path = file.path(testFolder, "volFoldChangeTest4"),
+                                               test_mode = T,
+                                               test_example = 1,
+                                               p_value_thresh = 0)
+  )
+  expect_true(file.exists(file.path(testFolder, "volFoldChangeTest4")))
 
   # Test the creation of a single plot
   fc_volcano <- singleEmetaPlot %>% trelli_foldchange_volcano(single_plot = TRUE, p_value_test = NULL, comparison = "Mock_vs_InfectionA")
   expect_true(inherits(fc_volcano, "ggplot"))
+  
+  # Expect error if trying to return a single plot without selecting a comparison
+  expect_error(
+    mtrelliData4 %>% trelli_panel_by("MClass") %>% trelli_foldchange_volcano(single_plot = T),
+    "single_plot will only work if 1 comparison has been selected."
+  )
+  
+  # Expect error if comparison is not a string
+  expect_error(
+    mtrelliData4 %>% trelli_panel_by("MClass") %>% trelli_foldchange_volcano(single_plot = T, comparison = 2),
+    "comparison must be a string."
+  )
 
   ## trelli_foldchange_heatmap--------------------------------------------------
 
@@ -597,6 +653,15 @@ test_that("trelliPlots check the correct inputs", {
   suppressWarnings(singleEmetaPlot %>%
     trelli_foldchange_heatmap(path = file.path(testFolder, "hmFoldChangeTest2"), ))
   expect_true(file.exists(file.path(testFolder, "hmFoldChangeTest2")))
+  
+  # Add RNA-seq example
+  suppressWarnings(seqTrelli4 %>% trelli_panel_by("Classification") %>%
+                     trelli_foldchange_heatmap(path = file.path(testFolder, "hmFoldChangeTest3"),
+                                               test_mode = T,
+                                               p_value_thresh = 0,
+                                               test_example = 1)
+  )
+  expect_true(file.exists(file.path(testFolder, "hmFoldChangeTest3")))
 
   # Generate a single plot
   fc_heatmap <- singleEmetaPlot %>% trelli_foldchange_heatmap(single_plot = TRUE)

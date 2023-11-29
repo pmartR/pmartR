@@ -155,7 +155,7 @@ trelli_rnaseq_boxplot <- function(trelliData,
   }
   
   if (any(c("p-value", "fold change") %in% cognostics) & attr(trelliData, "panel_by_omics") != get_edata_cname(trelliData$omicsData)) {
-    message(paste("Please panel by", get_edata_cname(trelliData$omicsData), "to get 'p-values' and 'fold change' as cognostics in the trelliscope display."))
+    message(paste("Please panel by", get_edata_cname(trelliData$omicsData), "to get 'p-value' and 'fold change' as cognostics in the trelliscope display."))
   }
   
   # Make boxplot function-------------------------------------------------------
@@ -292,7 +292,11 @@ trelli_rnaseq_boxplot <- function(trelliData,
         })) %>% dplyr::tibble()
         
         # Add new cognostics, removing when it is NULL 
-        cog_to_trelli <- cbind(cog_to_trelli, new_cogs) %>% dplyr::tibble()
+        if (!is.null(cog_to_trelli)) {
+          cog_to_trelli <- cbind(cog_to_trelli, new_cogs) %>% dplyr::tibble()
+        } else {
+          cog_to_trelli <- new_cogs
+        }
         
       }
     }
