@@ -25,9 +25,7 @@ results. Required.}
 
 \item{cognostics}{A vector of cognostic options for each plot. Valid entries are 
 "biomolecule count", "proportion significant", "mean fold change",
-and "sd fold change". Default is "biomolecule count". If the omics data is MS/NMR,
-the biomolecule count will count present biomolecules. If the omics data is sedData,
-the biomolecule count will count Non-Zero transcripts.}
+and "sd fold change". Default is "biomolecule count".}
 
 \item{p_value_thresh}{A value between 0 and 1 to indicate significant
 biomolecules for the anova (MS/NMR) or diffexp_seq (RNA-seq) test. Default is 0.05.}
