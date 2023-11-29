@@ -1200,7 +1200,7 @@ trelli_missingness_bar <- function(trelliData,
     Miss_Cog <- Miss_Cog %>% dplyr::select(c(name, value))
     
     # Add statistics if applicable
-    if ("g-test p-value" %in% cognostics) {
+    if ("g-test p-value" %in% cognostics & inherits(trelliData, "trelliData.seqData") == FALSE) {
       
       edata_cname <- get_edata_cname(trelliData$statRes)
       
@@ -1498,9 +1498,10 @@ trelli_foldchange_bar <- function(trelliData,
       }
     }
     
+    if ("p_value_gtest" %in% colnames(DF)) {DF <- DF %>% dplyr::select(-p_value_gtest)}
+    
     # Prepare DF for quick_cog function
     PreCog <- DF %>%
-      dplyr::select(-p_value_gtest) %>%
       dplyr::select(c(cognostics, Comparison)) %>%
       tidyr::pivot_longer(cognostics) %>%
       dplyr::mutate(Comparison = paste(Comparison, name)) %>%
@@ -1528,7 +1529,7 @@ trelli_foldchange_bar <- function(trelliData,
   } else {
     toBuild <- trelliData$trelliData.stat
   }
-
+  
   # Pass parameters to trelli_builder function
   trelli_builder(toBuild = toBuild,
                  cognostics = cognostics, 
@@ -1536,7 +1537,7 @@ trelli_foldchange_bar <- function(trelliData,
                  cogFUN = fc_bar_cog_fun,
                  path = path,
                  name = name,
-                 remove_nestedDF = FALSE,
+                 remove_nestedDF = TRUE,
                  ...)
   
 }
