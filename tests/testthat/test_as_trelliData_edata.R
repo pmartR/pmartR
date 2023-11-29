@@ -1,6 +1,11 @@
 context("class: trelliData edata")
 
 test_that("as.trelliData.edata returns correct data frames and attributes", {
+  
+  ##################
+  ## MS/NMR TESTS ##
+  ##################
+  
   # Load: peptide expression data-----------------------------------------------
 
   load(system.file('testdata',
@@ -396,4 +401,39 @@ test_that("as.trelliData.edata returns correct data frames and attributes", {
     ),
     "apply_norm must be TRUE to apply normalization parameters."
   )
+  
+  ###################
+  ## RNA SEQ TESTS ##
+  ###################
+  
+  # Load: seqData expression data-----------------------------------------------
+  
+  load(system.file('testdata',
+                   'little_seqdata.RData',
+                   package = 'pmartR'
+  ))
+  
+  # Test: seqData expression data-----------------------------------------------
+  
+  # Expect message
+  expect_message(
+    as.trelliData.edata(
+      e_data = edata,
+      edata_cname = "ID_REF",
+      omics_type = "seqData"
+    )
+    
+  )
+  
+  # Run the function
+  seq_edata <- as.trelliData.edata(
+    e_data = edata,
+    edata_cname = "ID_REF",
+    omics_type = "seqData"
+  )
+  
+  # Object should be both an edata and a seqData
+  expect_true(inherits(seq_edata, "trelliData.edata"))
+  expect_true(inherits(seq_edata, "trelliData.seqData"))
+  
 })
