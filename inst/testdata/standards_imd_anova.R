@@ -4062,43 +4062,41 @@ attr(cstan_2_2_4, "cnames") <- list(
 attr(cstan_2_2_4, "data_class") <- "pepData"
 
 # Save standards for IMD-ANOVA tests -------------------------------------------
+# save() the following objects in "inst/testdata/standards_imd_anova.RData"
+# astan_1_0_2,
+# gstan_1_0_2,
+# cstan_1_0_2,
 
-save(
-  astan_1_0_2,
-  gstan_1_0_2,
-  cstan_1_0_2,
+# astan_1_1_3,
+# gstan_1_1_3,
+# cstan_1_1_3,
 
-  astan_1_1_3,
-  gstan_1_1_3,
-  cstan_1_1_3,
+# astan_1_2_3,
+# gstan_1_2_3,
+# cstan_1_2_3,
 
-  astan_1_2_3,
-  gstan_1_2_3,
-  cstan_1_2_3,
+# astan_2_0_3,
+# gstan_2_0_3,
+# cstan_2_0_3,
 
-  astan_2_0_3,
-  gstan_2_0_3,
-  cstan_2_0_3,
+# astan_2_1_4,
+# gstan_2_1_4,
+# cstan_2_1_4,
 
-  astan_2_1_4,
-  gstan_2_1_4,
-  cstan_2_1_4,
+# astan_2_2_4,
+# gstan_2_2_4,
+# cstan_2_2_4,
 
-  astan_2_2_4,
-  gstan_2_2_4,
-  cstan_2_2_4,
+# tukey_pval_1_1_3,
+# tukey_pval_1_2_3,
+# tukey_pval_2_0_3,
+# tukey_pval_2_1_4,
+# tukey_pval_2_2_4,
 
-  tukey_pval_1_1_3,
-  tukey_pval_1_2_3,
-  tukey_pval_2_0_3,
-  tukey_pval_2_1_4,
-  tukey_pval_2_2_4,
+# dunnett_1_1_3,
+# dunnett_1_2_3,
+# dunnett_2_0_3,
+# dunnett_2_1_4,
+# dunnett_2_2_4
 
-  dunnett_1_1_3,
-  dunnett_1_2_3,
-  dunnett_2_0_3,
-  dunnett_2_1_4,
-  dunnett_2_2_4,
-
-  file = "inst/testdata/standards_imd_anova.RData"
-)
+# DO NOT PUT CODE HERE TO SAVE THE ABOVE OBJECTS.  It may create problems with CRAN submission.

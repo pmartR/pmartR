@@ -62,7 +62,7 @@
 #'
 #' # case where isoformRes is provided:
 #' # results2 = protein_quant(pepData = mypepData, method = 'rollup',
-#'                            combine_fn = 'mean', isoformRes = isoformRes)
+#' #                           combine_fn = 'mean', isoformRes = isoformRes)
 #' }
 #'
 #' @rdname protein_quant

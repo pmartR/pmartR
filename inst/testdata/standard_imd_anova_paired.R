@@ -1229,18 +1229,15 @@ attr(cstan_1_1_3, "data_class") <- "pepData"
 
 # Save standards for paired IMD-ANOVA tests ------------------------------------
 
-save(
+# save() the following to "inst/testdata/standards_imd_anova_paired.RData"
+# astan_0_0_3,
 
-  astan_0_0_3,
+# astan_1_0_3,
+# gstan_1_0_3,
+# cstan_1_0_3,
 
-  astan_1_0_3,
-  gstan_1_0_3,
-  cstan_1_0_3,
+# astan_1_1_3,
+# gstan_1_1_3,
+# cstan_1_1_3
 
-  astan_1_1_3,
-  gstan_1_1_3,
-  cstan_1_1_3,
-
-  file = file.path("inst/testdata/standards_imd_anova_paired.RData")
-
-)
+# DO NOT PUT CODE HERE TO SAVE THE ABOVE OBJECTS.  It may create problems with CRAN submission.
