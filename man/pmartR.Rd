@@ -4,6 +4,9 @@
 \name{pmartR}
 \alias{pmartR}
 \title{Panomics Marketplace - Quality Control and Statistical Analysis for Panomics Data}
+\value{
+No return value, used to appease R CMD check.
+}
 \description{
 Provides functionality for quality control processing and
  statistical analysis of mass spectrometry (MS) omics data, in particular 

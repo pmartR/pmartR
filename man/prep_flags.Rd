@@ -11,6 +11,9 @@ prep_flags(x, test)
 
 \item{test}{character string indicating the type of test run.}
 }
+\value{
+A data frame with the sample IDs and significance flags from a statistical test.
+}
 \description{
 Changes the flags columns from a statRes object into a format that the
 statRes plot funcitons can handle. pmartR is an unruly beast that cannot be

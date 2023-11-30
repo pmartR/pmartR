@@ -66,7 +66,7 @@ If isoformRes is provided then, a temporary pepData object is formed
 }
 \examples{
 \dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
-\dontrun{
+\donttest{
 library(pmartRdata)
 
 mypepData <- group_designation(omicsData = pep_object, main_effects = c("Phenotype"))
@@ -86,7 +86,7 @@ results <- protein_quant(pepData = mypepData, method = 'rollup',
 
 # case where isoformRes is provided:
 # results2 = protein_quant(pepData = mypepData, method = 'rollup',
-                           combine_fn = 'mean', isoformRes = isoformRes)
+#                           combine_fn = 'mean', isoformRes = isoformRes)
 }
 \dontshow{\}) # examplesIf}
 }

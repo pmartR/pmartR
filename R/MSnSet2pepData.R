@@ -31,8 +31,8 @@
 #'   R-based processing and visualisation of raw mass spectrometry data.”
 #'   bioRxiv.
 #'
-#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
-#' \dontrun{
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE) && requireNamespace("MSnbase", quietly = TRUE)
+#'
 #' library(MSnbase)
 #' data("msnset")
 #' result = MSnSet2pepData(msnset,
@@ -41,7 +41,7 @@
 #'   fdata_cname = "SampleID",
 #'   emeta_cname = "UniqueID"
 #' )
-#' }
+#'
 #'
 #' @noRd
 #'

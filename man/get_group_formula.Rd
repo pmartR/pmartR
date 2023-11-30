@@ -9,18 +9,16 @@ get_group_formula(omicsData)
 \arguments{
 \item{omicsData}{an object of type 'seqData', created by \code{\link{as.seqData}}}
 }
+\value{
+A list with two elements:
+\itemize{
+ \item grouping_info: A data.frame with the grouping information used in
+  the statistical analysis
+\item formula_string: A character string with the formula used in the
+ statistical analysis
+}
+}
 \description{
 For generating group design formulas and correctly ordered group data for
 seqData statistical functions
-}
-\examples{
-\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
-\dontrun{
-
-library(pmartRdata)
-myseqData <- rnaseq_object
-myseqData <- group_designation(omicsData = myseqData, main_effects = "Virus")
-grouping_info <- pmartR:::get_group_formula(omicsData = myseqData)
-}
-\dontshow{\}) # examplesIf}
 }

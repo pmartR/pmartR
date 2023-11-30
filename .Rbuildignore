@@ -13,3 +13,4 @@ tests/testthat/test_MSnSet2pepData.R
 ^CRAN-SUBMISSION$
 ^LICENSE\.md$
 ^DISCLAIMER\.md$
+^data-raw$

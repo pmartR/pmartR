@@ -26,7 +26,7 @@ Provide summary of a totalCountFilt S3 object
 }
 \examples{
 \dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
-\dontrun{
+\donttest{
 library(pmartRdata)
 myfilt <- total_count_filter(omicsData = rnaseq_object)
 summary(myfilt, min_count = 15)

@@ -27,7 +27,7 @@
 #'   each subset and store the results.
 #'
 #' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
-#' \dontrun{
+#' \donttest{
 #' library(pmartRdata)
 #'
 #' mypepData <- group_designation(

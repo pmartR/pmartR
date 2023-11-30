@@ -17,6 +17,10 @@ proData', 'metabData', 'lipidData', or 'nmrData', created by
 \item{statRes}{statRes an object of the class 'statRes', created by
 \code{\link{imd_anova}}}
 }
+\value{
+An object of class 'trelliData' containing the raw data and optionally, statRes.  
+ To be passed to trelliscope building functions.
+}
 \description{
 Either an omicData and/or a statRes object are accepted.
   omicData must be transformed and normalized, unless the data is isobaric
@@ -28,7 +32,7 @@ Either an omicData and/or a statRes object are accepted.
 }
 \examples{
 \dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
-\dontrun{
+\donttest{
 library(pmartRdata)
 
 # Transform the data

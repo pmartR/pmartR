@@ -65,7 +65,7 @@ Requires the 'edgeR' and 'limma' packages to run.
 }
 \examples{
 \dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
-\dontrun{
+\donttest{
 library(pmartRdata)
 myseqData <- group_designation(omicsData = rnaseq_object, main_effects = "Virus")
 edger_results <- diffexp_seq(omicsData = myseqData, method = "edgeR")

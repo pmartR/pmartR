@@ -18,6 +18,8 @@
 #'
 #' @useDynLib pmartR
 #' @name pmartR
+#'
+#' @return No return value, used to appease R CMD check.
 NULL
 
 utils::globalVariables(

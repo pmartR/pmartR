@@ -47,6 +47,12 @@ temporarily un-log transforming the data and then returning normalized data
 on the same scale it was provided). If using this argument, the
 'metabolite_name' argument should not be specified.}
 }
+\value{
+If \code{apply_norm} is TRUE, an object of class `nmrData`, normalized
+ and with information about the normalization process in `nmr_info`.  Otherwise,
+ an object of class `nmrnormRes` is returned, with the same info about
+ normalization in attribute `nmr_info` to be passed to plotting and summary functions.
+}
 \description{
 The data is normalized either to a spiked-in metabolite or to a
 sample-specific property

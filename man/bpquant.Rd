@@ -42,7 +42,7 @@ The result of this function can be used as one the \code{isoformRes}
 }
 \examples{
 \dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
-\dontrun{
+\donttest{
 library(pmartRdata)
 
 mypepData <- group_designation(

@@ -36,7 +36,7 @@ mypep <- edata_transform(omicsData = mypep, data_scale = "log2")
 norm_result <- normalize_global(omicsData = mypep, norm_fn = "median", subset_fn = "all")
 summary(norm_result)
 
-\dontrun{
+\donttest{
 spans_results <- spans_procedure(omicsData = mypep)
 summary(spans_results)
 }

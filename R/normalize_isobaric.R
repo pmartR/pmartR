@@ -33,6 +33,12 @@
 #'   'refpool_cname' argument must also be specified; in this case,
 #'   'channel_cname' and 'refpool_channel' should not be specified.
 #'
+#' @return If apply_norm = TRUE, an object of class 'isobaricpepData', normalized to reference pool,
+#'  and with the attribute 'isobaric_info' updated to include information about
+#'  the reference pool samples and the normalization procedure.  Otherwise an
+#'  object of class 'isobaricnormRes' containing similar information about the 
+#'  normalization process
+#'
 #' @details There are two ways to specify the information needed for identifying
 #'   reference samples which should be used for normalization: \enumerate{ \item
 #'   specify \code{channel_cname} and \code{refpool_channel}. This should be

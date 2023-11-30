@@ -53,7 +53,7 @@
 #' plot(sfit, col = c(1, 2))
 #' }
 #'
-# Function to fit the survival model
+#' @export
 fit_surv <- function(omicsData) {
   if (!requireNamespace("survival", quietly = TRUE)) {
     stop("Please install the 'survival' package.")
@@ -115,6 +115,9 @@ fit_surv <- function(omicsData) {
 #' )
 #' plot_km(omicsData = tcga_ovarian_pepdata_bp)
 #' }
+#'
+#' @export
+#'
 plot_km <- function(omicsData) {
   sfit <- fit_surv(omicsData)
 
@@ -143,6 +146,8 @@ plot_km <- function(omicsData) {
 #' # Percent is provided so corresponding time point is returned
 #' summary_km(tcga_ovarian_pepdata_bp, .4)
 #' }
+#'
+#' @export
 #'
 summary_km <- function(omicsData, percent = NULL, ...) {
   # Summary object

@@ -28,7 +28,7 @@ filtering would remove this biomolecule).
 }
 \examples{
 \dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
-\dontrun{
+\donttest{
 library(pmartRdata)
 to_filter <- total_count_filter(omicsData = rnaseq_object)
 summary(to_filter, min_count = 15)

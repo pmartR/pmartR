@@ -1,3 +1,19 @@
+### December 4, 2023
+
+Remaining Issues:
+    - There are still 3 instances of `\dontrun{}` in R/survival.R.  These examples cannot be run without additional software, and so have been left as `\dontrun{}`.  The remaining instances of `\dontrun{}` have been changed to `\donttest{}`.
+
+Fixed Issues:
+    - Added references to implemented methods in DESCRIPTION
+    - Fixed unexecutable code
+    - Changed of T/F to TRUE/FALSE
+    - Added missing @return to many exported methods
+    - Removed ::: in documentation
+    - Omitted examples in unexported functions or exported the functions.
+    - Commented out code in inst/testdata/ that was writing to disk.
+    - Removed `installed.packages()` call
+
+
 ### November 28, 2023
 - Removed VignetteBuilder from DESCRIPTION to remove note about missing vignette index.
 

@@ -4,21 +4,23 @@
 #'   functions
 #' @param ... further arguments passed to or from other methods.
 #'
+#' @return A data.frame containing panel plot options for this trelliData object.
+#' 
 #' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
-#' \dontrun{
+#' \donttest{
 #'
 #' library(dplyr)
-#'
+#' library(pmartRdata)
+#' 
+#' trelliData <- as.trelliData.edata(e_data = pep_edata,
+#'                                    edata_cname = "Peptide",
+#'                                    omics_type = "pepData")
+#' 
 #' # Use an edata example. Build with as.trelliData.edata.
 #' summary(trelliData)
-#' summary(trelliData %>% trelli_panel_by("Lipid"))
+#' summary(trelliData %>% trelli_panel_by("Peptide"))
 #' summary(trelliData %>% trelli_panel_by("Sample"))
 #'
-#' # Use an omicsData example. Build with as.trelliData.
-#' summary(trelliData2)
-#'
-#' # Use a statRes example. Build with as.trelliData.
-#' summary(trelliData3)
 #' }
 #'
 #' @export

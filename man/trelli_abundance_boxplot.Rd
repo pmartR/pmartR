@@ -58,6 +58,9 @@ trelliscope) should be returned. Default is FALSE.}
 
 \item{...}{Additional arguments to be passed on to the trelli builder}
 }
+\value{
+No return value, builds a trelliscope display of boxplots that is stored in `path`
+}
 \description{
 Specify a boxplot design and cognostics for the abundance
   boxplot trelliscope. Each boxplot will have its own groups as specified by
@@ -65,14 +68,39 @@ Specify a boxplot design and cognostics for the abundance
 }
 \examples{
 \dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
-\dontrun{
+\donttest{
+library(pmartRdata)
 
-## Generate trelliData objects using the as.trelliData.edata example code.
+trelliData1 <- as.trelliData.edata(e_data = pep_edata,
+                                   edata_cname = "Peptide",
+                                   omics_type = "pepData")
+# Transform the data
+omicsData <- edata_transform(omicsData = pep_object, data_scale = "log2")
+
+# Group the data by condition
+omicsData <- group_designation(omicsData = omicsData, main_effects = c("Phenotype"))
+
+# Apply the IMD ANOVA filter
+imdanova_Filt <- imdanova_filter(omicsData = omicsData)
+omicsData <- applyFilt(filter_object = imdanova_Filt, omicsData = omicsData,
+                       min_nonmiss_anova = 2)
+
+# Normalize my pepData
+omicsData <- normalize_global(omicsData, "subset_fn" = "all", "norm_fn" = "median",
+                             "apply_norm" = TRUE, "backtransform" = TRUE)
+
+# Implement the IMD ANOVA method and compute all pairwise comparisons 
+# (i.e. leave the `comparisons` argument NULL)
+statRes <- imd_anova(omicsData = omicsData, test_method = 'combined')
+
+# Generate the trelliData object
+trelliData2 <- as.trelliData(omicsData = omicsData)
+trelliData4 <- as.trelliData(omicsData = omicsData, statRes = statRes)
 
 # Build the abundance boxplot with an edata file where each panel is a biomolecule. 
 trelli_panel_by(trelliData = trelliData1, panel = "Peptide") \%>\% 
-   trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10)
-   
+   trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10, path = tempdir())
+
 # Build the abundance boxplot wher each panel is a sample.
 # Include all applicable cognostics. Remove points. 
 trelli_panel_by(trelliData = trelliData1, panel = "Sample") \%>\% 
@@ -81,34 +109,37 @@ trelli_panel_by(trelliData = trelliData1, panel = "Sample") \%>\%
                             cognostics = c("count", 
                                            "mean abundance", 
                                            "median abundance", 
-                                           "cv abundance")
+                                           "cv abundance"),
+                             path = tempdir()
                            )
 
 # Build the abundance boxplot with an omicsData object.
 # Let the panels be biomolecules. Here, grouping information is included.
 trelli_panel_by(trelliData = trelliData2, panel = "Peptide") \%>\% 
-   trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10)
-   
+   trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10, path = tempdir())
+
 # Build the abundance boxplot with an omicsData object. The panel is a biomolecule class,
 # which is proteins in this case.
 trelli_panel_by(trelliData = trelliData2, panel = "RazorProtein") \%>\% 
-   trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10)
-    
+   trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10, path = tempdir())
+
 # Build the abundance boxplot with an omicsData and statRes object.
 # Panel by a biomolecule, and add statistics data to the cognostics
 trelli_panel_by(trelliData = trelliData4, panel = "Peptide") \%>\%
-   trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10,
+   trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10, path = tempdir(),
                             cognostics = c("mean abundance", "anova p-value", "fold change"))
- 
+
 # Other options include modifying the ggplot  
 trelli_panel_by(trelliData = trelliData1, panel = "Peptide") \%>\% 
-   trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10, 
+   trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10, path = tempdir(),
      ggplot_params = c("ylab('')", "ylim(c(20,30))"))
 
 # Or making the plot interactive 
 trelli_panel_by(trelliData = trelliData4, panel = "RazorProtein") \%>\% 
-    trelli_abundance_boxplot(interactive = TRUE, test_mode = TRUE, test_example = 1:10)
+    trelli_abundance_boxplot(
+     interactive = TRUE, test_mode = TRUE, test_example = 1:10, path = tempdir())
 
+\dontshow{closeAllConnections()}
 }
 \dontshow{\}) # examplesIf}
 }

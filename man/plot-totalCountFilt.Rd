@@ -83,7 +83,7 @@ For plotting an S3 object of type 'totalCountFilt':
 }
 \examples{
 \dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
-\dontrun{
+\donttest{
 library(pmartRdata)
 seqfilt <- total_count_filter(omicsData = rnaseq_object)
 plot(seqfilt, min_count = 15)

@@ -106,7 +106,7 @@ mymetab <- group_designation(omicsData = mymetab, main_effects = "Phenotype")
 my_correlation <- cor_result(omicsData = mymetab)
 plot(my_correlation, omicsData = mymetab, order_by = "Phenotype")
 
-\dontrun{
+\donttest{
 myseq_correlation <- cor_result(omicsData = rnaseq_object)
 plot(myseq_correlation)
 }
