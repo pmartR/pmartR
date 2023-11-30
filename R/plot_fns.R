@@ -6030,7 +6030,7 @@ plot.statRes <- function(x,
                          bw_theme = TRUE,
                          display_count = TRUE,
                          custom_theme = NULL,
-                         cluster = F,
+                         cluster = FALSE,
                          free_y_axis = FALSE,
                          ...) {
   # Make sure we only have valid arguments

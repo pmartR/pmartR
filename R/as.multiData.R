@@ -63,10 +63,10 @@
 as.multiData <-
   function(...,
            f_meta = NULL,
-           sample_intersect = F,
+           sample_intersect = FALSE,
            match_samples = TRUE,
-           keep_sample_info = F,
-           auto_fmeta = F) {
+           keep_sample_info = FALSE,
+           auto_fmeta = FALSE) {
     omicsData_objects <- list(...)
 
     if (length(omicsData_objects) < 2) stop("Must provide at least two datasets.")
