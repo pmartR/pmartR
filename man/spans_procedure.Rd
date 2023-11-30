@@ -170,7 +170,7 @@ Below are details for specifying function and parameter options.
 
 \examples{
 \dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
-\dontrun{
+\donttest{
 library(pmartRdata)
 
 pep_object <- edata_transform(omicsData = pep_object, data_scale = "log2")

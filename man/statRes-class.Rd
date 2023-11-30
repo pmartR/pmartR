@@ -3,6 +3,9 @@
 \name{statRes-class}
 \alias{statRes-class}
 \title{Summary of statRes Object}
+\value{
+No return value, prints details about the statres object.
+}
 \description{
 Provide summary information about statRes objects
 }

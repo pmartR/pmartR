@@ -7,10 +7,10 @@
 as.multiData(
   ...,
   f_meta = NULL,
-  sample_intersect = F,
+  sample_intersect = FALSE,
   match_samples = TRUE,
-  keep_sample_info = F,
-  auto_fmeta = F
+  keep_sample_info = FALSE,
+  auto_fmeta = FALSE
 )
 }
 \arguments{

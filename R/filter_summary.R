@@ -85,6 +85,8 @@ summary.moleculeFilt <- function(object, min_num = NULL, ...) {
 #' @param x the moleculeFilt summary to print
 #' @param ... further arguments passed to or from other methods
 #'
+#' @return No return value, prints details about x
+#' 
 #' @export
 #' @name print.moleculeFilterSummary
 
@@ -248,6 +250,8 @@ summary.RNAFilt <- function(object,
 #' @param x the RNAFilt summary to print
 #' @param ... further arguments passed to or from other methods
 #'
+#' @return No return value, prints details about x
+#' 
 #' @export
 #' @name print.RNAFiltSummary
 print.RNAFiltSummary <- function(x, ...) {
@@ -310,7 +314,7 @@ print.RNAFiltSummary <- function(x, ...) {
 #' filtered at this threshold are reported.
 #'
 #' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
-#' \dontrun{
+#' \donttest{
 #' library(pmartRdata)
 #' myfilt <- total_count_filter(omicsData = rnaseq_object)
 #' summary(myfilt, min_count = 15)
@@ -367,6 +371,8 @@ summary.totalCountFilt <- function(object, min_count = NULL, ...) {
 #' @param x the Total Count filter summary to print
 #' @param ... further arguments passed to or from other methods
 #'
+#' @return No return value, prints details about x
+#' 
 #' @export
 #' @name print.totalCountFiltSummary
 #'
@@ -519,6 +525,8 @@ summary.proteomicsFilt <- function(object, min_num_peps = NULL, degen_peps = FAL
 #' @param x the proteomics filter summary to print
 #' @param ... further arguments passed to or from other methods
 #'
+#' @return No return value, prints details about x
+#' 
 #' @export
 #' @name print.proteomicsFilterSummary
 #'
@@ -842,6 +850,8 @@ summary.imdanovaFilt <- function(object, min_nonmiss_anova = NULL,
 #' @param x the imdanova filter summary to print
 #' @param ... further arguments passed to or from other methods
 #'
+#' @return No return value, prints details about x
+#' 
 #' @export
 #' @name print.imdanovaFilterSummary
 #'
@@ -977,6 +987,8 @@ summary.rmdFilt <- function(object, pvalue_threshold = NULL, ...) {
 #' @param x the RMD filter summary to print
 #' @param ... further arguments passed to or from other methods
 #'
+#' @return No return value, prints details about x
+#' 
 #' @export
 #' @name print.rmdFilterSummary
 #'
@@ -1092,8 +1104,10 @@ summary.cvFilt <- function(object, cv_threshold = NULL, ...) {
 #' @param x the CV filter summary to print
 #' @param ... further arguments passed to or from other methods
 #'
+#' @return No return value, prints details about x
+#' 
 #' @export
-#' @name print.cvSummary
+#' @name print.cvFilterSummary
 #'
 print.cvFilterSummary <- function(x, ...) {
   object <- x
@@ -1298,6 +1312,8 @@ summary.customFilt <- function(object, ...) {
 #' @param x the custom filter summary to print
 #' @param ... further arguments passed to or from other methods
 #'
+#' @return No return value, prints details about x
+#' 
 #' @export
 #' @name print.customFilterSummary
 #'

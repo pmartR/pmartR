@@ -22,6 +22,9 @@
 #'   potential future functions.
 #' @param p_value_thresh The user provided threshold for plotting significant
 #'   p-values.
+#' 
+#' @return No return value, validates a trelliData object before passing it to builder functions.
+#' 
 trelli_precheck <- function(trelliData, 
                             trelliCheck,
                             cognostics,
@@ -251,15 +254,42 @@ trelli_builder <- function(toBuild, cognostics, plotFUN, cogFUN, path, name, rem
 #'   trelliscope) should be returned. Default is FALSE.
 #' @param ... Additional arguments to be passed on to the trelli builder
 #'
+#' @return No return value, builds a trelliscope display of boxplots that is stored in `path`
+#' 
 #' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
-#' \dontrun{
+#' \donttest{
+#' library(pmartRdata)
 #' 
-#' ## Generate trelliData objects using the as.trelliData.edata example code.
+#' trelliData1 <- as.trelliData.edata(e_data = pep_edata,
+#'                                    edata_cname = "Peptide",
+#'                                    omics_type = "pepData")
+#' # Transform the data
+#' omicsData <- edata_transform(omicsData = pep_object, data_scale = "log2")
 #' 
+#' # Group the data by condition
+#' omicsData <- group_designation(omicsData = omicsData, main_effects = c("Phenotype"))
+#'
+#' # Apply the IMD ANOVA filter
+#' imdanova_Filt <- imdanova_filter(omicsData = omicsData)
+#' omicsData <- applyFilt(filter_object = imdanova_Filt, omicsData = omicsData,
+#'                        min_nonmiss_anova = 2)
+#'
+#' # Normalize my pepData
+#' omicsData <- normalize_global(omicsData, "subset_fn" = "all", "norm_fn" = "median",
+#'                              "apply_norm" = TRUE, "backtransform" = TRUE)
+#'
+#' # Implement the IMD ANOVA method and compute all pairwise comparisons 
+#' # (i.e. leave the `comparisons` argument NULL)
+#' statRes <- imd_anova(omicsData = omicsData, test_method = 'combined')
+#'
+#' # Generate the trelliData object
+#' trelliData2 <- as.trelliData(omicsData = omicsData)
+#' trelliData4 <- as.trelliData(omicsData = omicsData, statRes = statRes)
+#'
 #' # Build the abundance boxplot with an edata file where each panel is a biomolecule. 
 #' trelli_panel_by(trelliData = trelliData1, panel = "Peptide") %>% 
-#'    trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10)
-#'    
+#'    trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10, path = tempdir())
+#'
 #' # Build the abundance boxplot wher each panel is a sample.
 #' # Include all applicable cognostics. Remove points. 
 #' trelli_panel_by(trelliData = trelliData1, panel = "Sample") %>% 
@@ -268,36 +298,39 @@ trelli_builder <- function(toBuild, cognostics, plotFUN, cogFUN, path, name, rem
 #'                             cognostics = c("count", 
 #'                                            "mean abundance", 
 #'                                            "median abundance", 
-#'                                            "cv abundance")
+#'                                            "cv abundance"),
+#'                              path = tempdir()
 #'                            )
-#' 
+#'
 #' # Build the abundance boxplot with an omicsData object.
 #' # Let the panels be biomolecules. Here, grouping information is included.
 #' trelli_panel_by(trelliData = trelliData2, panel = "Peptide") %>% 
-#'    trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10)
-#'    
+#'    trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10, path = tempdir())
+#'
 #' # Build the abundance boxplot with an omicsData object. The panel is a biomolecule class,
 #' # which is proteins in this case.
 #' trelli_panel_by(trelliData = trelliData2, panel = "RazorProtein") %>% 
-#'    trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10)
-#'     
+#'    trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10, path = tempdir())
+#'
 #' # Build the abundance boxplot with an omicsData and statRes object.
 #' # Panel by a biomolecule, and add statistics data to the cognostics
 #' trelli_panel_by(trelliData = trelliData4, panel = "Peptide") %>%
-#'    trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10,
+#'    trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10, path = tempdir(),
 #'                             cognostics = c("mean abundance", "anova p-value", "fold change"))
-#'  
+#'
 #' # Other options include modifying the ggplot  
 #' trelli_panel_by(trelliData = trelliData1, panel = "Peptide") %>% 
-#'    trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10, 
+#'    trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10, path = tempdir(),
 #'      ggplot_params = c("ylab('')", "ylim(c(20,30))"))
-#' 
+#'
 #' # Or making the plot interactive 
 #' trelli_panel_by(trelliData = trelliData4, panel = "RazorProtein") %>% 
-#'     trelli_abundance_boxplot(interactive = TRUE, test_mode = TRUE, test_example = 1:10)
+#'     trelli_abundance_boxplot(
+#'      interactive = TRUE, test_mode = TRUE, test_example = 1:10, path = tempdir())
 #' 
+#' \dontshow{closeAllConnections()}
 #' }
-#'
+#' 
 #' @author David Degnan, Lisa Bramer
 #'
 #' @export
@@ -571,13 +604,43 @@ trelli_abundance_boxplot <- function(trelliData,
 #'   trelliscope) should be returned. Default is FALSE.
 #' @param ... Additional arguments to be passed on to the trelli builder
 #'
+#' @return No return value, builds a trelliscope display of histograms that is stored in `path`
+#' 
 #' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
-#' \dontrun{
+#' \donttest{
+#' 
+#' library(pmartRdata)
+#' 
+#' trelliData1 <- as.trelliData.edata(e_data = pep_edata,
+#'                                    edata_cname = "Peptide",
+#'                                    omics_type = "pepData")
+#' # Transform the data
+#' omicsData <- edata_transform(omicsData = pep_object, data_scale = "log2")
+#' 
+#' # Group the data by condition
+#' omicsData <- group_designation(omicsData = omicsData, main_effects = c("Phenotype"))
+#'
+#' # Apply the IMD ANOVA filter
+#' imdanova_Filt <- imdanova_filter(omicsData = omicsData)
+#' omicsData <- applyFilt(filter_object = imdanova_Filt, omicsData = omicsData,
+#'                        min_nonmiss_anova = 2)
+#'
+#' # Normalize my pepData
+#' omicsData <- normalize_global(omicsData, "subset_fn" = "all", "norm_fn" = "median",
+#'                              "apply_norm" = TRUE, "backtransform" = TRUE)
+#'
+#' # Implement the IMD ANOVA method and compute all pairwise comparisons 
+#' # (i.e. leave the `comparisons` argument NULL)
+#' statRes <- imd_anova(omicsData = omicsData, test_method = 'combined')
+#'
+#' # Generate the trelliData object
+#' trelliData2 <- as.trelliData(omicsData = omicsData)
+#' trelliData4 <- as.trelliData(omicsData = omicsData, statRes = statRes)
 #' 
 #' # Build the abundance histogram with an edata file. 
 #' # Generate trelliData in as.trelliData.edata
 #' trelli_panel_by(trelliData = trelliData1, panel = "Peptide") %>% 
-#'    trelli_abundance_histogram(test_mode = TRUE, test_example = 1:10)
+#'    trelli_abundance_histogram(test_mode = TRUE, test_example = 1:10, path = tempdir())
 #' 
 #' # Build the abundance histogram with an omicsData object. 
 #' # Generate trelliData in as.trelliData
@@ -587,15 +650,17 @@ trelli_abundance_boxplot <- function(trelliData,
 #' # Build the abundance histogram with an omicsData and statRes object. 
 #' # Generate trelliData in as.trelliData.
 #' trelli_panel_by(trelliData = trelliData4, panel = "Peptide") %>%
-#'    trelli_abundance_histogram(test_mode = TRUE, test_example = 1:10, cognostics = "sample count")
+#'    trelli_abundance_histogram(
+#'      test_mode = TRUE, test_example = 1:10, cognostics = "sample count", path = tempdir())
 #'    
 #' # Users can modify the plotting function with ggplot parameters and interactivity, 
 #' # and can also select certain cognostics.     
 #' trelli_panel_by(trelliData = trelliData1, panel = "Peptide") %>% 
 #'    trelli_abundance_histogram(test_mode = TRUE, test_example = 1:10, 
 #'      ggplot_params = c("ylab('')", "xlab('Abundance')"), interactive = TRUE,
-#'      cognostics = c("mean abundance", "median abundance"))  
-#'    
+#'      cognostics = c("mean abundance", "median abundance"), path = tempdir())  
+#'  
+#' \dontshow{closeAllConnections()}
 #' }
 #'
 #' @author David Degnan, Lisa Bramer
@@ -745,13 +810,40 @@ trelli_abundance_histogram <- function(trelliData,
 #'   trelliscope) should be returned. Default is FALSE.
 #' @param ... Additional arguments to be passed on to the trelli builder
 #'
+#' @return No return value, builds a trelliscope display of heatmaps that is stored in `path`
+#' 
 #' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
-#' \dontrun{
+#' \donttest{
+#' 
+#' library(pmartRdata)
+#' 
+#' # Transform the data
+#' omicsData <- edata_transform(omicsData = pep_object, data_scale = "log2")
+#' 
+#' # Group the data by condition
+#' omicsData <- group_designation(omicsData = omicsData, main_effects = c("Phenotype"))
+#'
+#' # Apply the IMD ANOVA filter
+#' imdanova_Filt <- imdanova_filter(omicsData = omicsData)
+#' omicsData <- applyFilt(filter_object = imdanova_Filt, omicsData = omicsData,
+#'                        min_nonmiss_anova = 2)
+#'
+#' # Normalize my pepData
+#' omicsData <- normalize_global(omicsData, "subset_fn" = "all", "norm_fn" = "median",
+#'                              "apply_norm" = TRUE, "backtransform" = TRUE)
+#'
+#' # Implement the IMD ANOVA method and compute all pairwise comparisons 
+#' # (i.e. leave the `comparisons` argument NULL)
+#' statRes <- imd_anova(omicsData = omicsData, test_method = 'combined')
+#'
+#' # Generate the trelliData object
+#' trelliData2 <- as.trelliData(omicsData = omicsData)
+#' trelliData4 <- as.trelliData(omicsData = omicsData, statRes = statRes)
 #' 
 #' # Build the abundance heatmap with an omicsData object with emeta variables. 
 #' # Generate trelliData in as.trelliData.
 #' trelli_panel_by(trelliData = trelliData2, panel = "RazorProtein") %>%
-#'    trelli_abundance_heatmap(test_mode = TRUE, test_example = 1:3)
+#'    trelli_abundance_heatmap(test_mode = TRUE, test_example = 1:3, path = tempdir())
 #'    
 #' # Users can modify the plotting function with ggplot parameters and interactivity, 
 #' # and can also select certain cognostics.     
@@ -759,9 +851,11 @@ trelli_abundance_histogram <- function(trelliData,
 #'    trelli_abundance_heatmap(
 #'      test_mode = TRUE, test_example = 1:5, 
 #'      ggplot_params = c("ylab('')", "xlab('')"), 
-#'      interactive = TRUE, cognostics = c("biomolecule count")
-#'    )  
-#'    
+#'      interactive = TRUE, cognostics = c("biomolecule count"),
+#'      path = tempdir()
+#'    )
+#'
+#' \dontshow{closeAllConnections()}
 #' }
 #' @author David Degnan, Lisa Bramer
 #'
@@ -953,41 +1047,76 @@ trelli_abundance_heatmap <- function(trelliData,
 #' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a
 #'    trelliscope) should be returned. Default is FALSE.
 #' @param ... Additional arguments to be passed on to the trelli builder
-#'   
+#'
+#' @return No return value, builds a trelliscope display of missingness bar charts that is stored in `path`
+#' 
 #' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
-#' \dontrun{
+#' \donttest{
+#'  
+#' library(pmartRdata)
+#' 
+#' trelliData1 <- as.trelliData.edata(e_data = pep_edata,
+#'                                    edata_cname = "Peptide",
+#'                                    omics_type = "pepData")
+#' # Transform the data
+#' omicsData <- edata_transform(omicsData = pep_object, data_scale = "log2")
+#' 
+#' # Group the data by condition
+#' omicsData <- group_designation(omicsData = omicsData, main_effects = c("Phenotype"))
+#'
+#' # Apply the IMD ANOVA filter
+#' imdanova_Filt <- imdanova_filter(omicsData = omicsData)
+#' omicsData <- applyFilt(filter_object = imdanova_Filt, omicsData = omicsData,
+#'                        min_nonmiss_anova = 2)
+#'
+#' # Normalize my pepData
+#' omicsData <- normalize_global(omicsData, "subset_fn" = "all", "norm_fn" = "median",
+#'                              "apply_norm" = TRUE, "backtransform" = TRUE)
+#'
+#' # Implement the IMD ANOVA method and compute all pairwise comparisons 
+#' # (i.e. leave the `comparisons` argument NULL)
+#' statRes <- imd_anova(omicsData = omicsData, test_method = 'combined')
+#'
+#' # Generate the trelliData object
+#' trelliData2 <- as.trelliData(omicsData = omicsData)
+#' trelliData3 <- as.trelliData(statRes = statRes)
+#' trelliData4 <- as.trelliData(omicsData = omicsData, statRes = statRes)
 #' 
 #' # Build the missingness bar plot with an edata file. Generate trelliData in as.trelliData.edata
 #' trelli_panel_by(trelliData = trelliData1, panel = "Peptide") %>% 
-#'   trelli_missingness_bar(test_mode = TRUE, test_example = 1:10)
+#'   trelli_missingness_bar(test_mode = TRUE, test_example = 1:10, path = tempdir())
 #' trelli_panel_by(trelliData = trelliData1, panel = "Sample") %>% 
-#'   trelli_missingness_bar(test_mode = TRUE, test_example = 1:10, cognostics = "observed proportion")
+#'   trelli_missingness_bar(test_mode = TRUE, test_example = 1:10, 
+#'    cognostics = "observed proportion", path = tempdir())
 #' 
 #' # Build the missingness bar plot with an omicsData object. Generate trelliData in as.trelliData
 #' trelli_panel_by(trelliData = trelliData2, panel = "Peptide") %>% 
-#'   trelli_missingness_bar(test_mode = TRUE, test_example = 1:10)
+#'   trelli_missingness_bar(test_mode = TRUE, test_example = 1:10, path = tempdir())
 #' 
 #' # Build the missingness bar plot with a statRes object. Generate trelliData in as.trelliData
 #' trelli_panel_by(trelliData = trelliData3, panel = "Peptide") %>%
-#'   trelli_missingness_bar(test_mode = TRUE, test_example = 1:10,
+#'   trelli_missingness_bar(test_mode = TRUE, test_example = 1:10, path = tempdir(),
 #'                          cognostics = c("observed proportion", "g-test p-value"))
 #' 
 #' # Build the missingness bar plot with an omicsData and statRes object. 
 #' # Generate trelliData in as.trelliData.
 #' trelli_panel_by(trelliData = trelliData4, panel = "Peptide") %>%
-#'   trelli_missingness_bar(test_mode = TRUE, test_example = 1:10) 
+#'   trelli_missingness_bar(test_mode = TRUE, test_example = 1:10, path = tempdir()) 
 #' 
 #' # Or making the plot interactive 
 #' trelli_panel_by(trelliData = trelliData2, panel = "Peptide") %>% 
-#'    trelli_missingness_bar(test_mode = TRUE, test_example = 1:5, interactive = TRUE)
+#'    trelli_missingness_bar(
+#'      test_mode = TRUE, test_example = 1:5, interactive = TRUE, path = tempdir())
 #'    
 #' # Or visualize only count data 
 #' trelli_panel_by(trelliData = trelliData2, panel = "Peptide") %>% 
 #'    trelli_missingness_bar(
 #'      test_mode = TRUE, test_example = 1:5, 
-#'      cognostics = "observed count", proportion = FALSE
+#'      cognostics = "observed count", proportion = FALSE,
+#'      path = tempdir()
 #'    )
-#'    
+#'
+#' \dontshow{closeAllConnections()}
 #' }
 #'
 #' @author David Degnan, Lisa Bramer
@@ -1347,17 +1476,40 @@ determine_significance <- function(DF, p_value_thresh) {
 #'   trelliscope) should be returned. Default is FALSE.
 #' @param ... Additional arguments to be passed on to the trelli builder
 #'
+#' @return No return value, builds a trelliscope display of fold_change bar plots that is stored in `path`
+#' 
 #' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
-#' \dontrun{
+#' \donttest{
+#' library(pmartRdata)
+#'
+#' # Transform the data
+#' omicsData <- edata_transform(omicsData = pep_object, data_scale = "log2")
+#' 
+#' # Group the data by condition
+#' omicsData <- group_designation(omicsData = omicsData, main_effects = c("Phenotype"))
+#'
+#' # Apply the IMD ANOVA filter
+#' imdanova_Filt <- imdanova_filter(omicsData = omicsData)
+#' omicsData <- applyFilt(filter_object = imdanova_Filt, omicsData = omicsData,
+#'                        min_nonmiss_anova = 2)
+#'
+#' # Normalize my pepData
+#' omicsData <- normalize_global(omicsData, "subset_fn" = "all", "norm_fn" = "median",
+#'                              "apply_norm" = TRUE, "backtransform" = TRUE)
+#'
+#' # Implement the IMD ANOVA method and compute all pairwise comparisons 
+#' # (i.e. leave the `comparisons` argument NULL)
+#' statRes <- imd_anova(omicsData = omicsData, test_method = 'combined')
+#'
+#' # Generate the trelliData object
+#' trelliData3 <- as.trelliData(statRes = statRes)
+#' trelliData4 <- as.trelliData(omicsData = omicsData, statRes = statRes)
 #' 
 #' # Build fold_change bar plot with statRes data grouped by edata_colname.
 #' trelli_panel_by(trelliData = trelliData3, panel = "Peptide") %>% 
-#'   trelli_foldchange_bar(test_mode = TRUE, test_example = 1:10)
-#'   
-#' # Or make the plot interactive  
-#' trelli_panel_by(trelliData = trelliData4, panel = "Peptide") %>% 
-#'   trelli_foldchange_bar(test_mode = TRUE, test_example = 1:10, interactive = TRUE) 
-#'    
+#'   trelli_foldchange_bar(test_mode = TRUE, test_example = 1:10, path = tempdir())
+#'
+#' \dontshow{closeAllConnections()}
 #' }
 #'
 #' @author David Degnan, Lisa Bramer
@@ -1529,9 +1681,34 @@ trelli_foldchange_bar <- function(trelliData,
 #' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a
 #'   trelliscope) should be returned. Default is FALSE.
 #' @param ... Additional arguments to be passed on to the trelli builder
-#'   
+#'
+#' @return No return value, builds a trelliscope display of fold_change boxplots that is stored in `path`
+#' 
 #' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
-#' \dontrun{ 
+#' \donttest{ 
+#' library(pmartRdata)
+#' 
+#' # Transform the data
+#' omicsData <- edata_transform(omicsData = pep_object, data_scale = "log2")
+#' 
+#' # Group the data by condition
+#' omicsData <- group_designation(omicsData = omicsData, main_effects = c("Phenotype"))
+#'
+#' # Apply the IMD ANOVA filter
+#' imdanova_Filt <- imdanova_filter(omicsData = omicsData)
+#' omicsData <- applyFilt(filter_object = imdanova_Filt, omicsData = omicsData,
+#'                        min_nonmiss_anova = 2)
+#'
+#' # Normalize my pepData
+#' omicsData <- normalize_global(omicsData, "subset_fn" = "all", "norm_fn" = "median",
+#'                              "apply_norm" = TRUE, "backtransform" = TRUE)
+#'
+#' # Implement the IMD ANOVA method and compute all pairwise comparisons 
+#' # (i.e. leave the `comparisons` argument NULL)
+#' statRes <- imd_anova(omicsData = omicsData, test_method = 'combined')
+#'
+#' # Generate the trelliData object
+#' trelliData4 <- as.trelliData(omicsData = omicsData, statRes = statRes)
 #' 
 #' # Build fold_change box plot with statRes data grouped by edata_colname.
 #' trelli_panel_by(trelliData = trelliData4, panel = "RazorProtein") %>% 
@@ -1540,9 +1717,11 @@ trelli_foldchange_bar <- function(trelliData,
 #'                             cognostics = c("biomolecule count", 
 #'                                            "proportion significant", 
 #'                                            "mean fold change",
-#'                                            "sd fold change")
+#'                                            "sd fold change"),
+#'                             path = tempdir()
 #'                            )
-#'
+#' 
+#' \dontshow{closeAllConnections()}
 #' }
 #'
 #' @author David Degnan, Lisa Bramer
@@ -1737,14 +1916,41 @@ trelli_foldchange_boxplot <- function(trelliData,
 #'   trelliscope) should be returned. Default is FALSE.
 #' @param ... Additional arguments to be passed on to the trelli builder
 #' 
+#' @return No return value, builds a trelliscope display of fold-change heatmaps that is stored in `path`
+#' 
 #' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
-#' \dontrun{ 
+#' \donttest{ 
+#' library(pmartRdata)
+#' 
+#' # Transform the data
+#' omicsData <- edata_transform(omicsData = pep_object, data_scale = "log2")
+#' 
+#' # Group the data by condition
+#' omicsData <- group_designation(omicsData = omicsData, main_effects = c("Phenotype"))
+#'
+#' # Apply the IMD ANOVA filter
+#' imdanova_Filt <- imdanova_filter(omicsData = omicsData)
+#' omicsData <- applyFilt(filter_object = imdanova_Filt, omicsData = omicsData,
+#'                        min_nonmiss_anova = 2)
+#'
+#' # Normalize my pepData
+#' omicsData <- normalize_global(omicsData, "subset_fn" = "all", "norm_fn" = "median",
+#'                              "apply_norm" = TRUE, "backtransform" = TRUE)
+#'
+#' # Implement the IMD ANOVA method and compute all pairwise comparisons 
+#' # (i.e. leave the `comparisons` argument NULL)
+#' statRes <- imd_anova(omicsData = omicsData, test_method = 'combined')
+#'
+#' # Generate the trelliData object
+#' trelliData4 <- as.trelliData(omicsData = omicsData, statRes = statRes)
 #' 
 #' # Build fold_change bar plot with statRes data grouped by edata_colname.
 #' trelli_panel_by(trelliData = trelliData4, panel = "RazorProtein") %>% 
 #'   trelli_foldchange_heatmap(test_mode = TRUE, 
-#'                             test_example = 1:10)
-#'
+#'                             test_example = 1:10,
+#'                             path = tempdir())
+#' 
+#' \dontshow{closeAllConnections()}
 #' }
 #'
 #' @author David Degnan, Lisa Bramer
@@ -1936,15 +2142,42 @@ trelli_foldchange_heatmap <- function(trelliData,
 #' @param single_plot A TRUE/FALSE to indicate whether 1 plot (not a
 #'   trelliscope) should be returned. Default is FALSE.
 #' @param ... Additional arguments to be passed on to the trelli builder
-#'   
+#' 
+#' @return No return value, builds a trelliscope display of fold-change volcano plots that is stored in `path`
+#' 
 #' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
-#' \dontrun{
+#' \donttest{
+#' 
+#' library(pmartRdata)
 #'
+#' # Transform the data
+#' omicsData <- edata_transform(omicsData = pep_object, data_scale = "log2")
+#'
+#' # Group the data by condition
+#' omicsData <- group_designation(omicsData = omicsData, main_effects = c("Phenotype"))
+#'
+#' # Apply the IMD ANOVA filter
+#' imdanova_Filt <- imdanova_filter(omicsData = omicsData)
+#' omicsData <- applyFilt(filter_object = imdanova_Filt, omicsData = omicsData,
+#'                        min_nonmiss_anova = 2)
+#'
+#' # Normalize my pepData
+#' omicsData <- normalize_global(omicsData, "subset_fn" = "all", "norm_fn" = "median",
+#'                              "apply_norm" = TRUE, "backtransform" = TRUE)
+#'
+#' # Implement the IMD ANOVA method and compute all pairwise comparisons 
+#' # (i.e. leave the `comparisons` argument NULL)
+#' statRes <- imd_anova(omicsData = omicsData, test_method = 'combined')
+#'
+#' # Generate the trelliData object
+#' trelliData4 <- as.trelliData(omicsData = omicsData, statRes = statRes)
 #' ## Build fold_change bar plot with statRes data grouped by edata_colname.
 #' trelli_panel_by(trelliData = trelliData4, panel = "RazorProtein") %>% 
 #'   trelli_foldchange_volcano(comparison = "all", test_mode = TRUE, test_example = 1:10,
-#'                             cognostics = c("biomolecule count", "proportion significant"))
-#'
+#'                             cognostics = c("biomolecule count", "proportion significant"),
+#'                             path = tempdir())
+#' 
+#' \dontshow{closeAllConnections()}
 #' }
 #'
 #' @author David Degnan, Lisa Bramer

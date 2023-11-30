@@ -51,22 +51,46 @@ trelliscope) should be returned. Default is FALSE.}
 
 \item{...}{Additional arguments to be passed on to the trelli builder}
 }
+\value{
+No return value, builds a trelliscope display of fold_change bar plots that is stored in `path`
+}
 \description{
 Specify a plot design and cognostics for the fold_change
   barchart trelliscope. Fold change must be grouped by edata_cname.
 }
 \examples{
 \dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
-\dontrun{
+\donttest{
+library(pmartRdata)
+
+# Transform the data
+omicsData <- edata_transform(omicsData = pep_object, data_scale = "log2")
+
+# Group the data by condition
+omicsData <- group_designation(omicsData = omicsData, main_effects = c("Phenotype"))
+
+# Apply the IMD ANOVA filter
+imdanova_Filt <- imdanova_filter(omicsData = omicsData)
+omicsData <- applyFilt(filter_object = imdanova_Filt, omicsData = omicsData,
+                       min_nonmiss_anova = 2)
+
+# Normalize my pepData
+omicsData <- normalize_global(omicsData, "subset_fn" = "all", "norm_fn" = "median",
+                             "apply_norm" = TRUE, "backtransform" = TRUE)
+
+# Implement the IMD ANOVA method and compute all pairwise comparisons 
+# (i.e. leave the `comparisons` argument NULL)
+statRes <- imd_anova(omicsData = omicsData, test_method = 'combined')
+
+# Generate the trelliData object
+trelliData3 <- as.trelliData(statRes = statRes)
+trelliData4 <- as.trelliData(omicsData = omicsData, statRes = statRes)
 
 # Build fold_change bar plot with statRes data grouped by edata_colname.
 trelli_panel_by(trelliData = trelliData3, panel = "Peptide") \%>\% 
-  trelli_foldchange_bar(test_mode = TRUE, test_example = 1:10)
-  
-# Or make the plot interactive  
-trelli_panel_by(trelliData = trelliData4, panel = "Peptide") \%>\% 
-  trelli_foldchange_bar(test_mode = TRUE, test_example = 1:10, interactive = TRUE) 
-   
+  trelli_foldchange_bar(test_mode = TRUE, test_example = 1:10, path = tempdir())
+
+\dontshow{closeAllConnections()}
 }
 \dontshow{\}) # examplesIf}
 }

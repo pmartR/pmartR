@@ -256,7 +256,7 @@ molecule_filter <- function(omicsData, use_groups = FALSE, use_batch = FALSE) {
 #'   across all samples.
 #'
 #' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
-#' \dontrun{
+#' \donttest{
 #' library(pmartRdata)
 #' to_filter <- total_count_filter(omicsData = rnaseq_object)
 #' summary(to_filter, min_count = 15)

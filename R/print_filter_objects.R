@@ -4,6 +4,8 @@
 #' @param x An object of type 'moleculeFilt'
 #' @param ...  further arguments passed to or from other methods
 #'
+#' @return No return value, prints details about x
+#'
 #' @rdname print-moleculeFilt
 #' @export
 #'
@@ -29,6 +31,8 @@ print.moleculeFilt <- function(x, ...) {
 #' For printing an S3 object of type 'totalCountFilt'
 #' @param x An object of type 'totalCountFilt'
 #' @param ...  further arguments passed to or from other methods
+#'
+#' @return No return value, prints details about x
 #'
 #' @rdname print-totalCountFilt
 #' @export
@@ -56,6 +60,8 @@ print.totalCountFilt <- function(x, ...) {
 #' @param x An object of type 'RNAFilt'
 #' @param ...  further arguments passed to or from other methods
 #'
+#' @return No return value, prints details about x
+#'
 #' @rdname print-RNAFilt
 #' @export
 #'
@@ -82,6 +88,8 @@ print.RNAFilt <- function(x, ...) {
 #' @param x An object of type 'proteomicsFilt'
 #' @param ...  further arguments passed to or from other methods
 #'
+#' @return No return value, prints details about x
+#' 
 #' @rdname print-proteomicsFilt
 #' @export
 #'
@@ -120,6 +128,8 @@ print.proteomicsFilt <- function(x, ...) {
 #' @param x An object of type 'imdanovaFilt'
 #' @param ...  further arguments passed to or from other methods
 #'
+#' @return No return value, prints details about x
+#' 
 #' @rdname print-imdanovaFilt
 #' @export
 #'
@@ -145,6 +155,8 @@ print.imdanovaFilt <- function(x, ...) {
 #' For printing an S3 object of type 'rmdFilt'
 #' @param x An object of type 'rmdFilt'
 #' @param ...  further arguments passed to or from other methods
+#'
+#' @return No return value, prints details about x
 #'
 #' @rdname print-rmdFilt
 #' @export
@@ -174,6 +186,8 @@ print.rmdFilt <- function(x, ...) {
 #' @param x An object of type 'cvFilt'
 #' @param ...  further arguments passed to or from other methods
 #'
+#' @return No return value, prints details about x
+#'
 #' @rdname print-cvFilt
 #' @export
 #'
@@ -199,6 +213,8 @@ print.cvFilt <- function(x, ...) {
 #' For printing an S3 object of type 'customFilt'
 #' @param x An object of type 'customFilt'
 #' @param ...  further arguments passed to or from other methods
+#'
+#' @return No return value, prints details about x
 #'
 #' @rdname print-customFilt
 #' @export

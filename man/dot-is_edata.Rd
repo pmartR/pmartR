@@ -15,11 +15,3 @@ A boolean where TRUE means the file is an acceptable edata file.
 \description{
 Test if a file is an edata file
 }
-\examples{
-\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
-\dontrun{
-
-.is_edata(pmartRdata::lipid_edata)
-}
-\dontshow{\}) # examplesIf}
-}

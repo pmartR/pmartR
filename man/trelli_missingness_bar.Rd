@@ -57,6 +57,9 @@ trelliscope) should be returned. Default is FALSE.}
 
 \item{...}{Additional arguments to be passed on to the trelli builder}
 }
+\value{
+No return value, builds a trelliscope display of missingness bar charts that is stored in `path`
+}
 \description{
 Specify a plot design and cognostics for the missing barchart
    trelliscope. Missingness is displayed per panel_by variable. Main_effects
@@ -64,39 +67,72 @@ Specify a plot design and cognostics for the missing barchart
 }
 \examples{
 \dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
-\dontrun{
+\donttest{
+ 
+library(pmartRdata)
+
+trelliData1 <- as.trelliData.edata(e_data = pep_edata,
+                                   edata_cname = "Peptide",
+                                   omics_type = "pepData")
+# Transform the data
+omicsData <- edata_transform(omicsData = pep_object, data_scale = "log2")
+
+# Group the data by condition
+omicsData <- group_designation(omicsData = omicsData, main_effects = c("Phenotype"))
+
+# Apply the IMD ANOVA filter
+imdanova_Filt <- imdanova_filter(omicsData = omicsData)
+omicsData <- applyFilt(filter_object = imdanova_Filt, omicsData = omicsData,
+                       min_nonmiss_anova = 2)
+
+# Normalize my pepData
+omicsData <- normalize_global(omicsData, "subset_fn" = "all", "norm_fn" = "median",
+                             "apply_norm" = TRUE, "backtransform" = TRUE)
+
+# Implement the IMD ANOVA method and compute all pairwise comparisons 
+# (i.e. leave the `comparisons` argument NULL)
+statRes <- imd_anova(omicsData = omicsData, test_method = 'combined')
+
+# Generate the trelliData object
+trelliData2 <- as.trelliData(omicsData = omicsData)
+trelliData3 <- as.trelliData(statRes = statRes)
+trelliData4 <- as.trelliData(omicsData = omicsData, statRes = statRes)
 
 # Build the missingness bar plot with an edata file. Generate trelliData in as.trelliData.edata
 trelli_panel_by(trelliData = trelliData1, panel = "Peptide") \%>\% 
-  trelli_missingness_bar(test_mode = TRUE, test_example = 1:10)
+  trelli_missingness_bar(test_mode = TRUE, test_example = 1:10, path = tempdir())
 trelli_panel_by(trelliData = trelliData1, panel = "Sample") \%>\% 
-  trelli_missingness_bar(test_mode = TRUE, test_example = 1:10, cognostics = "observed proportion")
+  trelli_missingness_bar(test_mode = TRUE, test_example = 1:10, 
+   cognostics = "observed proportion", path = tempdir())
 
 # Build the missingness bar plot with an omicsData object. Generate trelliData in as.trelliData
 trelli_panel_by(trelliData = trelliData2, panel = "Peptide") \%>\% 
-  trelli_missingness_bar(test_mode = TRUE, test_example = 1:10)
+  trelli_missingness_bar(test_mode = TRUE, test_example = 1:10, path = tempdir())
 
 # Build the missingness bar plot with a statRes object. Generate trelliData in as.trelliData
 trelli_panel_by(trelliData = trelliData3, panel = "Peptide") \%>\%
-  trelli_missingness_bar(test_mode = TRUE, test_example = 1:10,
+  trelli_missingness_bar(test_mode = TRUE, test_example = 1:10, path = tempdir(),
                          cognostics = c("observed proportion", "g-test p-value"))
 
 # Build the missingness bar plot with an omicsData and statRes object. 
 # Generate trelliData in as.trelliData.
 trelli_panel_by(trelliData = trelliData4, panel = "Peptide") \%>\%
-  trelli_missingness_bar(test_mode = TRUE, test_example = 1:10) 
+  trelli_missingness_bar(test_mode = TRUE, test_example = 1:10, path = tempdir()) 
 
 # Or making the plot interactive 
 trelli_panel_by(trelliData = trelliData2, panel = "Peptide") \%>\% 
-   trelli_missingness_bar(test_mode = TRUE, test_example = 1:5, interactive = TRUE)
+   trelli_missingness_bar(
+     test_mode = TRUE, test_example = 1:5, interactive = TRUE, path = tempdir())
    
 # Or visualize only count data 
 trelli_panel_by(trelliData = trelliData2, panel = "Peptide") \%>\% 
    trelli_missingness_bar(
      test_mode = TRUE, test_example = 1:5, 
-     cognostics = "observed count", proportion = FALSE
+     cognostics = "observed count", proportion = FALSE,
+     path = tempdir()
    )
-   
+
+\dontshow{closeAllConnections()}
 }
 \dontshow{\}) # examplesIf}
 }

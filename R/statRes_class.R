@@ -101,6 +101,7 @@ statRes_output <- function(imd_anova_out,
 #' Provide summary information about statRes objects
 #'
 #' @name statRes-class
+#' @return No return value, prints details about the statres object.
 #' @seealso See \code{\link{imd_anova}}
 #'
 #' @exportClass statRes

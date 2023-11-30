@@ -81,7 +81,7 @@ DESeq2 option requires package "survival" to be available.
 }
 \examples{
 \dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
-\dontrun{
+\donttest{
 library(pmartRdata)
 myseqData <- group_designation(omicsData = rnaseq_object, main_effects = "Virus")
 dispersion_est(omicsData = myseqData, method = "edgeR")

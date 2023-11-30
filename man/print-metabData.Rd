@@ -11,6 +11,9 @@
 
 \item{...}{further arguments passed to or from other methods}
 }
+\value{
+No return value, prints details about x
+}
 \description{
 For printing an S3 object of type 'metabData'
 }

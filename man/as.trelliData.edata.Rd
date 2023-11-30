@@ -60,6 +60,10 @@ normalized (and will therefore skip the normalization step)}
 \item{force_normalization}{A logical indicator to force normalization that is
 not required for both isobaric protein and NMR data}
 }
+\value{
+An object of class 'trelliData' containing the raw data.
+ To be passed to trelliscope building functions.
+}
 \description{
 The only acceptable input file type is a single edata file.
   Transformation and normalization must be specified. Isobaric protein or NMR

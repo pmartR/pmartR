@@ -126,7 +126,7 @@
 #'
 #'
 #' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
-#' \dontrun{
+#' \donttest{
 #' library(pmartRdata)
 #'
 #' pep_object <- edata_transform(omicsData = pep_object, data_scale = "log2")
@@ -695,7 +695,7 @@ normalize_global_basic <- function(edata, norm_fn) {
 #'   method. \cr
 #'
 #' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
-#' \dontrun{
+#' \donttest{
 #' library(pmartRdata)
 #'
 #' # data must be log transformed and grouped

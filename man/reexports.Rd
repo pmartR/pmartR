@@ -6,6 +6,11 @@
 \alias{\%dopar\%}
 \alias{\%>\%}
 \title{Objects exported from other packages}
+\value{
+No return, used solely for roxygen2 documentation
+
+No return, used solely for roxygen2 documentation
+}
 \keyword{internal}
 \description{
 These objects are imported from other packages. Follow the links

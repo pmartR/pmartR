@@ -48,6 +48,9 @@ potential future functions.}
 \item{p_value_thresh}{The user provided threshold for plotting significant
 p-values.}
 }
+\value{
+No return value, validates a trelliData object before passing it to builder functions.
+}
 \description{
 This function runs necessary checks for pmartR trelliscope plotting
 functions. It cleans any parameters (rounding numerics to integers, etc.),

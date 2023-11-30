@@ -860,7 +860,7 @@ plot.nmrnormRes <- function(x, nmrData = NULL, order_by = NULL,
 #'   interactive is TRUE
 #'
 #' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
-#' \dontrun{
+#' \donttest{
 #' library(pmartRdata)
 #' data(pep_object)
 #' mypep <- edata_transform(omicsData = pep_object, data_scale = "log2")
@@ -1658,7 +1658,7 @@ na_scatter <- function (edata, group_df, na.by.molecule, edata_cname,
 #' my_correlation <- cor_result(omicsData = mymetab)
 #' plot(my_correlation, omicsData = mymetab, order_by = "Phenotype")
 #'
-#' \dontrun{
+#' \donttest{
 #' myseq_correlation <- cor_result(omicsData = rnaseq_object)
 #' plot(myseq_correlation)
 #' }
@@ -1954,7 +1954,7 @@ plot.corRes <- function(x, omicsData = NULL, order_by = NULL,
 #' pca_lipids <- dim_reduction(omicsData = mylipid)
 #' plot(pca_lipids)
 #'
-#' \dontrun{
+#' \donttest{
 #' myseq <- group_designation(omicsData = rnaseq_object, main_effects = "Virus")
 #' pca_seq <- dim_reduction(omicsData = myseq)
 #' plot(pca_seq)
@@ -2623,7 +2623,7 @@ plot.moleculeFilt <- function(x, min_num = NULL, cumulative = TRUE,
 #'   interactive is TRUE
 #'
 #' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
-#' \dontrun{
+#' \donttest{
 #' library(pmartRdata)
 #' seqfilt <- total_count_filter(omicsData = rnaseq_object)
 #' plot(seqfilt, min_count = 15)
@@ -4619,6 +4619,8 @@ plot.cvFilt <- function(x, cv_threshold = NULL,
 #' @param x An object of class customFilt.
 #' @param ... further arguments passed to or from other methods.
 #'
+#' @return No return value, implemented to provide information to user.
+#' 
 #' @rdname plot-customFilt
 #'
 #' @export
@@ -6346,6 +6348,8 @@ plot.statRes <- function(x,
 #' @param x A statRes object.
 #' @param test character string indicating the type of test run.
 #'
+#' @return A data frame with the sample IDs and significance flags from a statistical test.
+#' 
 prep_flags <- function(x, test) {
   if (test == "anova") {
     # Assemble a data frame with the sample IDs and anova flags.

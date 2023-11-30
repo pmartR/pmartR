@@ -71,7 +71,7 @@ For plotting an S3 object of type 'SPANSRes'
 }
 \examples{
 \dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
-\dontrun{
+\donttest{
 library(pmartRdata)
 data(pep_object)
 mypep <- edata_transform(omicsData = pep_object, data_scale = "log2")

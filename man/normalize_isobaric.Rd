@@ -51,6 +51,13 @@ regarding reference pool samples. If using this argument, the
 'refpool_cname' argument must also be specified; in this case,
 'channel_cname' and 'refpool_channel' should not be specified.}
 }
+\value{
+If apply_norm = TRUE, an object of class 'isobaricpepData', normalized to reference pool,
+ and with the attribute 'isobaric_info' updated to include information about
+ the reference pool samples and the normalization procedure.  Otherwise an
+ object of class 'isobaricnormRes' containing similar information about the 
+ normalization process
+}
 \description{
 Examine reference pool samples and apply normalization of study samples to
 their corresponding reference pool sample

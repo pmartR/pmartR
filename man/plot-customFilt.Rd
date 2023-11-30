@@ -11,6 +11,9 @@
 
 \item{...}{further arguments passed to or from other methods.}
 }
+\value{
+No return value, implemented to provide information to user.
+}
 \description{
 Currently plotting a customFilt object is not supported
 }

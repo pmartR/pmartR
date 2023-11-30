@@ -36,7 +36,12 @@
 #'   temporarily un-log transforming the data and then returning normalized data
 #'   on the same scale it was provided). If using this argument, the
 #'   'metabolite_name' argument should not be specified.
-#'
+#' 
+#' @return If \code{apply_norm} is TRUE, an object of class `nmrData`, normalized
+#'  and with information about the normalization process in `nmr_info`.  Otherwise,
+#'  an object of class `nmrnormRes` is returned, with the same info about
+#'  normalization in attribute `nmr_info` to be passed to plotting and summary functions.
+#' 
 #' @details There are two ways to specify the information needed for
 #' performing instrument normalization on an nmrData object: \enumerate{ \item
 #' specify \code{metabolite_name}. This should be used when normalization to a

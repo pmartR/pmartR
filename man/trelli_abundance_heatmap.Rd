@@ -50,6 +50,9 @@ trelliscope) should be returned. Default is FALSE.}
 
 \item{...}{Additional arguments to be passed on to the trelli builder}
 }
+\value{
+No return value, builds a trelliscope display of heatmaps that is stored in `path`
+}
 \description{
 Specify a plot design and cognostics for the abundance heatmap
   trelliscope. Data must be grouped by an e_meta column. Main_effects order
@@ -57,12 +60,37 @@ Specify a plot design and cognostics for the abundance heatmap
 }
 \examples{
 \dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
-\dontrun{
+\donttest{
+
+library(pmartRdata)
+
+# Transform the data
+omicsData <- edata_transform(omicsData = pep_object, data_scale = "log2")
+
+# Group the data by condition
+omicsData <- group_designation(omicsData = omicsData, main_effects = c("Phenotype"))
+
+# Apply the IMD ANOVA filter
+imdanova_Filt <- imdanova_filter(omicsData = omicsData)
+omicsData <- applyFilt(filter_object = imdanova_Filt, omicsData = omicsData,
+                       min_nonmiss_anova = 2)
+
+# Normalize my pepData
+omicsData <- normalize_global(omicsData, "subset_fn" = "all", "norm_fn" = "median",
+                             "apply_norm" = TRUE, "backtransform" = TRUE)
+
+# Implement the IMD ANOVA method and compute all pairwise comparisons 
+# (i.e. leave the `comparisons` argument NULL)
+statRes <- imd_anova(omicsData = omicsData, test_method = 'combined')
+
+# Generate the trelliData object
+trelliData2 <- as.trelliData(omicsData = omicsData)
+trelliData4 <- as.trelliData(omicsData = omicsData, statRes = statRes)
 
 # Build the abundance heatmap with an omicsData object with emeta variables. 
 # Generate trelliData in as.trelliData.
 trelli_panel_by(trelliData = trelliData2, panel = "RazorProtein") \%>\%
-   trelli_abundance_heatmap(test_mode = TRUE, test_example = 1:3)
+   trelli_abundance_heatmap(test_mode = TRUE, test_example = 1:3, path = tempdir())
    
 # Users can modify the plotting function with ggplot parameters and interactivity, 
 # and can also select certain cognostics.     
@@ -70,9 +98,11 @@ trelli_panel_by(trelliData = trelliData4, panel = "RazorProtein") \%>\%
    trelli_abundance_heatmap(
      test_mode = TRUE, test_example = 1:5, 
      ggplot_params = c("ylab('')", "xlab('')"), 
-     interactive = TRUE, cognostics = c("biomolecule count")
-   )  
-   
+     interactive = TRUE, cognostics = c("biomolecule count"),
+     path = tempdir()
+   )
+
+\dontshow{closeAllConnections()}
 }
 \dontshow{\}) # examplesIf}
 }

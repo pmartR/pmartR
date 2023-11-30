@@ -42,7 +42,7 @@
 #'   Measurements}. Molecular & Cellular Proteomics.: MCP, 13(12), 3639-3646.
 #'
 #' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
-#' \dontrun{
+#' \donttest{
 #' library(pmartRdata)
 #'
 #' mypepData <- group_designation(omicsData = pep_object, main_effects = c("Phenotype"))
