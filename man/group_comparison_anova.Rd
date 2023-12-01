@@ -4,14 +4,33 @@
 \alias{group_comparison_anova}
 \title{Group comparisons for the anova test}
 \usage{
-group_comparison_anova(groupData, comparisons, anova_results_full)
+group_comparison_anova(
+  data,
+  groupData,
+  comparisons,
+  Xfull,
+  Xred,
+  anova_results_full,
+  beta_to_mu_full,
+  beta_to_mu_red
+)
 }
 \arguments{
+\item{data}{The expression values without the id column}
+
 \item{groupData}{data frame that assigns sample names to groups}
 
-\item{comparisons}{dataframe that defiens the comparsions of interest}
+\item{comparisons}{dataframe that defines the comparsions of interest}
+
+\item{Xfull}{design matrix for the full model with interaction terms between the main effects}
+
+\item{Xred}{design matrix for the reduced model with no interaction terms between the main effects}
 
 \item{anova_results_full}{results of the \code{pmartR::anova_test()} function}
+
+\item{beta_to_mu_full}{matrix that maps the beta coefficients to the group means for the full model}
+
+\item{beta_to_mu_red}{matrix that maps the beta coefficients to the group means for the reduced model}
 }
 \value{
 A data.frame containing the p-values from the group comparisons.
@@ -20,5 +39,5 @@ A data.frame containing the p-values from the group comparisons.
 Takes the results of anova_test() and returns group comparison p-values
 }
 \author{
-Bryan Stanfill
+Bryan Stanfill, Daniel Claborne
 }

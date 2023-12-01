@@ -198,6 +198,11 @@ groupie <- data.frame(
   Group = c(rep("Mock", 5), rep("FM", 5), rep("AM", 5))
 )
 
+Xmatrix_1_1_3 = structure(c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 
+0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0, 
+1), dim = c(15L, 4L))
+
 # Assemble ANOVA standards -----------------------------------------------------
 
 # main effects: 0; covariates: 0; groups: 3 ---------------
@@ -447,66 +452,30 @@ attr(astan_1_0_3, "cnames") <- list(
   fdata_cname = "Name",
   techrep_cname = NULL
 )
+attr(astan_1_0_3, "which_X") <- rep(0, nrow(astan_1_0_3))
 attr(astan_1_0_3, "data_class") <- "pepData"
 
 # main effects: 1; covariates: 1; groups: 3 ---------------
+data_1_1_3 <- data.matrix(diff_a_1_0_3[, -1])
 
-# Adjust the means to remove effect of covariates.
-adj_data_1_1_3 <- project_to_null(
-  data_mat = data.matrix(diff_a_1_0_3[, -1]),
-  Xmatrix = structure(c(1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                        0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                        0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1,
-                        0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0,
-                        0, 1, 0, 0, 1, 1, 0),
-                      .Dim = c(15L, 5L)),
-  ngroups = 3
-)
-
-cov_df_1_1_3 <- 2
-
-mean_a_1_1_3 <- data.frame(
-  Mean_Mock = rowMeans(adj_data_1_1_3[, 1:5],
-                       na.rm = TRUE),
-  Mean_FM = rowMeans(adj_data_1_1_3[, 6:10],
-                     na.rm = TRUE),
-  Mean_AM = rowMeans(adj_data_1_1_3[, 11:15],
-                     na.rm = TRUE)
-)
+Betas = compute_betas(data_mat = data_1_1_3, Xmatrix = Xmatrix_1_1_3)
+group_df <- build_factor_group_df(afilta_1_1_3)
+pred_grid <- get_pred_grid(group_df, main_effect_names = "Virus", covariate_names = "Gender")
+mean_a_1_1_3 <- get_lsmeans(data = data_1_1_3, xmatrix = Xmatrix_1_1_3, pred_grid = pred_grid, Betas = Betas)
 
 group_counts_1_1_3 <- data.frame(
-  nona_Mock = rowSums(!is.na(adj_data_1_1_3[, 1:5])),
-  nona_FM = rowSums(!is.na(adj_data_1_1_3[, 6:10])),
-  nona_AM = rowSums(!is.na(adj_data_1_1_3[, 11:15]))
+  nona_Mock = rowSums(!is.na(data_1_1_3[, 1:5])),
+  nona_FM = rowSums(!is.na(data_1_1_3[, 6:10])),
+  nona_AM = rowSums(!is.na(data_1_1_3[, 11:15]))
 ) %>%
   dplyr::rowwise() %>%
   dplyr::mutate(n_grp = sum(dplyr::c_across(nona_Mock:nona_AM) == 0)) %>%
   dplyr::ungroup()
 
+mean_a_1_1_3[group_counts_1_1_3[,-4] == 0] <- NA
+
 nona_grps_1_1_3 <- rowSums(group_counts_1_1_3[, 1:3] != 0)
-
-sigma_1_1_3 <- adj_data_1_1_3 %>%
-  dplyr::mutate(mMock = mean_a_1_1_3$Mean_Mock,
-                mFM = mean_a_1_1_3$Mean_FM,
-                mAM = mean_a_1_1_3$Mean_AM,
-                lg = group_counts_1_1_3$n_grp) %>%
-  dplyr::rowwise() %>%
-  dplyr::mutate(
-    sse = sum(
-      c((dplyr::c_across(Pair_1:Pair_5) - mMock)^2,
-        (dplyr::c_across(Pair_6:Pair_10) - mFM)^2,
-        (dplyr::c_across(Pair_11:Pair_15) - mAM)^2),
-      na.rm = TRUE
-    ),
-    vari = sse / (sum(!is.na(dplyr::c_across(Pair_1:Pair_15))) -
-                    # first number: number groups
-                    # lg: number groups with all missing data
-                    # cov_df_1_1_3: degrees of freedom lost due to covariates
-                    (3 - lg) - cov_df_1_1_3)
-  ) %>%
-  dplyr::pull(vari)
-
-nona_counts_1_1_3 <- rowSums(!is.na(adj_data_1_1_3))
+nona_counts_1_1_3 <- rowSums(!is.na(data_1_1_3))
 
 diffs_1_1_3 <- mean_a_1_1_3 %>%
   dplyr::mutate(
@@ -516,18 +485,23 @@ diffs_1_1_3 <- mean_a_1_1_3 %>%
   ) %>%
   dplyr::select(diff_m_f, diff_m_a, diff_f_a)
 
+beta_to_mu = pred_grid
+beta_to_mu[,4] = 0
+beta_to_mu = unique(beta_to_mu)
+cmat = rbind(c(1, -1, 0), c(1, 0, -1), c(0, 1, -1))
+cmat = cmat %*% beta_to_mu
+
+test_values <- get_test_values(data_1_1_3, Xmatrix_1_1_3, cmat)
+diff_denoms <- test_values$diff_denoms
+colnames(diff_denoms) <- c("C1", "C2", "C3")
+
 test_stat_1_1_3 <- diffs_1_1_3 %>%
   cbind(group_counts_1_1_3) %>%
+  cbind(diff_denoms) %>%
   dplyr::mutate(
-    stat_m_f = (diff_m_f /
-                  sqrt((1/nona_Mock +
-                          1/nona_FM) * sigma_1_1_3)),
-    stat_m_a = (diff_m_a /
-                  sqrt((1/nona_Mock +
-                          1/nona_AM) * sigma_1_1_3)),
-    stat_f_a = (diff_f_a /
-                  sqrt((1/nona_FM +
-                          1/nona_AM) * sigma_1_1_3))
+    stat_m_f = (diff_m_f / C1),
+    stat_m_a = (diff_m_a / C2),
+    stat_f_a = (diff_f_a / C3)
   ) %>%
   dplyr::select(stat_m_f, stat_m_a, stat_f_a) %>%
   dplyr::ungroup() %>%
@@ -536,19 +510,20 @@ test_stat_1_1_3 <- diffs_1_1_3 %>%
 pval_a_1_1_3 <- test_stat_1_1_3 %>%
   dplyr::mutate(
     lg = group_counts_1_1_3$n_grp,
+    ranks = test_values$ranks,
     P_value_A_Mock_vs_FM = pt(
       q = abs(stat_m_f),
-      df = nona_counts_1_1_3 - (3 - lg),
+      df = nona_counts_1_1_3 - test_values$ranks,
       lower.tail = FALSE
     ) * 2,
     P_value_A_Mock_vs_AM = pt(
       q = abs(stat_m_a),
-      df = nona_counts_1_1_3 - (3 - lg),
+      df = nona_counts_1_1_3 - test_values$ranks,
       lower.tail = FALSE
     ) * 2,
     P_value_A_FM_vs_AM = pt(
       q = abs(stat_f_a),
-      df = nona_counts_1_1_3 - (3 - lg),
+      df = nona_counts_1_1_3 - test_values$ranks,
       lower.tail = FALSE
     ) * 2
   ) %>%
@@ -654,6 +629,7 @@ attr(astan_1_1_3, "cnames") <- list(
   fdata_cname = "Name",
   techrep_cname = NULL
 )
+attr(astan_1_1_3, "which_X") <- rep(0, nrow(astan_1_1_3))
 attr(astan_1_1_3, "data_class") <- "pepData"
 
 # Generate G-Test standards ----------------------------------------------------
@@ -815,6 +791,7 @@ attr(gstan_1_0_3, "cnames") <- list(
   fdata_cname = "Name",
   techrep_cname = NULL
 )
+attr(gstan_1_0_3, "which_X") <- rep(0, nrow(gstan_1_0_3))
 attr(gstan_1_0_3, "data_class") <- "pepData"
 
 # main effects: 1; covariates: 1; groups: 3 ---------------
@@ -888,14 +865,31 @@ flag_g_1_1_3 <- data.frame(
   )
 )
 
-mean_g_1_1_3 <- data.frame(
-  Mean_Mock = rowMeans(diff_g[, 2:6],
-                       na.rm = TRUE),
-  Mean_FM = rowMeans(diff_g[, 7:11],
-                     na.rm = TRUE),
-  Mean_AM = rowMeans(diff_g[, 12:16],
-                     na.rm = TRUE)
-)
+data_g_1_1_3 <- data.matrix(diff_g[, -1])
+
+Betas = compute_betas(data_mat = data_g_1_1_3, Xmatrix = Xmatrix_1_1_3)
+group_df <- build_factor_group_df(gfilta_1_1_3)
+pred_grid <- get_pred_grid(group_df, main_effect_names = "Virus", covariate_names = "Gender")
+mean_g_1_1_3 <- get_lsmeans(data = data_g_1_1_3, xmatrix = Xmatrix_1_1_3, pred_grid = pred_grid, Betas = Betas)
+
+group_counts_g_1_1_3 <- data.frame(
+  nona_Mock = rowSums(!is.na(data_g_1_1_3[, 1:5])),
+  nona_FM = rowSums(!is.na(data_g_1_1_3[, 6:10])),
+  nona_AM = rowSums(!is.na(data_g_1_1_3[, 11:15]))
+) %>%
+  dplyr::rowwise() %>%
+  dplyr::mutate(n_grp = sum(dplyr::c_across(nona_Mock:nona_AM) == 0)) %>%
+  dplyr::ungroup()
+
+mean_g_1_1_3[group_counts_g_1_1_3[,-4] == 0] <- NA
+
+diffs_1_1_3 <- mean_g_1_1_3 %>%
+  dplyr::mutate(
+    diff_m_f = Mean_Mock - Mean_FM,
+    diff_m_a = Mean_Mock - Mean_AM,
+    diff_f_a = Mean_FM - Mean_AM
+  ) %>%
+  dplyr::select(diff_m_f, diff_m_a, diff_f_a)
 
 gstan_1_1_3 <- data.frame(
   Mass_Tag_ID = gfilta_1_1_3$e_data$Mass_Tag_ID,
@@ -903,15 +897,9 @@ gstan_1_1_3 <- data.frame(
   Count_FM = unname(obs_fm),
   Count_AM = unname(obs_am),
   mean_g_1_1_3,
-  Fold_change_Mock_vs_FM = (
-    mean_g_1_1_3[, 1] - mean_g_1_1_3[, 2]
-  ),
-  Fold_change_Mock_vs_AM = (
-    mean_g_1_1_3[, 1] - mean_g_1_1_3[, 3]
-  ),
-  Fold_change_FM_vs_AM = (
-    mean_g_1_1_3[, 2] - mean_g_1_1_3[, 3]
-  ),
+  Fold_change_Mock_vs_FM = diffs_1_1_3[,1],
+  Fold_change_Mock_vs_AM = diffs_1_1_3[,2],
+  Fold_change_FM_vs_AM = diffs_1_1_3[,3],
   P_value_G_Mock_vs_FM = pval_g_1_1_3[, 1],
   P_value_G_Mock_vs_AM = pval_g_1_1_3[, 2],
   P_value_G_FM_vs_AM = pval_g_1_1_3[, 3],
@@ -967,6 +955,7 @@ attr(gstan_1_1_3, "cnames") <- list(
   fdata_cname = "Name",
   techrep_cname = NULL
 )
+attr(gstan_1_1_3, "which_X") <- rep(0, nrow(gstan_1_1_3))
 attr(gstan_1_1_3, "data_class") <- "pepData"
 
 # Create combined standards ----------------------------------------------------
@@ -1094,6 +1083,15 @@ attr(cstan_1_0_3, "cnames") <- list(
   fdata_cname = "Name",
   techrep_cname = NULL
 )
+attr(cstan_1_0_3, "which_X") <- 
+c(0, 0, 0, 0, 0, 0, NA, NA, 0, 0, 0, NA, 0, 0, NA, NA, 0, 0, 
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+0, 0, 0, 0, 0, NA, 0, 0, 0, 0, 0, 0, NA, NA, NA, 0, 0, 0, 0, 
+0, 0, 0, 0, NA, 0, 0, 0, 0, 0, 0, 0, NA, NA, 0, 0, NA, 0, 0, 
+0, NA, 0, 0, 0, NA, 0, 0, 0, 0, NA, NA, 0, 0, NA, 0, 0, NA, NA, 
+0, 0, 0, 0, 0, 0, 0)
+
 attr(cstan_1_0_3, "data_class") <- "pepData"
 
 # main effects: 1; covariates: 1; groups: 3 ---------------
@@ -1219,6 +1217,14 @@ attr(cstan_1_1_3, "cnames") <- list(
   fdata_cname = "Name",
   techrep_cname = NULL
 )
+attr(cstan_1_1_3, "which_X") <- 
+  c(0, 0, 0, 0, 0, 0, NA, NA, 0, 0, 0, NA, 0, 0, NA, NA, 0, 0, 
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+  0, 0, 0, 0, 0, NA, 0, 0, 0, 0, 0, 0, NA, NA, NA, 0, 0, 0, 0, 
+  0, 0, 0, 0, NA, 0, 0, 0, 0, 0, 0, 0, NA, NA, 0, 0, NA, 0, 0, 
+  0, NA, 0, 0, 0, NA, 0, 0, 0, 0, NA, NA, 0, 0, NA, 0, 0, NA, NA, 
+  0, 0, 0, 0, 0, 0, 0)
 attr(cstan_1_1_3, "data_class") <- "pepData"
 
 # Save standards for paired IMD-ANOVA tests ------------------------------------

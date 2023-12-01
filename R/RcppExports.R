@@ -13,32 +13,12 @@ count_missing_cpp <- function(data, gp) {
     .Call('_pmartR_count_missing_cpp', PACKAGE = 'pmartR', data, gp)
 }
 
-anova_cpp <- function(data, gp, unequal_var, df_red) {
-    .Call('_pmartR_anova_cpp', PACKAGE = 'pmartR', data, gp, unequal_var, df_red)
-}
-
-two_factor_anova_cpp <- function(y, X_full, X_red, red_df, group_ids) {
-    .Call('_pmartR_two_factor_anova_cpp', PACKAGE = 'pmartR', y, X_full, X_red, red_df, group_ids)
-}
-
-fold_change_diff_copy <- function(data, C) {
-    .Call('_pmartR_fold_change_diff_copy', PACKAGE = 'pmartR', data, C)
-}
-
-group_comparison_anova_cpp <- function(means, sizes, sigma2, C) {
-    .Call('_pmartR_group_comparison_anova_cpp', PACKAGE = 'pmartR', means, sizes, sigma2, C)
-}
-
-holm_cpp <- function(ps) {
-    .Call('_pmartR_holm_cpp', PACKAGE = 'pmartR', ps)
-}
-
-ptukey_speed <- function(qstats, sizes) {
-    .Call('_pmartR_ptukey_speed', PACKAGE = 'pmartR', qstats, sizes)
-}
-
 fold_change_diff <- function(data, C) {
     .Call('_pmartR_fold_change_diff', PACKAGE = 'pmartR', data, C)
+}
+
+fold_change_diff_row <- function(means, C) {
+    .Call('_pmartR_fold_change_diff_row', PACKAGE = 'pmartR', means, C)
 }
 
 fold_change_ratio <- function(data, C) {
@@ -49,12 +29,28 @@ fold_change_diff_na_okay <- function(data, C) {
     .Call('_pmartR_fold_change_diff_na_okay', PACKAGE = 'pmartR', data, C)
 }
 
-proj_mat_cpp <- function(X, ngroups) {
-    .Call('_pmartR_proj_mat_cpp', PACKAGE = 'pmartR', X, ngroups)
+anova_cpp <- function(data, gp, unequal_var, X, Beta, pred_grid, continuous_covar_inds, group_ids_pred) {
+    .Call('_pmartR_anova_cpp', PACKAGE = 'pmartR', data, gp, unequal_var, X, Beta, pred_grid, continuous_covar_inds, group_ids_pred)
 }
 
-project_to_null_cpp <- function(data_mat, Xmatrix, ngroups) {
-    .Call('_pmartR_project_to_null_cpp', PACKAGE = 'pmartR', data_mat, Xmatrix, ngroups)
+two_factor_anova_cpp <- function(data, X_full, X_red, group_ids, pred_grid_full, pred_grid_red, continuous_covar_inds, group_ids_pred) {
+    .Call('_pmartR_two_factor_anova_cpp', PACKAGE = 'pmartR', data, X_full, X_red, group_ids, pred_grid_full, pred_grid_red, continuous_covar_inds, group_ids_pred)
+}
+
+group_comparison_anova_cpp <- function(means, data, sizes, which_xmatrix, Xfull, Xred, Cfull, Cred, Cmu) {
+    .Call('_pmartR_group_comparison_anova_cpp', PACKAGE = 'pmartR', means, data, sizes, which_xmatrix, Xfull, Xred, Cfull, Cred, Cmu)
+}
+
+holm_cpp <- function(ps) {
+    .Call('_pmartR_holm_cpp', PACKAGE = 'pmartR', ps)
+}
+
+ptukey_speed <- function(qstats, sizes) {
+    .Call('_pmartR_ptukey_speed', PACKAGE = 'pmartR', qstats, sizes)
+}
+
+compute_betas <- function(data_mat, Xmatrix) {
+    .Call('_pmartR_compute_betas', PACKAGE = 'pmartR', data_mat, Xmatrix)
 }
 
 kw_rcpp <- function(mtr, group) {

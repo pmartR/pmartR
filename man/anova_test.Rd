@@ -87,5 +87,5 @@ Webb-Robertson, Bobbie-Jo M., et al. "Combined statistical
   Journal of proteome research 9.11 (2010): 5748-5756.
 }
 \author{
-Bryan Stanfill
+Bryan Stanfill, Daniel Claborne
 }

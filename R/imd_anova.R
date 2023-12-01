@@ -213,14 +213,7 @@ imd_anova <- function(omicsData,
 
     # Add attribute so imd_test and anova_test don't return the same warning.
     attr(omicsData, "imdanova")$test_with_anova <- "No IMD ANOVA Attribute"
-  } # else {
-  #
-  #   cnames <- omicsData$e_data[,attr(omicsData,"cnames")$edata_cname]
-  #   filterrows <- which(cnames%in%attr(omicsData,"imdanova")$test_with_anova)
-  #   if(length(filterrows)>0) #Remove rows that need to be filtered
-  #     omicsData$e_data <- omicsData$e_data[filterrows,]
-  #
-  # }
+  } 
 
   # Check if combined results was selected.
   if (test_method == "combined" && pval_adjust_a_multcomp != pval_adjust_g_multcomp) {
@@ -427,7 +420,6 @@ imd_anova <- function(omicsData,
   anova_fold_change <- anova_results_full$Fold_changes
   colnames(anova_fold_change) <- paste0("Fold_change_", colnames(anova_fold_change))
 
-
   # Return appropriate results for each test_method
 
   if (test_method == 'anova') {
@@ -597,6 +589,17 @@ imd_anova <- function(omicsData,
   )
 
   attr(final_out, "bpFlags") <- the_flag
+  
+  which_X <- attr(anova_results_full, "which_X") 
+  if (!is.null(attr(anova_results_full, "which_X"))) {
+    which_X <- rep(NA, nrow(final_out))
+    model_inds <- match(anova_results_full$Results[,get_edata_cname(omicsData)], final_out[,get_edata_cname(omicsData)])
+    nona <- which(!is.na(model_inds))
+    model_inds <- model_inds[nona]
+    which_X[model_inds] <- attr(anova_results_full, "which_X")[nona]
+  }
+  
+  attr(final_out, "which_X") <- which_X
   attr(final_out, "cnames") = attr(omicsData, "cnames")
   attr(final_out, "data_class") = attr(omicsData, "class")
 
@@ -691,7 +694,7 @@ imd_anova <- function(omicsData,
 #'   p-value<pval_thresh) \cr
 #'   }
 #'
-#' @author Bryan Stanfill
+#' @author Bryan Stanfill, Daniel Claborne
 #'
 #' @references Webb-Robertson, Bobbie-Jo M., et al. "Combined statistical
 #'   analyses of peptide intensities and peptide occurrences improves
@@ -745,12 +748,17 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
   # The sampleIDs in groupData (possibly more than is in the e_data)
   group_samp_cname <- groupData[, samp_cname]
   # Only keep the rows of groupData that have columns in e_data
-  groupData <- groupData[group_samp_cname %in% colnames(omicsData$e_data), ]
-
-  # Create a data matrix that only includes the samples in "groupData" and put them in the order specified by
-  # "groupData"
-  data <- omicsData$e_data[, as.character(groupData[, samp_cname])]
-
+  groupData <- groupData[group_samp_cname%in%colnames(omicsData$e_data),]
+  groupData <- groupData %>% 
+    dplyr::left_join(omicsData$f_data)
+  
+  covariate_names = colnames(attr(attr(omicsData, "group_DF"), "covariates"))[-1]
+  main_effect_names = attr(attr(omicsData, "group_DF"), "main_effects")
+  
+  #Create a data matrix that only includes the samples in "groupData" and put them in the order specified by
+  #"groupData"
+  data <- omicsData$e_data[,as.character(groupData[,samp_cname])]
+  
   # Create a NULL object for covariate data. This will be used to determine if
   # this object has been modified in the paired section.
   cov_data <- NULL
@@ -879,8 +887,6 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
 
   # Covariate stuffs -----------------------------------------------------------
 
-  # If covariates are provided, remove their effect before computing group
-  # means/variances.
   if (!is.null(covariates)) {
     # Check if cov_data was updated/modified in the paired section. If it was
     # then it needs to remain in the format created in the paired section.
@@ -890,42 +896,16 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
       # matrix (when removing the effect of covariates).
       cov_data <- attr(attr(omicsData, "group_DF"), "covariates")
     }
-
     # The -1 is hard coded because the sample ID name is ALWAYS the first column
     # in the covariates data frame.
     if (any(is.na(cov_data[, -1]))) {
       warning("Missing values were detected in the provided covariates thus covariates will be ignored")
-      red_df <- matrix(rep(0, nrow(data)), ncol = 1)
-    } else {
-      # Combine main effect and covariate data. We only want two columns from
-      # the main effect data frame (groupData). These columns are the sample ID
-      # column and the Group column. The Group column contains all the
-      # information we need for creating the X matrix. We also need the sample
-      # ID column from the covariate data frame along with the corresponding
-      # columns for any covariates in the input.
-      covariates <- merge(groupData[c(samp_cname, "Group")],
-        cov_data,
-        sort = FALSE
-      )
-      cov_samp_col <- which(colnames(covariates) == samp_cname)
-      # source('~/pmartR/R/covariate_supp_funs.R') #Run to debug
-      xmatrix <- build_x_mat(covariates[, -cov_samp_col]) # Build the appropriate X matrix based on the covariates data frame
-      xmatrix <- reduce_xmatrix(xmatrix, length(unique(groupData$Group)))
-
-      # Remove effect of covariates by projecting into the null space generated by the X matrix
-      allproj <- project_to_null_cpp(data.matrix(data), xmatrix, length(unique(groupData$Group)))
-      data <- allproj$data_no_x
-      red_df <- allproj$lost_df
-      # print(red_df)
+      covar_effects <- matrix(0,nrow = nrow(data), ncol=ncol(data))
     }
 
     # If covariates are adjusted for, then force equal variance assumption even
     # if there are only two levels to main effect
     equal_var <- TRUE
-  } else {
-    # Set the value of reduced degrees of freedom (the degrees of freedom used
-    # up for covariates) to zero because covariates were not used.
-    red_df <- matrix(rep(0, nrow(data)), ncol = 1)
   }
 
   # paired t test stuffs -------------------------------------------------------
@@ -941,43 +921,125 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
     )
   }
 
+  # Everything assumes the group levels are in the order they appear
+  groupData$Group <- factor(groupData$Group, levels=unique(groupData$Group))
+  groupData[,main_effect_names] <- lapply(groupData[main_effect_names], function(x) factor(x, levels=unique(x)))
+  group_names <- paste("Mean",as.character(unique(groupData$Group)),sep="_")
+
+  # Keep all the relevant stuff
+  groupData_sub <- groupData[,c("Group", main_effect_names, covariate_names)]
+
+  ## Translate the groups into numeric labels for anova_cpp() function.  Also needed to order rows of the prediction grid
+  gp <- factor(groupData$Group,labels=1:k,levels=unique(groupData$Group))
+
   # ANOVA stuffs ---------------------------------------------------------------
-
   if (length(attr(get_group_DF(omicsData), "main_effects")) == 1) {
-    ## ---- One factor ANOVA ----##
+    ##---- One factor ANOVA ----##
+        
+    # pre-compute coefficients of the non-interaction model
+    xmatrix <- model.matrix(~ ., groupData[c("Group", covariate_names)])
+    Xfull = xmatrix # not used in one factor case, but needed as an argument
+    Xred = xmatrix
+    Betas <- compute_betas(data.matrix(data), xmatrix)
 
-    ## Translate the groups into numeric labels for anova_cpp() function
-    gp <- factor(groupData$Group, labels = 1:k, levels = unique(groupData$Group))
+    # indices of covariates in design matrix as well as special indices for continuous covariates.
+    if (length(covariate_names) > 0) {
+      covar_inds = (length(main_effect_names) + 1):(length(main_effect_names) + 1 + length(covariate_names))
+      covar_inds = which(attr(Xred, "assign") %in% covar_inds)
+      continuous_covars = covariate_names[sapply(groupData_sub[covariate_names], is.numeric)]
+      continuous_covar_inds = which(colnames(Xred) == continuous_covars)
+    } else {
+      covar_inds <- NULL
+      continuous_covar_inds <- numeric(0) # right type for Rcpp
+    }
+  
+    # Construct the matrix which predicts over all group + categorical covariates combinations.  Continuous covariates will be set to the mean of their values for non-missing data points.
+    pred_grid_red <- pred_grid_full <- get_pred_grid(group_df = groupData_sub, main_effect_names = main_effect_names, covariate_names, fspec = as.formula("~."))
+    
+    #Rcpp::sourceCpp('~/pmartR/src/anova_helper_funs.cpp') #Run if debugging code
+    raw_results <- anova_cpp(data.matrix(data),gp,1-equal_var, xmatrix, Betas, pred_grid_red, continuous_covar_inds, attr(pred_grid_red, "groups"))
+    which_xmatrix <- rep(0, nrow(data)) # dummy argument to group_comparison_anova, makes us always select the reduced model since we only have one main effect.
 
-    # Rcpp::sourceCpp('~/pmartR/src/anova_helper_funs.cpp') #Run if debugging code
-    raw_results <- anova_cpp(data.matrix(data), gp, 1 - equal_var, red_df)
-    group_names <- paste("Mean", as.character(unique(groupData$Group)), sep = "_")
-  } else {
-    ## ---- Two factor ANOVA ----##
-    # source('~/pmartR/R/anova_helper_fun.R') #Run if debugging
-    # source('~/pmartR/R/covariate_supp_funs.R')
-    # Rcpp::sourceCpp('~/pmartR/src/two_factor_anova.cpp')
-    raw_results <- run_twofactor_cpp(data = data.matrix(data), gpData = groupData, red_df)
-    group_names <- paste("Mean", colnames(raw_results$group_means), sep = "_")
+  }else{
+    ##---- Two factor ANOVA ----##
+    #source('~/pmartR/R/anova_helper_fun.R') #Run if debugging
+    #source('~/pmartR/R/covariate_supp_funs.R')
+    #Rcpp::sourceCpp('~/pmartR/src/two_factor_anova.cpp')    
+
+    # design matrix for the reduced model (no interactions between main effects)
+    Xred <- model.matrix(~.,data=dplyr::select(groupData_sub, -dplyr::one_of("Group")))
+
+    # design matrix for the full model (interaction terms between main effects)
+    rhs =sprintf("%s %s",
+                paste(main_effect_names, collapse="*"),
+                paste(c("", covariate_names), collapse = " + "))
+    full_formula = sprintf("~ %s", rhs)
+    Xfull <- model.matrix(as.formula(full_formula),data=dplyr::select(groupData_sub, -dplyr::one_of("Group")))
+
+    if (length(covariate_names) > 0) {
+      covar_inds = (length(main_effect_names) + 1):(length(main_effect_names) + 1 + length(covariate_names))
+      covar_inds = which(attr(Xred, "assign") %in% covar_inds)
+      continuous_covars = covariate_names[sapply(groupData_sub[covariate_names], is.numeric)]
+      continuous_covar_inds = which(colnames(Xred) == continuous_covars)
+    } else {
+      covar_inds <- NULL
+      continuous_covar_inds <- numeric(0)
+    }
+
+    pred_grid_red <- get_pred_grid(group_df = groupData_sub, main_effect_names = main_effect_names, covariate_names, fspec = as.formula("~."))
+    pred_grid_full <- get_pred_grid(group_df = groupData_sub, main_effect_names = main_effect_names, covariate_names, fspec = as.formula(full_formula))
+
+    raw_results <- run_twofactor_cpp(
+      data=data.matrix(data),
+      gpData=groupData_sub,
+      Xfull=Xfull, Xred=Xred,
+      pred_grid_full=pred_grid_full,
+      pred_grid_red=pred_grid_red,
+      continuous_covar_inds = continuous_covar_inds
+    )
+
+    which_xmatrix = raw_results$which_X
+    Xfull <- raw_results$Xfull
+    Xred <- raw_results$Xred
   }
+  
+  #The C++ function returns a list so we need to make it into a data.frame
+  results <- data.frame(raw_results$Sigma2, raw_results$lsmeans, raw_results$Fstats, raw_results$pvalue, raw_results$dof, which_xmatrix)
+  
+  #Rename the columns to match group names
+  colnames(results) <- c("Variance",group_names,"F_Statistic","p_value", "degrees_of_freedom", "which_xmatrix")
+  
+  #Pull off edata_cname and add to results df``
+  edatacname <- attr(omicsData,"cnames")$edata_cname
+  results <- cbind(omicsData$e_data[edatacname],results)
+  
+  ###-------Use group_comparison_anova() to compare the groups that were requested--------------##
+  #source('~/pmartR/R/group_comparison.R') # Run if debugging
+  #Rcpp::sourceCpp('~/pmartR/src/group_comparisons.cpp') #Run if debugging
+  
+  # Construct matrices that map the beta coefficients to the group means
+  beta_to_mu_full <- pred_grid_full
+  beta_to_mu_red <- pred_grid_red
 
-  # The C++ function returns a list so we need to make it into a data.frame
-  results <- data.frame(raw_results$Sigma2, raw_results$group_means, raw_results$Fstats, raw_results$pvalue)
+  beta_to_mu_full[,covar_inds] <- 0
+  beta_to_mu_red[,covar_inds] <- 0
 
-  # Rename the columns to match group names
-  colnames(results) <- c("Variance", group_names, "F_Statistic", "p_value")
+  beta_to_mu_full <- unique(beta_to_mu_full)
+  beta_to_mu_red <- unique(beta_to_mu_red)
 
-  # Pull off edata_cname and add to results df
-  edatacname <- attr(omicsData, "cnames")$edata_cname
-  results <- cbind(omicsData$e_data[edatacname], results)
-
-  ### -------Use group_comparison_anova() to compare the groups that were requested--------------##
-  # source('~/pmartR/R/group_comparison.R') # Run if debugging
-  # Rcpp::sourceCpp('~/pmartR/src/group_comparisons.cpp') #Run if debugging
-  group_comp <- group_comparison_anova(groupData = groupData, comparisons = comparisons, anova_results_full = list(Results = results, Sizes = raw_results$group_sizes))
-
-  # If there are only two levels, replace group_comp p-values with those taken from ANOVA function
-  if (k == 2) {
+  group_comp <- group_comparison_anova(
+    data=data.matrix(data),
+    groupData=groupData[,c("Group", main_effect_names, covariate_names)],
+    comparisons=comparisons,
+    Xfull = Xfull,
+    Xred = Xred,
+    anova_results_full=list(Results=results,Sizes=raw_results$group_sizes),
+    beta_to_mu_full,
+    beta_to_mu_red
+  )
+  
+  #If there are only two levels, replace group_comp p-values with those taken from ANOVA function
+  if(k==2){
     group_comp$p_values <- raw_results$pvalue
   }
 
@@ -991,7 +1053,7 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
     # ELSE INSTEAD OF RECREATING IT HERE
     Cmat_res <- create_c_matrix(groupData, comparisons)
     Cmat <- Cmat_res$cmat
-    fold_change <- fold_change_ratio(raw_results$group_means, Cmat)
+    fold_change <- fold_change_ratio(raw_results$lsmeans, Cmat)
     fold_change <- data.frame(fold_change)
     colnames(fold_change) <- colnames(group_comp$diff_mat)
   }
@@ -1029,44 +1091,37 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
 
   # (estimated variance, F-statistic, p-value and group means), estimated fold
   # changes, and adjusted p-values for the requested comparisons
-  return(list(
+  out <- list(
     Results = results,
     Fold_changes = fold_change,
     Fold_change_pvalues = p_values_adjust,
     Flags = sig_indicators
-  ))
+  )
+
+  attr(out, "Xfull") <- Xfull
+  attr(out, "Xred") <- Xred
+  attr(out, "which_X") <- which_xmatrix
+
+  return(out)
+
 }
 
-# Wrapper function for the two factor ANOVA function
-run_twofactor_cpp <- function(data, gpData, red_df) {
-  # Create design matrix for reduced model, i.e., no interaction effect
-  colnames(gpData)[-c(1, 2)] <- c("Factor1", "Factor2")
-  gpData <- cbind(gpData, y = 1:nrow(gpData))
-
-  # Create design matrix for the full model, i.e., all first order and
-  # interaction effects
-  Xred <- unname(model.matrix(lm(y ~ Factor1 + Factor2 - 1, data = gpData)))
-  Xfull <- unname(model.matrix(lm(y ~ Factor1 * Factor2 - 1, data = gpData)))
-
-  # Run the two factor ANOVA model
-  # Edit 2/16: add "group_ids" so C++ knows which groups belong to which columns,
-  # helps with handling NaNs
+#Wrapper function for the two factor ANOVA function
+run_twofactor_cpp <- function(data,gpData, Xfull, Xred, pred_grid_full, pred_grid_red, continuous_covar_inds){
+  #Run the two factor ANOVA model
   res <- two_factor_anova_cpp(
     data,
     Xfull,
     Xred,
-    red_df,
-    group_ids = as.numeric(factor(gpData$Group, levels = unique(gpData$Group)))
+    group_ids=as.numeric(factor(gpData$Group,levels=unique(gpData$Group))),
+    pred_grid_full,
+    pred_grid_red,
+    continuous_covar_inds,
+    attr(pred_grid_red, "groups")
   )
 
-  # Get the unique group levels to translate ANOVA parameters into group means
-  red_gpData <- dplyr::distinct(gpData, Group, .keep_all = TRUE)
-  red_gpData <- dplyr::arrange(red_gpData, y)
-
-  means <- res$par_estimates[, 1:length(red_gpData$Group)]
-  colnames(means) <- red_gpData$Group
-
-  res$group_means <- means
+  res$Xfull <- Xfull
+  res$Xred <- Xred
   return(res)
 }
 
@@ -1074,32 +1129,43 @@ run_twofactor_cpp <- function(data, gpData, red_df) {
 #'
 #' Takes the results of anova_test() and returns group comparison p-values
 #'
+#' @param data The expression values without the id column
 #' @param groupData data frame that assigns sample names to groups
-#' @param comparisons dataframe that defiens the comparsions of interest
+#' @param comparisons dataframe that defines the comparsions of interest
+#' @param Xfull design matrix for the full model with interaction terms between the main effects
+#' @param Xred design matrix for the reduced model with no interaction terms between the main effects 
 #' @param anova_results_full results of the \code{pmartR::anova_test()} function
+#' @param beta_to_mu_full matrix that maps the beta coefficients to the group means for the full model
+#' @param beta_to_mu_red matrix that maps the beta coefficients to the group means for the reduced model
 #'
 #' @return A data.frame containing the p-values from the group comparisons.
 #'
-#' @author Bryan Stanfill
+#' @author Bryan Stanfill, Daniel Claborne
 #'
-group_comparison_anova <- function(groupData, comparisons, anova_results_full) {
-  # The group means include the word "Group" in them so that is what will be passed
-  # to the group_comparison(...) and fold_change(...) functions along with estimated variance
+group_comparison_anova <- function(data,groupData,comparisons, Xfull, Xred, anova_results_full, beta_to_mu_full, beta_to_mu_red){
+  
+  #The group means include the word "Group" in them so that is what will be passed
+  #to the group_comparison(...) and fold_change(...) functions along with estimated variance
   anova_results <- anova_results_full$Results
-  means <- data.matrix(anova_results[, grep("Mean", colnames(anova_results))])
-  sigma2 <- data.matrix(anova_results$Variance)
+  means <- data.matrix(anova_results[,grep("Mean",colnames(anova_results))])
   sizes <- data.matrix(anova_results_full$Sizes)
-  # rm(anova_results_full)
+  which_xmatrix <- data.matrix(anova_results_full$Results$which_xmatrix)
+  
+  #If "comparisons" is null, then do all pairwise comparisons, else use the "comparisons" df to
+  #create the appropriate C matrix
+  
+  # From the design matrix, we can get the matrix D that maps coefficients (Beta) to cell means by the relationship mu = D %*% Beta.  We then multiply both sides by the contrast matrix C, which would be used to do group comparisons in the cell-means model.  The matrix C %*% D is the correct contrast matrix to do cell mean comparisons for our particular design matrices.
 
-  # If "comparisons" is null, then do all pairwise comparisons, else use the "comparisons" df to
-  # create the appropriate C matrix
-
-  ## ---- I used to deal with one vs two factor differently, that code is at the end of this script -----##
+  # Cell means contrast matrix
   Cmat_res <- create_c_matrix(group_df = groupData, to_compare_df = comparisons)
-
   Cmat <- Cmat_res$cmat
-  group_comp <- group_comparison_anova_cpp(means, sizes, sigma2, Cmat)
-
+  
+  # C %*% D appropriate contrast matrices for group comparisons
+  Cnew_full = Cmat %*% beta_to_mu_full
+  Cnew_red = Cmat %*% beta_to_mu_red
+  
+  group_comp <- group_comparison_anova_cpp(means, data, sizes, which_xmatrix, Xfull, Xred, Cnew_full, Cnew_red, Cmat)
+  
   group_comp$diff_mat <- data.frame(group_comp$diff_mat)
   colnames(group_comp$diff_mat) <- Cmat_res$names
   colnames(group_comp$diff_ses) <- Cmat_res$names
@@ -1735,7 +1801,7 @@ create_c_matrix <- function(group_df, to_compare_df = NULL) {
     for (i in 1:n_comparisons) {
       control_i <- which(to_compare_df$Control[i] == groups)
       test_i <- which(to_compare_df$Test[i] == groups)
-      Cmat[i,control_i] <- (-1/length(control_i))
+      Cmat[i,control_i] <- (-1/length(control_i)) # red herring, should only ever be one...
       Cmat[i,test_i] <- 1/length(test_i)
       compi <- c(compi,paste0(to_compare_df$Test[i],"_vs_",to_compare_df$Control[i]))
     }
@@ -1890,32 +1956,40 @@ ranked_holm_cpp <- function(ps) {
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-# Function to create an X matrix based on a covariate data frame
-build_x_mat <- function(cov_df) {
-  if (is.null(ncol(cov_df))) {
-    cov_df <- matrix(cov_df, ncol = 1)
+#Function to create an X matrix based on a covariate data frame
+build_x_mat <- function(cov_df, intercept = TRUE){
+  if(is.null(ncol(cov_df))){
+    cov_df <- matrix(cov_df,ncol=1)
   }
 
   # If all covariates are numeric, simply return the same matrix back
   if (is.numeric(cov_df)) {
     return(data.matrix(cov_df))
   }
-
-  # If the covariates are a mix of numeric, factors and characters, return matrix
-  # of group identifiers
-  Xmatrix <- NULL
-  for (i in 1:ncol(cov_df)) {
-    if (is.numeric(cov_df[, i])) {
-      # If column i is numeric, append it to X
-      Xmatrix <- cbind(Xmatrix, cov_df[, i])
-    } else {
-      coli_levels <- unique(cov_df[, i])
+  
+  # if we build the intercept model, the first column is the intercept, and all factor columns have their first level absorbed into the intercept.
+  if (intercept) {
+    Xmatrix <- rep(1, nrow(cov_df))
+  } else{
+    Xmatrix <- NULL
+  }
+  
+  #If the covariates are a mix of numeric, factors and characters, return matrix
+  #of group identifiers
+  for(i in 1:ncol(cov_df)){
+    
+    if(is.numeric(cov_df[,i])){
+      #If column i is numeric, append it to X
+      Xmatrix <- cbind(Xmatrix,cov_df[,i])
+    }else{
+      coli_levels <- unique(cov_df[,i])
       n_levels <- length(coli_levels)
-      if (n_levels != length(cov_df[, i])) {
-        Xcoli <- matrix(0, nrow(cov_df), n_levels)
-
-        for (j in 1:n_levels) {
-          Xcoli[cov_df[, i] == coli_levels[j], j] <- 1
+      if(n_levels!=length(cov_df[,i])){
+        Xcoli <- matrix(0,nrow(cov_df),n_levels - intercept)
+        
+        for(j in 1:(n_levels - intercept)){
+          # j + 1 so that we drop the first level
+          Xcoli[cov_df[,i]==coli_levels[j + intercept],j] <- 1
         }
         Xmatrix <- cbind(Xmatrix, Xcoli)
       }
@@ -1946,6 +2020,104 @@ reduce_xmatrix <- function(x, ngroups) {
     }
   }
   return(x)
+}
+
+#' Build the prediction grid to compute least squares means.
+#' 
+#' @param group_df A dataframe with the reserved 'Group' column, and columns for main effects and covariates.
+#' @param main_effect_names Character vector with the column names of the main effects in group_df.
+#' @param covariate_names Character vector with the column names of the covariates in group_df.
+#' @param fspec A formula specification to be passed to \code{\link{model.matrix}} to construct the prediction grid in model matrix form.
+#' 
+#' @return A matrix of the prediction grid
+#' 
+#' @author Daniel Claborne
+#'
+#' 
+get_pred_grid <- function(group_df, main_effect_names, covariate_names=NULL, fspec = as.formula("~.")) {
+  grid_list = list()
+  
+  for (name in main_effect_names) {
+    grid_list[[name]] = factor(unique(group_df[,name]), levels = unique(group_df[,name]))
+  }
+
+  for (name in covariate_names) {
+    if (is.numeric(group_df[,name])) {
+      grid_list[[name]] = 0
+    } else {
+      grid_list[[name]] = factor(unique(group_df[,name]), levels = unique(group_df[,name]))
+    }
+  }
+
+  grid_df <- do.call(expand.grid, grid_list)
+
+  # this left join maintains the order of the original groups in the grid
+  grid_df <- dplyr::left_join(
+    group_df %>% dplyr::distinct(Group, dplyr::across(dplyr::one_of(main_effect_names))), 
+    grid_df,
+    by = main_effect_names, keep=FALSE
+  )
+
+  k = length(unique(group_df$Group))
+  gp_id = factor(grid_df$Group, labels = 1:k, levels = unique(grid_df$Group))
+  gp_names = unique(grid_df$Group)
+  
+  grid_df <- grid_df %>% dplyr::select(-dplyr::one_of("Group"))
+
+  modmatrix = as.matrix(model.matrix(fspec, data = grid_df))
+  attr(modmatrix, "groups") = gp_id
+  attr(modmatrix, 'ordered_group_names') = gp_names
+    
+  return(modmatrix)
+}  
+
+#' Compute the least squares means from a prediction grid and estimated coefficients
+#' 
+#' @param data The raw data from which the estimates were computed
+#' @param xmatrix The design matrix from which the prediction grid was constructed
+#' @param pred_grid The prediction grid, obtained from \code{\link{get_pred_grid}}
+#' @param Betas The estimated coefficients
+#' @param continuous_covar_inds The column indices of xmatrix corresponding to continuous covariates.
+#' 
+#' @return A data frame of the least squares means
+#' 
+#' @author Daniel Claborne
+#' 
+get_lsmeans <- function(data, xmatrix, pred_grid, Betas, continuous_covar_inds=NULL) {
+  lsmeans <- list()
+
+  for (i in 1:nrow(Betas)) {
+    beta = Betas[i,]
+    y = data[i,]
+    nona = which(!is.na(y))
+    xnona = xmatrix[nona,]
+
+    # we predict at the average level of the continuous covariates
+    if (!is.null(continuous_covar_inds)) {
+      for (j in continuous_covar_inds) {
+        mean_ = mean(xnona[,j])
+        pred_grid[,j] = mean_
+      }
+    }
+
+    lsmeans_i <- pred_grid %*% beta
+    lsmeans[[i]] <- lsmeans_i
+  }
+
+  names(lsmeans) <- paste0("X", 1:nrow(Betas))
+  lsmeans = do.call(cbind.data.frame, lsmeans)
+
+  # average the predictions within group
+  lsmeans = lsmeans %>% 
+    dplyr::mutate(Group = attr(pred_grid, "groups")) %>%
+    dplyr::group_by(Group) %>%
+    dplyr::summarise(dplyr::across(dplyr::where(is.numeric), mean)) %>%
+    dplyr::select(-dplyr::one_of("Group")) %>%
+    t() %>%
+    as.data.frame() %>%
+    `colnames<-`(paste0("Mean_", attr(pred_grid, "ordered_group_names")))
+
+  return(lsmeans)
 }
 
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
