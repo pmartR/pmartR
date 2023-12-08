@@ -41,7 +41,7 @@ jobs:
           pak-version: devel # See https://github.com/r-lib/actions/issues/559
 
       - name: Build site
-        run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
+        run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE, examples=FALSE)
         shell: Rscript {0}
 
       - name: Deploy to GitHub pages 🚀

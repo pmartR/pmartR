@@ -1121,8 +1121,8 @@ applyFilt.proteomicsFilt <- function(filter_object,
     if (!is.null(pepe$e_data_remove)) {
       # find the which proteins had peptides removed.
       peps_rmv_by_pro <- omicsData$e_meta %>% 
-        dplyr::filter(!!rlang::sym(pep_id) %in% pepe$e_data_remove) %>%
-        dplyr::group_by(!!rlang::sym(pro_id)) %>%
+        dplyr::filter(!!dplyr::sym(pep_id) %in% pepe$e_data_remove) %>%
+        dplyr::group_by(!!dplyr::sym(pro_id)) %>%
         dplyr::summarise(n = dplyr::n())
 
       # decrement the counts of proteins that had redundant peptides removed.
