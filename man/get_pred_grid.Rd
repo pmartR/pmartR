@@ -4,14 +4,21 @@
 \alias{get_pred_grid}
 \title{Build the prediction grid to compute least squares means.}
 \usage{
-get_pred_grid(xmatrix, groups, continuous_covar_inds = NULL)
+get_pred_grid(
+  group_df,
+  main_effect_names,
+  covariate_names = NULL,
+  fspec = as.formula("~.")
+)
 }
 \arguments{
-\item{xmatrix}{The design matrix from which to construct the prediction grid}
+\item{group_df}{A dataframe with the reserved 'Group' column, and columns for main effects and covariates.}
 
-\item{groups}{The group assignments corresponding to rows in the design matrix}
+\item{main_effect_names}{Character vector with the column names of the main effects in group_df.}
 
-\item{continuous_covar_inds}{The column indices of xmatrix corresponding to continuous covariates.}
+\item{covariate_names}{Character vector with the column names of the covariates in group_df.}
+
+\item{fspec}{A formula specification to be passed to \code{\link{model.matrix}} to construct the prediction grid in model matrix form.}
 }
 \value{
 A matrix of the prediction grid

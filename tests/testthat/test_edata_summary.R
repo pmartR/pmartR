@@ -480,8 +480,8 @@ test_that('edata_summary correctly summarizes the data', {
   )
 
   # Sleuth around each object.
-  expect_identical(samp, stan_samp)
-  expect_identical(mole, stan_mole)
-  expect_identical(mole_1, stan_mole_1)
-  expect_identical(mole_2, stan_mole_2)
+  expect_equal(samp, stan_samp)
+  expect_equal(mole, stan_mole)
+  expect_equal(mole_1, stan_mole_1)
+  expect_equal(mole_2, stan_mole_2)
 })

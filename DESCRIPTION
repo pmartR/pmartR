@@ -1,7 +1,7 @@
 Package: pmartR
 Type: Package
 Title: Panomics Marketplace - Quality Control and Statistical Analysis for Panomics Data
-Version: 2.4.1
+Version: 2.4.2
 Date: 2023-11-07
 Authors@R: c(
     person("Lisa", "Bramer", email = "lisa.bramer@pnnl.gov", role = c("aut", "cre")), 

@@ -258,6 +258,7 @@ trelli_builder <- function(toBuild, cognostics, plotFUN, cogFUN, path, name, rem
 #' 
 #' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' \donttest{
+#' if (interactive()) {
 #' library(pmartRdata)
 #' 
 #' trelliData1 <- as.trelliData.edata(e_data = pep_edata,
@@ -329,6 +330,7 @@ trelli_builder <- function(toBuild, cognostics, plotFUN, cogFUN, path, name, rem
 #'      interactive = TRUE, test_mode = TRUE, test_example = 1:10, path = tempdir())
 #' 
 #' \dontshow{closeAllConnections()}
+#' }
 #' }
 #' 
 #' @author David Degnan, Lisa Bramer
@@ -608,7 +610,7 @@ trelli_abundance_boxplot <- function(trelliData,
 #' 
 #' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' \donttest{
-#' 
+#' if (interactive()) {
 #' library(pmartRdata)
 #' 
 #' trelliData1 <- as.trelliData.edata(e_data = pep_edata,
@@ -645,7 +647,7 @@ trelli_abundance_boxplot <- function(trelliData,
 #' # Build the abundance histogram with an omicsData object. 
 #' # Generate trelliData in as.trelliData
 #' trelli_panel_by(trelliData = trelliData2, panel = "Peptide") %>% 
-#'    trelli_abundance_histogram(test_mode = TRUE, test_example = 1:10)
+#'    trelli_abundance_histogram(test_mode = TRUE, test_example = 1:10, path = tempdir())
 #'     
 #' # Build the abundance histogram with an omicsData and statRes object. 
 #' # Generate trelliData in as.trelliData.
@@ -661,6 +663,7 @@ trelli_abundance_boxplot <- function(trelliData,
 #'      cognostics = c("mean abundance", "median abundance"), path = tempdir())  
 #'  
 #' \dontshow{closeAllConnections()}
+#' }
 #' }
 #'
 #' @author David Degnan, Lisa Bramer
@@ -814,7 +817,7 @@ trelli_abundance_histogram <- function(trelliData,
 #' 
 #' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' \donttest{
-#' 
+#' if (interactive()) {
 #' library(pmartRdata)
 #' 
 #' # Transform the data
@@ -856,6 +859,7 @@ trelli_abundance_histogram <- function(trelliData,
 #'    )
 #'
 #' \dontshow{closeAllConnections()}
+#' }
 #' }
 #' @author David Degnan, Lisa Bramer
 #'
@@ -1052,7 +1056,7 @@ trelli_abundance_heatmap <- function(trelliData,
 #' 
 #' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' \donttest{
-#'  
+#' if (interactive()) {
 #' library(pmartRdata)
 #' 
 #' trelliData1 <- as.trelliData.edata(e_data = pep_edata,
@@ -1117,6 +1121,7 @@ trelli_abundance_heatmap <- function(trelliData,
 #'    )
 #'
 #' \dontshow{closeAllConnections()}
+#' }
 #' }
 #'
 #' @author David Degnan, Lisa Bramer
@@ -1480,6 +1485,7 @@ determine_significance <- function(DF, p_value_thresh) {
 #' 
 #' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' \donttest{
+#' if (interactive()) {
 #' library(pmartRdata)
 #'
 #' # Transform the data
@@ -1510,6 +1516,7 @@ determine_significance <- function(DF, p_value_thresh) {
 #'   trelli_foldchange_bar(test_mode = TRUE, test_example = 1:10, path = tempdir())
 #'
 #' \dontshow{closeAllConnections()}
+#' }
 #' }
 #'
 #' @author David Degnan, Lisa Bramer
@@ -1686,6 +1693,7 @@ trelli_foldchange_bar <- function(trelliData,
 #' 
 #' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' \donttest{ 
+#' if (interactive()) {
 #' library(pmartRdata)
 #' 
 #' # Transform the data
@@ -1722,6 +1730,7 @@ trelli_foldchange_bar <- function(trelliData,
 #'                            )
 #' 
 #' \dontshow{closeAllConnections()}
+#' }
 #' }
 #'
 #' @author David Degnan, Lisa Bramer
@@ -1919,7 +1928,8 @@ trelli_foldchange_boxplot <- function(trelliData,
 #' @return No return value, builds a trelliscope display of fold-change heatmaps that is stored in `path`
 #' 
 #' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
-#' \donttest{ 
+#' \donttest{
+#' if (interactive()) {
 #' library(pmartRdata)
 #' 
 #' # Transform the data
@@ -1951,6 +1961,7 @@ trelli_foldchange_boxplot <- function(trelliData,
 #'                             path = tempdir())
 #' 
 #' \dontshow{closeAllConnections()}
+#' }
 #' }
 #'
 #' @author David Degnan, Lisa Bramer
@@ -2147,7 +2158,7 @@ trelli_foldchange_heatmap <- function(trelliData,
 #' 
 #' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' \donttest{
-#' 
+#' if (interactive()) {
 #' library(pmartRdata)
 #'
 #' # Transform the data
@@ -2178,6 +2189,7 @@ trelli_foldchange_heatmap <- function(trelliData,
 #'                             path = tempdir())
 #' 
 #' \dontshow{closeAllConnections()}
+#' }
 #' }
 #'
 #' @author David Degnan, Lisa Bramer

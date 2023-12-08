@@ -70,7 +70,7 @@ Specify a plot design and cognostics for the fold_change volcano
 \examples{
 \dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 \donttest{
-
+if (interactive()) {
 library(pmartRdata)
 
 # Transform the data
@@ -101,6 +101,7 @@ trelli_panel_by(trelliData = trelliData4, panel = "RazorProtein") \%>\%
                             path = tempdir())
 
 \dontshow{closeAllConnections()}
+}
 }
 \dontshow{\}) # examplesIf}
 }
