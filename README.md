@@ -9,7 +9,12 @@ This R package provides functionality for quality control processing, statistica
 
 ## Installation:
 
-(**Recommended**) To install the latest *release*:
+(**Recommended**) Install from CRAN:
+```r
+install.packages("pmartR")
+```
+
+To install the latest *release*:
 ```r
 devtools::install_github("pmartR/pmartR@*release")
 ```
