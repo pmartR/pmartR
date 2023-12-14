@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pmartR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.2</span>
       </span>
     </div>
 
@@ -103,7 +103,7 @@
                         <h4 data-toc-skip class="author">Kelly Stratton,
 Lisa Bramer</h4>
             
-            <h4 data-toc-skip class="date">2023-11-17</h4>
+            <h4 data-toc-skip class="date">2023-12-14</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/pmartR/pmartR/blob/HEAD/vignettes/Convenience_Functions.Rmd" class="external-link"><code>vignettes/Convenience_Functions.Rmd</code></a></small>
       <div class="hidden name"><code>Convenience_Functions.Rmd</code></div>
@@ -145,8 +145,9 @@ statRes or trellData object, inherited from the omicsData used in
 <pre><code><span><span class="co">## You have specified remove_singleton_groups = TRUE, but there are no singleton groups to remove. Proceeding with application of the IMD-ANOVA filter.</span></span></code></pre>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mystats</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/imd_anova.html">imd_anova</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mypro</span>, test_method <span class="op">=</span> <span class="st">"combined"</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Joining with `by = join_by(SampleID)`</span></span></code></pre>
 <pre><code><span><span class="co">## Joining with `by = join_by(RazorProtein)`</span></span></code></pre>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_data_class.html">get_data_class</a></span><span class="op">(</span><span class="va">mystats</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "proData"</span></span></code></pre>
 <ul>
@@ -156,7 +157,7 @@ scale, normalization information, number of unique entries in e_data,
 number of missing observations in e_data, proportion of missing
 observations in e_data, number of samples, and data type</li>
 </ul>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_data_info.html">get_data_info</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mypro</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## $data_scale_orig</span></span>
 <span><span class="co">## [1] "abundance"</span></span>
@@ -193,13 +194,13 @@ observations in e_data, number of samples, and data type</li>
 be different from the original data scale (if
 <code><a href="../reference/edata_transform.html">edata_transform()</a></code> was used)</li>
 </ul>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_data_scale.html">get_data_scale</a></span><span class="op">(</span>omicsObject <span class="op">=</span> <span class="va">mypro</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "log2"</span></span></code></pre>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_data_scale.html">get_data_scale</a></span><span class="op">(</span>omicsObject <span class="op">=</span> <span class="va">mymetab</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "abundance"</span></span></code></pre>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_data_scale.html">get_data_scale</a></span><span class="op">(</span>omicsObject <span class="op">=</span> <span class="va">mynmr</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "abundance"</span></span></code></pre>
 <ul>
@@ -208,13 +209,13 @@ be different from the original data scale (if
 indicating the scale the data was originally on when the omicsData
 object was created</li>
 </ul>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_data_scale_orig.html">get_data_scale_orig</a></span><span class="op">(</span>omicsObject <span class="op">=</span> <span class="va">mypro</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "abundance"</span></span></code></pre>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_data_scale_orig.html">get_data_scale_orig</a></span><span class="op">(</span>omicsObject <span class="op">=</span> <span class="va">mymetab</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "abundance"</span></span></code></pre>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_data_scale_orig.html">get_data_scale_orig</a></span><span class="op">(</span>omicsObject <span class="op">=</span> <span class="va">mynmr</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "abundance"</span></span></code></pre>
 <ul>
@@ -222,13 +223,13 @@ object was created</li>
 <code><a href="../reference/get_edata_cname.html">get_edata_cname()</a></code> - Returns the name of the column in
 e_data that contains the biomolecule IDs</li>
 </ul>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_edata_cname.html">get_edata_cname</a></span><span class="op">(</span>omicsObject <span class="op">=</span> <span class="va">mypro</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "RazorProtein"</span></span></code></pre>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_edata_cname.html">get_edata_cname</a></span><span class="op">(</span>omicsObject <span class="op">=</span> <span class="va">mymetab</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "Metabolite"</span></span></code></pre>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_edata_cname.html">get_edata_cname</a></span><span class="op">(</span>omicsObject <span class="op">=</span> <span class="va">mynmr</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "Metabolite"</span></span></code></pre>
 <ul>
@@ -236,13 +237,13 @@ e_data that contains the biomolecule IDs</li>
 <code><a href="../reference/get_emeta_cname.html">get_emeta_cname()</a></code> - Returns the name of the column in
 e_meta that contains the mapping to biomolecules in e_data</li>
 </ul>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_emeta_cname.html">get_emeta_cname</a></span><span class="op">(</span>omicsObject <span class="op">=</span> <span class="va">mypro</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "RazorProtein"</span></span></code></pre>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_emeta_cname.html">get_emeta_cname</a></span><span class="op">(</span>omicsObject <span class="op">=</span> <span class="va">mymetab</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## NULL</span></span></code></pre>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_emeta_cname.html">get_emeta_cname</a></span><span class="op">(</span>omicsObject <span class="op">=</span> <span class="va">mynmr</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "Metabolite"</span></span></code></pre>
 <ul>
@@ -250,13 +251,13 @@ e_meta that contains the mapping to biomolecules in e_data</li>
 <code><a href="../reference/get_fdata_cname.html">get_fdata_cname()</a></code> - Returns the name of the column in
 f_data that contains the names of the samples</li>
 </ul>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_fdata_cname.html">get_fdata_cname</a></span><span class="op">(</span>omicsObject <span class="op">=</span> <span class="va">mypro</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "SampleID"</span></span></code></pre>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_fdata_cname.html">get_fdata_cname</a></span><span class="op">(</span>omicsObject <span class="op">=</span> <span class="va">mymetab</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "SampleID"</span></span></code></pre>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_fdata_cname.html">get_fdata_cname</a></span><span class="op">(</span>omicsObject <span class="op">=</span> <span class="va">mynmr</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "SampleID"</span></span></code></pre>
 <ul>
@@ -269,7 +270,7 @@ attributes of this data frame. For both <code>mymetab</code> and
 <code>mynmr</code>, we have not designated groups yet so the results are
 NULL.</li>
 </ul>
-<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_group_DF.html">get_group_DF</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mypro</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##                  SampleID      Group</span></span>
 <span><span class="co">## 1  Sample_20_Phenotype3_A Phenotype3</span></span>
@@ -296,10 +297,10 @@ NULL.</li>
 <span><span class="co">## 22  Sample_6_Phenotype2_B Phenotype2</span></span>
 <span><span class="co">## 23 Sample_12_Phenotype2_B Phenotype2</span></span>
 <span><span class="co">## 24  Sample_9_Phenotype2_B Phenotype2</span></span></code></pre>
-<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_group_DF.html">get_group_DF</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mymetab</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## NULL</span></span></code></pre>
-<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_group_DF.html">get_group_DF</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mynmr</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## NULL</span></span></code></pre>
 <ul>
@@ -307,7 +308,7 @@ NULL.</li>
 <code><a href="../reference/get_group_table.html">get_group_table()</a></code> - This function returns a table with
 number of samples per group</li>
 </ul>
-<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_group_table.html">get_group_table</a></span><span class="op">(</span>omicsObject <span class="op">=</span> <span class="va">mypro</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## group</span></span>
 <span><span class="co">## Phenotype1 Phenotype2 Phenotype3 </span></span>
@@ -320,7 +321,7 @@ refpool_notation, and norm_info (list containing a single logical
 element that indicates whether the data have been normalized to a
 reference pool</li>
 </ul>
-<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">myiso</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/edata_transform.html">edata_transform</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">isobaric_object</span>, data_scale <span class="op">=</span> <span class="st">"log2"</span><span class="op">)</span></span>
 <span><span class="va">myiso_normalized</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/normalize_isobaric.html">normalize_isobaric</a></span><span class="op">(</span></span>
 <span>  omicsData <span class="op">=</span> <span class="va">myiso</span>,</span>
@@ -353,7 +354,7 @@ reference pool</li>
 <code><a href="../reference/get_meta_info.html">get_meta_info()</a></code> - Retrieves the values in the meta_info
 attribute from an omicsData object</li>
 </ul>
-<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_meta_info.html">get_meta_info</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mynmr</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## $meta_data</span></span>
 <span><span class="co">## [1] TRUE</span></span>
@@ -370,7 +371,7 @@ sample-specific values and ii) whether the data have been back
 transformed so the values are on a similar scale to the raw values
 before normalization.</li>
 </ul>
-<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_nmr_info.html">get_nmr_info</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mynmr</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## $metabolite_name</span></span>
 <span><span class="co">## [1] NA</span></span>
@@ -384,12 +385,12 @@ before normalization.</li>
 <span><span class="co">## </span></span>
 <span><span class="co">## $norm_info$backtransform</span></span>
 <span><span class="co">## [1] NA</span></span></code></pre>
-<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mynmr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/edata_transform.html">edata_transform</a></span><span class="op">(</span></span>
 <span>  omicsData <span class="op">=</span> <span class="va">nmr_identified_object</span>,</span>
 <span>  data_scale <span class="op">=</span> <span class="st">"log2"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Normalization using a "spiked in" metabolite</span></span>
 <span><span class="va">nmr_norm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/normalize_nmr.html">normalize_nmr</a></span><span class="op">(</span></span>
 <span>  omicsData <span class="op">=</span> <span class="va">mynmr</span>, apply_norm <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -420,7 +421,7 @@ before normalization.</li>
 <span><span class="co">## [25] 3.969331 4.707095 4.120682 4.794893 6.439716 6.050808 5.967296 6.467480</span></span>
 <span><span class="co">## [33] 5.859282 6.098328 6.600868 4.365027 6.036377 4.347367 5.047161 6.189109</span></span>
 <span><span class="co">## [41] 5.005238</span></span></code></pre>
-<div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Normalization using a sample property</span></span>
 <span><span class="va">nmr_norm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/normalize_nmr.html">normalize_nmr</a></span><span class="op">(</span></span>
 <span>  omicsData <span class="op">=</span> <span class="va">mynmr</span>, apply_norm <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -461,7 +462,7 @@ before normalization.</li>
 Each element in this list corresponds to a filter applied to the data,
 and filters are listed in the order they were applied.</li>
 </ul>
-<div class="sourceCode" id="cb59"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb60"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_filters.html">get_filters</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mypro</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [[1]]</span></span>
 <span><span class="co">## $type</span></span>
@@ -611,13 +612,13 @@ and filters are listed in the order they were applied.</li>
 data_info attribute indicating whether the data have been
 normalized</li>
 </ul>
-<div class="sourceCode" id="cb61"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb62"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_data_norm.html">get_data_norm</a></span><span class="op">(</span>omicsObject <span class="op">=</span> <span class="va">mypro</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] TRUE</span></span></code></pre>
-<div class="sourceCode" id="cb63"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_data_norm.html">get_data_norm</a></span><span class="op">(</span>omicsObject <span class="op">=</span> <span class="va">mymetab</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] FALSE</span></span></code></pre>
-<div class="sourceCode" id="cb65"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_data_norm.html">get_data_norm</a></span><span class="op">(</span>omicsObject <span class="op">=</span> <span class="va">mynmr</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] FALSE</span></span></code></pre>
 <ul>
@@ -625,10 +626,10 @@ normalized</li>
 <code><a href="../reference/get_isobaric_norm.html">get_isobaric_norm()</a></code> - A logical value indicating
 whether the data have been isobaric normalized</li>
 </ul>
-<div class="sourceCode" id="cb67"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb68"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_isobaric_norm.html">get_isobaric_norm</a></span><span class="op">(</span><span class="va">myiso</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] FALSE</span></span></code></pre>
-<div class="sourceCode" id="cb69"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb70"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_isobaric_norm.html">get_isobaric_norm</a></span><span class="op">(</span><span class="va">myiso_normalized</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] TRUE</span></span></code></pre>
 <ul>
@@ -636,10 +637,10 @@ whether the data have been isobaric normalized</li>
 <code><a href="../reference/get_nmr_norm.html">get_nmr_norm()</a></code> - A logical value indicating whether the
 data have been NMR normalized</li>
 </ul>
-<div class="sourceCode" id="cb71"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb72"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_nmr_norm.html">get_nmr_norm</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mynmr</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] FALSE</span></span></code></pre>
-<div class="sourceCode" id="cb73"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb74"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_nmr_norm.html">get_nmr_norm</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">nmr_norm</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] TRUE</span></span></code></pre>
 </div>
@@ -651,15 +652,16 @@ data have been NMR normalized</li>
 <code><a href="../reference/get_comparisons.html">get_comparisons()</a></code> - Returns a data frame with
 comparisons and their indices</li>
 </ul>
-<div class="sourceCode" id="cb75"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb76"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">imd_anova_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/imd_anova.html">imd_anova</a></span><span class="op">(</span></span>
 <span>  omicsData <span class="op">=</span> <span class="va">mypro</span>,</span>
 <span>  test_method <span class="op">=</span> <span class="st">"comb"</span>,</span>
 <span>  pval_adjust_a_multcomp <span class="op">=</span> <span class="st">"bon"</span>,</span>
 <span>  pval_adjust_g_multcomp <span class="op">=</span> <span class="st">"bon"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Joining with `by = join_by(RazorProtein)`</span></span></code></pre>
-<div class="sourceCode" id="cb77"><pre class="downlit sourceCode r">
+<pre><code><span><span class="co">## Joining with `by = join_by(SampleID)`</span></span>
+<span><span class="co">## Joining with `by = join_by(RazorProtein)`</span></span></code></pre>
+<div class="sourceCode" id="cb78"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_comparisons.html">get_comparisons</a></span><span class="op">(</span>compObj <span class="op">=</span> <span class="va">imd_anova_res</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##                comparisons index</span></span>
 <span><span class="co">## 1 Phenotype3_vs_Phenotype1     1</span></span>
@@ -684,7 +686,7 @@ comparisons and their indices</li>
 
       <footer><div class="copyright">
   <p></p>
-<p>Developed by Lisa Bramer, Kelly Stratton.</p>
+<p>Developed by Lisa Bramer, Kelly Stratton, Daniel Claborne.</p>
 </div>
 
 <div class="pkgdown">

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pmartR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.2</span>
       </span>
     </div>
 
@@ -146,45 +146,40 @@ retain_groups = T</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/pmartR/pmartRdata" class="external-link">pmartRdata</a></span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">obj_1</span> <span class="op">&lt;-</span> <span class="va">lipid_neg_object</span></span></span>
-<span class="r-in"><span><span class="va">obj_2</span> <span class="op">&lt;-</span> <span class="va">lipid_pos_object</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># de-duplicate any duplicate edata identifiers</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="va">obj_2</span><span class="op">$</span><span class="va">e_data</span><span class="op">[</span>, <span class="fu"><a href="get_edata_cname.html">get_edata_cname</a></span><span class="op">(</span><span class="va">obj_2</span><span class="op">)</span><span class="op">]</span> <span class="op">==</span> <span class="va">obj_2</span><span class="op">$</span><span class="va">e_meta</span><span class="op">[</span>, <span class="fu"><a href="get_edata_cname.html">get_edata_cname</a></span><span class="op">(</span><span class="va">obj_2</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
-<span class="r-in"><span><span class="va">obj_2</span><span class="op">$</span><span class="va">e_data</span><span class="op">[</span>, <span class="fu"><a href="get_edata_cname.html">get_edata_cname</a></span><span class="op">(</span><span class="va">obj_2</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"obj_2_"</span>, <span class="va">obj_2</span><span class="op">$</span><span class="va">e_data</span><span class="op">[</span>, <span class="fu"><a href="get_edata_cname.html">get_edata_cname</a></span><span class="op">(</span><span class="va">obj_2</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">obj_2</span><span class="op">$</span><span class="va">e_meta</span><span class="op">[</span>, <span class="fu"><a href="get_edata_cname.html">get_edata_cname</a></span><span class="op">(</span><span class="va">obj_2</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">obj_2</span><span class="op">$</span><span class="va">e_data</span><span class="op">[</span>, <span class="fu"><a href="get_edata_cname.html">get_edata_cname</a></span><span class="op">(</span><span class="va">obj_2</span><span class="op">)</span><span class="op">]</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">combine_object</span> <span class="op">&lt;-</span> <span class="fu">combine_lipidData</span><span class="op">(</span>obj_1 <span class="op">=</span> <span class="va">obj_1</span>, obj_2 <span class="op">=</span> <span class="va">obj_2</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># preprocess and group the data and keep filters/grouping structure</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">obj_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="edata_transform.html">edata_transform</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">obj_1</span>, data_scale <span class="op">=</span> <span class="st">"log2"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">obj_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="normalize_global.html">normalize_global</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">obj_1</span>, subset_fn <span class="op">=</span> <span class="st">"all"</span>,</span></span>
-<span class="r-in"><span>                          norm_fn <span class="op">=</span> <span class="st">"median"</span>, apply_norm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">obj_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="edata_transform.html">edata_transform</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">obj_2</span>, data_scale <span class="op">=</span> <span class="st">"log2"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">obj_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="normalize_global.html">normalize_global</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">obj_2</span>, subset_fn <span class="op">=</span> <span class="st">"all"</span>,</span></span>
-<span class="r-in"><span>                          norm_fn <span class="op">=</span> <span class="st">"median"</span>, apply_norm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">obj_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="group_designation.html">group_designation</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">obj_1</span>, main_effects <span class="op">=</span> <span class="st">"Virus"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">obj_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="group_designation.html">group_designation</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">obj_2</span>, main_effects <span class="op">=</span> <span class="st">"Virus"</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">obj_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="applyFilt.html">applyFilt</a></span><span class="op">(</span>filter_object <span class="op">=</span> <span class="fu"><a href="molecule_filter.html">molecule_filter</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">obj_1</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                   omicsData <span class="op">=</span> <span class="va">obj_1</span>, min_num <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> No biomolecules were filtered with the value specified for the min_num argument.</span>
-<span class="r-in"><span><span class="va">obj_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="applyFilt.html">applyFilt</a></span><span class="op">(</span>filter_object <span class="op">=</span> <span class="fu"><a href="cv_filter.html">cv_filter</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">obj_2</span><span class="op">)</span>, <span class="va">obj_2</span>, cv_thresh <span class="op">=</span> <span class="fl">60</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">combine_object_later</span> <span class="op">&lt;-</span> <span class="fu">combine_lipidData</span><span class="op">(</span></span></span>
-<span class="r-in"><span>                          obj_1 <span class="op">=</span> <span class="va">obj_1</span>,</span></span>
-<span class="r-in"><span>                          obj_2 <span class="op">=</span> <span class="va">obj_2</span>,</span></span>
-<span class="r-in"><span>                          retain_groups <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>                          retain_filters <span class="op">=</span> <span class="cn">TRUE</span></span></span>
-<span class="r-in"><span>                        <span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Grouping new object with main effects: Virus.</span>
-<span class="r-in"><span></span></span>
-</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/pmartR/pmartRdata" class="external-link">pmartRdata</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">obj_1</span> <span class="op">&lt;-</span> <span class="va">lipid_neg_object</span></span>
+<span><span class="va">obj_2</span> <span class="op">&lt;-</span> <span class="va">lipid_pos_object</span></span>
+<span></span>
+<span><span class="co"># de-duplicate any duplicate edata identifiers</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="va">obj_2</span><span class="op">$</span><span class="va">e_data</span><span class="op">[</span>, <span class="fu"><a href="get_edata_cname.html">get_edata_cname</a></span><span class="op">(</span><span class="va">obj_2</span><span class="op">)</span><span class="op">]</span> <span class="op">==</span> <span class="va">obj_2</span><span class="op">$</span><span class="va">e_meta</span><span class="op">[</span>, <span class="fu"><a href="get_edata_cname.html">get_edata_cname</a></span><span class="op">(</span><span class="va">obj_2</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="va">obj_2</span><span class="op">$</span><span class="va">e_data</span><span class="op">[</span>, <span class="fu"><a href="get_edata_cname.html">get_edata_cname</a></span><span class="op">(</span><span class="va">obj_2</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"obj_2_"</span>, <span class="va">obj_2</span><span class="op">$</span><span class="va">e_data</span><span class="op">[</span>, <span class="fu"><a href="get_edata_cname.html">get_edata_cname</a></span><span class="op">(</span><span class="va">obj_2</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="va">obj_2</span><span class="op">$</span><span class="va">e_meta</span><span class="op">[</span>, <span class="fu"><a href="get_edata_cname.html">get_edata_cname</a></span><span class="op">(</span><span class="va">obj_2</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">obj_2</span><span class="op">$</span><span class="va">e_data</span><span class="op">[</span>, <span class="fu"><a href="get_edata_cname.html">get_edata_cname</a></span><span class="op">(</span><span class="va">obj_2</span><span class="op">)</span><span class="op">]</span></span>
+<span></span>
+<span><span class="va">combine_object</span> <span class="op">&lt;-</span> <span class="fu">combine_lipidData</span><span class="op">(</span>obj_1 <span class="op">=</span> <span class="va">obj_1</span>, obj_2 <span class="op">=</span> <span class="va">obj_2</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># preprocess and group the data and keep filters/grouping structure</span></span>
+<span></span>
+<span><span class="va">obj_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="edata_transform.html">edata_transform</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">obj_1</span>, data_scale <span class="op">=</span> <span class="st">"log2"</span><span class="op">)</span></span>
+<span><span class="va">obj_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="normalize_global.html">normalize_global</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">obj_1</span>, subset_fn <span class="op">=</span> <span class="st">"all"</span>,</span>
+<span>                          norm_fn <span class="op">=</span> <span class="st">"median"</span>, apply_norm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">obj_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="edata_transform.html">edata_transform</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">obj_2</span>, data_scale <span class="op">=</span> <span class="st">"log2"</span><span class="op">)</span></span>
+<span><span class="va">obj_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="normalize_global.html">normalize_global</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">obj_2</span>, subset_fn <span class="op">=</span> <span class="st">"all"</span>,</span>
+<span>                          norm_fn <span class="op">=</span> <span class="st">"median"</span>, apply_norm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">obj_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="group_designation.html">group_designation</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">obj_1</span>, main_effects <span class="op">=</span> <span class="st">"Virus"</span><span class="op">)</span></span>
+<span><span class="va">obj_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="group_designation.html">group_designation</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">obj_2</span>, main_effects <span class="op">=</span> <span class="st">"Virus"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">obj_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="applyFilt.html">applyFilt</a></span><span class="op">(</span>filter_object <span class="op">=</span> <span class="fu"><a href="molecule_filter.html">molecule_filter</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">obj_1</span><span class="op">)</span>,</span>
+<span>                   omicsData <span class="op">=</span> <span class="va">obj_1</span>, min_num <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="va">obj_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="applyFilt.html">applyFilt</a></span><span class="op">(</span>filter_object <span class="op">=</span> <span class="fu"><a href="cv_filter.html">cv_filter</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">obj_2</span><span class="op">)</span>, <span class="va">obj_2</span>, cv_thresh <span class="op">=</span> <span class="fl">60</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">combine_object_later</span> <span class="op">&lt;-</span> <span class="fu">combine_lipidData</span><span class="op">(</span></span>
+<span>                          obj_1 <span class="op">=</span> <span class="va">obj_1</span>,</span>
+<span>                          obj_2 <span class="op">=</span> <span class="va">obj_2</span>,</span>
+<span>                          retain_groups <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>                          retain_filters <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>                        <span class="op">)</span></span></code></pre></div>
     </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -194,7 +189,7 @@ retain_groups = T</p>
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Lisa Bramer, Kelly Stratton.</p>
+  <p></p><p>Developed by Lisa Bramer, Kelly Stratton, Daniel Claborne.</p>
 </div>
 
 <div class="pkgdown">

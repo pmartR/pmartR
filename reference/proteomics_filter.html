@@ -18,7 +18,7 @@ the number of proteins to which each individual peptide maps."><!-- mathjax --><
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pmartR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.2</span>
       </span>
     </div>
 
@@ -113,25 +113,9 @@ component of omicsData must be nonempty.</p></dd>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/pmartR/pmartRdata" class="external-link">pmartRdata</a></span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">my_filter</span> <span class="op">&lt;-</span> <span class="fu">proteomics_filter</span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">pep_object</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">my_filter</span>, min_num_peps <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Summary of Proteomics Filter </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              Obs Proteins Per Peptide Obs Peptides Per Protein</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Min.                                1                        1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1st Qu.                             1                        2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Median                              1                        3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Mean                                1         7.15258215962441</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3rd Qu.                             1                        8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Max.                                1                      235</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                                               </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Filtered                            0                     1197</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Not Filtered                    21329                     1785</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span></span></span>
-</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/pmartR/pmartRdata" class="external-link">pmartRdata</a></span><span class="op">)</span></span>
+<span><span class="va">my_filter</span> <span class="op">&lt;-</span> <span class="fu">proteomics_filter</span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">pep_object</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">my_filter</span>, min_num_peps <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
     </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -141,7 +125,7 @@ component of omicsData must be nonempty.</p></dd>
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Lisa Bramer, Kelly Stratton.</p>
+  <p></p><p>Developed by Lisa Bramer, Kelly Stratton, Daniel Claborne.</p>
 </div>
 
 <div class="pkgdown">

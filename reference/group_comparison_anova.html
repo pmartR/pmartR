@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pmartR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.2</span>
       </span>
     </div>
 
@@ -84,21 +84,50 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">group_comparison_anova</span><span class="op">(</span><span class="va">groupData</span>, <span class="va">comparisons</span>, <span class="va">anova_results_full</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">group_comparison_anova</span><span class="op">(</span></span>
+<span>  <span class="va">data</span>,</span>
+<span>  <span class="va">groupData</span>,</span>
+<span>  <span class="va">comparisons</span>,</span>
+<span>  <span class="va">Xfull</span>,</span>
+<span>  <span class="va">Xred</span>,</span>
+<span>  <span class="va">anova_results_full</span>,</span>
+<span>  <span class="va">beta_to_mu_full</span>,</span>
+<span>  <span class="va">beta_to_mu_red</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>groupData</dt>
+    <dl><dt>data</dt>
+<dd><p>The expression values without the id column</p></dd>
+
+
+<dt>groupData</dt>
 <dd><p>data frame that assigns sample names to groups</p></dd>
 
 
 <dt>comparisons</dt>
-<dd><p>dataframe that defiens the comparsions of interest</p></dd>
+<dd><p>dataframe that defines the comparsions of interest</p></dd>
+
+
+<dt>Xfull</dt>
+<dd><p>design matrix for the full model with interaction terms between the main effects</p></dd>
+
+
+<dt>Xred</dt>
+<dd><p>design matrix for the reduced model with no interaction terms between the main effects</p></dd>
 
 
 <dt>anova_results_full</dt>
 <dd><p>results of the <code><a href="anova_test.html">pmartR::anova_test()</a></code> function</p></dd>
+
+
+<dt>beta_to_mu_full</dt>
+<dd><p>matrix that maps the beta coefficients to the group means for the full model</p></dd>
+
+
+<dt>beta_to_mu_red</dt>
+<dd><p>matrix that maps the beta coefficients to the group means for the reduced model</p></dd>
 
 </dl></div>
     <div id="value">
@@ -109,7 +138,7 @@
     </div>
     <div id="author">
     <h2>Author</h2>
-    <p>Bryan Stanfill</p>
+    <p>Bryan Stanfill, Daniel Claborne</p>
     </div>
 
   </div>
@@ -120,7 +149,7 @@
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Lisa Bramer, Kelly Stratton.</p>
+  <p></p><p>Developed by Lisa Bramer, Kelly Stratton, Daniel Claborne.</p>
 </div>
 
 <div class="pkgdown">

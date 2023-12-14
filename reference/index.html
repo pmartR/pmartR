@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pmartR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.2</span>
       </span>
     </div>
 
@@ -86,10 +86,6 @@
         </td>
         <td><p>Wrapper for DESeq2 workflow</p></td>
       </tr><tr><td>
-          <p><code><a href="MSnSet2pepData.html">MSnSet2pepData()</a></code> </p>
-        </td>
-        <td><p>Convert Data of class MSnSet to pmartR pepData Class</p></td>
-      </tr><tr><td>
           <p><code><a href="RNA_filter.html">RNA_filter()</a></code> </p>
         </td>
         <td><p>RNA Filter Object</p></td>
@@ -97,10 +93,6 @@
           <p><code><a href="all_subset.html">all_subset()</a></code> </p>
         </td>
         <td><p>Identify All Biomolecules for Use in Normalization</p></td>
-      </tr><tr><td>
-          <p><code><a href="analysis_log.html">analysis_log()</a></code> </p>
-        </td>
-        <td><p>Creates R markdown document report</p></td>
       </tr><tr><td>
           <p><code><a href="anova_filter.html">anova_filter()</a></code> </p>
         </td>
@@ -303,6 +295,10 @@ same type of filter has already been applied.</p></td>
         </td>
         <td><p>Fetch the isobaric normalization info</p></td>
       </tr><tr><td>
+          <p><code><a href="get_lsmeans.html">get_lsmeans()</a></code> </p>
+        </td>
+        <td><p>Compute the least squares means from a prediction grid and estimated coefficients</p></td>
+      </tr><tr><td>
           <p><code><a href="get_meta_info.html">get_meta_info()</a></code> </p>
         </td>
         <td><p>Fetch the meta_info attribute</p></td>
@@ -314,6 +310,10 @@ same type of filter has already been applied.</p></td>
           <p><code><a href="get_nmr_norm.html">get_nmr_norm()</a></code> </p>
         </td>
         <td><p>Fetch the NMR normalization info</p></td>
+      </tr><tr><td>
+          <p><code><a href="get_pred_grid.html">get_pred_grid()</a></code> </p>
+        </td>
+        <td><p>Build the prediction grid to compute least squares means.</p></td>
       </tr><tr><td>
           <p><code><a href="get_spans_params.html">get_spans_params()</a></code> </p>
         </td>
@@ -608,7 +608,7 @@ Normalization</p></td>
         </td>
         <td><p>Custom Filter Print Method</p></td>
       </tr><tr><td>
-          <p><code><a href="print.cvSummary.html">print(<i>&lt;cvFilterSummary&gt;</i>)</a></code> </p>
+          <p><code><a href="print.cvFilterSummary.html">print(<i>&lt;cvFilterSummary&gt;</i>)</a></code> </p>
         </td>
         <td><p>CV Filter Print Method</p></td>
       </tr><tr><td>
@@ -849,7 +849,7 @@ used to compute the SPANS score in step 2.</p></td>
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Lisa Bramer, Kelly Stratton.</p>
+  <p></p><p>Developed by Lisa Bramer, Kelly Stratton, Daniel Claborne.</p>
 </div>
 
 <div class="pkgdown">

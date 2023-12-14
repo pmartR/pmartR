@@ -18,7 +18,7 @@ their corresponding reference pool sample"><!-- mathjax --><script src="https://
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pmartR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.2</span>
       </span>
     </div>
 
@@ -149,6 +149,16 @@ regarding reference pool samples. If using this argument, the
 'channel_cname' and 'refpool_channel' should not be specified.</p></dd>
 
 </dl></div>
+    <div id="value">
+    <h2>Value</h2>
+    
+
+<p>If apply_norm = TRUE, an object of class 'isobaricpepData', normalized to reference pool,
+ and with the attribute 'isobaric_info' updated to include information about
+ the reference pool samples and the normalization procedure.  Otherwise an
+ object of class 'isobaricnormRes' containing similar information about the 
+ normalization process</p>
+    </div>
     <div id="details">
     <h2>Details</h2>
     <p>There are two ways to specify the information needed for identifying
@@ -174,36 +184,28 @@ regarding reference pool samples. If using this argument, the
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/pmartR/pmartRdata" class="external-link">pmartRdata</a></span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">myiso</span> <span class="op">&lt;-</span> <span class="fu"><a href="edata_transform.html">edata_transform</a></span><span class="op">(</span><span class="va">isobaric_object</span>, <span class="st">"log2"</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Don't apply the normalization quite yet;</span></span></span>
-<span class="r-in"><span><span class="co"># can use summary() and plot() to view reference pool samples</span></span></span>
-<span class="r-in"><span><span class="va">myiso_refpools</span> <span class="op">&lt;-</span> <span class="fu">normalize_isobaric</span><span class="op">(</span></span></span>
-<span class="r-in"><span>  omicsData <span class="op">=</span> <span class="va">myiso</span>, exp_cname <span class="op">=</span> <span class="st">"Plex"</span>,</span></span>
-<span class="r-in"><span>  apply_norm <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
-<span class="r-in"><span>  refpool_cname <span class="op">=</span> <span class="st">"Virus"</span>,</span></span>
-<span class="r-in"><span>  refpool_notation <span class="op">=</span> <span class="st">"Pool"</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">myiso_refpools</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Plex   Median       SD</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1   10 16.65771 2.082787</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2   15 17.66796 2.230995</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3   21 18.52677 2.256125</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4    3 16.68083 2.183433</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5    9 16.64818 2.105810</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Now apply the normalization;</span></span></span>
-<span class="r-in"><span><span class="co"># can use plot() to view the study samples after reference pool normalization</span></span></span>
-<span class="r-in"><span><span class="va">myiso_norm</span> <span class="op">&lt;-</span> <span class="fu">normalize_isobaric</span><span class="op">(</span></span></span>
-<span class="r-in"><span>  omicsData <span class="op">=</span> <span class="va">myiso</span>, exp_cname <span class="op">=</span> <span class="st">"Plex"</span>,</span></span>
-<span class="r-in"><span>  apply_norm <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>  refpool_cname <span class="op">=</span> <span class="st">"Virus"</span>,</span></span>
-<span class="r-in"><span>  refpool_notation <span class="op">=</span> <span class="st">"Pool"</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/pmartR/pmartRdata" class="external-link">pmartRdata</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">myiso</span> <span class="op">&lt;-</span> <span class="fu"><a href="edata_transform.html">edata_transform</a></span><span class="op">(</span><span class="va">isobaric_object</span>, <span class="st">"log2"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Don't apply the normalization quite yet;</span></span>
+<span><span class="co"># can use summary() and plot() to view reference pool samples</span></span>
+<span><span class="va">myiso_refpools</span> <span class="op">&lt;-</span> <span class="fu">normalize_isobaric</span><span class="op">(</span></span>
+<span>  omicsData <span class="op">=</span> <span class="va">myiso</span>, exp_cname <span class="op">=</span> <span class="st">"Plex"</span>,</span>
+<span>  apply_norm <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  refpool_cname <span class="op">=</span> <span class="st">"Virus"</span>,</span>
+<span>  refpool_notation <span class="op">=</span> <span class="st">"Pool"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">myiso_refpools</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Now apply the normalization;</span></span>
+<span><span class="co"># can use plot() to view the study samples after reference pool normalization</span></span>
+<span><span class="va">myiso_norm</span> <span class="op">&lt;-</span> <span class="fu">normalize_isobaric</span><span class="op">(</span></span>
+<span>  omicsData <span class="op">=</span> <span class="va">myiso</span>, exp_cname <span class="op">=</span> <span class="st">"Plex"</span>,</span>
+<span>  apply_norm <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  refpool_cname <span class="op">=</span> <span class="st">"Virus"</span>,</span>
+<span>  refpool_notation <span class="op">=</span> <span class="st">"Pool"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -213,7 +215,7 @@ regarding reference pool samples. If using this argument, the
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Lisa Bramer, Kelly Stratton.</p>
+  <p></p><p>Developed by Lisa Bramer, Kelly Stratton, Daniel Claborne.</p>
 </div>
 
 <div class="pkgdown">

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pmartR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.2</span>
       </span>
     </div>
 
@@ -85,7 +85,7 @@
 
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for statRes</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
 <span>  plot_type <span class="op">=</span> <span class="st">"bar"</span>,</span>
 <span>  fc_threshold <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -109,7 +109,7 @@
 <span>  bw_theme <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  display_count <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  custom_theme <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  cluster <span class="op">=</span> <span class="cn">F</span>,</span>
+<span>  cluster <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  free_y_axis <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -274,52 +274,38 @@ own range. The default is FALSE.</p></dd>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/pmartR/pmartRdata" class="external-link">pmartRdata</a></span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># Group the data by condition</span></span></span>
-<span class="r-in"><span><span class="va">mypro</span> <span class="op">&lt;-</span> <span class="fu"><a href="group_designation.html">group_designation</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  omicsData <span class="op">=</span> <span class="va">pro_object</span>,</span></span>
-<span class="r-in"><span>  main_effects <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Phenotype"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Apply the IMD ANOVA filter</span></span></span>
-<span class="r-in"><span><span class="va">imdanova_Filt</span> <span class="op">&lt;-</span> <span class="fu"><a href="imdanova_filter.html">imdanova_filter</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mypro</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">mypro</span> <span class="op">&lt;-</span> <span class="fu"><a href="applyFilt.html">applyFilt</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  filter_object <span class="op">=</span> <span class="va">imdanova_Filt</span>,</span></span>
-<span class="r-in"><span>  omicsData <span class="op">=</span> <span class="va">mypro</span>,</span></span>
-<span class="r-in"><span>  min_nonmiss_anova <span class="op">=</span> <span class="fl">2</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> You have specified remove_singleton_groups = TRUE, but there are no singleton groups to remove. Proceeding with application of the IMD-ANOVA filter.</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Implement the IMD ANOVA method and compuate all pairwise comparisons</span></span></span>
-<span class="r-in"><span><span class="co"># (i.e. leave the `comparisons` argument NULL)</span></span></span>
-<span class="r-in"><span><span class="va">anova_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="imd_anova.html">imd_anova</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mypro</span>, test_method <span class="op">=</span> <span class="st">'anova'</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Joining with `by = join_by(RazorProtein)`</span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">anova_res</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="plot.statRes-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">anova_res</span>, plot_type <span class="op">=</span> <span class="st">"volcano"</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Removed 100 rows containing missing values (`geom_point()`).</span>
-<span class="r-plt img"><img src="plot.statRes-2.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">imd_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="imd_anova.html">imd_anova</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mypro</span>, test_method <span class="op">=</span> <span class="st">'gtest'</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Joining with `by = join_by(RazorProtein)`</span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">imd_res</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="plot.statRes-3.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">imd_anova_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="imd_anova.html">imd_anova</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  omicsData <span class="op">=</span> <span class="va">mypro</span>,</span></span>
-<span class="r-in"><span>  test_method <span class="op">=</span> <span class="st">'comb'</span>,</span></span>
-<span class="r-in"><span>  pval_adjust_a_multcomp <span class="op">=</span> <span class="st">'bon'</span>,</span></span>
-<span class="r-in"><span>  pval_adjust_g_multcomp <span class="op">=</span> <span class="st">'bon'</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Joining with `by = join_by(RazorProtein)`</span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">imd_anova_res</span>, bw_theme <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="plot.statRes-4.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">imd_anova_res</span>, plot_type <span class="op">=</span> <span class="st">"volcano"</span>, bw_theme <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Joining with `by = join_by(RazorProtein, Comparison)`</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Removed 100 rows containing missing values (`geom_point()`).</span>
-<span class="r-plt img"><img src="plot.statRes-5.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span></span></span>
-</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/pmartR/pmartRdata" class="external-link">pmartRdata</a></span><span class="op">)</span></span>
+<span><span class="co"># Group the data by condition</span></span>
+<span><span class="va">mypro</span> <span class="op">&lt;-</span> <span class="fu"><a href="group_designation.html">group_designation</a></span><span class="op">(</span></span>
+<span>  omicsData <span class="op">=</span> <span class="va">pro_object</span>,</span>
+<span>  main_effects <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Phenotype"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Apply the IMD ANOVA filter</span></span>
+<span><span class="va">imdanova_Filt</span> <span class="op">&lt;-</span> <span class="fu"><a href="imdanova_filter.html">imdanova_filter</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mypro</span><span class="op">)</span></span>
+<span><span class="va">mypro</span> <span class="op">&lt;-</span> <span class="fu"><a href="applyFilt.html">applyFilt</a></span><span class="op">(</span></span>
+<span>  filter_object <span class="op">=</span> <span class="va">imdanova_Filt</span>,</span>
+<span>  omicsData <span class="op">=</span> <span class="va">mypro</span>,</span>
+<span>  min_nonmiss_anova <span class="op">=</span> <span class="fl">2</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Implement the IMD ANOVA method and compuate all pairwise comparisons</span></span>
+<span><span class="co"># (i.e. leave the `comparisons` argument NULL)</span></span>
+<span><span class="va">anova_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="imd_anova.html">imd_anova</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mypro</span>, test_method <span class="op">=</span> <span class="st">'anova'</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">anova_res</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">anova_res</span>, plot_type <span class="op">=</span> <span class="st">"volcano"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">imd_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="imd_anova.html">imd_anova</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mypro</span>, test_method <span class="op">=</span> <span class="st">'gtest'</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">imd_res</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">imd_anova_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="imd_anova.html">imd_anova</a></span><span class="op">(</span></span>
+<span>  omicsData <span class="op">=</span> <span class="va">mypro</span>,</span>
+<span>  test_method <span class="op">=</span> <span class="st">'comb'</span>,</span>
+<span>  pval_adjust_a_multcomp <span class="op">=</span> <span class="st">'bon'</span>,</span>
+<span>  pval_adjust_g_multcomp <span class="op">=</span> <span class="st">'bon'</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">imd_anova_res</span>, bw_theme <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">imd_anova_res</span>, plot_type <span class="op">=</span> <span class="st">"volcano"</span>, bw_theme <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
     </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -329,7 +315,7 @@ own range. The default is FALSE.</p></dd>
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Lisa Bramer, Kelly Stratton.</p>
+  <p></p><p>Developed by Lisa Bramer, Kelly Stratton, Daniel Claborne.</p>
 </div>
 
 <div class="pkgdown">

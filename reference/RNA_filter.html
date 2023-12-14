@@ -18,7 +18,7 @@ applyFilt"><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/m
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pmartR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.2</span>
       </span>
     </div>
 
@@ -118,52 +118,11 @@ applyFilt"><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/m
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/pmartR/pmartRdata" class="external-link">pmartRdata</a></span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">to_filter</span> <span class="op">&lt;-</span> <span class="fu">RNA_filter</span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">rnaseq_object</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">to_filter</span>, size_library <span class="op">=</span> <span class="fl">10000</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Summary of RNA Filter </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Library size cut-off: 10000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         LibrarySize   NonZero ProportionNonZero</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Min.       12208513 26359.000        0.53177453</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1st Qu.    14966913 28912.000        0.58327954</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Median     16751973 29865.000        0.60250565</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Mean       17048354 30186.200        0.60898564</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3rd Qu.    18517261 31299.000        0.63143560</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Max.       24990997 35713.000        0.72048499</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> SD          3078177  1978.452        0.03991389</span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">to_filter</span>, min_nonzero <span class="op">=</span> <span class="fl">5000</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Summary of RNA Filter </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> N Non-zero biomolecule cut-off: 5000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         LibrarySize   NonZero ProportionNonZero</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Min.       12208513 26359.000        0.53177453</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1st Qu.    14966913 28912.000        0.58327954</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Median     16751973 29865.000        0.60250565</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Mean       17048354 30186.200        0.60898564</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3rd Qu.    18517261 31299.000        0.63143560</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Max.       24990997 35713.000        0.72048499</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> SD          3078177  1978.452        0.03991389</span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">to_filter</span>, min_nonzero <span class="op">=</span> <span class="fl">.2</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Summary of RNA Filter </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Proportion Non-zero biomolecule cut-off: 0.200000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         LibrarySize   NonZero ProportionNonZero</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Min.       12208513 26359.000        0.53177453</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1st Qu.    14966913 28912.000        0.58327954</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Median     16751973 29865.000        0.60250565</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Mean       17048354 30186.200        0.60898564</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3rd Qu.    18517261 31299.000        0.63143560</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Max.       24990997 35713.000        0.72048499</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> SD          3078177  1978.452        0.03991389</span>
-<span class="r-in"><span></span></span>
-</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/pmartR/pmartRdata" class="external-link">pmartRdata</a></span><span class="op">)</span></span>
+<span><span class="va">to_filter</span> <span class="op">&lt;-</span> <span class="fu">RNA_filter</span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">rnaseq_object</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">to_filter</span>, size_library <span class="op">=</span> <span class="fl">10000</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">to_filter</span>, min_nonzero <span class="op">=</span> <span class="fl">5000</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">to_filter</span>, min_nonzero <span class="op">=</span> <span class="fl">.2</span><span class="op">)</span></span></code></pre></div>
     </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -173,7 +132,7 @@ applyFilt"><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/m
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Lisa Bramer, Kelly Stratton.</p>
+  <p></p><p>Developed by Lisa Bramer, Kelly Stratton, Daniel Claborne.</p>
 </div>
 
 <div class="pkgdown">

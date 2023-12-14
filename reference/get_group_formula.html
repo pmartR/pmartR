@@ -18,7 +18,7 @@ seqData statistical functions"><!-- mathjax --><script src="https://cdnjs.cloudf
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pmartR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.2</span>
       </span>
     </div>
 
@@ -95,19 +95,16 @@ seqData statistical functions</p>
 <dd><p>an object of type 'seqData', created by <code><a href="as.seqData.html">as.seqData</a></code></p></dd>
 
 </dl></div>
+    <div id="value">
+    <h2>Value</h2>
+    
 
-    <div id="ref-examples">
-    <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/pmartR/pmartRdata" class="external-link">pmartRdata</a></span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">myseqData</span> <span class="op">&lt;-</span> <span class="va">rnaseq_object</span></span></span>
-<span class="r-in"><span><span class="va">myseqData</span> <span class="op">&lt;-</span> <span class="fu"><a href="group_designation.html">group_designation</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">myseqData</span>, main_effects <span class="op">=</span> <span class="st">"Virus"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">grouping_info</span> <span class="op">&lt;-</span> <span class="fu">pmartR</span><span class="fu">:::</span><span class="fu">get_group_formula</span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">myseqData</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-in"><span></span></span>
-</code></pre></div>
-    </div>
+<p>A list with two elements:</p><ul><li><p>grouping_info: A data.frame with the grouping information used in
+  the statistical analysis</p></li>
+<li><p>formula_string: A character string with the formula used in the
+ statistical analysis</p></li>
+</ul></div>
+
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top"><h2 data-toc-skip>Contents</h2>
@@ -116,7 +113,7 @@ seqData statistical functions</p>
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Lisa Bramer, Kelly Stratton.</p>
+  <p></p><p>Developed by Lisa Bramer, Kelly Stratton, Daniel Claborne.</p>
 </div>
 
 <div class="pkgdown">

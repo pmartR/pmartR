@@ -18,7 +18,7 @@ applyFilt"><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/m
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pmartR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.2</span>
       </span>
     </div>
 
@@ -137,43 +137,9 @@ should be set to TRUE.</p></dd>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/pmartR/pmartRdata" class="external-link">pmartRdata</a></span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">to_filter</span> <span class="op">&lt;-</span> <span class="fu">molecule_filter</span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">pep_object</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">to_filter</span>, min_num <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Summary of Molecule Filter </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Minimum Number:2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Filtered:930</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Not Filtered:20399</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  num_observations frequency_counts</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                 1              930</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                 2             1928</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                 3             2895</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                 4             3826</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                 5             4705</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                 6             5627</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                 7             6443</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                 8             7213</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                 9             7937</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                10             8647</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                11             9383</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                12            10032</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                13            10678</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                14            11292</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                15            11937</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                16            12592</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                17            13240</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                18            13917</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                19            14571</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                20            15248</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                21            15941</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                22            16800</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                23            17956</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                24            21329</span>
-<span class="r-in"><span></span></span>
-</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/pmartR/pmartRdata" class="external-link">pmartRdata</a></span><span class="op">)</span></span>
+<span><span class="va">to_filter</span> <span class="op">&lt;-</span> <span class="fu">molecule_filter</span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">pep_object</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">to_filter</span>, min_num <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
     </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -183,7 +149,7 @@ should be set to TRUE.</p></dd>
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Lisa Bramer, Kelly Stratton.</p>
+  <p></p><p>Developed by Lisa Bramer, Kelly Stratton, Daniel Claborne.</p>
 </div>
 
 <div class="pkgdown">

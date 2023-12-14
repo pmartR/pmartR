@@ -19,7 +19,7 @@ mean, standard deviation, median, percent observed, minimum, and maximum."><!-- 
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pmartR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.2</span>
       </span>
     </div>
 
@@ -122,13 +122,11 @@ maximum data in the returned data frame. Defaults to FALSE.</p></dd>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/pmartR/pmartRdata" class="external-link">pmartRdata</a></span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">mylipid</span> <span class="op">&lt;-</span> <span class="fu"><a href="edata_transform.html">edata_transform</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">lipid_neg_object</span>, data_scale <span class="op">=</span> <span class="st">"log2"</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">dataRes_sample</span> <span class="op">&lt;-</span> <span class="fu"><a href="edata_summary.html">edata_summary</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mylipid</span>, groupvar <span class="op">=</span> <span class="cn">NULL</span>, by <span class="op">=</span> <span class="st">"sample"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">my_output</span> <span class="op">&lt;-</span> <span class="fu">report_dataRes</span><span class="op">(</span><span class="va">dataRes_sample</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/pmartR/pmartRdata" class="external-link">pmartRdata</a></span><span class="op">)</span></span>
+<span><span class="va">mylipid</span> <span class="op">&lt;-</span> <span class="fu"><a href="edata_transform.html">edata_transform</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">lipid_neg_object</span>, data_scale <span class="op">=</span> <span class="st">"log2"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">dataRes_sample</span> <span class="op">&lt;-</span> <span class="fu"><a href="edata_summary.html">edata_summary</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mylipid</span>, groupvar <span class="op">=</span> <span class="cn">NULL</span>, by <span class="op">=</span> <span class="st">"sample"</span><span class="op">)</span></span>
+<span><span class="va">my_output</span> <span class="op">&lt;-</span> <span class="fu">report_dataRes</span><span class="op">(</span><span class="va">dataRes_sample</span><span class="op">)</span></span></code></pre></div>
     </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -138,7 +136,7 @@ maximum data in the returned data frame. Defaults to FALSE.</p></dd>
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Lisa Bramer, Kelly Stratton.</p>
+  <p></p><p>Developed by Lisa Bramer, Kelly Stratton, Daniel Claborne.</p>
 </div>
 
 <div class="pkgdown">

@@ -18,7 +18,7 @@ surv_designation, and gives a summary of the results."><!-- mathjax --><script s
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pmartR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.2</span>
       </span>
     </div>
 
@@ -112,18 +112,16 @@ surv_designation, and gives a summary of the results.</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">OvarianPepdataBP</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">tcga_ovarian_pepdata_bp</span>, <span class="st">"survDF"</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>t_death <span class="op">=</span> <span class="st">"survival_time"</span>,</span></span>
-<span class="r-in"><span>                                                ind_death <span class="op">=</span> <span class="st">"vital_status"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># No percent is provided so the entire object is returned</span></span></span>
-<span class="r-in"><span><span class="fu">summary_km</span><span class="op">(</span><span class="va">tcga_ovarian_pepdata_bp</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Percent is provided so corresponding time point is returned</span></span></span>
-<span class="r-in"><span><span class="fu">summary_km</span><span class="op">(</span><span class="va">tcga_ovarian_pepdata_bp</span>, <span class="fl">.4</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-in"><span></span></span>
-</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">OvarianPepdataBP</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">tcga_ovarian_pepdata_bp</span>, <span class="st">"survDF"</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>t_death <span class="op">=</span> <span class="st">"survival_time"</span>,</span>
+<span>                                                ind_death <span class="op">=</span> <span class="st">"vital_status"</span><span class="op">)</span></span>
+<span><span class="co"># No percent is provided so the entire object is returned</span></span>
+<span><span class="fu">summary_km</span><span class="op">(</span><span class="va">tcga_ovarian_pepdata_bp</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Percent is provided so corresponding time point is returned</span></span>
+<span><span class="fu">summary_km</span><span class="op">(</span><span class="va">tcga_ovarian_pepdata_bp</span>, <span class="fl">.4</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
     </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -133,7 +131,7 @@ surv_designation, and gives a summary of the results.</p>
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Lisa Bramer, Kelly Stratton.</p>
+  <p></p><p>Developed by Lisa Bramer, Kelly Stratton, Daniel Claborne.</p>
 </div>
 
 <div class="pkgdown">

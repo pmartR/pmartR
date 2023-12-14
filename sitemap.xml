@@ -4,7 +4,13 @@
     <loc>/404.html</loc>
   </url>
   <url>
+    <loc>/DISCLAIMER.html</loc>
+  </url>
+  <url>
     <loc>/LICENSE-text.html</loc>
+  </url>
+  <url>
+    <loc>/LICENSE.html</loc>
   </url>
   <url>
     <loc>/articles/Convenience_Functions.html</loc>
@@ -46,16 +52,10 @@
     <loc>/reference/DESeq2_wrapper.html</loc>
   </url>
   <url>
-    <loc>/reference/MSnSet2pepData.html</loc>
-  </url>
-  <url>
     <loc>/reference/RNA_filter.html</loc>
   </url>
   <url>
     <loc>/reference/all_subset.html</loc>
-  </url>
-  <url>
-    <loc>/reference/analysis_log.html</loc>
   </url>
   <url>
     <loc>/reference/anova_filter.html</loc>
@@ -214,6 +214,9 @@
     <loc>/reference/get_isobaric_norm.html</loc>
   </url>
   <url>
+    <loc>/reference/get_lsmeans.html</loc>
+  </url>
+  <url>
     <loc>/reference/get_meta_info.html</loc>
   </url>
   <url>
@@ -221,6 +224,9 @@
   </url>
   <url>
     <loc>/reference/get_nmr_norm.html</loc>
+  </url>
+  <url>
+    <loc>/reference/get_pred_grid.html</loc>
   </url>
   <url>
     <loc>/reference/get_spans_params.html</loc>
@@ -448,7 +454,7 @@
     <loc>/reference/print.customFilterSummary.html</loc>
   </url>
   <url>
-    <loc>/reference/print.cvSummary.html</loc>
+    <loc>/reference/print.cvFilterSummary.html</loc>
   </url>
   <url>
     <loc>/reference/print.imdanovaFilterSummary.html</loc>

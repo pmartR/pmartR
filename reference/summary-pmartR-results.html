@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pmartR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.2</span>
       </span>
     </div>
 
@@ -120,41 +120,23 @@
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/pmartR/pmartRdata" class="external-link">pmartRdata</a></span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">mypep</span> <span class="op">&lt;-</span> <span class="fu"><a href="group_designation.html">group_designation</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">pep_object</span>, main_effects <span class="op">=</span> <span class="st">"Phenotype"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">mypep</span> <span class="op">&lt;-</span> <span class="fu"><a href="edata_transform.html">edata_transform</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mypep</span>, data_scale <span class="op">=</span> <span class="st">"log2"</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">norm_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="normalize_global.html">normalize_global</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mypep</span>, norm_fn <span class="op">=</span> <span class="st">"median"</span>, subset_fn <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">norm_result</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Summary of 'normRes' Object</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------                                                                 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Subset of data used for normalization calculation             All</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Normalization function used for normalization calculation  Median</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Backtransform requested                                     FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Number of biomolecules in subset                            21329</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Proportion of biomolecules in subset                            1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span><span class="va">spans_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="spans_procedure.html">spans_procedure</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mypep</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">spans_results</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">dim_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="dim_reduction.html">dim_reduction</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mypep</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">dim_results</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Summary of 'dimRes' Object</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     R_squaredPC1     0.507PC2     0.384</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">cor_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="cor_result.html">cor_result</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mypep</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">cor_results</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Summary of Correlation Matrix (Upper Triangle)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  0.8237  0.8821  0.8956  0.8944  0.9090  0.9340 </span>
-<span class="r-in"><span></span></span>
-</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/pmartR/pmartRdata" class="external-link">pmartRdata</a></span><span class="op">)</span></span>
+<span><span class="va">mypep</span> <span class="op">&lt;-</span> <span class="fu"><a href="group_designation.html">group_designation</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">pep_object</span>, main_effects <span class="op">=</span> <span class="st">"Phenotype"</span><span class="op">)</span></span>
+<span><span class="va">mypep</span> <span class="op">&lt;-</span> <span class="fu"><a href="edata_transform.html">edata_transform</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mypep</span>, data_scale <span class="op">=</span> <span class="st">"log2"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">norm_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="normalize_global.html">normalize_global</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mypep</span>, norm_fn <span class="op">=</span> <span class="st">"median"</span>, subset_fn <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">norm_result</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># \donttest{</span></span>
+<span><span class="va">spans_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="spans_procedure.html">spans_procedure</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mypep</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">spans_results</span><span class="op">)</span></span>
+<span><span class="co"># }</span></span>
+<span></span>
+<span><span class="va">dim_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="dim_reduction.html">dim_reduction</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mypep</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">dim_results</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">cor_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="cor_result.html">cor_result</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mypep</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">cor_results</span><span class="op">)</span></span></code></pre></div>
     </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -164,7 +146,7 @@
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Lisa Bramer, Kelly Stratton.</p>
+  <p></p><p>Developed by Lisa Bramer, Kelly Stratton, Daniel Claborne.</p>
 </div>
 
 <div class="pkgdown">

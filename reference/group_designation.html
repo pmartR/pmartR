@@ -18,7 +18,7 @@ variable(s) specified as main effects."><!-- mathjax --><script src="https://cdn
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pmartR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.2</span>
       </span>
     </div>
 
@@ -191,60 +191,12 @@ batch effects</p></dd>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/pmartR/pmartRdata" class="external-link">pmartRdata</a></span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">mylipid</span> <span class="op">&lt;-</span> <span class="fu">group_designation</span><span class="op">(</span></span></span>
-<span class="r-in"><span>  omicsData <span class="op">=</span> <span class="va">lipid_pos_object</span>,</span></span>
-<span class="r-in"><span>  main_effects <span class="op">=</span> <span class="st">"Virus"</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">mylipid</span>, <span class="st">"group_DF"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         SampleID   Group</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  StrainC_D1_R1 StrainC</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  StrainC_D1_R5 StrainC</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  StrainC_D1_R2 StrainC</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  StrainC_D1_R4 StrainC</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5  StrainC_D1_R3 StrainC</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  StrainC_D2_R2 StrainC</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7  StrainC_D2_R1 StrainC</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8  StrainC_D2_R5 StrainC</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9  StrainC_D2_R3 StrainC</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10 StrainC_D2_R4 StrainC</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11 StrainC_D3_R2 StrainC</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12 StrainC_D3_R1 StrainC</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13 StrainC_D3_R3 StrainC</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 14 StrainC_D3_R4 StrainC</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 15 StrainC_D3_R5 StrainC</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 16 StrainA_D1_R5 StrainA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 17 StrainA_D1_R1 StrainA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 18 StrainA_D1_R4 StrainA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 19 StrainA_D1_R2 StrainA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 20 StrainA_D1_R3 StrainA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 21 StrainA_D2_R2 StrainA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 22 StrainA_D2_R3 StrainA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 23 StrainA_D2_R4 StrainA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 24 StrainA_D2_R5 StrainA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 25 StrainA_D2_R1 StrainA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 26 StrainA_D3_R2 StrainA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 27 StrainA_D3_R3 StrainA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 28 StrainA_D3_R5 StrainA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 29 StrainA_D3_R4 StrainA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 30 StrainA_D3_R1 StrainA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 31 StrainB_D1_R1 StrainB</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 32 StrainB_D1_R2 StrainB</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 33 StrainB_D1_R4 StrainB</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 34 StrainB_D1_R5 StrainB</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 35 StrainB_D1_R3 StrainB</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 36 StrainB_D2_R3 StrainB</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 37 StrainB_D2_R1 StrainB</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 38 StrainB_D2_R2 StrainB</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 39 StrainB_D2_R4 StrainB</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 40 StrainB_D2_R5 StrainB</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 41 StrainB_D3_R3 StrainB</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 42 StrainB_D3_R1 StrainB</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 43 StrainB_D3_R2 StrainB</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 44 StrainB_D3_R5 StrainB</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 45 StrainB_D3_R4 StrainB</span>
-<span class="r-in"><span></span></span>
-</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/pmartR/pmartRdata" class="external-link">pmartRdata</a></span><span class="op">)</span></span>
+<span><span class="va">mylipid</span> <span class="op">&lt;-</span> <span class="fu">group_designation</span><span class="op">(</span></span>
+<span>  omicsData <span class="op">=</span> <span class="va">lipid_pos_object</span>,</span>
+<span>  main_effects <span class="op">=</span> <span class="st">"Virus"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">mylipid</span>, <span class="st">"group_DF"</span><span class="op">)</span></span></code></pre></div>
     </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -254,7 +206,7 @@ batch effects</p></dd>
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Lisa Bramer, Kelly Stratton.</p>
+  <p></p><p>Developed by Lisa Bramer, Kelly Stratton, Daniel Claborne.</p>
 </div>
 
 <div class="pkgdown">

@@ -18,7 +18,7 @@ and group assignment of a normalized omicsData or normRes object"><!-- mathjax -
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pmartR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.2</span>
       </span>
     </div>
 
@@ -112,34 +112,31 @@ Current options are "anova" and "kw" for a Kruskal-Wallis test.</p></dd>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/pmartR/pmartRdata" class="external-link">pmartRdata</a></span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">mymetab</span> <span class="op">&lt;-</span> <span class="fu"><a href="edata_transform.html">edata_transform</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">metab_object</span>, data_scale <span class="op">=</span> <span class="st">"log2"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">mymetab</span> <span class="op">&lt;-</span> <span class="fu"><a href="group_designation.html">group_designation</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mymetab</span>, main_effects <span class="op">=</span> <span class="st">"Phenotype"</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># provide the normRes object</span></span></span>
-<span class="r-in"><span><span class="va">mynorm</span> <span class="op">&lt;-</span> <span class="fu"><a href="normalize_global.html">normalize_global</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mymetab</span>, subset_fn <span class="op">=</span> <span class="st">"all"</span>,</span></span>
-<span class="r-in"><span>                           norm_fn <span class="op">=</span> <span class="st">"median"</span>, apply_norm <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">norm_pvals</span> <span class="op">&lt;-</span> <span class="fu">normRes_tests</span><span class="op">(</span>norm_obj <span class="op">=</span> <span class="va">mynorm</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># provide normalized omicsData object</span></span></span>
-<span class="r-in"><span><span class="va">mymetab</span> <span class="op">&lt;-</span> <span class="fu"><a href="normalize_global.html">normalize_global</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mymetab</span>, subset_fn <span class="op">=</span> <span class="st">"all"</span>,</span></span>
-<span class="r-in"><span>                            norm_fn <span class="op">=</span> <span class="st">"median"</span>, apply_norm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">norm_pvals</span> <span class="op">&lt;-</span> <span class="fu">normRes_tests</span><span class="op">(</span>norm_obj <span class="op">=</span> <span class="va">mymetab</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># NMR data object</span></span></span>
-<span class="r-in"><span><span class="va">mynmr</span> <span class="op">&lt;-</span> <span class="fu"><a href="edata_transform.html">edata_transform</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">nmr_identified_object</span>, data_scale <span class="op">=</span> <span class="st">"log2"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">mynmr</span> <span class="op">&lt;-</span> <span class="fu"><a href="group_designation.html">group_designation</a></span><span class="op">(</span><span class="va">mynmr</span>, main_effects <span class="op">=</span> <span class="st">"Condition"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">mynmrnorm</span> <span class="op">&lt;-</span> <span class="fu"><a href="normalize_nmr.html">normalize_nmr</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  omicsData <span class="op">=</span> <span class="va">mynmr</span>,</span></span>
-<span class="r-in"><span>  apply_norm <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>  sample_property_cname <span class="op">=</span> <span class="st">"Concentration"</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> backtransform is set to FALSE. Examine the distribution of your data to ensure this is reasonable.</span>
-<span class="r-in"><span><span class="va">mynmrnorm</span> <span class="op">&lt;-</span> <span class="fu"><a href="normalize_global.html">normalize_global</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mynmrnorm</span>, subset_fn <span class="op">=</span> <span class="st">"all"</span>,</span></span>
-<span class="r-in"><span>                              norm_fn <span class="op">=</span> <span class="st">"median"</span>, apply_norm <span class="op">=</span> <span class="cn">TRUE</span>, backtransform <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">norm_pvals</span> <span class="op">&lt;-</span> <span class="fu">normRes_tests</span><span class="op">(</span>norm_obj <span class="op">=</span> <span class="va">mynmrnorm</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/pmartR/pmartRdata" class="external-link">pmartRdata</a></span><span class="op">)</span></span>
+<span><span class="va">mymetab</span> <span class="op">&lt;-</span> <span class="fu"><a href="edata_transform.html">edata_transform</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">metab_object</span>, data_scale <span class="op">=</span> <span class="st">"log2"</span><span class="op">)</span></span>
+<span><span class="va">mymetab</span> <span class="op">&lt;-</span> <span class="fu"><a href="group_designation.html">group_designation</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mymetab</span>, main_effects <span class="op">=</span> <span class="st">"Phenotype"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># provide the normRes object</span></span>
+<span><span class="va">mynorm</span> <span class="op">&lt;-</span> <span class="fu"><a href="normalize_global.html">normalize_global</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mymetab</span>, subset_fn <span class="op">=</span> <span class="st">"all"</span>,</span>
+<span>                           norm_fn <span class="op">=</span> <span class="st">"median"</span>, apply_norm <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="va">norm_pvals</span> <span class="op">&lt;-</span> <span class="fu">normRes_tests</span><span class="op">(</span>norm_obj <span class="op">=</span> <span class="va">mynorm</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># provide normalized omicsData object</span></span>
+<span><span class="va">mymetab</span> <span class="op">&lt;-</span> <span class="fu"><a href="normalize_global.html">normalize_global</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mymetab</span>, subset_fn <span class="op">=</span> <span class="st">"all"</span>,</span>
+<span>                            norm_fn <span class="op">=</span> <span class="st">"median"</span>, apply_norm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">norm_pvals</span> <span class="op">&lt;-</span> <span class="fu">normRes_tests</span><span class="op">(</span>norm_obj <span class="op">=</span> <span class="va">mymetab</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># NMR data object</span></span>
+<span><span class="va">mynmr</span> <span class="op">&lt;-</span> <span class="fu"><a href="edata_transform.html">edata_transform</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">nmr_identified_object</span>, data_scale <span class="op">=</span> <span class="st">"log2"</span><span class="op">)</span></span>
+<span><span class="va">mynmr</span> <span class="op">&lt;-</span> <span class="fu"><a href="group_designation.html">group_designation</a></span><span class="op">(</span><span class="va">mynmr</span>, main_effects <span class="op">=</span> <span class="st">"Condition"</span><span class="op">)</span></span>
+<span><span class="va">mynmrnorm</span> <span class="op">&lt;-</span> <span class="fu"><a href="normalize_nmr.html">normalize_nmr</a></span><span class="op">(</span></span>
+<span>  omicsData <span class="op">=</span> <span class="va">mynmr</span>,</span>
+<span>  apply_norm <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  sample_property_cname <span class="op">=</span> <span class="st">"Concentration"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">mynmrnorm</span> <span class="op">&lt;-</span> <span class="fu"><a href="normalize_global.html">normalize_global</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mynmrnorm</span>, subset_fn <span class="op">=</span> <span class="st">"all"</span>,</span>
+<span>                              norm_fn <span class="op">=</span> <span class="st">"median"</span>, apply_norm <span class="op">=</span> <span class="cn">TRUE</span>, backtransform <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">norm_pvals</span> <span class="op">&lt;-</span> <span class="fu">normRes_tests</span><span class="op">(</span>norm_obj <span class="op">=</span> <span class="va">mynmrnorm</span><span class="op">)</span></span></code></pre></div>
     </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -149,7 +146,7 @@ Current options are "anova" and "kw" for a Kruskal-Wallis test.</p></dd>
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Lisa Bramer, Kelly Stratton.</p>
+  <p></p><p>Developed by Lisa Bramer, Kelly Stratton, Daniel Claborne.</p>
 </div>
 
 <div class="pkgdown">

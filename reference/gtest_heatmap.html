@@ -19,7 +19,7 @@ each bin, and have indicators for significance by g-test."><!-- mathjax --><scri
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pmartR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.2</span>
       </span>
     </div>
 
@@ -111,6 +111,11 @@ each bin, and have indicators for significance by g-test.</p>
 <dd><p>`data.frame` produced by pmartR:::<a href="make_volcano_plot_df.html">make_volcano_plot_df</a></p></dd>
 
 
+<dt>pval_thresh</dt>
+<dd><p>numeric value indicating the p-value threshold for
+significance.</p></dd>
+
+
 <dt>show_sig</dt>
 <dd><p>Boolean whether to show the visual indicator that a certain
 bin combination is significant by the g-test</p></dd>
@@ -162,12 +167,6 @@ will be displayed on the bar plot. The default is TRUE.</p></dd>
 <dt>legend_lab</dt>
 <dd><p>character string specifying the legend title.</p></dd>
 
-
-<dt>count_text_size</dt>
-<dd><p>In non-interactive mode, the size of the text
-indicating the number of biomolecules to be displayed inside the tile.
-Defaults to 3.  Setting this to zero causes no text to be shown.</p></dd>
-
 </dl></div>
     <div id="value">
     <h2>Value</h2>
@@ -185,7 +184,7 @@ to TRUE or FALSE respectively. A g-test heatmap</p>
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Lisa Bramer, Kelly Stratton.</p>
+  <p></p><p>Developed by Lisa Bramer, Kelly Stratton, Daniel Claborne.</p>
 </div>
 
 <div class="pkgdown">
