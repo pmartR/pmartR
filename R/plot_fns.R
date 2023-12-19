@@ -1768,7 +1768,7 @@ plot.corRes <- function(x, omicsData = NULL, order_by = NULL,
   }
 
   # Create the data frame that will be used to produce the correlation heat map.
-  corRes_obj_df <- data.frame(corRes_obj)
+  corRes_obj_df <- data.frame(corRes_obj, check.names = FALSE)
   corRes_obj_df <- cbind(Var1 = rownames(corRes_obj_df), corRes_obj_df)
   rownames(corRes_obj_df) <- 1:nrow(corRes_obj_df)
   corRes_melt <- corRes_obj_df %>%
@@ -1787,7 +1787,7 @@ plot.corRes <- function(x, omicsData = NULL, order_by = NULL,
         levels = abbreviate(rownames(corRes_obj), minlength = 20)
       )
     ) %>%
-    data.frame
+    data.frame(check.names = FALSE)
 
   # Create all the plot labels. Life is pain!!!
   xlabel <- if (is.null(x_lab)) "" else x_lab
