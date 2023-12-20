@@ -1345,16 +1345,18 @@ run_group_meancor <- function(omicsData, mintR_groupDF,
 
     # make a list of which columns belong to which groups #
     grp.col.ids = list()
-    for (i in 1:length(nonsingleton_groups)) {
-      # pull sample names from group.data in current group #
-      nms = as.character(
-        mintR_groupDF[
-          which(mintR_groupDF$Group == nonsingleton_groups[i]), samp_id
-        ]
-      )
-
-      # pull column numbers corresponding to above names #
-      grp.col.ids[[i]] = which(names(omicsData_nonsingletons$e_data) %in% nms)
+    if (length(nonsingleton_groups) > 0) {
+      for (i in 1:length(nonsingleton_groups)) {
+        # pull sample names from group.data in current group #
+        nms = as.character(
+          mintR_groupDF[
+            which(mintR_groupDF$Group == nonsingleton_groups[i]), samp_id
+          ]
+        )
+        
+        # pull column numbers corresponding to above names #
+        grp.col.ids[[i]] = which(names(omicsData_nonsingletons$e_data) %in% nms)
+      }
     }
 
     prwse.grp.cors.nonsingletons <- lapply(grp.col.ids, function(x) {
