@@ -1793,7 +1793,7 @@ applyFilt.customFilt <- function(filter_object, omicsData, ...) {
   # !#!#!#!#!#!#!#!#!#!
 
   # Check if samples will be filtered and the data are paired.
-  if (!is.null(filter_object$f_data_remove) &&
+  if (length(filter_object$f_data_remove) > 0 &&
     !is.null(attr(attr(omicsData, "group_DF"), "pair_id"))) {
     # Snag the associated pair IDs for the samples that will be filtered.
     filtered_pairs <- omicsData$f_data %>%
@@ -1824,7 +1824,7 @@ applyFilt.customFilt <- function(filter_object, omicsData, ...) {
         )
       )
     }
-  } else if (!is.null(filter_object$f_data_keep) &&
+  } else if (length(filter_object$f_data_keep) > 0 &&
     !is.null(attr(attr(omicsData, "group_DF"), "pair_id"))) {
     # Snag the associated pair IDs for the samples that will be kept.
     filtered_pairs <- omicsData$f_data %>%
@@ -2042,7 +2042,7 @@ pmartR_filter_worker <- function(filter_object, omicsData) {
     ##
 
     # remove any samples from f_data and e_data #
-    if (!is.null(filter_object$f_data_remove)) {
+    if (length(filter_object$f_data_remove) > 0) {
       # Find the row indices of the sample names that will be removed from the
       # f_data object.
       inds <- which(
@@ -2072,7 +2072,7 @@ pmartR_filter_worker <- function(filter_object, omicsData) {
     }
 
     # remove any edata molecules from e_data and e_meta #
-    if (!is.null(filter_object$e_data_remove)) {
+    if (length(filter_object$e_data_remove) > 0) {
       # Find the row indices of the biomolecule names that will be removed from
       # the e_data object.
       inds <- which(
@@ -2108,7 +2108,7 @@ pmartR_filter_worker <- function(filter_object, omicsData) {
     }
 
     # remove any emeta molecules from e_meta and e_data #
-    if (!is.null(filter_object$e_meta_remove)) {
+    if (length(filter_object$e_meta_remove) > 0) {
       valid_emeta <- omicsData$e_meta[, get_emeta_cname(omicsData)]
 
       # Find the row indices of the mapping variable names that will be removed
@@ -2161,7 +2161,7 @@ pmartR_filter_worker <- function(filter_object, omicsData) {
     # Filter with keep arguments ---------------
   } else {
     # keep samples in f_data and e_data #
-    if (!is.null(filter_object$f_data_keep)) {
+    if (length(filter_object$f_data_keep) > 0) {
       # Find the row indices in f_data of the samples that will be kept.
       inds <- which(
         omicsData$f_data[, which(names(omicsData$f_data) == samp_cname)]
@@ -2186,7 +2186,7 @@ pmartR_filter_worker <- function(filter_object, omicsData) {
     }
 
     # keep edata molecules in e_data and e_meta if it is present #
-    if (!is.null(filter_object$e_data_keep)) {
+    if (length(filter_object$e_data_keep) > 0) {
       # Find the row indices in e_data that correspond to the biomolecules
       # that should be kept.
       inds <- which(
@@ -2216,7 +2216,7 @@ pmartR_filter_worker <- function(filter_object, omicsData) {
 
     # keep emeta molecules in e_meta (here, we are explicitly specifying things
     # to keep).
-    if (!is.null(filter_object$e_meta_keep)) {
+    if (length(filter_object$e_meta_keep) > 0) {
       # Find the row indices in e_meta corresponding to the IDs of the mapping
       # variable. These are the rows that will be kept.
       inds <- which(
