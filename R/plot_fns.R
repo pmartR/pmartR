@@ -4813,13 +4813,12 @@ plot.normRes <- function(x, order_by = NULL, color_by = NULL,
   )
 
   # Farm boy, combine the plots and send them into the world. As you wish.
-  if (!interactive) {
-    # Return the regular plots side-by-side.
-
-    p_raw + p_norm
-  } else {
+  if (interactive && requirePlotly()) {
     # Return the interactive plots side-by-side.
     plotly::subplot(p_raw, p_norm, nrows = 1)
+  } else {
+    # Return the regular plots side-by-side.
+    p_raw + p_norm
   }
 }
 
@@ -6817,51 +6816,7 @@ gtest_heatmap <-
           )
       )
 
-    if (!interactive) {
-      p <- ggplot2::ggplot(gtest_counts) +
-        ggplot2::theme_minimal() +
-        ggplot2::geom_tile(
-          ggplot2::aes(Count_First_Group,
-            Count_Second_Group,
-            fill = n
-          ),
-          color = "black"
-        )
-
-      if(show_sig) {
-        sig_data <- gtest_counts %>% dplyr::filter(sig)
-        
-        if(nrow(sig_data) > 0) {
-          p <- p + ggplot2::geom_point(
-            data = sig_data,
-            ggplot2::aes(Count_First_Group, Count_Second_Group, shape = "1"),
-            fill = "white"
-          ) +
-          ggplot2::scale_shape_manual(name = "Statistically significant",
-                                      labels = "",
-                                      values = 21)
-        }
-      }
-
-      if (display_count) {
-        p <- p + ggplot2::geom_text(
-          ggplot2::aes(Count_First_Group, Count_Second_Group, label = n),
-          nudge_x = -0.5, nudge_y = 0.5, hjust = -0.1, vjust = 1.5,
-          color = "white", size = text_size
-        )
-      }
-
-      p <- p +
-        ggplot2::facet_wrap(~Comparison) +
-        ggplot2::scale_fill_gradient(
-          name = the_legend_label,
-          low = if (is.null(color_low)) "#132B43" else color_low,
-          high = if (is.null(color_high)) "#56B1F7" else color_high
-        ) +
-        ggplot2::xlab(the_x_label) +
-        ggplot2::ylab(the_y_label) +
-        ggplot2::ggtitle(the_title_label)
-    } else {
+    if (interactive && requirePlotly()) {
       comps <- unique(gtest_counts$Comparison)
       subplot_list <- list()
       limits = range(gtest_counts$n)
@@ -6953,6 +6908,50 @@ gtest_heatmap <-
           xaxis = list(title = the_x_label),
           yaxis = list(title = the_y_label)
         )
+    } else {
+      p <- ggplot2::ggplot(gtest_counts) +
+        ggplot2::theme_minimal() +
+        ggplot2::geom_tile(
+          ggplot2::aes(Count_First_Group,
+            Count_Second_Group,
+            fill = n
+          ),
+          color = "black"
+        )
+
+      if(show_sig) {
+        sig_data <- gtest_counts %>% dplyr::filter(sig)
+        
+        if(nrow(sig_data) > 0) {
+          p <- p + ggplot2::geom_point(
+            data = sig_data,
+            ggplot2::aes(Count_First_Group, Count_Second_Group, shape = "1"),
+            fill = "white"
+          ) +
+          ggplot2::scale_shape_manual(name = "Statistically significant",
+                                      labels = "",
+                                      values = 21)
+        }
+      }
+
+      if (display_count) {
+        p <- p + ggplot2::geom_text(
+          ggplot2::aes(Count_First_Group, Count_Second_Group, label = n),
+          nudge_x = -0.5, nudge_y = 0.5, hjust = -0.1, vjust = 1.5,
+          color = "white", size = text_size
+        )
+      }
+
+      p <- p +
+        ggplot2::facet_wrap(~Comparison) +
+        ggplot2::scale_fill_gradient(
+          name = the_legend_label,
+          low = if (is.null(color_low)) "#132B43" else color_low,
+          high = if (is.null(color_high)) "#56B1F7" else color_high
+        ) +
+        ggplot2::xlab(the_x_label) +
+        ggplot2::ylab(the_y_label) +
+        ggplot2::ggtitle(the_title_label)
     }
 
     return(p)
