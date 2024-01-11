@@ -1,7 +1,8 @@
 # pmartR
 <!-- badges: start -->
 [![DOI](https://zenodo.org/badge/69275428.svg)](https://zenodo.org/badge/latestdoi/69275428)
-[![R-CMD-check](https://github.com/pmartR/pmartR/actions/workflows/R-CMD-check-CRAN.yaml/badge.svg)](https://github.com/pmartR/pmartR/actions/workflows/R-CMD-check-CRAN.yaml)
+[![R-CMD-check](https://github.com/pmartR/pmartR/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/pmartR/pmartR/actions/workflows/R-CMD-check.yaml)
+[![CRAN status](https://www.r-pkg.org/badges/version/pmartR)](https://CRAN.R-project.org/package=pmartR)
 <!-- badges: end -->
 
 This R package provides functionality for quality control processing, statistical analysis and visualization of mass spectrometry (MS) omics data, in particular proteomic (either at the peptide or the protein level; isobaric labeled or unlabled), lipidomic, and metabolomic data. This includes data transformation, specification of groups that are to be compared against each other, filtering of feature and/or samples, data normalization, data summarization (correlation, PCA), and statistical comparisons of groups of interest (ANOVA and/or independence of missing data tests). Example data to be used with this packages can be found in [pmartRdata](https://github.com/pmartR/pmartRdata).
@@ -9,9 +10,22 @@ This R package provides functionality for quality control processing, statistica
 
 ## Installation:
 
+This package makes use of several packages hosted on BioConductor.  If you are encountering warnings about unavailable BioConductor packages such as `pcaMethods`, you may need to add them to `options("repos")`:
+
+```r
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+options("repos" = BiocManager::repositories())
+```
+
 (**Recommended**) Install from CRAN:
 ```r
 install.packages("pmartR")
+
+# or 
+
+BiocManager::install("pmartR")
 ```
 
 To install the latest *release*:
