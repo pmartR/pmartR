@@ -59,6 +59,9 @@ trelliscope) should be returned. Default is FALSE.}
 
 \item{...}{Additional arguments to be passed on to the trelli builder}
 }
+\value{
+No return value, builds a trelliscope display of boxplots that is stored in `path`
+}
 \description{
 Specify a boxplot design and cognostics for the RNA-Seq
   boxplot trelliscope. Each boxplot will have its own groups as specified by

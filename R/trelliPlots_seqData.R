@@ -37,6 +37,8 @@
 #'   trelliscope) should be returned. Default is FALSE.
 #' @param ... Additional arguments to be passed on to the trelli builder
 #'
+#' @return No return value, builds a trelliscope display of boxplots that is stored in `path`
+#' 
 #' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' \dontrun{
 #' library(pmartRdata)
@@ -383,6 +385,8 @@ trelli_rnaseq_boxplot <- function(trelliData,
 #'   trelliscope) should be returned. Default is FALSE.
 #' @param ... Additional arguments to be passed on to the trelli builder
 #'
+#' @return No return value, builds a trelliscope display of histograms that is stored in `path`
+#' 
 #' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' \dontrun{
 #' library(pmartRdata)
@@ -585,6 +589,8 @@ trelli_rnaseq_histogram <- function(trelliData,
 #'   trelliscope) should be returned. Default is FALSE.
 #' @param ... Additional arguments to be passed on to the trelli builder
 #'
+#' @return No return value, builds a trelliscope display of heatmaps that is stored in `path`
+#' 
 #' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' \dontrun{
 #' library(pmartRdata)
@@ -815,6 +821,8 @@ trelli_rnaseq_heatmap <- function(trelliData,
 #'    trelliscope) should be returned. Default is FALSE.
 #' @param ... Additional arguments to be passed on to the trelli builder
 #'   
+#' @return No return value, builds a trelliscope display of bar charts that is stored in `path`
+#' 
 #' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' \dontrun{
 #' library(pmartRdata)

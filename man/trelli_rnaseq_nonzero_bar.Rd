@@ -56,6 +56,9 @@ trelliscope) should be returned. Default is FALSE.}
 
 \item{...}{Additional arguments to be passed on to the trelli builder}
 }
+\value{
+No return value, builds a trelliscope display of bar charts that is stored in `path`
+}
 \description{
 Specify a plot design and cognostics for the Non-Zero barchart
    trelliscope. Non-Zeroes are displayed per panel_by variable. Main_effects
