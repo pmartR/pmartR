@@ -71,7 +71,8 @@ trelliData4 <- as.trelliData(omicsData = omicsData, statRes = statRes)
 omicsData_seq <- group_designation(omicsData = rnaseq_object, main_effects = c("Virus"))
 
 # Filter low transcript counts
-omicsData_seq <- applyFilt(filter_object = total_count_filter(omicsData = omicsData_seq), omicsData = omicsData_seq, min_count = 15)
+omicsData_seq <- applyFilt(filter_object = total_count_filter(omicsData = omicsData_seq), 
+ omicsData = omicsData_seq, min_count = 15)
 
 # Select a normalization and statistics method (options are 'edgeR', 'DESeq2', and 'voom').
 # See ?difexp_seq for more details

@@ -235,7 +235,7 @@ as.trelliData.edata <- function(e_data,
     
     # Conduct the lcpm transformation
     biomolecules <- omicsData$e_data[[edata_cname]]
-    temp_data <- omicsData$e_data %>% dplyr::select(-edata_cname)
+    temp_data <- omicsData$e_data %>% dplyr::select(-dplyr::all_of(edata_cname))
     samp_sum <- apply(temp_data, 2, sum, na.rm = TRUE) + 1
     div_sum <- sweep((temp_data + .5), 2, samp_sum, `/`)
     lcpm <- log2(div_sum * 10^6)
@@ -351,7 +351,8 @@ as.trelliData.edata <- function(e_data,
 #' omicsData_seq <- group_designation(omicsData = rnaseq_object, main_effects = c("Virus"))
 #' 
 #' # Filter low transcript counts
-#' omicsData_seq <- applyFilt(filter_object = total_count_filter(omicsData = omicsData_seq), omicsData = omicsData_seq, min_count = 15)
+#' omicsData_seq <- applyFilt(filter_object = total_count_filter(omicsData = omicsData_seq), 
+#'  omicsData = omicsData_seq, min_count = 15)
 #' 
 #' # Select a normalization and statistics method (options are 'edgeR', 'DESeq2', and 'voom').
 #' # See ?difexp_seq for more details
@@ -477,7 +478,7 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL) {
       
       # Generate log counts per million (lcpm)
       biomolecules <- omicsData$e_data[[edata_cname]]
-      temp_data <- omicsData$e_data %>% dplyr::select(-edata_cname)
+      temp_data <- omicsData$e_data %>% dplyr::select(-dplyr::all_of(edata_cname))
       samp_sum <- apply(temp_data, 2, sum, na.rm = TRUE) + 1
       div_sum <- sweep((temp_data + .5), 2, samp_sum, `/`)
       lcpm <- log2(div_sum * 10^6)
@@ -603,7 +604,7 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL) {
   attr(trelliData, "panel_by") <- FALSE
   class(trelliData) <- c("trelliData")
   
-  if (class(omicsData) == "seqData" | (!is.null(statRes) && ms_obj == FALSE)) {
+  if (inherits(omicsData, "seqData") | (!is.null(statRes) && ms_obj == FALSE)) {
     
     class(trelliData) <- c(class(trelliData), "trelliData.seqData")
     
@@ -861,11 +862,30 @@ trelli_panel_by <- function(trelliData, panel) {
 #' ## RNA-SEQ EXAMPLES ##  
 #' ######################
 #' 
-#' # Filter a trelliData seqData object with only statistics results, while not caring about a comparison
-#' trelli_pvalue_filter(trelliData_seq3, p_value_thresh = 0.05)
+#' #' # Group data by condition
+#' omicsData_seq <- group_designation(omicsData = rnaseq_object, main_effects = c("Virus"))
+#' 
+#' # Filter low transcript counts
+#' omicsData_seq <- applyFilt(
+#'  filter_object = total_count_filter(omicsData = omicsData_seq), 
+#'  omicsData = omicsData_seq, min_count = 15
+#' )
+#' 
+#' # Select a normalization and statistics method (options are 'edgeR', 'DESeq2', and 'voom').
+#' # See ?difexp_seq for more details
+#' statRes_seq <- diffexp_seq(omicsData = omicsData_seq, method = "voom")
+#' 
+#' # Generate the trelliData object
+#' trelliData_seq3 <- as.trelliData(statRes = statRes_seq)
+#' trelliData_seq4 <- as.trelliData(omicsData = omicsData_seq, statRes = statRes_seq)
+#' 
+#' # Filter a trelliData seqData object with only statistics results, while not 
+#' # caring about a comparison
+#' trelliData_seq3_filt <- trelli_pvalue_filter(trelliData_seq3, p_value_thresh = 0.05)
 #' 
 #' # Filter both a omicsData and statRes object, while caring about a specific comparison
-#' trelli_pvalue_filter(trelliData_seq4, p_value_thresh = 0.05, comparison = "StrainA_vs_StrainB")
+#' trelliData_seq4_filt <- trelli_pvalue_filter(trelliData_seq4, p_value_thresh = 0.05, 
+#'  comparison = "StrainA_vs_StrainB")
 #' 
 #' }
 #'

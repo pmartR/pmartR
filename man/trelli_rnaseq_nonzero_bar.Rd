@@ -63,37 +63,62 @@ Specify a plot design and cognostics for the Non-Zero barchart
    "trelli missingness bar".
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 \dontrun{
+library(pmartRdata)
+
+trelliData_seq1 <- as.trelliData.edata(e_data = rnaseq_edata, 
+                                      edata_cname = "Transcript",
+                                      omics_type = "seqData")
+omicsData_seq <- group_designation(omicsData = rnaseq_object, main_effects = c("Virus"))
+
+# Filter low transcript counts
+omicsData_seq <- applyFilt(filter_object = total_count_filter(omicsData = omicsData_seq), 
+ omicsData = omicsData_seq, min_count = 15)
+
+# Select a normalization and statistics method (options are 'edgeR', 'DESeq2', and 'voom').
+# See ?difexp_seq for more details
+statRes_seq <- diffexp_seq(omicsData = omicsData_seq, method = "voom")
+
+# Generate the trelliData object
+trelliData_seq2 <- as.trelliData(omicsData = omicsData_seq)
+trelliData_seq3 <- as.trelliData(statRes = statRes_seq)
+trelliData_seq4 <- as.trelliData(omicsData = omicsData_seq, statRes = statRes_seq)
 
 # Build the non-zero bar plot with an edata file. Generate trelliData in as.trelliData.edata
 trelli_panel_by(trelliData = trelliData_seq1, panel = "Transcript") \%>\% 
-  trelli_rnaseq_nonzero_bar(test_mode = TRUE, test_example = 1:10)
+  trelli_rnaseq_nonzero_bar(test_mode = TRUE, test_example = 1:10, path = tempdir())
 trelli_panel_by(trelliData = trelliData_seq1, panel = "Sample") \%>\% 
-  trelli_rnaseq_nonzero_bar(test_mode = TRUE, test_example = 1:10, cognostics = "non-zero proportion")
+  trelli_rnaseq_nonzero_bar(test_mode = TRUE, test_example = 1:10, 
+   cognostics = "non-zero proportion", path = tempdir())
 
 # Build the non-zero bar plot with an omicsData object. Generate trelliData in as.trelliData
 trelli_panel_by(trelliData = trelliData_seq2, panel = "Transcript") \%>\% 
-  trelli_rnaseq_nonzero_bar(test_mode = TRUE, test_example = 1:10)
+  trelli_rnaseq_nonzero_bar(test_mode = TRUE, test_example = 1:10, path = tempdir())
 
 # Build the non-zero bar plot with a statRes object. Generate trelliData in as.trelliData
 trelli_panel_by(trelliData = trelliData_seq3, panel = "Transcript") \%>\%
   trelli_rnaseq_nonzero_bar(test_mode = TRUE, test_example = 1:10,
-                         cognostics = c("non-zero proportion"))
+                         cognostics = c("non-zero proportion"), path = tempdir())
 
-# Build the non-zero bar plot with an omicsData and statRes object. Generate trelliData in as.trelliData.
+# Build the non-zero bar plot with an omicsData and statRes object. 
+# Generate trelliData in as.trelliData.
 trelli_panel_by(trelliData = trelliData_seq4, panel = "Gene") \%>\%
-  trelli_rnaseq_nonzero_bar(test_mode = TRUE, test_example = 1:10) 
+  trelli_rnaseq_nonzero_bar(test_mode = TRUE, test_example = 1:10, path = tempdir()) 
 
 # Or making the plot interactive 
 trelli_panel_by(trelliData = trelliData_seq2, panel = "Transcript") \%>\% 
-   trelli_rnaseq_nonzero_bar(test_mode = TRUE, test_example = 1:5, interactive = TRUE)
+   trelli_rnaseq_nonzero_bar(test_mode = TRUE, test_example = 1:5, 
+     interactive = TRUE, path = tempdir())
    
 # Or visualize only count data 
 trelli_panel_by(trelliData = trelliData_seq2, panel = "Transcript") \%>\% 
-   trelli_rnaseq_nonzero_bar(test_mode = TRUE, test_example = 1:5, cognostics = "non-zero count", proportion = FALSE)
-   
-}
+   trelli_rnaseq_nonzero_bar(test_mode = TRUE, test_example = 1:5, 
+     cognostics = "non-zero count", proportion = FALSE, path = tempdir())
 
+\dontshow{closeAllConnections()}   
+}
+\dontshow{\}) # examplesIf}
 }
 \author{
 David Degnan, Lisa Bramer

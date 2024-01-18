@@ -66,13 +66,33 @@ Specify a boxplot design and cognostics for the RNA-Seq
   for MS/NMR-based omics.
 }
 \examples{
+\dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 \dontrun{
+library(pmartRdata)
+
+trelliData_seq1 <- as.trelliData.edata(e_data = rnaseq_edata,
+                                      edata_cname = "Transcript",
+                                      omics_type = "seqData")
+omicsData_seq <- group_designation(omicsData = rnaseq_object, main_effects = c("Virus"))
+
+# Filter low transcript counts
+omicsData_seq <- applyFilt(filter_object = total_count_filter(omicsData = omicsData_seq), 
+ omicsData = omicsData_seq, min_count = 15)
+
+# Select a normalization and statistics method (options are 'edgeR', 'DESeq2', and 'voom').
+# See ?difexp_seq for more details
+statRes_seq <- diffexp_seq(omicsData = omicsData_seq, method = "voom")
+
+# Generate the trelliData object
+trelliData_seq2 <- as.trelliData(omicsData = omicsData_seq)
+trelliData_seq3 <- as.trelliData(statRes = statRes_seq)
+trelliData_seq4 <- as.trelliData(omicsData = omicsData_seq, statRes = statRes_seq)
 
 ## Generate trelliData objects using the as.trelliData.edata example code.
 
 # Build the RNA-seq boxplot with an edata file where each panel is a biomolecule. 
 trelli_panel_by(trelliData = trelliData_seq1, panel = "Transcript") \%>\% 
-   trelli_rnaseq_boxplot(test_mode = TRUE, test_example = 1:10)
+   trelli_rnaseq_boxplot(test_mode = TRUE, test_example = 1:10, path = tempdir())
    
 # Build the RNA-seq boxplot where each panel is a sample.
 # Include all applicable cognostics. Remove points. 
@@ -82,36 +102,39 @@ trelli_panel_by(trelliData = trelliData_seq1, panel = "Sample") \%>\%
                             cognostics = c("count", 
                                            "mean lcpm", 
                                            "median lcpm", 
-                                           "cv lcpm")
+                                           "cv lcpm"),
+                            path = tempdir()
                            )
 
 # Build the RNA-seq boxplot with an omicsData object.
 # Let the panels be biomolecules. Here, grouping information is included.
 trelli_panel_by(trelliData = trelliData_seq2, panel = "Transcript") \%>\% 
-   trelli_rnaseq_boxplot(test_mode = TRUE, test_example = 1:10)
+   trelli_rnaseq_boxplot(test_mode = TRUE, test_example = 1:10, path = tempdir())
    
 # Build the RNA-seq boxplot with an omicsData object. The panel is a biomolecule class,
 # which is proteins in this case.
 trelli_panel_by(trelliData = trelliData_seq2, panel = "Gene") \%>\% 
-   trelli_rnaseq_boxplot(test_mode = TRUE, test_example = 1:10)
+   trelli_rnaseq_boxplot(test_mode = TRUE, test_example = 1:10, path = tempdir())
     
 # Build the RNA-seq boxplot with an omicsData and statRes object.
 # Panel by a biomolecule, and add statistics data to the cognostics
 trelli_panel_by(trelliData = trelliData_seq4, panel = "Transcript") \%>\%
    trelli_rnaseq_boxplot(test_mode = TRUE, test_example = 1:10,
-                            cognostics = c("mean lcpm", "p-value", "fold change"))
+     cognostics = c("mean lcpm", "p-value", "fold change"), path = tempdir())
  
 # Other options include modifying the ggplot  
-trelli_panel_by(trelliData = trelliData_seq1, panel = "Transcript") \%>\% 
-   trelli_rnaseq_boxplot(test_mode = TRUE, test_example = 1:10, 
-     ggplot_params = c("ylab('')", "xlab('')"))
+trelli_panel_by(trelliData = trelliData_seq1, panel = "Transcript") \%>\%
+   trelli_rnaseq_boxplot(test_mode = TRUE, test_example = 1:10,
+     ggplot_params = c("ylab('')", "xlab('')"), path = tempdir())
 
 # Or making the plot interactive 
-trelli_panel_by(trelliData = trelliData_seq4, panel = "Gene") \%>\% 
-    trelli_rnaseq_boxplot(interactive = TRUE, test_mode = TRUE, test_example = 1:10)
+trelli_panel_by(trelliData = trelliData_seq4, panel = "Gene") \%>\%
+    trelli_rnaseq_boxplot(interactive = TRUE, test_mode = TRUE, 
+     test_example = 1:10, path = tempdir())
 
+\dontshow{closeAllConnections()}
 }
-
+\dontshow{\}) # examplesIf}
 }
 \author{
 David Degnan, Lisa Bramer

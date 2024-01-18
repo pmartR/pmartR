@@ -1647,7 +1647,7 @@ trelli_foldchange_bar <- function(trelliData,
     # Extend cognostics if p_value is in it
     if ("p-value" %in% cognostics) {
       if (inherits(trelliData, "trelliData.seqData")) {
-        DF <- DF %>% dplyr::rename(`p-value` = p_value)
+        DF <- DF %>% dplyr::rename(`p-value` = .data$p_value)
       } else {
         DF <- DF %>% dplyr::rename(`p-value` = p_value_anova)
       }
@@ -1907,7 +1907,7 @@ trelli_foldchange_boxplot <- function(trelliData,
         dplyr::group_by(Comparison) %>%
         dplyr::summarise(
           "biomolecule count" =  sum(!is.nan(fold_change)), 
-          "proportion significant" = round(sum(p_value[!is.na(p_value)] <= p_value_thresh) / `biomolecule count`, 4),
+          "proportion significant" = round(sum(.data$p_value[!is.na(.data$p_value)] <= p_value_thresh) / `biomolecule count`, 4),
           "mean fold change" = round(mean(fold_change, na.rm = TRUE), 4),
           "sd fold change" = round(sd(fold_change, na.rm = TRUE), 4)
         ) %>%
@@ -2155,7 +2155,7 @@ trelli_foldchange_heatmap <- function(trelliData,
         dplyr::group_by(Comparison) %>%
         dplyr::summarise(
           "biomolecule count" =  sum(!is.nan(fold_change)), 
-          "proportion significant" = round(sum(p_value[!is.na(p_value)] <= p_value_thresh) / `biomolecule count`, 4),
+          "proportion significant" = round(sum(.data$p_value[!is.na(.data$p_value)] <= p_value_thresh) / `biomolecule count`, 4),
           "mean fold change" = round(mean(fold_change, na.rm = TRUE), 4),
           "sd fold change" = round(sd(fold_change, na.rm = TRUE), 4)
         ) %>%
@@ -2386,7 +2386,7 @@ trelli_foldchange_volcano <- function(trelliData,
       
       # Make volcano plot 
       if (inherits(trelliData, "trelliData.seqData")) {
-        volcano <- ggplot2::ggplot(DF, ggplot2::aes(x = fold_change, y = -log10(p_value), color = Significance)) +
+        volcano <- ggplot2::ggplot(DF, ggplot2::aes(x = fold_change, y = -log10(.data$p_value), color = Significance)) +
           ggplot2::geom_point() + ggplot2::theme_bw() + ggplot2::ggtitle(title) +
           ggplot2::scale_color_manual(values = structure(c("blue", "red", "black"), 
                                                          .Names = c(LowSig, HighSig, NoSig))) +
@@ -2404,7 +2404,7 @@ trelli_foldchange_volcano <- function(trelliData,
     } else {
       
       if (inherits(trelliData, "trelliData.seqData")) {
-        volcano <- ggplot2::ggplot(DF, ggplot2::aes(x = fold_change, y = -log10(p_value))) +
+        volcano <- ggplot2::ggplot(DF, ggplot2::aes(x = fold_change, y = -log10(.data$p_value))) +
           ggplot2::geom_point() + ggplot2::theme_bw() + ggplot2::ggtitle(title) +
           ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) +
           ggplot2::xlab("Fold Change") + ggplot2::ylab("-Log10 P Value")
@@ -2444,9 +2444,9 @@ trelli_foldchange_volcano <- function(trelliData,
         cog_to_trelli <- DF %>%
           dplyr::summarise(
             "biomolecule count" = sum(!is.nan(fold_change)), 
-            "proportion significant" = round(sum(p_value[!is.na(p_value)] <= p_value_thresh) / `biomolecule count`, 4),
-            "proportion significant up" = round(sum(p_value[!is.na(p_value)] <= p_value_thresh & fold_change[!is.na(fold_change)] > 0) / `biomolecule count`, 4),
-            "proportion significant down" = round(sum(p_value[!is.na(p_value)] <= p_value_thresh & fold_change[!is.na(fold_change)] < 0) / `biomolecule count`, 4)
+            "proportion significant" = round(sum(.data$p_value[!is.na(.data$p_value)] <= p_value_thresh) / `biomolecule count`, 4),
+            "proportion significant up" = round(sum(.data$p_value[!is.na(.data$p_value)] <= p_value_thresh & fold_change[!is.na(fold_change)] > 0) / `biomolecule count`, 4),
+            "proportion significant down" = round(sum(.data$p_value[!is.na(.data$p_value)] <= p_value_thresh & fold_change[!is.na(fold_change)] < 0) / `biomolecule count`, 4)
           ) %>%
           tidyr::pivot_longer(c(`biomolecule count`, `proportion significant`, `proportion significant up`, `proportion significant down`)) %>%
           dplyr::filter(name %in% cognostics)

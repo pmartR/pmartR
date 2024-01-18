@@ -86,11 +86,30 @@ trelli_pvalue_filter(
 ## RNA-SEQ EXAMPLES ##  
 ######################
 
-# Filter a trelliData seqData object with only statistics results, while not caring about a comparison
-trelli_pvalue_filter(trelliData_seq3, p_value_thresh = 0.05)
+#' # Group data by condition
+omicsData_seq <- group_designation(omicsData = rnaseq_object, main_effects = c("Virus"))
+
+# Filter low transcript counts
+omicsData_seq <- applyFilt(
+ filter_object = total_count_filter(omicsData = omicsData_seq), 
+ omicsData = omicsData_seq, min_count = 15
+)
+
+# Select a normalization and statistics method (options are 'edgeR', 'DESeq2', and 'voom').
+# See ?difexp_seq for more details
+statRes_seq <- diffexp_seq(omicsData = omicsData_seq, method = "voom")
+
+# Generate the trelliData object
+trelliData_seq3 <- as.trelliData(statRes = statRes_seq)
+trelliData_seq4 <- as.trelliData(omicsData = omicsData_seq, statRes = statRes_seq)
+
+# Filter a trelliData seqData object with only statistics results, while not 
+# caring about a comparison
+trelliData_seq3_filt <- trelli_pvalue_filter(trelliData_seq3, p_value_thresh = 0.05)
 
 # Filter both a omicsData and statRes object, while caring about a specific comparison
-trelli_pvalue_filter(trelliData_seq4, p_value_thresh = 0.05, comparison = "StrainA_vs_StrainB")
+trelliData_seq4_filt <- trelli_pvalue_filter(trelliData_seq4, p_value_thresh = 0.05, 
+ comparison = "StrainA_vs_StrainB")
 
 }
 \dontshow{\}) # examplesIf}

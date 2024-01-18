@@ -37,14 +37,33 @@
 #'   trelliscope) should be returned. Default is FALSE.
 #' @param ... Additional arguments to be passed on to the trelli builder
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' \dontrun{
+#' library(pmartRdata)
+#' 
+#' trelliData_seq1 <- as.trelliData.edata(e_data = rnaseq_edata,
+#'                                       edata_cname = "Transcript",
+#'                                       omics_type = "seqData")
+#' omicsData_seq <- group_designation(omicsData = rnaseq_object, main_effects = c("Virus"))
+#' 
+#' # Filter low transcript counts
+#' omicsData_seq <- applyFilt(filter_object = total_count_filter(omicsData = omicsData_seq), 
+#'  omicsData = omicsData_seq, min_count = 15)
+#' 
+#' # Select a normalization and statistics method (options are 'edgeR', 'DESeq2', and 'voom').
+#' # See ?difexp_seq for more details
+#' statRes_seq <- diffexp_seq(omicsData = omicsData_seq, method = "voom")
+#' 
+#' # Generate the trelliData object
+#' trelliData_seq2 <- as.trelliData(omicsData = omicsData_seq)
+#' trelliData_seq3 <- as.trelliData(statRes = statRes_seq)
+#' trelliData_seq4 <- as.trelliData(omicsData = omicsData_seq, statRes = statRes_seq)
 #' 
 #' ## Generate trelliData objects using the as.trelliData.edata example code.
 #' 
 #' # Build the RNA-seq boxplot with an edata file where each panel is a biomolecule. 
 #' trelli_panel_by(trelliData = trelliData_seq1, panel = "Transcript") %>% 
-#'    trelli_rnaseq_boxplot(test_mode = TRUE, test_example = 1:10)
+#'    trelli_rnaseq_boxplot(test_mode = TRUE, test_example = 1:10, path = tempdir())
 #'    
 #' # Build the RNA-seq boxplot where each panel is a sample.
 #' # Include all applicable cognostics. Remove points. 
@@ -54,34 +73,37 @@
 #'                             cognostics = c("count", 
 #'                                            "mean lcpm", 
 #'                                            "median lcpm", 
-#'                                            "cv lcpm")
+#'                                            "cv lcpm"),
+#'                             path = tempdir()
 #'                            )
 #' 
 #' # Build the RNA-seq boxplot with an omicsData object.
 #' # Let the panels be biomolecules. Here, grouping information is included.
 #' trelli_panel_by(trelliData = trelliData_seq2, panel = "Transcript") %>% 
-#'    trelli_rnaseq_boxplot(test_mode = TRUE, test_example = 1:10)
+#'    trelli_rnaseq_boxplot(test_mode = TRUE, test_example = 1:10, path = tempdir())
 #'    
 #' # Build the RNA-seq boxplot with an omicsData object. The panel is a biomolecule class,
 #' # which is proteins in this case.
 #' trelli_panel_by(trelliData = trelliData_seq2, panel = "Gene") %>% 
-#'    trelli_rnaseq_boxplot(test_mode = TRUE, test_example = 1:10)
+#'    trelli_rnaseq_boxplot(test_mode = TRUE, test_example = 1:10, path = tempdir())
 #'     
 #' # Build the RNA-seq boxplot with an omicsData and statRes object.
 #' # Panel by a biomolecule, and add statistics data to the cognostics
 #' trelli_panel_by(trelliData = trelliData_seq4, panel = "Transcript") %>%
 #'    trelli_rnaseq_boxplot(test_mode = TRUE, test_example = 1:10,
-#'                             cognostics = c("mean lcpm", "p-value", "fold change"))
+#'      cognostics = c("mean lcpm", "p-value", "fold change"), path = tempdir())
 #'  
 #' # Other options include modifying the ggplot  
-#' trelli_panel_by(trelliData = trelliData_seq1, panel = "Transcript") %>% 
-#'    trelli_rnaseq_boxplot(test_mode = TRUE, test_example = 1:10, 
-#'      ggplot_params = c("ylab('')", "xlab('')"))
+#' trelli_panel_by(trelliData = trelliData_seq1, panel = "Transcript") %>%
+#'    trelli_rnaseq_boxplot(test_mode = TRUE, test_example = 1:10,
+#'      ggplot_params = c("ylab('')", "xlab('')"), path = tempdir())
 #' 
 #' # Or making the plot interactive 
-#' trelli_panel_by(trelliData = trelliData_seq4, panel = "Gene") %>% 
-#'     trelli_rnaseq_boxplot(interactive = TRUE, test_mode = TRUE, test_example = 1:10)
+#' trelli_panel_by(trelliData = trelliData_seq4, panel = "Gene") %>%
+#'     trelli_rnaseq_boxplot(interactive = TRUE, test_mode = TRUE, 
+#'      test_example = 1:10, path = tempdir())
 #' 
+#' \dontshow{closeAllConnections()}
 #' }
 #'
 #' @author David Degnan, Lisa Bramer
@@ -168,7 +190,7 @@ trelli_rnaseq_boxplot <- function(trelliData,
     }
     
     # Build plot
-    boxplot <- ggplot2::ggplot(DF, ggplot2::aes(x = Group, fill = Group, y = LCPM)) +
+    boxplot <- ggplot2::ggplot(DF, ggplot2::aes(x = Group, fill = Group, y = .data$LCPM)) +
       ggplot2::geom_boxplot(outlier.shape = NA) +
       ggplot2::theme_bw() +
       ggplot2::ggtitle(title) +
@@ -240,11 +262,11 @@ trelli_rnaseq_boxplot <- function(trelliData,
         dplyr::summarise(
           "sample nonzero count" = sum(Count != 0), 
           "biomolecule nonzero count" = sum(Count != 0), 
-          "mean lcpm" = round(mean(LCPM, na.rm = TRUE), 4),
-          "median lcpm" = round(median(LCPM, na.rm = TRUE), 4),
-          "cv lcpm" = round((sd(LCPM, na.rm = T) / mean(LCPM, na.rm =T)) * 100, 4),
+          "mean lcpm" = round(mean(.data$LCPM, na.rm = TRUE), 4),
+          "median lcpm" = round(median(.data$LCPM, na.rm = TRUE), 4),
+          "cv lcpm" = round((sd(.data$LCPM, na.rm = T) / mean(.data$LCPM, na.rm =T)) * 100, 4),
         ) %>%
-        tidyr::pivot_longer(c(`sample nonzero count`, `biomolecule nonzero count`, `mean lcpm`, `median lcpm`, `cv lcpm`)) %>%
+        tidyr::pivot_longer(c(.data$`sample nonzero count`, .data$`biomolecule nonzero count`, .data$`mean lcpm`, .data$`median lcpm`, .data$`cv lcpm`)) %>%
         dplyr::filter(name %in% cognostics) %>%
         dplyr::mutate(name = paste(Group, name)) %>%
         dplyr::ungroup() %>%
@@ -274,7 +296,7 @@ trelli_rnaseq_boxplot <- function(trelliData,
           dplyr::select(Nested_DF) %>%
           tidyr::unnest(cols = c(Nested_DF)) %>%
           dplyr::rename(
-            `p-value` = p_value,
+            `p-value` = .data$p_value,
             `fold change` = fold_change
           ) %>%
           dplyr::select(c(Comparison, stat_cogs)) %>%
@@ -361,28 +383,52 @@ trelli_rnaseq_boxplot <- function(trelliData,
 #'   trelliscope) should be returned. Default is FALSE.
 #' @param ... Additional arguments to be passed on to the trelli builder
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' \dontrun{
+#' library(pmartRdata)
 #' 
-#' # Build the RNA-seq histogram with an edata file. Generate trelliData in as.trelliData.edata
+#' trelliData_seq1 <- as.trelliData.edata(e_data = rnaseq_edata, 
+#'                                       edata_cname = "Transcript",
+#'                                       omics_type = "seqData")
+#' omicsData_seq <- group_designation(omicsData = rnaseq_object, main_effects = c("Virus"))
+#' 
+#' # Filter low transcript counts
+#' omicsData_seq <- applyFilt(filter_object = total_count_filter(omicsData = omicsData_seq), 
+#'  omicsData = omicsData_seq, min_count = 15)
+#' 
+#' # Select a normalization and statistics method (options are 'edgeR', 'DESeq2', and 'voom').
+#' # See ?difexp_seq for more details
+#' statRes_seq <- diffexp_seq(omicsData = omicsData_seq, method = "voom")
+#' 
+#' # Generate the trelliData object
+#' trelliData_seq2 <- as.trelliData(omicsData = omicsData_seq)
+#' trelliData_seq3 <- as.trelliData(statRes = statRes_seq)
+#' trelliData_seq4 <- as.trelliData(omicsData = omicsData_seq, statRes = statRes_seq)
+#' 
+#' # Build the RNA-seq histogram with an edata file. 
+#' # Generate trelliData in as.trelliData.edata
 #' trelli_panel_by(trelliData = trelliData_seq1, panel = "Transcript") %>% 
-#'    trelli_rnaseq_histogram(test_mode = TRUE, test_example = 1:10)
+#'    trelli_rnaseq_histogram(test_mode = TRUE, test_example = 1:10, path = tempdir())
 #' 
-#' # Build the RNA-seq histogram with an omicsData object. Generate trelliData in as.trelliData
+#' # Build the RNA-seq histogram with an omicsData object. 
+#' # Generate trelliData in as.trelliData
 #' trelli_panel_by(trelliData = trelliData_seq2, panel = "Transcript") %>% 
-#'    trelli_rnaseq_histogram(test_mode = TRUE, test_example = 1:10)
+#'    trelli_rnaseq_histogram(test_mode = TRUE, test_example = 1:10, path = tempdir())
 #'     
-#' # Build the RNA-seq histogram with an omicsData and statRes object. Generate trelliData in as.trelliData.
+#' # Build the RNA-seq histogram with an omicsData and statRes object. 
+#' # Generate trelliData in as.trelliData.
 #' trelli_panel_by(trelliData = trelliData_seq4, panel = "Transcript") %>%
-#'    trelli_rnaseq_histogram(test_mode = TRUE, test_example = 1:10, cognostics = "sample count")
+#'    trelli_rnaseq_histogram(test_mode = TRUE, test_example = 1:10, 
+#'      cognostics = "sample count", path = tempdir())
 #'    
 #' # Users can modify the plotting function with ggplot parameters and interactivity, 
 #' # and can also select certain cognostics.     
 #' trelli_panel_by(trelliData = trelliData_seq1, panel = "Transcript") %>% 
 #'    trelli_rnaseq_histogram(test_mode = TRUE, test_example = 1:10, 
 #'      ggplot_params = c("ylab('')", "xlab('')"), interactive = TRUE,
-#'      cognostics = c("mean lcpm", "median lcpm"))  
-#'    
+#'      cognostics = c("mean lcpm", "median lcpm"), path = tempdir())  
+#' 
+#' \dontshow{closeAllConnections()}
 #' }
 #'
 #' @author David Degnan, Lisa Bramer
@@ -439,7 +485,7 @@ trelli_rnaseq_histogram <- function(trelliData,
     DF <- DF[!is.na(DF$LCPM), ]
     
     # Build plot
-    histogram <- ggplot2::ggplot(DF, ggplot2::aes(x = LCPM)) +
+    histogram <- ggplot2::ggplot(DF, ggplot2::aes(x = .data$LCPM)) +
       ggplot2::geom_histogram(bins = 10, fill = "steelblue", color = "black") +
       ggplot2::ggtitle(title) +
       ggplot2::theme_bw() +
@@ -539,19 +585,37 @@ trelli_rnaseq_histogram <- function(trelliData,
 #'   trelliscope) should be returned. Default is FALSE.
 #' @param ... Additional arguments to be passed on to the trelli builder
 #'
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' \dontrun{
+#' library(pmartRdata)
 #' 
-#' # Build the RNA-seq heatmap with an omicsData object with emeta variables. Generate trelliData in as.trelliData.
+#' omicsData_seq <- group_designation(omicsData = rnaseq_object, main_effects = c("Virus"))
+#' 
+#' # Filter low transcript counts
+#' omicsData_seq <- applyFilt(filter_object = total_count_filter(omicsData = omicsData_seq), 
+#'  omicsData = omicsData_seq, min_count = 15)
+#' 
+#' # Select a normalization and statistics method (options are 'edgeR', 'DESeq2', and 'voom').
+#' # See ?difexp_seq for more details
+#' statRes_seq <- diffexp_seq(omicsData = omicsData_seq, method = "voom")
+#' 
+#' # Generate the trelliData object
+#' trelliData_seq2 <- as.trelliData(omicsData = omicsData_seq)
+#' trelliData_seq4 <- as.trelliData(omicsData = omicsData_seq, statRes = statRes_seq)
+#' 
+#' # Build the RNA-seq heatmap with an omicsData object with emeta variables. 
+#' # Generate trelliData in as.trelliData.
 #' trelli_panel_by(trelliData = trelliData_seq2, panel = "Gene") %>% 
-#'    trelli_rnaseq_heatmap(test_mode = TRUE, test_example = c(1532, 1905, 6134))
+#'    trelli_rnaseq_heatmap(test_mode = TRUE, test_example = c(1532, 1905, 6134), path = tempdir())
 #'    
 #' # Users can modify the plotting function with ggplot parameters and interactivity, 
 #' # and can also select certain cognostics.     
 #' trelli_panel_by(trelliData = trelliData_seq4, panel = "Gene") %>% 
 #'    trelli_rnaseq_heatmap(test_mode = TRUE, test_example = c(1532, 1905, 6134), 
-#'      ggplot_params = c("ylab('')", "xlab('')"), interactive = TRUE, cognostics = c("biomolecule count"))  
-#'    
+#'      ggplot_params = c("ylab('')", "xlab('')"), 
+#'      interactive = TRUE, cognostics = c("biomolecule count"), path = tempdir())  
+#' 
+#' \dontshow{closeAllConnections()}
 #' }
 #' @author David Degnan, Lisa Bramer
 #'
@@ -619,7 +683,7 @@ trelli_rnaseq_heatmap <- function(trelliData,
     }
     
     # Build plot: this should be edata_cname
-    hm <- ggplot2::ggplot(DF, ggplot2::aes(x = as.factor(.data[[edata_cname]]), y = .data[[fdata_cname]], fill = LCPM)) +
+    hm <- ggplot2::ggplot(DF, ggplot2::aes(x = as.factor(.data[[edata_cname]]), y = .data[[fdata_cname]], fill = .data$LCPM)) +
       ggplot2::geom_tile() +
       ggplot2::theme_bw() +
       ggplot2::ylab("Sample") +
@@ -662,9 +726,9 @@ trelli_rnaseq_heatmap <- function(trelliData,
       dplyr::group_by(Group) %>%
       dplyr::summarise(
         "Sample Non-Zero Count" = sum(Count != 0), 
-        "mean LCPM" = round(mean(LCPM, na.rm = TRUE), 4),
+        "mean LCPM" = round(mean(.data$LCPM, na.rm = TRUE), 4),
       ) %>%
-      tidyr::pivot_longer(c(`Sample Non-Zero Count`, `mean LCPM`)) %>%
+      tidyr::pivot_longer(c(.data$`Sample Non-Zero Count`, .data$`mean LCPM`)) %>%
       dplyr::filter(name %in% cognostics) %>%
       dplyr::mutate(name = paste(Group, name)) %>%
       dplyr::ungroup() %>%
@@ -751,36 +815,60 @@ trelli_rnaseq_heatmap <- function(trelliData,
 #'    trelliscope) should be returned. Default is FALSE.
 #' @param ... Additional arguments to be passed on to the trelli builder
 #'   
-#' @examples
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' \dontrun{
+#' library(pmartRdata)
+#' 
+#' trelliData_seq1 <- as.trelliData.edata(e_data = rnaseq_edata, 
+#'                                       edata_cname = "Transcript",
+#'                                       omics_type = "seqData")
+#' omicsData_seq <- group_designation(omicsData = rnaseq_object, main_effects = c("Virus"))
+#' 
+#' # Filter low transcript counts
+#' omicsData_seq <- applyFilt(filter_object = total_count_filter(omicsData = omicsData_seq), 
+#'  omicsData = omicsData_seq, min_count = 15)
+#' 
+#' # Select a normalization and statistics method (options are 'edgeR', 'DESeq2', and 'voom').
+#' # See ?difexp_seq for more details
+#' statRes_seq <- diffexp_seq(omicsData = omicsData_seq, method = "voom")
+#' 
+#' # Generate the trelliData object
+#' trelliData_seq2 <- as.trelliData(omicsData = omicsData_seq)
+#' trelliData_seq3 <- as.trelliData(statRes = statRes_seq)
+#' trelliData_seq4 <- as.trelliData(omicsData = omicsData_seq, statRes = statRes_seq)
 #' 
 #' # Build the non-zero bar plot with an edata file. Generate trelliData in as.trelliData.edata
 #' trelli_panel_by(trelliData = trelliData_seq1, panel = "Transcript") %>% 
-#'   trelli_rnaseq_nonzero_bar(test_mode = TRUE, test_example = 1:10)
+#'   trelli_rnaseq_nonzero_bar(test_mode = TRUE, test_example = 1:10, path = tempdir())
 #' trelli_panel_by(trelliData = trelliData_seq1, panel = "Sample") %>% 
-#'   trelli_rnaseq_nonzero_bar(test_mode = TRUE, test_example = 1:10, cognostics = "non-zero proportion")
+#'   trelli_rnaseq_nonzero_bar(test_mode = TRUE, test_example = 1:10, 
+#'    cognostics = "non-zero proportion", path = tempdir())
 #' 
 #' # Build the non-zero bar plot with an omicsData object. Generate trelliData in as.trelliData
 #' trelli_panel_by(trelliData = trelliData_seq2, panel = "Transcript") %>% 
-#'   trelli_rnaseq_nonzero_bar(test_mode = TRUE, test_example = 1:10)
+#'   trelli_rnaseq_nonzero_bar(test_mode = TRUE, test_example = 1:10, path = tempdir())
 #' 
 #' # Build the non-zero bar plot with a statRes object. Generate trelliData in as.trelliData
 #' trelli_panel_by(trelliData = trelliData_seq3, panel = "Transcript") %>%
 #'   trelli_rnaseq_nonzero_bar(test_mode = TRUE, test_example = 1:10,
-#'                          cognostics = c("non-zero proportion"))
+#'                          cognostics = c("non-zero proportion"), path = tempdir())
 #' 
-#' # Build the non-zero bar plot with an omicsData and statRes object. Generate trelliData in as.trelliData.
+#' # Build the non-zero bar plot with an omicsData and statRes object. 
+#' # Generate trelliData in as.trelliData.
 #' trelli_panel_by(trelliData = trelliData_seq4, panel = "Gene") %>%
-#'   trelli_rnaseq_nonzero_bar(test_mode = TRUE, test_example = 1:10) 
+#'   trelli_rnaseq_nonzero_bar(test_mode = TRUE, test_example = 1:10, path = tempdir()) 
 #' 
 #' # Or making the plot interactive 
 #' trelli_panel_by(trelliData = trelliData_seq2, panel = "Transcript") %>% 
-#'    trelli_rnaseq_nonzero_bar(test_mode = TRUE, test_example = 1:5, interactive = TRUE)
+#'    trelli_rnaseq_nonzero_bar(test_mode = TRUE, test_example = 1:5, 
+#'      interactive = TRUE, path = tempdir())
 #'    
 #' # Or visualize only count data 
 #' trelli_panel_by(trelliData = trelliData_seq2, panel = "Transcript") %>% 
-#'    trelli_rnaseq_nonzero_bar(test_mode = TRUE, test_example = 1:5, cognostics = "non-zero count", proportion = FALSE)
-#'    
+#'    trelli_rnaseq_nonzero_bar(test_mode = TRUE, test_example = 1:5, 
+#'      cognostics = "non-zero count", proportion = FALSE, path = tempdir())
+#' 
+#' \dontshow{closeAllConnections()}   
 #' }
 #'
 #' @author David Degnan, Lisa Bramer
@@ -843,12 +931,12 @@ trelli_rnaseq_nonzero_bar <- function(trelliData,
       ) %>%
         merge(totalCounts, by = "Group") %>%
         dplyr::mutate(
-          `Zero Count` = Total - `Non-Zero Count`,
-          `Zero Proportion` = round(`Zero Count` / Total, 4),
-          `Non-Zero Proportion` = round(`Non-Zero Count` / Total, 4)
+          `Zero Count` = Total - .data$`Non-Zero Count`,
+          `Zero Proportion` = round(.data$`Zero Count` / Total, 4),
+          `Non-Zero Proportion` = round(.data$`Non-Zero Count` / Total, 4)
         ) %>%
         dplyr::select(-Total) %>%
-        dplyr::mutate(Group, `Zero Count`, `Non-Zero Count`, `Zero Proportion`, `Non-Zero Proportion`)
+        dplyr::mutate(Group, .data$`Zero Count`, .data$`Non-Zero Count`, .data$`Zero Proportion`, .data$`Non-Zero Proportion`)
     
       } else {
       
@@ -863,8 +951,8 @@ trelli_rnaseq_nonzero_bar <- function(trelliData,
         dplyr::summarise(
           `Zero Count` = sum(Count == 0),
           `Non-Zero Count` = sum(Count != 0),
-          `Zero Proportion` = round(`Zero Count` / sum(c(`Zero Count`, `Non-Zero Count`)), 4),
-          `Non-Zero Proportion` = round(`Non-Zero Count` / sum(c(`Zero Count`, `Non-Zero Count`)), 4)
+          `Zero Proportion` = round(.data$`Zero Count` / sum(c(.data$`Zero Count`, .data$`Non-Zero Count`)), 4),
+          `Non-Zero Proportion` = round(.data$`Non-Zero Count` / sum(c(.data$`Zero Count`, .data$`Non-Zero Count`)), 4)
         )
     }
     
@@ -882,16 +970,16 @@ trelli_rnaseq_nonzero_bar <- function(trelliData,
     # Subset based on count or proportion
     if (proportion) {
       NZPlotDF <- NonZero %>%
-        dplyr::select(c(Group, `Zero Proportion`, `Non-Zero Proportion`)) %>%
-        dplyr::rename(Zero = `Zero Proportion`, `Non-Zero` = `Non-Zero Proportion`) %>%
-        tidyr::pivot_longer(c(Zero, `Non-Zero`)) %>%
+        dplyr::select(c(Group, .data$`Zero Proportion`, .data$`Non-Zero Proportion`)) %>%
+        dplyr::rename(Zero = .data$`Zero Proportion`, `Non-Zero` = .data$`Non-Zero Proportion`) %>%
+        tidyr::pivot_longer(c(.data$Zero, .data$`Non-Zero`)) %>%
         dplyr::mutate(name = factor(name, levels = c("Zero", "Non-Zero")))
       ylab <- "Proportion"
     } else {
       NZPlotDF <- NonZero %>%
-        dplyr::select(c(Group, `Zero Count`, `Non-Zero Count`)) %>%
-        dplyr::rename(Zero = `Zero Count`, `Non-Zero` = `Non-Zero Count`) %>%
-        tidyr::pivot_longer(c(Zero, `Non-Zero`)) %>%
+        dplyr::select(c(Group, .data$`Zero Count`, .data$`Non-Zero Count`)) %>%
+        dplyr::rename(Zero = .data$`Zero Count`, `Non-Zero` = .data$`Non-Zero Count`) %>%
+        tidyr::pivot_longer(c(.data$Zero, .data$`Non-Zero`)) %>%
         dplyr::mutate(name = factor(name, levels = c("Zero", "Non-Zero")))
       ylab <- "Count"
     }
@@ -942,10 +1030,10 @@ trelli_rnaseq_nonzero_bar <- function(trelliData,
     
     # Build cognostics
     NZ_Cog <- NonZero %>%
-      dplyr::mutate(`total count` = `Non-Zero Count` + `Zero Count`) %>%
-      dplyr::select(-c(`Zero Count`, `Zero Proportion`)) %>%
-      dplyr::rename(`non-zero count` = `Non-Zero Count`, `non-zero proportion` = `Non-Zero Proportion`) %>%
-      tidyr::pivot_longer(c(`non-zero count`, `non-zero proportion`, `total count`)) %>%
+      dplyr::mutate(`total count` = .data$`Non-Zero Count` + .data$`Zero Count`) %>%
+      dplyr::select(-c(.data$`Zero Count`, .data$`Zero Proportion`)) %>%
+      dplyr::rename(`non-zero count` = .data$`Non-Zero Count`, `non-zero proportion` = .data$`Non-Zero Proportion`) %>%
+      tidyr::pivot_longer(c(.data$`non-zero count`, .data$`non-zero proportion`, .data$`total count`)) %>%
       dplyr::filter(name %in% cognostics)
     
     # Expand the name depending on whether the counts are samples or biomolecules
@@ -1007,7 +1095,7 @@ trelli_rnaseq_nonzero_bar <- function(trelliData,
     
     # Get the columns with counts
     count_cols <- colnames(trelliData$statRes)[grepl("Count", colnames(trelliData$statRes))]
-    
+
     # Build toBuild dataframe
     toBuild <- trelliData$statRes %>%
       dplyr::select(c(edata_cname, count_cols)) %>%
@@ -1034,7 +1122,6 @@ trelli_rnaseq_nonzero_bar <- function(trelliData,
   } else {
     # Pass parameters to trelli_builder function
     if (!is.null(trelliData$omicsData)) {
-      
       trelli_builder(toBuild = toBuild,
                      cognostics = cognostics, 
                      plotFUN = nonzero_bar_plot_fun,
@@ -1043,10 +1130,7 @@ trelli_rnaseq_nonzero_bar <- function(trelliData,
                      name = name,
                      remove_nestedDF = FALSE,
                      ...)
-      
-      
     } else {
-      
       trelli_builder(toBuild = toBuild,
                      cognostics = cognostics, 
                      plotFUN = nonzero_bar_plot_fun,
@@ -1055,9 +1139,6 @@ trelli_rnaseq_nonzero_bar <- function(trelliData,
                      name = name,
                      remove_nestedDF = TRUE,
                      ...)
-      
     }
-    
-    
   }
 }

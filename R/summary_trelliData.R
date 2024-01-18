@@ -87,8 +87,8 @@ summary.trelliData <- function(object, ...) {
     
     All_Options <- All_Options %>%
       dplyr::mutate(
-        Plot = gsub("abundance", "rnaseq", Plot),
-        Plot = gsub("missingness", "rnaseq nonzero", Plot)
+        Plot = gsub("abundance", "rnaseq", .data$Plot),
+        Plot = gsub("missingness", "rnaseq nonzero", .data$Plot)
       )
     
   }
