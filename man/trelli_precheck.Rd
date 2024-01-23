@@ -14,6 +14,8 @@ trelli_precheck(
   test_mode,
   test_example,
   single_plot,
+  seqDataCheck,
+  seqText = NULL,
   p_value_skip = FALSE,
   p_value_thresh = NULL
 )
@@ -42,8 +44,13 @@ should be returned}
 \item{single_plot}{The user provided logical for whether a single plot should
 be returned}
 
-\item{p_value_skip}{Whether to skip specific p_value checks. Placeholder for
-potential future functions.}
+\item{seqDataCheck}{Whether seqData is permitted for this plot. "no" means that 
+seqData cannot be used at all, "permissible" means that seqData can be used, 
+and "required" means that seqData is required for the plotting function.}
+
+\item{seqText}{Text that should appear when seqDataCheck is violated.}
+
+\item{p_value_skip}{Whether to skip specific p_value checks.}
 
 \item{p_value_thresh}{The user provided threshold for plotting significant
 p-values.}

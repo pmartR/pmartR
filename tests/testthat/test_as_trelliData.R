@@ -1,6 +1,11 @@
 context("class: trelliData & trelli_panel_by")
 
 test_that("as.trelliData and trelli_panel_by returns correct data frames and attributes", {
+  
+  ##################
+  ## MS/NMR TESTS ##
+  ##################
+  
   # Load: peptide expression data-----------------------------------------------
 
   load(system.file('testdata',
@@ -350,4 +355,47 @@ test_that("as.trelliData and trelli_panel_by returns correct data frames and att
     as.trelliData(tinyNMR) %>% trelli_panel_by("Metabolite"),
     "Grouping by Metabolite results in panels with less than 3 data points in trelliData.omics."
   )
+  
+  
+  ###################
+  ## RNA SEQ TESTS ##
+  ###################
+  
+  # Load: seqData expression data-----------------------------------------------
+  
+  load(system.file('testdata',
+                   'little_seqdata.RData',
+                   package = 'pmartR'
+  ))
+  
+  seqData_omics <- as.seqData(e_data = edata, f_data = fdata, edata_cname = "ID_REF", fdata_cname = "Samples")
+  seqData_omics <- group_designation(seqData_omics, main_effects = "Tissue")
+  seqData_omics <- applyFilt(filter_object = total_count_filter(omicsData = seqData_omics), omicsData = seqData_omics, min_count = 15)
+  seqData_stat <- diffexp_seq(omicsData = seqData_omics, method = "voom")
+  
+  # Test: seqData expression data-----------------------------------------------
+  
+  # Expect message
+  expect_message(as.trelliData(omicsData = seqData_omics))
+  
+  # Save object
+  seqTest2 <- as.trelliData(omicsData = seqData_omics)
+  
+  # Expect message
+  expect_message(as.trelliData(statRes = seqData_stat))
+  
+  # Save object
+  seqTest3 <- as.trelliData(statRes = seqData_stat)
+  
+  # Expect message
+  expect_message(as.trelliData(omicsData = seqData_omics, statRes = seqData_stat))
+  
+  # Save object
+  seqTest4 <- as.trelliData(omicsData = seqData_omics, statRes = seqData_stat)
+  
+  # Check all object types
+  expect_true(inherits(seqTest2, "trelliData.seqData"))
+  expect_true(inherits(seqTest3, "trelliData.seqData"))
+  expect_true(inherits(seqTest4, "trelliData.seqData"))
+  
 })

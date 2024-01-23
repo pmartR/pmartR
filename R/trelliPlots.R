@@ -18,8 +18,11 @@
 #' @param test_example The user provided vector of plot indices
 #' @param single_plot The user provided logical for whether a single plot should
 #'   be returned
-#' @param p_value_skip Whether to skip specific p_value checks. Placeholder for
-#'   potential future functions.
+#' @param seqDataCheck Whether seqData is permitted for this plot. "no" means that 
+#'   seqData cannot be used at all, "permissible" means that seqData can be used, 
+#'   and "required" means that seqData is required for the plotting function.
+#' @param seqText Text that should appear when seqDataCheck is violated. 
+#' @param p_value_skip Whether to skip specific p_value checks. 
 #' @param p_value_thresh The user provided threshold for plotting significant
 #'   p-values.
 #' 
@@ -34,8 +37,18 @@ trelli_precheck <- function(trelliData,
                             test_mode,
                             test_example,
                             single_plot,
+                            seqDataCheck,
+                            seqText = NULL,
                             p_value_skip = FALSE,
                             p_value_thresh = NULL) {
+  
+  ####################
+  ## SEQDATA CHECKS ##
+  ####################
+  
+  seq_test <- inherits(trelliData, "trelliData.seqData")
+  if (seqDataCheck == "no" & seq_test) {stop(paste("seqData is not permitted for this plotting function.", seqText))}
+  if (seqDataCheck == "required" & !seq_test) {stop(paste("seqData is required for this plotting function.", seqText))}
   
   #########################
   ## TEST EXAMPLE CHECKS ##
@@ -53,7 +66,6 @@ trelli_precheck <- function(trelliData,
     }
     test_example <- unique(abs(round(test_example)))
   }
-
 
   #######################
   ## trelliData checks ##
@@ -219,11 +231,12 @@ trelli_builder <- function(toBuild, cognostics, plotFUN, cogFUN, path, name, rem
 
 #' @name trelli_abundance_boxplot
 #'
-#' @title Boxplot trelliscope building function for abundance data
+#' @title Boxplot trelliscope building function for abundance data 
 #'
 #' @description Specify a boxplot design and cognostics for the abundance
 #'   boxplot trelliscope. Each boxplot will have its own groups as specified by
-#'   the first main effect in group_designation.
+#'   the first main effect in group_designation. Use "trelli_rnaseq_boxplot"
+#'   for RNA-Seq data. 
 #'
 #' @param trelliData A trelliscope data object made by as.trelliData or
 #'   as.trelliData.edata, and grouped by trelli_panel_by. Required.
@@ -233,7 +246,7 @@ trelli_builder <- function(toBuild, cognostics, plotFUN, cogFUN, path, name, rem
 #'   If data are paneled by a sample or a biomolecule class, the count will be "biomolecule count". 
 #'   If statRes data is included, "anova p-value" and "fold change" data per comparisons
 #'   may be added. If grouping information is included, only "sample count" and 
-#'   "mean abundance" will be calclulated, along with "anova p-value" and "fold change"
+#'   "mean abundance" will be calculated, along with "anova p-value" and "fold change"
 #'   if specified. "anova p-value" will not be included if paneling a trelliscope
 #'   display by a biomolecule class. Default is "sample count" and "mean abundance".
 #' @param ggplot_params An optional vector of strings of ggplot parameters to
@@ -359,6 +372,8 @@ trelli_abundance_boxplot <- function(trelliData,
                   test_mode = test_mode, 
                   test_example = test_example,
                   single_plot = single_plot,
+                  seqDataCheck = "no",
+                  seqText = "Use trelli_rnaseq_boxplot instead.",
                   p_value_thresh = NULL)
   
   
@@ -402,7 +417,7 @@ trelli_abundance_boxplot <- function(trelliData,
   }
   
   if (any(c("anova p-value", "fold change") %in% cognostics) & attr(trelliData, "panel_by_omics") != get_edata_cname(trelliData$omicsData)) {
-    message(paste("Please panel by", get_edata_cname(trelliData$omicsData), "to get 'anova p-values' and 'fold changes' as cognostics in the trelliscope display."))
+    message(paste("Please panel by", get_edata_cname(trelliData$omicsData), "to get 'anova p-value' and 'fold change' as cognostics in the trelliscope display."))
   }
   
   # Make boxplot function-------------------------------------------------------
@@ -513,6 +528,7 @@ trelli_abundance_boxplot <- function(trelliData,
       stat_cogs <- cognostics[cognostics %in% c("fold change", "anova p-value")]
       
       if (length(stat_cogs) != 0) {
+        
         # Subset down the dataframe down to group, unnest the dataframe,
         # pivot_longer to comparison, subset columns to requested statistics,
         # switch name to a more specific name
@@ -538,9 +554,12 @@ trelli_abundance_boxplot <- function(trelliData,
           quick_cog(cogs_to_add$name[row], cogs_to_add$value[row])
         })) %>% dplyr::tibble()
 
-
         # Add new cognostics, removing when it is NULL 
-        cog_to_trelli <- cbind(cog_to_trelli, new_cogs) %>% dplyr::tibble()
+        if (!is.null(cog_to_trelli)) {
+          cog_to_trelli <- cbind(cog_to_trelli, new_cogs) %>% dplyr::tibble()
+        } else {
+          cog_to_trelli <- new_cogs
+        }
         
       }
     }
@@ -581,7 +600,7 @@ trelli_abundance_boxplot <- function(trelliData,
 #'
 #' @description Specify a plot design and cognostics for the abundance histogram
 #'   trelliscope. Main_effects grouping are ignored. Data must be grouped by
-#'   edata_cname.
+#'   edata_cname. For RNA-Seq data, use "trelli_rnaseq_histogram". 
 #'
 #' @param trelliData A trelliscope data object made by as.trelliData or
 #'   as.trelliData.edata, and grouped by edata_cname in trelli_panel_by.
@@ -691,6 +710,8 @@ trelli_abundance_histogram <- function(trelliData,
                   test_mode = test_mode, 
                   test_example = test_example,
                   single_plot = single_plot,
+                  seqDataCheck = "no",
+                  seqText = "Use trelli_rnaseq_histogram instead.",
                   p_value_thresh = NULL)
 
   
@@ -788,7 +809,7 @@ trelli_abundance_histogram <- function(trelliData,
 #'
 #' @description Specify a plot design and cognostics for the abundance heatmap
 #'   trelliscope. Data must be grouped by an e_meta column. Main_effects order
-#'   the y-variables. All statRes data is ignored.
+#'   the y-variables. All statRes data is ignored. For RNA-Seq data, use "trelli_rnaseq_heatmap".
 #'
 #' @param trelliData A trelliscope data object made by as.trelliData, and
 #'   grouped by an emeta variable. Required.
@@ -886,6 +907,8 @@ trelli_abundance_heatmap <- function(trelliData,
                   test_mode = test_mode, 
                   test_example = test_example,
                   single_plot = single_plot,
+                  seqDataCheck = "no",
+                  seqText = "Use trelli_rnaseq_heatmap instead.",
                   p_value_thresh = NULL)
   
   # Round test example to integer 
@@ -1022,7 +1045,8 @@ trelli_abundance_heatmap <- function(trelliData,
 #'
 #' @description Specify a plot design and cognostics for the missing barchart
 #'    trelliscope. Missingness is displayed per panel_by variable. Main_effects
-#'    data is used to split samples when applicable.
+#'    data is used to split samples when applicable. For RNA-Seq data, use 
+#'    "trelli rnaseq nonzero bar". 
 #'
 #' @param trelliData A trelliscope data object made by as.trelliData.edata or
 #'    as.trelliData. Required.
@@ -1104,7 +1128,7 @@ trelli_abundance_heatmap <- function(trelliData,
 #' 
 #' # Build the missingness bar plot with an omicsData and statRes object. 
 #' # Generate trelliData in as.trelliData.
-#' trelli_panel_by(trelliData = trelliData4, panel = "Peptide") %>%
+#' trelli_panel_by(trelliData = trelliData4, panel = "RazorProtein") %>%
 #'   trelli_missingness_bar(test_mode = TRUE, test_example = 1:10, path = tempdir()) 
 #' 
 #' # Or making the plot interactive 
@@ -1150,6 +1174,8 @@ trelli_missingness_bar <- function(trelliData,
                   test_mode = test_mode, 
                   test_example = test_example,
                   single_plot = single_plot,
+                  seqDataCheck = "no",
+                  seqText = "Use trelli_rnaseq_nonzero_bar instead.",
                   p_value_thresh = NULL)
   
   # Check that proportion is a non NA logical
@@ -1192,8 +1218,8 @@ trelli_missingness_bar <- function(trelliData,
         merge(totalCounts, by = "Group") %>%
         dplyr::mutate(
           `Absent Count` = Total - `Present Count`,
-          `Absent Proportion` = `Absent Count` / Total,
-          `Present Proportion` = `Present Count` / Total
+          `Absent Proportion` = round(`Absent Count` / Total, 4),
+          `Present Proportion` = round(`Present Count` / Total, 4)
         ) %>%
         dplyr::select(-Total) %>%
         dplyr::mutate(Group, `Absent Count`, `Present Count`, `Absent Proportion`, `Present Proportion`)
@@ -1319,7 +1345,7 @@ trelli_missingness_bar <- function(trelliData,
     Miss_Cog <- Miss_Cog %>% dplyr::select(c(name, value))
     
     # Add statistics if applicable
-    if ("g-test p-value" %in% cognostics) {
+    if ("g-test p-value" %in% cognostics & inherits(trelliData, "trelliData.seqData") == FALSE) {
       
       edata_cname <- get_edata_cname(trelliData$statRes)
       
@@ -1427,10 +1453,14 @@ trelli_missingness_bar <- function(trelliData,
   }
 }
 
-determine_significance <- function(DF, p_value_thresh) {
+determine_significance <- function(DF, p_value_thresh, is_seq) {
   
   # Subset by significance
-  DF$Significance <- DF$p_value_anova <= p_value_thresh
+  if (is_seq) {
+    DF$Significance <- DF$p_value <= p_value_thresh
+  } else {
+    DF$Significance <- DF$p_value_anova <= p_value_thresh 
+  }
   
   # Filter out NA values 
   DF <- DF[!(is.nan(DF$Significance) | is.nan(DF$fold_change)), ]
@@ -1461,7 +1491,9 @@ determine_significance <- function(DF, p_value_thresh) {
 #'
 #' @param trelliData A trelliscope data object with statRes results. Required.
 #' @param cognostics A vector of cognostic options for each plot. Valid entries
-#'   and the defaults are "fold change" and "anova p-value". 
+#'   and the defaults are "fold change" and "p-value". If the omics data is MS/NMR,
+#'   p-value will be the results from the ANOVA test. If the omics data is sedData,
+#'   the p-value will be the results from the function "diffexp_seq".
 #' @param p_value_thresh A value between 0 and 1 to indicate significant
 #'   biomolecules for p_value_test. Default is 0.05.
 #' @param ggplot_params An optional vector of strings of ggplot parameters to
@@ -1523,7 +1555,7 @@ determine_significance <- function(DF, p_value_thresh) {
 #'
 #' @export
 trelli_foldchange_bar <- function(trelliData,
-                                  cognostics = c("fold change", "anova p-value"),
+                                  cognostics = c("fold change", "p-value"),
                                   p_value_thresh = 0.05,
                                   ggplot_params = NULL,
                                   interactive = FALSE,
@@ -1539,11 +1571,12 @@ trelli_foldchange_bar <- function(trelliData,
   trelli_precheck(trelliData = trelliData, 
                   trelliCheck = "stat",
                   cognostics = cognostics,
-                  acceptable_cognostics = c("fold change", "anova p-value"),
+                  acceptable_cognostics = c("fold change", "p-value"),
                   ggplot_params = ggplot_params,
                   interactive = interactive,
                   test_mode = test_mode, 
                   test_example = test_example,
+                  seqDataCheck = "permissible",
                   single_plot = single_plot,
                   p_value_thresh = p_value_thresh)
   
@@ -1565,7 +1598,7 @@ trelli_foldchange_bar <- function(trelliData,
     if (p_value_thresh != 0) {
       
       # Get significant values
-      DF <- determine_significance(DF, p_value_thresh)
+      DF <- determine_significance(DF, p_value_thresh, is_seq = inherits(trelliData, "trelliData.seqData"))
       if (is.null(DF)) {
         return(NULL)
       }
@@ -1605,14 +1638,22 @@ trelli_foldchange_bar <- function(trelliData,
   # Create the cognostic function-----------------------------------------------
 
   fc_bar_cog_fun <- function(DF, Biomolecule) {
-    # Extend cognostics if p_value is in it
+    
+    # Extend cognostics if fold change is in it
     if ("fold change" %in% cognostics) {
       DF <- DF %>% dplyr::rename(`fold change` = fold_change)
     }
     
-    if ("anova p-value" %in% cognostics) {
-      DF <- DF %>% dplyr::rename(`anova p-value` = p_value_anova)
+    # Extend cognostics if p_value is in it
+    if ("p-value" %in% cognostics) {
+      if (inherits(trelliData, "trelliData.seqData")) {
+        DF <- DF %>% dplyr::rename(`p-value` = .data$p_value)
+      } else {
+        DF <- DF %>% dplyr::rename(`p-value` = p_value_anova)
+      }
     }
+    
+    if ("p_value_gtest" %in% colnames(DF)) {DF <- DF %>% dplyr::select(-p_value_gtest)}
     
     # Prepare DF for quick_cog function
     PreCog <- DF %>%
@@ -1643,7 +1684,7 @@ trelli_foldchange_bar <- function(trelliData,
   } else {
     toBuild <- trelliData$trelliData.stat
   }
-
+  
   # Pass parameters to trelli_builder function
   trelli_builder(toBuild = toBuild,
                  cognostics = cognostics, 
@@ -1651,14 +1692,14 @@ trelli_foldchange_bar <- function(trelliData,
                  cogFUN = fc_bar_cog_fun,
                  path = path,
                  name = name,
-                 remove_nestedDF = FALSE,
+                 remove_nestedDF = TRUE,
                  ...)
   
 }
 
 #' @name trelli_foldchange_boxplot
 #'
-#' @title Boxplot trelliscope building function for fold_change
+#' @title Boxplot trelliscope building function for fold_changes
 #'
 #' @description Specify a plot design and cognostics for the fold_change boxplot
 #'   trelliscope. Fold change must be grouped by an emeta column, which means
@@ -1668,9 +1709,9 @@ trelli_foldchange_bar <- function(trelliData,
 #'   results. Required.
 #' @param cognostics A vector of cognostic options for each plot. Valid entries are 
 #'   "biomolecule count", "proportion significant", "mean fold change",
-#'   and "sd fold change". Default is "biomolecule count" 
+#'   and "sd fold change". Default is "biomolecule count". 
 #' @param p_value_thresh A value between 0 and 1 to indicate significant
-#'   biomolecules for the anova test. Default is 0.05.
+#'   biomolecules for the anova (MS/NMR) or diffexp_seq (RNA-seq) test. Default is 0.05.
 #' @param include_points Add points. Default is TRUE.
 #' @param ggplot_params An optional vector of strings of ggplot parameters to
 #'   the backend ggplot function. For example, c("ylab('')", "xlab('')").
@@ -1728,6 +1769,22 @@ trelli_foldchange_bar <- function(trelliData,
 #'                                            "sd fold change"),
 #'                             path = tempdir()
 #'                            )
+#'                            
+#'                            
+#' #####################
+#' ## RNA-SEQ EXAMPLE ##                            
+#' #####################
+#'
+#' # Build fold_change box plot with statRes data grouped by edata_colname.
+#' trelli_panel_by(trelliData = trelliData_seq4, panel = "Gene") %>% 
+#'   trelli_foldchange_boxplot(test_mode = TRUE, 
+#'                             test_example = c(16823, 16890, 17680, 17976, 17981, 19281),
+#'                             cognostics = c("biomolecule count", 
+#'                                            "proportion significant", 
+#'                                            "mean fold change",
+#'                                            "sd fold change"),
+#'                             path = tempdir()
+#'                            )
 #' 
 #' \dontshow{closeAllConnections()}
 #' }
@@ -1762,6 +1819,7 @@ trelli_foldchange_boxplot <- function(trelliData,
                   interactive = interactive,
                   test_mode = test_mode, 
                   test_example = test_example,
+                  seqDataCheck = "permissible",
                   single_plot = single_plot,
                   p_value_thresh = p_value_thresh)
   
@@ -1779,7 +1837,6 @@ trelli_foldchange_boxplot <- function(trelliData,
   if (!is.logical(include_points) & !is.na(include_points)) {
     stop("include_points must be a TRUE or FALSE.")
   }
-
   # Make foldchange boxplot function--------------------------------------------
 
   fc_box_plot_fun <- function(DF, title) {
@@ -1787,7 +1844,7 @@ trelli_foldchange_boxplot <- function(trelliData,
     if (p_value_thresh != 0) {
     
       # Get significant values
-      DF <- determine_significance(DF, p_value_thresh)
+      DF <- determine_significance(DF, p_value_thresh, is_seq = inherits(trelliData, "trelliData.seqData"))
       if (is.null(DF)) {
         return(NULL)
       }
@@ -1842,22 +1899,46 @@ trelli_foldchange_boxplot <- function(trelliData,
   # Make cognostic function-----------------------------------------------------
 
   fc_box_cog_fun <- function(DF, Group) {
-    # Calculate stats and subset to selected choices
-    cog_to_trelli <- DF %>%
-      dplyr::group_by(Comparison) %>%
-      dplyr::summarise(
-        "biomolecule count" = sum(!is.nan(fold_change)), 
-        "proportion significant" = round(sum(p_value_anova[!is.na(p_value_anova)] <= p_value_thresh) / `biomolecule count`, 4),
-        "mean fold change" = round(mean(fold_change, na.rm = TRUE), 4),
-        "sd fold change" = round(sd(fold_change, na.rm = TRUE), 4)
-      ) %>%
-     tidyr::pivot_longer(c(`biomolecule count`, `proportion significant`, `mean fold change`, `sd fold change`)) %>%
-     dplyr::filter(name %in% cognostics) %>%
-     dplyr::mutate(
-      name = paste(Comparison, name)
-     ) %>%
-    dplyr::ungroup() %>%
-    dplyr::select(-Comparison) 
+    
+    # Calculate biomolecule count for seqData
+    if (inherits(trelliData, "trelliData.seqData")) {
+      
+      cog_to_trelli <- DF %>%
+        dplyr::group_by(Comparison) %>%
+        dplyr::summarise(
+          "biomolecule count" =  sum(!is.nan(fold_change)), 
+          "proportion significant" = round(sum(.data$p_value[!is.na(.data$p_value)] <= p_value_thresh) / `biomolecule count`, 4),
+          "mean fold change" = round(mean(fold_change, na.rm = TRUE), 4),
+          "sd fold change" = round(sd(fold_change, na.rm = TRUE), 4)
+        ) %>%
+        tidyr::pivot_longer(c(`biomolecule count`, `proportion significant`, `mean fold change`, `sd fold change`)) %>%
+        dplyr::filter(name %in% cognostics) %>%
+        dplyr::mutate(
+          name = paste(Comparison, name)
+        ) %>%
+        dplyr::ungroup() %>%
+        dplyr::select(-Comparison) 
+      
+    } else {
+      
+      # Calculate stats and subset to selected choices
+      cog_to_trelli <- DF %>%
+        dplyr::group_by(Comparison) %>%
+        dplyr::summarise(
+          "biomolecule count" = sum(!is.nan(fold_change)), 
+          "proportion significant" = round(sum(p_value_anova[!is.na(p_value_anova)] <= p_value_thresh) / `biomolecule count`, 4),
+          "mean fold change" = round(mean(fold_change, na.rm = TRUE), 4),
+          "sd fold change" = round(sd(fold_change, na.rm = TRUE), 4)
+        ) %>%
+        tidyr::pivot_longer(c(`biomolecule count`, `proportion significant`, `mean fold change`, `sd fold change`)) %>%
+        dplyr::filter(name %in% cognostics) %>%
+        dplyr::mutate(
+          name = paste(Comparison, name)
+        ) %>%
+        dplyr::ungroup() %>%
+        dplyr::select(-Comparison) 
+      
+    }
     
     # Add new cognostics 
     cog_to_trelli <- do.call(cbind, lapply(1:nrow(cog_to_trelli), function(row) {
@@ -1905,9 +1986,9 @@ trelli_foldchange_boxplot <- function(trelliData,
 #'   results. Required.
 #' @param cognostics A vector of cognostic options for each plot. Valid entries are 
 #'   "biomolecule count", "proportion significant", "mean fold change",
-#'   and "sd fold change". Default is "biomolecule count" 
-#' @param p_value_thresh A value between 0 and 1 to indicate significant
-#'   biomolecules for p_value_test. Default is 0.05.
+#'   and "sd fold change". Default is "biomolecule count". 
+#' @param p_value_thresh A value between 0 and 1 to indicate significant biomolecules 
+#'   for the anova (MS/NMR) or diffexp_seq (RNA-seq) test. Default is 0.05.
 #' @param ggplot_params An optional vector of strings of ggplot parameters to
 #'   the backend ggplot function. For example, c("ylab('')", "xlab('')").
 #'   Default is NULL.
@@ -1954,6 +2035,10 @@ trelli_foldchange_boxplot <- function(trelliData,
 #' # Generate the trelliData object
 #' trelliData4 <- as.trelliData(omicsData = omicsData, statRes = statRes)
 #' 
+#' ##########################
+#' ## MS/NMR OMICS EXAMPLE ##
+#' ##########################
+#' 
 #' # Build fold_change bar plot with statRes data grouped by edata_colname.
 #' trelli_panel_by(trelliData = trelliData4, panel = "RazorProtein") %>% 
 #'   trelli_foldchange_heatmap(test_mode = TRUE, 
@@ -1992,6 +2077,7 @@ trelli_foldchange_heatmap <- function(trelliData,
                   interactive = interactive,
                   test_mode = test_mode, 
                   test_example = test_example,
+                  seqDataCheck = "permissible",
                   single_plot = single_plot,
                   p_value_thresh = p_value_thresh)
   
@@ -2015,7 +2101,7 @@ trelli_foldchange_heatmap <- function(trelliData,
     if (p_value_thresh != 0) {
       
       # Get significant values
-      DF <- determine_significance(DF, p_value_thresh)
+      DF <- determine_significance(DF, p_value_thresh, is_seq = inherits(trelliData, "trelliData.seqData"))
       if (is.null(DF)) {
         return(NULL)
       }
@@ -2062,22 +2148,45 @@ trelli_foldchange_heatmap <- function(trelliData,
   
   fc_hm_cog_fun <- function(DF, Group) {
     
-    # Calculate stats and subset to selected choices 
-    cog_to_trelli <- DF %>%
-      dplyr::group_by(Comparison) %>%
-      dplyr::summarise(
-        "biomolecule count" = sum(!is.nan(fold_change)), 
-        "proportion significant" = round(sum(p_value_anova[!is.na(p_value_anova)] <= p_value_thresh) / `biomolecule count`, 4),
-        "mean fold change" = round(mean(fold_change, na.rm = TRUE), 4),
-        "sd fold change" = round(sd(fold_change, na.rm = TRUE), 4)
-      ) %>%
-      tidyr::pivot_longer(c(`biomolecule count`, `proportion significant`, `mean fold change`, `sd fold change`)) %>%
-      dplyr::filter(name %in% cognostics) %>%
-      dplyr::mutate(
-        name = paste(Comparison, name)
-      ) %>%
-      dplyr::ungroup() %>%
-      dplyr::select(-Comparison) 
+    # Calculate biomolecule count for seqData
+    if (inherits(trelliData, "trelliData.seqData")) {
+      
+      cog_to_trelli <- DF %>%
+        dplyr::group_by(Comparison) %>%
+        dplyr::summarise(
+          "biomolecule count" =  sum(!is.nan(fold_change)), 
+          "proportion significant" = round(sum(.data$p_value[!is.na(.data$p_value)] <= p_value_thresh) / `biomolecule count`, 4),
+          "mean fold change" = round(mean(fold_change, na.rm = TRUE), 4),
+          "sd fold change" = round(sd(fold_change, na.rm = TRUE), 4)
+        ) %>%
+        tidyr::pivot_longer(c(`biomolecule count`, `proportion significant`, `mean fold change`, `sd fold change`)) %>%
+        dplyr::filter(name %in% cognostics) %>%
+        dplyr::mutate(
+          name = paste(Comparison, name)
+        ) %>%
+        dplyr::ungroup() %>%
+        dplyr::select(-Comparison) 
+      
+    } else {
+      
+      # Calculate stats and subset to selected choices
+      cog_to_trelli <- DF %>%
+        dplyr::group_by(Comparison) %>%
+        dplyr::summarise(
+          "biomolecule count" = sum(!is.nan(fold_change)), 
+          "proportion significant" = round(sum(p_value_anova[!is.na(p_value_anova)] <= p_value_thresh) / `biomolecule count`, 4),
+          "mean fold change" = round(mean(fold_change, na.rm = TRUE), 4),
+          "sd fold change" = round(sd(fold_change, na.rm = TRUE), 4)
+        ) %>%
+        tidyr::pivot_longer(c(`biomolecule count`, `proportion significant`, `mean fold change`, `sd fold change`)) %>%
+        dplyr::filter(name %in% cognostics) %>%
+        dplyr::mutate(
+          name = paste(Comparison, name)
+        ) %>%
+        dplyr::ungroup() %>%
+        dplyr::select(-Comparison) 
+      
+    }
     
     # Add new cognostics 
     cog_to_trelli <- do.call(cbind, lapply(1:nrow(cog_to_trelli), function(row) {
@@ -2134,7 +2243,7 @@ trelli_foldchange_heatmap <- function(trelliData,
 #'   default. Required.
 #' @param cognostics A vector of cognostic options for each plot. Valid entries are 
 #'   "biomolecule count", "proportion significant", "proportion significant up",
-#'   and "proportion significant down". Default is "biomolecule count" 
+#'   and "proportion significant down". Default is "biomolecule count". 
 #' @param p_value_thresh A value between 0 and 1 to indicate significant
 #'   biomolecules for p_value_test. Default is 0.05.
 #' @param ggplot_params An optional vector of strings of ggplot parameters to
@@ -2221,6 +2330,7 @@ trelli_foldchange_volcano <- function(trelliData,
                                   interactive = interactive,
                                   test_mode = test_mode, 
                                   test_example = test_example,
+                                  seqDataCheck = "permissible",
                                   single_plot = single_plot,
                                   p_value_thresh = p_value_thresh)
   
@@ -2254,7 +2364,7 @@ trelli_foldchange_volcano <- function(trelliData,
     if (p_value_thresh != 0) {
       
       # Get significant values
-      DF <- determine_significance(DF, p_value_thresh)
+      DF <- determine_significance(DF, p_value_thresh, is_seq = inherits(trelliData, "trelliData.seqData"))
       if (is.null(DF)) {
         return(NULL)
       }
@@ -2274,20 +2384,36 @@ trelli_foldchange_volcano <- function(trelliData,
       HighSig <- paste(attr(DF, "LessThan"), "& High")
       NoSig <- attr(DF, "GreaterThan")
       
-      # Make volcano plot Stopped Here
-      volcano <- ggplot2::ggplot(DF, ggplot2::aes(x = fold_change, y = -log10(p_value_anova), color = Significance)) +
-        ggplot2::geom_point() + ggplot2::theme_bw() + ggplot2::ggtitle(title) +
-        ggplot2::scale_color_manual(values = structure(c("blue", "red", "black"), 
-                                                       .Names = c(LowSig, HighSig, NoSig))) +
-        ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) +
-        ggplot2::xlab("Fold Change") + ggplot2::ylab("-Log10 P Value")
+      # Make volcano plot 
+      if (inherits(trelliData, "trelliData.seqData")) {
+        volcano <- ggplot2::ggplot(DF, ggplot2::aes(x = fold_change, y = -log10(.data$p_value), color = Significance)) +
+          ggplot2::geom_point() + ggplot2::theme_bw() + ggplot2::ggtitle(title) +
+          ggplot2::scale_color_manual(values = structure(c("blue", "red", "black"), 
+                                                         .Names = c(LowSig, HighSig, NoSig))) +
+          ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) +
+          ggplot2::xlab("Fold Change") + ggplot2::ylab("-Log10 P Value") 
+      } else {
+        volcano <- ggplot2::ggplot(DF, ggplot2::aes(x = fold_change, y = -log10(p_value_anova), color = Significance)) +
+          ggplot2::geom_point() + ggplot2::theme_bw() + ggplot2::ggtitle(title) +
+          ggplot2::scale_color_manual(values = structure(c("blue", "red", "black"), 
+                                                         .Names = c(LowSig, HighSig, NoSig))) +
+          ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) +
+          ggplot2::xlab("Fold Change") + ggplot2::ylab("-Log10 P Value") 
+      }
       
     } else {
       
-      volcano <- ggplot2::ggplot(DF, ggplot2::aes(x = fold_change, y = -log10(p_value_anova))) +
-        ggplot2::geom_point() + ggplot2::theme_bw() + ggplot2::ggtitle(title) +
-        ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) +
-        ggplot2::xlab("Fold Change") + ggplot2::ylab("-Log10 P Value")
+      if (inherits(trelliData, "trelliData.seqData")) {
+        volcano <- ggplot2::ggplot(DF, ggplot2::aes(x = fold_change, y = -log10(.data$p_value))) +
+          ggplot2::geom_point() + ggplot2::theme_bw() + ggplot2::ggtitle(title) +
+          ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) +
+          ggplot2::xlab("Fold Change") + ggplot2::ylab("-Log10 P Value")
+      } else {
+        volcano <- ggplot2::ggplot(DF, ggplot2::aes(x = fold_change, y = -log10(p_value_anova))) +
+          ggplot2::geom_point() + ggplot2::theme_bw() + ggplot2::ggtitle(title) +
+          ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) +
+          ggplot2::xlab("Fold Change") + ggplot2::ylab("-Log10 P Value")
+      }
       
     }
 
@@ -2312,16 +2438,33 @@ trelli_foldchange_volcano <- function(trelliData,
     
     if (p_value_thresh != 0) {
       
-      # Make cognostics
-      cog_to_trelli <- DF %>%
-        dplyr::summarise(
-          "biomolecule count" = sum(!is.nan(fold_change)), 
-          "proportion significant" = round(sum(p_value_anova[!is.na(p_value_anova)] <= p_value_thresh) / `biomolecule count`, 4),
-          "proportion significant up" = round(sum(p_value_anova[!is.na(p_value_anova)] <= p_value_thresh & fold_change[!is.na(fold_change)] > 0) / `biomolecule count`, 4),
-          "proportion significant down" = round(sum(p_value_anova[!is.na(p_value_anova)] <= p_value_thresh & fold_change[!is.na(fold_change)] < 0) / `biomolecule count`, 4)
-        ) %>%
-        tidyr::pivot_longer(c(`biomolecule count`, `proportion significant`, `proportion significant up`, `proportion significant down`)) %>%
-        dplyr::filter(name %in% cognostics)
+      if (inherits(trelliData, "trelliData.seqData")) {
+        
+        # Make cognostics
+        cog_to_trelli <- DF %>%
+          dplyr::summarise(
+            "biomolecule count" = sum(!is.nan(fold_change)), 
+            "proportion significant" = round(sum(.data$p_value[!is.na(.data$p_value)] <= p_value_thresh) / `biomolecule count`, 4),
+            "proportion significant up" = round(sum(.data$p_value[!is.na(.data$p_value)] <= p_value_thresh & fold_change[!is.na(fold_change)] > 0) / `biomolecule count`, 4),
+            "proportion significant down" = round(sum(.data$p_value[!is.na(.data$p_value)] <= p_value_thresh & fold_change[!is.na(fold_change)] < 0) / `biomolecule count`, 4)
+          ) %>%
+          tidyr::pivot_longer(c(`biomolecule count`, `proportion significant`, `proportion significant up`, `proportion significant down`)) %>%
+          dplyr::filter(name %in% cognostics)
+        
+      } else {
+        
+        # Make cognostics
+        cog_to_trelli <- DF %>%
+          dplyr::summarise(
+            "biomolecule count" = sum(!is.nan(fold_change)), 
+            "proportion significant" = round(sum(p_value_anova[!is.na(p_value_anova)] <= p_value_thresh) / `biomolecule count`, 4),
+            "proportion significant up" = round(sum(p_value_anova[!is.na(p_value_anova)] <= p_value_thresh & fold_change[!is.na(fold_change)] > 0) / `biomolecule count`, 4),
+            "proportion significant down" = round(sum(p_value_anova[!is.na(p_value_anova)] <= p_value_thresh & fold_change[!is.na(fold_change)] < 0) / `biomolecule count`, 4)
+          ) %>%
+          tidyr::pivot_longer(c(`biomolecule count`, `proportion significant`, `proportion significant up`, `proportion significant down`)) %>%
+          dplyr::filter(name %in% cognostics)
+        
+      }
    
       # Convert to trelliscope cogs
       cog_to_trelli <- do.call(cbind, lapply(1:nrow(cog_to_trelli), function(row) {

@@ -16,7 +16,8 @@ trelli_pvalue_filter(
 
 \item{p_value_test}{A string to indicate which p_values to plot. Acceptable
 entries are "anova" or "gtest". Default is "anova". Unlike the
-plotting functions, here p_value_test cannot be null. Required.}
+plotting functions, here p_value_test cannot be null. Required unless
+the data is seqData, when this parameter will be ignored.}
 
 \item{p_value_thresh}{A value between 0 and 1 to indicate the p-value threshold 
 at which to keep plots. Default is 0.05. Required.}
@@ -61,6 +62,10 @@ statRes <- imd_anova(omicsData = omicsData, test_method = 'combined')
 trelliData3 <- as.trelliData(statRes = statRes)
 trelliData4 <- as.trelliData(omicsData = omicsData, statRes = statRes)
 
+###########################
+## MS/NMR OMICS EXAMPLES ##
+###########################
+
 # Filter a trelliData object with only statistics results, while not caring about a comparison
 trelli_pvalue_filter(trelliData3, p_value_test = "anova", p_value_thresh = 0.1)
 
@@ -77,6 +82,34 @@ trelli_pvalue_filter(
  comparison = "Phenotype3_vs_Phenotype2"
 )
 
+######################
+## RNA-SEQ EXAMPLES ##  
+######################
+
+#' # Group data by condition
+omicsData_seq <- group_designation(omicsData = rnaseq_object, main_effects = c("Virus"))
+
+# Filter low transcript counts
+omicsData_seq <- applyFilt(
+ filter_object = total_count_filter(omicsData = omicsData_seq), 
+ omicsData = omicsData_seq, min_count = 15
+)
+
+# Select a normalization and statistics method (options are 'edgeR', 'DESeq2', and 'voom').
+# See ?difexp_seq for more details
+statRes_seq <- diffexp_seq(omicsData = omicsData_seq, method = "voom")
+
+# Generate the trelliData object
+trelliData_seq3 <- as.trelliData(statRes = statRes_seq)
+trelliData_seq4 <- as.trelliData(omicsData = omicsData_seq, statRes = statRes_seq)
+
+# Filter a trelliData seqData object with only statistics results, while not 
+# caring about a comparison
+trelliData_seq3_filt <- trelli_pvalue_filter(trelliData_seq3, p_value_thresh = 0.05)
+
+# Filter both a omicsData and statRes object, while caring about a specific comparison
+trelliData_seq4_filt <- trelli_pvalue_filter(trelliData_seq4, p_value_thresh = 0.05, 
+ comparison = "StrainA_vs_StrainB")
 
 }
 \dontshow{\}) # examplesIf}

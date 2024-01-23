@@ -24,10 +24,10 @@ results. Required.}
 
 \item{cognostics}{A vector of cognostic options for each plot. Valid entries are 
 "biomolecule count", "proportion significant", "mean fold change",
-and "sd fold change". Default is "biomolecule count"}
+and "sd fold change". Default is "biomolecule count".}
 
-\item{p_value_thresh}{A value between 0 and 1 to indicate significant
-biomolecules for p_value_test. Default is 0.05.}
+\item{p_value_thresh}{A value between 0 and 1 to indicate significant biomolecules 
+for the anova (MS/NMR) or diffexp_seq (RNA-seq) test. Default is 0.05.}
 
 \item{ggplot_params}{An optional vector of strings of ggplot parameters to
 the backend ggplot function. For example, c("ylab('')", "xlab('')").
@@ -88,6 +88,10 @@ statRes <- imd_anova(omicsData = omicsData, test_method = 'combined')
 
 # Generate the trelliData object
 trelliData4 <- as.trelliData(omicsData = omicsData, statRes = statRes)
+
+##########################
+## MS/NMR OMICS EXAMPLE ##
+##########################
 
 # Build fold_change bar plot with statRes data grouped by edata_colname.
 trelli_panel_by(trelliData = trelliData4, panel = "RazorProtein") \%>\% 

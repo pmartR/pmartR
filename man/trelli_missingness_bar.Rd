@@ -63,7 +63,8 @@ No return value, builds a trelliscope display of missingness bar charts that is 
 \description{
 Specify a plot design and cognostics for the missing barchart
    trelliscope. Missingness is displayed per panel_by variable. Main_effects
-   data is used to split samples when applicable.
+   data is used to split samples when applicable. For RNA-Seq data, use 
+   "trelli rnaseq nonzero bar".
 }
 \examples{
 \dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
@@ -116,7 +117,7 @@ trelli_panel_by(trelliData = trelliData3, panel = "Peptide") \%>\%
 
 # Build the missingness bar plot with an omicsData and statRes object. 
 # Generate trelliData in as.trelliData.
-trelli_panel_by(trelliData = trelliData4, panel = "Peptide") \%>\%
+trelli_panel_by(trelliData = trelliData4, panel = "RazorProtein") \%>\%
   trelli_missingness_bar(test_mode = TRUE, test_example = 1:10, path = tempdir()) 
 
 # Or making the plot interactive 

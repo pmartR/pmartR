@@ -2,7 +2,7 @@
 % Please edit documentation in R/trelliPlots.R
 \name{trelli_foldchange_boxplot}
 \alias{trelli_foldchange_boxplot}
-\title{Boxplot trelliscope building function for fold_change}
+\title{Boxplot trelliscope building function for fold_changes}
 \usage{
 trelli_foldchange_boxplot(
   trelliData,
@@ -25,10 +25,10 @@ results. Required.}
 
 \item{cognostics}{A vector of cognostic options for each plot. Valid entries are 
 "biomolecule count", "proportion significant", "mean fold change",
-and "sd fold change". Default is "biomolecule count"}
+and "sd fold change". Default is "biomolecule count".}
 
 \item{p_value_thresh}{A value between 0 and 1 to indicate significant
-biomolecules for the anova test. Default is 0.05.}
+biomolecules for the anova (MS/NMR) or diffexp_seq (RNA-seq) test. Default is 0.05.}
 
 \item{include_points}{Add points. Default is TRUE.}
 
@@ -96,6 +96,22 @@ trelliData4 <- as.trelliData(omicsData = omicsData, statRes = statRes)
 trelli_panel_by(trelliData = trelliData4, panel = "RazorProtein") \%>\% 
   trelli_foldchange_boxplot(test_mode = TRUE, 
                             test_example = 1:10,
+                            cognostics = c("biomolecule count", 
+                                           "proportion significant", 
+                                           "mean fold change",
+                                           "sd fold change"),
+                            path = tempdir()
+                           )
+                           
+                           
+#####################
+## RNA-SEQ EXAMPLE ##                            
+#####################
+
+# Build fold_change box plot with statRes data grouped by edata_colname.
+trelli_panel_by(trelliData = trelliData_seq4, panel = "Gene") \%>\% 
+  trelli_foldchange_boxplot(test_mode = TRUE, 
+                            test_example = c(16823, 16890, 17680, 17976, 17981, 19281),
                             cognostics = c("biomolecule count", 
                                            "proportion significant", 
                                            "mean fold change",

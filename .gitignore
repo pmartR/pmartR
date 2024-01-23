@@ -1,14 +1,21 @@
+# R files
 *.Rproj.user
 *.Rhistory
-
 *.Ruserdata
 *.Rproj
+.Rproj.user
+.Rapp.history
+.RData
+
+# cpp compilation artifacts
 src/*.o
 src/*.so
-*.dll
-.Rproj.user
+src/*.o.tmp
+
 .DS_Store
-.Rapp.history
+*.dll
+
+# 
 
 # dont commit saved images or logs
 /tests/testthat/logs_*
@@ -17,4 +24,12 @@ src/*.so
 /tests/testthat/corRes_plot_3.html
 !tests/testthat/images/placeholder.txt
 /doc/
+/docs/
 /Meta/
+vignettes/*.R
+vignettes/*.html
+
+# vscode
+.vscode/
+
+untracked/

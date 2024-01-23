@@ -62,7 +62,7 @@ summary.trelliData <- function(object, ...) {
   #####################
   ## BUILD DATAFRAME ##
   #####################
-
+  
   # Create a base data.frame which can be filtered
   All_Options <- data.table::data.table(
     `Panel By Choice` = c(
@@ -81,6 +81,17 @@ summary.trelliData <- function(object, ...) {
       NA, "stat", "stat", "stat"
     )
   )
+  
+  # Update plot names when data is seqData
+  if (inherits(trelliData, "trelliData.seqData")) {
+    
+    All_Options <- All_Options %>%
+      dplyr::mutate(
+        Plot = gsub("abundance", "rnaseq", .data$Plot),
+        Plot = gsub("missingness", "rnaseq nonzero", .data$Plot)
+      )
+    
+  }
 
   #################################
   ## SUBSET AND RETURN DATAFRAME ##
@@ -180,7 +191,7 @@ summary.trelliData <- function(object, ...) {
     All_Options <- All_Options %>%
       dplyr::filter(`Panel By Choice` == panel_by_choice) %>%
       dplyr::select(-`Data Type`) %>%
-      dplyr::mutate(`Number of Plots` = count %>% as.character()) %>%
+      dplyr::mutate(`Number of Plots` = count %>% as.numeric()) %>%
       dplyr::mutate(`Panel By Choice` = Grouped)
   }
 

@@ -30,7 +30,7 @@ default. Required.}
 
 \item{cognostics}{A vector of cognostic options for each plot. Valid entries are 
 "biomolecule count", "proportion significant", "proportion significant up",
-and "proportion significant down". Default is "biomolecule count"}
+and "proportion significant down". Default is "biomolecule count".}
 
 \item{p_value_thresh}{A value between 0 and 1 to indicate significant
 biomolecules for p_value_test. Default is 0.05.}

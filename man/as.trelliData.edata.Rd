@@ -32,33 +32,36 @@ containing the biomolecule identifiers. It should be the only non-numeric
 colummn in edata.}
 
 \item{omics_type}{A string specifying the data type. Acceptable options are
-"pepData", "isobaricpepData", "proData", "metabData", "lipidData", or
-"nmrData".}
+"pepData", "isobaricpepData", "proData", "metabData", "lipidData", 
+"nmrData", or "seqData".}
 
 \item{data_scale_original}{A character string indicating original scale
 of the data. Valid values are: 'log2', 'log', 'log10', or 'abundance'.
-Default is abundance.}
+Default is abundance. This parameter is ignored if the data is "seqData".}
 
 \item{data_scale}{A character string indicating the scale to transform the
 data to. Valid values are: 'log2', 'log', 'log10', or 'abundance'. If the
 value is the same as data_scale_original, then transformation is not
-applied. Default is log2.}
+applied. Default is log2. This parameter is ignored if the data is "seqData".}
 
 \item{normalization_fun}{A character string indicating the pmartR
 normalization function to use on the data, if is_normalized is FALSE.
-Acceptable choices are 'global', 'loess', and 'quantile'.}
+Acceptable choices are 'global', 'loess', and 'quantile'. This parameter is
+ignored if the data is "seqData".}
 
 \item{normalization_params}{A vector or list where the normalization
 parameters are the names, and the parameter values are the list values. For
 example, an acceptable entry for 'normalize_global' would be
 list("subset_fn" = "all", "norm_fn" = "median", "apply_norm" = TRUE,
-"backtransform" = TRUE).}
+"backtransform" = TRUE). This parameter is ignored if the data is "seqData".}
 
 \item{is_normalized}{A logical indicator of whether the data is already
-normalized (and will therefore skip the normalization step)}
+normalized (and will therefore skip the normalization step). This parameter is
+ignored if the data is "seqData".}
 
 \item{force_normalization}{A logical indicator to force normalization that is
-not required for both isobaric protein and NMR data}
+not required for both isobaric protein and NMR data. This parameter is ignored
+if the data is "seqData."}
 }
 \value{
 An object of class 'trelliData' containing the raw data.
@@ -73,10 +76,23 @@ The only acceptable input file type is a single edata file.
 \dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 
-# Simple example 
+###########################
+## MS/NMR OMICS EXAMPLES ##
+###########################
+
+# Simple MS/NMR Example 
 trelliData1 <- as.trelliData.edata(e_data = pep_edata,
                                    edata_cname = "Peptide",
                                    omics_type = "pepData")
+ 
+######################
+## RNA-SEQ EXAMPLES ##  
+######################
+                                    
+# RNA-seq Example
+trelliData_seq1 <- as.trelliData.edata(e_data = rnaseq_edata, 
+                                      edata_cname = "Transcript",
+                                      omics_type = "seqData")
                                   
           
 \dontshow{\}) # examplesIf}

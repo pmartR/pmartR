@@ -28,7 +28,7 @@ If data are paneled by a biomolecule, the count will be "sample count".
 If data are paneled by a sample or a biomolecule class, the count will be "biomolecule count". 
 If statRes data is included, "anova p-value" and "fold change" data per comparisons
 may be added. If grouping information is included, only "sample count" and 
-"mean abundance" will be calclulated, along with "anova p-value" and "fold change"
+"mean abundance" will be calculated, along with "anova p-value" and "fold change"
 if specified. "anova p-value" will not be included if paneling a trelliscope
 display by a biomolecule class. Default is "sample count" and "mean abundance".}
 
@@ -64,7 +64,8 @@ No return value, builds a trelliscope display of boxplots that is stored in `pat
 \description{
 Specify a boxplot design and cognostics for the abundance
   boxplot trelliscope. Each boxplot will have its own groups as specified by
-  the first main effect in group_designation.
+  the first main effect in group_designation. Use "trelli_rnaseq_boxplot"
+  for RNA-Seq data.
 }
 \examples{
 \dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
