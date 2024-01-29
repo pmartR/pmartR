@@ -42,11 +42,7 @@ summary.trelliData <- function(object, ...) {
   stat <- !is.null(trelliData$statRes)
 
   # Get edata_cname
-  if (omics) {
-    edata_cname <- get_edata_cname(trelliData$omicsData)
-  } else {
-    edata_cname <- get_edata_cname(trelliData$statRes)
-  }
+  edata_cname <- attr(trelliData, "edata_col")
 
   # Extract fdata_cname
   fdata_cname <- attr(trelliData, "fdata_col")
@@ -72,10 +68,6 @@ summary.trelliData <- function(object, ...) {
       "fold change bar", "abundance boxplot", "missingness bar",
       "abundance boxplot", "abundance heatmap", "missingness bar",
       "fold change boxplot", "fold change heatmap", "fold change volcano"
-    ),
-    `Data Type` = c(
-      "omics", "omics", NA, "stat", "omics", NA, "omics", "omics",
-      NA, "stat", "stat", "stat"
     )
   )
   
@@ -93,58 +85,46 @@ summary.trelliData <- function(object, ...) {
   ## SUBSET AND RETURN DATAFRAME ##
   #################################
 
-  # Filter by "Data Type"
-  if (omics == FALSE) {
-    All_Options <- All_Options %>% 
-      dplyr::filter(`Data Type` != "omics" | is.na(`Data Type`))
-  }
-  if (stat == FALSE) {
-    All_Options <- All_Options %>% 
-      dplyr::filter(`Data Type` != "stat" | is.na(`Data Type`))
+  # Unnest if the data has been nested 
+  if (panel_by) {
+    plot_df <- trelliData$trelliData %>% tidyr::unnest(cols = c(Nested_DF))
+  } else {
+    plot_df <- trelliData$trelliData
   }
 
-  # If there is no grouping information, we should suggest potential plots.
-  if (panel_by == FALSE) {
-    
-    # Filter by "Panel By" choices
-    if (fdata_cname_missing) {
-      All_Options <- All_Options %>% 
-        dplyr::filter(`Panel By Choice` != "f_data cname")
-    }
-    if (emeta_cols_missing) {
-      All_Options <- All_Options %>% 
-        dplyr::filter(`Panel By Choice` != "e_meta column")
-    }
+  # Remove data type and add a holder for count
+  All_Options <- All_Options %>%
+    dplyr::mutate(`Number of Plots` = 0)
+  
+  # Replace names and get counts TODO: apply styler
+  bio_count <- trelliData$trelliData[[edata_cname]] %>% unique() %>% length()
+  All_Options[All_Options$`Panel By Choice` == "e_data cname", "Number of Plots"] <- bio_count %>% as.character()
+  All_Options[All_Options$`Panel By Choice` == "e_data cname", "Panel By Choice"] <- edata_cname
 
-    # Remove data type and add a holder for count
-    All_Options <- All_Options %>%
-      dplyr::select(-`Data Type`) %>%
-      dplyr::mutate(`Number of Plots` = 0)
+  if (!fdata_cname_missing) {
+    sample_count <- trelliData$trelliData[[fdata_cname]] %>% unique() %>% length()
+    All_Options[All_Options$`Panel By Choice` == "f_data cname", "Number of Plots"] <- sample_count %>% as.character()
+    All_Options[All_Options$`Panel By Choice` == "f_data cname", "Panel By Choice"] <- fdata_cname
+  }
 
-    # Replace names and get counts TODO: apply styler
-    if ("e_data cname" %in% All_Options$`Panel By Choice`) {
-      bio_var <- ifelse(omics, attr(trelliData$omicsData, "cnames")$edata_cname, attr(trelliData$statRes, "cnames")$edata_cname)
-      bio_count <- trelliData$trelliData[[bio_var]] %>% unique() %>% length()
-      All_Options[All_Options$`Panel By Choice` == "e_data cname", "Number of Plots"] <- bio_count %>% as.character()
-      All_Options[All_Options$`Panel By Choice` == "e_data cname", "Panel By Choice"] <- edata_cname
-    }
+  if (!emeta_cols_missing) {
 
-    if ("f_data cname" %in% All_Options$`Panel By Choice`) {
-      sample_var <- ifelse(omics, attr(trelliData$omicsData, "cnames")$fdata_cname, attr(trelliData$statRes, "cnames")$fdata_cname)
-      sample_count <- trelliData$trelliData[[sample_var]] %>% unique() %>% length()
-      All_Options[All_Options$`Panel By Choice` == "f_data cname", "Number of Plots"] <- sample_count %>% as.character()
-      All_Options[All_Options$`Panel By Choice` == "f_data cname", "Panel By Choice"] <- fdata_cname
-    }
-
-    if ("e_meta column" %in% All_Options$`Panel By Choice`) {
+    # Add counts
+    if (panel_by && attr(trelliData, "panel_by_col") %in% attr(trelliData, "edata_cols")) {
+      emeta_var <- attr(trelliData, "panel_by_col")
+      emeta_count <- trelliData$trelliData[[emeta_var]] %>% unique() %>% length()
+      All_Options[All_Options$`Panel By Choice` == "e_meta column", "Number of Plots"] <- emeta_count %>% as.character()
+      All_Options[All_Options$`Panel By Choice` == "e_meta column", "Panel By Choice"] <- emeta_var
+    } else {
+      
       # Get counts per e_meta variable
       emeta_counts <- lapply(emeta_cols, function(name) {
         trelliData$trelliData[[name]] %>% unique() %>% length()
       }) %>% 
         unlist() %>% 
         paste(collapse = ", ")
-
-      # Add counts
+      
+      
       All_Options[
         All_Options$`Panel By Choice` == "e_meta column", "Number of Plots"
       ] <- emeta_counts
@@ -152,48 +132,10 @@ summary.trelliData <- function(object, ...) {
         All_Options$`Panel By Choice` == "e_meta column", "Panel By Choice"
       ] <- paste(emeta_cols, collapse = ", ")
     }
-  } else {
-    
-    browser()
-    
-    # Determine what the data has been grouped by
-    Grouped <- ifelse(
-      omics,
-      attr(trelliData, "panel_by_omics"),
-      attr(trelliData, "panel_by_stat")
-    )
-
-    # Determine if group variable is edata_cname, fdata_cname, or an emeta
-    # column, and get a count
-    theMatch <- match(Grouped, c(edata_cname, fdata_cname, emeta_cols))
-    if (theMatch == 1) {
-      panel_by_choice <- "e_data cname"
-      count <- ifelse(
-        omics, 
-        nrow(trelliData$trelliData.omics), 
-        nrow(trelliData$trelliData.stat)
-      )
-    } else if (theMatch == 2) {
-      panel_by_choice <- "f_data cname"
-      count <- ifelse(
-        omics,
-        nrow(trelliData$omicsData$f_data),
-        attr(trelliData$statRes, "group_DF") %>% nrow()
-      )
-    } else {
-      panel_by_choice <- "e_meta column"
-      count <- trelliData$omicsData$e_meta[[Grouped]] %>%
-        unique() %>%
-        length()
-    }
-
-    # Finally, subset down the table, remove data type, and add a count
-    All_Options <- All_Options %>%
-      dplyr::filter(`Panel By Choice` == panel_by_choice) %>%
-      dplyr::select(-`Data Type`) %>%
-      dplyr::mutate(`Number of Plots` = count %>% as.numeric()) %>%
-      dplyr::mutate(`Panel By Choice` = Grouped)
   }
+  
+  # Remove zero counts
+  All_Options <- All_Options %>% dplyr::filter(!grepl("0", `Number of Plots`, fixed = T))
 
   return(All_Options)
 }
