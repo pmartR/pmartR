@@ -216,10 +216,9 @@ as.trelliData.edata <- function(e_data,
     
     # Put the edata into the trelliData omics slot
     trelliData <- list(
-      trelliData.omics = omicsData$e_data %>%
+      trelliData = omicsData$e_data %>%
         tidyr::pivot_longer(colnames(edata)[colnames(edata) != edata_cname]) %>%
         dplyr::rename(Sample = name, Abundance = value),
-      trelliData.stat = NULL,
       omicsData = omicsData,
       statRes = NULL
     )
@@ -258,8 +257,7 @@ as.trelliData.edata <- function(e_data,
     
     # Put the edata into the trelliData omics slot
     trelliData <- list(
-      trelliData.omics = pivoted,
-      trelliData.stat = NULL,
+      trelliData = pivoted,
       omicsData = omicsData,
       statRes = NULL
     )
@@ -274,8 +272,6 @@ as.trelliData.edata <- function(e_data,
   attr(trelliData, "fdata_col") <- "Sample"
   attr(trelliData, "emeta_col") <- NULL
   attr(trelliData, "panel_by_options") <- c(edata_cname, fdata_cname)
-  attr(trelliData, "panel_by_omics") <- NA
-  attr(trelliData, "panel_by_stat") <- NA
   attr(trelliData, "panel_by") <- FALSE
   class(trelliData) <- c("trelliData", "trelliData.edata")
   
@@ -502,6 +498,8 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL) {
   # Format statRes if applicable
   if (!is.null(statRes)) {
     
+    browser()
+    
     # Get edata cname
     edata_cname <- pmartR::get_edata_cname(statRes)
 
@@ -599,8 +597,6 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL) {
   group_nonoptions <- c("Abundance", "Comparison", "p_value_anova", "p_value_gtest", "p_value", "fold_change", "Group", "Count", "LCPM")
   group_options <- group_options[group_options %in% group_nonoptions == FALSE]
   attr(trelliData, "panel_by_options") <- group_options
-  attr(trelliData, "panel_by_omics") <- NA
-  attr(trelliData, "panel_by_stat") <- NA
   attr(trelliData, "panel_by") <- FALSE
   class(trelliData) <- c("trelliData")
   
