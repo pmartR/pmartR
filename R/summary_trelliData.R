@@ -38,11 +38,8 @@ summary.trelliData <- function(object, ...) {
 
   # Second, let's determine if there's omicsData or statRes or both in this
   # object
-  omics <- !is.null(trelliData$trelliData.omics)
-  stat <- !is.null(trelliData$trelliData.stat)
-
-  # Third, let's determine if this object is a trelliData.edata
-  edata_only <- inherits(trelliData, "trelliData.edata")
+  omics <- !is.null(trelliData$omicsData) 
+  stat <- !is.null(trelliData$statRes)
 
   # Get edata_cname
   if (omics) {
@@ -90,7 +87,6 @@ summary.trelliData <- function(object, ...) {
         Plot = gsub("abundance", "rnaseq", .data$Plot),
         Plot = gsub("missingness", "rnaseq nonzero", .data$Plot)
       )
-    
   }
 
   #################################
@@ -109,6 +105,7 @@ summary.trelliData <- function(object, ...) {
 
   # If there is no grouping information, we should suggest potential plots.
   if (panel_by == FALSE) {
+    
     # Filter by "Panel By" choices
     if (fdata_cname_missing) {
       All_Options <- All_Options %>% 
@@ -127,14 +124,14 @@ summary.trelliData <- function(object, ...) {
     # Replace names and get counts TODO: apply styler
     if ("e_data cname" %in% All_Options$`Panel By Choice`) {
       bio_var <- ifelse(omics, attr(trelliData$omicsData, "cnames")$edata_cname, attr(trelliData$statRes, "cnames")$edata_cname)
-      bio_count <- ifelse(omics, trelliData$trelliData.omics[[bio_var]] %>% unique() %>% length(), trelliData$trelliData.stat[[bio_var]] %>% unique() %>% length())
+      bio_count <- trelliData$trelliData[[bio_var]] %>% unique() %>% length()
       All_Options[All_Options$`Panel By Choice` == "e_data cname", "Number of Plots"] <- bio_count %>% as.character()
       All_Options[All_Options$`Panel By Choice` == "e_data cname", "Panel By Choice"] <- edata_cname
     }
 
     if ("f_data cname" %in% All_Options$`Panel By Choice`) {
       sample_var <- ifelse(omics, attr(trelliData$omicsData, "cnames")$fdata_cname, attr(trelliData$statRes, "cnames")$fdata_cname)
-      sample_count <- ifelse(omics, trelliData$trelliData.omics[[sample_var]] %>% unique() %>% length(), trelliData$trelliData.stat[[sample_var]] %>% unique() %>% length())
+      sample_count <- trelliData$trelliData[[sample_var]] %>% unique() %>% length()
       All_Options[All_Options$`Panel By Choice` == "f_data cname", "Number of Plots"] <- sample_count %>% as.character()
       All_Options[All_Options$`Panel By Choice` == "f_data cname", "Panel By Choice"] <- fdata_cname
     }
@@ -142,7 +139,7 @@ summary.trelliData <- function(object, ...) {
     if ("e_meta column" %in% All_Options$`Panel By Choice`) {
       # Get counts per e_meta variable
       emeta_counts <- lapply(emeta_cols, function(name) {
-        trelliData$trelliData.omics[[name]] %>% unique() %>% length()
+        trelliData$trelliData[[name]] %>% unique() %>% length()
       }) %>% 
         unlist() %>% 
         paste(collapse = ", ")
@@ -156,6 +153,9 @@ summary.trelliData <- function(object, ...) {
       ] <- paste(emeta_cols, collapse = ", ")
     }
   } else {
+    
+    browser()
+    
     # Determine what the data has been grouped by
     Grouped <- ifelse(
       omics,

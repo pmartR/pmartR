@@ -266,13 +266,14 @@ as.trelliData.edata <- function(e_data,
 
   # Save Panel By information and set class."panel_by_options" list the potential
   # inputs for the panel_by function. "panel_by_omics"/"panel_by_stat" will hold
-  # the column name of the trelliData.omics/trelliData.stat that the data has
+  # the column name of the trelliData/trelliData.stat that the data has
   # been grouped by. And "panel_by" tracks whether the panel_by function has been
   # applied or not.
   attr(trelliData, "fdata_col") <- "Sample"
   attr(trelliData, "emeta_col") <- NULL
   attr(trelliData, "panel_by_options") <- c(edata_cname, fdata_cname)
   attr(trelliData, "panel_by") <- FALSE
+  attr(trelliData, "panel_by_col") <- ""
   class(trelliData) <- c("trelliData", "trelliData.edata")
   
   # Add a special label for seqData
@@ -293,7 +294,7 @@ as.trelliData.edata <- function(e_data,
 #'   protein or NMR data. If group_designation() has been run on the omicData
 #'   object to add "main_effects", the resulting plots will include groups. The
 #'   main effects group_designation and e_meta columns are merged to the e_data
-#'   in long format to create the trelliData.omics dataframe, and e_meta is
+#'   in long format to create the trelliData dataframe, and e_meta is
 #'   merged to statRes in long format to create trelliData.stat dataframe.
 #'
 #' @param omicsData an object of the class 'pepData', 'isobaricpepData',
@@ -433,8 +434,7 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL) {
   # Generate the trelliData object----------------------------------------------
 
   # Create placeholders for trelliData objects
-  trelliData.omics <- NULL
-  trelliData.stat <- NULL
+  pre_trelliData <- NULL
   fdata_cname <- NULL
   emeta_cname <- NULL
 
@@ -448,13 +448,13 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL) {
     fdata <- omicsData$f_data
 
     # Generate telliData.omics object
-    trelliData.omics <- edata %>%
+    pre_trelliData <- edata %>%
       tidyr::pivot_longer(colnames(edata)[colnames(edata) != edata_cname]) %>%
       dplyr::rename(Abundance = value, !!fdata_cname := name)
 
     # Add group_designation if it exists
     if (!is.null(attributes(omicsData)$group_DF)) {
-      trelliData.omics <- dplyr::left_join(trelliData.omics, attributes(omicsData)$group_DF, by = fdata_cname)
+      pre_trelliData <- dplyr::left_join(pre_trelliData, attributes(omicsData)$group_DF, by = fdata_cname)
     }
 
     # Add emeta columns if emeta exists
@@ -463,14 +463,14 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL) {
       emeta <- omicsData$e_meta
 
       # Add emeta columns
-      trelliData.omics <- dplyr::left_join(trelliData.omics, emeta, by = edata_cname)
+      pre_trelliData <- dplyr::left_join(pre_trelliData, emeta, by = edata_cname)
     }
     
     # Clean up if seqData
     if (inherits(omicsData, "seqData")) {
       
       # Rename abundance as count
-      trelliData.omics <- trelliData.omics %>% dplyr::rename(Count = Abundance)
+      pre_trelliData <- pre_trelliData %>% dplyr::rename(Count = Abundance)
       
       # Generate log counts per million (lcpm)
       biomolecules <- omicsData$e_data[[edata_cname]]
@@ -486,7 +486,7 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL) {
         dplyr::rename(!!fdata_cname := name, LCPM = value)
       
       # Add LCPM to the dataframe 
-      trelliData.omics <- dplyr::left_join(trelliData.omics, lcpm_pivoted, by = c(edata_cname, fdata_cname))
+      pre_trelliData <- dplyr::left_join(pre_trelliData, lcpm_pivoted, by = c(edata_cname, fdata_cname))
       
     }
     
@@ -498,68 +498,20 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL) {
   # Format statRes if applicable
   if (!is.null(statRes)) {
     
-    browser()
-    
     # Get edata cname
     edata_cname <- pmartR::get_edata_cname(statRes)
 
     # Get column names of all fold changes, as well as p-values
-    pvalue_cols <- colnames(statRes)[grepl("P_value", colnames(statRes))]
+    pvalue_anova_cols <- colnames(statRes)[grepl("P_value_A", colnames(statRes))]
+    pvalue_gtest_cols <- colnames(statRes)[grepl("P_value_G", colnames(statRes))]
     fold_change_cols <- colnames(statRes)[grepl("Fold_change", colnames(statRes))]
     
     # Change class to prevent dplyr issues
     class(statRes) <- "data.frame"
     
-    # Determine if this is MS/NMR omics or RNA seq 
-    ms_obj <- any(grepl("P_value_A|P_value_G", colnames(statRes)))
-    
-    if (ms_obj) {
-      
-      # Pivot longer so that the first column is the edata_cname, extract comparison,
-      # panel_by comparison, nest dataframes, and then extract the p_value and fold_change
-      # for each group. Split p-values by the ANOVA or the g-test. 
-      trelliData.stat <- statRes %>%
-        dplyr::select(dplyr::all_of(c(edata_cname, pvalue_cols, fold_change_cols))) %>%
-        tidyr::pivot_longer(dplyr::all_of(c(pvalue_cols, fold_change_cols))) %>%
-        dplyr::mutate(
-          Comparison = gsub("P_value_A_|P_value_G_|Fold_change_", "", name),
-          Metric = ifelse(grepl("P_value_A", name), "p_value_anova", 
-                   ifelse(grepl("P_value_G", name), "p_value_gtest", "fold_change"))
-        ) %>%
-        dplyr::select(-name) %>%
-        dplyr::group_by(dplyr::across(c(Comparison, !!dplyr::sym(edata_cname)))) %>%
-        dplyr::reframe(
-          "p_value_anova" = ifelse(length(value[which(Metric == "p_value_anova")]) == 0, NA, value[which(Metric == "p_value_anova")]),
-          "p_value_gtest" = ifelse(length(value[which(Metric == "p_value_gtest")]) == 0, NA, value[which(Metric == "p_value_gtest")]),
-          "fold_change" = value[which(Metric == "fold_change")]
-        ) %>%
-        dplyr::relocate(!!dplyr::sym(edata_cname))
-      
-    } else {
-      
-      # Pivot longer so that the first column is the edata_cname, extract comparison,
-      # panel_by comparison, nest dataframes, and then extract the p_value and fold_change
-      # for each group. Here, there is just one p-value. 
-      trelliData.stat <- statRes %>%
-        dplyr::select(dplyr::all_of(c(edata_cname, pvalue_cols, fold_change_cols))) %>%
-        tidyr::pivot_longer(dplyr::all_of(c(pvalue_cols, fold_change_cols))) %>%
-        dplyr::mutate(
-          Comparison = gsub("P_value_|Fold_change_", "", name),
-          Metric = ifelse(grepl("P_value", name), "p_value", "fold_change")
-        ) %>%
-        dplyr::select(-name) %>%
-        dplyr::group_by(dplyr::across(c(Comparison, !!dplyr::sym(edata_cname)))) %>%
-        dplyr::summarize(
-          "p_value" = ifelse(length(value[which(Metric == "p_value")]) == 0, NA, value[which(Metric == "p_value")]),
-          "fold_change" = value[which(Metric == "fold_change")]
-        ) %>%
-        dplyr::relocate(!!dplyr::sym(edata_cname))
-    }
-
-    # Add emeta columns if emeta exists
-    if (!is.null(omicsData$e_meta)) {
-      # Add emeta columns
-      trelliData.stat <- dplyr::left_join(trelliData.stat, emeta, by = emeta_cname)
+    # trelliData is simply the statRes object if that is all that was provided 
+    if (is.null(omicsData)) {pre_trelliData <- statRes} else {
+      pre_trelliData <- dplyr::left_join(pre_trelliData, statRes, by = edata_cname)
     }
     
     # Fix statRes
@@ -571,8 +523,7 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL) {
   
   # Generate a trelliData object
   trelliData <- list(
-    trelliData.omics = trelliData.omics,
-    trelliData.stat = trelliData.stat,
+    trelliData = pre_trelliData,
     omicsData = omicsData,
     statRes = statRes
   )
@@ -589,18 +540,19 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL) {
   }
 
   # Save Panel By information and set class."panel_by_options" list the potential
-  # inputs for the panel_by function. "panel_by_omics"/"panel_by_stat" will hold
-  # the column name of the trelliData.omics/trelliData.stat that the data has
+  # inputs for the panel_by function. "panel_by" will hold
+  # the column name of the trelliData that the data has
   # been grouped by. And "panel_by" tracks whether the panel_by function has been
   # applied or not.
-  group_options <- c(colnames(trelliData.omics), colnames(trelliData.stat)) %>% unique()
-  group_nonoptions <- c("Abundance", "Comparison", "p_value_anova", "p_value_gtest", "p_value", "fold_change", "Group", "Count", "LCPM")
+  group_options <- colnames(pre_trelliData)[grepl("P_value_|Fold_change_|Flag_|Count_|Mean_", colnames(pre_trelliData)) == FALSE]
+  group_nonoptions <- c("Abundance", "Comparison", "Group", "Count", "LCPM")
   group_options <- group_options[group_options %in% group_nonoptions == FALSE]
   attr(trelliData, "panel_by_options") <- group_options
   attr(trelliData, "panel_by") <- FALSE
+  attr(trelliData, "panel_by_col") <- ""
   class(trelliData) <- c("trelliData")
   
-  if (inherits(omicsData, "seqData") | (!is.null(statRes) && ms_obj == FALSE)) {
+  if (inherits(omicsData, "seqData")) {
     
     class(trelliData) <- c(class(trelliData), "trelliData.seqData")
     
@@ -714,8 +666,8 @@ trelli_panel_by <- function(trelliData, panel) {
   # Determine which dataframes this grouping variable applies to----------------
 
   # Test if grouping applies to omicsData
-  if (!is.null(trelliData$trelliData.omics) &&
-    panel %in% colnames(trelliData$trelliData.omics)) {
+  if (!is.null(trelliData$trelliData) &&
+    panel %in% colnames(trelliData$trelliData)) {
     apply_to_omics <- TRUE
   } else {
     apply_to_omics <- FALSE
@@ -754,8 +706,8 @@ trelli_panel_by <- function(trelliData, panel) {
   # Onlt test grouping if it applies to omics
   if (apply_to_omics) {
     .test_grouping(
-      trelliData$trelliData.omics,
-      "trelliData.omics"
+      trelliData$trelliData,
+      "trelliData"
     )
   }
 
@@ -771,7 +723,7 @@ trelli_panel_by <- function(trelliData, panel) {
 
   # Group omicsData
   if (apply_to_omics) {
-    trelliData$trelliData.omics <- .group_samples(trelliData$trelliData.omics)
+    trelliData$trelliData <- .group_samples(trelliData$trelliData)
     attr(trelliData, "panel_by_omics") <- panel
   }
 
@@ -784,184 +736,4 @@ trelli_panel_by <- function(trelliData, panel) {
   # Export results--------------------------------------------------------------
   attr(trelliData, "panel_by") <- TRUE
   return(trelliData)
-}
-
-#' @name trelli_pvalue_filter
-#' 
-#' @title Filter a paneled trelliData object by a p-value 
-#' 
-#' @description This use-case-specific function allows users to filter down their plots to a 
-#'    specified p-value IF statistics data has been included. This function is mostly
-#'    relevant to the MODE application. 
-#'    
-#' @param trelliData A trelliData object with statistics results (statRes). Required.
-#' @param p_value_test A string to indicate which p_values to plot. Acceptable
-#'    entries are "anova" or "gtest". Default is "anova". Unlike the
-#'    plotting functions, here p_value_test cannot be null. Required unless
-#'    the data is seqData, when this parameter will be ignored.  
-#' @param p_value_thresh A value between 0 and 1 to indicate the p-value threshold 
-#'    at which to keep plots. Default is 0.05. Required.
-#' @param comparison The specific comparison to filter significant values to. Can
-#'    be null. See attr(statRes, "comparisons") for the available options. Optional.
-#' 
-#' @return A paneled trelliData object with only plots corresponding to significant
-#' p-values from a statistical test.
-#' 
-#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
-#' \donttest{
-#' library(pmartRdata)
-#' 
-#' # Transform the data
-#' omicsData <- edata_transform(omicsData = pep_object, data_scale = "log2")
-#' 
-#' # Group the data by condition
-#' omicsData <- group_designation(omicsData = omicsData, main_effects = c("Phenotype"))
-#'
-#' # Apply the IMD ANOVA filter
-#' imdanova_Filt <- imdanova_filter(omicsData = omicsData)
-#' omicsData <- applyFilt(filter_object = imdanova_Filt, omicsData = omicsData,
-#'                        min_nonmiss_anova = 2)
-#'
-#' # Normalize my pepData
-#' omicsData <- normalize_global(omicsData, "subset_fn" = "all", "norm_fn" = "median",
-#'                              "apply_norm" = TRUE, "backtransform" = TRUE)
-#'
-#' # Implement the IMD ANOVA method and compute all pairwise comparisons 
-#' # (i.e. leave the `comparisons` argument NULL)
-#' statRes <- imd_anova(omicsData = omicsData, test_method = 'combined')
-#'
-#' # Generate the trelliData object
-#' trelliData3 <- as.trelliData(statRes = statRes)
-#' trelliData4 <- as.trelliData(omicsData = omicsData, statRes = statRes)
-#' 
-#' ###########################
-#' ## MS/NMR OMICS EXAMPLES ##
-#' ###########################
-#' 
-#' # Filter a trelliData object with only statistics results, while not caring about a comparison
-#' trelli_pvalue_filter(trelliData3, p_value_test = "anova", p_value_thresh = 0.1)
-#' 
-#' # Filter a trelliData object with only statistics results, while caring about a specific comparison
-#' trelli_pvalue_filter(
-#'  trelliData3, p_value_test = "anova", p_value_thresh = 0.1, comparison = "Phenotype3_vs_Phenotype2")
-#' 
-#' # Filter both a omicsData and statRes object, while not caring about a specific comparison
-#' trelli_pvalue_filter(trelliData4, p_value_test = "anova", p_value_thresh = 0.001)
-#' 
-#' # Filter both a omicsData and statRes object, while caring about a specific comparison
-#' trelli_pvalue_filter(
-#'  trelliData4, p_value_test = "gtest", p_value_thresh = 0.25, 
-#'  comparison = "Phenotype3_vs_Phenotype2"
-#' )
-#' 
-#' ######################
-#' ## RNA-SEQ EXAMPLES ##  
-#' ######################
-#' 
-#' #' # Group data by condition
-#' omicsData_seq <- group_designation(omicsData = rnaseq_object, main_effects = c("Virus"))
-#' 
-#' # Filter low transcript counts
-#' omicsData_seq <- applyFilt(
-#'  filter_object = total_count_filter(omicsData = omicsData_seq), 
-#'  omicsData = omicsData_seq, min_count = 15
-#' )
-#' 
-#' # Select a normalization and statistics method (options are 'edgeR', 'DESeq2', and 'voom').
-#' # See ?difexp_seq for more details
-#' statRes_seq <- diffexp_seq(omicsData = omicsData_seq, method = "voom")
-#' 
-#' # Generate the trelliData object
-#' trelliData_seq3 <- as.trelliData(statRes = statRes_seq)
-#' trelliData_seq4 <- as.trelliData(omicsData = omicsData_seq, statRes = statRes_seq)
-#' 
-#' # Filter a trelliData seqData object with only statistics results, while not 
-#' # caring about a comparison
-#' trelliData_seq3_filt <- trelli_pvalue_filter(trelliData_seq3, p_value_thresh = 0.05)
-#' 
-#' # Filter both a omicsData and statRes object, while caring about a specific comparison
-#' trelliData_seq4_filt <- trelli_pvalue_filter(trelliData_seq4, p_value_thresh = 0.05, 
-#'  comparison = "StrainA_vs_StrainB")
-#' 
-#' }
-#'
-#' @author David Degnan, Lisa Bramer
-#' 
-#' @export
-trelli_pvalue_filter <- function(trelliData, 
-                                 p_value_test = "anova", 
-                                 p_value_thresh = 0.05,
-                                 comparison = NULL) {
-  
-  # Run initial checks----------------------------------------------------------
-  
-  # trelliData object must be of the trelliData class
-  if (any(class(trelliData) %in% c("trelliData")) == FALSE) {
-    stop("trelliData must be of the class trelliData.")
-  }
-  
-  # trelliData must contain statistics 
-  if (is.null(trelliData$statRes)) {
-    stop("trelliData must contain a statRes object.")
-  }
-  
-  # If the data is seqData, then p_value_test is not used
-  if (!inherits(trelliData, "trelliData.seqData")) {
-  
-    # Ensure the p_value_test is anova, gtest, or combined
-    if (p_value_test %in% c("anova", "gtest") == FALSE) {
-      stop("p_value_test must be anova, or gtest.")
-    }
-    
-  } else {message("p_value_test is ignored with seqData.")}
-  
-  # Ensure that p_value threshold is a single numeric
-  if (!is.numeric(p_value_thresh)) {
-    stop("p_value_threshold must be a number.")
-  }
-  p_value_thresh <- abs(p_value_thresh)
-  
-  # If comparison is not NULL...
-  if (!is.null(comparison)) {
-    # Ensure that comparison is an acceptable input
-    if (!is.character(comparison) | length(comparison) > 1) {
-      stop("comparison must be a string of length 1.")
-    }
-    
-    # Ensure that comparison is from the comparisons lists
-    Comparisons <- attr(trelliData$statRes, "comparisons")
-    if (comparison %in% Comparisons == FALSE) {
-      stop(paste0(comparison, " is not an acceptable comparison"))
-    }
-  }
-  
-  # Filter by p_value-----------------------------------------------------------
-  
-  # Pull the biomolecule name 
-  biomolecule <- attr(trelliData$statRes, "cnames")$edata_cname
-  
-  # Filter down to only a comparison if the user specifies one
-  if (!is.null(comparison)) {
-    trelliData$trelliData.stat <- trelliData$trelliData.stat[trelliData$trelliData.stat$Comparison == comparison,]
-  }
-  
-  # Filter statRes, unless it's seqData
-  if (!inherits(trelliData, "trelliData.seqData")) {
-    if (p_value_test == "anova") {
-      trelliData$trelliData.stat <- trelliData$trelliData.stat[trelliData$trelliData.stat$p_value_anova <= p_value_thresh,]
-    } else if (p_value_test == "gtest") {
-      trelliData$trelliData.stat <- trelliData$trelliData.stat[trelliData$trelliData.stat$p_value_gtest <= p_value_thresh,] 
-    } 
-  } else {
-    trelliData$trelliData.stat <- trelliData$trelliData.stat[trelliData$trelliData.stat$p_value <= p_value_thresh,]
-  }
-  
-  # Filter omics down 
-  if (!is.null(trelliData$trelliData.omics)) {
-    biomolecule_subset <-  trelliData$trelliData.stat[,biomolecule] %>% unlist()
-    trelliData$trelliData.omics <- trelliData$trelliData.omics[trelliData$trelliData.omics[[biomolecule]] %in% biomolecule_subset,]
-  }
-  
-  return(trelliData)
-  
 }
