@@ -6515,7 +6515,7 @@ make_volcano_plot_df <- function(x) {
     gsub(
       pattern = "_vs_",
       replacement = " vs ",
-      pvals$Comparison
+      volcano$Comparison
     )
 
   # create counts for gtest plot (number present in each group)
