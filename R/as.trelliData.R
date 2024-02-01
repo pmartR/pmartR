@@ -581,6 +581,7 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL) {
 #'
 #' @param trelliData A trelliscope data object made by as.trelliData or as.trelliData.edata. Required.
 #' @param panel The name of a column in trelliData to panel the data by. Required.
+#' 
 #'
 #' @return A trelliData object with attributes "panel_by_omics" or "panel_by_stat" to determine 
 #' which columns to divide the data by.
@@ -684,18 +685,51 @@ trelli_panel_by <- function(trelliData, panel) {
   # If the data is only statRes, there's no need to nest 
   if (!is.null(trelliData$omicsData)) {
     
-    # Fold change columns
+    # Identify fold change columns
     foldchanges <- NULL 
     if (any(grepl("Fold_change_", colnames(trelliData$trelliData)))) {
       foldchanges <- colnames(trelliData$trelliData)[grepl("Fold_change_", colnames(trelliData$trelliData))]
     }
-
-    # List bare minimum columns needed
-    needed_cols <- c(attr(trelliData, "edata_col"), 
-                     attr(trelliData, "emeta_col"), 
-                     attr(trelliData, "fdata_col"), 
-                     "Abundance", 
-                     foldchanges)
+    
+    # Identify p value columns
+    pvalues <- NULL 
+    if (any(grepl("P_value_", colnames(trelliData$trelliData)))) {
+      pvalues <- colnames(trelliData$trelliData)[grepl("P_value_", colnames(trelliData$trelliData))]
+    }
+    
+    # Identify which columns are needed, which columns should be tossed, and which
+    # columns could stay based on whether the data is paneled by the edata_col, 
+    # fdata_col, or emeta_col 
+    if (panel == attr(trelliData, "edata_col")) {
+      
+      # In this case, only fold changes need to be in the nested columns, if applicable.
+      needed_cols <- unique(c(attr(trelliData, "edata_col"), 
+                              attr(trelliData, "fdata_col"), 
+                              panel, "Group", "Abundance", 
+                              foldchanges))
+      
+    } else if (panel == attr(trelliData, "fdata_col")) {
+      
+      # Only edata_col, fdata_col, and abundance are needed when grouping by sample
+      needed_cols <- unique(c(attr(trelliData, "edata_col"), 
+                              attr(trelliData, "fdata_col"), 
+                              "Abundance"))
+      
+      # Toss unnecessary columns
+      trelliData$trelliData <- trelliData$trelliData %>% dplyr::select_at(needed_cols)
+      
+    } else if (panel %in% attr(trelliData, "emeta_col")) {
+      
+      # Count, Mean, and Flag columns are not needed 
+      trelliData$trelliData <- trelliData$trelliData[!grepl("Count_|Mean_|Flag_", colnames(trelliData$trelliData))]
+      
+      # In this case, fold changes and pvalues should go into the nested column, if applicable
+      needed_cols <- unique(c(attr(trelliData, "edata_col"), 
+                              attr(trelliData, "fdata_col"), 
+                              panel, "Group", "Abundance", 
+                              foldchanges, pvalues))
+      
+    }
     
     # Nest the data
     nested <- trelliData$trelliData %>% 
@@ -704,13 +738,38 @@ trelli_panel_by <- function(trelliData, panel) {
       tidyr::nest() %>%
       dplyr::ungroup() %>%
       dplyr::rename(Nested_DF = data)
-
     
     # Add data that does not need to be nested
-    if (any(colnames(trelliData$trelliData) %in% needed_cols) == FALSE) {
+    if (all(colnames(trelliData$trelliData) %in% needed_cols) == FALSE) {
       
-      browser()
+      # Pull columns to append
+      cols_2_append <- c(panel, colnames(trelliData$trelliData)[colnames(trelliData$trelliData) %in% needed_cols == FALSE])
       
+      # See if data can be kept numeric. If there's any duplicates, then no. 
+      as_numeric <- TRUE
+      
+      # Collapse by panel
+      to_append <- trelliData$trelliData[,cols_2_append] %>%
+        dplyr::group_by_at(panel) %>%
+        dplyr::summarize_all(function(x) {
+          
+          # Grab unique entries
+          unique_entries <- unique(x)
+          
+          # Return as is if numerics are acceptable
+          if (length(unique_entries) == 1 & as_numeric) {
+            return(unique_entries)
+          } else if (length(unique_entries) == 1) {
+            return(as.character(unique_entries))
+          } else {
+            as_numeric <- FALSE
+            return(paste0(unique_entries, collapse = ";"))
+          }
+        })
+      
+      # Append collapsed data.frame
+      nested <- dplyr::left_join(nested, to_append, by = panel)
+    
     }
     
     # Add nested data
