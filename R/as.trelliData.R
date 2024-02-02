@@ -697,15 +697,22 @@ trelli_panel_by <- function(trelliData, panel) {
       pvalues <- colnames(trelliData$trelliData)[grepl("P_value_", colnames(trelliData$trelliData))]
     }
     
+    # Identify expression columns (different depending on whether the data is MS/NMR or seq)
+    if (inherits(trelliData, "trelliData.seqData")) {
+      expression_cols <-  c("LCPM", "Count")
+    } else {
+      expression_cols <- c("Abundance")
+    }
+    
     # Identify which columns are needed, which columns should be tossed, and which
     # columns could stay based on whether the data is paneled by the edata_col, 
     # fdata_col, or emeta_col 
     if (panel == attr(trelliData, "edata_col")) {
-      
+  
       # In this case, only fold changes need to be in the nested columns, if applicable.
       needed_cols <- unique(c(attr(trelliData, "edata_col"), 
                               attr(trelliData, "fdata_col"), 
-                              panel, "Group", "Abundance", 
+                              panel, "Group", expression_cols, 
                               foldchanges))
       
     } else if (panel == attr(trelliData, "fdata_col")) {
@@ -713,7 +720,7 @@ trelli_panel_by <- function(trelliData, panel) {
       # Only edata_col, fdata_col, and abundance are needed when grouping by sample
       needed_cols <- unique(c(attr(trelliData, "edata_col"), 
                               attr(trelliData, "fdata_col"), 
-                              "Abundance"))
+                              expression_cols))
       
       # Toss unnecessary columns
       trelliData$trelliData <- trelliData$trelliData %>% dplyr::select_at(needed_cols)
@@ -726,14 +733,14 @@ trelli_panel_by <- function(trelliData, panel) {
       # In this case, fold changes and pvalues should go into the nested column, if applicable
       needed_cols <- unique(c(attr(trelliData, "edata_col"), 
                               attr(trelliData, "fdata_col"), 
-                              panel, "Group", "Abundance", 
+                              panel, "Group", expression_cols, 
                               foldchanges, pvalues))
       
     }
     
     # Nest the data
     nested <- trelliData$trelliData %>% 
-      dplyr::select(needed_cols) %>%
+      dplyr::select(dplyr::any_of(needed_cols)) %>%
       dplyr::group_by_at(panel) %>%
       tidyr::nest() %>%
       dplyr::ungroup() %>%
