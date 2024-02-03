@@ -279,23 +279,44 @@ protein_quant <- function(pepData, method, isoformRes = NULL,
   if (!is.null(emeta_cols)) {
     # Nab number of rows in e_data to compare with number of rows in e_meta.
     n_row_edata <- nrow(results$e_data)
-
-    # Grab the number of rows in e_meta depending on the rollup method used.
-    n_row_emeta <- if (is.null(results$e_meta)) {
+    n_row_emeta <- NULL
+    
+    if (is.null(results$e_meta)) {
       # Use either the original or isoform e_meta depending on the input.
       if (is.null(isoformRes)) {
-        nrow(unique(pepData$e_meta))
+        n_row_emeta <-
+          sapply(emeta_cols, \(x) 
+                 pepData$e_meta[,c(emeta_cname, x)] %>%
+                   dplyr::distinct() %>%
+                   nrow()
+          )
       } else {
-        nrow(e_meta_iso)
+        if (nrow(e_meta_iso) != n_row_edata) {
+          warning("One or more columns in emeta_cols contained values which ",
+                  "were not correctly aligned to the proteins. No emeta_cols ",
+                  "columns will be used.")
+          emeta_cols <- NULL
+        }
       }
     } else {
-      nrow(unique(results$e_meta))
+      n_row_emeta <- 
+        sapply(emeta_cols, \(x) 
+               results$e_meta[,c(emeta_cname, x)] %>%
+                 dplyr::distinct() %>%
+                 nrow()
+          )
     }
-
-    # Change emeta_cols to NULL if the number of e_data and unique e_meta rows
-    # do not match.
-    if (n_row_edata != n_row_emeta) {
-      emeta_cols <- NULL
+    
+    # Get the indexes of emeta_cols which are invalid
+    invalid_emeta_cols <- which(n_row_emeta != n_row_edata)
+    
+    # Remove the invalid columns
+    if (length(invalid_emeta_cols) > 0) {
+      warning("One or more columns in emeta_cols contained values which ",
+              "were not correctly aligned to the proteins. These columns ",
+              "will be removed: ", 
+              emeta_cols[invalid_emeta_cols])
+      emeta_cols <- emeta_cols[-invalid_emeta_cols]
     }
   }
 
