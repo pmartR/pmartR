@@ -128,14 +128,6 @@ summary.trelliData <- function(object, ...) {
   ## CALCULATE COUNTS ##
   ######################
 
-  # Unnest if the data has been nested, which is all paneled data except for 
-  # statRes only
-  if (panel_by & omics) {
-    plot_df <- trelliData$trelliData %>% tidyr::unnest(cols = c(Nested_DF))
-  } else {
-    plot_df <- trelliData$trelliData
-  }
-
   # Remove data type and add a holder for count
   All_Options <- All_Options %>%
     dplyr::mutate(`Number of Plots` = 0)

@@ -741,13 +741,12 @@ trelli_panel_by <- function(trelliData, panel) {
     # Nest the data
     nested <- trelliData$trelliData %>% 
       dplyr::select(dplyr::any_of(needed_cols)) %>%
-      dplyr::group_by_at(panel) %>%
-      tidyr::nest() %>%
-      dplyr::ungroup() %>%
-      dplyr::rename(Nested_DF = data)
+      dplyr::group_by_at(panel) 
     
     # Add data that does not need to be nested
     if (all(colnames(trelliData$trelliData) %in% needed_cols) == FALSE) {
+      
+      browser()
       
       # Pull columns to append
       cols_2_append <- c(panel, colnames(trelliData$trelliData)[colnames(trelliData$trelliData) %in% needed_cols == FALSE])
@@ -783,6 +782,8 @@ trelli_panel_by <- function(trelliData, panel) {
     trelliData$trelliData <- nested
     
   }
+  
+  
 
 
   # Export results--------------------------------------------------------------
