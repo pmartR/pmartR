@@ -419,25 +419,36 @@ trelli_abundance_boxplot <- function(trelliData,
     message(paste("Please panel by", get_edata_cname(trelliData$omicsData), "to get 'anova p-value' and 'fold change' as cognostics in the trelliscope display."))
   }
   
+  # Extract panel column
+  panel <- attr(trelliData, "panel_by_col")
+  
+  # Start summary toBuild data.frame
+  toBuild <- trelliData$trelliData
+
+  
+  browser()
+  
+  
   # First, add any missing cognostics-------------------------------------------
   
   # Maintain the original columns
-  ori_columns <- colnames(trelliData$trelliData)
+  ori_columns <- colnames(toBuild)
   
   # Add cognostics without groups
   if (is.null(attributes(trelliData$omicsData)$group_DF)) {
     
     # Since the data is not grouped, "median abundance", "cv abundance" are not 
     # permitted. Statistics and fold changes are not performed. 
-    trelliData$trelliData <- trelliData$trelliData %>% 
-      dplyr::mutate(
-        count = purrr::map_int(Nested_DF, function(x) {sum(!is.na(x$Abundance))}),
-        `mean abundance` = purrr::map_dbl(Nested_DF, function(x) {mean(x$Abundance, na.rm = T)})
+    toBuild <- toBuild %>% 
+      dplyr::group_by_at(panel) %>%
+      dplyr::summarize(
+        count = sum(!is.na(Abundance)),
+        `mean abundance` = mean(Abundance, na.rm = T)
       )
     
     # Change count to the proper name
     if (!is.null(count_name)) {
-      colnames(trelliData$trelliData)[which(colnames(trelliData$trelliData) == "count")] <- count_name
+      colnames(toBuild)[which(colnames(toBuild) == "count")] <- count_name
     }
     
   } else {
@@ -447,15 +458,20 @@ trelli_abundance_boxplot <- function(trelliData,
   }
   
   # Now, select only the requested cognostics 
-  trelliData$trelliData <- trelliData$trelliData %>%
-    dplyr::select(dplyr::all_of(c(ori_columns, cognostics)))
+  toBuild <- toBuild %>%
+    dplyr::select(dplyr::all_of(c(panel, cognostics)))
+  
+  # Add emeta columns
+  if (!is.null(attr(trelliData, "emeta_col"))) {
+    browser()
+  }
   
   # Second, make boxplot function-----------------------------------------------
 
   # First, generate the boxplot function
-  box_plot_fun <- function(Peptide) {
+  box_plot_fun <- function(Panel) {
     
-    browser()
+    DF <- dplyr::filter(trelliData$trelliData, Panel == {{Panel}})
     
     # Add a blank group if no group designation was given
     if (is.null(attributes(trelliData$omicsData)$group_DF)) {
@@ -498,9 +514,17 @@ trelli_abundance_boxplot <- function(trelliData,
     return(boxplot)
   }
   
-  # Add plots
-  trelliData$trelliData <- trelliData$trelliData %>%
-    dplyr::mutate(plots = trelliscope::panel_lazy(box_plot_fun))
+  # Add a panel column for plotting
+  trelliData$trelliData$Panel <- trelliData$trelliData[[panel]]
+  toBuild$Panel <- toBuild[[panel]]
+  
+  browser()
+  
+  # Add plots and remove that panel column
+  toBuild <- toBuild %>%
+    dplyr::group_by_at(panel) %>%
+    dplyr::mutate(plots = trelliscope::panel_lazy(box_plot_fun)) %>%
+    dplyr::select(-Panel)
   
   # Build trelliscope display---------------------------------------------------
 
@@ -509,12 +533,6 @@ trelli_abundance_boxplot <- function(trelliData,
     singleData <- trelliData$trelliData.omics[test_example[1], ]
     return(box_plot_fun(singleData$Nested_DF[[1]], unlist(singleData[1, 1])))
   } else {
-    # If test_mode is on, then just build the required panels
-    if (test_mode) {
-      toBuild <- trelliData$trelliData[test_example, ]
-    } else {
-      toBuild <- trelliData$trelliData
-    }
     
     browser()
     

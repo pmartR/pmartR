@@ -738,7 +738,7 @@ trelli_panel_by <- function(trelliData, panel) {
       
     }
     
-    # Nest the data
+    # Remove any unnecessary columns
     nested <- trelliData$trelliData %>% 
       dplyr::select(dplyr::any_of(needed_cols)) %>%
       dplyr::group_by_at(panel) 
@@ -746,13 +746,8 @@ trelli_panel_by <- function(trelliData, panel) {
     # Add data that does not need to be nested
     if (all(colnames(trelliData$trelliData) %in% needed_cols) == FALSE) {
       
-      browser()
-      
       # Pull columns to append
       cols_2_append <- c(panel, colnames(trelliData$trelliData)[colnames(trelliData$trelliData) %in% needed_cols == FALSE])
-      
-      # See if data can be kept numeric. If there's any duplicates, then no. 
-      as_numeric <- TRUE
       
       # Collapse by panel
       to_append <- trelliData$trelliData[,cols_2_append] %>%
@@ -763,15 +758,21 @@ trelli_panel_by <- function(trelliData, panel) {
           unique_entries <- unique(x)
           
           # Return as is if numerics are acceptable
-          if (length(unique_entries) == 1 & as_numeric) {
-            return(unique_entries)
-          } else if (length(unique_entries) == 1) {
+          if (length(unique_entries) == 1) {
             return(as.character(unique_entries))
           } else {
-            as_numeric <- FALSE
             return(paste0(unique_entries, collapse = ";"))
           }
         })
+      
+      # Convert any columns that can be numeric to that type
+      can_be_numeric <- lapply(2:ncol(to_append), function(theCol) {
+        all(grepl("^[[:digit:]]+$", to_append[,theCol]))
+      }) %>% unlist()
+      
+      if (any(can_be_numeric)) {
+        browser()
+      }
       
       # Append collapsed data.frame
       nested <- dplyr::left_join(nested, to_append, by = panel)

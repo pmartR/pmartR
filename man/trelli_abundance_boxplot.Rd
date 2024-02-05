@@ -49,7 +49,7 @@ Downloads.}
 \item{name}{The name of the display. Default is Trelliscope.}
 
 \item{build_trelliscope}{If TRUE, a trelliscope display will be built. Otherwise,
-a trelliscope dataframe will be returned. Default is TRUE.}
+a dataframe will be returned. Default is TRUE.}
 
 \item{test_mode}{A logical to return a smaller trelliscope to confirm plot
 and design. Default is FALSE.}
