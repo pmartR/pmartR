@@ -424,10 +424,6 @@ trelli_abundance_boxplot <- function(trelliData,
   
   # Start summary toBuild data.frame
   toBuild <- trelliData$trelliData
-
-  
-  browser()
-  
   
   # First, add any missing cognostics-------------------------------------------
   
@@ -437,13 +433,13 @@ trelli_abundance_boxplot <- function(trelliData,
   # Add cognostics without groups
   if (is.null(attributes(trelliData$omicsData)$group_DF)) {
     
-    # Since the data is not grouped, "median abundance", "cv abundance" are not 
-    # permitted. Statistics and fold changes are not performed. 
     toBuild <- toBuild %>% 
       dplyr::group_by_at(panel) %>%
       dplyr::summarize(
         count = sum(!is.na(Abundance)),
-        `mean abundance` = mean(Abundance, na.rm = T)
+        `mean abundance` = mean(Abundance, na.rm = T),
+        `median abundance` = median(Abundance, na.rm = T),
+        `cv abundance` = sd(Abundance, na.rm = T) / `mean abundance` * 100
       )
     
     # Change count to the proper name
@@ -464,6 +460,11 @@ trelli_abundance_boxplot <- function(trelliData,
   # Add emeta columns
   if (!is.null(attr(trelliData, "emeta_col"))) {
     browser()
+  }
+  
+  # Filter down if test mode
+  if (test_mode) {
+    toBuild <- toBuild[test_example,]
   }
   
   # Second, make boxplot function-----------------------------------------------
@@ -518,46 +519,33 @@ trelli_abundance_boxplot <- function(trelliData,
   trelliData$trelliData$Panel <- trelliData$trelliData[[panel]]
   toBuild$Panel <- toBuild[[panel]]
   
-  browser()
-  
   # Add plots and remove that panel column
   toBuild <- toBuild %>%
-    dplyr::group_by_at(panel) %>%
-    dplyr::mutate(plots = trelliscope::panel_lazy(box_plot_fun)) %>%
-    dplyr::select(-Panel)
+    dplyr::mutate(plots = trelliscope::panel_lazy(box_plot_fun)) 
   
   # Build trelliscope display---------------------------------------------------
 
   # Return a single plot if single_plot is TRUE
   if (single_plot) {
-    singleData <- trelliData$trelliData.omics[test_example[1], ]
-    return(box_plot_fun(singleData$Nested_DF[[1]], unlist(singleData[1, 1])))
-  } else {
     
-    browser()
+    singleData <- toBuild[test_example[1], "Panel"]
+    return(singleData)
+    
+  } else {
     
     # If build_trelliscope is true, then build the display. Otherwise, return 
     if (build_trelliscope) {
-      
-      
-      
+      trelliscope::as_trelliscope_df(
+        df = toBuild,
+        name = name,
+        path = path,
+        force_plot = TRUE,
+        ...
+      ) %>%
+        trelliscope::view_trelliscope()
     } else {
-      
-      
-      
-      
+      return(toBuild)
     }
-    
-
-    # Pass parameters to trelli_builder function
-    trelli_builder(toBuild = toBuild,
-                   cognostics = cognostics, 
-                   plotFUN = box_plot_fun,
-                   cogFUN = box_cog_fun,
-                   path = path,
-                   name = name,
-                   remove_nestedDF = FALSE,
-                   ...)
     
   }
 }
