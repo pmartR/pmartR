@@ -1521,7 +1521,7 @@ na_scatter <- function (edata, group_df, na.by.molecule, edata_cname,
     # Calculate the mean intensity for each molecule by group. NaN can appear if
     # an entire row has all NA values.
     mean_by_group <- lapply(indices_list,
-      function(x, temp_edata) rowMeans(temp_edata[, x],
+      function(x, temp_edata) rowMeans(temp_edata[x],
         na.rm = TRUE
       ),
       temp_edata = edata[, -edata_cname_id]
