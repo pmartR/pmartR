@@ -12,6 +12,9 @@
 #'
 #' @param y replacement value, usually numeric or NA
 #'
+#' @param threshold Positive numeric value.  Observed values below this
+#'  threshold will be replaced by `y` (in addition to all `x` values).
+#' 
 #' @details This function is often used to replace any 0 values in peptide,
 #'   protein, metabolite, or lipid data with NA's. For omicsData on the
 #'   abundance scale, when the omicsData object is created, any 0's in e_data
@@ -29,7 +32,7 @@
 #'
 #' @export
 #'
-edata_replace <- function(omicsData, x, y) {
+edata_replace <- function(omicsData, x, y, threshold = NULL) {
   ## some initial checks ##
 
   # check that omicsData is of appropriate class #
@@ -56,19 +59,48 @@ edata_replace <- function(omicsData, x, y) {
     num_replaced <- sum(is.na(omicsData$e_data[, -id_col]),
       na.rm = TRUE
     )
+
+    replace_inds <- which(is.na(omicsData$e_data[, -id_col]),
+      arr.ind = TRUE
+    )
   } else {
     num_replaced <- sum(omicsData$e_data[, -id_col] == x,
       na.rm = TRUE
     )
+
+    replace_inds <- which(omicsData$e_data[, -id_col] == x,
+      arr.ind = TRUE
+    )
+  }
+
+  # also count the number of values below the threshold and get indices to 
+  # replace
+  if (!is.null(threshold)) {
+    cond_thresh <- omicsData$e_data[, -id_col] < threshold
+    cond_match <- if(is.na(x)) {
+      !is.na(omicsData$e_data[, -id_col])
+    } else {
+      !omicsData$e_data[, -id_col] == x
+    }
+
+    cond <- cond_thresh & cond_match
+
+    num_thresholded <- sum(cond,
+      na.rm = TRUE
+    )
+
+    threshold_inds = which(cond,
+      arr.ind = TRUE
+    )
   }
 
   # Update the e_data data frame in the omicsData object.
-  omicsData$e_data[, -id_col] <- apply(omicsData$e_data[, -id_col],
-    2,
-    vector_replace,
-    x = x,
-    y = y
-  )
+  omicsData$e_data[, -id_col][replace_inds] <- y
+
+  # replace values below the threshold with y
+  if (!is.null(threshold)) {
+    omicsData$e_data[, -id_col][threshold_inds] <- y
+  }
 
   # Update the data_info attribute of the omicsData object.
   attr(omicsData, 'data_info') <- set_data_info(
@@ -91,6 +123,17 @@ edata_replace <- function(omicsData, x, y) {
     y,
     sep = " "
   ))
+
+  # Report the number of values below the threshold that were replaced
+  if (!is.null(threshold)) {
+    message(paste(num_thresholded,
+      "values below the threshold",
+      threshold,
+      "have been replaced with",
+      y,
+      sep = " "
+    ))
+  }
 
   # Return the updated omicsData object.
   return(omicsData)
