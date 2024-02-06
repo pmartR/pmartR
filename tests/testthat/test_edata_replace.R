@@ -110,6 +110,16 @@ test_that('edata_replace correctly replaces one value with another', {
     sprintf("%s values below the threshold %s have been replaced with %s", num_thresholded, thresh, 0)
   )
 
+  expect_error(
+    edata_replace(
+      omicsData = isodata,
+      x = NA,
+      y = 0,
+      threshold = min(isodata$e_data[,-1], na.rm=TRUE) - 1
+    ),
+    'outside the range of the data'
+  )
+
   expect_equal(sum(isodata2$e_data == 0), 400 + num_thresholded)
 
   # Load: lipidData ------------------------------------------------------------
@@ -200,6 +210,16 @@ test_that('edata_replace correctly replaces one value with another', {
       threshold = thresh
     ),
     sprintf("%s values below the threshold %s have been replaced with %s", num_thresholded, thresh, 0)
+  )
+
+  expect_error(
+    edata_replace(
+      omicsData = ldata,
+      x = NA,
+      y = 0,
+      threshold = max(ldata$e_data[,-1], na.rm=TRUE) + 1
+    ),
+    'outside the range of the data'
   )
 
   expect_equal(sum(ldata2$e_data == 0), 884 + num_thresholded)
@@ -406,6 +426,16 @@ test_that('edata_replace correctly replaces one value with another', {
     sprintf("%s values below the threshold %s have been replaced with %s", num_thresholded, thresh, 0)
   )
 
+  expect_error(
+    edata_replace(
+      omicsData = nmrdata,
+      x = NA,
+      y = 0,
+      threshold = max(nmrdata$e_data[,-1], na.rm=TRUE) + 1
+    ),
+    'outside the range of the data'
+  )
+
   expect_equal(sum(nmrdata2$e_data == 0), 302 + num_thresholded)
 
   # Load: pepData --------------------------------------------------------------
@@ -496,6 +526,16 @@ test_that('edata_replace correctly replaces one value with another', {
       threshold = thresh
     ),
     sprintf("%s values below the threshold %s have been replaced with %s", num_thresholded, thresh, 0)
+  )
+
+  expect_error(
+    edata_replace(
+      omicsData = pdata,
+      x = NA,
+      y = 0,
+      threshold = min(pdata$e_data[,-1], na.rm=TRUE) - 1
+    ),
+    'outside the range of the data'
   )
 
   expect_equal(sum(pdata2$e_data == 0), 341 + num_thresholded)

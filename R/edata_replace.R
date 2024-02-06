@@ -76,6 +76,13 @@ edata_replace <- function(omicsData, x, y, threshold = NULL) {
   # also count the number of values below the threshold and get indices to 
   # replace
   if (!is.null(threshold)) {
+    max_val <- max(omicsData$e_data[, -id_col], na.rm = TRUE)
+    min_val <- min(omicsData$e_data[, -id_col], na.rm = TRUE)
+
+    if (threshold < min_val || threshold > max_val) {
+      stop("The threshold value is outside the range of the data.  Check your that your data is on the scale you expect, and that the threshold value is within the range of the data.")
+    }
+
     cond_thresh <- omicsData$e_data[, -id_col] < threshold
     cond_match <- if(is.na(x)) {
       !is.na(omicsData$e_data[, -id_col])
