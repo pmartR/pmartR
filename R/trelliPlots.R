@@ -427,11 +427,8 @@ trelli_abundance_boxplot <- function(trelliData,
   
   # First, add any missing cognostics-------------------------------------------
   
-  # Maintain the original columns
-  ori_columns <- colnames(toBuild)
-  
   # Add cognostics without groups
-  if (is.null(attributes(trelliData$omicsData)$group_DF)) {
+  if ("Group" %in% colnames(toBuild) == FALSE) {
     
     toBuild <- toBuild %>% 
       dplyr::group_by_at(panel) %>%
@@ -447,19 +444,49 @@ trelli_abundance_boxplot <- function(trelliData,
       colnames(toBuild)[which(colnames(toBuild) == "count")] <- count_name
     }
     
+    # Now, select only the requested cognostics 
+    toBuild <- toBuild %>%
+      dplyr::select(dplyr::all_of(c(panel, cognostics)))
+    
   } else {
     
-    browser()
+    # Make a group variable name just to make group_by_at work properly
+    theGroup <- "Group"
     
-  }
-  
-  # Now, select only the requested cognostics 
-  toBuild <- toBuild %>%
-    dplyr::select(dplyr::all_of(c(panel, cognostics)))
-  
-  # Add emeta columns
-  if (!is.null(attr(trelliData, "emeta_col"))) {
-    browser()
+    # Add cognostics per group
+    toBuild <- toBuild %>% 
+      dplyr::group_by_at(c(panel, theGroup)) %>%
+      dplyr::summarise(
+        count = sum(!is.na(Abundance)),
+        `mean abundance` = mean(Abundance, na.rm = T), 
+      ) %>%
+      tidyr::pivot_wider(id_cols = panel, names_from = Group, values_from = c(count, `mean abundance`), names_sep = " ")
+    
+    # Now remove unwanted cognostics
+    if ("mean abundance" %in% cognostics == FALSE) {
+      toBuild <- toBuild[,grepl("mean abundance", colnames(toBuild)) == FALSE]
+    }
+    if (any(grepl("count", cognostics)) == FALSE) {
+      toBuild <- toBuild[,grepl("count", colnames(toBuild)) == FALSE]
+    }
+    
+    # Add emeta columns
+    if (!is.null(attr(trelliData, "emeta_col"))) {
+      
+      # Pull emeta uniqued columns that should have been prepped in the pivot_longer section
+      emeta <- trelliData$trelliData[,c(panel, attr(trelliData, "emeta_col"))] %>% unique()
+
+      # Trigger an error 
+      if (nrow(emeta) != nrow(toBuild)) {
+        stop(paste0("emeta data did not panel correctly. Please immediately report this", 
+                    " issue to the issue page with an example."))
+      }
+      
+      # Add emeta cognostics
+      toBuild <- dplyr::left_join(toBuild, emeta, by = panel)
+      
+    }
+    
   }
   
   # Filter down if test mode
@@ -475,7 +502,7 @@ trelli_abundance_boxplot <- function(trelliData,
     DF <- dplyr::filter(trelliData$trelliData, Panel == {{Panel}})
     
     # Add a blank group if no group designation was given
-    if (is.null(attributes(trelliData$omicsData)$group_DF)) {
+    if ("Group" %in% colnames(toBuild) == FALSE) {
       DF$Group <- "x"
     }
     
@@ -492,7 +519,7 @@ trelli_abundance_boxplot <- function(trelliData,
     }
 
     # Remove x axis if no groups
-    if (is.null(attributes(trelliData$omicsData)$group_DF)) {
+    if ("Group" %in% colnames(toBuild) == FALSE) {
       boxplot <- boxplot + ggplot2::theme(
         axis.title.x = ggplot2::element_blank(),
         axis.ticks.x = ggplot2::element_blank(),
@@ -521,6 +548,7 @@ trelli_abundance_boxplot <- function(trelliData,
   
   # Add plots and remove that panel column
   toBuild <- toBuild %>%
+    dplyr::ungroup() %>%
     dplyr::mutate(plots = trelliscope::panel_lazy(box_plot_fun)) 
   
   # Build trelliscope display---------------------------------------------------
