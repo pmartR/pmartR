@@ -765,13 +765,15 @@ trelli_panel_by <- function(trelliData, panel) {
           }
         })
       
-      # Convert any columns that can be numeric to that type
+      # Check if any column can be numeric
       can_be_numeric <- lapply(2:ncol(to_append), function(theCol) {
-        all(grepl("^[[:digit:]]+$", to_append[,theCol]))
+        all(grepl("^[0-9]{1,}$", unlist(to_append[,theCol])))
       }) %>% unlist()
       
+      # Convert any columns that can be numeric to that type
       if (any(can_be_numeric)) {
-        browser()
+        change <- (2:ncol(to_append))[can_be_numeric]
+        to_append <- to_append %>% dplyr::mutate_at(change, as.numeric)
       }
       
       # Append collapsed data.frame
