@@ -62,16 +62,16 @@ summary.trelliData <- function(object, ...) {
     `Panel By Choice` = c(
       rep("e_data cname", 4),
       rep("f_data cname", 2),
-      rep("e_meta column", 6)
+      rep("e_meta column", 5)
     ),
     Plot = c(
       "abundance boxplot", "abundance histogram", "missingness bar",
       "fold change bar", "abundance boxplot", "missingness bar",
-      "abundance boxplot", "abundance heatmap", "missingness bar",
+      "abundance heatmap", "missingness bar",
       "fold change boxplot", "fold change heatmap", "fold change volcano"
     ),
     `Data Type` = c(
-      "omics", "omics", NA, "stat", "omics", NA, "omics", "omics",
+      "omics", "omics", NA, "stat", "omics", NA, "omics",
       NA, "stat", "stat", "stat"
     )
   )

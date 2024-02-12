@@ -182,6 +182,20 @@ quick_cog <- function(name, value) {
   dplyr::tibble(!!dplyr::sym(name) := trelliscopejs::cog(value, desc = name))
 }
 
+# This function builds a trelliscope display from a trelliscope data.frame using lazy panel
+trelli_builder_lazy <- function(toBuild, path, name, ...) {
+  
+  trelliscope::as_trelliscope_df(
+    df = toBuild,
+    name = name,
+    path = path,
+    force_plot = TRUE,
+    ...
+  ) %>%
+    trelliscope::view_trelliscope()
+  
+}
+
 # This function builds all trelliscopes.
 trelli_builder <- function(toBuild, cognostics, plotFUN, cogFUN, path, name, remove_nestedDF, ...) {
   
@@ -316,9 +330,8 @@ trelli_builder <- function(toBuild, cognostics, plotFUN, cogFUN, path, name, rem
 #' trelli_panel_by(trelliData = trelliData2, panel = "Peptide") %>% 
 #'    trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10, path = tempdir())
 #'
-#' # Build the abundance boxplot with an omicsData object. The panel is a biomolecule class,
-#' # which is proteins in this case.
-#' trelli_panel_by(trelliData = trelliData2, panel = "RazorProtein") %>% 
+#' # Build the abundance boxplot with an omicsData object. 
+#' trelli_panel_by(trelliData = trelliData2, panel = "Peptide") %>% 
 #'    trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10, path = tempdir())
 #'
 #' # Build the abundance boxplot with an omicsData and statRes object.
@@ -333,7 +346,7 @@ trelli_builder <- function(toBuild, cognostics, plotFUN, cogFUN, path, name, rem
 #'      ggplot_params = c("ylab('')", "ylim(c(20,30))"))
 #'
 #' # Or making the plot interactive 
-#' trelli_panel_by(trelliData = trelliData4, panel = "RazorProtein") %>% 
+#' trelli_panel_by(trelliData = trelliData4, panel = "Peptide") %>% 
 #'     trelli_abundance_boxplot(
 #'      interactive = TRUE, test_mode = TRUE, test_example = 1:10, path = tempdir())
 #' 
@@ -373,6 +386,14 @@ trelli_abundance_boxplot <- function(trelliData,
                   seqText = "Use trelli_rnaseq_boxplot instead.",
                   p_value_thresh = NULL)
   
+  # Extract panel column
+  panel <- attr(trelliData, "panel_by_col")
+  
+  # Paneling by e_meta col is not allowed
+  if (panel %in% attr(trelliData, "emeta_col")) {
+    stop("Paneling by an e_meta column is not allowed for trelli_abundance_boxplot. Try `trelli_abundance_heatmap`")
+  }
+  
   # Remove stat specific options if no stats data was provided 
   if (is.null(trelliData$statRes)) {
     if (any(c("anova p-value", "fold change") %in% cognostics) & is.null(trelliData$statRes)) {
@@ -384,7 +405,7 @@ trelli_abundance_boxplot <- function(trelliData,
   }
   
   # Remove median and cv as cognostics if data is grouped
-  if (!inherits(trelliData, "trelliData.edata")) {
+  if (!inherits(trelliData, "trelliData.edata") & panel == attr(trelliData, "edata_col")) {
     if (any(c("median abundance", "cv abundance") %in% cognostics)) {
       cognostics <- cognostics[-match(c("median abundance", "cv abundance"), cognostics, nomatch = 0)]
       message("'median abundance' and 'cv abundance' are not permitted when groups have been specified.")
@@ -415,13 +436,11 @@ trelli_abundance_boxplot <- function(trelliData,
     
   }
   
-  if (any(c("anova p-value", "fold change") %in% cognostics) & attr(trelliData, "panel_by") != get_edata_cname(trelliData$omicsData)) {
+  if (any(c("anova p-value", "fold change") %in% cognostics) & panel != get_edata_cname(trelliData$omicsData)) {
     message(paste("Please panel by", get_edata_cname(trelliData$omicsData), "to get 'anova p-value' and 'fold change' as cognostics in the trelliscope display."))
+    cognostics <- cognostics[cognostics %in% c("anova p-value", "fold change") == FALSE]
   }
-  
-  # Extract panel column
-  panel <- attr(trelliData, "panel_by_col")
-  
+
   # Start summary toBuild data.frame
   toBuild <- trelliData$trelliData
   
@@ -489,6 +508,18 @@ trelli_abundance_boxplot <- function(trelliData,
     
   }
   
+  # Add p-values and fold changes 
+  if ("anova p-value" %in% cognostics) {
+    anova_cols <- colnames(trelliData$trelliData)[grepl("P_value_A", colnames(trelliData$trelliData))]
+    anova_data <- trelliData$trelliData[,c(panel, anova_cols)] %>% unique()
+    toBuild <- dplyr::left_join(toBuild, anova_data, by = panel)
+  }
+  if ("fold change" %in% cognostics) {
+    fc_cols <- colnames(trelliData$trelliData)[grepl("Fold_change", colnames(trelliData$trelliData))]
+    fc_data <- trelliData$trelliData[,c(panel, fc_cols)] %>% unique()
+    toBuild <- dplyr::left_join(toBuild, fc_data, by = panel)
+  }
+  
   # Filter down if test mode
   if (test_mode) {
     toBuild <- toBuild[test_example,]
@@ -502,7 +533,7 @@ trelli_abundance_boxplot <- function(trelliData,
     DF <- dplyr::filter(trelliData$trelliData, Panel == {{Panel}})
     
     # Add a blank group if no group designation was given
-    if ("Group" %in% colnames(toBuild) == FALSE) {
+    if ("Group" %in% colnames(DF) == FALSE) {
       DF$Group <- "x"
     }
     
@@ -563,14 +594,7 @@ trelli_abundance_boxplot <- function(trelliData,
     
     # If build_trelliscope is true, then build the display. Otherwise, return 
     if (build_trelliscope) {
-      trelliscope::as_trelliscope_df(
-        df = toBuild,
-        name = name,
-        path = path,
-        force_plot = TRUE,
-        ...
-      ) %>%
-        trelliscope::view_trelliscope()
+      trelli_builder_lazy(toBuild, path, name, ...)
     } else {
       return(toBuild)
     }
