@@ -494,12 +494,6 @@ trelli_abundance_boxplot <- function(trelliData,
       
       # Pull emeta uniqued columns that should have been prepped in the pivot_longer section
       emeta <- trelliData$trelliData[,c(panel, attr(trelliData, "emeta_col"))] %>% unique()
-
-      # Trigger an error 
-      if (nrow(emeta) != nrow(toBuild)) {
-        stop(paste0("emeta data did not panel correctly. Please immediately report this", 
-                    " issue to the issue page with an example."))
-      }
       
       # Add emeta cognostics
       toBuild <- dplyr::left_join(toBuild, emeta, by = panel)
@@ -527,7 +521,6 @@ trelli_abundance_boxplot <- function(trelliData,
   
   # Second, make boxplot function-----------------------------------------------
 
-  # First, generate the boxplot function
   box_plot_fun <- function(Panel) {
     
     DF <- dplyr::filter(trelliData$trelliData, Panel == {{Panel}})
@@ -580,7 +573,8 @@ trelli_abundance_boxplot <- function(trelliData,
   # Add plots and remove that panel column
   toBuild <- toBuild %>%
     dplyr::ungroup() %>%
-    dplyr::mutate(plots = trelliscope::panel_lazy(box_plot_fun)) 
+    dplyr::mutate(plots = trelliscope::panel_lazy(box_plot_fun)) %>%
+    dplyr::select(-Panel)
   
   # Build trelliscope display---------------------------------------------------
 
@@ -614,7 +608,7 @@ trelli_abundance_boxplot <- function(trelliData,
 #'   as.trelliData.edata, and grouped by edata_cname in trelli_panel_by.
 #'   Required.
 #' @param cognostics A vector of cognostic options for each plot. Valid entries
-#'   are "sample count", "mean abundance", "median abundance", "cv abundance", 
+#'   are "count", "mean abundance", "median abundance", "cv abundance", 
 #'   and "skew abundance". All are included by default. 
 #' @param ggplot_params An optional vector of strings of ggplot parameters to
 #'   the backend ggplot function. For example, c("ylab('')", "ylim(c(1,2))").
@@ -625,6 +619,8 @@ trelli_abundance_boxplot <- function(trelliData,
 #' @param path The base directory of the trelliscope application. Default is
 #'   Downloads.
 #' @param name The name of the display. Default is Trelliscope.
+#' @param build_trelliscope If TRUE, a trelliscope display will be built. Otherwise,
+#'   a dataframe will be returned. Default is TRUE. 
 #' @param test_mode A logical to return a smaller trelliscope to confirm plot
 #'   and design. Default is FALSE.
 #' @param test_example A vector of plot indices to return for test_mode. Default
@@ -700,8 +696,9 @@ trelli_abundance_histogram <- function(trelliData,
                                        cognostics = c("sample count", "mean abundance", "median abundance", "cv abundance", "skew abundance"),
                                        ggplot_params = NULL,
                                        interactive = FALSE,
-                                       path = .getDownloadsFolder(),
+                                       path = tempdir(),
                                        name = "Trelliscope",
+                                       build_trelliscope = TRUE,
                                        test_mode = FALSE,
                                        test_example = 1,
                                        single_plot = FALSE,
@@ -715,6 +712,7 @@ trelli_abundance_histogram <- function(trelliData,
                   acceptable_cognostics = c("sample count", "mean abundance", "median abundance", "cv abundance", "skew abundance"),
                   ggplot_params = ggplot_params,
                   interactive = interactive,
+                  build_trelliscope = TRUE,
                   test_mode = test_mode, 
                   test_example = test_example,
                   single_plot = single_plot,
@@ -722,6 +720,8 @@ trelli_abundance_histogram <- function(trelliData,
                   seqText = "Use trelli_rnaseq_histogram instead.",
                   p_value_thresh = NULL)
 
+  # Extract panel column
+  panel <- attr(trelliData, "panel_by_col")
   
   # Round test example to integer 
   if (test_mode) {
@@ -730,21 +730,53 @@ trelli_abundance_histogram <- function(trelliData,
   
   # Check that group data is edata_cname
   edata_cname <- pmartR::get_edata_cname(trelliData$omicsData)
-  if (edata_cname != attr(trelliData, "panel_by_omics")) {
+  if (edata_cname != panel) {
     stop("trelliData must be grouped by edata_cname.")
+  }
+  
+  # Start summary toBuild data.frame
+  toBuild <- trelliData$trelliData
+  
+  # First, add any missing cognostics-------------------------------------------
+  
+  toBuild <- toBuild %>% 
+    dplyr::group_by_at(panel) %>%
+    dplyr::summarize(
+      count = sum(!is.na(Abundance)),
+      `mean abundance` = mean(Abundance, na.rm = T),
+      `median abundance` = median(Abundance, na.rm = T),
+      `cv abundance` = sd(Abundance, na.rm = T) / `mean abundance` * 100,
+      `skew abundance` = e1071::skewness(Abundance, na.rm = T)
+    )
+  
+  # Add emeta columns
+  if (!is.null(attr(trelliData, "emeta_col"))) {
+    
+    # Pull emeta uniqued columns that should have been prepped in the pivot_longer section
+    emeta <- trelliData$trelliData[,c(panel, attr(trelliData, "emeta_col"))] %>% unique()
+    
+    # Add emeta cognostics
+    toBuild <- dplyr::left_join(toBuild, emeta, by = panel)
+    
+  }
+  
+  # Filter down if test mode
+  if (test_mode) {
+    toBuild <- toBuild[test_example,]
   }
 
   # Make histogram function-----------------------------------------------------
 
-  # First, generate the histogram function
-  hist_plot_fun <- function(DF, title) {
+  hist_plot_fun <- function(Panel) {
+    
+    DF <- dplyr::filter(trelliData$trelliData, Panel == {{Panel}})
+    
     # Remove NAs
     DF <- DF[!is.na(DF$Abundance), ]
 
     # Build plot
     histogram <- ggplot2::ggplot(DF, ggplot2::aes(x = Abundance)) +
       ggplot2::geom_histogram(bins = 10, fill = "steelblue", color = "black") +
-      ggplot2::ggtitle(title) +
       ggplot2::theme_bw() +
       ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) +
       ggplot2::xlab(paste(attr(trelliData$omicsData, "data_info")$data_scale, "Abundance")) +
@@ -764,49 +796,33 @@ trelli_abundance_histogram <- function(trelliData,
 
     return(histogram)
   }
-  
-  # Create cognostic function---------------------------------------------------
-
-  # Second, create function to return cognostics
-  hist_cog_fun <- function(DF, biomolecule) {
-    # Set basic cognostics for ungrouped data or in case when data is not split by fdata_cname
-    cog <- list(
-      "sample count" = dplyr::tibble(`Sample Count` = trelliscopejs::cog(sum(!is.na(DF$Abundance)), desc = "Sample Count")),
-      "mean abundance" = dplyr::tibble(`Mean Abundance` = trelliscopejs::cog(round(mean(DF$Abundance, na.rm = TRUE), 4), desc = "Mean Abundance")), 
-      "median abundance" = dplyr::tibble(`Median Abundance` = trelliscopejs::cog(round(median(DF$Abundance, na.rm = TRUE), 4), desc = "Median Abundance")), 
-      "cv abundance" = dplyr::tibble(`CV Abundance` = trelliscopejs::cog(round((sd(DF$Abundance, na.rm = TRUE) / mean(DF$Abundance, na.rm = T)) * 100, 4), desc = "CV Abundance")), 
-      "skew abundance" = dplyr::tibble(`Skew Abundance` = trelliscopejs::cog(round(e1071::skewness(DF$Abundance, na.rm = TRUE), 4), desc= "Skew Abundance"))
-    )
-    
-    # If cognostics are any of the cog, then add them 
-    cog_to_trelli <- do.call(dplyr::bind_cols, lapply(cognostics, function(x) {cog[[x]]})) %>% dplyr::tibble()
-    
-    return(cog_to_trelli)
-  }
 
   # Build trelliscope display---------------------------------------------------
-
+  
+  # Add a panel column for plotting
+  trelliData$trelliData$Panel <- trelliData$trelliData[[panel]]
+  toBuild$Panel <- toBuild[[panel]]
+  
+  # Add plots and remove that panel column
+  toBuild <- toBuild %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(plots = trelliscope::panel_lazy(hist_plot_fun)) %>%
+    dplyr::select(-Panel)
+  
   # Return a single plot if single_plot is TRUE
   if (single_plot) {
-    singleData <- trelliData$trelliData.omics[test_example[1], ]
-    return(hist_plot_fun(singleData$Nested_DF[[1]], unlist(singleData[1, 1])))
+    
+    singleData <- toBuild[test_example[1], "Panel"]
+    return(singleData)
+    
   } else {
-    # If test_mode is on, then just build the required panels
-    if (test_mode) {
-      toBuild <- trelliData$trelliData.omics[test_example, ]
+    
+    # If build_trelliscope is true, then build the display. Otherwise, return 
+    if (build_trelliscope) {
+      trelli_builder_lazy(toBuild, path, name, ...)
     } else {
-      toBuild <- trelliData$trelliData.omics
+      return(toBuild)
     }
-
-    # Pass parameters to trelli_builder function
-    trelli_builder(toBuild = toBuild,
-                   cognostics = cognostics, 
-                   plotFUN = hist_plot_fun,
-                   cogFUN = hist_cog_fun,
-                   path = path,
-                   name = name,
-                   remove_nestedDF = FALSE,
-                   ...)
     
   }
 }
@@ -818,6 +834,7 @@ trelli_abundance_histogram <- function(trelliData,
 #' @description Specify a plot design and cognostics for the abundance heatmap
 #'   trelliscope. Data must be grouped by an e_meta column. Main_effects order
 #'   the y-variables. All statRes data is ignored. For RNA-Seq data, use "trelli_rnaseq_heatmap".
+#'   Note that z-scores are plotted per biomolecule for ease of comparison.
 #'
 #' @param trelliData A trelliscope data object made by as.trelliData, and
 #'   grouped by an emeta variable. Required.
@@ -834,6 +851,8 @@ trelli_abundance_histogram <- function(trelliData,
 #' @param path The base directory of the trelliscope application. Default is
 #'   Downloads.
 #' @param name The name of the display. Default is Trelliscope
+#' @param build_trelliscope If TRUE, a trelliscope display will be built. Otherwise,
+#'   a dataframe will be returned. Default is TRUE. 
 #' @param test_mode A logical to return a smaller trelliscope to confirm plot
 #'   and design. Default is FALSE.
 #' @param test_example A vector of plot indices to return for test_mode. Default
@@ -899,6 +918,7 @@ trelli_abundance_heatmap <- function(trelliData,
                                      interactive = FALSE,
                                      path = .getDownloadsFolder(),
                                      name = "Trelliscope",
+                                     build_trelliscope = TRUE,
                                      test_mode = FALSE,
                                      test_example = 1,
                                      single_plot = FALSE,
@@ -912,12 +932,16 @@ trelli_abundance_heatmap <- function(trelliData,
                   acceptable_cognostics = c("sample count", "mean abundance", "biomolecule count"),
                   ggplot_params = ggplot_params,
                   interactive = interactive,
+                  build_trelliscope = TRUE,
                   test_mode = test_mode, 
                   test_example = test_example,
                   single_plot = single_plot,
                   seqDataCheck = "no",
                   seqText = "Use trelli_rnaseq_heatmap instead.",
                   p_value_thresh = NULL)
+  
+  # Extract panel column
+  panel <- attr(trelliData, "panel_by_col")
   
   # Round test example to integer 
   if (test_mode) {
@@ -937,10 +961,12 @@ trelli_abundance_heatmap <- function(trelliData,
   # Get the edata variable name
   edata_cname <- get_edata_cname(trelliData$omicsData)
   
+  
+  
   # Make heatmap function-------------------------------------------------------
 
   # First, generate the heatmap function
-  hm_plot_fun <- function(DF, title) {
+  hm_plot_fun <- function(Panel) {
     # Get fdata_cname
     fdata_cname <- get_fdata_cname(trelliData$omicsData)
 
