@@ -139,6 +139,8 @@ protein_quant <- function(pepData, method, isoformRes = NULL,
   data_scale <- get_data_scale(pepData)
   is_normalized <- attr(pepData, "data_info")$norm_info$is_normalized
 
+  browser()
+  
   # Prepare attribute info when isoformRes is present.
   if (!is.null(isoformRes)) {
     # Keep a copy of the original e_meta data frame. This will be used to
@@ -281,9 +283,9 @@ protein_quant <- function(pepData, method, isoformRes = NULL,
     n_row_edata <- nrow(results$e_data)
     n_row_emeta <- NULL
     
-    if (is.null(results$e_meta)) {
+    if (is.null(isoformRes)) {
+      if (is.null(results$e_meta)) {
       # Use either the original or isoform e_meta depending on the input.
-      if (is.null(isoformRes)) {
         n_row_emeta <-
           sapply(emeta_cols, \(x) 
                  pepData$e_meta[,c(emeta_cname, x)] %>%
@@ -292,30 +294,30 @@ protein_quant <- function(pepData, method, isoformRes = NULL,
           )
       } else {
         n_row_emeta <- 
-          sapply(emeta_cols, \(x)
-            e_meta %>%
-            dplyr::select(
-              all_of(c(emeta_cname, emeta_cols))
-            ) %>% 
-            dplyr::left_join(
-              e_meta_iso,
-              by = emeta_cname,
-              multiple = "all",
-              relationship = "many-to-many") %>%
-            dplyr::select(
-              !!dplyr::sym(emeta_cname_iso), !!dplyr::sym(x)
-            ) %>%
-            dplyr::distinct() %>%
-            nrow()
-          )
+          sapply(emeta_cols, \(x) 
+                 results$e_meta[,c(emeta_cname, x)] %>%
+                   dplyr::distinct() %>%
+                   nrow()
+            )
       }
     } else {
       n_row_emeta <- 
-        sapply(emeta_cols, \(x) 
-               results$e_meta[,c(emeta_cname, x)] %>%
-                 dplyr::distinct() %>%
-                 nrow()
-          )
+        sapply(emeta_cols, \(x)
+          e_meta %>%
+          dplyr::select(
+            all_of(c(emeta_cname, emeta_cols))
+          ) %>% 
+          dplyr::left_join(
+            e_meta_iso,
+            by = emeta_cname,
+            multiple = "all",
+            relationship = "many-to-many") %>%
+          dplyr::select(
+            !!dplyr::sym(emeta_cname_iso), !!dplyr::sym(x)
+          ) %>%
+          dplyr::distinct() %>%
+          nrow()
+        )
     }
     
     # Get the indexes of emeta_cols which are invalid
@@ -385,7 +387,7 @@ protein_quant <- function(pepData, method, isoformRes = NULL,
     peps_used <- if ("n_peps_used" %in% colnames(results$e_meta)) {
       # Extract counts from e_meta because peptides were counted in qrollup.
       results$e_meta %>%
-        dplyr::select(!!dplyr::sym(emeta_cname), n_peps_used) %>%
+        dplyr::select(!!dplyr::sym(emeta_cname_iso), n_peps_used) %>%
         # Only keep unique combinations of emeta_cname and n_peps_used
         dplyr::distinct()
     } else {
@@ -415,7 +417,7 @@ protein_quant <- function(pepData, method, isoformRes = NULL,
       results$e_meta <- results$e_meta %>%
         dplyr::select(-n_peps_used)
     }
-
+    
     # join the two count columns to the output e_meta
     results$e_meta <- results$e_meta %>%
       dplyr::left_join(
