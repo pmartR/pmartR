@@ -323,9 +323,10 @@ protein_quant <- function(pepData, method, isoformRes = NULL,
     
     # Remove the invalid columns
     if (length(invalid_emeta_cols) > 0) {
-      warning("One or more columns in emeta_cols contained values which ",
-              "were not correctly aligned to the proteins. These columns ",
-              "will be removed: ", 
+      warning("One or more columns from the peptide level e_meta contained ",
+              "values which, when rolling up to protein level e_meta, could ",
+              "not be retained because more than one value per protein ",
+              "resulted. These columns will be removed: ", 
               emeta_cols[invalid_emeta_cols])
       emeta_cols <- emeta_cols[-invalid_emeta_cols]
     }
