@@ -291,12 +291,23 @@ protein_quant <- function(pepData, method, isoformRes = NULL,
                    nrow()
           )
       } else {
-        if (nrow(e_meta_iso) != n_row_edata) {
-          warning("One or more columns in emeta_cols contained values which ",
-                  "were not correctly aligned to the proteins. No emeta_cols ",
-                  "columns will be used.")
-          emeta_cols <- NULL
-        }
+        n_row_emeta <- 
+          sapply(emeta_cols, \(x)
+            e_meta %>%
+            dplyr::select(
+              all_of(c(emeta_cname, emeta_cols))
+            ) %>% 
+            dplyr::left_join(
+              e_meta_iso,
+              by = emeta_cname,
+              multiple = "all",
+              relationship = "many-to-many") %>%
+            dplyr::select(
+              !!dplyr::sym(emeta_cname_iso), !!dplyr::sym(x)
+            ) %>%
+            dplyr::distinct() %>%
+            nrow()
+          )
       }
     } else {
       n_row_emeta <- 
