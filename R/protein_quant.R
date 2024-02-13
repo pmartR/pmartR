@@ -379,12 +379,12 @@ protein_quant <- function(pepData, method, isoformRes = NULL,
     } else {
       # Count peptides per isoform from the bpquant output.
       isoformRes2 %>%
-        dplyr::group_by(Protein_Isoform) %>%
+        dplyr::group_by(!!dplyr::sym(emeta_cname_iso)) %>%
         dplyr::mutate(n_peps_used = dplyr::n()) %>%
         # Only keep the first row of each group.
         dplyr::slice(1) %>%
         dplyr::ungroup() %>%
-        dplyr::select(!!dplyr::sym(emeta_cname), n_peps_used)
+        dplyr::select(!!dplyr::sym(emeta_cname_iso), n_peps_used)
     }
 
     # store total number of peptides mapping to each protein (different from
@@ -413,7 +413,9 @@ protein_quant <- function(pepData, method, isoformRes = NULL,
         relationship = "many-to-many"
       ) %>%
       dplyr::left_join(peps_used,
-                       by = emeta_cname,
+                       by = ifelse(is.null(isoformRes),
+                                   emeta_cname,
+                                   emeta_cname_iso),
                        multiple = "all",
                        relationship = "many-to-many") %>%
       # Move any columns specified by the user after n_peps_used.
