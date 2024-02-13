@@ -96,6 +96,32 @@ test_that('edata_replace correctly replaces one value with another', {
     c('isobaricpepData', 'pepData')
   )
 
+  # Use a threshold
+  thresh = quantile(isodata$e_data[,-1], na.rm=TRUE)[2]
+  num_thresholded <- sum(isodata$e_data[,-1] < thresh, na.rm = TRUE)
+
+  expect_message(
+    isodata2 <- edata_replace(
+      omicsData = isodata,
+      x = NA,
+      y = 0,
+      threshold = thresh
+    ),
+    sprintf("%s values below the threshold %s have been replaced with %s", num_thresholded, thresh, 0)
+  )
+
+  expect_error(
+    edata_replace(
+      omicsData = isodata,
+      x = NA,
+      y = 0,
+      threshold = min(isodata$e_data[,-1], na.rm=TRUE) - 1
+    ),
+    'outside the range of the data'
+  )
+
+  expect_equal(sum(isodata2$e_data == 0), 400 + num_thresholded)
+
   # Load: lipidData ------------------------------------------------------------
 
   load(system.file('testdata',
@@ -172,6 +198,32 @@ test_that('edata_replace correctly replaces one value with another', {
     'lipidData'
   )
 
+  # Use a threshold
+  thresh = quantile(ldata$e_data[,-1], na.rm=TRUE)[2]
+  num_thresholded <- sum(ldata$e_data[,-1] < thresh, na.rm = TRUE)
+
+  expect_message(
+    ldata2 <- edata_replace(
+      omicsData = ldata,
+      x = NA,
+      y = 0,
+      threshold = thresh
+    ),
+    sprintf("%s values below the threshold %s have been replaced with %s", num_thresholded, thresh, 0)
+  )
+
+  expect_error(
+    edata_replace(
+      omicsData = ldata,
+      x = NA,
+      y = 0,
+      threshold = max(ldata$e_data[,-1], na.rm=TRUE) + 1
+    ),
+    'outside the range of the data'
+  )
+
+  expect_equal(sum(ldata2$e_data == 0), 884 + num_thresholded)
+
   # Load: metabData ------------------------------------------------------------
 
   load(system.file('testdata',
@@ -247,6 +299,22 @@ test_that('edata_replace correctly replaces one value with another', {
     mdata2,
     'metabData'
   )
+
+  # Use a threshold
+  thresh = quantile(mdata$e_data[,-1], na.rm=TRUE)[2]
+  num_thresholded <- sum(mdata$e_data[,-1] < thresh, na.rm = TRUE)
+
+  expect_message(
+    mdata2 <- edata_replace(
+      omicsData = mdata,
+      x = NA,
+      y = 0,
+      threshold = thresh
+    ),
+    sprintf("%s values below the threshold %s have been replaced with %s", num_thresholded, thresh, 0)
+  )
+
+  expect_equal(sum(mdata2$e_data == 0), 148 + num_thresholded)
 
   # Load: nmrData --------------------------------------------------------------
 
@@ -344,6 +412,32 @@ test_that('edata_replace correctly replaces one value with another', {
     'nmrData'
   )
 
+  # Use a threshold
+  thresh = quantile(nmrdata$e_data[,-1], na.rm=TRUE)[2]
+  num_thresholded <- sum(nmrdata$e_data[,-1] < thresh, na.rm = TRUE)
+
+  expect_message(
+    nmrdata2 <- edata_replace(
+      omicsData = nmrdata,
+      x = NA,
+      y = 0,
+      threshold = thresh
+    ),
+    sprintf("%s values below the threshold %s have been replaced with %s", num_thresholded, thresh, 0)
+  )
+
+  expect_error(
+    edata_replace(
+      omicsData = nmrdata,
+      x = NA,
+      y = 0,
+      threshold = max(nmrdata$e_data[,-1], na.rm=TRUE) + 1
+    ),
+    'outside the range of the data'
+  )
+
+  expect_equal(sum(nmrdata2$e_data == 0), 302 + num_thresholded)
+
   # Load: pepData --------------------------------------------------------------
 
   load(system.file('testdata',
@@ -420,6 +514,32 @@ test_that('edata_replace correctly replaces one value with another', {
     'pepData'
   )
 
+  # Use a threshold
+  thresh = quantile(pdata$e_data[,-1], na.rm=TRUE)[2]
+  num_thresholded <- sum(pdata$e_data[,-1] < thresh, na.rm = TRUE)
+
+  expect_message(
+    pdata2 <- edata_replace(
+      omicsData = pdata,
+      x = NA,
+      y = 0,
+      threshold = thresh
+    ),
+    sprintf("%s values below the threshold %s have been replaced with %s", num_thresholded, thresh, 0)
+  )
+
+  expect_error(
+    edata_replace(
+      omicsData = pdata,
+      x = NA,
+      y = 0,
+      threshold = min(pdata$e_data[,-1], na.rm=TRUE) - 1
+    ),
+    'outside the range of the data'
+  )
+
+  expect_equal(sum(pdata2$e_data == 0), 341 + num_thresholded)
+
   # Load: proData --------------------------------------------------------------
 
   load(system.file('testdata',
@@ -495,6 +615,22 @@ test_that('edata_replace correctly replaces one value with another', {
     prdata,
     'proData'
   )
+
+  # Use a threshold
+  thresh = quantile(prdata$e_data[,-1], na.rm=TRUE)[2]
+  num_thresholded <- sum(prdata$e_data[,-1] < thresh, na.rm = TRUE)
+
+  expect_message(
+    prdata2 <- edata_replace(
+      omicsData = prdata,
+      x = NA,
+      y = 0,
+      threshold = thresh
+    ),
+    sprintf("%s values below the threshold %s have been replaced with %s", num_thresholded, thresh, 0)
+  )
+
+  expect_equal(sum(prdata2$e_data == 0), 234 + num_thresholded)
 
   # Test: seqData ------------------------------------------------------
   load(system.file('testdata',

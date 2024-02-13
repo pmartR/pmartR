@@ -4,7 +4,7 @@
 \alias{edata_replace}
 \title{Replace Values Equal to x with y}
 \usage{
-edata_replace(omicsData, x, y)
+edata_replace(omicsData, x, y, threshold = NULL)
 }
 \arguments{
 \item{omicsData}{an object of the class 'pepData', 'proData', 'metabData',
@@ -15,6 +15,9 @@ edata_replace(omicsData, x, y)
 \item{x}{value to be replaced, usually numeric or NA}
 
 \item{y}{replacement value, usually numeric or NA}
+
+\item{threshold}{Positive numeric value.  Observed values below this
+threshold will be replaced by `y` (in addition to all `x` values).}
 }
 \value{
 data object of the same class as omicsData
