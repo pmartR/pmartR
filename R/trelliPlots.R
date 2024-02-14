@@ -256,6 +256,9 @@ trelli_builder <- function(toBuild, cognostics, plotFUN, cogFUN, path, name, rem
 #'   "mean abundance" will be calculated, along with "anova p-value" and "fold change"
 #'   if specified. "anova p-value" will not be included if paneling a trelliscope
 #'   display by a biomolecule class. Default is "sample count" and "mean abundance".
+#'   Any additional cognostics from e_meta variables may be added if their column
+#'   name is specified, and the data has been paneled by the edata_cname or by 
+#'   an e_meta variable.
 #' @param ggplot_params An optional vector of strings of ggplot parameters to
 #'   the backend ggplot function. For example, c("ylab('')", "ylim(c(2,20))").
 #'   Default is NULL.
@@ -609,7 +612,9 @@ trelli_abundance_boxplot <- function(trelliData,
 #'   Required.
 #' @param cognostics A vector of cognostic options for each plot. Valid entries
 #'   are "count", "mean abundance", "median abundance", "cv abundance", 
-#'   and "skew abundance". All are included by default. 
+#'   and "skew abundance". All are included by default. Any additional cognostics 
+#'   from e_meta variables may be added if their column name is specified, and the 
+#'   data has been paneled by the edata_cname or by an e_meta variable.
 #' @param ggplot_params An optional vector of strings of ggplot parameters to
 #'   the backend ggplot function. For example, c("ylab('')", "ylim(c(1,2))").
 #'   Default is NULL.
@@ -742,12 +747,16 @@ trelli_abundance_histogram <- function(trelliData,
   toBuild <- toBuild %>% 
     dplyr::group_by_at(panel) %>%
     dplyr::summarize(
-      count = sum(!is.na(Abundance)),
+      `sample count` = sum(!is.na(Abundance)),
       `mean abundance` = mean(Abundance, na.rm = T),
       `median abundance` = median(Abundance, na.rm = T),
       `cv abundance` = sd(Abundance, na.rm = T) / `mean abundance` * 100,
       `skew abundance` = e1071::skewness(Abundance, na.rm = T)
     )
+  
+  # Now, select only the requested cognostics 
+  toBuild <- toBuild %>%
+    dplyr::select(dplyr::all_of(c(panel, cognostics)))
   
   # Add emeta columns
   if (!is.null(attr(trelliData, "emeta_col"))) {
@@ -841,8 +850,10 @@ trelli_abundance_histogram <- function(trelliData,
 #' @param cognostics A vector of cognostic options. Defaults are "sample count", 
 #'   "mean abundance" and "biomolecule count". "sample count" and "mean abundance"
 #'   are reported per group, and "biomolecule count" is the total number of biomolecules
-#'   in the biomolecule class (e_meta column).
-#' @param ggplot_params An optional vector of strings of ggplot parameters to
+#'   in the biomolecule class (e_meta column).Any additional cognostics from e_meta 
+#'   variables may be added if their column name is specified, and the data has 
+#'   been paneled by the edata_cname  or by an e_meta variable.
+#' @param ggplot_params An optional vector of strings ofggplot parameters to
 #'   the backend ggplot function. For example, c("ylab('')", "xlab('')").
 #'   Default is NULL.
 #' @param interactive A logical argument indicating whether the plots should be
@@ -949,7 +960,7 @@ trelli_abundance_heatmap <- function(trelliData,
   }
   
   # Check that group data is grouped by an e_meta variable
-  if (attr(trelliData, "panel_by_omics") %in% attr(trelliData, "emeta_col") == FALSE) {
+  if (panel %in% attr(trelliData, "emeta_col") == FALSE) {
     stop("trelliData must be paneled_by an e_meta column.")
   }
 
@@ -958,17 +969,55 @@ trelli_abundance_heatmap <- function(trelliData,
     cognostics <- NULL
   }
   
-  # Get the edata variable name
+  # Get the column names of edata and fdata
   edata_cname <- get_edata_cname(trelliData$omicsData)
+  fdata_cname <- get_fdata_cname(trelliData$omicsData)
   
+  # Start builder dataframe
+  toBuild <- trelliData$trelliData
   
+  # First, add any missing cognostics-------------------------------------------
   
+  # Make a group variable name just to make group_by_at work properly
+  theGroup <- "Group"
+  
+  # Add cognostics per group
+  toBuild <- toBuild %>% 
+    dplyr::group_by_at(c(panel, theGroup)) %>%
+    dplyr::summarise(
+      count = sum(!is.na(Abundance)),
+      `mean abundance` = mean(Abundance, na.rm = T)
+    ) %>%
+    tidyr::pivot_wider(id_cols = panel, names_from = Group, values_from = c(count, `mean abundance`), names_sep = " ")
+  
+  # Remove unwanted cognostics 
+  if ("sample count" %in% cognostics == FALSE) {
+    toBuild <- toBuild[,!grepl("count", colnames(toBuild))]
+  }
+  if ("mean abundance" %in% cognostics == FALSE) {
+    toBuild <- toBuild[,!grepl("mean abundance", colnames(toBuild))]
+  }
+  
+  # Add biomolecule count if requested 
+  if ("biomolecule count" %in% cognostics) {
+    bio_counts <- trelliData$trelliData %>% 
+      dplyr::select(panel, edata_cname) %>%
+      unique() %>%
+      dplyr::group_by_at(panel) %>%
+      dplyr::summarise(`biomolecule count` = dplyr::n())
+    toBuild <- dplyr::left_join(toBuild, bio_counts, by = panel)
+  }
+  
+  # Filter down if test mode
+  if (test_mode) {
+    toBuild <- toBuild[test_example,]
+  }
+
   # Make heatmap function-------------------------------------------------------
 
-  # First, generate the heatmap function
   hm_plot_fun <- function(Panel) {
-    # Get fdata_cname
-    fdata_cname <- get_fdata_cname(trelliData$omicsData)
+    
+    DF <- dplyr::filter(trelliData$trelliData, Panel == {{Panel}})
 
     # If group designation was set, then convert Group to a factor variable
     if (!is.null(attributes(trelliData$omicsData)$group_DF)) {
@@ -981,8 +1030,13 @@ trelli_abundance_heatmap <- function(trelliData,
       DF[, fdata_cname] <- as.factor(unlist(DF[, fdata_cname]))
     }
     
+    # Calculate z score
+    DF <- DF %>%
+      dplyr::group_by_at(edata_cname) %>%
+      dplyr::mutate(`Z-Score` = (Abundance - mean(Abundance, na.rm = T)) / sd(Abundance, na.rm = T))
+    
     # Build plot: this should be edata_cname
-    hm <- ggplot2::ggplot(DF, ggplot2::aes(x = as.factor(.data[[edata_cname]]), y = .data[[fdata_cname]], fill = Abundance)) +
+    hm <- ggplot2::ggplot(DF, ggplot2::aes(x = as.factor(.data[[edata_cname]]), y = .data[[fdata_cname]], fill = `Z-Score`)) +
       ggplot2::geom_tile() +
       ggplot2::theme_bw() +
       ggplot2::ylab("Sample") +
@@ -991,8 +1045,7 @@ trelli_abundance_heatmap <- function(trelliData,
         plot.title = ggplot2::element_text(hjust = 0.5),
         axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust = 1)
       ) +
-      ggplot2::scale_fill_gradient(low = "blue", high = "red", na.value = "white") +
-      ggplot2::ggtitle(title)
+      ggplot2::scale_fill_gradient(low = "blue", high = "red", na.value = "white") 
 
     # Add additional parameters
     if (!is.null(ggplot_params)) {
@@ -1009,66 +1062,33 @@ trelli_abundance_heatmap <- function(trelliData,
     return(hm)
   }
 
-  # Create cognostic function---------------------------------------------------
-
-  hm_cog_fun <- function(DF, emeta_var) {
-    # Subset down the dataframe down to group, unnest the dataframe,
-    # pivot_longer to comparison, subset columns to requested statistics,
-    # switch name to a more specific name
-    cogs_to_add <- DF %>%
-      dplyr::group_by(Group) %>%
-      dplyr::summarise(
-        "sample count" = sum(!is.na(Abundance)), 
-        "mean abundance" = round(mean(Abundance, na.rm = TRUE), 4),
-      ) %>%
-      tidyr::pivot_longer(c(`sample count`, `mean abundance`)) %>%
-      dplyr::filter(name %in% cognostics) %>%
-      dplyr::mutate(name = paste(Group, name)) %>%
-      dplyr::ungroup() %>%
-      dplyr::select(-Group) 
-    
-    if ("biomolecule count" %in% cognostics) {
-      cogs_to_add <- rbind(
-        cogs_to_add, 
-        data.frame(
-          name = "Biomolecule Count",
-          value = DF[[edata_cname]] %>% unique() %>% length()
-        )
-      )
-      
-    }
-    
-    # Add new cognostics 
-    cog_to_trelli <- do.call(cbind, lapply(1:nrow(cogs_to_add), function(row) {
-      quick_cog(cogs_to_add$name[row], cogs_to_add$value[row])
-    })) %>% dplyr::tibble()
-
-    return(cog_to_trelli)
-  }
 
   # Build trelliscope display---------------------------------------------------
-
+  
+  # Add a panel column for plotting
+  trelliData$trelliData$Panel <- trelliData$trelliData[[panel]]
+  toBuild$Panel <- toBuild[[panel]]
+  
+  # Add plots and remove that panel column
+  toBuild <- toBuild %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(plots = trelliscope::panel_lazy(hm_plot_fun)) %>%
+    dplyr::select(-Panel)
+  
   # Return a single plot if single_plot is TRUE
   if (single_plot) {
-    singleData <- trelliData$trelliData.omics[test_example[1], ]
-    return(hm_plot_fun(singleData$Nested_DF[[1]], unlist(singleData[1, 1])))
+    
+    singleData <- toBuild[test_example[1], "Panel"]
+    return(singleData)
+    
   } else {
-    # If test_mode is on, then just build the required panels
-    if (test_mode) {
-      toBuild <- trelliData$trelliData.omics[test_example, ]
+    
+    # If build_trelliscope is true, then build the display. Otherwise, return 
+    if (build_trelliscope) {
+      trelli_builder_lazy(toBuild, path, name, ...)
     } else {
-      toBuild <- trelliData$trelliData.omics
+      return(toBuild)
     }
-
-    # Pass parameters to trelli_builder function
-    trelli_builder(toBuild = toBuild,
-                   cognostics = cognostics, 
-                   plotFUN = hm_plot_fun,
-                   cogFUN = hm_cog_fun,
-                   path = path,
-                   name = name,
-                   remove_nestedDF = FALSE,
-                   ...) 
     
   }
 }
