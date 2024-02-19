@@ -98,6 +98,8 @@ and returns them.</p>
 <span>  <span class="va">test_mode</span>,</span>
 <span>  <span class="va">test_example</span>,</span>
 <span>  <span class="va">single_plot</span>,</span>
+<span>  <span class="va">seqDataCheck</span>,</span>
+<span>  seqText <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  p_value_skip <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  p_value_thresh <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -146,9 +148,18 @@ should be returned</p></dd>
 be returned</p></dd>
 
 
+<dt>seqDataCheck</dt>
+<dd><p>Whether seqData is permitted for this plot. "no" means that 
+seqData cannot be used at all, "permissible" means that seqData can be used, 
+and "required" means that seqData is required for the plotting function.</p></dd>
+
+
+<dt>seqText</dt>
+<dd><p>Text that should appear when seqDataCheck is violated.</p></dd>
+
+
 <dt>p_value_skip</dt>
-<dd><p>Whether to skip specific p_value checks. Placeholder for
-potential future functions.</p></dd>
+<dd><p>Whether to skip specific p_value checks.</p></dd>
 
 
 <dt>p_value_thresh</dt>

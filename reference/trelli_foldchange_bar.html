@@ -88,7 +88,7 @@
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">trelli_foldchange_bar</span><span class="op">(</span></span>
 <span>  <span class="va">trelliData</span>,</span>
-<span>  cognostics <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fold change"</span>, <span class="st">"anova p-value"</span><span class="op">)</span>,</span>
+<span>  cognostics <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fold change"</span>, <span class="st">"p-value"</span><span class="op">)</span>,</span>
 <span>  p_value_thresh <span class="op">=</span> <span class="fl">0.05</span>,</span>
 <span>  ggplot_params <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  interactive <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -109,7 +109,9 @@
 
 <dt>cognostics</dt>
 <dd><p>A vector of cognostic options for each plot. Valid entries
-and the defaults are "fold change" and "anova p-value".</p></dd>
+and the defaults are "fold change" and "p-value". If the omics data is MS/NMR,
+p-value will be the results from the ANOVA test. If the omics data is sedData,
+the p-value will be the results from the function "diffexp_seq".</p></dd>
 
 
 <dt>p_value_thresh</dt>

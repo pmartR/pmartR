@@ -113,12 +113,12 @@ results. Required.</p></dd>
 <dt>cognostics</dt>
 <dd><p>A vector of cognostic options for each plot. Valid entries are 
 "biomolecule count", "proportion significant", "mean fold change",
-and "sd fold change". Default is "biomolecule count"</p></dd>
+and "sd fold change". Default is "biomolecule count".</p></dd>
 
 
 <dt>p_value_thresh</dt>
-<dd><p>A value between 0 and 1 to indicate significant
-biomolecules for p_value_test. Default is 0.05.</p></dd>
+<dd><p>A value between 0 and 1 to indicate significant biomolecules 
+for the anova (MS/NMR) or diffexp_seq (RNA-seq) test. Default is 0.05.</p></dd>
 
 
 <dt>ggplot_params</dt>
@@ -199,6 +199,10 @@ trelliscope) should be returned. Default is FALSE.</p></dd>
 <span></span>
 <span><span class="co"># Generate the trelliData object</span></span>
 <span><span class="va">trelliData4</span> <span class="op">&lt;-</span> <span class="fu"><a href="as.trelliData.html">as.trelliData</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">omicsData</span>, statRes <span class="op">=</span> <span class="va">statRes</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">##########################</span></span>
+<span><span class="co">## MS/NMR OMICS EXAMPLE ##</span></span>
+<span><span class="co">##########################</span></span>
 <span></span>
 <span><span class="co"># Build fold_change bar plot with statRes data grouped by edata_colname.</span></span>
 <span><span class="fu"><a href="trelli_panel_by.html">trelli_panel_by</a></span><span class="op">(</span>trelliData <span class="op">=</span> <span class="va">trelliData4</span>, panel <span class="op">=</span> <span class="st">"RazorProtein"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>

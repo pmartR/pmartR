@@ -86,7 +86,7 @@ replaces them with y</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">edata_replace</span><span class="op">(</span><span class="va">omicsData</span>, <span class="va">x</span>, <span class="va">y</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">edata_replace</span><span class="op">(</span><span class="va">omicsData</span>, <span class="va">x</span>, <span class="va">y</span>, threshold <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -104,6 +104,11 @@ replaces them with y</p>
 
 <dt>y</dt>
 <dd><p>replacement value, usually numeric or NA</p></dd>
+
+
+<dt>threshold</dt>
+<dd><p>Positive numeric value.  Observed values below this
+threshold will be replaced by `y` (in addition to all `x` values).</p></dd>
 
 </dl></div>
     <div id="value">

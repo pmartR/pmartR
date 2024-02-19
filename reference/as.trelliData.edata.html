@@ -125,27 +125,28 @@ colummn in edata.</p></dd>
 
 <dt>omics_type</dt>
 <dd><p>A string specifying the data type. Acceptable options are
-"pepData", "isobaricpepData", "proData", "metabData", "lipidData", or
-"nmrData".</p></dd>
+"pepData", "isobaricpepData", "proData", "metabData", "lipidData", 
+"nmrData", or "seqData".</p></dd>
 
 
 <dt>data_scale_original</dt>
 <dd><p>A character string indicating original scale
 of the data. Valid values are: 'log2', 'log', 'log10', or 'abundance'.
-Default is abundance.</p></dd>
+Default is abundance. This parameter is ignored if the data is "seqData".</p></dd>
 
 
 <dt>data_scale</dt>
 <dd><p>A character string indicating the scale to transform the
 data to. Valid values are: 'log2', 'log', 'log10', or 'abundance'. If the
 value is the same as data_scale_original, then transformation is not
-applied. Default is log2.</p></dd>
+applied. Default is log2. This parameter is ignored if the data is "seqData".</p></dd>
 
 
 <dt>normalization_fun</dt>
 <dd><p>A character string indicating the pmartR
 normalization function to use on the data, if is_normalized is FALSE.
-Acceptable choices are 'global', 'loess', and 'quantile'.</p></dd>
+Acceptable choices are 'global', 'loess', and 'quantile'. This parameter is
+ignored if the data is "seqData".</p></dd>
 
 
 <dt>normalization_params</dt>
@@ -153,17 +154,19 @@ Acceptable choices are 'global', 'loess', and 'quantile'.</p></dd>
 parameters are the names, and the parameter values are the list values. For
 example, an acceptable entry for 'normalize_global' would be
 list("subset_fn" = "all", "norm_fn" = "median", "apply_norm" = TRUE,
-"backtransform" = TRUE).</p></dd>
+"backtransform" = TRUE). This parameter is ignored if the data is "seqData".</p></dd>
 
 
 <dt>is_normalized</dt>
 <dd><p>A logical indicator of whether the data is already
-normalized (and will therefore skip the normalization step)</p></dd>
+normalized (and will therefore skip the normalization step). This parameter is
+ignored if the data is "seqData".</p></dd>
 
 
 <dt>force_normalization</dt>
 <dd><p>A logical indicator to force normalization that is
-not required for both isobaric protein and NMR data</p></dd>
+not required for both isobaric protein and NMR data. This parameter is ignored
+if the data is "seqData."</p></dd>
 
 </dl></div>
     <div id="value">
@@ -182,10 +185,23 @@ not required for both isobaric protein and NMR data</p></dd>
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/pmartR/pmartRdata" class="external-link">pmartRdata</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Simple example </span></span>
+<span><span class="co">###########################</span></span>
+<span><span class="co">## MS/NMR OMICS EXAMPLES ##</span></span>
+<span><span class="co">###########################</span></span>
+<span></span>
+<span><span class="co"># Simple MS/NMR Example </span></span>
 <span><span class="va">trelliData1</span> <span class="op">&lt;-</span> <span class="fu">as.trelliData.edata</span><span class="op">(</span>e_data <span class="op">=</span> <span class="va">pep_edata</span>,</span>
 <span>                                   edata_cname <span class="op">=</span> <span class="st">"Peptide"</span>,</span>
 <span>                                   omics_type <span class="op">=</span> <span class="st">"pepData"</span><span class="op">)</span></span>
+<span> </span>
+<span><span class="co">######################</span></span>
+<span><span class="co">## RNA-SEQ EXAMPLES ##  </span></span>
+<span><span class="co">######################</span></span>
+<span>                                    </span>
+<span><span class="co"># RNA-seq Example</span></span>
+<span><span class="va">trelliData_seq1</span> <span class="op">&lt;-</span> <span class="fu">as.trelliData.edata</span><span class="op">(</span>e_data <span class="op">=</span> <span class="va">rnaseq_edata</span>, </span>
+<span>                                      edata_cname <span class="op">=</span> <span class="st">"Transcript"</span>,</span>
+<span>                                      omics_type <span class="op">=</span> <span class="st">"seqData"</span><span class="op">)</span></span>
 <span>                                  </span>
 <span>          </span></code></pre></div>
     </div>
