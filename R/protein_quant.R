@@ -138,8 +138,6 @@ protein_quant <- function(pepData, method, isoformRes = NULL,
   # Grab more attributes that will be used at some point somewhere.
   data_scale <- get_data_scale(pepData)
   is_normalized <- attr(pepData, "data_info")$norm_info$is_normalized
-
-  browser()
   
   # Prepare attribute info when isoformRes is present.
   if (!is.null(isoformRes)) {
