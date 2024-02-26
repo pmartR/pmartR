@@ -1,3 +1,5 @@
-# Re-submit December 7, 2023
+# Version 2.4.3 February 26, 2024
 
-Fixing test failures on M1 Macs after first publication.
+Various bugfixes https://github.com/pmartR/pmartR/releases/tag/v2.4.3
+
+Local/Github-Actions checks show no new NOTE/WARNING/ERROR.
