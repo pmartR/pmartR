@@ -749,3 +749,148 @@ mad_transform <- function(e_data,
 
   return(ret_res)
 }
+
+#' Zero to One scaling
+#'
+#' Re-scales the data to be between 0 and 1
+#'
+#' @param e_data e_data a \eqn{p \times n + 1} data.frame, where \eqn{p} is the
+#'   number of peptides, lipids, or metabolites and \eqn{n} is the number of
+#'   samples. Each row corresponds to data for a peptide, protein, lipid, or
+#'   metabolite, with one column giving the biomolecule identifier name.
+#' @param edata_id character string indicating the name of the peptide, protein,
+#'   lipid, or metabolite identifier. Usually obtained by calling
+#'   \code{attr(omicsData, "cnames")$edata_cname}.
+#' @param subset_fn character string indicating the subset function to use for
+#'   normalization.
+#' @param feature_subset character vector containing the feature names in the
+#'   subset to be used for normalization
+#' @param apply_norm logical argument. If TRUE, the normalization will be
+#'   applied to the data. Defaults to FALSE.
+#' @param backtransform logical argument. Not utilized in this scaling, but 
+#' included for code compatibility.
+#'
+#' @details The sample-wise mean of the feature subset specified for
+#'   normalization is subtracted from each feature in e_data to get the
+#'   normalized data. The location estimates are the sample-wise means of the
+#'   subset data. There are no scale estimates for mean centering, though the
+#'   function returns a NULL list element as a placeholdfer for a scale
+#'   estimate. If backtransform is TRUE, the global median of the subset data
+#'   (across all samples) is added back to the normalized values. Medians are
+#'   taken ignoring any NA values.
+#'
+#' @return List containing two elements: \code{norm_params} is list with two
+#'   elements:
+#' \tabular{ll}{
+#' scale \tab Range of each sample used in scaling \cr
+#' \tab \cr
+#' location \tab NULL
+#' \cr
+#' }
+#'
+#' \code{backtransform_params} is a list with two elements:
+#' \tabular{ll}{
+#' scale \tab NULL \cr
+#' \tab \cr
+#' location \tab NULL
+#' \cr
+#' }
+#'
+#' If \code{apply_norm} is TRUE, the transformed data is returned as a third
+#' list item.
+#'
+#' @author Lisa Bramer, Kelly Stratton, Rachel Richardson
+#'
+zero_one_scale <- function(
+    e_data,
+    edata_id,
+    subset_fn,
+    feature_subset,
+    backtransform = FALSE,
+    apply_norm = FALSE,
+    check.names = NULL) {
+  
+  # Determine which column of e_data contains the biomolecule IDs.
+  id_col <- which(colnames(e_data) == edata_id)
+  
+  # Check if all biomolecules will be used.
+  if (subset_fn == "all") {
+    # Compute the column-wise ranges
+    location_param <- NULL
+      scale_param <- apply(e_data[, -id_col], 2, range, na.rm = TRUE)
+    
+  # # Runs if any subset function other than "all" is being used.
+  } else {
+    # Determine which rows will be used to calculate the normalization
+    # parameters.
+    id_rows <- as.character(e_data[, id_col]) %in% as.character(feature_subset)
+
+    # Compute the column-wise mean.
+    location_param <- NULL
+      scale_param <- apply(e_data[id_rows, -id_col], 2, range, na.rm = TRUE)
+  }
+  
+  # Check the location_param vector for NAs.
+  if (any(is.na(unlist(scale_param)))) {
+    stop(paste("One or more of the scale parameters used for zero-to-one scaling ",
+               "normalization is NA. Cannot proceed with the normalization.",
+               sep = " "
+    ))
+  }
+  
+  # Set the backtransform parameters to NULL because they won't be used.
+  glob_median <- NULL
+  
+  # Check the status of the apply_norm argument.
+  if (apply_norm == FALSE) {
+    # Create a list of the parameters used to normalize the data. In this list
+    # the backtransform_params will always be NULL because these parameters can
+    # only be calculated if the normalization is actually applied to the data.
+    ret_res = list(
+      norm_params = list(
+        scale = scale_param,
+        location = location_param
+      ),
+      backtransform_params = list(
+        scale = NULL,
+        location = glob_median
+      )
+    )
+    
+    # Runs when apply_norm is TRUE.
+  } else {
+    # normalize the data!!!!!!!!!!!!!!!!!
+    
+    range01 <- function(x, scale){
+      (x-min(scale))/(max(scale)-min(scale))
+    }
+    
+    e_data_numeric <- e_data[, -id_col]
+    
+    suppressMessages(
+    zeroone_data <- purrr::map_dfc(
+      1:ncol(e_data_numeric), 
+      function(col) range01(e_data_numeric[,col], scale_param[,col]))
+    )
+    
+    zeroone_data[is.na(zeroone_data)] <- 0
+    
+    # Replace the old data with the normalized data.
+    e_data[, -id_col] <- zeroone_data
+    
+    # Plop all the information we spent so much time calculating in a list.
+    ret_res = list(
+      norm_params = list(
+        scale = scale_param,
+        location = location_param
+      ),
+      backtransform_params = list(
+        scale = NULL,
+        location = glob_median
+      ),
+      transf_data = e_data
+    )
+  }
+  
+  return(ret_res)
+}

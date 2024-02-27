@@ -96,15 +96,16 @@ Below are details for specifying function and parameter options.
  Specifying a normalization function
   indicates how normalization scale and location parameters should be
   calculated. The following are valid options: "median", "mean", "zscore",
-  and "mad". For median centering, the location estimates are the sample-wise
-  medians of the subset data and there are no scale estimates. For mean
-  centering, the location estimates are the sample-wise means of the subset
-  data and there are no scale estimates. For z-score transformation, the
-  location estimates are the subset means for each sample and the scale
-  estimates are the subset standard deviations for each sample. For median
-  absolute deviation (MAD) transformation, the location estimates are the
-  subset medians for each sample and the scale estimates are the subset MADs
-  for each sample.
+  "mad", and "zero_one_scale". For median centering, the location estimates are 
+  the sample-wise medians of the subset data and there are no scale 
+  estimates. For mean centering, the location estimates are the sample-wise 
+  means of the subset data and there are no scale estimates. For z-score 
+  transformation, the location estimates are the subset means for each sample 
+  and the scale estimates are the subset standard deviations for each sample. 
+  For median absolute deviation (MAD) transformation, the location estimates 
+  are the subset medians for each sample and the scale estimates are the 
+  subset MADs for each sample. For zero_one_scale transformation, there are no 
+  location estimates and the scale estimates are the range for each sample.
 }
 
 \section{Specifying Subset Parameters Using the \code{params} Argument}{
@@ -131,15 +132,16 @@ Below are details for specifying function and parameter options.
 
 \section{Backtransform}{
  The purpose of back transforming data is to ensure
-  values are on a scale similar to their raw values before normaliztion. The
-  following values are calculated and/or applied for backtransformation
+  values are on a scale similar to their raw values before normalization. The
+  following values are calculated and/or applied for back transformation
   purposes: \tabular{ll}{ \code{median} \tab scale is NULL and location
   parameter is a global median across all samples \cr \tab \cr \code{mean}
   \tab scale is NULL and location parameter is a global median across all
   samples \cr \tab \cr \code{zscore} \tab scale is pooled standard deviation
   and location is global mean across all samples \cr \tab \cr \code{mad} \tab
   scale is pooled median absolute deviation and location is global median
-  across all samples \cr }
+  across all samples.  \cr }  Back transformation is not applicable for
+  \code{norm_fn == 'zero_one_scale'}.
 }
 
 \examples{

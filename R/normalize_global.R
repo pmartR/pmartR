@@ -59,15 +59,16 @@
 #' @section Normalization Functions: Specifying a normalization function
 #'   indicates how normalization scale and location parameters should be
 #'   calculated. The following are valid options: "median", "mean", "zscore",
-#'   and "mad". For median centering, the location estimates are the sample-wise
-#'   medians of the subset data and there are no scale estimates. For mean
-#'   centering, the location estimates are the sample-wise means of the subset
-#'   data and there are no scale estimates. For z-score transformation, the
-#'   location estimates are the subset means for each sample and the scale
-#'   estimates are the subset standard deviations for each sample. For median
-#'   absolute deviation (MAD) transformation, the location estimates are the
-#'   subset medians for each sample and the scale estimates are the subset MADs
-#'   for each sample.
+#'   "mad", and "zero_one_scale". For median centering, the location estimates are 
+#'   the sample-wise medians of the subset data and there are no scale 
+#'   estimates. For mean centering, the location estimates are the sample-wise 
+#'   means of the subset data and there are no scale estimates. For z-score 
+#'   transformation, the location estimates are the subset means for each sample 
+#'   and the scale estimates are the subset standard deviations for each sample. 
+#'   For median absolute deviation (MAD) transformation, the location estimates 
+#'   are the subset medians for each sample and the scale estimates are the 
+#'   subset MADs for each sample. For zero_one_scale transformation, there are no 
+#'   location estimates and the scale estimates are the range for each sample.
 #'
 #' @section Specifying Subset Parameters Using the \code{params} Argument:
 #'   Parameters for the chosen subset function should be specified in a list
@@ -90,15 +91,16 @@
 #'   \cr }
 #'
 #' @section Backtransform: The purpose of back transforming data is to ensure
-#'   values are on a scale similar to their raw values before normaliztion. The
-#'   following values are calculated and/or applied for backtransformation
+#'   values are on a scale similar to their raw values before normalization. The
+#'   following values are calculated and/or applied for back transformation
 #'   purposes: \tabular{ll}{ \code{median} \tab scale is NULL and location
 #'   parameter is a global median across all samples \cr \tab \cr \code{mean}
 #'   \tab scale is NULL and location parameter is a global median across all
 #'   samples \cr \tab \cr \code{zscore} \tab scale is pooled standard deviation
 #'   and location is global mean across all samples \cr \tab \cr \code{mad} \tab
 #'   scale is pooled median absolute deviation and location is global median
-#'   across all samples \cr }
+#'   across all samples.  \cr }  Back transformation is not applicable for
+#'   \code{norm_fn == 'zero_one_scale'}.
 #'
 #' @return If apply_norm is FALSE, an S3 object of type 'normRes' is returned.
 #'   This object contains a list with: subset method, normalization method,
@@ -213,7 +215,7 @@ normalize_global <- function(omicsData, subset_fn, norm_fn, params = NULL,
   }
 
   # check for valid normalization function choice #
-  if (!(norm_fn %in% c("mean", "median", "zscore", "mad"))) {
+  if (!(norm_fn %in% c("mean", "median", "zscore", "mad", "zero_one_scale"))) {
     # It is really quite simple to select one of the four options.
     stop(paste(norm_fn, " is not a valid normalization option", sep = ""))
   }
@@ -366,6 +368,15 @@ normalize_global <- function(omicsData, subset_fn, norm_fn, params = NULL,
     # Stop the illogical user again!!
     stop("backtransform must a logical argument")
   }
+  
+  # Catch for zero-to-one scaling
+  if(norm_fn == "zero_one_scale"){
+    if(backtransform){
+      warning(paste0("backtransform is not implemented for zero_one_scale",
+                     " method. Setting 'backtransform' to FALSE."))
+      backtransform <- F
+    }
+  }
 
   # Subset the data prior to normalization -------------------------------------
 
@@ -432,7 +443,8 @@ normalize_global <- function(omicsData, subset_fn, norm_fn, params = NULL,
     mean = mean_center,
     median = median_center,
     zscore = zscore_transform,
-    mad = mad_transform
+    mad = mad_transform,
+    zero_one_scale = zero_one_scale
   )
 
   # Normalize the data according to the method selected.
