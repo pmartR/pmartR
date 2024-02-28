@@ -1,4 +1,4 @@
-pandoc: 2.19.2
+pandoc: 3.1.11
 pkgdown: 2.0.7
 pkgdown_sha: ~
 articles:
@@ -11,5 +11,5 @@ articles:
   Statistical_Analysis_with_pmartR: Statistical_Analysis_with_pmartR.html
   Trelliscope_Vignette: Trelliscope_Vignette.html
   Typical_Processing_Workflow: Typical_Processing_Workflow.html
-last_built: 2024-02-26T18:32Z
+last_built: 2024-02-28T17:50Z
 
