@@ -272,63 +272,26 @@ protein_quant <- function(pepData, method, isoformRes = NULL,
   # Update e_meta after quantitation -------------------------------------------
 
   # Check if emeta_cols is NULL. If it is everything can proceed as usual. If it
-  # is not NULL we have to check if the number of unique rows in e_meta is the
-  # same as the number of rows in e_data. If they aren't the pre_flight function
-  # will throw an error. To avoid this we will set emeta_cols to NULL. This will
-  # only keep the protein ID, n_peps_used, and peps_per_pro columns.
+  # is not NULL we have to ensure that identical proteins mapping to different 
+  # values of emeta_cols columns are combined. If they aren't the pre_flight 
+  # function will throw an error.
   if (!is.null(emeta_cols)) {
-    # Nab number of rows in e_data to compare with number of rows in e_meta.
-    n_row_edata <- nrow(results$e_data)
-    n_row_emeta <- NULL
     
     if (is.null(isoformRes)) {
       if (is.null(results$e_meta)) {
       # Use either the original or isoform e_meta depending on the input.
-        n_row_emeta <-
-          sapply(emeta_cols, \(x) 
-                 pepData$e_meta[,c(emeta_cname, x)] %>%
-                   dplyr::distinct() %>%
-                   nrow()
-          )
+        pepData$e_meta <- pepData$e_meta %>%
+          dplyr::group_by(!!dplyr::sym(emeta_cname)) %>%
+          dplyr::summarise_all(.funs = \(x) paste(unique(x), collapse = ";"))
       } else {
-        n_row_emeta <- 
-          sapply(emeta_cols, \(x) 
-                 results$e_meta[,c(emeta_cname, x)] %>%
-                   dplyr::distinct() %>%
-                   nrow()
-            )
+        results$e_meta <- results$e_meta %>%
+          dplyr::group_by(!!dplyr::sym(emeta_cname)) %>%
+          dplyr::summarise_all(.funs = \(x) paste(unique(x), collapse = ";"))
       }
     } else {
-      n_row_emeta <- 
-        sapply(emeta_cols, \(x)
-          e_meta %>%
-          dplyr::select(
-            all_of(c(emeta_cname, emeta_cols))
-          ) %>% 
-          dplyr::left_join(
-            e_meta_iso,
-            by = emeta_cname,
-            multiple = "all",
-            relationship = "many-to-many") %>%
-          dplyr::select(
-            !!dplyr::sym(emeta_cname_iso), !!dplyr::sym(x)
-          ) %>%
-          dplyr::distinct() %>%
-          nrow()
-        )
-    }
-    
-    # Get the indexes of emeta_cols which are invalid
-    invalid_emeta_cols <- which(n_row_emeta != n_row_edata)
-    
-    # Remove the invalid columns
-    if (length(invalid_emeta_cols) > 0) {
-      warning("One or more columns from the peptide level e_meta contained ",
-              "values which, when rolling up to protein level e_meta, could ",
-              "not be retained because more than one value per protein ",
-              "resulted. These columns will be removed: ", 
-              emeta_cols[invalid_emeta_cols])
-      emeta_cols <- emeta_cols[-invalid_emeta_cols]
+      e_meta <- e_meta %>%
+        dplyr::group_by(!!dplyr::sym(emeta_cname)) %>%
+        dplyr::summarise_all(.funs = \(x) paste(unique(x), collapse = ";"))
     }
   }
 
