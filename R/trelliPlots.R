@@ -503,6 +503,10 @@ trelli_abundance_boxplot <- function(trelliData,
       
     }
     
+    # Now, select only the requested cognostics 
+    toBuild <- toBuild %>%
+      dplyr::select(dplyr::all_of(c(panel, cognostics)))
+    
   }
   
   # Add p-values and fold changes 
@@ -754,10 +758,6 @@ trelli_abundance_histogram <- function(trelliData,
       `skew abundance` = e1071::skewness(Abundance, na.rm = T)
     )
   
-  # Now, select only the requested cognostics 
-  toBuild <- toBuild %>%
-    dplyr::select(dplyr::all_of(c(panel, cognostics)))
-  
   # Add emeta columns
   if (!is.null(attr(trelliData, "emeta_col"))) {
     
@@ -768,6 +768,10 @@ trelli_abundance_histogram <- function(trelliData,
     toBuild <- dplyr::left_join(toBuild, emeta, by = panel)
     
   }
+  
+  # Now, select only the requested cognostics 
+  toBuild <- toBuild %>%
+    dplyr::select(dplyr::all_of(c(panel, cognostics)))
   
   # Filter down if test mode
   if (test_mode) {
@@ -1122,6 +1126,8 @@ trelli_abundance_heatmap <- function(trelliData,
 #' @param path The base directory of the trelliscope application. Default is
 #'    Downloads.
 #' @param name The name of the display. Default is Trelliscope.
+#' @param build_trelliscope If TRUE, a trelliscope display will be built. Otherwise,
+#'   a dataframe will be returned. Default is TRUE. 
 #' @param test_mode A logical to return a smaller trelliscope to confirm plot
 #'    and design. Default is FALSE.
 #' @param test_example A vector of plot indices to return for test_mode. Default
@@ -1210,8 +1216,9 @@ trelli_missingness_bar <- function(trelliData,
                                    proportion = TRUE,
                                    ggplot_params = NULL,
                                    interactive = FALSE,
-                                   path = .getDownloadsFolder(),
+                                   path = tempdir(),
                                    name = "Trelliscope",
+                                   build_trelliscope = TRUE,
                                    test_mode = FALSE,
                                    test_example = 1,
                                    single_plot = FALSE,
@@ -1225,12 +1232,16 @@ trelli_missingness_bar <- function(trelliData,
                   acceptable_cognostics = c("total count", "observed count", "observed proportion", "g-test p-value"),
                   ggplot_params = ggplot_params,
                   interactive = interactive,
+                  build_trelliscope = build_trelliscope,
                   test_mode = test_mode, 
                   test_example = test_example,
                   single_plot = single_plot,
                   seqDataCheck = "no",
                   seqText = "Use trelli_rnaseq_nonzero_bar instead.",
                   p_value_thresh = NULL)
+  
+  # Extract panel column
+  panel <- attr(trelliData, "panel_by_col")
   
   # Check that proportion is a non NA logical
   if (!is.logical(proportion) | is.na(proportion)) {
@@ -1254,68 +1265,92 @@ trelli_missingness_bar <- function(trelliData,
   }
   
   # Determine if the trelliData is paneled by the edata column
-  if (is.na(attr(trelliData, "panel_by_omics"))) {
-    paneled_by_edata <- attr(trelliData, "panel_by_stat") == get_edata_cname(trelliData$statRes)
-  } else {
-    paneled_by_edata <- attr(trelliData, "panel_by_omics") == get_edata_cname(trelliData$omicsData)
-  }
-  
-  # Generate a function to make missingness dataframes--------------------------
-  get_missing_DF <- function(DF) {
-    # If there is no omics data, use statRes
-    if (is.null(trelliData$omicsData)) {
-      # Add to total counts
-      Missingness <- data.table::data.table(
-        Group = gsub("Count_", "", colnames(DF)),
-        `Present Count` = unlist(DF)
-      ) %>%
-        merge(totalCounts, by = "Group") %>%
-        dplyr::mutate(
-          `Absent Count` = Total - `Present Count`,
-          `Absent Proportion` = round(`Absent Count` / Total, 4),
-          `Present Proportion` = round(`Present Count` / Total, 4)
-        ) %>%
-        dplyr::select(-Total) %>%
-        dplyr::mutate(Group, `Absent Count`, `Present Count`, `Absent Proportion`, `Present Proportion`)
-    } else {
-      # Add a blank group if no group designation was given
-      if (is.null(attributes(trelliData$omicsData)$group_DF)) {
-        DF$Group <- "x"
-      }
+  paneled_by_edata <- panel == attr(trelliData, "edata_col")
 
-      # Create missingness data.frame
-      Missingness <- DF %>%
-        dplyr::group_by(Group) %>%
-        dplyr::summarise(
-          `Absent Count` = sum(is.na(Abundance)),
-          `Present Count` = sum(!is.na(Abundance)),
-          `Absent Proportion` = round(`Absent Count` / sum(c(`Absent Count`, `Present Count`)), 4),
-          `Present Proportion` = round(`Present Count` / sum(c(`Absent Count`, `Present Count`)), 4)
+  # Start builder dataframe
+  toBuild <- trelliData$trelliData
+  
+  # First, add any missing cognostics-------------------------------------------
+  
+  # Extract observed counts 
+  if (!is.null(trelliData$omicsData)) {
+    
+    if ("Group" %in% colnames(toBuild) == FALSE) {
+      toBuild <- toBuild %>% 
+        dplyr::group_by_at(panel) %>%
+        dplyr::summarize(
+          `total count` = dplyr::n(),
+          `observed count` = sum(!is.na(Abundance)),
+          `observed proportion` = round(`observed count` / `total count`, 4)
         )
+    } else {
+      theGroupName <- "Group"
+      
+      
+      toBuild %>%
+        dplyr::group_by_at(c(panel, theGroupName)) %>%
+        dplyr::summarize(
+          `total count` = dplyr::n(),
+          `observed count` = sum(!is.na(Abundance)),
+          `observed proportion` = round(`observed count` / `total count`, 4)
+        ) %>%
+        tidyr::pivot_wider()
     }
 
-    return(Missingness)
+  } else {
+    browser()
   }
-
-  # Make missingness bar function-----------------------------------------------
+  
+  # Add p-values if possible
+  if ("g-test p-value" %in% cognostics) {
+    browser()
+  }
+  
+  # Add emeta columns
+  if (!is.null(attr(trelliData, "emeta_col"))) {
+    
+    # Pull emeta uniqued columns that should have been prepped in the pivot_longer section
+    emeta <- trelliData$trelliData[,c(panel, attr(trelliData, "emeta_col"))] %>% unique()
+    
+    # Add emeta cognostics
+    toBuild <- dplyr::left_join(toBuild, emeta, by = panel)
+    
+  }
+  
+  # Second, write the plotting function-----------------------------------------
 
   # First, generate the boxplot function
-  missing_bar_plot_fun <- function(DF, title) {
-    # Get missingness dataframe
-    Missingness <- get_missing_DF(DF)
-
+  missing_bar_plot_fun <- function(Panel) {
+    
+    # In this rare case, the data needed is actually already in the summarized information,
+    # as opposed to the trelliData$trelliData long object
+    DF <- dplyr::filter(toBuild, Panel == {{Panel}}) 
+    
+    if ("Group" %in% colnames(toBuild)) {
+      
+      browser()
+      
+    } else {
+      MissPlotDF <- DF %>% 
+        dplyr::select(`total count`, `observed count`, `observed proportion`) %>%
+        dplyr::mutate(
+          `missing count` = `total count` - `observed count`,
+          `missing proportion` = round(`missing count` / `total count`, 4)
+        ) %>%
+        tidyr::pivot_longer(cols = c(1:5)) %>%
+        dplyr::mutate(Group = "X")
+    }
+    
     # Subset based on count or proportion
     if (proportion) {
-      MissPlotDF <- Missingness %>%
-        dplyr::select(c(Group, `Absent Proportion`, `Present Proportion`)) %>%
-        dplyr::rename(Absent = `Absent Proportion`, Present = `Present Proportion`) %>%
-        tidyr::pivot_longer(c(Absent, Present))
+      MissPlotDF <- MissPlotDF %>%
+        dplyr::filter(name %in% c("observed proportion", "missing proportion")) %>%
+        dplyr::mutate(name = ifelse(name == "observed proportion", "Present", "Absent"))
       ylab <- "Proportion"
     } else {
-      MissPlotDF <- Missingness %>%
-        dplyr::select(c(Group, `Absent Count`, `Present Count`)) %>%
-        dplyr::rename(Absent = `Absent Count`, Present = `Present Count`) %>%
-        tidyr::pivot_longer(c(Absent, Present))
+      MissPlotDF <- MissPlotDF %>%
+        dplyr::filter(name %in% c("observed count", "missing count")) %>%
+        dplyr::mutate(name = ifelse(name == "observed count", "Present", "Absent"))
       ylab <- "Count"
     }
 
@@ -1323,7 +1358,6 @@ trelli_missingness_bar <- function(trelliData,
     missing_bar <- ggplot2::ggplot(MissPlotDF, ggplot2::aes(x = Group, y = value, fill = name)) +
       ggplot2::geom_bar(stat = "identity", position = "stack", color = "black") +
       ggplot2::theme_bw() +
-      ggplot2::ggtitle(title) +
       ggplot2::ylab(ylab) +
       ggplot2::scale_fill_manual(values = c("black", "steelblue")) +
       ggplot2::theme(
@@ -1355,86 +1389,31 @@ trelli_missingness_bar <- function(trelliData,
     return(missing_bar)
   }
 
-  # Create the cognostic function-----------------------------------------------
-
-  # Next, generate the cognostic function
-  missing_bar_cog_fun <- function(DF, GroupingVar) {
-    # Get missingness dataframe
-    Missingness <- get_missing_DF(DF)
-
-    # Build cognostics
-    Miss_Cog <- Missingness %>%
-      dplyr::mutate(`total count` = `Present Count` + `Absent Count`) %>%
-      dplyr::select(-c(`Absent Count`, `Absent Proportion`)) %>%
-      dplyr::rename(`observed count` = `Present Count`, 
-                    `observed proportion` = `Present Proportion`) %>%
-      tidyr::pivot_longer(c(`observed count`, `observed proportion`, `total count`)) %>%
-      dplyr::filter(name %in% cognostics)
-    
-    # Expand the name depending on whether the counts are samples or biomolecules
-    if (paneled_by_edata & nrow(Miss_Cog) > 0) {
-      Miss_Cog <- Miss_Cog %>% 
-        dplyr::mutate(
-          name = lapply(name, function(x) {
-            splitNames <- strsplit(x, " ") %>% unlist()
-            return(paste(splitNames[1], "sample", splitNames[2]))
-          }) %>% unlist()
-        )
-    } else if (nrow(Miss_Cog) > 0) {
-      Miss_Cog <- Miss_Cog %>% 
-        dplyr::mutate(
-          name = lapply(name, function(x) {
-            splitNames <- strsplit(x, " ") %>% unlist()
-            return(paste(splitNames[1], "biomolecule", splitNames[2]))
-          }) %>% unlist()
-        )
-    }
-    
-    # Add grouping data if there's more than one group 
-    if (length(unique(Miss_Cog$Group)) > 1) {
-      Miss_Cog <- Miss_Cog %>% dplyr::mutate(name = paste(Group, name))
-    }
-
-    # Remove group column
-    Miss_Cog <- Miss_Cog %>% dplyr::select(c(name, value))
-    
-    # Add statistics if applicable
-    if ("g-test p-value" %in% cognostics & inherits(trelliData, "trelliData.seqData") == FALSE) {
-      
-      edata_cname <- get_edata_cname(trelliData$statRes)
-      
-      if (!is.na(attr(trelliData, "panel_by_stat")) && edata_cname == attr(trelliData, "panel_by_stat")) {
-        
-        Miss_Cog <- rbind(Miss_Cog, 
-                          trelliData$trelliData.stat %>%
-                            dplyr::filter(trelliData$trelliData.stat[[edata_cname]] == GroupingVar) %>%
-                            dplyr::select(Nested_DF) %>%
-                            tidyr::unnest(cols = c(Nested_DF)) %>%
-                            dplyr::mutate(Comparison = paste(Comparison, "g-test p-value")) %>%
-                            dplyr::select(Comparison, p_value_gtest) %>%
-                            dplyr::rename(name = Comparison, value = p_value_gtest) %>%
-                            dplyr::mutate(value = round(value, 4))
-        )
-        
-      }
-      
-    }
-    
-    # Return NULL if there's no cognostics 
-    if (nrow(Miss_Cog) == 0) {
-      return(NULL)
-    }
-    
-    # Generate cognostics 
-    cog_to_trelli <- do.call(cbind, lapply(1:nrow(Miss_Cog), function(row) {
-      quick_cog(name = Miss_Cog$name[row], value = Miss_Cog$value[row])
-    })) %>% dplyr::tibble()
-
-    return(cog_to_trelli)
-  }
 
   # Build trelliscope display---------------------------------------------------
 
+  # Add a panel column for plotting
+  trelliData$trelliData$Panel <- trelliData$trelliData[[panel]]
+  toBuild$Panel <- toBuild[[panel]]
+  
+  # Add plots and remove that panel column
+  toBuild <- toBuild %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(plots = trelliscope::panel_lazy(missing_bar_plot_fun)) %>%
+    dplyr::select(-Panel)
+  
+  browser()
+  
+  # Now, select only the requested cognostics 
+  toBuild <- toBuild %>%
+    dplyr::select(dplyr::all_of(c(panel, cognostics, plots)))
+  
+  if (test_mode) {
+    toBuild <- toBuild[test_example,]
+  }
+  
+  
+  
   # If test_mode is on, then just build the required panels. If the data is statRes, we
   # will need to restructure the data a bit.
   if (!is.null(trelliData$trelliData.omics)) {

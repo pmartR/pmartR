@@ -781,13 +781,21 @@ trelli_panel_by <- function(trelliData, panel) {
     
     }
     
+    # Set any Not a Number (NAN) values to NA 
+    numerics <- lapply(1:ncol(nested), function(theCol) {class(nested[[theCol]]) == "numeric"}) %>% unlist()
+    if (any(numerics)) {
+      theCols <- colnames(nested)[numerics]
+      for (theCol in theCols) {
+        if (any(is.nan(nested[[theCol]]))) {
+          nested[[theCol]][is.nan(nested[[theCol]])] <- NA
+        }
+      }
+    }
+    
     # Add nested data
     trelliData$trelliData <- nested
     
   }
-  
-  
-
 
   # Export results--------------------------------------------------------------
   attr(trelliData, "panel_by") <- TRUE
