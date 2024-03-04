@@ -11,8 +11,9 @@ trelli_foldchange_volcano(
   p_value_thresh = 0.05,
   ggplot_params = NULL,
   interactive = FALSE,
-  path = .getDownloadsFolder(),
+  path = tempdir(),
   name = "Trelliscope",
+  build_trelliscope = TRUE,
   test_mode = FALSE,
   test_example = 1,
   single_plot = FALSE,
@@ -44,9 +45,12 @@ interactive or not. Interactive plots are ggplots piped to ggplotly (for
 now). Default is FALSE.}
 
 \item{path}{The base directory of the trelliscope application. Default is
-Downloads.}
+a temporary directory.}
 
 \item{name}{The name of the display. Default is Trelliscope.}
+
+\item{build_trelliscope}{If TRUE, a trelliscope display will be built. Otherwise,
+a dataframe will be returned. Default is TRUE.}
 
 \item{test_mode}{A logical to return a smaller trelliscope to confirm plot
 and design. Default is FALSE.}

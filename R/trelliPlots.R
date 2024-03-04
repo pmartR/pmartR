@@ -267,7 +267,7 @@ trelli_builder <- function(toBuild, cognostics, plotFUN, cogFUN, path, name, rem
 #'   now). Default is FALSE.
 #' @param include_points Add points as a geom_jitter. Default is TRUE.
 #' @param path The base directory of the trelliscope application. Default is
-#'   Downloads.
+#'   a temporary directory.
 #' @param name The name of the display. Default is Trelliscope.
 #' @param build_trelliscope If TRUE, a trelliscope display will be built. Otherwise,
 #'   a dataframe will be returned. Default is TRUE. 
@@ -381,7 +381,7 @@ trelli_abundance_boxplot <- function(trelliData,
                   acceptable_cognostics = c("count", "mean abundance", "median abundance", "cv abundance", "anova p-value", "fold change"),
                   ggplot_params = ggplot_params,
                   interactive = interactive,
-                  build_trelliscope = TRUE,
+                  build_trelliscope = build_trelliscope,
                   test_mode = test_mode, 
                   test_example = test_example,
                   single_plot = single_plot,
@@ -626,7 +626,7 @@ trelli_abundance_boxplot <- function(trelliData,
 #'   interactive or not. Interactive plots are ggplots piped to ggplotly (for
 #'   now). Default is FALSE.
 #' @param path The base directory of the trelliscope application. Default is
-#'   Downloads.
+#'   a temporary directory.
 #' @param name The name of the display. Default is Trelliscope.
 #' @param build_trelliscope If TRUE, a trelliscope display will be built. Otherwise,
 #'   a dataframe will be returned. Default is TRUE. 
@@ -721,7 +721,7 @@ trelli_abundance_histogram <- function(trelliData,
                   acceptable_cognostics = c("sample count", "mean abundance", "median abundance", "cv abundance", "skew abundance"),
                   ggplot_params = ggplot_params,
                   interactive = interactive,
-                  build_trelliscope = TRUE,
+                  build_trelliscope = build_trelliscope,
                   test_mode = test_mode, 
                   test_example = test_example,
                   single_plot = single_plot,
@@ -864,7 +864,7 @@ trelli_abundance_histogram <- function(trelliData,
 #'   interactive or not. Interactive plots are ggplots piped to ggplotly (for
 #'   now). Default is FALSE.
 #' @param path The base directory of the trelliscope application. Default is
-#'   Downloads.
+#'   tempdir.
 #' @param name The name of the display. Default is Trelliscope
 #' @param build_trelliscope If TRUE, a trelliscope display will be built. Otherwise,
 #'   a dataframe will be returned. Default is TRUE. 
@@ -931,7 +931,7 @@ trelli_abundance_heatmap <- function(trelliData,
                                      cognostics = c("sample count", "mean abundance", "biomolecule count"),
                                      ggplot_params = NULL,
                                      interactive = FALSE,
-                                     path = .getDownloadsFolder(),
+                                     path = tempdir(),
                                      name = "Trelliscope",
                                      build_trelliscope = TRUE,
                                      test_mode = FALSE,
@@ -947,7 +947,7 @@ trelli_abundance_heatmap <- function(trelliData,
                   acceptable_cognostics = c("sample count", "mean abundance", "biomolecule count"),
                   ggplot_params = ggplot_params,
                   interactive = interactive,
-                  build_trelliscope = TRUE,
+                  build_trelliscope = build_trelliscope,
                   test_mode = test_mode, 
                   test_example = test_example,
                   single_plot = single_plot,
@@ -1124,7 +1124,7 @@ trelli_abundance_heatmap <- function(trelliData,
 #'    interactive or not. Interactive plots are ggplots piped to ggplotly (for
 #'    now). Default is FALSE.
 #' @param path The base directory of the trelliscope application. Default is
-#'    Downloads.
+#'    a temporary directory.
 #' @param name The name of the display. Default is Trelliscope.
 #' @param build_trelliscope If TRUE, a trelliscope display will be built. Otherwise,
 #'   a dataframe will be returned. Default is TRUE. 
@@ -1276,8 +1276,6 @@ trelli_missingness_bar <- function(trelliData,
   # Start builder dataframe
   toBuild <- trelliData$trelliData
   theGroupName <- "Group"
-  
-  # Make a function to 
   
   # First, add any missing cognostics-------------------------------------------
   
@@ -1505,14 +1503,10 @@ trelli_missingness_bar <- function(trelliData,
   
 }
 
-determine_significance <- function(DF, p_value_thresh, is_seq) {
+determine_significance <- function(DF, p_value_thresh) {
   
-  # Subset by significance
-  if (is_seq) {
-    DF$Significance <- DF$p_value <= p_value_thresh
-  } else {
-    DF$Significance <- DF$p_value_anova <= p_value_thresh 
-  }
+  # Dermine significance
+  DF$Significance <- DF$p_value <= p_value_thresh
   
   # Filter out NA values 
   DF <- DF[!(is.nan(DF$Significance) | is.nan(DF$fold_change)), ]
@@ -1544,7 +1538,7 @@ determine_significance <- function(DF, p_value_thresh, is_seq) {
 #' @param trelliData A trelliscope data object with statRes results. Required.
 #' @param cognostics A vector of cognostic options for each plot. Valid entries
 #'   and the defaults are "fold change" and "p-value". If the omics data is MS/NMR,
-#'   p-value will be the results from the ANOVA test. If the omics data is sedData,
+#'   p-value will be the results from the ANOVA test. If the omics data is seqData,
 #'   the p-value will be the results from the function "diffexp_seq".
 #' @param p_value_thresh A value between 0 and 1 to indicate significant
 #'   biomolecules for p_value_test. Default is 0.05.
@@ -1555,8 +1549,10 @@ determine_significance <- function(DF, p_value_thresh, is_seq) {
 #'   interactive or not. Interactive plots are ggplots piped to ggplotly (for
 #'   now). Default is FALSE.
 #' @param path The base directory of the trelliscope application. Default is
-#'   Downloads.
+#'   a temporary directory.
 #' @param name The name of the display. Default is Trelliscope.
+#' @param build_trelliscope If TRUE, a trelliscope display will be built. Otherwise,
+#'   a dataframe will be returned. Default is TRUE. 
 #' @param test_mode A logical to return a smaller trelliscope to confirm plot
 #'   and design. Default is FALSE.
 #' @param test_example A vector of plot indices to return for test_mode. Default
@@ -1611,8 +1607,9 @@ trelli_foldchange_bar <- function(trelliData,
                                   p_value_thresh = 0.05,
                                   ggplot_params = NULL,
                                   interactive = FALSE,
-                                  path = .getDownloadsFolder(),
+                                  path = tempdir(),
                                   name = "Trelliscope",
+                                  build_trelliscope = TRUE,
                                   test_mode = FALSE,
                                   test_example = 1,
                                   single_plot = FALSE,
@@ -1626,11 +1623,15 @@ trelli_foldchange_bar <- function(trelliData,
                   acceptable_cognostics = c("fold change", "p-value"),
                   ggplot_params = ggplot_params,
                   interactive = interactive,
+                  build_trelliscope = build_trelliscope,
                   test_mode = test_mode, 
                   test_example = test_example,
                   seqDataCheck = "permissible",
                   single_plot = single_plot,
                   p_value_thresh = p_value_thresh)
+  
+  # Extract panel column
+  panel <- attr(trelliData, "panel_by_col")
   
   # Round test example to integer 
   if (test_mode) {
@@ -1638,22 +1639,65 @@ trelli_foldchange_bar <- function(trelliData,
   }
   
   # Check that group data is edata_cname
-  edata_cname <- pmartR::get_edata_cname(trelliData$statRes)
-  if (is.na(attr(trelliData, "panel_by_stat")) || edata_cname != attr(trelliData, "panel_by_stat")) {
+  edata_cname <- attr(trelliData, "edata_col")
+  if (panel != edata_cname) {
     stop("trelliData must be grouped by edata_cname.")
   }
-
+  
+  # Start builder dataframe
+  toBuild <- trelliData$trelliData
+  
+  # First, generate the cognostics----------------------------------------------
+  
+  # Extract fold change and p-value ANOVA (omics) or p-value columns
+  needed_cols <- colnames(toBuild)[grepl("P_value|Fold_change", colnames(toBuild))]
+  if (any(grepl("P_value_G_", needed_cols))) {
+    needed_cols <- needed_cols[!grepl("P_value_G", needed_cols)]
+  }
+  
+  # Pull required columns 
+  toBuild <- toBuild %>% dplyr::select_at(c(panel, needed_cols))
+  
+  # Add emeta columns: TO FIX
+  if (!is.null(trelliData) && panel != attr(trelliData, "fdata_col") && !is.null(attr(trelliData, "emeta_col"))) {
+    
+    # Pull emeta uniqued columns that should have been prepped in the pivot_longer section
+    emeta <- trelliData$trelliData[,c(panel, attr(trelliData, "emeta_col"))] %>% unique()
+    
+    # Add emeta cognostics
+    toBuild <- dplyr::left_join(toBuild, emeta, by = panel) %>% 
+      unique()
+    
+  }
+  
+  # Filter down if test mode --> must be here to get the right selection of panels
+  if (test_mode) {
+    toBuild <- toBuild[test_example,]
+  }
+  
   # Make foldchange bar function------------------------------------------------
 
-  fc_bar_plot_fun <- function(DF, title) {
+  fc_bar_plot_fun <- function(Panel) {
+    
+    # Pull data.frame, and use needed cols from earlier. Then pull the comparisons,
+    # fold changes, and p-values. Make it flexible for seqData as well. 
+    DF <- dplyr::filter(trelliData$trelliData, Panel == {{Panel}}) %>%
+      dplyr::select_at(c(panel, needed_cols)) %>%
+      unique() %>%
+      dplyr::mutate_at(colnames(.)[2:ncol(.)], as.numeric) %>%
+      tidyr::pivot_longer(cols = c(2:ncol(.))) %>%
+      dplyr::mutate(
+        Comparison = gsub("Fold_change_|P_value_|P_value_A_", "", name),
+        Type = ifelse(grepl("Fold_change", name), "fold_change", "p_value")
+      ) %>% 
+      dplyr::select(-name) %>%
+      tidyr::pivot_wider(id_cols = c(panel, Comparison), names_from = Type, values_from = value)
     
     if (p_value_thresh != 0) {
       
       # Get significant values
-      DF <- determine_significance(DF, p_value_thresh, is_seq = inherits(trelliData, "trelliData.seqData"))
-      if (is.null(DF)) {
-        return(NULL)
-      }
+      DF <- determine_significance(DF, p_value_thresh)
+      if (is.null(DF)) {return(NULL)}
       
       # Make bar plot 
       bar <- ggplot2::ggplot(DF, ggplot2::aes(x = Comparison, y = fold_change, fill = Comparison, color = Significance)) +
@@ -1666,7 +1710,7 @@ trelli_foldchange_bar <- function(trelliData,
     }
 
     # Extend bar plot
-    bar <- bar + ggplot2::theme_bw() + ggplot2::ggtitle(title) +
+    bar <- bar + ggplot2::theme_bw() + 
       ggplot2::theme(
         plot.title = ggplot2::element_text(hjust = 0.5),
         axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust = 1),
@@ -1687,66 +1731,34 @@ trelli_foldchange_bar <- function(trelliData,
     return(bar)
   }
 
-  # Create the cognostic function-----------------------------------------------
-
-  fc_bar_cog_fun <- function(DF, Biomolecule) {
-    
-    # Extend cognostics if fold change is in it
-    if ("fold change" %in% cognostics) {
-      DF <- DF %>% dplyr::rename(`fold change` = fold_change)
-    }
-    
-    # Extend cognostics if p_value is in it
-    if ("p-value" %in% cognostics) {
-      if (inherits(trelliData, "trelliData.seqData")) {
-        DF <- DF %>% dplyr::rename(`p-value` = .data$p_value)
-      } else {
-        DF <- DF %>% dplyr::rename(`p-value` = p_value_anova)
-      }
-    }
-    
-    if ("p_value_gtest" %in% colnames(DF)) {DF <- DF %>% dplyr::select(-p_value_gtest)}
-    
-    # Prepare DF for quick_cog function
-    PreCog <- DF %>%
-      dplyr::select(c(cognostics, Comparison)) %>%
-      tidyr::pivot_longer(cognostics) %>%
-      dplyr::mutate(Comparison = paste(Comparison, name)) %>%
-      dplyr::select(-name)
-
-    # Make quick cognostics
-    cog_to_trelli <- do.call(cbind, lapply(1:nrow(PreCog), function(row) {
-      quick_cog(PreCog$Comparison[row], round(PreCog$value[row], 4))
-    })) %>% dplyr::tibble()
-    
-    return(cog_to_trelli)
-  }
 
   # Build trelliscope function--------------------------------------------------
-
+  
+  # Add a panel column for plotting
+  trelliData$trelliData$Panel <- trelliData$trelliData[[panel]]
+  toBuild$Panel <- toBuild[[panel]]
+  
+  # Add plots and remove that panel column
+  toBuild <- toBuild %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(plots = trelliscope::panel_lazy(fc_bar_plot_fun)) %>%
+    dplyr::select(-Panel)
+  
   # Return a single plot if single_plot is TRUE
   if (single_plot) {
-    singleData <- trelliData$trelliData.stat[test_example[1], ]
-    return(fc_bar_plot_fun(singleData$Nested_DF[[1]], unlist(singleData[1, 1])))
-  }
-
-  # Subset down to test example if applicable
-  if (test_mode) {
-    toBuild <- trelliData$trelliData.stat[test_example, ]
+    
+    singleData <- toBuild[test_example[1], "Panel"]
+    return(singleData)
+    
   } else {
-    toBuild <- trelliData$trelliData.stat
+    
+    # If build_trelliscope is true, then build the display. Otherwise, return 
+    if (build_trelliscope) {
+      trelli_builder_lazy(toBuild, path, name, ...)
+    } else {
+      return(toBuild)
+    }
   }
-  
-  # Pass parameters to trelli_builder function
-  trelli_builder(toBuild = toBuild,
-                 cognostics = cognostics, 
-                 plotFUN = fc_bar_plot_fun,
-                 cogFUN = fc_bar_cog_fun,
-                 path = path,
-                 name = name,
-                 remove_nestedDF = TRUE,
-                 ...)
-  
 }
 
 #' @name trelli_foldchange_boxplot
@@ -1772,8 +1784,10 @@ trelli_foldchange_bar <- function(trelliData,
 #'   interactive or not. Interactive plots are ggplots piped to ggplotly (for
 #'   now). Default is FALSE.
 #' @param path The base directory of the trelliscope application. Default is
-#'   Downloads.
+#'   a temporary directory.
 #' @param name The name of the display. Default is Trelliscope.
+#' @param build_trelliscope If TRUE, a trelliscope display will be built. Otherwise,
+#'   a dataframe will be returned. Default is TRUE. 
 #' @param test_mode A logical to return a smaller trelliscope to confirm plot
 #'   and design. Default is FALSE.
 #' @param test_example A vector of plot indices to return for test_mode. Default
@@ -1851,8 +1865,9 @@ trelli_foldchange_boxplot <- function(trelliData,
                                       include_points = TRUE,
                                       ggplot_params = NULL,
                                       interactive = FALSE,
-                                      path = .getDownloadsFolder(),
+                                      path = tempdir(),
                                       name = "Trelliscope",
+                                      build_trelliscope = TRUE,
                                       test_mode = FALSE,
                                       test_example = 1,
                                       single_plot = FALSE,
@@ -1869,11 +1884,15 @@ trelli_foldchange_boxplot <- function(trelliData,
                                             "sd fold change"),
                   ggplot_params = ggplot_params,
                   interactive = interactive,
+                  build_trelliscope = build_trelliscope,
                   test_mode = test_mode, 
                   test_example = test_example,
                   seqDataCheck = "permissible",
                   single_plot = single_plot,
                   p_value_thresh = p_value_thresh)
+  
+  # Extract panel column
+  panel <- attr(trelliData, "panel_by_col")
   
   # Round test example to integer 
   if (test_mode) {
@@ -2048,8 +2067,10 @@ trelli_foldchange_boxplot <- function(trelliData,
 #'   interactive or not. Interactive plots are ggplots piped to ggplotly (for
 #'   now). Default is FALSE.
 #' @param path The base directory of the trelliscope application. Default is
-#'   Downloads.
+#'   a temporary directory.
 #' @param name The name of the display. Default is Trelliscope.
+#' @param build_trelliscope If TRUE, a trelliscope display will be built. Otherwise,
+#'   a dataframe will be returned. Default is TRUE. 
 #' @param test_mode A logical to return a smaller trelliscope to confirm plot
 #'   and design. Default is FALSE.
 #' @param test_example A vector of plot indices to return for test_mode. Default
@@ -2109,8 +2130,9 @@ trelli_foldchange_heatmap <- function(trelliData,
                                       p_value_thresh = 0.05,
                                       ggplot_params = NULL,
                                       interactive = FALSE,
-                                      path = .getDownloadsFolder(),
+                                      path = tempdir(),
                                       name = "Trelliscope",
+                                      build_trelliscope = TRUE,
                                       test_mode = FALSE,
                                       test_example = 1,
                                       single_plot = FALSE,
@@ -2127,6 +2149,7 @@ trelli_foldchange_heatmap <- function(trelliData,
                                             "sd fold change"),
                   ggplot_params = ggplot_params,
                   interactive = interactive,
+                  build_trelliscope = build_trelliscope,
                   test_mode = test_mode, 
                   test_example = test_example,
                   seqDataCheck = "permissible",
@@ -2305,8 +2328,10 @@ trelli_foldchange_heatmap <- function(trelliData,
 #'   interactive or not. Interactive plots are ggplots piped to ggplotly (for
 #'   now). Default is FALSE.
 #' @param path The base directory of the trelliscope application. Default is
-#'   Downloads.
+#'   a temporary directory.
 #' @param name The name of the display. Default is Trelliscope.
+#' @param build_trelliscope If TRUE, a trelliscope display will be built. Otherwise,
+#'   a dataframe will be returned. Default is TRUE. 
 #' @param test_mode A logical to return a smaller trelliscope to confirm plot
 #'   and design. Default is FALSE.
 #' @param test_example A vector of plot indices to return for test_mode. Default
@@ -2362,8 +2387,9 @@ trelli_foldchange_volcano <- function(trelliData,
                                       p_value_thresh = 0.05,
                                       ggplot_params = NULL,
                                       interactive = FALSE,
-                                      path = .getDownloadsFolder(),
+                                      path = tempdir(),
                                       name = "Trelliscope",
+                                      build_trelliscope = TRUE,
                                       test_mode = FALSE,
                                       test_example = 1,
                                       single_plot = FALSE,
@@ -2380,6 +2406,7 @@ trelli_foldchange_volcano <- function(trelliData,
                                                             "proportion significant down"),
                                   ggplot_params = ggplot_params,
                                   interactive = interactive,
+                                  build_trelliscope = build_trelliscope,
                                   test_mode = test_mode, 
                                   test_example = test_example,
                                   seqDataCheck = "permissible",
