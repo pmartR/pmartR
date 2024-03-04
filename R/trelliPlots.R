@@ -1229,7 +1229,7 @@ trelli_missingness_bar <- function(trelliData,
   trelli_precheck(trelliData = trelliData, 
                   trelliCheck = c("either"),
                   cognostics = cognostics,
-                  acceptable_cognostics = c("total count", "observed count", "observed proportion", "g-test p-value"),
+                  acceptable_cognostics = c("total count", "observed count", "observed proportion", "g-test p-value", attr(trelliData, "emeta_col")),
                   ggplot_params = ggplot_params,
                   interactive = interactive,
                   build_trelliscope = build_trelliscope,
@@ -1253,7 +1253,7 @@ trelli_missingness_bar <- function(trelliData,
     if (is.null(trelliData$trelliData.stat)) {
       cognostics <- cognostics[cognostics != "g-test p-value"]
       message("'g-test p-value' can only be included if stats data (statRes) is included")
-    } else if (is.na(attr(trelliData, "panel_by_stat")) || get_edata_cname(trelliData$statRes) != attr(trelliData, "panel_by_stat")) {
+    } else if (panel != attr(trelliData, "edata_col")) {
       cognostics <- cognostics[cognostics != "g-test p-value"]
       message("'g-test p-value' can only be included if the data has been paneled by the biomolecule column 'edata_cname'")
     }
@@ -1275,6 +1275,7 @@ trelli_missingness_bar <- function(trelliData,
 
   # Start builder dataframe
   toBuild <- trelliData$trelliData
+  theGroupName <- "Group"
   
   # First, add any missing cognostics-------------------------------------------
   
@@ -1290,7 +1291,6 @@ trelli_missingness_bar <- function(trelliData,
           `observed proportion` = round(`observed count` / `total count`, 4)
         )
     } else {
-      theGroupName <- "Group"
       toBuild <- toBuild %>%
         dplyr::group_by_at(c(panel, theGroupName)) %>%
         dplyr::summarize(
@@ -1303,16 +1303,55 @@ trelli_missingness_bar <- function(trelliData,
     }
 
   } else {
-    browser()
+    
+    # Get count columns 
+    cols2rename <- colnames(toBuild)[grepl("Count_", colnames(toBuild))]
+    
+    # Make totals dataframe
+    totalsDF <- attr(trelliData$statRes, "group_DF")$Group %>% 
+      table(dnn = "Group") %>% 
+      data.frame() %>% 
+      dplyr::rename(`total count` = Freq)
+    
+    # Extract panel and observed counts. Format with group information. Add
+    # totals and observed proportion. 
+    toBuild <- toBuild %>%
+      dplyr::select_at(c(panel, cols2rename)) %>%
+      tidyr::pivot_longer(cols = c(2:ncol(.))) %>%
+      dplyr::mutate(name = gsub("Count_", "", name, fixed = T)) %>%
+      dplyr::rename(Group = name, `observed count` = value) %>%
+      dplyr::left_join(totalsDF, by = "Group") %>%
+      dplyr::mutate(`observed proportion` = round(`observed count` / `total count`, 4)) %>%
+      tidyr::pivot_wider(id_cols = panel, names_from = theGroupName, names_sep = " ",
+                         values_from = c("total count", "observed count", "observed proportion"))
+  
   }
+  
+  browser()
   
   # Add p-values if possible
   if ("g-test p-value" %in% cognostics) {
+    
+    # Determine if g-tests were conducted
+    gcols_pos <- grepl("P_value_G", colnames(trelliData$trelliData))
+    
+    # If no g-tests, skip 
+    if (!any(gcols_pos)) {
+      message("No g-test p-value columns found. Skipping this cognostic.")
+      cognostics <- cognostics[!(cognostics == "p-value g-test")]
+    } else {
+      gcols <- colnames(trelliData$trelliData)[gcols_pos]
+      for (gcol in gcols) {
+        toBuild <- cbind(toBuild, trelliData$trelliData[[gcol]])
+      }
+    }
+    
     browser()
+    
   }
   
   # Add emeta columns
-  if (!is.null(attr(trelliData, "emeta_col"))) {
+  if (!is.null(trelliData) && panel != attr(trelliData, "fdata_col") && !is.null(attr(trelliData, "emeta_col"))) {
     
     # Pull emeta uniqued columns that should have been prepped in the pivot_longer section
     emeta <- trelliData$trelliData[,c(panel, attr(trelliData, "emeta_col"))] %>% unique()
@@ -1338,30 +1377,36 @@ trelli_missingness_bar <- function(trelliData,
     # Set group information
     if ("Group" %in% colnames(DF) == FALSE) {DF$Group <- "X"}
     theGroupName <- "Group"
-      
+    
     # Split out group names from summary toBuild table, pivot_wider to add missing
     # columns, an then pivot longer 
     MissPlotDF <- DF %>% 
       dplyr::group_by_at(c(panel, theGroupName)) %>%
-      dplyr::summarize(
-        `total count` = dplyr::n(),
-        `observed count` = sum(!is.na(DF$Abundance)),
+      tidyr::nest() %>%
+      dplyr::mutate(
+        `total count` = purrr::map_int(data, nrow),
+        `observed count` = purrr::map_int(data, function(x) {sum(!is.na(x$Abundance))}),
         `missing count` = `total count` - `observed count`,
         `observed proportion` = round(`observed count` / `total count`, 4),
         `missing proportion` = round(`missing count` / `total count`, 4)
       ) %>%
+      dplyr::select(-data) %>%
       tidyr::pivot_longer(cols = c(3:7))
       
     # Subset based on count or proportion
     if (proportion) {
       MissPlotDF <- MissPlotDF %>%
         dplyr::filter(name %in% c("observed proportion", "missing proportion")) %>%
-        dplyr::mutate(name = ifelse(name == "observed proportion", "Present", "Absent"))
+        dplyr::mutate(name = 
+          factor(ifelse(name == "observed proportion", "Present", "Absent"), levels = c("Absent", "Present"))
+        )
       ylab <- "Proportion"
     } else {
       MissPlotDF <- MissPlotDF %>%
         dplyr::filter(name %in% c("observed count", "missing count")) %>%
-        dplyr::mutate(name = ifelse(name == "observed count", "Present", "Absent"))
+        dplyr::mutate(name = 
+          factor(ifelse(name == "observed count", "Present", "Absent"), levels = c("Absent", "Present"))
+        )
       ylab <- "Count"
     }
 
@@ -1370,7 +1415,7 @@ trelli_missingness_bar <- function(trelliData,
       ggplot2::geom_bar(stat = "identity", position = "stack", color = "black") +
       ggplot2::theme_bw() +
       ggplot2::ylab(ylab) +
-      ggplot2::scale_fill_manual(values = c("black", "steelblue")) +
+      ggplot2::scale_fill_manual(values = c("Absent" = "black", "Present" = "steelblue")) +
       ggplot2::theme(
         plot.title = ggplot2::element_text(hjust = 0.5),
         legend.title = ggplot2::element_blank()
@@ -1414,9 +1459,11 @@ trelli_missingness_bar <- function(trelliData,
     dplyr::select(-Panel)
   
   # Now, select only the requested cognostics 
+  selected <- colnames(toBuild)[lapply(colnames(toBuild), function(x) {grepl("total count|observed count|observed proportion", x)}) %>% unlist()]
+  selected <- c(selected, panel, "plots")
   
   toBuild <- toBuild %>%
-    dplyr::select(dplyr::all_of(c(panel, cognostics, "plots")))
+    dplyr::select(dplyr::all_of(selected))
 
   # Return a single plot if single_plot is TRUE
   if (single_plot) {
