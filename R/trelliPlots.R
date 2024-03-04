@@ -1250,7 +1250,7 @@ trelli_missingness_bar <- function(trelliData,
   
   # Test whether statRes data is included to use g-test p-value
   if ("g-test p-value" %in% cognostics) {
-    if (is.null(trelliData$trelliData.stat)) {
+    if (is.null(trelliData$statRes)) {
       cognostics <- cognostics[cognostics != "g-test p-value"]
       message("'g-test p-value' can only be included if stats data (statRes) is included")
     } else if (panel != attr(trelliData, "edata_col")) {
@@ -1276,6 +1276,8 @@ trelli_missingness_bar <- function(trelliData,
   # Start builder dataframe
   toBuild <- trelliData$trelliData
   theGroupName <- "Group"
+  
+  # Make a function to 
   
   # First, add any missing cognostics-------------------------------------------
   
@@ -1327,8 +1329,6 @@ trelli_missingness_bar <- function(trelliData,
   
   }
   
-  browser()
-  
   # Add p-values if possible
   if ("g-test p-value" %in% cognostics) {
     
@@ -1341,13 +1341,12 @@ trelli_missingness_bar <- function(trelliData,
       cognostics <- cognostics[!(cognostics == "p-value g-test")]
     } else {
       gcols <- colnames(trelliData$trelliData)[gcols_pos]
-      for (gcol in gcols) {
-        toBuild <- cbind(toBuild, trelliData$trelliData[[gcol]])
-      }
+      toBuild <- dplyr::left_join(toBuild, 
+        trelliData$trelliData %>% 
+          dplyr::select_at(c(panel, gcols)), 
+        by = panel
+      )
     }
-    
-    browser()
-    
   }
   
   # Add emeta columns
@@ -1357,7 +1356,8 @@ trelli_missingness_bar <- function(trelliData,
     emeta <- trelliData$trelliData[,c(panel, attr(trelliData, "emeta_col"))] %>% unique()
     
     # Add emeta cognostics
-    toBuild <- dplyr::left_join(toBuild, emeta, by = panel)
+    toBuild <- dplyr::left_join(toBuild, emeta, by = panel) %>% 
+      unique()
     
   }
   
@@ -1376,23 +1376,44 @@ trelli_missingness_bar <- function(trelliData,
     
     # Set group information
     if ("Group" %in% colnames(DF) == FALSE) {DF$Group <- "X"}
-    theGroupName <- "Group"
     
-    # Split out group names from summary toBuild table, pivot_wider to add missing
-    # columns, an then pivot longer 
-    MissPlotDF <- DF %>% 
-      dplyr::group_by_at(c(panel, theGroupName)) %>%
-      tidyr::nest() %>%
-      dplyr::mutate(
-        `total count` = purrr::map_int(data, nrow),
-        `observed count` = purrr::map_int(data, function(x) {sum(!is.na(x$Abundance))}),
-        `missing count` = `total count` - `observed count`,
-        `observed proportion` = round(`observed count` / `total count`, 4),
-        `missing proportion` = round(`missing count` / `total count`, 4)
-      ) %>%
-      dplyr::select(-data) %>%
-      tidyr::pivot_longer(cols = c(3:7))
+    if (is.null(trelliData$omicsData)) {
       
+      # Due to the way the new trelliscope functions run the lazy_plot function,
+      # we have to re-do how we calculated the columns for the summary toBuild file,
+      # but we can use the same variables defined globally.
+      MissPlotDF <- DF %>%
+        dplyr::select_at(c(panel, cols2rename)) %>%
+        tidyr::pivot_longer(cols = c(2:ncol(.))) %>%
+        dplyr::mutate(name = gsub("Count_", "", name, fixed = T)) %>%
+        dplyr::rename(Group = name, `observed count` = value) %>%
+        dplyr::left_join(totalsDF, by = "Group") %>%
+        dplyr::mutate(
+          `observed proportion` = round(`observed count` / `total count`, 4),
+          `missing count` = `total count` - `observed count`,
+          `missing proportion` = round(`missing count` / `total count`, 4)
+        ) %>%
+        tidyr::pivot_longer(cols = c(3:7))
+      
+    } else {
+      
+      # Split out group names from summary toBuild table, pivot_wider to add missing
+      # columns, an then pivot longer 
+      MissPlotDF <- DF %>% 
+        dplyr::group_by_at(c(panel, theGroupName)) %>%
+        tidyr::nest() %>%
+        dplyr::mutate(
+          `total count` = purrr::map_int(data, nrow),
+          `observed count` = purrr::map_int(data, function(x) {sum(!is.na(x$Abundance))}),
+          `missing count` = `total count` - `observed count`,
+          `observed proportion` = round(`observed count` / `total count`, 4),
+          `missing proportion` = round(`missing count` / `total count`, 4)
+        ) %>%
+        dplyr::select(-data) %>%
+        tidyr::pivot_longer(cols = c(3:7))
+      
+    }
+    
     # Subset based on count or proportion
     if (proportion) {
       MissPlotDF <- MissPlotDF %>%
