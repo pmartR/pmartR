@@ -7,7 +7,13 @@
 #'   \code{\link{as.proData}}, \code{\link{as.metabData}},
 #'   \code{\link{as.lipidData}}, \code{\link{as.nmrData}}, respectively.
 #'
-#'
+#' @details The sample-wise minimum of the features is subtracted from each 
+#' feature in e_data, then divided by the difference between the sample-wise 
+#' minimum and maximum of the features to get the normalized data. The location 
+#' estimates are not applicable for this data and the function returns a NULL 
+#' list element as a placeholder. The scale estimates are the sample-wise 
+#' feature ranges. All NA values are replaced with zero.
+#' 
 #' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #'
@@ -20,7 +26,7 @@
 #'   main_effects = "Phenotype"
 #' )
 #' norm_data <- normalize_zero_one_scaling(
-#'   omicsData = mymetab,
+#'   omicsData = mymetab
 #' )
 #'
 #' @author Rachel Richardson
@@ -118,7 +124,7 @@ normalize_zero_one_scaling <- function(omicsData) {
 #' minimum and maximum of the features to get the normalized data. The location 
 #' estimates are not applicable for this data and the function returns a NULL 
 #' list element as a placeholder. The scale estimates are the sample-wise 
-#' feature ranges.
+#' feature ranges. All NA values are replcaed with zero.
 #'
 #' @return List containing two elements: \code{norm_params} is list with two
 #'   elements:
