@@ -282,16 +282,16 @@ protein_quant <- function(pepData, method, isoformRes = NULL,
       # Use either the original or isoform e_meta depending on the input.
         pepData$e_meta <- pepData$e_meta %>%
           dplyr::group_by(!!dplyr::sym(emeta_cname)) %>%
-          dplyr::summarise_all(.funs = \(x) paste(unique(x), collapse = ";"))
+          dplyr::summarise_at(emeta_cols, .funs = \(x) paste(unique(x), collapse = ";"))
       } else {
         results$e_meta <- results$e_meta %>%
           dplyr::group_by(!!dplyr::sym(emeta_cname)) %>%
-          dplyr::summarise_all(.funs = \(x) paste(unique(x), collapse = ";"))
+          dplyr::summarise_at(emeta_cols, .funs = \(x) paste(unique(x), collapse = ";"))
       }
     } else {
       e_meta <- e_meta %>%
         dplyr::group_by(!!dplyr::sym(emeta_cname)) %>%
-        dplyr::summarise_all(.funs = \(x) paste(unique(x), collapse = ";"))
+        dplyr::summarise_at(emeta_cols, .funs = \(x) paste(unique(x), collapse = ";"))
     }
   }
 
