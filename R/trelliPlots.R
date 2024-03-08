@@ -2021,7 +2021,7 @@ trelli_foldchange_boxplot <- function(trelliData,
         ggplot2::theme(
           plot.title = ggplot2::element_text(hjust = 0.5), 
           axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1),
-        ) + ggplot2::ylab("Fold Change") + ggplot2::ggtitle(title) +
+        ) + ggplot2::ylab("Fold Change") + 
         ggplot2::guides(fill = "none")
       
       # Add include_points
@@ -2191,7 +2191,7 @@ trelli_foldchange_heatmap <- function(trelliData,
   }
   
   # Check that group data is an emeta column
-  if (attr(trelliData, "panel_by_omics") %in% attr(trelliData, "emeta_col") == FALSE) {
+  if (!(panel %in% attr(trelliData, "emeta_col"))) {
     stop("trelliData must be paneled_by an e_meta column.")
   }
   
@@ -2260,15 +2260,29 @@ trelli_foldchange_heatmap <- function(trelliData,
   
   fc_hm_plot_fun <- function(Panel) {
     
-    DF <- dplyr::filter(trelliData$trelliData, Panel == {{Panel}})
-    
     # Get edata cname
-    edata_cname <- get_edata_cname(trelliData$statRes)
+    edata_cname <- attr(trelliData, "edata_col")
+    
+    # Pull data.frame, and use needed cols from earlier. Then pull the comparisons,
+    # fold changes, and p-values. Make it flexible for seqData as well. 
+    DF <- dplyr::filter(trelliData$trelliData, Panel == {{Panel}}) %>%
+      dplyr::select_at(c(panel, edata_cname, needed_cols)) %>%
+      unique() %>%
+      dplyr::mutate_at(colnames(.)[3:ncol(.)], as.numeric) %>%
+      tidyr::pivot_longer(cols = c(3:ncol(.))) %>%
+      dplyr::mutate(
+        Comparison = gsub("Fold_change_|P_value_|P_value_A_", "", name),
+        Type = ifelse(grepl("Fold_change", name), "fold_change", "p_value")
+      ) %>% 
+      dplyr::select(-name) %>%
+      tidyr::pivot_wider(id_cols = c(panel, edata_cname, theComparison), names_from = Type, 
+                         values_from = value, values_fn = list) %>%
+      tidyr::unnest(cols = c(fold_change, p_value))
     
     if (p_value_thresh != 0) {
       
       # Get significant values
-      DF <- determine_significance(DF, p_value_thresh, is_seq = inherits(trelliData, "trelliData.seqData"))
+      DF <- determine_significance(DF, p_value_thresh)
       if (is.null(DF)) {
         return(NULL)
       }
@@ -2276,9 +2290,8 @@ trelli_foldchange_heatmap <- function(trelliData,
       # Make heatmap with significance
       hm <- ggplot2::ggplot(DF, ggplot2::aes(x = Comparison, y = as.factor(.data[[edata_cname]]), fill = fold_change)) +
         ggplot2::geom_tile() + ggplot2::theme_bw() + ggplot2::ylab("Biomolecule") + 
-        ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5), 
-                       axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1)) +
-        ggplot2::labs(fill = "Fold Change") + ggplot2::ggtitle(title) + 
+        ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1)) +
+        ggplot2::labs(fill = "Fold Change") + 
         ggplot2::scale_fill_gradient(low = "blue", high = "red", na.value = "white") +
         ggplot2::geom_point(ggplot2::aes(color = Significance)) + 
         ggplot2::scale_color_manual(values = structure(c("black", NA), .Names = c(attr(DF, "LessThan"), attr(DF, "GreaterThan"))), na.value = NA)
@@ -2291,8 +2304,7 @@ trelli_foldchange_heatmap <- function(trelliData,
         ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5), 
                        axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1)) +
         ggplot2::labs(fill = "Fold Change") +
-        ggplot2::scale_fill_gradient(low = "blue", high = "red", na.value = "white") +
-        ggplot2::ggtitle(title)
+        ggplot2::scale_fill_gradient(low = "blue", high = "red", na.value = "white")
       
     }
 
@@ -2312,32 +2324,30 @@ trelli_foldchange_heatmap <- function(trelliData,
   }
 
   # Build the trelliscope-------------------------------------------------------
-
+  
+  # Build the trelliscope-------------------------------------------------------
+  
+  # Add a panel column for plotting
+  trelliData$trelliData$Panel <- trelliData$trelliData[[panel]]
+  toBuild$Panel <- toBuild[[panel]]
+  
+  # Add plots and remove that panel column
+  toBuild <- toBuild %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(plots = trelliscope::panel_lazy(fc_hm_plot_fun)) %>%
+    dplyr::select(-Panel)
+  
   # Return a single plot if single_plot is TRUE
   if (single_plot) {
-    
-    singleData <- trelliData$trelliData.stat[test_example[1], ]
-    return(fc_hm_plot_fun(singleData$Nested_DF[[1]], unlist(singleData[1, 1])))
-    
+    singleData <- toBuild[test_example[1], "Panel"]
+    return(singleData)
   } else {
-    
-    # Subset down to test example if applicable
-    if (test_mode) {
-      toBuild <- trelliData$trelliData.stat[test_example, ]
+    # If build_trelliscope is true, then build the display. Otherwise, return 
+    if (build_trelliscope) {
+      trelli_builder_lazy(toBuild, path, name, ...)
     } else {
-      toBuild <- trelliData$trelliData.stat
+      return(toBuild)
     }
-
-    # Pass parameters to trelli_builder function
-    trelli_builder(toBuild = toBuild,
-                   cognostics = cognostics, 
-                   plotFUN = fc_hm_plot_fun,
-                   cogFUN = fc_hm_cog_fun,
-                   path = path,
-                   name = name,
-                   remove_nestedDF = FALSE,
-                   ...)
-    
   }
 
 }
@@ -2453,6 +2463,9 @@ trelli_foldchange_volcano <- function(trelliData,
                                   single_plot = single_plot,
                                   p_value_thresh = p_value_thresh)
   
+  # Extract panel column
+  panel <- attr(trelliData, "panel_by_col")
+  
   # Ensure that comparison is an acceptable input
   if (!is.character(comparison)) {
     stop("comparison must be a string.")
@@ -2472,9 +2485,54 @@ trelli_foldchange_volcano <- function(trelliData,
   }
   
   # Check that group data is an emeta column
-  if (attr(trelliData, "panel_by_omics") %in% attr(trelliData, "emeta_col") == FALSE) {
+  if (!(panel %in% attr(trelliData, "emeta_col"))) {
     stop("trelliData must be paneled_by an e_meta column.")
   }
+  
+  # Start builder dataframe
+  toBuild <- trelliData$trelliData
+  
+  # First, build the metas------------------------------------------------------
+  
+  browser()
+  
+  # Extract foldchanges and p-value ANOVA (omics) or p-value columns (seqData)
+  needed_cols <- colnames(toBuild)[grepl("P_value|Fold_change", colnames(toBuild))]
+  if (any(grepl("P_value_G_", needed_cols))) {
+    needed_cols <- needed_cols[!grepl("P_value_G", needed_cols)]
+  }
+  
+  # Pull required columns 
+  toBuild <- toBuild %>% dplyr::select_at(c(panel, needed_cols))
+  toBuild <- unique(toBuild)
+  
+  # Pivot longer to extract comparisons. Then split into p-value and fold change columns
+  toBuild %>%
+    tidyr::pivot_longer(cols = c(2:ncol(.))) %>%
+    dplyr::mutate(
+      Comparison = gsub("Fold_change_|P_value_|P_value_A_", "", name),
+      Type = ifelse(grepl("Fold_change", name), "fold_change", "p_value")
+    ) %>%
+    dplyr::select(-name) %>%
+    dplyr::filter(Comparison == comparison) %>%
+    dplyr::select(-Comparison) %>%
+    tidyr::pivot_wider(id_cols = panel, names_from = Type, values_from = value, values_fn = list) %>%
+    tidyr::unnest(cols = c(fold_change, p_value)) %>%
+    dplyr::mutate(fold_change = ifelse(fold_change >= 0, "up", "down")) %>%
+    dplyr::group_by_at(panel) %>%
+    dplyr::summarize(
+      `biomolecule count` = dplyr::n
+    )
+    
+  
+
+  
+  # Add additiona e_meta columns
+  emeta <- trelliData$trelliData[,unique(c(panel, attr(trelliData, "emeta_col")))] %>% unique()
+  
+  # Add emeta cognostics
+  toBuild <- dplyr::left_join(toBuild, emeta, by = panel) %>% unique()
+  
   
   # Make foldchange volcano function--------------------------------------------
   
@@ -2506,14 +2564,14 @@ trelli_foldchange_volcano <- function(trelliData,
       # Make volcano plot 
       if (inherits(trelliData, "trelliData.seqData")) {
         volcano <- ggplot2::ggplot(DF, ggplot2::aes(x = fold_change, y = -log10(.data$p_value), color = Significance)) +
-          ggplot2::geom_point() + ggplot2::theme_bw() + ggplot2::ggtitle(title) +
+          ggplot2::geom_point() + ggplot2::theme_bw() + 
           ggplot2::scale_color_manual(values = structure(c("blue", "red", "black"), 
                                                          .Names = c(LowSig, HighSig, NoSig))) +
           ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) +
           ggplot2::xlab("Fold Change") + ggplot2::ylab("-Log10 P Value") 
       } else {
         volcano <- ggplot2::ggplot(DF, ggplot2::aes(x = fold_change, y = -log10(p_value_anova), color = Significance)) +
-          ggplot2::geom_point() + ggplot2::theme_bw() + ggplot2::ggtitle(title) +
+          ggplot2::geom_point() + ggplot2::theme_bw() + 
           ggplot2::scale_color_manual(values = structure(c("blue", "red", "black"), 
                                                          .Names = c(LowSig, HighSig, NoSig))) +
           ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) +
@@ -2524,12 +2582,12 @@ trelli_foldchange_volcano <- function(trelliData,
       
       if (inherits(trelliData, "trelliData.seqData")) {
         volcano <- ggplot2::ggplot(DF, ggplot2::aes(x = fold_change, y = -log10(.data$p_value))) +
-          ggplot2::geom_point() + ggplot2::theme_bw() + ggplot2::ggtitle(title) +
+          ggplot2::geom_point() + ggplot2::theme_bw() + 
           ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) +
           ggplot2::xlab("Fold Change") + ggplot2::ylab("-Log10 P Value")
       } else {
         volcano <- ggplot2::ggplot(DF, ggplot2::aes(x = fold_change, y = -log10(p_value_anova))) +
-          ggplot2::geom_point() + ggplot2::theme_bw() + ggplot2::ggtitle(title) +
+          ggplot2::geom_point() + ggplot2::theme_bw() + 
           ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) +
           ggplot2::xlab("Fold Change") + ggplot2::ylab("-Log10 P Value")
       }
@@ -2549,52 +2607,6 @@ trelli_foldchange_volcano <- function(trelliData,
     }
     
     return(volcano)
-  }
-
-  # Make cognostic function-----------------------------------------------------
-  
-  fc_volcano_cog_fun <- function(DF, Group) {
-    
-    if (p_value_thresh != 0) {
-      
-      if (inherits(trelliData, "trelliData.seqData")) {
-        
-        # Make cognostics
-        cog_to_trelli <- DF %>%
-          dplyr::summarise(
-            "biomolecule count" = sum(!is.nan(fold_change)), 
-            "proportion significant" = round(sum(.data$p_value[!is.na(.data$p_value)] <= p_value_thresh) / `biomolecule count`, 4),
-            "proportion significant up" = round(sum(.data$p_value[!is.na(.data$p_value)] <= p_value_thresh & fold_change[!is.na(fold_change)] > 0) / `biomolecule count`, 4),
-            "proportion significant down" = round(sum(.data$p_value[!is.na(.data$p_value)] <= p_value_thresh & fold_change[!is.na(fold_change)] < 0) / `biomolecule count`, 4)
-          ) %>%
-          tidyr::pivot_longer(c(`biomolecule count`, `proportion significant`, `proportion significant up`, `proportion significant down`)) %>%
-          dplyr::filter(name %in% cognostics)
-        
-      } else {
-        
-        # Make cognostics
-        cog_to_trelli <- DF %>%
-          dplyr::summarise(
-            "biomolecule count" = sum(!is.nan(fold_change)), 
-            "proportion significant" = round(sum(p_value_anova[!is.na(p_value_anova)] <= p_value_thresh) / `biomolecule count`, 4),
-            "proportion significant up" = round(sum(p_value_anova[!is.na(p_value_anova)] <= p_value_thresh & fold_change[!is.na(fold_change)] > 0) / `biomolecule count`, 4),
-            "proportion significant down" = round(sum(p_value_anova[!is.na(p_value_anova)] <= p_value_thresh & fold_change[!is.na(fold_change)] < 0) / `biomolecule count`, 4)
-          ) %>%
-          tidyr::pivot_longer(c(`biomolecule count`, `proportion significant`, `proportion significant up`, `proportion significant down`)) %>%
-          dplyr::filter(name %in% cognostics)
-        
-      }
-   
-      # Convert to trelliscope cogs
-      cog_to_trelli <- do.call(cbind, lapply(1:nrow(cog_to_trelli), function(row) {
-        quick_cog(cog_to_trelli$name[row], cog_to_trelli$value[row])
-      })) %>% dplyr::tibble()
-      
-    } else {
-      return(NULL)
-    }
-    
-    return(cog_to_trelli)
   }
 
   # Build the trelliscope-------------------------------------------------------
