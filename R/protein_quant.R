@@ -139,6 +139,11 @@ protein_quant <- function(pepData, method, isoformRes = NULL,
   data_scale <- get_data_scale(pepData)
   is_normalized <- attr(pepData, "data_info")$norm_info$is_normalized
   
+  # Combine duplicate duplicate e_meta edata_cname values.
+  pepData$e_meta <- pepData$e_meta %>%
+    dplyr::group_by(!!dplyr::sym(edata_cname)) %>%
+    dplyr::summarise_all(.funs = \(x) paste(unique(x), collapse = ";"))
+  
   # Prepare attribute info when isoformRes is present.
   if (!is.null(isoformRes)) {
     # Keep a copy of the original e_meta data frame. This will be used to
