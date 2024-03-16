@@ -2325,8 +2325,6 @@ trelli_foldchange_heatmap <- function(trelliData,
 
   # Build the trelliscope-------------------------------------------------------
   
-  # Build the trelliscope-------------------------------------------------------
-  
   # Add a panel column for plotting
   trelliData$trelliData$Panel <- trelliData$trelliData[[panel]]
   toBuild$Panel <- toBuild[[panel]]
@@ -2494,9 +2492,7 @@ trelli_foldchange_volcano <- function(trelliData,
   
   # First, build the metas------------------------------------------------------
   
-  browser()
-  
-  # Extract foldchanges and p-value ANOVA (omics) or p-value columns (seqData)
+  # Extract fold change and p-value ANOVA (omics) or p-value columns (seqData)
   needed_cols <- colnames(toBuild)[grepl("P_value|Fold_change", colnames(toBuild))]
   if (any(grepl("P_value_G_", needed_cols))) {
     needed_cols <- needed_cols[!grepl("P_value_G", needed_cols)]
@@ -2505,9 +2501,10 @@ trelli_foldchange_volcano <- function(trelliData,
   # Pull required columns 
   toBuild <- toBuild %>% dplyr::select_at(c(panel, needed_cols))
   toBuild <- unique(toBuild)
+  theComparison <- "Comparison"
   
   # Pivot longer to extract comparisons. Then split into p-value and fold change columns
-  toBuild %>%
+  toBuild <- toBuild %>%
     tidyr::pivot_longer(cols = c(2:ncol(.))) %>%
     dplyr::mutate(
       Comparison = gsub("Fold_change_|P_value_|P_value_A_", "", name),
@@ -2518,82 +2515,92 @@ trelli_foldchange_volcano <- function(trelliData,
     dplyr::select(-Comparison) %>%
     tidyr::pivot_wider(id_cols = panel, names_from = Type, values_from = value, values_fn = list) %>%
     tidyr::unnest(cols = c(fold_change, p_value)) %>%
-    dplyr::mutate(fold_change = ifelse(fold_change >= 0, "up", "down")) %>%
+    dplyr::mutate(fold_change = ifelse(p_value <= p_value_thresh, 
+                                ifelse(fold_change >= 0, "up", "down"), "NS")) %>%
+    dplyr::filter(!is.na(fold_change)) %>%
     dplyr::group_by_at(panel) %>%
     dplyr::summarize(
-      `biomolecule count` = dplyr::n
+      `biomolecule count` = dplyr::n(),
+      `proportion significant` = sum(fold_change %in% c("up", "down")),
+      `proportion significant up` = sum(fold_change == "up"),
+      `proportion significant down` = sum(fold_change == "down")
     )
     
-  
-
-  
   # Add additiona e_meta columns
   emeta <- trelliData$trelliData[,unique(c(panel, attr(trelliData, "emeta_col")))] %>% unique()
   
   # Add emeta cognostics
   toBuild <- dplyr::left_join(toBuild, emeta, by = panel) %>% unique()
   
-  
+  # Filter down if test mode --> must be here to get the right selection of panels
+  if (test_mode) {
+    toBuild <- toBuild[test_example,]
+  }
+
   # Make foldchange volcano function--------------------------------------------
   
-  fc_volcano_plot_fun <- function(DF, title) {
+  fc_volcano_plot_fun <- function(Panel) {
 
+    # Get edata cname
+    edata_cname <- attr(trelliData, "edata_col")
+    
+    # Pull data.frame, and use needed cols from earlier. Then pull the comparisons,
+    # fold changes, and p-values. Make it flexible for seqData as well. 
+    DF <- dplyr::filter(trelliData$trelliData, Panel == {{Panel}}) %>%
+      dplyr::select_at(c(panel, edata_cname, needed_cols)) %>%
+      unique() %>%
+      dplyr::mutate_at(colnames(.)[3:ncol(.)], as.numeric) %>%
+      tidyr::pivot_longer(cols = c(3:ncol(.))) %>%
+      dplyr::mutate(
+        Comparison = gsub("Fold_change_|P_value_|P_value_A_", "", name),
+        Type = ifelse(grepl("Fold_change", name), "fold_change", "p_value")
+      ) %>% 
+      dplyr::filter(Comparison == comparison) %>%
+      dplyr::select(-name) %>%
+      tidyr::pivot_wider(id_cols = c(panel, edata_cname, theComparison), names_from = Type, 
+                         values_from = value, values_fn = list) %>%
+      tidyr::unnest(cols = c(fold_change, p_value))
+    
     if (p_value_thresh != 0) {
       
       # Get significant values
-      DF <- determine_significance(DF, p_value_thresh, is_seq = inherits(trelliData, "trelliData.seqData"))
-      if (is.null(DF)) {
-        return(NULL)
-      }
+      DF <- determine_significance(DF, p_value_thresh) 
+      if (is.null(DF)) {return(NULL)}
+      
+      GreaterThan <- attr(DF, "GreaterThan")
+      LessThan <- attr(DF, "LessThan")
+      DF <- DF %>% dplyr::filter(!is.na(fold_change))
       
       # Indicate which comparisons should be highlighted
       DF$Significance <- lapply(1:nrow(DF), function(row) {
-        if (DF$Significance[row] == attr(DF, "LessThan")) {
+        if (DF$Significance[row] == LessThan) {
           ifelse(DF$fold_change[row] > 0, 
                  paste(DF$Significance[row], "& High"), 
-                 paste(DF$Significance[row],"& Low")
+                 paste(DF$Significance[row], "& Low")
           )
-        } else {attr(DF, "GreaterThan")}
+        } else {GreaterThan}
       }) %>% unlist()
       
       # Indicate what symbols depict low, high, and no significance
-      LowSig <- paste(attr(DF, "LessThan"), "& Low")
-      HighSig <- paste(attr(DF, "LessThan"), "& High")
-      NoSig <- attr(DF, "GreaterThan")
+      LowSig <- paste(LessThan, "& Low")
+      HighSig <- paste(LessThan, "& High")
+      NoSig <- GreaterThan
       
       # Make volcano plot 
-      if (inherits(trelliData, "trelliData.seqData")) {
-        volcano <- ggplot2::ggplot(DF, ggplot2::aes(x = fold_change, y = -log10(.data$p_value), color = Significance)) +
-          ggplot2::geom_point() + ggplot2::theme_bw() + 
-          ggplot2::scale_color_manual(values = structure(c("blue", "red", "black"), 
-                                                         .Names = c(LowSig, HighSig, NoSig))) +
-          ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) +
-          ggplot2::xlab("Fold Change") + ggplot2::ylab("-Log10 P Value") 
-      } else {
-        volcano <- ggplot2::ggplot(DF, ggplot2::aes(x = fold_change, y = -log10(p_value_anova), color = Significance)) +
-          ggplot2::geom_point() + ggplot2::theme_bw() + 
-          ggplot2::scale_color_manual(values = structure(c("blue", "red", "black"), 
-                                                         .Names = c(LowSig, HighSig, NoSig))) +
-          ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) +
-          ggplot2::xlab("Fold Change") + ggplot2::ylab("-Log10 P Value") 
-      }
-      
-    } else {
-      
-      if (inherits(trelliData, "trelliData.seqData")) {
-        volcano <- ggplot2::ggplot(DF, ggplot2::aes(x = fold_change, y = -log10(.data$p_value))) +
-          ggplot2::geom_point() + ggplot2::theme_bw() + 
-          ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) +
-          ggplot2::xlab("Fold Change") + ggplot2::ylab("-Log10 P Value")
-      } else {
-        volcano <- ggplot2::ggplot(DF, ggplot2::aes(x = fold_change, y = -log10(p_value_anova))) +
-          ggplot2::geom_point() + ggplot2::theme_bw() + 
-          ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) +
-          ggplot2::xlab("Fold Change") + ggplot2::ylab("-Log10 P Value")
-      }
-      
-    }
+      volcano <- ggplot2::ggplot(DF, ggplot2::aes(x = fold_change, y = -log10(p_value), color = Significance)) +
+        ggplot2::geom_point() + ggplot2::theme_bw() + 
+        ggplot2::scale_color_manual(values = structure(c("blue", "red", "black"), 
+                                                       .Names = c(LowSig, HighSig, NoSig))) +
+        ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) +
+        ggplot2::xlab("Fold Change") + ggplot2::ylab("-Log10 P Value") 
 
+    } else {
+        volcano <- ggplot2::ggplot(DF, ggplot2::aes(x = fold_change, y = -log10(p_value))) +
+          ggplot2::geom_point() + ggplot2::theme_bw() + 
+          ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) +
+          ggplot2::xlab("Fold Change") + ggplot2::ylab("-Log10 P Value")
+    }
+      
     # Add additional parameters
     if (!is.null(ggplot_params)) {
       for (param in ggplot_params) {
@@ -2611,44 +2618,27 @@ trelli_foldchange_volcano <- function(trelliData,
 
   # Build the trelliscope-------------------------------------------------------
 
+  # Add a panel column for plotting
+  trelliData$trelliData$Panel <- trelliData$trelliData[[panel]]
+  toBuild$Panel <- toBuild[[panel]]
+  
+  # Add plots and remove that panel column
+  toBuild <- toBuild %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(plots = trelliscope::panel_lazy(fc_volcano_plot_fun)) %>%
+    dplyr::select(-Panel)
+  
   # Return a single plot if single_plot is TRUE
   if (single_plot) {
-    
-    if (length(comparison) > 1) {stop("single_plot will only work if 1 comparison has been selected.")}
-    
-    singleData <- trelliData$trelliData.stat[test_example[1], ]
-    return(fc_volcano_plot_fun(singleData$Nested_DF[[1]], unlist(singleData[1, 1])))
-    
+    singleData <- toBuild[test_example[1], "Panel"]
+    return(singleData)
   } else {
-    
-    # Set grouping variable names
-    emeta_var <- attr(trelliData, "panel_by_omics")
-    theComp <- "Comparison"
-    
-    # Create specific build variable with comparison information (different than default panel by)
-    toBuild <- trelliData$trelliData.stat %>% 
-      tidyr::unnest(cols = Nested_DF) %>%
-      dplyr::ungroup() %>%
-      dplyr::group_by_at(c(emeta_var, theComp)) %>%
-      tidyr::nest() %>%
-      dplyr::filter(Comparison %in% comparison) %>%
-      dplyr::rename(Nested_DF = data)
-    
-    # Subset down to test example if applicable
-    if (test_mode) {
-      toBuild <- toBuild[test_example, ]
-    } 
-    
-    # Pass parameters to trelli_builder function
-    trelli_builder(toBuild = toBuild,
-                   cognostics = cognostics, 
-                   plotFUN = fc_volcano_plot_fun,
-                   cogFUN = fc_volcano_cog_fun,
-                   path = path,
-                   name = name,
-                   remove_nestedDF = FALSE,
-                   ...)
-    
+    # If build_trelliscope is true, then build the display. Otherwise, return 
+    if (build_trelliscope) {
+      trelli_builder_lazy(toBuild, path, name, ...)
+    } else {
+      return(toBuild)
+    }
   }
   
 }
