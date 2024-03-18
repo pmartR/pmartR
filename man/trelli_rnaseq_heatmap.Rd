@@ -9,7 +9,8 @@ trelli_rnaseq_heatmap(
   cognostics = c("sample count", "mean LCPM", "biomolecule count"),
   ggplot_params = NULL,
   interactive = FALSE,
-  path = .getDownloadsFolder(),
+  build_trelliscope = TRUE,
+  path = tempdir(),
   name = "Trelliscope",
   test_mode = FALSE,
   test_example = 1,
@@ -32,6 +33,8 @@ Default is NULL.}
 
 \item{interactive}{A logical argument indicating whether the plots should be
 interactive or not. Interactive plots are ggplots piped to ggplotly. Default is FALSE.}
+
+\item{build_trelliscope}{The user provided value for building trelliscope}
 
 \item{path}{The base directory of the trelliscope application. Default is
 Downloads.}

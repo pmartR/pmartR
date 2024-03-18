@@ -9,8 +9,9 @@ trelli_rnaseq_boxplot(
   cognostics = c("count", "mean lcpm"),
   ggplot_params = NULL,
   interactive = FALSE,
+  build_trelliscope = TRUE,
   include_points = TRUE,
-  path = .getDownloadsFolder(),
+  path = tempdir(),
   name = "Trelliscope",
   test_mode = FALSE,
   test_example = 1,
@@ -40,6 +41,8 @@ Default is NULL.}
 \item{interactive}{A logical argument indicating whether the plots should be
 interactive or not. Interactive plots are ggplots piped to ggplotly (for
 now). Default is FALSE.}
+
+\item{build_trelliscope}{The user provided value for building trelliscope}
 
 \item{include_points}{Add points as a geom_jitter. Default is TRUE.}
 

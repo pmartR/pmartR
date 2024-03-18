@@ -25,6 +25,7 @@
 #' @param interactive A logical argument indicating whether the plots should be
 #'   interactive or not. Interactive plots are ggplots piped to ggplotly (for
 #'   now). Default is FALSE.
+#' @param build_trelliscope The user provided value for building trelliscope
 #' @param include_points Add points as a geom_jitter. Default is TRUE.
 #' @param path The base directory of the trelliscope application. Default is
 #'   Downloads.
@@ -112,16 +113,17 @@
 #'
 #' @export
 trelli_rnaseq_boxplot <- function(trelliData,
-                                     cognostics = c("count", "mean lcpm"),
-                                     ggplot_params = NULL,
-                                     interactive = FALSE,
-                                     include_points = TRUE,
-                                     path = .getDownloadsFolder(),
-                                     name = "Trelliscope",
-                                     test_mode = FALSE,
-                                     test_example = 1,
-                                     single_plot = FALSE,
-                                     ...) {
+                                  cognostics = c("count", "mean lcpm"),
+                                  ggplot_params = NULL,
+                                  interactive = FALSE,
+                                  build_trelliscope = TRUE, 
+                                  include_points = TRUE,
+                                  path = tempdir(),
+                                  name = "Trelliscope",
+                                  test_mode = FALSE,
+                                  test_example = 1,
+                                  single_plot = FALSE,
+                                  ...) {
   # Run initial checks----------------------------------------------------------
   
   # Run generic checks 
@@ -131,6 +133,7 @@ trelli_rnaseq_boxplot <- function(trelliData,
                   acceptable_cognostics = c("count", "mean lcpm", "median lcpm", "cv lcpm", "p-value", "fold change"),
                   ggplot_params = ggplot_params,
                   interactive = interactive,
+                  build_trelliscope = build_trelliscope,
                   test_mode = test_mode, 
                   test_example = test_example,
                   single_plot = single_plot,
@@ -139,9 +142,12 @@ trelli_rnaseq_boxplot <- function(trelliData,
                   p_value_thresh = NULL)
   
   
+  # Extract panel column
+  panel <- attr(trelliData, "panel_by_col")
+  
   # Remove stat specific options if no stats data was provided 
   if (is.null(trelliData$trelliData.stat)) {
-    if (any(c("p-value", "fold change") %in% cognostics) & is.null(trelliData$trelliData.stat)) {
+    if (any(c("p-value", "fold change") %in% cognostics) & is.null(trelliData$statRes)) {
       cognostics <- cognostics[-match(c("p-value", "fold change"), cognostics, nomatch = 0)]
       message(paste("'p-value' and/or 'fold change' were listed as cognostics, but not provided in the trelliData object.",
                     "Did you forget to include a statRes object?")
@@ -167,37 +173,101 @@ trelli_rnaseq_boxplot <- function(trelliData,
     stop("include_points must be a TRUE or FALSE.")
   }
   
-  # Determine if count is biomolecule count or sample count 
-  if ("count" %in% cognostics) {
+  if (any(c("p-value", "fold change") %in% cognostics) & panel != get_edata_cname(trelliData$omicsData)) {
+    message(paste("Please panel by", get_edata_cname(trelliData$omicsData), "to get 'p-value' and 'fold change' as cognostics in the trelliscope display."))
+  }
+
+  # Start summary toBuild data.frame
+  toBuild <- trelliData$trelliData
     
-    if (attr(trelliData, "panel_by_omics") == get_edata_cname(trelliData$omicsData)) {
-      cognostics[which(cognostics == "count")] <- "sample nonzero count"
-    } else {
-      cognostics[which(cognostics == "count")] <- "biomolecule nonzero count"
+  # First, generate the cognostics----------------------------------------------
+  
+  # Add cognostics without groups
+  if ("Group" %in% colnames(toBuild) == FALSE) {
+    
+    toBuild <- toBuild %>% 
+      dplyr::group_by_at(panel) %>%
+      dplyr::summarize(
+        count = sum(Count != 0),
+        `mean lcpm` = mean(LCPM, na.rm = T),
+        `median lcpm` = median(LCPM, na.rm = T),
+        `cv lcpm` = sd(LCPM, na.rm = T) / `mean lcpm` * 100
+      )
+
+    # Now, select only the requested cognostics 
+    toBuild <- toBuild %>%
+      dplyr::select(dplyr::all_of(c(panel, cognostics)))
+    
+  } else {
+    
+    # Make a group variable name just to make group_by_at work properly
+    theGroup <- "Group"
+    
+    # Add cognostics per group
+    toBuild <- toBuild %>% 
+      dplyr::group_by_at(c(panel, theGroup)) %>%
+      dplyr::summarise(
+        count = sum(Count != 0),
+        `mean lcpm` = mean(LCPM, na.rm = T),
+      ) %>%
+      tidyr::pivot_wider(id_cols = panel, names_from = Group, values_from = c(count, `mean lcpm`), names_sep = " ")
+    
+    # Now remove unwanted cognostics
+    if ("mean lcpm" %in% cognostics == FALSE) {
+      toBuild <- toBuild[,grepl("mean lcpm", colnames(toBuild)) == FALSE]
+    }
+    if (any(grepl("count", cognostics)) == FALSE) {
+      toBuild <- toBuild[,grepl("count", colnames(toBuild)) == FALSE]
+    }
+    
+    # Add emeta columns
+    if (!is.null(attr(trelliData, "emeta_col"))) {
+      
+      # Pull emeta uniqued columns that should have been prepped in the pivot_longer section
+      emeta <- trelliData$trelliData[,c(panel, attr(trelliData, "emeta_col"))] %>% unique()
+      
+      # Add emeta cognostics
+      toBuild <- dplyr::left_join(toBuild, emeta, by = panel)
+      
     }
     
   }
   
-  if (any(c("p-value", "fold change") %in% cognostics) & attr(trelliData, "panel_by_omics") != get_edata_cname(trelliData$omicsData)) {
-    message(paste("Please panel by", get_edata_cname(trelliData$omicsData), "to get 'p-value' and 'fold change' as cognostics in the trelliscope display."))
+  # Add p-values and fold changes 
+  if ("p-value" %in% cognostics) {
+    anova_cols <- colnames(trelliData$trelliData)[grepl("P_value_", colnames(trelliData$trelliData))]
+    anova_data <- trelliData$trelliData[,c(panel, anova_cols)] %>% unique()
+    toBuild <- dplyr::left_join(toBuild, anova_data, by = panel)
+  }
+  if ("fold change" %in% cognostics) {
+    fc_cols <- colnames(trelliData$trelliData)[grepl("Fold_change", colnames(trelliData$trelliData))]
+    fc_data <- trelliData$trelliData[,c(panel, fc_cols)] %>% unique()
+    toBuild <- dplyr::left_join(toBuild, fc_data, by = panel)
+  }
+  
+  # Filter down if test mode
+  if (test_mode) {
+    toBuild <- toBuild[test_example,]
   }
   
   # Make boxplot function-------------------------------------------------------
   
   # First, generate the boxplot function
-  box_plot_fun <- function(DF, title) {
+  box_plot_fun <- function(Panel) {
+    
+    DF <- dplyr::filter(trelliData$trelliData, Panel == {{Panel}})
+    
     # Add a blank group if no group designation was given
-    if (is.null(attributes(trelliData$omicsData)$group_DF)) {
+    if (!("Group" %in% colnames(DF))) {
       DF$Group <- "x"
     }
     
     # Build plot
-    boxplot <- ggplot2::ggplot(DF, ggplot2::aes(x = Group, fill = Group, y = .data$LCPM)) +
+    boxplot <- ggplot2::ggplot(DF, ggplot2::aes(x = Group, fill = Group, y = LCPM)) +
       ggplot2::geom_boxplot(outlier.shape = NA) +
       ggplot2::theme_bw() +
-      ggplot2::ggtitle(title) +
       ggplot2::theme(legend.position = "none", plot.title = ggplot2::element_text(hjust = 0.5)) +
-      ggplot2::ylab("Log Counts per Million (LCPM)")
+      ggplot2::ylab("Log Counts per Million (LCPM)") 
     
     # Add include_points
     if (include_points) {
@@ -228,131 +298,36 @@ trelli_rnaseq_boxplot <- function(trelliData,
     return(boxplot)
   }
   
-  # Create cognostic function---------------------------------------------------
+  # Add a panel column for plotting
+  trelliData$trelliData$Panel <- trelliData$trelliData[[panel]]
+  toBuild$Panel <- toBuild[[panel]]
   
-  # Second, create function to return cognostics
-  box_cog_fun <- function(DF, biomolecule) {
-    # Set basic cognostics for ungrouped data or in case when data is not split by fdata_cname
-    cog <- list(
-      "sample nonzero count" = dplyr::tibble(`Sample Non-Zero Count` = trelliscopejs::cog(sum(DF$Count != 0), desc = "Sample Non-Zero Count")),
-      "biomolecule nonzero count" = dplyr::tibble(`Biomolecule Non-Zero Count` = trelliscopejs::cog(sum(DF$Count != 0), desc = "Biomolecule Non-Zero Count")),
-      "mean lcpm" = dplyr::tibble(`Mean LCPM` = trelliscopejs::cog(round(mean(DF$LCPM, na.rm = TRUE), 4), desc = "Mean LCPM")), 
-      "median lcpm" = dplyr::tibble(`Median LCPM` = trelliscopejs::cog(round(median(DF$LCPM, na.rm = TRUE), 4), desc = "Median LCPM")), 
-      "cv lcpm" = dplyr::tibble(`CV LCPM` = trelliscopejs::cog(round((sd(DF$LCPM, na.rm = TRUE) / mean(DF$LCPM, na.rm = T)) * 100, 4), desc = "CV LCPM"))
-    )
-    
-    # If cognostics are any of the cog, then add them 
-    if (any(cognostics %in% c("sample nonzero count", "biomolecule nonzero count", "mean lcpm", "median lcpm", "cv lcpm"))) {
-      cog_to_trelli <- do.call(dplyr::bind_cols, lapply(cognostics, function(x) {cog[[x]]})) %>% dplyr::tibble()
-    } else {
-      cog_to_trelli <- NULL
-    }
-    
-    # Get fdata cname and panel_by selection
-    fdata_cname <- pmartR::get_fdata_cname(trelliData$omicsData)
-    panel_by_choice <- attr(trelliData, "panel_by_omics")
-    
-    # Additional group cognostics can be added only if group_designation was set and
-    # trelli_panel_by is not the fdata_cname
-    if (!is.null(attributes(trelliData$omicsData)$group_DF) & fdata_cname != panel_by_choice & !is.null(cog_to_trelli)) {
-      # Since the number of groups is unknown, first panel_by the Groups,
-      # then calculate all summary statistics, pivot to long format,
-      # subset down to requested statistics, switch name to a more specific name,
-      # combine group and name, and generate the cognostic tibble
-      cogs_to_add <- DF %>%
-        dplyr::group_by(Group) %>%
-        dplyr::summarise(
-          "sample nonzero count" = sum(Count != 0), 
-          "biomolecule nonzero count" = sum(Count != 0), 
-          "mean lcpm" = round(mean(.data$LCPM, na.rm = TRUE), 4),
-          "median lcpm" = round(median(.data$LCPM, na.rm = TRUE), 4),
-          "cv lcpm" = round((sd(.data$LCPM, na.rm = T) / mean(.data$LCPM, na.rm =T)) * 100, 4),
-        ) %>%
-        tidyr::pivot_longer(c(.data$`sample nonzero count`, .data$`biomolecule nonzero count`, .data$`mean lcpm`, .data$`median lcpm`, .data$`cv lcpm`)) %>%
-        dplyr::filter(name %in% cognostics) %>%
-        dplyr::mutate(name = paste(Group, name)) %>%
-        dplyr::ungroup() %>%
-        dplyr::select(-Group) 
-      
-      # Add new cognostics 
-      cog_to_trelli <- do.call(cbind, lapply(1:nrow(cogs_to_add), function(row) {
-        quick_cog(cogs_to_add$name[row], cogs_to_add$value[row])
-      })) %>% dplyr::tibble() 
-      
-    }
-    
-    # Add cognostics that only apply when stats data is grouped by edata_cname
-    edata_cname <- pmartR::get_edata_cname(trelliData$omicsData)
-    
-    if (!is.null(trelliData$trelliData.stat) && !is.na(attr(trelliData, "panel_by_stat")) && edata_cname == attr(trelliData, "panel_by_stat")) {
-      
-      # Downselect to only stats 
-      stat_cogs <- cognostics[cognostics %in% c("fold change", "p-value")]
-      
-      if (length(stat_cogs) != 0) {
-        # Subset down the dataframe down to group, unnest the dataframe,
-        # pivot_longer to comparison, subset columns to requested statistics,
-        # switch name to a more specific name
-        cogs_to_add <- trelliData$trelliData.stat %>%
-          dplyr::filter(trelliData$trelliData.stat[[edata_cname]] == biomolecule) %>%
-          dplyr::select(Nested_DF) %>%
-          tidyr::unnest(cols = c(Nested_DF)) %>%
-          dplyr::rename(
-            `p-value` = .data$p_value,
-            `fold change` = fold_change
-          ) %>%
-          dplyr::select(c(Comparison, stat_cogs)) %>%
-          tidyr::pivot_longer(stat_cogs) %>%
-          dplyr::mutate(
-            name = paste(Comparison, name),
-            value = round(value, 4)
-          ) %>%
-          dplyr::ungroup() %>%
-          dplyr::select(-Comparison)
-        
-        # Generate new cognostics
-        new_cogs <- do.call(cbind, lapply(1:nrow(cogs_to_add), function(row) {
-          quick_cog(cogs_to_add$name[row], cogs_to_add$value[row])
-        })) %>% dplyr::tibble()
-        
-        # Add new cognostics, removing when it is NULL 
-        if (!is.null(cog_to_trelli)) {
-          cog_to_trelli <- cbind(cog_to_trelli, new_cogs) %>% dplyr::tibble()
-        } else {
-          cog_to_trelli <- new_cogs
-        }
-        
-      }
-    }
-    
-    return(cog_to_trelli)
-  }
+  # Add plots and remove that panel column
+  toBuild <- toBuild %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(plots = trelliscope::panel_lazy(box_plot_fun)) %>%
+    dplyr::select(-Panel)
   
   # Build trelliscope display---------------------------------------------------
   
   # Return a single plot if single_plot is TRUE
   if (single_plot) {
-    singleData <- trelliData$trelliData.omics[test_example[1], ]
-    return(box_plot_fun(singleData$Nested_DF[[1]], unlist(singleData[1, 1])))
+    
+    singleData <- toBuild[test_example[1], "Panel"]
+    return(singleData)
+    
   } else {
-    # If test_mode is on, then just build the required panels
-    if (test_mode) {
-      toBuild <- trelliData$trelliData.omics[test_example, ]
+    
+    # If build_trelliscope is true, then build the display. Otherwise, return 
+    if (build_trelliscope) {
+      trelli_builder_lazy(toBuild, path, name, ...)
     } else {
-      toBuild <- trelliData$trelliData.omics
+      return(toBuild)
     }
     
-    # Pass parameters to trelli_builder function
-    trelli_builder(toBuild = toBuild,
-                   cognostics = cognostics, 
-                   plotFUN = box_plot_fun,
-                   cogFUN = box_cog_fun,
-                   path = path,
-                   name = name,
-                   remove_nestedDF = FALSE,
-                   ...)
-    
   }
+  
+  
 }
 
 #' @name trelli_rnaseq_histogram
@@ -374,6 +349,7 @@ trelli_rnaseq_boxplot <- function(trelliData,
 #' @param interactive A logical argument indicating whether the plots should be
 #'   interactive or not. Interactive plots are ggplots piped to ggplotly (for
 #'   now). Default is FALSE.
+#' @param build_trelliscope The user provided value for building trelliscope
 #' @param path The base directory of the trelliscope application. Default is
 #'   Downloads.
 #' @param name The name of the display. Default is Trelliscope.
@@ -439,15 +415,16 @@ trelli_rnaseq_boxplot <- function(trelliData,
 #'
 #' @export
 trelli_rnaseq_histogram <- function(trelliData,
-                                       cognostics = c("sample count", "mean lcpm", "median lcpm", "cv lcpm", "skew lcpm"),
-                                       ggplot_params = NULL,
-                                       interactive = FALSE,
-                                       path = .getDownloadsFolder(),
-                                       name = "Trelliscope",
-                                       test_mode = FALSE,
-                                       test_example = 1,
-                                       single_plot = FALSE,
-                                       ...) {
+                                    cognostics = c("sample count", "mean lcpm", "median lcpm", "cv lcpm", "skew lcpm"),
+                                    ggplot_params = NULL,
+                                    interactive = FALSE,
+                                    build_trelliscope = TRUE,
+                                    path = tempdir(),
+                                    name = "Trelliscope",
+                                    test_mode = FALSE,
+                                    test_example = 1,
+                                    single_plot = FALSE,
+                                    ...) {
   # Run initial checks----------------------------------------------------------
   
   # Run generic checks 
@@ -578,6 +555,7 @@ trelli_rnaseq_histogram <- function(trelliData,
 #'   Default is NULL.
 #' @param interactive A logical argument indicating whether the plots should be
 #'   interactive or not. Interactive plots are ggplots piped to ggplotly. Default is FALSE.
+#' @param build_trelliscope The user provided value for building trelliscope
 #' @param path The base directory of the trelliscope application. Default is
 #'   Downloads.
 #' @param name The name of the display. Default is Trelliscope
@@ -630,7 +608,8 @@ trelli_rnaseq_heatmap <- function(trelliData,
                                   cognostics = c("sample count", "mean LCPM", "biomolecule count"),
                                   ggplot_params = NULL,
                                   interactive = FALSE,
-                                  path = .getDownloadsFolder(),
+                                  build_trelliscope = TRUE,
+                                  path = tempdir(),
                                   name = "Trelliscope",
                                   test_mode = FALSE,
                                   test_example = 1,
@@ -645,6 +624,7 @@ trelli_rnaseq_heatmap <- function(trelliData,
                   acceptable_cognostics = c("sample count", "mean LCPM", "biomolecule count"),
                   ggplot_params = ggplot_params,
                   interactive = interactive,
+                  build_trelliscope = build_trelliscope,
                   test_mode = test_mode, 
                   test_example = test_example,
                   single_plot = single_plot,
@@ -810,6 +790,7 @@ trelli_rnaseq_heatmap <- function(trelliData,
 #' @param interactive A logical argument indicating whether the plots should be
 #'    interactive or not. Interactive plots are ggplots piped to ggplotly (for
 #'    now). Default is FALSE.
+#' @param build_trelliscope The user provided value for building trelliscope
 #' @param path The base directory of the trelliscope application. Default is
 #'    Downloads.
 #' @param name The name of the display. Default is Trelliscope.
@@ -887,7 +868,8 @@ trelli_rnaseq_nonzero_bar <- function(trelliData,
                                    proportion = TRUE,
                                    ggplot_params = NULL,
                                    interactive = FALSE,
-                                   path = .getDownloadsFolder(),
+                                   build_trelliscope = TRUE,
+                                   path = tempdir(),
                                    name = "Trelliscope",
                                    test_mode = FALSE,
                                    test_example = 1,
@@ -902,6 +884,7 @@ trelli_rnaseq_nonzero_bar <- function(trelliData,
                   acceptable_cognostics = c("total count", "non-zero count", "non-zero proportion"),
                   ggplot_params = ggplot_params,
                   interactive = interactive,
+                  build_trelliscope = build_trelliscope,
                   test_mode = test_mode, 
                   test_example = test_example,
                   single_plot = single_plot,

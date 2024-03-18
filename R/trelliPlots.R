@@ -177,11 +177,6 @@ trelli_precheck <- function(trelliData,
   
 }
 
-# A quick cognostic function
-quick_cog <- function(name, value) {
-  dplyr::tibble(!!dplyr::sym(name) := trelliscopejs::cog(value, desc = name))
-}
-
 # This function builds a trelliscope display from a trelliscope data.frame using lazy panel
 trelli_builder_lazy <- function(toBuild, path, name, ...) {
   
