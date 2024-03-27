@@ -313,8 +313,8 @@ trelli_rnaseq_boxplot <- function(trelliData,
   # Return a single plot if single_plot is TRUE
   if (single_plot) {
     
-    singleData <- toBuild[test_example[1], "Panel"]
-    return(singleData)
+    singleData <- toBuild[test_example[1], "plots"]
+    return(singleData$plots)
     
   } else {
     
@@ -540,8 +540,8 @@ trelli_rnaseq_histogram <- function(trelliData,
   # Return a single plot if single_plot is TRUE
   if (single_plot) {
     
-    singleData <- toBuild[test_example[1], "Panel"]
-    return(singleData)
+    singleData <- toBuild[test_example[1], "plots"]
+    return(singleData$plots)
     
   } else {
     
@@ -780,8 +780,8 @@ trelli_rnaseq_heatmap <- function(trelliData,
   # Return a single plot if single_plot is TRUE
   if (single_plot) {
     
-    singleData <- toBuild[test_example[1], "Panel"]
-    return(singleData)
+    singleData <- toBuild[test_example[1], "plots"]
+    return(singleData$plots)
     
   } else {
     
@@ -1139,8 +1139,8 @@ trelli_rnaseq_nonzero_bar <- function(trelliData,
   # Return a single plot if single_plot is TRUE
   if (single_plot) {
     
-    singleData <- toBuild[test_example[1], "Panel"]
-    return(singleData)
+    singleData <- toBuild[test_example[1], "plots"]
+    return(singleData$plots)
     
   } else {
     

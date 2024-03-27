@@ -420,20 +420,6 @@ trelli_abundance_boxplot <- function(trelliData,
     stop("include_points must be a TRUE or FALSE.")
   }
   
-  count_name <- NULL
-  # Determine if count is biomolecule count or sample count 
-  if ("count" %in% cognostics) {
-    
-    if (attr(trelliData, "panel_by") == get_edata_cname(trelliData$omicsData)) {
-      count_name <- "sample count"
-    } else {
-      count_name <- "biomolecule count"
-    }
-    
-    cognostics[which(cognostics == "count")] <- count_name
-    
-  }
-  
   if (any(c("anova p-value", "fold change") %in% cognostics) & panel != get_edata_cname(trelliData$omicsData)) {
     message(paste("Please panel by", get_edata_cname(trelliData$omicsData), "to get 'anova p-value' and 'fold change' as cognostics in the trelliscope display."))
     cognostics <- cognostics[cognostics %in% c("anova p-value", "fold change") == FALSE]
@@ -455,11 +441,6 @@ trelli_abundance_boxplot <- function(trelliData,
         `median abundance` = median(Abundance, na.rm = T),
         `cv abundance` = sd(Abundance, na.rm = T) / `mean abundance` * 100
       )
-    
-    # Change count to the proper name
-    if (!is.null(count_name)) {
-      colnames(toBuild)[which(colnames(toBuild) == "count")] <- count_name
-    }
     
     # Now, select only the requested cognostics 
     toBuild <- toBuild %>%
@@ -499,8 +480,12 @@ trelli_abundance_boxplot <- function(trelliData,
     }
     
     # Now, select only the requested cognostics 
-    toBuild <- toBuild %>%
-      dplyr::select(dplyr::all_of(c(panel, cognostics)))
+    toSelect <- lapply(colnames(toBuild), function(column) {
+      lapply(c(panel, cognostics), function(choice) {grepl(pattern = choice, x = column)}) %>%
+        unlist() %>%
+        any()
+    }) %>% unlist()
+    toBuild <- toBuild[,toSelect]
     
   }
   
@@ -583,8 +568,8 @@ trelli_abundance_boxplot <- function(trelliData,
   # Return a single plot if single_plot is TRUE
   if (single_plot) {
     
-    singleData <- toBuild[test_example[1], "Panel"]
-    return(singleData)
+    singleData <- toBuild[test_example[1], "plots"]
+    return(singleData$plots)
     
   } else {
     
@@ -765,8 +750,12 @@ trelli_abundance_histogram <- function(trelliData,
   }
   
   # Now, select only the requested cognostics 
-  toBuild <- toBuild %>%
-    dplyr::select(dplyr::all_of(c(panel, cognostics)))
+  toSelect <- lapply(colnames(toBuild), function(column) {
+    lapply(c(panel, cognostics), function(choice) {grepl(pattern = choice, x = column)}) %>%
+      unlist() %>%
+      any()
+  }) %>% unlist()
+  toBuild <- toBuild[,toSelect]
   
   # Filter down if test mode
   if (test_mode) {
@@ -820,8 +809,8 @@ trelli_abundance_histogram <- function(trelliData,
   # Return a single plot if single_plot is TRUE
   if (single_plot) {
     
-    singleData <- toBuild[test_example[1], "Panel"]
-    return(singleData)
+    singleData <- toBuild[test_example[1], "plots"]
+    return(singleData$plots)
     
   } else {
     
@@ -1007,6 +996,14 @@ trelli_abundance_heatmap <- function(trelliData,
     toBuild <- dplyr::left_join(toBuild, bio_counts, by = panel)
   }
   
+  # Now, select only the requested cognostics 
+  toSelect <- lapply(colnames(toBuild), function(column) {
+    lapply(c(panel, cognostics), function(choice) {grepl(pattern = choice, x = column)}) %>%
+      unlist() %>%
+      any()
+  }) %>% unlist()
+  toBuild <- toBuild[,toSelect]
+  
   # Filter down if test mode
   if (test_mode) {
     toBuild <- toBuild[test_example,]
@@ -1061,7 +1058,6 @@ trelli_abundance_heatmap <- function(trelliData,
     return(hm)
   }
 
-
   # Build trelliscope display---------------------------------------------------
   
   # Add a panel column for plotting
@@ -1077,8 +1073,8 @@ trelli_abundance_heatmap <- function(trelliData,
   # Return a single plot if single_plot is TRUE
   if (single_plot) {
     
-    singleData <- toBuild[test_example[1], "Panel"]
-    return(singleData)
+    singleData <- toBuild[test_example[1], "plots"]
+    return(singleData$plots)
     
   } else {
     
@@ -1354,6 +1350,14 @@ trelli_missingness_bar <- function(trelliData,
     
   }
   
+  # Now, select only the requested cognostics 
+  toSelect <- lapply(colnames(toBuild), function(column) {
+    lapply(c(panel, cognostics), function(choice) {grepl(pattern = choice, x = column)}) %>%
+      unlist() %>%
+      any()
+  }) %>% unlist()
+  toBuild <- toBuild[,toSelect]
+  
   # Filter down if test mode --> must be here to get the right selection of panels
   if (test_mode) {
     toBuild <- toBuild[test_example,]
@@ -1471,19 +1475,12 @@ trelli_missingness_bar <- function(trelliData,
     dplyr::ungroup() %>%
     dplyr::mutate(plots = trelliscope::panel_lazy(missing_bar_plot_fun)) %>%
     dplyr::select(-Panel)
-  
-  # Now, select only the requested cognostics 
-  selected <- colnames(toBuild)[lapply(colnames(toBuild), function(x) {grepl("total count|observed count|observed proportion", x)}) %>% unlist()]
-  selected <- c(selected, panel, "plots")
-  
-  toBuild <- toBuild %>%
-    dplyr::select(dplyr::all_of(selected))
 
   # Return a single plot if single_plot is TRUE
   if (single_plot) {
     
-    singleData <- toBuild[test_example[1], "Panel"]
-    return(singleData)
+    singleData <- toBuild[test_example[1], "plots"]
+    return(singleData$plots)
     
   } else {
     
@@ -1742,8 +1739,8 @@ trelli_foldchange_bar <- function(trelliData,
   # Return a single plot if single_plot is TRUE
   if (single_plot) {
     
-    singleData <- toBuild[test_example[1], "Panel"]
-    return(singleData)
+    singleData <- toBuild[test_example[1], "plots"]
+    return(singleData$plots)
     
   } else {
     
@@ -2054,8 +2051,8 @@ trelli_foldchange_boxplot <- function(trelliData,
   
   # Return a single plot if single_plot is TRUE
   if (single_plot) {
-    singleData <- toBuild[test_example[1], "Panel"]
-    return(singleData)
+    singleData <- toBuild[test_example[1], "plots"]
+    return(singleData$plots)
   } else {
     # If build_trelliscope is true, then build the display. Otherwise, return 
     if (build_trelliscope) {
@@ -2332,8 +2329,8 @@ trelli_foldchange_heatmap <- function(trelliData,
   
   # Return a single plot if single_plot is TRUE
   if (single_plot) {
-    singleData <- toBuild[test_example[1], "Panel"]
-    return(singleData)
+    singleData <- toBuild[test_example[1], "plots"]
+    return(singleData$plots)
   } else {
     # If build_trelliscope is true, then build the display. Otherwise, return 
     if (build_trelliscope) {
@@ -2625,8 +2622,8 @@ trelli_foldchange_volcano <- function(trelliData,
   
   # Return a single plot if single_plot is TRUE
   if (single_plot) {
-    singleData <- toBuild[test_example[1], "Panel"]
-    return(singleData)
+    singleData <- toBuild[test_example[1], "plots"]
+    return(singleData$plots)
   } else {
     # If build_trelliscope is true, then build the display. Otherwise, return 
     if (build_trelliscope) {
