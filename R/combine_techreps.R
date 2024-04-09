@@ -81,7 +81,7 @@ combine_techreps <- function(omicsData, combine_fn = NULL,
 
   # isobaric object has been reference sample normalized
   if (inherits(omicsData, "isobaricpepData")) {
-    if (!attr(res, "isobaric_info")$norm_info$is_normalized) stop("isobaricpepData objects must have been normalized to the appropriate reference pool samples before combining technical replicates")
+    if (!attr(omicsData, "isobaric_info")$norm_info$is_normalized) stop("isobaricpepData objects must have been normalized to the appropriate reference pool samples before combining technical replicates")
   }
 
   # legit display name column or vector of display names
