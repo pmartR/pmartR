@@ -6789,8 +6789,8 @@ gtest_heatmap <-
       dplyr::group_by(Count_First_Group, Count_Second_Group, Comparison) %>%
       dplyr::summarise(
         n = dplyr::n(),
-        n_sig = sum(P_value < pval_thresh),
-        sig = any(P_value < pval_thresh)
+        n_sig = sum(na.omit(P_value < pval_thresh)),
+        sig = any(na.omit(P_value < pval_thresh))
       ) %>%
       dplyr::mutate(
         Count_First_Group = as.character(Count_First_Group),
