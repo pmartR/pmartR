@@ -657,12 +657,16 @@ edgeR_wrapper <- function(
 
   all_cont <- res_contrasts[purrr::map_int(res_contrasts, nrow) != 0]
   all_cont <- purrr::reduce(all_cont, dplyr::full_join)
-
+  
   count_cols <- grep("^NonZero_Count_", colnames(all_cont))
   # mean_cols <- grep("^Mean", colnames(all_cont))
   lfc_cols <- grep("^logFC", colnames(all_cont))
   # pval_cols <- grep(colnames(all_cont), "_pvalue")
-  padj_cols <- grep("^(FDR|FWER)", colnames(all_cont))
+  if(p_adjust != "none"){
+    padj_cols <- grep("^(FDR|FWER)", colnames(all_cont))
+  } else {
+    padj_cols <- grep("^PValue", colnames(all_cont))
+  }
   flag_cols <- grep("^Flag", colnames(all_cont))
 
   colnames(all_cont)[-1] <- gsub("^logFC", "Fold_change", colnames(all_cont)[-1])
