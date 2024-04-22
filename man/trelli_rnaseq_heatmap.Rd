@@ -6,7 +6,7 @@
 \usage{
 trelli_rnaseq_heatmap(
   trelliData,
-  cognostics = c("sample count", "mean LCPM", "biomolecule count"),
+  cognostics = c("sample count", "mean lcpm", "biomolecule count"),
   ggplot_params = NULL,
   interactive = FALSE,
   build_trelliscope = TRUE,
@@ -23,7 +23,7 @@ trelli_rnaseq_heatmap(
 grouped by an emeta variable. Must be built using seqData. Required.}
 
 \item{cognostics}{A vector of cognostic options. Defaults are "sample count", 
-"mean LCPM" and "biomolecule count". "sample count" and "mean LCPM"
+"mean lcpm" and "biomolecule count". "sample count" and "mean lcpm"
 are reported per group, and "biomolecule count" is the total number of biomolecules
 in the biomolecule class (e_meta column).}
 

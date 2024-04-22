@@ -567,7 +567,7 @@ trelli_rnaseq_histogram <- function(trelliData,
 #' @param trelliData A trelliscope data object made by as.trelliData, and
 #'   grouped by an emeta variable. Must be built using seqData. Required.
 #' @param cognostics A vector of cognostic options. Defaults are "sample count", 
-#'   "mean LCPM" and "biomolecule count". "sample count" and "mean LCPM"
+#'   "mean lcpm" and "biomolecule count". "sample count" and "mean lcpm"
 #'   are reported per group, and "biomolecule count" is the total number of biomolecules
 #'   in the biomolecule class (e_meta column).
 #' @param ggplot_params An optional vector of strings of ggplot parameters to
@@ -625,7 +625,7 @@ trelli_rnaseq_histogram <- function(trelliData,
 #'
 #' @export
 trelli_rnaseq_heatmap <- function(trelliData,
-                                  cognostics = c("sample count", "mean LCPM", "biomolecule count"),
+                                  cognostics = c("sample count", "mean lcpm", "biomolecule count"),
                                   ggplot_params = NULL,
                                   interactive = FALSE,
                                   build_trelliscope = TRUE,
@@ -641,7 +641,7 @@ trelli_rnaseq_heatmap <- function(trelliData,
   trelli_precheck(trelliData = trelliData, 
                   trelliCheck = "omics",
                   cognostics = cognostics,
-                  acceptable_cognostics = c("sample count", "mean LCPM", "biomolecule count"),
+                  acceptable_cognostics = c("sample count", "mean lcpm", "biomolecule count"),
                   ggplot_params = ggplot_params,
                   interactive = interactive,
                   build_trelliscope = build_trelliscope,

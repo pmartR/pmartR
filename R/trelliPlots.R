@@ -428,82 +428,86 @@ trelli_abundance_boxplot <- function(trelliData,
   # Start summary toBuild data.frame
   toBuild <- trelliData$trelliData
   
-  # First, add any missing cognostics-------------------------------------------
+  # First, add any missing metas------------------------------------------------
   
-  # Add cognostics without groups
-  if ("Group" %in% colnames(toBuild) == FALSE) {
+  if (!single_plot) {
     
-    toBuild <- toBuild %>% 
-      dplyr::group_by_at(panel) %>%
-      dplyr::summarize(
-        count = sum(!is.na(Abundance)),
-        `mean abundance` = mean(Abundance, na.rm = T),
-        `median abundance` = median(Abundance, na.rm = T),
-        `cv abundance` = sd(Abundance, na.rm = T) / `mean abundance` * 100
-      )
-    
-    # Now, select only the requested cognostics 
-    toBuild <- toBuild %>%
-      dplyr::select(dplyr::all_of(c(panel, cognostics)))
-    
-  } else {
-    
-    # Make a group variable name just to make group_by_at work properly
-    theGroup <- "Group"
-    
-    # Add cognostics per group
-    toBuild <- toBuild %>% 
-      dplyr::group_by_at(c(panel, theGroup)) %>%
-      dplyr::summarise(
-        count = sum(!is.na(Abundance)),
-        `mean abundance` = mean(Abundance, na.rm = T), 
-      ) %>%
-      tidyr::pivot_wider(id_cols = panel, names_from = Group, values_from = c(count, `mean abundance`), names_sep = " ")
-    
-    # Now remove unwanted cognostics
-    if ("mean abundance" %in% cognostics == FALSE) {
-      toBuild <- toBuild[,grepl("mean abundance", colnames(toBuild)) == FALSE]
-    }
-    if (any(grepl("count", cognostics)) == FALSE) {
-      toBuild <- toBuild[,grepl("count", colnames(toBuild)) == FALSE]
-    }
-    
-    # Add emeta columns
-    if (!is.null(attr(trelliData, "emeta_col"))) {
+    # Add metas without groups
+    if ("Group" %in% colnames(toBuild) == FALSE) {
       
-      # Pull emeta uniqued columns that should have been prepped in the pivot_longer section
-      emeta <- trelliData$trelliData[,c(panel, attr(trelliData, "emeta_col"))] %>% unique()
+      toBuild <- toBuild %>% 
+        dplyr::group_by_at(panel) %>%
+        dplyr::summarize(
+          count = sum(!is.na(Abundance)),
+          `mean abundance` = mean(Abundance, na.rm = T),
+          `median abundance` = median(Abundance, na.rm = T),
+          `cv abundance` = sd(Abundance, na.rm = T) / `mean abundance` * 100
+        )
       
-      # Add emeta cognostics
-      toBuild <- dplyr::left_join(toBuild, emeta, by = panel)
+      # Now, select only the requested metas
+      toBuild <- toBuild %>%
+        dplyr::select(dplyr::all_of(c(panel, cognostics)))
+      
+    } else {
+      
+      # Make a group variable name just to make group_by_at work properly
+      theGroup <- "Group"
+      
+      # Add metas per group
+      toBuild <- toBuild %>% 
+        dplyr::group_by_at(c(panel, theGroup)) %>%
+        dplyr::summarise(
+          count = sum(!is.na(Abundance)),
+          `mean abundance` = mean(Abundance, na.rm = T), 
+        ) %>%
+        tidyr::pivot_wider(id_cols = panel, names_from = Group, values_from = c(count, `mean abundance`), names_sep = " ")
+      
+      # Now remove unwanted cognostics
+      if ("mean abundance" %in% cognostics == FALSE) {
+        toBuild <- toBuild[,grepl("mean abundance", colnames(toBuild)) == FALSE]
+      }
+      if (any(grepl("count", cognostics)) == FALSE) {
+        toBuild <- toBuild[,grepl("count", colnames(toBuild)) == FALSE]
+      }
+      
+      # Add emeta columns
+      if (!is.null(attr(trelliData, "emeta_col"))) {
+        
+        # Pull emeta uniqued columns that should have been prepped in the pivot_longer section
+        emeta <- trelliData$trelliData[,c(panel, attr(trelliData, "emeta_col"))] %>% unique()
+        
+        # Add emeta cognostics
+        toBuild <- dplyr::left_join(toBuild, emeta, by = panel)
+        
+      }
+      
+      # Now, select only the requested cognostics 
+      toSelect <- lapply(colnames(toBuild), function(column) {
+        lapply(c(panel, cognostics), function(choice) {grepl(pattern = choice, x = column)}) %>%
+          unlist() %>%
+          any()
+      }) %>% unlist()
+      toBuild <- toBuild[,toSelect]
       
     }
     
-    # Now, select only the requested cognostics 
-    toSelect <- lapply(colnames(toBuild), function(column) {
-      lapply(c(panel, cognostics), function(choice) {grepl(pattern = choice, x = column)}) %>%
-        unlist() %>%
-        any()
-    }) %>% unlist()
-    toBuild <- toBuild[,toSelect]
+    # Add p-values and fold changes 
+    if ("anova p-value" %in% cognostics) {
+      anova_cols <- colnames(trelliData$trelliData)[grepl("P_value_A", colnames(trelliData$trelliData))]
+      anova_data <- trelliData$trelliData[,c(panel, anova_cols)] %>% unique()
+      toBuild <- dplyr::left_join(toBuild, anova_data, by = panel)
+    }
+    if ("fold change" %in% cognostics) {
+      fc_cols <- colnames(trelliData$trelliData)[grepl("Fold_change", colnames(trelliData$trelliData))]
+      fc_data <- trelliData$trelliData[,c(panel, fc_cols)] %>% unique()
+      toBuild <- dplyr::left_join(toBuild, fc_data, by = panel)
+    }
     
-  }
-  
-  # Add p-values and fold changes 
-  if ("anova p-value" %in% cognostics) {
-    anova_cols <- colnames(trelliData$trelliData)[grepl("P_value_A", colnames(trelliData$trelliData))]
-    anova_data <- trelliData$trelliData[,c(panel, anova_cols)] %>% unique()
-    toBuild <- dplyr::left_join(toBuild, anova_data, by = panel)
-  }
-  if ("fold change" %in% cognostics) {
-    fc_cols <- colnames(trelliData$trelliData)[grepl("Fold_change", colnames(trelliData$trelliData))]
-    fc_data <- trelliData$trelliData[,c(panel, fc_cols)] %>% unique()
-    toBuild <- dplyr::left_join(toBuild, fc_data, by = panel)
-  }
-  
-  # Filter down if test mode
-  if (test_mode) {
-    toBuild <- toBuild[test_example,]
+    # Filter down if test mode
+    if (test_mode) {
+      toBuild <- toBuild[test_example,]
+    }
+    
   }
   
   # Second, make boxplot function-----------------------------------------------
@@ -727,7 +731,6 @@ trelli_abundance_histogram <- function(trelliData,
   toBuild <- trelliData$trelliData
   
   # First, add any missing cognostics-------------------------------------------
-  
   toBuild <- toBuild %>% 
     dplyr::group_by_at(panel) %>%
     dplyr::summarize(
@@ -966,47 +969,50 @@ trelli_abundance_heatmap <- function(trelliData,
   
   # First, add any missing cognostics-------------------------------------------
   
-  # Make a group variable name just to make group_by_at work properly
-  theGroup <- "Group"
+  if (!single_plot) {
   
-  # Add cognostics per group
-  toBuild <- toBuild %>% 
-    dplyr::group_by_at(c(panel, theGroup)) %>%
-    dplyr::summarise(
-      count = sum(!is.na(Abundance)),
-      `mean abundance` = mean(Abundance, na.rm = T)
-    ) %>%
-    tidyr::pivot_wider(id_cols = panel, names_from = Group, values_from = c(count, `mean abundance`), names_sep = " ")
-  
-  # Remove unwanted cognostics 
-  if ("sample count" %in% cognostics == FALSE) {
-    toBuild <- toBuild[,!grepl("count", colnames(toBuild))]
-  }
-  if ("mean abundance" %in% cognostics == FALSE) {
-    toBuild <- toBuild[,!grepl("mean abundance", colnames(toBuild))]
-  }
-  
-  # Add biomolecule count if requested 
-  if ("biomolecule count" %in% cognostics) {
-    bio_counts <- trelliData$trelliData %>% 
-      dplyr::select(panel, edata_cname) %>%
-      unique() %>%
-      dplyr::group_by_at(panel) %>%
-      dplyr::summarise(`biomolecule count` = dplyr::n())
-    toBuild <- dplyr::left_join(toBuild, bio_counts, by = panel)
-  }
-  
-  # Now, select only the requested cognostics 
-  toSelect <- lapply(colnames(toBuild), function(column) {
-    lapply(c(panel, cognostics), function(choice) {grepl(pattern = choice, x = column)}) %>%
-      unlist() %>%
-      any()
-  }) %>% unlist()
-  toBuild <- toBuild[,toSelect]
-  
-  # Filter down if test mode
-  if (test_mode) {
-    toBuild <- toBuild[test_example,]
+    # Make a group variable name just to make group_by_at work properly
+    theGroup <- "Group"
+    
+    # Add cognostics per group
+    toBuild <- toBuild %>% 
+      dplyr::group_by_at(c(panel, theGroup)) %>%
+      dplyr::summarise(
+        count = sum(!is.na(Abundance)),
+        `mean abundance` = mean(Abundance, na.rm = T)
+      ) %>%
+      tidyr::pivot_wider(id_cols = panel, names_from = Group, values_from = c(count, `mean abundance`), names_sep = " ")
+    
+    # Remove unwanted cognostics 
+    if ("sample count" %in% cognostics == FALSE) {
+      toBuild <- toBuild[,!grepl("count", colnames(toBuild))]
+    }
+    if ("mean abundance" %in% cognostics == FALSE) {
+      toBuild <- toBuild[,!grepl("mean abundance", colnames(toBuild))]
+    }
+    
+    # Add biomolecule count if requested 
+    if ("biomolecule count" %in% cognostics) {
+      bio_counts <- trelliData$trelliData %>% 
+        dplyr::select(panel, edata_cname) %>%
+        unique() %>%
+        dplyr::group_by_at(panel) %>%
+        dplyr::summarise(`biomolecule count` = dplyr::n())
+      toBuild <- dplyr::left_join(toBuild, bio_counts, by = panel)
+    }
+    
+    # Now, select only the requested cognostics 
+    toSelect <- lapply(colnames(toBuild), function(column) {
+      lapply(c(panel, cognostics), function(choice) {grepl(pattern = choice, x = column)}) %>%
+        unlist() %>%
+        any()
+    }) %>% unlist()
+    toBuild <- toBuild[,toSelect]
+    
+    # Filter down if test mode
+    if (test_mode) {
+      toBuild <- toBuild[test_example,]
+    }
   }
 
   # Make heatmap function-------------------------------------------------------
