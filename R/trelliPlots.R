@@ -116,6 +116,11 @@ trelli_precheck <- function(trelliData,
   ######################
   ## COGNOSTIC CHECKS ##
   ######################
+  
+  # Add emeta columns in acceptable cognostics 
+  if (!is.null(attr(trelliData, "emeta_col"))) {
+    acceptable_cognostics <- c(acceptable_cognostics, attr(trelliData, "emeta_col"))
+  }
 
   # If cognostics are not NULL...
   if (!is.null(cognostics)) {
