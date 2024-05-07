@@ -29,6 +29,11 @@
 #'   omicsData = mymetab
 #' )
 #'
+#' @return Normalized omicsData object of class 'pepData', 'proData', 'metabData',
+#'   'lipidData', 'nmrData', created by \code{\link{as.pepData}},
+#'   \code{\link{as.proData}}, \code{\link{as.metabData}},
+#'   \code{\link{as.lipidData}}, \code{\link{as.nmrData}}, respectively.
+#'
 #' @author Rachel Richardson
 #'
 #'
