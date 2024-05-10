@@ -1,7 +1,7 @@
 context("summary: trelliData edata and trelliData")
 
 test_that("trelliData object summaries return the correct data frames", {
-  
+  testthat::skip_on_cran()
   ##################
   ## MS/NMR TESTS ##
   ##################

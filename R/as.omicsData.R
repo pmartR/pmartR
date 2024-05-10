@@ -1780,7 +1780,7 @@ str_col <- function(edata,
     # Forcefully tell the user their data is not acceptable. In other words, we
     # don't want their crap data because our life is crazy enough already.
     stop(paste(grammar[[1]],
-      knitr::combine_words(non_numeric),
+      sprintf("(%s)", paste(non_numeric, collapse = ", ")),
       'of e_data',
       grammar[[2]],
       'non-numeric values.',
@@ -1802,7 +1802,7 @@ str_col <- function(edata,
     # Throw down an error letting the user know it is impossible to have an
     # infinite number of something in their sample. (How would it all fit?)
     stop(paste(grammar[[1]],
-      knitr::combine_words(too_vast),
+      sprintf("(%s)", paste(too_vast, collapse = ", ")),
       'of e_data',
       grammar[[2]],
       'infinite values.',

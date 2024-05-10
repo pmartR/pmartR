@@ -1,8 +1,12 @@
 context('seqData dispersion_est')
 
 test_that('dispersion_est returns the correct data frame and attributes', {
+  testthat::skip_if_not_installed("edgeR")
+  testthat::skip_if_not_installed("DESeq2")
+  testthat::skip_if_not_installed("limma")
+  
   # Load the reduced peptide data frames ---------------------------------------
-
+  
   load(system.file('testdata',
     'little_seqdata.RData',
     package = 'pmartR'
