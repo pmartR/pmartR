@@ -6921,7 +6921,7 @@ gtest_heatmap <-
             count_text = ifelse(
               is.na(n),
               NA,
-              ifelse(n_sig > 0, sprintf("%s (%s)", n, n_sig), n)
+              ifelse(.data$n_sig > 0, sprintf("%s (%s)", n, .data$n_sig), n)
             )
           ) 
       }
@@ -6956,7 +6956,7 @@ gtest_heatmap <-
           ggplot2::aes(
             Count_First_Group, 
             Count_Second_Group, 
-            label = count_text
+            label = .data$count_text
           ),
           nudge_x = -0.5, nudge_y = 0.5, hjust = -0.1, vjust = 1.5,
           color = "white", size = text_size
