@@ -1553,7 +1553,7 @@ test_that('custom_filter and applyFilt produce the correct output', {
   expect_error(
     applyFilt(filter_object = split_remove, omicsData = pairdata),
     paste("The following samples should also be removed based on the input:",
-      "FM_18hr_3 and AM_0hr_5. Samples in a pair must be removed together.",
+      "\\(FM_18hr_3, AM_0hr_5\\). Samples in a pair must be removed together.",
       sep = " "
     )
   )
@@ -1561,7 +1561,7 @@ test_that('custom_filter and applyFilt produce the correct output', {
   expect_error(
     applyFilt(filter_object = split_keep, omicsData = pairdata),
     paste("The following samples should also be kept based on the input:",
-      "FM_18hr_5. Samples in a pair must be kept together.",
+      "\\(FM_18hr_5\\). Samples in a pair must be kept together.",
       sep = " "
     )
   )

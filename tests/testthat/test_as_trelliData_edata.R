@@ -1,6 +1,7 @@
 context("class: trelliData edata")
 
 test_that("as.trelliData.edata returns correct data frames and attributes", {
+  testthat::skip_on_cran()
   
   ##################
   ## MS/NMR TESTS ##

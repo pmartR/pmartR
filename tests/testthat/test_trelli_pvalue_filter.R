@@ -1,7 +1,7 @@
 context("function: trelli_pvalue_filter")
 
 test_that("trelli_pvalue_filter returns correct data frames and attributes", {
-  
+  testthat::skip_on_cran()
   ##################
   ## MS/NMR TESTS ##
   ##################

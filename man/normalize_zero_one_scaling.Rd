@@ -12,6 +12,12 @@ normalize_zero_one_scaling(omicsData)
 \code{\link{as.proData}}, \code{\link{as.metabData}},
 \code{\link{as.lipidData}}, \code{\link{as.nmrData}}, respectively.}
 }
+\value{
+Normalized omicsData object of class 'pepData', 'proData', 'metabData',
+  'lipidData', 'nmrData', created by \code{\link{as.pepData}},
+  \code{\link{as.proData}}, \code{\link{as.metabData}},
+  \code{\link{as.lipidData}}, \code{\link{as.nmrData}}, respectively.
+}
 \description{
 Perform scaling of data from zero to one.
 }

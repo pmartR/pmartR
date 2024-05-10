@@ -762,7 +762,7 @@ test_that('the correct group data frame and attributes are created', {
       pair_denom = "0"
     ),
     paste("The following samples have main effects that differ between",
-      "pairs: Mock_0hr_2 and Mock_18hr_2",
+      "pairs: \\(Mock_0hr_2, Mock_18hr_2\\)",
       sep = " "
     )
   )
@@ -776,7 +776,7 @@ test_that('the correct group data frame and attributes are created', {
       pair_denom = "0"
     ),
     paste("The following samples have covariates that differ between",
-      "pairs: AM_0hr_4 and AM_18hr_4",
+      "pairs: \\(AM_0hr_4, AM_18hr_4\\)",
       sep = " "
     )
   )

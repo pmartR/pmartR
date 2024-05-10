@@ -16,7 +16,7 @@
 #'
 #' @return prints a data frame
 #'
-#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE) && requireNamespace("knitr", quietly = TRUE)
 #' library(pmartRdata)
 #' mylipid <- edata_transform(omicsData = lipid_neg_object, data_scale = "log2")
 #'

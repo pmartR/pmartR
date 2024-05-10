@@ -313,7 +313,7 @@ group_designation <- function(omicsData,
 
       stop(paste("The following pair IDs do not have at least two samples to ",
         "form a pair: ",
-        knitr::combine_words(pair_id),
+        sprintf("(%s)", paste(pair_id, collapse = ", ")),
         ".",
         sep = ""
       ))
@@ -376,7 +376,7 @@ group_designation <- function(omicsData,
         # Let them have it for making my life miserable.
         stop(paste("The following samples have main effects that differ",
           "between pairs:",
-          knitr::combine_words(reprobates),
+          sprintf("(%s)", paste(reprobates, collapse = ", ")),
           sep = " "
         ))
       }
@@ -422,7 +422,7 @@ group_designation <- function(omicsData,
         # Let them have it for making my life miserable.
         stop(paste("The following samples have covariates that differ",
           "between pairs:",
-          knitr::combine_words(reprobates),
+          sprintf("(%s)", paste(reprobates, collapse = ", ")),
           sep = " "
         ))
       }

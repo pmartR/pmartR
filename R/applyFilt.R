@@ -1816,9 +1816,7 @@ applyFilt.customFilt <- function(filter_object, omicsData, ...) {
       stop(
         paste("The following samples should also be removed based on the ",
           "input: ",
-          knitr::combine_words(
-            setdiff(filter_samp, as.character(filter_object$f_data_remove))
-          ),
+          sprintf("(%s)", paste(setdiff(filter_samp, as.character(filter_object$f_data_remove)), collapse = ", ")),
           ". Samples in a pair must be removed together.",
           sep = ""
         )
@@ -1846,9 +1844,7 @@ applyFilt.customFilt <- function(filter_object, omicsData, ...) {
     if (!setequal(filter_samp, as.character(filter_object$f_data_keep))) {
       stop(
         paste("The following samples should also be kept based on the input: ",
-          knitr::combine_words(
-            setdiff(filter_samp, as.character(filter_object$f_data_keep))
-          ),
+          sprintf("(%s)", paste(setdiff(filter_samp, as.character(filter_object$f_data_keep)), collapse = ", ")),
           ". Samples in a pair must be kept together.",
           sep = ""
         )
