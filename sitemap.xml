@@ -304,6 +304,9 @@
     <loc>/reference/normalize_quantile.html</loc>
   </url>
   <url>
+    <loc>/reference/normalize_zero_one_scaling.html</loc>
+  </url>
+  <url>
     <loc>/reference/p_adjustment_anova.html</loc>
   </url>
   <url>
@@ -656,6 +659,9 @@
   </url>
   <url>
     <loc>/reference/voom_wrapper.html</loc>
+  </url>
+  <url>
+    <loc>/reference/zero_one_scale.html</loc>
   </url>
   <url>
     <loc>/reference/zrollup.html</loc>
