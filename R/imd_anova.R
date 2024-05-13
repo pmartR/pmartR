@@ -150,67 +150,10 @@ imd_anova <- function(omicsData,
     stop("Data must be log transformed in order to implement ANOVA.")
   }
 
-  # Check for and imd_anova filter. Throw down a warning if a filter hasn't been
-  # applied and at least one biomolecule would be filtered. Apply the imd_anova
-  # filter internally with default setting and report the number of biomolecules
-  # that would be filtered in the warning message.
+  # Check for an imd_anova filter. Throw down a warning if a filter hasn't been
+  # applied.
   if (is.null(attr(omicsData, "imdanova"))) {
-    # Run the imdanova_filter function to see how many biomolecules would be
-    # filtered if the filter were applied.
-    filta <- imdanova_filter(omicsData)
-
-    # Change input to applyFilt depending on test_method.
-    if (test_method == "anova") {
-      suppressMessages(
-        filtad <- applyFilt.imdanovaFilt(filta,
-          omicsData = omicsData,
-          min_nonmiss_anova = 2
-        )
-      )
-    } else if (test_method == "gtest") {
-      suppressMessages(
-        filtad <- applyFilt.imdanovaFilt(filta,
-          omicsData = omicsData,
-          min_nonmiss_gtest = 3
-        )
-      )
-    } else {
-      suppressMessages(
-        filtad <- applyFilt.imdanovaFilt(filta,
-          omicsData = omicsData,
-          min_nonmiss_anova = 2,
-          min_nonmiss_gtest = 3
-        )
-      )
-    }
-
-    # If nothing is filtered an empty list will be returned. Check for an empty
-    # list and assign a value to n_filtad accordingly. This value will be
-    # reported in the warning if one or more biomolecules are filtered. If
-    # nothing is filtered with the default settings no warning message will be
-    # displayed.
-    if (length(attr(filtad, "filter")) == 0) {
-      # Nothing was filtered.
-      n_filtad <- 0
-    } else {
-      # At least one biomolecule was filtered.
-      n_filtad <- length(attributes(filtad)$filter[[1]]$filtered)
-    }
-
-    # Warn the user if something would be filtered with the imd_anova filter.
-    if (n_filtad > 0) {
-      warning(
-        paste(
-          "These data have not been filtered. If an IMD-ANOVA filter is",
-          "applied with the default settings",
-          n_filtad,
-          "biomolecules will be filtered. Consider applying an IMD-ANOVA",
-          "filter prior to calling imd_anova().",
-          sep = " "
-        )
-      )
-    }
-
+    warning("No IMD-ANOVA filter has been applied, output may include results for invalid comparisons (e.g ANOVA with only 2 observations in a group). Consider applying an IMD-ANOVA filter (see `?imdanova_filter`) prior to calling imd_anova()")
     # Add attribute so imd_test and anova_test don't return the same warning.
     attr(omicsData, "imdanova")$test_with_anova <- "No IMD ANOVA Attribute"
   } 

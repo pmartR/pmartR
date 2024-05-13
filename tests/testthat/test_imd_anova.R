@@ -576,5 +576,45 @@ test_that('all tests conform to the decrees of the God of Stats', {
 
   # Test argument checks -------------------------------------------------------
 
-  # Maybe add later (depending on the position of the planets and stars).
+  load(system.file('testdata',
+                   'little_pdata.RData',
+                   package = 'pmartR'
+  ))
+  
+  # add group and batch to fdata
+  fdata$Condition <- c(rep("Infection", 6), rep("Mock", 6))
+  fdata$Batch <- rep(seq(1:2), 6)
+  
+  # Create a pepData object with the reduced data set.
+  pdata <- as.pepData(
+    e_data = edata,
+    f_data = fdata,
+    e_meta = emeta,
+    edata_cname = "Mass_Tag_ID",
+    fdata_cname = "SampleID",
+    emeta_cname = "Protein"
+  )
+  
+  # need to run group_designation
+  expect_error(
+    imd_anova(pdata, test_method = "anova", pval_adjust_a_multcomp = "bonferroni"),
+    "group_designation"
+  )
+  
+  pdata <- group_designation(pdata, main_effects = "Condition")
+  
+  # need to run log transform
+  expect_error(
+    imd_anova(pdata, test_method = "anova", pval_adjust_a_multcomp = "bonferroni"),
+    "log transformed"
+  )
+  
+  pdata <- edata_transform(pdata, "log2")
+  
+  # no imdanova-filter applied, throws warning
+  expect_warning(
+    imd_anova(pdata, test_method = "anova", pval_adjust_a_multcomp = "bonferroni"),
+    "No IMD-ANOVA filter has been applied"
+  )
+ 
 })
