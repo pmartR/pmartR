@@ -23,6 +23,9 @@
 #'   that should be kept after rolling up to the protein level. The default,
 #'   NULL, only keeps the column containing the mapping variable along with the
 #'   new columns created (peps_per_pro and n_peps_used).
+#' @param emeta_cols_sep character specifying the string that will separate the 
+#'   elements for emeta_cols when they are collapsed into a single row when aggregating
+#'   rows belonging to the same protein.  Defaults to ";"
 #'
 #' @return omicsData object of the class 'proData'
 #'
@@ -71,7 +74,7 @@
 protein_quant <- function(pepData, method, isoformRes = NULL,
                           qrollup_thresh = NULL, single_pep = FALSE,
                           single_observation = FALSE, combine_fn = "median",
-                          parallel = TRUE, emeta_cols = NULL) {
+                          parallel = TRUE, emeta_cols = NULL, emeta_cols_sep = ";") {
   # Preflight checks -----------------------------------------------------------
 
   # Make sure the data are on one of the log scales.
@@ -282,16 +285,16 @@ protein_quant <- function(pepData, method, isoformRes = NULL,
       # Use either the original or isoform e_meta depending on the input.
         pepData$e_meta <- pepData$e_meta %>%
           dplyr::group_by(!!dplyr::sym(emeta_cname)) %>%
-          dplyr::summarise_at(emeta_cols, .funs = \(x) paste(unique(x), collapse = ";"))
+          dplyr::mutate(dplyr::across(emeta_cols, \(x) paste(unique(x), collapse = emeta_cols_sep)))
       } else {
         results$e_meta <- results$e_meta %>%
           dplyr::group_by(!!dplyr::sym(emeta_cname)) %>%
-          dplyr::summarise_at(emeta_cols, .funs = \(x) paste(unique(x), collapse = ";"))
+          dplyr::mutate(dplyr::across(emeta_cols, \(x) paste(unique(x), collapse = emeta_cols_sep)))
       }
     } else {
       e_meta <- e_meta %>%
         dplyr::group_by(!!dplyr::sym(emeta_cname)) %>%
-        dplyr::summarise_at(emeta_cols, .funs = \(x) paste(unique(x), collapse = ";"))
+        dplyr::mutate(dplyr::across(emeta_cols, \(x) paste(unique(x), collapse = emeta_cols_sep)))
     }
   }
 

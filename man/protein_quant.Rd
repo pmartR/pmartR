@@ -13,7 +13,8 @@ protein_quant(
   single_observation = FALSE,
   combine_fn = "median",
   parallel = TRUE,
-  emeta_cols = NULL
+  emeta_cols = NULL,
+  emeta_cols_sep = ";"
 )
 }
 \arguments{
@@ -44,6 +45,10 @@ rrollup, qrollup and zrollup functions.}
 that should be kept after rolling up to the protein level. The default,
 NULL, only keeps the column containing the mapping variable along with the
 new columns created (peps_per_pro and n_peps_used).}
+
+\item{emeta_cols_sep}{character specifying the string that will separate the 
+elements for emeta_cols when they are collapsed into a single row when aggregating
+rows belonging to the same protein.  Defaults to ";"}
 }
 \value{
 omicsData object of the class 'proData'
