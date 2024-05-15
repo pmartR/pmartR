@@ -23,6 +23,9 @@
 #'   that should be kept after rolling up to the protein level. The default,
 #'   NULL, only keeps the column containing the mapping variable along with the
 #'   new columns created (peps_per_pro and n_peps_used).
+#' @param emeta_cols_sep character specifying the string that will separate the 
+#'   elements for emeta_cols when they are collapsed into a single row when aggregating
+#'   rows belonging to the same protein.  Defaults to ";"
 #'
 #' @return omicsData object of the class 'proData'
 #'
@@ -71,7 +74,7 @@
 protein_quant <- function(pepData, method, isoformRes = NULL,
                           qrollup_thresh = NULL, single_pep = FALSE,
                           single_observation = FALSE, combine_fn = "median",
-                          parallel = TRUE, emeta_cols = NULL) {
+                          parallel = TRUE, emeta_cols = NULL, emeta_cols_sep = ";") {
   # Preflight checks -----------------------------------------------------------
 
   # Make sure the data are on one of the log scales.
@@ -138,7 +141,7 @@ protein_quant <- function(pepData, method, isoformRes = NULL,
   # Grab more attributes that will be used at some point somewhere.
   data_scale <- get_data_scale(pepData)
   is_normalized <- attr(pepData, "data_info")$norm_info$is_normalized
-
+  
   # Prepare attribute info when isoformRes is present.
   if (!is.null(isoformRes)) {
     # Keep a copy of the original e_meta data frame. This will be used to
@@ -272,30 +275,26 @@ protein_quant <- function(pepData, method, isoformRes = NULL,
   # Update e_meta after quantitation -------------------------------------------
 
   # Check if emeta_cols is NULL. If it is everything can proceed as usual. If it
-  # is not NULL we have to check if the number of unique rows in e_meta is the
-  # same as the number of rows in e_data. If they aren't the pre_flight function
-  # will throw an error. To avoid this we will set emeta_cols to NULL. This will
-  # only keep the protein ID, n_peps_used, and peps_per_pro columns.
+  # is not NULL we have to ensure that identical proteins mapping to different 
+  # values of emeta_cols columns are combined. If they aren't the pre_flight 
+  # function will throw an error.
   if (!is.null(emeta_cols)) {
-    # Nab number of rows in e_data to compare with number of rows in e_meta.
-    n_row_edata <- nrow(results$e_data)
-
-    # Grab the number of rows in e_meta depending on the rollup method used.
-    n_row_emeta <- if (is.null(results$e_meta)) {
+    
+    if (is.null(isoformRes)) {
+      if (is.null(results$e_meta)) {
       # Use either the original or isoform e_meta depending on the input.
-      if (is.null(isoformRes)) {
-        nrow(unique(pepData$e_meta))
+        pepData$e_meta <- pepData$e_meta %>%
+          dplyr::group_by(!!dplyr::sym(emeta_cname)) %>%
+          dplyr::mutate(dplyr::across(emeta_cols, \(x) paste(unique(x), collapse = emeta_cols_sep)))
       } else {
-        nrow(e_meta_iso)
+        results$e_meta <- results$e_meta %>%
+          dplyr::group_by(!!dplyr::sym(emeta_cname)) %>%
+          dplyr::mutate(dplyr::across(emeta_cols, \(x) paste(unique(x), collapse = emeta_cols_sep)))
       }
     } else {
-      nrow(unique(results$e_meta))
-    }
-
-    # Change emeta_cols to NULL if the number of e_data and unique e_meta rows
-    # do not match.
-    if (n_row_edata != n_row_emeta) {
-      emeta_cols <- NULL
+      e_meta <- e_meta %>%
+        dplyr::group_by(!!dplyr::sym(emeta_cname)) %>%
+        dplyr::mutate(dplyr::across(emeta_cols, \(x) paste(unique(x), collapse = emeta_cols_sep)))
     }
   }
 
@@ -352,18 +351,18 @@ protein_quant <- function(pepData, method, isoformRes = NULL,
     peps_used <- if ("n_peps_used" %in% colnames(results$e_meta)) {
       # Extract counts from e_meta because peptides were counted in qrollup.
       results$e_meta %>%
-        dplyr::select(!!dplyr::sym(emeta_cname), n_peps_used) %>%
+        dplyr::select(!!dplyr::sym(emeta_cname_iso), n_peps_used) %>%
         # Only keep unique combinations of emeta_cname and n_peps_used
         dplyr::distinct()
     } else {
       # Count peptides per isoform from the bpquant output.
       isoformRes2 %>%
-        dplyr::group_by(Protein_Isoform) %>%
+        dplyr::group_by(!!dplyr::sym(emeta_cname_iso)) %>%
         dplyr::mutate(n_peps_used = dplyr::n()) %>%
         # Only keep the first row of each group.
         dplyr::slice(1) %>%
         dplyr::ungroup() %>%
-        dplyr::select(!!dplyr::sym(emeta_cname), n_peps_used)
+        dplyr::select(!!dplyr::sym(emeta_cname_iso), n_peps_used)
     }
 
     # store total number of peptides mapping to each protein (different from
@@ -382,7 +381,7 @@ protein_quant <- function(pepData, method, isoformRes = NULL,
       results$e_meta <- results$e_meta %>%
         dplyr::select(-n_peps_used)
     }
-
+    
     # join the two count columns to the output e_meta
     results$e_meta <- results$e_meta %>%
       dplyr::left_join(
@@ -392,7 +391,9 @@ protein_quant <- function(pepData, method, isoformRes = NULL,
         relationship = "many-to-many"
       ) %>%
       dplyr::left_join(peps_used,
-                       by = emeta_cname,
+                       by = ifelse(is.null(isoformRes),
+                                   emeta_cname,
+                                   emeta_cname_iso),
                        multiple = "all",
                        relationship = "many-to-many") %>%
       # Move any columns specified by the user after n_peps_used.

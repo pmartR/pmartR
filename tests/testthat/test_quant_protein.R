@@ -130,7 +130,8 @@ test_that('each rollup method correctly quantifies proteins', {
       dplyr::group_by(Protein) %>%
       dplyr::mutate(peps_per_pro = dplyr::n()) %>%
       dplyr::mutate(n_peps_used = peps_per_pro) %>%
-      dplyr::select(Protein, peps_per_pro, n_peps_used) %>%
+      dplyr::mutate(dplyr::across('Peptide_Sequence', \(x) paste(unique(x), collapse = ";"))) %>%
+      dplyr::select(Protein, peps_per_pro, n_peps_used, Peptide_Sequence) %>%
       dplyr::distinct(.) %>%
       data.frame(),
     edata_cname = "Protein",
@@ -559,9 +560,10 @@ test_that('each rollup method correctly quantifies proteins', {
       dplyr::mutate(n_peps_used = dplyr::n()) %>%
       dplyr::left_join(pepes_per_pro2, by = "Protein", multiple = "all", relationship = "many-to-many") %>%
       dplyr::relocate(n_peps_used, .after = peps_per_pro) %>%
+      dplyr::mutate(dplyr::across('Peptide_Sequence', \(x) paste(unique(x), collapse = ";"))) %>%
       dplyr::distinct(
         Protein, Protein_Isoform, peps_per_pro,
-        n_peps_used
+        n_peps_used, Peptide_Sequence
       ) %>%
       data.frame(),
     edata_cname = "Protein_Isoform",
