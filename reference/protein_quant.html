@@ -19,7 +19,7 @@ An object of the class 'proData' is returned."><!-- mathjax --><script src="http
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pmartR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.4</span>
       </span>
     </div>
 
@@ -97,7 +97,8 @@ An object of the class 'proData' is returned.</p>
 <span>  single_observation <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  combine_fn <span class="op">=</span> <span class="st">"median"</span>,</span>
 <span>  parallel <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  emeta_cols <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  emeta_cols <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  emeta_cols_sep <span class="op">=</span> <span class="st">";"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -147,6 +148,12 @@ rrollup, qrollup and zrollup functions.</p></dd>
 that should be kept after rolling up to the protein level. The default,
 NULL, only keeps the column containing the mapping variable along with the
 new columns created (peps_per_pro and n_peps_used).</p></dd>
+
+
+<dt>emeta_cols_sep</dt>
+<dd><p>character specifying the string that will separate the 
+elements for emeta_cols when they are collapsed into a single row when aggregating
+rows belonging to the same protein.  Defaults to ";"</p></dd>
 
 </dl></div>
     <div id="value">
