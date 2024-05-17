@@ -65,6 +65,8 @@ jobs:
             github::pmartR/pmartRdata@master
           pak-version: devel # See https://github.com/r-lib/actions/issues/559
       - uses: r-hub/actions/run-check@v1
+        env:
+          '_R_CHECK_CRAN_INCOMING_': 'true'
         with:
           token: ${{ secrets.RHUB_TOKEN }}
           job-config: ${{ matrix.config.job-config }}
@@ -98,6 +100,8 @@ jobs:
             github::pmartR/pmartRdata@master
           pak-version: devel # See https://github.com/r-lib/actions/issues/559
       - uses: r-hub/actions/run-check@v1
+        env:
+          '_R_CHECK_CRAN_INCOMING_': 'true'
         with:
           job-config: ${{ matrix.config.job-config }}
           token: ${{ secrets.RHUB_TOKEN }}
