@@ -47,7 +47,7 @@ devtools::install_github("pmartR/pmartR")
 
 ### Problems with rcppArmadillo and gfortran on mac
 
-There is a problem that causes pmartR to fail compiling cpp code, which has something to do with rcppArmadillo and certain installations of gfortran.  See these posts that try to explain the issue:  [1](https://stackoverflow.com/questions/64992467/mac-clang-installation-seems-to-override-gcc-install) [2](https://stackoverflow.com/questions/29992066/rcpp-warning-directory-not-found-for-option-l-usr-local-cellar-gfortran-4-8/29993906#29993906) [3](https://community.rstudio.com/t/setting-up-travis-ci-on-linux-with-an-r-package-that-uses-rcpparmadillo/53910/3).  Two solutions we have found:
+There is a problem that causes pmartR to fail compiling cpp code, which has something to do with rcppArmadillo and certain installations of gfortran.  See these posts that try to explain the issue:  [1](https://stackoverflow.com/questions/64992467/mac-clang-installation-seems-to-override-gcc-install) [2](https://stackoverflow.com/questions/29992066/rcpp-warning-directory-not-found-for-option-l-usr-local-cellar-gfortran-4-8/29993906#29993906) [3](https://forum.posit.co/t/setting-up-travis-ci-on-linux-with-an-r-package-that-uses-rcpparmadillo/53910/3).  Two solutions we have found:
 
 1.  Install gfortran from a recommended source (not homebrew): 
     - [This CRAN-approved resource for build tools on mac](https://mac.r-project.org/tools/) lists two versions of gfortran and how to install them.
