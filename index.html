@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">pmartR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.5</span>
       </span>
     </div>
 
@@ -132,7 +132,7 @@
 <div class="section level3">
 <h3 id="problems-with-rcpparmadillo-and-gfortran-on-mac">Problems with rcppArmadillo and gfortran on mac<a class="anchor" aria-label="anchor" href="#problems-with-rcpparmadillo-and-gfortran-on-mac"></a>
 </h3>
-<p>There is a problem that causes pmartR to fail compiling cpp code, which has something to do with rcppArmadillo and certain installations of gfortran. See these posts that try to explain the issue: <a href="https://stackoverflow.com/questions/64992467/mac-clang-installation-seems-to-override-gcc-install" class="external-link">1</a> <a href="https://stackoverflow.com/questions/29992066/rcpp-warning-directory-not-found-for-option-l-usr-local-cellar-gfortran-4-8/29993906#29993906" class="external-link">2</a> <a href="https://community.rstudio.com/t/setting-up-travis-ci-on-linux-with-an-r-package-that-uses-rcpparmadillo/53910/3" class="external-link">3</a>. Two solutions we have found:</p>
+<p>There is a problem that causes pmartR to fail compiling cpp code, which has something to do with rcppArmadillo and certain installations of gfortran. See these posts that try to explain the issue: <a href="https://stackoverflow.com/questions/64992467/mac-clang-installation-seems-to-override-gcc-install" class="external-link">1</a> <a href="https://stackoverflow.com/questions/29992066/rcpp-warning-directory-not-found-for-option-l-usr-local-cellar-gfortran-4-8/29993906#29993906" class="external-link">2</a> <a href="https://forum.posit.co/t/setting-up-travis-ci-on-linux-with-an-r-package-that-uses-rcpparmadillo/53910/3" class="external-link">3</a>. Two solutions we have found:</p>
 <ol style="list-style-type: decimal">
 <li>Install gfortran from a recommended source (not homebrew):
 <ul>
