@@ -28,6 +28,17 @@ install.packages("pmartR")
 BiocManager::install("pmartR")
 ```
 
+If you are on Mac/Windows and have a recent R version, you can skip compilation by installing from binaries, see the [pmartR CRAN page](https://cran.r-project.org/web/packages/pmartR/index.html) for available binaries.
+
+```r
+install.packages("pmartR", type = "binary")
+
+# or 
+
+BiocManager::install("pmartR", type = "binary")
+```
+
+
 To install the latest *release*:
 ```r
 devtools::install_github("pmartR/pmartR@*release")
@@ -47,7 +58,7 @@ devtools::install_github("pmartR/pmartR")
 
 ### Problems with rcppArmadillo and gfortran on mac
 
-There is a problem that causes pmartR to fail compiling cpp code, which has something to do with rcppArmadillo and certain installations of gfortran.  See these posts that try to explain the issue:  [1](https://stackoverflow.com/questions/64992467/mac-clang-installation-seems-to-override-gcc-install) [2](https://stackoverflow.com/questions/29992066/rcpp-warning-directory-not-found-for-option-l-usr-local-cellar-gfortran-4-8/29993906#29993906) [3](https://forum.posit.co/t/setting-up-travis-ci-on-linux-with-an-r-package-that-uses-rcpparmadillo/53910/3).  Two solutions we have found:
+There is a problem that causes pmartR to fail compiling cpp code, which has something to do with rcppArmadillo and certain installations of gfortran.  See these posts that try to explain the issue:  [1](https://stackoverflow.com/questions/64992467/mac-clang-installation-seems-to-override-gcc-install) [2](https://stackoverflow.com/questions/29992066/rcpp-warning-directory-not-found-for-option-l-usr-local-cellar-gfortran-4-8/29993906#29993906) [3](https://forum.posit.co/t/setting-up-travis-ci-on-linux-with-an-r-package-that-uses-rcpparmadillo/53910/3).  The simplest solution if you are on Mac/Windows and have a recent R version is to install from pre-built binaries (see installation section).  If you cannot install from binaries, two solutions we have found are:
 
 1.  Install gfortran from a recommended source (not homebrew): 
     - [This CRAN-approved resource for build tools on mac](https://mac.r-project.org/tools/) lists two versions of gfortran and how to install them.
@@ -79,7 +90,10 @@ To get started, see the package documentation and function reference located [he
 ## Data:
 
 Example peptide (both unlabeled and isobaric labeled), protein, metabolite and lipid data are available in the __pmartRdata__ package available on Github, [here](https://github.com/pmartR/pmartRdata)
- 
+
+## Contributing
+See the [contributing docs](.github/CONTRIBUTING.md).
+
 ## Citation:
 
 To cite this package, please the following:
@@ -96,7 +110,7 @@ Degnan, D. J.; Stratton, K. G.; Richardson, R.; Claborne, D.; Martin, E. A.; Joh
   journal={Journal of Proteome Research},
   year={2023},
   publisher={ACS Publications}
-}) 
+}
 ```
 
 ## Disclaimer:
