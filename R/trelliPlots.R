@@ -196,46 +196,6 @@ trelli_builder_lazy <- function(toBuild, path, name, ...) {
   
 }
 
-# This function builds all trelliscopes.
-trelli_builder <- function(toBuild, cognostics, plotFUN, cogFUN, path, name, remove_nestedDF, ...) {
-  
-  # Remove any blank names 
-  if ("" %in% unlist(toBuild[,1])) {
-    message(paste("Removing", length(sum("" %in% toBuild[, 1])), "blank biomolecule names."))
-    toBuild <- toBuild[toBuild[, 1] != "", ]
-  }
-
-  if (nrow(toBuild) == 0) {
-    stop("No data to build trelliscope with.")
-  }
-  
-  # Plots will always be included 
-  preLaunch <- toBuild %>%
-    dplyr::ungroup() %>%
-    dplyr::mutate(
-      panel = trelliscopejs::map2_plot(Nested_DF, as.character(unlist(toBuild[, 1])), plotFUN)
-    ) 
-  
-  # Cognostics are optional
-  if (!is.null(cognostics)) {
-    
-    preLaunch <- preLaunch %>%
-      dplyr::mutate(
-        cog = trelliscopejs::map2_cog(Nested_DF, as.character(unlist(toBuild[, 1])), cogFUN)
-      )
-    
-  }
-  
-  # Some dataframes are only one row, which ends up as cognostics. Removing the nestedDF
-  # is recommended
-  if (remove_nestedDF) {preLaunch <- preLaunch %>% dplyr::select(-Nested_DF)}
-  
-  # Finally, build the diplay  
-  preLaunch %>%
-      trelliscopejs::trelliscope(path = path, name = name, nrow = 1, ncol = 1, thumb = TRUE, ...) 
-    
-}
-
 #' @name trelli_abundance_boxplot
 #'
 #' @title Boxplot trelliscope building function for abundance data 
