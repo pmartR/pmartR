@@ -47,14 +47,14 @@ test_that("as.trelliData and trelli_panel_by returns correct data frames and att
 
   # trelliData should have just the omicsData
   expect_equal(pepTrelli_omics$omicsData, pepOmics)
-  expect_null(pepTrelli_omics$trelliData.stat)
+  expect_null(pepTrelli_omics$trelliData)
   expect_null(pepTrelli_omics$statRes)
 
   # trelliData.omics should have edata_cname, fdata_cname, abundance, the main effects, and all emeta categories
   edata_cname <- get_edata_cname(pepOmics)
   fdata_cname <- get_fdata_cname(pepOmics)
   emeta_cols <- colnames(emeta)[colnames(emeta) != edata_cname]
-  expect_equal(colnames(pepTrelli_omics$trelliData.omics), c(edata_cname, fdata_cname, "Abundance", "Group", emeta_cols))
+  expect_equal(colnames(pepTrelli_omics$trelliData), c(edata_cname, fdata_cname, "Abundance", "Group", emeta_cols))
 
   # Check trelliData attributes. The only fdata column should always be
   # fdata_cname. Emeta columns should include everything but the edata_cname.
@@ -64,8 +64,7 @@ test_that("as.trelliData and trelli_panel_by returns correct data frames and att
   expect_equal(attr(pepTrelli_omics, "emeta_col"), emeta_cols)
   expect_equal(attr(pepTrelli_omics, "panel_by_options"), c(edata_cname, fdata_cname, emeta_cols))
   expect_false(attr(pepTrelli_omics, "panel_by"))
-  expect_equal(attr(pepTrelli_omics, "panel_by_omics"), NA)
-  expect_equal(attr(pepTrelli_omics, "panel_by_stat"), NA)
+  expect_equal(attr(pepTrelli_omics, "panel_by_col"), NA)
 
   # Test some trelli_panel_by options
   pepTrelli_omics_edatacname <- trelli_panel_by(pepTrelli_omics, edata_cname)
@@ -75,18 +74,18 @@ test_that("as.trelliData and trelli_panel_by returns correct data frames and att
   # After paneling by an acceptable choice, the number of plots should equal the
   # number of unique entries in that category.
   expect_equal(
-    pepTrelli_omics_edatacname$trelliData.omics %>% nrow(),
-    pepTrelli_omics$trelliData.omics[[edata_cname]] %>% unique() %>% length()
+    pepTrelli_omics_edatacname$trelliData %>% nrow(),
+    pepTrelli_omics$trelliData[[edata_cname]] %>% unique() %>% length()
   )
 
   expect_equal(
-    pepTrelli_omics_fdatacname$trelliData.omics %>% nrow(),
-    pepTrelli_omics$trelliData.omics[[fdata_cname]] %>% unique() %>% length()
+    pepTrelli_omics_fdatacname$trelliData %>% nrow(),
+    pepTrelli_omics$trelliData[[fdata_cname]] %>% unique() %>% length()
   )
 
   expect_equal(
-    pepTrelli_omics_emetacol$trelliData.omics %>% nrow(),
-    pepTrelli_omics$trelliData.omics[[emeta_cols[1]]] %>% unique() %>% length()
+    pepTrelli_omics_emetacol$trelliData %>% nrow(),
+    pepTrelli_omics$trelliData[[emeta_cols[1]]] %>% unique() %>% length()
   )
 
   # Check that the correct attributes were changed after paneling. Only "panel_by_omics"
@@ -113,13 +112,13 @@ test_that("as.trelliData and trelli_panel_by returns correct data frames and att
 
   # trelliData should have just the statRes
   expect_equal(pepTrelli_stat$statRes, pepStat)
-  expect_null(pepTrelli_stat$trelliData.omics)
+  expect_null(pepTrelli_stat$trelliData)
   expect_null(pepTrelli_stat$omicsData)
 
   # Without an emeta file, the options with just statRes are limited. The only
   # columns should be edata_cname, Comparison, p_value columns, and fold_change.
   expect_equal(
-    colnames(pepTrelli_stat$trelliData.stat),
+    colnames(pepTrelli_stat$trelliData),
     c(edata_cname, "Comparison", "p_value_anova", "p_value_gtest", "fold_change")
   )
 
@@ -136,8 +135,8 @@ test_that("as.trelliData and trelli_panel_by returns correct data frames and att
   # After paneling by an acceptable choice, the number of plots should equal the
   # number of unique entries in that category.
   expect_equal(
-    pepTrelli_stat_edatacname$trelliData.stat %>% nrow(),
-    pepTrelli_stat$trelliData.stat[[edata_cname]] %>% unique() %>% length()
+    pepTrelli_stat_edatacname$trelliData %>% nrow(),
+    pepTrelli_stat$trelliData[[edata_cname]] %>% unique() %>% length()
   )
 
   # Check that the correct attributes were changed after paneling. Only "panel_by_stat"
@@ -156,13 +155,13 @@ test_that("as.trelliData and trelli_panel_by returns correct data frames and att
   expect_equal(pepTrelli_both$omicsData, pepOmics)
   expect_equal(pepTrelli_both$statRes, pepStat)
 
-  # Now, check the trelliData.omics object. Should be the same as when we just supplied omicsData.
-  expect_equal(colnames(pepTrelli_both$trelliData.omics), c(edata_cname, fdata_cname, "Abundance", "Group", emeta_cols))
+  # Now, check the trelliData object. Should be the same as when we just supplied omicsData.
+  expect_equal(colnames(pepTrelli_both$trelliData), c(edata_cname, fdata_cname, "Abundance", "Group", emeta_cols))
 
-  # The trelliData.stat object should hav ethe same categories as when we just supplied
+  # The trelliData object should hav ethe same categories as when we just supplied
   # statRes, with the emeta cols.
   expect_equal(
-    colnames(pepTrelli_both$trelliData.stat),
+    colnames(pepTrelli_both$trelliData),
     c(edata_cname, "Comparison", "p_value_anova", "p_value_gtest", "fold_change", emeta_cols)
   )
 
@@ -187,28 +186,28 @@ test_that("as.trelliData and trelli_panel_by returns correct data frames and att
 
   # Number of biomolecules should be the same in both omicsData and statRes
   expect_equal(
-    pepTrelli_both_edatacname$trelliData.omics %>% nrow(),
-    pepTrelli_both$trelliData.omics[[edata_cname]] %>% unique() %>% length()
+    pepTrelli_both_edatacname$trelliData %>% nrow(),
+    pepTrelli_both$trelliData[[edata_cname]] %>% unique() %>% length()
   )
   expect_equal(
-    pepTrelli_both_edatacname$trelliData.stat %>% nrow(),
-    pepTrelli_both$trelliData.stat[[edata_cname]] %>% unique() %>% length()
+    pepTrelli_both_edatacname$trelliData %>% nrow(),
+    pepTrelli_both$trelliData[[edata_cname]] %>% unique() %>% length()
   )
 
   # Only omicsData can be paneled_by sample
   expect_equal(
-    pepTrelli_both_fdatacname$trelliData.omics %>% nrow(),
-    pepTrelli_both$trelliData.omics[[fdata_cname]] %>% unique() %>% length()
+    pepTrelli_both_fdatacname$trelliData %>% nrow(),
+    pepTrelli_both$trelliData[[fdata_cname]] %>% unique() %>% length()
   )
 
   # Number of emeta categories should be the same in both omicsData and statRes
   expect_equal(
-    pepTrelli_both_emetacol$trelliData.omics %>% nrow(),
-    pepTrelli_both$trelliData.omics[[emeta_cols[2]]] %>% unique() %>% length()
+    pepTrelli_both_emetacol$trelliData %>% nrow(),
+    pepTrelli_both$trelliData[[emeta_cols[2]]] %>% unique() %>% length()
   )
   expect_equal(
-    pepTrelli_both_emetacol$trelliData.stat %>% nrow(),
-    pepTrelli_both$trelliData.stat[[emeta_cols[2]]] %>% unique() %>% length()
+    pepTrelli_both_emetacol$trelliData %>% nrow(),
+    pepTrelli_both$trelliData[[emeta_cols[2]]] %>% unique() %>% length()
   )
 
   # Check that the correct attributes were changed after paneling. Only "panel_by_omics"
