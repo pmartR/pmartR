@@ -1,7 +1,7 @@
 context("class: trelliData & trelli_panel_by")
 
 test_that("as.trelliData and trelli_panel_by returns correct data frames and attributes", {
-  
+  testthat::skip_on_cran()
   ##################
   ## MS/NMR TESTS ##
   ##################
@@ -355,8 +355,12 @@ test_that("as.trelliData and trelli_panel_by returns correct data frames and att
     as.trelliData(tinyNMR) %>% trelli_panel_by("Metabolite"),
     "Grouping by Metabolite results in panels with less than 3 data points in trelliData.omics."
   )
-  
-  
+})
+
+test_that("as.trelliData and trelli_panel_by returns correct data frames and attributes for RNA-seq data", {
+  testthat::skip_on_cran()
+  testthat::skip_if_not_installed("edgeR")
+  testthat::skip_if_not_installed("limma")
   ###################
   ## RNA SEQ TESTS ##
   ###################

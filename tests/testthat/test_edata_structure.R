@@ -56,7 +56,7 @@ test_that('errors are thrown for bad data structures/values', {
       edata_cname = 'id',
       fdata_cname = 'sampleID'
     ),
-    'Columns 2 and 4 of e_data contain non-numeric values.'
+    'Columns \\(2, 4\\) of e_data contain non-numeric values.'
   )
 
   # Generate a lipidData object with sour_grapes_2.
@@ -67,7 +67,7 @@ test_that('errors are thrown for bad data structures/values', {
       edata_cname = 'id',
       fdata_cname = 'sampleID'
     ),
-    'Column 4 of e_data contains non-numeric values.'
+    'Column \\(4\\) of e_data contains non-numeric values.'
   )
 
 
@@ -80,7 +80,7 @@ test_that('errors are thrown for bad data structures/values', {
       edata_cname = 'id',
       fdata_cname = 'sampleID'
     ),
-    'Column 3 of e_data contains infinite values.'
+    'Column \\(3\\) of e_data contains infinite values.'
   )
 
   cantor[4, 6] <- -Inf
@@ -93,6 +93,6 @@ test_that('errors are thrown for bad data structures/values', {
       edata_cname = 'id',
       fdata_cname = 'sampleID'
     ),
-    'Columns 3 and 6 of e_data contain infinite values.'
+    'Columns \\(3, 6\\) of e_data contain infinite values.'
   )
 })

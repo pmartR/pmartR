@@ -1521,7 +1521,7 @@ na_scatter <- function (edata, group_df, na.by.molecule, edata_cname,
     # Calculate the mean intensity for each molecule by group. NaN can appear if
     # an entire row has all NA values.
     mean_by_group <- lapply(indices_list,
-      function(x, temp_edata) rowMeans(temp_edata[, x],
+      function(x, temp_edata) rowMeans(temp_edata[x],
         na.rm = TRUE
       ),
       temp_edata = edata[, -edata_cname_id]
@@ -6515,7 +6515,7 @@ make_volcano_plot_df <- function(x) {
     gsub(
       pattern = "_vs_",
       replacement = " vs ",
-      pvals$Comparison
+      volcano$Comparison
     )
 
   # create counts for gtest plot (number present in each group)
@@ -6765,7 +6765,7 @@ gtest_heatmap <-
       "Nonmissing (second group)" else
       y_lab
     the_title_label <- if (is.null(title_lab))
-      "Count of non-missing values in each group" else
+      "Biomolecule counts (and # significant) for each combination of non-missing values" else
       title_lab
     the_legend_label <- if (is.null(legend_lab))
       "Number of biomolecules \nin this bin" else
@@ -6787,7 +6787,11 @@ gtest_heatmap <-
     # summarized data frame of # of biomolecules per count combination.
     gtest_counts <- temp_data_gtest %>%
       dplyr::group_by(Count_First_Group, Count_Second_Group, Comparison) %>%
-      dplyr::summarise(n = dplyr::n(), sig = all(P_value < 0.05)) %>%
+      dplyr::summarise(
+        n = dplyr::n(),
+        n_sig = sum(na.omit(P_value < pval_thresh)),
+        sig = any(na.omit(P_value < pval_thresh))
+      ) %>%
       dplyr::mutate(
         Count_First_Group = as.character(Count_First_Group),
         Count_Second_Group = as.character(Count_Second_Group)
@@ -6819,7 +6823,7 @@ gtest_heatmap <-
     if (interactive && requirePlotly()) {
       comps <- unique(gtest_counts$Comparison)
       subplot_list <- list()
-      limits = range(gtest_counts$n)
+      limits = range(na.omit(gtest_counts$n))
       # legend entry will not appear for a single plot, so putting info in title
       subtext = if (length(comps) == 1)
         "\n(star indicates statistical significance)" else
@@ -6830,40 +6834,40 @@ gtest_heatmap <-
 
         p <- plotly::plot_ly() %>%
           plotly::add_trace(
-            data = data,
-            x = ~ as.numeric(Count_First_Group),
-            y = ~ as.numeric(Count_Second_Group),
-            z = ~n,
-            type = "heatmap",
-            hoverinfo = 'text',
-            text = ~ sprintf("%s biomolecules in this bin.", n),
-            colors = grDevices::colorRamp(
-              c(
-                if (is.null(color_low))
-                  "#132B43" else
-                  color_low,
-                if (is.null(color_high))
-                  "#56B1F7" else
-                  color_high
-              )
-            ),
-            showscale = i == length(comps),
-            xgap = 0.6, ygap = 0.6
-          ) %>%
-          plotly::add_trace(
             data = data %>% dplyr::filter(sig),
-            x = ~ as.numeric(Count_First_Group),
-            y = ~ as.numeric(Count_Second_Group),
+            x = ~ as.numeric(as.character(Count_First_Group)),
+            y = ~ as.numeric(as.character(Count_Second_Group)),
             type = 'scatter',
             mode = "markers",
             showlegend = i == length(comps),
             name = "Statistically significant",
+            hoverinfo = "skip",
             marker = list(
               symbol = "star",
               color = "white",
               line = list(color = "black", width = 0.5)
             ),
-            inherit = FALSE
+            colors = grDevices::colorRamp(
+              c(
+                if (is.null(color_low))
+                  "#132B43" else
+                    color_low,
+                if (is.null(color_high))
+                  "#56B1F7" else
+                    color_high
+              )
+            )
+          ) %>%
+          plotly::add_trace(
+            data = data,
+            x = ~ as.numeric(as.character(Count_First_Group)),
+            y = ~ as.numeric(as.character(Count_Second_Group)),
+            z = ~ n,
+            type = "heatmap",
+            hoverinfo = 'text',
+            text = ~ sprintf("%s biomolecules in this bin. (%s) significant", n, n_sig),
+            showscale = i == length(comps),
+            xgap = 0.6, ygap = 0.6
           ) %>%
           plotly::add_annotations(
             text = comps[[i]],
@@ -6873,6 +6877,7 @@ gtest_heatmap <-
             yref = "paper",
             showarrow = FALSE,
             yanchor = "bottom",
+            xanchor = "center",
             font = list(size = 14)
           )
 
@@ -6887,7 +6892,7 @@ gtest_heatmap <-
           p <- p %>%
             plotly::layout(
               plot_bgcolor = 'grey',
-              title = list(
+              title = list( 
                 text = paste(the_title_label, subtext),
                 font = list(size = 14),
                 y = 0.95, yanchor = "top"
@@ -6909,6 +6914,18 @@ gtest_heatmap <-
           yaxis = list(title = the_y_label)
         )
     } else {
+      # create the alternative column
+      if (display_count) {
+        gtest_counts <- gtest_counts %>% 
+          dplyr::mutate(
+            count_text = ifelse(
+              is.na(n),
+              NA,
+              ifelse(.data$n_sig > 0, sprintf("%s (%s)", n, .data$n_sig), n)
+            )
+          ) 
+      }
+      
       p <- ggplot2::ggplot(gtest_counts) +
         ggplot2::theme_minimal() +
         ggplot2::geom_tile(
@@ -6936,7 +6953,11 @@ gtest_heatmap <-
 
       if (display_count) {
         p <- p + ggplot2::geom_text(
-          ggplot2::aes(Count_First_Group, Count_Second_Group, label = n),
+          ggplot2::aes(
+            Count_First_Group, 
+            Count_Second_Group, 
+            label = .data$count_text
+          ),
           nudge_x = -0.5, nudge_y = 0.5, hjust = -0.1, vjust = 1.5,
           color = "white", size = text_size
         )
