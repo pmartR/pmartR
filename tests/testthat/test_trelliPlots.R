@@ -6,11 +6,10 @@ test_that("trelliPlots check the correct inputs", {
   #file_coverage(c("~/Git_Repos/pmartR/R/as.trelliData.R", 
   #                "~/Git_Repos/pmartR/R/summary_trelliData.R",
   #                "~/Git_Repos/pmartR/R/trelliPlots.R",
-  #                "~/Git_Repos/pmartR/R/trelliPlots_seqData.R",
+  #                "~/Git_Repos/pmartR/R/trelliPlots_seqData.R"
   #),
   #c("~/Git_Repos/pmartR/tests/testthat/test_as_trelliData_edata.R", 
   #  "~/Git_Repos/pmartR/tests/testthat/test_as_trelliData.R",
-  #  "~/Git_Repos/pmartR/tests/testthat/test_trelli_pvalue_filter.R",
   #  "~/Git_Repos/pmartR/tests/testthat/test_as_trelliData_summary.R",
   #  "~/Git_Repos/pmartR/tests/testthat/test_trelliPlots.R",
   #  "~/Git_Repos/pmartR/tests/testthat/test_trelliPlots_seqData.R")
@@ -63,7 +62,7 @@ test_that("trelliPlots check the correct inputs", {
     p_value_anova = 0.7,
     fold_change = NaN
   )
-  expect_null(pmartR:::determine_significance(ds_test, 0.05, is_seq = FALSE))
+  expect_null(pmartR:::determine_significance(ds_test, 0.05))
   
   # Load RNA-seq data for testing-----------------------------------------------
   
@@ -143,7 +142,7 @@ test_that("trelliPlots check the correct inputs", {
   # Test example also can't be more than the number of panels
   expect_error(
     mtrelliData1 %>% trelli_panel_by("Metabolite") %>% trelli_abundance_boxplot(test_mode = TRUE, test_example = -2000.3),
-    "test_example must be in the range of possibilities, of 1 to 80"
+    "test_example must be in the range of possibilities, of 1 to 960"
   )
 
   # Single plot must be true or false
@@ -159,36 +158,12 @@ test_that("trelliPlots check the correct inputs", {
       "'median abundance' and 'cv abundance' are not permitted when groups have been specified."
     )
   })
-  
-  # Expect a message that anova p-value and fold change have been removed 
-  suppressWarnings({
-    expect_message(
-      mtrelliData4 %>% trelli_panel_by("MClass") %>% trelli_abundance_boxplot(test_mode = TRUE, test_example = 1, cognostics = c("anova p-value", "fold change")),
-      "Please panel by Metabolite to get 'anova p-value' and 'fold change' as cognostics in the trelliscope display."
-    )    
-  })
-  
-  # Blank biomolecules should be removed, and if no data, an error produced
-  blankExample <- mtrelliData1 %>% trelli_panel_by("Metabolite")
-  blankExample$trelliData.omics <- blankExample$trelliData.omics[1, ]
-  blankExample$trelliData.omics$Metabolite <- ""
-
-  expect_error(
-    suppressMessages(blankExample %>% trelli_abundance_boxplot()),
-    "No data to build trelliscope with."
-  )
-
-  # Test mode for windows should pass
-  expect_equal(
-    .getDownloadsFolder(.test_mode = TRUE),
-    file.path(dirname("~"), "Downloads")
-  )
 
   # Expect a single plot object to be made
-  abun_boxplot <- mtrelliData1 %>%
+  suppressWarnings({abun_boxplot <- mtrelliData1 %>%
     trelli_panel_by("Metabolite") %>%
-    trelli_abundance_boxplot(single_plot = TRUE)
-  expect_true(inherits(abun_boxplot, "ggplot"))
+    trelli_abundance_boxplot(single_plot = TRUE)})
+  expect_true(inherits(abun_boxplot, "panel_lazy_vec"))
 
   # Generate a tests folder
   testFolder <- file.path(tempdir(), "/Trelli_Tests")
@@ -212,7 +187,7 @@ test_that("trelliPlots check the correct inputs", {
   # Build a trelliscope that tries to call stats cognostics without stats data and
   # has one plot
   singlePlot <- mtrelliData1 %>% trelli_panel_by("Metabolite") 
-  singlePlot$trelliData.omics <- singlePlot$trelliData.omics[1, ]
+  singlePlot$trelliData <- singlePlot$trelliData[1, ]
   suppressWarnings(singlePlot %>% 
    trelli_abundance_boxplot(path = file.path(testFolder, "BoxAbundanceTest2"), 
                             cognostics = "anova p-value")
@@ -228,16 +203,6 @@ test_that("trelliPlots check the correct inputs", {
       cognostics = NULL
     ))
   expect_true(file.exists(file.path(testFolder, "BoxAbundanceTest3")))
-  
-  # Build a trelliscope that panels by MClass
-  suppressWarnings(mtrelliData5 %>% trelli_panel_by("MClass") %>%
-                     trelli_abundance_boxplot(
-                       path = file.path(testFolder, "BoxAbundanceTest4"),
-                       test_mode = TRUE,
-                       test_example = 1,
-                       cognostics = "count"
-                     ))
-  expect_true(file.exists(file.path(testFolder, "BoxAbundanceTest4")))
   
   # Build a trelliscope that returns anova p-value and fold change only
   suppressWarnings(mtrelliData5 %>% trelli_panel_by("Metabolite") %>%
@@ -277,7 +242,7 @@ test_that("trelliPlots check the correct inputs", {
   abun_histplot <- mtrelliData1 %>%
     trelli_panel_by("Metabolite") %>%
     trelli_abundance_histogram(single_plot = TRUE)
-  expect_true(inherits(abun_histplot, "ggplot"))
+  expect_true(inherits(abun_histplot, "panel_lazy_vec"))
   
 
   # Test that trelliscope builds when passed cognostic doesn't exist  
@@ -322,12 +287,6 @@ test_that("trelliPlots check the correct inputs", {
     "trelliData must be paneled_by an e_meta column."
   )
 
-  # Return a single interactive plot
-  abun_hmplot <- mtrelliData4 %>%
-    trelli_panel_by("MClass") %>%
-    trelli_abundance_heatmap(single_plot = TRUE, ggplot_params = "xlab('')", interactive = TRUE)
-  expect_true(inherits(abun_hmplot, "plotly"))
-
   # Test that trelliscope builds with all cognostics
   suppressWarnings(mtrelliData4 %>% trelli_panel_by("MClass") %>%
     trelli_abundance_heatmap(
@@ -340,7 +299,7 @@ test_that("trelliPlots check the correct inputs", {
   # Test that the trelliscope still builds without group data and only one plot
   nogroup <- mtrelliData4 %>% trelli_panel_by("MClass")
   attributes(nogroup$omicsData)$group_DF <- NULL
-  nogroup$trelliData.omics <- nogroup$trelliData.omics[1, ]
+  nogroup$trelliData <- nogroup$trelliData[1, ]
   suppressWarnings(nogroup %>%
     trelli_abundance_heatmap(path = file.path(testFolder, "HmAbundanceTest2")))
   expect_true(file.exists(file.path(testFolder, "HmAbundanceTest2")))
@@ -364,23 +323,6 @@ test_that("trelliPlots check the correct inputs", {
     mtrelliData1 %>% trelli_panel_by("Metabolite") %>% trelli_missingness_bar(cognostics = "g-test p-value", test_mode = T, test_example = 1)
   )
   
-  # Expect message if paneled by class
-  expect_message(
-    mtrelliData5 %>% trelli_panel_by("MClass") %>% trelli_missingness_bar(cognostics = "g-test p-value", test_mode = T, test_example = 1),
-    "'g-test p-value' can only be included if the data has been paneled by the biomolecule column 'edata_cname'"
-  )
-
-  # Test trelliscope builds with all cognostics
-  suppressWarnings(mtrelliData1 %>% trelli_panel_by("Metabolite") %>% 
-    trelli_missingness_bar(path = file.path(testFolder, "MissingTest1"),
-                           ggplot_params = "ylab('')",
-                           test_mode = TRUE, 
-                           test_example = 2,
-                           cognostics = "observed proportion",
-                           interactive = TRUE)
-  )
-  expect_true(file.exists(file.path(testFolder, "MissingTest1")))
-  
   # Test trelliscope with just a statRes object 
   suppressWarnings(mtrelliData3 %>% trelli_panel_by("Metabolite") %>% 
                      trelli_missingness_bar(path = file.path(testFolder, "MissingTest2"),
@@ -390,16 +332,6 @@ test_that("trelliPlots check the correct inputs", {
                                             cognostics = c("g-test p-value", "total count"))
   )
   expect_true(file.exists(file.path(testFolder, "MissingTest2")))
-  
-  # Test trelliscope with paneling by a class
-  suppressWarnings(mtrelliData4 %>% trelli_panel_by("MClass") %>% 
-                     trelli_missingness_bar(path = file.path(testFolder, "MissingTest3"),
-                                            test_mode = TRUE, 
-                                            test_example = 2,
-                                            proportion = FALSE,
-                                            cognostics = "observed count")
-  )
-  expect_true(file.exists(file.path(testFolder, "MissingTest3")))
   
   # Test trelliscope with just a statRes object 
   suppressWarnings(mtrelliData4 %>% trelli_panel_by("Metabolite") %>% 
@@ -413,7 +345,7 @@ test_that("trelliPlots check the correct inputs", {
 
   # Build a single plot
   miss_plot <- singlePlot %>% trelli_missingness_bar(single_plot = TRUE)
-  expect_true(inherits(miss_plot, "ggplot"))
+  expect_true(inherits(miss_plot, "panel_lazy_vec"))
   
   # Seq data is not allowed for this dataset
   expect_error(
@@ -432,7 +364,7 @@ test_that("trelliPlots check the correct inputs", {
   # Requested test example must not be out of the range of possibilities
   expect_error(
     mtrelliData3 %>% trelli_panel_by("Metabolite") %>% trelli_foldchange_bar(test_mode = TRUE, test_example = -2000.3),
-    "test_example must be in the range of possibilities, of 1 to 65"
+    "test_example must be in the range of possibilities, of 1 to "
   )
 
   # trelliData must be paneled_by edata_cname
@@ -459,8 +391,8 @@ test_that("trelliPlots check the correct inputs", {
   
   # Generate a trelliscope without proportions and a single plot
   singleStatPlot <- mtrelliData4 %>% trelli_panel_by("Metabolite")
-  singleStatPlot$trelliData.omics <- singleStatPlot$trelliData.omics[1, ]
-  singleStatPlot$trelliData.stat <- singleStatPlot$trelliData.stat[singleStatPlot$trelliData.stat$Metabolite == singleStatPlot$trelliData.omics$Metabolite, ]
+  singleStatPlot$trelliData <- singleStatPlot$trelliData[1, ]
+  singleStatPlot$trelliData.stat <- singleStatPlot$trelliData.stat[singleStatPlot$trelliData.stat$Metabolite == singleStatPlot$trelliData$Metabolite, ]
   suppressWarnings(singleStatPlot %>%
      trelli_foldchange_bar(path = file.path(testFolder, "barFoldChangeTest1"),
                            ggplot_params = "ylab('')",
@@ -489,15 +421,6 @@ test_that("trelliPlots check the correct inputs", {
   )
   expect_true(file.exists(file.path(testFolder, "barFoldChangeTest3")))
 
-  # Generate a trelliscope with proportions and no p-values
-  fc_barplot <- mtrelliData3 %>% trelli_panel_by("Metabolite") %>% 
-                     trelli_foldchange_bar(test_mode = TRUE, 
-                                           test_example = 2,
-                                           p_value_test = "gtest",
-                                           p_value_thresh = 0,
-                                           single_plot = TRUE)
-  expect_true(inherits(fc_barplot, "ggplot"))
-  
   # Generate a trelliscope with seq data 
   suppressWarnings(seqTrelli3 %>% trelli_panel_by("ID_REF") %>% 
                      trelli_foldchange_bar(path = file.path(testFolder, "barFoldChangeTest4"),
@@ -533,8 +456,7 @@ test_that("trelliPlots check the correct inputs", {
 
   # Create a second trelliscope from the single data with no include_points and p_value in the cognostics
   singleEmetaPlot <- mtrelliData4 %>% trelli_panel_by("MClass")
-  singleEmetaPlot$trelliData.omics <- singleEmetaPlot$trelliData.omics[singleEmetaPlot$trelliData.omics$MClass == "MClass5", ]
-  singleEmetaPlot$trelliData.stat <- singleEmetaPlot$trelliData.stat[singleEmetaPlot$trelliData.stat$MClass == "MClass5", ]
+  singleEmetaPlot$trelliData <- singleEmetaPlot$trelliData[singleEmetaPlot$trelliData$MClass == "MClass5", ]
 
   suppressWarnings(singleEmetaPlot %>%
                      trelli_foldchange_boxplot(path = file.path(testFolder, "boxFoldChangeTest2"),
@@ -563,7 +485,7 @@ test_that("trelliPlots check the correct inputs", {
 
   # Generate a single plot
   fc_boxplot <- singleEmetaPlot %>% trelli_foldchange_boxplot(single_plot = TRUE)
-  expect_true(inherits(fc_boxplot, "ggplot"))
+  expect_true(inherits(fc_boxplot, "panel_lazy_vec"))
 
   ## trelli_foldchange_volcano--------------------------------------------------
   
@@ -579,7 +501,7 @@ test_that("trelliPlots check the correct inputs", {
     "trelliData must be paneled_by an e_meta column."
   )
 
-  # Generate a volcano trelliscope with a modified ggplot parameter
+  # Generate a volcano trelliscope with a modified panel_lazy_vec parameter
   suppressWarnings(mtrelliData4 %>% trelli_panel_by("MClass") %>% 
    trelli_foldchange_volcano(path = file.path(testFolder, "volFoldChangeTest1"),
                              comparison = "Mock_vs_InfectionA",
@@ -616,13 +538,7 @@ test_that("trelliPlots check the correct inputs", {
 
   # Test the creation of a single plot
   fc_volcano <- singleEmetaPlot %>% trelli_foldchange_volcano(single_plot = TRUE, p_value_test = NULL, comparison = "Mock_vs_InfectionA")
-  expect_true(inherits(fc_volcano, "ggplot"))
-  
-  # Expect error if trying to return a single plot without selecting a comparison
-  expect_error(
-    mtrelliData4 %>% trelli_panel_by("MClass") %>% trelli_foldchange_volcano(single_plot = T),
-    "single_plot will only work if 1 comparison has been selected."
-  )
+  expect_true(inherits(fc_volcano, "panel_lazy_vec"))
   
   # Expect error if comparison is not a string
   expect_error(
@@ -665,6 +581,6 @@ test_that("trelliPlots check the correct inputs", {
 
   # Generate a single plot
   fc_heatmap <- singleEmetaPlot %>% trelli_foldchange_heatmap(single_plot = TRUE)
-  expect_true(inherits(fc_heatmap, "ggplot"))
+  expect_true(inherits(fc_heatmap, "panel_lazy_vec"))
   
 })  

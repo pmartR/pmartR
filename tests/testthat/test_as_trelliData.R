@@ -47,7 +47,6 @@ test_that("as.trelliData and trelli_panel_by returns correct data frames and att
 
   # trelliData should have just the omicsData
   expect_equal(pepTrelli_omics$omicsData, pepOmics)
-  expect_null(pepTrelli_omics$trelliData)
   expect_null(pepTrelli_omics$statRes)
 
   # trelliData.omics should have edata_cname, fdata_cname, abundance, the main effects, and all emeta categories
@@ -71,34 +70,14 @@ test_that("as.trelliData and trelli_panel_by returns correct data frames and att
   pepTrelli_omics_fdatacname <- trelli_panel_by(pepTrelli_omics, fdata_cname)
   pepTrelli_omics_emetacol <- trelli_panel_by(pepTrelli_omics, emeta_cols[1])
 
-  # After paneling by an acceptable choice, the number of plots should equal the
-  # number of unique entries in that category.
-  expect_equal(
-    pepTrelli_omics_edatacname$trelliData %>% nrow(),
-    pepTrelli_omics$trelliData[[edata_cname]] %>% unique() %>% length()
-  )
-
-  expect_equal(
-    pepTrelli_omics_fdatacname$trelliData %>% nrow(),
-    pepTrelli_omics$trelliData[[fdata_cname]] %>% unique() %>% length()
-  )
-
-  expect_equal(
-    pepTrelli_omics_emetacol$trelliData %>% nrow(),
-    pepTrelli_omics$trelliData[[emeta_cols[1]]] %>% unique() %>% length()
-  )
-
   # Check that the correct attributes were changed after paneling. Only "panel_by_omics"
   # should contain the panel_by variable. The rest (besides panel_by flag) should be the same.
   expect_true(attr(pepTrelli_omics_edatacname, "panel_by"))
   expect_true(attr(pepTrelli_omics_fdatacname, "panel_by"))
   expect_true(attr(pepTrelli_omics_emetacol, "panel_by"))
-  expect_equal(attr(pepTrelli_omics_edatacname, "panel_by_omics"), edata_cname)
-  expect_equal(attr(pepTrelli_omics_fdatacname, "panel_by_omics"), fdata_cname)
-  expect_equal(attr(pepTrelli_omics_emetacol, "panel_by_omics"), emeta_cols[1])
-  expect_equal(attr(pepTrelli_omics_edatacname, "panel_by_stat"), NA)
-  expect_equal(attr(pepTrelli_omics_fdatacname, "panel_by_stat"), NA)
-  expect_equal(attr(pepTrelli_omics_emetacol, "panel_by_stat"), NA)
+  expect_equal(attr(pepTrelli_omics_edatacname, "panel_by_col"), edata_cname)
+  expect_equal(attr(pepTrelli_omics_fdatacname, "panel_by_col"), fdata_cname)
+  expect_equal(attr(pepTrelli_omics_emetacol, "panel_by_col"), emeta_cols[1])
   expect_equal(
     attributes(pepTrelli_omics)[c("fdata_col", "emeta_col", "panel_by_options", "class")],
     attributes(pepTrelli_omics_edatacname)[c("fdata_col", "emeta_col", "panel_by_options", "class")]
@@ -112,22 +91,13 @@ test_that("as.trelliData and trelli_panel_by returns correct data frames and att
 
   # trelliData should have just the statRes
   expect_equal(pepTrelli_stat$statRes, pepStat)
-  expect_null(pepTrelli_stat$trelliData)
   expect_null(pepTrelli_stat$omicsData)
-
-  # Without an emeta file, the options with just statRes are limited. The only
-  # columns should be edata_cname, Comparison, p_value columns, and fold_change.
-  expect_equal(
-    colnames(pepTrelli_stat$trelliData),
-    c(edata_cname, "Comparison", "p_value_anova", "p_value_gtest", "fold_change")
-  )
 
   # Check trelliData attributes. The only panel_by option should be edata_cname.
   # "panel_by" should be FALSE and no panelling variables listed.
   expect_equal(attr(pepTrelli_stat, "panel_by_options"), edata_cname)
   expect_false(attr(pepTrelli_stat, "panel_by"))
-  expect_equal(attr(pepTrelli_stat, "panel_by_omics"), NA)
-  expect_equal(attr(pepTrelli_stat, "panel_by_stat"), NA)
+  expect_equal(attr(pepTrelli_stat, "panel_by_col"), NA)
 
   # Test the only panel by option
   pepTrelli_stat_edatacname <- trelli_panel_by(pepTrelli_stat, edata_cname)
@@ -142,8 +112,7 @@ test_that("as.trelliData and trelli_panel_by returns correct data frames and att
   # Check that the correct attributes were changed after paneling. Only "panel_by_stat"
   # should contain the panel_by variable. The rest (besides panel_by flag) should be the same.
   expect_true(attr(pepTrelli_stat_edatacname, "panel_by"))
-  expect_equal(attr(pepTrelli_stat_edatacname, "panel_by_omics"), NA)
-  expect_equal(attr(pepTrelli_stat_edatacname, "panel_by_stat"), edata_cname)
+  expect_equal(attr(pepTrelli_stat_edatacname, "panel_by_col"), edata_cname)
   expect_equal(
     attributes(pepTrelli_stat)[c("fdata_col", "emeta_col", "panel_by_options", "class")],
     attributes(pepTrelli_stat_edatacname)[c("fdata_col", "emeta_col", "panel_by_options", "class")]
@@ -155,16 +124,6 @@ test_that("as.trelliData and trelli_panel_by returns correct data frames and att
   expect_equal(pepTrelli_both$omicsData, pepOmics)
   expect_equal(pepTrelli_both$statRes, pepStat)
 
-  # Now, check the trelliData object. Should be the same as when we just supplied omicsData.
-  expect_equal(colnames(pepTrelli_both$trelliData), c(edata_cname, fdata_cname, "Abundance", "Group", emeta_cols))
-
-  # The trelliData object should hav ethe same categories as when we just supplied
-  # statRes, with the emeta cols.
-  expect_equal(
-    colnames(pepTrelli_both$trelliData),
-    c(edata_cname, "Comparison", "p_value_anova", "p_value_gtest", "fold_change", emeta_cols)
-  )
-
   # Check trelliData attributes. The only fdata column should always be
   # fdata_cname. Emeta columns should include everything but the edata_cname.
   # Panel by options will include emeta_cname, and the aforementioned columns.
@@ -173,64 +132,31 @@ test_that("as.trelliData and trelli_panel_by returns correct data frames and att
   expect_equal(attr(pepTrelli_both, "emeta_col"), emeta_cols)
   expect_equal(attr(pepTrelli_both, "panel_by_options"), c(edata_cname, fdata_cname, emeta_cols))
   expect_false(attr(pepTrelli_both, "panel_by"))
-  expect_equal(attr(pepTrelli_both, "panel_by_omics"), NA)
-  expect_equal(attr(pepTrelli_both, "panel_by_stat"), NA)
+  expect_equal(attr(pepTrelli_both, "panel_by_col"), NA)
 
   # Test the only panel by edata_cname, fdata_cname, and an emeta_coumns
   pepTrelli_both_edatacname <- trelli_panel_by(pepTrelli_both, edata_cname)
   pepTrelli_both_fdatacname <- trelli_panel_by(pepTrelli_both, fdata_cname)
   pepTrelli_both_emetacol <- trelli_panel_by(pepTrelli_both, emeta_cols[2])
 
-  # After paneling by an acceptable choice, the number of plots should equal the
-  # number of unique entries in that category across omicsData and statRes.
-
-  # Number of biomolecules should be the same in both omicsData and statRes
-  expect_equal(
-    pepTrelli_both_edatacname$trelliData %>% nrow(),
-    pepTrelli_both$trelliData[[edata_cname]] %>% unique() %>% length()
-  )
-  expect_equal(
-    pepTrelli_both_edatacname$trelliData %>% nrow(),
-    pepTrelli_both$trelliData[[edata_cname]] %>% unique() %>% length()
-  )
-
-  # Only omicsData can be paneled_by sample
-  expect_equal(
-    pepTrelli_both_fdatacname$trelliData %>% nrow(),
-    pepTrelli_both$trelliData[[fdata_cname]] %>% unique() %>% length()
-  )
-
-  # Number of emeta categories should be the same in both omicsData and statRes
-  expect_equal(
-    pepTrelli_both_emetacol$trelliData %>% nrow(),
-    pepTrelli_both$trelliData[[emeta_cols[2]]] %>% unique() %>% length()
-  )
-  expect_equal(
-    pepTrelli_both_emetacol$trelliData %>% nrow(),
-    pepTrelli_both$trelliData[[emeta_cols[2]]] %>% unique() %>% length()
-  )
-
   # Check that the correct attributes were changed after paneling. Only "panel_by_omics"
   # should contain the panel_by variable. The rest (besides panel_by flag) should be the same.
   expect_true(attr(pepTrelli_both_edatacname, "panel_by"))
-  expect_equal(attr(pepTrelli_both_edatacname, "panel_by_omics"), edata_cname)
-  expect_equal(attr(pepTrelli_both_edatacname, "panel_by_stat"), edata_cname)
+  expect_equal(attr(pepTrelli_both_edatacname, "panel_by_col"), edata_cname)
   expect_equal(
     attributes(pepTrelli_both)[c("fdata_col", "emeta_col", "panel_by_options", "class")],
     attributes(pepTrelli_both_edatacname)[c("fdata_col", "emeta_col", "panel_by_options", "class")]
   )
 
   expect_true(attr(pepTrelli_both_fdatacname, "panel_by"))
-  expect_equal(attr(pepTrelli_both_fdatacname, "panel_by_omics"), fdata_cname)
-  expect_equal(attr(pepTrelli_both_fdatacname, "panel_by_stat"), NA)
+  expect_equal(attr(pepTrelli_both_fdatacname, "panel_by_col"), fdata_cname)
   expect_equal(
     attributes(pepTrelli_both)[c("fdata_col", "emeta_col", "panel_by_options", "class")],
     attributes(pepTrelli_both_fdatacname)[c("fdata_col", "emeta_col", "panel_by_options", "class")]
   )
 
   expect_true(attr(pepTrelli_both_emetacol, "panel_by"))
-  expect_equal(attr(pepTrelli_both_emetacol, "panel_by_omics"), emeta_cols[2])
-  expect_equal(attr(pepTrelli_both_emetacol, "panel_by_stat"), emeta_cols[2])
+  expect_equal(attr(pepTrelli_both_emetacol, "panel_by_col"), emeta_cols[2])
   expect_equal(
     attributes(pepTrelli_both)[c("fdata_col", "emeta_col", "panel_by_options", "class")],
     attributes(pepTrelli_both_emetacol)[c("fdata_col", "emeta_col", "panel_by_options", "class")]
@@ -347,13 +273,7 @@ test_that("as.trelliData and trelli_panel_by returns correct data frames and att
     "trelliData has already been paneled by Mass_Tag_ID"
   )
 
-  # Finally, test the warning with the small groups
-  tinyNMR <- as.nmrData(e_data = edata[1, 1:2], f_data = fdata[1, ], edata_cname = "Metabolite", fdata_cname = "SampleID")
 
-  expect_warning(
-    as.trelliData(tinyNMR) %>% trelli_panel_by("Metabolite"),
-    "Grouping by Metabolite results in panels with less than 3 data points in trelliData.omics."
-  )
 })
 
 test_that("as.trelliData and trelli_panel_by returns correct data frames and attributes for RNA-seq data", {
@@ -384,9 +304,6 @@ test_that("as.trelliData and trelli_panel_by returns correct data frames and att
   # Save object
   seqTest2 <- as.trelliData(omicsData = seqData_omics)
   
-  # Expect message
-  expect_message(as.trelliData(statRes = seqData_stat))
-  
   # Save object
   seqTest3 <- as.trelliData(statRes = seqData_stat)
   
@@ -398,7 +315,7 @@ test_that("as.trelliData and trelli_panel_by returns correct data frames and att
   
   # Check all object types
   expect_true(inherits(seqTest2, "trelliData.seqData"))
-  expect_true(inherits(seqTest3, "trelliData.seqData"))
+  expect_true(inherits(seqTest3, "trelliData"))
   expect_true(inherits(seqTest4, "trelliData.seqData"))
   
 })

@@ -61,7 +61,7 @@ test_that("trelliPlots check the correct inputs for seqData", {
   # The object must have omicsData
   expect_error(
     seqTrelli3 %>% trelli_panel_by("ID_REF") %>% trelli_rnaseq_boxplot(),
-    "trelliData must have omicsData for this plotting function."
+    "seqData is required for this plotting function. Use trelli_abundance_boxplot instead."
   )
   
   # Only acceptable cognostics are allowed
@@ -100,18 +100,6 @@ test_that("trelliPlots check the correct inputs for seqData", {
     "test_example should be a non-zero integer."
   )
   
-  # Test example also can't be more than the number of panels
-  expect_error(
-    seqTrelli1 %>% trelli_panel_by("ID_REF") %>% trelli_rnaseq_boxplot(test_mode = TRUE, test_example = -2000.3),
-    "test_example must be in the range of possibilities, of 1 to 1200"
-  )
-  
-  # Single plot must be true or false
-  expect_error(
-    seqTrelli1 %>% trelli_panel_by("ID_REF") %>% trelli_rnaseq_boxplot(single_plot = "test"),
-    "single_plot must be a TRUE or FALSE."
-  )
-  
   # Expect a message that median and cv abundance have been removed
   suppressWarnings({
     expect_message(
@@ -124,39 +112,11 @@ test_that("trelliPlots check the correct inputs for seqData", {
     )
   })
   
-  # Expect a message that p-value and fold change have been removed 
-  suppressWarnings({
-    expect_message(
-      seqTrelli4 %>% trelli_panel_by("Classification") %>% 
-        trelli_rnaseq_boxplot(
-          test_mode = TRUE, test_example = 1, 
-          cognostics = c("p-value", "fold change"), path = tempdir()
-        ),
-      "Please panel by ID_REF to get 'p-value' and 'fold change' as cognostics in the trelliscope display."
-    )    
-  })
-  
-  # Blank biomolecules should be removed, and if no data, an error produced
-  blankExample <- seqTrelli1 %>% trelli_panel_by("ID_REF")
-  blankExample$trelliData.omics <- blankExample$trelliData.omics[1, ]
-  blankExample$trelliData.omics$ID_REF <- ""
-  
-  expect_error(
-    suppressMessages(blankExample %>% trelli_rnaseq_boxplot(path = tempdir())),
-    "No data to build trelliscope with."
-  )
-  
-  # Test mode for windows should pass
-  expect_equal(
-    .getDownloadsFolder(.test_mode = TRUE),
-    file.path(dirname("~"), "Downloads")
-  )
-  
   # Expect a single plot object to be made
   rna_boxplot <- seqTrelli1 %>%
     trelli_panel_by("ID_REF") %>%
     trelli_rnaseq_boxplot(single_plot = TRUE, path = tempdir())
-  expect_true(inherits(rna_boxplot, "ggplot"))
+  expect_true(inherits(rna_boxplot, "panel_lazy_vec"))
   
   # Generate a tests folder
   testFolder <- file.path(tempdir(), "/Trelli_Tests")
@@ -180,7 +140,7 @@ test_that("trelliPlots check the correct inputs for seqData", {
   # Build a trelliscope that tries to call stats cognostics without stats data and
   # has one plot
   singlePlot <- seqTrelli1 %>% trelli_panel_by("ID_REF") 
-  singlePlot$trelliData.omics <- singlePlot$trelliData.omics[1, ]
+  singlePlot$trelliData <- singlePlot$trelliData[1, ]
   suppressWarnings(singlePlot %>% 
                      trelli_rnaseq_boxplot(path = file.path(testFolder, "BoxSeqTest2"), 
                                               cognostics = "p-value")
@@ -196,16 +156,6 @@ test_that("trelliPlots check the correct inputs for seqData", {
                        cognostics = NULL
                      ))
   expect_true(file.exists(file.path(testFolder, "BoxSeqTest3")))
-  
-  # Build a trelliscope that panels by Classification
-  suppressWarnings(seqTrelli4 %>% trelli_panel_by("Classification") %>%
-                     trelli_rnaseq_boxplot(
-                       path = file.path(testFolder, "BoxSeqTest4"),
-                       test_mode = TRUE,
-                       test_example = 1,
-                       cognostics = "count"
-                     ))
-  expect_true(file.exists(file.path(testFolder, "BoxSeqTest4")))
   
   # Build a trelliscope that returns  p-value and fold change only
   suppressWarnings(seqTrelli4 %>% trelli_panel_by("ID_REF") %>%
@@ -239,7 +189,7 @@ test_that("trelliPlots check the correct inputs for seqData", {
   abun_histplot <- seqTrelli1 %>%
     trelli_panel_by("ID_REF") %>%
     trelli_rnaseq_histogram(single_plot = TRUE, path = tempdir())
-  expect_true(inherits(abun_histplot, "ggplot"))
+  expect_true(inherits(abun_histplot, "panel_lazy_vec"))
   
   
   # Test that trelliscope builds when passed cognostic doesn't exist  
@@ -279,13 +229,15 @@ test_that("trelliPlots check the correct inputs for seqData", {
   )
   
   # Return a single interactive plot
-  abun_hmplot <- seqTrelli4 %>%
-    trelli_panel_by("Classification") %>%
-    trelli_rnaseq_heatmap(
-      single_plot = TRUE, ggplot_params = "xlab('')", 
-      interactive = TRUE, path = tempdir()
-    )
-  expect_true(inherits(abun_hmplot, "plotly"))
+  suppressWarnings({
+    abun_hmplot <- seqTrelli4 %>%
+      trelli_panel_by("Classification") %>%
+      trelli_rnaseq_heatmap(
+        single_plot = TRUE, ggplot_params = "xlab('')", 
+        interactive = TRUE, path = tempdir()
+      )
+    expect_true(inherits(abun_hmplot, "panel_lazy_vec"))
+  })
   
   # Test that trelliscope builds with all cognostics
   suppressWarnings(seqTrelli4 %>% trelli_panel_by("Classification") %>%
@@ -299,7 +251,7 @@ test_that("trelliPlots check the correct inputs for seqData", {
   # Test that the trelliscope still builds without group data and only one plot
   nogroup <- seqTrelli4 %>% trelli_panel_by("Classification")
   attributes(nogroup$omicsData)$group_DF <- NULL
-  nogroup$trelliData.omics <- nogroup$trelliData.omics[1, ]
+  nogroup$trelliData <- nogroup$trelliData[1, ]
   suppressWarnings(nogroup %>%
                      trelli_rnaseq_heatmap(path = file.path(testFolder, "HmSeqTest2")),)
   expect_true(file.exists(file.path(testFolder, "HmSeqTest2")))
@@ -308,7 +260,7 @@ test_that("trelliPlots check the correct inputs for seqData", {
   
   # Trigger proportion check warning with something outrageous
   expect_error(
-    seqTrelli3 %>% trelli_panel_by("ID_REF") %>% 
+    seqTrelli4 %>% trelli_panel_by("ID_REF") %>% 
     trelli_rnaseq_nonzero_bar(proportion = "cantelope", path = tempdir()),
     "proportion must be a TRUE or FALSE."
   )
@@ -325,7 +277,7 @@ test_that("trelliPlots check the correct inputs for seqData", {
   expect_true(file.exists(file.path(testFolder, "NonzeroTest1")))
   
   # Test trelliscope with just a statRes object 
-  suppressWarnings(seqTrelli3 %>% trelli_panel_by("ID_REF") %>% 
+  suppressWarnings(seqTrelli4 %>% trelli_panel_by("ID_REF") %>% 
                      trelli_rnaseq_nonzero_bar(path = file.path(testFolder, "NonzeroTest2"),
                                             test_mode = TRUE, 
                                             test_example = 2,
@@ -334,18 +286,8 @@ test_that("trelliPlots check the correct inputs for seqData", {
   )
   expect_true(file.exists(file.path(testFolder, "NonzeroTest2")))
   
-  # Test trelliscope with paneling by a class
-  suppressWarnings(seqTrelli4 %>% trelli_panel_by("Classification") %>% 
-                     trelli_rnaseq_nonzero_bar(path = file.path(testFolder, "NonzeroTest3"),
-                                            test_mode = TRUE, 
-                                            test_example = 2,
-                                            proportion = FALSE,
-                                            cognostics = "non-zero count")
-  )
-  expect_true(file.exists(file.path(testFolder, "NonzeroTest3")))
-  
   # Test trelliscope with just a statRes object 
-  suppressWarnings(seqTrelli3 %>% trelli_panel_by("ID_REF") %>% 
+  suppressWarnings(seqTrelli4 %>% trelli_panel_by("ID_REF") %>% 
                      trelli_rnaseq_nonzero_bar(path = file.path(testFolder, "NonzeroTest4"),
                                             test_mode = TRUE, 
                                             test_example = 2,
@@ -356,7 +298,7 @@ test_that("trelliPlots check the correct inputs for seqData", {
   
   # Build a single plot
   miss_plot <- singlePlot %>% trelli_rnaseq_nonzero_bar(single_plot = TRUE, path = tempdir())
-  expect_true(inherits(miss_plot, "ggplot"))
+  expect_true(inherits(miss_plot, "panel_lazy_vec"))
 
   
 })

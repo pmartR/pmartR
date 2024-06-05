@@ -102,7 +102,7 @@ test_that("trelliData object summaries return the correct data frames", {
   
   # Test: seqData expression data-----------------------------------------------
   
-  seqSummary <- as.trelliData(omicsData = seqData_omics, statRes = seqData_stat) %>% summary()
+  suppressWarnings({seqSummary <- as.trelliData(omicsData = seqData_omics, statRes = seqData_stat) %>% summary()})
   
   # No abundance plots should be suggested in summary
   expect_true(any(grepl("abundance", seqSummary$Plot)) == FALSE)
