@@ -11,6 +11,7 @@ trelli_precheck(
   acceptable_cognostics,
   ggplot_params,
   interactive,
+  build_trelliscope,
   test_mode,
   test_example,
   single_plot,
@@ -35,6 +36,8 @@ function}
 
 \item{interactive}{The user provided logical for whether the plot should be
 interactive}
+
+\item{build_trelliscope}{The user provided value for building trelliscope}
 
 \item{test_mode}{The user provided logical for whether a smaller trelliscope
 should be returned}

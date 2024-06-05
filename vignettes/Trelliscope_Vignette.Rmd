@@ -20,7 +20,6 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 library(pmartRdata)
 library(pmartR)
 library(dplyr)
-library(patchwork)
 ```
 
 ## Introduction
@@ -28,7 +27,7 @@ library(patchwork)
 A challenge of 'omics data is seeing trends on the biomolecule, sample, and biomolecule
 class (i.e. peptide fragments from a protein) level due to the large number 
 of individual plots to visualize. Trelliscope is an HTML tool which allows users to
-search, sort, and filter plots based on **cognostics**, which include single data 
+search, sort, and filter plots based on **congostics**, which include single data 
 descriptors of the data like the mean, standard deviation, p-value, etc. 
 
 The general workflow for the trelliscope builder functions in pmartR are as follows: 
@@ -189,7 +188,7 @@ can change which plot we're looking at with "test_example". On the left, we have
 a "Peptide" example and on the right, a "Sample" example, with the color changed
 to avoid confusion. 
 
-```{r}
+```{r, eval = F}
 # Panel by Mass Tag ID  
 PeptideGroups <- trelli_panel_by(trelliData1, "Peptide")
 
@@ -197,14 +196,11 @@ PeptideGroups <- trelli_panel_by(trelliData1, "Peptide")
 SampleGroups <- trelliData1 %>% trelli_panel_by("Sample") 
 
 # Create an example boxplot 
-Abun_Box_Edata <- trelli_abundance_boxplot(PeptideGroups, single_plot = TRUE, test_example = 3)
+trelli_abundance_boxplot(PeptideGroups, single_plot = TRUE, test_example = 3)
 
 # Make an abundance boxplot without the points 
-Abun_Box_Sample <- trelli_abundance_boxplot(SampleGroups, include_points = F, single_plot = T,
-                                            ggplot_params = "scale_fill_manual(values = 'forestgreen')")
-
-# Use patchwork to put plots together
-Abun_Box_Edata + Abun_Box_Sample
+trelli_abundance_boxplot(SampleGroups, include_points = F, single_plot = T,
+                         ggplot_params = "scale_fill_manual(values = 'forestgreen')")
 ```
 
 **Abundance Histogram**
@@ -212,7 +208,7 @@ Abun_Box_Edata + Abun_Box_Sample
 The abundance histogram is only supported for data that has been paneled by 
 edata_cname. 
 
-```{r, echo = T}
+```{r, echo = T, eval = F}
 trelli_abundance_histogram(PeptideGroups, single_plot = TRUE, test_example = 3)
 ```
 
@@ -221,18 +217,17 @@ trelli_abundance_histogram(PeptideGroups, single_plot = TRUE, test_example = 3)
 We can also build a missingness bar plots. If we would rather see count 
 information in the bar plot instead of proportions, we can easily set proportion to FALSE. 
 
-```{r}
+```{r, echo = T, eval = F}
 # Create an example bar plot 
-Miss_Bar_Edata <- trelli_missingness_bar(PeptideGroups,
-                                         single_plot = TRUE, test_example = 3,
-                                         ggplot_params = "ggtitle('Biomolecule')")
+trelli_missingness_bar(PeptideGroups,
+                       single_plot = TRUE, test_example = 3,
+                       ggplot_params = "ggtitle('Biomolecule')")
+
 # Make a missingness barplot 
-Miss_Bar_Sample <- trelli_missingness_bar(SampleGroups,
-                                          include_points = F, 
-                                          proportion = FALSE, single_plot = T,
-                                          ggplot_params = "ggtitle('Sample')")
-# Put plots together with patchwork
-Miss_Bar_Edata + Miss_Bar_Sample
+trelli_missingness_bar(SampleGroups,
+                      include_points = F, 
+                      proportion = FALSE, single_plot = T,
+                      ggplot_params = "ggtitle('Sample')")
 ```
 
 These are all the currently supported plots for only e_data files. There are 
@@ -285,7 +280,7 @@ sections on how each e_meta and group_designation affect each plot.
 The group_designation variables are utilized in the abundance boxplot when paneling
 by edata_cname ("Peptide")...
 
-```{r}
+```{r, echo = T, eval = F}
 trelliData2 %>% 
   trelli_panel_by("Peptide") %>% 
   trelli_abundance_boxplot(test_example = 3, single_plot = T, ggplot_params = "xlab('Phenotype')")
@@ -294,7 +289,7 @@ trelliData2 %>%
 ...or by an e_meta variable. In this case, our options include RazorProtein and ProteinList.
 Note that group_designation is used if included: 
 
-```{r}
+```{r, echo = T, eval = F}
 trelliData2 %>% 
   trelli_panel_by("RazorProtein") %>% 
   trelli_abundance_boxplot(test_example = 3, single_plot = T)
@@ -312,7 +307,7 @@ it remains the same as in Example Case 1.
 Once again, group_designation data is used if included, even if the panel_by
 variable is an e_meta variable. 
 
-```{r}
+```{r, echo = T, eval = F}
 trelliData2 %>% 
   trelli_panel_by("Peptide") %>% 
   trelli_missingness_bar(test_example = 3, single_plot = T)
@@ -325,7 +320,7 @@ each panel is an e_meta variable, one axis is the biomolecules within that
 biomolecule class, and the other axis is the samples in order by the "group_by"
 designation.
 
-```{r}
+```{r, echo = T, eval = F}
 trelliData2 %>% 
   trelli_panel_by("RazorProtein") %>% 
   trelli_abundance_heatmap(test_example = 2, single_plot = T, ggplot_params = "coord_flip()")
@@ -355,7 +350,7 @@ set a significance threshold.
 
 **Foldchange Bar**
 
-```{r}
+```{r, echo = T, eval = F}
 trelliData3 %>%
   trelli_panel_by("Peptide") %>%
   trelli_foldchange_bar(p_value_thresh = 0.05, 
@@ -382,7 +377,7 @@ summary(trelliData4)
 To create a fold change boxplot, the input data must be paneled by an e_meta
 variable. 
 
-```{r}
+```{r, echo = T, eval = F}
 trelliData4 %>%
   trelli_panel_by("RazorProtein") %>%
   trelli_foldchange_boxplot(
@@ -396,7 +391,7 @@ trelliData4 %>%
 These heatmaps shows fold change values per biomolecule (y-axis) and statistical 
 comparison (x-axis).
 
-```{r}
+```{r, echo = T, eval = F}
 trelliData4 %>%
   trelli_panel_by("RazorProtein") %>%
   trelli_foldchange_heatmap(
@@ -411,7 +406,7 @@ Volcano plots display the -log10 p-value versus the fold change values. Signific
 values with a low fold change are colored blue, and high ones are colored red. These
 plots require that a specific comparison is selected.
 
-```{r}
+```{r, echo = T, eval = F}
 trelliData4 %>%
   trelli_panel_by("RazorProtein") %>%
   trelli_foldchange_volcano(
@@ -519,3 +514,31 @@ log transformation and normalization is required.
 ```{r}
 attr(trelliData4, "panel_by_options")
 ```
+
+#### What do I do with my transcriptomics data (seqData)? 
+
+If plotting "abundances" or "missingness", different functions are used when plotting
+seqData, though the "fold change" plots are the same. Transcript counts are log
+counts per million transformed when plotting. Oftentimes, these trelliscope displays
+are quite large and need additional filtering. 
+
+| MS/NMR Plot Name | seqData Equivalent |
+|------------------|--------------------|
+| abundance_boxplot | rnaseq_boxplot |
+| abundance_histogram | rnaseq_histogram | 
+| abundance_heatmap | rnaseq_heatmap |
+| missingness_bar | rnaseq_nonzero_bar |
+
+
+
+
+
+
+
+
+
+
+
+
+
+

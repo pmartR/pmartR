@@ -27,7 +27,7 @@ Either an omicData and/or a statRes object are accepted.
   protein or NMR data. If group_designation() has been run on the omicData
   object to add "main_effects", the resulting plots will include groups. The
   main effects group_designation and e_meta columns are merged to the e_data
-  in long format to create the trelliData.omics dataframe, and e_meta is
+  in long format to create the trelliData dataframe, and e_meta is
   merged to statRes in long format to create trelliData.stat dataframe.
 }
 \examples{

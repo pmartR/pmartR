@@ -9,8 +9,9 @@ trelli_abundance_heatmap(
   cognostics = c("sample count", "mean abundance", "biomolecule count"),
   ggplot_params = NULL,
   interactive = FALSE,
-  path = .getDownloadsFolder(),
+  path = tempdir(),
   name = "Trelliscope",
+  build_trelliscope = TRUE,
   test_mode = FALSE,
   test_example = 1,
   single_plot = FALSE,
@@ -24,9 +25,11 @@ grouped by an emeta variable. Required.}
 \item{cognostics}{A vector of cognostic options. Defaults are "sample count", 
 "mean abundance" and "biomolecule count". "sample count" and "mean abundance"
 are reported per group, and "biomolecule count" is the total number of biomolecules
-in the biomolecule class (e_meta column).}
+in the biomolecule class (e_meta column).Any additional cognostics from e_meta 
+variables may be added if their column name is specified, and the data has 
+been paneled by the edata_cname  or by an e_meta variable.}
 
-\item{ggplot_params}{An optional vector of strings of ggplot parameters to
+\item{ggplot_params}{An optional vector of strings ofggplot parameters to
 the backend ggplot function. For example, c("ylab('')", "xlab('')").
 Default is NULL.}
 
@@ -35,9 +38,12 @@ interactive or not. Interactive plots are ggplots piped to ggplotly (for
 now). Default is FALSE.}
 
 \item{path}{The base directory of the trelliscope application. Default is
-Downloads.}
+tempdir.}
 
 \item{name}{The name of the display. Default is Trelliscope}
+
+\item{build_trelliscope}{If TRUE, a trelliscope display will be built. Otherwise,
+a dataframe will be returned. Default is TRUE.}
 
 \item{test_mode}{A logical to return a smaller trelliscope to confirm plot
 and design. Default is FALSE.}
@@ -57,6 +63,7 @@ No return value, builds a trelliscope display of heatmaps that is stored in `pat
 Specify a plot design and cognostics for the abundance heatmap
   trelliscope. Data must be grouped by an e_meta column. Main_effects order
   the y-variables. All statRes data is ignored. For RNA-Seq data, use "trelli_rnaseq_heatmap".
+  Note that z-scores are plotted per biomolecule for ease of comparison.
 }
 \examples{
 \dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
