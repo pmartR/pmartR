@@ -671,4 +671,12 @@ test_that('each rollup method correctly quantifies proteins', {
 
   # Compare the output to the standards.
   expect_identical(stan_qr_med_bayes, qr_med_bayes)
+  
+  # Check that error is thrown in any biomolecules have zero observations
+  pdata_zero <- pdata
+  pdata_zero$e_data[sample(1:nrow(pdata_zero$e_data)), -which(colnames(pdata_zero$e_data) == get_edata_cname(pdata_zero))] <- NA
+  expect_error(
+    protein_quant(pdata_zero, method = "rrollup", combine_fn = "median"),
+    regexp = "Your data contains biomolecules not observed in any of the samples"
+  )
 })
