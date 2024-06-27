@@ -121,6 +121,12 @@ protein_quant <- function(pepData, method, isoformRes = NULL,
     stop("emeta_cols must be a character vector.")
   }
 
+  # check that there are no biomolecules with zero observations
+  num_present_by_row <- rowSums(!is.na(pepData$e_data[, -which(names(pepData$e_data) == get_edata_cname(pepData))]))
+  if (min(num_present_by_row) == 0) {
+    stop("Your data contains biomolecules not observed in any of the samples:  please apply a molecule filter to remove these biomolecules before running protein_quant.")
+  }
+  
   # Set the combine_fn input to the appropriate function.
   if (combine_fn == "median") {
     chosen_combine_fn <- combine_fn_median
