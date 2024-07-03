@@ -564,7 +564,7 @@ cv_filter <- function(omicsData, use_groups = TRUE) {
 
     # Make sure the order of the groups in group_DF matches the order of the
     # sample names in cur_edata.
-    groupie <- groupDF$Group[match(names(cur_edata), groupDF$SampleID)]
+    groupie <- groupDF$Group[match(names(cur_edata), groupDF[[get_fdata_cname(omicsData)]])]
 
     # Calculate the pooled CV. The data needs to be converted to a matrix and
     # the group names need to be converted to a character vector for
