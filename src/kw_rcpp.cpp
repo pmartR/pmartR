@@ -70,7 +70,12 @@ double calculate_kwh(std::vector <std::vector <double> > ranks, std::vector <dou
     summation = summation + rsums[i];
   }
   
-  result = ((12/(n*(n+1)))*summation)- 3*(n+1);
+  result = ((12.0/(n*(n+1)))*summation) - 3.0*(n+1);
+  
+  /* handle strange floating point errors */
+  if (result < 0) {
+    result = 0.0;
+  }
   
   return result;
 }
