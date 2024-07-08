@@ -696,6 +696,10 @@ NumericVector holm_cpp(NumericVector ps) {
 
   NumericVector sorted_ps = clone(ps);
   NumericVector adj_ps(n);
+  
+  if (n == 0) {
+    return adj_ps;
+  }
 
   // Sort p-values in ascending order with NA/NaN at the end of the vector.
   std::sort(sorted_ps.begin(), sorted_ps.end(), withNaN);
