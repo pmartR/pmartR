@@ -160,6 +160,12 @@ group_designation <- function(omicsData,
     if (sum(main_effects %in% names(omicsData$f_data)) != length(main_effects)) {
       stop("One or more of the main_effects is not found in f_data of omicsData")
     }
+    
+    # Remove names if named vector
+    if(length(names(main_effects)) > 0){
+      names(main_effects) <- NULL
+      warning("Warning: 'main_effects' was input as a named vector. Only the vector values will be used.")
+    }
   }
 
   # Check covariates ---------------
