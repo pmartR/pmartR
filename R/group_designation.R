@@ -164,7 +164,6 @@ group_designation <- function(omicsData,
     # Remove names if named vector
     if(length(names(main_effects)) > 0){
       names(main_effects) <- NULL
-      warning("Warning: 'main_effects' was input as a named vector. Only the vector values will be used.")
     }
   }
 
