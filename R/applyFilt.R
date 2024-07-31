@@ -1992,11 +1992,9 @@ pmartR_filter_worker <- function(filter_object, omicsData) {
     # e_data
     valid_edata <- omicsData$e_data[, get_edata_cname(omicsData)]
 
-    missing_biomolecules <- unlist(
-      lapply(filter_object$e_data_remove, function(x) if (!(x %in% valid_edata)) x)
-    )
+    missing_biomolecules <- filter_object$e_data_remove[!(filter_object$e_data_remove %in% valid_edata)]
 
-    if (length(missing_biomolecules > 0)) {
+    if (length(missing_biomolecules) > 0) {
       warning(
         "Specified biomolecules ",
         paste0(missing_biomolecules, collapse = ", "),
@@ -2007,11 +2005,9 @@ pmartR_filter_worker <- function(filter_object, omicsData) {
     # f_data
     valid_fdata <- valid_names <- omicsData$f_data[, get_fdata_cname(omicsData)]
 
-    missing_samples <- unlist(
-      lapply(filter_object$f_data_remove, function(x) if (!(x %in% valid_fdata)) x)
-    )
+    missing_samples <- filter_object$f_data_remove[!(filter_object$f_data_remove %in% valid_fdata)]
 
-    if (length(missing_samples > 0)) {
+    if (length(missing_samples) > 0) {
       warning(
         "Specified samples ",
         paste0(missing_samples, collapse = ", "),
@@ -2023,11 +2019,9 @@ pmartR_filter_worker <- function(filter_object, omicsData) {
     # e_meta
     valid_emeta <- omicsData$e_meta[, get_emeta_cname(omicsData)]
 
-    missing_emeta <- unlist(
-      lapply(filter_object$e_meta_remove, function(x) if (!(x %in% valid_emeta)) x)
-    )
+    missing_emeta <- filter_object$e_meta_remove[!(filter_object$e_meta_remove %in% valid_emeta)]
 
-    if (length(missing_emeta > 0)) {
+    if (length(missing_emeta) > 0) {
       warning(
         "Specified e_meta values ",
         paste0(missing_emeta, collapse = ", "),
