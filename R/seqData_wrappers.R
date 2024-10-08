@@ -1334,12 +1334,19 @@ dispersion_est <- function(omicsData, method,
 
     fit_edgeR <- edgeR::glmQLFit(D_edgeR, design_matrix)
 
+    # edgeR people hate us
+    prior_name <- intersect(c("s2.prior", "var.prior"), names(fit_edgeR))
+    post_name <- intersect(c("s2.post", "var.post"), names(fit_edgeR))
+    
+    prior <- fit_edgeR[[prior_name]]
+    post <- fit_edgeR[[post_name]]
+    
     df2 <- data.frame(
       CD = D_edgeR$common.dispersion,
       TD = D_edgeR$trended.dispersion,
       TagD = D_edgeR$tagwise.dispersion,
-      fitD1 = fit_edgeR$var.prior,
-      fitD2 = fit_edgeR$var.post,
+      fitD1 = prior,
+      fitD2 = post,
       AveLogCPM = fit_edgeR$AveLogCPM
     )
 
