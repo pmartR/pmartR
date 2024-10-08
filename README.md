@@ -28,7 +28,7 @@ install.packages("pmartR")
 BiocManager::install("pmartR")
 ```
 
-If you are on Mac/Windows and have a recent R version, you can skip compilation by installing from binaries, see the [pmartR CRAN page](https://cran.r-project.org/web/packages/pmartR/index.html) for available binaries.
+If you are on Mac/Windows and have a recent R version, you can skip compilation by installing from binaries, see the [pmartR CRAN page](https://CRAN.R-project.org/package=pmartR) for available binaries.
 
 ```r
 install.packages("pmartR", type = "binary")
