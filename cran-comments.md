@@ -1,9 +1,5 @@
-# (Resubmit) Version 2.4.5 May 17, 2024
+# Version 2.4.6 October 8, 2024
 
-Fixed a stale url in README that was causing a NOTE.  
+Fixing errors related to the devel version of Bioconductor/edgeR.
 
-Other NOTE's about pmartRdata hosted in a drat repo were previously okay.
-
-****
-
-Fixing errors in noSuggests checks.  Various minor bugfixes.
+Changed url in README to canonical form.
