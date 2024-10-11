@@ -92,7 +92,7 @@ To get started, see the package documentation and function reference located [he
 Example peptide (both unlabeled and isobaric labeled), protein, metabolite and lipid data are available in the __pmartRdata__ package available on Github, [here](https://github.com/pmartR/pmartRdata)
 
 ## Contributing
-See the [contributing docs](.github/CONTRIBUTING.md).
+See the [contributing docs](https://github.com/pmartR/pmartR/blob/master/.github/CONTRIBUTING.md).
 
 ## Citation:
 
