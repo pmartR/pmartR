@@ -266,7 +266,7 @@ trelli_rnaseq_boxplot <- function(trelliData,
     boxplot <- ggplot2::ggplot(DF, ggplot2::aes(x = Group, fill = Group, y = LCPM)) +
       ggplot2::geom_boxplot(outlier.shape = NA) +
       ggplot2::theme_bw() +
-      ggplot2::theme(legend.position = "none", plot.title = ggplot2::element_text(hjust = 0.5)) +
+      ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) +
       ggplot2::ylab("Log Counts per Million (LCPM)") 
     
     # Add include_points

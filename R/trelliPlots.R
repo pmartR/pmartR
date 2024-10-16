@@ -481,30 +481,16 @@ trelli_abundance_boxplot <- function(trelliData,
     
     DF <- dplyr::filter(trelliData$trelliData, Panel == {{Panel}})
     
-    # Add a blank group if no group designation was given
-    if ("Group" %in% colnames(DF) == FALSE) {
-      DF$Group <- "x"
-    }
-    
     # Build plot
     boxplot <- ggplot2::ggplot(DF, ggplot2::aes(x = Group, fill = Group, y = Abundance)) +
       ggplot2::geom_boxplot(outlier.shape = NA) +
       ggplot2::theme_bw() +
-      ggplot2::theme(legend.position = "none", plot.title = ggplot2::element_text(hjust = 0.5)) +
+      ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) +
       ggplot2::ylab(paste(attr(trelliData$omicsData, "data_info")$data_scale, "Abundance"))
 
     # Add include_points
     if (include_points) {
       boxplot <- boxplot + ggplot2::geom_jitter(height = 0, width = 0.25)
-    }
-
-    # Remove x axis if no groups
-    if ("Group" %in% colnames(toBuild) == FALSE) {
-      boxplot <- boxplot + ggplot2::theme(
-        axis.title.x = ggplot2::element_blank(),
-        axis.ticks.x = ggplot2::element_blank(),
-        axis.text.x = ggplot2::element_blank()
-      )
     }
 
     # Add additional parameters
