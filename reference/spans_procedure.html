@@ -5,7 +5,7 @@ introduces into the data. Higher score implies less bias."><!-- mathjax --><scri
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -19,7 +19,7 @@ introduces into the data. Higher score implies less bias."><!-- mathjax --><scri
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pmartR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.6</span>
       </span>
     </div>
 
@@ -30,7 +30,7 @@ introduces into the data. Higher score implies less bias."><!-- mathjax --><scri
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -64,20 +64,20 @@ introduces into the data. Higher score implies less bias."><!-- mathjax --><scri
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/pmartR/pmartR/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Calculate SPANS Score for a Number of Normalization Methods</h1>
-    <small class="dont-index">Source: <a href="https://github.com/pmartR/pmartR/blob/HEAD/R/spans.R" class="external-link"><code>R/spans.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/pmartR/pmartR/blob/v2.4.6/R/spans.R" class="external-link"><code>R/spans.R</code></a></small>
     <div class="hidden name"><code>spans_procedure.Rd</code></div>
     </div>
 
@@ -107,80 +107,82 @@ introduces into the data. Higher score implies less bias.</p>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>omicsData</dt>
+
+
+<dl><dt id="arg-omicsdata">omicsData<a class="anchor" aria-label="anchor" href="#arg-omicsdata"></a></dt>
 <dd><p>aobject of the class 'pepData' or 'proData' created by
 <code><a href="as.pepData.html">as.pepData</a></code> or <code><a href="as.proData.html">as.proData</a></code> respectively. The data
 must be log transformed (using edata_transform()) and have a grouping
 structure, usually set by calling group_designation() on the object.</p></dd>
 
 
-<dt>norm_fn</dt>
+<dt id="arg-norm-fn">norm_fn<a class="anchor" aria-label="anchor" href="#arg-norm-fn"></a></dt>
 <dd><p>character vector indicating the normalization functions to
 test. See details for the current offerings.</p></dd>
 
 
-<dt>subset_fn</dt>
+<dt id="arg-subset-fn">subset_fn<a class="anchor" aria-label="anchor" href="#arg-subset-fn"></a></dt>
 <dd><p>character vector indicating which subset functions to test.
 See details for the current offerings.</p></dd>
 
 
-<dt>params</dt>
+<dt id="arg-params">params<a class="anchor" aria-label="anchor" href="#arg-params"></a></dt>
 <dd><p>list of additional arguments passed to the chosen subset
 functions. See details for parameter specification and default values.</p></dd>
 
 
-<dt>group</dt>
+<dt id="arg-group">group<a class="anchor" aria-label="anchor" href="#arg-group"></a></dt>
 <dd><p>character specifying a column name in f_data that gives the
 group assignment of the samples. Defaults to NULL, in which case the
 grouping structure given in <code>attr(omicsData, 'group_DF')</code> is used.</p></dd>
 
 
-<dt>n_iter</dt>
+<dt id="arg-n-iter">n_iter<a class="anchor" aria-label="anchor" href="#arg-n-iter"></a></dt>
 <dd><p>number of iterations used in calculating the background
 distribution in step 0 of SPANS. Defaults to 1000.</p></dd>
 
 
-<dt>sig_thresh</dt>
+<dt id="arg-sig-thresh">sig_thresh<a class="anchor" aria-label="anchor" href="#arg-sig-thresh"></a></dt>
 <dd><p>numeric value that specifies the maximum p-value for which
 a biomolecule can be considered highly significant based on a
 Kruskal-Wallis test. Defaults to 0.0001.</p></dd>
 
 
-<dt>nonsig_thresh</dt>
+<dt id="arg-nonsig-thresh">nonsig_thresh<a class="anchor" aria-label="anchor" href="#arg-nonsig-thresh"></a></dt>
 <dd><p>numeric value that specifies the minimum p-value for
 which a biomolecule can be considered non-significant based on a
 Kruskal-Wallis test. Defaults to 0.5.</p></dd>
 
 
-<dt>min_nonsig</dt>
+<dt id="arg-min-nonsig">min_nonsig<a class="anchor" aria-label="anchor" href="#arg-min-nonsig"></a></dt>
 <dd><p>integer value specifying the minimum number of
 non-significant biomolecules identified in step 0 of SPANS in order to
 proceed.  nonsig_thresh will be adjusted to the maximum value that gives
 this many biomolecules.</p></dd>
 
 
-<dt>min_sig</dt>
+<dt id="arg-min-sig">min_sig<a class="anchor" aria-label="anchor" href="#arg-min-sig"></a></dt>
 <dd><p>integer value specifying the minimum number of highly
 significant biomolecules identified in step 0 of SPANS in order to proceed.
 sig_thresh will be adjusted to the minimum value that gives this many
 biomolecules.</p></dd>
 
 
-<dt>max_nonsig</dt>
+<dt id="arg-max-nonsig">max_nonsig<a class="anchor" aria-label="anchor" href="#arg-max-nonsig"></a></dt>
 <dd><p>integer value specifying the maximum number of
 non-significant biomolecules identified in step 0 if SPANS in order to
 proceed.  Excesses of non-significant biomolecules will be randomly sampled
 down to these values.</p></dd>
 
 
-<dt>max_sig</dt>
+<dt id="arg-max-sig">max_sig<a class="anchor" aria-label="anchor" href="#arg-max-sig"></a></dt>
 <dd><p>integer value specifying the maximum number of
 highly significant biomolecules identified in step 0 if SPANS in order to
 proceed.  Excesses of highly significant biomolecules will be randomly
 sampled down to these values.</p></dd>
 
 
-<dt>...</dt>
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Additional arguments</p><table class="table table"><tr><td><code>location_thresh,
 scale_thresh</code> The minimum p-value resulting from a Kruskal-Wallis test on
 the location and scale parameters resulting from a normalization method in
@@ -190,22 +192,14 @@ procedure steps to console. Defaults to TRUE.</td></tr></table></dd>
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p>An object of class 'SPANSRes', which is a dataframe containing
+    <p>An object of class 'SPANSRes', which is a dataframe containing
   columns for the subset method and normalization used, the parameters used
   in the subset method, and the corresponding SPANS score.  <br></p>
-
-
-
 <p>The column 'mols_used_in_norm' contains the number of molecules that were
   selected by the subset method and subsequently used to determine the
   location/scale parameters for normalization.  The column 'passed selection'
   is <code>TRUE</code> if the subset+normalization procedure was selected for
   scoring.<br></p>
-
-
-
 <p>The attribute 'method_selection_pvals' is a dataframe containing
   information on the p values used to determine if a method was selected for
   scoring (location_p_value, scale_p_value) as well as the probabilities
@@ -255,7 +249,7 @@ procedure steps to console. Defaults to TRUE.</td></tr></table></dd>
     </div>
     <div id="specifying-subset-parameters-using-the-params-argument">
     <h2>Specifying Subset Parameters Using the <code>params</code> argument</h2>
-    
+
 
 <p>Parameters for the chosen subset function should be specified in a list.
   The list elements should have names corresponding to the subset function
@@ -325,15 +319,15 @@ procedure steps to console. Defaults to TRUE.</td></tr></table></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

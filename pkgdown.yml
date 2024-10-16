@@ -1,5 +1,5 @@
 pandoc: 3.1.11
-pkgdown: 2.0.9
+pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
   Convenience_Functions: Convenience_Functions.html
@@ -11,5 +11,4 @@ articles:
   Statistical_Analysis_with_pmartR: Statistical_Analysis_with_pmartR.html
   Trelliscope_Vignette: Trelliscope_Vignette.html
   Typical_Processing_Workflow: Typical_Processing_Workflow.html
-last_built: 2024-05-21T17:06Z
-
+last_built: 2024-10-16T16:24Z

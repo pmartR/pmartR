@@ -4,7 +4,7 @@ surv_designation, and return the "survfit" object'><!-- mathjax --><script src="
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -18,7 +18,7 @@ surv_designation, and return the "survfit" object'><!-- mathjax --><script src="
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pmartR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.6</span>
       </span>
     </div>
 
@@ -29,7 +29,7 @@ surv_designation, and return the "survfit" object'><!-- mathjax --><script src="
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -63,20 +63,20 @@ surv_designation, and return the "survfit" object'><!-- mathjax --><script src="
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/pmartR/pmartR/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Basic survival analysis function</h1>
-    <small class="dont-index">Source: <a href="https://github.com/pmartR/pmartR/blob/HEAD/R/survival.R" class="external-link"><code>R/survival.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/pmartR/pmartR/blob/v2.4.6/R/survival.R" class="external-link"><code>R/survival.R</code></a></small>
     <div class="hidden name"><code>fit_surv.Rd</code></div>
     </div>
 
@@ -91,20 +91,20 @@ surv_designation, and return the "survfit" object</p>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>omicsData</dt>
+
+
+<dl><dt id="arg-omicsdata">omicsData<a class="anchor" aria-label="anchor" href="#arg-omicsdata"></a></dt>
 <dd><p>A pmartR data object of any class, which has a `group_df` attribute that is usually created by the `group_designation()` function</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p>if fitted survival analysis object is returned</p>
+    <p>if fitted survival analysis object is returned</p>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">MSomicsSTAT</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">OvarianPepdataBP</span><span class="op">)</span></span>
 <span></span>
@@ -122,7 +122,7 @@ surv_designation, and return the "survfit" object</p>
 <span><span class="op">)</span></span>
 <span><span class="va">sfit</span> <span class="op">&lt;-</span> <span class="fu">fit_surv</span><span class="op">(</span><span class="va">tcga_ovarian_pepdata_bp</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sfit</span>, col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
+<span><span class="op">}</span> <span class="co"># }</span></span></code></pre></div>
     </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -136,15 +136,15 @@ surv_designation, and return the "survfit" object</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

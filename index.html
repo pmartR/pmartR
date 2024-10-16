@@ -19,7 +19,7 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">pmartR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.6</span>
       </span>
     </div>
 
@@ -45,7 +45,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
@@ -83,7 +83,7 @@
 <li>
   <a href="https://github.com/pmartR/pmartR/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul>
@@ -94,7 +94,7 @@
 </div>
 <!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="contents col-md-9">
@@ -120,19 +120,26 @@
 <span><span class="co"># or </span></span>
 <span></span>
 <span><span class="fu">BiocManager</span><span class="fu">::</span><span class="fu">install</span><span class="op">(</span><span class="st">"pmartR"</span><span class="op">)</span></span></code></pre></div>
-<p>To install the latest <em>release</em>:</p>
+<p>If you are on Mac/Windows and have a recent R version, you can skip compilation by installing from binaries, see the <a href="https://CRAN.R-project.org/package=pmartR" class="external-link">pmartR CRAN page</a> for available binaries.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"pmartR"</span>, type <span class="op">=</span> <span class="st">"binary"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># or </span></span>
+<span></span>
+<span><span class="fu">BiocManager</span><span class="fu">::</span><span class="fu">install</span><span class="op">(</span><span class="st">"pmartR"</span>, type <span class="op">=</span> <span class="st">"binary"</span><span class="op">)</span></span></code></pre></div>
+<p>To install the latest <em>release</em>:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"pmartR/pmartR@*release"</span><span class="op">)</span></span></code></pre></div>
 <p>To install a specific release, say v2.4.0:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"pmartR/pmartR@v2.4.0"</span><span class="op">)</span></span></code></pre></div>
 <p><strong>(Not recommended, since these changes are likely still being tested)</strong> You can also install the latest changes to master:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"pmartR/pmartR"</span><span class="op">)</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="problems-with-rcpparmadillo-and-gfortran-on-mac">Problems with rcppArmadillo and gfortran on mac<a class="anchor" aria-label="anchor" href="#problems-with-rcpparmadillo-and-gfortran-on-mac"></a>
 </h3>
-<p>There is a problem that causes pmartR to fail compiling cpp code, which has something to do with rcppArmadillo and certain installations of gfortran. See these posts that try to explain the issue: <a href="https://stackoverflow.com/questions/64992467/mac-clang-installation-seems-to-override-gcc-install" class="external-link">1</a> <a href="https://stackoverflow.com/questions/29992066/rcpp-warning-directory-not-found-for-option-l-usr-local-cellar-gfortran-4-8/29993906#29993906" class="external-link">2</a> <a href="https://forum.posit.co/t/setting-up-travis-ci-on-linux-with-an-r-package-that-uses-rcpparmadillo/53910/3" class="external-link">3</a>. Two solutions we have found:</p>
+<p>There is a problem that causes pmartR to fail compiling cpp code, which has something to do with rcppArmadillo and certain installations of gfortran. See these posts that try to explain the issue: <a href="https://stackoverflow.com/questions/64992467/mac-clang-installation-seems-to-override-gcc-install" class="external-link">1</a> <a href="https://stackoverflow.com/questions/29992066/rcpp-warning-directory-not-found-for-option-l-usr-local-cellar-gfortran-4-8/29993906#29993906" class="external-link">2</a> <a href="https://forum.posit.co/t/setting-up-travis-ci-on-linux-with-an-r-package-that-uses-rcpparmadillo/53910/3" class="external-link">3</a>. The simplest solution if you are on Mac/Windows and have a recent R version is to install from pre-built binaries (see installation section). If you cannot install from binaries, two solutions we have found are:</p>
 <ol style="list-style-type: decimal">
 <li>Install gfortran from a recommended source (not homebrew):
 <ul>
@@ -168,6 +175,11 @@ CC=/usr/local/bin/gcc -ld64</code></pre>
 <p>Example peptide (both unlabeled and isobaric labeled), protein, metabolite and lipid data are available in the <strong>pmartRdata</strong> package available on Github, <a href="https://github.com/pmartR/pmartRdata" class="external-link">here</a></p>
 </div>
 <div class="section level2">
+<h2 id="contributing">Contributing<a class="anchor" aria-label="anchor" href="#contributing"></a>
+</h2>
+<p>See the <a href="https://github.com/pmartR/pmartR/blob/master/.github/CONTRIBUTING.md" class="external-link">contributing docs</a>.</p>
+</div>
+<div class="section level2">
 <h2 id="citation">Citation:<a class="anchor" aria-label="anchor" href="#citation"></a>
 </h2>
 <p>To cite this package, please the following:</p>
@@ -180,17 +192,17 @@ CC=/usr/local/bin/gcc -ld64</code></pre>
   journal={Journal of Proteome Research},
   year={2023},
   publisher={ACS Publications}
-}) </code></pre>
+}</code></pre>
 </div>
 <div class="section level2">
 <h2 id="disclaimer">Disclaimer:<a class="anchor" aria-label="anchor" href="#disclaimer"></a>
 </h2>
 <p>This material was prepared as an account of work sponsored by an agency of the United States Government. Neither the United States Government nor the United States Department of Energy, nor Battelle, nor any of their employees, nor any jurisdiction or organization that has cooperated in the development of these materials, makes any warranty, express or implied, or assumes any legal liability or responsibility for the accuracy, completeness, or usefulness or any information, apparatus, product, software, or process disclosed, or represents that its use would not infringe privately owned rights.</p>
 <p>Reference herein to any specific commercial product, process, or service by trade name, trademark, manufacturer, or otherwise does not necessarily constitute or imply its endorsement, recommendation, or favoring by the United States Government or any agency thereof, or Battelle Memorial Institute. The views and opinions of authors expressed herein do not necessarily state or reflect those of the United States Government or any agency thereof.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>  PACIFIC NORTHWEST NATIONAL LABORATORY</span>
-<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>  operated by BATTELLE <span class="cf">for</span> the</span>
-<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>  UNITED STATES DEPARTMENT OF ENERGY</span>
-<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>  under Contract DE<span class="sc">-</span>AC05<span class="dv">-76</span>RL01830</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>  PACIFIC NORTHWEST NATIONAL LABORATORY</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>  operated by BATTELLE <span class="cf">for</span> the</span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>  UNITED STATES DEPARTMENT OF ENERGY</span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>  under Contract DE<span class="sc">-</span>AC05<span class="dv">-76</span>RL01830</span></code></pre></div>
 </div>
 </div>
   </div>
@@ -213,6 +225,12 @@ CC=/usr/local/bin/gcc -ld64</code></pre>
 </ul>
 </div>
 
+<div class="community">
+<h2 data-toc-skip>Community</h2>
+<ul class="list-unstyled">
+<li><a href="CONTRIBUTING.html">Contributing guide</a></li>
+</ul>
+</div>
 
 <div class="citation">
 <h2 data-toc-skip>Citation</h2>
@@ -251,16 +269,16 @@ CC=/usr/local/bin/gcc -ld64</code></pre>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
       </footer>
 </div>
 
-  
 
 
-  
+
+
 
   </body>
 </html>
