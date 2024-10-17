@@ -76,12 +76,12 @@ test_that("trelliData object summaries return the correct data frames", {
 
   # Test that each have the correct number of rows
   expect_equal(5, nrow(pepSummary1))
-  expect_equal(8, nrow(pepSummary2))
+  expect_equal(7, nrow(pepSummary2))
   expect_equal(2, nrow(pepSummary3))
-  expect_equal(12, nrow(pepSummary4))
+  expect_equal(11, nrow(pepSummary4))
   expect_equal(4, nrow(pepSumEdata))
   expect_equal(2, nrow(pepSumFdata))
-  expect_equal(6, nrow(pepSumEmeta))
+  expect_equal(5, nrow(pepSumEmeta))
   
   ###################
   ## RNA-SEQ TESTS ##
@@ -102,7 +102,7 @@ test_that("trelliData object summaries return the correct data frames", {
   
   # Test: seqData expression data-----------------------------------------------
   
-  seqSummary <- as.trelliData(omicsData = seqData_omics, statRes = seqData_stat) %>% summary()
+  suppressWarnings({seqSummary <- as.trelliData(omicsData = seqData_omics, statRes = seqData_stat) %>% summary()})
   
   # No abundance plots should be suggested in summary
   expect_true(any(grepl("abundance", seqSummary$Plot)) == FALSE)

@@ -10,8 +10,9 @@ trelli_abundance_boxplot(
   ggplot_params = NULL,
   interactive = FALSE,
   include_points = TRUE,
-  path = .getDownloadsFolder(),
+  path = tempdir(),
   name = "Trelliscope",
+  build_trelliscope = TRUE,
   test_mode = FALSE,
   test_example = 1,
   single_plot = FALSE,
@@ -30,7 +31,10 @@ If statRes data is included, "anova p-value" and "fold change" data per comparis
 may be added. If grouping information is included, only "sample count" and 
 "mean abundance" will be calculated, along with "anova p-value" and "fold change"
 if specified. "anova p-value" will not be included if paneling a trelliscope
-display by a biomolecule class. Default is "sample count" and "mean abundance".}
+display by a biomolecule class. Default is "sample count" and "mean abundance".
+Any additional cognostics from e_meta variables may be added if their column
+name is specified, and the data has been paneled by the edata_cname or by 
+an e_meta variable.}
 
 \item{ggplot_params}{An optional vector of strings of ggplot parameters to
 the backend ggplot function. For example, c("ylab('')", "ylim(c(2,20))").
@@ -43,9 +47,12 @@ now). Default is FALSE.}
 \item{include_points}{Add points as a geom_jitter. Default is TRUE.}
 
 \item{path}{The base directory of the trelliscope application. Default is
-Downloads.}
+a temporary directory.}
 
 \item{name}{The name of the display. Default is Trelliscope.}
+
+\item{build_trelliscope}{If TRUE, a trelliscope display will be built. Otherwise,
+a dataframe will be returned. Default is TRUE.}
 
 \item{test_mode}{A logical to return a smaller trelliscope to confirm plot
 and design. Default is FALSE.}
@@ -120,9 +127,8 @@ trelli_panel_by(trelliData = trelliData1, panel = "Sample") \%>\%
 trelli_panel_by(trelliData = trelliData2, panel = "Peptide") \%>\% 
    trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10, path = tempdir())
 
-# Build the abundance boxplot with an omicsData object. The panel is a biomolecule class,
-# which is proteins in this case.
-trelli_panel_by(trelliData = trelliData2, panel = "RazorProtein") \%>\% 
+# Build the abundance boxplot with an omicsData object. 
+trelli_panel_by(trelliData = trelliData2, panel = "Peptide") \%>\% 
    trelli_abundance_boxplot(test_mode = TRUE, test_example = 1:10, path = tempdir())
 
 # Build the abundance boxplot with an omicsData and statRes object.
@@ -137,7 +143,7 @@ trelli_panel_by(trelliData = trelliData1, panel = "Peptide") \%>\%
      ggplot_params = c("ylab('')", "ylim(c(20,30))"))
 
 # Or making the plot interactive 
-trelli_panel_by(trelliData = trelliData4, panel = "RazorProtein") \%>\% 
+trelli_panel_by(trelliData = trelliData4, panel = "Peptide") \%>\% 
     trelli_abundance_boxplot(
      interactive = TRUE, test_mode = TRUE, test_example = 1:10, path = tempdir())
 

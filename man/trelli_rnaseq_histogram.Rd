@@ -9,7 +9,8 @@ trelli_rnaseq_histogram(
   cognostics = c("sample count", "mean lcpm", "median lcpm", "cv lcpm", "skew lcpm"),
   ggplot_params = NULL,
   interactive = FALSE,
-  path = .getDownloadsFolder(),
+  build_trelliscope = TRUE,
+  path = tempdir(),
   name = "Trelliscope",
   test_mode = FALSE,
   test_example = 1,
@@ -33,6 +34,8 @@ Default is NULL.}
 \item{interactive}{A logical argument indicating whether the plots should be
 interactive or not. Interactive plots are ggplots piped to ggplotly (for
 now). Default is FALSE.}
+
+\item{build_trelliscope}{The user provided value for building trelliscope}
 
 \item{path}{The base directory of the trelliscope application. Default is
 Downloads.}

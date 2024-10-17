@@ -25,6 +25,7 @@
 #' @param interactive A logical argument indicating whether the plots should be
 #'   interactive or not. Interactive plots are ggplots piped to ggplotly (for
 #'   now). Default is FALSE.
+#' @param build_trelliscope The user provided value for building trelliscope
 #' @param include_points Add points as a geom_jitter. Default is TRUE.
 #' @param path The base directory of the trelliscope application. Default is
 #'   Downloads.
@@ -112,16 +113,17 @@
 #'
 #' @export
 trelli_rnaseq_boxplot <- function(trelliData,
-                                     cognostics = c("count", "mean lcpm"),
-                                     ggplot_params = NULL,
-                                     interactive = FALSE,
-                                     include_points = TRUE,
-                                     path = .getDownloadsFolder(),
-                                     name = "Trelliscope",
-                                     test_mode = FALSE,
-                                     test_example = 1,
-                                     single_plot = FALSE,
-                                     ...) {
+                                  cognostics = c("count", "mean lcpm"),
+                                  ggplot_params = NULL,
+                                  interactive = FALSE,
+                                  build_trelliscope = TRUE, 
+                                  include_points = TRUE,
+                                  path = tempdir(),
+                                  name = "Trelliscope",
+                                  test_mode = FALSE,
+                                  test_example = 1,
+                                  single_plot = FALSE,
+                                  ...) {
   # Run initial checks----------------------------------------------------------
   
   # Run generic checks 
@@ -131,6 +133,7 @@ trelli_rnaseq_boxplot <- function(trelliData,
                   acceptable_cognostics = c("count", "mean lcpm", "median lcpm", "cv lcpm", "p-value", "fold change"),
                   ggplot_params = ggplot_params,
                   interactive = interactive,
+                  build_trelliscope = build_trelliscope,
                   test_mode = test_mode, 
                   test_example = test_example,
                   single_plot = single_plot,
@@ -139,9 +142,12 @@ trelli_rnaseq_boxplot <- function(trelliData,
                   p_value_thresh = NULL)
   
   
+  # Extract panel column
+  panel <- attr(trelliData, "panel_by_col")
+  
   # Remove stat specific options if no stats data was provided 
   if (is.null(trelliData$trelliData.stat)) {
-    if (any(c("p-value", "fold change") %in% cognostics) & is.null(trelliData$trelliData.stat)) {
+    if (any(c("p-value", "fold change") %in% cognostics) & is.null(trelliData$statRes)) {
       cognostics <- cognostics[-match(c("p-value", "fold change"), cognostics, nomatch = 0)]
       message(paste("'p-value' and/or 'fold change' were listed as cognostics, but not provided in the trelliData object.",
                     "Did you forget to include a statRes object?")
@@ -167,37 +173,101 @@ trelli_rnaseq_boxplot <- function(trelliData,
     stop("include_points must be a TRUE or FALSE.")
   }
   
-  # Determine if count is biomolecule count or sample count 
-  if ("count" %in% cognostics) {
+  if (any(c("p-value", "fold change") %in% cognostics) & panel != get_edata_cname(trelliData$omicsData)) {
+    message(paste("Please panel by", get_edata_cname(trelliData$omicsData), "to get 'p-value' and 'fold change' as cognostics in the trelliscope display."))
+  }
+
+  # Start summary toBuild data.frame
+  toBuild <- trelliData$trelliData
     
-    if (attr(trelliData, "panel_by_omics") == get_edata_cname(trelliData$omicsData)) {
-      cognostics[which(cognostics == "count")] <- "sample nonzero count"
-    } else {
-      cognostics[which(cognostics == "count")] <- "biomolecule nonzero count"
+  # First, generate the cognostics----------------------------------------------
+  
+  # Add cognostics without groups
+  if ("Group" %in% colnames(toBuild) == FALSE) {
+    
+    toBuild <- toBuild %>% 
+      dplyr::group_by_at(panel) %>%
+      dplyr::summarize(
+        count = sum(Count != 0),
+        `mean lcpm` = mean(LCPM, na.rm = T),
+        `median lcpm` = median(LCPM, na.rm = T),
+        `cv lcpm` = sd(LCPM, na.rm = T) / `mean lcpm` * 100
+      )
+
+    # Now, select only the requested cognostics 
+    toBuild <- toBuild %>%
+      dplyr::select(dplyr::all_of(c(panel, cognostics)))
+    
+  } else {
+    
+    # Make a group variable name just to make group_by_at work properly
+    theGroup <- "Group"
+    
+    # Add cognostics per group
+    toBuild <- toBuild %>% 
+      dplyr::group_by_at(c(panel, theGroup)) %>%
+      dplyr::summarise(
+        count = sum(Count != 0),
+        `mean lcpm` = mean(LCPM, na.rm = T),
+      ) %>%
+      tidyr::pivot_wider(id_cols = panel, names_from = Group, values_from = c(count, `mean lcpm`), names_sep = " ")
+    
+    # Now remove unwanted cognostics
+    if ("mean lcpm" %in% cognostics == FALSE) {
+      toBuild <- toBuild[,grepl("mean lcpm", colnames(toBuild)) == FALSE]
+    }
+    if (any(grepl("count", cognostics)) == FALSE) {
+      toBuild <- toBuild[,grepl("count", colnames(toBuild)) == FALSE]
+    }
+    
+    # Add emeta columns
+    if (!is.null(attr(trelliData, "emeta_col"))) {
+      
+      # Pull emeta uniqued columns that should have been prepped in the pivot_longer section
+      emeta <- trelliData$trelliData[,c(panel, attr(trelliData, "emeta_col"))] %>% unique()
+      
+      # Add emeta cognostics
+      toBuild <- dplyr::left_join(toBuild, emeta, by = panel)
+      
     }
     
   }
   
-  if (any(c("p-value", "fold change") %in% cognostics) & attr(trelliData, "panel_by_omics") != get_edata_cname(trelliData$omicsData)) {
-    message(paste("Please panel by", get_edata_cname(trelliData$omicsData), "to get 'p-value' and 'fold change' as cognostics in the trelliscope display."))
+  # Add p-values and fold changes 
+  if ("p-value" %in% cognostics) {
+    anova_cols <- colnames(trelliData$trelliData)[grepl("P_value_", colnames(trelliData$trelliData))]
+    anova_data <- trelliData$trelliData[,c(panel, anova_cols)] %>% unique()
+    toBuild <- dplyr::left_join(toBuild, anova_data, by = panel)
+  }
+  if ("fold change" %in% cognostics) {
+    fc_cols <- colnames(trelliData$trelliData)[grepl("Fold_change", colnames(trelliData$trelliData))]
+    fc_data <- trelliData$trelliData[,c(panel, fc_cols)] %>% unique()
+    toBuild <- dplyr::left_join(toBuild, fc_data, by = panel)
+  }
+  
+  # Filter down if test mode
+  if (test_mode) {
+    toBuild <- toBuild[test_example,]
   }
   
   # Make boxplot function-------------------------------------------------------
   
   # First, generate the boxplot function
-  box_plot_fun <- function(DF, title) {
+  box_plot_fun <- function(Panel) {
+    
+    DF <- dplyr::filter(trelliData$trelliData, Panel == {{Panel}})
+    
     # Add a blank group if no group designation was given
-    if (is.null(attributes(trelliData$omicsData)$group_DF)) {
+    if (!("Group" %in% colnames(DF))) {
       DF$Group <- "x"
     }
     
     # Build plot
-    boxplot <- ggplot2::ggplot(DF, ggplot2::aes(x = Group, fill = Group, y = .data$LCPM)) +
+    boxplot <- ggplot2::ggplot(DF, ggplot2::aes(x = Group, fill = Group, y = LCPM)) +
       ggplot2::geom_boxplot(outlier.shape = NA) +
       ggplot2::theme_bw() +
-      ggplot2::ggtitle(title) +
-      ggplot2::theme(legend.position = "none", plot.title = ggplot2::element_text(hjust = 0.5)) +
-      ggplot2::ylab("Log Counts per Million (LCPM)")
+      ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) +
+      ggplot2::ylab("Log Counts per Million (LCPM)") 
     
     # Add include_points
     if (include_points) {
@@ -228,131 +298,36 @@ trelli_rnaseq_boxplot <- function(trelliData,
     return(boxplot)
   }
   
-  # Create cognostic function---------------------------------------------------
+  # Add a panel column for plotting
+  trelliData$trelliData$Panel <- trelliData$trelliData[[panel]]
+  toBuild$Panel <- toBuild[[panel]]
   
-  # Second, create function to return cognostics
-  box_cog_fun <- function(DF, biomolecule) {
-    # Set basic cognostics for ungrouped data or in case when data is not split by fdata_cname
-    cog <- list(
-      "sample nonzero count" = dplyr::tibble(`Sample Non-Zero Count` = trelliscopejs::cog(sum(DF$Count != 0), desc = "Sample Non-Zero Count")),
-      "biomolecule nonzero count" = dplyr::tibble(`Biomolecule Non-Zero Count` = trelliscopejs::cog(sum(DF$Count != 0), desc = "Biomolecule Non-Zero Count")),
-      "mean lcpm" = dplyr::tibble(`Mean LCPM` = trelliscopejs::cog(round(mean(DF$LCPM, na.rm = TRUE), 4), desc = "Mean LCPM")), 
-      "median lcpm" = dplyr::tibble(`Median LCPM` = trelliscopejs::cog(round(median(DF$LCPM, na.rm = TRUE), 4), desc = "Median LCPM")), 
-      "cv lcpm" = dplyr::tibble(`CV LCPM` = trelliscopejs::cog(round((sd(DF$LCPM, na.rm = TRUE) / mean(DF$LCPM, na.rm = T)) * 100, 4), desc = "CV LCPM"))
-    )
-    
-    # If cognostics are any of the cog, then add them 
-    if (any(cognostics %in% c("sample nonzero count", "biomolecule nonzero count", "mean lcpm", "median lcpm", "cv lcpm"))) {
-      cog_to_trelli <- do.call(dplyr::bind_cols, lapply(cognostics, function(x) {cog[[x]]})) %>% dplyr::tibble()
-    } else {
-      cog_to_trelli <- NULL
-    }
-    
-    # Get fdata cname and panel_by selection
-    fdata_cname <- pmartR::get_fdata_cname(trelliData$omicsData)
-    panel_by_choice <- attr(trelliData, "panel_by_omics")
-    
-    # Additional group cognostics can be added only if group_designation was set and
-    # trelli_panel_by is not the fdata_cname
-    if (!is.null(attributes(trelliData$omicsData)$group_DF) & fdata_cname != panel_by_choice & !is.null(cog_to_trelli)) {
-      # Since the number of groups is unknown, first panel_by the Groups,
-      # then calculate all summary statistics, pivot to long format,
-      # subset down to requested statistics, switch name to a more specific name,
-      # combine group and name, and generate the cognostic tibble
-      cogs_to_add <- DF %>%
-        dplyr::group_by(Group) %>%
-        dplyr::summarise(
-          "sample nonzero count" = sum(Count != 0), 
-          "biomolecule nonzero count" = sum(Count != 0), 
-          "mean lcpm" = round(mean(.data$LCPM, na.rm = TRUE), 4),
-          "median lcpm" = round(median(.data$LCPM, na.rm = TRUE), 4),
-          "cv lcpm" = round((sd(.data$LCPM, na.rm = T) / mean(.data$LCPM, na.rm =T)) * 100, 4),
-        ) %>%
-        tidyr::pivot_longer(c(.data$`sample nonzero count`, .data$`biomolecule nonzero count`, .data$`mean lcpm`, .data$`median lcpm`, .data$`cv lcpm`)) %>%
-        dplyr::filter(name %in% cognostics) %>%
-        dplyr::mutate(name = paste(Group, name)) %>%
-        dplyr::ungroup() %>%
-        dplyr::select(-Group) 
-      
-      # Add new cognostics 
-      cog_to_trelli <- do.call(cbind, lapply(1:nrow(cogs_to_add), function(row) {
-        quick_cog(cogs_to_add$name[row], cogs_to_add$value[row])
-      })) %>% dplyr::tibble() 
-      
-    }
-    
-    # Add cognostics that only apply when stats data is grouped by edata_cname
-    edata_cname <- pmartR::get_edata_cname(trelliData$omicsData)
-    
-    if (!is.null(trelliData$trelliData.stat) && !is.na(attr(trelliData, "panel_by_stat")) && edata_cname == attr(trelliData, "panel_by_stat")) {
-      
-      # Downselect to only stats 
-      stat_cogs <- cognostics[cognostics %in% c("fold change", "p-value")]
-      
-      if (length(stat_cogs) != 0) {
-        # Subset down the dataframe down to group, unnest the dataframe,
-        # pivot_longer to comparison, subset columns to requested statistics,
-        # switch name to a more specific name
-        cogs_to_add <- trelliData$trelliData.stat %>%
-          dplyr::filter(trelliData$trelliData.stat[[edata_cname]] == biomolecule) %>%
-          dplyr::select(Nested_DF) %>%
-          tidyr::unnest(cols = c(Nested_DF)) %>%
-          dplyr::rename(
-            `p-value` = .data$p_value,
-            `fold change` = fold_change
-          ) %>%
-          dplyr::select(c(Comparison, stat_cogs)) %>%
-          tidyr::pivot_longer(stat_cogs) %>%
-          dplyr::mutate(
-            name = paste(Comparison, name),
-            value = round(value, 4)
-          ) %>%
-          dplyr::ungroup() %>%
-          dplyr::select(-Comparison)
-        
-        # Generate new cognostics
-        new_cogs <- do.call(cbind, lapply(1:nrow(cogs_to_add), function(row) {
-          quick_cog(cogs_to_add$name[row], cogs_to_add$value[row])
-        })) %>% dplyr::tibble()
-        
-        # Add new cognostics, removing when it is NULL 
-        if (!is.null(cog_to_trelli)) {
-          cog_to_trelli <- cbind(cog_to_trelli, new_cogs) %>% dplyr::tibble()
-        } else {
-          cog_to_trelli <- new_cogs
-        }
-        
-      }
-    }
-    
-    return(cog_to_trelli)
-  }
+  # Add plots and remove that panel column
+  toBuild <- toBuild %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(plots = trelliscope::panel_lazy(box_plot_fun)) %>%
+    dplyr::select(-Panel)
   
   # Build trelliscope display---------------------------------------------------
   
   # Return a single plot if single_plot is TRUE
   if (single_plot) {
-    singleData <- trelliData$trelliData.omics[test_example[1], ]
-    return(box_plot_fun(singleData$Nested_DF[[1]], unlist(singleData[1, 1])))
+    
+    singleData <- toBuild[test_example[1], "plots"]
+    return(singleData$plots)
+    
   } else {
-    # If test_mode is on, then just build the required panels
-    if (test_mode) {
-      toBuild <- trelliData$trelliData.omics[test_example, ]
+    
+    # If build_trelliscope is true, then build the display. Otherwise, return 
+    if (build_trelliscope) {
+      trelli_builder_lazy(toBuild, path, name, ...)
     } else {
-      toBuild <- trelliData$trelliData.omics
+      return(toBuild)
     }
     
-    # Pass parameters to trelli_builder function
-    trelli_builder(toBuild = toBuild,
-                   cognostics = cognostics, 
-                   plotFUN = box_plot_fun,
-                   cogFUN = box_cog_fun,
-                   path = path,
-                   name = name,
-                   remove_nestedDF = FALSE,
-                   ...)
-    
   }
+  
+  
 }
 
 #' @name trelli_rnaseq_histogram
@@ -374,6 +349,7 @@ trelli_rnaseq_boxplot <- function(trelliData,
 #' @param interactive A logical argument indicating whether the plots should be
 #'   interactive or not. Interactive plots are ggplots piped to ggplotly (for
 #'   now). Default is FALSE.
+#' @param build_trelliscope The user provided value for building trelliscope
 #' @param path The base directory of the trelliscope application. Default is
 #'   Downloads.
 #' @param name The name of the display. Default is Trelliscope.
@@ -439,15 +415,16 @@ trelli_rnaseq_boxplot <- function(trelliData,
 #'
 #' @export
 trelli_rnaseq_histogram <- function(trelliData,
-                                       cognostics = c("sample count", "mean lcpm", "median lcpm", "cv lcpm", "skew lcpm"),
-                                       ggplot_params = NULL,
-                                       interactive = FALSE,
-                                       path = .getDownloadsFolder(),
-                                       name = "Trelliscope",
-                                       test_mode = FALSE,
-                                       test_example = 1,
-                                       single_plot = FALSE,
-                                       ...) {
+                                    cognostics = c("sample count", "mean lcpm", "median lcpm", "cv lcpm", "skew lcpm"),
+                                    ggplot_params = NULL,
+                                    interactive = FALSE,
+                                    build_trelliscope = TRUE,
+                                    path = tempdir(),
+                                    name = "Trelliscope",
+                                    test_mode = FALSE,
+                                    test_example = 1,
+                                    single_plot = FALSE,
+                                    ...) {
   # Run initial checks----------------------------------------------------------
   
   # Run generic checks 
@@ -457,6 +434,7 @@ trelli_rnaseq_histogram <- function(trelliData,
                   acceptable_cognostics = c("sample count", "mean lcpm", "median lcpm", "cv lcpm", "skew lcpm"),
                   ggplot_params = ggplot_params,
                   interactive = interactive,
+                  build_trelliscope = build_trelliscope,
                   test_mode = test_mode, 
                   test_example = test_example,
                   single_plot = single_plot,
@@ -464,6 +442,8 @@ trelli_rnaseq_histogram <- function(trelliData,
                   seqText = "Use trelli_abundance_histogram instead.",
                   p_value_thresh = NULL)
   
+  # Extract panel column
+  panel <- attr(trelliData, "panel_by_col")
   
   # Round test example to integer 
   if (test_mode) {
@@ -472,7 +452,7 @@ trelli_rnaseq_histogram <- function(trelliData,
   
   # Check that group data is edata_cname
   edata_cname <- pmartR::get_edata_cname(trelliData$omicsData)
-  if (edata_cname != attr(trelliData, "panel_by_omics")) {
+  if (edata_cname != panel) {
     stop("trelliData must be grouped by edata_cname.")
   }
   
@@ -481,20 +461,53 @@ trelli_rnaseq_histogram <- function(trelliData,
     cognostics[grepl("sample count", cognostics, fixed = T)] <- "sample nonzero count"
   }
   
+  # Start summary toBuild data.frame
+  toBuild <- trelliData$trelliData
+  
+  # First, add any missing cognostics-------------------------------------------
+  
+  toBuild <- toBuild %>% 
+    dplyr::group_by_at(panel) %>%
+    dplyr::summarize(
+      `sample nonzero count` = sum(Count != 0),
+      `mean lcpm` = mean(LCPM, na.rm = T),
+      `median lcpm` = median(LCPM, na.rm = T),
+      `cv lcpm` = sd(LCPM, na.rm = T) / `mean lcpm` * 100,
+      `skew lcpm` = e1071::skewness(LCPM, na.rm = T)
+    )
+  
+  # Add emeta columns
+  if (!is.null(attr(trelliData, "emeta_col"))) {
+    
+    # Pull emeta uniqued columns that should have been prepped in the pivot_longer section
+    emeta <- trelliData$trelliData[,c(panel, attr(trelliData, "emeta_col"))] %>% unique()
+    
+    # Add emeta cognostics
+    toBuild <- dplyr::left_join(toBuild, emeta, by = panel)
+    
+  }
+  
+  # Now, select only the requested cognostics 
+  toBuild <- toBuild %>%
+    dplyr::select(dplyr::all_of(c(panel, cognostics)))
+  
+  # Filter down if test mode
+  if (test_mode) {
+    toBuild <- toBuild[test_example,]
+  }
+  
   # Make histogram function-----------------------------------------------------
   
-  # First, generate the histogram function
-  hist_plot_fun <- function(DF, title) {
-    # Remove NAs
-    DF <- DF[!is.na(DF$LCPM), ]
+  hist_plot_fun <- function(Panel) {
+    
+    DF <- dplyr::filter(trelliData$trelliData, Panel == {{Panel}})
     
     # Build plot
-    histogram <- ggplot2::ggplot(DF, ggplot2::aes(x = .data$LCPM)) +
+    histogram <- ggplot2::ggplot(DF, ggplot2::aes(x = LCPM)) +
       ggplot2::geom_histogram(bins = 10, fill = "steelblue", color = "black") +
-      ggplot2::ggtitle(title) +
       ggplot2::theme_bw() +
       ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) +
-      ggplot2::xlab("Log Counts per Million (LCPM)") +
+      ggplot2::xlab("Log Counts Per Million") +
       ggplot2::ylab("Frequency")
     
     # Add additional parameters
@@ -512,48 +525,32 @@ trelli_rnaseq_histogram <- function(trelliData,
     return(histogram)
   }
   
-  # Create cognostic function---------------------------------------------------
-  
-  # Second, create function to return cognostics
-  hist_cog_fun <- function(DF, biomolecule) {
-    # Set basic cognostics for ungrouped data or in case when data is not split by fdata_cname
-    cog <- list(
-      "sample nonzero count" = dplyr::tibble(`Sample Non-Zero Count` = trelliscopejs::cog(sum(DF$Count != 0), desc = "Sample Non-Zero Count")),
-      "mean lcpm" = dplyr::tibble(`Mean LCPM` = trelliscopejs::cog(round(mean(DF$LCPM, na.rm = TRUE), 4), desc = "Mean LCPM")), 
-      "median lcpm" = dplyr::tibble(`Median LCPM` = trelliscopejs::cog(round(median(DF$LCPM, na.rm = TRUE), 4), desc = "Median LCPM")), 
-      "cv lcpm" = dplyr::tibble(`CV LCPM` = trelliscopejs::cog(round((sd(DF$LCPM, na.rm = TRUE) / mean(DF$LCPM, na.rm = T)) * 100, 4), desc = "CV LCPM")), 
-      "skew lcpm" = dplyr::tibble(`Skew LCPM` = trelliscopejs::cog(round(e1071::skewness(DF$LCPM, na.rm = TRUE), 4), desc= "Skew LCPM"))
-    )
-    
-    # If cognostics are any of the cog, then add them 
-    cog_to_trelli <- do.call(dplyr::bind_cols, lapply(cognostics, function(x) {cog[[x]]})) %>% dplyr::tibble()
-    
-    return(cog_to_trelli)
-  }
-  
   # Build trelliscope display---------------------------------------------------
+  
+  # Add a panel column for plotting
+  trelliData$trelliData$Panel <- trelliData$trelliData[[panel]]
+  toBuild$Panel <- toBuild[[panel]]
+  
+  # Add plots and remove that panel column
+  toBuild <- toBuild %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(plots = trelliscope::panel_lazy(hist_plot_fun)) %>%
+    dplyr::select(-Panel)
   
   # Return a single plot if single_plot is TRUE
   if (single_plot) {
-    singleData <- trelliData$trelliData.omics[test_example[1], ]
-    return(hist_plot_fun(singleData$Nested_DF[[1]], unlist(singleData[1, 1])))
-  } else {
-    # If test_mode is on, then just build the required panels
-    if (test_mode) {
-      toBuild <- trelliData$trelliData.omics[test_example, ]
-    } else {
-      toBuild <- trelliData$trelliData.omics
-    }
     
-    # Pass parameters to trelli_builder function
-    trelli_builder(toBuild = toBuild,
-                   cognostics = cognostics, 
-                   plotFUN = hist_plot_fun,
-                   cogFUN = hist_cog_fun,
-                   path = path,
-                   name = name,
-                   remove_nestedDF = FALSE,
-                   ...)
+    singleData <- toBuild[test_example[1], "plots"]
+    return(singleData$plots)
+    
+  } else {
+    
+    # If build_trelliscope is true, then build the display. Otherwise, return 
+    if (build_trelliscope) {
+      trelli_builder_lazy(toBuild, path, name, ...)
+    } else {
+      return(toBuild)
+    }
     
   }
 }
@@ -570,7 +567,7 @@ trelli_rnaseq_histogram <- function(trelliData,
 #' @param trelliData A trelliscope data object made by as.trelliData, and
 #'   grouped by an emeta variable. Must be built using seqData. Required.
 #' @param cognostics A vector of cognostic options. Defaults are "sample count", 
-#'   "mean LCPM" and "biomolecule count". "sample count" and "mean LCPM"
+#'   "mean lcpm" and "biomolecule count". "sample count" and "mean lcpm"
 #'   are reported per group, and "biomolecule count" is the total number of biomolecules
 #'   in the biomolecule class (e_meta column).
 #' @param ggplot_params An optional vector of strings of ggplot parameters to
@@ -578,6 +575,7 @@ trelli_rnaseq_histogram <- function(trelliData,
 #'   Default is NULL.
 #' @param interactive A logical argument indicating whether the plots should be
 #'   interactive or not. Interactive plots are ggplots piped to ggplotly. Default is FALSE.
+#' @param build_trelliscope The user provided value for building trelliscope
 #' @param path The base directory of the trelliscope application. Default is
 #'   Downloads.
 #' @param name The name of the display. Default is Trelliscope
@@ -627,10 +625,11 @@ trelli_rnaseq_histogram <- function(trelliData,
 #'
 #' @export
 trelli_rnaseq_heatmap <- function(trelliData,
-                                  cognostics = c("sample count", "mean LCPM", "biomolecule count"),
+                                  cognostics = c("sample count", "mean lcpm", "biomolecule count"),
                                   ggplot_params = NULL,
                                   interactive = FALSE,
-                                  path = .getDownloadsFolder(),
+                                  build_trelliscope = TRUE,
+                                  path = tempdir(),
                                   name = "Trelliscope",
                                   test_mode = FALSE,
                                   test_example = 1,
@@ -642,9 +641,10 @@ trelli_rnaseq_heatmap <- function(trelliData,
   trelli_precheck(trelliData = trelliData, 
                   trelliCheck = "omics",
                   cognostics = cognostics,
-                  acceptable_cognostics = c("sample count", "mean LCPM", "biomolecule count"),
+                  acceptable_cognostics = c("sample count", "mean lcpm", "biomolecule count"),
                   ggplot_params = ggplot_params,
                   interactive = interactive,
+                  build_trelliscope = build_trelliscope,
                   test_mode = test_mode, 
                   test_example = test_example,
                   single_plot = single_plot,
@@ -652,13 +652,17 @@ trelli_rnaseq_heatmap <- function(trelliData,
                   seqText = "Use trelli_abundance_heatmap instead.",
                   p_value_thresh = NULL)
   
+  
+  # Extract panel column
+  panel <- attr(trelliData, "panel_by_col")
+  
   # Round test example to integer 
   if (test_mode) {
     test_example <- unique(abs(round(test_example)))
   }
   
   # Check that group data is grouped by an e_meta variable
-  if (attr(trelliData, "panel_by_omics") %in% attr(trelliData, "emeta_col") == FALSE) {
+  if (panel %in% attr(trelliData, "emeta_col") == FALSE) {
     stop("trelliData must be paneled_by an e_meta column.")
   }
   
@@ -667,15 +671,55 @@ trelli_rnaseq_heatmap <- function(trelliData,
     cognostics <- NULL
   }
   
-  # Get the edata variable name
+  # Get the column names of edata and fdata
   edata_cname <- get_edata_cname(trelliData$omicsData)
+  fdata_cname <- get_fdata_cname(trelliData$omicsData)
+  
+  # Start summary toBuild data.frame
+  toBuild <- trelliData$trelliData
+  
+  # First, add any missing cognostics-------------------------------------------
+  
+  # Make a group variable name just to make group_by_at work properly
+  theGroup <- "Group"
+  
+  # Add cognostics per group
+  toBuild <- toBuild %>% 
+    dplyr::group_by_at(c(panel, theGroup)) %>%
+    dplyr::summarise(
+      count = sum(Count != 0),
+      `mean lcpm` = mean(LCPM, na.rm = T)
+    ) %>%
+    tidyr::pivot_wider(id_cols = panel, names_from = Group, values_from = c(count, `mean lcpm`), names_sep = " ")
+  
+  # Remove unwanted cognostics 
+  if ("sample count" %in% cognostics == FALSE) {
+    toBuild <- toBuild[,!grepl("count", colnames(toBuild))]
+  }
+  if ("mean lcpm" %in% cognostics == FALSE) {
+    toBuild <- toBuild[,!grepl("mean lcpm", colnames(toBuild))]
+  }
+  
+  # Add biomolecule count if requested 
+  if ("biomolecule count" %in% cognostics) {
+    bio_counts <- trelliData$trelliData %>% 
+      dplyr::select(panel, edata_cname) %>%
+      unique() %>%
+      dplyr::group_by_at(panel) %>%
+      dplyr::summarise(`biomolecule count` = dplyr::n())
+    toBuild <- dplyr::left_join(toBuild, bio_counts, by = panel)
+  }
+  
+  # Filter down if test mode
+  if (test_mode) {
+    toBuild <- toBuild[test_example,]
+  }
   
   # Make heatmap function-------------------------------------------------------
   
-  # First, generate the heatmap function
-  hm_plot_fun <- function(DF, title) {
-    # Get fdata_cname
-    fdata_cname <- get_fdata_cname(trelliData$omicsData)
+  hm_plot_fun <- function(Panel) {
+    
+    DF <- dplyr::filter(trelliData$trelliData, Panel == {{Panel}})
     
     # If group designation was set, then convert Group to a factor variable
     if (!is.null(attributes(trelliData$omicsData)$group_DF)) {
@@ -688,8 +732,13 @@ trelli_rnaseq_heatmap <- function(trelliData,
       DF[, fdata_cname] <- as.factor(unlist(DF[, fdata_cname]))
     }
     
+    # Calculate z score
+    DF <- DF %>%
+      dplyr::group_by_at(edata_cname) %>%
+      dplyr::mutate(`Z-Score` = (LCPM - mean(LCPM, na.rm = T)) / sd(LCPM, na.rm = T))
+    
     # Build plot: this should be edata_cname
-    hm <- ggplot2::ggplot(DF, ggplot2::aes(x = as.factor(.data[[edata_cname]]), y = .data[[fdata_cname]], fill = .data$LCPM)) +
+    hm <- ggplot2::ggplot(DF, ggplot2::aes(x = as.factor(.data[[edata_cname]]), y = .data[[fdata_cname]], fill = `Z-Score`)) +
       ggplot2::geom_tile() +
       ggplot2::theme_bw() +
       ggplot2::ylab("Sample") +
@@ -698,8 +747,7 @@ trelli_rnaseq_heatmap <- function(trelliData,
         plot.title = ggplot2::element_text(hjust = 0.5),
         axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust = 1)
       ) +
-      ggplot2::scale_fill_gradient(low = "blue", high = "red", na.value = "white") +
-      ggplot2::ggtitle(title)
+      ggplot2::scale_fill_gradient(low = "blue", high = "red", na.value = "white") 
     
     # Add additional parameters
     if (!is.null(ggplot_params)) {
@@ -716,73 +764,36 @@ trelli_rnaseq_heatmap <- function(trelliData,
     return(hm)
   }
   
-  # Create cognostic function---------------------------------------------------
-  
-  hm_cog_fun <- function(DF, emeta_var) {
-    
-    
-    # Adjust names
-    if ("sample count" %in% cognostics) {cognostics[grepl("sample count", cognostics)] <- "Sample Non-Zero Count"}
-    if ("biomolecule count" %in% cognostics) {cognostics[grepl("biomolecule count", cognostics)] <- "Biomolecule Non-Zero Count"}
-    
-    # Subset down the dataframe down to group, unnest the dataframe,
-    # pivot_longer to comparison, subset columns to requested statistics,
-    # switch name to a more specific name
-    cogs_to_add <- DF %>%
-      dplyr::group_by(Group) %>%
-      dplyr::summarise(
-        "Sample Non-Zero Count" = sum(Count != 0), 
-        "mean LCPM" = round(mean(.data$LCPM, na.rm = TRUE), 4),
-      ) %>%
-      tidyr::pivot_longer(c(.data$`Sample Non-Zero Count`, .data$`mean LCPM`)) %>%
-      dplyr::filter(name %in% cognostics) %>%
-      dplyr::mutate(name = paste(Group, name)) %>%
-      dplyr::ungroup() %>%
-      dplyr::select(-Group) 
-    
-    if ("Biomolecule Non-Zero Count" %in% cognostics) {
-      cogs_to_add <- rbind(
-        cogs_to_add, 
-        data.frame(
-          name = "Biomolecule Non-Zero Count",
-          value = DF[[edata_cname]] %>% unique() %>% length()
-        )
-      )
-    }
-    
-    # Add new cognostics 
-    cog_to_trelli <- do.call(cbind, lapply(1:nrow(cogs_to_add), function(row) {
-      quick_cog(cogs_to_add$name[row], cogs_to_add$value[row])
-    })) %>% dplyr::tibble()
-    
-    return(cog_to_trelli)
-  }
   
   # Build trelliscope display---------------------------------------------------
   
+  # Add a panel column for plotting
+  trelliData$trelliData$Panel <- trelliData$trelliData[[panel]]
+  toBuild$Panel <- toBuild[[panel]]
+  
+  # Add plots and remove that panel column
+  toBuild <- toBuild %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(plots = trelliscope::panel_lazy(hm_plot_fun)) %>%
+    dplyr::select(-Panel)
+  
   # Return a single plot if single_plot is TRUE
   if (single_plot) {
-    singleData <- trelliData$trelliData.omics[test_example[1], ]
-    return(hm_plot_fun(singleData$Nested_DF[[1]], unlist(singleData[1, 1])))
+    
+    singleData <- toBuild[test_example[1], "plots"]
+    return(singleData$plots)
+    
   } else {
-    # If test_mode is on, then just build the required panels
-    if (test_mode) {
-      toBuild <- trelliData$trelliData.omics[test_example, ]
+    
+    # If build_trelliscope is true, then build the display. Otherwise, return 
+    if (build_trelliscope) {
+      trelli_builder_lazy(toBuild, path, name, ...)
     } else {
-      toBuild <- trelliData$trelliData.omics
+      return(toBuild)
     }
     
-    # Pass parameters to trelli_builder function
-    trelli_builder(toBuild = toBuild,
-                   cognostics = cognostics, 
-                   plotFUN = hm_plot_fun,
-                   cogFUN = hm_cog_fun,
-                   path = path,
-                   name = name,
-                   remove_nestedDF = FALSE,
-                   ...) 
-    
   }
+
 }
 
 #' @name trelli_rnaseq_nonzero_bar
@@ -810,6 +821,7 @@ trelli_rnaseq_heatmap <- function(trelliData,
 #' @param interactive A logical argument indicating whether the plots should be
 #'    interactive or not. Interactive plots are ggplots piped to ggplotly (for
 #'    now). Default is FALSE.
+#' @param build_trelliscope The user provided value for building trelliscope
 #' @param path The base directory of the trelliscope application. Default is
 #'    Downloads.
 #' @param name The name of the display. Default is Trelliscope.
@@ -887,7 +899,8 @@ trelli_rnaseq_nonzero_bar <- function(trelliData,
                                    proportion = TRUE,
                                    ggplot_params = NULL,
                                    interactive = FALSE,
-                                   path = .getDownloadsFolder(),
+                                   build_trelliscope = TRUE,
+                                   path = tempdir(),
                                    name = "Trelliscope",
                                    test_mode = FALSE,
                                    test_example = 1,
@@ -902,12 +915,16 @@ trelli_rnaseq_nonzero_bar <- function(trelliData,
                   acceptable_cognostics = c("total count", "non-zero count", "non-zero proportion"),
                   ggplot_params = ggplot_params,
                   interactive = interactive,
+                  build_trelliscope = build_trelliscope,
                   test_mode = test_mode, 
                   test_example = test_example,
                   single_plot = single_plot,
                   seqDataCheck = "required",
                   seqText = "Use trelli_missingness_bar instead.",
                   p_value_thresh = NULL)
+  
+  # Extract panel column
+  panel <- attr(trelliData, "panel_by_col")
   
   # Check that proportion is a non NA logical
   if (!is.logical(proportion) | is.na(proportion)) {
@@ -920,83 +937,154 @@ trelli_rnaseq_nonzero_bar <- function(trelliData,
   }
   
   # Determine if the trelliData is paneled by the edata column
-  if (is.na(attr(trelliData, "panel_by_omics"))) {
-    paneled_by_edata <- attr(trelliData, "panel_by_stat") == get_edata_cname(trelliData$statRes)
-  } else {
-    paneled_by_edata <- attr(trelliData, "panel_by_omics") == get_edata_cname(trelliData$omicsData)
+  paneled_by_edata <- panel == attr(trelliData, "edata_col")
+  
+  # Set stats mode 
+  stats_mode <- FALSE
+  if (is.null(trelliData$omicsData)) {
+    stats_mode <- TRUE
   }
   
-  # Generate a function to make nonzero dataframes------------------------------
-  get_nonzero_DF <- function(DF) {
+  # Start builder dataframe
+  toBuild <- trelliData$trelliData
+  theGroupName <- "Group"
+  
+  # First, add any missing cognostics-------------------------------------------
+  
+  # Extract non-zero counts 
+  if (!is.null(trelliData$omicsData)) {
     
-    # If there is no omics data, use statRes
-    if (is.null(trelliData$omicsData)) {
-      
-      # Add to total counts
-      NonZero <- data.table::data.table(
-        Group = gsub("NonZero_Count_", "", colnames(DF)),
-        `Non-Zero Count` = unlist(DF)
-      ) %>%
-        merge(totalCounts, by = "Group") %>%
-        dplyr::mutate(
-          `Zero Count` = Total - .data$`Non-Zero Count`,
-          `Zero Proportion` = round(.data$`Zero Count` / Total, 4),
-          `Non-Zero Proportion` = round(.data$`Non-Zero Count` / Total, 4)
-        ) %>%
-        dplyr::select(-Total) %>%
-        dplyr::mutate(Group, .data$`Zero Count`, .data$`Non-Zero Count`, .data$`Zero Proportion`, .data$`Non-Zero Proportion`)
-    
-      } else {
-      
-      # Add a blank group if no group designation was given
-      if (is.null(attributes(trelliData$omicsData)$group_DF)) {
-        DF$Group <- "x"
-      }
-      
-      # Create nonzero data.frame
-      NonZero <- DF %>%
-        dplyr::group_by(Group) %>%
-        dplyr::summarise(
-          `Zero Count` = sum(Count == 0),
-          `Non-Zero Count` = sum(Count != 0),
-          `Zero Proportion` = round(.data$`Zero Count` / sum(c(.data$`Zero Count`, .data$`Non-Zero Count`)), 4),
-          `Non-Zero Proportion` = round(.data$`Non-Zero Count` / sum(c(.data$`Zero Count`, .data$`Non-Zero Count`)), 4)
+    if ("Group" %in% colnames(trelliData$trelliData) == FALSE) {
+      toBuild <- toBuild %>% 
+        dplyr::group_by_at(panel) %>%
+        dplyr::summarize(
+          `total count` = dplyr::n(),
+          `non-zero count` = sum(Count != 0),
+          `non-zero proportion` = round(`non-zero count` / `total count`, 4)
         )
+    } else {
+      toBuild <- toBuild %>%
+        dplyr::group_by_at(c(panel, theGroupName)) %>%
+        dplyr::summarize(
+          `total count` = dplyr::n(),
+          `non-zero count` = sum(Count != 0),
+          `non-zero proportion` = round(`non-zero count` / `total count`, 4)
+        ) %>% 
+        tidyr::pivot_wider(id_cols = panel, names_from = theGroupName, names_sep = " ",
+                           values_from = c("total count", "non-zero count", "non-zero proportion"))
     }
     
-    return(NonZero)
+  } else {
+    
+    # Get count columns 
+    cols2rename <- colnames(toBuild)[grepl("Count_", colnames(toBuild))]
+    
+    # Make totals dataframe
+    totalsDF <- attr(trelliData$statRes, "group_DF")$Group %>% 
+      table(dnn = "Group") %>% 
+      data.frame() %>% 
+      dplyr::rename(`total count` = Freq)
+    
+    # Extract panel and non-zero counts. Format with group information. Add
+    # totals and non-zero proportion. 
+    toBuild <- toBuild %>%
+      dplyr::select_at(c(panel, cols2rename)) %>%
+      tidyr::pivot_longer(cols = c(2:ncol(.))) %>%
+      dplyr::mutate(name = gsub("Count_", "", name, fixed = T)) %>%
+      dplyr::rename(Group = name, `non-zero count` = value) %>%
+      dplyr::left_join(totalsDF, by = "Group") %>%
+      dplyr::mutate(`non-zero proportion` = round(`non-zero count` / `total count`, 4)) %>%
+      tidyr::pivot_wider(id_cols = panel, names_from = theGroupName, names_sep = " ",
+                         values_from = c("total count", "non-zero count", "non-zero proportion"))
+    
   }
   
-  # Make nonzero bar function---------------------------------------------------
-  
-  # First, generate the boxplot function
-  nonzero_bar_plot_fun <- function(DF, title) {
+  # Add emeta columns
+  if (!is.null(trelliData) && panel != attr(trelliData, "fdata_col") && !is.null(attr(trelliData, "emeta_col"))) {
     
-    # Get non-zero dataframe
-    NonZero <- get_nonzero_DF(DF)
+    # Pull emeta uniqued columns that should have been prepped in the pivot_longer section
+    emeta <- trelliData$trelliData[,c(panel, attr(trelliData, "emeta_col"))] %>% unique()
+    
+    # Add emeta cognostics
+    toBuild <- dplyr::left_join(toBuild, emeta, by = panel) %>% 
+      unique()
+    
+  }
+  
+  # Filter down if test mode --> must be here to get the right selection of panels
+  if (test_mode) {
+    toBuild <- toBuild[test_example,]
+  }
+  
+  # Second, write the plotting function-----------------------------------------
+  
+  # First, generate the bar plot function
+  zero_bar_plot_fun <- function(Panel) {
+    
+    # WARNING: trelliData$trelliData must be used every time. There is no escape. 
+    DF <- dplyr::filter(trelliData$trelliData, Panel == {{Panel}}) 
+    
+    # Set group information
+    if ("Group" %in% colnames(DF) == FALSE) {DF$Group <- "X"}
+    
+    if (is.null(trelliData$omicsData)) {
+      
+      # Due to the way the new trelliscope functions run the lazy_plot function,
+      # we have to re-do how we calculated the columns for the summary toBuild file,
+      # but we can use the same variables defined globally.
+      MissPlotDF <- DF %>%
+        dplyr::select_at(c(panel, cols2rename)) %>%
+        tidyr::pivot_longer(cols = c(2:ncol(.))) %>%
+        dplyr::mutate(name = gsub("Count_", "", name, fixed = T)) %>%
+        dplyr::rename(Group = name, `non-zero count` = value) %>%
+        dplyr::left_join(totalsDF, by = "Group") %>%
+        dplyr::mutate(
+          `non-zero proportion` = round(`non-zero count` / `total count`, 4),
+          `zero count` = `total count` - `non-zero count`,
+          `zero proportion` = round(`zero count` / `total count`, 4)
+        ) %>%
+        tidyr::pivot_longer(cols = c(3:7))
+      
+    } else {
+      
+      # Split out group names from summary toBuild table, pivot_wider to add zero
+      # columns, an then pivot longer 
+      MissPlotDF <- DF %>% 
+        dplyr::group_by_at(c(panel, theGroupName)) %>%
+        tidyr::nest() %>%
+        dplyr::mutate(
+          `total count` = purrr::map_int(data, nrow),
+          `non-zero count` = purrr::map_int(data, function(x) {sum(x$Count != 0)}),
+          `zero count` = `total count` - `non-zero count`,
+          `non-zero proportion` = round(`non-zero count` / `total count`, 4),
+          `zero proportion` = round(`zero count` / `total count`, 4)
+        ) %>%
+        dplyr::select(-data) %>%
+        tidyr::pivot_longer(cols = c(3:7))
+      
+    }
     
     # Subset based on count or proportion
     if (proportion) {
-      NZPlotDF <- NonZero %>%
-        dplyr::select(c(Group, .data$`Zero Proportion`, .data$`Non-Zero Proportion`)) %>%
-        dplyr::rename(Zero = .data$`Zero Proportion`, `Non-Zero` = .data$`Non-Zero Proportion`) %>%
-        tidyr::pivot_longer(c(.data$Zero, .data$`Non-Zero`)) %>%
-        dplyr::mutate(name = factor(name, levels = c("Zero", "Non-Zero")))
+      MissPlotDF <- MissPlotDF %>%
+        dplyr::filter(name %in% c("non-zero proportion", "zero proportion")) %>%
+        dplyr::mutate(
+          name = factor(ifelse(name == "non-zero proportion", "Non-Zero", "Zero"), levels = c("Zero", "Non-Zero"))
+        )
       ylab <- "Proportion"
     } else {
-      NZPlotDF <- NonZero %>%
-        dplyr::select(c(Group, .data$`Zero Count`, .data$`Non-Zero Count`)) %>%
-        dplyr::rename(Zero = .data$`Zero Count`, `Non-Zero` = .data$`Non-Zero Count`) %>%
-        tidyr::pivot_longer(c(.data$Zero, .data$`Non-Zero`)) %>%
-        dplyr::mutate(name = factor(name, levels = c("Zero", "Non-Zero")))
+      MissPlotDF <- MissPlotDF %>%
+        dplyr::filter(name %in% c("non-zero count", "zero count")) %>%
+        dplyr::mutate( 
+          name = factor(ifelse(name == "non-zero count", "Non-Zero", "Zero"), levels = c("Zero", "Non-Zero"))
+        )
       ylab <- "Count"
     }
     
     # Build plot
-    zero_bar <- ggplot2::ggplot(NZPlotDF, ggplot2::aes(x = Group, y = value, fill = name)) +
+    zero_bar <- ggplot2::ggplot(MissPlotDF, ggplot2::aes(x = Group, y = value, fill = name)) +
       ggplot2::geom_bar(stat = "identity", position = "stack", color = "black") +
       ggplot2::theme_bw() +
-      ggplot2::ggtitle(title) +
       ggplot2::ylab(ylab) +
       ggplot2::scale_fill_manual(values = c("Non-Zero" = "steelblue", "Zero" = "black")) +
       ggplot2::theme(
@@ -1005,7 +1093,7 @@ trelli_rnaseq_nonzero_bar <- function(trelliData,
       )
     
     # Remove x axis if no groups
-    if (is.null(attributes(trelliData$omicsData)$group_DF) & stats_mode == FALSE) {
+    if ("Group" %in% colnames(trelliData$trelliData) == FALSE & stats_mode == FALSE) {
       zero_bar <- zero_bar + ggplot2::theme(
         axis.title.x = ggplot2::element_blank(),
         axis.ticks.x = ggplot2::element_blank(),
@@ -1028,125 +1116,42 @@ trelli_rnaseq_nonzero_bar <- function(trelliData,
     return(zero_bar)
   }
   
-  # Create the cognostic function-----------------------------------------------
-  
-  # Next, generate the cognostic function
-  nonzero_bar_cog_fun <- function(DF, GroupingVar) {
-    
-    # Get nonzero dataframe
-    NonZero <- get_nonzero_DF(DF)
-    
-    # Build cognostics
-    NZ_Cog <- NonZero %>%
-      dplyr::mutate(`total count` = .data$`Non-Zero Count` + .data$`Zero Count`) %>%
-      dplyr::select(-c(.data$`Zero Count`, .data$`Zero Proportion`)) %>%
-      dplyr::rename(`non-zero count` = .data$`Non-Zero Count`, `non-zero proportion` = .data$`Non-Zero Proportion`) %>%
-      tidyr::pivot_longer(c(.data$`non-zero count`, .data$`non-zero proportion`, .data$`total count`)) %>%
-      dplyr::filter(name %in% cognostics)
-    
-    # Expand the name depending on whether the counts are samples or biomolecules
-    if (paneled_by_edata & nrow(NZ_Cog) > 0) {
-      NZ_Cog <- NZ_Cog %>% 
-        dplyr::mutate(
-          name = lapply(name, function(x) {
-            splitNames <- strsplit(x, " ") %>% unlist()
-            return(paste(splitNames[1], "sample", splitNames[2]))
-          }) %>% unlist()
-        )
-    } else if (nrow(NZ_Cog) > 0) {
-      NZ_Cog <- NZ_Cog %>% 
-        dplyr::mutate(
-          name = lapply(name, function(x) {
-            splitNames <- strsplit(x, " ") %>% unlist()
-            return(paste(splitNames[1], "biomolecule", splitNames[2]))
-          }) %>% unlist()
-        )
-    }
-    
-    # Add grouping data if there's more than one group 
-    if (length(unique(NZ_Cog$Group)) > 1) {
-      NZ_Cog <- NZ_Cog %>% dplyr::mutate(name = paste(Group, name))
-    }
-    
-    # Remove group column
-    NZ_Cog <- NZ_Cog %>% dplyr::select(c(name, value))
-    
-    # Return NULL if there's no cognostics 
-    if (nrow(NZ_Cog) == 0) {
-      return(NULL)
-    }
-    
-    # Generate cognostics 
-    cog_to_trelli <- do.call(cbind, lapply(1:nrow(NZ_Cog), function(row) {
-      quick_cog(name = NZ_Cog$name[row], value = NZ_Cog$value[row])
-    })) %>% dplyr::tibble()
-    
-    return(cog_to_trelli)
-  }
   
   # Build trelliscope display---------------------------------------------------
   
-  # If test_mode is on, then just build the required panels. If the data is statRes, we
-  # will need to restructure the data a bit.
-  if (!is.null(trelliData$trelliData.omics)) {
-    stats_mode <- FALSE
-    if (test_mode) {
-      toBuild <- trelliData$trelliData.omics[test_example, ]
-    } else {
-      toBuild <- trelliData$trelliData.omics
-    }
-  } else {
-    stats_mode <- TRUE
-    
-    # Get the edata column name
-    edata_cname <- get_edata_cname(trelliData$statRes)
-    
-    # Get the columns with counts
-    count_cols <- colnames(trelliData$statRes)[grepl("Count", colnames(trelliData$statRes))]
-
-    # Build toBuild dataframe
-    toBuild <- trelliData$statRes %>%
-      dplyr::select(c(edata_cname, count_cols)) %>%
-      dplyr::group_by(!!dplyr::sym(edata_cname)) %>%
-      tidyr::nest() %>%
-      dplyr::ungroup() %>%
-      dplyr::rename(Nested_DF = data) 
-    
-    # Save total counts 
-    totalCounts <- attr(trelliData$statRes, "group_DF")$Group %>% 
-      table(dnn = "Group") %>% 
-      data.frame() %>% 
-      dplyr::rename(Total = Freq)
-    
-    if (test_mode) {
-      toBuild <- toBuild[test_example, ]
-    }
-  }
+  # Add a panel column for plotting
+  trelliData$trelliData$Panel <- trelliData$trelliData[[panel]]
+  toBuild$Panel <- toBuild[[panel]]
+  
+  # Add plots and remove that panel column
+  toBuild <- toBuild %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(plots = trelliscope::panel_lazy(zero_bar_plot_fun)) %>%
+    dplyr::select(-Panel)
+  
+  # Now, select only the requested cognostics 
+  selected <- colnames(toBuild)[lapply(colnames(toBuild), function(x) {grepl("total count|non-zero count|non-zero proportion", x)}) %>% unlist()]
+  selected <- c(selected, panel, "plots")
+  
+  toBuild <- toBuild %>%
+    dplyr::select(dplyr::all_of(selected))
   
   # Return a single plot if single_plot is TRUE
   if (single_plot) {
-    singleData <- toBuild[test_example[1], ]
-    return(nonzero_bar_plot_fun(singleData$Nested_DF[[1]], unlist(singleData[1, 1])))
+    
+    singleData <- toBuild[test_example[1], "plots"]
+    return(singleData$plots)
+    
   } else {
-    # Pass parameters to trelli_builder function
-    if (!is.null(trelliData$omicsData)) {
-      trelli_builder(toBuild = toBuild,
-                     cognostics = cognostics, 
-                     plotFUN = nonzero_bar_plot_fun,
-                     cogFUN = nonzero_bar_cog_fun,
-                     path = path,
-                     name = name,
-                     remove_nestedDF = FALSE,
-                     ...)
+    
+    # If build_trelliscope is true, then build the display. Otherwise, return 
+    if (build_trelliscope) {
+      trelli_builder_lazy(toBuild, path, name, ...)
     } else {
-      trelli_builder(toBuild = toBuild,
-                     cognostics = cognostics, 
-                     plotFUN = nonzero_bar_plot_fun,
-                     cogFUN = nonzero_bar_cog_fun,
-                     path = path,
-                     name = name,
-                     remove_nestedDF = TRUE,
-                     ...)
+      return(toBuild)
     }
+    
   }
+  
+ 
 }

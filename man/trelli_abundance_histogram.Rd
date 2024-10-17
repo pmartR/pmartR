@@ -10,8 +10,9 @@ trelli_abundance_histogram(
     "skew abundance"),
   ggplot_params = NULL,
   interactive = FALSE,
-  path = .getDownloadsFolder(),
+  path = tempdir(),
   name = "Trelliscope",
+  build_trelliscope = TRUE,
   test_mode = FALSE,
   test_example = 1,
   single_plot = FALSE,
@@ -24,8 +25,10 @@ as.trelliData.edata, and grouped by edata_cname in trelli_panel_by.
 Required.}
 
 \item{cognostics}{A vector of cognostic options for each plot. Valid entries
-are "sample count", "mean abundance", "median abundance", "cv abundance", 
-and "skew abundance". All are included by default.}
+are "count", "mean abundance", "median abundance", "cv abundance", 
+and "skew abundance". All are included by default. Any additional cognostics 
+from e_meta variables may be added if their column name is specified, and the 
+data has been paneled by the edata_cname or by an e_meta variable.}
 
 \item{ggplot_params}{An optional vector of strings of ggplot parameters to
 the backend ggplot function. For example, c("ylab('')", "ylim(c(1,2))").
@@ -36,9 +39,12 @@ interactive or not. Interactive plots are ggplots piped to ggplotly (for
 now). Default is FALSE.}
 
 \item{path}{The base directory of the trelliscope application. Default is
-Downloads.}
+a temporary directory.}
 
 \item{name}{The name of the display. Default is Trelliscope.}
+
+\item{build_trelliscope}{If TRUE, a trelliscope display will be built. Otherwise,
+a dataframe will be returned. Default is TRUE.}
 
 \item{test_mode}{A logical to return a smaller trelliscope to confirm plot
 and design. Default is FALSE.}

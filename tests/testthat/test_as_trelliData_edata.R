@@ -24,14 +24,14 @@ test_that("as.trelliData.edata returns correct data frames and attributes", {
     omics_type = "pepData"
   )
 
-  # Check the 4 resulting data.frames. First, trelliData.omics should exist and contain
+  # Check the 4 resulting data.frames. First, trelliData should exist and contain
   # 3 colummns: edata_cname, Sample, and Abundance. It should also have 1800 rows.
   expect_equal(
-    colnames(pep_trelli_edata$trelliData.omics),
+    colnames(pep_trelli_edata$trelliData),
     c("Mass_Tag_ID", "Sample", "Abundance")
   )
 
-  expect_equal(nrow(pep_trelli_edata$trelliData.omics), 1800)
+  expect_equal(nrow(pep_trelli_edata$trelliData), 1800)
 
   # omicsData must be of the class pepData
   expect_equal(class(pep_trelli_edata$omicsData), "pepData")
@@ -83,8 +83,7 @@ test_that("as.trelliData.edata returns correct data frames and attributes", {
     # The class will be both trelliData and trelli.edata.
     expect_equal(attr(trelliData, "fdata_col"), "Sample")
     expect_equal(attr(trelliData, "panel_by_options"), c(edata_cname, "Sample"))
-    expect_equal(attr(trelliData, "panel_by_omics"), NA)
-    expect_equal(attr(trelliData, "panel_by_stat"), NA)
+    expect_equal(attr(trelliData, "panel_by_col"), NA)
     expect_false(attr(trelliData, "panel_by"))
   }
 
@@ -111,14 +110,14 @@ test_that("as.trelliData.edata returns correct data frames and attributes", {
     is_normalized = TRUE
   )
 
-  # Check the 4 resulting data.frames. First, trelliData.omics should exist and contain
+  # Check the 4 resulting data.frames. First, trelliData should exist and contain
   # 3 colummns: edata_cname, Sample, and Abundance. It should also have 1650 rows.
   expect_equal(
-    colnames(pro_trelli_edata$trelliData.omics),
+    colnames(pro_trelli_edata$trelliData),
     c("Reference", "Sample", "Abundance")
   )
 
-  expect_equal(nrow(pro_trelli_edata$trelliData.omics), 1650)
+  expect_equal(nrow(pro_trelli_edata$trelliData), 1650)
 
   # omicsData must be of the class proData
   expect_equal(class(pro_trelli_edata$omicsData), "proData")
@@ -157,14 +156,14 @@ test_that("as.trelliData.edata returns correct data frames and attributes", {
     normalization_params = list(method = "affy", span = 0.2)
   )
 
-  # Check the 4 resulting data.frames. First, trelliData.omics should exist and contain
+  # Check the 4 resulting data.frames. First, trelliData should exist and contain
   # 3 colummns: edata_cname, Sample, and Abundance. It should also have 1606 rows.
   expect_equal(
-    colnames(lip_trelli_edata$trelliData.omics),
+    colnames(lip_trelli_edata$trelliData),
     c("LipidCommonName", "Sample", "Abundance")
   )
 
-  expect_equal(nrow(lip_trelli_edata$trelliData.omics), 1606)
+  expect_equal(nrow(lip_trelli_edata$trelliData), 1606)
 
   # omicsData must be of the class lipdData
   expect_equal(class(lip_trelli_edata$omicsData), "lipidData")
@@ -204,14 +203,14 @@ test_that("as.trelliData.edata returns correct data frames and attributes", {
     normalization_params = NULL
   )
 
-  # Check the 4 resulting data.frames. First, trelliData.omics should exist and contain
+  # Check the 4 resulting data.frames. First, trelliData should exist and contain
   # 3 colummns: edata_cname, Sample, and Abundance. It should also have 960 rows.
   expect_equal(
-    colnames(metab_trelli_edata$trelliData.omics),
+    colnames(metab_trelli_edata$trelliData),
     c("Metabolite", "Sample", "Abundance")
   )
 
-  expect_equal(nrow(metab_trelli_edata$trelliData.omics), 960)
+  expect_equal(nrow(metab_trelli_edata$trelliData), 960)
 
   # omicsData must be of the class metabData
   expect_equal(class(metab_trelli_edata$omicsData), "metabData")
@@ -244,14 +243,14 @@ test_that("as.trelliData.edata returns correct data frames and attributes", {
     data_scale = "abundance"
   )
 
-  # Check the 4 resulting data.frames. First, trelliData.omics should exist and contain
+  # Check the 4 resulting data.frames. First, trelliData should exist and contain
   # 3 colummns: edata_cname, Sample, and Abundance. It should also have 1558 rows.
   expect_equal(
-    colnames(nmr_trelli_edata$trelliData.omics),
+    colnames(nmr_trelli_edata$trelliData),
     c("Metabolite", "Sample", "Abundance")
   )
 
-  expect_equal(nrow(nmr_trelli_edata$trelliData.omics), 1558)
+  expect_equal(nrow(nmr_trelli_edata$trelliData), 1558)
 
   # omicsData must be of the class nmrData
   expect_equal(class(nmr_trelli_edata$omicsData), "nmrData")
@@ -284,14 +283,14 @@ test_that("as.trelliData.edata returns correct data frames and attributes", {
     data_scale = "log2"
   )
 
-  # Check the 4 resulting data.frames. First, trelliData.omics should exist and contain
+  # Check the 4 resulting data.frames. First, trelliData should exist and contain
   # 3 colummns: edata_cname, Sample, and Abundance. It should also have 1800 rows.
   expect_equal(
-    colnames(iso_trelli_edata$trelliData.omics),
+    colnames(iso_trelli_edata$trelliData),
     c("Peptide", "Sample", "Abundance")
   )
 
-  expect_equal(nrow(iso_trelli_edata$trelliData.omics), 1800)
+  expect_equal(nrow(iso_trelli_edata$trelliData), 1800)
 
   # omicsData must be of the class nmrData
   expect_equal(class(iso_trelli_edata$omicsData), c("isobaricpepData", "pepData"))

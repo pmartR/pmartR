@@ -10,8 +10,9 @@ trelli_foldchange_bar(
   p_value_thresh = 0.05,
   ggplot_params = NULL,
   interactive = FALSE,
-  path = .getDownloadsFolder(),
+  path = tempdir(),
   name = "Trelliscope",
+  build_trelliscope = TRUE,
   test_mode = FALSE,
   test_example = 1,
   single_plot = FALSE,
@@ -23,7 +24,7 @@ trelli_foldchange_bar(
 
 \item{cognostics}{A vector of cognostic options for each plot. Valid entries
 and the defaults are "fold change" and "p-value". If the omics data is MS/NMR,
-p-value will be the results from the ANOVA test. If the omics data is sedData,
+p-value will be the results from the ANOVA test. If the omics data is seqData,
 the p-value will be the results from the function "diffexp_seq".}
 
 \item{p_value_thresh}{A value between 0 and 1 to indicate significant
@@ -38,9 +39,12 @@ interactive or not. Interactive plots are ggplots piped to ggplotly (for
 now). Default is FALSE.}
 
 \item{path}{The base directory of the trelliscope application. Default is
-Downloads.}
+a temporary directory.}
 
 \item{name}{The name of the display. Default is Trelliscope.}
+
+\item{build_trelliscope}{If TRUE, a trelliscope display will be built. Otherwise,
+a dataframe will be returned. Default is TRUE.}
 
 \item{test_mode}{A logical to return a smaller trelliscope to confirm plot
 and design. Default is FALSE.}
