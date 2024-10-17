@@ -481,6 +481,9 @@ trelli_abundance_boxplot <- function(trelliData,
     
     DF <- dplyr::filter(trelliData$trelliData, Panel == {{Panel}})
     
+    # Add group if necessary
+    if ("Group" %in% colnames(DF) == FALSE) {DF$Group <- "Group"}
+    
     # Build plot
     boxplot <- ggplot2::ggplot(DF, ggplot2::aes(x = Group, fill = Group, y = Abundance)) +
       ggplot2::geom_boxplot(outlier.shape = NA) +
