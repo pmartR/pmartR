@@ -1512,7 +1512,7 @@ proteomics_filter <- function(omicsData) {
     # rows an identifier appears in).
     dplyr::tally() %>%
     # Convert pepCount to a data frame from a tibble.
-    data.frame()
+    data.frame(check.names = FALSE)
 
   # Count the number of peptides associated with each protein.
   proCount <- omicsData$e_meta %>%
@@ -1523,7 +1523,7 @@ proteomics_filter <- function(omicsData) {
     # rows an identifier appears in).
     dplyr::tally() %>%
     # Convert proCount to a data frame from a tibble.
-    data.frame()
+    data.frame(check.names = FALSE)
 
   # Generate a list containing the data frames for the two counts.
   output <- list(
