@@ -73,7 +73,7 @@ statRes_output <- function(imd_anova_out,
   down_a <- apply(anova_flags, 2, \(x) length(which(x == -1)))
   up_g <- apply(imd_flags, 2, \(x) length(which(x == 1)))
   down_g <- apply(imd_flags, 2, \(x) length(which(x == -1)))
-  attr(imd_anova_out, "number_significant") <- data.frame(
+  attr(imd_anova_out, "number_significant") <- data.frame(check.names = FALSE, 
     Comparison = comparisons,
     Up_total = up_a + up_g,
     Down_total = down_a + down_g,

@@ -101,7 +101,7 @@ all_pairwise_results_adjusted <- imd_anova(
 By default, all pairwise comparisons are made. Custom comparisons can by defined by passing a `data.frame` to the `comparisons` argument with column names "Test" and "Control". Now, group "Phenotype1" is treated as the control group and the remaining groups are compared to it.
 
 ```{r, warning=FALSE}
-one_vs_all <- data.frame(
+one_vs_all <- data.frame(check.names = FALSE, 
   Control = rep("Phenotype1", 2),
   Test = c("Phenotype2", "Phenotype3")
 )

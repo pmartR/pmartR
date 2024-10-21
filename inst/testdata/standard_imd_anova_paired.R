@@ -133,7 +133,7 @@ cfilta_1_1_3 <- applyFilt(filta_1_1_3, pairdata_1_1_3,
 # 18hr sample in row two the difference would be take by 0hr - 18hr. If the
 # order was mixed up (18hr occurred before 0hr in fdata) then for that pair 0hr
 # would be subtracted from 18hr.
-diff_a_1_0_3 <- data.frame(
+diff_a_1_0_3 <- data.frame(check.names = FALSE, 
   Mass_Tag_ID = afilta_1_0_3$e_data$Mass_Tag_ID,
   Pair_1 = afilta_1_0_3$e_data$Mock_0hr_1 - afilta_1_0_3$e_data$Mock_18hr_1,
   Pair_2 = afilta_1_0_3$e_data$Mock_0hr_2 - afilta_1_0_3$e_data$Mock_18hr_2,
@@ -153,7 +153,7 @@ diff_a_1_0_3 <- data.frame(
   row.names = NULL
 )
 
-diff_a_0_0_3 <- data.frame(
+diff_a_0_0_3 <- data.frame(check.names = FALSE, 
   Mass_Tag_ID = afilta_0_0_3$e_data$Mass_Tag_ID,
   Pair_1 = afilta_0_0_3$e_data$Mock_0hr_1 - afilta_0_0_3$e_data$Mock_18hr_1,
   Pair_2 = afilta_0_0_3$e_data$Mock_0hr_2 - afilta_0_0_3$e_data$Mock_18hr_2,
@@ -173,7 +173,7 @@ diff_a_0_0_3 <- data.frame(
   row.names = NULL
 )
 
-diff_g <- data.frame(
+diff_g <- data.frame(check.names = FALSE, 
   Mass_Tag_ID = gfilta_1_0_3$e_data$Mass_Tag_ID,
   Pair_1 = gfilta_1_0_3$e_data$Mock_0hr_1 - gfilta_1_0_3$e_data$Mock_18hr_1,
   Pair_2 = gfilta_1_0_3$e_data$Mock_0hr_2 - gfilta_1_0_3$e_data$Mock_18hr_2,
@@ -193,7 +193,7 @@ diff_g <- data.frame(
   row.names = NULL
 )
 
-groupie <- data.frame(
+groupie <- data.frame(check.names = FALSE, 
   Name = paste("Pair", 1:15, sep = "_"),
   Group = c(rep("Mock", 5), rep("FM", 5), rep("AM", 5))
 )
@@ -207,14 +207,14 @@ Xmatrix_1_1_3 = structure(c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0,
 
 # main effects: 0; covariates: 0; groups: 3 ---------------
 
-pval_a_0_0_3 <- data.frame(
+pval_a_0_0_3 <- data.frame(check.names = FALSE, 
   P_value_A_paired_diff = diff_a_0_0_3[, -1] %>%
     apply( 1, t.test) %>%
     lapply(`[[`, "p.value") %>%
     unlist()
 )
 
-flag_a_0_0_3 <- data.frame(
+flag_a_0_0_3 <- data.frame(check.names = FALSE, 
   Flag_A_paired_diff = aflag_diff(
     diff = rowMeans(diff_a_0_0_3[, 2:16],
                     na.rm = TRUE),
@@ -223,7 +223,7 @@ flag_a_0_0_3 <- data.frame(
   )
 )
 
-astan_0_0_3 <- data.frame(
+astan_0_0_3 <- data.frame(check.names = FALSE, 
   Mass_Tag_ID = diff_a_0_0_3$Mass_Tag_ID,
   Count_paired_diff = unname(rowSums(!is.na(afilta_0_0_3$e_data[, 2:31]))),
   Mean_paired_diff = rowMeans(diff_a_0_0_3[, 2:16],
@@ -239,7 +239,7 @@ class(astan_0_0_3) <- c("statRes", "data.frame")
 
 attr(astan_0_0_3, "group_DF") <- attr(afilta_0_0_3, "group_DF")
 attr(astan_0_0_3, "comparisons") <- c("paired_diff")
-attr(astan_0_0_3, "number_significant") <- data.frame(
+attr(astan_0_0_3, "number_significant") <- data.frame(check.names = FALSE, 
   Comparison = c("paired_diff"),
   Up_total = c(length(which(flag_a_0_0_3[, 1] == 1))),
   Down_total = c(length(which(flag_a_0_0_3[, 1] == -1))),
@@ -267,7 +267,7 @@ attr(astan_0_0_3, "data_info") <- list(
   data_types = NULL,
   batch_info = list(is_bc = FALSE)
 )
-attr(astan_0_0_3, "bpFlags") <- data.frame(
+attr(astan_0_0_3, "bpFlags") <- data.frame(check.names = FALSE, 
   Mass_Tag_ID = afilta_0_0_3$e_data$Mass_Tag_ID,
   paired_diff = flag_a_0_0_3$Flag_A_paired_diff
 )
@@ -281,7 +281,7 @@ attr(astan_0_0_3, "data_class") <- "pepData"
 
 # main effects: 1; covariates: 0; groups: 3 ---------------
 
-mean_a_1_0_3 <- data.frame(
+mean_a_1_0_3 <- data.frame(check.names = FALSE, 
   Mean_Mock = rowMeans(diff_a_1_0_3[, 2:6],
                        na.rm = TRUE),
   Mean_FM = rowMeans(diff_a_1_0_3[, 7:11],
@@ -290,7 +290,7 @@ mean_a_1_0_3 <- data.frame(
                      na.rm = TRUE)
 )
 
-group_counts_1_0_3 <- data.frame(
+group_counts_1_0_3 <- data.frame(check.names = FALSE, 
   nona_Mock = rowSums(!is.na(diff_a_1_0_3[, 2:6])),
   nona_FM = rowSums(!is.na(diff_a_1_0_3[, 7:11])),
   nona_AM = rowSums(!is.na(diff_a_1_0_3[, 12:16]))
@@ -355,7 +355,7 @@ pval_a_1_0_3 <- test_stat_1_0_3 %>%
                 P_value_A_Mock_vs_AM,
                 P_value_A_FM_vs_AM)
 
-flag_a_1_0_3 <- data.frame(
+flag_a_1_0_3 <- data.frame(check.names = FALSE, 
   Mock_vs_FM = aflag(
     grp1 = mean_a_1_0_3$Mean_Mock,
     grp2 = mean_a_1_0_3$Mean_FM,
@@ -376,7 +376,7 @@ flag_a_1_0_3 <- data.frame(
   )
 )
 
-astan_1_0_3 <- data.frame(
+astan_1_0_3 <- data.frame(check.names = FALSE, 
   Mass_Tag_ID = diff_a_1_0_3$Mass_Tag_ID,
   Count_Mock = unname(rowSums(!is.na(afilta_1_0_3$e_data[, 2:11]))),
   Count_FM = unname(rowSums(!is.na(afilta_1_0_3$e_data[, 12:21]))),
@@ -404,7 +404,7 @@ attr(astan_1_0_3, "group_DF") <- attr(afilta_1_0_3, "group_DF")
 attr(astan_1_0_3, "comparisons") <- c("Mock_vs_FM",
                                       "Mock_vs_AM",
                                       "FM_vs_AM")
-attr(astan_1_0_3, "number_significant") <- data.frame(
+attr(astan_1_0_3, "number_significant") <- data.frame(check.names = FALSE, 
   Comparison = c("Mock_vs_FM",
                  "Mock_vs_AM",
                  "FM_vs_AM"),
@@ -442,7 +442,7 @@ attr(astan_1_0_3, "data_info") <- list(
   data_types = NULL,
   batch_info = list(is_bc = FALSE)
 )
-attr(astan_1_0_3, "bpFlags") <- data.frame(
+attr(astan_1_0_3, "bpFlags") <- data.frame(check.names = FALSE, 
   Mass_Tag_ID = afilta_1_0_3$e_data$Mass_Tag_ID,
   flag_a_1_0_3
 )
@@ -463,7 +463,7 @@ group_df <- build_factor_group_df(afilta_1_1_3)
 pred_grid <- get_pred_grid(group_df, main_effect_names = "Virus", covariate_names = "Gender")
 mean_a_1_1_3 <- get_lsmeans(data = data_1_1_3, xmatrix = Xmatrix_1_1_3, pred_grid = pred_grid, Betas = Betas)
 
-group_counts_1_1_3 <- data.frame(
+group_counts_1_1_3 <- data.frame(check.names = FALSE, 
   nona_Mock = rowSums(!is.na(data_1_1_3[, 1:5])),
   nona_FM = rowSums(!is.na(data_1_1_3[, 6:10])),
   nona_AM = rowSums(!is.na(data_1_1_3[, 11:15]))
@@ -532,7 +532,7 @@ pval_a_1_1_3 <- test_stat_1_1_3 %>%
                 P_value_A_FM_vs_AM) %>%
   `row.names<-`(NULL)
 
-flag_a_1_1_3 <- data.frame(
+flag_a_1_1_3 <- data.frame(check.names = FALSE, 
   Mock_vs_FM = aflag(
     grp1 = mean_a_1_1_3$Mean_Mock,
     grp2 = mean_a_1_1_3$Mean_FM,
@@ -553,7 +553,7 @@ flag_a_1_1_3 <- data.frame(
   )
 )
 
-astan_1_1_3 <- data.frame(
+astan_1_1_3 <- data.frame(check.names = FALSE, 
   Mass_Tag_ID = afilta_1_1_3$e_data$Mass_Tag_ID,
   Count_Mock = unname(rowSums(!is.na(afilta_1_0_3$e_data[, 2:11]))),
   Count_FM = unname(rowSums(!is.na(afilta_1_0_3$e_data[, 12:21]))),
@@ -581,7 +581,7 @@ attr(astan_1_1_3, "group_DF") <- attr(afilta_1_1_3, "group_DF")
 attr(astan_1_1_3, "comparisons") <- c("Mock_vs_FM",
                                       "Mock_vs_AM",
                                       "FM_vs_AM")
-attr(astan_1_1_3, "number_significant") <- data.frame(
+attr(astan_1_1_3, "number_significant") <- data.frame(check.names = FALSE, 
   Comparison = c("Mock_vs_FM",
                  "Mock_vs_AM",
                  "FM_vs_AM"),
@@ -619,7 +619,7 @@ attr(astan_1_1_3, "data_info") <- list(
   data_types = NULL,
   batch_info = list(is_bc = FALSE)
 )
-attr(astan_1_1_3, "bpFlags") <- data.frame(
+attr(astan_1_1_3, "bpFlags") <- data.frame(check.names = FALSE, 
   Mass_Tag_ID = afilta_1_1_3$e_data$Mass_Tag_ID,
   flag_a_1_1_3
 )
@@ -647,7 +647,7 @@ abs_am <- rowSums(is.na(gfilta_1_0_3$e_data[, 22:31]))
 
 # main effects: 1; covariates: 0; groups: 3 ---------------
 
-pval_g_1_0_3 <- data.frame(
+pval_g_1_0_3 <- data.frame(check.names = FALSE, 
   P_value_G_Mock_vs_FM = rep(0, nrow(gfilta_1_0_3$e_data)),
   P_value_G_Mock_vs_AM = rep(0, nrow(gfilta_1_0_3$e_data)),
   P_value_G_FM_vs_AM = rep(0, nrow(gfilta_1_0_3$e_data))
@@ -685,7 +685,7 @@ for (e in 1:nrow(gfilta_1_0_3$e_data)) {
 
 }
 
-flag_g_1_0_3 <- data.frame(
+flag_g_1_0_3 <- data.frame(check.names = FALSE, 
   Mock_vs_FM = gflag(
     obs1 = obs_mock,
     obs2 = obs_fm,
@@ -712,7 +712,7 @@ flag_g_1_0_3 <- data.frame(
   )
 )
 
-mean_g_1_0_3 <- data.frame(
+mean_g_1_0_3 <- data.frame(check.names = FALSE, 
   Mean_Mock = rowMeans(diff_g[, 2:6],
                        na.rm = TRUE),
   Mean_FM = rowMeans(diff_g[, 7:11],
@@ -721,7 +721,7 @@ mean_g_1_0_3 <- data.frame(
                      na.rm = TRUE)
 )
 
-gstan_1_0_3 <- data.frame(
+gstan_1_0_3 <- data.frame(check.names = FALSE, 
   Mass_Tag_ID = gfilta_1_0_3$e_data$Mass_Tag_ID,
   Count_Mock = unname(obs_mock),
   Count_FM = unname(obs_fm),
@@ -749,7 +749,7 @@ class(gstan_1_0_3) <- c("statRes", "data.frame")
 
 attr(gstan_1_0_3, "group_DF") <- attr(gfilta_1_0_3, "group_DF")
 attr(gstan_1_0_3, "comparisons") <- c("Mock_vs_FM", "Mock_vs_AM", "FM_vs_AM")
-attr(gstan_1_0_3, "number_significant") <- data.frame(
+attr(gstan_1_0_3, "number_significant") <- data.frame(check.names = FALSE, 
   Comparison = c("Mock_vs_FM", "Mock_vs_AM", "FM_vs_AM"),
   Up_total = c(length(which(flag_g_1_0_3[, 1] == 1)),
                length(which(flag_g_1_0_3[, 2] == 1)),
@@ -796,7 +796,7 @@ attr(gstan_1_0_3, "data_class") <- "pepData"
 
 # main effects: 1; covariates: 1; groups: 3 ---------------
 
-pval_g_1_1_3 <- data.frame(
+pval_g_1_1_3 <- data.frame(check.names = FALSE, 
   P_value_G_Mock_vs_FM = rep(0, nrow(gfilta_1_1_3$e_data)),
   P_value_G_Mock_vs_AM = rep(0, nrow(gfilta_1_1_3$e_data)),
   P_value_G_FM_vs_AM = rep(0, nrow(gfilta_1_1_3$e_data))
@@ -838,7 +838,7 @@ for (e in 1:nrow(gfilta_1_1_3$e_data)) {
 
 }
 
-flag_g_1_1_3 <- data.frame(
+flag_g_1_1_3 <- data.frame(check.names = FALSE, 
   Mock_vs_FM = gflag(
     obs1 = obs_mock,
     obs2 = obs_fm,
@@ -872,7 +872,7 @@ group_df <- build_factor_group_df(gfilta_1_1_3)
 pred_grid <- get_pred_grid(group_df, main_effect_names = "Virus", covariate_names = "Gender")
 mean_g_1_1_3 <- get_lsmeans(data = data_g_1_1_3, xmatrix = Xmatrix_1_1_3, pred_grid = pred_grid, Betas = Betas)
 
-group_counts_g_1_1_3 <- data.frame(
+group_counts_g_1_1_3 <- data.frame(check.names = FALSE, 
   nona_Mock = rowSums(!is.na(data_g_1_1_3[, 1:5])),
   nona_FM = rowSums(!is.na(data_g_1_1_3[, 6:10])),
   nona_AM = rowSums(!is.na(data_g_1_1_3[, 11:15]))
@@ -891,7 +891,7 @@ diffs_1_1_3 <- mean_g_1_1_3 %>%
   ) %>%
   dplyr::select(diff_m_f, diff_m_a, diff_f_a)
 
-gstan_1_1_3 <- data.frame(
+gstan_1_1_3 <- data.frame(check.names = FALSE, 
   Mass_Tag_ID = gfilta_1_1_3$e_data$Mass_Tag_ID,
   Count_Mock = unname(obs_mock),
   Count_FM = unname(obs_fm),
@@ -913,7 +913,7 @@ class(gstan_1_1_3) <- c("statRes", "data.frame")
 
 attr(gstan_1_1_3, "group_DF") <- attr(gfilta_1_1_3, "group_DF")
 attr(gstan_1_1_3, "comparisons") <- c("Mock_vs_FM", "Mock_vs_AM", "FM_vs_AM")
-attr(gstan_1_1_3, "number_significant") <- data.frame(
+attr(gstan_1_1_3, "number_significant") <- data.frame(check.names = FALSE, 
   Comparison = c("Mock_vs_FM", "Mock_vs_AM", "FM_vs_AM"),
   Up_total = c(length(which(flag_g_1_1_3[, 1] == 1)),
                length(which(flag_g_1_1_3[, 2] == 1)),
@@ -1001,7 +1001,7 @@ class(cstan_1_0_3) <- c("statRes", "data.frame")
 
 attr(cstan_1_0_3, "group_DF") <- attr(cfilta_1_0_3, "group_DF")
 attr(cstan_1_0_3, "comparisons") <- c("Mock_vs_FM", "Mock_vs_AM", "FM_vs_AM")
-attr(cstan_1_0_3, "number_significant") <- data.frame(
+attr(cstan_1_0_3, "number_significant") <- data.frame(check.names = FALSE, 
   Comparison = c("Mock_vs_FM", "Mock_vs_AM", "FM_vs_AM"),
   Up_total = c(sum(length(which(flag_g_1_0_3[, 1] == 1)),
                    length(which(flag_a_1_0_3[, 1] == 1))),
@@ -1047,7 +1047,7 @@ attr(cstan_1_0_3, "data_info") <- list(
   data_types = NULL,
   batch_info = list(is_bc = FALSE)
 )
-attr(cstan_1_0_3, "bpFlags") <- data.frame(
+attr(cstan_1_0_3, "bpFlags") <- data.frame(check.names = FALSE, 
   Mass_Tag_ID = gfilta_1_0_3$e_data$Mass_Tag_ID,
   Mock_vs_FM = dplyr::case_when(
     is.na(cstan_1_0_3$Flag_A_Mock_vs_FM) ~
@@ -1135,7 +1135,7 @@ class(cstan_1_1_3) <- c("statRes", "data.frame")
 
 attr(cstan_1_1_3, "group_DF") <- attr(cfilta_1_1_3, "group_DF")
 attr(cstan_1_1_3, "comparisons") <- c("Mock_vs_FM", "Mock_vs_AM", "FM_vs_AM")
-attr(cstan_1_1_3, "number_significant") <- data.frame(
+attr(cstan_1_1_3, "number_significant") <- data.frame(check.names = FALSE, 
   Comparison = c("Mock_vs_FM", "Mock_vs_AM", "FM_vs_AM"),
   Up_total = c(sum(length(which(flag_g_1_1_3[, 1] == 1)),
                    length(which(flag_a_1_1_3[, 1] == 1))),
@@ -1181,7 +1181,7 @@ attr(cstan_1_1_3, "data_info") <- list(
   data_types = NULL,
   batch_info = list(is_bc = FALSE)
 )
-attr(cstan_1_1_3, "bpFlags") <- data.frame(
+attr(cstan_1_1_3, "bpFlags") <- data.frame(check.names = FALSE, 
   Mass_Tag_ID = gfilta_1_1_3$e_data$Mass_Tag_ID,
   Mock_vs_FM = dplyr::case_when(
     is.na(cstan_1_1_3$Flag_A_Mock_vs_FM) ~

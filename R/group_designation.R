@@ -500,7 +500,7 @@ group_designation <- function(omicsData,
   if (n.maineffects == 1) {
     # create output formatted with first column being sample id and second
     # column group id #
-    output <- data.frame(
+    output <- data.frame(check.names = FALSE, 
       Sample.ID = as.character(omicsData$f_data[, samp_id]),
       Group = as.character(omicsData$f_data[, main_effects]),
       stringsAsFactors = FALSE
@@ -532,7 +532,7 @@ group_designation <- function(omicsData,
     # create output formatted with first column being sample id and second
     # column group id # third and fourth columns are the original main effect
     # levels #
-    output <- data.frame(
+    output <- data.frame(check.names = FALSE, 
       Sample.ID = as.character(omicsData$f_data[, samp_id]),
       Group = Group,
       me1 = as.character(omicsData$f_data[, main_effects[[1]]]),
@@ -646,7 +646,7 @@ group_designation <- function(omicsData,
   } else if (length(covariates) == 1) {
     # Make the data frame with the sample ID as the first column and the one and
     # only covariate as the second column.
-    holy_covariates_batman <- data.frame(
+    holy_covariates_batman <- data.frame(check.names = FALSE, 
       sample_id = as.character(omicsData$f_data[, samp_id]),
       cov1 = omicsData$f_data[, covariates],
       stringsAsFactors = FALSE
@@ -659,7 +659,7 @@ group_designation <- function(omicsData,
   } else {
     # Make the data frame with the sample ID as the first column and the second
     # and third columns as the covariates.
-    holy_covariates_batman <- data.frame(
+    holy_covariates_batman <- data.frame(check.names = FALSE, 
       sample_id = as.character(omicsData$f_data[, samp_id]),
       cov1 = omicsData$f_data[, covariates[[1]]],
       cov2 = omicsData$f_data[, covariates[[2]]],
@@ -689,7 +689,7 @@ group_designation <- function(omicsData,
   } else {
     # make the data frame with the Sample ID as the first column and the batch id
     # as the second column
-    holy_batch_robin <- data.frame(
+    holy_batch_robin <- data.frame(check.names = FALSE, 
       sample_id = as.character(omicsData$f_data[, samp_id]),
       batch = omicsData$f_data[, batch_id],
       stringsAsFactors = FALSE

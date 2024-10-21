@@ -62,7 +62,7 @@ MSnSet2pepData <- function(msnset_object, data_scale, edata_cname = "UniqueID",
   msnset_edata <- msnset_object@assayData$exprs
   if (any(dim(msnset_edata) == 0))
     stop("msnset_object@assayData must not have empty rows or columns ")
-  msnset_edata <- as.data.frame(msnset_edata)
+  msnset_edata <- as.data.frame(check.names = FALSE, msnset_edata)
   msnset_edata <- cbind(row.names(msnset_edata), msnset_edata)
   row.names(msnset_edata) <- NULL
   names(msnset_edata)[1] <- "UniqueID"
@@ -70,7 +70,7 @@ MSnSet2pepData <- function(msnset_object, data_scale, edata_cname = "UniqueID",
   msnset_fdata <- msnset_object@phenoData@data
   if (any(dim(msnset_fdata) == 0))
     stop("msnset_object@phenoData must not have empty rows or columns ")
-  msnset_fdata <- as.data.frame(msnset_fdata)
+  msnset_fdata <- as.data.frame(check.names = FALSE, msnset_fdata)
   msnset_fdata <- cbind(row.names(msnset_fdata), msnset_fdata)
   row.names(msnset_fdata) <- NULL
   names(msnset_fdata)[1] <- "SampleID"
@@ -78,7 +78,7 @@ MSnSet2pepData <- function(msnset_object, data_scale, edata_cname = "UniqueID",
   msnset_emeta <- msnset_object@featureData@data
   if (any(dim(msnset_emeta) == 0))
     stop("msnset_object@featureData must not have empty rows or columns ")
-  msnset_emeta <- as.data.frame(msnset_emeta)
+  msnset_emeta <- as.data.frame(check.names = FALSE, msnset_emeta)
   msnset_emeta <- cbind(row.names(msnset_emeta), msnset_emeta)
   row.names(msnset_emeta) <- NULL
   names(msnset_emeta)[1] <- "UniqueID"

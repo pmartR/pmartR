@@ -200,7 +200,7 @@ test_that('as.isobaricpepData returns the correct data frame and attributes', {
   # Check for an error when e_data has more columns than f_data has rows.
   expect_error(
     as.isobaricpepData(
-      e_data = data.frame(edata,
+      e_data = data.frame(check.names = FALSE, edata,
         Sample13 = edata[, 10]
       ),
       f_data = fdata,
@@ -431,7 +431,7 @@ test_that('as.isobaricpepData returns the correct data frame and attributes', {
   expect_error(
     as.isobaricpepData(
       e_data = edata,
-      f_data = data.frame(fdata,
+      f_data = data.frame(check.names = FALSE, fdata,
         tReps = fdata[, 1]
       ),
       e_meta = emeta,

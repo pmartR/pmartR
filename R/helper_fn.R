@@ -909,7 +909,7 @@ get_comparisons <- function(compObj) {
     # pull comparisons attribute
     comp = attr(compObj, "comparisons")
 
-    result = data.frame(
+    result = data.frame(check.names = FALSE, 
       "comparisons" = as.character(comp),
       "index" = 1:length(comp),
       stringsAsFactors = FALSE

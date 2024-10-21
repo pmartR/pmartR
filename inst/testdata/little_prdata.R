@@ -24,7 +24,7 @@ fdata <- pro_fdata
 set.seed(338)
 
 # Construct an emeta data frame from edata.
-emeta <- data.frame(Reference = edata[, 1],
+emeta <- data.frame(check.names = FALSE, Reference = edata[, 1],
                     # Make up 38 different protein classes.
                     PClass = sample(x = paste0('PClass', 1:38),
                                     size = 150,

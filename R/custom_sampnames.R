@@ -207,7 +207,7 @@ subset_names <- function(x, firstn, from, to, delim, components, pattern, ...) {
 
   # Check if all short sample names are unique.
   if (length(unique(output)) != length(x)) {
-    display_df = data.frame("Names" = x, "Extracted" = output)
+    display_df = data.frame(check.names = FALSE, "Names" = x, "Extracted" = output)
 
     # Holy non-unique sample names, Batman!
     stop(

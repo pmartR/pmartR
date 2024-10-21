@@ -116,7 +116,7 @@ dim_reduction <- function(omicsData, k = 2) {
     pca_ests = pca_res@scores[, 1:k]
   }
 
-  temp_res = data.frame(SampleID = names(temp_data), pca_ests)
+  temp_res = data.frame(check.names = FALSE, SampleID = names(temp_data), pca_ests)
 
   class(temp_res) <- "dimRes"
 

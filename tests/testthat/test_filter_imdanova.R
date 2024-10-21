@@ -151,7 +151,7 @@ test_that('imdanova_filter and applyFilt produce the correct output', {
   # Inspect the attributes of the filter object.
   expect_equal(
     attr(filter, "group_sizes"),
-    data.frame(
+    data.frame(check.names = FALSE, 
       Group = c("Infection", "Mock"),
       n_group = c(9, 3)
     )
@@ -191,7 +191,7 @@ test_that('imdanova_filter and applyFilt produce the correct output', {
   # Inspect the attributes of the filter_ne object.
   expect_equal(
     attr(filter_ne, "group_sizes"),
-    data.frame(
+    data.frame(check.names = FALSE, 
       Group = c("Infection", "Mock"),
       n_group = c(9, 3)
     )
@@ -233,7 +233,7 @@ test_that('imdanova_filter and applyFilt produce the correct output', {
   # Inspect the attributes of the filter_sg object.
   expect_equal(
     attr(filter_sg_1, "group_sizes"),
-    data.frame(
+    data.frame(check.names = FALSE, 
       Group = c("Infection", "Mock"),
       n_group = c(9, 1)
     )
@@ -267,7 +267,7 @@ test_that('imdanova_filter and applyFilt produce the correct output', {
   # Inspect the attributes of the filter_sg object.
   expect_equal(
     attr(filter_sg, "group_sizes"),
-    data.frame(
+    data.frame(check.names = FALSE, 
       Group = c("Infection1", "Infection2", "Mock"),
       n_group = c(4, 5, 1)
     )
@@ -308,7 +308,7 @@ test_that('imdanova_filter and applyFilt produce the correct output', {
 
   # Fashion a vector of rows that pass the gtest criteria.
   p_gtest <- apply(
-    data.frame(
+    data.frame(check.names = FALSE, 
       infection = count_i,
       mock = count_m
     ),
@@ -340,7 +340,7 @@ test_that('imdanova_filter and applyFilt produce the correct output', {
   # Fashion a vector of rows that pass the gtest criteria for data with
   # singleton groups.
   p_gtest_sg <- apply(
-    data.frame(
+    data.frame(check.names = FALSE, 
       infection1 = count_i1,
       infection2 = count_i2,
       mock = count_m2
@@ -383,7 +383,7 @@ test_that('imdanova_filter and applyFilt produce the correct output', {
   )
   expect_identical(
     attr(aFiltered, 'filters')[[1]]$threshold,
-    data.frame(
+    data.frame(check.names = FALSE, 
       min_nonmiss_anova = 3,
       min_nonmiss_gtest = NA
     )
@@ -474,7 +474,7 @@ test_that('imdanova_filter and applyFilt produce the correct output', {
   )
   expect_identical(
     attr(gFiltered, 'filters')[[1]]$threshold,
-    data.frame(
+    data.frame(check.names = FALSE, 
       min_nonmiss_anova = NA,
       min_nonmiss_gtest = 3
     )
@@ -565,7 +565,7 @@ test_that('imdanova_filter and applyFilt produce the correct output', {
   )
   expect_identical(
     attr(bFiltered, 'filters')[[1]]$threshold,
-    data.frame(
+    data.frame(check.names = FALSE, 
       min_nonmiss_anova = 3,
       min_nonmiss_gtest = 3
     )
@@ -761,7 +761,7 @@ test_that('imdanova_filter and applyFilt produce the correct output', {
   )
   expect_identical(
     attr(aFiltered_sg, 'filters')[[1]]$threshold,
-    data.frame(
+    data.frame(check.names = FALSE, 
       min_nonmiss_anova = 3,
       min_nonmiss_gtest = NA
     )
@@ -859,7 +859,7 @@ test_that('imdanova_filter and applyFilt produce the correct output', {
   )
   expect_identical(
     attr(gFiltered_sg, 'filters')[[1]]$threshold,
-    data.frame(
+    data.frame(check.names = FALSE, 
       min_nonmiss_anova = NA,
       min_nonmiss_gtest = 3
     )
@@ -957,7 +957,7 @@ test_that('imdanova_filter and applyFilt produce the correct output', {
   )
   expect_identical(
     attr(bFiltered_sg, 'filters')[[1]]$threshold,
-    data.frame(
+    data.frame(check.names = FALSE, 
       min_nonmiss_anova = 3,
       min_nonmiss_gtest = 3
     )
@@ -1073,7 +1073,7 @@ test_that('imdanova_filter and applyFilt produce the correct output', {
   )
   expect_identical(
     attr(aFiltered_sg_f, 'filters')[[1]]$threshold,
-    data.frame(
+    data.frame(check.names = FALSE, 
       min_nonmiss_anova = 3,
       min_nonmiss_gtest = NA
     )
@@ -1190,7 +1190,7 @@ test_that('imdanova_filter and applyFilt produce the correct output', {
   )
   expect_identical(
     attr(gFiltered_sg_f, 'filters')[[1]]$threshold,
-    data.frame(
+    data.frame(check.names = FALSE, 
       min_nonmiss_anova = NA,
       min_nonmiss_gtest = 3
     )
@@ -1310,7 +1310,7 @@ test_that('imdanova_filter and applyFilt produce the correct output', {
   )
   expect_identical(
     attr(bFiltered_sg_f, 'filters')[[1]]$threshold,
-    data.frame(
+    data.frame(check.names = FALSE, 
       min_nonmiss_anova = 3,
       min_nonmiss_gtest = 3
     )
@@ -1443,7 +1443,7 @@ test_that('imdanova_filter and applyFilt produce the correct output', {
   )
   expect_identical(
     attr(filtered_imd, 'filters')[[2]]$threshold,
-    data.frame(
+    data.frame(check.names = FALSE, 
       min_nonmiss_anova = 3,
       min_nonmiss_gtest = NA
     )
@@ -1585,7 +1585,7 @@ test_that('imdanova_filter and applyFilt produce the correct output', {
     remove_singleton_groups = FALSE
   )
 
-  differential <- data.frame(
+  differential <- data.frame(check.names = FALSE, 
     Mass_Tag_ID = pairdata$e_data$Mass_Tag_ID,
     Mock_1 = pairdata$e_data$Mock_0hr_1 - pairdata$e_data$Mock_18hr_1,
     Mock_2 = pairdata$e_data$Mock_0hr_2 - pairdata$e_data$Mock_18hr_2,
@@ -1605,7 +1605,7 @@ test_that('imdanova_filter and applyFilt produce the correct output', {
     row.names = NULL
   )
 
-  count_diff <- data.frame(
+  count_diff <- data.frame(check.names = FALSE, 
     Mass_Tag_ID = differential$Mass_Tag_ID,
     count_mock = rowSums(!is.na(differential[, 2:6])),
     count_fm = rowSums(!is.na(differential[, 7:11])),
@@ -1635,7 +1635,7 @@ test_that('imdanova_filter and applyFilt produce the correct output', {
       class = c("imdanovaFilt", "data.frame"),
       row.names = 1:150,
       omicsData = pairdata,
-      group_sizes = data.frame(
+      group_sizes = data.frame(check.names = FALSE, 
         Group = c("AM", "FM", "Mock"),
         n_group = rep(10, 3)
       ),
@@ -1652,7 +1652,7 @@ test_that('imdanova_filter and applyFilt produce the correct output', {
   )
   expect_identical(
     attr(anova_2, "filters")[[1]]$threshold,
-    data.frame(
+    data.frame(check.names = FALSE, 
       min_nonmiss_anova = 2,
       min_nonmiss_gtest = NA
     )
@@ -1707,7 +1707,7 @@ test_that('imdanova_filter and applyFilt produce the correct output', {
   )
   expect_equal(
     attr(anova_2, "imdanova")$nonmiss_per_group$group_sizes,
-    data.frame(
+    data.frame(check.names = FALSE, 
       Group = c("AM", "FM", "Mock"),
       n_group = rep(5, 3)
     )
@@ -1741,7 +1741,7 @@ test_that('imdanova_filter and applyFilt produce the correct output', {
   )
   expect_identical(
     attr(gtest_2, "filters")[[1]]$threshold,
-    data.frame(
+    data.frame(check.names = FALSE, 
       min_nonmiss_anova = NA,
       min_nonmiss_gtest = 2
     )
@@ -1796,7 +1796,7 @@ test_that('imdanova_filter and applyFilt produce the correct output', {
   )
   expect_equal(
     attr(gtest_2, "imdanova")$nonmiss_per_group$group_sizes,
-    data.frame(
+    data.frame(check.names = FALSE, 
       Group = c("AM", "FM", "Mock"),
       n_group = rep(5, 3)
     )
@@ -1882,7 +1882,7 @@ test_that('imdanova_filter and applyFilt produce the correct output', {
     pdata_2,
     min_nonmiss_anova = 2,
     remove_singleton_groups = FALSE,
-    comparisons = data.frame(
+    comparisons = data.frame(check.names = FALSE, 
       Test = c("Infection_high", "Infection_low"),
       Control = rep("Mock_low", 2)
     )
@@ -1905,7 +1905,7 @@ test_that('imdanova_filter and applyFilt produce the correct output', {
     pdata_2,
     min_nonmiss_anova = 2,
     remove_singleton_groups = FALSE,
-    comparisons = data.frame(
+    comparisons = data.frame(check.names = FALSE, 
       Test = c("Infection_high", "Mock_high"),
       Control = c("Mock_high", "Infection_low")
     )
@@ -1944,7 +1944,7 @@ test_that('imdanova_filter and applyFilt produce the correct output', {
     pdata_2,
     min_nonmiss_gtest = 3,
     remove_singleton_groups = FALSE,
-    comparisons = data.frame(
+    comparisons = data.frame(check.names = FALSE, 
       Test = c("Infection_high", "Infection_low"),
       Control = rep("Mock_low", 2)
     )

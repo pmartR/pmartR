@@ -290,7 +290,7 @@ test_that('the filter object summaries are all square', {
     summary(
       imdanova_filter(pdata_2),
       min_nonmiss_anova = 2,
-      comparisons = data.frame(
+      comparisons = data.frame(check.names = FALSE, 
         Test = c("Infection_high", "Infection_low"),
         Control = rep("Mock_low", 2)
       )
@@ -310,7 +310,7 @@ test_that('the filter object summaries are all square', {
     summary(
       imdanova_filter(pdata_2),
       min_nonmiss_anova = 2,
-      comparisons = data.frame(
+      comparisons = data.frame(check.names = FALSE, 
         Test = c("Infection_high", "Mock_high"),
         Control = c("Mock_high", "Infection_low")
       )
@@ -330,7 +330,7 @@ test_that('the filter object summaries are all square', {
     summary(
       imdanova_filter(pdata_2),
       min_nonmiss_gtest = 3,
-      comparisons = data.frame(
+      comparisons = data.frame(check.names = FALSE, 
         Test = c("Infection_high", "Infection_low"),
         Control = rep("Mock_low", 2)
       )
@@ -354,7 +354,7 @@ test_that('the filter object summaries are all square', {
   expect_equal(
     summary(custom_filter(pdata, e_data_remove = "1406")),
     structure(
-      data.frame(
+      data.frame(check.names = FALSE, 
         Filtered = c(0, 1, 0),
         Remaining = c(12, 149, 83),
         Total = c(12, 150, 83)
@@ -372,7 +372,7 @@ test_that('the filter object summaries are all square', {
   expect_equal(
     summary(custom_filter(pdata, f_data_remove = "Infection4")),
     structure(
-      data.frame(
+      data.frame(check.names = FALSE, 
         Filtered = c(1, 0, 0),
         Remaining = c(11, 150, 83),
         Total = c(12, 150, 83)
@@ -390,7 +390,7 @@ test_that('the filter object summaries are all square', {
   expect_equal(
     summary(custom_filter(pdata, e_meta_remove = "ALBU_HUMAN")),
     structure(
-      data.frame(
+      data.frame(check.names = FALSE, 
         Filtered = c(0, 5, 1),
         Remaining = c(12, 145, 82),
         Total = c(12, 150, 83)
@@ -415,7 +415,7 @@ test_that('the filter object summaries are all square', {
       )
     ),
     structure(
-      data.frame(
+      data.frame(check.names = FALSE, 
         Filtered = c(1, 1, 1),
         Remaining = c(11, 149, 82),
         Total = c(12, 150, 83)
@@ -440,7 +440,7 @@ test_that('the filter object summaries are all square', {
       )
     ),
     structure(
-      data.frame(
+      data.frame(check.names = FALSE, 
         Discarded = c(0, 141, 80),
         Kept = c(12, 9, 3),
         Total = c(12, 150, 83)
@@ -463,7 +463,7 @@ test_that('the filter object summaries are all square', {
       )
     ),
     structure(
-      data.frame(
+      data.frame(check.names = FALSE, 
         Discarded = c(7, 0, 0),
         Kept = c(5, 150, 83),
         Total = c(12, 150, 83)
@@ -488,7 +488,7 @@ test_that('the filter object summaries are all square', {
       )
     ),
     structure(
-      data.frame(
+      data.frame(check.names = FALSE, 
         Discarded = c(7, 146, 80),
         Kept = c(5, 4, 3),
         Total = c(12, 150, 83)
@@ -511,7 +511,7 @@ test_that('the filter object summaries are all square', {
       )
     ),
     structure(
-      data.frame(
+      data.frame(check.names = FALSE, 
         Discarded = c(0, 146, 79),
         Kept = c(12, 4, 4),
         Total = c(12, 150, 83)

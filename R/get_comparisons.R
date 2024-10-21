@@ -99,6 +99,6 @@ create_comparisonDF <- function(comp_type, omicsData, control_group = NULL) {
   }
 
 
-  comparisons <- data.frame(Test = query_grps, Control = control_grps)
+  comparisons <- data.frame(check.names = FALSE, Test = query_grps, Control = control_grps)
   return(comparisons)
 }

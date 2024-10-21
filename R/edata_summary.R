@@ -73,7 +73,7 @@ edata_summary <- function(omicsData, by = 'sample', groupvar = NULL) {
     # check that groupvar is NULL, groupvar is only used when by == 'molecule'
     if (!is.null(groupvar)) stop("groupvar is only used when by == 'molecule'")
 
-    avg = as.data.frame(apply(
+    avg = as.data.frame(check.names = FALSE, apply(
       edata[, -edata_cname_id], 2,
       function(x) {
         if (all(is.na(x))) {
@@ -87,18 +87,18 @@ edata_summary <- function(omicsData, by = 'sample', groupvar = NULL) {
     names(avg) <- c("sample", "mean")
     rownames(avg) <- NULL
 
-    sd = as.data.frame(apply(edata[, -edata_cname_id], 2, sd, na.rm = TRUE))
+    sd = as.data.frame(check.names = FALSE, apply(edata[, -edata_cname_id], 2, sd, na.rm = TRUE))
     sd = cbind(names(edata[, -edata_cname_id]), sd)
     names(sd) <- c("sample", "sd")
     rownames(sd) <- NULL
 
-    mds = as.data.frame(apply(edata[, -edata_cname_id], 2, median, na.rm = TRUE))
+    mds = as.data.frame(check.names = FALSE, apply(edata[, -edata_cname_id], 2, median, na.rm = TRUE))
     mds = cbind(names(edata[, -edata_cname_id]), mds)
     names(mds) <- c("sample", "median")
     rownames(mds) <- NULL
 
     if (inherits(omicsData, "seqData")) {
-      pct_obs = as.data.frame(apply(
+      pct_obs = as.data.frame(check.names = FALSE, apply(
         edata[, -edata_cname_id], 2,
         function(x) {
           sum(x != 0) / length(x)
@@ -109,7 +109,7 @@ edata_summary <- function(omicsData, by = 'sample', groupvar = NULL) {
       names(pct_obs) <- c("sample", "pct_nonzero_obs")
       rownames(pct_obs) <- NULL
     } else {
-      pct_obs = as.data.frame(apply(
+      pct_obs = as.data.frame(check.names = FALSE, apply(
         edata[, -edata_cname_id], 2,
         function(x) {
           sum(!is.na(x)) / length(x)
@@ -121,12 +121,12 @@ edata_summary <- function(omicsData, by = 'sample', groupvar = NULL) {
       rownames(pct_obs) <- NULL
     }
 
-    min = as.data.frame(apply(edata[, -edata_cname_id], 2, min, na.rm = TRUE))
+    min = as.data.frame(check.names = FALSE, apply(edata[, -edata_cname_id], 2, min, na.rm = TRUE))
     min = cbind(names(edata[, -edata_cname_id]), min)
     names(min) <- c("sample", "min")
     rownames(min) <- NULL
 
-    max = as.data.frame(apply(edata[, -edata_cname_id], 2, max, na.rm = TRUE))
+    max = as.data.frame(check.names = FALSE, apply(edata[, -edata_cname_id], 2, max, na.rm = TRUE))
     max = cbind(names(edata[, -edata_cname_id]), max)
     names(max) <- c("sample", "max")
     rownames(max) <- NULL
@@ -164,21 +164,21 @@ edata_summary <- function(omicsData, by = 'sample', groupvar = NULL) {
             }
           }
         )
-        avg = data.frame(
+        avg = data.frame(check.names = FALSE, 
           molecule = edata[, edata_cname_id],
           mean = avg,
           stringsAsFactors = F
         )
         names(avg)[1] <- edata_cname
         sd = apply(edata[, -edata_cname_id], 1, sd, na.rm = TRUE)
-        sd = data.frame(
+        sd = data.frame(check.names = FALSE, 
           molecule = edata[, edata_cname_id],
           sd = sd,
           stringsAsFactors = F
         )
         names(sd)[1] <- edata_cname
         mds = apply(edata[, -edata_cname_id], 1, median, na.rm = TRUE)
-        mds = data.frame(
+        mds = data.frame(check.names = FALSE, 
           molecule = edata[, edata_cname_id],
           median = mds,
           stringsAsFactors = F
@@ -190,21 +190,21 @@ edata_summary <- function(omicsData, by = 'sample', groupvar = NULL) {
             sum(!is.na(x)) / length(x)
           }
         )
-        pct_obs = data.frame(
+        pct_obs = data.frame(check.names = FALSE, 
           molecule = edata[, edata_cname_id],
           pct_obs = pct_obs,
           stringsAsFactors = F
         )
         names(pct_obs)[1] <- edata_cname
         min = apply(edata[, -edata_cname_id], 1, min, na.rm = TRUE)
-        min = data.frame(
+        min = data.frame(check.names = FALSE, 
           molecule = edata[, edata_cname_id],
           min = min,
           stringsAsFactors = F
         )
         names(min)[1] <- edata_cname
         max = apply(edata[, -edata_cname_id], 1, max, na.rm = TRUE)
-        max = data.frame(
+        max = data.frame(check.names = FALSE, 
           molecule = edata[, edata_cname_id],
           max = max,
           stringsAsFactors = F
@@ -233,7 +233,7 @@ edata_summary <- function(omicsData, by = 'sample', groupvar = NULL) {
 
         # check that there are atleast 2 samples in each group and remove groups
         # that have less than two samples per group
-        n_per_grp = as.data.frame(groupDF %>%
+        n_per_grp = as.data.frame(check.names = FALSE, groupDF %>%
           dplyr::group_by(Group) %>%
           dplyr::summarise(count = dplyr::n()))
         remove_group = as.character(
@@ -311,7 +311,7 @@ edata_summary <- function(omicsData, by = 'sample', groupvar = NULL) {
 
       # check that there are atleast 2 samples in each group and remove groups
       # that have less than two samples per group
-      n_per_grp = as.data.frame(temp_fdata %>%
+      n_per_grp = as.data.frame(check.names = FALSE, temp_fdata %>%
         dplyr::group_by(Group) %>%
         dplyr::summarise(count = dplyr::n()))
       remove_group = as.character(n_per_grp[which(n_per_grp$count < 2), "Group"])
@@ -398,12 +398,12 @@ edata_summary <- function(omicsData, by = 'sample', groupvar = NULL) {
 
       # create output formatted with first column being fdata_cname and second
       # column group id #
-      output = data.frame(Sample.ID = fdata[, fdata_cname], Group = Group)
+      output = data.frame(check.names = FALSE, Sample.ID = fdata[, fdata_cname], Group = Group)
       names(output)[1] = fdata_cname
 
       # check that there are atleast 2 samples in each group and remove groups
       # that have less than two samples per group
-      n_per_grp = as.data.frame(output %>%
+      n_per_grp = as.data.frame(check.names = FALSE, output %>%
         dplyr::group_by(Group) %>%
         dplyr::summarise(count = dplyr::n()))
       remove_group = as.character(n_per_grp[which(n_per_grp$count < 2), "Group"])

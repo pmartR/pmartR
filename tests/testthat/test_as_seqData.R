@@ -132,7 +132,7 @@ test_that('as.seqData returns the correct data frame and attributes', {
   # Check for an error when e_data has more columns than f_data has rows.
   expect_error(
     as.seqData(
-      e_data = data.frame(edata,
+      e_data = data.frame(check.names = FALSE, edata,
         Mock4 = edata[, 10]
       ),
       f_data = fdata,
@@ -146,7 +146,7 @@ test_that('as.seqData returns the correct data frame and attributes', {
   fdata
 
   # Create an f_data object with an extra row.
-  fdata_1 <- rbind(fdata, data.frame(
+  fdata_1 <- rbind(fdata, data.frame(check.names = FALSE, 
     Samples = 'uterus_PBS_R5',
     Tissue = 'uterus',
     Treatment = 'PBS',
@@ -281,7 +281,7 @@ test_that('as.seqData returns the correct data frame and attributes', {
   expect_error(
     as.seqData(
       e_data = edata,
-      f_data = data.frame(fdata,
+      f_data = data.frame(check.names = FALSE, fdata,
         tReps = fdata[, 1]
       ),
       edata_cname = 'ID_REF',
@@ -461,7 +461,7 @@ test_that('as.seqData returns the correct data frame and attributes', {
     fdata_cname = 'Samples'
   ), "e_meta must be of class 'data.frame'")
 
-  emeta <- data.frame(edata[1], class = 1:nrow(edata))
+  emeta <- data.frame(check.names = FALSE, edata[1], class = 1:nrow(edata))
 
   ## Supports Data table conversion also
   seqdata <- as.seqData(

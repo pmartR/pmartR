@@ -98,7 +98,7 @@ test_that('the omicsData summaries are all square', {
 
   expect_identical(
     summary(pdata),
-    data.frame(
+    data.frame(check.names = FALSE, 
       temp = c("pepData", "12", "150", "83", "341", "0.189"),
       row.names = c(
         "Class", "Unique SampleIDs (f_data)",
@@ -111,7 +111,7 @@ test_that('the omicsData summaries are all square', {
 
   expect_identical(
     summary(pdata_gdf),
-    data.frame(
+    data.frame(check.names = FALSE, 
       temp = c("pepData", "12", "150", "83", "341", "0.189", "9", "3"),
       row.names = c(
         "Class", "Unique SampleIDs (f_data)",
@@ -125,7 +125,7 @@ test_that('the omicsData summaries are all square', {
 
   expect_identical(
     summary(pdata_2_2_4),
-    data.frame(
+    data.frame(check.names = FALSE, 
       temp = c(
         "pepData", "12", "150", "NA", "341", "0.189",
         "3", "3", "3", "3", "Gender, Age"
@@ -146,7 +146,7 @@ test_that('the omicsData summaries are all square', {
 
   expect_identical(
     summary(pairdata),
-    data.frame(
+    data.frame(check.names = FALSE, 
       temp = c("pepData", "30", "150", "16", "1184", "0.263", "30", "15"),
       row.names = c(
         "Class", "Unique Names (f_data)",

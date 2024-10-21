@@ -9,7 +9,7 @@ test_that('edata_summary correctly summarizes the data', {
   ))
 
   # Generate a second main effect.
-  fdata2 <- data.frame(fdata,
+  fdata2 <- data.frame(check.names = FALSE, fdata,
     Intensity = c(
       'low', 'low', 'high', 'low', 'high',
       'high', 'high', 'high', 'low', 'none',
@@ -36,14 +36,14 @@ test_that('edata_summary correctly summarizes the data', {
 
   # Make the summary data frame standard for the summary by sample.
   stan_samp <- list(
-    mean = data.frame(
+    mean = data.frame(check.names = FALSE, 
       sample = samp_char,
       mean = colMeans(pdata$e_data[, -1],
         na.rm = TRUE
       ),
       row.names = 1:12
     ),
-    sd = data.frame(
+    sd = data.frame(check.names = FALSE, 
       sample = samp_char,
       sd = apply(pdata$e_data[, -1], 2,
         sd,
@@ -51,7 +51,7 @@ test_that('edata_summary correctly summarizes the data', {
       ),
       row.names = 1:12
     ),
-    median = data.frame(
+    median = data.frame(check.names = FALSE, 
       sample = samp_char,
       median = apply(pdata$e_data[, -1], 2,
         median,
@@ -59,7 +59,7 @@ test_that('edata_summary correctly summarizes the data', {
       ),
       row.names = 1:12
     ),
-    pct_obs = data.frame(
+    pct_obs = data.frame(check.names = FALSE, 
       sample = samp_char,
       pct_obs = apply(
         pdata$e_data[, -1], 2,
@@ -69,7 +69,7 @@ test_that('edata_summary correctly summarizes the data', {
       ),
       row.names = 1:12
     ),
-    min = data.frame(
+    min = data.frame(check.names = FALSE, 
       sample = samp_char,
       min = apply(pdata$e_data[, -1], 2,
         min,
@@ -77,7 +77,7 @@ test_that('edata_summary correctly summarizes the data', {
       ),
       row.names = 1:12
     ),
-    max = data.frame(
+    max = data.frame(check.names = FALSE, 
       sample = samp_char,
       max = apply(pdata$e_data[, -1], 2,
         max,
@@ -101,27 +101,27 @@ test_that('edata_summary correctly summarizes the data', {
   # Make the summary data frame standard for the summary by molecule no main
   # effects.
   stan_mole <- list(
-    mean = data.frame(
+    mean = data.frame(check.names = FALSE, 
       Mass_Tag_ID = pdata$e_data$Mass_Tag_ID,
       mean = rowMeans(pdata$e_data[, -1],
         na.rm = TRUE
       )
     ),
-    sd = data.frame(
+    sd = data.frame(check.names = FALSE, 
       Mass_Tag_ID = pdata$e_data$Mass_Tag_ID,
       sd = apply(pdata$e_data[, -1], 1,
         sd,
         na.rm = TRUE
       )
     ),
-    median = data.frame(
+    median = data.frame(check.names = FALSE, 
       Mass_Tag_ID = pdata$e_data$Mass_Tag_ID,
       median = apply(pdata$e_data[, -1], 1,
         median,
         na.rm = TRUE
       )
     ),
-    pct_obs = data.frame(
+    pct_obs = data.frame(check.names = FALSE, 
       Mass_Tag_ID = pdata$e_data$Mass_Tag_ID,
       pct_obs = apply(
         pdata$e_data[, -1], 1,
@@ -130,14 +130,14 @@ test_that('edata_summary correctly summarizes the data', {
         }
       )
     ),
-    min = data.frame(
+    min = data.frame(check.names = FALSE, 
       Mass_Tag_ID = pdata$e_data$Mass_Tag_ID,
       min = apply(pdata$e_data[, -1], 1,
         min,
         na.rm = TRUE
       )
     ),
-    max = data.frame(
+    max = data.frame(check.names = FALSE, 
       Mass_Tag_ID = pdata$e_data$Mass_Tag_ID,
       max = apply(pdata$e_data[, -1], 1,
         max,
@@ -160,14 +160,14 @@ test_that('edata_summary correctly summarizes the data', {
   # Make the summary data frame standard for the summary by molecule one main
   # effect.
   stan_mole_1 <- list(
-    n_per_grp = data.frame(
+    n_per_grp = data.frame(check.names = FALSE, 
       Group = factor(
         x = c("Infection", "Mock"),
         levels = c("Infection", "Mock")
       ),
       count = as.integer(c(9, 3))
     ),
-    mean = data.frame(
+    mean = data.frame(check.names = FALSE, 
       Mass_Tag_ID = pdata$e_data$Mass_Tag_ID,
       Infection = rowMeans(pdata$e_data[, 2:10],
         na.rm = TRUE
@@ -177,7 +177,7 @@ test_that('edata_summary correctly summarizes the data', {
       ),
       row.names = 1:150
     ),
-    sd = data.frame(
+    sd = data.frame(check.names = FALSE, 
       Mass_Tag_ID = pdata$e_data$Mass_Tag_ID,
       Infection = apply(pdata$e_data[, 2:10], 1,
         sd,
@@ -189,7 +189,7 @@ test_that('edata_summary correctly summarizes the data', {
       ),
       row.names = 1:150
     ),
-    median = data.frame(
+    median = data.frame(check.names = FALSE, 
       Mass_Tag_ID = pdata$e_data$Mass_Tag_ID,
       Infection = apply(pdata$e_data[, 2:10], 1,
         median,
@@ -201,7 +201,7 @@ test_that('edata_summary correctly summarizes the data', {
       ),
       row.names = 1:150
     ),
-    pct_obs = data.frame(
+    pct_obs = data.frame(check.names = FALSE, 
       Mass_Tag_ID = pdata$e_data$Mass_Tag_ID,
       Infection = apply(
         pdata$e_data[, 2:10], 1,
@@ -217,7 +217,7 @@ test_that('edata_summary correctly summarizes the data', {
       ),
       row.names = 1:150
     ),
-    min = data.frame(
+    min = data.frame(check.names = FALSE, 
       Mass_Tag_ID = pdata$e_data$Mass_Tag_ID,
       Infection = apply(
         pdata$e_data[, 2:10], 1,
@@ -241,7 +241,7 @@ test_that('edata_summary correctly summarizes the data', {
       ),
       row.names = 1:150
     ),
-    max = data.frame(
+    max = data.frame(check.names = FALSE, 
       Mass_Tag_ID = pdata$e_data$Mass_Tag_ID,
       Infection = apply(
         pdata$e_data[, 2:10], 1,
@@ -287,7 +287,7 @@ test_that('edata_summary correctly summarizes the data', {
   # Make the summary data frame standard for the summary by molecule two main
   # effects.
   stan_mole_2 <- list(
-    n_per_grp = data.frame(
+    n_per_grp = data.frame(check.names = FALSE, 
       Group = c(
         "Infection_low",
         "Infection_high",
@@ -296,7 +296,7 @@ test_that('edata_summary correctly summarizes the data', {
       count = as.integer(c(4, 5, 3)),
       row.names = c(2, 1, 3)
     ),
-    mean = data.frame(
+    mean = data.frame(check.names = FALSE, 
       Mass_Tag_ID = pdata$e_data$Mass_Tag_ID,
       Infection_high = rowMeans(pdata$e_data[, c(4, 6:9)],
         na.rm = TRUE
@@ -309,7 +309,7 @@ test_that('edata_summary correctly summarizes the data', {
       ),
       row.names = 1:150
     ),
-    sd = data.frame(
+    sd = data.frame(check.names = FALSE, 
       Mass_Tag_ID = pdata$e_data$Mass_Tag_ID,
       Infection_high = apply(pdata$e_data[, c(4, 6:9)], 1,
         sd,
@@ -325,7 +325,7 @@ test_that('edata_summary correctly summarizes the data', {
       ),
       row.names = 1:150
     ),
-    median = data.frame(
+    median = data.frame(check.names = FALSE, 
       Mass_Tag_ID = pdata$e_data$Mass_Tag_ID,
       Infection_high = apply(pdata$e_data[, c(4, 6:9)], 1,
         median,
@@ -341,7 +341,7 @@ test_that('edata_summary correctly summarizes the data', {
       ),
       row.names = 1:150
     ),
-    pct_obs = data.frame(
+    pct_obs = data.frame(check.names = FALSE, 
       Mass_Tag_ID = pdata$e_data$Mass_Tag_ID,
       Infection_high = apply(
         pdata$e_data[, c(4, 6:9)], 1,
@@ -364,7 +364,7 @@ test_that('edata_summary correctly summarizes the data', {
       ),
       row.names = 1:150
     ),
-    min = data.frame(
+    min = data.frame(check.names = FALSE, 
       Mass_Tag_ID = pdata$e_data$Mass_Tag_ID,
       Infection_high = apply(
         pdata$e_data[, c(4, 6:9)], 1,
@@ -398,7 +398,7 @@ test_that('edata_summary correctly summarizes the data', {
       ),
       row.names = 1:150
     ),
-    max = data.frame(
+    max = data.frame(check.names = FALSE, 
       Mass_Tag_ID = pdata$e_data$Mass_Tag_ID,
       Infection_high = apply(
         pdata$e_data[, c(4, 6:9)], 1,
