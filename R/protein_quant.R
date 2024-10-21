@@ -666,7 +666,6 @@ rrollup <- function(pepData, combine_fn, parallel = TRUE) {
   # Combine the protein abundances (or is it abundanci?).
   final_result <- data.frame(check.names = FALSE, unique_proteins,
     data.table::rbindlist(r),
-    check.names = FALSE
   )
   names(final_result)[1] <- pro_id
 
@@ -817,15 +816,13 @@ qrollup <- function(pepData, qrollup_thresh, combine_fn, parallel = TRUE) {
   final_result <- data.frame(check.names = FALSE, unique_proteins,
     data.table::rbindlist(
       lapply(r, function(x) x[[1]])
-    ),
-    check.names = FALSE
+    )
   )
   names(final_result)[1] <- pro_id
 
   # Combine the peptide counts with their corresponding proteins.
   temp_pepes <- data.frame(check.names = FALSE, final_result[, 1],
     n_peps_used = sapply(r, function(x) x[[2]]),
-    check.names = FALSE
   )
   names(temp_pepes)[1] <- pro_id
 
@@ -976,7 +973,6 @@ zrollup <- function(pepData, combine_fn, parallel = TRUE) {
   # Combine the protein abundances (or is it abundanci?).
   final_result <- data.frame(check.names = FALSE, unique_proteins,
     data.table::rbindlist(r),
-    check.names = FALSE
   )
   names(final_result)[1] <- pro_id
 
