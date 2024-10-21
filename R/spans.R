@@ -466,8 +466,7 @@ spans_procedure <- function(omicsData,
     "parameters" = character(n_methods),
     "mols_used_in_norm" = numeric(n_methods),
     "passed_selection" = logical(n_methods),
-    stringsAsFactors = FALSE,
-    check.names = FALSE
+    stringsAsFactors = FALSE
   )
 
   extra_info <- data.frame(
@@ -479,8 +478,7 @@ spans_procedure <- function(omicsData,
     "F_log_HSmPV" = numeric(n_methods),
     "F_log_NSmPV" = numeric(n_methods),
     "SPANS_score" = numeric(n_methods),
-    stringsAsFactors = FALSE,
-    check.names = FALSE
+    stringsAsFactors = FALSE
   )
 
   # populate the dataframe from which_spans
