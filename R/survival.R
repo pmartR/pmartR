@@ -65,7 +65,7 @@ fit_surv <- function(omicsData) {
   ind_progress <- attr(omicsData, "survDF")$ind_progress
   covariates <- attr(omicsData, "survDF")$covariates
 
-  surv_df <- data.frame(time = omicsData$f_data[, t_death], status = 0)
+  surv_df <- data.frame(check.names = FALSE, time = omicsData$f_data[, t_death], status = 0)
   surv_df$status[grep("dead", omicsData$f_data[, ind_death], ignore.case = TRUE)] <- 1
 
 

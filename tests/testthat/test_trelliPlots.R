@@ -59,7 +59,7 @@ test_that("trelliPlots check the correct inputs", {
 
   mtrelliData5 <- as.trelliData(omicsData = metabData, statRes = metabStat_gtest)
   
-  ds_test <- data.frame(
+  ds_test <- data.frame(check.names = FALSE, 
     p_value_anova = 0.7,
     fold_change = NaN
   )
@@ -72,7 +72,7 @@ test_that("trelliPlots check the correct inputs", {
                    package = 'pmartR'
   ))
   
-  emeta <- data.frame("ID_REF" = edata$ID_REF, "Classification" = paste("Class", rep(1:200, 6)))
+  emeta <- data.frame(check.names = FALSE, "ID_REF" = edata$ID_REF, "Classification" = paste("Class", rep(1:200, 6)))
   seqData_omics <- as.seqData(e_data = edata, f_data = fdata, edata_cname = "ID_REF", fdata_cname = "Samples", e_meta = emeta, emeta_cname = "Classification")
   seqData_omics <- group_designation(seqData_omics, main_effects = "Tissue")
   seqData_omics <- applyFilt(filter_object = total_count_filter(omicsData = seqData_omics), omicsData = seqData_omics, min_count = 15)

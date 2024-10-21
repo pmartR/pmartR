@@ -22,7 +22,7 @@ edata <- lipid_edata
 fdata <- lipid_fdata
 
 # Construct an emeta data frame from edata.
-emeta <- data.frame(LipidCommonName = edata[, 1],
+emeta <- data.frame(check.names = FALSE, LipidCommonName = edata[, 1],
                     LipidClass = sub("\\(.*", "", edata[, 1]))
 # The sub function extracts all characters before the first (.
 

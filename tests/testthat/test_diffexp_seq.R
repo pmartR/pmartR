@@ -108,12 +108,12 @@ test_that('diffexp_seq returns the correct data frame and attributes', {
   )
   
   # Custom comparisons ---------------
-  comparisons <- data.frame(
+  comparisons <- data.frame(check.names = FALSE, 
     Test = "uterus_hCG",
     Control = "uterus_PBS"
   )
   
-  bad_comparisons <- data.frame(
+  bad_comparisons <- data.frame(check.names = FALSE, 
     Test = "uterus_hC",
     Control = "uterus_PBS"
   )

@@ -106,7 +106,7 @@ bpquant <- function(statRes, pepData, pi_not = .9,
   # merging e_meta with signatures from statRes
   protein_sig_data <- merge(e_meta, signatures, by = edata_cname, all.x = TRUE)
 
-  protein_sig_data <- as.data.frame(protein_sig_data)
+  protein_sig_data <- as.data.frame(check.names = FALSE, protein_sig_data)
 
   # removing any signatures with NA's
   protein_sig_data <- na.omit(protein_sig_data)
@@ -141,7 +141,7 @@ bpquant <- function(statRes, pepData, pi_not = .9,
 
     peptide_id <- result$peptide_idx
 
-    temp <- data.frame(
+    temp <- data.frame(check.names = FALSE, 
       Protein = as.character(cur_protein[, emeta_cname]),
       Mass_Tag_ID = as.character(cur_protein[, edata_cname]),
       proteoformID = peptide_id,
@@ -168,7 +168,7 @@ bpquant <- function(statRes, pepData, pi_not = .9,
     emeta_cname = emeta_cname,
     edata_cname = edata_cname
   )
-  isoformRes2 <- data.frame(data.table::rbindlist(isoformRes2))
+  isoformRes2 <- data.frame(check.names = FALSE, data.table::rbindlist(isoformRes2))
 
   attr(isoformRes, "isoformRes_subset") <- isoformRes2
 
@@ -235,7 +235,7 @@ bpquant_mod <- function(protein_sig, pi_not, max_proteoforms) {
   ## order signatures by count##
   cnt.ord = counts[order(counts, decreasing = TRUE)]
   if (nrow(sigs) > 1) {
-    sig.ord = as.data.frame(sigs[order(counts, decreasing = TRUE), ])
+    sig.ord = as.data.frame(check.names = FALSE, sigs[order(counts, decreasing = TRUE), ])
   } else {
     sig.ord = sigs
   }
@@ -378,7 +378,7 @@ isoformRes_func <- function(df, emeta_cname, edata_cname) {
 
     # append proteoform number if there's more than one #
     if (max(df$proteoformID) > 1) {
-      new_df <- data.frame(
+      new_df <- data.frame(check.names = FALSE, 
         cur_subset[[emeta_cname]],
         paste(cur_subset[[emeta_cname]],
           cur_subset$proteoformID,
@@ -387,7 +387,7 @@ isoformRes_func <- function(df, emeta_cname, edata_cname) {
         cur_subset[[edata_cname]]
       )
     } else {
-      new_df = data.frame(
+      new_df = data.frame(check.names = FALSE, 
         cur_subset[[emeta_cname]],
         cur_subset[[emeta_cname]],
         cur_subset[[edata_cname]]
@@ -397,5 +397,5 @@ isoformRes_func <- function(df, emeta_cname, edata_cname) {
     temp[[i]] <- new_df
   }
 
-  data.frame(data.table::rbindlist(temp))
+  data.frame(check.names = FALSE, data.table::rbindlist(temp))
 }

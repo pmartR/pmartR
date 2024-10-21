@@ -158,7 +158,7 @@ test_that('SPANS correctly spans the data', {
   # Original data ---------------
 
   # Forge a data frame standard for the SPANSRes object.
-  spandard <- data.frame(
+  spandard <- data.frame(check.names = FALSE, 
     subset_method = c(
       "rip", "ppp_rip", "rip", "ppp_rip", "rip", "ppp_rip",
       "rip", "all", "ppp_rip", "all", "all", "all", "los",
@@ -197,7 +197,7 @@ test_that('SPANS correctly spans the data', {
     ),
     row.names = 1:20,
     class = c("SPANSRes", "data.frame"),
-    method_selection_pvals = data.frame(
+    method_selection_pvals = data.frame(check.names = FALSE, 
       subset_method = spandard$subset_method,
       normalization_method = spandard$normaliztion_method,
       parameters = spandard$parameters,
@@ -241,7 +241,7 @@ test_that('SPANS correctly spans the data', {
   # Scrambled data ---------------
 
   # Forge a data frame standard for the scrambled SPANSRes object.
-  spandard_eggs <- data.frame(
+  spandard_eggs <- data.frame(check.names = FALSE, 
     subset_method = spandard$subset_method,
     normaliztion_method = spandard$normalization_method,
     SPANS_score = c(
@@ -261,7 +261,7 @@ test_that('SPANS correctly spans the data', {
     ),
     row.names = 1:20,
     class = c("SPANSRes", "data.frame"),
-    method_selection_pvals = data.frame(
+    method_selection_pvals = data.frame(check.names = FALSE, 
       subset_method = spandard_eggs$subset_method,
       normalization_method = spandard_eggs$normaliztion_method,
       parameters = spandard_eggs$parameters,

@@ -198,8 +198,8 @@ test_that('as.nmrData returns the correct data frame and attributes', {
   # Check for an error when e_data has more columns than f_data has rows.
   expect_error(
     as.nmrData(
-      e_data = data.frame(edata,
-        `F5-007` = edata[, 10], check.names = FALSE
+      e_data = data.frame(check.names = FALSE, edata,
+        `F5-007` = edata[, 10]
       ),
       f_data = fdata,
       edata_cname = 'Metabolite',
@@ -421,7 +421,7 @@ test_that('as.nmrData returns the correct data frame and attributes', {
   expect_error(
     as.nmrData(
       e_data = edata,
-      f_data = data.frame(fdata,
+      f_data = data.frame(check.names = FALSE, fdata,
         tReps = fdata[, 1]
       ),
       edata_cname = 'Metabolite',

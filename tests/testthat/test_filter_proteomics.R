@@ -47,25 +47,25 @@ test_that('proteomics_filter and applyFilt produce the correct output', {
   pepCount <- pdata$e_meta %>%
     dplyr::group_by(Mass_Tag_ID) %>%
     dplyr::tally() %>%
-    data.frame()
+    data.frame(check.names = FALSE)
 
   # Count the number of peptides associated with each protein.
   proCount <- pdata$e_meta %>%
     dplyr::group_by(Protein) %>%
     dplyr::tally() %>%
-    data.frame()
+    data.frame(check.names = FALSE)
 
   # Count the number of peptides in the ignoble e_meta data frame.
   pepCountS <- sordata$e_meta %>%
     dplyr::group_by(Mass_Tag_ID) %>%
     dplyr::tally() %>%
-    data.frame()
+    data.frame(check.names = FALSE)
 
   # Count the number of peptides associated with each protein.
   proCountS <- sordata$e_meta %>%
     dplyr::group_by(Protein) %>%
     dplyr::tally() %>%
-    data.frame()
+    data.frame(check.names = FALSE)
 
   # Non-degenerate peptides ---------------
 
@@ -193,7 +193,7 @@ test_that('proteomics_filter and applyFilt produce the correct output', {
   )
   expect_identical(
     attr(filtered, 'filters')[[1]]$threshold,
-    data.frame(
+    data.frame(check.names = FALSE, 
       min_num_peps = 2,
       redundancy = as.character(FALSE)
     )
@@ -275,7 +275,7 @@ test_that('proteomics_filter and applyFilt produce the correct output', {
   )
   expect_identical(
     attr(sorfiltered, 'filters')[[1]]$threshold,
-    data.frame(
+    data.frame(check.names = FALSE, 
       min_num_peps = 2,
       redundancy = "TRUE"
     )
@@ -354,7 +354,7 @@ test_that('proteomics_filter and applyFilt produce the correct output', {
   )
   expect_identical(
     attr(sorfiltered2, 'filters')[[1]]$threshold,
-    data.frame(
+    data.frame(check.names = FALSE, 
       min_num_peps = NA,
       redundancy = "TRUE"
     )
@@ -433,7 +433,7 @@ test_that('proteomics_filter and applyFilt produce the correct output', {
   )
   expect_identical(
     attr(sorfiltered3, 'filters')[[1]]$threshold,
-    data.frame(
+    data.frame(check.names = FALSE, 
       min_num_peps = 2,
       redundancy = "FALSE"
     )

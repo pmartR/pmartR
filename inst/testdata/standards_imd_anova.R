@@ -314,19 +314,19 @@ which_X_2_2_4_g <- structure(c(0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
 # main effects: 1; covariates: 0; groups: 2 ---------------
 
-mean_a_1_0_2 <- data.frame(
+mean_a_1_0_2 <- data.frame(check.names = FALSE, 
   Mean_Infection = rowMeans(afilta_1_0_2$e_data[, 2:10],
                             na.rm = TRUE),
   Mean_Mock = rowMeans(afilta_1_0_2$e_data[, 11:13],
                        na.rm = TRUE)
 )
 
-pval_a_1_0_2 <- data.frame(
+pval_a_1_0_2 <- data.frame(check.names = FALSE, 
   Infection_vs_Mock = a(data = afilta_1_0_2$e_data[, -1],
                         groups = attr(afilta_1_0_2, "group_DF")$Group)
 )
 
-flag_a_1_0_2 <- data.frame(
+flag_a_1_0_2 <- data.frame(check.names = FALSE, 
   Infection_vs_Mock = aflag(
     grp1 = mean_a_1_0_2$Mean_Infection,
     grp2 = mean_a_1_0_2$Mean_Mock,
@@ -335,7 +335,7 @@ flag_a_1_0_2 <- data.frame(
   )
 )
 
-astan_1_0_2 <- data.frame(
+astan_1_0_2 <- data.frame(check.names = FALSE, 
   Mass_Tag_ID = afilta_1_0_2$e_data$Mass_Tag_ID,
   Count_Infection = unname(rowSums(!is.na(afilta_1_0_2$e_data[, 2:10]))),
   Count_Mock = unname(rowSums(!is.na(afilta_1_0_2$e_data[, 11:13]))),
@@ -352,7 +352,7 @@ class(astan_1_0_2) <- c("statRes", "data.frame")
 
 attr(astan_1_0_2, "group_DF") <- groupDF_1_0_2
 attr(astan_1_0_2, "comparisons") <- c("Infection_vs_Mock")
-attr(astan_1_0_2, "number_significant") <- data.frame(
+attr(astan_1_0_2, "number_significant") <- data.frame(check.names = FALSE, 
   Comparison = c("Infection_vs_Mock"),
   Up_total = c(length(which(flag_a_1_0_2[, 1] == 1))),
   Down_total = c(length(which(flag_a_1_0_2[, 1] == -1))),
@@ -380,7 +380,7 @@ attr(astan_1_0_2, "data_info") <- list(
   data_types = NULL
 )
 attr(astan_1_0_2, "which_X") <- rep(0, nrow(astan_1_0_2))
-attr(astan_1_0_2, "bpFlags") <- data.frame(
+attr(astan_1_0_2, "bpFlags") <- data.frame(check.names = FALSE, 
   Mass_Tag_ID = afilta_1_0_2$e_data$Mass_Tag_ID,
   flag_a_1_0_2
 )
@@ -414,7 +414,7 @@ cmat = cmat %*% beta_to_mu
 
 test_values <- get_test_values(afilta_1_1_3$e_data[, -1], Xmatrix_1_1_3, cmat)
 
-group_counts_1_1_3 <- data.frame(
+group_counts_1_1_3 <- data.frame(check.names = FALSE, 
   nona_mutant = rowSums(!is.na(data_1_1_3[, c(1, 3:4, 9)])),
   nona_zombie = rowSums(!is.na(data_1_1_3[, c(2, 5:8)])),
   nona_human = rowSums(!is.na(data_1_1_3[, 10:12]))
@@ -475,7 +475,7 @@ pval_a_1_1_3 <- test_stat_1_1_3 %>%
                 P_value_A_zombie_vs_human) %>%
   `row.names<-`(NULL)
 
-flag_a_1_1_3 <- data.frame(
+flag_a_1_1_3 <- data.frame(check.names = FALSE, 
   mutant_vs_zombie = aflag(
     grp1 = mean_a_1_1_3$Mean_mutant,
     grp2 = mean_a_1_1_3$Mean_zombie,
@@ -496,7 +496,7 @@ flag_a_1_1_3 <- data.frame(
   )
 )
 
-astan_1_1_3 <- data.frame(
+astan_1_1_3 <- data.frame(check.names = FALSE, 
   Mass_Tag_ID = afilta_1_1_3$e_data$Mass_Tag_ID,
   Count_mutant = group_counts_1_1_3$nona_mutant,
   Count_zombie = group_counts_1_1_3$nona_zombie,
@@ -524,7 +524,7 @@ attr(astan_1_1_3, "group_DF") <- groupDF_1_1_3
 attr(astan_1_1_3, "comparisons") <- c("mutant_vs_zombie",
                                       "mutant_vs_human",
                                       "zombie_vs_human")
-attr(astan_1_1_3, "number_significant") <- data.frame(
+attr(astan_1_1_3, "number_significant") <- data.frame(check.names = FALSE, 
   Comparison = c("mutant_vs_zombie",
                  "mutant_vs_human",
                  "zombie_vs_human"),
@@ -562,7 +562,7 @@ attr(astan_1_1_3, "data_info") <- list(
   data_types = NULL
 )
 attr(astan_1_1_3, "which_X") <- rep(0, nrow(astan_1_1_3))
-attr(astan_1_1_3, "bpFlags") <- data.frame(
+attr(astan_1_1_3, "bpFlags") <- data.frame(check.names = FALSE, 
   Mass_Tag_ID = afilta_1_1_3$e_data$Mass_Tag_ID,
   flag_a_1_1_3
 )
@@ -622,7 +622,7 @@ tukey_pval_1_1_3[just_one_1_1_3, ][not_na_1_1_3] <- data.matrix(
 )[not_na_1_1_3]
 
 # Convert back to a data frame.
-tukey_pval_1_1_3 <- data.frame(tukey_pval_1_1_3)
+tukey_pval_1_1_3 <- data.frame(check.names = FALSE, tukey_pval_1_1_3)
 
 # Set a seed because the mvtnorm::pmvt function has a random process.
 set.seed(4)
@@ -689,7 +689,7 @@ beta_to_mu = unique(beta_to_mu)
 cmat = rbind(c(1, -1, 0), c(1, 0, -1), c(0, 1, -1))
 cmat = cmat %*% beta_to_mu
 
-group_counts_1_2_3 <- data.frame(
+group_counts_1_2_3 <- data.frame(check.names = FALSE, 
   nona_mutant = rowSums(!is.na(data_1_2_3[, c(1, 3:4, 9)])),
   nona_zombie = rowSums(!is.na(data_1_2_3[, c(2, 5:8)])),
   nona_human = rowSums(!is.na(data_1_2_3[, 10:12]))
@@ -753,7 +753,7 @@ pval_a_1_2_3 <- test_stat_1_2_3 %>%
                 P_value_A_zombie_vs_human) %>%
   `row.names<-`(NULL)
 
-flag_a_1_2_3 <- data.frame(
+flag_a_1_2_3 <- data.frame(check.names = FALSE, 
   mutant_vs_zombie = aflag(
     grp1 = mean_a_1_2_3$Mean_mutant,
     grp2 = mean_a_1_2_3$Mean_zombie,
@@ -774,7 +774,7 @@ flag_a_1_2_3 <- data.frame(
   )
 )
 
-astan_1_2_3 <- data.frame(
+astan_1_2_3 <- data.frame(check.names = FALSE, 
   Mass_Tag_ID = afilta_1_2_3$e_data$Mass_Tag_ID,
   Count_mutant = group_counts_1_2_3$nona_mutant,
   Count_zombie = group_counts_1_2_3$nona_zombie,
@@ -802,7 +802,7 @@ attr(astan_1_2_3, "group_DF") <- groupDF_1_2_3
 attr(astan_1_2_3, "comparisons") <- c("mutant_vs_zombie",
                                       "mutant_vs_human",
                                       "zombie_vs_human")
-attr(astan_1_2_3, "number_significant") <- data.frame(
+attr(astan_1_2_3, "number_significant") <- data.frame(check.names = FALSE, 
   Comparison = c("mutant_vs_zombie",
                  "mutant_vs_human",
                  "zombie_vs_human"),
@@ -840,7 +840,7 @@ attr(astan_1_2_3, "data_info") <- list(
   data_types = NULL
 )
 attr(astan_1_2_3, "which_X") <- rep(0, nrow(astan_1_2_3))
-attr(astan_1_2_3, "bpFlags") <- data.frame(
+attr(astan_1_2_3, "bpFlags") <- data.frame(check.names = FALSE, 
   Mass_Tag_ID = afilta_1_2_3$e_data$Mass_Tag_ID,
   flag_a_1_2_3
 )
@@ -900,7 +900,7 @@ tukey_pval_1_2_3[just_one_1_2_3, ][not_na_1_2_3] <- data.matrix(
 )[not_na_1_2_3]
 
 # Convert back to a data frame.
-tukey_pval_1_2_3 <- data.frame(tukey_pval_1_2_3)
+tukey_pval_1_2_3 <- data.frame(check.names = FALSE, tukey_pval_1_2_3)
 
 # Set a seed because the mvtnorm::pmvt function has a random process.
 set.seed(4)
@@ -952,7 +952,7 @@ suppressWarnings(
 # main effects: 2; covariates: 0; groups: 3 ---------------
 
 # no covariates? should just be the observed means.
-mean_a_2_0_3 <- data.frame(
+mean_a_2_0_3 <- data.frame(check.names = FALSE, 
   Mean_Infection_high = rowMeans(afilta_2_0_3$e_data[, c(2:4, 7:8)],
                                  na.rm = TRUE),
   Mean_Infection_low = rowMeans(afilta_2_0_3$e_data[, c(5:6, 9:10)],
@@ -961,7 +961,7 @@ mean_a_2_0_3 <- data.frame(
                             na.rm = TRUE)
 )
 
-group_counts_2_0_3 <- data.frame(
+group_counts_2_0_3 <- data.frame(check.names = FALSE, 
   nona_iHigh = rowSums(!is.na(afilta_2_0_3$e_data[, c(2:4, 7:8)])),
   nona_iLow = rowSums(!is.na(afilta_2_0_3$e_data[, c(5:6, 9:10)])),
   nona_mNone = rowSums(!is.na(afilta_2_0_3$e_data[, 11:13]))
@@ -1023,7 +1023,7 @@ pval_a_2_0_3 <- test_stat_2_0_3 %>%
                 P_value_A_Infection_high_vs_Mock_none,
                 P_value_A_Infection_low_vs_Mock_none)
 
-flag_a_2_0_3 <- data.frame(
+flag_a_2_0_3 <- data.frame(check.names = FALSE, 
   Infection_high_vs_Infection_low = aflag(
     grp1 = mean_a_2_0_3$Mean_Infection_high,
     grp2 = mean_a_2_0_3$Mean_Infection_low,
@@ -1044,7 +1044,7 @@ flag_a_2_0_3 <- data.frame(
   )
 )
 
-astan_2_0_3 <- data.frame(
+astan_2_0_3 <- data.frame(check.names = FALSE, 
   Mass_Tag_ID = afilta_2_0_3$e_data$Mass_Tag_ID,
   Count_Infection_high = unname(
     rowSums(!is.na(afilta_2_0_3$e_data[, c(2:4, 7:8)]))
@@ -1076,7 +1076,7 @@ attr(astan_2_0_3, "group_DF") <- groupDF_2_0_3
 attr(astan_2_0_3, "comparisons") <- c("Infection_high_vs_Infection_low",
                                       "Infection_high_vs_Mock_none",
                                       "Infection_low_vs_Mock_none")
-attr(astan_2_0_3, "number_significant") <- data.frame(
+attr(astan_2_0_3, "number_significant") <- data.frame(check.names = FALSE, 
   Comparison = c("Infection_high_vs_Infection_low",
                  "Infection_high_vs_Mock_none",
                  "Infection_low_vs_Mock_none"),
@@ -1114,7 +1114,7 @@ attr(astan_2_0_3, "data_info") <- list(
   data_types = NULL
 )
 attr(astan_2_0_3, "which_X") <- rep(0, nrow(astan_2_0_3))
-attr(astan_2_0_3, "bpFlags") <- data.frame(
+attr(astan_2_0_3, "bpFlags") <- data.frame(check.names = FALSE, 
   Mass_Tag_ID = afilta_2_0_3$e_data$Mass_Tag_ID,
   flag_a_2_0_3
 )
@@ -1174,7 +1174,7 @@ tukey_pval_2_0_3[just_one_2_0_3, ][not_na_2_0_3] <- data.matrix(
 )[not_na_2_0_3]
 
 # Convert back to a data frame.
-tukey_pval_2_0_3 <- data.frame(tukey_pval_2_0_3)
+tukey_pval_2_0_3 <- data.frame(check.names = FALSE, tukey_pval_2_0_3)
 
 # Set a seed because the mvtnorm::pmvt function has a random process.
 set.seed(5)
@@ -1245,7 +1245,7 @@ cobra <- run_twofactor_cpp(
   continuous_covar_inds = numeric(0)
 )
 
-group_counts_2_1_4 <- data.frame(
+group_counts_2_1_4 <- data.frame(check.names = FALSE, 
   nona_Infection_high = rowSums(!is.na(data_2_1_4[, c(1, 3, 5)])),
   nona_Infection_low = rowSums(!is.na(data_2_1_4[, c(2, 4, 6)])),
   nona_Mock_high = rowSums(!is.na(data_2_1_4[, c(7, 8, 12)])),
@@ -1256,7 +1256,7 @@ group_counts_2_1_4 <- data.frame(
 nona_grps_2_1_4 <- unname(rowSums(group_counts_2_1_4 != 0))
 nona_counts_2_1_4 <- unname(rowSums(!is.na(data_2_1_4)))
 
-mean_a_2_1_4 <- data.frame(cobra$lsmeans) 
+mean_a_2_1_4 <- data.frame(check.names = FALSE, cobra$lsmeans) 
 colnames(mean_a_2_1_4) <- paste0("Mean_", unique(groupData$Group))
 
 diffs_2_1_4 <- mean_a_2_1_4 %>%
@@ -1348,7 +1348,7 @@ pval_a_2_1_4 <- test_stat_2_1_4 %>%
                 P_value_A_Mock_high_vs_Mock_low) %>%
   `row.names<-`(NULL)
 
-flag_a_2_1_4 <- data.frame(
+flag_a_2_1_4 <- data.frame(check.names = FALSE, 
   Infection_high_vs_Infection_low = aflag(
     grp1 = mean_a_2_1_4[,1],
     grp2 = mean_a_2_1_4[,2],
@@ -1387,7 +1387,7 @@ flag_a_2_1_4 <- data.frame(
   )
 )
 
-astan_2_1_4 <- data.frame(
+astan_2_1_4 <- data.frame(check.names = FALSE, 
   Mass_Tag_ID = afilta_2_1_4$e_data$Mass_Tag_ID,
   Count_Infection_high = group_counts_2_1_4$nona_Infection_high,
   Count_Infection_low = group_counts_2_1_4$nona_Infection_low,
@@ -1419,7 +1419,7 @@ attr(astan_2_1_4, "comparisons") <- c("Infection_high_vs_Infection_low",
                                       "Infection_low_vs_Mock_high",
                                       "Infection_low_vs_Mock_low",
                                       "Mock_high_vs_Mock_low")
-attr(astan_2_1_4, "number_significant") <- data.frame(
+attr(astan_2_1_4, "number_significant") <- data.frame(check.names = FALSE, 
   Comparison = c("Infection_high_vs_Infection_low",
                  "Infection_high_vs_Mock_high",
                  "Infection_high_vs_Mock_low",
@@ -1472,7 +1472,7 @@ attr(astan_2_1_4, "data_info") <- list(
   data_types = NULL
 )
 attr(astan_2_1_4, "which_X") <- which_X_2_1_4_a
-attr(astan_2_1_4, "bpFlags") <- data.frame(
+attr(astan_2_1_4, "bpFlags") <- data.frame(check.names = FALSE, 
   Mass_Tag_ID = afilta_2_1_4$e_data$Mass_Tag_ID,
   flag_a_2_1_4
 )
@@ -1556,7 +1556,7 @@ tukey_pval_2_1_4[just_one_2_1_4, ][not_na_2_1_4] <- data.matrix(
 )[not_na_2_1_4]
 
 # Convert back to a data frame.
-tukey_pval_2_1_4 <- data.frame(tukey_pval_2_1_4)
+tukey_pval_2_1_4 <- data.frame(check.names = FALSE, tukey_pval_2_1_4)
 
 # Set a seed because the mvtnorm::pmvt function has a random process.
 set.seed(4)
@@ -1656,7 +1656,7 @@ cobra <- run_twofactor_cpp(
   continuous_covar_inds = 5
 )
 
-group_counts_2_2_4 <- data.frame(
+group_counts_2_2_4 <- data.frame(check.names = FALSE, 
   nona_Infection_high = rowSums(!is.na(data_2_2_4[, c(1, 3, 5)])),
   nona_Infection_low = rowSums(!is.na(data_2_2_4[, c(2, 4, 6)])),
   nona_Mock_high = rowSums(!is.na(data_2_2_4[, c(7, 8, 12)])),
@@ -1667,7 +1667,7 @@ group_counts_2_2_4 <- data.frame(
 nona_grps_2_2_4 <- unname(rowSums(group_counts_2_2_4 != 0))
 nona_counts_2_2_4 <- unname(rowSums(!is.na(data_2_2_4)))
 
-mean_a_2_2_4 <- data.frame(cobra$lsmeans)
+mean_a_2_2_4 <- data.frame(check.names = FALSE, cobra$lsmeans)
 colnames(mean_a_2_2_4) <- paste0("Mean_", unique(groupData$Group))
 
 diffs_2_2_4 <- mean_a_2_2_4 %>%
@@ -1758,7 +1758,7 @@ pval_a_2_2_4 <- test_stat_2_2_4 %>%
                 P_value_A_Mock_high_vs_Mock_low) %>%
   `row.names<-`(NULL)
 
-flag_a_2_2_4 <- data.frame(
+flag_a_2_2_4 <- data.frame(check.names = FALSE, 
   Infection_high_vs_Infection_low = aflag(
     grp1 = mean_a_2_2_4[,1],
     grp2 = mean_a_2_2_4[,2],
@@ -1797,7 +1797,7 @@ flag_a_2_2_4 <- data.frame(
   )
 )
 
-astan_2_2_4 <- data.frame(
+astan_2_2_4 <- data.frame(check.names = FALSE, 
   Mass_Tag_ID = afilta_2_2_4$e_data$Mass_Tag_ID,
   Count_Infection_high = group_counts_2_2_4$nona_Infection_high,
   Count_Infection_low = group_counts_2_2_4$nona_Infection_low,
@@ -1829,7 +1829,7 @@ attr(astan_2_2_4, "comparisons") <- c("Infection_high_vs_Infection_low",
                                       "Infection_low_vs_Mock_high",
                                       "Infection_low_vs_Mock_low",
                                       "Mock_high_vs_Mock_low")
-attr(astan_2_2_4, "number_significant") <- data.frame(
+attr(astan_2_2_4, "number_significant") <- data.frame(check.names = FALSE, 
   Comparison = c("Infection_high_vs_Infection_low",
                  "Infection_high_vs_Mock_high",
                  "Infection_high_vs_Mock_low",
@@ -1882,7 +1882,7 @@ attr(astan_2_2_4, "data_info") <- list(
   data_types = NULL
 )
 attr(astan_2_2_4, "which_X") <- which_X_2_2_4_a
-attr(astan_2_2_4, "bpFlags") <- data.frame(
+attr(astan_2_2_4, "bpFlags") <- data.frame(check.names = FALSE, 
   Mass_Tag_ID = afilta_2_2_4$e_data$Mass_Tag_ID,
   flag_a_2_2_4
 )
@@ -1966,7 +1966,7 @@ tukey_pval_2_2_4[just_one_2_2_4, ][not_na_2_2_4] <- data.matrix(
 )[not_na_2_2_4]
 
 # Convert back to a data frame.
-tukey_pval_2_2_4 <- data.frame(tukey_pval_2_2_4)
+tukey_pval_2_2_4 <- data.frame(check.names = FALSE, tukey_pval_2_2_4)
 
 # Set a seed because the mvtnorm::pmvt function has a random process.
 set.seed(4)
@@ -2098,7 +2098,7 @@ abs_ml_2_2_4 <- rowSums(is.na(gfilta_2_2_4$e_data[, 10:12]))
 
 # main effects: 1; covariates: 0; groups: 2 ---------------
 
-pval_g_1_0_2 <- data.frame(
+pval_g_1_0_2 <- data.frame(check.names = FALSE, 
   Infection_vs_Mock = pchisq(
     q = g(obs1 = obs_inf_1_0_2,
           obs2 = obs_mock_1_0_2,
@@ -2112,7 +2112,7 @@ pval_g_1_0_2 <- data.frame(
   )
 )
 
-flag_g_1_0_2 <- data.frame(
+flag_g_1_0_2 <- data.frame(check.names = FALSE, 
   Infection_vs_Mock = gflag(
     obs1 = obs_inf_1_0_2,
     obs2 = obs_mock_1_0_2,
@@ -2123,14 +2123,14 @@ flag_g_1_0_2 <- data.frame(
   )
 )
 
-mean_1_0_2 <- data.frame(
+mean_1_0_2 <- data.frame(check.names = FALSE, 
   Mean_Infection = rowMeans(gfilta_1_0_2$e_data[, 2:10],
                             na.rm = TRUE),
   Mean_Mock = rowMeans(gfilta_1_0_2$e_data[, 11:13],
                        na.rm = TRUE)
 )
 
-gstan_1_0_2 <- data.frame(
+gstan_1_0_2 <- data.frame(check.names = FALSE, 
   Mass_Tag_ID = gfilta_1_0_2$e_data$Mass_Tag_ID,
   Count_Infection = unname(obs_inf_1_0_2),
   Count_Mock = unname(obs_mock_1_0_2),
@@ -2147,7 +2147,7 @@ class(gstan_1_0_2) <- c("statRes", "data.frame")
 
 attr(gstan_1_0_2, "group_DF") <- groupDF_1_0_2
 attr(gstan_1_0_2, "comparisons") <- c("Infection_vs_Mock")
-attr(gstan_1_0_2, "number_significant") <- data.frame(
+attr(gstan_1_0_2, "number_significant") <- data.frame(check.names = FALSE, 
   Comparison = c("Infection_vs_Mock"),
   Up_total = c(length(which(flag_g_1_0_2[, 1] == 1))),
   Down_total = c(length(which(flag_g_1_0_2[, 1] == -1))),
@@ -2185,7 +2185,7 @@ attr(gstan_1_0_2, "data_class") <- "pepData"
 
 # main effects: 1; covariates: 1; groups: 3 ---------------
 
-pval_g_1_1_3 <- data.frame(
+pval_g_1_1_3 <- data.frame(check.names = FALSE, 
   P_value_G_mutant_vs_zombie = rep(0, nrow(gfilta_1_1_3$e_data)),
   P_value_G_mutant_vs_human = rep(0, nrow(gfilta_1_1_3$e_data)),
   P_value_G_zombie_vs_human = rep(0, nrow(gfilta_1_1_3$e_data))
@@ -2223,7 +2223,7 @@ for (e in 1:nrow(gfilta_1_1_3$e_data)) {
 
 }
 
-flag_g_1_1_3 <- data.frame(
+flag_g_1_1_3 <- data.frame(check.names = FALSE, 
   Flag_G_mutant_vs_zombie = gflag(
     obs1 = obs_mut_1_1_3,
     obs2 = obs_zom_1_1_3,
@@ -2262,7 +2262,7 @@ groupData[,"Condition"] <- lapply(groupData["Condition"], function(x) factor(x, 
 pred_grid <- get_pred_grid(groupData, "Condition", "Gender")
 mean_1_1_3 <- get_lsmeans(data = data_1_1_3, xmatrix = Xmatrix_1_1_3, pred_grid = pred_grid, Betas = Betas)
 
-counts_1_1_3 <- data.frame(
+counts_1_1_3 <- data.frame(check.names = FALSE, 
   "Count_mutant" = unname(obs_mut_1_1_3),
   "Count_zombie" = unname(obs_zom_1_1_3),
   "Count_human" = unname(obs_hum_1_1_3)
@@ -2273,7 +2273,7 @@ mean_1_1_3[counts_1_1_3 == 0] <- NA
 cmat = rbind(c(1, -1, 0), c(1, 0, -1), c(0, 1, -1))
 diffs_1_1_3 <- fold_change_diff(data.matrix(mean_1_1_3), cmat)
 
-gstan_1_1_3 <- data.frame(
+gstan_1_1_3 <- data.frame(check.names = FALSE, 
   Mass_Tag_ID = gfilta_1_1_3$e_data$Mass_Tag_ID,
   counts_1_1_3,
   mean_1_1_3,
@@ -2291,7 +2291,7 @@ attr(gstan_1_1_3, "group_DF") <- groupDF_1_1_3
 attr(gstan_1_1_3, "comparisons") <- c("mutant_vs_zombie",
                                       "mutant_vs_human",
                                       "zombie_vs_human")
-attr(gstan_1_1_3, "number_significant") <- data.frame(
+attr(gstan_1_1_3, "number_significant") <- data.frame(check.names = FALSE, 
   Comparison = c("mutant_vs_zombie",
                  "mutant_vs_human",
                  "zombie_vs_human"),
@@ -2339,7 +2339,7 @@ attr(gstan_1_1_3, "data_class") <- "pepData"
 
 # main effects: 1; covariates: 2; groups: 3 ---------------
 
-pval_g_1_2_3 <- data.frame(
+pval_g_1_2_3 <- data.frame(check.names = FALSE, 
   P_value_G_mutant_vs_zombie = rep(0, nrow(gfilta_1_2_3$e_data)),
   P_value_G_mutant_vs_human = rep(0, nrow(gfilta_1_2_3$e_data)),
   P_value_G_zombie_vs_human = rep(0, nrow(gfilta_1_2_3$e_data))
@@ -2380,7 +2380,7 @@ for (e in 1:nrow(gfilta_1_2_3$e_data)) {
 
 }
 
-flag_g_1_2_3 <- data.frame(
+flag_g_1_2_3 <- data.frame(check.names = FALSE, 
   Flag_G_mutant_vs_zombie = gflag(
     obs1 = obs_mut_1_2_3,
     obs2 = obs_zom_1_2_3,
@@ -2418,7 +2418,7 @@ groupData[,"Condition"] <- lapply(groupData["Condition"], function(x) factor(x, 
 pred_grid <- get_pred_grid(groupData, "Condition", c("Gender", "Age"))
 mean_1_2_3 <- get_lsmeans(data = data_1_2_3, xmatrix = Xmatrix_1_2_3, pred_grid = pred_grid, Betas = Betas, continuous_covar_inds = 5)
 
-counts_1_2_3 <- data.frame(
+counts_1_2_3 <- data.frame(check.names = FALSE, 
   "Count_mutant" = unname(obs_mut_1_2_3),
   "Count_zombie" = unname(obs_zom_1_2_3),
   "Count_human" = unname(obs_hum_1_2_3)
@@ -2429,7 +2429,7 @@ mean_1_2_3[counts_1_2_3 == 0] <- NA
 cmat = rbind(c(1, -1, 0), c(1, 0, -1), c(0, 1, -1))
 diffs_1_2_3 <- fold_change_diff(data.matrix(mean_1_2_3), cmat)
 
-gstan_1_2_3 <- data.frame(
+gstan_1_2_3 <- data.frame(check.names = FALSE, 
   Mass_Tag_ID = gfilta_1_2_3$e_data$Mass_Tag_ID,
   counts_1_2_3,
   mean_1_2_3,
@@ -2447,7 +2447,7 @@ attr(gstan_1_2_3, "group_DF") <- groupDF_1_2_3
 attr(gstan_1_2_3, "comparisons") <- c("mutant_vs_zombie",
                                       "mutant_vs_human",
                                       "zombie_vs_human")
-attr(gstan_1_2_3, "number_significant") <- data.frame(
+attr(gstan_1_2_3, "number_significant") <- data.frame(check.names = FALSE, 
   Comparison = c("mutant_vs_zombie",
                  "mutant_vs_human",
                  "zombie_vs_human"),
@@ -2495,7 +2495,7 @@ attr(gstan_1_2_3, "data_class") <- "pepData"
 
 # main effects: 2; covariates: 0; groups: 3 ---------------
 
-pval_g_2_0_3 <- data.frame(
+pval_g_2_0_3 <- data.frame(check.names = FALSE, 
   Infection_high_vs_Infection_low = pchisq(
     q = g(obs1 = obs_inf_high_2_0_3,
           obs2 = obs_inf_low_2_0_3,
@@ -2531,7 +2531,7 @@ pval_g_2_0_3 <- data.frame(
   )
 )
 
-flag_g_2_0_3 <- data.frame(
+flag_g_2_0_3 <- data.frame(check.names = FALSE, 
   Infection_high_vs_Infection_low = gflag(
     obs1 = obs_inf_high_2_0_3,
     obs2 = obs_inf_low_2_0_3,
@@ -2558,7 +2558,7 @@ flag_g_2_0_3 <- data.frame(
   )
 )
 
-mean_2_0_3 <- data.frame(
+mean_2_0_3 <- data.frame(check.names = FALSE, 
   Mean_Infection_high = rowMeans(gfilta_2_0_3$e_data[, c(2:4, 7:8)],
                                  na.rm = TRUE),
   Mean_Infection_low = rowMeans(gfilta_2_0_3$e_data[, c(5:6, 9:10)],
@@ -2567,7 +2567,7 @@ mean_2_0_3 <- data.frame(
                             na.rm = TRUE)
 )
 
-gstan_2_0_3 <- data.frame(
+gstan_2_0_3 <- data.frame(check.names = FALSE, 
   Mass_Tag_ID = gfilta_2_0_3$e_data$Mass_Tag_ID,
   Count_Infection_high = unname(obs_inf_high_2_0_3),
   Count_Infection_low = unname(obs_inf_low_2_0_3),
@@ -2597,7 +2597,7 @@ attr(gstan_2_0_3, "group_DF") <- groupDF_2_0_3
 attr(gstan_2_0_3, "comparisons") <- c("Infection_high_vs_Infection_low",
                                       "Infection_high_vs_Mock_none",
                                       "Infection_low_vs_Mock_none")
-attr(gstan_2_0_3, "number_significant") <- data.frame(
+attr(gstan_2_0_3, "number_significant") <- data.frame(check.names = FALSE, 
   Comparison = c("Infection_high_vs_Infection_low",
                  "Infection_high_vs_Mock_none",
                  "Infection_low_vs_Mock_none"),
@@ -2645,7 +2645,7 @@ attr(gstan_2_0_3, "data_class") <- "pepData"
 
 # main effects: 2; covariates: 1; groups: 4 ---------------
 
-pval_g_2_1_4 <- data.frame(
+pval_g_2_1_4 <- data.frame(check.names = FALSE, 
   P_value_G_Infection_high_vs_Infection_low = rep(0, nrow(gfilta_2_1_4$e_data)),
   P_value_G_Infection_high_vs_Mock_high = rep(0, nrow(gfilta_2_1_4$e_data)),
   P_value_G_Infection_high_vs_Mock_low = rep(0, nrow(gfilta_2_1_4$e_data)),
@@ -2719,7 +2719,7 @@ for (e in 1:nrow(gfilta_2_1_4$e_data)) {
 
 }
 
-flag_g_2_1_4 <- data.frame(
+flag_g_2_1_4 <- data.frame(check.names = FALSE, 
   Flag_G_Infection_high_vs_Infection_low = gflag(
     obs1 = obs_ih_2_1_4,
     obs2 = obs_il_2_1_4,
@@ -2783,7 +2783,7 @@ dragon <- run_twofactor_cpp(
   continuous_covar_inds = numeric(0)
 )
 
-mean_2_1_4 <- data.frame(
+mean_2_1_4 <- data.frame(check.names = FALSE, 
   Mean_Infection_high = dragon$adj_group_means[, 1],
   Mean_Infection_low = dragon$adj_group_means[, 2],
   Mean_Mock_high = dragon$adj_group_means[, 3],
@@ -2794,10 +2794,10 @@ cmat = rbind(c(1, -1, 0, 0), c(1, 0, -1, 0), c(1, 0, 0, -1),
              c(0, 1, -1, 0), c(0, 1, 0, -1), c(0, 0, 1, -1))
 
 diffs_2_1_4 <- fold_change_diff(data.matrix(mean_2_1_4), cmat)
-diffs_2_1_4 <- as.data.frame(diffs_2_1_4) %>%
+diffs_2_1_4 <- as.data.frame(check.names = FALSE, diffs_2_1_4) %>%
   `colnames<-`(c("Fold_change_Infection_high_vs_Infection_low", "Fold_change_Infection_high_vs_Mock_high", "Fold_change_Infection_high_vs_Mock_low", "Fold_change_Infection_low_vs_Mock_high", "Fold_change_Infection_low_vs_Mock_low", "Fold_change_Mock_high_vs_Mock_low"))
 
-gstan_2_1_4 <- data.frame(
+gstan_2_1_4 <- data.frame(check.names = FALSE, 
   Mass_Tag_ID = gfilta_2_1_4$e_data$Mass_Tag_ID,
   Count_Infection_high = unname(obs_ih_2_1_4),
   Count_Infection_low = unname(obs_il_2_1_4),
@@ -2819,7 +2819,7 @@ attr(gstan_2_1_4, "comparisons") <- c("Infection_high_vs_Infection_low",
                                       "Infection_low_vs_Mock_high",
                                       "Infection_low_vs_Mock_low",
                                       "Mock_high_vs_Mock_low")
-attr(gstan_2_1_4, "number_significant") <- data.frame(
+attr(gstan_2_1_4, "number_significant") <- data.frame(check.names = FALSE, 
   Comparison = c("Infection_high_vs_Infection_low",
                  "Infection_high_vs_Mock_high",
                  "Infection_high_vs_Mock_low",
@@ -2882,7 +2882,7 @@ attr(gstan_2_1_4, "data_class") <- "pepData"
 
 # main effects: 2; covariates: 2; groups: 4 ---------------
 
-pval_g_2_2_4 <- data.frame(
+pval_g_2_2_4 <- data.frame(check.names = FALSE, 
   P_value_G_Infection_high_vs_Infection_low = rep(0, nrow(gfilta_2_2_4$e_data)),
   P_value_G_Infection_high_vs_Mock_high = rep(0, nrow(gfilta_2_2_4$e_data)),
   P_value_G_Infection_high_vs_Mock_low = rep(0, nrow(gfilta_2_2_4$e_data)),
@@ -2962,7 +2962,7 @@ for (e in 1:nrow(gfilta_2_2_4$e_data)) {
 
 }
 
-flag_g_2_2_4 <- data.frame(
+flag_g_2_2_4 <- data.frame(check.names = FALSE, 
   Flag_G_Infection_high_vs_Infection_low = gflag(
     obs1 = obs_ih_2_2_4,
     obs2 = obs_il_2_2_4,
@@ -3024,7 +3024,7 @@ mustang <- run_twofactor_cpp(
   continuous_covar_inds = 5
 )
 
-mean_2_2_4 <- data.frame(
+mean_2_2_4 <- data.frame(check.names = FALSE, 
   Mean_Infection_high = mustang$adj_group_means[, 1],
   Mean_Infection_low = mustang$adj_group_means[, 2],
   Mean_Mock_high = mustang$adj_group_means[, 3],
@@ -3035,10 +3035,10 @@ cmat = rbind(c(1, -1, 0, 0), c(1, 0, -1, 0), c(1, 0, 0, -1),
              c(0, 1, -1, 0), c(0, 1, 0, -1), c(0, 0, 1, -1))
 
 diffs_2_2_4 <- fold_change_diff(data.matrix(mean_2_2_4), cmat)
-diffs_2_2_4 <- as.data.frame(diffs_2_2_4) %>%
+diffs_2_2_4 <- as.data.frame(check.names = FALSE, diffs_2_2_4) %>%
   `colnames<-`(c("Fold_change_Infection_high_vs_Infection_low", "Fold_change_Infection_high_vs_Mock_high", "Fold_change_Infection_high_vs_Mock_low", "Fold_change_Infection_low_vs_Mock_high", "Fold_change_Infection_low_vs_Mock_low", "Fold_change_Mock_high_vs_Mock_low"))
 
-gstan_2_2_4 <- data.frame(
+gstan_2_2_4 <- data.frame(check.names = FALSE, 
   Mass_Tag_ID = gfilta_2_2_4$e_data$Mass_Tag_ID,
   Count_Infection_high = unname(obs_ih_2_2_4),
   Count_Infection_low = unname(obs_il_2_2_4),
@@ -3060,7 +3060,7 @@ attr(gstan_2_2_4, "comparisons") <- c("Infection_high_vs_Infection_low",
                                       "Infection_low_vs_Mock_high",
                                       "Infection_low_vs_Mock_low",
                                       "Mock_high_vs_Mock_low")
-attr(gstan_2_2_4, "number_significant") <- data.frame(
+attr(gstan_2_2_4, "number_significant") <- data.frame(check.names = FALSE, 
   Comparison = c("Infection_high_vs_Infection_low",
                  "Infection_high_vs_Mock_high",
                  "Infection_high_vs_Mock_low",
@@ -3165,7 +3165,7 @@ class(cstan_1_0_2) <- c("statRes", "data.frame")
 
 attr(cstan_1_0_2, "group_DF") <- groupDF_1_0_2
 attr(cstan_1_0_2, "comparisons") <- c("Infection_vs_Mock")
-attr(cstan_1_0_2, "number_significant") <- data.frame(
+attr(cstan_1_0_2, "number_significant") <- data.frame(check.names = FALSE, 
   Comparison = c("Infection_vs_Mock"),
   Up_total = sum(length(which(flag_g_1_0_2[, 1] == 1)),
                  length(which(flag_a_1_0_2[, 1] == 1))),
@@ -3203,7 +3203,7 @@ attr(cstan_1_0_2, "which_X") <-
     0, 0, NA, 0, 0, 0, 0, NA, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
     0, NA, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NA, 
     0, 0)
-attr(cstan_1_0_2, "bpFlags") <- data.frame(
+attr(cstan_1_0_2, "bpFlags") <- data.frame(check.names = FALSE, 
   Mass_Tag_ID = gfilta_1_0_2$e_data$Mass_Tag_ID,
   Infection_vs_Mock = dplyr::case_when(
     is.na(cstan_1_0_2$Flag_A_Infection_vs_Mock) ~
@@ -3266,7 +3266,7 @@ attr(cstan_1_1_3, "group_DF") <- groupDF_1_1_3
 attr(cstan_1_1_3, "comparisons") <- c("mutant_vs_zombie",
                                       "mutant_vs_human",
                                       "zombie_vs_human")
-attr(cstan_1_1_3, "number_significant") <- data.frame(
+attr(cstan_1_1_3, "number_significant") <- data.frame(check.names = FALSE, 
   Comparison = c("mutant_vs_zombie",
                  "mutant_vs_human",
                  "zombie_vs_human"),
@@ -3321,7 +3321,7 @@ attr(cstan_1_1_3, "which_X") <-
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-attr(cstan_1_1_3, "bpFlags") <- data.frame(
+attr(cstan_1_1_3, "bpFlags") <- data.frame(check.names = FALSE, 
   Mass_Tag_ID = gfilta_1_1_3$e_data$Mass_Tag_ID,
   mutant_vs_zombie = dplyr::case_when(
     is.na(cstan_1_1_3$Flag_A_mutant_vs_zombie) ~
@@ -3408,7 +3408,7 @@ attr(cstan_1_2_3, "group_DF") <- groupDF_1_2_3
 attr(cstan_1_2_3, "comparisons") <- c("mutant_vs_zombie",
                                       "mutant_vs_human",
                                       "zombie_vs_human")
-attr(cstan_1_2_3, "number_significant") <- data.frame(
+attr(cstan_1_2_3, "number_significant") <- data.frame(check.names = FALSE, 
   Comparison = c("mutant_vs_zombie",
                  "mutant_vs_human",
                  "zombie_vs_human"),
@@ -3463,7 +3463,7 @@ attr(cstan_1_2_3, "which_X") <-
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-attr(cstan_1_2_3, "bpFlags") <- data.frame(
+attr(cstan_1_2_3, "bpFlags") <- data.frame(check.names = FALSE, 
   Mass_Tag_ID = gfilta_1_2_3$e_data$Mass_Tag_ID,
   mutant_vs_zombie = dplyr::case_when(
     is.na(cstan_1_2_3$Flag_A_mutant_vs_zombie) ~
@@ -3552,7 +3552,7 @@ attr(cstan_2_0_3, "comparisons") <- c(
   "Infection_high_vs_Mock_none",
   "Infection_low_vs_Mock_none"
 )
-attr(cstan_2_0_3, "number_significant") <- data.frame(
+attr(cstan_2_0_3, "number_significant") <- data.frame(check.names = FALSE, 
   Comparison = c("Infection_high_vs_Infection_low",
                  "Infection_high_vs_Mock_none",
                  "Infection_low_vs_Mock_none"),
@@ -3607,7 +3607,7 @@ attr(cstan_2_0_3, "which_X") <-
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-attr(cstan_2_0_3, "bpFlags") <- data.frame(
+attr(cstan_2_0_3, "bpFlags") <- data.frame(check.names = FALSE, 
   Mass_Tag_ID = gfilta_2_0_3$e_data$Mass_Tag_ID,
   Infection_high_vs_Infection_low = dplyr::case_when(
     is.na(cstan_2_0_3$Flag_A_Infection_high_vs_Infection_low) ~
@@ -3697,7 +3697,7 @@ attr(cstan_2_1_4, "comparisons") <- c("Infection_high_vs_Infection_low",
                                       "Infection_low_vs_Mock_high",
                                       "Infection_low_vs_Mock_low",
                                       "Mock_high_vs_Mock_low")
-attr(cstan_2_1_4, "number_significant") <- data.frame(
+attr(cstan_2_1_4, "number_significant") <- data.frame(check.names = FALSE, 
   Comparison = c("Infection_high_vs_Infection_low",
                  "Infection_high_vs_Mock_high",
                  "Infection_high_vs_Mock_low",
@@ -3779,7 +3779,7 @@ attr(cstan_2_1_4, "which_X") <-
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-attr(cstan_2_1_4, "bpFlags") <- data.frame(
+attr(cstan_2_1_4, "bpFlags") <- data.frame(check.names = FALSE, 
   Mass_Tag_ID = gfilta_2_1_4$e_data$Mass_Tag_ID,
   Infection_high_vs_Infection_low = dplyr::case_when(
     is.na(cstan_2_1_4$Flag_A_Infection_high_vs_Infection_low) ~
@@ -3902,7 +3902,7 @@ attr(cstan_2_2_4, "comparisons") <- c("Infection_high_vs_Infection_low",
                                       "Infection_low_vs_Mock_high",
                                       "Infection_low_vs_Mock_low",
                                       "Mock_high_vs_Mock_low")
-attr(cstan_2_2_4, "number_significant") <- data.frame(
+attr(cstan_2_2_4, "number_significant") <- data.frame(check.names = FALSE, 
   Comparison = c("Infection_high_vs_Infection_low",
                  "Infection_high_vs_Mock_high",
                  "Infection_high_vs_Mock_low",
@@ -3984,7 +3984,7 @@ attr(cstan_2_2_4, "which_X") <-
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-attr(cstan_2_2_4, "bpFlags") <- data.frame(
+attr(cstan_2_2_4, "bpFlags") <- data.frame(check.names = FALSE, 
   Mass_Tag_ID = gfilta_2_2_4$e_data$Mass_Tag_ID,
   Infection_high_vs_Infection_low = dplyr::case_when(
     is.na(cstan_2_2_4$Flag_A_Infection_high_vs_Infection_low) ~

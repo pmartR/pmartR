@@ -25,7 +25,7 @@ test_that('errors are thrown for bad data structures/values', {
   set.seed(8346)
 
   # Create a data frame with random numbers.
-  cantor <- data.frame(
+  cantor <- data.frame(check.names = FALSE, 
     id = paste0('e', 1:10),
     col1 = rnorm(10),
     col2 = rcauchy(10),
@@ -38,7 +38,7 @@ test_that('errors are thrown for bad data structures/values', {
   cantor[8, 3] <- Inf
 
   # Forge an f_data data frame for the naughty edata data frames.
-  fdata <- data.frame(
+  fdata <- data.frame(check.names = FALSE, 
     sampleID = paste0('col', 1:5),
     condition = c(
       rep('case', 3),

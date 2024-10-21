@@ -104,7 +104,7 @@ mymetab <- group_designation(omicsData = mymetab, main_effects = c("Phenotype", 
 imd_anova_res <- imd_anova(omicsData = mymetab, test_method = 'comb')
 
 # Same but with custom comparisons
-comp_df <- data.frame(Control = c("Phenotype1", "A"), Test = c("Phenotype2", "B"))
+comp_df <- data.frame(check.names = FALSE, Control = c("Phenotype1", "A"), Test = c("Phenotype2", "B"))
 custom_comps_res <- imd_anova(omicsData = mymetab, comparisons = comp_df, test_method = "combined")
 \dontshow{\}) # examplesIf}
 }

@@ -743,7 +743,7 @@ trelli_rnaseq_heatmap <- function(trelliData,
     if ("Biomolecule Non-Zero Count" %in% cognostics) {
       cogs_to_add <- rbind(
         cogs_to_add, 
-        data.frame(
+        data.frame(check.names = FALSE, 
           name = "Biomolecule Non-Zero Count",
           value = DF[[edata_cname]] %>% unique() %>% length()
         )
@@ -1115,7 +1115,7 @@ trelli_rnaseq_nonzero_bar <- function(trelliData,
     # Save total counts 
     totalCounts <- attr(trelliData$statRes, "group_DF")$Group %>% 
       table(dnn = "Group") %>% 
-      data.frame() %>% 
+      data.frame(check.names = FALSE) %>% 
       dplyr::rename(Total = Freq)
     
     if (test_mode) {

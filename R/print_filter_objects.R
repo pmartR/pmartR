@@ -13,7 +13,7 @@ print.moleculeFilt <- function(x, ...) {
   filter_object <- x
 
   if (!inherits(filter_object, "moleculeFilt")) stop("filter object must be of the class 'moleculeFilt'")
-  filter_object <- as.data.frame(lapply(filter_object, as.character), stringsAsFactors = FALSE)
+  filter_object <- as.data.frame(check.names = FALSE, lapply(filter_object, as.character), stringsAsFactors = FALSE)
 
   filter_object_head = head(filter_object, 4)[, 1:ncol(filter_object)]
   filter_object_tail = tail(filter_object, 4)[, 1:ncol(filter_object)]
@@ -41,7 +41,7 @@ print.totalCountFilt <- function(x, ...) {
   filter_object <- x
 
   if (!inherits(filter_object, "totalCountFilt")) stop("filter object must be of the class 'totalCountFilt'")
-  filter_object <- as.data.frame(lapply(filter_object, as.character), stringsAsFactors = FALSE)
+  filter_object <- as.data.frame(check.names = FALSE, lapply(filter_object, as.character), stringsAsFactors = FALSE)
 
   filter_object_head = head(filter_object, 4)[, 1:ncol(filter_object)]
   filter_object_tail = tail(filter_object, 4)[, 1:ncol(filter_object)]
@@ -69,7 +69,7 @@ print.RNAFilt <- function(x, ...) {
   filter_object <- x
 
   if (!inherits(filter_object, "RNAFilt")) stop("filter object must be of the class 'RNAFilt'")
-  filter_object <- as.data.frame(lapply(filter_object, as.character), stringsAsFactors = FALSE)
+  filter_object <- as.data.frame(check.names = FALSE, lapply(filter_object, as.character), stringsAsFactors = FALSE)
 
   filter_object_head = head(filter_object, 4)[, 1:ncol(filter_object)]
   filter_object_tail = tail(filter_object, 4)[, 1:ncol(filter_object)]
@@ -98,8 +98,8 @@ print.proteomicsFilt <- function(x, ...) {
 
   if (!inherits(filter_object, "proteomicsFilt")) stop("filter object must be of the class 'proteomicsFilt'")
 
-  counts_by_pep <- as.data.frame(lapply(filter_object$counts_by_pep, as.character), stringsAsFactors = FALSE)
-  counts_by_pro <- as.data.frame(lapply(filter_object$counts_by_pro, as.character), stringsAsFactors = FALSE)
+  counts_by_pep <- as.data.frame(check.names = FALSE, lapply(filter_object$counts_by_pep, as.character), stringsAsFactors = FALSE)
+  counts_by_pro <- as.data.frame(check.names = FALSE, lapply(filter_object$counts_by_pro, as.character), stringsAsFactors = FALSE)
 
   counts_by_pep_head <- head(counts_by_pep, 4)[1:ncol(counts_by_pep)]
   counts_by_pep_tail <- tail(counts_by_pep, 4)[1:ncol(counts_by_pep)]
@@ -137,7 +137,7 @@ print.imdanovaFilt <- function(x, ...) {
   filter_object <- x
 
   if (!inherits(filter_object, "imdanovaFilt")) stop("filter object must be of the class 'imdanovaFilt'")
-  filter_object <- as.data.frame(lapply(filter_object, as.character), stringsAsFactors = FALSE)
+  filter_object <- as.data.frame(check.names = FALSE, lapply(filter_object, as.character), stringsAsFactors = FALSE)
 
   filter_object_head = head(filter_object, 4)[, 1:ncol(filter_object)]
   filter_object_tail = tail(filter_object, 4)[, 1:ncol(filter_object)]
@@ -165,7 +165,7 @@ print.rmdFilt <- function(x, ...) {
   filter_object <- x
 
   if (!inherits(filter_object, "rmdFilt")) stop("filter object must be of the class 'rmdFilt'")
-  filter_object <- as.data.frame(lapply(filter_object, as.character), stringsAsFactors = FALSE)
+  filter_object <- as.data.frame(check.names = FALSE, lapply(filter_object, as.character), stringsAsFactors = FALSE)
   num_cols <- ncol(filter_object)
 
   filter_object_head = head(filter_object, 4)[, 1:min(num_cols, 5)]
@@ -195,7 +195,7 @@ print.cvFilt <- function(x, ...) {
   filter_object <- x
 
   if (!inherits(filter_object, "cvFilt")) stop("filter object must be of the class 'cvFilt'")
-  filter_object <- as.data.frame(lapply(filter_object, as.character), stringsAsFactors = FALSE)
+  filter_object <- as.data.frame(check.names = FALSE, lapply(filter_object, as.character), stringsAsFactors = FALSE)
 
   filter_object_head = head(filter_object, 4)[, 1:ncol(filter_object)]
   filter_object_tail = tail(filter_object, 4)[, 1:ncol(filter_object)]

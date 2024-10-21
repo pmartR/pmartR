@@ -92,7 +92,7 @@ test_that('each rollup method correctly quantifies proteins', {
       dplyr::group_by(Protein) %>%
       dplyr::mutate(dplyr::across(.cols = dplyr::everything(), .fns = \(x) median(x, na.rm = TRUE))) %>%
       dplyr::distinct() %>%
-      data.frame(),
+      data.frame(check.names = FALSE),
     f_data = pdata$f_data,
     e_meta = pdata$e_meta %>%
       dplyr::select(-Mass_Tag_ID) %>%
@@ -100,7 +100,7 @@ test_that('each rollup method correctly quantifies proteins', {
       dplyr::mutate(peps_per_pro = dplyr::n()) %>%
       dplyr::mutate(n_peps_used = peps_per_pro) %>%
       dplyr::distinct(Protein, peps_per_pro, n_peps_used) %>%
-      data.frame(),
+      data.frame(check.names = FALSE),
     edata_cname = "Protein",
     fdata_cname = "SampleID",
     emeta_cname = "Protein",
@@ -123,7 +123,7 @@ test_that('each rollup method correctly quantifies proteins', {
         .fns = pmartR:::combine_fn_mean
       )) %>%
       dplyr::distinct() %>%
-      data.frame(),
+      data.frame(check.names = FALSE),
     f_data = pdata$f_data,
     e_meta = pdata$e_meta %>%
       dplyr::select(-Mass_Tag_ID) %>%
@@ -133,7 +133,7 @@ test_that('each rollup method correctly quantifies proteins', {
       dplyr::mutate(dplyr::across('Peptide_Sequence', \(x) paste(unique(x), collapse = ";"))) %>%
       dplyr::select(Protein, peps_per_pro, n_peps_used, Peptide_Sequence) %>%
       dplyr::distinct(.) %>%
-      data.frame(),
+      data.frame(check.names = FALSE),
     edata_cname = "Protein",
     fdata_cname = "SampleID",
     emeta_cname = "Protein",
@@ -158,7 +158,7 @@ test_that('each rollup method correctly quantifies proteins', {
         .fns = \(x) median(x, na.rm = TRUE)
       )) %>%
       dplyr::distinct() %>%
-      data.frame(),
+      data.frame(check.names = FALSE),
     f_data = pdata2$f_data,
     e_meta = pdata2$e_meta %>%
       dplyr::select(-Mass_Tag_ID) %>%
@@ -166,7 +166,7 @@ test_that('each rollup method correctly quantifies proteins', {
       dplyr::mutate(peps_per_pro = dplyr::n()) %>%
       dplyr::mutate(n_peps_used = peps_per_pro) %>%
       dplyr::distinct(Protein, peps_per_pro, n_peps_used) %>%
-      data.frame(),
+      data.frame(check.names = FALSE),
     edata_cname = "Protein",
     fdata_cname = "SampleID",
     emeta_cname = "Protein",
@@ -262,7 +262,7 @@ test_that('each rollup method correctly quantifies proteins', {
     )))
 
   # Produce an e_data object to create the rrollup standard.
-  edata_med <- data.frame(
+  edata_med <- data.frame(check.names = FALSE, 
     temp_med$Protein,
     data.table::rbindlist(temp_med$ratio)
   )
@@ -280,7 +280,7 @@ test_that('each rollup method correctly quantifies proteins', {
       dplyr::mutate(peps_per_pro = dplyr::n()) %>%
       dplyr::mutate(n_peps_used = peps_per_pro) %>%
       dplyr::distinct(Protein, peps_per_pro, n_peps_used) %>%
-      data.frame(),
+      data.frame(check.names = FALSE),
     edata_cname = "Protein",
     fdata_cname = "SampleID",
     emeta_cname = "Protein",
@@ -345,7 +345,7 @@ test_that('each rollup method correctly quantifies proteins', {
     )))
 
   # Produce an e_data object to create the qrollup standard.
-  edata_med <- data.frame(
+  edata_med <- data.frame(check.names = FALSE, 
     temp_med$Protein,
     data.table::rbindlist(temp_med$qtile)
   )
@@ -369,7 +369,7 @@ test_that('each rollup method correctly quantifies proteins', {
       dplyr::mutate(peps_per_pro = dplyr::n()) %>%
       dplyr::mutate(n_peps_used = peps_per_pro) %>%
       dplyr::distinct(Protein, peps_per_pro, n_peps_used) %>%
-      data.frame(),
+      data.frame(check.names = FALSE),
     edata_cname = "Protein",
     fdata_cname = "SampleID",
     emeta_cname = "Protein",
@@ -426,7 +426,7 @@ test_that('each rollup method correctly quantifies proteins', {
     scaled_pepes <- apply((cData - vector_mds) / vector_sds, 2, fn)
 
     protein[1, ] <- scaled_pepes
-    protein <- data.frame(protein)
+    protein <- data.frame(check.names = FALSE, protein)
     names(protein) <- names(cData)
 
     return(protein)
@@ -468,7 +468,7 @@ test_that('each rollup method correctly quantifies proteins', {
     )))
 
   # Produce an e_data object to create the qrollup standard.
-  edata_med <- data.frame(
+  edata_med <- data.frame(check.names = FALSE, 
     temp_med$Protein,
     data.table::rbindlist(temp_med$zombie)
   )
@@ -486,7 +486,7 @@ test_that('each rollup method correctly quantifies proteins', {
       dplyr::mutate(peps_per_pro = dplyr::n()) %>%
       dplyr::mutate(n_peps_used = peps_per_pro) %>%
       dplyr::distinct(Protein, peps_per_pro, n_peps_used) %>%
-      data.frame(),
+      data.frame(check.names = FALSE),
     edata_cname = "Protein",
     fdata_cname = "SampleID",
     emeta_cname = "Protein",
@@ -552,7 +552,7 @@ test_that('each rollup method correctly quantifies proteins', {
       dplyr::group_by(Protein_Isoform) %>%
       dplyr::mutate(dplyr::across(.cols = dplyr::everything(), .fns = \(x) median(x, na.rm = TRUE))) %>%
       dplyr::distinct() %>%
-      data.frame(),
+      data.frame(check.names = FALSE),
     f_data = pdata3$f_data,
     e_meta = attr(bayes, "isoformRes_subset") %>%
       dplyr::select(-Mass_Tag_ID) %>%
@@ -565,7 +565,7 @@ test_that('each rollup method correctly quantifies proteins', {
         Protein, Protein_Isoform, peps_per_pro,
         n_peps_used, Peptide_Sequence
       ) %>%
-      data.frame(),
+      data.frame(check.names = FALSE),
     edata_cname = "Protein_Isoform",
     fdata_cname = "SampleID",
     emeta_cname = "Protein_Isoform",
@@ -606,7 +606,7 @@ test_that('each rollup method correctly quantifies proteins', {
     ))) %>%
     dplyr::select(Protein_Isoform, qtile) %>%
     tidyr::unnest(cols = c(Protein_Isoform, qtile)) %>%
-    data.frame()
+    data.frame(check.names = FALSE)
   rownames(edata_med) <- NULL
 
   # Match the protein counts with proteins in e_meta.
@@ -631,7 +631,7 @@ test_that('each rollup method correctly quantifies proteins', {
       ) %>% 
       dplyr::relocate(n_peps_used, .after = peps_per_pro) %>%
       dplyr::distinct(Protein, Protein_Isoform, peps_per_pro, n_peps_used) %>%
-      data.frame(),
+      data.frame(check.names = FALSE),
     edata_cname = "Protein_Isoform",
     fdata_cname = "SampleID",
     emeta_cname = "Protein_Isoform",

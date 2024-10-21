@@ -1317,7 +1317,7 @@ pre_flight <- function(e_data,
   if (inherits(e_data, "tbl_df") ||
     inherits(e_data, "tbl") ||
     inherits(e_data, "data.table")) {
-    e_data <- data.frame(e_data, check.names = FALSE)
+    e_data <- data.frame(check.names = FALSE, e_data)
   }
 
   # Make sure e_data is a data.frame.
@@ -1329,7 +1329,7 @@ pre_flight <- function(e_data,
   if (inherits(f_data, "tbl_df") ||
     inherits(f_data, "tbl") ||
     inherits(f_data, "data.table")) {
-    f_data <- data.frame(f_data, check.names = FALSE)
+    f_data <- data.frame(check.names = FALSE, f_data)
   }
 
   # Make sure f_data is a data.frame.
@@ -1344,7 +1344,7 @@ pre_flight <- function(e_data,
     if (inherits(e_meta, "tbl_df") ||
       inherits(e_meta, "tbl") ||
       inherits(e_meta, "data.table")) {
-      e_meta <- data.frame(e_meta, check.names = FALSE)
+      e_meta <- data.frame(check.names = FALSE, e_meta)
     }
 
     # Test that e_meta is a data frame.

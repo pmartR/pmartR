@@ -70,7 +70,7 @@ mypro <- pro_object
 mymultidata <- as.multiData(mymetab, mypro, auto_fmeta = TRUE, sample_intersect = TRUE)
 
 # Manually supply an f_meta
-f_meta <- data.frame(
+f_meta <- data.frame(check.names = FALSE, 
   "Proteins" = mypro$f_data$SampleID[match(mymetab$f_data$SampleID, mypro$f_data$SampleID)],
   "Metabolites" = mymetab$f_data$SampleID,
   "Condition" = mymetab$f_data$Phenotype[match(mymetab$f_data$SampleID, mypro$f_data$SampleID)]

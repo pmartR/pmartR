@@ -172,7 +172,7 @@ test_that('as.lipidData returns the correct data frame and attributes', {
   # Check for an error when e_data has more columns than f_data has rows.
   expect_error(
     as.lipidData(
-      e_data = data.frame(edata,
+      e_data = data.frame(check.names = FALSE, edata,
         Mock4 = edata[, 10]
       ),
       f_data = fdata,
@@ -193,7 +193,7 @@ test_that('as.lipidData returns the correct data frame and attributes', {
   ))
 
   # Forge an f_data object with an extra row.
-  fdata_1 <- data.frame(
+  fdata_1 <- data.frame(check.names = FALSE, 
     Sample_Name = c(
       paste0('Mock', 1:3),
       paste0('Infection', 1:10)
@@ -375,7 +375,7 @@ test_that('as.lipidData returns the correct data frame and attributes', {
   expect_error(
     as.lipidData(
       e_data = edata,
-      f_data = data.frame(fdata,
+      f_data = data.frame(check.names = FALSE, fdata,
         tReps = fdata[, 1]
       ),
       edata_cname = 'LipidCommonName',

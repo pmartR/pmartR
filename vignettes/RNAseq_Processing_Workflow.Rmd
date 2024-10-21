@@ -192,7 +192,7 @@ A principal components analysis (PCA) plot of our data shows clustering of strai
 mypca <- dim_reduction(omicsData = myseq, k = 2)
 plot(mypca, interactive = TRUE)
 
-mypca_df <- data.frame(SampleID = mypca$SampleID, PC1 = mypca$PC1, PC2 = mypca$PC2)
+mypca_df <- data.frame(check.names = FALSE, SampleID = mypca$SampleID, PC1 = mypca$PC1, PC2 = mypca$PC2)
 ```
 
 

@@ -207,7 +207,7 @@ mypep_imdanovafilt <- applyFilt(filter_object = myimdanovafilt,
                                 omicsData = mypep_groups_log2,
                                 min_nonmiss_anova = 2,
                                 min_nonmiss_gtest = 3,
-                                comparisons = data.frame(
+                                comparisons = data.frame(check.names = FALSE, 
                                   Control = c("Phenotype1", "Phenotype1"),
                                   Test = c("Phenotype2", "Phenotype3")))
 ```

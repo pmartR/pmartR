@@ -94,7 +94,7 @@ molecule_filter <- function(omicsData, use_groups = FALSE, use_batch = FALSE) {
 
     # Create a data frame with the ID column and the number of non-missing 
     # values.
-    output <- data.frame(omicsData$e_data[, id_col], num_obs)
+    output <- data.frame(check.names = FALSE, omicsData$e_data[, id_col], num_obs)
   }
 
   # SCENARIO 2: use_groups = FALSE, use_batch = TRUE
@@ -130,7 +130,7 @@ molecule_filter <- function(omicsData, use_groups = FALSE, use_batch = FALSE) {
       dplyr::ungroup() %>%
       dplyr::rename(molecule = dplyr::all_of(id_col)) %>%
       dplyr::arrange(match(molecule, ordering)) %>%
-      data.frame()
+      data.frame(check.names = FALSE)
 
     colnames(output)[1] <- get_edata_cname(omicsData)
   }
@@ -167,7 +167,7 @@ molecule_filter <- function(omicsData, use_groups = FALSE, use_batch = FALSE) {
       dplyr::ungroup() %>%
       dplyr::rename(molecule = dplyr::all_of(id_col)) %>%
       dplyr::arrange(match(molecule, ordering)) %>%
-      data.frame()
+      data.frame(check.names = FALSE)
 
     colnames(output)[1] <- get_edata_cname(omicsData)
   }
@@ -201,7 +201,7 @@ molecule_filter <- function(omicsData, use_groups = FALSE, use_batch = FALSE) {
       dplyr::ungroup() %>%
       dplyr::rename(molecule = dplyr::all_of(id_col)) %>%
       dplyr::arrange(match(molecule, ordering)) %>%
-      data.frame()
+      data.frame(check.names = FALSE)
 
     colnames(output)[1] <- get_edata_cname(omicsData)
   }
@@ -284,7 +284,7 @@ total_count_filter <- function(omicsData) {
   count_data <- rowSums(temp_data)
 
   # Create a data frame with the ID column and the number of non-missing values.
-  output <- data.frame(omicsData$e_data[, id_col], count_data)
+  output <- data.frame(check.names = FALSE, omicsData$e_data[, id_col], count_data)
   names(output) <- c(get_edata_cname(omicsData), "Total_Counts")
 
   output[[get_edata_cname(omicsData)]] <- as.character(
@@ -335,7 +335,7 @@ total_count_filter <- function(omicsData) {
       !!dplyr::sym(varname),
       lcpm
     ) %>% 
-    data.frame()
+    data.frame(check.names = FALSE)
   row.names(output) <- NULL
 
   attr(output, "e_data_lcpm") <- density_data
@@ -394,7 +394,7 @@ RNA_filter <- function(omicsData) {
   # unique biomolecules by edata definition
   non_zeros <- apply(temp_data != 0, 2, sum)
 
-  output <- data.frame(
+  output <- data.frame(check.names = FALSE, 
     SampleID = as.character(names(lib_sizes)),
     LibrarySize = as.integer(lib_sizes),
     NonZero = as.integer(non_zeros),
@@ -583,7 +583,7 @@ cv_filter <- function(omicsData, use_groups = TRUE) {
   # Create a data frame with the ID column from e_data and the CV values. This
   # data frame is called pool_cv even though the CV may not be pooled (this
   # makes us mysterious).
-  pool_cv <- data.frame(omicsData$e_data[, id_col],
+  pool_cv <- data.frame(check.names = FALSE, omicsData$e_data[, id_col],
     CV = cvs
   )
   names(pool_cv)[1] <- get_edata_cname(omicsData)
@@ -602,7 +602,7 @@ cv_filter <- function(omicsData, use_groups = TRUE) {
   ## generate some summary stats for CV values, for PMART purposes only ##
   tot.nas <- sum(is.na(pool_cv$CV))
 
-  output <- data.frame(pool_cv, row.names = NULL)
+  output <- data.frame(check.names = FALSE, pool_cv, row.names = NULL)
 
   orig_class <- class(output)
 
@@ -839,7 +839,7 @@ rmd_filter <- function(omicsData,
   metrics_final <- rep(NA, 5)
 
   # Initialize a data frame with the sample ID column from f_data.
-  rmd.vals <- data.frame(Sample.ID = names(omicsData$e_data[, -id_col]))
+  rmd.vals <- data.frame(check.names = FALSE, Sample.ID = names(omicsData$e_data[, -id_col]))
 
   # Compute the median absolute deviation across the samples (columns).
   if (any(metrics %in% c(
@@ -1045,7 +1045,7 @@ rmd_filter <- function(omicsData,
 
   rmd.pvals = 1 - pchisq(rob.dist.vals, df = (ncol(rmd.vals) - 1))
 
-  temp.res = data.frame(
+  temp.res = data.frame(check.names = FALSE, 
     Sample.ID = rmd.vals[, 1],
     Log2.md = log2.dist.vals,
     pvalue = rmd.pvals,
@@ -1139,7 +1139,7 @@ run_prop_missing <- function(data_only) {
   fracmiss <- nummiss / nrow(data_only)
 
   # store data #
-  res.final <- data.frame(Sample = names(data_only), Prop_missing = fracmiss, 
+  res.final <- data.frame(check.names = FALSE, Sample = names(data_only), Prop_missing = fracmiss, 
                           row.names = NULL)
 
   return(res.final)
@@ -1176,7 +1176,7 @@ run_mad <- function(data_only) {
   }
 
   # store data #
-  res.final <- data.frame(Sample = names(data_only), MAD = mad_val, 
+  res.final <- data.frame(check.names = FALSE, Sample = names(data_only), MAD = mad_val, 
                           row.names = NULL)
 
   return(res.final)
@@ -1213,7 +1213,7 @@ run_kurtosis <- function(data_only) {
   }
 
   # store data #
-  res.final <- data.frame(Sample = names(data_only), Kurtosis = kurt_res, 
+  res.final <- data.frame(check.names = FALSE, Sample = names(data_only), Kurtosis = kurt_res, 
                           row.names = NULL)
 
   return(res.final)
@@ -1250,7 +1250,7 @@ run_skewness <- function(data_only) {
   }
 
   # store data #
-  res.final <- data.frame(Sample = names(data_only), Skewness = skew_res, 
+  res.final <- data.frame(check.names = FALSE, Sample = names(data_only), Skewness = skew_res, 
                           row.names = NULL)
 
   return(res.final)
@@ -1448,7 +1448,7 @@ run_group_meancor <- function(omicsData, mintR_groupDF,
   # get order to put results in original sample order based on peptide.data #
   id_col <- which(names(omicsData$e_data) == get_edata_cname(omicsData))
   temp = match(names(omicsData$e_data)[-id_col], names(unlist(mean.cor2)))
-  res.cor = data.frame(
+  res.cor = data.frame(check.names = FALSE, 
     Sample.ID = names(omicsData$e_data)[-id_col],
     Mean_Correlation = unlist(mean.cor2)[temp],
     row.names = NULL

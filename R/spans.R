@@ -459,7 +459,7 @@ spans_procedure <- function(omicsData,
   # Combine results into SPANS output ------------------------------------------
 
   # create dataframe with selected methods
-  spansres_obj <- data.frame(
+  spansres_obj <- data.frame(check.names = FALSE, 
     "subset_method" = character(n_methods),
     "normalization_method" = character(n_methods),
     "SPANS_score" = numeric(n_methods),
@@ -470,7 +470,7 @@ spans_procedure <- function(omicsData,
     check.names = FALSE
   )
 
-  extra_info <- data.frame(
+  extra_info <- data.frame(check.names = FALSE, 
     "subset_method" = character(n_methods),
     "normalization_method" = character(n_methods),
     "parameters" = character(n_methods),

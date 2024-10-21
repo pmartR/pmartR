@@ -48,7 +48,7 @@
 #' mymultidata <- as.multiData(mymetab, mypro, auto_fmeta = TRUE, sample_intersect = TRUE)
 #'
 #' # Manually supply an f_meta
-#' f_meta <- data.frame(
+#' f_meta <- data.frame(check.names = FALSE, 
 #'   "Proteins" = mypro$f_data$SampleID[match(mymetab$f_data$SampleID, mypro$f_data$SampleID)],
 #'   "Metabolites" = mymetab$f_data$SampleID,
 #'   "Condition" = mymetab$f_data$Phenotype[match(mymetab$f_data$SampleID, mypro$f_data$SampleID)]
@@ -274,7 +274,7 @@ as.multiData <-
       })
 
       # f_meta will just be a data frame with identical columns
-      f_meta <- data.frame(setNames(
+      f_meta <- data.frame(check.names = FALSE, setNames(
         rep(list(shared_samps), length(fmeta_cnames)), fmeta_cnames
       ))
     } else {

@@ -75,7 +75,7 @@ test_that('all tests conform to the decrees of the God of Stats', {
 
   afruit_cus_2_0_3 <- imd_anova(
     omicsData = afilta_2_0_3,
-    comparisons = data.frame(
+    comparisons = data.frame(check.names = FALSE, 
       Control = c(
         "Infection_low",
         "Mock_none",
@@ -92,7 +92,7 @@ test_that('all tests conform to the decrees of the God of Stats', {
 
   gfruit_cus_2_0_3 <- imd_anova(
     omicsData = gfilta_2_0_3,
-    comparisons = data.frame(
+    comparisons = data.frame(check.names = FALSE, 
       Control = c(
         "Infection_low",
         "Mock_none",
@@ -304,7 +304,7 @@ test_that('all tests conform to the decrees of the God of Stats', {
   expect_equal(
     unclass(afruit_holm_1_1_3[, 11:13]),
     unclass(
-      data.frame(t(apply(astan_1_1_3[, 11:13],
+      data.frame(check.names = FALSE, t(apply(astan_1_1_3[, 11:13],
         1,
         p.adjust,
         method = "holm"
@@ -312,7 +312,7 @@ test_that('all tests conform to the decrees of the God of Stats', {
     )
   )
   expect_equal(
-    data.frame(afruit_tuk_1_1_3[, 11:13]),
+    data.frame(check.names = FALSE, afruit_tuk_1_1_3[, 11:13]),
     tukey_pval_1_1_3
   )
   expect_true(
@@ -334,7 +334,7 @@ test_that('all tests conform to the decrees of the God of Stats', {
   expect_equal(
     unclass(afruit_holm_1_2_3[, 11:13]),
     unclass(
-      data.frame(t(apply(astan_1_2_3[, 11:13],
+      data.frame(check.names = FALSE, t(apply(astan_1_2_3[, 11:13],
         1,
         p.adjust,
         method = "holm"
@@ -342,7 +342,7 @@ test_that('all tests conform to the decrees of the God of Stats', {
     )
   )
   expect_equal(
-    data.frame(afruit_tuk_1_2_3[, 11:13]),
+    data.frame(check.names = FALSE, afruit_tuk_1_2_3[, 11:13]),
     tukey_pval_1_2_3
   )
   expect_true(
@@ -362,7 +362,7 @@ test_that('all tests conform to the decrees of the God of Stats', {
   expect_equal(
     unclass(afruit_holm_2_0_3[, 11:13]),
     unclass(
-      data.frame(t(apply(astan_2_0_3[, 11:13],
+      data.frame(check.names = FALSE, t(apply(astan_2_0_3[, 11:13],
         1,
         p.adjust,
         method = "holm"
@@ -370,7 +370,7 @@ test_that('all tests conform to the decrees of the God of Stats', {
     )
   )
   expect_equal(
-    data.frame(afruit_tuk_2_0_3[, 11:13]),
+    data.frame(check.names = FALSE, afruit_tuk_2_0_3[, 11:13]),
     tukey_pval_2_0_3
   )
   # Because of the random process in the mvtnorm::pmvt function we test the
@@ -402,7 +402,7 @@ test_that('all tests conform to the decrees of the God of Stats', {
   expect_equal(
     unclass(afruit_holm_2_1_4[, 16:21]),
     unclass(
-      data.frame(t(apply(astan_2_1_4[, 16:21],
+      data.frame(check.names = FALSE, t(apply(astan_2_1_4[, 16:21],
         1,
         p.adjust,
         method = "holm"
@@ -410,7 +410,7 @@ test_that('all tests conform to the decrees of the God of Stats', {
     )
   )
   expect_equal(
-    data.frame(afruit_tuk_2_1_4[, 16:21]),
+    data.frame(check.names = FALSE, afruit_tuk_2_1_4[, 16:21]),
     tukey_pval_2_1_4
   )
   expect_true(
@@ -432,7 +432,7 @@ test_that('all tests conform to the decrees of the God of Stats', {
   expect_equal(
     unclass(afruit_holm_2_2_4[, 16:21]),
     unclass(
-      data.frame(t(apply(astan_2_2_4[, 16:21],
+      data.frame(check.names = FALSE, t(apply(astan_2_2_4[, 16:21],
         1,
         p.adjust,
         method = "holm"
@@ -440,7 +440,7 @@ test_that('all tests conform to the decrees of the God of Stats', {
     )
   )
   expect_equal(
-    data.frame(afruit_tuk_2_2_4[, 16:21]),
+    data.frame(check.names = FALSE, afruit_tuk_2_2_4[, 16:21]),
     tukey_pval_2_2_4
   )
   expect_true(
@@ -509,12 +509,12 @@ test_that('all tests conform to the decrees of the God of Stats', {
   # G-Test: Adjusted p-values ---------------
 
   expect_equal(
-    data.frame(gfruit_bon_2_0_3[, 11:13]),
-    data.frame(pmin(data.matrix(gstan_2_0_3[, 11:13] * 3), 1))
+    data.frame(check.names = FALSE, gfruit_bon_2_0_3[, 11:13]),
+    data.frame(check.names = FALSE, pmin(data.matrix(gstan_2_0_3[, 11:13] * 3), 1))
   )
   expect_equal(
-    data.frame(gfruit_holm_2_0_3[, 11:13]),
-    data.frame(t(apply(gstan_2_0_3[, 11:13],
+    data.frame(check.names = FALSE, gfruit_holm_2_0_3[, 11:13]),
+    data.frame(check.names = FALSE, t(apply(gstan_2_0_3[, 11:13],
       1,
       p.adjust,
       method = "holm"
@@ -522,12 +522,12 @@ test_that('all tests conform to the decrees of the God of Stats', {
   )
 
   expect_equal(
-    data.frame(gfruit_bon_2_1_4[, 16:21]),
-    data.frame(pmin(data.matrix(gstan_2_1_4[, 16:21] * 6), 1))
+    data.frame(check.names = FALSE, gfruit_bon_2_1_4[, 16:21]),
+    data.frame(check.names = FALSE, pmin(data.matrix(gstan_2_1_4[, 16:21] * 6), 1))
   )
   expect_equal(
-    data.frame(gfruit_holm_2_1_4[, 16:21]),
-    data.frame(t(apply(gstan_2_1_4[, 16:21],
+    data.frame(check.names = FALSE, gfruit_holm_2_1_4[, 16:21]),
+    data.frame(check.names = FALSE, t(apply(gstan_2_1_4[, 16:21],
       1,
       p.adjust,
       method = "holm"

@@ -42,8 +42,8 @@ test_that('the correct group data frame and attributes are created', {
 
   # Examinate the group_DF data frame.
   expect_equal(
-    data.frame(attr(pdata_gdf, 'group_DF')),
-    data.frame(
+    data.frame(check.names = FALSE, attr(pdata_gdf, 'group_DF')),
+    data.frame(check.names = FALSE, 
       SampleID = as.character(fdata$SampleID),
       Group = as.character(fdata$Condition),
       stringsAsFactors = FALSE
@@ -85,7 +85,7 @@ test_that('the correct group data frame and attributes are created', {
   # Generate objects and tests for 2 main effects ------------------------------
 
   # Add another column to fdata for a second main effect.
-  fdata_2 <- data.frame(fdata,
+  fdata_2 <- data.frame(check.names = FALSE, fdata,
     Intensity = c(
       'low', 'low', 'high', 'low', 'high',
       'high', 'high', 'high', 'low', 'none',
@@ -126,8 +126,8 @@ test_that('the correct group data frame and attributes are created', {
 
   # Examinate the group_DF data frame.
   expect_equal(
-    data.frame(attr(pdata_gdf_2, 'group_DF')),
-    data.frame(
+    data.frame(check.names = FALSE, attr(pdata_gdf_2, 'group_DF')),
+    data.frame(check.names = FALSE, 
       SampleID = as.character(fdata_2$SampleID),
       Group = as.character(paste(fdata_2$Condition,
         fdata_2$Intensity,
@@ -172,7 +172,7 @@ test_that('the correct group data frame and attributes are created', {
   )
 
   # Add another column to fdata for a second main effect with some NA values.
-  fdata_2 <- data.frame(fdata,
+  fdata_2 <- data.frame(check.names = FALSE, fdata,
     Intensity = c(
       'low', 'low', 'high', 'low', 'high',
       'high', 'high', 'high', 'low', NA, NA,
@@ -223,8 +223,8 @@ test_that('the correct group data frame and attributes are created', {
 
   # Examinate the group_DF data frame.
   expect_equal(
-    data.frame(attr(pdata_gdf_2, 'group_DF')),
-    data.frame(
+    data.frame(check.names = FALSE, attr(pdata_gdf_2, 'group_DF')),
+    data.frame(check.names = FALSE, 
       SampleID = as.character(fdata_2$SampleID[1:9]),
       Group = as.character(paste(fdata_2$Condition[1:9],
         fdata_2$Intensity[1:9],
@@ -743,7 +743,7 @@ test_that('the correct group data frame and attributes are created', {
       class = "data.frame",
       row.names = 1:30,
       main_effects = "Virus",
-      covariates = data.frame(
+      covariates = data.frame(check.names = FALSE, 
         Name = fdata$Name,
         age = pairdata_cov$f_data$age
       ),

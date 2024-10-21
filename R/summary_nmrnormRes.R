@@ -45,7 +45,7 @@ summary.nmrnormRes <- function(object, ...) {
   res_median = median(nmrnormRes_object$value, na.rm = TRUE)
   res_sd = sd(nmrnormRes_object$value, na.rm = TRUE)
 
-  final_res = as.data.frame(cbind(normalized_using, res_median, res_sd))
+  final_res = as.data.frame(check.names = FALSE, cbind(normalized_using, res_median, res_sd))
   row.names(final_res) = NULL
 
   if (is.null(sample_property_cname)) {

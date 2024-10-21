@@ -90,7 +90,7 @@ test_that('total_count_filter and applyFilt produce the correct output', {
 
     # Calculate the total_count with R functions. The first column of edata is removed
     # because it contains the peptide IDs.
-    use_r <- as.data.frame(apply(tester$e_data[-1], 1, sum))
+    use_r <- as.data.frame(check.names = FALSE, apply(tester$e_data[-1], 1, sum))
     use_r <- use_r[[1]]
 
     temp_data <- tester$e_data[-1]

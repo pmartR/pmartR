@@ -1081,7 +1081,7 @@ applyFilt.proteomicsFilt <- function(filter_object,
 
     # pull peptides with more than one row in e_meta.
     degen_peptides <- as.character(
-      data.frame(count_bypep[which(count_bypep$n > 1), ])[, pep_id]
+      data.frame(check.names = FALSE, count_bypep[which(count_bypep$n > 1), ])[, pep_id]
     )
 
     ## identify any proteins that now will not have peptides mapping to them ##
@@ -1257,7 +1257,7 @@ applyFilt.proteomicsFilt <- function(filter_object,
   # Update the filters attribute.
   attr(omicsData, 'filters')[[n_filters]] <- set_filter(
     type = class(filter_object)[[1]],
-    threshold = data.frame(
+    threshold = data.frame(check.names = FALSE, 
       min_num_peps = ifelse(is.null(min_num_peps),
         NA,
         min_num_peps
@@ -1694,7 +1694,7 @@ applyFilt.imdanovaFilt <- function(filter_object,
   # Update the filters attribute.
   attr(omicsData, 'filters')[[n_filters]] <- set_filter(
     type = class(filter_object)[[1]],
-    threshold = data.frame(
+    threshold = data.frame(check.names = FALSE, 
       min_nonmiss_anova = if (is.null(min_nonmiss_anova)) {
         # Report NA because min_nonmiss_anova is NULL.
         NA
@@ -2528,7 +2528,7 @@ gtest_filter <- function(nonmiss_per_group,
 as.diffData <- function(omicsData) {
   # Compute the difference and create a new edata object from the differences.
   diff_edata <- take_diff(omicsData)
-  diff_edata <- data.frame(
+  diff_edata <- data.frame(check.names = FALSE, 
     omicsData$e_data[, get_edata_cname(omicsData)],
     diff_edata
   )

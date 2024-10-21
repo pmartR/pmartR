@@ -110,7 +110,7 @@ test_that('bpquant produces correct isoforms', {
   )
   expect_equal(
     bayes[[1]],
-    data.frame(
+    data.frame(check.names = FALSE, 
       Protein = rep("ALBU_HUMAN", 5),
       Mass_Tag_ID = c(
         "1047", "1104", "1237", "1768",
@@ -121,7 +121,7 @@ test_that('bpquant produces correct isoforms', {
   )
   expect_equal(
     bayes[[5]],
-    data.frame(
+    data.frame(check.names = FALSE, 
       Protein = rep("PYGB_HUMAN", 5),
       Mass_Tag_ID = c(
         "1649", "11055", "11078", "12404",
@@ -132,7 +132,7 @@ test_that('bpquant produces correct isoforms', {
   )
   expect_equal(
     bayes[[22]],
-    data.frame(
+    data.frame(check.names = FALSE, 
       Protein = "EFTU_HUMAN",
       Mass_Tag_ID = c("6880071"),
       proteoformID = c(1)
@@ -140,7 +140,7 @@ test_that('bpquant produces correct isoforms', {
   )
   expect_equal(
     bayes[[36]],
-    data.frame(
+    data.frame(check.names = FALSE, 
       Protein = "XRCC5_HUMAN",
       Mass_Tag_ID = c("6948834"),
       proteoformID = c(1)
@@ -148,7 +148,7 @@ test_that('bpquant produces correct isoforms', {
   )
   expect_equal(
     bayes[[63]],
-    data.frame(
+    data.frame(check.names = FALSE, 
       Protein = "HNRPK_HUMAN",
       Mass_Tag_ID = c("6948906"),
       proteoformID = c(1)
@@ -171,7 +171,7 @@ test_that('bpquant produces correct isoforms', {
 
   # Run bpquant_mod on the flags for ALBU_HUMAN.
   bayes_mod <- pmartR:::bpquant_mod(
-    protein_sig = data.frame(flags1 = c(-1, 1, 1, 1, 1)),
+    protein_sig = data.frame(check.names = FALSE, flags1 = c(-1, 1, 1, 1, 1)),
     pi_not = 0.9,
     max_proteoforms = 5
   )
@@ -212,7 +212,7 @@ test_that('bpquant produces correct isoforms', {
 
   # Run isoformRes_func on the output for ALBU_HUMAN.
   iso_fun <- pmartR:::isoformRes_func(
-    df = data.frame(
+    df = data.frame(check.names = FALSE, 
       Protein = rep("ALBU_HUMAN", 4),
       Mass_Tag_ID = c("1104", "1237", "1768", "4198254"),
       proteoformID = c(1, 1, 1, 1)
@@ -224,7 +224,7 @@ test_that('bpquant produces correct isoforms', {
   # Sniff around the output for isoformRes_func.
   expect_identical(
     iso_fun,
-    data.frame(
+    data.frame(check.names = FALSE, 
       Protein = rep("ALBU_HUMAN", 4),
       Protein_Isoform = rep("ALBU_HUMAN", 4),
       Mass_Tag_ID = c("1104", "1237", "1768", "4198254")
@@ -233,7 +233,7 @@ test_that('bpquant produces correct isoforms', {
 
   # Run bpquant_mod on the flags for 6PGL_HUMAN.
   bayes_mod <- pmartR:::bpquant_mod(
-    protein_sig = data.frame(flags1 = c(-1, -1, -1, 1, 1)),
+    protein_sig = data.frame(check.names = FALSE, flags1 = c(-1, -1, -1, 1, 1)),
     pi_not = 0.9,
     max_proteoforms = 5
   )
@@ -274,7 +274,7 @@ test_that('bpquant produces correct isoforms', {
 
   # Run isoformRes_func on the output for 6PGL_HUMAN.
   iso_fun <- pmartR:::isoformRes_func(
-    df = data.frame(
+    df = data.frame(check.names = FALSE, 
       Protein = rep("6PGL_HUMAN", 5),
       Mass_Tag_ID = c(
         "8622908", "8655070", "9513231", "34862026",
@@ -289,7 +289,7 @@ test_that('bpquant produces correct isoforms', {
   # Sniff around the output for isoformRes_func.
   expect_identical(
     iso_fun,
-    data.frame(
+    data.frame(check.names = FALSE, 
       Protein = rep("6PGL_HUMAN", 5),
       Protein_Isoform = c(
         "6PGL_HUMAN;1", "6PGL_HUMAN;1",

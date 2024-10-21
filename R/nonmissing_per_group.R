@@ -36,7 +36,7 @@ nonmissing_per_group <- function(omicsData) {
     # Create a new column, n_group, that is the number of samples per group.
     dplyr::summarize(n_group = dplyr::n()) %>%
     # Convert to a data frame.
-    data.frame()
+    data.frame(check.names = FALSE)
 
   # Reorder the samples. This is done because the C++ function for counting
   # group sizes assumes the samples are ordered by group in the omicsData data
@@ -61,7 +61,7 @@ nonmissing_per_group <- function(omicsData) {
   )
 
   # Add the biomolecule IDs to the group counts.
-  nonmiss_totals <- data.frame(as.character(omicsData$e_data[, id_col]),
+  nonmiss_totals <- data.frame(check.names = FALSE, as.character(omicsData$e_data[, id_col]),
     nonmissing,
     stringsAsFactors = FALSE
   )

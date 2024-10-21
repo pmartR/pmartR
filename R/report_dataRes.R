@@ -124,7 +124,7 @@ report_dataRes <- function(dataRes, minmax = FALSE, digits = 2) {
         all_data = merge(data_mean_sd, data_min_max, by = edata_cname)
 
         mean_sd_cols = all_data[, c("mean", "sd")]
-        first_cols = as.data.frame(data_mean_sd[, -which(names(data_mean_sd) %in% names(mean_sd_cols))])
+        first_cols = as.data.frame(check.names = FALSE, data_mean_sd[, -which(names(data_mean_sd) %in% names(mean_sd_cols))])
         names(first_cols)[1] <- edata_cname
         new_col = apply(mean_sd_cols, 1, function(x) {
           if (is.na(x[1]) & is.na(x[2])) {
@@ -242,7 +242,7 @@ report_dataRes <- function(dataRes, minmax = FALSE, digits = 2) {
     all_data = merge(data_mean_sd, data_min_max, by = "sample")
 
     mean_sd_cols = all_data[, c("mean", "sd")]
-    first_cols = as.data.frame(data_mean_sd[, -which(names(data_mean_sd) %in% names(mean_sd_cols))])
+    first_cols = as.data.frame(check.names = FALSE, data_mean_sd[, -which(names(data_mean_sd) %in% names(mean_sd_cols))])
     names(first_cols) <- "sample"
     new_col = apply(mean_sd_cols, 1, function(x) {
       if (is.na(x[1]) & is.na(x[2])) {

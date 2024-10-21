@@ -20,14 +20,14 @@ print.pepData <- function(x, ...) {
   
   if (!inherits(pepData, "pepData")) stop("pep_object must be of the class 'pepData'")
 
-  e_data <- as.data.frame(lapply(pepData$e_data, as.character), stringsAsFactors = FALSE, check.names = FALSE)
-  f_data <- as.data.frame(lapply(pepData$f_data, as.character), stringsAsFactors = FALSE, check.names = FALSE)
+  e_data <- as.data.frame(check.names = FALSE, lapply(pepData$e_data, as.character), stringsAsFactors = FALSE)
+  f_data <- as.data.frame(check.names = FALSE, lapply(pepData$f_data, as.character), stringsAsFactors = FALSE)
   edata_ncols <- ncol(e_data)
   fdata_ncols <- ncol(f_data)
   blank_row = rep("----", 5)
 
   if (!is.null(pepData$e_meta)) {
-    e_meta <- as.data.frame(lapply(pepData$e_meta, as.character), stringsAsFactors = FALSE, check.names = FALSE)
+    e_meta <- as.data.frame(check.names = FALSE, lapply(pepData$e_meta, as.character), stringsAsFactors = FALSE)
     emeta_ncols <- ncol(e_meta)
 
     if (nrow(e_data) >= 9) {
@@ -119,14 +119,14 @@ print.metabData <- function(x, ...) {
   
   if (!inherits(metabData, "metabData")) stop("metab_object must be of the class 'metabData'")
 
-  e_data <- as.data.frame(lapply(metabData$e_data, as.character), stringsAsFactors = FALSE, check.names = FALSE)
-  f_data <- as.data.frame(lapply(metabData$f_data, as.character), stringsAsFactors = FALSE, check.names = FALSE)
+  e_data <- as.data.frame(check.names = FALSE, lapply(metabData$e_data, as.character), stringsAsFactors = FALSE)
+  f_data <- as.data.frame(check.names = FALSE, lapply(metabData$f_data, as.character), stringsAsFactors = FALSE)
   edata_ncols <- ncol(e_data)
   fdata_ncols <- ncol(f_data)
   blank_row = rep("----", 5)
 
   if (!is.null(metabData$e_meta)) {
-    e_meta <- as.data.frame(lapply(metabData$e_meta, as.character), stringsAsFactors = FALSE, check.names = FALSE)
+    e_meta <- as.data.frame(check.names = FALSE, lapply(metabData$e_meta, as.character), stringsAsFactors = FALSE)
     emeta_ncols <- ncol(e_meta)
 
     if (nrow(e_data) >= 9) {
@@ -218,14 +218,14 @@ print.proData <- function(x, ...) {
   
   if (!inherits(proData, "proData")) stop("pro_object must be of the class 'proData'")
 
-  e_data <- as.data.frame(lapply(proData$e_data, as.character), stringsAsFactors = FALSE, check.names = FALSE)
-  f_data <- as.data.frame(lapply(proData$f_data, as.character), stringsAsFactors = FALSE, check.names = FALSE)
+  e_data <- as.data.frame(check.names = FALSE, lapply(proData$e_data, as.character), stringsAsFactors = FALSE)
+  f_data <- as.data.frame(check.names = FALSE, lapply(proData$f_data, as.character), stringsAsFactors = FALSE)
   edata_ncols <- ncol(e_data)
   fdata_ncols <- ncol(f_data)
   blank_row = rep("----", 5)
 
   if (!is.null(proData$e_meta)) {
-    e_meta <- as.data.frame(lapply(proData$e_meta, as.character), stringsAsFactors = FALSE, check.names = FALSE)
+    e_meta <- as.data.frame(check.names = FALSE, lapply(proData$e_meta, as.character), stringsAsFactors = FALSE)
     emeta_ncols <- ncol(e_meta)
 
     if (nrow(e_data) >= 9) {
@@ -317,14 +317,14 @@ print.lipidData <- function(x, ...) {
   
   if (!inherits(lipidData, "lipidData")) stop("lipid_object must be of the class 'lipidData'")
 
-  e_data <- as.data.frame(lapply(lipidData$e_data, as.character), stringsAsFactors = FALSE, check.names = FALSE)
-  f_data <- as.data.frame(lapply(lipidData$f_data, as.character), stringsAsFactors = FALSE, check.names = FALSE)
+  e_data <- as.data.frame(check.names = FALSE, lapply(lipidData$e_data, as.character), stringsAsFactors = FALSE)
+  f_data <- as.data.frame(check.names = FALSE, lapply(lipidData$f_data, as.character), stringsAsFactors = FALSE)
   edata_ncols <- ncol(e_data)
   fdata_ncols <- ncol(f_data)
   blank_row = rep("----", 5)
 
   if (!is.null(lipidData$e_meta)) {
-    e_meta <- as.data.frame(lapply(lipidData$e_meta, as.character), stringsAsFactors = FALSE, check.names = FALSE)
+    e_meta <- as.data.frame(check.names = FALSE, lapply(lipidData$e_meta, as.character), stringsAsFactors = FALSE)
     emeta_ncols <- ncol(e_meta)
 
     if (nrow(e_data) >= 9) {
@@ -416,14 +416,14 @@ print.seqData <- function(x, ...) {
   
   if (!inherits(seqData, "seqData")) stop("lipid_object must be of the class 'seqData'")
 
-  e_data <- as.data.frame(lapply(seqData$e_data, as.character), stringsAsFactors = FALSE, check.names = FALSE)
-  f_data <- as.data.frame(lapply(seqData$f_data, as.character), stringsAsFactors = FALSE, check.names = FALSE)
+  e_data <- as.data.frame(check.names = FALSE, lapply(seqData$e_data, as.character), stringsAsFactors = FALSE)
+  f_data <- as.data.frame(check.names = FALSE, lapply(seqData$f_data, as.character), stringsAsFactors = FALSE)
   edata_ncols <- ncol(e_data)
   fdata_ncols <- ncol(f_data)
   blank_row = rep("----", 5)
 
   if (!is.null(seqData$e_meta)) {
-    e_meta <- as.data.frame(lapply(seqData$e_meta, as.character), stringsAsFactors = FALSE, check.names = FALSE)
+    e_meta <- as.data.frame(check.names = FALSE, lapply(seqData$e_meta, as.character), stringsAsFactors = FALSE)
     emeta_ncols <- ncol(e_meta)
 
     if (nrow(e_data) >= 9) {
@@ -516,7 +516,7 @@ print.dataRes <- function(x, ...) {
   
   if ((!is.null(attr(dataRes, "groupvar")) & attr(dataRes, "by") == "molecule") | (is.null(attr(dataRes, "groupvar")) & !is.null(attr(dataRes, "group_DF")) & (attr(dataRes, "by") == "molecule"))) {
     # extract item from dataRes, n_per_grp
-    n_per_grp <- as.data.frame(lapply(dataRes$n_per_grp, as.character), stringsAsFactors = FALSE)
+    n_per_grp <- as.data.frame(check.names = FALSE, lapply(dataRes$n_per_grp, as.character), stringsAsFactors = FALSE)
 
     # choosing how many rows to print
     if (nrow(n_per_grp) <= 10) {
@@ -536,7 +536,7 @@ print.dataRes <- function(x, ...) {
     }
 
     # extract item from dataRes, mean
-    mean <- as.data.frame(lapply(dataRes$mean, as.character), stringsAsFactors = FALSE)
+    mean <- as.data.frame(check.names = FALSE, lapply(dataRes$mean, as.character), stringsAsFactors = FALSE)
 
     # choosing how many rows to print
     if (nrow(mean) <= 10) {
@@ -555,7 +555,7 @@ print.dataRes <- function(x, ...) {
     }
 
     # extract item from dataRes, std_dev
-    sd <- as.data.frame(lapply(dataRes$sd, as.character), stringsAsFactors = FALSE)
+    sd <- as.data.frame(check.names = FALSE, lapply(dataRes$sd, as.character), stringsAsFactors = FALSE)
 
     # choosing how many rows to print
     if (nrow(sd) <= 10) {
@@ -574,7 +574,7 @@ print.dataRes <- function(x, ...) {
     }
 
     # extract item from dataRes, median
-    median <- as.data.frame(lapply(dataRes$median, as.character), stringsAsFactors = FALSE)
+    median <- as.data.frame(check.names = FALSE, lapply(dataRes$median, as.character), stringsAsFactors = FALSE)
 
     # choosing how many rows to print
     if (nrow(median) <= 10) {
@@ -593,7 +593,7 @@ print.dataRes <- function(x, ...) {
     }
 
     # extract item from dataRes, pct_obs
-    pct_obs <- as.data.frame(lapply(dataRes$pct_obs, as.character), stringsAsFactors = FALSE)
+    pct_obs <- as.data.frame(check.names = FALSE, lapply(dataRes$pct_obs, as.character), stringsAsFactors = FALSE)
 
     # choosing how many rows to print
     if (nrow(pct_obs) <= 10) {
@@ -612,7 +612,7 @@ print.dataRes <- function(x, ...) {
     }
 
     # extract item from dataRes, min
-    min <- as.data.frame(lapply(dataRes$min, as.character), stringsAsFactors = FALSE)
+    min <- as.data.frame(check.names = FALSE, lapply(dataRes$min, as.character), stringsAsFactors = FALSE)
 
     # choosing how many rows to print
     if (nrow(min) <= 10) {
@@ -631,7 +631,7 @@ print.dataRes <- function(x, ...) {
     }
 
     # extract item from dataRes, max
-    max <- as.data.frame(lapply(dataRes$max, as.character), stringsAsFactors = FALSE)
+    max <- as.data.frame(check.names = FALSE, lapply(dataRes$max, as.character), stringsAsFactors = FALSE)
 
     # choosing how many rows to print
     if (nrow(max) <= 10) {
@@ -650,7 +650,7 @@ print.dataRes <- function(x, ...) {
     }
   } else {
     # extract item from dataRes, mean
-    mean <- as.data.frame(lapply(dataRes$mean, as.character), stringsAsFactors = FALSE)
+    mean <- as.data.frame(check.names = FALSE, lapply(dataRes$mean, as.character), stringsAsFactors = FALSE)
 
     # choosing how many rows to print
     if (nrow(mean) <= 10) {
@@ -669,7 +669,7 @@ print.dataRes <- function(x, ...) {
     }
 
     # extract item from dataRes, std_dev
-    sd <- as.data.frame(lapply(dataRes$sd, as.character), stringsAsFactors = FALSE)
+    sd <- as.data.frame(check.names = FALSE, lapply(dataRes$sd, as.character), stringsAsFactors = FALSE)
 
     # choosing how many rows to print
     if (nrow(sd) <= 10) {
@@ -688,7 +688,7 @@ print.dataRes <- function(x, ...) {
     }
 
     # extract item from dataRes, median
-    median <- as.data.frame(lapply(dataRes$median, as.character), stringsAsFactors = FALSE)
+    median <- as.data.frame(check.names = FALSE, lapply(dataRes$median, as.character), stringsAsFactors = FALSE)
 
     # choosing how many rows to print
     if (nrow(median) <= 10) {
@@ -707,7 +707,7 @@ print.dataRes <- function(x, ...) {
     }
 
     # extract item from dataRes, pct_obs
-    pct_obs <- as.data.frame(lapply(dataRes$pct_obs, as.character), stringsAsFactors = FALSE)
+    pct_obs <- as.data.frame(check.names = FALSE, lapply(dataRes$pct_obs, as.character), stringsAsFactors = FALSE)
 
     # choosing how many rows to print
     if (nrow(pct_obs) <= 10) {
@@ -726,7 +726,7 @@ print.dataRes <- function(x, ...) {
     }
 
     # extract item from dataRes, min
-    min <- as.data.frame(lapply(dataRes$min, as.character), stringsAsFactors = FALSE)
+    min <- as.data.frame(check.names = FALSE, lapply(dataRes$min, as.character), stringsAsFactors = FALSE)
 
     # choosing how many rows to print
     if (nrow(min) <= 10) {
@@ -745,7 +745,7 @@ print.dataRes <- function(x, ...) {
     }
 
     # extract item from dataRes, max
-    max <- as.data.frame(lapply(dataRes$max, as.character), stringsAsFactors = FALSE)
+    max <- as.data.frame(check.names = FALSE, lapply(dataRes$max, as.character), stringsAsFactors = FALSE)
 
     # choosing how many rows to print
     if (nrow(max) <= 10) {

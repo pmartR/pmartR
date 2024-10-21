@@ -126,7 +126,7 @@ combine_techreps <- function(omicsData, combine_fn = NULL,
     dplyr::group_by(!!dplyr::sym(techrep_cname)) %>%
     dplyr::summarise_all(dplyr::n_distinct) %>%
     dplyr::select(-dplyr::one_of(c(techrep_cname, fdata_cname))) %>%
-    as.data.frame()
+    as.data.frame(check.names = FALSE)
 
   # names of columns with multiple values per bio sample, if any.
   names_mult <- lapply(distinct, function(x) {
@@ -145,7 +145,7 @@ combine_techreps <- function(omicsData, combine_fn = NULL,
     dplyr::group_by(!!dplyr::sym(techrep_cname)) %>%
     dplyr::slice(1) %>%
     dplyr::select(!!dplyr::sym(techrep_cname), dplyr::everything(), -dplyr::one_of(fdata_cname)) %>%
-    as.data.frame()
+    as.data.frame(check.names = FALSE)
 
   # create new, collapsed e_data object, averaged over technical replicates
   new_edata <- e_data[get_edata_cname(omicsData)]
@@ -204,7 +204,7 @@ combine_techreps <- function(omicsData, combine_fn = NULL,
         dplyr::group_by(!!dplyr::sym(techrep_cname)) %>%
         dplyr::slice(1) %>%
         dplyr::select(!!dplyr::sym(techrep_cname), dplyr::everything(), -dplyr::one_of(fdata_cname)) %>%
-        as.data.frame()
+        as.data.frame(check.names = FALSE)
 
       colnames(new_group_DF)[which(colnames(new_group_DF) == techrep_cname)] <- get_fdata_cname(omicsData) # this attribute will always have been reset at this point
       if (!is.null(bio_sample_names)) new_group_DF[, get_fdata_cname(omicsData)] <- bio_sample_names # display names is always a vector of values at this point

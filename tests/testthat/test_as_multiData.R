@@ -1,6 +1,6 @@
 source(system.file('testdata', 'load_data.R', package = 'pmartR'), local = TRUE)
 
-f_meta <- data.frame(
+f_meta <- data.frame(check.names = FALSE, 
   "Proteins" = c(paste0("Mock", 1:3), paste0("Infection", c(1:7)), NA, "Infection9"),
   "Lipids" = c(paste0("Mock", 1:3), paste0("Infection", c(1:4)), NA, paste0("Infection", c(6:9))),
   "Metabolites" = c(paste0("Mock", 1:3), paste0("Infection", c(1:9))),
@@ -8,7 +8,7 @@ f_meta <- data.frame(
 )
 
 # fmeta where the Lipids column is bad
-bad_fmeta1 <- data.frame(
+bad_fmeta1 <- data.frame(check.names = FALSE, 
   "Proteins" = c(paste0("Mock", 1:3), paste0("Infection", c(1:7)), NA, "Infection9"),
   "Lipids" = c(paste0("Mock", 1:3), paste0("Infection", c(1:3)), NA, NA, paste0("Infection", c(6:9))),
   "Metabolites" = c(paste0("Mock", 1:3), paste0("Infection", c(1:9))),

@@ -996,7 +996,7 @@ trelli_abundance_heatmap <- function(trelliData,
     if ("biomolecule count" %in% cognostics) {
       cogs_to_add <- rbind(
         cogs_to_add, 
-        data.frame(
+        data.frame(check.names = FALSE, 
           name = "Biomolecule Count",
           value = DF[[edata_cname]] %>% unique() %>% length()
         )
@@ -1410,7 +1410,7 @@ trelli_missingness_bar <- function(trelliData,
     # Save total counts 
     totalCounts <- attr(trelliData$statRes, "group_DF")$Group %>% 
       table(dnn = "Group") %>% 
-      data.frame() %>% 
+      data.frame(check.names = FALSE) %>% 
       dplyr::rename(Total = Freq)
 
     if (test_mode) {

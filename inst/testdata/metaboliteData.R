@@ -24,7 +24,7 @@ fdata <- metab_fdata
 set.seed(22)
 
 # Construct an emeta data frame from edata.
-emeta <- data.frame(Metabolite = edata[, 1],
+emeta <- data.frame(check.names = FALSE, Metabolite = edata[, 1],
                     # Make up 17 different metabolite classes.
                     MClass = sample(x = paste0('MClass', 1:17),
                                     size = 80,

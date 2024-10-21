@@ -94,7 +94,7 @@ test_that('normalize_zero_one_scaling produces the correct output', {
     edata_stand[-1][col] != min
   })
   min_val[is.na(min_val)] <- FALSE
-  min_val <- as.data.frame(min_val)
+  min_val <- as.data.frame(check.names = FALSE, min_val)
   a_norm_zeros <- as.matrix(a_norm$e_data[-1] != 0)
   row.names(a_norm_zeros) <- NULL
   
@@ -106,7 +106,7 @@ test_that('normalize_zero_one_scaling produces the correct output', {
     edata_stand[-1][col] != max
   })
   max_val[is.na(max_val)] <- TRUE
-  max_val <- as.data.frame(max_val)
+  max_val <- as.data.frame(check.names = FALSE, max_val)
   a_norm_ones <- as.matrix(a_norm$e_data[-1] != 1)
   row.names(a_norm_ones) <- NULL
   

@@ -951,10 +951,10 @@ test_that('custom_filter and applyFilt produce the correct output', {
   ))
 
   expect_equal(
-    data.frame(attr(pdata_grp, "group_DF")[-c(3, 5, 11), ],
+    data.frame(check.names = FALSE, attr(pdata_grp, "group_DF")[-c(3, 5, 11), ],
       row.names = NULL
     ),
-    data.frame(attr(filtered_fdr_grp, "group_DF"),
+    data.frame(check.names = FALSE, attr(filtered_fdr_grp, "group_DF"),
       row.names = NULL
     )
   )
@@ -1504,10 +1504,10 @@ test_that('custom_filter and applyFilt produce the correct output', {
   ))
 
   expect_equal(
-    data.frame(attr(pdata_grp, "group_DF")[c(3, 5, 11), ],
+    data.frame(check.names = FALSE, attr(pdata_grp, "group_DF")[c(3, 5, 11), ],
       row.names = NULL
     ),
-    data.frame(attr(filtered_fdk_grp, "group_DF"),
+    data.frame(check.names = FALSE, attr(filtered_fdk_grp, "group_DF"),
       row.names = NULL
     )
   )
