@@ -192,7 +192,7 @@ ppp_rip <- function(e_data, edata_id, fdata_id, groupDF, alpha = 0.2, proportion
   
   # conduct K-W test using kw_rcpp function 
   pvals = kw_rcpp(as.matrix(mydata), group_dat)
-  pvals = data.frame(pvals)
+  pvals = data.frame(check.names = FALSE, pvals)
 
   RIPeps <- as.character(peps[as.numeric(pvals[, 1]) > alpha &
     !is.na(as.numeric(pvals[, 1]))])
@@ -251,7 +251,7 @@ rip <- function(e_data, edata_id, fdata_id, groupDF, alpha = .2) {
 
   # conduct K-W test on un-normalized data, used kw_rcpp function
   pvals = kw_rcpp(as.matrix(mydata), group_dat)
-  pvals = data.frame(pvals)
+  pvals = data.frame(check.names = FALSE, pvals)
 
   RIPeps <- as.character(peps[as.numeric(pvals[, 1]) > alpha &
     !is.na(as.numeric(pvals[, 1]))])

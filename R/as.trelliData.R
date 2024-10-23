@@ -171,7 +171,7 @@ as.trelliData.edata <- function(e_data,
   # Build an omics data object--------------------------------------------------
 
   # Generate a f data frame
-  fdata <- data.frame("Sample" = colnames(edata)[colnames(edata) != edata_cname], "Condition" = NA)
+  fdata <- data.frame(check.names = FALSE, "Sample" = colnames(edata)[colnames(edata) != edata_cname], "Condition" = NA)
   fdata_cname <- "Sample"
 
   # Diverge building paths depending on input data type 
@@ -403,7 +403,7 @@ as.trelliData <- function(omicsData = NULL, statRes = NULL) {
     if (!is.null(attributes(omicsData)$group_DF)) {
       group_counts <- attributes(omicsData)$group_DF$Group %>%
         table(dnn = "Group") %>%
-        data.frame()
+        data.frame(check.names = FALSE)
       if (1 %in% group_counts$Freq) {
         warning(paste(
           "singleton groups found in group_designation:",

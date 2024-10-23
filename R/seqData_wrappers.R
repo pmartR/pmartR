@@ -237,9 +237,9 @@ DESeq2_wrapper <- function(omicsData, test = "Wald", p_adjust = "BH",
 
   group_means <- purrr::map_dfc(1:length(unique(grouping_info$Group)), function(group_n) {
     group <- unique(grouping_info$Group)[group_n]
-    group_cols <- as.data.frame(norm_factors_apply)[grouping_info$Group == group]
+    group_cols <- as.data.frame(check.names = FALSE, norm_factors_apply)[grouping_info$Group == group]
     means_group <- apply(group_cols, 1, mean, na.rm = T)
-    df <- data.frame(means_group)
+    df <- data.frame(check.names = FALSE, means_group)
     colnames(df) <- group
     df
   })
@@ -552,14 +552,14 @@ edgeR_wrapper <- function(
 
   ## Stick in attributes for MA plots
   norm_factors_find <- norm_factors_edgeR
-  norm_factors_apply <- as.data.frame(sweep(as.data.frame(norm_factors_find$counts),
+  norm_factors_apply <- as.data.frame(check.names = FALSE, sweep(as.data.frame(check.names = FALSE, norm_factors_find$counts),
     MARGIN = 2,
     FUN = "/", STATS = norm_factors_find$samples$norm.factors
   ))
   group_means <- suppressMessages(purrr::map_dfc(1:ncol(design_matrix_edgeR), function(col) {
     group_cols <- norm_factors_apply[as.logical(design_matrix_edgeR[, col])]
     means_group <- apply(group_cols, 1, mean, na.rm = T)
-    data.frame(means_group)
+    data.frame(check.names = FALSE, means_group)
   }))
 
   colnames(group_means) <- unique(grouping_info$Group)
@@ -621,7 +621,7 @@ edgeR_wrapper <- function(
       n = Inf, adjust.method = p_adjust,
       sort.by = "none"
     )
-    res <- as.data.frame(res$table)
+    res <- as.data.frame(check.names = FALSE, res$table)
 
     sig_col <- if ("FDR" %in% colnames(res)) "FDR" else "FWER"
 
@@ -854,18 +854,18 @@ voom_wrapper <- function(
   norm_factors_limma <- do.call(edgeR::calcNormFactors, run_NF)
 
   norm_factors_find <- norm_factors_limma
-  norm_factors_apply <- as.data.frame(sweep(as.data.frame(norm_factors_find$counts),
+  norm_factors_apply <- as.data.frame(check.names = FALSE, sweep(as.data.frame(check.names = FALSE, norm_factors_find$counts),
     MARGIN = 2,
     FUN = "/", STATS = norm_factors_find$samples$norm.factors
   ))
-  norm_factors_apply <- as.data.frame(sweep(as.data.frame(norm_factors_find$counts),
+  norm_factors_apply <- as.data.frame(check.names = FALSE, sweep(as.data.frame(check.names = FALSE, norm_factors_find$counts),
     MARGIN = 2,
     FUN = "/", STATS = norm_factors_find$samples$norm.factors
   ))
   group_means <- suppressMessages(purrr::map_dfc(1:ncol(design_matrix_limma), function(col) {
     group_cols <- norm_factors_apply[as.logical(design_matrix_limma[, col])]
     means_group <- apply(group_cols, 1, mean, na.rm = T)
-    data.frame(means_group)
+    data.frame(check.names = FALSE, means_group)
   }))
 
   colnames(group_means) <- unique(grouping_info$Group)
@@ -1286,7 +1286,7 @@ dispersion_est <- function(omicsData, method,
     dds <- DESeq2::estimateDispersions(dds)
 
     ## only plots for those above 0
-    df1 <- as.data.frame(S4Vectors::mcols(dds))
+    df1 <- as.data.frame(check.names = FALSE, S4Vectors::mcols(dds))
 
     ## Plot
     p <- ggplot2::ggplot(
@@ -1341,7 +1341,7 @@ dispersion_est <- function(omicsData, method,
     prior <- fit_edgeR[[prior_name]]
     post <- fit_edgeR[[post_name]]
     
-    df2 <- data.frame(
+    df2 <- data.frame(check.names = FALSE, 
       CD = D_edgeR$common.dispersion,
       TD = D_edgeR$trended.dispersion,
       TagD = D_edgeR$tagwise.dispersion,
@@ -1412,7 +1412,7 @@ dispersion_est <- function(omicsData, method,
 
     efit <- limma::eBayes(limma_vfit)
 
-    df3 <- data.frame(
+    df3 <- data.frame(check.names = FALSE, 
       x_disp = limma_voom$voom.xy$x,
       y_disp = limma_voom$voom.xy$y,
       x_fit = limma_voom$voom.line$x,

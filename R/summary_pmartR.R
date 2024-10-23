@@ -93,7 +93,7 @@ summary.seqData <- function(object, ...) {
 
   # construct output #
   newres <- lapply(res, function(x) ifelse(is.null(x), "NA", as.character(x)))
-  catmat <- data.frame(unlist(newres, use.names = FALSE))
+  catmat <- data.frame(check.names = FALSE, unlist(newres, use.names = FALSE))
 
   # assemble text strings #
   edata_name <- paste("Unique ", attributes(omicsData)$cnames$edata_cname, "s (e_data)", sep = "")
@@ -121,7 +121,7 @@ summary.seqData <- function(object, ...) {
     newres2 <- lapply(res2, function(x) ifelse(is.null(x), "NA", as.character(x)))
 
     newres2 <- c(newres, newres2)
-    catmat2 <- data.frame(unlist(newres2, use.names = FALSE))
+    catmat2 <- data.frame(check.names = FALSE, unlist(newres2, use.names = FALSE))
     colnames(catmat2) <- NULL
     rownames(catmat2) <- c(
       "Class", fdata_name, edata_name, emeta_name,
@@ -238,7 +238,7 @@ summarizer <- function(omicsData) {
 
   # Turn res into a data frame, remove all column names, and include the
   # established row names.
-  catmat <- data.frame(unlist(res, use.names = FALSE))
+  catmat <- data.frame(check.names = FALSE, unlist(res, use.names = FALSE))
   colnames(catmat) <- NULL
   rownames(catmat) <- res_names
 

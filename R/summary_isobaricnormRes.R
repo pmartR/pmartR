@@ -39,7 +39,7 @@ summary.isobaricnormRes <- function(object, ...) {
   xprmnts <- unique(isobaricnormRes_object$f_data[, exp_cname])
 
   # Assemble a data frame with the experiment levels/values.
-  dfxprmnts <- data.frame(xprmnts)
+  dfxprmnts <- data.frame(check.names = FALSE, xprmnts)
   names(dfxprmnts) <- exp_cname
 
   # Create a list that will hold the samples belonging to each experiment.

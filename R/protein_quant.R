@@ -654,7 +654,7 @@ rrollup <- function(pepData, combine_fn, parallel = TRUE) {
 
     # Convert the single row matrix to a single row data frame and rename the
     # columns to the original column names.
-    res <- data.frame(res)
+    res <- data.frame(check.names = FALSE, res)
     names(res) <- names(current_subset)
 
     # Using the foreach function with %dopar% will assign the last element
@@ -664,7 +664,7 @@ rrollup <- function(pepData, combine_fn, parallel = TRUE) {
   }
 
   # Combine the protein abundances (or is it abundanci?).
-  final_result <- data.frame(unique_proteins,
+  final_result <- data.frame(check.names = FALSE, unique_proteins,
     data.table::rbindlist(r),
     check.names = FALSE
   )
@@ -803,7 +803,7 @@ qrollup <- function(pepData, qrollup_thresh, combine_fn, parallel = TRUE) {
 
     # Convert the single row matrix to a single row data frame and rename the
     # columns to the original column names.
-    res <- data.frame(res)
+    res <- data.frame(check.names = FALSE, res)
     names(res) <- names(current_subset)
 
     # Using the foreach function with %dopar% will assign the last element
@@ -814,7 +814,7 @@ qrollup <- function(pepData, qrollup_thresh, combine_fn, parallel = TRUE) {
   }
 
   # Combine the protein abundances (or is it abundanci?).
-  final_result <- data.frame(unique_proteins,
+  final_result <- data.frame(check.names = FALSE, unique_proteins,
     data.table::rbindlist(
       lapply(r, function(x) x[[1]])
     ),
@@ -823,7 +823,7 @@ qrollup <- function(pepData, qrollup_thresh, combine_fn, parallel = TRUE) {
   names(final_result)[1] <- pro_id
 
   # Combine the peptide counts with their corresponding proteins.
-  temp_pepes <- data.frame(final_result[, 1],
+  temp_pepes <- data.frame(check.names = FALSE, final_result[, 1],
     n_peps_used = sapply(r, function(x) x[[2]]),
     check.names = FALSE
   )
@@ -964,7 +964,7 @@ zrollup <- function(pepData, combine_fn, parallel = TRUE) {
 
     # Convert the single row matrix to a single row data frame and rename the
     # columns to the original column names.
-    res <- data.frame(res, check.names = FALSE)
+    res <- data.frame(check.names = FALSE, res)
     names(res) <- names(current_subset)
 
     # Using the foreach function with %dopar% will assign the last element
@@ -974,7 +974,7 @@ zrollup <- function(pepData, combine_fn, parallel = TRUE) {
   }
 
   # Combine the protein abundances (or is it abundanci?).
-  final_result <- data.frame(unique_proteins,
+  final_result <- data.frame(check.names = FALSE, unique_proteins,
     data.table::rbindlist(r),
     check.names = FALSE
   )

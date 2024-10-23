@@ -120,7 +120,7 @@ normalize_quantile <- function(omicsData) {
 
   # Reassemble e_data with the normalized data. NOTE: The ID column will now be
   # the first column of e_data if it wasn't already.
-  omicsData$e_data <- data.frame(edata_idcol, x_norm)
+  omicsData$e_data <- data.frame(check.names = FALSE, edata_idcol, x_norm)
   names(omicsData$e_data) <- edata_cnames
 
 

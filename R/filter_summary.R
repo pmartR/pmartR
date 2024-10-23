@@ -53,7 +53,7 @@ summary.moleculeFilt <- function(object, min_num = NULL, ...) {
   # how many peptides appear in the dataset once, twice, 3 times, etc.
   cut_data <- table(cut(filter_object$Num_Observations, breaks = -1:max(filter_object$Num_Observations)))
   cumcounts <- cumsum(cut_data)
-  pep_observation_counts <- data.frame(num_observations = 0:(length(cumcounts) - 1), frequency_counts = cumcounts)
+  pep_observation_counts <- data.frame(check.names = FALSE, num_observations = 0:(length(cumcounts) - 1), frequency_counts = cumcounts)
 
   if (!is.null(min_num)) {
     # get number molecules tested
@@ -224,7 +224,7 @@ summary.RNAFilt <- function(object,
   }
 
   ## Pre-filter
-  df <- as.data.frame(apply(temp_obj[-1], 2, summary))
+  df <- as.data.frame(check.names = FALSE, apply(temp_obj[-1], 2, summary))
   df["SD", ] <- apply(temp_obj[-1], 2, sd)
 
   rmved <- !(filter_object[[colnames(filter_object)[[1]]]] %in% temp_obj[[colnames(filter_object)[[1]]]])
@@ -540,7 +540,7 @@ print.proteomicsFilterSummary <- function(x, ...) {
   }
   
   # create output #
-  catmat <- data.frame(
+  catmat <- data.frame(check.names = FALSE, 
     c(object$num_per_pep, " ", object$num_pep_filtered, object$num_pep_notfiltered),
     c(object$num_per_pro, " ", object$num_pro_filtered, object$num_pro_notfiltered)
   )
@@ -873,7 +873,7 @@ print.imdanovaFilterSummary <- function(x, ...) {
     object$num_not_filtered <- NA
   }
 
-  catmat <- data.frame(c(object$pep_observation_counts, object$num_filtered, object$num_not_filtered))
+  catmat <- data.frame(check.names = FALSE, c(object$pep_observation_counts, object$num_filtered, object$num_not_filtered))
   rownames(catmat) <- c("Total Observations: ", "Filtered: ", "Not Filtered: ")
 
   colnames(catmat) <- NULL
@@ -1283,14 +1283,14 @@ summary.customFilt <- function(object, ...) {
 
   ## construct data frame ##
   if (is.null(emeta_id)) {
-    disp <- data.frame(
+    disp <- data.frame(check.names = FALSE, 
       c(samps_filt, edata_filt),
       c(samps_left, edata_left),
       c(num_samples, num_edata)
     )
     rownames(disp) <- c(samp_id, edata_id)
   } else {
-    disp <- data.frame(
+    disp <- data.frame(check.names = FALSE, 
       c(samps_filt, edata_filt, emeta_filt),
       c(samps_left, edata_left, emeta_left),
       c(num_samples, num_edata, num_emeta)

@@ -51,7 +51,7 @@ summary.normRes <- function(object, ...) {
 
   # construct output #
   res <- lapply(res, function(x) ifelse(is.null(x), "NA", as.character(x)))
-  catmat <- data.frame(unlist(res, use.names = FALSE))
+  catmat <- data.frame(check.names = FALSE, unlist(res, use.names = FALSE))
 
   # assemble text strings #
   colnames(catmat) <- NULL
@@ -100,7 +100,7 @@ summary.dimRes <- function(object, ...) {
     r2[i] <- round(attr(dimRes_object, "R2")[i], 3)
   }
 
-  dim_summary = data.frame(R_squared = r2)
+  dim_summary = data.frame(check.names = FALSE, R_squared = r2)
   row.names(dim_summary) <- attributes(dimRes_object)$names[-1]
 
   message("Summary of 'dimRes' Object\n\n")

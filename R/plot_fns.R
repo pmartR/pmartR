@@ -694,7 +694,7 @@ plot.nmrnormRes <- function(x, nmrData = NULL, order_by = NULL,
   fdata_cname <- attr(nmrnormRes_obj, "cnames")$fdata_cname
 
   # organize nmrnormRes_obj
-  data <- data.frame(
+  data <- data.frame(check.names = FALSE, 
     Sample = nmrnormRes_obj$Sample,
     value = nmrnormRes_obj$value
   )
@@ -1491,7 +1491,7 @@ na_scatter <- function (edata, group_df, na.by.molecule, edata_cname,
     # is NULL.
     mean_intensity <- rowMeans(edata[, -edata_cname_id], na.rm = TRUE)
 
-    plot_data <- as.data.frame(cbind(mean_intensity, num_missing_vals))
+    plot_data <- as.data.frame(check.names = FALSE, cbind(mean_intensity, num_missing_vals))
 
     # Start the scatter plot when the group_DF attribute is NULL.
     p <- ggplot2::ggplot(
@@ -1532,7 +1532,7 @@ na_scatter <- function (edata, group_df, na.by.molecule, edata_cname,
     mean_intensity <- do.call(cbind, mean_by_group)
 
     plot_data <- cbind(num_missing_vals, mean_intensity)
-    plot_data <- as.data.frame(plot_data)
+    plot_data <- as.data.frame(check.names = FALSE, plot_data)
     plot_data <- plot_data %>%
       tidyr::pivot_longer(
         -num_missing_vals,
@@ -1768,7 +1768,7 @@ plot.corRes <- function(x, omicsData = NULL, order_by = NULL,
   }
 
   # Create the data frame that will be used to produce the correlation heat map.
-  corRes_obj_df <- data.frame(corRes_obj, check.names = FALSE)
+  corRes_obj_df <- data.frame(check.names = FALSE, corRes_obj)
   corRes_obj_df <- cbind(Var1 = rownames(corRes_obj_df), corRes_obj_df)
   rownames(corRes_obj_df) <- 1:nrow(corRes_obj_df)
   corRes_melt <- corRes_obj_df %>%
@@ -2002,7 +2002,7 @@ plot.dimRes <- function (x, omicsData = NULL,
       stop("palette must be an RColorBrewer palette")
     }
   }
-  plotdata <- data.frame(SampleID = dimRes_obj$SampleID,
+  plotdata <- data.frame(check.names = FALSE, SampleID = dimRes_obj$SampleID,
                          PC1 = dimRes_obj$PC1,
                          PC2 = dimRes_obj$PC2)
   plotdata_name <- names(plotdata)[1]
@@ -2516,7 +2516,7 @@ plot.moleculeFilt <- function(x, min_num = NULL, cumulative = TRUE,
   }
 
   # create plotting dataframe
-  pep_observation_counts <- data.frame(
+  pep_observation_counts <- data.frame(check.names = FALSE, 
     num_observations = num_obs,
     frequency_counts = counts,
     fill = fill
@@ -3132,7 +3132,7 @@ plot.imdanovaFilt <- function(x, min_nonmiss_anova = NULL,
   group_sizes <- attr(filter_object, "group_sizes")$n_group
   group_sizes_valid <- group_sizes[group_sizes > 1]
   max_x <- min(group_sizes_valid)
-  obs <- as.data.frame(filter_object)[-1]
+  obs <- as.data.frame(check.names = FALSE, filter_object)[-1]
 
   # Count number of groups in each row of the obs data frame that have > 0, > 1,
   # ..., > max_x non-missing values. For ANOVA we need at least two groups that
@@ -3161,14 +3161,14 @@ plot.imdanovaFilt <- function(x, min_nonmiss_anova = NULL,
   })
 
   # ANOVA table
-  plotter1 <- data.frame(
+  plotter1 <- data.frame(check.names = FALSE, 
     Min_obs = c(0:max_x),
     Count_biomolecules = c(n_biomolecules_anova),
     Statistic = c(rep("Within 2+ groups (ANOVA)", length(0:max_x)))
   )
 
   # G-test table
-  plotter2 <- data.frame(
+  plotter2 <- data.frame(check.names = FALSE, 
     Min_obs = c(0:max_x),
     Count_biomolecules = c(n_biomolecules_gtest),
     Statistic = c(rep("Within 1+ groups (G-Test)", length(0:max_x)))
@@ -3601,11 +3601,11 @@ plot.proteomicsFilt <- function(x,
     title_lab_pro
 
   # create plotting dataframe
-  pro_counts_df <- data.frame(
+  pro_counts_df <- data.frame(check.names = FALSE, 
     counts = pro_counts,
     bins = pro_bins
   )
-  pep_counts_df <- data.frame(
+  pep_counts_df <- data.frame(check.names = FALSE, 
     counts = pep_counts,
     bins = pep_bins
   )
@@ -6300,7 +6300,7 @@ plot.statRes <- function(x,
         v3 <- NA
       }
 
-      data.frame(var1 = v1, var2 = v2, pval = v3, comp = label)
+      data.frame(check.names = FALSE, var1 = v1, var2 = v2, pval = v3, comp = label)
     })
 
     p <- ggplot2::ggplot(
@@ -6352,7 +6352,7 @@ plot.statRes <- function(x,
 prep_flags <- function(x, test) {
   if (test == "anova") {
     # Assemble a data frame with the sample IDs and anova flags.
-    da_flag <- data.frame(
+    da_flag <- data.frame(check.names = FALSE, 
       x[, 1, drop = FALSE],
       x[, grep("^Flag_A_", colnames(x))],
       check.names = FALSE
@@ -6387,7 +6387,7 @@ prep_flags <- function(x, test) {
     # test is "combined".
 
     # Assemble a data frame with the sample IDs and anova flags.
-    da_flag <- data.frame(
+    da_flag <- data.frame(check.names = FALSE, 
       x[, 1, drop = FALSE],
       x[, grep("^Flag_A_", colnames(x))],
       check.names = FALSE
@@ -6527,7 +6527,7 @@ make_volcano_plot_df <- function(x) {
     colnames(counts) <-
       gsub("^Count_", replacement = "", colnames(counts))
 
-    counts_df <- data.frame()
+    counts_df <- data.frame(check.names = FALSE)
     for (comp in as.character(unique(volcano$Comparison))) {
       # create a vector of the two group names being compared
       groups = strsplit(comp, " vs ")[[1]]
