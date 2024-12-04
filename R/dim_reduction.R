@@ -118,14 +118,15 @@ dim_reduction <- function(omicsData, k = 2) {
 
   temp_res = data.frame(check.names = FALSE, SampleID = names(temp_data), pca_ests)
 
-  class(temp_res) <- "dimRes"
+  class(temp_res) <- c("dimRes", "data.frame")
 
   attr(temp_res, "group_DF") <- get_group_DF(omicsData)
-
 
   if (!inherits(pca_res, "glmpca")) {
     attr(temp_res, "R2") <- pca_res@R2
   }
 
+  
+  
   return(temp_res)
 }

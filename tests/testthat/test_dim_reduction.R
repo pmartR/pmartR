@@ -69,7 +69,7 @@ test_that('PCA produces the correct output', {
     PC3 = as.numeric(pals@scores[, 3])
   )
 
-  class(standard) <- "dimRes"
+  class(standard) <- c("dimRes", "data.frame")
   attr(standard, "group_DF") <- attr(ldata, "group_DF")
   attr(standard, "R2") <- pals@R2
   attr(standard, "row.names") <- names(ldata$e_data[, -1])
@@ -94,7 +94,7 @@ test_that('PCA produces the correct output', {
     PC2 = as.numeric(pals_g@scores[, 2])
   )
 
-  class(standard_g) <- "dimRes"
+  class(standard_g) <- c("dimRes", "data.frame")
   attr(standard_g, "group_DF") <- attr(ldata_g, "group_DF")
   attr(standard_g, "R2") <- pals_g@R2
   attr(standard_g, "row.names") <- names(ldata_g$e_data[, -1])
@@ -125,7 +125,7 @@ test_that('PCA produces the correct output', {
 
   seq_standard <- c(list(SampleID = names(seqdata$e_data)[-1]), pca_ests)
 
-  class(seq_standard) <- "dimRes"
+  class(seq_standard) <- c("dimRes", "data.frame")
   attr(seq_standard, "group_DF") <- attr(seqdata, "group_DF")
   attr(seq_standard, "row.names") <- names(seqdata$e_data[, -1])
 
@@ -153,7 +153,7 @@ test_that('PCA produces the correct output', {
 
   seq_standard_g <- c(list(SampleID = names(seqdata_grp$e_data)[-1]), pca_ests)
 
-  class(seq_standard_g) <- "dimRes"
+  class(seq_standard_g) <- c("dimRes", "data.frame")
   attr(seq_standard_g, "group_DF") <- attr(seqdata_grp, "group_DF")
   attr(seq_standard_g, "row.names") <- names(seqdata_grp$e_data[, -1])
 
