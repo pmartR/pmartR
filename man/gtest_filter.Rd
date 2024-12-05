@@ -2,7 +2,7 @@
 % Please edit documentation in R/applyFilt.R
 \name{gtest_filter}
 \alias{gtest_filter}
-\title{Identifies peptides to be filtered out in preparation for IMD-ANOVA.}
+\title{Identifies biomolecules to be filtered out in preparation for IMD-ANOVA.}
 \usage{
 gtest_filter(nonmiss_per_group, min_nonmiss_gtest, comparisons = NULL)
 }
@@ -13,8 +13,8 @@ group. The second element giving a data.frame with the first column giving
 the biomolecule and the second through kth columns giving the number of
 non-missing observations for each of the \code{k} groups.}
 
-\item{min_nonmiss_gtest}{the minimum number of non-missing peptide values
-allowed in a minimum of one group. Default value is 3.}
+\item{min_nonmiss_gtest}{the minimum number of non-missing biomolecule values
+in at least one group. Default value is 3.}
 
 \item{comparisons}{data.frame with columns for "Control" and "Test"
 containing the different comparisons of interest. Comparisons will be made
@@ -22,7 +22,7 @@ between the Test and the corresponding Control. If left NULL, then all
 pairwise comparisons are executed.}
 }
 \value{
-filter.peps a character vector of the peptides to be filtered out
+A character vector of the biomolecules to be filtered out
   prior to the G-test or IMD-ANOVA
 }
 \description{
@@ -31,9 +31,9 @@ filtered specifically according to the G-test.
 }
 \details{
 Two methods are available for determining the peptides to be
-  filtered. The naive approach is based on \code{min.nonmiss.allowed}, and
-  looks for peptides that do not have at least \code{min.nonmiss.allowed}
-  values per group. The other approach also looks for peptides that do not
+  filtered. The naive approach is based on \code{min_nonmiss_gtest}, and
+  looks for biomolecules that do not have at least \code{min_nonmiss_gtest}
+  values in at least one group. The other approach also looks for biomolecules that do not
   have at least a minimum number of values per group, but this minimum number
   is determined using the G-test and a p-value threshold supplied by the
   user. The G-test is a test of independence, used here to test the null

@@ -33,7 +33,7 @@ requirements for running an ANOVA.
 }
 \details{
 This function filters biomolecules that do not have at least
-  \code{min.nonmiss.allowed} values per group, where groups are from
+  \code{min_nonmiss_anova} values per group, where groups are from
   \code{group_designation}.
 }
 \seealso{
