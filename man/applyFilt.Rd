@@ -125,7 +125,7 @@ Further arguments can be specified depending on the class of the
   \code{min_nonmiss_anova} \tab integer value specifying the minimum number
   of non-missing feature values allowed per group for \code{anova_filter}.
   Default value is 2. \cr \code{min_nonmiss_gtest} \tab integer value
-  specifying the minimum number of non-missing feature values allowed per
+  specifying the minimum number of non-missing feature values in at least one
   group for \code{gtest_filter}. Default value is 3.\cr }
 
   For a \code{filter_object} of type 'totalCountFilt': \tabular{ll}{

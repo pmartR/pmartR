@@ -63,7 +63,7 @@
 #'   \code{min_nonmiss_anova} \tab integer value specifying the minimum number
 #'   of non-missing feature values allowed per group for \code{anova_filter}.
 #'   Default value is 2. \cr \code{min_nonmiss_gtest} \tab integer value
-#'   specifying the minimum number of non-missing feature values allowed per
+#'   specifying the minimum number of non-missing feature values in at least one
 #'   group for \code{gtest_filter}. Default value is 3.\cr }
 #'
 #'   For a \code{filter_object} of type 'totalCountFilt': \tabular{ll}{
@@ -2320,7 +2320,7 @@ pmartR_filter_worker <- function(filter_object, omicsData) {
 #'   pairwise comparisons are executed.
 #'
 #' @details This function filters biomolecules that do not have at least
-#'   \code{min.nonmiss.allowed} values per group, where groups are from
+#'   \code{min_nonmiss_anova} values per group, where groups are from
 #'   \code{group_designation}.
 #'
 #' @return filter.peps a character vector of the biomolecules to be filtered out
@@ -2440,7 +2440,7 @@ anova_filter <- function(nonmiss_per_group,
   return(junk)
 }
 
-#' Identifies peptides to be filtered out in preparation for IMD-ANOVA.
+#' Identifies biomolecules to be filtered out in preparation for IMD-ANOVA.
 #'
 #' The method identifies peptides, proteins, lipids, or metabolites to be
 #' filtered specifically according to the G-test.
@@ -2451,8 +2451,8 @@ anova_filter <- function(nonmiss_per_group,
 #'   the biomolecule and the second through kth columns giving the number of
 #'   non-missing observations for each of the \code{k} groups.
 #'
-#' @param min_nonmiss_gtest the minimum number of non-missing peptide values
-#'   allowed in a minimum of one group. Default value is 3.
+#' @param min_nonmiss_gtest the minimum number of non-missing biomolecule values
+#'  in at least one group. Default value is 3.
 #'
 #' @param comparisons data.frame with columns for "Control" and "Test"
 #'   containing the different comparisons of interest. Comparisons will be made
@@ -2460,16 +2460,16 @@ anova_filter <- function(nonmiss_per_group,
 #'   pairwise comparisons are executed.
 #'
 #' @details Two methods are available for determining the peptides to be
-#'   filtered. The naive approach is based on \code{min.nonmiss.allowed}, and
-#'   looks for peptides that do not have at least \code{min.nonmiss.allowed}
-#'   values per group. The other approach also looks for peptides that do not
+#'   filtered. The naive approach is based on \code{min_nonmiss_gtest}, and
+#'   looks for biomolecules that do not have at least \code{min_nonmiss_gtest}
+#'   values in at least one group. The other approach also looks for biomolecules that do not
 #'   have at least a minimum number of values per group, but this minimum number
 #'   is determined using the G-test and a p-value threshold supplied by the
 #'   user. The G-test is a test of independence, used here to test the null
 #'   hypothesis of independence between the number of missing values across
 #'   groups.
 #'
-#' @return filter.peps a character vector of the peptides to be filtered out
+#' @return A character vector of the biomolecules to be filtered out
 #'   prior to the G-test or IMD-ANOVA
 #'
 #' @author Kelly Stratton
