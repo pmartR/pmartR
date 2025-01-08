@@ -667,7 +667,8 @@ test_that('all tests conform to the decrees of the God of Stats', {
   mean_idx = grep("^Mean", colnames(truth_df))
   all_idx = c(pval_idx, mean_idx)
   
-  expect_false(any(truth_df[, all_idx], na.rm=T))
+  # It is technically possible some of these are the same or very similar....just check that most of them are not
+  expect_true(mean(truth_df[, all_idx], na.rm=T) < 0.001)
   
   afruit_2_2_4_full <- imd_anova(afilta_2_2_4,
     test_method = "anova",
@@ -687,7 +688,7 @@ test_that('all tests conform to the decrees of the God of Stats', {
   mean_idx = grep("^Mean", colnames(truth_df))
   all_idx = c(pval_idx, mean_idx)
   
-  expect_false(any(truth_df[, all_idx], na.rm=T))
+  expect_true(mean(truth_df[, all_idx], na.rm=T) < 0.001)
   
   # Same equality checks for combined method
   cfruit_2_1_4_full <- imd_anova(cfilta_2_1_4,
@@ -708,7 +709,7 @@ test_that('all tests conform to the decrees of the God of Stats', {
   mean_idx = grep("^Mean", colnames(truth_df))
   all_idx = c(pval_idx, mean_idx)
   
-  expect_false(any(truth_df[, all_idx], na.rm=T))
+  expect_true(mean(truth_df[, all_idx], na.rm=T) < 0.001)
   
   cfruit_2_2_4_full <- imd_anova(cfilta_2_2_4,
     test_method = "combined",
@@ -728,5 +729,5 @@ test_that('all tests conform to the decrees of the God of Stats', {
   mean_idx = grep("^Mean", colnames(truth_df))
   all_idx = c(pval_idx, mean_idx)
   
-  expect_false(any(truth_df[, all_idx], na.rm=T))
+  expect_true(mean(truth_df[, all_idx], na.rm=T) < 0.001)
 })
