@@ -259,6 +259,10 @@ imd_anova <- function(omicsData,
     stop("pval_thresh must be between 0 and 1.")
   }
 
+  if (!(model_selection %in% c("full", "reduced", "auto"))) {
+    stop("model_selection must be one of 'full', 'reduced', or 'auto'.")
+  }
+  
   # Statisticalness!!! ---------------------------------------------------------
 
   # Determine the non-missing per group counts for ALL biomolecules. Depending

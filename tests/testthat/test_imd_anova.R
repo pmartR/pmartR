@@ -646,4 +646,87 @@ test_that('all tests conform to the decrees of the God of Stats', {
     "No IMD-ANOVA filter has been applied"
   )
  
+  ### Test that the default 'full' model_selection is equal when which_X is 1 and unequal otherwise for two factor cases.
+  afruit_2_1_4_full <- imd_anova(afilta_2_1_4,
+    test_method = "anova",
+    model_selection = "full"
+  )
+  
+  # check equality of indices where auto uses the full model
+  full_idx = attr(afruit_2_1_4, 'which_X') == 1
+  
+  expect_equal(
+    data.frame(afruit_2_1_4[full_idx,]),
+    data.frame(afruit_2_1_4_full[full_idx,])
+  )
+  
+  # check non-equality of indices where auto does the reduced model
+  truth_df = data.frame(afruit_2_1_4[!full_idx,]) == data.frame(afruit_2_1_4_full[!full_idx,])
+
+  pval_idx = grep("^P_value", colnames(truth_df))
+  mean_idx = grep("^Mean", colnames(truth_df))
+  all_idx = c(pval_idx, mean_idx)
+  
+  expect_false(any(truth_df[, all_idx], na.rm=T))
+  
+  afruit_2_2_4_full <- imd_anova(afilta_2_2_4,
+    test_method = "anova",
+    model_selection = "full"
+  )
+
+  full_idx = attr(afruit_2_2_4, 'which_X') == 1
+  
+  expect_equal(
+    data.frame(afruit_2_2_4[full_idx,]),
+    data.frame(afruit_2_2_4_full[full_idx,])
+  )
+  
+  truth_df = data.frame(afruit_2_2_4[!full_idx,]) == data.frame(afruit_2_2_4_full[!full_idx,])
+  
+  pval_idx = grep("^P_value", colnames(truth_df))
+  mean_idx = grep("^Mean", colnames(truth_df))
+  all_idx = c(pval_idx, mean_idx)
+  
+  expect_false(any(truth_df[, all_idx], na.rm=T))
+  
+  # Same equality checks for combined method
+  cfruit_2_1_4_full <- imd_anova(cfilta_2_1_4,
+    test_method = "combined",
+    model_selection = "full"
+  )
+  
+  full_idx = attr(cfruit_2_1_4, 'which_X') == 1
+  
+  expect_equal(
+    data.frame(cfruit_2_1_4[full_idx,]),
+    data.frame(cfruit_2_1_4_full[full_idx,])
+  )
+  
+  truth_df = data.frame(cfruit_2_1_4[!full_idx,]) == data.frame(cfruit_2_1_4_full[!full_idx,])
+  
+  pval_idx = grep("^P_value_A", colnames(truth_df))
+  mean_idx = grep("^Mean", colnames(truth_df))
+  all_idx = c(pval_idx, mean_idx)
+  
+  expect_false(any(truth_df[, all_idx], na.rm=T))
+  
+  cfruit_2_2_4_full <- imd_anova(cfilta_2_2_4,
+    test_method = "combined",
+    model_selection = "full"
+  )
+  
+  full_idx = attr(cfruit_2_2_4, 'which_X') == 1
+  
+  expect_equal(
+    data.frame(cfruit_2_2_4[full_idx,]),
+    data.frame(cfruit_2_2_4_full[full_idx,])
+  )
+  
+  truth_df = data.frame(cfruit_2_2_4[!full_idx,]) == data.frame(cfruit_2_2_4_full[!full_idx,])
+  
+  pval_idx = grep("^P_value_A", colnames(truth_df))
+  mean_idx = grep("^Mean", colnames(truth_df))
+  all_idx = c(pval_idx, mean_idx)
+  
+  expect_false(any(truth_df[, all_idx], na.rm=T))
 })
