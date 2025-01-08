@@ -13,6 +13,7 @@ anova_test(
   pval_adjust_fdr,
   pval_thresh,
   covariates,
+  model_selection,
   paired,
   equal_var,
   parallel
@@ -42,6 +43,13 @@ peptides are considered differentially expressed. Defaults to 0.05}
 
 \item{covariates}{A character vector with no more than two variable names
 that will be used as covariates in the IMD-ANOVA analysis.}
+
+\item{model_selection}{Character, one of 'full', 'reduced', or 'auto'
+indicating the model to be used in the ANOVA analysis. The default 'full' uses all main
+effects, covariates, and interactions between main effects. 'reduced' does 
+not consider interactions between main effects. 'auto' performs an F-test
+to determine if the full model is necessary. If the F-test is significant,
+the full model is used, otherwise the reduced model is used.}
 
 \item{paired}{logical; should the data be paired or not? if TRUE then the
 `f_data` element of `omicsData` is checked for a "Pair" column, an error is

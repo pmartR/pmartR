@@ -113,8 +113,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // two_factor_anova_cpp
-List two_factor_anova_cpp(arma::mat data, arma::mat X_full, arma::mat X_red, arma::colvec group_ids, arma::mat pred_grid_full, arma::mat pred_grid_red, arma::uvec continuous_covar_inds, arma::uvec group_ids_pred);
-RcppExport SEXP _pmartR_two_factor_anova_cpp(SEXP dataSEXP, SEXP X_fullSEXP, SEXP X_redSEXP, SEXP group_idsSEXP, SEXP pred_grid_fullSEXP, SEXP pred_grid_redSEXP, SEXP continuous_covar_indsSEXP, SEXP group_ids_predSEXP) {
+List two_factor_anova_cpp(arma::mat data, arma::mat X_full, arma::mat X_red, arma::colvec group_ids, arma::mat pred_grid_full, arma::mat pred_grid_red, arma::uvec continuous_covar_inds, arma::uvec group_ids_pred, int model_selection);
+RcppExport SEXP _pmartR_two_factor_anova_cpp(SEXP dataSEXP, SEXP X_fullSEXP, SEXP X_redSEXP, SEXP group_idsSEXP, SEXP pred_grid_fullSEXP, SEXP pred_grid_redSEXP, SEXP continuous_covar_indsSEXP, SEXP group_ids_predSEXP, SEXP model_selectionSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -126,7 +126,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::mat >::type pred_grid_red(pred_grid_redSEXP);
     Rcpp::traits::input_parameter< arma::uvec >::type continuous_covar_inds(continuous_covar_indsSEXP);
     Rcpp::traits::input_parameter< arma::uvec >::type group_ids_pred(group_ids_predSEXP);
-    rcpp_result_gen = Rcpp::wrap(two_factor_anova_cpp(data, X_full, X_red, group_ids, pred_grid_full, pred_grid_red, continuous_covar_inds, group_ids_pred));
+    Rcpp::traits::input_parameter< int >::type model_selection(model_selectionSEXP);
+    rcpp_result_gen = Rcpp::wrap(two_factor_anova_cpp(data, X_full, X_red, group_ids, pred_grid_full, pred_grid_red, continuous_covar_inds, group_ids_pred, model_selection));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -218,7 +219,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_pmartR_fold_change_ratio", (DL_FUNC) &_pmartR_fold_change_ratio, 2},
     {"_pmartR_fold_change_diff_na_okay", (DL_FUNC) &_pmartR_fold_change_diff_na_okay, 2},
     {"_pmartR_anova_cpp", (DL_FUNC) &_pmartR_anova_cpp, 8},
-    {"_pmartR_two_factor_anova_cpp", (DL_FUNC) &_pmartR_two_factor_anova_cpp, 8},
+    {"_pmartR_two_factor_anova_cpp", (DL_FUNC) &_pmartR_two_factor_anova_cpp, 9},
     {"_pmartR_group_comparison_anova_cpp", (DL_FUNC) &_pmartR_group_comparison_anova_cpp, 9},
     {"_pmartR_holm_cpp", (DL_FUNC) &_pmartR_holm_cpp, 1},
     {"_pmartR_ptukey_speed", (DL_FUNC) &_pmartR_ptukey_speed, 2},
