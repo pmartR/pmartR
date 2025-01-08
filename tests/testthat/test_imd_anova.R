@@ -17,11 +17,16 @@ test_that('all tests conform to the decrees of the God of Stats', {
 
   # Compare IMD-ANOVAly --------------------------------------------------------
 
+  # NOTE: There are three numbers that follow each object's name. The first
+  # number represents the number of main effects. The second number represents
+  # the number of covariates. The third represents the number of groups (across
+  # all main effects).
+  
   # Default comparisons ---------------
 
-  afruit_1_0_2 <- imd_anova(afilta_1_0_2, test_method = "anova")
-  gfruit_1_0_2 <- imd_anova(gfilta_1_0_2, test_method = "gtest")
-  cfruit_1_0_2 <- imd_anova(cfilta_1_0_2, test_method = "combined")
+  afruit_1_0_2 <- imd_anova(afilta_1_0_2, test_method = "anova", model_selection = "auto")
+  gfruit_1_0_2 <- imd_anova(gfilta_1_0_2, test_method = "gtest", model_selection = "auto")
+  cfruit_1_0_2 <- imd_anova(cfilta_1_0_2, test_method = "combined", model_selection = "auto")
 
   afruit_1_1_3 <- imd_anova(afilta_1_1_3,
     test_method = "anova"
@@ -35,46 +40,53 @@ test_that('all tests conform to the decrees of the God of Stats', {
   )
 
   afruit_1_2_3 <- imd_anova(afilta_1_2_3,
-    test_method = "anova"
+    test_method = "anova",
   )
   gfruit_1_2_3 <- imd_anova(gfilta_1_2_3,
     test_method = "gtest",
     parallel = FALSE
   )
   cfruit_1_2_3 <- imd_anova(cfilta_1_2_3,
-    test_method = "combined"
+    test_method = "combined",
   )
 
-  afruit_2_0_3 <- imd_anova(afilta_2_0_3, test_method = "anova")
-  gfruit_2_0_3 <- imd_anova(gfilta_2_0_3, test_method = "gtest")
-  cfruit_2_0_3 <- imd_anova(cfilta_2_0_3, test_method = "combined")
+  afruit_2_0_3 <- imd_anova(afilta_2_0_3, test_method = "anova", model_selection = "auto")
+  gfruit_2_0_3 <- imd_anova(gfilta_2_0_3, test_method = "gtest", model_selection = "auto")
+  cfruit_2_0_3 <- imd_anova(cfilta_2_0_3, test_method = "combined", model_selection = "auto")
 
   afruit_2_1_4 <- imd_anova(afilta_2_1_4,
-    test_method = "anova"
+    test_method = "anova",
+    model_selection = "auto"
   )
   gfruit_2_1_4 <- imd_anova(gfilta_2_1_4,
     test_method = "gtest",
+    model_selection = "auto",
     parallel = FALSE
   )
   cfruit_2_1_4 <- imd_anova(cfilta_2_1_4,
-    test_method = "combined"
+    test_method = "combined",
+    model_selection = "auto"
   )
 
   afruit_2_2_4 <- imd_anova(afilta_2_2_4,
-    test_method = "anova"
+    test_method = "anova",
+    model_selection = "auto"
   )
   gfruit_2_2_4 <- imd_anova(gfilta_2_2_4,
     test_method = "gtest",
+    model_selection = "auto",
     parallel = FALSE
   )
   cfruit_2_2_4 <- imd_anova(cfilta_2_2_4,
-    test_method = "combined"
+    test_method = "combined",
+    model_selection = "auto"
   )
 
   # Custom comparisons ---------------
 
   afruit_cus_2_0_3 <- imd_anova(
     omicsData = afilta_2_0_3,
+    model_selection = "auto",
     comparisons = data.frame(check.names = FALSE, 
       Control = c(
         "Infection_low",
@@ -92,6 +104,7 @@ test_that('all tests conform to the decrees of the God of Stats', {
 
   gfruit_cus_2_0_3 <- imd_anova(
     omicsData = gfilta_2_0_3,
+    model_selection = "auto",
     comparisons = data.frame(check.names = FALSE, 
       Control = c(
         "Infection_low",
@@ -168,14 +181,17 @@ test_that('all tests conform to the decrees of the God of Stats', {
 
   afruit_bon_2_0_3 <- imd_anova(afilta_2_0_3,
     test_method = "anova",
+    model_selection = "auto",
     pval_adjust_a_multcomp = "bonferroni"
   )
   afruit_holm_2_0_3 <- imd_anova(afilta_2_0_3,
     test_method = "anova",
+    model_selection = "auto",
     pval_adjust_a_multcomp = "holm"
   )
   afruit_tuk_2_0_3 <- imd_anova(afilta_2_0_3,
     test_method = "anova",
+    model_selection = "auto",
     pval_adjust_a_multcomp = "tukey"
   )
   # Set a seed because the mvtnorm::pmvt function--which is called when doing a
@@ -183,6 +199,7 @@ test_that('all tests conform to the decrees of the God of Stats', {
   set.seed(4)
   afruit_dun_2_0_3 <- imd_anova(afilta_2_0_3,
     test_method = "anova",
+    model_selection = "auto",
     pval_adjust_a_multcomp = "dunnett"
   )
   # Still gives an error even though all case-vs-control comparisons are being
@@ -192,14 +209,17 @@ test_that('all tests conform to the decrees of the God of Stats', {
 
   afruit_bon_2_1_4 <- imd_anova(afilta_2_1_4,
     test_method = "anova",
+    model_selection = "auto",
     pval_adjust_a_multcomp = "bonferroni"
   )
   afruit_holm_2_1_4 <- imd_anova(afilta_2_1_4,
     test_method = "anova",
+    model_selection = "auto",
     pval_adjust_a_multcomp = "holm"
   )
   afruit_tuk_2_1_4 <- imd_anova(afilta_2_1_4,
     test_method = "anova",
+    model_selection = "auto",
     pval_adjust_a_multcomp = "tukey"
   )
   # Set a seed because the mvtnorm::pmvt function--which is called when doing a
@@ -207,19 +227,23 @@ test_that('all tests conform to the decrees of the God of Stats', {
   set.seed(8)
   afruit_dun_2_1_4 <- imd_anova(afilta_2_1_4,
     test_method = "anova",
+    model_selection = "auto",
     pval_adjust_a_multcomp = "dunnett"
   )
 
   afruit_bon_2_2_4 <- imd_anova(afilta_2_2_4,
     test_method = "anova",
+    model_selection = "auto",
     pval_adjust_a_multcomp = "bonferroni"
   )
   afruit_holm_2_2_4 <- imd_anova(afilta_2_2_4,
     test_method = "anova",
+    model_selection = "auto",
     pval_adjust_a_multcomp = "holm"
   )
   afruit_tuk_2_2_4 <- imd_anova(afilta_2_2_4,
     test_method = "anova",
+    model_selection = "auto",
     pval_adjust_a_multcomp = "tukey"
   )
   # Set a seed because the mvtnorm::pmvt function--which is called when doing a
@@ -227,6 +251,7 @@ test_that('all tests conform to the decrees of the God of Stats', {
   set.seed(11)
   afruit_dun_2_2_4 <- imd_anova(afilta_2_2_4,
     test_method = "anova",
+    model_selection = "auto",
     pval_adjust_a_multcomp = "dunnett"
   )
 
@@ -242,18 +267,22 @@ test_that('all tests conform to the decrees of the God of Stats', {
   )
   gfruit_bon_2_0_3 <- imd_anova(gfilta_2_0_3,
     test_method = "gtest",
+    model_selection = "auto",
     pval_adjust_g_multcomp = "bonferroni"
   )
   gfruit_holm_2_0_3 <- imd_anova(gfilta_2_0_3,
     test_method = "gtest",
+    model_selection = "auto",
     pval_adjust_g_multcomp = "holm"
   )
   gfruit_bon_2_1_4 <- imd_anova(gfilta_2_1_4,
     test_method = "gtest",
+    model_selection = "auto",
     pval_adjust_g_multcomp = "bonferroni"
   )
   gfruit_holm_2_1_4 <- imd_anova(gfilta_2_1_4,
     test_method = "gtest",
+    model_selection = "auto",
     pval_adjust_g_multcomp = "holm"
   )
 
@@ -470,13 +499,13 @@ test_that('all tests conform to the decrees of the God of Stats', {
     c(apply(data.frame(afruit_1_2_3$P_value_A_zombie_vs_human), 2, p.adjust, method = "bonferroni"))
   )
 
-  afruit_fdr_bon_2_0_3 <- imd_anova(afilta_2_0_3, test_method = "anova", pval_adjust_a_fdr = "bonferroni")
+  afruit_fdr_bon_2_0_3 <- imd_anova(afilta_2_0_3, test_method = "anova", pval_adjust_a_fdr = "bonferroni", model_selection = "auto")
   expect_equal(
     afruit_fdr_bon_2_0_3$P_value_A_Infection_high_vs_Mock_none,
     c(apply(data.frame(afruit_2_0_3$P_value_A_Infection_high_vs_Mock_none), 2, p.adjust, method = "bonferroni"))
   )
 
-  afruit_fdr_bon_2_1_4 <- imd_anova(afilta_2_1_4, test_method = "anova", pval_adjust_a_fdr = "bonferroni")
+  afruit_fdr_bon_2_1_4 <- imd_anova(afilta_2_1_4, test_method = "anova", pval_adjust_a_fdr = "bonferroni", model_selection = "auto")
   expect_equal(
     afruit_fdr_bon_2_1_4$P_value_A_Infection_high_vs_Infection_low,
     c(apply(data.frame(afruit_2_1_4$P_value_A_Infection_high_vs_Infection_low), 2, p.adjust, method = "bonferroni"))

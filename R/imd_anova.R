@@ -31,6 +31,12 @@
 #' @param pval_thresh numeric p-value threshold, below or equal to which
 #'   biomolecules are considered differentially expressed. Defaults to 0.05
 #' @param equal_var logical; should the variance across groups be assumed equal?
+#' @param model_selection Character, one of 'full', 'reduced', or 'auto'
+#'  indicating the model to be used in the ANOVA analysis. The default 'full' uses all main
+#'  effects, covariates, and interactions between main effects. 'reduced' does 
+#'  not consider interactions between main effects. 'auto' performs an F-test
+#'  to determine if the full model is necessary. If the F-test is significant,
+#'  the full model is used, otherwise the reduced model is used.
 #' @param parallel logical value indicating whether or not to use a
 #'   "doParallel" loop when running the G-Test with covariates. Defaults to
 #'   TRUE.
@@ -95,6 +101,7 @@ imd_anova <- function(omicsData,
                       pval_adjust_g_fdr = 'none',
                       pval_thresh = 0.05,
                       equal_var = TRUE,
+                      model_selection = "full",
                       parallel = TRUE) {
   # Preliminaries --------------------------------------------------------------
 
@@ -338,6 +345,7 @@ imd_anova <- function(omicsData,
       covariates = NULL,
       paired = paired,
       equal_var = equal_var,
+      model_selection = model_selection,
       parallel = parallel
     )
   } else {
@@ -350,6 +358,7 @@ imd_anova <- function(omicsData,
       covariates = covariates,
       paired = paired,
       equal_var = equal_var,
+      model_selection = model_selection,
       parallel = parallel
     )
     anova_fold_flags <- anova_results_full$Flags
@@ -618,6 +627,12 @@ imd_anova <- function(omicsData,
 #'   peptides are considered differentially expressed. Defaults to 0.05
 #' @param covariates A character vector with no more than two variable names
 #'   that will be used as covariates in the IMD-ANOVA analysis.
+#' @param model_selection Character, one of 'full', 'reduced', or 'auto'
+#'  indicating the model to be used in the ANOVA analysis. The default 'full' uses all main
+#'  effects, covariates, and interactions between main effects. 'reduced' does 
+#'  not consider interactions between main effects. 'auto' performs an F-test
+#'  to determine if the full model is necessary. If the F-test is significant,
+#'  the full model is used, otherwise the reduced model is used.
 #' @param paired logical; should the data be paired or not? if TRUE then the
 #'   `f_data` element of `omicsData` is checked for a "Pair" column, an error is
 #'   returned if none is found
@@ -645,8 +660,8 @@ imd_anova <- function(omicsData,
 #'   Journal of proteome research 9.11 (2010): 5748-5756.
 #'
 anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
-                       pval_adjust_fdr, pval_thresh, covariates, paired, equal_var,
-                       parallel) {
+                       pval_adjust_fdr, pval_thresh, covariates, model_selection, 
+                       paired, equal_var, parallel) {
   # Catch if number of groups is too small
   k <- length(unique(groupData$Group))
   if (k < 2 && !"no_main_effect" %in% attr(groupData, "main_effects")) {
@@ -938,7 +953,8 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
       Xfull=Xfull, Xred=Xred,
       pred_grid_full=pred_grid_full,
       pred_grid_red=pred_grid_red,
-      continuous_covar_inds = continuous_covar_inds
+      continuous_covar_inds = continuous_covar_inds,
+      model_selection = model_selection
     )
 
     which_xmatrix = raw_results$which_X
@@ -1050,7 +1066,15 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
 }
 
 #Wrapper function for the two factor ANOVA function
-run_twofactor_cpp <- function(data,gpData, Xfull, Xred, pred_grid_full, pred_grid_red, continuous_covar_inds){
+run_twofactor_cpp <- function(data,gpData, Xfull, Xred, pred_grid_full, pred_grid_red, continuous_covar_inds, model_selection){
+  
+  model_selection = switch(
+    model_selection,
+    "reduced" = 0,
+    "full" = 1,
+    "auto" = 2
+  )
+  
   #Run the two factor ANOVA model
   res <- two_factor_anova_cpp(
     data,
@@ -1060,7 +1084,8 @@ run_twofactor_cpp <- function(data,gpData, Xfull, Xred, pred_grid_full, pred_gri
     pred_grid_full,
     pred_grid_red,
     continuous_covar_inds,
-    attr(pred_grid_red, "groups")
+    attr(pred_grid_red, "groups"),
+    model_selection
   )
 
   res$Xfull <- Xfull

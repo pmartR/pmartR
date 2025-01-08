@@ -373,6 +373,7 @@ List anova_cpp(
  * @param pred_grid_red l x k2 The grid of main effect/covariate levels to predict over when computing the least squares means for the reduced model.
  * @param continuous_covar_inds The column indices of the continuous covariates in the design matrix.
  * @param group_ids_pred The group ids for each of the l levels of the main effects/covariates.  Used to average over covariates when computing least squares means.
+ * @param model_selection An integer specifying how to select the full (all interaction effects) or reduced (main effects only) model.  1 selects the full model for all tests (default), 0 selects the reduced model for all tests, and 2 automatically selects which model is used depending on the results of an F-test.
  * 
  * @return A list containing the least squares means, parameter estimates, group sizes, sigma^2, F-statistic, p-value, degrees of freedom, and which model was used for each row.
 */
@@ -385,7 +386,8 @@ List two_factor_anova_cpp(arma::mat data,
                           arma::mat pred_grid_full,
                           arma::mat pred_grid_red,
                           arma::uvec continuous_covar_inds,
-                          arma::uvec group_ids_pred
+                          arma::uvec group_ids_pred,
+                          int model_selection = 1
                           ){
 
   int i,j;
@@ -408,8 +410,6 @@ List two_factor_anova_cpp(arma::mat data,
   arma::mat diag_mat;
   arma::colvec par_ests(p_full),group_ids_nona(data.n_cols), group_ids_nona_unq;
   arma::mat parmat(n,p_full);
-  arma::rowvec csums(p_full);
-  arma::uvec zero_cols, non_zero_cols;
   arma::uvec missing_gp,size_j;
 
   // For a given biomolecule, the number of groups may be less
@@ -438,58 +438,78 @@ List two_factor_anova_cpp(arma::mat data,
       group_ids_nona.shed_row(to_remove[j]);
     }
 
-    //Remove completely empty columns
-    csums = sum(X_full_nona,0);
-    zero_cols = arma::find(csums==0);
-    non_zero_cols = arma::find(csums);
-
     df_red = X_red_nona.n_rows-rank(X_red_nona);
     df_full = X_full_nona.n_rows-rank(X_full_nona);
 
-    PxRed = pinv(X_red_nona.t()*X_red_nona)*X_red_nona.t()*yrowi_nona.t();
-    
-    arma::colvec residual_vec = yrowi_nona.t();
-    residual_vec = residual_vec - X_red_nona*PxRed;
-
-    sigma2_red = arma::conv_to<double>::from(residual_vec.t()*residual_vec/df_red);
-
-    if((df_red-df_full)<=0){
-      //If interaction can't be estimated, automatically select smaller model
-      pval(i) = 1;
-      Fstat(i) = 0;
-      dof(i) = df_red;
-    }else{
-      PxFull = X_full_nona*pinv(X_full_nona.t()*X_full_nona)*X_full_nona.t();
-      diag_mat.resize(size(PxFull));
-      diag_mat.eye();
-      sigma2_full = arma::conv_to<double>::from(yrowi_nona*(diag_mat-PxFull)*yrowi_nona.t()/(df_full));
-
-      PxFull = pinv(X_full_nona.t()*X_full_nona)*X_full_nona.t()*yrowi_nona.t();
-    
+    if (model_selection == 0) { // Choose all reduced model
+      PxRed = pinv(X_red_nona.t()*X_red_nona)*X_red_nona.t()*yrowi_nona.t();
+      
       arma::colvec residual_vec = yrowi_nona.t();
-      residual_vec = residual_vec - X_full_nona*PxFull;
-
-      sigma2_full = arma::conv_to<double>::from(residual_vec.t()*residual_vec/df_full);
-
-      Fstat(i) = (sigma2_red*df_red-sigma2_full*df_full)/sigma2_full;
-      pval(i) = R::pf(Fstat(i),df_red-df_full,df_full,0,0);
-    }
-
-    if(pval(i)<0.05){
-      //Reject null hypothesis that reduced model is good enough, use full model
-      XFinal = X_full_nona;
-      sig_est(i) = sigma2_full;
-      dof(i) = df_full;
-      whichX(i) = 1; // 1 indicates full model
-    }else{
-      XFinal = X_full_nona;
-      XFinal.cols(p_red,p_full-1).fill(0.0); //Zero out the interaction terms if they're insignificant
+      residual_vec = residual_vec - X_red_nona*PxRed;
+      
+      sigma2_red = arma::conv_to<double>::from(residual_vec.t()*residual_vec/df_red);
+      
       sig_est(i) = sigma2_red;
       dof(i) = df_red;
       whichX(i) = 0;
+      
+      XFinal = X_full_nona;
+      XFinal.cols(p_red,p_full-1).fill(0.0);
+    } else if (model_selection == 1) { // Choose all full model
+      PxFull = pinv(X_full_nona.t()*X_full_nona)*X_full_nona.t()*yrowi_nona.t();
+      
+      arma::colvec residual_vec = yrowi_nona.t();
+      residual_vec = residual_vec - X_full_nona*PxFull;
+      
+      sigma2_full = arma::conv_to<double>::from(residual_vec.t()*residual_vec/df_full);
+      
+      sig_est(i) = sigma2_full;
+      dof(i) = df_full;
+      whichX(i) = 1;
+      
+      XFinal = X_full_nona;
+    } else { // Choose model based on F-test
+      //Compute the reduced model
+      PxRed = pinv(X_red_nona.t()*X_red_nona)*X_red_nona.t()*yrowi_nona.t();
+      
+      arma::colvec residual_vec = yrowi_nona.t();
+      residual_vec = residual_vec - X_red_nona*PxRed;
+  
+      sigma2_red = arma::conv_to<double>::from(residual_vec.t()*residual_vec/df_red);
+  
+      if((df_red-df_full)<=0){
+        //If interaction can't be estimated, automatically select smaller model
+        pval(i) = 1;
+        Fstat(i) = 0;
+        dof(i) = df_red;
+      }else{
+        PxFull = pinv(X_full_nona.t()*X_full_nona)*X_full_nona.t()*yrowi_nona.t();
+      
+        arma::colvec residual_vec = yrowi_nona.t();
+        residual_vec = residual_vec - X_full_nona*PxFull;
+  
+        sigma2_full = arma::conv_to<double>::from(residual_vec.t()*residual_vec/df_full);
+  
+        Fstat(i) = (sigma2_red*df_red-sigma2_full*df_full)/sigma2_full;
+        pval(i) = R::pf(Fstat(i),df_red-df_full,df_full,0,0);
+      }
+  
+      if(pval(i)<0.05){
+        //Reject null hypothesis that reduced model is good enough, use full model
+        XFinal = X_full_nona;
+        sig_est(i) = sigma2_full;
+        dof(i) = df_full;
+        whichX(i) = 1; // 1 indicates full model
+      }else{
+        XFinal = X_full_nona;
+        XFinal.cols(p_red,p_full-1).fill(0.0); //Zero out the interaction terms if they're insignificant
+        sig_est(i) = sigma2_red;
+        dof(i) = df_red;
+        whichX(i) = 0;
+      }
     }
 
-    // Parameter estimates using the full X
+    // Parameter estimates using the final selected model X
     arma::colvec beta = pinv(XFinal.t()*XFinal)*XFinal.t()*yrowi_nona.t();
 
     //Find groups that had at least one non-missing value
