@@ -1242,7 +1242,8 @@ cobra <- run_twofactor_cpp(
   gpData = groupData[,c("Group", main_effect_names, covariate_names)], 
   Xfull=Xmatrix_2_1_4_full, Xred = Xmatrix_2_1_4,
   pred_grid_full = pred_grid_full_2_1_4, pred_grid_red = pred_grid_red_2_1_4,
-  continuous_covar_inds = numeric(0)
+  continuous_covar_inds = numeric(0),
+  model_selection = "auto"
 )
 
 group_counts_2_1_4 <- data.frame(check.names = FALSE, 
@@ -1653,7 +1654,8 @@ cobra <- run_twofactor_cpp(
   gpData = groupData[,c("Group", main_effect_names, covariate_names)], 
   Xfull=Xmatrix_2_2_4_full, Xred = Xmatrix_2_2_4,
   pred_grid_full = pred_grid_full_2_2_4, pred_grid_red = pred_grid_red_2_2_4,
-  continuous_covar_inds = 5
+  continuous_covar_inds = 5,
+  model_selection = "auto"
 )
 
 group_counts_2_2_4 <- data.frame(check.names = FALSE, 
@@ -2780,14 +2782,15 @@ dragon <- run_twofactor_cpp(
   Xred = Xmatrix_2_1_4,
   pred_grid_full = pred_grid_full_2_1_4,
   pred_grid_red = pred_grid_red_2_1_4,
-  continuous_covar_inds = numeric(0)
+  continuous_covar_inds = numeric(0),
+  model_selection = "auto"
 )
 
 mean_2_1_4 <- data.frame(check.names = FALSE, 
-  Mean_Infection_high = dragon$adj_group_means[, 1],
-  Mean_Infection_low = dragon$adj_group_means[, 2],
-  Mean_Mock_high = dragon$adj_group_means[, 3],
-  Mean_Mock_low = dragon$adj_group_means[, 4]
+  Mean_Infection_high = dragon$lsmeans[, 1],
+  Mean_Infection_low = dragon$lsmeans[, 2],
+  Mean_Mock_high = dragon$lsmeans[, 3],
+  Mean_Mock_low = dragon$lsmeans[, 4]
 )
 
 cmat = rbind(c(1, -1, 0, 0), c(1, 0, -1, 0), c(1, 0, 0, -1),
@@ -3021,14 +3024,15 @@ mustang <- run_twofactor_cpp(
   gpData = gdf,
   Xfull=Xmatrix_2_2_4_full, Xred = Xmatrix_2_2_4,
   pred_grid_full = pred_grid_full_2_2_4, pred_grid_red = pred_grid_red_2_2_4,
-  continuous_covar_inds = 5
+  continuous_covar_inds = 5,
+  model_selection = "auto"
 )
 
 mean_2_2_4 <- data.frame(check.names = FALSE, 
-  Mean_Infection_high = mustang$adj_group_means[, 1],
-  Mean_Infection_low = mustang$adj_group_means[, 2],
-  Mean_Mock_high = mustang$adj_group_means[, 3],
-  Mean_Mock_low = mustang$adj_group_means[, 4]
+  Mean_Infection_high = mustang$lsmeans[, 1],
+  Mean_Infection_low = mustang$lsmeans[, 2],
+  Mean_Mock_high = mustang$lsmeans[, 3],
+  Mean_Mock_low = mustang$lsmeans[, 4]
 )
 
 cmat = rbind(c(1, -1, 0, 0), c(1, 0, -1, 0), c(1, 0, 0, -1),
