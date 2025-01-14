@@ -33,7 +33,7 @@ anova_cpp <- function(data, gp, unequal_var, X, Beta, pred_grid, continuous_cova
     .Call('_pmartR_anova_cpp', PACKAGE = 'pmartR', data, gp, unequal_var, X, Beta, pred_grid, continuous_covar_inds, group_ids_pred)
 }
 
-two_factor_anova_cpp <- function(data, X_full, X_red, group_ids, pred_grid_full, pred_grid_red, continuous_covar_inds, group_ids_pred, model_selection = 1L) {
+two_factor_anova_cpp <- function(data, X_full, X_red, group_ids, pred_grid_full, pred_grid_red, continuous_covar_inds, group_ids_pred, model_selection = 2L) {
     .Call('_pmartR_two_factor_anova_cpp', PACKAGE = 'pmartR', data, X_full, X_red, group_ids, pred_grid_full, pred_grid_red, continuous_covar_inds, group_ids_pred, model_selection)
 }
 
