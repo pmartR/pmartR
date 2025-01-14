@@ -387,7 +387,7 @@ List two_factor_anova_cpp(arma::mat data,
                           arma::mat pred_grid_red,
                           arma::uvec continuous_covar_inds,
                           arma::uvec group_ids_pred,
-                          int model_selection = 1
+                          int model_selection = 2
                           ){
 
   int i,j;

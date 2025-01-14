@@ -15,7 +15,7 @@ imd_anova(
   pval_adjust_g_fdr = "none",
   pval_thresh = 0.05,
   equal_var = TRUE,
-  model_selection = "full",
+  model_selection = "auto",
   parallel = TRUE
 )
 }
@@ -58,11 +58,11 @@ biomolecules are considered differentially expressed. Defaults to 0.05}
 \item{equal_var}{logical; should the variance across groups be assumed equal?}
 
 \item{model_selection}{Character, one of 'full', 'reduced', or 'auto'
-indicating the model to be used in the ANOVA analysis. The default 'full' uses all main
-effects, covariates, and interactions between main effects. 'reduced' does 
-not consider interactions between main effects. 'auto' performs an F-test
+indicating the model to be used in the ANOVA analysis. The default 'auto' performs an F-test
 to determine if the full model is necessary. If the F-test is significant,
-the full model is used, otherwise the reduced model is used.}
+the full model is used, otherwise the reduced model is used.  'full' uses all main
+effects, covariates, and interactions between main effects. 'reduced' does 
+not consider interactions between main effects (only covariates and marginal main effects).}
 
 \item{parallel}{logical value indicating whether or not to use a
 "doParallel" loop when running the G-Test with covariates. Defaults to
