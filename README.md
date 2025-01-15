@@ -62,7 +62,7 @@ There is a problem that causes pmartR to fail compiling cpp code, which has some
 
 1.  Install gfortran from a recommended source (not homebrew): 
     - [This CRAN-approved resource for build tools on mac](https://mac.r-project.org/tools/) lists two versions of gfortran and how to install them.
-    - On Catalina 10.15.7 I downloaded and installed gfortran 8.2 from the link provided in [this blog post](https://thecoatlessprofessor.com/programming/cpp/r-compiler-tools-for-rcpp-on-macos/#google_vignette)  
+    - On Catalina 10.15.7 I downloaded and installed gfortran 8.2 from the link provided in [this blog post](https://blog.thecoatlessprofessor.com/programming/cpp/r-compiler-tools-for-rcpp-on-macos/index.html#google_vignette)  
 2.  When using the homebrew gfortran installation, add the line **FLIBS = -L\`gfortran -print-file-name=libgfortran.dylib | xargs dirname\`** to ~/.R/Makevars (a plain text file with no extention)
 
 ### gfortran and Apple silicon (M1/M2 chips)
