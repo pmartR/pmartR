@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pmartR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.5.0</span>
       </span>
     </div>
 
@@ -75,7 +75,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Test for a qualitative and quantitative difference between groups using IMD and ANOVA, respectively</h1>
-    <small class="dont-index">Source: <a href="https://github.com/pmartR/pmartR/blob/v2.4.6/R/imd_anova.R" class="external-link"><code>R/imd_anova.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/pmartR/pmartR/blob/v2.5.0/R/imd_anova.R" class="external-link"><code>R/imd_anova.R</code></a></small>
     <div class="hidden name"><code>imd_anova.Rd</code></div>
     </div>
 
@@ -94,6 +94,7 @@
 <span>  pval_adjust_g_fdr <span class="op">=</span> <span class="st">"none"</span>,</span>
 <span>  pval_thresh <span class="op">=</span> <span class="fl">0.05</span>,</span>
 <span>  equal_var <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  model_selection <span class="op">=</span> <span class="st">"auto"</span>,</span>
 <span>  parallel <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -157,6 +158,15 @@ biomolecules are considered differentially expressed. Defaults to 0.05</p></dd>
 <dd><p>logical; should the variance across groups be assumed equal?</p></dd>
 
 
+<dt id="arg-model-selection">model_selection<a class="anchor" aria-label="anchor" href="#arg-model-selection"></a></dt>
+<dd><p>Character, one of 'full', 'reduced', or 'auto'
+indicating the model to be used in the ANOVA analysis. The default 'auto' performs an F-test
+to determine if the full model is necessary. If the F-test is significant,
+the full model is used, otherwise the reduced model is used.  'full' uses all main
+effects, covariates, and interactions between main effects. 'reduced' does
+not consider interactions between main effects (only covariates and marginal main effects).</p></dd>
+
+
 <dt id="arg-parallel">parallel<a class="anchor" aria-label="anchor" href="#arg-parallel"></a></dt>
 <dd><p>logical value indicating whether or not to use a
 "doParallel" loop when running the G-Test with covariates. Defaults to
@@ -217,7 +227,11 @@ Journal of proteome research 9.11 (2010): 5748-5756.</p>
 <span><span class="va">imd_anova_res</span> <span class="op">&lt;-</span> <span class="fu">imd_anova</span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mymetab</span>, test_method <span class="op">=</span> <span class="st">'comb'</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Same but with custom comparisons</span></span>
-<span><span class="va">comp_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>Control <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Phenotype1"</span>, <span class="st">"A"</span><span class="op">)</span>, Test <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Phenotype2"</span>, <span class="st">"B"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">comp_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  check.names <span class="op">=</span> <span class="cn">FALSE</span>, </span>
+<span>  Control <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Phenotype1"</span>, <span class="st">"A"</span><span class="op">)</span>, </span>
+<span>  Test <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Phenotype2"</span>, <span class="st">"B"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span><span class="va">custom_comps_res</span> <span class="op">&lt;-</span> <span class="fu">imd_anova</span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mymetab</span>, comparisons <span class="op">=</span> <span class="va">comp_df</span>, test_method <span class="op">=</span> <span class="st">"combined"</span><span class="op">)</span></span></code></pre></div>
     </div>
   </div>

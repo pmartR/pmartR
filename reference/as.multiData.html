@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pmartR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.5.0</span>
       </span>
     </div>
 
@@ -75,7 +75,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Create a `multiData` object from multiple omicsData objects</h1>
-    <small class="dont-index">Source: <a href="https://github.com/pmartR/pmartR/blob/v2.4.6/R/as.multiData.R" class="external-link"><code>R/as.multiData.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/pmartR/pmartR/blob/v2.5.0/R/as.multiData.R" class="external-link"><code>R/as.multiData.R</code></a></small>
     <div class="hidden name"><code>as.multiData.Rd</code></div>
     </div>
 
@@ -170,7 +170,7 @@ and column-binding them.</p>
 <span><span class="va">mymultidata</span> <span class="op">&lt;-</span> <span class="fu">as.multiData</span><span class="op">(</span><span class="va">mymetab</span>, <span class="va">mypro</span>, auto_fmeta <span class="op">=</span> <span class="cn">TRUE</span>, sample_intersect <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Manually supply an f_meta</span></span>
-<span><span class="va">f_meta</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span><span class="va">f_meta</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>check.names <span class="op">=</span> <span class="cn">FALSE</span>, </span>
 <span>  <span class="st">"Proteins"</span> <span class="op">=</span> <span class="va">mypro</span><span class="op">$</span><span class="va">f_data</span><span class="op">$</span><span class="va">SampleID</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/match.html" class="external-link">match</a></span><span class="op">(</span><span class="va">mymetab</span><span class="op">$</span><span class="va">f_data</span><span class="op">$</span><span class="va">SampleID</span>, <span class="va">mypro</span><span class="op">$</span><span class="va">f_data</span><span class="op">$</span><span class="va">SampleID</span><span class="op">)</span><span class="op">]</span>,</span>
 <span>  <span class="st">"Metabolites"</span> <span class="op">=</span> <span class="va">mymetab</span><span class="op">$</span><span class="va">f_data</span><span class="op">$</span><span class="va">SampleID</span>,</span>
 <span>  <span class="st">"Condition"</span> <span class="op">=</span> <span class="va">mymetab</span><span class="op">$</span><span class="va">f_data</span><span class="op">$</span><span class="va">Phenotype</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/match.html" class="external-link">match</a></span><span class="op">(</span><span class="va">mymetab</span><span class="op">$</span><span class="va">f_data</span><span class="op">$</span><span class="va">SampleID</span>, <span class="va">mypro</span><span class="op">$</span><span class="va">f_data</span><span class="op">$</span><span class="va">SampleID</span><span class="op">)</span><span class="op">]</span></span>

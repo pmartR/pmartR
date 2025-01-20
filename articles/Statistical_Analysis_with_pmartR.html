@@ -32,7 +32,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pmartR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.5.0</span>
       </span>
     </div>
 
@@ -103,9 +103,9 @@
                         <h4 data-toc-skip class="author">Bryan Stanfill,
 Kelly Stratton, Lisa Bramer</h4>
             
-            <h4 data-toc-skip class="date">2024-10-16</h4>
+            <h4 data-toc-skip class="date">2025-01-20</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/pmartR/pmartR/blob/v2.4.6/vignettes/Statistical_Analysis_with_pmartR.Rmd" class="external-link"><code>vignettes/Statistical_Analysis_with_pmartR.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/pmartR/pmartR/blob/v2.5.0/vignettes/Statistical_Analysis_with_pmartR.Rmd" class="external-link"><code>vignettes/Statistical_Analysis_with_pmartR.Rmd</code></a></small>
       <div class="hidden name"><code>Statistical_Analysis_with_pmartR.Rmd</code></div>
 
     </div>
@@ -279,7 +279,7 @@ by defined by passing a <code>data.frame</code> to the
 “Control”. Now, group “Phenotype1” is treated as the control group and
 the remaining groups are compared to it.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">one_vs_all</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">one_vs_all</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>check.names <span class="op">=</span> <span class="cn">FALSE</span>, </span>
 <span>  Control <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"Phenotype1"</span>, <span class="fl">2</span><span class="op">)</span>,</span>
 <span>  Test <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Phenotype2"</span>, <span class="st">"Phenotype3"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
@@ -366,8 +366,8 @@ distribution with mean
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>
 and variance
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>σ</mi><mn>2</mn></msup><annotation encoding="application/x-tex">\sigma^2</annotation></semantics></math>.</p>
-<p>For each biomolecule, the <code>test_method = "anova"</code> argument
-automatically tests if the
+<p>By default, for each biomolecule, the
+<code>test_method = "anova"</code> argument automatically tests if the
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>γ</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><annotation encoding="application/x-tex">\gamma_{ij}</annotation></semantics></math>
 effect is statistically significant from zero using a full and reduced
 model
@@ -407,7 +407,10 @@ group differences. Conversely, if
 then there is not enough evidence to reject the null hypothesis and the
 reduced model is used. Group comparisons are computed in the same manner
 as the one-factor case, following <em>3.1 General linear models</em> in
-(<span class="citation">Bretz, Hothorn, and Westfall (2016)</span>).</p>
+(<span class="citation">Bretz, Hothorn, and Westfall (2016)</span>). The
+user can force the use of the full or reduced model for all biomolecules
+by specifying <code>model_selection = "full"</code> or
+<code>model_selection = "reduced"</code> in <code>imd_anova</code>.</p>
 <p>Regardless of whether the full or reduced model is used, both assume
 that the residuals are independent and normally distributed with a
 common variance for all groups. These assumptions must be checked before

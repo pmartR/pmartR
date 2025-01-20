@@ -32,7 +32,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pmartR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.5.0</span>
       </span>
     </div>
 
@@ -102,9 +102,9 @@
                         <h4 data-toc-skip class="author">Kelly Stratton,
 Lisa Bramer</h4>
             
-            <h4 data-toc-skip class="date">2024-10-16</h4>
+            <h4 data-toc-skip class="date">2025-01-20</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/pmartR/pmartR/blob/v2.4.6/vignettes/Filter_Functionality.Rmd" class="external-link"><code>vignettes/Filter_Functionality.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/pmartR/pmartR/blob/v2.5.0/vignettes/Filter_Functionality.Rmd" class="external-link"><code>vignettes/Filter_Functionality.Rmd</code></a></small>
       <div class="hidden name"><code>Filter_Functionality.Rmd</code></div>
 
     </div>
@@ -553,7 +553,7 @@ versus Phenotype1, the following code can be used.</p>
 <span>                                omicsData <span class="op">=</span> <span class="va">mypep_groups_log2</span>,</span>
 <span>                                min_nonmiss_anova <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>                                min_nonmiss_gtest <span class="op">=</span> <span class="fl">3</span>,</span>
-<span>                                comparisons <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>                                comparisons <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>check.names <span class="op">=</span> <span class="cn">FALSE</span>, </span>
 <span>                                  Control <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Phenotype1"</span>, <span class="st">"Phenotype1"</span><span class="op">)</span>,</span>
 <span>                                  Test <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Phenotype2"</span>, <span class="st">"Phenotype3"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## You have specified remove_singleton_groups = TRUE, but there are no singleton groups to remove. Proceeding with application of the IMD-ANOVA filter.</span></span></code></pre>
