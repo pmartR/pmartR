@@ -166,11 +166,11 @@ It is often good practice to filter out biomolecules that do not meet certain cr
 
 The proteomics filter is applicable only to peptide level data (`isobaricpepData` or `pepData` objects) that contain the `e_meta` component, as this filter counts the number of peptides that map to each protein and/or the number of proteins to which each individual peptide maps. 
 
-Using the argument `degen_peps = TRUE`, we see from the `summary` that each peptide maps to a single protein, so there are no redundant peptides to remove. 
+Using the argument `redundancy` = TRUE`, we see from the `summary` that each peptide maps to a single protein, so there are no redundant peptides to remove. 
 
 ```{r proteomics_filter}
 myfilter <- proteomics_filter(mypep)
-summary(myfilter, degen_peps = TRUE)
+summary(myfilter, redundancy = TRUE)
 plot(myfilter, bw_theme = TRUE)
 ```
 

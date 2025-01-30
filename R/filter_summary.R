@@ -399,19 +399,19 @@ print.totalCountFiltSummary <- function(x, ...) {
 #'   the minimum number of peptides that must map to a protein. Any protein with
 #'   less than \code{min_num_peps} mapping to it will be returned as a protein
 #'   that should be filtered. Default value is NULL.
-#' @param degen_peps logical indicator of whether to filter out 'degenerate' or 'redundant'
+#' @param redundancy logical indicator of whether to filter out 'degenerate' or 'redundant'
 #'   peptides (i.e. peptides mapping to multiple proteins) (TRUE) or not
 #'   (FALSE). Default value is FALSE.
 #' @param ... further arguments passed to or from other methods
 #' @return a summary table giving the number of Observed Proteins per Peptide
 #'   and number of Observed Peptides per Protein. If min_num_peps is specified
-#'   and/or degen_peps is TRUE, the number of biomolecules to be filtered with
+#'   and/or redundancy is TRUE, the number of biomolecules to be filtered with
 #'   the specified threshold(s) are reported.
 #'
 #' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
 #' library(pmartRdata)
 #' myfilt <- proteomics_filter(omicsData = pep_object)
-#' summary(myfilt, degen_peps = TRUE) # there are no degenerate peptides to filter out
+#' summary(myfilt, redundancy = TRUE) # there are no degenerate peptides to filter out
 #' summary(myfilt, min_num_peps = 2)
 #'
 #' @author Lisa Bramer
@@ -421,10 +421,15 @@ print.totalCountFiltSummary <- function(x, ...) {
 #' @rdname summary.proteomicsFilt
 #' @name summary.proteomicsFilt
 #' @export
-summary.proteomicsFilt <- function(object, min_num_peps = NULL, degen_peps = FALSE,
+summary.proteomicsFilt <- function(object, min_num_peps = NULL, redundancy = FALSE,
                                    ...) {
   filter_object <- object
-
+  counts_by_pro <- filter_object$counts_by_pro
+  counts_by_pep <- filter_object$counts_by_pep
+  
+  pro_id <- names(counts_by_pro)[names(counts_by_pro) != "n"]
+  pep_id <- names(counts_by_pep)[names(counts_by_pep) != "n"]
+  
   # Make sure we only have valid arguments
   if (length(list(...)) > 0) {
     warning("unused argument(s): ",
@@ -442,78 +447,111 @@ summary.proteomicsFilt <- function(object, min_num_peps = NULL, degen_peps = FAL
     # check that min_num_peps is of length 1 #
     if (length(min_num_peps) != 1) stop("min_num_peps must be of length 1")
     # check that min_num_peps is less than the total number of peptides #
-    if (min_num_peps > max(max(filter_object$counts_by_pep$n), max(filter_object$counts_by_pro$n))) stop("min_num_peps cannot be greater than the total number of peptides")
+    if (min_num_peps > max(max(counts_by_pep$n), max(filter_object$counts_by_pro$n))) stop("min_num_peps cannot be greater than the total number of peptides")
   }
-  # check that degen_peps is logical #
-  if (!is.logical(degen_peps)) stop("degen_peps must be either TRUE or FALSE")
+  # check that redundancy is logical #
+  if (!is.logical(redundancy)) stop("redundancy must be either TRUE or FALSE")
 
 
-  pep_sum <- summary(filter_object$counts_by_pep$n)
-  pro_sum <- summary(filter_object$counts_by_pro$n)
+  pep_sum <- summary(counts_by_pep$n)
+  pro_sum <- summary(counts_by_pro$n)
 
-  if (!is.null(min_num_peps)) {
-    count_bypro <- filter_object$counts_by_pro
-    count_bypep <- filter_object$counts_by_pep
-
-    pro_id <- names(count_bypro)[names(count_bypro) != "n"]
-    pep_id <- names(count_bypep)[names(count_bypep) != "n"]
-    pro_filt <- as.character(data.frame(count_bypro[which(count_bypro$n < min_num_peps), ])[, pro_id])
-
-    # determine which peptides no longer have a protein to map to  #
-    ## find rows in peptide.info that correspond to proteins to be filtered ##
-    protfilt.ids <- which(attr(filter_object, "e_meta")[, pro_id] %in% pro_filt)
-
-
-    ## find the peptides that are in the filter list but are not in the unfiltered lists ##
-    pep_filt <- as.character(setdiff(attr(filter_object, "e_meta")[protfilt.ids, pep_id], attr(filter_object, "e_meta")[-protfilt.ids, pep_id]))
-
-
-    if (length(pep_filt) == 0) {
-      pep_filt = NULL
-    }
-    if (length(pro_filt) == 0) {
-      pro_filt = NULL
-    }
-
-    filter_object_new2 <- list(proteins_filt = pro_filt, peptides_filt = pep_filt)
-  } else {
-    filter_object_new2 <- list(peptides_filt = c(), proteins_filt = c())
-  }
-
-  if (degen_peps) {
-    count_bypro <- filter_object$counts_by_pro
-    count_bypep <- filter_object$counts_by_pep
-
-    pro_id <- names(count_bypro)[names(count_bypro) != "n"]
-    pep_id <- names(count_bypep)[names(count_bypep) != "n"]
-    degen_peptides <- as.character(data.frame(count_bypep[which(count_bypep$n > 1), ])[, pep_id])
-
+  if (redundancy) {
+    count_bypep <- counts_by_pep
+    
+    # pull peptides with more than one row in e_meta.
+    degen_peptides <- as.character(
+      data.frame(check.names = FALSE, count_bypep[which(count_bypep$n > 1), ])[, pep_id]
+    )
+    
     ## identify any proteins that now will not have peptides mapping to them ##
     ## find rows in e_meta that correspond to peptides to be filtered ##
-    pepfilt.ids <- which(attr(filter_object, "e_meta")[, pep_id] %in% degen_peptides)
-
-    ## find the proteins that are in the filter list but are not in the unfiltered lists ##
-    add_prots <- as.character(setdiff(attr(filter_object, "e_meta")[pepfilt.ids, pro_id], attr(filter_object, "e_meta")[-pepfilt.ids, pro_id]))
-
+    pepfilt.ids = which(attr(filter_object, "e_meta")[, pep_id] %in% degen_peptides)
+    
+    # Fish out the indices for the proteins that will be filtered.
+    add_prots <- as.character(setdiff(
+      attr(filter_object, "e_meta")[pepfilt.ids, pro_id],
+      attr(filter_object, "e_meta")[-pepfilt.ids, pro_id]
+    ))
+    
     if (length(add_prots) == 0) {
       add_prots = NULL
     }
+    
     if (length(degen_peptides) == 0) {
       degen_peptides = NULL
     }
-    filter_object_new1 <- list(peptides_filt = degen_peptides, proteins_filt = add_prots)
+    
+    pepe <- list(
+      e_data_remove = degen_peptides,
+      e_meta_remove = add_prots
+    )
   } else {
-    filter_object_new1 <- list(peptides_filt = c(), proteins_filt = c())
+    pepe <- list(
+      e_data_remove = NULL,
+      e_meta_remove = NULL
+    )
+  }
+  
+  # Check if min_num_peps is not NULL.
+  if (!is.null(min_num_peps)) {
+    if (!is.null(pepe$e_data_remove)) {
+      # find the which proteins had peptides removed.
+      peps_rmv_by_pro <- attr(filter_object, "e_meta") %>% 
+        dplyr::filter(!!dplyr::sym(pep_id) %in% pepe$e_data_remove) %>%
+        dplyr::group_by(!!dplyr::sym(pro_id)) %>%
+        dplyr::summarise(n = dplyr::n())
+      
+      # decrement the counts of proteins that had redundant peptides removed.
+      temp_counts <- counts_by_pro 
+      decr_idx = match(peps_rmv_by_pro[[pro_id]],temp_counts[[pro_id]])
+      temp_counts[decr_idx,]$n <- temp_counts[decr_idx,]$n - peps_rmv_by_pro$n 
+    } else {
+      temp_counts <- counts_by_pro
+    }
+    
+    # Find all rows with proteins that map to fewer peptides than min_num_peps.
+    pro_idx <- which(temp_counts$n < min_num_peps)
+    
+    # pull proteins with less than min_num_peps.
+    pro_filt <- as.character(counts_by_pro[pro_idx, pro_id])
+    
+    # Find rows in e_meta that correspond to proteins to be filtered.
+    protfilt.ids = which(attr(filter_object, "e_meta")[, pro_id] %in% pro_filt)
+    
+    # Extricate the indices for the peptides that will be filtered.
+    pep_filt <- as.character(setdiff(
+      attr(filter_object, "e_meta")[protfilt.ids, pep_id],
+      attr(filter_object, "e_meta")[-protfilt.ids, pep_id]
+    ))
+    
+    if (length(pep_filt) == 0) {
+      pep_filt = NULL
+    }
+    
+    if (length(pro_filt) == 0) {
+      pro_filt = NULL
+    }
+    
+    pepe2 <- list(
+      e_meta_remove = pro_filt,
+      e_data_remove = pep_filt
+    )
+  } else {
+    pepe2 <- list(
+      e_data_remove = NULL,
+      e_meta_remove = NULL
+    )
   }
 
-  ## consolidate filter_object_new1 and filter_object_new2 ##
-  filter_object_new <- list(proteins_filt = unique(c(filter_object_new1$proteins_filt, filter_object_new2$proteins_filt)), peptides_filt = unique(c(filter_object_new1$peptides_filt, filter_object_new2$peptides_filt)))
+  ## consolidate pepe and pepe2 ##
+  filter_object_new <- list(e_meta_remove = unique(c(pepe$e_meta_remove, pepe2$e_meta_remove)), e_data_remove = unique(c(pepe$e_data_remove, pepe2$e_data_remove)))
 
   num_filtered <- lapply(filter_object_new, length)
   # return the 5 number summary for both parts of the filter, give total number of peps and/or prots filtered
-  res <- list(num_per_pep = pep_sum, num_per_pro = pro_sum, num_pep_filtered = num_filtered$peptides_filt, num_pro_filtered = num_filtered$proteins_filt)
-  res$num_pro_notfiltered = nrow(filter_object$counts_by_pro) - res$num_pro_filtered
-  res$num_pep_notfiltered = nrow(filter_object$counts_by_pep) - res$num_pep_filtered
+  res <- list(num_per_pep = pep_sum, num_per_pro = pro_sum, num_pep_filtered = num_filtered$e_data_remove, num_pro_filtered = num_filtered$e_meta_remove)
+  res$num_pro_notfiltered = nrow(counts_by_pro) - res$num_pro_filtered
+  res$num_pep_notfiltered = nrow(counts_by_pep) - res$num_pep_filtered
   class(res) = c("proteomicsFilterSummary", "list")
 
   return(res)
@@ -541,11 +579,11 @@ print.proteomicsFilterSummary <- function(x, ...) {
   
   # create output #
   catmat <- data.frame(check.names = FALSE, 
-    c(object$num_per_pep, " ", object$num_pep_filtered, object$num_pep_notfiltered),
-    c(object$num_per_pro, " ", object$num_pro_filtered, object$num_pro_notfiltered)
+    c(object$num_per_pep, " ", "Peptides", object$num_pep_filtered, object$num_pep_notfiltered),
+    c(object$num_per_pro, " ", "Proteins", object$num_pro_filtered, object$num_pro_notfiltered)
   )
   colnames(catmat) <- c("Obs Proteins Per Peptide", "Obs Peptides Per Protein")
-  rownames(catmat) <- c(names(object$num_per_pep), " ", "Filtered", "Not Filtered")
+  rownames(catmat) <- c(names(object$num_per_pep), " ", "  ", "Filtered", "Not Filtered")
 
   cat("\nSummary of Proteomics Filter \n\n")
   cat(capture.output(catmat), sep = "\n")

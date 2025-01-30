@@ -6433,7 +6433,7 @@ make_volcano_plot_df <- function(x) {
       names_to = "Comparison",
       values_to = "Fold_change",
       cols_vary = "slowest"
-    ) %>% data.frame
+    ) %>% data.frame(check.names = FALSE)
 
   # Run the cmbn_flags function here.
 
@@ -6452,7 +6452,7 @@ make_volcano_plot_df <- function(x) {
     dplyr::mutate(
       Fold_change_flag = as.character(Fold_change_flag)
     ) %>%
-    data.frame
+    data.frame(check.names = FALSE)
 
   # p values for labeling and y axis in anova volcano plot
   p_data <- x[, c(1, grep("^P_value", colnames(x)))]
@@ -6462,7 +6462,7 @@ make_volcano_plot_df <- function(x) {
       names_to = "Comparison",
       values_to = "P_value",
       cols_vary = "slowest"
-    ) %>% data.frame
+    ) %>% data.frame(check.names = FALSE)
 
   # grouping column based on test type
   if (attr(x, "statistical_test") == "combined") {
