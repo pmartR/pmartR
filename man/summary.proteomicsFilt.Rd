@@ -4,7 +4,7 @@
 \alias{summary.proteomicsFilt}
 \title{Proteomics Filter Summary}
 \usage{
-\method{summary}{proteomicsFilt}(object, min_num_peps = NULL, degen_peps = FALSE, ...)
+\method{summary}{proteomicsFilt}(object, min_num_peps = NULL, redundancy = FALSE, ...)
 }
 \arguments{
 \item{object}{S3 object of class 'proteomicsFilt' created by
@@ -16,7 +16,7 @@ the minimum number of peptides that must map to a protein. Any protein with
 less than \code{min_num_peps} mapping to it will be returned as a protein
 that should be filtered. Default value is NULL.}
 
-\item{degen_peps}{logical indicator of whether to filter out 'degenerate' or 'redundant'
+\item{redundancy}{logical indicator of whether to filter out 'degenerate' or 'redundant'
 peptides (i.e. peptides mapping to multiple proteins) (TRUE) or not
 (FALSE). Default value is FALSE.}
 
@@ -25,7 +25,7 @@ peptides (i.e. peptides mapping to multiple proteins) (TRUE) or not
 \value{
 a summary table giving the number of Observed Proteins per Peptide
   and number of Observed Peptides per Protein. If min_num_peps is specified
-  and/or degen_peps is TRUE, the number of biomolecules to be filtered with
+  and/or redundancy is TRUE, the number of biomolecules to be filtered with
   the specified threshold(s) are reported.
 }
 \description{
@@ -35,7 +35,7 @@ Provide summary of a proteomicsFilt S3 object
 \dontshow{if (requireNamespace("pmartRdata", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(pmartRdata)
 myfilt <- proteomics_filter(omicsData = pep_object)
-summary(myfilt, degen_peps = TRUE) # there are no degenerate peptides to filter out
+summary(myfilt, redundancy = TRUE) # there are no degenerate peptides to filter out
 summary(myfilt, min_num_peps = 2)
 \dontshow{\}) # examplesIf}
 }

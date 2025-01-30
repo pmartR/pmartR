@@ -1536,7 +1536,8 @@ proteomics_filter <- function(omicsData) {
 
   # Incorporate the proteomicsFilt class along with the list class.
   class(output) <- c("proteomicsFilt", orig_class)
-
+  attr(output, "e_meta") <- omicsData$e_meta
+  
   # Return the list of data frames containing peptide and protein counts.
   # We can count!!
   return(output)

@@ -185,16 +185,41 @@ test_that('the filter object summaries are all square', {
 
   # Proteomics filter ---------------
 
+  # make a fake degenerate peptide
+  fake_row = pdata_gdf$e_meta[10,]
+  fake_row$Protein <- pdata_gdf$e_meta[11, "Protein"]
+  pdata_gdf_degen <- pdata_gdf
+  pdata_gdf_degen$e_meta <- pdata_gdf_degen$e_meta |> rbind(fake_row)
+  
+  summ_profilt <- summary(proteomics_filter(pdata_gdf_degen), min_num_peps = 2)
+  summ_profilt_redundancy <- summary(proteomics_filter(pdata_gdf_degen), min_num_peps = 2, redundancy = T)
+  
   expect_equal(
-    summary(proteomics_filter(pdata_gdf), min_num_peps = 2),
+    summ_profilt,
     structure(
       list(
-        num_per_pep = summary(proteomics_filter(pdata_gdf)$counts_by_pep$n),
-        num_per_pro = summary(proteomics_filter(pdata_gdf)$counts_by_pro$n),
-        num_pep_filtered = 0,
+        num_per_pep = summary(proteomics_filter(pdata_gdf_degen)$counts_by_pep$n),
+        num_per_pro = summary(proteomics_filter(pdata_gdf_degen)$counts_by_pro$n),
+        num_pep_filtered = 56,
         num_pro_filtered = 56,
         num_pro_notfiltered = 27,
-        num_pep_notfiltered = 150
+        num_pep_notfiltered = 94
+      ),
+      class = c("proteomicsFilterSummary", "list")
+    )
+  )
+  
+  # should have removed a redundant peptide 
+  expect_equal(
+    summ_profilt_redundancy,
+    structure(
+      list(
+        num_per_pep = summary(proteomics_filter(pdata_gdf_degen)$counts_by_pep$n),
+        num_per_pro = summary(proteomics_filter(pdata_gdf_degen)$counts_by_pro$n),
+        num_pep_filtered = 57,
+        num_pro_filtered = 56,
+        num_pro_notfiltered = 27,
+        num_pep_notfiltered = 93
       ),
       class = c("proteomicsFilterSummary", "list")
     )
