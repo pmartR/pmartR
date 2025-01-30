@@ -148,7 +148,7 @@ In some instances, peptides can map to more than one protein; peptides such as t
 
 ```{r}
 myproteomicsfilt <- proteomics_filter(omicsData = mypep_groups_log2)
-summary(myproteomicsfilt, degen_peps = TRUE)
+summary(myproteomicsfilt, redundancy = TRUE)
 
 # This results in an error message since there are no redundant peptides
 # mypep_redundant <- applyFilt(filter_object = myredundantfilt, omicsData = mypep_groups_log2)
