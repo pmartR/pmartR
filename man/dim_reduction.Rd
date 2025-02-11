@@ -4,7 +4,7 @@
 \alias{dim_reduction}
 \title{Reduce Dimension of Data for Exploratory Data Analysis}
 \usage{
-dim_reduction(omicsData, k = 2)
+dim_reduction(omicsData, k = 2, seed = 2025)
 }
 \arguments{
 \item{omicsData}{an object of the class 'pepdata', 'prodata', 'metabData',
@@ -14,6 +14,8 @@ dim_reduction(omicsData, k = 2)
 \code{\link{as.seqData}}, respectively.}
 
 \item{k}{integer number of principal components to return. Defaults to 2.}
+
+\item{seed}{integer number for setting the seed. Defaults to 2025.}
 }
 \value{
 a data.frame with first \code{k} principal component scores, sample

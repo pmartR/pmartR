@@ -13,6 +13,7 @@
 #'   \code{\link{as.lipidData}}, \code{\link{as.nmrData}}, or
 #'   \code{\link{as.seqData}}, respectively.
 #' @param k integer number of principal components to return. Defaults to 2.
+#' @param seed integer number for setting the seed. Defaults to 2025.
 #'
 #' @return a data.frame with first \code{k} principal component scores, sample
 #'   identifiers, and group membership for each sample (if group designation was
@@ -78,6 +79,11 @@ dim_reduction <- function(omicsData, k = 2, seed = 2025) {
     get_data_scale(omicsData) != "counts") {
     # Welcome to the pit of despair!
     stop("seqData must be untransformed prior to calling dim_reduction.")
+  }
+  
+  # Check that seed is ok
+  if(!is.integer(seed) || length(seed) > 1){
+    stop("Seed must be an integer of length 1.")
   }
 
   samp_id = attr(omicsData, "cnames")$fdata_cname
