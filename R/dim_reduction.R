@@ -50,7 +50,7 @@
 #'
 #' @export
 #'
-dim_reduction <- function(omicsData, k = 2) {
+dim_reduction <- function(omicsData, k = 2, seed = 2025) {
   # check that omicsData is of appropriate class #
   if (!inherits(omicsData, c(
     "pepData", "proData", "metabData",
@@ -96,6 +96,8 @@ dim_reduction <- function(omicsData, k = 2) {
   if (length(minvars) > 0) {
     temp_data = temp_data[-minvars, ]
   }
+  
+  set.seed(seed)
 
   if (inherits(omicsData, "seqData")) {
     # GLM-PCA
