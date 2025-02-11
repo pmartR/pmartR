@@ -51,7 +51,7 @@
 #'
 #' @export
 #'
-dim_reduction <- function(omicsData, k = 2, seed = 2025) {
+dim_reduction <- function(omicsData, k = 2, seed = as.integer(2025)) {
   # check that omicsData is of appropriate class #
   if (!inherits(omicsData, c(
     "pepData", "proData", "metabData",
