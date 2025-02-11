@@ -4,7 +4,7 @@
 \alias{dim_reduction}
 \title{Reduce Dimension of Data for Exploratory Data Analysis}
 \usage{
-dim_reduction(omicsData, k = 2, seed = 2025)
+dim_reduction(omicsData, k = 2, seed = as.integer(2025))
 }
 \arguments{
 \item{omicsData}{an object of the class 'pepdata', 'prodata', 'metabData',
