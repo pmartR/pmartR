@@ -186,6 +186,6 @@ test_that('PCA produces the correct output', {
   expect_identical(dimmer, seq_standard)
 
   set.seed(40)
-  dimmer_g <- dim_reduction(seqdata_grp, k = 2, seed = as.integer(40))
+  dimmer_g <- dim_reduction(seqdata_grp, k = 2, seed = as.integer(338))
   expect_identical(dimmer_g, seq_standard_g)
 })
