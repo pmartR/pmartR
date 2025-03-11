@@ -145,6 +145,40 @@ test_that('each rollup method correctly quantifies proteins', {
 
   # Set the protein quantitation method to rollup.
   attr(stan_mea, "pro_quant_info")$method <- "rollup"
+  
+  merged_abund <- merged
+  merged_abund[3:ncol(merged_abund)] <- exp(merged_abund[3:ncol(merged_abund)])
+  merged_abund <- merged_abund %>%
+    dplyr::select(-Mass_Tag_ID) %>%
+    dplyr::group_by(Protein) %>%
+    dplyr::mutate(dplyr::across(.cols = dplyr::everything(), 
+                                .fns = \(x) if(all(is.na(x))) sum(x) else sum(x, na.rm = TRUE))) %>%
+    dplyr::distinct() %>%
+    data.frame(check.names = FALSE)
+  merged_abund[-1] <- log(merged_abund[-1])
+  
+  # Standard for rollup - sum
+  stan_sum <- as.proData(
+    e_data = merged_abund,
+    f_data = pdata$f_data,
+    e_meta = pdata$e_meta %>%
+      dplyr::select(-Mass_Tag_ID) %>%
+      dplyr::group_by(Protein) %>%
+      dplyr::mutate(peps_per_pro = dplyr::n()) %>%
+      dplyr::mutate(n_peps_used = peps_per_pro) %>%
+      dplyr::distinct(Protein, peps_per_pro, n_peps_used) %>%
+      data.frame(check.names = FALSE),
+    edata_cname = "Protein",
+    fdata_cname = "SampleID",
+    emeta_cname = "Protein",
+    data_scale = "log"
+  )
+  
+  # Set the original data scale to abundance.
+  attr(stan_sum, "data_info")$data_scale_orig <- "abundance"
+  
+  # Set the protein quantitation method to rollup.
+  attr(stan_sum, "pro_quant_info")$method <- "rollup"
 
   # With filters and group_DF ---------------
 
@@ -202,10 +236,19 @@ test_that('each rollup method correctly quantifies proteins', {
     isoformRes = NULL,
     emeta_cols = c("Peptide_Sequence")
   )
+  
+  # Quantitate using sum
+  pq_sum <- protein_quant(
+    pepData = pdata,
+    method = 'rollup',
+    combine_fn = 'sum',
+    isoformRes = NULL
+  )
 
   # Ensure the output from protein_quant matches the standards.
   expect_identical(pq_med, stan_med)
   expect_identical(pq_mea, stan_mea)
+  expect_identical(pq_sum, stan_sum)
 
   # With filters and group_DF ---------------
 
