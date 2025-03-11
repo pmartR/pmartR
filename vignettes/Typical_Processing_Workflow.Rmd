@@ -327,7 +327,12 @@ The PCA function in `pmartR` utilizes [@stacklies2007pcamethods] probabilistic P
 
 Using the `interactive = TRUE` argument to the plot function, we can see that the three potential outliers identified by the rMd filter are the same samples that do not cluster with the others (paying attention to the R^2 values on the axes).
 
+Randomness is present in probabilistic PCA computations, set.seed() can be used to ensure consistent results.
+
 ```{r pca}
+
+set.seed(2025)
+
 mypca <- dim_reduction(omicsData = mypep)
 
 plot(mypca, interactive = TRUE)
