@@ -3920,7 +3920,7 @@ plot.rmdFilt <- function(x, pvalue_threshold = NULL, sampleID = NULL,
         -dplyr::all_of(c(!!samp_id, !!main_eff_names)),
         names_to = "variable",
         cols_vary = "slowest"
-      ) %>% data.frame
+      ) %>% data.frame(check.names = FALSE)
   } else if (ncol(group_df) > 2) {
     ## put main effect with more levels first, for plotting aesthetics ##
     temp <- droplevels(group_df[, -(1:2)])
@@ -3931,7 +3931,7 @@ plot.rmdFilt <- function(x, pvalue_threshold = NULL, sampleID = NULL,
       -dplyr::all_of(c(!!samp_id, !!main_eff_names)),
       names_to = "variable",
       cols_vary = "slowest"
-    ) %>% data.frame
+    ) %>% data.frame(check.names = FALSE)
   }
 
   # Data frame that has information to create rmd box plots.
@@ -6619,7 +6619,7 @@ statres_barplot <- function(x,
       values_to = "Count",
       names_to = "Direction",
       cols_vary = "slowest"
-    ) %>% data.frame
+    ) %>% data.frame(check.names = FALSE)
     
   levels(comp_df_melt$Comparison) <- gsub(
     pattern = "_",
