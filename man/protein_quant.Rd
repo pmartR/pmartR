@@ -35,7 +35,8 @@ have just a single peptide mapping to them, defaults to FALSE.}
 \item{single_observation}{logical indicating whether or not to remove
 peptides that have just a single observation, defaults to FALSE.}
 
-\item{combine_fn}{character string specifying either be 'mean' or 'median'}
+\item{combine_fn}{character string specifying either be 'mean', 'median', or 
+'sum'. Using 'sum' is only supported when method is 'rollup'.}
 
 \item{parallel}{logical indicating whether or not to use "doParallel"
 loop in applying rollup functions. Defaults to TRUE. Is an argument of

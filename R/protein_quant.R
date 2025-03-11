@@ -15,7 +15,8 @@
 #'   have just a single peptide mapping to them, defaults to FALSE.
 #' @param single_observation logical indicating whether or not to remove
 #'   peptides that have just a single observation, defaults to FALSE.
-#' @param combine_fn character string specifying either be 'mean' or 'median'
+#' @param combine_fn character string specifying either be 'mean', 'median', or 
+#'   'sum'. Using 'sum' is only supported when method is 'rollup'.
 #' @param parallel logical indicating whether or not to use "doParallel"
 #'   loop in applying rollup functions. Defaults to TRUE. Is an argument of
 #'   rrollup, qrollup and zrollup functions.
@@ -87,10 +88,15 @@ protein_quant <- function(pepData, method, isoformRes = NULL,
 
   if (!inherits(pepData, "pepData"))
     stop("pepData must be an object of class pepData")
+  
   if (!(method %in% c('rollup', 'rrollup', 'qrollup', 'zrollup')))
     stop("method must be one of, rollup, rrollup, qrollup, zrollup")
-  if (!(combine_fn %in% c('median', 'mean')))
-    stop("combine_fn must be either 'mean' or 'median'")
+  
+  if (!(combine_fn %in% c('median', 'mean', 'sum')))
+    stop("combine_fn must be either 'mean', 'median', or 'sum'")
+  
+  if (combine_fn == 'sum' && method != "rollup")
+    stop("Using 'sum' for combine_fn is only supported when method is 'rollup'")
 
   # gives message if single_pep and single_observation are TRUE and method is not zrollup
   if (method != 'zrollup' &&
@@ -130,8 +136,10 @@ protein_quant <- function(pepData, method, isoformRes = NULL,
   # Set the combine_fn input to the appropriate function.
   if (combine_fn == "median") {
     chosen_combine_fn <- combine_fn_median
-  } else {
+  } else if (combine_fn == "mean") {
     chosen_combine_fn <- combine_fn_mean
+  } else if (combine_fn == "sum") {
+    chosen_combine_fn <- combine_fn_sum
   }
 
   # Extract attribute info to be used throughout the function ------------------
@@ -458,7 +466,8 @@ protein_quant <- function(pepData, method, isoformRes = NULL,
 #'
 #' @param pepData omicsData object of class 'pepData'
 #'
-#' @param combine_fn A character string that can either be 'mean' or 'median'.
+#' @param combine_fn A character string that can either be 'mean', 'median', 
+#' sum', or a function (e.g., combine_fn_mean, combine_fn_median, combine_fn_sum)
 #'
 #' @return An omicsData object of class 'proData'
 #'
@@ -481,6 +490,17 @@ pquant <- function(pepData, combine_fn) {
   pep_id <- attr(pepData, "cnames")$edata_cname
   samp_id = attr(pepData, "cnames")$fdata_cname
   pro_id <- attr(pepData, "cnames")$emeta_cname
+  
+  ## Must use abundance for sum
+  if(identical(combine_fn, combine_fn_sum)){
+    # Extricate attribute info for transformation
+    data_scale <- attr(pepData, "data_info")$data_scale
+    
+    # (Cannot sum on the log scale) #
+    if(data_scale != "abundance"){
+      pepData <- edata_transform(pepData, "abundance")
+    }
+  }
 
   # Quantitate the heck out of the peptides!
   res <- merge(
@@ -503,6 +523,28 @@ pquant <- function(pepData, combine_fn) {
   # Extricate attribute info for creating the proData object.
   # data_scale <- attr(pepData, "data_info")$data_scale
   # is_normalized <- attr(pepData, "data_info")$norm_info$is_normalized
+  
+  ## Must revert to previous data scale with sum
+  if(identical(combine_fn, combine_fn_sum)){
+    
+    if(data_scale != "abundance"){
+      
+      iCol <- which(colnames(res) == pro_id)
+      
+      if (data_scale == "log") {
+        # Natural logify the data.
+        res[, -iCol] <- log(res[, -iCol])
+      } else if (data_scale == "log2") {
+        # Log base 2ify the data.
+        res[, -iCol] <- log2(res[, -iCol])
+      } else if (data_scale == "log10") {
+        # Log base 10ify the data.
+        res[, -iCol] <- log10(res[, -iCol])
+      }
+      
+    }
+    
+  }
 
   # Add check here from Lisa's email -------------------------------------------
 
@@ -1010,3 +1052,10 @@ combine_fn_mean <- function(x) {
 }
 
 combine_fn_median <- function(x) median(x, na.rm = TRUE)
+
+combine_fn_sum <- function(x) {
+  if (all(is.na(x)))
+    sum(x) else
+      sum(x, na.rm = TRUE)
+}
+

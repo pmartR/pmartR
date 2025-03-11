@@ -9,7 +9,8 @@ pquant(pepData, combine_fn)
 \arguments{
 \item{pepData}{omicsData object of class 'pepData'}
 
-\item{combine_fn}{A character string that can either be 'mean' or 'median'.}
+\item{combine_fn}{A character string that can either be 'mean', 'median', 
+sum', or a function (e.g., combine_fn_mean, combine_fn_median, combine_fn_sum)}
 }
 \value{
 An omicsData object of class 'proData'
