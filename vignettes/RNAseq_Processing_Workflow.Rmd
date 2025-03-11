@@ -186,9 +186,11 @@ plot(mycor, interactive = TRUE)
 
 #### Principal Components Analysis
 
-A principal components analysis (PCA) plot of our data shows clustering of strains A and C with one another, separated from strain B. The two samples that are separated on PC1 one from the rest are the same two samples that stood out in the correlation heatmap.
+A principal components analysis (GLM-PCA) plot of our data shows clustering of strains A and C with one another, separated from strain B. The two samples that are separated on PC1 one from the rest are the same two samples that stood out in the correlation heatmap. Note: Randomness is present in GLM-PCA computations, set.seed() can be used to ensure consistent results.
 
 ```{r}
+
+set.seed(2025)
 mypca <- dim_reduction(omicsData = myseq, k = 2)
 plot(mypca, interactive = TRUE)
 
