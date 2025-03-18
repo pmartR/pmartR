@@ -1,9 +1,11 @@
 #' Combines two omicsData objects with identical sample information.
 #'
-#' @param obj_1 omicsData object of the same supported type as obj_2, currently
-#'   "lipidData". See details for more requirements.
-#' @param obj_2 omicsData object of the same supported type as obj_1, currently
-#'   "lipidData". See details for more requirements.
+#' @param obj_1 omicsData object of the same supported type as obj_2, 
+#'   currently "lipidData" and "metabData" are supported. See details for 
+#'   more requirements.
+#' @param obj_2 omicsData object of the same supported type as obj_1,
+#'   currently "lipidData" and "metabData" are supported. See details for 
+#'   more requirements.
 #' @param retain_groups logical indicator of whether to attempt to apply
 #'   existing group information to the new object. Defaults to FALSE.
 #' @param retain_filters Whether to retain filter information in the new object
@@ -55,7 +57,7 @@
 #'                    omicsData = obj_1, min_num = 2)
 #' obj_2 <- applyFilt(filter_object = cv_filter(omicsData = obj_2), obj_2, cv_thresh = 60)
 #'
-#' combine_object_later <- combine_lipidData(
+#' combine_object_later <- combine_omicsData(
 #'                           obj_1 = obj_1,
 #'                           obj_2 = obj_2,
 #'                           retain_groups = TRUE,
@@ -64,7 +66,11 @@
 #'
 #' @export
 #'
-combine_lipidData <- function(obj_1, obj_2, retain_groups = FALSE, retain_filters = FALSE, drop_duplicate_emeta = TRUE, ...) {
+combine_omicsData <- function(obj_1, obj_2, 
+                              retain_groups = FALSE, 
+                              retain_filters = FALSE, 
+                              drop_duplicate_emeta = TRUE, ...) {
+  
   if (class(obj_1) != class(obj_2)) {
     stop(sprintf(
       "Objects must be of the same class, found %s and %s",
@@ -74,7 +80,8 @@ combine_lipidData <- function(obj_1, obj_2, retain_groups = FALSE, retain_filter
   }
 
   # Check that it is among supported objects
-  if (!(class(obj_1) %in% c("lipidData"))) stop("Currently only support lipidData")
+  if (!(class(obj_1) %in% c("lipidData", "metabData"))) 
+    stop("Currently only support lipidData or metabData")
 
   if (get_data_norm(obj_1) != get_data_norm(obj_2))
     stop("Both objects must have the same normalization status (normalized/unnormalized)")
