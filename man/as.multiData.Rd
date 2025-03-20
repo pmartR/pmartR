@@ -82,6 +82,6 @@ mymultidata <- as.multiData(mymetab, mypro, f_meta = f_meta, sample_intersect = 
 \dontshow{\}) # examplesIf}
 }
 \seealso{
-\code{\link{combine_lipidData}} if you want to combine lipidData
+\code{\link{combine_omicsData}} if you want to combine lipidData
  objects before providing them to as.multiData.
 }
