@@ -39,7 +39,7 @@
 #' obj_2$e_data[, get_edata_cname(obj_2)] <- paste0("obj_2_", obj_2$e_data[, get_edata_cname(obj_2)])
 #' obj_2$e_meta[, get_edata_cname(obj_2)] <- obj_2$e_data[, get_edata_cname(obj_2)]
 #'
-#' combine_object <- combine_lipidData(obj_1 = obj_1, obj_2 = obj_2)
+#' combine_object <- combine_omicsData(obj_1 = obj_1, obj_2 = obj_2)
 #'
 #' # preprocess and group the data and keep filters/grouping structure
 #'

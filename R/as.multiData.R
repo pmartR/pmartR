@@ -28,7 +28,7 @@
 #' datasets, and simply creates an f_meta by copying this vector for each dataset
 #' and column-binding them.
 #'
-#' @seealso \code{\link{combine_lipidData}} if you want to combine lipidData
+#' @seealso \code{\link{combine_omicsData}} if you want to combine lipidData
 #'  objects before providing them to as.multiData.
 #'
 #' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
