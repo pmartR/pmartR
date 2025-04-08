@@ -80,7 +80,7 @@ combine_omicsData <- function(obj_1, obj_2,
   }
 
   # Check that it is among supported objects
-  if (!(class(obj_1) %in% c("lipidData", "metabData"))) 
+  if (!inherits(obj_1, c("lipidData", "metabData"))) 
     stop("Currently only support lipidData or metabData")
 
   if (get_data_norm(obj_1) != get_data_norm(obj_2))
