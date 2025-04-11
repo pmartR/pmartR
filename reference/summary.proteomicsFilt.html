@@ -85,7 +85,7 @@
 
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for class 'proteomicsFilt'</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">object</span>, min_num_peps <span class="op">=</span> <span class="cn">NULL</span>, degen_peps <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">object</span>, min_num_peps <span class="op">=</span> <span class="cn">NULL</span>, redundancy <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -105,7 +105,7 @@ less than <code>min_num_peps</code> mapping to it will be returned as a protein
 that should be filtered. Default value is NULL.</p></dd>
 
 
-<dt id="arg-degen-peps">degen_peps<a class="anchor" aria-label="anchor" href="#arg-degen-peps"></a></dt>
+<dt id="arg-redundancy">redundancy<a class="anchor" aria-label="anchor" href="#arg-redundancy"></a></dt>
 <dd><p>logical indicator of whether to filter out 'degenerate' or 'redundant'
 peptides (i.e. peptides mapping to multiple proteins) (TRUE) or not
 (FALSE). Default value is FALSE.</p></dd>
@@ -119,7 +119,7 @@ peptides (i.e. peptides mapping to multiple proteins) (TRUE) or not
     <h2>Value</h2>
     <p>a summary table giving the number of Observed Proteins per Peptide
   and number of Observed Peptides per Protein. If min_num_peps is specified
-  and/or degen_peps is TRUE, the number of biomolecules to be filtered with
+  and/or redundancy is TRUE, the number of biomolecules to be filtered with
   the specified threshold(s) are reported.</p>
     </div>
     <div id="see-also">
@@ -135,7 +135,7 @@ peptides (i.e. peptides mapping to multiple proteins) (TRUE) or not
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/pmartR/pmartRdata" class="external-link">pmartRdata</a></span><span class="op">)</span></span>
 <span><span class="va">myfilt</span> <span class="op">&lt;-</span> <span class="fu"><a href="proteomics_filter.html">proteomics_filter</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">pep_object</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">myfilt</span>, degen_peps <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="co"># there are no degenerate peptides to filter out</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">myfilt</span>, redundancy <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="co"># there are no degenerate peptides to filter out</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">myfilt</span>, min_num_peps <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
     </div>
   </div>

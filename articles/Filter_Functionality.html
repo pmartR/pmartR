@@ -102,7 +102,7 @@
                         <h4 data-toc-skip class="author">Kelly Stratton,
 Lisa Bramer</h4>
             
-            <h4 data-toc-skip class="date">2025-01-20</h4>
+            <h4 data-toc-skip class="date">2025-04-11</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/pmartR/pmartR/blob/v2.5.0/vignettes/Filter_Functionality.Rmd" class="external-link"><code>vignettes/Filter_Functionality.Rmd</code></a></small>
       <div class="hidden name"><code>Filter_Functionality.Rmd</code></div>
@@ -446,7 +446,7 @@ peptides such as this are called “redundant” or “degenerate”. Redundant
 peptides can be removed using the <code><a href="../reference/proteomics_filter.html">proteomics_filter()</a></code>.</p>
 <div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">myproteomicsfilt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proteomics_filter.html">proteomics_filter</a></span><span class="op">(</span>omicsData <span class="op">=</span> <span class="va">mypep_groups_log2</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">myproteomicsfilt</span>, degen_peps <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">myproteomicsfilt</span>, redundancy <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## </span></span>
 <span><span class="co">## Summary of Proteomics Filter </span></span>
 <span><span class="co">## </span></span>
@@ -458,6 +458,7 @@ peptides can be removed using the <code><a href="../reference/proteomics_filter.
 <span><span class="co">## 3rd Qu.                             1                        8</span></span>
 <span><span class="co">## Max.                                1                      235</span></span>
 <span><span class="co">##                                                               </span></span>
+<span><span class="co">##                              Peptides                 Proteins</span></span>
 <span><span class="co">## Filtered                            0                        0</span></span>
 <span><span class="co">## Not Filtered                    21329                     2982</span></span></code></pre>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
@@ -490,8 +491,9 @@ peptides) that have fewer than 2 peptides mapping to them.</p>
 <span><span class="co">## 3rd Qu.                             1                        8</span></span>
 <span><span class="co">## Max.                                1                      235</span></span>
 <span><span class="co">##                                                               </span></span>
-<span><span class="co">## Filtered                            0                      664</span></span>
-<span><span class="co">## Not Filtered                    21329                     2318</span></span></code></pre>
+<span><span class="co">##                              Peptides                 Proteins</span></span>
+<span><span class="co">## Filtered                          664                      664</span></span>
+<span><span class="co">## Not Filtered                    20665                     2318</span></span></code></pre>
 <div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mypep_proteomicsfilt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/applyFilt.html">applyFilt</a></span><span class="op">(</span>filter_object <span class="op">=</span> <span class="va">myproteomicsfilt</span>, omicsData <span class="op">=</span> <span class="va">mypep_groups_log2</span>, min_num_peps <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
 </div>
