@@ -18,6 +18,9 @@
   legend_position = "right",
   color_low = NULL,
   color_high = NULL,
+  Npep_bar = FALSE,
+  Npep_color_low = NULL,
+  Npep_color_high = NULL,
   bw_theme = TRUE,
   ...
 )
@@ -56,6 +59,14 @@ default is "none".}
 low values.}
 
 \item{color_high}{character string specifying the color of the gradient for
+high values}
+
+\item{Npep_bar}{Boolean for plotting with a color bar}
+
+\item{Npep_color_low}{character string specifying the color of the gradient for
+low values.}
+
+\item{Npep_color_high}{character string specifying the color of the gradient for
 high values}
 
 \item{bw_theme}{logical value. If TRUE uses the ggplot2 black and white theme.}
