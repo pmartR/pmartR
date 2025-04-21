@@ -463,6 +463,15 @@ normalize_global <- function(omicsData, subset_fn, norm_fn, params = NULL,
       sep = " "
     ))
   }
+  
+  if(prop_features_calc < .1){
+    warning(paste0("Normalization and subset methods selected",
+                   " uses less than 10% of all ",
+                   "biomolecules. Biomolecules used: ",
+                   length(peps), "/", nrow(omicsData$e_data),
+                   " (", round(prop_features_calc)*100, "%)"
+                   ))
+  }
 
   # Check if the normalization will be applied. If return all of the information
   # needed to normalize (which biomolecules to normalize with, normalization
