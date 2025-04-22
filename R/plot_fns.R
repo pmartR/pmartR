@@ -853,6 +853,11 @@ plot.nmrnormRes <- function(x, nmrData = NULL, order_by = NULL,
 #'   low values.
 #' @param color_high character string specifying the color of the gradient for
 #'   high values
+#' @param Npep_bar Boolean for plotting with a color bar
+#' @param Npep_color_low character string specifying the color of the gradient for
+#'   low values.
+#' @param Npep_color_high character string specifying the color of the gradient for
+#'   high values
 #' @param bw_theme logical value. If TRUE uses the ggplot2 black and white theme.
 #' @param ... further arguments passed to or from other methods.
 #'
@@ -878,6 +883,8 @@ plot.SPANSRes <- function(x, interactive = FALSE,
                           title_lab = NULL, title_lab_size = 14,
                           legend_lab = NULL, legend_position = "right",
                           color_low = NULL, color_high = NULL,
+                          Npep_bar = FALSE, Npep_color_low = NULL,
+                          Npep_color_high = NULL,
                           bw_theme = TRUE, ...) {
   SPANSRes_obj <- x
 
@@ -925,6 +932,51 @@ plot.SPANSRes <- function(x, interactive = FALSE,
 
   # Produce magnificent plots --------------------------------------------------
 
+  
+  # Want an interactive plot? As you wish.
+  if (interactive && requirePlotly()) {
+    p <- plotly::plot_ly(
+      SPANSRes_obj,
+      x = ~normalization_method,
+      y = ~ss_par,
+      z = ~SPANS_score,
+      hoverinfo = 'text',
+      text = ~ paste(
+        '</br> F(-Log10(HSmPV)):',
+        F_log_HSmPV,
+        '</br> F(Log10(NSmPV)): ',
+        F_log_NSmPV,
+        '</br> Scale p-value: ',
+        scale_p_value,
+        '</br> Location p-value',
+        location_p_value
+      ),
+      colors = grDevices::colorRamp(
+        c(
+          if (is.null(color_low)) "#132B43" else color_low,
+          if (is.null(color_high)) "#56B1F7" else color_high
+        )
+      ),
+      type = "heatmap"
+    ) %>%
+      plotly::add_trace(
+        x = da_best$normalization_method,
+        y = da_best$ss_par,
+        type = 'scatter',
+        mode = "markers",
+        marker = list(color = "black"),
+        name = "Top SPANS scores",
+        inherit = FALSE
+      ) %>%
+      plotly::colorbar(title = "SPANS score") %>%
+      plotly::layout(
+        plot_bgcolor = 'black',
+        xaxis = list(title = "Normalization Method"),
+        yaxis = list(title = "Subset Method"),
+        showlegend = TRUE
+      )
+  } else {
+  
   p <- ggplot2::ggplot(data = SPANSRes_obj) +
     ggplot2::geom_tile(
       ggplot2::aes(
@@ -984,48 +1036,85 @@ plot.SPANSRes <- function(x, interactive = FALSE,
       axis.ticks = ggplot2::element_blank()
     )
 
-  # Want an interactive plot? As you wish.
-  if (interactive && requirePlotly()) {
-    p <- plotly::plot_ly(
-      SPANSRes_obj,
-      x = ~normalization_method,
-      y = ~ss_par,
-      z = ~SPANS_score,
-      hoverinfo = 'text',
-      text = ~ paste(
-        '</br> F(-Log10(HSmPV)):',
-        F_log_HSmPV,
-        '</br> F(Log10(NSmPV)): ',
-        F_log_NSmPV,
-        '</br> Scale p-value: ',
-        scale_p_value,
-        '</br> Location p-value',
-        location_p_value
-      ),
-      colors = grDevices::colorRamp(
-        c(
-          if (is.null(color_low)) "#132B43" else color_low,
-          if (is.null(color_high)) "#56B1F7" else color_high
+  }
+  
+  ## Add n_pep bar
+  if(Npep_bar){
+    
+    if(interactive && requirePlotly()){
+      
+      SPANSRes_obj$all <- "all"
+      
+      p2 <- plotly::plot_ly(
+        SPANSRes_obj,
+        x = ~all,
+        y = ~ss_par,
+        z = ~mols_used_in_norm/max(mols_used_in_norm) * 100,
+        hoverinfo = 'text',
+        text = ~ paste(
+          '</br> % biomolecules used:',
+          round(mols_used_in_norm/max(mols_used_in_norm) * 100),
+          
+          '</br> N biomolecules used:',
+          mols_used_in_norm
+        ),
+        colors = grDevices::colorRamp(
+          c(
+            if (is.null(Npep_color_low)) "blue" else Npep_color_low,
+            if (is.null(Npep_color_low)) "orange" else Npep_color_low
+          )
+        ),
+        type = "heatmap"
+      )  %>% plotly::colorbar(title = "% Biomolecules Used") %>%
+        plotly::layout(
+          plot_bgcolor = 'black',
+          xaxis = list(title = "", showticklabels=FALSE),
+          yaxis = list(title = "", showticklabels=FALSE),
+          showlegend = TRUE
         )
-      ),
-      type = "heatmap"
-    ) %>%
-      plotly::add_trace(
-        x = da_best$normalization_method,
-        y = da_best$ss_par,
-        type = 'scatter',
-        mode = "markers",
-        marker = list(color = "black"),
-        name = "Top SPANS scores",
-        inherit = FALSE
-      ) %>%
-      plotly::colorbar(title = "SPANS score") %>%
-      plotly::layout(
-        plot_bgcolor = 'black',
-        xaxis = list(title = "Normalization Method"),
-        yaxis = list(title = "Subset Method"),
-        showlegend = TRUE
-      )
+      
+      
+      p <- plotly::subplot(p, p2, widths = c(.95, .05)) %>%
+        plotly::layout(
+          xaxis2 = list(title = "", showticklabels=FALSE, tickmode="none",
+                        tickcolor='white', ticklen=0),
+          yaxis2 = list(title = "", showticklabels=FALSE, tickmode="none",
+                        tickcolor='white', ticklen=0)
+        )
+      
+      
+    } else {
+      
+      p2 <- ggplot2::ggplot(data = SPANSRes_obj,
+                            ggplot2::aes(
+                              x = " ",
+                              y = ss_par,
+                              fill = mols_used_in_norm/max(mols_used_in_norm) * 100
+                            )   
+                            ) +
+        ggplot2::geom_tile(color = 'black') + 
+        ggplot2::theme_bw() +
+        ggplot2::labs(x = "", y = "", fill = "% Biomolecules Used") +
+        ggplot2::scale_y_discrete(expand = c(0, 0)) +
+        ggplot2::scale_x_discrete(expand = c(0, 0)) +
+        ggplot2::theme(
+          axis.text.x = ggplot2::element_blank(),
+          axis.text.y = ggplot2::element_blank(),
+          plot.margin = ggplot2::unit(c(0, 0, 0, 0), units = "npc"),
+          axis.ticks = ggplot2::element_blank()
+        ) +
+        ggplot2::scale_fill_gradient(
+          low = if (is.null(Npep_color_low)) "blue" else Npep_color_low,
+          high = if (is.null(Npep_color_low)) "orange" else Npep_color_high,
+        )
+      
+      p <- patchwork::wrap_plots(c(list(p), list(p2)),
+                            guides = "collect",
+                            widths = c(20, 1))
+      
+    }
+    
+    
   }
 
   return(p)

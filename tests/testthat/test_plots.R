@@ -185,9 +185,14 @@ test_that('plot functions are producing desired output',{
   
   ## Test plot.SPANSRES --------------------------------------------------------
   
-  expect_doppelganger_ci("plot.SPANSRes", plot(pep_spans_result))
-  expect_doppelganger_ci("plot.SPANSRes (bw_theme)", plot(pep_spans_result, bw_theme = TRUE))
-  expect_doppelganger_ci("plot.SPANSRes (color_high color_low)", plot(pep_spans_result, color_high = "#00FFFF", color_low = "#FF0000"))
+  expect_doppelganger_ci("plot.SPANSRes", 
+                         plot(pep_spans_result))
+  expect_doppelganger_ci("plot.SPANSRes (bw_theme)", 
+                         plot(pep_spans_result, bw_theme = TRUE))
+  expect_doppelganger_ci("plot.SPANSRes (color_high color_low)", 
+                         plot(pep_spans_result, color_high = "#00FFFF", color_low = "#FF0000"))
+  expect_doppelganger_ci("plot.SPANSRes (N biomolecule bar)", 
+                         plot(pep_spans_result, Npep_bar = T))
   
   ## Test plot.isobaricnormRes -------------------------------------------------
   
