@@ -469,7 +469,7 @@ normalize_global <- function(omicsData, subset_fn, norm_fn, params = NULL,
                    " uses less than 10% of all ",
                    "biomolecules. Biomolecules used: ",
                    length(peps), "/", nrow(omicsData$e_data),
-                   " (", round(prop_features_calc)*100, "%)"
+                   " (", round(prop_features_calc*100), "%)"
                    ))
   }
 
