@@ -84,6 +84,14 @@ Where you can replace the `gh_url` with the address of your fork if you are work
 ### pkgdown deploy site
 Pull requests and pushes to branches specified in .github/workflows/pkgdown.yaml will trigger a build of a web page containing function documentation and rendered vignettes.  This requires obviously that your vignettes build without error, and that your documentation is valid.  The site will **deploy** only when we do a release on github.
 
+## Submitting to CRAN
+
+After checks have passed (preferably the `rhub` checks), the easiest way to submit the package to CRAN for review is using `devtools`.  First, update `cran-comments.md` specifying any changes regarding CRAN checks (e.g. fixed NOTE/WARNINGs or other things that they would care about when deciding to accept/reject a submission).  Then we call `devtools::submit_cran(args = '--no-build-vignettes')`.  You will be prompted with a series of questions and then the package will be built and submitted.  The comments in `cran-comments.md` will be automatically included in the submission.
+
+The package maintainer as listed in DESCRIPTION will be sent an email confirming the submission.  Once they confirm it will be sent to the CRAN maintainers for review.
+
+Alternatively, you can use `R CMD build --no-build-vignettes pmartR` to build the package tarball and then manually upload it to the CRAN [submission site](https://cran.r-project.org/submit.html).
+
 ## Documentation and tests
 
 *  We use [roxygen2](https://cran.r-project.org/package=roxygen2), with [Markdown syntax](https://cran.r-project.org/web/packages/roxygen2/vignettes/rd-formatting.html), for documentation.  
