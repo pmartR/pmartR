@@ -1164,8 +1164,8 @@ paired_test <- function(data, bio_ids, cutoff, parallel) {
 
   # Set up parallel backend.
   if (parallel) {
-    cores <- parallelly::availableCores()
-    cl <- parallelly::makeClusterPSOCK(cores - 1)
+    cores <- parallelly::availableCores(omit = 1)
+    cl <- parallelly::makeClusterPSOCK(cores)
     on.exit(parallel::stopCluster(cl))
     doParallel::registerDoParallel(cl)
   } else {
@@ -1567,8 +1567,8 @@ imd_cov <- function(data, groupData, fdata, cmat,
 
   # Set up parallel backend.
   if (parallel) {
-    cores <- parallelly::availableCores()
-    cl <- parallelly::makeClusterPSOCK(cores - 1)
+    cores <- parallelly::availableCores(omit = 1)
+    cl <- parallelly::makeClusterPSOCK(cores)
     on.exit(parallel::stopCluster(cl))
     doParallel::registerDoParallel(cl)
   } else {
