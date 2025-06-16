@@ -6049,7 +6049,7 @@ plot_omicsData <- function(omicsData, order_by, color_by, facet_by, facet_cols,
 
 #' Plot statRes Object
 #'
-#' Produces plots that summarize the results contained in a `statRes` object.
+#' Produces plots that summarize the results contained in a `statRes` object. 
 #'
 #' @param x `statRes` object to be plotted, usually the result of `imd_anova`
 #' @param plot_type defines which plots to be produced, options are "bar",
