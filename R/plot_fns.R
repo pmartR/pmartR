@@ -6049,7 +6049,7 @@ plot_omicsData <- function(omicsData, order_by, color_by, facet_by, facet_cols,
 
 #' Plot statRes Object
 #'
-#' Produces plots that summarize the results contained in a `statRes` object. 
+#' Produces plots that summarize the results contained in a `statRes` object.
 #'
 #' @param x `statRes` object to be plotted, usually the result of `imd_anova`
 #' @param plot_type defines which plots to be produced, options are "bar",
@@ -6063,7 +6063,10 @@ plot_omicsData <- function(omicsData, order_by, color_by, facet_by, facet_cols,
 #' @param fc_colors vector of length three with character color values
 #'   interpretable by ggplot. i.e. c("orange", "black", "blue") with the values
 #'   being used to color negative, non-significant, and positive fold changes
-#'   respectively
+#'   respectively. When \code{plot_type = "histogram"}, this a vector of length two
+#'   with character color values interpretable by ggplot. i.e. c("green","gray") with the
+#'   values being used to color significant (regardless of direction)
+#'   and non-significant fold changes
 #' @param stacked TRUE/FALSE for whether to stack positive and negative fold
 #'   change sections in the barplot, defaults to TRUE
 #' @param show_sig This input is used when \code{plot_type = "gheatmap"}. A
@@ -6105,6 +6108,8 @@ plot_omicsData <- function(omicsData, order_by, color_by, facet_by, facet_cols,
 #'   axis. defaults to TRUE for seqData statistics and FALSE for all others.
 #' @param free_y_axis Logical. If TRUE the y axis for each bar plot can have its
 #'   own range. The default is FALSE.
+#' @param only_significant Logical. This input is used when \code{plot_type = "histogram"}. If
+#'    TRUE, only significant fold changes will be plotted. The default is FALSE
 #' @param ... further arguments passed to or from other methods.
 #'
 #' @details Plot types:
@@ -6120,6 +6125,8 @@ plot_omicsData <- function(omicsData, order_by, color_by, facet_by, facet_cols,
 #'  number of biomolecules that fall into that combination of nonmissing values.
 #'  \item{"fcheatmap"} Heatmap showing all biomolecules across comparisons,
 #'  colored by fold change.
+#'  \item{"histogram"} Histogram showing the distribution of log2 fold changes
+#'  across comparisons, colored by significance level status
 #' }
 #'
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
@@ -6186,18 +6193,19 @@ plot.statRes <- function(x,
                          custom_theme = NULL,
                          cluster = FALSE,
                          free_y_axis = FALSE,
+                         only_significant = FALSE,
                          ...) {
   # Make sure we only have valid arguments
   if (length(list(...)) > 0) {
     warning("unused argument(s): ",
-             toString(as.list(tail(match.call(), length(list(...))))))
+            toString(as.list(tail(match.call(), length(list(...))))))
   }
-
+  
   # Farm boy, fix all the problems. As you wish.
-
+  
   # Most plots are based on "number_significant" data frame so pull it out
   comp_df <- attr(x, "number_significant")
-
+  
   ## --------##
   # Go through the given plot_types and remove any that aren't currently avilable
   plt_tyj <- try(
@@ -6208,7 +6216,8 @@ plot.statRes <- function(x,
         "volcano",
         "gheatmap",
         "fcheatmap",
-        "ma"
+        "ma",
+        "histogram"
       )
     ),
     silent = TRUE
@@ -6223,27 +6232,27 @@ plot.statRes <- function(x,
   } else {
     plot_type <- plt_tyj
   }
-
+  
   # Don't make biomolecule heatmaps if there's only one comparison
   if (plot_type %in% c("fcheatmap") & nrow(comp_df) == 1) {
     stop(paste("Fold change heatmaps not supported when only one comparison",
-      "is being made.",
-      sep = " "
+               "is being made.",
+               sep = " "
     ))
   }
-
+  
   if (plot_type %in% c("ma") && attr(x, "data_class") != "seqData") {
     stop("MA plots are only supported for transcriptomic data.",
-      sep = " "
+         sep = " "
     )
   }
-
+  
   # specified theme parameters
   if (!is.null(custom_theme)) {
     if (bw_theme)
       warning(paste("Setting both bw_theme to TRUE and specifying a custom",
-        "theme may cause undesirable results",
-        sep = " "
+                    "theme may cause undesirable results",
+                    sep = " "
       ))
     if (!inherits(custom_theme, c("theme", "gg")))
       stop("custom_theme must be a valid 'theme' object as used in ggplot")
@@ -6255,15 +6264,15 @@ plot.statRes <- function(x,
     axis.text.x = ggplot2::element_text(angle = x_lab_angle),
     legend.position = legend_position
   )
-
+  
   # Both the volcano plot and heatmaps need a dataframe of fold changes by
   # comparison/biomolecule
   if (plot_type %in% c("volcano", "gheatmap", "fcheatmap")) {
     volcano <- make_volcano_plot_df(x)
   }
-
+  
   # Bar plot -------------------------------------------------------------------
-
+  
   if ("bar" %in% plot_type) {
     p <- statres_barplot(
       x = x,
@@ -6277,14 +6286,14 @@ plot.statRes <- function(x,
       legend_lab = legend_lab,
       free_y_axis = free_y_axis
     )
-
+    
     if (bw_theme) p <- p +
-      ggplot2::theme_bw() +
-      ggplot2::theme(strip.background = ggplot2::element_rect(fill = "white"))
-
+        ggplot2::theme_bw() +
+        ggplot2::theme(strip.background = ggplot2::element_rect(fill = "white"))
+    
     return(p + mytheme)
   }
-
+  
   # Volcano plot
   else if ("volcano" %in% plot_type) {
     if (!attr(x, "statistical_test") %in% c(
@@ -6292,14 +6301,14 @@ plot.statRes <- function(x,
     )
     ) {
       stop(paste("imd_anova must have been run with test_method = 'anova' or",
-        "'combined' to make the volcano plot. For seqData,",
-        "DE_wrapper must have been run.",
-        sep = " "
+                 "'combined' to make the volcano plot. For seqData,",
+                 "DE_wrapper must have been run.",
+                 sep = " "
       ))
     }
-
+    
     # still returns a ggplot, even if interactive = T
-
+    
     p <-
       statres_volcano_plot(
         volcano = volcano,
@@ -6313,28 +6322,28 @@ plot.statRes <- function(x,
         title_lab = title_lab,
         legend_lab = legend_lab
       )
-
+    
     if (bw_theme) p <- p +
       ggplot2::theme_bw() +
       ggplot2::theme(strip.background = ggplot2::element_rect(fill = "white"))
-
+    
     p <- p + mytheme
-
+    
     if (interactive && requirePlotly())
       return(plotly::ggplotly(p, tooltip = c("text"))) else
-      return(p)
+        return(p)
   }
-
+  
   # g-test heat map ------------------------------------------------------------
-
+  
   else if ("gheatmap" %in% plot_type) {
     if (!attr(x, "statistical_test") %in% c("gtest", "combined")) {
       stop(paste("imd_anova must have been run with test_method = 'gtest' or",
-        "'combined' to make the g-test heatmap. Not valid for seqData.",
-        sep = " "
+                 "'combined' to make the g-test heatmap. Not valid for seqData.",
+                 sep = " "
       ))
     }
-
+    
     p <-
       gtest_heatmap(
         volcano = volcano,
@@ -6351,42 +6360,42 @@ plot.statRes <- function(x,
         title_lab = title_lab,
         legend_lab = legend_lab
       )
-
+    
     if (!interactive) {
       p <- p + mytheme
     }
   }
-
+  
   # biomolecule fold change heatmap
   else if ("fcheatmap" %in% plot_type) {
     # Farm boy, do all the tedious label crap. As you wish.
     the_x_label <- if (is.null(x_lab))
       "Biomolecule" else
-      x_lab
+        x_lab
     the_y_label <- if (is.null(y_lab))
       "Comparison" else
-      y_lab
+        y_lab
     the_title_label <- if (is.null(title_lab))
       "Log Fold Change" else
-      title_lab
+        title_lab
     the_legend_label <- if (is.null(legend_lab))
       "Fold Change" else
-      legend_lab
-
+        legend_lab
+    
     # For now just consider biomolecules significant with respect to ANOVA
     volcano <- dplyr::filter(volcano, Type %in% c(
       "ANOVA", "EdgeR_F",
       "Voom_T", "DESeq_Wald",
       "DESeq_LRT"
     ))
-
+    
     volcano_sigs <- dplyr::filter(volcano, P_value < attr(x, "pval_thresh"))
     if (!(nrow(volcano_sigs)) > 0)
       warning("No molecules significant at the provided p-value threshold")
     colnames(volcano_sigs)[1] <- "Biomolecule"
-
+    
     if (cluster) {
-      wide <- volcano_sigs %>% 
+      wide <- volcano_sigs %>%
         tidyr::pivot_wider(
           id_cols = Biomolecule,
           names_from = Comparison,
@@ -6397,7 +6406,7 @@ plot.statRes <- function(x,
       dist_mat <- dist(wide[-1])
       res_hclust <- hclust(dist_mat)
       order_biom <- rev(res_hclust$labels[res_hclust$order])
-
+      
       volcano_sigs$Biomolecule <- as.character(volcano_sigs$Biomolecule)
       volcano_sigs$Biomolecule <- factor(
         volcano_sigs$Biomolecule,
@@ -6406,18 +6415,18 @@ plot.statRes <- function(x,
     } else {
       volcano_sigs$Biomolecule <- as.factor(volcano_sigs$Biomolecule)
     }
-
+    
     p <- ggplot2::ggplot(
       volcano_sigs,
       ggplot2::aes(Biomolecule,
-        Comparison,
-        text = paste(
-          "ID:",
-          Biomolecule,
-          "<br>",
-          "Pval:",
-          P_value
-        )
+                   Comparison,
+                   text = paste(
+                     "ID:",
+                     Biomolecule,
+                     "<br>",
+                     "Pval:",
+                     P_value
+                   )
       )
     ) +
       ggplot2::geom_tile(ggplot2::aes(fill = Fold_change), color = "white") +
@@ -6432,30 +6441,30 @@ plot.statRes <- function(x,
       mytheme
     if (interactive && requirePlotly())
       return(plotly::ggplotly(p, tooltip = c("text"))) else
-      return(p)
+        return(p)
   } else if ("ma" %in% plot_type) {
     ## Color by significance
     comps <- strsplit(attr(x, "comparisons"), "_vs_")
-
+    
     plotter <- purrr::map_dfr(1:length(comps), function(n_comp) {
       label <- attr(x, "comparisons")[n_comp]
       comp <- comps[[n_comp]]
       mean_df <- attr(x, "MA_means")
       pval <- grep(paste0("^P_value_", label), colnames(x), value = T)
-
+      
       v1 <- mean_df[[comp[1]]]
       v2 <- mean_df[[comp[2]]]
       v3 <- x[[pval]]
-
+      
       if (length(v1) == 0) {
         v1 <- NA
         v2 <- NA
         v3 <- NA
       }
-
+      
       data.frame(check.names = FALSE, var1 = v1, var2 = v2, pval = v3, comp = label)
     })
-
+    
     p <- ggplot2::ggplot(
       plotter,
       ggplot2::aes(
@@ -6476,18 +6485,44 @@ plot.statRes <- function(x,
         y = "M (Log2 Fold change)",
         color = paste("Significance < ", attr(x, "pval_thresh"))
       )
-
+    
     if (bw_theme) p <- p +
       ggplot2::theme_bw() +
       ggplot2::theme(strip.background = ggplot2::element_rect(fill = "white"))
-
+    
     p <- p + mytheme
-
+    
     if (interactive && requirePlotly())
       return(plotly::ggplotly(p, tooltip = c("text"))) else
-      return(p)
+        return(p)
   }
-
+  # histogram --------------------------------------------------------------------
+  else if("histogram" %in% plot_type){
+    # must have ran anova or combined
+    if (!attr(x, "statistical_test") %in% c(
+      "anova", "combined"
+    )
+    ) {
+      stop(paste("imd_anova must have been run with test_method = 'anova' or",
+                 "'combined' to make the histogram plot.",
+                 sep = " "
+      ))
+    }
+    
+    p <- statres_histogram(x,fc_colors,text_size,x_lab,
+                           y_lab, title_lab,legend_lab,
+                           free_y_axis,only_significant)
+    if (bw_theme) p <- p +
+      ggplot2::theme_bw() +
+      ggplot2::theme(strip.background = ggplot2::element_rect(fill = "white"))
+    
+    p <- p + mytheme
+    
+    if(interactive && requirePlotly())
+      return(plotly::ggplotly(p)) else
+        return(p)
+  }
+  
   return(p)
 }
 
@@ -7259,6 +7294,125 @@ statres_volcano_plot <-
         breaks = c("-1", "0", "1")
       )
 
+    return(p)
+  }
+
+#' Fold change histogram for statres objects
+#'
+#' Plots a histogram indicating the number of significant
+#' biomolecules, grouped by test type and fold change direction.
+#'
+#' @param x,fc_colors passed from
+#'   \code{\link[pmartR:plot.statRes]{pmartR::plot.statRes()}}
+#' @param text_size An integer specifying the size of the text (number of
+#'   non-missing values) within the plot. The default is 3.
+#' @param display_count logical value. Indicates whether the non-missing counts will
+#'   be displayed on the bar plot. The default is TRUE.
+#' @param x_lab character string specifying the x-axis label.
+#' @param y_lab character string specifying the y-axis label.
+#' @param title_lab character string specifying the plot title.
+#' @param legend_lab character string specifying the legend title.
+#' @param only_significant logical specifying whether only significant fold changes
+#'    are included in the histogram or all fold changes
+#'
+#' @return `ggplot` object - histogram
+#'
+#' @keywords internal
+#'
+statres_histogram <- 
+  function(x,
+           fc_colors = c("blue","darkgray"),
+           text_size,
+           x_lab,
+           y_lab,
+           title_lab,
+           legend_lab,
+           free_y_axis,
+           only_significant) {
+    # If free_y_axis is true then each bar plot can have its own y axis range.
+    if (free_y_axis) {
+      da_scales <- "free"
+    } else {
+      da_scales <- NULL
+    }
+    
+    only_sig <- if (is.null(only_significant))
+      TRUE else
+        only_significant
+    
+    # Farm boy, do all the tedious label crap. As you wish.
+    the_x_label <- if (is.null(x_lab))
+      "log2 Fold Change" else
+        x_lab
+    the_y_label <- if (is.null(y_lab))
+      "Count of Biomolecules" else
+        y_lab
+    the_title_label <- if (is.null(title_lab))
+      "Distribution of log2 Fold Changes" else
+        title_lab
+    the_legend_label <- if (is.null(legend_lab))
+      "Fold Change Significance" else
+        legend_lab
+    
+    
+    # make the data long by anova comparisons, p-values, and flag
+    x_long <- x %>%
+      tidyr::pivot_longer(dplyr::starts_with("Fold_change_"),
+                          names_to = "Comparison",
+                          values_to = "Fold_change") %>%
+      dplyr::mutate(Comparison = stringr::str_remove(Comparison,"Fold_change_")) %>%
+      tidyr::pivot_longer(dplyr::starts_with("P_value_A"),
+                          names_to = "Comparison2",
+                          values_to = "P_value_A") %>%
+      dplyr::mutate(Comparison2 = stringr::str_remove(Comparison2, "P_value_A_")) %>%
+      dplyr::filter(Comparison == Comparison2) %>%
+      dplyr::select(-Comparison2) %>%
+      tidyr::pivot_longer(dplyr::starts_with("Flag_A"),
+                          names_to = "Comparison3",
+                          values_to = "Flag_A") %>%
+      dplyr::mutate(Comparison3 = stringr::str_remove(Comparison3, "Flag_A_")) %>%
+      dplyr::filter(Comparison == Comparison3) %>%
+      dplyr::select(-Comparison3) %>%
+      dplyr::mutate(Significant = ifelse(Flag_A == 0, "Not Significant","Significant"))
+    
+    
+    
+    if(only_sig == TRUE){
+      p <- x_long %>%
+        dplyr::filter(P_value_A < 0.05) %>%
+        dplyr::mutate(Significant = factor(Significant, levels = c("Significant", "Not Significant"))) %>%
+        ggplot(aes(x = Fold_change, fill = Significant)) +
+        geom_histogram(position = "identity", alpha = 1) +
+        theme_bw() +
+        facet_wrap(~Comparison, scales = da_scales) +
+        ggplot2::xlab(the_x_label) +
+        ggplot2::xlab(the_x_label) +
+        ggplot2::ylab(the_y_label) +
+        ggplot2::ggtitle(the_title_label) +
+        ggplot2::scale_fill_manual(
+          values = c(fc_colors[1], fc_colors[2]),
+          labels = c("Significant", "Not Significant"),
+          name = the_legend_label
+        )
+    } else {
+      p <- x_long %>%
+        dplyr::mutate(Significant = factor(Significant, levels = c("Significant", "Not Significant"))) %>%
+        #dplyr::filter(P_value_A < 0.05) %>%
+        ggplot(aes(x = Fold_change, fill = Significant)) +
+        geom_histogram(position = "identity", alpha = 0.65) +
+        theme_bw() +
+        facet_wrap(~Comparison, scales = da_scales) +
+        ggplot2::xlab(the_x_label) +
+        ggplot2::xlab(the_x_label) +
+        ggplot2::ylab(the_y_label) +
+        ggplot2::ggtitle(the_title_label) +
+        ggplot2::scale_fill_manual(
+          values = c(fc_colors[1], fc_colors[2]),
+          labels = c("Significant", "Not Significant"),
+          name = the_legend_label
+        )
+    }
+    
     return(p)
   }
 
