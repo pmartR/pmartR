@@ -1189,6 +1189,9 @@ plot.SPANSRes <- function(x, interactive = FALSE,
 #'   be flipped. The default is FALSE.
 #' @param use_VizSampNames logical value. Indicates whether to use custom sample
 #'   names. The default is FALSE.
+#' @param groups logical value. Only applicable for plot_type = "scatter" with
+#' color_by = "Group". When TRUE, biomolecule means are calculated within each 
+#' experimental group for visualization.
 #' @param ... further arguments passed to or from other methods.
 #'
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
@@ -1231,6 +1234,7 @@ plot.naRes <- function (x, omicsData, plot_type = "bar",
                         text_size = 3, bar_width = 0.8, bw_theme = TRUE,
                         palette = NULL, display_count = TRUE,
                         coordinate_flip = FALSE, use_VizSampNames = FALSE,
+                        groups = FALSE,
                         ...) {
 
   naRes_obj <- x
@@ -1254,6 +1258,21 @@ plot.naRes <- function (x, omicsData, plot_type = "bar",
     # Fezzik, tear his arms off.
     stop("omicsData is not an appropriate class")
   }
+  
+  
+  # Check that naRes and omicObject have same attributes #
+  if(!all(unique(naRes_obj$na.by.sample[[1]]) %in% 
+            omicsData$f_data[[get_fdata_cname(omicsData)]])){
+    stop("Object from 'missingval_result()' does not have tha same samples as",
+         "the given 'omicsData' -- ensure these objects match.")
+  }
+  
+  if(!all(unique(naRes_obj$na.by.molecule[[1]]) %in% 
+          omicsData$e_data[[get_edata_cname(omicsData)]])){
+    stop("Object from 'missingval_result()' does not have tha same biomolecules as",
+         "the given 'omicsData' -- ensure these objects match.")
+  }
+  
 
   # Check that type is either bar or scatter.
   if (!(plot_type %in% c("bar", "scatter"))) {
@@ -1284,23 +1303,60 @@ plot.naRes <- function (x, omicsData, plot_type = "bar",
   }
 
   # Farm boy, make sure order_by exists in f_data. As you wish.
-  if (!is.null(order_by) && order_by != "Group") {
-
-    if (!order_by %in% names(omicsData$f_data)) {
+  if (!is.null(order_by)) {
+    
+    if(order_by == "Group" && is.null(get_group_DF(omicsData))){
+      stop ("group_designation must be run on the data to use order_by: column 'Group'")
+      
+    } else if (
+      order_by != "Group" &&
+      !order_by %in% names(omicsData$f_data) && 
+      plot_type == "bar"
+      ) {
       # I'm a pmartR developer. You killed my plot. Prepare to receive an error.
-      stop ("order_by: column '", order_by, "' not found in f_data.")
+      stop ("order_by: column '", order_by, "' is invalid; order_by must be a column in f_data or 'Group' when plot_type is 'bar'.")
 
+    } else if (plot_type == "scatter"){
+      warning("order_by argument is unused when plot_type is 'scatter'")
+      order_by <- NULL
     }
   }
 
   # Farm boy, make sure color_by exists in f_data. As you wish.
-  if (!is.null(color_by) && color_by != "Group") {
+  if (!is.null(color_by)) {
     
-    if (!color_by %in% names(omicsData$f_data)) {
+    if(order_by == "Group" && is.null(get_group_DF(omicsData))){
+      stop ("group_designation must be run on the data to use order_by: column 'Group'")
+      
+    } else if (
+      color_by != "Group" &&
+      !color_by %in% names(omicsData$f_data) && 
+      plot_type == "bar") {
+      
       # Clearly you cannot choose a column name in f_data!
-      stop ("color_by: column '", color_by, "' not found in f_data.")
+      stop ("color_by: column '", color_by, "' is invalid; color_by must be a column in f_data or 'Group' when plot_type is 'bar'.")
 
+    } else if(plot_type == "scatter" && color_by != "Group"){
+      
+      warning("color_by must be 'Group' or NULL for plot_type = 'scatter' -- color_by will be set to NULL.")
+      color_by <- NULL
+      
     }
+  }
+  
+  if(groups && is.null(get_group_DF(omicsData))){
+    warning("Argument 'groups' is only available after 'group_designation' has been run. Argument 'groups' will be set to FALSE.")
+    groups <- FALSE
+  }
+  
+  if(groups && plot_type != "scatter"){
+    warning("Argument 'groups' is only applicable to plot_type != 'scatter'. Argument 'groups' will be set to FALSE.")
+    groups <- FALSE
+  }
+  
+  if(!is.null(color_by) && plot_type == "scatter" && !groups){
+    warning("Argument 'color_by' for plot_type == 'scatter' requires argument 'groups' to be TRUE. Argument 'groups' will be set to TRUE")
+    groups <- TRUE
   }
 
   # Extract info from naRes_obj
@@ -1410,6 +1466,8 @@ plot.naRes <- function (x, omicsData, plot_type = "bar",
                     bw_theme = bw_theme, palette = palette,
                     x_lab_angle = x_lab_angle,
                     coordinate_flip = coordinate_flip,
+                    color_by = color_by,
+                    groups = groups,
                     interactive = interactive, point_size = point_size,
                     nonmissing = nonmissing)
 
@@ -1552,7 +1610,7 @@ na_scatter <- function (edata, group_df, na.by.molecule, edata_cname,
                         y_lab_scatter, title_lab_scatter, legend_lab_scatter,
                         legend_position, title_lab_size, x_lab_size, y_lab_size,
                         text_size, bw_theme, palette, x_lab_angle,
-                        coordinate_flip, interactive, point_size,
+                        coordinate_flip, color_by, groups, interactive, point_size,
                         nonmissing) {
 
   # Select missing/nonmissing
@@ -1575,7 +1633,7 @@ na_scatter <- function (edata, group_df, na.by.molecule, edata_cname,
     "Group" else
     legend_lab_scatter
 
-  if (is.null(group_df)) {
+  if (!groups) {
     # Calculate the mean intensity for each molecule when the group_DF attribute
     # is NULL.
     mean_intensity <- rowMeans(edata[, -edata_cname_id], na.rm = TRUE)
@@ -1591,6 +1649,7 @@ na_scatter <- function (edata, group_df, na.by.molecule, edata_cname,
       )
     ) +
       ggplot2::geom_point(size = point_size)
+    
   } else {
     # Extract group information to calculate the group-wise mean for each
     # molecule.
@@ -1645,9 +1704,18 @@ na_scatter <- function (edata, group_df, na.by.molecule, edata_cname,
         num_missing_vals
       )
     ) +
-      ggplot2::geom_point(ggplot2::aes(color = variable),
-        size = point_size
+      ggplot2::facet_grid(cols = vars(variable))
+    
+    if(!is.null(color_by)){
+      
+      p <- p + ggplot2::geom_point(ggplot2::aes(color = variable),
+                          size = point_size
       )
+      
+    } else {
+      p <- p + ggplot2::geom_point(size = point_size)
+    }
+    
   }
 
   # Add the x, y, and title labels.

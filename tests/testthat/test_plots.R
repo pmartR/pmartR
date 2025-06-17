@@ -166,7 +166,7 @@ test_that('plot functions are producing desired output',{
                            omicsData = mylipid,
                            plot_type = "scatter",
                            x_lab_angle = 50,
-                           color_by = "Condition")
+                           color_by = "Group")
   )
   
   ## Test plot.nmrnormRes ------------------------------------------------------
