@@ -1325,7 +1325,7 @@ plot.naRes <- function (x, omicsData, plot_type = "bar",
   # Farm boy, make sure color_by exists in f_data. As you wish.
   if (!is.null(color_by)) {
     
-    if(order_by == "Group" && is.null(get_group_DF(omicsData))){
+    if(color_by == "Group" && is.null(get_group_DF(omicsData))){
       stop ("group_designation must be run on the data to use order_by: column 'Group'")
       
     } else if (
@@ -1336,17 +1336,10 @@ plot.naRes <- function (x, omicsData, plot_type = "bar",
       # Clearly you cannot choose a column name in f_data!
       stop ("color_by: column '", color_by, "' is invalid; color_by must be a column in f_data or 'Group' when plot_type is 'bar'.")
 
-    } else if(plot_type == "scatter" && color_by != "Group"){
-      
-      warning("color_by must be 'Group' or NULL for plot_type = 'scatter' -- color_by will be set to NULL.")
+    }  else if (plot_type == "scatter"){
+      warning("color_by argument is unused when plot_type is 'scatter'")
       color_by <- NULL
-      
     }
-  }
-  
-  if(groups && is.null(get_group_DF(omicsData))){
-    warning("Argument 'groups' is only available after 'group_designation' has been run. Argument 'groups' will be set to FALSE.")
-    groups <- FALSE
   }
   
   if(groups && plot_type != "scatter"){
@@ -1354,9 +1347,9 @@ plot.naRes <- function (x, omicsData, plot_type = "bar",
     groups <- FALSE
   }
   
-  if(!is.null(color_by) && plot_type == "scatter" && !groups){
-    warning("Argument 'color_by' for plot_type == 'scatter' requires argument 'groups' to be TRUE. Argument 'groups' will be set to TRUE")
-    groups <- TRUE
+  if(groups && is.null(get_group_DF(omicsData))){
+    warning("Argument 'groups' is only available after 'group_designation' has been run. Argument 'groups' will be set to FALSE.")
+    groups <- FALSE
   }
 
   # Extract info from naRes_obj
@@ -1466,7 +1459,6 @@ plot.naRes <- function (x, omicsData, plot_type = "bar",
                     bw_theme = bw_theme, palette = palette,
                     x_lab_angle = x_lab_angle,
                     coordinate_flip = coordinate_flip,
-                    color_by = color_by,
                     groups = groups,
                     interactive = interactive, point_size = point_size,
                     nonmissing = nonmissing)
@@ -1610,7 +1602,7 @@ na_scatter <- function (edata, group_df, na.by.molecule, edata_cname,
                         y_lab_scatter, title_lab_scatter, legend_lab_scatter,
                         legend_position, title_lab_size, x_lab_size, y_lab_size,
                         text_size, bw_theme, palette, x_lab_angle,
-                        coordinate_flip, color_by, groups, interactive, point_size,
+                        coordinate_flip, groups, interactive, point_size,
                         nonmissing) {
 
   # Select missing/nonmissing
@@ -1627,7 +1619,7 @@ na_scatter <- function (edata, group_df, na.by.molecule, edata_cname,
     "Number of Missing Values (per molecule)" else
     y_lab_scatter
   plotTitleScatter <- if (is.null(title_lab_scatter))
-    "Mean Intensity vs NA per Molecule" else
+    "Mean Intensity vs Number of Missing Values" else
     title_lab_scatter
   legendLabelScatter <- if (is.null(legend_lab_scatter))
     "Group" else
@@ -1704,17 +1696,8 @@ na_scatter <- function (edata, group_df, na.by.molecule, edata_cname,
         num_missing_vals
       )
     ) +
-      ggplot2::facet_grid(cols = vars(variable))
-    
-    if(!is.null(color_by)){
-      
-      p <- p + ggplot2::geom_point(ggplot2::aes(color = variable),
-                          size = point_size
-      )
-      
-    } else {
-      p <- p + ggplot2::geom_point(size = point_size)
-    }
+      ggplot2::facet_grid(cols = vars(variable)) + 
+      ggplot2::geom_point(size = point_size)
     
   }
 
