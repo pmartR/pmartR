@@ -133,8 +133,8 @@ be flipped. The default is FALSE.}
 \item{use_VizSampNames}{logical value. Indicates whether to use custom sample
 names. The default is FALSE.}
 
-\item{groups}{logical value. Only applicable for plot_type = "scatter" with
-color_by = "Group". When TRUE, biomolecule means are calculated within each 
+\item{groups}{logical value. Only applicable for plot_type = "scatter". 
+When TRUE, biomolecule means are calculated within each 
 experimental group for visualization.}
 
 \item{...}{further arguments passed to or from other methods.}

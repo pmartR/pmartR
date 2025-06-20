@@ -1189,8 +1189,8 @@ plot.SPANSRes <- function(x, interactive = FALSE,
 #'   be flipped. The default is FALSE.
 #' @param use_VizSampNames logical value. Indicates whether to use custom sample
 #'   names. The default is FALSE.
-#' @param groups logical value. Only applicable for plot_type = "scatter" with
-#' color_by = "Group". When TRUE, biomolecule means are calculated within each 
+#' @param groups logical value. Only applicable for plot_type = "scatter". 
+#' When TRUE, biomolecule means are calculated within each 
 #' experimental group for visualization.
 #' @param ... further arguments passed to or from other methods.
 #'
@@ -1696,7 +1696,7 @@ na_scatter <- function (edata, group_df, na.by.molecule, edata_cname,
         num_missing_vals
       )
     ) +
-      ggplot2::facet_grid(cols = vars(variable)) + 
+      ggplot2::facet_grid(cols = dplyr::vars(variable)) + 
       ggplot2::geom_point(size = point_size)
     
   }

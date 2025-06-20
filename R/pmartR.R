@@ -9,7 +9,7 @@
 #'  and/or samples, data normalization, data summarization (correlation, PCA), 
 #'  and statistical comparisons between defined groups.
 #'
-#' @docType _PACKAGE
+#' @docType package
 #'
 #' @import methods
 #' @importFrom Rcpp evalCpp
