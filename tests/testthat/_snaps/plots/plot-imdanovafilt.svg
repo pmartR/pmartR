@@ -18,7 +18,7 @@
   </clipPath>
 </defs>
 <g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
-<rect x='0.00' y='0.00' width='720.00' height='576.00' style='stroke-width: 1.07; stroke: #FFFFFF; fill: #FFFFFF;' />
+<rect x='-0.000000000000064' y='0.00' width='720.00' height='576.00' style='stroke-width: 1.07; stroke: #FFFFFF; fill: #FFFFFF;' />
 </g>
 <defs>
   <clipPath id='cpMjcuOTB8NTY0LjQzfDIzLjUwfDU0NS4xMQ=='>
@@ -84,15 +84,11 @@
 <rect x='575.39' y='236.60' width='139.13' height='95.41' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
 <rect x='580.87' y='257.41' width='17.28' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
 <circle cx='589.51' cy='266.05' r='3.56' style='stroke-width: 0.71; stroke: none; fill: #FFC107;' />
-<circle cx='589.51' cy='266.05' r='3.56' style='stroke-width: 0.71; stroke: none; fill: #FFC107;' />
 <rect x='580.87' y='274.69' width='17.28' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
-<line x1='582.60' y1='283.33' x2='596.42' y2='283.33' style='stroke-width: 1.60; stroke: #FFC107; stroke-dasharray: 8.54,8.54; stroke-linecap: butt;' />
 <line x1='582.60' y1='283.33' x2='596.42' y2='283.33' style='stroke-width: 1.60; stroke: #FFC107; stroke-dasharray: 8.54,8.54; stroke-linecap: butt;' />
 <rect x='580.87' y='291.97' width='17.28' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
 <circle cx='589.51' cy='300.61' r='3.56' style='stroke-width: 0.71; stroke: none; fill: #004D40;' />
-<circle cx='589.51' cy='300.61' r='3.56' style='stroke-width: 0.71; stroke: none; fill: #004D40;' />
 <rect x='580.87' y='309.25' width='17.28' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
-<line x1='582.60' y1='317.89' x2='596.42' y2='317.89' style='stroke-width: 1.60; stroke: #004D40; stroke-dasharray: 2.13,6.40; stroke-linecap: butt;' />
 <line x1='582.60' y1='317.89' x2='596.42' y2='317.89' style='stroke-width: 1.60; stroke: #004D40; stroke-dasharray: 2.13,6.40; stroke-linecap: butt;' />
 <text x='603.63' y='269.08' style='font-size: 8.80px; font-family: sans;' textLength='101.49px' lengthAdjust='spacingAndGlyphs'>Within 1+ groups (G-Test)</text>
 <text x='603.63' y='286.36' style='font-size: 8.80px; font-family: sans;' textLength='73.86px' lengthAdjust='spacingAndGlyphs'>G-test applied filter</text>

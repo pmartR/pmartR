@@ -21,12 +21,31 @@
 <rect x='0.00' y='0.00' width='720.00' height='576.00' style='stroke-width: 1.07; stroke: #FFFFFF; fill: #FFFFFF;' />
 </g>
 <defs>
+  <clipPath id='cpMzguMjd8NjMxLjA5fDYxLjYyfDUwOS4zNQ=='>
+    <rect x='38.27' y='61.62' width='592.82' height='447.74' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMzguMjd8NjMxLjA5fDYxLjYyfDUwOS4zNQ==)'>
+</g>
+<g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
+</g>
+<defs>
   <clipPath id='cpNS40OHwzNTguNTN8MjIuNzh8NTcwLjUy'>
     <rect x='5.48' y='22.78' width='353.06' height='547.74' />
   </clipPath>
 </defs>
 <g clip-path='url(#cpNS40OHwzNTguNTN8MjIuNzh8NTcwLjUy)'>
 <rect x='5.48' y='22.78' width='353.06' height='547.74' style='stroke-width: 1.07; stroke: #FFFFFF; fill: #FFFFFF;' />
+</g>
+<g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
+</g>
+<defs>
+  <clipPath id='cpMzU4LjUzfDcxNC41MnwyMi43OHw1NzAuNTI='>
+    <rect x='358.53' y='22.78' width='355.99' height='547.74' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMzU4LjUzfDcxNC41MnwyMi43OHw1NzAuNTI=)'>
+<rect x='358.53' y='22.78' width='355.99' height='547.74' style='stroke-width: 1.07; stroke: #FFFFFF; fill: #FFFFFF;' />
 </g>
 <g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
 </g>
@@ -168,16 +187,6 @@
 <text x='314.31' y='304.82' style='font-size: 8.80px; font-family: sans;' textLength='21.04px' lengthAdjust='spacingAndGlyphs'>Mock</text>
 <text x='38.27' y='53.85' style='font-size: 11.00px; font-style: italic; font-family: sans;' textLength='107.63px' lengthAdjust='spacingAndGlyphs'>Ordered by  Condition</text>
 <text x='38.27' y='37.90' style='font-size: 14.00px; font-family: sans;' textLength='268.49px' lengthAdjust='spacingAndGlyphs'>Boxplots of Un-Normalized Metabolite Data</text>
-</g>
-<defs>
-  <clipPath id='cpMzU4LjUzfDcxNC41MnwyMi43OHw1NzAuNTI='>
-    <rect x='358.53' y='22.78' width='355.99' height='547.74' />
-  </clipPath>
-</defs>
-<g clip-path='url(#cpMzU4LjUzfDcxNC41MnwyMi43OHw1NzAuNTI=)'>
-<rect x='358.53' y='22.78' width='355.99' height='547.74' style='stroke-width: 1.07; stroke: #FFFFFF; fill: #FFFFFF;' />
-</g>
-<g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
 </g>
 <defs>
   <clipPath id='cpMzk0LjI2fDYzMS4wOXw2MS42Mnw1MDkuMzU='>
