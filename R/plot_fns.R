@@ -7381,10 +7381,10 @@ statres_histogram <-
       p <- x_long %>%
         dplyr::filter(P_value_A < 0.05) %>%
         dplyr::mutate(Significant = factor(Significant, levels = c("Significant", "Not Significant"))) %>%
-        ggplot(aes(x = Fold_change, fill = Significant)) +
-        geom_histogram(position = "identity", alpha = 1) +
-        theme_bw() +
-        facet_wrap(~Comparison, scales = da_scales) +
+        ggplot2::ggplot(ggplot2::aes(x = Fold_change, fill = Significant)) +
+        ggplot2::geom_histogram(position = "identity", alpha = 1) +
+        ggplot2::theme_bw() +
+        ggplot2::facet_wrap(~Comparison, scales = da_scales) +
         ggplot2::xlab(the_x_label) +
         ggplot2::xlab(the_x_label) +
         ggplot2::ylab(the_y_label) +
@@ -7398,10 +7398,10 @@ statres_histogram <-
       p <- x_long %>%
         dplyr::mutate(Significant = factor(Significant, levels = c("Significant", "Not Significant"))) %>%
         #dplyr::filter(P_value_A < 0.05) %>%
-        ggplot(aes(x = Fold_change, fill = Significant)) +
-        geom_histogram(position = "identity", alpha = 0.65) +
-        theme_bw() +
-        facet_wrap(~Comparison, scales = da_scales) +
+        ggplot2::ggplot(ggplot2::aes(x = Fold_change, fill = Significant)) +
+        ggplot2::geom_histogram(position = "identity", alpha = 0.65) +
+        ggplot2::theme_bw() +
+        ggplot2::facet_wrap(~Comparison, scales = da_scales) +
         ggplot2::xlab(the_x_label) +
         ggplot2::xlab(the_x_label) +
         ggplot2::ylab(the_y_label) +

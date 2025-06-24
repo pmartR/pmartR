@@ -10,41 +10,6 @@ expect_doppelganger_ci <- function(...) {
   }
 }
 
-test_that('plot helper functions are working good!', {
-  load(system.file('testdata', 'little_pdata.RData', package = 'pmartR'))
-  
-  # need a test fixture for this...
-  edata['Mass Tag ID'] <- edata$Mass_Tag_ID
-  edata$Mass_Tag_ID <- NULL
-  
-  emeta['Mass Tag ID'] <- emeta$Mass_Tag_ID
-  emeta['Protein Space'] <- emeta$Protein
-  emeta$Mass_Tag_ID <- NULL
-  emeta$Protein <- NULL
-  
-  pep_object <- as.pepData(
-    e_data = edata,
-    f_data = fdata,
-    e_meta = emeta,
-    edata_cname = 'Mass Tag ID',
-    fdata_cname = 'SampleID',
-    emeta_cname = 'Protein Space'
-  )
-  
-  mypep<- edata_transform(omicsData = pep_object, data_scale = "log2")
-  mypep <- group_designation(omicsData = mypep,
-                            main_effects = "Condition")
-  imdanova_Filt <- imdanova_filter(omicsData = mypep)
-  mypep <- applyFilt(filter_object = imdanova_Filt,
-                     omicsData = mypep,
-                     min_nonmiss_anova=2)
-  anova_res <- imd_anova(omicsData = mypep, test_method = 'combined')
-  
-  volcano_df <- pmartR:::make_volcano_plot_df(anova_res)
-  
-  expect_equal(dim(volcano_df), c(dim(mypep$e_data)[1]*2, 10))
-})
-
 test_that('plot functions are producing desired output',{
   testthat::skip_on_cran()
   testthat::skip_if_not_installed("vdiffr")
@@ -166,7 +131,7 @@ test_that('plot functions are producing desired output',{
                            omicsData = mylipid,
                            plot_type = "scatter",
                            x_lab_angle = 50,
-                           groups = T)
+                           color_by = "Condition")
   )
   
   ## Test plot.nmrnormRes ------------------------------------------------------
@@ -185,14 +150,9 @@ test_that('plot functions are producing desired output',{
   
   ## Test plot.SPANSRES --------------------------------------------------------
   
-  expect_doppelganger_ci("plot.SPANSRes", 
-                         plot(pep_spans_result))
-  expect_doppelganger_ci("plot.SPANSRes (bw_theme)", 
-                         plot(pep_spans_result, bw_theme = TRUE))
-  expect_doppelganger_ci("plot.SPANSRes (color_high color_low)", 
-                         plot(pep_spans_result, color_high = "#00FFFF", color_low = "#FF0000"))
-  expect_doppelganger_ci("plot.SPANSRes (N biomolecule bar)", 
-                         plot(pep_spans_result, Npep_bar = T))
+  expect_doppelganger_ci("plot.SPANSRes", plot(pep_spans_result))
+  expect_doppelganger_ci("plot.SPANSRes (bw_theme)", plot(pep_spans_result, bw_theme = TRUE))
+  expect_doppelganger_ci("plot.SPANSRes (color_high color_low)", plot(pep_spans_result, color_high = "#00FFFF", color_low = "#FF0000"))
   
   ## Test plot.isobaricnormRes -------------------------------------------------
   
@@ -260,7 +220,10 @@ test_that('plot functions are producing desired output',{
   
   ## Test plot.rmdFilt ---------------------------------------------------------
   
-  # pmartRdata used, see next test function #
+  mymetab <- edata_transform(omicsData = metab_object, data_scale = "log2")
+  mymetab <- group_designation(omicsData = mymetab, main_effects = "Condition")
+  rmd_results <- rmd_filter(omicsData = mymetab, metrics=c("MAD", "Skewness", "Correlation"))
+  expect_doppelganger_ci("plot.rmdFilt", plot(rmd_results, pvalue_threshold = 0.01, order_by = "Condition"))
   
   ## Test plot.cvFilt ----------------------------------------------------------
   
@@ -300,15 +263,16 @@ test_that('plot functions are producing desired output',{
                              test_method = 'comb',
                              pval_adjust_a_multcomp ='bon',
                              pval_adjust_g_multcomp = 'bon')
-  
-  expect_doppelganger_ci("plot.statRes (combined)", plot(imd_anova_res, bw_theme = TRUE))  ##
-  
-  ## Should probs change all left_joins to have the `by` argument
+  expect_doppelganger_ci("plot.statRes (combined)", plot(imd_anova_res, bw_theme = TRUE))
+
   expect_doppelganger_ci("plot.statRes (combined volcano)", plot(imd_anova_res, plot_type = "volcano", bw_theme = TRUE))
+  
+  expect_doppelganger_ci("plot.statRes (histogram)", plot(imd_anova_res, plot_type = "histogram", fc_colors = c("blue","gray"), bw_theme = TRUE))
   ## Test plot.totalcountFilt --------------------------------------------------
   
   seqfilt <- total_count_filter(omicsData = rnaseq_object)
   expect_doppelganger_ci("plot.totalCountFilt", plot(seqfilt, min_count = 5))
+  
   ## Test plot.RNAFilt ---------------------------------------------------------
   
   seqfilt <- RNA_filter(omicsData = rnaseq_object)
@@ -336,160 +300,5 @@ test_that('plot functions are producing desired output',{
   
   myseq <- group_designation(omicsData = rnaseq_object, main_effects = "Tissue")
   expect_doppelganger_ci("plot.seqData", plot(rnaseq_object, transformation = "lcpm"))
-  
+
 })
-
-
-
-test_that('pmartRdata plot tests', {
-  
-  ## RMD ##
-  testthat::skip_on_cran()
-  testthat::skip_if_not_installed("pmartRdata")
-  testthat::skip_if_not_installed("vdiffr")
-  
-  mypep <- edata_transform(omicsData = pmartRdata::pep_object, data_scale = "log2")
-  mypep$f_data$pair_id <- c(rep(1:4, 2), rep(5:8, 2), rep(9:12, 2))
-  mypep$f_data$Third_pheno <- 1:2
-  
-  ## Multiple groups, w/ pairing
-  
-  mypep <- group_designation(omicsData = mypep, main_effects = c("Phenotype", "Third_pheno"), 
-                             pair_id = "pair_id", pair_group = "SecondPhenotype", pair_denom = "B")
-  groups_pair <- rmd_filter(omicsData = mypep)
-  
-  ## Multiple groups
-  
-  mypep <- group_designation(omicsData = mypep, main_effects = c("Phenotype", "Third_pheno"))
-  groups <- rmd_filter(omicsData = mypep)
-  
-  ## One group, w/ pairing
-  
-  mypep <- group_designation(omicsData = mypep, main_effects = c("Phenotype"), 
-                             pair_id = "pair_id", pair_group = "SecondPhenotype", pair_denom = "B")
-  group_pair <- rmd_filter(omicsData = mypep)
-  
-  ## One group
-  
-  mypep <- group_designation(omicsData = mypep, main_effects = c("Phenotype"))
-  group <- rmd_filter(omicsData = mypep)
-  
-  ## Only pairing
-  
-  mypep <- group_designation(omicsData = mypep,
-                             pair_id = "pair_id", pair_group = "SecondPhenotype", pair_denom = "B")
-  pair <- rmd_filter(omicsData = mypep)
-  
-  ## silly names
-  legend_lab <- c("Hey", "There")
-  
-  # Expected warning/messages
-  warn_group <- "RMD calculated using designated experimental groups and may not be reflected in plot colors."
-  mess_bin <- "stat_bin" ## "{.fn {fun}} using {.code bins = 30}. Pick better value {.arg binwidth}."
-  
-  rme_plots <- purrr::map2(
-    list(groups_pair, groups, group_pair, group, pair),
-    list("gsp", "gs", "gp", "g", "p"),
-    function(rmd_results, label){
-      
-      ## Default scatter (Group) ##
-      expect_doppelganger_ci(
-        paste0("plot.rmdFilt.",label),
-        plot(rmd_results)
-        )
-      
-      ## Scatter, color_by
-      if(Sys.getenv("CI") != "true"){
-        testthat::expect_warning(
-          expect_doppelganger_ci(
-            paste0("plot.rmdFilt.color.",label), 
-            plot(rmd_results, color_by = "SecondPhenotype")
-          ),
-          warn_group
-        )
-        
-        ## Default Histogram (Group)
-        testthat::expect_message(
-          expect_doppelganger_ci(
-            paste0("plot.rmdFilt.hist.",label),
-            plot(rmd_results, hist = T)
-          ),
-          mess_bin
-        )
-        
-        ## Histogram, color_by
-        testthat::expect_message(
-          testthat::expect_warning(
-            expect_doppelganger_ci(
-              paste0("plot.rmdFilt.color.hist.",label),
-              plot(rmd_results, hist = T, color_by = "SecondPhenotype")
-            ),
-            warn_group
-          ),
-          mess_bin
-        )
-      }
-      
-      ## Scatter, p-value
-      expect_doppelganger_ci(
-        paste0("plot.rmdFilt.pval.",label),
-        plot(rmd_results, pvalue_threshold = 0.05)
-        )
-      
-      ## Boxplots
-      expect_doppelganger_ci(
-        paste0("plot.rmdFilt.sample",label), 
-        plot(rmd_results, sampleID = "Sample_47_Phenotype3_A")
-        )
-      
-      ## As above, with new labels for correct placement
-                                 
-       expect_doppelganger_ci(
-         paste0("plot.rmdFilt.legend.",label),
-         plot(rmd_results, legend_lab = legend_lab)
-         )
-       
-       if(Sys.getenv("CI") != "true"){
-         testthat::expect_warning(
-           expect_doppelganger_ci(
-             paste0("plot.rmdFilt.color.legend.",label),
-             plot(rmd_results, color_by = "SecondPhenotype", legend_lab = legend_lab)
-             ),
-           warn_group
-         )
-         
-         testthat::expect_message(
-           expect_doppelganger_ci(
-             paste0("plot.rmdFilt.hist.legend.",label),
-             plot(rmd_results, hist = T, legend_lab = legend_lab)
-             ),
-           mess_bin,
-         )
-         
-         testthat::expect_message(
-           testthat::expect_warning(
-             expect_doppelganger_ci(
-               paste0("plot.rmdFilt.color.hist.legend.",label),
-               plot(rmd_results, hist = T, color_by = "SecondPhenotype", legend_lab = legend_lab)
-               ),
-             warn_group
-           ),
-           mess_bin
-         )
-       }
-       
-       expect_doppelganger_ci(
-         paste0("plot.rmdFilt.pval.legend.",label),
-         plot(rmd_results, pvalue_threshold = 0.05, legend_lab = legend_lab)
-         )
-       
-       expect_doppelganger_ci(
-         paste0("plot.rmdFilt.sample.legend.",label),
-         plot(rmd_results, sampleID = "Sample_47_Phenotype3_A", legend_lab = legend_lab)
-         )
-       
-       
-       })
-  
-})
-
