@@ -3880,8 +3880,8 @@ plot.proteomicsFilt <- function(x,
 #'   p-value. If \code{sampleID} is NULL (see \code{sampleID} below), a
 #'   horizontal line is plotted at the RMD value that corresponds with the
 #'   threshold, and all samples above the line have a p-value below the
-#'   threshold. If \code{sampleID} is not NULL, \code{pvalue_threshold} will do
-#'   nothing. Default value is NULL.
+#'   threshold. If \code{sampleID} is not NULL or \code{hist} is TRUE, 
+#'.  \code{pvalue_threshold} will do nothing. Default value is NULL.
 #' @param sampleID character vector specifying the sample names to be plotted.
 #'   If specified, the plot function produces a boxplot instead of a
 #'   scatterplot. A point, colored by sample, will be placed on each boxplot for
@@ -3891,7 +3891,14 @@ plot.proteomicsFilt <- function(x,
 #'   fdata from the rmdFilt object. If \code{order_by} is "Group", the plot will
 #'   be ordered by the group variable from the group_designation function. If
 #'   NULL (default), the samples will be displayed in the order in which they
-#'   first appear.
+#'   first appear. Only applicable where \code{sampleID} = NULL and \code{hist} = FALSE.
+#' @param color_by character string specifying a variable by which to order
+#'   the samples in the plot. This variable must be found in the column names of
+#'   fdata from the rmdFilt object. If \code{color_by} is "Group" or NULL, the plot will
+#'   be colored by the group variable from the group_designation function. Only
+#'   applicable where \code{sampleID} = NULL.
+#' @param hist boolean value that changes default scatter plot to a histogram 
+#' displaying the distribution of all used RMD metrics.
 #' @param interactive logical value. If TRUE produces an interactive plot.
 #' @param x_lab character string specifying the x-axis label
 #' @param y_lab character string specifying the y-axis label. The default is
@@ -3935,8 +3942,10 @@ plot.proteomicsFilt <- function(x,
 #' @export
 #'
 plot.rmdFilt <- function(x, pvalue_threshold = NULL, sampleID = NULL,
-                         order_by = NULL, interactive = FALSE, x_lab = NULL,
-                         y_lab = NULL, x_lab_size = 11, y_lab_size = 11,
+                         order_by = NULL, color_by = NULL, 
+                         interactive = FALSE, hist = FALSE,
+                         x_lab = NULL, y_lab = NULL, 
+                         x_lab_size = 11, y_lab_size = 11,
                          x_lab_angle = 90, title_lab = NULL,
                          title_lab_size = 14, legend_lab = NULL,
                          legend_position = "right", point_size = 3,
@@ -3956,6 +3965,11 @@ plot.rmdFilt <- function(x, pvalue_threshold = NULL, sampleID = NULL,
   if (!inherits(filter_object, "rmdFilt")) {
     # The filter object is the wrong class. Savvy?
     stop("filter_object must be of class rmdFilt")
+  }
+  
+  # Have a looksie at the class of the filter object.
+  if (!is.logical(hist) || length(hist) != 1) {
+    stop("Argument 'hist' must be a logical (TRUE/FALSE) of length 1.")
   }
 
   # Make sure palette is one of the RColorBrewer options if it is not NULL.
@@ -3987,6 +4001,21 @@ plot.rmdFilt <- function(x, pvalue_threshold = NULL, sampleID = NULL,
       ))
     }
   }
+  
+  # Check if order_by is present. If it is additional checks need to be
+  # performed to make sure it is a valid input.
+  if (!is.null(color_by)) {
+    # Make sure order_by is either "Group" or is in f_data.
+    if (color_by != "Group" &&
+        !(color_by %in% names(attr(filter_object, "fdata")))) {
+      # Your plot is only mostly dead! There is still a slim hope that you can
+      # save it.
+      stop(paste("color_by must either be 'Group' or the name of a column",
+                 "from f_data.",
+                 sep = " "
+      ))
+    }
+  }
 
   # Have a looksie at the sampleID argument.
   if (!is.null(sampleID)) {
@@ -3995,37 +4024,75 @@ plot.rmdFilt <- function(x, pvalue_threshold = NULL, sampleID = NULL,
       stop("The sample IDs provided do not match the sample IDs in the data.")
   }
 
-  samp_id <- names(attr(filter_object, "group_DF"))[1]
+  ## Grab the important stuff
+  
+  group_df <- attr(filter_object, "group_DF")
+  fdata <- attr(filter_object, "fdata")
+  samp_id <- names(group_df)[1]
   metrics <- attributes(filter_object)$metrics
-
-  # determine how to melt based on the number of main effects
-  group_df <- attributes(filter_object)$group_DF
-
-  # determine the main effects, then melt the df #
-  if (ncol(group_df) == 2) {
-    main_eff_names <- "Group"
-    dfmelt <- filter_object %>%
-      tidyr::pivot_longer(
-        -dplyr::all_of(c(!!samp_id, !!main_eff_names)),
-        names_to = "variable",
-        cols_vary = "slowest"
-      ) %>% data.frame(check.names = FALSE)
-  } else if (ncol(group_df) > 2) {
-    ## put main effect with more levels first, for plotting aesthetics ##
-    temp <- droplevels(group_df[, -(1:2)])
-    numlevels <- sapply(1:2, function(j) length(levels(as.factor(temp[, j]))))
-    main_eff_names <- names(temp)[order(numlevels, decreasing = TRUE)]
-    dfmelt <- tidyr::pivot_longer(
-      filter_object[, -2],
-      -dplyr::all_of(c(!!samp_id, !!main_eff_names)),
-      names_to = "variable",
-      cols_vary = "slowest"
-    ) %>% data.frame(check.names = FALSE)
+  
+  ## Combine dfs, then melt ##
+  
+  # Prep for merge #
+  
+  ## If column exists in group_df, it is considered a character vector
+  cols_group <- colnames(filter_object)[colnames(filter_object) %in% colnames(group_df)]
+  cols_group2 <- colnames(fdata)[colnames(fdata) %in% colnames(group_df)]
+  
+  for(col in cols_group){
+    if(all(is.numeric(filter_object[[col]]))){
+      filter_object[[col]] <- as.character(filter_object[[col]])
+    }
   }
+  
+    for(col in cols_group2){
+    if(all(is.numeric(fdata[[col]]))){
+      fdata[[col]] <- as.character(fdata[[col]])
+    }
+  }
+  
+  filter_object <- filter_object %>%
+    dplyr::left_join(
+      group_df, 
+      by = cols_group
+    )
+  
+  filter_object <- filter_object %>% dplyr::left_join(
+      fdata, 
+      by = colnames(filter_object)[colnames(filter_object) %in% colnames(fdata)]
+    )
+  
+  dfmelt <- filter_object %>% tidyr::pivot_longer(
+    cols = metrics,
+    names_to = "variable",
+    cols_vary = "slowest"
+  ) %>% data.frame(check.names = FALSE)
+  
 
-  # Data frame that has information to create rmd box plots.
-  dfsub <- dfmelt[dfmelt$variable %in% metrics, ]
+  # Color by collector #
+  
+  if (is.null(color_by) || color_by == "Group") {
+    
+    if (ncol(group_df) > 2) {
+      
+      ## put main effect with more levels first, for plotting aesthetics ##
+      temp <- droplevels(group_df[, -(1:2)])
+      numlevels <- sapply(1:2, function(j) length(levels(as.factor(temp[, j]))))
+      color_by <- names(temp)[order(numlevels, decreasing = TRUE)]
+      
+    } else {
+      color_by <- "Group"
+    }
+    
+  } else {
 
+    dfmelt[[color_by]] <- factor(dfmelt[[color_by]])
+    
+    warning(paste0("RMD calculated using designated experimental groups",
+                   " and may not be reflected in plot colors."))
+    
+  }
+  
   # legend labels #
   ## function for shortening long main effect names ##
   abbrev_fun <- function(string) {
@@ -4036,56 +4103,23 @@ plot.rmdFilt <- function(x, pvalue_threshold = NULL, sampleID = NULL,
   # Shorten the names of the main effects (if they are over 25 characters). This
   # vector will have more than one element if there is more than one main
   # effect.
-  display_names <- sapply(main_eff_names, abbrev_fun)
-
-  # Create the title for the legend that describes differences by color.
-  legend_title_color <- ifelse(is.null(legend_lab),
-    display_names[1],
-    legend_lab[1]
-  )
-
-  # Initialize the title for the legend that describes differences by point
-  # shape to NULL. It will only be used if there is more than one main effect.
-  legend_title_shape <- NULL
-
-  # Use the legend label (if it is provided in the input) for the legend
-  # describing the differences by point shape. The user must specify a legend
-  # label with more than one element. It is not created within the function.
-  if (length(display_names) > 1) {
-    if (length(legend_lab) > 1) {
-      legend_title_shape <- legend_lab[2]
-    } else {
-      legend_title_shape <- display_names[2]
-    }
-  }
+  display_names <- sapply(color_by, abbrev_fun)
 
   # Assemble captivating plots -------------------------------------------------
 
   # Order the samples according to the order_argument. If order_by is not
   # provided order the samples according to the order they appear in the filter
-  # object.
+  # object. This is only applicable to scatter plots.
   if (!is.null(order_by)) {
-    if (order_by == "Group") {
-      # Order the samples by the Group column from group_DF.
-      filter_object[[samp_id]] <- factor(
-        filter_object[[samp_id]],
-        levels = filter_object[[samp_id]][order(attr(
-          filter_object,
-          "group_DF"
-        )$Group)],
-        ordered = TRUE
-      )
-    } else {
-      # Order the samples by the specified column from f_data.
-      filter_object[[samp_id]] <- factor(
-        filter_object[[samp_id]],
-        levels = filter_object[[samp_id]][order(attr(
-          filter_object,
-          "fdata"
-        )[[order_by]])],
-        ordered = TRUE
-      )
-    }
+    
+    level_use <- unique(filter_object[[samp_id]][order(filter_object[[order_by]])])
+    
+    filter_object[[samp_id]] <- factor(
+      filter_object[[samp_id]],
+      levels = level_use,
+      ordered = TRUE
+    )
+    
   } else {
     # Order the data in the order the samples appear in the samp_id column.
     filter_object[[samp_id]] <- factor(
@@ -4093,13 +4127,15 @@ plot.rmdFilt <- function(x, pvalue_threshold = NULL, sampleID = NULL,
       levels = unique(filter_object[[samp_id]]),
     )
   }
+  
+  ## Make the label shorter for faceted plots
+  edit_label <- dfmelt$variable == "Proportion_Missing"
+  dfmelt$variable[edit_label] <- "Prop. Missing"
 
   # Beautiful box plots ---------------
 
   # Check is sampleID is NULL. Generate box plots if it is not NULL.
   if (!is.null(sampleID)) {
-    levels(dfsub$variable)[levels(dfsub$variable) == "Fraction_Missing"] <-
-      "Prop_missing"
 
     plot_title <- ifelse(is.null(title_lab),
       "Summary of RMD metrics used",
@@ -4108,7 +4144,7 @@ plot.rmdFilt <- function(x, pvalue_threshold = NULL, sampleID = NULL,
     xlabel <- ifelse(is.null(x_lab), " ", x_lab)
     ylabel <- ifelse(is.null(y_lab), "Value", y_lab)
 
-    p <- ggplot2::ggplot(dfsub) +
+    p <- ggplot2::ggplot(dfmelt) +
       ggplot2::geom_boxplot(ggplot2::aes(
         x = rep(1, length(value)),
         y = value
@@ -4118,7 +4154,7 @@ plot.rmdFilt <- function(x, pvalue_threshold = NULL, sampleID = NULL,
         ncol = length(metrics)
       ) +
       ggplot2::geom_point(
-        data = dfsub[dfsub[, samp_id] %in% sampleID, ],
+        data = dfmelt[dfmelt[[samp_id]] %in% sampleID, ],
         ggplot2::aes(
           x = rep(1, length(value)),
           y = value,
@@ -4128,304 +4164,270 @@ plot.rmdFilt <- function(x, pvalue_threshold = NULL, sampleID = NULL,
       ) +
       ggplot2::xlab(xlabel) +
       ggplot2::ylab(ylabel) +
-      ggplot2::ggtitle(plot_title)
+      ggplot2::ggtitle(plot_title) +
+      ggplot2::theme(axis.text.x = ggplot2::element_blank())
 
     # Stunning scatter plots: no threshold ---------------
-  } else if (is.null(pvalue_threshold)) {
-    # Start scatter plot skeleton when there is no p-value threshold.
-    p <- ggplot2::ggplot(filter_object)
-
-    # Start plot when there is only one main effect.
-    if (length(main_eff_names) == 1) {
-      p <- p +
-        ggplot2::geom_point(
-          ggplot2::aes(
-            x = !!dplyr::sym(samp_id),
-            y = Log2.md,
-            color = !!dplyr::sym(main_eff_names[1])
-          ),
-          size = point_size
-        )
-
-
-      # Start plot when there are two main effects.
+  } else if (!hist) {
+    
+    ## Filter the results
+    if(!is.null(pvalue_threshold)){
+      
+      
+      # Determine which samples fall below the p-value threshold (outliers)
+      filter_object$out <- filter_object$pvalue < pvalue_threshold
+      
+      ## Define plotting features
+      
+      # Shape and Alpha (opacity) #
+      if (!is.null(attr(group_df, "pair_id"))) {
+        
+        pair_id <- attr(group_df, "pair_id")
+        
+        ## Get pairs that have divergence in outlier status
+        pch_df <- filter_object %>% 
+          dplyr::group_by_at(dplyr::vars(pair_id)) %>% 
+          dplyr::reframe(
+            diverge = any(out) && !all(out)
+          ) %>% 
+          dplyr::right_join(filter_object, by = pair_id) %>%
+          
+          ## Identify the non-outliers in those pairs -- Will be set to TRUE
+          dplyr::group_by_at(dplyr::vars(samp_id)) %>% 
+          dplyr::reframe(
+            pch = ifelse(Reduce("&", list(!out, diverge)), "Removed because paired with outlier", ""),
+            alpha = ifelse(Reduce("|", list(Reduce("&", list(!out, diverge)), out)), 1, 0.5)
+          )
+        
+        filter_object <- dplyr::left_join(filter_object, pch_df, by = samp_id)
+        
+      } else {
+        filter_object$pch <- ""
+        filter_object$alpha <- as.numeric(filter_object$out)
+        filter_object$alpha[filter_object$alpha == 0] <- 0.5
+      }
+      
+      # get y-intercept for line
+      df <- attributes(filter_object)$df
+      yint <- log(qchisq(1 - pvalue_threshold, df = df), base = 2)
+      
     } else {
-      p <- p +
-        ggplot2::geom_point(
-          ggplot2::aes(
-            x = !!dplyr::sym(samp_id),
-            y = Log2.md,
-            color = !!dplyr::sym(main_eff_names[1]),
-            shape = !!dplyr::sym(main_eff_names[2])
-          ),
-          size = point_size
+      # Alpha (opacity) #
+      filter_object$pch <- ""
+      filter_object$alpha <- 1
+    }
+    
+    ## Color ##
+    filter_object$color <- filter_object[[color_by[1]]]
+    
+    ## Two main effects w/ pairing -- allow main effect shapes if no paired problems, otherwise add as color
+    if(
+      all(filter_object$pch != "Removed because paired with outlier") && 
+      length(color_by) > 1
+      ){
+      
+      filter_object$pch <- filter_object[[color_by[2]]]
+      
+      } else if (
+        length(color_by) > 1
+        ){
+        
+      filter_object$color <- purrr::map2_chr(
+        filter_object[[color_by[1]]], 
+        filter_object[[color_by[2]]],
+        function(x,y) toString(c(x,y))
         )
     }
-
-    plot_title <- ifelse(is.null(title_lab),
-      "Sample Outlier Results",
-      title_lab
-    )
-    xlabel <- ifelse(is.null(x_lab), "Samples", x_lab)
-    ylabel <- ifelse(is.null(y_lab), "log2(Robust Mahalanobis Distance)", y_lab)
-
-    p <- p +
-      ggplot2::xlab(xlabel) +
-      ggplot2::ylab(ylabel) +
-      ggplot2::ggtitle(plot_title) +
-      ggplot2::labs(
-        color = legend_title_color,
-        shape = legend_title_shape
-      )
-
-    # Stunning scatter plots: with threshold ---------------
-  } else {
-    # Determine which samples fall below the p-value threshold. This is a
-    # logical vector that will be used to find pairs that are split (one sample
-    # is filtered and the other is not) and to change the transparency of the
-    # point in the plot.
-    goodies_alpha <- filter_object$pvalue < pvalue_threshold
-
-    # If data are paired make sure no sample is left behind!
-    if (!is.null(attr(attr(filter_object, "group_DF"), "pair_id"))) {
-      # Find the corresponding sample(s) if one sample from a pair is below the
-      # p-value threshold and the other sample is not.
-      if (sum(goodies_alpha) > 0) {
-        # Snatch the sample name and pair name as they will be used in multiple
-        # places. It will save some typing. ... However, all the typing I just
-        # saved has probably been undone by writing this comment.
-        sample_name <- attr(filter_object, "fdata_cname")
-        pair_name <- attr(attr(filter_object, "group_DF"), "pair_id")
-
-        # Grab the names of filtered samples.
-        filtad <- as.character(filter_object[goodies_alpha, sample_name])
-
-        # !#!#!#!#!#!#!#!#!#!
-        # The following code checks if the samples in a pair will be split. For
-        # example, one sample in a pair will be filtered and another sample in
-        # the pair will not be filtered. If a pair is split remove ALL samples
-        # associated with that pair.
-        # !#!#!#!#!#!#!#!#!#!
-
-        # Snag the associated pair IDs for the samples that will be filtered.
-        filtad_pairs <- attr(filter_object, "fdata") %>%
-          dplyr::filter(!!dplyr::sym(sample_name) %in% filtad) %>%
-          dplyr::pull(!!dplyr::sym(pair_name))
-
-        # Go back to f_data and nab all the sample names corresponding to the
-        # pair IDs associated with the original samples that were selected for
-        # removal. These sample names will be used to change the point shape.
-        # The points that will be different are the ones corresponding to the
-        # samples that belong to pair where only one sample falls below the
-        # threshold.
-        filtad_too <- attr(filter_object, "fdata") %>%
-          dplyr::filter(!!dplyr::sym(pair_name) %in% filtad_pairs) %>%
-          dplyr::pull(!!dplyr::sym(sample_name)) %>%
-          as.character()
-
-        # Update the goodies_alpha vector to reflect the additional samples that
-        # will be filtered.
-        goodies_alpha <- filter_object[, sample_name] %in% filtad_too
-
-        # Create a vector of samples who are guilty by association. (They do not
-        # fall below the threshold but their partners do.)
-        condemned <- setdiff(filtad_too, filtad)
-
-        # Create a logical vector that will determine the point shape.
-        goodies_pch <- filter_object[, sample_name] %in% condemned
-
-      } else goodies_pch <- rep(FALSE, nrow(filter_object))
-
-    } else {
-      # The data are not paired so all points should be a solid circle.
-      goodies_pch <- rep(FALSE, nrow(filter_object))
-    }
-
-    # get y-intercept for line
-    df <- attributes(filter_object)$df
-    yint <- log(qchisq(1 - pvalue_threshold, df = df), base = 2)
-
-    # make title
+    
+    # make labels #
+    
     if (is.null(title_lab)) {
       plot_title <- "Sample Outlier Results"
-      subtitle <- paste("p-value threshold = ", pvalue_threshold)
     } else {
       plot_title <- title_lab
-      subtitle <- ggplot2::waiver()
     }
+    
+    if(!is.null(pvalue_threshold)){
+      subtitle <- paste("p-value threshold = ", pvalue_threshold)
+    } else {
+      subtitle <- NULL
+    }
+    
     xlabel <- ifelse(is.null(x_lab), "Samples", x_lab)
     ylabel <- ifelse(is.null(y_lab), "log2(Robust Mahalanobis Distance)", y_lab)
-
-    # Start scatter plot skeleton when a p-value threshold is specified.
-    p <- ggplot2::ggplot(filter_object)
-
-    # Start scatter plot skeleton when a p-value threshold has been provided.
-    if (length(main_eff_names) == 1) {
-      # we need separate plots for if we have pair id or not
-
-      if (!is.null(attr(attr(filter_object, "group_DF"), "pair_id"))) {
-        # if !null then we need to include pair fill information
-        p <- p +
-          ggplot2::geom_point(
-            ggplot2::aes(
-              x = !!dplyr::sym(samp_id),
-              y = Log2.md,
-              col = !!dplyr::sym(main_eff_names),
-              # Add a fill layer that will not affect how the plot looks. This
-              # layer is used to create a legend when one sample from a pair is
-              # an outlier but the other sample belonging to the pair is not.
-              fill = "Removed because paired with outlier"
-            ),
-            alpha = ifelse(goodies_alpha, 1, 0.5),
-            size = point_size,
-            shape = ifelse(goodies_pch, 15, 16)
-          )
-      } else {
-        # if null pair id then we do not need to account for fill
-        p <- p +
-          ggplot2::geom_point(
-            ggplot2::aes(
-              x = !!dplyr::sym(samp_id),
-              y = Log2.md,
-              col = !!dplyr::sym(main_eff_names)
-            ),
-            alpha = ifelse(goodies_alpha, 1, 0.5),
-            size = point_size,
-            shape = ifelse(goodies_pch, 15, 16)
-          )
-      }
-    } else {
-      if (!is.null(attr(attr(filter_object, "group_DF"), "pair_id"))) {
-        # if !null then we need to include pair fill information
-        p <- p +
-          ggplot2::geom_point(
-            ggplot2::aes(
-              x = !!dplyr::sym(samp_id),
-              y = Log2.md,
-              col = !!dplyr::sym(main_eff_names[1]),
-              shape = !!dplyr::sym(main_eff_names[2]),
-              # Add a fill layer that will not affect how the plot looks. This
-              # layer is used to create a legend when one sample from a pair is
-              # an outlier but the other sample belonging to the pair is not.
-              fill = "Removed because paired with outlier"
-            ),
-            alpha = ifelse(goodies_alpha, 1, 0.5),
-            # Make guilty-by-association points really small because we will
-            # plot a square point over them with the next lines of code. We
-            # don't want the edges of a circle or triangle peeking out from
-            # behind a square. That would make a hideous and confusing plot if
-            # that happened.
-            size = ifelse(goodies_pch, 0, point_size)
-          ) +
-          # Add another layer of points with guilty-by-association samples
-          # plotted as a square.
-          ggplot2::geom_point(
-            ggplot2::aes(
-              x = !!dplyr::sym(samp_id),
-              y = Log2.md,
-              col = !!dplyr::sym(main_eff_names[1])
-            ),
-            size = ifelse(goodies_pch, point_size, 0),
-            shape = ifelse(goodies_pch, 15, 16)
-          )
-      } else {
-        # if null pair id then we do not need to account for fill
-        p <- p +
-          ggplot2::geom_point(
-            ggplot2::aes(
-              x = !!dplyr::sym(samp_id),
-              y = Log2.md,
-              col = !!dplyr::sym(main_eff_names[1]),
-              shape = !!dplyr::sym(main_eff_names[2])
-            ),
-            alpha = ifelse(goodies_alpha, 1, 0.5),
-            # Make guilty-by-association points really small because we will
-            # plot a square point over them with the next lines of code. We
-            # don't want the edges of a circle or triangle peeking out from
-            # behind a square. That would make a hideous and confusing plot if
-            # that happened.
-            size = ifelse(goodies_pch, 0, point_size)
-          ) +
-          # Add another layer of points with guilty-by-association samples
-          # plotted as a square.
-          ggplot2::geom_point(
-            ggplot2::aes(
-              x = !!dplyr::sym(samp_id),
-              y = Log2.md,
-              col = !!dplyr::sym(main_eff_names[1])
-            ),
-            size = ifelse(goodies_pch, point_size, 0),
-            shape = ifelse(goodies_pch, 15, 16)
-          )
-      }
+    
+    colorlabel <- display_names[1]
+    shapelabel <- ""
+    
+    ## Two main effects w/ pairing -- allow main effect shapes if no paired problems, otherwise add as color
+    if(all(filter_object$pch != "Removed because paired with outlier") && 
+       length(display_names) > 1){
+      
+      shapelabel <- display_names[2]
+      
+    } else if (
+      length(display_names) > 1
+      ){
+      colorlabel <- toString(display_names)
     }
-
-    # Add title, axis labels, and other crap.
-    p <- p +
-      ggplot2::xlab(xlabel) +
-      ggplot2::ylab(ylabel) +
-      ggplot2::ggtitle(plot_title,
+    
+    
+    ## Plot ##
+    
+    p <- ggplot2::ggplot(
+      data = filter_object,
+      mapping = ggplot2::aes(
+        x = !!dplyr::sym(samp_id),
+        y = Log2.md,
+        color = color,
+        shape = pch
+        )
+      ) +
+      ggplot2::geom_point(
+        alpha = filter_object$alpha,
+        size = point_size
+      ) +
+      ggplot2::labs(
+        x = xlabel,
+        y = ylabel,
+        color = colorlabel,
+        shape =  shapelabel,
+        title = plot_title,
         subtitle = subtitle
       ) +
-      ggplot2::geom_hline(yintercept = yint) +
       ggplot2::guides(
         color = ggplot2::guide_legend(ncol = 1),
         shape = ggplot2::guide_legend(ncol = 1)
-      ) +
-      ggplot2::labs(
-        color = legend_title_color,
-        shape = legend_title_shape
       )
-
+    
+    ## Extras ##
+    
+    ## Add hline ##
+    if(!is.null(pvalue_threshold)){
+      p <- p + ggplot2::geom_hline(yintercept = yint)
+    }
+    
     # Add a manual legend that describes the shape of the points that are
     # removed because they belong to a pair with one sample being an outlier.
-    if (sum(goodies_pch > 0)) {
-      p <- p +
-        ggplot2::scale_fill_manual(
-          name = NULL,
-          values = 1,
-          breaks = "Removed because paired with outlier",
-          guide = ggplot2::guide_legend(
-            override.aes = list(
-              linetype = 0,
-              shape = 15,
-              color = "black"
-            )
-          )
+    if (any( filter_object$pch == "Removed because paired with outlier")) {
+      
+      p <- p + 
+        ggplot2::scale_shape_manual(
+          values = c(16, "Removed because paired with outlier" = 15),
+          breaks = "Removed because paired with outlier"
         )
     }
-  }
+    
+    ## Remove unneeded legends ##
+    
+    ## Shape ##
+    if (all(filter_object$pch == "")) {
+      p <- p +
+        ggplot2::guides(shape = "none")
+    }
+    
+    
+    # Farm boy, remove the default legend(s) if the data are paired and there are
+    # no main effects. As you wish.
+    # If there are no main effects do not print a legend.
+    if ("paired_diff" %in% attr(filter_object, "group_DF")$Group && 
+        length(color_by) == 1 &&
+        color_by == "Group") {
+      # Remove the color legend. This legend is automatically created because we
+      # specified a variable to color by in aes().
+      p <- p +
+        ggplot2::guides(color = "none")
+    }
 
-  # Farm boy, make me a plot with beautiful colors. As you wish.
-  if (!is.null(palette)) p <- p +
-    ggplot2::scale_color_brewer(
-      name = legend_title_color,
-      palette = palette
+  } else {
+    
+    edit_label <- dfmelt$variable == "Proportion_Missing"
+    dfmelt$variable[edit_label] <- "Prop. Missing"
+    
+    ## Switch Proportion missing to prop missing
+    
+    ## Hist plot ##
+    if(length(color_by) != 1){
+
+      colorlabel <- toString(as.character(display_names))
+      
+      p <- dfmelt %>%
+        ggplot2::ggplot(ggplot2::aes(x = value, 
+                                     fill = paste(!!rlang::sym(color_by[1]),
+                                                  !!rlang::sym(color_by[2]), sep = ", "))
+        ) +
+        ggplot2::geom_histogram() +
+        ggplot2::facet_grid(cols = dplyr::vars(variable),
+                            rows = dplyr::vars(!!rlang::sym(color_by[1]), 
+                                               !!rlang::sym(color_by[2])),
+                            scales = "free")
+      
+    } else {
+      
+      colorlabel <- display_names
+      p <- dfmelt %>%
+        ggplot2::ggplot(ggplot2::aes(x = value, 
+                                     fill = !!rlang::sym(color_by))
+        ) +
+        ggplot2::geom_histogram()
+      
+      
+      if("paired_diff" %in% attr(filter_object, "group_DF")$Group){
+        p <- p + ggplot2::facet_grid(cols = dplyr::vars(variable),
+                                     scales = "free")
+      } else {
+        p <- p + ggplot2::facet_grid(cols = dplyr::vars(variable),
+                                     rows = dplyr::vars(!!rlang::sym(color_by)),
+                                     scales = "free")
+      }
+    }
+    
+    plot_title <- ifelse(is.null(title_lab),
+                         "Sample Metric Distribution",
+                         title_lab
     )
-
-  # Farm boy, create thematic elements for the plot. As you wish.
-  mytheme <- ggplot2::theme(
-    axis.ticks.x = ggplot2::element_blank(),
-    axis.text.x = ggplot2::element_text(angle = x_lab_angle, hjust = 1),
-    plot.title = ggplot2::element_text(size = title_lab_size),
-    plot.subtitle = ggplot2::element_text(face = 'italic'),
-    axis.title.x = ggplot2::element_text(size = x_lab_size),
-    axis.title.y = ggplot2::element_text(size = y_lab_size),
-    legend.position = legend_position
-  )
-
-  # Farm boy, remove useless box plot x-axis labels. As you wish.
-  if (!is.null(sampleID)) {
-    mytheme <- mytheme +
-      ggplot2::theme(axis.text.x = ggplot2::element_blank())
+    xlabel <- ifelse(is.null(x_lab), "Metric Value", x_lab)
+    ylabel <- ifelse(is.null(y_lab), "N Samples", y_lab)
+    
+    p <- p +
+      ggplot2::labs(
+        x = xlabel,
+        y = ylabel,
+        fill = colorlabel,
+        title = plot_title
+      )
+    
+    ## Legend for color ##
+    
+    # Farm boy, remove the default legend(s) if the data are paired and there are
+    # no main effects. As you wish.
+    # If there are no main effects do not print a legend.
+    if ("paired_diff" %in% attr(filter_object, "group_DF")$Group && 
+        length(color_by) == 1 &&
+        color_by == "Group") {
+      # Remove the color legend. This legend is automatically created because we
+      # specified a variable to color by in aes().
+      p <- p +
+        ggplot2::guides(fill = "none")
+    } else {
+      p <- p + ggplot2::guides(
+        fill = ggplot2::guide_legend(ncol = 1)
+      )
+    }
+    
+    
+  }
+  
+  ### Custom names ###
+  
+  if(!is.null(legend_lab)){
+    p <- p + ggplot2::labs(
+      color = legend_lab[1],
+      fill = legend_lab[1],
+      shape = if(!is.null(legend_lab[2])) legend_lab[2] else NULL
+    )
   }
 
-  # Farm boy, add the black and white theme to the plot. As you wish.
-  if (bw_theme) p <- p + ggplot2::theme_bw() +
-    ggplot2::theme(strip.background = ggplot2::element_rect(fill = "white"))
-
-  # Farm boy, add the thematic elements you created to the plot. As you wish.
-  p <- p + mytheme
 
   # Farm boy, use my custom sample names in the plot. As you wish.
   if (use_VizSampNames) {
@@ -4446,16 +4448,40 @@ plot.rmdFilt <- function(x, pvalue_threshold = NULL, sampleID = NULL,
         )
     }
   }
-
-  # Farm boy, remove the default legend(s) if the data are paired and there are
-  # no main effects. As you wish.
-  # If there are no main effects do not print a legend.
-  if ("paired_diff" %in% attr(filter_object, "group_DF")$Group) {
-    # Remove the color legend. This legend is automatically created because we
-    # specified a variable to color by in aes().
+  
+  ## Palette ##
+  
+  # Farm boy, make me a plot with beautiful colors. As you wish.
+  if (!is.null(palette)){
     p <- p +
-      ggplot2::guides(color = "none")
+      ggplot2::scale_color_brewer(
+        palette = palette
+      )
+    p <- p +
+      ggplot2::scale_fill_brewer(
+        palette = palette
+      )
   }
+  
+  ### Themes ###
+  
+  # Farm boy, create thematic elements for the plot. As you wish.
+  mytheme <- ggplot2::theme(
+    axis.ticks.x = ggplot2::element_blank(),
+    axis.text.x = ggplot2::element_text(angle = x_lab_angle, hjust = 1),
+    plot.title = ggplot2::element_text(size = title_lab_size),
+    plot.subtitle = ggplot2::element_text(face = 'italic'),
+    axis.title.x = ggplot2::element_text(size = x_lab_size),
+    axis.title.y = ggplot2::element_text(size = y_lab_size),
+    legend.position = legend_position
+  )
+  
+  # Farm boy, add the black and white theme to the plot. As you wish.
+  if (bw_theme) p <- p + ggplot2::theme_bw() +
+    ggplot2::theme(strip.background = ggplot2::element_rect(fill = "white"))
+  
+  # Farm boy, add the thematic elements you created to the plot. As you wish.
+  p <- p + mytheme
 
   # Farm boy, make the plot interactive. As you wish.
   if (interactive && requirePlotly()) p <- plotly::ggplotly(p)
