@@ -260,10 +260,75 @@ test_that('plot functions are producing desired output',{
   
   ## Test plot.rmdFilt ---------------------------------------------------------
   
-  mymetab <- edata_transform(omicsData = metab_object, data_scale = "log2")
-  mymetab <- group_designation(omicsData = mymetab, main_effects = "Condition")
-  rmd_results <- rmd_filter(omicsData = mymetab, metrics=c("MAD", "Skewness", "Correlation"))
-  expect_doppelganger_ci("plot.rmdFilt", plot(rmd_results, pvalue_threshold = 0.01, order_by = "Condition"))
+  mypep <- edata_transform(omicsData = pmartRdata::pep_object, data_scale = "log2")
+  mypep$f_data$pair_id <- c(rep(1:4, 2), rep(5:8, 2), rep(9:12, 2))
+  mypep$f_data$Third_pheno <- 1:2
+  
+  ## Multiple groups, w/ pairing
+  
+  mypep <- group_designation(omicsData = mypep, main_effects = c("Phenotype", "Third_pheno"), 
+                             pair_id = "pair_id", pair_group = "SecondPhenotype", pair_denom = "B")
+  groups_pair <- rmd_filter(omicsData = mypep)
+  
+  ## Multiple groups
+  
+  mypep <- group_designation(omicsData = mypep, main_effects = c("Phenotype", "Third_pheno"))
+  groups <- rmd_filter(omicsData = mypep)
+  
+  ## One group, w/ pairing
+  
+  mypep <- group_designation(omicsData = mypep, main_effects = c("Phenotype"), 
+                             pair_id = "pair_id", pair_group = "SecondPhenotype", pair_denom = "B")
+  group_pair <- rmd_filter(omicsData = mypep)
+  
+  ## One group
+  
+  mypep <- group_designation(omicsData = mypep, main_effects = c("Phenotype"))
+  group <- rmd_filter(omicsData = mypep)
+  
+  ## Only pairing
+  
+  mypep <- group_designation(omicsData = mypep,
+                             pair_id = "pair_id", pair_group = "SecondPhenotype", pair_denom = "B")
+  pair <- rmd_filter(omicsData = mypep)
+  
+  ## silly names
+  legend_lab <- c("Hey", "There")
+  
+  rme_plots <- purrr::map2(list(groups_pair, groups, group_pair, group, pair),
+                           list("gsp", "gs", "gp", "g", "p"),
+                           function(rmd_results, label){
+    
+    suppressWarnings({
+      suppressMessages({
+        expect_doppelganger_ci(paste0("plot.rmdFilt.",label), 
+                               plot(rmd_results))
+        expect_doppelganger_ci(paste0("plot.rmdFilt.color.",label), 
+                               plot(rmd_results, color_by = "SecondPhenotype"))
+        expect_doppelganger_ci(paste0("plot.rmdFilt.hist.",label),
+                               plot(rmd_results, hist = T))
+        expect_doppelganger_ci(paste0("plot.rmdFilt.color.hist.",label),
+                               plot(rmd_results, hist = T, color_by = "SecondPhenotype"))
+        expect_doppelganger_ci(paste0("plot.rmdFilt.pval.",label),
+                               plot(rmd_results, pvalue_threshold = 0.05))
+        expect_doppelganger_ci(paste0("plot.rmdFilt.sample",label), 
+                               plot(rmd_results, order_by = "SecondPhenotype", sampleID = "Sample_47_Phenotype3_A"))
+        
+        expect_doppelganger_ci(paste0("plot.rmdFilt.legend.",label),
+                               plot(rmd_results, legend_lab = legend_lab))
+        expect_doppelganger_ci(paste0("plot.rmdFilt.color.legend.",label),
+                               plot(rmd_results, color_by = "SecondPhenotype", legend_lab = legend_lab))
+        expect_doppelganger_ci(paste0("plot.rmdFilt.hist.legend.",label),
+                               plot(rmd_results, hist = T, legend_lab = legend_lab))
+        expect_doppelganger_ci(paste0("plot.rmdFilt.color.hist.legend.",label),
+                               plot(rmd_results, hist = T, color_by = "SecondPhenotype", legend_lab = legend_lab))
+        expect_doppelganger_ci(paste0("plot.rmdFilt.pval.legend.",label),
+                               plot(rmd_results, pvalue_threshold = 0.05, legend_lab = legend_lab))
+        expect_doppelganger_ci(paste0("plot.rmdFilt.sample.legend.",label),
+                               plot(rmd_results, order_by = "SecondPhenotype", sampleID = "Sample_47_Phenotype3_A", legend_lab = legend_lab))
+      })
+    })
+  })
   
   ## Test plot.cvFilt ----------------------------------------------------------
   
