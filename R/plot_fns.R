@@ -4221,9 +4221,18 @@ plot.rmdFilt <- function(x, pvalue_threshold = NULL, sampleID = NULL,
     # Stunning scatter plots: no threshold ---------------
   } else if (!hist) {
     
-    ## Filter the results
+    ## Color ##
+    filter_object$color <- filter_object[[color_by[1]]]
+
+    ## Shape -- not including pair info ##
+    if(length(color_by) > 1){
+      filter_object$pch <- filter_object[[color_by[2]]]
+    } else {
+      filter_object$pch <- ""
+    }
+    
+    ## Alpha ##
     if(!is.null(pvalue_threshold)){
-      
       
       # Determine which samples fall below the p-value threshold (outliers)
       filter_object$out <- filter_object$pvalue < pvalue_threshold
@@ -4236,24 +4245,24 @@ plot.rmdFilt <- function(x, pvalue_threshold = NULL, sampleID = NULL,
         pair_id <- attr(group_df, "pair_id")
         
         ## Get pairs that have divergence in outlier status
-        pch_df <- filter_object %>% 
+        pair_df <- filter_object %>% 
           dplyr::group_by_at(dplyr::vars(pair_id)) %>% 
           dplyr::reframe(
             diverge = any(out) && !all(out)
           ) %>% 
           dplyr::right_join(filter_object, by = pair_id) %>%
           
-          ## Identify the non-outliers in those pairs -- Will be set to TRUE
+          ## Identify the outliers thier pairs will be highlighted, even if they fall bellow threshold
           dplyr::group_by_at(dplyr::vars(samp_id)) %>% 
           dplyr::reframe(
-            pch = ifelse(Reduce("&", list(!out, diverge)), "Removed because paired with outlier", ""),
+            pair_pch = ifelse(Reduce("&", list(!out, diverge)), "Removed because paired with outlier", NA),
             alpha = ifelse(Reduce("|", list(Reduce("&", list(!out, diverge)), out)), 1, 0.5)
           )
         
-        filter_object <- dplyr::left_join(filter_object, pch_df, by = samp_id)
+        filter_object <- dplyr::left_join(filter_object, pair_df, by = samp_id)
         
       } else {
-        filter_object$pch <- ""
+        filter_object$pair_pch <- NA
         filter_object$alpha <- as.numeric(filter_object$out)
         filter_object$alpha[filter_object$alpha == 0] <- 0.5
       }
@@ -4264,30 +4273,8 @@ plot.rmdFilt <- function(x, pvalue_threshold = NULL, sampleID = NULL,
       
     } else {
       # Alpha (opacity) #
-      filter_object$pch <- ""
       filter_object$alpha <- 1
-    }
-    
-    ## Color ##
-    filter_object$color <- filter_object[[color_by[1]]]
-    
-    ## Two main effects w/ pairing -- allow main effect shapes if no paired problems, otherwise add as color
-    if(
-      all(filter_object$pch != "Removed because paired with outlier") && 
-      length(color_by) > 1
-      ){
-      
-      filter_object$pch <- filter_object[[color_by[2]]]
-      
-      } else if (
-        length(color_by) > 1
-        ){
-        
-      filter_object$color <- purrr::map2_chr(
-        filter_object[[color_by[1]]], 
-        filter_object[[color_by[2]]],
-        function(x,y) toString(c(x,y))
-        )
+      filter_object$pair_pch <- NA
     }
     
     # make labels #
@@ -4308,20 +4295,7 @@ plot.rmdFilt <- function(x, pvalue_threshold = NULL, sampleID = NULL,
     ylabel <- ifelse(is.null(y_lab), "log2(Robust Mahalanobis Distance)", y_lab)
     
     colorlabel <- display_names[1]
-    shapelabel <- ""
-    
-    ## Two main effects w/ pairing -- allow main effect shapes if no paired problems, otherwise add as color
-    if(all(filter_object$pch != "Removed because paired with outlier") && 
-       length(display_names) > 1){
-      
-      shapelabel <- display_names[2]
-      
-    } else if (
-      length(display_names) > 1
-      ){
-      colorlabel <- toString(display_names)
-    }
-    
+    shapelabel <- if(length(display_names) > 1) display_names[2] else NULL
     
     ## Plot ##
     
@@ -4351,22 +4325,29 @@ plot.rmdFilt <- function(x, pvalue_threshold = NULL, sampleID = NULL,
         shape = ggplot2::guide_legend(ncol = 1)
       )
     
+    
     ## Extras ##
+    
+    ## Pair adjustment ##
+    if(any(!is.na(filter_object$pair_pch))){
+      
+      ## Abuse fill to add a second label
+      pair_pch_df <- filter_object[!is.na(filter_object$pair_pch),] 
+      
+      p <- p + ggplot2::geom_point(
+        data = pair_pch_df,
+        ggplot2::aes(fill = pair_pch),
+        alpha = .8,
+        shape = 4,
+        color = "black",
+        size = point_size + 1
+      ) + ggplot2::labs(fill = "")
+    }
+    
     
     ## Add hline ##
     if(!is.null(pvalue_threshold)){
       p <- p + ggplot2::geom_hline(yintercept = yint)
-    }
-    
-    # Add a manual legend that describes the shape of the points that are
-    # removed because they belong to a pair with one sample being an outlier.
-    if (any( filter_object$pch == "Removed because paired with outlier")) {
-      
-      p <- p + 
-        ggplot2::scale_shape_manual(
-          values = c(16, "Removed because paired with outlier" = 15),
-          breaks = "Removed because paired with outlier"
-        )
     }
     
     ## Remove unneeded legends ##
@@ -4474,7 +4455,7 @@ plot.rmdFilt <- function(x, pvalue_threshold = NULL, sampleID = NULL,
   if(!is.null(legend_lab)){
     p <- p + ggplot2::labs(
       color = legend_lab[1],
-      fill = legend_lab[1],
+      fill = if(!hist) NULL else legend_lab[1],
       shape = if(!is.null(legend_lab[2])) legend_lab[2] else NULL
     )
   }
@@ -4504,14 +4485,18 @@ plot.rmdFilt <- function(x, pvalue_threshold = NULL, sampleID = NULL,
   
   # Farm boy, make me a plot with beautiful colors. As you wish.
   if (!is.null(palette)){
-    p <- p +
-      ggplot2::scale_color_brewer(
-        palette = palette
-      )
-    p <- p +
-      ggplot2::scale_fill_brewer(
-        palette = palette
-      )
+    
+    if(hist){
+      p <- p +
+        ggplot2::scale_fill_brewer(
+          palette = palette
+        )
+    } else {
+      p <- p +
+        ggplot2::scale_color_brewer(
+          palette = palette
+        )
+    }
   }
   
   ### Themes ###
