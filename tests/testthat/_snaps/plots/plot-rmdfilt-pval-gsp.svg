@@ -61,29 +61,35 @@
 <polyline points='492.17,445.83 492.17,38.83 ' style='stroke-width: 1.07; stroke: #EBEBEB; stroke-linecap: butt;' />
 <polyline points='512.71,445.83 512.71,38.83 ' style='stroke-width: 1.07; stroke: #EBEBEB; stroke-linecap: butt;' />
 <circle cx='40.22' cy='335.71' r='3.56' style='stroke-width: 0.71; stroke: none; fill: #619CFF; fill-opacity: 0.50;' />
-<circle cx='60.77' cy='328.55' r='3.56' style='stroke-width: 0.71; stroke: none; fill: #F564E3; fill-opacity: 0.50;' />
+<polygon points='60.77,323.02 65.56,331.31 55.98,331.31 ' style='stroke-width: 0.71; stroke: none; fill: #619CFF; fill-opacity: 0.50;' />
 <circle cx='81.31' cy='361.35' r='3.56' style='stroke-width: 0.71; stroke: none; fill: #619CFF; fill-opacity: 0.50;' />
-<circle cx='101.85' cy='427.33' r='3.56' style='stroke-width: 0.71; stroke: none; fill: #F564E3; fill-opacity: 0.50;' />
+<polygon points='101.85,421.80 106.64,430.09 97.06,430.09 ' style='stroke-width: 0.71; stroke: none; fill: #619CFF; fill-opacity: 0.50;' />
 <circle cx='122.40' cy='297.51' r='3.56' style='stroke-width: 0.71; stroke: none; fill: #619CFF; fill-opacity: 0.50;' />
-<circle cx='142.94' cy='288.93' r='3.56' style='stroke-width: 0.71; stroke: none; fill: #F564E3; fill-opacity: 0.50;' />
+<polygon points='142.94,283.40 147.73,291.69 138.15,291.69 ' style='stroke-width: 0.71; stroke: none; fill: #619CFF; fill-opacity: 0.50;' />
 <circle cx='163.48' cy='256.92' r='3.56' style='stroke-width: 0.71; stroke: none; fill: #619CFF; fill-opacity: 0.50;' />
-<circle cx='184.02' cy='374.01' r='3.56' style='stroke-width: 0.71; stroke: none; fill: #F564E3; fill-opacity: 0.50;' />
+<polygon points='184.02,368.48 188.81,376.78 179.24,376.78 ' style='stroke-width: 0.71; stroke: none; fill: #619CFF; fill-opacity: 0.50;' />
 <circle cx='204.57' cy='143.71' r='3.56' style='stroke-width: 0.71; stroke: none; fill: #F8766D;' />
-<circle cx='225.11' cy='352.45' r='3.56' style='stroke-width: 0.71; stroke: none; fill: #B79F00; fill-opacity: 0.50;' />
-<polygon points='242.10,294.34 249.21,294.34 249.21,287.23 242.10,287.23 ' style='stroke-width: 0.71; stroke: none; fill: #F8766D;' />
-<circle cx='266.20' cy='355.28' r='3.56' style='stroke-width: 0.71; stroke: none; fill: #B79F00; fill-opacity: 0.50;' />
-<polygon points='283.18,302.45 290.29,302.45 290.29,295.34 283.18,295.34 ' style='stroke-width: 0.71; stroke: none; fill: #F8766D;' />
-<circle cx='307.28' cy='388.13' r='3.56' style='stroke-width: 0.71; stroke: none; fill: #B79F00; fill-opacity: 0.50;' />
+<polygon points='225.11,346.92 229.90,355.22 220.32,355.22 ' style='stroke-width: 0.71; stroke: none; fill: #F8766D; fill-opacity: 0.50;' />
+<circle cx='245.65' cy='290.79' r='3.56' style='stroke-width: 0.71; stroke: none; fill: #F8766D;' />
+<polygon points='266.20,349.75 270.98,358.04 261.41,358.04 ' style='stroke-width: 0.71; stroke: none; fill: #F8766D; fill-opacity: 0.50;' />
+<circle cx='286.74' cy='298.90' r='3.56' style='stroke-width: 0.71; stroke: none; fill: #F8766D;' />
+<polygon points='307.28,382.60 312.07,390.89 302.49,390.89 ' style='stroke-width: 0.71; stroke: none; fill: #F8766D; fill-opacity: 0.50;' />
 <circle cx='327.82' cy='175.53' r='3.56' style='stroke-width: 0.71; stroke: none; fill: #F8766D;' />
-<circle cx='348.37' cy='272.98' r='3.56' style='stroke-width: 0.71; stroke: none; fill: #B79F00; fill-opacity: 0.50;' />
+<polygon points='348.37,267.45 353.15,275.75 343.58,275.75 ' style='stroke-width: 0.71; stroke: none; fill: #F8766D; fill-opacity: 0.50;' />
 <circle cx='368.91' cy='303.02' r='3.56' style='stroke-width: 0.71; stroke: none; fill: #00BA38; fill-opacity: 0.50;' />
-<circle cx='389.45' cy='360.23' r='3.56' style='stroke-width: 0.71; stroke: none; fill: #00BFC4; fill-opacity: 0.50;' />
+<polygon points='389.45,354.70 394.24,363.00 384.66,363.00 ' style='stroke-width: 0.71; stroke: none; fill: #00BA38; fill-opacity: 0.50;' />
 <circle cx='409.99' cy='395.67' r='3.56' style='stroke-width: 0.71; stroke: none; fill: #00BA38; fill-opacity: 0.50;' />
-<circle cx='430.54' cy='57.33' r='3.56' style='stroke-width: 0.71; stroke: none; fill: #00BFC4;' />
+<polygon points='430.54,51.80 435.33,60.10 425.75,60.10 ' style='stroke-width: 0.71; stroke: none; fill: #00BA38;' />
 <circle cx='451.08' cy='422.30' r='3.56' style='stroke-width: 0.71; stroke: none; fill: #00BA38; fill-opacity: 0.50;' />
-<circle cx='471.62' cy='331.70' r='3.56' style='stroke-width: 0.71; stroke: none; fill: #00BFC4; fill-opacity: 0.50;' />
+<polygon points='471.62,326.17 476.41,334.46 466.83,334.46 ' style='stroke-width: 0.71; stroke: none; fill: #00BA38; fill-opacity: 0.50;' />
 <circle cx='492.17' cy='291.71' r='3.56' style='stroke-width: 0.71; stroke: none; fill: #00BA38; fill-opacity: 0.50;' />
-<polygon points='509.15,359.72 516.26,359.72 516.26,352.61 509.15,352.61 ' style='stroke-width: 0.71; stroke: none; fill: #00BFC4;' />
+<polygon points='512.71,350.64 517.50,358.93 507.92,358.93 ' style='stroke-width: 0.71; stroke: none; fill: #00BA38;' />
+<line x1='241.03' y1='295.41' x2='250.27' y2='286.16' style='stroke-width: 0.71; stroke: #000000; stroke-opacity: 0.80;' />
+<line x1='241.03' y1='286.16' x2='250.27' y2='295.41' style='stroke-width: 0.71; stroke: #000000; stroke-opacity: 0.80;' />
+<line x1='282.12' y1='303.52' x2='291.36' y2='294.27' style='stroke-width: 0.71; stroke: #000000; stroke-opacity: 0.80;' />
+<line x1='282.12' y1='294.27' x2='291.36' y2='303.52' style='stroke-width: 0.71; stroke: #000000; stroke-opacity: 0.80;' />
+<line x1='508.09' y1='360.79' x2='517.33' y2='351.55' style='stroke-width: 0.71; stroke: #000000; stroke-opacity: 0.80;' />
+<line x1='508.09' y1='351.55' x2='517.33' y2='360.79' style='stroke-width: 0.71; stroke: #000000; stroke-opacity: 0.80;' />
 <line x1='27.90' y1='198.32' x2='525.03' y2='198.32' style='stroke-width: 1.07; stroke-linecap: butt;' />
 <rect x='27.90' y='38.83' width='497.13' height='406.99' style='stroke-width: 1.07; stroke: #333333;' />
 </g>
@@ -124,30 +130,30 @@
 <text transform='translate(518.76,450.76) rotate(-90)' text-anchor='end' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='102.27px' lengthAdjust='spacingAndGlyphs'>Sample_9_Phenotype2_B</text>
 <text x='276.47' y='568.24' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='42.81px' lengthAdjust='spacingAndGlyphs'>Samples</text>
 <text transform='translate(13.05,242.33) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='174.29px' lengthAdjust='spacingAndGlyphs'>log2(Robust Mahalanobis Distance)</text>
-<rect x='535.99' y='150.08' width='178.53' height='43.57' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
-<rect x='541.47' y='170.89' width='17.28' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
-<polygon points='546.56,183.09 553.67,183.09 553.67,175.98 546.56,175.98 ' style='stroke-width: 0.71; stroke: none; fill: #000000;' />
-<text x='564.23' y='182.56' style='font-size: 8.80px; font-family: sans;' textLength='144.81px' lengthAdjust='spacingAndGlyphs'>Removed because paired with outlier</text>
-<rect x='535.99' y='204.61' width='131.45' height='129.97' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
-<text x='541.47' y='218.80' style='font-size: 11.00px; font-family: sans;' textLength='120.49px' lengthAdjust='spacingAndGlyphs'>Phenotype, Third_pheno</text>
-<rect x='541.47' y='225.42' width='17.28' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
-<circle cx='550.11' cy='234.06' r='3.56' style='stroke-width: 0.71; stroke: #F8766D; fill: #F8766D;' />
-<rect x='541.47' y='242.70' width='17.28' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
-<circle cx='550.11' cy='251.34' r='3.56' style='stroke-width: 0.71; stroke: #B79F00; fill: #B79F00;' />
-<rect x='541.47' y='259.98' width='17.28' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
-<circle cx='550.11' cy='268.62' r='3.56' style='stroke-width: 0.71; stroke: #00BA38; fill: #00BA38;' />
-<rect x='541.47' y='277.26' width='17.28' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
-<circle cx='550.11' cy='285.90' r='3.56' style='stroke-width: 0.71; stroke: #00BFC4; fill: #00BFC4;' />
-<rect x='541.47' y='294.54' width='17.28' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
-<circle cx='550.11' cy='303.18' r='3.56' style='stroke-width: 0.71; stroke: #619CFF; fill: #619CFF;' />
-<rect x='541.47' y='311.82' width='17.28' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
-<circle cx='550.11' cy='320.46' r='3.56' style='stroke-width: 0.71; stroke: #F564E3; fill: #F564E3;' />
-<text x='564.23' y='237.09' style='font-size: 8.80px; font-family: sans;' textLength='56.77px' lengthAdjust='spacingAndGlyphs'>Phenotype1, 1</text>
-<text x='564.23' y='254.37' style='font-size: 8.80px; font-family: sans;' textLength='56.77px' lengthAdjust='spacingAndGlyphs'>Phenotype1, 2</text>
-<text x='564.23' y='271.65' style='font-size: 8.80px; font-family: sans;' textLength='56.77px' lengthAdjust='spacingAndGlyphs'>Phenotype2, 1</text>
-<text x='564.23' y='288.93' style='font-size: 8.80px; font-family: sans;' textLength='56.77px' lengthAdjust='spacingAndGlyphs'>Phenotype2, 2</text>
-<text x='564.23' y='306.21' style='font-size: 8.80px; font-family: sans;' textLength='56.77px' lengthAdjust='spacingAndGlyphs'>Phenotype3, 1</text>
-<text x='564.23' y='323.49' style='font-size: 8.80px; font-family: sans;' textLength='56.77px' lengthAdjust='spacingAndGlyphs'>Phenotype3, 2</text>
+<rect x='535.99' y='140.09' width='178.53' height='43.57' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<rect x='541.47' y='160.91' width='17.28' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<line x1='545.49' y1='174.17' x2='554.73' y2='164.92' style='stroke-width: 0.71; stroke: #000000; stroke-opacity: 0.80;' />
+<line x1='545.49' y1='164.92' x2='554.73' y2='174.17' style='stroke-width: 0.71; stroke: #000000; stroke-opacity: 0.80;' />
+<text x='564.23' y='172.57' style='font-size: 8.80px; font-family: sans;' textLength='144.81px' lengthAdjust='spacingAndGlyphs'>Removed because paired with outlier</text>
+<rect x='535.99' y='194.62' width='72.73' height='60.85' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<text x='541.47' y='208.82' style='font-size: 11.00px; font-family: sans;' textLength='61.77px' lengthAdjust='spacingAndGlyphs'>Third_pheno</text>
+<rect x='541.47' y='215.44' width='17.28' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<circle cx='550.11' cy='224.08' r='3.56' style='stroke-width: 0.71; stroke: none; fill: #000000;' />
+<rect x='541.47' y='232.72' width='17.28' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<polygon points='550.11,235.83 554.90,244.12 545.32,244.12 ' style='stroke-width: 0.71; stroke: none; fill: #000000;' />
+<text x='564.23' y='227.11' style='font-size: 8.80px; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>1</text>
+<text x='564.23' y='244.39' style='font-size: 8.80px; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>2</text>
+<rect x='535.99' y='266.44' width='80.70' height='78.13' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<text x='541.47' y='280.63' style='font-size: 11.00px; font-family: sans;' textLength='52.61px' lengthAdjust='spacingAndGlyphs'>Phenotype</text>
+<rect x='541.47' y='287.25' width='17.28' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<circle cx='550.11' cy='295.89' r='3.56' style='stroke-width: 0.71; stroke: #F8766D; fill: #F8766D;' />
+<rect x='541.47' y='304.53' width='17.28' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<circle cx='550.11' cy='313.17' r='3.56' style='stroke-width: 0.71; stroke: #00BA38; fill: #00BA38;' />
+<rect x='541.47' y='321.81' width='17.28' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<circle cx='550.11' cy='330.45' r='3.56' style='stroke-width: 0.71; stroke: #619CFF; fill: #619CFF;' />
+<text x='564.23' y='298.92' style='font-size: 8.80px; font-family: sans;' textLength='46.98px' lengthAdjust='spacingAndGlyphs'>Phenotype1</text>
+<text x='564.23' y='316.20' style='font-size: 8.80px; font-family: sans;' textLength='46.98px' lengthAdjust='spacingAndGlyphs'>Phenotype2</text>
+<text x='564.23' y='333.48' style='font-size: 8.80px; font-family: sans;' textLength='46.98px' lengthAdjust='spacingAndGlyphs'>Phenotype3</text>
 <text x='27.90' y='31.07' style='font-size: 11.00px; font-style: italic; font-family: sans;' textLength='121.40px' lengthAdjust='spacingAndGlyphs'>p-value threshold =  0.05</text>
 <text x='27.90' y='15.11' style='font-size: 14.00px; font-family: sans;' textLength='143.19px' lengthAdjust='spacingAndGlyphs'>Sample Outlier Results</text>
 </g>
