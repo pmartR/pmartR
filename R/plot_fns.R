@@ -4197,15 +4197,15 @@ plot.rmdFilt <- function(x, pvalue_threshold = NULL, sampleID = NULL,
         pair_df <- filter_object %>% 
           dplyr::group_by_at(dplyr::vars(pair_id)) %>% 
           dplyr::reframe(
-            diverge = any(out) && !all(out)
+            diverge = any(.data$out) && !all(.data$out)
           ) %>% 
           dplyr::right_join(filter_object, by = pair_id) %>%
           
           ## Identify the outliers thier pairs will be highlighted, even if they fall bellow threshold
           dplyr::group_by_at(dplyr::vars(samp_id)) %>% 
           dplyr::reframe(
-            pair_pch = ifelse(Reduce("&", list(!out, diverge)), "Removed because paired with outlier", NA),
-            alpha = ifelse(Reduce("|", list(Reduce("&", list(!out, diverge)), out)), 1, 0.5)
+            pair_pch = ifelse(Reduce("&", list(!.data$out, .data$diverge)), "Removed because paired with outlier", NA),
+            alpha = ifelse(Reduce("|", list(Reduce("&", list(!.data$out, .data$diverge)), out)), 1, 0.5)
           )
         
         filter_object <- dplyr::left_join(filter_object, pair_df, by = samp_id)
@@ -4334,13 +4334,13 @@ plot.rmdFilt <- function(x, pvalue_threshold = NULL, sampleID = NULL,
       
       p <- dfmelt %>%
         ggplot2::ggplot(ggplot2::aes(x = value, 
-                                     fill = paste(!!rlang::sym(color_by[1]),
-                                                  !!rlang::sym(color_by[2]), sep = ", "))
+                                     fill = paste(!!dplyr::sym(color_by[1]),
+                                                  !!dplyr::sym(color_by[2]), sep = ", "))
         ) +
         ggplot2::geom_histogram() +
         ggplot2::facet_grid(cols = dplyr::vars(variable),
-                            rows = dplyr::vars(!!rlang::sym(color_by[1]), 
-                                               !!rlang::sym(color_by[2])),
+                            rows = dplyr::vars(!!dplyr::sym(color_by[1]), 
+                                               !!dplyr::sym(color_by[2])),
                             scales = "free")
       
     } else {
@@ -4348,7 +4348,7 @@ plot.rmdFilt <- function(x, pvalue_threshold = NULL, sampleID = NULL,
       colorlabel <- display_names
       p <- dfmelt %>%
         ggplot2::ggplot(ggplot2::aes(x = value, 
-                                     fill = !!rlang::sym(color_by))
+                                     fill = !!dplyr::sym(color_by))
         ) +
         ggplot2::geom_histogram()
       
@@ -4358,7 +4358,7 @@ plot.rmdFilt <- function(x, pvalue_threshold = NULL, sampleID = NULL,
                                      scales = "free")
       } else {
         p <- p + ggplot2::facet_grid(cols = dplyr::vars(variable),
-                                     rows = dplyr::vars(!!rlang::sym(color_by)),
+                                     rows = dplyr::vars(!!dplyr::sym(color_by)),
                                      scales = "free")
       }
     }

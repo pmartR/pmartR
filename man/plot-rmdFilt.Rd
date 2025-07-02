@@ -9,7 +9,9 @@
   pvalue_threshold = NULL,
   sampleID = NULL,
   order_by = NULL,
+  color_by = NULL,
   interactive = FALSE,
+  hist = FALSE,
   x_lab = NULL,
   y_lab = NULL,
   x_lab_size = 11,
@@ -30,11 +32,11 @@
 \item{x}{object of class rmdFilt created via \code{\link{rmd_filter}}}
 
 \item{pvalue_threshold}{numeric threshold for the Robust Mahalanobis Distance (RMD)
-p-value. If \code{sampleID} is NULL (see \code{sampleID} below), a
-horizontal line is plotted at the RMD value that corresponds with the
-threshold, and all samples above the line have a p-value below the
-threshold. If \code{sampleID} is not NULL, \code{pvalue_threshold} will do
-nothing. Default value is NULL.}
+  p-value. If \code{sampleID} is NULL (see \code{sampleID} below), a
+  horizontal line is plotted at the RMD value that corresponds with the
+  threshold, and all samples above the line have a p-value below the
+  threshold. If \code{sampleID} is not NULL or \code{hist} is TRUE, 
+.  \code{pvalue_threshold} will do nothing. Default value is NULL.}
 
 \item{sampleID}{character vector specifying the sample names to be plotted.
 If specified, the plot function produces a boxplot instead of a
@@ -46,9 +48,18 @@ the samples in the plot. This variable must be found in the column names of
 fdata from the rmdFilt object. If \code{order_by} is "Group", the plot will
 be ordered by the group variable from the group_designation function. If
 NULL (default), the samples will be displayed in the order in which they
-first appear.}
+first appear. Only applicable where \code{sampleID} = NULL and \code{hist} = FALSE.}
+
+\item{color_by}{character string specifying a variable by which to order
+the samples in the plot. This variable must be found in the column names of
+fdata from the rmdFilt object. If \code{color_by} is "Group" or NULL, the plot will
+be colored by the group variable from the group_designation function. Only
+applicable where \code{sampleID} = NULL.}
 
 \item{interactive}{logical value. If TRUE produces an interactive plot.}
+
+\item{hist}{boolean value that changes default scatter plot to a histogram 
+displaying the distribution of all used RMD metrics.}
 
 \item{x_lab}{character string specifying the x-axis label}
 
