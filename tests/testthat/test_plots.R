@@ -306,6 +306,8 @@ test_that('plot functions are producing desired output',{
   expect_doppelganger_ci("plot.statRes (combined)", plot(imd_anova_res, bw_theme = TRUE))
 
   expect_doppelganger_ci("plot.statRes (combined volcano)", plot(imd_anova_res, plot_type = "volcano", bw_theme = TRUE))
+  
+  expect_doppelganger_ci("plot.statRes (histogram)", plot(imd_anova_res, plot_type = "histogram", fc_colors = c("blue","gray"), bw_theme = TRUE))
   ## Test plot.totalcountFilt --------------------------------------------------
   
   seqfilt <- total_count_filter(omicsData = rnaseq_object)
@@ -338,5 +340,5 @@ test_that('plot functions are producing desired output',{
   
   myseq <- group_designation(omicsData = rnaseq_object, main_effects = "Tissue")
   expect_doppelganger_ci("plot.seqData", plot(rnaseq_object, transformation = "lcpm"))
-  
+
 })
