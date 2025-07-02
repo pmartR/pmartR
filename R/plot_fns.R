@@ -6071,7 +6071,9 @@ plot_omicsData <- function(omicsData, order_by, color_by, facet_by, facet_cols,
 #'   change sections in the barplot, defaults to TRUE
 #' @param show_sig This input is used when \code{plot_type = "gheatmap"}. A
 #'   logical value. If TRUE a visual indicator that a certain bin combination is
-#'   significant by the g-test is shown.
+#'   significant by the g-test is shown. This input is also used when 
+#'   when \code{plot_type = "histogram"}. If TRUE, only significant fold changes 
+#'   will be plotted.
 #' @param color_low This input is used when \code{plot_type = "gheatmap"}. A
 #'   character string specifying the color of the gradient for low count values.
 #' @param color_high This input is used when \code{plot_type = "gheatmap"}. A
@@ -6108,8 +6110,6 @@ plot_omicsData <- function(omicsData, order_by, color_by, facet_by, facet_cols,
 #'   axis. defaults to TRUE for seqData statistics and FALSE for all others.
 #' @param free_y_axis Logical. If TRUE the y axis for each bar plot can have its
 #'   own range. The default is FALSE.
-#' @param only_significant Logical. This input is used when \code{plot_type = "histogram"}. If
-#'    TRUE, only significant fold changes will be plotted. The default is FALSE
 #' @param ... further arguments passed to or from other methods.
 #'
 #' @details Plot types:
@@ -6193,7 +6193,6 @@ plot.statRes <- function(x,
                          custom_theme = NULL,
                          cluster = FALSE,
                          free_y_axis = FALSE,
-                         only_significant = FALSE,
                          ...) {
   # Make sure we only have valid arguments
   if (length(list(...)) > 0) {
@@ -6511,7 +6510,7 @@ plot.statRes <- function(x,
     
     p <- statres_histogram(x,fc_colors,text_size,x_lab,
                            y_lab, title_lab,legend_lab,
-                           free_y_axis,only_significant)
+                           free_y_axis,show_sig)
     if (bw_theme) p <- p +
       ggplot2::theme_bw() +
       ggplot2::theme(strip.background = ggplot2::element_rect(fill = "white"))
@@ -7312,7 +7311,7 @@ statres_volcano_plot <-
 #' @param y_lab character string specifying the y-axis label.
 #' @param title_lab character string specifying the plot title.
 #' @param legend_lab character string specifying the legend title.
-#' @param only_significant logical specifying whether only significant fold changes
+#' @param show_sig logical specifying whether only significant fold changes
 #'    are included in the histogram or all fold changes
 #'
 #' @return `ggplot` object - histogram
@@ -7328,7 +7327,7 @@ statres_histogram <-
            title_lab,
            legend_lab,
            free_y_axis,
-           only_significant) {
+           show_sig) {
     # If free_y_axis is true then each bar plot can have its own y axis range.
     if (free_y_axis) {
       da_scales <- "free"
@@ -7336,9 +7335,9 @@ statres_histogram <-
       da_scales <- NULL
     }
     
-    only_sig <- if (is.null(only_significant))
+    only_sig <- if (is.null(show_sig))
       TRUE else
-        only_significant
+        show_sig
     
     # Farm boy, do all the tedious label crap. As you wish.
     the_x_label <- if (is.null(x_lab))
@@ -7376,42 +7375,29 @@ statres_histogram <-
       dplyr::mutate(Significant = ifelse(Flag_A == 0, "Not Significant","Significant"))
     
     
-    
+    p <- x_long
+    # only_sig is TRUE we filter down to only those less than the p-value threshold
     if(only_sig == TRUE){
-      p <- x_long %>%
-        dplyr::filter(P_value_A < 0.05) %>%
+      p <- p %>% dplyr::filter(P_value_A < attributes(x)$pval_thresh)
+      if(nrow(p) == 0){
+        stop (paste0("There are no significant molecules in this analysis."))
+      }
+    }
+    
+    # make the plot
+    p <- p %>%
         dplyr::mutate(Significant = factor(Significant, levels = c("Significant", "Not Significant"))) %>%
         ggplot2::ggplot(ggplot2::aes(x = Fold_change, fill = Significant)) +
         ggplot2::geom_histogram(position = "identity", alpha = 1) +
-        ggplot2::theme_bw() +
         ggplot2::facet_wrap(~Comparison, scales = da_scales) +
         ggplot2::xlab(the_x_label) +
         ggplot2::xlab(the_x_label) +
         ggplot2::ylab(the_y_label) +
         ggplot2::ggtitle(the_title_label) +
         ggplot2::scale_fill_manual(
-          values = c(fc_colors[1], fc_colors[2]),
-          labels = c("Significant", "Not Significant"),
+          values = c("Significant" = fc_colors[1], "Not Significant" = fc_colors[2]),
           name = the_legend_label
         )
-    } else {
-      p <- x_long %>%
-        dplyr::mutate(Significant = factor(Significant, levels = c("Significant", "Not Significant"))) %>%
-        #dplyr::filter(P_value_A < 0.05) %>%
-        ggplot2::ggplot(ggplot2::aes(x = Fold_change, fill = Significant)) +
-        ggplot2::geom_histogram(position = "identity", alpha = 0.65) +
-        ggplot2::theme_bw() +
-        ggplot2::facet_wrap(~Comparison, scales = da_scales) +
-        ggplot2::xlab(the_x_label) +
-        ggplot2::xlab(the_x_label) +
-        ggplot2::ylab(the_y_label) +
-        ggplot2::ggtitle(the_title_label) +
-        ggplot2::scale_fill_manual(
-          values = c(fc_colors[1], fc_colors[2]),
-          labels = c("Significant", "Not Significant"),
-          name = the_legend_label
-        )
-    }
     
     return(p)
   }
