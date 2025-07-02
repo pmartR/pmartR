@@ -57,5 +57,5 @@ Suggests:
     vdiffr
 Additional_repositories:
     https://pmartR.github.io/drat
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
 Encoding: UTF-8
