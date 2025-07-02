@@ -2698,21 +2698,23 @@ plot.moleculeFilt <- function(x, min_num = NULL, cumulative = TRUE,
     )
 
   # Evan, make me a plot with beautiful colors. As you wish.
-  if (!is.null(palette)) {
-    # Use the ColorBrewer color and create the legend title
-    p <- p +
-      ggplot2::scale_fill_brewer(
-        palette = palette,
-        name = legend_lab
+  if(!cumulative){
+    if (!is.null(palette)) {
+      # Use the ColorBrewer color and create the legend title
+      p <- p +
+        ggplot2::scale_fill_brewer(
+          palette = palette,
+          name = legend_lab
+        )
+    } else {
+      p <- p + ggplot2::scale_fill_manual(
+        name = legend_lab,
+        values = c(
+          "dropped" = "red",
+          "retained" = "green"
+        )
       )
-  } else {
-    p <- p + ggplot2::scale_fill_manual(
-      name = legend_lab,
-      values = c(
-        "dropped" = "red",
-        "retained" = "green"
-      )
-    )
+    }
   }
 
   # Evan, make me an interactive plot. As you wish.

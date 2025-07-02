@@ -300,14 +300,15 @@ test_that('plot functions are producing desired output',{
                              test_method = 'comb',
                              pval_adjust_a_multcomp ='bon',
                              pval_adjust_g_multcomp = 'bon')
-  expect_doppelganger_ci("plot.statRes (combined)", plot(imd_anova_res, bw_theme = TRUE))
-
+  
+  expect_doppelganger_ci("plot.statRes (combined)", plot(imd_anova_res, bw_theme = TRUE))  ##
+  
+  ## Should probs change all left_joins to have the `by` argument
   expect_doppelganger_ci("plot.statRes (combined volcano)", plot(imd_anova_res, plot_type = "volcano", bw_theme = TRUE))
   ## Test plot.totalcountFilt --------------------------------------------------
   
   seqfilt <- total_count_filter(omicsData = rnaseq_object)
   expect_doppelganger_ci("plot.totalCountFilt", plot(seqfilt, min_count = 5))
-  
   ## Test plot.RNAFilt ---------------------------------------------------------
   
   seqfilt <- RNA_filter(omicsData = rnaseq_object)
@@ -382,41 +383,109 @@ test_that('pmartRdata plot tests', {
   ## silly names
   legend_lab <- c("Hey", "There")
   
-  rme_plots <- purrr::map2(list(groups_pair, groups, group_pair, group, pair),
-                           list("gsp", "gs", "gp", "g", "p"),
-                           function(rmd_results, label){
-                             
-                             ## suppressed for known warnings when color_by != Group or NULL
-                             suppressWarnings({
-                               suppressMessages({
-                                 expect_doppelganger_ci(paste0("plot.rmdFilt.",label), 
-                                                        plot(rmd_results))
-                                 expect_doppelganger_ci(paste0("plot.rmdFilt.color.",label), 
-                                                        plot(rmd_results, color_by = "SecondPhenotype"))
-                                 expect_doppelganger_ci(paste0("plot.rmdFilt.hist.",label),
-                                                        plot(rmd_results, hist = T))
-                                 expect_doppelganger_ci(paste0("plot.rmdFilt.color.hist.",label),
-                                                        plot(rmd_results, hist = T, color_by = "SecondPhenotype"))
-                                 expect_doppelganger_ci(paste0("plot.rmdFilt.pval.",label),
-                                                        plot(rmd_results, pvalue_threshold = 0.05))
-                                 expect_doppelganger_ci(paste0("plot.rmdFilt.sample",label), 
-                                                        plot(rmd_results, order_by = "SecondPhenotype", sampleID = "Sample_47_Phenotype3_A"))
+  # Expected warning/messages
+  warn_group <- "RMD calculated using designated experimental groups and may not be reflected in plot colors."
+  mess_bin <- "stat_bin" ## "{.fn {fun}} using {.code bins = 30}. Pick better value {.arg binwidth}."
+  
+  rme_plots <- purrr::map2(
+    list(groups_pair, groups, group_pair, group, pair),
+    list("gsp", "gs", "gp", "g", "p"),
+    function(rmd_results, label){
+      
+      ## Default scatter (Group) ##
+      expect_doppelganger_ci(
+        paste0("plot.rmdFilt.",label),
+        plot(rmd_results)
+        )
+      
+      ## Scatter, color_by
+      testthat::expect_warning(
+        expect_doppelganger_ci(
+          paste0("plot.rmdFilt.color.",label), 
+          plot(rmd_results, color_by = "SecondPhenotype")
+          ),
+        warn_group
+        )
+      
+      ## Default Histogram (Group)
+      testthat::expect_message(
+        expect_doppelganger_ci(
+          paste0("plot.rmdFilt.hist.",label),
+          plot(rmd_results, hist = T)
+          ),
+        mess_bin
+      )
+      
+      ## Histogram, color_by
+      testthat::expect_message(
+        testthat::expect_warning(
+          expect_doppelganger_ci(
+            paste0("plot.rmdFilt.color.hist.",label),
+            plot(rmd_results, hist = T, color_by = "SecondPhenotype")
+            ),
+          warn_group
+        ),
+        mess_bin
+      )
+      
+      ## Scatter, p-value
+      expect_doppelganger_ci(
+        paste0("plot.rmdFilt.pval.",label),
+        plot(rmd_results, pvalue_threshold = 0.05)
+        )
+      
+      ## Boxplots
+      expect_doppelganger_ci(
+        paste0("plot.rmdFilt.sample",label), 
+        plot(rmd_results, sampleID = "Sample_47_Phenotype3_A")
+        )
+      
+      ## As above, with new labels for correct placement
                                  
-                                 expect_doppelganger_ci(paste0("plot.rmdFilt.legend.",label),
-                                                        plot(rmd_results, legend_lab = legend_lab))
-                                 expect_doppelganger_ci(paste0("plot.rmdFilt.color.legend.",label),
-                                                        plot(rmd_results, color_by = "SecondPhenotype", legend_lab = legend_lab))
-                                 expect_doppelganger_ci(paste0("plot.rmdFilt.hist.legend.",label),
-                                                        plot(rmd_results, hist = T, legend_lab = legend_lab))
-                                 expect_doppelganger_ci(paste0("plot.rmdFilt.color.hist.legend.",label),
-                                                        plot(rmd_results, hist = T, color_by = "SecondPhenotype", legend_lab = legend_lab))
-                                 expect_doppelganger_ci(paste0("plot.rmdFilt.pval.legend.",label),
-                                                        plot(rmd_results, pvalue_threshold = 0.05, legend_lab = legend_lab))
-                                 expect_doppelganger_ci(paste0("plot.rmdFilt.sample.legend.",label),
-                                                        plot(rmd_results, order_by = "SecondPhenotype", sampleID = "Sample_47_Phenotype3_A", legend_lab = legend_lab))
-                               })
-                             })
-                           })
+       expect_doppelganger_ci(
+         paste0("plot.rmdFilt.legend.",label),
+         plot(rmd_results, legend_lab = legend_lab)
+         )
+       
+       testthat::expect_warning(
+         expect_doppelganger_ci(
+           paste0("plot.rmdFilt.color.legend.",label),
+           plot(rmd_results, color_by = "SecondPhenotype", legend_lab = legend_lab)
+           ),
+         warn_group
+       )
+       
+       testthat::expect_message(
+         expect_doppelganger_ci(
+           paste0("plot.rmdFilt.hist.legend.",label),
+           plot(rmd_results, hist = T, legend_lab = legend_lab)
+           ),
+         mess_bin,
+       )
+       
+       testthat::expect_message(
+         testthat::expect_warning(
+           expect_doppelganger_ci(
+             paste0("plot.rmdFilt.color.hist.legend.",label),
+             plot(rmd_results, hist = T, color_by = "SecondPhenotype", legend_lab = legend_lab)
+             ),
+           warn_group
+         ),
+         mess_bin
+       )
+       
+       expect_doppelganger_ci(
+         paste0("plot.rmdFilt.pval.legend.",label),
+         plot(rmd_results, pvalue_threshold = 0.05, legend_lab = legend_lab)
+         )
+       
+       expect_doppelganger_ci(
+         paste0("plot.rmdFilt.sample.legend.",label),
+         plot(rmd_results, sampleID = "Sample_47_Phenotype3_A", legend_lab = legend_lab)
+         )
+       
+       
+       })
   
 })
 
