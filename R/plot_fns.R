@@ -4258,7 +4258,7 @@ plot.rmdFilt <- function(x, pvalue_threshold = NULL, sampleID = NULL,
           dplyr::group_by_at(dplyr::vars(samp_id)) %>% 
           dplyr::reframe(
             pair_pch = ifelse(Reduce("&", list(!.data$out, .data$diverge)), "Removed because paired with outlier", NA),
-            alpha = ifelse(Reduce("|", list(Reduce("&", list(!.data$out, .data$diverge)), out)), 1, 0.5)
+            alpha = ifelse(Reduce("|", list(Reduce("&", list(!.data$out, .data$diverge)), .data$out)), 1, 0.5)
           )
         
         filter_object <- dplyr::left_join(filter_object, pair_df, by = samp_id)
@@ -4307,7 +4307,7 @@ plot.rmdFilt <- function(x, pvalue_threshold = NULL, sampleID = NULL,
         x = !!dplyr::sym(samp_id),
         y = Log2.md,
         color = color,
-        shape = pch
+        shape = .data$pch
         )
       ) +
       ggplot2::geom_point(
@@ -4338,7 +4338,7 @@ plot.rmdFilt <- function(x, pvalue_threshold = NULL, sampleID = NULL,
       
       p <- p + ggplot2::geom_point(
         data = pair_pch_df,
-        ggplot2::aes(fill = pair_pch),
+        ggplot2::aes(fill = .data$pair_pch),
         alpha = .8,
         shape = 4,
         color = "black",
