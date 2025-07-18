@@ -7363,22 +7363,22 @@ statres_histogram <-
       tidyr::pivot_longer(dplyr::starts_with("P_value_A"),
                           names_to = "Comparison2",
                           values_to = "P_value_A") %>%
-      dplyr::mutate(Comparison2 = stringr::str_remove(Comparison2, "P_value_A_")) %>%
-      dplyr::filter(Comparison == Comparison2) %>%
-      dplyr::select(-Comparison2) %>%
+      dplyr::mutate(Comparison2 = stringr::str_remove(.data$Comparison2, "P_value_A_")) %>%
+      dplyr::filter(Comparison == .data$Comparison2) %>%
+      dplyr::select(-c(dplyr::one_of("Comparison2"))) %>%
       tidyr::pivot_longer(dplyr::starts_with("Flag_A"),
                           names_to = "Comparison3",
                           values_to = "Flag_A") %>%
-      dplyr::mutate(Comparison3 = stringr::str_remove(Comparison3, "Flag_A_")) %>%
-      dplyr::filter(Comparison == Comparison3) %>%
-      dplyr::select(-Comparison3) %>%
+      dplyr::mutate(Comparison3 = stringr::str_remove(.data$Comparison3, "Flag_A_")) %>%
+      dplyr::filter(Comparison == .data$Comparison3) %>%
+      dplyr::select(-c(dplyr::one_of("Comparison3"))) %>%
       dplyr::mutate(Significant = ifelse(Flag_A == 0, "Not Significant","Significant"))
     
-    
+
     p <- x_long
     # only_sig is TRUE we filter down to only those less than the p-value threshold
     if(only_sig == TRUE){
-      p <- p %>% dplyr::filter(P_value_A < attributes(x)$pval_thresh)
+      p <- p %>% dplyr::filter(.data$P_value_A < attributes(x)$pval_thresh)
       if(nrow(p) == 0){
         stop (paste0("There are no significant molecules in this analysis."))
       }
@@ -7386,7 +7386,7 @@ statres_histogram <-
     
     # make the plot
     p <- p %>%
-        dplyr::mutate(Significant = factor(Significant, levels = c("Significant", "Not Significant"))) %>%
+        dplyr::mutate(Significant = factor(.data$Significant, levels = c("Significant", "Not Significant"))) %>%
         ggplot2::ggplot(ggplot2::aes(x = Fold_change, fill = Significant)) +
         ggplot2::geom_histogram(position = "identity", alpha = 1) +
         ggplot2::facet_wrap(~Comparison, scales = da_scales) +
