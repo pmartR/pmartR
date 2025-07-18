@@ -7373,7 +7373,6 @@ statres_histogram <-
       dplyr::filter(Comparison == .data$Comparison3) %>%
       dplyr::select(-c(dplyr::one_of("Comparison3"))) %>%
       dplyr::mutate(Significant = ifelse(Flag_A == 0, "Not Significant","Significant"))
-    
 
     p <- x_long
     # only_sig is TRUE we filter down to only those less than the p-value threshold
