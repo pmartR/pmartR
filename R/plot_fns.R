@@ -7353,7 +7353,6 @@ statres_histogram <-
       "Fold Change Significance" else
         legend_lab
     
-    
     # make the data long by anova comparisons, p-values, and flag
     x_long <- x %>%
       tidyr::pivot_longer(dplyr::starts_with("Fold_change_"),
