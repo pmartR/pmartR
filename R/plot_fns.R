@@ -7388,9 +7388,8 @@ statres_histogram <-
     p <- p %>%
         dplyr::mutate(Significant = factor(.data$Significant, levels = c("Significant", "Not Significant"))) %>%
         ggplot2::ggplot(ggplot2::aes(x = Fold_change, fill = Significant)) +
-        ggplot2::geom_histogram(position = "identity", alpha = 1) +
+        ggplot2::geom_histogram(position = "identity", alpha = 0.75) +
         ggplot2::facet_wrap(~Comparison, scales = da_scales) +
-        ggplot2::xlab(the_x_label) +
         ggplot2::xlab(the_x_label) +
         ggplot2::ylab(the_y_label) +
         ggplot2::ggtitle(the_title_label) +
