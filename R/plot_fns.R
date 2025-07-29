@@ -7358,7 +7358,7 @@ statres_histogram <-
       tidyr::pivot_longer(dplyr::starts_with("Fold_change_"),
                           names_to = "Comparison",
                           values_to = "Fold_change") %>%
-      dplyr::mutate(Comparison = stringr::str_remove(Comparison,"Fold_change_")) %>%
+      dplyr::mutate(Comparison = stringr::str_remove(.data$Comparison,"Fold_change_")) %>%
       tidyr::pivot_longer(dplyr::starts_with("P_value_A"),
                           names_to = "Comparison2",
                           values_to = "P_value_A") %>%
@@ -7371,7 +7371,7 @@ statres_histogram <-
       dplyr::mutate(Comparison3 = stringr::str_remove(.data$Comparison3, "Flag_A_")) %>%
       dplyr::filter(Comparison == .data$Comparison3) %>%
       dplyr::select(-c(dplyr::one_of("Comparison3"))) %>%
-      dplyr::mutate(Significant = ifelse(Flag_A == 0, "Not Significant","Significant"))
+      dplyr::mutate(Significant = ifelse(.data$Flag_A == 0, "Not Significant","Significant"))
 
     p <- x_long
     # only_sig is TRUE we filter down to only those less than the p-value threshold
@@ -7385,9 +7385,9 @@ statres_histogram <-
     # make the plot
     p <- p %>%
         dplyr::mutate(Significant = factor(.data$Significant, levels = c("Significant", "Not Significant"))) %>%
-        ggplot2::ggplot(ggplot2::aes(x = Fold_change, fill = Significant)) +
+        ggplot2::ggplot(ggplot2::aes(x = .data$Fold_change, fill = .data$Significant)) +
         ggplot2::geom_histogram(position = "identity", alpha = 0.75) +
-        ggplot2::facet_wrap(~Comparison, scales = da_scales) +
+        ggplot2::facet_wrap(~.data$Comparison, scales = da_scales) +
         ggplot2::xlab(the_x_label) +
         ggplot2::ylab(the_y_label) +
         ggplot2::ggtitle(the_title_label) +
