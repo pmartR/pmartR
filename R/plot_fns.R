@@ -7305,12 +7305,12 @@ statres_volcano_plot <-
 #'   \code{\link[pmartR:plot.statRes]{pmartR::plot.statRes()}}
 #' @param text_size An integer specifying the size of the text (number of
 #'   non-missing values) within the plot. The default is 3.
-#' @param display_count logical value. Indicates whether the non-missing counts will
 #'   be displayed on the bar plot. The default is TRUE.
 #' @param x_lab character string specifying the x-axis label.
 #' @param y_lab character string specifying the y-axis label.
 #' @param title_lab character string specifying the plot title.
 #' @param legend_lab character string specifying the legend title.
+#' @param free_y_axis logical specifying whether to use \code{scales = 'free'} in \code{ggplot2::facet_wrap}
 #' @param show_sig logical specifying whether only significant fold changes
 #'    are included in the histogram or all fold changes
 #'

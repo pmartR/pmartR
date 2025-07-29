@@ -21,7 +21,8 @@ statres_histogram(
 \code{\link[pmartR:plot.statRes]{pmartR::plot.statRes()}}}
 
 \item{text_size}{An integer specifying the size of the text (number of
-non-missing values) within the plot. The default is 3.}
+non-missing values) within the plot. The default is 3.
+be displayed on the bar plot. The default is TRUE.}
 
 \item{x_lab}{character string specifying the x-axis label.}
 
@@ -31,11 +32,10 @@ non-missing values) within the plot. The default is 3.}
 
 \item{legend_lab}{character string specifying the legend title.}
 
+\item{free_y_axis}{logical specifying whether to use \code{scales = 'free'} in \code{ggplot2::facet_wrap}}
+
 \item{show_sig}{logical specifying whether only significant fold changes
 are included in the histogram or all fold changes}
-
-\item{display_count}{logical value. Indicates whether the non-missing counts will
-be displayed on the bar plot. The default is TRUE.}
 }
 \value{
 `ggplot` object - histogram
