@@ -731,3 +731,48 @@ test_that('all tests conform to the decrees of the God of Stats', {
   
   expect_true(mean(truth_df[, all_idx], na.rm=T) < 0.001)
 })
+
+test_that('Numeric columns dont break things', {
+  testthat::skip_on_cran()
+  load(system.file('testdata',
+    'standards_filter.RData',
+    package = 'pmartR'
+  ))
+
+  # Load IMD-ANOVA standards ---------------------------------------------------
+
+  load(system.file('testdata',
+    'standards_imd_anova.RData',
+    package = 'pmartR'
+  ))
+
+  ## 2 main effects
+  afilta_2_2_4$f_data$Level <- ifelse(afilta_2_2_4$f_data$Level == "high", 1, 0)
+  afilta_2_2_4 <- group_designation(afilta_2_2_4, main_effects = c("Condition", "Level"), covariates = c("Gender", "Age"))
+
+  gfilta_2_2_4$f_data$Level <- ifelse(gfilta_2_2_4$f_data$Level == "high", 1, 0)
+  gfilta_2_2_4 <- group_designation(gfilta_2_2_4, main_effects = c("Condition", "Level"), covariates = c("Gender", "Age"))
+
+  cfilta_2_2_4$f_data$Level <- ifelse(cfilta_2_2_4$f_data$Level == "high", 1, 0)
+  cfilta_2_2_4 <- group_designation(cfilta_2_2_4, main_effects = c("Condition", "Level"), covariates = c("Gender", "Age"))
+  
+  afruit_2_2_4 <- imd_anova(afilta_2_2_4,
+    test_method = "anova",
+    model_selection = "auto"
+  )
+
+  gfruit_2_2_4 <- imd_anova(gfilta_2_2_4,
+    test_method = "gtest",
+    model_selection = "auto",
+    parallel = FALSE
+  )
+  cfruit_2_2_4 <- imd_anova(cfilta_2_2_4,
+    test_method = "combined",
+    model_selection = "auto"
+  )
+
+  # simply check if the output is correct
+  expect_true(all.equal(astan_2_2_4, afruit_2_2_4, check.attributes = F))
+  expect_true(all.equal(gstan_2_2_4, gfruit_2_2_4, check.attributes = F))
+  expect_true(all.equal(cstan_2_2_4, cfruit_2_2_4, check.attributes = F))
+})
