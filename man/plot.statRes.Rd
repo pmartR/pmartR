@@ -49,14 +49,19 @@ change less than \code{abs(fc_threshold)} are colored as 'non-significant'
 \item{fc_colors}{vector of length three with character color values
 interpretable by ggplot. i.e. c("orange", "black", "blue") with the values
 being used to color negative, non-significant, and positive fold changes
-respectively}
+respectively. When \code{plot_type = "histogram"}, this a vector of length two
+with character color values interpretable by ggplot. i.e. c("green","gray") with the
+values being used to color significant (regardless of direction)
+and non-significant fold changes}
 
 \item{stacked}{TRUE/FALSE for whether to stack positive and negative fold
 change sections in the barplot, defaults to TRUE}
 
 \item{show_sig}{This input is used when \code{plot_type = "gheatmap"}. A
 logical value. If TRUE a visual indicator that a certain bin combination is
-significant by the g-test is shown.}
+significant by the g-test is shown. This input is also used when 
+when \code{plot_type = "histogram"}. If TRUE, only significant fold changes 
+will be plotted.}
 
 \item{color_low}{This input is used when \code{plot_type = "gheatmap"}. A
 character string specifying the color of the gradient for low count values.}
@@ -136,6 +141,8 @@ Plot types:
  number of biomolecules that fall into that combination of nonmissing values.
  \item{"fcheatmap"} Heatmap showing all biomolecules across comparisons,
  colored by fold change.
+ \item{"histogram"} Histogram showing the distribution of log2 fold changes
+ across comparisons, colored by significance level status
 }
 }
 \examples{
