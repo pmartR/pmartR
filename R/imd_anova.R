@@ -703,27 +703,31 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
   # }
 
   samp_cname <- attr(omicsData, "cnames")$fdata_cname
-
+  covariate_names = colnames(attr(attr(omicsData, "group_DF"), "covariates"))[-1]
+  main_effect_names = attr(attr(omicsData, "group_DF"), "main_effects")
+  
   # 10/27/2021 Not sure when/if the columns in e_data could be different from
   # the rows in group_DF. We are leaving the following code how it is to prevent
   # any unforeseen and unfortunate cases where groupData (the group_DF
   # attribute) has more columns than e_data (yikes!).
-
+  
   # Remove rows in "groupData" that don't have corresponding columns in
   # 'omicsData$edata'
   # The sampleIDs in groupData (possibly more than is in the e_data)
   group_samp_cname <- groupData[, samp_cname]
   # Only keep the rows of groupData that have columns in e_data
   groupData <- groupData[group_samp_cname%in%colnames(omicsData$e_data),]
-  groupData <- groupData %>% 
-    dplyr::left_join(omicsData$f_data)
-  
-  covariate_names = colnames(attr(attr(omicsData, "group_DF"), "covariates"))[-1]
-  main_effect_names = attr(attr(omicsData, "group_DF"), "main_effects")
   
   #Create a data matrix that only includes the samples in "groupData" and put them in the order specified by
   #"groupData"
   data <- omicsData$e_data[,as.character(groupData[,samp_cname])]
+  
+  # need to grab main effect and covariate columns
+  groupData <- groupData %>%
+    dplyr::left_join(
+      omicsData$f_data |> 
+        dplyr::mutate(dplyr::across(dplyr::one_of(main_effect_names), as.character))
+    )
   
   # Create a NULL object for covariate data. This will be used to determine if
   # this object has been modified in the paired section.
