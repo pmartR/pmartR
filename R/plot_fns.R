@@ -7399,6 +7399,230 @@ statres_histogram <-
     return(p)
   }
 
+#' Plot Heatmap omicsData Object
+#'
+#' For plotting an S3 object of type 'omicsData'
+#'
+#' @param omicsData an object of the class 'pepData', 'isobaricpepData',
+#'   'proData', 'lipidData', 'metabData', or 'nmrData' created via
+#'   \code{\link{as.pepData}}, \code{\link{as.isobaricpepData}},
+#'   \code{\link{as.proData}}, \code{\link{as.lipidData}},
+#'   \code{\link{as.metabData}}, or \code{\link{as.nmrData}}, respectively.
+#' @param autoscale logical value. Indicates whether abundance values should be
+#'    autoscaled prior to plotting heatmap
+#' @param include_names logical value. Indicates whether molecule names should be
+#'    included in the plot
+#' @param order_by A character string specifying a column in f_data by which to
+#'   order the samples.
+#' @param x_lab character string specifying the x-axis label
+#' @param y_lab character string specifying the y-axis label
+#' @param x_lab_size integer value indicating the font size for the x-axis.
+#'   The default is 11.
+#' @param y_lab_size integer value indicating the font size for the y-axis.
+#'   The default is 11.
+#' @param x_lab_angle integer value indicating the angle of x-axis labels.
+#'   The default is 90.
+#' @param title_lab character string specifying the plot title
+#' @param title_lab_size integer value indicating the font size of the plot
+#'   title. The default is 14.
+#' @param color_low character string specifying the color of the gradient for
+#'   low values
+#' @param color_high character string specifying the color of the gradient for
+#'   high values
+#'
+#' @return ComplexHeatmap Heatmap plot object
+#'
+#' @rdname plot-heatmap
+#'
+#' @examplesIf requireNamespace("pmartRdata", quietly = TRUE)
+#' library(pmartRdata)
+#' mymetab <- edata_transform(omicsData = metab_object, data_scale = "log2")
+#' omics_heatmap(mymetab, order_by = "Phenotype", autoscale = TRUE,
+#'    x_lab = "SampleID", y_lab = "Autoscaled Abundance")
+#'
+#' @export
+#'
+omics_heatmap <- function(omicsData, autoscale = FALSE, include_names = FALSE,
+                          order_by = NULL,
+                          x_lab = NULL, y_lab = NULL,
+                          x_lab_size = 11, y_lab_size = 11,
+                          title_lab = NULL, title_lab_size = 14,
+                          color_low = "blue", color_high = "red"){
+  
+  # Preliminaries --------------------------------------------------------------
+  
+  # Keeping the user honest ---------------
+  
+  # Farm boy, make sure the data is the correct class. As you wish.
+  # check that omicsData is of appropriate class #
+  if (!inherits(omicsData, c(
+    "pepData", "proData", "metabData",
+    "lipidData", "nmrData"
+  ))) {
+    # INCONCEIVABLE!!!
+    stop(paste("omicsData must be of class 'isobaricpepData', 'lipidData'",
+               "'metabData', 'nmrData', 'pepData', 'proData'.",
+               sep = " "
+    ))
+  }
+  
+  # order_by must be a character of length 1
+  if (!is.null(order_by)) {
+    if (!is.character(order_by) || length(order_by) > 1)
+      stop("order_by must be a character vector of length 1")
+    
+    # check that order_by is a column in the f_data
+    if(!order_by %in% names(omicsData$f_data)){
+      stop ("order_by must be a name of a column in f_data of omicsData")
+    }
+  }
+  
+  # check for NAs (not relevant unless we want to allow for clustering)
+  
+  # autoscale
+  # must be of length 1
+  if(length(autoscale) != 1){
+    stop (paste("If not null, autoscale must be of length 1"))
+  }
+  # must be logical
+  if(!is.logical(autoscale)){
+    stop (paste("If not null, autoscale must be of class logical"))
+  }
+  
+  # include_names
+  # must be of length 1
+  if(length(include_names) != 1){
+    stop (paste("If not null, include_names must be of length 1"))
+  }
+  # must be logical
+  if(!is.logical(include_names)){
+    stop (paste("If not null, include_names must be of class logical"))
+  }
+  
+  # title_lab
+  # must be of length 1
+  if(!is.null(title_lab) && length(title_lab) != 1){
+    stop (paste("If not null, title_lab must be of length 1"))
+  }
+  # must be a character
+  if(!is.null(title_lab) && !is.character(title_lab)){
+    stop (paste("If not null, title_lab must be of class character"))
+  }
+  
+  # x_lab
+  # must be of length 1
+  if(!is.null(x_lab) && length(x_lab) != 1){
+    stop (paste("If not null, x_lab must be of length 1"))
+  }
+  # must be a character
+  if(!is.null(x_lab) && !is.character(x_lab)){
+    stop (paste("If not null, x_lab must be of class character"))
+  }
+  
+  # y_lab
+  # must be of length 1
+  if(!is.null(y_lab) && length(y_lab) != 1){
+    stop (paste("If not null, y_lab must be of length 1"))
+  }
+  # must be a character
+  if(!is.null(y_lab) && !is.character(y_lab)){
+    stop (paste("If not null, y_lab must be of class character"))
+  }
+  
+  # x_lab_size
+  # must be of length 1
+  if(length(x_lab_size) != 1){
+    stop (paste("If not null, x_lab_size must be of length 1"))
+  }
+  # must be a number
+  if(!is.numeric(x_lab_size)){
+    stop (paste("If not null, x_lab_size must be of class numeric"))
+  }
+  
+  # y_lab_size
+  # must be of length 1
+  if(length(y_lab_size) != 1){
+    stop (paste("If not null, y_lab_size must be of length 1"))
+  }
+  # must be a number
+  if(!is.numeric(y_lab_size)){
+    stop (paste("If not null, y_lab_size must be of class numeric"))
+  }
+  
+  # title_lab_size
+  # must be of length 1
+  if(length(title_lab_size) != 1){
+    stop (paste("If not null, title_lab_size must be of length 1"))
+  }
+  # must be a number
+  if(!is.numeric(title_lab_size)){
+    stop (paste("If not null, title_lab_size must be of class numeric"))
+  }
+  
+  # color_low
+  # must be of length 1
+  if(length(color_low) != 1){
+    stop (paste("If not null, color_low must be of length 1"))
+  }
+  try_color_low <- try(col2rgb(color_low), silent = TRUE)
+  if("try-error" %in% class(try_color_low)){
+    stop(paste("color_low must be a valid color name for the the function col2rbg"))
+  }
+  
+  # color_high
+  # must be of length 1
+  if(length(color_high) != 1){
+    stop (paste("If not null, color_high must be of length 1"))
+  }
+  try_color_high <- try(col2rgb(color_high), silent = TRUE)
+  if("try-error" %in% class(try_color_high)){
+    stop(paste("color_high must be a valid color name for the the function col2rbg"))
+  }
+  
+  ####### RUN THE FUNCTION ########
+  edata_cname = pmartR::get_edata_cname(omicsData)
+  fdata_cname = pmartR::get_fdata_cname(omicsData)
+  
+  # convert edata to a matrix
+  edata <- omicsData$e_data %>%
+    tibble::column_to_rownames(var = edata_cname)
+  edata_matrix <- as.matrix(edata)
+  
+  # scale the data if autoscale = TRUE
+  if(autoscale == TRUE){
+    edata_matrix <- as.matrix(DiffCorr::scalingMethods(edata_matrix, methods = "auto"))
+  }
+  
+  # order the data by the order_by component if that is not null
+  if(!is.null(order_by)){
+    fdata_ordered <- omicsData$f_data %>%
+      dplyr::arrange(!!as.symbol(order_by))
+    samples_ordered <- fdata_ordered[[fdata_cname]]
+    edata_matrix <- edata_matrix[,samples_ordered]
+  }
+  
+  # update label information
+  title_lab = ifelse(is.null(title_lab)," ",title_lab)
+  x_lab = ifelse(is.null(x_lab), "", x_lab)
+  y_lab = ifelse(is.null(y_lab), "", y_lab)
+  
+  # make the plot
+  p <- ComplexHeatmap::Heatmap(edata_matrix,
+                               column_title = x_lab,
+                               column_title_gp = grid::gpar(fontsize = x_lab_size),
+                               row_title = y_lab,
+                               row_title_gp = grid::gpar(fontsize = y_lab_size),
+                               show_row_names = include_names,
+                               col = c(color_low,"white",color_high),
+                               name = title_lab,
+                               cluster_rows = FALSE,
+                               cluster_columns = FALSE,
+                               heatmap_legend_param = list(title_gp = grid::gpar(fontsize = title_lab_size)))
+  
+  # plot the plot
+  return(p)
+}
+
 #' Require Plotly
 #'
 #' Loads plotly if installed, else prints a message telling the user to install
