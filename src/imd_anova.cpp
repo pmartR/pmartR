@@ -447,7 +447,7 @@ List two_factor_anova_cpp(arma::mat data,
       arma::colvec residual_vec = yrowi_nona.t();
       residual_vec = residual_vec - X_red_nona*PxRed;
       
-      sigma2_red = arma::conv_to<double>::from(residual_vec.t()*residual_vec/df_red);
+      sigma2_red = arma::as_scalar(residual_vec.t()*residual_vec/df_red);
       
       sig_est(i) = sigma2_red;
       dof(i) = df_red;
@@ -461,7 +461,7 @@ List two_factor_anova_cpp(arma::mat data,
       arma::colvec residual_vec = yrowi_nona.t();
       residual_vec = residual_vec - X_full_nona*PxFull;
       
-      sigma2_full = arma::conv_to<double>::from(residual_vec.t()*residual_vec/df_full);
+      sigma2_full = arma::as_scalar(residual_vec.t()*residual_vec/df_full);
       
       sig_est(i) = sigma2_full;
       dof(i) = df_full;
@@ -475,7 +475,7 @@ List two_factor_anova_cpp(arma::mat data,
       arma::colvec residual_vec = yrowi_nona.t();
       residual_vec = residual_vec - X_red_nona*PxRed;
   
-      sigma2_red = arma::conv_to<double>::from(residual_vec.t()*residual_vec/df_red);
+      sigma2_red = arma::as_scalar(residual_vec.t()*residual_vec/df_red);
   
       if((df_red-df_full)<=0){
         //If interaction can't be estimated, automatically select smaller model
@@ -488,7 +488,7 @@ List two_factor_anova_cpp(arma::mat data,
         arma::colvec residual_vec = yrowi_nona.t();
         residual_vec = residual_vec - X_full_nona*PxFull;
   
-        sigma2_full = arma::conv_to<double>::from(residual_vec.t()*residual_vec/df_full);
+        sigma2_full = arma::as_scalar(residual_vec.t()*residual_vec/df_full);
   
         Fstat(i) = (sigma2_red*df_red-sigma2_full*df_full)/sigma2_full;
         pval(i) = R::pf(Fstat(i),df_red-df_full,df_full,0,0);
@@ -667,7 +667,7 @@ List group_comparison_anova_cpp(arma::mat means, arma::mat data, arma::mat sizes
     for(int k=0; k<num_comparisons; k++){
 
       //Only compute p-values if the degrees of freedom are atleast 3
-      if (arma::is_finite(t_tests(i,k)) && dof > 0) {
+      if (std::isfinite(t_tests(i,k)) && dof > 0) {
         p_values(i,k) = 2*R::pt(fabs(t_tests(i,k)),
                  dof,
                  false,
