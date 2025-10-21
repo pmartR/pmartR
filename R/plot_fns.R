@@ -5019,6 +5019,16 @@ plot.normRes <- function(x, order_by = NULL, color_by = NULL,
 #'   \code{\link[RColorBrewer]{RColorBrewer}}.
 #' @param use_VizSampNames logical value. Indicates whether to use custom sample
 #'   names. The default is FALSE.
+#' @param plot_type character string specifying the plot type (either boxplot or heatmap)
+#' @param autoscale logical value. If TRUE data is autoscaled for heatmap. This argument
+#'   is not relevant for when plot_type is set to boxplot
+#' @param include_names logical value. If TRUE molecule names are included in heatmap. This argument
+#'   is not relevant for when plot_type is set to boxplot
+#' @param color_low character string of a color for the low values in heatmap. This argument
+#'   is not relevant character string of a color for the high values in heatmap. for when plot_type is set to boxplot
+#' @param color_high This argument
+#'   is not relevant for when plot_type is set to boxplot
+#' @param ... further arguments passed to or from other methods.
 #' @param ... further arguments passed to or from other methods.
 #'
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
@@ -5041,26 +5051,37 @@ plot.isobaricpepData <- function(x, order_by = NULL, color_by = NULL,
                                  title_lab = NULL, title_lab_size = 14,
                                  legend_lab = NULL, legend_position = "right",
                                  ylimit = NULL, bw_theme = TRUE,
-                                 palette = NULL, use_VizSampNames = FALSE,
+                                 palette = NULL, use_VizSampNames = FALSE, plot_type = "boxplot",
+                                 autoscale = FALSE, include_names = FALSE,
+                                 color_low = "blue",color_high = "red",
                                  ...) {
   # Make sure we only have valid arguments
   if (length(list(...)) > 0) {
     warning("unused argument(s): ",
              toString(as.list(tail(match.call(), length(list(...))))))
   }
-
-  # Farm boy, make me a plot with an isobaricpepData object. As you wish.
-  plot_omicsData(
-    omicsData = x, order_by = order_by,
-    color_by = color_by, facet_by = facet_by,
-    facet_cols = facet_cols, interactive = interactive,
-    x_lab = x_lab, y_lab = y_lab, x_lab_size = x_lab_size,
-    y_lab_size = y_lab_size, x_lab_angle = x_lab_angle,
-    title_lab = title_lab, title_lab_size = title_lab_size,
-    legend_lab = legend_lab, legend_position = legend_position,
-    ylimit = ylimit, bw_theme = bw_theme, palette = palette,
-    use_VizSampNames = use_VizSampNames
-  )
+  
+  # Farm boy, make me a plot with a metabData object. As you wish.
+  if(plot_type == "heatmap"){
+    # checks for variables that are not 
+    omics_heatmap(omicsData = x, autoscale = autoscale, include_names = include_names,
+                  order_by = order_by,x_lab = x_lab, y_lab = y_lab,
+                  x_lab_size = x_lab_size, y_lab_size = y_lab_size,
+                  title_lab = title_lab, title_lab_size = title_lab_size,
+                  color_low = color_low, color_high = color_high)
+  } else {
+    plot_omicsData(
+      omicsData = x, order_by = order_by,
+      color_by = color_by, facet_by = facet_by,
+      facet_cols = facet_cols, interactive = interactive,
+      x_lab = x_lab, y_lab = y_lab, x_lab_size = x_lab_size,
+      y_lab_size = y_lab_size, x_lab_angle = x_lab_angle,
+      title_lab = title_lab, title_lab_size = title_lab_size,
+      legend_lab = legend_lab, legend_position = legend_position,
+      ylimit = ylimit, bw_theme = bw_theme, palette = palette,
+      use_VizSampNames = use_VizSampNames
+    )
+  }
 }
 
 #' Plot lipidData Object
@@ -5107,6 +5128,16 @@ plot.isobaricpepData <- function(x, order_by = NULL, color_by = NULL,
 #'   \code{\link[RColorBrewer]{RColorBrewer}}.
 #' @param use_VizSampNames logical value. Indicates whether to use custom sample
 #'   names. The default is FALSE.
+#' @param plot_type character string specifying the plot type (either boxplot or heatmap)
+#' @param autoscale logical value. If TRUE data is autoscaled for heatmap. This argument
+#'   is not relevant for when plot_type is set to boxplot
+#' @param include_names logical value. If TRUE molecule names are included in heatmap. This argument
+#'   is not relevant for when plot_type is set to boxplot
+#' @param color_low character string of a color for the low values in heatmap. This argument
+#'   is not relevant character string of a color for the high values in heatmap. for when plot_type is set to boxplot
+#' @param color_high This argument
+#'   is not relevant for when plot_type is set to boxplot
+#' @param ... further arguments passed to or from other methods.
 #' @param ... further arguments passed to or from other methods.
 #'
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
@@ -5128,25 +5159,36 @@ plot.lipidData <- function(x, order_by = NULL, color_by = NULL,
                            title_lab = NULL, title_lab_size = 14,
                            legend_lab = NULL, legend_position = "right",
                            ylimit = NULL, bw_theme = TRUE, palette = NULL,
-                           use_VizSampNames = FALSE, ...) {
+                           use_VizSampNames = FALSE, plot_type = "boxplot",
+                           autoscale = FALSE, include_names = FALSE,
+                           color_low = "blue",color_high = "red",...) {
   # Make sure we only have valid arguments
   if (length(list(...)) > 0) {
     warning("unused argument(s): ",
              toString(as.list(tail(match.call(), length(list(...))))))
   }
 
-  # Farm boy, make me a plot with a lipidData object. As you wish.
-  plot_omicsData(
-    omicsData = x, order_by = order_by,
-    color_by = color_by, facet_by = facet_by,
-    facet_cols = facet_cols, interactive = interactive,
-    x_lab = x_lab, y_lab = y_lab, x_lab_size = x_lab_size,
-    y_lab_size = y_lab_size, x_lab_angle = x_lab_angle,
-    title_lab = title_lab, title_lab_size = title_lab_size,
-    legend_lab = legend_lab, legend_position = legend_position,
-    ylimit = ylimit, bw_theme = bw_theme, palette = palette,
-    use_VizSampNames = use_VizSampNames
-  )
+  # Farm boy, make me a plot with a metabData object. As you wish.
+  if(plot_type == "heatmap"){
+    # checks for variables that are not 
+    omics_heatmap(omicsData = x, autoscale = autoscale, include_names = include_names,
+                  order_by = order_by,x_lab = x_lab, y_lab = y_lab,
+                  x_lab_size = x_lab_size, y_lab_size = y_lab_size,
+                  title_lab = title_lab, title_lab_size = title_lab_size,
+                  color_low = color_low, color_high = color_high)
+  } else {
+    plot_omicsData(
+      omicsData = x, order_by = order_by,
+      color_by = color_by, facet_by = facet_by,
+      facet_cols = facet_cols, interactive = interactive,
+      x_lab = x_lab, y_lab = y_lab, x_lab_size = x_lab_size,
+      y_lab_size = y_lab_size, x_lab_angle = x_lab_angle,
+      title_lab = title_lab, title_lab_size = title_lab_size,
+      legend_lab = legend_lab, legend_position = legend_position,
+      ylimit = ylimit, bw_theme = bw_theme, palette = palette,
+      use_VizSampNames = use_VizSampNames
+    )
+  }
 }
 
 #' Plot metabData Object
@@ -5193,6 +5235,15 @@ plot.lipidData <- function(x, order_by = NULL, color_by = NULL,
 #'   \code{\link[RColorBrewer]{RColorBrewer}}.
 #' @param use_VizSampNames logical value. Indicates whether to use custom sample
 #'   names. The default is FALSE.
+#' @param plot_type character string specifying the plot type (either boxplot or heatmap)
+#' @param autoscale logical value. If TRUE data is autoscaled for heatmap. This argument
+#'   is not relevant for when plot_type is set to boxplot
+#' @param include_names logical value. If TRUE molecule names are included in heatmap. This argument
+#'   is not relevant for when plot_type is set to boxplot
+#' @param color_low character string of a color for the low values in heatmap. This argument
+#'   is not relevant character string of a color for the high values in heatmap. for when plot_type is set to boxplot
+#' @param color_high This argument
+#'   is not relevant for when plot_type is set to boxplot
 #' @param ... further arguments passed to or from other methods.
 #'
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
@@ -5214,7 +5265,9 @@ plot.metabData <- function(x, order_by = NULL, color_by = NULL,
                            title_lab = NULL, title_lab_size = 14,
                            legend_lab = NULL, legend_position = "right",
                            ylimit = NULL, bw_theme = TRUE, palette = NULL,
-                           use_VizSampNames = FALSE, ...) {
+                           use_VizSampNames = FALSE, plot_type = "boxplot",
+                           autoscale = FALSE, include_names = FALSE,
+                           color_low = "blue",color_high = "red",...) {
   # Make sure we only have valid arguments
   if (length(list(...)) > 0) {
     warning("unused argument(s): ",
@@ -5222,17 +5275,26 @@ plot.metabData <- function(x, order_by = NULL, color_by = NULL,
   }
 
   # Farm boy, make me a plot with a metabData object. As you wish.
-  plot_omicsData(
-    omicsData = x, order_by = order_by,
-    color_by = color_by, facet_by = facet_by,
-    facet_cols = facet_cols, interactive = interactive,
-    x_lab = x_lab, y_lab = y_lab, x_lab_size = x_lab_size,
-    y_lab_size = y_lab_size, x_lab_angle = x_lab_angle,
-    title_lab = title_lab, title_lab_size = title_lab_size,
-    legend_lab = legend_lab, legend_position = legend_position,
-    ylimit = ylimit, bw_theme = bw_theme, palette = palette,
-    use_VizSampNames = use_VizSampNames
-  )
+  if(plot_type == "heatmap"){
+    # checks for variables that are not 
+    omics_heatmap(omicsData = x, autoscale = autoscale, include_names = include_names,
+                  order_by = order_by,x_lab = x_lab, y_lab = y_lab,
+                  x_lab_size = x_lab_size, y_lab_size = y_lab_size,
+                  title_lab = title_lab, title_lab_size = title_lab_size,
+                  color_low = color_low, color_high = color_high)
+  } else {
+    plot_omicsData(
+      omicsData = x, order_by = order_by,
+      color_by = color_by, facet_by = facet_by,
+      facet_cols = facet_cols, interactive = interactive,
+      x_lab = x_lab, y_lab = y_lab, x_lab_size = x_lab_size,
+      y_lab_size = y_lab_size, x_lab_angle = x_lab_angle,
+      title_lab = title_lab, title_lab_size = title_lab_size,
+      legend_lab = legend_lab, legend_position = legend_position,
+      ylimit = ylimit, bw_theme = bw_theme, palette = palette,
+      use_VizSampNames = use_VizSampNames
+    )
+  }
 }
 
 #' Plot nmrData Object
@@ -5279,6 +5341,16 @@ plot.metabData <- function(x, order_by = NULL, color_by = NULL,
 #'   \code{\link[RColorBrewer]{RColorBrewer}}.
 #' @param use_VizSampNames logical value. Indicates whether to use custom sample
 #'   names. The default is FALSE.
+#' @param plot_type character string specifying the plot type (either boxplot or heatmap)
+#' @param autoscale logical value. If TRUE data is autoscaled for heatmap. This argument
+#'   is not relevant for when plot_type is set to boxplot
+#' @param include_names logical value. If TRUE molecule names are included in heatmap. This argument
+#'   is not relevant for when plot_type is set to boxplot
+#' @param color_low character string of a color for the low values in heatmap. This argument
+#'   is not relevant character string of a color for the high values in heatmap. for when plot_type is set to boxplot
+#' @param color_high This argument
+#'   is not relevant for when plot_type is set to boxplot
+#' @param ... further arguments passed to or from other methods.
 #' @param ... further arguments passed to or from other methods.
 #'
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
@@ -5300,25 +5372,36 @@ plot.nmrData <- function(x, order_by = NULL, color_by = NULL,
                          title_lab = NULL, title_lab_size = 14,
                          legend_lab = NULL, legend_position = "right",
                          ylimit = NULL, bw_theme = TRUE, palette = NULL,
-                         use_VizSampNames = FALSE, ...) {
+                         use_VizSampNames = FALSE, plot_type = "boxplot",
+                         autoscale = FALSE, include_names = FALSE,
+                         color_low = "blue",color_high = "red", ...) {
   # Make sure we only have valid arguments
   if (length(list(...)) > 0) {
     warning("unused argument(s): ",
              toString(as.list(tail(match.call(), length(list(...))))))
   }
-
-  # Farm boy, make me a plot with a nmrData object. As you wish.
-  plot_omicsData(
-    omicsData = x, order_by = order_by,
-    color_by = color_by, facet_by = facet_by,
-    facet_cols = facet_cols, interactive = interactive,
-    x_lab = x_lab, y_lab = y_lab, x_lab_size = x_lab_size,
-    y_lab_size = y_lab_size, x_lab_angle = x_lab_angle,
-    title_lab = title_lab, title_lab_size = title_lab_size,
-    legend_lab = legend_lab, legend_position = legend_position,
-    ylimit = ylimit, bw_theme = bw_theme, palette = palette,
-    use_VizSampNames = use_VizSampNames
-  )
+  
+  # Farm boy, make me a plot with a metabData object. As you wish.
+  if(plot_type == "heatmap"){
+    # checks for variables that are not 
+    omics_heatmap(omicsData = x, autoscale = autoscale, include_names = include_names,
+                  order_by = order_by,x_lab = x_lab, y_lab = y_lab,
+                  x_lab_size = x_lab_size, y_lab_size = y_lab_size,
+                  title_lab = title_lab, title_lab_size = title_lab_size,
+                  color_low = color_low, color_high = color_high)
+  } else {
+    plot_omicsData(
+      omicsData = x, order_by = order_by,
+      color_by = color_by, facet_by = facet_by,
+      facet_cols = facet_cols, interactive = interactive,
+      x_lab = x_lab, y_lab = y_lab, x_lab_size = x_lab_size,
+      y_lab_size = y_lab_size, x_lab_angle = x_lab_angle,
+      title_lab = title_lab, title_lab_size = title_lab_size,
+      legend_lab = legend_lab, legend_position = legend_position,
+      ylimit = ylimit, bw_theme = bw_theme, palette = palette,
+      use_VizSampNames = use_VizSampNames
+    )
+  }
 }
 
 #' Plot seqData Object
@@ -5461,6 +5544,16 @@ plot.seqData <- function(x, order_by = NULL, color_by = NULL,
 #'   \code{\link[RColorBrewer]{RColorBrewer}}.
 #' @param use_VizSampNames logical value. Indicates whether to use custom sample
 #'   names. The default is FALSE.
+#' @param plot_type character string specifying the plot type (either boxplot or heatmap)
+#' @param autoscale logical value. If TRUE data is autoscaled for heatmap. This argument
+#'   is not relevant for when plot_type is set to boxplot
+#' @param include_names logical value. If TRUE molecule names are included in heatmap. This argument
+#'   is not relevant for when plot_type is set to boxplot
+#' @param color_low character string of a color for the low values in heatmap. This argument
+#'   is not relevant character string of a color for the high values in heatmap. for when plot_type is set to boxplot
+#' @param color_high This argument
+#'   is not relevant for when plot_type is set to boxplot
+#' @param ... further arguments passed to or from other methods.
 #' @param ... further arguments passed to or from other methods.
 #'
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
@@ -5483,25 +5576,36 @@ plot.pepData <- function(x, order_by = NULL, color_by = NULL,
                          title_lab = NULL, title_lab_size = 14,
                          legend_lab = NULL, legend_position = "right",
                          ylimit = NULL, bw_theme = TRUE, palette = NULL,
-                         use_VizSampNames = FALSE, ...) {
+                         use_VizSampNames = FALSE, plot_type = "boxplot",
+                         autoscale = FALSE, include_names = FALSE,
+                         color_low = "blue",color_high = "red",...) {
   # Make sure we only have valid arguments
   if (length(list(...)) > 0) {
     warning("unused argument(s): ",
              toString(as.list(tail(match.call(), length(list(...))))))
   }
-
-  # Farm boy, make me a plot with a pepData object. As you wish.
-  plot_omicsData(
-    omicsData = x, order_by = order_by,
-    color_by = color_by, facet_by = facet_by,
-    facet_cols = facet_cols, interactive = interactive,
-    x_lab = x_lab, y_lab = y_lab, x_lab_size = x_lab_size,
-    y_lab_size = y_lab_size, x_lab_angle = x_lab_angle,
-    title_lab = title_lab, title_lab_size = title_lab_size,
-    legend_lab = legend_lab, legend_position = legend_position,
-    ylimit = ylimit, bw_theme = bw_theme, palette = palette,
-    use_VizSampNames = use_VizSampNames
-  )
+  
+  # Farm boy, make me a plot with a metabData object. As you wish.
+  if(plot_type == "heatmap"){
+    # checks for variables that are not 
+    omics_heatmap(omicsData = x, autoscale = autoscale, include_names = include_names,
+                  order_by = order_by,x_lab = x_lab, y_lab = y_lab,
+                  x_lab_size = x_lab_size, y_lab_size = y_lab_size,
+                  title_lab = title_lab, title_lab_size = title_lab_size,
+                  color_low = color_low, color_high = color_high)
+  } else {
+    plot_omicsData(
+      omicsData = x, order_by = order_by,
+      color_by = color_by, facet_by = facet_by,
+      facet_cols = facet_cols, interactive = interactive,
+      x_lab = x_lab, y_lab = y_lab, x_lab_size = x_lab_size,
+      y_lab_size = y_lab_size, x_lab_angle = x_lab_angle,
+      title_lab = title_lab, title_lab_size = title_lab_size,
+      legend_lab = legend_lab, legend_position = legend_position,
+      ylimit = ylimit, bw_theme = bw_theme, palette = palette,
+      use_VizSampNames = use_VizSampNames
+    )
+  }
 }
 
 #' Plot proData Object
@@ -5548,6 +5652,16 @@ plot.pepData <- function(x, order_by = NULL, color_by = NULL,
 #'   \code{\link[RColorBrewer]{RColorBrewer}}.
 #' @param use_VizSampNames logical value. Indicates whether to use custom sample
 #'   names. The default is FALSE.
+#' @param plot_type character string specifying the plot type (either boxplot or heatmap)
+#' @param autoscale logical value. If TRUE data is autoscaled for heatmap. This argument
+#'   is not relevant for when plot_type is set to boxplot
+#' @param include_names logical value. If TRUE molecule names are included in heatmap. This argument
+#'   is not relevant for when plot_type is set to boxplot
+#' @param color_low character string of a color for the low values in heatmap. This argument
+#'   is not relevant character string of a color for the high values in heatmap. for when plot_type is set to boxplot
+#' @param color_high This argument
+#'   is not relevant for when plot_type is set to boxplot
+#' @param ... further arguments passed to or from other methods.
 #' @param ... further arguments passed to or from other methods.
 #'
 #' @return ggplot2 plot object if interactive is FALSE, or plotly plot object if
@@ -5568,25 +5682,36 @@ plot.proData <- function(x, order_by = NULL, color_by = NULL,
                          title_lab = NULL, title_lab_size = 14,
                          legend_lab = NULL, legend_position = "right",
                          ylimit = NULL, bw_theme = TRUE, palette = NULL,
-                         use_VizSampNames = FALSE, ...) {
+                         use_VizSampNames = FALSE, plot_type = "boxplot",
+                         autoscale = FALSE, include_names = FALSE,
+                         color_low = "blue",color_high = "red", ...) {
   # Make sure we only have valid arguments
   if (length(list(...)) > 0) {
     warning("unused argument(s): ",
              toString(as.list(tail(match.call(), length(list(...))))))
   }
 
-  # Farm boy, make me a plot with a proData object. As you wish.
-  plot_omicsData(
-    omicsData = x, order_by = order_by,
-    color_by = color_by, facet_by = facet_by,
-    facet_cols = facet_cols, interactive = interactive,
-    x_lab = x_lab, y_lab = y_lab, x_lab_size = x_lab_size,
-    y_lab_size = y_lab_size, x_lab_angle = x_lab_angle,
-    title_lab = title_lab, title_lab_size = title_lab_size,
-    legend_lab = legend_lab, legend_position = legend_position,
-    ylimit = ylimit, bw_theme = bw_theme, palette = palette,
-    use_VizSampNames = use_VizSampNames
-  )
+  # Farm boy, make me a plot with a metabData object. As you wish.
+  if(plot_type == "heatmap"){
+    # checks for variables that are not 
+    omics_heatmap(omicsData = x, autoscale = autoscale, include_names = include_names,
+                  order_by = order_by,x_lab = x_lab, y_lab = y_lab,
+                  x_lab_size = x_lab_size, y_lab_size = y_lab_size,
+                  title_lab = title_lab, title_lab_size = title_lab_size,
+                  color_low = color_low, color_high = color_high)
+  } else {
+    plot_omicsData(
+      omicsData = x, order_by = order_by,
+      color_by = color_by, facet_by = facet_by,
+      facet_cols = facet_cols, interactive = interactive,
+      x_lab = x_lab, y_lab = y_lab, x_lab_size = x_lab_size,
+      y_lab_size = y_lab_size, x_lab_angle = x_lab_angle,
+      title_lab = title_lab, title_lab_size = title_lab_size,
+      legend_lab = legend_lab, legend_position = legend_position,
+      ylimit = ylimit, bw_theme = bw_theme, palette = palette,
+      use_VizSampNames = use_VizSampNames
+    )
+  }
 }
 
 # The function that does all the heavy lifting for the isobaricpepData,
@@ -7440,7 +7565,7 @@ statres_histogram <-
 #' omics_heatmap(mymetab, order_by = "Phenotype", autoscale = TRUE,
 #'    x_lab = "SampleID", y_lab = "Autoscaled Abundance")
 #'
-#' @export
+#' @keywords internal
 #'
 omics_heatmap <- function(omicsData, autoscale = FALSE, include_names = FALSE,
                           order_by = NULL,
@@ -7464,6 +7589,11 @@ omics_heatmap <- function(omicsData, autoscale = FALSE, include_names = FALSE,
                "'metabData', 'nmrData', 'pepData', 'proData'.",
                sep = " "
     ))
+  }
+  
+  # check omicsData is on log2 scale
+  if(get_data_scale(omicsData) != "log2"){
+    stop(paste("omicsData must be on the log2 scale for heatmap"))
   }
   
   # order_by must be a character of length 1
@@ -7583,6 +7713,7 @@ omics_heatmap <- function(omicsData, autoscale = FALSE, include_names = FALSE,
   edata_cname = pmartR::get_edata_cname(omicsData)
   fdata_cname = pmartR::get_fdata_cname(omicsData)
   
+  rownames(omicsData$e_data) <- NULL
   # convert edata to a matrix
   edata <- omicsData$e_data %>%
     tibble::column_to_rownames(var = edata_cname)

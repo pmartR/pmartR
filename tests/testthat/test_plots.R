@@ -282,21 +282,27 @@ test_that('plot functions are producing desired output',{
   
   myiso <- edata_transform(omicsData = isobaric_object, data_scale = "log2")
   expect_doppelganger_ci("plot.isobaricpepData", plot(myiso))
+  expect_doppelganger_ci("plot.isobaricpepData", plot(myiso,plot_type = "heatmap"))
   
   mylipid <- edata_transform(omicsData = lipid_pos_object, data_scale = "log2")
   expect_doppelganger_ci("plot.lipidData", plot(mylipid, order_by = "Condition", color_by = "Condition"))
+  expect_doppelganger_ci("plot.lipidData", plot(mylipid, order_by = "Condition",plot_type = "heatmap"))
   
   mymetab <- edata_transform(omicsData = metab_object, data_scale = "log2")
   expect_doppelganger_ci("plot.metabData", plot(mymetab, order_by = "Condition", color_by = "Condition"))
+  expect_doppelganger_ci("plot.metabData", plot(mymetab, order_by = "Condition",plot_type = "heatmap"))
   
   mynmr <- edata_transform(omicsData = nmr_identified_object, data_scale = "log2")
   expect_doppelganger_ci("plot.nmrData", plot(mynmr, order_by = "Condition", color_by = "Condition"))
+  expect_doppelganger_ci("plot.nmrData", plot(mynmr, order_by = "Condition",plot_type = "heatmap"))
   
   mypep <- edata_transform(omicsData = pep_object, data_scale = "log2")
   expect_doppelganger_ci("plot.pepData", plot(mypep, order_by = "Condition", color_by = "Condition"))
+  expect_doppelganger_ci("plot.pepData", plot(mypep, order_by = "Condition",plot_type = "heatmap"))
   
   mypro <- edata_transform(omicsData = pro_object, data_scale = "log2")
-  expect_doppelganger_ci("plot.proData", plot(pro_object, order_by = "Condition", color_by = "Condition"))
+  expect_doppelganger_ci("plot.proData", plot(mypro, order_by = "Condition", color_by = "Condition"))
+  expect_doppelganger_ci("plot.proData", plot(mypro, order_by = "Condition",plot_type = "heatmap"))
   
   myseq <- group_designation(omicsData = rnaseq_object, main_effects = "Tissue")
   expect_doppelganger_ci("plot.seqData", plot(rnaseq_object, transformation = "lcpm"))
