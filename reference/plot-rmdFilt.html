@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pmartR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.5.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.5.1</span>
       </span>
     </div>
 
@@ -75,7 +75,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Plot rmdFilt Object</h1>
-    <small class="dont-index">Source: <a href="https://github.com/pmartR/pmartR/blob/v2.5.0/R/plot_fns.R" class="external-link"><code>R/plot_fns.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/pmartR/pmartR/blob/v2.5.1/R/plot_fns.R" class="external-link"><code>R/plot_fns.R</code></a></small>
     <div class="hidden name"><code>plot-rmdFilt.Rd</code></div>
     </div>
 
@@ -90,7 +90,9 @@
 <span>  pvalue_threshold <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  sampleID <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  order_by <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  color_by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  interactive <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  hist <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  x_lab <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  y_lab <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  x_lab_size <span class="op">=</span> <span class="fl">11</span>,</span>
@@ -118,11 +120,11 @@
 
 <dt id="arg-pvalue-threshold">pvalue_threshold<a class="anchor" aria-label="anchor" href="#arg-pvalue-threshold"></a></dt>
 <dd><p>numeric threshold for the Robust Mahalanobis Distance (RMD)
-p-value. If <code>sampleID</code> is NULL (see <code>sampleID</code> below), a
-horizontal line is plotted at the RMD value that corresponds with the
-threshold, and all samples above the line have a p-value below the
-threshold. If <code>sampleID</code> is not NULL, <code>pvalue_threshold</code> will do
-nothing. Default value is NULL.</p></dd>
+  p-value. If <code>sampleID</code> is NULL (see <code>sampleID</code> below), a
+  horizontal line is plotted at the RMD value that corresponds with the
+  threshold, and all samples above the line have a p-value below the
+  threshold. If <code>sampleID</code> is not NULL or <code>hist</code> is TRUE,
+.  <code>pvalue_threshold</code> will do nothing. Default value is NULL.</p></dd>
 
 
 <dt id="arg-sampleid">sampleID<a class="anchor" aria-label="anchor" href="#arg-sampleid"></a></dt>
@@ -138,11 +140,24 @@ the samples in the plot. This variable must be found in the column names of
 fdata from the rmdFilt object. If <code>order_by</code> is "Group", the plot will
 be ordered by the group variable from the group_designation function. If
 NULL (default), the samples will be displayed in the order in which they
-first appear.</p></dd>
+first appear. Only applicable where <code>sampleID</code> = NULL and <code>hist</code> = FALSE.</p></dd>
+
+
+<dt id="arg-color-by">color_by<a class="anchor" aria-label="anchor" href="#arg-color-by"></a></dt>
+<dd><p>character string specifying a variable by which to order
+the samples in the plot. This variable must be found in the column names of
+fdata from the rmdFilt object. If <code>color_by</code> is "Group" or NULL, the plot will
+be colored by the group variable from the group_designation function. Only
+applicable where <code>sampleID</code> = NULL.</p></dd>
 
 
 <dt id="arg-interactive">interactive<a class="anchor" aria-label="anchor" href="#arg-interactive"></a></dt>
 <dd><p>logical value. If TRUE produces an interactive plot.</p></dd>
+
+
+<dt id="arg-hist">hist<a class="anchor" aria-label="anchor" href="#arg-hist"></a></dt>
+<dd><p>boolean value that changes default scatter plot to a histogram
+displaying the distribution of all used RMD metrics.</p></dd>
 
 
 <dt id="arg-x-lab">x_lab<a class="anchor" aria-label="anchor" href="#arg-x-lab"></a></dt>
@@ -239,7 +254,7 @@ names. The default is FALSE.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
       </footer></div>

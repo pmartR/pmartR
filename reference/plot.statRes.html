@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pmartR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.5.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.5.1</span>
       </span>
     </div>
 
@@ -75,7 +75,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Plot statRes Object</h1>
-    <small class="dont-index">Source: <a href="https://github.com/pmartR/pmartR/blob/v2.5.0/R/plot_fns.R" class="external-link"><code>R/plot_fns.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/pmartR/pmartR/blob/v2.5.1/R/plot_fns.R" class="external-link"><code>R/plot_fns.R</code></a></small>
     <div class="hidden name"><code>plot.statRes.Rd</code></div>
     </div>
 
@@ -141,7 +141,10 @@ change less than <code>abs(fc_threshold)</code> are colored as 'non-significant'
 <dd><p>vector of length three with character color values
 interpretable by ggplot. i.e. c("orange", "black", "blue") with the values
 being used to color negative, non-significant, and positive fold changes
-respectively</p></dd>
+respectively. When <code>plot_type = "histogram"</code>, this a vector of length two
+with character color values interpretable by ggplot. i.e. c("green","gray") with the
+values being used to color significant (regardless of direction)
+and non-significant fold changes</p></dd>
 
 
 <dt id="arg-stacked">stacked<a class="anchor" aria-label="anchor" href="#arg-stacked"></a></dt>
@@ -152,7 +155,9 @@ change sections in the barplot, defaults to TRUE</p></dd>
 <dt id="arg-show-sig">show_sig<a class="anchor" aria-label="anchor" href="#arg-show-sig"></a></dt>
 <dd><p>This input is used when <code>plot_type = "gheatmap"</code>. A
 logical value. If TRUE a visual indicator that a certain bin combination is
-significant by the g-test is shown.</p></dd>
+significant by the g-test is shown. This input is also used when
+when <code>plot_type = "histogram"</code>. If TRUE, only significant fold changes
+will be plotted.</p></dd>
 
 
 <dt id="arg-color-low">color_low<a class="anchor" aria-label="anchor" href="#arg-color-low"></a></dt>
@@ -270,6 +275,8 @@ own range. The default is FALSE.</p></dd>
  number of biomolecules that fall into that combination of nonmissing values.</p></li>
 <li><p>"fcheatmap" Heatmap showing all biomolecules across comparisons,
  colored by fold change.</p></li>
+<li><p>"histogram" Histogram showing the distribution of log2 fold changes
+ across comparisons, colored by significance level status</p></li>
 </ul></div>
 
     <div id="ref-examples">
@@ -319,7 +326,7 @@ own range. The default is FALSE.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
       </footer></div>
