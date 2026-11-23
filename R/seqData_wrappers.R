@@ -1286,7 +1286,7 @@ dispersion_est <- function(omicsData, method,
     dds <- DESeq2::estimateDispersions(dds)
 
     ## only plots for those above 0
-    df1 <- as.data.frame(check.names = FALSE, S4Vectors::mcols(dds))
+    df1 <- as.data.frame(optional = TRUE, S4Vectors::mcols(dds))
 
     ## Plot
     p <- ggplot2::ggplot(
