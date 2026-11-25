@@ -447,7 +447,7 @@ Here we utilize rrollup.
 
 ```{r protein_quant}
 mypro <- protein_quant(
-  pepData = mypep,
+  pepData = mynorm,
   method = "rrollup",
   combine_fn = "median"
 )
